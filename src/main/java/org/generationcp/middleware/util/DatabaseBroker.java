@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.util;
@@ -29,6 +29,7 @@ import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ExperimentPhenotypeDao;
@@ -88,7 +89,7 @@ import org.hibernate.Transaction;
 /**
  * Used to handle DAO instances and sessions connecting to the database. Superclass of DataManager, Builder, Searcher and Saver classes.
  * Maintains session for local and central connection.
- *
+ * 
  * @author Joyce Avestro
  */
 
@@ -148,15 +149,15 @@ public class DatabaseBroker {
 
 	protected DmsProjectDao getDmsProjectDao() {
 		DmsProjectDao dmsProjectDao = new DmsProjectDao();
-		 dmsProjectDao.setSession(this.getActiveSession());
-		 return dmsProjectDao;
-	 }
+		dmsProjectDao.setSession(this.getActiveSession());
+		return dmsProjectDao;
+	}
 
 	protected CVTermDao getCvTermDao() {
 		CVTermDao cvTermDao = new CVTermDao();
 		cvTermDao.setSession(this.getActiveSession());
-		 return cvTermDao;
-	 }
+		return cvTermDao;
+	}
 
 	protected StandardVariableDao getStandardVariableDao() {
 		return new StandardVariableDao(this.getActiveSession());
@@ -169,8 +170,8 @@ public class DatabaseBroker {
 	protected CVTermRelationshipDao getCvTermRelationshipDao() {
 		CVTermRelationshipDao cvTermRelationshipDao = new CVTermRelationshipDao();
 		cvTermRelationshipDao.setSession(this.getActiveSession());
-		 return cvTermRelationshipDao;
-	 }
+		return cvTermRelationshipDao;
+	}
 
 	protected CountryDAO getCountryDao() {
 		CountryDAO countryDao = new CountryDAO();
@@ -248,15 +249,15 @@ public class DatabaseBroker {
 		if (this.projectPropertyDao == null) {
 			this.projectPropertyDao = new ProjectPropertyDao();
 		}
-		 this.projectPropertyDao.setSession(this.getActiveSession());
-		 return this.projectPropertyDao;
-	 }
+		this.projectPropertyDao.setSession(this.getActiveSession());
+		return this.projectPropertyDao;
+	}
 
 	protected ProjectRelationshipDao getProjectRelationshipDao() {
 		ProjectRelationshipDao projectRelationshipDao = new ProjectRelationshipDao();
-		 projectRelationshipDao.setSession(this.getActiveSession());
-		 return projectRelationshipDao;
-	 }
+		projectRelationshipDao.setSession(this.getActiveSession());
+		return projectRelationshipDao;
+	}
 
 	protected GeolocationDao getGeolocationDao() {
 		GeolocationDao geolocationDao = new GeolocationDao();
@@ -500,9 +501,9 @@ public class DatabaseBroker {
 
 	protected LocationDAO getLocationDAO() {
 		LocationDAO locationDao = new LocationDAO();
-		 locationDao.setSession(this.getActiveSession());
-		 return locationDao;
-	 }
+		locationDao.setSession(this.getActiveSession());
+		return locationDao;
+	}
 
 	protected LocdesDAO getLocdesDao() {
 		LocdesDAO locdesDao = new LocdesDAO();
@@ -511,34 +512,34 @@ public class DatabaseBroker {
 	}
 
 	public ProgramFavoriteDAO getProgramFavoriteDao() {
-		 ProgramFavoriteDAO programFavoriteDao = new ProgramFavoriteDAO();
-		 programFavoriteDao.setSession(this.getActiveSession());
-		 return programFavoriteDao;
-	 }
+		ProgramFavoriteDAO programFavoriteDao = new ProgramFavoriteDAO();
+		programFavoriteDao.setSession(this.getActiveSession());
+		return programFavoriteDao;
+	}
 
 	protected GermplasmListDAO getGermplasmListDAO() {
 		if (this.germplasmListDao == null) {
 			this.germplasmListDao = new GermplasmListDAO();
-		 }
-		 this.germplasmListDao.setSession(this.getActiveSession());
-		 return this.germplasmListDao;
-	 }
+		}
+		this.germplasmListDao.setSession(this.getActiveSession());
+		return this.germplasmListDao;
+	}
 
 	public void setGermplasmListDao(GermplasmListDAO germplasmListDao) {
-		 this.germplasmListDao = germplasmListDao;
-	 }
+		this.germplasmListDao = germplasmListDao;
+	}
 
 	protected GermplasmListDataDAO getGermplasmListDataDAO() {
-		 GermplasmListDataDAO germplasmListDataDao = new GermplasmListDataDAO();
-		 germplasmListDataDao.setSession(this.getActiveSession());
-		 return germplasmListDataDao;
-	 }
+		GermplasmListDataDAO germplasmListDataDao = new GermplasmListDataDAO();
+		germplasmListDataDao.setSession(this.getActiveSession());
+		return germplasmListDataDao;
+	}
 
-	 protected ListDataPropertyDAO getListDataPropertyDAO() {
+	protected ListDataPropertyDAO getListDataPropertyDAO() {
 		ListDataPropertyDAO listDataPropertyDao = new ListDataPropertyDAO();
-		 listDataPropertyDao.setSession(this.getActiveSession());
-		 return listDataPropertyDao;
-	 }
+		listDataPropertyDao.setSession(this.getActiveSession());
+		return listDataPropertyDao;
+	}
 
 	protected ListDataProjectDAO getListDataProjectDAO() {
 		ListDataProjectDAO listDataProjectDao = new ListDataProjectDAO();
@@ -595,8 +596,14 @@ public class DatabaseBroker {
 		}
 	}
 
+	public UserProgramTreeStateDAO getUserProgramTreeStateDAO() {
+		UserProgramTreeStateDAO userProgramTreeStateDAO = new UserProgramTreeStateDAO();
+		userProgramTreeStateDAO.setSession(getActiveSession());
+		return userProgramTreeStateDAO;
+	}
+
 	public void setProjectPropertyDao(ProjectPropertyDao projectPropertyDao) {
-		 this.projectPropertyDao = projectPropertyDao;
-	 }
+		this.projectPropertyDao = projectPropertyDao;
+	}
 
 }
