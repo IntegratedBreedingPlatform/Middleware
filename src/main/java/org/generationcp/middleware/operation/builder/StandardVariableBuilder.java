@@ -18,13 +18,13 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.domain.ontology.OntologyVariableSummary;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -183,11 +183,15 @@ public class StandardVariableBuilder extends Builder {
 				getDataType(dataTypeString),null,null,null);
 		Term method = this.getTermBuilder().findOrSaveMethod(methodName,methodName);
 
-		List<OntologyVariableSummary> ontologyVariableSummaryList  = 
-				getOntologyVariableDataManager().getWithFilter(
-						programUUID, false, method.getId(), property.getId(), scale.getId());
+		VariableFilter filterOpts = new VariableFilter();
+		filterOpts.setProgramUuid(programUUID);
+		filterOpts.addPropertyId(property.getId());
+		filterOpts.addMethodId(method.getId());
+		filterOpts.addScaleId(scale.getId());
+
+		List<Variable> variableList = getOntologyVariableDataManager().getWithFilter(filterOpts);
 		StandardVariable standardVariable = null;
-		if (ontologyVariableSummaryList == null || ontologyVariableSummaryList.isEmpty()) {
+		if (variableList == null || variableList.isEmpty()) {
 			OntologyVariableInfo variableInfo = createOntologyVariableInfo(
 					name, description, method.getId(), 
 					property.getId(), scale.getId(), programUUID, 
@@ -196,8 +200,8 @@ public class StandardVariableBuilder extends Builder {
 			standardVariable = create(variableInfo.getId(),programUUID);
 			standardVariable.setPhenotypicType(role);
 		} else {
-			OntologyVariableSummary ontologyVariableSummary = ontologyVariableSummaryList.get(0);
-			standardVariable = create(ontologyVariableSummary.getId(),programUUID);
+			Variable variable = variableList.get(0);
+			standardVariable = create(variable.getId(), programUUID);
 			standardVariable.setPhenotypicType(role);
 		}
 

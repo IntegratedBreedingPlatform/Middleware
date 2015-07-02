@@ -3,17 +3,10 @@ package org.generationcp.middleware.manager.ontology;
 
 import com.google.common.base.Function;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.domain.ontology.Method;
-import org.generationcp.middleware.domain.ontology.Property;
-import org.generationcp.middleware.domain.ontology.Scale;
-import org.generationcp.middleware.domain.ontology.TermRelationshipId;
-import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.ontology.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -22,6 +15,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManage
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableInfoDaoElements;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
@@ -376,13 +370,6 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		});
 
 		return variables;
-	}
-
-	@Override
-	public void processTreatmentFactorHasPairValue(List<OntologyVariableSummary> summaryList, List<Integer> hiddenFields) throws MiddlewareException {
-		for (OntologyVariableSummary ontologyVariableSummary : summaryList) {
-			ontologyVariableSummary.setHasPair(getCvTermDao().hasPossibleTreatmentPairs(ontologyVariableSummary.getTerm().getId(), ontologyVariableSummary.getPropertySummary().getId(), hiddenFields));
-		}
 	}
 
 	@Override

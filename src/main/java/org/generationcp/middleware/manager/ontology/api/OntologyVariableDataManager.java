@@ -12,14 +12,12 @@
 
 package org.generationcp.middleware.manager.ontology.api;
 
-import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * This is the API for retrieving ontology variable data.
@@ -35,7 +33,6 @@ public interface OntologyVariableDataManager {
 	 */
 	List<Variable> getWithFilter(VariableFilter variableFilter) throws MiddlewareException;
 
-	void processTreatmentFactorHasPairValue(List<OntologyVariableSummary> summaryList, List<Integer> hiddenFields) throws MiddlewareException;
 	/**
 	 * Return variable by Id * @return Variable
 	 * 
