@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -37,6 +37,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataMana
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.InventoryServiceImpl;
@@ -58,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * The {@link ManagerFactory} is a convenience class intended to provide methods to get instances of the Manager/Service implementations
  * provided by the Middleware.
  * </p>
- *
+ * 
  * @author Kevin Manansala
  * @author Glenn Marintes
  */
@@ -77,15 +78,15 @@ public class ManagerFactory implements Serializable {
 	private static ThreadLocal<ManagerFactory> currentManagerFactory = new ThreadLocal<ManagerFactory>();
 
 	public ManagerFactory() {
-		ManagerFactory.currentManagerFactory.set(this);
+		currentManagerFactory.set(this);
 	}
 
 	public static ThreadLocal<ManagerFactory> getCurrentManagerFactoryThreadLocal() {
-		return ManagerFactory.currentManagerFactory;
+		return currentManagerFactory;
 	}
 
 	public SessionFactory getsessionFactory() {
-		return this.sessionFactory;
+		return sessionFactory;
 	}
 
 	public void setsessionFactory(SessionFactory sessionFactory) {
@@ -93,7 +94,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public HibernateSessionProvider getSessionProvider() {
-		return this.sessionProvider;
+		return sessionProvider;
 	}
 
 	public void setSessionProvider(HibernateSessionProvider sessionProvider) {
@@ -101,27 +102,27 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public GermplasmDataManager getGermplasmDataManager() {
-		return new GermplasmDataManagerImpl(this.sessionProvider, this.databaseName);
+		return new GermplasmDataManagerImpl(sessionProvider, databaseName);
 	}
 
 	public PedigreeDataManager getPedigreeDataManager() {
-		return new PedigreeDataManagerImpl(this.sessionProvider, this.databaseName);
+		return new PedigreeDataManagerImpl(sessionProvider, databaseName);
 	}
 
 	public CrossStudyDataManager getCrossStudyDataManager() {
-		return new CrossStudyDataManagerImpl(this.sessionProvider);
+		return new CrossStudyDataManagerImpl(sessionProvider);
 	}
 
 	public GermplasmListManager getGermplasmListManager() {
-		return new GermplasmListManagerImpl(this.sessionProvider, this.databaseName);
+		return new GermplasmListManagerImpl(sessionProvider, databaseName);
 	}
 
 	public LocationDataManager getLocationDataManager() {
-		return new LocationDataManagerImpl(this.sessionProvider);
+		return new LocationDataManagerImpl(sessionProvider);
 	}
 
 	public OntologyDataManager getOntologyDataManager() {
-		return new OntologyDataManagerImpl(this.sessionProvider);
+		return new OntologyDataManagerImpl(sessionProvider);
 	}
 
 	public TermDataManager getTermDataManager() {
@@ -146,107 +147,111 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public PresetDataManager getPresetDataManager() {
-		return new PresetDataManagerImpl(this.sessionProvider);
+		return new PresetDataManagerImpl(sessionProvider);
 	}
 
 	public StudyDataManager getStudyDataManager() throws ConfigException {
-		return new StudyDataManagerImpl(this.sessionProvider);
+		return new StudyDataManagerImpl(sessionProvider);
 	}
 
 	public StudyDataManager getNewStudyDataManager() throws ConfigException {
-		return new StudyDataManagerImpl(this.sessionProvider, this.databaseName);
+		return new StudyDataManagerImpl(sessionProvider, databaseName);
 	}
 
 	public OntologyDataManager getNewOntologyDataManager() throws ConfigException {
-		return new OntologyDataManagerImpl(this.sessionProvider);
+		return new OntologyDataManagerImpl(sessionProvider);
 	}
 
 	public InventoryDataManager getInventoryDataManager() throws ConfigException {
-		return new InventoryDataManagerImpl(this.sessionProvider, this.databaseName);
+		return new InventoryDataManagerImpl(sessionProvider, databaseName);
+	}
+
+	public UserProgramStateDataManager getUserProgramStateDataManager() throws ConfigException {
+		return new UserProgramStateDataManagerImpl(sessionProvider);
 	}
 
 	public GenotypicDataManager getGenotypicDataManager() throws ConfigException {
-		return new GenotypicDataManagerImpl(this.sessionProvider);
+		return new GenotypicDataManagerImpl(sessionProvider);
 	}
 
 	public UserDataManager getUserDataManager() {
-		return new UserDataManagerImpl(this.sessionProvider);
+		return new UserDataManagerImpl(sessionProvider);
 	}
 
 	public FieldbookService getFieldbookMiddlewareService() throws ConfigException {
-		return new FieldbookServiceImpl(this.sessionProvider, this.databaseName);
+		return new FieldbookServiceImpl(sessionProvider, databaseName);
 	}
 
 	public InventoryService getInventoryMiddlewareService() throws ConfigException {
-		return new InventoryServiceImpl(this.sessionProvider, this.databaseName);
+		return new InventoryServiceImpl(sessionProvider, databaseName);
 	}
 
 	public DataImportService getDataImportService() throws ConfigException {
-		return new DataImportServiceImpl(this.sessionProvider);
+		return new DataImportServiceImpl(sessionProvider);
 	}
 
 	public OntologyService getOntologyService() throws ConfigException {
-		return new OntologyServiceImpl(this.sessionProvider);
+		return new OntologyServiceImpl(sessionProvider);
 	}
 
 	public MBDTDataManager getMbdtDataManager() {
-		return new MBDTDataManagerImpl(this.sessionProvider);
+		return new MBDTDataManagerImpl(sessionProvider);
 	}
 
 	public ReportService getReportService() throws ConfigException {
-		return new ReportServiceImpl(this.sessionProvider, this.databaseName);
+		return new ReportServiceImpl(sessionProvider, databaseName);
 	}
 
 	public PedigreeService getPedigreeService() {
-		return PedigreeFactory.getPedigreeService(this.sessionProvider, this.pedigreeProfile, this.cropName);
+		return PedigreeFactory.getPedigreeService(sessionProvider, pedigreeProfile, cropName);
 	}
 
 	/*
 	 * This was exposed so that it can be access in the jUnit
 	 */
 	public PedigreeService getPedigreeService(String profile, String crop) {
-		return PedigreeFactory.getPedigreeService(this.sessionProvider, profile, crop);
+		return PedigreeFactory.getPedigreeService(sessionProvider, profile, crop);
 	}
 
 	/**
 	 * Closes the db connection by shutting down the HibernateUtil object
 	 */
 	public void close() {
-		ManagerFactory.LOG.trace("Closing ManagerFactory...");
+		LOG.trace("Closing ManagerFactory...");
 
-		if (this.sessionProvider != null) {
-			this.sessionProvider.close();
+		if (sessionProvider != null) {
+			sessionProvider.close();
 		}
 
-		if (this.sessionFactory != null && !this.sessionFactory.isClosed()) {
-			this.sessionFactory.close();
+		if (sessionFactory != null && !sessionFactory.isClosed()) {
+			sessionFactory.close();
 		}
-		ManagerFactory.currentManagerFactory.remove();
-		ManagerFactory.LOG.trace("Closing ManagerFactory...Done.");
+		currentManagerFactory.remove();
+		LOG.trace("Closing ManagerFactory...Done.");
 	}
 
-	 public String getDatabaseName() {
-		 return this.databaseName;
-	 }
+	public String getDatabaseName() {
+		return databaseName;
+	}
 
-	 public void setDatabaseName(String localDatabaseName) {
-		 this.databaseName = localDatabaseName;
-	 }
+	public void setDatabaseName(String localDatabaseName) {
+		this.databaseName = localDatabaseName;
+	}
 
 	public String getCropName() {
-		 return this.cropName;
-	 }
+		return this.cropName;
+	}
 
-	 public void setCropName(String cropName) {
-		 this.cropName = cropName;
-	 }
+	public void setCropName(String cropName) {
+		this.cropName = cropName;
+	}
 
-	 public String getPedigreeProfile() {
-		 return this.pedigreeProfile;
-	 }
+	public String getPedigreeProfile() {
+		return this.pedigreeProfile;
+	}
 
-	 public void setPedigreeProfile(String pedigreeProfile) {
-		 this.pedigreeProfile = pedigreeProfile;
-	 }
+	public void setPedigreeProfile(String pedigreeProfile) {
+		this.pedigreeProfile = pedigreeProfile;
+	}
 
 }
