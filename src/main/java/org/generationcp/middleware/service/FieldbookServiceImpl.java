@@ -461,8 +461,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 					// Save name entries
 					for (Name name : germplasms.get(germplasm)) {
-						Integer nameId = nameDao.getNextId("nid");
-						name.setNid(nameId);
 						name.setGermplasmId(gId);
 						nameDao.save(name);
 					}

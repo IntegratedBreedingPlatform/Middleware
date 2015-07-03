@@ -436,11 +436,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			NameDAO dao = this.getNameDao();
 
 			for (Name name : names) {
-				if (operation == Operation.ADD) {
-					// Auto-assign IDs for new records
-					Integer nextId = dao.getNextId("nid");
-					name.setNid(nextId);
-				}
 				Name recordAdded = dao.saveOrUpdate(name);
 				idNamesSaved.add(recordAdded.getNid());
 				namesSaved++;
@@ -1018,9 +1013,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				// Auto-assign IDs for new DB records
 				Integer nextId = dao.getNextId("gid");
 				germplasm.setGid(nextId);
-				
-				Integer nameId = nameDao.getNextId("nid");
-				name.setNid(nameId);
+
 				name.setNstat(Integer.valueOf(1));
 				name.setGermplasmId(nextId);
 

@@ -13,11 +13,7 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * POJO for names table.
@@ -41,6 +37,7 @@ public class Name implements Serializable {
 	public static final String GET_PREFFERED_NAMES_BY_GIDS = "SELECT gid, nval " + "FROM names " + "WHERE nstat = 1 AND gid IN (:gids)";
 
 	@Id
+	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "nid")
 	private Integer nid;
