@@ -129,8 +129,8 @@ public class VariableDataManagerImplTest extends DataManagerIntegrationTest {
 		VariableDataManagerImplTest.testVariableInfo.setPropertyId(VariableDataManagerImplTest.testProperty.getId());
 		VariableDataManagerImplTest.testVariableInfo.setScaleId(VariableDataManagerImplTest.testScale.getId());
 		VariableDataManagerImplTest.testVariableInfo.setAlias("My alias");
-		VariableDataManagerImplTest.testVariableInfo.setMinValue("0");
-		VariableDataManagerImplTest.testVariableInfo.setMaxValue("100");
+		VariableDataManagerImplTest.testVariableInfo.setExpectedMin("0");
+		VariableDataManagerImplTest.testVariableInfo.setExpectedMax("100");
 		VariableDataManagerImplTest.testVariableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
 		VariableDataManagerImplTest.testVariableInfo.addVariableType(VariableType.ANALYSIS);
 		VariableDataManagerImplTest.testVariableInfo.setIsFavorite(true);

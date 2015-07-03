@@ -87,8 +87,8 @@ public class TermDataManagerImplTest extends DataManagerIntegrationTest {
 		TermDataManagerImplTest.testVariableInfo.setPropertyId(TermDataManagerImplTest.testProperty.getId());
 		TermDataManagerImplTest.testVariableInfo.setScaleId(TermDataManagerImplTest.testScale.getId());
 		TermDataManagerImplTest.testVariableInfo.setAlias("My alias");
-		TermDataManagerImplTest.testVariableInfo.setMinValue("0");
-		TermDataManagerImplTest.testVariableInfo.setMaxValue("100");
+		TermDataManagerImplTest.testVariableInfo.setExpectedMin("0");
+		TermDataManagerImplTest.testVariableInfo.setExpectedMax("100");
 		TermDataManagerImplTest.testVariableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
 		TermDataManagerImplTest.testVariableInfo.addVariableType(VariableType.ANALYSIS);
 		TermDataManagerImplTest.testVariableInfo.setIsFavorite(true);

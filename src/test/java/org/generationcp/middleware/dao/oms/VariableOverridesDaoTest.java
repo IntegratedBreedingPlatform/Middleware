@@ -33,8 +33,8 @@ public class VariableOverridesDaoTest extends MiddlewareIntegrationTest {
 				VariableOverridesDaoTest.dao.getByVariableAndProgram(VariableOverridesDaoTest.variableId,
 						VariableOverridesDaoTest.programId);
 		Assert.assertEquals(overrides.getAlias(), dbOverrides.getAlias());
-		Assert.assertEquals(overrides.getMinValue(), dbOverrides.getMinValue());
-		Assert.assertEquals(overrides.getMaxValue(), dbOverrides.getMaxValue());
+		Assert.assertEquals(overrides.getExpectedMin(), dbOverrides.getExpectedMin());
+		Assert.assertEquals(overrides.getExpectedMax(), dbOverrides.getExpectedMax());
 	}
 
 	@AfterClass

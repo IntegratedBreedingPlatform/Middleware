@@ -57,8 +57,8 @@ public class VariableOverridesDao extends GenericDAO<VariableOverrides, Integer>
 		}
 
 		overrides.setAlias(alias);
-		overrides.setMinValue(minValue);
-		overrides.setMaxValue(maxValue);
+		overrides.setExpectedMin(minValue);
+		overrides.setExpectedMax(maxValue);
 		return this.merge(overrides);
 	}
 }

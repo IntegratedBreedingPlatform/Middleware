@@ -424,8 +424,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 				if (overrides != null) {
 					variable.setAlias(overrides.getAlias());
-					variable.setMinValue(overrides.getMinValue());
-					variable.setMaxValue(overrides.getMaxValue());
+					variable.setMinValue(overrides.getExpectedMin());
+					variable.setMaxValue(overrides.getExpectedMax());
 				}
 
 				// Get favorite from ProgramFavoriteDAO
@@ -494,9 +494,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			}
 
 			// Saving min max values
-			if (variableInfo.getMinValue() != null || variableInfo.getMaxValue() != null) {
+			if (variableInfo.getExpectedMin() != null || variableInfo.getExpectedMax() != null) {
 				this.getVariableProgramOverridesDao().save(variableInfo.getId(), variableInfo.getProgramUuid(), null,
-						variableInfo.getMinValue(), variableInfo.getMaxValue());
+						variableInfo.getExpectedMin(), variableInfo.getExpectedMax());
 			}
 
 			// Saving favorite
@@ -618,9 +618,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			}
 
 			// Saving alias, min, max values
-			if (variableInfo.getAlias() != null || variableInfo.getMinValue() != null || variableInfo.getMaxValue() != null) {
+			if (variableInfo.getAlias() != null || variableInfo.getExpectedMin() != null || variableInfo.getExpectedMax() != null) {
 				this.getVariableProgramOverridesDao().save(variableInfo.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias(),
-						variableInfo.getMinValue(), variableInfo.getMaxValue());
+						variableInfo.getExpectedMin(), variableInfo.getExpectedMax());
 			} else if (variableOverrides != null) {
 				this.getVariableProgramOverridesDao().makeTransient(variableOverrides);
 			}

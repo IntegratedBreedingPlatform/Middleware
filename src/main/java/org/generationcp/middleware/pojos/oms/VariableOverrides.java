@@ -59,28 +59,28 @@ public class VariableOverrides implements Serializable {
 	/**
 	 * Variable alias
 	 */
-	@Column(name = "exp_min_value")
-	private String minValue;
+	@Column(name = "expected_min")
+	private String expectedMin;
 
 	/**
 	 * Variable alias
 	 */
-	@Column(name = "exp_max_value")
-	private String maxValue;
+	@Column(name = "expected_max")
+	private String expectedMax;
 
 	public VariableOverrides() {
 
 	}
 
-	public VariableOverrides(Integer id, Integer variableId, String programUuid, String alias, String minValue, String maxValue) {
+	public VariableOverrides(Integer id, Integer variableId, String programUuid, String alias, String expectedMin, String expectedMax) {
 		super();
 
 		this.id = id;
 		this.variableId = variableId;
 		this.programUuid = programUuid;
 		this.alias = alias;
-		this.minValue = minValue;
-		this.maxValue = maxValue;
+		this.expectedMin = expectedMin;
+		this.expectedMax = expectedMax;
 	}
 
 	public Integer getId() {
@@ -115,20 +115,20 @@ public class VariableOverrides implements Serializable {
 		this.alias = alias;
 	}
 
-	public String getMinValue() {
-		return this.minValue;
+	public String getExpectedMin() {
+		return this.expectedMin;
 	}
 
-	public void setMinValue(String minValue) {
-		this.minValue = minValue;
+	public void setExpectedMin(String minValue) {
+		this.expectedMin = minValue;
 	}
 
-	public String getMaxValue() {
-		return this.maxValue;
+	public String getExpectedMax() {
+		return this.expectedMax;
 	}
 
-	public void setMaxValue(String maxValue) {
-		this.maxValue = maxValue;
+	public void setExpectedMax(String maxValue) {
+		this.expectedMax = maxValue;
 	}
 
 	@Override
@@ -164,7 +164,7 @@ public class VariableOverrides implements Serializable {
 	@Override
 	public String toString() {
 		return "VariableOverrides{" + "id=" + this.id + ", variableId=" + this.variableId + ", programUuid='" + this.programUuid
-				+ '\'' + ", alias='" + this.alias + '\'' + ", minValue='" + this.minValue + '\'' + ", maxValue='" + this.maxValue + '\''
+				+ '\'' + ", alias='" + this.alias + '\'' + ", minValue='" + this.expectedMin + '\'' + ", maxValue='" + this.expectedMax + '\''
 				+ '}';
 	}
 }

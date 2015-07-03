@@ -228,8 +228,8 @@ public class StandardVariableBuilder extends Builder {
 		variableInfo.setScaleId(scaleId);
 		variableInfo.setProgramUuid(programUUID);
 
-		variableInfo.setMinValue(minValue);
-		variableInfo.setMaxValue(maxValue);
+		variableInfo.setExpectedMin(minValue);
+		variableInfo.setExpectedMax(maxValue);
 		
 		variableInfo.addVariableType(mapPhenotypicTypeToDefaultVariableType(role));
 		return variableInfo;

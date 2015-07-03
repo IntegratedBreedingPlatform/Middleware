@@ -20,16 +20,16 @@ public class OntologyVariableInfo {
 	private Integer methodId;
 	private Integer propertyId;
 	private Integer scaleId;
-	private String minValue;
-	private String maxValue;
+	private String expectedMin;
+	private String expectedMax;
 	private Boolean isFavorite;
 
 	public OntologyVariableInfo() {
 		this.term = new Term();
 	}
 
-	public OntologyVariableInfo(String programUuid, String alias, Integer methodId, Integer propertyId, Integer scaleId, String minValue,
-			String maxValue, Boolean isFavorite, Set<VariableType> variableTypes) {
+	public OntologyVariableInfo(String programUuid, String alias, Integer methodId, Integer propertyId, Integer scaleId, String expectedMin,
+			String expectedMax, Boolean isFavorite, Set<VariableType> variableTypes) {
 		this();
 
 		this.programUuid = programUuid;
@@ -37,8 +37,8 @@ public class OntologyVariableInfo {
 		this.methodId = methodId;
 		this.propertyId = propertyId;
 		this.scaleId = scaleId;
-		this.minValue = minValue;
-		this.maxValue = maxValue;
+		this.expectedMin = expectedMin;
+		this.expectedMax = expectedMax;
 		this.isFavorite = isFavorite;
 	}
 
@@ -122,20 +122,20 @@ public class OntologyVariableInfo {
 		this.scaleId = scaleId;
 	}
 
-	public String getMinValue() {
-		return this.minValue;
+	public String getExpectedMin() {
+		return this.expectedMin;
 	}
 
-	public void setMinValue(String minValue) {
-		this.minValue = minValue;
+	public void setExpectedMin(String expectedMin) {
+		this.expectedMin = expectedMin;
 	}
 
-	public String getMaxValue() {
-		return this.maxValue;
+	public String getExpectedMax() {
+		return this.expectedMax;
 	}
 
-	public void setMaxValue(String maxValue) {
-		this.maxValue = maxValue;
+	public void setExpectedMax(String expectedMax) {
+		this.expectedMax = expectedMax;
 	}
 
 	public Boolean isFavorite() {
