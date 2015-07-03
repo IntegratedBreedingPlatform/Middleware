@@ -13,11 +13,7 @@ package org.generationcp.middleware.pojos.oms;
 
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  *
@@ -38,6 +34,7 @@ public class CVTermRelationship implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "cvterm_relationship_id")
 	private Integer cvTermRelationshipId;

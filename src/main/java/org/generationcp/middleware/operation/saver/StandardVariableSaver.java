@@ -222,16 +222,11 @@ public class StandardVariableSaver extends Saver {
 	}
 
 	private void saveCvTermRelationship(int subjectId, int typeId, int objectId) throws MiddlewareQueryException {
-
 		CVTermRelationship relationship = new CVTermRelationship();
-
-		relationship.setCvTermRelationshipId(this.getCvTermRelationshipDao().getNextId("cvTermRelationshipId"));
 		relationship.setSubjectId(subjectId);
 		relationship.setTypeId(typeId);
 		relationship.setObjectId(objectId);
-
 		this.getCvTermRelationshipDao().save(relationship);
-
 	}
 
 	private Integer saveConstraint(int cvTermId, int typeId, Double constraintValue) throws MiddlewareQueryException {
