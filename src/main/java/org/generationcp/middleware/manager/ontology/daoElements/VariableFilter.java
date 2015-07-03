@@ -15,6 +15,7 @@ public class VariableFilter {
 	private final List<Integer> propertyIds = new ArrayList<>();
 	private final List<Integer> scaleIds = new ArrayList<>();
 	private final List<Integer> variableIds = new ArrayList<>();
+	private final List<Integer> excludedVariableIds = new ArrayList<>();
 	private final List<DataType> dataTypes = new ArrayList<>();
 	private final List<VariableType> variableTypes = new ArrayList<>();
 	private final List<String> propertyClasses = new ArrayList<>();
@@ -73,6 +74,14 @@ public class VariableFilter {
 
 	public void addVariableId(Integer id){
 		this.variableIds.add(id);
+	}
+
+	public List<Integer> getExcludedVariableIds() {
+		return excludedVariableIds;
+	}
+
+	public void addExcludedVariableId(Integer id){
+		this.excludedVariableIds.add(id);
 	}
 
 	public List<DataType> getDataTypes() {
