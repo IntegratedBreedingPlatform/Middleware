@@ -815,11 +815,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			AttributeDAO dao = this.getAttributeDao();
 
 			for (Attribute attribute : attributes) {
-				if (operation == Operation.ADD) {
-					// Auto-assign IDs for new DB records
-					Integer nextId = dao.getNextId("aid");
-					attribute.setAid(nextId);
-				}
 				Attribute recordSaved = dao.saveOrUpdate(attribute);
 				idAttributesSaved.add(recordSaved.getAid());
 			}
@@ -1129,10 +1124,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		try {
 			trans = session.beginTransaction();
 			AttributeDAO dao = this.getAttributeDao();
-
-			// Auto-assign IDs for new DB records
-			Integer nextId = dao.getNextId("aid");
-			attr.setAid(nextId);
 			dao.save(attr);
 			isAttrSaved++;
 
@@ -1161,11 +1152,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 			int attrSaved = 0;
 			for (Attribute attr : attrs) {
-
-				// Auto-assign IDs for new DB records
-				Integer nextId = dao.getNextId("aid");
-				attr.setAid(nextId);
-
 				Attribute newAttr = dao.save(attr);
 				isAttrSaved.add(newAttr.getAid());
 				attrSaved++;
