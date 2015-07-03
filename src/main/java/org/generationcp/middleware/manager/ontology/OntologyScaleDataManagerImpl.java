@@ -11,12 +11,12 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.TermSummary;
-import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.TermRelationshipId;
+import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -79,7 +79,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 	/**
 	 * This will fetch list of Scales by passing scaleIds This method is private and consumed by other methods
-	 * 
+	 *
 	 * @param fetchAll will tell weather query should get all scales or not.
 	 * @param scaleIds will tell weather scaleIds should be pass to filter result. Combination of these two will give flexible usage.
 	 * @return List<Scale>
@@ -100,67 +100,67 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 			List<CVTerm> terms =
 					fetchAll ? this.getCvTermDao().getAllByCvId(CvId.SCALES) : this.getCvTermDao().getAllByCvId(scaleIds, CvId.SCALES);
-			for (CVTerm s : terms) {
-				if (fetchAll) {
-					scaleIds.add(s.getCvTermId());
-				}
-				map.put(s.getCvTermId(), new Scale(Term.fromCVTerm(s)));
-			}
+					for (CVTerm s : terms) {
+						if (fetchAll) {
+							scaleIds.add(s.getCvTermId());
+						}
+						map.put(s.getCvTermId(), new Scale(Term.fromCVTerm(s)));
+					}
 
-			Query query =
-					this.getActiveSession()
+					Query query =
+							this.getActiveSession()
 							.createSQLQuery(
 									"select p.* from cvtermprop p inner join cvterm t on p.cvterm_id = t.cvterm_id where t.is_obsolete =0 and t.cv_id = "
 											+ CvId.SCALES.getId()).addEntity(CVTermProperty.class);
 
-			List properties = query.list();
+					List properties = query.list();
 
-			for (Object p : properties) {
-				CVTermProperty property = (CVTermProperty) p;
-				Scale scale = map.get(property.getCvTermId());
+					for (Object p : properties) {
+						CVTermProperty property = (CVTermProperty) p;
+						Scale scale = map.get(property.getCvTermId());
 
-				if (scale == null) {
-					continue;
-				}
+						if (scale == null) {
+							continue;
+						}
 
-				if (Objects.equals(property.getTypeId(), TermId.MIN_VALUE.getId())) {
-					scale.setMinValue(property.getValue());
-				} else if (Objects.equals(property.getTypeId(), TermId.MAX_VALUE.getId())) {
-					scale.setMaxValue(property.getValue());
-				} else if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
-					scale.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
-				} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
-					scale.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
-				}
-			}
+						if (Objects.equals(property.getTypeId(), TermId.MIN_VALUE.getId())) {
+							scale.setMinValue(property.getValue());
+						} else if (Objects.equals(property.getTypeId(), TermId.MAX_VALUE.getId())) {
+							scale.setMaxValue(property.getValue());
+						} else if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
+							scale.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+						} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
+							scale.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
+						}
+					}
 
-			query =
-					this.getActiveSession().createSQLQuery(
-							"SELECT r.subject_id, r.type_id, t.cv_id, t.cvterm_id, t.name, t.definition "
-									+ "FROM cvterm_relationship r inner join cvterm t on r.object_id = t.cvterm_id "
-									+ "where r.subject_id in (:scaleIds)");
+					query =
+							this.getActiveSession().createSQLQuery(
+									"SELECT r.subject_id, r.type_id, t.cv_id, t.cvterm_id, t.name, t.definition "
+											+ "FROM cvterm_relationship r inner join cvterm t on r.object_id = t.cvterm_id "
+											+ "where r.subject_id in (:scaleIds)");
 
-			query.setParameterList("scaleIds", scaleIds);
+					query.setParameterList("scaleIds", scaleIds);
 
-			List result = query.list();
+					List result = query.list();
 
-			for (Object row : result) {
-				Object[] items = (Object[]) row;
+					for (Object row : result) {
+						Object[] items = (Object[]) row;
 
-				Integer scaleId = (Integer) items[0];
+						Integer scaleId = (Integer) items[0];
 
-				Scale scale = map.get(scaleId);
+						Scale scale = map.get(scaleId);
 
-				if (scale == null) {
-					continue;
-				}
+						if (scale == null) {
+							continue;
+						}
 
-				if (Objects.equals(items[1], TermId.HAS_TYPE.getId())) {
-					scale.setDataType(DataType.getById((Integer) items[3]));
-				} else if (Objects.equals(items[1], TermId.HAS_VALUE.getId())) {
-					scale.addCategory(new TermSummary((Integer) items[3], (String) items[4], (String) items[5]));
-				}
-			}
+						if (Objects.equals(items[1], TermId.HAS_TYPE.getId())) {
+							scale.setDataType(DataType.getById((Integer) items[3]));
+						} else if (Objects.equals(items[1], TermId.HAS_VALUE.getId())) {
+							scale.addCategory(new TermSummary((Integer) items[3], (String) items[4], (String) items[5]));
+						}
+					}
 
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error at getScales", e);
@@ -232,12 +232,12 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 				this.getCvDao().save(cv);
 
 				// Saving Categorical data if present
-				for(TermSummary c : scale.getCategories()){
+				for (TermSummary c : scale.getCategories()) {
 
 					String label = c.getName().trim();
 					String value = c.getDefinition().trim();
 
-					CVTerm category = new CVTerm(this.getCvTermDao().getNextId("cvTermId"), cv.getCvId(), label, value , null, 0, 0);
+					CVTerm category = new CVTerm(this.getCvTermDao().getNextId("cvTermId"), cv.getCvId(), label, value, null, 0, 0);
 					this.getCvTermDao().save(category);
 					this.getCvTermRelationshipDao().save(scale.getId(), TermId.HAS_VALUE.getId(), category.getCvTermId());
 				}
