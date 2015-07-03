@@ -232,8 +232,6 @@ public class StandardVariableSaver extends Saver {
 	private Integer saveConstraint(int cvTermId, int typeId, Double constraintValue) throws MiddlewareQueryException {
 		if (constraintValue != null) {
 			CVTermProperty property = new CVTermProperty();
-			int nextId = this.getCvTermPropertyDao().getNextId("cvTermPropertyId");
-			property.setCvTermPropertyId(nextId);
 			property.setTypeId(typeId);
 			property.setValue(constraintValue.toString());
 			property.setRank(0);
@@ -365,7 +363,6 @@ public class StandardVariableSaver extends Saver {
 				cropOntologyProperty.setCvTermId(traitId);
 				cropOntologyProperty.setRank(0);
 				cropOntologyProperty.setTypeId(TermId.CROP_ONTOLOGY_ID.getId());
-				cropOntologyProperty.setCvTermPropertyId(this.getCvTermPropertyDao().getNextId("cvTermPropertyId"));
 			}
 		}
 		if (isForCreate) {
