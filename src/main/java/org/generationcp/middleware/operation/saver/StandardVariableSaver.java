@@ -169,7 +169,6 @@ public class StandardVariableSaver extends Saver {
 		if (cvTerm == null) {
 
 			cvTerm = new CVTerm();
-			cvTerm.setCvTermId(this.getCvTermDao().getNextId("cvTermId"));
 			cvTerm.setCv(StandardVariableSaver.CV_VARIABLES);
 			cvTerm.setName(stdVar.getName());
 			cvTerm.setDefinition(stdVar.getDescription());
@@ -184,7 +183,6 @@ public class StandardVariableSaver extends Saver {
 
 	private CVTerm createCvTerm(Enumeration enumeration, Integer cvId) throws MiddlewareQueryException {
 		CVTerm cvTerm = new CVTerm();
-		cvTerm.setCvTermId(this.getCvTermDao().getNextId("cvTermId"));
 		cvTerm.setCv(cvId);
 		cvTerm.setName(enumeration.getName());
 		cvTerm.setDefinition(enumeration.getDescription());
