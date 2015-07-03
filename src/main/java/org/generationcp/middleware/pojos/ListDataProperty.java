@@ -13,13 +13,7 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.generationcp.middleware.util.Debug;
 import org.hibernate.annotations.NotFound;
@@ -38,6 +32,7 @@ public class ListDataProperty implements Serializable {
 	private static final long serialVersionUID = 2527090989063203962L;
 
 	@Id
+	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "listdataprop_id")
 	private Integer listDataPropertyId;
