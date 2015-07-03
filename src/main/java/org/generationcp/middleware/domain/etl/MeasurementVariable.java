@@ -56,14 +56,14 @@ public class MeasurementVariable {
 	private String treatmentLabel;
 
 	private Operation operation;
-	
+
 	private PhenotypicType role;
 
 	public MeasurementVariable() {
 	}
 
-	public MeasurementVariable(String name, String description, String scale, String method, String property, String dataType,
-			String value, String label) {
+	public MeasurementVariable(String name, String description, String scale, String method,
+			String property, String dataType, String value, String label) {
 		this.name = name;
 		this.description = description;
 		this.scale = scale;
@@ -74,9 +74,9 @@ public class MeasurementVariable {
 		this.label = label;
 		this.required = false;
 	}
-	
-	public MeasurementVariable(String name, String description, String scale, String method, String property, String dataType,
-			String value, String label, PhenotypicType role) {
+
+	public MeasurementVariable(String name, String description, String scale, String method,
+			String property, String dataType, String value, String label, PhenotypicType role) {
 		this.name = name;
 		this.description = description;
 		this.scale = scale;
@@ -89,37 +89,42 @@ public class MeasurementVariable {
 		this.role = role;
 	}
 
-	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
-			String value, String label) {
+	public MeasurementVariable(int termId, String name, String description, String scale,
+			String method, String property, String dataType, String value, String label) {
 		this(name, description, scale, method, property, dataType, value, label);
 		this.termId = termId;
 	}
 
-	public MeasurementVariable(String name, String description, String scale, String method, String property, String dataType,
-			String value, String label, Double minRange, Double maxRange) {
+	public MeasurementVariable(String name, String description, String scale, String method,
+			String property, String dataType, String value, String label, Double minRange,
+			Double maxRange) {
 		this(name, description, scale, method, property, dataType, value, label);
 		this.minRange = minRange;
 		this.maxRange = maxRange;
 	}
-	
-	public MeasurementVariable(String name, String description, String scale, String method, String property, String dataType,
-			String value, String label, Double minRange, Double maxRange, PhenotypicType role) {
+
+	public MeasurementVariable(String name, String description, String scale, String method,
+			String property, String dataType, String value, String label, Double minRange,
+			Double maxRange, PhenotypicType role) {
 		this(name, description, scale, method, property, dataType, value, label, role);
 		this.minRange = minRange;
 		this.maxRange = maxRange;
 	}
 
-	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
-			String value, String label, Double minRange, Double maxRange) {
+	public MeasurementVariable(int termId, String name, String description, String scale,
+			String method, String property, String dataType, String value, String label,
+			Double minRange, Double maxRange) {
 		this(name, description, scale, method, property, dataType, value, label, minRange, maxRange);
 		this.termId = termId;
 	}
-	
-	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
-			String value, String label, Double minRange, Double maxRange, PhenotypicType role) {
-		this(name, description, scale, method, property, dataType, value, label, minRange, maxRange, role);
+
+	public MeasurementVariable(int termId, String name, String description, String scale,
+			String method, String property, String dataType, String value, String label,
+			Double minRange, Double maxRange, PhenotypicType role) {
+		this(name, description, scale, method, property, dataType, value, label, minRange,
+				maxRange, role);
 		this.termId = termId;
-		
+
 	}
 
 	public int getTermId() {
@@ -185,14 +190,14 @@ public class MeasurementVariable {
 	public void setValue(String value) {
 		this.value = value;
 	}
-	
+
 	public String getLabel() {
 		if (this.label == null) {
 			this.label = "";
-		} 
-		if("".equalsIgnoreCase(this.label) && this.role != null){
+		}
+		if ("".equalsIgnoreCase(this.label) && this.role != null) {
 			this.label = this.role.getLabelList().get(0);
-	    }
+		}
 		return this.label;
 	}
 
@@ -246,7 +251,7 @@ public class MeasurementVariable {
 	public void setFactor(boolean isFactor) {
 		this.isFactor = isFactor;
 	}
-	
+
 	/**
 	 * @return the dataTypeId
 	 */
@@ -255,7 +260,8 @@ public class MeasurementVariable {
 	}
 
 	/**
-	 * @param dataTypeId the dataTypeId to set
+	 * @param dataTypeId
+	 *            the dataTypeId to set
 	 */
 	public void setDataTypeId(Integer dataTypeId) {
 		this.dataTypeId = dataTypeId;
@@ -269,7 +275,8 @@ public class MeasurementVariable {
 	}
 
 	/**
-	 * @param possibleValues the possibleValues to set
+	 * @param possibleValues
+	 *            the possibleValues to set
 	 */
 	public void setPossibleValues(List<ValueReference> possibleValues) {
 
@@ -294,7 +301,8 @@ public class MeasurementVariable {
 	}
 
 	/**
-	 * @param minRange the minRange to set
+	 * @param minRange
+	 *            the minRange to set
 	 */
 	public void setMinRange(Double minRange) {
 		this.minRange = minRange;
@@ -308,7 +316,8 @@ public class MeasurementVariable {
 	}
 
 	/**
-	 * @param maxRange the maxRange to set
+	 * @param maxRange
+	 *            the maxRange to set
 	 */
 	public void setMaxRange(Double maxRange) {
 		this.maxRange = maxRange;
@@ -347,13 +356,11 @@ public class MeasurementVariable {
 	public void setTreatmentLabel(String treatmentLabel) {
 		this.treatmentLabel = treatmentLabel;
 	}
-	
-	
+
 	public PhenotypicType getRole() {
-		return role;
+		return this.role;
 	}
 
-	
 	public void setRole(PhenotypicType role) {
 		this.role = role;
 	}
@@ -366,7 +373,8 @@ public class MeasurementVariable {
 	}
 
 	/**
-	 * @param operation the operation to set
+	 * @param operation
+	 *            the operation to set
 	 */
 	public void setOperation(Operation operation) {
 		this.operation = operation;
