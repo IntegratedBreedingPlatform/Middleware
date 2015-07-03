@@ -48,7 +48,6 @@ public class StockSaver extends Saver {
 
 	private StockModel createStock(VariableList variableList, StockModel stockModel) throws MiddlewareQueryException {
 		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
-			int propertyIndex = this.getStockPropertyDao().getNextId("stockPropId");
 			for (Variable variable : variableList.getVariables()) {
 				int storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
 				String value = variable.getValue();
@@ -81,7 +80,7 @@ public class StockSaver extends Saver {
 					stockModel = this.getStockObject(stockModel);
 					StockProperty stockProperty = this.getStockProperty(stockModel, variable);
 					if (stockProperty == null && variable.getValue() != null && !variable.getValue().isEmpty()) {
-						this.addProperty(stockModel, this.createProperty(propertyIndex++, variable));
+						this.addProperty(stockModel, this.createProperty(variable));
 					}
 				} else {
 					throw new MiddlewareQueryException("Non-Stock Variable was used in calling create stock: "
@@ -122,10 +121,8 @@ public class StockSaver extends Saver {
 		stockModel.getProperties().add(property);
 	}
 
-	private StockProperty createProperty(int index, Variable variable) throws MiddlewareQueryException {
+	private StockProperty createProperty(Variable variable) throws MiddlewareQueryException {
 		StockProperty property = new StockProperty();
-
-		property.setStockPropId(index);
 		property.setTypeId(variable.getVariableType().getId());
 		property.setValue(variable.getValue());
 		property.setRank(variable.getVariableType().getRank());
