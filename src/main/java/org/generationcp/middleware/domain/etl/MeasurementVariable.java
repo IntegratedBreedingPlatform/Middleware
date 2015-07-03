@@ -318,9 +318,14 @@ public class MeasurementVariable {
 		// datatype ids: 1120, 1125, 1128, 1130
 		if (this.dataTypeId == null && this.dataType != null) {
 			return this.dataType;
-		} else if (this.dataTypeId == TermId.CHARACTER_VARIABLE.getId() || this.dataTypeId == TermId.TIMESTAMP_VARIABLE.getId()
-				|| this.dataTypeId == TermId.CHARACTER_DBID_VARIABLE.getId() || this.dataTypeId == TermId.CATEGORICAL_VARIABLE.getId()
-				|| this.dataTypeId == TermId.GERMPLASM_LIST_DATA_TYPE.getId()) {
+		} else if (this.dataTypeId == TermId.CHARACTER_VARIABLE.getId()
+				|| this.dataTypeId == TermId.TIMESTAMP_VARIABLE.getId()
+				|| this.dataTypeId == TermId.CHARACTER_DBID_VARIABLE.getId()
+				|| this.dataTypeId == TermId.CATEGORICAL_VARIABLE.getId()
+				|| this.dataTypeId == TermId.GERMPLASM_LIST_DATA_TYPE.getId()
+				|| this.dataTypeId == TermId.LOCATION_DATA_TYPE.getId()
+				|| this.dataTypeId == TermId.PERSON_DATA_TYPE.getId()
+				|| this.dataTypeId == TermId.BREEDING_METHOD_DATA_TYPE.getId()) {
 			return "C";
 		} else {
 			return "N";

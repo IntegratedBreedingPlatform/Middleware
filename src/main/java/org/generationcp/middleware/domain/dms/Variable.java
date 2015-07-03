@@ -136,11 +136,19 @@ public class Variable implements Serializable, Comparable<Variable> {
 						value = enumeration.getName();
 					}
 				} else if (this.variableType.getStandardVariable().getDataType() != null
-						&& this.variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+						&& this.variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE
+								.getId()) {
 
-					Integer overridingId = this.variableType.getStandardVariable().getOverridenEnumerations().get(Integer.parseInt(value));
+					Integer overridingId = null;
+
+					if (this.variableType.getStandardVariable().getOverridenEnumerations() != null) {
+						overridingId = this.variableType.getStandardVariable()
+								.getOverridenEnumerations().get(Integer.parseInt(value));
+					}
+
 					if (overridingId != null) {
-						enumeration = this.variableType.getStandardVariable().findEnumerationById(overridingId);
+						enumeration = this.variableType.getStandardVariable().findEnumerationById(
+								overridingId);
 					}
 
 					if (enumeration != null) {
