@@ -196,7 +196,6 @@ public class StandardVariableSaver extends Saver {
 
 	public CV createCv(StandardVariable variable) throws MiddlewareQueryException {
 		CV cv = new CV();
-		cv.setCvId(this.getCvDao().getNextId("cvId"));
 		cv.setName(String.valueOf(variable.getId()));
 		cv.setDefinition(String.valueOf(variable.getName() + " - " + variable.getDescription()));
 		this.getCvDao().save(cv);
