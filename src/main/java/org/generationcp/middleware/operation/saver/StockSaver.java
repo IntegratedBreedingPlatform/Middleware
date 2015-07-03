@@ -108,7 +108,6 @@ public class StockSaver extends Saver {
 	private StockModel getStockObject(StockModel stockModel) throws MiddlewareQueryException {
 		if (stockModel == null) {
 			stockModel = new StockModel();
-			stockModel.setStockId(this.getStockDao().getNextId("stockId"));
 			stockModel.setIsObsolete(false);
 			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		}
