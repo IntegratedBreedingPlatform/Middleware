@@ -11,27 +11,14 @@
 
 package org.generationcp.middleware.service.api;
 
-import java.util.List;
-import java.util.Set;
-
-import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.StandardVariableSummary;
-import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.dms.VariableConstraints;
-import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Method;
-import org.generationcp.middleware.domain.oms.Property;
-import org.generationcp.middleware.domain.oms.Scale;
-import org.generationcp.middleware.domain.oms.StandardVariableReference;
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TraitClass;
-import org.generationcp.middleware.domain.oms.TraitClassReference;
+import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -481,8 +468,7 @@ public interface OntologyService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 * @throws MiddlewareException the middleware exception
 	 */
-	TraitClass addOrUpdateTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException,
-			MiddlewareException;
+	TraitClass addOrUpdateTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareException;
 
 	/**
 	 * Updates the given trait class. This searches for the id. If it exists, the entry in the database is replaced with the new value.
@@ -524,11 +510,11 @@ public interface OntologyService {
 	 * Count the number of experiments the variable was used.
 	 *
 	 * @param variableId the variable id
-	 * @param storedInId the stored in id
+	 * @param variableTypeId the stored in id
 	 * @return the count
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException;
+	long countExperimentsByVariable(int variableId, int variableTypeId) throws MiddlewareQueryException;
 
 	/**
 	 * Adds a new Term to the database. Creates a new cvterm entry in the local database. Returns a negative id.

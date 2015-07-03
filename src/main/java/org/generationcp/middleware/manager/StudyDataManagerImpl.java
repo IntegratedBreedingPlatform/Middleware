@@ -57,11 +57,9 @@ import java.util.Map;
 
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
-	private PedigreeService pedigreeService;
-
-	private LocationDataManager locationDataManager;
-
 	private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
+	private PedigreeService pedigreeService;
+	private LocationDataManager locationDataManager;
 
 	public StudyDataManagerImpl() {
 	}
@@ -448,8 +446,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException {
-		return this.getExperimentDao().countByObservedVariable(variableId, storedInId);
+	public long countExperimentsByVariable(int variableId, int variableTypeId) throws MiddlewareQueryException {
+		return this.getExperimentDao().countByObservedVariable(variableId, variableTypeId);
 	}
 
 	@Override

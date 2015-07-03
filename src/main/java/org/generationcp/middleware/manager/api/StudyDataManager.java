@@ -63,7 +63,6 @@ public interface StudyDataManager {
 	/**
 	 * Returns list of root or top-level folders from specified database.
 	 *
-	 * @param instance Can be CENTRAL or LOCAL
 	 * @return List of Folder POJOs or empty list if none found
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -393,11 +392,11 @@ public interface StudyDataManager {
 	 * Count the number of experiments the variable was used in the project.
 	 *
 	 * @param variableId the variable id
-	 * @param storedInId the stored in id
+	 * @param variableTypeId the stored in id
 	 * @return the long
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException;
+	long countExperimentsByVariable(int variableId, int variableTypeId) throws MiddlewareQueryException;
 
 	/**
 	 * Gets the field map information (entries, reps, plots and count) of the given study id and study type.
@@ -528,7 +527,6 @@ public interface StudyDataManager {
 	/**
 	 * Gets the study details.
 	 *
-	 * @param instance the instance
 	 * @param studyType the study type
 	 * @param id the id
 	 * @return the study details
@@ -616,7 +614,6 @@ public interface StudyDataManager {
 	/**
 	 * Gets the geolocation prop value.
 	 *
-	 * @param instance the instance
 	 * @param stdVarId the std var id
 	 * @param studyId the study id
 	 * @return the geolocation prop value
@@ -645,9 +642,10 @@ public interface StudyDataManager {
 	/**
 	 * Check if study has measurement data.
 	 *
-	 * @param studyId the study id
-	 * @return true, if successful
-	 * @throws MiddlewareQueryException the middleware query exception
+	 * @param datasetId
+	 * @param variateIds
+	 * @return
+	 * @throws MiddlewareQueryException
 	 */
 	boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
 
@@ -679,7 +677,7 @@ public interface StudyDataManager {
 	 *
 	 * @param projectId the project id
 	 * @param locationId the location id
-	 * @param plotNos list of plotNos
+	 * @param plotNo
 	 * @param cvTermIds list of std var Ids
 	 * @return list of plotNo, stdVarId and phenoTypeId
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -698,11 +696,10 @@ public interface StudyDataManager {
 
 	/**
 	 * Determines if the data for the specified Trial contains at least 2 replicates with values
-	 *
-	 * @param project_id the project id
-	 * @param location_id the location id
-	 * @return true or false
-	 * @throws MiddlewareQueryException the middleware query exception
+	 * @param projectId
+	 * @param locationId
+	 * @return
+	 * @throws MiddlewareQueryException
 	 */
 	Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId) throws MiddlewareQueryException;
 
