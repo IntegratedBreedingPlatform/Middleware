@@ -29,7 +29,7 @@ import org.junit.Test;
  * Implements {@link DataManagerIntegrationTest}
  */
 
-public class ScaleDataManagerImplTest extends DataManagerIntegrationTest {
+public class OntologyScaleDataManagerImplIntegrationTest extends DataManagerIntegrationTest {
 
 	private static OntologyScaleDataManager manager;
 
@@ -37,42 +37,42 @@ public class ScaleDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Before
 	public void setUp() throws Exception {
-		ScaleDataManagerImplTest.manager = DataManagerIntegrationTest.managerFactory.getOntologyScaleDataManager();
+		OntologyScaleDataManagerImplIntegrationTest.manager = DataManagerIntegrationTest.managerFactory.getOntologyScaleDataManager();
 		String name = MiddlewareIntegrationTest.getNewRandomName();
 		String definition = "Test Definition";
-		ScaleDataManagerImplTest.testScale = new Scale();
-		ScaleDataManagerImplTest.testScale.setName(name);
-		ScaleDataManagerImplTest.testScale.setDefinition(definition);
-		ScaleDataManagerImplTest.testScale.setDataType(DataType.NUMERIC_VARIABLE);
-		ScaleDataManagerImplTest.testScale.setMinValue("0");
-		ScaleDataManagerImplTest.testScale.setMaxValue("100");
-		ScaleDataManagerImplTest.manager.addScale(ScaleDataManagerImplTest.testScale);
+		OntologyScaleDataManagerImplIntegrationTest.testScale = new Scale();
+		OntologyScaleDataManagerImplIntegrationTest.testScale.setName(name);
+		OntologyScaleDataManagerImplIntegrationTest.testScale.setDefinition(definition);
+		OntologyScaleDataManagerImplIntegrationTest.testScale.setDataType(DataType.NUMERIC_VARIABLE);
+		OntologyScaleDataManagerImplIntegrationTest.testScale.setMinValue("0");
+		OntologyScaleDataManagerImplIntegrationTest.testScale.setMaxValue("100");
+		OntologyScaleDataManagerImplIntegrationTest.manager.addScale(OntologyScaleDataManagerImplIntegrationTest.testScale);
 	}
 
 	@Test
 	public void testGetAllScales() throws Exception {
-		List<Scale> scales = ScaleDataManagerImplTest.manager.getAllScales();
+		List<Scale> scales = OntologyScaleDataManagerImplIntegrationTest.manager.getAllScales();
 		Assert.assertTrue(scales.size() > 0);
 		Debug.println(MiddlewareIntegrationTest.INDENT, "From Total Scales:  " + scales.size());
 	}
 
 	@Test
 	public void testGetScaleById() throws Exception {
-		Scale scale = ScaleDataManagerImplTest.manager.getScaleById(6025);
+		Scale scale = OntologyScaleDataManagerImplIntegrationTest.manager.getScaleById(6025);
 		Assert.assertNotNull(scale);
 		Assert.assertEquals("CSSI", scale.getName());
 	}
 
 	@Test
 	public void testAddScale() throws Exception {
-		Assert.assertNotNull(ScaleDataManagerImplTest.testScale.getId());
-		Assert.assertTrue(ScaleDataManagerImplTest.testScale.getId() > 0);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "From db:  " + ScaleDataManagerImplTest.testScale);
-		Scale scaleFromDb = ScaleDataManagerImplTest.manager.getScaleById(ScaleDataManagerImplTest.testScale.getId());
-		Assert.assertEquals(ScaleDataManagerImplTest.testScale.getName(), scaleFromDb.getName());
-		Assert.assertEquals(ScaleDataManagerImplTest.testScale.getDataType(), scaleFromDb.getDataType());
-		Assert.assertEquals(ScaleDataManagerImplTest.testScale.getMinValue(), scaleFromDb.getMinValue());
-		Assert.assertEquals(ScaleDataManagerImplTest.testScale.getMaxValue(), scaleFromDb.getMaxValue());
+		Assert.assertNotNull(OntologyScaleDataManagerImplIntegrationTest.testScale.getId());
+		Assert.assertTrue(OntologyScaleDataManagerImplIntegrationTest.testScale.getId() > 0);
+		Debug.println(MiddlewareIntegrationTest.INDENT, "From db:  " + OntologyScaleDataManagerImplIntegrationTest.testScale);
+		Scale scaleFromDb = OntologyScaleDataManagerImplIntegrationTest.manager.getScaleById(OntologyScaleDataManagerImplIntegrationTest.testScale.getId());
+		Assert.assertEquals(OntologyScaleDataManagerImplIntegrationTest.testScale.getName(), scaleFromDb.getName());
+		Assert.assertEquals(OntologyScaleDataManagerImplIntegrationTest.testScale.getDataType(), scaleFromDb.getDataType());
+		Assert.assertEquals(OntologyScaleDataManagerImplIntegrationTest.testScale.getMinValue(), scaleFromDb.getMinValue());
+		Assert.assertEquals(OntologyScaleDataManagerImplIntegrationTest.testScale.getMaxValue(), scaleFromDb.getMaxValue());
 	}
 
 	@Test
@@ -83,11 +83,11 @@ public class ScaleDataManagerImplTest extends DataManagerIntegrationTest {
 		scale.setDataType(DataType.CATEGORICAL_VARIABLE);
 		scale.addCategory(new TermSummary(null, "1", "First"));
 		scale.addCategory(new TermSummary(null, "2", "Second"));
-		ScaleDataManagerImplTest.manager.addScale(scale);
+		OntologyScaleDataManagerImplIntegrationTest.manager.addScale(scale);
 		Assert.assertNotNull(scale.getId());
 		Assert.assertTrue(scale.getId() > 0);
 		Debug.println(MiddlewareIntegrationTest.INDENT, "From db:  " + scale);
-		Scale scaleFromDb = ScaleDataManagerImplTest.manager.getScaleById(scale.getId());
+		Scale scaleFromDb = OntologyScaleDataManagerImplIntegrationTest.manager.getScaleById(scale.getId());
 		Assert.assertEquals(scale.getName(), scaleFromDb.getName());
 		Assert.assertEquals(scale.getDataType(), scaleFromDb.getDataType());
 		Assert.assertEquals(scale.getMinValue(), scaleFromDb.getMinValue());
@@ -102,16 +102,16 @@ public class ScaleDataManagerImplTest extends DataManagerIntegrationTest {
 		scale.setDataType(DataType.CATEGORICAL_VARIABLE);
 		scale.addCategory(new TermSummary(null, "1", "First"));
 		scale.addCategory(new TermSummary(null, "2", "Second"));
-		ScaleDataManagerImplTest.manager.addScale(scale);
+		OntologyScaleDataManagerImplIntegrationTest.manager.addScale(scale);
 		Assert.assertNotNull(scale.getId());
 		Assert.assertTrue(scale.getId() > 0);
 
 		// Updating same scale with one more category
 		scale.addCategory(new TermSummary(3,"3", "Third"));
-		ScaleDataManagerImplTest.manager.updateScale(scale);
+		OntologyScaleDataManagerImplIntegrationTest.manager.updateScale(scale);
 
 		Debug.println(MiddlewareIntegrationTest.INDENT, "From db:  " + scale);
-		Scale scaleFromDb = ScaleDataManagerImplTest.manager.getScaleById(scale.getId());
+		Scale scaleFromDb = OntologyScaleDataManagerImplIntegrationTest.manager.getScaleById(scale.getId());
 		Assert.assertEquals(scale.getName(), scaleFromDb.getName());
 		Assert.assertEquals(scale.getDataType(), scaleFromDb.getDataType());
 		Assert.assertEquals(scale.getMinValue(), scaleFromDb.getMinValue());
@@ -120,20 +120,20 @@ public class ScaleDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testUpdateScale() throws Exception {
-		ScaleDataManagerImplTest.testScale.setDefinition("new definition");
-		ScaleDataManagerImplTest.testScale.setDataType(DataType.CATEGORICAL_VARIABLE);
-		ScaleDataManagerImplTest.testScale.addCategory(new TermSummary(1, "1", "First"));
-		ScaleDataManagerImplTest.testScale.addCategory(new TermSummary(2, "2", "Second"));
-		ScaleDataManagerImplTest.testScale.setMinValue(null);
-		ScaleDataManagerImplTest.testScale.setMaxValue(null);
-		ScaleDataManagerImplTest.manager.updateScale(ScaleDataManagerImplTest.testScale);
-		Scale updatedScale = ScaleDataManagerImplTest.manager.getScaleById(ScaleDataManagerImplTest.testScale.getId());
-		Assert.assertEquals(updatedScale.getDefinition(), ScaleDataManagerImplTest.testScale.getDefinition());
-		Debug.println(MiddlewareIntegrationTest.INDENT, "From db:  " + ScaleDataManagerImplTest.testScale);
+		OntologyScaleDataManagerImplIntegrationTest.testScale.setDefinition("new definition");
+		OntologyScaleDataManagerImplIntegrationTest.testScale.setDataType(DataType.CATEGORICAL_VARIABLE);
+		OntologyScaleDataManagerImplIntegrationTest.testScale.addCategory(new TermSummary(1, "1", "First"));
+		OntologyScaleDataManagerImplIntegrationTest.testScale.addCategory(new TermSummary(2, "2", "Second"));
+		OntologyScaleDataManagerImplIntegrationTest.testScale.setMinValue(null);
+		OntologyScaleDataManagerImplIntegrationTest.testScale.setMaxValue(null);
+		OntologyScaleDataManagerImplIntegrationTest.manager.updateScale(OntologyScaleDataManagerImplIntegrationTest.testScale);
+		Scale updatedScale = OntologyScaleDataManagerImplIntegrationTest.manager.getScaleById(OntologyScaleDataManagerImplIntegrationTest.testScale.getId());
+		Assert.assertEquals(updatedScale.getDefinition(), OntologyScaleDataManagerImplIntegrationTest.testScale.getDefinition());
+		Debug.println(MiddlewareIntegrationTest.INDENT, "From db:  " + OntologyScaleDataManagerImplIntegrationTest.testScale);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		ScaleDataManagerImplTest.manager.deleteScale(ScaleDataManagerImplTest.testScale.getId());
+		OntologyScaleDataManagerImplIntegrationTest.manager.deleteScale(OntologyScaleDataManagerImplIntegrationTest.testScale.getId());
 	}
 }
