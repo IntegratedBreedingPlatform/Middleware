@@ -48,7 +48,6 @@ public class GeolocationPropertySaver extends Saver {
 		}
 		if (property == null) {
 			property = new GeolocationProperty();
-			property.setGeolocationPropertyId(this.getGeolocationPropertyDao().getNextId("geolocationPropertyId"));
 			property.setRank(this.getMaxRank(geolocation.getProperties()));
 			property.setGeolocation(geolocation);
 			property.setType(typeId);
@@ -83,7 +82,6 @@ public class GeolocationPropertySaver extends Saver {
 		}
 		if (property == null) {
 			property = new GeolocationProperty();
-			property.setGeolocationPropertyId(this.getGeolocationPropertyDao().getNextId("geolocationPropertyId"));
 			property.setRank(this.getMaxRank(geolocation.getProperties()));
 			property.setGeolocation(geolocation);
 			property.setType(typeId);

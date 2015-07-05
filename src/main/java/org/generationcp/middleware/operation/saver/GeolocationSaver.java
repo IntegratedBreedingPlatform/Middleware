@@ -72,8 +72,6 @@ public class GeolocationSaver extends Saver {
 		Geolocation geolocation = null;
 
 		if (factors != null && factors.getVariables() != null && !factors.getVariables().isEmpty()) {
-			int propertyIndex = this.getGeolocationPropertyDao().getNextId("geolocationPropertyId");
-
 			for (Variable variable : factors.getVariables()) {
 
 				Integer storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
@@ -101,7 +99,7 @@ public class GeolocationSaver extends Saver {
 
 				} else if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId() == storedInId) {
 					geolocation = this.getGeolocationObject(geolocation, locationId);
-					this.addProperty(geolocation, this.createOrUpdateProperty(propertyIndex++, variable, geolocation));
+					this.addProperty(geolocation, this.createOrUpdateProperty(variable, geolocation));
 
 				} else if (TermId.OBSERVATION_VARIATE.getId() == storedInId || TermId.CATEGORICAL_VARIATE.getId() == storedInId) {
 					geolocation = this.getGeolocationObject(geolocation, locationId);
@@ -135,13 +133,12 @@ public class GeolocationSaver extends Saver {
 		return finalGeolocation;
 	}
 
-	private GeolocationProperty createOrUpdateProperty(int index, Variable variable, Geolocation geolocation)
+	private GeolocationProperty createOrUpdateProperty(Variable variable, Geolocation geolocation)
 			throws MiddlewareQueryException {
 		GeolocationProperty property = this.getGeolocationProperty(variable.getVariableType().getId(), geolocation);
 
 		if (property == null) {
 			property = new GeolocationProperty();
-			property.setGeolocationPropertyId(index);
 			property.setType(variable.getVariableType().getId());
 			property.setRank(variable.getVariableType().getRank());
 		}
