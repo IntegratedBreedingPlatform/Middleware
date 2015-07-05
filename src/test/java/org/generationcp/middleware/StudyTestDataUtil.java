@@ -45,10 +45,8 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
 		dmsProject.setName(StudyTestDataUtil.TEST_FOLDER_NAME + randomInt);
 		dmsProject.setDescription(StudyTestDataUtil.TEST_FOLDER_DESC + randomInt);
 		dmsProject.setProgramUUID(uniqueId);
-		int folderId =
-				this.studyDataManager.addSubFolder(DmsProject.SYSTEM_FOLDER_ID, dmsProject.getName(), dmsProject.getDescription(),
+		this.studyDataManager.addSubFolder(DmsProject.SYSTEM_FOLDER_ID, dmsProject.getName(), dmsProject.getDescription(),
 						dmsProject.getProgramUUID());
-		dmsProject.setProjectId(folderId);
 		return dmsProject;
 	}
 
@@ -79,8 +77,7 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
 		dmsProject.setDescription(description);
 		dmsProject.setProgramUUID(uniqueId);
 
-		StudyReference studyReference = this.studyDataManager.addStudy(DmsProject.SYSTEM_FOLDER_ID, typeList, studyValues, uniqueId);
-		dmsProject.setProjectId(studyReference.getId());
+		this.studyDataManager.addStudy(DmsProject.SYSTEM_FOLDER_ID, typeList, studyValues, uniqueId);
 		return dmsProject;
 	}
 
@@ -116,7 +113,6 @@ public class StudyTestDataUtil extends DataManagerIntegrationTest {
 		dmsProject.setProgramUUID(uniqueId);
 
 		StudyReference studyReference = this.studyDataManager.addStudy(DmsProject.SYSTEM_FOLDER_ID, typeList, studyValues, uniqueId);
-		dmsProject.setProjectId(studyReference.getId());
 		return dmsProject;
 	}
 

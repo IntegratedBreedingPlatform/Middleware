@@ -39,7 +39,6 @@ public class DatasetProjectSaver extends Saver {
 	public DmsProject addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues, String programUUID)
 			throws MiddlewareQueryException {
 		DmsProject datasetProject = new DmsProject();
-		datasetProject.setProjectId(this.getDmsProjectDao().getNextId("projectId"));
 		datasetProject.setName(this.getName(datasetValues));
 		datasetProject.setDescription(this.getDescription(datasetValues));
 		datasetProject.setProgramUUID(programUUID);

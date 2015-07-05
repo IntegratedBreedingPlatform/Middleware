@@ -27,8 +27,6 @@ public class ProjectSaver extends Saver {
 
 	public DmsProject save(DmsProject project) throws MiddlewareQueryException {
 		DmsProjectDao projectDao = this.getDmsProjectDao();
-		Integer generatedId = projectDao.getNextId("projectId");
-		project.setProjectId(generatedId);
 		return projectDao.save(project);
 	}
 
@@ -37,19 +35,16 @@ public class ProjectSaver extends Saver {
 
 		if (studyValues != null) {
 			project = new DmsProject();
-			Integer studyId = null;
 			String name = this.getStringValue(studyValues, TermId.STUDY_NAME.getId());
 			String description = this.getStringValue(studyValues, TermId.STUDY_TITLE.getId());
-			this.mapStudytoProject(studyId, name, description, project);
+			this.mapStudytoProject(name, description, project);
 		}
 
 		return project;
 	}
 
-	private void mapStudytoProject(Integer id, String name, String description, DmsProject project) throws MiddlewareException {
+	private void mapStudytoProject(String name, String description, DmsProject project) throws MiddlewareException {
 		StringBuffer errorMessage = new StringBuffer("");
-
-		project.setProjectId(id);
 
 		if (name != null && !name.equals("")) {
 			project.setName(name);
@@ -79,7 +74,7 @@ public class ProjectSaver extends Saver {
 	public DmsProject saveFolder(int parentId, String name, String description, String programUUID) throws Exception {
 		DmsProject project = new DmsProject();
 		project.setProgramUUID(programUUID);
-		this.mapStudytoProject(null, name, description, project);
+		this.mapStudytoProject(name, description, project);
 
 		try {
 			project = this.save(project);
