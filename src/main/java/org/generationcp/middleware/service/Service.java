@@ -82,7 +82,7 @@ public abstract class Service extends DatabaseBroker {
 		return new ExperimentPropertySaver(this.sessionProvider);
 	}
 
-	protected final StudyDataManager getStudyDataManager() {
+	protected StudyDataManager getStudyDataManager() {
 		return new StudyDataManagerImpl(this.sessionProvider, this.databaseName);
 	}
 

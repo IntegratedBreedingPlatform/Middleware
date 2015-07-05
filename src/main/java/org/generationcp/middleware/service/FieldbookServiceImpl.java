@@ -13,7 +13,6 @@ package org.generationcp.middleware.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -74,6 +73,7 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.DatabaseBroker;
+import org.generationcp.middleware.util.FieldbookListUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -95,25 +95,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<StudyDetails> getAllLocalNurseryDetails(String programUUID) throws MiddlewareQueryException {
 		List<StudyDetails> studyDetailList = this.getStudyDataManager().getAllStudyDetails(StudyType.N, programUUID);
-		List<StudyDetails> newList = new ArrayList<StudyDetails>();
-		for (StudyDetails detail : studyDetailList) {
-			if (detail.hasRows()) {
-				newList.add(detail);
-			}
-		}
-		return newList;
+		return FieldbookListUtil.removeStudyDetailsWithEmptyRows(studyDetailList);
 	}
 
 	@Override
 	public List<StudyDetails> getAllLocalTrialStudyDetails(String programUUID) throws MiddlewareQueryException {
 		List<StudyDetails> studyDetailList = this.getStudyDataManager().getAllStudyDetails(StudyType.T, programUUID);
-		List<StudyDetails> newList = new ArrayList<StudyDetails>();
-		for (StudyDetails detail : studyDetailList) {
-			if (detail.hasRows()) {
-				newList.add(detail);
-			}
-		}
-		return newList;
+		return FieldbookListUtil.removeStudyDetailsWithEmptyRows(studyDetailList);
 	}
 
 	@Override
@@ -353,18 +341,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		List<Method> methodList =
 				filterOutGenerative ? this.getGermplasmDataManager().getAllMethodsNotGenerative() : this.getGermplasmDataManager()
 						.getAllMethods();
-		Collections.sort(methodList, new Comparator<Method>() {
-
-			@Override
-			public int compare(Method o1, Method o2) {
-				String methodName1 = o1.getMname().toUpperCase();
-				String methodName2 = o2.getMname().toUpperCase();
-
-				// ascending order
-				return methodName1.compareTo(methodName2);
-			}
-
-		});
+		FieldbookListUtil.sortMethodNamesInAscendingOrder(methodList);
 		return methodList;
 	}
 
@@ -390,18 +367,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			}
 		}
 
-		Collections.sort(methodList, new Comparator<Method>() {
-
-			@Override
-			public int compare(Method o1, Method o2) {
-				String methodName1 = o1.getMname().toUpperCase();
-				String methodName2 = o2.getMname().toUpperCase();
-
-				// ascending order
-				return methodName1.compareTo(methodName2);
-			}
-
-		});
+		FieldbookListUtil.sortMethodNamesInAscendingOrder(methodList);
 		return methodList;
 	}
 
@@ -784,26 +750,22 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public int addFieldLocation(String fieldName, Integer parentLocationId, Integer currentUserId) throws MiddlewareQueryException {
-		LocationDataManager manager = this.getLocationDataManager();
-
-		Integer lType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
-		Location location = new Location(null, lType, 0, fieldName, "-", 0, 0, 0, 0, 0);
-
-		Integer dType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.FIELD_PARENT.getCode());
-		Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentLocationId), 0, 0);
-
-		return manager.addLocationAndLocdes(location, locdes);
+		return this.addLocation(fieldName, parentLocationId, currentUserId);
 	}
 
 	@Override
 	public int addBlockLocation(String blockName, Integer parentFieldId, Integer currentUserId) throws MiddlewareQueryException {
+		return this.addLocation(blockName, parentFieldId, currentUserId);
+	}
+
+	public int addLocation(String locationName, Integer parentId, Integer currentUserId) throws MiddlewareQueryException {
 		LocationDataManager manager = this.getLocationDataManager();
 
-		Integer lType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
-		Location location = new Location(null, lType, 0, blockName, "-", 0, 0, 0, 0, 0);
+		Integer lType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
+		Location location = new Location(null, lType, 0, locationName, "-", 0, 0, 0, 0, 0);
 
-		Integer dType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode());
-		Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentFieldId), 0, 0);
+		Integer dType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.FIELD_PARENT.getCode());
+		Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentId), 0, 0);
 
 		return manager.addLocationAndLocdes(location, locdes);
 	}
@@ -887,13 +849,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Location getLocationByName(String locationName, Operation op) throws MiddlewareQueryException {
-		List<Location> locations = getLocationDataManager().getLocationsByName(locationName, 0, 1, op);
-		if (locations != null && !locations.isEmpty()){
+		List<Location> locations = this.getLocationDataManager().getLocationsByName(locationName, 0, 1, op);
+		if (locations != null && !locations.isEmpty()) {
 			return locations.get(0);
 		}
 		return null;
 	}
-	
+
 	@Override
 	public Person getPersonById(int id) throws MiddlewareQueryException {
 		return this.getUserDataManager().getPersonById(id);
@@ -1087,7 +1049,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Method getMethodByCode(String code, String programUUID) throws MiddlewareQueryException {
-		return this.getGermplasmDataManager().getMethodByCode(code,programUUID);
+		return this.getGermplasmDataManager().getMethodByCode(code, programUUID);
 	}
 
 	@Override
