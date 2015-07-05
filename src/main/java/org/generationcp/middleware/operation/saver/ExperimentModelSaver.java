@@ -123,7 +123,6 @@ public class ExperimentModelSaver extends Saver {
 	// GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
 	private Geolocation createNewGeoLocation() throws MiddlewareQueryException {
 		Geolocation location = new Geolocation();
-		location.setLocationId(this.getGeolocationDao().getNextId("locationId"));
 		location.setDescription("1");
 		this.getGeolocationDao().save(location);
 		return location;

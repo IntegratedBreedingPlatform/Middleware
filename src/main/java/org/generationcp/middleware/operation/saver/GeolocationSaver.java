@@ -127,7 +127,6 @@ public class GeolocationSaver extends Saver {
 			}
 			if (finalGeolocation == null) {
 				finalGeolocation = new Geolocation();
-				finalGeolocation.setLocationId(this.getGeolocationDao().getNextId("locationId"));
 			}
 		}
 		return finalGeolocation;
