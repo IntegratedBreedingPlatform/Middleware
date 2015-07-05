@@ -127,8 +127,6 @@ public class DatasetProjectSaver extends Saver {
 
 	private List<ProjectRelationship> createProjectRelationship(int studyId, DmsProject datasetProject) throws MiddlewareQueryException {
 		ProjectRelationship relationship = new ProjectRelationship();
-
-		relationship.setProjectRelationshipId(this.getProjectRelationshipDao().getNextId("projectRelationshipId"));
 		relationship.setSubjectProject(datasetProject);
 		relationship.setObjectProject(this.getDmsProjectDao().getById(studyId));
 		relationship.setTypeId(TermId.BELONGS_TO_STUDY.getId());
