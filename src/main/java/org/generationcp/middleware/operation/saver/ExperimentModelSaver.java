@@ -103,8 +103,6 @@ public class ExperimentModelSaver extends Saver {
 
 	private ExperimentModel create(int projectId, Values values, TermId expType) throws MiddlewareQueryException {
 		ExperimentModel experimentModel = new ExperimentModel();
-
-		experimentModel.setNdExperimentId(this.getExperimentDao().getNextId("ndExperimentId"));
 		experimentModel.setTypeId(expType.getId());
 		experimentModel.setProperties(this.createProperties(experimentModel, values.getVariableList()));
 
