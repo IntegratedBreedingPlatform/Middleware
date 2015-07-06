@@ -52,11 +52,9 @@ public class ProjectPropertySaver extends Saver {
 		List<VariableType> variableTypes = variableTypeList != null ? variableTypeList.getVariableTypes() : null;
 
 		if (variableTypes != null && !variableTypes.isEmpty()) {
-			int index = this.getProjectPropertyDao().getNextId(ProjectPropertySaver.PROJECT_PROPERTY_ID);
 			for (VariableType variableType : variableTypes) {
-				List<ProjectProperty> list = this.createVariableProperties(index, project, variableType);
+				List<ProjectProperty> list = this.createVariableProperties(project, variableType);
 				properties.addAll(list);
-				index = index + list.size();
 			}
 		}
 		return properties;
@@ -73,19 +71,18 @@ public class ProjectPropertySaver extends Saver {
 		project.setProperties(properties);
 	}
 
-	private List<ProjectProperty> createVariableProperties(int startIndex, DmsProject project, VariableType variableType)
+	private List<ProjectProperty> createVariableProperties(DmsProject project, VariableType variableType)
 			throws MiddlewareQueryException {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
-		int index = startIndex;
-		properties.add(new ProjectProperty(index++, project, variableType.getStandardVariable().getStoredIn().getId(), variableType
+		properties.add(new ProjectProperty(project, variableType.getStandardVariable().getStoredIn().getId(), variableType
 				.getLocalName(), variableType.getRank()));
-		properties.add(new ProjectProperty(index++, project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(),
+		properties.add(new ProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(),
 				variableType.getRank()));
-		properties.add(new ProjectProperty(index++, project, TermId.STANDARD_VARIABLE.getId(), String.valueOf(variableType.getId()),
+		properties.add(new ProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), String.valueOf(variableType.getId()),
 				variableType.getRank()));
 
 		if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
-			properties.add(new ProjectProperty(index++, project, TermId.MULTIFACTORIAL_INFO.getId(), variableType.getTreatmentLabel(),
+			properties.add(new ProjectProperty(project, TermId.MULTIFACTORIAL_INFO.getId(), variableType.getTreatmentLabel(),
 					variableType.getRank()));
 		}
 
