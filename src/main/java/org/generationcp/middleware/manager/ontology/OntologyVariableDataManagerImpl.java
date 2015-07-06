@@ -157,7 +157,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 				// check if excludedVariableIds not empty and add filter clause of it
 				if(!variableFilter.getExcludedVariableIds().isEmpty()){
-					filterClause += " and p.cvterm_id not in(:excludedVariableIds)";
+					filterClause += " and v.cvterm_id not in(:excludedVariableIds)";
 					listParameters.put("excludedVariableIds", variableFilter.getExcludedVariableIds());
 				}
 
