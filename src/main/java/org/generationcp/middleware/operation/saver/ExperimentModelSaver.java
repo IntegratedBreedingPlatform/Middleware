@@ -159,8 +159,6 @@ public class ExperimentModelSaver extends Saver {
 
 	private void addExperimentProject(ExperimentModel experimentModel, int projectId) throws MiddlewareQueryException {
 		ExperimentProject exproj = new ExperimentProject();
-
-		exproj.setExperimentProjectId(this.getExperimentProjectDao().getNextId("experimentProjectId"));
 		exproj.setProjectId(projectId);
 		exproj.setExperiment(experimentModel);
 		this.getExperimentProjectDao().save(exproj);
