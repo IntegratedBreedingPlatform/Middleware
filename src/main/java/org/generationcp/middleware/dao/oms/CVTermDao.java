@@ -11,6 +11,9 @@
 
 package org.generationcp.middleware.dao.oms;
 
+import java.math.BigInteger;
+import java.util.*;
+
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -26,9 +29,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-
-import java.math.BigInteger;
-import java.util.*;
 
 /**
  * DAO class for {@link CVTerm}.
@@ -1221,9 +1221,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 							.append(" INNER JOIN cvterm_relationship sr ON sr.type_id = ").append(TermId.HAS_SCALE.getId())
 							.append("   AND sr.subject_id = c.cvterm_id ").append(" INNER JOIN cvterm_relationship mr ON mr.type_id = ")
 							.append(TermId.HAS_METHOD.getId()).append("   AND mr.subject_id = c.cvterm_id ")
-							.append(" INNER JOIN cvtermprop cvprop ON cvprop.type_id = ").append(TermId.VARIABLE_TYPE)
+							.append(" INNER JOIN cvtermprop cvprop ON cvprop.type_id = ").append(TermId.VARIABLE_TYPE.getId())
 							.append("   AND cvprop.cvterm_id = c.cvterm_id AND cvprop.value = '")
-							.append(VariableType.TREATMENT_FACTOR.name())
+							.append(VariableType.TREATMENT_FACTOR.getName())
 							.append("' WHERE c.cvterm_id <> ").append(cvTermId)
 							.append("   AND c.cvterm_id NOT IN (:hiddenFields) ");
 
@@ -1253,9 +1253,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 							.append(TermId.HAS_SCALE.getId()).append("   AND sr.subject_id = c.cvterm_id ")
 							.append(" INNER JOIN cvterm_relationship mr ON mr.type_id = ").append(TermId.HAS_METHOD.getId())
 							.append("   AND mr.subject_id = c.cvterm_id ")
-							.append(" INNER JOIN cvterm_relationship stin ON stin.type_id = ").append(TermId.STORED_IN.getId())
-							.append("   AND stin.subject_id = c.cvterm_id AND stin.object_id = ")
-							.append(TermId.TRIAL_DESIGN_INFO_STORAGE.getId()).append(" WHERE c.cvterm_id <> ").append(cvTermId)
+							.append(" INNER JOIN cvtermprop cvprop ON cvprop.type_id = ").append(TermId.VARIABLE_TYPE.getId())
+							.append("   AND cvprop.cvterm_id = c.cvterm_id AND cvprop.value = '")
+							.append(VariableType.TREATMENT_FACTOR.getName())
+							.append("' WHERE c.cvterm_id <> ").append(cvTermId)
 							.append("   AND c.cvterm_id NOT IN (:hiddenFields) ");
 
 			SQLQuery query =
