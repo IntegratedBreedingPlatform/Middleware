@@ -161,7 +161,6 @@ public class ExperimentModelSaver extends Saver {
 
 	private ExperimentStock createExperimentStock(ExperimentModel experiment, int stockId) throws MiddlewareQueryException {
 		ExperimentStock experimentStock = new ExperimentStock();
-		experimentStock.setExperimentStockId(this.getExperimentStockDao().getNextId("experimentStockId"));
 		experimentStock.setTypeId(TermId.IBDB_STRUCTURE.getId());
 		experimentStock.setStock(this.getStockModelBuilder().get(stockId));
 		experimentStock.setExperiment(experiment);

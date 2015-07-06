@@ -13,13 +13,7 @@ package org.generationcp.middleware.pojos.dms;
 
 import java.io.Serializable;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 /**
  * http://gmod.org/wiki/Chado_Natural_Diversity_Module#Table:_nd_experiment_stock
@@ -36,6 +30,7 @@ public class ExperimentStock implements Serializable {
 	private static final long serialVersionUID = -3361812145612014083L;
 
 	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_stock_id")
 	private Integer experimentStockId;
