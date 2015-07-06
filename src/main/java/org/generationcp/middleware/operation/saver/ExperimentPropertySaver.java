@@ -35,7 +35,6 @@ public class ExperimentPropertySaver extends Saver {
 		if (experimentProperty == null) {
 			this.getProjectPropertySaver().createProjectPropertyIfNecessary(experiment.getProject(), propertyType, storedIn);
 			experimentProperty = new ExperimentProperty();
-			experimentProperty.setNdExperimentpropId(this.getExperimentPropertyDao().getNextId("ndExperimentpropId"));
 			experimentProperty.setTypeId(propertyType.getId());
 			experimentProperty.setRank(0);
 			experimentProperty.setExperiment(experiment);
@@ -48,7 +47,6 @@ public class ExperimentPropertySaver extends Saver {
 		ExperimentProperty experimentProperty = this.getExperimentProperty(experiment, propertyType);
 		if (experimentProperty == null) {
 			experimentProperty = new ExperimentProperty();
-			experimentProperty.setNdExperimentpropId(this.getExperimentPropertyDao().getNextId("ndExperimentpropId"));
 			experimentProperty.setTypeId(propertyType);
 			experimentProperty.setRank(0);
 			experimentProperty.setExperiment(experiment);

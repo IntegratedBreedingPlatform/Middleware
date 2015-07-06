@@ -129,10 +129,9 @@ public class ExperimentModelSaver extends Saver {
 	private List<ExperimentProperty> createProperties(ExperimentModel experimentModel, VariableList factors)
 			throws MiddlewareQueryException {
 		if (factors != null && factors.getVariables() != null && !factors.getVariables().isEmpty()) {
-			int id = this.getExperimentPropertyDao().getNextId("ndExperimentpropId");
 			for (Variable variable : factors.getVariables()) {
 				if (TermId.TRIAL_DESIGN_INFO_STORAGE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
-					this.addProperty(experimentModel, variable, id++);
+					this.addProperty(experimentModel, variable);
 				}
 			}
 		}
@@ -140,13 +139,11 @@ public class ExperimentModelSaver extends Saver {
 		return experimentModel.getProperties();
 	}
 
-	private void addProperty(ExperimentModel experimentModel, Variable variable, int id) throws MiddlewareQueryException {
+	private void addProperty(ExperimentModel experimentModel, Variable variable) throws MiddlewareQueryException {
 		if (experimentModel.getProperties() == null) {
 			experimentModel.setProperties(new ArrayList<ExperimentProperty>());
 		}
 		ExperimentProperty property = new ExperimentProperty();
-
-		property.setNdExperimentpropId(id);
 		property.setExperiment(experimentModel);
 		property.setTypeId(variable.getVariableType().getId());
 		property.setValue(variable.getValue());
@@ -289,8 +286,6 @@ public class ExperimentModelSaver extends Saver {
 			experimentModel.setProperties(new ArrayList<ExperimentProperty>());
 		}
 		ExperimentProperty property = new ExperimentProperty();
-
-		property.setNdExperimentpropId(this.getExperimentPropertyDao().getNextId("ndExperimentpropId"));
 		property.setExperiment(experimentModel);
 		property.setTypeId(stdVariable.getId());
 		property.setValue(value == null ? null : value.toString());
