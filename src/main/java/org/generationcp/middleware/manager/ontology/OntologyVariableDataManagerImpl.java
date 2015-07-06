@@ -1,7 +1,9 @@
 
 package org.generationcp.middleware.manager.ontology;
 
-import com.google.common.base.Function;
+import java.math.BigInteger;
+import java.util.*;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -30,8 +32,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import java.math.BigInteger;
-import java.util.*;
+import com.google.common.base.Function;
 
 /**
  * Implements {@link OntologyVariableDataManagerImpl}
@@ -444,6 +445,13 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error in getting standard variable summaries from standard_variable_summary view", e);
+		}
+	}
+
+	@Override
+	public void processTreatmentFactorHasPairValue(List<Variable> summaryList, List<Integer> hiddenFields) throws MiddlewareException {
+		for (Variable variable : summaryList) {
+			variable.setHasPair(getCvTermDao().hasPossibleTreatmentPairs(variable.getId(), variable.getProperty().getId(), hiddenFields));
 		}
 	}
 
