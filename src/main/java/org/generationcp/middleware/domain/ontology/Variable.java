@@ -42,6 +42,8 @@ public class Variable extends Term {
 
 	private Integer studies;
 
+	private Boolean hasPair;
+
 	public Variable() {
 		this.setVocabularyId(CvId.VARIABLES.getId());
 	}
@@ -129,6 +131,14 @@ public class Variable extends Term {
 
 	public void setStudies(Integer studies) {
 		this.studies = studies;
+	}
+
+	public Boolean getHasPair() {
+		return hasPair;
+	}
+
+	public void setHasPair(Boolean hasPair) {
+		this.hasPair = hasPair;
 	}
 
 	@Override
