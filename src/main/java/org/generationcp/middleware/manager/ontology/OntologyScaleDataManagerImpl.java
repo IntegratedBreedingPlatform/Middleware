@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -52,6 +53,10 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 	public OntologyScaleDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+	}
+
+	public OntologyScaleDataManagerImpl() {
+		super();
 	}
 
 	@Override
@@ -100,67 +105,67 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 			List<CVTerm> terms =
 					fetchAll ? this.getCvTermDao().getAllByCvId(CvId.SCALES) : this.getCvTermDao().getAllByCvId(scaleIds, CvId.SCALES);
-					for (CVTerm s : terms) {
-						if (fetchAll) {
-							scaleIds.add(s.getCvTermId());
-						}
-						map.put(s.getCvTermId(), new Scale(Term.fromCVTerm(s)));
-					}
+			for (CVTerm s : terms) {
+				if (fetchAll) {
+					scaleIds.add(s.getCvTermId());
+				}
+				map.put(s.getCvTermId(), new Scale(Term.fromCVTerm(s)));
+			}
 
-					Query query =
-							this.getActiveSession()
+			Query query =
+					this.getActiveSession()
 							.createSQLQuery(
 									"select p.* from cvtermprop p inner join cvterm t on p.cvterm_id = t.cvterm_id where t.is_obsolete =0 and t.cv_id = "
 											+ CvId.SCALES.getId()).addEntity(CVTermProperty.class);
 
-					List properties = query.list();
+			List properties = query.list();
 
-					for (Object p : properties) {
-						CVTermProperty property = (CVTermProperty) p;
-						Scale scale = map.get(property.getCvTermId());
+			for (Object p : properties) {
+				CVTermProperty property = (CVTermProperty) p;
+				Scale scale = map.get(property.getCvTermId());
 
-						if (scale == null) {
-							continue;
-						}
+				if (scale == null) {
+					continue;
+				}
 
-						if (Objects.equals(property.getTypeId(), TermId.MIN_VALUE.getId())) {
-							scale.setMinValue(property.getValue());
-						} else if (Objects.equals(property.getTypeId(), TermId.MAX_VALUE.getId())) {
-							scale.setMaxValue(property.getValue());
-						} else if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
-							scale.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
-						} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
-							scale.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
-						}
-					}
+				if (Objects.equals(property.getTypeId(), TermId.MIN_VALUE.getId())) {
+					scale.setMinValue(property.getValue());
+				} else if (Objects.equals(property.getTypeId(), TermId.MAX_VALUE.getId())) {
+					scale.setMaxValue(property.getValue());
+				} else if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
+					scale.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+				} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
+					scale.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
+				}
+			}
 
-					query =
-							this.getActiveSession().createSQLQuery(
-									"SELECT r.subject_id, r.type_id, t.cv_id, t.cvterm_id, t.name, t.definition "
-											+ "FROM cvterm_relationship r inner join cvterm t on r.object_id = t.cvterm_id "
-											+ "where r.subject_id in (:scaleIds)");
+			query =
+					this.getActiveSession().createSQLQuery(
+							"SELECT r.subject_id, r.type_id, t.cv_id, t.cvterm_id, t.name, t.definition "
+									+ "FROM cvterm_relationship r inner join cvterm t on r.object_id = t.cvterm_id "
+									+ "where r.subject_id in (:scaleIds)");
 
-					query.setParameterList("scaleIds", scaleIds);
+			query.setParameterList("scaleIds", scaleIds);
 
-					List result = query.list();
+			List result = query.list();
 
-					for (Object row : result) {
-						Object[] items = (Object[]) row;
+			for (Object row : result) {
+				Object[] items = (Object[]) row;
 
-						Integer scaleId = (Integer) items[0];
+				Integer scaleId = (Integer) items[0];
 
-						Scale scale = map.get(scaleId);
+				Scale scale = map.get(scaleId);
 
-						if (scale == null) {
-							continue;
-						}
+				if (scale == null) {
+					continue;
+				}
 
-						if (Objects.equals(items[1], TermId.HAS_TYPE.getId())) {
-							scale.setDataType(DataType.getById((Integer) items[3]));
-						} else if (Objects.equals(items[1], TermId.HAS_VALUE.getId())) {
-							scale.addCategory(new TermSummary((Integer) items[3], (String) items[4], (String) items[5]));
-						}
-					}
+				if (Objects.equals(items[1], TermId.HAS_TYPE.getId())) {
+					scale.setDataType(DataType.getById((Integer) items[3]));
+				} else if (Objects.equals(items[1], TermId.HAS_VALUE.getId())) {
+					scale.addCategory(new TermSummary((Integer) items[3], (String) items[4], (String) items[5]));
+				}
+			}
 
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error at getScales", e);
@@ -367,25 +372,15 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 				}
 			}
 
-			// Updating values if present
-			if (!Strings.isNullOrEmpty(scale.getMinValue())) {
-				this.getCvTermPropertyDao().save(scale.getId(), TermId.MIN_VALUE.getId(), String.valueOf(scale.getMinValue()), 0);
-			} else {
-				CVTermProperty property = this.getCvTermPropertyDao().getOneByCvTermAndType(scale.getId(), TermId.MIN_VALUE.getId());
-				if (property != null) {
-					this.getCvTermPropertyDao().makeTransient(property);
-				}
-			}
+			CvTermPropertyDao cvTermPropertyDao = this.getCvTermPropertyDao();
+			int maxTermId = TermId.MAX_VALUE.getId();
+			int minTermId = TermId.MIN_VALUE.getId();
+			String minScale = scale.getMinValue();
+			String maxScale = scale.getMaxValue();
 
 			// Updating values if present
-			if (!Strings.isNullOrEmpty(scale.getMaxValue())) {
-				this.getCvTermPropertyDao().save(scale.getId(), TermId.MAX_VALUE.getId(), String.valueOf(scale.getMaxValue()), 0);
-			} else {
-				CVTermProperty property = this.getCvTermPropertyDao().getOneByCvTermAndType(scale.getId(), TermId.MAX_VALUE.getId());
-				if (property != null) {
-					this.getCvTermPropertyDao().makeTransient(property);
-				}
-			}
+			this.updatingValues(cvTermPropertyDao, scale, minScale, minTermId);
+			this.updatingValues(cvTermPropertyDao, scale, maxScale, maxTermId);
 
 			// Getting cvId. Usually this will be available if previous data type is categorical
 			Integer cvId = categoricalValues.isEmpty() ? null : categoricalValues.get(0).getCv();
@@ -455,6 +450,17 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			throw new MiddlewareQueryException("Error at updateScale :" + e.getMessage(), e);
 		}
 
+	}
+
+	void updatingValues(CvTermPropertyDao cvTermPropertyDao, Scale scale, String scaleSize, int termId) throws MiddlewareQueryException {
+		if (!Strings.isNullOrEmpty(scaleSize)) {
+			cvTermPropertyDao.save(scale.getId(), termId, String.valueOf(scaleSize), 0);
+		} else {
+			CVTermProperty property = cvTermPropertyDao.getOneByCvTermAndType(scale.getId(), termId);
+			if (property != null) {
+				cvTermPropertyDao.makeTransient(property);
+			}
+		}
 	}
 
 	@Override
