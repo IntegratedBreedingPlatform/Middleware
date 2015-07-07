@@ -257,8 +257,6 @@ public class ExperimentBuilder extends Builder {
 			for (DMSVariableType variableType : variableTypes.getVariableTypes()) {
 				Variable var = this.createGermplasmFactor(stockModel, variableType);
 				if(var != null){
-					var.getVariableType().setRole(PhenotypicType.GERMPLASM);
-					var.getVariableType().getStandardVariable().setPhenotypicType(PhenotypicType.GERMPLASM);
 					factors.add(var);
 				}				
 			}
