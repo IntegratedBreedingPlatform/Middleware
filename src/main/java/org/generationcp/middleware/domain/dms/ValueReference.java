@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.domain.oms.TermSummary;
+
 import java.io.Serializable;
 
 public class ValueReference extends Reference implements Serializable, Comparable<ValueReference> {
@@ -45,6 +47,13 @@ public class ValueReference extends Reference implements Serializable, Comparabl
 		this.setKey(String.valueOf(id));
 		super.setName(name);
 		super.setDescription(description);
+	}
+
+	public ValueReference(TermSummary termSummary) {
+		super.setId(termSummary.getId());
+		this.setKey(termSummary.getId().toString());
+		super.setName(termSummary.getName());
+		super.setDescription(termSummary.getDefinition());
 	}
 
 	@Override
