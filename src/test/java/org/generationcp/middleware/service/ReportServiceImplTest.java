@@ -14,10 +14,12 @@ import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.ReportService;
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+@Ignore
 @RunWith(JUnit4.class)
 public class ReportServiceImplTest extends DataManagerIntegrationTest {
 
