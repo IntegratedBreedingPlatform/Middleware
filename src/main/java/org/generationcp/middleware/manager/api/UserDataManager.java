@@ -153,4 +153,14 @@ public interface UserDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	User getUserByUserName(String userName) throws MiddlewareQueryException;
+
+	/**
+	 * Get Person with the specified firstname, middlename and lastname
+	 * 
+	 * @param firstName
+	 * @param middleName
+	 * @param lastName
+	 * @return
+	 */
+	Person getPersonByName(String firstName, String middleName, String lastName) throws MiddlewareQueryException;
 }

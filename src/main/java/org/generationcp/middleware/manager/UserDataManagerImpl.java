@@ -226,4 +226,9 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	public User getUserByUserName(String userName) throws MiddlewareQueryException {
 		return this.getUserDao().getUserByUserName(userName);
 	}
+
+	@Override
+	public Person getPersonByName(String firstName, String middleName, String lastName) throws MiddlewareQueryException {
+		return this.getPersonDao().getPersonByName(firstName, middleName, lastName);
+	}
 }

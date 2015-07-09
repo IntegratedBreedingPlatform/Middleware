@@ -19,6 +19,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
@@ -131,4 +132,21 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 		return map;
 	}
 
+	public Person getPersonByName(String firstName, String middleName, String lastName) throws MiddlewareQueryException {
+		Person person = null;
+		try {
+			Criteria criteria = this.getSession().createCriteria(Person.class);
+			criteria.add(Restrictions.eq("firstName", firstName));
+			criteria.add(Restrictions.eq("lastName", lastName));
+			criteria.add(Restrictions.eq("middleName", middleName));
+
+			person = (Person) criteria.uniqueResult();
+
+		} catch (HibernateException e) {
+			this.logAndThrowException(
+					String.format("Error with getPersonByName(firstName=[%s],middleName=[%s],lastName)", firstName, middleName, lastName),
+					e);
+		}
+		return person;
+	}
 }
