@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.operation.saver;
@@ -426,8 +426,7 @@ public class WorkbookSaver extends Saver {
 					// if geolocationId already exists, no need to create the geolocation
 					row.setLocationId(geolocationId);
 				} else {
-					TimerWatch watch =
-							new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations");
+					TimerWatch watch = new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations");
 					VariableList geolocation = this.getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
 					if (geolocation != null && !geolocation.isEmpty()) {
 						String trialInstanceNumber = this.getTrialInstanceNumber(geolocation);
