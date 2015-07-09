@@ -224,10 +224,13 @@ public class StandardVariableBuilderTest extends DataManagerIntegrationTest {
 			for (StandardVariable standardVariable : headerStandardVariables) {
 				if("TRIAL_INSTANCE".equals(header)) {
 					assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(),standardVariable.getId());
+					assertEquals(PhenotypicType.TRIAL_ENVIRONMENT,standardVariable.getPhenotypicType());
 				} else if("ENTRY_NO".equals(header)) {
 					assertEquals(TermId.ENTRY_NO.getId(),standardVariable.getId());
+					assertEquals(PhenotypicType.GERMPLASM,standardVariable.getPhenotypicType());
 				} else if("PLOT_NO".equals(header)) {
 					assertEquals(TermId.PLOT_NO.getId(),standardVariable.getId());
+					assertEquals(PhenotypicType.TRIAL_DESIGN,standardVariable.getPhenotypicType());
 				}
 			}
 		}
