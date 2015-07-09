@@ -209,9 +209,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
+	public Integer getStandardVariableIdByPropertyScaleMethodRole(
+			String property, String scale, String method, PhenotypicType role)
 			throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
+		return this.getOntologyDataManager()
+				.getStandardVariableIdByPropertyScaleMethod(property, scale,
+						method);
 	}
 
 	@Override

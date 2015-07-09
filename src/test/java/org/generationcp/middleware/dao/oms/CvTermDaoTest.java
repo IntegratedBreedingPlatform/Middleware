@@ -15,7 +15,6 @@ package org.generationcp.middleware.dao.oms;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -23,6 +22,7 @@ import org.generationcp.middleware.domain.oms.PropertyReference;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
 import org.junit.AfterClass;
@@ -45,7 +45,9 @@ public class CvTermDaoTest extends MiddlewareIntegrationTest {
 		List<String> nameOrSynonyms =
 				Arrays.asList("ENTRY", "ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");
 
-		Map<String, Set<Integer>> results = CvTermDaoTest.dao.getTermsByNameOrSynonyms(nameOrSynonyms, CvId.VARIABLES.getId());
+		Map<String, Map<Integer, VariableType>> results = CvTermDaoTest.dao
+				.getTermIdsWithTypeByNameOrSynonyms(nameOrSynonyms,
+						CvId.VARIABLES.getId());
 
 		Debug.println(0, "testGetTermsByNameOrSynonyms(nameOrSynonyms=" + nameOrSynonyms + ") RESULTS:");
 		for (String name : nameOrSynonyms) {
@@ -98,7 +100,8 @@ public class CvTermDaoTest extends MiddlewareIntegrationTest {
 	public void testGetStandardVariableIdsByProperties() throws Exception {
 		List<String> nameOrSynonyms =
 				Arrays.asList("ENTRY", "ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");
-		Map<String, Set<Integer>> results = CvTermDaoTest.dao.getStandardVariableIdsByProperties(nameOrSynonyms);
+		Map<String, Map<Integer, VariableType>> results = CvTermDaoTest.dao
+				.getStandardVariableIdsWithTypeByProperties(nameOrSynonyms);
 
 		Debug.println(0, "testGetStandardVariableIdsByProperties(nameOrSynonyms=" + nameOrSynonyms + ") RESULTS:");
 		for (String name : nameOrSynonyms) {

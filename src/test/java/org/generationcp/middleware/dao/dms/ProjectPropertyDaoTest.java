@@ -15,9 +15,9 @@ package org.generationcp.middleware.dao.dms;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.util.Debug;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -38,7 +38,8 @@ public class ProjectPropertyDaoTest extends MiddlewareIntegrationTest {
 		List<String> propertyNames =
 				Arrays.asList("ENTRY", "ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");
 
-		Map<String, Set<Integer>> results = ProjectPropertyDaoTest.dao.getStandardVariableIdsByPropertyNames(propertyNames);
+		Map<String, Map<Integer, VariableType>> results = ProjectPropertyDaoTest.dao
+				.getStandardVariableIdsWithTypeByPropertyNames(propertyNames);
 
 		Debug.println(0, "testGetStandardVariableIdsByPropertyNames(propertyNames=" + propertyNames + ") RESULTS:");
 		for (String name : propertyNames) {

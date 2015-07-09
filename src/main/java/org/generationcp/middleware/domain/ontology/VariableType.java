@@ -1,8 +1,10 @@
 
 package org.generationcp.middleware.domain.ontology;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -102,6 +104,14 @@ public enum VariableType {
 			}
 		}
 		return variableTypes;
+	}
+
+	public static List<Integer> ids() {
+		List<Integer> variableTypeIds = new ArrayList<Integer>();
+		for (VariableType variableType : VariableType.values()) {
+			variableTypeIds.add(variableType.getId());
+		}
+		return variableTypeIds;
 	}
 
 	@Override

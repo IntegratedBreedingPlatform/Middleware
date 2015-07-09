@@ -50,8 +50,11 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	@Override
 	public StandardVariable getStandardVariable(Integer propertyId, Integer scaleId, Integer methodId, String programUUID) throws MiddlewareException {
 		OntologyDataManager manager = this.getOntologyDataManager();
-		Integer standardVariableId = manager.getStandardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId);
+		Integer standardVariableId = manager
+				.getStandardVariableIdByPropertyIdScaleIdMethodId(propertyId,
+						scaleId, methodId);
 		return manager.getStandardVariable(standardVariableId,programUUID);
+		
 	}
 
 	@Override

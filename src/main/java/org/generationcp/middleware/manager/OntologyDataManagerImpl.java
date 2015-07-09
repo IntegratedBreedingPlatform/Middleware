@@ -196,12 +196,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Integer getStandardVariableIdByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId)
-			throws MiddlewareQueryException {
-		return this.getStandardVariableBuilder().getIdByPropertyScaleMethod(propertyId, scaleId, methodId);
-	}
-
-	@Override
 	public StandardVariable findStandardVariableByTraitScaleMethodNames(String property, String scale, String method, String programUUID)
 			throws MiddlewareException {
 		Term termProperty, termScale, termMethod;
@@ -905,21 +899,21 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
+	public Integer getStandardVariableIdByPropertyScaleMethod(String property, String scale, String method)
 			throws MiddlewareQueryException {
 
 		Integer propertyId = this.findTermIdByName(property, CvId.PROPERTIES);
 		Integer scaleId = this.findTermIdByName(scale, CvId.SCALES);
 		Integer methodId = this.findTermIdByName(method, CvId.METHODS);
 
-		return this.getStandardVariableBuilder().getIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
+		return getStandardVariableIdByPropertyIdScaleIdMethodId(propertyId, scaleId, methodId);
 	}
 
 	@Override
-	public Integer getStandardVariableIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role)
+	public Integer getStandardVariableIdByPropertyIdScaleIdMethodId(Integer propertyId, Integer scaleId, Integer methodId)
 			throws MiddlewareQueryException {
 
-		return this.getStandardVariableBuilder().getIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
+		return this.getStandardVariableBuilder().getIdByPropertyScaleMethod(propertyId, scaleId, methodId);
 
 	}
 

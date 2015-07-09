@@ -340,10 +340,10 @@ public class Util {
 		return Util.convertCollectionToCSV(valueSet);
 	}
 
-	public static String convertCollectionToCSV(Collection<String> collection) {
+	public static String convertCollectionToCSV(Collection<?> collection) {
 		int i = 0;
 		StringBuilder csv = new StringBuilder();
-		for (String value : collection) {
+		for (Object value : collection) {
 			if (i != 0) {
 				csv.append(", ");
 			}

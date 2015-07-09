@@ -54,7 +54,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String ERROR_PLOT_DOESNT_EXIST = "error.plot.doesnt.exist";
 	public static final String ERROR_ENTRY_DOESNT_EXIST = "error.entry.doesnt.exist";
 	public static final String ERROR_DUPLICATE_STUDY_NAME = "error.duplicate.study.name";
-	public static final String ERROR_DUPLICATE_PSMR = "error.duplicate.psmr";
+	public static final String ERROR_DUPLICATE_PSM = "error.duplicate.psm";
 	public static final String ERROR_INVALID_VARIABLE_NAME_LENGTH = "error.invalid.variable.name.length";
 	public static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
 
@@ -167,17 +167,21 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// perform validations on the parsed data that require db access
 		List<Message> messages = new LinkedList<Message>();
 
-		if (!this.isEntryExists(ontology, workbook.getFactors(),programUUID)) {
-			messages.add(new Message(DataImportServiceImpl.ERROR_ENTRY_DOESNT_EXIST));
+		if (!this.isEntryExists(ontology, workbook.getFactors())) {
+			messages.add(new Message(
+					DataImportServiceImpl.ERROR_ENTRY_DOESNT_EXIST));
 		}
 
-		if (!this.isPlotExists(ontology, workbook.getFactors(),programUUID)) {
-			messages.add(new Message(DataImportServiceImpl.ERROR_PLOT_DOESNT_EXIST));
+		if (!this.isPlotExists(ontology, workbook.getFactors())) {
+			messages.add(new Message(
+					DataImportServiceImpl.ERROR_PLOT_DOESNT_EXIST));
 		}
 
-		if (!workbook.isNursery() && !this.isTrialInstanceNumberExists(
-				ontology, workbook.getTrialVariables(),programUUID)) {
-			messages.add(new Message(DataImportServiceImpl.ERROR_MISSING_TRIAL_CONDITION));
+		if (!workbook.isNursery()
+				&& !this.isTrialInstanceNumberExists(ontology,
+						workbook.getTrialVariables())) {
+			messages.add(new Message(
+					DataImportServiceImpl.ERROR_MISSING_TRIAL_CONDITION));
 		}
 
 		messages.addAll(this.validateMeasurementVariableName(workbook.getAllVariables()));
@@ -320,12 +324,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 					variableNameMap.put(measurementVariable.getName(), measurementVariable);
 				}
 
-				PhenotypicType type =
-						variableList == workbook.getVariates() || variableList == workbook.getConstants() ? PhenotypicType.VARIATE
-								: PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel());
-				Integer varId =
-						ontologyDataManager.getStandardVariableIdByPropertyScaleMethodRole(measurementVariable.getProperty(),
-								measurementVariable.getScale(), measurementVariable.getMethod(), type);
+				Integer varId = ontologyDataManager
+						.getStandardVariableIdByPropertyScaleMethod(
+								measurementVariable.getProperty(),
+								measurementVariable.getScale(),
+								measurementVariable.getMethod());
 
 				if (varId == null) {
 
@@ -334,9 +337,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 									measurementVariable.getName(),programUUID);
 
 					for (StandardVariable variable : variableSet) {
-						messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), variable
-								.getProperty().getName(), variable.getScale().getName(), variable.getMethod().getName(), variable
-								.getPhenotypicType().getGroup()));
+						messages.add(new Message(
+								"error.import.existing.standard.variable.name",
+								measurementVariable.getName(), variable
+										.getProperty().getName(), variable
+										.getScale().getName(), variable
+										.getMethod().getName()));
 					}
 
 				}
@@ -370,20 +376,19 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			throws MiddlewareQueryException {
 		Map<String, List<MeasurementVariable>> stdVarMap = new LinkedHashMap<String, List<MeasurementVariable>>();
 		for (MeasurementVariable measurementVariable : workbookVariables) {
-			PhenotypicType type =
-					isVariate ? PhenotypicType.VARIATE : PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel());
 			// need to retrieve standard variable because of synonyms
-			Integer standardVariableId =
-					this.getOntologyDataManager().getStandardVariableIdByPropertyScaleMethodRole(measurementVariable.getProperty(),
-							measurementVariable.getScale(), measurementVariable.getMethod(), type);
+			Integer standardVariableId = this.getOntologyDataManager()
+					.getStandardVariableIdByPropertyScaleMethod(
+							measurementVariable.getProperty(),
+							measurementVariable.getScale(),
+							measurementVariable.getMethod());
 			String key;
 			if (standardVariableId != null) {
 				key = Integer.toString(standardVariableId);
 			} else {
-				key =
-						measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-"
-								+ measurementVariable.getMethod().toLowerCase() + "-"
-								+ (type == null ? measurementVariable.getLabel().toLowerCase() : type.getGroup());
+				key = measurementVariable.getProperty().toLowerCase() + "-"
+						+ measurementVariable.getScale().toLowerCase() + "-"
+						+ measurementVariable.getMethod().toLowerCase();
 			}
 			List<MeasurementVariable> vars = stdVarMap.get(key);
 			if (vars == null) {
@@ -410,7 +415,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 				for (MeasurementVariable measurementVariable : vars) {
 					this.initializeIfNull(errors, measurementVariable.getName() + ":" + measurementVariable.getTermId());
 					errors.get(measurementVariable.getName() + ":" + measurementVariable.getTermId()).add(
-							new Message(DataImportServiceImpl.ERROR_DUPLICATE_PSMR, duplicates.toString()));
+							new Message(ERROR_DUPLICATE_PSM, duplicates.toString()));
 				}
 			}
 		}
@@ -428,7 +433,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 					delimiter = ", ";
 					duplicates.append(measurementVariable.getName());
 				}
-				errors.add(new Message("error.duplicate.psmr", duplicates.toString()));
+				errors.add(new Message(ERROR_DUPLICATE_PSM, duplicates.toString()));
 			}
 		}
 	}
@@ -451,36 +456,23 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	// for single location
-	private String getLocationDescription(OntologyDataManager ontology, 
+	private String getLocationDescription(OntologyDataManager ontology,
 			Workbook workbook, String programUUID) throws MiddlewareException {
 
-		// check if single location (it means the location is defined in the description sheet)
-		List<MeasurementVariable> list = workbook.getConditions();
-		for (MeasurementVariable mvar : list) {
-			StandardVariable svar =
-					ontology.findStandardVariableByTraitScaleMethodNames(
-							mvar.getProperty(), mvar.getScale(), mvar.getMethod(), programUUID);
-			if (svar != null && TermId.TRIAL_INSTANCE_FACTOR.getId() == svar.getId()) {
-				return mvar.getValue();
-			}
+		// check if single location
+		// it means the location is defined in the description sheet)
+		String trialInstanceNumber = getTrialInstanceNumberFromMeasurementVariables(
+				ontology, workbook.getConditions());
+		if (trialInstanceNumber != null) {
+			return trialInstanceNumber;
 		}
-		// check if multi-location (it means the location is defined in the observation sheet)
-		// get first row - should contain the study location
-		MeasurementRow row = workbook.getObservations().get(0);
-		List<MeasurementVariable> trialFactors = workbook.getTrialFactors();
-		for (MeasurementVariable mvar : trialFactors) {
-			PhenotypicType type = PhenotypicType.getPhenotypicTypeForLabel(mvar.getLabel());
-			Integer varId =
-					ontology.getStandardVariableIdByPropertyScaleMethodRole(mvar.getProperty(), mvar.getScale(), mvar.getMethod(), type);
 
-			if (varId != null) {
-				StandardVariable svar = ontology.getStandardVariable(varId,programUUID);
-				if (svar != null && svar.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
-					return row.getMeasurementDataValue(mvar.getName());
-				}
-			}
-		}
-		// GCP-7340, GCP-7346
+		// check if multi-location
+		// it means the location is defined in the observation sheet
+		trialInstanceNumber = getTrialInstanceNumberFromMeasurementRows(
+				ontology, workbook.getObservations(),
+				workbook.getTrialFactors());
+
 		if (workbook.isNursery()) {
 			return "1";
 		}
@@ -495,60 +487,93 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(name, programUUID, relationship);
 	}
 
-	protected Boolean isEntryExists(OntologyDataManager ontology, List<MeasurementVariable> list, String programUUID) throws MiddlewareException {
+	protected Boolean isEntryExists(OntologyDataManager ontology,
+			List<MeasurementVariable> list) throws MiddlewareException {
 		for (MeasurementVariable mvar : list) {
-			PhenotypicType type = PhenotypicType.getPhenotypicTypeForLabel(mvar.getLabel());
-			Integer varId =
-					ontology.getStandardVariableIdByPropertyScaleMethodRole(mvar.getProperty(), mvar.getScale(), mvar.getMethod(), type);
+			Integer varId = ontology
+					.getStandardVariableIdByPropertyScaleMethod(
+							mvar.getProperty(), mvar.getScale(),
+							mvar.getMethod());
 
-			if (varId != null) {
-				StandardVariable svar = ontology.getStandardVariable(varId,programUUID);
-				if (svar!=null && svar.getId() == TermId.ENTRY_NO.getId()) {
-					mvar.setRequired(true);
-					return true;
-				}
+			if (varId != null && varId == TermId.ENTRY_NO.getId()) {
+				mvar.setRequired(true);
+				return true;
 			}
 		}
 
 		return false;
 	}
 
-	protected Boolean isPlotExists(OntologyDataManager ontology, List<MeasurementVariable> list, String programUUID) throws MiddlewareException {
+	protected Boolean isPlotExists(OntologyDataManager ontology,
+			List<MeasurementVariable> list) throws MiddlewareException {
 		for (MeasurementVariable mvar : list) {
-			PhenotypicType type = PhenotypicType.getPhenotypicTypeForLabel(mvar.getLabel());
-			Integer varId =
-					ontology.getStandardVariableIdByPropertyScaleMethodRole(mvar.getProperty(), mvar.getScale(), mvar.getMethod(), type);
+			Integer varId = ontology
+					.getStandardVariableIdByPropertyScaleMethod(
+							mvar.getProperty(), mvar.getScale(),
+							mvar.getMethod());
 
-			if (varId != null) {
-				StandardVariable svar = ontology.getStandardVariable(varId,programUUID);
-
-				if (svar.getId() == TermId.PLOT_NO.getId() || svar.getId() == TermId.PLOT_NNO.getId()) {
-					mvar.setRequired(true);
-					return true;
-				}
-
-			}
-
-		}
-		return false;
-	}
-
-	protected Boolean isTrialInstanceNumberExists(
-			OntologyDataManager ontology, List<MeasurementVariable> list, String programUUID)
-			throws MiddlewareException {
-		for (MeasurementVariable mvar : list) {
-
-			StandardVariable svar =
-					ontology.findStandardVariableByTraitScaleMethodNames(
-							mvar.getProperty(), mvar.getScale(), mvar.getMethod(), programUUID);
-
-			if (svar != null && svar.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+			if (varId != null
+					&& (varId == TermId.PLOT_NO.getId() || varId == TermId.PLOT_NNO
+							.getId())) {
 				mvar.setRequired(true);
 				return true;
 			}
 
 		}
 		return false;
+	}
+
+	protected Boolean isTrialInstanceNumberExists(OntologyDataManager ontology,
+			List<MeasurementVariable> list) throws MiddlewareException {
+		MeasurementVariable var = getTrialInstanceNumberMeasurementVariable(
+				ontology, list);
+		if (var != null) {
+			var.setRequired(true);
+			return true;
+		}
+		return false;
+	}
+
+	private String getTrialInstanceNumberFromMeasurementRows(
+			OntologyDataManager ontology, List<MeasurementRow> measurementRows,
+			List<MeasurementVariable> trialFactors)
+			throws MiddlewareQueryException {
+
+		// get first row - should contain the study location
+		MeasurementRow row = measurementRows.get(0);
+		MeasurementVariable var = getTrialInstanceNumberMeasurementVariable(
+				ontology, trialFactors);
+		if (var != null) {
+			return row.getMeasurementDataValue(var.getName());
+		}
+
+		return null;
+	}
+
+	private String getTrialInstanceNumberFromMeasurementVariables(
+			OntologyDataManager ontology, List<MeasurementVariable> list)
+			throws MiddlewareQueryException {
+		MeasurementVariable mvar = getTrialInstanceNumberMeasurementVariable(
+				ontology, list);
+		if (mvar != null) {
+			return mvar.getValue();
+		}
+		return null;
+	}
+
+	private MeasurementVariable getTrialInstanceNumberMeasurementVariable(
+			OntologyDataManager ontology, List<MeasurementVariable> list)
+			throws MiddlewareQueryException {
+		for (MeasurementVariable mvar : list) {
+			Integer varId = ontology
+					.getStandardVariableIdByPropertyScaleMethod(
+							mvar.getProperty(), mvar.getScale(),
+							mvar.getMethod());
+			if (varId != null && TermId.TRIAL_INSTANCE_FACTOR.getId() == varId) {
+				return mvar;
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -569,21 +594,25 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(this.getSessionProvider());
 
-		if (!this.isEntryExists(ontology, workbook.getFactors(),programUUID)) {
+		if (!this.isEntryExists(ontology, workbook.getFactors())) {
 			this.initializeIfNull(errors, Constants.MISSING_ENTRY);
-			// DMV : TODO change implem so that backend is agnostic to UI when determining messages
-			errors.get(Constants.MISSING_ENTRY).add(new Message("error.entry.doesnt.exist.wizard"));
+			// DMV : TODO change implem so that backend is agnostic to UI when
+			// determining messages
+			errors.get(Constants.MISSING_ENTRY).add(
+					new Message("error.entry.doesnt.exist.wizard"));
 		}
 
-		if ((workbook.getImportType() == null || workbook.getImportType() == DataSetType.PLOT_DATA.getId())
-				&& !this.isPlotExists(ontology, workbook.getFactors(),programUUID)) {
+		if ((workbook.getImportType() == null || workbook.getImportType() == DataSetType.PLOT_DATA
+				.getId())
+				&& !this.isPlotExists(ontology, workbook.getFactors())) {
 			this.initializeIfNull(errors, Constants.MISSING_PLOT);
 			// DMV : TODO change implem so that backend is agnostic to UI when determining messages
 			errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
 		}
 
-		if (!workbook.isNursery() && !this.isTrialInstanceNumberExists(
-				ontology, workbook.getTrialVariables(), programUUID)) {
+		if (!workbook.isNursery()
+				&& !this.isTrialInstanceNumberExists(ontology,
+						workbook.getTrialVariables())) {
 			this.initializeIfNull(errors, Constants.MISSING_TRIAL);
 			errors.get(Constants.MISSING_TRIAL).add(new Message(DataImportServiceImpl.ERROR_MISSING_TRIAL_CONDITION));
 		}
@@ -656,10 +685,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// the following code is a workaround versus the current state management in the ETL Wizard
 		// to re-set the "required" fields to true for checking later on
 
-		this.isPlotExists(ontology, workbook.getFactors(),programUUID);
-		this.isEntryExists(ontology, workbook.getFactors(),programUUID);
+		this.isPlotExists(ontology, workbook.getFactors());
+		this.isEntryExists(ontology, workbook.getFactors());
 		if (!workbook.isNursery()) {
-			this.isTrialInstanceNumberExists(ontology, workbook.getTrialVariables(), programUUID);
+			this.isTrialInstanceNumberExists(ontology,
+					workbook.getTrialVariables());
 		}
 
 		List<Message> requiredVariableValueErrors = this.checkForEmptyRequiredVariables(workbook);
@@ -690,9 +720,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			String trialInstanceHeader = null;
 			List<MeasurementVariable> trialFactors = workbook.getTrialFactors();
 			for (MeasurementVariable mvar : trialFactors) {
-				PhenotypicType type = PhenotypicType.getPhenotypicTypeForLabel(mvar.getLabel());
-				Integer varId =
-						ontology.getStandardVariableIdByPropertyScaleMethodRole(mvar.getProperty(), mvar.getScale(), mvar.getMethod(), type);
+				Integer varId = ontology
+						.getStandardVariableIdByPropertyScaleMethod(
+								mvar.getProperty(), mvar.getScale(),
+								mvar.getMethod());
 				if (varId != null) {
 					StandardVariable svar = ontology.getStandardVariable(varId,programUUID);
 					if (svar.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {

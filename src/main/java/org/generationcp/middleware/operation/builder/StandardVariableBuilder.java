@@ -286,64 +286,90 @@ public class StandardVariableBuilder extends Builder {
 		return stdVariableId;
 	}
 
-	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers, String programUUID) throws MiddlewareException {
+	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(
+			List<String> headers, String programUUID)
+			throws MiddlewareException {
 
 		Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<String, List<StandardVariable>>();
-		Map<String, Set<Integer>> standardVariableIdsInProjects = new HashMap<String, Set<Integer>>();
+		Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<String, Map<Integer, VariableType>>();
 
 		// Step 1: Search for DISTINCT standard variables used for projectprop records where projectprop.value equals input name (eg. REP)
 		List<String> names = headers;
-		standardVariableIdsInProjects = this.getStandardVariableIdsForProjectProperties(names);
+		standardVariableIdsWithTypeInProjects = this
+				.getStandardVariableIdsWithTypeForProjectProperties(names);
 
 		// Step 2: If no variable found, search for cvterm (standard variables) with given name.
 		// Exclude header items with result from step 1
 		names = new ArrayList<String>();
 		for (String name : headers) {
-			Set<Integer> varIds = standardVariableIdsInProjects.get(name.toUpperCase());
+			Set<Integer> varIds = standardVariableIdsWithTypeInProjects.get(
+					name.toUpperCase()).keySet();
 			if (varIds == null || varIds.isEmpty()) {
 				names.add(name);
 			}
 		}
 
-		standardVariableIdsInProjects.putAll(this.getStandardVariableIdsForTerms(names));
-		// Step 3. If no variable still found for steps 1 and 2, treat the header as a trait / property name.
-		// Search for trait with given name and return the standard variables using that trait (if any)
+		standardVariableIdsWithTypeInProjects.putAll(this
+				.getStandardVariableIdsWithTypeForTerms(names));
+		// Step 3. If no variable still found for steps 1 and 2, treat the
+		// header as a trait / property name.
+		// Search for trait with given name and return the standard variables
+		// using that trait (if any)
 
 		// Exclude header items with result from step 2
 		names = new ArrayList<String>();
 		for (String name : headers) {
-			Set<Integer> varIds = standardVariableIdsInProjects.get(name.toUpperCase());
+			Set<Integer> varIds = standardVariableIdsWithTypeInProjects.get(
+					name.toUpperCase()).keySet();
 			if (varIds == null || varIds.isEmpty()) {
 				names.add(name);
 			}
 		}
 
-		standardVariableIdsInProjects.putAll(this.getStandardVariableIdsForTraits(names));
+		standardVariableIdsWithTypeInProjects.putAll(this
+				.getStandardVariableIdsForTraits(names));
 		for (String name : headers) {
 			String upperName = name.toUpperCase();
-			Set<Integer> varIds = standardVariableIdsInProjects.get(upperName);
+			Map<Integer, VariableType> varIdsWithType = standardVariableIdsWithTypeInProjects
+					.get(upperName);
 
 			List<StandardVariable> variables = new ArrayList<StandardVariable>();
-			if (varIds != null) {
-				List<Integer> standardVariableIds = new ArrayList<Integer>(varIds);
-				variables = this.create(standardVariableIds,programUUID);
+			if (varIdsWithType != null) {
+				List<Integer> standardVariableIds = new ArrayList<Integer>(
+						varIdsWithType.keySet());
+				variables = this.create(standardVariableIds, programUUID);
+				setRoleOfVariables(variables, varIdsWithType);
 			}
 			standardVariablesInProjects.put(name, variables);
 		}
 		return standardVariablesInProjects;
 	}
 
-	public Map<String, Set<Integer>> getStandardVariableIdsForProjectProperties(List<String> propertyNames) throws MiddlewareQueryException {
-		return this.getProjectPropertyDao().getStandardVariableIdsByPropertyNames(propertyNames);
+	private void setRoleOfVariables(List<StandardVariable> variables,
+			Map<Integer, VariableType> varIdsWithType) {
+		for (StandardVariable standardVariable : variables) {
+			VariableType type = varIdsWithType.get(standardVariable.getId());
+			standardVariable.setPhenotypicType(type.getRole());
+		}
 	}
 
-	public Map<String, Set<Integer>> getStandardVariableIdsForTerms(List<String> termNames) throws MiddlewareQueryException {
-		return this.getCvTermDao().getTermsByNameOrSynonyms(termNames, CvId.VARIABLES.getId());
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(
+			List<String> propertyNames) throws MiddlewareQueryException {
+		return this.getProjectPropertyDao()
+				.getStandardVariableIdsWithTypeByPropertyNames(propertyNames);
+	}
+
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForTerms(
+			List<String> termNames) throws MiddlewareQueryException {
+		return this.getCvTermDao().getTermIdsWithTypeByNameOrSynonyms(
+				termNames, CvId.VARIABLES.getId());
 
 	}
 
-	public Map<String, Set<Integer>> getStandardVariableIdsForTraits(List<String> traitNames) throws MiddlewareQueryException {
-		return this.getCvTermDao().getStandardVariableIdsByProperties(traitNames);
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsForTraits(
+			List<String> traitNames) throws MiddlewareQueryException {
+		return this.getCvTermDao().getStandardVariableIdsWithTypeByProperties(
+				traitNames);
 	}
 
 	public Integer getIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException {

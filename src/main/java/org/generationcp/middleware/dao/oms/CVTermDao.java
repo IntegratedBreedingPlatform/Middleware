@@ -24,6 +24,7 @@ import org.generationcp.middleware.domain.oms.*;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -83,8 +84,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return termIds;
 	}
 
-	public Map<String, Set<Integer>> getTermsByNameOrSynonyms(List<String> nameOrSynonyms, int cvId) throws MiddlewareQueryException {
-		Map<String, Set<Integer>> stdVarMap = new HashMap<String, Set<Integer>>();
+	public Map<String, Map<Integer, VariableType>> getTermIdsWithTypeByNameOrSynonyms(
+			List<String> nameOrSynonyms, int cvId)
+			throws MiddlewareQueryException {
+		Map<String, Map<Integer, VariableType>> stdVarMap = new HashMap<String, Map<Integer, VariableType>>();
 
 		// Store the names in the map in uppercase
 		for (int i = 0, size = nameOrSynonyms.size(); i < size; i++) {
@@ -111,14 +114,15 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 					String nameOrSynonym = ((String) row[0]).trim().toUpperCase();
 					Integer cvtermId = (Integer) row[1];
 
-					Set<Integer> stdVarIds = null;
+					Map<Integer, VariableType> stdVarIdsWithType = null;
 					if (stdVarMap.containsKey(nameOrSynonym)) {
-						stdVarIds = stdVarMap.get(nameOrSynonym);
+						stdVarIdsWithType = stdVarMap.get(nameOrSynonym);
 					} else {
-						stdVarIds = new HashSet<>();
-						stdVarMap.put(nameOrSynonym, stdVarIds);
+						stdVarIdsWithType = new HashMap<Integer, VariableType>();
+						stdVarMap.put(nameOrSynonym, stdVarIdsWithType);
 					}
-					stdVarIds.add(cvtermId);
+					stdVarIdsWithType.put(cvtermId,
+							getDefaultVariableType(cvtermId));
 				}
 
 			}
@@ -129,7 +133,23 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return stdVarMap;
 	}
 
-	public CVTerm getByNameAndCvId(String name, int cvId) throws MiddlewareQueryException {
+	private VariableType getDefaultVariableType(Integer cvTermId) {
+		Criteria criteria = this.getSession().createCriteria(
+				CVTermProperty.class);
+		criteria.add(Restrictions.eq("cvTermId", cvTermId));
+		criteria.add(Restrictions.eq("typeId", TermId.VARIABLE_TYPE.getId()));
+		criteria.addOrder(Order.asc("cvTermPropertyId"));
+		List<CVTermProperty> variableTypes = criteria.list();
+		if (variableTypes != null) {
+			for (CVTermProperty cvTermProperty : variableTypes) {
+				return VariableType.getByName(cvTermProperty.getValue());
+			}
+		}
+		return null;
+	}
+
+	public CVTerm getByNameAndCvId(String name, int cvId)
+			throws MiddlewareQueryException {
 		CVTerm term = null;
 
 		try {
@@ -616,15 +636,18 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	/**
-	 * Returns standard variables associated to the given list of trait names or synonyms
-	 *
+	 * Returns standard variables associated to the given list of trait names or
+	 * synonyms
+	 * 
 	 * @param propertyNameOrSynonyms
-	 * @return Map of name-standard variable ids of the given trait name or synonyms
+	 * @return Map of name-(standard variable ids-variable type) of the given
+	 *         trait name or synonyms
 	 * @throws MiddlewareQueryException
 	 */
-	public Map<String, Set<Integer>> getStandardVariableIdsByProperties(List<String> propertyNameOrSynonyms)
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByProperties(
+			List<String> propertyNameOrSynonyms)
 			throws MiddlewareQueryException {
-		Map<String, Set<Integer>> stdVarMap = new HashMap<String, Set<Integer>>();
+		Map<String, Map<Integer, VariableType>> stdVarMap = new HashMap<String, Map<Integer, VariableType>>();
 
 		// Store the names in the map in uppercase
 		for (int i = 0, size = propertyNameOrSynonyms.size(); i < size; i++) {
@@ -653,21 +676,23 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 					String cvtermSynonym = ((String) row[1]).trim().toUpperCase();
 					Integer cvtermId = (Integer) row[2];
 
-					Set<Integer> stdVarIds = new HashSet<Integer>();
+					Map<Integer, VariableType> stdVarIdsWithType = new HashMap<Integer, VariableType>();
 					if (propertyNameOrSynonyms.contains(cvtermName)) {
 						if (stdVarMap.containsKey(cvtermName)) {
-							stdVarIds = stdVarMap.get(cvtermName);
+							stdVarIdsWithType = stdVarMap.get(cvtermName);
 						}
-						stdVarIds.add(cvtermId);
-						stdVarMap.put(cvtermName, stdVarIds);
+						stdVarIdsWithType.put(cvtermId,
+								getDefaultVariableType(cvtermId));
+						stdVarMap.put(cvtermName, stdVarIdsWithType);
 
 					}
 					if (propertyNameOrSynonyms.contains(cvtermSynonym)) {
 						if (stdVarMap.containsKey(cvtermSynonym)) {
-							stdVarIds = stdVarMap.get(cvtermSynonym);
+							stdVarIdsWithType = stdVarMap.get(cvtermSynonym);
 						}
-						stdVarIds.add(cvtermId);
-						stdVarMap.put(cvtermSynonym, stdVarIds);
+						stdVarIdsWithType.put(cvtermId,
+								getDefaultVariableType(cvtermId));
+						stdVarMap.put(cvtermSynonym, stdVarIdsWithType);
 					}
 
 				}
@@ -676,7 +701,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		} catch (HibernateException e) {
 			this.logAndThrowException(
-					"Error in getStandardVariableIdsByProperties=" + propertyNameOrSynonyms + " in CVTermDao: " + e.getMessage(), e);
+					"Error in getStandardVariableIdsWithTypeByProperties="
+							+ propertyNameOrSynonyms + " in CVTermDao: "
+							+ e.getMessage(), e);
 		}
 
 		return stdVarMap;

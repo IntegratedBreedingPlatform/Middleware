@@ -84,18 +84,6 @@ public interface OntologyDataManager {
 	StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) throws MiddlewareQueryException;
 
 	/**
-	 * Retrieves a the standardVariableId given the property, scale and method Ids.
-	 *
-	 * @param propertyId the property id
-	 * @param scaleId the scale id
-	 * @param methodId the method id
-	 * @return the standard variable id by property scale method
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	Integer getStandardVariableIdByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId)
-			throws MiddlewareQueryException;
-
-	/**
 	 * Find standard variables by name or synonym.
 	 *
 	 * @param nameOrSynonym the name or synonym
@@ -527,29 +515,37 @@ public interface OntologyDataManager {
 	void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException;
 
 	/**
-	 * Returns the variable id given the property, scale, method, and role (P-S-M-R).
-	 *
-	 * @param property the property
-	 * @param scale the scale
-	 * @param method the method
-	 * @param role the role
-	 * @return the standard variable id by property scale method role
-	 * @throws MiddlewareQueryException the middleware query exception
+	 * Returns the variable id given the property, scale, method, and role
+	 * (P-S-M-R).
+	 * 
+	 * @param property
+	 *            the property
+	 * @param scale
+	 *            the scale
+	 * @param method
+	 *            the method
+	 * @return the standard variable id by property scale method
+	 * @throws MiddlewareQueryException
+	 *             the middleware query exception
 	 */
-	Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
-			throws MiddlewareQueryException;
+	Integer getStandardVariableIdByPropertyScaleMethod(String property,
+			String scale, String method) throws MiddlewareQueryException;
 
 	/**
-	 * Returns the variable id given the property, scale, method, and role (P-S-M-R).
-	 *
-	 * @param propertyId the property id
-	 * @param scaleId the scale id
-	 * @param methodId the method id
-	 * @param role the role
-	 * @return the standard variable id by property scale method role
-	 * @throws MiddlewareQueryException the middleware query exception
+	 * Returns the variable id given the property, scale, method (P-S-M).
+	 * 
+	 * @param propertyId
+	 *            the property id
+	 * @param scaleId
+	 *            the scale id
+	 * @param methodId
+	 *            the method id
+	 * @return the standard variable id by property scale method
+	 * @throws MiddlewareQueryException
+	 *             the middleware query exception
 	 */
-	Integer getStandardVariableIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role)
+	Integer getStandardVariableIdByPropertyIdScaleIdMethodId(
+			Integer propertyId, Integer scaleId, Integer methodId)
 			throws MiddlewareQueryException;
 
 	/**
