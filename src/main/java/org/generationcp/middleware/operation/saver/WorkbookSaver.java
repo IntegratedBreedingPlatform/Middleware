@@ -405,7 +405,6 @@ public class WorkbookSaver extends Saver {
 			throws MiddlewareQueryException {
 
 		Set<String> trialInstanceNumbers = new HashSet<String>();
-		Integer locationId = null;
 		List<MeasurementRow> observations = null;
 		Long geolocationId = null;
 		boolean hasTrialObservations = false;
@@ -440,16 +439,16 @@ public class WorkbookSaver extends Saver {
 									this.getGeolocationSaver().saveGeolocationOrRetrieveIfExisting(
 											workbook.getStudyDetails().getStudyName(), geolocation, row, workbook.isNursery(),
 											isDeleteTrialObservations, programUUID);
-							locationId = g.getLocationId();
-							locationIds.add(locationId);
+							geolocationId = g.getLocationId().longValue();
+							locationIds.add(geolocationId.intValue());
 							if (g.getVariates() != null && !g.getVariates().isEmpty()) {
 								VariableList trialVariates = new VariableList();
 								trialVariates.addAll(g.getVariates());
-								trialVariatesMap.put(locationId, trialVariates);
+								trialVariatesMap.put(geolocationId.intValue(), trialVariates);
 							}
 						}
-						row.setLocationId(locationId);
-						locationMap.put(trialInstanceNumber, locationId);
+						row.setLocationId(geolocationId.intValue());
+						locationMap.put(trialInstanceNumber, geolocationId.intValue());
 					}
 				}
 			}
@@ -460,7 +459,7 @@ public class WorkbookSaver extends Saver {
 					if (trialInstance != null) {
 						Integer locId = locationMap.get(trialInstance);
 						row.setLocationId(locId);
-					} else if (geolocationId != null) {
+					} else if (geolocationId != null && geolocationId != 0) {
 						row.setLocationId(geolocationId);
 					}
 				}
