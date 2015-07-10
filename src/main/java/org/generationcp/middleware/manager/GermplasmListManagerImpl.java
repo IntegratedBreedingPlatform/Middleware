@@ -63,6 +63,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 				new Class[] {Integer.TYPE, Integer.TYPE});
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Deprecated
 	@Override
 	public List<GermplasmList> getAllGermplasmLists(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
@@ -82,6 +85,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return this.getGermplasmListDAO().getByName(name, operation, start, numOfRows);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Override
 	@Deprecated
 	public List<GermplasmList> getGermplasmListByName(String name, int start, int numOfRows, Operation operation, Database instance)
@@ -96,6 +102,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return this.getGermplasmListDAO().countByName(name, operation);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Deprecated
 	@Override
 	public long countGermplasmListByName(String name, Operation operation, Database instance) throws MiddlewareQueryException {
@@ -198,6 +207,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return topLevelFolders;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Override
 	@Deprecated
 	public List<GermplasmList> getAllTopLevelListsBatched(int batchSize, Database instance) throws MiddlewareQueryException {
@@ -612,6 +624,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return results;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Deprecated
 	@Override
 	public List<GermplasmList> searchForGermplasmList(String q, Operation o, boolean searchPublicData) throws MiddlewareQueryException {

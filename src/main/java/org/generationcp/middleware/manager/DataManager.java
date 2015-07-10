@@ -151,6 +151,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 * @param parameterTypes The types of the parameters to be passed to the method
 	 * @return List of all records satisfying the given parameters
 	 * @throws MiddlewareQueryException
+	 * @deprecated
 	 */
 	// TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
 	// Logic changed to simply invoke the getMethod by reflection and not do any cursor positioning using count methods.
@@ -378,21 +379,22 @@ public abstract class DataManager extends DatabaseBroker {
 	 * Calls the corresponding count method as specified in the parameter methodName. <br/>
 	 * <br/>
 	 * Sample usage: <br/>
-	 * 
+	 *
 	 * <pre>
 	 * <code>
-	 *  public long countLocationsByCountry(Country country) throws MiddlewareQueryException { 
-	 *      return countAllByMethod(getLocationDao(), "countByCountry", new Object[]{country}, new Class[]{Country.class}); 
+	 *  public long countLocationsByCountry(Country country) throws MiddlewareQueryException {
+	 *      return countAllByMethod(getLocationDao(), "countByCountry", new Object[]{country}, new Class[]{Country.class});
 	 *  }
 	 *  </code>
 	 * </pre>
-	 * 
+	 *
 	 * @param dao The DAO to call the method from
 	 * @param methodName The method to call
 	 * @param parameters The parameters to be passed to the method
 	 * @param parameterTypes The types of the parameters to be passed to the method
 	 * @return the count
 	 * @throws MiddlewareQueryException
+	 * @deprecated
 	 */
 	@SuppressWarnings("rawtypes")
 	@Deprecated

@@ -105,9 +105,12 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public long countLocationsByName(String name, Operation op, String programUUID) throws MiddlewareQueryException {
 		return this.countAllByMethod(this.getLocationDao(), "countByNameAndUniqueID", new Object[] {name, op, programUUID}, new Class[] {
-				String.class, Operation.class, String.class});
+			String.class, Operation.class, String.class});
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Override
 	@Deprecated
 	public List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException {
@@ -116,19 +119,25 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		return locations;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Override
 	@Deprecated
 	public List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
 		List<String> methods = Arrays.asList("countByName", "getByName");
 		return this.getFromCentralAndLocalByMethod(this.getLocationDao(), methods, start, numOfRows, new Object[] {name, op}, new Class[] {
-				String.class, Operation.class});
+			String.class, Operation.class});
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Override
 	@Deprecated
 	public long countLocationsByName(String name, Operation op) throws MiddlewareQueryException {
 		return this.countAllByMethod(this.getLocationDao(), "countByName", new Object[] {name, op}, new Class[] {String.class,
-				Operation.class});
+			Operation.class});
 	}
 
 	@Override

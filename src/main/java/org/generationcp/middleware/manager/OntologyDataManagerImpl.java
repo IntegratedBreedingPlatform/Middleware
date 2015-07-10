@@ -163,6 +163,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Deprecated
 	@Override
 	public Term addMethod(String name, String definition) throws MiddlewareQueryException {
