@@ -165,7 +165,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<Location> getLocationsByType(Integer type, String programUUID) throws MiddlewareQueryException {
 		return this.getAllByMethod(this.getLocationDao(), "getByType", new Object[] {type, programUUID}, new Class[] {Integer.class,
-				String.class});
+			String.class});
 	}
 
 	@Override
@@ -183,7 +183,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public long countLocationsByType(Integer type, String programUUID) throws MiddlewareQueryException {
 		return this.countAllByMethod(this.getLocationDao(), "countByType", new Object[] {type, programUUID}, new Class[] {Integer.class,
-				String.class});
+			String.class});
 	}
 
 	@Override
@@ -401,19 +401,19 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<Location> getLocationsByCountryAndType(Country country, Integer type) throws MiddlewareQueryException {
 		return super.getAllByMethod(this.getLocationDao(), "getByCountryAndType", new Object[] {country, type}, new Class[] {Country.class,
-				Integer.class});
+			Integer.class});
 	}
 
 	@Override
 	public List<Location> getLocationsByNameCountryAndType(String name, Country country, Integer type) throws MiddlewareQueryException {
 		return super.getAllByMethod(this.getLocationDao(), "getByNameCountryAndType", new Object[] {name, country, type}, new Class[] {
-				String.class, Country.class, Integer.class});
+			String.class, Country.class, Integer.class});
 	}
 
 	@Override
 	public List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows) throws MiddlewareQueryException {
 		return super.getAllByMethod(this.getLocationDao(), "getLocationDetails", new Object[] {locationId, start, numOfRows}, new Class[] {
-				Integer.class, Integer.class, Integer.class});
+			Integer.class, Integer.class, Integer.class});
 
 	}
 
@@ -444,7 +444,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		Integer fieldLtypeFldId = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
 
 		return super.getAllByMethod(this.getLocationDao(), "getLocationsByDTypeAndLType", new Object[] {String.valueOf(locationId),
-				fieldParentFldId, fieldLtypeFldId}, new Class[] {String.class, Integer.class, Integer.class});
+			fieldParentFldId, fieldLtypeFldId}, new Class[] {String.class, Integer.class, Integer.class});
 	}
 
 	@Override
@@ -453,7 +453,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		Integer blockLtypeFldId = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
 
 		return super.getAllByMethod(this.getLocationDao(), "getLocationsByDTypeAndLType", new Object[] {String.valueOf(fieldId),
-				blockParentFldId, blockLtypeFldId}, new Class[] {String.class, Integer.class, Integer.class});
+			blockParentFldId, blockLtypeFldId}, new Class[] {String.class, Integer.class, Integer.class});
 	}
 
 	@Override
