@@ -56,7 +56,7 @@ public class PoiEventUserModel {
 			try {
 				sheet2 = r.getSheet("rSheet" + (sheetIndex + 1));
 			} catch (Exception e) {
-				e.printStackTrace();
+				PoiEventUserModel.LOG.error("Sheet could not be retrieved", e);
 			}
 		}
 

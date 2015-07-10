@@ -33,7 +33,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 	private MBDTGenerationDAO generationDAO;
 	private SelectedMarkerDAO selectedMarkerDAO;
 	private SelectedGenotypeDAO selectedGenotypeDAO;
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(MBDTDataManagerImpl.class);
 
 	public MBDTDataManagerImpl(HibernateSessionProvider sessionProvider) {
@@ -300,7 +300,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 			session.clear();
 			transaction.commit();
 		} catch (MiddlewareQueryException e) {
-			e.printStackTrace();
+			MBDTDataManagerImpl.LOG.error("Setting selected accessions was not successful", e);
 			transaction.rollback();
 		}
 	}
@@ -383,11 +383,11 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 			session.clear();
 			transaction.commit();
 		} catch (MiddlewareQueryException e) {
-			e.printStackTrace();
+			MBDTDataManagerImpl.LOG.error("Setting parent data was not successful", e);
 			transaction.rollback();
 			throw e;
 		} catch (HibernateException e) {
-			e.printStackTrace();
+			MBDTDataManagerImpl.LOG.error("Setting parent data was not successful", e);
 			transaction.rollback();
 			throw e;
 		}
