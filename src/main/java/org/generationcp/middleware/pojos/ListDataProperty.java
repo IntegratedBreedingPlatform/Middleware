@@ -13,11 +13,19 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 
-import javax.persistence.*;
-
 import org.generationcp.middleware.util.Debug;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 /**
  * POJO for listdataprop table

@@ -11,9 +11,17 @@
 
 package org.generationcp.middleware.pojos;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
 import java.io.Serializable;
 
-import javax.persistence.*;
 
 /**
  * POJO for atributs table.
@@ -31,7 +39,7 @@ public class Attribute implements Serializable {
 	public static final String GET_BY_GID = "getAttributesByGID";
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "aid")
 	private Integer aid;
