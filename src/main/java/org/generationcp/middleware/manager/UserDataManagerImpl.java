@@ -62,9 +62,6 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 			trans = session.beginTransaction();
 			UserDAO dao = this.getUserDao();
 
-			Integer userId = dao.getNextId("userid");
-			user.setUserid(userId);
-
 			User recordSaved = dao.saveOrUpdate(user);
 			idUserSaved = recordSaved.getUserid();
 

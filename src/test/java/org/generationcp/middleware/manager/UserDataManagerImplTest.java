@@ -50,11 +50,9 @@ public class UserDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testAddUser() throws MiddlewareQueryException {
 		User user = new User();
-		user.setUserid(-1);
 		user.setInstalid(-1);
 		user.setStatus(-1);
 		user.setAccess(-1);
-		user.setUserid(-1);
 		user.setType(-1);
 		user.setName("user_test");
 		user.setPassword("user_password");
@@ -179,11 +177,9 @@ public class UserDataManagerImplTest extends DataManagerIntegrationTest {
 
 		// local database
 		User user = new User();
-		user.setUserid(-1);
 		user.setInstalid(-1);
 		user.setStatus(-1);
 		user.setAccess(-1);
-		user.setUserid(-1);
 		user.setType(-1);
 		user.setName("user_test");
 		user.setPassword("user_password");
@@ -204,11 +200,9 @@ public class UserDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testGetUserByUserName() throws Exception {
 		User user = new User();
-		user.setUserid(-1);
 		user.setInstalid(-1);
 		user.setStatus(-1);
 		user.setAccess(-1);
-		user.setUserid(-1);
 		user.setType(-1);
 		user.setName("user_test");
 		user.setPassword("user_password");

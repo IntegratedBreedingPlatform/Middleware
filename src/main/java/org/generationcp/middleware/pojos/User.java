@@ -18,6 +18,8 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
@@ -58,6 +60,7 @@ public class User implements Serializable, BeanFormState {
 	public static final String GET_ALL_USERS_SORTED = "getAllUsersSorted";
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "userid")
 	private Integer userid;

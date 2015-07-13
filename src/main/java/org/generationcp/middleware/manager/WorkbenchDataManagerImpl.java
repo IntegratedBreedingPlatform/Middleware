@@ -662,15 +662,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			// begin save transaction
 			trans = session.beginTransaction();
 
-			SQLQuery q = session.createSQLQuery("SELECT MAX(userid) FROM users");
-			Integer userId = (Integer) q.uniqueResult();
-
-			if (userId == null || userId.intValue() < 0) {
-				user.setUserid(1);
-			} else {
-				user.setUserid(userId + 1);
-			}
-
 			User recordSaved = this.getUserDao().saveOrUpdate(user);
 			idUserSaved = recordSaved.getUserid();
 
