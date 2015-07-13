@@ -62,43 +62,43 @@ public class WFieldbook23 extends AbstractWheatTrialReporter {
 						entry.setCrossname(dataItem.getValue());
 						break;
 					case "DESIGNATION":
-						entry.setSelHist(dataItem.getValue());
+						entry.setSel_hist(dataItem.getValue());
 						break;
 					case "f_cross_name":
-						entry.setFCrossName(dataItem.getValue());
+						entry.setF_cross_name(dataItem.getValue());
 						break;
 					case "f_selHist":
-						entry.setFSelHist(dataItem.getValue());
+						entry.setF_sel_hist(dataItem.getValue());
 						break;
 					case "f_tabbr":
-						entry.setFTabbr(dataItem.getValue());
+						entry.setF_tabbr(dataItem.getValue());
 						break;
 					case "f_locycle":
 						entry.setFlocycle(dataItem.getValue());
 						break;
 					case "f_ent":
-						entry.setFEnt(Integer.valueOf(dataItem.getValue()));
+						entry.setF_ent(Integer.valueOf(dataItem.getValue()));
 						break;
 					case "m_cross_name":
-						entry.setMCrossName(dataItem.getValue());
+						entry.setM_cross_name(dataItem.getValue());
 						break;
 					case "m_selHist":
-						entry.setMSelHist(dataItem.getValue());
+						entry.setM_sel_hist(dataItem.getValue());
 						break;
 					case "m_tabbr":
-						entry.setMTabbr(dataItem.getValue());
+						entry.setM_tabbr(dataItem.getValue());
 						break;
 					case "m_locycle":
 						entry.setMlocycle(dataItem.getValue());
 						break;
 					case "m_ent":
-						entry.setMEnt(Integer.valueOf(dataItem.getValue()));
+						entry.setM_ent(Integer.valueOf(dataItem.getValue()));
 						break;
 
 						// TODO: pending mappings
 					default:
-						entry.setSEnt(-99);
-						entry.setSTabbr("???");
+						entry.setS_ent(-99);
+						entry.setS_tabbr("???");
 						entry.setSlocycle("???");
 				}
 			}
