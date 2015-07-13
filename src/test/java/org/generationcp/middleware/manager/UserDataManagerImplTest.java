@@ -97,7 +97,6 @@ public class UserDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testAddPerson() throws MiddlewareQueryException {
 		Person person = new Person();
-		person.setId(-1);
 		person.setInstituteId(1);
 		person.setFirstName("Lich");
 		person.setMiddleName("Frozen");
@@ -152,7 +151,6 @@ public class UserDataManagerImplTest extends DataManagerIntegrationTest {
 
 		// local database
 		Person person = new Person();
-		person.setId(-1);
 		person.setInstituteId(1);
 		person.setFirstName("Lich");
 		person.setMiddleName("Frozen");
