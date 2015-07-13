@@ -43,19 +43,22 @@ public class DataSetBuilderTest {
 	private DmsProject generateDmsProject() {
 
 		DmsProject dmsProject = new DmsProject();
+		dmsProject.setProjectId(DataSetBuilderTest.STUDY_ID);
 
 		List<ProjectRelationship> relatedBys = new ArrayList<>();
-		relatedBys.add(this.createProjectRelationship(dmsProject));
-		relatedBys.add(this.createProjectRelationship(dmsProject));
-		relatedBys.add(this.createProjectRelationship(dmsProject));
+		relatedBys.add(this.createProjectRelationship(1));
+		relatedBys.add(this.createProjectRelationship(2));
+		relatedBys.add(this.createProjectRelationship(3));
 		dmsProject.setRelatedBys(relatedBys);
 
 		return dmsProject;
 	}
 
-	private ProjectRelationship createProjectRelationship(DmsProject project) {
+	private ProjectRelationship createProjectRelationship(int projectId) {
 
 		ProjectRelationship relationship = new ProjectRelationship();
+		DmsProject project = new DmsProject();
+		project.setProjectId(projectId);
 		relationship.setSubjectProject(project);
 		return relationship;
 
