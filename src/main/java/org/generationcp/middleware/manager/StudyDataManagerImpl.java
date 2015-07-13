@@ -1060,7 +1060,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 					existingPhenotypeOutlier.setValue(phenotypeOutlier.getValue());
 					phenotypeOutlierDao.saveOrUpdate(existingPhenotypeOutlier);
 				} else {
-					phenotypeOutlier.setPhenotypeOutlierId(phenotypeOutlierDao.getNextId("phenotypeOutlierId"));
 					phenotypeOutlierDao.saveOrUpdate(phenotypeOutlier);
 				}
 				if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
