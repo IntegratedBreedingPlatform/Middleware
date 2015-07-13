@@ -1,19 +1,19 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.oms;
 
 /**
  * The cvterm ID constants used in Middleware.
- *
+ * 
  */
 public enum TermId {
 
@@ -85,7 +85,7 @@ public enum TermId {
 	, ENTRY_CODE(8300), ENTRY_NO(8230), SOURCE(8360), CROSS(8377), DESIG(8250), CHECK(8255), STOCKID(1727)
 
 	// Location
-	, TRIAL_LOCATION(8180), LOCATION_ID(8190), SITE_NAME(8196)
+	, TRIAL_LOCATION(8180), LOCATION_ID(8190), SITE_NAME(8196), COOPERATOOR_ID(8372)
 
 	// Study Type
 	, NURSERY(10000), TRIAL(10010)
