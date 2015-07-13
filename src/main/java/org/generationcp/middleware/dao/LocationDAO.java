@@ -31,6 +31,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -68,7 +69,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		if (operation == null || operation == Operation.EQUAL) {
 			criteria.add(Restrictions.eq(LocationDAO.LNAME, name));
 		} else if (operation == Operation.LIKE) {
-			criteria.add(Restrictions.like(LocationDAO.LNAME, name));
+			criteria.add(Restrictions.like(LocationDAO.LNAME, name, MatchMode.START));
 		}
 	}
 
