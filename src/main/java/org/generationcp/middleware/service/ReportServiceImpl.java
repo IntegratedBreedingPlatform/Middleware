@@ -110,26 +110,28 @@ public class ReportServiceImpl extends Service implements ReportService {
 		for (MeasurementRow row : observations) {
 			int gid = Integer.valueOf(row.getMeasurementDataValue("GID"));
 			GermplasmPedigreeTreeNode germNode = germNodes.get(gid);
-			Germplasm germplasm = germNode.getGermplasm();
+			if (germNode != null) {
+				Germplasm germplasm = germNode.getGermplasm();
 
-			if (germplasm.getGrplce() >= 0 & germNode.getLinkedNodes().size() == 2) { // is geneative and has parents
-				Germplasm female = germNode.getLinkedNodes().get(0).getGermplasm();
-				Germplasm male = germNode.getLinkedNodes().get(1).getGermplasm();
+				if (germplasm.getGrplce() >= 0 & germNode.getLinkedNodes().size() == 2) { // is geneative and has parents
+					Germplasm female = germNode.getLinkedNodes().get(0).getGermplasm();
+					Germplasm male = germNode.getLinkedNodes().get(1).getGermplasm();
 
-				// TODO: pending values for origin of the entries
-				row.getDataList().add(new MeasurementData("f_selHist", female.getSelectionHistory()));
-				row.getDataList().add(new MeasurementData("f_cross_name", female.getSelectionHistory()));
-				row.getDataList().add(new MeasurementData("f_tabbr", "NA")); // put source trial abbreviation
-				row.getDataList().add(new MeasurementData("f_locycle", "NA")); // put source trial cycle
-				row.getDataList().add(new MeasurementData("f_ent", "-99")); // put source trial entry
-				row.getDataList().add(new MeasurementData("f_lid", "-99")); // put source location id
+					// TODO: pending values for origin of the entries
+					row.getDataList().add(new MeasurementData("f_selHist", female.getSelectionHistory()));
+					row.getDataList().add(new MeasurementData("f_cross_name", female.getSelectionHistory()));
+					row.getDataList().add(new MeasurementData("f_tabbr", "NA")); // put source trial abbreviation
+					row.getDataList().add(new MeasurementData("f_locycle", "NA")); // put source trial cycle
+					row.getDataList().add(new MeasurementData("f_ent", "-99")); // put source trial entry
+					row.getDataList().add(new MeasurementData("f_lid", "-99")); // put source location id
 
-				row.getDataList().add(new MeasurementData("m_selHist", male.getSelectionHistory()));
-				row.getDataList().add(new MeasurementData("m_cross_name", male.getSelectionHistory()));
-				row.getDataList().add(new MeasurementData("m_tabbr", "NA")); // put source trial abbreviation
-				row.getDataList().add(new MeasurementData("m_locycle", "NA")); // put source trial cycle
-				row.getDataList().add(new MeasurementData("m_ent", "-99")); // put source trial entry
-				row.getDataList().add(new MeasurementData("m_lid", "-99")); // put source location id
+					row.getDataList().add(new MeasurementData("m_selHist", male.getSelectionHistory()));
+					row.getDataList().add(new MeasurementData("m_cross_name", male.getSelectionHistory()));
+					row.getDataList().add(new MeasurementData("m_tabbr", "NA")); // put source trial abbreviation
+					row.getDataList().add(new MeasurementData("m_locycle", "NA")); // put source trial cycle
+					row.getDataList().add(new MeasurementData("m_ent", "-99")); // put source trial entry
+					row.getDataList().add(new MeasurementData("m_lid", "-99")); // put source location id
+				}
 			}
 		}
 	}
