@@ -91,6 +91,7 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 	}
 
 	protected void deleteSampleProjectData() throws Exception {
+		this.executeUpdate("DELETE FROM mbdt_generations WHERE project_id = " + MBDTDataManagerTest.SAMPLE_PROJECT_ID);
 		this.executeUpdate("DELETE FROM mbdt_project WHERE project_id = " + MBDTDataManagerTest.SAMPLE_PROJECT_ID);
 	}
 
