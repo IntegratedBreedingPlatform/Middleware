@@ -5,11 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.Service;
+import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
@@ -30,12 +33,15 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	final StudyGermplasmListService studyGermplasmListService;
 
+	private final DataImportService dataImportService;
+
 	public StudyServiceImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 		Session currentSession = getCurrentSession();
 		trialTraits = new TraitServiceImpl(currentSession);
 		studyMeasurements = new StudyMeasurements(getCurrentSession());
 		studyGermplasmListService = new StudyGermplasmListServiceImpl(getCurrentSession());
+		dataImportService = new DataImportServiceImpl(sessionProvider);
 	}
 
 	/**
@@ -45,10 +51,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 	 * @param trialMeasurements
 	 */
 	StudyServiceImpl(final TraitService trialTraits, final StudyMeasurements trialMeasurements, 
-			final StudyGermplasmListService studyGermplasmListServiceImpl) {
+			final StudyGermplasmListService studyGermplasmListServiceImpl,
+			final DataImportService dataImportService) {
 		this.trialTraits = trialTraits;
 		this.studyMeasurements = trialMeasurements;
 		this.studyGermplasmListService = studyGermplasmListServiceImpl;
+		this.dataImportService = dataImportService;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -156,4 +164,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public List<StudyGermplasmDto> getStudyGermplasmList(final Integer studyIdentifer) {
 		return studyGermplasmListService.getGermplasmList(studyIdentifer);
 	}
+	
+	@Override
+	public String addNewStudy(Workbook workbook, String programUUID) throws MiddlewareQueryException {
+		int responseStat = dataImportService.saveProjectData(workbook, programUUID);
+		
+		return "save response status: "+ responseStat;
+	}
+
 }
