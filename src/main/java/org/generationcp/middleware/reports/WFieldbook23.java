@@ -32,7 +32,7 @@ public class WFieldbook23 extends AbstractWheatTrialReporter {
 
 	@Override
 	public String getReportCode() {
-		return "WFb23";
+		return "WFb23/48";
 	}
 
 	@Override
