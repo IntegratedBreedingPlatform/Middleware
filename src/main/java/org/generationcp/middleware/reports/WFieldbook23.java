@@ -95,7 +95,7 @@ public class WFieldbook23 extends AbstractWheatTrialReporter {
 						entry.setMEnt(Integer.valueOf(dataItem.getValue()));
 						break;
 
-						// TODO: pending mappings
+					// TODO: pending mappings
 					default:
 						entry.setSEnt(-99);
 						entry.setSTabbr("???");

@@ -156,23 +156,23 @@ public class WLabels05 extends AbstractReporter {
 		sb.append(StringUtil.stringOf(" ", colSpan));
 		for (int i = 0; i < columns; i++) {
 			sb.append(StringUtil.format(records.get(i).get("study"), 30, true)).append(" OCC: ")
-			.append(StringUtil.format(records.get(i).get("occ"), 4, true))
-			.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
+					.append(StringUtil.format(records.get(i).get("occ"), 4, true))
+					.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
 		}
 
 		sb.append(StringUtil.stringOf(" ", colSpan));
 		for (int i = 0; i < columns; i++) {
 			sb.append(StringUtil.format(records.get(i).get("subProg"), 3, true)).append(" ")
-			.append(StringUtil.format(records.get(i).get("type"), 5, true)).append(" ")
-			.append(StringUtil.format(records.get(i).get("season"), 13, true)).append(StringUtil.format("ENTRY", 7, false))
-			.append(" ").append(StringUtil.format(records.get(i).get("entry"), 9, true))
-			.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
+					.append(StringUtil.format(records.get(i).get("type"), 5, true)).append(" ")
+					.append(StringUtil.format(records.get(i).get("season"), 13, true)).append(StringUtil.format("ENTRY", 7, false))
+					.append(" ").append(StringUtil.format(records.get(i).get("entry"), 9, true))
+					.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
 		}
 
 		sb.append(StringUtil.stringOf(" ", colSpan));
 		for (int i = 0; i < columns; i++) {
 			sb.append(StringUtil.format("CIMMYT", 10, false)).append(StringUtil.stringOf(" ", 30))
-			.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
+					.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
 		}
 
 		sb.append(StringUtil.stringOf(" ", colSpan));
@@ -190,13 +190,13 @@ public class WLabels05 extends AbstractReporter {
 		sb.append(StringUtil.stringOf(" ", colSpan));
 		for (int i = 0; i < columns; i++) {
 			sb.append(StringUtil.stringOf(" ", 4)).append(StringUtil.format(records.get(i).get("selHistA"), 36, true))
-			.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
+					.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
 		}
 
 		sb.append(StringUtil.stringOf(" ", colSpan));
 		for (int i = 0; i < columns; i++) {
 			sb.append(StringUtil.stringOf(" ", 4)).append(StringUtil.format(records.get(i).get("selHistB"), 36, true))
-			.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
+					.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
 		}
 
 		return sb.append("\r\n").toString();
@@ -247,20 +247,20 @@ public class WLabels05 extends AbstractReporter {
 						pedigreeA =
 								pedigreeA.length() > 40 ? pedigreeA.substring(0, pedigreeA.substring(0, 40).lastIndexOf("/") + 1)
 										: pedigreeA;
-								pedigreeB =
-										pedigreeB.length() > 40 ? pedigreeB.substring(pedigreeB.lastIndexOf("/", 40) + 1, pedigreeB.length()) : "";
-										record.put("pedigreeA", pedigreeA);
-										record.put("pedigreeB", pedigreeB);
-										break;
+						pedigreeB =
+								pedigreeB.length() > 40 ? pedigreeB.substring(pedigreeB.lastIndexOf("/", 40) + 1, pedigreeB.length()) : "";
+						record.put("pedigreeA", pedigreeA);
+						record.put("pedigreeB", pedigreeB);
+						break;
 					case "DESIGNATION":
 						selHistA = row.get(i);
 						selHistB = selHistA;
 						selHistA =
 								selHistA.length() > 36 ? selHistA.substring(0, selHistA.substring(0, 36).lastIndexOf("-") + 1) : selHistA;
-								selHistB = selHistB.length() > 36 ? selHistB.substring(selHistB.lastIndexOf("-", 36) + 1, selHistB.length()) : "";
-								record.put("selHistA", selHistA);
-								record.put("selHistB", selHistB);
-								break;
+						selHistB = selHistB.length() > 36 ? selHistB.substring(selHistB.lastIndexOf("-", 36) + 1, selHistB.length()) : "";
+						record.put("selHistA", selHistA);
+						record.put("selHistB", selHistB);
+						break;
 					case "PLOT_NO":
 						record.put("plot", row.get(i));
 						break;

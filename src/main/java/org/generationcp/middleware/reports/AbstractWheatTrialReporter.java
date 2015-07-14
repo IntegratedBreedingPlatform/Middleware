@@ -108,7 +108,7 @@ public abstract class AbstractWheatTrialReporter extends AbstractReporter {
 					case "PLOT_NO":
 						entry.setPlot(Integer.valueOf(dataItem.getValue()));
 						break;
-						// TODO: pending mappings
+					// TODO: pending mappings
 					default:
 						entry.setSEnt(-99);
 						entry.setSTabbr("???");

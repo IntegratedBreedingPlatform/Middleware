@@ -37,23 +37,23 @@ public class WTags22 extends WTags04 {
 			switch (headers.get(i)) {
 				case "ENTRY_NO":
 					entry = row.get(i);
-				break;
+					break;
 				case "PLOT_NO":
 					plot = row.get(i);
-				break;
+					break;
 				case "CROSS":
 					pedigreeA = row.get(i);
 					pedigreeB = pedigreeA;
 					pedigreeA =
 							pedigreeA.length() > 40 ? pedigreeA.substring(0, pedigreeA.substring(0, 40).lastIndexOf("/") + 1) : pedigreeA;
 					pedigreeB = pedigreeB.length() > 40 ? pedigreeB.substring(pedigreeB.lastIndexOf("/", 40) + 1, pedigreeB.length()) : "";
-				break;
+					break;
 				case "DESIGNATION":
 					selHistA = row.get(i);
 					selHistB = selHistA;
 					selHistA = selHistA.length() > 36 ? selHistA.substring(0, selHistA.substring(0, 36).lastIndexOf("-") + 1) : selHistA;
 					selHistB = selHistB.length() > 36 ? selHistB.substring(selHistB.lastIndexOf("-", 36) + 1, selHistB.length()) : "";
-				break;
+					break;
 			}
 		}
 

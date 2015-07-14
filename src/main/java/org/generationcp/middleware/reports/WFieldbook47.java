@@ -57,13 +57,13 @@ public class WFieldbook47 extends AbstractWheatTrialReporter {
 				switch (dataItem.getLabel()) {
 					case "ENTRY_NO":
 						entry.setEntryNum(Integer.valueOf(dataItem.getValue()));
-					break;
+						break;
 					case "CROSS":
 						entry.setCrossname(dataItem.getValue());
-					break;
+						break;
 					case "DESIGNATION":
 						entry.setSelHist(dataItem.getValue());
-					break;
+						break;
 					case "f_cross_name":
 						entry.setFCrossName(dataItem.getValue());
 					break;
@@ -75,7 +75,7 @@ public class WFieldbook47 extends AbstractWheatTrialReporter {
 					break;
 					case "f_locycle":
 						entry.setFlocycle(dataItem.getValue());
-					break;
+						break;
 					case "f_ent":
 						entry.setFEnt(Integer.valueOf(dataItem.getValue()));
 					break;
@@ -93,7 +93,7 @@ public class WFieldbook47 extends AbstractWheatTrialReporter {
 					break;
 					case "m_locycle":
 						entry.setMlocycle(dataItem.getValue());
-					break;
+						break;
 					case "m_ent":
 						entry.setMEnt(Integer.valueOf(dataItem.getValue()));
 					break;
