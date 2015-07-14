@@ -164,9 +164,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 		for (Integer markerID : markerIDs) {
 			SelectedMarker sm = new SelectedMarker(generation, markerID);
-			Integer newId = this.selectedMarkerDAO.getNextId("id");
-			sm.setId(newId);
-
 			this.selectedMarkerDAO.saveOrUpdate(sm);
 		}
 	}
