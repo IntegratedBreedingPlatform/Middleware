@@ -34,7 +34,7 @@ public class WLabels05 extends AbstractReporter {
 	@Override
 	public Reporter createReporter() {
 		Reporter r = new WLabels05();
-		r.setFileNameExpression("LABEL05_{trial_name}");
+		r.setFileNameExpression("LABEL05_{trialName}");
 		return r;
 	}
 
@@ -110,7 +110,7 @@ public class WLabels05 extends AbstractReporter {
 			}
 
 			if (null != trialName) {
-				params.put("trial_name", trialName);
+				params.put("trialName", trialName);
 				break;
 			}
 		}

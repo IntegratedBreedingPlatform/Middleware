@@ -26,7 +26,7 @@ public class WFieldbook23 extends AbstractWheatTrialReporter {
 	@Override
 	public Reporter createReporter() {
 		Reporter r = new WFieldbook23();
-		r.setFileNameExpression("F1-HistCrosses_{trial_name}");
+		r.setFileNameExpression("F1-HistCrosses_{trialName}");
 		return r;
 	}
 

@@ -33,7 +33,7 @@ public class WTags04 extends AbstractReporter {
 	@Override
 	public Reporter createReporter() {
 		Reporter r = new WTags04();
-		r.setFileNameExpression("TAGS04_{trial_name}");
+		r.setFileNameExpression("TAGS04_{trialName}");
 		return r;
 	}
 

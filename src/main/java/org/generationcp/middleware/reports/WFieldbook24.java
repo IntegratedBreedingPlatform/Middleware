@@ -6,7 +6,7 @@ public class WFieldbook24 extends AbstractWheatTrialReporter {
 	@Override
 	public Reporter createReporter() {
 		Reporter r = new WFieldbook24();
-		r.setFileNameExpression(this.getReportCode() + "-NB_{trial_name}-{occ}");
+		r.setFileNameExpression(this.getReportCode() + "-NB_{trialName}-{occ}");
 		return r;
 	}
 

@@ -13,7 +13,7 @@ public class WTags22 extends WTags04 {
 	@Override
 	public Reporter createReporter() {
 		Reporter r = new WTags22();
-		r.setFileNameExpression("TAGS22_{trial_name}");
+		r.setFileNameExpression("TAGS22_{trialName}");
 		return r;
 	}
 

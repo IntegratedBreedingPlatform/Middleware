@@ -40,7 +40,7 @@ public class WFieldbook22 extends AbstractReporter {
 		params.put("occ", 123);
 		params.put("lid", "lid");
 		params.put("program", "dummy program");
-		params.put("trial_abbr", "trial_abbr");
+		params.put("trialAbbr", "trial_abbr");
 		params.put("cycle", "dummy cycleA");
 
 		return params;

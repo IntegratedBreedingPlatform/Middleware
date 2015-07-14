@@ -6,7 +6,7 @@ public class WFieldbook25 extends AbstractWheatTrialReporter {
 	@Override
 	public Reporter createReporter() {
 		Reporter r = new WFieldbook25();
-		r.setFileNameExpression("NationalSegregating_Nur-{trial_name}_{occ}");
+		r.setFileNameExpression("NationalSegregating_Nur-{trialName}_{occ}");
 		return r;
 	}
 
