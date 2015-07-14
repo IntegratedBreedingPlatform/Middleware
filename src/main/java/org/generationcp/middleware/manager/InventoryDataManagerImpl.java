@@ -276,11 +276,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 			TransactionDAO dao = this.getTransactionDao();
 
 			for (org.generationcp.middleware.pojos.ims.Transaction transaction : transactions) {
-				if (operation == Operation.ADD) {
-					// Auto-assign IDs for new local DB records
-					Integer id = dao.getNextId("id");
-					transaction.setId(id);
-				}
 				org.generationcp.middleware.pojos.ims.Transaction recordSaved = dao.saveOrUpdate(transaction);
 				idTransactionsSaved.add(recordSaved.getId());
 				transactionsSaved++;
