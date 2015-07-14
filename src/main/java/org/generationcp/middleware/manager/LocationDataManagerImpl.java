@@ -291,10 +291,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			trans = session.beginTransaction();
 			LocationDAO dao = this.getLocationDao();
 
-			// Auto-assign IDs for new DB records
-			Integer nextId = dao.getNextId("locid");
-			location.setLocid(nextId);
-
 			Location recordSaved = dao.saveOrUpdate(location);
 			idLocationSaved = recordSaved.getLocid();
 
@@ -321,11 +317,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			LocationDAO dao = this.getLocationDao();
 
 			for (Location location : locations) {
-
-				// Auto-assign IDs for new DB records
-				Integer nextID = dao.getNextId("locid");
-				location.setLocid(nextID);
-
 				Location recordSaved = dao.saveOrUpdate(location);
 				idLocationsSaved.add(recordSaved.getLocid());
 			}
@@ -353,13 +344,11 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 			// Auto-assign IDs for new DB records
 			LocationDAO locationDao = this.getLocationDao();
-			Integer nextId = locationDao.getNextId("locid");
-			location.setLocid(nextId);
 			Location recordSaved = locationDao.saveOrUpdate(location);
 			idLocationSaved = recordSaved.getLocid();
 
 			LocdesDAO locdesDao = this.getLocdesDao();
-			nextId = locdesDao.getNextId("ldid");
+			Integer nextId = locdesDao.getNextId("ldid");
 			locdes.setLdid(nextId);
 			locdes.setLocationId(idLocationSaved);
 			locdesDao.saveOrUpdate(locdes);

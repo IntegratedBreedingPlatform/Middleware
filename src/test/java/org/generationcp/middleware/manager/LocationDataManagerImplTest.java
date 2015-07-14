@@ -268,7 +268,6 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testAddLocation() throws MiddlewareQueryException {
 		Location location = new Location();
-		location.setLocid(-1);
 		location.setCntryid(1);
 		location.setLabbr("");
 		location.setLname("TEST-LOCATION-1");
@@ -295,7 +294,6 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		List<Location> locations = new ArrayList<Location>();
 
 		Location location1 = new Location();
-		location1.setLocid(-2);
 		location1.setCntryid(1);
 		location1.setLabbr("");
 		location1.setLname("TEST-LOCATION-2");
@@ -307,7 +305,6 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		location1.setSnl3id(1);
 
 		Location location2 = new Location();
-		location2.setLocid(-3);
 		location2.setCntryid(1);
 		location2.setLabbr("");
 		location2.setLname("TEST-LOCATION-3");
@@ -497,7 +494,6 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 	private Location createLocationTestData(int id, String programUUID) {
 		Location location = new Location();
 		location.setUniqueID(programUUID);
-		location.setLocid(id);
 		location.setLrplce(0);
 		location.setLname("TEST-LOCATION" + id);
 		location.setLabbr("");
