@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-02-18T11:40:26 -->
+<!-- Created with Jaspersoft Studio version 6.0.4.final using JasperReports Library version 6.0.4  -->
+<!-- 2015-07-14T14:09:45 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb25_entry" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="a812020a-af24-404a-88f8-803bcc90a7ec">
 	<property name="ireport.zoom" value="3.0"/>
 	<property name="ireport.x" value="0"/>
@@ -30,19 +30,19 @@
 	<parameter name="tid" class="java.lang.Integer"/>
 	<parameter name="occ" class="java.lang.Integer"/>
 	<parameter name="program" class="java.lang.String"/>
-	<parameter name="trial_name" class="java.lang.String"/>
-	<parameter name="trial_abbr" class="java.lang.String"/>
+	<parameter name="trialName" class="java.lang.String"/>
+	<parameter name="trialAbbr" class="java.lang.String"/>
 	<parameter name="LoCycle" class="java.lang.String"/>
-	<parameter name="dms_ip" class="java.lang.String"/>
-	<parameter name="gms_ip" class="java.lang.String"/>
+	<parameter name="dmsIp" class="java.lang.String"/>
+	<parameter name="gmsIp" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
-	<field name="s_occ_lid" class="java.lang.String">
-		<fieldDescription><![CDATA[s_occ_lid]]></fieldDescription>
+	<field name="sOccLid" class="java.lang.String">
+		<fieldDescription><![CDATA[sOccLid]]></fieldDescription>
 	</field>
-	<field name="m_occ" class="java.lang.Integer">
-		<fieldDescription><![CDATA[m_occ]]></fieldDescription>
+	<field name="mOcc" class="java.lang.Integer">
+		<fieldDescription><![CDATA[mOcc]]></fieldDescription>
 	</field>
 	<field name="rep" class="java.lang.Integer">
 		<fieldDescription><![CDATA[rep]]></fieldDescription>
@@ -50,17 +50,17 @@
 	<field name="linea4" class="java.lang.String">
 		<fieldDescription><![CDATA[linea4]]></fieldDescription>
 	</field>
-	<field name="f_tna" class="java.lang.String">
-		<fieldDescription><![CDATA[f_tna]]></fieldDescription>
+	<field name="fTna" class="java.lang.String">
+		<fieldDescription><![CDATA[fTna]]></fieldDescription>
 	</field>
-	<field name="s_occ_cycle" class="java.lang.String">
-		<fieldDescription><![CDATA[s_occ_cycle]]></fieldDescription>
+	<field name="sOccCycle" class="java.lang.String">
+		<fieldDescription><![CDATA[sOccCycle]]></fieldDescription>
 	</field>
 	<field name="sinoffset" class="java.lang.Integer">
 		<fieldDescription><![CDATA[sinoffset]]></fieldDescription>
 	</field>
-	<field name="f_cross_name" class="java.lang.String">
-		<fieldDescription><![CDATA[f_cross_name]]></fieldDescription>
+	<field name="fCrossName" class="java.lang.String">
+		<fieldDescription><![CDATA[fCrossName]]></fieldDescription>
 	</field>
 	<field name="intrid" class="java.lang.String">
 		<fieldDescription><![CDATA[intrid]]></fieldDescription>
@@ -68,50 +68,50 @@
 	<field name="subblock" class="java.lang.Integer">
 		<fieldDescription><![CDATA[subblock]]></fieldDescription>
 	</field>
-	<field name="m_cycle" class="java.lang.String">
-		<fieldDescription><![CDATA[m_cycle]]></fieldDescription>
+	<field name="mCycle" class="java.lang.String">
+		<fieldDescription><![CDATA[mCycle]]></fieldDescription>
 	</field>
-	<field name="replication_no" class="java.lang.Integer">
-		<fieldDescription><![CDATA[replication_no]]></fieldDescription>
+	<field name="replicationNo" class="java.lang.Integer">
+		<fieldDescription><![CDATA[replicationNo]]></fieldDescription>
 	</field>
-	<field name="f_lid" class="java.lang.String">
-		<fieldDescription><![CDATA[f_lid]]></fieldDescription>
+	<field name="fLid" class="java.lang.String">
+		<fieldDescription><![CDATA[fLid]]></fieldDescription>
 	</field>
-	<field name="m_tid" class="java.lang.Integer">
-		<fieldDescription><![CDATA[m_tid]]></fieldDescription>
+	<field name="mTid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[mTid]]></fieldDescription>
 	</field>
-	<field name="s_occ_offset" class="java.lang.Integer">
-		<fieldDescription><![CDATA[s_occ_offset]]></fieldDescription>
+	<field name="sOccOffset" class="java.lang.Integer">
+		<fieldDescription><![CDATA[sOccOffset]]></fieldDescription>
 	</field>
-	<field name="sel_hist" class="java.lang.String">
-		<fieldDescription><![CDATA[sel_hist]]></fieldDescription>
+	<field name="selHist" class="java.lang.String">
+		<fieldDescription><![CDATA[selHist]]></fieldDescription>
 	</field>
 	<field name="slocycle" class="java.lang.String">
 		<fieldDescription><![CDATA[slocycle]]></fieldDescription>
 	</field>
-	<field name="f_ent" class="java.lang.Integer">
-		<fieldDescription><![CDATA[f_ent]]></fieldDescription>
+	<field name="fEnt" class="java.lang.Integer">
+		<fieldDescription><![CDATA[fEnt]]></fieldDescription>
 	</field>
 	<field name="linea2" class="java.lang.String">
 		<fieldDescription><![CDATA[linea2]]></fieldDescription>
 	</field>
-	<field name="m_tabbr" class="java.lang.String">
-		<fieldDescription><![CDATA[m_tabbr]]></fieldDescription>
+	<field name="mTabbr" class="java.lang.String">
+		<fieldDescription><![CDATA[mTabbr]]></fieldDescription>
 	</field>
-	<field name="f_sid" class="java.lang.Integer">
-		<fieldDescription><![CDATA[f_sid]]></fieldDescription>
+	<field name="fSid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[fSid]]></fieldDescription>
 	</field>
 	<field name="ischeck" class="java.lang.Integer">
 		<fieldDescription><![CDATA[ischeck]]></fieldDescription>
 	</field>
-	<field name="m_sel_hist" class="java.lang.String">
-		<fieldDescription><![CDATA[m_sel_hist]]></fieldDescription>
+	<field name="mSelHist" class="java.lang.String">
+		<fieldDescription><![CDATA[mSelHist]]></fieldDescription>
 	</field>
-	<field name="m_sid" class="java.lang.Integer">
-		<fieldDescription><![CDATA[m_sid]]></fieldDescription>
+	<field name="mSid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[mSid]]></fieldDescription>
 	</field>
-	<field name="f_tabbr" class="java.lang.String">
-		<fieldDescription><![CDATA[f_tabbr]]></fieldDescription>
+	<field name="fTabbr" class="java.lang.String">
+		<fieldDescription><![CDATA[fTabbr]]></fieldDescription>
 	</field>
 	<field name="type" class="java.lang.String">
 		<fieldDescription><![CDATA[type]]></fieldDescription>
@@ -119,32 +119,32 @@
 	<field name="mlocycle" class="java.lang.String">
 		<fieldDescription><![CDATA[mlocycle]]></fieldDescription>
 	</field>
-	<field name="m_gid" class="java.lang.Integer">
-		<fieldDescription><![CDATA[m_gid]]></fieldDescription>
+	<field name="mGid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[mGid]]></fieldDescription>
 	</field>
 	<field name="entryNum" class="java.lang.Integer">
 		<fieldDescription><![CDATA[entryNum]]></fieldDescription>
 	</field>
-	<field name="s_trial_offset" class="java.lang.Integer">
-		<fieldDescription><![CDATA[s_trial_offset]]></fieldDescription>
+	<field name="sTrialOffset" class="java.lang.Integer">
+		<fieldDescription><![CDATA[sTrialOffset]]></fieldDescription>
 	</field>
-	<field name="s_occ" class="java.lang.Integer">
-		<fieldDescription><![CDATA[s_occ]]></fieldDescription>
+	<field name="sOcc" class="java.lang.Integer">
+		<fieldDescription><![CDATA[sOcc]]></fieldDescription>
 	</field>
-	<field name="f_cid" class="java.lang.Integer">
-		<fieldDescription><![CDATA[f_cid]]></fieldDescription>
+	<field name="fCid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[fCid]]></fieldDescription>
 	</field>
-	<field name="s_tid" class="java.lang.Integer">
-		<fieldDescription><![CDATA[s_tid]]></fieldDescription>
+	<field name="sTid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[sTid]]></fieldDescription>
 	</field>
-	<field name="m_ent" class="java.lang.Integer">
-		<fieldDescription><![CDATA[m_ent]]></fieldDescription>
+	<field name="mEnt" class="java.lang.Integer">
+		<fieldDescription><![CDATA[mEnt]]></fieldDescription>
 	</field>
-	<field name="m_trial_offset" class="java.lang.Integer">
-		<fieldDescription><![CDATA[m_trial_offset]]></fieldDescription>
+	<field name="mTrialOffset" class="java.lang.Integer">
+		<fieldDescription><![CDATA[mTrialOffset]]></fieldDescription>
 	</field>
-	<field name="f_cycle" class="java.lang.String">
-		<fieldDescription><![CDATA[f_cycle]]></fieldDescription>
+	<field name="fCycle" class="java.lang.String">
+		<fieldDescription><![CDATA[fCycle]]></fieldDescription>
 	</field>
 	<field name="slocycle2" class="java.lang.String">
 		<fieldDescription><![CDATA[slocycle2]]></fieldDescription>
@@ -158,8 +158,8 @@
 	<field name="sid" class="java.lang.Integer">
 		<fieldDescription><![CDATA[sid]]></fieldDescription>
 	</field>
-	<field name="s_tabbr2" class="java.lang.String">
-		<fieldDescription><![CDATA[s_tabbr2]]></fieldDescription>
+	<field name="sTabbr2" class="java.lang.String">
+		<fieldDescription><![CDATA[sTabbr2]]></fieldDescription>
 	</field>
 	<field name="code28" class="java.lang.String">
 		<fieldDescription><![CDATA[code28]]></fieldDescription>
@@ -167,14 +167,14 @@
 	<field name="plot4" class="java.lang.Integer">
 		<fieldDescription><![CDATA[plot4]]></fieldDescription>
 	</field>
-	<field name="f_tid" class="java.lang.Integer">
-		<fieldDescription><![CDATA[f_tid]]></fieldDescription>
+	<field name="fTid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[fTid]]></fieldDescription>
 	</field>
 	<field name="gid" class="java.lang.Integer">
 		<fieldDescription><![CDATA[gid]]></fieldDescription>
 	</field>
-	<field name="m_cid" class="java.lang.Integer">
-		<fieldDescription><![CDATA[m_cid]]></fieldDescription>
+	<field name="mCid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[mCid]]></fieldDescription>
 	</field>
 	<field name="rep4" class="java.lang.Integer">
 		<fieldDescription><![CDATA[rep4]]></fieldDescription>
@@ -185,44 +185,44 @@
 	<field name="rep3" class="java.lang.Integer">
 		<fieldDescription><![CDATA[rep3]]></fieldDescription>
 	</field>
-	<field name="level_no" class="java.lang.Integer">
-		<fieldDescription><![CDATA[level_no]]></fieldDescription>
+	<field name="levelNo" class="java.lang.Integer">
+		<fieldDescription><![CDATA[levelNo]]></fieldDescription>
 	</field>
-	<field name="f_gid" class="java.lang.Integer">
-		<fieldDescription><![CDATA[f_gid]]></fieldDescription>
+	<field name="fGid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[fGid]]></fieldDescription>
 	</field>
 	<field name="linea3" class="java.lang.String">
 		<fieldDescription><![CDATA[linea3]]></fieldDescription>
 	</field>
-	<field name="s_trial_cycle" class="java.lang.String">
-		<fieldDescription><![CDATA[s_trial_cycle]]></fieldDescription>
+	<field name="sTrialCycle" class="java.lang.String">
+		<fieldDescription><![CDATA[sTrialCycle]]></fieldDescription>
 	</field>
-	<field name="s_ona" class="java.lang.String">
-		<fieldDescription><![CDATA[s_ona]]></fieldDescription>
+	<field name="sOna" class="java.lang.String">
+		<fieldDescription><![CDATA[sOna]]></fieldDescription>
 	</field>
-	<field name="m_tna" class="java.lang.String">
-		<fieldDescription><![CDATA[m_tna]]></fieldDescription>
+	<field name="mTna" class="java.lang.String">
+		<fieldDescription><![CDATA[mTna]]></fieldDescription>
 	</field>
-	<field name="s_ent2" class="java.lang.Integer">
-		<fieldDescription><![CDATA[s_ent2]]></fieldDescription>
+	<field name="sEnt2" class="java.lang.Integer">
+		<fieldDescription><![CDATA[sEnt2]]></fieldDescription>
 	</field>
-	<field name="s_ent" class="java.lang.Integer">
-		<fieldDescription><![CDATA[s_ent]]></fieldDescription>
+	<field name="sEnt" class="java.lang.Integer">
+		<fieldDescription><![CDATA[sEnt]]></fieldDescription>
 	</field>
-	<field name="f_occ" class="java.lang.Integer">
-		<fieldDescription><![CDATA[f_occ]]></fieldDescription>
+	<field name="fOcc" class="java.lang.Integer">
+		<fieldDescription><![CDATA[fOcc]]></fieldDescription>
 	</field>
-	<field name="s_tabbr" class="java.lang.String">
-		<fieldDescription><![CDATA[s_tabbr]]></fieldDescription>
+	<field name="sTabbr" class="java.lang.String">
+		<fieldDescription><![CDATA[sTabbr]]></fieldDescription>
 	</field>
-	<field name="s_tna" class="java.lang.String">
-		<fieldDescription><![CDATA[s_tna]]></fieldDescription>
+	<field name="sTna" class="java.lang.String">
+		<fieldDescription><![CDATA[sTna]]></fieldDescription>
 	</field>
 	<field name="cid" class="java.lang.Integer">
 		<fieldDescription><![CDATA[cid]]></fieldDescription>
 	</field>
-	<field name="f_sel_hist" class="java.lang.String">
-		<fieldDescription><![CDATA[f_sel_hist]]></fieldDescription>
+	<field name="fSelHist" class="java.lang.String">
+		<fieldDescription><![CDATA[fSelHist]]></fieldDescription>
 	</field>
 	<field name="rep2" class="java.lang.Integer">
 		<fieldDescription><![CDATA[rep2]]></fieldDescription>
@@ -230,8 +230,8 @@
 	<field name="plot2" class="java.lang.Integer">
 		<fieldDescription><![CDATA[plot2]]></fieldDescription>
 	</field>
-	<field name="m_cross_name" class="java.lang.String">
-		<fieldDescription><![CDATA[m_cross_name]]></fieldDescription>
+	<field name="mCrossName" class="java.lang.String">
+		<fieldDescription><![CDATA[mCrossName]]></fieldDescription>
 	</field>
 	<field name="rep1" class="java.lang.Integer">
 		<fieldDescription><![CDATA[rep1]]></fieldDescription>
@@ -245,17 +245,17 @@
 	<field name="plot1" class="java.lang.Integer">
 		<fieldDescription><![CDATA[plot1]]></fieldDescription>
 	</field>
-	<field name="s_intrid" class="java.lang.String">
-		<fieldDescription><![CDATA[s_intrid]]></fieldDescription>
+	<field name="sIntrid" class="java.lang.String">
+		<fieldDescription><![CDATA[sIntrid]]></fieldDescription>
 	</field>
 	<field name="plot3" class="java.lang.Integer">
 		<fieldDescription><![CDATA[plot3]]></fieldDescription>
 	</field>
-	<field name="f_trial_offset" class="java.lang.Integer">
-		<fieldDescription><![CDATA[f_trial_offset]]></fieldDescription>
+	<field name="fTrialOffset" class="java.lang.Integer">
+		<fieldDescription><![CDATA[fTrialOffset]]></fieldDescription>
 	</field>
-	<field name="m_lid" class="java.lang.String">
-		<fieldDescription><![CDATA[m_lid]]></fieldDescription>
+	<field name="mLid" class="java.lang.String">
+		<fieldDescription><![CDATA[mLid]]></fieldDescription>
 	</field>
 	<variable name="contador" class="java.lang.Integer" resetType="None" calculation="Count">
 		<variableExpression><![CDATA[$V{contador}]]></variableExpression>
@@ -320,14 +320,14 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{trial_name}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{trialName}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="304" y="18" width="101" height="19" uuid="c86dbecb-d609-49c0-8973-3b2ac4a894c1"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{trial_abbr}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{trialAbbr}]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="32" y="35" width="513" height="2" uuid="34d92c7f-fb70-44d0-8ba1-eef446510817"/>
@@ -364,12 +364,12 @@
 					<property name="com.jaspersoft.studio.unit.y" value="px"/>
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<printWhenExpression><![CDATA[$F{s_ent}!=0]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$F{sEnt}!=0]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Justified" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{s_ent}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{sEnt}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="35" y="2" width="31" height="14" uuid="f86e0541-cd48-468c-84d5-dfb66d1ce9e9"/>
@@ -386,7 +386,7 @@
 				<textElement>
 					<font fontName="Times New Roman" size="7" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{s_tabbr}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{sTabbr}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="523" y="2" width="36" height="14" uuid="ecb49f33-8070-4288-99a6-0137ed37243c">
@@ -484,14 +484,14 @@ $F{linea3})]]></textFieldExpression>
 				<textElement>
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{gms_ip}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{gmsIp}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="80" y="0" width="158" height="9" uuid="bba17aa9-95de-43db-8d64-f2e88de2665f"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{dms_ip}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{dmsIp}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>
@@ -509,14 +509,14 @@ $F{linea3})]]></textFieldExpression>
 				<textElement>
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{gms_ip}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{gmsIp}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="167" y="1" width="158" height="9" uuid="9532a3d4-39d3-4490-9247-090d581880cc"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{dms_ip}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{dmsIp}]]></textFieldExpression>
 			</textField>
 		</band>
 	</lastPageFooter>

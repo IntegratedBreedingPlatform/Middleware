@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-02-13T15:32:26 -->
+<!-- Created with Jaspersoft Studio version 6.0.4.final using JasperReports Library version 6.0.4  -->
+<!-- 2015-07-14T14:09:46 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb60_occ" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="594bb8d2-8604-4185-bc15-f116574c7e8f">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
@@ -12,16 +12,16 @@
 	<parameter name="tid" class="java.lang.Integer"/>
 	<parameter name="occ" class="java.lang.Integer"/>
 	<parameter name="program" class="java.lang.String"/>
-	<parameter name="trial_name" class="java.lang.String"/>
-	<parameter name="trial_abbr" class="java.lang.String"/>
+	<parameter name="trialName" class="java.lang.String"/>
+	<parameter name="trialAbbr" class="java.lang.String"/>
 	<parameter name="lid" class="java.lang.String"/>
 	<parameter name="cycle" class="java.lang.String"/>
-	<parameter name="num_reporte" class="java.lang.Integer"/>
+	<parameter name="numReporte" class="java.lang.Integer"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
-	<field name="station_id" class="java.lang.String">
-		<fieldDescription><![CDATA[station_id]]></fieldDescription>
+	<field name="stationId" class="java.lang.String">
+		<fieldDescription><![CDATA[stationId]]></fieldDescription>
 	</field>
 	<field name="lid" class="java.lang.String">
 		<fieldDescription><![CDATA[lid]]></fieldDescription>
@@ -29,8 +29,8 @@
 	<field name="entriesList" class="java.util.List">
 		<fieldDescription><![CDATA[entriesList]]></fieldDescription>
 	</field>
-	<field name="occ_cycle" class="java.lang.String">
-		<fieldDescription><![CDATA[occ_cycle]]></fieldDescription>
+	<field name="occCycle" class="java.lang.String">
+		<fieldDescription><![CDATA[occCycle]]></fieldDescription>
 	</field>
 	<field name="offset" class="java.lang.String">
 		<fieldDescription><![CDATA[offset]]></fieldDescription>
@@ -44,26 +44,26 @@
 	<field name="station" class="java.lang.String">
 		<fieldDescription><![CDATA[station]]></fieldDescription>
 	</field>
-	<field name="occ_abbr" class="java.lang.String">
-		<fieldDescription><![CDATA[occ_abbr]]></fieldDescription>
+	<field name="occAbbr" class="java.lang.String">
+		<fieldDescription><![CDATA[occAbbr]]></fieldDescription>
 	</field>
-	<field name="location_id" class="java.lang.String">
-		<fieldDescription><![CDATA[location_id]]></fieldDescription>
+	<field name="locationId" class="java.lang.String">
+		<fieldDescription><![CDATA[locationId]]></fieldDescription>
 	</field>
-	<field name="cooperator_id" class="java.lang.String">
-		<fieldDescription><![CDATA[cooperator_id]]></fieldDescription>
+	<field name="cooperatorId" class="java.lang.String">
+		<fieldDescription><![CDATA[cooperatorId]]></fieldDescription>
 	</field>
 	<field name="plantDate" class="java.lang.String">
 		<fieldDescription><![CDATA[plantDate]]></fieldDescription>
 	</field>
-	<field name="occ_name" class="java.lang.String">
-		<fieldDescription><![CDATA[occ_name]]></fieldDescription>
+	<field name="occName" class="java.lang.String">
+		<fieldDescription><![CDATA[occName]]></fieldDescription>
 	</field>
-	<field name="fb_class" class="java.lang.String">
-		<fieldDescription><![CDATA[fb_class]]></fieldDescription>
+	<field name="fbClass" class="java.lang.String">
+		<fieldDescription><![CDATA[fbClass]]></fieldDescription>
 	</field>
-	<field name="occ_new_cycle" class="java.lang.String">
-		<fieldDescription><![CDATA[occ_new_cycle]]></fieldDescription>
+	<field name="occNewCycle" class="java.lang.String">
+		<fieldDescription><![CDATA[occNewCycle]]></fieldDescription>
 	</field>
 	<background>
 		<band splitType="Stretch"/>
@@ -88,16 +88,16 @@
 					<subreportParameterExpression><![CDATA[$P{program}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="trial_abbr">
-					<subreportParameterExpression><![CDATA[$P{trial_abbr}]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[$P{trialAbbr}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="num_reporte">
-					<subreportParameterExpression><![CDATA[$P{num_reporte}]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[$P{numReporte}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="tid">
 					<subreportParameterExpression><![CDATA[$P{tid}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="trial_name">
-					<subreportParameterExpression><![CDATA[$P{trial_name}]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[$P{trialName}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="occ">
 					<subreportParameterExpression><![CDATA[$P{occ}]]></subreportParameterExpression>

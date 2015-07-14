@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-02-13T15:10:34 -->
+<!-- Created with Jaspersoft Studio version 6.0.4.final using JasperReports Library version 6.0.4  -->
+<!-- 2015-07-14T14:09:46 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb47_occ" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="15d362af-3ea5-458f-9a5c-5b4515f0fff1">
 	<property name="ireport.zoom" value="2.0"/>
 	<property name="ireport.x" value="0"/>
@@ -12,9 +12,9 @@
 	<parameter name="tid" class="java.lang.Integer"/>
 	<parameter name="occ" class="java.lang.Integer"/>
 	<parameter name="program" class="java.lang.String"/>
-	<parameter name="trial_name" class="java.lang.String"/>
-	<parameter name="trial_abbr" class="java.lang.String"/>
-	<parameter name="num_reporte" class="java.lang.Integer"/>
+	<parameter name="trialName" class="java.lang.String"/>
+	<parameter name="trialAbbr" class="java.lang.String"/>
+	<parameter name="numReporte" class="java.lang.Integer"/>
 	<parameter name="lid" class="java.lang.String"/>
 	<parameter name="Ientry" class="java.lang.Integer"/>
 	<parameter name="Fentry" class="java.lang.Integer"/>
@@ -22,16 +22,16 @@
 	<parameter name="labbr" class="java.lang.String"/>
 	<parameter name="lname" class="java.lang.String"/>
 	<parameter name="cycle" class="java.lang.String"/>
-	<parameter name="dms_ip" class="java.lang.String"/>
-	<parameter name="gms_ip" class="java.lang.String"/>
+	<parameter name="dmsIp" class="java.lang.String"/>
+	<parameter name="gmsIp" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
 	<field name="lid" class="java.lang.String">
 		<fieldDescription><![CDATA[lid]]></fieldDescription>
 	</field>
-	<field name="occ_new_cycle" class="java.lang.String">
-		<fieldDescription><![CDATA[occ_new_cycle]]></fieldDescription>
+	<field name="occNewCycle" class="java.lang.String">
+		<fieldDescription><![CDATA[occNewCycle]]></fieldDescription>
 	</field>
 	<field name="entriesList" class="java.util.List">
 		<fieldDescription><![CDATA[entriesList]]></fieldDescription>
@@ -45,29 +45,29 @@
 	<field name="station" class="java.lang.String">
 		<fieldDescription><![CDATA[station]]></fieldDescription>
 	</field>
-	<field name="location_id" class="java.lang.Integer">
-		<fieldDescription><![CDATA[location_id]]></fieldDescription>
+	<field name="locationId" class="java.lang.Integer">
+		<fieldDescription><![CDATA[locationId]]></fieldDescription>
 	</field>
-	<field name="occ_cycle" class="java.lang.String">
-		<fieldDescription><![CDATA[occ_cycle]]></fieldDescription>
+	<field name="occCycle" class="java.lang.String">
+		<fieldDescription><![CDATA[occCycle]]></fieldDescription>
 	</field>
 	<field name="occ" class="java.lang.Integer">
 		<fieldDescription><![CDATA[occ]]></fieldDescription>
 	</field>
-	<field name="fb_class" class="java.lang.String">
-		<fieldDescription><![CDATA[fb_class]]></fieldDescription>
+	<field name="fbClass" class="java.lang.String">
+		<fieldDescription><![CDATA[fbClass]]></fieldDescription>
 	</field>
-	<field name="station_id" class="java.lang.Integer">
-		<fieldDescription><![CDATA[station_id]]></fieldDescription>
+	<field name="stationId" class="java.lang.Integer">
+		<fieldDescription><![CDATA[stationId]]></fieldDescription>
 	</field>
-	<field name="cooperator_id" class="java.lang.Integer">
-		<fieldDescription><![CDATA[cooperator_id]]></fieldDescription>
+	<field name="cooperatorId" class="java.lang.Integer">
+		<fieldDescription><![CDATA[cooperatorId]]></fieldDescription>
 	</field>
-	<field name="occ_name" class="java.lang.String">
-		<fieldDescription><![CDATA[occ_name]]></fieldDescription>
+	<field name="occName" class="java.lang.String">
+		<fieldDescription><![CDATA[occName]]></fieldDescription>
 	</field>
-	<field name="occ_abbr" class="java.lang.String">
-		<fieldDescription><![CDATA[occ_abbr]]></fieldDescription>
+	<field name="occAbbr" class="java.lang.String">
+		<fieldDescription><![CDATA[occAbbr]]></fieldDescription>
 	</field>
 	<field name="plantDate" class="java.lang.Integer">
 		<fieldDescription><![CDATA[plantDate]]></fieldDescription>
@@ -92,19 +92,19 @@
 					<subreportParameterExpression><![CDATA[$P{lname}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="dms_ip">
-					<subreportParameterExpression><![CDATA[$P{dms_ip}]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[$P{dmsIp}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="labbr">
 					<subreportParameterExpression><![CDATA[$P{labbr}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="trial_abbr">
-					<subreportParameterExpression><![CDATA[$P{trial_abbr}]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[$P{trialAbbr}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="Ientry">
 					<subreportParameterExpression><![CDATA[$P{Ientry}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="gms_ip">
-					<subreportParameterExpression><![CDATA[$P{gms_ip}]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[$P{gmsIp}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="country">
 					<subreportParameterExpression><![CDATA[$P{country}]]></subreportParameterExpression>
@@ -122,13 +122,13 @@
 					<subreportParameterExpression><![CDATA[$P{program}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="num_reporte">
-					<subreportParameterExpression><![CDATA[$P{num_reporte}]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[$P{numReporte}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="tid">
 					<subreportParameterExpression><![CDATA[$P{tid}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="trial_name">
-					<subreportParameterExpression><![CDATA[$P{trial_name}]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[$P{trialName}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="occ">
 					<subreportParameterExpression><![CDATA[$P{occ}]]></subreportParameterExpression>
