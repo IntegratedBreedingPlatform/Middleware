@@ -348,8 +348,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			idLocationSaved = recordSaved.getLocid();
 
 			LocdesDAO locdesDao = this.getLocdesDao();
-			Integer nextId = locdesDao.getNextId("ldid");
-			locdes.setLdid(nextId);
 			locdes.setLocationId(idLocationSaved);
 			locdesDao.saveOrUpdate(locdes);
 
