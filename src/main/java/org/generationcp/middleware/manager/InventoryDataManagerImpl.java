@@ -176,14 +176,12 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		try {
 			trans = session.beginTransaction();
 			StockTransactionDAO stockTransactionDAO = this.getStockTransactionDAO();
-			Integer id = stockTransactionDAO.getNextId("id");
-			stockTransaction.setId(id);
-			stockTransactionDAO.saveOrUpdate(stockTransaction);
+			stockTransaction = stockTransactionDAO.saveOrUpdate(stockTransaction);
 			stockTransactionDAO.flush();
 			stockTransactionDAO.clear();
 			trans.commit();
 
-			return id;
+			return stockTransaction.getId();
 		} catch (HibernateException e) {
 			this.rollbackTransaction(trans);
 			throw new MiddlewareQueryException(e.getMessage(), e);
