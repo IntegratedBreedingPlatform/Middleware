@@ -107,9 +107,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 			if (existing != null) {
 				throw new MiddlewareQueryException("A generation with the given name within the project already exists");
 			}
-
-			Integer newId = this.generationDAO.getNextId("generationID");
-			generation.setGenerationID(newId);
 		}
 
 		this.generationDAO.saveOrUpdate(generation);

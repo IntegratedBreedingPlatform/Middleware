@@ -611,7 +611,6 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 
 			MBDTGeneration generation =
 					new MBDTGeneration(MBDTDataManagerTest.SAMPLE_GENERATION_NAME, newProject, MBDTDataManagerTest.SAMPLE_DATASET_ID);
-			generation.setGenerationID(MBDTDataManagerTest.SAMPLE_GENERATION_ID);
 			this.dut.setGeneration(MBDTDataManagerTest.SAMPLE_PROJECT_ID, generation);
 
 			this.dut.setSelectedAccessions(MBDTDataManagerTest.SAMPLE_GENERATION_ID, gidList);
@@ -672,7 +671,6 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 
 			MBDTGeneration generation =
 					new MBDTGeneration(MBDTDataManagerTest.SAMPLE_GENERATION_NAME, newProject, MBDTDataManagerTest.SAMPLE_DATASET_ID);
-			generation.setGenerationID(MBDTDataManagerTest.SAMPLE_GENERATION_ID);
 			this.dut.setGeneration(MBDTDataManagerTest.SAMPLE_PROJECT_ID, generation);
 
 			conn = this.dataSource.getConnection();
@@ -744,7 +742,6 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 
 			MBDTGeneration generation =
 					new MBDTGeneration(MBDTDataManagerTest.SAMPLE_GENERATION_NAME, newProject, MBDTDataManagerTest.SAMPLE_DATASET_ID);
-			generation.setGenerationID(MBDTDataManagerTest.SAMPLE_GENERATION_ID);
 			this.dut.setGeneration(MBDTDataManagerTest.SAMPLE_PROJECT_ID, generation);
 
 			// insert parent data into mbdt_selected_genotypes table
@@ -832,7 +829,6 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 
 			MBDTGeneration generation =
 					new MBDTGeneration(MBDTDataManagerTest.SAMPLE_GENERATION_NAME, newProject, MBDTDataManagerTest.SAMPLE_DATASET_ID);
-			generation.setGenerationID(MBDTDataManagerTest.SAMPLE_GENERATION_ID);
 			this.dut.setGeneration(MBDTDataManagerTest.SAMPLE_PROJECT_ID, generation);
 
 			// insert parent data into mbdt_selected_genotypes table
@@ -923,7 +919,6 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 
 			MBDTGeneration generation =
 					new MBDTGeneration(MBDTDataManagerTest.SAMPLE_GENERATION_NAME, newProject, MBDTDataManagerTest.SAMPLE_DATASET_ID);
-			generation.setGenerationID(MBDTDataManagerTest.SAMPLE_GENERATION_ID);
 			this.dut.setGeneration(MBDTDataManagerTest.SAMPLE_PROJECT_ID, generation);
 
 			this.dut.setParentData(MBDTDataManagerTest.SAMPLE_GENERATION_ID, SelectedGenotypeEnum.R, gidList);
@@ -1107,7 +1102,6 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 			if (generation == null) {
 				generation =
 						new MBDTGeneration(MBDTDataManagerTest.SAMPLE_GENERATION_NAME, newProject, MBDTDataManagerTest.SAMPLE_DATASET_ID);
-				generation.setGenerationID(MBDTDataManagerTest.SAMPLE_GENERATION_ID);
 				this.dut.setGeneration(MBDTDataManagerTest.SAMPLE_PROJECT_ID, generation);
 			}
 
