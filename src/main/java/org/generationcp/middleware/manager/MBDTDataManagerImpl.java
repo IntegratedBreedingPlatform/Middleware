@@ -228,7 +228,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 	}
 
 	@Override
-	public void setSelectedAccessions(Integer generationID, List<Integer> gids) throws MiddlewareQueryException {
+	public void setSelectedAccessions(MBDTGeneration generation, List<Integer> gids) throws MiddlewareQueryException {
 
 		if (gids == null || gids.isEmpty()) {
 			return;
@@ -238,10 +238,9 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 		this.prepareGenerationDAO();
 		this.prepareSelectedGenotypeDAO();
-		MBDTGeneration generation = this.getGeneration(generationID);
 
 		if (generation == null) {
-			throw new MiddlewareQueryException("Generation with given ID does not exist");
+			throw new MiddlewareQueryException("Given Generation does not exist");
 		}
 
 		Session session = this.getActiveSession();
@@ -295,7 +294,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 	}
 
 	@Override
-	public void setParentData(Integer generationID, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException {
+	public void setParentData(MBDTGeneration generation, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException {
 
 		if (gids == null || gids.isEmpty()) {
 			return;
@@ -310,7 +309,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 		this.prepareGenerationDAO();
 		this.prepareSelectedGenotypeDAO();
-		MBDTGeneration generation = this.getGeneration(generationID);
 
 		if (generation == null) {
 			throw new MiddlewareQueryException("Generation with given ID does not exist");
