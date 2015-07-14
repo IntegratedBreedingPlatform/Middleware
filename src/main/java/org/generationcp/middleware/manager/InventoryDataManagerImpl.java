@@ -205,11 +205,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 			LotDAO dao = this.getLotDao();
 
 			for (Lot lot : lots) {
-				if (operation == Operation.ADD && lot.getId() == null) {
-					// Auto-assign IDs for new local DB records
-					Integer id = dao.getNextId("id");
-					lot.setId(id);
-				}
 				Lot recordSaved = dao.saveOrUpdate(lot);
 				idLotsSaved.add(recordSaved.getId());
 				lotsSaved++;
