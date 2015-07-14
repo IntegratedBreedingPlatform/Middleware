@@ -378,7 +378,9 @@ public class MeasurementVariable {
 			return false;
 		}
 		MeasurementVariable other = (MeasurementVariable) obj;
-		if (this.termId != other.termId) {
+		if (this.termId != 0 && other.termId != 0 && this.termId != other.termId) {
+			return false;
+		} else if(this.getPSMRHashCode() != other.getPSMRHashCode()) {
 			return false;
 		}
 
@@ -389,8 +391,16 @@ public class MeasurementVariable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + this.termId;
+		int uniqueHashCode = termId;
+		if (uniqueHashCode == 0) {
+			uniqueHashCode = getPSMRHashCode();
+		}
+		result = prime * result + uniqueHashCode;
 		return result;
+	}
+
+	private int getPSMRHashCode() {
+		return java.util.Objects.hash(property, scale, method, label);
 	}
 
 }
