@@ -280,9 +280,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 			// create new entries with the default type
 			for (Integer gid : gidSet) {
 				SelectedGenotype genotype = new SelectedGenotype(generation, SelectedGenotypeEnum.SR, gid);
-				Integer newId = this.selectedGenotypeDAO.getNextId("id");
-				genotype.setId(newId);
-
 				this.selectedGenotypeDAO.saveOrUpdate(genotype);
 
 			}
@@ -364,9 +361,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 			for (Integer gid : gidSet) {
 				SelectedGenotype genotype = new SelectedGenotype(generation, genotypeEnum, gid);
-				Integer newId = this.selectedGenotypeDAO.getNextId("id");
-				genotype.setId(newId);
-
 				this.selectedGenotypeDAO.saveOrUpdate(genotype);
 
 			}
