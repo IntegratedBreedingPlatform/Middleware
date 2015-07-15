@@ -53,8 +53,6 @@ public class ListDataProjectSaver extends Saver {
 	private GermplasmList createInitialGermplasmList(int projectId, Integer originalListId, GermplasmListType type)
 			throws MiddlewareQueryException {
 		GermplasmList snapList = new GermplasmList();
-
-		snapList.setId(this.getGermplasmListDAO().getNextId("id"));
 		snapList.setProjectId(projectId);
 		snapList.setDate(Util.getCurrentDateAsLongValue());
 		snapList.setStatus(1);

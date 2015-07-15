@@ -79,8 +79,6 @@ public class GermplasmListDAOTest extends MiddlewareIntegrationTest {
 	private static GermplasmList createGermplasmListTestData(String name, String description, long date, String type, int userId, int status)
 			throws MiddlewareQueryException {
 		GermplasmList list = new GermplasmList();
-		Integer nextId = GermplasmListDAOTest.dao.getNextId("id");
-		list.setId(nextId);
 		list.setName(name);
 		list.setDescription(description);
 		list.setDate(date);

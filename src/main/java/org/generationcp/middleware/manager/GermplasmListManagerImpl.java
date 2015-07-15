@@ -271,11 +271,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 			for (GermplasmList germplasmList : germplasmLists) {
 				if (operation == Operation.ADD) {
-					// Auto-assign IDs for new DB records
-					Integer nextId = this.getGermplasmListDAO().getNextId("id");
-					germplasmListIds.add(nextId);
-					germplasmList.setId(nextId);
-					this.getGermplasmListDAO().saveOrUpdate(germplasmList);
+					germplasmList = this.getGermplasmListDAO().saveOrUpdate(germplasmList);
+					germplasmListIds.add(germplasmList.getId());
 				} else if (operation == Operation.UPDATE) {
 					germplasmListIds.add(germplasmList.getId());
 					this.getGermplasmListDAO().merge(germplasmList);
