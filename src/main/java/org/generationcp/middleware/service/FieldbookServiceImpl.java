@@ -420,19 +420,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 				// Save germplasm and name entries if non-existing
 				if (germplasmFound == null || germplasmFound.getGid() == null) {
-					Integer gId = germplasmDao.getNextId("gid");
+					germplasm = germplasmDao.save(germplasm);
+					germplasm.setLgid(germplasm.getGid());
 
 					// Save name entries
 					for (Name name : germplasms.get(germplasm)) {
-						name.setGermplasmId(gId);
+						name.setGermplasmId(germplasm.getGid());
 						nameDao.save(name);
 					}
-
-					// Save germplasm
-					germplasm.setGid(gId);
-					germplasm.setLgid(gId);
-					germplasmDao.save(germplasm);
-
 				}
 
 				// Save germplasmListData

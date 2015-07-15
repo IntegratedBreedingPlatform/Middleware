@@ -956,15 +956,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			GermplasmDAO dao = this.getGermplasmDao();
 
 			for (Germplasm germplasm : germplasms) {
-				if (operation == Operation.ADD) {
-					// Auto-assign IDs for new DB records
-					Integer nextId = dao.getNextId("gid");
-					germplasm.setGid(nextId);
-					germplasm.setLgid(nextId);
-				}
-
 				Germplasm recordSaved = dao.saveOrUpdate(germplasm);
 				idGermplasmsSaved.add(recordSaved.getGid());
+				recordSaved.setLgid(recordSaved.getGid());
 				germplasmsSaved++;
 				if (germplasmsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
 					// flush a batch of inserts and release memory
@@ -1036,7 +1030,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public Integer addGermplasm(Germplasm germplasm, Name preferredName) throws MiddlewareQueryException {
 		Map<Germplasm, Name> germplasmNameMap = new HashMap<Germplasm, Name>();
-		germplasm.setGid(Integer.valueOf(1));
 		germplasmNameMap.put(germplasm, preferredName);
 		List<Integer> ids = this.addGermplasm(germplasmNameMap);
 		return !ids.isEmpty() ? ids.get(0) : null;
@@ -1057,15 +1050,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			for (Germplasm germplasm : germplasmNameMap.keySet()) {
 				Name name = germplasmNameMap.get(germplasm);
 
-				// Auto-assign IDs for new DB records
-				Integer nextId = dao.getNextId("gid");
-				germplasm.setGid(nextId);
-
 				name.setNstat(Integer.valueOf(1));
-				name.setGermplasmId(nextId);
 
 				Germplasm germplasmSaved = dao.save(germplasm);
 				isGermplasmsSaved.add(germplasmSaved.getGid());
+				name.setGermplasmId(germplasmSaved.getGid());
 				nameDao.save(name);
 				germplasmsSaved++;
 
