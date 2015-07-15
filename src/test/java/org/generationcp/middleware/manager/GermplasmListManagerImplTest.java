@@ -29,6 +29,7 @@ import org.generationcp.middleware.utils.test.Debug;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -48,10 +49,24 @@ public class GermplasmListManagerImplTest extends DataManagerIntegrationTest {
 	private static List<Integer> testDataIds;
 	private static final Integer STATUS_DELETED = 9;
 
+	private Integer parentId;
+
 	@BeforeClass
 	public static void setUp() throws Exception {
 		GermplasmListManagerImplTest.manager = DataManagerIntegrationTest.managerFactory.getGermplasmListManager();
 		GermplasmListManagerImplTest.testDataIds = new ArrayList<Integer>();
+	}
+
+	@Before
+	public void setUpBefore() throws Exception {
+		GermplasmList germplasmListParent =
+				new GermplasmList(null, "Test List #1", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test Parent List #1", null,
+						1);
+		parentId = GermplasmListManagerImplTest.manager.addGermplasmList(germplasmListParent);
+		GermplasmList germplasmList =
+				new GermplasmList(null, "Test List #1", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test List #1 for GCP-92",
+						germplasmListParent, 1);
+		Integer id = GermplasmListManagerImplTest.manager.addGermplasmList(germplasmList);
 	}
 
 	@Test
@@ -514,7 +529,6 @@ public class GermplasmListManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetGermplasmListByParentFolderId() throws Exception {
-		Integer parentId = Integer.valueOf(0);
 		List<GermplasmList> results = GermplasmListManagerImplTest.manager.getGermplasmListByParentFolderId(parentId, 0, 100);
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
@@ -524,7 +538,6 @@ public class GermplasmListManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetGermplasmListByParentFolderIdBatched() throws Exception {
-		Integer parentId = Integer.valueOf(0);
 		int batchSize = 1;
 		List<GermplasmList> results = new ArrayList<GermplasmList>();
 		results = GermplasmListManagerImplTest.manager.getGermplasmListByParentFolderIdBatched(parentId, batchSize);
