@@ -381,12 +381,13 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 									"SELECT cvt_categorical.cvterm_id, cvt_categorical.name, cvt_categorical.definition, cvr_value.object_id, cvt_value.name "
 											+ "FROM cvterm_relationship cvr_categorical  "
 											+ "INNER JOIN cvterm cvt_categorical ON cvr_categorical.subject_id = cvt_categorical.cvterm_id "
-											+ "INNER JOIN cvterm_relationship cvr_stored_in ON cvr_categorical.subject_id = cvr_stored_in.subject_id "
-											+ "INNER JOIN cvterm_relationship cvr_value ON cvr_stored_in.subject_id = cvr_value.subject_id and cvr_value.type_id = 1190 "
+											+ "INNER JOIN cvterm_relationship cvr_scale ON cvr_categorical.subject_id = cvr_scale.subject_id "
+											+ "INNER JOIN cvterm_relationship cvr_scale_type ON cvr_scale.object_id = cvr_scale_type.subject_id "
+											+ "INNER JOIN cvterm_relationship cvr_value ON cvr_scale.object_id = cvr_value.subject_id and cvr_value.type_id = 1190 "
 											+ "INNER JOIN cvterm cvt_value ON cvr_value.object_id = cvt_value.cvterm_id "
-											+ "WHERE cvr_categorical.type_id = 1105 AND cvr_categorical.object_id = 1130 "
-											+ "    AND cvr_stored_in.type_id = 1044 AND cvr_stored_in.object_id = 1048 "
+											+ "WHERE cvr_scale.type_id = 1220 and cvr_scale_type.type_id = 1105 AND cvr_scale_type.object_id = 1130 "
 											+ "    AND cvt_categorical.cvterm_id in (:traitIds) ");
+
 			query.setParameterList("traitIds", traitIds);
 
 			List<Object[]> list = query.list();

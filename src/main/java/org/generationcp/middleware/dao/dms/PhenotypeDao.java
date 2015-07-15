@@ -606,7 +606,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 							.append("				AND e.nd_geolocation_id IN (:environmentIds) ")
 							.append("	LEFT JOIN cvterm_relationship cr_scale ON p.observable_id = cr_scale.subject_id AND cr_scale.type_id = 1220 ")
 							.append("	LEFT JOIN cvterm c_scale ON c_scale.cvterm_id = cr_scale.object_id ")
-							.append("	LEFT JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.subject_id ")
+							.append("	LEFT JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.object_id ")
 							.append("	    AND cr_type.type_id = 1105 ")
 							.append("LEFT JOIN cvterm_relationship cr_property ON p.observable_id = cr_property.subject_id AND cr_property.type_id = 1200 ")
 							.append("LEFT JOIN cvterm trait ON cr_property.object_id = trait.cvterm_id ");
