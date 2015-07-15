@@ -1472,8 +1472,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 			for (ProgramFavorite favorite : list) {
 
-				Integer nextId = dao.getNextId("id");
-				favorite.setProgramFavoriteId(nextId);
 				dao.save(favorite);
 				favoriteSaved++;
 
@@ -1502,8 +1500,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		try {
 			trans = session.beginTransaction();
 			ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
-			Integer nextId = dao.getNextId("id");
-			favorite.setProgramFavoriteId(nextId);
 			dao.save(favorite);
 			trans.commit();
 		} catch (Exception e) {
