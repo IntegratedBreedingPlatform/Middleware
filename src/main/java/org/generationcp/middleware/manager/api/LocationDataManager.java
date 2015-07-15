@@ -400,14 +400,6 @@ public interface LocationDataManager {
 	List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws MiddlewareQueryException;
 
 	/**
-	 * Gets the next negative id.
-	 *
-	 * @return the next negative id
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	Integer getNextNegativeId() throws MiddlewareQueryException;
-
-	/**
 	 * Gets all fields belonging to the given location.
 	 *
 	 * @param locationId the location id of the parent of the fields to return.

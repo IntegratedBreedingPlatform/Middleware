@@ -420,12 +420,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public Integer getNextNegativeId() throws MiddlewareQueryException {
-		return this.getLocationDao().getNextId("locid");
-
-	}
-
-	@Override
 	public List<Location> getAllFieldLocations(int locationId) throws MiddlewareQueryException {
 		Integer fieldParentFldId = this.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.FIELD_PARENT.getCode());
 		Integer fieldLtypeFldId = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
