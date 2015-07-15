@@ -794,10 +794,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			trans = session.beginTransaction();
 			BibrefDAO dao = this.getBibrefDao();
 
-			// Auto-assign IDs for new DB records
-			Integer nextId = dao.getNextId("refid");
-			bibref.setRefid(nextId);
-
 			Bibref recordSaved = dao.saveOrUpdate(bibref);
 			idBibrefSaved = recordSaved.getRefid();
 
