@@ -1,14 +1,18 @@
 
 package org.generationcp.middleware.manager.ontology;
 
-import java.math.BigInteger;
-import java.util.*;
-
+import com.google.common.base.Function;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TermSummary;
-import org.generationcp.middleware.domain.ontology.*;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.Method;
+import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.ontology.TermRelationshipId;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -32,7 +36,17 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-import com.google.common.base.Function;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Implements {@link OntologyVariableDataManagerImpl}
@@ -435,7 +449,15 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 								term.getCvTermId());
 				variable.setIsFavorite(programFavorite != null);
 
-				variable.setObservations(this.getVariableObservations(id));
+				// setting variable studies
+				variable.setStudies((int) this.getDmsProjectDao().countByVariable(id));
+
+				//setting variable observations, first observations will be null so set it to 0
+				variable.setObservations(0);
+				for (VariableType v : variable.getVariableTypes()) {
+					long observation = this.getExperimentDao().countByObservedVariable(id, v.getId());
+					variable.setObservations((int) (variable.getObservations() + observation));
+				}
 
 				return variable;
 
