@@ -1095,10 +1095,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		try {
 			trans = session.beginTransaction();
 			UserDefinedFieldDAO dao = this.getUserDefinedFieldDao();
-
-			// Auto-assign IDs for new DB records
-			Integer nextId = dao.getNextId("fldno");
-			field.setFldno(nextId);
 			dao.save(field);
 
 			// end transaction, commit to database
@@ -1127,10 +1123,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 			int udfldSaved = 0;
 			for (UserDefinedField field : fields) {
-
-				// Auto-assign IDs for new DB records
-				Integer nextId = dao.getNextId("fldno");
-				field.setFldno(nextId);
 
 				UserDefinedField udflds = dao.save(field);
 				isUdfldSaved.add(udflds.getFldno());
