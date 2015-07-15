@@ -636,10 +636,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			trans = session.beginTransaction();
 			MethodDAO dao = this.getMethodDao();
 
-			// Auto-assign IDs for new records
-			Integer nextId = dao.getNextId("mid");
-			method.setMid(nextId);
-
 			Method recordSaved = dao.saveOrUpdate(method);
 			methodId = recordSaved.getMid();
 
@@ -697,10 +693,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			MethodDAO dao = this.getMethodDao();
 
 			for (Method method : methods) {
-				// Auto-assign IDs for new DB records
-				Integer nextId = dao.getNextId("mid");
-				method.setMid(nextId);
-
 				Method recordSaved = dao.saveOrUpdate(method);
 				idMethodsSaved.add(recordSaved.getMid());
 			}

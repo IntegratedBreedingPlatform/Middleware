@@ -966,10 +966,8 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
 	public void getProgramMethodsAndDeleteByUniqueId() {
 		// create program locations
 		String programUUID = GermplasmDataManagerImplTest.commonTestProject.getUniqueID();
-		int testMethodID1 = 100000;
-		int testMethodID2 = 100001;
-		Method testMethod1 = this.createMethodTestData(testMethodID1, programUUID);
-		Method testMethod2 = this.createMethodTestData(testMethodID2, programUUID);
+		Method testMethod1 = this.createMethodTestData(programUUID);
+		Method testMethod2 = this.createMethodTestData(programUUID);
 		try {
 			GermplasmDataManagerImplTest.manager.addMethod(testMethod1);
 			GermplasmDataManagerImplTest.manager.addMethod(testMethod2);
@@ -985,12 +983,11 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
 		}
 	}
 
-	private Method createMethodTestData(int id, String programUUID) {
+	private Method createMethodTestData(String programUUID) {
 		Method method = new Method();
 		method.setUniqueID(programUUID);
-		method.setMid(id);
-		method.setMname("TEST-LOCATION" + id);
-		method.setMdesc("TEST-LOCATION-DESC" + id);
+		method.setMname("TEST-LOCATION" + System.currentTimeMillis());
+		method.setMdesc("TEST-LOCATION-DESC" + System.currentTimeMillis());
 		method.setMcode("0");
 		method.setMgrp("0");
 		method.setMtype("0");
