@@ -981,10 +981,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		try {
 			trans = session.beginTransaction();
 
-			AccMetadataSetDAO dao = this.getAccMetadataSetDao();
-			Integer generatedId = dao.getNextId("accMetadataSetId");
-			accMetadataSet.setAccMetadataSetId(generatedId);
-
 			AccMetadataSet recordSaved = this.getAccMetadataSetDao().save(accMetadataSet);
 			savedId = recordSaved.getAccMetadataSetId();
 
@@ -2640,9 +2636,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		if (accMetadataSets != null) {
 			for (AccMetadataSet accMetadataSet : accMetadataSets) {
-				if (accMetadataSet.getAccMetadataSetId() == null) {
-					accMetadataSet.setAccMetadataSetId(accMetadataSetDao.getNextId("accMetadataSetId"));
-				}
+
 				accMetadataSetDao.merge(accMetadataSet);
 				rowsSaved++;
 				if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
