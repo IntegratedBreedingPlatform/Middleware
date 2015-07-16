@@ -1087,7 +1087,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addMappingPopValue(MappingPopValues mappingPopValue) throws MiddlewareQueryException {
-		mappingPopValue.setMpId(this.getMappingPopValuesDao().getNextId("mpId"));
 		return ((MappingPopValues) super.saveOrUpdate(this.getMappingPopValuesDao(), mappingPopValue)).getMpId();
 	}
 
@@ -2765,13 +2764,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		MappingPopValuesDAO mappingPopValuesDao = this.getMappingPopValuesDao();
 		Integer rowsSaved = 0;
 
-		Integer generatedId = mappingPopValuesDao.getNextId("mpId");
-
 		for (MappingPopValues mappingPopValues : mappingPopValuesList) {
-			if (mappingPopValues.getMpId() == null) {
-				mappingPopValues.setMpId(generatedId);
-				generatedId++;
-			}
 			mappingPopValuesDao.merge(mappingPopValues);
 
 			rowsSaved++;
