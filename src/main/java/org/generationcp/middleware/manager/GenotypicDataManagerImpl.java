@@ -2833,7 +2833,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		try {
 			trans = session.beginTransaction();
 
-			trackData.setTrackId(this.getTrackDataDao().getNextId("trackId"));
 			this.getTrackDataDao().save(trackData);
 
 			for (TrackMarker trackMarker : trackMarkers) {
