@@ -1101,7 +1101,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			throw new MiddlewareQueryException("Map Id not found: " + markerOnMap.getMapId());
 		}
 
-		markerOnMap.setMarkerOnMapId(this.getMarkerOnMapDao().getNextId("markerOnMapId"));
 		return ((MarkerOnMap) super.save(this.getMarkerOnMapDao(), markerOnMap)).getMapId();
 	}
 
@@ -2617,8 +2616,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		this.getActiveSession();
 		MarkerOnMapDAO markerOnMapDao = this.getMarkerOnMapDao();
 
-		Integer generatedId = markerOnMapDao.getNextId("markerOnMapId");
-		markerOnMap.setMarkerOnMapId(generatedId);
 		markerOnMap.setMarkerId(markerId);
 		markerOnMap.setMapId(mapId);
 
