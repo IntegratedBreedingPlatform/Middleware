@@ -953,7 +953,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addMarker(Marker marker) throws MiddlewareQueryException {
-		marker.setMarkerId(this.getMarkerDao().getNextId("markerId"));
 		return ((Marker) super.save(this.getMarkerDao(), marker)).getMarkerId();
 	}
 
@@ -2446,8 +2445,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		if (markerId == null) {
 			this.getActiveSession();
 			MarkerDAO markerDao = this.getMarkerDao();
-			Integer markerGeneratedId = markerDao.getNextId("markerId");
-			marker.setMarkerId(markerGeneratedId);
 			marker.setMarkerType(markerType);
 			Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
 			markerId = markerRecordSaved.getMarkerId();
@@ -2476,8 +2473,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		// Save the marker
 		this.getActiveSession();
 		MarkerDAO markerDao = this.getMarkerDao();
-		Integer markerGeneratedId = markerDao.getNextId("markerId");
-		marker.setMarkerId(markerGeneratedId);
 		marker.setMarkerType(markerType);
 		Marker markerRecordSaved = markerDao.merge(marker);
 		markerId = markerRecordSaved.getMarkerId();
@@ -2493,16 +2488,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		this.getActiveSession();
 		MarkerDAO markerDao = this.getMarkerDao();
-		Integer markerGeneratedId = markerDao.getNextId("markerId");
 		Integer rowsSaved = 0;
 
 		if (markers != null) {
 			for (Marker marker : markers) {
-
-				if (marker.getMarkerId() == null) {
-					marker.setMarkerId(markerGeneratedId);
-					markerGeneratedId++;
-				}
 				markerDao.merge(marker);
 
 				// Flush
