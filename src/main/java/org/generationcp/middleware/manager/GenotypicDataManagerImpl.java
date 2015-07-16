@@ -1035,7 +1035,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addDataset(Dataset dataset) throws MiddlewareQueryException {
-		dataset.setDatasetId(this.getDatasetDao().getNextId("datasetId"));
 		return ((Dataset) super.save(this.getDatasetDao(), dataset)).getDatasetId();
 	}
 
@@ -2205,9 +2204,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		try {
 			trans = session.beginTransaction();
 
-			if (dataset.getDatasetId() == null) {
-				dataset.setDatasetId(this.getDatasetDao().getNextId("datasetId"));
-			}
 			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_MTA);
 			dataset.setUploadTemplateDate(new Date());
 			// TODO review this -ve id based logic.. Overall, this whole methods seems to be unused no refs from GDMS code. Remove entirely,
@@ -2247,9 +2243,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		try {
 			trans = session.beginTransaction();
 
-			if (dataset.getDatasetId() == null) {
-				dataset.setDatasetId(this.getDatasetDao().getNextId("datasetId"));
-			}
 			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_MTA);
 			dataset.setUploadTemplateDate(new Date());
 			// TODO review this -ve id based logic.. Overall, this whole methods seems to be unused no refs from GDMS code. Remove entirely,
@@ -2356,8 +2349,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Integer datasetId = null;
 		this.getActiveSession();
 		DatasetDAO datasetDao = this.getDatasetDao();
-		Integer datasetGeneratedId = datasetDao.getNextId("datasetId");
-		dataset.setDatasetId(datasetGeneratedId);
 
 		dataset.setDatasetType(datasetType);
 
@@ -2380,8 +2371,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private Integer saveDataset(Dataset dataset) throws Exception {
 		this.getActiveSession();
 		DatasetDAO datasetDao = this.getDatasetDao();
-		Integer datasetGeneratedId = datasetDao.getNextId("datasetId");
-		dataset.setDatasetId(datasetGeneratedId);
 		Dataset datasetRecordSaved = datasetDao.merge(dataset);
 		return datasetRecordSaved.getDatasetId();
 	}
