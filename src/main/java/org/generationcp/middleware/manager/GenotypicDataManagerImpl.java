@@ -2838,7 +2838,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			for (TrackMarker trackMarker : trackMarkers) {
 				trackMarker.setTrackId(trackData.getTrackId());
-				trackMarker.setTrackMarkerId(this.getTrackMarkerDao().getNextId("trackMarkerId"));
 				this.getTrackMarkerDao().save(trackMarker);
 			}
 
