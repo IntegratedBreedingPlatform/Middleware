@@ -1069,7 +1069,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addCharValues(CharValues charValues) throws MiddlewareQueryException {
-		charValues.setAcId(this.getCharValuesDao().getNextId("acId"));
 		return ((CharValues) super.saveOrUpdate(this.getCharValuesDao(), charValues)).getAcId();
 	}
 
@@ -2711,13 +2710,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		CharValuesDAO charValuesDao = this.getCharValuesDao();
 		Integer rowsSaved = 0;
 
-		Integer generatedId = charValuesDao.getNextId("acId");
-
 		for (CharValues charValues : charValuesList) {
-			if (charValues.getAcId() == null) {
-				charValues.setAcId(generatedId);
-				generatedId++;
-			}
+
 			charValuesDao.merge(charValues);
 
 			rowsSaved++;
