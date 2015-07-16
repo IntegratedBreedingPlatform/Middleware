@@ -34,6 +34,7 @@ public class MarkerMetadataSet implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
 	@Column(name = "marker_metadataset_id")
 	private Integer markerMetadataSetId;
 
