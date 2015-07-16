@@ -1112,7 +1112,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addMap(Map map) throws MiddlewareQueryException {
-		map.setMapId(this.getMapDao().getNextId("mapId"));
 		return ((Map) super.saveOrUpdate(this.getMapDao(), map)).getMapId();
 	}
 
@@ -2592,9 +2591,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Integer mapSavedId = map.getMapId() == null ? this.getMapIdByMapName(map.getMapName()) : map.getMapId();
 		if (mapSavedId == null) {
 			MapDAO mapDao = this.getMapDao();
-
-			Integer mapGeneratedId = mapDao.getNextId("mapId");
-			map.setMapId(mapGeneratedId);
 
 			Map mapRecordSaved = mapDao.saveOrUpdate(map);
 			mapSavedId = mapRecordSaved.getMapId();
