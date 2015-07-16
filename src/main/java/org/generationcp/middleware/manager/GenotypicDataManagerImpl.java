@@ -1123,7 +1123,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addQtl(Qtl qtl) throws MiddlewareQueryException {
-		qtl.setQtlId(this.getQtlDao().getNextId("qtlId"));
 		return ((Qtl) super.saveOrUpdate(this.getQtlDao(), qtl)).getQtlId();
 	}
 
@@ -2733,9 +2732,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private Integer saveQtl(Integer datasetId, Qtl qtl) throws Exception {
 		this.getActiveSession();
 		QtlDAO qtlDao = this.getQtlDao();
-
-		Integer qtlId = qtlDao.getNextId("qtlId");
-		qtl.setQtlId(qtlId);
 
 		qtl.setDatasetId(datasetId);
 
