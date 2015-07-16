@@ -970,8 +970,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addMarkerUserInfo(MarkerUserInfo markerUserInfo) throws MiddlewareQueryException {
-		MarkerUserInfoDetails details = markerUserInfo.getMarkerUserInfoDetails();
-		markerUserInfo.setUserInfoId(this.getMarkerUserInfoDao().getNextId("userInfoId"));
 		return ((MarkerUserInfo) super.save(this.getMarkerUserInfoDao(), markerUserInfo)).getUserInfoId();
 	}
 
@@ -2587,7 +2585,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		this.getActiveSession();
 
 		MarkerUserInfoDAO dao = this.getMarkerUserInfoDao();
-		markerUserInfo.setUserInfoId(dao.getNextId("userInfoId"));
 		MarkerUserInfo markerUserInfoRecordSaved = dao.save(markerUserInfo);
 		Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
 		if (markerUserInfoSavedId == null) {
@@ -2600,10 +2597,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		this.getActiveSession();
 		MarkerUserInfoDAO dao = this.getMarkerUserInfoDao();
 
-		if (markerUserInfo.getUserInfoId() == null) {
-			markerUserInfo.setUserInfoId(dao.getNextId("userInfoId"));
-
-		} else {
+		if (markerUserInfo.getUserInfoId() != null) {
 			MarkerUserInfo markerDetailsFromDB = this.getMarkerUserInfoDao().getById(markerUserInfo.getUserInfoId());
 			if (markerDetailsFromDB == null) {
 				return this.saveMarkerUserInfo(markerUserInfo);
