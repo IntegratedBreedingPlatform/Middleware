@@ -2220,8 +2220,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.getDatasetUsersDao().merge(users);
 
 			MtaDAO mtaDao = this.getMtaDao();
-			int id = mtaDao.getNextId("mtaId");
-			mta.setMtaId(id);
 			mta.setDatasetId(dataset.getDatasetId());
 			mtaDao.merge(mta);
 
@@ -2267,18 +2265,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			MtaMetadataDAO mtaMetadataDao = this.getMtaMetadataDao();
 
 			int rowsSaved = 0;
-			int id = mtaDao.getNextId("mtaId");
 
 			for (int i = 0; i < mtaList.size(); i++) {
 				Mta mta = mtaList.get(i);
-				mta.setMtaId(id);
 				mta.setDatasetId(dataset.getDatasetId());
 				mtaDao.merge(mta);
 
 				mtaMetadata.setDatasetID(dataset.getDatasetId());
 				mtaMetadataDao.merge(mtaMetadata);
-
-				id++;
 
 				rowsSaved++;
 				if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
