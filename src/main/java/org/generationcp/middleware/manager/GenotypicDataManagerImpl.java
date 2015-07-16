@@ -1008,10 +1008,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		try {
 			trans = session.beginTransaction();
 
-			if (markerMetadataSet != null && markerMetadataSet.getMarkerMetadataSetId() == null) {
-				markerMetadataSet.setMarkerMetadataSetId(this.getMarkerMetadataSetDao().getNextId("markerMetadataSetId"));
-			}
-
 			MarkerMetadataSet recordSaved = this.getMarkerMetadataSetDao().save(markerMetadataSet);
 			savedId = recordSaved.getMarkerMetadataSetId();
 
@@ -2666,9 +2662,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Integer rowsSaved = 0;
 
 		for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
-			if (markerMetadataSet.getMarkerMetadataSetId() == null) {
-				markerMetadataSet.setMarkerMetadataSetId(markerMetadataSetDao.getNextId("markerMetadataSetId"));
-			}
 			markerMetadataSetDao.merge(markerMetadataSet);
 			rowsSaved++;
 			if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
