@@ -1101,7 +1101,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addDartValue(DartValues dartValue) throws MiddlewareQueryException {
-		dartValue.setAdId(this.getDartValuesDao().getNextId("adId"));
 		return ((DartValues) super.save(this.getDartValuesDao(), dartValue)).getAdId();
 	}
 
@@ -2807,13 +2806,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		DartValuesDAO dartValuesDao = this.getDartValuesDao();
 		Integer rowsSaved = 0;
 
-		Integer generatedId = dartValuesDao.getNextId("adId");
-
 		for (DartValues dartValues : dartValuesList) {
-			if (dartValues.getAdId() == null) {
-				dartValues.setAdId(generatedId);
-				generatedId++;
-			}
 			dartValuesDao.merge(dartValues);
 
 			rowsSaved++;
