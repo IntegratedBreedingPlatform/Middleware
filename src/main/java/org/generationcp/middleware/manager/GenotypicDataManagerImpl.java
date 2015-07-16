@@ -971,9 +971,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public Integer addMarkerUserInfo(MarkerUserInfo markerUserInfo) throws MiddlewareQueryException {
 		MarkerUserInfoDetails details = markerUserInfo.getMarkerUserInfoDetails();
-		if (details != null && details.getContactId() == null) {
-			details.setContactId(this.getMarkerUserInfoDetailsDao().getNextId("contactId"));
-		}
 		markerUserInfo.setUserInfoId(this.getMarkerUserInfoDao().getNextId("userInfoId"));
 		return ((MarkerUserInfo) super.save(this.getMarkerUserInfoDao(), markerUserInfo)).getUserInfoId();
 	}
@@ -2589,14 +2586,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private Integer saveMarkerUserInfo(MarkerUserInfo markerUserInfo) throws Exception {
 		this.getActiveSession();
 
-		// Set contact id
-		if (markerUserInfo != null) {
-			MarkerUserInfoDetails details = markerUserInfo.getMarkerUserInfoDetails();
-			if (details != null && details.getContactId() == null) {
-				details.setContactId(this.getMarkerUserInfoDetailsDao().getNextId("contactId"));
-			}
-		}
-
 		MarkerUserInfoDAO dao = this.getMarkerUserInfoDao();
 		markerUserInfo.setUserInfoId(dao.getNextId("userInfoId"));
 		MarkerUserInfo markerUserInfoRecordSaved = dao.save(markerUserInfo);
@@ -2614,13 +2603,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		if (markerUserInfo.getUserInfoId() == null) {
 			markerUserInfo.setUserInfoId(dao.getNextId("userInfoId"));
 
-			// Set contact id
-			if (markerUserInfo != null) {
-				MarkerUserInfoDetails details = markerUserInfo.getMarkerUserInfoDetails();
-				if (details != null && details.getContactId() == null) {
-					details.setContactId(this.getMarkerUserInfoDetailsDao().getNextId("contactId"));
-				}
-			}
 		} else {
 			MarkerUserInfo markerDetailsFromDB = this.getMarkerUserInfoDao().getById(markerUserInfo.getUserInfoId());
 			if (markerDetailsFromDB == null) {
