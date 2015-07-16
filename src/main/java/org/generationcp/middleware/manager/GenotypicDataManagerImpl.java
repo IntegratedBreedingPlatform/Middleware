@@ -1061,7 +1061,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addGDMSMarkerAlias(MarkerAlias markerAlias) throws MiddlewareQueryException {
-		markerAlias.setMarkerAliasId(this.getMarkerAliasDao().getNextId("markerAliasId"));
 		return ((MarkerAlias) super.save(this.getMarkerAliasDao(), markerAlias)).getMarkerId();
 	}
 
@@ -1180,7 +1179,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			marker.setMarkerType(markerType);
 
 			// Add GDMS Marker Alias
-			markerAlias.setMarkerAliasId(this.getMarkerAliasDao().getNextId("markerAliasId"));
 			markerAlias.setMarkerId(idGDMSMarkerSaved);
 			this.saveMarkerAlias(markerAlias);
 
@@ -2548,10 +2546,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	private Integer saveMarkerAlias(MarkerAlias markerAlias) throws Exception {
 		this.getActiveSession();
-
-		if (markerAlias.getMarkerAliasId() == null) {
-			markerAlias.setMarkerAliasId(this.getMarkerAliasDao().getNextId("markerAliasId"));
-		}
 
 		MarkerAlias markerAliasRecordSaved = this.getMarkerAliasDao().save(markerAlias);
 		Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
