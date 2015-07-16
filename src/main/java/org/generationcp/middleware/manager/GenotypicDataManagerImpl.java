@@ -1063,7 +1063,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addAlleleValues(AlleleValues alleleValues) throws MiddlewareQueryException {
-		alleleValues.setAnId(this.getAlleleValuesDao().getNextId("anId"));
 		return ((AlleleValues) super.saveOrUpdate(this.getAlleleValuesDao(), alleleValues)).getAnId();
 	}
 
@@ -2772,13 +2771,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		AlleleValuesDAO alleleValuesDao = this.getAlleleValuesDao();
 		Integer rowsSaved = 0;
 
-		Integer generatedId = alleleValuesDao.getNextId("anId");
-
 		for (AlleleValues alleleValues : alleleValuesList) {
-			if (alleleValues.getAnId() == null) {
-				alleleValues.setAnId(generatedId);
-				generatedId++;
-			}
 			alleleValuesDao.merge(alleleValues);
 
 			rowsSaved++;
