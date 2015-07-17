@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -110,6 +110,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
 					OntologyDataManagerImpl.LOG.debug("new scale with id = " + stdVariable.getScale().getId());
 				}
+			} else if (stdVariable.getScale().getId() == 0) {
+				stdVariable.setScale(scale);
 			}
 
 			Term property = this.findTermByName(stdVariable.getProperty().getName(), CvId.PROPERTIES);
@@ -119,6 +121,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
 					OntologyDataManagerImpl.LOG.debug("new property with id = " + stdVariable.getProperty().getId());
 				}
+			} else if (stdVariable.getProperty().getId() == 0) {
+				stdVariable.setProperty(property);
 			}
 
 			Term method = this.findTermByName(stdVariable.getMethod().getName(), CvId.METHODS);
@@ -128,6 +132,19 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
 					OntologyDataManagerImpl.LOG.debug("new method with id = " + stdVariable.getMethod().getId());
 				}
+			} else if (stdVariable.getMethod().getId() == 0) {
+				stdVariable.setMethod(method);
+			}
+
+			Term isA = this.findTermByName(stdVariable.getIsA().getName(), CvId.IBDB_TERMS);
+			if (isA == null) {
+				stdVariable.setIsA(this.getTermSaver().save(stdVariable.getIsA().getName(), stdVariable.getIsA().getDefinition(),
+						CvId.IBDB_TERMS));
+				if (LOG.isDebugEnabled()) {
+					LOG.debug("new trait class with id = " + stdVariable.getIsA().getId());
+				}
+			} else if (stdVariable.getIsA().getId() == 0) {
+				stdVariable.setIsA(isA);
 			}
 
 			if (this.findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(), stdVariable.getScale().getName(),
@@ -448,8 +465,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		try {
 			trans = session.beginTransaction();
 			Term term = this.saveOrUpdateCvTerm(name, definition, cvId);
-			
-			if (objectId != 0){
+
+			if (objectId != 0) {
 				this.saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
 			}
 
