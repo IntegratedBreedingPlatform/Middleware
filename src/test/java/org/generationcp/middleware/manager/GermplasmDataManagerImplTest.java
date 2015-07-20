@@ -466,11 +466,11 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testAddMethods() throws MiddlewareQueryException {
 		List<Method> methods = new ArrayList<Method>();
 		String programUUID = UUID.randomUUID().toString();
-		methods.add(new Method(1, "GEN", "S", "UGM", "yesno", "description 1", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
+		methods.add(new Method(null, "GEN", "S", "UGM", "yesno", "description 1", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
 				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610), programUUID));
-		methods.add(new Method(2, "GEN", "S", "UGM", "yesno", "description 2", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
+		methods.add(new Method(null, "GEN", "S", "UGM", "yesno", "description 2", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
 				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610), programUUID));
-		methods.add(new Method(3, "GEN", "S", "UGM", "yesno", "description 3", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
+		methods.add(new Method(null, "GEN", "S", "UGM", "yesno", "description 3", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
 				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610), programUUID));
 
 		List<Integer> methodsAdded = GermplasmDataManagerImplTest.manager.addMethod(methods);
@@ -1012,7 +1012,7 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetGermplasmByLocalGID() throws Exception {
-		Integer lgid = 0;
+		Integer lgid = 1;
 
 		Germplasm germplasm = GermplasmDataManagerImplTest.manager.getGermplasmByLocalGid(lgid);
 
