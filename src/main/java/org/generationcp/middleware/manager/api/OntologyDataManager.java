@@ -570,4 +570,22 @@ public interface OntologyDataManager {
 	List<NameSynonym> getSynonymsOfTerm(Integer termId) throws MiddlewareQueryException;
 
 	boolean isSeedAmountVariable(String variateProperty) throws MiddlewareQueryException;
+
+	/**
+	 * Returns the cv id by name
+	 * 
+	 * @param name of cv
+	 * @return cv_id
+	 */
+	Integer getCVIdByName(String name) throws MiddlewareQueryException;
+
+	/**
+	 * Returns Term based on the given name and cv id.
+	 * 
+	 * @param name the name
+	 * @param cvId the cv id
+	 * @return Term
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Term findTermByName(String name, int cvId) throws MiddlewareQueryException;
 }

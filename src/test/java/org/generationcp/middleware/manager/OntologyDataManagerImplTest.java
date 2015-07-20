@@ -1187,4 +1187,9 @@ public class OntologyDataManagerImplTest extends DataManagerIntegrationTest impl
 		Assert.assertNull(term);
 	}
 
+	@Test
+	public void testGetCVIdByName() throws MiddlewareQueryException {
+		Integer cvId = OntologyDataManagerImplTest.manager.getCVIdByName("Variables");
+		Assert.assertTrue(cvId == 1040);
+	}
 }

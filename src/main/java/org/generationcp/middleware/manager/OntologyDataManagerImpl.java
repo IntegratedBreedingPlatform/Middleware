@@ -986,4 +986,15 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 		return isSeedAmountVar;
 	}
+
+	@Override
+	public Integer getCVIdByName(String name) throws MiddlewareQueryException {
+		return this.getCvDao().getIdByName(name);
+	}
+
+	@Override
+	public Term findTermByName(String name, int cvId) throws MiddlewareQueryException {
+		return this.getTermBuilder().findTermByName(name, cvId);
+	}
+
 }
