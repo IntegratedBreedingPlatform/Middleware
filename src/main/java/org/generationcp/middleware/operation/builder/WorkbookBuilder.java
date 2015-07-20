@@ -94,21 +94,18 @@ public class WorkbookBuilder extends Builder {
 		List<Experiment> experiments = this.getStudyDataManager().getExperiments(dataSetId, 0, (int) expCount, variables);
 
 		VariableList conditionVariables = null, constantVariables = null, trialConstantVariables = null;
+		VariableList trialDatasetVariablesWithNoValues = getSingleRowOfEmptyTrialVariables(workbook, study.getId(), dataSetId);
 		if (isTrial) {
 			conditionVariables = new VariableList();
 			conditionVariables.addAll(study.getConditions());
-			conditionVariables.addAll(this.getSingleRowOfEmptyTrialVariables(workbook, study.getId(), dataSetId));
-
-			constantVariables = study.getConstants();
-			trialConstantVariables = this.getTrialConstants(workbook.getTrialDatasetId());
-
-			variables = this.removeTrialDatasetVariables(variables, conditionVariables, constantVariables);
+			conditionVariables.addAll(trialDatasetVariablesWithNoValues);
 		} else {
-			this.getSingleRowOfEmptyTrialVariables(workbook, study.getId(), dataSetId);
 			conditionVariables = study.getConditions();
-			constantVariables = study.getConstants();
-			trialConstantVariables = this.getTrialConstants(workbook.getTrialDatasetId());
 		}
+		constantVariables = study.getConstants();
+		trialConstantVariables = getTrialConstants(workbook.getTrialDatasetId());
+		variables = removeTrialDatasetVariables(variables, trialDatasetVariablesWithNoValues);
+
 		List<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(conditionVariables, true, true);
 		List<MeasurementVariable> factors = this.buildFactors(variables, isTrial);
 		List<MeasurementVariable> constants = this.buildStudyMeasurementVariables(constantVariables, false, true);
@@ -200,7 +197,7 @@ public class WorkbookBuilder extends Builder {
 
 						if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
 							expDesignVariables.add(measurementVariable);
-						} else {
+						} else if (!conditions.contains(measurementVariable)) {
 							conditions.add(measurementVariable);
 						}
 					}
@@ -868,23 +865,18 @@ public class WorkbookBuilder extends Builder {
 		return rows;
 	}
 
-	protected VariableTypeList removeTrialDatasetVariables(VariableTypeList variables, VariableList conditions, VariableList constants) {
+	protected VariableTypeList removeTrialDatasetVariables(VariableTypeList variables, VariableList toBeDeleted) {
 		List<Integer> trialList = new ArrayList<Integer>();
-		if (conditions != null && !conditions.isEmpty()) {
-			for (Variable condition : conditions.getVariables()) {
-				trialList.add(condition.getVariableType().getId());
-			}
-		}
-		if (constants != null && !constants.isEmpty()) {
-			for (Variable constant : constants.getVariables()) {
-				trialList.add(constant.getVariableType().getId());
+		if (toBeDeleted != null && !toBeDeleted.isEmpty()) {
+			for (Variable variable : toBeDeleted.getVariables()) {
+				trialList.add(variable.getVariableType().getStandardVariable().getId());
 			}
 		}
 
 		VariableTypeList list = new VariableTypeList();
 		if (variables != null) {
 			for (VariableType type : variables.getVariableTypes()) {
-				if (!trialList.contains(type.getId())) {
+				if (!trialList.contains(type.getStandardVariable().getId())) {
 					list.add(type);
 				}
 			}

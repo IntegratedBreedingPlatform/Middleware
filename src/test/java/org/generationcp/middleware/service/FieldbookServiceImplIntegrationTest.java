@@ -11,7 +11,10 @@
 
 package org.generationcp.middleware.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -161,10 +164,47 @@ public class FieldbookServiceImplIntegrationTest extends DataManagerIntegrationT
 	@Test
 	public void testGetNurseryDataSet() throws MiddlewareQueryException {
 		Workbook workbook = WorkbookTest.getTestWorkbook();
-		workbook.print(MiddlewareIntegrationTest.INDENT);
-		int id = FieldbookServiceImplIntegrationTest.dataImportService.saveDataset(workbook, FieldbookServiceImplIntegrationTest.commonTestProject.getUniqueID());
-		workbook = FieldbookServiceImplIntegrationTest.fieldbookService.getNurseryDataSet(id);
-		workbook.print(MiddlewareIntegrationTest.INDENT);
+		workbook.print(INDENT);
+		int id = dataImportService.saveDataset(workbook, true, false, commonTestProject.getUniqueID());
+		Workbook resultingWorkbook = fieldbookService.getNurseryDataSet(id);
+		resultingWorkbook.print(INDENT);
+
+		assertNotNull(resultingWorkbook);
+		assertNotNull(resultingWorkbook.getStudyDetails());
+		assertEquals(workbook.getStudyDetails().getStudyType(), resultingWorkbook.getStudyDetails().getStudyType());
+		assertEquals(workbook.getStudyDetails().getStudyName(), resultingWorkbook.getStudyDetails().getStudyName());
+		assertEquals(workbook.getStudyDetails().getTitle(), resultingWorkbook.getStudyDetails().getTitle());
+		assertEquals(workbook.getStudyDetails().getObjective(), resultingWorkbook.getStudyDetails().getObjective());
+		assertEquals(workbook.getStudyDetails().getStartDate(), resultingWorkbook.getStudyDetails().getStartDate());
+		assertEquals(workbook.getStudyDetails().getEndDate(), resultingWorkbook.getStudyDetails().getEndDate());
+		assertEquals(workbook.getConditions().size(), resultingWorkbook.getConditions().size());
+		assertEquals(workbook.getConstants().size(), resultingWorkbook.getConstants().size());
+		assertEquals(workbook.getFactors().size(), resultingWorkbook.getFactors().size());
+		assertEquals(workbook.getVariates().size(), resultingWorkbook.getVariates().size());
+		assertEquals(workbook.getObservations().size(), resultingWorkbook.getObservations().size());
+	}
+
+	@Test
+	public void testGetTrialDataSet() throws MiddlewareQueryException {
+		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
+		workbook.print(INDENT);
+		int id = dataImportService.saveDataset(workbook, true, false, commonTestProject.getUniqueID());
+		Workbook resultingWorkbook = fieldbookService.getTrialDataSet(id);
+		resultingWorkbook.print(INDENT);
+
+		assertNotNull(resultingWorkbook);
+		assertNotNull(resultingWorkbook.getStudyDetails());
+		assertEquals(workbook.getStudyDetails().getStudyType(), resultingWorkbook.getStudyDetails().getStudyType());
+		assertEquals(workbook.getStudyDetails().getStudyName(), resultingWorkbook.getStudyDetails().getStudyName());
+		assertEquals(workbook.getStudyDetails().getTitle(), resultingWorkbook.getStudyDetails().getTitle());
+		assertEquals(workbook.getStudyDetails().getObjective(), resultingWorkbook.getStudyDetails().getObjective());
+		assertEquals(workbook.getStudyDetails().getStartDate(), resultingWorkbook.getStudyDetails().getStartDate());
+		assertEquals(workbook.getStudyDetails().getEndDate(), resultingWorkbook.getStudyDetails().getEndDate());
+		assertEquals(workbook.getConditions().size(), resultingWorkbook.getConditions().size());
+		assertEquals(workbook.getConstants().size(), resultingWorkbook.getConstants().size());
+		assertEquals(workbook.getFactors().size(), resultingWorkbook.getFactors().size());
+		assertEquals(workbook.getVariates().size(), resultingWorkbook.getVariates().size());
+		assertEquals(workbook.getObservations().size(), resultingWorkbook.getObservations().size());
 	}
 
 	@Test

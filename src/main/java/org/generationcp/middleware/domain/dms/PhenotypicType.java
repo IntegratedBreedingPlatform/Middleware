@@ -91,4 +91,13 @@ public enum PhenotypicType {
 		}
 		return storages;
 	}
+
+	public static PhenotypicType getPhenotypicTypeByGroup(String group) {
+		for (PhenotypicType type : PhenotypicType.values()) {
+			if (type.getGroup().equals(group)) {
+				return type;
+			}
+		}
+		return null;
+	}
 }

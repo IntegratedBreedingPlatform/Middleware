@@ -249,6 +249,10 @@ public class WorkbookSaver extends Saver {
 			workbook.setFactors(null);
 			workbook.setStudyDetails(null);
 			workbook.setVariates(null);
+		} else {
+			workbook.setStudyId(studyId);
+			workbook.setTrialDatasetId(trialDatasetId);
+			workbook.setMeasurementDatesetId(datasetId);
 		}
 
 		this.createMeasurementEffectExperiments(datasetId, effectVariables, workbook.getObservations(), trialHeaders, trialVariatesMap);

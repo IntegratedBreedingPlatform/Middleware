@@ -285,9 +285,12 @@ public class WorkbookBuilderTest extends DataManagerIntegrationTest {
 		VariableList constants = this.transformMeasurementVariablesToVariableList(workbook.getConstants(), constantsVariableTypeList);
 		// find the trial instance variable before removing it as a factor
 		VariableType trialInstance = factorsVariableTypeList.findById(TermId.TRIAL_INSTANCE_FACTOR.getId());
+		VariableList toBeDeleted = new VariableList();
+		toBeDeleted.addAll(conditions);
+		toBeDeleted.addAll(constants);
 		// call the method to test: remove trial instance
 		VariableTypeList finalFactors =
-				WorkbookBuilderTest.workbookBuilder.removeTrialDatasetVariables(factorsVariableTypeList, conditions, constants);
+				WorkbookBuilderTest.workbookBuilder.removeTrialDatasetVariables(factorsVariableTypeList, toBeDeleted);
 		// verify if the trial instance is no longer found in the final factors
 		Assert.assertFalse(finalFactors.getVariableTypes().contains(trialInstance));
 

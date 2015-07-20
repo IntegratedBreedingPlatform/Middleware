@@ -79,8 +79,9 @@ public class PhenotypeSaver extends Saver {
 	public void save(int experimentId, Variable variable) throws MiddlewareQueryException {
 		Phenotype phenotype = this.createPhenotype(variable);
 		if (phenotype != null) {
-			this.getPhenotypeDao().save(phenotype);
+			phenotype = this.getPhenotypeDao().save(phenotype);
 			this.saveExperimentPhenotype(experimentId, phenotype.getPhenotypeId());
+			variable.setPhenotypeId(phenotype.getPhenotypeId());
 		}
 	}
 
