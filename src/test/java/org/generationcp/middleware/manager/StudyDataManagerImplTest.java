@@ -1415,4 +1415,33 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 				StudyDataManagerImplTest.commonTestProject.getUniqueID(), studyDetails.getProgramUUID());
 		Assert.assertEquals("Study should be a trial", StudyType.T, studyDetails.getStudyType());
 	}
+
+	@Test
+	public void testGetGeolocationIdByProjectIdAndTrialInstanceNumber() {
+		try {
+			Integer projectId = 25007;
+			String trialInstanceNumberExpected = "1";
+			Integer geolocationId =
+					StudyDataManagerImplTest.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId,
+							trialInstanceNumberExpected);
+			if(geolocationId!=null) {
+				String trialInstanceNumberActual = StudyDataManagerImplTest.manager.getTrialInstanceNumberByGeolocationId(geolocationId);
+				Assert.assertEquals(trialInstanceNumberExpected, trialInstanceNumberActual);
+			}
+		} catch (MiddlewareQueryException e) {
+			Assert.fail("Unexpected exception: " + e.getMessage());
+		}
+	}
+
+	@Test
+	public void testGetTrialInstanceNumberByGeolocationId() {
+		try {
+			String trialInstanceNumberExpected = "1";
+			String trialInstanceNumberActual = StudyDataManagerImplTest.manager.getTrialInstanceNumberByGeolocationId(1);
+			Assert.assertNotNull(trialInstanceNumberActual);
+			Assert.assertEquals(trialInstanceNumberExpected, trialInstanceNumberActual);
+		} catch (MiddlewareQueryException e) {
+			Assert.fail("Unexpected exception: " + e.getMessage());
+		}
+	}
 }

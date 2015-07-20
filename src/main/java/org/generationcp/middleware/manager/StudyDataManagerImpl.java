@@ -1130,4 +1130,19 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("Error in updateVariableOrdering " + e.getMessage(), e);
 		}
 	}
+
+	@Override
+	public Integer getGeolocationIdByProjectIdAndTrialInstanceNumber(int projectId, String trialInstanceNumber)
+			throws MiddlewareQueryException {
+		return getExperimentProjectDao().getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId, trialInstanceNumber);
+	}
+
+	@Override
+	public String getTrialInstanceNumberByGeolocationId(int geolocationId) throws MiddlewareQueryException {
+		Geolocation geolocation = getGeolocationDao().getById(geolocationId);
+		if (geolocation != null) {
+			return geolocation.getDescription();
+		}
+		return null;
+	}
 }

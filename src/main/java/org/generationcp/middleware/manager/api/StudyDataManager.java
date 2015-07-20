@@ -757,4 +757,24 @@ public interface StudyDataManager {
 	 * @param variableIds - list of variable IDs in the order that they will be saved
 	 */
 	public void updateVariableOrdering(int datasetId, List<Integer> variableIds) throws MiddlewareQueryException;
+
+	/**
+	 * Gets the geolocation id by project id and trial instance number.
+	 * 
+	 * @param projectId - study id or dataset id
+	 * @param trial instance number
+	 * @return the geolocation id
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	public Integer getGeolocationIdByProjectIdAndTrialInstanceNumber(int projectId, String trialInstanceNumber)
+			throws MiddlewareQueryException;
+
+	/**
+	 * Retrieves the trial instance number by geolocation id
+	 * 
+	 * @param geolocationId
+	 * @return trial instance number
+	 * @throws MiddlewareQueryException
+	 */
+	public String getTrialInstanceNumberByGeolocationId(int geolocationId) throws MiddlewareQueryException;
 }
