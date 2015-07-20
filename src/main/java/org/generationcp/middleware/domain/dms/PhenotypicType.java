@@ -10,7 +10,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 /**
  * The different phenotypic types used in standard variable. For factor type, these are used: STUDY, DATASET, TRIAL_ENVIRONMENT, GERMPLASM,
  * TRIAL_DESIGN For role type, these are used: TRIAL_ENVIRONMENT, GERMPLASM, TRIAL_DESIGN, VARIATE
- *
+ * 
  */
 public enum PhenotypicType {
 

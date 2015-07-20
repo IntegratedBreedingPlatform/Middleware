@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.operation.builder;
@@ -94,7 +94,7 @@ public class WorkbookBuilder extends Builder {
 		List<Experiment> experiments = this.getStudyDataManager().getExperiments(dataSetId, 0, (int) expCount, variables);
 
 		VariableList conditionVariables = null, constantVariables = null, trialConstantVariables = null;
-		VariableList trialDatasetVariablesWithNoValues = getSingleRowOfEmptyTrialVariables(workbook, study.getId(), dataSetId);
+		VariableList trialDatasetVariablesWithNoValues = this.getSingleRowOfEmptyTrialVariables(workbook, study.getId(), dataSetId);
 		if (isTrial) {
 			conditionVariables = new VariableList();
 			conditionVariables.addAll(study.getConditions());
@@ -103,8 +103,8 @@ public class WorkbookBuilder extends Builder {
 			conditionVariables = study.getConditions();
 		}
 		constantVariables = study.getConstants();
-		trialConstantVariables = getTrialConstants(workbook.getTrialDatasetId());
-		variables = removeTrialDatasetVariables(variables, trialDatasetVariablesWithNoValues);
+		trialConstantVariables = this.getTrialConstants(workbook.getTrialDatasetId());
+		variables = this.removeTrialDatasetVariables(variables, trialDatasetVariablesWithNoValues);
 
 		List<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(conditionVariables, true, true);
 		List<MeasurementVariable> factors = this.buildFactors(variables, isTrial);
@@ -742,14 +742,14 @@ public class WorkbookBuilder extends Builder {
 
 			// added for optimization
 			String key = Integer.toString(vType.getId());
-					Variable var = experiment.getVariatesMap().get(key);
-					if (var != null) {
-						vlist.add(var);
-						found = true;
-					}
-					if (!found) {
-						vlist.add(new Variable(vType, (String) null));
-					}
+			Variable var = experiment.getVariatesMap().get(key);
+			if (var != null) {
+				vlist.add(var);
+				found = true;
+			}
+			if (!found) {
+				vlist.add(new Variable(vType, (String) null));
+			}
 		}
 
 		return vlist;
