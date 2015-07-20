@@ -2362,7 +2362,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private Integer saveDataset(Dataset dataset) throws Exception {
 		this.getActiveSession();
 		DatasetDAO datasetDao = this.getDatasetDao();
-		Dataset datasetRecordSaved = datasetDao.merge(dataset);
+		Dataset datasetRecordSaved = datasetDao.save(dataset);
 		return datasetRecordSaved.getDatasetId();
 	}
 
