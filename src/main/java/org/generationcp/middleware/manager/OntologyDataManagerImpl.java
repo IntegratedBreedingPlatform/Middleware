@@ -110,6 +110,82 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
 					OntologyDataManagerImpl.LOG.debug("new scale with id = " + stdVariable.getScale().getId());
 				}
+			}
+
+			Term property = this.findTermByName(stdVariable.getProperty().getName(), CvId.PROPERTIES);
+			if (property == null) {
+				stdVariable.setProperty(this.getTermSaver().save(stdVariable.getProperty().getName(),
+						stdVariable.getProperty().getDefinition(), CvId.PROPERTIES));
+				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
+					OntologyDataManagerImpl.LOG.debug("new property with id = " + stdVariable.getProperty().getId());
+				}
+			}
+
+			Term method = this.findTermByName(stdVariable.getMethod().getName(), CvId.METHODS);
+			if (method == null) {
+				stdVariable.setMethod(this.getTermSaver().save(stdVariable.getMethod().getName(), stdVariable.getMethod().getDefinition(),
+						CvId.METHODS));
+				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
+					OntologyDataManagerImpl.LOG.debug("new method with id = " + stdVariable.getMethod().getId());
+				}
+			}
+
+			if (this.findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(), stdVariable.getScale().getName(),
+					stdVariable.getMethod().getName()) == null) {
+				this.getStandardVariableSaver().save(stdVariable);
+			}
+			trans.commit();
+		} catch (Exception e) {
+			this.rollbackTransaction(trans);
+			throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException {
+		Session session = this.getCurrentSession();
+		Transaction trans = null;
+
+		trans = session.beginTransaction();
+
+		try {
+
+			for (StandardVariable stdVariable : stdVariableList) {
+				this.getStandardVariableSaver().save(stdVariable);
+			}
+
+			trans.commit();
+
+		} catch (Exception e) {
+			this.rollbackTransaction(trans);
+			throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
+		}
+
+	}
+
+	@Override
+	public void addStandardVariableForMigrator(StandardVariable stdVariable) throws MiddlewareQueryException {
+
+		Session session = this.getCurrentSession();
+		Transaction trans = null;
+
+		Term existingStdVar = this.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+		if (existingStdVar != null) {
+			throw new MiddlewareQueryException(String.format(
+					"Error in addStandardVariableForMigrator, Variable with name \"%s\" already exists", stdVariable.getName()));
+		}
+
+		try {
+
+			trans = session.beginTransaction();
+			// check if scale, property and method exists first
+			Term scale = this.findTermByName(stdVariable.getScale().getName(), CvId.SCALES);
+			if (scale == null) {
+				stdVariable.setScale(this.getTermSaver().save(stdVariable.getScale().getName(), stdVariable.getScale().getDefinition(),
+						CvId.SCALES));
+				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
+					OntologyDataManagerImpl.LOG.debug("new scale with id = " + stdVariable.getScale().getId());
+				}
 			} else if (stdVariable.getScale().getId() == 0) {
 				stdVariable.setScale(scale);
 			}
@@ -154,28 +230,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			trans.commit();
 		} catch (Exception e) {
 			this.rollbackTransaction(trans);
-			throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
-		trans = session.beginTransaction();
-
-		try {
-
-			for (StandardVariable stdVariable : stdVariableList) {
-				this.getStandardVariableSaver().save(stdVariable);
-			}
-
-			trans.commit();
-
-		} catch (Exception e) {
-			this.rollbackTransaction(trans);
-			throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in addStandardVariableForMigrator " + e.getMessage(), e);
 		}
 
 	}
