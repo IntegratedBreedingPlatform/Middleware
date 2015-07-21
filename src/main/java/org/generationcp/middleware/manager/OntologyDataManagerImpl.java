@@ -509,10 +509,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		try {
 			trans = session.beginTransaction();
 			Term term = this.saveOrUpdateCvTerm(name, definition, cvId);
-
-			if (objectId != 0) {
-				this.saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
-			}
+			this.saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
 
 			trans.commit();
 			return term;
