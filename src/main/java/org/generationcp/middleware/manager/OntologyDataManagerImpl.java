@@ -212,17 +212,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				stdVariable.setMethod(method);
 			}
 
-			Term isA = this.findTermByName(stdVariable.getIsA().getName(), CvId.IBDB_TERMS);
-			if (isA == null) {
-				stdVariable.setIsA(this.getTermSaver().save(stdVariable.getIsA().getName(), stdVariable.getIsA().getDefinition(),
-						CvId.IBDB_TERMS));
-				if (LOG.isDebugEnabled()) {
-					LOG.debug("new trait class with id = " + stdVariable.getIsA().getId());
-				}
-			} else if (stdVariable.getIsA().getId() == 0) {
-				stdVariable.setIsA(isA);
-			}
-
 			if (this.findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(), stdVariable.getScale().getName(),
 					stdVariable.getMethod().getName()) == null) {
 				this.getStandardVariableSaver().save(stdVariable);
