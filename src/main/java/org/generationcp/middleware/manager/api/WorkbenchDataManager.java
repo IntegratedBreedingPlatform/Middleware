@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.manager.api;
@@ -50,7 +50,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the projects.
-	 *
+	 * 
 	 * @return the projects
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -58,7 +58,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the projects.
-	 *
+	 * 
 	 * @param start - the starting record
 	 * @param numOfRows - the number of rows to retrieve
 	 * @return the projects
@@ -68,7 +68,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the list of Projects that the specified User is associated with.
-	 *
+	 * 
 	 * @param user - the User associated with the projects to be retrieved
 	 * @return the projects which the specified user is involved
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -77,7 +77,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Save or update project.
-	 *
+	 * 
 	 * @param project - the project to save
 	 * @return the project saved
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -86,7 +86,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Save a project.
-	 *
+	 * 
 	 * @param project the project
 	 * @return The Project added
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -95,7 +95,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Update a project using Hibernate's Session.merge() method.
-	 *
+	 * 
 	 * @param project the project
 	 * @return The merged Project.
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -104,7 +104,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Delete project.
-	 *
+	 * 
 	 * @param project - the project to delete
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -112,7 +112,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Delete project dependencies.
-	 *
+	 * 
 	 * @param project - the project to delete dependencies
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -120,7 +120,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the workflow templates.
-	 *
+	 * 
 	 * @return the workflow templates
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -128,7 +128,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the workflow templates.
-	 *
+	 * 
 	 * @param start - the starting record
 	 * @param numOfRows - the number of rows to retrieve
 	 * @return the workflow templates
@@ -138,7 +138,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the workflow templates based on the given name.
-	 *
+	 * 
 	 * @param name - the name of the workflow template
 	 * @return the workflow templates
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -147,14 +147,14 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the tool DAO directly.
-	 *
+	 * 
 	 * @return the tool with the given name
 	 */
 	ToolDAO getToolDao();
 
 	/**
 	 * Get all tools.
-	 *
+	 * 
 	 * @return The list of all tools.
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -162,7 +162,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the tool with the given name.
-	 *
+	 * 
 	 * @param toolName - the tool name to match
 	 * @return the tool with the given name
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -171,7 +171,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Get the list of tools with the specified type.
-	 *
+	 * 
 	 * @param toolType the tool type
 	 * @return the list of matching tools
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -180,7 +180,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Checks if is valid user login.
-	 *
+	 * 
 	 * @param username - the username
 	 * @param password - the password
 	 * @return true, if is valid user login
@@ -190,7 +190,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Changes the password of the user.
-	 *
+	 * 
 	 * @param username - the username
 	 * @param password - the new password
 	 * @return true, if is user login is completed
@@ -200,7 +200,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Checks if is person exists.
-	 *
+	 * 
 	 * @param firstName - the first name
 	 * @param lastName - the last name
 	 * @return true, if is person exists
@@ -229,7 +229,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Checks if a username exists.
-	 *
+	 * 
 	 * @param userName - the user name to check
 	 * @return true, if is username exists
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -238,7 +238,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Get the user info record for the specified user.
-	 *
+	 * 
 	 * @param userId the user id
 	 * @return the user info
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -260,7 +260,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Increments the log in count.
-	 *
+	 * 
 	 * @param userId the user id
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -268,7 +268,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Insert or update the specified {@link UserInfo} record.
-	 *
+	 * 
 	 * @param userDetails the user details
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -276,7 +276,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Adds the person.
-	 *
+	 * 
 	 * @param person - the Person to add
 	 * @return Returns the id of the {@code Person} record added
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -285,7 +285,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Adds a user.
-	 *
+	 * 
 	 * @param user - the user to add
 	 * @return Returns the id of the {@code User} record added
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -294,7 +294,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets a project by id.
-	 *
+	 * 
 	 * @param projectId - the project id to match
 	 * @return the project matching the given id
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -303,7 +303,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets a project by name. Should return only one value.
-	 *
+	 * 
 	 * @param projectName - the project name to match
 	 * @return the project matching the given name
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -312,7 +312,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets a project by Uuid. Should return only one value.
-	 *
+	 * 
 	 * @param projectUuid - the project Uuid to match
 	 * @return the project matching the given Uuid
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -321,7 +321,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Updates all the project roles for a project.
-	 *
+	 * 
 	 * @param project - the project to use
 	 * @param newRoles - the new roles to add
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -330,7 +330,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Registers a workbench dataset.
-	 *
+	 * 
 	 * @param dataset - the workbench dataset to save
 	 * @return Returns the id of the {@code WorkbenchDataset} record added
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -339,7 +339,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the workbench dataset by id.
-	 *
+	 * 
 	 * @param datasetId the dataset id
 	 * @return the workench dataset matching the given id
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -348,7 +348,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Delete a workbench dataset.
-	 *
+	 * 
 	 * @param dataset the dataset to delete
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -356,7 +356,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns all the Workbench users.
-	 *
+	 * 
 	 * @return A {@code List} of all the {@code User}s in the Workbench database.
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -364,7 +364,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns all the Workbench users ordered by First Name then Last Name.
-	 *
+	 * 
 	 * @return A {@code List} of all the {@code User}s in the Workbench database.
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -372,7 +372,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns number of all Users.
-	 *
+	 * 
 	 * @return the number of all Users
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -380,7 +380,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the user by id.
-	 *
+	 * 
 	 * @param id - the user id to match
 	 * @return the user matching the given id
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -389,7 +389,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the user by name.
-	 *
+	 * 
 	 * @param name - the name to match
 	 * @param start - the starting record
 	 * @param numOfRows - the number of rows to retrieve
@@ -401,7 +401,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Deletes a user.
-	 *
+	 * 
 	 * @param user - the User to delete
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -409,7 +409,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns all Persons.
-	 *
+	 * 
 	 * @return all Persons
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -417,7 +417,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns number of all Persons.
-	 *
+	 * 
 	 * @return the number of all Persons
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -425,7 +425,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the person by id.
-	 *
+	 * 
 	 * @param id - the id to match
 	 * @return the person matching the given id
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -434,7 +434,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Deletes a person.
-	 *
+	 * 
 	 * @param person - the Person to delete
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -442,7 +442,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns the project last accessed by the user.
-	 *
+	 * 
 	 * @param userId - the user id to match
 	 * @return the last Project opened by the given user
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -451,7 +451,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns a list of {@link WorkbenchDataset} records by project id.
-	 *
+	 * 
 	 * @param projectId - the project id
 	 * @param start - the starting record
 	 * @param numOfRows - the number of rows to retrieve
@@ -462,7 +462,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns the number of {@link WorkbenchDataset} records by project id.
-	 *
+	 * 
 	 * @param projectId the project id
 	 * @return the number of {@link WorkbenchDataset} records
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -471,7 +471,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns a list of {@link WorkbenchDataset} by name.
-	 *
+	 * 
 	 * @param name - the {@link WorkbenchDataset} name
 	 * @param op - the operator; EQUAL, LIKE
 	 * @param start - the starting record
@@ -483,7 +483,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns the number of {@link WorkbenchDataset} by name.
-	 *
+	 * 
 	 * @param name - the {@link WorkbenchDataset} name
 	 * @param op - the operator; EQUAL, LIKE
 	 * @return the number of {@link WorkbenchDataset}
@@ -493,7 +493,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Adds a single project user given a Project object, a User object, and a Role object.
-	 *
+	 * 
 	 * @param project the project
 	 * @param user the user
 	 * @param role the role of the user in the project
@@ -504,7 +504,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Adds a single workbench_project_user_role record.
-	 *
+	 * 
 	 * @param projectUserRole - the ProjectUserRole to save
 	 * @return Returns the id of the {@code ProjectUserRole} record added
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -513,7 +513,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Adds multiple workbench_project_user_role records.
-	 *
+	 * 
 	 * @param projectUserRoles - the records to add
 	 * @return Returns the ids of the {@code ProjectUserRole} records added
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -522,7 +522,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Adds a project activity.
-	 *
+	 * 
 	 * @param projectActivity - the project activity
 	 * @return Returns the id of the {@code ProjectActivity} record added
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -531,7 +531,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Adds project activities.
-	 *
+	 * 
 	 * @param projectActivityList - the project activity list
 	 * @return Returns the ids of the {@code ProjectActivity} records added
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -540,7 +540,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Retrieves the workbench_project_user_role records based on the given project.
-	 *
+	 * 
 	 * @param project - the Project to match
 	 * @return the associated list of ProjectUser
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -549,7 +549,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Deletes the given ProjectUserRole.
-	 *
+	 * 
 	 * @param projectUserRole - the ProjectUserRole to delete
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -557,7 +557,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Return a List of {@link User} records associated with a {@link Project}.
-	 *
+	 * 
 	 * @param projectId - the project id
 	 * @return the List of {@link User} records
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -566,7 +566,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns the number of {@link User} records associated with a {@link Project}.
-	 *
+	 * 
 	 * @param projectId - the project id
 	 * @return the number of {@link User} records
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -575,7 +575,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Get the list of all installed central crop databases.
-	 *
+	 * 
 	 * @return the installed central crops
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -583,7 +583,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Get the crop type corresponding to the given name.
-	 *
+	 * 
 	 * @param cropName - the crop name to match
 	 * @return the CropType retrieved
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -592,7 +592,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Add a crop type to the database.
-	 *
+	 * 
 	 * @param cropType - the crop type to add
 	 * @return Returns the id of the {@code CropType} record added
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -601,7 +601,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Return a List of {@link ProjectActivity} records associated with a {@link Project}.
-	 *
+	 * 
 	 * @param projectId - the project id
 	 * @param start - the starting record
 	 * @param numOfRows - the number of rows to retrieve
@@ -612,7 +612,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Delete a project activity.
-	 *
+	 * 
 	 * @param projectActivity - the project activity to delete
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -620,7 +620,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns the number of {@link ProjectActivity} records associated with a {@link Project}.
-	 *
+	 * 
 	 * @param projectId - the project id to match
 	 * @return the number of {@link ProjectActivity} records associated to the given project
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -629,7 +629,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Adds the tool configuration.
-	 *
+	 * 
 	 * @param toolConfig - the tool config to add
 	 * @return Returns the id of the {@code ToolConfiguration} record added
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -638,7 +638,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Update tool configuration.
-	 *
+	 * 
 	 * @param toolConfig - the tool config to update
 	 * @return Returns the id of the updated {@code ToolConfiguration} record
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -647,7 +647,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Delete tool configuration.
-	 *
+	 * 
 	 * @param toolConfig - the tool config to delete
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -655,7 +655,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the list of {@link ToolConfiguration} records by tool id.
-	 *
+	 * 
 	 * @param toolId - the tool id
 	 * @return the list of tool configurations by tool id
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -664,7 +664,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the {@link ToolConfiguration} by tool id and config key.
-	 *
+	 * 
 	 * @param toolId - the tool id
 	 * @param configKey - the config key
 	 * @return the tool configuration by tool id and config key
@@ -674,7 +674,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Add a Workbench User and IBDB local database User mapping.
-	 *
+	 * 
 	 * @param userMap the user map
 	 * @return Returns the id of the {@code IbdbUserMap} record added
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -685,7 +685,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns the IbdbUserMap object given a combination of a Workbench User ID and a Project ID.
-	 *
+	 * 
 	 * @param workbenchUserId - the specified Workbench User ID
 	 * @param projectId - the specified Project ID
 	 * @return Returns the IbdbUserMap object associated with the specified Workbench User ID and Project ID. Returns null when there is no
@@ -696,7 +696,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns the Local IBDB User ID given a combination of a Workbench User ID and a Project ID.
-	 *
+	 * 
 	 * @param workbenchUserId - the specified Workbench User ID
 	 * @param projectId - the specified Project ID
 	 * @return Returns the IBDB User ID associated with the specified Workbench User ID and Project ID. Returns null when there is no IBDB
@@ -707,7 +707,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Save or update the specified {@link WorkbenchRuntimeData}.
-	 *
+	 * 
 	 * @param workbenchRuntimeData the workbench runtime data
 	 * @return Returns the id of the updated {@code WorkbenchRuntimeData} record
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -716,7 +716,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the workbench runtime data.
-	 *
+	 * 
 	 * @return The WorkbenchRuntimeData
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -724,7 +724,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the role by id.
-	 *
+	 * 
 	 * @param id - the role id to match
 	 * @return the role matching the given id
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -733,7 +733,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the role by name and workflow template.
-	 *
+	 * 
 	 * @param name - the role name to match
 	 * @param workflowTemplate - the workflow template to match
 	 * @return the role matching the given name and workflow template
@@ -743,7 +743,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the roles by workflow template.
-	 *
+	 * 
 	 * @param workflowTemplate - the workflow template to match
 	 * @return the role matching the given workflow template
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -752,7 +752,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the workflow template of the given role.
-	 *
+	 * 
 	 * @param role - the role to match
 	 * @return the workflow template matching the given role
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -761,7 +761,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the roles given the project and user.
-	 *
+	 * 
 	 * @param project - the project to match
 	 * @param user - the user to match
 	 * @return the list of roles matching the given workflow template
@@ -771,7 +771,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns all records from the workbench_role table,.
-	 *
+	 * 
 	 * @return List of Role objects
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -779,7 +779,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns all records from the workbench_role table, ordered by descending role_id.
-	 *
+	 * 
 	 * @return List of Role objects
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -787,7 +787,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns all records from the workbench_role table, ordered by ascending label_order.
-	 *
+	 * 
 	 * @return List of Role objects
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -795,7 +795,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Get the workbench setting object.
-	 *
+	 * 
 	 * @return The WorkbenchSetting
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -803,7 +803,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Saves the specified SecurityQuestion object.
-	 *
+	 * 
 	 * @param securityQuestion - the Security Question object to be saved.
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -811,7 +811,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets all the Security Questions associated with the specified User ID.
-	 *
+	 * 
 	 * @param userId - User ID of the user to get security questions.
 	 * @return - a {@code List} of {@code SecurityQuestion} objects associated with the given User.
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -820,7 +820,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns the ProjectUserMysqlAccount record identified by the given project id and user id.
-	 *
+	 * 
 	 * @param projectId the project id
 	 * @param userId the user id
 	 * @return The ProjectUserMysqlAccount of the given project id and user id.
@@ -831,7 +831,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Stores a list of ProjectUserMysqlAccount records in the database.
-	 *
+	 * 
 	 * @param records the records
 	 * @return List of ids of the records saved
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -840,7 +840,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Stores a ProjectUserMysqlAccount record in the database.
-	 *
+	 * 
 	 * @param record the record
 	 * @return id of the record saved
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -849,7 +849,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the backup projects.
-	 *
+	 * 
 	 * @return the backup projects
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -857,7 +857,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the backup of the specified projects.
-	 *
+	 * 
 	 * @param project the project
 	 * @return the backup projects
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -866,7 +866,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Save or update backup project.
-	 *
+	 * 
 	 * @param projectBackup - the project backup to save
 	 * @return the project backup saved
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -875,7 +875,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * remove backup project.
-	 *
+	 * 
 	 * @param projectBackup - the project backup to be deleted
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -883,7 +883,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the ProjectUserInfoDAO.
-	 *
+	 * 
 	 * @return ProjectUserInfoDAO
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -891,7 +891,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Saves or updates the ProjectUserInfo.
-	 *
+	 * 
 	 * @param projectUserInfo the project user info
 	 * @return ProjectUserInfo
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -900,7 +900,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the all workbench sidebar category.
-	 *
+	 * 
 	 * @return the all workbench sidebar category
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -908,7 +908,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the all workbench sidebar links.
-	 *
+	 * 
 	 * @return the all workbench sidebar links
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -916,7 +916,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the all workbench sidebar links by category id.
-	 *
+	 * 
 	 * @param category the category
 	 * @return the all workbench sidebar links by category id
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -937,7 +937,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the template settings.
-	 *
+	 * 
 	 * @param templateSettingFilter the template setting filter. Fill only the values to filter. Set all other values to null.
 	 * @return the template settings
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -946,7 +946,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Adds the template setting.
-	 *
+	 * 
 	 * @param templateSetting the template setting
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -954,7 +954,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Update template setting.
-	 *
+	 * 
 	 * @param templateSetting the template setting
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -962,7 +962,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Delete template setting.
-	 *
+	 * 
 	 * @param templateSetting the template setting
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -970,7 +970,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Delete template setting with the given id.
-	 *
+	 * 
 	 * @param id the template setting id to delete
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -978,7 +978,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns the project last accessed regardless of user.
-	 *
+	 * 
 	 * @return the last Project opened by the given user
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -987,7 +987,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Detects whether the selected project in Workbench has changed
-	 *
+	 * 
 	 * @return True if the project has changed, otherwise false
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -995,7 +995,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Retrive all standard presets with specific crop + tool
-	 *
+	 * 
 	 * @param cropName
 	 * @param toolId
 	 * @return
@@ -1005,7 +1005,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns the DAO object for standard preset
-	 *
+	 * 
 	 * @return StandardPresetDAO
 	 */
 	StandardPresetDAO getStandardPresetDAO() throws MiddlewareQueryException;
@@ -1017,7 +1017,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * save or update a standard preset
-	 *
+	 * 
 	 * @param standardPreset
 	 * @return
 	 * @throws MiddlewareQueryException
@@ -1026,7 +1026,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * delete a standard preset by id
-	 *
+	 * 
 	 * @param standardPresetId
 	 * @throws MiddlewareQueryException
 	 */
