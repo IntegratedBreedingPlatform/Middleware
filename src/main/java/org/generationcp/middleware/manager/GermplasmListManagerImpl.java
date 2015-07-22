@@ -405,11 +405,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 			List<Integer> deletedListEntryIds = new ArrayList<Integer>();
 
 			for (GermplasmListData germplasmListData : germplasmListDatas) {
-				if (operation == Operation.ADD) {
-					// Auto-assign IDs for new DB records
-					Integer nextListId = this.getGermplasmListDataDAO().getNextId("id");
-					germplasmListData.setId(nextListId);
-				}
+
 				GermplasmListData recordSaved = this.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
 				idGermplasmListDataSaved.add(recordSaved.getId());
 				germplasmListDataSaved++;

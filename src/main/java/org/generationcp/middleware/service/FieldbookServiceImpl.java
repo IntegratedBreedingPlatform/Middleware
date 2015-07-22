@@ -431,8 +431,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				}
 
 				// Save germplasmListData
-				Integer germplasmListDataId = this.getGermplasmListDataDAO().getNextId("id");
-				germplasmListData.setId(germplasmListDataId);
 				germplasmListData.setGid(germplasm.getGid());
 				germplasmListData.setList(germplasmList);
 				this.getGermplasmListDataDAO().save(germplasmListData);
@@ -485,13 +483,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			// Save germplasms, names, list data
 			for (Entry<Germplasm, GermplasmListData> entry : listDataItems.entrySet()) {
 
-				// Save germplasmListData
-				Integer germplasmListDataId = this.getGermplasmListDataDAO().getNextId("id");
-
 				Germplasm germplasm = entry.getKey();
 				GermplasmListData germplasmListData = entry.getValue();
 
-				germplasmListData.setId(germplasmListDataId);
 				germplasmListData.setGid(germplasm.getGid());
 				germplasmListData.setList(germplasmList);
 				this.getGermplasmListDataDAO().save(germplasmListData);
