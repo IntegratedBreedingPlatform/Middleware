@@ -9,6 +9,8 @@ import java.util.StringTokenizer;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -29,6 +31,7 @@ public class ListDataProject implements Serializable {
 	public static final String PLOT_RECIP = "Plot Recip";
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "listdata_project_id")
 	private Integer listDataProjectId;

@@ -1202,7 +1202,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		try {
 			trans = session.beginTransaction();
 			for (ListDataProject listDataProject : listDataProjectList) {
-				listDataProject.setListDataProjectId(this.getListDataProjectDAO().getNextId("listDataProjectId"));
 				listDataProject.setList(this.getGermplasmListById(listDataProject.getList().getId()));
 				this.getListDataProjectDAO().save(listDataProject);
 			}
