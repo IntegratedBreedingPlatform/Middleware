@@ -2185,21 +2185,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 	}
 
 	@Test
-	public void testGetLastId() throws Exception {
-		Database instance = Database.LOCAL;
-		for (GdmsTable gdmsTable : GdmsTable.values()) {
-			long lastId = GenotypicDataManagerImplTest.manager.getLastId(instance, gdmsTable);
-			Debug.println("testGetLastId(" + gdmsTable + ") in " + instance + " = " + lastId);
-		}
-
-		instance = Database.CENTRAL;
-		for (GdmsTable gdmsTable : GdmsTable.values()) {
-			long lastId = GenotypicDataManagerImplTest.manager.getLastId(instance, gdmsTable);
-			Debug.println("testGetLastId(" + gdmsTable + ") in " + instance + " = " + lastId);
-		}
-	}
-
-	@Test
 	public void testAddMta() throws Exception {
 		Mta mta =
 				new Mta(null, 1, null, 1, 2.1f, 1, 1.1f, 2.2f, 3.3f, "gene", "chromosome", "alleleA", "alleleB", "alleleAPhenotype",
@@ -2219,21 +2204,19 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testAddMtaGCP9174() throws Exception {
-		int nextDatasetId = (int) (GenotypicDataManagerImplTest.manager.getLastId(Database.LOCAL, GdmsTable.GDMS_DATASET) - 1);
 		Dataset dataset =
-				new Dataset(nextDatasetId, "sample", "testing", "MTA", "Groundnut", "Groundnut", null, "", "int", null, "Tassel", "LOD",
+				new Dataset(null, "sample", "testing", "MTA", "Groundnut", "Groundnut", null, "", "int", null, "Tassel", "LOD",
 						"ICRISAT", "TrusharShah", null, null);
-
-		int nextMtaId = (int) (GenotypicDataManagerImplTest.manager.getLastId(Database.LOCAL, GdmsTable.GDMS_MTA) - 1);
+		Integer datasetId = GenotypicDataManagerImplTest.manager.addDataset(dataset);
 
 		Mta mta =
-				new Mta(nextMtaId, markerId, nextDatasetId, 5, 6.01f, 22395, 0.0f, 0.0f, 0.0f, "1RS:1AL", "RIL-1 _LG12", "C", "T", "absent",
+				new Mta(null, markerId, datasetId, mapId, 6.01f, 22395, 0.0f, 0.0f, 0.0f, "1RS:1AL", "RIL-1 _LG12", "C", "T", "absent",
 						"present", 0.0f, 0.0f, 0.0f, 0.0f, "Bonferroni", 0.0f, 0.0f, "co-dominant", "association",
 						"Ellis et al (2002) TAG 105:1038-1042", "");
 
-		MtaMetadata mtaMetadata = new MtaMetadata(nextMtaId, "project1", "population", 100, "Thousand");
+		MtaMetadata mtaMetadata = new MtaMetadata(datasetId, "project1", "population", 100, "Thousand");
 
-		DatasetUsers users = new DatasetUsers(nextDatasetId, 1);
+		DatasetUsers users = new DatasetUsers(datasetId, 1);
 
 		GenotypicDataManagerImplTest.manager.addMTA(dataset, mta, mtaMetadata, users);
 

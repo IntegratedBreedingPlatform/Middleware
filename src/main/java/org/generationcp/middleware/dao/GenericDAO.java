@@ -219,19 +219,6 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		}
 	}
 
-	public static Integer getLastId(Session session, Database instance, String tableName, String idName) throws MiddlewareQueryException {
-		try {
-			SQLQuery query = session.createSQLQuery("SELECT MAX(" + idName + ") FROM " + tableName);
-			Integer result = (Integer) query.uniqueResult();
-
-			return result != null ? result : 0;
-
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error in getMaxId(instance=" + instance + ", tableName=" + tableName + ", idName=" + idName
-					+ "): " + e.getMessage(), e);
-		}
-	}
-
 	public void flush() {
 		this.getSession().flush();
 	}
