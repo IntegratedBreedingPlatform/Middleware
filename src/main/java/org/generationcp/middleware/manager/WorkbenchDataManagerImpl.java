@@ -1200,6 +1200,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
+	public Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException {
+		return this.getIbdbUserMapDao().getWorkbenchUserId(ibdbUserId, projectId);
+	}
+
+	@Override
 	public Integer updateWorkbenchRuntimeData(WorkbenchRuntimeData workbenchRuntimeData) throws MiddlewareQueryException {
 		Session session = this.getCurrentSession();
 		Transaction trans = null;

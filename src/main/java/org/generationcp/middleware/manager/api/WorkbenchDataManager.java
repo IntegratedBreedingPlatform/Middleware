@@ -926,7 +926,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Returns the correspoding workbench user id.
-	 *
+	 * 
 	 * @param ibdbUserId the ibdb user id
 	 * @param projectId - the specified Project ID
 	 * @return Returns the IBDB User ID associated with the specified Workbench User ID and Project ID. Returns null when there is no IBDB
@@ -1036,5 +1036,16 @@ public interface WorkbenchDataManager {
 	 * Close the sessionProvider
 	 */
 	void close();
+
+	/**
+	 * Returns the correspoding workbench user id.
+	 * 
+	 * @param ibdbUserId the ibdb user id
+	 * @param projectId - the specified Project ID
+	 * @return Returns the IBDB User ID associated with the specified Workbench User ID and Project ID. Returns null when there is no IBDB
+	 *         User ID matching the specified Workbench User ID and Project ID.
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException;
 
 }
