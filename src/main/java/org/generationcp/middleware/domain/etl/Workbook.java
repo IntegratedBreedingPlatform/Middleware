@@ -40,7 +40,9 @@ public class Workbook {
 	private List<MeasurementVariable> variates;
 
 	private List<MeasurementRow> observations;
-	private List<MeasurementRow> exportArrangedObservations; // for exporting only
+
+	// for exporting only
+	private List<MeasurementRow> exportArrangedObservations;
 
 	// derived variables used to improve performance
 	private List<String> trialHeaders;
@@ -62,7 +64,8 @@ public class Workbook {
 
 	private Integer totalNumberOfInstances;
 
-	private Map<String, MeasurementVariable> measurementDatasetVariablesMap; // added for optimization
+	// added for optimization
+	private Map<String, MeasurementVariable> measurementDatasetVariablesMap;
 
 	private Integer studyId;
 	private Integer trialDatasetId;
@@ -295,10 +298,9 @@ public class Workbook {
 		if (this.trialVariables == null) {
 			unique.addAll(this.getConditionsAndConstants(false));
 
-			List<MeasurementVariable> trialFactors = this.getTrialFactors();
-			if (trialFactors != null) {
+			if (this.getTrialFactors() != null) {
 
-				unique.addAll(trialFactors);
+				unique.addAll(this.getTrialFactors());
 
 			}
 			this.trialVariables = new ArrayList<>(unique);
@@ -852,7 +854,7 @@ public class Workbook {
 
 			return rows;
 		}
-		return null;
+		return new ArrayList<MeasurementRow>();
 	}
 
 	public void updateTrialObservationsWithReferenceList(List<List<ValueReference>> trialList) {
