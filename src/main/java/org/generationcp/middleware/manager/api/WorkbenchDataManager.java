@@ -218,6 +218,16 @@ public interface WorkbenchDataManager {
 	boolean isPersonWithEmailExists(String email) throws MiddlewareQueryException;
 
 	/**
+	 *
+	 * @param email
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	Person getPersonByEmail(String email) throws MiddlewareQueryException;
+
+	Person getPersonByEmailAndName(String email, String firstName, String lastName) throws MiddlewareQueryException;
+
+	/**
 	 * Checks if person with specified username AND email exists.
 	 * 
 	 * @param username
