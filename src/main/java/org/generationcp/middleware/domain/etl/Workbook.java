@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.etl;
@@ -81,7 +81,7 @@ public class Workbook {
 	private List<StandardVariable> expDesignVariables;
 	private boolean hasExistingDataOverwrite;
 	private List<Integer> columnOrderedLists;
-	
+
 	public Workbook() {
 		this.reset();
 	}
@@ -289,20 +289,20 @@ public class Workbook {
 	}
 
 	public List<MeasurementVariable> getTrialVariables() {
-		
+
 		Set<MeasurementVariable> unique = new HashSet<>();
-		
+
 		if (this.trialVariables == null) {
 			unique.addAll(this.getConditionsAndConstants(false));
-			
+
 			List<MeasurementVariable> trialFactors = this.getTrialFactors();
 			if (trialFactors != null) {
-				
+
 				unique.addAll(trialFactors);
 
 			}
 			this.trialVariables = new ArrayList<>(unique);
-			
+
 		}
 		return this.trialVariables;
 	}
