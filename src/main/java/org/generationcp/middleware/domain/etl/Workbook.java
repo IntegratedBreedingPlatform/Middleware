@@ -242,7 +242,7 @@ public class Workbook {
 	}
 
 	public List<MeasurementVariable> getMeasurementDatasetVariablesView() {
-		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+		Set<MeasurementVariable> list = new HashSet<MeasurementVariable>();
 		if (!this.isNursery()) {
 			MeasurementVariable trialFactor = null;
 			if (this.getTrialFactors() != null) {
@@ -258,8 +258,8 @@ public class Workbook {
 			}
 		}
 		list.addAll(this.getMeasurementDatasetVariables());
-		list = this.arrangeMeasurementVariables(list);
-		return list;
+
+		return this.arrangeMeasurementVariables(new ArrayList<>(list));
 	}
 
 	public Map<String, MeasurementVariable> getMeasurementDatasetVariablesMap() {

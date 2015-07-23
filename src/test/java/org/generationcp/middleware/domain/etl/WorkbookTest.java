@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.etl;
@@ -114,7 +114,6 @@ public class WorkbookTest {
 	private static final int COOPERATOR_ID_ID = 8372;
 	private static final int COOPERATOR_NAME_ID = 8373;
 
-	private static final String GERMPLASM_NAME = "TIANDOUGOU-9";
 	private static final String NUMERIC_VALUE = "1";
 
 	public static final Integer LOCATION_ID_1 = 1;
@@ -153,17 +152,11 @@ public class WorkbookTest {
 	private static List<Workbook> workbooks;
 
 	public static Workbook getTestWorkbook() {
-		if (WorkbookTest.workbook == null) {
-			WorkbookTest.createTestWorkbook(WorkbookTest.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, null, 1, false);
-		}
-		return WorkbookTest.workbook;
+		return WorkbookTest.createTestWorkbook(WorkbookTest.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, null, 1, false);
 	}
 
 	public static Workbook getTestWorkbook(int noOfObservations, StudyType studyType) {
-		if (WorkbookTest.workbook == null) {
-			WorkbookTest.createTestWorkbook(noOfObservations, studyType, null, 1, false);
-		}
-		return WorkbookTest.workbook;
+		return WorkbookTest.createTestWorkbook(noOfObservations, studyType, null, 1, false);
 	}
 
 	public static List<Workbook> getTestWorkbooks(int noOfTrial, int noOfObservations) {
@@ -666,6 +659,34 @@ public class WorkbookTest {
 		MeasurementVariable var = new MeasurementVariable();
 		var.setTermId(termId);
 		return var;
+	}
+
+	@Test
+	public void testGetMeasurementDatasetVariablesViewForTrial() {
+		this.getTestWorkbook(1, StudyType.T);
+
+		List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
+
+		int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
+
+		Assert.assertEquals(
+				"MeasurementDatasetVariablesView size should be the total no of non trial factors, variates and trial_instance",
+				totalMeasurementVariableCount + 1, list.size());
+
+	}
+
+	@Test
+	public void testGetMeasurementDatasetVariablesViewForNursery() {
+
+		this.getTestWorkbook(1, StudyType.N);
+
+		List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
+
+		int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
+
+		Assert.assertEquals("MeasurementDatasetVariablesView size should be the total no of non trial factors, variates",
+				totalMeasurementVariableCount, list.size());
+
 	}
 
 	@Test
