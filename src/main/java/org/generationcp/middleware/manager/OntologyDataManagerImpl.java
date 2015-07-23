@@ -212,9 +212,12 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				stdVariable.setMethod(method);
 			}
 
-			if (this.findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(), stdVariable.getScale().getName(),
-					stdVariable.getMethod().getName()) == null) {
+			StandardVariable existingStandardVariable = this.findStandardVariableByTraitScaleMethodNames(
+			stdVariable.getProperty().getName(), stdVariable.getScale().getName(), stdVariable.getMethod().getName());
+			if (existingStandardVariable == null) {
 				this.getStandardVariableSaver().save(stdVariable);
+			} else {
+				stdVariable.setId(existingStandardVariable.getId());
 			}
 			trans.commit();
 		} catch (Exception e) {
