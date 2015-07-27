@@ -399,7 +399,7 @@ public class FieldbookServiceImplIntegrationTest extends DataManagerIntegrationT
 		Integer listId =
 				FieldbookServiceImplIntegrationTest.fieldbookService.saveNurseryAdvanceGermplasmList(germplasms, listData, germplasmList);
 
-		Assert.assertTrue(listId != null && listId < 0);
+		Assert.assertTrue(listId != null);
 
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Germplasm List Added: ");
 		Debug.println(MiddlewareIntegrationTest.INDENT * 2, germplasmList.toString());
@@ -416,7 +416,7 @@ public class FieldbookServiceImplIntegrationTest extends DataManagerIntegrationT
 		Integer listId =
 				FieldbookServiceImplIntegrationTest.fieldbookService.saveNurseryAdvanceGermplasmList(germplasms, listData, germplasmList);
 
-		Assert.assertTrue(listId != null && listId < 0);
+		Assert.assertTrue(listId != null);
 
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Germplasm List Added: ");
 		Debug.println(MiddlewareIntegrationTest.INDENT * 2, germplasmList.toString());
