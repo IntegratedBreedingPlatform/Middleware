@@ -419,12 +419,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				// Save germplasm and name entries if non-existing
 				if (germplasmFound == null || germplasmFound.getGid() == null) {
 					List<Name> nameList = germplasms.get(germplasm);
-					//Lgid could not be null in the DB, so we are saving a value before saving it to the DB
+					// Lgid could not be null in the DB, so we are saving a value before saving it to the DB
 					if (germplasm.getLgid() == null) {
 						germplasm.setLgid(germplasm.getGid() != null ? germplasm.getGid() : Integer.valueOf(0));
 					}
 					germplasm = germplasmDao.save(germplasm);
-					//set Lgid to GID if it's value was not set previously
+					// set Lgid to GID if it's value was not set previously
 					if (germplasm.getLgid().equals(Integer.valueOf(0))) {
 						germplasm.setLgid(germplasm.getGid());
 					}
@@ -473,8 +473,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		Session session = this.getCurrentSession();
 		Transaction trans = null;
 
-		Integer listId = null;
-
 		GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
 
 		long startTime = System.currentTimeMillis();
@@ -516,7 +514,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 		FieldbookServiceImpl.LOG.debug("========== saveGermplasmList Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
 
-		return listId;
+		return germplasmList.getId();
 
 	}
 
