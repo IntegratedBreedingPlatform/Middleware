@@ -624,7 +624,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	public Person getPersonByEmailAndName(String email, String firstName, String lastName) throws MiddlewareQueryException {
-		return this.getPersonDao().getPersonByEmailAndName(email,  firstName, lastName);
+		return this.getPersonDao().getPersonByEmailAndName(email, firstName, lastName);
 	}
 
 	@Override
@@ -1445,6 +1445,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		User user = this.getUserByName(username, 0, 1, Operation.EQUAL).get(0);
 
 		return this.getUserInfo(user.getUserid());
+	}
+
+	@Override
+	public User getUserByUsername(String userName) throws MiddlewareQueryException {
+		return getUserDao().getUserByUserName(userName);
 	}
 
 	@Override

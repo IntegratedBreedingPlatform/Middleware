@@ -264,6 +264,8 @@ public interface WorkbenchDataManager {
 	 */
 	UserInfo getUserInfoByUsername(String username) throws MiddlewareQueryException;
 
+	User getUserByUsername(String userName) throws MiddlewareQueryException;
+
 	UserInfo getUserInfoByResetToken(String token) throws MiddlewareQueryException;
 
 	UserInfo updateUserInfo(UserInfo userInfo) throws MiddlewareQueryException;
