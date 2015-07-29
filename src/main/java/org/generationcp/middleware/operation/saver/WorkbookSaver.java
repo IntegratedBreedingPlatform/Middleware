@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.operation.saver;
@@ -69,9 +69,9 @@ public class WorkbookSaver extends Saver {
 	/**
 	 * This method transforms Variable data from a Fieldbook presented as an XLS style Workbook. - Variables new to the ontology are created
 	 * and persisted - Columns and rows are transformed into entities suitables for persistence
-	 * 
+	 *
 	 * Note : the result of this process is suitable for Dataset Creation
-	 * 
+	 *
 	 * @param workbook
 	 * @return Map<String>, ?> : a map of 3 sub-maps containing Strings(headers), VariableTypeLists and Lists of MeasurementVariables
 	 * @throws Exception
@@ -126,10 +126,10 @@ public class WorkbookSaver extends Saver {
 
 	/**
 	 * Dataset creation and persistence for Fieldbook upload
-	 * 
+	 *
 	 * NOTE IMPORTANT : This step will fail if the Fieldbook has not had new Variables processed and new ontology terms created.
-	 * 
-	 * 
+	 *
+	 *
 	 * @param workbook
 	 * @param variableMap : a map of 3 sub-maps containing Strings(headers), VariableTypeLists and Lists of MeasurementVariables
 	 * @return int (success/fail)
@@ -255,7 +255,7 @@ public class WorkbookSaver extends Saver {
 			workbook.setMeasurementDatesetId(datasetId);
 		}
 
-		this.createMeasurementEffectExperiments(datasetId, effectVariables, workbook.getObservations(), trialHeaders, trialVariatesMap);
+		this.createMeasurementEffectExperiments(datasetId, effectVariables, workbook.getObservations(), trialHeaders);
 
 		return studyId;
 	}
@@ -355,7 +355,7 @@ public class WorkbookSaver extends Saver {
 
 	public int createLocationAndSetToObservations(Workbook workbook, List<MeasurementVariable> trialMV, VariableTypeList trialVariables,
 			Map<Integer, VariableList> trialVariatesMap, boolean isDeleteTrialObservations, String programUUID)
-			throws MiddlewareQueryException {
+					throws MiddlewareQueryException {
 
 		TimerWatch watch = new TimerWatch("transform trial environment");
 		if (workbook.getTrialObservations() != null && workbook.getTrialObservations().size() == 1) {
@@ -406,7 +406,7 @@ public class WorkbookSaver extends Saver {
 
 	public int createLocationsAndSetToObservations(List<Integer> locationIds, Workbook workbook, VariableTypeList trialFactors,
 			List<String> trialHeaders, Map<Integer, VariableList> trialVariatesMap, boolean isDeleteTrialObservations, String programUUID)
-			throws MiddlewareQueryException {
+					throws MiddlewareQueryException {
 
 		Set<String> trialInstanceNumbers = new HashSet<String>();
 		List<MeasurementRow> observations = null;
@@ -488,9 +488,9 @@ public class WorkbookSaver extends Saver {
 		return null;
 	}
 
-	private MeasurementVariable getMainFactor(List<MeasurementVariable> mvars) {
+	private MeasurementVariable getTrialInstanceFactor(List<MeasurementVariable> mvars) {
 		for (MeasurementVariable mvar : mvars) {
-			if (mvar.getName().equals(mvar.getLabel())) {
+			if (mvar.getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 				return mvar;
 			}
 		}
@@ -554,7 +554,7 @@ public class WorkbookSaver extends Saver {
 			studyVariables.addAll(this.getVariableTypeListTransformer().transform(workbook.getStudyConstants(), true,
 					studyVariables.size() + 1));
 
-			if (workbook.isNursery() && this.getMainFactor(workbook.getTrialVariables()) == null) {
+			if (workbook.isNursery() && this.getTrialInstanceFactor(workbook.getTrialVariables()) == null) {
 				studyVariables.add(this.createOccVariableType(studyVariables.size() + 1));
 			}
 
@@ -606,7 +606,7 @@ public class WorkbookSaver extends Saver {
 			DatasetValues trialValues =
 					this.getDatasetValuesTransformer().transform(trialName, trialName, DataSetType.SUMMARY_DATA, trialMV, trialVariables);
 
-			if (workbook.isNursery() && (trialMV == null || trialMV.isEmpty() || this.getMainFactor(trialMV) == null)) {
+			if (workbook.isNursery() && (trialMV == null || trialMV.isEmpty() || this.getTrialInstanceFactor(trialMV) == null)) {
 				trialVariables.add(this.createOccVariableType(trialVariables.size() + 1));
 			}
 
@@ -614,7 +614,7 @@ public class WorkbookSaver extends Saver {
 			DmsProject trial = this.getDatasetProjectSaver().addDataSet(studyId, trialVariables, trialValues, programUUID);
 			trialDatasetId = trial.getProjectId();
 		} else {
-			if (workbook.isNursery() && (trialMV == null || trialMV.isEmpty() || this.getMainFactor(trialMV) == null)) {
+			if (workbook.isNursery() && (trialMV == null || trialMV.isEmpty() || this.getTrialInstanceFactor(trialMV) == null)) {
 				trialVariables.add(this.createOccVariableType(trialVariables.size() + 1));
 			}
 		}
@@ -632,7 +632,7 @@ public class WorkbookSaver extends Saver {
 
 	private int createMeasurementEffectDatasetIfNecessary(Workbook workbook, int studyId, List<MeasurementVariable> effectMV,
 			VariableTypeList effectVariables, VariableTypeList trialVariables, String programUUID) throws MiddlewareQueryException,
-			MiddlewareException {
+	MiddlewareException {
 		TimerWatch watch = new TimerWatch("find measurement effect dataset");
 		String datasetName = workbook.getStudyDetails().getMeasurementDatasetName();
 		Integer datasetId = null;
@@ -664,7 +664,7 @@ public class WorkbookSaver extends Saver {
 			watch.restart("transform measurement effect dataset");
 			DatasetValues datasetValues =
 					this.getDatasetValuesTransformer()
-							.transform(datasetName, datasetName, DataSetType.PLOT_DATA, effectMV, effectVariables);
+					.transform(datasetName, datasetName, DataSetType.PLOT_DATA, effectMV, effectVariables);
 
 			watch.restart("save measurement effect dataset");
 			// fix for GCP-6436 start
@@ -718,7 +718,7 @@ public class WorkbookSaver extends Saver {
 	}
 
 	private void createMeasurementEffectExperiments(int datasetId, VariableTypeList effectVariables, List<MeasurementRow> observations,
-			List<String> trialHeaders, Map<Integer, VariableList> trialVariatesMap) throws MiddlewareQueryException {
+			List<String> trialHeaders) throws MiddlewareQueryException {
 
 		TimerWatch watch = new TimerWatch("saving stocks and measurement effect data (total)");
 		TimerWatch rowWatch = new TimerWatch("for each row");
@@ -733,10 +733,6 @@ public class WorkbookSaver extends Saver {
 			for (MeasurementRow row : observations) {
 				rowWatch.restart("saving row " + i++);
 				ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
-				VariableList trialVariates = trialVariatesMap.get((int) row.getLocationId());
-				if (trialVariates != null) {
-					experimentValues.getVariableList().addAll(trialVariates);
-				}
 				try {
 					experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
 				} catch (PhenotypeException e) {
@@ -847,7 +843,7 @@ public class WorkbookSaver extends Saver {
 
 	/**
 	 * Saves project ontology creating entries in the following tables: project, projectprop and project_relationship
-	 * 
+	 *
 	 * @param workbook
 	 * @return study id
 	 * @throws Exception
@@ -901,7 +897,7 @@ public class WorkbookSaver extends Saver {
 	/**
 	 * Saves experiments creating entries in the following tables: nd_geolocation, nd_geolocationprop, nd_experiment, nd_experiment_project,
 	 * nd_experimentprop nd_experiment_stock, stock, stockprop, nd_experiment_phenotype and phenotype
-	 * 
+	 *
 	 * @param workbook
 	 * @throws Exception
 	 */
@@ -979,8 +975,7 @@ public class WorkbookSaver extends Saver {
 			this.createMeansExperiments(meansDatasetId, effectVariables, workbook.getObservations(), trialHeaders, trialVariatesMap);
 		} else {
 			// 3. measurement experiments
-			this.createMeasurementEffectExperiments(measurementDatasetId, effectVariables, workbook.getObservations(), trialHeaders,
-					trialVariatesMap);
+			this.createMeasurementEffectExperiments(measurementDatasetId, effectVariables, workbook.getObservations(), trialHeaders);
 		}
 	}
 
@@ -1041,7 +1036,7 @@ public class WorkbookSaver extends Saver {
 
 	private int createMeansDatasetIfNecessary(Workbook workbook, int studyId, List<MeasurementVariable> effectMV,
 			VariableTypeList effectVariables, VariableTypeList trialVariables, String programUUID) throws MiddlewareQueryException,
-			MiddlewareException {
+	MiddlewareException {
 
 		TimerWatch watch = new TimerWatch("find means dataset");
 		Integer datasetId = this.getMeansDataset(studyId);
