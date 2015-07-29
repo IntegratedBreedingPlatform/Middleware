@@ -13,6 +13,7 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -340,4 +341,15 @@ public class User implements Serializable, BeanFormState {
 
 	}
 
+	public boolean hasRole(String role) {
+		if (!Objects.equals(this.roles,null)) {
+			for (UserRole userRole : this.roles) {
+				if (userRole.getRole().equals(role)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
 }
