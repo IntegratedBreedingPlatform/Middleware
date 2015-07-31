@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -871,6 +871,78 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		Debug.println(MiddlewareIntegrationTest.INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
 	}
 
+	@Test
+	public void testSaveTrialDatasetSummary() throws Exception {
+
+		// get an existing trial environment dataset
+		Integer trialDataSetId = 25008;
+		DmsProject project = manager.getProject(trialDataSetId);
+
+		if (project != null) {
+
+			// get the geolocation_id of the first trial instance, we will add the summary variables here
+			Integer locationId = manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(project.getProjectId(), "1");
+			List<Integer> locationIds = new ArrayList<>();
+			locationIds.add(locationId);
+
+			// create a list of summary variables to add
+			VariableTypeList variableTypeList = this.createVariatypeListForSummary();
+			List<ExperimentValues> experimentValues = this.createExperimentValues(variableTypeList, locationId);
+
+			// add variableTypes to project properties if not exists
+			VariableTypeList nonExistingVariableTypes = new VariableTypeList();
+			for (VariableType variableType : variableTypeList.getVariableTypes()) {
+				if (manager.getDataSet(trialDataSetId).findVariableTypeByLocalName(variableType.getLocalName()) == null) {
+					nonExistingVariableTypes.add(variableType);
+				}
+			}
+
+			// save or update the summary variable to the trial dataset
+			StudyDataManagerImplTest.manager.saveTrialDatasetSummary(project, nonExistingVariableTypes, experimentValues, locationIds);
+
+			List<Experiment> experiments = manager.getExperiments(trialDataSetId, 0, 1);
+
+			Assert.assertNotNull(experiments);
+
+			for (VariableType variable : variableTypeList.getVariableTypes()) {
+				Variable savedVariable = experiments.get(0).getVariates().findByLocalName(variable.getLocalName());
+				Assert.assertNotNull(savedVariable);
+				Assert.assertEquals("12345", savedVariable.getValue());
+			}
+		}
+
+	}
+
+	private List<ExperimentValues> createExperimentValues(VariableTypeList variableTypeList, Integer locationId) {
+		List<ExperimentValues> experimentValues = new ArrayList<ExperimentValues>();
+
+		ExperimentValues expValue = new ExperimentValues();
+		List<Variable> traits = new ArrayList<Variable>();
+		VariableList variableList = new VariableList();
+		variableList.setVariables(traits);
+
+		expValue.setLocationId(locationId);
+
+		for (VariableType variableType : variableTypeList.getVariableTypes()) {
+			variableList.add(new Variable(variableType, "12345"));
+		}
+
+		expValue.setVariableList(variableList);
+		experimentValues.add(expValue);
+
+		return experimentValues;
+	}
+
+	private VariableTypeList createVariatypeListForSummary() throws Exception {
+
+		VariableTypeList variableTypeList = new VariableTypeList();
+
+		VariableType grainYieldSem = this.createVariableType(18140, "GRAIN_YIELD_SUMMARY_STAT", "test", 100);
+		variableTypeList.add(grainYieldSem);
+
+		return variableTypeList;
+	}
+
 	private Variable createVariable(int termId, String value, int rank) throws Exception {
 		StandardVariable stVar = StudyDataManagerImplTest.ontologyManager.getStandardVariable(termId);
 
@@ -1424,7 +1496,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 			Integer geolocationId =
 					StudyDataManagerImplTest.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId,
 							trialInstanceNumberExpected);
-			if(geolocationId!=null) {
+			if (geolocationId != null) {
 				String trialInstanceNumberActual = StudyDataManagerImplTest.manager.getTrialInstanceNumberByGeolocationId(geolocationId);
 				Assert.assertEquals(trialInstanceNumberExpected, trialInstanceNumberActual);
 			}
