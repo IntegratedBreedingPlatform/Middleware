@@ -598,10 +598,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	private void updateExperimentValues(List<ExperimentValues> experimentValues, Integer projectId, List<Integer> locationIds)
 			throws MiddlewareQueryException {
-		for (Integer locationId : locationIds) {
-			// delete phenotypes by project id and locationId
-			this.getPhenotypeDao().deletePhenotypesByProjectIdAndLocationId(projectId, locationId);
-		}
+
 		for (ExperimentValues exp : experimentValues) {
 			if (exp.getVariableList() != null && !exp.getVariableList().isEmpty()) {
 				ExperimentModel experimentModel =
