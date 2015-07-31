@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -56,6 +56,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
@@ -81,6 +82,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	private LocationDataManager locationDataManager;
 
+	private OntologyDataManager ontologyDataManager;
+
 	private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 
 	public StudyDataManagerImpl() {
@@ -90,6 +93,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		super(sessionProvider, databaseName);
 		this.locationDataManager = new LocationDataManagerImpl(sessionProvider);
 		this.pedigreeService = this.getPedigreeService();
+		this.ontologyDataManager = new OntologyDataManagerImpl(sessionProvider);
 	}
 
 	public StudyDataManagerImpl(HibernateSessionProvider sessionProvider) {
@@ -229,7 +233,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList)
-					throws MiddlewareQueryException {
+			throws MiddlewareQueryException {
 		this.clearSessions();
 		if (varTypeList == null) {
 			return this.getExperiments(dataSetId, start, numOfRows);
@@ -279,7 +283,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValuesList)
-					throws MiddlewareQueryException {
+			throws MiddlewareQueryException {
 		Session session = this.getCurrentSession();
 		Transaction trans = null;
 
@@ -1131,12 +1135,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public Integer getGeolocationIdByProjectIdAndTrialInstanceNumber(int projectId, String trialInstanceNumber)
 			throws MiddlewareQueryException {
-		return getExperimentProjectDao().getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId, trialInstanceNumber);
+		return this.getExperimentProjectDao().getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId, trialInstanceNumber);
 	}
 
 	@Override
 	public String getTrialInstanceNumberByGeolocationId(int geolocationId) throws MiddlewareQueryException {
-		Geolocation geolocation = getGeolocationDao().getById(geolocationId);
+		Geolocation geolocation = this.getGeolocationDao().getById(geolocationId);
 		if (geolocation != null) {
 			return geolocation.getDescription();
 		}
