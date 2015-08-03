@@ -677,7 +677,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Count the number of variates with recorded data.
-	 * 
+	 *
 	 * @param datasetId
 	 * @param variateIds
 	 * @return
@@ -741,7 +741,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Soft-delete all program studies
-	 * 
+	 *
 	 * @param programUUID Program UUID of the studies to be deleted
 	 * @throws MiddlewareQueryException if any error occurs during data access.
 	 */
@@ -760,7 +760,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Gets the geolocation id by project id and trial instance number.
-	 * 
+	 *
 	 * @param projectId - study id or dataset id
 	 * @param trial instance number
 	 * @return the geolocation id
@@ -771,7 +771,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Retrieves the trial instance number by geolocation id
-	 * 
+	 *
 	 * @param geolocationId
 	 * @return trial instance number
 	 * @throws MiddlewareQueryException

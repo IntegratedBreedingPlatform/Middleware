@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -341,9 +341,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException {
 
-		List<DmsProject> datasetProjects =
-				this.getDmsProjectDao().getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(),
-						String.valueOf(dataSetType.getId()));
+		List<DmsProject> datasetProjects = this.getDmsProjectDao().getDataSetsByStudyAndProjectProperty(studyId,
+				TermId.DATASET_TYPE.getId(), String.valueOf(dataSetType.getId()));
 		List<DataSet> datasets = new ArrayList<DataSet>();
 
 		for (DmsProject datasetProject : datasetProjects) {
@@ -354,7 +353,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public long countExperimentsByTrialEnvironmentAndVariate(int trialEnvironmentId, int variateVariableId) throws MiddlewareQueryException {
+	public long countExperimentsByTrialEnvironmentAndVariate(int trialEnvironmentId, int variateVariableId)
+			throws MiddlewareQueryException {
 		long count = 0;
 		count = this.getExperimentDao().countByTrialEnvironmentAndVariate(trialEnvironmentId, variateVariableId);
 		return count;
@@ -458,12 +458,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		try {
 
-			String sql =
-					"select pp.value " + "from projectprop pp "
-							+ "inner join projectprop pp2 on pp.rank = pp2.rank and pp.project_id = pp2.project_id "
-							+ "where pp.project_id = :projectId and pp2.value = :standardVariableId "
-							+ "and pp.type_id not in (pp2.value, " + TermId.STANDARD_VARIABLE.getId() + ","
-							+ TermId.VARIABLE_DESCRIPTION.getId() + ")";
+			String sql = "select pp.value " + "from projectprop pp "
+					+ "inner join projectprop pp2 on pp.rank = pp2.rank and pp.project_id = pp2.project_id "
+					+ "where pp.project_id = :projectId and pp2.value = :standardVariableId " + "and pp.type_id not in (pp2.value, "
+					+ TermId.STANDARD_VARIABLE.getId() + "," + TermId.VARIABLE_DESCRIPTION.getId() + ")";
 
 			Query query = session.createSQLQuery(sql);
 			query.setParameter("projectId", projectId);
@@ -673,8 +671,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			return true;
 		} catch (Exception e) {
 			this.rollbackTransaction(trans);
-			throw new MiddlewareQueryException("Error encountered with renameFolder(folderId=" + folderId + ", name=" + newFolderName
-					+ ": " + e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					"Error encountered with renameFolder(folderId=" + folderId + ", name=" + newFolderName + ": " + e.getMessage(), e);
 		}
 	}
 

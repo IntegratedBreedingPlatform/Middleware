@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -276,9 +276,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		List<Integer> folderIds = Arrays.asList(25000, 1);
 		for (Integer folderId : folderIds) {
 			Debug.println(MiddlewareIntegrationTest.INDENT, " folderId = " + folderId);
-			List<Reference> childrenNodes =
-					StudyDataManagerImplTest.manager
-							.getChildrenOfFolder(folderId, StudyDataManagerImplTest.commonTestProject.getUniqueID());
+			List<Reference> childrenNodes = StudyDataManagerImplTest.manager.getChildrenOfFolder(folderId,
+					StudyDataManagerImplTest.commonTestProject.getUniqueID());
 			Assert.assertNotNull(childrenNodes);
 			Assert.assertTrue(childrenNodes.size() > 0);
 			Debug.println(MiddlewareIntegrationTest.INDENT, "testGetChildrenOfFolder(folderId=" + folderId + "): " + childrenNodes.size());
@@ -346,9 +345,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		VariableList germplasmVariableList = this.createGermplasm("unique name", "1000", "name", "2000", "prop1", "prop2");
 		studyValues.setGermplasmId(StudyDataManagerImplTest.manager.addStock(germplasmVariableList));
 
-		StudyReference studyRef =
-				StudyDataManagerImplTest.manager.addStudy(parentStudyId, typeList, studyValues,
-						StudyDataManagerImplTest.commonTestProject.getUniqueID());
+		StudyReference studyRef = StudyDataManagerImplTest.manager.addStudy(parentStudyId, typeList, studyValues,
+				StudyDataManagerImplTest.commonTestProject.getUniqueID());
 
 		Assert.assertNotNull(studyRef.getId());
 		Assert.assertTrue(studyRef.getId() != 0);
@@ -402,9 +400,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		int dataSetId = -4; // Local sorghum
 		DataSet dataSet = StudyDataManagerImplTest.manager.getDataSet(dataSetId);
 		dataSet.print(MiddlewareIntegrationTest.INDENT);
-		List<Experiment> experiments =
-				StudyDataManagerImplTest.manager.getExperiments(dataSetId, 0,
-						(int) StudyDataManagerImplTest.manager.countExperiments(dataSetId));
+		List<Experiment> experiments = StudyDataManagerImplTest.manager.getExperiments(dataSetId, 0,
+				(int) StudyDataManagerImplTest.manager.countExperiments(dataSetId));
 		Debug.println(MiddlewareIntegrationTest.INDENT, " Experiments: " + experiments.size());
 
 		Debug.println(MiddlewareIntegrationTest.INDENT, " Variables.getDisplayValue(): " + experiments.size());
@@ -424,8 +421,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 			for (Variable variable : variables) {
 				if (!"GID".equals(variable.getVariableType().getLocalName().trim())) {
 					String value = variable.getDisplayValue();
-					Debug.println(MiddlewareIntegrationTest.INDENT, "Data Type is "
-							+ variable.getVariableType().getStandardVariable().getDataType().getName());
+					Debug.println(MiddlewareIntegrationTest.INDENT,
+							"Data Type is " + variable.getVariableType().getStandardVariable().getDataType().getName());
 					Debug.println(MiddlewareIntegrationTest.INDENT, "\t" + experiment.getId() + "  :  "
 							+ variable.getVariableType().getStandardVariable().getName() + "  :  " + value);
 				}
@@ -656,8 +653,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 				factor.print(MiddlewareIntegrationTest.INDENT);
 			}
 		} else {
-			Debug.println(MiddlewareIntegrationTest.INDENT, "NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH PROPERTY = "
-					+ propertyId);
+			Debug.println(MiddlewareIntegrationTest.INDENT,
+					"NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH PROPERTY = " + propertyId);
 		}
 	}
 
@@ -665,8 +662,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testGetFactorsByPhenotypicType() throws Exception {
 		PhenotypicType phenotypicType = PhenotypicType.DATASET;
 		int datasetId = 10087;
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetFactorsByPhenotypicType (dataset=" + datasetId + ", role=" + phenotypicType
-				+ ")");
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"testGetFactorsByPhenotypicType (dataset=" + datasetId + ", role=" + phenotypicType + ")");
 		DataSet dataset = StudyDataManagerImplTest.manager.getDataSet(datasetId);
 		if (dataset != null) {
 			VariableTypeList factors = dataset.getFactorsByPhenotypicType(phenotypicType);
@@ -676,8 +673,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 					factor.print(MiddlewareIntegrationTest.INDENT);
 				}
 			} else {
-				Debug.println(MiddlewareIntegrationTest.INDENT, "NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH FACTOR TYPE = "
-						+ phenotypicType);
+				Debug.println(MiddlewareIntegrationTest.INDENT,
+						"NO FACTORS FOUND FOR DATASET = " + datasetId + " WITH FACTOR TYPE = " + phenotypicType);
 			}
 		} else {
 			Debug.println(MiddlewareIntegrationTest.INDENT, "DATASET = " + datasetId + " NOT FOUND. ");
@@ -688,8 +685,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testGetDataSetsByType() throws Exception {
 		int studyId = 10010;
 		DataSetType dataSetType = DataSetType.MEANS_DATA;
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetDataSetsByType(studyId = " + studyId + ", dataSetType = " + dataSetType
-				+ ")");
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"testGetDataSetsByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
 		List<DataSet> datasets = StudyDataManagerImplTest.manager.getDataSetsByType(studyId, dataSetType);
 		for (DataSet dataset : datasets) {
 			Debug.println(MiddlewareIntegrationTest.INDENT,
@@ -698,8 +695,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 		studyId = 10080;
 		dataSetType = DataSetType.MEANS_DATA;
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetDataSetsByType(studyId = " + studyId + ", dataSetType = " + dataSetType
-				+ ")");
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"testGetDataSetsByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
 		datasets = StudyDataManagerImplTest.manager.getDataSetsByType(studyId, dataSetType);
 		for (DataSet dataset : datasets) {
 			Debug.println(MiddlewareIntegrationTest.INDENT,
@@ -716,8 +713,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testFindOneDataSetByType() throws Exception {
 		int studyId = 10010;
 		DataSetType dataSetType = DataSetType.MEANS_DATA;
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType
-				+ ")");
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
 		DataSet dataset = StudyDataManagerImplTest.manager.findOneDataSetByType(studyId, dataSetType);
 		if (dataset != null) {
 			Debug.println(MiddlewareIntegrationTest.INDENT,
@@ -726,8 +723,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 		studyId = 10080;
 		dataSetType = DataSetType.MEANS_DATA;
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType
-				+ ")");
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
 		dataset = StudyDataManagerImplTest.manager.findOneDataSetByType(studyId, dataSetType);
 		if (dataset != null) {
 			Debug.println(MiddlewareIntegrationTest.INDENT,
@@ -735,8 +732,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		}
 
 		dataSetType = DataSetType.SUMMARY_DATA;
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType
-				+ ")");
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"testFindOneDataSetByType(studyId = " + studyId + ", dataSetType = " + dataSetType + ")");
 		dataset = StudyDataManagerImplTest.manager.findOneDataSetByType(studyId, dataSetType);
 		Assert.assertNull(dataset);
 	}
@@ -780,8 +777,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		Integer projectId = 10085;
 		Integer standardVariableId = 8230;
 		String localName = StudyDataManagerImplTest.manager.getLocalNameByStandardVariableId(projectId, standardVariableId);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocalNameByStandardVariableId(" + projectId + ", " + standardVariableId
-				+ "): " + localName);
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"testGetLocalNameByStandardVariableId(" + projectId + ", " + standardVariableId + "): " + localName);
 	}
 
 	@Test
@@ -876,12 +873,13 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 		// get an existing trial environment dataset
 		Integer trialDataSetId = 25008;
-		DmsProject project = manager.getProject(trialDataSetId);
+		DmsProject project = StudyDataManagerImplTest.manager.getProject(trialDataSetId);
 
 		if (project != null) {
 
 			// get the geolocation_id of the first trial instance, we will add the summary variables here
-			Integer locationId = manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(project.getProjectId(), "1");
+			Integer locationId =
+					StudyDataManagerImplTest.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(project.getProjectId(), "1");
 			List<Integer> locationIds = new ArrayList<>();
 			locationIds.add(locationId);
 
@@ -892,7 +890,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 			// add variableTypes to project properties if not exists
 			VariableTypeList nonExistingVariableTypes = new VariableTypeList();
 			for (VariableType variableType : variableTypeList.getVariableTypes()) {
-				if (manager.getDataSet(trialDataSetId).findVariableTypeByLocalName(variableType.getLocalName()) == null) {
+				if (StudyDataManagerImplTest.manager.getDataSet(trialDataSetId)
+						.findVariableTypeByLocalName(variableType.getLocalName()) == null) {
 					nonExistingVariableTypes.add(variableType);
 				}
 			}
@@ -900,7 +899,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 			// save or update the summary variable to the trial dataset
 			StudyDataManagerImplTest.manager.saveTrialDatasetSummary(project, nonExistingVariableTypes, experimentValues, locationIds);
 
-			List<Experiment> experiments = manager.getExperiments(trialDataSetId, 0, 1);
+			List<Experiment> experiments = StudyDataManagerImplTest.manager.getExperiments(trialDataSetId, 0, 1);
 
 			Assert.assertNotNull(experiments);
 
@@ -1143,16 +1142,14 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		Study study = StudyDataManagerImplTest.manager.getStudy(10010);
 		String name = study.getName();
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Name: " + name);
-		boolean isExisting =
-				StudyDataManagerImplTest.manager.checkIfProjectNameIsExistingInProgram(name,
-						StudyDataManagerImplTest.commonTestProject.getUniqueID());
+		boolean isExisting = StudyDataManagerImplTest.manager.checkIfProjectNameIsExistingInProgram(name,
+				StudyDataManagerImplTest.commonTestProject.getUniqueID());
 		Assert.assertTrue(isExisting);
 
 		name = "SHOULDNOTEXISTSTUDY";
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Name: " + name);
-		isExisting =
-				StudyDataManagerImplTest.manager.checkIfProjectNameIsExistingInProgram(name,
-						StudyDataManagerImplTest.commonTestProject.getUniqueID());
+		isExisting = StudyDataManagerImplTest.manager.checkIfProjectNameIsExistingInProgram(name,
+				StudyDataManagerImplTest.commonTestProject.getUniqueID());
 		Assert.assertFalse(isExisting);
 	}
 
@@ -1160,9 +1157,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testGetFieldMapCountsOfTrial() throws MiddlewareQueryException {
 		List<Integer> trialIdList = new ArrayList<Integer>();
 		trialIdList.addAll(Arrays.asList(Integer.valueOf(-4)));
-		List<FieldMapInfo> fieldMapInfos =
-				StudyDataManagerImplTest.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T,
-						StudyDataManagerImplTest.crossExpansionProperties);
+		List<FieldMapInfo> fieldMapInfos = StudyDataManagerImplTest.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T,
+				StudyDataManagerImplTest.crossExpansionProperties);
 		for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
 			Debug.println(MiddlewareIntegrationTest.INDENT, fieldMapInfo.getFieldbookName());
 			if (fieldMapInfo.getDatasets() != null) {
@@ -1188,9 +1184,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 		// REPLACED BY THIS TO MAKE THE JUNIT WORK - Get the first nursery from
 		// the db
-		List<StudyDetails> studyDetailsList =
-				StudyDataManagerImplTest.manager
-						.getAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID());
+		List<StudyDetails> studyDetailsList = StudyDataManagerImplTest.manager
+				.getAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID());
 		if (studyDetailsList != null && studyDetailsList.size() > 0) {
 			for (StudyDetails study : studyDetailsList) {
 				if (study.getStudyType() == StudyType.N) {
@@ -1202,9 +1197,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 		if (nurseryIdList.size() > 0) {
 
-			List<FieldMapInfo> fieldMapInfos =
-					StudyDataManagerImplTest.manager.getFieldMapInfoOfStudy(nurseryIdList, StudyType.N,
-							StudyDataManagerImplTest.crossExpansionProperties);
+			List<FieldMapInfo> fieldMapInfos = StudyDataManagerImplTest.manager.getFieldMapInfoOfStudy(nurseryIdList, StudyType.N,
+					StudyDataManagerImplTest.crossExpansionProperties);
 			for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
 				Debug.println(MiddlewareIntegrationTest.INDENT, fieldMapInfo.getFieldbookName());
 				if (fieldMapInfo.getDatasets() != null) {
@@ -1226,9 +1220,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		List<Integer> trialIdList = new ArrayList<Integer>();
 
 		// REPLACED BY THIS TO MAKE THE JUNIT WORK
-		List<StudyDetails> studyDetailsList =
-				StudyDataManagerImplTest.manager
-						.getAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID());
+		List<StudyDetails> studyDetailsList = StudyDataManagerImplTest.manager
+				.getAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID());
 		if (studyDetailsList != null && studyDetailsList.size() > 0) {
 			for (StudyDetails study : studyDetailsList) {
 				if (study.getStudyType() == StudyType.T) {
@@ -1238,9 +1231,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 			}
 		}
 
-		List<FieldMapInfo> info =
-				StudyDataManagerImplTest.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T,
-						StudyDataManagerImplTest.crossExpansionProperties);
+		List<FieldMapInfo> info = StudyDataManagerImplTest.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T,
+				StudyDataManagerImplTest.crossExpansionProperties);
 
 		StudyDataManagerImplTest.manager.saveOrUpdateFieldmapProperties(info, -1, false);
 	}
@@ -1249,9 +1241,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testGetAllNurseryAndTrialStudyDetails() throws MiddlewareQueryException {
 		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetStudyDetailsWithPaging");
 		Debug.println(MiddlewareIntegrationTest.INDENT, "List ALL Trials and Nurseries");
-		List<StudyDetails> list =
-				StudyDataManagerImplTest.manager
-						.getAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID());
+		List<StudyDetails> list = StudyDataManagerImplTest.manager
+				.getAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID());
 		for (StudyDetails s : list) {
 			Debug.println(MiddlewareIntegrationTest.INDENT, s.toString());
 		}
@@ -1352,10 +1343,9 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNotNull() {
 		LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
 
-		FieldmapBlockInfo fieldMapBlockInfo =
-				new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK,
-						FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, FieldMapDataUtil.MACHINE_ROW_CAPACITY,
-						false, null, FieldMapDataUtil.FIELD_ID);
+		FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK,
+				FieldMapDataUtil.RANGES_IN_BLOCK, FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
+				FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
 
 		StudyDataManagerImpl localManager = (StudyDataManagerImpl) StudyDataManagerImplTest.manager;
 
@@ -1371,14 +1361,18 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 			Assert.assertEquals("Expected " + FieldMapDataUtil.ROWS_IN_BLOCK + " but got " + trialInstance.getRowsInBlock() + " instead.",
 					FieldMapDataUtil.ROWS_IN_BLOCK, trialInstance.getRowsInBlock().intValue());
-			Assert.assertEquals("Expected " + FieldMapDataUtil.RANGES_IN_BLOCK + " but got " + trialInstance.getRangesInBlock()
-					+ " instead.", FieldMapDataUtil.RANGES_IN_BLOCK, trialInstance.getRangesInBlock().intValue());
-			Assert.assertEquals("Expected " + FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT + " but got " + trialInstance.getRowsPerPlot()
-					+ " instead.", FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, trialInstance.getRowsPerPlot().intValue());
-			Assert.assertEquals("Expected " + FieldMapDataUtil.PLANTING_ORDER + " but got " + trialInstance.getPlantingOrder()
-					+ " instead.", FieldMapDataUtil.PLANTING_ORDER, trialInstance.getPlantingOrder().intValue());
-			Assert.assertEquals("Expected " + FieldMapDataUtil.MACHINE_ROW_CAPACITY + " but got " + trialInstance.getMachineRowCapacity()
-					+ " instead.", FieldMapDataUtil.MACHINE_ROW_CAPACITY, trialInstance.getMachineRowCapacity().intValue());
+			Assert.assertEquals(
+					"Expected " + FieldMapDataUtil.RANGES_IN_BLOCK + " but got " + trialInstance.getRangesInBlock() + " instead.",
+					FieldMapDataUtil.RANGES_IN_BLOCK, trialInstance.getRangesInBlock().intValue());
+			Assert.assertEquals(
+					"Expected " + FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT + " but got " + trialInstance.getRowsPerPlot() + " instead.",
+					FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, trialInstance.getRowsPerPlot().intValue());
+			Assert.assertEquals(
+					"Expected " + FieldMapDataUtil.PLANTING_ORDER + " but got " + trialInstance.getPlantingOrder() + " instead.",
+					FieldMapDataUtil.PLANTING_ORDER, trialInstance.getPlantingOrder().intValue());
+			Assert.assertEquals(
+					"Expected " + FieldMapDataUtil.MACHINE_ROW_CAPACITY + " but got " + trialInstance.getMachineRowCapacity() + " instead.",
+					FieldMapDataUtil.MACHINE_ROW_CAPACITY, trialInstance.getMachineRowCapacity().intValue());
 		} catch (MiddlewareQueryException e) {
 			Assert.fail("Expected mocked value to be returned but used the original call for getBlockInformation instead.");
 		}
@@ -1388,10 +1382,9 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNull() {
 		LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
 
-		FieldmapBlockInfo fieldMapBlockInfo =
-				new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK,
-						FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, FieldMapDataUtil.MACHINE_ROW_CAPACITY,
-						false, null, FieldMapDataUtil.FIELD_ID);
+		FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK,
+				FieldMapDataUtil.RANGES_IN_BLOCK, FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
+				FieldMapDataUtil.MACHINE_ROW_CAPACITY, false, null, FieldMapDataUtil.FIELD_ID);
 
 		StudyDataManagerImpl localManager = (StudyDataManagerImpl) StudyDataManagerImplTest.manager;
 
@@ -1461,25 +1454,22 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetStudyDetails() throws MiddlewareQueryException {
-		List<StudyDetails> studyDetailsList =
-				StudyDataManagerImplTest.manager.getStudyDetails(StudyType.N, StudyDataManagerImplTest.commonTestProject.getUniqueID(), -1,
-						-1);
+		List<StudyDetails> studyDetailsList = StudyDataManagerImplTest.manager.getStudyDetails(StudyType.N,
+				StudyDataManagerImplTest.commonTestProject.getUniqueID(), -1, -1);
 		Assert.assertNotNull(studyDetailsList);
 	}
 
 	@Test
 	public void testGetNurseryAndTrialStudyDetails() throws MiddlewareQueryException {
-		List<StudyDetails> studyDetailsList =
-				StudyDataManagerImplTest.manager.getNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID(),
-						-1, -1);
+		List<StudyDetails> studyDetailsList = StudyDataManagerImplTest.manager
+				.getNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID(), -1, -1);
 		Assert.assertNotNull(studyDetailsList);
 	}
 
 	@Test
 	public void testGetStudyDetails_ByTypeAndId() throws MiddlewareQueryException {
-		DmsProject study =
-				StudyTestDataUtil.getInstance().createStudyTestDataWithActiveStatus(
-						StudyDataManagerImplTest.commonTestProject.getUniqueID());
+		DmsProject study = StudyTestDataUtil.getInstance()
+				.createStudyTestDataWithActiveStatus(StudyDataManagerImplTest.commonTestProject.getUniqueID());
 		StudyDetails studyDetails = StudyDataManagerImplTest.manager.getStudyDetails(StudyType.T, study.getProjectId());
 		Assert.assertNotNull("Study should not be null", studyDetails);
 		Assert.assertEquals("Study should have the id " + study.getProjectId(), study.getProjectId(), studyDetails.getId());
@@ -1493,9 +1483,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		try {
 			Integer projectId = 25007;
 			String trialInstanceNumberExpected = "1";
-			Integer geolocationId =
-					StudyDataManagerImplTest.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId,
-							trialInstanceNumberExpected);
+			Integer geolocationId = StudyDataManagerImplTest.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId,
+					trialInstanceNumberExpected);
 			if (geolocationId != null) {
 				String trialInstanceNumberActual = StudyDataManagerImplTest.manager.getTrialInstanceNumberByGeolocationId(geolocationId);
 				Assert.assertEquals(trialInstanceNumberExpected, trialInstanceNumberActual);
