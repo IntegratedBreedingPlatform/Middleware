@@ -1516,4 +1516,30 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
 	}
+
+	@Test
+	public void testSaveGeolocationProperty() throws MiddlewareQueryException {
+		Integer stdVarId = TermId.EXPERIMENT_DESIGN_FACTOR.getId();
+		Integer studyId = 25019;
+		String expDesign = StudyDataManagerImplTest.manager.getGeolocationPropValue(stdVarId, studyId);
+		String newExpDesign = null;
+		if (expDesign != null) {
+			if (TermId.RANDOMIZED_COMPLETE_BLOCK.getId() == Integer.parseInt(expDesign)) {
+				newExpDesign = Integer.toString(TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId());
+			} else if (TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId() == Integer.parseInt(expDesign)) {
+				newExpDesign = Integer.toString(TermId.RANDOMIZED_COMPLETE_BLOCK.getId());
+			}
+			// update experimental design value
+			int ndGeolocationId = StudyDataManagerImplTest.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(studyId, "1");
+			StudyDataManagerImplTest.manager.saveGeolocationProperty(ndGeolocationId, stdVarId, newExpDesign);
+			String actualExpDesign = StudyDataManagerImplTest.manager.getGeolocationPropValue(stdVarId, studyId);
+			Assert.assertEquals(newExpDesign, actualExpDesign);
+			Assert.assertNotEquals(expDesign, actualExpDesign);
+			// revert to previous value
+			StudyDataManagerImplTest.manager.saveGeolocationProperty(ndGeolocationId, stdVarId, expDesign);
+			actualExpDesign = StudyDataManagerImplTest.manager.getGeolocationPropValue(stdVarId, studyId);
+			Assert.assertEquals(expDesign, actualExpDesign);
+			Assert.assertNotEquals(newExpDesign, actualExpDesign);
+		}
+	}
 }

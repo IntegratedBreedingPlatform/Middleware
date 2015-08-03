@@ -777,4 +777,14 @@ public interface StudyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	public String getTrialInstanceNumberByGeolocationId(int geolocationId) throws MiddlewareQueryException;
+
+	/**
+	 * Save the geolocation property given the geolocation id, type id and value
+	 *
+	 * @param geolocationId
+	 * @param typeId
+	 * @param value
+	 * @throws MiddlewareQueryException
+	 */
+	public void saveGeolocationProperty(int geolocationId, int typeId, String value) throws MiddlewareQueryException;
 }

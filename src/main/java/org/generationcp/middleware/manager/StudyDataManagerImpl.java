@@ -1146,4 +1146,20 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		return null;
 	}
+
+	@Override
+	public void saveGeolocationProperty(int geolocationId, int typeId, String value) throws MiddlewareQueryException {
+		Session session = this.getCurrentSession();
+		Transaction trans = null;
+
+		try {
+			trans = session.beginTransaction();
+			this.getGeolocationPropertySaver().saveOrUpdate(geolocationId, typeId, value);
+			trans.commit();
+		} catch (Exception e) {
+			this.rollbackTransaction(trans);
+			throw new MiddlewareQueryException("Error in saveGeolocationProperty " + e.getMessage(), e);
+		}
+
+	}
 }
