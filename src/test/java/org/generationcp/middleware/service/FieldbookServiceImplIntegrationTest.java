@@ -763,9 +763,9 @@ public class FieldbookServiceImplIntegrationTest extends DataManagerIntegrationT
 		DmsProject testFolder = studyTestDataUtil.createFolderTestData(uniqueId);
 		DmsProject testStudy1 = studyTestDataUtil.createStudyTestData(uniqueId);
 		DmsProject testStudy2 = studyTestDataUtil.createStudyTestDataWithActiveStatus(uniqueId);
-		FieldbookServiceImplIntegrationTest.fieldbookService.deleteStudy(testFolder.getProjectId());
-		FieldbookServiceImplIntegrationTest.fieldbookService.deleteStudy(testStudy1.getProjectId());
-		FieldbookServiceImplIntegrationTest.fieldbookService.deleteStudy(testStudy2.getProjectId());
+		FieldbookServiceImplIntegrationTest.fieldbookService.deleteStudy(testFolder.getProjectId(), null);
+		FieldbookServiceImplIntegrationTest.fieldbookService.deleteStudy(testStudy1.getProjectId(), null);
+		FieldbookServiceImplIntegrationTest.fieldbookService.deleteStudy(testStudy2.getProjectId(), null);
 
 		boolean folderExists = false;
 		boolean study1Exists = false;

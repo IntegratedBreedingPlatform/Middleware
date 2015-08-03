@@ -49,6 +49,7 @@ import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
@@ -1047,9 +1048,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void deleteStudy(int studyId) throws MiddlewareQueryException {
+	public void deleteStudy(int studyId, Integer currentUserId) throws MiddlewareQueryException, UnpermittedDeletionException {
 		Session session = this.getCurrentSession();
 		Transaction trans = null;
+
+		Integer studyUserId = this.getStudy(studyId).getUser();
+		if (studyUserId != null && !studyUserId.equals(currentUserId)) {
+			throw new UnpermittedDeletionException("You are not able to delete this nursery or trial as you are not the owner. The owner is "
+					+ this.getOwnerListName(studyUserId));
+		}
 
 		try {
 			trans = session.beginTransaction();

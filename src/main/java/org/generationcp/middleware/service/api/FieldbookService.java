@@ -34,6 +34,7 @@ import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -811,7 +812,7 @@ public interface FieldbookService {
 	/*
 	 * Deletes a study (logical delete).
 	 */
-	void deleteStudy(int studyId) throws MiddlewareQueryException;
+	void deleteStudy(int studyId, Integer currentUserId) throws MiddlewareQueryException, UnpermittedDeletionException;
 
 	/**
 	 * Gets the favorite project location ids.
