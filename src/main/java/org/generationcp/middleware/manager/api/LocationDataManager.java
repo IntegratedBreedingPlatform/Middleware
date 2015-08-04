@@ -277,8 +277,7 @@ public interface LocationDataManager {
 	UserDefinedField getUserDefinedFieldByID(Integer id) throws MiddlewareQueryException;
 
 	/**
-	 * Returns the Map representation of <Code, UserDefinedField>
-	 * of the given tableType (ftable and ftype from the udflds table).
+	 * Returns the Map representation of <Code, UserDefinedField> of the given tableType (ftable and ftype from the udflds table).
 	 *
 	 * @param tableType the table type
 	 * @return the user defined field map of code by ud table type
@@ -363,7 +362,7 @@ public interface LocationDataManager {
 
 	/**
 	 * Get all breeding locations.
-	 * 
+	 *
 	 * Return a List of Locations which represent the breeding locations stored in the location table of IBDB.
 	 *
 	 * @return the all breeding locations
@@ -373,7 +372,7 @@ public interface LocationDataManager {
 
 	/**
 	 * Count all breeding locations.
-	 * 
+	 *
 	 * Return the total count of Locations which represent the breeding locations stored in the location table of IBDB.
 	 *
 	 * @return the long
@@ -440,7 +439,7 @@ public interface LocationDataManager {
 
 	/**
 	 * get all location records filtered by programUUID
-	 * 
+	 *
 	 * @param programUUID
 	 * @return list of locid
 	 */
@@ -448,7 +447,7 @@ public interface LocationDataManager {
 
 	/**
 	 * delete all location records filtered by programUUID
-	 * 
+	 *
 	 * @param programUUID
 	 */
 	void deleteProgramLocationsByUniqueId(String programUUID) throws MiddlewareQueryException;

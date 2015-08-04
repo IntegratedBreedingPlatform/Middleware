@@ -160,8 +160,8 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locationList);
 
 		List<Location> locationList2 = LocationDataManagerImplTest.manager.getLocationsByName(name, start, numOfRows, Operation.EQUAL);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationsByName(" + name + ", start=" + start + ", numOfRows=" + numOfRows
-				+ "): ");
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"testGetLocationsByName(" + name + ", start=" + start + ", numOfRows=" + numOfRows + "): ");
 		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locationList2);
 	}
 
@@ -219,8 +219,8 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		int type = 405;
 
 		List<Location> locations = LocationDataManagerImplTest.manager.getLocationsByCountryAndType(country, type);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationByCountryAndType(country=" + country + "): type= " + type + ":"
-				+ locations.size());
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"testGetLocationByCountryAndType(country=" + country + "): type= " + type + ":" + locations.size());
 		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locations);
 	}
 
@@ -251,8 +251,8 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 
 		List<Location> locationList = LocationDataManagerImplTest.manager.getLocationsByType(type, start, numOfRows);
 		Assert.assertNotNull("Expecting to have returned results.", locationList);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationByType(type=" + type + ", start=" + start + ", numOfRows="
-				+ numOfRows + "): " + locationList.size());
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"testGetLocationByType(type=" + type + ", start=" + start + ", numOfRows=" + numOfRows + "): " + locationList.size());
 		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locations);
 	}
 
@@ -287,8 +287,8 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 				+ LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL));
 
 		// cleanup
-		LocationDataManagerImplTest.manager.deleteLocation(LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-1", 0, 5,
-				Operation.EQUAL).get(0));
+		LocationDataManagerImplTest.manager
+				.deleteLocation(LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL).get(0));
 	}
 
 	@Test
@@ -331,10 +331,10 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 				LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL));
 
 		// cleanup
-		LocationDataManagerImplTest.manager.deleteLocation(LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-2", 0, 5,
-				Operation.EQUAL).get(0));
-		LocationDataManagerImplTest.manager.deleteLocation(LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-3", 0, 5,
-				Operation.EQUAL).get(0));
+		LocationDataManagerImplTest.manager
+				.deleteLocation(LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL).get(0));
+		LocationDataManagerImplTest.manager
+				.deleteLocation(LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL).get(0));
 	}
 
 	@Test
@@ -343,8 +343,8 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		String fieldType = "LTYPE";
 		List<UserDefinedField> userDefinedField =
 				LocationDataManagerImplTest.manager.getUserDefinedFieldByFieldTableNameAndType(tableName, fieldType);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetUserDefineFieldByTableNameAndType(type=" + tableName + "): "
-				+ userDefinedField.size());
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"testGetUserDefineFieldByTableNameAndType(type=" + tableName + "): " + userDefinedField.size());
 		Debug.printObjects(MiddlewareIntegrationTest.INDENT, userDefinedField);
 	}
 
@@ -577,8 +577,8 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 				LocationDataManagerImplTest.manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
 		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
 		for (Location location : locationList) {
-			Assert.assertTrue("Location should have a location name having the keyword " + locationName, location.getLname().toLowerCase()
-					.contains(locationName.toLowerCase()));
+			Assert.assertTrue("Location should have a location name having the keyword " + locationName,
+					location.getLname().toLowerCase().contains(locationName.toLowerCase()));
 		}
 	}
 
