@@ -26,6 +26,7 @@ import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Georef;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
+import org.generationcp.middleware.pojos.Locdes;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -753,6 +754,17 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			this.logAndThrowException("Error in getProgramLocations(" + programUUID + ") in LocationDao: " + e.getMessage(), e);
 		}
 		return locations;
+	}
+
+	public List<Locdes> getLocdesByLocId(Integer locationId) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = this.getSession().createCriteria(Locdes.class);
+			criteria.add(Restrictions.eq("locationId", locationId));
+			return criteria.list();
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error with getByIds() query from Location: " + e.getMessage(), e);
+		}
+		return new ArrayList<Locdes>();
 	}
 
 }

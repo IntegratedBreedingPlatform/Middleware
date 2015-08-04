@@ -453,4 +453,21 @@ public interface LocationDataManager {
 	 */
 	void deleteProgramLocationsByUniqueId(String programUUID) throws MiddlewareQueryException;
 
+	/**
+	 * Retrieves all locdes entries from both central and local by location id
+	 *
+	 * @return all locdes entries by location id
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<Locdes> getLocdesByLocId(Integer locationId) throws MiddlewareQueryException;
+
+	/**
+	 * Save or update the list of locdes object
+	 *
+	 * @param location id
+	 * @param locdesList
+	 * @throws MiddlewareQueryException
+	 */
+	public void saveOrUpdateLocdesList(Integer locationId, List<Locdes> locdesList) throws MiddlewareQueryException;
+
 }

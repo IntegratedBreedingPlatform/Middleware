@@ -94,7 +94,7 @@ public class LocdesSaver extends Saver {
 		}
 	}
 
-	private void saveOrUpdateLocdes(Integer locId, List<Locdes> descriptions, int typeId, Object value, int userId)
+	public void saveOrUpdateLocdes(Integer locId, List<Locdes> descriptions, int typeId, Object value, int userId)
 			throws MiddlewareQueryException {
 		if (value != null) {
 			Locdes locdes = this.findLocdes(descriptions, typeId);

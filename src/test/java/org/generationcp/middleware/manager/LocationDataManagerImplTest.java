@@ -12,7 +12,9 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
@@ -23,6 +25,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
+import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
@@ -576,6 +579,50 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		for (Location location : locationList) {
 			Assert.assertTrue("Location should have a location name having the keyword " + locationName, location.getLname().toLowerCase()
 					.contains(locationName.toLowerCase()));
+		}
+	}
+
+	@Test
+	public void testGetLocdesByLocId() throws MiddlewareQueryException {
+		Integer locationId = 700000019;
+		List<Locdes> locdesList = LocationDataManagerImplTest.manager.getLocdesByLocId(locationId);
+		Assert.assertNotNull(locdesList);
+		for (Locdes locdes : locdesList) {
+			Assert.assertEquals(locationId, locdes.getLocationId());
+		}
+	}
+
+	@Test
+	public void testSaveOrUpdateLocdesList() throws MiddlewareQueryException {
+		Integer locationId = 700000019;
+		List<Locdes> existingLocdesList = LocationDataManagerImplTest.manager.getLocdesByLocId(locationId);
+		int rowsInPlotTypeId = 308;
+		Map<Integer, String> ldidToRowsInPlotMap = new HashMap<>();
+		if (existingLocdesList != null && !existingLocdesList.isEmpty()) {
+			// update rows in plot to 5
+			for (Locdes locdes : existingLocdesList) {
+				if (locdes.getTypeId() == rowsInPlotTypeId) {
+					ldidToRowsInPlotMap.put(locdes.getLdid(), locdes.getDval());
+					locdes.setDval("5");
+				}
+			}
+			LocationDataManagerImplTest.manager.saveOrUpdateLocdesList(locationId, existingLocdesList);
+			List<Locdes> newLocdesList = LocationDataManagerImplTest.manager.getLocdesByLocId(locationId);
+			Assert.assertEquals(existingLocdesList.size(), newLocdesList.size());
+			for (Locdes locdes : newLocdesList) {
+				if (locdes.getTypeId() == rowsInPlotTypeId) {
+					Assert.assertEquals("5", locdes.getDval());
+					locdes.setDval(ldidToRowsInPlotMap.get(locdes.getLdid()));
+				}
+			}
+			// revert to previous rows in plot
+			LocationDataManagerImplTest.manager.saveOrUpdateLocdesList(locationId, newLocdesList);
+			List<Locdes> revertedLocdesList = LocationDataManagerImplTest.manager.getLocdesByLocId(locationId);
+			for (Locdes locdes : revertedLocdesList) {
+				if (locdes.getTypeId() == rowsInPlotTypeId) {
+					Assert.assertEquals(ldidToRowsInPlotMap.get(locdes.getLdid()), locdes.getDval());
+				}
+			}
 		}
 	}
 

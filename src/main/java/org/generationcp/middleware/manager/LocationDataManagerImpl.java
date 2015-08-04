@@ -566,4 +566,37 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		}
 	}
 
+	@Override
+	public List<Locdes> getLocdesByLocId(Integer locationId) throws MiddlewareQueryException {
+		return this.getLocationDao().getLocdesByLocId(locationId);
+	}
+
+	@Override
+	public void saveOrUpdateLocdesList(Integer locId, List<Locdes> locdesList) throws MiddlewareQueryException {
+
+		if (locdesList != null && !locdesList.isEmpty()) {
+
+			Session session = this.getCurrentSession();
+			Transaction trans = null;
+
+			try {
+				trans = session.beginTransaction();
+
+				List<Locdes> existingLocdesList = this.getLocDesDao().getByLocation(locId);
+				for (Locdes locdes : locdesList) {
+					this.getLocdesSaver().saveOrUpdateLocdes(locdes.getLocationId(), existingLocdesList, locdes.getTypeId(),
+							locdes.getDval(), locdes.getUserId());
+				}
+
+				trans.commit();
+
+			} catch (Exception e) {
+				this.rollbackTransaction(trans);
+				this.logAndThrowException("Error encountered with saveOrUpdateLocdesList(): " + e.getMessage(), e,
+						LocationDataManagerImpl.LOG);
+			}
+		}
+
+	}
+
 }
