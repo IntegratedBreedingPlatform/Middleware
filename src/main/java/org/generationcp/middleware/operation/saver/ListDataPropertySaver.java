@@ -12,7 +12,9 @@ import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class ListDataPropertySaver extends Saver {
 
 	public ListDataPropertySaver(HibernateSessionProvider sessionProviderForLocal) {
@@ -30,7 +32,7 @@ public class ListDataPropertySaver extends Saver {
 
 		try {
 			// begin save transaction
-			trans = session.beginTransaction();
+
 
 			Integer recordsSaved = 0;
 			for (ListDataInfo listDataObj : listDataCollection) {
@@ -72,9 +74,9 @@ public class ListDataPropertySaver extends Saver {
 				}
 			}
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (MiddlewareQueryException e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in saving List Data properties - " + e.getMessage(), e);
 
 		} finally {
@@ -95,7 +97,7 @@ public class ListDataPropertySaver extends Saver {
 
 		try {
 			// begin save transaction
-			trans = session.beginTransaction();
+
 
 			Integer recordsSaved = 0;
 			for (ListDataProperty listDataProperty : listDataProps) {
@@ -113,9 +115,9 @@ public class ListDataPropertySaver extends Saver {
 					throw new MiddlewareQueryException("List Data ID cannot be null.");
 				}
 			}
-			trans.commit();
+
 		} catch (MiddlewareQueryException e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in saving List Data properties - " + e.getMessage(), e);
 
 		} finally {

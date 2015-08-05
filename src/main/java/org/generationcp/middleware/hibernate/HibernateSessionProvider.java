@@ -12,6 +12,7 @@
 package org.generationcp.middleware.hibernate;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 
 /**
  * Implementations of this interface allows you to get a Hibernate {@link Session}.
@@ -32,4 +33,6 @@ public interface HibernateSessionProvider {
 	 * Implementations should clear resources used by this {@link HibernateSessionProvider}.
 	 */
 	void close();
+	
+	SessionFactory getSessionFactory();
 }

@@ -15,6 +15,7 @@ import java.io.Serializable;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 /**
  * <p>
@@ -37,7 +38,6 @@ public class HibernateSessionPerThreadProvider implements HibernateSessionProvid
 
 	private SessionFactory sessionFactory;
 
-	private final ThreadLocal<Session> THREAD_SESSION = new ThreadLocal<Session>();
 
 	public HibernateSessionPerThreadProvider() {
 	}
@@ -56,14 +56,8 @@ public class HibernateSessionPerThreadProvider implements HibernateSessionProvid
 
 	@Override
 	public Session getSession() {
-		Session session = this.THREAD_SESSION.get();
-
-		if (session == null) {
-			session = this.sessionFactory.openSession();
-			this.THREAD_SESSION.set(session);
-		}
-
-		return session;
+		return SessionFactoryUtils.getSession(sessionFactory, false);
+		//return this.sessionFactory.getCurrentSession();
 	}
 
 	/**
@@ -81,13 +75,13 @@ public class HibernateSessionPerThreadProvider implements HibernateSessionProvid
 	 */
 	@Override
 	public void close() {
-		Session session = this.THREAD_SESSION.get();
-		if (session != null) {
-			try {
-				session.close();
-			} finally {
-				this.THREAD_SESSION.remove();
-			}
-		}
+//		Session session = this.THREAD_SESSION.get();
+//		if (session != null) {
+//			try {
+//				session.close();
+//			} finally {
+//				this.THREAD_SESSION.remove();
+//			}
+//		}
 	}
 }
