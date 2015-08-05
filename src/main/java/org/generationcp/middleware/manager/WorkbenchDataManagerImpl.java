@@ -365,9 +365,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Project saveOrUpdateProject(Project project) throws MiddlewareQueryException {
-		Transaction trans = null;
-		Session session = this.getCurrentSession();
-
+		
 		try {
 
 			this.getProjectDao().merge(project);
@@ -387,8 +385,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public ProjectUserInfo saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo) throws MiddlewareQueryException {
-		Transaction trans = null;
-		Session session = this.getCurrentSession();
+		
 
 		try {
 
@@ -409,8 +406,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Project addProject(Project project) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
 
 		try {
 
@@ -427,9 +423,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Project mergeProject(Project project) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
 		try {
 
 			this.getProjectDao().merge(project);
@@ -505,8 +498,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	public void deleteIbdbProjectBackup(IbdbUserMap ibdbUserMap) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
 		try {
 
 			this.getIbdbUserMapDao().makeTransient(ibdbUserMap);
@@ -524,8 +516,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	public void deleteProjectUserInfoDao(ProjectUserInfo projectUserInfo) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
 		try {
 
 			this.getProjectUserInfoDao().makeTransient(projectUserInfo);
@@ -539,8 +530,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	public void deleteProjectUserMysqlAccount(ProjectUserMysqlAccount mysqlaccount) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
 		try {
 
 			this.getProjectUserMysqlAccountDAO().makeTransient(mysqlaccount);
@@ -556,8 +546,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void deleteProject(Project project) throws MiddlewareQueryException {
-		Transaction trans = null;
-		Session session = this.getCurrentSession();
+		
 		try {
 
 			this.getProjectDao().deleteProject(project.getProjectName());
@@ -618,6 +607,16 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
+	public Person getPersonByEmail(String email) throws MiddlewareQueryException {
+		return this.getPersonDao().getPersonByEmail(email);
+	}
+
+	@Override
+	public Person getPersonByEmailAndName(String email, String firstName, String lastName) throws MiddlewareQueryException {
+		return this.getPersonDao().getPersonByEmailAndName(email, firstName, lastName);
+	}
+	
+	@Override
 	public boolean isUsernameExists(String userName) throws MiddlewareQueryException {
 		return this.getUserDao().isUsernameExists(userName);
 	}
@@ -629,8 +628,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Integer addPerson(Person person) throws MiddlewareQueryException {
-		Transaction trans = null;
-		Session session = this.getCurrentSession();
+		
 
 		Integer idPersonSaved = null;
 		try {
@@ -651,8 +649,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Integer addUser(User user) throws MiddlewareQueryException {
-		Transaction trans = null;
-		Session session = this.getCurrentSession();
+		
 
 		Integer idUserSaved = null;
 		try {
@@ -690,8 +687,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Integer addWorkbenchDataset(WorkbenchDataset dataset) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
 
 		Integer workbenchDatasetSaved = null;
 		try {
@@ -716,8 +712,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void deleteWorkbenchDataset(WorkbenchDataset dataset) throws MiddlewareQueryException {
-		Transaction trans = null;
-		Session session = this.getCurrentSession();
+		
 
 		try {
 
@@ -764,8 +759,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void deleteUser(User user) throws MiddlewareQueryException {
-		Transaction trans = null;
-		Session session = this.getCurrentSession();
+		
 
 		try {
 
@@ -795,8 +789,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void deletePerson(Person person) throws MiddlewareQueryException {
-		Transaction trans = null;
-		Session session = this.getCurrentSession();
+		
 
 		try {
 
@@ -846,8 +839,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Integer addProjectUserRole(ProjectUserRole projectUserRole) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
 
 		Integer idSaved = null;
 		try {
@@ -872,7 +864,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		if (session == null) {
 			return new ArrayList<Integer>();
 		}
-		Transaction trans = null;
+		
 
 		List<Integer> idsSaved = new ArrayList<Integer>();
 		try {
@@ -908,7 +900,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			return;
 		}
 
-		Transaction trans = null;
+		
 
 		try {
 
@@ -954,7 +946,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			this.logAndThrowException("Crop type already exists.");
 		}
 
-		Transaction trans = null;
+		
 		String idSaved = null;
 		try {
 			// begin save transaction
@@ -1001,7 +993,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			return new ArrayList<Integer>();
 		}
 
-		Transaction trans = null;
+		
 
 		List<Integer> idsSaved = new ArrayList<Integer>();
 		try {
@@ -1032,8 +1024,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void deleteProjectActivity(ProjectActivity projectActivity) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
 
 		try {
 
@@ -1063,8 +1054,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	private Integer addOrUpdateToolConfiguration(ToolConfiguration toolConfig, Operation op) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
 
 		Integer idSaved = null;
 		try {
@@ -1084,8 +1074,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void deleteToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
 
 		try {
 
@@ -1111,8 +1100,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Integer addIbdbUserMap(IbdbUserMap userMap) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
 
 		try {
 
@@ -1139,8 +1127,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public IbdbUserMap getIbdbUserMap(Integer workbenchUserId, Long projectId) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
 
 		IbdbUserMap bbdbUserMap = null;
 		try {
@@ -1159,8 +1146,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
 
 		Integer ibdbUserId = null;
 		try {
@@ -1178,9 +1164,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
+	public Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException {
+		return this.getIbdbUserMapDao().getWorkbenchUserId(ibdbUserId, projectId);
+	}
+
+	@Override
 	public Integer updateWorkbenchRuntimeData(WorkbenchRuntimeData workbenchRuntimeData) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
 
 		try {
 
@@ -1266,8 +1256,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void addSecurityQuestion(SecurityQuestion securityQuestion) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
 
 		try {
 
@@ -1320,7 +1309,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			return new ArrayList<Integer>();
 		}
 
-		Transaction trans = null;
+		
 
 		List<Integer> idsSaved = new ArrayList<Integer>();
 		try {
@@ -1370,8 +1359,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public ProjectBackup saveOrUpdateProjectBackup(ProjectBackup projectBackup) throws MiddlewareQueryException {
 
-		Transaction trans = null;
-		Session session = this.getCurrentSession();
+		
 
 		try {
 
@@ -1400,8 +1388,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void deleteProjectBackup(ProjectBackup projectBackup) throws MiddlewareQueryException {
-		Transaction trans = null;
-		Session session = this.getCurrentSession();
+		
 
 		try {
 
@@ -1433,13 +1420,18 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
+	public User getUserByUsername(String userName) throws MiddlewareQueryException {
+		return getUserDao().getUserByUserName(userName);
+	}
+
+	@Override
 	public UserInfo getUserInfoByResetToken(String token) throws MiddlewareQueryException {
 		return this.getUserInfoDao().getUserInfoByToken(token);
 	}
 
 	@Override
 	public UserInfo updateUserInfo(UserInfo userInfo) throws MiddlewareQueryException {
-		Transaction trans = null;
+		
 		Session session = this.getCurrentSession();
 
 		try {
@@ -1462,7 +1454,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void incrementUserLogInCount(int userId) throws MiddlewareQueryException {
-		Transaction trans = null;
+		
 		Session session = this.getCurrentSession();
 
 		try {
@@ -1523,8 +1515,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Integer addTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
 
 		try {
 
@@ -1548,8 +1539,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void updateTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException {
-		Transaction trans = null;
-		Session session = this.getCurrentSession();
+		
 
 		try {
 
@@ -1586,8 +1576,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void deleteTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException {
-		Transaction trans = null;
-		Session session = this.getCurrentSession();
+		
 
 		try {
 
@@ -1603,8 +1592,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void deleteTemplateSetting(Integer id) throws MiddlewareQueryException {
-		Transaction trans = null;
-		Session session = this.getCurrentSession();
+		
 
 		try {
 
@@ -1759,5 +1747,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			this.sessionProvider.close();
 		}
 	}
+
 
 }
