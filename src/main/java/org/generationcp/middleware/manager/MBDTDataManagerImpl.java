@@ -23,10 +23,12 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by IntelliJ IDEA. User: Daniel Villafuerte
  */
+@Transactional
 public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager {
 
 	private MBDTProjectDAO projectDAO;
@@ -244,7 +246,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 		}
 
 		Session session = this.getActiveSession();
-		Transaction transaction = session.beginTransaction();
+
 		try {
 			List<SelectedGenotype> existing = this.selectedGenotypeDAO.getSelectedGenotypeByIds(gidSet);
 
@@ -286,10 +288,10 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 			// perform batch update on creation of new entries
 			session.flush();
 			session.clear();
-			transaction.commit();
+
 		} catch (MiddlewareQueryException e) {
 			MBDTDataManagerImpl.LOG.error("Setting selected accessions was not successful", e);
-			transaction.rollback();
+
 		}
 	}
 
@@ -317,7 +319,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 		List<SelectedGenotype> existingAccession = this.selectedGenotypeDAO.getSelectedGenotypeByIds(gidSet);
 
 		Session session = this.getActiveSession();
-		Transaction transaction = session.beginTransaction();
+
 
 		try {
 			if (existingAccession != null && !existingAccession.isEmpty()) {
@@ -365,14 +367,14 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 			session.flush();
 			session.clear();
-			transaction.commit();
+
 		} catch (MiddlewareQueryException e) {
 			MBDTDataManagerImpl.LOG.error("Setting parent data was not successful", e);
-			transaction.rollback();
+
 			throw e;
 		} catch (HibernateException e) {
 			MBDTDataManagerImpl.LOG.error("Setting parent data was not successful", e);
-			transaction.rollback();
+
 			throw e;
 		}
 	}

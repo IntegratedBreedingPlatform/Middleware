@@ -51,6 +51,7 @@ import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the InventoryDataManager interface. Most of the functions in this class only use the connection to the local instance,
@@ -59,6 +60,7 @@ import org.slf4j.LoggerFactory;
  * @author Kevin Manansala
  *
  */
+@Transactional
 public class InventoryDataManagerImpl extends DataManager implements InventoryDataManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(InventoryDataManagerImpl.class);
@@ -174,19 +176,19 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			StockTransactionDAO stockTransactionDAO = this.getStockTransactionDAO();
 			stockTransaction = stockTransactionDAO.saveOrUpdate(stockTransaction);
 			stockTransactionDAO.flush();
 			stockTransactionDAO.clear();
-			trans.commit();
+
 
 			return stockTransaction.getId();
 		} catch (HibernateException e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		} catch (MiddlewareQueryException e) {
-			this.rollbackTransaction(trans);
+
 			throw e;
 		}
 	}
@@ -199,7 +201,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		List<Integer> idLotsSaved = new ArrayList<Integer>();
 		try {
 			// begin save transaction
-			trans = session.beginTransaction();
+
 			LotDAO dao = this.getLotDao();
 
 			for (Lot lot : lots) {
@@ -213,15 +215,15 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 				}
 			}
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (ConstraintViolationException e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		} catch (MiddlewareQueryException e) {
-			this.rollbackTransaction(trans);
+
 			throw e;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Lot: InventoryDataManager.addOrUpdateLot(lots=" + lots
 					+ ", operation=" + operation + "): " + e.getMessage(), e, InventoryDataManagerImpl.LOG);
 		} finally {
@@ -270,7 +272,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		List<Integer> idTransactionsSaved = new ArrayList<Integer>();
 		try {
 			// begin save transaction
-			trans = session.beginTransaction();
+
 			TransactionDAO dao = this.getTransactionDao();
 
 			for (org.generationcp.middleware.pojos.ims.Transaction transaction : transactions) {
@@ -284,9 +286,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 				}
 			}
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while saving Transaction: InventoryDataManager.addOrUpdateTransaction(transactions=" + transactions
 							+ ", operation=" + operation + "): " + e.getMessage(), e, InventoryDataManagerImpl.LOG);
@@ -866,7 +868,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		Session session = this.getCurrentSession();
 		Transaction trans = null;
 		try {
-			trans = session.beginTransaction();
+
 			GermplasmList germplasmList = this.getGermplasmListDAO().getById(listId);
 			GermplasmListType germplasmListType = GermplasmListType.valueOf(germplasmList.getType());
 			int numberOfEntries = 1;
@@ -889,9 +891,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 				}
 				numberOfEntries++;
 			}
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while updating inventory " + "of list id " + listId + "." + e.getMessage(), e,
 					InventoryDataManagerImpl.LOG);
 		} finally {

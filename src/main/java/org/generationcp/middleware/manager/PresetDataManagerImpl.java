@@ -12,10 +12,12 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by cyrus on 12/16/14.
  */
+@Transactional
 public class PresetDataManagerImpl extends DataManager implements PresetDataManager {
 
 	public PresetDataManagerImpl(HibernateSessionProvider sessionProvider) {
@@ -111,17 +113,17 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 	@Override
 	public ProgramPreset saveOrUpdateProgramPreset(ProgramPreset programPreset) throws MiddlewareQueryException {
 
-		Transaction transaction = this.getCurrentSession().beginTransaction();
+
 
 		try {
 			ProgramPreset result = this.getProgramPresetDAO().saveOrUpdate(programPreset);
 
-			transaction.commit();
+
 
 			return result;
 
 		} catch (HibernateException e) {
-			this.rollbackTransaction(transaction);
+
 			this.logAndThrowException(
 					"Cannot perform: WorkbenchDataManager.deleteProgramPreset(programPresetName=" + programPreset.getName() + "): "
 							+ e.getMessage(), e);
@@ -134,16 +136,16 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 
 	@Override
 	public void deleteProgramPreset(int programPresetId) throws MiddlewareQueryException {
-		Transaction transaction = this.getCurrentSession().beginTransaction();
+
 
 		try {
 
 			ProgramPreset preset = this.getProgramPresetDAO().getById(programPresetId);
 			this.getCurrentSession().delete(preset);
-			transaction.commit();
+
 
 		} catch (HibernateException e) {
-			this.rollbackTransaction(transaction);
+
 			this.logAndThrowException("Cannot delete preset: WorkbenchDataManager.deleteProgramPreset(programPresetId=" + programPresetId
 					+ "): " + e.getMessage(), e);
 		} finally {

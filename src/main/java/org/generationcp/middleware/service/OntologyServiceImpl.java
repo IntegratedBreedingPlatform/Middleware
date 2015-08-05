@@ -36,9 +36,15 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.service.api.OntologyService;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class OntologyServiceImpl extends Service implements OntologyService {
 
+	public OntologyServiceImpl() {
+		super();
+	}
+	
 	public OntologyServiceImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}

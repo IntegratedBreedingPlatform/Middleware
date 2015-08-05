@@ -28,11 +28,13 @@ import org.generationcp.middleware.domain.h2h.TraitObservation;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the CrossStudyDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
  *
  */
+@Transactional
 public class CrossStudyDataManagerImpl extends DataManager implements CrossStudyDataManager {
 
 	public CrossStudyDataManagerImpl() {

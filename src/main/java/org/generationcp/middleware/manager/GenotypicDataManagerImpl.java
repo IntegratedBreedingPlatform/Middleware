@@ -93,6 +93,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the GenotypicDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -100,6 +101,7 @@ import org.slf4j.LoggerFactory;
  * @author Joyce Avestro, Glenn Marintes, Daniel Villafuerte
  */
 @SuppressWarnings("unchecked")
+@Transactional
 public class GenotypicDataManagerImpl extends DataManager implements GenotypicDataManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GenotypicDataManagerImpl.class);
@@ -931,7 +933,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 		Integer savedId = null;
 		try {
-			trans = session.beginTransaction();
+
 
 			// No need to auto-assign negative IDs for new local DB records
 			// qtlId and mapId are foreign keys
@@ -939,9 +941,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			QtlDetails recordSaved = this.getQtlDetailsDao().save(qtlDetails);
 			savedId = recordSaved.getQtlId();
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Qtl Details: GenotypicDataManager.addQtlDetails(qtlDetails="
 					+ qtlDetails + "): " + e.getMessage(), e, GenotypicDataManagerImpl.LOG);
 		} finally {
@@ -979,14 +981,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Integer savedId = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			AccMetadataSet recordSaved = this.getAccMetadataSetDao().save(accMetadataSet);
 			savedId = recordSaved.getAccMetadataSetId();
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered with addAccMetadataSet(accMetadataSet=" + accMetadataSet + "): " + e.getMessage(),
 					e, GenotypicDataManagerImpl.LOG);
 		} finally {
@@ -1002,14 +1004,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Integer savedId = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			MarkerMetadataSet recordSaved = this.getMarkerMetadataSetDao().save(markerMetadataSet);
 			savedId = recordSaved.getMarkerMetadataSetId();
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered with addMarkerMetadataSet(markerMetadataSet=" + markerMetadataSet + "): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
@@ -1033,11 +1035,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Integer id = null;
 		try {
 			// begin save transaction
-			trans = session.beginTransaction();
+
 			id = this.saveMarkerIfNotExisting(marker, marker.getMarkerType());
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while adding Marker: " + e.getMessage(), e, GenotypicDataManagerImpl.LOG);
 		} finally {
 			session.flush();
@@ -1150,7 +1152,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		try {
 			// begin save transaction
-			trans = session.beginTransaction();
+
 
 			// Add GDMS Marker
 			Integer idGDMSMarkerSaved = this.saveMarkerIfNotExisting(marker, markerType);
@@ -1169,10 +1171,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			markerUserInfo.setMarkerId(idGDMSMarkerSaved);
 			this.saveMarkerUserInfo(markerUserInfo);
 
-			trans.commit();
+
 			return true;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Marker: " + e.getMessage(), e, GenotypicDataManagerImpl.LOG);
 			return false;
 		} finally {
@@ -1186,7 +1188,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Session session = this.getActiveSession();
 		Transaction trans = null;
 		try {
-			trans = session.beginTransaction();
+
 
 			Integer datasetId = this.saveDataset(dataset, GenotypicDataManagerImpl.TYPE_QTL, null);
 
@@ -1204,10 +1206,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 				}
 			}
 
-			trans.commit();
+
 			return true;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered with setQTL(): " + e.getMessage(), e, GenotypicDataManagerImpl.LOG);
 			return false;
 		} finally {
@@ -1224,7 +1226,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_DART);
 			dataset.setDataType(GenotypicDataManagerImpl.DATA_TYPE_INT);
@@ -1247,10 +1249,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.saveAlleleValues(alleleValueList);
 			this.saveDartValues(dartValueList);
 
-			trans.commit();
+
 			return true;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while setting DArT: setDart(): " + e.getMessage(), e, GenotypicDataManagerImpl.LOG);
 			return false;
 		} finally {
@@ -1266,7 +1268,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_SSR);
 			dataset.setDataType(GenotypicDataManagerImpl.DATA_TYPE_INT);
 
@@ -1284,10 +1286,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.saveAccMetadataSets(accMetadataSets);
 			this.saveAlleleValues(alleleValueList);
 
-			trans.commit();
+
 			return true;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while setting SSR: setSSR(): " + e.getMessage(), e, GenotypicDataManagerImpl.LOG);
 			return false;
 		} finally {
@@ -1303,7 +1305,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_SNP);
 			dataset.setDataType(GenotypicDataManagerImpl.DATA_TYPE_INT);
@@ -1320,10 +1322,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.saveAccMetadataSets(accMetadataSets);
 			this.saveCharValues(charValueList);
 
-			trans.commit();
+
 			return true;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while setting SNP: setSNP(): " + e.getMessage(), e, GenotypicDataManagerImpl.LOG);
 			return false;
 		} finally {
@@ -1340,7 +1342,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			Integer datasetId = this.saveMappingData(dataset, datasetUser, mappingPop, markers, markerMetadataSets);
 
@@ -1356,10 +1358,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.saveAccMetadataSets(accMetadataSets);
 			this.saveMappingPopValues(mappingPopValueList);
 
-			trans.commit();
+
 			return true;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while setting MappingABH: setMappingABH(): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
 			return false;
@@ -1377,7 +1379,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			Integer datasetId = this.saveMappingData(dataset, datasetUser, mappingPop, markers, markerMetadataSets);
 
@@ -1398,10 +1400,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.saveMappingPopValues(mappingPopValueList);
 			this.saveCharValues(charValueList);
 
-			trans.commit();
+
 			return true;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while setting MappingAllelicSNP: setMappingAllelicSNP(): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
 			return false;
@@ -1419,7 +1421,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			Integer datasetId = this.saveMappingData(dataset, datasetUser, mappingPop, markers, markerMetadataSets);
 
@@ -1445,10 +1447,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.saveAlleleValues(alleleValueList);
 			this.saveDartValues(dartValueList);
 
-			trans.commit();
+
 			return true;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while setting MappingAllelicSSRDArT: setMappingAllelicSSRDArT(): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
@@ -1469,7 +1471,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			Integer datasetId = this.updateDatasetMarkersAndMarkerMetadataSets(dataset, markers, markerMetadataSets);
 
@@ -1509,10 +1511,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			}
 
-			trans.commit();
+
 			return true;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while updating DArT: updateDart(): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
 		} finally {
@@ -1533,7 +1535,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			Integer datasetId = this.updateDatasetMarkersAndMarkerMetadataSets(dataset, markers, markerMetadataSets);
 
@@ -1567,10 +1569,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			}
 
-			trans.commit();
+
 			return true;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while updating SSR: updateSSR(): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
 		} finally {
@@ -1591,7 +1593,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			Integer datasetId = this.updateDatasetMarkersAndMarkerMetadataSets(dataset, markers, markerMetadataSets);
 
@@ -1624,10 +1626,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 				this.saveCharValues(charValues);
 			}
 
-			trans.commit();
+
 			return true;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while updating SNP: updateSNP(): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
 		} finally {
@@ -1648,7 +1650,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			Integer datasetId = this.saveOrUpdateMappingData(dataset, mappingPop, markers, markerMetadataSets);
 
@@ -1681,10 +1683,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 				this.saveMappingPopValues(mappingPopValues);
 			}
 
-			trans.commit();
+
 			return true;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while updating MappingABH: updateMappingABH(): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
 		} finally {
@@ -1706,7 +1708,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			Integer datasetId = this.saveOrUpdateMappingData(dataset, mappingPop, markers, markerMetadataSets);
 
@@ -1746,10 +1748,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 				this.saveCharValues(charValues);
 			}
 
-			trans.commit();
+
 			return true;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while updating MappingAllelicSNP: updateMappingAllelicSNP(): " + e.getMessage(),
 					e, GenotypicDataManagerImpl.LOG);
 		} finally {
@@ -1771,7 +1773,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			Integer datasetId = this.saveOrUpdateMappingData(dataset, mappingPop, markers, markerMetadataSets);
 
@@ -1817,10 +1819,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 				this.saveDartValues(dartValues);
 			}
 
-			trans.commit();
+
 			return true;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while updating MappingAllelicSSRDArT updateMappingAllelicSSRDArT(): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
@@ -1867,14 +1869,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Session session = this.getActiveSession();
 		Transaction trans = null;
 		try {
-			trans = session.beginTransaction();
+
 			Integer markerSavedId = this.saveMarker(marker, GenotypicDataManagerImpl.TYPE_UA);
 			Integer mapSavedId = this.saveMap(map);
 			this.saveMarkerOnMap(markerSavedId, mapSavedId, markerOnMap);
-			trans.commit();
+
 			return true;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while setting Maps: setMaps(): " + e.getMessage(), e, GenotypicDataManagerImpl.LOG);
 			return false;
 		} finally {
@@ -2008,7 +2010,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			// delete qtl and qtl details
 			this.getQtlDetailsDao().deleteByQtlIds(qtlIds);
@@ -2018,9 +2020,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.getDatasetUsersDao().deleteByDatasetId(datasetId);
 			this.getDatasetDao().deleteByDatasetId(datasetId);
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Cannot delete QTLs and Dataset: GenotypicDataManager.deleteQTLs(qtlIds=" + qtlIds
 					+ " and datasetId = " + datasetId + "):  " + e.getMessage(), e);
 		}
@@ -2032,15 +2034,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getAlleleValuesDao().deleteByDatasetId(datasetId);
 			this.getDatasetUsersDao().deleteByDatasetId(datasetId);
 			this.getAccMetadataSetDao().deleteByDatasetId(datasetId);
 			this.getMarkerMetadataSetDao().deleteByDatasetId(datasetId);
 			this.getDatasetDao().deleteByDatasetId(datasetId);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Cannot delete SSR Genotyping Datasets: "
 					+ "GenotypicDataManager.deleteSSRGenotypingDatasets(datasetId = " + datasetId + "):  " + e.getMessage(), e);
 		}
@@ -2052,15 +2054,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getCharValuesDao().deleteByDatasetId(datasetId);
 			this.getDatasetUsersDao().deleteByDatasetId(datasetId);
 			this.getAccMetadataSetDao().deleteByDatasetId(datasetId);
 			this.getMarkerMetadataSetDao().deleteByDatasetId(datasetId);
 			this.getDatasetDao().deleteByDatasetId(datasetId);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Cannot delete SNP Genotyping Datasets: "
 					+ "GenotypicDataManager.deleteSNPGenotypingDatasets(datasetId = " + datasetId + "):  " + e.getMessage(), e);
 		}
@@ -2072,16 +2074,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getAlleleValuesDao().deleteByDatasetId(datasetId);
 			this.getDartValuesDao().deleteByDatasetId(datasetId);
 			this.getDatasetUsersDao().deleteByDatasetId(datasetId);
 			this.getAccMetadataSetDao().deleteByDatasetId(datasetId);
 			this.getMarkerMetadataSetDao().deleteByDatasetId(datasetId);
 			this.getDatasetDao().deleteByDatasetId(datasetId);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Cannot delete DArT Genotyping Datasets: "
 					+ "GenotypicDataManager.deleteDArTGenotypingDatasets(datasetId = " + datasetId + "):  " + e.getMessage(), e);
 		}
@@ -2094,7 +2096,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getMappingPopValuesDao().deleteByDatasetId(datasetId);
 			this.getMappingPopDao().deleteByDatasetId(datasetId);
 			this.getDatasetUsersDao().deleteByDatasetId(datasetId);
@@ -2112,9 +2114,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.getDatasetDao().deleteByDatasetId(datasetId);
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Cannot delete Mapping Population Datasets: "
 					+ "GenotypicDataManager.deleteMappingPopulationDatasets(datasetId = " + datasetId + "):  " + e.getMessage(), e);
 		}
@@ -2136,14 +2138,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			this.getMarkerOnMapDao().deleteByMapId(mapId);
 			this.getMapDao().deleteByMapId(mapId);
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Cannot delete Mapping Population Datasets: "
 					+ "GenotypicDataManager.deleteMappingPopulationDatasets(datasetId = " + mapId + "):  " + e.getMessage(), e);
 		}
@@ -2174,7 +2176,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		}
 
 		try {
-			trans = session.beginTransaction();
+
 
 			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_MTA);
 			dataset.setUploadTemplateDate(new Date());
@@ -2195,9 +2197,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			mtaMetadata.setDatasetID(dataset.getDatasetId());
 			mtaMetadataDao.merge(mtaMetadata);
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error in GenotypicDataManager.addMTA: " + e.getMessage(), e);
 		}
 	}
@@ -2213,7 +2215,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_MTA);
 			dataset.setUploadTemplateDate(new Date());
@@ -2248,9 +2250,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 				}
 			}
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error in GenotypicDataManager.addMTAs: " + e.getMessage(), e);
 		}
 	}
@@ -2261,7 +2263,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			for (Integer datasetId : datasetIds) {
 
@@ -2270,9 +2272,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 				this.getDatasetUsersDao().deleteByDatasetId(datasetId);
 				this.getDatasetDao().deleteByDatasetId(datasetId);
 			}
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Cannot delete MTAs and Dataset: GenotypicDataManager.deleteMTA(datasetIds=" + datasetIds + "):  "
 					+ e.getMessage(), e);
 		}
@@ -2293,15 +2295,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			// No need to generate id. The id (mta_id) is a foreign key
 			MtaMetadataDAO mtaMetadataDao = this.getMtaMetadataDao();
 			mtaMetadataDao.save(mtaMetadata);
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error in GenotypicDataManager.addMtaMetadata: " + e.getMessage(), e);
 		}
 	}
@@ -2826,7 +2828,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			this.getTrackDataDao().save(trackData);
 
@@ -2835,9 +2837,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 				this.getTrackMarkerDao().save(trackMarker);
 			}
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error in GenotypicDataManager.addHaplotype(trackData=" + trackData + ", trackMarkers="
 					+ trackMarkers + "): " + e.getMessage(), e);
 		}
@@ -3097,7 +3099,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			// Update GDMS Marker - update all fields except marker_id, marker_name and species
 			this.updateMarkerInfo(marker);
@@ -3115,11 +3117,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			markerUserInfo.setMarkerId(markerId);
 			this.saveOrUpdateMarkerUserInfo(markerUserInfo);
 
-			trans.commit();
+
 			return true;
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while updating MarkerInfo: updateMarkerInfo(marker=" + marker + ", markerAlias="
 					+ markerAlias + ", markerDetails=" + markerDetails + ", markerUserInfo=" + markerUserInfo + "): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);

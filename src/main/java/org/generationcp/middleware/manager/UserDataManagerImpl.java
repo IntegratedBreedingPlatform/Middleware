@@ -26,10 +26,13 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 
 /**
  * Implementation of the UserDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
  */
+@Transactional
 public class UserDataManagerImpl extends DataManager implements UserDataManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserDataManagerImpl.class);
@@ -59,15 +62,15 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 		Integer idUserSaved = null;
 		try {
-			trans = session.beginTransaction();
+
 			UserDAO dao = this.getUserDao();
 
 			User recordSaved = dao.saveOrUpdate(user);
 			idUserSaved = recordSaved.getUserid();
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(),
 					e, UserDataManagerImpl.LOG);
 		} finally {
@@ -83,11 +86,11 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getUserDao().saveOrUpdate(user);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(),
 					e, UserDataManagerImpl.LOG);
 		} finally {
@@ -108,11 +111,11 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getUserDao().makeTransient(user);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while deleting User: UserDataManager.deleteUser(user=" + user + "): " + e.getMessage(), e,
 					UserDataManagerImpl.LOG);
@@ -150,15 +153,15 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 		Integer idPersonSaved = null;
 		try {
-			trans = session.beginTransaction();
+
 			PersonDAO dao = this.getPersonDao();
 
 			Person recordSaved = dao.saveOrUpdate(person);
 			idPersonSaved = recordSaved.getId();
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while saving Person: UserDataManager.addPerson(person=" + person + "): " + e.getMessage(), e,
 					UserDataManagerImpl.LOG);
@@ -179,11 +182,11 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getPersonDao().makeTransient(person);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while deleting Person: UserDataManager.deletePerson(person=" + person + "): " + e.getMessage(), e,
 					UserDataManagerImpl.LOG);

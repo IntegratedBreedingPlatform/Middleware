@@ -27,11 +27,14 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.service.api.InventoryService;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * This is the API for inventory management system.
  *
  */
+
+@Transactional
 public class InventoryServiceImpl extends Service implements InventoryService {
 
 	public InventoryServiceImpl(HibernateSessionProvider sessionProvider, String localDatabaseName) {

@@ -56,7 +56,6 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
@@ -75,14 +74,14 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
 	private PedigreeService pedigreeService;
 
 	private LocationDataManager locationDataManager;
-
-	private OntologyDataManager ontologyDataManager;
 
 	private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 
@@ -93,7 +92,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		super(sessionProvider, databaseName);
 		this.locationDataManager = new LocationDataManagerImpl(sessionProvider);
 		this.pedigreeService = this.getPedigreeService();
-		this.ontologyDataManager = new OntologyDataManagerImpl(sessionProvider);
 	}
 
 	public StudyDataManagerImpl(HibernateSessionProvider sessionProvider) {
@@ -179,13 +177,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			DmsProject project = this.getStudySaver().saveStudy(parentFolderId, variableTypeList, studyValues, true, programUUID);
-			trans.commit();
+
 			return new StudyReference(project.getProjectId(), project.getName(), project.getDescription());
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered with addStudy(folderId=" + parentFolderId + ", variableTypeList="
 					+ variableTypeList + ", studyValues=" + studyValues + "): " + e.getMessage(), e, StudyDataManagerImpl.LOG);
 		}
@@ -200,13 +198,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			DmsProject datasetProject = this.getDatasetProjectSaver().addDataSet(studyId, variableTypeList, datasetValues, programUUID);
-			trans.commit();
+
 			return new DatasetReference(datasetProject.getProjectId(), datasetProject.getName(), datasetProject.getDescription());
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("error in addDataSet " + e.getMessage(), e);
 		}
 	}
@@ -233,7 +231,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList)
-			throws MiddlewareQueryException {
+					throws MiddlewareQueryException {
 		this.clearSessions();
 		if (varTypeList == null) {
 			return this.getExperiments(dataSetId, start, numOfRows);
@@ -254,12 +252,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getExperimentModelSaver().addExperiment(dataSetId, experimentType, experimentValues);
-			trans.commit();
+
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
 		}
 	}
@@ -271,33 +269,33 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getExperimentModelSaver().addOrUpdateExperiment(dataSetId, experimentType, experimentValues);
-			trans.commit();
+
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("error in addOrUpdateExperiment " + e.getMessage(), e);
 		}
 	}
 
 	@Override
 	public void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValuesList)
-			throws MiddlewareQueryException {
+					throws MiddlewareQueryException {
 		Session session = this.getCurrentSession();
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			for (ExperimentValues experimentValues : experimentValuesList) {
 				this.getExperimentModelSaver().addOrUpdateExperiment(dataSetId, experimentType, experimentValues);
 			}
 
-			trans.commit();
+
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("error in addOrUpdateExperiment " + e.getMessage(), e);
 		}
 
@@ -309,14 +307,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			Geolocation geolocation = this.getGeolocationSaver().saveGeolocation(variableList, null, false);
 			int id = geolocation.getLocationId();
-			trans.commit();
+
 			return id;
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("error in addTrialEnvironment " + e.getMessage(), e);
 		}
 	}
@@ -327,13 +325,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			int id = this.getStockSaver().saveStock(variableList);
-			trans.commit();
+
 			return id;
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("error in addStock " + e.getMessage(), e);
 		}
 	}
@@ -341,8 +339,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException {
 
-		List<DmsProject> datasetProjects = this.getDmsProjectDao().getDataSetsByStudyAndProjectProperty(studyId,
-				TermId.DATASET_TYPE.getId(), String.valueOf(dataSetType.getId()));
+		List<DmsProject> datasetProjects =
+				this.getDmsProjectDao().getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(),
+						String.valueOf(dataSetType.getId()));
 		List<DataSet> datasets = new ArrayList<DataSet>();
 
 		for (DmsProject datasetProject : datasetProjects) {
@@ -353,8 +352,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public long countExperimentsByTrialEnvironmentAndVariate(int trialEnvironmentId, int variateVariableId)
-			throws MiddlewareQueryException {
+	public long countExperimentsByTrialEnvironmentAndVariate(int trialEnvironmentId, int variateVariableId) throws MiddlewareQueryException {
 		long count = 0;
 		count = this.getExperimentDao().countByTrialEnvironmentAndVariate(trialEnvironmentId, variateVariableId);
 		return count;
@@ -366,12 +364,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getDatasetProjectSaver().addDatasetVariableType(datasetId, variableType);
-			trans.commit();
+
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("error in addDataSetVariableType " + e.getMessage(), e);
 		}
 	}
@@ -382,12 +380,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getExperimentModelSaver().setExperimentValue(experimentId, variableId, value);
-			trans.commit();
+
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("error in addDataSetVariableType " + e.getMessage(), e);
 		}
 	}
@@ -428,11 +426,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getDataSetDestroyer().deleteDataSet(datasetId);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("error in deleteDataSet " + e.getMessage(), e);
 		}
 	}
@@ -443,11 +441,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getDataSetDestroyer().deleteExperimentsByLocation(datasetId, locationId);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("error in deleteExperimentsByLocation " + e.getMessage(), e);
 		}
 	}
@@ -458,10 +456,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		try {
 
-			String sql = "select pp.value " + "from projectprop pp "
-					+ "inner join projectprop pp2 on pp.rank = pp2.rank and pp.project_id = pp2.project_id "
-					+ "where pp.project_id = :projectId and pp2.value = :standardVariableId " + "and pp.type_id not in (pp2.value, "
-					+ TermId.STANDARD_VARIABLE.getId() + "," + TermId.VARIABLE_DESCRIPTION.getId() + ")";
+			String sql =
+					"select pp.value " + "from projectprop pp "
+							+ "inner join projectprop pp2 on pp.rank = pp2.rank and pp.project_id = pp2.project_id "
+							+ "where pp.project_id = :projectId and pp2.value = :standardVariableId "
+							+ "and pp.type_id not in (pp2.value, " + TermId.STANDARD_VARIABLE.getId() + ","
+							+ TermId.VARIABLE_DESCRIPTION.getId() + ")";
 
 			Query query = session.createSQLQuery(sql);
 			query.setParameter("projectId", projectId);
@@ -556,7 +556,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			Transaction trans = null;
 
 			try {
-				trans = session.beginTransaction();
+
 
 				if (isNew) {
 					this.getLocdesSaver().saveLocationDescriptions(info, userId);
@@ -566,10 +566,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				this.getGeolocationPropertySaver().saveFieldmapProperties(info);
 				this.getExperimentPropertySaver().saveFieldmapProperties(info);
 
-				trans.commit();
+
 
 			} catch (Exception e) {
-				this.rollbackTransaction(trans);
+
 				this.logAndThrowException("Error encountered with saveOrUpdateFieldmapProperties(): " + e.getMessage(), e,
 						StudyDataManagerImpl.LOG);
 			}
@@ -584,23 +584,26 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			if (variableTypeList != null && variableTypeList.getVariableTypes() != null && !variableTypeList.getVariableTypes().isEmpty()) {
 				this.getProjectPropertySaver().saveProjectProperties(project, variableTypeList);
 			}
 			if (experimentValues != null && !experimentValues.isEmpty()) {
 				this.updateExperimentValues(experimentValues, project.getProjectId(), locationIds);
 			}
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("error in saveTrialDatasetSummary " + e.getMessage(), e);
 		}
 	}
 
 	private void updateExperimentValues(List<ExperimentValues> experimentValues, Integer projectId, List<Integer> locationIds)
 			throws MiddlewareQueryException {
-
+		for (Integer locationId : locationIds) {
+			// delete phenotypes by project id and locationId
+			this.getPhenotypeDao().deletePhenotypesByProjectIdAndLocationId(projectId, locationId);
+		}
 		for (ExperimentValues exp : experimentValues) {
 			if (exp.getVariableList() != null && !exp.getVariableList().isEmpty()) {
 				ExperimentModel experimentModel =
@@ -663,16 +666,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			DmsProject currentFolder = this.getDmsProjectDao().getById(folderId);
 			currentFolder.setName(newFolderName);
 			this.getDmsProjectDao().saveOrUpdate(currentFolder);
-			trans.commit();
+
 			return true;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
-			throw new MiddlewareQueryException(
-					"Error encountered with renameFolder(folderId=" + folderId + ", name=" + newFolderName + ": " + e.getMessage(), e);
+
+			throw new MiddlewareQueryException("Error encountered with renameFolder(folderId=" + folderId + ", name=" + newFolderName
+					+ ": " + e.getMessage(), e);
 		}
 	}
 
@@ -689,12 +692,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Session session = this.getCurrentSession();
 		Transaction trans = null;
 		try {
-			trans = session.beginTransaction();
+
 			DmsProject project = this.getProjectSaver().saveFolder(parentFolderId, name, description, programUUID);
-			trans.commit();
+
 			return project.getProjectId();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error encountered with addSubFolder(parentFolderId=" + parentFolderId + ", name=" + name
 					+ ", description=" + description + "): " + e.getMessage(), e);
 		}
@@ -717,16 +720,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		try {
 			Session session = this.getCurrentSession();
 
-			trans = session.beginTransaction();
+
 
 			// disassociate the source project from any parent it had previously
 			this.getProjectRelationshipDao().deleteChildAssociation(sourceId);
 
 			this.getProjectRelationshipSaver().saveProjectParentRelationship(source, targetId, isAStudy);
-			trans.commit();
+
 			return true;
 		} catch (MiddlewareException e) {
-			this.rollbackTransaction(trans);
+
 			StudyDataManagerImpl.LOG.error(e.getMessage(), e);
 			return false;
 		}
@@ -749,15 +752,15 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Session session = this.getCurrentSession();
 		Transaction trans = null;
 		try {
-			trans = session.beginTransaction();
+
 			// modify the folder name
 			String name = project.getName() + "#" + Math.random();
 			project.setName(name);
 			dmsProjectDao.saveOrUpdate(project);
 			this.getProjectRelationshipDao().deleteByProjectId(project.getProjectId());
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error encountered with deleteEmptyFolder(id=" + id + "): " + e.getMessage(), e);
 		}
 	}
@@ -1046,7 +1049,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		int i = 0;
 
 		try {
-			trans = session.beginTransaction();
+
 
 			for (PhenotypeOutlier phenotypeOutlier : phenotyleOutliers) {
 
@@ -1072,10 +1075,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			phenotypeOutlierDao.flush();
 			phenotypeOutlierDao.clear();
 
-			trans.commit();
+
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("error in savePhenotypeOutlier " + e.getMessage(), e);
 		}
 
@@ -1103,13 +1106,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			for (Integer projectId : projectIds) {
 				this.getStudyDestroyer().deleteStudy(projectId);
 			}
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, StudyDataManagerImpl.LOG);
 		}
 	}
@@ -1120,12 +1123,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getProjectPropertySaver().updateVariablesRanking(datasetId, variableIds);
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in updateVariableOrdering " + e.getMessage(), e);
 		}
 	}
@@ -1133,12 +1136,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public Integer getGeolocationIdByProjectIdAndTrialInstanceNumber(int projectId, String trialInstanceNumber)
 			throws MiddlewareQueryException {
-		return this.getExperimentProjectDao().getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId, trialInstanceNumber);
+		return getExperimentProjectDao().getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId, trialInstanceNumber);
 	}
 
 	@Override
 	public String getTrialInstanceNumberByGeolocationId(int geolocationId) throws MiddlewareQueryException {
-		Geolocation geolocation = this.getGeolocationDao().getById(geolocationId);
+		Geolocation geolocation = getGeolocationDao().getById(geolocationId);
 		if (geolocation != null) {
 			return geolocation.getDescription();
 		}
@@ -1147,15 +1150,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void saveGeolocationProperty(int geolocationId, int typeId, String value) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
 		try {
-			trans = session.beginTransaction();
 			this.getGeolocationPropertySaver().saveOrUpdate(geolocationId, typeId, value);
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
 			throw new MiddlewareQueryException("Error in saveGeolocationProperty " + e.getMessage(), e);
 		}
 

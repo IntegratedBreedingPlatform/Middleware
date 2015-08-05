@@ -44,7 +44,9 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class DataImportServiceImpl extends Service implements DataImportService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataImportServiceImpl.class);
@@ -95,17 +97,17 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		Map<String, ?> variableMap = null;
 		TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)");
 		try {
-			trans = session.beginTransaction();
+
 			boolean isUpdate = workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null;
 			if (isUpdate) {
 				this.getWorkbookSaver().saveWorkbookVariables(workbook);
 				this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
 			}
 			variableMap = this.getWorkbookSaver().saveVariables(workbook);
-			trans.commit();
+
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered with saving to database: ", e, DataImportServiceImpl.LOG);
 
 		} finally {
@@ -119,16 +121,16 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		try {
 
-			trans2 = session.beginTransaction();
+
 
 			int studyId = this.getWorkbookSaver().saveDataset(workbook, variableMap, retainValues, isDeleteObservations, programUUID);
 
-			trans2.commit();
+
 
 			return studyId;
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans2);
+
 			this.logAndThrowException("Error encountered with saving to database: ", e, DataImportServiceImpl.LOG);
 
 		} finally {
@@ -597,12 +599,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		try {
 
-			trans = session.beginTransaction();
+
 			studyId = this.getWorkbookSaver().saveProjectOntology(workbook, programUUID);
-			trans.commit();
+
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered with importing project ontology: ", e, DataImportServiceImpl.LOG);
 
 		} finally {
@@ -620,12 +622,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		try {
 
-			trans = session.beginTransaction();
+
 			this.getWorkbookSaver().saveProjectData(workbook, programUUID);
-			trans.commit();
+
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered in importing observations: ", e, DataImportServiceImpl.LOG);
 			return 0;
 		} finally {

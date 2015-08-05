@@ -52,6 +52,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -60,6 +61,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 @SuppressWarnings("unchecked")
+@Transactional
 public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDataManagerImpl.class);
@@ -392,7 +394,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		try {
 			// begin update transaction
-			trans = session.beginTransaction();
+
 			NameDAO dao = this.getNameDao();
 
 			// check for a name record with germplasm = gid, and nval = newPrefName
@@ -427,9 +429,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			}
 
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error in GermplasmpDataManager.updateGermplasmPrefNameAbbrev(gid=" + gid + ", newPrefValue="
 					+ newPrefValue + ", nameOrAbbrev=" + nameOrAbbrev + "):  " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
 		} finally {
@@ -471,7 +473,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		List<Integer> idNamesSaved = new ArrayList<Integer>();
 		try {
 			// begin save transaction
-			trans = session.beginTransaction();
+
 			NameDAO dao = this.getNameDao();
 
 			for (Name name : names) {
@@ -485,9 +487,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				}
 			}
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error while saving Germplasm Name: GermplasmDataManager.addOrUpdateGermplasmName(names=" + names
 					+ ", operation=" + operation + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
 		} finally {
@@ -633,15 +635,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		Integer methodId = null;
 		try {
-			trans = session.beginTransaction();
+
 			MethodDAO dao = this.getMethodDao();
 
 			Method recordSaved = dao.saveOrUpdate(method);
 			methodId = recordSaved.getMid();
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e,
 					GermplasmDataManagerImpl.LOG);
@@ -664,14 +666,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				throw new MiddlewareQueryException("method has no Id or is not a local method");
 			}
 
-			trans = session.beginTransaction();
+
 			MethodDAO dao = this.getMethodDao();
 
 			recordSaved = dao.merge(method);
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e,
 					GermplasmDataManagerImpl.LOG);
@@ -689,7 +691,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		List<Integer> idMethodsSaved = new ArrayList<Integer>();
 		try {
-			trans = session.beginTransaction();
+
 			MethodDAO dao = this.getMethodDao();
 
 			for (Method method : methods) {
@@ -697,9 +699,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				idMethodsSaved.add(recordSaved.getMid());
 			}
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving a list of Methods: GermplasmDataManager.addMethod(methods=" + methods
 					+ "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
 		} finally {
@@ -714,11 +716,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getMethodDao().makeTransient(method);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while deleting Method: GermplasmDataMananger.deleteMethod(method=" + method
 					+ "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
 		} finally {
@@ -791,15 +793,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		Integer idBibrefSaved = null;
 		try {
-			trans = session.beginTransaction();
+
 			BibrefDAO dao = this.getBibrefDao();
 
 			Bibref recordSaved = dao.saveOrUpdate(bibref);
 			idBibrefSaved = recordSaved.getRefid();
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while saving Bibliographic Reference: GermplasmDataManager.addBibliographicReference(bibref="
 							+ bibref + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
@@ -841,16 +843,16 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		List<Integer> idAttributesSaved = new ArrayList<Integer>();
 		try {
-			trans = session.beginTransaction();
+
 			AttributeDAO dao = this.getAttributeDao();
 
 			for (Attribute attribute : attributes) {
 				Attribute recordSaved = dao.saveOrUpdate(attribute);
 				idAttributesSaved.add(recordSaved.getAid());
 			}
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Attribute: GermplasmDataManager.addOrUpdateAttributes(attributes="
 					+ attributes + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
 		} finally {
@@ -940,7 +942,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		int germplasmsSaved = 0;
 		List<Integer> idGermplasmsSaved = new ArrayList<Integer>();
 		try {
-			trans = session.beginTransaction();
+
 			GermplasmDAO dao = this.getGermplasmDao();
 
 			for (Germplasm germplasm : germplasms) {
@@ -955,9 +957,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				}
 			}
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Germplasm: GermplasmDataManager.addOrUpdateGermplasms(germplasms="
 					+ germplasms + ", operation=" + operation + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
 		} finally {
@@ -973,16 +975,16 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		int progenitorsSaved = 0;
 		try {
-			trans = session.beginTransaction();
+
 			ProgenitorDAO dao = this.getProgenitorDao();
 
 			for (Progenitor progenitor : progenitors) {
 				dao.saveOrUpdate(progenitor);
 				progenitorsSaved++;
 			}
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Progenitor: GermplasmDataManager.addOrUpdateProgenitors(progenitors="
 					+ progenitors + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
 		} finally {
@@ -1031,7 +1033,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		int germplasmsSaved = 0;
 		List<Integer> isGermplasmsSaved = new ArrayList<Integer>();
 		try {
-			trans = session.beginTransaction();
+
 			GermplasmDAO dao = this.getGermplasmDao();
 			NameDAO nameDao = this.getNameDao();
 
@@ -1053,9 +1055,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				}
 			}
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Germplasm: GermplasmDataManager.addGermplasm(germplasmNameMap="
 					+ germplasmNameMap + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
 		} finally {
@@ -1070,14 +1072,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			UserDefinedFieldDAO dao = this.getUserDefinedFieldDao();
 			dao.save(field);
 
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedField(): " + e.getMessage(), e,
 					GermplasmDataManagerImpl.LOG);
@@ -1095,7 +1097,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		List<Integer> isUdfldSaved = new ArrayList<Integer>();
 		try {
-			trans = session.beginTransaction();
+
 			UserDefinedFieldDAO dao = this.getUserDefinedFieldDao();
 
 			int udfldSaved = 0;
@@ -1112,9 +1114,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				}
 			}
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedFields(fields="
 					+ fields + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
 		} finally {
@@ -1131,15 +1133,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		Integer isAttrSaved = 0;
 		try {
-			trans = session.beginTransaction();
+
 			AttributeDAO dao = this.getAttributeDao();
 			dao.save(attr);
 			isAttrSaved++;
 
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Attribute: GermplasmDataManager.addAttribute(addAttribute=" + attr
 					+ "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
 		} finally {
@@ -1156,7 +1158,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		List<Integer> isAttrSaved = new ArrayList<Integer>();
 		try {
-			trans = session.beginTransaction();
+
 			AttributeDAO dao = this.getAttributeDao();
 
 			int attrSaved = 0;
@@ -1172,9 +1174,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				}
 			}
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving UserDefinedField: GermplasmDataManager.addAttributes(attrs="
 					+ isAttrSaved + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
 		} finally {
@@ -1436,7 +1438,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		int favoriteSaved = 0;
 
 		try {
-			trans = session.beginTransaction();
+
 			ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
 
 			for (ProgramFavorite favorite : list) {
@@ -1451,9 +1453,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				}
 			}
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorites(list="
 					+ list + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
 		} finally {
@@ -1467,12 +1469,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
 			dao.save(favorite);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorite(favorite="
 					+ favorite + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
 		} finally {
@@ -1489,7 +1491,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		int favoriteDeleted = 0;
 
 		try {
-			trans = session.beginTransaction();
+
 			ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
 
 			for (ProgramFavorite favorite : list) {
@@ -1503,9 +1505,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				}
 			}
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving ProgramFavorite: GermplasmDataManager.deleteProgramFavorites(list="
 					+ list + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
 		} finally {
@@ -1520,12 +1522,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
 			dao.makeTransient(favorite);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while deleting ProgramFavorite: GermplasmDataManager.deleteProgramFavorite(favorite=" + favorite
 							+ "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
@@ -1557,7 +1559,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		MethodDAO methodDao = this.getMethodDao();
 		int deleted = 0;
 		try {
-			trans = session.beginTransaction();
+
 			List<Method> list = this.getProgramMethods(programUUID);
 			for (Method method : list) {
 				methodDao.makeTransient(method);
@@ -1566,9 +1568,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 					methodDao.clear();
 				}
 			}
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while deleting methods: GermplasmDataManager.deleteProgramMethodsByUniqueId(uniqueId=" + programUUID
 							+ "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);

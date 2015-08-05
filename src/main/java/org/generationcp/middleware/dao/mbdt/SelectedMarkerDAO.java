@@ -12,10 +12,12 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by IntelliJ IDEA. User: Daniel Villafuerte
  */
+@Transactional
 public class SelectedMarkerDAO extends GenericDAO<SelectedMarker, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SelectedMarkerDAO.class);
@@ -40,17 +42,17 @@ public class SelectedMarkerDAO extends GenericDAO<SelectedMarker, Integer> {
 	@Override
 	public SelectedMarker saveOrUpdate(SelectedMarker entity) throws MiddlewareQueryException {
 		Session session = this.getSession();
-		Transaction transaction = session.beginTransaction();
+
 
 		try {
 			SelectedMarker marker = super.saveOrUpdate(entity);
-			transaction.commit();
+
 			session.flush();
 			session.clear();
 			return marker;
 		} catch (MiddlewareQueryException e) {
 			SelectedMarkerDAO.LOG.error("Saving or updating was not successful", e);
-			transaction.rollback();
+
 			throw e;
 		}
 	}

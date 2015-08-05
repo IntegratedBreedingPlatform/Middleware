@@ -40,6 +40,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the LocationDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -47,6 +48,7 @@ import org.slf4j.LoggerFactory;
  * @author Joyce Avestro
  */
 @SuppressWarnings("unchecked")
+@Transactional
 public class LocationDataManagerImpl extends DataManager implements LocationDataManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(LocationDataManagerImpl.class);
@@ -288,15 +290,15 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		Integer idLocationSaved = null;
 		try {
 			// begin save transaction
-			trans = session.beginTransaction();
+
 			LocationDAO dao = this.getLocationDao();
 
 			Location recordSaved = dao.saveOrUpdate(location);
 			idLocationSaved = recordSaved.getLocid();
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Location: LocationDataManager.addLocation(location=" + location
 					+ "): " + e.getMessage(), e, LocationDataManagerImpl.LOG);
 		} finally {
@@ -313,7 +315,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		List<Integer> idLocationsSaved = new ArrayList<Integer>();
 		try {
 			// begin save transaction
-			trans = session.beginTransaction();
+
 			LocationDAO dao = this.getLocationDao();
 
 			for (Location location : locations) {
@@ -321,9 +323,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 				idLocationsSaved.add(recordSaved.getLocid());
 			}
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Locations: LocationDataManager.addLocation(locations=" + locations
 					+ "): " + e.getMessage(), e, LocationDataManagerImpl.LOG);
 		} finally {
@@ -340,7 +342,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		Integer idLocationSaved = null;
 		try {
 			// begin save transaction
-			trans = session.beginTransaction();
+
 
 			// Auto-assign IDs for new DB records
 			LocationDAO locationDao = this.getLocationDao();
@@ -351,9 +353,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			locdes.setLocationId(idLocationSaved);
 			locdesDao.saveOrUpdate(locdes);
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Location: addLocationAndLocdes(" + "location=" + location
 					+ ", locdes=" + locdes + "): " + e.getMessage(), e, LocationDataManagerImpl.LOG);
 		} finally {
@@ -368,11 +370,11 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getLocationDao().makeTransient(location);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while deleting Location: LocationDataManager.deleteLocation(location=" + location
 					+ "): " + e.getMessage(), e, LocationDataManagerImpl.LOG);
 		} finally {
@@ -545,7 +547,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		LocationDAO locationDao = this.getLocationDao();
 		int deleted = 0;
 		try {
-			trans = session.beginTransaction();
+
 			List<Location> list = this.getProgramLocations(programUUID);
 			for (Location location : list) {
 				locationDao.makeTransient(location);
@@ -554,9 +556,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 					locationDao.clear();
 				}
 			}
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while deleting locations: GermplasmDataManager.deleteProgramLocationsByUniqueId(uniqueId="
 							+ programUUID + "): " + e.getMessage(),

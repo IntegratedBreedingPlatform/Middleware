@@ -9,10 +9,12 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by IntelliJ IDEA. User: Daniel Villafuerte Date: 5/20/2014 Time: 4:12 AM
  */
+@Transactional
 public class MBDTProjectDAO extends GenericDAO<MBDTProjectData, Integer> {
 
 	@Override
@@ -23,19 +25,19 @@ public class MBDTProjectDAO extends GenericDAO<MBDTProjectData, Integer> {
 	@Override
 	public MBDTProjectData save(MBDTProjectData entity) throws MiddlewareQueryException {
 		Session session = this.getSession();
-		Transaction transaction = session.beginTransaction();
+
 		try {
 
 			MBDTProjectData returnVal = super.save(entity);
-			transaction.commit();
+
 			session.flush();
 			session.clear();
 			return returnVal;
 		} catch (HibernateException e) {
-			transaction.rollback();
+
 			throw e;
 		} catch (MiddlewareQueryException e) {
-			transaction.rollback();
+
 			throw e;
 		}
 	}

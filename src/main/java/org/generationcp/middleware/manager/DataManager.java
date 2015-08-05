@@ -483,12 +483,12 @@ public abstract class DataManager extends DatabaseBroker {
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			Object recordSaved = dao.save(entity);
-			trans.commit();
+
 			return recordSaved;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n" + e.getMessage(), e,
 					DataManager.LOG);
@@ -504,12 +504,12 @@ public abstract class DataManager extends DatabaseBroker {
 		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
+
 			Object recordSaved = dao.saveOrUpdate(entity);
-			trans.commit();
+
 			return recordSaved;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n" + e.getMessage(), e,
 					DataManager.LOG);
@@ -570,11 +570,11 @@ public abstract class DataManager extends DatabaseBroker {
 		Session session = this.getActiveSession();
 		Transaction trans = null;
 		try {
-			trans = session.beginTransaction();
+
 			work.doWork();
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered with " + work.getName() + e.getMessage(), e, DataManager.LOG);
 		} finally {
 			session.flush();

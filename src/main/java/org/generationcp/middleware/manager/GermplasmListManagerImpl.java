@@ -32,11 +32,13 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the GermplasmListManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
  */
 @SuppressWarnings("unchecked")
+@Transactional
 public class GermplasmListManagerImpl extends DataManager implements GermplasmListManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListManagerImpl.class);
@@ -267,7 +269,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		List<Integer> germplasmListIds = new ArrayList<Integer>();
 		try {
 			// begin save transaction
-			trans = session.beginTransaction();
+
 
 			for (GermplasmList germplasmList : germplasmLists) {
 				if (operation == Operation.ADD) {
@@ -286,9 +288,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 				}
 			}
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while saving Germplasm List: GermplasmListManager.addOrUpdateGermplasmList(germplasmLists="
 							+ germplasmLists + ", operation-" + operation + "): " + e.getMessage(), e, GermplasmListManagerImpl.LOG);
@@ -322,7 +324,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		int germplasmListsDeleted = 0;
 		try {
 			// begin delete transaction
-			trans = session.beginTransaction();
+
 
 			List<Integer> listIds = new ArrayList<Integer>();
 			for (GermplasmList germplasmList : germplasmLists) {
@@ -343,11 +345,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 			// end transaction, commit to database
 			if (!trans.wasCommitted()) {
-				trans.commit();
+
 			}
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while deleting Germplasm List: GermplasmListManager.deleteGermplasmList(germplasmLists="
 							+ germplasmLists + "): " + e.getMessage(), e, GermplasmListManagerImpl.LOG);
@@ -397,7 +399,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		List<Integer> idGermplasmListDataSaved = new ArrayList<Integer>();
 		try {
 			// begin save transaction
-			trans = session.beginTransaction();
+
 
 			GermplasmListDataDAO dao = new GermplasmListDataDAO();
 			dao.setSession(session);
@@ -423,9 +425,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 				this.getTransactionDao().cancelUnconfirmedTransactionsForListEntries(deletedListEntryIds);
 			}
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while saving Germplasm List Data: GermplasmListManager.addOrUpdateGermplasmListData(germplasmListDatas="
 							+ germplasmListDatas + ", operation=" + operation + "): " + e.getMessage(), e, GermplasmListManagerImpl.LOG);
@@ -447,15 +449,15 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		int germplasmListDataDeleted = 0;
 		try {
 			// begin delete transaction
-			trans = session.beginTransaction();
+
 
 			germplasmListDataDeleted = this.getGermplasmListDataDAO().deleteByListId(listId);
 			this.getTransactionDao().cancelUnconfirmedTransactionsForLists(Arrays.asList(new Integer[] {listId}));
 
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while deleting Germplasm List Data: GermplasmListManager.deleteGermplasmListDataByListId(listId="
 							+ listId + "): " + e.getMessage(), e, GermplasmListManagerImpl.LOG);
@@ -495,7 +497,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		int germplasmListDataDeleted = 0;
 		try {
 			// begin delete transaction
-			trans = session.beginTransaction();
+
 
 			List<Integer> listEntryIds = new ArrayList<Integer>();
 			for (GermplasmListData germplasmListData : germplasmListDatas) {
@@ -511,9 +513,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 				germplasmListDataDeleted++;
 			}
 			// end transaction, commit to database
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while deleting Germplasm List Data: GermplasmListManager.deleteGermplasmListData(germplasmListDatas="
 							+ germplasmListDatas + "): " + e.getMessage(), e, GermplasmListManagerImpl.LOG);
