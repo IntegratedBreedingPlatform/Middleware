@@ -787,4 +787,12 @@ public interface StudyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	public void saveGeolocationProperty(int geolocationId, int typeId, String value) throws MiddlewareQueryException;
+
+	/**
+	 * Retrieves all DMS project names with no program uuid.
+	 *
+	 * @throws MiddlewareQueryException
+	 * @return list of DMS project names with no programUUID
+	 */
+	public List<String> getAllSharedProjectNames() throws MiddlewareQueryException;
 }
