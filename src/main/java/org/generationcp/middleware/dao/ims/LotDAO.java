@@ -31,12 +31,16 @@ import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link Lot}.
- *
+ * 
  */
 public class LotDAO extends GenericDAO<Lot, Integer> {
 
+	/*
+	 * NOTE setting the trnstat=0 for actual_balance to include anticipated transaction to the total_amount. This is only temporary change
+	 * as required by BMS-1052
+	 */
 	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS = "SELECT i.lotid, i.eid, " + "  locid, scaleid, i.comments, "
-			+ "  SUM(CASE WHEN trnstat = 1 THEN trnqty ELSE 0 END) AS actual_balance, " + "  SUM(trnqty) AS available_balance, "
+			+ "  SUM(CASE WHEN trnstat = 0 THEN trnqty ELSE 0 END) AS actual_balance, " + "  SUM(trnqty) AS available_balance, "
 			+ "  SUM(CASE WHEN trnstat = 0 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS reserved_amt, ";
 
 	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS = LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS
