@@ -133,7 +133,7 @@ public class WorkbookBuilder extends Builder {
 		List<MeasurementRow> observations =
 				this.buildObservations(experiments, variables.getVariates(), factors, variates, isTrial, conditions);
 		List<TreatmentVariable> treatmentFactors = this.buildTreatmentFactors(variables);
-		List<ProjectProperty> projectProperties = this.getDataSetBuilder().getTrialDataset(id, dataSetId).getProperties();
+		List<ProjectProperty> projectProperties = this.getDataSetBuilder().getTrialDataset(id).getProperties();
 
 		for (ProjectProperty projectProperty : projectProperties) {
 			if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
@@ -334,7 +334,7 @@ public class WorkbookBuilder extends Builder {
 		if (dataSetId != null) {
 			this.setTreatmentFactorValues(treatmentFactors, dataSetId);
 		}
-		DmsProject dmsProject = this.getDataSetBuilder().getTrialDataset(id, dataSetId != null ? dataSetId : 0);
+		DmsProject dmsProject = this.getDataSetBuilder().getTrialDataset(id);
 		List<MeasurementVariable> experimentalDesignVariables = new ArrayList<MeasurementVariable>();
 		List<ProjectProperty> projectProperties = dmsProject != null ? dmsProject.getProperties() : new ArrayList<ProjectProperty>();
 
@@ -776,7 +776,7 @@ public class WorkbookBuilder extends Builder {
 
 	private VariableList getSingleRowOfEmptyTrialVariables(Workbook workbook, int studyId, int measurementDatasetId)
 			throws MiddlewareQueryException {
-		DmsProject trialProject = this.getDataSetBuilder().getTrialDataset(studyId, measurementDatasetId);
+		DmsProject trialProject = this.getDataSetBuilder().getTrialDataset(studyId);
 		DataSet dataset = this.getDataSetBuilder().build(trialProject.getProjectId());
 		VariableTypeList typeList = dataset.getFactorsByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
 		VariableList list = new VariableList();

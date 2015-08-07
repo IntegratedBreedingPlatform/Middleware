@@ -147,7 +147,7 @@ public class DatabaseBroker {
 		}
 	}
 
-	protected DmsProjectDao getDmsProjectDao() {
+	public DmsProjectDao getDmsProjectDao() {
 		DmsProjectDao dmsProjectDao = new DmsProjectDao();
 		dmsProjectDao.setSession(this.getActiveSession());
 		return dmsProjectDao;
