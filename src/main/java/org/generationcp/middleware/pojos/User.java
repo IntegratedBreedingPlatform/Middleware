@@ -23,11 +23,14 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -101,7 +104,8 @@ public class User implements Serializable, BeanFormState {
 	@Transient
 	private Boolean isnew = false;
 
-	@Transient
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name="personid", insertable=false, updatable=false)
 	private Person person;
 
 	@Transient

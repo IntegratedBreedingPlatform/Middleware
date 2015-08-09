@@ -59,6 +59,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String ERROR_INVALID_VARIABLE_NAME_LENGTH = "error.invalid.variable.name.length";
 	public static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
 
+	public DataImportServiceImpl() {
+		super();
+		
+	}
 	public DataImportServiceImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}
