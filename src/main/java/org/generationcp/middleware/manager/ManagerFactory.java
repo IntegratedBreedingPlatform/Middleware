@@ -96,7 +96,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public PedigreeDataManager getPedigreeDataManager() {
-		return new PedigreeDataManagerImpl(sessionProvider, databaseName);
+		return new PedigreeDataManagerImpl(this.sessionProvider);
 	}
 
 	public CrossStudyDataManager getCrossStudyDataManager() {
