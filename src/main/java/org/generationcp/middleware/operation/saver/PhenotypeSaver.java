@@ -121,19 +121,12 @@ public class PhenotypeSaver extends Saver {
 				phenotype.setObservableId(variable.getVariableType().getId());
 				phenotype.setName(String.valueOf(variable.getVariableType().getId()));
 
-				// TODO: This code needs reviewing to ensure that the commits from both master and ontology are maintained BMS-1403
-				// Master changes:
-				// https://github.com/IntegratedBreedingPlatform/Middleware/commits/master/src/main/java/org/generationcp/middleware/operation/saver/PhenotypeSaver.java
-				// Ontology branch changes:
-				// https://github.com/IntegratedBreedingPlatform/Middleware/commits/BMS-36-Ontology/src/main/java/org/generationcp/middleware/operation/saver/PhenotypeSaver.java
-
 				if (dataType != null && dataType.getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 
 					Enumeration enumeration = variable.getVariableType().getStandardVariable().getEnumerationByName(variable.getValue());
 					// in case the value entered is the id and not the enumeration code/name
 					if (enumeration == null && NumberUtils.isNumber(variable.getValue())) {
-						enumeration =
-								variable.getVariableType().getStandardVariable()
+						enumeration = variable.getVariableType().getStandardVariable()
 								.getEnumeration(Double.valueOf(variable.getValue()).intValue());
 					}
 					if (enumeration != null) {
@@ -207,8 +200,8 @@ public class PhenotypeSaver extends Saver {
 					this.getCvTermRelationshipDao().getBySubjectIdAndTypeId(scaleRelationship.getObjectId(), TermId.HAS_VALUE.getId());
 			if (possibleValues != null) {
 				for (CVTermRelationship cvTermRelationship : possibleValues) {
-					possibleValuesMap.put(cvTermRelationship.getObjectId(), this.getCvTermDao().getById(cvTermRelationship.getObjectId())
-							.getName());
+					possibleValuesMap.put(cvTermRelationship.getObjectId(),
+							this.getCvTermDao().getById(cvTermRelationship.getObjectId()).getName());
 				}
 			}
 		}
