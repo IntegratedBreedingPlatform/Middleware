@@ -6,8 +6,8 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype;
-import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
+import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.hibernate.Session;
 
 

@@ -45,8 +45,6 @@ import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -92,8 +90,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		Term existingStdVar = this.findTermByName(stdVariable.getName(), CvId.VARIABLES);
 		if (existingStdVar != null) {
@@ -145,8 +143,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 
 
@@ -168,8 +166,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public void addStandardVariableForMigrator(StandardVariable stdVariable) throws MiddlewareQueryException {
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		Term existingStdVar = this.findTermByName(stdVariable.getName(), CvId.VARIABLES);
 		if (existingStdVar != null) {
@@ -346,8 +344,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			return term;
 		}
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 			if (CvId.VARIABLES.getId() != cvId.getId()) {
@@ -367,8 +365,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public void updateTerm(Term term) throws MiddlewareException {
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		if (term == null) {
 			return;
@@ -448,8 +446,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			return term;
 		}
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -473,8 +471,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -492,8 +490,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public void addOrUpdateCropOntologyID(Property property, String cropOntologyID) throws MiddlewareQueryException {
 		assert !StringUtils.isEmpty(cropOntologyID);
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -508,18 +506,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId)
 			throws MiddlewareException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
 		try {
-
 			Term term = this.saveOrUpdateCvTerm(name, definition, cvId);
 			this.saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
-
-
 			return term;
 		} catch (MiddlewareQueryException e) {
-
 			throw new MiddlewareQueryException(e.getCode(), e);
 		}
 	}
@@ -527,8 +518,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public Term updateTermAndRelationship(Term term, int typeId, int objectId) throws MiddlewareException {
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
 		Term updatedTerm = null;
 
 		if (term == null) {
@@ -536,12 +525,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		}
 
 		try {
-
-
 			updatedTerm = this.getTermSaver().update(term);
-
 			this.saveOrUpdateCvTermRelationship(updatedTerm.getId(), objectId, typeId);
-
 
 		} catch (Exception e) {
 
@@ -631,9 +616,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			return new TraitClass(term, this.getTermById(parentTraitClassId));
 		}
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
 		try {
 
 			term = this.getTermSaver().save(name, definition, CvId.IBDB_TERMS);
@@ -641,7 +623,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			if (term != null) {
 				this.getTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), parentTraitClassId);
 			}
-
 
 		} catch (Exception e) {
 
@@ -723,8 +704,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			throw new MiddlewareQueryException(errorCodes, "The variable you entered is invalid");
 		}
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -746,8 +727,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) throws MiddlewareException {
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -762,8 +743,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public void deleteStandardVariableLocalConstraints(int standardVariableId) throws MiddlewareQueryException {
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -789,8 +770,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 		Integer cvId = this.getEnumerationCvId(variable);
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -814,8 +795,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 		Integer cvId = this.getEnumerationCvId(variable);
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -850,8 +831,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public void deleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -868,8 +849,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public void deleteTerm(int cvTermId, CvId cvId) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -888,8 +869,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public void deleteTermAndRelationship(int cvTermId, CvId cvId, int typeId, int objectId) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 			if (this.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId) != null) {
@@ -956,8 +937,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 

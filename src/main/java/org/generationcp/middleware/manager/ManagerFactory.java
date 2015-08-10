@@ -40,7 +40,6 @@ import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.ReportService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
-import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

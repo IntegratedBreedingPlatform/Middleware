@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.dao.gdms.AccMetadataSetDAO;
 import org.generationcp.middleware.dao.gdms.AlleleValuesDAO;
 import org.generationcp.middleware.dao.gdms.CharValuesDAO;
@@ -75,7 +74,6 @@ import org.generationcp.middleware.pojos.gdms.MarkerNameElement;
 import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
 import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.generationcp.middleware.pojos.gdms.MarkerUserInfo;
-import org.generationcp.middleware.pojos.gdms.MarkerUserInfoDetails;
 import org.generationcp.middleware.pojos.gdms.Mta;
 import org.generationcp.middleware.pojos.gdms.MtaMetadata;
 import org.generationcp.middleware.pojos.gdms.ParentElement;
@@ -89,8 +87,6 @@ import org.generationcp.middleware.pojos.gdms.SSRDataRow;
 import org.generationcp.middleware.pojos.gdms.TrackData;
 import org.generationcp.middleware.pojos.gdms.TrackMarker;
 import org.generationcp.middleware.util.DatabaseBroker;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -929,8 +925,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addQtlDetails(QtlDetails qtlDetails) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 		Integer savedId = null;
 		try {
 
@@ -946,8 +942,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.logAndThrowException("Error encountered while saving Qtl Details: GenotypicDataManager.addQtlDetails(qtlDetails="
 					+ qtlDetails + "): " + e.getMessage(), e, GenotypicDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return savedId;
 
@@ -976,8 +970,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addAccMetadataSet(AccMetadataSet accMetadataSet) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 		Integer savedId = null;
 
 		try {
@@ -991,16 +985,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.logAndThrowException("Error encountered with addAccMetadataSet(accMetadataSet=" + accMetadataSet + "): " + e.getMessage(),
 					e, GenotypicDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return savedId;
 	}
 
 	@Override
 	public Integer addMarkerMetadataSet(MarkerMetadataSet markerMetadataSet) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 		Integer savedId = null;
 
 		try {
@@ -1015,8 +1007,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.logAndThrowException(
 					"Error encountered with addMarkerMetadataSet(markerMetadataSet=" + markerMetadataSet + "): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return savedId;
 	}
@@ -1030,19 +1020,17 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	public Integer addGDMSMarker(Marker marker) throws MiddlewareQueryException {
 		// Check for existence. duplicate marker names are not allowed.
 
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 		Integer id = null;
 		try {
-			// begin save transaction
+			
 
 			id = this.saveMarkerIfNotExisting(marker, marker.getMarkerType());
 
 		} catch (Exception e) {
 
 			this.logAndThrowException("Error encountered while adding Marker: " + e.getMessage(), e, GenotypicDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return id;
 	}
@@ -1147,11 +1135,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	private Boolean setMarker(Marker marker, String markerType, MarkerAlias markerAlias, MarkerDetails markerDetails,
 			MarkerUserInfo markerUserInfo) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			// begin save transaction
+			
 
 
 			// Add GDMS Marker
@@ -1177,16 +1165,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.logAndThrowException("Error encountered while saving Marker: " + e.getMessage(), e, GenotypicDataManagerImpl.LOG);
 			return false;
-		} finally {
-			session.flush();
-		}
-
+		} 
 	}
 
 	@Override
 	public Boolean setQTL(Dataset dataset, DatasetUsers datasetUser, List<QtlDataRow> rows) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 		try {
 
 
@@ -1212,8 +1197,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.logAndThrowException("Error encountered with setQTL(): " + e.getMessage(), e, GenotypicDataManagerImpl.LOG);
 			return false;
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -1222,8 +1205,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			List<AccMetadataSet> accMetadataSets, List<DartValues> dartValueList, List<AlleleValues> alleleValueList)
 			throws MiddlewareQueryException {
 
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -1255,8 +1238,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.logAndThrowException("Error encountered while setting DArT: setDart(): " + e.getMessage(), e, GenotypicDataManagerImpl.LOG);
 			return false;
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -1264,8 +1245,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	public Boolean setSSR(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets,
 			List<AccMetadataSet> accMetadataSets, List<AlleleValues> alleleValueList) throws MiddlewareQueryException {
 
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -1292,8 +1273,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.logAndThrowException("Error encountered while setting SSR: setSSR(): " + e.getMessage(), e, GenotypicDataManagerImpl.LOG);
 			return false;
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -1301,8 +1280,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	public Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets,
 			List<AccMetadataSet> accMetadataSets, List<CharValues> charValueList) throws MiddlewareQueryException {
 
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -1328,8 +1307,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.logAndThrowException("Error encountered while setting SNP: setSNP(): " + e.getMessage(), e, GenotypicDataManagerImpl.LOG);
 			return false;
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -1338,8 +1315,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList)
 			throws MiddlewareQueryException {
 
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -1365,8 +1342,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.logAndThrowException("Error encountered while setting MappingABH: setMappingABH(): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
 			return false;
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -1375,8 +1350,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList,
 			List<CharValues> charValueList) throws MiddlewareQueryException {
 
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -1407,8 +1382,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.logAndThrowException("Error encountered while setting MappingAllelicSNP: setMappingAllelicSNP(): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
 			return false;
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -1417,8 +1390,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList,
 			List<AlleleValues> alleleValueList, List<DartValues> dartValueList) throws MiddlewareQueryException {
 
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -1455,8 +1428,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 					"Error encountered while setting MappingAllelicSSRDArT: setMappingAllelicSSRDArT(): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
 			return false;
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -1467,8 +1438,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		if (dataset == null || dataset.getDatasetId() == null) {
 			throw new MiddlewareException("Dataset is null and cannot be updated.");
 		}
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -1517,8 +1488,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.logAndThrowException("Error encountered while updating DArT: updateDart(): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return false;
 	}
@@ -1531,8 +1500,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			throw new MiddlewareException("Dataset is null and cannot be updated.");
 		}
 
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -1575,8 +1544,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.logAndThrowException("Error encountered while updating SSR: updateSSR(): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return false;
 	}
@@ -1589,8 +1556,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			throw new MiddlewareException("Dataset is null and cannot be updated.");
 		}
 
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -1632,8 +1599,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.logAndThrowException("Error encountered while updating SNP: updateSNP(): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return false;
 	}
@@ -1646,8 +1611,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			throw new MiddlewareException("Dataset is null and cannot be updated.");
 		}
 
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -1689,8 +1654,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.logAndThrowException("Error encountered while updating MappingABH: updateMappingABH(): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return false;
 	}
@@ -1704,8 +1667,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			throw new MiddlewareException("Dataset is null and cannot be updated.");
 		}
 
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -1754,8 +1717,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.logAndThrowException("Error encountered while updating MappingAllelicSNP: updateMappingAllelicSNP(): " + e.getMessage(),
 					e, GenotypicDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return false;
 	}
@@ -1769,8 +1730,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			throw new MiddlewareException("Dataset is null and cannot be updated.");
 		}
 
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -1826,8 +1787,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.logAndThrowException(
 					"Error encountered while updating MappingAllelicSSRDArT updateMappingAllelicSSRDArT(): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return false;
 
@@ -1866,8 +1825,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Boolean setMaps(Marker marker, MarkerOnMap markerOnMap, Map map) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 		try {
 
 			Integer markerSavedId = this.saveMarker(marker, GenotypicDataManagerImpl.TYPE_UA);
@@ -1879,8 +1838,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			this.logAndThrowException("Error encountered while setting Maps: setMaps(): " + e.getMessage(), e, GenotypicDataManagerImpl.LOG);
 			return false;
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -2006,8 +1963,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public void deleteQTLs(List<Integer> qtlIds, Integer datasetId) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -2030,8 +1987,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public void deleteSSRGenotypingDatasets(Integer datasetId) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -2050,8 +2007,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public void deleteSNPGenotypingDatasets(Integer datasetId) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -2070,8 +2027,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public void deleteDArTGenotypingDatasets(Integer datasetId) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -2092,8 +2049,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public void deleteMappingPopulationDatasets(Integer datasetId) throws MiddlewareQueryException {
 
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -2134,8 +2091,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public void deleteMaps(Integer mapId) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -2168,8 +2125,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public void addMTA(Dataset dataset, Mta mta, MtaMetadata mtaMetadata, DatasetUsers users) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		if (dataset == null) {
 			this.logAndThrowException("Dataset passed must not be null");
@@ -2211,8 +2168,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.logAndThrowException("Dataset passed must not be null");
 		}
 
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -2259,8 +2216,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public void deleteMTA(List<Integer> datasetIds) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -2291,8 +2248,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.logAndThrowException("Error in GenotypicDataManager.addMtaMetadata: MtaMetadata.datasetID must not be null.");
 		}
 
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -2824,8 +2781,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	// GCP-8566
 	@Override
 	public void addHaplotype(TrackData trackData, List<TrackMarker> trackMarkers) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -3095,8 +3052,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			}
 		}
 
-		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -3125,8 +3082,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.logAndThrowException("Error encountered while updating MarkerInfo: updateMarkerInfo(marker=" + marker + ", markerAlias="
 					+ markerAlias + ", markerDetails=" + markerDetails + ", markerUserInfo=" + markerUserInfo + "): " + e.getMessage(), e,
 					GenotypicDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return false;
 	}

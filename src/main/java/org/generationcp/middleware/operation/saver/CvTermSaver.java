@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.List;
-
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;

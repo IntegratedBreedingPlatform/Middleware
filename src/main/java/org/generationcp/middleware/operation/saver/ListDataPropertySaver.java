@@ -10,8 +10,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.util.DatabaseBroker;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -23,17 +21,8 @@ public class ListDataPropertySaver extends Saver {
 
 	public List<ListDataInfo> saveProperties(List<ListDataInfo> listDataCollection) throws MiddlewareQueryException {
 
-		Session sessionForLocal = this.getCurrentSession();
-		sessionForLocal.flush();
-
-		// initialize session & transaction
-		Session session = sessionForLocal;
-		Transaction trans = null;
 
 		try {
-			// begin save transaction
-
-
 			Integer recordsSaved = 0;
 			for (ListDataInfo listDataObj : listDataCollection) {
 				Integer listDataId = listDataObj.getListDataId();
@@ -73,32 +62,19 @@ public class ListDataPropertySaver extends Saver {
 					throw new MiddlewareQueryException("List Data ID cannot be null.");
 				}
 			}
-			// end transaction, commit to database
+			
 
 		} catch (MiddlewareQueryException e) {
 
 			throw new MiddlewareQueryException("Error in saving List Data properties - " + e.getMessage(), e);
 
-		} finally {
-			sessionForLocal.flush();
 		}
-
 		return listDataCollection;
 	}
 
 	public List<ListDataProperty> saveListDataProperties(List<ListDataProperty> listDataProps) throws MiddlewareQueryException {
 
-		Session sessionForLocal = this.getCurrentSession();
-		sessionForLocal.flush();
-
-		// initialize session & transaction
-		Session session = sessionForLocal;
-		Transaction trans = null;
-
 		try {
-			// begin save transaction
-
-
 			Integer recordsSaved = 0;
 			for (ListDataProperty listDataProperty : listDataProps) {
 
@@ -120,8 +96,6 @@ public class ListDataPropertySaver extends Saver {
 
 			throw new MiddlewareQueryException("Error in saving List Data properties - " + e.getMessage(), e);
 
-		} finally {
-			sessionForLocal.flush();
 		}
 
 		return listDataProps;

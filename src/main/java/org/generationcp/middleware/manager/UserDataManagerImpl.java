@@ -23,11 +23,9 @@ import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.annotation.Propagation;
 
 /**
  * Implementation of the UserDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -58,7 +56,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	@Override
 	public Integer addUser(User user) throws MiddlewareQueryException {
 		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
 
 		Integer idUserSaved = null;
 		try {
@@ -83,7 +81,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	@Override
 	public Integer updateUser(User user) throws MiddlewareQueryException {
 		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
 
 		try {
 
@@ -108,7 +106,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	@Override
 	public void deleteUser(User user) throws MiddlewareQueryException {
 		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
 
 		try {
 
@@ -149,7 +147,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	@Override
 	public Integer addPerson(Person person) throws MiddlewareQueryException {
 		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
 
 		Integer idPersonSaved = null;
 		try {
@@ -179,7 +177,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	@Override
 	public void deletePerson(Person person) throws MiddlewareQueryException {
 		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
 
 		try {
 

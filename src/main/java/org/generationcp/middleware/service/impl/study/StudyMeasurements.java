@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.TraitDto;
-import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 

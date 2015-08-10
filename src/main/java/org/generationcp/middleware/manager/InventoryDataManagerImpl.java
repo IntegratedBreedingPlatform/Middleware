@@ -46,8 +46,6 @@ import org.generationcp.middleware.util.DatabaseBroker;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -172,8 +170,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	@Override
 	public Integer addStockTransaction(StockTransaction stockTransaction) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -194,13 +192,13 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	}
 
 	private List<Integer> addOrUpdateLot(List<Lot> lots, Operation operation) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		int lotsSaved = 0;
 		List<Integer> idLotsSaved = new ArrayList<Integer>();
 		try {
-			// begin save transaction
+			
 
 			LotDAO dao = this.getLotDao();
 
@@ -214,7 +212,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 					dao.clear();
 				}
 			}
-			// end transaction, commit to database
+			
 
 		} catch (ConstraintViolationException e) {
 
@@ -226,8 +224,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 			this.logAndThrowException("Error encountered while saving Lot: InventoryDataManager.addOrUpdateLot(lots=" + lots
 					+ ", operation=" + operation + "): " + e.getMessage(), e, InventoryDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 
 		return idLotsSaved;
@@ -265,13 +261,13 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	private List<Integer> addOrUpdateTransaction(List<org.generationcp.middleware.pojos.ims.Transaction> transactions, Operation operation)
 			throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		int transactionsSaved = 0;
 		List<Integer> idTransactionsSaved = new ArrayList<Integer>();
 		try {
-			// begin save transaction
+			
 
 			TransactionDAO dao = this.getTransactionDao();
 
@@ -285,15 +281,13 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 					dao.clear();
 				}
 			}
-			// end transaction, commit to database
+			
 
 		} catch (Exception e) {
 
 			this.logAndThrowException(
 					"Error encountered while saving Transaction: InventoryDataManager.addOrUpdateTransaction(transactions=" + transactions
 							+ ", operation=" + operation + "): " + e.getMessage(), e, InventoryDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 
 		return idTransactionsSaved;
@@ -477,9 +471,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	@Override
 	public List<LotReportRow> generateReportOnDormantLots(int year, int start, int numOfRows) throws MiddlewareQueryException {
-		Session sessionForLocal = this.getCurrentSession();
+		
 
-		SQLQuery query = sessionForLocal.createSQLQuery(Lot.GENERATE_REPORT_ON_DORMANT);
+		SQLQuery query = this.getActiveSession().createSQLQuery(Lot.GENERATE_REPORT_ON_DORMANT);
 		query.setParameter("year", year);
 		query.setFirstResult(start);
 		query.setMaxResults(numOfRows);
@@ -865,8 +859,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	@Override
 	public void updateInventory(Integer listId, List<InventoryDetails> inventoryDetailList) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 		try {
 
 			GermplasmList germplasmList = this.getGermplasmListDAO().getById(listId);
@@ -885,10 +879,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 					transaction.setBulkCompl(Util.nullIfEmpty(inventoryDetails.getBulkCompl()));
 				}
 				this.getTransactionDao().saveOrUpdate(transaction);
-				if (numberOfEntries % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					session.flush();
-					session.clear();
-				}
 				numberOfEntries++;
 			}
 
@@ -896,9 +886,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 			this.logAndThrowException("Error encountered while updating inventory " + "of list id " + listId + "." + e.getMessage(), e,
 					InventoryDataManagerImpl.LOG);
-		} finally {
-			session.flush();
-			session.clear();
 		}
 	}
 

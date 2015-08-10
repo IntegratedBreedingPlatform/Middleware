@@ -20,7 +20,6 @@ import org.generationcp.middleware.pojos.mbdt.SelectedGenotype;
 import org.generationcp.middleware.pojos.mbdt.SelectedMarker;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;

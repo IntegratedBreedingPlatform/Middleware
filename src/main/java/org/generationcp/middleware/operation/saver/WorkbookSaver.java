@@ -49,7 +49,6 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.util.TimerWatch;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -138,7 +137,7 @@ public class WorkbookSaver extends Saver {
 	@SuppressWarnings("unchecked")
 	public int saveDataset(Workbook workbook, Map<String, ?> variableMap, boolean retainValues, boolean isDeleteObservations,
 			String programUUID) throws Exception {
-		Session session = this.getCurrentSession();
+		
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
 		Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
 		Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
@@ -184,9 +183,6 @@ public class WorkbookSaver extends Saver {
 			isDeleteTrialObservations = true;
 			// delete measurement data
 			this.getExperimentDestroyer().deleteExperimentsByStudy(datasetId);
-			session.flush();
-			session.clear();
-
 			// reset trial observation details such as experimentid, stockid and geolocationid
 			this.resetTrialObservations(workbook.getTrialObservations());
 		}
@@ -209,8 +205,7 @@ public class WorkbookSaver extends Saver {
 
 		// GCP-6091 end
 		if (isDeleteTrialObservations) {
-			session.flush();
-			session.clear();
+
 			ExperimentModel studyExperiment =
 					this.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(workbook.getStudyDetails().getId())).get(0);
 			studyExperiment.setGeoLocation(this.getGeolocationDao().getById(studyLocationId));
@@ -683,8 +678,6 @@ public class WorkbookSaver extends Saver {
 			throws MiddlewareQueryException {
 		Map<String, Integer> stockMap = this.getStockModelBuilder().getStockMapForDataset(datasetId);
 
-		Session session = this.getCurrentSession();
-		int i = 0;
 		List<Integer> variableIndexesList = new ArrayList<Integer>();
 		// we get the indexes so that in the next rows we dont need to compare anymore per row
 		if (workbook.getObservations() != null && !workbook.getObservations().isEmpty()) {
@@ -706,12 +699,6 @@ public class WorkbookSaver extends Saver {
 					this.getStockSaver().saveOrUpdateStock(stock, stockId);
 				}
 				row.setStockId(stockId);
-				if (i % 50 == 0) {
-					// to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
-					session.flush();
-					session.clear();
-				}
-				i++;
 			}
 		}
 
@@ -725,7 +712,7 @@ public class WorkbookSaver extends Saver {
 
 		// observation values start at row 2
 		int i = 2;
-		Session session = this.getCurrentSession();
+		
 		ExperimentValuesTransformer experimentValuesTransformer = this.getExperimentValuesTransformer();
 		ExperimentModelSaver experimentModelSaver = this.getExperimentModelSaver();
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
@@ -753,11 +740,6 @@ public class WorkbookSaver extends Saver {
 							}
 						}
 					}
-				}
-				if (i % 50 == 0) {
-					// to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
-					session.flush();
-					session.clear();
 				}
 			}
 		}
@@ -1082,7 +1064,7 @@ public class WorkbookSaver extends Saver {
 
 		// observation values start at row 2
 		int i = 2;
-		Session session = this.getCurrentSession();
+		
 		ExperimentValuesTransformer experimentValuesTransformer = this.getExperimentValuesTransformer();
 		ExperimentModelSaver experimentModelSaver = this.getExperimentModelSaver();
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
@@ -1114,11 +1096,6 @@ public class WorkbookSaver extends Saver {
 							}
 						}
 					}
-				}
-				if (i % 50 == 0) {
-					// to save memory space - http://docs.jboss.org/hibernate/core/3.3/reference/en/html/batch.html#batch-inserts
-					session.flush();
-					session.clear();
 				}
 			}
 		}

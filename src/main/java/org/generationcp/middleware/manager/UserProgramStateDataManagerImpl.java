@@ -12,10 +12,7 @@ import org.generationcp.middleware.pojos.UserProgramTreeState;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -74,8 +71,8 @@ public class UserProgramStateDataManagerImpl extends DataManager implements User
 	public UserProgramTreeState saveOrUpdateUserProgramTreeState(int userId, String programUuid, String type, List<String> treeState)
 			throws MiddlewareQueryException {
 		UserProgramTreeState userProgramTreeState = null;
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 		try {
 
 			userProgramTreeState = this.getUserProgramTreeState(userId, programUuid, type);

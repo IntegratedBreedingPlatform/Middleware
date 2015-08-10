@@ -67,13 +67,10 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -632,7 +629,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		Integer idPersonSaved = null;
 		try {
-			// begin save transaction
+			
 
 
 			Person recordSaved = this.getPersonDao().saveOrUpdate(person);
@@ -653,7 +650,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		Integer idUserSaved = null;
 		try {
-			// begin save transaction
+			
 
 
 			User recordSaved = this.getUserDao().saveOrUpdate(user);
@@ -691,7 +688,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		Integer workbenchDatasetSaved = null;
 		try {
-			// begin save transaction
+			
 
 			WorkbenchDataset datasetSaved = this.getWorkbenchDatasetDao().saveOrUpdate(dataset);
 			workbenchDatasetSaved = datasetSaved.getDatasetId().intValue();
@@ -843,7 +840,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 		Integer idSaved = null;
 		try {
-			// begin save transaction
+			
 
 			ProjectUserRole recordSaved = this.getProjectUserRoleDao().saveOrUpdate(projectUserRole);
 			idSaved = recordSaved.getProjectUserId();
@@ -860,15 +857,10 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public List<Integer> addProjectUserRole(List<ProjectUserRole> projectUserRoles) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		if (session == null) {
-			return new ArrayList<Integer>();
-		}
 		
-
 		List<Integer> idsSaved = new ArrayList<Integer>();
 		try {
-			// begin save transaction
+			
 
 			ProjectUserRoleDAO dao = this.getProjectUserRoleDao();
 
@@ -895,19 +887,10 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void deleteProjectUserRole(ProjectUserRole projectUserRole) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		if (session == null) {
-			return;
-		}
-
 		
-
 		try {
-
 			this.getProjectUserRoleDao().makeTransient(projectUserRole);
-
 		} catch (Exception e) {
-
 			this.logAndThrowException("Error encountered while deleting ProjectUser: WorkbenchDataManager.deleteProjectUser(projectUser="
 					+ projectUserRole + "): " + e.getMessage(), e);
 		}
@@ -936,10 +919,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public String addCropType(CropType cropType) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		if (session == null) {
-			return null;
-		}
 
 		CropTypeDAO dao = this.getCropTypeDao();
 		if (this.getCropTypeDao().getByName(cropType.getCropName()) != null) {
@@ -949,11 +928,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		
 		String idSaved = null;
 		try {
-			// begin save transaction
+			
 
 			CropType recordSaved = dao.saveOrUpdate(cropType);
 			idSaved = recordSaved.getCropName();
-			// end transaction, commit to database
+			
 
 		} catch (Exception e) {
 
@@ -987,13 +966,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	private List<Integer> addOrUpdateProjectActivityData(List<ProjectActivity> projectActivityList, Operation operation)
 			throws MiddlewareQueryException {
-
-		Session session = this.getCurrentSession();
-		if (session == null) {
-			return new ArrayList<Integer>();
-		}
-
-		
 
 		List<Integer> idsSaved = new ArrayList<Integer>();
 		try {
@@ -1304,34 +1276,16 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	private List<Integer> addProjectUserMysqlAccount(List<ProjectUserMysqlAccount> records) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		if (session == null) {
-			return new ArrayList<Integer>();
-		}
-
 		
 
 		List<Integer> idsSaved = new ArrayList<Integer>();
 		try {
-			// begin save transaction
-
-
 			ProjectUserMysqlAccountDAO dao = this.getProjectUserMysqlAccountDao();
 
 			for (ProjectUserMysqlAccount record : records) {
 				ProjectUserMysqlAccount recordSaved = dao.saveOrUpdate(record);
 				idsSaved.add(recordSaved.getId());
 			}
-
-			// end transaction, commit to database
-
-
-			// remove ProjectUserMysqlAccount data from session cache
-			for (ProjectUserMysqlAccount record : records) {
-				session.evict(record);
-			}
-			session.evict(records);
-
 		} catch (Exception e) {
 
 			this.logAndThrowException(
@@ -1432,7 +1386,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public UserInfo updateUserInfo(UserInfo userInfo) throws MiddlewareQueryException {
 		
-		Session session = this.getCurrentSession();
+		
 
 		try {
 
@@ -1445,17 +1399,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 			this.logAndThrowException("Cannot update userInfo =" + userInfo.getUserId() + "): " + e.getMessage(), e);
 
-		} finally {
-			session.flush();
 		}
-
 		return userInfo;
 	}
 
 	@Override
 	public void incrementUserLogInCount(int userId) throws MiddlewareQueryException {
 		
-		Session session = this.getCurrentSession();
+		
 
 		try {
 
@@ -1469,8 +1420,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} catch (Exception e) {
 
 			this.logAndThrowException("Cannot increment login count for user_id =" + userId + "): " + e.getMessage(), e);
-		} finally {
-			session.flush();
 		}
 	}
 

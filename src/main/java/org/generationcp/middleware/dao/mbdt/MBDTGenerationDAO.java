@@ -9,7 +9,6 @@ import org.generationcp.middleware.pojos.mbdt.MBDTGeneration;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.transaction.annotation.Transactional;
 

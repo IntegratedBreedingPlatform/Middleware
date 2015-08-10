@@ -71,7 +71,6 @@ import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -173,8 +172,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID)
 			throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -194,8 +193,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues, String programUUID)
 			throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -248,8 +247,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public void addExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues)
 			throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -265,8 +264,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues)
 			throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -282,8 +281,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValuesList)
 					throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -303,8 +302,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public int addTrialEnvironment(VariableList variableList) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -321,8 +320,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public int addStock(VariableList variableList) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -360,8 +359,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void addDataSetVariableType(int datasetId, VariableType variableType) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -376,8 +375,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void setExperimentValue(int experimentId, int variableId, String value) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -422,8 +421,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void deleteDataSet(int datasetId) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -437,8 +436,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void deleteExperimentsByLocation(int datasetId, int locationId) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -552,8 +551,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		if (info != null && !info.isEmpty()) {
 
-			Session session = this.getCurrentSession();
-			Transaction trans = null;
+			
+			
 
 			try {
 
@@ -580,8 +579,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public void saveTrialDatasetSummary(DmsProject project, VariableTypeList variableTypeList, List<ExperimentValues> experimentValues,
 			List<Integer> locationIds) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -662,8 +661,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("Folder name is not unique");
 		}
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -689,8 +688,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		if (isExisting) {
 			throw new MiddlewareQueryException("Folder name is not unique");
 		}
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 		try {
 
 			DmsProject project = this.getProjectSaver().saveFolder(parentFolderId, name, description, programUUID);
@@ -716,9 +715,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("Target Project is not existing");
 		}
 
-		Transaction trans = null;
+		
 		try {
-			Session session = this.getCurrentSession();
+			
 
 
 
@@ -749,8 +748,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("Folder is not empty");
 		}
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 		try {
 
 			// modify the folder name
@@ -1043,8 +1042,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public void saveOrUpdatePhenotypeOutliers(List<PhenotypeOutlier> phenotyleOutliers) throws MiddlewareQueryException {
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 		PhenotypeOutlierDao phenotypeOutlierDao = this.getPhenotypeOutlierDao();
 		int i = 0;
 
@@ -1102,8 +1101,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public void deleteProgramStudies(String programUUID) throws MiddlewareQueryException {
 		List<Integer> projectIds = this.getDmsProjectDao().getAllProgramStudiesAndFolders(programUUID);
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -1119,8 +1118,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void updateVariableOrdering(int datasetId, List<Integer> variableIds) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 

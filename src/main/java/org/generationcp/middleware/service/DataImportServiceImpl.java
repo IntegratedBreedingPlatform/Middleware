@@ -40,7 +40,6 @@ import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.util.TimerWatch;
-import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,8 +95,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	@Override
 	public int saveDataset(Workbook workbook, boolean retainValues, boolean isDeleteObservations, String programUUID)
 			throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 		Map<String, ?> variableMap = null;
 		TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)");
 		try {
@@ -596,8 +595,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	@Override
 	public int saveProjectOntology(Workbook workbook, String programUUID) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 		TimerWatch timerWatch = new TimerWatch("saveProjectOntology (grand total)");
 		int studyId = 0;
 
@@ -620,8 +619,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	@Override
 	public int saveProjectData(Workbook workbook, String programUUID) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 		TimerWatch timerWatch = new TimerWatch("saveProjectData (grand total)");
 
 		try {

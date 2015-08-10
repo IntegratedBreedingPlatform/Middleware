@@ -36,8 +36,6 @@ import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.DatabaseBroker;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -284,12 +282,12 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public Integer addLocation(Location location) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		Integer idLocationSaved = null;
 		try {
-			// begin save transaction
+			
 
 			LocationDAO dao = this.getLocationDao();
 
@@ -301,20 +299,18 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 			this.logAndThrowException("Error encountered while saving Location: LocationDataManager.addLocation(location=" + location
 					+ "): " + e.getMessage(), e, LocationDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return idLocationSaved;
 	}
 
 	@Override
 	public List<Integer> addLocation(List<Location> locations) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		List<Integer> idLocationsSaved = new ArrayList<Integer>();
 		try {
-			// begin save transaction
+			
 
 			LocationDAO dao = this.getLocationDao();
 
@@ -328,20 +324,18 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 			this.logAndThrowException("Error encountered while saving Locations: LocationDataManager.addLocation(locations=" + locations
 					+ "): " + e.getMessage(), e, LocationDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return idLocationsSaved;
 	}
 
 	@Override
 	public int addLocationAndLocdes(Location location, Locdes locdes) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		Integer idLocationSaved = null;
 		try {
-			// begin save transaction
+			
 
 
 			// Auto-assign IDs for new DB records
@@ -358,16 +352,14 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 			this.logAndThrowException("Error encountered while saving Location: addLocationAndLocdes(" + "location=" + location
 					+ ", locdes=" + locdes + "): " + e.getMessage(), e, LocationDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return idLocationSaved;
 	}
 
 	@Override
 	public void deleteLocation(Location location) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
@@ -377,8 +369,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 			this.logAndThrowException("Error encountered while deleting Location: LocationDataManager.deleteLocation(location=" + location
 					+ "): " + e.getMessage(), e, LocationDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -542,8 +532,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public void deleteProgramLocationsByUniqueId(String programUUID) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 		LocationDAO locationDao = this.getLocationDao();
 		int deleted = 0;
 		try {
@@ -563,8 +553,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 					"Error encountered while deleting locations: GermplasmDataManager.deleteProgramLocationsByUniqueId(uniqueId="
 							+ programUUID + "): " + e.getMessage(),
 					e, LocationDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 	}
 

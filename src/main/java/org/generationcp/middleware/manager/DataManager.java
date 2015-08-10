@@ -60,7 +60,6 @@ import org.generationcp.middleware.operation.saver.StudySaver;
 import org.generationcp.middleware.operation.searcher.StudySearcherByNameStartSeasonCountry;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -480,7 +479,7 @@ public abstract class DataManager extends DatabaseBroker {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public Object save(GenericDAO dao, Object entity) throws MiddlewareQueryException {
 		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
 
 		try {
 
@@ -501,7 +500,7 @@ public abstract class DataManager extends DatabaseBroker {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public Object saveOrUpdate(GenericDAO dao, Object entity) throws MiddlewareQueryException {
 		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
 
 		try {
 
@@ -568,7 +567,7 @@ public abstract class DataManager extends DatabaseBroker {
 
 	void doInTransaction(Work work) throws MiddlewareQueryException {
 		Session session = this.getActiveSession();
-		Transaction trans = null;
+		
 		try {
 
 			work.doWork();

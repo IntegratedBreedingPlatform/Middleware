@@ -34,10 +34,8 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
-import org.hibernate.Hibernate;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-
-import org.hibernate.Session;
+import org.hibernate.Hibernate;
 
 public class ProjectPropertySaver extends Saver {
 
@@ -340,13 +338,12 @@ public class ProjectPropertySaver extends Saver {
 	private void deleteVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, int storedInId, int termId,
 			Geolocation geolocation) throws MiddlewareQueryException {
 
-		Session session = this.getCurrentSession();
+		
 		this.deleteVariable(project, termId);
 		if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(storedInId)) {
 			this.deleteVariable(trialDataset, termId);
 			this.deleteVariable(measurementDataset, termId);
-			session.flush();
-			session.clear();
+
 			if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
 				this.getGeolocationPropertyDao().deleteGeolocationPropertyValueInProject(project.getProjectId(), termId);
 			} else {

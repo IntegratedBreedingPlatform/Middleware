@@ -12,9 +12,9 @@ import java.util.List;
 
 import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.TraitDto;
-import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.hibernate.Session;
 import org.junit.Before;
 import org.junit.Test;
