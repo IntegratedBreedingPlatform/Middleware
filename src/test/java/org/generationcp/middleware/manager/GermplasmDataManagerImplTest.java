@@ -466,11 +466,11 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testAddMethods() throws MiddlewareQueryException {
 		List<Method> methods = new ArrayList<Method>();
 		String programUUID = UUID.randomUUID().toString();
-		methods.add(new Method(1, "GEN", "S", "UGM", "yesno", "description 1", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
+		methods.add(new Method(null, "GEN", "S", "UGM", "yesno", "description 1", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
 				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610), programUUID));
-		methods.add(new Method(2, "GEN", "S", "UGM", "yesno", "description 2", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
+		methods.add(new Method(null, "GEN", "S", "UGM", "yesno", "description 2", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
 				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610), programUUID));
-		methods.add(new Method(3, "GEN", "S", "UGM", "yesno", "description 3", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
+		methods.add(new Method(null, "GEN", "S", "UGM", "yesno", "description 3", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
 				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610), programUUID));
 
 		List<Integer> methodsAdded = GermplasmDataManagerImplTest.manager.addMethod(methods);
@@ -966,10 +966,8 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
 	public void getProgramMethodsAndDeleteByUniqueId() {
 		// create program locations
 		String programUUID = GermplasmDataManagerImplTest.commonTestProject.getUniqueID();
-		int testMethodID1 = 100000;
-		int testMethodID2 = 100001;
-		Method testMethod1 = this.createMethodTestData(testMethodID1, programUUID);
-		Method testMethod2 = this.createMethodTestData(testMethodID2, programUUID);
+		Method testMethod1 = this.createMethodTestData(programUUID);
+		Method testMethod2 = this.createMethodTestData(programUUID);
 		try {
 			GermplasmDataManagerImplTest.manager.addMethod(testMethod1);
 			GermplasmDataManagerImplTest.manager.addMethod(testMethod2);
@@ -985,12 +983,11 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
 		}
 	}
 
-	private Method createMethodTestData(int id, String programUUID) {
+	private Method createMethodTestData(String programUUID) {
 		Method method = new Method();
 		method.setUniqueID(programUUID);
-		method.setMid(id);
-		method.setMname("TEST-LOCATION" + id);
-		method.setMdesc("TEST-LOCATION-DESC" + id);
+		method.setMname("TEST-LOCATION" + System.currentTimeMillis());
+		method.setMdesc("TEST-LOCATION-DESC" + System.currentTimeMillis());
 		method.setMcode("0");
 		method.setMgrp("0");
 		method.setMtype("0");
@@ -1017,7 +1014,7 @@ public class GermplasmDataManagerImplTest extends DataManagerIntegrationTest {
 	@Ignore
 	// TODO: This test is failed in Ontology branch. There is no lgid with -1 value in DBScripts.
 	public void testGetGermplasmByLocalGID() throws Exception {
-		Integer lgid = 0;
+		Integer lgid = 1;
 
 		Germplasm germplasm = GermplasmDataManagerImplTest.manager.getGermplasmByLocalGid(lgid);
 

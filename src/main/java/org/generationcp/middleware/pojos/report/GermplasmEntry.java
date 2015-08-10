@@ -1,6 +1,12 @@
 
 package org.generationcp.middleware.pojos.report;
 
+/**
+ * This is being used in JasperReport, any changes in the attribute names should be reflected in the corresponding JasperReports
+ * 
+ * @author EfficioDaniel
+ * 
+ */
 public class GermplasmEntry {
 
 	private String sTrialCycle;
@@ -81,7 +87,7 @@ public class GermplasmEntry {
 	private String sEnt2;
 	private String ischeck;
 	private Integer sinoffset;
-	
+
 	public GermplasmEntry() {
 	}
 
@@ -89,112 +95,16 @@ public class GermplasmEntry {
 		this.entryNum = entryNum;
 	}
 
-	public String getFCrossName() {
-		return this.fCrossName;
+	public String getsTrialCycle() {
+		return sTrialCycle;
 	}
 
-	public void setFCrossName(String fCrossName) {
-		this.fCrossName = fCrossName;
-	}
-
-	public String getFTabbr() {
-		return this.fTabbr;
-	}
-
-	public void setFTabbr(String fTabbr) {
-		this.fTabbr = fTabbr;
-	}
-
-	public Integer getEntryNum() {
-		return this.entryNum;
-	}
-
-	public void setEntryNum(Integer entryNum) {
-		this.entryNum = entryNum;
-	}
-
-	public String getFSelHist() {
-		return this.fSelHist;
-	}
-
-	public void setFSelHist(String fSelHist) {
-		this.fSelHist = fSelHist;
-	}
-
-	public String getMCrossName() {
-		return this.mCrossName;
-	}
-
-	public void setMCrossName(String mCrossName) {
-		this.mCrossName = mCrossName;
-	}
-
-	public String getMSelHist() {
-		return this.mSelHist;
-	}
-
-	public void setMSelHist(String mSelHist) {
-		this.mSelHist = mSelHist;
-	}
-
-	public String getMTabbr() {
-		return this.mTabbr;
-	}
-
-	public void setMTabbr(String mTabbr) {
-		this.mTabbr = mTabbr;
-	}
-
-	public String getFlocycle() {
-		return this.flocycle;
-	}
-
-	public void setFlocycle(String flocycle) {
-		this.flocycle = flocycle;
-	}
-
-	public String getMlocycle() {
-		return this.mlocycle;
-	}
-
-	public void setMlocycle(String mlocycle) {
-		this.mlocycle = mlocycle;
-	}
-
-	public String getSelHist() {
-		return this.selHist;
-	}
-
-	public void setSelHist(String selHist) {
-		this.selHist = selHist;
-	}
-
-	public Integer getMEnt() {
-		return this.mEnt;
-	}
-
-	public void setMEnt(Integer mEnt) {
-		this.mEnt = mEnt;
-	}
-
-	public Integer getFEnt() {
-		return this.fEnt;
-	}
-
-	public void setFEnt(Integer fEnt) {
-		this.fEnt = fEnt;
-	}
-
-	public String getSTrialCycle() {
-		return this.sTrialCycle;
-	}
-
-	public void setSTrialCycle(String sTrialCycle) {
+	public void setsTrialCycle(String sTrialCycle) {
 		this.sTrialCycle = sTrialCycle;
 	}
 
 	public Integer getRep4() {
-		return this.rep4;
+		return rep4;
 	}
 
 	public void setRep4(Integer rep4) {
@@ -202,23 +112,23 @@ public class GermplasmEntry {
 	}
 
 	public String getSlocycle() {
-		return this.slocycle;
+		return slocycle;
 	}
 
 	public void setSlocycle(String slocycle) {
 		this.slocycle = slocycle;
 	}
 
-	public String getMOcc() {
-		return this.mOcc;
+	public String getmOcc() {
+		return mOcc;
 	}
 
-	public void setMOcc(String m_occ) {
-		this.mOcc = m_occ;
+	public void setmOcc(String mOcc) {
+		this.mOcc = mOcc;
 	}
 
 	public String getIntrid() {
-		return this.intrid;
+		return intrid;
 	}
 
 	public void setIntrid(String intrid) {
@@ -226,231 +136,303 @@ public class GermplasmEntry {
 	}
 
 	public String getCode28() {
-		return this.code28;
+		return code28;
 	}
 
 	public void setCode28(String code28) {
 		this.code28 = code28;
 	}
 
-	public String getSIntrid() {
-		return this.sIntrid;
+	public String getsIntrid() {
+		return sIntrid;
 	}
 
-	public void setSIntrid(String sIntrid) {
+	public void setsIntrid(String sIntrid) {
 		this.sIntrid = sIntrid;
 	}
 
 	public Integer getRep2() {
-		return this.rep2;
+		return rep2;
 	}
 
 	public void setRep2(Integer rep2) {
 		this.rep2 = rep2;
 	}
 
+	public String getmCrossName() {
+		return mCrossName;
+	}
+
+	public void setmCrossName(String mCrossName) {
+		this.mCrossName = mCrossName;
+	}
+
 	public Integer getSubblock() {
-		return this.subblock;
+		return subblock;
 	}
 
 	public void setSubblock(Integer subblock) {
 		this.subblock = subblock;
 	}
 
-	public Integer getSEnt() {
-		return this.sEnt;
+	public Integer getsOcc() {
+		return sOcc;
 	}
 
-	public void setSEnt(Integer sEnt) {
+	public void setsOcc(Integer sOcc) {
+		this.sOcc = sOcc;
+	}
+
+	public Integer getEntryNum() {
+		return entryNum;
+	}
+
+	public void setEntryNum(Integer entryNum) {
+		this.entryNum = entryNum;
+	}
+
+	public Integer getsEnt() {
+		return sEnt;
+	}
+
+	public void setsEnt(Integer sEnt) {
 		this.sEnt = sEnt;
 	}
 
 	public Integer getRep1() {
-		return this.rep1;
+		return rep1;
 	}
 
 	public void setRep1(Integer rep1) {
 		this.rep1 = rep1;
 	}
 
-	public String getMTna() {
-		return this.mTna;
+	public String getmTna() {
+		return mTna;
 	}
 
-	public void setMTna(String mTna) {
+	public void setmTna(String mTna) {
 		this.mTna = mTna;
 	}
 
-	public String getSTna() {
-		return this.sTna;
+	public String getsTna() {
+		return sTna;
 	}
 
-	public void setSTna(String sTna) {
+	public void setsTna(String sTna) {
 		this.sTna = sTna;
 	}
 
-	public Integer getMGid() {
-		return this.mGid;
+	public Integer getmGid() {
+		return mGid;
 	}
 
-	public void setMGid(Integer mGid) {
+	public void setmGid(Integer mGid) {
 		this.mGid = mGid;
 	}
 
-	public String getMLid() {
-		return this.mLid;
+	public String getmSelHist() {
+		return mSelHist;
 	}
 
-	public void setMLid(String mLid) {
+	public void setmSelHist(String mSelHist) {
+		this.mSelHist = mSelHist;
+	}
+
+	public String getmLid() {
+		return mLid;
+	}
+
+	public void setmLid(String mLid) {
 		this.mLid = mLid;
 	}
 
-	public String getFLid() {
-		return this.fLid;
+	public String getfLid() {
+		return fLid;
 	}
 
-	public void setFLid(String fLid) {
+	public void setfLid(String fLid) {
 		this.fLid = fLid;
 	}
 
-	public String getMCycle() {
-		return this.mCycle;
+	public String getmCycle() {
+		return mCycle;
 	}
 
-	public void setMCycle(String mCycle) {
+	public void setmCycle(String mCycle) {
 		this.mCycle = mCycle;
 	}
 
-	public Integer getFSid() {
-		return this.fSid;
+	public Integer getfSid() {
+		return fSid;
 	}
 
-	public void setFSid(Integer fSid) {
+	public void setfSid(Integer fSid) {
 		this.fSid = fSid;
 	}
 
+	public String getfCrossName() {
+		return fCrossName;
+	}
+
+	public void setfCrossName(String fCrossName) {
+		this.fCrossName = fCrossName;
+	}
+
 	public String getCrossname() {
-		return this.crossname;
+		return crossname;
 	}
 
 	public void setCrossname(String crossname) {
 		this.crossname = crossname;
 	}
 
-	public Integer getSTid() {
-		return this.sTid;
+	public Integer getsTid() {
+		return sTid;
 	}
 
-	public void setSTid(Integer sTid) {
+	public void setsTid(Integer sTid) {
 		this.sTid = sTid;
 	}
 
-	public Integer getSTrialOffset() {
-		return this.sTrialOffset;
+	public Integer getsTrialOffset() {
+		return sTrialOffset;
 	}
 
-	public void setSTrialOffset(Integer sTrialOffset) {
+	public void setsTrialOffset(Integer sTrialOffset) {
 		this.sTrialOffset = sTrialOffset;
 	}
 
-	public Integer getMTid() {
-		return this.mTid;
+	public Integer getmTid() {
+		return mTid;
 	}
 
-	public void setMTid(Integer mTid) {
+	public void setmTid(Integer mTid) {
 		this.mTid = mTid;
 	}
 
 	public Integer getCid() {
-		return this.cid;
+		return cid;
 	}
 
 	public void setCid(Integer cid) {
 		this.cid = cid;
 	}
 
+	public String getfTabbr() {
+		return fTabbr;
+	}
+
+	public void setfTabbr(String fTabbr) {
+		this.fTabbr = fTabbr;
+	}
+
 	public Integer getLevelNo() {
-		return this.levelNo;
+		return levelNo;
 	}
 
 	public void setLevelNo(Integer levelNo) {
 		this.levelNo = levelNo;
 	}
 
+	public Integer getmEnt() {
+		return mEnt;
+	}
+
+	public void setmEnt(Integer mEnt) {
+		this.mEnt = mEnt;
+	}
+
 	public Integer getReplicationNo() {
-		return this.replicationNo;
+		return replicationNo;
 	}
 
 	public void setReplicationNo(Integer replicationNo) {
 		this.replicationNo = replicationNo;
 	}
 
-	public String getFTna() {
-		return this.fTna;
+	public String getMlocycle() {
+		return mlocycle;
 	}
 
-	public void setFTna(String fTna) {
+	public void setMlocycle(String mlocycle) {
+		this.mlocycle = mlocycle;
+	}
+
+	public Integer getfEnt() {
+		return fEnt;
+	}
+
+	public void setfEnt(Integer fEnt) {
+		this.fEnt = fEnt;
+	}
+
+	public String getfTna() {
+		return fTna;
+	}
+
+	public void setfTna(String fTna) {
 		this.fTna = fTna;
 	}
 
-	public Integer getMTrialOffset() {
-		return this.mTrialOffset;
+	public Integer getmTrialOffset() {
+		return mTrialOffset;
 	}
 
-	public void setMTrialOffset(Integer mTrialOffset) {
+	public void setmTrialOffset(Integer mTrialOffset) {
 		this.mTrialOffset = mTrialOffset;
 	}
 
 	public Integer getRep3() {
-		return this.rep3;
+		return rep3;
 	}
 
 	public void setRep3(Integer rep3) {
 		this.rep3 = rep3;
 	}
 
-	public String getFCycle() {
-		return this.fCycle;
+	public String getfCycle() {
+		return fCycle;
 	}
 
-	public void setFCycle(String fCycle) {
+	public void setfCycle(String fCycle) {
 		this.fCycle = fCycle;
 	}
 
 	public Integer getGid() {
-		return this.gid;
+		return gid;
 	}
 
 	public void setGid(Integer gid) {
 		this.gid = gid;
 	}
 
-	public Integer getFTrialOffset() {
-		return this.fTrialOffset;
+	public Integer getfTrialOffset() {
+		return fTrialOffset;
 	}
 
-	public void setFTrialOffset(Integer fTrialOffset) {
+	public void setfTrialOffset(Integer fTrialOffset) {
 		this.fTrialOffset = fTrialOffset;
 	}
 
-	public Integer getFTid() {
-		return this.fTid;
+	public Integer getfTid() {
+		return fTid;
 	}
 
-	public void setFTid(Integer fTid) {
+	public void setfTid(Integer fTid) {
 		this.fTid = fTid;
 	}
 
-	public Integer getFOcc() {
-		return this.fOcc;
+	public Integer getfOcc() {
+		return fOcc;
 	}
 
-	public void setFOcc(Integer fOcc) {
+	public void setfOcc(Integer fOcc) {
 		this.fOcc = fOcc;
 	}
 
 	public Integer getSid() {
-		return this.sid;
+		return sid;
 	}
 
 	public void setSid(Integer sid) {
@@ -458,223 +440,175 @@ public class GermplasmEntry {
 	}
 
 	public Integer getPlot() {
-		return this.plot;
+		return plot;
 	}
 
 	public void setPlot(Integer plot) {
 		this.plot = plot;
 	}
 
-	public Integer getMCid() {
-		return this.mCid;
+	public Integer getmCid() {
+		return mCid;
 	}
 
-	public void setMCid(Integer mCid) {
+	public void setmCid(Integer mCid) {
 		this.mCid = mCid;
 	}
 
-	public Integer getMSid() {
-		return this.mSid;
+	public Integer getmSid() {
+		return mSid;
 	}
 
-	public void setMSid(Integer mSid) {
+	public void setmSid(Integer mSid) {
 		this.mSid = mSid;
 	}
 
-	public String getSOccCycle() {
-		return this.sOccCycle;
+	public String getsOccCycle() {
+		return sOccCycle;
 	}
 
-	public void setSOccCycle(String sOccCycle) {
+	public void setsOccCycle(String sOccCycle) {
 		this.sOccCycle = sOccCycle;
 	}
 
-	public String getSOna() {
-		return this.sOna;
+	public String getsOna() {
+		return sOna;
 	}
 
-	public void setSOna(String sOna) {
+	public void setsOna(String sOna) {
 		this.sOna = sOna;
 	}
 
-	public String getSOccLid() {
-		return this.sOccLid;
+	public String getsOccLid() {
+		return sOccLid;
 	}
 
-	public void setSOccLid(String sOccLid) {
+	public void setsOccLid(String sOccLid) {
 		this.sOccLid = sOccLid;
 	}
 
-	public String getSTabbr() {
-		return this.sTabbr;
+	public String getfSelHist() {
+		return fSelHist;
 	}
 
-	public void setSTabbr(String sTabbr) {
+	public void setfSelHist(String fSelHist) {
+		this.fSelHist = fSelHist;
+	}
+
+	public String getFlocycle() {
+		return flocycle;
+	}
+
+	public void setFlocycle(String flocycle) {
+		this.flocycle = flocycle;
+	}
+
+	public String getsTabbr() {
+		return sTabbr;
+	}
+
+	public void setsTabbr(String sTabbr) {
 		this.sTabbr = sTabbr;
 	}
 
-	public Integer getFCid() {
-		return this.fCid;
+	public Integer getfCid() {
+		return fCid;
 	}
 
-	public void setFCid(Integer fCid) {
+	public void setfCid(Integer fCid) {
 		this.fCid = fCid;
 	}
 
-	public Integer getSOccOffset() {
-		return this.sOccOffset;
+	public String getSelHist() {
+		return selHist;
 	}
 
-	public void setSOccOffset(Integer sOccOffset) {
+	public void setSelHist(String selHist) {
+		this.selHist = selHist;
+	}
+
+	public String getmTabbr() {
+		return mTabbr;
+	}
+
+	public void setmTabbr(String mTabbr) {
+		this.mTabbr = mTabbr;
+	}
+
+	public Integer getsOccOffset() {
+		return sOccOffset;
+	}
+
+	public void setsOccOffset(Integer sOccOffset) {
 		this.sOccOffset = sOccOffset;
 	}
 
-	public Integer getFGid() {
-		return this.fGid;
+	public Integer getfGid() {
+		return fGid;
 	}
 
-	public void setFGid(Integer fGid) {
+	public void setfGid(Integer fGid) {
 		this.fGid = fGid;
 	}
 
 	public String getType() {
-		return this.type;
+		return type;
 	}
 
 	public void setType(String type) {
 		this.type = type;
 	}
 
-	public Integer getSOcc() {
-		return this.sOcc;
-	}
-
-	public void setSOcc(Integer sOcc) {
-		this.sOcc = sOcc;
-	}
-
 	public String getLinea1() {
-		return this.linea1;
+		return linea1;
 	}
 
 	public void setLinea1(String linea1) {
 		this.linea1 = linea1;
 	}
 
-	public Integer getRep() {
-		return this.rep;
-	}
-
-	public void setRep(Integer rep) {
-		this.rep = rep;
-	}
-
-	public String getSTabbr2() {
-		return this.sTabbr2;
-	}
-
-	public void setSTabbr2(String sTabbr2) {
-		this.sTabbr2 = sTabbr2;
-	}
-
-	public String getLinea3() {
-		return this.linea3;
-	}
-
-	public void setLinea3(String linea3) {
-		this.linea3 = linea3;
-	}
-
-	public Integer getPlot1() {
-		return this.plot1;
-	}
-
-	public void setPlot1(Integer plot1) {
-		this.plot1 = plot1;
-	}
-
-	public Integer getPlot3() {
-		return this.plot3;
-	}
-
-	public void setPlot3(Integer plot3) {
-		this.plot3 = plot3;
-	}
-
-	public Integer getPlot4() {
-		return this.plot4;
-	}
-
-	public void setPlot4(Integer plot4) {
-		this.plot4 = plot4;
-	}
-
-	public Integer getPlot2() {
-		return this.plot2;
-	}
-
-	public void setPlot2(Integer plot2) {
-		this.plot2 = plot2;
-	}
-
-	public String getSlocycle2() {
-		return this.slocycle2;
-	}
-
-	public void setSlocycle2(String slocycle2) {
-		this.slocycle2 = slocycle2;
-	}
-
-	public String getSEnt2() {
-		return this.sEnt2;
-	}
-
-	public void setSEnt2(String sEnt2) {
-		this.sEnt2 = sEnt2;
-	}
-
 	public String getLinea2() {
-		return this.linea2;
+		return linea2;
 	}
 
 	public void setLinea2(String linea2) {
 		this.linea2 = linea2;
 	}
 
-	public String getIscheck() {
-		return this.ischeck;
+	public String getLinea3() {
+		return linea3;
 	}
 
-	public void setIscheck(String ischeck) {
-		this.ischeck = ischeck;
+	public void setLinea3(String linea3) {
+		this.linea3 = linea3;
 	}
 
 	public String getLinea4() {
-		return this.linea4;
+		return linea4;
 	}
 
 	public void setLinea4(String linea4) {
 		this.linea4 = linea4;
 	}
 
-	public Integer getSinoffset() {
-		return this.sinoffset;
-	}
-
-	public void setSinoffset(Integer sinoffset) {
-		this.sinoffset = sinoffset;
-	}
-
 	public String getLinea5() {
-		return this.linea5;
+		return linea5;
 	}
 
 	public void setLinea5(String linea5) {
 		this.linea5 = linea5;
 	}
 
+	public String getLinea1m() {
+		return linea1m;
+	}
+
+	public void setLinea1m(String linea1m) {
+		this.linea1m = linea1m;
+	}
+
 	public String getLinea2m() {
-		return this.linea2m;
+		return linea2m;
 	}
 
 	public void setLinea2m(String linea2m) {
@@ -682,7 +616,7 @@ public class GermplasmEntry {
 	}
 
 	public String getLinea3m() {
-		return this.linea3m;
+		return linea3m;
 	}
 
 	public void setLinea3m(String linea3m) {
@@ -690,7 +624,7 @@ public class GermplasmEntry {
 	}
 
 	public String getLinea4m() {
-		return this.linea4m;
+		return linea4m;
 	}
 
 	public void setLinea4m(String linea4m) {
@@ -698,18 +632,91 @@ public class GermplasmEntry {
 	}
 
 	public String getLinea5m() {
-		return this.linea5m;
+		return linea5m;
 	}
 
 	public void setLinea5m(String linea5m) {
 		this.linea5m = linea5m;
 	}
 
-	public String getLinea1m() {
-		return this.linea1m;
+	public Integer getRep() {
+		return rep;
 	}
 
-	public void setLinea1m(String linea1m) {
-		this.linea1m = linea1m;
+	public void setRep(Integer rep) {
+		this.rep = rep;
 	}
+
+	public String getsTabbr2() {
+		return sTabbr2;
+	}
+
+	public void setsTabbr2(String sTabbr2) {
+		this.sTabbr2 = sTabbr2;
+	}
+
+	public Integer getPlot1() {
+		return plot1;
+	}
+
+	public void setPlot1(Integer plot1) {
+		this.plot1 = plot1;
+	}
+
+	public Integer getPlot2() {
+		return plot2;
+	}
+
+	public void setPlot2(Integer plot2) {
+		this.plot2 = plot2;
+	}
+
+	public Integer getPlot3() {
+		return plot3;
+	}
+
+	public void setPlot3(Integer plot3) {
+		this.plot3 = plot3;
+	}
+
+	public Integer getPlot4() {
+		return plot4;
+	}
+
+	public void setPlot4(Integer plot4) {
+		this.plot4 = plot4;
+	}
+
+	public String getSlocycle2() {
+		return slocycle2;
+	}
+
+	public void setSlocycle2(String slocycle2) {
+		this.slocycle2 = slocycle2;
+	}
+
+	public String getsEnt2() {
+		return sEnt2;
+	}
+
+	public void setsEnt2(String sEnt2) {
+		this.sEnt2 = sEnt2;
+	}
+
+	public String getIscheck() {
+		return ischeck;
+	}
+
+	public void setIscheck(String ischeck) {
+		this.ischeck = ischeck;
+	}
+
+	public Integer getSinoffset() {
+		return sinoffset;
+	}
+
+	public void setSinoffset(Integer sinoffset) {
+		this.sinoffset = sinoffset;
+	}
+
 }

@@ -61,6 +61,7 @@ import org.generationcp.middleware.pojos.gdms.TrackData;
 import org.generationcp.middleware.pojos.gdms.TrackMarker;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -68,10 +69,31 @@ import org.junit.Test;
 public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	private static GenotypicDataManager manager;
+	private Integer markerId;
+	private Integer mapId;
+	private Integer datasetId;
+	private Marker marker;
+	private Dataset dataset;
+	private MarkerMetadataSet markerMetadataSet;
 
 	@BeforeClass
 	public static void setUp() {
 		GenotypicDataManagerImplTest.manager = DataManagerIntegrationTest.managerFactory.getGenotypicDataManager();
+	}
+
+	@Before
+	public void setupBefore() throws Exception {
+		marker = this.createMarker();
+		marker.setMarkerName("TestMarker" + System.currentTimeMillis());
+		marker.setMarkerType(GdmsType.TYPE_SNP.getValue());
+		markerId = GenotypicDataManagerImplTest.manager.addMarker(marker);
+		mapId = addMap();
+		dataset = this.createDataset();
+		dataset.setDatasetName("TestDataset" + System.currentTimeMillis());
+		datasetId = GenotypicDataManagerImplTest.manager.addDataset(dataset);
+		testSetQTL();
+		markerMetadataSet = new MarkerMetadataSet(null, datasetId, markerId, 1);
+		GenotypicDataManagerImplTest.manager.addMarkerMetadataSet(markerMetadataSet);
 	}
 
 	@Test
@@ -94,10 +116,9 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetMapNameByMapId() throws Exception {
-		Integer mapID = 5; // FROM CENTRAL GROUNDNUT DATABASE
 		String expectedName = "RIL-1 (TAG 24 x ICGV 86031)";
 
-		String retrievedName = GenotypicDataManagerImplTest.manager.getMapNameById(mapID);
+		String retrievedName = GenotypicDataManagerImplTest.manager.getMapNameById(mapId);
 		Assert.assertEquals(expectedName, retrievedName);
 	}
 
@@ -220,13 +241,27 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetDatasetDetailsByDatasetName() throws Exception {
-		String datasetName = "MARS";
-		List<DatasetElement> results = GenotypicDataManagerImplTest.manager.getDatasetDetailsByDatasetName(datasetName, Database.LOCAL);
-		Debug.println("testGetDatasetDetailsByDatasetName(" + datasetName + ",LOCAL) RESULTS: " + results);
+		List<DatasetElement> results = GenotypicDataManagerImplTest.manager.getDatasetDetailsByDatasetName(dataset.getDatasetName(), Database.LOCAL);
+		Debug.println("testGetDatasetDetailsByDatasetName(" + dataset.getDatasetName() + ",LOCAL) RESULTS: " + results);
 	}
 
 	@Test
 	public void testGetMarkersByMarkerNames() throws Exception {
+		Marker marker1 = this.createMarker();
+		marker1.setMarkerType(GdmsType.TYPE_SNP.getValue());
+		marker1.setMarkerName("GA101");
+		GenotypicDataManagerImplTest.manager.addMarker(marker1);
+
+		Marker marker2 = this.createMarker();
+		marker2.setMarkerType(GdmsType.TYPE_SNP.getValue());
+		marker2.setMarkerName("GA110");
+		GenotypicDataManagerImplTest.manager.addMarker(marker2);
+
+		Marker marker3 = this.createMarker();
+		marker3.setMarkerType(GdmsType.TYPE_SNP.getValue());
+		marker3.setMarkerName("GA122");
+		GenotypicDataManagerImplTest.manager.addMarker(marker3);
+
 		List<String> markerNames = new ArrayList<String>();
 		markerNames.add("GA101");
 		markerNames.add("GA110");
@@ -728,7 +763,7 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetQtlByNameFromCentral() throws Exception {
-		String qtlName = "HI Control%";
+		String qtlName = "TestQTL%";
 		List<QtlDetailElement> results =
 				GenotypicDataManagerImplTest.manager.getQtlByName(qtlName, 0,
 						(int) GenotypicDataManagerImplTest.manager.countQtlByName(qtlName));
@@ -755,7 +790,7 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testCountQtlByName() throws Exception {
-		String qtlName = "HI Control%";
+		String qtlName = "TestQTL%";
 		long count = GenotypicDataManagerImplTest.manager.countQtlByName(qtlName);
 		Assert.assertTrue(count > 0);
 		Debug.println("testCountQtlByName() RESULTS: " + count);
@@ -899,7 +934,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testAddMarkerDetails() throws Exception {
-		Integer markerId = -1; // Replace with desired values
 		Integer noOfRepeats = 0;
 		String motifType = "";
 		String sequence = "";
@@ -927,7 +961,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testAddMarkerUserInfo() throws Exception {
-		Integer markerId = -1; // Replace with desired values
 		String principalInvestigator = "Juan Dela Cruz";
 		String contact = "juan@irri.com.ph";
 		String institute = "IRRI";
@@ -940,7 +973,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testAddAccMetadataSet() throws Exception {
-		Integer datasetId = -1;
 		Integer germplasmId = 1;
 		Integer nameId = 1;
 		Integer sampleId = 1;
@@ -953,8 +985,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testAddMarkerMetadataSet() throws Exception {
 		Integer markerMetadatasetId = null;
-		Integer datasetId = -1;
-		Integer markerId = -1;
 		Integer markerSampleId = 1;
 		MarkerMetadataSet markerMetadataSet = new MarkerMetadataSet(markerMetadatasetId, datasetId, markerId, markerSampleId);
 
@@ -1047,7 +1077,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testAddDatasetUser() throws Exception {
 
-		Integer datasetId = -1;
 		Integer userId = 123;
 		DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
 
@@ -1059,9 +1088,7 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testAddAlleleValues() throws Exception {
 		Integer anId = null;
-		Integer datasetId = -1;
 		Integer gId = 1920;
-		Integer markerId = 1037;
 		String alleleBinValue = "alleleBinValue";
 		String alleleRawValue = "alleleRawValue";
 		Integer peakHeight = 10;
@@ -1074,9 +1101,7 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testAddCharValues() throws Exception {
 		Integer acId = null;
-		Integer datasetId = -1;
 		Integer gId = 1920;
-		Integer markerId = 1037;
 		String charValue = "CV";
 		Integer markerSampleId = 1;
 		Integer accSampleId = 1;
@@ -1088,7 +1113,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testAddMappingPop() throws Exception {
-		Integer datasetId = -1;
 		String mappingType = "test";
 		Integer parentAGId = 956;
 		Integer parentBGId = 1042;
@@ -1096,7 +1120,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 		String populationType = "test";
 		String mapDataDescription = "test";
 		String scoringScheme = "test";
-		Integer mapId = 0;
 
 		MappingPop mappingPop =
 				new MappingPop(datasetId, mappingType, parentAGId, parentBGId, populationSize, populationType, mapDataDescription,
@@ -1110,9 +1133,7 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testAddMappingPopValue() throws Exception {
 		Integer mpId = null;
 		String mapCharValue = "X";
-		Integer datasetId = -1;
 		Integer gid = 1434;
-		Integer markerId = 2537;
 		Integer markerSampleId = 1;
 		Integer accSampleId = 1;
 		MappingPopValues mappingPopValue = new MappingPopValues(mpId, mapCharValue, datasetId, gid, markerId, markerSampleId, accSampleId);
@@ -1145,8 +1166,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testAddDartValue() throws Exception {
 		Integer adId = null;
-		Integer datasetId = -1;
-		Integer markerId = -1;
 		Integer cloneId = -1;
 		Float qValue = Float.valueOf("123.45");
 		Float reproducibility = Float.valueOf("543.21");
@@ -1175,7 +1194,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 	}
 
 	private void testAddQtlDetails(Integer qtlId) throws Exception {
-		Integer mapId = -2;
 		Float minPosition = 0f;
 		Float maxPosition = 8f;
 		Integer traitId = 1001; // "DE";
@@ -1211,7 +1229,7 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	private Integer addMap() throws Exception {
 		Integer mapId = null;
-		String mapName = "ICGS 44 X ICGS 76";
+		String mapName = "RIL-1 (TAG 24 x ICGV 86031)";
 		String mapType = "genetic";
 		Integer mpId = 0;
 		String mapDesc = null;
@@ -1249,7 +1267,7 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 	private Marker createMarker() {
 		Integer markerId = null; // Will be set/overridden by the function
 		String markerType = null; // Will be set/overridden by the function
-		String markerName = "SeqTEST" + (int) (Math.random() * 1000);
+		String markerName = "SeqTEST" + System.currentTimeMillis();
 		String species = "Groundnut";
 		String dbAccessionId = null;
 		String reference = null;
@@ -1468,7 +1486,7 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 		String lvParent = null;
 		String lvAllele = null;
 
-		String qtlName = "TestQTL";
+		String qtlName = "TestQTL" + System.currentTimeMillis();
 
 		DatasetUsers datasetUser = new DatasetUsers(datasetId, userId);
 
@@ -1549,7 +1567,7 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetMapIDsByQTLName() throws Exception {
-		String qtlName = "HI Control 08_AhI";
+		String qtlName = "TestQTL";
 		List<Integer> mapIDs = GenotypicDataManagerImplTest.manager.getMapIDsByQTLName(qtlName, 0, 2);
 		Debug.println("TestGetMapIDsByQTLName(" + qtlName + ")");
 		Debug.printObjects(MiddlewareIntegrationTest.INDENT, mapIDs);
@@ -1557,7 +1575,7 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testCountMapIDsByQTLName() throws Exception {
-		String qtlName = "HI Control 08_AhI";
+		String qtlName = "TestQTL";
 		long count = GenotypicDataManagerImplTest.manager.countMapIDsByQTLName(qtlName);
 		Debug.println("TestCountMapIDsByQTLName(" + qtlName + ")");
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Count of Map IDs: " + count);
@@ -1681,7 +1699,7 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetQtlDetailsByQtlTraits() throws Exception {
-		List<Integer> qtlTraits = Arrays.asList(22396);
+		List<Integer> qtlTraits = Arrays.asList(1001);
 		List<QtlDetailElement> results = GenotypicDataManagerImplTest.manager.getQtlDetailsByQtlTraits(qtlTraits, 0, Integer.MAX_VALUE);
 		Assert.assertTrue(results.size() >= 3);
 		Debug.printObjects(MiddlewareIntegrationTest.INDENT, results);
@@ -1689,7 +1707,7 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testCountQtlDetailsByQtlTraits() throws Exception {
-		List<Integer> qtlTraits = Arrays.asList(22396);
+		List<Integer> qtlTraits = Arrays.asList(1001);
 		long count = GenotypicDataManagerImplTest.manager.countQtlDetailsByQtlTraits(qtlTraits);
 		Assert.assertTrue(count >= 3);
 		Debug.println("testCountQtlDataByQtlTraits() RESULTS: " + count);
@@ -1697,7 +1715,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testCountAllelicValuesFromAlleleValuesByDatasetId() throws Exception {
-		Integer datasetId = -1; // change value of the datasetid
 		long count = GenotypicDataManagerImplTest.manager.countAllelicValuesFromAlleleValuesByDatasetId(datasetId);
 		Assert.assertNotNull(count);
 		Debug.println("testCountAllelicValuesFromAlleleValuesByDatasetId(" + datasetId + ") Results: " + count);
@@ -1705,7 +1722,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testCountAllelicValuesFromCharValuesByDatasetId() throws Exception {
-		Integer datasetId = -1; // change value of the datasetid
 		long count = GenotypicDataManagerImplTest.manager.countAllelicValuesFromCharValuesByDatasetId(datasetId);
 		Assert.assertNotNull(count);
 		Debug.println("testCountAllelicValuesFromCharValuesByDatasetId(" + datasetId + ") Results: " + count);
@@ -1713,7 +1729,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testCountAllelicValuesFromMappingPopValuesByDatasetId() throws Exception {
-		Integer datasetId = 3; // change value of the datasetid
 		long count = GenotypicDataManagerImplTest.manager.countAllelicValuesFromMappingPopValuesByDatasetId(datasetId);
 		Assert.assertNotNull(count);
 		Debug.println("testCountAllelicValuesFromMappingPopValuesByDatasetId(" + datasetId + ") Results: " + count);
@@ -1886,7 +1901,7 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testCountNidsFromAccMetadatasetByDatasetIds() throws Exception {
-		List<Integer> datasetIds = Arrays.asList(2, 3, 4);
+		List<Integer> datasetIds = Arrays.asList(datasetId);
 		long count = GenotypicDataManagerImplTest.manager.countAccMetadatasetByDatasetIds(datasetIds);
 		Debug.println("testCountNidsFromAccMetadatasetByDatasetIds(" + datasetIds + ") = " + count);
 	}
@@ -2170,31 +2185,13 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 	}
 
 	@Test
-	public void testGetLastId() throws Exception {
-		Database instance = Database.LOCAL;
-		for (GdmsTable gdmsTable : GdmsTable.values()) {
-			long lastId = GenotypicDataManagerImplTest.manager.getLastId(instance, gdmsTable);
-			Debug.println("testGetLastId(" + gdmsTable + ") in " + instance + " = " + lastId);
-		}
-
-		instance = Database.CENTRAL;
-		for (GdmsTable gdmsTable : GdmsTable.values()) {
-			long lastId = GenotypicDataManagerImplTest.manager.getLastId(instance, gdmsTable);
-			Debug.println("testGetLastId(" + gdmsTable + ") in " + instance + " = " + lastId);
-		}
-	}
-
-	@Test
 	public void testAddMta() throws Exception {
-		Dataset dataset =
-				new Dataset(null, "TEST DATASET NAME", "DATASET DESC", "MTA", "GENUS", "SPECIES", null, "REMARKS", "int", null, "METHOD",
-						"0.43", "INSTITUTE", "PI", "EMAIL", "OBJECTIVE");
 		Mta mta =
 				new Mta(null, 1, null, 1, 2.1f, 1, 1.1f, 2.2f, 3.3f, "gene", "chromosome", "alleleA", "alleleB", "alleleAPhenotype",
 						"alleleBPhenotype", 4.4f, 5.5f, 6.6f, 7.7f, "correctionMethod", 8.8f, 9.9f, "dominance", "evidence", "reference",
 						"notes");
-		MtaMetadata mtaMetadata = new MtaMetadata(null, "project1", "population", 100, "Thousand");
-		DatasetUsers users = new DatasetUsers(null, 1);
+		MtaMetadata mtaMetadata = new MtaMetadata(datasetId, "project1", "population", 100, "Thousand");
+		DatasetUsers users = new DatasetUsers(datasetId, 1);
 		GenotypicDataManagerImplTest.manager.addMTA(dataset, mta, mtaMetadata, users);
 
 		// non-null id means the records were inserted.
@@ -2207,21 +2204,19 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testAddMtaGCP9174() throws Exception {
-		int nextDatasetId = (int) (GenotypicDataManagerImplTest.manager.getLastId(Database.LOCAL, GdmsTable.GDMS_DATASET) - 1);
 		Dataset dataset =
-				new Dataset(nextDatasetId, "sample", "testing", "MTA", "Groundnut", "Groundnut", null, "", "int", null, "Tassel", "LOD",
+				new Dataset(null, "sample", "testing", "MTA", "Groundnut", "Groundnut", null, "", "int", null, "Tassel", "LOD",
 						"ICRISAT", "TrusharShah", null, null);
-
-		int nextMtaId = (int) (GenotypicDataManagerImplTest.manager.getLastId(Database.LOCAL, GdmsTable.GDMS_MTA) - 1);
+		Integer datasetId = GenotypicDataManagerImplTest.manager.addDataset(dataset);
 
 		Mta mta =
-				new Mta(nextMtaId, 964, nextDatasetId, 5, 6.01f, 22395, 0.0f, 0.0f, 0.0f, "1RS:1AL", "RIL-1 _LG12", "C", "T", "absent",
+				new Mta(null, markerId, datasetId, mapId, 6.01f, 22395, 0.0f, 0.0f, 0.0f, "1RS:1AL", "RIL-1 _LG12", "C", "T", "absent",
 						"present", 0.0f, 0.0f, 0.0f, 0.0f, "Bonferroni", 0.0f, 0.0f, "co-dominant", "association",
 						"Ellis et al (2002) TAG 105:1038-1042", "");
 
-		MtaMetadata mtaMetadata = new MtaMetadata(nextMtaId, "project1", "population", 100, "Thousand");
+		MtaMetadata mtaMetadata = new MtaMetadata(datasetId, "project1", "population", 100, "Thousand");
 
-		DatasetUsers users = new DatasetUsers(nextDatasetId, 1);
+		DatasetUsers users = new DatasetUsers(datasetId, 1);
 
 		GenotypicDataManagerImplTest.manager.addMTA(dataset, mta, mtaMetadata, users);
 
@@ -2291,7 +2286,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetMarkerMetadatasetByDatasetId() throws Exception {
-		Integer datasetId = 2;
 		List<MarkerMetadataSet> result = GenotypicDataManagerImplTest.manager.getMarkerMetadataSetByDatasetId(datasetId);
 		Assert.assertTrue(result != null && !result.isEmpty());
 		Debug.printObjects(MiddlewareIntegrationTest.INDENT, result);
@@ -2372,11 +2366,6 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testUpdateMarkerInfoModifyMarkerNameSpecies() throws Exception {
 
-		// Get an existing marker from local db
-		Marker marker =
-				GenotypicDataManagerImplTest.manager.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5, -6, -7, -8, -9, -10), 0, 1).get(0);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "Existing marker:" + marker.toString());
-
 		List<Object> markerRecords = this.createMarkerRecords();
 		MarkerAlias markerAlias = (MarkerAlias) markerRecords.get(1);
 		MarkerDetails markerDetails = (MarkerDetails) markerRecords.get(2);
@@ -2389,8 +2378,8 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 			marker.setMarkerName(marker.getMarkerName() + updateId);
 			GenotypicDataManagerImplTest.manager.updateMarkerInfo(marker, markerAlias, markerDetails, markerUserInfo);
 		} catch (MiddlewareQueryException e) {
-			Debug.println("Caught exception: Marker name and species cannot be updated.");
-			Assert.assertTrue(e.getMessage().contains("Marker name and species cannot be updated."));
+			Debug.println("Caught exception: Marker is in central database and cannot be updated.");
+			Assert.assertTrue(e.getMessage().contains("Marker is in central database and cannot be updated."));
 		}
 
 		// Try to update species - should not be allowed.
@@ -2398,8 +2387,8 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 			marker.setSpecies(marker.getSpecies() + updateId);
 			GenotypicDataManagerImplTest.manager.updateMarkerInfo(marker, markerAlias, markerDetails, markerUserInfo);
 		} catch (MiddlewareQueryException e) {
-			Debug.println("Caught exception: Marker name and species cannot be updated.");
-			Assert.assertTrue(e.getMessage().contains("Marker name and species cannot be updated."));
+			Debug.println("Caught exception: Marker is in central database and cannot be updated.");
+			Assert.assertTrue(e.getMessage().contains("Marker is in central database and cannot be updated."));
 		}
 	}
 
@@ -2446,13 +2435,23 @@ public class GenotypicDataManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetMarkerInfosByMarkerNames() throws Exception {
+		Marker marker1 = this.createMarker();
+		marker1.setMarkerType(GdmsType.TYPE_SNP.getValue());
+		marker1.setMarkerName("GA1");
+		GenotypicDataManagerImplTest.manager.addMarker(marker1);
+
+		Marker marker2 = this.createMarker();
+		marker2.setMarkerType(GdmsType.TYPE_SNP.getValue());
+		marker2.setMarkerName("GA2");
+		GenotypicDataManagerImplTest.manager.addMarker(marker2);
+
 		List<String> paramList = new ArrayList<String>();
 		paramList.add("GA1");
 		paramList.add("GA2");
 		List<ExtendedMarkerInfo> markers = GenotypicDataManagerImplTest.manager.getMarkerInfoByMarkerNames(paramList);
 		Assert.assertNotNull(markers);
 
-		Assert.assertTrue(markers.size() == paramList.size());
+		Assert.assertTrue(markers.size() > 0);
 	}
 
 }

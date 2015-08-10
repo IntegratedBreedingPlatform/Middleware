@@ -13,7 +13,6 @@ package org.generationcp.middleware.service;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -51,6 +50,7 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
@@ -75,6 +75,7 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.DatabaseBroker;
+import org.generationcp.middleware.util.FieldbookListUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -96,25 +97,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<StudyDetails> getAllLocalNurseryDetails(String programUUID) throws MiddlewareQueryException {
 		List<StudyDetails> studyDetailList = this.getStudyDataManager().getAllStudyDetails(StudyType.N, programUUID);
-		List<StudyDetails> newList = new ArrayList<StudyDetails>();
-		for (StudyDetails detail : studyDetailList) {
-			if (detail.hasRows()) {
-				newList.add(detail);
-			}
-		}
-		return newList;
+		return FieldbookListUtil.removeStudyDetailsWithEmptyRows(studyDetailList);
 	}
 
 	@Override
 	public List<StudyDetails> getAllLocalTrialStudyDetails(String programUUID) throws MiddlewareQueryException {
 		List<StudyDetails> studyDetailList = this.getStudyDataManager().getAllStudyDetails(StudyType.T, programUUID);
-		List<StudyDetails> newList = new ArrayList<StudyDetails>();
-		for (StudyDetails detail : studyDetailList) {
-			if (detail.hasRows()) {
-				newList.add(detail);
-			}
-		}
-		return newList;
+		return FieldbookListUtil.removeStudyDetailsWithEmptyRows(studyDetailList);
 	}
 
 	@Override
@@ -209,12 +198,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Integer getStandardVariableIdByPropertyScaleMethodRole(
-			String property, String scale, String method, PhenotypicType role)
-			throws MiddlewareQueryException {
-		return this.getOntologyDataManager()
-				.getStandardVariableIdByPropertyScaleMethod(property, scale,
-						method);
+	public Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
+					throws MiddlewareQueryException {
+		return this.getOntologyDataManager().getStandardVariableIdByPropertyScaleMethod(property, scale, method);
 	}
 
 	@Override
@@ -233,7 +219,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void saveMeasurementRows(Workbook workbook,String programUUID) throws MiddlewareException {
+	public void saveMeasurementRows(Workbook workbook, String programUUID) throws MiddlewareException {
 		Session session = this.getCurrentSession();
 		Transaction trans = null;
 
@@ -252,7 +238,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			this.getWorkbookSaver().saveWorkbookVariables(workbook);
 			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
 
-			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook,programUUID);
+			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
 
 			// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
 			Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
@@ -272,7 +258,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			}
 
 			// save trial observations
-			this.getWorkbookSaver().saveTrialObservations(workbook,programUUID);
+			this.getWorkbookSaver().saveTrialObservations(workbook, programUUID);
 
 			Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 			if (measurementDatasetId == null) {
@@ -288,8 +274,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					if (NonEditableFactors.find(factor.getTermId()) == null) {
 						for (MeasurementRow row : observations) {
 							for (MeasurementData field : row.getDataList()) {
-								if (factor.getName().equals(field.getLabel())
-										&& factor.getRole() == PhenotypicType.TRIAL_DESIGN) {
+								if (factor.getName().equals(field.getLabel()) && factor.getRole() == PhenotypicType.TRIAL_DESIGN) {
 									this.getExperimentPropertySaver().saveOrUpdateProperty(
 											this.getExperimentDao().getById(row.getExperimentId()), factor.getTermId(), field.getValue());
 								}
@@ -321,12 +306,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 										phenotype = new Phenotype();
 									}
 									if (phenotype != null) {
-										
+
 										this.getPhenotypeSaver().saveOrUpdate(
 												row.getExperimentId(),
 												variate.getTermId(),
 												field.getcValueId() != null && !"".equals(field.getcValueId()) ? field.getcValueId()
-														: field.getValue(), phenotype, field.isCustomCategoricalValue(), variate.getDataTypeId());
+														: field.getValue(), phenotype, field.isCustomCategoricalValue(),
+												variate.getDataTypeId());
 
 										i++;
 										if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
@@ -357,19 +343,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		List<Method> methodList =
 				filterOutGenerative ? this.getGermplasmDataManager().getAllMethodsNotGenerative() : this.getGermplasmDataManager()
 						.getAllMethods();
-		Collections.sort(methodList, new Comparator<Method>() {
-
-			@Override
-			public int compare(Method o1, Method o2) {
-				String methodName1 = o1.getMname().toUpperCase();
-				String methodName2 = o2.getMname().toUpperCase();
-
-				// ascending order
-				return methodName1.compareTo(methodName2);
-			}
-
-		});
-		return methodList;
+				FieldbookListUtil.sortMethodNamesInAscendingOrder(methodList);
+				return methodList;
 	}
 
 	@Override
@@ -394,18 +369,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			}
 		}
 
-		Collections.sort(methodList, new Comparator<Method>() {
-
-			@Override
-			public int compare(Method o1, Method o2) {
-				String methodName1 = o1.getMname().toUpperCase();
-				String methodName2 = o2.getMname().toUpperCase();
-
-				// ascending order
-				return methodName1.compareTo(methodName2);
-			}
-
-		});
+		FieldbookListUtil.sortMethodNamesInAscendingOrder(methodList);
 		return methodList;
 	}
 
@@ -416,8 +380,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		Session session = this.getActiveSession();
 		Transaction trans = null;
 
-		Integer listId = null;
-
 		GermplasmDAO germplasmDao = this.getGermplasmDao();
 		NameDAO nameDao = this.getNameDao();
 		GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
@@ -427,9 +389,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		try {
 			trans = session.beginTransaction();
 
-			// Save germplasm list
-			listId = germplasmListDao.getNextId("id");
-			germplasmList.setId(listId);
 			germplasmListDao.save(germplasmList);
 
 			int i = 0;
@@ -461,26 +420,25 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 				// Save germplasm and name entries if non-existing
 				if (germplasmFound == null || germplasmFound.getGid() == null) {
-					Integer gId = germplasmDao.getNextId("gid");
-
-					// Save name entries
-					for (Name name : germplasms.get(germplasm)) {
-						Integer nameId = nameDao.getNextId("nid");
-						name.setNid(nameId);
-						name.setGermplasmId(gId);
-						nameDao.save(name);
+					List<Name> nameList = germplasms.get(germplasm);
+					// Lgid could not be null in the DB, so we are saving a value before saving it to the DB
+					if (germplasm.getLgid() == null) {
+						germplasm.setLgid(germplasm.getGid() != null ? germplasm.getGid() : Integer.valueOf(0));
+					}
+					germplasm = germplasmDao.save(germplasm);
+					// set Lgid to GID if it's value was not set previously
+					if (germplasm.getLgid().equals(Integer.valueOf(0))) {
+						germplasm.setLgid(germplasm.getGid());
 					}
 
-					// Save germplasm
-					germplasm.setGid(gId);
-					germplasm.setLgid(gId);
-					germplasmDao.save(germplasm);
-
+					// Save name entries
+					for (Name name : nameList) {
+						name.setGermplasmId(germplasm.getGid());
+						nameDao.save(name);
+					}
 				}
 
 				// Save germplasmListData
-				Integer germplasmListDataId = this.getGermplasmListDataDAO().getNextId("id");
-				germplasmListData.setId(germplasmListDataId);
 				germplasmListData.setGid(germplasm.getGid());
 				germplasmListData.setList(germplasmList);
 				this.getGermplasmListDataDAO().save(germplasmListData);
@@ -506,7 +464,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		FieldbookServiceImpl.LOG.debug("========== saveNurseryAdvanceGermplasmList Duration (ms): "
 				+ (System.currentTimeMillis() - startTime) / 60);
 
-		return listId;
+		return germplasmList.getId();
 
 	}
 
@@ -517,8 +475,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		Session session = this.getCurrentSession();
 		Transaction trans = null;
 
-		Integer listId = null;
-
 		GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
 
 		long startTime = System.currentTimeMillis();
@@ -526,9 +482,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		try {
 			trans = session.beginTransaction();
 
-			// Save germplasm list
-			listId = germplasmListDao.getNextId("id");
-			germplasmList.setId(listId);
 			germplasmListDao.save(germplasmList);
 
 			int i = 0;
@@ -536,13 +489,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			// Save germplasms, names, list data
 			for (Entry<Germplasm, GermplasmListData> entry : listDataItems.entrySet()) {
 
-				// Save germplasmListData
-				Integer germplasmListDataId = this.getGermplasmListDataDAO().getNextId("id");
-
 				Germplasm germplasm = entry.getKey();
 				GermplasmListData germplasmListData = entry.getValue();
 
-				germplasmListData.setId(germplasmListDataId);
 				germplasmListData.setGid(germplasm.getGid());
 				germplasmListData.setList(germplasmList);
 				this.getGermplasmListDataDAO().save(germplasmListData);
@@ -567,7 +516,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 		FieldbookServiceImpl.LOG.debug("========== saveGermplasmList Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
 
-		return listId;
+		return germplasmList.getId();
 
 	}
 
@@ -625,8 +574,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public StandardVariable getStandardVariable(int id,String programUUID) throws MiddlewareException {
-		return this.getOntologyDataManager().getStandardVariable(id,programUUID);
+	public StandardVariable getStandardVariable(int id, String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getStandardVariable(id, programUUID);
 	}
 
 	@Override
@@ -634,8 +583,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 		List<ValueReference> nurseryTypes = new ArrayList<ValueReference>();
 
-		StandardVariable stdVar = this.getOntologyDataManager().getStandardVariable(
-				TermId.NURSERY_TYPE.getId(),programUUID);
+		StandardVariable stdVar = this.getOntologyDataManager().getStandardVariable(TermId.NURSERY_TYPE.getId(), programUUID);
 		List<Enumeration> validValues = stdVar.getEnumerations();
 
 		if (validValues != null) {
@@ -791,26 +739,24 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public int addFieldLocation(String fieldName, Integer parentLocationId, Integer currentUserId) throws MiddlewareQueryException {
-		LocationDataManager manager = this.getLocationDataManager();
-
-		Integer lType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
-		Location location = new Location(null, lType, 0, fieldName, "-", 0, 0, 0, 0, 0);
-
-		Integer dType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.FIELD_PARENT.getCode());
-		Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentLocationId), 0, 0);
-
-		return manager.addLocationAndLocdes(location, locdes);
+		return this
+				.addLocation(fieldName, parentLocationId, currentUserId, LocationType.FIELD.getCode(), LocdesType.FIELD_PARENT.getCode());
 	}
 
 	@Override
 	public int addBlockLocation(String blockName, Integer parentFieldId, Integer currentUserId) throws MiddlewareQueryException {
+		return this.addLocation(blockName, parentFieldId, currentUserId, LocationType.BLOCK.getCode(), LocdesType.BLOCK_PARENT.getCode());
+	}
+
+	public int addLocation(String locationName, Integer parentId, Integer currentUserId, String locCode, String parentCode)
+			throws MiddlewareQueryException {
 		LocationDataManager manager = this.getLocationDataManager();
 
-		Integer lType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
-		Location location = new Location(null, lType, 0, blockName, "-", 0, 0, 0, 0, 0);
+		Integer lType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, locCode);
+		Location location = new Location(null, lType, 0, locationName, "-", 0, 0, 0, 0, 0);
 
-		Integer dType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode());
-		Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentFieldId), 0, 0);
+		Integer dType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, parentCode);
+		Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentId), 0, 0);
 
 		return manager.addLocationAndLocdes(location, locdes);
 	}
@@ -894,13 +840,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Location getLocationByName(String locationName, Operation op) throws MiddlewareQueryException {
-		List<Location> locations = getLocationDataManager().getLocationsByName(locationName, 0, 1, op);
-		if (locations != null && !locations.isEmpty()){
+		List<Location> locations = this.getLocationDataManager().getLocationsByName(locationName, 0, 1, op);
+		if (locations != null && !locations.isEmpty()) {
 			return locations.get(0);
 		}
 		return null;
 	}
-	
+
 	@Override
 	public Person getPersonById(int id) throws MiddlewareQueryException {
 		return this.getUserDataManager().getPersonById(id);
@@ -1042,14 +988,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(
-			String property, String scale, String method,
+	public MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(String property, String scale, String method,
 			PhenotypicType role, String programUUID) throws MiddlewareException {
 		MeasurementVariable variable = null;
 		StandardVariable standardVariable = null;
 		Integer id = this.getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
 		if (id != null) {
-			standardVariable = this.getStandardVariableBuilder().create(id,programUUID);
+			standardVariable = this.getStandardVariableBuilder().create(id, programUUID);
 			standardVariable.setPhenotypicType(role);
 			return this.getMeasurementVariableTransformer().transform(standardVariable, false);
 		}
@@ -1096,7 +1041,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Method getMethodByCode(String code, String programUUID) throws MiddlewareQueryException {
-		return this.getGermplasmDataManager().getMethodByCode(code,programUUID);
+		return this.getGermplasmDataManager().getMethodByCode(code, programUUID);
 	}
 
 	@Override
@@ -1105,9 +1050,16 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void deleteStudy(int studyId) throws MiddlewareQueryException {
+	public void deleteStudy(int studyId, Integer currentUserId) throws UnpermittedDeletionException, MiddlewareException {
 		Session session = this.getCurrentSession();
 		Transaction trans = null;
+
+		Integer studyUserId = this.getStudy(studyId).getUser();
+		if (studyUserId != null && !studyUserId.equals(currentUserId)) {
+			throw new UnpermittedDeletionException(
+					"You are not able to delete this nursery or trial as you are not the owner. The owner is "
+							+ this.getOwnerListName(studyUserId));
+		}
 
 		try {
 			trans = session.beginTransaction();
@@ -1264,7 +1216,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		try {
 			trans = session.beginTransaction();
 			for (ListDataProject listDataProject : listDataProjectList) {
-				listDataProject.setListDataProjectId(this.getListDataProjectDAO().getNextId("listDataProjectId"));
 				listDataProject.setList(this.getGermplasmListById(listDataProject.getList().getId()));
 				this.getListDataProjectDAO().save(listDataProject);
 			}
@@ -1278,7 +1229,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public StandardVariable getStandardVariableByName(String name, String programUUID) throws MiddlewareException {
-		return this.getStandardVariableBuilder().getByName(name,programUUID);
+		return this.getStandardVariableBuilder().getByName(name, programUUID);
 	}
 
 }

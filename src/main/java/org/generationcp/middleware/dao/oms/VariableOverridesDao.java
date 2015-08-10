@@ -52,8 +52,7 @@ public class VariableOverridesDao extends GenericDAO<VariableOverrides, Integer>
 		VariableOverrides overrides = this.getByVariableAndProgram(variableId, programUuid);
 		// check for uniqueness
 		if (overrides == null) {
-			return this.save(new VariableOverrides(this.getNextId(VariableOverrides.ID_NAME), variableId, programUuid, alias,
-					minValue, maxValue));
+			return this.save(new VariableOverrides(null, variableId, programUuid, alias, minValue, maxValue));
 		}
 
 		overrides.setAlias(alias);

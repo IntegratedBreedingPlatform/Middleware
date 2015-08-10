@@ -18,6 +18,8 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
@@ -59,6 +61,7 @@ public class Location implements Serializable, Comparable<Location> {
 	public static final int UNKNOWN_LOCATION_ID = 0;
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "locid")
 	@XmlElement(name = "locationId")

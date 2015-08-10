@@ -11,12 +11,25 @@
 
 package org.generationcp.middleware.operation.builder;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.domain.dms.NameSynonym;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
-import org.generationcp.middleware.domain.oms.*;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TermProperty;
+import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -32,8 +45,6 @@ import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 
-import java.util.*;
-
 public class StandardVariableBuilder extends Builder {
 
 	private static final String DATA_TYPE_NUMERIC = "N";
@@ -43,16 +54,16 @@ public class StandardVariableBuilder extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public StandardVariable create(int standardVariableId,String programUUID) throws MiddlewareException {
-		Variable variable = getOntologyVariableDataManager().getVariable(programUUID,standardVariableId);
-		return getStandardVariableTransformer().transformVariable(variable);
+	public StandardVariable create(int standardVariableId, String programUUID) throws MiddlewareException {
+		Variable variable = this.getOntologyVariableDataManager().getVariable(programUUID, standardVariableId);
+		return this.getStandardVariableTransformer().transformVariable(variable);
 	}
 
 	public List<StandardVariable> create(List<Integer> standardVariableIds, String programUUID) throws MiddlewareException {
 		List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
 		if (standardVariableIds != null && !standardVariableIds.isEmpty()) {
 			for (Integer id : standardVariableIds) {
-				standardVariables.add(this.create(id,programUUID));
+				standardVariables.add(this.create(id, programUUID));
 			}
 		}
 		return standardVariables;
@@ -175,13 +186,11 @@ public class StandardVariableBuilder extends Builder {
 	public StandardVariable findOrSave(String name, String description, String propertyName, String scaleName, String methodName,
 			PhenotypicType role, String dataTypeString, String programUUID) throws MiddlewareException {
 
-		TermBuilder termBuilder = getTermBuilder();
-		Term property = termBuilder.findOrSaveProperty(propertyName,
-				propertyName,null,termBuilder.getDefaultTraitClasses());
-		
-		Term scale = this.getTermBuilder().findOrSaveScale(scaleName,scaleName,
-				getDataType(dataTypeString),null,null,null);
-		Term method = this.getTermBuilder().findOrSaveMethod(methodName,methodName);
+		TermBuilder termBuilder = this.getTermBuilder();
+		Term property = termBuilder.findOrSaveProperty(propertyName, propertyName, null, termBuilder.getDefaultTraitClasses());
+
+		Term scale = this.getTermBuilder().findOrSaveScale(scaleName, scaleName, this.getDataType(dataTypeString), null, null, null);
+		Term method = this.getTermBuilder().findOrSaveMethod(methodName, methodName);
 
 		VariableFilter filterOpts = new VariableFilter();
 		filterOpts.setProgramUuid(programUUID);
@@ -189,19 +198,18 @@ public class StandardVariableBuilder extends Builder {
 		filterOpts.addMethodId(method.getId());
 		filterOpts.addScaleId(scale.getId());
 
-		List<Variable> variableList = getOntologyVariableDataManager().getWithFilter(filterOpts);
+		List<Variable> variableList = this.getOntologyVariableDataManager().getWithFilter(filterOpts);
 		StandardVariable standardVariable = null;
 		if (variableList == null || variableList.isEmpty()) {
-			OntologyVariableInfo variableInfo = createOntologyVariableInfo(
-					name, description, method.getId(), 
-					property.getId(), scale.getId(), programUUID, 
-					null, null, role);
-			getOntologyVariableDataManager().addVariable(variableInfo);
-			standardVariable = create(variableInfo.getId(),programUUID);
+			OntologyVariableInfo variableInfo =
+					this.createOntologyVariableInfo(name, description, method.getId(), property.getId(), scale.getId(), programUUID, null,
+							null, role);
+			this.getOntologyVariableDataManager().addVariable(variableInfo);
+			standardVariable = this.create(variableInfo.getId(), programUUID);
 			standardVariable.setPhenotypicType(role);
 		} else {
 			Variable variable = variableList.get(0);
-			standardVariable = create(variable.getId(), programUUID);
+			standardVariable = this.create(variable.getId(), programUUID);
 			standardVariable.setPhenotypicType(role);
 		}
 
@@ -209,16 +217,15 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	private String getDataType(String dataTypeString) {
-		if(DATA_TYPE_NUMERIC.equals(dataTypeString)) {
+		if (DATA_TYPE_NUMERIC.equals(dataTypeString)) {
 			return DataType.NUMERIC_VARIABLE.getName();
-		} else if(DATA_TYPE_CHARACTER.equals(dataTypeString)) {
+		} else if (DATA_TYPE_CHARACTER.equals(dataTypeString)) {
 			return DataType.CHARACTER_VARIABLE.getName();
 		}
 		return dataTypeString;
 	}
 
-	private OntologyVariableInfo createOntologyVariableInfo(
-			String name, String description, int methodId, int propertyId, int scaleId, 
+	private OntologyVariableInfo createOntologyVariableInfo(String name, String description, int methodId, int propertyId, int scaleId,
 			String programUUID, String minValue, String maxValue, PhenotypicType role) {
 		OntologyVariableInfo variableInfo = new OntologyVariableInfo();
 		variableInfo.setName(name);
@@ -230,22 +237,21 @@ public class StandardVariableBuilder extends Builder {
 
 		variableInfo.setExpectedMin(minValue);
 		variableInfo.setExpectedMax(maxValue);
-		
-		variableInfo.addVariableType(mapPhenotypicTypeToDefaultVariableType(role));
+
+		variableInfo.addVariableType(this.mapPhenotypicTypeToDefaultVariableType(role));
 		return variableInfo;
 	}
 
-	public VariableType mapPhenotypicTypeToDefaultVariableType(
-			PhenotypicType role) {
-		if(PhenotypicType.STUDY == role || PhenotypicType.DATASET == role) {
+	public VariableType mapPhenotypicTypeToDefaultVariableType(PhenotypicType role) {
+		if (PhenotypicType.STUDY == role || PhenotypicType.DATASET == role) {
 			return VariableType.STUDY_DETAIL;
-		} else if(PhenotypicType.TRIAL_ENVIRONMENT == role) {
+		} else if (PhenotypicType.TRIAL_ENVIRONMENT == role) {
 			return VariableType.ENVIRONMENT_DETAIL;
-		} else if(PhenotypicType.GERMPLASM == role) {
+		} else if (PhenotypicType.GERMPLASM == role) {
 			return VariableType.GERMPLASM_DESCRIPTOR;
-		} else if(PhenotypicType.TRIAL_DESIGN == role) {
+		} else if (PhenotypicType.TRIAL_DESIGN == role) {
 			return VariableType.EXPERIMENTAL_DESIGN;
-		} else if(PhenotypicType.VARIATE == role) {
+		} else if (PhenotypicType.VARIATE == role) {
 			return VariableType.TRAIT;
 		}
 		return null;
@@ -254,28 +260,29 @@ public class StandardVariableBuilder extends Builder {
 	public StandardVariable getByName(String name, String programUUID) throws MiddlewareException {
 		CVTerm cvTerm = this.getCvTermDao().getByName(name);
 		if (cvTerm != null && cvTerm.getCvTermId() != null) {
-			return this.getStandardVariableBuilder().create(cvTerm.getCvTermId(),programUUID);
+			return this.getStandardVariableBuilder().create(cvTerm.getCvTermId(), programUUID);
 		}
 		return null;
 	}
 
-	public StandardVariable getByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId, String programUUID) throws MiddlewareException {
+	public StandardVariable getByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId, String programUUID)
+			throws MiddlewareException {
 
 		Integer stdVariableId = this.getIdByPropertyScaleMethod(propertyId, scaleId, methodId);
 		StandardVariable standardVariable = null;
 		if (stdVariableId != null) {
-			standardVariable = this.getStandardVariableBuilder().create(stdVariableId,programUUID);
+			standardVariable = this.getStandardVariableBuilder().create(stdVariableId, programUUID);
 		}
 		return standardVariable;
 	}
 
-	public StandardVariable getByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role, String programUUID)
-			throws MiddlewareException {
+	public StandardVariable getByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role,
+			String programUUID) throws MiddlewareException {
 
 		Integer stdVariableId = this.getIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
 		StandardVariable standardVariable = null;
 		if (stdVariableId != null) {
-			standardVariable = this.getStandardVariableBuilder().create(stdVariableId,programUUID);
+			standardVariable = this.getStandardVariableBuilder().create(stdVariableId, programUUID);
 		}
 		return standardVariable;
 	}
@@ -286,31 +293,27 @@ public class StandardVariableBuilder extends Builder {
 		return stdVariableId;
 	}
 
-	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(
-			List<String> headers, String programUUID)
-			throws MiddlewareException {
+	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers, String programUUID)
+					throws MiddlewareException {
 
 		Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<String, List<StandardVariable>>();
 		Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<String, Map<Integer, VariableType>>();
 
 		// Step 1: Search for DISTINCT standard variables used for projectprop records where projectprop.value equals input name (eg. REP)
 		List<String> names = headers;
-		standardVariableIdsWithTypeInProjects = this
-				.getStandardVariableIdsWithTypeForProjectProperties(names);
+		standardVariableIdsWithTypeInProjects = this.getStandardVariableIdsWithTypeForProjectProperties(names);
 
 		// Step 2: If no variable found, search for cvterm (standard variables) with given name.
 		// Exclude header items with result from step 1
 		names = new ArrayList<String>();
 		for (String name : headers) {
-			Set<Integer> varIds = standardVariableIdsWithTypeInProjects.get(
-					name.toUpperCase()).keySet();
+			Set<Integer> varIds = standardVariableIdsWithTypeInProjects.get(name.toUpperCase()).keySet();
 			if (varIds == null || varIds.isEmpty()) {
 				names.add(name);
 			}
 		}
 
-		standardVariableIdsWithTypeInProjects.putAll(this
-				.getStandardVariableIdsWithTypeForTerms(names));
+		standardVariableIdsWithTypeInProjects.putAll(this.getStandardVariableIdsWithTypeForTerms(names));
 		// Step 3. If no variable still found for steps 1 and 2, treat the
 		// header as a trait / property name.
 		// Search for trait with given name and return the standard variables
@@ -319,57 +322,48 @@ public class StandardVariableBuilder extends Builder {
 		// Exclude header items with result from step 2
 		names = new ArrayList<String>();
 		for (String name : headers) {
-			Set<Integer> varIds = standardVariableIdsWithTypeInProjects.get(
-					name.toUpperCase()).keySet();
+			Set<Integer> varIds = standardVariableIdsWithTypeInProjects.get(name.toUpperCase()).keySet();
 			if (varIds == null || varIds.isEmpty()) {
 				names.add(name);
 			}
 		}
 
-		standardVariableIdsWithTypeInProjects.putAll(this
-				.getStandardVariableIdsForTraits(names));
+		standardVariableIdsWithTypeInProjects.putAll(this.getStandardVariableIdsForTraits(names));
 		for (String name : headers) {
 			String upperName = name.toUpperCase();
-			Map<Integer, VariableType> varIdsWithType = standardVariableIdsWithTypeInProjects
-					.get(upperName);
+			Map<Integer, VariableType> varIdsWithType = standardVariableIdsWithTypeInProjects.get(upperName);
 
 			List<StandardVariable> variables = new ArrayList<StandardVariable>();
 			if (varIdsWithType != null) {
-				List<Integer> standardVariableIds = new ArrayList<Integer>(
-						varIdsWithType.keySet());
+				List<Integer> standardVariableIds = new ArrayList<Integer>(varIdsWithType.keySet());
 				variables = this.create(standardVariableIds, programUUID);
-				setRoleOfVariables(variables, varIdsWithType);
+				this.setRoleOfVariables(variables, varIdsWithType);
 			}
 			standardVariablesInProjects.put(name, variables);
 		}
 		return standardVariablesInProjects;
 	}
 
-	private void setRoleOfVariables(List<StandardVariable> variables,
-			Map<Integer, VariableType> varIdsWithType) {
+	private void setRoleOfVariables(List<StandardVariable> variables, Map<Integer, VariableType> varIdsWithType) {
 		for (StandardVariable standardVariable : variables) {
 			VariableType type = varIdsWithType.get(standardVariable.getId());
 			standardVariable.setPhenotypicType(type.getRole());
 		}
 	}
 
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(
-			List<String> propertyNames) throws MiddlewareQueryException {
-		return this.getProjectPropertyDao()
-				.getStandardVariableIdsWithTypeByPropertyNames(propertyNames);
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(List<String> propertyNames)
+			throws MiddlewareQueryException {
+		return this.getProjectPropertyDao().getStandardVariableIdsWithTypeByPropertyNames(propertyNames);
 	}
 
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForTerms(
-			List<String> termNames) throws MiddlewareQueryException {
-		return this.getCvTermDao().getTermIdsWithTypeByNameOrSynonyms(
-				termNames, CvId.VARIABLES.getId());
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForTerms(List<String> termNames)
+			throws MiddlewareQueryException {
+		return this.getCvTermDao().getTermIdsWithTypeByNameOrSynonyms(termNames, CvId.VARIABLES.getId());
 
 	}
 
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsForTraits(
-			List<String> traitNames) throws MiddlewareQueryException {
-		return this.getCvTermDao().getStandardVariableIdsWithTypeByProperties(
-				traitNames);
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsForTraits(List<String> traitNames) throws MiddlewareQueryException {
+		return this.getCvTermDao().getStandardVariableIdsWithTypeByProperties(traitNames);
 	}
 
 	public Integer getIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException {

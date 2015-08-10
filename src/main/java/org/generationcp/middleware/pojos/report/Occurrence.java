@@ -3,7 +3,25 @@ package org.generationcp.middleware.pojos.report;
 
 import java.util.List;
 
+/**
+ * This is being used in JasperReport, any changes in the attribute names should be reflected in the corresponding JasperReports
+ * 
+ * @author EfficioDaniel
+ * 
+ */
 public class Occurrence {
+
+	public Occurrence() {
+	}
+
+	public Occurrence(Integer occ) {
+		this.occ = occ;
+	}
+
+	public Occurrence(List<GermplasmEntry> entriesList) {
+		this.entriesList = entriesList;
+		this.entriesList2 = entriesList;
+	}
 
 	private String stationId;
 	private String lid;
@@ -34,7 +52,7 @@ public class Occurrence {
 	private String program;
 	private String newCycle;
 	private Integer studyID;
-	private String useAbbreviation;
+	private String useAbreviation;
 	private String internatType;
 	private String cycle;
 	private String trialAbbr;
@@ -45,204 +63,8 @@ public class Occurrence {
 	private String printMegaEnvironment;
 	private Integer expansionLevel;
 
-	public Occurrence() {
-	}
-
-	public Occurrence(Integer occ) {
-		this.occ = occ;
-	}
-
-	public Occurrence(List<GermplasmEntry> entriesList) {
-		this.entriesList = entriesList;
-		this.entriesList2 = entriesList;
-	}
-	
-	public Integer getOffset2() {
-		return this.offset2;
-	}
-
-	public void setOffset2(Integer offset2) {
-		this.offset2 = offset2;
-	}
-
-	public Integer getTotalEntries() {
-		return this.totalEntries;
-	}
-
-	public void setTotalEntries(Integer totalEntries) {
-		this.totalEntries = totalEntries;
-	}
-
-	public Integer getCheck1() {
-		return this.check1;
-	}
-
-	public void setCheck1(Integer check1) {
-		this.check1 = check1;
-	}
-
-	public String getUseGeneric() {
-		return this.useGeneric;
-	}
-
-	public void setUseGeneric(String useGeneric) {
-		this.useGeneric = useGeneric;
-	}
-
-	public String getOrganization() {
-		return this.organization;
-	}
-
-	public void setOrganization(String organization) {
-		this.organization = organization;
-	}
-
-	public Integer getOffset1() {
-		return this.offset1;
-	}
-
-	public void setOffset1(Integer offset1) {
-		this.offset1 = offset1;
-	}
-
-	public Integer getTid() {
-		return this.tid;
-	}
-
-	public void setTid(Integer tid) {
-		this.tid = tid;
-	}
-
-	public Integer getCheckFreq() {
-		return this.checkFreq;
-	}
-
-	public void setCheckFreq(Integer checkFreq) {
-		this.checkFreq = checkFreq;
-	}
-
-	public String getProgram() {
-		return this.program;
-	}
-
-	public void setProgram(String program) {
-		this.program = program;
-	}
-
-	public String getNewCycle() {
-		return this.newCycle;
-	}
-
-	public void setNewCycle(String newCycle) {
-		this.newCycle = newCycle;
-	}
-
-	public Integer getStudyID() {
-		return this.studyID;
-	}
-
-	public void setStudyID(Integer studyID) {
-		this.studyID = studyID;
-	}
-
-	public String getUseAbbreviation() {
-		return this.useAbbreviation;
-	}
-
-	public void setUseAbbreviation(String useAbbreviation) {
-		this.useAbbreviation = useAbbreviation;
-	}
-
-	public String getInternatType() {
-		return this.internatType;
-	}
-
-	public void setInternatType(String internatType) {
-		this.internatType = internatType;
-	}
-
-	public String getCycle() {
-		return this.cycle;
-	}
-
-	public void setCycle(String cycle) {
-		this.cycle = cycle;
-	}
-
-	public String getTrialAbbr() {
-		return this.trialAbbr;
-	}
-
-	public void setTrialAbbr(String trialAbbr) {
-		this.trialAbbr = trialAbbr;
-	}
-
-	public String getTrialName() {
-		return this.trialName;
-	}
-
-	public void setTrialName(String trialName) {
-		this.trialName = trialName;
-	}
-
-	public Integer getOffset() {
-		return this.offset;
-	}
-
-	public void setOffset(Integer offset) {
-		this.offset = offset;
-	}
-
-	public Integer getCheck2() {
-		return this.check2;
-	}
-
-	public void setCheck2(Integer check2) {
-		this.check2 = check2;
-	}
-
-	public List<GermplasmEntry> getEntriesList2() {
-		return this.entriesList2;
-	}
-
-	public void setEntriesList2(List<GermplasmEntry> entriesList2) {
-		this.entriesList2 = entriesList2;
-	}
-
-	public List<Occurrence> getOcurrencesList() {
-		return this.ocurrencesList;
-	}
-
-	public void setOcurrencesList(List<Occurrence> ocurrencesList) {
-		this.ocurrencesList = ocurrencesList;
-	}
-
-	public Integer getTrialMegaEnvironment() {
-		return this.trialMegaEnvironment;
-	}
-
-	public void setTrialMegaEnvironment(Integer trialMegaEnvironment) {
-		this.trialMegaEnvironment = trialMegaEnvironment;
-	}
-
-	public String getPrintMegaEnvironment() {
-		return this.printMegaEnvironment;
-	}
-
-	public void setPrintMegaEnvironment(String printMegaEnvironment) {
-		this.printMegaEnvironment = printMegaEnvironment;
-	}
-
-	public Integer getExpansionLevel() {
-		return this.expansionLevel;
-	}
-
-	public void setExpansionLevel(Integer expansionLevel) {
-		this.expansionLevel = expansionLevel;
-	}
-
 	public String getStationId() {
-		return this.stationId;
+		return stationId;
 	}
 
 	public void setStationId(String stationId) {
@@ -250,7 +72,7 @@ public class Occurrence {
 	}
 
 	public String getLid() {
-		return this.lid;
+		return lid;
 	}
 
 	public void setLid(String lid) {
@@ -258,7 +80,7 @@ public class Occurrence {
 	}
 
 	public List<GermplasmEntry> getEntriesList() {
-		return this.entriesList;
+		return entriesList;
 	}
 
 	public void setEntriesList(List<GermplasmEntry> entriesList) {
@@ -266,15 +88,23 @@ public class Occurrence {
 	}
 
 	public String getOccCycle() {
-		return this.occCycle;
+		return occCycle;
 	}
 
 	public void setOccCycle(String occCycle) {
 		this.occCycle = occCycle;
 	}
 
+	public Integer getOffset() {
+		return offset;
+	}
+
+	public void setOffset(Integer offset) {
+		this.offset = offset;
+	}
+
 	public Integer getOcc() {
-		return this.occ;
+		return occ;
 	}
 
 	public void setOcc(Integer occ) {
@@ -282,7 +112,7 @@ public class Occurrence {
 	}
 
 	public String getHarvDate() {
-		return this.harvDate;
+		return harvDate;
 	}
 
 	public void setHarvDate(String harvDate) {
@@ -290,7 +120,7 @@ public class Occurrence {
 	}
 
 	public String getStation() {
-		return this.station;
+		return station;
 	}
 
 	public void setStation(String station) {
@@ -298,7 +128,7 @@ public class Occurrence {
 	}
 
 	public String getOccAbbr() {
-		return this.occAbbr;
+		return occAbbr;
 	}
 
 	public void setOccAbbr(String occAbbr) {
@@ -306,7 +136,7 @@ public class Occurrence {
 	}
 
 	public String getLocationId() {
-		return this.locationId;
+		return locationId;
 	}
 
 	public void setLocationId(String locationId) {
@@ -314,7 +144,7 @@ public class Occurrence {
 	}
 
 	public String getCooperatorId() {
-		return this.cooperatorId;
+		return cooperatorId;
 	}
 
 	public void setCooperatorId(String cooperatorId) {
@@ -322,7 +152,7 @@ public class Occurrence {
 	}
 
 	public String getPlantDate() {
-		return this.plantDate;
+		return plantDate;
 	}
 
 	public void setPlantDate(String plantDate) {
@@ -330,7 +160,7 @@ public class Occurrence {
 	}
 
 	public String getOccName() {
-		return this.occName;
+		return occName;
 	}
 
 	public void setOccName(String occName) {
@@ -338,7 +168,7 @@ public class Occurrence {
 	}
 
 	public String getFbClass() {
-		return this.fbClass;
+		return fbClass;
 	}
 
 	public void setFbClass(String fbClass) {
@@ -346,11 +176,187 @@ public class Occurrence {
 	}
 
 	public String getOccNewCycle() {
-		return this.occNewCycle;
+		return occNewCycle;
 	}
 
 	public void setOccNewCycle(String occNewCycle) {
 		this.occNewCycle = occNewCycle;
+	}
+
+	public List<GermplasmEntry> getEntriesList2() {
+		return entriesList2;
+	}
+
+	public void setEntriesList2(List<GermplasmEntry> entriesList2) {
+		this.entriesList2 = entriesList2;
+	}
+
+	public Integer getOffset2() {
+		return offset2;
+	}
+
+	public void setOffset2(Integer offset2) {
+		this.offset2 = offset2;
+	}
+
+	public Integer getTotalEntries() {
+		return totalEntries;
+	}
+
+	public void setTotalEntries(Integer totalEntries) {
+		this.totalEntries = totalEntries;
+	}
+
+	public Integer getCheck1() {
+		return check1;
+	}
+
+	public void setCheck1(Integer check1) {
+		this.check1 = check1;
+	}
+
+	public String getUseGeneric() {
+		return useGeneric;
+	}
+
+	public void setUseGeneric(String useGeneric) {
+		this.useGeneric = useGeneric;
+	}
+
+	public String getOrganization() {
+		return organization;
+	}
+
+	public void setOrganization(String organization) {
+		this.organization = organization;
+	}
+
+	public Integer getOffset1() {
+		return offset1;
+	}
+
+	public void setOffset1(Integer offset1) {
+		this.offset1 = offset1;
+	}
+
+	public Integer getTid() {
+		return tid;
+	}
+
+	public void setTid(Integer tid) {
+		this.tid = tid;
+	}
+
+	public Integer getCheckFreq() {
+		return checkFreq;
+	}
+
+	public void setCheckFreq(Integer checkFreq) {
+		this.checkFreq = checkFreq;
+	}
+
+	public String getProgram() {
+		return program;
+	}
+
+	public void setProgram(String program) {
+		this.program = program;
+	}
+
+	public String getNewCycle() {
+		return newCycle;
+	}
+
+	public void setNewCycle(String newCycle) {
+		this.newCycle = newCycle;
+	}
+
+	public Integer getStudyID() {
+		return studyID;
+	}
+
+	public void setStudyID(Integer studyID) {
+		this.studyID = studyID;
+	}
+
+	public String getUseAbreviation() {
+		return useAbreviation;
+	}
+
+	public void setUseAbreviation(String useAbreviation) {
+		this.useAbreviation = useAbreviation;
+	}
+
+	public String getInternatType() {
+		return internatType;
+	}
+
+	public void setInternatType(String internatType) {
+		this.internatType = internatType;
+	}
+
+	public String getCycle() {
+		return cycle;
+	}
+
+	public void setCycle(String cycle) {
+		this.cycle = cycle;
+	}
+
+	public String getTrialAbbr() {
+		return trialAbbr;
+	}
+
+	public void setTrialAbbr(String trialAbbr) {
+		this.trialAbbr = trialAbbr;
+	}
+
+	public String getTrialName() {
+		return trialName;
+	}
+
+	public void setTrialName(String trialName) {
+		this.trialName = trialName;
+	}
+
+	public Integer getCheck2() {
+		return check2;
+	}
+
+	public void setCheck2(Integer check2) {
+		this.check2 = check2;
+	}
+
+	public List<Occurrence> getOcurrencesList() {
+		return ocurrencesList;
+	}
+
+	public void setOcurrencesList(List<Occurrence> ocurrencesList) {
+		this.ocurrencesList = ocurrencesList;
+	}
+
+	public Integer getTrialMegaEnvironment() {
+		return trialMegaEnvironment;
+	}
+
+	public void setTrialMegaEnvironment(Integer trialMegaEnvironment) {
+		this.trialMegaEnvironment = trialMegaEnvironment;
+	}
+
+	public String getPrintMegaEnvironment() {
+		return printMegaEnvironment;
+	}
+
+	public void setPrintMegaEnvironment(String printMegaEnvironment) {
+		this.printMegaEnvironment = printMegaEnvironment;
+	}
+
+	public Integer getExpansionLevel() {
+		return expansionLevel;
+	}
+
+	public void setExpansionLevel(Integer expansionLevel) {
+		this.expansionLevel = expansionLevel;
 	}
 
 }

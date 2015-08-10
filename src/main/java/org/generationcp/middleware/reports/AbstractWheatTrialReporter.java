@@ -44,10 +44,10 @@ public abstract class AbstractWheatTrialReporter extends AbstractReporter {
 					params.put("program", var.getValue());
 					break;
 				case "STUDY_NAME":
-					params.put("trial_abbr", var.getValue());
+					params.put("trialAbbr", var.getValue());
 					break;
 				case "STUDY_TITLE":
-					params.put("trial_name", var.getValue());
+					params.put("trialName", var.getValue());
 					break;
 				case "CROP_SEASON":
 					params.put("cycle", var.getValue());
@@ -70,8 +70,8 @@ public abstract class AbstractWheatTrialReporter extends AbstractReporter {
 					params.put("organization", var.getValue());
 					break;
 				default:
-					params.put("dms_ip", "???");
-					params.put("gms_ip", "???");
+					params.put("dmsIp", "???");
+					params.put("gmsIp", "???");
 					params.put("version", "v-1");
 					break;
 			}
@@ -108,10 +108,10 @@ public abstract class AbstractWheatTrialReporter extends AbstractReporter {
 					case "PLOT_NO":
 						entry.setPlot(Integer.valueOf(dataItem.getValue()));
 						break;
-						// TODO: pending mappings
+					// TODO: pending mappings
 					default:
-						entry.setSEnt(-99);
-						entry.setSTabbr("???");
+						entry.setsEnt(-99);
+						entry.setsTabbr("???");
 						entry.setSlocycle("???");
 
 				}

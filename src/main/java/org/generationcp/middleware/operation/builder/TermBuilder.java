@@ -69,9 +69,11 @@ public class TermBuilder extends Builder {
 	}
 
 	public Term findTermByName(String name, CvId cvId) throws MiddlewareQueryException {
-		Term term = null;
-		term = this.mapToTerm(this.getCvTermDao().getByNameAndCvId(name, cvId.getId()));
-		return term;
+		return findTermByName(name, cvId.getId());
+	}
+
+	public Term findTermByName(String name, int cvId) throws MiddlewareQueryException {
+		return this.mapToTerm(this.getCvTermDao().getByNameAndCvId(name, cvId));
 	}
 
 	private Term mapToTerm(CVTerm cvTerm) {

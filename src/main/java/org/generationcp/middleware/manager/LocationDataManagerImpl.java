@@ -104,6 +104,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 				String.class, Operation.class, String.class});
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Override
 	@Deprecated
 	public List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException {
@@ -112,6 +115,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		return locations;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Override
 	@Deprecated
 	public List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
@@ -120,6 +126,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 				String.class, Operation.class});
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Override
 	@Deprecated
 	public long countLocationsByName(String name, Operation op) throws MiddlewareQueryException {
@@ -278,10 +287,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			trans = session.beginTransaction();
 			LocationDAO dao = this.getLocationDao();
 
-			// Auto-assign IDs for new DB records
-			Integer nextId = dao.getNextId("locid");
-			location.setLocid(nextId);
-
 			Location recordSaved = dao.saveOrUpdate(location);
 			idLocationSaved = recordSaved.getLocid();
 
@@ -308,11 +313,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			LocationDAO dao = this.getLocationDao();
 
 			for (Location location : locations) {
-
-				// Auto-assign IDs for new DB records
-				Integer nextID = dao.getNextId("locid");
-				location.setLocid(nextID);
-
 				Location recordSaved = dao.saveOrUpdate(location);
 				idLocationsSaved.add(recordSaved.getLocid());
 			}
@@ -340,14 +340,10 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 			// Auto-assign IDs for new DB records
 			LocationDAO locationDao = this.getLocationDao();
-			Integer nextId = locationDao.getNextId("locid");
-			location.setLocid(nextId);
 			Location recordSaved = locationDao.saveOrUpdate(location);
 			idLocationSaved = recordSaved.getLocid();
 
 			LocdesDAO locdesDao = this.getLocdesDao();
-			nextId = locdesDao.getNextId("ldid");
-			locdes.setLdid(nextId);
 			locdes.setLocationId(idLocationSaved);
 			locdesDao.saveOrUpdate(locdes);
 
@@ -417,12 +413,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public Long countAllBreedingLocations() throws MiddlewareQueryException {
 		return this.countAllByMethod(this.getLocationDAO(), "countAllBreedingLocations", new Object[] {}, new Class[] {});
-	}
-
-	@Override
-	public Integer getNextNegativeId() throws MiddlewareQueryException {
-		return this.getLocationDao().getNextId("locid");
-
 	}
 
 	@Override
@@ -570,6 +560,38 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		} finally {
 			session.flush();
 		}
+	}
+
+	@Override
+	public List<Locdes> getLocdesByLocId(Integer locationId) throws MiddlewareQueryException {
+		return this.getLocationDao().getLocdesByLocId(locationId);
+	}
+
+	@Override
+	public void saveOrUpdateLocdesList(Integer locId, List<Locdes> locdesList) throws MiddlewareQueryException {
+
+		if (locdesList != null && !locdesList.isEmpty()) {
+
+			Session session = this.getCurrentSession();
+			Transaction trans = null;
+
+			try {
+				trans = session.beginTransaction();
+
+				List<Locdes> existingLocdesList = this.getLocDesDao().getByLocation(locId);
+				for (Locdes locdes : locdesList) {
+					this.getLocdesSaver().saveOrUpdateLocdes(locdes.getLocationId(), existingLocdesList, locdes.getTypeId(),
+							locdes.getDval(), locdes.getUserId());
+				}
+
+				trans.commit();
+
+			} catch (Exception e) {
+				this.rollbackTransaction(trans);
+				this.logAndThrowException("Error encountered with saveOrUpdateLocdesList(): " + e.getMessage(), e);
+			}
+		}
+
 	}
 
 }

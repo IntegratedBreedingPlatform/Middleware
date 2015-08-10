@@ -61,9 +61,9 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
 
 			Query query =
 					this.getSession()
-							.createSQLQuery(
-									"select p.* from cvtermprop p inner join cvterm t on p.cvterm_id = t.cvterm_id where t.is_obsolete =0 and t.cv_id = "
-											+ cvId).addEntity(CVTermProperty.class);
+					.createSQLQuery(
+							"select p.* from cvtermprop p inner join cvterm t on p.cvterm_id = t.cvterm_id where t.is_obsolete =0 and t.cv_id = "
+									+ cvId).addEntity(CVTermProperty.class);
 
 			return query.list();
 
@@ -122,7 +122,7 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
 		CVTermProperty property = this.getOneByCvTermAndType(cvTermId, typeId);
 
 		if (property == null) {
-			return this.save(new CVTermProperty(this.getNextId(CVTermProperty.ID_NAME), cvTermId, typeId, value, rank));
+			return this.save(new CVTermProperty(null, cvTermId, typeId, value, rank));
 		}
 
 		property.setValue(value);

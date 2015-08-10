@@ -1,5 +1,5 @@
 /*******************************************************************************
- * 
+ *
  * Copyright (c) 2012, All Rights Reserved.
  *
  * Generation Challenge Programme (GCP)
@@ -59,7 +59,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Retrieves a list of Standard Variables from a list of Ids.
-	 * 
+	 *
 	 * @param ids - list of ids
 	 * @return list of StandardVariable instances
 	 */
@@ -76,7 +76,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Gets summary for a standard variable identified by given id. Returns {@code null} if no match is found.
-	 * 
+	 *
 	 * @param standardVariableId
 	 * @return
 	 * @throws MiddlewareQueryException
@@ -308,9 +308,9 @@ public interface OntologyDataManager {
 	 * Retrieves ALL the trait classes containing the hierarchical structure of the trait classes. If includePropertiesAndVariables = true,
 	 * it retrieves the properties and standard variables in a hierarchical structure as well: Trait Group --> Properties --> Standard
 	 * Variables.
-	 * 
+	 *
 	 * The list is returned in alphabetical order of the name.
-	 * 
+	 *
 	 * @param includePropertiesAndVariables true if we want to load the property and standard variable, else false
 	 * @return the trait groups
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -357,9 +357,8 @@ public interface OntologyDataManager {
 	 * @return the standard variables matching the given parameters
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<StandardVariable> getStandardVariables(Integer traitClassId, 
-			Integer propertyId, Integer methodId, Integer scaleId, String programUUID)
-			throws MiddlewareException;
+	List<StandardVariable> getStandardVariables(Integer traitClassId, Integer propertyId, Integer methodId, Integer scaleId,
+			String programUUID) throws MiddlewareException;
 
 	/**
 	 *
@@ -515,38 +514,27 @@ public interface OntologyDataManager {
 	void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException;
 
 	/**
-	 * Returns the variable id given the property, scale, method, and role
-	 * (P-S-M-R).
-	 * 
-	 * @param property
-	 *            the property
-	 * @param scale
-	 *            the scale
-	 * @param method
-	 *            the method
+	 * Returns the variable id given the property, scale, method, and role (P-S-M-R).
+	 *
+	 * @param property the property
+	 * @param scale the scale
+	 * @param method the method
 	 * @return the standard variable id by property scale method
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer getStandardVariableIdByPropertyScaleMethod(String property,
-			String scale, String method) throws MiddlewareQueryException;
+	Integer getStandardVariableIdByPropertyScaleMethod(String property, String scale, String method) throws MiddlewareQueryException;
 
 	/**
 	 * Returns the variable id given the property, scale, method (P-S-M).
-	 * 
-	 * @param propertyId
-	 *            the property id
-	 * @param scaleId
-	 *            the scale id
-	 * @param methodId
-	 *            the method id
+	 *
+	 * @param propertyId the property id
+	 * @param scaleId the scale id
+	 * @param methodId the method id
 	 * @return the standard variable id by property scale method
-	 * @throws MiddlewareQueryException
-	 *             the middleware query exception
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer getStandardVariableIdByPropertyIdScaleIdMethodId(
-			Integer propertyId, Integer scaleId, Integer methodId)
-			throws MiddlewareQueryException;
+	Integer getStandardVariableIdByPropertyIdScaleIdMethodId(Integer propertyId, Integer scaleId, Integer methodId)
+					throws MiddlewareQueryException;
 
 	/**
 	 * validate if the enumeration is being used.
@@ -560,11 +548,39 @@ public interface OntologyDataManager {
 
 	/**
 	 * Returns synonyms (if any) of given term (not limited to standard variable)
-	 * 
+	 *
 	 * @param termId
 	 * @return
 	 */
 	List<NameSynonym> getSynonymsOfTerm(Integer termId) throws MiddlewareQueryException;
 
 	boolean isSeedAmountVariable(String variateProperty) throws MiddlewareQueryException;
+
+	/**
+	 * Returns the cv id by name
+	 *
+	 * @param name of cv
+	 * @return cv_id
+	 */
+	Integer getCVIdByName(String name) throws MiddlewareQueryException;
+
+	/**
+	 * Returns Term based on the given name and cv id.
+	 *
+	 * @param name the name
+	 * @param cvId the cv id
+	 * @return Term
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Term findTermByName(String name, int cvId) throws MiddlewareQueryException;
+
+	/**
+	 * This is specifically for use in Database Migrator. Adds a StandardVariable to the database. Must provide the property, method, scale,
+	 * dataType, and storedIn info. Otherwise, it will throw an exception.
+	 *
+	 * @param stdVariable the std variable
+	 * @param programUUID TODO
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	void addStandardVariableForMigrator(StandardVariable stdVariable, String programUUID) throws MiddlewareQueryException;
 }

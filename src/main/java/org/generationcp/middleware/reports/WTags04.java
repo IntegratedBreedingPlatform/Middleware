@@ -33,7 +33,7 @@ public class WTags04 extends AbstractReporter {
 	@Override
 	public Reporter createReporter() {
 		Reporter r = new WTags04();
-		r.setFileNameExpression("TAGS04_{trial_name}");
+		r.setFileNameExpression("TAGS04_{trialName}");
 		return r;
 	}
 
@@ -172,8 +172,8 @@ public class WTags04 extends AbstractReporter {
 					pedigreeB = pedigreeA;
 					pedigreeA =
 							pedigreeA.length() > 40 ? pedigreeA.substring(0, pedigreeA.substring(0, 40).lastIndexOf("/") + 1) : pedigreeA;
-							pedigreeB = pedigreeB.length() > 40 ? pedigreeB.substring(pedigreeB.lastIndexOf("/", 40) + 1, pedigreeB.length()) : "";
-							break;
+					pedigreeB = pedigreeB.length() > 40 ? pedigreeB.substring(pedigreeB.lastIndexOf("/", 40) + 1, pedigreeB.length()) : "";
+					break;
 				case "DESIGNATION":
 					selHistA = row.get(i);
 					selHistB = selHistA;
@@ -190,22 +190,22 @@ public class WTags04 extends AbstractReporter {
 		StringBuilder sb = new StringBuilder();
 
 		sb.append(StringUtil.stringOf(" ", rowSpan)).append(StringUtil.format(study, 30, true)).append(" OCC: ")
-		.append(StringUtil.format(occ, 4, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
-		.append(StringUtil.format(subProg, 3, true)).append(" ").append(StringUtil.format(type, 5, true)).append(" ")
-		.append(StringUtil.format(season, 13, true)).append(StringUtil.format("ENTRY", 7, false)).append(" ")
-		.append(StringUtil.format(entry, 6, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan - 15))
-		.append(StringUtil.format("CIMMYT", 6, false)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan));
+				.append(StringUtil.format(occ, 4, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
+				.append(StringUtil.format(subProg, 3, true)).append(" ").append(StringUtil.format(type, 5, true)).append(" ")
+				.append(StringUtil.format(season, 13, true)).append(StringUtil.format("ENTRY", 7, false)).append(" ")
+				.append(StringUtil.format(entry, 6, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan - 15))
+				.append(StringUtil.format("CIMMYT", 6, false)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan));
 
 		if (entryType == null || !entryType.equals("T")) { // test entry, meaning Not-a-check.
 			sb.append(StringUtil.format(pedigreeA, rowSize, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
-			.append(StringUtil.format(pedigreeB, rowSize, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
-			.append(StringUtil.format("", 4, true)).append(StringUtil.format(selHistA, 36, true)).append("\r\n")
-			.append(StringUtil.stringOf(" ", rowSpan)).append(StringUtil.format("", 4, true))
-			.append(StringUtil.format(selHistB, 36, true));
+					.append(StringUtil.format(pedigreeB, rowSize, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
+					.append(StringUtil.format("", 4, true)).append(StringUtil.format(selHistA, 36, true)).append("\r\n")
+					.append(StringUtil.stringOf(" ", rowSpan)).append(StringUtil.format("", 4, true))
+					.append(StringUtil.format(selHistB, 36, true));
 		} else {
 			sb.append(StringUtil.format("LOCAL CHECK ", rowSize, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan))
-			.append(StringUtil.format("** CHECK **", rowSize, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan * 2))
-			.append("\r\n").append(StringUtil.stringOf(" ", rowSpan * 2));
+					.append(StringUtil.format("** CHECK **", rowSize, true)).append("\r\n").append(StringUtil.stringOf(" ", rowSpan * 2))
+					.append("\r\n").append(StringUtil.stringOf(" ", rowSpan * 2));
 		}
 
 		return sb.append("\r\n\r\n").toString();

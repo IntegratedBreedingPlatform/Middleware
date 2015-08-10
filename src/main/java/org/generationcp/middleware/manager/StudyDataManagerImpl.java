@@ -11,11 +11,36 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
-import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.DatasetValues;
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.dms.ExperimentValues;
+import org.generationcp.middleware.domain.dms.FolderReference;
+import org.generationcp.middleware.domain.dms.Reference;
+import org.generationcp.middleware.domain.dms.Stocks;
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.domain.fieldbook.*;
+import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
+import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
@@ -49,11 +74,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
@@ -204,9 +224,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, 
-			VariableTypeList varTypeList)
-					throws MiddlewareException {
+	public List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList)
+			throws MiddlewareException {
 		this.clearSessions();
 		if (varTypeList == null) {
 			return this.getExperiments(dataSetId, start, numOfRows);
@@ -256,7 +275,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValuesList)
-					throws MiddlewareQueryException {
+			throws MiddlewareQueryException {
 		Session session = this.getCurrentSession();
 		Transaction trans = null;
 
@@ -349,7 +368,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 	}
 
-	
 	@Override
 	public TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) throws MiddlewareException {
 		DmsProject study = this.getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(datasetId, TermId.BELONGS_TO_STUDY.getId());
@@ -559,10 +577,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	private void updateExperimentValues(List<ExperimentValues> experimentValues, Integer projectId, List<Integer> locationIds)
 			throws MiddlewareQueryException {
-		for (Integer locationId : locationIds) {
-			// delete phenotypes by project id and locationId
-			this.getPhenotypeDao().deletePhenotypesByProjectIdAndLocationId(projectId, locationId);
-		}
+
 		for (ExperimentValues exp : experimentValues) {
 			if (exp.getVariableList() != null && !exp.getVariableList().isEmpty()) {
 				ExperimentModel experimentModel =
@@ -1018,7 +1033,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 					existingPhenotypeOutlier.setValue(phenotypeOutlier.getValue());
 					phenotypeOutlierDao.saveOrUpdate(existingPhenotypeOutlier);
 				} else {
-					phenotypeOutlier.setPhenotypeOutlierId(phenotypeOutlierDao.getNextId("phenotypeOutlierId"));
 					phenotypeOutlierDao.saveOrUpdate(phenotypeOutlier);
 				}
 				if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
@@ -1088,5 +1102,36 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			this.rollbackTransaction(trans);
 			throw new MiddlewareQueryException("Error in updateVariableOrdering " + e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public Integer getGeolocationIdByProjectIdAndTrialInstanceNumber(int projectId, String trialInstanceNumber)
+			throws MiddlewareQueryException {
+		return this.getExperimentProjectDao().getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId, trialInstanceNumber);
+	}
+
+	@Override
+	public String getTrialInstanceNumberByGeolocationId(int geolocationId) throws MiddlewareQueryException {
+		Geolocation geolocation = this.getGeolocationDao().getById(geolocationId);
+		if (geolocation != null) {
+			return geolocation.getDescription();
+		}
+		return null;
+	}
+
+	@Override
+	public void saveGeolocationProperty(int geolocationId, int typeId, String value) throws MiddlewareQueryException {
+		Session session = this.getCurrentSession();
+		Transaction trans = null;
+
+		try {
+			trans = session.beginTransaction();
+			this.getGeolocationPropertySaver().saveOrUpdate(geolocationId, typeId, value);
+			trans.commit();
+		} catch (Exception e) {
+			this.rollbackTransaction(trans);
+			throw new MiddlewareQueryException("Error in saveGeolocationProperty " + e.getMessage(), e);
+		}
+
 	}
 }

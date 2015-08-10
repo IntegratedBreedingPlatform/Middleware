@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-02-20T13:33:59 -->
+<!-- Created with Jaspersoft Studio version 6.0.4.final using JasperReports Library version 6.0.4  -->
+<!-- 2015-07-14T14:09:46 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb61_header" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="fbcf4316-1996-480e-b1b1-0e00e8f70e67">
 	<property name="ireport.zoom" value="3.0"/>
 	<property name="ireport.x" value="0"/>
@@ -30,14 +30,14 @@
 	<parameter name="tid" class="java.lang.Integer"/>
 	<parameter name="occ" class="java.lang.Integer"/>
 	<parameter name="program" class="java.lang.String"/>
-	<parameter name="trial_name" class="java.lang.String"/>
-	<parameter name="trial_abbr" class="java.lang.String"/>
+	<parameter name="trialName" class="java.lang.String"/>
+	<parameter name="trialAbbr" class="java.lang.String"/>
 	<parameter name="LoCycle" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
 		<defaultValueExpression><![CDATA["./"]]></defaultValueExpression>
 	</parameter>
-	<parameter name="gms_ip" class="java.lang.String"/>
-	<parameter name="dms_ip" class="java.lang.String"/>
+	<parameter name="gmsIp" class="java.lang.String"/>
+	<parameter name="dmsIp" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -59,14 +59,14 @@
 	<field name="plot" class="java.lang.Integer">
 		<fieldDescription><![CDATA[plot]]></fieldDescription>
 	</field>
-	<field name="s_ent" class="java.lang.Integer">
-		<fieldDescription><![CDATA[s_ent]]></fieldDescription>
+	<field name="sEnt" class="java.lang.Integer">
+		<fieldDescription><![CDATA[sEnt]]></fieldDescription>
 	</field>
-	<field name="s_tabbr" class="java.lang.String">
-		<fieldDescription><![CDATA[s_tabbr]]></fieldDescription>
+	<field name="sTabbr" class="java.lang.String">
+		<fieldDescription><![CDATA[sTabbr]]></fieldDescription>
 	</field>
-	<field name="s_tid" class="java.lang.Integer">
-		<fieldDescription><![CDATA[s_tid]]></fieldDescription>
+	<field name="sTid" class="java.lang.Integer">
+		<fieldDescription><![CDATA[sTid]]></fieldDescription>
 	</field>
 	<field name="slocycle" class="java.lang.String">
 		<fieldDescription><![CDATA[slocycle]]></fieldDescription>
@@ -146,14 +146,14 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{trial_name}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{trialName}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="313" y="9" width="110" height="12" uuid="a8b650fe-5eeb-48cb-bbea-b0aa7df393c0"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{trial_abbr}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{trialAbbr}]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="6" y="46" width="521" height="1" uuid="8243ce48-9531-4562-9795-f138bee741ac"/>
@@ -239,12 +239,12 @@
 				<reportElement x="336" y="20" width="29" height="12" uuid="6af5811e-a0f9-4d34-9af4-1c1ea4aa9210">
 					<property name="local_mesure_unitheight" value="pixel"/>
 					<property name="com.jaspersoft.studio.unit.height" value="px"/>
-					<printWhenExpression><![CDATA[$F{s_ent}!=0]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$F{sEnt}!=0]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{s_ent}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{sEnt}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="44" y="0" width="242" height="10" uuid="325315e0-87c0-44aa-874f-3f3264de02bb">
@@ -295,7 +295,7 @@ $F{linea1})]]></textFieldExpression>
 				<textElement>
 					<font fontName="Times New Roman" size="7" isBold="false"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{s_tabbr}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{sTabbr}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="297" y="1" width="55" height="12" uuid="a61e5b02-8e51-499f-9433-55887fce5dc2">
@@ -387,14 +387,14 @@ $F{linea1})]]></textFieldExpression>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{dms_ip}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{dmsIp}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="327" y="1" width="173" height="9" uuid="8875f08b-f73e-4f74-aef1-db783813842a"/>
 				<textElement>
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{gms_ip}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{gmsIp}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>
@@ -412,14 +412,14 @@ $F{linea1})]]></textFieldExpression>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{dms_ip}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{dmsIp}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="366" y="1" width="158" height="9" uuid="d60c7351-f5ad-48e2-ae70-e11ffda4c7bd"/>
 				<textElement>
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{gms_ip}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{gmsIp}]]></textFieldExpression>
 			</textField>
 		</band>
 	</lastPageFooter>

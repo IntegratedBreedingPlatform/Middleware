@@ -651,7 +651,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Count the number of variates with recorded data.
-	 * 
+	 *
 	 * @param datasetId
 	 * @param variateIds
 	 * @return
@@ -714,7 +714,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Soft-delete all program studies
-	 * 
+	 *
 	 * @param programUUID Program UUID of the studies to be deleted
 	 * @throws MiddlewareQueryException if any error occurs during data access.
 	 */
@@ -730,4 +730,34 @@ public interface StudyDataManager {
 	 * @param variableIds - list of variable IDs in the order that they will be saved
 	 */
 	void updateVariableOrdering(int datasetId, List<Integer> variableIds) throws MiddlewareQueryException;
+
+	/**
+	 * Gets the geolocation id by project id and trial instance number.
+	 *
+	 * @param projectId - study id or dataset id
+	 * @param trial instance number
+	 * @return the geolocation id
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	public Integer getGeolocationIdByProjectIdAndTrialInstanceNumber(int projectId, String trialInstanceNumber)
+			throws MiddlewareQueryException;
+
+	/**
+	 * Retrieves the trial instance number by geolocation id
+	 *
+	 * @param geolocationId
+	 * @return trial instance number
+	 * @throws MiddlewareQueryException
+	 */
+	public String getTrialInstanceNumberByGeolocationId(int geolocationId) throws MiddlewareQueryException;
+
+	/**
+	 * Save the geolocation property given the geolocation id, type id and value
+	 *
+	 * @param geolocationId
+	 * @param typeId
+	 * @param value
+	 * @throws MiddlewareQueryException
+	 */
+	public void saveGeolocationProperty(int geolocationId, int typeId, String value) throws MiddlewareQueryException;
 }

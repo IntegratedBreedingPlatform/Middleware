@@ -40,7 +40,7 @@ public class GeolocationPropertySaver extends Saver {
 		}
 	}
 
-	private void saveOrUpdate(int geolocationId, int typeId, String value) throws MiddlewareQueryException {
+	public void saveOrUpdate(int geolocationId, int typeId, String value) throws MiddlewareQueryException {
 		Geolocation geolocation = this.getGeolocationDao().getById(geolocationId);
 		GeolocationProperty property = null;
 		if (geolocation.getProperties() != null && !geolocation.getProperties().isEmpty()) {
@@ -48,7 +48,6 @@ public class GeolocationPropertySaver extends Saver {
 		}
 		if (property == null) {
 			property = new GeolocationProperty();
-			property.setGeolocationPropertyId(this.getGeolocationPropertyDao().getNextId("geolocationPropertyId"));
 			property.setRank(this.getMaxRank(geolocation.getProperties()));
 			property.setGeolocation(geolocation);
 			property.setType(typeId);
@@ -83,7 +82,6 @@ public class GeolocationPropertySaver extends Saver {
 		}
 		if (property == null) {
 			property = new GeolocationProperty();
-			property.setGeolocationPropertyId(this.getGeolocationPropertyDao().getNextId("geolocationPropertyId"));
 			property.setRank(this.getMaxRank(geolocation.getProperties()));
 			property.setGeolocation(geolocation);
 			property.setType(typeId);

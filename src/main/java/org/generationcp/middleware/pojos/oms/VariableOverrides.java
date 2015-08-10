@@ -16,6 +16,8 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
@@ -34,6 +36,7 @@ public class VariableOverrides implements Serializable {
 	public static final String ID_NAME = "id";
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "id")
 	private Integer id;
@@ -163,8 +166,8 @@ public class VariableOverrides implements Serializable {
 
 	@Override
 	public String toString() {
-		return "VariableOverrides{" + "id=" + this.id + ", variableId=" + this.variableId + ", programUuid='" + this.programUuid
-				+ '\'' + ", alias='" + this.alias + '\'' + ", minValue='" + this.expectedMin + '\'' + ", maxValue='" + this.expectedMax + '\''
+		return "VariableOverrides{" + "id=" + this.id + ", variableId=" + this.variableId + ", programUuid='" + this.programUuid + '\''
+				+ ", alias='" + this.alias + '\'' + ", minValue='" + this.expectedMin + '\'' + ", maxValue='" + this.expectedMax + '\''
 				+ '}';
 	}
 }

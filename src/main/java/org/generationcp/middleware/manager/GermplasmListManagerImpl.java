@@ -63,6 +63,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 				new Class[] {Integer.TYPE, Integer.TYPE});
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Deprecated
 	@Override
 	public List<GermplasmList> getAllGermplasmLists(int start, int numOfRows, Database instance) throws MiddlewareQueryException {
@@ -82,6 +85,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return this.getGermplasmListDAO().getByName(name, operation, start, numOfRows);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Override
 	@Deprecated
 	public List<GermplasmList> getGermplasmListByName(String name, int start, int numOfRows, Operation operation, Database instance)
@@ -96,6 +102,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return this.getGermplasmListDAO().countByName(name, operation);
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Deprecated
 	@Override
 	public long countGermplasmListByName(String name, Operation operation, Database instance) throws MiddlewareQueryException {
@@ -198,6 +207,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return topLevelFolders;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Override
 	@Deprecated
 	public List<GermplasmList> getAllTopLevelListsBatched(int batchSize, Database instance) throws MiddlewareQueryException {
@@ -259,11 +271,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 			for (GermplasmList germplasmList : germplasmLists) {
 				if (operation == Operation.ADD) {
-					// Auto-assign IDs for new DB records
-					Integer nextId = this.getGermplasmListDAO().getNextId("id");
-					germplasmListIds.add(nextId);
-					germplasmList.setId(nextId);
-					this.getGermplasmListDAO().saveOrUpdate(germplasmList);
+					germplasmList = this.getGermplasmListDAO().saveOrUpdate(germplasmList);
+					germplasmListIds.add(germplasmList.getId());
 				} else if (operation == Operation.UPDATE) {
 					germplasmListIds.add(germplasmList.getId());
 					this.getGermplasmListDAO().merge(germplasmList);
@@ -396,11 +405,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 			List<Integer> deletedListEntryIds = new ArrayList<Integer>();
 
 			for (GermplasmListData germplasmListData : germplasmListDatas) {
-				if (operation == Operation.ADD) {
-					// Auto-assign IDs for new DB records
-					Integer nextListId = this.getGermplasmListDataDAO().getNextId("id");
-					germplasmListData.setId(nextListId);
-				}
+
 				GermplasmListData recordSaved = this.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
 				idGermplasmListDataSaved.add(recordSaved.getId());
 				germplasmListDataSaved++;
@@ -612,6 +617,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return results;
 	}
 
+	/**
+	 * @deprecated
+	 */
 	@Deprecated
 	@Override
 	public List<GermplasmList> searchForGermplasmList(String q, Operation o, boolean searchPublicData) throws MiddlewareQueryException {

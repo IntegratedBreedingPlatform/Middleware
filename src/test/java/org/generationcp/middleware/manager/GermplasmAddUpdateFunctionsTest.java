@@ -46,6 +46,7 @@ public class GermplasmAddUpdateFunctionsTest extends DataManagerIntegrationTest 
 		g.setLocationId(Integer.valueOf(9000));
 		g.setMethodId(Integer.valueOf(1));
 		g.setMgid(Integer.valueOf(1));
+		g.setLgid(Integer.valueOf(1));
 		// g.setUserId(Integer.valueOf(527));
 		g.setUserId(Integer.valueOf(1));
 		g.setReferenceId(Integer.valueOf(1));

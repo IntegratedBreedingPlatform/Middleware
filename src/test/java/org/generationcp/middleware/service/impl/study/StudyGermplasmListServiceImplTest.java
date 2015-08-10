@@ -1,6 +1,10 @@
 
 package org.generationcp.middleware.service.impl.study;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.when;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -11,9 +15,7 @@ import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.SimpleExpression;
-import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import uk.co.jemos.podam.api.PodamFactory;
@@ -32,9 +34,9 @@ public class StudyGermplasmListServiceImplTest {
 
 		final Session currentSession = Mockito.mock(Session.class);
 		final Criteria mockCriteria = Mockito.mock(Criteria.class);
-		Mockito.when(currentSession.createCriteria(ListDataProject.class)).thenReturn(mockCriteria);
-		Mockito.when(mockCriteria.createAlias("list", "l")).thenReturn(mockCriteria);
-		Mockito.when(mockCriteria.add(Matchers.any(SimpleExpression.class))).thenReturn(mockCriteria);
+		when(currentSession.createCriteria(ListDataProject.class)).thenReturn(mockCriteria);
+		when(mockCriteria.createAlias("list", "l")).thenReturn(mockCriteria);
+		when(mockCriteria.add(any(SimpleExpression.class))).thenReturn(mockCriteria);
 
 		final PodamFactory factory = new PodamFactoryImpl();
 
@@ -48,15 +50,14 @@ public class StudyGermplasmListServiceImplTest {
 		final List<ListDataProject> queryResults = new ArrayList<ListDataProject>();
 		queryResults.add(listDataProject);
 
-		Mockito.when(mockCriteria.list()).thenReturn(queryResults);
+		when(mockCriteria.list()).thenReturn(queryResults);
 
 		final StudyGermplasmDto expectedGermplasm = this.getResultingStudyGermplasmDto(germplasmList, listDataProject);
 
 		final StudyGermplasmListServiceImpl studyGermplasmListServiceImpl = new StudyGermplasmListServiceImpl(currentSession);
 		final List<StudyGermplasmDto> actualGermplasmList = studyGermplasmListServiceImpl.getGermplasmList(2013);
 
-		Assert.assertEquals("The two lists must be equal.", Collections.<StudyGermplasmDto>singletonList(expectedGermplasm),
-				actualGermplasmList);
+		assertEquals("The two lists must be equal.", Collections.<StudyGermplasmDto>singletonList(expectedGermplasm), actualGermplasmList);
 	}
 
 	private StudyGermplasmDto getResultingStudyGermplasmDto(GermplasmList germplasmList, ListDataProject listDataProject) {

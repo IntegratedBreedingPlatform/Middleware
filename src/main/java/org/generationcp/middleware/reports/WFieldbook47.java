@@ -57,48 +57,48 @@ public class WFieldbook47 extends AbstractWheatTrialReporter {
 				switch (dataItem.getLabel()) {
 					case "ENTRY_NO":
 						entry.setEntryNum(Integer.valueOf(dataItem.getValue()));
-					break;
+						break;
 					case "CROSS":
 						entry.setCrossname(dataItem.getValue());
-					break;
+						break;
 					case "DESIGNATION":
 						entry.setSelHist(dataItem.getValue());
-					break;
+						break;
 					case "f_cross_name":
-						entry.setFCrossName(dataItem.getValue());
-					break;
+						entry.setfCrossName(dataItem.getValue());
+						break;
 					case "f_selHist":
-						entry.setFSelHist(dataItem.getValue());
-					break;
+						entry.setfSelHist(dataItem.getValue());
+						break;
 					case "f_tabbr":
-						entry.setFTabbr(dataItem.getValue());
-					break;
+						entry.setfTabbr(dataItem.getValue());
+						break;
 					case "f_locycle":
 						entry.setFlocycle(dataItem.getValue());
-					break;
+						break;
 					case "f_ent":
-						entry.setFEnt(Integer.valueOf(dataItem.getValue()));
-					break;
+						entry.setfEnt(Integer.valueOf(dataItem.getValue()));
+						break;
 					case "f_lid":
-						entry.setFLid(dataItem.getValue());
-					break;
+						entry.setfLid(dataItem.getValue());
+						break;
 					case "m_cross_name":
-						entry.setMCrossName(dataItem.getValue());
-					break;
+						entry.setmCrossName(dataItem.getValue());
+						break;
 					case "m_selHist":
-						entry.setMSelHist(dataItem.getValue());
-					break;
+						entry.setmSelHist(dataItem.getValue());
+						break;
 					case "m_tabbr":
-						entry.setMTabbr(dataItem.getValue());
-					break;
+						entry.setmTabbr(dataItem.getValue());
+						break;
 					case "m_locycle":
 						entry.setMlocycle(dataItem.getValue());
-					break;
+						break;
 					case "m_ent":
-						entry.setMEnt(Integer.valueOf(dataItem.getValue()));
-					break;
+						entry.setmEnt(Integer.valueOf(dataItem.getValue()));
+						break;
 					case "m_lid":
-						entry.setMLid(dataItem.getValue());
+						entry.setmLid(dataItem.getValue());
 						break;
 
 					// TODO: pending mappings

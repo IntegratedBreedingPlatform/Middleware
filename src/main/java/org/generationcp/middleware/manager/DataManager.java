@@ -141,7 +141,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 *      }
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * @param dao The DAO to call the methods from
 	 * @param methods The methods to call (countXXX and its corresponding getXXX)
 	 * @param start The start row
@@ -150,6 +150,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 * @param parameterTypes The types of the parameters to be passed to the method
 	 * @return List of all records satisfying the given parameters
 	 * @throws MiddlewareQueryException
+	 * @deprecated
 	 */
 	// TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
 	// Logic changed to simply invoke the getMethod by reflection and not do any cursor positioning using count methods.
@@ -182,7 +183,7 @@ public abstract class DataManager extends DatabaseBroker {
 			toReturn.addAll((Collection) getMethod.invoke(dao, getMethodParameters));
 
 		} catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
-								// NoSuchMethodException
+			// NoSuchMethodException
 			this.logAndThrowException("Error in gettting all from central and local using " + getMethodName + ": " + e.getMessage(), e);
 		}
 		return toReturn;
@@ -194,7 +195,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 * Calls the corresponding method that returns list type as specified in the parameter methodName. <br/>
 	 * <br/>
 	 * Sample usage: <br/>
-	 * 
+	 *
 	 * <pre>
 	 * <code>
 	 *      public List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException {
@@ -203,7 +204,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 *      }
 	 *  </code>
 	 * </pre>
-	 * 
+	 *
 	 * @param dao The DAO to call the method from
 	 * @param methodName The method to call
 	 * @param parameters The parameters to be passed to the method
@@ -211,7 +212,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 * @return the List result
 	 * @throws MiddlewareQueryException
 	 * @deprecated
-	*/
+	 */
 	@Deprecated
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public List getAllByMethod(GenericDAO dao, String methodName, Object[] parameters, Class[] parameterTypes)
@@ -233,16 +234,16 @@ public abstract class DataManager extends DatabaseBroker {
 	 * Calls the corresponding method that returns list type as specified in the parameter methodName. <br/>
 	 * <br/>
 	 * Sample usage: <br/>
-	 * 
+	 *
 	 * <pre>
 	 * <code>
 	 *      public List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-	 *        return (List<Germplasm>) getFromInstanceByMethod(getGermplasmDao(), instance, "getByPrefName", new Object[]{name, start, numOfRows}, 
+	 *        return (List<Germplasm>) getFromInstanceByMethod(getGermplasmDao(), instance, "getByPrefName", new Object[]{name, start, numOfRows},
 	 *              new Class[]{String.class, Integer.TYPE, Integer.TYPE});
 	 *    }
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * @param dao The DAO to call the method from
 	 * @param methodName The method to call
 	 * @param parameters The parameters to be passed to the method. If the referenced DAO method has parameters start and numOfRows, you may
@@ -260,7 +261,7 @@ public abstract class DataManager extends DatabaseBroker {
 			dao.setSession(this.getActiveSession());
 			toReturn.addAll((List) method.invoke(dao, parameters));
 		} catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
-								// NoSuchMethodException
+			// NoSuchMethodException
 			this.logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
 		}
 		return toReturn;
@@ -271,16 +272,16 @@ public abstract class DataManager extends DatabaseBroker {
 	 * Calls the corresponding method that returns list type as specified in the parameter methodName. <br/>
 	 * <br/>
 	 * Sample usage: <br/>
-	 * 
+	 *
 	 * <pre>
 	 * <code>
 	 *      public List<Germplasm> getGermplasmByPrefName(String name, int start, int numOfRows, Database instance) throws MiddlewareQueryException {
-	 *        return (List<Germplasm>) getFromInstanceByMethod(getGermplasmDao(), instance, "getByPrefName", new Object[]{name, start, numOfRows}, 
+	 *        return (List<Germplasm>) getFromInstanceByMethod(getGermplasmDao(), instance, "getByPrefName", new Object[]{name, start, numOfRows},
 	 *              new Class[]{String.class, Integer.TYPE, Integer.TYPE});
 	 *    }
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * @param dao The DAO to call the method from
 	 * @param methodName The method to call
 	 * @param parameters The parameters to be passed to the method. If the referenced DAO method has parameters start and numOfRows, you may
@@ -289,7 +290,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 * @return the List result
 	 * @throws MiddlewareQueryException
 	 * @deprecated
-	*/
+	 */
 	@Deprecated
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public List getFromInstanceByMethod(GenericDAO dao, Database instance, String methodName, Object[] parameters, Class[] parameterTypes)
@@ -300,7 +301,7 @@ public abstract class DataManager extends DatabaseBroker {
 			dao.setSession(this.getActiveSession());
 			toReturn.addAll((List) method.invoke(dao, parameters));
 		} catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
-								// NoSuchMethodException
+			// NoSuchMethodException
 			this.logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
 		}
 		return toReturn;
@@ -311,17 +312,17 @@ public abstract class DataManager extends DatabaseBroker {
 	 * Calls the corresponding method that returns list type as specified in the parameter methodName. <br/>
 	 * <br/>
 	 * Sample usage: <br/>
-	 * 
+	 *
 	 * <pre>
 	 * <code>
 	 *     public List<Integer> getMarkerIdsByDatasetId(Integer datasetId) throws MiddlewareQueryException {
-	 *        return (List<Integer>) super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(), datasetId, "getMarkerIdByDatasetId", 
+	 *        return (List<Integer>) super.getFromInstanceByIdAndMethod(getMarkerMetadataSetDao(), datasetId, "getMarkerIdByDatasetId",
 	 *                new Object[]{datasetId}, new Class[]{Integer.class});
-	 * 
+	 *
 	 *    }
 	 * <code>
 	 * </pre>
-	 * 
+	 *
 	 * @param dao The DAO to call the method from
 	 * @param id The id used to get the instance to connect to
 	 * @param methodName The method to call
@@ -340,7 +341,7 @@ public abstract class DataManager extends DatabaseBroker {
 			dao.setSession(this.getActiveSession());
 			toReturn.addAll((List) method.invoke(dao, parameters));
 		} catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
-								// NoSuchMethodException
+			// NoSuchMethodException
 			this.logAndThrowException("Error in calling " + methodName + "(): " + e.getMessage(), e);
 		}
 		return toReturn;
@@ -351,7 +352,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 * Returns the count of entities based on the given DAO. <br/>
 	 * <br/>
 	 * Sample usage: <br/>
-	 * 
+	 *
 	 * <pre>
 	 * <code>
 	 *     public long countAllLocations() throws MiddlewareQueryException {
@@ -359,7 +360,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 *     }
 	 * <code>
 	 * </pre>
-	 * 
+	 *
 	 * @param dao The DAO to call the method from
 	 * @return The number of entities
 	 * @throws MiddlewareQueryException
@@ -377,21 +378,22 @@ public abstract class DataManager extends DatabaseBroker {
 	 * Calls the corresponding count method as specified in the parameter methodName. <br/>
 	 * <br/>
 	 * Sample usage: <br/>
-	 * 
+	 *
 	 * <pre>
 	 * <code>
-	 *  public long countLocationsByCountry(Country country) throws MiddlewareQueryException { 
-	 *      return countAllByMethod(getLocationDao(), "countByCountry", new Object[]{country}, new Class[]{Country.class}); 
+	 *  public long countLocationsByCountry(Country country) throws MiddlewareQueryException {
+	 *      return countAllByMethod(getLocationDao(), "countByCountry", new Object[]{country}, new Class[]{Country.class});
 	 *  }
 	 *  </code>
 	 * </pre>
-	 * 
+	 *
 	 * @param dao The DAO to call the method from
 	 * @param methodName The method to call
 	 * @param parameters The parameters to be passed to the method
 	 * @param parameterTypes The types of the parameters to be passed to the method
 	 * @return the count
 	 * @throws MiddlewareQueryException
+	 * @deprecated
 	 */
 	@SuppressWarnings("rawtypes")
 	@Deprecated
@@ -413,7 +415,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 * Returns the count of entities based on the given DAO. <br/>
 	 * <br/>
 	 * Sample usage: <br/>
-	 * 
+	 *
 	 * <pre>
 	 * <code>
 	 *     public long countAllGermplasm(Database instance) throws MiddlewareQueryException {
@@ -421,7 +423,7 @@ public abstract class DataManager extends DatabaseBroker {
 	 *    }
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * @param dao The DAO to call the method from
 	 * @param instance The database instance to query from
 	 * @return The number of entities
@@ -440,17 +442,17 @@ public abstract class DataManager extends DatabaseBroker {
 	 * Calls the corresponding count method as specified in the parameter methodName. <br/>
 	 * <br/>
 	 * Sample usage: <br/>
-	 * 
+	 *
 	 * <pre>
 	 * <code>
 	 *      public long countMarkerIDsByMapIDAndLinkageBetweenStartPosition(int mapId, String linkageGroup, double startPos, double endPos)
 	 *            throws MiddlewareQueryException {
-	 *        return super.countFromInstanceByIdAndMethod(getMarkerDao(), mapId, "countMarkerIDsByMapIDAndLinkageBetweenStartPosition", 
+	 *        return super.countFromInstanceByIdAndMethod(getMarkerDao(), mapId, "countMarkerIDsByMapIDAndLinkageBetweenStartPosition",
 	 *                new Object[]{mapId, linkageGroup, startPos, endPos}, new Class[]{Integer.TYPE, String.class, Double.TYPE, Double.TYPE});
 	 *    }
 	 * </code>
 	 * </pre>
-	 * 
+	 *
 	 * @param dao The DAO to call the method from
 	 * @param id The entity id
 	 * @param methodName The method to call
@@ -468,7 +470,7 @@ public abstract class DataManager extends DatabaseBroker {
 			dao.setSession(this.getActiveSession());
 			count = count + ((Long) countMethod.invoke(dao, parameters)).intValue();
 		} catch (Exception e) { // IllegalArgumentException, IllegalAccessException, InvocationTargetException, SecurityException,
-								// NoSuchMethodException
+			// NoSuchMethodException
 			this.logAndThrowException("Error in counting: " + e.getMessage(), e);
 		}
 		return count;
@@ -515,7 +517,7 @@ public abstract class DataManager extends DatabaseBroker {
 	/**
 	 * Logs an error based on the given message using the given Logger parameter. TODO: Deprecate this method and do not use. It is referred
 	 * as anti pattern. Reference: https://today.java.net/article/2006/04/04/exception-handling-antipatterns#logAndThrow
-	 * 
+	 *
 	 * @param message The message to log and to set on the exception
 	 * @param e The origin of the exception
 	 * @throws MiddlewareQueryException
@@ -528,6 +530,7 @@ public abstract class DataManager extends DatabaseBroker {
 	/**
 	 * Retrieves the positive ids from the given list of ids
 	 * 
+	 *
 	 * @param ids The positive list of ids
 	 * @return the positive ids from the given list
 	 */

@@ -48,20 +48,17 @@ public class LocdesSaver extends Saver {
 	}
 
 	private Map<String, Integer> getUdfldMap() throws MiddlewareQueryException {
-		return this.getUserDefinedFieldDao()
-				.getByCodesInMap(
-						"LOCDES",
-						"DTYPE",
-						Arrays.asList(LocdesType.ROWS_IN_BLOCK.getCode(), LocdesType.RANGES_IN_BLOCK.getCode(),
-								LocdesType.ROWS_IN_PLOT.getCode(), LocdesType.MACHINE_ROW_CAPACITY.getCode(),
-								LocdesType.PLANTING_ORDER.getCode(), LocdesType.DELETED_PLOTS.getCode()));
+		return this.getUserDefinedFieldDao().getByCodesInMap("LOCDES", "DTYPE",
+				Arrays.asList(LocdesType.ROWS_IN_BLOCK.getCode(), LocdesType.RANGES_IN_BLOCK.getCode(), LocdesType.ROWS_IN_PLOT.getCode(),
+						LocdesType.MACHINE_ROW_CAPACITY.getCode(), LocdesType.PLANTING_ORDER.getCode(),
+						LocdesType.DELETED_PLOTS.getCode()));
 	}
 
 	private int getId(Map<String, Integer> map, LocdesType type) throws MiddlewareQueryException {
 		Integer id = map.get(type.getCode());
 		if (id == null) {
-			throw new MiddlewareQueryException("Locdes Type " + type.getCode()
-					+ " does not exists, please contact your system administrator");
+			throw new MiddlewareQueryException(
+					"Locdes Type " + type.getCode() + " does not exists, please contact your system administrator");
 		}
 		return id;
 	}
@@ -94,7 +91,7 @@ public class LocdesSaver extends Saver {
 		}
 	}
 
-	private void saveOrUpdateLocdes(Integer locId, List<Locdes> descriptions, int typeId, Object value, int userId)
+	public void saveOrUpdateLocdes(Integer locId, List<Locdes> descriptions, int typeId, Object value, int userId)
 			throws MiddlewareQueryException {
 		if (value != null) {
 			Locdes locdes = this.findLocdes(descriptions, typeId);
@@ -130,7 +127,6 @@ public class LocdesSaver extends Saver {
 
 	private Locdes createLocdes(Integer locId, int typeId, Object value, int userId) throws MiddlewareQueryException {
 		Locdes locdes = new Locdes();
-		locdes.setLdid(this.getLocdesDao().getNextId("ldid"));
 		locdes.setLocationId(locId);
 		locdes.setTypeId(typeId);
 		locdes.setDval(value.toString());

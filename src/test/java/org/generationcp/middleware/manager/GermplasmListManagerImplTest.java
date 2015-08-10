@@ -20,15 +20,20 @@ import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataColumn;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.utils.test.Debug;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -45,13 +50,64 @@ import org.junit.runners.MethodSorters;
 public class GermplasmListManagerImplTest extends DataManagerIntegrationTest {
 
 	private static GermplasmListManager manager;
+	private static GermplasmDataManager dataManager;
 	private static List<Integer> testDataIds;
 	private static final Integer STATUS_DELETED = 9;
+
+	private Integer parentId;
+	private Integer listId;
+	private Integer lrecId;
 
 	@BeforeClass
 	public static void setUp() throws Exception {
 		GermplasmListManagerImplTest.manager = DataManagerIntegrationTest.managerFactory.getGermplasmListManager();
+		GermplasmListManagerImplTest.dataManager = DataManagerIntegrationTest.managerFactory.getGermplasmDataManager();
 		GermplasmListManagerImplTest.testDataIds = new ArrayList<Integer>();
+	}
+
+	@Before
+	public void setUpBefore() throws Exception {
+		GermplasmList germplasmListParent =
+				new GermplasmList(null, "Test List #1", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test Parent List #1", null,
+						1);
+		parentId = GermplasmListManagerImplTest.manager.addGermplasmList(germplasmListParent);
+		GermplasmList germplasmList =
+				new GermplasmList(null, "Test List #1", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test List #1 for GCP-92",
+						germplasmListParent, 1);
+		Integer id = GermplasmListManagerImplTest.manager.addGermplasmList(germplasmList);
+		GermplasmList germplasmList1 =
+				new GermplasmList(null, "TestList444", Long.valueOf(20120306), "LST", Integer.valueOf(1), "Test List #4 for GCP-92",
+						null, 1);
+		id = GermplasmListManagerImplTest.manager.addGermplasmList(germplasmList1);
+		Name name = new Name(null, null, 1, 1, 1, "Name", 0, 0, 0);
+		Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
+		GermplasmListManagerImplTest.dataManager.addGermplasm(germplasm, name);
+		GermplasmListData germplasmListData =
+				new GermplasmListData(null, germplasmList1, germplasm.getGid(), 2, "EntryCode", "SeedSource", "Germplasm Name 5", "GroupName", 0,
+						99995);
+		GermplasmListManagerImplTest.manager.addGermplasmListData(germplasmListData);
+
+		GermplasmList germplasmList2 =
+				new GermplasmList(null, "Test List #5", Long.valueOf(20120306), "LST", Integer.valueOf(1), "Test List #5 for GCP-92",
+						null, 1);
+		id = GermplasmListManagerImplTest.manager.addGermplasmList(germplasmList2);
+		GermplasmListData germplasmListData1 =
+				new GermplasmListData(null, germplasmList2, germplasm.getGid(), 1, "EntryCode", "SeedSource", "Germplasm Name 5", "GroupName", 0,
+						99995);
+		GermplasmListManagerImplTest.manager.addGermplasmListData(germplasmListData1);
+		GermplasmList germplasmList3 =
+				new GermplasmList(null, "Test List #3", Long.valueOf(20120306), "LST", Integer.valueOf(1), "Test List #3 for GCP-92",
+						null, 1);
+		id = GermplasmListManagerImplTest.manager.addGermplasmList(germplasmList3);
+		GermplasmList germplasmList6 =
+				new GermplasmList(null, "Test List #6", Long.valueOf(20120306), "LST", Integer.valueOf(1), "Test List #6 for GCP-92",
+						null, 1);
+		listId = GermplasmListManagerImplTest.manager.addGermplasmList(germplasmList6);
+		GermplasmListData germplasmListData2 =
+				new GermplasmListData(null, germplasmList6, germplasm.getGid(), 1, "EntryCode", "SeedSource", "Germplasm Name 6", "GroupName", 0,
+						99995);
+		GermplasmListManagerImplTest.manager.addGermplasmListData(germplasmListData2);
+		lrecId = germplasmListData2.getId();
 	}
 
 	@Test
@@ -377,13 +433,13 @@ public class GermplasmListManagerImplTest extends DataManagerIntegrationTest {
 
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Test Case #2: test deleteGermplasmListDataByListIdEntryId");
 		germplasmList =
-				GermplasmListManagerImplTest.manager.getGermplasmListByName("Test List #4", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
+				GermplasmListManagerImplTest.manager.getGermplasmListByName("TestList444", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
 		listData.add(GermplasmListManagerImplTest.manager.getGermplasmListDataByListIdAndEntryId(germplasmList.getId(), /* entryId= */2));
 		GermplasmListManagerImplTest.manager.deleteGermplasmListDataByListIdEntryId(germplasmList.getId(), 2);
 
 		Debug.println(MiddlewareIntegrationTest.INDENT, "Test Case #3: test deleteGermplasmListData(data)");
 		germplasmList =
-				GermplasmListManagerImplTest.manager.getGermplasmListByName("Test List #4", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
+				GermplasmListManagerImplTest.manager.getGermplasmListByName("Test List #5", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
 		GermplasmListData data = GermplasmListManagerImplTest.manager.getGermplasmListDataByListIdAndEntryId(germplasmList.getId(), /*
 																																	 * entryId=
 																																	 */1);
@@ -514,7 +570,6 @@ public class GermplasmListManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetGermplasmListByParentFolderId() throws Exception {
-		Integer parentId = Integer.valueOf(0);
 		List<GermplasmList> results = GermplasmListManagerImplTest.manager.getGermplasmListByParentFolderId(parentId, 0, 100);
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
@@ -524,7 +579,6 @@ public class GermplasmListManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetGermplasmListByParentFolderIdBatched() throws Exception {
-		Integer parentId = Integer.valueOf(0);
 		int batchSize = 1;
 		List<GermplasmList> results = new ArrayList<GermplasmList>();
 		results = GermplasmListManagerImplTest.manager.getGermplasmListByParentFolderIdBatched(parentId, batchSize);
@@ -624,8 +678,6 @@ public class GermplasmListManagerImplTest extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetGermplasmListDataByListIdAndLrecId() throws Exception {
-		Integer listId = 1;
-		Integer lrecId = 1;
 		GermplasmListData data = GermplasmListManagerImplTest.manager.getGermplasmListDataByListIdAndLrecId(listId, lrecId);
 		Assert.assertNotNull("It should not be null", data);
 		Assert.assertEquals("It should be equal", listId, data.getList().getId());

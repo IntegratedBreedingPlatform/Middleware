@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -67,7 +67,6 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
@@ -620,6 +619,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return this.getPersonDao().isPersonWithEmailExists(email);
 	}
 
+	public Person getPersonByEmail(String email) throws MiddlewareQueryException {
+		return this.getPersonDao().getPersonByEmail(email);
+	}
+
+	public Person getPersonByEmailAndName(String email, String firstName, String lastName) throws MiddlewareQueryException {
+		return this.getPersonDao().getPersonByEmailAndName(email, firstName, lastName);
+	}
+
 	@Override
 	public boolean isUsernameExists(String userName) throws MiddlewareQueryException {
 		return this.getUserDao().isUsernameExists(userName);
@@ -639,15 +646,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		try {
 			// begin save transaction
 			trans = session.beginTransaction();
-
-			SQLQuery q = session.createSQLQuery("SELECT MAX(personid) FROM persons");
-			Integer personId = (Integer) q.uniqueResult();
-
-			if (personId == null || personId.intValue() < 0) {
-				person.setId(1);
-			} else {
-				person.setId(personId + 1);
-			}
 
 			Person recordSaved = this.getPersonDao().saveOrUpdate(person);
 			idPersonSaved = recordSaved.getId();
@@ -670,15 +668,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		try {
 			// begin save transaction
 			trans = session.beginTransaction();
-
-			SQLQuery q = session.createSQLQuery("SELECT MAX(userid) FROM users");
-			Integer userId = (Integer) q.uniqueResult();
-
-			if (userId == null || userId.intValue() < 0) {
-				user.setUserid(1);
-			} else {
-				user.setUserid(userId + 1);
-			}
 
 			User recordSaved = this.getUserDao().saveOrUpdate(user);
 			idUserSaved = recordSaved.getUserid();
@@ -1199,23 +1188,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Integer getWorkbenchUserId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
-		Integer workbenchUserId = null;
-		try {
-			trans = session.beginTransaction();
-			workbenchUserId = this.getIbdbUserMapDao().getWorkbenchUserId(ibdbUserId, projectId);
-			trans.commit();
-		} catch (Exception e) {
-			this.rollbackTransaction(trans);
-			this.logAndThrowException(
-					"Error encountered while retrieving Local IBDB user id: WorkbenchDataManager.getLocalIbdbUserId(workbenchUserId="
-							+ workbenchUserId + ", projectId=" + projectId + "): " + e.getMessage(), e);
-		}
-
-		return workbenchUserId;
+	public Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException {
+		return this.getIbdbUserMapDao().getWorkbenchUserId(ibdbUserId, projectId);
 	}
 
 	@Override
@@ -1471,6 +1445,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		User user = this.getUserByName(username, 0, 1, Operation.EQUAL).get(0);
 
 		return this.getUserInfo(user.getUserid());
+	}
+
+	@Override
+	public User getUserByUsername(String userName) throws MiddlewareQueryException {
+		return getUserDao().getUserByUserName(userName);
 	}
 
 	@Override

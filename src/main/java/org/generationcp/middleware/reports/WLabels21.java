@@ -11,7 +11,7 @@ public class WLabels21 extends WLabels05 {
 	@Override
 	public Reporter createReporter() {
 		Reporter r = new WLabels21();
-		r.setFileNameExpression("LABEL21_{trial_name}");
+		r.setFileNameExpression("LABEL21_{trialName}");
 		return r;
 	}
 

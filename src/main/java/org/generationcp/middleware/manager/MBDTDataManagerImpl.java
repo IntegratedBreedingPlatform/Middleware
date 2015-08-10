@@ -33,7 +33,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 	private MBDTGenerationDAO generationDAO;
 	private SelectedMarkerDAO selectedMarkerDAO;
 	private SelectedGenotypeDAO selectedGenotypeDAO;
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(MBDTDataManagerImpl.class);
 
 	public MBDTDataManagerImpl(HibernateSessionProvider sessionProvider) {
@@ -50,8 +50,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 			if (existingData != null) {
 				throw new MiddlewareQueryException("A project with the given name already exists");
 			}
-
-			projectData.setProjectID(this.projectDAO.getNextId("projectID"));
 		}
 
 		projectData = this.projectDAO.save(projectData);
@@ -107,9 +105,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 			if (existing != null) {
 				throw new MiddlewareQueryException("A generation with the given name within the project already exists");
 			}
-
-			Integer newId = this.generationDAO.getNextId("generationID");
-			generation.setGenerationID(newId);
 		}
 
 		this.generationDAO.saveOrUpdate(generation);
@@ -169,9 +164,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 		for (Integer markerID : markerIDs) {
 			SelectedMarker sm = new SelectedMarker(generation, markerID);
-			Integer newId = this.selectedMarkerDAO.getNextId("id");
-			sm.setId(newId);
-
 			this.selectedMarkerDAO.saveOrUpdate(sm);
 		}
 	}
@@ -236,7 +228,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 	}
 
 	@Override
-	public void setSelectedAccessions(Integer generationID, List<Integer> gids) throws MiddlewareQueryException {
+	public void setSelectedAccessions(MBDTGeneration generation, List<Integer> gids) throws MiddlewareQueryException {
 
 		if (gids == null || gids.isEmpty()) {
 			return;
@@ -246,10 +238,9 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 		this.prepareGenerationDAO();
 		this.prepareSelectedGenotypeDAO();
-		MBDTGeneration generation = this.getGeneration(generationID);
 
 		if (generation == null) {
-			throw new MiddlewareQueryException("Generation with given ID does not exist");
+			throw new MiddlewareQueryException("Given Generation does not exist");
 		}
 
 		Session session = this.getActiveSession();
@@ -288,9 +279,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 			// create new entries with the default type
 			for (Integer gid : gidSet) {
 				SelectedGenotype genotype = new SelectedGenotype(generation, SelectedGenotypeEnum.SR, gid);
-				Integer newId = this.selectedGenotypeDAO.getNextId("id");
-				genotype.setId(newId);
-
 				this.selectedGenotypeDAO.saveOrUpdate(genotype);
 
 			}
@@ -300,13 +288,13 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 			session.clear();
 			transaction.commit();
 		} catch (MiddlewareQueryException e) {
-			e.printStackTrace();
+			MBDTDataManagerImpl.LOG.error("Setting selected accessions was not successful", e);
 			transaction.rollback();
 		}
 	}
 
 	@Override
-	public void setParentData(Integer generationID, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException {
+	public void setParentData(MBDTGeneration generation, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException {
 
 		if (gids == null || gids.isEmpty()) {
 			return;
@@ -321,7 +309,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 		this.prepareGenerationDAO();
 		this.prepareSelectedGenotypeDAO();
-		MBDTGeneration generation = this.getGeneration(generationID);
 
 		if (generation == null) {
 			throw new MiddlewareQueryException("Generation with given ID does not exist");
@@ -372,9 +359,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 			for (Integer gid : gidSet) {
 				SelectedGenotype genotype = new SelectedGenotype(generation, genotypeEnum, gid);
-				Integer newId = this.selectedGenotypeDAO.getNextId("id");
-				genotype.setId(newId);
-
 				this.selectedGenotypeDAO.saveOrUpdate(genotype);
 
 			}
@@ -383,11 +367,11 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 			session.clear();
 			transaction.commit();
 		} catch (MiddlewareQueryException e) {
-			e.printStackTrace();
+			MBDTDataManagerImpl.LOG.error("Setting parent data was not successful", e);
 			transaction.rollback();
 			throw e;
 		} catch (HibernateException e) {
-			e.printStackTrace();
+			MBDTDataManagerImpl.LOG.error("Setting parent data was not successful", e);
 			transaction.rollback();
 			throw e;
 		}

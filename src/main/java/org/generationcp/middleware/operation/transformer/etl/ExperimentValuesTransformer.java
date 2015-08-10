@@ -40,11 +40,11 @@ public class ExperimentValuesTransformer extends Transformer {
 							} else {
 								value = data.getValue();
 							}
+							Variable variable = new Variable(varType, value);
+							variableList.add(variable);
+							data.setVariable(variable);
 						}
 					}
-
-					Variable variable = new Variable(varType, value);
-					variableList.add(variable);
 				}
 
 				experimentValues.setVariableList(variableList);

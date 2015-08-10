@@ -946,7 +946,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addMarker(Marker marker) throws MiddlewareQueryException {
-		marker.setMarkerId(this.getMarkerDao().getNextId("markerId"));
 		return ((Marker) super.save(this.getMarkerDao(), marker)).getMarkerId();
 	}
 
@@ -963,11 +962,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addMarkerUserInfo(MarkerUserInfo markerUserInfo) throws MiddlewareQueryException {
-		MarkerUserInfoDetails details = markerUserInfo.getMarkerUserInfoDetails();
-		if (details != null && details.getContactId() == null) {
-			details.setContactId(this.getMarkerUserInfoDetailsDao().getNextId("contactId"));
-		}
-		markerUserInfo.setUserInfoId(this.getMarkerUserInfoDao().getNextId("userInfoId"));
 		return ((MarkerUserInfo) super.save(this.getMarkerUserInfoDao(), markerUserInfo)).getUserInfoId();
 	}
 
@@ -979,10 +973,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		try {
 			trans = session.beginTransaction();
-
-			AccMetadataSetDAO dao = this.getAccMetadataSetDao();
-			Integer generatedId = dao.getNextId("accMetadataSetId");
-			accMetadataSet.setAccMetadataSetId(generatedId);
 
 			AccMetadataSet recordSaved = this.getAccMetadataSetDao().save(accMetadataSet);
 			savedId = recordSaved.getAccMetadataSetId();
@@ -1007,10 +997,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		try {
 			trans = session.beginTransaction();
 
-			if (markerMetadataSet != null && markerMetadataSet.getMarkerMetadataSetId() == null) {
-				markerMetadataSet.setMarkerMetadataSetId(this.getMarkerMetadataSetDao().getNextId("markerMetadataSetId"));
-			}
-
 			MarkerMetadataSet recordSaved = this.getMarkerMetadataSetDao().save(markerMetadataSet);
 			savedId = recordSaved.getMarkerMetadataSetId();
 
@@ -1027,7 +1013,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addDataset(Dataset dataset) throws MiddlewareQueryException {
-		dataset.setDatasetId(this.getDatasetDao().getNextId("datasetId"));
 		return ((Dataset) super.save(this.getDatasetDao(), dataset)).getDatasetId();
 	}
 
@@ -1054,7 +1039,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addGDMSMarkerAlias(MarkerAlias markerAlias) throws MiddlewareQueryException {
-		markerAlias.setMarkerAliasId(this.getMarkerAliasDao().getNextId("markerAliasId"));
 		return ((MarkerAlias) super.save(this.getMarkerAliasDao(), markerAlias)).getMarkerId();
 	}
 
@@ -1071,13 +1055,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addAlleleValues(AlleleValues alleleValues) throws MiddlewareQueryException {
-		alleleValues.setAnId(this.getAlleleValuesDao().getNextId("anId"));
 		return ((AlleleValues) super.saveOrUpdate(this.getAlleleValuesDao(), alleleValues)).getAnId();
 	}
 
 	@Override
 	public Integer addCharValues(CharValues charValues) throws MiddlewareQueryException {
-		charValues.setAcId(this.getCharValuesDao().getNextId("acId"));
 		return ((CharValues) super.saveOrUpdate(this.getCharValuesDao(), charValues)).getAcId();
 	}
 
@@ -1095,7 +1077,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addMappingPopValue(MappingPopValues mappingPopValue) throws MiddlewareQueryException {
-		mappingPopValue.setMpId(this.getMappingPopValuesDao().getNextId("mpId"));
 		return ((MappingPopValues) super.saveOrUpdate(this.getMappingPopValuesDao(), mappingPopValue)).getMpId();
 	}
 
@@ -1105,25 +1086,21 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			throw new MiddlewareQueryException("Map Id not found: " + markerOnMap.getMapId());
 		}
 
-		markerOnMap.setMarkerOnMapId(this.getMarkerOnMapDao().getNextId("markerOnMapId"));
 		return ((MarkerOnMap) super.save(this.getMarkerOnMapDao(), markerOnMap)).getMapId();
 	}
 
 	@Override
 	public Integer addDartValue(DartValues dartValue) throws MiddlewareQueryException {
-		dartValue.setAdId(this.getDartValuesDao().getNextId("adId"));
 		return ((DartValues) super.save(this.getDartValuesDao(), dartValue)).getAdId();
 	}
 
 	@Override
 	public Integer addQtl(Qtl qtl) throws MiddlewareQueryException {
-		qtl.setQtlId(this.getQtlDao().getNextId("qtlId"));
 		return ((Qtl) super.saveOrUpdate(this.getQtlDao(), qtl)).getQtlId();
 	}
 
 	@Override
 	public Integer addMap(Map map) throws MiddlewareQueryException {
-		map.setMapId(this.getMapDao().getNextId("mapId"));
 		return ((Map) super.saveOrUpdate(this.getMapDao(), map)).getMapId();
 	}
 
@@ -1173,7 +1150,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			marker.setMarkerType(markerType);
 
 			// Add GDMS Marker Alias
-			markerAlias.setMarkerAliasId(this.getMarkerAliasDao().getNextId("markerAliasId"));
 			markerAlias.setMarkerId(idGDMSMarkerSaved);
 			this.saveMarkerAlias(markerAlias);
 
@@ -2158,11 +2134,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	@Override
-	public long getLastId(Database instance, GdmsTable gdmsTable) throws MiddlewareQueryException {
-		return GenericDAO.getLastId(this.getActiveSession(), gdmsTable.getTableName(), gdmsTable.getIdName());
-	}
-
-	@Override
 	public void addMTA(Dataset dataset, Mta mta, MtaMetadata mtaMetadata, DatasetUsers users) throws MiddlewareQueryException {
 		Session session = this.getActiveSession();
 		Transaction trans = null;
@@ -2174,9 +2145,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		try {
 			trans = session.beginTransaction();
 
-			if (dataset.getDatasetId() == null) {
-				dataset.setDatasetId(this.getDatasetDao().getNextId("datasetId"));
-			}
 
 			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_MTA);
 			dataset.setUploadTemplateDate(new Date());
@@ -2190,10 +2158,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.getDatasetUsersDao().merge(users);
 
 			MtaDAO mtaDao = this.getMtaDao();
-			int id = mtaDao.getNextId("mtaId");
-			mta.setMtaId(id);
 			mta.setDatasetId(dataset.getDatasetId());
-			mtaDao.merge(mta);
+			mtaDao.save(mta);
 
 			MtaMetadataDAO mtaMetadataDao = this.getMtaMetadataDao();
 			mtaMetadata.setDatasetID(dataset.getDatasetId());
@@ -2219,9 +2185,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		try {
 			trans = session.beginTransaction();
 
-			if (dataset.getDatasetId() == null) {
-				dataset.setDatasetId(this.getDatasetDao().getNextId("datasetId"));
-			}
 			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_MTA);
 			dataset.setUploadTemplateDate(new Date());
 			// TODO review this -ve id based logic.. Overall, this whole methods seems to be unused no refs from GDMS code. Remove entirely,
@@ -2237,17 +2200,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			MtaMetadataDAO mtaMetadataDao = this.getMtaMetadataDao();
 
 			int rowsSaved = 0;
-			int id = mtaDao.getNextId("mtaId");
 
 			for (Mta mta : mtaList) {
-				mta.setMtaId(id);
 				mta.setDatasetId(dataset.getDatasetId());
 				mtaDao.merge(mta);
 
 				mtaMetadata.setDatasetID(dataset.getDatasetId());
 				mtaMetadataDao.merge(mtaMetadata);
-
-				id++;
 
 				rowsSaved++;
 				if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
@@ -2331,8 +2290,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Integer datasetId;
 		this.getActiveSession();
 		DatasetDAO datasetDao = this.getDatasetDao();
-		Integer datasetGeneratedId = datasetDao.getNextId("datasetId");
-		dataset.setDatasetId(datasetGeneratedId);
 
 		dataset.setDatasetType(datasetType);
 
@@ -2355,9 +2312,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private Integer saveDataset(Dataset dataset) throws Exception {
 		this.getActiveSession();
 		DatasetDAO datasetDao = this.getDatasetDao();
-		Integer datasetGeneratedId = datasetDao.getNextId("datasetId");
-		dataset.setDatasetId(datasetGeneratedId);
-		Dataset datasetRecordSaved = datasetDao.merge(dataset);
+		Dataset datasetRecordSaved = datasetDao.save(dataset);
 		return datasetRecordSaved.getDatasetId();
 	}
 
@@ -2437,13 +2392,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		}
 
 		// If the marker is not yet existing in the database (local and central) - should create a new marker in the local database.
-		this.getActiveSession();
-		MarkerDAO markerDao = this.getMarkerDao();
-		Integer markerGeneratedId = markerDao.getNextId("markerId");
-		marker.setMarkerId(markerGeneratedId);
-		marker.setMarkerType(markerType);
-		Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
-		markerId = markerRecordSaved.getMarkerId();
+		if (markerId == null) {
+			this.getActiveSession();
+			MarkerDAO markerDao = this.getMarkerDao();
+			marker.setMarkerType(markerType);
+			Marker markerRecordSaved = markerDao.saveOrUpdate(marker);
+			markerId = markerRecordSaved.getMarkerId();
+		}
 
 		if (markerId == null) {
 			throw new Exception(); // To immediately roll back and to avoid executing the other insert functions
@@ -2465,8 +2420,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		// Save the marker
 		this.getActiveSession();
 		MarkerDAO markerDao = this.getMarkerDao();
-		Integer markerGeneratedId = markerDao.getNextId("markerId");
-		marker.setMarkerId(markerGeneratedId);
 		marker.setMarkerType(markerType);
 		Marker markerRecordSaved = markerDao.merge(marker);
 		markerId = markerRecordSaved.getMarkerId();
@@ -2482,16 +2435,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		this.getActiveSession();
 		MarkerDAO markerDao = this.getMarkerDao();
-		Integer markerGeneratedId = markerDao.getNextId("markerId");
 		Integer rowsSaved = 0;
 
 		if (markers != null) {
 			for (Marker marker : markers) {
-
-				if (marker.getMarkerId() == null) {
-					marker.setMarkerId(markerGeneratedId);
-					markerGeneratedId++;
-				}
 				markerDao.merge(marker);
 
 				// Flush
@@ -2529,10 +2476,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	private Integer saveMarkerAlias(MarkerAlias markerAlias) throws Exception {
 		this.getActiveSession();
-
-		if (markerAlias.getMarkerAliasId() == null) {
-			markerAlias.setMarkerAliasId(this.getMarkerAliasDao().getNextId("markerAliasId"));
-		}
 
 		MarkerAlias markerAliasRecordSaved = this.getMarkerAliasDao().save(markerAlias);
 		Integer markerAliasRecordSavedMarkerId = markerAliasRecordSaved.getMarkerId();
@@ -2577,16 +2520,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private Integer saveMarkerUserInfo(MarkerUserInfo markerUserInfo) throws Exception {
 		this.getActiveSession();
 
-		// Set contact id
-		if (markerUserInfo != null) {
-			MarkerUserInfoDetails details = markerUserInfo.getMarkerUserInfoDetails();
-			if (details != null && details.getContactId() == null) {
-				details.setContactId(this.getMarkerUserInfoDetailsDao().getNextId("contactId"));
-			}
-		}
-
 		MarkerUserInfoDAO dao = this.getMarkerUserInfoDao();
-		markerUserInfo.setUserInfoId(dao.getNextId("userInfoId"));
 		MarkerUserInfo markerUserInfoRecordSaved = dao.save(markerUserInfo);
 		Integer markerUserInfoSavedId = markerUserInfoRecordSaved.getMarkerId();
 		if (markerUserInfoSavedId == null) {
@@ -2599,15 +2533,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		this.getActiveSession();
 		MarkerUserInfoDAO dao = this.getMarkerUserInfoDao();
 
-		if (markerUserInfo.getUserInfoId() == null) {
-			markerUserInfo.setUserInfoId(dao.getNextId("userInfoId"));
-
-			// Set contact id
-			MarkerUserInfoDetails details = markerUserInfo.getMarkerUserInfoDetails();
-			if (details != null && details.getContactId() == null) {
-				details.setContactId(this.getMarkerUserInfoDetailsDao().getNextId("contactId"));
-			}
-		} else {
+		if (markerUserInfo.getUserInfoId() != null) {
 			MarkerUserInfo markerDetailsFromDB = this.getMarkerUserInfoDao().getById(markerUserInfo.getUserInfoId());
 			if (markerDetailsFromDB == null) {
 				return this.saveMarkerUserInfo(markerUserInfo);
@@ -2624,9 +2550,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		if (mapSavedId == null) {
 			MapDAO mapDao = this.getMapDao();
 
-			Integer mapGeneratedId = mapDao.getNextId("mapId");
-			map.setMapId(mapGeneratedId);
-
 			Map mapRecordSaved = mapDao.saveOrUpdate(map);
 			mapSavedId = mapRecordSaved.getMapId();
 		}
@@ -2642,8 +2565,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		this.getActiveSession();
 		MarkerOnMapDAO markerOnMapDao = this.getMarkerOnMapDao();
 
-		Integer generatedId = markerOnMapDao.getNextId("markerOnMapId");
-		markerOnMap.setMarkerOnMapId(generatedId);
 		markerOnMap.setMarkerId(markerId);
 		markerOnMap.setMapId(mapId);
 
@@ -2668,9 +2589,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		if (accMetadataSets != null) {
 			for (AccMetadataSet accMetadataSet : accMetadataSets) {
-				if (accMetadataSet.getAccMetadataSetId() == null) {
-					accMetadataSet.setAccMetadataSetId(accMetadataSetDao.getNextId("accMetadataSetId"));
-				}
+
 				accMetadataSetDao.merge(accMetadataSet);
 				rowsSaved++;
 				if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
@@ -2687,9 +2606,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		Integer rowsSaved = 0;
 
 		for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
-			if (markerMetadataSet.getMarkerMetadataSetId() == null) {
-				markerMetadataSet.setMarkerMetadataSetId(markerMetadataSetDao.getNextId("markerMetadataSetId"));
-			}
 			markerMetadataSetDao.merge(markerMetadataSet);
 			rowsSaved++;
 			if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
@@ -2718,9 +2634,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private Integer saveQtl(Integer datasetId, Qtl qtl) throws Exception {
 		this.getActiveSession();
 		QtlDAO qtlDao = this.getQtlDao();
-
-		Integer qtlId = qtlDao.getNextId("qtlId");
-		qtl.setQtlId(qtlId);
 
 		qtl.setDatasetId(datasetId);
 
@@ -2757,13 +2670,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		CharValuesDAO charValuesDao = this.getCharValuesDao();
 		Integer rowsSaved = 0;
 
-		Integer generatedId = charValuesDao.getNextId("acId");
-
 		for (CharValues charValues : charValuesList) {
-			if (charValues.getAcId() == null) {
-				charValues.setAcId(generatedId);
-				generatedId++;
-			}
+
 			charValuesDao.merge(charValues);
 
 			rowsSaved++;
@@ -2805,13 +2713,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		MappingPopValuesDAO mappingPopValuesDao = this.getMappingPopValuesDao();
 		Integer rowsSaved = 0;
 
-		Integer generatedId = mappingPopValuesDao.getNextId("mpId");
-
 		for (MappingPopValues mappingPopValues : mappingPopValuesList) {
-			if (mappingPopValues.getMpId() == null) {
-				mappingPopValues.setMpId(generatedId);
-				generatedId++;
-			}
 			mappingPopValuesDao.merge(mappingPopValues);
 
 			rowsSaved++;
@@ -2830,13 +2732,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		AlleleValuesDAO alleleValuesDao = this.getAlleleValuesDao();
 		Integer rowsSaved = 0;
 
-		Integer generatedId = alleleValuesDao.getNextId("anId");
-
 		for (AlleleValues alleleValues : alleleValuesList) {
-			if (alleleValues.getAnId() == null) {
-				alleleValues.setAnId(generatedId);
-				generatedId++;
-			}
 			alleleValuesDao.merge(alleleValues);
 
 			rowsSaved++;
@@ -2858,13 +2754,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		DartValuesDAO dartValuesDao = this.getDartValuesDao();
 		Integer rowsSaved = 0;
 
-		Integer generatedId = dartValuesDao.getNextId("adId");
-
 		for (DartValues dartValues : dartValuesList) {
-			if (dartValues.getAdId() == null) {
-				dartValues.setAdId(generatedId);
-				generatedId++;
-			}
 			dartValuesDao.merge(dartValues);
 
 			rowsSaved++;
@@ -2904,12 +2794,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		try {
 			trans = session.beginTransaction();
 
-			trackData.setTrackId(this.getTrackDataDao().getNextId("trackId"));
 			this.getTrackDataDao().save(trackData);
 
 			for (TrackMarker trackMarker : trackMarkers) {
 				trackMarker.setTrackId(trackData.getTrackId());
-				trackMarker.setTrackMarkerId(this.getTrackMarkerDao().getNextId("trackMarkerId"));
 				this.getTrackMarkerDao().save(trackMarker);
 			}
 

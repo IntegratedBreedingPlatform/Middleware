@@ -11,7 +11,7 @@
 
 package org.generationcp.middleware.domain.etl;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -23,6 +23,7 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Location;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class WorkbookTest {
@@ -67,7 +68,7 @@ public class WorkbookTest {
 	private static final String SCORE_1_5 = "Score (1-5)";
 	private static final String VISUAL_SCORING = "Visual scoring";
 	private static final String COMMON_RUST = "Common rust";
-	
+
 	// METHODS
 	private static final String ASSIGNED = "ASSIGNED";
 	private static final String ENUMERATED = "ENUMERATED";
@@ -145,25 +146,19 @@ public class WorkbookTest {
 	private static final String SITE_SOIL_PH = "SITE_SOIL_PH";
 
 	public static final String[] G_NAMES = {"TIANDOUGOU-9", "KENINKENI-27", "SM114-1A-1-1-1B", "SM114-1A-14-1-1B", "SM114-1A-361-1-1B",
-			"SM114-1A-86-1-1B", "SM114-1A-115-1-1B", "SM114-1A-281-1-1B", "SM114-1A-134-1-1B", "SM114-1A-69-1-1B", "SM114-1A-157-1-1B",
-			"SM114-1A-179-1-1B", "TIANDOUGOU-9", "SM114-1A-36-1-1B", "SM114-1A-201-1-1B", "SM114-1A-31-1-1B", "SM114-1A-353-1-1B",
-			"SM114-1A-26-1-1B", "SM114-1A-125-1-1B", "SM114-1A-384-1-1B"};
+		"SM114-1A-86-1-1B", "SM114-1A-115-1-1B", "SM114-1A-281-1-1B", "SM114-1A-134-1-1B", "SM114-1A-69-1-1B", "SM114-1A-157-1-1B",
+		"SM114-1A-179-1-1B", "TIANDOUGOU-9", "SM114-1A-36-1-1B", "SM114-1A-201-1-1B", "SM114-1A-31-1-1B", "SM114-1A-353-1-1B",
+		"SM114-1A-26-1-1B", "SM114-1A-125-1-1B", "SM114-1A-384-1-1B"};
 
 	private static Workbook workbook;
 	private static List<Workbook> workbooks;
 
 	public static Workbook getTestWorkbook() {
-		if (WorkbookTest.workbook == null) {
-			WorkbookTest.createTestWorkbook(WorkbookTest.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, null, 1, false);
-		}
-		return WorkbookTest.workbook;
+		return WorkbookTest.createTestWorkbook(WorkbookTest.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, null, 1, false);
 	}
 
 	public static Workbook getTestWorkbook(int noOfObservations, StudyType studyType) {
-		if (WorkbookTest.workbook == null) {
-			WorkbookTest.createTestWorkbook(noOfObservations, studyType, null, 1, false);
-		}
-		return WorkbookTest.workbook;
+		return WorkbookTest.createTestWorkbook(noOfObservations, studyType, null, 1, false);
 	}
 
 	public static List<Workbook> getTestWorkbooks(int noOfTrial, int noOfObservations) {
@@ -253,17 +248,18 @@ public class WorkbookTest {
 				WorkbookTest.DBID, WorkbookTest.CONDUCTED, WorkbookTest.PERSON, WorkbookTest.NUMERIC, WorkbookTest.NUMERIC_VALUE,
 				WorkbookTest.TRIAL, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.STUDY));
 
-		conditions.add(WorkbookTest.createMeasurementVariable(WorkbookTest.LOCATION_NAME_ID, "SITE", "TRIAL SITE NAME", 
-				WorkbookTest.DBCV, WorkbookTest.ASSIGNED, WorkbookTest.LOCATION, WorkbookTest.CHAR, "SITE " + trialNo, 
-				WorkbookTest.TRIAL, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT));
-				
-		conditions.add(WorkbookTest.createMeasurementVariable(WorkbookTest.LOCATION_ID_ID, "SITE ID", "TRIAL SITE ID", 
-				WorkbookTest.DBID, WorkbookTest.ASSIGNED, WorkbookTest.LOCATION, WorkbookTest.NUMERIC, String.valueOf(trialNo), 
-				WorkbookTest.TRIAL, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT));
-		
-		conditions.add(WorkbookTest.createMeasurementVariable(WorkbookTest.EXPT_DESIGN_ID, "DESIGN", "EXPERIMENTAL DESIGN", 
-				WorkbookTest.TYPE, WorkbookTest.ASSIGNED, WorkbookTest.EXPERIMENT_DESIGN, WorkbookTest.CHAR, String.valueOf(TermId.RANDOMIZED_COMPLETE_BLOCK
-						.getId()), WorkbookTest.TRIAL, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT));
+		conditions.add(WorkbookTest.createMeasurementVariable(WorkbookTest.LOCATION_NAME_ID, "SITE", "TRIAL SITE NAME", WorkbookTest.DBCV,
+				WorkbookTest.ASSIGNED, WorkbookTest.LOCATION, WorkbookTest.CHAR, "SITE " + trialNo, WorkbookTest.TRIAL,
+				TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT));
+
+		conditions.add(WorkbookTest.createMeasurementVariable(WorkbookTest.LOCATION_ID_ID, "SITE ID", "TRIAL SITE ID", WorkbookTest.DBID,
+				WorkbookTest.ASSIGNED, WorkbookTest.LOCATION, WorkbookTest.NUMERIC, String.valueOf(trialNo), WorkbookTest.TRIAL,
+				TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT));
+
+		conditions.add(WorkbookTest.createMeasurementVariable(WorkbookTest.EXPT_DESIGN_ID, "DESIGN", "EXPERIMENTAL DESIGN",
+				WorkbookTest.TYPE, WorkbookTest.ASSIGNED, WorkbookTest.EXPERIMENT_DESIGN, WorkbookTest.CHAR,
+				String.valueOf(TermId.RANDOMIZED_COMPLETE_BLOCK.getId()), WorkbookTest.TRIAL, TermId.CHARACTER_VARIABLE.getId(),
+				PhenotypicType.TRIAL_ENVIRONMENT));
 
 		workbook.setConditions(conditions);
 	}
@@ -337,13 +333,14 @@ public class WorkbookTest {
 				WorkbookTest.createMeasurementVariable(WorkbookTest.GYLD_ID, WorkbookTest.GYLD, "Grain yield -dry and weigh (kg/ha)",
 						WorkbookTest.KG_HA, WorkbookTest.DRY_AND_WEIGH, WorkbookTest.YIELD, WorkbookTest.NUMERIC,
 						WorkbookTest.NUMERIC_VALUE, WorkbookTest.PLOT, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE);
-		
+
 		variates.add(measurementVariable);
 
 		MeasurementVariable siteSoilPh =
 				WorkbookTest.createMeasurementVariable(WorkbookTest.SITE_SOIL_PH_ID, WorkbookTest.SITE_SOIL_PH,
 						"Soil acidity - ph meter (pH)", WorkbookTest.PH, WorkbookTest.MEASURED, WorkbookTest.SOIL_ACIDITY,
-						WorkbookTest.NUMERIC, WorkbookTest.NUMERIC_VALUE, WorkbookTest.STUDY, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE);
+						WorkbookTest.NUMERIC, WorkbookTest.NUMERIC_VALUE, WorkbookTest.STUDY, TermId.NUMERIC_VARIABLE.getId(),
+						PhenotypicType.VARIATE);
 		variates.add(siteSoilPh);
 		workbook.setVariates(variates);
 	}
@@ -354,15 +351,15 @@ public class WorkbookTest {
 		MeasurementVariable gyld =
 				WorkbookTest.createMeasurementVariable(WorkbookTest.GYLD_ID, WorkbookTest.GYLD, "Grain yield -dry and weigh (kg/ha)",
 						WorkbookTest.KG_HA, WorkbookTest.DRY_AND_WEIGH, WorkbookTest.YIELD, WorkbookTest.NUMERIC,
-						WorkbookTest.NUMERIC_VALUE, WorkbookTest.PLOT, TermId.NUMERIC_VARIABLE.getId() ,PhenotypicType.VARIATE);
-		
+						WorkbookTest.NUMERIC_VALUE, WorkbookTest.PLOT, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE);
+
 		variates.add(gyld);
 
 		MeasurementVariable siteSoilPh =
 				WorkbookTest.createMeasurementVariable(WorkbookTest.SITE_SOIL_PH_ID, WorkbookTest.SITE_SOIL_PH,
-						"Soil acidity - ph meter (pH)", WorkbookTest.PH, WorkbookTest.MEASURED, WorkbookTest.SOIL_ACIDITY, 
-						WorkbookTest.NUMERIC, WorkbookTest.NUMERIC_VALUE, WorkbookTest.PLOT,
-						TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE);
+						"Soil acidity - ph meter (pH)", WorkbookTest.PH, WorkbookTest.MEASURED, WorkbookTest.SOIL_ACIDITY,
+						WorkbookTest.NUMERIC, WorkbookTest.NUMERIC_VALUE, WorkbookTest.PLOT, TermId.NUMERIC_VARIABLE.getId(),
+						PhenotypicType.VARIATE);
 		variates.add(siteSoilPh);
 
 		workbook.setVariates(variates);
@@ -373,15 +370,15 @@ public class WorkbookTest {
 		List<MeasurementVariable> variates = currentWorkbook.getVariates();
 		MeasurementVariable measurementVariable =
 				WorkbookTest
-						.createMeasurementVariable(
-								WorkbookTest.CRUST_ID,
-								WorkbookTest.CRUST,
-								"Score for the severity of common rust, (In highlands and mid altitude, Puccinia sorghi) symptoms rated on a scale from 1 (= clean, no infection) to 5 (= severely diseased).",
-								WorkbookTest.SCORE_1_5, WorkbookTest.VISUAL_SCORING, WorkbookTest.COMMON_RUST, WorkbookTest.CHAR, null,
-								WorkbookTest.PLOT, TermId.CATEGORICAL_VARIABLE.getId(), PhenotypicType.VARIATE);
-		
+				.createMeasurementVariable(
+						WorkbookTest.CRUST_ID,
+						WorkbookTest.CRUST,
+						"Score for the severity of common rust, (In highlands and mid altitude, Puccinia sorghi) symptoms rated on a scale from 1 (= clean, no infection) to 5 (= severely diseased).",
+						WorkbookTest.SCORE_1_5, WorkbookTest.VISUAL_SCORING, WorkbookTest.COMMON_RUST, WorkbookTest.CHAR, null,
+						WorkbookTest.PLOT, TermId.CATEGORICAL_VARIABLE.getId(), PhenotypicType.VARIATE);
+
 		measurementVariable.setOperation(Operation.ADD);
-		
+
 		variates.add(measurementVariable);
 
 		WorkbookTest.addObservations(currentWorkbook);
@@ -420,8 +417,8 @@ public class WorkbookTest {
 					WorkbookTest.DAY_OBS, workbook.getFactors()));
 			dataList.add(WorkbookTest.createMeasurementData(WorkbookTest.GYLD, WorkbookTest.randomizeValue(random, fmt, 5000),
 					WorkbookTest.GYLD_ID, workbook.getVariates()));
-			dataList.add(WorkbookTest.createMeasurementData(WorkbookTest.SITE_SOIL_PH, "1",
-					WorkbookTest.SITE_SOIL_PH_ID, workbook.getVariates()));
+			dataList.add(WorkbookTest.createMeasurementData(WorkbookTest.SITE_SOIL_PH, "1", WorkbookTest.SITE_SOIL_PH_ID,
+					workbook.getVariates()));
 			row.setDataList(dataList);
 			observations.add(row);
 		}
@@ -663,6 +660,34 @@ public class WorkbookTest {
 		MeasurementVariable var = new MeasurementVariable();
 		var.setTermId(termId);
 		return var;
+	}
+
+	@Test
+	public void testGetMeasurementDatasetVariablesViewForTrial() {
+		this.getTestWorkbook(1, StudyType.T);
+
+		List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
+
+		int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
+
+		Assert.assertEquals(
+				"MeasurementDatasetVariablesView size should be the total no of non trial factors, variates and trial_instance",
+				totalMeasurementVariableCount + 1, list.size());
+
+	}
+
+	@Test
+	public void testGetMeasurementDatasetVariablesViewForNursery() {
+
+		this.getTestWorkbook(1, StudyType.N);
+
+		List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
+
+		int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
+
+		Assert.assertEquals("MeasurementDatasetVariablesView size should be the total no of non trial factors, variates",
+				totalMeasurementVariableCount, list.size());
+
 	}
 
 	@Test

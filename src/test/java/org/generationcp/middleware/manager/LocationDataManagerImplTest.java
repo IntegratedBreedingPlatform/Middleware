@@ -12,7 +12,9 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
@@ -23,6 +25,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
+import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
@@ -157,8 +160,8 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locationList);
 
 		List<Location> locationList2 = LocationDataManagerImplTest.manager.getLocationsByName(name, start, numOfRows, Operation.EQUAL);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationsByName(" + name + ", start=" + start + ", numOfRows=" + numOfRows
-				+ "): ");
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"testGetLocationsByName(" + name + ", start=" + start + ", numOfRows=" + numOfRows + "): ");
 		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locationList2);
 	}
 
@@ -216,8 +219,8 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		int type = 405;
 
 		List<Location> locations = LocationDataManagerImplTest.manager.getLocationsByCountryAndType(country, type);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationByCountryAndType(country=" + country + "): type= " + type + ":"
-				+ locations.size());
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"testGetLocationByCountryAndType(country=" + country + "): type= " + type + ":" + locations.size());
 		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locations);
 	}
 
@@ -248,8 +251,8 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 
 		List<Location> locationList = LocationDataManagerImplTest.manager.getLocationsByType(type, start, numOfRows);
 		Assert.assertNotNull("Expecting to have returned results.", locationList);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationByType(type=" + type + ", start=" + start + ", numOfRows="
-				+ numOfRows + "): " + locationList.size());
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"testGetLocationByType(type=" + type + ", start=" + start + ", numOfRows=" + numOfRows + "): " + locationList.size());
 		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locations);
 	}
 
@@ -268,7 +271,6 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testAddLocation() throws MiddlewareQueryException {
 		Location location = new Location();
-		location.setLocid(-1);
 		location.setCntryid(1);
 		location.setLabbr("");
 		location.setLname("TEST-LOCATION-1");
@@ -285,8 +287,8 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 				+ LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL));
 
 		// cleanup
-		LocationDataManagerImplTest.manager.deleteLocation(LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-1", 0, 5,
-				Operation.EQUAL).get(0));
+		LocationDataManagerImplTest.manager
+				.deleteLocation(LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL).get(0));
 	}
 
 	@Test
@@ -295,7 +297,6 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		List<Location> locations = new ArrayList<Location>();
 
 		Location location1 = new Location();
-		location1.setLocid(-2);
 		location1.setCntryid(1);
 		location1.setLabbr("");
 		location1.setLname("TEST-LOCATION-2");
@@ -307,7 +308,6 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		location1.setSnl3id(1);
 
 		Location location2 = new Location();
-		location2.setLocid(-3);
 		location2.setCntryid(1);
 		location2.setLabbr("");
 		location2.setLname("TEST-LOCATION-3");
@@ -331,10 +331,10 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 				LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL));
 
 		// cleanup
-		LocationDataManagerImplTest.manager.deleteLocation(LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-2", 0, 5,
-				Operation.EQUAL).get(0));
-		LocationDataManagerImplTest.manager.deleteLocation(LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-3", 0, 5,
-				Operation.EQUAL).get(0));
+		LocationDataManagerImplTest.manager
+				.deleteLocation(LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL).get(0));
+		LocationDataManagerImplTest.manager
+				.deleteLocation(LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL).get(0));
 	}
 
 	@Test
@@ -343,8 +343,8 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		String fieldType = "LTYPE";
 		List<UserDefinedField> userDefinedField =
 				LocationDataManagerImplTest.manager.getUserDefinedFieldByFieldTableNameAndType(tableName, fieldType);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetUserDefineFieldByTableNameAndType(type=" + tableName + "): "
-				+ userDefinedField.size());
+		Debug.println(MiddlewareIntegrationTest.INDENT,
+				"testGetUserDefineFieldByTableNameAndType(type=" + tableName + "): " + userDefinedField.size());
 		Debug.printObjects(MiddlewareIntegrationTest.INDENT, userDefinedField);
 	}
 
@@ -497,7 +497,6 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 	private Location createLocationTestData(int id, String programUUID) {
 		Location location = new Location();
 		location.setUniqueID(programUUID);
-		location.setLocid(id);
 		location.setLrplce(0);
 		location.setLname("TEST-LOCATION" + id);
 		location.setLabbr("");
@@ -578,8 +577,52 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 				LocationDataManagerImplTest.manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
 		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
 		for (Location location : locationList) {
-			Assert.assertTrue("Location should have a location name having the keyword " + locationName, location.getLname().toLowerCase()
-					.contains(locationName.toLowerCase()));
+			Assert.assertTrue("Location should have a location name having the keyword " + locationName,
+					location.getLname().toLowerCase().contains(locationName.toLowerCase()));
+		}
+	}
+
+	@Test
+	public void testGetLocdesByLocId() throws MiddlewareQueryException {
+		Integer locationId = 700000019;
+		List<Locdes> locdesList = LocationDataManagerImplTest.manager.getLocdesByLocId(locationId);
+		Assert.assertNotNull(locdesList);
+		for (Locdes locdes : locdesList) {
+			Assert.assertEquals(locationId, locdes.getLocationId());
+		}
+	}
+
+	@Test
+	public void testSaveOrUpdateLocdesList() throws MiddlewareQueryException {
+		Integer locationId = 700000019;
+		List<Locdes> existingLocdesList = LocationDataManagerImplTest.manager.getLocdesByLocId(locationId);
+		int rowsInPlotTypeId = 308;
+		Map<Integer, String> ldidToRowsInPlotMap = new HashMap<>();
+		if (existingLocdesList != null && !existingLocdesList.isEmpty()) {
+			// update rows in plot to 5
+			for (Locdes locdes : existingLocdesList) {
+				if (locdes.getTypeId() == rowsInPlotTypeId) {
+					ldidToRowsInPlotMap.put(locdes.getLdid(), locdes.getDval());
+					locdes.setDval("5");
+				}
+			}
+			LocationDataManagerImplTest.manager.saveOrUpdateLocdesList(locationId, existingLocdesList);
+			List<Locdes> newLocdesList = LocationDataManagerImplTest.manager.getLocdesByLocId(locationId);
+			Assert.assertEquals(existingLocdesList.size(), newLocdesList.size());
+			for (Locdes locdes : newLocdesList) {
+				if (locdes.getTypeId() == rowsInPlotTypeId) {
+					Assert.assertEquals("5", locdes.getDval());
+					locdes.setDval(ldidToRowsInPlotMap.get(locdes.getLdid()));
+				}
+			}
+			// revert to previous rows in plot
+			LocationDataManagerImplTest.manager.saveOrUpdateLocdesList(locationId, newLocdesList);
+			List<Locdes> revertedLocdesList = LocationDataManagerImplTest.manager.getLocdesByLocId(locationId);
+			for (Locdes locdes : revertedLocdesList) {
+				if (locdes.getTypeId() == rowsInPlotTypeId) {
+					Assert.assertEquals(ldidToRowsInPlotMap.get(locdes.getLdid()), locdes.getDval());
+				}
+			}
 		}
 	}
 

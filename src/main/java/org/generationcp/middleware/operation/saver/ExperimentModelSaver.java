@@ -105,8 +105,6 @@ public class ExperimentModelSaver extends Saver {
 
 	private ExperimentModel create(int projectId, Values values, TermId expType) throws MiddlewareQueryException {
 		ExperimentModel experimentModel = new ExperimentModel();
-
-		experimentModel.setNdExperimentId(this.getExperimentDao().getNextId("ndExperimentId"));
 		experimentModel.setTypeId(expType.getId());
 		experimentModel.setProperties(this.createProperties(experimentModel, values.getVariableList()));
 
@@ -125,7 +123,6 @@ public class ExperimentModelSaver extends Saver {
 	// GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
 	private Geolocation createNewGeoLocation() throws MiddlewareQueryException {
 		Geolocation location = new Geolocation();
-		location.setLocationId(this.getGeolocationDao().getNextId("locationId"));
 		location.setDescription("1");
 		this.getGeolocationDao().save(location);
 		return location;
@@ -134,10 +131,9 @@ public class ExperimentModelSaver extends Saver {
 	private List<ExperimentProperty> createProperties(ExperimentModel experimentModel, VariableList factors)
 			throws MiddlewareQueryException {
 		if (factors != null && factors.getVariables() != null && !factors.getVariables().isEmpty()) {
-			int id = this.getExperimentPropertyDao().getNextId("ndExperimentpropId");
 			for (Variable variable : factors.getVariables()) {
 				if (PhenotypicType.TRIAL_DESIGN == variable.getVariableType().getRole()) {
-					this.addProperty(experimentModel, variable, id++);
+					this.addProperty(experimentModel, variable);
 				}
 			}
 		}
@@ -145,13 +141,11 @@ public class ExperimentModelSaver extends Saver {
 		return experimentModel.getProperties();
 	}
 
-	private void addProperty(ExperimentModel experimentModel, Variable variable, int id) throws MiddlewareQueryException {
+	private void addProperty(ExperimentModel experimentModel, Variable variable) throws MiddlewareQueryException {
 		if (experimentModel.getProperties() == null) {
 			experimentModel.setProperties(new ArrayList<ExperimentProperty>());
 		}
 		ExperimentProperty property = new ExperimentProperty();
-
-		property.setNdExperimentpropId(id);
 		property.setExperiment(experimentModel);
 		property.setTypeId(variable.getVariableType().getId());
 		property.setValue(variable.getValue());
@@ -162,8 +156,6 @@ public class ExperimentModelSaver extends Saver {
 
 	private void addExperimentProject(ExperimentModel experimentModel, int projectId) throws MiddlewareQueryException {
 		ExperimentProject exproj = new ExperimentProject();
-
-		exproj.setExperimentProjectId(this.getExperimentProjectDao().getNextId("experimentProjectId"));
 		exproj.setProjectId(projectId);
 		exproj.setExperiment(experimentModel);
 		this.getExperimentProjectDao().save(exproj);
@@ -171,7 +163,6 @@ public class ExperimentModelSaver extends Saver {
 
 	private ExperimentStock createExperimentStock(ExperimentModel experiment, int stockId) throws MiddlewareQueryException {
 		ExperimentStock experimentStock = new ExperimentStock();
-		experimentStock.setExperimentStockId(this.getExperimentStockDao().getNextId("experimentStockId"));
 		experimentStock.setTypeId(TermId.IBDB_STRUCTURE.getId());
 		experimentStock.setStock(this.getStockModelBuilder().get(stockId));
 		experimentStock.setExperiment(experiment);

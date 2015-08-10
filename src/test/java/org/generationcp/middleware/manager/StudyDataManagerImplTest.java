@@ -11,11 +11,35 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.StudyTestDataUtil;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
-import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.DatasetValues;
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.dms.ExperimentValues;
+import org.generationcp.middleware.domain.dms.FolderReference;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.Reference;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Stocks;
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
@@ -42,11 +66,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
 
 public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 
@@ -260,7 +279,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 			Debug.println(MiddlewareIntegrationTest.INDENT, " folderId = " + folderId);
 			List<Reference> childrenNodes =
 					StudyDataManagerImplTest.manager
-							.getChildrenOfFolder(folderId, StudyDataManagerImplTest.commonTestProject.getUniqueID());
+					.getChildrenOfFolder(folderId, StudyDataManagerImplTest.commonTestProject.getUniqueID());
 			Assert.assertNotNull(childrenNodes);
 			Assert.assertTrue(childrenNodes.size() > 0);
 			Debug.println(MiddlewareIntegrationTest.INDENT, "testGetChildrenOfFolder(folderId=" + folderId + "): " + childrenNodes.size());
@@ -551,8 +570,8 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		DMSVariableType variableType = new DMSVariableType();
 		variableType.setLocalName("Dog");
 		variableType.setLocalDescription("Man's best friend");
-		variableType.setStandardVariable(StudyDataManagerImplTest.ontologyManager.
-				getStandardVariable(8240,commonTestProject.getUniqueID()));
+		variableType
+		.setStandardVariable(StudyDataManagerImplTest.ontologyManager.getStandardVariable(8240, commonTestProject.getUniqueID()));
 		variableType.setRank(99);
 		StudyDataManagerImplTest.manager.addDataSetVariableType(dataSet.getId(), variableType);
 
@@ -589,14 +608,6 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	public void testGetStocksInDataset() throws Exception {
 		Stocks stocks = StudyDataManagerImplTest.manager.getStocksInDataset(10085);
 		stocks.print(MiddlewareIntegrationTest.INDENT);
-	}
-
-	private void printExperiments(String title, int datasetId) throws Exception {
-		Debug.println(MiddlewareIntegrationTest.INDENT, title);
-		List<Experiment> experiments = StudyDataManagerImplTest.manager.getExperiments(datasetId, 0, 4);
-		for (Experiment experiment : experiments) {
-			experiment.print(3);
-		}
 	}
 
 	@Test
@@ -838,9 +849,81 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		Debug.println(MiddlewareIntegrationTest.INDENT, "countExperimentsByVariable on " + variableId + ", " + storedInId + " = " + count);
 	}
 
+	@Test
+	public void testSaveTrialDatasetSummary() throws Exception {
+
+		// get an existing trial environment dataset
+		Integer trialDataSetId = 25008;
+		DmsProject project = StudyDataManagerImplTest.manager.getProject(trialDataSetId);
+
+		if (project != null) {
+
+			// get the geolocation_id of the first trial instance, we will add the summary variables here
+			Integer locationId =
+					StudyDataManagerImplTest.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(project.getProjectId(), "1");
+			List<Integer> locationIds = new ArrayList<>();
+			locationIds.add(locationId);
+
+			// create a list of summary variables to add
+			VariableTypeList variableTypeList = this.createVariatypeListForSummary();
+			List<ExperimentValues> experimentValues = this.createExperimentValues(variableTypeList, locationId);
+
+			// add variableTypes to project properties if not exists
+			VariableTypeList nonExistingVariableTypes = new VariableTypeList();
+			for (DMSVariableType variableType : variableTypeList.getVariableTypes()) {
+				if (StudyDataManagerImplTest.manager.getDataSet(trialDataSetId).findVariableTypeByLocalName(variableType.getLocalName()) == null) {
+					nonExistingVariableTypes.add(variableType);
+				}
+			}
+
+			// save or update the summary variable to the trial dataset
+			StudyDataManagerImplTest.manager.saveTrialDatasetSummary(project, nonExistingVariableTypes, experimentValues, locationIds);
+
+			List<Experiment> experiments = StudyDataManagerImplTest.manager.getExperiments(trialDataSetId, 0, 1);
+
+			Assert.assertNotNull(experiments);
+
+			for (DMSVariableType variable : variableTypeList.getVariableTypes()) {
+				Variable savedVariable = experiments.get(0).getVariates().findByLocalName(variable.getLocalName());
+				Assert.assertNotNull(savedVariable);
+				Assert.assertEquals("12345", savedVariable.getValue());
+			}
+		}
+
+	}
+
+	private List<ExperimentValues> createExperimentValues(VariableTypeList variableTypeList, Integer locationId) {
+		List<ExperimentValues> experimentValues = new ArrayList<ExperimentValues>();
+
+		ExperimentValues expValue = new ExperimentValues();
+		List<Variable> traits = new ArrayList<Variable>();
+		VariableList variableList = new VariableList();
+		variableList.setVariables(traits);
+
+		expValue.setLocationId(locationId);
+
+		for (DMSVariableType variableType : variableTypeList.getVariableTypes()) {
+			variableList.add(new Variable(variableType, "12345"));
+		}
+
+		expValue.setVariableList(variableList);
+		experimentValues.add(expValue);
+
+		return experimentValues;
+	}
+
+	private VariableTypeList createVariatypeListForSummary() throws Exception {
+
+		VariableTypeList variableTypeList = new VariableTypeList();
+
+		DMSVariableType grainYieldSem = this.createVariableType(18140, "GRAIN_YIELD_SUMMARY_STAT", "test", 100);
+		variableTypeList.add(grainYieldSem);
+
+		return variableTypeList;
+	}
+
 	private Variable createVariable(int termId, String value, int rank) throws Exception {
-		StandardVariable stVar = StudyDataManagerImplTest.ontologyManager.getStandardVariable(
-				termId,commonTestProject.getUniqueID());
+		StandardVariable stVar = StudyDataManagerImplTest.ontologyManager.getStandardVariable(termId, commonTestProject.getUniqueID());
 
 		DMSVariableType vtype = new DMSVariableType();
 		vtype.setStandardVariable(stVar);
@@ -852,8 +935,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 	}
 
 	private DMSVariableType createVariableType(int termId, String name, String description, int rank) throws Exception {
-		StandardVariable stdVar = StudyDataManagerImplTest.ontologyManager.getStandardVariable(
-				termId,commonTestProject.getUniqueID());
+		StandardVariable stdVar = StudyDataManagerImplTest.ontologyManager.getStandardVariable(termId, commonTestProject.getUniqueID());
 
 		DMSVariableType vtype = new DMSVariableType();
 		vtype.setLocalName(name);
@@ -1087,7 +1169,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		// the db
 		List<StudyDetails> studyDetailsList =
 				StudyDataManagerImplTest.manager
-						.getAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID());
+				.getAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID());
 		if (studyDetailsList != null && studyDetailsList.size() > 0) {
 			for (StudyDetails study : studyDetailsList) {
 				if (study.getStudyType() == StudyType.N) {
@@ -1125,7 +1207,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		// REPLACED BY THIS TO MAKE THE JUNIT WORK
 		List<StudyDetails> studyDetailsList =
 				StudyDataManagerImplTest.manager
-						.getAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID());
+				.getAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID());
 		if (studyDetailsList != null && studyDetailsList.size() > 0) {
 			for (StudyDetails study : studyDetailsList) {
 				if (study.getStudyType() == StudyType.T) {
@@ -1148,7 +1230,7 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		Debug.println(MiddlewareIntegrationTest.INDENT, "List ALL Trials and Nurseries");
 		List<StudyDetails> list =
 				StudyDataManagerImplTest.manager
-						.getAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID());
+				.getAllNurseryAndTrialStudyDetails(StudyDataManagerImplTest.commonTestProject.getUniqueID());
 		for (StudyDetails s : list) {
 			Debug.println(MiddlewareIntegrationTest.INDENT, s.toString());
 		}
@@ -1383,5 +1465,60 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 		Assert.assertEquals("Study should have the programUUID " + StudyDataManagerImplTest.commonTestProject.getUniqueID(),
 				StudyDataManagerImplTest.commonTestProject.getUniqueID(), studyDetails.getProgramUUID());
 		Assert.assertEquals("Study should be a trial", StudyType.T, studyDetails.getStudyType());
+	}
+
+	@Test
+	public void testGetGeolocationIdByProjectIdAndTrialInstanceNumber() {
+		try {
+			Integer projectId = 25007;
+			String trialInstanceNumberExpected = "1";
+			Integer geolocationId =
+					StudyDataManagerImplTest.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId,
+							trialInstanceNumberExpected);
+			if (geolocationId != null) {
+				String trialInstanceNumberActual = StudyDataManagerImplTest.manager.getTrialInstanceNumberByGeolocationId(geolocationId);
+				Assert.assertEquals(trialInstanceNumberExpected, trialInstanceNumberActual);
+			}
+		} catch (MiddlewareQueryException e) {
+			Assert.fail("Unexpected exception: " + e.getMessage());
+		}
+	}
+
+	@Test
+	public void testGetTrialInstanceNumberByGeolocationId() {
+		try {
+			String trialInstanceNumberExpected = "1";
+			String trialInstanceNumberActual = StudyDataManagerImplTest.manager.getTrialInstanceNumberByGeolocationId(1);
+			Assert.assertNotNull(trialInstanceNumberActual);
+			Assert.assertEquals(trialInstanceNumberExpected, trialInstanceNumberActual);
+		} catch (MiddlewareQueryException e) {
+			Assert.fail("Unexpected exception: " + e.getMessage());
+		}
+	}
+
+	@Test
+	public void testSaveGeolocationProperty() throws MiddlewareQueryException {
+		Integer stdVarId = TermId.EXPERIMENT_DESIGN_FACTOR.getId();
+		Integer studyId = 25019;
+		String expDesign = StudyDataManagerImplTest.manager.getGeolocationPropValue(stdVarId, studyId);
+		String newExpDesign = null;
+		if (expDesign != null) {
+			if (TermId.RANDOMIZED_COMPLETE_BLOCK.getId() == Integer.parseInt(expDesign)) {
+				newExpDesign = Integer.toString(TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId());
+			} else if (TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId() == Integer.parseInt(expDesign)) {
+				newExpDesign = Integer.toString(TermId.RANDOMIZED_COMPLETE_BLOCK.getId());
+			}
+			// update experimental design value
+			int ndGeolocationId = StudyDataManagerImplTest.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(studyId, "1");
+			StudyDataManagerImplTest.manager.saveGeolocationProperty(ndGeolocationId, stdVarId, newExpDesign);
+			String actualExpDesign = StudyDataManagerImplTest.manager.getGeolocationPropValue(stdVarId, studyId);
+			Assert.assertEquals(newExpDesign, actualExpDesign);
+			Assert.assertNotEquals(expDesign, actualExpDesign);
+			// revert to previous value
+			StudyDataManagerImplTest.manager.saveGeolocationProperty(ndGeolocationId, stdVarId, expDesign);
+			actualExpDesign = StudyDataManagerImplTest.manager.getGeolocationPropValue(stdVarId, studyId);
+			Assert.assertEquals(expDesign, actualExpDesign);
+			Assert.assertNotEquals(newExpDesign, actualExpDesign);
+		}
 	}
 }

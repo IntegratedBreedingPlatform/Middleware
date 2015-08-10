@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Created with Jaspersoft Studio version 6.0.4.final using JasperReports Library version 6.0.4  -->
-<!-- 2015-05-14T13:33:07 -->
+<!-- 2015-07-14T12:13:49 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb26_header" pageWidth="612" pageHeight="792" columnWidth="572" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" resourceBundle="i18n/resources" uuid="d2d09ff1-8954-4f03-9bf3-c6716eeef7ad">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
@@ -13,9 +13,9 @@
 	<parameter name="tid" class="java.lang.Integer"/>
 	<parameter name="occ" class="java.lang.Integer"/>
 	<parameter name="program" class="java.lang.String"/>
-	<parameter name="trial_name" class="java.lang.String"/>
-	<parameter name="trial_abbr" class="java.lang.String"/>
-	<parameter name="num_reporte" class="java.lang.Integer"/>
+	<parameter name="trialName" class="java.lang.String"/>
+	<parameter name="trialAbbr" class="java.lang.String"/>
+	<parameter name="numReporte" class="java.lang.Integer"/>
 	<parameter name="Ientry" class="java.lang.Integer"/>
 	<parameter name="Fentry" class="java.lang.Integer"/>
 	<parameter name="offset" class="java.lang.Integer"/>
@@ -24,9 +24,9 @@
 	<parameter name="lname" class="java.lang.String"/>
 	<parameter name="lid" class="java.lang.String"/>
 	<parameter name="cycle" class="java.lang.String"/>
-	<parameter name="fb_class" class="java.lang.String"/>
-	<parameter name="gms_ip" class="java.lang.String"/>
-	<parameter name="dms_ip" class="java.lang.String"/>
+	<parameter name="fbClass" class="java.lang.String"/>
+	<parameter name="gmsIp" class="java.lang.String"/>
+	<parameter name="dmsIp" class="java.lang.String"/>
 	<parameter name="version" class="java.lang.String"/>
 	<parameter name="organization" class="java.lang.String"/>
 	<queryString>
@@ -185,14 +185,14 @@
 				<textElement verticalAlignment="Middle" rotation="None">
 					<font fontName="SansSerif" size="7" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{trial_name}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{trialName}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="363" y="260" width="155" height="12" uuid="2a8e375f-b0d0-46d8-b2db-ee8d35702034"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="7" isBold="false" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{trial_abbr}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{trialAbbr}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="363" y="360" width="91" height="12" uuid="2812bd57-6513-49ba-ac09-2e7212f024d3"/>
@@ -227,7 +227,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{num_reporte}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{numReporte}]]></textFieldExpression>
 			</textField>
 			<staticText>
 				<reportElement x="363" y="440" width="35" height="12" uuid="fa8d89c4-4f2d-49b1-9af2-b15b8bb54485"/>
@@ -486,7 +486,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="SansSerif" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{fb_class}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{fbClass}]]></textFieldExpression>
 			</textField>
 			<image>
 				<reportElement key="image-1" x="5" y="5" width="245" height="70" uuid="528191e8-1fba-4cf8-a3f3-83c4c36bee31"/>
@@ -680,19 +680,19 @@
 					<subreportParameterExpression><![CDATA[$P{lname}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="dms_ip">
-					<subreportParameterExpression><![CDATA[$P{dms_ip}]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[$P{dmsIp}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="labbr">
 					<subreportParameterExpression><![CDATA[$P{labbr}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="trial_abbr">
-					<subreportParameterExpression><![CDATA[$P{trial_abbr}]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[$P{trialAbbr}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="Ientry">
 					<subreportParameterExpression><![CDATA[$P{Ientry}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="gms_ip">
-					<subreportParameterExpression><![CDATA[$P{gms_ip}]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[$P{gmsIp}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="country">
 					<subreportParameterExpression><![CDATA[$P{country}]]></subreportParameterExpression>
@@ -704,7 +704,7 @@
 					<subreportParameterExpression><![CDATA[$P{lid}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="fb_class">
-					<subreportParameterExpression><![CDATA[$P{fb_class}]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[$P{fbClass}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="LoCycle">
 					<subreportParameterExpression><![CDATA[$P{LoCycle}]]></subreportParameterExpression>
@@ -713,13 +713,13 @@
 					<subreportParameterExpression><![CDATA[$P{program}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="num_reporte">
-					<subreportParameterExpression><![CDATA[$P{num_reporte}]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[$P{numReporte}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="tid">
 					<subreportParameterExpression><![CDATA[$P{tid}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="trial_name">
-					<subreportParameterExpression><![CDATA[$P{trial_name}]]></subreportParameterExpression>
+					<subreportParameterExpression><![CDATA[$P{trialName}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="occ">
 					<subreportParameterExpression><![CDATA[$P{occ}]]></subreportParameterExpression>

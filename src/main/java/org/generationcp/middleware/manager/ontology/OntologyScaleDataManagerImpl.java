@@ -231,7 +231,6 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			if (Objects.equals(scale.getDataType().getId(), DataType.CATEGORICAL_VARIABLE.getId())) {
 				// Saving new CV
 				CV cv = new CV();
-				cv.setCvId(this.getCvDao().getNextId("cvId"));
 				cv.setName(String.valueOf(scale.getId()));
 				cv.setDefinition(String.valueOf(scale.getName() + " - " + scale.getDefinition()));
 				this.getCvDao().save(cv);
@@ -242,7 +241,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 					String label = c.getName().trim();
 					String value = c.getDefinition().trim();
 
-					CVTerm category = new CVTerm(this.getCvTermDao().getNextId("cvTermId"), cv.getCvId(), label, value, null, 0, 0);
+					CVTerm category = new CVTerm(null, cv.getCvId(), label, value, null, 0, 0);
 					this.getCvTermDao().save(category);
 					this.getCvTermRelationshipDao().save(scale.getId(), TermId.HAS_VALUE.getId(), category.getCvTermId());
 				}
@@ -389,9 +388,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 				// Creating new cv if old data type was not categorical
 				if (Objects.equals(cvId, null)) {
-					cvId = this.getCvDao().getNextId("cvId");
 					CV cv = new CV();
-					cv.setCvId(cvId);
 					cv.setName(String.valueOf(scale.getId()));
 					cv.setDefinition(String.valueOf(scale.getName() + " - " + scale.getDefinition()));
 					this.getCvDao().save(cv);
@@ -423,8 +420,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 					}
 
 					if (category == null) {
-						Integer nextId = this.getCvTermDao().getNextId("cvTermId");
-						category = new CVTerm(nextId, cvId, label, value, null, 0, 0);
+						category = new CVTerm(null, cvId, label, value, null, 0, 0);
 						this.getCvTermDao().save(category);
 						this.getCvTermRelationshipDao().save(scale.getId(), TermId.HAS_VALUE.getId(), category.getCvTermId());
 					}

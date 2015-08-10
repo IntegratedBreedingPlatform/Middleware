@@ -35,6 +35,7 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -227,17 +228,17 @@ public interface FieldbookService {
 	 * @param workbook that contains the measurement rows to save
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void saveMeasurementRows(Workbook workbook,String programUUID) throws MiddlewareException;
+	void saveMeasurementRows(Workbook workbook, String programUUID) throws MiddlewareException;
 
 	/**
 	 * Saves germplasm list advanced nursery types. This method saves the germplasms (and corresponding name) if not found in the database.
 	 * ListData items are always added to the database, before saving the germplasm list.
-	 * 
+	 *
 	 * Old Fieldbook Implementation:
-	 * 
+	 *
 	 * call Save Listnms; For each entry in the advance list table if (gid != null) germplasm = findByGid(gid) if (germplasm == null)
 	 * germplasm = findByName(table.desig)
-	 * 
+	 *
 	 * if (germplasm != null) call Save ListData using gid from germplasm.gid else call Save Germplasm - note new gid generated call Save
 	 * Names using NType = 1027, NVal = table.desig, NStat = 0 call Save Names using NType = 1028, NVal = table.germplasmBCID, NStat = 1
 	 * call Save Names using NType = 1029, NVal = table.cross, NStat = 0 call Save ListData
@@ -246,7 +247,7 @@ public interface FieldbookService {
 	 *        values
 	 * @param listDataItems the list data to add - the key of the Map is the germplasm associated to the germplasm list data value
 	 * @param germplasmList the germplasm list to add
-	 * 
+	 *
 	 * @return The id of the newly-created germplasm list
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -326,7 +327,7 @@ public interface FieldbookService {
 	 * @return the standard variable
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	StandardVariable getStandardVariable(int id,String programUUID) throws MiddlewareException;
+	StandardVariable getStandardVariable(int id, String programUUID) throws MiddlewareException;
 
 	/**
 	 * Gets the all nursery types.
@@ -731,9 +732,8 @@ public interface FieldbookService {
 	 * @return the measurement variable by property scale method and role
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(String property, 
-			String scale, String method, PhenotypicType role, String programUUID)
-			throws MiddlewareException;
+	MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(String property, String scale, String method,
+			PhenotypicType role, String programUUID) throws MiddlewareException;
 
 	public void setTreatmentFactorValues(List<TreatmentVariable> treatmentFactors, int measurementDatasetID)
 			throws MiddlewareQueryException;
@@ -813,7 +813,7 @@ public interface FieldbookService {
 	/*
 	 * Deletes a study (logical delete).
 	 */
-	void deleteStudy(int studyId) throws MiddlewareQueryException;
+	void deleteStudy(int studyId, Integer currentUserId) throws UnpermittedDeletionException, MiddlewareException;
 
 	/**
 	 * Gets the favorite project location ids.
@@ -835,7 +835,7 @@ public interface FieldbookService {
 
 	/**
 	 * Returns germplasm lists by project id.
-	 * 
+	 *
 	 * @param projectId
 	 * @return
 	 * @throws MiddlewareQueryException
@@ -844,7 +844,7 @@ public interface FieldbookService {
 
 	/**
 	 * Creates or Update a list data project.
-	 * 
+	 *
 	 * @param projectId
 	 * @param type
 	 * @param list
@@ -858,7 +858,7 @@ public interface FieldbookService {
 
 	/**
 	 * Retrieves a list data project
-	 * 
+	 *
 	 * @param listId
 	 * @return
 	 * @throws MiddlewareQueryException
@@ -871,7 +871,7 @@ public interface FieldbookService {
 
 	/**
 	 * Deletes a list data project given the project_id and the type.
-	 * 
+	 *
 	 * @param projectId
 	 * @param type
 	 * @throws MiddlewareQueryException
@@ -880,10 +880,10 @@ public interface FieldbookService {
 
 	/**
 	 * Saves germplasm list crosses types. ListData items are always added to the database, before saving the germplasm list.
-	 * 
+	 *
 	 * @param listDataItems the list data to add - the key of the Map is the germplasm associated to the germplasm list data value
 	 * @param germplasmList the germplasm list to add
-	 * 
+	 *
 	 * @return The id of the newly-created germplasm list
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -901,7 +901,7 @@ public interface FieldbookService {
 	 * @param name of the Standard Varible
 	 * @throws MiddlewareQueryException the middleware query exception
 	 * **/
-	StandardVariable getStandardVariableByName(String name,String programUUID) throws MiddlewareException;
+	StandardVariable getStandardVariableByName(String name, String programUUID) throws MiddlewareException;
 
 	List<StandardVariableReference> filterStandardVariablesByIsAIds(List<StandardVariableReference> standardReferences, List<Integer> isAIds);
 

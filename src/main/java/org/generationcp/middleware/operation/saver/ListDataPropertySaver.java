@@ -45,8 +45,6 @@ public class ListDataPropertySaver extends Saver {
 							// create if combination of listdata ID and column name doesn't exist yet
 							if (property == null) {
 								property = new ListDataProperty(listData, column.getColumnName());
-								Integer nextId = this.getListDataPropertyDAO().getNextId("listDataPropertyId");
-								property.setListDataPropertyId(nextId);
 							}
 							String value = column.getValue();
 							if (value != null) {
@@ -103,10 +101,7 @@ public class ListDataPropertySaver extends Saver {
 			for (ListDataProperty listDataProperty : listDataProps) {
 
 				if (listDataProperty.getListData() != null) {
-
-					Integer nextId = this.getListDataPropertyDAO().getNextId("listDataPropertyId");
-					listDataProperty.setListDataPropertyId(nextId);
-					listDataProperty = this.getListDataPropertyDAO().saveOrUpdate(listDataProperty);
+					this.getListDataPropertyDAO().saveOrUpdate(listDataProperty);
 
 					if (recordsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
 						// flush a batch of inserts and release memory

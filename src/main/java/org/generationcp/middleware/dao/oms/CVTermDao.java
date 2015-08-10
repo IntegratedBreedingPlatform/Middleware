@@ -12,7 +12,11 @@
 package org.generationcp.middleware.dao.oms;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -20,7 +24,14 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
-import org.generationcp.middleware.domain.oms.*;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.PropertyReference;
+import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -64,10 +75,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			StringBuilder sqlString =
 					new StringBuilder().append("SELECT DISTINCT cvt.cvterm_id ").append("FROM cvterm cvt ")
-							.append("WHERE cvt.cv_id = :cvId and cvt.name = :nameOrSynonym ").append("UNION ")
-							.append("SELECT DISTINCT cvt.cvterm_id ")
-							.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
-							.append("AND cvt.cv_id = :cvId AND syn.synonym = :nameOrSynonym ");
+					.append("WHERE cvt.cv_id = :cvId and cvt.name = :nameOrSynonym ").append("UNION ")
+					.append("SELECT DISTINCT cvt.cvterm_id ")
+					.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
+					.append("AND cvt.cv_id = :cvId AND syn.synonym = :nameOrSynonym ");
 
 			SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 			query.setParameter("cvId", cvId);
@@ -84,9 +95,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return termIds;
 	}
 
-	public Map<String, Map<Integer, VariableType>> getTermIdsWithTypeByNameOrSynonyms(
-			List<String> nameOrSynonyms, int cvId)
-			throws MiddlewareQueryException {
+	public Map<String, Map<Integer, VariableType>> getTermIdsWithTypeByNameOrSynonyms(List<String> nameOrSynonyms, int cvId)
+					throws MiddlewareQueryException {
 		Map<String, Map<Integer, VariableType>> stdVarMap = new HashMap<String, Map<Integer, VariableType>>();
 
 		// Store the names in the map in uppercase
@@ -99,10 +109,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 				StringBuilder sqlString =
 						new StringBuilder().append("SELECT cvt.name, cvt.cvterm_id ").append("FROM cvterm cvt ")
-								.append("WHERE cvt.cv_id = :cvId and cvt.name IN (:nameOrSynonyms) ").append("UNION ")
-								.append("SELECT syn.synonym, cvt.cvterm_id ")
-								.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
-								.append("AND cvt.cv_id = :cvId AND syn.synonym IN (:nameOrSynonyms) ");
+						.append("WHERE cvt.cv_id = :cvId and cvt.name IN (:nameOrSynonyms) ").append("UNION ")
+						.append("SELECT syn.synonym, cvt.cvterm_id ")
+						.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
+						.append("AND cvt.cv_id = :cvId AND syn.synonym IN (:nameOrSynonyms) ");
 
 				SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 				query.setParameter("cvId", cvId);
@@ -121,8 +131,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 						stdVarIdsWithType = new HashMap<Integer, VariableType>();
 						stdVarMap.put(nameOrSynonym, stdVarIdsWithType);
 					}
-					stdVarIdsWithType.put(cvtermId,
-							getDefaultVariableType(cvtermId));
+					stdVarIdsWithType.put(cvtermId, this.getDefaultVariableType(cvtermId));
 				}
 
 			}
@@ -134,8 +143,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	private VariableType getDefaultVariableType(Integer cvTermId) {
-		Criteria criteria = this.getSession().createCriteria(
-				CVTermProperty.class);
+		Criteria criteria = this.getSession().createCriteria(CVTermProperty.class);
 		criteria.add(Restrictions.eq("cvTermId", cvTermId));
 		criteria.add(Restrictions.eq("typeId", TermId.VARIABLE_TYPE.getId()));
 		criteria.addOrder(Order.asc("cvTermPropertyId"));
@@ -148,20 +156,19 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return null;
 	}
 
-	public CVTerm getByNameAndCvId(String name, int cvId)
-			throws MiddlewareQueryException {
+	public CVTerm getByNameAndCvId(String name, int cvId) throws MiddlewareQueryException {
 		CVTerm term = null;
 
 		try {
 
 			StringBuilder sqlString =
 					new StringBuilder().append("SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
-							.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ").append("FROM cvterm cvt ")
-							.append("WHERE cvt.cv_id = :cvId and cvt.name = :nameOrSynonym ").append("UNION ")
-							.append("	SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
-							.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ")
-							.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
-							.append("AND cvt.cv_id = :cvId AND syn.synonym = :nameOrSynonym ");
+					.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ").append("FROM cvterm cvt ")
+					.append("WHERE cvt.cv_id = :cvId and cvt.name = :nameOrSynonym ").append("UNION ")
+					.append("	SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
+					.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ")
+					.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
+					.append("AND cvt.cv_id = :cvId AND syn.synonym = :nameOrSynonym ");
 
 			SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 			query.setParameter("cvId", cvId);
@@ -196,12 +203,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			StringBuilder sqlString =
 					new StringBuilder().append("SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
-							.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ").append("FROM cvterm cvt ")
-							.append("WHERE cvt.name = :nameOrSynonym ").append("UNION ")
-							.append("	SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
-							.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ")
-							.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
-							.append("AND syn.synonym = :nameOrSynonym ");
+					.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ").append("FROM cvterm cvt ")
+					.append("WHERE cvt.name = :nameOrSynonym ").append("UNION ")
+					.append("	SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
+					.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ")
+					.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
+					.append("AND syn.synonym = :nameOrSynonym ");
 
 			SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 			query.setParameter("nameOrSynonym", name);
@@ -236,7 +243,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			StringBuilder sqlString =
 					new StringBuilder().append("SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
-							.append("FROM cvterm cvt ").append("WHERE cvt.cv_id = :cvId");
+					.append("FROM cvterm cvt ").append("WHERE cvt.cv_id = :cvId");
 
 			SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 			query.setParameter("cvId", cvId);
@@ -293,13 +300,13 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			try {
 				StringBuilder queryString =
 						new StringBuilder().append("SELECT cvt.cvterm_id, cvt.name, cvt.definition ").append("FROM cvterm cvt ")
-								.append("INNER JOIN cvterm_relationship datatype ON datatype.subject_id = cvt.cvterm_id ")
-								.append(" AND datatype.type_id = ").append(TermId.HAS_TYPE.getId())
-								.append(" INNER JOIN cvterm_relationship stored_in ON datatype.subject_id = stored_in.subject_id ")
-								.append(" AND stored_in.type_id = ").append(TermId.STORED_IN.getId())
-								.append(" WHERE cvt.cvterm_id in (:ids)")
-								.append(" AND (stored_in.object_id <> :storedIn OR (stored_in.object_id = :storedIn ")
-								.append(" AND datatype.object_id = :datatype))");
+						.append("INNER JOIN cvterm_relationship datatype ON datatype.subject_id = cvt.cvterm_id ")
+						.append(" AND datatype.type_id = ").append(TermId.HAS_TYPE.getId())
+						.append(" INNER JOIN cvterm_relationship stored_in ON datatype.subject_id = stored_in.subject_id ")
+						.append(" AND stored_in.type_id = ").append(TermId.STORED_IN.getId())
+						.append(" WHERE cvt.cvterm_id in (:ids)")
+						.append(" AND (stored_in.object_id <> :storedIn OR (stored_in.object_id = :storedIn ")
+						.append(" AND datatype.object_id = :datatype))");
 
 				SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 				query.setParameterList("ids", ids);
@@ -332,8 +339,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		try {
 			StringBuilder queryString =
 					new StringBuilder().append("SELECT cvt.cvterm_id, cvt.name, cvt.definition ").append("FROM cvterm cvt ")
-							.append("INNER JOIN cvterm_relationship cvr ON cvr.subject_id = cvt.cvterm_id ")
-							.append("             AND cvr.type_id = 1105 AND cvr.object_id IN (:types) ");
+					.append("INNER JOIN cvterm_relationship cvr ON cvr.subject_id = cvt.cvterm_id ")
+					.append("             AND cvr.type_id = 1105 AND cvr.object_id IN (:types) ");
 			if (storedIn != null) {
 				queryString.append("INNER JOIN cvterm_relationship stored_in ON cvr.subject_id = stored_in.subject_id ").append(
 						"AND stored_in.type_id = 1044 AND stored_in.object_id = :storedIn ");
@@ -377,16 +384,16 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		try {
 			SQLQuery query =
 					this.getSession()
-							.createSQLQuery(
-									"SELECT cvt_categorical.cvterm_id, cvt_categorical.name, cvt_categorical.definition, cvr_value.object_id, cvt_value.name "
-											+ "FROM cvterm_relationship cvr_categorical  "
-											+ "INNER JOIN cvterm cvt_categorical ON cvr_categorical.subject_id = cvt_categorical.cvterm_id "
-											+ "INNER JOIN cvterm_relationship cvr_scale ON cvr_categorical.subject_id = cvr_scale.subject_id "
-											+ "INNER JOIN cvterm_relationship cvr_scale_type ON cvr_scale.object_id = cvr_scale_type.subject_id "
-											+ "INNER JOIN cvterm_relationship cvr_value ON cvr_scale.object_id = cvr_value.subject_id and cvr_value.type_id = 1190 "
-											+ "INNER JOIN cvterm cvt_value ON cvr_value.object_id = cvt_value.cvterm_id "
-											+ "WHERE cvr_scale.type_id = 1220 and cvr_scale_type.type_id = 1105 AND cvr_scale_type.object_id = 1130 "
-											+ "    AND cvt_categorical.cvterm_id in (:traitIds) ");
+					.createSQLQuery(
+							"SELECT cvt_categorical.cvterm_id, cvt_categorical.name, cvt_categorical.definition, cvr_value.object_id, cvt_value.name "
+									+ "FROM cvterm_relationship cvr_categorical  "
+									+ "INNER JOIN cvterm cvt_categorical ON cvr_categorical.subject_id = cvt_categorical.cvterm_id "
+									+ "INNER JOIN cvterm_relationship cvr_scale ON cvr_categorical.subject_id = cvr_scale.subject_id "
+									+ "INNER JOIN cvterm_relationship cvr_scale_type ON cvr_scale.object_id = cvr_scale_type.subject_id "
+									+ "INNER JOIN cvterm_relationship cvr_value ON cvr_scale.object_id = cvr_value.subject_id and cvr_value.type_id = 1190 "
+									+ "INNER JOIN cvterm cvt_value ON cvr_value.object_id = cvt_value.cvterm_id "
+									+ "WHERE cvr_scale.type_id = 1220 and cvr_scale_type.type_id = 1105 AND cvr_scale_type.object_id = 1130 "
+									+ "    AND cvt_categorical.cvterm_id in (:traitIds) ");
 
 			query.setParameterList("traitIds", traitIds);
 
@@ -463,14 +470,14 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			StringBuilder sql =
 					new StringBuilder()
-							.append("SELECT cvt.cvterm_id, cvt.name, cvt.definition,  c_scale.scaleName, cr_type.object_id ")
-							.append("FROM cvterm cvt ")
-							.append("	INNER JOIN cvterm_relationship cr_scale ON cvt.cvterm_id = cr_scale.subject_id ")
-							.append("   INNER JOIN (SELECT cvterm_id, name AS scaleName FROM cvterm) c_scale ON c_scale.cvterm_id = cr_scale.object_id ")
-							.append("        AND cr_scale.type_id = ").append(TermId.HAS_SCALE.getId()).append(" ")
-							.append("	INNER JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.subject_id ")
-							.append("		AND cr_type.type_id = ").append(TermId.HAS_TYPE.getId()).append(" ")
-							.append("WHERE cvt.cvterm_id in (:traitIds) ");
+			.append("SELECT cvt.cvterm_id, cvt.name, cvt.definition,  c_scale.scaleName, cr_type.object_id ")
+			.append("FROM cvterm cvt ")
+			.append("	INNER JOIN cvterm_relationship cr_scale ON cvt.cvterm_id = cr_scale.subject_id ")
+			.append("   INNER JOIN (SELECT cvterm_id, name AS scaleName FROM cvterm) c_scale ON c_scale.cvterm_id = cr_scale.object_id ")
+			.append("        AND cr_scale.type_id = ").append(TermId.HAS_SCALE.getId()).append(" ")
+			.append("	INNER JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.subject_id ")
+			.append("		AND cr_type.type_id = ").append(TermId.HAS_TYPE.getId()).append(" ")
+			.append("WHERE cvt.cvterm_id in (:traitIds) ");
 
 			SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 			query.setParameterList("traitIds", traitIds);
@@ -495,7 +502,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	public Integer getStandadardVariableIdByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId, String sortOrder)
-					throws MiddlewareQueryException {
+			throws MiddlewareQueryException {
 		try {
 			StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT DISTINCT cvr.subject_id ");
@@ -530,7 +537,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			queryString.append("INNER JOIN cvterm_relationship cvrs ON cvr.subject_id = cvrs.subject_id AND cvrs.type_id = 1220 ");
 			queryString.append("INNER JOIN cvterm_relationship cvrm ON cvr.subject_id = cvrm.subject_id AND cvrm.type_id = 1210 ");
 			queryString
-			.append("INNER JOIN cvterm_relationship storedIn ON cvr.subject_id = storedIn.subject_id AND storedIn.type_id = 1044 ");
+					.append("INNER JOIN cvterm_relationship storedIn ON cvr.subject_id = storedIn.subject_id AND storedIn.type_id = 1044 ");
 			queryString.append("INNER JOIN cvterm term ON cvr.subject_id = term.cvterm_id ");
 			queryString.append("WHERE storedIn.object_id IN (:type) ORDER BY term.name");
 
@@ -637,17 +644,14 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	/**
-	 * Returns standard variables associated to the given list of trait names or
-	 * synonyms
-	 * 
+	 * Returns standard variables associated to the given list of trait names or synonyms
+	 *
 	 * @param propertyNameOrSynonyms
-	 * @return Map of name-(standard variable ids-variable type) of the given
-	 *         trait name or synonyms
+	 * @return Map of name-(standard variable ids-variable type) of the given trait name or synonyms
 	 * @throws MiddlewareQueryException
 	 */
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByProperties(
-			List<String> propertyNameOrSynonyms)
-			throws MiddlewareQueryException {
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByProperties(List<String> propertyNameOrSynonyms)
+					throws MiddlewareQueryException {
 		Map<String, Map<Integer, VariableType>> stdVarMap = new HashMap<String, Map<Integer, VariableType>>();
 
 		// Store the names in the map in uppercase
@@ -660,12 +664,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 				StringBuilder sqlString =
 						new StringBuilder().append("SELECT DISTINCT cvtr.name, syn.synonym, cvt.cvterm_id ")
-								.append("FROM cvterm_relationship cvr ")
-								.append("INNER JOIN cvterm cvtr ON cvr.object_id = cvtr.cvterm_id AND cvr.type_id = 1200 ")
-								.append("INNER JOIN cvterm cvt ON cvr.subject_id = cvt.cvterm_id AND cvt.cv_id = 1040 ")
-								.append(", cvtermsynonym syn ")
-								.append("WHERE (cvtr.cvterm_id = syn.cvterm_id AND syn.synonym IN (:propertyNameOrSynonyms) ")
-								.append("OR cvtr.name IN (:propertyNameOrSynonyms)) ");
+						.append("FROM cvterm_relationship cvr ")
+						.append("INNER JOIN cvterm cvtr ON cvr.object_id = cvtr.cvterm_id AND cvr.type_id = 1200 ")
+						.append("INNER JOIN cvterm cvt ON cvr.subject_id = cvt.cvterm_id AND cvt.cv_id = 1040 ")
+						.append(", cvtermsynonym syn ")
+						.append("WHERE (cvtr.cvterm_id = syn.cvterm_id AND syn.synonym IN (:propertyNameOrSynonyms) ")
+						.append("OR cvtr.name IN (:propertyNameOrSynonyms)) ");
 
 				SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 				query.setParameterList("propertyNameOrSynonyms", propertyNameOrSynonyms);
@@ -682,8 +686,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 						if (stdVarMap.containsKey(cvtermName)) {
 							stdVarIdsWithType = stdVarMap.get(cvtermName);
 						}
-						stdVarIdsWithType.put(cvtermId,
-								getDefaultVariableType(cvtermId));
+						stdVarIdsWithType.put(cvtermId, this.getDefaultVariableType(cvtermId));
 						stdVarMap.put(cvtermName, stdVarIdsWithType);
 
 					}
@@ -691,8 +694,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 						if (stdVarMap.containsKey(cvtermSynonym)) {
 							stdVarIdsWithType = stdVarMap.get(cvtermSynonym);
 						}
-						stdVarIdsWithType.put(cvtermId,
-								getDefaultVariableType(cvtermId));
+						stdVarIdsWithType.put(cvtermId, this.getDefaultVariableType(cvtermId));
 						stdVarMap.put(cvtermSynonym, stdVarIdsWithType);
 					}
 
@@ -701,10 +703,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error in getStandardVariableIdsWithTypeByProperties="
-							+ propertyNameOrSynonyms + " in CVTermDao: "
-							+ e.getMessage(), e);
+			this.logAndThrowException("Error in getStandardVariableIdsWithTypeByProperties=" + propertyNameOrSynonyms + " in CVTermDao: "
+					+ e.getMessage(), e);
 		}
 
 		return stdVarMap;
@@ -803,9 +803,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		try {
 			StringBuilder sqlString =
 					new StringBuilder().append("SELECT cvt.* ").append("FROM cvterm cvt ")
-							.append("INNER JOIN cvterm_relationship cvr on cvr.object_id = cvt.cvterm_id ")
-							.append("INNER JOIN cvterm v on cvr.subject_id = v.cvterm_id ")
-							.append("WHERE cvr.type_id = :isAtermId AND v.cv_id = :cvId AND v.cvterm_id = :termId");
+					.append("INNER JOIN cvterm_relationship cvr on cvr.object_id = cvt.cvterm_id ")
+					.append("INNER JOIN cvterm v on cvr.subject_id = v.cvterm_id ")
+					.append("WHERE cvr.type_id = :isAtermId AND v.cv_id = :cvId AND v.cvterm_id = :termId");
 
 			SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 			query.setParameter("termId", termId);
@@ -850,10 +850,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			StringBuilder sqlString =
 					new StringBuilder().append("SELECT cvterm_id, name, definition ")
-							.append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
-							.append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId())
-							.append(" AND cvr.object_id = ").append(classType.getId()).append(" ").append(" AND cvt.cv_id = ")
-							.append(CvId.IBDB_TERMS.getId());
+					.append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
+					.append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId())
+					.append(" AND cvr.object_id = ").append(classType.getId()).append(" ").append(" AND cvt.cv_id = ")
+					.append(CvId.IBDB_TERMS.getId());
 
 			SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 
@@ -886,9 +886,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		try {
 			StringBuilder sqlString =
 					new StringBuilder().append("SELECT cvterm_id, name, definition, cvr.object_id ")
-							.append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
-							.append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId()).append(" ")
-							.append("WHERE cv_id = 1000 AND object_id NOT IN (1000, 1002, 1003)  ").append("ORDER BY cvr.object_id ");
+					.append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
+					.append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId()).append(" ")
+					.append("WHERE cv_id = 1000 AND object_id NOT IN (1000, 1002, 1003)  ").append("ORDER BY cvr.object_id ");
 
 			SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 
@@ -937,10 +937,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			StringBuilder sqlString =
 					new StringBuilder().append("SELECT cvterm_id, name, definition, cvr.object_id ")
-							.append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
-							.append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId()).append(" ")
-							.append(" AND cvr.object_id  IN (:traitClassIds) ").append("WHERE cv_id =  ").append(CvId.PROPERTIES.getId())
-							.append(" ").append("ORDER BY cvr.object_id ");
+					.append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
+					.append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId()).append(" ")
+					.append(" AND cvr.object_id  IN (:traitClassIds) ").append("WHERE cv_id =  ").append(CvId.PROPERTIES.getId())
+					.append(" ").append("ORDER BY cvr.object_id ");
 
 			SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 			query.setParameterList("traitClassIds", traitClassIds);
@@ -998,9 +998,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		try {
 			StringBuilder sqlString =
 					new StringBuilder().append("SELECT cvterm_id, name, definition, cvr.object_id ")
-							.append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
-							.append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.HAS_PROPERTY.getId())
-							.append(" AND cvr.object_id  IN (:propertyIds) ").append("ORDER BY cvr.object_id ");
+					.append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
+					.append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.HAS_PROPERTY.getId())
+					.append(" AND cvr.object_id  IN (:propertyIds) ").append("ORDER BY cvr.object_id ");
 
 			SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 			query.setParameterList("propertyIds", propertyIds);
@@ -1085,7 +1085,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			if (propertyId != null) {
 				queryString.append("INNER JOIN cvterm_relationship cvrp ON cvr.subject_id = cvrp.subject_id ");
 				queryString.append("    AND cvr.object_id = :propertyId AND cvr.type_id = ").append(TermId.HAS_PROPERTY.getId())
-						.append(" ");
+				.append(" ");
 			}
 			if (methodId != null) {
 				queryString.append("INNER JOIN cvterm_relationship cvrm ON cvr.subject_id = cvrm.subject_id ");
@@ -1124,52 +1124,17 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return standardVariableIds;
 	}
 
-	@SuppressWarnings("unused")
-	private List<Integer> getStandardVariablesBelongingToTraitClass(List<Integer> standardVariableIds) throws MiddlewareQueryException {
-		List<Integer> standardVariablesOfTraitClass = new ArrayList<>();
-
-		if (standardVariableIds == null || standardVariableIds.isEmpty()) {
-			return standardVariablesOfTraitClass;
-		}
-
-		try {
-			// Trait class via 'IS A' of property
-			StringBuilder queryString =
-					new StringBuilder().append("SELECT DISTINCT cvr.subject_id ").append("FROM  cvterm_relationship cvr ")
-							.append("   INNER JOIN cvterm_relationship cvrt ON cvr.object_id = cvrt.subject_id ")
-							.append("                       AND cvr.type_id = ").append(TermId.HAS_PROPERTY.getId()).append(" ")
-							.append("    AND cvrt.type_id = ").append(TermId.IS_A.getId()).append(" ")
-							.append("   AND cvr.subject_id IN (:standardVariableIds) ");
-
-			SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
-			query.setParameterList("standardVariableIds", standardVariableIds);
-
-			List<Integer> result = query.list();
-
-			if (result != null && !result.isEmpty()) {
-				for (Integer row : result) {
-					standardVariablesOfTraitClass.add(row);
-				}
-			}
-
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getStandardVariablesBelongingToTraitClass :" + e.getMessage(), e);
-		}
-
-		return standardVariablesOfTraitClass;
-	}
-
 	public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {
 		List<Property> properties = new ArrayList<>();
 		try {
 			StringBuilder sql =
 					new StringBuilder().append("SELECT p.cvterm_id, p.name, p.definition, pr.object_id, coId.value ")
-							.append(" FROM cvterm p ")
-							.append(" INNER JOIN cvterm_relationship pr ON pr.subject_id = p.cvterm_id AND pr.type_id = ")
-							.append(TermId.IS_A.getId())
-							.append(" LEFT JOIN cvtermprop coId ON coId.cvterm_id = p.cvterm_id AND coId.type_id = ")
-							.append(TermId.CROP_ONTOLOGY_ID.getId()).append(" WHERE p.cv_id = ").append(CvId.PROPERTIES.getId())
-							.append(" AND p.is_obsolete = 0 ");
+					.append(" FROM cvterm p ")
+					.append(" INNER JOIN cvterm_relationship pr ON pr.subject_id = p.cvterm_id AND pr.type_id = ")
+					.append(TermId.IS_A.getId())
+					.append(" LEFT JOIN cvtermprop coId ON coId.cvterm_id = p.cvterm_id AND coId.type_id = ")
+					.append(TermId.CROP_ONTOLOGY_ID.getId()).append(" WHERE p.cv_id = ").append(CvId.PROPERTIES.getId())
+					.append(" AND p.is_obsolete = 0 ");
 
 			SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 			List<Object[]> result = query.list();
@@ -1189,8 +1154,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public Integer getStandadardVariableIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId,
 			PhenotypicType role) throws MiddlewareQueryException {
-		//for the new ontology manager changes, role is already not defined by the stored in id and variable is already unique by PSM
-		return getStandadardVariableIdByPropertyScaleMethod(propertyId,scaleId,methodId,"ASC");
+		// for the new ontology manager changes, role is already not defined by the stored in id and variable is already unique by PSM
+		return this.getStandadardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId, "ASC");
 
 	}
 
@@ -1204,24 +1169,24 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			// TODO : further optimize to remove the need for union of operation
 			StringBuilder sqlString =
 					new StringBuilder().append("SELECT c.cvterm_id, c.name, c.definition ").append(" FROM cvterm c ")
-							.append(" INNER JOIN cvterm_relationship stinrel ON stinrel.subject_id = c.cvterm_id ")
-							.append("   AND stinrel.type_id = ").append(TermId.STORED_IN.getId()).append("   AND stinrel.object_id = ")
-							.append(TermId.TRIAL_DESIGN_INFO_STORAGE.getId())
-							.append(" INNER JOIN cvterm_relationship dtyperel ON dtyperel.subject_id = c.cvterm_id ")
-							.append("   AND dtyperel.type_id = ").append(TermId.HAS_TYPE.getId()).append("   AND dtyperel.object_id = ")
-							.append(TermId.NUMERIC_VARIABLE.getId())
-							.append(" INNER JOIN cvterm_relationship proprel ON proprel.subject_id = c.cvterm_id ")
-							.append("   AND proprel.type_id = ").append(TermId.HAS_PROPERTY.getId())
-							.append(" WHERE c.cvterm_id NOT IN (:hiddenFields) AND ");
+					.append(" INNER JOIN cvterm_relationship stinrel ON stinrel.subject_id = c.cvterm_id ")
+					.append("   AND stinrel.type_id = ").append(TermId.STORED_IN.getId()).append("   AND stinrel.object_id = ")
+					.append(TermId.TRIAL_DESIGN_INFO_STORAGE.getId())
+					.append(" INNER JOIN cvterm_relationship dtyperel ON dtyperel.subject_id = c.cvterm_id ")
+					.append("   AND dtyperel.type_id = ").append(TermId.HAS_TYPE.getId()).append("   AND dtyperel.object_id = ")
+					.append(TermId.NUMERIC_VARIABLE.getId())
+					.append(" INNER JOIN cvterm_relationship proprel ON proprel.subject_id = c.cvterm_id ")
+					.append("   AND proprel.type_id = ").append(TermId.HAS_PROPERTY.getId())
+					.append(" WHERE c.cvterm_id NOT IN (:hiddenFields) AND ");
 			if (!showOnlyPaired) {
 				sqlString.append(" NOT ");
 			}
 			sqlString.append(" EXISTS (SELECT 1 FROM cvterm_relationship pairrel ")
-			.append(" INNER JOIN cvterm_relationship stin ON stin.subject_id = pairrel.subject_id ").append(" AND stin.type_id = ")
-					.append(TermId.STORED_IN.getId()).append(" AND stin.object_id = ").append(TermId.TRIAL_DESIGN_INFO_STORAGE.getId())
-			.append(" WHERE pairrel.object_id = proprel.object_id ").append(" AND pairrel.type_id = ")
-					.append(TermId.HAS_PROPERTY.getId()).append(" AND pairrel.subject_id <> c.cvterm_id ")
-			.append(" AND pairrel.subject_id NOT IN (:hiddenFields)) ");
+					.append(" INNER JOIN cvterm_relationship stin ON stin.subject_id = pairrel.subject_id ").append(" AND stin.type_id = ")
+			.append(TermId.STORED_IN.getId()).append(" AND stin.object_id = ").append(TermId.TRIAL_DESIGN_INFO_STORAGE.getId())
+					.append(" WHERE pairrel.object_id = proprel.object_id ").append(" AND pairrel.type_id = ")
+			.append(TermId.HAS_PROPERTY.getId()).append(" AND pairrel.subject_id <> c.cvterm_id ")
+					.append(" AND pairrel.subject_id NOT IN (:hiddenFields)) ");
 
 			SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 			query.setParameterList("hiddenFields", hiddenFields);
@@ -1244,16 +1209,15 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		try {
 			StringBuilder sqlString =
 					new StringBuilder().append("SELECT count(c.cvterm_id) ").append(" FROM cvterm c ")
-							.append(" INNER JOIN cvterm_relationship pr ON pr.type_id = ").append(TermId.HAS_PROPERTY.getId())
-							.append("   AND pr.subject_id = c.cvterm_id ").append("   AND pr.object_id = ").append(propertyId)
-							.append(" INNER JOIN cvterm_relationship sr ON sr.type_id = ").append(TermId.HAS_SCALE.getId())
-							.append("   AND sr.subject_id = c.cvterm_id ").append(" INNER JOIN cvterm_relationship mr ON mr.type_id = ")
-							.append(TermId.HAS_METHOD.getId()).append("   AND mr.subject_id = c.cvterm_id ")
-							.append(" INNER JOIN cvtermprop cvprop ON cvprop.type_id = ").append(TermId.VARIABLE_TYPE.getId())
-							.append("   AND cvprop.cvterm_id = c.cvterm_id AND cvprop.value = '")
-							.append(VariableType.TREATMENT_FACTOR.getName())
-							.append("' WHERE c.cvterm_id <> ").append(cvTermId)
-							.append("   AND c.cvterm_id NOT IN (:hiddenFields) ");
+					.append(" INNER JOIN cvterm_relationship pr ON pr.type_id = ").append(TermId.HAS_PROPERTY.getId())
+					.append("   AND pr.subject_id = c.cvterm_id ").append("   AND pr.object_id = ").append(propertyId)
+					.append(" INNER JOIN cvterm_relationship sr ON sr.type_id = ").append(TermId.HAS_SCALE.getId())
+					.append("   AND sr.subject_id = c.cvterm_id ").append(" INNER JOIN cvterm_relationship mr ON mr.type_id = ")
+					.append(TermId.HAS_METHOD.getId()).append("   AND mr.subject_id = c.cvterm_id ")
+					.append(" INNER JOIN cvtermprop cvprop ON cvprop.type_id = ").append(TermId.VARIABLE_TYPE.getId())
+					.append("   AND cvprop.cvterm_id = c.cvterm_id AND cvprop.value = '")
+					.append(VariableType.TREATMENT_FACTOR.getName()).append("' WHERE c.cvterm_id <> ").append(cvTermId)
+					.append("   AND c.cvterm_id NOT IN (:hiddenFields) ");
 
 			SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 			query.setParameterList("hiddenFields", hiddenFields);
@@ -1274,22 +1238,20 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		try {
 			StringBuilder sqlString =
 					new StringBuilder()
-							.append("SELECT c.cvterm_id, c.name, c.definition, pr.object_id AS propertyId, sr.object_id AS scaleId, mr.object_id AS methodId ")
-							.append(" FROM cvterm c ").append(" INNER JOIN cvterm_relationship pr ON pr.type_id = ")
-							.append(TermId.HAS_PROPERTY.getId()).append("   AND pr.subject_id = c.cvterm_id and pr.object_id = ")
-							.append(propertyId).append(" INNER JOIN cvterm_relationship sr ON sr.type_id = ")
-							.append(TermId.HAS_SCALE.getId()).append("   AND sr.subject_id = c.cvterm_id ")
-							.append(" INNER JOIN cvterm_relationship mr ON mr.type_id = ").append(TermId.HAS_METHOD.getId())
-							.append("   AND mr.subject_id = c.cvterm_id ")
-							.append(" INNER JOIN cvtermprop cvprop ON cvprop.type_id = ").append(TermId.VARIABLE_TYPE.getId())
-							.append("   AND cvprop.cvterm_id = c.cvterm_id AND cvprop.value = '")
-							.append(VariableType.TREATMENT_FACTOR.getName())
-							.append("' WHERE c.cvterm_id <> ").append(cvTermId)
-							.append("   AND c.cvterm_id NOT IN (:hiddenFields) ");
+			.append("SELECT c.cvterm_id, c.name, c.definition, pr.object_id AS propertyId, sr.object_id AS scaleId, mr.object_id AS methodId ")
+			.append(" FROM cvterm c ").append(" INNER JOIN cvterm_relationship pr ON pr.type_id = ")
+			.append(TermId.HAS_PROPERTY.getId()).append("   AND pr.subject_id = c.cvterm_id and pr.object_id = ")
+			.append(propertyId).append(" INNER JOIN cvterm_relationship sr ON sr.type_id = ")
+			.append(TermId.HAS_SCALE.getId()).append("   AND sr.subject_id = c.cvterm_id ")
+			.append(" INNER JOIN cvterm_relationship mr ON mr.type_id = ").append(TermId.HAS_METHOD.getId())
+			.append("   AND mr.subject_id = c.cvterm_id ").append(" INNER JOIN cvtermprop cvprop ON cvprop.type_id = ")
+							.append(TermId.VARIABLE_TYPE.getId()).append("   AND cvprop.cvterm_id = c.cvterm_id AND cvprop.value = '")
+			.append(VariableType.TREATMENT_FACTOR.getName()).append("' WHERE c.cvterm_id <> ").append(cvTermId)
+			.append("   AND c.cvterm_id NOT IN (:hiddenFields) ");
 
 			SQLQuery query =
 					this.getSession().createSQLQuery(sqlString.toString()).addScalar("cvterm_id").addScalar("name").addScalar("definition")
-							.addScalar("propertyId").addScalar("scaleId").addScalar("methodId");
+					.addScalar("propertyId").addScalar("scaleId").addScalar("methodId");
 
 			query.setParameterList("hiddenFields", hiddenFields);
 
@@ -1317,19 +1279,19 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		try {
 			StringBuilder sql =
 					new StringBuilder()
-							.append("SELECT pr.subject_id AS id, s.name AS scalename, m.name AS methodname, prs.name as name, prs.definition as definition ")
-							.append(" FROM cvterm_relationship pr ")
-							.append(" INNER JOIN cvterm_relationship mr ON mr.subject_id = pr.subject_id ").append("    AND mr.type_id = ")
-							.append(TermId.HAS_METHOD.getId()).append(" INNER JOIN cvterm m ON m.cvterm_id = mr.object_id ")
-							.append(" INNER JOIN cvterm_relationship sr ON sr.subject_id = pr.subject_id ").append("    AND sr.type_id = ")
-							.append(TermId.HAS_SCALE.getId()).append(" INNER JOIN cvterm s ON s.cvterm_id = sr.object_id ")
-							.append(" INNER JOIN cvterm prs ON prs.cvterm_id = pr.subject_id ").append(" WHERE pr.type_id = ")
-							.append(TermId.HAS_PROPERTY.getId()).append("    AND pr.object_id = ")
-							.append(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
+			.append("SELECT pr.subject_id AS id, s.name AS scalename, m.name AS methodname, prs.name as name, prs.definition as definition ")
+			.append(" FROM cvterm_relationship pr ")
+			.append(" INNER JOIN cvterm_relationship mr ON mr.subject_id = pr.subject_id ").append("    AND mr.type_id = ")
+			.append(TermId.HAS_METHOD.getId()).append(" INNER JOIN cvterm m ON m.cvterm_id = mr.object_id ")
+			.append(" INNER JOIN cvterm_relationship sr ON sr.subject_id = pr.subject_id ").append("    AND sr.type_id = ")
+			.append(TermId.HAS_SCALE.getId()).append(" INNER JOIN cvterm s ON s.cvterm_id = sr.object_id ")
+			.append(" INNER JOIN cvterm prs ON prs.cvterm_id = pr.subject_id ").append(" WHERE pr.type_id = ")
+			.append(TermId.HAS_PROPERTY.getId()).append("    AND pr.object_id = ")
+			.append(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
 
 			SQLQuery query =
 					this.getSession().createSQLQuery(sql.toString()).addScalar("id").addScalar("scalename").addScalar("methodname")
-							.addScalar("name").addScalar("definition");
+					.addScalar("name").addScalar("definition");
 			List<Object[]> result = query.list();
 			if (result != null && !result.isEmpty()) {
 				for (Object[] row : result) {
@@ -1393,17 +1355,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	public CVTerm save(String name, String definition, CvId cvId) throws MiddlewareQueryException {
-
-		Integer generatedId;
-
-		try {
-			generatedId = this.getNextId(CVTerm.ID_NAME);
-		} catch (MiddlewareQueryException e) {
-			throw new MiddlewareQueryException(e.getMessage(), e);
-		}
-
 		CVTerm cvTerm = new CVTerm();
-		cvTerm.setCvTermId(generatedId);
 		cvTerm.setCv(cvId.getId());
 		cvTerm.setName(name);
 		cvTerm.setDefinition(definition);

@@ -24,7 +24,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
-import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.util.StringUtil;
 
 public class GeolocationSaver extends Saver {
@@ -59,10 +58,10 @@ public class GeolocationSaver extends Saver {
 					if (var.getPhenotypeId() == null) {
 						this.getPhenotypeSaver().save(row.getExperimentId(), var);
 					} else {
-						
+
 						this.getPhenotypeSaver().saveOrUpdate(row.getExperimentId(), var.getVariableType().getStandardVariable().getId(),
-								var.getValue(),
-								this.getPhenotypeDao().getById(var.getPhenotypeId()), var.getVariableType().getStandardVariable().getDataType().getId());
+								var.getValue(), this.getPhenotypeDao().getById(var.getPhenotypeId()),
+								var.getVariableType().getStandardVariable().getDataType().getId());
 					}
 				}
 			}
@@ -75,8 +74,6 @@ public class GeolocationSaver extends Saver {
 		Geolocation geolocation = null;
 
 		if (factors != null && factors.getVariables() != null && !factors.getVariables().isEmpty()) {
-			int propertyIndex = getGeolocationPropertyId();
-
 			for (Variable variable : factors.getVariables()) {
 
 				Integer variableId = variable.getVariableType().getStandardVariable().getId();
@@ -105,7 +102,7 @@ public class GeolocationSaver extends Saver {
 
 				} else if (PhenotypicType.TRIAL_ENVIRONMENT == role) {
 					geolocation = this.getGeolocationObject(geolocation, locationId);
-					this.addProperty(geolocation, this.createOrUpdateProperty(propertyIndex++, variable, geolocation));
+					this.addProperty(geolocation, this.createOrUpdateProperty(variable, geolocation));
 
 				} else if (PhenotypicType.VARIATE == role) {
 					geolocation = this.getGeolocationObject(geolocation, locationId);
@@ -125,39 +122,28 @@ public class GeolocationSaver extends Saver {
 		return geolocation;
 	}
 
-	protected int getGeolocationPropertyId() throws MiddlewareQueryException {
-		return getGeolocationPropertyDao().getNextId("geolocationPropertyId");
-	}
-
 	private Geolocation getGeolocationObject(Geolocation geolocation, Integer locationId) throws MiddlewareQueryException {
 		Geolocation finalGeolocation = geolocation;
 		if (finalGeolocation == null) {
 			if (locationId != null) {
-				finalGeolocation = getGeolocationById(locationId);
+				finalGeolocation = this.getGeolocationById(locationId);
 			}
 			if (finalGeolocation == null) {
 				finalGeolocation = new Geolocation();
-				finalGeolocation.setLocationId(getGeolocationId());
 			}
 		}
 		return finalGeolocation;
 	}
 
 	protected Geolocation getGeolocationById(Integer locationId) throws MiddlewareQueryException {
-		return getGeolocationDao().getById(locationId);
-	}
-	
-	protected int getGeolocationId() throws MiddlewareQueryException {
-		return getGeolocationDao().getNextId("locationId");
+		return this.getGeolocationDao().getById(locationId);
 	}
 
-	private GeolocationProperty createOrUpdateProperty(int index, Variable variable, Geolocation geolocation)
-			throws MiddlewareQueryException {
+	private GeolocationProperty createOrUpdateProperty(Variable variable, Geolocation geolocation) throws MiddlewareQueryException {
 		GeolocationProperty property = this.getGeolocationProperty(variable.getVariableType().getId(), geolocation);
 
 		if (property == null) {
 			property = new GeolocationProperty();
-			property.setGeolocationPropertyId(index);
 			property.setType(variable.getVariableType().getId());
 			property.setRank(variable.getVariableType().getRank());
 		}
@@ -200,10 +186,9 @@ public class GeolocationSaver extends Saver {
 		return geolocation;
 	}
 
-	public Geolocation updateGeolocationInformation(MeasurementRow row, boolean isNursery, String programUUID) throws MiddlewareQueryException,
-			MiddlewareException {
-		VariableTypeList variableTypes = this.getVariableTypeListTransformer().transform(
-				row.getMeasurementVariables(), false, programUUID);
+	public Geolocation updateGeolocationInformation(MeasurementRow row, boolean isNursery, String programUUID)
+			throws MiddlewareQueryException, MiddlewareException {
+		VariableTypeList variableTypes = this.getVariableTypeListTransformer().transform(row.getMeasurementVariables(), false, programUUID);
 		VariableList variableList = this.getVariableListTransformer().transformTrialEnvironment(row, variableTypes);
 
 		return this.saveGeolocation(variableList, row, isNursery, false);

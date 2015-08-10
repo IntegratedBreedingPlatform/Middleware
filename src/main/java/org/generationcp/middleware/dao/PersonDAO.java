@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.dao;
@@ -19,13 +19,14 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link Person}.
- *
+ * 
  */
 public class PersonDAO extends GenericDAO<Person, Integer> {
 
@@ -65,6 +66,41 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 		}
 
 		return false;
+	}
+
+	public Person getPersonByEmail(String email) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(Person.class);
+
+			criteria.add(Restrictions.eq("email", email));
+
+			return (Person) criteria.uniqueResult();
+		} catch (HibernateException e) {
+			logAndThrowException("Error with getPersonByEmail(email=" + email
+					+ ") query from Person: " + e.getMessage(), e);
+		}
+
+		return null;
+	}
+
+	public Person getPersonByEmailAndName(String email, String firstName, String lastName) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(Person.class);
+
+			criteria.add(Restrictions.eq("email", email))
+                    .add(Restrictions.eq("firstName", firstName))
+                    .add(Restrictions.eq("lastName", lastName));
+
+			Object result = criteria.uniqueResult();
+			if (result != null) {
+                return (Person) result;
+            }
+		} catch (HibernateException e) {
+			logAndThrowException("Error with getPersonByEmail(email=" + email
+					+ ") query from Person: " + e.getMessage(), e);
+		}
+
+		return null;
 	}
 
 	public boolean isPersonWithUsernameAndEmailExists(String username, String email) throws MiddlewareQueryException {
@@ -131,4 +167,21 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 		return map;
 	}
 
+	public Person getPersonByName(String firstName, String middleName, String lastName) throws MiddlewareQueryException {
+		Person person = null;
+		try {
+			Criteria criteria = this.getSession().createCriteria(Person.class);
+			criteria.add(Restrictions.eq("firstName", firstName));
+			criteria.add(Restrictions.eq("lastName", lastName));
+			criteria.add(Restrictions.eq("middleName", middleName));
+
+			person = (Person) criteria.uniqueResult();
+
+		} catch (HibernateException e) {
+			this.logAndThrowException(
+					String.format("Error with getPersonByName(firstName=[%s],middleName=[%s],lastName)", firstName, middleName, lastName),
+					e);
+		}
+		return person;
+	}
 }

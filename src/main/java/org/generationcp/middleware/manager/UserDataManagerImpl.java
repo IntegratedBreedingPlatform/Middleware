@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -61,9 +61,6 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 		try {
 			trans = session.beginTransaction();
 			UserDAO dao = this.getUserDao();
-
-			Integer userId = dao.getNextId("userid");
-			user.setUserid(userId);
 
 			User recordSaved = dao.saveOrUpdate(user);
 			idUserSaved = recordSaved.getUserid();
@@ -155,9 +152,6 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 			trans = session.beginTransaction();
 			PersonDAO dao = this.getPersonDao();
 
-			Integer personId = dao.getNextId("id");
-			person.setId(personId);
-
 			Person recordSaved = dao.saveOrUpdate(person);
 			idPersonSaved = recordSaved.getId();
 
@@ -222,5 +216,10 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	@Override
 	public User getUserByUserName(String userName) throws MiddlewareQueryException {
 		return this.getUserDao().getUserByUserName(userName);
+	}
+
+	@Override
+	public Person getPersonByName(String firstName, String middleName, String lastName) throws MiddlewareQueryException {
+		return this.getPersonDao().getPersonByName(firstName, middleName, lastName);
 	}
 }

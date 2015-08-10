@@ -62,8 +62,8 @@ public class MeasurementVariable {
 	public MeasurementVariable() {
 	}
 
-	public MeasurementVariable(String name, String description, String scale, String method,
-			String property, String dataType, String value, String label) {
+	public MeasurementVariable(String name, String description, String scale, String method, String property, String dataType,
+			String value, String label) {
 		this.name = name;
 		this.description = description;
 		this.scale = scale;
@@ -75,8 +75,8 @@ public class MeasurementVariable {
 		this.required = false;
 	}
 
-	public MeasurementVariable(String name, String description, String scale, String method,
-			String property, String dataType, String value, String label, PhenotypicType role) {
+	public MeasurementVariable(String name, String description, String scale, String method, String property, String dataType,
+			String value, String label, PhenotypicType role) {
 		this.name = name;
 		this.description = description;
 		this.scale = scale;
@@ -89,40 +89,35 @@ public class MeasurementVariable {
 		this.role = role;
 	}
 
-	public MeasurementVariable(int termId, String name, String description, String scale,
-			String method, String property, String dataType, String value, String label) {
+	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
+			String value, String label) {
 		this(name, description, scale, method, property, dataType, value, label);
 		this.termId = termId;
 	}
 
-	public MeasurementVariable(String name, String description, String scale, String method,
-			String property, String dataType, String value, String label, Double minRange,
-			Double maxRange) {
+	public MeasurementVariable(String name, String description, String scale, String method, String property, String dataType,
+			String value, String label, Double minRange, Double maxRange) {
 		this(name, description, scale, method, property, dataType, value, label);
 		this.minRange = minRange;
 		this.maxRange = maxRange;
 	}
 
-	public MeasurementVariable(String name, String description, String scale, String method,
-			String property, String dataType, String value, String label, Double minRange,
-			Double maxRange, PhenotypicType role) {
+	public MeasurementVariable(String name, String description, String scale, String method, String property, String dataType,
+			String value, String label, Double minRange, Double maxRange, PhenotypicType role) {
 		this(name, description, scale, method, property, dataType, value, label, role);
 		this.minRange = minRange;
 		this.maxRange = maxRange;
 	}
 
-	public MeasurementVariable(int termId, String name, String description, String scale,
-			String method, String property, String dataType, String value, String label,
-			Double minRange, Double maxRange) {
+	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
+			String value, String label, Double minRange, Double maxRange) {
 		this(name, description, scale, method, property, dataType, value, label, minRange, maxRange);
 		this.termId = termId;
 	}
 
-	public MeasurementVariable(int termId, String name, String description, String scale,
-			String method, String property, String dataType, String value, String label,
-			Double minRange, Double maxRange, PhenotypicType role) {
-		this(name, description, scale, method, property, dataType, value, label, minRange,
-				maxRange, role);
+	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
+			String value, String label, Double minRange, Double maxRange, PhenotypicType role) {
+		this(name, description, scale, method, property, dataType, value, label, minRange, maxRange, role);
 		this.termId = termId;
 
 	}
@@ -260,8 +255,7 @@ public class MeasurementVariable {
 	}
 
 	/**
-	 * @param dataTypeId
-	 *            the dataTypeId to set
+	 * @param dataTypeId the dataTypeId to set
 	 */
 	public void setDataTypeId(Integer dataTypeId) {
 		this.dataTypeId = dataTypeId;
@@ -275,8 +269,7 @@ public class MeasurementVariable {
 	}
 
 	/**
-	 * @param possibleValues
-	 *            the possibleValues to set
+	 * @param possibleValues the possibleValues to set
 	 */
 	public void setPossibleValues(List<ValueReference> possibleValues) {
 
@@ -301,8 +294,7 @@ public class MeasurementVariable {
 	}
 
 	/**
-	 * @param minRange
-	 *            the minRange to set
+	 * @param minRange the minRange to set
 	 */
 	public void setMinRange(Double minRange) {
 		this.minRange = minRange;
@@ -316,8 +308,7 @@ public class MeasurementVariable {
 	}
 
 	/**
-	 * @param maxRange
-	 *            the maxRange to set
+	 * @param maxRange the maxRange to set
 	 */
 	public void setMaxRange(Double maxRange) {
 		this.maxRange = maxRange;
@@ -327,14 +318,10 @@ public class MeasurementVariable {
 		// datatype ids: 1120, 1125, 1128, 1130
 		if (this.dataTypeId == null && this.dataType != null) {
 			return this.dataType;
-		} else if (this.dataTypeId == TermId.CHARACTER_VARIABLE.getId()
-				|| this.dataTypeId == TermId.TIMESTAMP_VARIABLE.getId()
-				|| this.dataTypeId == TermId.CHARACTER_DBID_VARIABLE.getId()
-				|| this.dataTypeId == TermId.CATEGORICAL_VARIABLE.getId()
-				|| this.dataTypeId == TermId.GERMPLASM_LIST_DATA_TYPE.getId()
-				|| this.dataTypeId == TermId.LOCATION_DATA_TYPE.getId()
-				|| this.dataTypeId == TermId.PERSON_DATA_TYPE.getId()
-				|| this.dataTypeId == TermId.BREEDING_METHOD_DATA_TYPE.getId()) {
+		} else if (this.dataTypeId == TermId.CHARACTER_VARIABLE.getId() || this.dataTypeId == TermId.TIMESTAMP_VARIABLE.getId()
+				|| this.dataTypeId == TermId.CHARACTER_DBID_VARIABLE.getId() || this.dataTypeId == TermId.CATEGORICAL_VARIABLE.getId()
+				|| this.dataTypeId == TermId.GERMPLASM_LIST_DATA_TYPE.getId() || this.dataTypeId == TermId.LOCATION_DATA_TYPE.getId()
+				|| this.dataTypeId == TermId.PERSON_DATA_TYPE.getId() || this.dataTypeId == TermId.BREEDING_METHOD_DATA_TYPE.getId()) {
 			return "C";
 		} else {
 			return "N";
@@ -373,8 +360,7 @@ public class MeasurementVariable {
 	}
 
 	/**
-	 * @param operation
-	 *            the operation to set
+	 * @param operation the operation to set
 	 */
 	public void setOperation(Operation operation) {
 		this.operation = operation;
@@ -424,7 +410,9 @@ public class MeasurementVariable {
 			return false;
 		}
 		MeasurementVariable other = (MeasurementVariable) obj;
-		if (this.termId != other.termId) {
+		if (this.termId != 0 && other.termId != 0 && this.termId != other.termId) {
+			return false;
+		} else if (this.getPSMHashCode() != other.getPSMHashCode()) {
 			return false;
 		}
 
@@ -435,16 +423,16 @@ public class MeasurementVariable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		int uniqueHashCode = termId;
+		int uniqueHashCode = this.termId;
 		if (uniqueHashCode == 0) {
-			uniqueHashCode = getPSMHashCode();
+			uniqueHashCode = this.getPSMHashCode();
 		}
 		result = prime * result + uniqueHashCode;
 		return result;
 	}
 
 	private int getPSMHashCode() {
-		return java.util.Objects.hash(property, scale, method);
+		return java.util.Objects.hash(this.property, this.scale, this.method);
 	}
 
 }

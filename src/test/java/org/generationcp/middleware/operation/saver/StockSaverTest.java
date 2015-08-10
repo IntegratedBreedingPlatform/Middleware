@@ -1,6 +1,14 @@
+
 package org.generationcp.middleware.operation.saver;
 
-import org.generationcp.middleware.domain.dms.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -10,27 +18,18 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
 public class StockSaverTest {
 
 	private StockSaver stockSaver;
 	private StockModel stockModel;
-	
+
 	private enum StockVariable {
-		
-		ENTRY_NO(TermId.ENTRY_NO.getId(),
-				TermId.ENTRY_NO.toString(),PhenotypicType.GERMPLASM,"1"),
-		GID(TermId.GID.getId(),
-				TermId.GID.toString(),PhenotypicType.GERMPLASM,"4"),
-		DESIG(TermId.DESIG.getId(),
-				TermId.DESIG.toString(),PhenotypicType.GERMPLASM,"SDFTY"),
-		ENTRY_CODE(TermId.ENTRY_CODE.getId(),
-				TermId.ENTRY_CODE.toString(),PhenotypicType.GERMPLASM,"CODE1"),
-		GERMPLASM_1(1,"GERMPLASM_1",PhenotypicType.GERMPLASM,"3"),
-		GERMPLASM_2(2,"GERMPLASM_2",PhenotypicType.GERMPLASM,"4");
-		
+
+		ENTRY_NO(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.toString(), PhenotypicType.GERMPLASM, "1"), GID(TermId.GID.getId(), TermId.GID
+				.toString(), PhenotypicType.GERMPLASM, "4"), DESIG(TermId.DESIG.getId(), TermId.DESIG.toString(), PhenotypicType.GERMPLASM,
+				"SDFTY"), ENTRY_CODE(TermId.ENTRY_CODE.getId(), TermId.ENTRY_CODE.toString(), PhenotypicType.GERMPLASM, "CODE1"), GERMPLASM_1(
+				1, "GERMPLASM_1", PhenotypicType.GERMPLASM, "3"), GERMPLASM_2(2, "GERMPLASM_2", PhenotypicType.GERMPLASM, "4");
+
 		private int id;
 		private String name;
 		private PhenotypicType role;
@@ -42,80 +41,81 @@ public class StockSaverTest {
 			this.role = role;
 			this.value = value;
 		}
+
 		public int getId() {
-			return id;
+			return this.id;
 		}
+
 		public String getName() {
-			return name;
+			return this.name;
 		}
+
 		public PhenotypicType getRole() {
-			return role;
+			return this.role;
 		}
+
 		public String getValue() {
-			return value;
+			return this.value;
 		}
 	}
 
 	@Before
 	public void setUp() throws MiddlewareQueryException {
-		stockSaver = Mockito.spy(new StockSaver(Mockito.mock(HibernateSessionProvider.class)));
-		Mockito.doReturn(1).when(stockSaver).getStockPropertyId();
-		Mockito.doReturn(1).when(stockSaver).getStockId();
+		this.stockSaver = Mockito.spy(new StockSaver(Mockito.mock(HibernateSessionProvider.class)));
 	}
-	
+
 	@Test
 	public void testCreateOrUpdate() throws MiddlewareQueryException {
-		VariableList factors = createVariableList();
-		stockModel = stockSaver.createStock(factors, stockModel);
-		assertNotNull(stockModel);
-		assertEquals(StockVariable.ENTRY_NO.getValue(),stockModel.getUniqueName());
-		assertEquals(StockVariable.GID.getValue(),stockModel.getDbxrefId().toString());
-		assertEquals(StockVariable.DESIG.getValue(),stockModel.getName().toString());
-		assertEquals(StockVariable.ENTRY_CODE.getValue(),stockModel.getValue());
-		assertNotNull(stockModel.getProperties());
-		assertEquals(2, stockModel.getProperties().size());
-		for (StockProperty property: stockModel.getProperties()) {
+		VariableList factors = this.createVariableList();
+		this.stockModel = this.stockSaver.createStock(factors, this.stockModel);
+		assertNotNull(this.stockModel);
+		assertEquals(StockVariable.ENTRY_NO.getValue(), this.stockModel.getUniqueName());
+		assertEquals(StockVariable.GID.getValue(), this.stockModel.getDbxrefId().toString());
+		assertEquals(StockVariable.DESIG.getValue(), this.stockModel.getName().toString());
+		assertEquals(StockVariable.ENTRY_CODE.getValue(), this.stockModel.getValue());
+		assertNotNull(this.stockModel.getProperties());
+		assertEquals(2, this.stockModel.getProperties().size());
+		for (StockProperty property : this.stockModel.getProperties()) {
 			StockVariable stockVariable = null;
-			switch(property.getTypeId()) {
-				case 1: stockVariable = StockVariable.GERMPLASM_1; 
+			switch (property.getTypeId()) {
+				case 1:
+					stockVariable = StockVariable.GERMPLASM_1;
 					break;
-				case 2: stockVariable = StockVariable.GERMPLASM_2; 
+				case 2:
+					stockVariable = StockVariable.GERMPLASM_2;
 					break;
-			} 
-			assertEquals(stockVariable.getValue(),property.getValue());
+			}
+			assertEquals(stockVariable.getValue(), property.getValue());
 		}
 	}
 
 	private VariableList createVariableList() {
 		VariableList variableList = new VariableList();
-		for(int i=0;i<6;i++) {
+		for (int i = 0; i < 6; i++) {
 			StockVariable variable = StockVariable.values()[i];
 			int standardVariableId = variable.getId();
 			String name = variable.getName();
-			String description = variable.getName()+"_DESC";
+			String description = variable.getName() + "_DESC";
 			String value = variable.getValue();
 			PhenotypicType role = variable.getRole();
-			variableList.add(createVariable(standardVariableId,name,description,value,i+1,role));
+			variableList.add(this.createVariable(standardVariableId, name, description, value, i + 1, role));
 		}
 		return variableList;
 	}
 
-	private Variable createVariable(int standardVariableId, String name, 
-			String description, String value, int rank, PhenotypicType role) {
+	private Variable createVariable(int standardVariableId, String name, String description, String value, int rank, PhenotypicType role) {
 		Variable variable = new Variable();
-		variable.setVariableType(createVariableType(
-				standardVariableId,name,description,rank,role));
+		variable.setVariableType(this.createVariableType(standardVariableId, name, description, rank, role));
 		variable.setValue(value);
 		return variable;
 	}
 
-	private DMSVariableType createVariableType(int standardVariableId,
-			String name, String description, int rank, PhenotypicType role) {
+	private DMSVariableType createVariableType(int standardVariableId, String name, String description, int rank, PhenotypicType role) {
 		DMSVariableType variableType = new DMSVariableType();
 		variableType.setLocalName(name);
 		variableType.setLocalDescription(description);
 		variableType.setRole(role);
-		variableType.setStandardVariable(createStandardVariable(standardVariableId));
+		variableType.setStandardVariable(this.createStandardVariable(standardVariableId));
 		variableType.setRank(rank);
 		return variableType;
 	}

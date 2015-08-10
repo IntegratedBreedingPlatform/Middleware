@@ -26,13 +26,13 @@ public class WFieldbook23 extends AbstractWheatTrialReporter {
 	@Override
 	public Reporter createReporter() {
 		Reporter r = new WFieldbook23();
-		r.setFileNameExpression("F1-HistCrosses_{trial_name}");
+		r.setFileNameExpression("F1-HistCrosses_{trialName}");
 		return r;
 	}
 
 	@Override
 	public String getReportCode() {
-		return "WFb23";
+		return "WFb23/48";
 	}
 
 	@Override
@@ -65,40 +65,40 @@ public class WFieldbook23 extends AbstractWheatTrialReporter {
 						entry.setSelHist(dataItem.getValue());
 						break;
 					case "f_cross_name":
-						entry.setFCrossName(dataItem.getValue());
+						entry.setfCrossName(dataItem.getValue());
 						break;
 					case "f_selHist":
-						entry.setFSelHist(dataItem.getValue());
+						entry.setfSelHist(dataItem.getValue());
 						break;
 					case "f_tabbr":
-						entry.setFTabbr(dataItem.getValue());
+						entry.setfTabbr(dataItem.getValue());
 						break;
 					case "f_locycle":
 						entry.setFlocycle(dataItem.getValue());
 						break;
 					case "f_ent":
-						entry.setFEnt(Integer.valueOf(dataItem.getValue()));
+						entry.setfEnt(Integer.valueOf(dataItem.getValue()));
 						break;
 					case "m_cross_name":
-						entry.setMCrossName(dataItem.getValue());
+						entry.setmCrossName(dataItem.getValue());
 						break;
 					case "m_selHist":
-						entry.setMSelHist(dataItem.getValue());
+						entry.setmSelHist(dataItem.getValue());
 						break;
 					case "m_tabbr":
-						entry.setMTabbr(dataItem.getValue());
+						entry.setmTabbr(dataItem.getValue());
 						break;
 					case "m_locycle":
 						entry.setMlocycle(dataItem.getValue());
 						break;
 					case "m_ent":
-						entry.setMEnt(Integer.valueOf(dataItem.getValue()));
+						entry.setmEnt(Integer.valueOf(dataItem.getValue()));
 						break;
 
-						// TODO: pending mappings
+					// TODO: pending mappings
 					default:
-						entry.setSEnt(-99);
-						entry.setSTabbr("???");
+						entry.setsEnt(-99);
+						entry.setsTabbr("???");
 						entry.setSlocycle("???");
 				}
 			}

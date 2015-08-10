@@ -213,8 +213,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		if (relationship != null) {
 			return relationship;
 		}
-		CVTermRelationship cvTermRelationship =
-				new CVTermRelationship(this.getNextId(CVTermRelationship.ID_NAME), typeId, subjectId, objectId);
+		CVTermRelationship cvTermRelationship = new CVTermRelationship(null, typeId, subjectId, objectId);
 		return this.save(cvTermRelationship);
 	}
 }

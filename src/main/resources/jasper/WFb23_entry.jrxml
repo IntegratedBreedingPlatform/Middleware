@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.0.1.final using JasperReports Library version 6.0.0  -->
-<!-- 2015-02-26T16:47:38 -->
+<!-- Created with Jaspersoft Studio version 6.0.4.final using JasperReports Library version 6.0.4  -->
+<!-- 2015-07-14T13:13:21 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="585" pageHeight="778" columnWidth="585" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="e8f35f09-6a39-4fab-a23e-d79d2e6b4f3c">
 	<property name="ireport.zoom" value="3.0"/>
 	<property name="ireport.x" value="866"/>
@@ -12,48 +12,48 @@
 	<parameter name="tid" class="java.lang.Integer"/>
 	<parameter name="occ" class="java.lang.Integer"/>
 	<parameter name="program" class="java.lang.String"/>
-	<parameter name="trial_name" class="java.lang.String"/>
-	<parameter name="trial_abbr" class="java.lang.String"/>
-	<parameter name="dms_ip" class="java.lang.String"/>
-	<parameter name="gms_ip" class="java.lang.String"/>
+	<parameter name="trialName" class="java.lang.String"/>
+	<parameter name="trialAbbr" class="java.lang.String"/>
+	<parameter name="dmsIp" class="java.lang.String"/>
+	<parameter name="gmsIp" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
 	<field name="entryNum" class="java.lang.Integer">
 		<fieldDescription><![CDATA[entryNum]]></fieldDescription>
 	</field>
-	<field name="m_cross_name" class="java.lang.String">
-		<fieldDescription><![CDATA[m_cross_name]]></fieldDescription>
+	<field name="mCrossName" class="java.lang.String">
+		<fieldDescription><![CDATA[mCrossName]]></fieldDescription>
 	</field>
-	<field name="m_sel_hist" class="java.lang.String">
-		<fieldDescription><![CDATA[m_sel_hist]]></fieldDescription>
+	<field name="mSelHist" class="java.lang.String">
+		<fieldDescription><![CDATA[mSelHist]]></fieldDescription>
 	</field>
-	<field name="f_cross_name" class="java.lang.String">
-		<fieldDescription><![CDATA[f_cross_name]]></fieldDescription>
+	<field name="fCrossName" class="java.lang.String">
+		<fieldDescription><![CDATA[fCrossName]]></fieldDescription>
 	</field>
-	<field name="f_tabbr" class="java.lang.String">
-		<fieldDescription><![CDATA[f_tabbr]]></fieldDescription>
+	<field name="fTabbr" class="java.lang.String">
+		<fieldDescription><![CDATA[fTabbr]]></fieldDescription>
 	</field>
-	<field name="m_ent" class="java.lang.Integer">
-		<fieldDescription><![CDATA[m_ent]]></fieldDescription>
+	<field name="mEnt" class="java.lang.Integer">
+		<fieldDescription><![CDATA[mEnt]]></fieldDescription>
 	</field>
 	<field name="mlocycle" class="java.lang.String">
 		<fieldDescription><![CDATA[mlocycle]]></fieldDescription>
 	</field>
-	<field name="f_ent" class="java.lang.Integer">
-		<fieldDescription><![CDATA[f_ent]]></fieldDescription>
+	<field name="fEnt" class="java.lang.Integer">
+		<fieldDescription><![CDATA[fEnt]]></fieldDescription>
 	</field>
-	<field name="f_sel_hist" class="java.lang.String">
-		<fieldDescription><![CDATA[f_sel_hist]]></fieldDescription>
+	<field name="fSelHist" class="java.lang.String">
+		<fieldDescription><![CDATA[fSelHist]]></fieldDescription>
 	</field>
 	<field name="flocycle" class="java.lang.String">
 		<fieldDescription><![CDATA[flocycle]]></fieldDescription>
 	</field>
-	<field name="sel_hist" class="java.lang.String">
-		<fieldDescription><![CDATA[sel_hist]]></fieldDescription>
+	<field name="selHist" class="java.lang.String">
+		<fieldDescription><![CDATA[selHist]]></fieldDescription>
 	</field>
-	<field name="m_tabbr" class="java.lang.String">
-		<fieldDescription><![CDATA[m_tabbr]]></fieldDescription>
+	<field name="mTabbr" class="java.lang.String">
+		<fieldDescription><![CDATA[mTabbr]]></fieldDescription>
 	</field>
 	<background>
 		<band splitType="Stretch"/>
@@ -117,14 +117,14 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{trial_name}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{trialName}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="363" y="14" width="91" height="12" isPrintWhenDetailOverflows="true" uuid="8e3de264-cd30-4bc4-b5c2-6d9f0ec6a20c"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{trial_abbr}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{trialAbbr}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="12" y="0" width="79" height="13" uuid="19bdbc0f-2e3d-4221-b1b8-29bdc1f88c03"/>
@@ -154,19 +154,19 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{f_cross_name}.length()>50) ?
+				<textFieldExpression><![CDATA[(($F{fCrossName}.length()>50) ?
 
-   $F{f_cross_name}.substring(0, $F{f_cross_name}.substring(0,50).lastIndexOf("/")).concat("/...")
+   $F{fCrossName}.substring(0, $F{fCrossName}.substring(0,50).lastIndexOf("/")).concat("/...")
 
 
-    : $F{f_cross_name})]]></textFieldExpression>
+    : $F{fCrossName})]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="319" y="7" width="53" height="11" uuid="eefc0b26-61ca-4619-a080-00338f05c2c4"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{f_tabbr}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{fTabbr}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="false">
 				<reportElement x="8" y="7" width="28" height="12" uuid="5431a96a-d7b3-46f6-828c-2174fad19543"/>
@@ -180,43 +180,43 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{f_sel_hist}.length()>60) ?
+				<textFieldExpression><![CDATA[(($F{fSelHist}.length()>60) ?
 
-   $F{f_sel_hist}.substring(0, $F{f_sel_hist}.substring(0,60).lastIndexOf("-")).concat("-...")
+   $F{fSelHist}.substring(0, $F{fSelHist}.substring(0,60).lastIndexOf("-")).concat("-...")
 
 
-    : $F{f_sel_hist})]]></textFieldExpression>
+    : $F{fSelHist})]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="41" y="33" width="275" height="12" uuid="80e7ed7e-ef6a-401f-a0ab-391126ed6a1a"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Tahoma" size="8" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{m_cross_name}.length()>50) ?
+				<textFieldExpression><![CDATA[(($F{mCrossName}.length()>50) ?
 
-   $F{m_cross_name}.substring(0, $F{m_cross_name}.substring(0,50).lastIndexOf("/")).concat("/...")
+   $F{mCrossName}.substring(0, $F{mCrossName}.substring(0,50).lastIndexOf("/")).concat("/...")
 
 
-    : $F{m_cross_name})]]></textFieldExpression>
+    : $F{mCrossName})]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="41" y="44" width="275" height="12" uuid="b0a3b1e8-d49f-4ef7-bd67-f33e7db9356c"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{m_sel_hist}.length()>60) ?
+				<textFieldExpression><![CDATA[(($F{mSelHist}.length()>60) ?
 
-   $F{m_sel_hist}.substring(0, $F{m_sel_hist}.substring(0,60).lastIndexOf("-")).concat("-...")
+   $F{mSelHist}.substring(0, $F{mSelHist}.substring(0,60).lastIndexOf("-")).concat("-...")
 
 
-    : $F{m_sel_hist})]]></textFieldExpression>
+    : $F{mSelHist})]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="320" y="33" width="52" height="11" uuid="5bd17556-fcfd-4522-9dfe-af1ff8be9199"/>
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{m_tabbr}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{mTabbr}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="526" y="1" width="34" height="12" uuid="b18a8c47-903b-4756-ad32-510a3b787d74"/>
@@ -268,12 +268,12 @@
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7" isUnderline="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[(($F{sel_hist}.length()>65) ?
+				<textFieldExpression><![CDATA[(($F{selHist}.length()>65) ?
 
-   $F{sel_hist}.substring(0, $F{sel_hist}.substring(0,65).lastIndexOf("-"))
+   $F{selHist}.substring(0, $F{selHist}.substring(0,65).lastIndexOf("-"))
 
 
-    : $F{sel_hist})]]></textFieldExpression>
+    : $F{selHist})]]></textFieldExpression>
 			</textField>
 			<line>
 				<reportElement x="39" y="0" width="1" height="68" uuid="2a92d6ea-b03f-4ee8-aadf-621bf82452d9"/>
@@ -283,21 +283,21 @@
 			</line>
 			<textField>
 				<reportElement x="378" y="33" width="38" height="11" uuid="35b78682-945e-40b0-b956-0ccc30fe7474">
-					<printWhenExpression><![CDATA[$F{m_ent}!=0]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$F{mEnt}!=0]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{m_ent}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{mEnt}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="378" y="7" width="38" height="11" uuid="c6486450-6a1d-4b5a-9e43-a54024500342">
-					<printWhenExpression><![CDATA[$F{f_ent}!=0]]></printWhenExpression>
+					<printWhenExpression><![CDATA[$F{fEnt}!=0]]></printWhenExpression>
 				</reportElement>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{f_ent}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{fEnt}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
@@ -308,14 +308,14 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{dms_ip}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{dmsIp}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="41" y="7" width="158" height="9" uuid="74aa7d4b-1677-4ad1-85c7-6ce49cf427f3"/>
 				<textElement>
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{gms_ip}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{gmsIp}]]></textFieldExpression>
 			</textField>
 		</band>
 	</pageFooter>
@@ -333,14 +333,14 @@
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{dms_ip}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{dmsIp}]]></textFieldExpression>
 			</textField>
 			<textField>
 				<reportElement x="50" y="7" width="158" height="9" uuid="51e09ef8-fa57-44e4-a053-1e080e87c2d8"/>
 				<textElement>
 					<font fontName="Times New Roman" size="7"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$P{gms_ip}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$P{gmsIp}]]></textFieldExpression>
 			</textField>
 		</band>
 	</lastPageFooter>

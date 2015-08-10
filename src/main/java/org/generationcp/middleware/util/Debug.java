@@ -116,13 +116,13 @@ public class Debug {
 				if (Debug.LOG.isDebugEnabled()) {
 					Debug.LOG.error(e.getMessage(), e);
 				} else {
-					e.printStackTrace();
+					Debug.LOG.error("Printing was not successful", e);
 				}
 			} catch (IllegalAccessException e) {
 				if (Debug.LOG.isDebugEnabled()) {
 					Debug.LOG.error(e.getMessage(), e);
 				} else {
-					e.printStackTrace();
+					Debug.LOG.error("Printing was not successful", e);
 				}
 			}
 		}

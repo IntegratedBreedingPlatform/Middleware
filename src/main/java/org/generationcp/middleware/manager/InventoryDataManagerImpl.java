@@ -172,14 +172,12 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		try {
 			trans = session.beginTransaction();
 			StockTransactionDAO stockTransactionDAO = this.getStockTransactionDAO();
-			Integer id = stockTransactionDAO.getNextId("id");
-			stockTransaction.setId(id);
-			stockTransactionDAO.saveOrUpdate(stockTransaction);
+			stockTransaction = stockTransactionDAO.saveOrUpdate(stockTransaction);
 			stockTransactionDAO.flush();
 			stockTransactionDAO.clear();
 			trans.commit();
 
-			return id;
+			return stockTransaction.getId();
 		} catch (HibernateException e) {
 			this.rollbackTransaction(trans);
 			throw new MiddlewareQueryException(e.getMessage(), e);
@@ -201,11 +199,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 			LotDAO dao = this.getLotDao();
 
 			for (Lot lot : lots) {
-				if (operation == Operation.ADD && lot.getId() == null) {
-					// Auto-assign IDs for new local DB records
-					Integer id = dao.getNextId("id");
-					lot.setId(id);
-				}
 				Lot recordSaved = dao.saveOrUpdate(lot);
 				idLotsSaved.add(recordSaved.getId());
 				lotsSaved++;
@@ -277,11 +270,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 			TransactionDAO dao = this.getTransactionDao();
 
 			for (org.generationcp.middleware.pojos.ims.Transaction transaction : transactions) {
-				if (operation == Operation.ADD) {
-					// Auto-assign IDs for new local DB records
-					Integer id = dao.getNextId("id");
-					transaction.setId(id);
-				}
 				org.generationcp.middleware.pojos.ims.Transaction recordSaved = dao.saveOrUpdate(transaction);
 				idTransactionsSaved.add(recordSaved.getId());
 				transactionsSaved++;

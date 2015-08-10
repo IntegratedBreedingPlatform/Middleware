@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -36,6 +37,7 @@ import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -62,10 +64,42 @@ public class InventoryDataManagerImplTestIT extends DataManagerIntegrationTest {
 	private static InventoryDataManager manager;
 	private static InventoryService inventoryService;
 
+	private Integer lotId;
+	private Lot lot;
+
 	@BeforeClass
 	public static void setUp() throws Exception {
 		InventoryDataManagerImplTestIT.manager = DataManagerIntegrationTest.managerFactory.getInventoryDataManager();
 		InventoryDataManagerImplTestIT.inventoryService = DataManagerIntegrationTest.managerFactory.getInventoryMiddlewareService();
+	}
+
+	@Before
+	public void setUpBefore() throws Exception {
+		List<Lot> lots = new ArrayList<Lot>();
+		lot = new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9001, 1538, 0, 0, "sample added lot 1");
+		lots.add(lot);
+		lots.add(new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9002, 1539, 0, 0, "sample added lot 2"));
+		List<Integer> idList = InventoryDataManagerImplTestIT.manager.addLots(lots);
+		lotId = idList.get(0);
+		lot.setId(lotId);
+
+		List<Transaction> transactions = new ArrayList<Transaction>();
+		transactions.add(new Transaction(null, 1, InventoryDataManagerImplTestIT.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0,
+				1).get(0), Integer.valueOf(20140413), 1, -1d, "sample added transaction 1", 0, null, null, null, 100d, 1, null));
+		transactions.add(new Transaction(null, 1, InventoryDataManagerImplTestIT.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0,
+				1).get(0), Integer.valueOf(20140518), 1, -2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
+		transactions.add(new Transaction(null, 1, InventoryDataManagerImplTestIT.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0,
+				1).get(0), Integer.valueOf(20140518), 0, -2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
+		transactions.add(new Transaction(null, 1, InventoryDataManagerImplTestIT.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0,
+				1).get(0), Integer.valueOf(20140518), 0, 2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
+		transactions.add(new Transaction(null, 1, lot, Integer.valueOf(20140413), 1, -1d, "sample added transaction 1", 0, null, null, null,
+				100d, 1, null));
+		transactions.add(new Transaction(null, 1, InventoryDataManagerImplTestIT.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0,
+				1).get(0), Integer.valueOf(20120518), 1, 2d, "sample added transaction 2", 0, null, null, null, 150d, 1, null));
+		Set<Transaction> transactionSet = new HashSet<>();
+		transactionSet.add(transactions.get(4));
+		lot.setTransactions(transactionSet);
+		InventoryDataManagerImplTestIT.manager.addTransactions(transactions);
 	}
 
 	@Test
@@ -310,7 +344,6 @@ public class InventoryDataManagerImplTestIT extends DataManagerIntegrationTest {
 
 	@Test
 	public void testGetTransactionsByLotId() throws Exception {
-		Integer lotId = Integer.valueOf(1);
 		Set<Transaction> transactions = InventoryDataManagerImplTestIT.manager.getTransactionsByLotId(lotId);
 		Assert.assertTrue(transactions != null);
 		Assert.assertTrue(!transactions.isEmpty());

@@ -36,15 +36,14 @@ import org.hibernate.criterion.Restrictions;
 public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_PROJECTPROP = "SELECT count(ep.nd_experiment_id) "
-			+ " FROM nd_experiment_project ep "
-			+ " INNER JOIN projectprop pp ON pp.project_id = ep.project_id"
+			+ " FROM nd_experiment_project ep " + " INNER JOIN projectprop pp ON pp.project_id = ep.project_id"
 			+ " AND pp.type_id = 1070 and pp.value = :variableId";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATION = "SELECT count(e.nd_experiment_id) "
 			+ " FROM nd_experiment e " + " INNER JOIN nd_geolocation g ON g.nd_geolocation_id = e.nd_geolocation_id "
 			+ " WHERE (8170 = :variableId AND g.description IS NOT NULL) " + " OR (8191 = :variableId AND g.latitude IS NOT NULL) "
-			+ " OR (8192 = :variableId AND g.longitude IS NOT NULL) " + " OR (8193 = :storedInId AND g.geodetic_datum IS NOT NULL) "
-			+ " OR (8194 = :storedInId AND g.altitude IS NOT NULL)";
+			+ " OR (8192 = :variableId AND g.longitude IS NOT NULL) " + " OR (8193 = :variableId AND g.geodetic_datum IS NOT NULL) "
+			+ " OR (8194 = :variableId AND g.altitude IS NOT NULL)";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATIONPROP = "SELECT count(e.nd_experiment_id) "
 			+ " FROM nd_experiment e " + " INNER JOIN nd_geolocationprop gp ON gp.nd_geolocation_id = e.nd_geolocation_id "
@@ -65,8 +64,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_PHENOTYPE = "SELECT count(ep.nd_experiment_id) "
 			+ " FROM nd_experiment_phenotype ep " + " INNER JOIN phenotype p ON p.phenotype_id = ep.phenotype_id "
-			+ " AND p.observable_id = :variableId " + " AND (p.value IS NOT NULL "
-			+ " OR p.cvalue_id IS NOT NULL)";
+			+ " AND p.observable_id = :variableId " + " AND (p.value IS NOT NULL " + " OR p.cvalue_id IS NOT NULL)";
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByGeolocationIds(Collection<Integer> geolocationIds) throws MiddlewareQueryException {
@@ -114,18 +112,16 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATION;
 			} else if (VariableType.ENVIRONMENT_DETAIL.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_GEOLOCATIONPROP;
-			} else if (VariableType.EXPERIMENTAL_DESIGN.getId() == variableTypeId || 
-					VariableType.TREATMENT_FACTOR.getId() == variableTypeId) {
+			} else if (VariableType.EXPERIMENTAL_DESIGN.getId() == variableTypeId
+					|| VariableType.TREATMENT_FACTOR.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_EXPERIMENTPROP;
-			} else if (TermId.ENTRY_NO.getId() == variableId || TermId.GID.getId() == variableId
-					|| TermId.DESIG.getId() == variableId || TermId.ENTRY_CODE.getId() == variableId) {
+			} else if (TermId.ENTRY_NO.getId() == variableId || TermId.GID.getId() == variableId || TermId.DESIG.getId() == variableId
+					|| TermId.ENTRY_CODE.getId() == variableId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCK;
 			} else if (VariableType.GERMPLASM_DESCRIPTOR.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP;
-			} else if (VariableType.TRAIT.getId() == variableTypeId 
-					|| VariableType.ANALYSIS.getId() == variableTypeId
-					|| VariableType.NURSERY_CONDITION.getId() == variableTypeId
-					|| VariableType.SELECTION_METHOD.getId() == variableTypeId
+			} else if (VariableType.TRAIT.getId() == variableTypeId || VariableType.ANALYSIS.getId() == variableTypeId
+					|| VariableType.NURSERY_CONDITION.getId() == variableTypeId || VariableType.SELECTION_METHOD.getId() == variableTypeId
 					|| VariableType.TRIAL_CONDITION.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_PHENOTYPE;
 			}
@@ -139,8 +135,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error at countByObservationVariable=" + variableId + "," + variableTypeId + " query at ExperimentDAO: " + e.getMessage(), e);
+			this.logAndThrowException("Error at countByObservationVariable=" + variableId + "," + variableTypeId
+					+ " query at ExperimentDAO: " + e.getMessage(), e);
 		}
 		return 0;
 	}
@@ -265,14 +261,14 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			// Delete experiments
 			Query statement =
 					this.getSession()
-							.createSQLQuery(
-									"DELETE e, ep, es, epheno, pheno, eprop " + "FROM nd_experiment e "
-											+ "LEFT JOIN nd_experiment_project ep ON e.nd_experiment_id = ep.nd_experiment_id "
-											+ "LEFT JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id "
-											+ "LEFT JOIN nd_experiment_phenotype epheno ON e.nd_experiment_id = epheno.nd_experiment_id "
-											+ "LEFT JOIN phenotype pheno ON epheno.phenotype_id = pheno.phenotype_id "
-											+ "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
-											+ "WHERE ep.project_id = :datasetId ").setParameter("datasetId", datasetId);
+					.createSQLQuery(
+							"DELETE e, ep, es, epheno, pheno, eprop " + "FROM nd_experiment e "
+									+ "LEFT JOIN nd_experiment_project ep ON e.nd_experiment_id = ep.nd_experiment_id "
+									+ "LEFT JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id "
+									+ "LEFT JOIN nd_experiment_phenotype epheno ON e.nd_experiment_id = epheno.nd_experiment_id "
+									+ "LEFT JOIN phenotype pheno ON epheno.phenotype_id = pheno.phenotype_id "
+									+ "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
+									+ "WHERE ep.project_id = :datasetId ").setParameter("datasetId", datasetId);
 			statement.executeUpdate();
 			this.flush();
 			this.clear();
@@ -290,16 +286,16 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			// Delete experiments
 			Query statement =
 					this.getSession()
-							.createSQLQuery(
-									"DELETE g, gp, e, ep, es, epheno, pheno, eprop " + "FROM nd_geolocation g "
-											+ "LEFT JOIN nd_geolocationprop gp on g.nd_geolocation_id = gp.nd_geolocation_id "
-											+ "LEFT join nd_experiment e on g.nd_geolocation_id = e.nd_geolocation_id "
-											+ "LEFT JOIN nd_experiment_project ep ON e.nd_experiment_id = ep.nd_experiment_id "
-											+ "LEFT JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id "
-											+ "LEFT JOIN nd_experiment_phenotype epheno ON e.nd_experiment_id = epheno.nd_experiment_id "
-											+ "LEFT JOIN phenotype pheno ON epheno.phenotype_id = pheno.phenotype_id "
-											+ "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
-											+ "WHERE ep.project_id = :datasetId ").setParameter("datasetId", datasetId);
+					.createSQLQuery(
+							"DELETE g, gp, e, ep, es, epheno, pheno, eprop " + "FROM nd_geolocation g "
+									+ "LEFT JOIN nd_geolocationprop gp on g.nd_geolocation_id = gp.nd_geolocation_id "
+									+ "LEFT join nd_experiment e on g.nd_geolocation_id = e.nd_geolocation_id "
+									+ "LEFT JOIN nd_experiment_project ep ON e.nd_experiment_id = ep.nd_experiment_id "
+									+ "LEFT JOIN nd_experiment_stock es ON e.nd_experiment_id = es.nd_experiment_id "
+									+ "LEFT JOIN nd_experiment_phenotype epheno ON e.nd_experiment_id = epheno.nd_experiment_id "
+									+ "LEFT JOIN phenotype pheno ON epheno.phenotype_id = pheno.phenotype_id "
+									+ "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
+									+ "WHERE ep.project_id = :datasetId ").setParameter("datasetId", datasetId);
 
 			statement.executeUpdate();
 			this.flush();

@@ -1,16 +1,18 @@
 
 package org.generationcp.middleware.pojos.dms;
 
-import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import java.io.Serializable;
+
 
 /**
  * http://wiki.cimmyt.org/confluence/display/MBP/Business+Rules+for+Mapping+to+Chado
@@ -29,6 +31,7 @@ public class ProjectProperty implements Serializable {
 	private static final long serialVersionUID = 7517773605676616639L;
 
 	@Id
+	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "projectprop_id")
 	private Integer projectPropertyId;
@@ -61,8 +64,7 @@ public class ProjectProperty implements Serializable {
 	public ProjectProperty() {
 	}
 
-	public ProjectProperty(Integer projectPropertyId, DmsProject project, Integer typeId, String value, Integer rank) {
-		this.projectPropertyId = projectPropertyId;
+	public ProjectProperty(DmsProject project, Integer typeId, String value, Integer rank) {
 		this.project = project;
 		this.typeId = typeId;
 		this.value = value;

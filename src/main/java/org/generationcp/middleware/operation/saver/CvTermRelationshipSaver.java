@@ -26,21 +26,14 @@ public class CvTermRelationshipSaver extends Saver {
 	// Returns the id
 	public Integer save(Integer subjectId, Integer typeId, Integer objectId) throws MiddlewareException, MiddlewareQueryException {
 		CVTermRelationshipDao dao = this.getCvTermRelationshipDao();
-		Integer generatedId;
-		try {
-			generatedId = dao.getNextId("cvTermRelationshipId");
-		} catch (MiddlewareQueryException e) {
-			throw new MiddlewareQueryException(e.getMessage(), e);
-		}
-		CVTermRelationship cvTermRelationship = this.create(generatedId, subjectId, typeId, objectId);
+		CVTermRelationship cvTermRelationship = this.create(subjectId, typeId, objectId);
 		dao.save(cvTermRelationship);
 
 		return cvTermRelationship.getCvTermRelationshipId();
 	}
 
-	public CVTermRelationship create(Integer relationshipId, Integer subjectId, Integer typeId, Integer objectId) {
+	public CVTermRelationship create(Integer subjectId, Integer typeId, Integer objectId) {
 		CVTermRelationship relationship = new CVTermRelationship();
-		relationship.setCvTermRelationshipId(relationshipId);
 		relationship.setSubjectId(subjectId);
 		relationship.setTypeId(typeId);
 		relationship.setObjectId(objectId);
