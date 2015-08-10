@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -139,25 +138,11 @@ public class PhenotypeSaver extends Saver {
 					}
 					if (enumeration != null) {
 						phenotype.setcValue(enumeration.getId());
+						phenotype.setValue(enumeration.getName());
 					} else {
-						// throw a PhenotypeException
-						PhenotypeExceptionDto exception = new PhenotypeExceptionDto();
-						exception.setLocalVariableName(variable.getVariableType().getLocalName());
-						exception.setStandardVariableName(variable.getVariableType().getStandardVariable().getName());
-						exception.setStandardVariableId(variable.getVariableType().getStandardVariable().getId());
-						exception.setInvalidValues(new TreeSet<String>());
-						exception.getInvalidValues().add(variable.getValue());
-						List<Enumeration> enumerations = variable.getVariableType().getStandardVariable().getEnumerations();
-						if (enumerations != null) {
-							for (int i = 0; i < enumerations.size(); i++) {
-								Enumeration e = enumerations.get(i);
-								if (exception.getValidValues() == null) {
-									exception.setValidValues(new TreeSet<String>());
-								}
-								exception.getValidValues().add(e.getName());
-							}
-						}
-						throw new PhenotypeException(exception);
+						// set it as a custom value of the categorical variate
+						phenotype.setValue(variable.getValue());
+						phenotype.setcValue(null);
 					}
 				}
 			}
