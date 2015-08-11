@@ -105,6 +105,7 @@ public class User implements Serializable, BeanFormState {
 
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name="personid", insertable=false, updatable=false)
+	@NotFound(action = NotFoundAction.IGNORE)
 	private Person person;
 
 	@Transient
