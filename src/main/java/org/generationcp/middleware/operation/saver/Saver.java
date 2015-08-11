@@ -36,6 +36,10 @@ import org.generationcp.middleware.util.DatabaseBroker;
  */
 public abstract class Saver extends DatabaseBroker {
 
+	protected Saver() {
+		
+	}
+	
 	/**
 	 * Instantiates a new data manager given session providers for local and central.
 	 */

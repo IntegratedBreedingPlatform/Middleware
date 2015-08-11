@@ -37,6 +37,10 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 	private static final Logger LOG = LoggerFactory.getLogger(MBDTDataManagerImpl.class);
 
+	public MBDTDataManagerImpl() {
+		
+	}
+	
 	public MBDTDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}

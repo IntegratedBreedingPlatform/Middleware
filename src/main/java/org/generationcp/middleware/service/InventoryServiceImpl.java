@@ -37,6 +37,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class InventoryServiceImpl extends Service implements InventoryService {
 
+	public InventoryServiceImpl() {
+		super();
+	}
+	
 	public InventoryServiceImpl(HibernateSessionProvider sessionProvider, String localDatabaseName) {
 		super(sessionProvider, localDatabaseName);
 	}

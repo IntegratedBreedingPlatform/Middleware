@@ -15,6 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ListDataPropertySaver extends Saver {
 
+	public ListDataPropertySaver() {
+		super();
+	}
+	
 	public ListDataPropertySaver(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}

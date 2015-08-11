@@ -81,7 +81,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(WorkbenchDataManagerImpl.class);
 
-	private final HibernateSessionProvider sessionProvider;
+	private HibernateSessionProvider sessionProvider;
 
 	private Project currentlastOpenedProject;
 
@@ -114,6 +114,10 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	private String installationDirectory;
 	private StandardPresetDAO standardPresetDAO;
 
+	public WorkbenchDataManagerImpl() {
+		super();
+	}
+	
 	public WorkbenchDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
 	}

@@ -25,12 +25,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
 
-	final TraitService trialTraits;
+	private TraitService trialTraits;
 
-	final StudyMeasurements studyMeasurements;
+	private StudyMeasurements studyMeasurements;
 
-	final StudyGermplasmListService studyGermplasmListService;
+	private StudyGermplasmListService studyGermplasmListService;
 
+	public StudyServiceImpl() {
+		super();
+	}
+	
 	public StudyServiceImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 		Session currentSession = getCurrentSession();
