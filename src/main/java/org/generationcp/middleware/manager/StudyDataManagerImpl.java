@@ -1134,4 +1134,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 
 	}
+
+	@Override
+	public List<String> getAllSharedProjectNames() throws MiddlewareQueryException {
+		return this.getDmsProjectDao().getAllSharedProjectNames();
+	}
 }

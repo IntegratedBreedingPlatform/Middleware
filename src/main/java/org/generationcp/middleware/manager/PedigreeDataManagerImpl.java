@@ -36,9 +36,9 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	public PedigreeDataManagerImpl() {
 	}
 
-	public PedigreeDataManagerImpl(HibernateSessionProvider sessionProvider, String databaseName) {
-		super(sessionProvider, databaseName);
-		this.germplasmDataManager = new GermplasmDataManagerImpl(sessionProvider, databaseName);
+	public PedigreeDataManagerImpl(HibernateSessionProvider sessionProvider) {
+		super(sessionProvider);
+		this.germplasmDataManager = new GermplasmDataManagerImpl(sessionProvider);
 	}
 
 	@Override
@@ -47,8 +47,8 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	}
 
 	@Override
-	public Integer countPedigreeLevel(Integer gid, Boolean includeDerivativeLine) throws MiddlewareQueryException,
-			MaxPedigreeLevelReachedException {
+	public Integer countPedigreeLevel(Integer gid, Boolean includeDerivativeLine)
+			throws MiddlewareQueryException, MaxPedigreeLevelReachedException {
 		return this.countPedigreeLevel(gid, includeDerivativeLine, false);
 	}
 
@@ -198,7 +198,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	/**
 	 * Given a GermplasmPedigreeTreeNode and the level of the desired tree, add parents to the node recursively until the specified level of
 	 * the tree is reached.
-	 * 
+	 *
 	 * @param node
 	 * @param level
 	 * @return the given GermplasmPedigreeTreeNode with its parents added to it
@@ -254,7 +254,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	/**
 	 * Given a GermplasmPedigreeTreeNode and the level of the desired tree, add parents to the node recursively excluding derivative lines
 	 * until the specified level of the tree is reached.
-	 * 
+	 *
 	 * @param node
 	 * @param level
 	 * @return the given GermplasmPedigreeTreeNode with its parents added to it
@@ -366,7 +366,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	/**
 	 * Recursive function which gets the root of a derivative neighborhood by tracing back through the source germplasms. The function stops
 	 * when the steps are exhausted or a germplasm created by a generative method is encountered, whichever comes first.
-	 * 
+	 *
 	 * @param gid
 	 * @param steps
 	 * @return Object[] - first element is the Germplasm POJO, second is an Integer which is the number of steps left to take
@@ -406,7 +406,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
 	/**
 	 * Recursive function to get the derived lines given a Germplasm. This constructs the derivative neighborhood.
-	 * 
+	 *
 	 * @param node
 	 * @param steps
 	 * @return
@@ -529,7 +529,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
 	/**
 	 * Recursive function to get the list of all ancestor germplasm with DER method type and the given the locationID
-	 * 
+	 *
 	 * @param germplasmsParam
 	 * @param currentGermplasm
 	 * @param locationID
@@ -593,22 +593,24 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 		this.germplasmDataManager = germplasmDataManager;
 	}
 
+	@Override
 	public int calculateRecurrentParent(Integer maleParentGID, Integer femaleParentGID) throws MiddlewareQueryException {
-		Germplasm maleParent = getGermplasmDataManager().getGermplasmByGID(maleParentGID);
-		Germplasm femaleParent = getGermplasmDataManager().getGermplasmByGID(femaleParentGID);
+		Germplasm maleParent = this.getGermplasmDataManager().getGermplasmByGID(maleParentGID);
+		Germplasm femaleParent = this.getGermplasmDataManager().getGermplasmByGID(femaleParentGID);
 
 		if (maleParent == null || femaleParent == null) {
-			return NONE;
+			return PedigreeDataManager.NONE;
 		}
 
 		if (femaleParent.getGnpgs() >= 2
 				&& (maleParentGID.equals(femaleParent.getGpid1()) || maleParentGID.equals(femaleParent.getGpid2()))) {
-			return MALE_RECURRENT;
+			return PedigreeDataManager.MALE_RECURRENT;
 		} else if (maleParent.getGnpgs() >= 2
 				&& (femaleParentGID.equals(maleParent.getGpid1()) || femaleParentGID.equals(maleParent.getGpid2()))) {
-			return FEMALE_RECURRENT;
+			return PedigreeDataManager.FEMALE_RECURRENT;
 		}
 
-		return NONE;
+		return PedigreeDataManager.NONE;
 	}
+
 }

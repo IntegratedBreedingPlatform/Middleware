@@ -4,10 +4,13 @@ package org.generationcp.middleware.operation.builder;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ProjectRelationship;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,47 +24,56 @@ public class DataSetBuilderTest {
 
 	@Mock
 	HibernateSessionProvider hibernateSessionProvider;
-
+	
+	// Class to be tested - DO NOT MOCK
 	DataSetBuilder dataSetBuilder;
+	
+	// Mock Services
+	StudyDataManager studyDataManager; 
+	DmsProjectDao dmsProjectDao;
 
 	@Before
 	public void setUp() throws MiddlewareQueryException {
+		
+		this.studyDataManager = Mockito.mock(StudyDataManagerImpl.class);
+		this.dmsProjectDao = Mockito.mock(DmsProjectDao.class);
+		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID)).thenReturn(generateDatasetReferences());
+		Mockito.when(this.dmsProjectDao.getById(4)).thenReturn(generateDmsProject(4));
+		
 		MockitoAnnotations.initMocks(this);
+		
+		// Inject the mock services into the test class
+		dataSetBuilder = new DataSetBuilder(this.hibernateSessionProvider, dmsProjectDao, studyDataManager);
 
-		this.dataSetBuilder = Mockito.spy(new DataSetBuilder(this.hibernateSessionProvider));
-		Mockito.doReturn(this.generateDmsProject()).when(this.dataSetBuilder).getDmsProjectById(DataSetBuilderTest.STUDY_ID);
 	}
 
 	@Test
 	public void testDataSetBuilderGetTrialDataSet() throws MiddlewareQueryException {
-
-		DmsProject project = this.dataSetBuilder.getTrialDataset(DataSetBuilderTest.STUDY_ID, 1);
-
-		Assert.assertTrue("The Trial Dataset's project id should be 1", "1".equals(project.getProjectId().toString()));
+		DmsProject trialDataset = this.dataSetBuilder.getTrialDataset(DataSetBuilderTest.STUDY_ID);
+		Assert.assertTrue("The Trial Dataset's project id should be 4", "4".equals(trialDataset.getProjectId().toString()));
 	}
 
-	private DmsProject generateDmsProject() {
+	private List<DatasetReference> generateDatasetReferences() {
+		
+		List<DatasetReference> dsRefs = new ArrayList<DatasetReference>();
 
+		DatasetReference ref1 = new DatasetReference(1, "TestTrial");
+		DatasetReference ref2 = new DatasetReference(4, "TestTrial-ENVIRONMENT");
+		DatasetReference ref3 = new DatasetReference(3, "TestTrial-DUMMY");
+		DatasetReference ref4 = new DatasetReference(2, "TestTrial-PLOTDATA");
+		
+		dsRefs.add(ref1);
+		dsRefs.add(ref2);
+		dsRefs.add(ref3);
+		dsRefs.add(ref4);
+
+		return dsRefs;
+	}
+	
+	private DmsProject generateDmsProject(int id) {
 		DmsProject dmsProject = new DmsProject();
-		dmsProject.setProjectId(DataSetBuilderTest.STUDY_ID);
-
-		List<ProjectRelationship> relatedBys = new ArrayList<>();
-		relatedBys.add(this.createProjectRelationship(1));
-		relatedBys.add(this.createProjectRelationship(2));
-		relatedBys.add(this.createProjectRelationship(3));
-		dmsProject.setRelatedBys(relatedBys);
-
+		dmsProject.setProjectId(id);
 		return dmsProject;
-	}
-
-	private ProjectRelationship createProjectRelationship(int projectId) {
-
-		ProjectRelationship relationship = new ProjectRelationship();
-		DmsProject project = new DmsProject();
-		project.setProjectId(projectId);
-		relationship.setSubjectProject(project);
-		return relationship;
-
 	}
 
 }

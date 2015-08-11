@@ -96,7 +96,7 @@ public abstract class Builder extends DatabaseBroker {
 		return new CvTermRelationshipSaver(this.sessionProvider);
 	}
 
-	protected final StudyDataManager getStudyDataManager() {
+	public StudyDataManager getStudyDataManager() {
 		return new StudyDataManagerImpl(this.sessionProvider);
 	}
 

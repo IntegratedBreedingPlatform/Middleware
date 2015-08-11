@@ -1521,4 +1521,10 @@ public class StudyDataManagerImplTest extends DataManagerIntegrationTest {
 			Assert.assertNotEquals(newExpDesign, actualExpDesign);
 		}
 	}
+
+	@Test
+	public void testGetAllSharedProjectNames() throws MiddlewareQueryException {
+		List<String> sharedProjectNames = StudyDataManagerImplTest.manager.getAllSharedProjectNames();
+		Assert.assertNotNull(sharedProjectNames);
+	}
 }
