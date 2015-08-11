@@ -57,7 +57,6 @@ public class HibernateSessionPerThreadProvider implements HibernateSessionProvid
 	@Override
 	public Session getSession() {
 		return SessionFactoryUtils.getSession(sessionFactory, false);
-		//return this.sessionFactory.getCurrentSession();
 	}
 
 	/**
@@ -75,13 +74,6 @@ public class HibernateSessionPerThreadProvider implements HibernateSessionProvid
 	 */
 	@Override
 	public void close() {
-//		Session session = this.THREAD_SESSION.get();
-//		if (session != null) {
-//			try {
-//				session.close();
-//			} finally {
-//				this.THREAD_SESSION.remove();
-//			}
-//		}
+		//TODO:TX we need to get rid of this method.
 	}
 }

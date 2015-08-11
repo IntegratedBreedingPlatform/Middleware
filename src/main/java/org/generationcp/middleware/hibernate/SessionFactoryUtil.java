@@ -79,18 +79,5 @@ public abstract class SessionFactoryUtil {
 		}
 
 		return cfg.buildSessionFactory();
-////		SessionFactoryUtil.LOG.info("Opening SessionFactory for: " + connectionUrl);
-//	      BasicDataSource dataSource = new BasicDataSource();
-//	      dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-//	      dataSource.setUrl(connectionUrl);
-//	      dataSource.setUsername(params.getUsername());
-//	      dataSource.setPassword(params.getPassword());
-//		
-//	      LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-//	      sessionFactory.setDataSource(dataSource);
-//	      //sessionFactory.setPackagesToScan(new String[] { "org.baeldung.spring.persistence.model" });
-//	      //sessionFactory.setHibernateProperties(cfg);
-//	      sessionFactory.
-//		return sessionFactory.getObject();
 	}
 }
