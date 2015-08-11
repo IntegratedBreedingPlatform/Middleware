@@ -122,8 +122,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 					DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + dbName, userName, password);
 
 			// final Connection connection = workbenchDataSource.getConnection();
-			final PreparedStatement preparedStatement = connection.prepareStatement("show databases like ?");
-			preparedStatement.setString(1, "ibdbv2%");
+			final PreparedStatement preparedStatement = connection.prepareStatement("Select db_name from workbench_crop");
 			final ResultSet rs = preparedStatement.executeQuery();
 			while (rs.next()) {
 				final String cropDatabaseName = rs.getString(1);
