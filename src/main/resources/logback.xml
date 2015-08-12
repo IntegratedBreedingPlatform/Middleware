@@ -33,4 +33,6 @@
     
     <!-- Set the log levels -->
     <logger name="org.generationcp" level="DEBUG"/>
+    <logger name="com.atomikos" level="WARN"/>
+    
 </configuration>
