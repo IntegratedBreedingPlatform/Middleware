@@ -21,27 +21,27 @@ import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 public interface PedigreeDataManager {
 
 	public static final int MAX_PEDIGREE_LEVEL = 5;
-    public static final int NONE = 0;
-    public static final int MALE_RECURRENT = 1;
-    public static final int FEMALE_RECURRENT = 2;
+	public static final int NONE = 0;
+	public static final int MALE_RECURRENT = 1;
+	public static final int FEMALE_RECURRENT = 2;
 
 	/**
 	 * Creates a pedigree tree for the Germplasm identified by the given gid. The tree contains all generative progenitors down to the
 	 * specified level. The Germplasm POJOs included in the tree have their preferred names pre-loaded. The root of the tree is the
 	 * Germplasm identified by the given gid parameter. The nodes down the tree are the ancestors of the nodes above them.
-	 * 
+	 *
 	 * Example tree:
-	 * 
+	 *
 	 * Result of calling: generatePedigreeTree(new Integer(306436), 4);
-	 * 
+	 *
 	 * 306436 : TOX 494 (root node) 33208 : 63-83 (child node of root, representing parent of Germplasm 306436) 2269311 : 63-83 310357 :
 	 * IRAT 2 96783 : IGUAPE CATETO (child node of root, representing parent of Germplasm 306436) 312744 : RPCB-2B-849 (child node of root,
 	 * representing parent of Germplasm 306436) 2268822 : RPCB-2B-849 3160 : IR 1416-131 (child node of root, representing parent of
 	 * Germplasm 306436) 2231 : IR 1416 1163 : IR 400-28-4-5 (child node containing Germplasm 2231, representing parent of Germplasm 2231)
 	 * 2229 : TE TEP (child node containing Germplasm 2231, representing parent of Germplasm 2231) 312646 : LITA 506 (child node of root,
 	 * representing parent of Germplasm 306436)
-	 * 
-	 * 
+	 *
+	 *
 	 * @param gid - GID of a Germplasm
 	 * @param level - level of the tree to be created
 	 * @return GermplasmPedigreeTree representing the pedigree tree
@@ -53,19 +53,19 @@ public interface PedigreeDataManager {
 	 * Creates a pedigree tree for the Germplasm identified by the given gid. The tree contains all generative progenitors down to the
 	 * specified level. The Germplasm POJOs included in the tree have their preferred names pre-loaded. The root of the tree is the
 	 * Germplasm identified by the given gid parameter. The nodes down the tree are the ancestors of the nodes above them.
-	 * 
+	 *
 	 * Example tree:
-	 * 
+	 *
 	 * Result of calling: generatePedigreeTree(new Integer(306436), 4, true);
-	 * 
+	 *
 	 * 306436 : TOX 494 (root node) 33208 : 63-83 (child node of root, representing parent of Germplasm 306436) 2269311 : 63-83 310357 :
 	 * IRAT 2 96783 : IGUAPE CATETO (child node of root, representing parent of Germplasm 306436) 312744 : RPCB-2B-849 (child node of root,
 	 * representing parent of Germplasm 306436) 2268822 : RPCB-2B-849 3160 : IR 1416-131 (child node of root, representing parent of
 	 * Germplasm 306436) 2231 : IR 1416 1163 : IR 400-28-4-5 (child node containing Germplasm 2231, representing parent of Germplasm 2231)
 	 * 2229 : TE TEP (child node containing Germplasm 2231, representing parent of Germplasm 2231) 312646 : LITA 506 (child node of root,
 	 * representing parent of Germplasm 306436)
-	 * 
-	 * 
+	 *
+	 *
 	 * @param gid - GID of a Germplasm
 	 * @param level - level of the tree to be created
 	 * @param includeDerivativeLines - option to include derivative lines on result
@@ -81,10 +81,10 @@ public interface PedigreeDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	Integer countPedigreeLevel(Integer gid, Boolean includeDerivativeLine) throws MiddlewareQueryException,
-			MaxPedigreeLevelReachedException;
+	MaxPedigreeLevelReachedException;
 
 	Integer countPedigreeLevel(Integer gid, Boolean includeDerivativeLine, boolean calculateFullPedigree) throws MiddlewareQueryException,
-			MaxPedigreeLevelReachedException;
+	MaxPedigreeLevelReachedException;
 
 	/**
 	 * Returns the GermplasmPedigreeTree object which represents the derivative neighborhood for the germplasm identified by the given gid.
@@ -94,9 +94,9 @@ public interface PedigreeDataManager {
 	 * retrieved and added to the tree. And then from each of those derived germplasms, all immediate derived lines are retrieved and added
 	 * to the tree, and so on and so forth. The number of levels of the tree is the sum of the actual number of steps backward made to reach
 	 * the root and the given number of steps forward plus 1 (for the level which the given germplasm belongs).
-	 * 
+	 *
 	 * The Germplasm POJOs included in the tree have their preferred names pre-loaded.
-	 * 
+	 *
 	 * @param gid
 	 * @param numberOfStepsBackward - number of steps backward from the germplasm identified by the given gid
 	 * @param numberOfStepsForward - number of steps forward from the germplasm identified by the given gid
@@ -114,9 +114,9 @@ public interface PedigreeDataManager {
 	 * immediate derived lines are retrieved and added to the tree, and so on and so forth. The number of levels of the tree is the sum of
 	 * the actual number of steps backward made to reach the root and the given number of steps forward plus 1 (for the level which the
 	 * given germplasm belongs).
-	 * 
+	 *
 	 * The Germplasm POJOs included in the tree have their preferred names pre-loaded.
-	 * 
+	 *
 	 * @param gid
 	 * @param numberOfStepsBackward - number of steps backward from the germplasm identified by the given gid
 	 * @param numberOfStepsForward - number of steps forward from the germplasm identified by the given gid
@@ -129,7 +129,7 @@ public interface PedigreeDataManager {
 	 * Returns the Germplasm representing the children of the Germplasm identified by the given gid. The function returns a List of Object
 	 * arrays. Each Object array contains 2 elements, the first is an int to specify the progenitor number and the second is the Germplasm
 	 * POJO representing the child germplasm.
-	 * 
+	 *
 	 * @param gid - gid of the parent Germplasm
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
@@ -140,7 +140,7 @@ public interface PedigreeDataManager {
 
 	/**
 	 * Returns the number of children of the Germplasm identified by the given gid.
-	 * 
+	 *
 	 * @param gid
 	 * @return count of children
 	 * @throws MiddlewareQueryException
@@ -151,7 +151,7 @@ public interface PedigreeDataManager {
 	 * Returns the Germplasm which are management group neighbors of the Germplasm identified by the given GID. The given Germplasm is
 	 * assumed to be a root of a management group. The Germplasm POJOs included in the results come with their preferred names which can be
 	 * accessed by calling Germplasm.getPreferredName().
-	 * 
+	 *
 	 * @param gid - gid of the Germplasm
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
@@ -162,7 +162,7 @@ public interface PedigreeDataManager {
 
 	/**
 	 * Returns the number of management neighbors of the Germplasm with the given id.
-	 * 
+	 *
 	 * @param gid - the Germplasm id
 	 * @return the number of management neighbors
 	 * @throws MiddlewareQueryException
@@ -171,7 +171,7 @@ public interface PedigreeDataManager {
 
 	/**
 	 * Returns the number of group relatives a Germplasm has.
-	 * 
+	 *
 	 * @param gid
 	 * @return The number of group relatives of a Germplasm
 	 * @throws MiddlewareQueryException
@@ -181,7 +181,7 @@ public interface PedigreeDataManager {
 	/**
 	 * Returns the Germplasm which are group relatives of the Germplasm identified by the given GID. The Germplasm POJOs included in the
 	 * results come with their preferred names which can be accessed by calling Germplasm.getPreferredName().
-	 * 
+	 *
 	 * @param gid
 	 * @return List of Germplasm POJOs
 	 * @throws MiddlewareQueryException
@@ -193,7 +193,7 @@ public interface PedigreeDataManager {
 	 * source germplasms from the given Germplasm through its progenitors, up until a Germplasm created by a generative method is
 	 * encountered. The Germplasm POJOs included in the results come with their preferred names which can be accessed by calling
 	 * Germplasm.getPreferredName().
-	 * 
+	 *
 	 * @param gid
 	 * @return List of Germplasm POJOs, arranged from the given Germplasm down to the last source on the generation history
 	 * @throws MiddlewareQueryException
@@ -203,7 +203,7 @@ public interface PedigreeDataManager {
 	/**
 	 * Returns the Germplasm representing the parent of the child Germplasm identified by the given gid and having the given progenitor
 	 * number.
-	 * 
+	 *
 	 * @param gid - gid of child Germplasm
 	 * @param progenitorNumber - progenitor number of the parent with respect to the child
 	 * @return Germplasm POJO
@@ -215,7 +215,7 @@ public interface PedigreeDataManager {
 	 * Given the gid of the the germplasm, return the list of all ancestor germplasm with DER mtype and the locationID. The list is created
 	 * by tracing back through the source germplasms from the given Germplasm through its progenitors, up until a Germplasm created by a
 	 * generative method is encountered.
-	 * 
+	 *
 	 * @param gid - gid of the Germplasm
 	 * @param locationID - locationID of the Ancestor Germplasms
 	 * @return List of all ancestor Germplasm POJOs
@@ -223,5 +223,5 @@ public interface PedigreeDataManager {
 	 */
 	List<Germplasm> getPedigreeLine(Integer gid, int locationID) throws MiddlewareQueryException;
 
-    int calculateRecurrentParent(Integer maleParentGID, Integer femaleParentGID) throws MiddlewareQueryException;
+	int calculateRecurrentParent(Integer maleParentGID, Integer femaleParentGID) throws MiddlewareQueryException;
 }

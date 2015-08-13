@@ -23,8 +23,6 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 /**
  * Implements {@link OntologyMethodDataManager}
@@ -143,20 +141,14 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
 		// Constant CvId
 		method.setVocabularyId(CvId.METHODS.getId());
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
 		try {
-			trans = session.beginTransaction();
 			term = this.getCvTermDao().save(method.getName(), method.getDefinition(), CvId.METHODS);
 			method.setId(term.getCvTermId());
 
 			// Save creation time
 			this.getCvTermPropertyDao().save(method.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
 			throw new MiddlewareQueryException("Error at addMethod" + e.getMessage(), e);
 		}
 	}
@@ -171,11 +163,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
 		// Constant CvId
 		method.setVocabularyId(CvId.METHODS.getId());
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
 		try {
-			trans = session.beginTransaction();
 
 			term.setName(method.getName());
 			term.setDefinition(method.getDefinition());
@@ -185,9 +173,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
 			// Save last modified Time
 			this.getCvTermPropertyDao().save(method.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
 			throw new MiddlewareQueryException("Error at updateMethod" + e.getMessage(), e);
 		}
 
@@ -204,11 +190,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
 			throw new MiddlewareException(OntologyMethodDataManagerImpl.METHOD_IS_REFERRED_TO_VARIABLE);
 		}
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
 		try {
-			trans = session.beginTransaction();
 
 			// delete properties
 			List<CVTermProperty> properties = this.getCvTermPropertyDao().getByCvTermId(term.getCvTermId());
@@ -218,9 +200,7 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
 
 			this.getCvTermDao().makeTransient(term);
 
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
 			throw new MiddlewareQueryException("Error at deleteMethod" + e.getMessage(), e);
 		}
 	}

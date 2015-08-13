@@ -19,14 +19,17 @@ import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -93,14 +96,16 @@ public class User implements Serializable, BeanFormState {
 	@Column(name = "cdate")
 	private Integer cdate;
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@NotFound(action = NotFoundAction.IGNORE)
 	private List<UserRole> roles;
 
 	@Transient
 	private Boolean isnew = false;
 
-	@Transient
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name="personid", insertable=false, updatable=false)
+	@NotFound(action = NotFoundAction.IGNORE)
 	private Person person;
 
 	@Transient

@@ -44,8 +44,6 @@ import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import com.google.common.base.Function;
 
@@ -500,11 +498,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_EXIST_WITH_SAME_NAME);
 		}
 
-		Session session = this.getActiveSession();
-		Transaction transaction = null;
-
 		try {
-			transaction = session.beginTransaction();
 			// Saving term to database.
 			CVTerm savedTerm = this.getCvTermDao().save(variableInfo.getName(), variableInfo.getDescription(), CvId.VARIABLES);
 			variableInfo.setId(savedTerm.getCvTermId());
@@ -554,10 +548,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			// Setting last update time.
 			this.getCvTermPropertyDao().save(variableInfo.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
-			transaction.commit();
 
 		} catch (Exception e) {
-			this.rollbackTransaction(transaction);
 			throw new MiddlewareQueryException("Error at addVariable :" + e.getMessage(), e);
 		}
 	}
@@ -581,11 +573,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		List<CVTermProperty> termProperties = elements.getTermProperties();
 		VariableOverrides variableOverrides = elements.getVariableOverrides();
 
-		Session session = this.getActiveSession();
-		Transaction transaction = null;
 
 		try {
-			transaction = session.beginTransaction();
 
 			// Updating term to database.
 			if (!(variableInfo.getName().equals(term.getName()) && Objects.equals(variableInfo.getDescription(), term.getDefinition()))) {
@@ -684,10 +673,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			this.getCvTermPropertyDao().save(variableInfo.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()),
 					0);
 
-			transaction.commit();
-
 		} catch (Exception e) {
-			this.rollbackTransaction(transaction);
 			throw new MiddlewareQueryException("Error at updateVariable :" + e.getMessage(), e);
 		}
 	}
@@ -706,11 +692,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.CAN_NOT_DELETE_USED_VARIABLE);
 		}
 
-		Session session = this.getActiveSession();
-		Transaction transaction = null;
-
 		try {
-			transaction = session.beginTransaction();
 
 			// Delete relationships
 			List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(id);
@@ -734,10 +716,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			// delete main entity
 			this.getCvTermDao().makeTransient(term);
 
-			transaction.commit();
 
 		} catch (Exception e) {
-			this.rollbackTransaction(transaction);
 			throw new MiddlewareQueryException("Error at updateVariable :" + e.getMessage(), e);
 		}
 	}

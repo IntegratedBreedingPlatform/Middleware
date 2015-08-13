@@ -78,7 +78,6 @@ public abstract class SessionFactoryUtil {
 			}
 		}
 
-		SessionFactoryUtil.LOG.info("Opening SessionFactory for: " + connectionUrl);
 		return cfg.buildSessionFactory();
 	}
 }

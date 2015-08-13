@@ -15,6 +15,7 @@ import java.io.Serializable;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.springframework.orm.hibernate3.SessionFactoryUtils;
 
 /**
  * <p>
@@ -35,8 +36,6 @@ public class HibernateSessionPerRequestProvider implements HibernateSessionProvi
 
 	private SessionFactory sessionFactory;
 
-	private Session session;
-
 	public HibernateSessionPerRequestProvider() {
 	}
 
@@ -54,20 +53,11 @@ public class HibernateSessionPerRequestProvider implements HibernateSessionProvi
 
 	@Override
 	public synchronized Session getSession() {
-		if (this.session != null) {
-			return this.session;
-
-		}
-
-		this.session = this.sessionFactory == null ? null : this.sessionFactory.openSession();
-		return this.session;
+		return SessionFactoryUtils.getSession(sessionFactory, false);
 	}
 
 	@Override
 	public void close() {
-		if (this.session != null) {
-			this.session.close();
-			this.session = null;
-		}
+		//TODO:TX we need to get rid of this method.
 	}
 }

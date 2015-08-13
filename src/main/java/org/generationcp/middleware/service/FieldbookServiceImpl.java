@@ -81,7 +81,9 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
@@ -220,13 +222,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void saveMeasurementRows(Workbook workbook, String programUUID) throws MiddlewareException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
+		
 
 		long startTime = System.currentTimeMillis();
 
 		try {
-			trans = session.beginTransaction();
 
 			List<Integer> deletedVariateIds = this.getDeletedVariateIds(workbook.getVariates());
 
@@ -313,13 +315,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 												field.getcValueId() != null && !"".equals(field.getcValueId()) ? field.getcValueId()
 														: field.getValue(), phenotype, field.isCustomCategoricalValue(),
 												variate.getDataTypeId());
-
-										i++;
-										if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-											// flush a batch of inserts and release memory
-											session.flush();
-											session.clear();
-										}
 									}
 								}
 							}
@@ -328,9 +323,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				}
 			}
 
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
 			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
 		}
 
@@ -378,7 +371,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			GermplasmList germplasmList) throws MiddlewareQueryException {
 
 		Session session = this.getActiveSession();
-		Transaction trans = null;
 
 		GermplasmDAO germplasmDao = this.getGermplasmDao();
 		NameDAO nameDao = this.getNameDao();
@@ -387,8 +379,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		long startTime = System.currentTimeMillis();
 
 		try {
-			trans = session.beginTransaction();
-
 			germplasmListDao.save(germplasmList);
 
 			int i = 0;
@@ -452,9 +442,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 			}
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered with FieldbookService.saveNurseryAdvanceGermplasmList(germplasms=" + germplasms
 					+ ", germplasmList=" + germplasmList + "): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
 		} finally {
@@ -472,19 +462,16 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public Integer saveGermplasmList(Map<Germplasm, GermplasmListData> listDataItems, GermplasmList germplasmList)
 			throws MiddlewareQueryException {
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+
+
 
 		GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
 
 		long startTime = System.currentTimeMillis();
 
 		try {
-			trans = session.beginTransaction();
 
 			germplasmListDao.save(germplasmList);
-
-			int i = 0;
 
 			// Save germplasms, names, list data
 			for (Entry<Germplasm, GermplasmListData> entry : listDataItems.entrySet()) {
@@ -495,23 +482,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				germplasmListData.setGid(germplasm.getGid());
 				germplasmListData.setList(germplasmList);
 				this.getGermplasmListDataDAO().save(germplasmListData);
-
-				i++;
-				// flush a batch of inserts and release memory
-				if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					session.flush();
-					session.clear();
-				}
-
 			}
 
-			trans.commit();
+			
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
 			this.logAndThrowException("Error encountered with FieldbookService.saveNurseryAdvanceGermplasmList(germplasmList="
 					+ germplasmList + "): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
-		} finally {
-			session.flush();
 		}
 
 		FieldbookServiceImpl.LOG.debug("========== saveGermplasmList Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
@@ -947,7 +923,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			this.getExperimentDestroyer().deleteExperimentsByStudy(datasetId);
 			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+			
 			this.logAndThrowException("Error encountered with deleteObservationsOfStudy(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
 		}
 	}
@@ -1062,13 +1038,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		try {
-			trans = session.beginTransaction();
-
 			this.getStudyDestroyer().deleteStudy(studyId);
 
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
 			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
 		}
 	}
@@ -1135,18 +1107,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			int userId) throws MiddlewareQueryException {
 
 		int listId = 0;
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
 		try {
-			trans = session.beginTransaction();
 
 			listId = this.getListDataProjectSaver().saveOrUpdateListDataProject(projectId, type, originalListId, listDatas, userId);
 
-			trans.commit();
 		} catch (Exception e) {
 			FieldbookServiceImpl.LOG.error(e.getMessage(), e);
-			this.rollbackTransaction(trans);
 			this.logAndThrowException("Error encountered with saveOrUpdateListDataProject(): " + e.getMessage(), e,
 					FieldbookServiceImpl.LOG);
 		}
@@ -1155,19 +1121,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public void updateGermlasmListInfoStudy(int crossesListId, int studyId) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
 
 			this.getListDataProjectSaver().updateGermlasmListInfoStudy(crossesListId, studyId);
 
-			trans.commit();
 
 		} catch (Exception e) {
 			FieldbookServiceImpl.LOG.error(e.getMessage(), e);
-			this.rollbackTransaction(trans);
 			this.logAndThrowException("Error encountered with updateGermlasmListInfoStudy(): " + e.getMessage(), e,
 					FieldbookServiceImpl.LOG);
 		}
@@ -1210,19 +1171,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public void addListDataProjectList(List<ListDataProject> listDataProjectList) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
 
 		try {
-			trans = session.beginTransaction();
 			for (ListDataProject listDataProject : listDataProjectList) {
 				listDataProject.setList(this.getGermplasmListById(listDataProject.getList().getId()));
 				this.getListDataProjectDAO().save(listDataProject);
 			}
-			trans.commit();
 		} catch (Exception e) {
 			FieldbookServiceImpl.LOG.error(e.getMessage(), e);
-			this.rollbackTransaction(trans);
 			this.logAndThrowException("Error encountered with addListDataProjectList(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
 		}
 	}

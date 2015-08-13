@@ -18,11 +18,13 @@ import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * DAO class for {@link ProjectUserInfo}.
  *
  */
+@Transactional
 public class ProjectUserInfoDAO extends GenericDAO<ProjectUserInfo, Integer> {
 
 	public ProjectUserInfo getByProjectIdAndUserId(Integer projectId, Integer userId) throws MiddlewareQueryException {

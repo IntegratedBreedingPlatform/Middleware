@@ -36,8 +36,7 @@ import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.DatabaseBroker;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the LocationDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -45,6 +44,7 @@ import org.hibernate.Transaction;
  * @author Joyce Avestro
  */
 @SuppressWarnings("unchecked")
+@Transactional
 public class LocationDataManagerImpl extends DataManager implements LocationDataManager {
 
 	public LocationDataManagerImpl() {
@@ -278,38 +278,36 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public Integer addLocation(Location location) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		Integer idLocationSaved = null;
 		try {
-			// begin save transaction
-			trans = session.beginTransaction();
+			
+
 			LocationDAO dao = this.getLocationDao();
 
 			Location recordSaved = dao.saveOrUpdate(location);
 			idLocationSaved = recordSaved.getLocid();
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error encountered while saving Location: LocationDataManager.addLocation(location="
 					+ location + "): " + e.getMessage(), e);
-		} finally {
-			session.flush();
 		}
 		return idLocationSaved;
 	}
 
 	@Override
 	public List<Integer> addLocation(List<Location> locations) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		List<Integer> idLocationsSaved = new ArrayList<Integer>();
 		try {
-			// begin save transaction
-			trans = session.beginTransaction();
+			
+
 			LocationDAO dao = this.getLocationDao();
 
 			for (Location location : locations) {
@@ -317,26 +315,24 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 				idLocationsSaved.add(recordSaved.getLocid());
 			}
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error encountered while saving Locations: LocationDataManager.addLocation(locations="
 					+ locations + "): " + e.getMessage(), e);
-		} finally {
-			session.flush();
 		}
 		return idLocationsSaved;
 	}
 
 	@Override
 	public int addLocationAndLocdes(Location location, Locdes locdes) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		Integer idLocationSaved = null;
 		try {
-			// begin save transaction
-			trans = session.beginTransaction();
+			
+
 
 			// Auto-assign IDs for new DB records
 			LocationDAO locationDao = this.getLocationDao();
@@ -347,32 +343,27 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			locdes.setLocationId(idLocationSaved);
 			locdesDao.saveOrUpdate(locdes);
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
 			throw new MiddlewareQueryException("Error encountered while saving Location: addLocationAndLocdes(" + "location=" + location
 					+ ", locdes=" + locdes + "): " + e.getMessage(), e);
-		} finally {
-			session.flush();
 		}
 		return idLocationSaved;
 	}
 
 	@Override
 	public void deleteLocation(Location location) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getLocationDao().makeTransient(location);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error encountered while deleting Location: LocationDataManager.deleteLocation(location="
 					+ location + "): " + e.getMessage(), e);
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -537,12 +528,12 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public void deleteProgramLocationsByUniqueId(String programUUID) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 		LocationDAO locationDao = this.getLocationDao();
 		int deleted = 0;
 		try {
-			trans = session.beginTransaction();
+
 			List<Location> list = this.getProgramLocations(programUUID);
 			for (Location location : list) {
 				locationDao.makeTransient(location);
@@ -551,14 +542,12 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 					locationDao.clear();
 				}
 			}
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException(
 					"Error encountered while deleting locations: GermplasmDataManager.deleteProgramLocationsByUniqueId(uniqueId="
 							+ programUUID + "): " + e.getMessage(), e);
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -571,23 +560,13 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	public void saveOrUpdateLocdesList(Integer locId, List<Locdes> locdesList) throws MiddlewareQueryException {
 
 		if (locdesList != null && !locdesList.isEmpty()) {
-
-			Session session = this.getCurrentSession();
-			Transaction trans = null;
-
 			try {
-				trans = session.beginTransaction();
-
 				List<Locdes> existingLocdesList = this.getLocDesDao().getByLocation(locId);
 				for (Locdes locdes : locdesList) {
 					this.getLocdesSaver().saveOrUpdateLocdes(locdes.getLocationId(), existingLocdesList, locdes.getTypeId(),
 							locdes.getDval(), locdes.getUserId());
 				}
-
-				trans.commit();
-
 			} catch (Exception e) {
-				this.rollbackTransaction(trans);
 				this.logAndThrowException("Error encountered with saveOrUpdateLocdesList(): " + e.getMessage(), e);
 			}
 		}

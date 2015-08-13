@@ -31,8 +31,6 @@ import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Query;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -204,11 +202,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 		// Constant CvId
 		scale.setVocabularyId(CvId.SCALES.getId());
 
-		Session session = this.getActiveSession();
-		Transaction transaction = null;
-
 		try {
-			transaction = session.beginTransaction();
 
 			// Saving term to database.
 			CVTerm savedTerm = this.getCvTermDao().save(scale.getName(), scale.getDefinition(), CvId.SCALES);
@@ -250,10 +244,8 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			// Save creation time
 			this.getCvTermPropertyDao().save(scale.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
-			transaction.commit();
 
 		} catch (Exception e) {
-			this.rollbackTransaction(transaction);
 			throw new MiddlewareQueryException("Error at addScale :" + e.getMessage(), e);
 		}
 	}
@@ -346,11 +338,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 					}
 				});
 
-		Session session = this.getActiveSession();
-		Transaction transaction = null;
-
 		try {
-			transaction = session.beginTransaction();
 
 			// Constant CvId
 			scale.setVocabularyId(CvId.SCALES.getId());
@@ -439,10 +427,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			// Save last modified Time
 			this.getCvTermPropertyDao().save(scale.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
-			transaction.commit();
-
 		} catch (Exception e) {
-			this.rollbackTransaction(transaction);
 			throw new MiddlewareQueryException("Error at updateScale :" + e.getMessage(), e);
 		}
 
@@ -476,11 +461,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_IS_REFERRED_TO_VARIABLE);
 		}
 
-		Session session = this.getActiveSession();
-		Transaction transaction = null;
-
 		try {
-			transaction = session.beginTransaction();
 
 			// Deleting existing relationships for property
 			List<Integer> categoricalTermIds = new ArrayList<>();
@@ -510,10 +491,9 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			}
 
 			this.getCvTermDao().makeTransient(term);
-			transaction.commit();
+
 
 		} catch (Exception e) {
-			this.rollbackTransaction(transaction);
 			throw new MiddlewareQueryException("Error at deleteScale" + e.getMessage(), e);
 		}
 	}

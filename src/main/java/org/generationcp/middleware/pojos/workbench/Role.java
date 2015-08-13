@@ -16,6 +16,7 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -46,7 +47,7 @@ public class Role implements Serializable {
 	@Column(name = "name")
 	private String name;
 
-	@OneToOne(optional = false)
+	@OneToOne(optional = false, fetch = FetchType.LAZY)
 	@JoinColumn(name = "workflow_template_id")
 	private WorkflowTemplate workflowTemplate;
 
@@ -115,8 +116,6 @@ public class Role implements Serializable {
 		builder.append(this.roleId);
 		builder.append(", name=");
 		builder.append(this.name);
-		builder.append(", workflowTemplate=");
-		builder.append(this.workflowTemplate);
 		builder.append("]");
 		return builder.toString();
 	}

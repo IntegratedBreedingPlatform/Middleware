@@ -20,16 +20,21 @@ import org.generationcp.middleware.service.api.study.TraitService;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class StudyServiceImpl extends Service implements StudyService {
 
-	final TraitService trialTraits;
+	private TraitService trialTraits;
 
-	final StudyMeasurements studyMeasurements;
+	private StudyMeasurements studyMeasurements;
 
-	final StudyGermplasmListService studyGermplasmListService;
+	private StudyGermplasmListService studyGermplasmListService;
 
+	public StudyServiceImpl() {
+		super();
+	}
+	
 	public StudyServiceImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 		Session currentSession = this.getCurrentSession();
@@ -130,16 +135,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		final Session currentSession = this.getCurrentSession();
 		final Observations observations = new Observations(currentSession);
-		Transaction tx = null;
 		try {
-			tx = currentSession.beginTransaction();
 			ObservationDto updatedMeasurement = observations.updataObsevationTraits(middlewareMeasurement);
-			tx.commit();
 			return updatedMeasurement;
 		} catch (RuntimeException e) {
-			if (tx != null) {
-				tx.rollback();
-			}
 			throw e; // or display error message
 		}
 	}

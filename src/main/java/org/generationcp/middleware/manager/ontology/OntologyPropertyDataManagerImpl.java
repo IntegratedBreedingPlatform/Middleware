@@ -1,7 +1,15 @@
 
 package org.generationcp.middleware.manager.ontology;
 
-import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -17,10 +25,8 @@ import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
-import java.util.*;
+import com.google.common.base.Strings;
 
 /**
  * Implements {@link OntologyPropertyDataManagerImpl}
@@ -250,11 +256,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
 		List<Term> allClasses = this.getCvTermDao().getTermByCvId(CvId.TRAIT_CLASS.getId());
 
-		Session session = this.getActiveSession();
-		Transaction transaction = null;
-
 		try {
-			transaction = session.beginTransaction();
 
 			CVTerm propertyTerm = this.getCvTermDao().save(property.getName(), property.getDefinition(), CvId.PROPERTIES);
 			property.setId(propertyTerm.getCvTermId());
@@ -298,9 +300,8 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 			// Save creation time
 			this.getCvTermPropertyDao().save(property.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
-			transaction.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(transaction);
 			throw new MiddlewareQueryException("Error at addProperty :" + e.getMessage(), e);
 		}
 	}
@@ -314,11 +315,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
 		List<Term> allClasses = this.getCvTermDao().getTermByCvId(CvId.TRAIT_CLASS.getId());
 
-		Session session = this.getActiveSession();
-		Transaction transaction = null;
-
 		try {
-			transaction = session.beginTransaction();
 
 			term.setName(property.getName());
 			term.setDefinition(property.getDefinition());
@@ -391,9 +388,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 			// Save last modified Time
 			this.getCvTermPropertyDao().save(property.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
-			transaction.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(transaction);
 			throw new MiddlewareQueryException("Error at updateProperty" + e.getMessage(), e);
 		}
 	}
@@ -409,11 +404,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 			throw new MiddlewareException(OntologyPropertyDataManagerImpl.PROPERTY_IS_REFERRED_TO_VARIABLE);
 		}
 
-		Session session = this.getActiveSession();
-		Transaction transaction = null;
-
 		try {
-			transaction = session.beginTransaction();
 
 			// Deleting existing relationships for property
 			List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(propertyId);
@@ -430,10 +421,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 			}
 
 			this.getCvTermDao().makeTransient(term);
-			transaction.commit();
-
 		} catch (HibernateException e) {
-			this.rollbackTransaction(transaction);
 			throw new MiddlewareQueryException("Error at deleteProperty" + e.getMessage(), e);
 		}
 	}

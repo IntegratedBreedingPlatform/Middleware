@@ -19,13 +19,14 @@ import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * DAO class for {@link Tool}.
  *
  */
+@Transactional
 public class ToolDAO extends GenericDAO<Tool, Long> {
 
 	public Tool getByToolName(String toolName) throws MiddlewareQueryException {
@@ -76,14 +77,14 @@ public class ToolDAO extends GenericDAO<Tool, Long> {
 	@Override
 	public Tool save(Tool entity) throws MiddlewareQueryException {
 
-		Transaction tx = this.getSession().beginTransaction();
+
 
 		try {
 			Tool out = super.save(entity);
-			tx.commit();
+
 			return out;
 		} catch (MiddlewareQueryException e) {
-			tx.rollback();
+
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 	}
@@ -91,14 +92,14 @@ public class ToolDAO extends GenericDAO<Tool, Long> {
 	@Override
 	public Tool update(Tool entity) throws MiddlewareQueryException {
 
-		Transaction tx = this.getSession().beginTransaction();
+
 
 		try {
 			Tool out = super.update(entity);
-			tx.commit();
+
 			return out;
 		} catch (MiddlewareQueryException e) {
-			tx.rollback();
+
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 	}

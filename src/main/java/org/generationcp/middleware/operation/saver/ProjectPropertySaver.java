@@ -36,7 +36,6 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Hibernate;
-import org.hibernate.Session;
 
 public class ProjectPropertySaver extends Saver {
 
@@ -346,13 +345,12 @@ public class ProjectPropertySaver extends Saver {
 	private void deleteVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, PhenotypicType role,
 			int termId, Geolocation geolocation) throws MiddlewareQueryException {
 
-		Session session = this.getCurrentSession();
+		
 		this.deleteVariable(project, termId);
 		if (PhenotypicType.TRIAL_ENVIRONMENT == role) {
 			this.deleteVariable(trialDataset, termId);
 			this.deleteVariable(measurementDataset, termId);
-			session.flush();
-			session.clear();
+
 
 			if (this.isInGeolocation(termId)) {
 				this.getGeolocationSaver().setGeolocation(geolocation, termId, null);

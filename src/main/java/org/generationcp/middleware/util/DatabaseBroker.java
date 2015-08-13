@@ -137,18 +137,7 @@ public class DatabaseBroker {
 		return null;
 	}
 
-	/**
-	 * Rolls back a given transaction
-	 * 
-	 * @param trans current transaction
-	 */
-	public void rollbackTransaction(Transaction trans) {
-		if (trans != null) {
-			trans.rollback();
-		}
-	}
-
-	public DmsProjectDao getDmsProjectDao() {
+	protected DmsProjectDao getDmsProjectDao() {
 		DmsProjectDao dmsProjectDao = new DmsProjectDao();
 		dmsProjectDao.setSession(this.getActiveSession());
 		return dmsProjectDao;

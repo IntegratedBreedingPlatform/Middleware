@@ -50,7 +50,6 @@ import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.ReportService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
-import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +68,6 @@ public class ManagerFactory implements Serializable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ManagerFactory.class);
 
-	private SessionFactory sessionFactory;
 	private HibernateSessionProvider sessionProvider;
 
 	private String databaseName;
@@ -85,14 +83,6 @@ public class ManagerFactory implements Serializable {
 		return ManagerFactory.currentManagerFactory;
 	}
 
-	public SessionFactory getsessionFactory() {
-		return this.sessionFactory;
-	}
-
-	public void setsessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
-
 	public HibernateSessionProvider getSessionProvider() {
 		return this.sessionProvider;
 	}
@@ -106,7 +96,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public PedigreeDataManager getPedigreeDataManager() {
-		return new PedigreeDataManagerImpl(this.sessionProvider);
+		return new PedigreeDataManagerImpl(sessionProvider, databaseName);
 	}
 
 	public CrossStudyDataManager getCrossStudyDataManager() {
@@ -223,9 +213,6 @@ public class ManagerFactory implements Serializable {
 			this.sessionProvider.close();
 		}
 
-		if (this.sessionFactory != null && !this.sessionFactory.isClosed()) {
-			this.sessionFactory.close();
-		}
 		ManagerFactory.currentManagerFactory.remove();
 		ManagerFactory.LOG.trace("Closing ManagerFactory...Done.");
 	}
