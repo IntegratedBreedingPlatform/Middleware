@@ -2137,11 +2137,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_MTA);
 			dataset.setUploadTemplateDate(new Date());
-			// TODO review this -ve id based logic.. Overall, this whole methods seems to be unused no refs from GDMS code. Remove entirely,
-			// once confirmed.
-			if (dataset.getDatasetId() < 0) {
-				this.getDatasetDao().merge(dataset);
-			}
+			
+			this.getDatasetDao().merge(dataset);
+			
 
 			users.setDatasetId(dataset.getDatasetId());
 			this.getDatasetUsersDao().merge(users);
@@ -2162,6 +2160,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	}
 
 	@Override
+	public Integer addMTA(Mta mta) throws MiddlewareQueryException {
+		return ((Mta)super.save(getMtaDao(), mta)).getMtaId();
+	}
+
+	@Override
 	public void setMTA(Dataset dataset, DatasetUsers users, List<Mta> mtaList, MtaMetadata mtaMetadata) throws MiddlewareQueryException {
 
 		if (dataset == null) {
@@ -2176,11 +2179,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_MTA);
 			dataset.setUploadTemplateDate(new Date());
-			// TODO review this -ve id based logic.. Overall, this whole methods seems to be unused no refs from GDMS code. Remove entirely,
-			// once confirmed.
-			if (dataset.getDatasetId() < 0) {
-				this.getDatasetDao().merge(dataset);
-			}
+			
+			this.getDatasetDao().merge(dataset);
+			
 
 			users.setDatasetId(dataset.getDatasetId());
 			this.getDatasetUsersDao().merge(users);
@@ -2801,6 +2802,16 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 					+ trackMarkers + "): " + e.getMessage(), e);
 		}
 
+	}
+
+	@Override
+	public Integer addTrackData(TrackData trackData) throws MiddlewareQueryException {
+		return ((TrackData)super.save(getTrackDataDao(), trackData)).getTrackId();
+	}
+
+	@Override
+	public Integer addTrackMarker(TrackMarker trackMarker) throws MiddlewareQueryException {
+		return ((TrackMarker)super.save(getTrackMarkerDao(), trackMarker)).getTrackId();
 	}
 
 	// GCP-7881
