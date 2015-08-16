@@ -11,9 +11,9 @@
 
 package org.generationcp.middleware.domain.dms;
 
-import org.generationcp.middleware.util.Debug;
-
 import java.io.Serializable;
+
+import org.generationcp.middleware.util.Debug;
 
 /**
  * Contains the details of a variable type - local name, local description and rank.

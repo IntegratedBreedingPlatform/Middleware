@@ -1,13 +1,18 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
-import org.generationcp.middleware.domain.dms.*;
+import java.util.List;
+
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-
-import java.util.List;
 
 public class StudyValuesTransformer extends Transformer {
 

@@ -1,11 +1,11 @@
 
 package org.generationcp.middleware.manager.ontology.daoElements;
 
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.ontology.VariableType;
-
 import java.util.HashSet;
 import java.util.Set;
+
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.VariableType;
 
 /**
  * This class consist of variable association ids and basic values.

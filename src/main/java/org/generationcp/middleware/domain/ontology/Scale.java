@@ -11,14 +11,12 @@
 
 package org.generationcp.middleware.domain.ontology;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.util.Debug;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Extends {@link Term}

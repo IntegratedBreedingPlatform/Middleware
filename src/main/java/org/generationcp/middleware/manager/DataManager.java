@@ -58,8 +58,6 @@ import org.generationcp.middleware.operation.saver.StockSaver;
 import org.generationcp.middleware.operation.saver.StudySaver;
 import org.generationcp.middleware.operation.searcher.StudySearcherByNameStartSeasonCountry;
 import org.generationcp.middleware.util.DatabaseBroker;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

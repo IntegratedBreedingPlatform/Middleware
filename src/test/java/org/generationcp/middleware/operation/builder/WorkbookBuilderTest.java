@@ -11,9 +11,21 @@
 
 package org.generationcp.middleware.operation.builder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.domain.dms.*;
-import org.generationcp.middleware.domain.etl.*;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.MeasurementData;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.etl.WorkbookTest;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -29,9 +41,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class WorkbookBuilderTest extends DataManagerIntegrationTest {
 

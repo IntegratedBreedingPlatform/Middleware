@@ -11,14 +11,27 @@
 
 package org.generationcp.middleware.service.api;
 
-import org.generationcp.middleware.domain.dms.*;
-import org.generationcp.middleware.domain.oms.*;
+import java.util.List;
+import java.util.Set;
+
+import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariableSummary;
+import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.dms.VariableConstraints;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Method;
+import org.generationcp.middleware.domain.oms.Property;
+import org.generationcp.middleware.domain.oms.Scale;
+import org.generationcp.middleware.domain.oms.StandardVariableReference;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TraitClass;
+import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  *

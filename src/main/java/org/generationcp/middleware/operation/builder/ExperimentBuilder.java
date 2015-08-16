@@ -11,13 +11,31 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import org.generationcp.middleware.domain.dms.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.pojos.dms.*;
-
-import java.util.*;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentProject;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.generationcp.middleware.pojos.dms.ExperimentStock;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.dms.StockProperty;
 
 public class ExperimentBuilder extends Builder {
 	

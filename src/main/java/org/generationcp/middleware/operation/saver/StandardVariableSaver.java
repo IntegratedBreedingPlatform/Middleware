@@ -33,7 +33,6 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
-import org.generationcp.middleware.util.StringUtil;
 
 public class StandardVariableSaver extends Saver {
 

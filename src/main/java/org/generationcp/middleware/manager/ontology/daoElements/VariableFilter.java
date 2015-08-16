@@ -1,10 +1,10 @@
 package org.generationcp.middleware.manager.ontology.daoElements;
 
-import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.ontology.DataType;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.VariableType;
 
 public class VariableFilter {
 	private String programUuid;

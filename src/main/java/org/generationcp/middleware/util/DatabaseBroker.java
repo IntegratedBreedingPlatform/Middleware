@@ -85,7 +85,6 @@ import org.generationcp.middleware.dao.oms.VariableOverridesDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 /**
  * Used to handle DAO instances and sessions connecting to the database. Superclass of DataManager, Builder, Searcher and Saver classes.

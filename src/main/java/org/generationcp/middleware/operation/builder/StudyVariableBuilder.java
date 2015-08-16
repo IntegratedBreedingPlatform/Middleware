@@ -11,14 +11,18 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import org.generationcp.middleware.domain.dms.*;
+import java.util.List;
+
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
-
-import java.util.List;
 
 public class StudyVariableBuilder extends Builder {
 

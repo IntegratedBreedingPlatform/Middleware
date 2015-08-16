@@ -11,7 +11,14 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
-import org.generationcp.middleware.domain.dms.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetValues;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.utils.test.Debug;
@@ -20,9 +27,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class DatasetValuesTransformerTest extends TestOutputFormatter {
 

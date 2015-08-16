@@ -11,15 +11,23 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import org.generationcp.middleware.domain.dms.*;
+import java.util.Set;
+
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.Stock;
+import org.generationcp.middleware.domain.dms.Stocks;
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
-
-import java.util.Set;
 
 public class StockBuilder extends Builder {
 

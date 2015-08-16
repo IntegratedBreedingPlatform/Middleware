@@ -1,7 +1,17 @@
 
 package org.generationcp.middleware;
 
-import org.generationcp.middleware.domain.dms.*;
+import java.util.List;
+import java.util.Random;
+
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.FolderReference;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -9,9 +19,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-
-import java.util.List;
-import java.util.Random;
 
 public class StudyTestDataUtil extends DataManagerIntegrationTest {
 

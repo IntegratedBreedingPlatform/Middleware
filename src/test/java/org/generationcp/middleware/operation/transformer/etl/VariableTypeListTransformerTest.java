@@ -11,6 +11,9 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -24,9 +27,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class VariableTypeListTransformerTest extends DataManagerIntegrationTest {
 

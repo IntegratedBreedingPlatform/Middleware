@@ -11,7 +11,7 @@
 
 package org.generationcp.middleware.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
 
 import java.util.ArrayList;
 import java.util.List;

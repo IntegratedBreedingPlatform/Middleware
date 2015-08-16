@@ -1,8 +1,16 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.generationcp.middleware.MiddlewareIntegrationTest;
-import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -12,9 +20,6 @@ import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MeasurementVariableTransformerTest extends MiddlewareIntegrationTest {
 

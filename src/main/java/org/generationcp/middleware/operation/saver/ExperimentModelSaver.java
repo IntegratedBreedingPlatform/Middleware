@@ -16,22 +16,18 @@ import java.util.List;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.Values;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
 import org.generationcp.middleware.pojos.dms.ExperimentProject;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.util.DatabaseBroker;
 
 public class ExperimentModelSaver extends Saver {

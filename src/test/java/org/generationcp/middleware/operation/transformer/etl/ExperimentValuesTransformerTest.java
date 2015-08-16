@@ -11,6 +11,9 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -24,9 +27,6 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ExperimentValuesTransformerTest extends TestOutputFormatter {
 

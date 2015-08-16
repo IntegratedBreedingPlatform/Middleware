@@ -11,7 +11,27 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import org.generationcp.middleware.domain.dms.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.DatasetValues;
+import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.dms.ExperimentValues;
+import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -31,8 +51,6 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.util.TimerWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.*;
 
 // ASsumptions - can be added to validations
 // Mandatory fields: workbook.studyDetails.studyName

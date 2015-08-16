@@ -11,9 +11,9 @@
 
 package org.generationcp.middleware.domain.dms;
 
-import org.generationcp.middleware.domain.oms.TermSummary;
-
 import java.io.Serializable;
+
+import org.generationcp.middleware.domain.oms.TermSummary;
 
 public class ValueReference extends Reference implements Serializable, Comparable<ValueReference> {
 

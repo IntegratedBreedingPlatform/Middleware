@@ -11,7 +11,23 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import org.generationcp.middleware.domain.dms.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.TrialEnvironment;
+import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
+import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -20,9 +36,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
-
-import java.util.*;
-import java.util.Map.Entry;
 
 public class TrialEnvironmentBuilder extends Builder {
 

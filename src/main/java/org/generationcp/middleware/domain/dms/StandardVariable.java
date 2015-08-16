@@ -11,16 +11,16 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.util.Debug;
-
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * The Standard Variable with term, property, scale, method, data type, etc.
