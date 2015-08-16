@@ -30,11 +30,13 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the GermplasmListManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
  */
 @SuppressWarnings("unchecked")
+@Transactional
 public class GermplasmListManagerImpl extends DataManager implements GermplasmListManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListManagerImpl.class);
