@@ -44,13 +44,14 @@ import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Function;
 
 /**
  * Implements {@link OntologyVariableDataManagerImpl}
  */
-
+@Transactional
 public class OntologyVariableDataManagerImpl extends DataManager implements OntologyVariableDataManager {
 
 	private static final String VARIABLE_DOES_NOT_EXIST = "Variable does not exist";
@@ -58,10 +59,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	private static final String VARIABLE_EXIST_WITH_SAME_NAME = "Variable exist with same name";
 	private static final String CAN_NOT_DELETE_USED_VARIABLE = "Used variable can not be deleted";
 
-	private final OntologyMethodDataManager methodDataManager;
-	private final OntologyPropertyDataManager propertyDataManager;
-	private final OntologyScaleDataManager scaleDataManager;
+	private OntologyMethodDataManager methodDataManager;
+	private OntologyPropertyDataManager propertyDataManager;
+	private OntologyScaleDataManager scaleDataManager;
 
+	public OntologyVariableDataManagerImpl() {
+		super();
+	}
+	
 	public OntologyVariableDataManagerImpl(OntologyMethodDataManager methodDataManager, OntologyPropertyDataManager propertyDataManager,
 			OntologyScaleDataManager scaleDataManager, HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);

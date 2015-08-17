@@ -31,6 +31,7 @@ import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -38,6 +39,7 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 
+@Transactional
 public class OntologyScaleDataManagerImpl extends DataManager implements OntologyScaleDataManager {
 
 	private static final String SCALE_DOES_NOT_EXIST = "Scale does not exist";
@@ -49,13 +51,15 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	private static final String SCALE_MAX_VALUE_NOT_VALID = "Max value is not valid";
 	private static final String SCALE_IS_REFERRED_TO_VARIABLE = "Scale is referred to variable.";
 
+	public OntologyScaleDataManagerImpl() {
+		super();
+	}
+	
 	public OntologyScaleDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}
 
-	public OntologyScaleDataManagerImpl() {
-		super();
-	}
+
 
 	@Override
 	public Scale getScaleById(int scaleId) throws MiddlewareException {

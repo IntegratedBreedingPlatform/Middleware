@@ -1,4 +1,4 @@
-
+ 
 package org.generationcp.middleware.manager.ontology;
 
 import java.util.ArrayList;
@@ -14,9 +14,13 @@ import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
-
+import org.springframework.transaction.annotation.Transactional;
+@Transactional
 public class TermDataManagerImpl extends DataManager implements TermDataManager {
 
+	public TermDataManagerImpl() {
+		
+	}
 	public TermDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}

@@ -23,16 +23,22 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.hibernate.HibernateException;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implements {@link OntologyMethodDataManager}
  */
+@Transactional
 public class OntologyMethodDataManagerImpl extends DataManager implements OntologyMethodDataManager {
 
 	private static final String METHOD_DOES_NOT_EXIST = "Method does not exist with that id";
 	private static final String TERM_IS_NOT_METHOD = "That term is not a METHOD";
 	private static final String METHOD_IS_REFERRED_TO_VARIABLE = "Method is referred to variable.";
 
+	public OntologyMethodDataManagerImpl() {
+		super();
+	}
+	
 	public OntologyMethodDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}

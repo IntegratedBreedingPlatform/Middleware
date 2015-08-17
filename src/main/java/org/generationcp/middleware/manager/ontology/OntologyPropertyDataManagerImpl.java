@@ -25,13 +25,14 @@ import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Strings;
 
 /**
  * Implements {@link OntologyPropertyDataManagerImpl}
  */
-
+@Transactional
 public class OntologyPropertyDataManagerImpl extends DataManager implements OntologyPropertyDataManager {
 
 	private static final String SHOULD_VALID_TRAIT_CLASS = "Term should be of valid TRAIT_CLASS";
@@ -39,6 +40,10 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 	private static final String TERM_IS_NOT_PROPERTY = "That term is not a PROPERTY";
 	private static final String PROPERTY_IS_REFERRED_TO_VARIABLE = "Property is referred to variable.";
 
+	public OntologyPropertyDataManagerImpl() {
+		super();
+	}
+	
 	public OntologyPropertyDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}

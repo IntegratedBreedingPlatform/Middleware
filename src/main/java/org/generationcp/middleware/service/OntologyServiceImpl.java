@@ -41,6 +41,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class OntologyServiceImpl extends Service implements OntologyService {
 
+	public OntologyServiceImpl() {
+		super();
+	}
+	
 	public OntologyServiceImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}
