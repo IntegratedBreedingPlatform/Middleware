@@ -17,7 +17,9 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.CrossExpansionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
@@ -83,7 +85,7 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 
 	/**
 	 * Recursive procedure to generate the pedigree
-	 *
+	 * 
 	 * @param pGid Input GID
 	 * @param level default zero
 	 * @param parentGermplasmClass empty class
