@@ -14,11 +14,9 @@ package org.generationcp.middleware.operation.saver;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -137,7 +135,7 @@ public class WorkbookSaver extends Saver {
 	@SuppressWarnings("unchecked")
 	public int saveDataset(Workbook workbook, Map<String, ?> variableMap, boolean retainValues, boolean isDeleteObservations,
 			String programUUID) throws Exception {
-		
+
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
 		Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
 		Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
@@ -403,7 +401,6 @@ public class WorkbookSaver extends Saver {
 			List<String> trialHeaders, Map<Integer, VariableList> trialVariatesMap, boolean isDeleteTrialObservations, String programUUID)
 					throws MiddlewareQueryException {
 
-		Set<String> trialInstanceNumbers = new HashSet<String>();
 		List<MeasurementRow> observations = null;
 		Long geolocationId = null;
 		boolean hasTrialObservations = false;
@@ -416,14 +413,12 @@ public class WorkbookSaver extends Saver {
 		} else {
 			observations = workbook.getObservations();
 		}
-		Map<String, Integer> locationMap = new HashMap<String, Integer>();
+		Map<String, Long> locationMap = new HashMap<String, Long>();
 		if (observations != null) {
 			for (MeasurementRow row : observations) {
 				geolocationId = row.getLocationId();
-				if (geolocationId != null && geolocationId != 0) {
-					// if geolocationId already exists, no need to create the geolocation
-					row.setLocationId(geolocationId);
-				} else {
+				if (geolocationId == null || geolocationId == 0) {
+					// if geolocationId does not exist, create the geolocation and set to row.locationId
 					TimerWatch watch = new TimerWatch("transformTrialEnvironment in createLocationsAndSetToObservations");
 					VariableList geolocation = this.getVariableListTransformer().transformTrialEnvironment(row, trialFactors, trialHeaders);
 					if (geolocation != null && !geolocation.isEmpty()) {
@@ -431,7 +426,7 @@ public class WorkbookSaver extends Saver {
 						if (WorkbookSaver.LOG.isDebugEnabled()) {
 							WorkbookSaver.LOG.debug("trialInstanceNumber = " + trialInstanceNumber);
 						}
-						if (trialInstanceNumbers.add(trialInstanceNumber)) {
+						if (!locationMap.containsKey(trialInstanceNumber)) {
 							// if new location (unique by trial instance number)
 							watch.restart("save geolocation");
 							Geolocation g =
@@ -445,9 +440,11 @@ public class WorkbookSaver extends Saver {
 								trialVariates.addAll(g.getVariates());
 								trialVariatesMap.put(geolocationId.intValue(), trialVariates);
 							}
+							locationMap.put(trialInstanceNumber, geolocationId);
+						} else {
+							geolocationId = locationMap.get(trialInstanceNumber);
 						}
-						row.setLocationId(geolocationId.intValue());
-						locationMap.put(trialInstanceNumber, geolocationId.intValue());
+						row.setLocationId(geolocationId);
 					}
 				}
 			}
@@ -456,8 +453,7 @@ public class WorkbookSaver extends Saver {
 				for (MeasurementRow row : workbook.getObservations()) {
 					String trialInstance = this.getTrialInstanceNumber(row);
 					if (trialInstance != null) {
-						Integer locId = locationMap.get(trialInstance);
-						row.setLocationId(locId);
+						row.setLocationId(locationMap.get(trialInstance));
 					} else if (geolocationId != null && geolocationId != 0) {
 						row.setLocationId(geolocationId);
 					}
@@ -712,7 +708,7 @@ public class WorkbookSaver extends Saver {
 
 		// observation values start at row 2
 		int i = 2;
-		
+
 		ExperimentValuesTransformer experimentValuesTransformer = this.getExperimentValuesTransformer();
 		ExperimentModelSaver experimentModelSaver = this.getExperimentModelSaver();
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
@@ -1064,7 +1060,7 @@ public class WorkbookSaver extends Saver {
 
 		// observation values start at row 2
 		int i = 2;
-		
+
 		ExperimentValuesTransformer experimentValuesTransformer = this.getExperimentValuesTransformer();
 		ExperimentModelSaver experimentModelSaver = this.getExperimentModelSaver();
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
