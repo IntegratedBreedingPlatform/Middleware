@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.dao.dms;
@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Phenotype}.
- *
+ * 
  */
 @SuppressWarnings("unchecked")
 public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
@@ -934,7 +934,16 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return null;
 	}
 
-	public Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId) {
+	public Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId, int germplasmTermId) {
+
+		String groupByGermplasm = "nd_exp_stock.stock_id";
+		if (germplasmTermId == TermId.DESIG.getId()) {
+			groupByGermplasm = "stock.name";
+		} else if (germplasmTermId == TermId.GID.getId()) {
+			groupByGermplasm = "stock.dbxref_id";
+		} else if (germplasmTermId == TermId.ENTRY_NO.getId()) {
+			groupByGermplasm = "stock.uniquename";
+		}
 
 		StringBuilder sql =
 				new StringBuilder()
@@ -943,12 +952,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 						.append(" nd_experiment_project a ")
 						.append(" INNER JOIN nd_experiment nd_exp ON a.nd_experiment_id = nd_exp.nd_experiment_id ")
 						.append(" INNER JOIN nd_experiment_stock nd_exp_stock ON nd_exp.nd_experiment_id = nd_exp_stock.nd_experiment_id ")
+						.append(" INNER JOIN stock ON nd_exp_stock.stock_id = stock.stock_id ")
 						.append(" LEFT JOIN nd_experiment_phenotype nd_exp_pheno ON nd_exp.nd_experiment_id = nd_exp_pheno.nd_experiment_id ")
 						.append(" LEFT JOIN phenotype  ON nd_exp_pheno.phenotype_id = phenotype.phenotype_id ")
 						.append(" where a.project_id = ").append(projectId).append(" and nd_exp.nd_geolocation_id = ").append(locationId)
 						.append(" and ((phenotype.value <> '' and phenotype.value is not null) or ")
 						.append(" (phenotype.cvalue_id <> '' and phenotype.cvalue_id is not null)) ")
-						.append(" group by nd_exp.nd_geolocation_id, nd_exp_stock.stock_id, phenotype.observable_id ")
+						.append(" group by nd_exp.nd_geolocation_id, ").append(groupByGermplasm).append(" , phenotype.observable_id ")
 						.append(" having count(phenotype.observable_id) >= 2 LIMIT 1 ");
 
 		SQLQuery query = this.getSession().createSQLQuery(sql.toString());

@@ -1,13 +1,13 @@
 /*******************************************************************************
  * 
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.dao.dms;
@@ -21,6 +21,7 @@ import org.generationcp.middleware.DataManagerIntegrationTest;
 import org.generationcp.middleware.MiddlewareIntegrationTest;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.junit.AfterClass;
@@ -91,9 +92,9 @@ public class PhenotypeDaoTest extends DataManagerIntegrationTest {
 				}
 			}
 			Assert.assertTrue("The plot dataset should have at least 2 common entries for analysis",
-					PhenotypeDaoTest.dao.containsAtLeast2CommonEntriesWithValues(plotId, locationId));
+					PhenotypeDaoTest.dao.containsAtLeast2CommonEntriesWithValues(plotId, locationId, TermId.ENTRY_NO.getId()));
 			Assert.assertFalse("The trial dataset does not contain entries for analysis",
-					PhenotypeDaoTest.dao.containsAtLeast2CommonEntriesWithValues(trialId, locationId));
+					PhenotypeDaoTest.dao.containsAtLeast2CommonEntriesWithValues(trialId, locationId, TermId.ENTRY_NO.getId()));
 		}
 	}
 

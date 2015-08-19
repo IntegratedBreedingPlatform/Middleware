@@ -1084,9 +1084,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId) throws MiddlewareQueryException {
+	public Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId, int germplasmTermId)
+			throws MiddlewareQueryException {
 
-		return this.getPhenotypeDao().containsAtLeast2CommonEntriesWithValues(projectId, locationId);
+		return this.getPhenotypeDao().containsAtLeast2CommonEntriesWithValues(projectId, locationId, germplasmTermId);
 	}
 
 	public void setLocationDataManager(LocationDataManager locationDataManager) {
