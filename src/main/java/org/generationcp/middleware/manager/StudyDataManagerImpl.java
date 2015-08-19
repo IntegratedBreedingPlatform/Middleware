@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -172,8 +172,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID)
 			throws MiddlewareQueryException {
-		
-		
 
 		try {
 
@@ -193,8 +191,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public DatasetReference addDataSet(int studyId, VariableTypeList variableTypeList, DatasetValues datasetValues, String programUUID)
 			throws MiddlewareQueryException {
-		
-		
 
 		try {
 
@@ -230,7 +226,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList)
-					throws MiddlewareQueryException {
+			throws MiddlewareQueryException {
 		this.clearSessions();
 		if (varTypeList == null) {
 			return this.getExperiments(dataSetId, start, numOfRows);
@@ -247,13 +243,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public void addExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues)
 			throws MiddlewareQueryException {
-		
-		
 
 		try {
 
 			this.getExperimentModelSaver().addExperiment(dataSetId, experimentType, experimentValues);
-
 
 		} catch (Exception e) {
 
@@ -264,13 +257,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues)
 			throws MiddlewareQueryException {
-		
-		
 
 		try {
 
 			this.getExperimentModelSaver().addOrUpdateExperiment(dataSetId, experimentType, experimentValues);
-
 
 		} catch (Exception e) {
 
@@ -280,18 +270,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValuesList)
-					throws MiddlewareQueryException {
-		
-		
+			throws MiddlewareQueryException {
 
 		try {
-
 
 			for (ExperimentValues experimentValues : experimentValuesList) {
 				this.getExperimentModelSaver().addOrUpdateExperiment(dataSetId, experimentType, experimentValues);
 			}
-
-
 
 		} catch (Exception e) {
 
@@ -302,8 +287,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public int addTrialEnvironment(VariableList variableList) throws MiddlewareQueryException {
-		
-		
 
 		try {
 
@@ -320,8 +303,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public int addStock(VariableList variableList) throws MiddlewareQueryException {
-		
-		
 
 		try {
 
@@ -359,13 +340,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void addDataSetVariableType(int datasetId, VariableType variableType) throws MiddlewareQueryException {
-		
-		
 
 		try {
 
 			this.getDatasetProjectSaver().addDatasetVariableType(datasetId, variableType);
-
 
 		} catch (Exception e) {
 
@@ -375,13 +353,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void setExperimentValue(int experimentId, int variableId, String value) throws MiddlewareQueryException {
-		
-		
 
 		try {
 
 			this.getExperimentModelSaver().setExperimentValue(experimentId, variableId, value);
-
 
 		} catch (Exception e) {
 
@@ -421,8 +396,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void deleteDataSet(int datasetId) throws MiddlewareQueryException {
-		
-		
 
 		try {
 
@@ -436,8 +409,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void deleteExperimentsByLocation(int datasetId, int locationId) throws MiddlewareQueryException {
-		
-		
 
 		try {
 
@@ -551,11 +522,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		if (info != null && !info.isEmpty()) {
 
-			
-			
-
 			try {
-
 
 				if (isNew) {
 					this.getLocdesSaver().saveLocationDescriptions(info, userId);
@@ -564,8 +531,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				}
 				this.getGeolocationPropertySaver().saveFieldmapProperties(info);
 				this.getExperimentPropertySaver().saveFieldmapProperties(info);
-
-
 
 			} catch (Exception e) {
 
@@ -579,8 +544,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public void saveTrialDatasetSummary(DmsProject project, VariableTypeList variableTypeList, List<ExperimentValues> experimentValues,
 			List<Integer> locationIds) throws MiddlewareQueryException {
-		
-		
 
 		try {
 
@@ -661,9 +624,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("Folder name is not unique");
 		}
 
-		
-		
-
 		try {
 
 			DmsProject currentFolder = this.getDmsProjectDao().getById(folderId);
@@ -688,8 +648,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		if (isExisting) {
 			throw new MiddlewareQueryException("Folder name is not unique");
 		}
-		
-		
+
 		try {
 
 			DmsProject project = this.getProjectSaver().saveFolder(parentFolderId, name, description, programUUID);
@@ -715,11 +674,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("Target Project is not existing");
 		}
 
-		
 		try {
-			
-
-
 
 			// disassociate the source project from any parent it had previously
 			this.getProjectRelationshipDao().deleteChildAssociation(sourceId);
@@ -748,8 +703,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("Folder is not empty");
 		}
 
-		
-		
 		try {
 
 			// modify the folder name
@@ -1042,13 +995,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public void saveOrUpdatePhenotypeOutliers(List<PhenotypeOutlier> phenotyleOutliers) throws MiddlewareQueryException {
 
-		
-		
 		PhenotypeOutlierDao phenotypeOutlierDao = this.getPhenotypeOutlierDao();
 		int i = 0;
 
 		try {
-
 
 			for (PhenotypeOutlier phenotypeOutlier : phenotyleOutliers) {
 
@@ -1073,8 +1023,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 			phenotypeOutlierDao.flush();
 			phenotypeOutlierDao.clear();
-
-
 
 		} catch (Exception e) {
 
@@ -1102,8 +1050,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public void deleteProgramStudies(String programUUID) throws MiddlewareQueryException {
 		List<Integer> projectIds = this.getDmsProjectDao().getAllProgramStudiesAndFolders(programUUID);
-		
-		
 
 		try {
 
@@ -1119,13 +1065,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public void updateVariableOrdering(int datasetId, List<Integer> variableIds) throws MiddlewareQueryException {
-		
-		
 
 		try {
 
 			this.getProjectPropertySaver().updateVariablesRanking(datasetId, variableIds);
-
 
 		} catch (Exception e) {
 
@@ -1136,12 +1079,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public Integer getGeolocationIdByProjectIdAndTrialInstanceNumber(int projectId, String trialInstanceNumber)
 			throws MiddlewareQueryException {
-		return getExperimentProjectDao().getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId, trialInstanceNumber);
+		return this.getExperimentProjectDao().getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId, trialInstanceNumber);
 	}
 
 	@Override
 	public String getTrialInstanceNumberByGeolocationId(int geolocationId) throws MiddlewareQueryException {
-		Geolocation geolocation = getGeolocationDao().getById(geolocationId);
+		Geolocation geolocation = this.getGeolocationDao().getById(geolocationId);
 		if (geolocation != null) {
 			return geolocation.getDescription();
 		}
