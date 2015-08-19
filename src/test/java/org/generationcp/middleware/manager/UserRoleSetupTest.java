@@ -4,31 +4,23 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.UserRole;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Creates users with different roles. Temporary while the new user creation screens are under development.
  *
  */
-public class UserRoleSetupTest extends DataManagerIntegrationTest {
+public class UserRoleSetupTest extends IntegrationTestBase {
 
-	private static WorkbenchDataManagerImpl manager;
-
-	@BeforeClass
-	public static void setUp() throws MiddlewareQueryException {
-		HibernateSessionProvider sessionProvider =
-				new HibernateSessionPerThreadProvider(MiddlewareIntegrationTest.workbenchSessionUtil.getSessionFactory());
-		UserRoleSetupTest.manager = new WorkbenchDataManagerImpl(sessionProvider);
-	}
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
 
 	@Test
 	public void testAddUsersWithRoles() throws MiddlewareQueryException {
@@ -47,7 +39,7 @@ public class UserRoleSetupTest extends DataManagerIntegrationTest {
 		adminPerson.setContact("-");
 		adminPerson.setLanguage(0);
 		adminPerson.setPhone("-");
-		Integer adminPersonId = UserRoleSetupTest.manager.addPerson(adminPerson);
+		Integer adminPersonId = this.workbenchDataManager.addPerson(adminPerson);
 
 		User adminUser = new User();
 		adminUser.setName("admin");
@@ -63,7 +55,7 @@ public class UserRoleSetupTest extends DataManagerIntegrationTest {
 		List<UserRole> adminRoles = new ArrayList<UserRole>();
 		adminRoles.add(new UserRole(adminUser, "ADMIN"));
 		adminUser.setRoles(adminRoles);
-		UserRoleSetupTest.manager.addUser(adminUser);
+		this.workbenchDataManager.addUser(adminUser);
 
 		// Breeder
 		Person breederPerson = new Person();
@@ -80,7 +72,7 @@ public class UserRoleSetupTest extends DataManagerIntegrationTest {
 		breederPerson.setContact("-");
 		breederPerson.setLanguage(0);
 		breederPerson.setPhone("-");
-		Integer breederPersonId = UserRoleSetupTest.manager.addPerson(breederPerson);
+		Integer breederPersonId = this.workbenchDataManager.addPerson(breederPerson);
 
 		User breederUser = new User();
 		breederUser.setName("breeder");
@@ -96,7 +88,7 @@ public class UserRoleSetupTest extends DataManagerIntegrationTest {
 		List<UserRole> breederRoles = new ArrayList<UserRole>();
 		breederRoles.add(new UserRole(breederUser, "BREEDER"));
 		breederUser.setRoles(breederRoles);
-		UserRoleSetupTest.manager.addUser(breederUser);
+		this.workbenchDataManager.addUser(breederUser);
 
 		// Technician
 		Person technicianPerson = new Person();
@@ -113,7 +105,7 @@ public class UserRoleSetupTest extends DataManagerIntegrationTest {
 		technicianPerson.setContact("-");
 		technicianPerson.setLanguage(0);
 		technicianPerson.setPhone("-");
-		Integer technicianPersonId = UserRoleSetupTest.manager.addPerson(technicianPerson);
+		Integer technicianPersonId = this.workbenchDataManager.addPerson(technicianPerson);
 
 		User technicianUser = new User();
 		technicianUser.setName("technician");
@@ -129,7 +121,7 @@ public class UserRoleSetupTest extends DataManagerIntegrationTest {
 		List<UserRole> technicianRoles = new ArrayList<UserRole>();
 		technicianRoles.add(new UserRole(technicianUser, "TECHNICIAN"));
 		technicianUser.setRoles(technicianRoles);
-		UserRoleSetupTest.manager.addUser(technicianUser);
+		this.workbenchDataManager.addUser(technicianUser);
 	}
 
 }

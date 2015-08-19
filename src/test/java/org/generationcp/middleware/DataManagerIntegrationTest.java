@@ -17,7 +17,10 @@ import org.junit.BeforeClass;
 /**
  * Base class with some common functionality required for Middleware data manager integration tests (i.e. tests that require actual
  * workbehch, central and local databse connections).
+ *
+ * @deprecated use {@link IntegrationTestBase} instead.
  */
+@Deprecated
 public class DataManagerIntegrationTest extends MiddlewareIntegrationTest {
 
 	protected static ManagerFactory managerFactory;

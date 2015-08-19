@@ -82,3 +82,4 @@ Thumbs.db
 updatedIbdbScripts/
 /bin
 node_modules
+*.epoch

@@ -18,11 +18,14 @@ import org.slf4j.LoggerFactory;
 /**
  * Base class with common functionality - mainly session factory creation - required for Middleware integration tests (i.e. tests that
  * require actual workbench, central and local database connections).
+ *
+ * @deprecated use {@link IntegrationTestBase} instead.
  */
+@Deprecated
 public class MiddlewareIntegrationTest {
 
 	protected static final Logger LOG = LoggerFactory.getLogger(MiddlewareIntegrationTest.class);
-	protected static final int INDENT = 3;
+	public static final int INDENT = 3;
 
 	protected static DatabaseConnectionParameters connectionParameters, workbenchConnectionParameters;
 	protected static HibernateUtil sessionUtil, workbenchSessionUtil;

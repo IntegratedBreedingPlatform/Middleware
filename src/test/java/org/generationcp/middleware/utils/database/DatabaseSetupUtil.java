@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.commons.lang.SystemUtils;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.manager.DatabaseConnectionParameters;
 import org.generationcp.middleware.util.ResourceFinder;
@@ -33,6 +34,10 @@ import org.tmatesoft.svn.core.wc2.SvnTarget;
 
 import com.hazelcast.util.StringUtil;
 
+/**
+ * @deprecated use {@link IntegrationTestBase} instead.
+ */
+@Deprecated
 public class DatabaseSetupUtil {
 
 	protected static final Logger LOG = LoggerFactory.getLogger(DatabaseSetupUtil.class);
@@ -192,7 +197,7 @@ public class DatabaseSetupUtil {
 
 	/**
 	 * This function will help to delete directory recursively
-	 * 
+	 *
 	 * @param srcFile Source file to examine
 	 * @throws IOException if File not found
 	 */
