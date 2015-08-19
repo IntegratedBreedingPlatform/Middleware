@@ -18,6 +18,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 
+// TODO remove parent class and singletong instance creation.
 public class WorkbenchTestDataUtil extends DataManagerIntegrationTest {
 
 	private static WorkbenchTestDataUtil instance;
@@ -40,6 +41,10 @@ public class WorkbenchTestDataUtil extends DataManagerIntegrationTest {
 		return WorkbenchTestDataUtil.instance;
 	}
 
+	public WorkbenchTestDataUtil(WorkbenchDataManager workbenchDataManager) {
+		this.workbenchDataManager = workbenchDataManager;
+	}
+
 	public Person createTestPersonData() {
 		Person person = new Person();
 		person.setInstituteId(1);
@@ -53,22 +58,22 @@ public class WorkbenchTestDataUtil extends DataManagerIntegrationTest {
 		person.setEmail("lichking@blizzard.com");
 		person.setNotes("notes");
 		person.setContact("Contact");
-		person.setLanguage(-1);
+		person.setLanguage(1);
 		person.setPhone("Phone");
 		return person;
 	}
 
 	public User createTestUserData() {
 		User user = new User();
-		user.setInstalid(-1);
-		user.setStatus(-1);
-		user.setAccess(-1);
-		user.setType(-1);
+		user.setInstalid(1);
+		user.setStatus(1);
+		user.setAccess(1);
+		user.setType(1);
 		user.setName("user_test" + new Random().nextInt());
 		user.setPassword("user_password");
 		user.setPersonid(1);
-		user.setAdate(20120101);
-		user.setCdate(20120101);
+		user.setAdate(20150101);
+		user.setCdate(20150101);
 		return user;
 	}
 
