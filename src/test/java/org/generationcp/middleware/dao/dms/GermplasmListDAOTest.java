@@ -58,8 +58,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	private static GermplasmList saveGermplasm(GermplasmList list) throws MiddlewareQueryException {
 		GermplasmList newList = GermplasmListDAOTest.dao.saveOrUpdate(list);
-		GermplasmListDAOTest.dao.flush();
-		GermplasmListDAOTest.dao.clear();
 		return newList;
 	}
 

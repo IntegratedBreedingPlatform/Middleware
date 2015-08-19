@@ -54,7 +54,6 @@ import org.slf4j.LoggerFactory;
 // Mandatory fields: workbook.studyDetails.studyName
 // template must not contain exact same combo of property-scale-method
 
-// TODO : CONTROL THE SESSION - we need to flush in new Standard Variables as soon as we can - before Datasets and constructed
 public class WorkbookSaver extends Saver {
 
 	private static final Logger LOG = LoggerFactory.getLogger(WorkbookSaver.class);
@@ -103,7 +102,6 @@ public class WorkbookSaver extends Saver {
 		VariableTypeList effectVariables = this.getVariableTypeListTransformer().transform(workbook.getNonTrialFactors(), false);
 		effectVariables.addAll(this.getVariableTypeListTransformer().transform(workbook.getVariates(), true, effectVariables.size() + 1));
 
-		// Load Lists into Maps in order to return to the front end (and force Session Flush)
 		// -- headers
 		headerMap.put("trialHeaders", trialHeaders);
 		// -- variableTypeLists

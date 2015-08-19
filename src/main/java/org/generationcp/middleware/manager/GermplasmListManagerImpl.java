@@ -263,12 +263,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		
 		
 
-		int germplasmListsSaved = 0;
 		List<Integer> germplasmListIds = new ArrayList<Integer>();
 		try {
-			
-
-
 			for (GermplasmList germplasmList : germplasmLists) {
 				if (operation == Operation.ADD) {
 					germplasmList = this.getGermplasmListDAO().saveOrUpdate(germplasmList);
@@ -276,13 +272,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 				} else if (operation == Operation.UPDATE) {
 					germplasmListIds.add(germplasmList.getId());
 					this.getGermplasmListDAO().merge(germplasmList);
-				}
-
-				germplasmListsSaved++;
-				if (germplasmListsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					this.getGermplasmListDAO().flush();
-					this.getGermplasmListDAO().clear();
 				}
 			}
 			
@@ -382,13 +371,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	private List<Integer> addOrUpdateGermplasmListData(List<GermplasmListData> germplasmListDatas, Operation operation)
 			throws MiddlewareQueryException {
 
-		
-
-		
-		
-		
-
-		int germplasmListDataSaved = 0;
 		List<Integer> idGermplasmListDataSaved = new ArrayList<Integer>();
 		try {
 			
@@ -403,12 +385,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 				GermplasmListData recordSaved = this.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
 				idGermplasmListDataSaved.add(recordSaved.getId());
-				germplasmListDataSaved++;
-				if (germplasmListDataSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					this.getGermplasmListDataDAO().flush();
-					this.getGermplasmListDataDAO().clear();
-				}
 				if (germplasmListData.getStatus() != null && germplasmListData.getStatus().intValue() == 9) {
 					deletedListEntryIds.add(germplasmListData.getId());
 				}

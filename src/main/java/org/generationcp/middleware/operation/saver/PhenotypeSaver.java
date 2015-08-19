@@ -44,12 +44,9 @@ public class PhenotypeSaver extends Saver {
 	}
 
 	public void savePhenotypes(ExperimentModel experimentModel, VariableList variates) throws MiddlewareQueryException {
-		int i = 0;
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
 		if (variates != null && variates.getVariables() != null && !variates.getVariables().isEmpty()) {
 			for (Variable variable : variates.getVariables()) {
-
-				i++;
 
 				try {
 					this.save(experimentModel.getNdExperimentId(), variable);
@@ -60,16 +57,9 @@ public class PhenotypeSaver extends Saver {
 					}
 					exceptions.put(e.getException().getStandardVariableId(), e.getException());
 				}
-				if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					this.getPhenotypeDao().flush();
-					this.getPhenotypeDao().clear();
-				}
-
 			}
-
-			this.getPhenotypeDao().flush();
-			this.getPhenotypeDao().clear();
 		}
+
 		if (exceptions != null) {
 			throw new PhenotypeException(exceptions);
 		}

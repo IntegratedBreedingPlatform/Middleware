@@ -34,14 +34,8 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 
 	public void deleteByMapId(int mapId) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
 			SQLQuery statement = this.getSession().createSQLQuery("DELETE FROM gdms_markers_onmap WHERE map_id = " + mapId);
 			statement.executeUpdate();
-
-			this.flush();
-			this.clear();
-
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deleteByMapId=" + mapId + " in MarkerOnMapDAO: " + e.getMessage(), e);
 		}

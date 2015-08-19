@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -172,6 +172,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID)
 			throws MiddlewareQueryException {
+		
+		
 
 		try {
 
@@ -206,7 +208,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<Experiment> getExperiments(int dataSetId, int start, int numRows) throws MiddlewareQueryException {
-		this.clearSessions();
 		VariableTypeList variableTypes = this.getDataSetBuilder().getVariableTypes(dataSetId);
 		return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), start, numRows, variableTypes);
 	}
@@ -214,8 +215,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId, int start, int numRows)
 			throws MiddlewareQueryException {
-		this.clearSessions();
-
 		VariableTypeList trialVariableTypes = this.getDataSetBuilder().getVariableTypes(trialDataSetId);
 		VariableTypeList variableTypes = this.getDataSetBuilder().getVariableTypes(dataSetId);
 
@@ -226,8 +225,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList)
-			throws MiddlewareQueryException {
-		this.clearSessions();
+					throws MiddlewareQueryException {
 		if (varTypeList == null) {
 			return this.getExperiments(dataSetId, start, numOfRows);
 		} else {
@@ -257,6 +255,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues)
 			throws MiddlewareQueryException {
+		
+		
 
 		try {
 
@@ -996,14 +996,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public void saveOrUpdatePhenotypeOutliers(List<PhenotypeOutlier> phenotyleOutliers) throws MiddlewareQueryException {
 
 		PhenotypeOutlierDao phenotypeOutlierDao = this.getPhenotypeOutlierDao();
-		int i = 0;
-
 		try {
 
 			for (PhenotypeOutlier phenotypeOutlier : phenotyleOutliers) {
-
-				i++;
-
 				PhenotypeOutlier existingPhenotypeOutlier =
 						phenotypeOutlierDao.getPhenotypeOutlierByPhenotypeId(phenotypeOutlier.getPhenotypeId());
 
@@ -1013,16 +1008,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				} else {
 					phenotypeOutlierDao.saveOrUpdate(phenotypeOutlier);
 				}
-				if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// batch save
-					phenotypeOutlierDao.flush();
-					phenotypeOutlierDao.clear();
-				}
-
 			}
-
-			phenotypeOutlierDao.flush();
-			phenotypeOutlierDao.clear();
 
 		} catch (Exception e) {
 

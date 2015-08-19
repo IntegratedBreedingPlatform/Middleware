@@ -478,13 +478,8 @@ public abstract class DataManager extends DatabaseBroker {
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public Object save(GenericDAO dao, Object entity) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		
-
 		try {
-
 			Object recordSaved = dao.save(entity);
-
 			return recordSaved;
 		} catch (Exception e) {
 
@@ -492,20 +487,13 @@ public abstract class DataManager extends DatabaseBroker {
 					"Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n" + e.getMessage(), e,
 					DataManager.LOG);
 			return null;
-		} finally {
-			session.flush();
 		}
 	}
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public Object saveOrUpdate(GenericDAO dao, Object entity) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		
-
 		try {
-
 			Object recordSaved = dao.saveOrUpdate(entity);
-
 			return recordSaved;
 		} catch (Exception e) {
 
@@ -513,8 +501,6 @@ public abstract class DataManager extends DatabaseBroker {
 					"Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n" + e.getMessage(), e,
 					DataManager.LOG);
 			return null;
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -566,17 +552,10 @@ public abstract class DataManager extends DatabaseBroker {
 	}
 
 	void doInTransaction(Work work) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		
 		try {
-
 			work.doWork();
-
 		} catch (Exception e) {
-
 			this.logAndThrowException("Error encountered with " + work.getName() + e.getMessage(), e, DataManager.LOG);
-		} finally {
-			session.flush();
 		}
 	}
 

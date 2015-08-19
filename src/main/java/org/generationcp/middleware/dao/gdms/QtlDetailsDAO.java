@@ -286,15 +286,10 @@ public class QtlDetailsDAO extends GenericDAO<QtlDetails, Integer> {
 
 	public void deleteByQtlIds(List<Integer> qtlIds) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
 			SQLQuery statement =
 					this.getSession()
 							.createSQLQuery("DELETE FROM gdms_qtl_details WHERE qtl_id IN (" + StringUtils.join(qtlIds, ",") + ")");
 			statement.executeUpdate();
-
-			this.flush();
-			this.clear();
 
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deleteByQtlIds=" + qtlIds + " in QtlDetailsDAO: " + e.getMessage(), e);

@@ -248,8 +248,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 			throw new MiddlewareQueryException("Given Generation does not exist");
 		}
 
-		Session session = this.getActiveSession();
-
 		try {
 			List<SelectedGenotype> existing = this.selectedGenotypeDAO.getSelectedGenotypeByIds(gidSet);
 
@@ -275,10 +273,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 					gidSet.remove(genotype.getGid());
 				}
-
-				// perform batch operation on update commands first
-				session.flush();
-				session.clear();
 			}
 
 			// create new entries with the default type
@@ -287,10 +281,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 				this.selectedGenotypeDAO.saveOrUpdate(genotype);
 
 			}
-
-			// perform batch update on creation of new entries
-			session.flush();
-			session.clear();
 
 		} catch (MiddlewareQueryException e) {
 			MBDTDataManagerImpl.LOG.error("Setting selected accessions was not successful", e);
@@ -320,9 +310,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 		}
 
 		List<SelectedGenotype> existingAccession = this.selectedGenotypeDAO.getSelectedGenotypeByIds(gidSet);
-
-		Session session = this.getActiveSession();
-
 
 		try {
 			if (existingAccession != null && !existingAccession.isEmpty()) {
@@ -357,9 +344,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 					this.selectedGenotypeDAO.saveOrUpdate(genotype);
 				}
-
-				session.flush();
-				session.clear();
 			}
 
 			for (Integer gid : gidSet) {
@@ -368,16 +352,11 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 			}
 
-			session.flush();
-			session.clear();
-
 		} catch (MiddlewareQueryException e) {
 			MBDTDataManagerImpl.LOG.error("Setting parent data was not successful", e);
-
 			throw e;
 		} catch (HibernateException e) {
 			MBDTDataManagerImpl.LOG.error("Setting parent data was not successful", e);
-
 			throw e;
 		}
 	}

@@ -310,17 +310,11 @@ public class ExperimentModelSaver extends Saver {
 		Geolocation location = this.getGeolocationSaver().createMinimumGeolocation();
 		List<ExperimentModel> experiments = this.getExperimentDao().getExperimentsByProjectIds(ids);
 		if (experiments != null && !experiments.isEmpty()) {
-			int i = 0;
 			for (ExperimentModel experiment : experiments) {
 				if (experiment.getGeoLocation().getLocationId().intValue() == 1) {
 					experiment.setGeoLocation(location);
 					this.getExperimentDao().update(experiment);
 				}
-				if (i > 0 && i % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					this.getExperimentDao().flush();
-					this.getExperimentDao().clear();
-				}
-				i++;
 			}
 		}
 

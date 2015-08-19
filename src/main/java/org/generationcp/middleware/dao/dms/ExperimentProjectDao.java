@@ -133,8 +133,6 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 
 	public int getExperimentIdByLocationIdStockId(int projectId, Integer locationId, Integer stockId) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
 			// update the value of phenotypes
 			String sql =
 					"SELECT exp.nd_experiment_id " + "FROM nd_experiment_project ep "
@@ -146,9 +144,6 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 
 			SQLQuery statement = this.getSession().createSQLQuery(sql);
 			Integer returnVal = (Integer) statement.uniqueResult();
-
-			this.flush();
-			this.clear();
 
 			if (returnVal == null) {
 				return 0;

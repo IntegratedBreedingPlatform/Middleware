@@ -638,8 +638,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public void deletePhenotypesByProjectIdAndLocationId(Integer projectId, Integer locationId) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
 			// Delete phenotypes and experiment phenotypes
 			String sql =
 					"delete pheno, epheno" + " from nd_experiment_project ep, nd_experiment e,"
@@ -648,9 +646,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 							+ " and e.nd_experiment_id = epheno.nd_experiment_id" + " and epheno.phenotype_id = pheno.phenotype_id";
 			SQLQuery statement = this.getSession().createSQLQuery(sql);
 			statement.executeUpdate();
-
-			this.flush();
-			this.clear();
 
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deletePhenotypesByProjectIdAndLocationId=" + projectId + ", " + locationId
@@ -661,8 +656,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public int updatePhenotypesByProjectIdAndLocationId(Integer projectId, Integer locationId, Integer stockId, Integer cvTermId,
 			String value) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
 			// update the value of phenotypes
 			String sql =
 					"UPDATE nd_experiment_project ep " + "INNER JOIN nd_experiment exp ON ep.nd_experiment_id = exp.nd_experiment_id "
@@ -676,9 +669,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			SQLQuery statement = this.getSession().createSQLQuery(sql);
 			int returnVal = statement.executeUpdate();
 
-			this.flush();
-			this.clear();
-
 			return returnVal;
 
 		} catch (HibernateException e) {
@@ -691,8 +681,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public List<Object[]> getPhenotypeIdsByLocationAndPlotNo(Integer projectId, Integer locationId, List<Integer> plotNos,
 			List<Integer> cvTermIds) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
 			// get the phenotype_id
 			String sql =
 					"SELECT  expprop.value, pheno.observable_id, pheno.phenotype_id FROM nd_experiment_project ep "
@@ -711,9 +699,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 			List<Object[]> returnVal = statement.list();
 
-			this.flush();
-			this.clear();
-
 			return returnVal;
 
 		} catch (HibernateException e) {
@@ -726,8 +711,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public List<Object[]> getPhenotypeIdsByLocationAndPlotNo(Integer projectId, Integer locationId, Integer plotNo, List<Integer> cvTermIds)
 			throws MiddlewareQueryException {
 		try {
-			this.flush();
-
 			if (cvTermIds.isEmpty()) {
 				return new ArrayList<Object[]>();
 			}
@@ -749,9 +732,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			statement.setParameter("plotNo", plotNo);
 
 			List<Object[]> returnVal = statement.list();
-
-			this.flush();
-			this.clear();
 
 			return returnVal;
 

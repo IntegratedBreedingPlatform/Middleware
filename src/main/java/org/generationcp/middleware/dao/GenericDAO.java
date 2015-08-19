@@ -217,14 +217,6 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		}
 	}
 
-	public void flush() {
-		this.getSession().flush();
-	}
-
-	public void clear() {
-		this.getSession().clear();
-	}
-
 	public void setStartAndNumOfRows(Query query, int start, int numOfRows) {
 		if (numOfRows > 0) {
 			query.setFirstResult(start);

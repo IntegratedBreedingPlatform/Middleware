@@ -69,15 +69,8 @@ public class MBDTGenerationDAO extends GenericDAO<MBDTGeneration, Integer> {
 
 	@Override
 	public MBDTGeneration saveOrUpdate(MBDTGeneration entity) throws MiddlewareQueryException {
-		Session session = this.getSession();
-
-
 		try {
 			MBDTGeneration returnVal = super.saveOrUpdate(entity);
-
-			session.flush();
-			session.clear();
-
 			return returnVal;
 		} catch (MiddlewareQueryException e) {
 

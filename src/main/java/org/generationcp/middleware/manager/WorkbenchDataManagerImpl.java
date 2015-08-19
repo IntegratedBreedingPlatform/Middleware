@@ -1653,23 +1653,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public StandardPreset saveOrUpdateStandardPreset(StandardPreset standardPreset) throws MiddlewareQueryException {
-
-
-
 		try {
-			StandardPreset result = this.getStandardPresetDAO().saveOrUpdate(standardPreset);
-
-
-
-			return result;
+			return this.getStandardPresetDAO().saveOrUpdate(standardPreset);
 
 		} catch (HibernateException e) {
-
 			this.logAndThrowException(
 					"Cannot perform: WorkbenchDataManager.saveOrUpdateStandardPreset(standardPreset=" + standardPreset.getName() + "): "
 							+ e.getMessage(), e);
-		} finally {
-			this.getCurrentSession().flush();
 		}
 
 		return null;
@@ -1677,20 +1667,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void deleteStandardPreset(int standardPresetId) throws MiddlewareQueryException {
-
-
-
 		try {
 			StandardPreset preset = this.getStandardPresetDAO().getById(standardPresetId);
 			this.getCurrentSession().delete(preset);
-
-
 		} catch (HibernateException e) {
-
 			this.logAndThrowException("Cannot delete preset: WorkbenchDataManager.deleteStandardPreset(standardPresetId="
 					+ standardPresetId + "): " + e.getMessage(), e);
-		} finally {
-			this.getCurrentSession().flush();
 		}
 	}
 

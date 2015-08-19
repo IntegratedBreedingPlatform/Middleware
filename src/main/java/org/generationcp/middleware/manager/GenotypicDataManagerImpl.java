@@ -2189,7 +2189,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			MtaDAO mtaDao = this.getMtaDao();
 			MtaMetadataDAO mtaMetadataDao = this.getMtaMetadataDao();
 
-			int rowsSaved = 0;
 
 			for (int i = 0; i < mtaList.size(); i++) {
 				Mta mta = mtaList.get(i);
@@ -2198,14 +2197,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 				mtaMetadata.setDatasetID(dataset.getDatasetId());
 				mtaMetadataDao.merge(mtaMetadata);
-
-				rowsSaved++;
-				if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					mtaDao.flush();
-					mtaDao.clear();
-					mtaMetadataDao.flush();
-					mtaMetadataDao.clear();
-				}
 			}
 
 
@@ -2429,18 +2420,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		this.getActiveSession();
 		MarkerDAO markerDao = this.getMarkerDao();
-		Integer rowsSaved = 0;
-
 		if (markers != null) {
 			for (Marker marker : markers) {
 				markerDao.merge(marker);
-
-				// Flush
-				rowsSaved++;
-				if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					markerDao.flush();
-					markerDao.clear();
-				}
 			}
 		}
 	}
@@ -2579,17 +2561,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		this.getActiveSession();
 		AccMetadataSetDAO accMetadataSetDao = this.getAccMetadataSetDao();
-		Integer rowsSaved = 0;
 
 		if (accMetadataSets != null) {
 			for (AccMetadataSet accMetadataSet : accMetadataSets) {
-
 				accMetadataSetDao.merge(accMetadataSet);
-				rowsSaved++;
-				if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					accMetadataSetDao.flush();
-					accMetadataSetDao.clear();
-				}
 			}
 		}
 	}
@@ -2597,15 +2572,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private void saveMarkerMetadataSets(List<MarkerMetadataSet> markerMetadataSets) throws Exception {
 		this.getActiveSession();
 		MarkerMetadataSetDAO markerMetadataSetDao = this.getMarkerMetadataSetDao();
-		Integer rowsSaved = 0;
-
 		for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
 			markerMetadataSetDao.merge(markerMetadataSet);
-			rowsSaved++;
-			if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-				markerMetadataSetDao.flush();
-				markerMetadataSetDao.clear();
-			}
 		}
 	}
 
@@ -2662,17 +2630,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		}
 		this.getActiveSession();
 		CharValuesDAO charValuesDao = this.getCharValuesDao();
-		Integer rowsSaved = 0;
-
 		for (CharValues charValues : charValuesList) {
-
 			charValuesDao.merge(charValues);
-
-			rowsSaved++;
-			if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-				charValuesDao.flush();
-				charValuesDao.clear();
-			}
 		}
 	}
 
@@ -2705,16 +2664,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		}
 		this.getActiveSession();
 		MappingPopValuesDAO mappingPopValuesDao = this.getMappingPopValuesDao();
-		Integer rowsSaved = 0;
-
 		for (MappingPopValues mappingPopValues : mappingPopValuesList) {
 			mappingPopValuesDao.merge(mappingPopValues);
-
-			rowsSaved++;
-			if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-				mappingPopValuesDao.flush();
-				mappingPopValuesDao.clear();
-			}
 		}
 	}
 
@@ -2724,16 +2675,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		}
 		this.getActiveSession();
 		AlleleValuesDAO alleleValuesDao = this.getAlleleValuesDao();
-		Integer rowsSaved = 0;
-
 		for (AlleleValues alleleValues : alleleValuesList) {
 			alleleValuesDao.merge(alleleValues);
-
-			rowsSaved++;
-			if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-				alleleValuesDao.flush();
-				alleleValuesDao.clear();
-			}
 		}
 
 	}
@@ -2746,17 +2689,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		this.getActiveSession();
 		DartValuesDAO dartValuesDao = this.getDartValuesDao();
-		Integer rowsSaved = 0;
-
 		for (DartValues dartValues : dartValuesList) {
 			dartValuesDao.merge(dartValues);
-
-			rowsSaved++;
-			if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-				dartValuesDao.flush();
-				dartValuesDao.clear();
-			}
-
 		}
 	}
 

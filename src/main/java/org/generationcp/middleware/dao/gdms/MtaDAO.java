@@ -50,8 +50,6 @@ public class MtaDAO extends GenericDAO<Mta, Integer> {
 
 	public void deleteByDatasetId(int datasetId) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
 			SQLQuery statement =
 					this.getSession().createSQLQuery(
 							"DELETE FROM gdms_mta_metadata WHERE mta_id in (select mta_id from gdms_mta where dataset_id = " + datasetId
@@ -60,9 +58,6 @@ public class MtaDAO extends GenericDAO<Mta, Integer> {
 
 			statement = this.getSession().createSQLQuery("DELETE FROM gdms_mta where dataset_id = " + datasetId);
 			statement.executeUpdate();
-
-			this.flush();
-			this.clear();
 
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in MtaDAO: " + e.getMessage(), e);
