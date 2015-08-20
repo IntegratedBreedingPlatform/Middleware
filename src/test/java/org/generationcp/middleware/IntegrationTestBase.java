@@ -1,7 +1,13 @@
 
 package org.generationcp.middleware;
 
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -20,6 +26,23 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public abstract class IntegrationTestBase {
 
+	private static final Logger LOG = LoggerFactory.getLogger(IntegrationTestBase.class);
 	public static final int INDENT = 3;
+
+	@Rule
+	public TestName name = new TestName();
+	private long startTime;
+
+	@Before
+	public void beforeEachTest() {
+		this.startTime = System.nanoTime();
+	}
+
+	@After
+	public void afterEachTest() {
+		long elapsedTime = System.nanoTime() - this.startTime;
+		LOG.debug("+++++ Test: " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + " took " + (double) elapsedTime
+				/ 1000000 + " ms = " + (double) elapsedTime / 1000000000 + " s +++++");
+	}
 
 }
