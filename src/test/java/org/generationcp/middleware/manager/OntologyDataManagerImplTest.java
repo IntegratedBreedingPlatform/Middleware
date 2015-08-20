@@ -28,7 +28,6 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TermProperty;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -963,14 +962,12 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddOrUpdateTermNotInCentral() throws Exception {
+	public void testAddOrUpdateTerm() throws Exception {
 		String name = "Real";
 		// add random number to see the update
 		String definition = "Real Description NEW " + (int) (Math.random() * 100);
 		Term origTerm = this.ontologyDataManager.findTermByName(name, CvId.SCALES);
 		Term newTerm = this.ontologyDataManager.addOrUpdateTerm(name, definition, CvId.SCALES);
-		Debug.println(IntegrationTestBase.INDENT, "Original:  " + origTerm);
-		Debug.println(IntegrationTestBase.INDENT, "Updated :  " + newTerm);
 
 		if (origTerm != null) { // if the operation is update, the ids must be same
 			Assert.assertEquals(origTerm.getId(), newTerm.getId());
@@ -978,7 +975,7 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testUpdateTermNotInCentral() throws Exception {
+	public void testUpdateTerm() throws Exception {
 		String name = "Integer2";
 		// add random number to see the update
 		String definition = "Integer NEW " + (int) (Math.random() * 100);
@@ -990,9 +987,6 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 
 		this.ontologyDataManager.updateTerm(new Term(origTerm.getId(), name, definition));
 		Term newTerm = this.ontologyDataManager.findTermByName(name, CvId.SCALES);
-
-		Debug.println(IntegrationTestBase.INDENT, "Original:  " + origTerm);
-		Debug.println(IntegrationTestBase.INDENT, "Updated :  " + newTerm);
 
 		if (origTerm != null && newTerm != null) {
 			Assert.assertTrue(newTerm.getDefinition().equals(definition));
@@ -1024,7 +1018,7 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 
 		Integer stdVariableId =
 				this.ontologyDataManager.getStandardVariableIdByTermId(stdVariable.getProperty().getId(), TermId.HAS_PROPERTY);
-		Debug.println(IntegrationTestBase.INDENT, "From db:  " + stdVariableId);
+		Assert.assertNotNull(stdVariableId);
 	}
 
 	@Test
@@ -1082,23 +1076,16 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testDeleteOntology() throws Exception {
-		String name = "Test Property" + new Random().nextInt(10000);
-		String definition = "Property Definition";
-		/*
-		 * int isA = 1087; Term term = manager.addProperty(name, definition, isA); manager.deleteTermAndRelationship(term.getId(),
-		 * CvId.PROPERTIES, TermId.IS_A.getId(), isA);
-		 *
-		 * term= manager.getTermById(term.getId()); assertNull(term);
-		 */
-		name = "Parent Test Trait Class " + new Random().nextInt(10000);
-		definition = "Parent Test Definition";
+	public void testDeleteParentChildTerms() throws Exception {
+		String parentTermName = "Parent Test Trait Class" + new Random().nextInt(10000);
+		String parentTermDef = parentTermName + " Definition";
+		Term termParent =
+				this.ontologyDataManager.addTraitClass(parentTermName, parentTermDef, TermId.ONTOLOGY_TRAIT_CLASS.getId()).getTerm();
 
-		Term termParent = this.ontologyDataManager.addTraitClass(name, definition, TermId.ONTOLOGY_TRAIT_CLASS.getId()).getTerm();
+		String childTermName = "Child Test Trait Class" + new Random().nextInt(10000);
+		String childTermDef = childTermName + " Definition";
+		this.ontologyDataManager.addTraitClass(childTermName, childTermDef, termParent.getId()).getTerm();
 
-		name = "Child Test Trait Class " + new Random().nextInt(10000);
-		definition = "Child Test Definition";
-		Term termChild = this.ontologyDataManager.addTraitClass(name, definition, termParent.getId()).getTerm();
 		boolean hasMiddlewareException = false;
 		try {
 			this.ontologyDataManager.deleteTermAndRelationship(termParent.getId(), CvId.IBDB_TERMS, TermId.IS_A.getId(),
@@ -1107,18 +1094,6 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 			hasMiddlewareException = true;
 		}
 		Assert.assertEquals(true, hasMiddlewareException);
-
-		// we do the cleanup here
-
-		this.ontologyDataManager.deleteTermAndRelationship(termChild.getId(), CvId.IBDB_TERMS, TermId.IS_A.getId(),
-				TermId.ONTOLOGY_TRAIT_CLASS.getId());
-		this.ontologyDataManager.deleteTermAndRelationship(termParent.getId(), CvId.IBDB_TERMS, TermId.IS_A.getId(),
-				TermId.ONTOLOGY_TRAIT_CLASS.getId());
-
-		Term term = this.ontologyDataManager.getTermById(termChild.getId());
-		Assert.assertNull(term);
-		term = this.ontologyDataManager.getTermById(termParent.getId());
-		Assert.assertNull(term);
 	}
 
 	@Test
@@ -1129,40 +1104,30 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testDeleteStandardVariable() throws Exception {
-		List<TermProperty> termProperties = new ArrayList<TermProperty>();
-		termProperties.add(new TermProperty(1, TermId.CROP_ONTOLOGY_ID.getId(), "CO:12345", 0));
+		StandardVariable myOwnPlantHeight = new StandardVariable();
+		myOwnPlantHeight.setName("MyOwnPlantHeight " + new Random().nextInt(1000));
+		myOwnPlantHeight.setDescription(myOwnPlantHeight.getName() + " - Description.");
+		myOwnPlantHeight.setProperty(new Term(15020, "Plant height", "Plant height"));
+		myOwnPlantHeight.setMethod(new Term(16010, "Soil to tip at maturity", "Soil to tip at maturity"));
 
-		String propertyName = "property name " + new Random().nextInt(10000);
-		this.ontologyDataManager.addProperty(propertyName, "test property", 1087);
-		Property property = this.ontologyDataManager.getProperty(propertyName);
+		Term myOwnScale = new Term();
+		myOwnScale.setName("MyOwnScale " + new Random().nextInt(1000));
+		myOwnScale.setDefinition(myOwnScale.getName() + " - Description.");
+		myOwnPlantHeight.setScale(myOwnScale);
 
-		String scaleName = "scale name " + new Random().nextInt(10000);
-		Term scale = this.ontologyDataManager.addTerm(scaleName, "test scale", CvId.SCALES);
+		myOwnPlantHeight.setIsA(new Term(OntologyDataManagerImplTestConstants.OBJECT_ID, "Agronomic", "Agronomic"));
+		myOwnPlantHeight.setDataType(new Term(1110, "Numeric variable", "Variable with numeric values either continuous or integer"));
+		myOwnPlantHeight.setStoredIn(new Term(1043, "Observation variate", "Phenotypic data stored in phenotype.value"));
 
-		String methodName = "method name " + new Random().nextInt(10000);
-		Term method = this.ontologyDataManager.addTerm(methodName, methodName, CvId.METHODS);
+		this.ontologyDataManager.addStandardVariable(myOwnPlantHeight);
+		// Check that variable got created
+		Assert.assertNotNull(myOwnPlantHeight.getId());
 
-		Term dataType = new Term(1120, "Character variable", "variable with char values");
-		Term storedIn = new Term(1010, "Study information", "Study element");
-		Term traitClass = new Term(600, "TRAIT CLASS", "TRAIT CLASS DEF");
+		this.ontologyDataManager.deleteStandardVariable(myOwnPlantHeight.getId());
 
-		StandardVariable standardVariable = new StandardVariable();
-		standardVariable.setName("TestVariable" + new Random().nextInt(10000));
-		standardVariable.setDescription("Test Desc");
-		standardVariable.setProperty(property.getTerm());
-		standardVariable.setMethod(method);
-		standardVariable.setScale(scale);
-		standardVariable.setDataType(dataType);
-		standardVariable.setPhenotypicType(PhenotypicType.TRIAL_DESIGN);
-		standardVariable.setIsA(traitClass);
-		standardVariable.setStoredIn(storedIn);
-		standardVariable.setCropOntologyId("CO:1200");
-		this.ontologyDataManager.addStandardVariable(standardVariable);
-		Debug.println(IntegrationTestBase.INDENT, String.valueOf(standardVariable.getId()));
-		this.ontologyDataManager.deleteStandardVariable(standardVariable.getId());
-		Term term = this.ontologyDataManager.getTermById(standardVariable.getId());
-
-		Assert.assertNull(term);
+		// Check that the variable got deleted
+		Term term = this.ontologyDataManager.getTermById(myOwnPlantHeight.getId());
+		Assert.assertNull("Expected the standard variable deleted but it is still there!", term);
 	}
 
 	@Test
