@@ -35,14 +35,15 @@ public abstract class IntegrationTestBase {
 
 	@Before
 	public void beforeEachTest() {
+		LOG.debug("+++++ Test : " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + "() started +++++\n");
 		this.startTime = System.nanoTime();
 	}
 
 	@After
 	public void afterEachTest() {
 		long elapsedTime = System.nanoTime() - this.startTime;
-		LOG.debug("+++++ Test: " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + " took " + (double) elapsedTime
-				/ 1000000 + " ms = " + (double) elapsedTime / 1000000000 + " s +++++");
+		LOG.debug(" +++++ Test : " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + "() ended, took "
+				+ (double) elapsedTime / 1000000 + " ms = " + (double) elapsedTime / 1000000000 + " s +++++\n");
 	}
 
 }
