@@ -687,9 +687,9 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 		this.workbenchDataManager.addTemplateSetting(templateSetting1);
 		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting1 added: " + templateSetting1);
+
 		this.workbenchDataManager.addTemplateSetting(templateSetting2);
 		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting2 added: " + templateSetting2);
-		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting1 updated: " + templateSetting1);
 
 		Assert.assertFalse(templateSetting1.isDefault());
 		Assert.assertTrue(templateSetting2.isDefault());
@@ -706,13 +706,14 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 		this.workbenchDataManager.addTemplateSetting(templateSetting1);
 		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting1 added: " + templateSetting1);
+		
 		this.workbenchDataManager.addTemplateSetting(templateSetting2);
 		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting2 added: " + templateSetting2);
 
 		templateSetting1.setIsDefault(Boolean.TRUE);
 		this.workbenchDataManager.updateTemplateSetting(templateSetting1);
-		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting1 update: " + templateSetting1);
-		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting2 update: " + templateSetting2);
+		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting1 updated: " + templateSetting1);
+		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting2 updated: " + templateSetting2);
 
 		Assert.assertTrue(templateSetting1.isDefault());
 		Assert.assertFalse(templateSetting2.isDefault());
@@ -721,7 +722,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	private TemplateSetting createTemplateSetting() throws MiddlewareQueryException {
 		Integer templateSettingId = null;
-		Integer projectId = -1;
+		Integer projectId = 1;
 		Tool tool = this.workbenchDataManager.getToolWithName("nursery_manager_fieldbook_web");
 		String name = "S9801-PLOT DATA_" + (int) (Math.random() * 1000);
 		String configuration =
