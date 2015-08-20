@@ -19,7 +19,7 @@ import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 
 // TODO remove parent class and singletong instance creation.
-public class WorkbenchTestDataUtil extends DataManagerIntegrationTest {
+public class WorkbenchTestDataUtil {
 
 	private static WorkbenchTestDataUtil instance;
 	private final WorkbenchDataManager workbenchDataManager;
