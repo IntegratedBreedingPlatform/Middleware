@@ -12,6 +12,8 @@
 package org.generationcp.middleware.domain.inventory;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.util.Util;
@@ -92,6 +94,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	private String duplicate;
 	private String bulkWith;
 	private String bulkCompl;
+	private List<String> bulkWithStockIds;
 
 	/** The ff. fields are used for importing inventory for stock list */
 	private Integer listDataProjectId;
@@ -708,6 +711,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 
 	public void setBulkWith(String bulkWith) {
 		this.bulkWith = bulkWith;
+		this.bulkWithStockIds = new ArrayList<>();
 	}
 
 	public String getBulkCompl() {
@@ -753,8 +757,11 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	public void addBulkWith(String bulkWith) {
 		if (this.bulkWith == null) {
 			this.bulkWith = bulkWith;
-		} else if (!this.bulkWith.equals(bulkWith) && !this.bulkWith.contains(", " + bulkWith)) {
+			this.bulkWithStockIds = new ArrayList<>();
+			this.bulkWithStockIds.add(bulkWith);
+		} else if (!this.bulkWithStockIds.contains(bulkWith)) {
 			this.bulkWith += ", " + bulkWith;
+			this.bulkWithStockIds.add(bulkWith);
 		}
 	}
 
@@ -769,4 +776,9 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	public void setStockSourceRecordId(Integer stockSourceRecordId) {
 		this.stockSourceRecordId = stockSourceRecordId;
 	}
+
+	public List<String> getBulkWithStockIds() {
+		return this.bulkWithStockIds;
+	}
+
 }
