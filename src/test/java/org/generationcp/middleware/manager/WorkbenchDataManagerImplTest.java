@@ -691,6 +691,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		this.workbenchDataManager.addTemplateSetting(templateSetting2);
 		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting2 added: " + templateSetting2);
 
+		// When a new template is added with default flag on, any other templates that are existing for the same project and tool must be set as non-default.
 		Assert.assertFalse(templateSetting1.isDefault());
 		Assert.assertTrue(templateSetting2.isDefault());
 	}
@@ -709,12 +710,15 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		
 		this.workbenchDataManager.addTemplateSetting(templateSetting2);
 		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting2 added: " + templateSetting2);
+		
+		Assert.assertFalse(templateSetting1.isDefault());
+		Assert.assertTrue(templateSetting2.isDefault());
 
 		templateSetting1.setIsDefault(Boolean.TRUE);
 		this.workbenchDataManager.updateTemplateSetting(templateSetting1);
 		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting1 updated: " + templateSetting1);
-		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting2 updated: " + templateSetting2);
 
+		// When a new template is added with default flag on, any other templates that are existing for the same project and tool must be set as non-default.
 		Assert.assertTrue(templateSetting1.isDefault());
 		Assert.assertFalse(templateSetting2.isDefault());
 
