@@ -37,7 +37,7 @@ import org.hibernate.criterion.SimpleExpression;
 public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	public static final Integer STATUS_DELETED = 9;
-	protected static final List<SimpleExpression> RETRICTED_LIST = new ArrayList();
+	protected static final List<SimpleExpression> RETRICTED_LIST = new ArrayList<SimpleExpression>();
 
 	static {
 		GermplasmListDAO.RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
@@ -430,6 +430,13 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		}
 
 		return 0;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<GermplasmList> getListsByProgram(String programUUID) {
+		Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
+		criteria.add(Restrictions.eq("programUUID", programUUID));
+		return criteria.list();
 	}
 
 	public GermplasmList getByListRef(Integer listRef) {

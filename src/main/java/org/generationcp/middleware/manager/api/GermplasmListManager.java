@@ -315,6 +315,15 @@ public interface GermplasmListManager {
 	 * @throws MiddlewareQueryException
 	 */
 	List<Integer> updateGermplasmList(List<GermplasmList> germplasmLists) throws MiddlewareQueryException;
+	
+	/**
+	 * Service to delete all lists that belong to a program
+	 * 
+	 * @param programUUID : string - the unique program key that denotes a program
+	 * @return int : returns number of rows deleted from the DB
+	 * 
+	 */
+	public int deleteGermplasmListsByProgram(String programUUID) throws MiddlewareQueryException;
 
 	/**
 	 * Removes the specified {@code GermplasmList} object from the database.

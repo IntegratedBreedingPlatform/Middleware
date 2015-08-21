@@ -309,6 +309,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		list.add(germplasmList);
 		return this.deleteGermplasmList(list);
 	}
+	
+	@Override
+	public int deleteGermplasmListsByProgram(String programUUID) throws MiddlewareQueryException {
+		List<GermplasmList> lists = this.getGermplasmListDAO().getListsByProgram(programUUID);
+		return this.deleteGermplasmList(lists);
+	}
 
 	@Override
 	public int deleteGermplasmList(List<GermplasmList> germplasmLists) throws MiddlewareQueryException {
