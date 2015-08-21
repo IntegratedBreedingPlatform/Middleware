@@ -61,7 +61,11 @@
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
     
-     <bean id="locationDataManager" class="org.generationcp.middleware.manager.LocationDataManagerImpl">
+    <bean id="locationDataManager" class="org.generationcp.middleware.manager.LocationDataManagerImpl">
+        <property name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+    
+    <bean id="crossStudyDataManager" class="org.generationcp.middleware.manager.CrossStudyDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
     
