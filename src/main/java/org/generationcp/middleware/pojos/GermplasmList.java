@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos;
@@ -35,9 +35,9 @@ import org.hibernate.annotations.SQLDelete;
 
 /**
  * POJO for listnms table.
- *
+ * 
  * @author Kevin Manansala, Mark Agarrado
- *
+ * 
  */
 
 @Entity
@@ -90,7 +90,7 @@ public class GermplasmList implements Serializable {
 
 	@Column(name = "projectId")
 	private Integer projectId;
-	
+
 	@Column(name = "program_uuid")
 	private String programUUID;
 
@@ -334,7 +334,7 @@ public class GermplasmList implements Serializable {
 	}
 
 	public String getProgramUUID() {
-		return programUUID;
+		return this.programUUID;
 	}
 
 	public void setProgramUUID(String programUUID) {
@@ -433,7 +433,7 @@ public class GermplasmList implements Serializable {
 	 * 
 	 * @return
 	 * @deprecated
-	*/
+	 */
 	@Deprecated
 	public boolean isLocalList() {
 		return this.getId() < 0;
