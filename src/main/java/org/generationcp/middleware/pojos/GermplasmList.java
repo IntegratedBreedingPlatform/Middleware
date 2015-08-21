@@ -354,7 +354,8 @@ public class GermplasmList implements Serializable {
 	}
 
 	public void setListData(List<GermplasmListData> listData) {
-		this.listData = listData;
+		this.listData.clear();
+		this.listData.addAll(listData);
 	}
 
 	@Override
