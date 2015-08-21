@@ -90,6 +90,9 @@ public class GermplasmList implements Serializable {
 
 	@Column(name = "projectId")
 	private Integer projectId;
+	
+	@Column(name = "program_uuid")
+	private String programUUID;
 
 	@Column(name = "notes")
 	private String notes;
@@ -328,6 +331,14 @@ public class GermplasmList implements Serializable {
 
 	public void setProjectId(Integer projectId) {
 		this.projectId = projectId;
+	}
+
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
 	}
 
 	public String getNotes() {
