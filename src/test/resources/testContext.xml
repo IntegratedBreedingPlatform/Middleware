@@ -53,6 +53,18 @@
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
     
+    <bean id="germplasmDataManager" class="org.generationcp.middleware.manager.GermplasmDataManagerImpl">
+        <property name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+    
+    <bean id="pedigreeService" class="org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl">
+        <property name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+    
+     <bean id="locationDataManager" class="org.generationcp.middleware.manager.LocationDataManagerImpl">
+        <property name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+    
     <bean id="cropSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider">
         <property name="sessionFactory" ref="IBDBV2_MAIZE_MERGED_SessionFactory"/>
         <aop:scoped-proxy proxy-target-class="false"/>
