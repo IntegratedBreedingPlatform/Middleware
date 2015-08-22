@@ -1,5 +1,5 @@
 /*******************************************************************************
- * 
+ *
  * Copyright (c) 2012, All Rights Reserved.
  *
  * Generation Challenge Programme (GCP)
@@ -12,18 +12,16 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
-import org.hibernate.Session;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
-public class GermplasmListDAOTest extends MiddlewareIntegrationTest {
+public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	private static GermplasmListDAO dao;
 	private static final String TEST_GERMPLASM_LIST_NAME = "TestGermplasmListName";
@@ -34,13 +32,10 @@ public class GermplasmListDAOTest extends MiddlewareIntegrationTest {
 	private static final Integer STATUS_ACTIVE = 0;
 	private static final Integer STATUS_DELETED = 9;
 
-	private static Session session;
-
-	@BeforeClass
-	public static void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		GermplasmListDAOTest.dao = new GermplasmListDAO();
-		GermplasmListDAOTest.session = MiddlewareIntegrationTest.sessionUtil.getCurrentSession();
-		GermplasmListDAOTest.dao.setSession(GermplasmListDAOTest.session);
+		GermplasmListDAOTest.dao.setSession(this.sessionProvder.getSession());
 	}
 
 	@Test
@@ -59,14 +54,6 @@ public class GermplasmListDAOTest extends MiddlewareIntegrationTest {
 		Assert.assertEquals("There should be no germplasm list with name " + GermplasmListDAOTest.TEST_GERMPLASM_LIST_NAME, 0,
 				GermplasmListDAOTest.dao.countByName(GermplasmListDAOTest.TEST_GERMPLASM_LIST_NAME, Operation.EQUAL));
 
-		GermplasmListDAOTest.deleteGermplasm(list);
-
-	}
-
-	private static void deleteGermplasm(GermplasmList list) throws MiddlewareQueryException {
-		GermplasmListDAOTest.session.delete(list);
-		GermplasmListDAOTest.session.flush();
-		GermplasmListDAOTest.session.clear();
 	}
 
 	private static GermplasmList saveGermplasm(GermplasmList list) throws MiddlewareQueryException {
@@ -86,11 +73,5 @@ public class GermplasmListDAOTest extends MiddlewareIntegrationTest {
 		list.setUserId(userId);
 		list.setStatus(status);
 		return list;
-	}
-
-	@AfterClass
-	public static void tearDown() {
-		GermplasmListDAOTest.dao.setSession(null);
-		GermplasmListDAOTest.dao = null;
 	}
 }

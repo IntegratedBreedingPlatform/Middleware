@@ -9,44 +9,24 @@ import java.util.Map;
 
 import javax.sql.DataSource;
 
-import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.conformity.ConformityGermplasmInput;
 import org.generationcp.middleware.domain.conformity.UploadInput;
 import org.generationcp.middleware.exceptions.ConformityException;
-import org.generationcp.middleware.manager.api.GenotypicDataManager;
-import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.service.api.ConformityTestingService;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import com.mchange.v2.c3p0.DriverManagerDataSourceFactory;
+public class ConformityTestingServiceImplTest extends IntegrationTestBase {
 
-/**
- * Created by IntelliJ IDEA. User: Daniel Villafuerte
- */
-@RunWith(JUnit4.class)
-public class ConformityTestingServiceImplTest extends DataManagerIntegrationTest {
-
-	/**
-	 * Created by IntelliJ IDEA. User: Daniel Villafuerte
-	 */
-
+	@Autowired
 	private ConformityTestingService conformityTestingService;
 
+	// TODO will require a DataSource bean setup in testContext.xml
+	@Autowired
 	private DataSource dataSource;
-	private final static String[] PREP_SCRIPTS = new String[] {
-			"INSERT INTO germplsm VALUES(-1, 31, 2, 2216, 2217, 2, -1, 131,0,0,0,0,null,null,null)",
-			"INSERT INTO germplsm VALUES(-2, 31, 2, 2218, 2221, 2, -2, 131,0,0,0,0,null,null,null)",
-			"INSERT INTO names VALUES (-1, -1, 5, 1, 2, 'TEST1', 131, 0,0)",
-			"INSERT INTO names VALUES (-2, -2, 5, 1, 2, 'TEST2', 131, 0,0)"};
-
-	private final static String[] CLEANUP_SCRIPTS = new String[] {"DELETE FROM germplsm where gid in (-1, -2)",
-			"DELETE FROM names where nid in (-1, -2)"};
 
 	protected void executeUpdate(String sql) throws Exception {
 		Connection conn = null;
@@ -75,25 +55,6 @@ public class ConformityTestingServiceImplTest extends DataManagerIntegrationTest
 
 		if (rs != null) {
 			rs.close();
-		}
-	}
-
-	@Before
-	public void setup() {
-		try {
-			PedigreeDataManager pedigreeDataManager = DataManagerIntegrationTest.managerFactory.getPedigreeDataManager();
-			GenotypicDataManager genotypicDataManager = DataManagerIntegrationTest.managerFactory.getGenotypicDataManager();
-
-			this.conformityTestingService = new ConformityTestingServiceImpl(genotypicDataManager, pedigreeDataManager);
-			this.dataSource =
-					DriverManagerDataSourceFactory.create(MiddlewareIntegrationTest.connectionParameters.getDriverName(),
-							MiddlewareIntegrationTest.connectionParameters.getUrl(),
-							MiddlewareIntegrationTest.connectionParameters.getUsername(),
-							MiddlewareIntegrationTest.connectionParameters.getPassword());
-
-		} catch (Exception e) {
-			Assert.fail(e.getMessage());
-			e.printStackTrace();
 		}
 	}
 
@@ -189,7 +150,7 @@ public class ConformityTestingServiceImplTest extends DataManagerIntegrationTest
 		input.addEntry(entry);
 
 		try {
-			Map<Integer, Map<String, String>> output = this.conformityTestingService.testConformity(input);
+			this.conformityTestingService.testConformity(input);
 
 			Assert.fail("Unable to warn regarding no parent or ancestor information");
 		} catch (ConformityException e) {

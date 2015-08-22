@@ -13,8 +13,7 @@ package org.generationcp.middleware.manager;
 
 import java.util.List;
 
-import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -23,51 +22,47 @@ import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.MockDataUtil;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
+public class PedigreeDataManagerTest extends IntegrationTestBase {
 
-	private static PedigreeDataManager pedigreeManager;
-
-	@BeforeClass
-	public static void setUp() throws Exception {
-		PedigreeDataManagerTest.pedigreeManager = DataManagerIntegrationTest.managerFactory.getPedigreeDataManager();
-	}
+	@Autowired
+	private PedigreeDataManager pedigreeManager;
 
 	@Test
 	public void testGetGermplasmDescendants() throws Exception {
 		Integer gid = Integer.valueOf(1);
-		List<Object[]> germplsmList = PedigreeDataManagerTest.pedigreeManager.getDescendants(gid, 0, 20);
+		List<Object[]> germplsmList = this.pedigreeManager.getDescendants(gid, 0, 20);
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetGermplasmDescendants(" + gid + "): ");
+		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmDescendants(" + gid + "): ");
 		for (Object[] object : germplsmList) {
-			Debug.println(MiddlewareIntegrationTest.INDENT, "  progenitor number: " + object[0]);
-			Debug.println(MiddlewareIntegrationTest.INDENT, "   " + object[1]);
+			Debug.println(IntegrationTestBase.INDENT, "  progenitor number: " + object[0]);
+			Debug.println(IntegrationTestBase.INDENT, "   " + object[1]);
 		}
 	}
 
 	@Test
 	public void testCountGermplasmDescendants() throws Exception {
 		Integer gid = Integer.valueOf(1);
-		long count = PedigreeDataManagerTest.pedigreeManager.countDescendants(gid);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testCountGermplasmDescendants(" + gid + "):" + count);
+		long count = this.pedigreeManager.countDescendants(gid);
+		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmDescendants(" + gid + "):" + count);
 	}
 
 	@Test
 	public void testGetProgenitorByGID() throws Exception {
 		Integer gid = Integer.valueOf(779745);
 		Integer pNo = Integer.valueOf(10);
-		Germplasm germplasm = PedigreeDataManagerTest.pedigreeManager.getParentByGIDAndProgenitorNumber(gid, pNo);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetProgenitorByGID(" + gid + ", " + pNo + "):" + germplasm);
+		Germplasm germplasm = this.pedigreeManager.getParentByGIDAndProgenitorNumber(gid, pNo);
+		Debug.println(IntegrationTestBase.INDENT, "testGetProgenitorByGID(" + gid + ", " + pNo + "):" + germplasm);
 	}
 
 	@Test
 	public void testGeneratePedigreeTree() throws Exception {
 		Integer gid = Integer.valueOf(306436);
 		int level = 4;
-		Debug.println(MiddlewareIntegrationTest.INDENT, "GID = " + gid + ", level = " + level + ":");
-		GermplasmPedigreeTree tree = PedigreeDataManagerTest.pedigreeManager.generatePedigreeTree(gid, level);
+		Debug.println(IntegrationTestBase.INDENT, "GID = " + gid + ", level = " + level + ":");
+		GermplasmPedigreeTree tree = this.pedigreeManager.generatePedigreeTree(gid, level);
 		if (tree != null) {
 			this.printNode(tree.getRoot(), 1);
 		}
@@ -77,7 +72,7 @@ public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
 	public void testGetPedigreeLevelCount() throws Exception {
 		Integer gid = 1;
 		boolean includeDerivativeLine = false;
-		Integer pedigreeLevelCount = PedigreeDataManagerTest.pedigreeManager.countPedigreeLevel(gid, includeDerivativeLine);
+		Integer pedigreeLevelCount = this.pedigreeManager.countPedigreeLevel(gid, includeDerivativeLine);
 		Debug.println(Integer.toString(pedigreeLevelCount));
 		Assert.assertNotNull("It should not be null", pedigreeLevelCount);
 		Assert.assertEquals("It should be equal to 1", new Integer(1), pedigreeLevelCount);
@@ -88,7 +83,7 @@ public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
 	public void testGetPedigreeLevelCount_IncludeDerivative() throws Exception {
 		Integer gid = 1;
 		boolean includeDerivativeLine = true;
-		Integer pedigreeLevelCount = PedigreeDataManagerTest.pedigreeManager.countPedigreeLevel(gid, includeDerivativeLine);
+		Integer pedigreeLevelCount = this.pedigreeManager.countPedigreeLevel(gid, includeDerivativeLine);
 		Debug.println(Integer.toString(pedigreeLevelCount));
 		Assert.assertNotNull("It should not be null", pedigreeLevelCount);
 		Assert.assertEquals("It should be equal to 1", new Integer(1), pedigreeLevelCount);
@@ -101,9 +96,8 @@ public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
 		int levels = 3;
 		Boolean includeDerivativeLines = true;
 
-		GermplasmPedigreeTree germplasmPedigreeTree =
-				PedigreeDataManagerTest.pedigreeManager.generatePedigreeTree(gid, levels, includeDerivativeLines);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "generatePedigreeTree(" + gid + ", " + levels + ", " + includeDerivativeLines + ")");
+		GermplasmPedigreeTree germplasmPedigreeTree = this.pedigreeManager.generatePedigreeTree(gid, levels, includeDerivativeLines);
+		Debug.println(IntegrationTestBase.INDENT, "generatePedigreeTree(" + gid + ", " + levels + ", " + includeDerivativeLines + ")");
 		Debug.println(this.renderNode(germplasmPedigreeTree.getRoot(), ""));
 	}
 
@@ -121,14 +115,14 @@ public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
 	@Test
 	public void testGetManagementNeighbors() throws Exception {
 		Integer gid = Integer.valueOf(1);
-		int count = (int) PedigreeDataManagerTest.pedigreeManager.countManagementNeighbors(gid);
-		List<Germplasm> neighbors = PedigreeDataManagerTest.pedigreeManager.getManagementNeighbors(gid, 0, count);
+		int count = (int) this.pedigreeManager.countManagementNeighbors(gid);
+		List<Germplasm> neighbors = this.pedigreeManager.getManagementNeighbors(gid, 0, count);
 		Assert.assertNotNull(neighbors);
 		Assert.assertFalse(neighbors.isEmpty());
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetManagementNeighbors(" + gid + "):" + count);
+		Debug.println(IntegrationTestBase.INDENT, "testGetManagementNeighbors(" + gid + "):" + count);
 		for (Germplasm g : neighbors) {
 			String name = g.getPreferredName() != null ? g.getPreferredName().getNval() : null;
-			Debug.println(MiddlewareIntegrationTest.INDENT, g.getGid() + " : " + name);
+			Debug.println(IntegrationTestBase.INDENT, g.getGid() + " : " + name);
 		}
 	}
 
@@ -136,40 +130,40 @@ public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
 	public void testGetGroupRelatives() throws Exception {
 		Integer gid = Integer.valueOf(1);
 
-		long count = PedigreeDataManagerTest.pedigreeManager.countGroupRelatives(gid);
-		List<Germplasm> neighbors = PedigreeDataManagerTest.pedigreeManager.getGroupRelatives(gid, 0, (int) count);
+		long count = this.pedigreeManager.countGroupRelatives(gid);
+		List<Germplasm> neighbors = this.pedigreeManager.getGroupRelatives(gid, 0, (int) count);
 		Assert.assertNotNull(neighbors);
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetGroupRelatives(" + gid + "):" + neighbors.size());
+		Debug.println(IntegrationTestBase.INDENT, "testGetGroupRelatives(" + gid + "):" + neighbors.size());
 		for (Germplasm g : neighbors) {
 			String name = g.getPreferredName() != null ? g.getPreferredName().getNval() : null;
-			Debug.println(MiddlewareIntegrationTest.INDENT, g.getGid() + " : " + name);
+			Debug.println(IntegrationTestBase.INDENT, g.getGid() + " : " + name);
 		}
 	}
 
 	@Test
 	public void testGetGenerationHistory() throws Exception {
 		Integer gid = Integer.valueOf(50533);
-		List<Germplasm> results = PedigreeDataManagerTest.pedigreeManager.getGenerationHistory(gid);
+		List<Germplasm> results = this.pedigreeManager.getGenerationHistory(gid);
 		Assert.assertNotNull(results);
 		Assert.assertFalse(results.isEmpty());
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetGenerationHistory(" + gid + "):" + results.size());
+		Debug.println(IntegrationTestBase.INDENT, "testGetGenerationHistory(" + gid + "):" + results.size());
 		for (Germplasm g : results) {
 			String name = g.getPreferredName() != null ? g.getPreferredName().getNval() : null;
-			Debug.println(MiddlewareIntegrationTest.INDENT, g.getGid() + " : " + name);
+			Debug.println(IntegrationTestBase.INDENT, g.getGid() + " : " + name);
 		}
 	}
 
 	@Test
 	public void testGetDescendants() throws Exception {
 		Integer id = Integer.valueOf(2);
-		List<Object[]> results = PedigreeDataManagerTest.pedigreeManager.getDescendants(id, 0, 100);
+		List<Object[]> results = this.pedigreeManager.getDescendants(id, 0, 100);
 		Assert.assertNotNull(results);
 		Assert.assertFalse(results.isEmpty());
 		for (Object[] result : results) {
-			Debug.println(MiddlewareIntegrationTest.INDENT, result[0]);
-			Debug.println(MiddlewareIntegrationTest.INDENT, result[1]);
+			Debug.println(IntegrationTestBase.INDENT, result[0]);
+			Debug.println(IntegrationTestBase.INDENT, result[1]);
 		}
 	}
 
@@ -178,9 +172,8 @@ public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
 		Integer gid = Integer.valueOf(1);
 		int stepsBack = 3;
 		int stepsForward = 3;
-		GermplasmPedigreeTree tree = PedigreeDataManagerTest.pedigreeManager.getDerivativeNeighborhood(gid, stepsBack, stepsForward);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetDerivativeNeighborhood(" + gid + ", " + stepsBack + ", " + stepsForward
-				+ "): ");
+		GermplasmPedigreeTree tree = this.pedigreeManager.getDerivativeNeighborhood(gid, stepsBack, stepsForward);
+		Debug.println(IntegrationTestBase.INDENT, "testGetDerivativeNeighborhood(" + gid + ", " + stepsBack + ", " + stepsForward + "): ");
 		if (tree != null) {
 			this.printNode(tree.getRoot(), 1);
 		}
@@ -189,61 +182,61 @@ public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
 	@Test
 	public void testGetDerivativeNeighborhood2() throws Exception {
 
-		MockDataUtil.mockNeighborhoodTestData(PedigreeDataManagerTest.pedigreeManager, 'D');
+		MockDataUtil.mockNeighborhoodTestData(this.pedigreeManager, 'D');
 		GermplasmPedigreeTree tree;
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "TestCase #1: GID = TOP node (GID, Backward, Forward = -1, 0, 6)");
-		tree = PedigreeDataManagerTest.pedigreeManager.getDerivativeNeighborhood(-1, 0, 6);
+		Debug.println(IntegrationTestBase.INDENT, "TestCase #1: GID = TOP node (GID, Backward, Forward = -1, 0, 6)");
+		tree = this.pedigreeManager.getDerivativeNeighborhood(-1, 0, 6);
 		MockDataUtil.printTree(tree);
 		Assert.assertEquals("-1*-2**-4***-9***-10**-5*-3**-6**-7***-11****-12****-13*****-14**-8***-15****-17****-18*****-20***-16****-19",
 				MockDataUtil.printTree(tree, "*", ""));
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "TestCase #2: GID = LEAF node (GID, Backward, Forward = -5, 2, 10)");
-		tree = PedigreeDataManagerTest.pedigreeManager.getDerivativeNeighborhood(-5, 2, 10);
+		Debug.println(IntegrationTestBase.INDENT, "TestCase #2: GID = LEAF node (GID, Backward, Forward = -5, 2, 10)");
+		tree = this.pedigreeManager.getDerivativeNeighborhood(-5, 2, 10);
 		MockDataUtil.printTree(tree);
 		Assert.assertEquals("-1*-2**-4***-9***-10**-5*-3**-6**-7***-11****-12****-13*****-14**-8***-15****-17****-18*****-20***-16****-19",
 				MockDataUtil.printTree(tree, "*", ""));
 
-		Debug.println(MiddlewareIntegrationTest.INDENT,
+		Debug.println(IntegrationTestBase.INDENT,
 				"TestCase #3: GID = MID node AND Backward < Depth of LEAF (GID, Backward, Forward = -11, 1, 10)");
-		tree = PedigreeDataManagerTest.pedigreeManager.getDerivativeNeighborhood(-11, 1, 10);
+		tree = this.pedigreeManager.getDerivativeNeighborhood(-11, 1, 10);
 		MockDataUtil.printTree(tree);
 		Assert.assertEquals("-7*-11**-12**-13***-14", MockDataUtil.printTree(tree, "*", ""));
 
-		Debug.println(MiddlewareIntegrationTest.INDENT,
+		Debug.println(IntegrationTestBase.INDENT,
 				"TestCase #4: GID = MID node AND Backward = Dept of LEAF (GID, Backward, Forward = -11, 3, 10)");
-		tree = PedigreeDataManagerTest.pedigreeManager.getDerivativeNeighborhood(-11, 3, 10);
+		tree = this.pedigreeManager.getDerivativeNeighborhood(-11, 3, 10);
 		MockDataUtil.printTree(tree);
 		Assert.assertEquals("-1*-2**-4***-9***-10**-5*-3**-6**-7***-11****-12****-13*****-14**-8***-15****-17****-18*****-20***-16****-19",
 				MockDataUtil.printTree(tree, "*", ""));
 
-		Debug.println(MiddlewareIntegrationTest.INDENT,
+		Debug.println(IntegrationTestBase.INDENT,
 				"TestCase #5: GID = MID node AND Backward > Dept of LEAF (GID, Backward, Forward = -11, 5, 10)");
-		tree = PedigreeDataManagerTest.pedigreeManager.getDerivativeNeighborhood(-11, 5, 10);
+		tree = this.pedigreeManager.getDerivativeNeighborhood(-11, 5, 10);
 		MockDataUtil.printTree(tree);
 		Assert.assertEquals("-1*-2**-4***-9***-10**-5*-3**-6**-7***-11****-12****-13*****-14**-8***-15****-17****-18*****-20***-16****-19",
 				MockDataUtil.printTree(tree, "*", ""));
 
-		Debug.println(MiddlewareIntegrationTest.INDENT,
+		Debug.println(IntegrationTestBase.INDENT,
 				"TestCase #6: GID = MID node AND Forward < Tree Depth - MID depth (GID, Backward, Forward = -3, 1, 2)");
-		tree = PedigreeDataManagerTest.pedigreeManager.getDerivativeNeighborhood(-3, 1, 2);
+		tree = this.pedigreeManager.getDerivativeNeighborhood(-3, 1, 2);
 		MockDataUtil.printTree(tree);
 		Assert.assertEquals("-1*-2**-4***-9***-10**-5*-3**-6**-7***-11**-8***-15***-16", MockDataUtil.printTree(tree, "*", ""));
 
-		Debug.println(MiddlewareIntegrationTest.INDENT,
+		Debug.println(IntegrationTestBase.INDENT,
 				"TestCase #7: GID is MAN, but Ancestors and Descendants have non-MAN members (GID, Backward, Forward = -15, 2, 1)");
-		tree = PedigreeDataManagerTest.pedigreeManager.getDerivativeNeighborhood(-15, 2, 1);
+		tree = this.pedigreeManager.getDerivativeNeighborhood(-15, 2, 1);
 		MockDataUtil.printTree(tree);
 		Assert.assertEquals("-3*-6*-7**-11***-12***-13*-8**-15***-17***-18**-16***-19", MockDataUtil.printTree(tree, "*", ""));
 
-		Debug.println(MiddlewareIntegrationTest.INDENT,
+		Debug.println(IntegrationTestBase.INDENT,
 				"TestCase #8: Should stop at GEN even if Backward count is not exhausted (GID, Backward, Forward = -9, 4, 1)");
-		tree = PedigreeDataManagerTest.pedigreeManager.getDerivativeNeighborhood(-9, 4, 1);
+		tree = this.pedigreeManager.getDerivativeNeighborhood(-9, 4, 1);
 		MockDataUtil.printTree(tree);
 		Assert.assertEquals("-4*-9*-10", MockDataUtil.printTree(tree, "*", ""));
 
 		// cleanup
-		MockDataUtil.cleanupMockMaintenanceTestData(PedigreeDataManagerTest.pedigreeManager);
+		MockDataUtil.cleanupMockMaintenanceTestData(this.pedigreeManager);
 	}
 
 	private void printNode(GermplasmPedigreeTreeNode node, int level) {
@@ -254,7 +247,7 @@ public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
 		}
 
 		String name = node.getGermplasm().getPreferredName() != null ? node.getGermplasm().getPreferredName().getNval() : null;
-		Debug.println(MiddlewareIntegrationTest.INDENT, tabs.toString() + node.getGermplasm().getGid() + " : " + name);
+		Debug.println(IntegrationTestBase.INDENT, tabs.toString() + node.getGermplasm().getGid() + " : " + name);
 
 		for (GermplasmPedigreeTreeNode parent : node.getLinkedNodes()) {
 			this.printNode(parent, level + 1);
@@ -264,99 +257,99 @@ public class PedigreeDataManagerTest extends DataManagerIntegrationTest {
 	@Test
 	public void testGetMaintenanceNeighborhood() throws Exception {
 
-		MockDataUtil.mockNeighborhoodTestData(PedigreeDataManagerTest.pedigreeManager, 'M');
+		MockDataUtil.mockNeighborhoodTestData(this.pedigreeManager, 'M');
 		GermplasmPedigreeTree tree;
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "TestCase #1: GID = TOP node (GID, Backward, Forward = -1, 0, 6)");
-		tree = PedigreeDataManagerTest.pedigreeManager.getMaintenanceNeighborhood(-1, 0, 6);
+		Debug.println(IntegrationTestBase.INDENT, "TestCase #1: GID = TOP node (GID, Backward, Forward = -1, 0, 6)");
+		tree = this.pedigreeManager.getMaintenanceNeighborhood(-1, 0, 6);
 		MockDataUtil.printTree(tree);
 		Assert.assertEquals("-1*-2*-3**-6**-7***-11****-12****-13*****-14", MockDataUtil.printTree(tree, "*", ""));
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "TestCase #2: GID = LEAF node (GID, Backward, Forward = -5, 2, 10)");
-		tree = PedigreeDataManagerTest.pedigreeManager.getMaintenanceNeighborhood(-5, 2, 10);
+		Debug.println(IntegrationTestBase.INDENT, "TestCase #2: GID = LEAF node (GID, Backward, Forward = -5, 2, 10)");
+		tree = this.pedigreeManager.getMaintenanceNeighborhood(-5, 2, 10);
 		MockDataUtil.printTree(tree);
 		Assert.assertEquals("-1*-2*-3**-6**-7***-11****-12****-13*****-14", MockDataUtil.printTree(tree, "*", ""));
 
-		Debug.println(MiddlewareIntegrationTest.INDENT,
+		Debug.println(IntegrationTestBase.INDENT,
 				"TestCase #3: GID = MID node AND Backward < Depth of LEAF (GID, Backward, Forward = -11, 1, 10)");
-		tree = PedigreeDataManagerTest.pedigreeManager.getMaintenanceNeighborhood(-11, 1, 10);
+		tree = this.pedigreeManager.getMaintenanceNeighborhood(-11, 1, 10);
 		MockDataUtil.printTree(tree);
 		Assert.assertEquals("-7*-11**-12**-13***-14", MockDataUtil.printTree(tree, "*", ""));
 
-		Debug.println(MiddlewareIntegrationTest.INDENT,
+		Debug.println(IntegrationTestBase.INDENT,
 				"TestCase #4: GID = MID node AND Backward = Dept of LEAF (GID, Backward, Forward = -11, 3, 10)");
-		tree = PedigreeDataManagerTest.pedigreeManager.getMaintenanceNeighborhood(-11, 3, 10);
+		tree = this.pedigreeManager.getMaintenanceNeighborhood(-11, 3, 10);
 		MockDataUtil.printTree(tree);
 		Assert.assertEquals("-1*-2*-3**-6**-7***-11****-12****-13*****-14", MockDataUtil.printTree(tree, "*", ""));
 
-		Debug.println(MiddlewareIntegrationTest.INDENT,
+		Debug.println(IntegrationTestBase.INDENT,
 				"TestCase #5: GID = MID node AND Backward > Dept of LEAF (GID, Backward, Forward = -11, 5, 10)");
-		tree = PedigreeDataManagerTest.pedigreeManager.getMaintenanceNeighborhood(-11, 5, 10);
+		tree = this.pedigreeManager.getMaintenanceNeighborhood(-11, 5, 10);
 		MockDataUtil.printTree(tree);
 		Assert.assertEquals("-1*-2*-3**-6**-7***-11****-12****-13*****-14", MockDataUtil.printTree(tree, "*", ""));
 
-		Debug.println(MiddlewareIntegrationTest.INDENT,
+		Debug.println(IntegrationTestBase.INDENT,
 				"TestCase #6: GID = MID node AND Forward < Tree Depth - MID depth (GID, Backward, Forward = -3, 1, 2)");
-		tree = PedigreeDataManagerTest.pedigreeManager.getMaintenanceNeighborhood(-3, 1, 2);
+		tree = this.pedigreeManager.getMaintenanceNeighborhood(-3, 1, 2);
 		MockDataUtil.printTree(tree);
 		Assert.assertEquals("-1*-2*-3**-6**-7***-11", MockDataUtil.printTree(tree, "*", ""));
 
-		Debug.println(MiddlewareIntegrationTest.INDENT,
+		Debug.println(IntegrationTestBase.INDENT,
 				"TestCase #7: GID is MAN, but Ancestors and Descendants have non-MAN members (GID, Backward, Forward = -15, 2, 1)");
-		tree = PedigreeDataManagerTest.pedigreeManager.getMaintenanceNeighborhood(-15, 2, 1);
+		tree = this.pedigreeManager.getMaintenanceNeighborhood(-15, 2, 1);
 		MockDataUtil.printTree(tree);
 		Assert.assertEquals("-1*-2*-3**-6**-7***-11", MockDataUtil.printTree(tree, "*", ""));
 
-		Debug.println(MiddlewareIntegrationTest.INDENT,
+		Debug.println(IntegrationTestBase.INDENT,
 				"TestCase #8: Should stop at GEN even if Backward count is not exhausted (GID, Backward, Forward = -9, 4, 1)");
-		tree = PedigreeDataManagerTest.pedigreeManager.getMaintenanceNeighborhood(-9, 4, 1);
+		tree = this.pedigreeManager.getMaintenanceNeighborhood(-9, 4, 1);
 		MockDataUtil.printTree(tree);
 		Assert.assertEquals("-4*-9*-10", MockDataUtil.printTree(tree, "*", ""));
 
 		// cleanup
-		MockDataUtil.cleanupMockMaintenanceTestData(PedigreeDataManagerTest.pedigreeManager);
+		MockDataUtil.cleanupMockMaintenanceTestData(this.pedigreeManager);
 	}
 
 	@Test
 	public void testGetParentByGIDAndProgenitorNumber() throws Exception {
 		Integer gid = Integer.valueOf(104);
 		Integer progenitorNumber = Integer.valueOf(2);
-		Germplasm result = PedigreeDataManagerTest.pedigreeManager.getParentByGIDAndProgenitorNumber(gid, progenitorNumber);
+		Germplasm result = this.pedigreeManager.getParentByGIDAndProgenitorNumber(gid, progenitorNumber);
 		Assert.assertNotNull(result);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetParentByGIDAndProgenitorNumber(): " + result);
+		Debug.println(IntegrationTestBase.INDENT, "testGetParentByGIDAndProgenitorNumber(): " + result);
 	}
 
 	@Test
 	public void testCountDescendants() throws Exception {
 		Integer gid = 10; // change gid value
-		long count = PedigreeDataManagerTest.pedigreeManager.countDescendants(gid);
+		long count = this.pedigreeManager.countDescendants(gid);
 		Assert.assertNotNull(count);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testCountDescendants(" + gid + "):" + count);
+		Debug.println(IntegrationTestBase.INDENT, "testCountDescendants(" + gid + "):" + count);
 	}
 
 	@Test
 	public void testCountGroupRelatives() throws Exception {
 		Integer gid = 1; // change gid value
-		long count = PedigreeDataManagerTest.pedigreeManager.countGroupRelatives(gid);
+		long count = this.pedigreeManager.countGroupRelatives(gid);
 		Assert.assertNotNull(count);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testCountGroupRelatives(" + gid + "):" + count);
+		Debug.println(IntegrationTestBase.INDENT, "testCountGroupRelatives(" + gid + "):" + count);
 	}
 
 	@Test
 	public void testCountManagementNeighbors() throws Exception {
 		Integer gid = 1; // change gid value
-		long count = PedigreeDataManagerTest.pedigreeManager.countManagementNeighbors(gid);
+		long count = this.pedigreeManager.countManagementNeighbors(gid);
 		Assert.assertNotNull(count);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testCountManagementNeighbors(" + gid + "):" + count);
+		Debug.println(IntegrationTestBase.INDENT, "testCountManagementNeighbors(" + gid + "):" + count);
 	}
 
 	@Test
 	public void testGetPedigreeLine() throws Exception {
 		Integer gid = Integer.valueOf(306436);
 		int locationID = 187;
-		List<Germplasm> results = PedigreeDataManagerTest.pedigreeManager.getPedigreeLine(gid, locationID);
+		List<Germplasm> results = this.pedigreeManager.getPedigreeLine(gid, locationID);
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetPedigreeLine(" + gid + ", " + locationID + "):" + results.size());
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, results);
+		Debug.println(IntegrationTestBase.INDENT, "testGetPedigreeLine(" + gid + ", " + locationID + "):" + results.size());
+		Debug.printObjects(IntegrationTestBase.INDENT, results);
 	}
 }

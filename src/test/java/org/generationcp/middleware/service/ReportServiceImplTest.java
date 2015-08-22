@@ -5,30 +5,21 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 
-import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.reports.Reporter;
 import org.generationcp.middleware.service.api.DataImportService;
-import org.generationcp.middleware.service.api.FieldbookService;
-import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.ReportService;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.springframework.beans.factory.annotation.Autowired;
 
-@RunWith(JUnit4.class)
-public class ReportServiceImplTest extends DataManagerIntegrationTest {
+public class ReportServiceImplTest extends IntegrationTestBase {
 
-	private static ReportService reportService;
-	private static DataImportService dataImportService;
+	@Autowired
+	private ReportService reportService;
 
-	private static StudyDataManager studyMgr = DataManagerIntegrationTest.managerFactory.getStudyDataManager();
-	private static StudyDataManager studyMgrNew = DataManagerIntegrationTest.managerFactory.getNewStudyDataManager();
-
-	private static FieldbookService fbService = DataManagerIntegrationTest.managerFactory.getFieldbookMiddlewareService();
-	private static OntologyService ontologyService = DataManagerIntegrationTest.managerFactory.getOntologyService();
+	@Autowired
+	private DataImportService dataImportService;
 
 	private static final int PROJECT_ID = -2; // local nursery;
 	private static final String KEY_MAIZE_FIELDBOOK_NURSERY = "MFbNur";
@@ -37,7 +28,6 @@ public class ReportServiceImplTest extends DataManagerIntegrationTest {
 
 	private static final int PROJECT_WHEAT_ID = -2; // local trial;
 	private static final int PROJECT_WHEAT_CROSSES_ID = -8; // local nursery;
-	private static final int PROJECT_WHEAT_TRIAL_ID = -11; // local nursery;
 	private static final String KEY_WHEAT_FIELDBOOK_23 = "WFb23";
 	private static final String KEY_WHEAT_FIELDBOOK_24 = "WFb24";
 	private static final String KEY_WHEAT_FIELDBOOK_25 = "WFb25";
@@ -55,19 +45,12 @@ public class ReportServiceImplTest extends DataManagerIntegrationTest {
 	private static final String KEY_WHEAT_LABELS_05 = "WLBL05";
 	private static final String KEY_WHEAT_LABELS_21 = "WLBL21";
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		ReportServiceImplTest.reportService = DataManagerIntegrationTest.managerFactory.getReportService();
-
-		ReportServiceImplTest.dataImportService = DataManagerIntegrationTest.managerFactory.getDataImportService();
-	}
-
 	// TODO create separate class for testing keys
 	// TODO create separate class for testing total number of parameters by report type
 
 	@Test
 	public void testGetReportKeys() {
-		Assert.assertTrue(ReportServiceImplTest.reportService.getReportKeys().size() > 0);
+		Assert.assertTrue(this.reportService.getReportKeys().size() > 0);
 	}
 
 	@Test
@@ -169,19 +152,19 @@ public class ReportServiceImplTest extends DataManagerIntegrationTest {
 
 	/**
 	 * Tests that a particular report is indeed created, given a studyId.
-	 * 
+	 *
 	 * @param studyId id of the test study
 	 * @param reportCode specific report code to generate.
 	 */
 	private void assertReportGenerated(Integer studyId, String reportCode) {
 
-		boolean hasReportKey = ReportServiceImplTest.reportService.getReportKeys().contains(reportCode);
+		boolean hasReportKey = this.reportService.getReportKeys().contains(reportCode);
 
 		if (hasReportKey) {
 			try {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-				Reporter rep = ReportServiceImplTest.reportService.getStreamReport(reportCode, studyId, baos);
+				Reporter rep = this.reportService.getStreamReport(reportCode, studyId, baos);
 
 				Assert.assertTrue("Failed test - empty report for code [" + reportCode + "].", baos.size() > 0);
 

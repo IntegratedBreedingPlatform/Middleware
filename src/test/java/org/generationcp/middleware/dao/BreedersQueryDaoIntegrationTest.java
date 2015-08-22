@@ -4,20 +4,20 @@ package org.generationcp.middleware.dao;
 import java.util.HashSet;
 import java.util.List;
 
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.h2h.GermplasmLocationInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
-public class BreedersQueryDaoIntegrationTest extends MiddlewareIntegrationTest {
+public class BreedersQueryDaoIntegrationTest extends IntegrationTestBase {
 
 	private static BreedersQueryDao dao;
 
-	@BeforeClass
-	public static void setUp() {
-		BreedersQueryDaoIntegrationTest.dao = new BreedersQueryDao(MiddlewareIntegrationTest.sessionUtil.getCurrentSession());
+	@Before
+	public void setUp() {
+		BreedersQueryDaoIntegrationTest.dao = new BreedersQueryDao(this.sessionProvder.getSession());
 	}
 
 	// FIXME I assume some Rice corp data in central schema for my test

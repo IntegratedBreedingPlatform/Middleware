@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware;
 
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -8,6 +9,8 @@ import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.transaction.TransactionConfiguration;
@@ -28,6 +31,10 @@ public abstract class IntegrationTestBase {
 
 	private static final Logger LOG = LoggerFactory.getLogger(IntegrationTestBase.class);
 	public static final int INDENT = 3;
+
+	@Autowired
+	@Qualifier(value = "cropSessionProvider")
+	protected HibernateSessionProvider sessionProvder;
 
 	@Rule
 	public TestName name = new TestName();
