@@ -18,6 +18,7 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
@@ -611,6 +612,12 @@ public interface InventoryDataManager {
 	void cancelReservedInventory(List<org.generationcp.middleware.pojos.ims.ReservedInventoryKey> lotEntries)
 			throws MiddlewareQueryException;
 
+	/**
+	 * Adds in inventory related information into an existing {@link GermplasmList}
+	 * @param germplasmList Existing germplasm list that we want to add inventory data too.
+	 */
+	void populateLotCountsIntoExistingList(GermplasmList germplasmList);
+	
 	Integer addStockTransaction(StockTransaction stockTransaction) throws MiddlewareQueryException;
 
 	boolean isStockIdExists(List<String> stockIDs) throws MiddlewareQueryException;
@@ -622,4 +629,6 @@ public interface InventoryDataManager {
 	void updateInventory(Integer listId, List<InventoryDetails> inventoryDetailListFromDB) throws MiddlewareQueryException;
 
 	Lot getLotById(Integer id) throws MiddlewareQueryException;
+
+
 }

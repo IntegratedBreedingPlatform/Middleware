@@ -782,9 +782,18 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	@Override
 	public List<GermplasmListData> getLotCountsForList(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
 		List<GermplasmListData> listEntries = this.getGermplasmListDataByListId(id, start, numOfRows);
-		return this.getListInventoryBuilder().retrieveLotCountsForList(id, start, numOfRows, listEntries);
+		return this.getListInventoryBuilder().retrieveLotCountsForList(listEntries);
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.generationcp.middleware.manager.api.InventoryDataManager#populateLotCountsIntoExistingList(org.generationcp.middleware.pojos.GermplasmList)
+	 */
+	@Override
+	public void populateLotCountsIntoExistingList(final GermplasmList germplasmList) throws MiddlewareQueryException {
+		this.getListInventoryBuilder().retrieveLotCountsForList(germplasmList.getListData());
+	}
+	
 	@Override
 	public Integer countLotsWithAvailableBalanceForGermplasm(Integer gid) throws MiddlewareQueryException {
 		return this.getListInventoryBuilder().countLotsWithAvailableBalanceForGermplasm(gid);
