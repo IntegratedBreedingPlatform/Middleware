@@ -215,19 +215,4 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 		this.userDataManager.deleteUser(user);
 
 	}
-
-	@Test
-	public void testIsValidUserLogin() throws MiddlewareQueryException {
-		String validuser = "GMCLAREN"; // enter valid username
-		String validpass = "IR123"; // enter valid password
-		Debug.println(IntegrationTestBase.INDENT,
-				"testIsValidUserLogin (using valid username & password): " + this.userDataManager.isValidUserLogin(validuser, validpass));
-		String invaliduser = "username"; // enter invalid username
-		String invalidpass = "password"; // enter invalid password
-		Debug.println(
-				IntegrationTestBase.INDENT,
-				"testIsValidUserLogin (using invalid username & password): "
-						+ this.userDataManager.isValidUserLogin(invaliduser, invalidpass));
-	}
-
 }

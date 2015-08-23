@@ -179,16 +179,6 @@ public interface WorkbenchDataManager {
 	List<Tool> getToolsWithType(ToolType toolType) throws MiddlewareQueryException;
 
 	/**
-	 * Checks if is valid user login.
-	 * 
-	 * @param username - the username
-	 * @param password - the password
-	 * @return true, if is valid user login
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException;
-
-	/**
 	 * Changes the password of the user.
 	 * 
 	 * @param username - the username

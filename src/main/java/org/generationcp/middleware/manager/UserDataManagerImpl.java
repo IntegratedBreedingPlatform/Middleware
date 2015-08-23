@@ -152,14 +152,6 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	}
 
 	@Override
-	public boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException {
-		if (this.getUserDao().getByUsernameAndPassword(username, password) != null) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
 	public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException {
 		if (this.getPersonDao().isPersonExists(firstName, lastName)) {
 			return true;

@@ -590,14 +590,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException {
-		if (this.getUserDao().getByUsernameAndPassword(username, password) != null) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
 	public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException {
 		return this.getPersonDao().isPersonExists(firstName, lastName);
 	}
