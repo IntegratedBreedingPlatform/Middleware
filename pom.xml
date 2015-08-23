@@ -101,14 +101,6 @@
 			<scope>test</scope>
 		</dependency>
 		
-		<!-- Used in tests to do a git (svn) checkout of DBScripts for db setup -->
-		<dependency>
-			<groupId>org.tmatesoft.svnkit</groupId>
-			<artifactId>svnkit</artifactId>
-			<version>1.8.5</version>
-			<scope>test</scope>
-		</dependency>
-		
 		<!-- podam = POjo DAta Mocker :) -->
 		<dependency>
 			<groupId>uk.co.jemos.podam</groupId>

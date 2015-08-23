@@ -5,9 +5,6 @@ import java.util.Date;
 import java.util.Random;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
@@ -18,28 +15,13 @@ import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 
-// TODO remove parent class and singletong instance creation.
 public class WorkbenchTestDataUtil {
 
-	private static WorkbenchTestDataUtil instance;
 	private final WorkbenchDataManager workbenchDataManager;
 	private Project commonTestProject;
 	private User testUser1, testUser2;
 	private Person testPerson1, testPerson2;
 	private ProjectActivity testProjectActivity1, testProjectActivity2;
-
-	private WorkbenchTestDataUtil() {
-		HibernateSessionProvider sessionProvider =
-				new HibernateSessionPerThreadProvider(MiddlewareIntegrationTest.workbenchSessionUtil.getSessionFactory());
-		this.workbenchDataManager = new WorkbenchDataManagerImpl(sessionProvider);
-	}
-
-	public static WorkbenchTestDataUtil getInstance() {
-		if (WorkbenchTestDataUtil.instance == null) {
-			WorkbenchTestDataUtil.instance = new WorkbenchTestDataUtil();
-		}
-		return WorkbenchTestDataUtil.instance;
-	}
 
 	public WorkbenchTestDataUtil(WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
