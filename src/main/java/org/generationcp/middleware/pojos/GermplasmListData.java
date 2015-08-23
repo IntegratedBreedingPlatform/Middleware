@@ -35,7 +35,6 @@ import org.generationcp.middleware.interfaces.GermplasmExportSource;
 import org.generationcp.middleware.util.Debug;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
-import org.hibernate.annotations.SQLDelete;
 
 /**
  * POJO for listdata table.
@@ -46,7 +45,6 @@ import org.hibernate.annotations.SQLDelete;
 @NamedQueries({@NamedQuery(name = "deleteGermplasmListDataByListId", query = "UPDATE GermplasmListData SET status = 9 WHERE list = :listId")})
 @Entity
 @Table(name = "listdata")
-@SQLDelete(sql = "UPDATE listdata SET lrstatus = 9 WHERE lrecid = ?")
 public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	private static final long serialVersionUID = 1L;
