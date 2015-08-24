@@ -121,8 +121,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		adminUser.setStatus(0);
 		adminUser.setAccess(0);
 		adminUser.setType(0);
-		adminUser.setAdate(20140101);
-		adminUser.setCdate(20140101);
+		adminUser.setAssignDate(20140101);
+		adminUser.setCloseDate(20140101);
 
 		List<UserRole> adminRoles = new ArrayList<UserRole>();
 		adminRoles.add(new UserRole(adminUser, "ADMIN"));
@@ -156,8 +156,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		breederUser.setStatus(0);
 		breederUser.setAccess(0);
 		breederUser.setType(0);
-		breederUser.setAdate(20140101);
-		breederUser.setCdate(20140101);
+		breederUser.setAssignDate(20140101);
+		breederUser.setCloseDate(20140101);
 
 		List<UserRole> breederRoles = new ArrayList<UserRole>();
 		breederRoles.add(new UserRole(breederUser, "BREEDER"));
@@ -191,8 +191,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		technicianUser.setStatus(0);
 		technicianUser.setAccess(0);
 		technicianUser.setType(0);
-		technicianUser.setAdate(20140101);
-		technicianUser.setCdate(20140101);
+		technicianUser.setAssignDate(20140101);
+		technicianUser.setCloseDate(20140101);
 
 		List<UserRole> technicianRoles = new ArrayList<UserRole>();
 		technicianRoles.add(new UserRole(technicianUser, "TECHNICIAN"));

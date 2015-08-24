@@ -52,8 +52,8 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 		user.setName("user_test");
 		user.setPassword("user_password");
 		user.setPersonid(-1);
-		user.setAdate(20120101);
-		user.setCdate(20120101);
+		user.setAssignDate(20120101);
+		user.setCloseDate(20120101);
 
 		this.userDataManager.addUser(user);
 
@@ -179,8 +179,8 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 		user.setName("user_test");
 		user.setPassword("user_password");
 		user.setPersonid(-1);
-		user.setAdate(20120101);
-		user.setCdate(20120101);
+		user.setAssignDate(20120101);
+		user.setCloseDate(20120101);
 
 		this.userDataManager.addUser(user);
 
@@ -202,8 +202,8 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 		user.setName("user_test");
 		user.setPassword("user_password");
 		user.setPersonid(-1);
-		user.setAdate(20120101);
-		user.setCdate(20120101);
+		user.setAssignDate(20120101);
+		user.setCloseDate(20120101);
 
 		this.userDataManager.addUser(user);
 

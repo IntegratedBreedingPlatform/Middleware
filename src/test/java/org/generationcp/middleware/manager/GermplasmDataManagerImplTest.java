@@ -89,8 +89,8 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		if (user == null) {
 			user = new User();
 			user.setAccess(1);
-			user.setAdate(1);
-			user.setCdate(1);
+			user.setAssignDate(1);
+			user.setCloseDate(1);
 			user.setInstalid(1);
 			user.setName("uname");
 			user.setPassword("upwd");

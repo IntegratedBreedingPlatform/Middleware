@@ -54,8 +54,8 @@ public class WorkbenchTestDataUtil {
 		user.setName("user_test" + new Random().nextInt());
 		user.setPassword("user_password");
 		user.setPersonid(1);
-		user.setAdate(20150101);
-		user.setCdate(20150101);
+		user.setAssignDate(20150101);
+		user.setCloseDate(20150101);
 		return user;
 	}
 

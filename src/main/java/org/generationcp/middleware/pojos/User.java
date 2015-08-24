@@ -152,8 +152,8 @@ public class User implements Serializable, BeanFormState {
 		user.setName(this.name);
 		user.setPassword(this.password);
 		user.setPersonid(this.personid);
-		user.setAdate(this.adate);
-		user.setCdate(this.cdate);
+		user.setAssignDate(this.adate);
+		user.setCloseDate(this.cdate);
 		user.setIsNew(this.isnew);
 		user.setActive(this.active);
 		user.setEnabled(this.enabled);
@@ -224,19 +224,19 @@ public class User implements Serializable, BeanFormState {
 		this.personid = personid;
 	}
 
-	public Integer getAdate() {
+	public Integer getAssignDate() {
 		return this.adate;
 	}
 
-	public void setAdate(Integer adate) {
+	public void setAssignDate(Integer adate) {
 		this.adate = adate;
 	}
 
-	public Integer getCdate() {
+	public Integer getCloseDate() {
 		return this.cdate;
 	}
 
-	public void setCdate(Integer cdate) {
+	public void setCloseDate(Integer cdate) {
 		this.cdate = cdate;
 	}
 

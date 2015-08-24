@@ -144,8 +144,8 @@ public class DataSetupTest extends IntegrationTestBase {
 		workbenchUser.setName("joe");
 		workbenchUser.setPassword("b");
 		workbenchUser.setPersonid(person.getId());
-		workbenchUser.setAdate(20150101);
-		workbenchUser.setCdate(20150101);
+		workbenchUser.setAssignDate(20150101);
+		workbenchUser.setCloseDate(20150101);
 		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, "ADMIN")));
 
 		this.workbenchDataManager.addUser(workbenchUser);
