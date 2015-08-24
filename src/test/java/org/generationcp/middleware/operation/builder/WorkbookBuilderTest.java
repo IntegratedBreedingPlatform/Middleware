@@ -51,7 +51,6 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	@Autowired
 	private FieldbookService fieldbookService;
 
-	@Autowired
 	private WorkbookBuilder workbookBuilder;
 
 	private MeasurementVariableTransformer measurementVariableTransformer;

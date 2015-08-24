@@ -9,13 +9,7 @@ import org.generationcp.middleware.domain.conformity.UploadInput;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
-/**
- * Created by IntelliJ IDEA. User: Daniel Villafuerte
- */
-@RunWith(JUnit4.class)
 public class ConformityInputTransformerTest {
 
 	private Map<String, String>[] parentMapArray;

@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.etl;
@@ -16,12 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import junit.framework.Assert;
-
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Location;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class WorkbookTest {
@@ -144,9 +143,9 @@ public class WorkbookTest {
 	private static final String CHALK_PCT = "CHALK_PCT";
 
 	public static final String[] G_NAMES = {"TIANDOUGOU-9", "KENINKENI-27", "SM114-1A-1-1-1B", "SM114-1A-14-1-1B", "SM114-1A-361-1-1B",
-			"SM114-1A-86-1-1B", "SM114-1A-115-1-1B", "SM114-1A-281-1-1B", "SM114-1A-134-1-1B", "SM114-1A-69-1-1B", "SM114-1A-157-1-1B",
-			"SM114-1A-179-1-1B", "TIANDOUGOU-9", "SM114-1A-36-1-1B", "SM114-1A-201-1-1B", "SM114-1A-31-1-1B", "SM114-1A-353-1-1B",
-			"SM114-1A-26-1-1B", "SM114-1A-125-1-1B", "SM114-1A-384-1-1B"};
+		"SM114-1A-86-1-1B", "SM114-1A-115-1-1B", "SM114-1A-281-1-1B", "SM114-1A-134-1-1B", "SM114-1A-69-1-1B", "SM114-1A-157-1-1B",
+		"SM114-1A-179-1-1B", "TIANDOUGOU-9", "SM114-1A-36-1-1B", "SM114-1A-201-1-1B", "SM114-1A-31-1-1B", "SM114-1A-353-1-1B",
+		"SM114-1A-26-1-1B", "SM114-1A-125-1-1B", "SM114-1A-384-1-1B"};
 
 	private static Workbook workbook;
 	private static List<Workbook> workbooks;
@@ -367,12 +366,12 @@ public class WorkbookTest {
 		List<MeasurementVariable> variates = currentWorkbook.getVariates();
 		MeasurementVariable measurementVariable =
 				WorkbookTest
-						.createMeasurementVariable(
-								WorkbookTest.CRUST_ID,
-								WorkbookTest.CRUST,
-								"Score for the severity of common rust, (In highlands and mid altitude, Puccinia sorghi) symptoms rated on a scale from 1 (= clean, no infection) to 5 (= severely diseased).",
-								WorkbookTest.SCORE_1_5, WorkbookTest.VISUAL_SCORING, WorkbookTest.COMMON_RUST, WorkbookTest.CHAR, null,
-								WorkbookTest.PLOT, TermId.CHARACTER_VARIABLE.getId());
+				.createMeasurementVariable(
+						WorkbookTest.CRUST_ID,
+						WorkbookTest.CRUST,
+						"Score for the severity of common rust, (In highlands and mid altitude, Puccinia sorghi) symptoms rated on a scale from 1 (= clean, no infection) to 5 (= severely diseased).",
+						WorkbookTest.SCORE_1_5, WorkbookTest.VISUAL_SCORING, WorkbookTest.COMMON_RUST, WorkbookTest.CHAR, null,
+						WorkbookTest.PLOT, TermId.CHARACTER_VARIABLE.getId());
 		measurementVariable.setStoredIn(TermId.CATEGORICAL_VARIATE.getId());
 		measurementVariable.setOperation(Operation.ADD);
 		variates.add(measurementVariable);
@@ -663,7 +662,7 @@ public class WorkbookTest {
 
 	@Test
 	public void testGetMeasurementDatasetVariablesViewForTrial() {
-		this.getTestWorkbook(1, StudyType.T);
+		WorkbookTest.getTestWorkbook(1, StudyType.T);
 
 		List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 
@@ -678,7 +677,7 @@ public class WorkbookTest {
 	@Test
 	public void testGetMeasurementDatasetVariablesViewForNursery() {
 
-		this.getTestWorkbook(1, StudyType.N);
+		WorkbookTest.getTestWorkbook(1, StudyType.N);
 
 		List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 

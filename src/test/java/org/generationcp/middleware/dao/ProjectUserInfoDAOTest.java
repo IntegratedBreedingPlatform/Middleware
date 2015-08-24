@@ -53,12 +53,7 @@ public class ProjectUserInfoDAOTest extends IntegrationTestBase {
 		ProjectUserInfo result = this.dao.getByProjectIdAndUserId(projectId, userId);
 
 		Assert.assertNotNull(result);
-
-		if (result == null) {
-			Debug.println(0, "testGetByProjectIdAndUserId RESULTS: no result");
-		} else {
-			Debug.println(0, "testGetByProjectIdAndUserId RESULTS:" + result.getProjectId());
-			Debug.println(0, result.toString());
-		}
+		Debug.println(0, "testGetByProjectIdAndUserId RESULTS:" + result.getProjectId());
+		Debug.println(0, result.toString());
 	}
 }

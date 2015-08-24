@@ -24,7 +24,7 @@ public class StandardVariableDaoTest extends IntegrationTestBase {
 	private OntologyDataManager manager;
 
 	@Test
-	public void testGetStandardVariableSummaryCentral() throws MiddlewareQueryException {
+	public void testGetStandardVariableSummaryReferenceData() throws MiddlewareQueryException {
 
 		StandardVariableDao dao = new StandardVariableDao(this.sessionProvder.getSession());
 
@@ -62,7 +62,7 @@ public class StandardVariableDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStandardVariableSummaryLocal() throws MiddlewareQueryException {
+	public void testGetStandardVariableSummaryUserCreated() throws MiddlewareQueryException {
 		// First create a local Standardvariable
 		StandardVariable myOwnPlantHeight = new StandardVariable();
 		myOwnPlantHeight.setName("MyOwnPlantHeight " + new Random().nextInt(1000));
@@ -91,24 +91,7 @@ public class StandardVariableDaoTest extends IntegrationTestBase {
 		Assert.assertNotNull(summary);
 
 		// Make sure that the summary data loaded from view matches with details data loaded using the usual method.
-		Assert.assertEquals(new Integer(details.getId()), summary.getId());
-		Assert.assertEquals(details.getName(), summary.getName());
-		Assert.assertEquals(details.getDescription(), summary.getDescription());
-
-		// For local standard variables we only assert the IDs of main components of the ontology star because
-		// some ID references in the LOCAL 'standard_variable_summary' view data may be to central DB which view does not hard link to.
-		Assert.assertEquals(new Integer(details.getProperty().getId()), summary.getProperty().getId());
-		Assert.assertEquals(new Integer(details.getMethod().getId()), summary.getMethod().getId());
-		Assert.assertEquals(new Integer(details.getScale().getId()), summary.getScale().getId());
-		// isA is not populated in local databases anymore against the standard variable, it is stored against the Property of SV.
-		// the view always returns null for isA :(
-		Assert.assertNull(summary.getIsA());
-		Assert.assertEquals(new Integer(details.getDataType().getId()), summary.getDataType().getId());
-		Assert.assertEquals(new Integer(details.getStoredIn().getId()), summary.getStoredIn().getId());
-		Assert.assertEquals(details.getPhenotypicType(), summary.getPhenotypicType());
-
-		// Test done. Cleanup the test data created.
-		this.manager.deleteStandardVariable(myOwnPlantHeight.getId());
+		this.assertVariableDataMatches(details, summary);
 	}
 
 	@Test

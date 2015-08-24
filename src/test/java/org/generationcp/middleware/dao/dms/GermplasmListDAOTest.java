@@ -12,6 +12,8 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import java.util.UUID;
+
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -70,6 +72,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		list.setType(type);
 		list.setUserId(userId);
 		list.setStatus(status);
+		list.setProgramUUID(UUID.randomUUID().toString());
 		return list;
 	}
 }
