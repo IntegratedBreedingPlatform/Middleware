@@ -35,6 +35,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.OntologyDataManagerImplTestConstants;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -846,6 +847,7 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	@Ignore(value = "Skipping this test. It takes minute+ to run and does not have any assertions anyway. Needs revising.")
 	public void testGetAllStandardVariable() throws Exception {
 		Set<StandardVariable> standardVariables = this.ontologyDataManager.getAllStandardVariables();
 		for (StandardVariable stdVar : standardVariables) {
