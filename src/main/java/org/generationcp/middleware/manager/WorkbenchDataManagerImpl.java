@@ -889,6 +889,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		} catch (Exception e) {
 			this.logAndThrowException("Error encountered while deleting ProjectUser: WorkbenchDataManager.deleteProjectUser(projectUser="
 					+ projectUserRole + "): " + e.getMessage(), e);
+		} finally {
+			this.getCurrentSession().flush();
 		}
 	}
 
