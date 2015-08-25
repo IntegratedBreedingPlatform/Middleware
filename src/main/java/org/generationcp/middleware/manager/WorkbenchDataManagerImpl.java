@@ -193,19 +193,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void updateProjectsRolesForProject(Project project, List<ProjectUserRole> newRoles) throws MiddlewareQueryException {
-		List<ProjectUserRole> deleteRoles = this.getProjectUserRolesByProject(project);
-
 		// remove all previous roles
-		for (ProjectUserRole projectUserRole : deleteRoles) {
-			this.deleteProjectUserRole(projectUserRole);
-		}
-
+		this.deleteProjectUserRolesByProject(project);
+		// apply the delete first before the add
+		getCurrentSession().flush();
 		// add the new roles
-		for (ProjectUserRole projectUserRole : newRoles) {
-			User user = new User();
-			user.setUserid(projectUserRole.getUserId());
-			this.addProjectUserRole(project, user, projectUserRole.getRole());
-		}
+		this.addProjectUserRole(newRoles);
 	}
 
 	private ProjectUserRoleDAO getProjectUserRoleDao() {
@@ -849,6 +842,19 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		}
 
 		return idSaved;
+	}
+
+	@Override
+	public void deleteProjectUserRolesByProject(Project project) throws MiddlewareQueryException {
+		// remove all previous roles
+		try {
+			for (ProjectUserRole projectUserRole : this.getProjectUserRolesByProject(project)) {
+					getCurrentSession().delete(projectUserRole);
+			}
+		} catch (Exception e) {
+			this.logAndThrowException("Error encountered while deleting ProjectUser: WorkbenchDataManager.deleteProjectUserRoles(projec="
+					+ project + "): " + e.getMessage(), e);
+		}
 	}
 
 	@Override

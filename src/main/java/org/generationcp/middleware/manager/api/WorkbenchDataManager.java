@@ -513,6 +513,8 @@ public interface WorkbenchDataManager {
 	 */
 	Integer addProjectUserRole(ProjectUserRole projectUserRole) throws MiddlewareQueryException;
 
+	void deleteProjectUserRolesByProject(Project project) throws MiddlewareQueryException;
+
 	/**
 	 * Adds multiple workbench_project_user_role records.
 	 * 
