@@ -403,7 +403,11 @@
 						<include>**/ListDataProjectTest.java</include>
 						<include>**/FieldbookListUtilTest.java</include>
 						<include>**/UtilTest.java</include>
-												
+						<include>**/TrialTraitsTest.java</include>
+						<include>**/StudyServiceImplTest.java</include>
+						<include>**/ObservationsTest.java</include>
+						<include>**/QueryTest.java</include>
+						<include>**/StudyMeasurementsTest.java</include>
 					</includes>
 				</configuration>
 			</plugin>
