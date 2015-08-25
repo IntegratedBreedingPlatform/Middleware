@@ -83,3 +83,4 @@ updatedIbdbScripts/
 /bin
 node_modules
 *.epoch
+*.lck
