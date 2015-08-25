@@ -378,6 +378,7 @@
 						<include>**/CrossStudyDataManagerImplTest.java</include>
 						<include>**/GermplasmDataManagerUtilTest.java</include>
 						<include>**/GermplasmAddUpdateFunctionsTest.java</include>
+						<include>**/LocationDataManagerImplTest.java</include>
 						
 						<include>**/CvTermDaoTest.java</include>
 						<include>**/StandardVariableDaoTest.java</include>
@@ -393,7 +394,14 @@
 						<include>**/ProjectPropertySaverTest.java</include>
 						<include>**/WorkbookSaverTest.java</include>
 						<include>**/DatasetValuesTransformerTest.java</include>
-						<include>**/ExperimentValuesTransformerTest.java</include>						
+						<include>**/ExperimentValuesTransformerTest.java</include>
+						<include>**/MeasurementVariableTransformerTest.java</include>
+						<include>**/StudyValuesTransformerTest.java</include>
+						<include>**/GDMSPojosSimpleTest.java</include>
+						<include>**/GMSPojosSimpleTest.java</include>
+						<include>**/IMSPojosSimpleTest.java</include>
+						<include>**/ListDataProjectTest.java</include>
+												
 					</includes>
 				</configuration>
 			</plugin>

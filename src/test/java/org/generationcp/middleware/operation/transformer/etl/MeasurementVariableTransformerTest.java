@@ -24,6 +24,8 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 	private MeasurementVariableTransformer transformer;
 	private StandardVariableBuilder standardVariableBuilder;
 	private static final int SITE_SOIL_PH = 8270;
+
+	// FIXME maize specific cvterm. Change to use something from common cvterms.
 	private static final int CRUST = 20310;
 
 	@Before
@@ -175,8 +177,8 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 
 	private VariableTypeList createTrialConstantVariableTypeList() throws MiddlewareQueryException {
 		VariableTypeList varTypeList = new VariableTypeList();
-		StandardVariable siteSoilPh = this.getStandardVariable(this.SITE_SOIL_PH);
-		StandardVariable crust = this.getStandardVariable(this.CRUST);
+		StandardVariable siteSoilPh = this.getStandardVariable(MeasurementVariableTransformerTest.SITE_SOIL_PH);
+		StandardVariable crust = this.getStandardVariable(MeasurementVariableTransformerTest.CRUST);
 		varTypeList.add(new VariableType("SITE_SOIL_PH", "Soil acidity - ph meter (pH)", siteSoilPh, 1));
 		varTypeList.add(new VariableType("CRUST", "Score for the severity of common rust, "
 				+ "(In highlands and mid altitude, Puccinia sorghi) " + "symptoms rated on a scale from 1 (= clean, no infection) to "

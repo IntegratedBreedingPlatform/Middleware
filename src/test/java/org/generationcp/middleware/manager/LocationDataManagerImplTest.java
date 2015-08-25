@@ -296,9 +296,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 				IntegrationTestBase.INDENT,
 				"testAddLocation(" + location + "): " + id + "  \n  "
 						+ this.manager.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL));
-
-		// cleanup
-		this.manager.deleteLocation(this.manager.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL).get(0));
 	}
 
 	@Test
@@ -337,10 +334,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		Debug.println(IntegrationTestBase.INDENT, "testAddLocations() Locations added: " + locationsAdded.size());
 		Debug.println(IntegrationTestBase.INDENT, this.manager.getLocationsByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL));
 		Debug.println(IntegrationTestBase.INDENT, this.manager.getLocationsByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL));
-
-		// cleanup
-		this.manager.deleteLocation(this.manager.getLocationsByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL).get(0));
-		this.manager.deleteLocation(this.manager.getLocationsByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL).get(0));
 	}
 
 	@Test

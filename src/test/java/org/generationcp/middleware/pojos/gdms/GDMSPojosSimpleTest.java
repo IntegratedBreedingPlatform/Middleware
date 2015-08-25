@@ -22,7 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SuppressWarnings("rawtypes")
-public class PojosSimpleTest extends IntegrationTestBase {
+public class GDMSPojosSimpleTest extends IntegrationTestBase {
 
 	private Session session;
 

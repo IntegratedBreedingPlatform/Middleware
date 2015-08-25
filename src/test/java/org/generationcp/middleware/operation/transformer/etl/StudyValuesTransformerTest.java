@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
+import org.hibernate.Session;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -37,7 +38,10 @@ public class StudyValuesTransformerTest extends TestOutputFormatter {
 
 	@BeforeClass
 	public static void setUp() throws Exception {
-		StudyValuesTransformerTest.transformer = new StudyValuesTransformer(Mockito.mock(HibernateSessionProvider.class));
+		Session mockSession = Mockito.mock(Session.class);
+		HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
+		Mockito.when(mockSessionProvider.getSession()).thenReturn(mockSession);
+		StudyValuesTransformerTest.transformer = new StudyValuesTransformer(mockSessionProvider);
 	}
 
 	@Test

@@ -22,7 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 @SuppressWarnings("rawtypes")
-public class PojosSimpleTest extends IntegrationTestBase {
+public class GMSPojosSimpleTest extends IntegrationTestBase {
 
 	private Session session;
 
@@ -199,13 +199,6 @@ public class PojosSimpleTest extends IntegrationTestBase {
 			User holder = (User) obj;
 			Debug.println(IntegrationTestBase.INDENT, holder);
 		}
-	}
-
-	@Test
-	public void testGettingGermplasmDetails() {
-		Integer gid = Integer.valueOf(50533);
-		Germplasm g = (Germplasm) this.session.load(Germplasm.class, gid);
-		Debug.println(IntegrationTestBase.INDENT, g);
 	}
 
 	@Test
