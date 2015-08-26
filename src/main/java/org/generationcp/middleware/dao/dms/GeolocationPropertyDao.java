@@ -111,6 +111,11 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 
 	public void deleteGeolocationPropertyValueInProject(int studyId, int termId) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			StringBuilder sql =
 					new StringBuilder().append("DELETE FROM nd_geolocationprop  ").append(" WHERE nd_geolocation_id IN ( ")
 							.append("   SELECT e.nd_geolocation_id ").append("   FROM nd_experiment e ")

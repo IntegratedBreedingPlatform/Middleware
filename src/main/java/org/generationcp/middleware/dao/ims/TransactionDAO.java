@@ -413,6 +413,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	public void cancelUnconfirmedTransactionsForListEntries(List<Integer> listEntryIds) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			String sql =
 					"UPDATE ims_transaction " + "SET trnstat = 9, " + "trndate = :currentDate "
 							+ "WHERE trnstat = 0 AND recordid IN (:entryIds) " + "AND sourceType = 'LIST'";
@@ -428,6 +433,12 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	public void cancelReservationsForLotEntryAndLrecId(Integer lotId, Integer lrecId) throws MiddlewareQueryException {
 		try {
+			
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			String sql =
 					"UPDATE ims_transaction " + "SET trnstat = 9, " + "trndate = :currentDate " + "WHERE trnstat = 0 AND lotId = :lotId "
 							+ "AND recordId = :lrecId " + "AND trnqty < 0 " + "AND sourceType = 'LIST'";
@@ -459,6 +470,11 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	public void cancelUnconfirmedTransactionsForLists(List<Integer> listIds) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			String sql =
 					"UPDATE ims_transaction " + "SET trnstat = 9, " + "trndate = :currentDate "
 							+ "WHERE trnstat = 0 AND sourceId in (:listIds) " + "AND sourceType = 'LIST'";

@@ -638,6 +638,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public void deletePhenotypesByProjectIdAndLocationId(Integer projectId, Integer locationId) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			// Delete phenotypes and experiment phenotypes
 			String sql =
 					"delete pheno, epheno" + " from nd_experiment_project ep, nd_experiment e,"
@@ -656,6 +661,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public int updatePhenotypesByProjectIdAndLocationId(Integer projectId, Integer locationId, Integer stockId, Integer cvTermId,
 			String value) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			// update the value of phenotypes
 			String sql =
 					"UPDATE nd_experiment_project ep " + "INNER JOIN nd_experiment exp ON ep.nd_experiment_id = exp.nd_experiment_id "
@@ -842,6 +852,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public void deletePhenotypesInProjectByTerm(List<Integer> ids, int termId) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			StringBuilder sql =
 					new StringBuilder().append("DELETE FROM phenotype ").append(" WHERE phenotype_id IN ( ")
 							.append(" SELECT eph.phenotype_id ").append(" FROM nd_experiment_phenotype eph ")

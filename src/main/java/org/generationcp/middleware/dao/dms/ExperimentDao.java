@@ -239,7 +239,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		String experimentIds = StringUtils.join(experimentIdList, ",");
 
 		try {
-			// Please note we are manually flushing because deletes and updates causes the Hibernate session to get out of synch with
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 			// statement
 			this.getSession().flush();
@@ -263,7 +263,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public void deleteExperimentsByStudy(int datasetId) throws MiddlewareQueryException {
 
 		try {
-			// Please note we are manually flushing because deletes and updates causes the Hibernate session to get out of synch with
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 			// statement
 			this.getSession().flush();
@@ -289,7 +289,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		try {
 
-			// Please note we are manually flushing because deletes and updates causes the Hibernate session to get out of synch with
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 			// statement
 			this.getSession().flush();

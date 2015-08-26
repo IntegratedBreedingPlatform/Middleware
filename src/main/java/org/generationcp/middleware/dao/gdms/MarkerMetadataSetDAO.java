@@ -168,6 +168,10 @@ public class MarkerMetadataSetDAO extends GenericDAO<MarkerMetadataSet, Integer>
 
 	public void deleteByDatasetId(Integer datasetId) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
 			
 			SQLQuery statement = this.getSession().createSQLQuery("DELETE FROM gdms_marker_metadataset WHERE dataset_id = " + datasetId);
 			statement.executeUpdate();
