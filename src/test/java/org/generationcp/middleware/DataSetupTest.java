@@ -204,17 +204,18 @@ public class DataSetupTest extends IntegrationTestBase {
 				this.germplasmTestDataGenerator.createGermplasmRecords(DataSetupTest.NUMBER_OF_GERMPLASM, DataSetupTest.GERMPLSM_PREFIX);
 
 		// Germplasm list
-		GermplasmList germplasmList =
-				new GermplasmList(null, "Test Germplasm List " + randomInt, Long.valueOf(20141014), "LST", Integer.valueOf(1),
-						"Test Germplasm List", null, 1);
+		GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt, Long.valueOf(20141014), "LST",
+				Integer.valueOf(1), "Test Germplasm List", null, 1);
+
 		Integer germplasmListId = this.germplasmListManager.addGermplasmList(germplasmList);
 		germplasmList.setProgramUUID(programUUID);
 
 		// Germplasm list data
 		List<GermplasmListData> germplasmListData = new ArrayList<GermplasmListData>();
 		for (int i = 0; i < DataSetupTest.NUMBER_OF_GERMPLASM; i++) {
-			germplasmListData.add(new GermplasmListData(null, germplasmList, gids[i], i, "EntryCode" + i, DataSetupTest.GERMPLSM_PREFIX + i
-					+ " Source", DataSetupTest.GERMPLSM_PREFIX + i, DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0));
+			germplasmListData.add(
+					new GermplasmListData(null, germplasmList, gids[i], i, "EntryCode" + i, DataSetupTest.GERMPLSM_PREFIX + i + " Source",
+							DataSetupTest.GERMPLSM_PREFIX + i, DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0));
 		}
 		this.germplasmListManager.addGermplasmListData(germplasmListData);
 
@@ -267,50 +268,44 @@ public class DataSetupTest extends IntegrationTestBase {
 
 		// Constants
 		List<MeasurementVariable> constants = new ArrayList<MeasurementVariable>();
-		constants.add(this.createMeasurementVariable(8270, "SITE_SOIL_PH", "Soil acidity - ph meter (pH)", "Soil acidity", "Ph meter",
-				"pH", DataSetupTest.NUMERIC, "7", DataSetupTest.STUDY, TermId.OBSERVATION_VARIATE.getId(), false));
+		constants.add(this.createMeasurementVariable(8270, "SITE_SOIL_PH", "Soil acidity - ph meter (pH)", "Soil acidity", "Ph meter", "pH",
+				DataSetupTest.NUMERIC, "7", DataSetupTest.STUDY, TermId.OBSERVATION_VARIATE.getId(), false));
 		workbook.setConstants(constants);
 
 		// Factors
 		List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
-		MeasurementVariable entryFactor =
-				this.createMeasurementVariable(TermId.ENTRY_NO.getId(), "ENTRY_NO", "Germplasm entry - enumerated (number)",
-						"Germplasm entry", DataSetupTest.ENUMERATED, DataSetupTest.NUMBER, DataSetupTest.NUMERIC, null,
-						DataSetupTest.ENTRY, TermId.ENTRY_NUMBER_STORAGE.getId(), true);
+		MeasurementVariable entryFactor = this.createMeasurementVariable(TermId.ENTRY_NO.getId(), "ENTRY_NO",
+				"Germplasm entry - enumerated (number)", "Germplasm entry", DataSetupTest.ENUMERATED, DataSetupTest.NUMBER,
+				DataSetupTest.NUMERIC, null, DataSetupTest.ENTRY, TermId.ENTRY_NUMBER_STORAGE.getId(), true);
 		factors.add(entryFactor);
 
-		MeasurementVariable designationFactor =
-				this.createMeasurementVariable(TermId.DESIG.getId(), "DESIGNATION", "Germplasm designation - assigned (DBCV)",
-						"Germplasm Designation", DataSetupTest.ASSIGNED, DataSetupTest.DBCV, DataSetupTest.CHAR, null, DataSetupTest.DESIG,
-						TermId.ENTRY_DESIGNATION_STORAGE.getId(), true);
+		MeasurementVariable designationFactor = this.createMeasurementVariable(TermId.DESIG.getId(), "DESIGNATION",
+				"Germplasm designation - assigned (DBCV)", "Germplasm Designation", DataSetupTest.ASSIGNED, DataSetupTest.DBCV,
+				DataSetupTest.CHAR, null, DataSetupTest.DESIG, TermId.ENTRY_DESIGNATION_STORAGE.getId(), true);
 		factors.add(designationFactor);
 
-		MeasurementVariable crossFactor =
-				this.createMeasurementVariable(TermId.CROSS.getId(), "CROSS", "The pedigree string of the germplasm", "Cross history",
-						DataSetupTest.ASSIGNED, DataSetupTest.PEDIGREE_STRING, DataSetupTest.CHAR, null, DataSetupTest.CROSS,
-						TermId.GERMPLASM_ENTRY_STORAGE.getId(), true);
+		MeasurementVariable crossFactor = this.createMeasurementVariable(TermId.CROSS.getId(), "CROSS",
+				"The pedigree string of the germplasm", "Cross history", DataSetupTest.ASSIGNED, DataSetupTest.PEDIGREE_STRING,
+				DataSetupTest.CHAR, null, DataSetupTest.CROSS, TermId.GERMPLASM_ENTRY_STORAGE.getId(), true);
 		factors.add(crossFactor);
 
-		MeasurementVariable gidFactor =
-				this.createMeasurementVariable(TermId.GID.getId(), "GID", "Germplasm identifier - assigned (DBID)", "Germplasm id",
-						DataSetupTest.ASSIGNED, DataSetupTest.DBID, DataSetupTest.NUMERIC, null, DataSetupTest.GID,
-						TermId.ENTRY_GID_STORAGE.getId(), true);
+		MeasurementVariable gidFactor = this.createMeasurementVariable(TermId.GID.getId(), "GID", "Germplasm identifier - assigned (DBID)",
+				"Germplasm id", DataSetupTest.ASSIGNED, DataSetupTest.DBID, DataSetupTest.NUMERIC, null, DataSetupTest.GID,
+				TermId.ENTRY_GID_STORAGE.getId(), true);
 		factors.add(gidFactor);
 
-		MeasurementVariable plotFactor =
-				this.createMeasurementVariable(TermId.PLOT_NO.getId(), "PLOT_NO", "Field plot - enumerated (number)", "Field plot",
-						DataSetupTest.ENUMERATED, DataSetupTest.NUMBER, DataSetupTest.NUMERIC, null, DataSetupTest.PLOT,
-						TermId.TRIAL_DESIGN_INFO_STORAGE.getId(), true);
+		MeasurementVariable plotFactor = this.createMeasurementVariable(TermId.PLOT_NO.getId(), "PLOT_NO",
+				"Field plot - enumerated (number)", "Field plot", DataSetupTest.ENUMERATED, DataSetupTest.NUMBER, DataSetupTest.NUMERIC,
+				null, DataSetupTest.PLOT, TermId.TRIAL_DESIGN_INFO_STORAGE.getId(), true);
 		factors.add(plotFactor);
 
 		workbook.setFactors(factors);
 
 		// Variates
 		List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
-		MeasurementVariable variate =
-				this.createMeasurementVariable(18000, "Grain_yield", "Grain yield -dry and weigh (kg/ha)", DataSetupTest.GRAIN_YIELD,
-						DataSetupTest.DRY_AND_WEIGH, DataSetupTest.KG_HA, DataSetupTest.NUMERIC, null, DataSetupTest.PLOT,
-						TermId.OBSERVATION_VARIATE.getId(), false);
+		MeasurementVariable variate = this.createMeasurementVariable(18000, "Grain_yield", "Grain yield -dry and weigh (kg/ha)",
+				DataSetupTest.GRAIN_YIELD, DataSetupTest.DRY_AND_WEIGH, DataSetupTest.KG_HA, DataSetupTest.NUMERIC, null,
+				DataSetupTest.PLOT, TermId.OBSERVATION_VARIATE.getId(), false);
 		variates.add(variate);
 
 		workbook.setVariates(variates);
@@ -330,9 +325,8 @@ public class DataSetupTest extends IntegrationTestBase {
 			designationData.setMeasurementVariable(designationFactor);
 			dataList.add(designationData);
 
-			MeasurementData crossData =
-					new MeasurementData(crossFactor.getLabel(), DataSetupTest.GERMPLSM_PREFIX + i + "MP-" + i + "/"
-							+ DataSetupTest.GERMPLSM_PREFIX + i + "FP-" + i);
+			MeasurementData crossData = new MeasurementData(crossFactor.getLabel(),
+					DataSetupTest.GERMPLSM_PREFIX + i + "MP-" + i + "/" + DataSetupTest.GERMPLSM_PREFIX + i + "FP-" + i);
 			crossData.setMeasurementVariable(crossFactor);
 			dataList.add(crossData);
 
@@ -371,9 +365,8 @@ public class DataSetupTest extends IntegrationTestBase {
 			listDataProjects.add(listDataProject);
 		}
 		// Add listdata_project entries
-		int nurseryListId =
-				this.middlewareFieldbookService.saveOrUpdateListDataProject(nurseryStudyId, GermplasmListType.NURSERY, germplasmListId,
-						listDataProjects, 1);
+		int nurseryListId = this.middlewareFieldbookService.saveOrUpdateListDataProject(nurseryStudyId, GermplasmListType.NURSERY,
+				germplasmListId, listDataProjects, 1);
 
 		// Load and check some basics
 		Workbook nurseryWorkbook = this.middlewareFieldbookService.getNurseryDataSet(nurseryStudyId);
