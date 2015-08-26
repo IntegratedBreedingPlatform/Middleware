@@ -499,8 +499,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public GermplasmList getGermplasmListByName(String name) throws MiddlewareQueryException {
-		List<GermplasmList> germplasmLists = this.getGermplasmListManager().getGermplasmListByName(name, 0, 1, Operation.EQUAL);
+	public GermplasmList getGermplasmListByName(String name, String programUUID) throws MiddlewareQueryException {
+		List<GermplasmList> germplasmLists =
+				this.getGermplasmListManager().getGermplasmListByName(name, programUUID, 0, 1, Operation.EQUAL);
 		if (!germplasmLists.isEmpty()) {
 			return germplasmLists.get(0);
 		}

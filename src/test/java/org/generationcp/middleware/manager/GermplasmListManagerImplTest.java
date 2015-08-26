@@ -56,6 +56,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	private static List<Integer> testDataIds = new ArrayList<Integer>();
 	private static final Integer STATUS_DELETED = 9;
+	private static final String PROGRAM_UUID = "12345678";
 
 	private Integer parentId;
 	private Integer listId;
@@ -65,14 +66,17 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	public void setUpBefore() throws Exception {
 		GermplasmList germplasmListParent =
 				new GermplasmList(null, "Test List #1", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test Parent List #1", null, 1);
+		germplasmListParent.setProgramUUID(PROGRAM_UUID);
 		this.parentId = this.manager.addGermplasmList(germplasmListParent);
 		GermplasmList germplasmList =
 				new GermplasmList(null, "Test List #1", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test List #1 for GCP-92",
 						germplasmListParent, 1);
+		germplasmList.setProgramUUID(PROGRAM_UUID);
 		this.manager.addGermplasmList(germplasmList);
 		GermplasmList germplasmList1 =
 				new GermplasmList(null, "TestList444", Long.valueOf(20120306), "LST", Integer.valueOf(1), "Test List #4 for GCP-92", null,
 						1);
+		germplasmList1.setProgramUUID(PROGRAM_UUID);
 		this.manager.addGermplasmList(germplasmList1);
 		Name name = new Name(null, null, 1, 1, 1, "Name", 0, 0, 0);
 		Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
@@ -85,6 +89,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		GermplasmList germplasmList2 =
 				new GermplasmList(null, "Test List #5", Long.valueOf(20120306), "LST", Integer.valueOf(1), "Test List #5 for GCP-92", null,
 						1);
+		germplasmList2.setProgramUUID(PROGRAM_UUID);
 		this.manager.addGermplasmList(germplasmList2);
 		GermplasmListData germplasmListData1 =
 				new GermplasmListData(null, germplasmList2, germplasm.getGid(), 1, "EntryCode", "SeedSource", "Germplasm Name 5",
@@ -93,10 +98,12 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		GermplasmList germplasmList3 =
 				new GermplasmList(null, "Test List #3", Long.valueOf(20120306), "LST", Integer.valueOf(1), "Test List #3 for GCP-92", null,
 						1);
+		germplasmList3.setProgramUUID(PROGRAM_UUID);
 		this.manager.addGermplasmList(germplasmList3);
 		GermplasmList germplasmList6 =
 				new GermplasmList(null, "Test List #6", Long.valueOf(20120306), "LST", Integer.valueOf(1), "Test List #6 for GCP-92", null,
 						1);
+		germplasmList6.setProgramUUID(PROGRAM_UUID);
 		this.listId = this.manager.addGermplasmList(germplasmList6);
 		GermplasmListData germplasmListData2 =
 				new GermplasmListData(null, germplasmList6, germplasm.getGid(), 1, "EntryCode", "SeedSource", "Germplasm Name 6",
@@ -130,7 +137,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetGermplasmListByName() throws Exception {
 		String name = "2002%";
-		List<GermplasmList> lists = this.manager.getGermplasmListByName(name, 0, 5, Operation.LIKE);
+		List<GermplasmList> lists = this.manager.getGermplasmListByName(name, PROGRAM_UUID, 0, 5, Operation.LIKE);
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmListByName(" + name + "): ");
 		Debug.printObjects(IntegrationTestBase.INDENT, lists);
 		// Verify using: select * from listnms where liststatus <> 9 and listname like '2002%';
@@ -237,6 +244,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		GermplasmList germplasmList =
 				new GermplasmList(null, "Test List #1", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test List #1 for GCP-92", null,
 						1);
+		germplasmList.setProgramUUID(PROGRAM_UUID);
 		Integer id = this.manager.addGermplasmList(germplasmList);
 		Debug.println(IntegrationTestBase.INDENT,
 				"testAddGermplasmList(germplasmList=" + germplasmList + "): \n  " + this.manager.getGermplasmListById(id));
@@ -250,11 +258,13 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		GermplasmList germplasmList =
 				new GermplasmList(null, "Test List #1", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test List #1 for GCP-92", null,
 						1);
+		germplasmList.setProgramUUID(PROGRAM_UUID);
 		germplasmLists.add(germplasmList);
 
 		germplasmList =
 				new GermplasmList(null, "Test List #2", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test List #2 for GCP-92", null,
 						1);
+		germplasmList.setProgramUUID(PROGRAM_UUID);
 		germplasmLists.add(germplasmList);
 
 		germplasmList =

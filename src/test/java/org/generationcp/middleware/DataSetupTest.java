@@ -208,6 +208,7 @@ public class DataSetupTest extends IntegrationTestBase {
 				new GermplasmList(null, "Test Germplasm List " + randomInt, Long.valueOf(20141014), "LST", Integer.valueOf(1),
 						"Test Germplasm List", null, 1);
 		Integer germplasmListId = this.germplasmListManager.addGermplasmList(germplasmList);
+		germplasmList.setProgramUUID(programUUID);
 
 		// Germplasm list data
 		List<GermplasmListData> germplasmListData = new ArrayList<GermplasmListData>();

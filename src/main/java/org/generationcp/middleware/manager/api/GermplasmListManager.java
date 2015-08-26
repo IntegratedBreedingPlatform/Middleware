@@ -78,13 +78,15 @@ public interface GermplasmListManager {
 	 * Returns all the Germplasm List records with names matching the given parameter.
 	 * 
 	 * @param name
+	 * @param programUUID
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @param operation - can be equal or like
 	 * @return List of GermplasmList POJOs
 	 * @throws MiddlewareQueryException
 	 */
-	List<GermplasmList> getGermplasmListByName(String name, int start, int numOfRows, Operation operation) throws MiddlewareQueryException;
+	List<GermplasmList> getGermplasmListByName(String name, String programUUID, int start, int numOfRows, Operation operation)
+			throws MiddlewareQueryException;
 
 	/**
 	 * Returns all the Germplasm List records with names matching the given parameter.
@@ -244,38 +246,25 @@ public interface GermplasmListManager {
 	List<GermplasmList> getAllTopLevelLists(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
 
 	/**
-	 * Returns the Top Level Germplasm List Folders present in the specified database. Retrieval from the database is done by batch (as
-	 * specified in batchSize) to reduce the load in instances where there is a large volume of top level folders to be retrieved. Though
-	 * retrieval is by batch, this method still returns all of the top level folders as a single list.
-	 * 
+	 * Returns the Top Level Germplasm List Folders present in the program of the specified database. Retrieval from the database is done by
+	 * batch (as specified in batchSize) to reduce the load in instances where there is a large volume of top level folders to be retrieved.
+	 * Though retrieval is by batch, this method still returns all of the top level folders as a single list.
+	 *
+	 * @param programUUID - the program UUID
 	 * @param batchSize - the number of records to be retrieved per iteration
 	 * @return - List of GermplasmList POJOs
 	 * @throws MiddlewareQueryException
 	 */
-	List<GermplasmList> getAllTopLevelListsBatched(int batchSize) throws MiddlewareQueryException;
+	List<GermplasmList> getAllTopLevelListsBatched(String programUUID, int batchSize) throws MiddlewareQueryException;
 
 	/**
-	 * Returns the Top Level Germplasm List Folders present in the specified database. Retrieval from the database is done by batch (as
-	 * specified in batchSize) to reduce the load in instances where there is a large volume of top level folders to be retrieved. Though
-	 * retrieval is by batch, this method still returns all of the top level folders as a single list.
-	 * 
-	 * @param batchSize - the number of records to be retrieved per iteration
-	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
-	 * @return - List of GermplasmList POJOs
-	 * @throws MiddlewareQueryException
-	 * @deprecated
-	*/
-	@Deprecated
-	List<GermplasmList> getAllTopLevelListsBatched(int batchSize, Database instance) throws MiddlewareQueryException;
-
-	/**
-	 * Returns the number of Top Level Germplasm List Folders in the specified database.
-	 * 
-	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
+	 * Returns the number of Top Level Germplasm List Folders with the same or null program UUID.
+	 *
+	 * @param programUUID
 	 * @return The count of all top level lists on the specified instance.
 	 * @throws MiddlewareQueryException
 	 */
-	long countAllTopLevelLists(Database instance) throws MiddlewareQueryException;
+	long countAllTopLevelLists(String programUUID) throws MiddlewareQueryException;
 
 	/**
 	 * Inserts a single {@code GermplasmList} object into the database.
@@ -448,12 +437,14 @@ public interface GermplasmListManager {
 	 * Returns a list of {@code GermplasmList} child records given a parent id.
 	 *
 	 * @param parentId - the ID of the parent to retrieve the child lists
+	 * @param programUUID - the program UUID of the program where to retrieve the child lists
 	 * @param start - the starting point to retrieve the results
 	 * @param numOfRows - the number of rows from the starting point to be retrieved
 	 * @return Returns a List of GermplasmList POJOs for the child lists
 	 * @throws MiddlewareQueryException
 	 */
-	List<GermplasmList> getGermplasmListByParentFolderId(Integer parentId, int start, int numOfRows) throws MiddlewareQueryException;
+	List<GermplasmList> getGermplasmListByParentFolderId(Integer parentId, String programUUID, int start, int numOfRows)
+			throws MiddlewareQueryException;
 
 	/**
 	 * Returns a list of {@code GermplasmList} child records given a parent id. Retrieval from the database is done by batch (as specified
@@ -461,20 +452,23 @@ public interface GermplasmListManager {
 	 * batch, this method still returns all of the child folders as a single list.
 	 * 
 	 * @param parentId - the ID of the parent to retrieve the child lists
+	 * @param programUUID - the program UUID of the program where to retrieve the child lists
 	 * @param batchSize - the number of records to be retrieved per iteration
 	 * @return Returns a List of GermplasmList POJOs for the child lists
 	 * @throws MiddlewareQueryException
 	 */
-	List<GermplasmList> getGermplasmListByParentFolderIdBatched(Integer parentId, int batchSize) throws MiddlewareQueryException;
+	List<GermplasmList> getGermplasmListByParentFolderIdBatched(Integer parentId, String programUUID, int batchSize)
+			throws MiddlewareQueryException;
 
 	/**
 	 * Returns the number of {@code GermplasmList} child records given a parent id.
 	 *
 	 * @param parentId the parent id
+	 * @param programUUID the program UUID
 	 * @return number of germplasm list child records of a parent record
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	long countGermplasmListByParentFolderId(Integer parentId) throws MiddlewareQueryException;
+	long countGermplasmListByParentFolderId(Integer parentId, String programUUID) throws MiddlewareQueryException;
 
 	/**
 	 * Return a List of UserDefinedField POJOs representing records from the udflds table of IBDB which are the types of germplasm lists.

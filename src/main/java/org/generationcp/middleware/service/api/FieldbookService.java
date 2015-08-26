@@ -287,7 +287,7 @@ public interface FieldbookService {
 	 * @return the germplasm list by name
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	GermplasmList getGermplasmListByName(String name) throws MiddlewareQueryException;
+	GermplasmList getGermplasmListByName(String name, String programUUID) throws MiddlewareQueryException;
 
 	/**
 	 * Get All distinct values given a standard variable id.
