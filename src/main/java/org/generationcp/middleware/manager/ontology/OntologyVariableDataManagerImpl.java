@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import com.google.common.base.Function;
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -45,8 +47,6 @@ import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.base.Function;
 
 /**
  * Implements {@link OntologyVariableDataManagerImpl}
@@ -652,7 +652,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			}
 
 			// Saving alias, min, max values
-			if (variableInfo.getAlias() != null || variableInfo.getExpectedMin() != null || variableInfo.getExpectedMax() != null) {
+			if (!Strings.isNullOrEmpty(variableInfo.getAlias()) || variableInfo.getExpectedMin() != null
+					|| variableInfo.getExpectedMax() != null) {
 				this.getVariableProgramOverridesDao().save(variableInfo.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias(),
 						variableInfo.getExpectedMin(), variableInfo.getExpectedMax());
 			} else if (variableOverrides != null) {
@@ -663,7 +664,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			ProgramFavorite programFavorite =
 					this.getProgramFavoriteDao().getProgramFavorite(variableInfo.getProgramUuid(), ProgramFavorite.FavoriteType.VARIABLE,
 							term.getCvTermId());
-			boolean isFavorite = variableInfo.isFavorite() || variableInfo.getAlias() != null;
+			boolean isFavorite = variableInfo.isFavorite() || !Strings.isNullOrEmpty(variableInfo.getAlias());
 
 			if (isFavorite && programFavorite == null) {
 				programFavorite = new ProgramFavorite();
