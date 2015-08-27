@@ -515,6 +515,8 @@ public interface WorkbenchDataManager {
 
 	void deleteProjectUserRolesByProject(Project project) throws MiddlewareQueryException;
 
+	void deleteProjectUserRoles(List<ProjectUserRole> oldRoles);
+
 	/**
 	 * Adds multiple workbench_project_user_role records.
 	 * 
