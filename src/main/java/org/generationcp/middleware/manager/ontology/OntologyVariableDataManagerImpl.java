@@ -46,6 +46,7 @@ import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -59,20 +60,29 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	private static final String VARIABLE_EXIST_WITH_SAME_NAME = "Variable exist with same name";
 	private static final String CAN_NOT_DELETE_USED_VARIABLE = "Used variable can not be deleted";
 
-	private OntologyMethodDataManager methodDataManager;
-	private OntologyPropertyDataManager propertyDataManager;
-	private OntologyScaleDataManager scaleDataManager;
+	@Autowired
+	private OntologyMethodDataManager methodManager;
+
+	@Autowired
+	private OntologyPropertyDataManager propertyManager;
+
+	@Autowired
+	private OntologyScaleDataManager scaleManager;
 
 	public OntologyVariableDataManagerImpl() {
 		super();
 	}
-	
+
+	public OntologyVariableDataManagerImpl(HibernateSessionProvider sessionProvider) {
+		super(sessionProvider);
+	}
+
 	public OntologyVariableDataManagerImpl(OntologyMethodDataManager methodDataManager, OntologyPropertyDataManager propertyDataManager,
 			OntologyScaleDataManager scaleDataManager, HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
-		this.methodDataManager = methodDataManager;
-		this.propertyDataManager = propertyDataManager;
-		this.scaleDataManager = scaleDataManager;
+		this.methodManager = methodDataManager;
+		this.propertyManager = propertyDataManager;
+		this.scaleManager = scaleDataManager;
 	}
 
 	@Override
@@ -427,11 +437,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(term.getCvTermId());
 				for (CVTermRelationship r : relationships) {
 					if (Objects.equals(r.getTypeId(), TermId.HAS_METHOD.getId())) {
-						variable.setMethod(this.methodDataManager.getMethod(r.getObjectId()));
+						variable.setMethod(this.methodManager.getMethod(r.getObjectId()));
 					} else if (Objects.equals(r.getTypeId(), TermId.HAS_PROPERTY.getId())) {
-						variable.setProperty(this.propertyDataManager.getProperty(r.getObjectId()));
+						variable.setProperty(this.propertyManager.getProperty(r.getObjectId()));
 					} else if (Objects.equals(r.getTypeId(), TermId.HAS_SCALE.getId())) {
-						variable.setScale(this.scaleDataManager.getScaleById(r.getObjectId()));
+						variable.setScale(this.scaleManager.getScaleById(r.getObjectId()));
 					}
 				}
 

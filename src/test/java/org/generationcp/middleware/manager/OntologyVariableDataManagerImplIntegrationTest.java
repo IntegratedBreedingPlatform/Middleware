@@ -32,7 +32,6 @@ import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.OntologyDataCreationUtil;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,12 +41,16 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 	@Autowired
 	private OntologyVariableDataManager variableManager;
+
 	@Autowired
 	private OntologyMethodDataManager methodManager;
+
 	@Autowired
 	private OntologyPropertyDataManager propertyManager;
+
 	@Autowired
 	private OntologyScaleDataManager scaleManager;
+
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
@@ -96,7 +99,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	 */
 	@Before
 	public void setUp() throws Exception {
-		WorkbenchTestDataUtil instance = new WorkbenchTestDataUtil(null);
+		WorkbenchTestDataUtil instance = new WorkbenchTestDataUtil(this.workbenchDataManager);
 		this.testProject = instance.createTestProjectData();
 
 		this.testMethod = new org.generationcp.middleware.domain.ontology.Method();
@@ -133,13 +136,5 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.testVariableInfo.addVariableType(VariableType.ANALYSIS);
 		this.testVariableInfo.setIsFavorite(true);
 		this.variableManager.addVariable(this.testVariableInfo);
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		this.variableManager.deleteVariable(this.testVariableInfo.getId());
-		this.methodManager.deleteMethod(this.testMethod.getId());
-		this.propertyManager.deleteProperty(this.testProperty.getId());
-		this.scaleManager.deleteScale(this.testScale.getId());
 	}
 }
