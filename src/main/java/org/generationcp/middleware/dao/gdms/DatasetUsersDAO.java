@@ -28,14 +28,8 @@ public class DatasetUsersDAO extends GenericDAO<DatasetUsers, Integer> {
 
 	public void deleteByDatasetId(int datasetId) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
 			SQLQuery statement = this.getSession().createSQLQuery("DELETE FROM gdms_dataset_users WHERE dataset_id = " + datasetId);
 			statement.executeUpdate();
-
-			this.flush();
-			this.clear();
-
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in DatasetUsersDAO: " + e.getMessage(), e);
 		}

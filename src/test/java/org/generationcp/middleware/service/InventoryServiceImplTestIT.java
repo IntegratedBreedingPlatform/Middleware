@@ -4,7 +4,7 @@ package org.generationcp.middleware.service;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.DataManagerIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
@@ -13,28 +13,24 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @RunWith(MockitoJUnitRunner.class)
-public class InventoryServiceImplTestIT extends DataManagerIntegrationTest {
+public class InventoryServiceImplTestIT extends IntegrationTestBase {
 
-	private static InventoryService inventoryService;
+	@Autowired
+	private InventoryService inventoryService;
 
 	public static final String TEST_INVENTORY_ID = "TR1-123";
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		InventoryServiceImplTestIT.inventoryService = DataManagerIntegrationTest.managerFactory.getInventoryMiddlewareService();
-	}
-
 	@Test
 	public void testGetCurrentNotificationNumber() throws MiddlewareException {
-		Integer currentNotificationNumber = InventoryServiceImplTestIT.inventoryService.getCurrentNotationNumberForBreederIdentifier("TR");
+		Integer currentNotificationNumber = this.inventoryService.getCurrentNotationNumberForBreederIdentifier("TR");
 		Assert.assertEquals(0, currentNotificationNumber.intValue());
 	}
 
@@ -62,13 +58,13 @@ public class InventoryServiceImplTestIT extends DataManagerIntegrationTest {
 	public void testStockHasCompletedBulking() throws MiddlewareQueryException {
 		Integer listId = 17;
 		List<InventoryDetails> inventoryDetailsList =
-				InventoryServiceImplTestIT.inventoryService.getInventoryListByListDataProjectListId(listId, GermplasmListType.CROSSES);
+				this.inventoryService.getInventoryListByListDataProjectListId(listId, GermplasmListType.CROSSES);
 		boolean hasCompletedBulking = false;
 		for (InventoryDetails inventoryDetails : inventoryDetailsList) {
 			if (InventoryDetails.BULK_COMPL_COMPLETED.equals(inventoryDetails.getBulkCompl())) {
 				hasCompletedBulking = true;
 			}
 		}
-		Assert.assertEquals(hasCompletedBulking, InventoryServiceImplTestIT.inventoryService.stockHasCompletedBulking(listId));
+		Assert.assertEquals(hasCompletedBulking, this.inventoryService.stockHasCompletedBulking(listId));
 	}
 }

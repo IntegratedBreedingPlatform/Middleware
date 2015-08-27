@@ -531,20 +531,12 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		
 		
 		LocationDAO locationDao = this.getLocationDao();
-		int deleted = 0;
 		try {
-
 			List<Location> list = this.getProgramLocations(programUUID);
 			for (Location location : list) {
 				locationDao.makeTransient(location);
-				if (deleted % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					locationDao.flush();
-					locationDao.clear();
-				}
 			}
-
 		} catch (Exception e) {
-
 			throw new MiddlewareQueryException(
 					"Error encountered while deleting locations: GermplasmDataManager.deleteProgramLocationsByUniqueId(uniqueId="
 							+ programUUID + "): " + e.getMessage(), e);

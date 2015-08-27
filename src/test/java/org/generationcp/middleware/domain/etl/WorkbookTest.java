@@ -664,7 +664,7 @@ public class WorkbookTest {
 
 	@Test
 	public void testGetMeasurementDatasetVariablesViewForTrial() {
-		this.getTestWorkbook(1, StudyType.T);
+		WorkbookTest.getTestWorkbook(1, StudyType.T);
 
 		List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 
@@ -679,7 +679,7 @@ public class WorkbookTest {
 	@Test
 	public void testGetMeasurementDatasetVariablesViewForNursery() {
 
-		this.getTestWorkbook(1, StudyType.N);
+		WorkbookTest.getTestWorkbook(1, StudyType.N);
 
 		List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 

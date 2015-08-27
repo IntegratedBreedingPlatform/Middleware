@@ -193,19 +193,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void updateProjectsRolesForProject(Project project, List<ProjectUserRole> newRoles) throws MiddlewareQueryException {
-		List<ProjectUserRole> deleteRoles = this.getProjectUserRolesByProject(project);
-
 		// remove all previous roles
-		for (ProjectUserRole projectUserRole : deleteRoles) {
-			this.deleteProjectUserRole(projectUserRole);
-		}
-
+		this.deleteProjectUserRolesByProject(project);
+		// apply the delete first before the add
+		getCurrentSession().flush();
 		// add the new roles
-		for (ProjectUserRole projectUserRole : newRoles) {
-			User user = new User();
-			user.setUserid(projectUserRole.getUserId());
-			this.addProjectUserRole(project, user, projectUserRole.getRole());
-		}
+		this.addProjectUserRole(newRoles);
 	}
 
 	private ProjectUserRoleDAO getProjectUserRoleDao() {
@@ -590,14 +583,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException {
-		if (this.getUserDao().getByUsernameAndPassword(username, password) != null) {
-			return true;
-		}
-		return false;
-	}
-
-	@Override
 	public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException {
 		return this.getPersonDao().isPersonExists(firstName, lastName);
 	}
@@ -857,6 +842,19 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		}
 
 		return idSaved;
+	}
+
+	@Override
+	public void deleteProjectUserRolesByProject(Project project) throws MiddlewareQueryException {
+		// remove all previous roles
+		try {
+			for (ProjectUserRole projectUserRole : this.getProjectUserRolesByProject(project)) {
+					getCurrentSession().delete(projectUserRole);
+			}
+		} catch (Exception e) {
+			this.logAndThrowException("Error encountered while deleting ProjectUser: WorkbenchDataManager.deleteProjectUserRoles(projec="
+					+ project + "): " + e.getMessage(), e);
+		}
 	}
 
 	@Override
@@ -1653,23 +1651,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public StandardPreset saveOrUpdateStandardPreset(StandardPreset standardPreset) throws MiddlewareQueryException {
-
-
-
 		try {
-			StandardPreset result = this.getStandardPresetDAO().saveOrUpdate(standardPreset);
-
-
-
-			return result;
+			return this.getStandardPresetDAO().saveOrUpdate(standardPreset);
 
 		} catch (HibernateException e) {
-
 			this.logAndThrowException(
 					"Cannot perform: WorkbenchDataManager.saveOrUpdateStandardPreset(standardPreset=" + standardPreset.getName() + "): "
 							+ e.getMessage(), e);
-		} finally {
-			this.getCurrentSession().flush();
 		}
 
 		return null;
@@ -1677,20 +1665,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void deleteStandardPreset(int standardPresetId) throws MiddlewareQueryException {
-
-
-
 		try {
 			StandardPreset preset = this.getStandardPresetDAO().getById(standardPresetId);
 			this.getCurrentSession().delete(preset);
-
-
 		} catch (HibernateException e) {
-
 			this.logAndThrowException("Cannot delete preset: WorkbenchDataManager.deleteStandardPreset(standardPresetId="
 					+ standardPresetId + "): " + e.getMessage(), e);
-		} finally {
-			this.getCurrentSession().flush();
 		}
 	}
 

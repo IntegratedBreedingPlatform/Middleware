@@ -13,7 +13,7 @@ package org.generationcp.middleware.dao;
 
 import java.util.List;
 
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.util.Debug;
@@ -22,7 +22,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ProjectUserInfoDAOTest extends MiddlewareIntegrationTest {
+public class ProjectUserInfoDAOTest extends IntegrationTestBase {
 
 	private ProjectUserInfoDAO dao;
 	private UserDAO userDao;
@@ -30,7 +30,7 @@ public class ProjectUserInfoDAOTest extends MiddlewareIntegrationTest {
 
 	@Before
 	public void setUp() throws Exception {
-		Session currentSession = MiddlewareIntegrationTest.workbenchSessionUtil.getCurrentSession();
+		Session currentSession = this.sessionProvder.getSession();
 
 		this.dao = new ProjectUserInfoDAO();
 		this.dao.setSession(currentSession);
@@ -53,12 +53,7 @@ public class ProjectUserInfoDAOTest extends MiddlewareIntegrationTest {
 		ProjectUserInfo result = this.dao.getByProjectIdAndUserId(projectId, userId);
 
 		Assert.assertNotNull(result);
-
-		if (result == null) {
-			Debug.println(0, "testGetByProjectIdAndUserId RESULTS: no result");
-		} else {
-			Debug.println(0, "testGetByProjectIdAndUserId RESULTS:" + result.getProjectId());
-			Debug.println(0, result.toString());
-		}
+		Debug.println(0, "testGetByProjectIdAndUserId RESULTS:" + result.getProjectId());
+		Debug.println(0, result.toString());
 	}
 }

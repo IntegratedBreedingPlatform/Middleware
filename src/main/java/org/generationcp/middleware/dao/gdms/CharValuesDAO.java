@@ -209,14 +209,8 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 
 	public void deleteByDatasetId(int datasetId) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
 			SQLQuery statement = this.getSession().createSQLQuery("DELETE FROM gdms_char_values WHERE dataset_id = " + datasetId);
 			statement.executeUpdate();
-
-			this.flush();
-			this.clear();
-
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in CharValuesDAO: " + e.getMessage(), e);
 		}

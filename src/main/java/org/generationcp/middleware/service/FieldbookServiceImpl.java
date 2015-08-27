@@ -370,8 +370,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public Integer saveNurseryAdvanceGermplasmList(Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listDataItems,
 			GermplasmList germplasmList) throws MiddlewareQueryException {
 
-		Session session = this.getActiveSession();
-
 		GermplasmDAO germplasmDao = this.getGermplasmDao();
 		NameDAO nameDao = this.getNameDao();
 		GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
@@ -380,8 +378,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 		try {
 			germplasmListDao.save(germplasmList);
-
-			int i = 0;
 
 			// Save germplasms, names, list data
 			for (Germplasm germplasm : germplasms.keySet()) {
@@ -432,14 +428,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				germplasmListData.setGid(germplasm.getGid());
 				germplasmListData.setList(germplasmList);
 				this.getGermplasmListDataDAO().save(germplasmListData);
-
-				i++;
-				if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					session.flush();
-					session.clear();
-				}
-
 			}
 
 
@@ -447,8 +435,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 			this.logAndThrowException("Error encountered with FieldbookService.saveNurseryAdvanceGermplasmList(germplasms=" + germplasms
 					+ ", germplasmList=" + germplasmList + "): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
-		} finally {
-			session.flush();
 		}
 
 		FieldbookServiceImpl.LOG.debug("========== saveNurseryAdvanceGermplasmList Duration (ms): "

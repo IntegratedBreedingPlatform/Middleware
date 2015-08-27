@@ -1,5 +1,5 @@
 /*******************************************************************************
- * 
+ *
  * Copyright (c) 2012, All Rights Reserved.
  *
  * Generation Challenge Programme (GCP)
@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.PropertyReference;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
@@ -27,45 +27,43 @@ import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
-public class CvTermDaoTest extends MiddlewareIntegrationTest {
+public class CvTermDaoTest extends IntegrationTestBase {
 
 	private static CVTermDao dao;
 
-	@BeforeClass
-	public static void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		CvTermDaoTest.dao = new CVTermDao();
-		CvTermDaoTest.dao.setSession(MiddlewareIntegrationTest.sessionUtil.getCurrentSession());
+		CvTermDaoTest.dao.setSession(this.sessionProvder.getSession());
 	}
 
 	@Test
 	public void testGetTermIdsWithTypeByNameOrSynonyms() throws Exception {
-		Map<String,VariableType> expectedStdVarWithTypeMap = createVarNameWithTypeMapTestData();
+		Map<String, VariableType> expectedStdVarWithTypeMap = this.createVarNameWithTypeMapTestData();
 
 		List<String> nameOrSynonyms = new ArrayList<String>();
 		nameOrSynonyms.addAll(expectedStdVarWithTypeMap.keySet());
-		
-		Map<String, Map<Integer, VariableType>> results = CvTermDaoTest.dao
-				.getTermIdsWithTypeByNameOrSynonyms(nameOrSynonyms,
-						CvId.VARIABLES.getId());
+
+		Map<String, Map<Integer, VariableType>> results =
+				CvTermDaoTest.dao.getTermIdsWithTypeByNameOrSynonyms(nameOrSynonyms, CvId.VARIABLES.getId());
 
 		Debug.println(0, "testGetTermIdsWithTypeByNameOrSynonyms(nameOrSynonyms=" + nameOrSynonyms + ") RESULTS:");
 		for (String name : nameOrSynonyms) {
 			Map<Integer, VariableType> actualStdVarIdWithTypeMap = results.get(name);
 			Debug.println(0, "    Name/Synonym = " + name + ", Terms = " + actualStdVarIdWithTypeMap);
-			if(actualStdVarIdWithTypeMap!=null) {
+			if (actualStdVarIdWithTypeMap != null) {
 				Assert.assertTrue(actualStdVarIdWithTypeMap.containsValue(expectedStdVarWithTypeMap.get(name)));
 			}
 		}
 
 	}
-	
-	private Map<String,VariableType> createVarNameWithTypeMapTestData(){
-		Map<String,VariableType> varNameWithTypeMap = new HashMap<String, VariableType>();
+
+	private Map<String, VariableType> createVarNameWithTypeMapTestData() {
+		Map<String, VariableType> varNameWithTypeMap = new HashMap<String, VariableType>();
 		varNameWithTypeMap.put("TRIAL_INSTANCE", VariableType.ENVIRONMENT_DETAIL);
 		varNameWithTypeMap.put("ENTRY_NO", VariableType.GERMPLASM_DESCRIPTOR);
 		varNameWithTypeMap.put("DESIGNATION", VariableType.GERMPLASM_DESCRIPTOR);
@@ -79,7 +77,7 @@ public class CvTermDaoTest extends MiddlewareIntegrationTest {
 
 	@Test
 	public void testFilterByColumnValue() throws Exception {
-		List<CVTerm> cvTerms = CvTermDaoTest.dao.filterByColumnValue("name", "Test Method");
+		List<CVTerm> cvTerms = CvTermDaoTest.dao.filterByColumnValue("name", "Collaborator");
 		Assert.assertEquals(cvTerms.size(), 1);
 	}
 
@@ -114,19 +112,18 @@ public class CvTermDaoTest extends MiddlewareIntegrationTest {
 
 	@Test
 	public void testGetStandardVariableIdsWithTypeByProperties() throws Exception {
-		Map<String,VariableType> expectedVarWithTypeMap = createVarNameWithTypeMapTestData();
-		
+		Map<String, VariableType> expectedVarWithTypeMap = this.createVarNameWithTypeMapTestData();
+
 		List<String> propertyNames = new ArrayList<String>();
 		propertyNames.addAll(expectedVarWithTypeMap.keySet());
-		
-		Map<String, Map<Integer, VariableType>> results = CvTermDaoTest.dao
-				.getStandardVariableIdsWithTypeByProperties(propertyNames);
+
+		Map<String, Map<Integer, VariableType>> results = CvTermDaoTest.dao.getStandardVariableIdsWithTypeByProperties(propertyNames);
 
 		Debug.println(0, "testGetStandardVariableIdsByProperties(nameOrSynonyms=" + propertyNames + ") RESULTS:");
 		for (String name : propertyNames) {
 			Map<Integer, VariableType> actualStdVarIdWithTypeMap = results.get(name);
 			Debug.println(0, "    Name/Synonym = " + name + ", Terms = " + actualStdVarIdWithTypeMap);
-			if(actualStdVarIdWithTypeMap!=null) {
+			if (actualStdVarIdWithTypeMap != null) {
 				Assert.assertTrue(actualStdVarIdWithTypeMap.containsValue(expectedVarWithTypeMap.get(name)));
 			}
 		}
@@ -199,12 +196,6 @@ public class CvTermDaoTest extends MiddlewareIntegrationTest {
 				Debug.println(4, id + " (size = 0) : " + null);
 			}
 		}
-	}
-
-	@AfterClass
-	public static void tearDown() throws Exception {
-		CvTermDaoTest.dao.setSession(null);
-		CvTermDaoTest.dao = null;
 	}
 
 }

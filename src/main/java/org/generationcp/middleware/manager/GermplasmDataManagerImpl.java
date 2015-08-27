@@ -462,10 +462,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	private List<Integer> addOrUpdateGermplasmName(List<Name> names, Operation operation) throws MiddlewareQueryException {
-		
-		
-
-		int namesSaved = 0;
 		List<Integer> idNamesSaved = new ArrayList<Integer>();
 		try {
 
@@ -475,12 +471,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			for (Name name : names) {
 				Name recordAdded = dao.saveOrUpdate(name);
 				idNamesSaved.add(recordAdded.getNid());
-				namesSaved++;
-				if (namesSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
 		} catch (Exception e) {
 			
@@ -913,28 +903,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	private List<Integer> addOrUpdateGermplasms(List<Germplasm> germplasms, Operation operation) throws MiddlewareQueryException {
-		
-		
-
-		int germplasmsSaved = 0;
 		List<Integer> idGermplasmsSaved = new ArrayList<Integer>();
 		try {
-
 			GermplasmDAO dao = this.getGermplasmDao();
 
 			for (Germplasm germplasm : germplasms) {
 				Germplasm recordSaved = dao.saveOrUpdate(germplasm);
 				idGermplasmsSaved.add(recordSaved.getGid());
 				recordSaved.setLgid(recordSaved.getGid());
-				germplasmsSaved++;
-				if (germplasmsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
-			
-
 		} catch (Exception e) {
 
 			throw new MiddlewareQueryException(
@@ -1002,10 +979,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Integer> addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws MiddlewareQueryException {
-		
-		
-
-		int germplasmsSaved = 0;
 		List<Integer> isGermplasmsSaved = new ArrayList<Integer>();
 		try {
 
@@ -1021,16 +994,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				isGermplasmsSaved.add(germplasmSaved.getGid());
 				name.setGermplasmId(germplasmSaved.getGid());
 				nameDao.save(name);
-				germplasmsSaved++;
-
-				if (germplasmsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
-			
-
 		} catch (Exception e) {
 
 			throw new MiddlewareQueryException(
@@ -1063,26 +1027,16 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Integer> addUserDefinedFields(List<UserDefinedField> fields) throws MiddlewareQueryException {
-		
-		
 
 		List<Integer> isUdfldSaved = new ArrayList<Integer>();
 		try {
 
 			UserDefinedFieldDAO dao = this.getUserDefinedFieldDao();
 
-			int udfldSaved = 0;
 			for (UserDefinedField field : fields) {
 
 				UserDefinedField udflds = dao.save(field);
 				isUdfldSaved.add(udflds.getFldno());
-				udfldSaved++;
-
-				if (udfldSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
 			
 
@@ -1129,17 +1083,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 			AttributeDAO dao = this.getAttributeDao();
 
-			int attrSaved = 0;
 			for (Attribute attr : attrs) {
 				Attribute newAttr = dao.save(attr);
 				isAttrSaved.add(newAttr.getAid());
-				attrSaved++;
-
-				if (attrSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
 			
 
@@ -1399,24 +1345,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public void saveProgramFavorites(List<ProgramFavorite> list) throws MiddlewareQueryException {
 		
-		
-
-		int favoriteSaved = 0;
-
 		try {
-
 			ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
 
 			for (ProgramFavorite favorite : list) {
-
 				dao.save(favorite);
-				favoriteSaved++;
-
-				if (favoriteSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
 			
 
@@ -1449,29 +1382,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public void deleteProgramFavorites(List<ProgramFavorite> list) throws MiddlewareQueryException {
-		
-		
-
-		int favoriteDeleted = 0;
-
 		try {
-
 			ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
-
 			for (ProgramFavorite favorite : list) {
-
 				dao.makeTransient(favorite);
-
-				if (favoriteDeleted % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
-			
-
 		} catch (Exception e) {
-
 			throw new MiddlewareQueryException(
 					"Error encountered while saving ProgramFavorite: GermplasmDataManager.deleteProgramFavorites(list=" + list + "): "
 							+ e.getMessage(), e);
@@ -1518,16 +1434,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		
 		
 		MethodDAO methodDao = this.getMethodDao();
-		int deleted = 0;
 		try {
 
 			List<Method> list = this.getProgramMethods(programUUID);
 			for (Method method : list) {
 				methodDao.makeTransient(method);
-				if (deleted % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					methodDao.flush();
-					methodDao.clear();
-				}
 			}
 
 		} catch (Exception e) {

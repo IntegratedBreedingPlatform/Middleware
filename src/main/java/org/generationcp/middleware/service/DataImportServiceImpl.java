@@ -70,8 +70,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	/**
 	 * Saves a Dataset from a Workbook into the database via 1. Saving new Ontology Variables (column headers) 2. Saving data
 	 * <p/>
-	 * The operation is performed in two separate transactions in order to force a Hibernate Session Flush, and thereby persist all required
-	 * terms to the Ontology Tables
 	 */
 	@Override
 	public int saveDataset(Workbook workbook, String programUUID) throws MiddlewareQueryException {

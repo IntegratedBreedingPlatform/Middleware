@@ -577,20 +577,6 @@ public class DatabaseBroker {
 		return programPresetDAO;
 	}
 
-	// ===========================================================================================
-
-	protected void clearSessions() {
-		if (this.sessionProvider != null) {
-			this.sessionProvider.getSession().clear();
-		}
-	}
-
-	protected void flushSessions() {
-		if (this.sessionProvider != null) {
-			this.sessionProvider.getSession().flush();
-		}
-	}
-
 	public UserProgramTreeStateDAO getUserProgramTreeStateDAO() {
 		UserProgramTreeStateDAO userProgramTreeStateDAO = new UserProgramTreeStateDAO();
 		userProgramTreeStateDAO.setSession(getActiveSession());

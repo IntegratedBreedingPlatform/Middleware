@@ -161,14 +161,8 @@ public class MappingPopDAO extends GenericDAO<MappingPop, Integer> {
 
 	public void deleteByDatasetId(int datasetId) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
 			SQLQuery statement = this.getSession().createSQLQuery("DELETE FROM gdms_mapping_pop WHERE dataset_id = " + datasetId);
 			statement.executeUpdate();
-
-			this.flush();
-			this.clear();
-
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in MappingPopDAO: " + e.getMessage(), e);
 		}

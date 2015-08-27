@@ -478,7 +478,6 @@ public abstract class DataManager extends DatabaseBroker {
 	public Object save(GenericDAO dao, Object entity) throws MiddlewareQueryException {
 
 		try {
-
 			Object recordSaved = dao.save(entity);
 			return recordSaved;
 		} catch (Exception e) {
@@ -490,9 +489,7 @@ public abstract class DataManager extends DatabaseBroker {
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public Object saveOrUpdate(GenericDAO dao, Object entity) throws MiddlewareQueryException {
 		try {
-
 			Object recordSaved = dao.saveOrUpdate(entity);
-
 			return recordSaved;
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n"

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * 
+ *
  * Copyright (c) 2012, All Rights Reserved.
  *
  * Generation Challenge Programme (GCP)
@@ -16,38 +16,30 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.util.Debug;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
-public class GeolocationDaoTest extends MiddlewareIntegrationTest {
+public class GeolocationDaoTest extends IntegrationTestBase {
 
-	private static GeolocationDao dao;
+	private GeolocationDao dao;
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		GeolocationDaoTest.dao = new GeolocationDao();
-		GeolocationDaoTest.dao.setSession(MiddlewareIntegrationTest.sessionUtil.getCurrentSession());
+	@Before
+	public void setUp() throws Exception {
+		this.dao = new GeolocationDao();
+		this.dao.setSession(this.sessionProvder.getSession());
 	}
 
 	@Test
 	public void testGetTrialEnvironmentDetails() throws Exception {
 		Set<Integer> environmentIds = new HashSet<Integer>();
 		environmentIds.add(5822);
-		List<TrialEnvironment> results = GeolocationDaoTest.dao.getTrialEnvironmentDetails(environmentIds);
+		List<TrialEnvironment> results = this.dao.getTrialEnvironmentDetails(environmentIds);
 		Debug.println(0, "testGetTrialEnvironmentDetails(environmentIds=" + environmentIds + ") RESULTS:");
 		for (TrialEnvironment env : results) {
 			env.print(4);
 		}
 	}
-
-	@AfterClass
-	public static void tearDown() throws Exception {
-		GeolocationDaoTest.dao.setSession(null);
-		GeolocationDaoTest.dao = null;
-	}
-
 }

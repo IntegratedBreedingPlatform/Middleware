@@ -47,7 +47,7 @@ public class Role implements Serializable {
 	@Column(name = "name")
 	private String name;
 
-	@OneToOne(optional = false, fetch = FetchType.LAZY)
+	@OneToOne(optional = false)
 	@JoinColumn(name = "workflow_template_id")
 	private WorkflowTemplate workflowTemplate;
 

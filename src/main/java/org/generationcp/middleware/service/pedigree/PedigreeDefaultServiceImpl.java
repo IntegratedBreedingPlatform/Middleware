@@ -15,7 +15,9 @@ import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class PedigreeDefaultServiceImpl extends Service implements PedigreeService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
@@ -476,7 +478,7 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 	}
 
 	/**
-	 *
+	 * 
 	 * @param recurringParentGid
 	 * @param toCheck
 	 * @return an array of 2 Objects, first is an Integer which is the number of doses of the recurring parent, and the other is a Germplasm

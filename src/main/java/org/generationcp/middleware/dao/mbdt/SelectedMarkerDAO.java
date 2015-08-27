@@ -40,14 +40,9 @@ public class SelectedMarkerDAO extends GenericDAO<SelectedMarker, Integer> {
 
 	@Override
 	public SelectedMarker saveOrUpdate(SelectedMarker entity) throws MiddlewareQueryException {
-		Session session = this.getSession();
-
-
 		try {
 			SelectedMarker marker = super.saveOrUpdate(entity);
 
-			session.flush();
-			session.clear();
 			return marker;
 		} catch (MiddlewareQueryException e) {
 			SelectedMarkerDAO.LOG.error("Saving or updating was not successful", e);

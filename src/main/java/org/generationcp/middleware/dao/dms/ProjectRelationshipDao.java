@@ -76,9 +76,7 @@ public class ProjectRelationshipDao extends GenericDAO<ProjectRelationship, Inte
 			sb.append(" or objectProject.projectId = " + projectId.intValue());
 			Session session = this.getSession();
 			Query q = session.createQuery(sb.toString());
-			// fix session caching start - http://stackoverflow.com/questions/1954208/hibernate-transaction-problem
-			session.flush();
-			session.clear();
+
 			q.executeUpdate();
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error with deleteByProjectId=" + projectId + ") query from ProjectRelationship: " + e.getMessage(),
@@ -93,9 +91,7 @@ public class ProjectRelationshipDao extends GenericDAO<ProjectRelationship, Inte
 			sb.append("where subjectProject.projectId = " + projectId.intValue());
 			Session session = this.getSession();
 			Query q = session.createQuery(sb.toString());
-			// fix session caching start - http://stackoverflow.com/questions/1954208/hibernate-transaction-problem
-			session.flush();
-			session.clear();
+
 			// fix session caching end
 			q.executeUpdate();
 

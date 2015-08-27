@@ -257,18 +257,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	private List<Integer> addOrUpdateGermplasmList(List<GermplasmList> germplasmLists, Operation operation) throws MiddlewareQueryException {
-		
 
-		
-		
-		
-
-		int germplasmListsSaved = 0;
 		List<Integer> germplasmListIds = new ArrayList<Integer>();
 		try {
-			
-
-
 			for (GermplasmList germplasmList : germplasmLists) {
 				if (operation == Operation.ADD) {
 					germplasmList = this.getGermplasmListDAO().saveOrUpdate(germplasmList);
@@ -277,15 +268,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 					germplasmListIds.add(germplasmList.getId());
 					this.getGermplasmListDAO().merge(germplasmList);
 				}
-
-				germplasmListsSaved++;
-				if (germplasmListsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					this.getGermplasmListDAO().flush();
-					this.getGermplasmListDAO().clear();
-				}
 			}
-			
 
 		} catch (Exception e) {
 
@@ -309,14 +292,15 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		list.add(germplasmList);
 		return this.deleteGermplasmList(list);
 	}
+	
+	@Override
+	public int deleteGermplasmListsByProgram(String programUUID) throws MiddlewareQueryException {
+		List<GermplasmList> lists = this.getGermplasmListDAO().getListsByProgram(programUUID);
+		return this.deleteGermplasmList(lists);
+	}
 
 	@Override
 	public int deleteGermplasmList(List<GermplasmList> germplasmLists) throws MiddlewareQueryException {
-		
-		
-		
-		
-
 		int germplasmListsDeleted = 0;
 		try {
 			// begin delete transaction
@@ -374,16 +358,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	private List<Integer> addOrUpdateGermplasmListData(List<GermplasmListData> germplasmListDatas, Operation operation)
 			throws MiddlewareQueryException {
 
-		
-		
-		
-		
-		int germplasmListDataSaved = 0;
 		List<Integer> idGermplasmListDataSaved = new ArrayList<Integer>();
 		try {
-			
-
-
 			GermplasmListDataDAO dao = new GermplasmListDataDAO();
 			dao.setSession(this.getActiveSession());
 
@@ -393,12 +369,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 				GermplasmListData recordSaved = this.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
 				idGermplasmListDataSaved.add(recordSaved.getId());
-				germplasmListDataSaved++;
-				if (germplasmListDataSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					this.getGermplasmListDataDAO().flush();
-					this.getGermplasmListDataDAO().clear();
-				}
 				if (germplasmListData.getStatus() != null && germplasmListData.getStatus().intValue() == 9) {
 					deletedListEntryIds.add(germplasmListData.getId());
 				}
@@ -421,23 +391,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public int deleteGermplasmListDataByListId(Integer listId) throws MiddlewareQueryException {
-		
-
-		
-		
-		
 
 		int germplasmListDataDeleted = 0;
 		try {
-			// begin delete transaction
-
 			germplasmListDataDeleted = this.getGermplasmListDataDAO().deleteByListId(listId);
 			this.getTransactionDao().cancelUnconfirmedTransactionsForLists(Arrays.asList(new Integer[] {listId}));
-
-			
-
 		} catch (Exception e) {
-
 			throw new MiddlewareQueryException(
 					"Error encountered while deleting Germplasm List Data: GermplasmListManager.deleteGermplasmListDataByListId(listId="
 							+ listId + "): " + e.getMessage(), e);
@@ -467,10 +426,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public int deleteGermplasmListData(List<GermplasmListData> germplasmListDatas) throws MiddlewareQueryException {
-		
-		
-		
-		
 
 		int germplasmListDataDeleted = 0;
 		try {

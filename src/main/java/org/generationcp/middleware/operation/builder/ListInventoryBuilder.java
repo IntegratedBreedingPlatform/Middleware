@@ -31,14 +31,10 @@ public class ListInventoryBuilder extends Builder {
 	 * Return list of GermplasmListData objects for given list, with counts for number of lots with available balance and number of lots
 	 * with reserved seed per entry
 	 *
-	 * @param listId
-	 * @param start
-	 * @param numOfRows
-	 * @return
-	 * @throws MiddlewareQueryException
+	 * @param listEntries list of {@link GermplasmListData} to which we append lot counts.
+	 * @return a germplasm list with the lot count
 	 */
-	public List<GermplasmListData> retrieveLotCountsForList(Integer listId, Integer start, Integer numOfRows,
-			List<GermplasmListData> listEntries) throws MiddlewareQueryException {
+	public List<GermplasmListData> retrieveLotCountsForList(List<GermplasmListData> listEntries) {
 		List<Integer> listEntryIds = new ArrayList<Integer>();
 		List<Integer> gids = new ArrayList<Integer>();
 		List<Integer> lrecIds = new ArrayList<Integer>();

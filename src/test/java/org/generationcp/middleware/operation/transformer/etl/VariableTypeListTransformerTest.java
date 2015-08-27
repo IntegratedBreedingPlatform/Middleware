@@ -14,7 +14,7 @@ package org.generationcp.middleware.operation.transformer.etl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.DataManagerIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -23,12 +23,11 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
-public class VariableTypeListTransformerTest extends DataManagerIntegrationTest {
+public class VariableTypeListTransformerTest extends IntegrationTestBase {
 
 	private static VariableTypeListTransformer transformer;
 
@@ -57,10 +56,10 @@ public class VariableTypeListTransformerTest extends DataManagerIntegrationTest 
 	private static final StandardVariable[] VARIATE_ARR = new StandardVariable[] {VariableTypeListTransformerTest.STDVAR3};
 
 	private static final String PROGRAM_UUID = "1234567";
-	@BeforeClass
-	public static void setUp() throws Exception {
-		HibernateSessionProvider sessionProvider = DataManagerIntegrationTest.managerFactory.getSessionProvider();
-		VariableTypeListTransformerTest.transformer = new VariableTypeListTransformer(sessionProvider);
+
+	@Before
+	public void setUp() throws Exception {
+		VariableTypeListTransformerTest.transformer = new VariableTypeListTransformer(this.sessionProvder);
 	}
 
 	@Test
@@ -77,8 +76,8 @@ public class VariableTypeListTransformerTest extends DataManagerIntegrationTest 
 
 	private void testTransform(boolean isVariate) throws Exception {
 		List<MeasurementVariable> measurementVariables = this.createMeasurmentVariablesTestData(isVariate);
-		VariableTypeList variableTypeList = VariableTypeListTransformerTest.transformer.transform(
-				measurementVariables, isVariate, PROGRAM_UUID);
+		VariableTypeList variableTypeList =
+				VariableTypeListTransformerTest.transformer.transform(measurementVariables, isVariate, PROGRAM_UUID);
 		Assert.assertNotNull(variableTypeList);
 		int i = 0;
 		for (DMSVariableType variableType : variableTypeList.getVariableTypes()) {
@@ -115,16 +114,15 @@ public class VariableTypeListTransformerTest extends DataManagerIntegrationTest 
 							VariableTypeListTransformerTest.TEST_SCALE1, VariableTypeListTransformerTest.TEST_METHOD1,
 							VariableTypeListTransformerTest.TEST_PROPERTY1, "C", "value1", "TRIAL");
 			variable.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
-			mapMeasurementVariableToStandardVariable(variable,STDVAR1);
+			this.mapMeasurementVariableToStandardVariable(variable, STDVAR1);
 			list.add(variable);
-			
 
 			variable =
 					new MeasurementVariable(VariableTypeListTransformerTest.FACTOR2, VariableTypeListTransformerTest.FACTOR2,
 							VariableTypeListTransformerTest.TEST_SCALE2, VariableTypeListTransformerTest.TEST_METHOD2,
 							VariableTypeListTransformerTest.TEST_PROPERTY2, "C", "value2", "TRIAL");
 			variable.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
-			mapMeasurementVariableToStandardVariable(variable,STDVAR2);
+			this.mapMeasurementVariableToStandardVariable(variable, STDVAR2);
 			list.add(variable);
 
 		} else {
@@ -133,30 +131,29 @@ public class VariableTypeListTransformerTest extends DataManagerIntegrationTest 
 							VariableTypeListTransformerTest.TEST_SCALE3, VariableTypeListTransformerTest.TEST_METHOD3,
 							VariableTypeListTransformerTest.TEST_PROPERTY3, "C", "value3", "TRIAL");
 			variable.setRole(PhenotypicType.VARIATE);
-			mapMeasurementVariableToStandardVariable(variable,STDVAR3);
+			this.mapMeasurementVariableToStandardVariable(variable, STDVAR3);
 			list.add(variable);
 		}
 
 		return list;
 	}
 
-	private void mapMeasurementVariableToStandardVariable(
-			MeasurementVariable variable, StandardVariable stdVar) {
+	private void mapMeasurementVariableToStandardVariable(MeasurementVariable variable, StandardVariable stdVar) {
 		stdVar.setName(variable.getName());
 		stdVar.setDescription(variable.getDescription());
-		stdVar.setProperty(new Term(10,variable.getProperty(),variable.getProperty()));
-		stdVar.setScale(new Term(10,variable.getScale(),variable.getScale()));
-		stdVar.setMethod(new Term(10,variable.getMethod(),variable.getMethod()));
+		stdVar.setProperty(new Term(10, variable.getProperty(), variable.getProperty()));
+		stdVar.setScale(new Term(10, variable.getScale(), variable.getScale()));
+		stdVar.setMethod(new Term(10, variable.getMethod(), variable.getMethod()));
 		DataType dataType = null;
-		if("N".equals(variable.getDataType())) {
+		if ("N".equals(variable.getDataType())) {
 			dataType = DataType.getById(TermId.NUMERIC_VARIABLE.getId());
-		} else if("C".equals(variable.getDataType())) {
+		} else if ("C".equals(variable.getDataType())) {
 			dataType = DataType.getById(TermId.CHARACTER_VARIABLE.getId());
 		} else {
 			dataType = DataType.getByName(variable.getDataType());
-		}	
-		if(dataType!=null) {
-			stdVar.setDataType(new Term(dataType.getId(),dataType.getName(),dataType.getName()));
+		}
+		if (dataType != null) {
+			stdVar.setDataType(new Term(dataType.getId(), dataType.getName(), dataType.getName()));
 		}
 		stdVar.setPhenotypicType(variable.getRole());
 	}

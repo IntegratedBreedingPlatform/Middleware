@@ -86,7 +86,6 @@ import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
 import org.generationcp.middleware.pojos.gdms.TrackData;
 import org.generationcp.middleware.pojos.gdms.TrackMarker;
-import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -114,6 +113,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	private static final String DATA_TYPE_INT = GdmsType.DATA_TYPE_INT.getValue();
 	private static final String DATA_TYPE_MAP = GdmsType.DATA_TYPE_MAP.getValue();
+
+	public GenotypicDataManagerImpl() {
+	}
 
 	public GenotypicDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
@@ -918,8 +920,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addQtlDetails(QtlDetails qtlDetails) throws MiddlewareQueryException {
-		
-		
+
 		Integer savedId = null;
 		try {
 
@@ -928,7 +929,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			QtlDetails recordSaved = this.getQtlDetailsDao().save(qtlDetails);
 			savedId = recordSaved.getQtlId();
-
 
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while saving Qtl Details: GenotypicDataManager.addQtlDetails(qtlDetails="
@@ -961,15 +961,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addAccMetadataSet(AccMetadataSet accMetadataSet) throws MiddlewareQueryException {
-		
-		
+
 		Integer savedId = null;
 
 		try {
 
 			AccMetadataSet recordSaved = this.getAccMetadataSetDao().save(accMetadataSet);
 			savedId = recordSaved.getAccMetadataSetId();
-
 
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered with addAccMetadataSet(accMetadataSet=" + accMetadataSet + "): "
@@ -980,15 +978,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Integer addMarkerMetadataSet(MarkerMetadataSet markerMetadataSet) throws MiddlewareQueryException {
-		
-		
+
 		Integer savedId = null;
 
 		try {
 
 			MarkerMetadataSet recordSaved = this.getMarkerMetadataSetDao().save(markerMetadataSet);
 			savedId = recordSaved.getMarkerMetadataSetId();
-
 
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered with addMarkerMetadataSet(markerMetadataSet=" + markerMetadataSet + "): "
@@ -1006,11 +1002,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	public Integer addGDMSMarker(Marker marker) throws MiddlewareQueryException {
 		// Check for existence. duplicate marker names are not allowed.
 
-		
-		
 		Integer id = null;
 		try {
-			
 
 			id = this.saveMarkerIfNotExisting(marker, marker.getMarkerType());
 
@@ -1120,8 +1113,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	private Boolean setMarker(Marker marker, String markerType, MarkerAlias markerAlias, MarkerDetails markerDetails,
 			MarkerUserInfo markerUserInfo) throws MiddlewareQueryException {
-		
-		
 
 		try {
 			// Add GDMS Marker
@@ -1144,15 +1135,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			return true;
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while saving Marker: " + e.getMessage(), e);
-		} 
+		}
 	}
 
 	@Override
 	public Boolean setQTL(Dataset dataset, DatasetUsers datasetUser, List<QtlDataRow> rows) throws MiddlewareQueryException {
-		
-		
-		try {
 
+		try {
 
 			Integer datasetId = this.saveDataset(dataset, GenotypicDataManagerImpl.TYPE_QTL, null);
 
@@ -1170,7 +1159,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 				}
 			}
 
-
 			return true;
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered with setQTL(): " + e.getMessage(), e);
@@ -1180,10 +1168,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public Boolean setDart(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets,
 			List<AccMetadataSet> accMetadataSets, List<DartValues> dartValueList, List<AlleleValues> alleleValueList)
-			throws MiddlewareQueryException {
-
-		
-		
+					throws MiddlewareQueryException {
 
 		try {
 
@@ -1208,7 +1193,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.saveAlleleValues(alleleValueList);
 			this.saveDartValues(dartValueList);
 
-
 			return true;
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while setting DArT: setDart(): " + e.getMessage(), e);
@@ -1218,9 +1202,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public Boolean setSSR(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets,
 			List<AccMetadataSet> accMetadataSets, List<AlleleValues> alleleValueList) throws MiddlewareQueryException {
-
-		
-		
 
 		try {
 
@@ -1241,7 +1222,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.saveAccMetadataSets(accMetadataSets);
 			this.saveAlleleValues(alleleValueList);
 
-
 			return true;
 		} catch (Exception e) {
 
@@ -1252,9 +1232,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public Boolean setSNP(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers, List<MarkerMetadataSet> markerMetadataSets,
 			List<AccMetadataSet> accMetadataSets, List<CharValues> charValueList) throws MiddlewareQueryException {
-
-		
-		
 
 		try {
 
@@ -1273,7 +1250,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.saveAccMetadataSets(accMetadataSets);
 			this.saveCharValues(charValueList);
 
-
 			return true;
 		} catch (Exception e) {
 
@@ -1284,13 +1260,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public Boolean setMappingABH(Dataset dataset, DatasetUsers datasetUser, MappingPop mappingPop, List<Marker> markers,
 			List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList)
-			throws MiddlewareQueryException {
-
-		
-		
+					throws MiddlewareQueryException {
 
 		try {
-
 
 			Integer datasetId = this.saveMappingData(dataset, datasetUser, mappingPop, markers, markerMetadataSets);
 
@@ -1306,7 +1278,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.saveAccMetadataSets(accMetadataSets);
 			this.saveMappingPopValues(mappingPopValueList);
 
-
 			return true;
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while setting MappingABH: setMappingABH(): " + e.getMessage(), e);
@@ -1318,11 +1289,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList,
 			List<CharValues> charValueList) throws MiddlewareQueryException {
 
-		
-		
-
 		try {
-
 
 			Integer datasetId = this.saveMappingData(dataset, datasetUser, mappingPop, markers, markerMetadataSets);
 
@@ -1343,7 +1310,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.saveMappingPopValues(mappingPopValueList);
 			this.saveCharValues(charValueList);
 
-
 			return true;
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while setting MappingAllelicSNP: setMappingAllelicSNP(): "
@@ -1356,11 +1322,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			List<MarkerMetadataSet> markerMetadataSets, List<AccMetadataSet> accMetadataSets, List<MappingPopValues> mappingPopValueList,
 			List<AlleleValues> alleleValueList, List<DartValues> dartValueList) throws MiddlewareQueryException {
 
-		
-		
-
 		try {
-
 
 			Integer datasetId = this.saveMappingData(dataset, datasetUser, mappingPop, markers, markerMetadataSets);
 
@@ -1386,7 +1348,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.saveAlleleValues(alleleValueList);
 			this.saveDartValues(dartValueList);
 
-
 			return true;
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while setting MappingAllelicSSRDArT: setMappingAllelicSSRDArT(): "
@@ -1401,8 +1362,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		if (dataset == null || dataset.getDatasetId() == null) {
 			throw new MiddlewareException("Dataset is null and cannot be updated.");
 		}
-		
-		
 
 		try {
 
@@ -1444,7 +1403,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			}
 
-
 			return true;
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while updating DArT: updateDart(): " + e.getMessage(), e);
@@ -1458,9 +1416,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		if (dataset == null || dataset.getDatasetId() == null) {
 			throw new MiddlewareException("Dataset is null and cannot be updated.");
 		}
-
-		
-		
 
 		try {
 
@@ -1496,7 +1451,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 			}
 
-
 			return true;
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while updating SSR: updateSSR(): " + e.getMessage(), e);
@@ -1511,9 +1465,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		if (dataset == null || dataset.getDatasetId() == null) {
 			throw new MiddlewareException("Dataset is null and cannot be updated.");
 		}
-
-		
-		
 
 		try {
 
@@ -1548,7 +1499,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 				this.saveCharValues(charValues);
 			}
 
-
 			return true;
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while updating SNP: updateSNP(): " + e.getMessage(), e);
@@ -1562,9 +1512,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		if (dataset == null || dataset.getDatasetId() == null) {
 			throw new MiddlewareException("Dataset is null and cannot be updated.");
 		}
-
-		
-		
 
 		try {
 
@@ -1599,7 +1546,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 				this.saveMappingPopValues(mappingPopValues);
 			}
 
-
 			return true;
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while updating MappingABH: updateMappingABH(): " + e.getMessage(), e);
@@ -1615,9 +1561,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		if (dataset == null || dataset.getDatasetId() == null) {
 			throw new MiddlewareException("Dataset is null and cannot be updated.");
 		}
-
-		
-		
 
 		try {
 
@@ -1659,7 +1602,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 				this.saveCharValues(charValues);
 			}
 
-
 			return true;
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while updating MappingAllelicSNP: updateMappingAllelicSNP(): "
@@ -1676,11 +1618,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			throw new MiddlewareException("Dataset is null and cannot be updated.");
 		}
 
-		
-		
-
 		try {
-
 
 			Integer datasetId = this.saveOrUpdateMappingData(dataset, mappingPop, markers, markerMetadataSets);
 
@@ -1726,7 +1664,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 				this.saveDartValues(dartValues);
 			}
 
-
 			return true;
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while updating MappingAllelicSSRDArT updateMappingAllelicSSRDArT(): "
@@ -1767,8 +1704,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public Boolean setMaps(Marker marker, MarkerOnMap markerOnMap, Map map) throws MiddlewareQueryException {
-		
-		
+
 		try {
 
 			Integer markerSavedId = this.saveMarker(marker, GenotypicDataManagerImpl.TYPE_UA);
@@ -1903,11 +1839,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public void deleteQTLs(List<Integer> qtlIds, Integer datasetId) throws MiddlewareQueryException {
-		
-		
 
 		try {
-
 
 			// delete qtl and qtl details
 			this.getQtlDetailsDao().deleteByQtlIds(qtlIds);
@@ -1916,7 +1849,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			// delete dataset users and dataset
 			this.getDatasetUsersDao().deleteByDatasetId(datasetId);
 			this.getDatasetDao().deleteByDatasetId(datasetId);
-
 
 		} catch (Exception e) {
 
@@ -1927,8 +1859,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public void deleteSSRGenotypingDatasets(Integer datasetId) throws MiddlewareQueryException {
-		
-		
 
 		try {
 
@@ -1947,8 +1877,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public void deleteSNPGenotypingDatasets(Integer datasetId) throws MiddlewareQueryException {
-		
-		
 
 		try {
 
@@ -1967,8 +1895,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public void deleteDArTGenotypingDatasets(Integer datasetId) throws MiddlewareQueryException {
-		
-		
 
 		try {
 
@@ -1989,9 +1915,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public void deleteMappingPopulationDatasets(Integer datasetId) throws MiddlewareQueryException {
 
-		
-		
-
 		try {
 
 			this.getMappingPopValuesDao().deleteByDatasetId(datasetId);
@@ -2010,7 +1933,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			this.getDartValuesDao().deleteByDatasetId(datasetId);
 
 			this.getDatasetDao().deleteByDatasetId(datasetId);
-
 
 		} catch (Exception e) {
 
@@ -2031,15 +1953,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public void deleteMaps(Integer mapId) throws MiddlewareQueryException {
-		
-		
 
 		try {
 
-
 			this.getMarkerOnMapDao().deleteByMapId(mapId);
 			this.getMapDao().deleteByMapId(mapId);
-
 
 		} catch (Exception e) {
 
@@ -2065,8 +1983,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public void addMTA(Dataset dataset, Mta mta, MtaMetadata mtaMetadata, DatasetUsers users) throws MiddlewareQueryException {
-		
-		
 
 		if (dataset == null) {
 			throw new MiddlewareQueryException("Dataset passed must not be null");
@@ -2074,14 +1990,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		try {
 
-
 			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_MTA);
 			dataset.setUploadTemplateDate(new Date());
-			// TODO review this -ve id based logic.. Overall, this whole methods seems to be unused no refs from GDMS code. Remove entirely,
-			// once confirmed.
-			if (dataset.getDatasetId() < 0) {
-				this.getDatasetDao().merge(dataset);
-			}
+
+			this.getDatasetDao().merge(dataset);
 
 			users.setDatasetId(dataset.getDatasetId());
 			this.getDatasetUsersDao().merge(users);
@@ -2094,11 +2006,15 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			mtaMetadata.setDatasetID(dataset.getDatasetId());
 			mtaMetadataDao.merge(mtaMetadata);
 
-
 		} catch (Exception e) {
 
 			this.logAndThrowException("Error in GenotypicDataManager.addMTA: " + e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public Integer addMTA(Mta mta) throws MiddlewareQueryException {
+		return ((Mta) super.save(this.getMtaDao(), mta)).getMtaId();
 	}
 
 	@Override
@@ -2108,18 +2024,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			throw new MiddlewareQueryException("Dataset passed must not be null");
 		}
 
-		
-		
-
 		try {
 
 			dataset.setDatasetType(GenotypicDataManagerImpl.TYPE_MTA);
 			dataset.setUploadTemplateDate(new Date());
-			// TODO review this -ve id based logic.. Overall, this whole methods seems to be unused no refs from GDMS code. Remove entirely,
-			// once confirmed.
-			if (dataset.getDatasetId() < 0) {
-				this.getDatasetDao().merge(dataset);
-			}
+
+			this.getDatasetDao().merge(dataset);
 
 			users.setDatasetId(dataset.getDatasetId());
 			this.getDatasetUsersDao().merge(users);
@@ -2127,24 +2037,13 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			MtaDAO mtaDao = this.getMtaDao();
 			MtaMetadataDAO mtaMetadataDao = this.getMtaMetadataDao();
 
-			int rowsSaved = 0;
-
 			for (Mta mta : mtaList) {
 				mta.setDatasetId(dataset.getDatasetId());
 				mtaDao.merge(mta);
 
 				mtaMetadata.setDatasetID(dataset.getDatasetId());
 				mtaMetadataDao.merge(mtaMetadata);
-
-				rowsSaved++;
-				if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					mtaDao.flush();
-					mtaDao.clear();
-					mtaMetadataDao.flush();
-					mtaMetadataDao.clear();
-				}
 			}
-
 
 		} catch (Exception e) {
 
@@ -2154,11 +2053,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 	@Override
 	public void deleteMTA(List<Integer> datasetIds) throws MiddlewareQueryException {
-		
-		
 
 		try {
-
 
 			for (Integer datasetId : datasetIds) {
 
@@ -2186,16 +2082,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			throw new MiddlewareQueryException("Error in GenotypicDataManager.addMtaMetadata: MtaMetadata.datasetID must not be null.");
 		}
 
-		
-		
-
 		try {
-
 
 			// No need to generate id. The id (mta_id) is a foreign key
 			MtaMetadataDAO mtaMetadataDao = this.getMtaMetadataDao();
 			mtaMetadataDao.save(mtaMetadata);
-
 
 		} catch (Exception e) {
 
@@ -2342,7 +2233,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		// If the marker has same marker name existing in local, use the existing record.
 		if (markerId == null) {
 			this.getActiveSession();
-			Integer markerIdWithName = this.getMarkerIdByMarkerName(marker.getMarkerName());
+			this.getMarkerIdByMarkerName(marker.getMarkerName());
 		}
 
 		// Save the marker
@@ -2363,18 +2254,9 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		this.getActiveSession();
 		MarkerDAO markerDao = this.getMarkerDao();
-		Integer rowsSaved = 0;
-
 		if (markers != null) {
 			for (Marker marker : markers) {
 				markerDao.merge(marker);
-
-				// Flush
-				rowsSaved++;
-				if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					markerDao.flush();
-					markerDao.clear();
-				}
 			}
 		}
 	}
@@ -2513,17 +2395,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		this.getActiveSession();
 		AccMetadataSetDAO accMetadataSetDao = this.getAccMetadataSetDao();
-		Integer rowsSaved = 0;
 
 		if (accMetadataSets != null) {
 			for (AccMetadataSet accMetadataSet : accMetadataSets) {
-
 				accMetadataSetDao.merge(accMetadataSet);
-				rowsSaved++;
-				if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					accMetadataSetDao.flush();
-					accMetadataSetDao.clear();
-				}
 			}
 		}
 	}
@@ -2531,15 +2406,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	private void saveMarkerMetadataSets(List<MarkerMetadataSet> markerMetadataSets) throws Exception {
 		this.getActiveSession();
 		MarkerMetadataSetDAO markerMetadataSetDao = this.getMarkerMetadataSetDao();
-		Integer rowsSaved = 0;
-
 		for (MarkerMetadataSet markerMetadataSet : markerMetadataSets) {
 			markerMetadataSetDao.merge(markerMetadataSet);
-			rowsSaved++;
-			if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-				markerMetadataSetDao.flush();
-				markerMetadataSetDao.clear();
-			}
 		}
 	}
 
@@ -2596,17 +2464,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		}
 		this.getActiveSession();
 		CharValuesDAO charValuesDao = this.getCharValuesDao();
-		Integer rowsSaved = 0;
-
 		for (CharValues charValues : charValuesList) {
-
 			charValuesDao.merge(charValues);
-
-			rowsSaved++;
-			if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-				charValuesDao.flush();
-				charValuesDao.clear();
-			}
 		}
 	}
 
@@ -2639,16 +2498,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		}
 		this.getActiveSession();
 		MappingPopValuesDAO mappingPopValuesDao = this.getMappingPopValuesDao();
-		Integer rowsSaved = 0;
-
 		for (MappingPopValues mappingPopValues : mappingPopValuesList) {
 			mappingPopValuesDao.merge(mappingPopValues);
-
-			rowsSaved++;
-			if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-				mappingPopValuesDao.flush();
-				mappingPopValuesDao.clear();
-			}
 		}
 	}
 
@@ -2658,16 +2509,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 		}
 		this.getActiveSession();
 		AlleleValuesDAO alleleValuesDao = this.getAlleleValuesDao();
-		Integer rowsSaved = 0;
-
 		for (AlleleValues alleleValues : alleleValuesList) {
 			alleleValuesDao.merge(alleleValues);
-
-			rowsSaved++;
-			if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-				alleleValuesDao.flush();
-				alleleValuesDao.clear();
-			}
 		}
 
 	}
@@ -2680,17 +2523,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 
 		this.getActiveSession();
 		DartValuesDAO dartValuesDao = this.getDartValuesDao();
-		Integer rowsSaved = 0;
-
 		for (DartValues dartValues : dartValuesList) {
 			dartValuesDao.merge(dartValues);
-
-			rowsSaved++;
-			if (rowsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-				dartValuesDao.flush();
-				dartValuesDao.clear();
-			}
-
 		}
 	}
 
@@ -2716,11 +2550,8 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	// GCP-8566
 	@Override
 	public void addHaplotype(TrackData trackData, List<TrackMarker> trackMarkers) throws MiddlewareQueryException {
-		
-		
 
 		try {
-
 
 			this.getTrackDataDao().save(trackData);
 
@@ -2729,13 +2560,22 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 				this.getTrackMarkerDao().save(trackMarker);
 			}
 
-
 		} catch (Exception e) {
 
 			this.logAndThrowException("Error in GenotypicDataManager.addHaplotype(trackData=" + trackData + ", trackMarkers="
 					+ trackMarkers + "): " + e.getMessage(), e);
 		}
 
+	}
+
+	@Override
+	public Integer addTrackData(TrackData trackData) throws MiddlewareQueryException {
+		return ((TrackData) super.save(this.getTrackDataDao(), trackData)).getTrackId();
+	}
+
+	@Override
+	public Integer addTrackMarker(TrackMarker trackMarker) throws MiddlewareQueryException {
+		return ((TrackMarker) super.save(this.getTrackMarkerDao(), trackMarker)).getTrackId();
 	}
 
 	// GCP-7881
@@ -2987,11 +2827,7 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			}
 		}
 
-		
-		
-
 		try {
-
 
 			// Update GDMS Marker - update all fields except marker_id, marker_name and species
 			this.updateMarkerInfo(marker);
@@ -3008,7 +2844,6 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 			// Add or update marker user info
 			markerUserInfo.setMarkerId(markerId);
 			this.saveOrUpdateMarkerUserInfo(markerUserInfo);
-
 
 			return true;
 

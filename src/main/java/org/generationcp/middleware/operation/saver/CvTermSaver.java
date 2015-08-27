@@ -34,14 +34,6 @@ public class CvTermSaver extends Saver {
 		return new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
 	}
 
-	public Term saveOrUpdate(String name, String definition, CvId cvId) throws MiddlewareException, MiddlewareQueryException {
-		this.validateInputFields(name, definition);
-		CVTermDao dao = this.getCvTermDao();
-		CVTerm cvTerm = this.create(name, definition, cvId.getId(), false, false);
-		dao.saveOrUpdate(cvTerm);
-		return new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
-	}
-
 	public Term update(Term term) throws MiddlewareException, MiddlewareQueryException {
 		this.validateInputFields(term.getName(), term.getDefinition());
 		CVTermDao dao = this.getCvTermDao();

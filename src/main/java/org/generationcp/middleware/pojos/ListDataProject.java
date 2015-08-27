@@ -17,12 +17,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.generationcp.middleware.interfaces.GermplasmExportSource;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 @Entity
 @Table(name = "listdata_project")
-public class ListDataProject implements Serializable {
+public class ListDataProject implements Serializable, GermplasmExportSource {
 
 	private static final long serialVersionUID = 1L;
 	public static final String PEDIGREE_DUPE = "Pedigree Dupe";
@@ -85,6 +86,9 @@ public class ListDataProject implements Serializable {
 	@Transient
 	private Integer mgid = null;
 
+	@Transient
+	private String checkTypeDescription = null;
+
 	/**
 	 * @return the listDataProjectId
 	 */
@@ -116,6 +120,7 @@ public class ListDataProject implements Serializable {
 	/**
 	 * @return the germplasmId
 	 */
+	@Override
 	public Integer getGermplasmId() {
 		return this.germplasmId;
 	}
@@ -130,6 +135,7 @@ public class ListDataProject implements Serializable {
 	/**
 	 * @return the checkType
 	 */
+	@Override
 	public Integer getCheckType() {
 		return this.checkType;
 	}
@@ -144,6 +150,7 @@ public class ListDataProject implements Serializable {
 	/**
 	 * @return the entryId
 	 */
+	@Override
 	public Integer getEntryId() {
 		return this.entryId;
 	}
@@ -158,6 +165,7 @@ public class ListDataProject implements Serializable {
 	/**
 	 * @return the entryCode
 	 */
+	@Override
 	public String getEntryCode() {
 		return this.entryCode;
 	}
@@ -172,6 +180,7 @@ public class ListDataProject implements Serializable {
 	/**
 	 * @return the seedSource
 	 */
+	@Override
 	public String getSeedSource() {
 		return this.seedSource;
 	}
@@ -186,6 +195,7 @@ public class ListDataProject implements Serializable {
 	/**
 	 * @return the designation
 	 */
+	@Override
 	public String getDesignation() {
 		return this.designation;
 	}
@@ -200,6 +210,7 @@ public class ListDataProject implements Serializable {
 	/**
 	 * @return the groupName
 	 */
+	@Override
 	public String getGroupName() {
 		return this.groupName;
 	}
@@ -219,6 +230,7 @@ public class ListDataProject implements Serializable {
 		this.duplicate = duplicate;
 	}
 
+	@Override
 	public String getFemaleParent() {
 		return this.femaleParent;
 	}
@@ -227,6 +239,7 @@ public class ListDataProject implements Serializable {
 		this.femaleParent = femaleParent;
 	}
 
+	@Override
 	public Integer getFgid() {
 		return this.fgid;
 	}
@@ -235,6 +248,7 @@ public class ListDataProject implements Serializable {
 		this.fgid = fgid;
 	}
 
+	@Override
 	public String getMaleParent() {
 		return this.maleParent;
 	}
@@ -243,6 +257,7 @@ public class ListDataProject implements Serializable {
 		this.maleParent = maleParent;
 	}
 
+	@Override
 	public Integer getMgid() {
 		return this.mgid;
 	}
@@ -346,6 +361,29 @@ public class ListDataProject implements Serializable {
 		}
 
 		return returnVal;
+	}
+
+	@Override
+	public String getCheckTypeDescription() {
+
+		return this.checkTypeDescription;
+	}
+
+	public void setCheckTypeDescription(String value) {
+		this.checkTypeDescription = value;
+
+	}
+
+	@Override
+	public String getStockIDs() {
+
+		return "";
+	}
+
+	@Override
+	public String getSeedAmount() {
+
+		return "";
 	}
 
 }

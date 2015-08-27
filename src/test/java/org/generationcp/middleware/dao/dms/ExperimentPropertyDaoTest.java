@@ -1,5 +1,5 @@
 /*******************************************************************************
- * 
+ *
  * Copyright (c) 2012, All Rights Reserved.
  *
  * Generation Challenge Programme (GCP)
@@ -14,29 +14,28 @@ package org.generationcp.middleware.dao.dms;
 
 import java.util.List;
 
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.util.Debug;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
-public class ExperimentPropertyDaoTest extends MiddlewareIntegrationTest {
+public class ExperimentPropertyDaoTest extends IntegrationTestBase {
 
-	private static ExperimentPropertyDao dao;
+	private ExperimentPropertyDao dao;
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		ExperimentPropertyDaoTest.dao = new ExperimentPropertyDao();
-		ExperimentPropertyDaoTest.dao.setSession(MiddlewareIntegrationTest.sessionUtil.getCurrentSession());
+	@Before
+	public void setUp() throws Exception {
+		this.dao = new ExperimentPropertyDao();
+		this.dao.setSession(this.sessionProvder.getSession());
 	}
 
 	// FIXME: hardcoded project id
 	@Test
 	public void testGetFieldMapLabels() throws Exception {
 		int projectId = 5734; // 5790;
-		List<FieldMapDatasetInfo> datasets = ExperimentPropertyDaoTest.dao.getFieldMapLabels(projectId);
+		List<FieldMapDatasetInfo> datasets = this.dao.getFieldMapLabels(projectId);
 
 		if (datasets == null) {
 			Debug.println(0, "testGetFieldMapLabels(projectId=" + projectId + ") RESULTS: NULL/Empty");
@@ -49,11 +48,4 @@ public class ExperimentPropertyDaoTest extends MiddlewareIntegrationTest {
 		}
 		Assert.assertFalse(datasets.isEmpty());
 	}
-
-	@AfterClass
-	public static void tearDown() throws Exception {
-		ExperimentPropertyDaoTest.dao.setSession(null);
-		ExperimentPropertyDaoTest.dao = null;
-	}
-
 }

@@ -18,8 +18,6 @@ import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
-import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
@@ -39,22 +37,35 @@ import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class DataSetupTest extends DataManagerIntegrationTest {
+public class DataSetupTest extends IntegrationTestBase {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataSetupTest.class);
 
-	private static WorkbenchDataManager workbenchDataManager;
-	private static UserDataManager userDataManager;
-	private static DataImportService dataImportService;
-	private static GermplasmDataManager germplasmManager;
-	private static GermplasmListManager germplasmListManager;
-	private static FieldbookService middlewareFieldbookService;
-	private static GermplasmTestDataGenerator germplasmTestDataGenerator;
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
+
+	@Autowired
+	private UserDataManager userDataManager;
+
+	@Autowired
+	private DataImportService dataImportService;
+
+	@Autowired
+	private GermplasmDataManager germplasmManager;
+
+	@Autowired
+	private GermplasmListManager germplasmListManager;
+
+	@Autowired
+	private FieldbookService middlewareFieldbookService;
+
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
 	private static final int NUMBER_OF_GERMPLASM = 20;
 	private static final String GERMPLSM_PREFIX = "GP-VARIETY-";
@@ -96,17 +107,11 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 	private static final String GRAIN_YIELD = "Grain Yield";
 	private static final String DRY_AND_WEIGH = "Dry and weigh";
 
-	@BeforeClass
-	public static void setUp() {
-		DataSetupTest.workbenchDataManager =
-				new WorkbenchDataManagerImpl(new HibernateSessionPerThreadProvider(
-						MiddlewareIntegrationTest.workbenchSessionUtil.getSessionFactory()));
-		DataSetupTest.dataImportService = DataManagerIntegrationTest.managerFactory.getDataImportService();
-		DataSetupTest.germplasmManager = DataManagerIntegrationTest.managerFactory.getGermplasmDataManager();
-		DataSetupTest.germplasmListManager = DataManagerIntegrationTest.managerFactory.getGermplasmListManager();
-		DataSetupTest.middlewareFieldbookService = DataManagerIntegrationTest.managerFactory.getFieldbookMiddlewareService();
-		DataSetupTest.userDataManager = DataManagerIntegrationTest.managerFactory.getUserDataManager();
-		DataSetupTest.germplasmTestDataGenerator = new GermplasmTestDataGenerator(DataSetupTest.germplasmManager);
+	@Before
+	public void setUp() {
+		if (this.germplasmTestDataGenerator == null) {
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager);
+		}
 	}
 
 	@Test
@@ -131,7 +136,7 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 		person.setContact("No Contact");
 		person.setLanguage(1);
 		person.setPhone("02121212121");
-		DataSetupTest.workbenchDataManager.addPerson(person);
+		this.workbenchDataManager.addPerson(person);
 
 		User workbenchUser = new User();
 		workbenchUser.setInstalid(1);
@@ -141,18 +146,18 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 		workbenchUser.setName("joe");
 		workbenchUser.setPassword("b");
 		workbenchUser.setPersonid(person.getId());
-		workbenchUser.setAdate(20150101);
-		workbenchUser.setCdate(20150101);
+		workbenchUser.setAssignDate(20150101);
+		workbenchUser.setCloseDate(20150101);
 		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, "ADMIN")));
 
-		DataSetupTest.workbenchDataManager.addUser(workbenchUser);
+		this.workbenchDataManager.addUser(workbenchUser);
 
-		CropType cropType = DataSetupTest.workbenchDataManager.getCropTypeByName("maize");
+		CropType cropType = this.workbenchDataManager.getCropTypeByName("maize");
 		if (cropType == null) {
 			cropType = new CropType("maize");
 			cropType.setDbName("ibdbv2_maize_merged");
 			cropType.setVersion("4.0.0");
-			DataSetupTest.workbenchDataManager.addCropType(cropType);
+			this.workbenchDataManager.addCropType(cropType);
 		}
 
 		Project program = new Project();
@@ -161,10 +166,10 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 		program.setStartDate(new Date(System.currentTimeMillis()));
 		program.setCropType(cropType);
 		program.setLastOpenDate(new Date(System.currentTimeMillis()));
-		DataSetupTest.workbenchDataManager.addProject(program);
+		this.workbenchDataManager.addProject(program);
 
 		List<ProjectUserRole> projectUserRoles = new ArrayList<ProjectUserRole>();
-		List<Role> allRolesList = DataSetupTest.workbenchDataManager.getAllRoles();
+		List<Role> allRolesList = this.workbenchDataManager.getAllRoles();
 		for (Role role : allRolesList) {
 			ProjectUserRole projectUserRole = new ProjectUserRole();
 			projectUserRole.setUserId(workbenchUser.getUserid());
@@ -172,22 +177,22 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 			projectUserRole.setProject(program);
 			projectUserRoles.add(projectUserRole);
 		}
-		DataSetupTest.workbenchDataManager.addProjectUserRole(projectUserRoles);
+		this.workbenchDataManager.addProjectUserRole(projectUserRoles);
 
 		User cropDBUser = workbenchUser.copy();
 		Person cropDBPerson = person.copy();
-		DataSetupTest.userDataManager.addPerson(cropDBPerson);
+		this.userDataManager.addPerson(cropDBPerson);
 		cropDBUser.setPersonid(cropDBPerson.getId());
-		DataSetupTest.userDataManager.addUser(cropDBUser);
+		this.userDataManager.addUser(cropDBUser);
 
 		IbdbUserMap ibdbUserMap = new IbdbUserMap();
 		ibdbUserMap.setWorkbenchUserId(workbenchUser.getUserid());
 		ibdbUserMap.setProjectId(program.getProjectId());
 		ibdbUserMap.setIbdbUserId(cropDBUser.getUserid());
-		DataSetupTest.workbenchDataManager.addIbdbUserMap(ibdbUserMap);
+		this.workbenchDataManager.addIbdbUserMap(ibdbUserMap);
 
 		ProjectUserInfo pUserInfo = new ProjectUserInfo(program.getProjectId().intValue(), workbenchUser.getUserid());
-		DataSetupTest.workbenchDataManager.saveOrUpdateProjectUserInfo(pUserInfo);
+		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pUserInfo);
 
 		return program.getUniqueID();
 	}
@@ -198,14 +203,13 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 
 		// Germplasm
 		Integer[] gids =
-				DataSetupTest.germplasmTestDataGenerator.createGermplasmRecords(DataSetupTest.NUMBER_OF_GERMPLASM,
-						DataSetupTest.GERMPLSM_PREFIX);
+				this.germplasmTestDataGenerator.createGermplasmRecords(DataSetupTest.NUMBER_OF_GERMPLASM, DataSetupTest.GERMPLSM_PREFIX);
 
 		// Germplasm list
 		GermplasmList germplasmList =
 				new GermplasmList(null, "Test Germplasm List " + randomInt, Long.valueOf(20141014), "LST", Integer.valueOf(1),
 						"Test Germplasm List", null, 1);
-		Integer germplasmListId = DataSetupTest.germplasmListManager.addGermplasmList(germplasmList);
+		Integer germplasmListId = this.germplasmListManager.addGermplasmList(germplasmList);
 
 		// Germplasm list data
 		List<GermplasmListData> germplasmListData = new ArrayList<GermplasmListData>();
@@ -213,7 +217,7 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 			germplasmListData.add(new GermplasmListData(null, germplasmList, gids[i], i, "EntryCode" + i, DataSetupTest.GERMPLSM_PREFIX + i
 					+ " Source", DataSetupTest.GERMPLSM_PREFIX + i, DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0));
 		}
-		DataSetupTest.germplasmListManager.addGermplasmListData(germplasmListData);
+		this.germplasmListManager.addGermplasmListData(germplasmListData);
 
 		// Now the Nursery creation via the Workbook
 
@@ -351,7 +355,7 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 		workbook.setObservations(observations);
 
 		// Save the workbook
-		int nurseryStudyId = DataSetupTest.dataImportService.saveDataset(workbook, true, false, programUUID);
+		int nurseryStudyId = this.dataImportService.saveDataset(workbook, true, false, programUUID);
 		DataSetupTest.LOG.info("Nursery " + studyDetails.getStudyName() + " created. ID: " + nurseryStudyId);
 
 		// Convert germplasm list we created into ListDataProject entries
@@ -369,11 +373,11 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 		}
 		// Add listdata_project entries
 		int nurseryListId =
-				DataSetupTest.middlewareFieldbookService.saveOrUpdateListDataProject(nurseryStudyId, GermplasmListType.NURSERY,
-						germplasmListId, listDataProjects, 1);
+				this.middlewareFieldbookService.saveOrUpdateListDataProject(nurseryStudyId, GermplasmListType.NURSERY, germplasmListId,
+						listDataProjects, 1);
 
 		// Load and check some basics
-		Workbook nurseryWorkbook = DataSetupTest.middlewareFieldbookService.getNurseryDataSet(nurseryStudyId);
+		Workbook nurseryWorkbook = this.middlewareFieldbookService.getNurseryDataSet(nurseryStudyId);
 		Assert.assertNotNull(nurseryWorkbook);
 
 		StudyDetails nurseryStudyDetails = nurseryWorkbook.getStudyDetails();
@@ -394,7 +398,7 @@ public class DataSetupTest extends DataManagerIntegrationTest {
 		Assert.assertEquals(observations.size(), nurseryWorkbook.getObservations().size());
 
 		// Assert list data got saved with Nursery
-		List<ListDataProject> listDataProject = DataSetupTest.middlewareFieldbookService.getListDataProject(nurseryListId);
+		List<ListDataProject> listDataProject = this.middlewareFieldbookService.getListDataProject(nurseryListId);
 		Assert.assertEquals(germplasmListData.size(), listDataProject.size());
 	}
 

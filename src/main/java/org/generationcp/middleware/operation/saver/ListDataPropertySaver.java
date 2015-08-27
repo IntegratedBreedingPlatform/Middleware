@@ -27,7 +27,6 @@ public class ListDataPropertySaver extends Saver {
 
 
 		try {
-			Integer recordsSaved = 0;
 			for (ListDataInfo listDataObj : listDataCollection) {
 				Integer listDataId = listDataObj.getListDataId();
 				if (listDataId != null) {
@@ -48,12 +47,6 @@ public class ListDataPropertySaver extends Saver {
 							property.setValue(value);
 
 							property = this.getListDataPropertyDAO().saveOrUpdate(property);
-							recordsSaved++;
-							if (recordsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-								// flush a batch of inserts and release memory
-								this.getListDataPropertyDAO().flush();
-								this.getListDataPropertyDAO().clear();
-							}
 							// save ID of the inserted or updated listdataprop record
 							column.setListDataColumnId(property.getListDataPropertyId());
 							column.setValue(property.getValue());
@@ -79,17 +72,10 @@ public class ListDataPropertySaver extends Saver {
 	public List<ListDataProperty> saveListDataProperties(List<ListDataProperty> listDataProps) throws MiddlewareQueryException {
 
 		try {
-			Integer recordsSaved = 0;
 			for (ListDataProperty listDataProperty : listDataProps) {
 
 				if (listDataProperty.getListData() != null) {
 					this.getListDataPropertyDAO().saveOrUpdate(listDataProperty);
-
-					if (recordsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-						// flush a batch of inserts and release memory
-						this.getListDataPropertyDAO().flush();
-						this.getListDataPropertyDAO().clear();
-					}
 
 				} else {
 					throw new MiddlewareQueryException("List Data ID cannot be null.");

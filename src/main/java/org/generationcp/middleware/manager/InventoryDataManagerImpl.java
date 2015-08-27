@@ -167,16 +167,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	@Override
 	public Integer addStockTransaction(StockTransaction stockTransaction) throws MiddlewareQueryException {
-		
-		
-
 		try {
-
 			StockTransactionDAO stockTransactionDAO = this.getStockTransactionDAO();
 			stockTransaction = stockTransactionDAO.saveOrUpdate(stockTransaction);
-			stockTransactionDAO.flush();
-			stockTransactionDAO.clear();
-
 			return stockTransaction.getId();
 		} catch (HibernateException e) {
 
@@ -188,28 +181,13 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	}
 
 	private List<Integer> addOrUpdateLot(List<Lot> lots, Operation operation) throws MiddlewareQueryException {
-		
-		
-
-		int lotsSaved = 0;
 		List<Integer> idLotsSaved = new ArrayList<Integer>();
 		try {
-			
-
 			LotDAO dao = this.getLotDao();
-
 			for (Lot lot : lots) {
 				Lot recordSaved = dao.saveOrUpdate(lot);
 				idLotsSaved.add(recordSaved.getId());
-				lotsSaved++;
-				if (lotsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
-			
-
 		} catch (ConstraintViolationException e) {
 
 			throw new MiddlewareQueryException(e.getMessage(), e);
@@ -257,10 +235,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	private List<Integer> addOrUpdateTransaction(List<org.generationcp.middleware.pojos.ims.Transaction> transactions, Operation operation)
 			throws MiddlewareQueryException {
-		
-		
 
-		int transactionsSaved = 0;
 		List<Integer> idTransactionsSaved = new ArrayList<Integer>();
 		try {
 			
@@ -270,12 +245,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 			for (org.generationcp.middleware.pojos.ims.Transaction transaction : transactions) {
 				org.generationcp.middleware.pojos.ims.Transaction recordSaved = dao.saveOrUpdate(transaction);
 				idTransactionsSaved.add(recordSaved.getId());
-				transactionsSaved++;
-				if (transactionsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
 			
 
@@ -810,9 +779,18 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	@Override
 	public List<GermplasmListData> getLotCountsForList(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
 		List<GermplasmListData> listEntries = this.getGermplasmListDataByListId(id, start, numOfRows);
-		return this.getListInventoryBuilder().retrieveLotCountsForList(id, start, numOfRows, listEntries);
+		return this.getListInventoryBuilder().retrieveLotCountsForList(listEntries);
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.generationcp.middleware.manager.api.InventoryDataManager#populateLotCountsIntoExistingList(org.generationcp.middleware.pojos.GermplasmList)
+	 */
+	@Override
+	public void populateLotCountsIntoExistingList(final GermplasmList germplasmList) throws MiddlewareQueryException {
+		this.getListInventoryBuilder().retrieveLotCountsForList(germplasmList.getListData());
+	}
+	
 	@Override
 	public Integer countLotsWithAvailableBalanceForGermplasm(Integer gid) throws MiddlewareQueryException {
 		return this.getListInventoryBuilder().countLotsWithAvailableBalanceForGermplasm(gid);

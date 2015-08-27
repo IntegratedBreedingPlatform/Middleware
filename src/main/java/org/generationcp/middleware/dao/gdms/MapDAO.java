@@ -398,14 +398,8 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 
 	public void deleteByMapId(int mapId) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
 			SQLQuery statement = this.getSession().createSQLQuery("DELETE FROM gdms_map WHERE map_id = " + mapId);
 			statement.executeUpdate();
-
-			this.flush();
-			this.clear();
-
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deleteByMapId=" + mapId + " in MapDAO: " + e.getMessage(), e);
 		}

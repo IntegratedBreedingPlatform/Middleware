@@ -312,9 +312,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 		List<SelectedGenotype> existingAccession = this.selectedGenotypeDAO.getSelectedGenotypeByIds(gidSet);
 
-		Session session = this.getActiveSession();
-
-
 		try {
 			if (existingAccession != null && !existingAccession.isEmpty()) {
 				for (SelectedGenotype genotype : existingAccession) {
@@ -348,9 +345,6 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 					this.selectedGenotypeDAO.saveOrUpdate(genotype);
 				}
-
-				session.flush();
-				session.clear();
 			}
 
 			for (Integer gid : gidSet) {
@@ -359,16 +353,11 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 			}
 
-			session.flush();
-			session.clear();
-
 		} catch (MiddlewareQueryException e) {
 			MBDTDataManagerImpl.LOG.error("Setting parent data was not successful", e);
-
 			throw e;
 		} catch (HibernateException e) {
 			MBDTDataManagerImpl.LOG.error("Setting parent data was not successful", e);
-
 			throw e;
 		}
 	}

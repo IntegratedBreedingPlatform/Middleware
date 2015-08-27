@@ -1999,6 +1999,8 @@ public interface GenotypicDataManager {
 	 */
 	void addMTA(Dataset dataset, Mta mta, MtaMetadata mtaMetadata, DatasetUsers users) throws MiddlewareQueryException;
 
+	Integer addMTA(Mta mta) throws MiddlewareQueryException;
+
 	/**
 	 * 
 	 * Uploads MTA data to the database. Adds MTA, MTA Metadata, Dataset, and DatasetUsers records to the database. Mta and MtaMetadata have
@@ -2066,6 +2068,10 @@ public interface GenotypicDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	void addHaplotype(TrackData trackData, List<TrackMarker> trackMarkers) throws MiddlewareQueryException;
+
+	Integer addTrackData(TrackData trackData) throws MiddlewareQueryException;
+
+	Integer addTrackMarker(TrackMarker trackMarker) throws MiddlewareQueryException;
 
 	// GCP-7881
 	/**

@@ -540,9 +540,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		// If term is not existing, add
 		if (term == null) {
 			term = this.getTermSaver().save(name, definition, cvId);
-			// If term is existing, update
 		} else {
-			term = this.getTermSaver().saveOrUpdate(name, definition, cvId);
+			// If term is existing, update
+			term.setDefinition(definition);
+			this.getTermSaver().update(term);
 		}
 		return term;
 	}

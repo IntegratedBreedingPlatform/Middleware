@@ -112,43 +112,27 @@ public class PresetDataManagerImpl extends DataManager implements PresetDataMana
 	@Override
 	public ProgramPreset saveOrUpdateProgramPreset(ProgramPreset programPreset) throws MiddlewareQueryException {
 
-
-
 		try {
 			ProgramPreset result = this.getProgramPresetDAO().saveOrUpdate(programPreset);
-
-
 
 			return result;
 
 		} catch (HibernateException e) {
-
 			this.logAndThrowException(
 					"Cannot perform: WorkbenchDataManager.deleteProgramPreset(programPresetName=" + programPreset.getName() + "): "
 							+ e.getMessage(), e);
-		} finally {
-			this.getCurrentSession().flush();
 		}
-
 		return null;
 	}
 
 	@Override
 	public void deleteProgramPreset(int programPresetId) throws MiddlewareQueryException {
-
-
 		try {
-
 			ProgramPreset preset = this.getProgramPresetDAO().getById(programPresetId);
 			this.getCurrentSession().delete(preset);
-
-
 		} catch (HibernateException e) {
-
 			this.logAndThrowException("Cannot delete preset: WorkbenchDataManager.deleteProgramPreset(programPresetId=" + programPresetId
 					+ "): " + e.getMessage(), e);
-		} finally {
-			this.getCurrentSession().flush();
 		}
 	}
 }

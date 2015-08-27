@@ -55,9 +55,6 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public Integer addUser(User user) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		
-
 		Integer idUserSaved = null;
 		try {
 
@@ -65,36 +62,23 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 			User recordSaved = dao.saveOrUpdate(user);
 			idUserSaved = recordSaved.getUserid();
-
-
 		} catch (Exception e) {
-
 			throw new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): "
 					+ e.getMessage(), e);
-		} finally {
-			session.flush();
-		}
+		} 
 
 		return idUserSaved;
 	}
 
 	@Override
 	public Integer updateUser(User user) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		
-
 		try {
-
 			this.getUserDao().saveOrUpdate(user);
-
 		} catch (Exception e) {
 
 			throw new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): "
 					+ e.getMessage(), e);
-		} finally {
-			session.flush();
 		}
-
 		return user.getUserid();
 	}
 
@@ -105,19 +89,11 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public void deleteUser(User user) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		
-
 		try {
-
 			this.getUserDao().makeTransient(user);
-
 		} catch (Exception e) {
-
 			throw new MiddlewareQueryException("Error encountered while deleting User: UserDataManager.deleteUser(user=" + user + "): "
 					+ e.getMessage(), e);
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -145,23 +121,14 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public Integer addPerson(Person person) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		
-
 		Integer idPersonSaved = null;
 		try {
-
 			PersonDAO dao = this.getPersonDao();
-
 			Person recordSaved = dao.saveOrUpdate(person);
 			idPersonSaved = recordSaved.getId();
-
-
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while saving Person: UserDataManager.addPerson(person=" + person + "): "
 					+ e.getMessage(), e);
-		} finally {
-			session.flush();
 		}
 		return idPersonSaved;
 	}
@@ -173,28 +140,12 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public void deletePerson(Person person) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		
-
 		try {
-
 			this.getPersonDao().makeTransient(person);
-
 		} catch (Exception e) {
-
 			throw new MiddlewareQueryException("Error encountered while deleting Person: UserDataManager.deletePerson(person=" + person
 					+ "): " + e.getMessage(), e);
-		} finally {
-			session.flush();
 		}
-	}
-
-	@Override
-	public boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException {
-		if (this.getUserDao().getByUsernameAndPassword(username, password) != null) {
-			return true;
-		}
-		return false;
 	}
 
 	@Override

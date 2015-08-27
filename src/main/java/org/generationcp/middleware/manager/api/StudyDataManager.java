@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.manager.api;
@@ -44,13 +44,13 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and datasets from the CHADO schema.
- *
+ * 
  */
 public interface StudyDataManager {
 
 	/**
 	 * Get the Study for a specific study id. Retrieves from central if the given ID is positive, otherwise retrieves from local.
-	 *
+	 * 
 	 * @param studyId the study's unique id
 	 * @return the study or null if not found
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -59,7 +59,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Gets the study.
-	 *
+	 * 
 	 * @param studyId the study id
 	 * @param hasVariableType the has variable type
 	 * @return the study
@@ -69,7 +69,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Gets the study id by name.
-	 *
+	 * 
 	 * @param studyName the study name
 	 * @return the study id by name
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -78,7 +78,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Returns list of root or top-level folders from specified database.
-	 *
+	 * 
 	 * @return List of Folder POJOs or empty list if none found
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -87,7 +87,7 @@ public interface StudyDataManager {
 	/**
 	 * Returns list of children of a folder given its ID. Retrieves from central if the given ID is positive, otherwise retrieves from
 	 * local.
-	 *
+	 * 
 	 * @param folderId The id of the folder to match
 	 * @param programUUID the program UUID
 	 * @return List of AbstractNode (FolderNode, StudyNode) POJOs or empty list if none found
@@ -98,7 +98,7 @@ public interface StudyDataManager {
 	/**
 	 * Returns the list of DataSet references for a specific study. Retrieves from central if the given ID is positive, otherwise retrieves
 	 * from local.
-	 *
+	 * 
 	 * @param studyId The study id to match
 	 * @return List of DatasetReferences belonging to the study or empty list if none found
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -108,7 +108,7 @@ public interface StudyDataManager {
 	/**
 	 * Returns the DataSet corresponding to the given dataset ID. Retrieves from central if the given ID is positive, otherwise retrieves
 	 * from local.
-	 *
+	 * 
 	 * @param dataSetId the data set id
 	 * @return The DataSet matching the given ID or null if none found
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -117,7 +117,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Gets the experiments given a dataset ID.
-	 *
+	 * 
 	 * @param dataSetId The dataset ID to match
 	 * @param start The start index of the rows to retrieve
 	 * @param numOfRows The number of items to retrieve
@@ -128,7 +128,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Gets the experiments.
-	 *
+	 * 
 	 * @param dataSetId the data set id
 	 * @param start the start
 	 * @param numOfRows the num of rows
@@ -140,7 +140,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Get the number of experiments in a dataset. Retrieves from central if the given ID is positive, otherwise retrieves from local.
-	 *
+	 * 
 	 * @param dataSetId the data set id
 	 * @return the count
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -149,7 +149,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Returns the list of study references for a particular search filter.
-	 *
+	 * 
 	 * @param filter The filter for the search - could be an instance of BrowseStudyQueryFilter, GidStudyQueryFilter,
 	 *        ParentFolderStudyQueryFilter.
 	 * @param numOfRows The number of rows to retrieve
@@ -160,7 +160,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Returns the list of factors for a specific study. Retrieves from central if the given ID is positive, otherwise retrieves from local.
-	 *
+	 * 
 	 * @param studyId the study id
 	 * @return The factors of the study stored in a VariableTypeList
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -170,7 +170,7 @@ public interface StudyDataManager {
 	/**
 	 * Returns the list of variates for a specific study. Retrieves from central if the given ID is positive, otherwise retrieves from
 	 * local.
-	 *
+	 * 
 	 * @param studyId the study id
 	 * @return The variates of the study stored in a VariableTypeList
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -180,7 +180,7 @@ public interface StudyDataManager {
 	/**
 	 * Adds a study to the local database. Adds an entry into Project, ProjectProperty, ProjectRelationships and Experiment. Inserts
 	 * constants and conditions listed in variableTypeList. Sets the parent to the given parentFolderId input parameter.
-	 *
+	 * 
 	 * @param parentFolderId The ID of the parent folder
 	 * @param variableTypeList The conditions and constants of the Study
 	 * @param studyValues The values for the variables to insert
@@ -193,7 +193,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Adds a dataset, dataset labels (factors and variate labels), and parent study association in the local database.
-	 *
+	 * 
 	 * @param studyId the study id
 	 * @param variableTypeList the variable type list
 	 * @param datasetValues the dataset values
@@ -206,7 +206,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Add a new variable/column to the dataset.
-	 *
+	 * 
 	 * @param datasetId the dataset id
 	 * @param variableType the variable type
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -216,7 +216,7 @@ public interface StudyDataManager {
 	
 	/**
 	 * Adds an experiment row to the dataset.
-	 *
+	 * 
 	 * @param dataSetId The ID of the dataset to add the experiment into
 	 * @param experimentType The type of Experiment - could be ExperimentType.PLOT, ExperimentType.SAMPLE, ExperimentType.AVERAGE,
 	 *        ExperimentType.SUMMARY
@@ -227,7 +227,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Adds or updates an experiment row to the dataset.
-	 *
+	 * 
 	 * @param dataSetId The ID of the dataset to add the experiment into
 	 * @param experimentType The type of Experiment - could be ExperimentType.PLOT, ExperimentType.SAMPLE, ExperimentType.AVERAGE,
 	 *        ExperimentType.SUMMARY
@@ -239,7 +239,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Adds or updates experiment rows to the dataset.
-	 *
+	 * 
 	 * @param dataSetId The ID of the dataset to add the experiment into
 	 * @param experimentType The type of Experiment - could be ExperimentType.PLOT, ExperimentType.SAMPLE, ExperimentType.AVERAGE,
 	 *        ExperimentType.SUMMARY
@@ -252,7 +252,7 @@ public interface StudyDataManager {
 	/**
 	 * Adds a Trial Environment. Accepts a variable list and sets up the trial environment data in the local database. It will throw an
 	 * exception if the variable in the variable list passed is not recognized for trial environment.
-	 *
+	 * 
 	 * @param variableList the variable list
 	 * @return ID of the trial environment data created.
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -262,7 +262,7 @@ public interface StudyDataManager {
 	/**
 	 * Adds a Stock entry. Accepts a variable list and sets up the stock data in the local database. It will throw an exception if the
 	 * variable in the variable list is not a stock variable.
-	 *
+	 * 
 	 * @param variableList the variable list
 	 * @return ID of the stock data created
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -272,7 +272,7 @@ public interface StudyDataManager {
 	/**
 	 * Returns a list of datasets based on the given type. Retrieves from central if the given ID is positive, otherwise retrieves from
 	 * local.
-	 *
+	 * 
 	 * @param studyId the study id
 	 * @param dataSetType the data set type
 	 * @return The list of datasets matching the dataSetType or empty list if non found.
@@ -283,7 +283,7 @@ public interface StudyDataManager {
 	/**
 	 * Returns the number of experiments matching the given trial environment and variate. Counts from central if the given ID is positive,
 	 * otherwise counts from local.
-	 *
+	 * 
 	 * @param trialEnvironmentId the trial environment id
 	 * @param variateVariableId the variate variable id
 	 * @return The count
@@ -294,7 +294,7 @@ public interface StudyDataManager {
 	/**
 	 * Retrieves the trial environments belonging to the given dataset. Retrieves from central if the given ID is positive, otherwise
 	 * retrieves from local.
-	 *
+	 * 
 	 * @param datasetId the dataset id
 	 * @return The trial environments
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -304,7 +304,7 @@ public interface StudyDataManager {
 	/**
 	 * Retrieves the stocks belonging to the given dataset. Retrieves from central if the given ID is positive, otherwise retrieves from
 	 * local.
-	 *
+	 * 
 	 * @param datasetId the dataset id
 	 * @return The stocks
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -314,7 +314,7 @@ public interface StudyDataManager {
 	/**
 	 * Returns the number of stocks matching the given dataset ID, trial environment ID and variate ID. Counts from central if the given ID
 	 * is positive, otherwise counts from local.
-	 *
+	 * 
 	 * @param datasetId the dataset id
 	 * @param trialEnvironmentId the trial environment id
 	 * @param variateStdVarId the variate std var id
@@ -326,7 +326,7 @@ public interface StudyDataManager {
 	/**
 	 * Returns the number of observations with value, matching the given dataset ID, trial environment ID and variate ID. Counts from
 	 * central if the given ID is positive, otherwise counts from local.
-	 *
+	 * 
 	 * @param datasetId the dataset id
 	 * @param trialEnvironmentId the trial environment id
 	 * @param variateStdVarId the variate std var id
@@ -338,7 +338,7 @@ public interface StudyDataManager {
 	/**
 	 * Returns a single dataset belonging to the study with the given type. If there is more than one matching dataset, only one is
 	 * returned. If there are none, null is returned.
-	 *
+	 * 
 	 * @param studyId the study id
 	 * @param type the type
 	 * @return the data set
@@ -349,7 +349,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Deletes the dataset matching the given ID.
-	 *
+	 * 
 	 * @param datasetId the dataset id
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -357,7 +357,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Deletes location matching the given dataset ID and location ID.
-	 *
+	 * 
 	 * @param datasetId the dataset id
 	 * @param locationId the location id
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -366,7 +366,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Retrieves the local name associated to the given project ID and standard variable ID.
-	 *
+	 * 
 	 * @param projectId the project id
 	 * @param standardVariableId the standard variable id
 	 * @return The local name
@@ -378,7 +378,7 @@ public interface StudyDataManager {
 	 * Retrieves the details of nursery and trial studies from the currently selected program. Returns the id, name, description, start
 	 * date, start year, season and study type of a Nursery or Trial Study. Returns in sorted order of the following: Year (Descending),
 	 * Season (Dry/Wet/General), Study Type(Nursery/Trial), Name(Ascending)
-	 *
+	 * 
 	 * @param programUUID of the currently selected program
 	 * @return The list of study details having the given study type from local and central
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -387,7 +387,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Checks if the name specified is an already existing project name.
-	 *
+	 * 
 	 * @param name the name
 	 * @param programUUID the program UUID
 	 * @return true or false
@@ -397,7 +397,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Count the number of projects the variable was used in the project.
-	 *
+	 * 
 	 * @param variableId the variable id
 	 * @return the long
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -406,7 +406,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Count the number of experiments the variable was used in the project.
-	 *
+	 * 
 	 * @param variableId the variable id
 	 * @param variableTypeId the stored in id
 	 * @return the long
@@ -416,7 +416,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Gets the field map information (entries, reps, plots and count) of the given study id and study type.
-	 *
+	 * 
 	 * @param studyIdList the study id list
 	 * @param studyType Can be either StudyType.T (Trial) or StudyType.N (Nursery)
 	 * @return the FieldMapCount object containing the counts
@@ -427,7 +427,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Save or Update Field Map Properties like row, column, block, total rows, total columns, planting order.
-	 *
+	 * 
 	 * @param info the info
 	 * @param userId the user id
 	 * @param isNew the is new
@@ -437,7 +437,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Save Project Properties of the Project.
-	 *
+	 * 
 	 * @param project the project
 	 * @param variableTypeList the variable type list
 	 * @param experimentValues the experiment values
@@ -449,7 +449,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Retrieve all field map labels in the block of the specified trial instance id.
-	 *
+	 * 
 	 * @param datasetId the dataset id
 	 * @param geolocationId the geolocation id
 	 * @return the all field maps in block by trial instance id
@@ -460,7 +460,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Check if the given id is an existing study.
-	 *
+	 * 
 	 * @param id the id
 	 * @return true, if is study
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -470,7 +470,7 @@ public interface StudyDataManager {
 	/**
 	 * Adds a subFolder. Accepts a parentFolderId, the name and description of the folder. It will throw an exception if the parentFolderId
 	 * is not existing in the local database and the name of the folder is not unique
-	 *
+	 * 
 	 * @param parentFolderId the parent folder id
 	 * @param name the name
 	 * @param description the description
@@ -482,7 +482,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Rename sub folder.
-	 *
+	 * 
 	 * @param newFolderName the new folder name
 	 * @param folderId the folder id
 	 * @param programUUID the program UUID
@@ -493,7 +493,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Logically delete a folder by updating the folder's name and deleting its project relationships.
-	 *
+	 * 
 	 * @param id the id
 	 * @param programUUID the programUUID
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -502,7 +502,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Returns the parent folder of the project. Accepts a project id.
-	 *
+	 * 
 	 * @param id the id
 	 * @return ID of the folder created
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -511,7 +511,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Returns the dms project. Accepts a project id.
-	 *
+	 * 
 	 * @param id the id
 	 * @return DmsProject referenced by id
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -520,7 +520,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Move dms project.
-	 *
+	 * 
 	 * @param sourceId the source id
 	 * @param targetId the target id
 	 * @param isAStudy the is a study
@@ -531,7 +531,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Retrieves the study details of the given study type from from both selected DB instance ordered by db instance then study name.
-	 *
+	 * 
 	 * @param studyType Can be any of the types defined in {@link StudyType}
 	 * @param start The start index of the rows to retrieve
 	 * @param numOfRows The number of items to retrieve
@@ -542,7 +542,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Gets the study details.
-	 *
+	 * 
 	 * @param studyType the study type
 	 * @param id the id
 	 * @return the study details
@@ -552,7 +552,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Retrieves the study details of the all nurseries and trials from both selected DB instance ordered by study name.
-	 *
+	 * 
 	 * @param programUUID unique ID of the currently selected program
 	 * @param start The start index of the rows to retrieve
 	 * @param numOfRows The number of items to retrieve
@@ -563,7 +563,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Retrieves all the study details of the given study type from both central and local ordered by db instance then study name.
-	 *
+	 * 
 	 * @param studyType Can be any of the types defined in {@link StudyType}
 	 * @param programUUID unique ID of the currenly selected program
 	 * @return The list of study details having the given study type
@@ -573,7 +573,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Count all studies of the given study type from selected DB instance.
-	 *
+	 * 
 	 * @param studyType Can be any of the types defined in {@link StudyType}
 	 * @param programUUID unique ID of the currently selected program
 	 * @return The list of study details having the given study type
@@ -583,7 +583,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Count all studies of the given study type from both central and local.
-	 *
+	 * 
 	 * @param studyType Can be any of the types defined in {@link StudyType}
 	 * @param programUUID unique ID of the currently selected program
 	 * @return The list of study details having the given study type
@@ -593,7 +593,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Retrieves the study details of the all nurseries and trials from both central and local ordered by db instance then study name.
-	 *
+	 * 
 	 * @param programUUID unique ID of the currently selected program
 	 * @return The list of study details of Nurseries and Trials
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -602,7 +602,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Count all nurseries and trials
-	 *
+	 * 
 	 * @param programUUID unique ID of the currently selected program
 	 * @return The list of study details from the currently selected program
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -611,7 +611,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Retrieves the folder tree.
-	 *
+	 * 
 	 * @return the folder tree
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -619,7 +619,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Count plots with plants selectedof dataset.
-	 *
+	 * 
 	 * @param dataSetId the data set id
 	 * @param variateIds the variate ids
 	 * @return the int
@@ -629,7 +629,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Gets the geolocation prop value.
-	 *
+	 * 
 	 * @param stdVarId the std var id
 	 * @param studyId the study id
 	 * @return the geolocation prop value
@@ -639,7 +639,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Gets the all field maps in block by block id.
-	 *
+	 * 
 	 * @param blockId the block id
 	 * @return List of all field maps in the block
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -648,7 +648,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Gets the folder name by id.
-	 *
+	 * 
 	 * @param folderId the folder id
 	 * @return the folder name by id
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -657,7 +657,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Check if study has measurement data.
-	 *
+	 * 
 	 * @param datasetId
 	 * @param variateIds
 	 * @return
@@ -667,7 +667,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Count the number of variates with recorded data.
-	 *
+	 * 
 	 * @param datasetId
 	 * @param variateIds
 	 * @return
@@ -677,7 +677,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Check if study has measurement data.
-	 *
+	 * 
 	 * @param projectId the project id
 	 * @param locationId the location id
 	 * @param plotNos list of plotNos
@@ -690,7 +690,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Check if study has measurement data.
-	 *
+	 * 
 	 * @param projectId the project id
 	 * @param locationId the location id
 	 * @param plotNo
@@ -703,7 +703,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Save the Phenotype Outlier data
-	 *
+	 * 
 	 * @param phenotyleOutliers list of PhenotypeOutliers
 	 * @return none
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -712,16 +712,18 @@ public interface StudyDataManager {
 
 	/**
 	 * Determines if the data for the specified Trial contains at least 2 replicates with values
-	 * @param projectId
-	 * @param locationId
-	 * @return
-	 * @throws MiddlewareQueryException
+	 * 
+	 * @param project_id the project id
+	 * @param location_id the location id
+	 * @param germplamTermId the germplasm CVTerm id
+	 * @return true or false
+	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId) throws MiddlewareQueryException;
+	Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId, int germplasmTermId) throws MiddlewareQueryException;
 
 	/**
 	 * Determines the {@link StudyType} for study identified by the provided studyId.
-	 *
+	 * 
 	 * @param studyId Identifier of the study to determine study type for.
 	 * @return {@link StudyType} of the study. Returns {@code null} if study type can not be determined for the given study.
 	 * @throws MiddlewareQueryException if any error occurs during data access.
@@ -730,7 +732,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Soft-delete all program studies
-	 *
+	 * 
 	 * @param programUUID Program UUID of the studies to be deleted
 	 * @throws MiddlewareQueryException if any error occurs during data access.
 	 */
@@ -741,7 +743,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Updates the rank or order of given variables as they ordered in the given list
-	 *
+	 * 
 	 * @param datasetId - project Id of
 	 * @param variableIds - list of variable IDs in the order that they will be saved
 	 */
@@ -749,7 +751,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Gets the geolocation id by project id and trial instance number.
-	 *
+	 * 
 	 * @param projectId - study id or dataset id
 	 * @param trial instance number
 	 * @return the geolocation id
@@ -760,7 +762,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Retrieves the trial instance number by geolocation id
-	 *
+	 * 
 	 * @param geolocationId
 	 * @return trial instance number
 	 * @throws MiddlewareQueryException
@@ -769,7 +771,7 @@ public interface StudyDataManager {
 
 	/**
 	 * Save the geolocation property given the geolocation id, type id and value
-	 *
+	 * 
 	 * @param geolocationId
 	 * @param typeId
 	 * @param value
@@ -779,9 +781,10 @@ public interface StudyDataManager {
 
 	/**
 	 * Retrieves all DMS project names with no program uuid.
-	 *
+	 * 
 	 * @throws MiddlewareQueryException
 	 * @return list of DMS project names with no programUUID
 	 */
 	public List<String> getAllSharedProjectNames() throws MiddlewareQueryException;
+
 }

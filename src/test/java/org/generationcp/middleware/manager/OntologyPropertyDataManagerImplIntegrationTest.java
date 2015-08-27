@@ -13,54 +13,53 @@ package org.generationcp.middleware.manager;
 
 import java.util.List;
 
-import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.utils.test.Debug;
+import org.generationcp.middleware.utils.test.OntologyDataCreationUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-/**
- * Implements {@link DataManagerIntegrationTest}
- */
-public class OntologyPropertyDataManagerImplIntegrationTest extends DataManagerIntegrationTest {
+public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationTestBase {
 
-	private static OntologyPropertyDataManager propertyDataManager;
-	private static TermDataManager termDataManager;
-	private static Property testProperty;
+	@Autowired
+	private OntologyPropertyDataManager propertyDataManager;
+	@Autowired
+	private TermDataManager termDataManager;
 
-	private static String className = "newClass";
+	private Property testProperty;
+
+	private static final String CLASS_NAME = "newClass";
 
 	@Before
 	public void setUp() throws Exception {
-		OntologyPropertyDataManagerImplIntegrationTest.propertyDataManager = DataManagerIntegrationTest.managerFactory.getOntologyPropertyDataManager();
-		OntologyPropertyDataManagerImplIntegrationTest.termDataManager = DataManagerIntegrationTest.managerFactory.getTermDataManager();
-		OntologyPropertyDataManagerImplIntegrationTest.testProperty = new Property();
-		OntologyPropertyDataManagerImplIntegrationTest.testProperty.setName(MiddlewareIntegrationTest.getNewRandomName());
-		OntologyPropertyDataManagerImplIntegrationTest.testProperty.setDefinition("definition");
-		OntologyPropertyDataManagerImplIntegrationTest.testProperty.setCropOntologyId("CO_322:0000046");
-		OntologyPropertyDataManagerImplIntegrationTest.testProperty.addClass(OntologyPropertyDataManagerImplIntegrationTest.className);
-		OntologyPropertyDataManagerImplIntegrationTest.testProperty.addClass(MiddlewareIntegrationTest.getNewRandomName());
-		Debug.println("adding test property " + OntologyPropertyDataManagerImplIntegrationTest.testProperty);
-		OntologyPropertyDataManagerImplIntegrationTest.propertyDataManager.addProperty(OntologyPropertyDataManagerImplIntegrationTest.testProperty);
+		this.testProperty = new Property();
+		this.testProperty.setName(OntologyDataCreationUtil.getNewRandomName());
+		this.testProperty.setDefinition("definition");
+		this.testProperty.setCropOntologyId("CO_322:0000046");
+		this.testProperty.addClass(CLASS_NAME);
+		this.testProperty.addClass(OntologyDataCreationUtil.getNewRandomName());
+		Debug.println("adding test property " + this.testProperty);
+		this.propertyDataManager.addProperty(this.testProperty);
 	}
 
 	@Test
 	public void testGetPropertyById() throws Exception {
-		Property property = OntologyPropertyDataManagerImplIntegrationTest.propertyDataManager.getProperty(OntologyPropertyDataManagerImplIntegrationTest.testProperty.getId());
+		Property property = this.propertyDataManager.getProperty(this.testProperty.getId());
 		Assert.assertNotNull(property);
 		property.print(2);
 	}
 
 	@Test
 	public void testGetAllPropertiesByClassName() throws Exception {
-		List<Property> properties = OntologyPropertyDataManagerImplIntegrationTest.propertyDataManager.getAllPropertiesWithClass("agronomic");
+		List<Property> properties = this.propertyDataManager.getAllPropertiesWithClass("agronomic");
 		for (Property p : properties) {
 			p.print(2);
 		}
@@ -70,7 +69,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends DataManagerI
 
 	@Test
 	public void testGetAllProperties() throws Exception {
-		List<Property> properties = OntologyPropertyDataManagerImplIntegrationTest.propertyDataManager.getAllProperties();
+		List<Property> properties = this.propertyDataManager.getAllProperties();
 		for (Property p : properties) {
 			p.print(2);
 		}
@@ -80,27 +79,24 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends DataManagerI
 
 	@Test
 	public void testUpdateProperty() throws Exception {
-		OntologyPropertyDataManagerImplIntegrationTest.testProperty.setDefinition("new definition");
-		OntologyPropertyDataManagerImplIntegrationTest.testProperty.setCropOntologyId("CO_322:0000047");
-		OntologyPropertyDataManagerImplIntegrationTest.testProperty.getClasses().clear();
-		OntologyPropertyDataManagerImplIntegrationTest.testProperty.addClass(MiddlewareIntegrationTest.getNewRandomName());
-		OntologyPropertyDataManagerImplIntegrationTest.propertyDataManager.updateProperty(OntologyPropertyDataManagerImplIntegrationTest.testProperty);
-		Property updatedProperty =
-				OntologyPropertyDataManagerImplIntegrationTest.propertyDataManager.getProperty(OntologyPropertyDataManagerImplIntegrationTest.testProperty.getId());
+		this.testProperty.setDefinition("new definition");
+		this.testProperty.setCropOntologyId("CO_322:0000047");
+		this.testProperty.getClasses().clear();
+		this.testProperty.addClass(OntologyDataCreationUtil.getNewRandomName());
+		this.propertyDataManager.updateProperty(this.testProperty);
+		Property updatedProperty = this.propertyDataManager.getProperty(this.testProperty.getId());
 		Assert.assertEquals(updatedProperty.getDefinition(), "new definition");
 		Assert.assertEquals(updatedProperty.getCropOntologyId(), "CO_322:0000047");
 		Assert.assertEquals(updatedProperty.getClasses().size(), 1);
-		Assert.assertTrue(updatedProperty.getClasses().containsAll(OntologyPropertyDataManagerImplIntegrationTest.testProperty.getClasses()));
+		Assert.assertTrue(updatedProperty.getClasses().containsAll(this.testProperty.getClasses()));
 
 		// className = newClass should delete on-fly when class is no longer used by any property.
-		Term classTerm =
-				OntologyPropertyDataManagerImplIntegrationTest.termDataManager.getTermByNameAndCvId(OntologyPropertyDataManagerImplIntegrationTest.className,
-						CvId.TRAIT_CLASS.getId());
+		Term classTerm = this.termDataManager.getTermByNameAndCvId(CLASS_NAME, CvId.TRAIT_CLASS.getId());
 		Assert.assertNull(classTerm);
 	}
 
 	@After
 	public void tearDown() throws Exception {
-		OntologyPropertyDataManagerImplIntegrationTest.propertyDataManager.deleteProperty(OntologyPropertyDataManagerImplIntegrationTest.testProperty.getId());
+		this.propertyDataManager.deleteProperty(this.testProperty.getId());
 	}
 }
