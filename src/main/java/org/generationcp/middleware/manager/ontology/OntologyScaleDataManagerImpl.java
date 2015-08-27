@@ -10,6 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -32,12 +37,6 @@ import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Query;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 
 @Transactional
 public class OntologyScaleDataManagerImpl extends DataManager implements OntologyScaleDataManager {
@@ -379,11 +378,14 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			if (scale.getDataType().equals(DataType.CATEGORICAL_VARIABLE)) {
 
 				// Creating new cv if old data type was not categorical
-				if (Objects.equals(cvId, null)) {
+				if (cvId == null) {
 					CV cv = new CV();
 					cv.setName(String.valueOf(scale.getId()));
 					cv.setDefinition(String.valueOf(scale.getName() + " - " + scale.getDefinition()));
 					this.getCvDao().save(cv);
+
+					//Setting cvId from auto incremented value.
+					cvId = cv.getCvId();
 				}
 
 				// Saving new categorical data if present
