@@ -372,7 +372,6 @@
 				<configuration>
 					<includes>
 						<include>**/WorkbenchDataManagerImplTest.java</include>
-						<include>**/OntologyDataManagerImplTest.java</include>
 						<include>**/GermplasmDataManagerImplTest.java</include>
 						<include>**/UserDataManagerImplTest.java</include>
 						<include>**/CrossStudyDataManagerImplTest.java</include>
