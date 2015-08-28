@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
 import org.generationcp.middleware.service.api.study.StudySummary;
@@ -38,7 +40,12 @@ public class StudyServiceImplTest {
 	public void listMeasurementData() throws Exception {
 		TraitService mockTrialTraits = Mockito.mock(TraitService.class);
 		StudyMeasurements mockTrailMeasurements = Mockito.mock(StudyMeasurements.class);
-		StudyServiceImpl result = new StudyServiceImpl(mockTrialTraits, mockTrailMeasurements, Mockito.mock(StudyGermplasmListService.class));
+		StudyGermplasmListService mockStudyGermplasmListService = Mockito.mock(StudyGermplasmListService.class);
+		DataImportService mockDataImportService = Mockito.mock(DataImportService.class);
+		FieldbookService mockFieldbookService = Mockito.mock(FieldbookService.class); 
+		
+		StudyServiceImpl result = new StudyServiceImpl(mockTrialTraits, mockTrailMeasurements,
+			mockStudyGermplasmListService, mockDataImportService, mockFieldbookService);
 
 		List<TraitDto> projectTraits = Arrays.<TraitDto>asList(new TraitDto(1, "Trait1"), new TraitDto(1, "Trait2"));
 		when(mockTrialTraits.getTraits(1234)).thenReturn(projectTraits);

@@ -24,5 +24,5 @@ public interface StudyService {
 
 	List<StudyGermplasmDto> getStudyGermplasmList(Integer studyIdentifer);
 	
-	String addNewStudy(Workbook workbook, String programUUID)throws MiddlewareQueryException;
+	Integer addNewStudy(Workbook workbook, String programUUID)throws MiddlewareQueryException;
 }
