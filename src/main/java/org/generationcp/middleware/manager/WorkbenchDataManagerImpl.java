@@ -1104,19 +1104,21 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Integer addIbdbUserMap(IbdbUserMap userMap) throws MiddlewareQueryException {
-		
-
 		try {
-
-			this.getIbdbUserMapDao().saveOrUpdate(userMap);
-
+			IbdbUserMap existingMapping = this.getIbdbUserMap(userMap.getWorkbenchUserId(), userMap.getProjectId());
+			if (existingMapping == null) {
+				this.getIbdbUserMapDao().saveOrUpdate(userMap);
+				return userMap.getIbdbUserMapId().intValue();
+			} else {
+				return existingMapping.getIbdbUserMapId().intValue();
+			}
 		} catch (Exception e) {
-
-			this.logAndThrowException("Error encountered while adding IbdbUserMap: WorkbenchDataManager.addIbdbUserMap(userMap=" + userMap
-					+ "): " + e.getMessage(), e);
+			String message =
+					"Error encountered while adding IbdbUserMap (linking workbench user id to crop database user): WorkbenchDataManager.addIbdbUserMap(userMap="
+							+ userMap + "): " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-
-		return userMap.getIbdbUserId();
 	}
 
 	@Override

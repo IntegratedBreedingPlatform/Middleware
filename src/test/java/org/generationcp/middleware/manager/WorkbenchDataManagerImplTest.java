@@ -236,9 +236,24 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		Integer result = this.workbenchDataManager.addIbdbUserMap(userMap);
 		Assert.assertNotNull("Expected id of a newly saved record in workbench_ibdb_user_map", result);
 
-		Integer localIbdbUserId =
+		Integer cropDBUserId =
 				this.workbenchDataManager.getLocalIbdbUserId(this.testUser1.getUserid(), this.commonTestProject.getProjectId());
-		Assert.assertNotNull(localIbdbUserId);
+		Assert.assertNotNull(cropDBUserId);
+		
+		// Try to add a duplicate IbdbUserMap (same workbench project and user id).
+		IbdbUserMap duplicateUserMap = new IbdbUserMap();
+		duplicateUserMap.setProjectId(userMap.getProjectId());
+		duplicateUserMap.setIbdbUserId(userMap.getIbdbUserId());
+		duplicateUserMap.setWorkbenchUserId(userMap.getWorkbenchUserId());
+		Integer result2 = this.workbenchDataManager.addIbdbUserMap(duplicateUserMap);
+		Assert.assertEquals("Expected existing record's id being returned when trying to add duplicate entry in workbench_ibdb_user_map",
+				result, result2);
+		Integer cropDBUserId2 =
+				this.workbenchDataManager.getLocalIbdbUserId(this.testUser1.getUserid(), this.commonTestProject.getProjectId());
+		Assert.assertEquals(
+				"Expected workbench user to map to same crop db record after attempting to add duplicate entry in workbench_ibdb_user_map",
+				cropDBUserId, cropDBUserId2);
+	
 	}
 
 	@Test

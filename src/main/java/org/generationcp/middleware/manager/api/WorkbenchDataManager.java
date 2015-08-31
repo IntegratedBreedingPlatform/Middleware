@@ -679,10 +679,10 @@ public interface WorkbenchDataManager {
 	ToolConfiguration getToolConfigurationByToolIdAndConfigKey(Long toolId, String configKey) throws MiddlewareQueryException;
 
 	/**
-	 * Add a Workbench User and IBDB local database User mapping.
+	 * Add a mapping between Workbench user record and the crop databse user record, if it does not already exist.
 	 * 
 	 * @param userMap the user map
-	 * @return Returns the id of the {@code IbdbUserMap} record added
+	 * @return Returns the id of the {@code IbdbUserMap} record added or that of the existing one if it is already there.
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Integer addIbdbUserMap(IbdbUserMap userMap) throws MiddlewareQueryException;
