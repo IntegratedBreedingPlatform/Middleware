@@ -14,6 +14,7 @@ package org.generationcp.middleware.operation.transformer.etl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -24,24 +25,17 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.utils.test.Debug;
-import org.generationcp.middleware.utils.test.TestOutputFormatter;
-import org.hibernate.Session;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
-public class StudyValuesTransformerTest extends TestOutputFormatter {
+public class StudyValuesTransformerTest extends IntegrationTestBase {
 
 	private static StudyValuesTransformer transformer;
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		Session mockSession = Mockito.mock(Session.class);
-		HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
-		Mockito.when(mockSessionProvider.getSession()).thenReturn(mockSession);
-		StudyValuesTransformerTest.transformer = new StudyValuesTransformer(mockSessionProvider);
+	@Before
+	public void setUp() throws Exception {
+		StudyValuesTransformerTest.transformer = new StudyValuesTransformer(this.sessionProvder);
 	}
 
 	@Test
@@ -63,7 +57,7 @@ public class StudyValuesTransformerTest extends TestOutputFormatter {
 		Debug.println(0, "LocationId:" + studyVal.getLocationId());
 
 		for (Variable stock : result.getVariables()) {
-			Debug.println(TestOutputFormatter.INDENT, stock.toString());
+			Debug.println(this.INDENT, stock.toString());
 		}
 
 	}
