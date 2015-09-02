@@ -85,34 +85,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	private Project currentlastOpenedProject;
 
-	private CropTypeDAO cropTypeDao;
-	private IbdbUserMapDAO ibdbUserMapDao;
-	private PersonDAO personDao;
-	private ProjectActivityDAO projectActivityDao;
-	private ProjectDAO projectDao;
-	private ProjectUserMysqlAccountDAO projectUserMysqlAccountDao;
-	private ProjectUserRoleDAO projectUserRoleDao;
-	private ProjectUserMysqlAccountDAO projectUserMysqlAccountDAO;
-	private ProjectUserInfoDAO projectUserInfoDao;
-	private RoleDAO roleDao;
-	private SecurityQuestionDAO securityQuestionDao;
-	private ToolConfigurationDAO toolConfigurationDao;
-	private ToolDAO toolDao;
-	private UserDAO userDao;
-
-	private UserInfoDAO userInfoDao;
-
-	private WorkbenchDatasetDAO workbenchDatasetDao;
-	private WorkbenchRuntimeDataDAO workbenchRuntimeDataDao;
-	private WorkbenchSettingDAO workbenchSettingDao;
-	private WorkflowTemplateDAO workflowTemplateDao;
-	private ProjectBackupDAO projectBackupDao;
-	private WorkbenchSidebarCategoryDAO workbenchSidebarCategoryDAO;
-	private WorkbenchSidebarCategoryLinkDAO workbenchSidebarCategoryLinkDAO;
-	private TemplateSettingDAO templateSettingDAO;
-
 	private String installationDirectory;
-	private StandardPresetDAO standardPresetDAO;
 
 	public WorkbenchDataManagerImpl() {
 		super();
@@ -127,68 +100,56 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	private CropTypeDAO getCropTypeDao() {
-		if (this.cropTypeDao == null) {
-			this.cropTypeDao = new CropTypeDAO();
-		}
-		this.cropTypeDao.setSession(this.getCurrentSession());
-		return this.cropTypeDao;
+		CropTypeDAO cropTypeDao = new CropTypeDAO();
+		cropTypeDao.setSession(this.getCurrentSession());
+		return cropTypeDao;
 	}
 
 	private IbdbUserMapDAO getIbdbUserMapDao() {
-		if (this.ibdbUserMapDao == null) {
-			this.ibdbUserMapDao = new IbdbUserMapDAO();
-		}
-		this.ibdbUserMapDao.setSession(this.getCurrentSession());
-		return this.ibdbUserMapDao;
+		IbdbUserMapDAO ibdbUserMapDao = new IbdbUserMapDAO();
+		ibdbUserMapDao.setSession(this.getCurrentSession());
+		return ibdbUserMapDao;
 	}
 
 	private PersonDAO getPersonDao() {
-		if (this.personDao == null) {
-			this.personDao = new PersonDAO();
-		}
-		this.personDao.setSession(this.getCurrentSession());
-		return this.personDao;
+		PersonDAO personDao = new PersonDAO();
+		personDao.setSession(this.getCurrentSession());
+		return personDao;
 	}
 
 	private ProjectActivityDAO getProjectActivityDao() {
-		if (this.projectActivityDao == null) {
-			this.projectActivityDao = new ProjectActivityDAO();
-		}
-		this.projectActivityDao.setSession(this.getCurrentSession());
-		return this.projectActivityDao;
+		ProjectActivityDAO projectActivityDao = new ProjectActivityDAO();
+		projectActivityDao.setSession(this.getCurrentSession());
+		return projectActivityDao;
 	}
 
 	private ProjectUserMysqlAccountDAO getProjectUserMysqlAccountDAO() {
-		if (this.projectUserMysqlAccountDAO == null) {
-			this.projectUserMysqlAccountDAO = new ProjectUserMysqlAccountDAO();
-		}
-		this.projectUserMysqlAccountDAO.setSession(this.getCurrentSession());
-		return this.projectUserMysqlAccountDAO;
+
+		ProjectUserMysqlAccountDAO projectUserMysqlAccountDAO = new ProjectUserMysqlAccountDAO();
+		projectUserMysqlAccountDAO.setSession(this.getCurrentSession());
+		return projectUserMysqlAccountDAO;
 	}
 
 	private ProjectDAO getProjectDao() {
-		if (this.projectDao == null) {
-			this.projectDao = new ProjectDAO();
-		}
-		this.projectDao.setSession(this.getCurrentSession());
-		return this.projectDao;
+
+		ProjectDAO projectDao = new ProjectDAO();
+		projectDao.setSession(this.getCurrentSession());
+		return projectDao;
 	}
 
 	private ProjectUserMysqlAccountDAO getProjectUserMysqlAccountDao() {
-		if (this.projectUserMysqlAccountDao == null) {
-			this.projectUserMysqlAccountDao = new ProjectUserMysqlAccountDAO();
-		}
-		this.projectUserMysqlAccountDao.setSession(this.getCurrentSession());
-		return this.projectUserMysqlAccountDao;
+
+		ProjectUserMysqlAccountDAO projectUserMysqlAccountDao = new ProjectUserMysqlAccountDAO();
+		projectUserMysqlAccountDao.setSession(this.getCurrentSession());
+		return projectUserMysqlAccountDao;
 	}
 
 	@Override
 	public ProjectUserInfoDAO getProjectUserInfoDao() {
-		if (this.projectUserInfoDao == null) {
-			this.projectUserInfoDao = new ProjectUserInfoDAO();
-		}
-		this.projectUserInfoDao.setSession(this.getCurrentSession());
-		return this.projectUserInfoDao;
+
+		ProjectUserInfoDAO projectUserInfoDao = new ProjectUserInfoDAO();
+		projectUserInfoDao.setSession(this.getCurrentSession());
+		return projectUserInfoDao;
 	}
 
 	@Override
@@ -223,134 +184,117 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	private ProjectUserRoleDAO getProjectUserRoleDao() {
-		if (this.projectUserRoleDao == null) {
-			this.projectUserRoleDao = new ProjectUserRoleDAO();
-		}
-		this.projectUserRoleDao.setSession(this.getCurrentSession());
-		return this.projectUserRoleDao;
+		ProjectUserRoleDAO projectUserRoleDao = new ProjectUserRoleDAO();
+		projectUserRoleDao.setSession(this.getCurrentSession());
+		return projectUserRoleDao;
 	}
 
 	private RoleDAO getRoleDao() {
-		if (this.roleDao == null) {
-			this.roleDao = new RoleDAO();
-		}
-		this.roleDao.setSession(this.getCurrentSession());
-		return this.roleDao;
+
+		RoleDAO roleDao = new RoleDAO();
+		roleDao.setSession(this.getCurrentSession());
+		return roleDao;
 	}
 
 	private SecurityQuestionDAO getSecurityQuestionDao() {
-		if (this.securityQuestionDao == null) {
-			this.securityQuestionDao = new SecurityQuestionDAO();
-		}
-		this.securityQuestionDao.setSession(this.getCurrentSession());
-		return this.securityQuestionDao;
+
+		SecurityQuestionDAO securityQuestionDao = new SecurityQuestionDAO();
+		securityQuestionDao.setSession(this.getCurrentSession());
+		return securityQuestionDao;
 	}
 
 	private ToolConfigurationDAO getToolConfigurationDao() {
-		if (this.toolConfigurationDao == null) {
-			this.toolConfigurationDao = new ToolConfigurationDAO();
-		}
-		this.toolConfigurationDao.setSession(this.getCurrentSession());
-		return this.toolConfigurationDao;
+
+		ToolConfigurationDAO toolConfigurationDao = new ToolConfigurationDAO();
+		toolConfigurationDao.setSession(this.getCurrentSession());
+		return toolConfigurationDao;
 	}
 
 	@Override
 	public ToolDAO getToolDao() {
-		if (this.toolDao == null) {
-			this.toolDao = new ToolDAO();
-		}
-		this.toolDao.setSession(this.getCurrentSession());
-		return this.toolDao;
+
+		ToolDAO toolDao = new ToolDAO();
+		toolDao.setSession(this.getCurrentSession());
+		return toolDao;
 	}
 
 	private UserDAO getUserDao() {
-		if (this.userDao == null) {
-			this.userDao = new UserDAO();
-		}
-		this.userDao.setSession(this.getCurrentSession());
-		return this.userDao;
+
+		UserDAO userDao = new UserDAO();
+		userDao.setSession(this.getCurrentSession());
+		return userDao;
 	}
 
 	private UserInfoDAO getUserInfoDao() {
-		if (this.userInfoDao == null) {
-			this.userInfoDao = new UserInfoDAO();
-		}
-		this.userInfoDao.setSession(this.getCurrentSession());
-		return this.userInfoDao;
+
+		UserInfoDAO userInfoDao = new UserInfoDAO();
+		userInfoDao.setSession(this.getCurrentSession());
+		return userInfoDao;
 	}
 
 	private WorkbenchDatasetDAO getWorkbenchDatasetDao() {
-		if (this.workbenchDatasetDao == null) {
-			this.workbenchDatasetDao = new WorkbenchDatasetDAO();
-		}
-		this.workbenchDatasetDao.setSession(this.getCurrentSession());
-		return this.workbenchDatasetDao;
+
+		WorkbenchDatasetDAO workbenchDatasetDao = new WorkbenchDatasetDAO();
+		workbenchDatasetDao.setSession(this.getCurrentSession());
+		return workbenchDatasetDao;
 	}
 
 	private WorkbenchRuntimeDataDAO getWorkbenchRuntimeDataDao() {
-		if (this.workbenchRuntimeDataDao == null) {
-			this.workbenchRuntimeDataDao = new WorkbenchRuntimeDataDAO();
-		}
-		this.workbenchRuntimeDataDao.setSession(this.getCurrentSession());
-		return this.workbenchRuntimeDataDao;
+
+		WorkbenchRuntimeDataDAO workbenchRuntimeDataDao = new WorkbenchRuntimeDataDAO();
+		workbenchRuntimeDataDao.setSession(this.getCurrentSession());
+		return workbenchRuntimeDataDao;
 	}
 
 	private WorkbenchSettingDAO getWorkbenchSettingDao() {
-		if (this.workbenchSettingDao == null) {
-			this.workbenchSettingDao = new WorkbenchSettingDAO();
-		}
-		this.workbenchSettingDao.setSession(this.getCurrentSession());
-		return this.workbenchSettingDao;
+
+		WorkbenchSettingDAO workbenchSettingDao = new WorkbenchSettingDAO();
+		workbenchSettingDao.setSession(this.getCurrentSession());
+		return workbenchSettingDao;
 	}
 
 	private WorkflowTemplateDAO getWorkflowTemplateDao() {
-		if (this.workflowTemplateDao == null) {
-			this.workflowTemplateDao = new WorkflowTemplateDAO();
-		}
-		this.workflowTemplateDao.setSession(this.getCurrentSession());
-		return this.workflowTemplateDao;
+
+		WorkflowTemplateDAO workflowTemplateDao = new WorkflowTemplateDAO();
+		workflowTemplateDao.setSession(this.getCurrentSession());
+		return workflowTemplateDao;
 	}
 
 	private ProjectBackupDAO getProjectBackupDao() {
-		if (this.projectBackupDao == null) {
-			this.projectBackupDao = new ProjectBackupDAO();
-		}
-		this.projectBackupDao.setSession(this.getCurrentSession());
-		return this.projectBackupDao;
+
+		ProjectBackupDAO projectBackupDao = new ProjectBackupDAO();
+
+		projectBackupDao.setSession(this.getCurrentSession());
+		return projectBackupDao;
 	}
 
 	private WorkbenchSidebarCategoryDAO getWorkbenchSidebarCategoryDao() {
-		if (this.workbenchSidebarCategoryDAO == null) {
-			this.workbenchSidebarCategoryDAO = new WorkbenchSidebarCategoryDAO();
-		}
-		this.workbenchSidebarCategoryDAO.setSession(this.getCurrentSession());
-		return this.workbenchSidebarCategoryDAO;
+
+		WorkbenchSidebarCategoryDAO workbenchSidebarCategoryDAO = new WorkbenchSidebarCategoryDAO();
+		workbenchSidebarCategoryDAO.setSession(this.getCurrentSession());
+		return workbenchSidebarCategoryDAO;
 	}
 
 	private WorkbenchSidebarCategoryLinkDAO getWorkbenchSidebarCategoryLinkDao() {
-		if (this.workbenchSidebarCategoryLinkDAO == null) {
-			this.workbenchSidebarCategoryLinkDAO = new WorkbenchSidebarCategoryLinkDAO();
-		}
-		this.workbenchSidebarCategoryLinkDAO.setSession(this.getCurrentSession());
-		return this.workbenchSidebarCategoryLinkDAO;
+
+		WorkbenchSidebarCategoryLinkDAO workbenchSidebarCategoryLinkDAO = new WorkbenchSidebarCategoryLinkDAO();
+
+		workbenchSidebarCategoryLinkDAO.setSession(this.getCurrentSession());
+		return workbenchSidebarCategoryLinkDAO;
 	}
 
 	private TemplateSettingDAO getTemplateSettingDao() {
-		if (this.templateSettingDAO == null) {
-			this.templateSettingDAO = new TemplateSettingDAO();
-		}
-		this.templateSettingDAO.setSession(this.getCurrentSession());
-		return this.templateSettingDAO;
+
+		TemplateSettingDAO templateSettingDAO = new TemplateSettingDAO();
+		templateSettingDAO.setSession(this.getCurrentSession());
+		return templateSettingDAO;
 	}
 
 	@Override
 	public StandardPresetDAO getStandardPresetDAO() {
-		if (this.standardPresetDAO == null) {
-			this.standardPresetDAO = new StandardPresetDAO();
-		}
-
-		this.standardPresetDAO.setSession(this.getCurrentSession());
-		return this.standardPresetDAO;
+		final StandardPresetDAO standardPresetDAO = new StandardPresetDAO();
+		standardPresetDAO.setSession(this.getCurrentSession());
+		return standardPresetDAO;
 	}
 
 	private void logAndThrowException(String message, Exception e) throws MiddlewareQueryException {
@@ -382,12 +326,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	public Project saveOrUpdateProject(Project project) throws MiddlewareQueryException {
 
 		try {
-
 			this.getProjectDao().merge(project);
-
-			// TODO: copy the workbench template created by the project into the
-			// project_workflow_step table
-
 		} catch (Exception e) {
 
 			this.logAndThrowException(
@@ -401,12 +340,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	public ProjectUserInfo saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo) throws MiddlewareQueryException {
 
 		try {
-
 			this.getProjectUserInfoDao().merge(projectUserInfo);
-
-			// TODO: copy the workbench template created by the project into the
-			// project_workflow_step table
-
 		} catch (Exception e) {
 
 			this.logAndThrowException("Cannot save ProjectUserInfo: WorkbenchDataManager.saveOrUpdateProjectUserInfo(project="
@@ -420,30 +354,22 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	public Project addProject(Project project) throws MiddlewareQueryException {
 
 		try {
-
 			project.setUniqueID(UUID.randomUUID().toString());
 			this.getProjectDao().save(project);
-
 		} catch (Exception e) {
-
 			this.logAndThrowException("Cannot save Project: WorkbenchDataManager.addProject(project=" + project + "): " + e.getMessage(), e);
 		}
-
 		return project;
 	}
 
 	@Override
 	public Project mergeProject(Project project) throws MiddlewareQueryException {
 		try {
-
 			this.getProjectDao().merge(project);
-
 		} catch (Exception e) {
-
 			this.logAndThrowException(
 					"Cannot save Project: WorkbenchDataManager.updateProject(project=" + project + "): " + e.getMessage(), e);
 		}
-
 		return project;
 	}
 

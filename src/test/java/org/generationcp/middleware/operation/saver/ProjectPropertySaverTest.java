@@ -11,7 +11,6 @@ import java.util.Map;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -25,17 +24,18 @@ public class ProjectPropertySaverTest {
 			20314, 20327, 20307, 8390, 8263, 8255, 8400, 8410);
 	private static final List<Integer> VARS_TO_DELETE = Arrays.asList(8377, 8263, 20310);
 
-	private static ProjectPropertySaver projectPropSaver;
-	private static ProjectPropertyDao projectPropDao;
+	private ProjectPropertySaver projectPropSaver;
+	private ProjectPropertyDao projectPropDao;
 
 	private int datasetId;
 	private Map<Integer, List<Integer>> dummyProjectPropIds;
 
 	@Before
 	public void setup() {
-		ProjectPropertySaverTest.projectPropDao = Mockito.mock(ProjectPropertyDao.class);
-		ProjectPropertySaverTest.projectPropSaver = new ProjectPropertySaver(Mockito.mock(HibernateSessionProvider.class));
-		ProjectPropertySaverTest.projectPropSaver.setProjectPropertyDao(ProjectPropertySaverTest.projectPropDao);
+		this.projectPropDao = Mockito.mock(ProjectPropertyDao.class);
+		final Saver mockSaver = Mockito.mock(Saver.class);
+		Mockito.when(mockSaver.getProjectPropertyDao()).thenReturn(this.projectPropDao);
+		this.projectPropSaver = new ProjectPropertySaver(mockSaver);
 
 		this.datasetId = -11;
 		this.dummyProjectPropIds = ProjectPropertySaverTest.getDummyProjectPropIds();
@@ -73,8 +73,8 @@ public class ProjectPropertySaverTest {
 			int start = this.dummyProjectPropIds.size() + i * 3;
 			newMap.put(newVariableIds.get(i), Arrays.asList(start + 1, start + 2, start + 3));
 		}
-		Mockito.doReturn(newVariableIds).when(ProjectPropertySaverTest.projectPropDao)
-				.getDatasetVariableIdsForGivenStoredInIds(Matchers.anyInt(), Matchers.anyList(), Matchers.anyList());
+		Mockito.doReturn(newVariableIds).when(this.projectPropDao)
+		.getDatasetVariableIdsForGivenStoredInIds(Matchers.anyInt(), Matchers.anyList(), Matchers.anyList());
 
 		int startRank = this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, newMap);
 		List<Integer> idsToUpdate = new ArrayList<>(variableIds);
@@ -116,21 +116,21 @@ public class ProjectPropertySaverTest {
 
 	@SuppressWarnings("unchecked")
 	private void verifyUpdateVariablesRankingAssertions(List<Integer> variableIds, Map<Integer, List<Integer>> idsMap, int startRank) {
-		Mockito.verify(ProjectPropertySaverTest.projectPropDao, Mockito.times(variableIds.size())).updateRank(Matchers.anyList(),
+		Mockito.verify(this.projectPropDao, Mockito.times(variableIds.size())).updateRank(Matchers.anyList(),
 				Matchers.anyInt());
 		int rank = startRank;
 		for (Integer id : variableIds) {
-			Mockito.verify(ProjectPropertySaverTest.projectPropDao).updateRank(idsMap.get(id), rank++);
+			Mockito.verify(this.projectPropDao).updateRank(idsMap.get(id), rank++);
 		}
 	}
 
 	private int callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(List<Integer> variableIds, Map<Integer, List<Integer>> idsMap)
 			throws MiddlewareQueryException {
 		int startRank = idsMap.size() + 1;
-		Mockito.doReturn(startRank).when(ProjectPropertySaverTest.projectPropDao).getNextRank(this.datasetId);
-		Mockito.doReturn(idsMap).when(ProjectPropertySaverTest.projectPropDao).getProjectPropertyIDsPerVariableId(this.datasetId);
+		Mockito.doReturn(startRank).when(this.projectPropDao).getNextRank(this.datasetId);
+		Mockito.doReturn(idsMap).when(this.projectPropDao).getProjectPropertyIDsPerVariableId(this.datasetId);
 
-		ProjectPropertySaverTest.projectPropSaver.updateVariablesRanking(this.datasetId, variableIds);
+		this.projectPropSaver.updateVariablesRanking(this.datasetId, variableIds);
 
 		return startRank;
 	}
