@@ -96,7 +96,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 	private String host;
 
 	private String port;
-	
+
 	@Override
 	public void postProcessBeanFactory(final ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		// TODO Auto-generated method stub
@@ -106,7 +106,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 	public void postProcessBeanDefinitionRegistry(final BeanDefinitionRegistry registry) throws BeansException {
 		Connection connection = null;
 		try {
-			
+
 			final Resource resource = new ClassPathResource("/database.properties");
 			final Properties props = PropertiesLoaderUtils.loadProperties(resource);
 			this.host = (String) props.get("db.host");
@@ -114,19 +114,19 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 			this.userName = (String) props.get("db.username");
 			this.password = (String) props.get("db.password");
 			String dbName = (String) props.get("db.workbench.name");
-			
-			createXADataSource(registry, dbName);
+
+			this.createXADataSource(registry, dbName);
 
 			Class.forName("com.mysql.jdbc.Driver");
 			connection =
-					DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + dbName, userName, password);
+					DriverManager.getConnection("jdbc:mysql://" + this.host + ":" + this.port + "/" + dbName, this.userName, this.password);
 
 			// final Connection connection = workbenchDataSource.getConnection();
 			final PreparedStatement preparedStatement = connection.prepareStatement("Select db_name from workbench_crop");
 			final ResultSet rs = preparedStatement.executeQuery();
 			while (rs.next()) {
 				final String cropDatabaseName = rs.getString(1);
-				createXADataSource(registry, cropDatabaseName);
+				this.createXADataSource(registry, cropDatabaseName);
 			}
 			JdbcUtils.closeResultSet(rs);
 			JdbcUtils.closeStatement(preparedStatement);
@@ -143,16 +143,16 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 	private void createXADataSource(final BeanDefinitionRegistry registry, final String cropDatabaseName) {
 
 		final RootBeanDefinition dataSourceBeanDefinition =
-				createRootBeanDefinition(AtomikosDataSourceBean.class,
+				this.createRootBeanDefinition(AtomikosDataSourceBean.class,
 						ImmutableMap.<String, Object>of("init-method", "init", "destroy-method", "close", "depends-on", "transactionManager"),
-						getDataSourceBeanDefinitionProperties(cropDatabaseName));
+						this.getDataSourceBeanDefinitionProperties(cropDatabaseName));
 		registry.registerBeanDefinition(cropDatabaseName.toUpperCase() + DATA_SOURCE, dataSourceBeanDefinition);
 
 		final ImmutableMap<String, Object> sessionFactoryBeanDefinitionProperties =
 				ImmutableMap.<String, Object>of(DATA_SOURCE_ATTRIBUTE, dataSourceBeanDefinition, "configLocation",
-						hibernateConfigurationLocation, "configurationClass", org.hibernate.cfg.AnnotationConfiguration.class);
+						this.hibernateConfigurationLocation, "configurationClass", org.hibernate.cfg.AnnotationConfiguration.class);
 		final RootBeanDefinition createRootBeanDefinition =
-				createRootBeanDefinition(AnnotationSessionFactoryBean.class, ImmutableMap.<String, Object>of(),
+				this.createRootBeanDefinition(AnnotationSessionFactoryBean.class, ImmutableMap.<String, Object>of(),
 						sessionFactoryBeanDefinitionProperties);
 		registry.registerBeanDefinition(computeSessionFactoryName(cropDatabaseName), createRootBeanDefinition);
 	}
@@ -186,24 +186,24 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 
 		dataSourceBeanDefinitionProperties.put(UNIQUE_RESOURCE_NAME,
 				XA_PREFIX + cropDatabaseName.toUpperCase() + "_" + System.currentTimeMillis());
-		dataSourceBeanDefinitionProperties.put(MAINTENANCE_INTERVAL, maintenanceInterval);
-		dataSourceBeanDefinitionProperties.put(MAX_IDLE_TIME, maxIdleTime);
-		dataSourceBeanDefinitionProperties.put(MAX_POOL_SIZE, maxPoolSize);
+		dataSourceBeanDefinitionProperties.put(MAINTENANCE_INTERVAL, this.maintenanceInterval);
+		dataSourceBeanDefinitionProperties.put(MAX_IDLE_TIME, this.maxIdleTime);
+		dataSourceBeanDefinitionProperties.put(MAX_POOL_SIZE, this.maxPoolSize);
 
-		dataSourceBeanDefinitionProperties.put(MIN_POOL_SIZE, minPoolSize);
-		dataSourceBeanDefinitionProperties.put(TEST_QUERY, testQuery);
-		dataSourceBeanDefinitionProperties.put(BORROW_CONNECTION_TIMEOUT, borrowConnectionTimeout);
-		dataSourceBeanDefinitionProperties.put(XA_DATA_SOURCE_CLASS_NAME, xaDriverName);
+		dataSourceBeanDefinitionProperties.put(MIN_POOL_SIZE, this.minPoolSize);
+		dataSourceBeanDefinitionProperties.put(TEST_QUERY, this.testQuery);
+		dataSourceBeanDefinitionProperties.put(BORROW_CONNECTION_TIMEOUT, this.borrowConnectionTimeout);
+		dataSourceBeanDefinitionProperties.put(XA_DATA_SOURCE_CLASS_NAME, this.xaDriverName);
 
-		dataSourceBeanDefinitionProperties.put(XA_PROPERTIES, getDatabaseConnectionProperties(cropDatabaseName));
+		dataSourceBeanDefinitionProperties.put(XA_PROPERTIES, this.getDatabaseConnectionProperties(cropDatabaseName));
 		return dataSourceBeanDefinitionProperties;
 	}
 
 	private Properties getDatabaseConnectionProperties(final String cropDatabaseName) {
 		final Properties databaseConnectionProperties = new Properties();
-		databaseConnectionProperties.setProperty(URL, "jdbc:mysql://" + host + ":" + port + "/" + cropDatabaseName);
-		databaseConnectionProperties.setProperty(USER, userName);
-		databaseConnectionProperties.setProperty(PASSWORD_PROPERTY, password);
+		databaseConnectionProperties.setProperty(URL, "jdbc:mysql://" + this.host + ":" + this.port + "/" + cropDatabaseName);
+		databaseConnectionProperties.setProperty(USER, this.userName);
+		databaseConnectionProperties.setProperty(PASSWORD_PROPERTY, this.password);
 		return databaseConnectionProperties;
 	}
 
@@ -211,7 +211,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 	 * @return the workbenchDataSource
 	 */
 	public DataSource getWorkbenchDataSource() {
-		return workbenchDataSource;
+		return this.workbenchDataSource;
 	}
 
 	/**
@@ -225,7 +225,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 	 * @return the userName
 	 */
 	public String getUserName() {
-		return userName;
+		return this.userName;
 	}
 
 	/**
@@ -239,7 +239,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 	 * @return the password
 	 */
 	public String getPassword() {
-		return password;
+		return this.password;
 	}
 
 	/**
@@ -253,7 +253,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 	 * @return the xaDriverName
 	 */
 	public String getXaDriverName() {
-		return xaDriverName;
+		return this.xaDriverName;
 	}
 
 	/**
@@ -267,7 +267,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 	 * @return the borrowConnectionTimeout
 	 */
 	public String getBorrowConnectionTimeout() {
-		return borrowConnectionTimeout;
+		return this.borrowConnectionTimeout;
 	}
 
 	/**
@@ -281,7 +281,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 	 * @return the maxIdleTime
 	 */
 	public String getMaxIdleTime() {
-		return maxIdleTime;
+		return this.maxIdleTime;
 	}
 
 	/**
@@ -295,7 +295,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 	 * @return the maintenanceInterval
 	 */
 	public String getMaintenanceInterval() {
-		return maintenanceInterval;
+		return this.maintenanceInterval;
 	}
 
 	/**
@@ -309,7 +309,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 	 * @return the testQuery
 	 */
 	public String getTestQuery() {
-		return testQuery;
+		return this.testQuery;
 	}
 
 	/**
@@ -323,7 +323,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 	 * @return the maxPoolSize
 	 */
 	public String getMaxPoolSize() {
-		return maxPoolSize;
+		return this.maxPoolSize;
 	}
 
 	/**
@@ -337,7 +337,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 	 * @return the minPoolSize
 	 */
 	public String getMinPoolSize() {
-		return minPoolSize;
+		return this.minPoolSize;
 	}
 
 	/**
@@ -351,7 +351,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 	 * @return the workbenchJdbcUrl
 	 */
 	public String getWorkbenchJdbcUrl() {
-		return workbenchJdbcUrl;
+		return this.workbenchJdbcUrl;
 	}
 
 	/**
@@ -365,7 +365,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 	 * @return the hibernateConfigurationLocation
 	 */
 	public String getHibernateConfigurationLocation() {
-		return hibernateConfigurationLocation;
+		return this.hibernateConfigurationLocation;
 	}
 
 	/**
