@@ -37,6 +37,8 @@ import com.google.common.collect.ImmutableMap;
 
 public class XADataSources implements BeanDefinitionRegistryPostProcessor, InitializingBean {
 
+	private static final String PIN_GLOBAL_TX_TO_PHYSICAL_CONNECTION = "pinGlobalTxToPhysicalConnection";
+
 	private static final String XA_DATA_SOURCE_CLASS_NAME = "xaDataSourceClassName";
 
 	private static final String DATA_SOURCE_ATTRIBUTE = "dataSource";
@@ -204,6 +206,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor, Initi
 		databaseConnectionProperties.setProperty(URL, "jdbc:mysql://" + this.host + ":" + this.port + "/" + cropDatabaseName);
 		databaseConnectionProperties.setProperty(USER, this.userName);
 		databaseConnectionProperties.setProperty(PASSWORD_PROPERTY, this.password);
+		databaseConnectionProperties.setProperty(PIN_GLOBAL_TX_TO_PHYSICAL_CONNECTION, "true");
 		return databaseConnectionProperties;
 	}
 
