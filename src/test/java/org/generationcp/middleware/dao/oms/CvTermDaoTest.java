@@ -1,5 +1,5 @@
 /*******************************************************************************
- * 
+ *
  * Copyright (c) 2012, All Rights Reserved.
  *
  * Generation Challenge Programme (GCP)
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.PropertyReference;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
@@ -25,19 +25,18 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
-public class CvTermDaoTest extends MiddlewareIntegrationTest {
+public class CvTermDaoTest extends IntegrationTestBase {
 
 	private static CVTermDao dao;
 
-	@BeforeClass
-	public static void setUp() throws Exception {
+	@Before
+	public void setUp() throws Exception {
 		CvTermDaoTest.dao = new CVTermDao();
-		CvTermDaoTest.dao.setSession(MiddlewareIntegrationTest.sessionUtil.getCurrentSession());
+		CvTermDaoTest.dao.setSession(this.sessionProvder.getSession());
 	}
 
 	@Test
@@ -168,11 +167,4 @@ public class CvTermDaoTest extends MiddlewareIntegrationTest {
 			}
 		}
 	}
-
-	@AfterClass
-	public static void tearDown() throws Exception {
-		CvTermDaoTest.dao.setSession(null);
-		CvTermDaoTest.dao = null;
-	}
-
 }

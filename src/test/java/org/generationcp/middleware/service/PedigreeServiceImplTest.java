@@ -12,15 +12,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.generationcp.middleware.DataManagerIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.PedigreeService;
-import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * Please note that this test requires a wheat database with a gid dump to actually run.
@@ -28,18 +27,18 @@ import org.junit.Test;
  * @author Akhil
  *
  */
-public class PedigreeServiceImplTest extends DataManagerIntegrationTest {
+public class PedigreeServiceImplTest extends IntegrationTestBase {
 
+	// TODO pedigree service parameters need to be set in testContext.xml
+	@Autowired
 	private PedigreeService pedigreeCimmytWheatService;
+
 	private CrossExpansionProperties crossExpansionProperties;
 
 	private final PedigreeDataReader pedigreeDataReader = new PedigreeDataReader();
 
 	@Before
 	public void setup() {
-		this.pedigreeCimmytWheatService =
-				DataManagerIntegrationTest.managerFactory.getPedigreeService(PedigreeFactory.PROFILE_CIMMYT,
-						CropType.CropEnum.WHEAT.toString());
 		this.crossExpansionProperties = new CrossExpansionProperties();
 		this.crossExpansionProperties.setDefaultLevel(1);
 		this.crossExpansionProperties.setWheatLevel(0);

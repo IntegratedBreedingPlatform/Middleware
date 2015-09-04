@@ -17,7 +17,6 @@ import java.util.Set;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
-import org.generationcp.middleware.manager.GdmsTable;
 import org.generationcp.middleware.manager.GdmsType;
 import org.generationcp.middleware.manager.SetOperation;
 import org.generationcp.middleware.pojos.Name;
@@ -1990,17 +1989,6 @@ public interface GenotypicDataManager {
 	List<MarkerSampleId> getMarkerFromMappingPopByGids(List<Integer> gIds) throws MiddlewareQueryException;
 
 	/**
-	 * Retrieves the last ID of a given GDMS table. For the local instance, this will be the MIN value. For the central instance, this will
-	 * be the MAX value.
-	 *
-	 * @param instance the instance
-	 * @param gdmsTable the gdms table
-	 * @return the last ID of the GDMS table
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	long getLastId(Database instance, GdmsTable gdmsTable) throws MiddlewareQueryException;
-
-	/**
 	 * Adds the mta.
 	 *
 	 * @param dataset the dataset
@@ -2010,6 +1998,8 @@ public interface GenotypicDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	void addMTA(Dataset dataset, Mta mta, MtaMetadata mtaMetadata, DatasetUsers users) throws MiddlewareQueryException;
+
+	Integer addMTA(Mta mta) throws MiddlewareQueryException;
 
 	/**
 	 * 
@@ -2078,6 +2068,10 @@ public interface GenotypicDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	void addHaplotype(TrackData trackData, List<TrackMarker> trackMarkers) throws MiddlewareQueryException;
+
+	Integer addTrackData(TrackData trackData) throws MiddlewareQueryException;
+
+	Integer addTrackMarker(TrackMarker trackMarker) throws MiddlewareQueryException;
 
 	// GCP-7881
 	/**

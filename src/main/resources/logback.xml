@@ -17,12 +17,6 @@
         <prudent>true</prudent>
         <append>true</append>
         
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-		    <level>INFO</level>
-		    <onMatch>ACCEPT</onMatch>
-		    <onMismatch>DENY</onMismatch>
-		</filter>
-        
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <fileNamePattern>${log-dir}/%d{yyyy/MM}/system-log.${HOSTNAME}.%d{dd}.log</fileNamePattern>
         </rollingPolicy>
@@ -39,10 +33,6 @@
     
     <!-- Set the log levels -->
     <logger name="org.generationcp" level="DEBUG"/>
-    <logger name="org.hibernate.cfg" level="WARN"/>
-    <logger name="org.hibernate.SQL" level="DEBUG"/>
-    <logger name="org.hibernate.type" level="DEBUG"/>
-    <logger name="org.hibernate.cache" level="DEBUG"/>
-    <logger name="org.hibernate.transaction" level="DEBUG"/>
-    <logger name="org.springframework" level="WARN"/>
+    <logger name="com.atomikos" level="WARN"/>
+    
 </configuration>

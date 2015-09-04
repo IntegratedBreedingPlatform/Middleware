@@ -37,7 +37,7 @@ import org.hibernate.criterion.SimpleExpression;
 public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	public static final Integer STATUS_DELETED = 9;
-	protected static final List<SimpleExpression> RETRICTED_LIST = new ArrayList();
+	protected static final List<SimpleExpression> RETRICTED_LIST = new ArrayList<SimpleExpression>();
 
 	static {
 		GermplasmListDAO.RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
@@ -123,7 +123,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<GermplasmList> getByName(String name, Operation operation, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<GermplasmList> getByName(String name, String programUUID, Operation operation, int start, int numOfRows)
+			throws MiddlewareQueryException {
 		try {
 			Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 
@@ -136,6 +137,11 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			}
 
 			criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
+
+			Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
+			Criterion nullProgramUUID = Restrictions.isNull("programUUID");
+			criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
+
 			criteria.setFirstResult(start);
 			criteria.setMaxResults(numOfRows);
 			return criteria.list();
@@ -204,14 +210,16 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<GermplasmList> getAllTopLevelLists(int start, int numOfRows) throws MiddlewareQueryException {
+	public List<GermplasmList> getAllTopLevelLists(String programUUID, int start, int numOfRows) throws MiddlewareQueryException {
 		try {
 			Criterion topFolder = Restrictions.eq("parent.id", 0);
 			Criterion nullFolder = Restrictions.isNull("parent");
-
+			Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
+			Criterion nullProgramUUID = Restrictions.isNull("programUUID");
 			Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 			criteria.add(Restrictions.or(topFolder, nullFolder));
 			criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
+			criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
 
 			this.hideSnapshotListTypes(criteria);
 
@@ -225,13 +233,16 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return new ArrayList<GermplasmList>();
 	}
 
-	public long countAllTopLevelLists() throws MiddlewareQueryException {
+	public long countAllTopLevelLists(String programUUID) throws MiddlewareQueryException {
 		try {
 			Criterion topFolder = Restrictions.eq("parent.id", 0);
 			Criterion nullFolder = Restrictions.isNull("parent");
+			Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
+			Criterion nullProgramUUID = Restrictions.isNull("programUUID");
 			Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 			criteria.add(Restrictions.or(topFolder, nullFolder));
 			criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
+			criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
 
 			this.hideSnapshotListTypes(criteria);
 
@@ -247,18 +258,24 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	 * Gets the germplasm list children.
 	 *
 	 * @param parentId the parent id
+	 * @param programUUID the program UUID
 	 * @param start the start
 	 * @param numOfRows the num of rows
 	 * @return the germplasm list children
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
 	@SuppressWarnings("unchecked")
-	public List<GermplasmList> getByParentFolderId(Integer parentId, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<GermplasmList> getByParentFolderId(Integer parentId, String programUUID, int start, int numOfRows)
+			throws MiddlewareQueryException {
 		try {
 			if (parentId != null) {
 				Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 				criteria.add(Restrictions.eq("parent", new GermplasmList(parentId)));
 				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
+
+				Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
+				Criterion nullProgramUUID = Restrictions.isNull("programUUID");
+				criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
 
 				this.hideSnapshotListTypes(criteria);
 
@@ -281,12 +298,16 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	 * @return number of germplasm list child records of a parent record
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	public long countByParentFolderId(Integer parentId) throws MiddlewareQueryException {
+	public long countByParentFolderId(Integer parentId, String programUUID) throws MiddlewareQueryException {
 		try {
 			if (parentId != null) {
 				Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 				criteria.add(Restrictions.eq("parent", new GermplasmList(parentId)));
 				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
+
+				Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
+				Criterion nullProgramUUID = Restrictions.isNull("programUUID");
+				criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
 
 				this.hideSnapshotListTypes(criteria);
 
@@ -430,6 +451,13 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		}
 
 		return 0;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<GermplasmList> getListsByProgram(String programUUID) {
+		Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
+		criteria.add(Restrictions.eq("programUUID", programUUID));
+		return criteria.list();
 	}
 
 	public GermplasmList getByListRef(Integer listRef) {

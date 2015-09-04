@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.List;
-
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -33,14 +31,6 @@ public class CvTermSaver extends Saver {
 		CVTerm cvTerm = this.create(name, definition, cvId.getId(), false, false);
 		dao.save(cvTerm);
 
-		return new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
-	}
-
-	public Term saveOrUpdate(String name, String definition, CvId cvId) throws MiddlewareException, MiddlewareQueryException {
-		this.validateInputFields(name, definition);
-		CVTermDao dao = this.getCvTermDao();
-		CVTerm cvTerm = this.create(name, definition, cvId.getId(), false, false);
-		dao.saveOrUpdate(cvTerm);
 		return new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
 	}
 

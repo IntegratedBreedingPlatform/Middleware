@@ -1,5 +1,5 @@
 /*******************************************************************************
- * 
+ *
  * Copyright (c) 2012, All Rights Reserved.
  *
  * Generation Challenge Programme (GCP)
@@ -17,55 +17,65 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.service.api.DataImportService;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class PhenotypeDaoTest extends DataManagerIntegrationTest {
+public class PhenotypeDaoTest extends IntegrationTestBase {
 
-	private static PhenotypeDao dao;
-	private static DataImportService dataImportService;
-	private static StudyDataManager studyDataManager;
+	private PhenotypeDao dao;
+
+	@Autowired
+	private DataImportService dataImportService;
+
+	@Autowired
+	private StudyDataManager studyDataManager;
+
 	private static final String FIELDBOOK_FILE_IBD_VALID = "Trial457-3-1_Valid_IBD.xls";
 	private static final String FIELDBOOK_FILE_CATVARIATES_ONLY = "FieldbookFile_CategoricalVariatesOnly.xls";
-	private static Map<Integer, Map<String, Object>> studies = new HashMap<Integer, Map<String, Object>>();
+	private Map<Integer, Map<String, Object>> studies = new HashMap<Integer, Map<String, Object>>();
+	private boolean testDataLoaded = false;
 
 	private static final String DATASETS = "datasets";
 	private static final String WORKBOOK = "workbook";
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		PhenotypeDaoTest.dao = new PhenotypeDao();
-		PhenotypeDaoTest.dao.setSession(MiddlewareIntegrationTest.sessionUtil.getCurrentSession());
+	@Before
+	public void setUp() throws Exception {
 
-		PhenotypeDaoTest.dataImportService = DataManagerIntegrationTest.managerFactory.getDataImportService();
-		PhenotypeDaoTest.studyDataManager = DataManagerIntegrationTest.managerFactory.getNewStudyDataManager();
+		if (this.dao == null) {
+			this.dao = new PhenotypeDao();
+			this.dao.setSession(this.sessionProvder.getSession());
+		}
 
-		PhenotypeDaoTest.importFieldbookFile(PhenotypeDaoTest.FIELDBOOK_FILE_IBD_VALID);
-		PhenotypeDaoTest.importFieldbookFile(PhenotypeDaoTest.FIELDBOOK_FILE_CATVARIATES_ONLY);
+		this.importFieldbookFile(PhenotypeDaoTest.FIELDBOOK_FILE_IBD_VALID);
+		this.importFieldbookFile(PhenotypeDaoTest.FIELDBOOK_FILE_CATVARIATES_ONLY);
 	}
 
-	private static void importFieldbookFile(String fieldbookFileIbdValid) throws Exception {
-		String fileLocation = PhenotypeDaoTest.class.getClassLoader().getResource(fieldbookFileIbdValid).getFile();
-		File file = new File(fileLocation);
-		Workbook workbook = PhenotypeDaoTest.dataImportService.parseWorkbook(file);
-		workbook.print(MiddlewareIntegrationTest.INDENT);
+	private void importFieldbookFile(String fieldbookFileIbdValid) throws Exception {
 
-		int studyId = PhenotypeDaoTest.dataImportService.saveDataset(workbook, null);
+		if (!this.testDataLoaded) {
+			String fileLocation = PhenotypeDaoTest.class.getClassLoader().getResource(fieldbookFileIbdValid).getFile();
+			File file = new File(fileLocation);
+			Workbook workbook = this.dataImportService.parseWorkbook(file);
+			workbook.print(IntegrationTestBase.INDENT);
 
-		List<DatasetReference> datasetRefences = PhenotypeDaoTest.studyDataManager.getDatasetReferences(studyId);
+			int studyId = this.dataImportService.saveDataset(workbook, null);
 
-		Map<String, Object> studyDetails = new HashMap<String, Object>();
-		studyDetails.put(PhenotypeDaoTest.DATASETS, datasetRefences);
-		studyDetails.put(PhenotypeDaoTest.WORKBOOK, workbook);
-		PhenotypeDaoTest.studies.put(studyId, studyDetails);
+			List<DatasetReference> datasetRefences = this.studyDataManager.getDatasetReferences(studyId);
+
+			Map<String, Object> studyDetails = new HashMap<String, Object>();
+			studyDetails.put(PhenotypeDaoTest.DATASETS, datasetRefences);
+			studyDetails.put(PhenotypeDaoTest.WORKBOOK, workbook);
+			this.studies.put(studyId, studyDetails);
+			this.testDataLoaded = true;
+		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -75,9 +85,9 @@ public class PhenotypeDaoTest extends DataManagerIntegrationTest {
 		int trialId = 0;
 		int plotId = 0;
 
-		for (Integer studyId : PhenotypeDaoTest.studies.keySet()) {
+		for (Integer studyId : this.studies.keySet()) {
 
-			Map<String, Object> studyDetails = PhenotypeDaoTest.studies.get(studyId);
+			Map<String, Object> studyDetails = this.studies.get(studyId);
 			Workbook workbook = (Workbook) studyDetails.get(PhenotypeDaoTest.WORKBOOK);
 			List<DatasetReference> datasetRefences = (List<DatasetReference>) studyDetails.get(PhenotypeDaoTest.DATASETS);
 
@@ -91,26 +101,9 @@ public class PhenotypeDaoTest extends DataManagerIntegrationTest {
 				}
 			}
 			Assert.assertTrue("The plot dataset should have at least 2 common entries for analysis",
-					PhenotypeDaoTest.dao.containsAtLeast2CommonEntriesWithValues(plotId, locationId));
+					this.dao.containsAtLeast2CommonEntriesWithValues(plotId, locationId, TermId.ENTRY_NO.getId()));
 			Assert.assertFalse("The trial dataset does not contain entries for analysis",
-					PhenotypeDaoTest.dao.containsAtLeast2CommonEntriesWithValues(trialId, locationId));
+					this.dao.containsAtLeast2CommonEntriesWithValues(trialId, locationId, TermId.ENTRY_NO.getId()));
 		}
 	}
-
-	@SuppressWarnings("unchecked")
-	@AfterClass
-	public static void tearDown() throws Exception {
-		for (Integer studyId : PhenotypeDaoTest.studies.keySet()) {
-			List<DatasetReference> datasetRefences =
-					(List<DatasetReference>) PhenotypeDaoTest.studies.get(studyId).get(PhenotypeDaoTest.DATASETS);
-			for (DatasetReference datasetReference : datasetRefences) {
-				int datasetId = datasetReference.getId();
-				PhenotypeDaoTest.studyDataManager.deleteDataSet(datasetId);
-			}
-			PhenotypeDaoTest.studyDataManager.deleteDataSet(studyId);
-		}
-		PhenotypeDaoTest.dao.setSession(null);
-		PhenotypeDaoTest.dao = null;
-	}
-
 }

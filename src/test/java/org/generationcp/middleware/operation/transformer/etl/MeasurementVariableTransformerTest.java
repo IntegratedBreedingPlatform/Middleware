@@ -4,7 +4,7 @@ package org.generationcp.middleware.operation.transformer.etl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -14,39 +14,37 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.hibernate.HibernateSessionPerThreadProvider;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
-public class MeasurementVariableTransformerTest extends MiddlewareIntegrationTest {
+public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 
-	private static MeasurementVariableTransformer transformer;
-	private static StandardVariableBuilder standardVariableBuilder;
+	private MeasurementVariableTransformer transformer;
+	private StandardVariableBuilder standardVariableBuilder;
 	private static final int SITE_SOIL_PH = 8270;
+
+	// FIXME maize specific cvterm. Change to use something from common cvterms.
 	private static final int CRUST = 20310;
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		HibernateSessionProvider sessionProvider =
-				new HibernateSessionPerThreadProvider(MiddlewareIntegrationTest.sessionUtil.getSessionFactory());
-		MeasurementVariableTransformerTest.transformer = new MeasurementVariableTransformer(sessionProvider);
-		MeasurementVariableTransformerTest.standardVariableBuilder = new StandardVariableBuilder(sessionProvider);
+	@Before
+	public void setUp() throws Exception {
+		this.transformer = new MeasurementVariableTransformer(this.sessionProvder);
+		this.standardVariableBuilder = new StandardVariableBuilder(this.sessionProvder);
 	}
 
 	@Test
 	public void testTransform_NullList() throws Exception {
 		VariableTypeList varTypeList = null;
-		List<MeasurementVariable> measurementVariables = MeasurementVariableTransformerTest.transformer.transform(varTypeList, true);
+		List<MeasurementVariable> measurementVariables = this.transformer.transform(varTypeList, true);
 		Assert.assertTrue("Measurement variable list should be empty", measurementVariables.isEmpty());
 	}
 
 	@Test
 	public void testTransform_EmptyList() throws Exception {
 		VariableTypeList varTypeList = new VariableTypeList();
-		List<MeasurementVariable> measurementVariables = MeasurementVariableTransformerTest.transformer.transform(varTypeList, true);
+		List<MeasurementVariable> measurementVariables = this.transformer.transform(varTypeList, true);
 		Assert.assertTrue("Measurement variable list should be empty", measurementVariables.isEmpty());
 	}
 
@@ -55,7 +53,7 @@ public class MeasurementVariableTransformerTest extends MiddlewareIntegrationTes
 		boolean isFactor = true;
 		boolean isInTrialDataset = false;
 		VariableTypeList varTypeList = this.createFactorVariableTypeList();
-		List<MeasurementVariable> measurementVariables = MeasurementVariableTransformerTest.transformer.transform(varTypeList, isFactor);
+		List<MeasurementVariable> measurementVariables = this.transformer.transform(varTypeList, isFactor);
 		Assert.assertFalse("Measurement variable list should not be empty", measurementVariables.isEmpty());
 		for (MeasurementVariable measurementVariable : measurementVariables) {
 			Assert.assertTrue("Measurement variable should be a factor", measurementVariable.isFactor());
@@ -121,7 +119,7 @@ public class MeasurementVariableTransformerTest extends MiddlewareIntegrationTes
 	}
 
 	private StandardVariable getStandardVariable(int id) throws MiddlewareQueryException {
-		return MeasurementVariableTransformerTest.standardVariableBuilder.create(id);
+		return this.standardVariableBuilder.create(id);
 	}
 
 	private VariableType transformMeasurementVariable(MeasurementVariable measurementVariable, StandardVariable standardVariable) {
@@ -143,8 +141,7 @@ public class MeasurementVariableTransformerTest extends MiddlewareIntegrationTes
 		boolean isFactor = false;
 		boolean isInTrialDataset = false;
 		VariableTypeList varTypeList = this.createVariateVariableTypeList();
-		List<MeasurementVariable> measurementVariables =
-				MeasurementVariableTransformerTest.transformer.transform(varTypeList, isFactor, isInTrialDataset);
+		List<MeasurementVariable> measurementVariables = this.transformer.transform(varTypeList, isFactor, isInTrialDataset);
 		Assert.assertFalse("Measurement variable list should not be empty", measurementVariables.isEmpty());
 		for (MeasurementVariable measurementVariable : measurementVariables) {
 			Assert.assertFalse("Measurement variable should not be a factor", measurementVariable.isFactor());
@@ -159,8 +156,7 @@ public class MeasurementVariableTransformerTest extends MiddlewareIntegrationTes
 		boolean isFactor = false;
 		boolean isInTrialDataset = true;
 		VariableTypeList varTypeList = this.createTrialConstantVariableTypeList();
-		List<MeasurementVariable> measurementVariables =
-				MeasurementVariableTransformerTest.transformer.transform(varTypeList, isFactor, isInTrialDataset);
+		List<MeasurementVariable> measurementVariables = this.transformer.transform(varTypeList, isFactor, isInTrialDataset);
 		Assert.assertFalse("Measurement variable list should not be empty", measurementVariables.isEmpty());
 		for (MeasurementVariable measurementVariable : measurementVariables) {
 			Assert.assertFalse("Measurement variable should not be a factor", measurementVariable.isFactor());

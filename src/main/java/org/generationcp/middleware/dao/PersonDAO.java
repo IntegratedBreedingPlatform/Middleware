@@ -68,6 +68,41 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 		return false;
 	}
 
+	public Person getPersonByEmail(String email) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(Person.class);
+
+			criteria.add(Restrictions.eq("email", email));
+
+			return (Person) criteria.uniqueResult();
+		} catch (HibernateException e) {
+			logAndThrowException("Error with getPersonByEmail(email=" + email
+					+ ") query from Person: " + e.getMessage(), e);
+		}
+
+		return null;
+	}
+
+	public Person getPersonByEmailAndName(String email, String firstName, String lastName) throws MiddlewareQueryException {
+		try {
+			Criteria criteria = getSession().createCriteria(Person.class);
+
+			criteria.add(Restrictions.eq("email", email))
+                    .add(Restrictions.eq("firstName", firstName))
+                    .add(Restrictions.eq("lastName", lastName));
+
+			Object result = criteria.uniqueResult();
+			if (result != null) {
+                return (Person) result;
+            }
+		} catch (HibernateException e) {
+			logAndThrowException("Error with getPersonByEmail(email=" + email
+					+ ") query from Person: " + e.getMessage(), e);
+		}
+
+		return null;
+	}
+
 	public boolean isPersonWithUsernameAndEmailExists(String username, String email) throws MiddlewareQueryException {
 		try {
 			StringBuilder sql = new StringBuilder();

@@ -4,13 +4,7 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.internal.runners.JUnit4ClassRunner;
-import org.junit.runner.RunWith;
 
-/**
- * Created by IntelliJ IDEA. User: Daniel Villafuerte Date: 11/18/2014 Time: 2:14 PM
- */
-@RunWith(JUnit4ClassRunner.class)
 public class SeasonTest {
 
 	@Test

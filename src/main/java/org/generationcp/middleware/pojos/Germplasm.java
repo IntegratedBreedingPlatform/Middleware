@@ -16,6 +16,8 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
@@ -288,6 +290,7 @@ public class Germplasm implements Serializable {
 			+ "	G.gid = LDATAPROJ.germplasm_id and" + "	G.gnpgs >= 0" + " where LNAMES.projectid = :projId";
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "gid")
 	@XmlElement(name = "gid")

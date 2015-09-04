@@ -21,15 +21,14 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 	public void deleteByListId(int listId) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			SQLQuery statement =
 					this.getSession().createSQLQuery("delete ldp " + "from listdata_project ldp " + "where ldp.list_id = " + listId);
 			statement.executeUpdate();
-
-			this.flush();
-			this.clear();
-
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deleteByListId=" + listId + " in ListDataProjectDAO: " + e.getMessage(), e);
 		}
@@ -109,17 +108,11 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 	public void deleteByListIdWithList(int listId) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
 			SQLQuery statement =
 					this.getSession().createSQLQuery(
 							"delete ldp, lst " + "from listdata_project ldp, listnms lst "
 									+ "where ldp.list_id = lst.listid and ldp.list_id = " + listId);
 			statement.executeUpdate();
-
-			this.flush();
-			this.clear();
-
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deleteByListId=" + listId + " in ListDataProjectDAO: " + e.getMessage(), e);
 		}

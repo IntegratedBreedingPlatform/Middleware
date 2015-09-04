@@ -28,14 +28,13 @@ public class DatasetUsersDAO extends GenericDAO<DatasetUsers, Integer> {
 
 	public void deleteByDatasetId(int datasetId) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			SQLQuery statement = this.getSession().createSQLQuery("DELETE FROM gdms_dataset_users WHERE dataset_id = " + datasetId);
 			statement.executeUpdate();
-
-			this.flush();
-			this.clear();
-
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deleteByDatasetId=" + datasetId + " in DatasetUsersDAO: " + e.getMessage(), e);
 		}

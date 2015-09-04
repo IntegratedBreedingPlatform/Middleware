@@ -70,15 +70,18 @@ public class ProjectRelationshipDao extends GenericDAO<ProjectRelationship, Inte
 
 	public void deleteByProjectId(Integer projectId) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			StringBuilder sb = new StringBuilder();
 			sb.append("delete from ProjectRelationship ");
 			sb.append("where subjectProject.projectId = " + projectId.intValue());
 			sb.append(" or objectProject.projectId = " + projectId.intValue());
 			Session session = this.getSession();
 			Query q = session.createQuery(sb.toString());
-			// fix session caching start - http://stackoverflow.com/questions/1954208/hibernate-transaction-problem
-			session.flush();
-			session.clear();
+
 			q.executeUpdate();
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error with deleteByProjectId=" + projectId + ") query from ProjectRelationship: " + e.getMessage(),
@@ -93,9 +96,7 @@ public class ProjectRelationshipDao extends GenericDAO<ProjectRelationship, Inte
 			sb.append("where subjectProject.projectId = " + projectId.intValue());
 			Session session = this.getSession();
 			Query q = session.createQuery(sb.toString());
-			// fix session caching start - http://stackoverflow.com/questions/1954208/hibernate-transaction-problem
-			session.flush();
-			session.clear();
+
 			// fix session caching end
 			q.executeUpdate();
 

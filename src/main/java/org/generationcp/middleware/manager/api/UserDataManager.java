@@ -117,16 +117,6 @@ public interface UserDataManager {
 	void deletePerson(Person person) throws MiddlewareQueryException;
 
 	/**
-	 * Checks if is valid user login.
-	 * 
-	 * @param username the username
-	 * @param password the password
-	 * @return true, if is valid user login
-	 * @throws MiddlewareQueryException the MiddlewareQueryException
-	 */
-	boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException;
-
-	/**
 	 * Checks if is person exists.
 	 * 
 	 * @param firstName the first name

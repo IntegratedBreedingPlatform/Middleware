@@ -4,21 +4,17 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.DataManagerIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class UserProgramStateDataManagerImplTest extends DataManagerIntegrationTest {
+public class UserProgramStateDataManagerImplTest extends IntegrationTestBase {
 
-	private static UserProgramStateDataManager manager;
-
-	@BeforeClass
-	public static void setUp() throws Exception {
-		UserProgramStateDataManagerImplTest.manager = DataManagerIntegrationTest.managerFactory.getUserProgramStateDataManager();
-	}
+	@Autowired
+	private UserProgramStateDataManager manager;
 
 	@Test
 	public void testSavingUserProgramStateAndRetrieval() throws MiddlewareQueryException {
@@ -30,11 +26,10 @@ public class UserProgramStateDataManagerImplTest extends DataManagerIntegrationT
 		treeState.add("5");
 		treeState.add("6");
 
-		UserProgramStateDataManagerImplTest.manager.saveOrUpdateUserProgramTreeState(userId, programUuid, type, treeState);
-		List<String> states =
-				UserProgramStateDataManagerImplTest.manager.getUserProgramTreeStateByUserIdProgramUuidAndType(userId, programUuid, type);
+		this.manager.saveOrUpdateUserProgramTreeState(userId, programUuid, type, treeState);
+		List<String> states = this.manager.getUserProgramTreeStateByUserIdProgramUuidAndType(userId, programUuid, type);
 		for (int index = 0; index < treeState.size(); index++) {
-			Assert.assertEquals("Should be the same list after savign and retrieving", treeState.get(index), states.get(index));
+			Assert.assertEquals("Should be the same list after saving and retrieving", treeState.get(index), states.get(index));
 		}
 	}
 

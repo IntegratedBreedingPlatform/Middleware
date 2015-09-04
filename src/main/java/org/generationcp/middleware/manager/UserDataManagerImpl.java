@@ -23,13 +23,14 @@ import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the UserDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
  */
+@Transactional
 public class UserDataManagerImpl extends DataManager implements UserDataManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserDataManagerImpl.class);
@@ -54,49 +55,30 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public Integer addUser(User user) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
-
 		Integer idUserSaved = null;
 		try {
-			trans = session.beginTransaction();
-			UserDAO dao = this.getUserDao();
 
-			Integer userId = dao.getNextId("userid");
-			user.setUserid(userId);
+			UserDAO dao = this.getUserDao();
 
 			User recordSaved = dao.saveOrUpdate(user);
 			idUserSaved = recordSaved.getUserid();
-
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
 			this.logAndThrowException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(),
 					e, UserDataManagerImpl.LOG);
-		} finally {
-			session.flush();
-		}
+		} 
 
 		return idUserSaved;
 	}
 
 	@Override
 	public Integer updateUser(User user) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
-
 		try {
-			trans = session.beginTransaction();
 			this.getUserDao().saveOrUpdate(user);
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(),
 					e, UserDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
-
 		return user.getUserid();
 	}
 
@@ -107,20 +89,12 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public void deleteUser(User user) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
-
 		try {
-			trans = session.beginTransaction();
 			this.getUserDao().makeTransient(user);
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
 			this.logAndThrowException(
 					"Error encountered while deleting User: UserDataManager.deleteUser(user=" + user + "): " + e.getMessage(), e,
 					UserDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -148,28 +122,15 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public Integer addPerson(Person person) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
-
 		Integer idPersonSaved = null;
 		try {
-			trans = session.beginTransaction();
 			PersonDAO dao = this.getPersonDao();
-
-			Integer personId = dao.getNextId("id");
-			person.setId(personId);
-
 			Person recordSaved = dao.saveOrUpdate(person);
 			idPersonSaved = recordSaved.getId();
-
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
 			this.logAndThrowException(
 					"Error encountered while saving Person: UserDataManager.addPerson(person=" + person + "): " + e.getMessage(), e,
 					UserDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return idPersonSaved;
 	}
@@ -181,29 +142,13 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 
 	@Override
 	public void deletePerson(Person person) throws MiddlewareQueryException {
-		Session session = this.getActiveSession();
-		Transaction trans = null;
-
 		try {
-			trans = session.beginTransaction();
 			this.getPersonDao().makeTransient(person);
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
 			this.logAndThrowException(
 					"Error encountered while deleting Person: UserDataManager.deletePerson(person=" + person + "): " + e.getMessage(), e,
 					UserDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
-	}
-
-	@Override
-	public boolean isValidUserLogin(String username, String password) throws MiddlewareQueryException {
-		if (this.getUserDao().getByUsernameAndPassword(username, password) != null) {
-			return true;
-		}
-		return false;
 	}
 
 	@Override

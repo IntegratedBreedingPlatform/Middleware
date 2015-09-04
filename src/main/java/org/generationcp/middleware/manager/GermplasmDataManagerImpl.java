@@ -48,10 +48,9 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
 import org.generationcp.middleware.util.DatabaseBroker;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -60,6 +59,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 @SuppressWarnings("unchecked")
+@Transactional
 public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDataManagerImpl.class);
@@ -387,12 +387,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	private void updateGermplasmPrefNameAbbrev(Integer gid, String newPrefValue, String nameOrAbbrev) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 			// begin update transaction
-			trans = session.beginTransaction();
+
 			NameDAO dao = this.getNameDao();
 
 			// check for a name record with germplasm = gid, and nval = newPrefName
@@ -426,14 +426,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 						new Throwable(), GermplasmDataManagerImpl.LOG);
 			}
 
-			// end transaction, commit to database
-			trans.commit();
+			
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error in GermplasmpDataManager.updateGermplasmPrefNameAbbrev(gid=" + gid + ", newPrefValue="
 					+ newPrefValue + ", nameOrAbbrev=" + nameOrAbbrev + "):  " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -464,36 +462,18 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	private List<Integer> addOrUpdateGermplasmName(List<Name> names, Operation operation) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
-		int namesSaved = 0;
 		List<Integer> idNamesSaved = new ArrayList<Integer>();
 		try {
-			// begin save transaction
-			trans = session.beginTransaction();
 			NameDAO dao = this.getNameDao();
 
 			for (Name name : names) {
 				Name recordAdded = dao.saveOrUpdate(name);
 				idNamesSaved.add(recordAdded.getNid());
-				namesSaved++;
-				if (namesSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
-			// end transaction, commit to database
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
 			this.logAndThrowException("Error while saving Germplasm Name: GermplasmDataManager.addOrUpdateGermplasmName(names=" + names
 					+ ", operation=" + operation + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
-
 		return idNamesSaved;
 	}
 
@@ -628,37 +608,31 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Integer addMethod(Method method) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		Integer methodId = null;
 		try {
-			trans = session.beginTransaction();
-			MethodDAO dao = this.getMethodDao();
 
-			// Auto-assign IDs for new records
-			Integer nextId = dao.getNextId("mid");
-			method.setMid(nextId);
+			MethodDAO dao = this.getMethodDao();
 
 			Method recordSaved = dao.saveOrUpdate(method);
 			methodId = recordSaved.getMid();
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e,
 					GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return methodId;
 	}
 
 	@Override
 	public Method editMethod(Method method) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		Method recordSaved = null;
 
@@ -668,19 +642,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				throw new MiddlewareQueryException("method has no Id or is not a local method");
 			}
 
-			trans = session.beginTransaction();
+
 			MethodDAO dao = this.getMethodDao();
 
 			recordSaved = dao.merge(method);
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e,
 					GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 
 		return recordSaved;
@@ -688,49 +660,41 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Integer> addMethod(List<Method> methods) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		List<Integer> idMethodsSaved = new ArrayList<Integer>();
 		try {
-			trans = session.beginTransaction();
+
 			MethodDAO dao = this.getMethodDao();
 
 			for (Method method : methods) {
-				// Auto-assign IDs for new DB records
-				Integer nextId = dao.getNextId("mid");
-				method.setMid(nextId);
-
 				Method recordSaved = dao.saveOrUpdate(method);
 				idMethodsSaved.add(recordSaved.getMid());
 			}
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving a list of Methods: GermplasmDataManager.addMethod(methods=" + methods
 					+ "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return idMethodsSaved;
 	}
 
 	@Override
 	public void deleteMethod(Method method) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getMethodDao().makeTransient(method);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while deleting Method: GermplasmDataMananger.deleteMethod(method=" + method
 					+ "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -794,29 +758,23 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Integer addBibliographicReference(Bibref bibref) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		Integer idBibrefSaved = null;
 		try {
-			trans = session.beginTransaction();
-			BibrefDAO dao = this.getBibrefDao();
 
-			// Auto-assign IDs for new DB records
-			Integer nextId = dao.getNextId("refid");
-			bibref.setRefid(nextId);
+			BibrefDAO dao = this.getBibrefDao();
 
 			Bibref recordSaved = dao.saveOrUpdate(bibref);
 			idBibrefSaved = recordSaved.getRefid();
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while saving Bibliographic Reference: GermplasmDataManager.addBibliographicReference(bibref="
 							+ bibref + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return idBibrefSaved;
 	}
@@ -848,25 +806,23 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	private List<Integer> addOrUpdateAttributes(List<Attribute> attributes, Operation operation) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		List<Integer> idAttributesSaved = new ArrayList<Integer>();
 		try {
-			trans = session.beginTransaction();
+
 			AttributeDAO dao = this.getAttributeDao();
 
 			for (Attribute attribute : attributes) {
 				Attribute recordSaved = dao.saveOrUpdate(attribute);
 				idAttributesSaved.add(recordSaved.getAid());
 			}
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Attribute: GermplasmDataManager.addOrUpdateAttributes(attributes="
 					+ attributes + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 
 		return idAttributesSaved;
@@ -946,65 +902,42 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	private List<Integer> addOrUpdateGermplasms(List<Germplasm> germplasms, Operation operation) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
-		int germplasmsSaved = 0;
 		List<Integer> idGermplasmsSaved = new ArrayList<Integer>();
 		try {
-			trans = session.beginTransaction();
 			GermplasmDAO dao = this.getGermplasmDao();
 
 			for (Germplasm germplasm : germplasms) {
-				if (operation == Operation.ADD) {
-					// Auto-assign IDs for new DB records
-					Integer nextId = dao.getNextId("gid");
-					germplasm.setGid(nextId);
-					germplasm.setLgid(nextId);
-				}
-
 				Germplasm recordSaved = dao.saveOrUpdate(germplasm);
 				idGermplasmsSaved.add(recordSaved.getGid());
-				germplasmsSaved++;
-				if (germplasmsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
+				recordSaved.setLgid(recordSaved.getGid());
 			}
-			// end transaction, commit to database
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Germplasm: GermplasmDataManager.addOrUpdateGermplasms(germplasms="
 					+ germplasms + ", operation=" + operation + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 
 		return idGermplasmsSaved;
 	}
 
 	private int addOrUpdateProgenitors(List<Progenitor> progenitors) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		int progenitorsSaved = 0;
 		try {
-			trans = session.beginTransaction();
+
 			ProgenitorDAO dao = this.getProgenitorDao();
 
 			for (Progenitor progenitor : progenitors) {
 				dao.saveOrUpdate(progenitor);
 				progenitorsSaved++;
 			}
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Progenitor: GermplasmDataManager.addOrUpdateProgenitors(progenitors="
 					+ progenitors + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return progenitorsSaved;
 	}
@@ -1036,7 +969,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public Integer addGermplasm(Germplasm germplasm, Name preferredName) throws MiddlewareQueryException {
 		Map<Germplasm, Name> germplasmNameMap = new HashMap<Germplasm, Name>();
-		germplasm.setGid(Integer.valueOf(1));
 		germplasmNameMap.put(germplasm, preferredName);
 		List<Integer> ids = this.addGermplasm(germplasmNameMap);
 		return !ids.isEmpty() ? ids.get(0) : null;
@@ -1044,72 +976,47 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Integer> addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
-		int germplasmsSaved = 0;
 		List<Integer> isGermplasmsSaved = new ArrayList<Integer>();
 		try {
-			trans = session.beginTransaction();
+
 			GermplasmDAO dao = this.getGermplasmDao();
 			NameDAO nameDao = this.getNameDao();
 
 			for (Germplasm germplasm : germplasmNameMap.keySet()) {
 				Name name = germplasmNameMap.get(germplasm);
 
-				// Auto-assign IDs for new DB records
-				Integer nextId = dao.getNextId("gid");
-				germplasm.setGid(nextId);
-
 				name.setNstat(Integer.valueOf(1));
-				name.setGermplasmId(nextId);
 
 				Germplasm germplasmSaved = dao.save(germplasm);
 				isGermplasmsSaved.add(germplasmSaved.getGid());
+				name.setGermplasmId(germplasmSaved.getGid());
 				nameDao.save(name);
-				germplasmsSaved++;
-
-				if (germplasmsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
-			// end transaction, commit to database
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Germplasm: GermplasmDataManager.addGermplasm(germplasmNameMap="
 					+ germplasmNameMap + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return isGermplasmsSaved;
 	}
 
 	@Override
 	public Integer addUserDefinedField(UserDefinedField field) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			trans = session.beginTransaction();
-			UserDefinedFieldDAO dao = this.getUserDefinedFieldDao();
 
-			// Auto-assign IDs for new DB records
-			Integer nextId = dao.getNextId("fldno");
-			field.setFldno(nextId);
+			UserDefinedFieldDAO dao = this.getUserDefinedFieldDao();
 			dao.save(field);
 
-			// end transaction, commit to database
-			trans.commit();
+			
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedField(): " + e.getMessage(), e,
 					GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 
 		return field.getFldno();
@@ -1117,39 +1024,23 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Integer> addUserDefinedFields(List<UserDefinedField> fields) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
 
 		List<Integer> isUdfldSaved = new ArrayList<Integer>();
 		try {
-			trans = session.beginTransaction();
+
 			UserDefinedFieldDAO dao = this.getUserDefinedFieldDao();
 
-			int udfldSaved = 0;
 			for (UserDefinedField field : fields) {
-
-				// Auto-assign IDs for new DB records
-				Integer nextId = dao.getNextId("fldno");
-				field.setFldno(nextId);
 
 				UserDefinedField udflds = dao.save(field);
 				isUdfldSaved.add(udflds.getFldno());
-				udfldSaved++;
-
-				if (udfldSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
-			// end transaction, commit to database
-			trans.commit();
+			
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedFields(fields="
 					+ fields + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 
 		return isUdfldSaved;
@@ -1157,24 +1048,22 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Integer addAttribute(Attribute attr) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		Integer isAttrSaved = 0;
 		try {
-			trans = session.beginTransaction();
+
 			AttributeDAO dao = this.getAttributeDao();
 			dao.save(attr);
 			isAttrSaved++;
 
-			// end transaction, commit to database
-			trans.commit();
+			
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Attribute: GermplasmDataManager.addAttribute(addAttribute=" + attr
 					+ "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 
 		return isAttrSaved;
@@ -1182,34 +1071,24 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Integer> addAttributes(List<Attribute> attrs) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		List<Integer> isAttrSaved = new ArrayList<Integer>();
 		try {
-			trans = session.beginTransaction();
+
 			AttributeDAO dao = this.getAttributeDao();
 
-			int attrSaved = 0;
 			for (Attribute attr : attrs) {
 				Attribute newAttr = dao.save(attr);
 				isAttrSaved.add(newAttr.getAid());
-				attrSaved++;
-
-				if (attrSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
-			// end transaction, commit to database
-			trans.commit();
+			
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving UserDefinedField: GermplasmDataManager.addAttributes(attrs="
 					+ isAttrSaved + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 
 		return isAttrSaved;
@@ -1461,111 +1340,69 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public void saveProgramFavorites(List<ProgramFavorite> list) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
-		int favoriteSaved = 0;
-
+		
 		try {
-			trans = session.beginTransaction();
 			ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
 
 			for (ProgramFavorite favorite : list) {
-
-				Integer nextId = dao.getNextId("id");
-				favorite.setProgramFavoriteId(nextId);
 				dao.save(favorite);
-				favoriteSaved++;
-
-				if (favoriteSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
-			// end transaction, commit to database
-			trans.commit();
+			
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorites(list="
 					+ list + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 	}
 
 	@Override
 	public void saveProgramFavorite(ProgramFavorite favorite) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			trans = session.beginTransaction();
+
 			ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
-			Integer nextId = dao.getNextId("id");
-			favorite.setProgramFavoriteId(nextId);
 			dao.save(favorite);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorite(favorite="
 					+ favorite + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 
 	}
 
 	@Override
 	public void deleteProgramFavorites(List<ProgramFavorite> list) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
-		int favoriteDeleted = 0;
-
 		try {
-			trans = session.beginTransaction();
 			ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
-
 			for (ProgramFavorite favorite : list) {
-
 				dao.makeTransient(favorite);
-
-				if (favoriteDeleted % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
-			// end transaction, commit to database
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
 			this.logAndThrowException("Error encountered while saving ProgramFavorite: GermplasmDataManager.deleteProgramFavorites(list="
 					+ list + "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 
 	}
 
 	@Override
 	public void deleteProgramFavorite(ProgramFavorite favorite) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			trans = session.beginTransaction();
+
 			ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
 			dao.makeTransient(favorite);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while deleting ProgramFavorite: GermplasmDataManager.deleteProgramFavorite(favorite=" + favorite
 							+ "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 
 	}
@@ -1587,28 +1424,21 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public void deleteProgramMethodsByUniqueId(String programUUID) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 		MethodDAO methodDao = this.getMethodDao();
-		int deleted = 0;
 		try {
-			trans = session.beginTransaction();
+
 			List<Method> list = this.getProgramMethods(programUUID);
 			for (Method method : list) {
 				methodDao.makeTransient(method);
-				if (deleted % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					methodDao.flush();
-					methodDao.clear();
-				}
 			}
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while deleting methods: GermplasmDataManager.deleteProgramMethodsByUniqueId(uniqueId=" + programUUID
 							+ "): " + e.getMessage(), e, GermplasmDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 	}
 

@@ -13,28 +13,29 @@ package org.generationcp.middleware.pojos;
 
 import java.util.List;
 
-import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.utils.test.Debug;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 @SuppressWarnings("rawtypes")
-public class PojosSimpleTest extends DataManagerIntegrationTest {
+public class GMSPojosSimpleTest extends IntegrationTestBase {
 
-	private static Session session;
+	private Session session;
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		PojosSimpleTest.session = DataManagerIntegrationTest.managerFactory.getSessionProvider().getSession();
+	@Before
+	public void setUp() throws Exception {
+		if (this.session == null) {
+			this.session = this.sessionProvder.getSession();
+		}
 	}
 
 	@Test
 	public void testAtributs() {
-		Query query = PojosSimpleTest.session.createQuery("FROM Attribute");
+		Query query = this.session.createQuery("FROM Attribute");
 		query.setMaxResults(5);
 		List results = query.list();
 
@@ -42,13 +43,13 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
 			Assert.assertTrue(obj instanceof Attribute);
 			Assert.assertTrue(obj != null);
 			Attribute atributs = (Attribute) obj;
-			Debug.println(MiddlewareIntegrationTest.INDENT, atributs);
+			Debug.println(IntegrationTestBase.INDENT, atributs);
 		}
 	}
 
 	@Test
 	public void testBibrefs() {
-		Query query = PojosSimpleTest.session.createQuery("FROM Bibref");
+		Query query = this.session.createQuery("FROM Bibref");
 		query.setMaxResults(5);
 		List results = query.list();
 
@@ -56,13 +57,13 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
 			Assert.assertTrue(obj instanceof Bibref);
 			Assert.assertTrue(obj != null);
 			Bibref holder = (Bibref) obj;
-			Debug.println(MiddlewareIntegrationTest.INDENT, holder);
+			Debug.println(IntegrationTestBase.INDENT, holder);
 		}
 	}
 
 	@Test
 	public void testCntry() {
-		Query query = PojosSimpleTest.session.createQuery("FROM Country");
+		Query query = this.session.createQuery("FROM Country");
 		query.setMaxResults(5);
 		List results = query.list();
 
@@ -70,13 +71,13 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
 			Assert.assertTrue(obj instanceof Country);
 			Assert.assertTrue(obj != null);
 			Country holder = (Country) obj;
-			Debug.println(MiddlewareIntegrationTest.INDENT, holder);
+			Debug.println(IntegrationTestBase.INDENT, holder);
 		}
 	}
 
 	@Test
 	public void testGeoref() {
-		Query query = PojosSimpleTest.session.createQuery("FROM Georef");
+		Query query = this.session.createQuery("FROM Georef");
 		query.setMaxResults(5);
 		List results = query.list();
 
@@ -84,13 +85,13 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
 			Assert.assertTrue(obj instanceof Georef);
 			Assert.assertTrue(obj != null);
 			Georef holder = (Georef) obj;
-			Debug.println(MiddlewareIntegrationTest.INDENT, holder);
+			Debug.println(IntegrationTestBase.INDENT, holder);
 		}
 	}
 
 	@Test
 	public void testGermplsm() {
-		Query query = PojosSimpleTest.session.createQuery("FROM Germplasm");
+		Query query = this.session.createQuery("FROM Germplasm");
 		query.setMaxResults(5);
 		List results = query.list();
 
@@ -98,13 +99,13 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
 			Assert.assertTrue(obj instanceof Germplasm);
 			Assert.assertTrue(obj != null);
 			Germplasm holder = (Germplasm) obj;
-			Debug.println(MiddlewareIntegrationTest.INDENT, holder);
+			Debug.println(IntegrationTestBase.INDENT, holder);
 		}
 	}
 
 	@Test
 	public void testLocation() {
-		Query query = PojosSimpleTest.session.createQuery("FROM Location");
+		Query query = this.session.createQuery("FROM Location");
 		query.setMaxResults(5);
 		List results = query.list();
 
@@ -112,13 +113,13 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
 			Assert.assertTrue(obj instanceof Location);
 			Assert.assertTrue(obj != null);
 			Location holder = (Location) obj;
-			Debug.println(MiddlewareIntegrationTest.INDENT, holder);
+			Debug.println(IntegrationTestBase.INDENT, holder);
 		}
 	}
 
 	@Test
 	public void testLocdes() {
-		Query query = PojosSimpleTest.session.createQuery("FROM Locdes");
+		Query query = this.session.createQuery("FROM Locdes");
 		query.setMaxResults(5);
 		List results = query.list();
 
@@ -126,13 +127,13 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
 			Assert.assertTrue(obj instanceof Locdes);
 			Assert.assertTrue(obj != null);
 			Locdes holder = (Locdes) obj;
-			Debug.println(MiddlewareIntegrationTest.INDENT, holder);
+			Debug.println(IntegrationTestBase.INDENT, holder);
 		}
 	}
 
 	@Test
 	public void testMethods() {
-		Query query = PojosSimpleTest.session.createQuery("FROM Method");
+		Query query = this.session.createQuery("FROM Method");
 		query.setMaxResults(5);
 		List results = query.list();
 
@@ -140,13 +141,13 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
 			Assert.assertTrue(obj instanceof Method);
 			Assert.assertTrue(obj != null);
 			Method holder = (Method) obj;
-			Debug.println(MiddlewareIntegrationTest.INDENT, holder);
+			Debug.println(IntegrationTestBase.INDENT, holder);
 		}
 	}
 
 	@Test
 	public void testNames() {
-		Query query = PojosSimpleTest.session.createQuery("FROM Name");
+		Query query = this.session.createQuery("FROM Name");
 		query.setMaxResults(5);
 		List results = query.list();
 
@@ -154,13 +155,13 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
 			Assert.assertTrue(obj instanceof Name);
 			Assert.assertTrue(obj != null);
 			Name holder = (Name) obj;
-			Debug.println(MiddlewareIntegrationTest.INDENT, holder);
+			Debug.println(IntegrationTestBase.INDENT, holder);
 		}
 	}
 
 	@Test
 	public void testProgntrs() {
-		Query query = PojosSimpleTest.session.createQuery("FROM Progenitor");
+		Query query = this.session.createQuery("FROM Progenitor");
 		query.setMaxResults(5);
 		List results = query.list();
 
@@ -168,13 +169,13 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
 			Assert.assertTrue(obj instanceof Progenitor);
 			Assert.assertTrue(obj != null);
 			Progenitor holder = (Progenitor) obj;
-			Debug.println(MiddlewareIntegrationTest.INDENT, holder);
+			Debug.println(IntegrationTestBase.INDENT, holder);
 		}
 	}
 
 	@Test
 	public void testUdflds() {
-		Query query = PojosSimpleTest.session.createQuery("FROM UserDefinedField");
+		Query query = this.session.createQuery("FROM UserDefinedField");
 		query.setMaxResults(5);
 		List results = query.list();
 
@@ -182,13 +183,13 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
 			Assert.assertTrue(obj instanceof UserDefinedField);
 			Assert.assertTrue(obj != null);
 			UserDefinedField holder = (UserDefinedField) obj;
-			Debug.println(MiddlewareIntegrationTest.INDENT, holder);
+			Debug.println(IntegrationTestBase.INDENT, holder);
 		}
 	}
 
 	@Test
 	public void testUser() {
-		Query query = PojosSimpleTest.session.createQuery("FROM User");
+		Query query = this.session.createQuery("FROM User");
 		query.setMaxResults(5);
 		List results = query.list();
 
@@ -196,20 +197,13 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
 			Assert.assertTrue(obj instanceof User);
 			Assert.assertTrue(obj != null);
 			User holder = (User) obj;
-			Debug.println(MiddlewareIntegrationTest.INDENT, holder);
+			Debug.println(IntegrationTestBase.INDENT, holder);
 		}
 	}
 
 	@Test
-	public void testGettingGermplasmDetails() {
-		Integer gid = Integer.valueOf(50533);
-		Germplasm g = (Germplasm) PojosSimpleTest.session.load(Germplasm.class, gid);
-		Debug.println(MiddlewareIntegrationTest.INDENT, g);
-	}
-
-	@Test
 	public void testGermplasmList() {
-		Query query = PojosSimpleTest.session.createQuery("FROM GermplasmList");
+		Query query = this.session.createQuery("FROM GermplasmList");
 		query.setMaxResults(5);
 		List results = query.list();
 
@@ -217,13 +211,13 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
 			Assert.assertTrue(obj instanceof GermplasmList);
 			Assert.assertTrue(obj != null);
 			GermplasmList holder = (GermplasmList) obj;
-			Debug.println(MiddlewareIntegrationTest.INDENT, holder);
+			Debug.println(IntegrationTestBase.INDENT, holder);
 		}
 	}
 
 	@Test
 	public void testGermplasmListData() {
-		Query query = PojosSimpleTest.session.createQuery("FROM GermplasmListData");
+		Query query = this.session.createQuery("FROM GermplasmListData");
 		query.setMaxResults(5);
 		List results = query.list();
 
@@ -231,7 +225,7 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
 			Assert.assertTrue(obj instanceof GermplasmListData);
 			Assert.assertTrue(obj != null);
 			GermplasmListData holder = (GermplasmListData) obj;
-			Debug.println(MiddlewareIntegrationTest.INDENT, holder);
+			Debug.println(IntegrationTestBase.INDENT, holder);
 		}
 	}
 
@@ -239,14 +233,14 @@ public class PojosSimpleTest extends DataManagerIntegrationTest {
 	public void testListDataProperty() {
 
 		// UNCOMMENT TO TEST: (IMPORTANT -- RUN IN RICE DB ONLY)
-		Query query = PojosSimpleTest.session.createQuery("FROM GermplasmListData where id IN (32334, 32335, 32336)");
+		Query query = this.session.createQuery("FROM GermplasmListData where id IN (32334, 32335, 32336)");
 		List results = query.list();
 
 		for (Object obj : results) {
 			Assert.assertTrue(obj instanceof GermplasmListData);
 			Assert.assertTrue(obj != null);
 			GermplasmListData data = (GermplasmListData) obj;
-			data.print(MiddlewareIntegrationTest.INDENT);
+			data.print(IntegrationTestBase.INDENT);
 		}
 	}
 }

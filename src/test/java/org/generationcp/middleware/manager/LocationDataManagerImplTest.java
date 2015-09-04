@@ -12,70 +12,83 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
+import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
+public class LocationDataManagerImplTest extends IntegrationTestBase {
 
-	private static LocationDataManager manager;
-	private static Project commonTestProject;
-	private static WorkbenchTestDataUtil workbenchTestDataUtil;
+	@Autowired
+	private LocationDataManager manager;
+
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
+
+	private Project commonTestProject;
+	private WorkbenchTestDataUtil workbenchTestDataUtil;
 	private final static Integer COUNTRY_LTYPEID = 405;
 	private final static Integer PHILIPPINES_CNTRYID = 171;
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		LocationDataManagerImplTest.manager = DataManagerIntegrationTest.managerFactory.getLocationDataManager();
-		LocationDataManagerImplTest.workbenchTestDataUtil = WorkbenchTestDataUtil.getInstance();
-		LocationDataManagerImplTest.workbenchTestDataUtil.setUpWorkbench();
-		LocationDataManagerImplTest.commonTestProject = LocationDataManagerImplTest.workbenchTestDataUtil.getCommonTestProject();
+	@Before
+	public void setUp() throws Exception {
+		if (this.workbenchTestDataUtil == null) {
+			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
+			this.workbenchTestDataUtil.setUpWorkbench();
+		}
+
+		if (this.commonTestProject == null) {
+			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
+		}
 	}
 
 	@Test
 	public void testGetAllLocations() throws Exception {
-		List<Location> locationList = LocationDataManagerImplTest.manager.getAllLocations();
+		List<Location> locationList = this.manager.getAllLocations();
 		Assert.assertTrue(locationList != null);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetAllLocations(): ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locationList);
+		Debug.println(IntegrationTestBase.INDENT, "testGetAllLocations(): ");
+		Debug.printObjects(IntegrationTestBase.INDENT, locationList);
 	}
 
 	@Test
 	public void testGetLocationsByUniqueID() throws Exception {
 		String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
-		List<Location> locationList = LocationDataManagerImplTest.manager.getLocationsByUniqueID(programUUID);
+		List<Location> locationList = this.manager.getLocationsByUniqueID(programUUID);
 		Assert.assertNotNull("Expecting to have returned results.", locationList);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationsByUniqueID(): ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locationList);
+		Debug.println(IntegrationTestBase.INDENT, "testGetLocationsByUniqueID(): ");
+		Debug.printObjects(IntegrationTestBase.INDENT, locationList);
 	}
 
 	@Test
 	public void testCountLocationsByUniqueID() throws Exception {
 		String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
-		long count = LocationDataManagerImplTest.manager.countLocationsByUniqueID(programUUID);
+		long count = this.manager.countLocationsByUniqueID(programUUID);
 		Assert.assertTrue("Expecting to have returned results.", count > 0);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testCountLocationsByUniqueID(" + programUUID + "): " + count);
+		Debug.println(IntegrationTestBase.INDENT, "testCountLocationsByUniqueID(" + programUUID + "): " + count);
 	}
 
 	@Test
 	public void testGetLocationsByIDs() throws Exception {
 
 		// Attempt to get all locations so we can proceed
-		List<Location> locationList = LocationDataManagerImplTest.manager.getAllLocations();
+		List<Location> locationList = this.manager.getAllLocations();
 		Assert.assertTrue(locationList != null);
 		Assert.assertTrue("we cannot proceed test if size < 0", locationList.size() > 0);
 
@@ -90,19 +103,19 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 			}
 		}
 
-		List<Location> results = LocationDataManagerImplTest.manager.getLocationsByIDs(ids);
+		List<Location> results = this.manager.getLocationsByIDs(ids);
 		Assert.assertTrue(results != null);
 		Assert.assertTrue(results.size() < 5);
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationsByIDs(): ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, results);
+		Debug.println(IntegrationTestBase.INDENT, "testGetLocationsByIDs(): ");
+		Debug.printObjects(IntegrationTestBase.INDENT, results);
 	}
 
 	@Test
 	public void testGetLocationDetailsByIDs() throws Exception {
 
 		// Attempt to get all locations so we can proceed
-		List<Location> locationList = LocationDataManagerImplTest.manager.getAllLocations();
+		List<Location> locationList = this.manager.getAllLocations();
 		Assert.assertTrue(locationList != null);
 		Assert.assertTrue("we cannot proceed test if size < 0", locationList.size() > 0);
 
@@ -117,32 +130,32 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 			}
 		}
 
-		List<LocationDetails> results = LocationDataManagerImplTest.manager.getLocationDetailsByLocationIDs(ids);
+		List<LocationDetails> results = this.manager.getLocationDetailsByLocationIDs(ids);
 		Assert.assertTrue(results != null);
 		Assert.assertTrue(results.size() < 5);
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationDetailsByIDs(): ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, results);
+		Debug.println(IntegrationTestBase.INDENT, "testGetLocationDetailsByIDs(): ");
+		Debug.printObjects(IntegrationTestBase.INDENT, results);
 	}
 
 	@Test
 	public void testGetAllCountry() throws Exception {
-		List<Country> countryList = LocationDataManagerImplTest.manager.getAllCountry();
+		List<Country> countryList = this.manager.getAllCountry();
 		Assert.assertTrue(countryList != null);
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, countryList);
+		Debug.printObjects(IntegrationTestBase.INDENT, countryList);
 	}
 
 	@Test
 	public void testLocationDetails() throws Exception {
-		List<LocationDetails> locationList = LocationDataManagerImplTest.manager.getLocationDetailsByLocId(1, 1, 1);
+		List<LocationDetails> locationList = this.manager.getLocationDetailsByLocId(1, 1, 1);
 		Assert.assertTrue(locationList != null);
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locationList);
+		Debug.printObjects(IntegrationTestBase.INDENT, locationList);
 	}
 
 	@Test
 	public void testCountAllLocations() throws Exception {
-		long count = LocationDataManagerImplTest.manager.countAllLocations();
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testCountAllLocations(): " + count);
+		long count = this.manager.countAllLocations();
+		Debug.println(IntegrationTestBase.INDENT, "testCountAllLocations(): " + count);
 	}
 
 	@Test
@@ -151,15 +164,15 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		int start = 0;
 		int numOfRows = 5;
 
-		List<Location> locationList = LocationDataManagerImplTest.manager.getLocationsByName(name, Operation.EQUAL);
+		List<Location> locationList = this.manager.getLocationsByName(name, Operation.EQUAL);
 		Assert.assertTrue(locationList != null);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationsByName(" + name + "): " + locationList.size());
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locationList);
+		Debug.println(IntegrationTestBase.INDENT, "testGetLocationsByName(" + name + "): " + locationList.size());
+		Debug.printObjects(IntegrationTestBase.INDENT, locationList);
 
-		List<Location> locationList2 = LocationDataManagerImplTest.manager.getLocationsByName(name, start, numOfRows, Operation.EQUAL);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationsByName(" + name + ", start=" + start + ", numOfRows=" + numOfRows
+		List<Location> locationList2 = this.manager.getLocationsByName(name, start, numOfRows, Operation.EQUAL);
+		Debug.println(IntegrationTestBase.INDENT, "testGetLocationsByName(" + name + ", start=" + start + ", numOfRows=" + numOfRows
 				+ "): ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locationList2);
+		Debug.printObjects(IntegrationTestBase.INDENT, locationList2);
 	}
 
 	@Test
@@ -167,66 +180,65 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		String name = "AFGHANISTAN";
 		int start = 0;
 		int numOfRows = 5;
-		String programUUID = LocationDataManagerImplTest.commonTestProject.getUniqueID();
+		String programUUID = this.commonTestProject.getUniqueID();
 
-		List<Location> locationList = LocationDataManagerImplTest.manager.getLocationsByName(name, Operation.EQUAL, programUUID);
+		List<Location> locationList = this.manager.getLocationsByName(name, Operation.EQUAL, programUUID);
 		Assert.assertTrue("Expecting the location list returned is not null.", locationList != null);
 
-		List<Location> locationList2 =
-				LocationDataManagerImplTest.manager.getLocationsByName(name, start, numOfRows, Operation.EQUAL, programUUID);
+		List<Location> locationList2 = this.manager.getLocationsByName(name, start, numOfRows, Operation.EQUAL, programUUID);
 		Assert.assertTrue("Expecting the location list 2 returned is not null.", locationList2 != null);
 	}
 
 	@Test
 	public void testCountLocationsByName() throws Exception {
 		String name = "AFGHANISTAN";
-		long count = LocationDataManagerImplTest.manager.countLocationsByName(name, Operation.EQUAL);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testCountLocationByName(" + name + "): " + count);
+		long count = this.manager.countLocationsByName(name, Operation.EQUAL);
+		Debug.println(IntegrationTestBase.INDENT, "testCountLocationByName(" + name + "): " + count);
 	}
 
 	@Test
 	public void testCountLocationsByNameWithProgramUUID() throws Exception {
 		String name = "AFGHANISTAN";
-		String programUUID = LocationDataManagerImplTest.commonTestProject.getUniqueID();
-		long count = LocationDataManagerImplTest.manager.countLocationsByName(name, Operation.EQUAL, programUUID);
+		String programUUID = this.commonTestProject.getUniqueID();
+		long count = this.manager.countLocationsByName(name, Operation.EQUAL, programUUID);
 		Assert.assertTrue("Expecting the count returned is greated than 0", count > 0);
 	}
 
 	@Test
 	public void testGetLocationsByCountry() throws MiddlewareQueryException {
 		Integer id = 171; // Tested in rice db. 171 = Philippines
-		Country country = LocationDataManagerImplTest.manager.getCountryById(id);
+		Country country = this.manager.getCountryById(id);
 		int start = 0;
 		int numOfRows = 5;
 
-		List<Location> locations = LocationDataManagerImplTest.manager.getLocationsByCountry(country);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationByCountry(country=" + country + "): " + locations.size());
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locations);
+		List<Location> locations = this.manager.getLocationsByCountry(country);
+		Debug.println(IntegrationTestBase.INDENT, "testGetLocationByCountry(country=" + country + "): " + locations.size());
+		Debug.printObjects(IntegrationTestBase.INDENT, locations);
 
-		List<Location> locationList = LocationDataManagerImplTest.manager.getLocationsByCountry(country, start, numOfRows);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationByCountry(country=" + country + ", start=" + start + ", numOfRows="
+		List<Location> locationList = this.manager.getLocationsByCountry(country, start, numOfRows);
+		Debug.println(IntegrationTestBase.INDENT, "testGetLocationByCountry(country=" + country + ", start=" + start + ", numOfRows="
 				+ numOfRows + "): " + locationList.size());
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locationList);
+		Debug.printObjects(IntegrationTestBase.INDENT, locationList);
 	}
 
 	@Test
 	public void testGetLocationsByCountryAndType() throws MiddlewareQueryException {
 		Integer id = 1; // Tested in rice db. 171 = Philippines
-		Country country = LocationDataManagerImplTest.manager.getCountryById(id);
+		Country country = this.manager.getCountryById(id);
 		int type = 405;
 
-		List<Location> locations = LocationDataManagerImplTest.manager.getLocationsByCountryAndType(country, type);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationByCountryAndType(country=" + country + "): type= " + type + ":"
+		List<Location> locations = this.manager.getLocationsByCountryAndType(country, type);
+		Debug.println(IntegrationTestBase.INDENT, "testGetLocationByCountryAndType(country=" + country + "): type= " + type + ":"
 				+ locations.size());
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locations);
+		Debug.printObjects(IntegrationTestBase.INDENT, locations);
 	}
 
 	@Test
 	public void testCountLocationsByCountry() throws Exception {
 		Integer id = 171; // Tested in rice db. 171 = Philippines
-		Country country = LocationDataManagerImplTest.manager.getCountryById(id);
-		long count = LocationDataManagerImplTest.manager.countLocationsByCountry(country);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testCountLocationByCountry(country=" + country + "): " + count);
+		Country country = this.manager.getCountryById(id);
+		long count = this.manager.countLocationsByCountry(country);
+		Debug.println(IntegrationTestBase.INDENT, "testCountLocationByCountry(country=" + country + "): " + count);
 	}
 
 	@Test
@@ -235,40 +247,39 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		int start = 0;
 		int numOfRows = 5;
 
-		List<Location> locations = LocationDataManagerImplTest.manager.getLocationsByType(type);
+		List<Location> locations = this.manager.getLocationsByType(type);
 		Assert.assertNotNull("Expecting to have returned results.", locations);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationByType(type=" + type + "): " + locations.size());
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locations);
+		Debug.println(IntegrationTestBase.INDENT, "testGetLocationByType(type=" + type + "): " + locations.size());
+		Debug.printObjects(IntegrationTestBase.INDENT, locations);
 
 		String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
-		List<Location> locationsByProgramUUID = LocationDataManagerImplTest.manager.getLocationsByType(type, programUUID);
+		List<Location> locationsByProgramUUID = this.manager.getLocationsByType(type, programUUID);
 		Assert.assertNotNull("Expecting to have returned results.", locationsByProgramUUID);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationByType(type=" + type + "): " + locations.size());
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locationsByProgramUUID);
+		Debug.println(IntegrationTestBase.INDENT, "testGetLocationByType(type=" + type + "): " + locations.size());
+		Debug.printObjects(IntegrationTestBase.INDENT, locationsByProgramUUID);
 
-		List<Location> locationList = LocationDataManagerImplTest.manager.getLocationsByType(type, start, numOfRows);
+		List<Location> locationList = this.manager.getLocationsByType(type, start, numOfRows);
 		Assert.assertNotNull("Expecting to have returned results.", locationList);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationByType(type=" + type + ", start=" + start + ", numOfRows="
-				+ numOfRows + "): " + locationList.size());
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locations);
+		Debug.println(IntegrationTestBase.INDENT, "testGetLocationByType(type=" + type + ", start=" + start + ", numOfRows=" + numOfRows
+				+ "): " + locationList.size());
+		Debug.printObjects(IntegrationTestBase.INDENT, locations);
 	}
 
 	@Test
 	public void testCountLocationsByType() throws Exception {
 		Integer type = 405; // Tested in rice db
-		long count = LocationDataManagerImplTest.manager.countLocationsByType(type);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testCountLocationByType(type=" + type + "): " + count);
+		long count = this.manager.countLocationsByType(type);
+		Debug.println(IntegrationTestBase.INDENT, "testCountLocationByType(type=" + type + "): " + count);
 
 		String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
 		type = 405;
-		count = LocationDataManagerImplTest.manager.countLocationsByType(type, programUUID);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testCountLocationByType(type=" + type + "): " + count);
+		count = this.manager.countLocationsByType(type, programUUID);
+		Debug.println(IntegrationTestBase.INDENT, "testCountLocationByType(type=" + type + "): " + count);
 	}
 
 	@Test
 	public void testAddLocation() throws MiddlewareQueryException {
 		Location location = new Location();
-		location.setLocid(-1);
 		location.setCntryid(1);
 		location.setLabbr("");
 		location.setLname("TEST-LOCATION-1");
@@ -280,13 +291,11 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		location.setSnl3id(1);
 
 		// add the location
-		Integer id = LocationDataManagerImplTest.manager.addLocation(location);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testAddLocation(" + location + "): " + id + "  \n  "
-				+ LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL));
-
-		// cleanup
-		LocationDataManagerImplTest.manager.deleteLocation(LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-1", 0, 5,
-				Operation.EQUAL).get(0));
+		Integer id = this.manager.addLocation(location);
+		Debug.println(
+				IntegrationTestBase.INDENT,
+				"testAddLocation(" + location + "): " + id + "  \n  "
+						+ this.manager.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL));
 	}
 
 	@Test
@@ -295,7 +304,6 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		List<Location> locations = new ArrayList<Location>();
 
 		Location location1 = new Location();
-		location1.setLocid(-2);
 		location1.setCntryid(1);
 		location1.setLabbr("");
 		location1.setLname("TEST-LOCATION-2");
@@ -307,7 +315,6 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		location1.setSnl3id(1);
 
 		Location location2 = new Location();
-		location2.setLocid(-3);
 		location2.setCntryid(1);
 		location2.setLabbr("");
 		location2.setLname("TEST-LOCATION-3");
@@ -322,76 +329,67 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		locations.add(location2);
 
 		// add the location
-		List<Integer> locationsAdded = LocationDataManagerImplTest.manager.addLocation(locations);
+		List<Integer> locationsAdded = this.manager.addLocation(locations);
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testAddLocations() Locations added: " + locationsAdded.size());
-		Debug.println(MiddlewareIntegrationTest.INDENT,
-				LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL));
-		Debug.println(MiddlewareIntegrationTest.INDENT,
-				LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL));
-
-		// cleanup
-		LocationDataManagerImplTest.manager.deleteLocation(LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-2", 0, 5,
-				Operation.EQUAL).get(0));
-		LocationDataManagerImplTest.manager.deleteLocation(LocationDataManagerImplTest.manager.getLocationsByName("TEST-LOCATION-3", 0, 5,
-				Operation.EQUAL).get(0));
+		Debug.println(IntegrationTestBase.INDENT, "testAddLocations() Locations added: " + locationsAdded.size());
+		Debug.println(IntegrationTestBase.INDENT, this.manager.getLocationsByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL));
+		Debug.println(IntegrationTestBase.INDENT, this.manager.getLocationsByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL));
 	}
 
 	@Test
 	public void testGetUserDefinedFieldByFieldTable() throws MiddlewareQueryException {
 		String tableName = "LOCATION";
 		String fieldType = "LTYPE";
-		List<UserDefinedField> userDefinedField =
-				LocationDataManagerImplTest.manager.getUserDefinedFieldByFieldTableNameAndType(tableName, fieldType);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetUserDefineFieldByTableNameAndType(type=" + tableName + "): "
-				+ userDefinedField.size());
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, userDefinedField);
+		List<UserDefinedField> userDefinedField = this.manager.getUserDefinedFieldByFieldTableNameAndType(tableName, fieldType);
+		Debug.println(IntegrationTestBase.INDENT,
+				"testGetUserDefineFieldByTableNameAndType(type=" + tableName + "): " + userDefinedField.size());
+		Debug.printObjects(IntegrationTestBase.INDENT, userDefinedField);
 	}
 
 	@Test
 	public void testGetAllBreedingLocations() throws MiddlewareQueryException {
-		List<Location> locations = LocationDataManagerImplTest.manager.getAllBreedingLocations();
-		Debug.println(MiddlewareIntegrationTest.INDENT, "getAllBreedingLocations()  " + locations);
+		List<Location> locations = this.manager.getAllBreedingLocations();
+		Debug.println(IntegrationTestBase.INDENT, "getAllBreedingLocations()  " + locations);
 	}
 
 	@Test
 	public void testCountAllBreedingLocations() throws MiddlewareQueryException {
-		Long locationCount = LocationDataManagerImplTest.manager.countAllBreedingLocations();
-		Debug.println(MiddlewareIntegrationTest.INDENT, "countAllBreedingLocations() - Total Count = " + locationCount);
+		Long locationCount = this.manager.countAllBreedingLocations();
+		Debug.println(IntegrationTestBase.INDENT, "countAllBreedingLocations() - Total Count = " + locationCount);
 	}
 
 	@Test
 	public void testGetCountryById() throws Exception {
 		Integer id = Integer.valueOf(1);
-		Country countries = LocationDataManagerImplTest.manager.getCountryById(id);
+		Country countries = this.manager.getCountryById(id);
 		Assert.assertNotNull(countries);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetCountryById(" + id + "): ");
-		Debug.println(MiddlewareIntegrationTest.INDENT, countries);
+		Debug.println(IntegrationTestBase.INDENT, "testGetCountryById(" + id + "): ");
+		Debug.println(IntegrationTestBase.INDENT, countries);
 	}
 
 	@Test
 	public void testGetLocationByID() throws Exception {
 		Integer id = Integer.valueOf(1);
-		Location locid = LocationDataManagerImplTest.manager.getLocationByID(id);
+		Location locid = this.manager.getLocationByID(id);
 		Assert.assertNotNull(locid);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationByID(" + id + "): ");
-		Debug.println(MiddlewareIntegrationTest.INDENT, locid);
+		Debug.println(IntegrationTestBase.INDENT, "testGetLocationByID(" + id + "): ");
+		Debug.println(IntegrationTestBase.INDENT, locid);
 	}
 
 	@Test
 	public void testGetLocationDetailsByLocId() throws Exception {
 		Integer locationId = Integer.valueOf(2);
-		List<LocationDetails> locdetails = LocationDataManagerImplTest.manager.getLocationDetailsByLocId(locationId, 0, 100);
+		List<LocationDetails> locdetails = this.manager.getLocationDetailsByLocId(locationId, 0, 100);
 		Assert.assertNotNull(locdetails);
 		Assert.assertTrue(!locdetails.isEmpty());
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testGetLocationDetailsByLocId(" + locationId + "): ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, locdetails);
+		Debug.println(IntegrationTestBase.INDENT, "testGetLocationDetailsByLocId(" + locationId + "): ");
+		Debug.printObjects(IntegrationTestBase.INDENT, locdetails);
 	}
 
 	@Test
 	public void testGetUserDefinedFieldByID() throws Exception {
 		Integer id = Integer.valueOf(2);
-		UserDefinedField result = LocationDataManagerImplTest.manager.getUserDefinedFieldByID(id);
+		UserDefinedField result = this.manager.getUserDefinedFieldByID(id);
 		Assert.assertNotNull(result);
 		Debug.println(3, result);
 	}
@@ -399,7 +397,7 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testGetAllFieldLocations() throws Exception {
 		Integer locationId = 17649; // TODO replace later with get field by id OR get first BREED ltype from location
-		List<Location> result = LocationDataManagerImplTest.manager.getAllFieldLocations(locationId);
+		List<Location> result = this.manager.getAllFieldLocations(locationId);
 		Assert.assertNotNull(result);
 		Debug.printObjects(3, result);
 	}
@@ -407,7 +405,7 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testGetAllBlockLocations() throws Exception {
 		Integer fieldId = -11; // TODO replace later with get field by id OR get first field from location
-		List<Location> result = LocationDataManagerImplTest.manager.getAllBlockLocations(fieldId);
+		List<Location> result = this.manager.getAllBlockLocations(fieldId);
 		Assert.assertNotNull(result);
 		Debug.printObjects(3, result);
 	}
@@ -415,21 +413,21 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testGetBlockInformation() throws Exception {
 		Integer blockId = -15;
-		FieldmapBlockInfo result = LocationDataManagerImplTest.manager.getBlockInformation(blockId);
+		FieldmapBlockInfo result = this.manager.getBlockInformation(blockId);
 		Assert.assertNotNull(result);
 		Debug.println(3, result);
 	}
 
 	@Test
 	public void testGetAllFields() throws Exception {
-		List<Location> result = LocationDataManagerImplTest.manager.getAllFields();
+		List<Location> result = this.manager.getAllFields();
 		Assert.assertNotNull(result);
 		Debug.printObjects(3, result);
 	}
 
 	@Test
 	public void testGetProvincesByCountry() throws Exception {
-		List<Location> provinces = LocationDataManagerImplTest.manager.getAllProvincesByCountry(101);
+		List<Location> provinces = this.manager.getAllProvincesByCountry(101);
 
 		Assert.assertNotNull(provinces);
 		Assert.assertTrue(provinces.size() > 0);
@@ -439,11 +437,11 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void testGeorefIntegration() throws Exception {
 		// retrieve all breeding location
-		List<Location> breedingLocations = LocationDataManagerImplTest.manager.getAllBreedingLocations();
+		List<Location> breedingLocations = this.manager.getAllBreedingLocations();
 
 		Assert.assertTrue(breedingLocations.size() > 0); // must have a data
 
-		Location aculcoLoc = LocationDataManagerImplTest.manager.getLocationByID(25340); // this location exists on rice central
+		Location aculcoLoc = this.manager.getLocationByID(25340); // this location exists on rice central
 
 		// aculco is in wheat
 		if (aculcoLoc != null) {
@@ -457,8 +455,7 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 			Assert.assertTrue(aculcoLoc.getGeoref().getAlt() == 2080);
 
 			// test LocationDAO.getLocationDetails()
-			List<LocationDetails> locationDetails =
-					LocationDataManagerImplTest.manager.getLocationDetailsByLocId(aculcoLoc.getLocid(), 0, Integer.MAX_VALUE);
+			List<LocationDetails> locationDetails = this.manager.getLocationDetailsByLocId(aculcoLoc.getLocid(), 0, Integer.MAX_VALUE);
 
 			locationDetails.get(0).getLongitude();
 			locationDetails.get(0).getLatitude();
@@ -474,20 +471,20 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 	@Test
 	public void getProgramLocationsAndDeleteByUniqueId() {
 		// create program locations
-		String programUUID = LocationDataManagerImplTest.commonTestProject.getUniqueID();
+		String programUUID = this.commonTestProject.getUniqueID();
 		int testLocationID1 = 100000;
 		int testLocationID2 = 100001;
 		Location testLocation1 = this.createLocationTestData(testLocationID1, programUUID);
 		Location testLocation2 = this.createLocationTestData(testLocationID2, programUUID);
 		try {
-			LocationDataManagerImplTest.manager.addLocation(testLocation1);
-			LocationDataManagerImplTest.manager.addLocation(testLocation2);
+			this.manager.addLocation(testLocation1);
+			this.manager.addLocation(testLocation2);
 			// verify
-			List<Location> locationList = LocationDataManagerImplTest.manager.getProgramLocations(programUUID);
+			List<Location> locationList = this.manager.getProgramLocations(programUUID);
 			Assert.assertEquals("There should be 2 program locations with programUUID[" + programUUID + "]", 2, locationList.size());
 			// delete locations
-			LocationDataManagerImplTest.manager.deleteProgramLocationsByUniqueId(programUUID);
-			locationList = LocationDataManagerImplTest.manager.getProgramLocations(programUUID);
+			this.manager.deleteProgramLocationsByUniqueId(programUUID);
+			locationList = this.manager.getProgramLocations(programUUID);
 			Assert.assertTrue("There should be no program locations with programUUID[" + programUUID + "]", locationList.isEmpty());
 		} catch (MiddlewareQueryException e) {
 			Assert.fail("Getting of Program Methods Failed ");
@@ -497,7 +494,6 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 	private Location createLocationTestData(int id, String programUUID) {
 		Location location = new Location();
 		location.setUniqueID(programUUID);
-		location.setLocid(id);
 		location.setLrplce(0);
 		location.setLname("TEST-LOCATION" + id);
 		location.setLabbr("");
@@ -517,8 +513,7 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		String locationName = "";
 		Country country = null;
 		Integer locationTypeId = null;
-		List<Location> locationList =
-				LocationDataManagerImplTest.manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
+		List<Location> locationList = this.manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
 		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
 	}
 
@@ -527,8 +522,7 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		String locationName = "";
 		Country country = null;
 		Integer locationTypeId = 0;
-		List<Location> locationList =
-				LocationDataManagerImplTest.manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
+		List<Location> locationList = this.manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
 		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
 		boolean hasLocationWithNonZeroLtypeId = false;
 		for (Location location : locationList) {
@@ -545,8 +539,7 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		String locationName = "";
 		Country country = null;
 		Integer locationTypeId = LocationDataManagerImplTest.COUNTRY_LTYPEID;
-		List<Location> locationList =
-				LocationDataManagerImplTest.manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
+		List<Location> locationList = this.manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
 		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
 		for (Location location : locationList) {
 			Assert.assertEquals("Location should have a lytpeId = " + LocationDataManagerImplTest.COUNTRY_LTYPEID,
@@ -560,8 +553,7 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		Country country = new Country();
 		country.setCntryid(LocationDataManagerImplTest.PHILIPPINES_CNTRYID);
 		Integer locationTypeId = null;
-		List<Location> locationList =
-				LocationDataManagerImplTest.manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
+		List<Location> locationList = this.manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
 		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
 		for (Location location : locationList) {
 			Assert.assertEquals("Location should have a countryId = " + LocationDataManagerImplTest.PHILIPPINES_CNTRYID,
@@ -574,12 +566,55 @@ public class LocationDataManagerImplTest extends DataManagerIntegrationTest {
 		String locationName = "Phil";
 		Country country = null;
 		Integer locationTypeId = null;
-		List<Location> locationList =
-				LocationDataManagerImplTest.manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
+		List<Location> locationList = this.manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
 		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
 		for (Location location : locationList) {
 			Assert.assertTrue("Location should have a location name having the keyword " + locationName, location.getLname().toLowerCase()
 					.contains(locationName.toLowerCase()));
+		}
+	}
+
+	@Test
+	public void testGetLocdesByLocId() throws MiddlewareQueryException {
+		Integer locationId = 700000019;
+		List<Locdes> locdesList = this.manager.getLocdesByLocId(locationId);
+		Assert.assertNotNull(locdesList);
+		for (Locdes locdes : locdesList) {
+			Assert.assertEquals(locationId, locdes.getLocationId());
+		}
+	}
+
+	@Test
+	public void testSaveOrUpdateLocdesList() throws MiddlewareQueryException {
+		Integer locationId = 700000019;
+		List<Locdes> existingLocdesList = this.manager.getLocdesByLocId(locationId);
+		int rowsInPlotTypeId = 308;
+		Map<Integer, String> ldidToRowsInPlotMap = new HashMap<>();
+		if (existingLocdesList != null && !existingLocdesList.isEmpty()) {
+			// update rows in plot to 5
+			for (Locdes locdes : existingLocdesList) {
+				if (locdes.getTypeId() == rowsInPlotTypeId) {
+					ldidToRowsInPlotMap.put(locdes.getLdid(), locdes.getDval());
+					locdes.setDval("5");
+				}
+			}
+			this.manager.saveOrUpdateLocdesList(locationId, existingLocdesList);
+			List<Locdes> newLocdesList = this.manager.getLocdesByLocId(locationId);
+			Assert.assertEquals(existingLocdesList.size(), newLocdesList.size());
+			for (Locdes locdes : newLocdesList) {
+				if (locdes.getTypeId() == rowsInPlotTypeId) {
+					Assert.assertEquals("5", locdes.getDval());
+					locdes.setDval(ldidToRowsInPlotMap.get(locdes.getLdid()));
+				}
+			}
+			// revert to previous rows in plot
+			this.manager.saveOrUpdateLocdesList(locationId, newLocdesList);
+			List<Locdes> revertedLocdesList = this.manager.getLocdesByLocId(locationId);
+			for (Locdes locdes : revertedLocdesList) {
+				if (locdes.getTypeId() == rowsInPlotTypeId) {
+					Assert.assertEquals(ldidToRowsInPlotMap.get(locdes.getLdid()), locdes.getDval());
+				}
+			}
 		}
 	}
 

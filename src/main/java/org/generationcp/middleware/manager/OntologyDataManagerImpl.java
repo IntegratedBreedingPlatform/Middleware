@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -45,11 +45,11 @@ import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class OntologyDataManagerImpl extends DataManager implements OntologyDataManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(OntologyDataManagerImpl.class);
@@ -90,8 +90,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		Term existingStdVar = this.findTermByName(stdVariable.getName(), CvId.VARIABLES);
 		if (existingStdVar != null) {
@@ -101,7 +101,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 		try {
 
-			trans = session.beginTransaction();
+
 			// check if scale, property and method exists first
 			Term scale = this.findTermByName(stdVariable.getScale().getName(), CvId.SCALES);
 			if (scale == null) {
@@ -134,19 +134,19 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 					stdVariable.getMethod().getName()) == null) {
 				this.getStandardVariableSaver().save(stdVariable);
 			}
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
 		}
 	}
 
 	@Override
 	public void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
-		trans = session.beginTransaction();
+
 
 		try {
 
@@ -154,11 +154,75 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				this.getStandardVariableSaver().save(stdVariable);
 			}
 
-			trans.commit();
+
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
+		}
+
+	}
+
+	@Override
+	public void addStandardVariableForMigrator(StandardVariable stdVariable) throws MiddlewareQueryException {
+
+		
+		
+
+		Term existingStdVar = this.findTermByName(stdVariable.getName(), CvId.VARIABLES);
+		if (existingStdVar != null) {
+			throw new MiddlewareQueryException(String.format(
+					"Error in addStandardVariableForMigrator, Variable with name \"%s\" already exists", stdVariable.getName()));
+		}
+
+		try {
+
+
+			// check if scale, property and method exists first
+			Term scale = this.findTermByName(stdVariable.getScale().getName(), CvId.SCALES);
+			if (scale == null) {
+				stdVariable.setScale(this.getTermSaver().save(stdVariable.getScale().getName(), stdVariable.getScale().getDefinition(),
+						CvId.SCALES));
+				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
+					OntologyDataManagerImpl.LOG.debug("new scale with id = " + stdVariable.getScale().getId());
+				}
+			} else if (stdVariable.getScale().getId() == 0) {
+				stdVariable.setScale(scale);
+			}
+
+			Term property = this.findTermByName(stdVariable.getProperty().getName(), CvId.PROPERTIES);
+			if (property == null) {
+				stdVariable.setProperty(this.getTermSaver().save(stdVariable.getProperty().getName(),
+						stdVariable.getProperty().getDefinition(), CvId.PROPERTIES));
+				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
+					OntologyDataManagerImpl.LOG.debug("new property with id = " + stdVariable.getProperty().getId());
+				}
+			} else if (stdVariable.getProperty().getId() == 0) {
+				stdVariable.setProperty(property);
+			}
+
+			Term method = this.findTermByName(stdVariable.getMethod().getName(), CvId.METHODS);
+			if (method == null) {
+				stdVariable.setMethod(this.getTermSaver().save(stdVariable.getMethod().getName(), stdVariable.getMethod().getDefinition(),
+						CvId.METHODS));
+				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
+					OntologyDataManagerImpl.LOG.debug("new method with id = " + stdVariable.getMethod().getId());
+				}
+			} else if (stdVariable.getMethod().getId() == 0) {
+				stdVariable.setMethod(method);
+			}
+
+			StandardVariable existingStandardVariable = this.findStandardVariableByTraitScaleMethodNames(
+			stdVariable.getProperty().getName(), stdVariable.getScale().getName(), stdVariable.getMethod().getName());
+			if (existingStandardVariable == null) {
+				this.getStandardVariableSaver().save(stdVariable);
+			} else {
+				stdVariable.setId(existingStandardVariable.getId());
+			}
+
+		} catch (Exception e) {
+
+			throw new MiddlewareQueryException("Error in addStandardVariableForMigrator " + e.getMessage(), e);
 		}
 
 	}
@@ -280,20 +344,20 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			return term;
 		}
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 			if (CvId.VARIABLES.getId() != cvId.getId()) {
-				trans = session.beginTransaction();
+
 				term = this.getTermSaver().save(name, definition, cvId);
-				trans.commit();
+
 			} else {
 				throw new MiddlewareQueryException("Variables cannot be used in this method.");
 			}
 			return term;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in addTerm: " + e.getMessage(), e);
 		}
 	}
@@ -301,19 +365,19 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public void updateTerm(Term term) throws MiddlewareException {
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		if (term == null) {
 			return;
 		}
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getTermSaver().update(term);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in updateTerm: " + e.getMessage(), e);
 		}
 	}
@@ -382,11 +446,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			return term;
 		}
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			trans = session.beginTransaction();
+
 			term = this.getTermSaver().save(name, definition, CvId.PROPERTIES);
 			Term isATerm = this.getTermById(isA);
 
@@ -396,9 +460,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				throw new MiddlewareQueryException("The isA passed is not a valid Class term: " + isA);
 			}
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in addProperty " + e.getMessage(), e);
 		}
 
@@ -407,17 +471,17 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			trans = session.beginTransaction();
+
 			Term term = this.saveOrUpdateCvTerm(name, definition, cvId);
-			trans.commit();
+
 
 			return term;
 		} catch (MiddlewareQueryException e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException(e.getCode(), e);
 		}
 
@@ -426,15 +490,15 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public void addOrUpdateCropOntologyID(Property property, String cropOntologyID) throws MiddlewareQueryException {
 		assert !StringUtils.isEmpty(cropOntologyID);
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getStandardVariableSaver().saveOrUpdateCropOntologyId(property.getTerm().getId(), cropOntologyID);
-			trans.commit();
+
 		} catch (MiddlewareQueryException e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException(e.getCode(), e);
 		}
 	}
@@ -442,18 +506,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public Term addOrUpdateTermAndRelationship(String name, String definition, CvId cvId, int typeId, int objectId)
 			throws MiddlewareException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
 		try {
-			trans = session.beginTransaction();
 			Term term = this.saveOrUpdateCvTerm(name, definition, cvId);
 			this.saveOrUpdateCvTermRelationship(term.getId(), objectId, typeId);
-
-			trans.commit();
 			return term;
 		} catch (MiddlewareQueryException e) {
-			this.rollbackTransaction(trans);
 			throw new MiddlewareQueryException(e.getCode(), e);
 		}
 	}
@@ -461,8 +518,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public Term updateTermAndRelationship(Term term, int typeId, int objectId) throws MiddlewareException {
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
 		Term updatedTerm = null;
 
 		if (term == null) {
@@ -470,15 +525,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		}
 
 		try {
-			trans = session.beginTransaction();
-
 			updatedTerm = this.getTermSaver().update(term);
-
 			this.saveOrUpdateCvTermRelationship(updatedTerm.getId(), objectId, typeId);
 
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in updateTerm: " + e.getMessage(), e);
 		}
 
@@ -491,9 +542,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		// If term is not existing, add
 		if (term == null) {
 			term = this.getTermSaver().save(name, definition, cvId);
-			// If term is existing, update
 		} else {
-			term = this.getTermSaver().saveOrUpdate(name, definition, cvId);
+			// If term is existing, update
+			term.setDefinition(definition);
+			this.getTermSaver().update(term);
 		}
 		return term;
 	}
@@ -565,20 +617,16 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			return new TraitClass(term, this.getTermById(parentTraitClassId));
 		}
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
 		try {
-			trans = session.beginTransaction();
+
 			term = this.getTermSaver().save(name, definition, CvId.IBDB_TERMS);
 
 			if (term != null) {
 				this.getTermRelationshipSaver().save(term.getId(), TermId.IS_A.getId(), parentTraitClassId);
 			}
 
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in addTraitClass " + e.getMessage(), e);
 		}
 		return new TraitClass(term, this.getTermById(parentTraitClassId));
@@ -657,11 +705,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			throw new MiddlewareQueryException(errorCodes, "The variable you entered is invalid");
 		}
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			trans = session.beginTransaction();
+
 
 			if (operation == Operation.ADD) {
 				this.getStandardVariableSaver().save(standardVariable);
@@ -669,10 +717,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				this.getStandardVariableSaver().update(standardVariable);
 			}
 
-			trans.commit();
+
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in saveOrUpdateStandardVariable " + e.getMessage(), e);
 		}
 	}
@@ -680,15 +728,15 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) throws MiddlewareException {
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getStandardVariableSaver().saveConstraints(standardVariableId, constraints);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in addOrUpdateStandardVariableConstraints: " + e.getMessage(), e);
 		}
 	}
@@ -696,19 +744,19 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public void deleteStandardVariableLocalConstraints(int standardVariableId) throws MiddlewareQueryException {
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			trans = session.beginTransaction();
+
 			StandardVariable stdVar = this.getStandardVariable(standardVariableId);
 
 			this.getStandardVariableSaver().deleteConstraints(stdVar);
 
-			trans.commit();
+
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in deleteStandardVariableLocalConstraints " + e.getMessage(), e);
 		}
 	}
@@ -723,15 +771,15 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 		Integer cvId = this.getEnumerationCvId(variable);
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getStandardVariableSaver().saveEnumeration(variable, enumeration, cvId);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in addStandardVariableEnumeration: " + e.getMessage(), e);
 		}
 
@@ -748,11 +796,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 		Integer cvId = this.getEnumerationCvId(variable);
 
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			trans = session.beginTransaction();
+
 			// Operation is ADD
 			if (enumeration.getId() == null) {
 				this.getStandardVariableSaver().saveEnumeration(variable, enumeration, cvId);
@@ -761,9 +809,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			} else {
 				this.getTermSaver().update(new Term(enumeration.getId(), enumeration.getName(), enumeration.getDescription()));
 			}
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in saveOrUpdateStandardVariableEnumeration: " + e.getMessage(), e);
 		}
 
@@ -784,46 +832,46 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public void deleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			trans = session.beginTransaction();
+
 			StandardVariable stdVar = this.getStandardVariable(standardVariableId);
 			this.getStandardVariableSaver().deleteEnumeration(standardVariableId, stdVar.getEnumeration(enumerationId));
 
-			trans.commit();
+
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in deleteStandardVariableEnumeration " + e.getMessage(), e);
 		}
 	}
 
 	@Override
 	public void deleteTerm(int cvTermId, CvId cvId) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 
 			if (CvId.VARIABLES.getId() != cvId.getId()) {
-				trans = session.beginTransaction();
+
 				this.getTermSaver().delete(this.getCvTermDao().getById(cvTermId), cvId);
-				trans.commit();
+
 			} else {
 				throw new MiddlewareQueryException("variables cannot be used in this method");
 			}
 		} catch (MiddlewareQueryException e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException(e.getCode(), e);
 		}
 	}
 
 	@Override
 	public void deleteTermAndRelationship(int cvTermId, CvId cvId, int typeId, int objectId) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
 			if (this.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId) != null) {
@@ -831,18 +879,18 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			}
 
 			if (CvId.VARIABLES.getId() != cvId.getId()) {
-				trans = session.beginTransaction();
+
 				this.deleteCvTermRelationship(cvTermId, typeId);
 				this.getTermSaver().delete(this.getCvTermDao().getById(cvTermId), cvId);
-				trans.commit();
+
 			} else {
 				throw new MiddlewareQueryException("variables cannot be used in this method");
 			}
 		} catch (MiddlewareQueryException e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException(e.getCode(), e);
 		} catch (MiddlewareException e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 	}
@@ -890,17 +938,17 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			trans = session.beginTransaction();
+
 			StandardVariable stdVar = this.getStandardVariable(stdVariableId);
 			this.getStandardVariableSaver().delete(stdVar);
-			trans.commit();
+
 
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException("Error in deleteStandardVariable " + e.getMessage(), e);
 		}
 	}
@@ -966,4 +1014,15 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 		return isSeedAmountVar;
 	}
+
+	@Override
+	public Integer getCVIdByName(String name) throws MiddlewareQueryException {
+		return this.getCvDao().getIdByName(name);
+	}
+
+	@Override
+	public Term findTermByName(String name, int cvId) throws MiddlewareQueryException {
+		return this.getTermBuilder().findTermByName(name, cvId);
+	}
+
 }

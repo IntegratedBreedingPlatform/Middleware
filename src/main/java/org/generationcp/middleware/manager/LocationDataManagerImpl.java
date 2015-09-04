@@ -36,10 +36,9 @@ import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.DatabaseBroker;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the LocationDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -47,6 +46,7 @@ import org.slf4j.LoggerFactory;
  * @author Joyce Avestro
  */
 @SuppressWarnings("unchecked")
+@Transactional
 public class LocationDataManagerImpl extends DataManager implements LocationDataManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(LocationDataManagerImpl.class);
@@ -104,8 +104,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public long countLocationsByName(String name, Operation op, String programUUID) throws MiddlewareQueryException {
-		return this.countAllByMethod(this.getLocationDao(), "countByNameAndUniqueID", new Object[] {name, op, programUUID}, new Class[] {
-			String.class, Operation.class, String.class});
+		return this.countAllByMethod(this.getLocationDao(), "countByNameAndUniqueID", new Object[] {name, op, programUUID},
+				new Class[] {String.class, Operation.class, String.class});
 	}
 
 	/**
@@ -126,8 +126,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Deprecated
 	public List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
 		List<String> methods = Arrays.asList("countByName", "getByName");
-		return this.getFromCentralAndLocalByMethod(this.getLocationDao(), methods, start, numOfRows, new Object[] {name, op}, new Class[] {
-			String.class, Operation.class});
+		return this.getFromCentralAndLocalByMethod(this.getLocationDao(), methods, start, numOfRows, new Object[] {name, op},
+				new Class[] {String.class, Operation.class});
 	}
 
 	/**
@@ -136,8 +136,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	@Deprecated
 	public long countLocationsByName(String name, Operation op) throws MiddlewareQueryException {
-		return this.countAllByMethod(this.getLocationDao(), "countByName", new Object[] {name, op}, new Class[] {String.class,
-			Operation.class});
+		return this.countAllByMethod(this.getLocationDao(), "countByName", new Object[] {name, op},
+				new Class[] {String.class, Operation.class});
 	}
 
 	@Override
@@ -164,8 +164,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<Location> getLocationsByType(Integer type, String programUUID) throws MiddlewareQueryException {
-		return this.getAllByMethod(this.getLocationDao(), "getByType", new Object[] {type, programUUID}, new Class[] {Integer.class,
-			String.class});
+		return this.getAllByMethod(this.getLocationDao(), "getByType", new Object[] {type, programUUID},
+				new Class[] {Integer.class, String.class});
 	}
 
 	@Override
@@ -182,8 +182,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public long countLocationsByType(Integer type, String programUUID) throws MiddlewareQueryException {
-		return this.countAllByMethod(this.getLocationDao(), "countByType", new Object[] {type, programUUID}, new Class[] {Integer.class,
-			String.class});
+		return this.countAllByMethod(this.getLocationDao(), "countByType", new Object[] {type, programUUID},
+				new Class[] {Integer.class, String.class});
 	}
 
 	@Override
@@ -282,114 +282,93 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public Integer addLocation(Location location) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		Integer idLocationSaved = null;
 		try {
-			// begin save transaction
-			trans = session.beginTransaction();
-			LocationDAO dao = this.getLocationDao();
+			
 
-			// Auto-assign IDs for new DB records
-			Integer nextId = dao.getNextId("locid");
-			location.setLocid(nextId);
+			LocationDAO dao = this.getLocationDao();
 
 			Location recordSaved = dao.saveOrUpdate(location);
 			idLocationSaved = recordSaved.getLocid();
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Location: LocationDataManager.addLocation(location=" + location
 					+ "): " + e.getMessage(), e, LocationDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return idLocationSaved;
 	}
 
 	@Override
 	public List<Integer> addLocation(List<Location> locations) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		List<Integer> idLocationsSaved = new ArrayList<Integer>();
 		try {
-			// begin save transaction
-			trans = session.beginTransaction();
+			
+
 			LocationDAO dao = this.getLocationDao();
 
 			for (Location location : locations) {
-
-				// Auto-assign IDs for new DB records
-				Integer nextID = dao.getNextId("locid");
-				location.setLocid(nextID);
-
 				Location recordSaved = dao.saveOrUpdate(location);
 				idLocationsSaved.add(recordSaved.getLocid());
 			}
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Locations: LocationDataManager.addLocation(locations=" + locations
 					+ "): " + e.getMessage(), e, LocationDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return idLocationsSaved;
 	}
 
 	@Override
 	public int addLocationAndLocdes(Location location, Locdes locdes) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		Integer idLocationSaved = null;
 		try {
-			// begin save transaction
-			trans = session.beginTransaction();
+			
+
 
 			// Auto-assign IDs for new DB records
 			LocationDAO locationDao = this.getLocationDao();
-			Integer nextId = locationDao.getNextId("locid");
-			location.setLocid(nextId);
 			Location recordSaved = locationDao.saveOrUpdate(location);
 			idLocationSaved = recordSaved.getLocid();
 
 			LocdesDAO locdesDao = this.getLocdesDao();
-			nextId = locdesDao.getNextId("ldid");
-			locdes.setLdid(nextId);
 			locdes.setLocationId(idLocationSaved);
 			locdesDao.saveOrUpdate(locdes);
 
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Location: addLocationAndLocdes(" + "location=" + location
 					+ ", locdes=" + locdes + "): " + e.getMessage(), e, LocationDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 		return idLocationSaved;
 	}
 
 	@Override
 	public void deleteLocation(Location location) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 
 		try {
-			trans = session.beginTransaction();
+
 			this.getLocationDao().makeTransient(location);
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while deleting Location: LocationDataManager.deleteLocation(location=" + location
 					+ "): " + e.getMessage(), e, LocationDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 	}
 
@@ -400,29 +379,28 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<Location> getLocationsByCountryAndType(Country country, Integer type) throws MiddlewareQueryException {
-		return super.getAllByMethod(this.getLocationDao(), "getByCountryAndType", new Object[] {country, type}, new Class[] {Country.class,
-			Integer.class});
+		return super.getAllByMethod(this.getLocationDao(), "getByCountryAndType", new Object[] {country, type},
+				new Class[] {Country.class, Integer.class});
 	}
 
 	@Override
 	public List<Location> getLocationsByNameCountryAndType(String name, Country country, Integer type) throws MiddlewareQueryException {
-		return super.getAllByMethod(this.getLocationDao(), "getByNameCountryAndType", new Object[] {name, country, type}, new Class[] {
-			String.class, Country.class, Integer.class});
+		return super.getAllByMethod(this.getLocationDao(), "getByNameCountryAndType", new Object[] {name, country, type},
+				new Class[] {String.class, Country.class, Integer.class});
 	}
 
 	@Override
 	public List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows) throws MiddlewareQueryException {
-		return super.getAllByMethod(this.getLocationDao(), "getLocationDetails", new Object[] {locationId, start, numOfRows}, new Class[] {
-			Integer.class, Integer.class, Integer.class});
+		return super.getAllByMethod(this.getLocationDao(), "getLocationDetails", new Object[] {locationId, start, numOfRows},
+				new Class[] {Integer.class, Integer.class, Integer.class});
 
 	}
 
 	@Override
 	public List<Location> getAllBreedingLocations() throws MiddlewareQueryException {
 
-		List<Location> allLocations =
-				this.getFromInstanceByMethod(this.getLocationDAO(), Database.LOCAL, "getAllBreedingLocations", new Object[] {},
-						new Class[] {});
+		List<Location> allLocations = this.getFromInstanceByMethod(this.getLocationDAO(), Database.LOCAL, "getAllBreedingLocations",
+				new Object[] {}, new Class[] {});
 
 		return allLocations;
 	}
@@ -433,18 +411,13 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public Integer getNextNegativeId() throws MiddlewareQueryException {
-		return this.getLocationDao().getNextId("locid");
-
-	}
-
-	@Override
 	public List<Location> getAllFieldLocations(int locationId) throws MiddlewareQueryException {
 		Integer fieldParentFldId = this.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.FIELD_PARENT.getCode());
 		Integer fieldLtypeFldId = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
 
-		return super.getAllByMethod(this.getLocationDao(), "getLocationsByDTypeAndLType", new Object[] {String.valueOf(locationId),
-			fieldParentFldId, fieldLtypeFldId}, new Class[] {String.class, Integer.class, Integer.class});
+		return super.getAllByMethod(this.getLocationDao(), "getLocationsByDTypeAndLType",
+				new Object[] {String.valueOf(locationId), fieldParentFldId, fieldLtypeFldId},
+				new Class[] {String.class, Integer.class, Integer.class});
 	}
 
 	@Override
@@ -452,8 +425,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		Integer blockParentFldId = this.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode());
 		Integer blockLtypeFldId = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
 
-		return super.getAllByMethod(this.getLocationDao(), "getLocationsByDTypeAndLType", new Object[] {String.valueOf(fieldId),
-			blockParentFldId, blockLtypeFldId}, new Class[] {String.class, Integer.class, Integer.class});
+		return super.getAllByMethod(this.getLocationDao(), "getLocationsByDTypeAndLType",
+				new Object[] {String.valueOf(fieldId), blockParentFldId, blockLtypeFldId},
+				new Class[] {String.class, Integer.class, Integer.class});
 	}
 
 	@Override
@@ -505,9 +479,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	public List<Location> getAllFields() throws MiddlewareQueryException {
 		Integer fieldLtype = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
 		Integer relationshipType = this.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.FIELD_PARENT.getCode());
-		List<Location> locations =
-				super.getAllByMethod(this.getLocationDao(), "getByTypeWithParent", new Object[] {fieldLtype, relationshipType},
-						new Class[] {Integer.class, Integer.class});
+		List<Location> locations = super.getAllByMethod(this.getLocationDao(), "getByTypeWithParent",
+				new Object[] {fieldLtype, relationshipType}, new Class[] {Integer.class, Integer.class});
 
 		Set<Integer> parentIds = new HashSet<Integer>();
 		for (Location location : locations) {
@@ -530,9 +503,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<Location> getAllProvincesByCountry(Integer countryId) throws MiddlewareQueryException {
-		List<Location> provinces =
-				super.getAllByMethod(this.getLocationDao(), "getAllProvincesByCountry", new Object[] {countryId},
-						new Class[] {Integer.class});
+		List<Location> provinces = super.getAllByMethod(this.getLocationDao(), "getAllProvincesByCountry", new Object[] {countryId},
+				new Class[] {Integer.class});
 
 		return provinces;
 	}
@@ -560,29 +532,43 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public void deleteProgramLocationsByUniqueId(String programUUID) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 		LocationDAO locationDao = this.getLocationDao();
-		int deleted = 0;
 		try {
-			trans = session.beginTransaction();
 			List<Location> list = this.getProgramLocations(programUUID);
 			for (Location location : list) {
 				locationDao.makeTransient(location);
-				if (deleted % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					locationDao.flush();
-					locationDao.clear();
-				}
 			}
-			trans.commit();
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
 			this.logAndThrowException(
 					"Error encountered while deleting locations: GermplasmDataManager.deleteProgramLocationsByUniqueId(uniqueId="
-							+ programUUID + "): " + e.getMessage(), e, LocationDataManagerImpl.LOG);
-		} finally {
-			session.flush();
+							+ programUUID + "): " + e.getMessage(),
+					e, LocationDataManagerImpl.LOG);
 		}
+	}
+
+	@Override
+	public List<Locdes> getLocdesByLocId(Integer locationId) throws MiddlewareQueryException {
+		return this.getLocationDao().getLocdesByLocId(locationId);
+	}
+
+	@Override
+	public void saveOrUpdateLocdesList(Integer locId, List<Locdes> locdesList) throws MiddlewareQueryException {
+
+		if (locdesList != null && !locdesList.isEmpty()) {
+			try {
+				List<Locdes> existingLocdesList = this.getLocDesDao().getByLocation(locId);
+				for (Locdes locdes : locdesList) {
+					this.getLocdesSaver().saveOrUpdateLocdes(locdes.getLocationId(), existingLocdesList, locdes.getTypeId(),
+							locdes.getDval(), locdes.getUserId());
+				}
+			} catch (Exception e) {
+				this.logAndThrowException("Error encountered with saveOrUpdateLocdesList(): " + e.getMessage(), e,
+						LocationDataManagerImpl.LOG);
+			}
+		}
+
 	}
 
 }

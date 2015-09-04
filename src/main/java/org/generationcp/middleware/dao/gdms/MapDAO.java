@@ -398,14 +398,13 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 
 	public void deleteByMapId(int mapId) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			SQLQuery statement = this.getSession().createSQLQuery("DELETE FROM gdms_map WHERE map_id = " + mapId);
 			statement.executeUpdate();
-
-			this.flush();
-			this.clear();
-
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deleteByMapId=" + mapId + " in MapDAO: " + e.getMessage(), e);
 		}

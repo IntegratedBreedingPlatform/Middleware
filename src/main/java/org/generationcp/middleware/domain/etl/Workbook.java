@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.etl;
@@ -40,7 +40,9 @@ public class Workbook {
 	private List<MeasurementVariable> variates;
 
 	private List<MeasurementRow> observations;
-	private List<MeasurementRow> exportArrangedObservations; // for exporting only
+
+	// for exporting only
+	private List<MeasurementRow> exportArrangedObservations;
 
 	// derived variables used to improve performance
 	private List<String> trialHeaders;
@@ -62,7 +64,8 @@ public class Workbook {
 
 	private Integer totalNumberOfInstances;
 
-	private Map<String, MeasurementVariable> measurementDatasetVariablesMap; // added for optimization
+	// added for optimization
+	private Map<String, MeasurementVariable> measurementDatasetVariablesMap;
 
 	private Integer studyId;
 	private Integer trialDatasetId;
@@ -81,7 +84,7 @@ public class Workbook {
 	private List<StandardVariable> expDesignVariables;
 	private boolean hasExistingDataOverwrite;
 	private List<Integer> columnOrderedLists;
-	
+
 	public Workbook() {
 		this.reset();
 	}
@@ -242,7 +245,7 @@ public class Workbook {
 	}
 
 	public List<MeasurementVariable> getMeasurementDatasetVariablesView() {
-		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+		Set<MeasurementVariable> list = new HashSet<MeasurementVariable>();
 		if (!this.isNursery()) {
 			MeasurementVariable trialFactor = null;
 			if (this.getTrialFactors() != null) {
@@ -258,8 +261,8 @@ public class Workbook {
 			}
 		}
 		list.addAll(this.getMeasurementDatasetVariables());
-		list = this.arrangeMeasurementVariables(list);
-		return list;
+
+		return this.arrangeMeasurementVariables(new ArrayList<>(list));
 	}
 
 	public Map<String, MeasurementVariable> getMeasurementDatasetVariablesMap() {
@@ -289,20 +292,19 @@ public class Workbook {
 	}
 
 	public List<MeasurementVariable> getTrialVariables() {
-		
+
 		Set<MeasurementVariable> unique = new HashSet<>();
-		
+
 		if (this.trialVariables == null) {
 			unique.addAll(this.getConditionsAndConstants(false));
-			
-			List<MeasurementVariable> trialFactors = this.getTrialFactors();
-			if (trialFactors != null) {
-				
-				unique.addAll(trialFactors);
+
+			if (this.getTrialFactors() != null) {
+
+				unique.addAll(this.getTrialFactors());
 
 			}
 			this.trialVariables = new ArrayList<>(unique);
-			
+
 		}
 		return this.trialVariables;
 	}
@@ -852,7 +854,7 @@ public class Workbook {
 
 			return rows;
 		}
-		return null;
+		return new ArrayList<MeasurementRow>();
 	}
 
 	public void updateTrialObservationsWithReferenceList(List<List<ValueReference>> trialList) {

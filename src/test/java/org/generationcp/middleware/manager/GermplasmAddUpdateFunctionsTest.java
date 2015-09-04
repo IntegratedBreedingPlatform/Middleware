@@ -14,24 +14,19 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class GermplasmAddUpdateFunctionsTest extends DataManagerIntegrationTest {
+public class GermplasmAddUpdateFunctionsTest extends IntegrationTestBase {
 
-	private static GermplasmDataManager manager;
-
-	@BeforeClass
-	public static void setUp() throws Exception {
-		GermplasmAddUpdateFunctionsTest.manager = DataManagerIntegrationTest.managerFactory.getGermplasmDataManager();
-	}
+	@Autowired
+	private GermplasmDataManager manager;
 
 	@Test
 	public void testAddAndUpdateGermplasm() throws Exception {
@@ -46,6 +41,7 @@ public class GermplasmAddUpdateFunctionsTest extends DataManagerIntegrationTest 
 		g.setLocationId(Integer.valueOf(9000));
 		g.setMethodId(Integer.valueOf(1));
 		g.setMgid(Integer.valueOf(1));
+		g.setLgid(Integer.valueOf(1));
 		// g.setUserId(Integer.valueOf(527));
 		g.setUserId(Integer.valueOf(1));
 		g.setReferenceId(Integer.valueOf(1));
@@ -58,12 +54,12 @@ public class GermplasmAddUpdateFunctionsTest extends DataManagerIntegrationTest 
 		n.setTypeId(Integer.valueOf(1));
 		n.setUserId(Integer.valueOf(1));
 
-		Integer addedGid = GermplasmAddUpdateFunctionsTest.manager.addGermplasm(g, n);
+		Integer addedGid = this.manager.addGermplasm(g, n);
 
 		Debug.println(0, "Germplasm added: " + addedGid);
 
-		Germplasm oldG = GermplasmAddUpdateFunctionsTest.manager.getGermplasmByGID(addedGid);
-		Name name = GermplasmAddUpdateFunctionsTest.manager.getNameByGIDAndNval(addedGid, n.getNval(), GetGermplasmByNameModes.NORMAL);
+		Germplasm oldG = this.manager.getGermplasmByGID(addedGid);
+		Name name = this.manager.getNameByGIDAndNval(addedGid, n.getNval(), GetGermplasmByNameModes.NORMAL);
 
 		Assert.assertNotNull(oldG.getGid());
 		Assert.assertEquals(g.getLocationId(), oldG.getLocationId());
@@ -73,18 +69,18 @@ public class GermplasmAddUpdateFunctionsTest extends DataManagerIntegrationTest 
 		List<Germplasm> gList = new ArrayList<Germplasm>();
 		oldG.setGdate(3000);
 		gList.add(oldG);
-		GermplasmAddUpdateFunctionsTest.manager.updateGermplasm(gList);
-		Germplasm newG = GermplasmAddUpdateFunctionsTest.manager.getGermplasmByGID(addedGid);
+		this.manager.updateGermplasm(gList);
+		Germplasm newG = this.manager.getGermplasmByGID(addedGid);
 		Assert.assertEquals(newG.getGdate(), oldG.getGdate());
 
 		// update the GID via grplce
 		newG.setGrplce(addedGid);
 		gList.clear();
 		gList.add(newG);
-		GermplasmAddUpdateFunctionsTest.manager.updateGermplasm(gList);
-		Germplasm newerG = GermplasmAddUpdateFunctionsTest.manager.getGermplasmByGID(newG.getGid());
+		this.manager.updateGermplasm(gList);
+		Germplasm newerG = this.manager.getGermplasmByGID(newG.getGid());
 		Assert.assertNull(newerG);
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testUpdateGermplasm(" + addedGid + ")");
+		Debug.println(IntegrationTestBase.INDENT, "testUpdateGermplasm(" + addedGid + ")");
 
 	}
 

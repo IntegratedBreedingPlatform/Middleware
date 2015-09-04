@@ -4,15 +4,17 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-	<version>4.0.0.M5</version>
+	<version>4.0.0.ALPHA</version>
 	<name>ibp middleware</name>
-	
+
 	<properties>
-		<envConfig>release</envConfig>
 		<jasper.version>6.0.0</jasper.version>
 		<itext.version>2.1.7</itext.version>
 		<reflections.version>0.9.9</reflections.version>
-	</properties>	
+		<atomikos.version>3.9.3</atomikos.version>
+		<spring.version>3.2.11.RELEASE</spring.version>
+		<envConfig>${user.name}</envConfig>
+	</properties>
 
 	<distributionManagement>
 		<repository>
@@ -59,12 +61,7 @@
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
-			<version>5.1.6</version>
-		</dependency>
-		<dependency>
-			<groupId>c3p0</groupId>
-			<artifactId>c3p0</artifactId>
-			<version>0.9.1.2</version>
+			<version>5.1.36</version>
 		</dependency>
 		<dependency>
 			<groupId>javassist</groupId>
@@ -81,17 +78,53 @@
 			<artifactId>commons-configuration</artifactId>
 			<version>1.10</version>
 		</dependency>
+		
+		<!-- Test dependencies -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.11</version>
 			<scope>test</scope>
 		</dependency>
-
+		
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.9.5</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-test</artifactId>
+			<version>${spring.version}</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- podam = POjo DAta Mocker :) -->
+		<dependency>
+			<groupId>uk.co.jemos.podam</groupId>
+			<artifactId>podam</artifactId>
+			<version>5.4.1.RELEASE</version>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- Temporary fix to solve the Spring testContext.xml file parsing error on test init. -->
+		<dependency> 
+		    <groupId>xml-apis</groupId>
+		    <artifactId>xml-apis</artifactId>
+		    <version>1.4.01</version>
+		</dependency>	
+		
 		<!-- Logging dependencies -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
+			<version>1.7.7</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
 			<version>1.7.7</version>
 		</dependency>
 		<dependency>
@@ -113,14 +146,6 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- Mockito -->
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>1.9.5</version>
-			<scope>test</scope>
-		</dependency>
-
 		<!-- Used for Workbook Parser -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
@@ -137,52 +162,105 @@
 			<artifactId>poi-ooxml-schemas</artifactId>
 			<version>3.8</version>
 		</dependency>
-		<!-- Used in tests, we would dynamically do a git (svn) checkout -->
-		<dependency>
-			<groupId>org.tmatesoft.svnkit</groupId>
-			<artifactId>svnkit</artifactId>
-			<version>1.8.5</version>
-		</dependency>
-
+		
 		<!-- Jasper reports module -->
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
 			<version>${jasper.version}</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>com.lowagie</groupId>
 			<artifactId>itext</artifactId>
 			<version>${itext.version}</version>
 			<scope>compile</scope>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
 			<version>${reflections.version}</version>
 		</dependency>
-		
-		<!--  JAMon performance monitoring. -->		
-        <dependency>
-            <groupId>com.jamonapi</groupId>
-            <artifactId>jamon</artifactId>
-            <version>2.80</version>
-        </dependency>
-        
-        
+
+		<!-- JAMon performance monitoring. -->
+		<dependency>
+			<groupId>com.jamonapi</groupId>
+			<artifactId>jamon</artifactId>
+			<version>2.80</version>
+		</dependency>
+
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>18.0</version>
 		</dependency>
-
+		
+		<!-- Spring -->
 		<dependency>
-			<groupId>uk.co.jemos.podam</groupId>
-			<artifactId>podam</artifactId>
-			<version>5.4.1.RELEASE</version>
-			<scope>test</scope>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring.version}</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-aop</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${spring.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>commons-logging</groupId>
+					<artifactId>commons-logging</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-orm</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-tx</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.atomikos</groupId>
+			<artifactId>transactions-jta</artifactId>
+			<version>${atomikos.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.atomikos</groupId>
+			<artifactId>transactions-jdbc</artifactId>
+			<version>${atomikos.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.atomikos</groupId>
+			<artifactId>transactions-hibernate3</artifactId>
+			<version>${atomikos.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>hibernate</artifactId>
+					<groupId>org.hibernate</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -293,14 +371,43 @@
 				<version>2.18</version>
 				<configuration>
 					<includes>
-						<include>**/UserRoleSetupTest.java</include>
+						<include>**/WorkbenchDataManagerImplTest.java</include>
+						<include>**/OntologyDataManagerImplTest.java</include>
+						<include>**/GermplasmDataManagerImplTest.java</include>
 						<include>**/UserDataManagerImplTest.java</include>
 						<include>**/CrossStudyDataManagerImplTest.java</include>
 						<include>**/GermplasmDataManagerUtilTest.java</include>
-						<include>**/OntologyDataManagerImplTest.java</include>
-						<include>**/WorkbenchDataManagerImplTest.java</include>
-						<includes>**/ReportServiceImplTest.java</includes>
-						<include>**/GermplasmDataManagerImplTest.java</include>
+						<include>**/GermplasmAddUpdateFunctionsTest.java</include>
+						<include>**/LocationDataManagerImplTest.java</include>
+						
+						<include>**/CvTermDaoTest.java</include>
+						<include>**/StandardVariableDaoTest.java</include>
+						<include>**/BreedersQueryDaoTest.java</include>
+						<include>**/GermplasmListDAOTest.java</include>
+						<include>**/ConformityInputTransformerTest.java</include>
+						<include>**/StandardVariableTest.java</include>
+						<include>**/MeasurementDataTest.java</include>
+						<include>**/WorkbookTest.java</include>
+						<include>**/DataSetBuilderTest.java</include>
+						<include>**/WorkbookParserTest.java</include>
+						<include>**/ListDataProjectSaverTest.java</include>
+						<include>**/ProjectPropertySaverTest.java</include>
+						<include>**/WorkbookSaverTest.java</include>
+						<include>**/DatasetValuesTransformerTest.java</include>
+						<include>**/ExperimentValuesTransformerTest.java</include>
+						<include>**/MeasurementVariableTransformerTest.java</include>
+						<include>**/StudyValuesTransformerTest.java</include>
+						<include>**/GDMSPojosSimpleTest.java</include>
+						<include>**/GMSPojosSimpleTest.java</include>
+						<include>**/IMSPojosSimpleTest.java</include>
+						<include>**/ListDataProjectTest.java</include>
+						<include>**/FieldbookListUtilTest.java</include>
+						<include>**/UtilTest.java</include>
+						<include>**/TrialTraitsTest.java</include>
+						<include>**/StudyServiceImplTest.java</include>
+						<include>**/ObservationsTest.java</include>
+						<include>**/QueryTest.java</include>
+						<include>**/StudyMeasurementsTest.java</include>
 					</includes>
 				</configuration>
 			</plugin>

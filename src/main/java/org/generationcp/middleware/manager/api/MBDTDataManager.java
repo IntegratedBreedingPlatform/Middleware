@@ -117,16 +117,16 @@ public interface MBDTDataManager {
 
 	/**
 	 *
-	 * @param generationID The id of the generation entry to which the saved entries / existing entries will be / are associated
+	 * @param generation The generation entry to which the saved entries / existing entries will be / are associated
 	 * @param gids A list of GIDs. Existing GID entries will have their selected status toggled on / off. Non existing GID entries will be
 	 *        saved to the mbdt_selected_genotypes table with sg_type = 'SR'
 	 * @throws MiddlewareQueryException if the provided generation ID refers to a non existent entry in the mbdt_generations table
 	 */
-	public void setSelectedAccessions(Integer generationID, List<Integer> gids) throws MiddlewareQueryException;
+	public void setSelectedAccessions(MBDTGeneration generation, List<Integer> gids) throws MiddlewareQueryException;
 
 	/**
 	 *
-	 * @param generationID The id representing the generation entry to which the saved entries / existing entries will be / are associated
+	 * @param generation The generation entry to which the saved entries / existing entries will be / are associated
 	 * @param genotypeEnum The parent data type to which the entry will be saved / modified. Possible values are SelectedGenotypeEnum.R or
 	 *        SelectedGenotypeEnum.D only.
 	 * @param gids A list of GIDs. Existing GID entries will have their parent data type modified (while still retaining the selected prefix
@@ -134,7 +134,7 @@ public interface MBDTDataManager {
 	 *        value for genotypeEnum
 	 * @throws MiddlewareQueryException if the provided generation ID refers to a non existent entry in the mbdt_generations table
 	 */
-	public void setParentData(Integer generationID, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException;
+	public void setParentData(MBDTGeneration generation, SelectedGenotypeEnum genotypeEnum, List<Integer> gids) throws MiddlewareQueryException;
 
 	// for test purposes
 	public void clear();

@@ -26,16 +26,13 @@ public class DataSetDestroyer extends Destroyer {
 
 	public void deleteDataSet(int datasetId) throws MiddlewareQueryException {
 		this.getDataSetDao().delete(datasetId);
-		this.getDmsProjectDao().clear();
 	}
 
 	public void deleteExperimentsByLocation(int datasetId, int locationId) throws MiddlewareQueryException {
 		this.getDataSetDao().deleteExperimentsByLocation(datasetId, locationId);
-		this.getDmsProjectDao().clear();
 	}
 
 	public void deleteExperimentsByLocationAndExperimentType(int datasetId, int locationId, int typeId) throws MiddlewareQueryException {
 		this.getDataSetDao().deleteExperimentsByLocationAndType(datasetId, locationId, typeId);
-		this.getDmsProjectDao().clear();
 	}
 }

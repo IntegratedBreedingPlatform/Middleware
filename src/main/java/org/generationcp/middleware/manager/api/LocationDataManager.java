@@ -277,8 +277,7 @@ public interface LocationDataManager {
 	UserDefinedField getUserDefinedFieldByID(Integer id) throws MiddlewareQueryException;
 
 	/**
-	 * Returns the Map representation of <Code, UserDefinedField>
-	 * of the given tableType (ftable and ftype from the udflds table).
+	 * Returns the Map representation of <Code, UserDefinedField> of the given tableType (ftable and ftype from the udflds table).
 	 *
 	 * @param tableType the table type
 	 * @return the user defined field map of code by ud table type
@@ -363,7 +362,7 @@ public interface LocationDataManager {
 
 	/**
 	 * Get all breeding locations.
-	 * 
+	 *
 	 * Return a List of Locations which represent the breeding locations stored in the location table of IBDB.
 	 *
 	 * @return the all breeding locations
@@ -373,7 +372,7 @@ public interface LocationDataManager {
 
 	/**
 	 * Count all breeding locations.
-	 * 
+	 *
 	 * Return the total count of Locations which represent the breeding locations stored in the location table of IBDB.
 	 *
 	 * @return the long
@@ -398,14 +397,6 @@ public interface LocationDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws MiddlewareQueryException;
-
-	/**
-	 * Gets the next negative id.
-	 *
-	 * @return the next negative id
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	Integer getNextNegativeId() throws MiddlewareQueryException;
 
 	/**
 	 * Gets all fields belonging to the given location.
@@ -448,7 +439,7 @@ public interface LocationDataManager {
 
 	/**
 	 * get all location records filtered by programUUID
-	 * 
+	 *
 	 * @param programUUID
 	 * @return list of locid
 	 */
@@ -456,9 +447,26 @@ public interface LocationDataManager {
 
 	/**
 	 * delete all location records filtered by programUUID
-	 * 
+	 *
 	 * @param programUUID
 	 */
 	void deleteProgramLocationsByUniqueId(String programUUID) throws MiddlewareQueryException;
+
+	/**
+	 * Retrieves all locdes entries from both central and local by location id
+	 *
+	 * @return all locdes entries by location id
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<Locdes> getLocdesByLocId(Integer locationId) throws MiddlewareQueryException;
+
+	/**
+	 * Save or update the list of locdes object
+	 *
+	 * @param location id
+	 * @param locdesList
+	 * @throws MiddlewareQueryException
+	 */
+	public void saveOrUpdateLocdesList(Integer locationId, List<Locdes> locdesList) throws MiddlewareQueryException;
 
 }

@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.etl;
@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
@@ -39,6 +40,9 @@ public class MeasurementData {
 	public boolean isCustomCategoricalValue;
 
 	private boolean isAccepted;
+
+	// used to map this object to what is actually saved in the database after saving
+	private Variable variable;
 
 	public MeasurementData() {
 	}
@@ -107,6 +111,9 @@ public class MeasurementData {
 	}
 
 	public Integer getPhenotypeId() {
+		if (this.phenotypeId == null && this.variable != null) {
+			return this.variable.getPhenotypeId();
+		}
 		return this.phenotypeId;
 	}
 
@@ -281,4 +288,13 @@ public class MeasurementData {
 		}
 		return false;
 	}
+
+	public Variable getVariable() {
+		return this.variable;
+	}
+
+	public void setVariable(Variable variable) {
+		this.variable = variable;
+	}
+
 }

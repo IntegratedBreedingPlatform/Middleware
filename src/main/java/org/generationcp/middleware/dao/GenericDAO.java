@@ -19,12 +19,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.LockOptions;
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
@@ -217,40 +215,6 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error in refresh(" + entity + "): " + e.getMessage(), e);
 		}
-	}
-
-	public Integer getNextId(String idName) throws MiddlewareQueryException {
-		try {
-			Criteria crit = this.getSession().createCriteria(this.getPersistentClass());
-			crit.setProjection(Projections.max(idName));
-			Integer maxId = (Integer) crit.uniqueResult();
-			Integer nextId = maxId != null ? Integer.valueOf(maxId.intValue() + 1) : Integer.valueOf(1);
-			GenericDAO.LOG.debug("Returning nextId " + nextId + " for entity " + this.getPersistentClass().getName());
-			return nextId;
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error in getNextId(idName=" + idName + "): " + e.getMessage(), e);
-		}
-	}
-
-	public static Integer getLastId(Session session, Database instance, String tableName, String idName) throws MiddlewareQueryException {
-		try {
-			SQLQuery query = session.createSQLQuery("SELECT MAX(" + idName + ") FROM " + tableName);
-			Integer result = (Integer) query.uniqueResult();
-
-			return result != null ? result : 0;
-
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error in getMaxId(instance=" + instance + ", tableName=" + tableName + ", idName=" + idName
-					+ "): " + e.getMessage(), e);
-		}
-	}
-
-	public void flush() {
-		this.getSession().flush();
-	}
-
-	public void clear() {
-		this.getSession().clear();
 	}
 
 	public void setStartAndNumOfRows(Query query, int start, int numOfRows) {

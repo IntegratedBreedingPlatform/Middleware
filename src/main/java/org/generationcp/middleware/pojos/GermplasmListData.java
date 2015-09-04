@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos;
@@ -19,6 +19,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -29,22 +31,21 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
+import org.generationcp.middleware.interfaces.GermplasmExportSource;
 import org.generationcp.middleware.util.Debug;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
-import org.hibernate.annotations.SQLDelete;
 
 /**
  * POJO for listdata table.
- *
+ * 
  * @author Kevin Manansala
- *
+ * 
  */
 @NamedQueries({@NamedQuery(name = "deleteGermplasmListDataByListId", query = "UPDATE GermplasmListData SET status = 9 WHERE list = :listId")})
 @Entity
 @Table(name = "listdata")
-@SQLDelete(sql = "UPDATE listdata SET lrstatus = 9 WHERE lrecid = ?")
-public class GermplasmListData implements Serializable {
+public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	private static final long serialVersionUID = 1L;
 
@@ -52,6 +53,7 @@ public class GermplasmListData implements Serializable {
 	public static final String DELETE_BY_LIST_ID = "deleteGermplasmListDataByListId";
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "lrecid")
 	private Integer id;
@@ -145,6 +147,7 @@ public class GermplasmListData implements Serializable {
 		this.gid = gid;
 	}
 
+	@Override
 	public Integer getEntryId() {
 		return this.entryId;
 	}
@@ -153,6 +156,7 @@ public class GermplasmListData implements Serializable {
 		this.entryId = entryId;
 	}
 
+	@Override
 	public String getEntryCode() {
 		return this.entryCode;
 	}
@@ -161,6 +165,7 @@ public class GermplasmListData implements Serializable {
 		this.entryCode = entryCode;
 	}
 
+	@Override
 	public String getSeedSource() {
 		return this.seedSource;
 	}
@@ -169,6 +174,7 @@ public class GermplasmListData implements Serializable {
 		this.seedSource = seedSource;
 	}
 
+	@Override
 	public String getDesignation() {
 		return this.designation;
 	}
@@ -177,6 +183,7 @@ public class GermplasmListData implements Serializable {
 		this.designation = designation;
 	}
 
+	@Override
 	public String getGroupName() {
 		return this.groupName;
 	}
@@ -291,4 +298,55 @@ public class GermplasmListData implements Serializable {
 		}
 	}
 
+	@Override
+	public Integer getGermplasmId() {
+
+		return this.gid;
+	}
+
+	@Override
+	public Integer getCheckType() {
+		return null;
+	}
+
+	@Override
+	public String getFemaleParent() {
+
+		return null;
+	}
+
+	@Override
+	public Integer getFgid() {
+
+		return null;
+	}
+
+	@Override
+	public String getMaleParent() {
+
+		return "";
+	}
+
+	@Override
+	public Integer getMgid() {
+		return null;
+	}
+
+	@Override
+	public String getCheckTypeDescription() {
+
+		return null;
+	}
+
+	@Override
+	public String getStockIDs() {
+
+		return "";
+	}
+
+	@Override
+	public String getSeedAmount() {
+
+		return "";
+	}
 }

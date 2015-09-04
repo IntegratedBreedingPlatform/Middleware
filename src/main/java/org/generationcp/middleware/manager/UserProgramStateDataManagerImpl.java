@@ -12,13 +12,13 @@ import org.generationcp.middleware.pojos.UserProgramTreeState;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by cyrus on 12/16/14.
  */
+@Transactional
 public class UserProgramStateDataManagerImpl extends DataManager implements UserProgramStateDataManager {
 
 	public UserProgramStateDataManagerImpl(HibernateSessionProvider sessionProvider) {
@@ -71,10 +71,10 @@ public class UserProgramStateDataManagerImpl extends DataManager implements User
 	public UserProgramTreeState saveOrUpdateUserProgramTreeState(int userId, String programUuid, String type, List<String> treeState)
 			throws MiddlewareQueryException {
 		UserProgramTreeState userProgramTreeState = null;
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 		try {
-			trans = session.beginTransaction();
+
 			userProgramTreeState = this.getUserProgramTreeState(userId, programUuid, type);
 			if (userProgramTreeState == null) {
 				userProgramTreeState = new UserProgramTreeState();
@@ -85,9 +85,9 @@ public class UserProgramStateDataManagerImpl extends DataManager implements User
 			String text = Util.convertCollectionToCSV(treeState);
 			userProgramTreeState.setTreeState(text);
 			this.getUserProgramTreeStateDAO().saveOrUpdate(userProgramTreeState);
-			trans.commit();
+
 		} catch (HibernateException e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("error in: WorkbenchDataManager.saveOrUpdateUserProgramTreeState(programId=" + programUuid + "): "
 					+ e.getMessage(), e);
 		}

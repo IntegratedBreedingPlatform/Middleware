@@ -1,13 +1,13 @@
 /*******************************************************************************
  * 
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.manager.api;
@@ -34,14 +34,14 @@ import org.generationcp.middleware.manager.Operation;
 
 /**
  * This is the API for retrieving ontology data from the CHADO schema.
- *
- *
+ * 
+ * 
  */
 public interface OntologyDataManager {
 
 	/**
 	 * Retrieves a Term record given its id. This can also be used to retrieve traits, methods and scales.
-	 *
+	 * 
 	 * @param termId the term id
 	 * @return the term by id
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -50,7 +50,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Retrieves a StandardVariable given its id.
-	 *
+	 * 
 	 * @param stdVariableId the std variable id
 	 * @return the standard variable
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -67,7 +67,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Gets standard variable summaries for given a list of ids. Returns an empty list if no matches are found.
-	 *
+	 * 
 	 * @param standardVariableIds the list of standard variable ids
 	 * @return the list of standard variable summaries
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -85,7 +85,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Retrieves a the standardVariableId given the property, scale and method Ids.
-	 *
+	 * 
 	 * @param propertyId the property id
 	 * @param scaleId the scale id
 	 * @param methodId the method id
@@ -97,7 +97,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Find standard variables by name or synonym.
-	 *
+	 * 
 	 * @param nameOrSynonym the name or synonym
 	 * @return the sets the
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -107,7 +107,7 @@ public interface OntologyDataManager {
 	/**
 	 * Adds a StandardVariable to the database. Must provide the property, method, scale, dataType, and storedIn info. Otherwise, it will
 	 * throw an exception.
-	 *
+	 * 
 	 * @param stdVariable the std variable
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -116,7 +116,7 @@ public interface OntologyDataManager {
 	/**
 	 * Adds a StandardVariable to the database. Must provide the property, method, scale, dataType, and storedIn info. Otherwise, it will
 	 * throw an exception.
-	 *
+	 * 
 	 * @param stdVariableList the std variable
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -124,7 +124,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Adds a new Method to the database. Creates a new cvterm entry in the local database. Returns a negative id.
-	 *
+	 * 
 	 * @param name the name
 	 * @param definition the definition
 	 * @return the term
@@ -134,7 +134,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Find method by id.
-	 *
+	 * 
 	 * @param id the id
 	 * @return the term
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -143,7 +143,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Find method by name.
-	 *
+	 * 
 	 * @param name the name
 	 * @return the term
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -152,7 +152,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Retrieves the StandardVariable given the property, scale and method names.
-	 *
+	 * 
 	 * @param property the property
 	 * @param scale the scale
 	 * @param method the method
@@ -164,7 +164,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Retrieve method given the traitId.
-	 *
+	 * 
 	 * @param traitId the trait id
 	 * @return List<Term>
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -173,7 +173,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Retrieve scales given the traitId.
-	 *
+	 * 
 	 * @param traitId the trait id
 	 * @return List<Term>
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -182,9 +182,9 @@ public interface OntologyDataManager {
 
 	/**
 	 * Returns the list of Term entries based on the given CvId. The CvId can be CvId.PROPERTIES, CvId.METHODS, CvId.SCALES, CvId.VARIABLES.
-	 *
+	 * 
 	 * This can be used to get all scales, all traits, all trait methods, all properties, all methods and all variables.
-	 *
+	 * 
 	 * @param cvId the cv id
 	 * @return the all terms by cv id
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -193,9 +193,9 @@ public interface OntologyDataManager {
 
 	/**
 	 * Returns the count of entries based on the given CvId. The CvId can be CvId.PROPERTIES, CvId.METHODS, CvId.SCALES, CvId.VARIABLES.
-	 *
+	 * 
 	 * This can be used to count all scales, all traits, all trait methods, all properties, all methods and all variables.
-	 *
+	 * 
 	 * @param cvId the cv id
 	 * @return the long
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -204,7 +204,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Returns Term based on the given name and cvid.
-	 *
+	 * 
 	 * @param name the name
 	 * @param cvId the cv id
 	 * @return Term
@@ -214,7 +214,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Adds a new Term to the database. Creates a new cvterm entry in the local database. Returns a negative id.
-	 *
+	 * 
 	 * @param name the name
 	 * @param definition the definition
 	 * @param cvId the cv id
@@ -226,7 +226,7 @@ public interface OntologyDataManager {
 	/**
 	 * Updates an existing term in the database. This method searches for the given id in local. If it exists, the corresponding name and
 	 * definition are updated.
-	 *
+	 * 
 	 * @param term the term
 	 * @throws MiddlewareException the middleware exception
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -235,7 +235,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Returns the list of Term entries based on possible data types.
-	 *
+	 * 
 	 * @return list of data type Term objects
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -243,7 +243,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Returns the key-value pairs of PhenotypicType - StandardVariable.
-	 *
+	 * 
 	 * @param type the type
 	 * @param start the start
 	 * @param numOfRows the num of rows
@@ -255,11 +255,11 @@ public interface OntologyDataManager {
 
 	/**
 	 * Returns the standard variables associated to a project from projectprop, cvterm or trait - in the given order.
-	 *
+	 * 
 	 * 1. Search for DISTINCT standard variables used for projectprop records where projectprop.value equals input name (eg. REP) 2. If no
 	 * variable found, search for cvterm (standard variables) with given name. 3. If no variable still found for steps 1 and 2, treat the
 	 * header as a trait / property name. Search for trait with given name and return the standard variables using that trait (if any)
-	 *
+	 * 
 	 * @param headers the headers
 	 * @return The key in map would be the header string. If no standard variable list found, an empty list on map is returned for that
 	 *         header key.
@@ -269,7 +269,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Retrieves the List of Terms matching the given nameOrSynonym and CvId.
-	 *
+	 * 
 	 * @param nameOrSynonym the name or synonym
 	 * @param cvId the cv id
 	 * @return the list
@@ -279,7 +279,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Returns the count of Term entries based on possible "is a" of properties.
-	 *
+	 * 
 	 * @return count of is_a Term objects
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -289,7 +289,7 @@ public interface OntologyDataManager {
 	/**
 	 * Adds a new property to the database that adds the property term and it's is a relationship) Creates a new cvterm entry in the local
 	 * database and a cvterm_relationship of type is_a Returns the added term.
-	 *
+	 * 
 	 * @param name the name
 	 * @param definition the definition
 	 * @param isA the is a
@@ -300,7 +300,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Given the termId, retrieve the Property POJO.
-	 *
+	 * 
 	 * @param termId the term id
 	 * @return property
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -309,7 +309,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Given the name, retrieve the Property POJO.
-	 *
+	 * 
 	 * @param name the name
 	 * @return property
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -332,7 +332,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Retrieves all the Term entries based on the given list of ids.
-	 *
+	 * 
 	 * @param ids the ids
 	 * @return the terms by ids
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -341,7 +341,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Adds the trait class.
-	 *
+	 * 
 	 * @param name the name
 	 * @param definition the definition
 	 * @param parentTraitClassId the parent trait class id
@@ -352,7 +352,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Gets all the standard variables.
-	 *
+	 * 
 	 * @return the all standard variable
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -361,7 +361,7 @@ public interface OntologyDataManager {
 	/**
 	 * Gets the all standard variables based on the parameters with values. At least one parameter needs to have a value. If a standard
 	 * variable has no trait class, it is not included in the result.
-	 *
+	 * 
 	 * @param traitClassId the trait class id
 	 * @param propertyId the property id
 	 * @param methodId the method id
@@ -373,7 +373,7 @@ public interface OntologyDataManager {
 			throws MiddlewareQueryException;
 
 	/**
-	 *
+	 * 
 	 * @param property the specific Property Term element to which the crop ontology ID will be saved
 	 * @param cropOntologyID the crop ontology ID to be saved
 	 * @throws MiddlewareQueryException
@@ -382,7 +382,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Adds or updates the term and relationship.
-	 *
+	 * 
 	 * @param name the name
 	 * @param definition the definition
 	 * @param cvId the cv id
@@ -397,7 +397,7 @@ public interface OntologyDataManager {
 	/**
 	 * Updates the given term and its associated entry in the cvterm_relationship table. Searches first if the given term id exists. If it
 	 * exists in local, the records are updated.
-	 *
+	 * 
 	 * @param term The term to update
 	 * @param typeId the type id of the relationship between the term id and the objectId
 	 * @param objectId the object id
@@ -409,7 +409,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Adds or updates the term.
-	 *
+	 * 
 	 * @param name the name
 	 * @param definition the definition
 	 * @param cvId the cv id
@@ -421,7 +421,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Gets the standard variable id by term id.
-	 *
+	 * 
 	 * @param cvTermId the cv term id
 	 * @param termId the term id
 	 * @return the standard variable id by term id
@@ -431,7 +431,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Insert or Update a Standard Variable.
-	 *
+	 * 
 	 * @param standardVariable the standard variable
 	 * @param operation the operation
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -441,7 +441,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Adds or updates standard variable constraints.
-	 *
+	 * 
 	 * @param standardVariableId the standard variable id
 	 * @param constraints the constraints
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -451,7 +451,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Deletes standard variable constraints.
-	 *
+	 * 
 	 * @param standardVariableId the standard variable id
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -459,7 +459,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Adds standard variable enumeration.
-	 *
+	 * 
 	 * @param variable the variable
 	 * @param enumeration the enumeration
 	 * @return the enumeration
@@ -472,7 +472,7 @@ public interface OntologyDataManager {
 	 * - Save or update standard variable enumeration. - The enumeration passed is treated as a new value if the id is null, otherwise it is
 	 * treated as an update operation. - If the ID of the Enumeration passed is positive, a new entry is added to local. - If the ID of the
 	 * Enumeration passed is negative, the existing entry in local is updated. - Only the name and description can be updated.
-	 *
+	 * 
 	 * @param variable the variable
 	 * @param enumeration the enumeration
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -482,7 +482,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Deletes standard variable enumeration.
-	 *
+	 * 
 	 * @param standardVariableId the standard variable id
 	 * @param validValueId the valid value id
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -491,7 +491,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Delete term.
-	 *
+	 * 
 	 * @param cvTermId the cv term id
 	 * @param cvId the cv id
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -500,7 +500,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Delete term and relationship.
-	 *
+	 * 
 	 * @param cvTermId the cv term id
 	 * @param cvId the cv id
 	 * @param typeId the type id
@@ -511,7 +511,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Returns all Properties with its trait class.
-	 *
+	 * 
 	 * @return the all properties with trait class
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -519,7 +519,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Delete standard variable.
-	 *
+	 * 
 	 * @param stdVariableId the std variable id
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -527,7 +527,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Returns the variable id given the property, scale, method, and role (P-S-M-R).
-	 *
+	 * 
 	 * @param property the property
 	 * @param scale the scale
 	 * @param method the method
@@ -540,7 +540,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * Returns the variable id given the property, scale, method, and role (P-S-M-R).
-	 *
+	 * 
 	 * @param propertyId the property id
 	 * @param scaleId the scale id
 	 * @param methodId the method id
@@ -553,7 +553,7 @@ public interface OntologyDataManager {
 
 	/**
 	 * validate if the enumeration is being used.
-	 *
+	 * 
 	 * @param standardVariableId
 	 * @param enumerationId
 	 * @return true if valid
@@ -570,4 +570,31 @@ public interface OntologyDataManager {
 	List<NameSynonym> getSynonymsOfTerm(Integer termId) throws MiddlewareQueryException;
 
 	boolean isSeedAmountVariable(String variateProperty) throws MiddlewareQueryException;
+
+	/**
+	 * Returns the cv id by name
+	 * 
+	 * @param name of cv
+	 * @return cv_id
+	 */
+	Integer getCVIdByName(String name) throws MiddlewareQueryException;
+
+	/**
+	 * Returns Term based on the given name and cv id.
+	 * 
+	 * @param name the name
+	 * @param cvId the cv id
+	 * @return Term
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Term findTermByName(String name, int cvId) throws MiddlewareQueryException;
+
+	/**
+	 * This is specifically for use in Database Migrator. Adds a StandardVariable to the database. Must provide the property, method, scale,
+	 * dataType, and storedIn info. Otherwise, it will throw an exception.
+	 * 
+	 * @param stdVariable the std variable
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	void addStandardVariableForMigrator(StandardVariable stdVariable) throws MiddlewareQueryException;
 }

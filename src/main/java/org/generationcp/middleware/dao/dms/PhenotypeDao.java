@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.dao.dms;
@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Phenotype}.
- *
+ * 
  */
 @SuppressWarnings("unchecked")
 public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
@@ -638,8 +638,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public void deletePhenotypesByProjectIdAndLocationId(Integer projectId, Integer locationId) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			// Delete phenotypes and experiment phenotypes
 			String sql =
 					"delete pheno, epheno" + " from nd_experiment_project ep, nd_experiment e,"
@@ -648,9 +651,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 							+ " and e.nd_experiment_id = epheno.nd_experiment_id" + " and epheno.phenotype_id = pheno.phenotype_id";
 			SQLQuery statement = this.getSession().createSQLQuery(sql);
 			statement.executeUpdate();
-
-			this.flush();
-			this.clear();
 
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deletePhenotypesByProjectIdAndLocationId=" + projectId + ", " + locationId
@@ -661,8 +661,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public int updatePhenotypesByProjectIdAndLocationId(Integer projectId, Integer locationId, Integer stockId, Integer cvTermId,
 			String value) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			// update the value of phenotypes
 			String sql =
 					"UPDATE nd_experiment_project ep " + "INNER JOIN nd_experiment exp ON ep.nd_experiment_id = exp.nd_experiment_id "
@@ -676,9 +679,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			SQLQuery statement = this.getSession().createSQLQuery(sql);
 			int returnVal = statement.executeUpdate();
 
-			this.flush();
-			this.clear();
-
 			return returnVal;
 
 		} catch (HibernateException e) {
@@ -691,8 +691,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public List<Object[]> getPhenotypeIdsByLocationAndPlotNo(Integer projectId, Integer locationId, List<Integer> plotNos,
 			List<Integer> cvTermIds) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
 			// get the phenotype_id
 			String sql =
 					"SELECT  expprop.value, pheno.observable_id, pheno.phenotype_id FROM nd_experiment_project ep "
@@ -711,9 +709,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 			List<Object[]> returnVal = statement.list();
 
-			this.flush();
-			this.clear();
-
 			return returnVal;
 
 		} catch (HibernateException e) {
@@ -726,8 +721,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public List<Object[]> getPhenotypeIdsByLocationAndPlotNo(Integer projectId, Integer locationId, Integer plotNo, List<Integer> cvTermIds)
 			throws MiddlewareQueryException {
 		try {
-			this.flush();
-
 			if (cvTermIds.isEmpty()) {
 				return new ArrayList<Object[]>();
 			}
@@ -749,9 +742,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			statement.setParameter("plotNo", plotNo);
 
 			List<Object[]> returnVal = statement.list();
-
-			this.flush();
-			this.clear();
 
 			return returnVal;
 
@@ -862,6 +852,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public void deletePhenotypesInProjectByTerm(List<Integer> ids, int termId) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			StringBuilder sql =
 					new StringBuilder().append("DELETE FROM phenotype ").append(" WHERE phenotype_id IN ( ")
 							.append(" SELECT eph.phenotype_id ").append(" FROM nd_experiment_phenotype eph ")
@@ -934,7 +929,16 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return null;
 	}
 
-	public Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId) {
+	public Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId, int germplasmTermId) {
+
+		String groupByGermplasm = "nd_exp_stock.stock_id";
+		if (germplasmTermId == TermId.DESIG.getId()) {
+			groupByGermplasm = "stock.name";
+		} else if (germplasmTermId == TermId.GID.getId()) {
+			groupByGermplasm = "stock.dbxref_id";
+		} else if (germplasmTermId == TermId.ENTRY_NO.getId()) {
+			groupByGermplasm = "stock.uniquename";
+		}
 
 		StringBuilder sql =
 				new StringBuilder()
@@ -943,12 +947,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 						.append(" nd_experiment_project a ")
 						.append(" INNER JOIN nd_experiment nd_exp ON a.nd_experiment_id = nd_exp.nd_experiment_id ")
 						.append(" INNER JOIN nd_experiment_stock nd_exp_stock ON nd_exp.nd_experiment_id = nd_exp_stock.nd_experiment_id ")
+						.append(" INNER JOIN stock ON nd_exp_stock.stock_id = stock.stock_id ")
 						.append(" LEFT JOIN nd_experiment_phenotype nd_exp_pheno ON nd_exp.nd_experiment_id = nd_exp_pheno.nd_experiment_id ")
 						.append(" LEFT JOIN phenotype  ON nd_exp_pheno.phenotype_id = phenotype.phenotype_id ")
 						.append(" where a.project_id = ").append(projectId).append(" and nd_exp.nd_geolocation_id = ").append(locationId)
 						.append(" and ((phenotype.value <> '' and phenotype.value is not null) or ")
 						.append(" (phenotype.cvalue_id <> '' and phenotype.cvalue_id is not null)) ")
-						.append(" group by nd_exp.nd_geolocation_id, nd_exp_stock.stock_id, phenotype.observable_id ")
+						.append(" group by nd_exp.nd_geolocation_id, ").append(groupByGermplasm).append(" , phenotype.observable_id ")
 						.append(" having count(phenotype.observable_id) >= 2 LIMIT 1 ");
 
 		SQLQuery query = this.getSession().createSQLQuery(sql.toString());

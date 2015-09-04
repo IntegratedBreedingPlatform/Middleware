@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos;
@@ -20,6 +20,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -33,9 +35,9 @@ import org.hibernate.annotations.SQLDelete;
 
 /**
  * POJO for listnms table.
- *
+ * 
  * @author Kevin Manansala, Mark Agarrado
- *
+ * 
  */
 
 @Entity
@@ -46,6 +48,7 @@ public class GermplasmList implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "listid")
 	private Integer id;
@@ -87,6 +90,9 @@ public class GermplasmList implements Serializable {
 
 	@Column(name = "projectId")
 	private Integer projectId;
+
+	@Column(name = "program_uuid")
+	private String programUUID;
 
 	@Column(name = "notes")
 	private String notes;
@@ -327,6 +333,14 @@ public class GermplasmList implements Serializable {
 		this.projectId = projectId;
 	}
 
+	public String getProgramUUID() {
+		return this.programUUID;
+	}
+
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
+	}
+
 	public String getNotes() {
 		return this.notes;
 	}
@@ -419,7 +433,7 @@ public class GermplasmList implements Serializable {
 	 * 
 	 * @return
 	 * @deprecated
-	*/
+	 */
 	@Deprecated
 	public boolean isLocalList() {
 		return this.getId() < 0;

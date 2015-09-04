@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
@@ -69,10 +70,21 @@ public class ExperimentValuesTransformerTest extends TestOutputFormatter {
 
 		List<MeasurementData> dataList = new ArrayList<MeasurementData>();
 
-		dataList.add(new MeasurementData("ENTRY", "1"));
-		dataList.add(new MeasurementData("GID", "-1"));
-		dataList.add(new MeasurementData("DESIG", "TIANDOUGOU-9"));
-		dataList.add(new MeasurementData("CROSS", "-"));
+		MeasurementData data1 = new MeasurementData("ENTRY", "1");
+		data1.setMeasurementVariable(new MeasurementVariable());
+		dataList.add(data1);
+
+		MeasurementData data2 = new MeasurementData("GID", "-1");
+		data2.setMeasurementVariable(new MeasurementVariable());
+		dataList.add(data2);
+
+		MeasurementData data3 = new MeasurementData("DESIG", "TIANDOUGOU-9");
+		data3.setMeasurementVariable(new MeasurementVariable());
+		dataList.add(data3);
+
+		MeasurementData data4 = new MeasurementData("CROSS", "-");
+		data4.setMeasurementVariable(new MeasurementVariable());
+		dataList.add(data4);
 
 		mRow.setDataList(dataList);
 

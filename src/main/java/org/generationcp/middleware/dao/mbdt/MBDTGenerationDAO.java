@@ -9,13 +9,13 @@ import org.generationcp.middleware.pojos.mbdt.MBDTGeneration;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by IntelliJ IDEA. User: Daniel Villafuerte
  */
-
+@Transactional
 public class MBDTGenerationDAO extends GenericDAO<MBDTGeneration, Integer> {
 
 	public MBDTGeneration getByProjectAndDatasetID(Integer datasetID, Integer projectID) throws MiddlewareQueryException {
@@ -69,21 +69,14 @@ public class MBDTGenerationDAO extends GenericDAO<MBDTGeneration, Integer> {
 
 	@Override
 	public MBDTGeneration saveOrUpdate(MBDTGeneration entity) throws MiddlewareQueryException {
-		Session session = this.getSession();
-		Transaction transaction = session.beginTransaction();
-
 		try {
 			MBDTGeneration returnVal = super.saveOrUpdate(entity);
-			transaction.commit();
-			session.flush();
-			session.clear();
-
 			return returnVal;
 		} catch (MiddlewareQueryException e) {
-			transaction.rollback();
+
 			throw e;
 		} catch (HibernateException e) {
-			transaction.rollback();
+
 			throw e;
 		}
 	}

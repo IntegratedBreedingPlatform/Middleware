@@ -84,7 +84,6 @@ import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 /**
  * Used to handle DAO instances and sessions connecting to the database. Superclass of DataManager, Builder, Searcher and Saver classes.
@@ -134,17 +133,6 @@ public class DatabaseBroker {
 			return this.sessionProvider.getSession();
 		}
 		return null;
-	}
-
-	/**
-	 * Rolls back a given transaction
-	 * 
-	 * @param trans
-	 */
-	public void rollbackTransaction(Transaction trans) {
-		if (trans != null) {
-			trans.rollback();
-		}
 	}
 
 	protected DmsProjectDao getDmsProjectDao() {
@@ -580,20 +568,6 @@ public class DatabaseBroker {
 		ProgramPresetDAO programPresetDAO = new ProgramPresetDAO();
 		programPresetDAO.setSession(this.getActiveSession());
 		return programPresetDAO;
-	}
-
-	// ===========================================================================================
-
-	protected void clearSessions() {
-		if (this.sessionProvider != null) {
-			this.sessionProvider.getSession().clear();
-		}
-	}
-
-	protected void flushSessions() {
-		if (this.sessionProvider != null) {
-			this.sessionProvider.getSession().flush();
-		}
 	}
 
 	public UserProgramTreeStateDAO getUserProgramTreeStateDAO() {

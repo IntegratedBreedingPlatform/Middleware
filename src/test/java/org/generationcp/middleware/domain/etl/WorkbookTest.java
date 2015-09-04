@@ -16,12 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import junit.framework.Assert;
-
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Location;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class WorkbookTest {
@@ -114,7 +113,6 @@ public class WorkbookTest {
 	private static final int COOPERATOR_ID_ID = 8372;
 	private static final int COOPERATOR_NAME_ID = 8373;
 
-	private static final String GERMPLASM_NAME = "TIANDOUGOU-9";
 	private static final String NUMERIC_VALUE = "1";
 
 	public static final Integer LOCATION_ID_1 = 1;
@@ -145,25 +143,19 @@ public class WorkbookTest {
 	private static final String CHALK_PCT = "CHALK_PCT";
 
 	public static final String[] G_NAMES = {"TIANDOUGOU-9", "KENINKENI-27", "SM114-1A-1-1-1B", "SM114-1A-14-1-1B", "SM114-1A-361-1-1B",
-			"SM114-1A-86-1-1B", "SM114-1A-115-1-1B", "SM114-1A-281-1-1B", "SM114-1A-134-1-1B", "SM114-1A-69-1-1B", "SM114-1A-157-1-1B",
-			"SM114-1A-179-1-1B", "TIANDOUGOU-9", "SM114-1A-36-1-1B", "SM114-1A-201-1-1B", "SM114-1A-31-1-1B", "SM114-1A-353-1-1B",
-			"SM114-1A-26-1-1B", "SM114-1A-125-1-1B", "SM114-1A-384-1-1B"};
+		"SM114-1A-86-1-1B", "SM114-1A-115-1-1B", "SM114-1A-281-1-1B", "SM114-1A-134-1-1B", "SM114-1A-69-1-1B", "SM114-1A-157-1-1B",
+		"SM114-1A-179-1-1B", "TIANDOUGOU-9", "SM114-1A-36-1-1B", "SM114-1A-201-1-1B", "SM114-1A-31-1-1B", "SM114-1A-353-1-1B",
+		"SM114-1A-26-1-1B", "SM114-1A-125-1-1B", "SM114-1A-384-1-1B"};
 
 	private static Workbook workbook;
 	private static List<Workbook> workbooks;
 
 	public static Workbook getTestWorkbook() {
-		if (WorkbookTest.workbook == null) {
-			WorkbookTest.createTestWorkbook(WorkbookTest.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, null, 1, false);
-		}
-		return WorkbookTest.workbook;
+		return WorkbookTest.createTestWorkbook(WorkbookTest.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, null, 1, false);
 	}
 
 	public static Workbook getTestWorkbook(int noOfObservations, StudyType studyType) {
-		if (WorkbookTest.workbook == null) {
-			WorkbookTest.createTestWorkbook(noOfObservations, studyType, null, 1, false);
-		}
-		return WorkbookTest.workbook;
+		return WorkbookTest.createTestWorkbook(noOfObservations, studyType, null, 1, false);
 	}
 
 	public static List<Workbook> getTestWorkbooks(int noOfTrial, int noOfObservations) {
@@ -374,12 +366,12 @@ public class WorkbookTest {
 		List<MeasurementVariable> variates = currentWorkbook.getVariates();
 		MeasurementVariable measurementVariable =
 				WorkbookTest
-						.createMeasurementVariable(
-								WorkbookTest.CRUST_ID,
-								WorkbookTest.CRUST,
-								"Score for the severity of common rust, (In highlands and mid altitude, Puccinia sorghi) symptoms rated on a scale from 1 (= clean, no infection) to 5 (= severely diseased).",
-								WorkbookTest.SCORE_1_5, WorkbookTest.VISUAL_SCORING, WorkbookTest.COMMON_RUST, WorkbookTest.CHAR, null,
-								WorkbookTest.PLOT, TermId.CHARACTER_VARIABLE.getId());
+				.createMeasurementVariable(
+						WorkbookTest.CRUST_ID,
+						WorkbookTest.CRUST,
+						"Score for the severity of common rust, (In highlands and mid altitude, Puccinia sorghi) symptoms rated on a scale from 1 (= clean, no infection) to 5 (= severely diseased).",
+						WorkbookTest.SCORE_1_5, WorkbookTest.VISUAL_SCORING, WorkbookTest.COMMON_RUST, WorkbookTest.CHAR, null,
+						WorkbookTest.PLOT, TermId.CHARACTER_VARIABLE.getId());
 		measurementVariable.setStoredIn(TermId.CATEGORICAL_VARIATE.getId());
 		measurementVariable.setOperation(Operation.ADD);
 		variates.add(measurementVariable);
@@ -666,6 +658,34 @@ public class WorkbookTest {
 		MeasurementVariable var = new MeasurementVariable();
 		var.setTermId(termId);
 		return var;
+	}
+
+	@Test
+	public void testGetMeasurementDatasetVariablesViewForTrial() {
+		WorkbookTest.getTestWorkbook(1, StudyType.T);
+
+		List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
+
+		int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
+
+		Assert.assertEquals(
+				"MeasurementDatasetVariablesView size should be the total no of non trial factors, variates and trial_instance",
+				totalMeasurementVariableCount + 1, list.size());
+
+	}
+
+	@Test
+	public void testGetMeasurementDatasetVariablesViewForNursery() {
+
+		WorkbookTest.getTestWorkbook(1, StudyType.N);
+
+		List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
+
+		int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
+
+		Assert.assertEquals("MeasurementDatasetVariablesView size should be the total no of non trial factors, variates",
+				totalMeasurementVariableCount, list.size());
+
 	}
 
 	@Test

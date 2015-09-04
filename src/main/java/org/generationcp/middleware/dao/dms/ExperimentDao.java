@@ -239,8 +239,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		String experimentIds = StringUtils.join(experimentIdList, ",");
 
 		try {
-			this.flush();
-
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			// Delete experiments
 			SQLQuery statement =
 					this.getSession().createSQLQuery(
@@ -252,10 +255,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 									+ "left join nd_experimentprop eprop on eprop.nd_experiment_id = e.nd_experiment_id "
 									+ "where ep.nd_experiment_id in (" + experimentIds + ") ");
 			statement.executeUpdate();
-
-			this.flush();
-			this.clear();
-
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deleteExperimentsByLocation=" + experimentIds + " in DataSetDao: " + e.getMessage(), e);
 		}
@@ -264,7 +263,10 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public void deleteExperimentsByStudy(int datasetId) throws MiddlewareQueryException {
 
 		try {
-			this.flush();
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
 
 			// Delete experiments
 			Query statement =
@@ -278,9 +280,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 											+ "LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id "
 											+ "WHERE ep.project_id = :datasetId ").setParameter("datasetId", datasetId);
 			statement.executeUpdate();
-			this.flush();
-			this.clear();
-
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deleteExperimentsByStudy=" + datasetId + " in DataSetDao: " + e.getMessage(), e);
 		}
@@ -289,7 +288,11 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 	public void deleteTrialExperimentsOfStudy(int datasetId) throws MiddlewareQueryException {
 
 		try {
-			this.flush();
+
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
 
 			// Delete experiments
 			Query statement =
@@ -306,8 +309,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 											+ "WHERE ep.project_id = :datasetId ").setParameter("datasetId", datasetId);
 
 			statement.executeUpdate();
-			this.flush();
-			this.clear();
 
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deleteTrialExperimentsOfStudy=" + datasetId + " in DataSetDao: " + e.getMessage(), e);

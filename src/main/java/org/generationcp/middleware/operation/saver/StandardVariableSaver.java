@@ -95,7 +95,7 @@ public class StandardVariableSaver extends Saver {
 			this.saveRelationship(varId, TermId.IS_A.getId(), stdVar.getIsA());
 		}
 
-		this.saveEnumerations(varId, stdVar.getEnumerations());
+		this.saveEnumerations(varId, stdVar);
 
 		return stdVar.getId();
 	}
@@ -254,13 +254,40 @@ public class StandardVariableSaver extends Saver {
 		}
 	}
 
-	private void saveEnumerations(int varId, List<Enumeration> enumerations) throws MiddlewareQueryException {
+	private void saveEnumerations(int varId, StandardVariable variable) throws MiddlewareQueryException {
+		
+		List<Enumeration> enumerations = variable.getEnumerations();
+		
 		if (enumerations != null && !enumerations.isEmpty()) {
 			for (Enumeration enumeration : enumerations) {
+				
+				if (enumeration.getId() == null){
+
+					Integer cvId = this.getEnumerationCvId(variable);
+					CVTerm cvTerm = this.createCvTerm(enumeration, cvId);
+					enumeration.setId(cvTerm.getCvTermId());
+
+				}
+				
 				this.saveCvTermRelationship(varId, TermId.HAS_VALUE.getId(), enumeration.getId());
+				
 			}
 		}
 	}
+	
+	private Integer getEnumerationCvId(StandardVariable variable) throws MiddlewareQueryException {
+
+		// Check if cv entry of enumeration already exists
+		// Add cv entry of the standard variable if none found
+		Integer cvId = this.getCvDao().getIdByName(String.valueOf(variable.getId()));
+
+		if (cvId == null) {
+			cvId = this.createCv(variable).getCvId();
+		}
+
+		return cvId;
+	}
+	
 
 	public void update(StandardVariable standardVariable) throws MiddlewareQueryException {
 		CVTerm varTerm = this.getStandardVariableBuilder().getCvTerm(standardVariable.getName(), CvId.VARIABLES.getId());

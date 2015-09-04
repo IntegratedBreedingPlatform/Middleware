@@ -16,6 +16,7 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
@@ -115,8 +116,6 @@ public class Role implements Serializable {
 		builder.append(this.roleId);
 		builder.append(", name=");
 		builder.append(this.name);
-		builder.append(", workflowTemplate=");
-		builder.append(this.workflowTemplate);
 		builder.append("]");
 		return builder.toString();
 	}

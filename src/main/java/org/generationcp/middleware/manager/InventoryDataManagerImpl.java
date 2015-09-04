@@ -46,11 +46,10 @@ import org.generationcp.middleware.util.DatabaseBroker;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the InventoryDataManager interface. Most of the functions in this class only use the connection to the local instance,
@@ -59,6 +58,7 @@ import org.slf4j.LoggerFactory;
  * @author Kevin Manansala
  *
  */
+@Transactional
 public class InventoryDataManagerImpl extends DataManager implements InventoryDataManager {
 
 	private static final Logger LOG = LoggerFactory.getLogger(InventoryDataManagerImpl.class);
@@ -170,69 +170,37 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	@Override
 	public Integer addStockTransaction(StockTransaction stockTransaction) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
 		try {
-			trans = session.beginTransaction();
 			StockTransactionDAO stockTransactionDAO = this.getStockTransactionDAO();
-			Integer id = stockTransactionDAO.getNextId("id");
-			stockTransaction.setId(id);
-			stockTransactionDAO.saveOrUpdate(stockTransaction);
-			stockTransactionDAO.flush();
-			stockTransactionDAO.clear();
-			trans.commit();
-
-			return id;
+			stockTransaction = stockTransactionDAO.saveOrUpdate(stockTransaction);
+			return stockTransaction.getId();
 		} catch (HibernateException e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		} catch (MiddlewareQueryException e) {
-			this.rollbackTransaction(trans);
+
 			throw e;
 		}
 	}
 
 	private List<Integer> addOrUpdateLot(List<Lot> lots, Operation operation) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
-
-		int lotsSaved = 0;
 		List<Integer> idLotsSaved = new ArrayList<Integer>();
 		try {
-			// begin save transaction
-			trans = session.beginTransaction();
 			LotDAO dao = this.getLotDao();
-
 			for (Lot lot : lots) {
-				if (operation == Operation.ADD && lot.getId() == null) {
-					// Auto-assign IDs for new local DB records
-					Integer id = dao.getNextId("id");
-					lot.setId(id);
-				}
 				Lot recordSaved = dao.saveOrUpdate(lot);
 				idLotsSaved.add(recordSaved.getId());
-				lotsSaved++;
-				if (lotsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
-			// end transaction, commit to database
-			trans.commit();
 		} catch (ConstraintViolationException e) {
-			this.rollbackTransaction(trans);
+
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		} catch (MiddlewareQueryException e) {
-			this.rollbackTransaction(trans);
+
 			throw e;
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while saving Lot: InventoryDataManager.addOrUpdateLot(lots=" + lots
 					+ ", operation=" + operation + "): " + e.getMessage(), e, InventoryDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 
 		return idLotsSaved;
@@ -270,40 +238,24 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	private List<Integer> addOrUpdateTransaction(List<org.generationcp.middleware.pojos.ims.Transaction> transactions, Operation operation)
 			throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
 
-		int transactionsSaved = 0;
 		List<Integer> idTransactionsSaved = new ArrayList<Integer>();
 		try {
-			// begin save transaction
-			trans = session.beginTransaction();
+			
+
 			TransactionDAO dao = this.getTransactionDao();
 
 			for (org.generationcp.middleware.pojos.ims.Transaction transaction : transactions) {
-				if (operation == Operation.ADD) {
-					// Auto-assign IDs for new local DB records
-					Integer id = dao.getNextId("id");
-					transaction.setId(id);
-				}
 				org.generationcp.middleware.pojos.ims.Transaction recordSaved = dao.saveOrUpdate(transaction);
 				idTransactionsSaved.add(recordSaved.getId());
-				transactionsSaved++;
-				if (transactionsSaved % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					// flush a batch of inserts and release memory
-					dao.flush();
-					dao.clear();
-				}
 			}
-			// end transaction, commit to database
-			trans.commit();
+			
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException(
 					"Error encountered while saving Transaction: InventoryDataManager.addOrUpdateTransaction(transactions=" + transactions
 							+ ", operation=" + operation + "): " + e.getMessage(), e, InventoryDataManagerImpl.LOG);
-		} finally {
-			session.flush();
 		}
 
 		return idTransactionsSaved;
@@ -487,9 +439,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	@Override
 	public List<LotReportRow> generateReportOnDormantLots(int year, int start, int numOfRows) throws MiddlewareQueryException {
-		Session sessionForLocal = this.getCurrentSession();
+		
 
-		SQLQuery query = sessionForLocal.createSQLQuery(Lot.GENERATE_REPORT_ON_DORMANT);
+		SQLQuery query = this.getActiveSession().createSQLQuery(Lot.GENERATE_REPORT_ON_DORMANT);
 		query.setParameter("year", year);
 		query.setFirstResult(start);
 		query.setMaxResults(numOfRows);
@@ -830,9 +782,18 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	@Override
 	public List<GermplasmListData> getLotCountsForList(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
 		List<GermplasmListData> listEntries = this.getGermplasmListDataByListId(id, start, numOfRows);
-		return this.getListInventoryBuilder().retrieveLotCountsForList(id, start, numOfRows, listEntries);
+		return this.getListInventoryBuilder().retrieveLotCountsForList(listEntries);
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.generationcp.middleware.manager.api.InventoryDataManager#populateLotCountsIntoExistingList(org.generationcp.middleware.pojos.GermplasmList)
+	 */
+	@Override
+	public void populateLotCountsIntoExistingList(final GermplasmList germplasmList) throws MiddlewareQueryException {
+		this.getListInventoryBuilder().retrieveLotCountsForList(germplasmList.getListData());
+	}
+	
 	@Override
 	public Integer countLotsWithAvailableBalanceForGermplasm(Integer gid) throws MiddlewareQueryException {
 		return this.getListInventoryBuilder().countLotsWithAvailableBalanceForGermplasm(gid);
@@ -875,10 +836,10 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	@Override
 	public void updateInventory(Integer listId, List<InventoryDetails> inventoryDetailList) throws MiddlewareQueryException {
-		Session session = this.getCurrentSession();
-		Transaction trans = null;
+		
+		
 		try {
-			trans = session.beginTransaction();
+
 			GermplasmList germplasmList = this.getGermplasmListDAO().getById(listId);
 			GermplasmListType germplasmListType = GermplasmListType.valueOf(germplasmList.getType());
 			int numberOfEntries = 1;
@@ -895,20 +856,13 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 					transaction.setBulkCompl(Util.nullIfEmpty(inventoryDetails.getBulkCompl()));
 				}
 				this.getTransactionDao().saveOrUpdate(transaction);
-				if (numberOfEntries % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					session.flush();
-					session.clear();
-				}
 				numberOfEntries++;
 			}
-			trans.commit();
+
 		} catch (Exception e) {
-			this.rollbackTransaction(trans);
+
 			this.logAndThrowException("Error encountered while updating inventory " + "of list id " + listId + "." + e.getMessage(), e,
 					InventoryDataManagerImpl.LOG);
-		} finally {
-			session.flush();
-			session.clear();
 		}
 	}
 

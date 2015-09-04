@@ -133,8 +133,6 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 
 	public int getExperimentIdByLocationIdStockId(int projectId, Integer locationId, Integer stockId) throws MiddlewareQueryException {
 		try {
-			this.flush();
-
 			// update the value of phenotypes
 			String sql =
 					"SELECT exp.nd_experiment_id " + "FROM nd_experiment_project ep "
@@ -146,9 +144,6 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 
 			SQLQuery statement = this.getSession().createSQLQuery(sql);
 			Integer returnVal = (Integer) statement.uniqueResult();
-
-			this.flush();
-			this.clear();
 
 			if (returnVal == null) {
 				return 0;
@@ -176,6 +171,31 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 		} catch (HibernateException e) {
 			this.logAndThrowException(
 					"Error at getExperimentIdByProjectId=" + projectId + ", " + " query at ExperimentProjectDao: " + e.getMessage(), e);
+		}
+		return null;
+	}
+
+	public Integer getGeolocationIdByProjectIdAndTrialInstanceNumber(int projectId, String trialInstanceNumber)
+			throws MiddlewareQueryException {
+		try {
+			StringBuilder sql = new StringBuilder();
+			sql.append("SELECT ng.nd_geolocation_id ");
+			sql.append("FROM nd_experiment_project nep ");
+			sql.append("INNER JOIN nd_experiment ne ");
+			sql.append("ON nep.nd_experiment_id = ne.nd_experiment_id ");
+			sql.append("INNER JOIN nd_geolocation ng ");
+			sql.append("ON ng.nd_geolocation_id = ne.nd_geolocation_id ");
+			sql.append("WHERE nep.project_id = :projectId ");
+			sql.append("AND ng.description = :trialInstanceNumber ");
+			sql.append("GROUP BY ng.nd_geolocation_id ");
+			SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+			query.setParameter("projectId", projectId);
+			query.setParameter("trialInstanceNumber", trialInstanceNumber);
+			return (Integer) query.uniqueResult();
+
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error at getGeolocationIdByProjectIdAndTrialInstanceNumber = " + projectId + ", "
+					+ trialInstanceNumber + " at ExperimentProjectDao: " + e.getMessage(), e);
 		}
 		return null;
 	}

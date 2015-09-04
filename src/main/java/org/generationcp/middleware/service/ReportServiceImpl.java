@@ -24,7 +24,9 @@ import org.generationcp.middleware.reports.BuildReportException;
 import org.generationcp.middleware.reports.Reporter;
 import org.generationcp.middleware.reports.ReporterFactory;
 import org.generationcp.middleware.service.api.ReportService;
+import org.springframework.transaction.annotation.Transactional;
 
+@Transactional
 public class ReportServiceImpl extends Service implements ReportService {
 
 	private final ReporterFactory factory = ReporterFactory.instance();

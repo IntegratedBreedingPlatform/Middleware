@@ -135,7 +135,7 @@ a problem with the connection passed to them.
 1. To run the JUnit tests in the project, you need: Java, Maven, and an IBDB database you can connect 
 to.  The current schema tested right now is the IBDB version 1.</br>
 </br>
-2. Create a file named "testDatabaseConfig.properties" in the src/test/resources folder of the project.
+2. Create a file named "test.properties" in the src/test/resources folder of the project.
 The content of the file should be like this:</br>
 </br>
 local.host = localhost</br>
@@ -177,7 +177,7 @@ limit the test class to run by using the option "-Dtest=TestClassName", for exam
 mvn clean test -Dtest=TestGermplasmDataManagerImpl</br>
 </br>
 </p>
-4. If you are using a configuration folder (e.g. dev), put the testDatabaseConfig.properties to 
+4. If you are using a configuration folder (e.g. dev), put the test.properties to 
 pipeline/config/dev folder, then run mvn clean test -DenvConfig=dev<br/>
 
 <h4>Technical Support</h4>

@@ -23,12 +23,14 @@ import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the PedigreeDataManager interface. To instantiate this
  * class, a Hibernate Session must be passed to its constructor.
  * 
  */
+@Transactional
 public class PedigreeDataManagerImpl extends DataManager implements PedigreeDataManager{
 
     private GermplasmDataManagerImpl germplasmDataManager;

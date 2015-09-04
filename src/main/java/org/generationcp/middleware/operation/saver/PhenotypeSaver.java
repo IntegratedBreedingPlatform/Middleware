@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -45,12 +44,9 @@ public class PhenotypeSaver extends Saver {
 	}
 
 	public void savePhenotypes(ExperimentModel experimentModel, VariableList variates) throws MiddlewareQueryException {
-		int i = 0;
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
 		if (variates != null && variates.getVariables() != null && !variates.getVariables().isEmpty()) {
 			for (Variable variable : variates.getVariables()) {
-
-				i++;
 
 				try {
 					this.save(experimentModel.getNdExperimentId(), variable);
@@ -61,16 +57,9 @@ public class PhenotypeSaver extends Saver {
 					}
 					exceptions.put(e.getException().getStandardVariableId(), e.getException());
 				}
-				if (i % DatabaseBroker.JDBC_BATCH_SIZE == 0) {
-					this.getPhenotypeDao().flush();
-					this.getPhenotypeDao().clear();
-				}
-
 			}
-
-			this.getPhenotypeDao().flush();
-			this.getPhenotypeDao().clear();
 		}
+
 		if (exceptions != null) {
 			throw new PhenotypeException(exceptions);
 		}
@@ -79,8 +68,9 @@ public class PhenotypeSaver extends Saver {
 	public void save(int experimentId, Variable variable) throws MiddlewareQueryException {
 		Phenotype phenotype = this.createPhenotype(variable);
 		if (phenotype != null) {
-			this.getPhenotypeDao().save(phenotype);
+			phenotype = this.getPhenotypeDao().save(phenotype);
 			this.saveExperimentPhenotype(experimentId, phenotype.getPhenotypeId());
+			variable.setPhenotypeId(phenotype.getPhenotypeId());
 		}
 	}
 
@@ -128,29 +118,15 @@ public class PhenotypeSaver extends Saver {
 						if (enumeration == null && NumberUtils.isNumber(variable.getValue())) {
 							enumeration =
 									variable.getVariableType().getStandardVariable()
-											.getEnumeration(Double.valueOf(variable.getValue()).intValue());
+									.getEnumeration(Double.valueOf(variable.getValue()).intValue());
 						}
 						if (enumeration != null) {
 							phenotype.setcValue(enumeration.getId());
+							phenotype.setValue(enumeration.getName());
 						} else {
-							// throw a PhenotypeException
-							PhenotypeExceptionDto exception = new PhenotypeExceptionDto();
-							exception.setLocalVariableName(variable.getVariableType().getLocalName());
-							exception.setStandardVariableName(variable.getVariableType().getStandardVariable().getName());
-							exception.setStandardVariableId(variable.getVariableType().getStandardVariable().getId());
-							exception.setInvalidValues(new TreeSet<String>());
-							exception.getInvalidValues().add(variable.getValue());
-							List<Enumeration> enumerations = variable.getVariableType().getStandardVariable().getEnumerations();
-							if (enumerations != null) {
-								for (int i = 0; i < enumerations.size(); i++) {
-									Enumeration e = enumerations.get(i);
-									if (exception.getValidValues() == null) {
-										exception.setValidValues(new TreeSet<String>());
-									}
-									exception.getValidValues().add(e.getName());
-								}
-							}
-							throw new PhenotypeException(exception);
+							//set it as a custom value of the categorical variate
+							phenotype.setValue(variable.getValue());
+							phenotype.setcValue(null);
 						}
 					} else if (dataType.getId() == TermId.NUMERIC_VARIABLE.getId()) {
 						if (!NumberUtils.isNumber(variable.getValue())) {

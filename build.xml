@@ -48,7 +48,7 @@
 		<copy todir="src/test/resources" overwrite="true">
 			<fileset dir="${basedir}/pipeline/config/ci" id="fromDir">
 				<include name="test-hibernate.cfg.xml" />
-				<include name="testDatabaseConfig.properties" />
+				<include name="test.properties" />
 			</fileset>
 		</copy>
 	</target>

@@ -16,6 +16,8 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
@@ -31,6 +33,7 @@ public class PhenotypeOutlier implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "phenotype_outlier_id")
 	private Integer phenotypeOutlierId;
@@ -46,9 +49,8 @@ public class PhenotypeOutlier implements Serializable {
 	public PhenotypeOutlier() {
 	}
 
-	public PhenotypeOutlier(Integer phenotypeOutlierId, Integer phenotypeId, Integer observableId, Integer plotNo, Integer projectId,
+	public PhenotypeOutlier(Integer phenotypeId, Integer observableId, Integer plotNo, Integer projectId,
 			String value) {
-		this.setPhenotypeOutlierId(phenotypeOutlierId);
 		this.setPhenotypeId(phenotypeId);
 		this.setValue(value);
 	}

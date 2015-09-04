@@ -10,8 +10,7 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.mbdt.SelectedGenotypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.MBDTDataManager;
@@ -19,18 +18,16 @@ import org.generationcp.middleware.pojos.mbdt.MBDTGeneration;
 import org.generationcp.middleware.pojos.mbdt.MBDTProjectData;
 import org.generationcp.middleware.pojos.mbdt.SelectedGenotype;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import com.mchange.v2.c3p0.DriverManagerDataSourceFactory;
+public class MBDTDataManagerTest extends IntegrationTestBase {
 
-/**
- * Created by IntelliJ IDEA. User: Daniel Villafuerte
- */
-public class MBDTDataManagerTest extends DataManagerIntegrationTest {
-
+	@Autowired
 	private MBDTDataManager dut;
+
+	// TODO setup in testContext.xml and inject
 	private DataSource dataSource;
 
 	public static final Integer SAMPLE_PROJECT_ID = -1;
@@ -47,16 +44,6 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 		MBDTDataManagerTest.SAMPLE_PARENT_GIDS.add(4);
 		MBDTDataManagerTest.SAMPLE_PARENT_GIDS.add(5);
 		MBDTDataManagerTest.SAMPLE_PARENT_GIDS.add(6);
-	}
-
-	@Before
-	public void prepareDatabaseItems() throws Exception {
-		this.dut = DataManagerIntegrationTest.managerFactory.getMbdtDataManager();
-		this.dataSource =
-				DriverManagerDataSourceFactory.create(MiddlewareIntegrationTest.connectionParameters.getDriverName(),
-						MiddlewareIntegrationTest.connectionParameters.getUrl(),
-						MiddlewareIntegrationTest.connectionParameters.getUsername(),
-						MiddlewareIntegrationTest.connectionParameters.getPassword());
 	}
 
 	protected void executeUpdate(String sql) throws Exception {
@@ -91,7 +78,9 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 	}
 
 	protected void deleteSampleProjectData() throws Exception {
-		this.executeUpdate("DELETE FROM mbdt_project WHERE project_id = " + MBDTDataManagerTest.SAMPLE_PROJECT_ID);
+		this.executeUpdate("DELETE FROM mbdt_generations WHERE project_id IN (SELECT project_id FROM mbdt_project WHERE pname = '"
+				+ MBDTDataManagerTest.SAMPLE_PROJECT_NAME + "')");
+		this.executeUpdate("DELETE FROM mbdt_project WHERE pname = '" + MBDTDataManagerTest.SAMPLE_PROJECT_NAME + "'");
 	}
 
 	protected void insertSampleMarkerData() throws Exception {
@@ -164,7 +153,6 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 		this.dut.clear();
 		Integer generatedId = this.dut.setProjectData(newProject);
 		Assert.assertNotNull(generatedId);
-		Assert.assertTrue(generatedId < 0);
 
 		// clean up operation
 		Connection connection = null;
@@ -201,9 +189,8 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 
 		MBDTProjectData newProject = new MBDTProjectData(null, null, 0, null, null, null);
 
-		Integer generatedId = null;
 		try {
-			generatedId = this.dut.setProjectData(newProject);
+			this.dut.setProjectData(newProject);
 
 			Assert.fail("Should not allow saving of null project name");
 		} catch (MiddlewareQueryException e) {
@@ -297,7 +284,6 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 			Assert.assertNotNull(generation);
 			Assert.assertEquals(MBDTDataManagerTest.SAMPLE_GENERATION_NAME, generation.getGenerationName());
 			Assert.assertNotNull(generation.getGenerationID());
-			Assert.assertTrue(generation.getGenerationID() < 0);
 
 			conn = this.dataSource.getConnection();
 			stmt = conn.createStatement();
@@ -510,8 +496,7 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 			this.insertSampleGenerationData();
 			this.insertSampleAccessionData();
 
-			// attempt to retrieve accesions for non existing generation
-			List<SelectedGenotype> accessions = this.dut.getSelectedAccession(Integer.MAX_VALUE);
+			this.dut.getSelectedAccession(Integer.MAX_VALUE);
 			Assert.fail("Unable to recognize non existing generation ID");
 		} catch (MiddlewareQueryException e) {
 
@@ -611,10 +596,9 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 
 			MBDTGeneration generation =
 					new MBDTGeneration(MBDTDataManagerTest.SAMPLE_GENERATION_NAME, newProject, MBDTDataManagerTest.SAMPLE_DATASET_ID);
-			generation.setGenerationID(MBDTDataManagerTest.SAMPLE_GENERATION_ID);
 			this.dut.setGeneration(MBDTDataManagerTest.SAMPLE_PROJECT_ID, generation);
 
-			this.dut.setSelectedAccessions(MBDTDataManagerTest.SAMPLE_GENERATION_ID, gidList);
+			this.dut.setSelectedAccessions(generation, gidList);
 
 			conn = this.dataSource.getConnection();
 			stmt = conn.createStatement();
@@ -672,7 +656,6 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 
 			MBDTGeneration generation =
 					new MBDTGeneration(MBDTDataManagerTest.SAMPLE_GENERATION_NAME, newProject, MBDTDataManagerTest.SAMPLE_DATASET_ID);
-			generation.setGenerationID(MBDTDataManagerTest.SAMPLE_GENERATION_ID);
 			this.dut.setGeneration(MBDTDataManagerTest.SAMPLE_PROJECT_ID, generation);
 
 			conn = this.dataSource.getConnection();
@@ -682,7 +665,7 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 			assert rs.next();
 			int genotypeCount = rs.getInt("genotypeCount");
 
-			this.dut.setSelectedAccessions(MBDTDataManagerTest.SAMPLE_GENERATION_ID, gidList);
+			this.dut.setSelectedAccessions(generation, gidList);
 
 			rs = stmt.executeQuery("SELECT count(*) as genotypeCount from mbdt_selected_genotypes");
 			assert rs.next();
@@ -700,9 +683,9 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 	}
 
 	@Test
-	public void testSetParentDataNonExistingGenerationID() throws Exception {
+	public void testSetParentDataNonExistingGeneration() throws Exception {
 		try {
-			this.dut.setParentData(Integer.MAX_VALUE, SelectedGenotypeEnum.R, MBDTDataManagerTest.SAMPLE_PARENT_GIDS);
+			this.dut.setParentData(null, SelectedGenotypeEnum.R, MBDTDataManagerTest.SAMPLE_PARENT_GIDS);
 			Assert.fail("Unable to catch non existing generation ID");
 		} catch (MiddlewareQueryException e) {
 			e.printStackTrace();
@@ -744,14 +727,13 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 
 			MBDTGeneration generation =
 					new MBDTGeneration(MBDTDataManagerTest.SAMPLE_GENERATION_NAME, newProject, MBDTDataManagerTest.SAMPLE_DATASET_ID);
-			generation.setGenerationID(MBDTDataManagerTest.SAMPLE_GENERATION_ID);
 			this.dut.setGeneration(MBDTDataManagerTest.SAMPLE_PROJECT_ID, generation);
 
 			// insert parent data into mbdt_selected_genotypes table
-			this.dut.setParentData(MBDTDataManagerTest.SAMPLE_GENERATION_ID, SelectedGenotypeEnum.D, new ArrayList<Integer>(gidList));
+			this.dut.setParentData(generation, SelectedGenotypeEnum.D, new ArrayList<Integer>(gidList));
 
 			// using the same gid list, pass them into the setSelectedAccessions method
-			this.dut.setSelectedAccessions(MBDTDataManagerTest.SAMPLE_GENERATION_ID, new ArrayList<Integer>(gidList));
+			this.dut.setSelectedAccessions(generation, new ArrayList<Integer>(gidList));
 
 			conn = this.dataSource.getConnection();
 			stmt = conn.createStatement();
@@ -832,17 +814,16 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 
 			MBDTGeneration generation =
 					new MBDTGeneration(MBDTDataManagerTest.SAMPLE_GENERATION_NAME, newProject, MBDTDataManagerTest.SAMPLE_DATASET_ID);
-			generation.setGenerationID(MBDTDataManagerTest.SAMPLE_GENERATION_ID);
 			this.dut.setGeneration(MBDTDataManagerTest.SAMPLE_PROJECT_ID, generation);
 
 			// insert parent data into mbdt_selected_genotypes table
-			this.dut.setParentData(MBDTDataManagerTest.SAMPLE_GENERATION_ID, SelectedGenotypeEnum.D, gidList);
+			this.dut.setParentData(generation, SelectedGenotypeEnum.D, gidList);
 
 			// using the same gid list, pass them into the setSelectedAccessions method
-			this.dut.setSelectedAccessions(MBDTDataManagerTest.SAMPLE_GENERATION_ID, new ArrayList<Integer>(gidList));
+			this.dut.setSelectedAccessions(generation, new ArrayList<Integer>(gidList));
 
 			// make a call to selected accessions a second time. the items that were marked as selected should go back to being selected
-			this.dut.setSelectedAccessions(MBDTDataManagerTest.SAMPLE_GENERATION_ID, new ArrayList<Integer>(gidList));
+			this.dut.setSelectedAccessions(generation, new ArrayList<Integer>(gidList));
 
 			conn = this.dataSource.getConnection();
 			stmt = conn.createStatement();
@@ -923,10 +904,9 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 
 			MBDTGeneration generation =
 					new MBDTGeneration(MBDTDataManagerTest.SAMPLE_GENERATION_NAME, newProject, MBDTDataManagerTest.SAMPLE_DATASET_ID);
-			generation.setGenerationID(MBDTDataManagerTest.SAMPLE_GENERATION_ID);
 			this.dut.setGeneration(MBDTDataManagerTest.SAMPLE_PROJECT_ID, generation);
 
-			this.dut.setParentData(MBDTDataManagerTest.SAMPLE_GENERATION_ID, SelectedGenotypeEnum.R, gidList);
+			this.dut.setParentData(generation, SelectedGenotypeEnum.R, gidList);
 
 			conn = this.dataSource.getConnection();
 			stmt = conn.createStatement();
@@ -1023,21 +1003,16 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 					new MBDTGeneration(MBDTDataManagerTest.SAMPLE_GENERATION_NAME, newProject, MBDTDataManagerTest.SAMPLE_DATASET_ID);
 			this.dut.setGeneration(MBDTDataManagerTest.SAMPLE_PROJECT_ID, generation);
 
-			this.dut.setParentData(MBDTDataManagerTest.SAMPLE_GENERATION_ID, SelectedGenotypeEnum.R, new ArrayList<Integer>(
-					MBDTDataManagerTest.SAMPLE_PARENT_GIDS));
+			this.dut.setParentData(generation, SelectedGenotypeEnum.R, new ArrayList<Integer>(MBDTDataManagerTest.SAMPLE_PARENT_GIDS));
 
 			// make another call to setParentData. since the gid entries should already be existing, it should just modify those items
-			this.dut.setParentData(MBDTDataManagerTest.SAMPLE_GENERATION_ID, SelectedGenotypeEnum.D, new ArrayList<Integer>(
-					MBDTDataManagerTest.SAMPLE_PARENT_GIDS));
+			this.dut.setParentData(generation, SelectedGenotypeEnum.D, new ArrayList<Integer>(MBDTDataManagerTest.SAMPLE_PARENT_GIDS));
 
 			conn = this.dataSource.getConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(sqlString.toString());
 
-			int recordCount = 0;
-
 			while (rs.next()) {
-				recordCount++;
 				String type = rs.getString("sg_type");
 
 				Assert.assertEquals("D", type);
@@ -1107,11 +1082,10 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 			if (generation == null) {
 				generation =
 						new MBDTGeneration(MBDTDataManagerTest.SAMPLE_GENERATION_NAME, newProject, MBDTDataManagerTest.SAMPLE_DATASET_ID);
-				generation.setGenerationID(MBDTDataManagerTest.SAMPLE_GENERATION_ID);
 				this.dut.setGeneration(MBDTDataManagerTest.SAMPLE_PROJECT_ID, generation);
 			}
 
-			this.dut.setParentData(MBDTDataManagerTest.SAMPLE_GENERATION_ID, SelectedGenotypeEnum.R, gidList);
+			this.dut.setParentData(generation, SelectedGenotypeEnum.R, gidList);
 
 			conn = this.dataSource.getConnection();
 			stmt = conn.createStatement();
@@ -1188,22 +1162,17 @@ public class MBDTDataManagerTest extends DataManagerIntegrationTest {
 			this.dut.setGeneration(MBDTDataManagerTest.SAMPLE_PROJECT_ID, generation);
 
 			// insert entries into the system whose type is recurrent, with the selected prefix
-			this.dut.setSelectedAccessions(MBDTDataManagerTest.SAMPLE_GENERATION_ID, new ArrayList<Integer>(
-					MBDTDataManagerTest.SAMPLE_PARENT_GIDS));
+			this.dut.setSelectedAccessions(generation, new ArrayList<Integer>(MBDTDataManagerTest.SAMPLE_PARENT_GIDS));
 
 			// since the entries should already be existing in the system, it should change the parent type of the entries, without removing
 			// the selected prefix
-			this.dut.setParentData(MBDTDataManagerTest.SAMPLE_GENERATION_ID, SelectedGenotypeEnum.D, new ArrayList<Integer>(
-					MBDTDataManagerTest.SAMPLE_PARENT_GIDS));
+			this.dut.setParentData(generation, SelectedGenotypeEnum.D, new ArrayList<Integer>(MBDTDataManagerTest.SAMPLE_PARENT_GIDS));
 
 			conn = this.dataSource.getConnection();
 			stmt = conn.createStatement();
 			rs = stmt.executeQuery(sqlString.toString());
 
-			int recordCount = 0;
-
 			while (rs.next()) {
-				recordCount++;
 				String type = rs.getString("sg_type");
 
 				Assert.assertEquals("SD", type);

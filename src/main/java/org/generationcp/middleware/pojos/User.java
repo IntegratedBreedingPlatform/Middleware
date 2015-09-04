@@ -13,17 +13,23 @@ package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -58,6 +64,7 @@ public class User implements Serializable, BeanFormState {
 	public static final String GET_ALL_USERS_SORTED = "getAllUsersSorted";
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "userid")
 	private Integer userid;
@@ -89,14 +96,16 @@ public class User implements Serializable, BeanFormState {
 	@Column(name = "cdate")
 	private Integer cdate;
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@NotFound(action = NotFoundAction.IGNORE)
 	private List<UserRole> roles;
 
 	@Transient
 	private Boolean isnew = false;
 
-	@Transient
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name="personid", insertable=false, updatable=false)
+	@NotFound(action = NotFoundAction.IGNORE)
 	private Person person;
 
 	@Transient
@@ -143,8 +152,8 @@ public class User implements Serializable, BeanFormState {
 		user.setName(this.name);
 		user.setPassword(this.password);
 		user.setPersonid(this.personid);
-		user.setAdate(this.adate);
-		user.setCdate(this.cdate);
+		user.setAssignDate(this.adate);
+		user.setCloseDate(this.cdate);
 		user.setIsNew(this.isnew);
 		user.setActive(this.active);
 		user.setEnabled(this.enabled);
@@ -215,19 +224,19 @@ public class User implements Serializable, BeanFormState {
 		this.personid = personid;
 	}
 
-	public Integer getAdate() {
+	public Integer getAssignDate() {
 		return this.adate;
 	}
 
-	public void setAdate(Integer adate) {
+	public void setAssignDate(Integer adate) {
 		this.adate = adate;
 	}
 
-	public Integer getCdate() {
+	public Integer getCloseDate() {
 		return this.cdate;
 	}
 
-	public void setCdate(Integer cdate) {
+	public void setCloseDate(Integer cdate) {
 		this.cdate = cdate;
 	}
 
@@ -337,4 +346,15 @@ public class User implements Serializable, BeanFormState {
 
 	}
 
+	public boolean hasRole(String role) {
+		if (!Objects.equals(this.roles,null)) {
+			for (UserRole userRole : this.roles) {
+				if (userRole.getRole().equals(role)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
 }

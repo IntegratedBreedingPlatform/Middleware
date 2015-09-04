@@ -6,7 +6,7 @@ Running JUnit tests
 to.  The current schema tested right now is the ICIS 5.5 schema, in the future versions of
 the IBDB schema will be tested.
 
-2. Create a file named "testDatabaseConfig.properties" in the src/test/resources folder of the project.
+2. Create a file named "test.properties" in the src/test/resources folder of the project.
 The content of the file should be like this:
 
 local.host = localhost
@@ -47,5 +47,5 @@ limit the test class to run by using the option "-Dtest=TestClassName", for exam
 mvn clean test -Dtest=TestGermplasmDataManagerImpl
 
 
-4. If you are using a configuration folder (e.g. dev), put the testDatabaseConfig.properties to 
+4. If you are using a configuration folder (e.g. dev), put the test.properties to 
 pipeline/config/dev folder, then run mvn clean test -DenvConfig=dev

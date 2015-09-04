@@ -3,30 +3,29 @@ package org.generationcp.middleware.dao.ims;
 
 import java.util.List;
 
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
-public class StockTransactionDAOTest extends MiddlewareIntegrationTest {
+public class StockTransactionDAOTest extends IntegrationTestBase {
 
-	private static StockTransactionDAO dao;
+	private StockTransactionDAO dao;
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		StockTransactionDAOTest.dao = new StockTransactionDAO();
-		StockTransactionDAOTest.dao.setSession(MiddlewareIntegrationTest.sessionUtil.getCurrentSession());
+	@Before
+	public void setUp() throws Exception {
+		this.dao = new StockTransactionDAO();
+		this.dao.setSession(this.sessionProvder.getSession());
 	}
 
 	@Test
 	public void testRetrieveInventoryDetailsForListDataProjectListId() throws MiddlewareQueryException {
 		Integer stockListId = 17;
 		List<InventoryDetails> inventoryDetailsList =
-				StockTransactionDAOTest.dao.retrieveInventoryDetailsForListDataProjectListId(stockListId, GermplasmListType.CROSSES);
+				this.dao.retrieveInventoryDetailsForListDataProjectListId(stockListId, GermplasmListType.CROSSES);
 		Assert.assertNotNull(inventoryDetailsList);
 		for (InventoryDetails inventoryDetails : inventoryDetailsList) {
 			Assert.assertNotNull(inventoryDetails.getLotId());
@@ -61,11 +60,5 @@ public class StockTransactionDAOTest extends MiddlewareIntegrationTest {
 			}
 
 		}
-	}
-
-	@AfterClass
-	public static void tearDown() throws Exception {
-		StockTransactionDAOTest.dao.setSession(null);
-		StockTransactionDAOTest.dao = null;
 	}
 }

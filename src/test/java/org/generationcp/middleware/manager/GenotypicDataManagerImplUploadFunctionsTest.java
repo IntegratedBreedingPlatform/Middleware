@@ -17,8 +17,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.generationcp.middleware.DataManagerIntegrationTest;
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
@@ -42,12 +41,13 @@ import org.generationcp.middleware.pojos.gdms.SNPDataRow;
 import org.generationcp.middleware.pojos.gdms.SSRDataRow;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
-public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerIntegrationTest {
+public class GenotypicDataManagerImplUploadFunctionsTest extends IntegrationTestBase {
 
-	private static GenotypicDataManager manager;
+	@Autowired
+	private GenotypicDataManager manager;
 
 	private static final String DATASET = "Dataset";
 	private static final String DATASET_USERS = "DatasetUsers";
@@ -61,11 +61,6 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 	private static final String MARKER = "Marker";
 
 	private static final int NUMBER_OF_ROWS = 10; // 210 * 260;
-
-	@BeforeClass
-	public static void setUp() throws Exception {
-		GenotypicDataManagerImplUploadFunctionsTest.manager = DataManagerIntegrationTest.managerFactory.getGenotypicDataManager();
-	}
 
 	private Dataset createDataset() throws Exception {
 		Integer datasetId = null; // Crop tested: Groundnut
@@ -279,18 +274,17 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 		}
 
 		Boolean addStatus =
-				GenotypicDataManagerImplUploadFunctionsTest.manager.setDart(dataset, datasetUser, markers, markerMetadataSets,
-						accMetadataSets, dartValueList, alleleValueList);
+				this.manager.setDart(dataset, datasetUser, markers, markerMetadataSets, accMetadataSets, dartValueList, alleleValueList);
 		Assert.assertTrue(addStatus);
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testSetDArT() Added: ");
+		Debug.println(IntegrationTestBase.INDENT, "testSetDArT() Added: ");
 		this.printUploadedData(dataset, datasetUser, markers, markerMetadataSets, null);
 		if (accMetadataSets.size() < 20) {
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, accMetadataSets);
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, alleleValueList);
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, dartValueList);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, accMetadataSets);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, alleleValueList);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, dartValueList);
 		} else {
-			Debug.println(MiddlewareIntegrationTest.INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
+			Debug.println(IntegrationTestBase.INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
 		}
 
 		/*
@@ -345,18 +339,16 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 			id++;
 		}
 
-		Boolean addStatus =
-				GenotypicDataManagerImplUploadFunctionsTest.manager.setSSR(dataset, datasetUser, markers, markerMetadataSets,
-						accMetadataSets, alleleValueList);
+		Boolean addStatus = this.manager.setSSR(dataset, datasetUser, markers, markerMetadataSets, accMetadataSets, alleleValueList);
 		Assert.assertTrue(addStatus);
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testSetSSR() Added: ");
+		Debug.println(IntegrationTestBase.INDENT, "testSetSSR() Added: ");
 		this.printUploadedData(dataset, datasetUser, markers, markerMetadataSets, null);
 		if (accMetadataSets.size() < 20) {
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, accMetadataSets);
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, alleleValueList);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, accMetadataSets);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, alleleValueList);
 		} else {
-			Debug.println(MiddlewareIntegrationTest.INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
+			Debug.println(IntegrationTestBase.INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
 		}
 
 		/*
@@ -413,18 +405,16 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 			id++;
 		}
 
-		Boolean addStatus =
-				GenotypicDataManagerImplUploadFunctionsTest.manager.setSNP(dataset, datasetUser, markers, markerMetadataSets,
-						accMetadataSets, charValueList);
+		Boolean addStatus = this.manager.setSNP(dataset, datasetUser, markers, markerMetadataSets, accMetadataSets, charValueList);
 		Assert.assertTrue(addStatus);
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testSetSNP() Added: ");
+		Debug.println(IntegrationTestBase.INDENT, "testSetSNP() Added: ");
 		this.printUploadedData(dataset, datasetUser, markers, markerMetadataSets, null);
 		if (accMetadataSets.size() < 20) {
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, accMetadataSets);
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, charValueList);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, accMetadataSets);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, charValueList);
 		} else {
-			Debug.println(MiddlewareIntegrationTest.INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
+			Debug.println(IntegrationTestBase.INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
 		}
 		/*
 		 * TO VERIFY RESULTS IN DB: select * from gdms_dataset where dataset_id = <datasetId>; select * from gdms_dataset_users order by
@@ -498,17 +488,17 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 		}
 
 		Boolean addStatus =
-				GenotypicDataManagerImplUploadFunctionsTest.manager.setMappingABH(dataset, datasetUser, mappingPop, markers,
-						markerMetadataSets, accMetadataSets, mappingPopValueList);
+				this.manager.setMappingABH(dataset, datasetUser, mappingPop, markers, markerMetadataSets, accMetadataSets,
+						mappingPopValueList);
 		Assert.assertTrue(addStatus);
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testSetMappingABH() Added: ");
+		Debug.println(IntegrationTestBase.INDENT, "testSetMappingABH() Added: ");
 		this.printUploadedData(dataset, datasetUser, markers, markerMetadataSets, mappingPop);
 		if (accMetadataSets.size() < 20) {
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, accMetadataSets);
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, mappingPopValueList);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, accMetadataSets);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, mappingPopValueList);
 		} else {
-			Debug.println(MiddlewareIntegrationTest.INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
+			Debug.println(IntegrationTestBase.INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
 		}
 
 		/*
@@ -574,19 +564,19 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 		}
 
 		Boolean addStatus =
-				GenotypicDataManagerImplUploadFunctionsTest.manager.setMappingAllelicSNP(dataset, datasetUser, mappingPop, markers,
-						markerMetadataSets, accMetadataSets, mappingPopValueList, charValueList);
+				this.manager.setMappingAllelicSNP(dataset, datasetUser, mappingPop, markers, markerMetadataSets, accMetadataSets,
+						mappingPopValueList, charValueList);
 
 		Assert.assertTrue(addStatus);
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testSetMappingAllelicSNP() Added: ");
+		Debug.println(IntegrationTestBase.INDENT, "testSetMappingAllelicSNP() Added: ");
 		this.printUploadedData(dataset, datasetUser, markers, markerMetadataSets, mappingPop);
 		if (accMetadataSets.size() < 20) {
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, accMetadataSets);
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, mappingPopValueList);
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, charValueList);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, accMetadataSets);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, mappingPopValueList);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, charValueList);
 		} else {
-			Debug.println(MiddlewareIntegrationTest.INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
+			Debug.println(IntegrationTestBase.INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
 		}
 		/*
 		 * TO VERIFY RESULTS IN DB: select * from gdms_dataset where dataset_id = <datasetId>; select * from gdms_dataset_users order by
@@ -656,20 +646,20 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 		}
 
 		Boolean addStatus =
-				GenotypicDataManagerImplUploadFunctionsTest.manager.setMappingAllelicSSRDArT(dataset, datasetUser, mappingPop, markers,
-						markerMetadataSets, accMetadataSets, mappingPopValueList, alleleValueList, dartValueList);
+				this.manager.setMappingAllelicSSRDArT(dataset, datasetUser, mappingPop, markers, markerMetadataSets, accMetadataSets,
+						mappingPopValueList, alleleValueList, dartValueList);
 
 		Assert.assertTrue(addStatus);
 
-		Debug.println(MiddlewareIntegrationTest.INDENT, "testSetMappingAllelicSSRDArT() Added: ");
+		Debug.println(IntegrationTestBase.INDENT, "testSetMappingAllelicSSRDArT() Added: ");
 		this.printUploadedData(dataset, datasetUser, markers, markerMetadataSets, mappingPop);
 		if (accMetadataSets.size() < 20) {
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, accMetadataSets);
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, mappingPopValueList);
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, alleleValueList);
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, dartValueList);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, accMetadataSets);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, mappingPopValueList);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, alleleValueList);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, dartValueList);
 		} else {
-			Debug.println(MiddlewareIntegrationTest.INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
+			Debug.println(IntegrationTestBase.INDENT * 2, "#Data Rows Added: " + accMetadataSets.size());
 		}
 		/*
 		 * TO VERIFY RESULTS IN DB: select * from gdms_dataset where dataset_id = <datasetId>; select * from gdms_dataset_users order by
@@ -684,20 +674,20 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 	private void printUploadedData(Dataset dataset, DatasetUsers datasetUser, List<Marker> markers,
 			List<MarkerMetadataSet> markerMetadataSets, MappingPop mappingPop) {
 
-		Debug.println(MiddlewareIntegrationTest.INDENT * 2, dataset.toString());
-		Debug.println(MiddlewareIntegrationTest.INDENT * 2, datasetUser.toString());
+		Debug.println(IntegrationTestBase.INDENT * 2, dataset.toString());
+		Debug.println(IntegrationTestBase.INDENT * 2, datasetUser.toString());
 		if (mappingPop != null) {
-			Debug.println(MiddlewareIntegrationTest.INDENT * 2, mappingPop.toString());
+			Debug.println(IntegrationTestBase.INDENT * 2, mappingPop.toString());
 		}
 		if (markers != null && markers.size() < 20) {
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, markers);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, markers);
 		} else {
-			Debug.println(MiddlewareIntegrationTest.INDENT * 2, "#Markers Added: " + markers.size());
+			Debug.println(IntegrationTestBase.INDENT * 2, "#Markers Added: " + markers.size());
 		}
 		if (markerMetadataSets != null && markerMetadataSets.size() < 20) {
-			Debug.printObjects(MiddlewareIntegrationTest.INDENT * 2, markerMetadataSets);
+			Debug.printObjects(IntegrationTestBase.INDENT * 2, markerMetadataSets);
 		} else {
-			Debug.println(MiddlewareIntegrationTest.INDENT * 2, "#MarkerMetadataSets Added: " + markerMetadataSets.size());
+			Debug.println(IntegrationTestBase.INDENT * 2, "#MarkerMetadataSets Added: " + markerMetadataSets.size());
 		}
 
 	}
@@ -708,9 +698,9 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 		List<Dataset> datasets = new ArrayList<Dataset>();
 
 		if (type == GdmsType.TYPE_MAPPING) {
-			datasets = GenotypicDataManagerImplUploadFunctionsTest.manager.getDatasetsByMappingTypeFromLocal(mappingType);
+			datasets = this.manager.getDatasetsByMappingTypeFromLocal(mappingType);
 		} else {
-			datasets = GenotypicDataManagerImplUploadFunctionsTest.manager.getDatasetsByType(type);
+			datasets = this.manager.getDatasetsByType(type);
 		}
 		if (datasets.size() > 0) {
 			for (Dataset dataset : datasets) {
@@ -796,7 +786,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 
 		Dataset dataset = this.getTestDatasetByType(gdmsType, null);
 		if (dataset == null) {
-			Debug.println(MiddlewareIntegrationTest.INDENT, "Please upload dataset of type " + gdmsType.getValue()
+			Debug.println(IntegrationTestBase.INDENT, "Please upload dataset of type " + gdmsType.getValue()
 					+ " first before testing update.");
 			return;
 		}
@@ -804,14 +794,12 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 		Integer datasetId = dataset.getDatasetId();
 		this.updateDataset(dataset, updateId.toString());
 
-		List<DartDataRow> rows = GenotypicDataManagerImplUploadFunctionsTest.manager.getDartDataRows(datasetId);
+		List<DartDataRow> rows = this.manager.getDartDataRows(datasetId);
 		Debug.println("ROWS BEFORE: ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, rows);
+		Debug.printObjects(IntegrationTestBase.INDENT, rows);
 
 		// Update markers
-		List<Marker> markers =
-				GenotypicDataManagerImplUploadFunctionsTest.manager
-						.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
+		List<Marker> markers = this.manager.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
 
 		// No change in markerMetadataSet
 		List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
@@ -843,15 +831,15 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 		Debug.println("ADD OR UPDATE ROW: " + newRow);
 
 		// UPDATE
-		GenotypicDataManagerImplUploadFunctionsTest.manager.updateDart(dataset, markers, markerMetadataSets, updatedRows);
+		this.manager.updateDart(dataset, markers, markerMetadataSets, updatedRows);
 
-		Dataset datasetAfter = GenotypicDataManagerImplUploadFunctionsTest.manager.getDatasetById(datasetId);
+		Dataset datasetAfter = this.manager.getDatasetById(datasetId);
 		Debug.printObject(0, "DATASET AFTER: " + datasetAfter);
 		Assert.assertEquals(dataset, datasetAfter); // Dataset updated
 
-		List<DartDataRow> rowsAfter = GenotypicDataManagerImplUploadFunctionsTest.manager.getDartDataRows(datasetId);
+		List<DartDataRow> rowsAfter = this.manager.getDartDataRows(datasetId);
 		Debug.println("ROWS AFTER: ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, rowsAfter);
+		Debug.printObjects(IntegrationTestBase.INDENT, rowsAfter);
 
 	}
 
@@ -862,7 +850,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 
 		Dataset dataset = this.getTestDatasetByType(gdmsType, null);
 		if (dataset == null) {
-			Debug.println(MiddlewareIntegrationTest.INDENT, "Please upload dataset of type " + gdmsType.getValue()
+			Debug.println(IntegrationTestBase.INDENT, "Please upload dataset of type " + gdmsType.getValue()
 					+ " first before testing update.");
 			return;
 		}
@@ -871,14 +859,12 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 
 		this.updateDataset(dataset, updateId.toString());
 
-		List<SNPDataRow> rows = GenotypicDataManagerImplUploadFunctionsTest.manager.getSNPDataRows(datasetId);
+		List<SNPDataRow> rows = this.manager.getSNPDataRows(datasetId);
 		Debug.println("ROWS BEFORE: ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, rows);
+		Debug.printObjects(IntegrationTestBase.INDENT, rows);
 
 		// Update markers
-		List<Marker> markers =
-				GenotypicDataManagerImplUploadFunctionsTest.manager
-						.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
+		List<Marker> markers = this.manager.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
 
 		// No change in markerMetadataSet
 		List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
@@ -906,15 +892,15 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 		Debug.println("ADD OR UPDATE ROW: " + newRow);
 
 		// UPDATE
-		GenotypicDataManagerImplUploadFunctionsTest.manager.updateSNP(dataset, markers, markerMetadataSets, updatedRows);
+		this.manager.updateSNP(dataset, markers, markerMetadataSets, updatedRows);
 
-		Dataset datasetAfter = GenotypicDataManagerImplUploadFunctionsTest.manager.getDatasetById(datasetId);
+		Dataset datasetAfter = this.manager.getDatasetById(datasetId);
 		Debug.printObject(0, "DATASET AFTER: " + datasetAfter);
 		Assert.assertEquals(dataset, datasetAfter); // Dataset updated
 
-		List<SNPDataRow> rowsAfter = GenotypicDataManagerImplUploadFunctionsTest.manager.getSNPDataRows(datasetId);
+		List<SNPDataRow> rowsAfter = this.manager.getSNPDataRows(datasetId);
 		Debug.println("ROWS AFTER: ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, rowsAfter);
+		Debug.printObjects(IntegrationTestBase.INDENT, rowsAfter);
 	}
 
 	@Test
@@ -925,7 +911,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 
 		Dataset dataset = this.getTestDatasetByType(gdmsType, null);
 		if (dataset == null) {
-			Debug.println(MiddlewareIntegrationTest.INDENT, "Please upload dataset of type " + gdmsType.getValue()
+			Debug.println(IntegrationTestBase.INDENT, "Please upload dataset of type " + gdmsType.getValue()
 					+ " first before testing update.");
 			return;
 		}
@@ -933,14 +919,12 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 		Integer datasetId = dataset.getDatasetId();
 		this.updateDataset(dataset, updateId.toString());
 
-		List<SSRDataRow> rows = GenotypicDataManagerImplUploadFunctionsTest.manager.getSSRDataRows(datasetId);
+		List<SSRDataRow> rows = this.manager.getSSRDataRows(datasetId);
 		Debug.println("ROWS BEFORE: ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, rows);
+		Debug.printObjects(IntegrationTestBase.INDENT, rows);
 
 		// Update markers
-		List<Marker> markers =
-				GenotypicDataManagerImplUploadFunctionsTest.manager
-						.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
+		List<Marker> markers = this.manager.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
 
 		// No change in markerMetadataSet
 		List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
@@ -968,26 +952,26 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 		Debug.println("ADD OR UPDATE ROW: " + newRow);
 
 		// UPDATE
-		GenotypicDataManagerImplUploadFunctionsTest.manager.updateSSR(dataset, markers, markerMetadataSets, updatedRows);
+		this.manager.updateSSR(dataset, markers, markerMetadataSets, updatedRows);
 
-		Dataset datasetAfter = GenotypicDataManagerImplUploadFunctionsTest.manager.getDatasetById(datasetId);
+		Dataset datasetAfter = this.manager.getDatasetById(datasetId);
 		Debug.printObject(0, "DATASET AFTER: " + datasetAfter);
 		Assert.assertEquals(dataset, datasetAfter); // Dataset updated
 
-		List<SSRDataRow> rowsAfter = GenotypicDataManagerImplUploadFunctionsTest.manager.getSSRDataRows(datasetId);
+		List<SSRDataRow> rowsAfter = this.manager.getSSRDataRows(datasetId);
 		Debug.println("ROWS AFTER: ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, rowsAfter);
+		Debug.printObjects(IntegrationTestBase.INDENT, rowsAfter);
 	}
 
 	@Test
 	public void testUpdateMappingABH() throws Exception {
 		GdmsType gdmsType = GdmsType.TYPE_MAPPING;
 		String updateId = " UPDATED " + String.valueOf((int) (Math.random() * 1000)); // to append to description/remarks field for the
-																						// update operation
+		// update operation
 
 		Dataset dataset = this.getTestDatasetByType(gdmsType, null);
 		if (dataset == null) {
-			Debug.println(MiddlewareIntegrationTest.INDENT, "Please upload dataset of type " + gdmsType.getValue()
+			Debug.println(IntegrationTestBase.INDENT, "Please upload dataset of type " + gdmsType.getValue()
 					+ " first before testing update.");
 			return;
 		}
@@ -996,20 +980,18 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 		this.updateDataset(dataset, updateId);
 
 		// Update markers
-		List<Marker> markers =
-				GenotypicDataManagerImplUploadFunctionsTest.manager
-						.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
+		List<Marker> markers = this.manager.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
 
 		// No change in markerMetadataSet
 		List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
 
 		// Update mappingPop
-		MappingPop mappingPop = GenotypicDataManagerImplUploadFunctionsTest.manager.getMappingPopByDatasetId(datasetId);
+		MappingPop mappingPop = this.manager.getMappingPopByDatasetId(datasetId);
 		this.updateMappingPop(mappingPop, updateId);
 
-		List<MappingABHRow> rows = GenotypicDataManagerImplUploadFunctionsTest.manager.getMappingABHRows(datasetId);
+		List<MappingABHRow> rows = this.manager.getMappingABHRows(datasetId);
 		Debug.println("ROWS BEFORE: ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, rows);
+		Debug.printObjects(IntegrationTestBase.INDENT, rows);
 
 		// Update existing rows
 		List<MappingABHRow> updatedRows = new ArrayList<MappingABHRow>();
@@ -1034,30 +1016,30 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 		Debug.println("ADD OR UPDATE ROW: " + newRow);
 
 		// UPDATE
-		GenotypicDataManagerImplUploadFunctionsTest.manager.updateMappingABH(dataset, mappingPop, markers, markerMetadataSets, updatedRows);
+		this.manager.updateMappingABH(dataset, mappingPop, markers, markerMetadataSets, updatedRows);
 
-		Dataset datasetAfter = GenotypicDataManagerImplUploadFunctionsTest.manager.getDatasetById(datasetId);
+		Dataset datasetAfter = this.manager.getDatasetById(datasetId);
 		Debug.printObject(0, "DATASET AFTER: " + datasetAfter);
 		Assert.assertEquals(dataset, datasetAfter); // Dataset updated
 
-		MappingPop mappingPopAfter = GenotypicDataManagerImplUploadFunctionsTest.manager.getMappingPopByDatasetId(datasetId);
+		MappingPop mappingPopAfter = this.manager.getMappingPopByDatasetId(datasetId);
 		Debug.printObject(0, "MAPPINGPOP AFTER: " + mappingPopAfter);
 		Assert.assertEquals(mappingPop, mappingPopAfter); // MappingPop updated
 
-		List<MappingABHRow> rowsAfter = GenotypicDataManagerImplUploadFunctionsTest.manager.getMappingABHRows(datasetId);
+		List<MappingABHRow> rowsAfter = this.manager.getMappingABHRows(datasetId);
 		Debug.println("ROWS AFTER: ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, rowsAfter);
+		Debug.printObjects(IntegrationTestBase.INDENT, rowsAfter);
 	}
 
 	@Test
 	public void testUpdateMappingAllelicSNP() throws Exception {
 		GdmsType gdmsType = GdmsType.TYPE_MAPPING;
 		String updateId = " UPDATED " + String.valueOf((int) (Math.random() * 1000)); // to append to description/remarks field for the
-																						// update operation
+		// update operation
 
 		Dataset dataset = this.getTestDatasetByType(gdmsType, GdmsType.TYPE_SNP);
 		if (dataset == null) {
-			Debug.println(MiddlewareIntegrationTest.INDENT, "Please upload dataset of type " + gdmsType.getValue()
+			Debug.println(IntegrationTestBase.INDENT, "Please upload dataset of type " + gdmsType.getValue()
 					+ " first before testing update.");
 			return;
 		}
@@ -1066,20 +1048,18 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 		this.updateDataset(dataset, updateId);
 
 		// Update markers
-		List<Marker> markers =
-				GenotypicDataManagerImplUploadFunctionsTest.manager
-						.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
+		List<Marker> markers = this.manager.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
 
 		// No change in markerMetadataSet
 		List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
 
 		// Update mappingPop
-		MappingPop mappingPop = GenotypicDataManagerImplUploadFunctionsTest.manager.getMappingPopByDatasetId(datasetId);
+		MappingPop mappingPop = this.manager.getMappingPopByDatasetId(datasetId);
 		this.updateMappingPop(mappingPop, updateId);
 
-		List<MappingAllelicSNPRow> rows = GenotypicDataManagerImplUploadFunctionsTest.manager.getMappingAllelicSNPRows(datasetId);
+		List<MappingAllelicSNPRow> rows = this.manager.getMappingAllelicSNPRows(datasetId);
 		Debug.println("ROWS BEFORE: ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, rows);
+		Debug.printObjects(IntegrationTestBase.INDENT, rows);
 
 		// Update existing rows
 		List<MappingAllelicSNPRow> updatedRows = new ArrayList<MappingAllelicSNPRow>();
@@ -1108,20 +1088,19 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 		Debug.println("ADD OR UPDATE ROW: " + newRow);
 
 		// UPDATE
-		GenotypicDataManagerImplUploadFunctionsTest.manager.updateMappingAllelicSNP(dataset, mappingPop, markers, markerMetadataSets,
-				updatedRows);
+		this.manager.updateMappingAllelicSNP(dataset, mappingPop, markers, markerMetadataSets, updatedRows);
 
-		Dataset datasetAfter = GenotypicDataManagerImplUploadFunctionsTest.manager.getDatasetById(datasetId);
+		Dataset datasetAfter = this.manager.getDatasetById(datasetId);
 		Debug.printObject(0, "DATASET AFTER: " + datasetAfter);
 		Assert.assertEquals(dataset, datasetAfter); // Dataset updated
 
-		MappingPop mappingPopAfter = GenotypicDataManagerImplUploadFunctionsTest.manager.getMappingPopByDatasetId(datasetId);
+		MappingPop mappingPopAfter = this.manager.getMappingPopByDatasetId(datasetId);
 		Debug.printObject(0, "MAPPINGPOP AFTER: " + mappingPopAfter);
 		Assert.assertEquals(mappingPop, mappingPopAfter); // MappingPop updated
 
-		List<MappingAllelicSNPRow> rowsAfter = GenotypicDataManagerImplUploadFunctionsTest.manager.getMappingAllelicSNPRows(datasetId);
+		List<MappingAllelicSNPRow> rowsAfter = this.manager.getMappingAllelicSNPRows(datasetId);
 		Debug.println("ROWS AFTER: ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, rowsAfter);
+		Debug.printObjects(IntegrationTestBase.INDENT, rowsAfter);
 	}
 
 	@Test
@@ -1131,7 +1110,7 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 
 		Dataset dataset = this.getTestDatasetByType(gdmsType, GdmsType.TYPE_SSR);
 		if (dataset == null) {
-			Debug.println(MiddlewareIntegrationTest.INDENT, "Please upload dataset of type " + gdmsType.getValue()
+			Debug.println(IntegrationTestBase.INDENT, "Please upload dataset of type " + gdmsType.getValue()
 					+ " first before testing update.");
 			return;
 		}
@@ -1140,20 +1119,18 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 		this.updateDataset(dataset, updateId.toString());
 
 		// Update markers
-		List<Marker> markers =
-				GenotypicDataManagerImplUploadFunctionsTest.manager
-						.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
+		List<Marker> markers = this.manager.getMarkersByIds(Arrays.asList(-1, -2, -3, -4, -5), 0, Integer.MAX_VALUE);
 
 		// No change in markerMetadataSet
 		List<MarkerMetadataSet> markerMetadataSets = new ArrayList<MarkerMetadataSet>();
 
 		// Update mappingPop
-		MappingPop mappingPop = GenotypicDataManagerImplUploadFunctionsTest.manager.getMappingPopByDatasetId(datasetId);
+		MappingPop mappingPop = this.manager.getMappingPopByDatasetId(datasetId);
 		this.updateMappingPop(mappingPop, updateId.toString());
 
-		List<MappingAllelicSSRDArTRow> rows = GenotypicDataManagerImplUploadFunctionsTest.manager.getMappingAllelicSSRDArTRows(datasetId);
+		List<MappingAllelicSSRDArTRow> rows = this.manager.getMappingAllelicSSRDArTRows(datasetId);
 		Debug.println("ROWS BEFORE: ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, rows);
+		Debug.printObjects(IntegrationTestBase.INDENT, rows);
 
 		// Update existing rows
 		List<MappingAllelicSSRDArTRow> updatedRows = new ArrayList<MappingAllelicSSRDArTRow>();
@@ -1186,20 +1163,18 @@ public class GenotypicDataManagerImplUploadFunctionsTest extends DataManagerInte
 		Debug.println("ADD OR UPDATE ROW: " + newRow);
 
 		// UPDATE
-		GenotypicDataManagerImplUploadFunctionsTest.manager.updateMappingAllelicSSRDArT(dataset, mappingPop, markers, markerMetadataSets,
-				updatedRows);
+		this.manager.updateMappingAllelicSSRDArT(dataset, mappingPop, markers, markerMetadataSets, updatedRows);
 
-		Dataset datasetAfter = GenotypicDataManagerImplUploadFunctionsTest.manager.getDatasetById(datasetId);
+		Dataset datasetAfter = this.manager.getDatasetById(datasetId);
 		Debug.printObject(0, "DATASET AFTER: " + datasetAfter);
 		Assert.assertEquals(dataset, datasetAfter); // Dataset updated
 
-		MappingPop mappingPopAfter = GenotypicDataManagerImplUploadFunctionsTest.manager.getMappingPopByDatasetId(datasetId);
+		MappingPop mappingPopAfter = this.manager.getMappingPopByDatasetId(datasetId);
 		Debug.printObject(0, "MAPPINGPOP AFTER: " + mappingPopAfter);
 		Assert.assertEquals(mappingPop, mappingPopAfter); // MappingPop updated
 
-		List<MappingAllelicSSRDArTRow> rowsAfter =
-				GenotypicDataManagerImplUploadFunctionsTest.manager.getMappingAllelicSSRDArTRows(datasetId);
+		List<MappingAllelicSSRDArTRow> rowsAfter = this.manager.getMappingAllelicSSRDArTRows(datasetId);
 		Debug.println("ROWS AFTER: ");
-		Debug.printObjects(MiddlewareIntegrationTest.INDENT, rowsAfter);
+		Debug.printObjects(IntegrationTestBase.INDENT, rowsAfter);
 	}
 }

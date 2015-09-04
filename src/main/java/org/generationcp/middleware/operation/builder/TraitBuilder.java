@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.operation.builder;
@@ -182,8 +182,11 @@ public class TraitBuilder extends Builder {
 		List<Double> values = traitValues.get(traitInfo.getId());
 		Collections.sort(values);
 
-		double medianValue = values.get(values.size() / 2); // if the number of values is odd
-		if (values.size() % 2 == 0) { // change if the number of values is even
+		// if the number of values is odd
+		double medianValue = values.get(values.size() / 2);
+
+		// change if the number of values is even
+		if (values.size() % 2 == 0) {
 			double middleNumOne = values.get(values.size() / 2 - 1);
 			double middleNumTwo = values.get(values.size() / 2);
 			medianValue = (middleNumOne + middleNumTwo) / 2;

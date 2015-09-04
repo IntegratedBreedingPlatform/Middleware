@@ -1,5 +1,5 @@
 /*******************************************************************************
- * 
+ *
  * Copyright (c) 2012, All Rights Reserved.
  *
  * Generation Challenge Programme (GCP)
@@ -17,20 +17,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.generationcp.middleware.MiddlewareIntegrationTest;
+import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.util.Debug;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
-public class ProjectPropertyDaoTest extends MiddlewareIntegrationTest {
+public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
-	private static ProjectPropertyDao dao;
+	private ProjectPropertyDao dao;
 
-	@BeforeClass
-	public static void setUp() throws Exception {
-		ProjectPropertyDaoTest.dao = new ProjectPropertyDao();
-		ProjectPropertyDaoTest.dao.setSession(MiddlewareIntegrationTest.sessionUtil.getCurrentSession());
+	@Before
+	public void setUp() throws Exception {
+		this.dao = new ProjectPropertyDao();
+		this.dao.setSession(this.sessionProvder.getSession());
 	}
 
 	@Test
@@ -38,7 +37,7 @@ public class ProjectPropertyDaoTest extends MiddlewareIntegrationTest {
 		List<String> propertyNames =
 				Arrays.asList("ENTRY", "ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");
 
-		Map<String, Set<Integer>> results = ProjectPropertyDaoTest.dao.getStandardVariableIdsByPropertyNames(propertyNames);
+		Map<String, Set<Integer>> results = this.dao.getStandardVariableIdsByPropertyNames(propertyNames);
 
 		Debug.println(0, "testGetStandardVariableIdsByPropertyNames(propertyNames=" + propertyNames + ") RESULTS:");
 		for (String name : propertyNames) {
@@ -51,11 +50,4 @@ public class ProjectPropertyDaoTest extends MiddlewareIntegrationTest {
 			 */
 		}
 	}
-
-	@AfterClass
-	public static void tearDown() throws Exception {
-		ProjectPropertyDaoTest.dao.setSession(null);
-		ProjectPropertyDaoTest.dao = null;
-	}
-
 }

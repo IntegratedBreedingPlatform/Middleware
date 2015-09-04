@@ -8,6 +8,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.util.Util;
 
 public class ListDataProjectSaver extends Saver {
@@ -52,10 +53,11 @@ public class ListDataProjectSaver extends Saver {
 
 	private GermplasmList createInitialGermplasmList(int projectId, Integer originalListId, GermplasmListType type)
 			throws MiddlewareQueryException {
+		
+		DmsProject project = this.getStudyDataManager().getProject(projectId);		
 		GermplasmList snapList = new GermplasmList();
-
-		snapList.setId(this.getGermplasmListDAO().getNextId("id"));
 		snapList.setProjectId(projectId);
+		snapList.setProgramUUID(project.getProgramUUID());
 		snapList.setDate(Util.getCurrentDateAsLongValue());
 		snapList.setStatus(1);
 		snapList.setType(type.name());
@@ -112,7 +114,6 @@ public class ListDataProjectSaver extends Saver {
 	}
 
 	private void prepareListDataProjectForSaving(ListDataProject listDataProject, GermplasmList snapList) throws MiddlewareQueryException {
-		listDataProject.setListDataProjectId(this.getListDataProjectDAO().getNextId("listDataProjectId"));
 		listDataProject.setList(snapList);
 		if (listDataProject.getCheckType() == null) {
 			listDataProject.setCheckType(0);

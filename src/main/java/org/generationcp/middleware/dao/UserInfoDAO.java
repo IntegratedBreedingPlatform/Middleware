@@ -28,6 +28,12 @@ import org.hibernate.criterion.Restrictions;
 public class UserInfoDAO extends GenericDAO<UserInfo, Integer> {
 
 	public boolean updateLoginCounter(UserInfo userInfo) {
+		
+		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+		// statement
+		this.getSession().flush();
+		
 		int loginCount = 0;
 		if (userInfo != null && userInfo.getLoginCount() != null) {
 			loginCount = userInfo.getLoginCount().intValue();
@@ -60,6 +66,11 @@ public class UserInfoDAO extends GenericDAO<UserInfo, Integer> {
 	}
 
 	public boolean insertOrUpdateUserInfo(UserInfo userInfo) {
+		
+		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+		// statement
+		this.getSession().flush();
 		if (userInfo != null) {
 			String queryString = "REPLACE INTO workbench_user_info (user_id, login_count) VALUES (:userId, :loginCount)";
 			Session s = this.getSession();

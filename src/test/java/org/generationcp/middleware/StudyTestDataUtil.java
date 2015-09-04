@@ -19,24 +19,18 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 
-public class StudyTestDataUtil extends DataManagerIntegrationTest {
+public class StudyTestDataUtil {
 
-	private static StudyTestDataUtil instance;
-	private final StudyDataManager studyDataManager;
-	private final OntologyDataManager ontologyManager;
+	private StudyDataManager studyDataManager;
+
+	private OntologyDataManager ontologyManager;
+
 	private static final String TEST_FOLDER_NAME = "TEST_FOLDER_NAME";
 	private static final String TEST_FOLDER_DESC = "TEST_FOLDER_DESC";
 
-	private StudyTestDataUtil() {
-		this.studyDataManager = DataManagerIntegrationTest.managerFactory.getStudyDataManager();
-		this.ontologyManager = DataManagerIntegrationTest.managerFactory.getOntologyDataManager();
-	}
-
-	public static StudyTestDataUtil getInstance() {
-		if (StudyTestDataUtil.instance == null) {
-			StudyTestDataUtil.instance = new StudyTestDataUtil();
-		}
-		return StudyTestDataUtil.instance;
+	public StudyTestDataUtil(StudyDataManager studyDataManager, OntologyDataManager ontologyManager) {
+		this.studyDataManager = studyDataManager;
+		this.ontologyManager = ontologyManager;
 	}
 
 	public DmsProject createFolderTestData(String uniqueId) throws MiddlewareQueryException {
