@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
@@ -33,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PedigreeDataManagerImpl extends DataManager implements PedigreeDataManager{
 
-    private GermplasmDataManagerImpl germplasmDataManager;
+    private GermplasmDataManager germplasmDataManager;
     private static final ThreadLocal<Integer> PEDIGREE_COUNTER = new ThreadLocal<>();
     private static final ThreadLocal<Boolean> CALCULATE_FULL = new ThreadLocal<>();
 
@@ -605,14 +606,13 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
     }
 
 
-    private GermplasmDataManagerImpl getGermplasmDataManager(){
+	public GermplasmDataManager getGermplasmDataManager() {
 	    return this.germplasmDataManager;
     }
     
-    public void setGermplasmDataManager(
-	    	GermplasmDataManagerImpl germplasmDataManager) {
-	        this.germplasmDataManager = germplasmDataManager;
-	    }
+	public void setGermplasmDataManager(GermplasmDataManager germplasmDataManager) {
+		this.germplasmDataManager = germplasmDataManager;
+	}
 
     public int calculateRecurrentParent(Integer maleParentGID, Integer femaleParentGID) throws MiddlewareQueryException{
         Germplasm maleParent = getGermplasmDataManager().getGermplasmByGID(maleParentGID);
