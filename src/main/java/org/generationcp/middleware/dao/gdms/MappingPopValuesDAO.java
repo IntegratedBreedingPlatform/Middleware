@@ -225,6 +225,11 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer> {
 
 	public void deleteByDatasetId(int datasetId) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			SQLQuery statement = this.getSession().createSQLQuery("DELETE FROM gdms_mapping_pop_values WHERE dataset_id = " + datasetId);
 			statement.executeUpdate();
 		} catch (HibernateException e) {

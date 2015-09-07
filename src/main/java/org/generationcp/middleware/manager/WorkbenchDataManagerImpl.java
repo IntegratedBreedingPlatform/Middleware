@@ -193,12 +193,34 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public void updateProjectsRolesForProject(Project project, List<ProjectUserRole> newRoles) throws MiddlewareQueryException {
-		// remove all previous roles
-		this.deleteProjectUserRolesByProject(project);
-		// apply the delete first before the add
-		getCurrentSession().flush();
-		// add the new roles
-		this.addProjectUserRole(newRoles);
+		List<ProjectUserRole> oldRoles = this.getProjectUserRolesByProject(project);
+
+
+		List<ProjectUserRole> toDeleteRoles = this.getUniqueUserRolesFrom(oldRoles, newRoles);
+		List<ProjectUserRole> toAddRoles = this.getUniqueUserRolesFrom(newRoles, oldRoles);
+
+		this.deleteProjectUserRoles(toDeleteRoles);
+		this.addProjectUserRole(toAddRoles);
+	}
+
+	private List<ProjectUserRole> getUniqueUserRolesFrom(List<ProjectUserRole> list1, List<ProjectUserRole> list2) {
+		List<ProjectUserRole> uniqueRoles = new ArrayList<>();
+		for (ProjectUserRole role : list1) {
+			if (!this.projectRoleContains(role,list2)) {
+				uniqueRoles.add(role);
+			}
+		}
+		return uniqueRoles;
+	}
+
+	private boolean projectRoleContains(ProjectUserRole oldRole,List<ProjectUserRole> roles) {
+		for (ProjectUserRole role : roles) {
+			if (oldRole.getUserId().equals(role.getUserId()) && oldRole.getRole().getRoleId().equals(role.getRole().getRoleId())) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	private ProjectUserRoleDAO getProjectUserRoleDao() {
@@ -847,15 +869,23 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public void deleteProjectUserRolesByProject(Project project) throws MiddlewareQueryException {
 		// remove all previous roles
+		this.deleteProjectUserRoles(this.getProjectUserRolesByProject(project));
+	}
+
+	@Override
+	public void deleteProjectUserRoles(List<ProjectUserRole> oldRoles) {
+		// remove all previous roles
 		try {
-			for (ProjectUserRole projectUserRole : this.getProjectUserRolesByProject(project)) {
-					getCurrentSession().delete(projectUserRole);
+			for (ProjectUserRole projectUserRole : oldRoles) {
+				getCurrentSession().delete(projectUserRole);
 			}
 		} catch (Exception e) {
-			this.logAndThrowException("Error encountered while deleting ProjectUser: WorkbenchDataManager.deleteProjectUserRoles(projec="
-					+ project + "): " + e.getMessage(), e);
+			this.logAndThrowException("Error encountered while deleting ProjectUser: WorkbenchDataManager.deleteProjectUserRoles(oldRoles="
+					+ oldRoles + "): " + e.getMessage(), e);
 		}
 	}
+
+
 
 	@Override
 	public List<Integer> addProjectUserRole(List<ProjectUserRole> projectUserRoles) throws MiddlewareQueryException {
@@ -1074,19 +1104,21 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Integer addIbdbUserMap(IbdbUserMap userMap) throws MiddlewareQueryException {
-		
-
 		try {
-
-			this.getIbdbUserMapDao().saveOrUpdate(userMap);
-
+			IbdbUserMap existingMapping = this.getIbdbUserMap(userMap.getWorkbenchUserId(), userMap.getProjectId());
+			if (existingMapping == null) {
+				this.getIbdbUserMapDao().saveOrUpdate(userMap);
+				return userMap.getIbdbUserMapId().intValue();
+			} else {
+				return existingMapping.getIbdbUserMapId().intValue();
+			}
 		} catch (Exception e) {
-
-			this.logAndThrowException("Error encountered while adding IbdbUserMap: WorkbenchDataManager.addIbdbUserMap(userMap=" + userMap
-					+ "): " + e.getMessage(), e);
+			String message =
+					"Error encountered while adding IbdbUserMap (linking workbench user id to crop database user): WorkbenchDataManager.addIbdbUserMap(userMap="
+							+ userMap + "): " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-
-		return userMap.getIbdbUserId();
 	}
 
 	@Override

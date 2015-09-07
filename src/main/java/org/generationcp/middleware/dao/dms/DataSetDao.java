@@ -27,6 +27,11 @@ public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 
 	public void delete(int datasetId) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			// Delete from project relationship
 			SQLQuery statement =
 					this.getSession().createSQLQuery(
@@ -59,6 +64,11 @@ public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 
 	public void deleteExperimentsByLocation(int datasetId, int locationId) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			// Delete experiments
 			SQLQuery statement =
 					this.getSession().createSQLQuery(
@@ -90,6 +100,11 @@ public class DataSetDao extends GenericDAO<DmsProject, Integer> {
 
 	public void deleteExperimentsByLocationAndType(int datasetId, int locationId, int typeId) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			// Delete experiments
 			SQLQuery statement =
 					this.getSession().createSQLQuery(

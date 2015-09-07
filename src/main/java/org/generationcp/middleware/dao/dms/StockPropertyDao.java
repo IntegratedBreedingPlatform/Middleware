@@ -49,6 +49,11 @@ public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 
 	public void deleteStockPropInProjectByTermId(Integer projectId, int termId) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			StringBuilder sql =
 					new StringBuilder().append("DELETE FROM stockprop ").append(" WHERE stock_id IN ( ").append(" SELECT s.stock_id ")
 							.append(" FROM stock s ").append(" INNER JOIN nd_experiment_stock e ON s.stock_id = e.stock_id ")

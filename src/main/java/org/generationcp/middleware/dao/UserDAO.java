@@ -69,6 +69,11 @@ public class UserDAO extends GenericDAO<User, Integer> {
 
 	public boolean changePassword(String userName, String password) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			if (userName != null && password != null) {
 				String queryString = "UPDATE users SET upswd = :password WHERE uname LIKE :username";
 				Session s = this.getSession();

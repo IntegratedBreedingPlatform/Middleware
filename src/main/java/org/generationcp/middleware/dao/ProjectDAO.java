@@ -55,6 +55,11 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 	}
 
 	public void deleteProject(String projectName) {
+		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+		// statement
+		this.getSession().flush();
+		
 		SQLQuery query = this.getSession().createSQLQuery("delete from workbench_project where project_name= '" + projectName + "';");
 
 		query.executeUpdate();

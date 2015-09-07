@@ -510,6 +510,11 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 	public void deleteExperimentPropInProjectByTermId(int projectId, int termId) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			StringBuilder sql =
 					new StringBuilder().append("DELETE FROM nd_experimentprop ").append(" WHERE nd_experiment_id IN ( ")
 							.append(" SELECT e.nd_experiment_id ").append(" FROM nd_experiment e ")

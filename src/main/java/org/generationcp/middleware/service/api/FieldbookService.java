@@ -288,7 +288,7 @@ public interface FieldbookService {
 	 * @return the germplasm list by name
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	GermplasmList getGermplasmListByName(String name) throws MiddlewareQueryException;
+	GermplasmList getGermplasmListByName(String name, String programUUID) throws MiddlewareQueryException;
 
 	/**
 	 * Get All distinct values given a standard variable id.
@@ -900,10 +900,11 @@ public interface FieldbookService {
 	 *
 	 * @param name of the Standard Varible
 	 * @throws MiddlewareQueryException the middleware query exception
-	 * **/
+	 **/
 	StandardVariable getStandardVariableByName(String name, String programUUID) throws MiddlewareException;
 
-	List<StandardVariableReference> filterStandardVariablesByIsAIds(List<StandardVariableReference> standardReferences, List<Integer> isAIds);
+	List<StandardVariableReference> filterStandardVariablesByIsAIds(List<StandardVariableReference> standardReferences,
+			List<Integer> isAIds);
 
 	Location getLocationByName(String locationName, Operation op) throws MiddlewareQueryException;
 }

@@ -21,6 +21,11 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 	public void deleteByListId(int listId) throws MiddlewareQueryException {
 		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
 			SQLQuery statement =
 					this.getSession().createSQLQuery("delete ldp " + "from listdata_project ldp " + "where ldp.list_id = " + listId);
 			statement.executeUpdate();

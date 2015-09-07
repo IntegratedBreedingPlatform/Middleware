@@ -42,7 +42,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * The add/update/delete tests are highly dependent on the tests before it Therefore the order of execution is important. In the future, we
  * will change this to make tests independent of each other. As a temporary solution, we will force the ordering in those methods using
  * FixMethodOrder"
- * 
+ *
  * // Test using RICE database
  */
 @FixMethodOrder(MethodSorters.JVM)
@@ -56,6 +56,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	private static List<Integer> testDataIds = new ArrayList<Integer>();
 	private static final Integer STATUS_DELETED = 9;
+	private static final String PROGRAM_UUID = "a7433c01-4f46-4bc8-ae3a-678f0b62ac23";
 
 	private Integer parentId;
 	private Integer listId;
@@ -65,42 +66,40 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	public void setUpBefore() throws Exception {
 		GermplasmList germplasmListParent =
 				new GermplasmList(null, "Test List #1", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test Parent List #1", null, 1);
+		germplasmListParent.setProgramUUID(GermplasmListManagerImplTest.PROGRAM_UUID);
 		this.parentId = this.manager.addGermplasmList(germplasmListParent);
-		GermplasmList germplasmList =
-				new GermplasmList(null, "Test List #1", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test List #1 for GCP-92",
-						germplasmListParent, 1);
+		GermplasmList germplasmList = new GermplasmList(null, "Test List #1", Long.valueOf(20120305), "LST", Integer.valueOf(1),
+				"Test List #1 for GCP-92", germplasmListParent, 1);
+		germplasmList.setProgramUUID(GermplasmListManagerImplTest.PROGRAM_UUID);
 		this.manager.addGermplasmList(germplasmList);
-		GermplasmList germplasmList1 =
-				new GermplasmList(null, "TestList444", Long.valueOf(20120306), "LST", Integer.valueOf(1), "Test List #4 for GCP-92", null,
-						1);
+		GermplasmList germplasmList1 = new GermplasmList(null, "TestList444", Long.valueOf(20120306), "LST", Integer.valueOf(1),
+				"Test List #4 for GCP-92", null, 1);
+		germplasmList1.setProgramUUID(GermplasmListManagerImplTest.PROGRAM_UUID);
 		this.manager.addGermplasmList(germplasmList1);
 		Name name = new Name(null, null, 1, 1, 1, "Name", 0, 0, 0);
 		Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
 		this.dataManager.addGermplasm(germplasm, name);
-		GermplasmListData germplasmListData =
-				new GermplasmListData(null, germplasmList1, germplasm.getGid(), 2, "EntryCode", "SeedSource", "Germplasm Name 5",
-						"GroupName", 0, 99995);
+		GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList1, germplasm.getGid(), 2, "EntryCode", "SeedSource",
+				"Germplasm Name 5", "GroupName", 0, 99995);
 		this.manager.addGermplasmListData(germplasmListData);
 
-		GermplasmList germplasmList2 =
-				new GermplasmList(null, "Test List #5", Long.valueOf(20120306), "LST", Integer.valueOf(1), "Test List #5 for GCP-92", null,
-						1);
+		GermplasmList germplasmList2 = new GermplasmList(null, "Test List #5", Long.valueOf(20120306), "LST", Integer.valueOf(1),
+				"Test List #5 for GCP-92", null, 1);
+		germplasmList2.setProgramUUID(GermplasmListManagerImplTest.PROGRAM_UUID);
 		this.manager.addGermplasmList(germplasmList2);
-		GermplasmListData germplasmListData1 =
-				new GermplasmListData(null, germplasmList2, germplasm.getGid(), 1, "EntryCode", "SeedSource", "Germplasm Name 5",
-						"GroupName", 0, 99995);
+		GermplasmListData germplasmListData1 = new GermplasmListData(null, germplasmList2, germplasm.getGid(), 1, "EntryCode", "SeedSource",
+				"Germplasm Name 5", "GroupName", 0, 99995);
 		this.manager.addGermplasmListData(germplasmListData1);
-		GermplasmList germplasmList3 =
-				new GermplasmList(null, "Test List #3", Long.valueOf(20120306), "LST", Integer.valueOf(1), "Test List #3 for GCP-92", null,
-						1);
+		GermplasmList germplasmList3 = new GermplasmList(null, "Test List #3", Long.valueOf(20120306), "LST", Integer.valueOf(1),
+				"Test List #3 for GCP-92", null, 1);
+		germplasmList3.setProgramUUID(GermplasmListManagerImplTest.PROGRAM_UUID);
 		this.manager.addGermplasmList(germplasmList3);
-		GermplasmList germplasmList6 =
-				new GermplasmList(null, "Test List #6", Long.valueOf(20120306), "LST", Integer.valueOf(1), "Test List #6 for GCP-92", null,
-						1);
+		GermplasmList germplasmList6 = new GermplasmList(null, "Test List #6", Long.valueOf(20120306), "LST", Integer.valueOf(1),
+				"Test List #6 for GCP-92", null, 1);
+		germplasmList6.setProgramUUID(GermplasmListManagerImplTest.PROGRAM_UUID);
 		this.listId = this.manager.addGermplasmList(germplasmList6);
-		GermplasmListData germplasmListData2 =
-				new GermplasmListData(null, germplasmList6, germplasm.getGid(), 1, "EntryCode", "SeedSource", "Germplasm Name 6",
-						"GroupName", 0, 99995);
+		GermplasmListData germplasmListData2 = new GermplasmListData(null, germplasmList6, germplasm.getGid(), 1, "EntryCode", "SeedSource",
+				"Germplasm Name 6", "GroupName", 0, 99995);
 		this.manager.addGermplasmListData(germplasmListData2);
 		this.lrecId = germplasmListData2.getId();
 	}
@@ -129,8 +128,9 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetGermplasmListByName() throws Exception {
-		String name = "2002%";
-		List<GermplasmList> lists = this.manager.getGermplasmListByName(name, 0, 5, Operation.LIKE);
+		String name = "nursery advance list";
+		List<GermplasmList> lists =
+				this.manager.getGermplasmListByName(name, GermplasmListManagerImplTest.PROGRAM_UUID, 0, 5, Operation.LIKE);
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmListByName(" + name + "): ");
 		Debug.printObjects(IntegrationTestBase.INDENT, lists);
 		// Verify using: select * from listnms where liststatus <> 9 and listname like '2002%';
@@ -139,10 +139,8 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testCountGermplasmListByName() throws Exception {
 		String name = "2002%";
-		Debug.println(
-				IntegrationTestBase.INDENT,
-				"testCountGermplasmListByName(" + name + "): "
-						+ this.manager.countGermplasmListByName(name, Operation.LIKE, Database.CENTRAL));
+		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmListByName(" + name + "): "
+				+ this.manager.countGermplasmListByName(name, Operation.LIKE, Database.CENTRAL));
 		// Verify using: select count(*) from listnms where liststatus <> 9 and listname like '2002%';
 	}
 
@@ -159,10 +157,8 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testCountGermplasmListByStatus() throws Exception {
 		Integer status = Integer.valueOf(1);
-		Debug.println(
-				IntegrationTestBase.INDENT,
-				"testCountGermplasmListByStatus(status=" + status + "): "
-						+ this.manager.countGermplasmListByStatus(status, Database.CENTRAL));
+		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmListByStatus(status=" + status + "): "
+				+ this.manager.countGermplasmListByStatus(status, Database.CENTRAL));
 		// Verify using: select count(*) from listnms where liststatus <> 9 and liststatus = 1;
 	}
 
@@ -234,9 +230,9 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddGermplasmList() throws Exception {
-		GermplasmList germplasmList =
-				new GermplasmList(null, "Test List #1", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test List #1 for GCP-92", null,
-						1);
+		GermplasmList germplasmList = new GermplasmList(null, "Test List #1", Long.valueOf(20120305), "LST", Integer.valueOf(1),
+				"Test List #1 for GCP-92", null, 1);
+		germplasmList.setProgramUUID(GermplasmListManagerImplTest.PROGRAM_UUID);
 		Integer id = this.manager.addGermplasmList(germplasmList);
 		Debug.println(IntegrationTestBase.INDENT,
 				"testAddGermplasmList(germplasmList=" + germplasmList + "): \n  " + this.manager.getGermplasmListById(id));
@@ -247,24 +243,24 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testAddGermplasmLists() throws Exception {
 		List<GermplasmList> germplasmLists = new ArrayList<GermplasmList>();
-		GermplasmList germplasmList =
-				new GermplasmList(null, "Test List #1", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test List #1 for GCP-92", null,
-						1);
+		GermplasmList germplasmList = new GermplasmList(null, "Test List #1", Long.valueOf(20120305), "LST", Integer.valueOf(1),
+				"Test List #1 for GCP-92", null, 1);
+		germplasmList.setProgramUUID(GermplasmListManagerImplTest.PROGRAM_UUID);
 		germplasmLists.add(germplasmList);
 
-		germplasmList =
-				new GermplasmList(null, "Test List #2", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test List #2 for GCP-92", null,
-						1);
+		germplasmList = new GermplasmList(null, "Test List #2", Long.valueOf(20120305), "LST", Integer.valueOf(1),
+				"Test List #2 for GCP-92", null, 1);
+		germplasmList.setProgramUUID(GermplasmListManagerImplTest.PROGRAM_UUID);
 		germplasmLists.add(germplasmList);
 
-		germplasmList =
-				new GermplasmList(null, "Test List #3", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test List #3 for GCP-92", null,
-						1);
+		germplasmList = new GermplasmList(null, "Test List #3", Long.valueOf(20120305), "LST", Integer.valueOf(1),
+				"Test List #3 for GCP-92", null, 1);
+		germplasmList.setProgramUUID(GermplasmListManagerImplTest.PROGRAM_UUID);
 		germplasmLists.add(germplasmList);
 
-		germplasmList =
-				new GermplasmList(null, "Test List #4", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test List #4 for GCP-92", null,
-						1);
+		germplasmList = new GermplasmList(null, "Test List #4", Long.valueOf(20120305), "LST", Integer.valueOf(1),
+				"Test List #4 for GCP-92", null, 1);
+		germplasmList.setProgramUUID(GermplasmListManagerImplTest.PROGRAM_UUID);
 		germplasmLists.add(germplasmList);
 
 		List<Integer> ids = this.manager.addGermplasmList(germplasmLists);
@@ -317,9 +313,8 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testAddGermplasmListData() throws Exception {
 		GermplasmList germList = this.manager.getGermplasmListByName("Test List #1", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
-		GermplasmListData germplasmListData =
-				new GermplasmListData(null, germList, Integer.valueOf(2), 1, "EntryCode", "SeedSource", "Germplasm Name 3", "GroupName", 0,
-						99992);
+		GermplasmListData germplasmListData = new GermplasmListData(null, germList, Integer.valueOf(2), 1, "EntryCode", "SeedSource",
+				"Germplasm Name 3", "GroupName", 0, 99992);
 
 		Debug.println(IntegrationTestBase.INDENT,
 				"testAddGermplasmListData() records added: " + this.manager.addGermplasmListData(germplasmListData));
@@ -335,44 +330,36 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		List<GermplasmListData> germplasmListDatas = new ArrayList<GermplasmListData>();
 
 		GermplasmList germList = this.manager.getGermplasmListByName("Test List #4", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
-		GermplasmListData germplasmListData =
-				new GermplasmListData(null, germList, Integer.valueOf(2), /* entryId= */2, "EntryCode", "SeedSource", "Germplasm Name 4",
-						"GroupName", 0, 99993);
+		GermplasmListData germplasmListData = new GermplasmListData(null, germList, Integer.valueOf(2), /* entryId= */2, "EntryCode",
+				"SeedSource", "Germplasm Name 4", "GroupName", 0, 99993);
 		germplasmListDatas.add(germplasmListData);
-		germplasmListData =
-				new GermplasmListData(null, germList, Integer.valueOf(2), /* entryId= */1, "EntryCode", "SeedSource", "Germplasm Name 6",
-						"GroupName", 0, 99996);
+		germplasmListData = new GermplasmListData(null, germList, Integer.valueOf(2), /* entryId= */1, "EntryCode", "SeedSource",
+				"Germplasm Name 6", "GroupName", 0, 99996);
 		germplasmListDatas.add(germplasmListData);
 
 		germList = this.manager.getGermplasmListByName("Test List #1", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
-		germplasmListData =
-				new GermplasmListData(null, germList, Integer.valueOf(1), 2, "EntryCode", "SeedSource", "Germplasm Name 1", "GroupName", 0,
-						99990);
+		germplasmListData = new GermplasmListData(null, germList, Integer.valueOf(1), 2, "EntryCode", "SeedSource", "Germplasm Name 1",
+				"GroupName", 0, 99990);
 		germplasmListDatas.add(germplasmListData);
 
-		germplasmListData =
-				new GermplasmListData(null, germList, Integer.valueOf(1), 3, "EntryCode", "SeedSource", "Germplasm Name 2", "GroupName", 0,
-						99991);
+		germplasmListData = new GermplasmListData(null, germList, Integer.valueOf(1), 3, "EntryCode", "SeedSource", "Germplasm Name 2",
+				"GroupName", 0, 99991);
 		germplasmListDatas.add(germplasmListData);
 
 		germList = this.manager.getGermplasmListByName("Test List #2", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
-		germplasmListData =
-				new GermplasmListData(null, germList, Integer.valueOf(3), 2, "EntryCode", "SeedSource", "Germplasm Name 5", "GroupName", 0,
-						99995);
+		germplasmListData = new GermplasmListData(null, germList, Integer.valueOf(3), 2, "EntryCode", "SeedSource", "Germplasm Name 5",
+				"GroupName", 0, 99995);
 		germplasmListDatas.add(germplasmListData);
 
 		germList = this.manager.getGermplasmListByName("Test List #3", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
-		germplasmListData =
-				new GermplasmListData(null, germList, Integer.valueOf(4), 1, "EntryCode", "SeedSource", "Germplasm Name 7", "GroupName", 0,
-						99997);
+		germplasmListData = new GermplasmListData(null, germList, Integer.valueOf(4), 1, "EntryCode", "SeedSource", "Germplasm Name 7",
+				"GroupName", 0, 99997);
 		germplasmListDatas.add(germplasmListData);
-		germplasmListData =
-				new GermplasmListData(null, germList, Integer.valueOf(4), 2, "EntryCode", "SeedSource", "Germplasm Name 8", "GroupName", 0,
-						99998);
+		germplasmListData = new GermplasmListData(null, germList, Integer.valueOf(4), 2, "EntryCode", "SeedSource", "Germplasm Name 8",
+				"GroupName", 0, 99998);
 		germplasmListDatas.add(germplasmListData);
-		germplasmListData =
-				new GermplasmListData(null, germList, Integer.valueOf(4), 3, "EntryCode", "SeedSource", "Germplasm Name 9", "GroupName", 0,
-						99999);
+		germplasmListData = new GermplasmListData(null, germList, Integer.valueOf(4), 3, "EntryCode", "SeedSource", "Germplasm Name 9",
+				"GroupName", 0, 99999);
 		germplasmListDatas.add(germplasmListData);
 
 		Debug.println(IntegrationTestBase.INDENT,
@@ -426,8 +413,8 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		Debug.println(IntegrationTestBase.INDENT, "Test Case #3: test deleteGermplasmListData(data)");
 		germplasmList = this.manager.getGermplasmListByName("Test List #5", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
 		GermplasmListData data = this.manager.getGermplasmListDataByListIdAndEntryId(germplasmList.getId(), /*
-		 * entryId=
-		 */1);
+																											 * entryId=
+																											 */1);
 		listData.add(data);
 		this.manager.deleteGermplasmListData(data);
 
@@ -453,14 +440,16 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		List<GermplasmListData> listDataList = new ArrayList<GermplasmListData>();
 
 		Debug.println(IntegrationTestBase.INDENT, "Test Case #1: test deleteGermplasmListByListId");
-		GermplasmList germplasmList = this.manager.getGermplasmListByName("Test List #1", 0, 1, Operation.EQUAL).get(0);
+		GermplasmList germplasmList = this.manager
+				.getGermplasmListByName("Test List #1", GermplasmListManagerImplTest.PROGRAM_UUID, 0, 1, Operation.EQUAL).get(0);
 		germplasmLists.add(germplasmList);
 		listDataList.addAll(germplasmList.getListData());
-		Debug.println(IntegrationTestBase.INDENT, "\tremoved " + this.manager.deleteGermplasmListByListId(germplasmList.getId())
-				+ " record(s)");
+		Debug.println(IntegrationTestBase.INDENT,
+				"\tremoved " + this.manager.deleteGermplasmListByListId(germplasmList.getId()) + " record(s)");
 
 		Debug.println(IntegrationTestBase.INDENT, "Test Case #2: test deleteGermplasmList(data)");
-		germplasmList = this.manager.getGermplasmListByName("Test List #4", 0, 1, Operation.EQUAL).get(0);
+		germplasmList = this.manager
+				.getGermplasmListByName("Test List #4", GermplasmListManagerImplTest.PROGRAM_UUID, 0, 1, Operation.EQUAL).get(0);
 		germplasmLists.add(germplasmList);
 		listDataList.addAll(germplasmList.getListData());
 		Debug.println(IntegrationTestBase.INDENT, "\tremoved " + this.manager.deleteGermplasmList(germplasmList) + " record(s)");
@@ -471,7 +460,8 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		 * germplasmList = manager.getGermplasmListByName("Test List #2", 0, 1, Operation.EQUAL, Database.LOCAL).get(0);
 		 * toBeDeleted.add(germplasmList); listDataList.addAll(germplasmList.getListData());
 		 */
-		germplasmList = this.manager.getGermplasmListByName("Test List #3", 0, 1, Operation.EQUAL).get(0);
+		germplasmList = this.manager
+				.getGermplasmListByName("Test List #3", GermplasmListManagerImplTest.PROGRAM_UUID, 0, 1, Operation.EQUAL).get(0);
 		toBeDeleted.add(germplasmList);
 		listDataList.addAll(germplasmList.getListData());
 		germplasmLists.addAll(toBeDeleted);
@@ -493,8 +483,8 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetTopLevelLists() throws Exception {
-		int count = (int) this.manager.countAllTopLevelLists(Database.CENTRAL);
-		List<GermplasmList> topLevelFolders = this.manager.getAllTopLevelLists(0, count, Database.CENTRAL);
+		int count = (int) this.manager.countAllTopLevelLists(GermplasmListManagerImplTest.PROGRAM_UUID);
+		List<GermplasmList> topLevelFolders = this.manager.getAllTopLevelListsBatched(GermplasmListManagerImplTest.PROGRAM_UUID, count);
 		Debug.println(IntegrationTestBase.INDENT, "testGetTopLevelLists(0, 100, Database.CENTRAL): " + count);
 		Debug.printObjects(IntegrationTestBase.INDENT, topLevelFolders);
 		// Verify using: select * from listnms where liststatus <> 9 and lhierarchy = null or lhierarchy = 0
@@ -502,7 +492,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountTopLevelLists() throws Exception {
-		long count = this.manager.countAllTopLevelLists(Database.CENTRAL);
+		long count = this.manager.countAllTopLevelLists(GermplasmListManagerImplTest.PROGRAM_UUID);
 		Debug.println(IntegrationTestBase.INDENT, "testCountTopLevelLists(Database.CENTRAL): " + count);
 		// Verify using: select count(*) from listnms where liststatus <> 9 and lhierarchy = null or lhierarchy = 0
 	}
@@ -510,8 +500,9 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGermplasmListByParentFolderId() throws Exception {
 		Integer parentFolderId = Integer.valueOf(56);
-		int count = (int) this.manager.countGermplasmListByParentFolderId(parentFolderId);
-		List<GermplasmList> children = this.manager.getGermplasmListByParentFolderId(parentFolderId, 0, count);
+		int count = (int) this.manager.countGermplasmListByParentFolderId(parentFolderId, GermplasmListManagerImplTest.PROGRAM_UUID);
+		List<GermplasmList> children =
+				this.manager.getGermplasmListByParentFolderId(parentFolderId, GermplasmListManagerImplTest.PROGRAM_UUID, 0, count);
 		Debug.println(IntegrationTestBase.INDENT, "testGermplasmListByParentFolderId(" + parentFolderId + "): " + count);
 		Debug.printObjects(IntegrationTestBase.INDENT, children);
 		// Verify using: select * from listnms where liststatus <> 9 and lhierarchy = 56;
@@ -520,7 +511,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testCountGermplasmListByParentFolderId() throws Exception {
 		Integer parentFolderId = Integer.valueOf(56);
-		Long result = this.manager.countGermplasmListByParentFolderId(parentFolderId);
+		Long result = this.manager.countGermplasmListByParentFolderId(parentFolderId, GermplasmListManagerImplTest.PROGRAM_UUID);
 		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmListByParentFolderId(" + parentFolderId + "): " + result);
 		// Verify using: select count(*) from listnms where liststatus <> 9 and lhierarchy = 56;
 	}
@@ -542,7 +533,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetAllTopLevelListsBatched() throws Exception {
 		int batchSize = 1;
-		List<GermplasmList> results = this.manager.getAllTopLevelListsBatched(batchSize, Database.CENTRAL);
+		List<GermplasmList> results = this.manager.getAllTopLevelListsBatched(GermplasmListManagerImplTest.PROGRAM_UUID, batchSize);
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 		Debug.println(IntegrationTestBase.INDENT, "testGetAllTopLevelListsBatched(" + batchSize + "): ");
@@ -551,7 +542,8 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetGermplasmListByParentFolderId() throws Exception {
-		List<GermplasmList> results = this.manager.getGermplasmListByParentFolderId(this.parentId, 0, 100);
+		List<GermplasmList> results =
+				this.manager.getGermplasmListByParentFolderId(this.parentId, GermplasmListManagerImplTest.PROGRAM_UUID, 0, 100);
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmListByParentFolderId(" + this.parentId + "): ");
@@ -561,8 +553,8 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetGermplasmListByParentFolderIdBatched() throws Exception {
 		int batchSize = 1;
-		List<GermplasmList> results = new ArrayList<GermplasmList>();
-		results = this.manager.getGermplasmListByParentFolderIdBatched(this.parentId, batchSize);
+		List<GermplasmList> results =
+				this.manager.getGermplasmListByParentFolderIdBatched(this.parentId, GermplasmListManagerImplTest.PROGRAM_UUID, batchSize);
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmListByParentFolderIdBatched(): ");
