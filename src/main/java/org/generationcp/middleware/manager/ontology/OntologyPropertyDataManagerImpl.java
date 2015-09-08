@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -26,8 +27,6 @@ import org.generationcp.middleware.util.ISO8601DateParser;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.base.Strings;
 
 /**
  * Implements {@link OntologyPropertyDataManagerImpl}
@@ -168,7 +167,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 											+ " LEFT JOIN cvtermprop tp ON tp.cvterm_id = p.cvterm_id AND tp.type_id = "
 											+ TermId.CROP_ONTOLOGY_ID.getId()
 											+ " LEFT JOIN (select cvtr.subject_id PropertyId, o.cv_id, o.cvterm_id, o.name, o.definition, o.is_obsolete "
-											+ " from cvTerm o inner join cvterm_relationship cvtr on cvtr.object_id = o.cvterm_id and cvtr.type_id = "
+											+ " from cvterm o inner join cvterm_relationship cvtr on cvtr.object_id = o.cvterm_id and cvtr.type_id = "
 											+ TermId.IS_A.getId() + ")" + " cs on cs.PropertyId = p.cvterm_id" + " where p.cv_id = "
 											+ CvId.PROPERTIES.getId() + " and p." + this.getCvTermDao().SHOULD_NOT_OBSOLETE + filterClause
 											+ " Group BY p.cvterm_id Order BY p.name ")
