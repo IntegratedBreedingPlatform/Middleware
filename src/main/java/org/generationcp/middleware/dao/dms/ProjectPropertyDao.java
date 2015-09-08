@@ -53,11 +53,11 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 				StringBuilder sqlString =
 						new StringBuilder()
-								.append("SELECT DISTINCT ppValue.value, ppStdVar.id ")
-								.append("FROM projectprop ppValue  ")
-								.append("INNER JOIN (SELECT project_id, value id, rank FROM projectprop WHERE type_id = 1070) AS ppStdVar  ")
-								.append("    ON ppValue.project_id = ppStdVar.project_id AND ppValue.type_id != 1060  AND ppValue.rank = ppStdVar.rank ")
-								.append("    AND ppValue.value IN (:propertyNames) ");
+				.append("SELECT DISTINCT ppValue.value, ppStdVar.id ")
+				.append("FROM projectprop ppValue  ")
+				.append("INNER JOIN (SELECT project_id, value id, rank FROM projectprop WHERE type_id = 1070) AS ppStdVar  ")
+				.append("    ON ppValue.project_id = ppStdVar.project_id AND ppValue.type_id != 1060  AND ppValue.rank = ppStdVar.rank ")
+				.append("    AND ppValue.value IN (:propertyNames) ");
 				SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 				query.setParameterList("propertyNames", propertyNames);
 
@@ -110,7 +110,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			String sql = "SELECT max(rank) FROM projectprop WHERE project_id = :projectId";
 			Query query = this.getSession().createSQLQuery(sql);
 			query.setParameter("projectId", projectId);
-
 			return (Integer) query.uniqueResult() + 1;
 
 		} catch (HibernateException e) {

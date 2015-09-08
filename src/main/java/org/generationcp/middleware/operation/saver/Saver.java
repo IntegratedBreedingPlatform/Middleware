@@ -34,12 +34,12 @@ import org.generationcp.middleware.util.DatabaseBroker;
  *
  * @author Joyce Avestro
  */
-public abstract class Saver extends DatabaseBroker {
+public class Saver extends DatabaseBroker {
 
-	protected Saver() {
-		
+	public Saver() {
+
 	}
-	
+
 	/**
 	 * Instantiates a new data manager given session providers for local and central.
 	 */
