@@ -224,8 +224,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	}
 
 	public void setProperties(List<ListDataProperty> properties) {
-		this.properties.clear();
-		this.properties.addAll(properties);
+		this.properties = properties;
 	}
 
 	public ListDataInventory getInventoryInfo() {
@@ -293,8 +292,10 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	public void print(int indent) {
 		Debug.println(indent, this.toString());
-		for (ListDataProperty property : this.properties) {
-			property.print(indent + 3);
+		if (this.properties != null) {
+			for (ListDataProperty property : this.properties) {
+				property.print(indent + 3);
+			}
 		}
 	}
 

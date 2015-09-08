@@ -88,7 +88,6 @@ public class StandardVariableTest {
 		var.setScale(new Term(StandardVariableTest.SCALE_ID, StandardVariableTest.SCALE_NAME, StandardVariableTest.SCALE_DEF));
 		var.setMethod(new Term(StandardVariableTest.METHOD_ID, StandardVariableTest.METHOD_NAME, StandardVariableTest.METHOD_DEF));
 		var.setDataType(new Term(StandardVariableTest.DATA_TYPE_ID, StandardVariableTest.DATA_TYPE_NAME, StandardVariableTest.DATA_TYPE_DEF));
-		var.setStoredIn(new Term(StandardVariableTest.STORED_IN_ID, StandardVariableTest.STORED_IN_NAME, StandardVariableTest.STORED_IN_DEF));
 		var.setIsA(new Term(StandardVariableTest.TRAIT_CLASS_ID, StandardVariableTest.TRAIT_CLASS_NAME,
 				StandardVariableTest.TRAIT_CLASS_DEF));
 		var.setPhenotypicType(PhenotypicType.VARIATE);
@@ -109,9 +108,7 @@ public class StandardVariableTest {
 	public void testIsNumericIfDataTypeIsNotNumericAndIsNumericalCategoricalVariate() {
 		StandardVariableTest.standardVariable.setDataType(new Term(StandardVariableTest.CATEGORICAL_VAR_DATA_TYPE_ID,
 				StandardVariableTest.CATEGORICAL_VAR_DATA_TYPE_NAME, StandardVariableTest.CATEGORICAL_VAR_DATA_TYPE_DEF));
-		StandardVariableTest.standardVariable.setStoredIn(new Term(StandardVariableTest.CATEGORICAL_VAR_STORED_IN_ID,
-				StandardVariableTest.CATEGORICAL_VAR_STORED_IN_NAME, StandardVariableTest.CATEGORICAL_VAR_STORED_IN_DEF));
-
+		
 		List<Enumeration> validValues = new ArrayList<Enumeration>();
 		validValues.add(new Enumeration(StandardVariableTest.CATEGORICAL_VAR_NUMERIC_ENUM_ID,
 				StandardVariableTest.CATEGORICAL_VAR_NUMERIC_ENUM_NAME, StandardVariableTest.CATEGORICAL_VAR_NUMERIC_ENUM_DEF, 1));
@@ -126,7 +123,6 @@ public class StandardVariableTest {
 	public void testIsNumericIfDataTypeIsNotNumericAndIsNotNumericalCategoricalVariate() {
 		StandardVariableTest.standardVariable.setDataType(new Term(StandardVariableTest.CATEGORICAL_VAR_DATA_TYPE_ID,
 				StandardVariableTest.CATEGORICAL_VAR_DATA_TYPE_NAME, StandardVariableTest.CATEGORICAL_VAR_DATA_TYPE_DEF));
-		StandardVariableTest.standardVariable.setStoredIn(null);
 		Assert.assertFalse(StandardVariableTest.standardVariable.isNumericCategoricalVariate());
 		Assert.assertFalse("A standard variable with DATA TYPE EQUAL NOT EQUAL TO NUMERIC VARIABLE and "
 				+ "is NOT A NUMERIC CATEGORICAL VARIATE is numeric.", StandardVariableTest.standardVariable.isNumeric());
@@ -134,8 +130,8 @@ public class StandardVariableTest {
 
 	@Test
 	public void testIsNumericCategoricalVariate() {
-		StandardVariableTest.standardVariable.setStoredIn(new Term(StandardVariableTest.CATEGORICAL_VAR_STORED_IN_ID,
-				StandardVariableTest.CATEGORICAL_VAR_STORED_IN_NAME, StandardVariableTest.CATEGORICAL_VAR_STORED_IN_DEF));
+		StandardVariableTest.standardVariable.setDataType(new Term(StandardVariableTest.CATEGORICAL_VAR_DATA_TYPE_ID,
+				StandardVariableTest.CATEGORICAL_VAR_DATA_TYPE_NAME, StandardVariableTest.CATEGORICAL_VAR_DATA_TYPE_DEF));
 		List<Enumeration> validValues = new ArrayList<Enumeration>();
 		validValues.add(new Enumeration(StandardVariableTest.CATEGORICAL_VAR_NUMERIC_ENUM_ID,
 				StandardVariableTest.CATEGORICAL_VAR_NUMERIC_ENUM_NAME, StandardVariableTest.CATEGORICAL_VAR_NUMERIC_ENUM_DEF, 1));
@@ -146,16 +142,9 @@ public class StandardVariableTest {
 	}
 
 	@Test
-	public void testIsNumericCategoricalVariateIfRoleIsNull() {
-		StandardVariableTest.standardVariable.setStoredIn(null);
-		Assert.assertFalse("A standard variable with NO ROLE is not a numeric categorical variate.",
-				StandardVariableTest.standardVariable.isNumericCategoricalVariate());
-	}
-
-	@Test
 	public void testIsNumericCategoricalVariateWithNoValidValues() {
-		StandardVariableTest.standardVariable.setStoredIn(new Term(StandardVariableTest.CATEGORICAL_VAR_STORED_IN_ID,
-				StandardVariableTest.CATEGORICAL_VAR_STORED_IN_NAME, StandardVariableTest.CATEGORICAL_VAR_STORED_IN_DEF));
+		StandardVariableTest.standardVariable.setDataType(new Term(StandardVariableTest.CATEGORICAL_VAR_DATA_TYPE_ID,
+				StandardVariableTest.CATEGORICAL_VAR_DATA_TYPE_NAME, StandardVariableTest.CATEGORICAL_VAR_DATA_TYPE_DEF));
 		StandardVariableTest.standardVariable.setEnumerations(null);
 		Assert.assertFalse("A standard variable with ROLE EQUAL to CATEGORICAL VARIATE "
 				+ "with NO VALID VALUES may be a numeric or non-numeric categorical variate.",
@@ -166,9 +155,7 @@ public class StandardVariableTest {
 	public void testIsNumericCategoricalVariateWithNonNumericValidValues() {
 		StandardVariableTest.standardVariable.setDataType(new Term(StandardVariableTest.CATEGORICAL_VAR_DATA_TYPE_ID,
 				StandardVariableTest.CATEGORICAL_VAR_DATA_TYPE_NAME, StandardVariableTest.CATEGORICAL_VAR_DATA_TYPE_DEF));
-		StandardVariableTest.standardVariable.setStoredIn(new Term(StandardVariableTest.CATEGORICAL_VAR_STORED_IN_ID,
-				StandardVariableTest.CATEGORICAL_VAR_STORED_IN_NAME, StandardVariableTest.CATEGORICAL_VAR_STORED_IN_DEF));
-
+		
 		List<Enumeration> validValues = new ArrayList<Enumeration>();
 		validValues.add(new Enumeration(StandardVariableTest.CATEGORICAL_VAR_NUMERIC_ENUM_ID,
 				StandardVariableTest.CATEGORICAL_VAR_NUMERIC_ENUM_NAME, StandardVariableTest.CATEGORICAL_VAR_NUMERIC_ENUM_DEF, 1));

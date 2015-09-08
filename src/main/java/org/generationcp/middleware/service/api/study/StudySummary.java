@@ -22,7 +22,8 @@ public class StudySummary {
 
 	}
 
-	public StudySummary(Integer id, String name, String title, String objective, StudyType type, String startDate, String endDate, String programUUID) {
+	public StudySummary(Integer id, String name, String title, String objective, StudyType type, String startDate, String endDate,
+			String programUUID) {
 		this.id = id;
 		this.name = name;
 		this.title = title;
@@ -94,7 +95,7 @@ public class StudySummary {
 	}
 
 	public String getProgramUUID() {
-		return programUUID;
+		return this.programUUID;
 	}
 
 	public void setProgramUUID(String programUUID) {

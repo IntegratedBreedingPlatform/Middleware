@@ -11,8 +11,8 @@
 
 package org.generationcp.middleware.operation.saver;
 
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -47,11 +47,10 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 	private boolean areTrialAndConstantsInList(VariableTypeList plotVariables, VariableTypeList effectVariables) {
 		if (plotVariables != null) {
-			for (VariableType var : plotVariables.getVariableTypes()) {
+			for (DMSVariableType var : plotVariables.getVariableTypes()) {
 				if (var.getStandardVariable().getId() != TermId.TRIAL_INSTANCE_FACTOR.getId()
-						&& (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(
-								Integer.valueOf(var.getStandardVariable().getStoredIn().getId())) || PhenotypicType.VARIATE
-								.getTypeStorages().contains(Integer.valueOf(var.getStandardVariable().getStoredIn().getId()))
+						&& (PhenotypicType.TRIAL_ENVIRONMENT == 
+								var.getRole() || PhenotypicType.VARIATE == var.getRole()
 								&& !this.isInOriginalPlotDataset(var.getStandardVariable().getId(), effectVariables))) {
 					return true;
 				}
@@ -63,7 +62,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 	private boolean isInOriginalPlotDataset(int id, VariableTypeList effectVariables) {
 		if (effectVariables != null) {
-			for (VariableType var : effectVariables.getVariableTypes()) {
+			for (DMSVariableType var : effectVariables.getVariableTypes()) {
 				if (var.getStandardVariable().getId() == id) {
 					return true;
 				}

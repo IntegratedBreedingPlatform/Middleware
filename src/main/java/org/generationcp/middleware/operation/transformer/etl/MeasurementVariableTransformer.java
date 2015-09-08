@@ -4,13 +4,13 @@ package org.generationcp.middleware.operation.transformer.etl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -30,9 +30,9 @@ public class MeasurementVariableTransformer extends Transformer {
 		List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
 
 		if (variableTypeList != null && !variableTypeList.isEmpty()) {
-			for (VariableType variableType : variableTypeList.getVariableTypes()) {
+			for (DMSVariableType variableType : variableTypeList.getVariableTypes()) {
 				StandardVariable stdVariable = variableType.getStandardVariable();
-				String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
+				String label = getLabelBasedOnRole(stdVariable.getPhenotypicType());
 				if (!isFactor && isTrial) {
 					label = PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
 				}
@@ -41,7 +41,7 @@ public class MeasurementVariableTransformer extends Transformer {
 						new MeasurementVariable(stdVariable.getId(), variableType.getLocalName(), stdVariable.getDescription(), stdVariable
 								.getScale().getName(), stdVariable.getMethod().getName(), stdVariable.getProperty().getName(), stdVariable
 								.getDataType().getName(), "", label);
-				measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
+				measurementVariable.setRole(variableType.getRole());
 				measurementVariable.setFactor(isFactor);
 				measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
 				measurementVariable.setPossibleValues(this.transformPossibleValues(stdVariable.getEnumerations()));
@@ -65,9 +65,9 @@ public class MeasurementVariableTransformer extends Transformer {
 
 		if (variableList != null && !variableList.isEmpty()) {
 			for (Variable variable : variableList.getVariables()) {
-				VariableType variableType = variable.getVariableType();
+				DMSVariableType variableType = variable.getVariableType();
 				StandardVariable stdVariable = variableType.getStandardVariable();
-				String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
+				String label = getLabelBasedOnRole(stdVariable.getPhenotypicType());
 				// for trial constants
 				if (!isFactor && !isStudy) {
 					label = PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
@@ -75,8 +75,8 @@ public class MeasurementVariableTransformer extends Transformer {
 				MeasurementVariable measurementVariable =
 						new MeasurementVariable(stdVariable.getId(), variableType.getLocalName(), stdVariable.getDescription(), stdVariable
 								.getScale().getName(), stdVariable.getMethod().getName(), stdVariable.getProperty().getName(), stdVariable
-								.getDataType().getName(), "", label);
-				measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
+								.getDataType().getName(), "", label);			
+				measurementVariable.setRole(variableType.getRole());
 				measurementVariable.setFactor(isFactor);
 				measurementVariable.setValue(variable.getDisplayValue());
 				measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
@@ -95,16 +95,13 @@ public class MeasurementVariableTransformer extends Transformer {
 		return measurementVariables;
 	}
 
-	private String getLabelOfStoredIn(int storedIn) {
-		return PhenotypicType.getPhenotypicTypeById(storedIn).getLabelList().get(0);
-	}
-
 	public List<ValueReference> transformPossibleValues(List<Enumeration> enumerations) {
 		List<ValueReference> list = new ArrayList<ValueReference>();
 
 		if (enumerations != null) {
 			for (Enumeration enumeration : enumerations) {
-				list.add(new ValueReference(enumeration.getId(), enumeration.getName(), enumeration.getDescription()));
+				int enumerationId = enumeration.getId() == null ? 0 : enumeration.getId();
+				list.add(new ValueReference(enumerationId, enumeration.getName(), enumeration.getDescription()));
 			}
 		}
 
@@ -115,13 +112,13 @@ public class MeasurementVariableTransformer extends Transformer {
 		MeasurementVariable measurementVariable = null;
 
 		if (stdVariable != null) {
-			String label = this.getLabelOfStoredIn(stdVariable.getStoredIn().getId());
+			
+			String label = getLabelBasedOnRole(stdVariable.getPhenotypicType());
 
 			measurementVariable =
 					new MeasurementVariable(stdVariable.getId(), stdVariable.getName(), stdVariable.getDescription(), stdVariable
 							.getScale().getName(), stdVariable.getMethod().getName(), stdVariable.getProperty().getName(), stdVariable
 							.getDataType().getName(), "", label);
-			measurementVariable.setStoredIn(stdVariable.getStoredIn().getId());
 			measurementVariable.setFactor(isFactor);
 			measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
 			measurementVariable.setPossibleValues(this.transformPossibleValues(stdVariable.getEnumerations()));
@@ -129,8 +126,13 @@ public class MeasurementVariableTransformer extends Transformer {
 				measurementVariable.setMinRange(stdVariable.getConstraints().getMinValue());
 				measurementVariable.setMaxRange(stdVariable.getConstraints().getMaxValue());
 			}
+			measurementVariable.setRole(stdVariable.getPhenotypicType());
 		}
 
 		return measurementVariable;
+	}
+
+	private String getLabelBasedOnRole(PhenotypicType role) {
+		return role.getLabelList().get(0);
 	}
 }

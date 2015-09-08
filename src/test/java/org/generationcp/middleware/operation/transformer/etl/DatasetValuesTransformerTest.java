@@ -14,10 +14,10 @@ package org.generationcp.middleware.operation.transformer.etl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -58,10 +58,10 @@ public class DatasetValuesTransformerTest extends TestOutputFormatter {
 		StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(2);
 
-		varTypeList.add(new VariableType("PI Name", "Name of Principal Investigator", standardVariable, 1));
-		varTypeList.add(new VariableType("PI ID", "ID of Principal Investigator", standardVariable, 1));
-		varTypeList.add(new VariableType("TRIAL", "TRIAL NUMBER", standardVariable, 1));
-		varTypeList.add(new VariableType("COOPERATOR", "COOPERATOR NAME", standardVariable, 1));
+		varTypeList.add(new DMSVariableType("PI Name", "Name of Principal Investigator", standardVariable, 1));
+		varTypeList.add(new DMSVariableType("PI ID", "ID of Principal Investigator", standardVariable, 1));
+		varTypeList.add(new DMSVariableType("TRIAL", "TRIAL NUMBER", standardVariable, 1));
+		varTypeList.add(new DMSVariableType("COOPERATOR", "COOPERATOR NAME", standardVariable, 1));
 
 		return varTypeList;
 	}

@@ -3,15 +3,15 @@ package org.generationcp.middleware.operation.transformer.etl;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 public class StudyValuesTransformer extends Transformer {
@@ -21,7 +21,7 @@ public class StudyValuesTransformer extends Transformer {
 	}
 
 	public StudyValues transform(Integer germplasmId, Integer locationId, StudyDetails studyDetails,
-			List<MeasurementVariable> measurementVariables, VariableTypeList variableTypeList) throws MiddlewareQueryException {
+			List<MeasurementVariable> measurementVariables, VariableTypeList variableTypeList) throws MiddlewareException {
 
 		StudyValues studyValues = new StudyValues();
 		VariableList variableList = new VariableList();
@@ -29,7 +29,7 @@ public class StudyValuesTransformer extends Transformer {
 		variableTypeList.allocateRoom(variableListFromStudy.size());
 
 		if (variableTypeList != null) {
-			for (VariableType variableType : variableTypeList.getVariableTypes()) {
+			for (DMSVariableType variableType : variableTypeList.getVariableTypes()) {
 				if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.STUDY
 						|| variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.VARIATE) {
 					String value = null;

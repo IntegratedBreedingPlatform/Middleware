@@ -52,13 +52,13 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	/* ======================= STANDARD VARIABLE ================================== */
 
 	@Override
-	public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getStandardVariable(stdVariableId);
+	public StandardVariable getStandardVariable(int stdVariableId, String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getStandardVariable(stdVariableId,programUUID);
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds) throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getStandardVariables(standardVariableIds);
+	public List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds, String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getStandardVariables(standardVariableIds,programUUID);
 	}
 
 	@Override
@@ -67,22 +67,25 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-	public StandardVariable getStandardVariable(Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException {
+	public StandardVariable getStandardVariable(Integer propertyId, Integer scaleId, Integer methodId, String programUUID) throws MiddlewareException {
 		OntologyDataManager manager = this.getOntologyDataManager();
-		Integer standardVariableId = manager.getStandardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId);
-		return manager.getStandardVariable(standardVariableId);
+		Integer standardVariableId = manager
+				.getStandardVariableIdByPropertyIdScaleIdMethodId(propertyId,
+						scaleId, methodId);
+		return manager.getStandardVariable(standardVariableId,programUUID);
+		
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariables(String nameOrSynonym) throws MiddlewareQueryException {
+	public List<StandardVariable> getStandardVariables(String nameOrSynonym,String programUUID) throws MiddlewareException {
 		List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
-		standardVariables.addAll(this.getOntologyDataManager().findStandardVariablesByNameOrSynonym(nameOrSynonym));
+		standardVariables.addAll(this.getOntologyDataManager().findStandardVariablesByNameOrSynonym(nameOrSynonym,programUUID));
 		return standardVariables;
 	}
 
 	@Override
-	public void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException {
-		this.getOntologyDataManager().addStandardVariable(stdVariable);
+	public void addStandardVariable(StandardVariable stdVariable,String programUUID) throws MiddlewareQueryException {
+		this.getOntologyDataManager().addStandardVariable(stdVariable,programUUID);
 	}
 
 	@Override
@@ -96,33 +99,32 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-	public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getAllStandardVariables();
+	public Set<StandardVariable> getAllStandardVariables(String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getAllStandardVariables(programUUID);
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariablesByTraitClass(Integer traitClassId) throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getStandardVariables(traitClassId, null, null, null);
+	public List<StandardVariable> getStandardVariablesByTraitClass(Integer traitClassId,String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getStandardVariables(traitClassId, null, null, null, programUUID);
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariablesByProperty(Integer propertyId) throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getStandardVariables(null, propertyId, null, null);
+	public List<StandardVariable> getStandardVariablesByProperty(Integer propertyId, String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getStandardVariables(null, propertyId, null, null, programUUID);
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariablesByMethod(Integer methodId) throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getStandardVariables(null, null, methodId, null);
+	public List<StandardVariable> getStandardVariablesByMethod(Integer methodId, String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getStandardVariables(null, null, methodId, null, programUUID);
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariablesByScale(Integer scaleId) throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getStandardVariables(null, null, null, scaleId);
+	public List<StandardVariable> getStandardVariablesByScale(Integer scaleId, String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getStandardVariables(null, null, null, scaleId, programUUID);
 	}
 
 	@Override
-	public void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException,
-			MiddlewareException {
+	public void saveOrUpdateStandardVariable(StandardVariable standardVariable, Operation operation) throws MiddlewareException {
 		this.getOntologyDataManager().saveOrUpdateStandardVariable(standardVariable, operation);
 	}
 
@@ -133,7 +135,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 
 	@Override
 	public void addOrUpdateStandardVariableMinMaxConstraints(int standardVariableId, VariableConstraints constraints)
-			throws MiddlewareQueryException, MiddlewareException {
+			throws MiddlewareException {
 		this.getOntologyDataManager().addOrUpdateStandardVariableConstraints(standardVariableId, constraints);
 	}
 
@@ -143,8 +145,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-	public Enumeration addStandardVariableValidValue(StandardVariable variable, Enumeration validValue) throws MiddlewareQueryException,
-			MiddlewareException {
+	public Enumeration addStandardVariableValidValue(StandardVariable variable, Enumeration validValue) throws MiddlewareException {
 		return this.getOntologyDataManager().addStandardVariableEnumeration(variable, validValue);
 	}
 
@@ -154,8 +155,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-	public void saveOrUpdateStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration)
-			throws MiddlewareQueryException, MiddlewareException {
+	public void saveOrUpdateStandardVariableEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareException {
 		this.getOntologyDataManager().saveOrUpdateStandardVariableEnumeration(variable, enumeration);
 	}
 
@@ -188,8 +188,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-	public Property addOrUpdateProperty(String name, String definition, int isAId, String cropOntologyId) throws MiddlewareQueryException,
-			MiddlewareException {
+	public Property addOrUpdateProperty(String name, String definition, int isAId, String cropOntologyId) throws MiddlewareException {
 
 		Property property =
 				new Property(this.getOntologyDataManager().addOrUpdateTermAndRelationship(name, definition, CvId.PROPERTIES,
@@ -200,7 +199,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-	public void updateProperty(Property property) throws MiddlewareQueryException, MiddlewareException {
+	public void updateProperty(Property property) throws MiddlewareException {
 		this.getOntologyDataManager().updateTermAndRelationship(property.getTerm(), TermId.IS_A.getId(), property.getIsA().getId());
 	}
 
@@ -240,12 +239,12 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-	public Scale addOrUpdateScale(String name, String definition) throws MiddlewareQueryException, MiddlewareException {
+	public Scale addOrUpdateScale(String name, String definition) throws MiddlewareException {
 		return new Scale(this.getOntologyDataManager().addOrUpdateTerm(name, definition, CvId.SCALES));
 	}
 
 	@Override
-	public void updateScale(Scale scale) throws MiddlewareQueryException, MiddlewareException {
+	public void updateScale(Scale scale) throws MiddlewareException {
 		this.getOntologyDataManager().updateTerm(scale.getTerm());
 	}
 
@@ -284,12 +283,12 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-	public Method addOrUpdateMethod(String name, String definition) throws MiddlewareQueryException, MiddlewareException {
+	public Method addOrUpdateMethod(String name, String definition) throws MiddlewareException {
 		return new Method(this.getOntologyDataManager().addOrUpdateTerm(name, definition, CvId.METHODS));
 	}
 
 	@Override
-	public void updateMethod(Method method) throws MiddlewareQueryException, MiddlewareException {
+	public void updateMethod(Method method) throws MiddlewareException {
 		this.getOntologyDataManager().updateTerm(method.getTerm());
 	}
 
@@ -327,8 +326,8 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-	public long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException {
-		return this.getStudyDataManager().countExperimentsByVariable(variableId, storedInId);
+	public long countExperimentsByVariable(int variableId, int variableTypeId) throws MiddlewareQueryException {
+		return this.getStudyDataManager().countExperimentsByVariable(variableId, variableTypeId);
 	}
 
 	@Override
@@ -342,8 +341,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-	public TraitClass addOrUpdateTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareQueryException,
-			MiddlewareException {
+	public TraitClass addOrUpdateTraitClass(String name, String definition, int parentTraitClassId) throws MiddlewareException {
 		Term term =
 				this.getOntologyDataManager().addOrUpdateTermAndRelationship(name, definition, CvId.IBDB_TERMS, TermId.IS_A.getId(),
 						parentTraitClassId);
@@ -352,7 +350,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-	public TraitClass updateTraitClass(TraitClass traitClass) throws MiddlewareQueryException, MiddlewareException {
+	public TraitClass updateTraitClass(TraitClass traitClass) throws MiddlewareException {
 		Term term =
 				this.getOntologyDataManager().updateTermAndRelationship(traitClass.getTerm(), TermId.IS_A.getId(),
 						traitClass.getIsA().getId());

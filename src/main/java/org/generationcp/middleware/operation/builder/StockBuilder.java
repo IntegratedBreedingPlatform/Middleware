@@ -13,6 +13,7 @@ package org.generationcp.middleware.operation.builder;
 
 import java.util.Set;
 
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Stock;
@@ -20,9 +21,9 @@ import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.StockModel;
@@ -34,7 +35,7 @@ public class StockBuilder extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public Stocks getStocksInDataset(int datasetId) throws MiddlewareQueryException {
+	public Stocks getStocksInDataset(int datasetId) throws MiddlewareException {
 		DataSet dataSet = this.getDataSetBuilder().build(datasetId);
 		Study study = this.getStudyBuilder().createStudy(dataSet.getStudyId());
 
@@ -59,7 +60,7 @@ public class StockBuilder extends Builder {
 		Stocks stocks = new Stocks();
 		for (StockModel stockModel : stockModels) {
 			VariableList variables = new VariableList();
-			for (VariableType variableType : stockVariableTypes.getVariableTypes()) {
+			for (DMSVariableType variableType : stockVariableTypes.getVariableTypes()) {
 				Variable variable = new Variable(variableType, this.getValue(stockModel, variableType));
 				variables.add(variable);
 			}
@@ -68,18 +69,18 @@ public class StockBuilder extends Builder {
 		return stocks;
 	}
 
-	private String getValue(StockModel stockModel, VariableType variableType) {
+	private String getValue(StockModel stockModel, DMSVariableType variableType) {
 		String value = null;
-		int storedInId = variableType.getStandardVariable().getStoredIn().getId();
-		if (storedInId == TermId.ENTRY_NUMBER_STORAGE.getId()) {
+		int id = variableType.getStandardVariable().getId();
+		if (id == TermId.ENTRY_NO.getId()) {
 			value = stockModel.getUniqueName();
-		} else if (storedInId == TermId.ENTRY_GID_STORAGE.getId()) {
+		} else if (id == TermId.GID.getId()) {
 			value = stockModel.getDbxrefId() == null ? null : Integer.toString(stockModel.getDbxrefId());
-		} else if (storedInId == TermId.ENTRY_DESIGNATION_STORAGE.getId()) {
+		} else if (id == TermId.DESIG.getId()) {
 			value = stockModel.getName();
-		} else if (storedInId == TermId.ENTRY_CODE_STORAGE.getId()) {
+		} else if (id == TermId.ENTRY_CODE.getId()) {
 			value = stockModel.getValue();
-		} else if (storedInId == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
+		} else {
 			value = this.getPropertyValue(variableType.getId(), stockModel.getProperties());
 		}
 		return value;

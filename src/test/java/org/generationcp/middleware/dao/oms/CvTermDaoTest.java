@@ -12,10 +12,11 @@
 
 package org.generationcp.middleware.dao.oms;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -23,6 +24,7 @@ import org.generationcp.middleware.domain.oms.PropertyReference;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
 import org.junit.Assert;
@@ -40,22 +42,50 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetTermsByNameOrSynonyms() throws Exception {
-		List<String> nameOrSynonyms =
-				Arrays.asList("ENTRY", "ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");
+	public void testGetTermIdsWithTypeByNameOrSynonyms() throws Exception {
+		Map<String, VariableType> expectedStdVarWithTypeMap = this.createVarNameWithTypeMapTestData();
 
-		Map<String, Set<Integer>> results = CvTermDaoTest.dao.getTermsByNameOrSynonyms(nameOrSynonyms, CvId.VARIABLES.getId());
+		List<String> nameOrSynonyms = new ArrayList<String>();
+		nameOrSynonyms.addAll(expectedStdVarWithTypeMap.keySet());
 
-		Debug.println(0, "testGetTermsByNameOrSynonyms(nameOrSynonyms=" + nameOrSynonyms + ") RESULTS:");
+		Map<String, Map<Integer, VariableType>> results =
+				CvTermDaoTest.dao.getTermIdsWithTypeByNameOrSynonyms(nameOrSynonyms, CvId.VARIABLES.getId());
+
+		Debug.println(0, "testGetTermIdsWithTypeByNameOrSynonyms(nameOrSynonyms=" + nameOrSynonyms + ") RESULTS:");
 		for (String name : nameOrSynonyms) {
-			Debug.println(0, "    Name/Synonym = " + name + ", Terms = " + results.get(name));
+			Map<Integer, VariableType> actualStdVarIdWithTypeMap = results.get(name);
+			Debug.println(0, "    Name/Synonym = " + name + ", Terms = " + actualStdVarIdWithTypeMap);
+			if (actualStdVarIdWithTypeMap != null) {
+				Assert.assertTrue(actualStdVarIdWithTypeMap.containsValue(expectedStdVarWithTypeMap.get(name)));
+			}
 		}
 
-		/*
-		 * SQL TO VERIFY: SELECT DISTINCT cvterm.name, syn.synonym, cvterm.cvterm_id FROM cvterm, cvtermsynonym syn WHERE cvterm.cv_id =
-		 * 1040 AND (cvterm.name IN (:nameOrSynonyms) OR (syn.synonym IN (:nameOrSynonyms) AND syn.cvterm_id = cvterm.cvterm_id))
-		 */
+	}
 
+	private Map<String, VariableType> createVarNameWithTypeMapTestData() {
+		Map<String, VariableType> varNameWithTypeMap = new HashMap<String, VariableType>();
+		varNameWithTypeMap.put("TRIAL_INSTANCE", VariableType.ENVIRONMENT_DETAIL);
+		varNameWithTypeMap.put("ENTRY_NO", VariableType.GERMPLASM_DESCRIPTOR);
+		varNameWithTypeMap.put("DESIGNATION", VariableType.GERMPLASM_DESCRIPTOR);
+		varNameWithTypeMap.put("GID", VariableType.GERMPLASM_DESCRIPTOR);
+		varNameWithTypeMap.put("CROSS", VariableType.GERMPLASM_DESCRIPTOR);
+		varNameWithTypeMap.put("PLOT_NO", VariableType.EXPERIMENTAL_DESIGN);
+		varNameWithTypeMap.put("REP_NO", VariableType.EXPERIMENTAL_DESIGN);
+		varNameWithTypeMap.put("SITE_SOIL_PH", VariableType.TRAIT);
+		return varNameWithTypeMap;
+	}
+
+	@Test
+	public void testFilterByColumnValue() throws Exception {
+		List<CVTerm> cvTerms = CvTermDaoTest.dao.filterByColumnValue("name", "Collaborator");
+		Assert.assertEquals(cvTerms.size(), 1);
+	}
+
+	@Test
+	public void testFilterByColumnValues() throws Exception {
+		List<Integer> ids = Arrays.asList(2020, 2030);
+		List<CVTerm> cvTerms = CvTermDaoTest.dao.filterByColumnValues("cvTermId", ids);
+		Assert.assertEquals(cvTerms.size(), 2);
 	}
 
 	@Test
@@ -81,22 +111,22 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStandardVariableIdsByProperties() throws Exception {
-		List<String> nameOrSynonyms =
-				Arrays.asList("ENTRY", "ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");
-		Map<String, Set<Integer>> results = CvTermDaoTest.dao.getStandardVariableIdsByProperties(nameOrSynonyms);
+	public void testGetStandardVariableIdsWithTypeByProperties() throws Exception {
+		Map<String, VariableType> expectedVarWithTypeMap = this.createVarNameWithTypeMapTestData();
 
-		Debug.println(0, "testGetStandardVariableIdsByProperties(nameOrSynonyms=" + nameOrSynonyms + ") RESULTS:");
-		for (String name : nameOrSynonyms) {
-			Debug.println(0, "    Name/Synonym = " + name + ", Terms = " + results.get(name));
+		List<String> propertyNames = new ArrayList<String>();
+		propertyNames.addAll(expectedVarWithTypeMap.keySet());
+
+		Map<String, Map<Integer, VariableType>> results = CvTermDaoTest.dao.getStandardVariableIdsWithTypeByProperties(propertyNames);
+
+		Debug.println(0, "testGetStandardVariableIdsByProperties(nameOrSynonyms=" + propertyNames + ") RESULTS:");
+		for (String name : propertyNames) {
+			Map<Integer, VariableType> actualStdVarIdWithTypeMap = results.get(name);
+			Debug.println(0, "    Name/Synonym = " + name + ", Terms = " + actualStdVarIdWithTypeMap);
+			if (actualStdVarIdWithTypeMap != null) {
+				Assert.assertTrue(actualStdVarIdWithTypeMap.containsValue(expectedVarWithTypeMap.get(name)));
+			}
 		}
-
-		/*
-		 * SQL TO VERIFY: SELECT DISTINCT cvtr.name, syn.synonym, cvt.cvterm_id FROM cvterm_relationship cvr INNER JOIN cvterm cvtr ON
-		 * cvr.object_id = cvtr.cvterm_id AND cvr.type_id = 1200 INNER JOIN cvterm cvt ON cvr.subject_id = cvt.cvterm_id AND cvt.cv_id =
-		 * 1040 , cvtermsynonym syn WHERE (cvtr.cvterm_id = syn.cvterm_id AND syn.synonym IN (:propertyNames) OR cvtr.name IN
-		 * (:propertyNames));
-		 */
 	}
 
 	@Test
@@ -145,7 +175,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 					property.print(4);
 				}
 			} else {
-				Debug.println(4, traitClassId + " (size = 0) : " + properties);
+				Debug.println(4, traitClassId + " (size = 0) : " + null);
 			}
 		}
 	}
@@ -163,8 +193,9 @@ public class CvTermDaoTest extends IntegrationTestBase {
 			if (properties != null) {
 				Debug.println(4, id + " (size = " + properties.size() + ") : " + properties);
 			} else {
-				Debug.println(4, id + " (size = 0) : " + properties);
+				Debug.println(4, id + " (size = 0) : " + null);
 			}
 		}
 	}
+
 }

@@ -318,7 +318,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		ProjectUserRole projUsrRole1 = new ProjectUserRole(this.commonTestProject, this.testUser1, role1);
 		ProjectUserRole projUsrRole2 = new ProjectUserRole(this.commonTestProject, this.testUser1, role2);
 
-		List<ProjectUserRole> projectUserRoles = new ArrayList<ProjectUserRole>();
+		List<ProjectUserRole> projectUserRoles = new ArrayList<>();
 		projectUserRoles.add(projUsrRole1);
 		projectUserRoles.add(projUsrRole2);
 
@@ -403,7 +403,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetRoleById() throws MiddlewareQueryException {
-		Integer id = Integer.valueOf(1); // Assumption: there is a role with id 1
+		Integer id = 1; // Assumption: there is a role with id 1
 		Role role = this.workbenchDataManager.getRoleById(id);
 		Assert.assertNotNull(role);
 		Debug.println(IntegrationTestBase.INDENT, "testGetRoleById(id=" + id + "): \n  " + role);
@@ -468,7 +468,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 				this.workbenchDataManager.getProjectUserMysqlAccountByProjectIdAndUserId(this.commonTestProject.getProjectId().intValue(),
 						this.testUser1.getUserid());
 		Assert.assertNotNull(record);
-		Assert.assertEquals(Long.valueOf(this.commonTestProject.getProjectId()), new Long(record.getProject().getProjectId()));
+		Assert.assertEquals(this.commonTestProject.getProjectId(), record.getProject().getProjectId());
 		Assert.assertEquals(this.testUser1.getUserid(), record.getUser().getUserid());
 		Debug.println(IntegrationTestBase.INDENT, record.toString());
 	}
@@ -706,7 +706,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		this.workbenchDataManager.addTemplateSetting(templateSetting2);
 		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting2 added: " + templateSetting2);
 
-		// When a new template is added with default flag on, any other templates that are existing for the same project and tool must be set as non-default.
+		// When a new template is added with default flag on, any other templates that are existing for the same project and tool must be
+		// set as non-default.
 		Assert.assertFalse(templateSetting1.isDefault());
 		Assert.assertTrue(templateSetting2.isDefault());
 	}
@@ -722,10 +723,10 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 		this.workbenchDataManager.addTemplateSetting(templateSetting1);
 		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting1 added: " + templateSetting1);
-		
+
 		this.workbenchDataManager.addTemplateSetting(templateSetting2);
 		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting2 added: " + templateSetting2);
-		
+
 		Assert.assertFalse(templateSetting1.isDefault());
 		Assert.assertTrue(templateSetting2.isDefault());
 
@@ -733,7 +734,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		this.workbenchDataManager.updateTemplateSetting(templateSetting1);
 		Debug.println(IntegrationTestBase.INDENT, "TemplateSetting1 updated: " + templateSetting1);
 
-		// When a new template is added with default flag on, any other templates that are existing for the same project and tool must be set as non-default.
+		// When a new template is added with default flag on, any other templates that are existing for the same project and tool must be
+		// set as non-default.
 		Assert.assertTrue(templateSetting1.isDefault());
 		Assert.assertFalse(templateSetting2.isDefault());
 
@@ -784,6 +786,12 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testGetAllStandardPreset() throws Exception {
+		List<StandardPreset> out = this.workbenchDataManager.getStandardPresetDAO().getAll();
+		Assert.assertTrue(out.size() > 0);
+	}
+
+	@Test
 	public void testGetStandardPresetFromCropAndTool() throws Exception {
 		this.initializeStandardPresets();
 
@@ -826,7 +834,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	protected List<StandardPreset> initializeStandardPresets() throws MiddlewareQueryException {
-		List<StandardPreset> fulllist = new ArrayList<StandardPreset>();
+		List<StandardPreset> fulllist = new ArrayList<>();
 		for (int j = 1; j < 3; j++) {
 			for (int i = 1; i < 6; i++) {
 				StandardPreset preset = new StandardPreset();

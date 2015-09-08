@@ -255,10 +255,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 		} catch (Exception e) {
 
-			this.logAndThrowException(
+			throw new MiddlewareQueryException(
 					"Error encountered while saving Germplasm List: GermplasmListManager.addOrUpdateGermplasmList(germplasmLists="
-							+ germplasmLists + ", operation-" + operation + "): " + e.getMessage(),
-					e, GermplasmListManagerImpl.LOG);
+							+ germplasmLists + ", operation-" + operation + "): " + e.getMessage(), e);
 		}
 
 		return germplasmListIds;
@@ -288,6 +287,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		int germplasmListsDeleted = 0;
 		try {
 			// begin delete transaction
+
 			List<Integer> listIds = new ArrayList<Integer>();
 			for (GermplasmList germplasmList : germplasmLists) {
 				listIds.add(germplasmList.getId());
@@ -305,11 +305,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 				germplasmListsDeleted++;
 			}
 		} catch (Exception e) {
-
-			this.logAndThrowException(
+			throw new MiddlewareQueryException(
 					"Error encountered while deleting Germplasm List: GermplasmListManager.deleteGermplasmList(germplasmLists="
-							+ germplasmLists + "): " + e.getMessage(),
-					e, GermplasmListManagerImpl.LOG);
+							+ germplasmLists + "): " + e.getMessage(), e);
 		}
 		return germplasmListsDeleted;
 	}
@@ -365,11 +363,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 		} catch (Exception e) {
 
-			this.logAndThrowException(
+			throw new MiddlewareQueryException(
 					"Error encountered while saving Germplasm List Data: GermplasmListManager.addOrUpdateGermplasmListData(germplasmListDatas="
-							+ germplasmListDatas + ", operation=" + operation + "): " + e.getMessage(),
-					e, GermplasmListManagerImpl.LOG);
+							+ germplasmListDatas + ", operation=" + operation + "): " + e.getMessage(), e);
 		}
+
 		return idGermplasmListDataSaved;
 	}
 
@@ -382,10 +380,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 			this.getTransactionDao().cancelUnconfirmedTransactionsForLists(Arrays.asList(new Integer[] {listId}));
 
 		} catch (Exception e) {
-			this.logAndThrowException(
+			throw new MiddlewareQueryException(
 					"Error encountered while deleting Germplasm List Data: GermplasmListManager.deleteGermplasmListDataByListId(listId="
-							+ listId + "): " + e.getMessage(),
-					e, GermplasmListManagerImpl.LOG);
+							+ listId + "): " + e.getMessage(), e);
 		}
 
 		return germplasmListDataDeleted;
@@ -433,10 +430,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 		} catch (Exception e) {
 
-			this.logAndThrowException(
+			throw new MiddlewareQueryException(
 					"Error encountered while deleting Germplasm List Data: GermplasmListManager.deleteGermplasmListData(germplasmListDatas="
-							+ germplasmListDatas + "): " + e.getMessage(),
-					e, GermplasmListManagerImpl.LOG);
+							+ germplasmListDatas + "): " + e.getMessage(), e);
 		}
 
 		return germplasmListDataDeleted;
@@ -580,4 +576,5 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	public GermplasmList getGermplasmListByListRef(Integer listRef) throws MiddlewareQueryException {
 		return this.getGermplasmListDAO().getByListRef(listRef);
 	}
+
 }

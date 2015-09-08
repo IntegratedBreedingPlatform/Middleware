@@ -1,9 +1,6 @@
 
 package org.generationcp.middleware.service.impl.study;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -21,6 +18,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 /**
@@ -38,46 +36,48 @@ public class StudyServiceImplTest {
 	public void listMeasurementData() throws Exception {
 		TraitService mockTrialTraits = Mockito.mock(TraitService.class);
 		StudyMeasurements mockTrailMeasurements = Mockito.mock(StudyMeasurements.class);
-		StudyServiceImpl result = new StudyServiceImpl(mockTrialTraits, mockTrailMeasurements, Mockito.mock(StudyGermplasmListService.class));
+		StudyServiceImpl result =
+				new StudyServiceImpl(mockTrialTraits, mockTrailMeasurements, Mockito.mock(StudyGermplasmListService.class));
 
 		List<TraitDto> projectTraits = Arrays.<TraitDto>asList(new TraitDto(1, "Trait1"), new TraitDto(1, "Trait2"));
-		when(mockTrialTraits.getTraits(1234)).thenReturn(projectTraits);
+		Mockito.when(mockTrialTraits.getTraits(1234)).thenReturn(projectTraits);
 		final List<MeasurementDto> traits = new ArrayList<MeasurementDto>();
 		traits.add(new MeasurementDto(new TraitDto(1, "traitName"), 9999, "triatValue"));
 		final ObservationDto measurement =
 				new ObservationDto(1, "trialInstance", "entryType", 1234, "designation", "entryNo", "seedSource", "repitionNumber",
 						"plotNumber", traits);
 		final List<ObservationDto> testMeasurements = Collections.<ObservationDto>singletonList(measurement);
-		when(mockTrailMeasurements.getAllMeasurements(1234, projectTraits)).thenReturn(testMeasurements);
+		Mockito.when(mockTrailMeasurements.getAllMeasurements(1234, projectTraits)).thenReturn(testMeasurements);
 		result.getObservations(1234);
 
 		final List<ObservationDto> allMeasurements = mockTrailMeasurements.getAllMeasurements(1234, projectTraits);
-		assertEquals(allMeasurements, testMeasurements);
+		Assert.assertEquals(allMeasurements, testMeasurements);
 	}
-	
+
 	@Test
 	public void testlistAllStudies() throws MiddlewareQueryException {
 		Session mockSession = Mockito.mock(Session.class);
 		SQLQuery mockSqlQuery = Mockito.mock(SQLQuery.class);
-		
+
 		HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
 		Mockito.when(mockSessionProvider.getSession()).thenReturn(mockSession);
-		Mockito.when(mockSession.createSQLQuery(Mockito.anyString())).thenReturn(mockSqlQuery);
-		Mockito.when(mockSqlQuery.addScalar(Mockito.anyString())).thenReturn(mockSqlQuery);
-		
+		Mockito.when(mockSession.createSQLQuery(Matchers.anyString())).thenReturn(mockSqlQuery);
+		Mockito.when(mockSqlQuery.addScalar(Matchers.anyString())).thenReturn(mockSqlQuery);
+
 		final Object[] testDBRow =
-				{2007, "Wheat Trial 1", "Wheat Trial 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", "10010", "Wheat Trial 1 Objective", "20150417", "20150422"};
+			{2007, "Wheat Trial 1", "Wheat Trial 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", "10010", "Wheat Trial 1 Objective",
+						"20150417", "20150422"};
 		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow);
-		
+
 		Mockito.when(mockSqlQuery.list()).thenReturn(testResult);
-		
+
 		StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
 		List<StudySummary> studySummaries = studyServiceImpl.listAllStudies("c996de54-3ebb-41ca-8fed-160a33ffffd4");
 		Assert.assertNotNull(studySummaries);
 		Assert.assertEquals(1, studySummaries.size());
-		
+
 		StudySummary studySummary = studySummaries.get(0);
-		
+
 		Assert.assertEquals(testDBRow[0], studySummary.getId());
 		Assert.assertEquals(testDBRow[1], studySummary.getName());
 		Assert.assertEquals(testDBRow[2], studySummary.getTitle());
@@ -86,7 +86,6 @@ public class StudyServiceImplTest {
 		Assert.assertEquals(testDBRow[5], studySummary.getObjective());
 		Assert.assertEquals(testDBRow[6], studySummary.getStartDate());
 		Assert.assertEquals(testDBRow[7], studySummary.getEndDate());
-		
+
 	}
 }
-

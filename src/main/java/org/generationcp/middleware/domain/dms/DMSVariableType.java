@@ -18,7 +18,7 @@ import org.generationcp.middleware.util.Debug;
 /**
  * Contains the details of a variable type - local name, local description and rank.
  */
-public class VariableType implements Serializable, Comparable<VariableType> {
+public class DMSVariableType implements Serializable, Comparable<DMSVariableType> {
 
 	private static final long serialVersionUID = 1L;
 
@@ -31,15 +31,18 @@ public class VariableType implements Serializable, Comparable<VariableType> {
 	private StandardVariable standardVariable;
 
 	private String treatmentLabel;
+	
+	private PhenotypicType role;
 
-	public VariableType() {
+	public DMSVariableType() {
 	}
 
-	public VariableType(String localName, String localDescription, StandardVariable standardVariable, int rank) {
+	public DMSVariableType(String localName, String localDescription, StandardVariable standardVariable, int rank) {
 		this.localName = localName;
 		this.localDescription = localDescription;
 		this.standardVariable = standardVariable;
 		this.rank = rank;
+		this.role = standardVariable.getPhenotypicType();
 	}
 
 	public int getId() {
@@ -86,6 +89,14 @@ public class VariableType implements Serializable, Comparable<VariableType> {
 		this.treatmentLabel = treatmentLabel;
 	}
 
+	public PhenotypicType getRole() {
+		return role;
+	}
+
+	public void setRole(PhenotypicType role) {
+		this.role = role;
+	}
+
 	public void print(int indent) {
 		Debug.println(indent, "Variable Type: ");
 		indent += 3;
@@ -105,10 +116,10 @@ public class VariableType implements Serializable, Comparable<VariableType> {
 		if (obj == null) {
 			return false;
 		}
-		if (!(obj instanceof VariableType)) {
+		if (!(obj instanceof DMSVariableType)) {
 			return false;
 		}
-		VariableType other = (VariableType) obj;
+		DMSVariableType other = (DMSVariableType) obj;
 		return other.getId() == this.getId();
 	}
 
@@ -130,7 +141,7 @@ public class VariableType implements Serializable, Comparable<VariableType> {
 
 	@Override
 	// Sort in ascending order by rank
-	public int compareTo(VariableType compareValue) {
+	public int compareTo(DMSVariableType compareValue) {
 		int compareRank = compareValue.getRank();
 		return Integer.valueOf(this.rank).compareTo(compareRank);
 	}

@@ -81,6 +81,7 @@ import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.dao.oms.StandardVariableDao;
+import org.generationcp.middleware.dao.oms.VariableOverridesDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
 import org.hibernate.Session;
@@ -269,6 +270,12 @@ public class DatabaseBroker {
 		CvTermPropertyDao cvTermPropertyDao = new CvTermPropertyDao();
 		cvTermPropertyDao.setSession(this.getActiveSession());
 		return cvTermPropertyDao;
+	}
+
+	public final VariableOverridesDao getVariableProgramOverridesDao() {
+		VariableOverridesDao variableOverridesDao = new VariableOverridesDao();
+		variableOverridesDao.setSession(this.getActiveSession());
+		return variableOverridesDao;
 	}
 
 	public CvTermSynonymDao getCvTermSynonymDao() {
@@ -565,4 +572,41 @@ public class DatabaseBroker {
 	}
 
 
+	/**
+	 * Parse hibernate query result value to boolean with null check
+	 * 
+	 * @param val value
+	 * @return boolean
+	 */
+	protected boolean typeSafeObjectToBoolean(Object val) {
+		if (val == null) {
+			  return false;
+		  }
+		if (val instanceof Integer) {
+			  return (Integer) val != 0;
+		  }
+		if (val instanceof Boolean) {
+			  return (Boolean) val;
+		  }
+		return false;
+	}
+
+	/**
+	 * Parse hibernate query result value to Integer with null check
+	 * 
+	 * @param val value
+	 * @return boolean
+	 */
+	protected Integer typeSafeObjectToInteger(Object val) {
+		if (val == null) {
+			  return null;
+		  }
+		if (val instanceof Integer) {
+			  return (Integer) val;
+		  }
+		if (val instanceof String) {
+			  return Integer.valueOf((String) val);
+		  }
+		throw new NumberFormatException("Can not cast " + val.getClass() + " to Integer for value: " + val);
+	}
 }

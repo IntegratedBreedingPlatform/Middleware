@@ -13,10 +13,9 @@ package org.generationcp.middleware.dao;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.hibernate.Criteria;
@@ -26,12 +25,14 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class GenericDAO<T, ID extends Serializable> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GenericDAO.class);
+
 	private final Class<T> persistentClass;
 	private Session session;
 
@@ -50,23 +51,6 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 
 	public Class<T> getPersistentClass() {
 		return this.persistentClass;
-	}
-
-	protected void logAndThrowException(String message, Throwable e) throws MiddlewareQueryException {
-		GenericDAO.LOG.error(message, e);
-		throw new MiddlewareQueryException(message, e);
-	}
-
-	protected String getLogExceptionMessage(String methodName, String paramVar, String paramValue, String exceptionMessage, String className) {
-		String message = "Error with " + methodName + "(";
-
-		if (paramVar.length() != 0) {
-			message += paramVar + "=" + paramValue;
-		}
-
-		message += ") query from " + className + ": " + exceptionMessage;
-
-		return message;
 	}
 
 	public T getById(ID id) throws MiddlewareQueryException {
@@ -91,37 +75,29 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		}
 	}
 
+	public List<T> filterByColumnValue(String columnName, Object value) throws MiddlewareQueryException {
+		Criterion criterion = value == null ? Restrictions.isNull(columnName) : Restrictions.eq(columnName, value);
+		return this.getByCriteria(new ArrayList<>(Collections.singletonList(criterion)));
+	}
+
+	public List<T> filterByColumnValues(String columnName, List<?> values) throws MiddlewareQueryException {
+		if (values == null || values.isEmpty()) {
+			return new ArrayList<>();
+		}
+		return this.getByCriteria(new ArrayList<>(Collections.singletonList(Restrictions.in(columnName, values))));
+	}
+
 	@SuppressWarnings("unchecked")
 	protected List<T> getByCriteria(List<Criterion> criterion) throws MiddlewareQueryException {
 		try {
-			Criteria crit = this.getSession().createCriteria(this.getPersistentClass());
+			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			for (Criterion c : criterion) {
-				crit.add(c);
+				criteria.add(c);
 			}
 
-			return crit.list();
+			return criteria.list();
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error in getByCriteria(" + criterion + "): " + e.getMessage(), e);
-		}
-	}
-
-	protected Criteria getByCriteriaWithAliases(List<Criterion> criterion, Map<String, String> aliases) throws MiddlewareQueryException {
-		try {
-			Criteria crit = this.getSession().createCriteria(this.getPersistentClass());
-
-			for (String field : aliases.keySet()) {
-				String alias = aliases.get(field);
-				crit.createAlias(field, alias);
-			}
-
-			for (Criterion c : criterion) {
-				crit.add(c);
-			}
-
-			return crit;
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error in getByCriteriaWithAliases(criterion=" + criterion + ", aliases=" + aliases + "): "
-					+ e.getMessage(), e);
 		}
 	}
 
@@ -151,7 +127,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.setProjection(Projections.rowCount());
-			return ((Long) criteria.uniqueResult()).longValue();
+			return (Long) criteria.uniqueResult();
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error in countAll(): " + e.getMessage(), e);
 		}
@@ -193,14 +169,6 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		}
 	}
 
-	public void evict(T entity) throws MiddlewareQueryException {
-		try {
-			this.getSession().evict(entity);
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error in evict(" + entity + "): " + e.getMessage(), e);
-		}
-	}
-
 	public void makeTransient(T entity) throws MiddlewareQueryException {
 		try {
 			this.getSession().delete(entity);
@@ -224,18 +192,52 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		}
 	}
 
-	private static Set<Class<?>> getWrapperTypes() {
-		Set<Class<?>> ret = new HashSet<Class<?>>();
-		ret.add(Boolean.class);
-		ret.add(Character.class);
-		ret.add(Byte.class);
-		ret.add(Short.class);
-		ret.add(Integer.class);
-		ret.add(Long.class);
-		ret.add(Float.class);
-		ret.add(Double.class);
-		ret.add(Void.class);
-		ret.add(String.class);
-		return ret;
+	// TODO: Should deprecate as this is considered as antipattern
+	protected void logAndThrowException(String message, Throwable e) throws MiddlewareQueryException {
+		GenericDAO.LOG.error(message, e);
+		throw new MiddlewareQueryException(message, e);
+	}
+
+	protected String getLogExceptionMessage(String methodName, String paramVar, String paramValue, String exceptionMessage, String className) {
+		String message = "Error with " + methodName + "(";
+
+		if (paramVar.length() != 0) {
+			message += paramVar + "=" + paramValue;
+		}
+
+		message += ") query from " + className + ": " + exceptionMessage;
+
+		return message;
+	}
+
+	private final static int PARAMETER_LIMIT = 999;
+
+	/**
+	 * An utility method to build the Criterion Query IN clause if the number of parameter values passed has a size more than 1000. Oracle
+	 * does not allow more than 1000 parameter values in a IN clause. maximum number of expressions in a list is 1000'.
+	 * 
+	 * @param propertyName The name of property
+	 * @param values List to be passed in clause
+	 * @return Criterion
+	 */
+	public static Criterion buildInCriterion(String propertyName, List values) {
+
+		Criterion criterion = null;
+
+		int listSize = values.size();
+		for (int i = 0; i < listSize; i += GenericDAO.PARAMETER_LIMIT) {
+			List subList;
+			if (listSize > i + GenericDAO.PARAMETER_LIMIT) {
+				subList = values.subList(i, i + GenericDAO.PARAMETER_LIMIT);
+			} else {
+				subList = values.subList(i, listSize);
+			}
+			if (criterion != null) {
+				criterion = Restrictions.or(criterion, Restrictions.in(propertyName, subList));
+			} else {
+				criterion = Restrictions.in(propertyName, subList);
+			}
+		}
+		return criterion;
 	}
 }

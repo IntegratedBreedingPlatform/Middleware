@@ -48,6 +48,7 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -155,7 +156,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Study getStudy(int studyId) throws MiddlewareQueryException {
+	public Study getStudy(int studyId) throws MiddlewareException {
 		// not using the variable type
 		return this.getStudyDataManager().getStudy(studyId, false);
 	}
@@ -197,19 +198,19 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
-			throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
+					throws MiddlewareQueryException {
+		return this.getOntologyDataManager().getStandardVariableIdByPropertyScaleMethod(property, scale, method);
 	}
 
 	@Override
-	public Workbook getNurseryDataSet(int id) throws MiddlewareQueryException {
+	public Workbook getNurseryDataSet(int id) throws MiddlewareException {
 		Workbook workbook = this.getWorkbookBuilder().create(id, StudyType.N);
 		this.setOrderVariableByRank(workbook);
 		return workbook;
 	}
 
 	@Override
-	public Workbook getTrialDataSet(int id) throws MiddlewareQueryException {
+	public Workbook getTrialDataSet(int id) throws MiddlewareException {
 		Workbook workbook = this.getWorkbookBuilder().create(id, StudyType.T);
 		this.setOrderVariableByRank(workbook);
 		return workbook;
@@ -217,7 +218,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException {
+	public void saveMeasurementRows(Workbook workbook, String programUUID) throws MiddlewareException {
 
 		long startTime = System.currentTimeMillis();
 
@@ -232,7 +233,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			this.getWorkbookSaver().saveWorkbookVariables(workbook);
 			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
 
-			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook);
+			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
 
 			// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
 			Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
@@ -252,7 +253,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			}
 
 			// save trial observations
-			this.getWorkbookSaver().saveTrialObservations(workbook);
+			this.getWorkbookSaver().saveTrialObservations(workbook, programUUID);
 
 			Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 			if (measurementDatasetId == null) {
@@ -268,8 +269,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					if (NonEditableFactors.find(factor.getTermId()) == null) {
 						for (MeasurementRow row : observations) {
 							for (MeasurementData field : row.getDataList()) {
-								if (factor.getName().equals(field.getLabel())
-										&& factor.getStoredIn() == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
+								if (factor.getName().equals(field.getLabel()) && factor.getRole() == PhenotypicType.TRIAL_DESIGN) {
 									this.getExperimentPropertySaver().saveOrUpdateProperty(
 											this.getExperimentDao().getById(row.getExperimentId()), factor.getTermId(), field.getValue());
 								}
@@ -300,10 +300,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 										phenotype = new Phenotype();
 									}
 									if (phenotype != null) {
-										this.getPhenotypeSaver().saveOrUpdate(row.getExperimentId(), variate.getTermId(),
-												variate.getStoredIn(), field.getcValueId() != null && !"".equals(field.getcValueId())
-														? field.getcValueId() : field.getValue(),
-												phenotype, field.isCustomCategoricalValue());
+
+										this.getPhenotypeSaver().saveOrUpdate(
+												row.getExperimentId(),
+												variate.getTermId(),
+												field.getcValueId() != null && !"".equals(field.getcValueId()) ? field.getcValueId()
+														: field.getValue(), phenotype, field.isCustomCategoricalValue(),
+												variate.getDataTypeId());
 									}
 								}
 							}
@@ -313,7 +316,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			}
 
 		} catch (Exception e) {
-
 			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
 		}
 
@@ -325,8 +327,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public List<Method> getAllBreedingMethods(boolean filterOutGenerative) throws MiddlewareQueryException {
 		List<Method> methodList = filterOutGenerative ? this.getGermplasmDataManager().getAllMethodsNotGenerative()
 				: this.getGermplasmDataManager().getAllMethods();
-		FieldbookListUtil.sortMethodNamesInAscendingOrder(methodList);
-		return methodList;
+				FieldbookListUtil.sortMethodNamesInAscendingOrder(methodList);
+				return methodList;
 	}
 
 	@Override
@@ -366,7 +368,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		long startTime = System.currentTimeMillis();
 
 		try {
-
 			germplasmListDao.save(germplasmList);
 
 			// Save germplasms, names, list data
@@ -436,6 +437,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public Integer saveGermplasmList(Map<Germplasm, GermplasmListData> listDataItems, GermplasmList germplasmList)
 			throws MiddlewareQueryException {
 
+
+
 		GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
 
 		long startTime = System.currentTimeMillis();
@@ -456,11 +459,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			}
 
 		} catch (Exception e) {
-
 			this.logAndThrowException("Error encountered with FieldbookService.saveNurseryAdvanceGermplasmList(germplasmList="
 					+ germplasmList + "): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
 		}
+
 		FieldbookServiceImpl.LOG.debug("========== saveGermplasmList Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
+
 		return germplasmList.getId();
 
 	}
@@ -515,21 +519,21 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getAllStandardVariables();
+	public Set<StandardVariable> getAllStandardVariables(String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getAllStandardVariables(programUUID);
 	}
 
 	@Override
-	public StandardVariable getStandardVariable(int id) throws MiddlewareQueryException {
-		return this.getOntologyDataManager().getStandardVariable(id);
+	public StandardVariable getStandardVariable(int id, String programUUID) throws MiddlewareException {
+		return this.getOntologyDataManager().getStandardVariable(id, programUUID);
 	}
 
 	@Override
-	public List<ValueReference> getAllNurseryTypes() throws MiddlewareQueryException {
+	public List<ValueReference> getAllNurseryTypes(String programUUID) throws MiddlewareException {
 
 		List<ValueReference> nurseryTypes = new ArrayList<ValueReference>();
 
-		StandardVariable stdVar = this.getOntologyDataManager().getStandardVariable(TermId.NURSERY_TYPE.getId());
+		StandardVariable stdVar = this.getOntologyDataManager().getStandardVariable(TermId.NURSERY_TYPE.getId(), programUUID);
 		List<Enumeration> validValues = stdVar.getEnumerations();
 
 		if (validValues != null) {
@@ -654,7 +658,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Workbook getStudyVariableSettings(int id, boolean isNursery) throws MiddlewareQueryException {
+	public Workbook getStudyVariableSettings(int id, boolean isNursery) throws MiddlewareException {
 		return this.getWorkbookBuilder().createStudyVariableSettings(id, isNursery);
 	}
 
@@ -799,7 +803,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public int getMeasurementDatasetId(int studyId, String studyName) throws MiddlewareQueryException {
+	public int getMeasurementDatasetId(int studyId, String studyName) throws MiddlewareException {
 		return this.getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
 	}
 
@@ -885,11 +889,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public void deleteObservationsOfStudy(int datasetId) throws MiddlewareQueryException {
-
 		try {
-
 			this.getExperimentDestroyer().deleteExperimentsByStudy(datasetId);
-
 		} catch (Exception e) {
 
 			this.logAndThrowException("Error encountered with deleteObservationsOfStudy(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
@@ -898,7 +899,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList,
-			List<MeasurementVariable> variateList) throws MiddlewareQueryException {
+			List<MeasurementVariable> variateList) throws MiddlewareException {
 		return this.getWorkbookBuilder().buildTrialObservations(trialDatasetId, factorList, variateList);
 	}
 
@@ -933,12 +934,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(String property, String scale, String method,
-			PhenotypicType role) throws MiddlewareQueryException {
+			PhenotypicType role, String programUUID) throws MiddlewareException {
 		MeasurementVariable variable = null;
 		StandardVariable standardVariable = null;
 		Integer id = this.getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
 		if (id != null) {
-			standardVariable = this.getStandardVariableBuilder().create(id);
+			standardVariable = this.getStandardVariableBuilder().create(id, programUUID);
+			standardVariable.setPhenotypicType(role);
 			return this.getMeasurementVariableTransformer().transform(standardVariable, false);
 		}
 		return variable;
@@ -951,7 +953,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException {
+	public Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareException {
 		Workbook workbook = this.getDataSetBuilder().buildCompleteDataset(datasetId, isTrial);
 		this.setOrderVariableByRank(workbook, datasetId);
 		return workbook;
@@ -993,8 +995,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void deleteStudy(int studyId, Integer currentUserId) throws MiddlewareQueryException, UnpermittedDeletionException {
-
+	public void deleteStudy(int studyId, Integer currentUserId) throws UnpermittedDeletionException, MiddlewareException {
 		Integer studyUserId = this.getStudy(studyId).getUser();
 		if (studyUserId != null && !studyUserId.equals(currentUserId)) {
 			throw new UnpermittedDeletionException(
@@ -1003,11 +1004,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		try {
-
 			this.getStudyDestroyer().deleteStudy(studyId);
 
 		} catch (Exception e) {
-
 			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
 		}
 	}
@@ -1074,14 +1073,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			int userId) throws MiddlewareQueryException {
 
 		int listId = 0;
-
 		try {
 
 			listId = this.getListDataProjectSaver().saveOrUpdateListDataProject(projectId, type, originalListId, listDatas, userId);
 
 		} catch (Exception e) {
 			FieldbookServiceImpl.LOG.error(e.getMessage(), e);
-
 			this.logAndThrowException("Error encountered with saveOrUpdateListDataProject(): " + e.getMessage(), e,
 					FieldbookServiceImpl.LOG);
 		}
@@ -1097,7 +1094,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 		} catch (Exception e) {
 			FieldbookServiceImpl.LOG.error(e.getMessage(), e);
-
 			this.logAndThrowException("Error encountered with updateGermlasmListInfoStudy(): " + e.getMessage(), e,
 					FieldbookServiceImpl.LOG);
 		}
@@ -1105,13 +1101,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds) throws MiddlewareQueryException {
+	public void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds) throws MiddlewareException {
 		Integer plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
 		this.getStudyDataManager().updateVariableOrdering(plotDatasetId, orderedTermIds);
 	}
 
 	@Override
-	public boolean setOrderVariableByRank(Workbook workbook) throws MiddlewareQueryException {
+	public boolean setOrderVariableByRank(Workbook workbook) throws MiddlewareException {
 		if (workbook != null) {
 			Integer studyId = workbook.getStudyDetails().getId();
 			String studyName = workbook.getStudyDetails().getStudyName();
@@ -1142,22 +1138,19 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public void addListDataProjectList(List<ListDataProject> listDataProjectList) throws MiddlewareQueryException {
 
 		try {
-
 			for (ListDataProject listDataProject : listDataProjectList) {
 				listDataProject.setList(this.getGermplasmListById(listDataProject.getList().getId()));
 				this.getListDataProjectDAO().save(listDataProject);
 			}
-
 		} catch (Exception e) {
 			FieldbookServiceImpl.LOG.error(e.getMessage(), e);
-
 			this.logAndThrowException("Error encountered with addListDataProjectList(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
 		}
 	}
 
 	@Override
-	public StandardVariable getStandardVariableByName(String name) throws MiddlewareQueryException {
-		return this.getStandardVariableBuilder().getByName(name);
+	public StandardVariable getStandardVariableByName(String name, String programUUID) throws MiddlewareException {
+		return this.getStandardVariableBuilder().getByName(name, programUUID);
 	}
 
 }

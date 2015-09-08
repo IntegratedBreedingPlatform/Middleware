@@ -3,11 +3,11 @@ package org.generationcp.middleware.util;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.VariableType;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 
 public class DatasetUtil {
@@ -17,7 +17,7 @@ public class DatasetUtil {
 	public final static String OLD_SUMMARY_DATASET_NAME_PREFIX = "TRIAL_";
 	public final static String NEW_SUMMARY_DATASET_NAME_SUFFIX = "-ENVIRONMENT";
 
-	public static DataSet getTrialDataSet(StudyDataManager studyDataManager, int studyId) throws MiddlewareQueryException {
+	public static DataSet getTrialDataSet(StudyDataManager studyDataManager, int studyId) throws MiddlewareException {
 		List<DataSet> summaryDatasets = studyDataManager.getDataSetsByType(studyId, DataSetType.SUMMARY_DATA);
 		if (summaryDatasets == null || summaryDatasets.isEmpty()) {
 			List<DataSet> plotDatasets = studyDataManager.getDataSetsByType(studyId, DataSetType.PLOT_DATA);
@@ -34,7 +34,7 @@ public class DatasetUtil {
 				} else {
 					if (dataSet != null && dataSet.getVariableTypes().getVariableTypes() != null) {
 						boolean aTrialDataset = true;
-						for (VariableType variableType : dataSet.getVariableTypes().getVariableTypes()) {
+						for (DMSVariableType variableType : dataSet.getVariableTypes().getVariableTypes()) {
 							if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
 								aTrialDataset = false;
 								break;
@@ -52,11 +52,11 @@ public class DatasetUtil {
 		return null;
 	}
 
-	public static DataSet getMeansDataSet(StudyDataManager studyDataManager, int studyId) throws MiddlewareQueryException {
+	public static DataSet getMeansDataSet(StudyDataManager studyDataManager, int studyId) throws MiddlewareException {
 		return studyDataManager.getDataSetsByType(studyId, DataSetType.MEANS_DATA).get(0);
 	}
 
-	public static Integer getPlotDataSetId(StudyDataManager studyDataManager, int studyId) throws MiddlewareQueryException {
+	public static Integer getPlotDataSetId(StudyDataManager studyDataManager, int studyId) throws MiddlewareException {
 		List<DataSet> plotDatasets = studyDataManager.getDataSetsByType(studyId, DataSetType.PLOT_DATA);
 		for (DataSet dataSet : plotDatasets) {
 			String name = dataSet.getName();
@@ -73,7 +73,7 @@ public class DatasetUtil {
 			} else {
 				if (dataSet != null && dataSet.getVariableTypes().getVariableTypes() != null) {
 					boolean aPlotDataset = false;
-					for (VariableType variableType : dataSet.getVariableTypes().getVariableTypes()) {
+					for (DMSVariableType variableType : dataSet.getVariableTypes().getVariableTypes()) {
 						if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
 							aPlotDataset = true;
 							break;

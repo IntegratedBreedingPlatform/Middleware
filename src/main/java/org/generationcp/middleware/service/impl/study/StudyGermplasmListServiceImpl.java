@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.service.impl.study;
 
 import java.util.ArrayList;
@@ -10,21 +11,20 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
-
 public class StudyGermplasmListServiceImpl implements StudyGermplasmListService {
 
-	private Session currentSession;
-	
+	private final Session currentSession;
+
 	public StudyGermplasmListServiceImpl(final Session currentSession) {
 		this.currentSession = currentSession;
 	}
 
 	@Override
 	public List<StudyGermplasmDto> getGermplasmList(int studyBusinessIdentifier) {
-		
-		final Criteria listDataCriteria = currentSession.createCriteria(ListDataProject.class)
-				.createAlias("list", "l")
-				.add(Restrictions.eq("l.projectId", studyBusinessIdentifier));
+
+		final Criteria listDataCriteria =
+				this.currentSession.createCriteria(ListDataProject.class).createAlias("list", "l")
+						.add(Restrictions.eq("l.projectId", studyBusinessIdentifier));
 		final List<ListDataProject> list = listDataCriteria.list();
 		final List<StudyGermplasmDto> studyGermplasmDtos = new ArrayList<StudyGermplasmDto>();
 		Integer index = 0;
@@ -35,7 +35,8 @@ public class StudyGermplasmListServiceImpl implements StudyGermplasmListService 
 			studyGermplasmDto.setEntryCode(listDataProject.getEntryCode());
 			studyGermplasmDto.setEntryNo(listDataProject.getEntryId().toString());
 			studyGermplasmDto.setGermplasmId(listDataProject.getGermplasmId());
-			studyGermplasmDto.setPosition((++index).toString());
+			++index;
+			studyGermplasmDto.setPosition(index.toString());
 			studyGermplasmDto.setSeedSource(listDataProject.getSeedSource());
 			studyGermplasmDto.setEntryType(listDataProject.getList().getType());
 			studyGermplasmDtos.add(studyGermplasmDto);

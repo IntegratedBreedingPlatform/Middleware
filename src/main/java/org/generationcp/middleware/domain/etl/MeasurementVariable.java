@@ -13,6 +13,7 @@ package org.generationcp.middleware.domain.etl;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.Operation;
@@ -38,8 +39,6 @@ public class MeasurementVariable {
 
 	private String label;
 
-	private int storedIn;
-
 	private boolean isFactor;
 
 	private Integer dataTypeId;
@@ -58,6 +57,8 @@ public class MeasurementVariable {
 
 	private Operation operation;
 
+	private PhenotypicType role;
+
 	public MeasurementVariable() {
 	}
 
@@ -74,6 +75,20 @@ public class MeasurementVariable {
 		this.required = false;
 	}
 
+	public MeasurementVariable(String name, String description, String scale, String method, String property, String dataType,
+			String value, String label, PhenotypicType role) {
+		this.name = name;
+		this.description = description;
+		this.scale = scale;
+		this.method = method;
+		this.property = property;
+		this.dataType = dataType;
+		this.value = value;
+		this.label = label;
+		this.required = false;
+		this.role = role;
+	}
+
 	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
 			String value, String label) {
 		this(name, description, scale, method, property, dataType, value, label);
@@ -87,10 +102,24 @@ public class MeasurementVariable {
 		this.maxRange = maxRange;
 	}
 
+	public MeasurementVariable(String name, String description, String scale, String method, String property, String dataType,
+			String value, String label, Double minRange, Double maxRange, PhenotypicType role) {
+		this(name, description, scale, method, property, dataType, value, label, role);
+		this.minRange = minRange;
+		this.maxRange = maxRange;
+	}
+
 	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
 			String value, String label, Double minRange, Double maxRange) {
 		this(name, description, scale, method, property, dataType, value, label, minRange, maxRange);
 		this.termId = termId;
+	}
+
+	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
+			String value, String label, Double minRange, Double maxRange, PhenotypicType role) {
+		this(name, description, scale, method, property, dataType, value, label, minRange, maxRange, role);
+		this.termId = termId;
+
 	}
 
 	public int getTermId() {
@@ -161,6 +190,9 @@ public class MeasurementVariable {
 		if (this.label == null) {
 			this.label = "";
 		}
+		if ("".equalsIgnoreCase(this.label) && this.role != null) {
+			this.label = this.role.getLabelList().get(0);
+		}
 		return this.label;
 	}
 
@@ -189,8 +221,6 @@ public class MeasurementVariable {
 		builder.append(this.value);
 		builder.append(", label=");
 		builder.append(this.label);
-		builder.append(", storedIn=");
-		builder.append(this.storedIn);
 		builder.append(", isFactor=");
 		builder.append(this.isFactor);
 		builder.append("]");
@@ -215,14 +245,6 @@ public class MeasurementVariable {
 
 	public void setFactor(boolean isFactor) {
 		this.isFactor = isFactor;
-	}
-
-	public int getStoredIn() {
-		return this.storedIn;
-	}
-
-	public void setStoredIn(int storedIn) {
-		this.storedIn = storedIn;
 	}
 
 	/**
@@ -297,7 +319,9 @@ public class MeasurementVariable {
 		if (this.dataTypeId == null && this.dataType != null) {
 			return this.dataType;
 		} else if (this.dataTypeId == TermId.CHARACTER_VARIABLE.getId() || this.dataTypeId == TermId.TIMESTAMP_VARIABLE.getId()
-				|| this.dataTypeId == TermId.CHARACTER_DBID_VARIABLE.getId() || this.dataTypeId == TermId.CATEGORICAL_VARIABLE.getId()) {
+				|| this.dataTypeId == TermId.CHARACTER_DBID_VARIABLE.getId() || this.dataTypeId == TermId.CATEGORICAL_VARIABLE.getId()
+				|| this.dataTypeId == TermId.GERMPLASM_LIST_DATA_TYPE.getId() || this.dataTypeId == TermId.LOCATION_DATA_TYPE.getId()
+				|| this.dataTypeId == TermId.PERSON_DATA_TYPE.getId() || this.dataTypeId == TermId.BREEDING_METHOD_DATA_TYPE.getId()) {
 			return "C";
 		} else {
 			return "N";
@@ -318,6 +342,14 @@ public class MeasurementVariable {
 
 	public void setTreatmentLabel(String treatmentLabel) {
 		this.treatmentLabel = treatmentLabel;
+	}
+
+	public PhenotypicType getRole() {
+		return this.role;
+	}
+
+	public void setRole(PhenotypicType role) {
+		this.role = role;
 	}
 
 	/**
@@ -345,7 +377,7 @@ public class MeasurementVariable {
 		var.setDataType(this.dataType);
 		var.setValue(this.value);
 		var.setLabel(this.label);
-		var.setStoredIn(this.storedIn);
+		var.setRole(this.role);
 		var.setFactor(this.isFactor);
 		var.setDataTypeId(this.dataTypeId);
 		var.setPossibleValues(this.possibleValues);
@@ -380,7 +412,7 @@ public class MeasurementVariable {
 		MeasurementVariable other = (MeasurementVariable) obj;
 		if (this.termId != 0 && other.termId != 0 && this.termId != other.termId) {
 			return false;
-		} else if(this.getPSMRHashCode() != other.getPSMRHashCode()) {
+		} else if (this.getPSMHashCode() != other.getPSMHashCode()) {
 			return false;
 		}
 
@@ -391,16 +423,16 @@ public class MeasurementVariable {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		int uniqueHashCode = termId;
+		int uniqueHashCode = this.termId;
 		if (uniqueHashCode == 0) {
-			uniqueHashCode = getPSMRHashCode();
+			uniqueHashCode = this.getPSMHashCode();
 		}
 		result = prime * result + uniqueHashCode;
 		return result;
 	}
 
-	private int getPSMRHashCode() {
-		return java.util.Objects.hash(property, scale, method, label);
+	private int getPSMHashCode() {
+		return java.util.Objects.hash(this.property, this.scale, this.method);
 	}
 
 }

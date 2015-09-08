@@ -18,11 +18,11 @@ package org.generationcp.middleware.domain.oms;
 public enum CvId {
 
 	// Ontology
-	IBDB_TERMS(1000), PROPERTIES(1010), METHODS(1020), SCALES(1030), VARIABLES(1040), STUDY_STATUS(2005);
+	IBDB_TERMS(1000), PROPERTIES(1010), TRAIT_CLASS(1011), METHODS(1020), SCALES(1030), DATA_TYPE(1031), VARIABLES(1040), VARIABLE_TYPE(1041),  STUDY_STATUS(2005);
 
 	private final int id;
 
-	private CvId(int id) {
+	CvId(int id) {
 		this.id = id;
 	}
 

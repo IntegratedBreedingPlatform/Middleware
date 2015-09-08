@@ -19,15 +19,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.Operation;
@@ -53,10 +53,10 @@ public class ProjectPropertySaver {
 
 	public List<ProjectProperty> create(DmsProject project, VariableTypeList variableTypeList) throws MiddlewareQueryException {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
-		List<VariableType> variableTypes = variableTypeList != null ? variableTypeList.getVariableTypes() : null;
+		List<DMSVariableType> variableTypes = variableTypeList != null ? variableTypeList.getVariableTypes() : null;
 
 		if (variableTypes != null && !variableTypes.isEmpty()) {
-			for (VariableType variableType : variableTypes) {
+			for (DMSVariableType variableType : variableTypes) {
 				List<ProjectProperty> list = this.createVariableProperties(project, variableType);
 				properties.addAll(list);
 			}
@@ -75,19 +75,21 @@ public class ProjectPropertySaver {
 		project.setProperties(properties);
 	}
 
-	private List<ProjectProperty> createVariableProperties(DmsProject project, VariableType variableType)
+	private List<ProjectProperty> createVariableProperties(DmsProject project, DMSVariableType variableType)
 			throws MiddlewareQueryException {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
-		properties.add(new ProjectProperty(project, variableType.getStandardVariable().getStoredIn().getId(), variableType
-				.getLocalName(), variableType.getRank()));
-		properties.add(new ProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(),
-				variableType.getRank()));
-		properties.add(new ProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), String.valueOf(variableType.getId()),
-				variableType.getRank()));
+		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum =
+				this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(variableType.getRole());
+		int variableTypeId = variableTypeEnum.getId();
+		properties.add(new ProjectProperty(project, variableTypeId, variableType.getLocalName(), variableType.getRank()));
+		properties.add(new ProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType
+				.getRank()));
+		properties.add(new ProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), String.valueOf(variableType.getId()), variableType
+				.getRank()));
 
 		if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
-			properties.add(new ProjectProperty(project, TermId.MULTIFACTORIAL_INFO.getId(), variableType.getTreatmentLabel(),
-					variableType.getRank()));
+			properties.add(new ProjectProperty(project, TermId.MULTIFACTORIAL_INFO.getId(), variableType.getTreatmentLabel(), variableType
+					.getRank()));
 		}
 
 		return properties;
@@ -96,8 +98,10 @@ public class ProjectPropertySaver {
 	public void saveProjectPropValues(int projectId, VariableList variableList) throws MiddlewareQueryException {
 		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
 			for (Variable variable : variableList.getVariables()) {
-				int storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
-				if (TermId.STUDY_INFO_STORAGE.getId() == storedInId || TermId.DATASET_INFO_STORAGE.getId() == storedInId) {
+				org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum =
+						this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
+								variable.getVariableType().getRole());
+				if (variableTypeEnum == org.generationcp.middleware.domain.ontology.VariableType.STUDY_DETAIL) {
 					ProjectProperty property = new ProjectProperty();
 					property.setTypeId(variable.getVariableType().getStandardVariable().getId());
 					property.setValue(variable.getValue());
@@ -109,9 +113,11 @@ public class ProjectPropertySaver {
 		}
 	}
 
-	public void saveVariableType(DmsProject project, VariableType variableType) throws MiddlewareQueryException {
-		this.saveProjectProperty(project, variableType.getStandardVariable().getStoredIn().getId(), variableType.getLocalName(),
-				variableType.getRank());
+	public void saveVariableType(DmsProject project, DMSVariableType variableType) throws MiddlewareQueryException {
+		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum =
+				this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
+						variableType.getStandardVariable().getPhenotypicType());
+		this.saveProjectProperty(project, variableTypeEnum.getId(), variableType.getLocalName(), variableType.getRank());
 		this.saveProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType.getRank());
 		this.saveProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), Integer.toString(variableType.getStandardVariable().getId()),
 				variableType.getRank());
@@ -130,13 +136,13 @@ public class ProjectPropertySaver {
 		project.addProperty(property);
 	}
 
-	public void createProjectPropertyIfNecessary(DmsProject project, TermId termId, int storedIn) throws MiddlewareQueryException {
+	public void createProjectPropertyIfNecessary(DmsProject project, TermId termId, PhenotypicType role) throws MiddlewareQueryException {
 		ProjectProperty property = this.daoFactory.getProjectPropertyDao().getByStandardVariableId(project, termId.getId());
 		if (property == null) {
 			int rank = this.daoFactory.getProjectPropertyDao().getNextRank(project.getProjectId());
 			StandardVariable stdvar = new StandardVariable();
 			stdvar.setId(termId.getId());
-			stdvar.setStoredIn(new Term(storedIn, null, null));
+			stdvar.setPhenotypicType(role);
 			CVTerm cvTerm = this.daoFactory.getCvTermDao().getById(termId.getId());
 			String localVariableName = termId.toString();
 			String localVariableDescription = termId.toString();
@@ -145,7 +151,7 @@ public class ProjectPropertySaver {
 				localVariableDescription = cvTerm.getDefinition();
 			}
 
-			VariableType variableType = new VariableType(localVariableName, localVariableDescription, stdvar, rank);
+			DMSVariableType variableType = new DMSVariableType(localVariableName, localVariableDescription, stdvar, rank);
 			this.saveVariableType(project, variableType);
 		}
 	}
@@ -169,7 +175,7 @@ public class ProjectPropertySaver {
 						this.updateVariable(study, trialDataset, measurementDataset, variable, isConstant, geolocation);
 					}
 				} else if (variable.getOperation() == Operation.DELETE) {
-					this.deleteVariable(study, trialDataset, measurementDataset, variable.getStoredIn(), variable.getTermId(), geolocation);
+					this.deleteVariable(study, trialDataset, measurementDataset, variable.getRole(), variable.getTermId(), geolocation);
 				}
 			}
 		}
@@ -187,10 +193,15 @@ public class ProjectPropertySaver {
 		return nextRank;
 	}
 
+	private boolean isInGeolocation(int termId) {
+		return TermId.TRIAL_INSTANCE_FACTOR.getId() == termId || TermId.LATITUDE.getId() == termId || TermId.LONGITUDE.getId() == termId
+				|| TermId.GEODETIC_DATUM.getId() == termId || TermId.ALTITUDE.getId() == termId;
+	}
+
 	private void insertVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, MeasurementVariable variable,
 			int rank, boolean isConstant, Geolocation geolocation) throws MiddlewareQueryException {
 
-		if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(variable.getStoredIn())) {
+		if (PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()) {
 			int datasetRank = this.getNextRank(trialDataset);
 			int measurementRank = this.getNextRank(measurementDataset);
 
@@ -200,15 +211,14 @@ public class ProjectPropertySaver {
 			if (variable.getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 				this.insertVariable(measurementDataset, variable, measurementRank);
 			}
-
-			if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
-				this.daoFactory.getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
-			} else {
-				this.daoFactory.getGeolocationSaver().setGeolocation(geolocation, variable.getTermId(), variable.getStoredIn(), variable.getValue());
+			if (this.isInGeolocation(variable.getTermId())) {
+				this.daoFactory.getGeolocationSaver().setGeolocation(geolocation, variable.getTermId(), variable.getValue());
 				this.daoFactory.getGeolocationDao().saveOrUpdate(geolocation);
+			} else {
+				this.daoFactory.getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
 			}
-		} else if (variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
-				|| variable.getStoredIn() == TermId.CATEGORICAL_VARIATE.getId()) {
+
+		} else if (PhenotypicType.VARIATE == variable.getRole()) {
 
 			if (isConstant) {
 				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel())) {
@@ -216,12 +226,12 @@ public class ProjectPropertySaver {
 					int datasetRank = this.getNextRank(trialDataset);
 					this.insertVariable(trialDataset, variable, datasetRank);
 					this.daoFactory.getPhenotypeSaver().saveOrUpdatePhenotypeValue(trialDataset.getProjectId(), variable.getTermId(),
-							variable.getStoredIn(), variable.getValue());
+							variable.getValue(), variable.getDataTypeId());
 				} else {
 					// a study constant
 					this.insertVariable(project, variable, rank);
 					this.daoFactory.getPhenotypeSaver().saveOrUpdatePhenotypeValue(project.getProjectId(), variable.getTermId(),
-							variable.getStoredIn(), variable.getValue());
+							variable.getValue(), variable.getDataTypeId());
 				}
 			} else {
 				int measurementRank = this.getNextRank(measurementDataset);
@@ -243,14 +253,14 @@ public class ProjectPropertySaver {
 		this.saveVariableType(project, this.createVariableType(variable, rank));
 	}
 
-	private VariableType createVariableType(MeasurementVariable variable, int rank) {
-		VariableType varType = new VariableType();
+	private DMSVariableType createVariableType(MeasurementVariable variable, int rank) {
+		DMSVariableType varType = new DMSVariableType();
 		StandardVariable stdvar = new StandardVariable();
 		varType.setStandardVariable(stdvar);
 
 		stdvar.setId(variable.getTermId());
-		stdvar.setStoredIn(new Term(variable.getStoredIn(), null, null));
-
+		varType.setRole(variable.getRole());
+		stdvar.setPhenotypicType(variable.getRole());
 		varType.setLocalName(variable.getName());
 		varType.setLocalDescription(variable.getDescription());
 		varType.setRank(rank);
@@ -264,18 +274,19 @@ public class ProjectPropertySaver {
 	private void updateVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, MeasurementVariable variable,
 			boolean isConstant, Geolocation geolocation) throws MiddlewareQueryException {
 
-		if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(variable.getStoredIn())) {
+		if (PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()) {
 			this.updateVariable(project, variable);
 			this.updateVariable(trialDataset, variable);
 			this.updateVariable(measurementDataset, variable);
-			if (variable.getStoredIn() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
-				this.daoFactory.getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
-			} else {
-				this.daoFactory.getGeolocationSaver().setGeolocation(geolocation, variable.getTermId(), variable.getStoredIn(), variable.getValue());
+
+			if (this.isInGeolocation(variable.getTermId())) {
+				this.daoFactory.getGeolocationSaver().setGeolocation(geolocation, variable.getTermId(), variable.getValue());
 				this.daoFactory.getGeolocationDao().saveOrUpdate(geolocation);
+			} else {
+				this.daoFactory.getGeolocationPropertySaver().saveOrUpdate(geolocation, variable.getTermId(), variable.getValue());
 			}
-		} else if (variable.getStoredIn() == TermId.OBSERVATION_VARIATE.getId()
-				|| variable.getStoredIn() == TermId.CATEGORICAL_VARIATE.getId()) {
+
+		} else if (PhenotypicType.VARIATE == variable.getRole()) {
 
 			if (isConstant) {
 				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel())) {
@@ -283,12 +294,12 @@ public class ProjectPropertySaver {
 					this.updateVariable(trialDataset, variable);
 					this.updateVariable(measurementDataset, variable);
 					this.daoFactory.getPhenotypeSaver().saveOrUpdatePhenotypeValue(trialDataset.getProjectId(), variable.getTermId(),
-							variable.getStoredIn(), variable.getValue());
+							variable.getValue(), variable.getDataTypeId());
 				} else {
 					// a study constant
 					this.updateVariable(project, variable);
 					this.daoFactory.getPhenotypeSaver().saveOrUpdatePhenotypeValue(project.getProjectId(), variable.getTermId(),
-							variable.getStoredIn(), variable.getValue());
+							variable.getValue(), variable.getDataTypeId());
 				}
 			} else {
 				this.updateVariable(measurementDataset, variable);
@@ -296,21 +307,18 @@ public class ProjectPropertySaver {
 		} else {
 			// study
 			this.updateVariable(project, variable);
-			if (variable.getStoredIn() == TermId.STUDY_NAME_STORAGE.getId()) {
+			if (variable.getTermId() == TermId.STUDY_NAME.getId()) {
 				project.setName(variable.getValue());
 				this.daoFactory.getDmsProjectDao().merge(project);
-
-			} else if (variable.getStoredIn() == TermId.STUDY_TITLE_STORAGE.getId()) {
+			} else if (variable.getTermId() == TermId.STUDY_TITLE.getId()) {
 				project.setDescription(variable.getValue());
 				this.daoFactory.getDmsProjectDao().merge(project);
-
 			}
 		}
 	}
 
 	private void updateVariable(DmsProject project, MeasurementVariable variable) throws MiddlewareQueryException {
 		if (project.getProperties() != null) {
-			List<Integer> allTypeStorages = PhenotypicType.getAllTypeStorages();
 			int rank = this.getRank(project, variable.getTermId());
 			for (ProjectProperty property : project.getProperties()) {
 				if (rank == property.getRank()) {
@@ -318,7 +326,7 @@ public class ProjectPropertySaver {
 						property.setValue(variable.getDescription());
 					} else if (property.getTypeId().intValue() == variable.getTermId()) {
 						property.setValue(variable.getValue());
-					} else if (allTypeStorages.contains(property.getTypeId().intValue())) {
+					} else if (VariableType.getById(property.getTypeId().intValue()) != null) {
 						property.setValue(variable.getName());
 					}
 					this.daoFactory.getProjectPropertyDao().update(property);
@@ -341,22 +349,22 @@ public class ProjectPropertySaver {
 		return rank;
 	}
 
-	private void deleteVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, int storedInId, int termId,
-			Geolocation geolocation) throws MiddlewareQueryException {
-
+	private void deleteVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, PhenotypicType role,
+			int termId, Geolocation geolocation) throws MiddlewareQueryException {
 
 		this.deleteVariable(project, termId);
-		if (PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(storedInId)) {
+		if (PhenotypicType.TRIAL_ENVIRONMENT == role) {
 			this.deleteVariable(trialDataset, termId);
 			this.deleteVariable(measurementDataset, termId);
 
-			if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
-				this.daoFactory.getGeolocationPropertyDao().deleteGeolocationPropertyValueInProject(project.getProjectId(), termId);
-			} else {
-				this.daoFactory.getGeolocationSaver().setGeolocation(geolocation, termId, storedInId, null);
+			if (this.isInGeolocation(termId)) {
+				this.daoFactory.getGeolocationSaver().setGeolocation(geolocation, termId, null);
 				this.daoFactory.getGeolocationDao().saveOrUpdate(geolocation);
+			} else {
+				this.daoFactory.getGeolocationPropertyDao().deleteGeolocationPropertyValueInProject(project.getProjectId(), termId);
 			}
-		} else if (storedInId == TermId.OBSERVATION_VARIATE.getId() || storedInId == TermId.CATEGORICAL_VARIATE.getId()) {
+
+		} else if (PhenotypicType.VARIATE == role) {
 			// for constants
 			this.deleteVariable(project, termId);
 			this.deleteVariable(trialDataset, termId);
@@ -385,9 +393,9 @@ public class ProjectPropertySaver {
 	private void deleteVariableForFactors(DmsProject project, MeasurementVariable variable) throws MiddlewareQueryException {
 		this.deleteVariable(project, variable.getTermId());
 
-		if (variable.getStoredIn() == TermId.TRIAL_DESIGN_INFO_STORAGE.getId()) {
+		if (variable.getRole() == PhenotypicType.TRIAL_DESIGN) {
 			this.daoFactory.getExperimentPropertyDao().deleteExperimentPropInProjectByTermId(project.getProjectId(), variable.getTermId());
-		} else if (variable.getStoredIn() == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
+		} else if (variable.getRole() == PhenotypicType.GERMPLASM) {
 			this.daoFactory.getStockPropertyDao().deleteStockPropInProjectByTermId(project.getProjectId(), variable.getTermId());
 		}
 	}
@@ -408,7 +416,8 @@ public class ProjectPropertySaver {
 
 	public void updateVariablesRanking(int datasetId, List<Integer> variableIds) throws MiddlewareQueryException {
 		int rank = this.daoFactory.getProjectPropertyDao().getNextRank(datasetId);
-		Map<Integer, List<Integer>> projectPropIDMap = this.daoFactory.getProjectPropertyDao().getProjectPropertyIDsPerVariableId(datasetId);
+		Map<Integer, List<Integer>> projectPropIDMap =
+				this.daoFactory.getProjectPropertyDao().getProjectPropertyIDsPerVariableId(datasetId);
 		rank = this.updateVariableRank(variableIds, rank, projectPropIDMap);
 
 		// if any factors were added but not included in list of variables, update their ranks also so they come last

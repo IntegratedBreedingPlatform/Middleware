@@ -3,12 +3,12 @@ package org.generationcp.middleware.operation.destroyer;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -54,8 +54,9 @@ public class StudyDestroyer extends Destroyer {
 			VariableTypeList typeList = new VariableTypeList();
 			StandardVariable statusDeletedTerm = new StandardVariable();
 			statusDeletedTerm.setId(TermId.STUDY_STATUS.getId());
-			statusDeletedTerm.setStoredIn(new Term(TermId.STUDY_INFO_STORAGE.getId(), null, null));
-			VariableType type = new VariableType(TermId.STUDY_STATUS.name(), TermId.STUDY_STATUS.name(), statusDeletedTerm, maxRank + 1);
+			statusDeletedTerm.setPhenotypicType(PhenotypicType.STUDY);
+			DMSVariableType type =
+					new DMSVariableType(TermId.STUDY_STATUS.name(), TermId.STUDY_STATUS.name(), statusDeletedTerm, maxRank + 1);
 			typeList.add(type);
 			VariableList varList = new VariableList();
 			Variable var = new Variable(type, TermId.DELETED_STUDY.getId());

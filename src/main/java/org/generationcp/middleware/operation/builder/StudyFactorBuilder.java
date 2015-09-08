@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 
@@ -25,7 +25,7 @@ public class StudyFactorBuilder extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public VariableTypeList build(int studyId) throws MiddlewareQueryException {
+	public VariableTypeList build(int studyId) throws MiddlewareException {
 		VariableTypeList factors = new VariableTypeList();
 		this.addFactors(studyId, factors);
 
@@ -36,9 +36,10 @@ public class StudyFactorBuilder extends Builder {
 		return factors.sort();
 	}
 
-	private void addFactors(int projectId, VariableTypeList factors) throws MiddlewareQueryException {
+	private void addFactors(int projectId, VariableTypeList factors) throws MiddlewareException {
 		DmsProject project = this.getDmsProjectDao().getById(projectId);
-		VariableTypeList variableTypes = this.getVariableTypeBuilder().create(project.getProperties());
+		VariableTypeList variableTypes = this.getVariableTypeBuilder().create(
+				project.getProperties(),project.getProgramUUID());
 		factors.addAll(variableTypes.getFactors());
 	}
 }

@@ -33,7 +33,7 @@ public class PropertyReference extends Reference implements Serializable, Compar
 	public PropertyReference(Integer id, String name) {
 		super.setId(id);
 		super.setName(name);
-		this.standardVariables = new ArrayList<StandardVariableReference>();
+		this.standardVariables = new ArrayList<>();
 	}
 
 	public PropertyReference(Integer id, String name, String description) {

@@ -18,10 +18,19 @@ import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.operation.saver.CvTermRelationshipSaver;
 import org.generationcp.middleware.operation.saver.CvTermSaver;
 import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
+import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.util.DatabaseBroker;
 
 /**
@@ -105,5 +114,26 @@ public abstract class Builder extends DatabaseBroker {
 
 	protected final WorkbookBuilder getWorkbookBuilder() {
 		return new WorkbookBuilder(this.sessionProvider);
+	}
+	
+	protected final OntologyVariableDataManager getOntologyVariableDataManager() {
+		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
+				this.getOntologyScaleDataManager(), this.sessionProvider);
+	}
+	
+	protected final OntologyMethodDataManager getOntologyMethodDataManager() {
+		return new OntologyMethodDataManagerImpl(this.sessionProvider);
+	}
+	
+	protected final OntologyPropertyDataManager getOntologyPropertyDataManager() {
+		return new OntologyPropertyDataManagerImpl(this.sessionProvider);
+	}
+
+	protected final OntologyScaleDataManager getOntologyScaleDataManager() {
+		return new OntologyScaleDataManagerImpl(this.sessionProvider);
+	}
+	
+	protected final StandardVariableTransformer getStandardVariableTransformer() {
+		return new StandardVariableTransformer(this.sessionProvider);
 	}
 }

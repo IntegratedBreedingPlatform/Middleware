@@ -14,9 +14,9 @@ package org.generationcp.middleware.operation.builder;
 import java.util.List;
 import java.util.Set;
 
-import org.generationcp.middleware.domain.dms.VariableType;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
@@ -27,24 +27,29 @@ public class VariableTypeBuilder extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public VariableTypeList create(List<ProjectProperty> properties) throws MiddlewareQueryException {
+	public VariableTypeList create(List<ProjectProperty> properties, String programUUID) 
+			throws MiddlewareException {
 		Set<VariableInfo> variableInfoList = this.getVariableInfoBuilder().create(properties);
 
 		VariableTypeList variableTypes = new VariableTypeList();
 		for (VariableInfo variableInfo : variableInfoList) {
-			variableTypes.add(this.create(variableInfo));
+			variableTypes.add(this.create(variableInfo,programUUID));
 		}
 		return variableTypes.sort();
 	}
 
-	public VariableType create(VariableInfo variableInfo) throws MiddlewareQueryException {
-		VariableType variableType = new VariableType();
+	public DMSVariableType create(VariableInfo variableInfo, String programUUID) throws MiddlewareException {
+		DMSVariableType variableType = new DMSVariableType();
 
 		variableType.setLocalName(variableInfo.getLocalName());
 		variableType.setLocalDescription(variableInfo.getLocalDescription());
 		variableType.setRank(variableInfo.getRank());
-		variableType.setStandardVariable(this.getStandardVariableBuilder().create(variableInfo.getStdVariableId()));
+		variableType.setStandardVariable(this.getStandardVariableBuilder().create(
+				variableInfo.getStdVariableId(),programUUID));
 		variableType.setTreatmentLabel(variableInfo.getTreatmentLabel());
+		
+		variableType.setRole(variableInfo.getRole());
+		variableType.getStandardVariable().setPhenotypicType(variableInfo.getRole());
 
 		return variableType;
 	}

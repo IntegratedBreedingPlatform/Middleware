@@ -17,16 +17,17 @@ import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -36,7 +37,7 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.util.DatasetUtil;
 
 public class DataSetBuilder extends Builder {
-	
+
 	// ready for Sring autowiring :-)
 	private DmsProjectDao dmsProjectDao;
 	private StudyDataManager studyDataManager;
@@ -49,14 +50,14 @@ public class DataSetBuilder extends Builder {
 		this.dmsProjectDao = this.getDmsProjectDao();
 		this.studyDataManager = this.getStudyDataManager();
 	}
-	
+
 	public DataSetBuilder(HibernateSessionProvider sessionProviderForLocal, DmsProjectDao dmsProjectDao, StudyDataManager studyDataManager) {
 		super(sessionProviderForLocal);
 		this.dmsProjectDao = dmsProjectDao;
 		this.studyDataManager = studyDataManager;
 	}
 
-	public DataSet build(int dataSetId) throws MiddlewareQueryException {
+	public DataSet build(int dataSetId) throws MiddlewareException {
 		DataSet dataSet = null;
 		DmsProject project = this.dmsProjectDao.getById(dataSetId);
 		if (project != null) {
@@ -65,19 +66,19 @@ public class DataSetBuilder extends Builder {
 		return dataSet;
 	}
 
-	public VariableTypeList getVariableTypes(int dataSetId) throws MiddlewareQueryException {
+	public VariableTypeList getVariableTypes(int dataSetId) throws MiddlewareException {
 		VariableTypeList variableTypeList = new VariableTypeList();
 		DmsProject project = this.dmsProjectDao.getById(dataSetId);
 		if (project != null) {
 			Set<VariableInfo> variableInfoList = this.getVariableInfoBuilder().create(project.getProperties());
 			for (VariableInfo variableInfo : variableInfoList) {
-				variableTypeList.add(this.getVariableTypeBuilder().create(variableInfo));
+				variableTypeList.add(this.getVariableTypeBuilder().create(variableInfo, project.getProgramUUID()));
 			}
 		}
 		return variableTypeList.sort();
 	}
 
-	private DataSet createDataSet(DmsProject project) throws MiddlewareQueryException {
+	private DataSet createDataSet(DmsProject project) throws MiddlewareException {
 		DataSet dataSet = new DataSet();
 		dataSet.setId(project.getProjectId());
 		dataSet.setName(project.getName());
@@ -93,12 +94,12 @@ public class DataSetBuilder extends Builder {
 		return this.getGeolocationDao().getLocationIds(projectId);
 	}
 
-	private VariableTypeList getVariableTypes(DmsProject project) throws MiddlewareQueryException {
+	private VariableTypeList getVariableTypes(DmsProject project) throws MiddlewareException {
 		VariableTypeList variableTypes = new VariableTypeList();
 
 		Set<VariableInfo> variableInfoList = this.getVariableInfoBuilder().create(project.getProperties());
 		for (VariableInfo variableInfo : variableInfoList) {
-			variableTypes.add(this.getVariableTypeBuilder().create(variableInfo));
+			variableTypes.add(this.getVariableTypeBuilder().create(variableInfo, project.getProgramUUID()));
 		}
 		return variableTypes.sort();
 	}
@@ -118,19 +119,19 @@ public class DataSetBuilder extends Builder {
 	}
 
 	public DmsProject getTrialDataset(int studyId) throws MiddlewareQueryException {
-		List<DatasetReference> datasetReferences = studyDataManager.getDatasetReferences(studyId);
-		if(datasetReferences == null || datasetReferences.isEmpty()) {
+		List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(studyId);
+		if (datasetReferences == null || datasetReferences.isEmpty()) {
 			throw new MiddlewareQueryException("no.dataset.found", "No datasets found for study " + studyId);
 		}
 		for (DatasetReference datasetReference : datasetReferences) {
-			if(datasetReference.getName().endsWith(DatasetUtil.NEW_SUMMARY_DATASET_NAME_SUFFIX)) {
+			if (datasetReference.getName().endsWith(DatasetUtil.NEW_SUMMARY_DATASET_NAME_SUFFIX)) {
 				return this.getDmsProjectById(datasetReference.getId());
 			}
 		}
 		throw new MiddlewareQueryException("no.trial.dataset.found", "Study exists but no environmant dataset for " + studyId);
 	}
 
-	public Workbook buildCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException {
+	public Workbook buildCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareException {
 		DataSet dataset = this.build(datasetId);
 		List<Integer> siblingVariables = this.getVariablesOfSiblingDatasets(datasetId);
 		boolean isMeasurementDataset = this.isMeasurementDataset(dataset);
@@ -140,9 +141,13 @@ public class DataSetBuilder extends Builder {
 		} else {
 			variables = dataset.getVariableTypes();
 		}
-		variables = this.filterDatasetVariables(variables, !isTrial, isMeasurementDataset);
+
+		// We need to set the role of the variables based on the experiments before filtering them based on role
 		long expCount = this.getStudyDataManager().countExperiments(datasetId);
 		List<Experiment> experiments = this.getStudyDataManager().getExperiments(datasetId, 0, (int) expCount, variables);
+
+		variables = this.filterDatasetVariables(variables, !isTrial, isMeasurementDataset);
+
 		List<MeasurementVariable> factorList = this.getMeasurementVariableTransformer().transform(variables.getFactors(), true);
 		List<MeasurementVariable> variateList = this.getMeasurementVariableTransformer().transform(variables.getVariates(), false, true);
 		Workbook workbook = new Workbook();
@@ -160,14 +165,12 @@ public class DataSetBuilder extends Builder {
 	private VariableTypeList filterDatasetVariables(VariableTypeList variables, boolean isNursery, boolean isMeasurementDataset) {
 		VariableTypeList newVariables = new VariableTypeList();
 		if (variables != null) {
-			for (VariableType variable : variables.getVariableTypes()) {
+			for (DMSVariableType variable : variables.getVariableTypes()) {
 				boolean partOfHiddenDatasetColumns = DataSetBuilder.HIDDEN_DATASET_COLUMNS.contains(variable.getId());
 				boolean isOccAndNurseryAndMeasurementDataset =
 						variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId() && isNursery && isMeasurementDataset;
 				boolean isMeasurementDatasetAndIsTrialFactors =
-						isMeasurementDataset
-								&& PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages().contains(
-										variable.getStandardVariable().getStoredIn().getId());
+						isMeasurementDataset && PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole();
 				boolean isTrialAndOcc = !isNursery && variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId();
 				if (!partOfHiddenDatasetColumns && !isOccAndNurseryAndMeasurementDataset && !isMeasurementDatasetAndIsTrialFactors
 						|| isTrialAndOcc) {
@@ -193,7 +196,7 @@ public class DataSetBuilder extends Builder {
 	private VariableTypeList filterVariables(VariableTypeList variables, List<Integer> filters) {
 		VariableTypeList newList = new VariableTypeList();
 		if (variables != null && !variables.getVariableTypes().isEmpty()) {
-			for (VariableType variable : variables.getVariableTypes()) {
+			for (DMSVariableType variable : variables.getVariableTypes()) {
 				if (!filters.contains(variable.getId()) || variable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 					newList.add(variable);
 				}

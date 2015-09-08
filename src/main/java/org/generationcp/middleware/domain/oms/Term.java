@@ -13,6 +13,7 @@ package org.generationcp.middleware.domain.oms;
 
 import java.io.Serializable;
 
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
 
 /**
@@ -39,6 +40,14 @@ public class Term implements Serializable {
 		this.id = id;
 		this.name = name;
 		this.definition = definition;
+	}
+
+	public Term(int id, String name, String definition, int vocabularyId, Boolean obsolete) {
+		this.id = id;
+		this.name = name;
+		this.definition = definition;
+		this.vocabularyId = vocabularyId;
+		this.obsolete = obsolete;
 	}
 
 	public int getId() {
@@ -73,6 +82,31 @@ public class Term implements Serializable {
 		this.definition = definition;
 	}
 
+	public static Term fromCVTerm(CVTerm cvTerm) {
+		if (cvTerm == null) {
+			return null;
+		}
+
+		Term term = new Term();
+		term.setId(cvTerm.getCvTermId());
+		term.setName(cvTerm.getName());
+		term.setDefinition(cvTerm.getDefinition());
+		term.setVocabularyId(cvTerm.getCv());
+		term.setObsolete(cvTerm.isObsolete());
+		return term;
+	}
+
+	public CVTerm toCVTerm() {
+		CVTerm cvTerm = new CVTerm();
+		cvTerm.setCv(this.getVocabularyId());
+		cvTerm.setCvTermId(this.getId());
+		cvTerm.setName(this.getName());
+		cvTerm.setDefinition(this.getDefinition());
+		cvTerm.setIsObsolete(this.isObsolete());
+		cvTerm.setIsRelationshipType(false);
+		return cvTerm;
+	}
+
 	public void print(int indent) {
 		Debug.println(indent, "Id: " + this.getId());
 		Debug.println(indent, "Vocabulary: " + this.getVocabularyId());
@@ -100,15 +134,8 @@ public class Term implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Term [id=");
-		builder.append(this.id);
-		builder.append(", name=");
-		builder.append(this.name);
-		builder.append(", definition=");
-		builder.append(this.definition);
-		builder.append("]");
-		return builder.toString();
+		return "Term [id=" + this.id + ", name=" + this.name + ", definition=" + this.definition + ", vocabularyId=" + this.vocabularyId
+				+ ", obsolete=" + this.obsolete + "]";
 	}
 
 	public void setObsolete(Boolean obsolete) {

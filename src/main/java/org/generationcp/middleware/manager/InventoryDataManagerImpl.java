@@ -47,8 +47,6 @@ import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.exception.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -61,7 +59,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class InventoryDataManagerImpl extends DataManager implements InventoryDataManager {
 
-	private static final Logger LOG = LoggerFactory.getLogger(InventoryDataManagerImpl.class);
 
 	public InventoryDataManagerImpl() {
 	}
@@ -199,8 +196,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 			throw e;
 		} catch (Exception e) {
 
-			this.logAndThrowException("Error encountered while saving Lot: InventoryDataManager.addOrUpdateLot(lots=" + lots
-					+ ", operation=" + operation + "): " + e.getMessage(), e, InventoryDataManagerImpl.LOG);
+			throw new MiddlewareQueryException("Error encountered while saving Lot: InventoryDataManager.addOrUpdateLot(lots=" + lots
+					+ ", operation=" + operation + "): " + e.getMessage(), e);
 		}
 
 		return idLotsSaved;
@@ -253,9 +250,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 		} catch (Exception e) {
 
-			this.logAndThrowException(
+			throw new MiddlewareQueryException(
 					"Error encountered while saving Transaction: InventoryDataManager.addOrUpdateTransaction(transactions=" + transactions
-							+ ", operation=" + operation + "): " + e.getMessage(), e, InventoryDataManagerImpl.LOG);
+							+ ", operation=" + operation + "): " + e.getMessage(), e);
 		}
 
 		return idTransactionsSaved;
@@ -861,8 +858,7 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 		} catch (Exception e) {
 
-			this.logAndThrowException("Error encountered while updating inventory " + "of list id " + listId + "." + e.getMessage(), e,
-					InventoryDataManagerImpl.LOG);
+			this.logAndThrowException("Error encountered while updating inventory " + "of list id " + listId + "." + e.getMessage(), e);
 		}
 	}
 

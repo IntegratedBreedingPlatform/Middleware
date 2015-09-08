@@ -14,6 +14,7 @@ package org.generationcp.middleware.operation.saver;
 import java.util.HashSet;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -46,17 +47,18 @@ public class StockSaver extends Saver {
 		}
 	}
 
-	private StockModel createStock(VariableList variableList, StockModel stockModel) throws MiddlewareQueryException {
+	protected StockModel createStock(VariableList variableList, StockModel stockModel) throws MiddlewareQueryException {
 		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
 			for (Variable variable : variableList.getVariables()) {
-				int storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
+				int variableId = variable.getVariableType().getStandardVariable().getId();
 				String value = variable.getValue();
+				PhenotypicType role = variable.getVariableType().getRole();
 
-				if (TermId.ENTRY_NUMBER_STORAGE.getId() == storedInId) {
+				if (TermId.ENTRY_NO.getId() == variableId) {
 					stockModel = this.getStockObject(stockModel);
 					stockModel.setUniqueName(value);
 
-				} else if (TermId.ENTRY_GID_STORAGE.getId() == storedInId) {
+				} else if (TermId.GID.getId() == variableId) {
 					stockModel = this.getStockObject(stockModel);
 					Integer dbxref = null;
 					if (NumberUtils.isNumber(value)) {
@@ -68,15 +70,15 @@ public class StockSaver extends Saver {
 					}
 					stockModel.setDbxrefId(dbxref);
 
-				} else if (TermId.ENTRY_DESIGNATION_STORAGE.getId() == storedInId) {
+				} else if (TermId.DESIG.getId() == variableId) {
 					stockModel = this.getStockObject(stockModel);
 					stockModel.setName(value);
 
-				} else if (TermId.ENTRY_CODE_STORAGE.getId() == storedInId) {
+				} else if (TermId.ENTRY_CODE.getId() == variableId) {
 					stockModel = this.getStockObject(stockModel);
 					stockModel.setValue(value);
 
-				} else if (TermId.GERMPLASM_ENTRY_STORAGE.getId() == storedInId) {
+				} else if (PhenotypicType.GERMPLASM == role) {
 					stockModel = this.getStockObject(stockModel);
 					StockProperty stockProperty = this.getStockProperty(stockModel, variable);
 					if (stockProperty == null && variable.getValue() != null && !variable.getValue().isEmpty()) {

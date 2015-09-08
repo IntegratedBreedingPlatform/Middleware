@@ -19,8 +19,8 @@ import java.util.Map;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -74,14 +74,14 @@ public class PhenotypeSaver extends Saver {
 		}
 	}
 
-	public void saveOrUpdate(int experimentId, Integer variableId, int storedIn, String value, Phenotype phenotype)
+	public void saveOrUpdate(int experimentId, Integer variableId, String value, Phenotype phenotype, Integer dataTypeId)
 			throws MiddlewareQueryException {
-		this.saveOrUpdate(experimentId, variableId, storedIn, value, phenotype, false);
+		this.saveOrUpdate(experimentId, variableId, value, phenotype, false, dataTypeId);
 	}
 
-	public void saveOrUpdate(int experimentId, Integer variableId, int storedIn, String value, Phenotype oldPhenotype,
-			boolean isCustomCategoricalValue) throws MiddlewareQueryException {
-		Phenotype phenotype = this.createPhenotype(variableId, storedIn, value, oldPhenotype, isCustomCategoricalValue);
+	public void saveOrUpdate(int experimentId, Integer variableId, String value, Phenotype oldPhenotype, boolean isCustomCategoricalValue,
+			Integer dataTypeId) throws MiddlewareQueryException {
+		Phenotype phenotype = this.createPhenotype(variableId, value, oldPhenotype, isCustomCategoricalValue, dataTypeId);
 		this.saveOrUpdate(experimentId, phenotype);
 	}
 
@@ -95,56 +95,41 @@ public class PhenotypeSaver extends Saver {
 
 	private Phenotype createPhenotype(Variable variable) throws MiddlewareQueryException {
 		Phenotype phenotype = null;
-
 		if (variable.getValue() != null && !"".equals(variable.getValue().trim())) {
-			if (TermId.OBSERVATION_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
+
+			PhenotypicType role = variable.getVariableType().getStandardVariable().getPhenotypicType();
+			Term dataType = variable.getVariableType().getStandardVariable().getDataType();
+
+			if (role == PhenotypicType.VARIATE) {
+
 				phenotype = this.getPhenotypeObject(phenotype);
-				if (variable.getValue() != null) {
+				if (variable.getValue() != null && !"".equals(variable.getValue())) {
 					phenotype.setValue(variable.getValue().trim());
 				} else {
 					phenotype.setValue(null);
 				}
 				phenotype.setObservableId(variable.getVariableType().getId());
 				phenotype.setName(String.valueOf(variable.getVariableType().getId()));
-			} else if (TermId.CATEGORICAL_VARIATE.getId() == variable.getVariableType().getStandardVariable().getStoredIn().getId()) {
-				phenotype = this.getPhenotypeObject(phenotype);
-				if (variable.getValue() != null && !"".equals(variable.getValue())) {
-					phenotype.setValue(variable.getValue());
-					Term dataType = variable.getVariableType().getStandardVariable().getDataType();
-					if (dataType.getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-						Enumeration enumeration =
-								variable.getVariableType().getStandardVariable().getEnumerationByName(variable.getValue());
-						// in case the value entered is the id and not the enumeration code/name
-						if (enumeration == null && NumberUtils.isNumber(variable.getValue())) {
-							enumeration =
-									variable.getVariableType().getStandardVariable()
-									.getEnumeration(Double.valueOf(variable.getValue()).intValue());
-						}
-						if (enumeration != null) {
-							phenotype.setcValue(enumeration.getId());
-							phenotype.setValue(enumeration.getName());
-						} else {
-							//set it as a custom value of the categorical variate
-							phenotype.setValue(variable.getValue());
-							phenotype.setcValue(null);
-						}
-					} else if (dataType.getId() == TermId.NUMERIC_VARIABLE.getId()) {
-						if (!NumberUtils.isNumber(variable.getValue())) {
-							// FIXME Technical debt - throw an error that value must be numeric - should be handled by GCP-7956
-						} else {
-							VariableConstraints constraints = variable.getVariableType().getStandardVariable().getConstraints();
-							if (constraints != null) {
-								// FIXME Technical debt - Check if value is within the min and max - should be handled by GCP-7956
-							}
-						}
 
+				if (dataType != null && dataType.getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+
+					Enumeration enumeration = variable.getVariableType().getStandardVariable().getEnumerationByName(variable.getValue());
+					// in case the value entered is the id and not the enumeration code/name
+					if (enumeration == null && NumberUtils.isNumber(variable.getValue())) {
+						enumeration = variable.getVariableType().getStandardVariable()
+								.getEnumeration(Double.valueOf(variable.getValue()).intValue());
+					}
+					if (enumeration != null) {
+						phenotype.setcValue(enumeration.getId());
+						phenotype.setValue(enumeration.getName());
+					} else {
+						// set it as a custom value of the categorical variate
+						phenotype.setValue(variable.getValue());
+						phenotype.setcValue(null);
 					}
 				}
-				phenotype.setObservableId(variable.getVariableType().getId());
-				phenotype.setName(String.valueOf(variable.getVariableType().getId()));
 			}
 		}
-
 		return phenotype;
 	}
 
@@ -155,8 +140,8 @@ public class PhenotypeSaver extends Saver {
 		}
 	}
 
-	private Phenotype createPhenotype(Integer variableId, int storedIn, String value, Phenotype oldPhenotype,
-			boolean isCustomCategoricalValue) throws MiddlewareQueryException {
+	private Phenotype createPhenotype(Integer variableId, String value, Phenotype oldPhenotype, boolean isCustomCategoricalValue,
+			Integer dataTypeId) throws MiddlewareQueryException {
 
 		if ((value == null || "".equals(value.trim())) && (oldPhenotype == null || oldPhenotype.getPhenotypeId() == null)) {
 			return null;
@@ -164,10 +149,10 @@ public class PhenotypeSaver extends Saver {
 
 		Phenotype phenotype = this.getPhenotypeObject(oldPhenotype);
 
-		if (TermId.OBSERVATION_VARIATE.getId() == storedIn) {
-			phenotype.setValue(value);
-		} else if (TermId.CATEGORICAL_VARIATE.getId() == storedIn) {
+		if (TermId.CATEGORICAL_VARIABLE.getId() == dataTypeId) {
 			this.setCategoricalVariatePhenotypeValues(phenotype, value, variableId);
+		} else {
+			phenotype.setValue(value);
 		}
 		phenotype.setObservableId(variableId);
 		phenotype.setName(String.valueOf(variableId));
@@ -196,13 +181,18 @@ public class PhenotypeSaver extends Saver {
 		}
 	}
 
-	private Map<Integer, String> getPossibleValuesMap(int variableId) throws MiddlewareQueryException {
+	protected Map<Integer, String> getPossibleValuesMap(int variableId) throws MiddlewareQueryException {
 		Map<Integer, String> possibleValuesMap = new HashMap<Integer, String>();
-		List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(variableId);
-		for (CVTermRelationship cvTermRelationship : relationships) {
-			if (TermId.HAS_VALUE.getId() == cvTermRelationship.getTypeId()) {
-				possibleValuesMap.put(cvTermRelationship.getObjectId(), this.getCvTermDao().getById(cvTermRelationship.getObjectId())
-						.getName());
+		CVTermRelationship scaleRelationship =
+				this.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(variableId, TermId.HAS_SCALE.getId());
+		if (scaleRelationship != null) {
+			List<CVTermRelationship> possibleValues =
+					this.getCvTermRelationshipDao().getBySubjectIdAndTypeId(scaleRelationship.getObjectId(), TermId.HAS_VALUE.getId());
+			if (possibleValues != null) {
+				for (CVTermRelationship cvTermRelationship : possibleValues) {
+					possibleValuesMap.put(cvTermRelationship.getObjectId(),
+							this.getCvTermDao().getById(cvTermRelationship.getObjectId()).getName());
+				}
 			}
 		}
 		return possibleValuesMap;
@@ -236,7 +226,7 @@ public class PhenotypeSaver extends Saver {
 
 	}
 
-	public void saveOrUpdatePhenotypeValue(int projectId, int variableId, int storedIn, String value) throws MiddlewareQueryException {
+	public void saveOrUpdatePhenotypeValue(int projectId, int variableId, String value, int dataTypeId) throws MiddlewareQueryException {
 		if (value != null) {
 			boolean isInsert = false;
 			Integer phenotypeId = this.getPhenotypeDao().getPhenotypeIdByProjectAndType(projectId, variableId);
@@ -250,7 +240,7 @@ public class PhenotypeSaver extends Saver {
 			} else {
 				phenotype = this.getPhenotypeDao().getById(phenotypeId);
 			}
-			if (storedIn == TermId.CATEGORICAL_VARIATE.getId() && NumberUtils.isNumber(value)) {
+			if (dataTypeId == TermId.CATEGORICAL_VARIABLE.getId() && NumberUtils.isNumber(value)) {
 				phenotype.setcValue(Double.valueOf(value).intValue());
 			} else {
 				phenotype.setValue(value);

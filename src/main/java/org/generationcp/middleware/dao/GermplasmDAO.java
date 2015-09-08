@@ -743,7 +743,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	/**
 	 * Search for germplasms given a search term
 	 * 
-	 * @param q - the search term to be used
+	 * @param searchedString - the search term to be used
 	 * @param o - like or equal
 	 * @param includeParents boolean flag to denote whether parents will be included in search results
 	 * @param withInventoryOnly - boolean flag to denote whether result will be filtered by those with inventories only

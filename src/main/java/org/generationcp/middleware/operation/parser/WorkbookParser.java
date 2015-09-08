@@ -427,13 +427,25 @@ public class WorkbookParser {
 				this.errorMessages.add(new Message("error.missing.field.datatype", Integer.toString(this.currentRow + 1)));
 			}
 
-			if (!Section.VARIATE.toString().equals(name) && StringUtils.isEmpty(var.getLabel())) {
-				this.errorMessages.add(new Message("error.missing.field.label", Integer.toString(this.currentRow + 1)));
+			if (!Section.VARIATE.toString().equals(name)
+					&& StringUtils.isEmpty(var.getLabel())) {
+				this.errorMessages.add(new Message("error.missing.field.label",
+						Integer.toString(this.currentRow + 1)));
+			} else {
+				var.setRole(PhenotypicType.VARIATE);
 			}
 
-			if ((Section.FACTOR.toString().equals(name) || Section.CONDITION.toString().equals(name))
-					&& PhenotypicType.getPhenotypicTypeForLabel(var.getLabel()) == null) {
-				this.errorMessages.add(new Message("error.invalid.field.label", Integer.toString(this.currentRow + 1)));
+			if (Section.FACTOR.toString().equals(name)
+					|| Section.CONDITION.toString().equals(name)) {
+				PhenotypicType role = PhenotypicType
+						.getPhenotypicTypeForLabel(var.getLabel());
+				if (role == null) {
+					this.errorMessages.add(new Message(
+							"error.invalid.field.label", Integer
+									.toString(this.currentRow + 1)));
+				} else {
+					var.setRole(role);
+				}
 			}
 
 			measurementVariables.add(var);

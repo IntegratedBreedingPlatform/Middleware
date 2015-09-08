@@ -5,15 +5,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.junit.Assert;
 import org.junit.Before;
@@ -58,12 +58,13 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 		for (MeasurementVariable measurementVariable : measurementVariables) {
 			Assert.assertTrue("Measurement variable should be a factor", measurementVariable.isFactor());
 			StandardVariable stdVariable = this.getStandardVariable(measurementVariable.getTermId());
-			VariableType variableType = this.transformMeasurementVariable(measurementVariable, stdVariable);
+			DMSVariableType variableType = this.transformMeasurementVariable(measurementVariable, stdVariable);
 			this.validateMeasurementVariable(measurementVariable, variableType, isInTrialDataset);
 		}
 	}
 
-	public void validateMeasurementVariable(MeasurementVariable measurementVariable, VariableType variableType, boolean isInTrialDataset) {
+	public void validateMeasurementVariable(MeasurementVariable measurementVariable, DMSVariableType variableType,
+			boolean isInTrialDataset) {
 		StandardVariable stdVariable = variableType.getStandardVariable();
 		Assert.assertEquals("Name should be " + variableType.getLocalName(), variableType.getLocalName(), measurementVariable.getName());
 		Assert.assertEquals("Description should be " + stdVariable.getDescription(), stdVariable.getDescription(),
@@ -76,9 +77,8 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 				measurementVariable.getProperty());
 		Assert.assertEquals("Data Type should be " + stdVariable.getDataType().getName(), stdVariable.getDataType().getName(),
 				measurementVariable.getDataType());
-		Assert.assertEquals("Stored In should be " + stdVariable.getStoredIn().getId(), stdVariable.getStoredIn().getId(),
-				measurementVariable.getStoredIn());
-		String label = this.getLabel(stdVariable.getStoredIn().getId(), isInTrialDataset);
+
+		String label = this.getLabel(stdVariable.getPhenotypicType(), isInTrialDataset);
 		Assert.assertEquals("Label should be " + label, label, measurementVariable.getLabel());
 		List<ValueReference> possibleValues = this.getPossibleValues(stdVariable.getEnumerations());
 		Assert.assertEquals("Possible values should be " + possibleValues, possibleValues, measurementVariable.getPossibleValues());
@@ -96,34 +96,34 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 		}
 	}
 
-	private String getLabel(int storedIn, boolean isInTrialDataset) {
+	private String getLabel(PhenotypicType role, boolean isInTrialDataset) {
 		if (isInTrialDataset) {
 			return PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
 		}
-		return PhenotypicType.getPhenotypicTypeById(storedIn).getLabelList().get(0);
+		return role.getLabelList().get(0);
 	}
 
-	private VariableTypeList createFactorVariableTypeList() throws MiddlewareQueryException {
+	private VariableTypeList createFactorVariableTypeList() throws MiddlewareException {
 		VariableTypeList varTypeList = new VariableTypeList();
 		StandardVariable trialInstance = this.getStandardVariable(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		StandardVariable entryType = this.getStandardVariable(TermId.CHECK.getId());
 		StandardVariable gid = this.getStandardVariable(TermId.GID.getId());
 		StandardVariable entryNo = this.getStandardVariable(TermId.ENTRY_NO.getId());
 		StandardVariable repNo = this.getStandardVariable(TermId.REP_NO.getId());
-		varTypeList.add(new VariableType("TRIAL_INSTANCE", "Trial instance - enumerated (number)", trialInstance, 1));
-		varTypeList.add(new VariableType("ENTRY_TYPE", "Entry type (test/check)- assigned (type)", entryType, 2));
-		varTypeList.add(new VariableType("GID", "Germplasm identifier - assigned (DBID)", gid, 3));
-		varTypeList.add(new VariableType("ENTRY_NO", "Germplasm entry - enumerated (number)", entryNo, 4));
-		varTypeList.add(new VariableType("REP_NO", "Replication - assigned (number)", repNo, 5));
+		varTypeList.add(new DMSVariableType("TRIAL_INSTANCE", "Trial instance - enumerated (number)", trialInstance, 1));
+		varTypeList.add(new DMSVariableType("ENTRY_TYPE", "Entry type (test/check)- assigned (type)", entryType, 2));
+		varTypeList.add(new DMSVariableType("GID", "Germplasm identifier - assigned (DBID)", gid, 3));
+		varTypeList.add(new DMSVariableType("ENTRY_NO", "Germplasm entry - enumerated (number)", entryNo, 4));
+		varTypeList.add(new DMSVariableType("REP_NO", "Replication - assigned (number)", repNo, 5));
 		return varTypeList;
 	}
 
-	private StandardVariable getStandardVariable(int id) throws MiddlewareQueryException {
-		return this.standardVariableBuilder.create(id);
+	private StandardVariable getStandardVariable(int id) throws MiddlewareException {
+		return this.standardVariableBuilder.create(id,"1234567");
 	}
 
-	private VariableType transformMeasurementVariable(MeasurementVariable measurementVariable, StandardVariable standardVariable) {
-		return new VariableType(measurementVariable.getName(), measurementVariable.getDescription(), standardVariable, 0);
+	private DMSVariableType transformMeasurementVariable(MeasurementVariable measurementVariable, StandardVariable standardVariable) {
+		return new DMSVariableType(measurementVariable.getName(), measurementVariable.getDescription(), standardVariable, 0);
 	}
 
 	private List<ValueReference> getPossibleValues(List<Enumeration> enumerations) {
@@ -146,7 +146,7 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 		for (MeasurementVariable measurementVariable : measurementVariables) {
 			Assert.assertFalse("Measurement variable should not be a factor", measurementVariable.isFactor());
 			StandardVariable stdVariable = this.getStandardVariable(measurementVariable.getTermId());
-			VariableType variableType = this.transformMeasurementVariable(measurementVariable, stdVariable);
+			DMSVariableType variableType = this.transformMeasurementVariable(measurementVariable, stdVariable);
 			this.validateMeasurementVariable(measurementVariable, variableType, isInTrialDataset);
 		}
 	}
@@ -161,26 +161,26 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 		for (MeasurementVariable measurementVariable : measurementVariables) {
 			Assert.assertFalse("Measurement variable should not be a factor", measurementVariable.isFactor());
 			StandardVariable stdVariable = this.getStandardVariable(measurementVariable.getTermId());
-			VariableType variableType = this.transformMeasurementVariable(measurementVariable, stdVariable);
+			DMSVariableType variableType = this.transformMeasurementVariable(measurementVariable, stdVariable);
 			this.validateMeasurementVariable(measurementVariable, variableType, isInTrialDataset);
 		}
 	}
 
-	private VariableTypeList createVariateVariableTypeList() throws MiddlewareQueryException {
+	private VariableTypeList createVariateVariableTypeList() throws MiddlewareException {
 		VariableTypeList varTypeList = new VariableTypeList();
 		StandardVariable asi = this.getStandardVariable(20308);
-		varTypeList.add(new VariableType("ASI", "Determined by (i) measuring the number of days after "
+		varTypeList.add(new DMSVariableType("ASI", "Determined by (i) measuring the number of days after "
 				+ "planting until 50 % of the plants shed pollen (anthesis date, AD) "
 				+ "and show silks (silking date, SD), respectively, " + "and (ii) calculating: ASI = SD - AD.", asi, 1));
 		return varTypeList;
 	}
 
-	private VariableTypeList createTrialConstantVariableTypeList() throws MiddlewareQueryException {
+	private VariableTypeList createTrialConstantVariableTypeList() throws MiddlewareException {
 		VariableTypeList varTypeList = new VariableTypeList();
 		StandardVariable siteSoilPh = this.getStandardVariable(MeasurementVariableTransformerTest.SITE_SOIL_PH);
 		StandardVariable crust = this.getStandardVariable(MeasurementVariableTransformerTest.CRUST);
-		varTypeList.add(new VariableType("SITE_SOIL_PH", "Soil acidity - ph meter (pH)", siteSoilPh, 1));
-		varTypeList.add(new VariableType("CRUST", "Score for the severity of common rust, "
+		varTypeList.add(new DMSVariableType("SITE_SOIL_PH", "Soil acidity - ph meter (pH)", siteSoilPh, 1));
+		varTypeList.add(new DMSVariableType("CRUST", "Score for the severity of common rust, "
 				+ "(In highlands and mid altitude, Puccinia sorghi) " + "symptoms rated on a scale from 1 (= clean, no infection) to "
 				+ "5 (= severely diseased).", crust, 2));
 		return varTypeList;
