@@ -314,7 +314,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets a project by Uuid. Should return only one value.
-	 * 
+	 *
 	 * @param projectUuid - the project Uuid to match
 	 * @return the project matching the given Uuid
 	 * @throws MiddlewareQueryException the middleware query exception

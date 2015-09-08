@@ -10,9 +10,14 @@ import org.generationcp.middleware.reports.Reporter;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.ReportService;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@Ignore
+@RunWith(JUnit4.class)
 public class ReportServiceImplTest extends IntegrationTestBase {
 
 	@Autowired

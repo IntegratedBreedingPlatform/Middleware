@@ -12,7 +12,7 @@ import org.hibernate.Session;
 
 public class TraitServiceImpl implements TraitService {
 
-	private Session session;
+	private final Session session;
 
 	final TraitNamesQuery traitQuery = new TraitNamesQuery();
 
@@ -22,7 +22,7 @@ public class TraitServiceImpl implements TraitService {
 
 	@Override
 	public List<TraitDto> getTraits(final int studyBusinessIdentifier) {
-		final List<TraitDto> list = getTraitListForTrail(studyBusinessIdentifier);
+		final List<TraitDto> list = this.getTraitListForTrail(studyBusinessIdentifier);
 		if (list != null && !list.isEmpty()) {
 			return Collections.unmodifiableList(list);
 		}
@@ -31,7 +31,7 @@ public class TraitServiceImpl implements TraitService {
 
 	@SuppressWarnings("unchecked")
 	private List<TraitDto> getTraitListForTrail(final int projectBusinessIdentifier) {
-		final String traitsInProjectQuery = traitQuery.getTraitQuery();
+		final String traitsInProjectQuery = this.traitQuery.getTraitQuery();
 		final SQLQuery traitSqlQuery = this.session.createSQLQuery(traitsInProjectQuery);
 		traitSqlQuery.addScalar("cvterm_id");
 		traitSqlQuery.addScalar("name");
@@ -39,7 +39,7 @@ public class TraitServiceImpl implements TraitService {
 		List<Object[]> list = traitSqlQuery.list();
 		final List<TraitDto> traitList = new ArrayList<TraitDto>();
 		for (Object[] rows : list) {
-			traitList.add(new TraitDto((Integer)rows[0], (String)rows[1]));
+			traitList.add(new TraitDto((Integer) rows[0], (String) rows[1]));
 		}
 		return traitList;
 	}

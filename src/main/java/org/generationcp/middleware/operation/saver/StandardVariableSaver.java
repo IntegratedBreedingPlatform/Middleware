@@ -49,7 +49,6 @@ public class StandardVariableSaver extends Saver {
 			this.deleteCropOntologyId(stdVar.getProperty().getId(), stdVar.getCropOntologyId());
 		}
 
-		this.deleteRelationship(stdVar.getId(), TermId.STORED_IN.getId(), stdVar.getStoredIn());
 		this.deleteRelationship(stdVar.getId(), TermId.HAS_TYPE.getId(), stdVar.getDataType());
 		this.deleteRelationship(stdVar.getId(), TermId.HAS_SCALE.getId(), stdVar.getScale());
 		this.deleteRelationship(stdVar.getId(), TermId.HAS_PROPERTY.getId(), stdVar.getProperty());
@@ -89,7 +88,6 @@ public class StandardVariableSaver extends Saver {
 		this.saveRelationship(varId, TermId.HAS_SCALE.getId(), stdVar.getScale());
 		this.saveRelationship(varId, TermId.HAS_METHOD.getId(), stdVar.getMethod());
 		this.saveRelationship(varId, TermId.HAS_TYPE.getId(), stdVar.getDataType());
-		this.saveRelationship(varId, TermId.STORED_IN.getId(), stdVar.getStoredIn());
 
 		if (stdVar.getIsA() != null) {
 			this.saveRelationship(varId, TermId.IS_A.getId(), stdVar.getIsA());
@@ -330,10 +328,6 @@ public class StandardVariableSaver extends Saver {
 		} else if (typeID == TermId.HAS_TYPE.getId()) {
 			if (standardVariable.getDataType() != null) {
 				objectId = standardVariable.getDataType().getId();
-			}
-		} else if (typeID == TermId.STORED_IN.getId()) {
-			if (standardVariable.getStoredIn() != null) {
-				objectId = standardVariable.getStoredIn().getId();
 			}
 		}
 

@@ -29,12 +29,17 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.exceptions.MiddlewareException;
+
+import com.google.common.base.Function;
 
 /**
  * A utility class used to get primitive values of wrapper classes, check for null values, and list functions such as getting the max,
@@ -167,6 +172,59 @@ public class Util {
 		return Arrays.asList(objects);
 	}
 
+	public static Integer getCurrentDateAsInteger() {
+		Calendar now = Calendar.getInstance();
+		SimpleDateFormat formatter = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
+		String dateNowStr = formatter.format(now.getTime());
+		Integer dateNowInt = Integer.valueOf(dateNowStr);
+		return dateNowInt;
+
+	}
+
+	/**
+	 * @param source source list
+	 * @param projection projection function
+	 * @param <Source> Source Type
+	 * @param <Result> Result Type
+	 * @return List<Result> Projected data
+	 */
+	public static <Source, Result> List<Result> convertAll(List<Source> source, Function<Source, Result> projection) {
+		ArrayList<Result> results = new ArrayList<>();
+		for (Source element : source) {
+			results.add(projection.apply(element));
+		}
+		return results;
+	}
+
+	public static void checkAndThrowForNullObjects(Object... objects) throws MiddlewareException {
+		final String insufficientData = "One or more required fields are missing.";
+		for (Object o : objects) {
+			if (o != null) {
+				continue;
+			}
+			throw new MiddlewareException(insufficientData);
+		}
+	}
+
+	/**
+	 * @param source source list
+	 * @param projection projection function
+	 * @param <Key> Key Type
+	 * @param <Source> Source Type
+	 * @return List<Result> Projected data
+	 */
+	public static <Key, Source> Map<Key, Source> mapAll(List<Source> source, Function<Source, Key> projection) {
+		Map<Key, Source> results = new HashMap<>();
+		for (Source element : source) {
+			results.put(projection.apply(element), element);
+		}
+		return results;
+	}
+
+	public static boolean isNonNullValidNumericString(Object value) {
+		return value != null && (value instanceof Integer || value instanceof String && ((String) value).matches("^[0-9]+$"));
+	}
+
 	/**
 	 * Returns the current date in format "yyyyMMdd" as Integer
 	 * 
@@ -282,10 +340,10 @@ public class Util {
 		return Util.convertCollectionToCSV(valueSet);
 	}
 
-	public static String convertCollectionToCSV(Collection<String> collection) {
+	public static String convertCollectionToCSV(Collection<?> collection) {
 		int i = 0;
 		StringBuilder csv = new StringBuilder();
-		for (String value : collection) {
+		for (Object value : collection) {
 			if (i != 0) {
 				csv.append(", ");
 			}

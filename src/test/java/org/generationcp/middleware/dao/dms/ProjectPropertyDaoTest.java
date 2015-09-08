@@ -12,13 +12,15 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.util.Debug;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,21 +35,34 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStandardVariableIdsByPropertyNames() throws Exception {
-		List<String> propertyNames =
-				Arrays.asList("ENTRY", "ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");
+	public void testGetStandardVariableIdsWithTypeByPropertyNames() throws Exception {
+		Map<String, VariableType> expectedStdVarWithTypeMap = this.createVarNameWithTypeMapTestData();
 
-		Map<String, Set<Integer>> results = this.dao.getStandardVariableIdsByPropertyNames(propertyNames);
+		List<String> propertyNames = new ArrayList<String>();
+		propertyNames.addAll(expectedStdVarWithTypeMap.keySet());
+
+		Map<String, Map<Integer, VariableType>> results = this.dao.getStandardVariableIdsWithTypeByPropertyNames(propertyNames);
 
 		Debug.println(0, "testGetStandardVariableIdsByPropertyNames(propertyNames=" + propertyNames + ") RESULTS:");
 		for (String name : propertyNames) {
-			Debug.println(0, "    Header = " + name + ", Terms = " + results.get(name));
-
-			/*
-			 * TO VERIFY: SELECT DISTINCT ppValue.value, ppStdVar.id FROM projectprop ppValue INNER JOIN (SELECT project_id, value id FROM
-			 * projectprop WHERE type_id = 1070) AS ppStdVar ON ppValue.project_id = ppStdVar.project_id AND ppValue.type_id = 1060 AND
-			 * ppValue.value IN (:propertyNames)
-			 */
+			Map<Integer, VariableType> actualStdVarIdWithTypeMap = results.get(name);
+			Debug.println(0, "    Header = " + name + ", Terms = " + actualStdVarIdWithTypeMap);
+			if (actualStdVarIdWithTypeMap != null) {
+				Assert.assertTrue(actualStdVarIdWithTypeMap.containsValue(expectedStdVarWithTypeMap.get(name)));
+			}
 		}
+	}
+
+	private Map<String, VariableType> createVarNameWithTypeMapTestData() {
+		Map<String, VariableType> varNameWithTypeMap = new HashMap<String, VariableType>();
+		varNameWithTypeMap.put("TRIAL_INSTANCE", VariableType.ENVIRONMENT_DETAIL);
+		varNameWithTypeMap.put("ENTRY_NO", VariableType.GERMPLASM_DESCRIPTOR);
+		varNameWithTypeMap.put("DESIGNATION", VariableType.GERMPLASM_DESCRIPTOR);
+		varNameWithTypeMap.put("GID", VariableType.GERMPLASM_DESCRIPTOR);
+		varNameWithTypeMap.put("CROSS", VariableType.GERMPLASM_DESCRIPTOR);
+		varNameWithTypeMap.put("PLOT_NO", VariableType.EXPERIMENTAL_DESIGN);
+		varNameWithTypeMap.put("REP_NO", VariableType.EXPERIMENTAL_DESIGN);
+		varNameWithTypeMap.put("SITE_SOIL_PH", VariableType.TRAIT);
+		return varNameWithTypeMap;
 	}
 }

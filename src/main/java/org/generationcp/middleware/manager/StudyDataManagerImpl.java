@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -33,7 +34,6 @@ import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
@@ -78,11 +78,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
-	private PedigreeService pedigreeService;
-
-	private LocationDataManager locationDataManager;
-
 	private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
+	private PedigreeService pedigreeService;
+	private LocationDataManager locationDataManager;
 
 	public StudyDataManagerImpl() {
 	}
@@ -108,12 +106,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Study getStudy(int studyId) throws MiddlewareQueryException {
+	public Study getStudy(int studyId) throws MiddlewareException {
 		return this.getStudyBuilder().createStudy(studyId);
 	}
 
 	@Override
-	public Study getStudy(int studyId, boolean hasVariableType) throws MiddlewareQueryException {
+	public Study getStudy(int studyId, boolean hasVariableType) throws MiddlewareException {
 		return this.getStudyBuilder().createStudy(studyId, hasVariableType);
 	}
 
@@ -143,17 +141,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public DataSet getDataSet(int dataSetId) throws MiddlewareQueryException {
+	public DataSet getDataSet(int dataSetId) throws MiddlewareException {
 		return this.getDataSetBuilder().build(dataSetId);
 	}
 
 	@Override
-	public VariableTypeList getAllStudyFactors(int studyId) throws MiddlewareQueryException {
+	public VariableTypeList getAllStudyFactors(int studyId) throws MiddlewareException {
 		return this.getStudyFactorBuilder().build(studyId);
 	}
 
 	@Override
-	public VariableTypeList getAllStudyVariates(int studyId) throws MiddlewareQueryException {
+	public VariableTypeList getAllStudyVariates(int studyId) throws MiddlewareException {
 		return this.getStudyVariateBuilder().build(studyId);
 	}
 
@@ -183,11 +181,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		} catch (Exception e) {
 
-			this.logAndThrowException("Error encountered with addStudy(folderId=" + parentFolderId + ", variableTypeList="
-					+ variableTypeList + ", studyValues=" + studyValues + "): " + e.getMessage(), e, StudyDataManagerImpl.LOG);
+			throw new MiddlewareQueryException("Error encountered with addStudy(folderId=" + parentFolderId + ", variableTypeList="
+					+ variableTypeList + ", studyValues=" + studyValues + "): " + e.getMessage(), e);
 		}
 
-		return null;
 	}
 
 	@Override
@@ -207,14 +204,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<Experiment> getExperiments(int dataSetId, int start, int numRows) throws MiddlewareQueryException {
+	public List<Experiment> getExperiments(int dataSetId, int start, int numRows) throws MiddlewareException {
 		VariableTypeList variableTypes = this.getDataSetBuilder().getVariableTypes(dataSetId);
 		return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), start, numRows, variableTypes);
 	}
 
 	@Override
 	public List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId, int start, int numRows)
-			throws MiddlewareQueryException {
+			throws MiddlewareException {
 		VariableTypeList trialVariableTypes = this.getDataSetBuilder().getVariableTypes(trialDataSetId);
 		VariableTypeList variableTypes = this.getDataSetBuilder().getVariableTypes(dataSetId);
 
@@ -225,7 +222,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList)
-					throws MiddlewareQueryException {
+			throws MiddlewareException {
 		if (varTypeList == null) {
 			return this.getExperiments(dataSetId, start, numOfRows);
 		} else {
@@ -317,7 +314,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException {
+	public List<DataSet> getDataSetsByType(int studyId, DataSetType dataSetType) throws MiddlewareException {
 
 		List<DmsProject> datasetProjects =
 				this.getDmsProjectDao().getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(),
@@ -339,7 +336,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public void addDataSetVariableType(int datasetId, VariableType variableType) throws MiddlewareQueryException {
+	public void addDataSetVariableType(int datasetId, DMSVariableType variableType) throws MiddlewareQueryException {
 
 		try {
 
@@ -352,26 +349,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public void setExperimentValue(int experimentId, int variableId, String value) throws MiddlewareQueryException {
-
-		try {
-
-			this.getExperimentModelSaver().setExperimentValue(experimentId, variableId, value);
-
-		} catch (Exception e) {
-
-			throw new MiddlewareQueryException("error in addDataSetVariableType " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) throws MiddlewareQueryException {
+	public TrialEnvironments getTrialEnvironmentsInDataset(int datasetId) throws MiddlewareException {
 		DmsProject study = this.getProjectRelationshipDao().getObjectBySubjectIdAndTypeId(datasetId, TermId.BELONGS_TO_STUDY.getId());
 		return this.getTrialEnvironmentBuilder().getTrialEnvironmentsInDataset(study.getProjectId(), datasetId);
 	}
 
 	@Override
-	public Stocks getStocksInDataset(int datasetId) throws MiddlewareQueryException {
+	public Stocks getStocksInDataset(int datasetId) throws MiddlewareException {
 		return this.getStockBuilder().getStocksInDataset(datasetId);
 	}
 
@@ -386,7 +370,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public DataSet findOneDataSetByType(int studyId, DataSetType dataSetType) throws MiddlewareQueryException {
+	public DataSet findOneDataSetByType(int studyId, DataSetType dataSetType) throws MiddlewareException {
 		List<DataSet> datasets = this.getDataSetsByType(studyId, dataSetType);
 		if (datasets != null && !datasets.isEmpty()) {
 			return datasets.get(0);
@@ -456,8 +440,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public long countExperimentsByVariable(int variableId, int storedInId) throws MiddlewareQueryException {
-		return this.getExperimentDao().countByObservedVariable(variableId, storedInId);
+	public long countExperimentsByVariable(int variableId, int variableTypeId) throws MiddlewareQueryException {
+		return this.getExperimentDao().countByObservedVariable(variableId, variableTypeId);
 	}
 
 	@Override
@@ -534,8 +518,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 			} catch (Exception e) {
 
-				this.logAndThrowException("Error encountered with saveOrUpdateFieldmapProperties(): " + e.getMessage(), e,
-						StudyDataManagerImpl.LOG);
+				throw new MiddlewareQueryException("Error encountered with saveOrUpdateFieldmapProperties(): " + e.getMessage(), e);
 			}
 		}
 
@@ -562,10 +545,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	private void updateExperimentValues(List<ExperimentValues> experimentValues, Integer projectId, List<Integer> locationIds)
 			throws MiddlewareQueryException {
-		for (Integer locationId : locationIds) {
-			// delete phenotypes by project id and locationId
-			this.getPhenotypeDao().deletePhenotypesByProjectIdAndLocationId(projectId, locationId);
-		}
+
 		for (ExperimentValues exp : experimentValues) {
 			if (exp.getVariableList() != null && !exp.getVariableList().isEmpty()) {
 				ExperimentModel experimentModel =
@@ -824,10 +804,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException {
-		if (this.getPhenotypeDao().countVariatesDataOfStudy(datasetId, variateIds) > 0) {
-			return true;
-		}
-		return false;
+		return this.getPhenotypeDao().countVariatesDataOfStudy(datasetId, variateIds) > 0;
 	}
 
 	@Override
@@ -1011,7 +988,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			}
 
 		} catch (Exception e) {
-
 			throw new MiddlewareQueryException("error in savePhenotypeOutlier " + e.getMessage(), e);
 		}
 
@@ -1038,14 +1014,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		List<Integer> projectIds = this.getDmsProjectDao().getAllProgramStudiesAndFolders(programUUID);
 
 		try {
-
 			for (Integer projectId : projectIds) {
 				this.getStudyDestroyer().deleteStudy(projectId);
 			}
-
 		} catch (Exception e) {
-
-			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, StudyDataManagerImpl.LOG);
+			throw new MiddlewareQueryException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e);
 		}
 	}
 
@@ -1053,11 +1026,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public void updateVariableOrdering(int datasetId, List<Integer> variableIds) throws MiddlewareQueryException {
 
 		try {
-
 			this.getProjectPropertySaver().updateVariablesRanking(datasetId, variableIds);
 
 		} catch (Exception e) {
-
 			throw new MiddlewareQueryException("Error in updateVariableOrdering " + e.getMessage(), e);
 		}
 	}

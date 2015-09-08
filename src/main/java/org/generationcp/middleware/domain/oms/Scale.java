@@ -16,7 +16,6 @@ import org.generationcp.middleware.util.Debug;
 public class Scale {
 
 	private Term term;
-
 	private String displayName;
 
 	public Scale() {
@@ -32,18 +31,6 @@ public class Scale {
 
 	public void setTerm(Term term) {
 		this.term = term;
-	}
-
-	public String getDisplayName() {
-		if (this.displayName == null) {
-			return this.term.getName();
-		} else {
-			return this.displayName;
-		}
-	}
-
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
 	}
 
 	public int getId() {
@@ -68,6 +55,14 @@ public class Scale {
 
 	public void setDefinition(String definition) {
 		this.term.setDefinition(definition);
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
+	}
+
+	public String getDisplayName() {
+		return this.displayName;
 	}
 
 	@Override
@@ -96,5 +91,4 @@ public class Scale {
 			Debug.println(indent + 3, "null");
 		}
 	}
-
 }

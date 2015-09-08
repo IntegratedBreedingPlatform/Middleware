@@ -52,12 +52,21 @@ public class DataImportServiceImplTest {
 		// we just need to test if isTrialInstanceNumberExists works, so lets mock out other dataImportService calls for the moment
 		Mockito.when(this.workbook.isNursery()).thenReturn(true);
 
-		// tip! do note that spy-ed object still calls the real method, may cause changing internal state as side effect
-		Mockito.when(moleDataImportService.isEntryExists(this.ontology, this.workbook.getFactors())).thenReturn(true);
-		Mockito.when(moleDataImportService.isPlotExists(this.ontology, this.workbook.getFactors())).thenReturn(true);
-		Mockito.when(moleDataImportService.isTrialInstanceNumberExists(this.ontology, this.workbook.getTrialVariables())).thenReturn(true);
+		// tip! do note that spy-ed object still calls the real method, may
+		// cause changing internal state as side effect
+		Mockito.when(
+				moleDataImportService.isEntryExists(this.ontology,
+						this.workbook.getFactors())).thenReturn(true);
+		Mockito.when(
+				moleDataImportService.isPlotExists(this.ontology,
+						this.workbook.getFactors())).thenReturn(true);
+		Mockito.when(
+				moleDataImportService.isTrialInstanceNumberExists(
+						this.ontology, this.workbook.getTrialVariables()))
+				.thenReturn(true);
 
-		Mockito.when(this.workbook.getAllVariables()).thenReturn(this.initializeTestMeasurementVariables());
+		Mockito.when(this.workbook.getAllVariables()).thenReturn(
+				this.initializeTestMeasurementVariables());
 
 		try {
 			moleDataImportService.strictParseWorkbook(this.file, this.parser, this.workbook, this.ontology,

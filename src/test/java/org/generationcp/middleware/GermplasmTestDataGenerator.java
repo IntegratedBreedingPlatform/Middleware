@@ -23,11 +23,13 @@ public class GermplasmTestDataGenerator {
 	}
 
 	private Integer createGermplasm(String germplasmName) throws MiddlewareQueryException {
+
 		Germplasm g = new Germplasm();
 		g.setGdate(Integer.valueOf(20141014));
 		g.setGnpgs(Integer.valueOf(0));
 		g.setGpid1(Integer.valueOf(0));
 		g.setGpid2(Integer.valueOf(0));
+		g.setLgid(Integer.valueOf(0));
 		g.setGrplce(Integer.valueOf(0));
 		g.setLocationId(Integer.valueOf(1));
 		g.setMethodId(Integer.valueOf(1));

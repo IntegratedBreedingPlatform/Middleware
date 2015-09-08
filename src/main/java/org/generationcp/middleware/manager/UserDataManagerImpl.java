@@ -63,8 +63,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 			User recordSaved = dao.saveOrUpdate(user);
 			idUserSaved = recordSaved.getUserid();
 		} catch (Exception e) {
-			this.logAndThrowException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(),
-					e, UserDataManagerImpl.LOG);
+			throw new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): "
+					+ e.getMessage(), e);
 		} 
 
 		return idUserSaved;
@@ -76,8 +76,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 			this.getUserDao().saveOrUpdate(user);
 		} catch (Exception e) {
 
-			this.logAndThrowException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(),
-					e, UserDataManagerImpl.LOG);
+			throw new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): "
+					+ e.getMessage(), e);
 		}
 		return user.getUserid();
 	}
@@ -92,9 +92,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 		try {
 			this.getUserDao().makeTransient(user);
 		} catch (Exception e) {
-			this.logAndThrowException(
-					"Error encountered while deleting User: UserDataManager.deleteUser(user=" + user + "): " + e.getMessage(), e,
-					UserDataManagerImpl.LOG);
+			throw new MiddlewareQueryException("Error encountered while deleting User: UserDataManager.deleteUser(user=" + user + "): "
+					+ e.getMessage(), e);
 		}
 	}
 
@@ -128,9 +127,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 			Person recordSaved = dao.saveOrUpdate(person);
 			idPersonSaved = recordSaved.getId();
 		} catch (Exception e) {
-			this.logAndThrowException(
-					"Error encountered while saving Person: UserDataManager.addPerson(person=" + person + "): " + e.getMessage(), e,
-					UserDataManagerImpl.LOG);
+			throw new MiddlewareQueryException("Error encountered while saving Person: UserDataManager.addPerson(person=" + person + "): "
+					+ e.getMessage(), e);
 		}
 		return idPersonSaved;
 	}
@@ -145,9 +143,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 		try {
 			this.getPersonDao().makeTransient(person);
 		} catch (Exception e) {
-			this.logAndThrowException(
-					"Error encountered while deleting Person: UserDataManager.deletePerson(person=" + person + "): " + e.getMessage(), e,
-					UserDataManagerImpl.LOG);
+			throw new MiddlewareQueryException("Error encountered while deleting Person: UserDataManager.deletePerson(person=" + person
+					+ "): " + e.getMessage(), e);
 		}
 	}
 

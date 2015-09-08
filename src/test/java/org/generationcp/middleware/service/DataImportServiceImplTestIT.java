@@ -22,6 +22,7 @@ import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.etl.WorkbookTest;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -68,7 +69,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveTrialDataset() throws MiddlewareQueryException {
+	public void testSaveTrialDataset() throws MiddlewareException {
 		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
 
 		int id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
@@ -91,7 +92,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveNurseryDataset() throws MiddlewareQueryException {
+	public void testSaveNurseryDataset() throws MiddlewareException {
 		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
 
 		int id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
@@ -114,7 +115,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddTrialEnvironmentToTrial() throws MiddlewareQueryException {
+	public void testAddTrialEnvironmentToTrial() throws MiddlewareException {
 		Workbook workbook = WorkbookTest.getTestWorkbook(4, StudyType.T);
 
 		int id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
@@ -135,7 +136,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testDeletionOfExperimentPropAndStockProp() throws MiddlewareQueryException {
+	public void testDeletionOfExperimentPropAndStockProp() throws MiddlewareException {
 		WorkbookTest.setTestWorkbook(null);
 		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
 
@@ -216,7 +217,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 			this.dataImportService.strictParseWorkbook(file, DataImportServiceImplTestIT.PROGRAM_UUID);
 		} catch (WorkbookParserException e) {
 			Assert.fail("Unable to correctly parse Nursery workbook with no trial condition");
-		} catch (MiddlewareQueryException e) {
+		} catch (MiddlewareException e) {
 			Assert.fail("Unexpected exception : " + e.getMessage());
 		}
 	}
@@ -238,7 +239,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 			Assert.assertSame(messages.size(), 7);
 
 			return;
-		} catch (MiddlewareQueryException e) {
+		} catch (MiddlewareException e) {
 			Assert.fail("Unexpected exception : " + e.getMessage());
 		}
 
@@ -257,7 +258,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 			Assert.assertTrue(messages.size() == 1);
 			Assert.assertEquals(expectedErrorKey, messages.get(0).getMessageKey());
 			return;
-		} catch (MiddlewareQueryException e) {
+		} catch (MiddlewareException e) {
 			Assert.fail("Unexpected exception : " + e.getMessage());
 		}
 
@@ -322,10 +323,10 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testValidateProjectOntology() throws MiddlewareQueryException {
+	public void testValidateProjectOntology() throws MiddlewareException {
 		Workbook workbook = WorkbookTest.getTestWorkbookWithErrors();
 		workbook.print(IntegrationTestBase.INDENT);
-		Map<String, List<Message>> errors = this.dataImportService.validateProjectOntology(workbook);
+		Map<String, List<Message>> errors = this.dataImportService.validateProjectOntology(workbook, PROGRAM_UUID);
 		Assert.assertNotNull(errors);
 		if (errors != null) {
 			Debug.println(IntegrationTestBase.INDENT, "Errors Identified: ");
@@ -344,7 +345,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testValidateProjectData() throws MiddlewareQueryException {
+	public void testValidateProjectData() throws MiddlewareException {
 		String studyName = "validateProjectData_" + new Random().nextInt(10000);
 		int trialNo = 1;
 		Workbook workbook = WorkbookTest.getTestWorkbookForWizard(studyName, trialNo);

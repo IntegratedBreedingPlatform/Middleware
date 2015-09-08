@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.UUID;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -39,7 +40,9 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class OntologyDataManagerImplTest extends IntegrationTestBase {
+public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase {
+
+	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
 
 	@Autowired
 	private OntologyDataManager ontologyDataManager;
@@ -53,7 +56,8 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetStandardVariable() throws Exception {
-		StandardVariable stdVar = this.ontologyDataManager.getStandardVariable(OntologyDataManagerImplTestConstants.STD_VARIABLE_ID);
+		StandardVariable stdVar =
+				this.ontologyDataManager.getStandardVariable(OntologyDataManagerImplTestConstants.STD_VARIABLE_ID, PROGRAM_UUID);
 		Assert.assertNotNull(stdVar);
 		Debug.println(IntegrationTestBase.INDENT, "testGetStandardVariable(): " + stdVar);
 	}
@@ -61,7 +65,7 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void getStandVariableList() throws MiddlewareQueryException {
 		List<Integer> ids = Arrays.asList(new Integer[] {1, 2, 3, 4, 5});
-		List<StandardVariable> standardVariables = this.ontologyDataManager.getStandardVariables(ids);
+		List<StandardVariable> standardVariables = this.ontologyDataManager.getStandardVariables(ids, null);
 		Assert.assertNotNull(standardVariables);
 		Assert.assertTrue(standardVariables.size() > 0);
 		for (StandardVariable standardVariable : standardVariables) {
@@ -91,7 +95,8 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertNotNull(summary);
 
 		// Load details using the ususal method
-		StandardVariable details = this.ontologyDataManager.getStandardVariable(OntologyDataManagerImplTestConstants.PLANT_HEIGHT_ID);
+		StandardVariable details =
+				this.ontologyDataManager.getStandardVariable(OntologyDataManagerImplTestConstants.PLANT_HEIGHT_ID, PROGRAM_UUID);
 		Assert.assertNotNull(details);
 
 		// Make sure that the summary data loaded from view based method matches
@@ -115,12 +120,11 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 
 		myOwnPlantHeight.setIsA(new Term(OntologyDataManagerImplTestConstants.OBJECT_ID, "Agronomic", "Agronomic"));
 		myOwnPlantHeight.setDataType(new Term(1110, "Numeric variable", "Variable with numeric values either continuous or integer"));
-		myOwnPlantHeight.setStoredIn(new Term(1043, "Observation variate", "Phenotypic data stored in phenotype.value"));
 
-		this.ontologyDataManager.addStandardVariable(myOwnPlantHeight);
+		this.ontologyDataManager.addStandardVariable(myOwnPlantHeight, PROGRAM_UUID);
 
 		// Load details using existing method
-		StandardVariable details = this.ontologyDataManager.getStandardVariable(myOwnPlantHeight.getId());
+		StandardVariable details = this.ontologyDataManager.getStandardVariable(myOwnPlantHeight.getId(), PROGRAM_UUID);
 		Assert.assertNotNull(details);
 
 		// Load summary from the view based method
@@ -145,7 +149,6 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		this.assertTermDataMatches(details.getScale(), summary.getScale());
 		this.assertTermDataMatches(details.getIsA(), summary.getIsA());
 		this.assertTermDataMatches(details.getDataType(), summary.getDataType());
-		this.assertTermDataMatches(details.getStoredIn(), summary.getStoredIn());
 
 		Assert.assertEquals(details.getPhenotypicType(), summary.getPhenotypicType());
 	}
@@ -158,7 +161,8 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCopyStandardVariable() throws Exception {
-		StandardVariable stdVar = this.ontologyDataManager.getStandardVariable(OntologyDataManagerImplTestConstants.STD_VARIABLE_ID);
+		StandardVariable stdVar =
+				this.ontologyDataManager.getStandardVariable(OntologyDataManagerImplTestConstants.STD_VARIABLE_ID, PROGRAM_UUID);
 		StandardVariable stdVar2 = stdVar.copy();
 
 		Assert.assertNotSame(stdVar.getId(), stdVar2.getId());
@@ -166,7 +170,6 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertSame(stdVar.getScale(), stdVar2.getScale());
 		Assert.assertSame(stdVar.getMethod(), stdVar2.getMethod());
 		Assert.assertSame(stdVar.getDataType(), stdVar2.getDataType());
-		Assert.assertSame(stdVar.getStoredIn(), stdVar2.getStoredIn());
 		Assert.assertSame(stdVar.getPhenotypicType(), stdVar2.getPhenotypicType());
 		Assert.assertSame(stdVar.getConstraints(), stdVar2.getConstraints());
 		if (stdVar.getName() != null) {
@@ -184,14 +187,14 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 	public void testStandardVariableCache() throws Exception {
 		Debug.println(IntegrationTestBase.INDENT, "testStandardVariableCache(): ");
 		// First call to getStandardVariable() will put the value to the cache
-		this.ontologyDataManager.getStandardVariable(OntologyDataManagerImplTestConstants.STD_VARIABLE_ID);
+		this.ontologyDataManager.getStandardVariable(OntologyDataManagerImplTestConstants.STD_VARIABLE_ID, PROGRAM_UUID);
 		// Second (and subsequent) calls will retrieve the value from the cache
-		this.ontologyDataManager.getStandardVariable(OntologyDataManagerImplTestConstants.STD_VARIABLE_ID);
+		this.ontologyDataManager.getStandardVariable(OntologyDataManagerImplTestConstants.STD_VARIABLE_ID, PROGRAM_UUID);
 	}
 
 	@Test
 	public void testNameSynonyms() throws Exception {
-		StandardVariable sv = this.ontologyDataManager.getStandardVariable(8383);
+		StandardVariable sv = this.ontologyDataManager.getStandardVariable(8383, PROGRAM_UUID);
 		sv.print(IntegrationTestBase.INDENT);
 	}
 
@@ -208,7 +211,6 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		stdVariable.setProperty(this.ontologyDataManager.findTermByName(propertyName, CvId.PROPERTIES));
 		stdVariable.setMethod(new Term(4030, "Assigned", "Term, name or id assigned"));
 		stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
-		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
 		stdVariable.setIsA(new Term(1050, "Study condition", "Study condition class"));
 		stdVariable.setEnumerations(new ArrayList<Enumeration>());
@@ -219,7 +221,7 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		stdVariable.setCropOntologyId("CROP-TEST");
 
 		try {
-			this.ontologyDataManager.addStandardVariable(stdVariable);
+			this.ontologyDataManager.addStandardVariable(stdVariable, PROGRAM_UUID);
 		} catch (MiddlewareQueryException e) {
 			if (e.getMessage().contains("already exists")) {
 				// Ignore. The test run successfully before.
@@ -263,7 +265,6 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		stdVariable.setScale(scale);
 		stdVariable.setMethod(method);
 
-		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
 		// added as this is required
 		stdVariable.setIsA(new Term(1050, "Study condition", "Study condition class"));
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
@@ -273,7 +274,7 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
 		stdVariable.setConstraints(new VariableConstraints(100.0, 999.0));
 
-		this.ontologyDataManager.addStandardVariable(stdVariable);
+		this.ontologyDataManager.addStandardVariable(stdVariable, PROGRAM_UUID);
 
 		Debug.println(IntegrationTestBase.INDENT, "Standard variable saved: " + stdVariable.getId());
 	}
@@ -283,13 +284,13 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		int standardVariableId = OntologyDataManagerImplTestConstants.CATEGORICAL_VARIABLE_TERM_ID;
 		String name = "Name_" + new Random().nextInt(10000);
 		String description = "Test Valid Value" + new Random().nextInt(10000);
-		StandardVariable standardVariable = this.ontologyDataManager.getStandardVariable(standardVariableId);
+		StandardVariable standardVariable = this.ontologyDataManager.getStandardVariable(standardVariableId, PROGRAM_UUID);
 		Enumeration validValue = new Enumeration(null, name, description, 1);
 
 		Debug.printObject(IntegrationTestBase.INDENT, standardVariable);
 		this.ontologyDataManager.saveOrUpdateStandardVariableEnumeration(standardVariable, validValue);
 		Debug.printObject(IntegrationTestBase.INDENT, validValue);
-		standardVariable = this.ontologyDataManager.getStandardVariable(standardVariableId);
+		standardVariable = this.ontologyDataManager.getStandardVariable(standardVariableId, PROGRAM_UUID);
 		Debug.printObject(IntegrationTestBase.INDENT, standardVariable);
 		Assert.assertNotNull(standardVariable.getEnumeration(validValue.getId()));
 
@@ -309,15 +310,15 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		int standardVariableId = OntologyDataManagerImplTestConstants.CATEGORICAL_VARIABLE_TERM_ID;
 		String name = "Name_" + new Random().nextInt(10000);
 		String description = "Test Valid Value" + new Random().nextInt(10000);
-		StandardVariable standardVariable = this.ontologyDataManager.getStandardVariable(standardVariableId);
+		StandardVariable standardVariable = this.ontologyDataManager.getStandardVariable(standardVariableId, PROGRAM_UUID);
 		Enumeration validValue = new Enumeration(null, name, description, standardVariable.getEnumerations().size() + 1);
 
 		Debug.printObject(IntegrationTestBase.INDENT, standardVariable);
 		this.ontologyDataManager.saveOrUpdateStandardVariableEnumeration(standardVariable, validValue);
-		standardVariable = this.ontologyDataManager.getStandardVariable(standardVariableId);
+		standardVariable = this.ontologyDataManager.getStandardVariable(standardVariableId, PROGRAM_UUID);
 		Integer validValueGeneratedId1 = standardVariable.getEnumerationByName(name).getId();
 		Debug.printObject(IntegrationTestBase.INDENT, validValue);
-		standardVariable = this.ontologyDataManager.getStandardVariable(standardVariableId);
+		standardVariable = this.ontologyDataManager.getStandardVariable(standardVariableId, PROGRAM_UUID);
 		Debug.printObject(IntegrationTestBase.INDENT, standardVariable);
 		Assert.assertNotNull(standardVariable.getEnumeration(validValue.getId()));
 
@@ -340,7 +341,7 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		this.ontologyDataManager.saveOrUpdateStandardVariableEnumeration(standardVariable, validValue);
 
 		Debug.printObject(IntegrationTestBase.INDENT, validValue);
-		standardVariable = this.ontologyDataManager.getStandardVariable(standardVariableId);
+		standardVariable = this.ontologyDataManager.getStandardVariable(standardVariableId, PROGRAM_UUID);
 		Debug.printObject(IntegrationTestBase.INDENT, standardVariable);
 		Assert.assertNotNull(standardVariable.getEnumeration(validValue.getId()));
 
@@ -350,7 +351,7 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		this.ontologyDataManager.saveOrUpdateStandardVariableEnumeration(standardVariable, validValue);
 
 		Debug.printObject(IntegrationTestBase.INDENT, validValue);
-		standardVariable = this.ontologyDataManager.getStandardVariable(standardVariableId);
+		standardVariable = this.ontologyDataManager.getStandardVariable(standardVariableId, PROGRAM_UUID);
 		Debug.printObject(IntegrationTestBase.INDENT, standardVariable);
 		Assert.assertTrue(standardVariable.getEnumeration(validValue.getId()).getDescription().equals(description));
 
@@ -374,7 +375,7 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 	/*
 	 * @Test public void testGetStandardVariableIdByPropertyScaleMethod() throws Exception { Integer propertyId = Integer.valueOf(2010);
 	 * Integer scaleId = Integer.valueOf(6000); Integer methodId = Integer.valueOf(4030);
-	 *
+	 * 
 	 * Integer varid = manager.getStandardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId); assertNotNull (varid);
 	 * Debug.println(INDENT, "testGetStandadardVariableIdByPropertyScaleMethod() Results: " + varid); }
 	 */
@@ -397,7 +398,7 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 			headers.add(baseVariableName + i);
 		}
 
-		Map<String, List<StandardVariable>> results = this.ontologyDataManager.getStandardVariablesInProjects(headers);
+		Map<String, List<StandardVariable>> results = this.ontologyDataManager.getStandardVariablesInProjects(headers, PROGRAM_UUID);
 
 		Assert.assertNotNull("Application is unable to return non empty output even on non present variables", results);
 		Assert.assertTrue("Application is unable to return non empty output even on non present variables", results.size() == testItemCount);
@@ -425,7 +426,7 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetStandardVariablesInProjectsKnownHeaders() throws Exception {
 		List<String> headers = Arrays.asList(OntologyDataManagerImplTestConstants.COMMON_HEADERS);
 
-		Map<String, List<StandardVariable>> results = this.ontologyDataManager.getStandardVariablesInProjects(headers);
+		Map<String, List<StandardVariable>> results = this.ontologyDataManager.getStandardVariablesInProjects(headers, PROGRAM_UUID);
 
 		for (Map.Entry<String, List<StandardVariable>> entry : results.entrySet()) {
 			List<StandardVariable> variableList = entry.getValue();
@@ -445,11 +446,11 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetStandardVariablesForNewlyCreatedEntries() throws Exception {
 		// set up and create a new standard variable for this test
 		StandardVariable dummyVariable = this.constructDummyStandardVariable();
-		this.ontologyDataManager.addStandardVariable(dummyVariable);
+		this.ontologyDataManager.addStandardVariable(dummyVariable, PROGRAM_UUID);
 
 		List<String> headers = Arrays.asList(dummyVariable.getName());
 
-		Map<String, List<StandardVariable>> results = this.ontologyDataManager.getStandardVariablesInProjects(headers);
+		Map<String, List<StandardVariable>> results = this.ontologyDataManager.getStandardVariablesInProjects(headers, PROGRAM_UUID);
 
 		try {
 
@@ -488,9 +489,6 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		Term methodTerm = this.ontologyDataManager.findTermByName("Counting", CvId.METHODS);
 		standardVariable.setMethod(methodTerm);
 
-		Term storedInTerm = this.ontologyDataManager.getTermById(TermId.OBSERVATION_VARIATE.getId());
-		standardVariable.setStoredIn(storedInTerm);
-
 		Term dataType = this.ontologyDataManager.getTermById(TermId.NUMERIC_VARIABLE.getId());
 		standardVariable.setDataType(dataType);
 
@@ -503,19 +501,21 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 	public void testFindStandardVariablesByNameOrSynonym() throws Exception {
 		Debug.println(IntegrationTestBase.INDENT, "Test FindStandardVariablesByNameOrSynonym");
 		Set<StandardVariable> standardVariables =
-				this.ontologyDataManager.findStandardVariablesByNameOrSynonym(OntologyDataManagerImplTestConstants.TERM_NAME_NOT_EXISTING);
+				this.ontologyDataManager.findStandardVariablesByNameOrSynonym(OntologyDataManagerImplTestConstants.TERM_NAME_NOT_EXISTING,
+						PROGRAM_UUID);
 		Assert.assertSame(standardVariables.size(), 0);
 
 		standardVariables =
-				this.ontologyDataManager
-				.findStandardVariablesByNameOrSynonym(OntologyDataManagerImplTestConstants.TERM_NAME_IS_IN_SYNONYMS);
+				this.ontologyDataManager.findStandardVariablesByNameOrSynonym(
+						OntologyDataManagerImplTestConstants.TERM_NAME_IS_IN_SYNONYMS, PROGRAM_UUID);
 		Assert.assertSame(standardVariables.size(), 1);
 		for (StandardVariable stdVar : standardVariables) {
 			stdVar.print(IntegrationTestBase.INDENT);
 		}
 
 		standardVariables =
-				this.ontologyDataManager.findStandardVariablesByNameOrSynonym(OntologyDataManagerImplTestConstants.TERM_SYNONYM);
+				this.ontologyDataManager.findStandardVariablesByNameOrSynonym(OntologyDataManagerImplTestConstants.TERM_SYNONYM,
+						PROGRAM_UUID);
 		Assert.assertSame(standardVariables.size(), 1);
 		for (StandardVariable stdVar : standardVariables) {
 			stdVar.print(IntegrationTestBase.INDENT);
@@ -526,8 +526,8 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 	public void testFindStandardVariablesByNameOrSynonymWithProperties() throws Exception {
 		Debug.println(IntegrationTestBase.INDENT, "Test getTraitDetailsByTAbbr");
 		Set<StandardVariable> standardVariables =
-				this.ontologyDataManager
-				.findStandardVariablesByNameOrSynonym(OntologyDataManagerImplTestConstants.TERM_NAME_IS_IN_SYNONYMS);
+				this.ontologyDataManager.findStandardVariablesByNameOrSynonym(
+						OntologyDataManagerImplTestConstants.TERM_NAME_IS_IN_SYNONYMS, PROGRAM_UUID);
 		Assert.assertSame(standardVariables.size(), 1);
 		for (StandardVariable stdVar : standardVariables) {
 			stdVar.print(IntegrationTestBase.INDENT);
@@ -585,7 +585,8 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testFindStandardVariableByTraitScaleMethodNames() throws Exception {
-		StandardVariable stdVar = this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames("Cooperator", "DBCV", "Assigned");
+		StandardVariable stdVar =
+				this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames("Cooperator", "DBCV", "Assigned", PROGRAM_UUID);
 		Debug.println(IntegrationTestBase.INDENT, "testFindStandardVariableByTraitScaleMethodNames(): " + stdVar);
 	}
 
@@ -621,7 +622,8 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetMethodsForTrait() throws Exception {
-		StandardVariable stdVar = this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames("User", "DBCV", "Assigned");
+		StandardVariable stdVar =
+				this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames("User", "DBCV", "Assigned", PROGRAM_UUID);
 		List<Term> terms = this.ontologyDataManager.getMethodsForTrait(stdVar.getProperty().getId());
 		Debug.println(IntegrationTestBase.INDENT, "Size: " + terms.size());
 		Assert.assertNotNull(terms);
@@ -635,7 +637,9 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertTrue(hasAssigned);// should return Assigned
 
 		// 2nd test
-		stdVar = this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames("Germplasm entry", "Number", "Enumerated");
+		stdVar =
+				this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames("Germplasm entry", "Number", "Enumerated",
+						PROGRAM_UUID);
 		terms = this.ontologyDataManager.getMethodsForTrait(stdVar.getProperty().getId());
 		Debug.println(IntegrationTestBase.INDENT, "Size: " + terms.size());
 		Assert.assertNotNull(terms);
@@ -651,7 +655,8 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetScalesForTrait() throws Exception {
-		StandardVariable stdVar = this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames("User", "DBCV", "Assigned");
+		StandardVariable stdVar =
+				this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames("User", "DBCV", "Assigned", PROGRAM_UUID);
 		List<Term> terms = this.ontologyDataManager.getScalesForTrait(stdVar.getProperty().getId());
 		Debug.println(IntegrationTestBase.INDENT, "Size: " + terms.size());
 		Assert.assertNotNull(terms);
@@ -665,7 +670,9 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertTrue(hasDBCV);// should return DBCV
 
 		// 2nd test
-		stdVar = this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames("Germplasm entry", "Number", "Enumerated");
+		stdVar =
+				this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames("Germplasm entry", "Number", "Enumerated",
+						PROGRAM_UUID);
 		terms = this.ontologyDataManager.getScalesForTrait(stdVar.getProperty().getId());
 		Debug.println(IntegrationTestBase.INDENT, "Size: " + terms.size());
 		Assert.assertNotNull(terms);
@@ -734,7 +741,7 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		Integer numOfRows = 100;
 
 		Map<String, StandardVariable> standardVariables =
-				this.ontologyDataManager.getStandardVariablesForPhenotypicType(phenotypicType, start, numOfRows);
+				this.ontologyDataManager.getStandardVariablesForPhenotypicType(phenotypicType, PROGRAM_UUID, start, numOfRows);
 
 		for (Object key : standardVariables.keySet()) {
 			Debug.println(key + " : " + standardVariables.get(key).getId() + " : " + standardVariables.get(key).toString());
@@ -748,7 +755,7 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		List<String> headers =
 				Arrays.asList("ENTRY", "ENTRYNO", "PLOT", "TRIAL_NO", "TRIAL", "STUDY", "DATASET", "LOC", "LOCN", "NURSER", "Plot Number");
 
-		Map<String, List<StandardVariable>> results = this.ontologyDataManager.getStandardVariablesInProjects(headers);
+		Map<String, List<StandardVariable>> results = this.ontologyDataManager.getStandardVariablesInProjects(headers, PROGRAM_UUID);
 
 		Debug.println(IntegrationTestBase.INDENT, "testGetStandardVariablesInProjects(headers=" + headers + ") RESULTS:");
 		for (String name : headers) {
@@ -769,7 +776,7 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		// term doesn't exist
 		List<Term> terms =
 				this.ontologyDataManager
-						.findTermsByNameOrSynonym(OntologyDataManagerImplTestConstants.TERM_NAME_NOT_EXISTING, CvId.METHODS);
+				.findTermsByNameOrSynonym(OntologyDataManagerImplTestConstants.TERM_NAME_NOT_EXISTING, CvId.METHODS);
 		Assert.assertSame(terms.size(), 0);
 
 		// term exist but isn't a method
@@ -849,7 +856,7 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	@Ignore(value = "Skipping this test. It takes minute+ to run and does not have any assertions anyway. Needs revising.")
 	public void testGetAllStandardVariable() throws Exception {
-		Set<StandardVariable> standardVariables = this.ontologyDataManager.getAllStandardVariables();
+		Set<StandardVariable> standardVariables = this.ontologyDataManager.getAllStandardVariables(PROGRAM_UUID);
 		for (StandardVariable stdVar : standardVariables) {
 			stdVar.print(IntegrationTestBase.INDENT);
 		}
@@ -861,12 +868,12 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetStandardVariablesByTraitClass() throws MiddlewareQueryException {
 		List<StandardVariable> vars =
 				this.ontologyDataManager.getStandardVariables(OntologyDataManagerImplTestConstants.NONEXISTING_TERM_TRAIT_CLASS_ID, null,
-						null, null);
+						null, null, PROGRAM_UUID);
 		Assert.assertTrue(vars.isEmpty());
 
 		vars =
 				this.ontologyDataManager.getStandardVariables(OntologyDataManagerImplTestConstants.EXPECTED_TERM_TRAIT_CLASS_ID, null,
-						null, null);
+						null, null, PROGRAM_UUID);
 		Assert.assertFalse(vars.isEmpty());
 
 		for (StandardVariable var : vars) {
@@ -878,13 +885,13 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetStandardVariablesByProperty() throws MiddlewareQueryException {
 		List<StandardVariable> vars =
 				this.ontologyDataManager.getStandardVariables(null, OntologyDataManagerImplTestConstants.NONEXISTING_TERM_PROPERTY_ID,
-						null, null);
+						null, null, PROGRAM_UUID);
 
 		Assert.assertTrue(vars.isEmpty());
 
 		vars =
 				this.ontologyDataManager.getStandardVariables(null, OntologyDataManagerImplTestConstants.EXPECTED_TERM_PROPERTY_ID, null,
-						null);
+						null, PROGRAM_UUID);
 		Assert.assertFalse(vars.isEmpty());
 
 		for (StandardVariable var : vars) {
@@ -896,12 +903,12 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetStandardVariablesByMethod() throws MiddlewareQueryException {
 		List<StandardVariable> vars =
 				this.ontologyDataManager.getStandardVariables(null, null, OntologyDataManagerImplTestConstants.NONEXISTING_TERM_METHOD_ID,
-						null);
+						null, PROGRAM_UUID);
 		Assert.assertTrue(vars.isEmpty());
 
 		vars =
 				this.ontologyDataManager.getStandardVariables(null, null, OntologyDataManagerImplTestConstants.EXPECTED_TERM_METHOD_ID,
-						null);
+						null, PROGRAM_UUID);
 		Assert.assertFalse(vars.isEmpty());
 
 		for (StandardVariable var : vars) {
@@ -913,10 +920,12 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetStandardVariablesByScale() throws MiddlewareQueryException {
 		List<StandardVariable> vars =
 				this.ontologyDataManager.getStandardVariables(null, null, null,
-						OntologyDataManagerImplTestConstants.NONEXISTING_TERM_SCALE_ID);
+						OntologyDataManagerImplTestConstants.NONEXISTING_TERM_SCALE_ID, PROGRAM_UUID);
 		Assert.assertTrue(vars.isEmpty());
 
-		vars = this.ontologyDataManager.getStandardVariables(null, null, null, OntologyDataManagerImplTestConstants.EXPECTED_TERM_SCALE_ID);
+		vars =
+				this.ontologyDataManager.getStandardVariables(null, null, null,
+						OntologyDataManagerImplTestConstants.EXPECTED_TERM_SCALE_ID, PROGRAM_UUID);
 		Assert.assertFalse(vars.isEmpty());
 
 		for (StandardVariable var : vars) {
@@ -1006,7 +1015,6 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		stdVariable.setProperty(this.ontologyDataManager.findTermByName(propertyName, CvId.PROPERTIES));
 		stdVariable.setMethod(new Term(4030, "Assigned", "Term, name or id assigned"));
 		stdVariable.setScale(new Term(6000, "DBCV", "Controlled vocabulary from a database"));
-		stdVariable.setStoredIn(new Term(1010, "Study information", "Study element"));
 		stdVariable.setDataType(new Term(1120, "Character variable", "variable with char values"));
 		stdVariable.setIsA(new Term(1050, "Study condition", "Study condition class"));
 		stdVariable.setEnumerations(new ArrayList<Enumeration>());
@@ -1016,7 +1024,7 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 		stdVariable.setConstraints(new VariableConstraints(100.0, 999.0));
 		stdVariable.setCropOntologyId("CROP-TEST");
 
-		this.ontologyDataManager.addStandardVariable(stdVariable);
+		this.ontologyDataManager.addStandardVariable(stdVariable, PROGRAM_UUID);
 
 		Integer stdVariableId =
 				this.ontologyDataManager.getStandardVariableIdByTermId(stdVariable.getProperty().getId(), TermId.HAS_PROPERTY);
@@ -1119,9 +1127,8 @@ public class OntologyDataManagerImplTest extends IntegrationTestBase {
 
 		myOwnPlantHeight.setIsA(new Term(OntologyDataManagerImplTestConstants.OBJECT_ID, "Agronomic", "Agronomic"));
 		myOwnPlantHeight.setDataType(new Term(1110, "Numeric variable", "Variable with numeric values either continuous or integer"));
-		myOwnPlantHeight.setStoredIn(new Term(1043, "Observation variate", "Phenotypic data stored in phenotype.value"));
 
-		this.ontologyDataManager.addStandardVariable(myOwnPlantHeight);
+		this.ontologyDataManager.addStandardVariable(myOwnPlantHeight, PROGRAM_UUID);
 		// Check that variable got created
 		Assert.assertNotNull(myOwnPlantHeight.getId());
 

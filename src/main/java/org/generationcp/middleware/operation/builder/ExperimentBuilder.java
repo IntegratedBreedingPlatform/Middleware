@@ -17,11 +17,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -37,7 +38,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 
 public class ExperimentBuilder extends Builder {
-
+	
 	public ExperimentBuilder(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
@@ -152,23 +153,26 @@ public class ExperimentBuilder extends Builder {
 		this.getExperimentDao().refresh(experiment);
 		if (experiment.getPhenotypes() != null) {
 			for (Phenotype phenotype : experiment.getPhenotypes()) {
-				VariableType variableType = variableTypes.findById(phenotype.getObservableId());
+				DMSVariableType variableType = variableTypes.findById(phenotype.getObservableId());
 				// TODO: trial constants are currently being saved in the measurement effect dataset
 				// added this validation for now, to handle the said scenario, otherwise, and NPE is thrown
 				// in the future, trial constant will no longer be saved at the measurements level
 				if (variableType != null) {
-					if (variableType.getStandardVariable().getStoredIn().getId() == TermId.CATEGORICAL_VARIATE.getId()
-							&& variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
-						Variable var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId());
+					Variable var =  null;
+					if (variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+						var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getcValueId());						
 						if (phenotype.getcValueId() == null && phenotype.getValue() != null) {
 							var.setValue(phenotype.getValue());
 							var.setCustomValue(true);
 						}
+						
 						variates.add(var);
 					} else {
-						variates.add(new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getValue()));
-
+						var = new Variable(phenotype.getPhenotypeId(), variableType, phenotype.getValue());
+						variates.add(var);
 					}
+					var.getVariableType().setRole(PhenotypicType.VARIATE);
+					var.getVariableType().getStandardVariable().setPhenotypicType(PhenotypicType.VARIATE);
 				}
 			}
 		}
@@ -197,56 +201,39 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	private void addLocationFactors(ExperimentModel experimentModel, VariableList factors, VariableTypeList variableTypes) {
-		for (VariableType variableType : variableTypes.getVariableTypes()) {
-			if (this.isLocationFactor(variableType)) {
-				factors.add(this.createLocationFactor(experimentModel.getGeoLocation(), variableType));
-			}
+		for (DMSVariableType variableType : variableTypes.getVariableTypes()) {
+			
+				Variable variable = this.createLocationFactor(experimentModel.getGeoLocation(), variableType);
+				if(variable != null){
+					variable.getVariableType().setRole(PhenotypicType.TRIAL_ENVIRONMENT);
+					variable.getVariableType().getStandardVariable().setPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
+					factors.add(variable);
+				}
+			
 		}
 	}
 
-	private boolean isLocationFactor(VariableType variableType) {
+	protected Variable createLocationFactor(Geolocation geoLocation, DMSVariableType variableType) {
 		StandardVariable standardVariable = variableType.getStandardVariable();
-		if (standardVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
-			return true;
-		}
-		if (standardVariable.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
-			return true;
-		}
-		if (standardVariable.getStoredIn().getId() == TermId.LATITUDE_STORAGE.getId()) {
-			return true;
-		}
-		if (standardVariable.getStoredIn().getId() == TermId.LONGITUDE_STORAGE.getId()) {
-			return true;
-		}
-		if (standardVariable.getStoredIn().getId() == TermId.DATUM_STORAGE.getId()) {
-			return true;
-		}
-		if (standardVariable.getStoredIn().getId() == TermId.ALTITUDE_STORAGE.getId()) {
-			return true;
-		}
-
-		return false;
-	}
-
-	private Variable createLocationFactor(Geolocation geoLocation, VariableType variableType) {
-		StandardVariable standardVariable = variableType.getStandardVariable();
-		if (standardVariable.getStoredIn().getId() == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
-			return new Variable(variableType, this.findLocationValue(variableType.getId(), geoLocation.getProperties()));
-		}
-		if (standardVariable.getStoredIn().getId() == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
+		
+		if (standardVariable.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 			return new Variable(variableType, geoLocation.getDescription());
 		}
-		if (standardVariable.getStoredIn().getId() == TermId.LATITUDE_STORAGE.getId()) {
+		if (standardVariable.getId() == TermId.LATITUDE.getId()) {
 			return new Variable(variableType, geoLocation.getLatitude());
 		}
-		if (standardVariable.getStoredIn().getId() == TermId.LONGITUDE_STORAGE.getId()) {
+		if (standardVariable.getId() == TermId.LONGITUDE.getId()) {
 			return new Variable(variableType, geoLocation.getLongitude());
 		}
-		if (standardVariable.getStoredIn().getId() == TermId.DATUM_STORAGE.getId()) {
+		if (standardVariable.getId() == TermId.GEODETIC_DATUM.getId()) {
 			return new Variable(variableType, geoLocation.getGeodeticDatum());
 		}
-		if (standardVariable.getStoredIn().getId() == TermId.ALTITUDE_STORAGE.getId()) {
+		if (standardVariable.getId() == TermId.ALTITUDE.getId()) {
 			return new Variable(variableType, geoLocation.getAltitude());
+		}
+		String locVal = this.findLocationValue(variableType.getId(), geoLocation.getProperties());
+		if (locVal != null) {
+			return new Variable(variableType, locVal);
 		}
 		return null;
 	}
@@ -285,51 +272,35 @@ public class ExperimentBuilder extends Builder {
 				stockModel = this.getStockBuilder().get(experimentStocks.get(0).getStock().getStockId());
 			}
 
-			for (VariableType variableType : variableTypes.getVariableTypes()) {
-				if (this.isGermplasmFactor(variableType)) {
-					factors.add(this.createGermplasmFactor(stockModel, variableType));
-				}
+			for (DMSVariableType variableType : variableTypes.getVariableTypes()) {
+				Variable var = this.createGermplasmFactor(stockModel, variableType);
+				if(var != null){
+					factors.add(var);
+				}				
 			}
 		}
 	}
 
-	private boolean isGermplasmFactor(VariableType variableType) {
+	private Variable createGermplasmFactor(StockModel stockModel, DMSVariableType variableType) {
 		StandardVariable standardVariable = variableType.getStandardVariable();
-		if (standardVariable.getStoredIn().getId() == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
-			return true;
-		}
-		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
-			return true;
-		}
-		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_GID_STORAGE.getId()) {
-			return true;
-		}
-		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_DESIGNATION_STORAGE.getId()) {
-			return true;
-		}
-		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_CODE_STORAGE.getId()) {
-			return true;
-		}
-		return false;
-	}
-
-	private Variable createGermplasmFactor(StockModel stockModel, VariableType variableType) {
-		StandardVariable standardVariable = variableType.getStandardVariable();
-		if (standardVariable.getStoredIn().getId() == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
-			return new Variable(variableType, this.findStockValue(variableType.getId(), stockModel.getProperties()));
-		}
-		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_NUMBER_STORAGE.getId()) {
+		
+		if (standardVariable.getId() == TermId.ENTRY_NO.getId()) {
 			return new Variable(variableType, stockModel.getUniqueName());
 		}
-		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_GID_STORAGE.getId()) {
+		if (standardVariable.getId() == TermId.GID.getId()) {
 			return new Variable(variableType, stockModel.getDbxrefId());
 		}
-		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_DESIGNATION_STORAGE.getId()) {
+		if (standardVariable.getId() == TermId.DESIG.getId()) {
 			return new Variable(variableType, stockModel.getName());
 		}
-		if (standardVariable.getStoredIn().getId() == TermId.ENTRY_CODE_STORAGE.getId()) {
+		if (standardVariable.getId() == TermId.ENTRY_CODE.getId()) {
 			return new Variable(variableType, stockModel.getValue());
 		}
+		String val = this.findStockValue(variableType.getId(), stockModel.getProperties());
+		if (val != null) {
+			return new Variable(variableType, val);
+		}
+		
 		return null;
 	}
 
@@ -348,7 +319,7 @@ public class ExperimentBuilder extends Builder {
 			throws MiddlewareQueryException {
 		if (experimentModel.getProperties() != null) {
 			for (ExperimentProperty property : experimentModel.getProperties()) {
-				variables.add(this.createVariable(property, variableTypes));
+				variables.add(this.createVariable(property, variableTypes, PhenotypicType.TRIAL_DESIGN));
 			}
 		}
 	}
@@ -357,7 +328,7 @@ public class ExperimentBuilder extends Builder {
 			boolean hasVariableType) throws MiddlewareQueryException {
 		if (experimentModel.getProperties() != null) {
 			for (ExperimentProperty property : experimentModel.getProperties()) {
-				Variable var = this.createVariable(property, variableTypes, hasVariableType);
+				Variable var = this.createVariable(property, variableTypes, hasVariableType, PhenotypicType.TRIAL_DESIGN);
 				if (var.getVariableType() != null) {
 					variables.add(var);
 				}
@@ -365,18 +336,21 @@ public class ExperimentBuilder extends Builder {
 		}
 	}
 
-	private Variable createVariable(ExperimentProperty property, VariableTypeList variableTypes) throws MiddlewareQueryException {
+	protected Variable createVariable(ExperimentProperty property, VariableTypeList variableTypes, PhenotypicType role) throws MiddlewareQueryException {
 		Variable variable = new Variable();
 		variable.setVariableType(variableTypes.findById(property.getTypeId()));
 		variable.setValue(property.getValue());
+		variable.getVariableType().setRole(role);
+		variable.getVariableType().getStandardVariable().setPhenotypicType(role);
 		return variable;
 	}
 
-	private Variable createVariable(ExperimentProperty property, VariableTypeList variableTypes, boolean hasVariableType)
+	protected Variable createVariable(ExperimentProperty property, VariableTypeList variableTypes, boolean hasVariableType, PhenotypicType role)
 			throws MiddlewareQueryException {
 		Variable variable = new Variable();
 		variable.setVariableType(variableTypes.findById(property.getTypeId()), hasVariableType);
 		variable.setValue(property.getValue());
+		variable.getVariableType().setRole(role);
 		return variable;
 	}
 

@@ -18,27 +18,28 @@ public class TraitDto {
 	}
 
 	public Integer getTraitId() {
-		return traitId;
+		return this.traitId;
 	}
 
 	public String getTraitName() {
-		return traitName;
+		return this.traitName;
 	}
 
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof TraitDto))
+		if (!(other instanceof TraitDto)) {
 			return false;
+		}
 		TraitDto castOther = (TraitDto) other;
-		return new EqualsBuilder().append(traitId, castOther.traitId).append(traitName, castOther.traitName).isEquals();
+		return new EqualsBuilder().append(this.traitId, castOther.traitId).append(this.traitName, castOther.traitName).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		if (hashCode == 0) {
-			hashCode = new HashCodeBuilder().append(traitId).append(traitName).toHashCode();
+		if (this.hashCode == 0) {
+			this.hashCode = new HashCodeBuilder().append(this.traitId).append(this.traitName).toHashCode();
 		}
-		return hashCode;
+		return this.hashCode;
 	}
 
 }

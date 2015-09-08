@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Study;
@@ -26,10 +27,10 @@ import org.generationcp.middleware.domain.dms.TrialEnvironmentProperty;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -42,7 +43,7 @@ public class TrialEnvironmentBuilder extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public TrialEnvironments getTrialEnvironmentsInDataset(int studyId, int datasetId) throws MiddlewareQueryException {
+	public TrialEnvironments getTrialEnvironmentsInDataset(int studyId, int datasetId) throws MiddlewareException {
 		DmsProject project = this.getDataSetBuilder().getTrialDataset(studyId);
 		DataSet dataSet = this.getDataSetBuilder().build(project.getProjectId());
 		Study study = this.getStudyBuilder().createStudy(dataSet.getStudyId());
@@ -69,7 +70,7 @@ public class TrialEnvironmentBuilder extends Builder {
 		TrialEnvironments trialEnvironments = new TrialEnvironments();
 		for (Geolocation location : locations) {
 			VariableList variables = new VariableList();
-			for (VariableType variableType : trialEnvironmentVariableTypes.getVariableTypes()) {
+			for (DMSVariableType variableType : trialEnvironmentVariableTypes.getVariableTypes()) {
 				Variable variable = new Variable(variableType, this.getValue(location, variableType));
 				variables.add(variable);
 			}
@@ -78,20 +79,20 @@ public class TrialEnvironmentBuilder extends Builder {
 		return trialEnvironments;
 	}
 
-	private String getValue(Geolocation location, VariableType variableType) {
+	private String getValue(Geolocation location, DMSVariableType variableType) {
 		String value = null;
-		int storedInId = variableType.getStandardVariable().getStoredIn().getId();
-		if (storedInId == TermId.TRIAL_INSTANCE_STORAGE.getId()) {
+		int id = variableType.getStandardVariable().getId();
+		if (id == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 			value = location.getDescription();
-		} else if (storedInId == TermId.LATITUDE_STORAGE.getId()) {
+		} else if (id == TermId.LATITUDE.getId()) {
 			value = location.getLatitude() == null ? null : Double.toString(location.getLatitude());
-		} else if (storedInId == TermId.LONGITUDE_STORAGE.getId()) {
+		} else if (id == TermId.LONGITUDE.getId()) {
 			value = location.getLongitude() == null ? null : Double.toString(location.getLongitude());
-		} else if (storedInId == TermId.DATUM_STORAGE.getId()) {
+		} else if (id == TermId.GEODETIC_DATUM.getId()) {
 			value = location.getGeodeticDatum();
-		} else if (storedInId == TermId.ALTITUDE_STORAGE.getId()) {
+		} else if (id == TermId.ALTITUDE.getId()) {
 			value = location.getAltitude() == null ? null : Double.toString(location.getAltitude());
-		} else if (storedInId == TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId()) {
+		} else {
 			value = this.getPropertyValue(variableType.getId(), location.getProperties());
 		}
 		return value;

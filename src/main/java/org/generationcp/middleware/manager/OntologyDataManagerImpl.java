@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -69,13 +69,13 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public StandardVariable getStandardVariable(int stdVariableId) throws MiddlewareQueryException {
-		return this.getStandardVariableBuilder().create(stdVariableId);
+	public StandardVariable getStandardVariable(int stdVariableId, String programUUID) throws MiddlewareException {
+		return this.getStandardVariableBuilder().create(stdVariableId, programUUID);
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds) throws MiddlewareQueryException {
-		return this.getStandardVariableBuilder().create(standardVariableIds);
+	public List<StandardVariable> getStandardVariables(List<Integer> standardVariableIds, String programUUID) throws MiddlewareException {
+		return this.getStandardVariableBuilder().create(standardVariableIds, programUUID);
 	}
 
 	@Override
@@ -89,7 +89,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void addStandardVariable(StandardVariable stdVariable) throws MiddlewareQueryException {
+	public void addStandardVariable(StandardVariable stdVariable, String programUUID) throws MiddlewareQueryException {
 		
 		
 
@@ -131,7 +131,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			}
 
 			if (this.findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(), stdVariable.getScale().getName(),
-					stdVariable.getMethod().getName()) == null) {
+					stdVariable.getMethod().getName(), programUUID) == null) {
 				this.getStandardVariableSaver().save(stdVariable);
 			}
 
@@ -164,7 +164,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public void addStandardVariableForMigrator(StandardVariable stdVariable) throws MiddlewareQueryException {
+	public void addStandardVariableForMigrator(StandardVariable stdVariable, String programUUID) throws MiddlewareQueryException {
 
 		
 		
@@ -212,8 +212,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 				stdVariable.setMethod(method);
 			}
 
-			StandardVariable existingStandardVariable = this.findStandardVariableByTraitScaleMethodNames(
-			stdVariable.getProperty().getName(), stdVariable.getScale().getName(), stdVariable.getMethod().getName());
+			// FIXME: Need to pass through programUUID
+			StandardVariable existingStandardVariable =
+					this.findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(), stdVariable.getScale().getName(),
+							stdVariable.getMethod().getName(), programUUID);
 			if (existingStandardVariable == null) {
 				this.getStandardVariableSaver().save(stdVariable);
 			} else {
@@ -237,17 +239,17 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Set<StandardVariable> findStandardVariablesByNameOrSynonym(String nameOrSynonym) throws MiddlewareQueryException {
+	public Set<StandardVariable> findStandardVariablesByNameOrSynonym(String nameOrSynonym, String programUUID) throws MiddlewareException {
 		Set<StandardVariable> standardVariables = new HashSet<StandardVariable>();
-		standardVariables.addAll(this.getStandardVariablesByNameOrSynonym(nameOrSynonym));
+		standardVariables.addAll(this.getStandardVariablesByNameOrSynonym(nameOrSynonym, programUUID));
 		return standardVariables;
 	}
 
-	private Set<StandardVariable> getStandardVariablesByNameOrSynonym(String nameOrSynonym) throws MiddlewareQueryException {
+	private Set<StandardVariable> getStandardVariablesByNameOrSynonym(String nameOrSynonym, String programUUID) throws MiddlewareException {
 		Set<StandardVariable> standardVariables = new HashSet<StandardVariable>();
 		List<Integer> stdVarIds = this.getCvTermDao().getTermsByNameOrSynonym(nameOrSynonym, CvId.VARIABLES.getId());
 		for (Integer stdVarId : stdVarIds) {
-			standardVariables.add(this.getStandardVariable(stdVarId));
+			standardVariables.add(this.getStandardVariable(stdVarId, programUUID));
 		}
 		return standardVariables;
 	}
@@ -263,14 +265,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Integer getStandardVariableIdByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId)
-			throws MiddlewareQueryException {
-		return this.getStandardVariableBuilder().getIdByPropertyScaleMethod(propertyId, scaleId, methodId);
-	}
-
-	@Override
-	public StandardVariable findStandardVariableByTraitScaleMethodNames(String property, String scale, String method)
-			throws MiddlewareQueryException {
+	public StandardVariable findStandardVariableByTraitScaleMethodNames(String property, String scale, String method, String programUUID)
+			throws MiddlewareException {
 		Term termProperty, termScale, termMethod;
 		Integer propertyId = null, scaleId = null, methodId = null;
 
@@ -290,7 +286,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			methodId = termMethod.getId();
 		}
 
-		return this.getStandardVariableBuilder().getByPropertyScaleMethod(propertyId, scaleId, methodId);
+		return this.getStandardVariableBuilder().getByPropertyScaleMethod(propertyId, scaleId, methodId, programUUID);
 	}
 
 	@Override
@@ -392,8 +388,8 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Map<String, StandardVariable> getStandardVariablesForPhenotypicType(PhenotypicType type, int start, int numOfRows)
-			throws MiddlewareQueryException {
+	public Map<String, StandardVariable> getStandardVariablesForPhenotypicType(PhenotypicType type, String programUUID, int start,
+			int numOfRows) throws MiddlewareException {
 
 		TreeMap<String, StandardVariable> standardVariables = new TreeMap<String, StandardVariable>();
 		List<Integer> localStdVariableIds = new ArrayList<Integer>();
@@ -401,7 +397,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		localStdVariableIds = this.getCvTermDao().getStandardVariableIdsByPhenotypicType(type);
 
 		for (Integer stdVarId : localStdVariableIds) {
-			StandardVariable sd = this.getStandardVariableBuilder().create(stdVarId);
+			StandardVariable sd = this.getStandardVariableBuilder().create(stdVarId, programUUID);
 			standardVariables.put(sd.getName(), sd);
 		}
 
@@ -417,8 +413,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers) throws MiddlewareQueryException {
-		return this.getStandardVariableBuilder().getStandardVariablesInProjects(headers);
+	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers, String programUUID)
+			throws MiddlewareException {
+		return this.getStandardVariableBuilder().getStandardVariablesInProjects(headers, programUUID);
 	}
 
 	@Override
@@ -526,6 +523,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 		try {
 			updatedTerm = this.getTermSaver().update(term);
+
 			this.saveOrUpdateCvTermRelationship(updatedTerm.getId(), objectId, typeId);
 
 		} catch (Exception e) {
@@ -634,36 +632,35 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException {
+	public Set<StandardVariable> getAllStandardVariables(String programUUID) throws MiddlewareException {
 		Set<StandardVariable> standardVariables = new HashSet<StandardVariable>();
 		List<Term> terms = this.getAllTermsByCvId(CvId.VARIABLES);
 		for (Term term : terms) {
-			standardVariables.add(this.getStandardVariable(term.getId()));
+			standardVariables.add(this.getStandardVariable(term.getId(), programUUID));
 		}
 		return standardVariables;
 	}
 
 	@Override
-	public List<StandardVariable> getStandardVariables(Integer traitClassId, Integer propertyId, Integer methodId, Integer scaleId)
-			throws MiddlewareQueryException {
+	public List<StandardVariable> getStandardVariables(Integer traitClassId, Integer propertyId, Integer methodId, Integer scaleId,
+			String programUUID) throws MiddlewareException {
 		List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
 
 		if (traitClassId != null) {
-			standardVariables.addAll(this.getStandardVariablesOfTraitClass(Database.LOCAL, traitClassId));
+			standardVariables.addAll(this.getStandardVariablesOfTraitClass(traitClassId, programUUID));
 			return standardVariables;
 		}
 
 		// For property, scale, method
 		List<Integer> standardVariableIds = this.getCvTermDao().getStandardVariableIds(traitClassId, propertyId, methodId, scaleId);
 		for (Integer id : standardVariableIds) {
-			standardVariables.add(this.getStandardVariable(id));
+			standardVariables.add(this.getStandardVariable(id, programUUID));
 		}
 
 		return standardVariables;
 	}
 
-	private List<StandardVariable> getStandardVariablesOfTraitClass(Database instance, Integer traitClassId)
-			throws MiddlewareQueryException {
+	private List<StandardVariable> getStandardVariablesOfTraitClass(Integer traitClassId, String programUUID) throws MiddlewareException {
 		List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
 		List<PropertyReference> properties = this.getCvTermDao().getPropertiesOfTraitClass(traitClassId);
 
@@ -678,7 +675,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			List<StandardVariableReference> stdVarRefs = propertyVars.get(propId);
 			if (stdVarRefs != null) {
 				for (StandardVariableReference stdVarRef : stdVarRefs) {
-					standardVariables.add(this.getStandardVariable(stdVarRef.getId()));
+					standardVariables.add(this.getStandardVariable(stdVarRef.getId(), programUUID));
 				}
 			}
 		}
@@ -709,7 +706,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		
 
 		try {
-
 
 			if (operation == Operation.ADD) {
 				this.getStandardVariableSaver().save(standardVariable);
@@ -749,7 +745,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 		try {
 
-			StandardVariable stdVar = this.getStandardVariable(standardVariableId);
+			StandardVariable stdVar = this.getStandardVariable(standardVariableId, null);
 
 			this.getStandardVariableSaver().deleteConstraints(stdVar);
 
@@ -837,7 +833,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 		try {
 
-			StandardVariable stdVar = this.getStandardVariable(standardVariableId);
+			StandardVariable stdVar = this.getStandardVariable(standardVariableId, null);
 			this.getStandardVariableSaver().deleteEnumeration(standardVariableId, stdVar.getEnumeration(enumerationId));
 
 
@@ -925,7 +921,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public List<Property> getAllPropertiesWithTraitClass() throws MiddlewareQueryException {
-		List<Property> properties = this.getPropertyBuilder().getAllPropertiesWithTraitClass();
+		List<Property> properties = this.getCvTermDao().getAllPropertiesWithTraitClass();
 		Collections.sort(properties, new Comparator<Property>() {
 
 			@Override
@@ -943,7 +939,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 		try {
 
-			StandardVariable stdVar = this.getStandardVariable(stdVariableId);
+			StandardVariable stdVar = this.getStandardVariable(stdVariableId, null);
 			this.getStandardVariableSaver().delete(stdVar);
 
 
@@ -954,21 +950,20 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
-			throws MiddlewareQueryException {
+	public Integer getStandardVariableIdByPropertyScaleMethod(String property, String scale, String method) throws MiddlewareQueryException {
 
 		Integer propertyId = this.findTermIdByName(property, CvId.PROPERTIES);
 		Integer scaleId = this.findTermIdByName(scale, CvId.SCALES);
 		Integer methodId = this.findTermIdByName(method, CvId.METHODS);
 
-		return this.getStandardVariableBuilder().getIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
+		return this.getStandardVariableIdByPropertyIdScaleIdMethodId(propertyId, scaleId, methodId);
 	}
 
 	@Override
-	public Integer getStandardVariableIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role)
+	public Integer getStandardVariableIdByPropertyIdScaleIdMethodId(Integer propertyId, Integer scaleId, Integer methodId)
 			throws MiddlewareQueryException {
 
-		return this.getStandardVariableBuilder().getIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
+		return this.getStandardVariableBuilder().getIdByPropertyScaleMethod(propertyId, scaleId, methodId);
 
 	}
 

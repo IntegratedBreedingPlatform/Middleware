@@ -15,10 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -63,6 +64,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	private static final int CRUST = 20310;
 	private static final int CUSTOM_VARIATE = 18020;
 
+	private static final String PROGRAM_UUID = "12345678";
+
 	@Before
 	public void setUp() throws Exception {
 		if (this.workbookBuilder == null) {
@@ -106,7 +109,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetTrialObservationsForNursery() throws MiddlewareQueryException {
+	public void testGetTrialObservationsForNursery() throws MiddlewareException {
 		WorkbookTest.setTestWorkbook(null);
 		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
 
@@ -142,7 +145,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetTrialObservationsForTrial() throws MiddlewareQueryException {
+	public void testGetTrialObservationsForTrial() throws MiddlewareException {
 		WorkbookTest.setTestWorkbook(null);
 		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
 
@@ -184,7 +187,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testPopulateMeasurementData_EmptyMeasurementVariableList() throws MiddlewareQueryException {
+	public void testPopulateMeasurementData_EmptyMeasurementVariableList() throws MiddlewareException {
 		List<MeasurementVariable> measurementVariableList = new ArrayList<MeasurementVariable>();
 		VariableList variableList = this.createVariableList(this.createMeasurementVariableList());
 		List<MeasurementData> measurementDataList = new ArrayList<MeasurementData>();
@@ -193,7 +196,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testPopulateMeasurementData_EmptyVariableList() throws MiddlewareQueryException {
+	public void testPopulateMeasurementData_EmptyVariableList() throws MiddlewareException {
 		List<MeasurementVariable> measurementVariableList = this.createMeasurementVariableList();
 		VariableList variableList = new VariableList();
 		List<MeasurementData> measurementDataList = new ArrayList<MeasurementData>();
@@ -205,14 +208,14 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testPopulateMeasurementData() throws MiddlewareQueryException {
+	public void testPopulateMeasurementData() throws MiddlewareException {
 		List<MeasurementVariable> measurementVariableList = this.createMeasurementVariableList();
 		VariableList variableList = this.createVariableList(measurementVariableList);
 		List<MeasurementData> measurementDataList = new ArrayList<MeasurementData>();
 		this.workbookBuilder.populateMeasurementData(measurementVariableList, variableList, measurementDataList);
 		Assert.assertFalse("Measurement data should not be empty", measurementDataList.isEmpty());
 		for (MeasurementData measurementData : measurementDataList) {
-			if (TermId.CATEGORICAL_VARIATE.getId() != measurementData.getMeasurementVariable().getStoredIn()) {
+			if (TermId.CATEGORICAL_VARIABLE.getId() != measurementData.getMeasurementVariable().getDataTypeId()) {
 				Assert.assertNull("Categorical value id should be null", measurementData.getcValueId());
 			} else if (WorkbookBuilderTest.CUSTOM_VARIATE == measurementData.getMeasurementVariable().getTermId()) {
 				Assert.assertNull("Categorical value id should be null", measurementData.getcValueId());
@@ -223,7 +226,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		}
 	}
 
-	private VariableList createVariableList(List<MeasurementVariable> measurementVariableList) throws MiddlewareQueryException {
+	private VariableList createVariableList(List<MeasurementVariable> measurementVariableList) throws MiddlewareException {
 		VariableList variableList = new VariableList();
 		int count = 0;
 		for (MeasurementVariable measurementVariable : measurementVariableList) {
@@ -241,21 +244,21 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		return variableList;
 	}
 
-	private Variable createVariable(MeasurementVariable measurementVariable, String value) throws MiddlewareQueryException {
+	private Variable createVariable(MeasurementVariable measurementVariable, String value) throws MiddlewareException {
 		Variable variable = new Variable();
-		VariableType variableType = this.createVariableType(measurementVariable);
+		DMSVariableType variableType = this.createVariableType(measurementVariable);
 		variable.setVariableType(variableType);
 		variable.setValue(value);
 		return variable;
 	}
 
-	private VariableType createVariableType(MeasurementVariable measurementVariable) throws MiddlewareQueryException {
-		VariableType variableType =
+	private DMSVariableType createVariableType(MeasurementVariable measurementVariable) throws MiddlewareException {
+		DMSVariableType variableType =
 				this.transformMeasurementVariable(measurementVariable, this.getStandardVariable(measurementVariable.getTermId()));
 		return variableType;
 	}
 
-	private List<MeasurementVariable> createMeasurementVariableList() throws MiddlewareQueryException {
+	private List<MeasurementVariable> createMeasurementVariableList() throws MiddlewareException {
 		List<MeasurementVariable> measurementVariableList = new ArrayList<MeasurementVariable>();
 		measurementVariableList.add(this.getMeasurementVariable(TermId.ENTRY_CODE.getId(), true));
 		measurementVariableList.add(this.getMeasurementVariable(TermId.ENTRY_NO.getId(), true));
@@ -268,16 +271,16 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		return measurementVariableList;
 	}
 
-	private MeasurementVariable getMeasurementVariable(int termId, boolean isFactor) throws MiddlewareQueryException {
+	private MeasurementVariable getMeasurementVariable(int termId, boolean isFactor) throws MiddlewareException {
 		return this.measurementVariableTransformer.transform(this.getStandardVariable(termId), isFactor);
 	}
 
-	private StandardVariable getStandardVariable(int id) throws MiddlewareQueryException {
-		return this.standardVariableBuilder.create(id);
+	private StandardVariable getStandardVariable(int id) throws MiddlewareException {
+		return this.standardVariableBuilder.create(id, "1234567");
 	}
 
-	private VariableType transformMeasurementVariable(MeasurementVariable measurementVariable, StandardVariable standardVariable) {
-		return new VariableType(measurementVariable.getName(), measurementVariable.getDescription(), standardVariable, 0);
+	private DMSVariableType transformMeasurementVariable(MeasurementVariable measurementVariable, StandardVariable standardVariable) {
+		return new DMSVariableType(measurementVariable.getName(), measurementVariable.getDescription(), standardVariable, 0);
 	}
 
 	@Test
@@ -286,13 +289,15 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
 		// add trial instance (also added in conditions)
 		workbook.getFactors().add(WorkbookTest.createTrialInstanceMeasurementVariable(1));
-		VariableTypeList factorsVariableTypeList = this.variableTypeListTransformer.transform(workbook.getFactors(), false);
-		VariableTypeList conditionsVariableTypeList = this.variableTypeListTransformer.transform(workbook.getConditions(), false);
-		VariableTypeList constantsVariableTypeList = this.variableTypeListTransformer.transform(workbook.getConstants(), false);
+		VariableTypeList factorsVariableTypeList = this.variableTypeListTransformer.transform(workbook.getFactors(), false, PROGRAM_UUID);
+		VariableTypeList conditionsVariableTypeList =
+				this.variableTypeListTransformer.transform(workbook.getConditions(), false, PROGRAM_UUID);
+		VariableTypeList constantsVariableTypeList =
+				this.variableTypeListTransformer.transform(workbook.getConstants(), false, PROGRAM_UUID);
 		VariableList conditions = this.transformMeasurementVariablesToVariableList(workbook.getConditions(), conditionsVariableTypeList);
 		VariableList constants = this.transformMeasurementVariablesToVariableList(workbook.getConstants(), constantsVariableTypeList);
 		// find the trial instance variable before removing it as a factor
-		VariableType trialInstance = factorsVariableTypeList.findById(TermId.TRIAL_INSTANCE_FACTOR.getId());
+		DMSVariableType trialInstance = factorsVariableTypeList.findById(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		VariableList toBeDeleted = new VariableList();
 		toBeDeleted.addAll(conditions);
 		toBeDeleted.addAll(constants);
@@ -303,17 +308,38 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	}
 
+	@Test
+	public void testSetMeasurementVarRoles() {
+		List<MeasurementVariable> measurementVariableLists = new ArrayList<MeasurementVariable>();
+		MeasurementVariable measurementVar = new MeasurementVariable();
+		measurementVariableLists.add(measurementVar);
+		this.workbookBuilder.setMeasurementVarRoles(measurementVariableLists, false, true);
+		for (MeasurementVariable var : measurementVariableLists) {
+			Assert.assertEquals("Should have a phenotype role of variate since its not a factor", var.getRole(), PhenotypicType.VARIATE);
+		}
+
+		this.workbookBuilder.setMeasurementVarRoles(measurementVariableLists, true, true);
+		for (MeasurementVariable var : measurementVariableLists) {
+			Assert.assertEquals("Should have a phenotype role of STUDY", var.getRole(), PhenotypicType.STUDY);
+		}
+
+		this.workbookBuilder.setMeasurementVarRoles(measurementVariableLists, true, false);
+		for (MeasurementVariable var : measurementVariableLists) {
+			Assert.assertEquals("Should have a phenotype role of Trial Environment", var.getRole(), PhenotypicType.TRIAL_ENVIRONMENT);
+		}
+	}
+
 	// derived from VariableListTransformer.transformTrialEnvironment (but with no specific role to filter)
 	private VariableList transformMeasurementVariablesToVariableList(List<MeasurementVariable> mVarList, VariableTypeList variableTypeList) {
 		VariableList variableList = new VariableList();
 		if (mVarList != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
 			if (mVarList.size() == variableTypeList.getVariableTypes().size()) {
 
-				List<VariableType> varTypes = variableTypeList.getVariableTypes();
+				List<DMSVariableType> varTypes = variableTypeList.getVariableTypes();
 				for (int i = 0, l = mVarList.size(); i < l; i++) {
-					VariableType varTypeFinal = null;
+					DMSVariableType varTypeFinal = null;
 					String value = mVarList.get(i).getValue();
-					for (VariableType varType : varTypes) {
+					for (DMSVariableType varType : varTypes) {
 						if (mVarList.get(i).getTermId() == varType.getId()) {
 							varTypeFinal = varType;
 						}

@@ -12,6 +12,7 @@
 package org.generationcp.middleware.util;
 
 import java.lang.reflect.Array;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
 
@@ -105,6 +106,18 @@ public abstract class StringUtil {
 
 		try {
 			return new BigInteger(string);
+		} catch (NumberFormatException e) {
+			return defaultValue;
+		}
+	}
+
+	public static BigDecimal parseBigDecimal(String string, BigDecimal defaultValue) {
+		if (StringUtils.isBlank(string)) {
+			return defaultValue;
+		}
+
+		try {
+			return new BigDecimal(string);
 		} catch (NumberFormatException e) {
 			return defaultValue;
 		}

@@ -333,9 +333,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	/**
 	 * Get Germplasm List Types
-	 *
+	 * 
 	 * Return a List of UserDefinedField POJOs representing records from the udflds table of IBDB which are the types of germplasm lists.
-	 *
+	 * 
 	 * @return List of germplasm list types
 	 * @throws MiddlewareQueryException
 	 */
@@ -353,9 +353,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	/**
 	 * Get Germplasm Name Types
-	 *
+	 * 
 	 * Return a List of UserDefinedField POJOs representing records from the udflds table of IBDB which are the types of germplasm names.
-	 *
+	 * 
 	 * @return List of germplasm name types
 	 * @throws MiddlewareQueryException
 	 */
@@ -373,7 +373,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	/**
 	 * Get Germplasm Lists with names like Q or germplasms with name like Q or gid equal to Q
-	 *
+	 * 
 	 * @param q
 	 * @param o - like or equal
 	 * @return List of GermplasmLists

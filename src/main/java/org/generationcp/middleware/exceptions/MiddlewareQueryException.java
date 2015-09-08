@@ -21,6 +21,12 @@ public class MiddlewareQueryException extends MiddlewareException {
 
 	private String code;
 
+	/**
+	 * TODO: Should deprecate this. MiddlewareQueryExceptions should also consist cause attached to it. TODO: Use MiddlewareException
+	 * because this method usage consist domain specific data conflict.
+	 * 
+	 * @param message
+	 */
 	public MiddlewareQueryException(String message) {
 		super(message);
 	}

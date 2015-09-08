@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.helper;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.util.Debug;
 
 public class VariableInfo {
@@ -24,6 +25,8 @@ public class VariableInfo {
 	private int stdVariableId;
 
 	private String treatmentLabel;
+	
+	private PhenotypicType role;
 
 	public String getLocalName() {
 		return this.localName;
@@ -63,6 +66,16 @@ public class VariableInfo {
 
 	public void setTreatmentLabel(String treatmentLabel) {
 		this.treatmentLabel = treatmentLabel;
+	}
+
+	
+	public PhenotypicType getRole() {
+		return role;
+	}
+
+	
+	public void setRole(PhenotypicType role) {
+		this.role = role;
 	}
 
 	public void print(int indent) {

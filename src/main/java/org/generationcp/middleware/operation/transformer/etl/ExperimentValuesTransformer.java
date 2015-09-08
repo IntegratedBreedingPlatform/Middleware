@@ -3,10 +3,10 @@ package org.generationcp.middleware.operation.transformer.etl;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -32,10 +32,10 @@ public class ExperimentValuesTransformer extends Transformer {
 				Integer germplasmId = Integer.parseInt(String.valueOf(mRow.getStockId()));
 				VariableList variableList = new VariableList();
 
-				List<VariableType> varTypes = varTypeList.getVariableTypes();
+				List<DMSVariableType> varTypes = varTypeList.getVariableTypes();
 
 				for (int i = 0, l = varTypes.size(); i < l; i++) {
-					VariableType varType = varTypes.get(i);
+					DMSVariableType varType = varTypes.get(i);
 					String value = null;
 					for (MeasurementData data : nonTrialMD) {
 						if (data.getMeasurementVariable().getTermId() == varTypes.get(i).getId()) {

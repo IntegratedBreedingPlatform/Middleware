@@ -33,6 +33,7 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
@@ -179,7 +180,7 @@ public interface FieldbookService {
 	 * @return the Study corresponding to the given study id
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Study getStudy(int studyId) throws MiddlewareQueryException;
+	Study getStudy(int studyId) throws MiddlewareException;
 
 	/**
 	 * Returns the variable id given the property, scale, method, and role (P-S-M-R).
@@ -210,16 +211,16 @@ public interface FieldbookService {
 	 * @return the data set
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Workbook getNurseryDataSet(int id) throws MiddlewareQueryException;
+	Workbook getNurseryDataSet(int id) throws MiddlewareException;
 
 	/**
 	 * Gets the data set.
 	 *
 	 * @param id the id
 	 * @return the data set
-	 * @throws MiddlewareQueryException the middleware query exception
+	 * @throws MiddlewareException the middleware exception
 	 */
-	Workbook getTrialDataSet(int id) throws MiddlewareQueryException;
+	Workbook getTrialDataSet(int id) throws MiddlewareException;
 
 	/**
 	 * Saves the measurement rows of a workbook as a local trial or nursery on the new CHADO schema.
@@ -227,7 +228,7 @@ public interface FieldbookService {
 	 * @param workbook that contains the measurement rows to save
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void saveMeasurementRows(Workbook workbook) throws MiddlewareQueryException;
+	void saveMeasurementRows(Workbook workbook, String programUUID) throws MiddlewareException;
 
 	/**
 	 * Saves germplasm list advanced nursery types. This method saves the germplasms (and corresponding name) if not found in the database.
@@ -302,9 +303,9 @@ public interface FieldbookService {
 	 * Get all standard variables.
 	 *
 	 * @return the all standard variables
-	 * @throws MiddlewareQueryException the middleware query exception
+	 * @throws MiddlewareQueryException the middleware exception
 	 */
-	Set<StandardVariable> getAllStandardVariables() throws MiddlewareQueryException;
+	Set<StandardVariable> getAllStandardVariables(String programUUID) throws MiddlewareException;
 
 	/**
 	 * Get all distinct values given the PSMR combination.
@@ -326,7 +327,7 @@ public interface FieldbookService {
 	 * @return the standard variable
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	StandardVariable getStandardVariable(int id) throws MiddlewareQueryException;
+	StandardVariable getStandardVariable(int id, String programUUID) throws MiddlewareException;
 
 	/**
 	 * Gets the all nursery types.
@@ -334,7 +335,7 @@ public interface FieldbookService {
 	 * @return the all nursery types
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<ValueReference> getAllNurseryTypes() throws MiddlewareQueryException;
+	List<ValueReference> getAllNurseryTypes(String programUUID) throws MiddlewareException;
 
 	/**
 	 * Gets the all persons.
@@ -383,7 +384,7 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 
-	Workbook getStudyVariableSettings(int id, boolean isNursery) throws MiddlewareQueryException;
+	Workbook getStudyVariableSettings(int id, boolean isNursery) throws MiddlewareException;
 
 	/**
 	 * Gets the germplasms.
@@ -542,7 +543,7 @@ public interface FieldbookService {
 	 * @return the measurement dataset id
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	int getMeasurementDatasetId(int studyId, String studyName) throws MiddlewareQueryException;
+	int getMeasurementDatasetId(int studyId, String studyName) throws MiddlewareException;
 
 	/**
 	 * count the number of observations.
@@ -637,7 +638,7 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList,
-			List<MeasurementVariable> variateList) throws MiddlewareQueryException;
+			List<MeasurementVariable> variateList) throws MiddlewareException;
 
 	/**
 	 * Check if study has measurement data.
@@ -732,7 +733,7 @@ public interface FieldbookService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(String property, String scale, String method,
-			PhenotypicType role) throws MiddlewareQueryException;
+			PhenotypicType role, String programUUID) throws MiddlewareException;
 
 	public void setTreatmentFactorValues(List<TreatmentVariable> treatmentFactors, int measurementDatasetID)
 			throws MiddlewareQueryException;
@@ -745,7 +746,7 @@ public interface FieldbookService {
 	 * @return the complete dataset
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareQueryException;
+	Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareException;
 
 	/**
 	 * Gets the germplasm name types.
@@ -812,7 +813,7 @@ public interface FieldbookService {
 	/*
 	 * Deletes a study (logical delete).
 	 */
-	void deleteStudy(int studyId, Integer currentUserId) throws MiddlewareQueryException, UnpermittedDeletionException;
+	void deleteStudy(int studyId, Integer currentUserId) throws UnpermittedDeletionException, MiddlewareException;
 
 	/**
 	 * Gets the favorite project location ids.
@@ -888,9 +889,9 @@ public interface FieldbookService {
 	 */
 	Integer saveGermplasmList(Map<Germplasm, GermplasmListData> listDataItems, GermplasmList germplasmList) throws MiddlewareQueryException;
 
-	void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds) throws MiddlewareQueryException;
+	void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds) throws MiddlewareException;
 
-	boolean setOrderVariableByRank(Workbook workbook) throws MiddlewareQueryException;
+	boolean setOrderVariableByRank(Workbook workbook) throws MiddlewareException;
 
 	void addListDataProjectList(List<ListDataProject> listDataProjectList) throws MiddlewareQueryException;
 
@@ -900,7 +901,7 @@ public interface FieldbookService {
 	 * @param name of the Standard Varible
 	 * @throws MiddlewareQueryException the middleware query exception
 	 **/
-	StandardVariable getStandardVariableByName(String name) throws MiddlewareQueryException;
+	StandardVariable getStandardVariableByName(String name, String programUUID) throws MiddlewareException;
 
 	List<StandardVariableReference> filterStandardVariablesByIsAIds(List<StandardVariableReference> standardReferences,
 			List<Integer> isAIds);

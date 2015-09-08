@@ -15,7 +15,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
@@ -36,6 +38,7 @@ public class VariableInfoBuilder {
 		ProjectProperty localNameProperty = this.findLocalNameProperty(stdVariableProperty.getValue(), properties);
 		ProjectProperty localDescriptionProperty = this.findLocalDescriptionProperty(properties);
 		ProjectProperty treatmentLabelProperty = this.findTreatmentLabelProperty(properties);
+		PhenotypicType role = this.findRole(properties);
 
 		VariableInfo variableDef = new VariableInfo();
 		variableDef.setLocalName(localNameProperty == null ? null : localNameProperty.getValue());
@@ -48,6 +51,7 @@ public class VariableInfoBuilder {
 			variableDef.setTreatmentLabel(treatmentLabelProperty.getValue());
 		}
 
+		variableDef.setRole(role);
 		return variableDef;
 	}
 
@@ -69,6 +73,16 @@ public class VariableInfoBuilder {
 		return null;
 	}
 
+	private PhenotypicType findRole(Set<ProjectProperty> properties) {
+		for (ProjectProperty property : properties) {
+			VariableType varType = VariableType.getById(property.getTypeId());
+			if (varType != null) {
+				return varType.getRole();
+			}
+		}
+		return null;
+	}
+	
 	private ProjectProperty findLocalNameProperty(String stdVariableIdStr, Set<ProjectProperty> properties) {
 		Integer stdVariableId = Integer.parseInt(stdVariableIdStr);
 		for (ProjectProperty property : properties) {

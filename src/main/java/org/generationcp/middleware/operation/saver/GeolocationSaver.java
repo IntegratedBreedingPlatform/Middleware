@@ -13,6 +13,7 @@ package org.generationcp.middleware.operation.saver;
 
 import java.util.ArrayList;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -57,9 +58,10 @@ public class GeolocationSaver extends Saver {
 					if (var.getPhenotypeId() == null) {
 						this.getPhenotypeSaver().save(row.getExperimentId(), var);
 					} else {
+
 						this.getPhenotypeSaver().saveOrUpdate(row.getExperimentId(), var.getVariableType().getStandardVariable().getId(),
-								var.getVariableType().getStandardVariable().getStoredIn().getId(), var.getValue(),
-								this.getPhenotypeDao().getById(var.getPhenotypeId()));
+								var.getValue(), this.getPhenotypeDao().getById(var.getPhenotypeId()),
+								var.getVariableType().getStandardVariable().getDataType().getId());
 					}
 				}
 			}
@@ -68,40 +70,41 @@ public class GeolocationSaver extends Saver {
 		return null;
 	}
 
-	private Geolocation createOrUpdate(VariableList factors, MeasurementRow row, Integer locationId) throws MiddlewareQueryException {
+	protected Geolocation createOrUpdate(VariableList factors, MeasurementRow row, Integer locationId) throws MiddlewareQueryException {
 		Geolocation geolocation = null;
 
 		if (factors != null && factors.getVariables() != null && !factors.getVariables().isEmpty()) {
 			for (Variable variable : factors.getVariables()) {
 
-				Integer storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
+				Integer variableId = variable.getVariableType().getStandardVariable().getId();
+				PhenotypicType role = variable.getVariableType().getRole();
 				String value = variable.getValue();
 
-				if (TermId.TRIAL_INSTANCE_STORAGE.getId() == storedInId) {
+				if (TermId.TRIAL_INSTANCE_FACTOR.getId() == variableId) {
 					geolocation = this.getGeolocationObject(geolocation, locationId);
 					geolocation.setDescription(value);
 
-				} else if (TermId.LATITUDE_STORAGE.getId() == storedInId) {
+				} else if (TermId.LATITUDE.getId() == variableId) {
 					geolocation = this.getGeolocationObject(geolocation, locationId);
 					geolocation.setLatitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 
-				} else if (TermId.LONGITUDE_STORAGE.getId() == storedInId) {
+				} else if (TermId.LONGITUDE.getId() == variableId) {
 					geolocation = this.getGeolocationObject(geolocation, locationId);
 					geolocation.setLongitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 
-				} else if (TermId.DATUM_STORAGE.getId() == storedInId) {
+				} else if (TermId.GEODETIC_DATUM.getId() == variableId) {
 					geolocation = this.getGeolocationObject(geolocation, locationId);
 					geolocation.setGeodeticDatum(value);
 
-				} else if (TermId.ALTITUDE_STORAGE.getId() == storedInId) {
+				} else if (TermId.ALTITUDE.getId() == variableId) {
 					geolocation = this.getGeolocationObject(geolocation, locationId);
 					geolocation.setAltitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 
-				} else if (TermId.TRIAL_ENVIRONMENT_INFO_STORAGE.getId() == storedInId) {
+				} else if (PhenotypicType.TRIAL_ENVIRONMENT == role) {
 					geolocation = this.getGeolocationObject(geolocation, locationId);
 					this.addProperty(geolocation, this.createOrUpdateProperty(variable, geolocation));
 
-				} else if (TermId.OBSERVATION_VARIATE.getId() == storedInId || TermId.CATEGORICAL_VARIATE.getId() == storedInId) {
+				} else if (PhenotypicType.VARIATE == role) {
 					geolocation = this.getGeolocationObject(geolocation, locationId);
 					// value is in observation sheet
 					if (row != null) {
@@ -123,7 +126,7 @@ public class GeolocationSaver extends Saver {
 		Geolocation finalGeolocation = geolocation;
 		if (finalGeolocation == null) {
 			if (locationId != null) {
-				finalGeolocation = this.getGeolocationDao().getById(locationId);
+				finalGeolocation = this.getGeolocationById(locationId);
 			}
 			if (finalGeolocation == null) {
 				finalGeolocation = new Geolocation();
@@ -132,8 +135,11 @@ public class GeolocationSaver extends Saver {
 		return finalGeolocation;
 	}
 
-	private GeolocationProperty createOrUpdateProperty(Variable variable, Geolocation geolocation)
-			throws MiddlewareQueryException {
+	protected Geolocation getGeolocationById(Integer locationId) throws MiddlewareQueryException {
+		return this.getGeolocationDao().getById(locationId);
+	}
+
+	private GeolocationProperty createOrUpdateProperty(Variable variable, Geolocation geolocation) throws MiddlewareQueryException {
 		GeolocationProperty property = this.getGeolocationProperty(variable.getVariableType().getId(), geolocation);
 
 		if (property == null) {
@@ -180,28 +186,28 @@ public class GeolocationSaver extends Saver {
 		return geolocation;
 	}
 
-	public Geolocation updateGeolocationInformation(MeasurementRow row, boolean isNursery) throws MiddlewareQueryException,
-			MiddlewareException {
-		VariableTypeList variableTypes = this.getVariableTypeListTransformer().transform(row.getMeasurementVariables(), false);
+	public Geolocation updateGeolocationInformation(MeasurementRow row, boolean isNursery, String programUUID)
+			throws MiddlewareQueryException, MiddlewareException {
+		VariableTypeList variableTypes = this.getVariableTypeListTransformer().transform(row.getMeasurementVariables(), false, programUUID);
 		VariableList variableList = this.getVariableListTransformer().transformTrialEnvironment(row, variableTypes);
 
 		return this.saveGeolocation(variableList, row, isNursery, false);
 	}
 
-	public void setGeolocation(Geolocation geolocation, int termId, int storedInId, String value) {
-		if (TermId.TRIAL_INSTANCE_STORAGE.getId() == storedInId) {
+	public void setGeolocation(Geolocation geolocation, int termId, String value) {
+		if (TermId.TRIAL_INSTANCE_FACTOR.getId() == termId) {
 			geolocation.setDescription(value);
 
-		} else if (TermId.LATITUDE_STORAGE.getId() == storedInId) {
+		} else if (TermId.LATITUDE.getId() == termId) {
 			geolocation.setLatitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 
-		} else if (TermId.LONGITUDE_STORAGE.getId() == storedInId) {
+		} else if (TermId.LONGITUDE.getId() == termId) {
 			geolocation.setLongitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 
-		} else if (TermId.DATUM_STORAGE.getId() == storedInId) {
+		} else if (TermId.GEODETIC_DATUM.getId() == termId) {
 			geolocation.setGeodeticDatum(value);
 
-		} else if (TermId.ALTITUDE_STORAGE.getId() == storedInId) {
+		} else if (TermId.ALTITUDE.getId() == termId) {
 			geolocation.setAltitude(StringUtil.isEmpty(value) ? null : Double.valueOf(value));
 		}
 	}
@@ -213,9 +219,8 @@ public class GeolocationSaver extends Saver {
 		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
 			String trialInstanceNumber = null;
 			for (Variable variable : variableList.getVariables()) {
-				Integer storedInId = variable.getVariableType().getStandardVariable().getStoredIn().getId();
 				String value = variable.getValue();
-				if (TermId.TRIAL_INSTANCE_STORAGE.getId() == storedInId) {
+				if (TermId.TRIAL_INSTANCE_FACTOR.getId() == variable.getVariableType().getStandardVariable().getId()) {
 					trialInstanceNumber = value;
 					break;
 				}

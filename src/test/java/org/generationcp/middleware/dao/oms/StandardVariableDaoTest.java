@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.junit.Assert;
@@ -19,12 +20,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class StandardVariableDaoTest extends IntegrationTestBase {
 
 	private static final int PLANT_HEIGHT_ID = 18020, GRAIN_YIELD_ID = 18000;
+	private static final String PROGRAM_UUID = "1234567";
 
 	@Autowired
 	private OntologyDataManager manager;
 
 	@Test
-	public void testGetStandardVariableSummaryReferenceData() throws MiddlewareQueryException {
+	public void testGetStandardVariableSummaryReferenceData() throws MiddlewareException {
 
 		StandardVariableDao dao = new StandardVariableDao(this.sessionProvder.getSession());
 
@@ -33,7 +35,7 @@ public class StandardVariableDaoTest extends IntegrationTestBase {
 		Assert.assertNotNull(summary);
 
 		// Load details using existing method
-		StandardVariable details = this.manager.getStandardVariable(StandardVariableDaoTest.PLANT_HEIGHT_ID);
+		StandardVariable details = this.manager.getStandardVariable(StandardVariableDaoTest.PLANT_HEIGHT_ID, PROGRAM_UUID);
 		Assert.assertNotNull(details);
 
 		// Make sure that the summary data loaded from view matches with details data loaded using the usual method.
@@ -50,7 +52,6 @@ public class StandardVariableDaoTest extends IntegrationTestBase {
 		this.assertTermDataMatches(details.getScale(), summary.getScale());
 		this.assertTermDataMatches(details.getIsA(), summary.getIsA());
 		this.assertTermDataMatches(details.getDataType(), summary.getDataType());
-		this.assertTermDataMatches(details.getStoredIn(), summary.getStoredIn());
 
 		Assert.assertEquals(details.getPhenotypicType(), summary.getPhenotypicType());
 	}
@@ -62,7 +63,7 @@ public class StandardVariableDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStandardVariableSummaryUserCreated() throws MiddlewareQueryException {
+	public void testGetStandardVariableSummaryUserCreated() throws MiddlewareException {
 		// First create a local Standardvariable
 		StandardVariable myOwnPlantHeight = new StandardVariable();
 		myOwnPlantHeight.setName("MyOwnPlantHeight " + new Random().nextInt(1000));
@@ -77,12 +78,11 @@ public class StandardVariableDaoTest extends IntegrationTestBase {
 
 		myOwnPlantHeight.setIsA(new Term(1340, "Agronomic", "Agronomic"));
 		myOwnPlantHeight.setDataType(new Term(1110, "Numeric variable", "Variable with numeric values either continuous or integer"));
-		myOwnPlantHeight.setStoredIn(new Term(1043, "Observation variate", "Phenotypic data stored in phenotype.value"));
-
-		this.manager.addStandardVariable(myOwnPlantHeight);
+		
+		this.manager.addStandardVariable(myOwnPlantHeight,PROGRAM_UUID);
 
 		// Load details using existing method
-		StandardVariable details = this.manager.getStandardVariable(myOwnPlantHeight.getId());
+		StandardVariable details = this.manager.getStandardVariable(myOwnPlantHeight.getId(), PROGRAM_UUID);
 		Assert.assertNotNull(details);
 
 		// Load summary from the view

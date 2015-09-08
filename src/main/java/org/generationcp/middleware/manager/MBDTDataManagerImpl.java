@@ -273,6 +273,7 @@ public class MBDTDataManagerImpl extends DataManager implements MBDTDataManager 
 
 					gidSet.remove(genotype.getGid());
 				}
+
 			}
 
 			// create new entries with the default type

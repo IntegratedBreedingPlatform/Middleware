@@ -37,19 +37,19 @@ public class StudyServiceImpl extends Service implements StudyService {
 	
 	public StudyServiceImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
-		Session currentSession = getCurrentSession();
-		trialTraits = new TraitServiceImpl(currentSession);
-		studyMeasurements = new StudyMeasurements(getCurrentSession());
-		studyGermplasmListService = new StudyGermplasmListServiceImpl(getCurrentSession());
+		Session currentSession = this.getCurrentSession();
+		this.trialTraits = new TraitServiceImpl(currentSession);
+		this.studyMeasurements = new StudyMeasurements(this.getCurrentSession());
+		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(this.getCurrentSession());
 	}
 
 	/**
 	 * Only used for tests.
-	 * 
+	 *
 	 * @param trialTraits
 	 * @param trialMeasurements
 	 */
-	StudyServiceImpl(final TraitService trialTraits, final StudyMeasurements trialMeasurements, 
+	StudyServiceImpl(final TraitService trialTraits, final StudyMeasurements trialMeasurements,
 			final StudyGermplasmListService studyGermplasmListServiceImpl) {
 		this.trialTraits = trialTraits;
 		this.studyMeasurements = trialMeasurements;
@@ -62,25 +62,21 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		List<StudySummary> studySummaries = new ArrayList<StudySummary>();
 
-		String sql = "SELECT DISTINCT "
-				+ "	p.project_id AS id, "
-				+ "	p.name AS name, "
-				+ "	p.description AS title, "
-				+ "	p.program_uuid AS programUUID, "
-				+ "	ppType.value AS studyTypeId, "
-				+ "	ppObjective.value AS objective, "
-				+ "	ppStartDate.value AS startDate, "
-				+ "	ppEndDate.value AS endDate "
-				+ " FROM "
-				+ "	project p "
-				+ "	INNER JOIN projectprop ppType ON p.project_id = ppType.project_id AND ppType.type_id = " + TermId.STUDY_TYPE.getId()
-				+ "	LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id AND ppObjective.type_id = " + TermId.STUDY_OBJECTIVE.getId()
-				+ "	LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id AND ppStartDate.type_id = " + TermId.START_DATE.getId()
-				+ "	LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id AND ppEndDate.type_id = " + TermId.END_DATE.getId() 
-				+ "	WHERE NOT EXISTS "
-				+ "	  (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id = "+ TermId.STUDY_STATUS.getId()
-				+ "         AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  " + TermId.DELETED_STUDY.getId() + ") ";
-		
+		String sql =
+				"SELECT DISTINCT " + "	p.project_id AS id, " + "	p.name AS name, " + "	p.description AS title, "
+						+ "	p.program_uuid AS programUUID, " + "	ppType.value AS studyTypeId, " + "	ppObjective.value AS objective, "
+						+ "	ppStartDate.value AS startDate, " + "	ppEndDate.value AS endDate " + " FROM " + "	project p "
+						+ "	INNER JOIN projectprop ppType ON p.project_id = ppType.project_id AND ppType.type_id = "
+						+ TermId.STUDY_TYPE.getId()
+						+ "	LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id AND ppObjective.type_id = "
+						+ TermId.STUDY_OBJECTIVE.getId()
+						+ "	LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id AND ppStartDate.type_id = "
+						+ TermId.START_DATE.getId()
+						+ "	LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id AND ppEndDate.type_id = "
+						+ TermId.END_DATE.getId() + "	WHERE NOT EXISTS "
+						+ "	  (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id = " + TermId.STUDY_STATUS.getId()
+						+ "         AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  " + TermId.DELETED_STUDY.getId() + ") ";
+
 		if (!StringUtils.isEmpty(programUniqueId)) {
 			sql += " AND p.program_uuid = '" + programUniqueId.trim() + "'";
 		}
@@ -88,15 +84,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		List<Object[]> list = null;
 		try {
-			Query query = getCurrentSession().createSQLQuery(sql)
-					.addScalar("id")
-					.addScalar("name")
-					.addScalar("title")
-					.addScalar("programUUID")
-					.addScalar("studyTypeId")
-					.addScalar("objective")
-					.addScalar("startDate")
-					.addScalar("endDate");
+			Query query =
+					this.getCurrentSession().createSQLQuery(sql).addScalar("id").addScalar("name").addScalar("title")
+							.addScalar("programUUID").addScalar("studyTypeId").addScalar("objective").addScalar("startDate")
+							.addScalar("endDate");
 			list = query.list();
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error in listAllStudies() query in StudyServiceImpl: " + e.getMessage(), e);
@@ -113,35 +104,36 @@ public class StudyServiceImpl extends Service implements StudyService {
 				String startDate = (String) row[6];
 				String endDate = (String) row[7];
 
-				StudySummary studySummary = new StudySummary(id, name, title, objective,
-						StudyType.getStudyTypeById(Integer.valueOf(studyTypeId)), startDate, endDate, programUUID);
+				StudySummary studySummary =
+						new StudySummary(id, name, title, objective, StudyType.getStudyTypeById(Integer.valueOf(studyTypeId)), startDate,
+								endDate, programUUID);
 				studySummaries.add(studySummary);
 			}
 		}
 		return studySummaries;
 	}
-	
+
 	@Override
 	public List<ObservationDto> getObservations(final int studyIdentifier) {
 
-		final List<TraitDto> traits = trialTraits.getTraits(studyIdentifier);
+		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
 
-		return studyMeasurements.getAllMeasurements(studyIdentifier, traits);
+		return this.studyMeasurements.getAllMeasurements(studyIdentifier, traits);
 	}
 
 	@Override
 	public List<ObservationDto> getSingleObservation(final int studyIdentifier, int measurementIdentifier) {
 
-		final List<TraitDto> traits = trialTraits.getTraits(studyIdentifier);
+		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
 
-		return studyMeasurements.getMeasurement(studyIdentifier, traits, measurementIdentifier);
+		return this.studyMeasurements.getMeasurement(studyIdentifier, traits, measurementIdentifier);
 
 	}
 
 	@Override
 	public ObservationDto updataObservation(final Integer studyIdentifier, final ObservationDto middlewareMeasurement) {
 
-		final Session currentSession = getCurrentSession();
+		final Session currentSession = this.getCurrentSession();
 		final Observations observations = new Observations(currentSession);
 		try {
 			ObservationDto updatedMeasurement = observations.updataObsevationTraits(middlewareMeasurement);
@@ -153,6 +145,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public List<StudyGermplasmDto> getStudyGermplasmList(final Integer studyIdentifer) {
-		return studyGermplasmListService.getGermplasmList(studyIdentifer);
+		return this.studyGermplasmListService.getGermplasmList(studyIdentifer);
 	}
 }

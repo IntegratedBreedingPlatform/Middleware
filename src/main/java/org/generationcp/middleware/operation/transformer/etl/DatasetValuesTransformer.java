@@ -3,11 +3,11 @@ package org.generationcp.middleware.operation.transformer.etl;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -29,8 +29,8 @@ public class DatasetValuesTransformer extends Transformer {
 
 		VariableList variables = new VariableList();
 
-		List<VariableType> varTypes = varTypeList.getVariableTypes();
-		for (VariableType varType : varTypes) {
+		List<DMSVariableType> varTypes = varTypeList.getVariableTypes();
+		for (DMSVariableType varType : varTypes) {
 			String value = null;
 			for (MeasurementVariable var : mvList) {
 				if (var.getTermId() == varType.getId()) {

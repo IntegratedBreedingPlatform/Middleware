@@ -28,6 +28,16 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.TermDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.ExperimentBuilder;
 import org.generationcp.middleware.operation.builder.LotBuilder;
@@ -88,6 +98,27 @@ public abstract class Service extends DatabaseBroker {
 
 	protected final OntologyDataManager getOntologyDataManager() {
 		return new OntologyDataManagerImpl(this.sessionProvider);
+	}
+
+	protected final TermDataManager getTermDataManager() {
+		return new TermDataManagerImpl(this.sessionProvider);
+	}
+
+	protected final OntologyMethodDataManager getOntologyMethodDataManager() {
+		return new OntologyMethodDataManagerImpl(this.sessionProvider);
+	}
+
+	protected final OntologyPropertyDataManager getOntologyPropertyDataManager() {
+		return new OntologyPropertyDataManagerImpl(this.sessionProvider);
+	}
+
+	protected final OntologyScaleDataManager getOntologyScaleDataManager() {
+		return new OntologyScaleDataManagerImpl(this.sessionProvider);
+	}
+
+	protected final OntologyVariableDataManager getOntologyVariableDataManager() {
+		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
+				this.getOntologyScaleDataManager(), this.sessionProvider);
 	}
 
 	protected final GermplasmDataManager getGermplasmDataManager() {

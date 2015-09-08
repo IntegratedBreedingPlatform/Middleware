@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.util;
@@ -81,6 +81,7 @@ import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.dao.oms.StandardVariableDao;
+import org.generationcp.middleware.dao.oms.VariableOverridesDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
 import org.hibernate.Session;
@@ -88,7 +89,7 @@ import org.hibernate.Session;
 /**
  * Used to handle DAO instances and sessions connecting to the database. Superclass of DataManager, Builder, Searcher and Saver classes.
  * Maintains session for local and central connection.
- * 
+ *
  * @author Joyce Avestro
  */
 
@@ -96,12 +97,8 @@ public class DatabaseBroker {
 
 	protected HibernateSessionProvider sessionProvider;
 	protected String databaseName;
-	private GermplasmListDAO germplasmListDao;
 
 	protected static final int JDBC_BATCH_SIZE = 50;
-
-	// StudyDataManager DAO
-	private ProjectPropertyDao projectPropertyDao;
 
 	protected DatabaseBroker() {
 
@@ -128,372 +125,376 @@ public class DatabaseBroker {
 		return this.getActiveSession();
 	}
 
-	protected Session getActiveSession() {
+	public Session getActiveSession() {
 		if (this.sessionProvider != null) {
 			return this.sessionProvider.getSession();
 		}
 		return null;
 	}
 
-	protected DmsProjectDao getDmsProjectDao() {
+	public DmsProjectDao getDmsProjectDao() {
 		DmsProjectDao dmsProjectDao = new DmsProjectDao();
 		dmsProjectDao.setSession(this.getActiveSession());
 		return dmsProjectDao;
 	}
 
-	protected CVTermDao getCvTermDao() {
+	public CVTermDao getCvTermDao() {
 		CVTermDao cvTermDao = new CVTermDao();
 		cvTermDao.setSession(this.getActiveSession());
 		return cvTermDao;
 	}
 
-	protected StandardVariableDao getStandardVariableDao() {
+	public StandardVariableDao getStandardVariableDao() {
 		return new StandardVariableDao(this.getActiveSession());
 	}
 
-	protected BreedersQueryDao getBreedersQueryDao() {
+	public BreedersQueryDao getBreedersQueryDao() {
 		return new BreedersQueryDao(this.getActiveSession());
 	}
 
-	protected CVTermRelationshipDao getCvTermRelationshipDao() {
+	public CVTermRelationshipDao getCvTermRelationshipDao() {
 		CVTermRelationshipDao cvTermRelationshipDao = new CVTermRelationshipDao();
 		cvTermRelationshipDao.setSession(this.getActiveSession());
 		return cvTermRelationshipDao;
 	}
 
-	protected CountryDAO getCountryDao() {
+	public CountryDAO getCountryDao() {
 		CountryDAO countryDao = new CountryDAO();
 		countryDao.setSession(this.getActiveSession());
 		return countryDao;
 	}
 
-	protected UserDAO getUserDao() {
+	public UserDAO getUserDao() {
 		UserDAO userDao = new UserDAO();
 		userDao.setSession(this.getActiveSession());
 		return userDao;
 	}
 
-	protected CVDao getCvDao() {
+	public CVDao getCvDao() {
 		CVDao cvDao = new CVDao();
 		cvDao.setSession(this.getActiveSession());
 		return cvDao;
 	}
 
-	protected StockDao getStockDao() {
+	public StockDao getStockDao() {
 		StockDao stockDao = new StockDao();
 		stockDao.setSession(this.getActiveSession());
 		return stockDao;
 	}
 
-	protected StudySearchDao getStudySearchDao() {
+	public StudySearchDao getStudySearchDao() {
 		StudySearchDao studySearchDao = new StudySearchDao();
 		studySearchDao.setSession(this.getActiveSession());
 		return studySearchDao;
 	}
 
-	protected LocationSearchDao getLocationSearchDao() {
+	public LocationSearchDao getLocationSearchDao() {
 		LocationSearchDao dao = new LocationSearchDao();
 		dao.setSession(this.getActiveSession());
 		return dao;
 	}
 
-	protected GeolocationPropertyDao getGeolocationPropertyDao() {
+	public GeolocationPropertyDao getGeolocationPropertyDao() {
 		GeolocationPropertyDao geolocationPropertyDao = new GeolocationPropertyDao();
 		geolocationPropertyDao.setSession(this.getActiveSession());
 		return geolocationPropertyDao;
 	}
 
-	protected ExperimentDao getExperimentDao() {
+	public ExperimentDao getExperimentDao() {
 		ExperimentDao experimentDao = new ExperimentDao();
 		experimentDao.setSession(this.getActiveSession());
 		return experimentDao;
 	}
 
-	protected ExperimentPropertyDao getExperimentPropertyDao() {
+	public ExperimentPropertyDao getExperimentPropertyDao() {
 		ExperimentPropertyDao experimentPropertyDao = new ExperimentPropertyDao();
 		experimentPropertyDao.setSession(this.getActiveSession());
 		return experimentPropertyDao;
 	}
 
-	protected StockPropertyDao getStockPropertyDao() {
+	public StockPropertyDao getStockPropertyDao() {
 		StockPropertyDao stockPropertyDao = new StockPropertyDao();
 		stockPropertyDao.setSession(this.getActiveSession());
 		return stockPropertyDao;
 	}
 
-	protected ExperimentStockDao getExperimentStockDao() {
+	public ExperimentStockDao getExperimentStockDao() {
 		ExperimentStockDao experimentStockDao = new ExperimentStockDao();
 		experimentStockDao.setSession(this.getActiveSession());
 		return experimentStockDao;
 	}
 
-	protected ExperimentProjectDao getExperimentProjectDao() {
+	public ExperimentProjectDao getExperimentProjectDao() {
 		ExperimentProjectDao experimentProjectDao = new ExperimentProjectDao();
 		experimentProjectDao.setSession(this.getActiveSession());
 		return experimentProjectDao;
 	}
 
 	public ProjectPropertyDao getProjectPropertyDao() {
-		if (this.projectPropertyDao == null) {
-			this.projectPropertyDao = new ProjectPropertyDao();
-		}
-		this.projectPropertyDao.setSession(this.getActiveSession());
-		return this.projectPropertyDao;
+		ProjectPropertyDao projectPropertyDao = new ProjectPropertyDao();
+		projectPropertyDao.setSession(this.getActiveSession());
+		return projectPropertyDao;
 	}
 
-	protected ProjectRelationshipDao getProjectRelationshipDao() {
+	public ProjectRelationshipDao getProjectRelationshipDao() {
 		ProjectRelationshipDao projectRelationshipDao = new ProjectRelationshipDao();
 		projectRelationshipDao.setSession(this.getActiveSession());
 		return projectRelationshipDao;
 	}
 
-	protected GeolocationDao getGeolocationDao() {
+	public GeolocationDao getGeolocationDao() {
 		GeolocationDao geolocationDao = new GeolocationDao();
 		geolocationDao.setSession(this.getActiveSession());
 		return geolocationDao;
 	}
 
-	protected PhenotypeDao getPhenotypeDao() {
+	public PhenotypeDao getPhenotypeDao() {
 		PhenotypeDao phenotypeDao = new PhenotypeDao();
 		phenotypeDao.setSession(this.getActiveSession());
 		return phenotypeDao;
 	}
 
-	protected PhenotypeOutlierDao getPhenotypeOutlierDao() {
+	public PhenotypeOutlierDao getPhenotypeOutlierDao() {
 		PhenotypeOutlierDao phenotypeOutlierDao = new PhenotypeOutlierDao();
 		phenotypeOutlierDao.setSession(this.getActiveSession());
 		return phenotypeOutlierDao;
 	}
 
-	protected ExperimentPhenotypeDao getExperimentPhenotypeDao() {
+	public ExperimentPhenotypeDao getExperimentPhenotypeDao() {
 		ExperimentPhenotypeDao experimentPhenotypeDao = new ExperimentPhenotypeDao();
 		experimentPhenotypeDao.setSession(this.getActiveSession());
 		return experimentPhenotypeDao;
 	}
 
-	protected CvTermPropertyDao getCvTermPropertyDao() {
+	public CvTermPropertyDao getCvTermPropertyDao() {
 		CvTermPropertyDao cvTermPropertyDao = new CvTermPropertyDao();
 		cvTermPropertyDao.setSession(this.getActiveSession());
 		return cvTermPropertyDao;
 	}
 
-	protected CvTermSynonymDao getCvTermSynonymDao() {
+	public final VariableOverridesDao getVariableProgramOverridesDao() {
+		VariableOverridesDao variableOverridesDao = new VariableOverridesDao();
+		variableOverridesDao.setSession(this.getActiveSession());
+		return variableOverridesDao;
+	}
+
+	public CvTermSynonymDao getCvTermSynonymDao() {
 		CvTermSynonymDao cvTermSynonymDao = new CvTermSynonymDao();
 		cvTermSynonymDao.setSession(this.getActiveSession());
 		return cvTermSynonymDao;
 	}
 
-	protected NameDAO getNameDao() {
+	public NameDAO getNameDao() {
 		NameDAO nameDao = new NameDAO();
 		nameDao.setSession(this.getActiveSession());
 		return nameDao;
 	}
 
-	protected AccMetadataSetDAO getAccMetadataSetDao() {
+	public AccMetadataSetDAO getAccMetadataSetDao() {
 		AccMetadataSetDAO accMetadataSetDao = new AccMetadataSetDAO();
 		accMetadataSetDao.setSession(this.getActiveSession());
 		return accMetadataSetDao;
 	}
 
-	protected AlleleValuesDAO getAlleleValuesDao() {
+	public AlleleValuesDAO getAlleleValuesDao() {
 		AlleleValuesDAO alleleValuesDao = new AlleleValuesDAO();
 		alleleValuesDao.setSession(this.getActiveSession());
 		return alleleValuesDao;
 	}
 
-	protected CharValuesDAO getCharValuesDao() {
+	public CharValuesDAO getCharValuesDao() {
 		CharValuesDAO charValuesDao = new CharValuesDAO();
 		charValuesDao.setSession(this.getActiveSession());
 		return charValuesDao;
 	}
 
-	protected DartValuesDAO getDartValuesDao() {
+	public DartValuesDAO getDartValuesDao() {
 		DartValuesDAO dartValuesDao = new DartValuesDAO();
 		dartValuesDao.setSession(this.getActiveSession());
 		return dartValuesDao;
 	}
 
-	protected DatasetDAO getDatasetDao() {
+	public DatasetDAO getDatasetDao() {
 		DatasetDAO datasetDao = new DatasetDAO();
 		datasetDao.setSession(this.getActiveSession());
 		return datasetDao;
 	}
 
-	protected DatasetUsersDAO getDatasetUsersDao() {
+	public DatasetUsersDAO getDatasetUsersDao() {
 		DatasetUsersDAO datasetUsersDao = new DatasetUsersDAO();
 		datasetUsersDao.setSession(this.getActiveSession());
 		return datasetUsersDao;
 	}
 
-	protected MapDAO getMapDao() {
+	public MapDAO getMapDao() {
 		MapDAO mapDao = new MapDAO();
 		mapDao.setSession(this.getActiveSession());
 		return mapDao;
 	}
 
-	protected MappingDataDAO getMappingDataDao() {
+	public MappingDataDAO getMappingDataDao() {
 		MappingDataDAO mappingDataDao = new MappingDataDAO();
 		mappingDataDao.setSession(this.getActiveSession());
 		return mappingDataDao;
 	}
 
-	protected MappingPopDAO getMappingPopDao() {
+	public MappingPopDAO getMappingPopDao() {
 		MappingPopDAO mappingPopDao = new MappingPopDAO();
 		mappingPopDao.setSession(this.getActiveSession());
 		return mappingPopDao;
 	}
 
-	protected MappingPopValuesDAO getMappingPopValuesDao() {
+	public MappingPopValuesDAO getMappingPopValuesDao() {
 		MappingPopValuesDAO mappingPopValuesDao = new MappingPopValuesDAO();
 		mappingPopValuesDao.setSession(this.getActiveSession());
 		return mappingPopValuesDao;
 	}
 
-	protected MarkerAliasDAO getMarkerAliasDao() {
+	public MarkerAliasDAO getMarkerAliasDao() {
 		MarkerAliasDAO markerAliasDao = new MarkerAliasDAO();
 		markerAliasDao.setSession(this.getActiveSession());
 		return markerAliasDao;
 	}
 
-	protected MarkerDAO getMarkerDao() {
+	public MarkerDAO getMarkerDao() {
 		MarkerDAO markerDao = new MarkerDAO();
 		markerDao.setSession(this.getActiveSession());
 		return markerDao;
 	}
 
-	protected MarkerDetailsDAO getMarkerDetailsDao() {
+	public MarkerDetailsDAO getMarkerDetailsDao() {
 		MarkerDetailsDAO markerDetailsDao = new MarkerDetailsDAO();
 		markerDetailsDao.setSession(this.getActiveSession());
 		return markerDetailsDao;
 	}
 
-	protected MarkerInfoDAO getMarkerInfoDao() {
+	public MarkerInfoDAO getMarkerInfoDao() {
 		MarkerInfoDAO markerInfoDao = new MarkerInfoDAO();
 		markerInfoDao.setSession(this.getActiveSession());
 		return markerInfoDao;
 	}
 
-	protected ExtendedMarkerInfoDAO getExtendedMarkerInfoDao() {
+	public ExtendedMarkerInfoDAO getExtendedMarkerInfoDao() {
 		ExtendedMarkerInfoDAO extendedMarkerInfoDAO = new ExtendedMarkerInfoDAO();
 		extendedMarkerInfoDAO.setSession(this.getActiveSession());
 		return extendedMarkerInfoDAO;
 	}
 
-	protected MarkerMetadataSetDAO getMarkerMetadataSetDao() {
+	public MarkerMetadataSetDAO getMarkerMetadataSetDao() {
 		MarkerMetadataSetDAO markerMetadataSetDao = new MarkerMetadataSetDAO();
 		markerMetadataSetDao.setSession(this.getActiveSession());
 		return markerMetadataSetDao;
 	}
 
-	protected MarkerOnMapDAO getMarkerOnMapDao() {
+	public MarkerOnMapDAO getMarkerOnMapDao() {
 		MarkerOnMapDAO markerOnMapDao = new MarkerOnMapDAO();
 		markerOnMapDao.setSession(this.getActiveSession());
 		return markerOnMapDao;
 	}
 
-	protected MarkerUserInfoDAO getMarkerUserInfoDao() {
+	public MarkerUserInfoDAO getMarkerUserInfoDao() {
 		MarkerUserInfoDAO markerUserInfoDao = new MarkerUserInfoDAO();
 		markerUserInfoDao.setSession(this.getActiveSession());
 		return markerUserInfoDao;
 	}
 
-	protected MarkerUserInfoDetailsDAO getMarkerUserInfoDetailsDao() {
+	public MarkerUserInfoDetailsDAO getMarkerUserInfoDetailsDao() {
 		MarkerUserInfoDetailsDAO markerUserInfoDetailsDao = new MarkerUserInfoDetailsDAO();
 		markerUserInfoDetailsDao.setSession(this.getActiveSession());
 		return markerUserInfoDetailsDao;
 	}
 
-	protected QtlDAO getQtlDao() {
+	public QtlDAO getQtlDao() {
 		QtlDAO qtlDao = new QtlDAO();
 		qtlDao.setSession(this.getActiveSession());
 		return qtlDao;
 	}
 
-	protected QtlDetailsDAO getQtlDetailsDao() {
+	public QtlDetailsDAO getQtlDetailsDao() {
 		QtlDetailsDAO qtlDetailsDao = new QtlDetailsDAO();
 		qtlDetailsDao.setSession(this.getActiveSession());
 		return qtlDetailsDao;
 	}
 
-	protected MtaDAO getMtaDao() {
+	public MtaDAO getMtaDao() {
 		MtaDAO mtaDao = new MtaDAO();
 		mtaDao.setSession(this.getActiveSession());
 		return mtaDao;
 	}
 
-	protected MtaMetadataDAO getMtaMetadataDao() {
+	public MtaMetadataDAO getMtaMetadataDao() {
 		MtaMetadataDAO mtaMetadataDao = new MtaMetadataDAO();
 		mtaMetadataDao.setSession(this.getActiveSession());
 		return mtaMetadataDao;
 	}
 
-	protected TrackDataDAO getTrackDataDao() {
+	public TrackDataDAO getTrackDataDao() {
 		TrackDataDAO trackDataDao = new TrackDataDAO();
 		trackDataDao.setSession(this.getActiveSession());
 		return trackDataDao;
 	}
 
-	protected TrackMarkerDAO getTrackMarkerDao() {
+	public TrackMarkerDAO getTrackMarkerDao() {
 		TrackMarkerDAO trackMarkerDao = new TrackMarkerDAO();
 		trackMarkerDao.setSession(this.getActiveSession());
 		return trackMarkerDao;
 	}
 
-	protected AttributeDAO getAttributeDao() {
+	public AttributeDAO getAttributeDao() {
 		AttributeDAO attributeDao = new AttributeDAO();
 		attributeDao.setSession(this.getActiveSession());
 		return attributeDao;
 	}
 
-	protected BibrefDAO getBibrefDao() {
+	public BibrefDAO getBibrefDao() {
 		BibrefDAO bibrefDao = new BibrefDAO();
 		bibrefDao.setSession(this.getActiveSession());
 		return bibrefDao;
 	}
 
-	protected GermplasmDAO getGermplasmDao() {
+	public GermplasmDAO getGermplasmDao() {
 		GermplasmDAO germplasmDao = new GermplasmDAO();
 		germplasmDao.setSession(this.getActiveSession());
 		return germplasmDao;
 	}
 
-	protected LocationDAO getLocationDao() {
+	public LocationDAO getLocationDao() {
 		LocationDAO locationDao = new LocationDAO();
 		locationDao.setSession(this.getActiveSession());
 		return locationDao;
 	}
 
-	protected LocdesDAO getLocDesDao() {
+	public LocdesDAO getLocDesDao() {
 		LocdesDAO locdesDao = new LocdesDAO();
 		locdesDao.setSession(this.getActiveSession());
 		return locdesDao;
 	}
 
-	protected MethodDAO getMethodDao() {
+	public MethodDAO getMethodDao() {
 		MethodDAO methodDao = new MethodDAO();
 		methodDao.setSession(this.getActiveSession());
 		return methodDao;
 	}
 
-	protected ProgenitorDAO getProgenitorDao() {
+	public ProgenitorDAO getProgenitorDao() {
 		ProgenitorDAO progenitorDao = new ProgenitorDAO();
 		progenitorDao.setSession(this.getActiveSession());
 		return progenitorDao;
 	}
 
-	protected UserDefinedFieldDAO getUserDefinedFieldDao() {
+	public UserDefinedFieldDAO getUserDefinedFieldDao() {
 		UserDefinedFieldDAO userDefinedFieldDao = new UserDefinedFieldDAO();
 		userDefinedFieldDao.setSession(this.getActiveSession());
 		return userDefinedFieldDao;
 	}
 
-	protected LocationDAO getLocationDAO() {
+	public LocationDAO getLocationDAO() {
 		LocationDAO locationDao = new LocationDAO();
 		locationDao.setSession(this.getActiveSession());
 		return locationDao;
 	}
 
-	protected LocdesDAO getLocdesDao() {
+	public LocdesDAO getLocdesDao() {
 		LocdesDAO locdesDao = new LocdesDAO();
 		locdesDao.setSession(this.getActiveSession());
 		return locdesDao;
@@ -505,43 +506,37 @@ public class DatabaseBroker {
 		return programFavoriteDao;
 	}
 
-	protected GermplasmListDAO getGermplasmListDAO() {
-		if (this.germplasmListDao == null) {
-			this.germplasmListDao = new GermplasmListDAO();
-		}
-		this.germplasmListDao.setSession(this.getActiveSession());
-		return this.germplasmListDao;
+	public GermplasmListDAO getGermplasmListDAO() {
+		GermplasmListDAO germplasmListDao = new GermplasmListDAO();
+		germplasmListDao.setSession(this.getActiveSession());
+		return germplasmListDao;
 	}
 
-	public void setGermplasmListDao(GermplasmListDAO germplasmListDao) {
-		this.germplasmListDao = germplasmListDao;
-	}
-
-	protected GermplasmListDataDAO getGermplasmListDataDAO() {
+	public GermplasmListDataDAO getGermplasmListDataDAO() {
 		GermplasmListDataDAO germplasmListDataDao = new GermplasmListDataDAO();
 		germplasmListDataDao.setSession(this.getActiveSession());
 		return germplasmListDataDao;
 	}
 
-	protected ListDataPropertyDAO getListDataPropertyDAO() {
+	public ListDataPropertyDAO getListDataPropertyDAO() {
 		ListDataPropertyDAO listDataPropertyDao = new ListDataPropertyDAO();
 		listDataPropertyDao.setSession(this.getActiveSession());
 		return listDataPropertyDao;
 	}
 
-	protected ListDataProjectDAO getListDataProjectDAO() {
+	public ListDataProjectDAO getListDataProjectDAO() {
 		ListDataProjectDAO listDataProjectDao = new ListDataProjectDAO();
 		listDataProjectDao.setSession(this.getActiveSession());
 		return listDataProjectDao;
 	}
 
-	protected LotDAO getLotDao() {
+	public LotDAO getLotDao() {
 		LotDAO lotDao = new LotDAO();
 		lotDao.setSession(this.getActiveSession());
 		return lotDao;
 	}
 
-	protected PersonDAO getPersonDao() {
+	public PersonDAO getPersonDao() {
 		PersonDAO personDao = new PersonDAO();
 		personDao.setSession(this.getActiveSession());
 		return personDao;
@@ -559,12 +554,12 @@ public class DatabaseBroker {
 		return stockTransactionDAO;
 	}
 
-	protected TermPropertyBuilder getTermPropertyBuilder() {
+	public TermPropertyBuilder getTermPropertyBuilder() {
 		return new TermPropertyBuilder(this.sessionProvider);
 	}
 
 	// ================================ InventoryDataManager DAO Methods =============================
-	protected ProgramPresetDAO getProgramPresetDAO() {
+	public ProgramPresetDAO getProgramPresetDAO() {
 		ProgramPresetDAO programPresetDAO = new ProgramPresetDAO();
 		programPresetDAO.setSession(this.getActiveSession());
 		return programPresetDAO;
@@ -572,12 +567,46 @@ public class DatabaseBroker {
 
 	public UserProgramTreeStateDAO getUserProgramTreeStateDAO() {
 		UserProgramTreeStateDAO userProgramTreeStateDAO = new UserProgramTreeStateDAO();
-		userProgramTreeStateDAO.setSession(getActiveSession());
+		userProgramTreeStateDAO.setSession(this.getActiveSession());
 		return userProgramTreeStateDAO;
 	}
 
-	public void setProjectPropertyDao(ProjectPropertyDao projectPropertyDao) {
-		this.projectPropertyDao = projectPropertyDao;
+
+	/**
+	 * Parse hibernate query result value to boolean with null check
+	 * 
+	 * @param val value
+	 * @return boolean
+	 */
+	protected boolean typeSafeObjectToBoolean(Object val) {
+		if (val == null) {
+			  return false;
+		  }
+		if (val instanceof Integer) {
+			  return (Integer) val != 0;
+		  }
+		if (val instanceof Boolean) {
+			  return (Boolean) val;
+		  }
+		return false;
 	}
 
+	/**
+	 * Parse hibernate query result value to Integer with null check
+	 * 
+	 * @param val value
+	 * @return boolean
+	 */
+	protected Integer typeSafeObjectToInteger(Object val) {
+		if (val == null) {
+			  return null;
+		  }
+		if (val instanceof Integer) {
+			  return (Integer) val;
+		  }
+		if (val instanceof String) {
+			  return Integer.valueOf((String) val);
+		  }
+		throw new NumberFormatException("Can not cast " + val.getClass() + " to Integer for value: " + val);
+	}
 }

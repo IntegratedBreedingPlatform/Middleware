@@ -14,7 +14,6 @@ package org.generationcp.middleware.domain.dms;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,16 +51,6 @@ public class VariableList implements Serializable {
 			}
 		}
 		return null;
-	}
-
-	public Map<String, Variable> getVariableMap() {
-		if (this.variableMap == null) {
-			this.variableMap = new HashMap<String, Variable>();
-			for (Variable variable : this.getVariables()) {
-				this.variableMap.put(Integer.toString(variable.getVariableType().getStandardVariable().getStoredIn().getId()), variable);
-			}
-		}
-		return this.variableMap;
 	}
 
 	public List<Variable> getVariables() {

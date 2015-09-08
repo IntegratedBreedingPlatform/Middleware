@@ -37,6 +37,7 @@ import javax.persistence.UniqueConstraint;
 public class CVTerm implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	public static final String ID_NAME = "cvTermId";
 
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
@@ -58,7 +59,7 @@ public class CVTerm implements Serializable {
 	private String name;
 
 	/** A human-readable text definition. */
-	@Column(name = "definition")
+	@Column(name = "definition", length = 1024)
 	private String definition;
 
 	/**
@@ -140,20 +141,20 @@ public class CVTerm implements Serializable {
 	}
 
 	public Boolean isObsolete() {
-		return this.isObsolete > 0 ? true : false;
+		return this.isObsolete > 0;
 	}
 
 	public void setIsObsolete(Boolean isObsolete) {
 
-		this.isObsolete = (int) (isObsolete ? 1 : 0);
+		this.isObsolete = isObsolete ? 1 : 0;
 	}
 
 	public Boolean isRelationshipType() {
-		return this.isRelationshipType > 0 ? true : false;
+		return this.isRelationshipType > 0;
 	}
 
 	public void setIsRelationshipType(Boolean isRelationshipType) {
-		this.isRelationshipType = (int) (isRelationshipType ? 1 : 0);
+		this.isRelationshipType = isRelationshipType ? 1 : 0;
 	}
 
 	@Override

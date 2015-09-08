@@ -26,7 +26,6 @@ import org.generationcp.middleware.operation.builder.ListInventoryBuilder;
 import org.generationcp.middleware.operation.builder.MethodBuilder;
 import org.generationcp.middleware.operation.builder.NameBuilder;
 import org.generationcp.middleware.operation.builder.NameSynonymBuilder;
-import org.generationcp.middleware.operation.builder.PropertyBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.StudyBuilder;
@@ -59,7 +58,6 @@ import org.generationcp.middleware.operation.saver.StockSaver;
 import org.generationcp.middleware.operation.saver.StudySaver;
 import org.generationcp.middleware.operation.searcher.StudySearcherByNameStartSeasonCountry;
 import org.generationcp.middleware.util.DatabaseBroker;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -478,15 +476,13 @@ public abstract class DataManager extends DatabaseBroker {
 
 	@SuppressWarnings({"rawtypes", "unchecked"})
 	public Object save(GenericDAO dao, Object entity) throws MiddlewareQueryException {
+
 		try {
 			Object recordSaved = dao.save(entity);
 			return recordSaved;
 		} catch (Exception e) {
-
-			this.logAndThrowException(
-					"Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n" + e.getMessage(), e,
-					DataManager.LOG);
-			return null;
+			throw new MiddlewareQueryException("Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n"
+					+ e.getMessage(), e);
 		}
 	}
 
@@ -496,21 +492,14 @@ public abstract class DataManager extends DatabaseBroker {
 			Object recordSaved = dao.saveOrUpdate(entity);
 			return recordSaved;
 		} catch (Exception e) {
-
-			this.logAndThrowException(
-					"Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n" + e.getMessage(), e,
-					DataManager.LOG);
-			return null;
+			throw new MiddlewareQueryException("Error encountered with saving " + entity.getClass() + "(" + entity.toString() + "): \n"
+					+ e.getMessage(), e);
 		}
 	}
 
-	protected void logAndThrowException(String message) throws MiddlewareQueryException {
-		DataManager.LOG.error(message);
-		throw new MiddlewareQueryException(message);
-	}
-
 	/**
-	 * Logs an error based on the given message using the given Logger parameter.
+	 * Logs an error based on the given message using the given Logger parameter. TODO: Deprecate this method and do not use. It is referred
+	 * as anti pattern. Reference: https://today.java.net/article/2006/04/04/exception-handling-antipatterns#logAndThrow
 	 *
 	 * @param message The message to log and to set on the exception
 	 * @param e The origin of the exception
@@ -518,31 +507,18 @@ public abstract class DataManager extends DatabaseBroker {
 	 */
 	protected void logAndThrowException(String message, Throwable e) throws MiddlewareQueryException {
 		DataManager.LOG.error(e.getMessage(), e);
-		throw new MiddlewareQueryException(message + e.getMessage(), e);
-	}
-
-	/**
-	 * Logs an error based on the given message using the given Logger parameter. <br/>
-	 * Throws a MiddlewarewareQueryException that wraps the origin of the exception. <br/>
-	 *
-	 * @param message The message to log and to set on the exception
-	 * @param e The origin of the exception
-	 * @param log The Logger to use
-	 * @throws MiddlewareQueryException
-	 */
-	protected void logAndThrowException(String message, Throwable e, Logger log) throws MiddlewareQueryException {
-		DataManager.LOG.error(e.getMessage(), e);
-		throw new MiddlewareQueryException(message + e.getMessage(), e);
+		throw new MiddlewareQueryException(message, e);
 	}
 
 	/**
 	 * Retrieves the positive ids from the given list of ids
+	 * 
 	 *
 	 * @param ids The positive list of ids
 	 * @return the positive ids from the given list
 	 */
 	protected List<Integer> getPositiveIds(List<Integer> ids) {
-		List<Integer> positiveIds = new ArrayList<Integer>();
+		List<Integer> positiveIds = new ArrayList<>();
 		for (Integer id : ids) {
 			if (id >= 0) {
 				positiveIds.add(id);
@@ -552,10 +528,11 @@ public abstract class DataManager extends DatabaseBroker {
 	}
 
 	void doInTransaction(Work work) throws MiddlewareQueryException {
+
 		try {
 			work.doWork();
 		} catch (Exception e) {
-			this.logAndThrowException("Error encountered with " + work.getName() + e.getMessage(), e, DataManager.LOG);
+			throw new MiddlewareQueryException("Error encountered with " + work.getName() + e.getMessage(), e);
 		}
 	}
 
@@ -677,10 +654,6 @@ public abstract class DataManager extends DatabaseBroker {
 
 	protected final TraitGroupBuilder getTraitGroupBuilder() {
 		return new TraitGroupBuilder(this.sessionProvider);
-	}
-
-	protected final PropertyBuilder getPropertyBuilder() {
-		return new PropertyBuilder(this.sessionProvider);
 	}
 
 	protected final ExperimentPropertySaver getExperimentPropertySaver() {

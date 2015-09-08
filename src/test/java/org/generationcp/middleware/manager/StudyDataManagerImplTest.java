@@ -19,6 +19,7 @@ import java.util.Random;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.StudyTestDataUtil;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -37,7 +38,6 @@ import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
-import org.generationcp.middleware.domain.dms.VariableType;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -50,6 +50,7 @@ import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.domain.workbench.StudyNode;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -517,7 +518,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		datasetValues.setName("No Datatype dataset" + new Random().nextInt(10000));
 		datasetValues.setDescription("whatever ds");
 
-		VariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
+		DMSVariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
 		typeList.add(variableType);
 
 		variableType = this.createVariableType(18050, "Disease Pressure", "whatever", 5);
@@ -571,10 +572,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Debug.println(IntegrationTestBase.INDENT, "Original Dataset");
 		dataSet.print(3);
 
-		VariableType variableType = new VariableType();
+		DMSVariableType variableType = new DMSVariableType();
 		variableType.setLocalName("Dog");
 		variableType.setLocalDescription("Man's best friend");
-		variableType.setStandardVariable(this.ontologyManager.getStandardVariable(8240));
+		variableType.setStandardVariable(this.ontologyManager.getStandardVariable(8240, commonTestProject.getUniqueID()));
 		variableType.setRank(99);
 		this.manager.addDataSetVariableType(dataSet.getId(), variableType);
 
@@ -601,22 +602,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSetExperimentValue() throws Exception {
-		StudyReference studyRef = this.addTestStudy();
-		DatasetReference datasetRef = this.addTestDataset(studyRef.getId());
-		this.addTestExperiments(datasetRef.getId(), 4);
-		List<Experiment> experiments = this.manager.getExperiments(datasetRef.getId(), 0, 2);
-
-		this.printExperiments("Original", datasetRef.getId());
-		for (Experiment experiment : experiments) {
-			this.manager.setExperimentValue(experiment.getId(), 18000, "666");
-			this.manager.setExperimentValue(experiment.getId(), 18050, "19010");
-			this.manager.setExperimentValue(experiment.getId(), 8200, "4");
-		}
-		this.printExperiments("Modified", datasetRef.getId());
-	}
-
-	@Test
 	public void testGetTrialEnvironmentsInDataset() throws Exception {
 		Debug.println(IntegrationTestBase.INDENT, "Test getTrialEnvironmentsInDataset");
 		TrialEnvironments trialEnvironments = this.manager.getTrialEnvironmentsInDataset(10085);
@@ -627,14 +612,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetStocksInDataset() throws Exception {
 		Stocks stocks = this.manager.getStocksInDataset(10085);
 		stocks.print(IntegrationTestBase.INDENT);
-	}
-
-	private void printExperiments(String title, int datasetId) throws Exception {
-		Debug.println(IntegrationTestBase.INDENT, title);
-		List<Experiment> experiments = this.manager.getExperiments(datasetId, 0, 4);
-		for (Experiment experiment : experiments) {
-			experiment.print(3);
-		}
 	}
 
 	@Test
@@ -657,7 +634,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		DataSet dataset = this.manager.getDataSet(datasetId);
 		VariableTypeList factors = dataset.getFactorsByProperty(propertyId);
 		if (factors != null && factors.getVariableTypes() != null && factors.getVariableTypes().size() > 0) {
-			for (VariableType factor : factors.getVariableTypes()) {
+			for (DMSVariableType factor : factors.getVariableTypes()) {
 				factor.print(IntegrationTestBase.INDENT);
 			}
 		} else {
@@ -675,7 +652,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			VariableTypeList factors = dataset.getFactorsByPhenotypicType(phenotypicType);
 
 			if (factors != null && factors.getVariableTypes() != null && factors.getVariableTypes().size() > 0) {
-				for (VariableType factor : factors.getVariableTypes()) {
+				for (DMSVariableType factor : factors.getVariableTypes()) {
 					factor.print(IntegrationTestBase.INDENT);
 				}
 			} else {
@@ -886,7 +863,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 			// add variableTypes to project properties if not exists
 			VariableTypeList nonExistingVariableTypes = new VariableTypeList();
-			for (VariableType variableType : variableTypeList.getVariableTypes()) {
+			for (DMSVariableType variableType : variableTypeList.getVariableTypes()) {
 				if (this.manager.getDataSet(trialDataSetId).findVariableTypeByLocalName(variableType.getLocalName()) == null) {
 					nonExistingVariableTypes.add(variableType);
 				}
@@ -899,7 +876,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 			Assert.assertNotNull(experiments);
 
-			for (VariableType variable : variableTypeList.getVariableTypes()) {
+			for (DMSVariableType variable : variableTypeList.getVariableTypes()) {
 				Variable savedVariable = experiments.get(0).getVariates().findByLocalName(variable.getLocalName());
 				Assert.assertNotNull(savedVariable);
 				Assert.assertEquals("12345", savedVariable.getValue());
@@ -918,7 +895,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		expValue.setLocationId(locationId);
 
-		for (VariableType variableType : variableTypeList.getVariableTypes()) {
+		for (DMSVariableType variableType : variableTypeList.getVariableTypes()) {
 			variableList.add(new Variable(variableType, "12345"));
 		}
 
@@ -932,16 +909,16 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		VariableTypeList variableTypeList = new VariableTypeList();
 
-		VariableType grainYieldSem = this.createVariableType(18140, "GRAIN_YIELD_SUMMARY_STAT", "test", 100);
+		DMSVariableType grainYieldSem = this.createVariableType(18140, "GRAIN_YIELD_SUMMARY_STAT", "test", 100);
 		variableTypeList.add(grainYieldSem);
 
 		return variableTypeList;
 	}
 
 	private Variable createVariable(int termId, String value, int rank) throws Exception {
-		StandardVariable stVar = this.ontologyManager.getStandardVariable(termId);
+		StandardVariable stVar = this.ontologyManager.getStandardVariable(termId, commonTestProject.getUniqueID());
 
-		VariableType vtype = new VariableType();
+		DMSVariableType vtype = new DMSVariableType();
 		vtype.setStandardVariable(stVar);
 		vtype.setRank(rank);
 		Variable var = new Variable();
@@ -950,10 +927,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		return var;
 	}
 
-	private VariableType createVariableType(int termId, String name, String description, int rank) throws Exception {
-		StandardVariable stdVar = this.ontologyManager.getStandardVariable(termId);
+	private DMSVariableType createVariableType(int termId, String name, String description, int rank) throws Exception {
+		StandardVariable stdVar = this.ontologyManager.getStandardVariable(termId, commonTestProject.getUniqueID());
 
-		VariableType vtype = new VariableType();
+		DMSVariableType vtype = new DMSVariableType();
 		vtype.setLocalName(name);
 		vtype.setLocalDescription(description);
 		vtype.setRank(rank);
@@ -962,7 +939,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		return vtype;
 	}
 
-	private void updateVariableType(VariableType type, String name, String description) {
+	private void updateVariableType(DMSVariableType type, String name, String description) {
 		type.setLocalName(name);
 		type.setLocalDescription(description);
 	}
@@ -1054,7 +1031,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		datasetValues.setDescription("My Dataset Description");
 		datasetValues.setType(DataSetType.MEANS_DATA);
 
-		VariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
+		DMSVariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
 		typeList.add(variableType);
 
 		variableType = this.createVariableType(18050, "Disease Pressure", "whatever", 5);
@@ -1076,7 +1053,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		datasetValues.setDescription("My Dataset Description");
 		datasetValues.setType(DataSetType.MEANS_DATA);
 
-		VariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
+		DMSVariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
 		typeList.add(variableType);
 
 		variableType = this.createVariableType(18050, "Disease Pressure", "whatever", 5);
@@ -1283,7 +1260,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			return;
 		}
 
-		for (VariableType vType : dataSet.getVariableTypes().getVariates().getVariableTypes()) {
+		for (DMSVariableType vType : dataSet.getVariableTypes().getVariates().getVariableTypes()) {
 			cvTermIds.add(vType.getStandardVariable().getId());
 		}
 
@@ -1433,7 +1410,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			programStudiesAndFolders = studyTestDataUtil.getLocalRootFolders(this.commonTestProject.getUniqueID());
 			Assert.assertEquals("Current Program with programUUID " + this.commonTestProject.getUniqueID() + " should return no children",
 					0, programStudiesAndFolders.size());
-		} catch (MiddlewareQueryException e) {
+		} catch (MiddlewareException e) {
 			Assert.fail("Unexpected exception: " + e.getMessage());
 		}
 
@@ -1452,7 +1429,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudyDetails_ByTypeAndId() throws MiddlewareQueryException {
+	public void testGetStudyDetails_ByTypeAndId() throws MiddlewareException {
 		StudyTestDataUtil studyTestDataUtil = new StudyTestDataUtil(this.manager, this.ontologyManager);
 		DmsProject study = studyTestDataUtil.createStudyTestDataWithActiveStatus(this.commonTestProject.getUniqueID());
 		StudyDetails studyDetails = this.manager.getStudyDetails(StudyType.T, study.getProjectId());

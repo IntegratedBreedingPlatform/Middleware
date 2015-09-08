@@ -28,6 +28,16 @@ import org.generationcp.middleware.manager.api.PresetDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.TermDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.InventoryServiceImpl;
@@ -103,6 +113,27 @@ public class ManagerFactory implements Serializable {
 
 	public OntologyDataManager getOntologyDataManager() {
 		return new OntologyDataManagerImpl(this.sessionProvider);
+	}
+
+	public TermDataManager getTermDataManager() {
+		return new TermDataManagerImpl(this.sessionProvider);
+	}
+
+	public OntologyMethodDataManager getOntologyMethodDataManager() {
+		return new OntologyMethodDataManagerImpl(this.sessionProvider);
+	}
+
+	public OntologyPropertyDataManager getOntologyPropertyDataManager() {
+		return new OntologyPropertyDataManagerImpl(this.sessionProvider);
+	}
+
+	public OntologyScaleDataManager getOntologyScaleDataManager() {
+		return new OntologyScaleDataManagerImpl(this.sessionProvider);
+	}
+
+	public OntologyVariableDataManager getOntologyVariableDataManager() {
+		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
+				this.getOntologyScaleDataManager(), this.sessionProvider);
 	}
 
 	public PresetDataManager getPresetDataManager() {

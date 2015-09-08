@@ -29,6 +29,8 @@ public class Study implements Serializable {
 	private VariableList conditions;
 
 	private VariableList constants;
+	
+	private String programUUID;
 
 	public Study() {
 	}
@@ -188,7 +190,7 @@ public class Study implements Serializable {
 		VariableTypeList filteredFactors = new VariableTypeList();
 		VariableTypeList factors = this.getConditionVariableTypes();
 		if (factors != null && factors.getVariableTypes() != null) {
-			for (VariableType factor : factors.getVariableTypes()) {
+			for (DMSVariableType factor : factors.getVariableTypes()) {
 				if (factor.getStandardVariable().getPhenotypicType() == pheotypicType) {
 					filteredFactors.add(factor);
 				}
@@ -196,4 +198,14 @@ public class Study implements Serializable {
 		}
 		return filteredFactors.sort();
 	}
+
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
+	}
+	
+	
 }

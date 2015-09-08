@@ -32,10 +32,14 @@ public class ValueReferenceBuilder extends Builder {
 
 	public List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException {
 		List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(stdVarId);
-		Integer dataType = this.getRelationshipValue(relationships, TermId.HAS_TYPE.getId());
-
+		Integer scaleId = this.getRelationshipValue(relationships, TermId.HAS_SCALE.getId());
+		
+		//get data type and valid values from scale
+		List<CVTermRelationship> scaleRelationships = this.getCvTermRelationshipDao().getBySubject(scaleId);
+		Integer dataType = this.getRelationshipValue(scaleRelationships, TermId.HAS_TYPE.getId());
+		
 		if (dataType != null && dataType == TermId.CATEGORICAL_VARIABLE.getId()) {
-			Set<ValueReference> set = this.getRelationshipValues(relationships, TermId.HAS_VALUE.getId());
+			Set<ValueReference> set = this.getRelationshipValues(scaleRelationships, TermId.HAS_VALUE.getId());
 			for (ValueReference ref : set) {
 				CVTerm term = this.getCvTermDao().getById(ref.getId());
 				if (term != null) {
