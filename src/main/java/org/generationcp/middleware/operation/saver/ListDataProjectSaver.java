@@ -11,10 +11,16 @@ import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.util.Util;
 
-public class ListDataProjectSaver extends Saver {
+public class ListDataProjectSaver {
+
+	private Saver daoFactory;
 
 	public ListDataProjectSaver(HibernateSessionProvider sessionProviderForLocal) {
-		super(sessionProviderForLocal);
+		this.daoFactory = new Saver(sessionProviderForLocal);
+	}
+
+	public ListDataProjectSaver(Saver daoFactory) {
+		this.daoFactory = daoFactory;
 	}
 
 	public int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> listDatas,
@@ -34,17 +40,17 @@ public class ListDataProjectSaver extends Saver {
 			this.setDefaultGermplasmListInfo(snapList, userId);
 		}
 
-		this.getGermplasmListDAO().saveOrUpdate(snapList);
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(snapList);
 
 		if (!isCreate && !isAdvanced) {
 			// delete old list data projects
-			this.getListDataProjectDAO().deleteByListId(snapList.getId());
+			this.daoFactory.getListDataProjectDAO().deleteByListId(snapList.getId());
 		}
 
 		if (listDatas != null) {
 			for (ListDataProject listDataProject : listDatas) {
 				this.prepareListDataProjectForSaving(listDataProject, snapList);
-				this.getListDataProjectDAO().save(listDataProject);
+				this.daoFactory.getListDataProjectDAO().save(listDataProject);
 			}
 		}
 
@@ -53,8 +59,8 @@ public class ListDataProjectSaver extends Saver {
 
 	private GermplasmList createInitialGermplasmList(int projectId, Integer originalListId, GermplasmListType type)
 			throws MiddlewareQueryException {
-		
-		DmsProject project = this.getStudyDataManager().getProject(projectId);		
+
+		DmsProject project = this.daoFactory.getStudyDataManager().getProject(projectId);
 		GermplasmList snapList = new GermplasmList();
 		snapList.setProjectId(projectId);
 		snapList.setProgramUUID(project.getProgramUUID());
@@ -71,7 +77,7 @@ public class ListDataProjectSaver extends Saver {
 	}
 
 	private void updateGermplasmListInfo(GermplasmList germplasmList, int originalListId, int userId) throws MiddlewareQueryException {
-		GermplasmList origList = this.getGermplasmListDAO().getById(originalListId);
+		GermplasmList origList = this.daoFactory.getGermplasmListDAO().getById(originalListId);
 		if (origList != null) {
 			germplasmList.setListLocation(origList.getListLocation());
 			germplasmList.setUserId(origList.getUserId());
@@ -88,11 +94,11 @@ public class ListDataProjectSaver extends Saver {
 	}
 
 	public void updateGermlasmListInfoStudy(int crossesListId, int studyId) throws MiddlewareQueryException {
-		GermplasmList crossesList = this.getGermplasmListDAO().getById(crossesListId);
+		GermplasmList crossesList = this.daoFactory.getGermplasmListDAO().getById(crossesListId);
 		if (crossesList != null) {
 			crossesList.setProjectId(studyId);
 		}
-		this.getGermplasmListDAO().saveOrUpdate(crossesList);
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(crossesList);
 	}
 
 	private void setDefaultGermplasmListInfo(GermplasmList snapList, int userId) {
@@ -106,7 +112,7 @@ public class ListDataProjectSaver extends Saver {
 
 	private GermplasmList getGermplasmList(int projectId, GermplasmListType type) throws MiddlewareQueryException {
 		GermplasmList gList = null;
-		List<GermplasmList> tempList = this.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
+		List<GermplasmList> tempList = this.daoFactory.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
 		if (tempList != null && !tempList.isEmpty()) {
 			gList = tempList.get(0);
 		}

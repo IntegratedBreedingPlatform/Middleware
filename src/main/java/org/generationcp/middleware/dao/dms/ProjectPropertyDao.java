@@ -126,7 +126,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			String sql = "SELECT max(rank) FROM projectprop WHERE project_id = :projectId";
 			Query query = this.getSession().createSQLQuery(sql);
 			query.setParameter("projectId", projectId);
-
 			return (Integer) query.uniqueResult() + 1;
 
 		} catch (HibernateException e) {
