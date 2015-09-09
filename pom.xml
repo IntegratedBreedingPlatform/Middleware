@@ -78,7 +78,7 @@
 			<artifactId>commons-configuration</artifactId>
 			<version>1.10</version>
 		</dependency>
-		
+
 		<!-- Test dependencies -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -86,21 +86,21 @@
 			<version>4.11</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
 			<version>1.9.5</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-test</artifactId>
 			<version>${spring.version}</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- podam = POjo DAta Mocker :) -->
 		<dependency>
 			<groupId>uk.co.jemos.podam</groupId>
@@ -108,14 +108,14 @@
 			<version>5.4.1.RELEASE</version>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Temporary fix to solve the Spring testContext.xml file parsing error on test init. -->
-		<dependency> 
+		<dependency>
 		    <groupId>xml-apis</groupId>
 		    <artifactId>xml-apis</artifactId>
 		    <version>1.4.01</version>
-		</dependency>	
-		
+		</dependency>
+
 		<!-- Logging dependencies -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -162,21 +162,21 @@
 			<artifactId>poi-ooxml-schemas</artifactId>
 			<version>3.8</version>
 		</dependency>
-		
+
 		<!-- Jasper reports module -->
 		<dependency>
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
 			<version>${jasper.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.lowagie</groupId>
 			<artifactId>itext</artifactId>
 			<version>${itext.version}</version>
 			<scope>compile</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.reflections</groupId>
 			<artifactId>reflections</artifactId>
@@ -195,26 +195,26 @@
 			<artifactId>guava</artifactId>
 			<version>18.0</version>
 		</dependency>
-		
+
 		<!-- Spring -->
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-core</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-beans</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
@@ -226,7 +226,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-orm</artifactId>
@@ -243,13 +243,13 @@
 			<artifactId>transactions-jta</artifactId>
 			<version>${atomikos.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.atomikos</groupId>
 			<artifactId>transactions-jdbc</artifactId>
 			<version>${atomikos.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>com.atomikos</groupId>
 			<artifactId>transactions-hibernate3</artifactId>
@@ -378,7 +378,7 @@
 						<include>**/GermplasmDataManagerUtilTest.java</include>
 						<include>**/GermplasmAddUpdateFunctionsTest.java</include>
 						<include>**/LocationDataManagerImplTest.java</include>
-						
+
 						<include>**/BreedersQueryDaoTest.java</include>
 						<include>**/GermplasmListDAOTest.java</include>
 						<include>**/ConformityInputTransformerTest.java</include>
@@ -403,7 +403,7 @@
 						<include>**/ObservationsTest.java</include>
 						<include>**/QueryTest.java</include>
 						<include>**/StudyMeasurementsTest.java</include>
-						
+
 						<!-- New Ontology Manager Tests -->
 						<include>**/CvTermDaoTest.java</include>
 						<include>**/StandardVariableTest.java</include>
