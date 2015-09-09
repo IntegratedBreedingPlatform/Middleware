@@ -15,13 +15,14 @@ import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.OntologyDataCreationUtil;
-import org.junit.After;
+import org.hibernate.Criteria;
+import org.hibernate.criterion.Restrictions;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -91,12 +92,10 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 		Assert.assertTrue(updatedProperty.getClasses().containsAll(this.testProperty.getClasses()));
 
 		// className = newClass should delete on-fly when class is no longer used by any property.
-		Term classTerm = this.termDataManager.getTermByNameAndCvId(CLASS_NAME, CvId.TRAIT_CLASS.getId());
-		Assert.assertNull(classTerm);
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		this.propertyDataManager.deleteProperty(this.testProperty.getId());
+		Criteria criteria = this.sessionProvder.getSession().createCriteria(CVTerm.class)
+				.add(Restrictions.eq("name",CLASS_NAME))
+				.add(Restrictions.eq("cvId", CvId.TRAIT_CLASS.getId()));
+		Assert.assertTrue("Expected cvterm for the class that is no longer in use to be deleted as part of update.", criteria.list()
+				.isEmpty());
 	}
 }
