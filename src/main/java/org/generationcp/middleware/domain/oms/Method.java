@@ -13,6 +13,11 @@ package org.generationcp.middleware.domain.oms;
 
 import org.generationcp.middleware.util.Debug;
 
+/**
+ * This Method class is going to deprecate as we are going to implement ontology package's Method class across the BMS applications.
+ */
+
+@Deprecated
 public class Method {
 
 	private Term term;
