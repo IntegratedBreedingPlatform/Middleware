@@ -4,6 +4,7 @@ package org.ibp.test.utilities;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -41,7 +42,8 @@ public class ReflectionPojoUtilities {
 	}
 
 	private static boolean isPojo(final Class<? extends Object> klass) {
-		final Method[] methods = klass.getDeclaredMethods();
+		final List<Method> methods = new ArrayList<Method>();
+		ReflectionPojoUtilities.getApplicableMethods(methods, klass);
 
 		for (final Method method : methods) {
 
@@ -55,6 +57,16 @@ public class ReflectionPojoUtilities {
 			}
 		}
 		return true;
+	}
+
+	private static List<Method> getApplicableMethods(List<Method> methods, final Class<?> klass) {
+		methods.addAll(Arrays.asList(klass.getDeclaredMethods()));
+
+		if (klass.getSuperclass() != null && !klass.getSuperclass().equals(Object.class)) {
+			methods = ReflectionPojoUtilities.getApplicableMethods(methods, klass.getSuperclass());
+		}
+
+		return methods;
 	}
 
 	private static boolean isGetter(final Method method) {

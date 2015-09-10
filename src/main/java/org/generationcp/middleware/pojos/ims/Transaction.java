@@ -281,7 +281,7 @@ public class Transaction implements Serializable {
 		}
 
 		Transaction rhs = (Transaction) obj;
-		return new EqualsBuilder().appendSuper(super.equals(obj)).append(this.id, rhs.id).isEquals();
+		return new EqualsBuilder().append(this.id, rhs.id).isEquals();
 	}
 
 	@Override

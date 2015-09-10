@@ -87,14 +87,14 @@ public class ParentElement implements Serializable {
 			return false;
 		}
 
-		ParentElement rhs = (ParentElement) obj;
-		return new EqualsBuilder().appendSuper(super.equals(obj)).append(this.parentANId, rhs.parentANId)
+		final ParentElement rhs = (ParentElement) obj;
+		return new EqualsBuilder().append(this.parentANId, rhs.parentANId)
 				.append(this.parentBNId, rhs.parentBNId).append(this.mappingPopType, rhs.mappingPopType).isEquals();
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("ParentElement [parentAGId=");
 		builder.append(this.parentANId);
 		builder.append(", parentBGId=");

@@ -6,6 +6,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -101,8 +102,14 @@ public class TestGetterAndSetter {
 	}
 
 	private void privateCopy(final Object destination, final Object source) throws Exception {
-		final Field[] fields = source.getClass().getDeclaredFields();
+		final List<Field> fields = new ArrayList<Field>();
+		this.getApplicableFields(fields, source.getClass());
 		for (final Field field : fields) {
+
+			if(Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers())) {
+				// Skip static final fields
+				continue;
+			}
 
 			if (PropertyUtils.isWriteable(source, field.getName())) {
 				BeanUtils.setProperty(destination, field.getName(), PropertyUtils.getProperty(source, field.getName()));
@@ -115,6 +122,20 @@ public class TestGetterAndSetter {
 				field.set(destination, field.get(source));
 			}
 		}
+		final Class<?> superclass = source.getClass().getSuperclass();
+		if(!superclass.equals(Object.class)) {
+
+		}
+	}
+
+	private List<Field> getApplicableFields(List<Field> fields, final Class<?> type) {
+		fields.addAll(Arrays.asList(type.getDeclaredFields()));
+
+		if (type.getSuperclass() != null) {
+			fields = this.getApplicableFields(fields, type.getSuperclass());
+		}
+
+		return fields;
 	}
 
 	private List<Class<? extends Object>> findAllPojosInPackage(final String packageName) throws Exception {

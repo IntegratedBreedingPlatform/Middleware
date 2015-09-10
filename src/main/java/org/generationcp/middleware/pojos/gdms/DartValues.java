@@ -171,7 +171,7 @@ public class DartValues implements Serializable {
 		}
 
 		DartValues rhs = (DartValues) obj;
-		return new EqualsBuilder().appendSuper(super.equals(obj)).append(this.adId, rhs.adId).isEquals();
+		return new EqualsBuilder().append(this.adId, rhs.adId).isEquals();
 	}
 
 	@Override

@@ -93,7 +93,7 @@ public class GermplasmNameDetails implements Serializable {
 		}
 
 		GermplasmNameDetails rhs = (GermplasmNameDetails) obj;
-		return new EqualsBuilder().appendSuper(super.equals(obj)).append(this.germplasmId, rhs.germplasmId).append(this.nameId, rhs.nameId)
+		return new EqualsBuilder().append(this.germplasmId, rhs.germplasmId).append(this.nameId, rhs.nameId)
 				.append(this.nVal, rhs.nVal).isEquals();
 	}
 
