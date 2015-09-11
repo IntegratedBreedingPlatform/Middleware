@@ -14,7 +14,7 @@ package org.generationcp.middleware.domain.oms;
 import org.generationcp.middleware.util.Debug;
 
 /**
- * This Method class is going to deprecate as we are going to implement ontology package's Method class across the BMS applications.
+ * @deprecated as we have a new version of the Ontology API now. Use the new API class {@link org.generationcp.middleware.domain.ontology.Method} instead.
  */
 
 @Deprecated
