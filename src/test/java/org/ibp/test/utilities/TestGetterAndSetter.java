@@ -23,7 +23,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 /**
- * A helper test to test getter and setter solely for reducing noise in the test coverage.
+ * A helper to test getter and setter solely for reducing noise in the test coverage.
  *
  */
 public class TestGetterAndSetter {
@@ -32,24 +32,37 @@ public class TestGetterAndSetter {
 	private static final String REGEX_ESCAPE = "\\";
 	final PodamFactory factory = new PodamFactoryImpl();
 
+	/**
+	 * Generate a test suit that can be run by JUnit
+	 *
+	 * @param testSuiteName the name of the test suite
+	 * @param packageName the package that we want to scan for pojo's
+	 * @return The newly created test suite that tests our pojo's
+	 */
 	public Test getTestSuite(final String testSuiteName, final String packageName) {
 		try {
 			final TestSuite suite = new TestSuite(testSuiteName);
 			final TestGetterAndSetter testGetterAndSetter = new TestGetterAndSetter();
-			final ArrayList<GetterAndSetterTestCase> testBmsApiGetterAndSetter;
+			final List<GetterAndSetterTestCase> getterSetterTestCases =
+					testGetterAndSetter.generateGetterAndSetterTestCases(packageName);
 
-			testBmsApiGetterAndSetter = testGetterAndSetter.testBmsApiGetterAndSetter(packageName);
-
-			for (final GetterAndSetterTestCase getterAndSetterTestCase : testBmsApiGetterAndSetter) {
+			for (final GetterAndSetterTestCase getterAndSetterTestCase : getterSetterTestCases) {
 				suite.addTest(getterAndSetterTestCase);
 			}
+
 			return suite;
 		} catch (final Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
 
-	private ArrayList<GetterAndSetterTestCase> testBmsApiGetterAndSetter(final String packageName) throws Exception {
+	/**
+	 * Find pojo's and create getter and setter tests for them
+	 * @param packageName the package name to look for pojos
+	 * @return {@link List} of getter and setter testers
+	 * @throws Exception
+	 */
+	private List<GetterAndSetterTestCase> generateGetterAndSetterTestCases(final String packageName) throws Exception {
 		final List<Class<? extends Object>> findAllPojosInPackage = this.findAllPojosInPackage(packageName);
 		final ArrayList<GetterAndSetterTestCase> getterAndSetterTestCases = new ArrayList<>();
 		for (final Class<? extends Object> class1 : findAllPojosInPackage) {
@@ -66,6 +79,12 @@ public class TestGetterAndSetter {
 		return getterAndSetterTestCases;
 	}
 
+	/**
+	 * Hunt for all classes in a packages
+	 * @param packageName the package name to search for all classes
+	 * @return {@link Set} a set of classes
+	 * @throws Exception In case of any reflection issues
+	 */
 	private Set<Class<? extends Object>> getAllClasses(final String packageName) throws Exception {
 		final Set<Class<? extends Object>> allClasses = new HashSet<Class<? extends Object>>();
 
@@ -106,7 +125,7 @@ public class TestGetterAndSetter {
 		this.getApplicableFields(fields, source.getClass());
 		for (final Field field : fields) {
 
-			if(Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers())) {
+			if (Modifier.isStatic(field.getModifiers()) && Modifier.isFinal(field.getModifiers())) {
 				// Skip static final fields
 				continue;
 			}
@@ -123,7 +142,7 @@ public class TestGetterAndSetter {
 			}
 		}
 		final Class<?> superclass = source.getClass().getSuperclass();
-		if(!superclass.equals(Object.class)) {
+		if (!superclass.equals(Object.class)) {
 
 		}
 	}
@@ -138,7 +157,14 @@ public class TestGetterAndSetter {
 		return fields;
 	}
 
+	/**
+	 * Find pojo's
+	 * @param packageName the package name to look for pojos
+	 * @return {@link List} of pojo's to generate getter and setter fest for.
+	 * @throws Exception
+	 */
 	private List<Class<? extends Object>> findAllPojosInPackage(final String packageName) throws Exception {
+		// Get all possible classes
 		final Set<Class<? extends Object>> allClasses = this.getAllClasses(packageName);
 		return ReflectionPojoUtilities.getAllPojos(allClasses);
 	}

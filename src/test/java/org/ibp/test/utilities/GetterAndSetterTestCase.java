@@ -7,11 +7,18 @@ import org.junit.Assert;
 
 import junit.framework.TestCase;
 
+/**
+ * Test the getter, setters, equals and hash code methods
+ */
 public class GetterAndSetterTestCase extends TestCase {
 
 	private final Object expected;
 	private final Object actual;
 
+	/**
+	 * @param expected the expected values for the test
+	 * @param actual the actual value for the test
+	 */
 	public GetterAndSetterTestCase(final Object expected, final Object actual) {
 		this.expected = expected;
 		this.actual = actual;
@@ -32,13 +39,21 @@ public class GetterAndSetterTestCase extends TestCase {
 		final Method equalsMethod = this.getMethodIfItExists(klass, "equals", Object.class);
 
 		if (equalsMethod != null) {
-			Assert.assertTrue(String.format("The testing of class %s resulted in unequal values. Please make sure your equals method is corret.", klass.getName()),
+			Assert.assertTrue(String.format(
+					"The testing of class %s resulted in unequal values. Please make sure your equals method is corret.", klass.getName()),
 					(Boolean) equalsMethod.invoke(this.expected, this.actual));
-			Assert.assertEquals(String.format("The testing of class %s resulted in unequal hash values. Please  make sure hash method is corret.", klass.getName()),
+			Assert.assertEquals(String.format(
+					"The testing of class %s resulted in unequal hash values. Please  make sure hash method is corret.", klass.getName()),
 					this.expected.hashCode(), this.actual.hashCode());
 		}
 	}
 
+	/**
+	 * @param klass the target class which contains the method
+	 * @param name the name of the method that we want to find the class
+	 * @param parameterTypes the expected parameters in the method
+	 * @return true if the requested method exists
+	 */
 	private Method getMethodIfItExists(final Class<?> klass, final String name, final Class<?>... parameterTypes) {
 		try {
 			return klass.getDeclaredMethod(name, parameterTypes);
