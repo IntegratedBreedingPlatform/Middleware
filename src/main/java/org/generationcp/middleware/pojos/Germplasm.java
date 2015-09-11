@@ -584,7 +584,7 @@ public class Germplasm implements Serializable {
 		}
 
 		Germplasm rhs = (Germplasm) obj;
-		return new EqualsBuilder().appendSuper(super.equals(obj)).append(this.gid, rhs.gid).isEquals();
+		return new EqualsBuilder().append(this.gid, rhs.gid).isEquals();
 	}
 
 	@Override

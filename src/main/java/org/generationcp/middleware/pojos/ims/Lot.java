@@ -251,7 +251,7 @@ public class Lot implements Serializable {
 		}
 
 		Lot rhs = (Lot) obj;
-		return new EqualsBuilder().appendSuper(super.equals(obj)).append(this.id, rhs.id).isEquals();
+		return new EqualsBuilder().append(this.id, rhs.id).isEquals();
 	}
 
 	@Override

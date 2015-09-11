@@ -71,7 +71,7 @@ public class GermplasmMarkerElement {
 		}
 
 		GermplasmMarkerElement rhs = (GermplasmMarkerElement) obj;
-		return new EqualsBuilder().appendSuper(super.equals(obj)).append(this.germplasmName, rhs.germplasmName)
+		return new EqualsBuilder().append(this.germplasmName, rhs.germplasmName)
 				.append(this.markerNames, rhs.markerNames).isEquals();
 	}
 

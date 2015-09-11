@@ -1,17 +1,18 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -38,9 +39,9 @@ import org.hibernate.annotations.NotFoundAction;
 
 /**
  * POJO for listdata table.
- * 
+ *
  * @author Kevin Manansala
- * 
+ *
  */
 @NamedQueries({@NamedQuery(name = "deleteGermplasmListDataByListId", query = "UPDATE GermplasmListData SET status = 9 WHERE list = :listId")})
 @Entity
@@ -94,7 +95,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	private Integer localRecordId;
 
 	@OneToMany(mappedBy = "listData", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
-	private List<ListDataProperty> properties;
+	private List<ListDataProperty> properties = new ArrayList<ListDataProperty>();
 
 	@Transient
 	private ListDataInventory inventoryInfo;

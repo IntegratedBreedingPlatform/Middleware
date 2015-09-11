@@ -173,13 +173,13 @@ public class AlleleValues implements Serializable {
 			return false;
 		}
 
-		AlleleValues rhs = (AlleleValues) obj;
-		return new EqualsBuilder().appendSuper(super.equals(obj)).append(this.anId, rhs.anId).isEquals();
+		final AlleleValues rhs = (AlleleValues) obj;
+		return new EqualsBuilder().append(this.anId, rhs.anId).isEquals();
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("AlleleValues [anId=");
 		builder.append(this.anId);
 		builder.append(", datasetId=");

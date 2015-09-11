@@ -162,7 +162,7 @@ public class MappingPop implements Serializable {
 		}
 
 		MappingPop rhs = (MappingPop) obj;
-		return new EqualsBuilder().appendSuper(super.equals(obj)).append(this.datasetId, rhs.datasetId).append(this.parent, rhs.parent)
+		return new EqualsBuilder().append(this.datasetId, rhs.datasetId).append(this.parent, rhs.parent)
 				.append(this.populationSize, rhs.populationSize).append(this.populationType, rhs.populationType)
 				.append(this.mapDataDescription, rhs.mapDataDescription).append(this.scoringScheme, rhs.scoringScheme)
 				.append(this.mapId, rhs.mapId).isEquals();
