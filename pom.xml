@@ -5,7 +5,7 @@
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
 	<version>4.0.0.BETA</version>
-	<name>ibp middleware</name>
+	<name>Middleware</name>
 
 	<properties>
 		<jasper.version>6.0.0</jasper.version>
