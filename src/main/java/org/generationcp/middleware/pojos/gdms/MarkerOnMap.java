@@ -134,7 +134,7 @@ public class MarkerOnMap implements Serializable {
 		}
 
 		MarkerOnMap rhs = (MarkerOnMap) obj;
-		return new EqualsBuilder().appendSuper(super.equals(obj)).append(this.markerOnMapId, rhs.markerOnMapId).isEquals();
+		return new EqualsBuilder().append(this.markerOnMapId, rhs.markerOnMapId).isEquals();
 	}
 
 	@Override

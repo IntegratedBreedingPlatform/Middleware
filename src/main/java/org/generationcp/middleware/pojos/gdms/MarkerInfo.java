@@ -282,7 +282,7 @@ public class MarkerInfo implements Serializable {
 		}
 
 		MarkerInfo rhs = (MarkerInfo) obj;
-		return new EqualsBuilder().appendSuper(super.equals(obj)).append(this.markerId, rhs.markerId).isEquals();
+		return new EqualsBuilder().append(this.markerId, rhs.markerId).isEquals();
 	}
 
 	@Override

@@ -136,7 +136,7 @@ public class MappingData implements Serializable {
 		}
 
 		MappingData rhs = (MappingData) obj;
-		return new EqualsBuilder().appendSuper(super.equals(obj)).append(this.markerId, rhs.markerId)
+		return new EqualsBuilder().append(this.markerId, rhs.markerId)
 				.append(this.linkageGroup, rhs.linkageGroup).append(this.startPosition, rhs.startPosition)
 				.append(this.mapUnit, rhs.mapUnit).append(this.mapName, rhs.mapName).append(this.markerName, rhs.markerName).isEquals();
 	}

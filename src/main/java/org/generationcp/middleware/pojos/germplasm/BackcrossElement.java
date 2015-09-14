@@ -30,6 +30,10 @@ public class BackcrossElement implements GermplasmCrossElement {
 		return this.numberOfDosesOfRecurringParent;
 	}
 
+	public boolean isRecurringParentOnTheRight() {
+		return this.recurringParentOnTheRight;
+	}
+
 	public void setNumberOfDosesOfRecurringParent(int numberOfDosesOfRecurringParent) {
 		this.numberOfDosesOfRecurringParent = numberOfDosesOfRecurringParent;
 	}
