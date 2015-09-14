@@ -142,7 +142,7 @@ public class ServiceFactory implements Serializable {
 	 * DatabaseConnectionParameters central = new DatabaseConnectionParameters(...);<br>
 	 * ManagerFactory factory = new ManagerFactory(null, central);<br>
 	 * <br>
-	 * 
+	 *
 	 * @param paramsForLocal
 	 * @param paramsForCentral
 	 * @throws ConfigException
@@ -264,7 +264,7 @@ public class ServiceFactory implements Serializable {
 	}
 
 	public InventoryService getInventoryService() {
-		return new InventoryServiceImpl(this.sessionProviderForLocal, this.localDatabaseName);
+		return new InventoryServiceImpl(this.sessionProviderForLocal);
 	}
 
 	/**

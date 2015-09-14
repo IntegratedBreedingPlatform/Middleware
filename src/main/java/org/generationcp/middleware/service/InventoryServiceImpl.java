@@ -57,8 +57,8 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 		this.transactionBuilder = this.getTransactionBuilder();
 	}
 
-	public InventoryServiceImpl(HibernateSessionProvider sessionProvider, String localDatabaseName) {
-		super(sessionProvider, localDatabaseName);
+	public InventoryServiceImpl(HibernateSessionProvider sessionProvider) {
+		super(sessionProvider);
 		this.transactionDAO = this.getTransactionDao();
 		this.inventoryDataManager = this.getInventoryDataManager();
 		this.stockTransactionDAO = this.getStockTransactionDAO();
@@ -98,6 +98,10 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 		return this.inventoryDataManager.getInventoryDetailsByGermplasmList(listId, germplasmListType);
 	}
 
+	/**
+	 * This method gets the maximum notation number of the existing stock IDs. For example, if there are existing stock IDs: SID1-1, SID1-2,
+	 * SID2-1, SID2-2, SID2-3, SID3-1, SID3-2, this method returns 3, from SID3-1 or SID3-2
+	 */
 	@Override
 	public Integer getCurrentNotationNumberForBreederIdentifier(String breederIdentifier) throws MiddlewareQueryException {
 		List<String> inventoryIDs = this.transactionDAO.getInventoryIDsWithBreederIdentifier(breederIdentifier);
@@ -127,6 +131,16 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 		return currentMax;
 	}
 
+	/**
+	 * This method creates a new inventory lot, inventory transaction and stock transaction and save them in the database. An inventory lot
+	 * tracks individual entities, where an entity is stored, what units they are managed in, what quantities are in storage and what
+	 * quantities are available for use. Thus, it should be unique by entity id (ex. germplasm id), entity type (ex. germplasm if the
+	 * entities are seed stocks), location id (where the lot is stored) and scale id (scale in which quantities of entity are measured). An
+	 * inventory transaction tracks anticipated transactions (Deposit or Reserved), committed transactions (Stored or Retrieved) and
+	 * cancelled transactions made on inventory lots. On the other hand, an stock transaction tracks the inventory transaction made on
+	 * generated seed stock of a nursery/trial
+	 *
+	 */
 	@Override
 	public void addLotAndTransaction(InventoryDetails details, GermplasmListData listData, ListDataProject listDataProject)
 			throws MiddlewareQueryException {

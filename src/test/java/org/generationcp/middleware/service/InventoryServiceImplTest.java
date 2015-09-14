@@ -5,7 +5,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
@@ -34,7 +33,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class InventoryServiceImplTest extends IntegrationTestBase {
+public class InventoryServiceImplTest {
 
 	public static final String TEST_INVENTORY_ID = "TR1-123";
 
@@ -94,7 +93,7 @@ public class InventoryServiceImplTest extends IntegrationTestBase {
 
 	@Test(expected = MiddlewareQueryException.class)
 	public void testAddLotAndTransaction_LotAlreadyExists() {
-		final InventoryDetails details = this.createInventoryDetailsTestData();
+		final InventoryDetails details = this.createInventoryDetailsTestData(1);
 		final GermplasmListData listData = this.createGermplasmListDataTestData();
 		final ListDataProject listDataProject = this.createListDataProjectTestData();
 
@@ -106,7 +105,7 @@ public class InventoryServiceImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddLotAndTransaction() {
-		final InventoryDetails details = this.createInventoryDetailsTestData();
+		final InventoryDetails details = this.createInventoryDetailsTestData(1);
 		final GermplasmListData listData = this.createGermplasmListDataTestData();
 		final ListDataProject listDataProject = this.createListDataProjectTestData();
 
@@ -136,7 +135,7 @@ public class InventoryServiceImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddLotAndTransaction_NullListData() {
-		final InventoryDetails details = this.createInventoryDetailsTestData();
+		final InventoryDetails details = this.createInventoryDetailsTestData(1);
 		final GermplasmListData listData = null;
 		final ListDataProject listDataProject = this.createListDataProjectTestData();
 
@@ -197,7 +196,7 @@ public class InventoryServiceImplTest extends IntegrationTestBase {
 		return germplasmListData;
 	}
 
-	private InventoryDetails createInventoryDetailsTestData() {
+	private InventoryDetails createInventoryDetailsTestData(Integer listId) {
 		final InventoryDetails inventoryDetails = new InventoryDetails();
 		inventoryDetails.setGid(201);
 		inventoryDetails.setLocationId(1);
@@ -205,7 +204,7 @@ public class InventoryServiceImplTest extends IntegrationTestBase {
 		inventoryDetails.setComment("TEST");
 		inventoryDetails.setUserId(1);
 		inventoryDetails.setAmount(20d);
-		inventoryDetails.setSourceId(5);
+		inventoryDetails.setSourceId(listId);
 		inventoryDetails.setInventoryID("SID1-1");
 		inventoryDetails.setBulkCompl("Y");
 		inventoryDetails.setBulkCompl("SID1-2");
@@ -213,16 +212,54 @@ public class InventoryServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testStockHasCompletedBulking() throws MiddlewareQueryException {
-		final Integer listId = 17;
+	public void testRetrieveInventoryDetailsForListDataProjectListId_Crosses() throws MiddlewareQueryException {
+		final Integer listId = 1;
+		GermplasmListType listType = GermplasmListType.CROSSES;
+		final List<InventoryDetails> expectedInventoryDetailsList = this.createInventoryDetailsListTestData(listId);
+		Mockito.doReturn(expectedInventoryDetailsList).when(this.stockTransactionDAO)
+		.retrieveInventoryDetailsForListDataProjectListId(listId, listType);
 		final List<InventoryDetails> inventoryDetailsList =
-				this.inventoryServiceImpl.getInventoryListByListDataProjectListId(listId, GermplasmListType.CROSSES);
-		boolean hasCompletedBulking = false;
+				this.inventoryServiceImpl.getInventoryListByListDataProjectListId(listId, listType);
 		for (final InventoryDetails inventoryDetails : inventoryDetailsList) {
-			if (InventoryDetails.BULK_COMPL_COMPLETED.equals(inventoryDetails.getBulkCompl())) {
-				hasCompletedBulking = true;
-			}
+			Assert.assertEquals(listId, inventoryDetails.getSourceId());
 		}
-		Assert.assertEquals(hasCompletedBulking, this.inventoryServiceImpl.stockHasCompletedBulking(listId));
 	}
+
+	@Test
+	public void testRetrieveInventoryDetailsForListDataProjectListId_Advanced() throws MiddlewareQueryException {
+		final Integer listId = 1;
+		GermplasmListType listType = GermplasmListType.ADVANCED;
+		final List<InventoryDetails> expectedInventoryDetailsList = this.createInventoryDetailsListTestData(listId);
+		Mockito.doReturn(expectedInventoryDetailsList).when(this.stockTransactionDAO)
+		.retrieveInventoryDetailsForListDataProjectListId(listId, listType);
+		final List<InventoryDetails> inventoryDetailsList =
+				this.inventoryServiceImpl.getInventoryListByListDataProjectListId(listId, listType);
+		for (final InventoryDetails inventoryDetails : inventoryDetailsList) {
+			Assert.assertEquals(listId, inventoryDetails.getSourceId());
+		}
+	}
+
+	private List<InventoryDetails> createInventoryDetailsListTestData(Integer listId) {
+		List<InventoryDetails> inventoryDetailsList = new ArrayList<>();
+		inventoryDetailsList.add(this.createInventoryDetailsTestData(listId));
+		return inventoryDetailsList;
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testRetrieveInventoryDetailsForListDataProjectListId_WrongListType() throws MiddlewareQueryException {
+		final Integer listId = 1;
+		GermplasmListType listType = GermplasmListType.LST;
+		Mockito.doThrow(IllegalArgumentException.class).when(this.stockTransactionDAO)
+		.retrieveInventoryDetailsForListDataProjectListId(listId, listType);
+		this.inventoryServiceImpl.getInventoryListByListDataProjectListId(listId, listType);
+	}
+
+	@Test
+	public void testStockHasCompletedBulking() throws MiddlewareQueryException {
+		final Integer listId = 1;
+		Mockito.doReturn(true).when(this.stockTransactionDAO).stockHasCompletedBulking(listId);
+		Assert.assertEquals(true, this.inventoryServiceImpl.stockHasCompletedBulking(listId));
+	}
+
+
 }
