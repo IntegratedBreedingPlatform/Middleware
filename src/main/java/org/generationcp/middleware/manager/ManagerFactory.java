@@ -173,7 +173,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public InventoryService getInventoryMiddlewareService() throws ConfigException {
-		return new InventoryServiceImpl(this.sessionProvider, this.databaseName);
+		return new InventoryServiceImpl(this.sessionProvider);
 	}
 
 	public DataImportService getDataImportService() throws ConfigException {
