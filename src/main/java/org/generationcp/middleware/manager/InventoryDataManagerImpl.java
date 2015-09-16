@@ -12,12 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.ims.LotDAO;
@@ -34,15 +29,12 @@ import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.ReservedInventoryKey;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.report.LotReportRow;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
-import org.generationcp.middleware.util.DatabaseBroker;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -109,18 +101,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	public List<Lot> getLotsByEntityTypeAndEntityIdAndLocationId(String type, Integer entityId, Integer locationId, int start, int numOfRows)
 			throws MiddlewareQueryException {
 		return this.getLotDao().getByEntityTypeAndEntityIdAndLocationId(type, entityId, locationId, start, numOfRows);
-	}
-
-	@Override
-	public Lot getLotByEntityTypeAndEntityIdAndLocationIdAndScaleId(String type, Integer entityId, Integer locationId, Integer scaleId)
-			throws MiddlewareQueryException {
-		List<Lot> lots =
-				this.getLotDao().getByEntityTypeEntityIdsLocationIdAndScaleId(type, Arrays.asList(new Integer[] {entityId}), locationId,
-						scaleId);
-		if (lots != null && !lots.isEmpty()) {
-			return lots.get(0);
-		}
-		return null;
 	}
 
 	@Override
@@ -549,219 +529,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	}
 
 	@Override
-	public List<InventoryDetails> getInventoryDetailsByGermplasmList(Integer listId, String germplasmType) throws MiddlewareQueryException {
-
-		GermplasmList germplasmList = this.getGermplasmListDAO().getById(listId);
-		List<GermplasmListData> listData = null;
-
-		if (germplasmList.getType() != null && germplasmList.getType().equalsIgnoreCase(germplasmType)) {
-
-			Integer listDataListId = this.getGermplasmListDAO().getListDataListIDFromListDataProjectListID(listId);
-			listData = this.getGermplasmListDataByListId(listDataListId, 0, Integer.MAX_VALUE);
-		} else {
-			listData = this.getGermplasmListDataByListId(listId, 0, Integer.MAX_VALUE);
-		}
-
-		// Get recordIds in list
-		List<Integer> recordIds = new ArrayList<Integer>();
-		for (GermplasmListData datum : listData) {
-			if (datum != null) {
-				recordIds.add(datum.getId());
-			}
-		}
-
-		List<InventoryDetails> inventoryDetails = this.getTransactionDao().getInventoryDetailsByTransactionRecordId(recordIds);
-
-		this.fillInventoryDetailList(inventoryDetails, listData);
-
-		Set<Integer> locationIds = new HashSet<Integer>();
-		Set<Integer> userIds = new HashSet<Integer>();
-		Set<Integer> scaleIds = new HashSet<Integer>();
-
-		for (InventoryDetails detail : inventoryDetails) {
-
-			Integer locationId = detail.getLocationId();
-			if (locationId != null) {
-				locationIds.add(locationId);
-			}
-
-			Integer userId = detail.getUserId();
-			if (userId != null) {
-				userIds.add(userId);
-			}
-
-			Integer scaleId = detail.getScaleId();
-			if (scaleId != null) {
-				scaleIds.add(scaleId);
-			}
-
-		}
-
-		List<Location> locations = new ArrayList<Location>();
-		List<CVTerm> scales = new ArrayList<CVTerm>();
-		Map<Integer, String> userNames = new HashMap<Integer, String>();
-
-		if (!locationIds.isEmpty()) {
-			locations.addAll(this.getLocationDao().getByIds(new ArrayList<>(locationIds)));
-		}
-		if (!userIds.isEmpty()) {
-			userNames.putAll(this.getPersonDao().getPersonNamesByUserIds(new ArrayList<>(userIds)));
-		}
-		if (!scaleIds.isEmpty()) {
-			scales.addAll(this.getCvTermDao().getByIds(new ArrayList<>(scaleIds)));
-		}
-
-		// Build List<InventoryDetails>
-		for (InventoryDetails detail : inventoryDetails) {
-			for (Location location : locations) {
-				if (detail.getLocationId() != null && detail.getLocationId().equals(location.getLocid())) {
-					// in preparation for BMS-143 (use abbreviation when exporting inventory details of advance list
-					detail.setLocationName(location.getLname());
-					detail.setLocationAbbr(location.getLabbr());
-					break;
-				}
-			}
-
-			if (detail.getUserId() != null && userNames.containsKey(detail.getUserId())) {
-				detail.setUserName(userNames.get(detail.getUserId()));
-			}
-
-			for (CVTerm scale : scales) {
-				if (detail.getScaleId() != null && detail.getScaleId().equals(scale.getCvTermId())) {
-					detail.setScaleName(scale.getName());
-					break;
-				}
-			}
-
-			// set source name
-			if (germplasmList != null) {
-				detail.setSourceId(listId);
-				detail.setSourceName(germplasmList.getName());
-			}
-		}
-
-		Collections.sort(inventoryDetails);
-		return inventoryDetails;
-	}
-
-	@Override
 	public boolean transactionsExistForListProjectDataListID(Integer listDataProjectListID) throws MiddlewareQueryException {
 
 		return this.getStockTransactionDAO().listDataProjectListHasStockTransactions(listDataProjectListID);
-	}
-
-	protected void fillInventoryDetailList(List<InventoryDetails> detailList, List<GermplasmListData> dataList) {
-		List<GermplasmListData> forFill = new ArrayList<>();
-
-		for (GermplasmListData germplasmListData : dataList) {
-			boolean found = false;
-			for (InventoryDetails inventoryDetails : detailList) {
-				if (germplasmListData.getId().equals(inventoryDetails.getSourceRecordId())) {
-					inventoryDetails.copyFromGermplasmListData(germplasmListData);
-					found = true;
-				}
-			}
-
-			if (!found) {
-				forFill.add(germplasmListData);
-			}
-		}
-
-		for (GermplasmListData data : forFill) {
-			InventoryDetails detail = new InventoryDetails();
-			detail.copyFromGermplasmListData(data);
-			detailList.add(detail);
-		}
-	}
-
-	@Override
-	public List<InventoryDetails> getInventoryDetailsByGermplasmList(Integer listId) throws MiddlewareQueryException {
-
-		return this.getInventoryDetailsByGermplasmList(listId, GermplasmListType.ADVANCED.name());
-
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids) throws MiddlewareQueryException {
-
-		List<Name> gidNames = super.getAllByMethod(this.getNameDao(), "getNamesByGids", new Object[] {gids}, new Class[] {List.class});
-
-		List<InventoryDetails> inventoryDetails = this.getTransactionDao().getInventoryDetailsByGids(gids);
-		Set<Integer> locationIds = new HashSet<Integer>();
-		Set<Integer> userIds = new HashSet<Integer>();
-		Set<Integer> scaleIds = new HashSet<Integer>();
-
-		for (InventoryDetails detail : inventoryDetails) {
-			if (detail != null) {
-				Integer locationId = detail.getLocationId();
-				if (locationId != null) {
-					locationIds.add(locationId);
-				}
-
-				Integer userId = detail.getUserId();
-				if (userId != null) {
-					userIds.add(userId);
-				}
-
-				Integer scaleId = detail.getScaleId();
-				if (scaleId != null) {
-					scaleIds.add(scaleId);
-				}
-			}
-		}
-
-		List<Location> locations = new ArrayList<Location>();
-		List<CVTerm> scales = new ArrayList<CVTerm>();
-		Map<Integer, String> userNames = new HashMap<Integer, String>();
-
-		if (!locationIds.isEmpty()) {
-			locations.addAll(this.getLocationDao().getByIds(new ArrayList<Integer>(locationIds)));
-		}
-		if (!userIds.isEmpty()) {
-			userNames.putAll(this.getPersonDao().getPersonNamesByUserIds(new ArrayList<Integer>(userIds)));
-		}
-		if (!scaleIds.isEmpty()) {
-			scales.addAll(this.getCvTermDao().getByIds(new ArrayList<Integer>(scaleIds)));
-		}
-
-		// Build List<InventoryDetails>
-		for (InventoryDetails detail : inventoryDetails) {
-			if (detail != null) {
-				for (Name name : gidNames) {
-					if (detail.getGid() != null && detail.getGid().equals(name.getGermplasmId())) {
-						detail.setGermplasmName(name.getNval());
-						break;
-					}
-				}
-
-				for (Location location : locations) {
-					if (detail.getLocationId() != null && detail.getLocationId().equals(location.getLocid())) {
-						detail.setLocationName(location.getLname());
-						break;
-					}
-				}
-
-				if (detail.getUserId() != null && userNames.containsKey(detail.getUserId())) {
-					detail.setUserName(userNames.get(detail.getUserId()));
-				}
-
-				for (CVTerm scale : scales) {
-					if (detail.getScaleId() != null && detail.getScaleId().equals(scale.getCvTermId())) {
-						detail.setScaleName(scale.getName());
-						break;
-					}
-				}
-			}
-		}
-		Collections.sort(inventoryDetails);
-		return inventoryDetails;
-	}
-
-	@Override
-	public List<InventoryDetails> getInventoryDetailsByStudy(Integer studyId) throws MiddlewareQueryException {
-		// FIXME - get gids from study/nd_experiment, call getInventoryDetailsByGids, set sourceName
-		return new ArrayList<InventoryDetails>();
 	}
 
 	@Override
@@ -833,13 +603,12 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	@Override
 	public void updateInventory(Integer listId, List<InventoryDetails> inventoryDetailList) throws MiddlewareQueryException {
-		
-		
+
+
 		try {
 
 			GermplasmList germplasmList = this.getGermplasmListDAO().getById(listId);
 			GermplasmListType germplasmListType = GermplasmListType.valueOf(germplasmList.getType());
-			int numberOfEntries = 1;
 			for (InventoryDetails inventoryDetails : inventoryDetailList) {
 				Lot lot = this.getLotDao().getById(inventoryDetails.getLotId());
 				lot.setLocationId(inventoryDetails.getLocationId());
@@ -853,7 +622,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 					transaction.setBulkCompl(Util.nullIfEmpty(inventoryDetails.getBulkCompl()));
 				}
 				this.getTransactionDao().saveOrUpdate(transaction);
-				numberOfEntries++;
 			}
 
 		} catch (Exception e) {

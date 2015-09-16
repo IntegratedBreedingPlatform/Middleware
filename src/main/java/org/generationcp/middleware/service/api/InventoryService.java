@@ -18,10 +18,11 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.ims.Lot;
 
 /**
  * This is the API for inventory management system.
- * 
+ *
  */
 public interface InventoryService {
 
@@ -43,27 +44,6 @@ public interface InventoryService {
 	 */
 	List<InventoryDetails> getInventoryDetailsByGermplasmList(Integer listId) throws MiddlewareQueryException;
 
-	/**
-	 * Gets the inventory details by gids.
-	 *
-	 * @param gids the gids
-	 * @return the inventory details by gids
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids) throws MiddlewareQueryException;
-
-	/**
-	 * Gets the inventory details by study. Inventory details to retrieve are based on nd_experiment_id of the study matching
-	 * ims_transaction.source_rec_id
-	 *
-	 *
-	 *
-	 * @param studyId the study id
-	 * @return the inventory details by study
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<InventoryDetails> getInventoryDetailsByStudy(Integer studyId) throws MiddlewareQueryException;
-
 	Integer getCurrentNotationNumberForBreederIdentifier(String breederIdentifier) throws MiddlewareQueryException;
 
 	void addLotAndTransaction(InventoryDetails details, GermplasmListData listData, ListDataProject listDataProject)
@@ -76,4 +56,6 @@ public interface InventoryService {
 			throws MiddlewareQueryException;
 
 	boolean stockHasCompletedBulking(Integer listId) throws MiddlewareQueryException;
+
+	Lot getLotByEntityTypeAndEntityIdAndLocationIdAndScaleId(String entityType, Integer entityId, Integer locationId, Integer scaleId);
 }
