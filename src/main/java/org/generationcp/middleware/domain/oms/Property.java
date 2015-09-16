@@ -13,6 +13,11 @@ package org.generationcp.middleware.domain.oms;
 
 import org.generationcp.middleware.util.Debug;
 
+/**
+ * @deprecated as we have a new version of the Ontology API now. Use the new API class {@link org.generationcp.middleware.domain.ontology.Property} instead.
+ */
+
+@Deprecated
 public class Property {
 
 	private Term term;
