@@ -124,7 +124,7 @@
     </bean>
     
     <bean id="ontologyMethodDataManager" class="org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
     
     <bean id="ontologyPropertyDataManager" class="org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl">
@@ -138,7 +138,7 @@
     <bean id="ontologyScaleDataManager" class="org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="termDataManager" class="org.generationcp.middleware.manager.ontology.TermDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
