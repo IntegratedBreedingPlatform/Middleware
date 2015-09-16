@@ -122,10 +122,11 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 
 		for (String inventoryID : inventoryIDs) {
 			Matcher matcher = pattern.matcher(inventoryID);
-			matcher.find();
-			// Matcher.group(1) is needed because group(0) includes the identifier in the match
-			// Matcher.group(1) only captures the value inside the parenthesis
-			currentMax = Math.max(currentMax, Integer.valueOf(matcher.group(1)));
+			if (matcher.find()) {
+				// Matcher.group(1) is needed because group(0) includes the identifier in the match
+				// Matcher.group(1) only captures the value inside the parenthesis
+				currentMax = Math.max(currentMax, Integer.valueOf(matcher.group(1)));
+			}
 		}
 
 		return currentMax;
