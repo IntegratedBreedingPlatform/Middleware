@@ -67,6 +67,7 @@
     
     <bean id="pedigreeDataManager" class="org.generationcp.middleware.manager.PedigreeDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
+        <property name="germplasmDataManager" ref="germplasmDataManager"/>
     </bean>
     
     <bean id="locationDataManager" class="org.generationcp.middleware.manager.LocationDataManagerImpl">

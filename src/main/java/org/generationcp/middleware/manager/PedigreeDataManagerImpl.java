@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
@@ -33,7 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PedigreeDataManagerImpl extends DataManager implements PedigreeDataManager{
 
-    private GermplasmDataManagerImpl germplasmDataManager;
+    private GermplasmDataManager germplasmDataManager;
     private static final ThreadLocal<Integer> PEDIGREE_COUNTER = new ThreadLocal<>();
     private static final ThreadLocal<Boolean> CALCULATE_FULL = new ThreadLocal<>();
 
@@ -533,86 +534,13 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
         return toreturn;
     }
     
-    @Override
-    public List<Germplasm> getPedigreeLine(Integer gid, int locationID) throws MiddlewareQueryException {
-    	List<Germplasm> germplasms = new ArrayList<Germplasm>();
-	
-    	Germplasm currentGermplasm = germplasmDataManager.getGermplasmByGID(gid);
-    	
-    	if (currentGermplasm != null) {
-    		germplasms = addParentsWithDerivativeMethod(germplasms, currentGermplasm, locationID);
-    	}
-    	
-    	return germplasms;
-    }
-
-    /**
-     * Recursive function to get the list of all ancestor germplasm with DER method
-     * type and the given the locationID
-     * 
-     * @param germplasmsParam
-     * @param currentGermplasm
-     * @param locationID
-     * @return the given Germplasm list with its parents added to it
-     * @throws MiddlewareQueryException
-	 * @deprecated
-	*/
-	@Deprecated
-    private List<Germplasm> addParentsWithDerivativeMethod(List<Germplasm> germplasmsParam, Germplasm currentGermplasm, int locationID) throws MiddlewareQueryException {
-    	List<Germplasm> germplasms = germplasmsParam;
-    	// get parents of node
-        if (currentGermplasm.getGnpgs() == -1) {
-            // get the source germplasm
-            Germplasm parent = germplasmDataManager.getGermplasmWithMethodType(currentGermplasm.getGpid2());
-            if (parent != null) {
-            	Method method = parent.getMethod();
-            	String mType = "";
-            	
-            	if (method != null) {
-            		mType = method.getMtype();
-            	}
-            	
-            	// add parent only if method = DER and if it matches the given locationID
-            	if ("DER".equals(mType) && parent.getLocationId().intValue() == locationID) {
-            		germplasms.add(parent);
-            	} 
-            	germplasms = addParentsWithDerivativeMethod(germplasms, parent, locationID);
-            }
-        } else if (currentGermplasm.getGnpgs() >= 1) {
-            // get female parent
-            Germplasm femaleParent = germplasmDataManager.getGermplasmByGID(currentGermplasm.getGpid1());
-            if (femaleParent != null) {
-            	germplasms = addParentsWithDerivativeMethod(germplasms, femaleParent, locationID);
-            }
-        	
-            // get male parent
-            Germplasm maleParent = germplasmDataManager.getGermplasmByGID(currentGermplasm.getGpid2());
-            if (maleParent != null) {
-            	germplasms = addParentsWithDerivativeMethod(germplasms, maleParent, locationID);
-            }
-			
-            if (currentGermplasm.getGnpgs() > 2) {
-                // if there are more parents, get each of them
-                List<Germplasm> otherParents = germplasmDataManager.getProgenitorsByGIDWithPrefName(currentGermplasm.getGid());
-                if(otherParents!=null) {
-	                for (Germplasm otherParent : otherParents) {
-	                	germplasms = addParentsWithDerivativeMethod(germplasms, otherParent, locationID);
-	                }
-                }
-            }
-        }
-		return germplasms;
-    }
-
-
-    private GermplasmDataManagerImpl getGermplasmDataManager(){
+	public GermplasmDataManager getGermplasmDataManager() {
 	    return this.germplasmDataManager;
     }
     
-    public void setGermplasmDataManager(
-	    	GermplasmDataManagerImpl germplasmDataManager) {
-	        this.germplasmDataManager = germplasmDataManager;
-	    }
+	public void setGermplasmDataManager(GermplasmDataManager germplasmDataManager) {
+		this.germplasmDataManager = germplasmDataManager;
+	}
 
     public int calculateRecurrentParent(Integer maleParentGID, Integer femaleParentGID) throws MiddlewareQueryException{
         Germplasm maleParent = getGermplasmDataManager().getGermplasmByGID(maleParentGID);

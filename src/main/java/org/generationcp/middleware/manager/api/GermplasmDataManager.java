@@ -27,7 +27,6 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -46,10 +45,10 @@ public interface GermplasmDataManager {
 	 * Searches for all germplasm records which matches the given name. Three searching modes are available; normal search, the spaces on
 	 * the name will be removed, the name will be standardize before searching. The three modes can be specified using the enum
 	 * GetGermplasmByNameModes.
-	 * 
+	 *
 	 * Names to be included in the search may be limited by name status. Accepted values are 0 - 10. If the given status is zero all names
 	 * will be included in the search.
-	 * 
+	 *
 	 * Names to be included in the search may be limited by name type. The enum GermplasmNameType is used to specify the type of names to be
 	 * included in the search. If the given type is null, all names will be included in the search.
 	 *
@@ -89,17 +88,17 @@ public interface GermplasmDataManager {
 	 * @return List of Germplasm POJOs
 	 * @throws MiddlewareQueryException the middleware query exception
 	 * @deprecated
-	*/
+	 */
 	@Deprecated
 	List<Germplasm> getGermplasmByName(String name, int start, int numOfRows) throws MiddlewareQueryException;
 
 	/**
 	 * Returns the number of germplasm records with any name matching the given parameter. Search modes can also be specified like in using
 	 * the getGermplasmByName() method.
-	 * 
+	 *
 	 * Names to be included in the search may be limited by name status. Accepted values are 0 - 10. If the given status is zero all names
 	 * will be included in the search.
-	 * 
+	 *
 	 * Names to be included in the search may be limited by name type. The enum GermplasmNameType is used to specify the type of names to be
 	 * included in the search. If the given type is null, all names will be included in the search.
 	 *
@@ -141,21 +140,6 @@ public interface GermplasmDataManager {
 			throws MiddlewareQueryException;
 
 	/**
-	 * Please use LocationDataManager.getLocationDetailsByLocId().
-	 * 
-	 * Returns the germplasm records that were created at the locations with names matching the given parameter.
-	 *
-	 * @param locationId - location id to search details from
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @return List of Germplasm POJOs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	*/
-	@Deprecated
-	List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows) throws MiddlewareQueryException;
-
-	/**
 	 * Returns the number of germplasm records that were created at the locations with names matching the given parameter.
 	 *
 	 * @param name - search string for the name of the locations
@@ -167,213 +151,16 @@ public interface GermplasmDataManager {
 	long countGermplasmByLocationName(String name, Operation op, Database instance) throws MiddlewareQueryException;
 
 	/**
-	 * Please use LocationDataManager.getAllLocations().
-	 * 
-	 * Returns all Location information from central and local databases.
-	 *
-	 * @return All Locations
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	*/
-	@Deprecated
-	List<Location> getAllLocations() throws MiddlewareQueryException;
-
-	/**
-	 * Please use LocationDataManager.getAllLocalLocations().
-	 * 
-	 * Returns all Local Locations.
-	 *
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @return All Locations based on the given start and numOfRows
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	*/
-	@Deprecated
-	List<Location> getAllLocalLocations(int start, int numOfRows) throws MiddlewareQueryException;
-
-	/**
-	 * Please use LocationDataManager.countAllLocations().
-	 * 
-	 * Returns number of all Locations.
-	 *
-	 * @return the number of all Locations
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	*/
-	@Deprecated
-	long countAllLocations() throws MiddlewareQueryException;
-
-	/**
-	 * Please use LocationDataManager.getLocationsByName().
-	 * 
-	 * Returns the Location records with names matching the given parameter.
-	 *
-	 * @param name - search string for the name of the locations
-	 * @param op - can be EQUAL like LIKE
-	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	*/
-	@Deprecated
-	List<Location> getLocationsByName(String name, Operation op) throws MiddlewareQueryException;
-
-	/**
-	 * Please use LocationDataManager.getLocationsByName().
-	 * 
-	 * Returns the Location records with names matching the given parameter.
-	 *
-	 * @param name - search string for the name of the locations
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param op - can be EQUAL like LIKE
-	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	*/
-	@Deprecated
-	List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
-
-	/**
 	 * Please use LocationDataManager.getAllCountry().
-	 * 
+	 *
 	 * Returns all country records.
 	 *
 	 * @return List of Location POJOs
 	 * @throws MiddlewareQueryException the middleware query exception
 	 * @deprecated
-	*/
+	 */
 	@Deprecated
 	List<Country> getAllCountry() throws MiddlewareQueryException;
-
-	/**
-	 * Please use LocationDataManager.countLocationsByName().
-	 * 
-	 * Returns the number of Locations with names matching the given parameter.
-	 *
-	 * @param name - search string for the name of the locations
-	 * @param op - can be EQUAL like LIKE
-	 * @return Number of Locations
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	*/
-	@Deprecated
-	long countLocationsByName(String name, Operation op) throws MiddlewareQueryException;
-
-	/**
-	 * Please use LocationDataManager.getLocationsByCountry().
-	 * 
-	 * Returns all the Location records with country matching the given parameter. The data is retrieved from both local and central
-	 * databases.
-	 *
-	 * @param country - search string for the country of the locations
-	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	*/
-	@Deprecated
-	List<Location> getLocationsByCountry(Country country) throws MiddlewareQueryException;
-
-	/**
-	 * Please use LocationDataManager.getLocationsByCountryAndType().
-	 * 
-	 * Returns all the Location records with country and location type matching the given parameter. The data is retrieved from both local
-	 * and central databases.
-	 *
-	 * @param country - search string for the country of the locations
-	 * @param type - search string for the locations type
-	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	*/
-	@Deprecated
-	List<Location> getLocationsByCountryAndType(Country country, Integer type) throws MiddlewareQueryException;
-
-	/**
-	 * Please use LocationDataManager.getLocationsByNameCountryAndType().
-	 * 
-	 * Returns all the Location records with name, country and location type matching the given parameter. The data is retrieved from both
-	 * local and central databases.
-	 *
-	 * @param name the name
-	 * @param country the country
-	 * @param type the type
-	 * @return the locations by name country and type
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	*/
-	@Deprecated
-	List<Location> getLocationsByNameCountryAndType(String name, Country country, Integer type) throws MiddlewareQueryException;
-
-	/**
-	 * Please use LocationDataManager.getLocationsByCountry().
-	 * 
-	 * Returns the Location records with country matching the given parameter. The data is retrieved from both local and central databases.
-	 *
-	 * @param country - search string for the country of the locations
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	*/
-	@Deprecated
-	List<Location> getLocationsByCountry(Country country, int start, int numOfRows) throws MiddlewareQueryException;
-
-	/**
-	 * Please use LocationDataManager.countLocationsByContry().
-	 * 
-	 * Returns the number of Locations with countries matching the given parameter. The data is retrieved from both local and central
-	 * databases.
-	 *
-	 * @param country - search string for the country of the locations
-	 * @return Number of Locations
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	*/
-	@Deprecated
-	long countLocationsByCountry(Country country) throws MiddlewareQueryException;
-
-	/**
-	 * Please use LocationDataManager.getLocationsByType().
-	 * 
-	 * Returns the Location records with type matching the given parameter. The data is retrieved from both local and central databases.
-	 *
-	 * @param type - search string for the type of the locations
-	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	*/
-	@Deprecated
-	List<Location> getLocationsByType(Integer type) throws MiddlewareQueryException;
-
-	/**
-	 * Please use LocationDataManager.getLocationsByType().
-	 * 
-	 * Returns the Location records with type matching the given parameter. The data is retrieved from both local and central databases.
-	 *
-	 * @param type - search string for the type of the locations
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	*/
-	@Deprecated
-	List<Location> getLocationsByType(Integer type, int start, int numOfRows) throws MiddlewareQueryException;
-
-	/**
-	 * Please use LocationDataManager.countLocationsByType().
-	 * 
-	 * Returns the number of Locations with types matching the given parameter. The data is retrieved from both local and central databases.
-	 *
-	 * @param type - search string for the type of the locations
-	 * @return Number of Locations
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	*/
-	@Deprecated
-	long countLocationsByType(Integer type) throws MiddlewareQueryException;
 
 	/**
 	 * Retrieves all the Germplasm entries from the given database instance.
@@ -450,10 +237,10 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns all the names of the Germplasm identified by the gid parameter.
-	 * 
+	 *
 	 * Results may be filtered by name status. Accepted values are 0 - 10. If the given status is zero all names will be included in the
 	 * result.
-	 * 
+	 *
 	 * Results may also be filtered by type. The enum GermplasmNameType is used to specify the type of names to be included in the result.
 	 * If the given type is null, all names will be included in the result.
 	 *
@@ -759,7 +546,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the number of Methods with group matching the given parameter.
-	 * 
+	 *
 	 * Retrieves from both local and central databases.
 	 *
 	 * @param group - search string for the methods
@@ -797,34 +584,35 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Return the UserDefinedField using local field no
+	 *
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
 	UserDefinedField getUserDefinedFieldByLocalFieldNo(Integer lfldno) throws MiddlewareQueryException;
-	
+
 	/**
 	 * Please use LocationDataManager.getCountryById().
-	 * 
+	 *
 	 * Returns the country record identified by the given id.
 	 *
 	 * @param id - id of the country record
 	 * @return the Country POJO representing the record
 	 * @throws MiddlewareQueryException the middleware query exception
 	 * @deprecated
-	*/
+	 */
 	@Deprecated
 	Country getCountryById(Integer id) throws MiddlewareQueryException;
 
 	/**
 	 * Please use LocationDataManager.getLocationById().
-	 * 
+	 *
 	 * Returns the location record identified by the given id.
 	 *
 	 * @param id - id of the location record
 	 * @return the Location POJO representing the record
 	 * @throws MiddlewareQueryException the middleware query exception
 	 * @deprecated
-	*/
+	 */
 	@Deprecated
 	Location getLocationByID(Integer id) throws MiddlewareQueryException;
 
@@ -930,7 +718,7 @@ public interface GermplasmDataManager {
 	/**
 	 * Given the gid of the child germplasm, the gid of the parent germplasm and the progenitor number, this method makes the necessary
 	 * changes to save the relationship on the database.
-	 * 
+	 *
 	 * This method will either update the Germplasm record, to change the gpid1 or gpid2 fields (if the progenitor number given is 1 or 2),
 	 * or will either add or update the Progenitor record which represents this relationship. A new Progenitor record will be stored when
 	 * necessary.
@@ -974,9 +762,9 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Given a map of valid Germplasm and Name objects, add new records for the given parameters.
-	 * 
+	 *
 	 * The Name objects matching each Germplasm object in the map will be set as the preferred name of the Germplasm objects.
-	 * 
+	 *
 	 * Note that you need to assign temporary ids for the Germplasm objects so that they can serve as the keys for the Map. The function
 	 * will replace these temp ids with the correct ones for storing in the database.
 	 *
@@ -1035,15 +823,15 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Please use LocationDataManager.getAllBreedingLocations().
-	 * 
+	 *
 	 * Get all breeding locations.
-	 * 
+	 *
 	 * Return a List of Locations which represent the breeding locations stored in the location table of IBDB.
 	 *
 	 * @return the all breeding locations
 	 * @throws MiddlewareQueryException the middleware query exception
 	 * @deprecated
-	*/
+	 */
 	@Deprecated
 	List<Location> getAllBreedingLocations() throws MiddlewareQueryException;
 
@@ -1131,7 +919,7 @@ public interface GermplasmDataManager {
 	 * @param withInventoryOnly - boolean flag to denote whether result will be filtered by those with inventories only
 	 * @return - List of germplasms filtered by the gid, stockID and germplasm name based on the operation and search term, with parents and
 	 *         with inventory only filtered if specified
-	 * 
+	 *
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly)
@@ -1139,14 +927,14 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Please use LocationDataManager.getLocationsByIDs().
-	 * 
+	 *
 	 * Gets the locations by the given IDs.
 	 *
 	 * @param ids Location IDs
 	 * @return the corresponding Locations
 	 * @throws MiddlewareQueryException the middleware query exception
 	 * @deprecated
-	*/
+	 */
 	@Deprecated
 	List<Location> getLocationsByIDs(List<Integer> ids) throws MiddlewareQueryException;
 
@@ -1286,7 +1074,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Returns the maximum number in the sequence.
-	 * 
+	 *
 	 * @param prefix
 	 * @param suffix
 	 * @param nameType
@@ -1297,7 +1085,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * check if name and standardized version of it already exists.
-	 * 
+	 *
 	 * @param prefix
 	 * @param count
 	 * @param suffix
@@ -1308,7 +1096,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * get all method records filtered by programUUID
-	 * 
+	 *
 	 * @param programUUID
 	 * @return list of mid
 	 */
@@ -1316,7 +1104,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * delete all method records filtered by programUUID
-	 * 
+	 *
 	 * @param programUUID
 	 */
 	void deleteProgramMethodsByUniqueId(String programUUID) throws MiddlewareQueryException;
@@ -1325,7 +1113,7 @@ public interface GermplasmDataManager {
 	 * Generates a Map of {@link GermplasmPedigreeTreeNode}, which is a wrapper for a Germplasm and its immediate parents, stored as nodes
 	 * in <b>linkedNodes</b> atribute, being the first node the female and the second one the male parent. The information is ultimately
 	 * stored in Germplasm beans, containing only gids and information about names. The key of the map is the gid.
-	 * 
+	 *
 	 * @param studyId The identifier for the study which parents will be retuned.
 	 * @return The parents for each germplasm in a study.
 	 */

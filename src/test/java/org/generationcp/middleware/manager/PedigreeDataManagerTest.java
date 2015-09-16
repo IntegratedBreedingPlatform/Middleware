@@ -342,14 +342,4 @@ public class PedigreeDataManagerTest extends IntegrationTestBase {
 		Assert.assertNotNull(count);
 		Debug.println(IntegrationTestBase.INDENT, "testCountManagementNeighbors(" + gid + "):" + count);
 	}
-
-	@Test
-	public void testGetPedigreeLine() throws Exception {
-		Integer gid = Integer.valueOf(306436);
-		int locationID = 187;
-		List<Germplasm> results = this.pedigreeManager.getPedigreeLine(gid, locationID);
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetPedigreeLine(" + gid + ", " + locationID + "):" + results.size());
-		Debug.printObjects(IntegrationTestBase.INDENT, results);
-	}
 }
