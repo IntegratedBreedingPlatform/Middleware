@@ -226,6 +226,8 @@ public class InventoryServiceImpl extends Service implements InventoryService {
 		for (final GermplasmListData data : forFill) {
 			final InventoryDetails detail = new InventoryDetails();
 			detail.copyFromGermplasmListData(data);
+			detail.setSourceId(germplasmList.getId());
+			detail.setSourceName(germplasmList.getName());
 			detailList.add(detail);
 		}
 	}

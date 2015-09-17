@@ -41,6 +41,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.exceptions.verification.TooLittleActualInvocations;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -173,9 +174,13 @@ public class InventoryServiceImplTest {
 
 		this.inventoryServiceImpl.addLotAndTransaction(details, listData, listDataProject);
 
-		Mockito.verify(this.lotDAO).saveOrUpdate(lot);
-		Mockito.verify(this.transactionDAO).saveOrUpdate(transaction);
-		Mockito.verify(this.stockTransactionDAO).saveOrUpdate(Mockito.any(StockTransaction.class));
+		try {
+			Mockito.verify(this.lotDAO).saveOrUpdate(lot);
+			Mockito.verify(this.transactionDAO).saveOrUpdate(transaction);
+			Mockito.verify(this.stockTransactionDAO).saveOrUpdate(Mockito.any(StockTransaction.class));
+		} catch (TooLittleActualInvocations e) {
+			Assert.fail("Inventory lot, inventory transaction and stock transaction must be saved to the database");
+		}
 	}
 
 	@Test
@@ -202,9 +207,13 @@ public class InventoryServiceImplTest {
 
 		this.inventoryServiceImpl.addLotAndTransaction(details, listData, listDataProject);
 
-		Mockito.verify(this.lotDAO).saveOrUpdate(lot);
-		Mockito.verify(this.transactionDAO).saveOrUpdate(transaction);
-		Mockito.verify(this.stockTransactionDAO).saveOrUpdate(Mockito.any(StockTransaction.class));
+		try {
+			Mockito.verify(this.lotDAO).saveOrUpdate(lot);
+			Mockito.verify(this.transactionDAO).saveOrUpdate(transaction);
+			Mockito.verify(this.stockTransactionDAO).saveOrUpdate(Mockito.any(StockTransaction.class));
+		} catch (TooLittleActualInvocations e) {
+			Assert.fail("Inventory lot, inventory transaction and stock transaction must be saved to the database");
+		}
 	}
 
 	private StockTransaction createStockTransactionTestData(final ListDataProject listDataProject, final Transaction transaction) {
@@ -268,7 +277,8 @@ public class InventoryServiceImplTest {
 		final List<InventoryDetails> inventoryDetailsList =
 				this.inventoryServiceImpl.getInventoryListByListDataProjectListId(listId, listType);
 		for (final InventoryDetails inventoryDetails : inventoryDetailsList) {
-			Assert.assertEquals(listId, inventoryDetails.getSourceId());
+			Assert.assertEquals("All inventory details must be belong to the list with id " + listId, listId,
+					inventoryDetails.getSourceId());
 		}
 	}
 
@@ -282,7 +292,8 @@ public class InventoryServiceImplTest {
 		final List<InventoryDetails> inventoryDetailsList =
 				this.inventoryServiceImpl.getInventoryListByListDataProjectListId(listId, listType);
 		for (final InventoryDetails inventoryDetails : inventoryDetailsList) {
-			Assert.assertEquals(listId, inventoryDetails.getSourceId());
+			Assert.assertEquals("All inventory details must be belong to the list with id " + listId, listId,
+					inventoryDetails.getSourceId());
 		}
 	}
 
@@ -305,7 +316,7 @@ public class InventoryServiceImplTest {
 	public void testStockHasCompletedBulking() throws MiddlewareQueryException {
 		final Integer listId = 1;
 		Mockito.doReturn(true).when(this.stockTransactionDAO).stockHasCompletedBulking(listId);
-		Assert.assertEquals(true, this.inventoryServiceImpl.stockHasCompletedBulking(listId));
+		Assert.assertEquals("Bulking of stocks should be completed", true, this.inventoryServiceImpl.stockHasCompletedBulking(listId));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -334,11 +345,54 @@ public class InventoryServiceImplTest {
 		Assert.assertNotNull(result);
 		Assert.assertEquals(NUM_OF_LISTDATA_RECORDS, result.size());
 		for (InventoryDetails inventoryDetails : result) {
-			Assert.assertEquals(germplasmList.getName(), inventoryDetails.getSourceName());
-			Assert.assertEquals(germplasmList.getId(), inventoryDetails.getSourceId());
-			Assert.assertEquals(TEST_LOCATION_NAME + inventoryDetails.getLocationId(), inventoryDetails.getLocationName());
-			Assert.assertEquals(TEST_SCALE_NAME + inventoryDetails.getScaleId(), inventoryDetails.getScaleName());
-			Assert.assertEquals(TEST_FULLNAME, inventoryDetails.getUserName());
+			Assert.assertEquals("Inventory source name should be " + germplasmList.getName(), germplasmList.getName(),
+					inventoryDetails.getSourceName());
+			Assert.assertEquals("Inventory source id should be " + germplasmList.getId(), germplasmList.getId(),
+					inventoryDetails.getSourceId());
+			Assert.assertEquals("Location name should be " + TEST_LOCATION_NAME + inventoryDetails.getLocationId(),
+					TEST_LOCATION_NAME + inventoryDetails.getLocationId(), inventoryDetails.getLocationName());
+			Assert.assertEquals("Scale name should be " + TEST_SCALE_NAME + inventoryDetails.getScaleId(),
+					TEST_SCALE_NAME + inventoryDetails.getScaleId(), inventoryDetails.getScaleName());
+			Assert.assertEquals("User name must be " + TEST_FULLNAME, TEST_FULLNAME, inventoryDetails.getUserName());
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testGetInventoryDetailsByGermplasmList_Crosses() {
+		final Integer crossesId = 2;
+		final Integer lstListId = 1;
+		GermplasmList germplasmList = this.createGermplasmListTestData(crossesId, GermplasmListType.CROSSES.name());
+		List<GermplasmListData> germplasmListDataList = this.createGermplasmListDataListTestData(germplasmList);
+		List<Integer> germplasmListDataIDList = this.getAllGermplasmListDataIDs(germplasmListDataList);
+		List<InventoryDetails> inventoryDetailsList = this.createInventoryDetailsListTestData(crossesId, germplasmListDataIDList);
+		List<Location> locationList = this.createLocationListTestData();
+		List<CVTerm> scaleList = this.createScaleListTestData();
+		Map<Integer, String> usernameList = this.createUsernameMapTestData();
+
+		Mockito.doReturn(germplasmList).when(this.germplasmListDAO).getById(crossesId);
+		Mockito.doReturn(lstListId).when(this.germplasmListDAO).getListDataListIDFromListDataProjectListID(crossesId);
+		Mockito.doReturn(germplasmListDataList).when(this.germplasmListDataDAO).getByListId(lstListId, 0, Integer.MAX_VALUE);
+		Mockito.doReturn(inventoryDetailsList).when(this.transactionDAO).getInventoryDetailsByTransactionRecordId(germplasmListDataIDList);
+		Mockito.doReturn(locationList).when(this.locationDAO).getByIds(Mockito.anyList());
+		Mockito.doReturn(scaleList).when(this.cvTermDAO).getByIds(Mockito.anyList());
+		Mockito.doReturn(usernameList).when(this.personDAO).getPersonNamesByUserIds(Mockito.anyList());
+
+		List<InventoryDetails> result =
+				this.inventoryServiceImpl.getInventoryDetailsByGermplasmList(crossesId, GermplasmListType.CROSSES.name());
+
+		Assert.assertNotNull(result);
+		Assert.assertEquals(NUM_OF_LISTDATA_RECORDS, result.size());
+		for (InventoryDetails inventoryDetails : result) {
+			Assert.assertEquals("Inventory source name should be " + germplasmList.getName(), germplasmList.getName(),
+					inventoryDetails.getSourceName());
+			Assert.assertEquals("Inventory source id should be " + germplasmList.getId(), germplasmList.getId(),
+					inventoryDetails.getSourceId());
+			Assert.assertEquals("Location name should be " + TEST_LOCATION_NAME + inventoryDetails.getLocationId(),
+					TEST_LOCATION_NAME + inventoryDetails.getLocationId(), inventoryDetails.getLocationName());
+			Assert.assertEquals("Scale name should be " + TEST_SCALE_NAME + inventoryDetails.getScaleId(),
+					TEST_SCALE_NAME + inventoryDetails.getScaleId(), inventoryDetails.getScaleName());
+			Assert.assertEquals("User name must be " + TEST_FULLNAME, TEST_FULLNAME, inventoryDetails.getUserName());
 		}
 	}
 
