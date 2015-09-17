@@ -34,6 +34,10 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 	private static final String METHOD_IS_REFERRED_TO_VARIABLE = "Method is referred to variable.";
 
 	private OntologyDaoFactory ontologyDaoFactory;
+	
+	public OntologyMethodDataManagerImpl() {
+		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
+	}
 
 	public OntologyMethodDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		ontologyDaoFactory = new OntologyDaoFactory(sessionProvider);
