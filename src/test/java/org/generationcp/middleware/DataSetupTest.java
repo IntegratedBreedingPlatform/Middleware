@@ -233,8 +233,8 @@ public class DataSetupTest extends IntegrationTestBase {
 		studyDetails.setStudyName("Test Nursery " + randomInt);
 		studyDetails.setObjective(studyDetails.getStudyName() + " Objective");
 		studyDetails.setTitle(studyDetails.getStudyName() + " Description");
-		studyDetails.setStartDate("2014-10-01");
-		studyDetails.setEndDate("2014-10-31");
+		studyDetails.setStartDate("20151001");
+		studyDetails.setEndDate("20151031");
 		studyDetails.setParentFolderId(1);
 		workbook.setStudyDetails(studyDetails);
 
