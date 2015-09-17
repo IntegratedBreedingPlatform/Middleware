@@ -17,57 +17,48 @@ import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.util.ISO8601DateParser;
-import org.hibernate.HibernateException;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implements {@link OntologyMethodDataManager}
  */
 @Transactional
-public class OntologyMethodDataManagerImpl extends DataManager implements OntologyMethodDataManager {
+public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager {
 
 	private static final String METHOD_DOES_NOT_EXIST = "Method does not exist with that id";
 	private static final String TERM_IS_NOT_METHOD = "That term is not a METHOD";
 	private static final String METHOD_IS_REFERRED_TO_VARIABLE = "Method is referred to variable.";
 
-	public OntologyMethodDataManagerImpl() {
-		super();
-	}
+	private OntologyDaoFactory ontologyDaoFactory;
 	
+	public OntologyMethodDataManagerImpl() {
+		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
+	}
+
 	public OntologyMethodDataManagerImpl(HibernateSessionProvider sessionProvider) {
-		super(sessionProvider);
+		ontologyDaoFactory = new OntologyDaoFactory(sessionProvider);
+	}
+
+	public OntologyMethodDataManagerImpl(OntologyDaoFactory ontologyDaoFactory) {
+		this.ontologyDaoFactory = ontologyDaoFactory;
 	}
 
 	@Override
 	public Method getMethod(int id) throws MiddlewareException {
-		CVTerm term = this.getCvTermDao().getById(id);
-		this.checkTermIsMethod(term);
-
-		try {
-			List<Method> methods = this.getMethods(false, new ArrayList<>(Collections.singletonList(id)));
-
-			if (methods.isEmpty()) {
-				return null;
-			}
-
-			return methods.get(0);
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error at getMethod :" + e.getMessage(), e);
+		List<Method> methods = this.getMethods(false, new ArrayList<>(Collections.singletonList(id)));
+		if (methods.isEmpty()) {
+			return null;
 		}
+		return methods.get(0);
 	}
 
 	@Override
 	public List<Method> getAllMethods() throws MiddlewareException {
-		try {
-			return this.getMethods(true, null);
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error at getAllMethods :" + e.getMessage(), e);
-		}
+		return this.getMethods(true, null);
 	}
 
 	/**
@@ -85,41 +76,28 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
 			methodIds = new ArrayList<>();
 		}
 
-		if (!fetchAll && methodIds.size() == 0) {
-			return new ArrayList<>();
+		List<CVTerm> terms = fetchAll ?
+				this.ontologyDaoFactory.getCvTermDao().getAllByCvId(CvId.METHODS) :
+				this.ontologyDaoFactory.getCvTermDao().getAllByCvId(methodIds, CvId.METHODS);
+
+		for (CVTerm m : terms) {
+			Method method = new Method(Term.fromCVTerm(m));
+			map.put(method.getId(), method);
 		}
 
-		try {
+		// Created, modified from CVTermProperty
+		List termProperties = this.ontologyDaoFactory.getCvTermPropertyDao().getByCvTermIds(new ArrayList<>(map.keySet()));
 
-			List<CVTerm> terms =
-					fetchAll ? this.getCvTermDao().getAllByCvId(CvId.METHODS) : this.getCvTermDao().getAllByCvId(methodIds, CvId.METHODS);
+		for (Object p : termProperties) {
+			CVTermProperty property = (CVTermProperty) p;
 
-			for (CVTerm m : terms) {
-				Method method = new Method(Term.fromCVTerm(m));
-				map.put(method.getId(), method);
+			Method method = map.get(property.getCvTermId());
+
+			if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
+				method.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+			} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
+				method.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
 			}
-
-			// Created, modified from CVTermProperty
-			List termProperties = this.getCvTermPropertyDao().getByCvTermIds(new ArrayList<>(map.keySet()));
-
-			for (Object p : termProperties) {
-				CVTermProperty property = (CVTermProperty) p;
-
-				Method method = map.get(property.getCvTermId());
-
-				if (method == null) {
-					continue;
-				}
-
-				if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
-					method.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
-				} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
-					method.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
-				}
-			}
-
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error at getProperties :" + e.getMessage(), e);
 		}
 
 		ArrayList<Method> methods = new ArrayList<>(map.values());
@@ -135,10 +113,11 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
 		return methods;
 	}
 
+
 	@Override
 	public void addMethod(Method method) throws MiddlewareException {
 
-		CVTerm term = this.getCvTermDao().getByNameAndCvId(method.getName(), CvId.METHODS.getId());
+		CVTerm term = this.ontologyDaoFactory.getCvTermDao().getByNameAndCvId(method.getName(), CvId.METHODS.getId());
 
 		if (term != null) {
 			throw new MiddlewareQueryException("Method exist with same name");
@@ -147,68 +126,58 @@ public class OntologyMethodDataManagerImpl extends DataManager implements Ontolo
 		// Constant CvId
 		method.setVocabularyId(CvId.METHODS.getId());
 
-		try {
-			term = this.getCvTermDao().save(method.getName(), method.getDefinition(), CvId.METHODS);
-			method.setId(term.getCvTermId());
+		term = this.ontologyDaoFactory.getCvTermDao().save(method.getName(), method.getDefinition(), CvId.METHODS);
+		method.setId(term.getCvTermId());
 
-			// Save creation time
-			this.getCvTermPropertyDao().save(method.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
+		method.setDateCreated(new Date());
 
-		} catch (Exception e) {
-			throw new MiddlewareQueryException("Error at addMethod" + e.getMessage(), e);
-		}
+		String stringDateValue = ISO8601DateParser.toString(method.getDateCreated());
+
+		// Save creation time
+		this.ontologyDaoFactory.getCvTermPropertyDao().save(method.getId(), TermId.CREATION_DATE.getId(), stringDateValue, 0);
 	}
 
 	@Override
 	public void updateMethod(Method method) throws MiddlewareException {
 
-		CVTerm term = this.getCvTermDao().getById(method.getId());
+		CVTerm term = this.ontologyDaoFactory.getCvTermDao().getById(method.getId());
 
 		this.checkTermIsMethod(term);
 
 		// Constant CvId
 		method.setVocabularyId(CvId.METHODS.getId());
 
-		try {
+		term.setName(method.getName());
+		term.setDefinition(method.getDefinition());
 
-			term.setName(method.getName());
-			term.setDefinition(method.getDefinition());
+		this.ontologyDaoFactory.getCvTermDao().merge(term);
 
-			this.getCvTermDao().merge(term);
+		method.setDateLastModified(new Date());
 
-			// Save last modified Time
-			this.getCvTermPropertyDao().save(method.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
-
-		} catch (Exception e) {
-			throw new MiddlewareQueryException("Error at updateMethod" + e.getMessage(), e);
-		}
+		// Save last modified Time
+		this.ontologyDaoFactory.getCvTermPropertyDao()
+				.save(method.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(method.getDateLastModified()), 0);
 
 	}
 
 	@Override
 	public void deleteMethod(int id) throws MiddlewareException {
 
-		CVTerm term = this.getCvTermDao().getById(id);
+		CVTerm term = this.ontologyDaoFactory.getCvTermDao().getById(id);
 
 		this.checkTermIsMethod(term);
 
-		if (this.getCvTermRelationshipDao().isTermReferred(id)) {
+		if (this.ontologyDaoFactory.getCvTermRelationshipDao().isTermReferred(id)) {
 			throw new MiddlewareException(OntologyMethodDataManagerImpl.METHOD_IS_REFERRED_TO_VARIABLE);
 		}
 
-		try {
-
-			// delete properties
-			List<CVTermProperty> properties = this.getCvTermPropertyDao().getByCvTermId(term.getCvTermId());
-			for (CVTermProperty property : properties) {
-				this.getCvTermPropertyDao().makeTransient(property);
-			}
-
-			this.getCvTermDao().makeTransient(term);
-
-		} catch (Exception e) {
-			throw new MiddlewareQueryException("Error at deleteMethod" + e.getMessage(), e);
+		// delete properties
+		List<CVTermProperty> properties = this.ontologyDaoFactory.getCvTermPropertyDao().getByCvTermId(term.getCvTermId());
+		for (CVTermProperty property : properties) {
+			this.ontologyDaoFactory.getCvTermPropertyDao().makeTransient(property);
 		}
+
+		this.ontologyDaoFactory.getCvTermDao().makeTransient(term);
 	}
 
 	private void checkTermIsMethod(CVTerm term) throws MiddlewareException {
