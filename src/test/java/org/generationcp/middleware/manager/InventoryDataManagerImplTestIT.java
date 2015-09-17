@@ -539,13 +539,6 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetInventoryDetailsByGermplasmList() throws Exception {
-		Integer listId = 1;
-		List<InventoryDetails> result = this.manager.getInventoryDetailsByGermplasmList(listId);
-		Debug.printObjects(IntegrationTestBase.INDENT, result);
-	}
-
-	@Test
 	public void testGetLotCountsForGermplasmList() throws MiddlewareQueryException {
 		int listid = 1;
 		List<GermplasmListData> listEntries = this.manager.getLotCountsForList(listid, 0, Integer.MAX_VALUE);

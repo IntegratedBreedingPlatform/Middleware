@@ -89,18 +89,6 @@ public interface InventoryDataManager {
 	List<Lot> getLotsByEntityTypeAndLocationId(String type, Integer locationId, int start, int numOfRows) throws MiddlewareQueryException;
 
 	/**
-	 * Returns the Lot record with entity type, location id, scale id matching the given parameters.
-	 *
-	 * @param type the type
-	 * @param locationId the location id
-	 * @param scaleId the location id
-	 * @return Lot POJO
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	Lot getLotByEntityTypeAndEntityIdAndLocationIdAndScaleId(String type, Integer entityId, Integer locationId, Integer scaleId)
-			throws MiddlewareQueryException;
-
-	/**
 	 * Returns the number of Lot records with entity type and location id matching the given parameters.
 	 *
 	 * @param type the type
@@ -496,49 +484,12 @@ public interface InventoryDataManager {
 			throws MiddlewareQueryException;
 
 	/**
-	 * Gets the inventory details by germplasm list.
-	 *
-	 * @param listId the list id
-	 * @return the inventory details by germplasm list
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<InventoryDetails> getInventoryDetailsByGermplasmList(Integer listId, String germplasmType) throws MiddlewareQueryException;
-
-	/**
 	 *
 	 * @param listDataProjectListID
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
 	boolean transactionsExistForListProjectDataListID(Integer listDataProjectListID) throws MiddlewareQueryException;
-
-	/**
-	 * Gets the inventory details by germplasm list.
-	 *
-	 * @param listId the list id
-	 * @return the inventory details by germplasm list
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<InventoryDetails> getInventoryDetailsByGermplasmList(Integer listId) throws MiddlewareQueryException;
-
-	/**
-	 * Gets the inventory details by gids.
-	 *
-	 * @param gids the gids
-	 * @return the inventory details by gids
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<InventoryDetails> getInventoryDetailsByGids(List<Integer> gids) throws MiddlewareQueryException;
-
-	/**
-	 * Gets the inventory details by study. Inventory details to retrieve are based on nd_experiment_id of the study matching
-	 * ims_transaction.source_rec_id
-	 *
-	 * @param studyId the study id
-	 * @return the inventory details by study
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<InventoryDetails> getInventoryDetailsByStudy(Integer studyId) throws MiddlewareQueryException;
 
 	/**
 	 * Returns lot rows and aggregate inventory data for given list entry
@@ -553,18 +504,18 @@ public interface InventoryDataManager {
 
 	/**
 	 * Returns the germplasm entries of given list id with lot rows and aggregate inventory data per entry
-	 * 
+	 *
 	 * @param listId - id of list
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * 
+	 *
 	 * @return List of GermplasmListData POJOs
 	 */
 	List<GermplasmListData> getLotDetailsForList(Integer listId, int start, int numOfRows) throws MiddlewareQueryException;
 
 	/**
 	 * Gets number of lots with available balance for germplasm
-	 * 
+	 *
 	 * @param gid
 	 * @return
 	 * @throws MiddlewareQueryException
@@ -583,11 +534,11 @@ public interface InventoryDataManager {
 	/**
 	 * Returns the germplasm entries of given list id with lot counts such as # of lots with available balance and # of lots with reserved
 	 * seed per entry
-	 * 
+	 *
 	 * @param listId - id of list
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * 
+	 *
 	 * @return List of GermplasmListData POJOs
 	 */
 	List<GermplasmListData> getLotCountsForList(Integer listId, int start, int numOfRows) throws MiddlewareQueryException;
@@ -595,7 +546,7 @@ public interface InventoryDataManager {
 	/**
 	 * Return the germplasm entries of given entry IDs of specific list with lot counts such as # of lots with available balance and # of
 	 * lots with reserved seed per entry
-	 * 
+	 *
 	 * @param listId
 	 * @param entryIds
 	 * @return
@@ -617,7 +568,7 @@ public interface InventoryDataManager {
 	 * @param germplasmList Existing germplasm list that we want to add inventory data too.
 	 */
 	void populateLotCountsIntoExistingList(GermplasmList germplasmList);
-	
+
 	Integer addStockTransaction(StockTransaction stockTransaction) throws MiddlewareQueryException;
 
 	boolean isStockIdExists(List<String> stockIDs) throws MiddlewareQueryException;
