@@ -41,7 +41,7 @@ import org.mockito.MockitoAnnotations;
 /**
  * Unit test class to test Ontology Method Data Manger
  */
-public class MethodDataManagerImplTest extends UnitTestBase {
+public class OntologyMethodDataManagerImplUnitTest extends UnitTestBase {
 
 	@InjectMocks
 	private OntologyMethodDataManagerImpl methodDataManager = new OntologyMethodDataManagerImpl();
