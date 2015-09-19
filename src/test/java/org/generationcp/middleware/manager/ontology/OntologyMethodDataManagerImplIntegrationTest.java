@@ -37,7 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Integration test class to test Ontology Method Data Manger
  */
-public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
+public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 
 	@Autowired
 	private OntologyMethodDataManager manager;
