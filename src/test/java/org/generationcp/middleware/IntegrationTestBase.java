@@ -1,14 +1,11 @@
 
 package org.generationcp.middleware;
 
+import java.util.Date;
+
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.rules.TestName;
+import org.generationcp.middleware.util.CustomClock;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -27,30 +24,24 @@ import org.springframework.transaction.annotation.Transactional;
 // Spring configuration to automatically rollback after test completion.
 @TransactionConfiguration(defaultRollback = true)
 @Transactional
-public abstract class IntegrationTestBase {
+public abstract class IntegrationTestBase extends TestBase {
 
-	private static final Logger LOG = LoggerFactory.getLogger(IntegrationTestBase.class);
 	public static final int INDENT = 3;
 
 	@Autowired
 	@Qualifier(value = "cropSessionProvider")
 	protected HibernateSessionProvider sessionProvder;
 
-	@Rule
-	public TestName name = new TestName();
-	private long startTime;
+	@Autowired
+	private CustomClock customClock;
 
-	@Before
-	public void beforeEachTest() {
-		LOG.info("+++++ Test : " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + "() started +++++\n");
-		this.startTime = System.nanoTime();
+	protected void stubCurrentDate(int year, int month, int day) {
+		customClock.set(constructDate(year, month, day));
 	}
 
-	@After
-	public void afterEachTest() {
-		long elapsedTime = System.nanoTime() - this.startTime;
-		LOG.info(" +++++ Test : " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + "() ended, took "
-				+ (double) elapsedTime / 1000000 + " ms = " + (double) elapsedTime / 1000000000 + " s +++++\n");
+	protected void stubCurrentDate(Date date) {
+		customClock.set(date);
 	}
-
 }
+
+
