@@ -4,7 +4,6 @@ package org.generationcp.middleware.manager.ontology;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,10 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
+import org.generationcp.middleware.util.Clock;
 import org.generationcp.middleware.util.ISO8601DateParser;
+import org.generationcp.middleware.util.SystemClock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -33,18 +35,20 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 	private static final String TERM_IS_NOT_METHOD = "That term is not a METHOD";
 	private static final String METHOD_IS_REFERRED_TO_VARIABLE = "Method is referred to variable.";
 
+	@Autowired
 	private OntologyDaoFactory ontologyDaoFactory;
-	
+
+	@Autowired
+	protected Clock systemClock;
+
 	public OntologyMethodDataManagerImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
 	}
 
 	public OntologyMethodDataManagerImpl(HibernateSessionProvider sessionProvider) {
-		ontologyDaoFactory = new OntologyDaoFactory(sessionProvider);
-	}
-
-	public OntologyMethodDataManagerImpl(OntologyDaoFactory ontologyDaoFactory) {
-		this.ontologyDaoFactory = ontologyDaoFactory;
+		this.ontologyDaoFactory = new OntologyDaoFactory();
+		this.ontologyDaoFactory.setSessionProvider(sessionProvider);
+		this.systemClock = new SystemClock();
 	}
 
 	@Override
@@ -129,8 +133,9 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 		term = this.ontologyDaoFactory.getCvTermDao().save(method.getName(), method.getDefinition(), CvId.METHODS);
 		method.setId(term.getCvTermId());
 
-		method.setDateCreated(new Date());
+		method.setDateCreated(systemClock.now());
 
+		// Save creation time
 		String stringDateValue = ISO8601DateParser.toString(method.getDateCreated());
 
 		// Save creation time
@@ -152,7 +157,7 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 
 		this.ontologyDaoFactory.getCvTermDao().merge(term);
 
-		method.setDateLastModified(new Date());
+		method.setDateLastModified(systemClock.now());
 
 		// Save last modified Time
 		this.ontologyDaoFactory.getCvTermPropertyDao()
