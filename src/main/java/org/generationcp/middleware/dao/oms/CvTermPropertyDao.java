@@ -14,7 +14,9 @@ package org.generationcp.middleware.dao.oms;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.base.Strings;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.hibernate.Criteria;
@@ -128,5 +130,26 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
 		property.setValue(value);
 		property.setRank(rank);
 		return this.merge(property);
+	}
+
+	public void updateOrDeleteProperty(Integer cvTermId, Integer typeId, String value, Integer rank) throws MiddlewareException {
+		CVTermProperty existingProperty = this.getOneByCvTermAndType(cvTermId, typeId);
+
+		if (existingProperty == null) {
+			if (Strings.isNullOrEmpty(value)) {
+				return;
+			}
+
+			this.save(new CVTermProperty(null, cvTermId, typeId, value, rank));
+		} else {
+			if (Strings.isNullOrEmpty(value)) {
+				this.makeTransient(existingProperty);
+			} else {
+				existingProperty.setValue(value);
+				existingProperty.setRank(rank);
+				this.merge(existingProperty);
+			}
+		}
+
 	}
 }

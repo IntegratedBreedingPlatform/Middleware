@@ -45,6 +45,7 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
 	}
 
+	//TODO:This is temporary hack for managerfactory, builder and service. It should refactor to remove this constructor
 	public OntologyMethodDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		this.ontologyDaoFactory = new OntologyDaoFactory();
 		this.ontologyDaoFactory.setSessionProvider(sessionProvider);

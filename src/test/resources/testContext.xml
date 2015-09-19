@@ -124,11 +124,11 @@
     </bean>
     
     <bean id="ontologyMethodDataManager" class="org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl">
-        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+
     </bean>
     
     <bean id="ontologyPropertyDataManager" class="org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+
     </bean>
     
     <bean id="ontologyVariableDataManager" class="org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl">
@@ -146,7 +146,19 @@
     <bean id="ontologyService" class="org.generationcp.middleware.service.OntologyServiceImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
+    <bean id="ontologyDaoFactory" class="org.generationcp.middleware.manager.ontology.OntologyDaoFactory">
+        <property name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
+    <bean id="systemClock" class="org.generationcp.middleware.util.CustomClock">
+
+    </bean>
+
+    <bean id="ontologyCommonDAO" class="org.generationcp.middleware.manager.ontology.OntologyCommonDAOImpl">
+        <property name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
     <bean id="cropSessionProvider" class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider">
         <property name="sessionFactory" ref="IBDBV2_MAIZE_MERGED_SessionFactory"/>
         <aop:scoped-proxy proxy-target-class="false"/>
