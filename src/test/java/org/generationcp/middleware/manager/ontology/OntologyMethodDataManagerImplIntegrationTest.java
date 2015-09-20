@@ -42,13 +42,16 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 	@Autowired
 	private OntologyMethodDataManager manager;
 
-	private final CVTermDao dao = new CVTermDao();
-	private final CvTermPropertyDao propertyDao = new CvTermPropertyDao();
+	@Autowired
+	private OntologyDaoFactory daoFactory;
+
+	private CVTermDao termDao;
+	private CvTermPropertyDao propertyDao;
 
 	@Before
 	public void setUp() throws Exception {
-		this.dao.setSession(this.sessionProvder.getSession());
-		this.propertyDao.setSession(this.sessionProvder.getSession());
+		this.termDao = this.daoFactory.getCvTermDao();
+		this.propertyDao = this.daoFactory.getCvTermPropertyDao();
 	}
 
 	/*
@@ -62,9 +65,9 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 		TestDataHelper.fillTestMethodsCvTerms(methodTerms, 3);
 
 		Map<Integer, CVTerm> termMap = new HashMap<>();
-		// save 3 methods using dao
+		// save 3 methods using termDao
 		for (CVTerm term : methodTerms) {
-			dao.save(term);
+			this.termDao.save(term);
 			termMap.put(term.getCvTermId(), term);
 		}
 
@@ -76,7 +79,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 
 		// Fetch Created Date Properties and save it using propertyDao
 		for (CVTermProperty property : methodCreatedDateProperties) {
-			propertyDao.save(property);
+            this.propertyDao.save(property);
 			createDateMap.put(property.getCvTermId(), property.getValue());
 		}
 
@@ -88,7 +91,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 
 		// Fetch Updated Date Property and save it using propertyDao
 		for (CVTermProperty property : methodUpdatedDateProperties) {
-			propertyDao.save(property);
+            this.propertyDao.save(property);
 			updateDateMap.put(property.getCvTermId(), property.getValue());
 		}
 
@@ -122,9 +125,9 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 	* */
 	@Test
 	public void testGetMethodByIdShouldGetFullMethodWithIdSupplied() throws Exception {
-		// Save Method Term using dao
+		// Save Method Term using termDao
 		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
-		dao.save(methodTerm);
+        this.termDao.save(methodTerm);
 
 		// Fill Test Created Date Property using TestDataHelper
 		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
@@ -132,7 +135,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(methodTerm), methodCreatedDateProperties, testCreatedDate);
 
 		CVTermProperty methodCreatedDateProperty = methodCreatedDateProperties.get(0);
-		propertyDao.save(methodCreatedDateProperty);
+        this.propertyDao.save(methodCreatedDateProperty);
 
 		// Fill Test Updated Date Property using TestDataHelper
 		Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
@@ -140,7 +143,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(methodTerm), methodUpdatedDateProperties, testUpdatedDate);
 
 		CVTermProperty methodUpdatedDateProperty = methodUpdatedDateProperties.get(0);
-		propertyDao.save(methodUpdatedDateProperty);
+        this.propertyDao.save(methodUpdatedDateProperty);
 
 		// Fetch all methods and check our method exists or not.
 		Method method = this.manager.getMethod(methodTerm.getCvTermId());
@@ -169,7 +172,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 
 		this.manager.addMethod(method);
 
-		CVTerm cvterm = dao.getById(method.getId());
+		CVTerm cvterm = this.termDao.getById(method.getId());
 
 		// Make sure each method data inserted properly, assert them and display proper message if not inserted properly
 		String message = "The %s for method '" + method.getId() + "' was not added correctly.";
@@ -189,9 +192,9 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 	 */
 	@Test
 	public void testUpdateMethodShouldUpdateExistingMethod() throws Exception {
-		// Save Method Term using dao
+		// Save Method Term using termDao
 		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
-		dao.save(methodTerm);
+        this.termDao.save(methodTerm);
 
 		// Fill Test Created Date Property using TestDataHelper
 		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
@@ -199,7 +202,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(methodTerm), methodCreatedDateProperties, testCreatedDate);
 
 		CVTermProperty methodCreatedDateProperty = methodCreatedDateProperties.get(0);
-		propertyDao.save(methodCreatedDateProperty);
+        this.propertyDao.save(methodCreatedDateProperty);
 
 		//Updating method via manager
 		Method method = new Method();
@@ -212,7 +215,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 
 		this.manager.updateMethod(method);
 
-		CVTerm cvterm = dao.getById(method.getId());
+		CVTerm cvterm = this.termDao.getById(method.getId());
 
 		// Make sure the inserted data should come as they are inserted and Display proper message if the data doesn't come as expected
 		String message = "The %s for method '" + method.getId() + "' was not updated correctly.";
@@ -250,9 +253,9 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 	 */
 	@Test
 	public void testDeleteMethodShouldDeleteExistingMethod() throws Exception {
-		// Save Method Term using dao
+		// Save Method Term using termDao
 		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
-		dao.save(methodTerm);
+        this.termDao.save(methodTerm);
 
 		// Fill Test Created Date Property using TestDataHelper
 		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
@@ -261,7 +264,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 
 		CVTermProperty methodCreatedDateProperty = methodCreatedDateProperties.get(0);
 		// Save Method Created Date Property using propertydao
-		propertyDao.save(methodCreatedDateProperty);
+        this.propertyDao.save(methodCreatedDateProperty);
 
 		// Fill Test Updated Date Property using TestDataHelper
 		Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
@@ -270,12 +273,12 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 
 		CVTermProperty methodUpdatedDateProperty = methodUpdatedDateProperties.get(0);
 		// Save Method Updated Date Property using propertydao
-		propertyDao.save(methodUpdatedDateProperty);
+        this.propertyDao.save(methodUpdatedDateProperty);
 
 		// Delete the method
 		this.manager.deleteMethod(methodTerm.getCvTermId());
 
-		CVTerm cvterm = dao.getById(methodTerm.getCvTermId());
+		CVTerm cvterm = this.termDao.getById(methodTerm.getCvTermId());
 
 		// Make sure the method must be deleted and it asserts null
 		String message = "The %s for method '" + methodTerm.getCvTermId() + "' was not deleted correctly.";
