@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.operation.builder;
@@ -33,7 +33,6 @@ import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
@@ -54,12 +53,12 @@ public class StandardVariableBuilder extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public StandardVariable create(int standardVariableId, String programUUID) throws MiddlewareException {
+	public StandardVariable create(int standardVariableId, String programUUID) {
 		Variable variable = this.getOntologyVariableDataManager().getVariable(programUUID, standardVariableId);
 		return this.getStandardVariableTransformer().transformVariable(variable);
 	}
 
-	public List<StandardVariable> create(List<Integer> standardVariableIds, String programUUID) throws MiddlewareException {
+	public List<StandardVariable> create(List<Integer> standardVariableIds, String programUUID) {
 		List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
 		if (standardVariableIds != null && !standardVariableIds.isEmpty()) {
 			for (Integer id : standardVariableIds) {
@@ -69,7 +68,7 @@ public class StandardVariableBuilder extends Builder {
 		return standardVariables;
 	}
 
-	public StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) throws MiddlewareQueryException {
+	public StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) {
 		StandardVariableSummary summary = null;
 		if (standardVariableId != null) {
 			summary = this.getStandardVariableDao().getStandardVariableSummary(standardVariableId);
@@ -83,10 +82,10 @@ public class StandardVariableBuilder extends Builder {
 	/**
 	 * Loads a list of {@link StandardVariableSummary}'s for the given set of standard variable ids from standard_variable_summary database
 	 * view.
-	 *
+	 * 
 	 * @see StandardVariableDao#getStarndardVariableSummaries(List)
 	 */
-	public List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) throws MiddlewareQueryException {
+	public List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) {
 		List<StandardVariableSummary> result = new ArrayList<StandardVariableSummary>();
 		if (standardVariableIds != null && !standardVariableIds.isEmpty()) {
 			List<StandardVariableSummary> localVariables = this.getStandardVariableDao().getStarndardVariableSummaries(standardVariableIds);
@@ -96,7 +95,7 @@ public class StandardVariableBuilder extends Builder {
 		return result;
 	}
 
-	public List<StandardVariableSummary> getStandardVariableSummariesWithIsAId(List<Integer> isAIds) throws MiddlewareQueryException {
+	public List<StandardVariableSummary> getStandardVariableSummariesWithIsAId(List<Integer> isAIds) {
 		List<StandardVariableSummary> result = new ArrayList<StandardVariableSummary>();
 		if (isAIds != null && !isAIds.isEmpty()) {
 			List<StandardVariableSummary> localVariables = this.getStandardVariableDao().getStandardVariableSummaryWithIsAId(isAIds);
@@ -105,7 +104,7 @@ public class StandardVariableBuilder extends Builder {
 		return result;
 	}
 
-	private void specialProcessing(List<StandardVariableSummary> summaries) throws MiddlewareQueryException {
+	private void specialProcessing(List<StandardVariableSummary> summaries) {
 		if (summaries == null || summaries.isEmpty()) {
 			return;
 		}
@@ -126,7 +125,7 @@ public class StandardVariableBuilder extends Builder {
 
 	}
 
-	public String getCropOntologyId(Term term) throws MiddlewareQueryException {
+	public String getCropOntologyId(Term term) {
 		String cropOntologyId = null;
 		List<TermProperty> termProperties = this.createTermProperties(term.getId());
 		if (termProperties != null && !termProperties.isEmpty()) {
@@ -155,7 +154,7 @@ public class StandardVariableBuilder extends Builder {
 		return null;
 	}
 
-	private Term createTerm(List<CVTermRelationship> cvTermRelationships, TermId relationship) throws MiddlewareQueryException {
+	private Term createTerm(List<CVTermRelationship> cvTermRelationships, TermId relationship) {
 		Integer id = this.findTermId(cvTermRelationships, relationship);
 		if (id != null) {
 			// add to handle missing cvterm_relationship (i.e. is_a)
@@ -164,27 +163,27 @@ public class StandardVariableBuilder extends Builder {
 		return null;
 	}
 
-	private Term createTerm(Integer id) throws MiddlewareQueryException {
+	private Term createTerm(Integer id) {
 		CVTerm cvTerm = this.getCvTerm(id);
 		return cvTerm != null ? new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition()) : null;
 	}
 
-	public List<NameSynonym> createSynonyms(int cvTermId) throws MiddlewareQueryException {
+	public List<NameSynonym> createSynonyms(int cvTermId) {
 		List<CVTermSynonym> synonyms = this.getNameSynonymBuilder().findSynonyms(cvTermId);
 		return this.getNameSynonymBuilder().create(synonyms);
 	}
 
-	public List<TermProperty> createTermProperties(int cvTermId) throws MiddlewareQueryException {
+	public List<TermProperty> createTermProperties(int cvTermId) {
 		List<CVTermProperty> cvTermProperties = this.getTermPropertyBuilder().findProperties(cvTermId);
 		return this.getTermPropertyBuilder().create(cvTermProperties);
 	}
 
-	private CVTerm getCvTerm(int id) throws MiddlewareQueryException {
+	private CVTerm getCvTerm(int id) {
 		return this.getCvTermDao().getById(id);
 	}
 
 	public StandardVariable findOrSave(String name, String description, String propertyName, String scaleName, String methodName,
-			PhenotypicType role, String dataTypeString, String programUUID) throws MiddlewareException {
+			PhenotypicType role, String dataTypeString, String programUUID) {
 
 		TermBuilder termBuilder = this.getTermBuilder();
 		Term property = termBuilder.findOrSaveProperty(propertyName, propertyName, null, termBuilder.getDefaultTraitClasses());
@@ -257,7 +256,7 @@ public class StandardVariableBuilder extends Builder {
 		return null;
 	}
 
-	public StandardVariable getByName(String name, String programUUID) throws MiddlewareException {
+	public StandardVariable getByName(String name, String programUUID) {
 		CVTerm cvTerm = this.getCvTermDao().getByName(name);
 		if (cvTerm != null && cvTerm.getCvTermId() != null) {
 			return this.getStandardVariableBuilder().create(cvTerm.getCvTermId(), programUUID);
@@ -265,8 +264,7 @@ public class StandardVariableBuilder extends Builder {
 		return null;
 	}
 
-	public StandardVariable getByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId, String programUUID)
-			throws MiddlewareException {
+	public StandardVariable getByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId, String programUUID) {
 
 		Integer stdVariableId = this.getIdByPropertyScaleMethod(propertyId, scaleId, methodId);
 		StandardVariable standardVariable = null;
@@ -277,7 +275,7 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	public StandardVariable getByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role,
-			String programUUID) throws MiddlewareException {
+			String programUUID) {
 
 		Integer stdVariableId = this.getIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
 		StandardVariable standardVariable = null;
@@ -287,14 +285,13 @@ public class StandardVariableBuilder extends Builder {
 		return standardVariable;
 	}
 
-	public Integer getIdByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId) throws MiddlewareQueryException {
+	public Integer getIdByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId) {
 		Integer stdVariableId = null;
 		stdVariableId = this.getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId, "DESC");
 		return stdVariableId;
 	}
 
-	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers, String programUUID)
-					throws MiddlewareException {
+	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headers, String programUUID) {
 
 		Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<String, List<StandardVariable>>();
 		Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<String, Map<Integer, VariableType>>();
@@ -355,39 +352,36 @@ public class StandardVariableBuilder extends Builder {
 		}
 	}
 
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(List<String> propertyNames)
-			throws MiddlewareQueryException {
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(List<String> propertyNames) {
 		return this.getProjectPropertyDao().getStandardVariableIdsWithTypeByPropertyNames(propertyNames);
 	}
 
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForTerms(List<String> termNames)
-			throws MiddlewareQueryException {
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForTerms(List<String> termNames) {
 		return this.getCvTermDao().getTermIdsWithTypeByNameOrSynonyms(termNames, CvId.VARIABLES.getId());
 
 	}
 
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsForTraits(List<String> traitNames) throws MiddlewareQueryException {
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsForTraits(List<String> traitNames) {
 		return this.getCvTermDao().getStandardVariableIdsWithTypeByProperties(traitNames);
 	}
 
-	public Integer getIdByTermId(int cvTermId, TermId termId) throws MiddlewareQueryException {
+	public Integer getIdByTermId(int cvTermId, TermId termId) {
 		Integer stdVariableId = null;
 		stdVariableId = this.getCvTermDao().getStandardVariableIdByTermId(cvTermId, termId);
 		return stdVariableId;
 	}
 
-	public CVTerm getCvTerm(String name, int cvId) throws MiddlewareQueryException {
+	public CVTerm getCvTerm(String name, int cvId) {
 		return this.getCvTermDao().getByNameAndCvId(name, cvId);
 	}
 
-	public Integer getIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role)
-			throws MiddlewareQueryException {
+	public Integer getIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role) {
 		Integer stdVariableId = null;
 		stdVariableId = this.getCvTermDao().getStandadardVariableIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
 		return stdVariableId;
 	}
 
-	public boolean validateEnumerationUsage(int standardVariableId, int enumerationId) throws MiddlewareQueryException {
+	public boolean validateEnumerationUsage(int standardVariableId, int enumerationId) {
 		Integer storedInId =
 				this.getCvTermRelationshipDao().getObjectIdByTypeAndSubject(TermId.STORED_IN.getId(), standardVariableId).get(0);
 		String value = String.valueOf(enumerationId);
@@ -406,37 +400,37 @@ public class StandardVariableBuilder extends Builder {
 		}
 	}
 
-	private boolean isExistsGeolocationByTypeAndValue(int factorId, String value) throws MiddlewareQueryException {
+	private boolean isExistsGeolocationByTypeAndValue(int factorId, String value) {
 		Set<Integer> geolocationIds = new HashSet<Integer>();
 		geolocationIds.addAll(this.getGeolocationPropertyDao().getGeolocationIdsByPropertyTypeAndValue(factorId, value));
 		return !geolocationIds.isEmpty();
 	}
 
-	private boolean isExistsStocksByTypeAndValue(Integer factorId, String value) throws MiddlewareQueryException {
+	private boolean isExistsStocksByTypeAndValue(Integer factorId, String value) {
 		Set<Integer> stockIds = new HashSet<Integer>();
 		stockIds.addAll(this.getStockPropertyDao().getStockIdsByPropertyTypeAndValue(factorId, value));
 		return !stockIds.isEmpty();
 	}
 
-	private boolean isExistsExperimentsByTypeAndValue(Integer factorId, String value) throws MiddlewareQueryException {
+	private boolean isExistsExperimentsByTypeAndValue(Integer factorId, String value) {
 		Set<Integer> experimentIds = new HashSet<Integer>();
 		experimentIds.addAll(this.getExperimentPropertyDao().getExperimentIdsByPropertyTypeAndValue(factorId, value));
 		return !experimentIds.isEmpty();
 	}
 
-	private boolean isExistsPropertyByTypeAndValue(Integer factorId, String value) throws MiddlewareQueryException {
+	private boolean isExistsPropertyByTypeAndValue(Integer factorId, String value) {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		properties.addAll(this.getProjectPropertyDao().getByTypeAndValue(factorId, value));
 		return !properties.isEmpty();
 	}
 
-	private boolean isExistsPhenotypeByTypeAndValue(Integer variateId, String value, boolean isEnum) throws MiddlewareQueryException {
+	private boolean isExistsPhenotypeByTypeAndValue(Integer variateId, String value, boolean isEnum) {
 		List<Phenotype> phenotypes = new ArrayList<Phenotype>();
 		phenotypes.addAll(this.getPhenotypeDao().getByTypeAndValue(variateId, value, isEnum));
 		return !phenotypes.isEmpty();
 	}
 
-	public List<StandardVariableReference> findAllByProperty(int propertyId) throws MiddlewareQueryException {
+	public List<StandardVariableReference> findAllByProperty(int propertyId) {
 		List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
 		list.addAll(this.getCvTermDao().getStandardVariablesOfProperty(propertyId));
 		return list;
