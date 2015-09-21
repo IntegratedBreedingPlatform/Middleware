@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.api.study;
 
 import java.util.List;
 
+import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 public interface StudyService {
@@ -22,4 +23,6 @@ public interface StudyService {
 	ObservationDto updataObservation(final Integer studyIdentifier, final ObservationDto middlewareMeasurement);
 
 	List<StudyGermplasmDto> getStudyGermplasmList(Integer studyIdentifer);
+	
+	Integer addNewStudy(Workbook workbook, String programUUID)throws MiddlewareQueryException;
 }
