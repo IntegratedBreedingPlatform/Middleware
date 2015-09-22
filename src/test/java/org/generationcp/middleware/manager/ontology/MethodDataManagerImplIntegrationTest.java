@@ -160,6 +160,7 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(String.format(message, "IsObsolete"), methodTerm.isObsolete(), method.isObsolete());
 		Assert.assertEquals(String.format(message, "CreatedDate"), method.getDateCreated(), testCreatedDate);
 		Assert.assertEquals(String.format(message, "UpdatedDate"), method.getDateLastModified(), testUpdatedDate);
+		Assert.assertFalse("Method " + method.getId() + " should not be obsolete", method.isObsolete());
 	}
 
 	/**

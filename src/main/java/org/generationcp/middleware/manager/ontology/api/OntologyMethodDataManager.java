@@ -25,13 +25,23 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 public interface OntologyMethodDataManager {
 
 	/**
-	 * Gets the method with the given id.
+	 * Gets the method with the given id. Returns null if obsolete.
 	 *
 	 * @param id the id to match
 	 * @return the matching method
 	 * @throws MiddlewareException the middleware query exception
 	 */
 	Method getMethod(int id) throws MiddlewareException;
+
+	/**
+	 * Gets the method with the given id. Return null if obsolete and filterObsolete is true.
+	 *
+	 * @param id the id to match
+	 * @param filterObsolete the flag to determine if obsolete method will be filtered
+	 * @return the matching method
+	 * @throws MiddlewareException the middleware query exception
+	 */
+	Method getMethod(int id, boolean filterObsolete) throws MiddlewareException;
 
 	/**
 	 * Gets the all methods from Central and Local.

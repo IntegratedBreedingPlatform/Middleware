@@ -156,8 +156,8 @@ public class MethodDataManagerImplTest {
 		List<CVTermProperty> methodUpdatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(methodTerm), methodUpdatedDateProperties, testUpdatedDate);
 
-		Mockito.when(this.cvTermDao.getAllByCvId(Collections.singletonList(methodTerm.getCvTermId()), CvId.METHODS))
-				.thenReturn(Collections.singletonList(methodTerm));
+		Mockito.when(this.cvTermDao.getAllByCvId(Collections.singletonList(methodTerm.getCvTermId()), CvId.METHODS, true))
+		.thenReturn(Collections.singletonList(methodTerm));
 		List<CVTermProperty> combinedProperties = new ArrayList<>(methodCreatedDateProperties);
 		combinedProperties.addAll(methodUpdatedDateProperties);
 		Mockito.when(this.cvTermPropertyDao.getByCvTermIds(Collections.singletonList(methodTerm.getCvTermId())))
@@ -172,6 +172,7 @@ public class MethodDataManagerImplTest {
 		Assert.assertEquals(String.format(message, "IsObsolete"), methodTerm.isObsolete(), method.isObsolete());
 		Assert.assertEquals(String.format(message, "CreatedDate"), method.getDateCreated(), testCreatedDate);
 		Assert.assertEquals(String.format(message, "UpdatedDate"), method.getDateLastModified(), testUpdatedDate);
+		Assert.assertFalse("Method " + method.getId() + " should not be obsolete", method.isObsolete());
 	}
 
 	/*
@@ -181,7 +182,7 @@ public class MethodDataManagerImplTest {
 	public void testGetMethodByIdShouldReturnNullIfTermDoesNotExists() throws Exception {
 		Method method = this.methodDataManager.getMethod(0);
 		Assert.assertNull(method);
-		Mockito.verify(this.cvTermDao, Mockito.times(1)).getAllByCvId(Collections.singletonList(0), CvId.METHODS);
+		Mockito.verify(this.cvTermDao, Mockito.times(1)).getAllByCvId(Collections.singletonList(0), CvId.METHODS, true);
 	}
 
 	/**
@@ -389,5 +390,21 @@ public class MethodDataManagerImplTest {
 		Mockito.when(this.cvTermDao.getById(methodTerm.getCvTermId())).thenReturn(methodTerm);
 		Mockito.doReturn(true).when(this.cvTermRelationshipDao).isTermReferred(methodTerm.getCvTermId());
 		this.methodDataManager.deleteMethod(methodTerm.getCvTermId());
+	}
+
+	@Test
+	public void testGetMethod_DontFilterObsolete() {
+		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
+		methodTerm.setIsObsolete(true);
+
+		boolean filterObsolete = false;
+		Mockito.when(this.cvTermDao.getAllByCvId(Collections.singletonList(methodTerm.getCvTermId()), CvId.METHODS, filterObsolete))
+		.thenReturn(Collections.singletonList(methodTerm));
+
+		Method method = this.methodDataManager.getMethod(methodTerm.getCvTermId(), filterObsolete);
+		Assert.assertNotNull(method);
+		Assert.assertTrue("Method should have id " + methodTerm.getCvTermId(), methodTerm.getCvTermId().intValue() == method.getId());
+		Assert.assertTrue("Method" + method.getId() + " should be obsolete", method.isObsolete());
+
 	}
 }

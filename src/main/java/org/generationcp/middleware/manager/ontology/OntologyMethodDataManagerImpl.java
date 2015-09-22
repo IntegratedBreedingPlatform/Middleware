@@ -49,7 +49,12 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 
 	@Override
 	public Method getMethod(int id) throws MiddlewareException {
-		List<Method> methods = this.getMethods(false, new ArrayList<>(Collections.singletonList(id)));
+		return this.getMethod(id, true);
+	}
+
+	@Override
+	public Method getMethod(int id, boolean filterObsolete) throws MiddlewareException {
+		List<Method> methods = this.getMethods(false, new ArrayList<>(Collections.singletonList(id)), filterObsolete);
 		if (methods.isEmpty()) {
 			return null;
 		}
@@ -62,23 +67,35 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 	}
 
 	/**
-	 * This will fetch list of methods by passing methodIds
-	 * 
-	 * @param fetchAll will tell wheather query should get all methods or not.
-	 * @param methodIds will tell wheather methodIds should be pass to filter result. Combination of these two will give flexible usage.
+	 * This will fetch list of methods by passing methodIds. It filters out obsolete methods by default.
+	 *
+	 * @param fetchAll will tell whether query should get all methods or not.
+	 * @param methodIds will tell whether methodIds should be pass to filter result. Combination of these two will give flexible usage.
 	 * @return List<Method>
 	 * @throws MiddlewareException
 	 */
 	private List<Method> getMethods(Boolean fetchAll, List<Integer> methodIds) throws MiddlewareException {
+		return this.getMethods(fetchAll, methodIds, true);
+	}
+
+	/**
+	 * This will fetch list of methods by passing methodIds. It does not filter out obsolete methods if filterObsolete is false.
+	 *
+	 * @param fetchAll will tell wheather query should get all methods or not.
+	 * @param methodIds will tell wheather methodIds should be pass to filter result. Combination of these two will give flexible usage.
+	 * @param filterObsolete will tell whether obsolete methods will be filtered
+	 * @return List<Method>
+	 * @throws MiddlewareException
+	 */
+	private List<Method> getMethods(Boolean fetchAll, List<Integer> methodIds, boolean filterObsolete) throws MiddlewareException {
 
 		Map<Integer, Method> map = new HashMap<>();
 		if (methodIds == null) {
 			methodIds = new ArrayList<>();
 		}
 
-		List<CVTerm> terms = fetchAll ?
-				this.ontologyDaoFactory.getCvTermDao().getAllByCvId(CvId.METHODS) :
-				this.ontologyDaoFactory.getCvTermDao().getAllByCvId(methodIds, CvId.METHODS);
+		List<CVTerm> terms = fetchAll ? this.ontologyDaoFactory.getCvTermDao().getAllByCvId(CvId.METHODS, filterObsolete)
+				: this.ontologyDaoFactory.getCvTermDao().getAllByCvId(methodIds, CvId.METHODS, filterObsolete);
 
 		for (CVTerm m : terms) {
 			Method method = new Method(Term.fromCVTerm(m));

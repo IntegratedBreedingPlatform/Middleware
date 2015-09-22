@@ -14,10 +14,13 @@ package org.generationcp.middleware.manager;
 import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.oms.CVTermDao;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.OntologyDataCreationUtil;
 import org.junit.After;
@@ -43,6 +46,7 @@ public class OntologyScaleDataManagerImplIntegrationTest extends IntegrationTest
 		this.testScale.setDataType(DataType.NUMERIC_VARIABLE);
 		this.testScale.setMinValue("0");
 		this.testScale.setMaxValue("100");
+		this.testScale.setObsolete(false);
 		this.manager.addScale(this.testScale);
 	}
 
@@ -51,14 +55,49 @@ public class OntologyScaleDataManagerImplIntegrationTest extends IntegrationTest
 		List<Scale> scales = this.manager.getAllScales();
 		Assert.assertTrue(scales.size() > 0);
 		Debug.println(IntegrationTestBase.INDENT, "From Total Scales:  " + scales.size());
+		for (Scale scale : scales) {
+			Assert.assertTrue("Scale " + scale.getId() + " should have cv id " + CvId.SCALES.getId(),
+					scale.getVocabularyId() == CvId.SCALES.getId());
+			Assert.assertFalse("Scale " + scale.getId() + " should not be obsolete", scale.isObsolete());
+		}
 	}
 
 	@Test
 	public void testGetScaleById() throws Exception {
-		Scale scale = this.manager.getScaleById(6025);
+		int id = 6025;
+		Scale scale = this.manager.getScaleById(id);
 		Assert.assertNotNull(scale);
 		Assert.assertEquals("CSSI", scale.getName());
+		Assert.assertTrue("Scale should have id " + id, scale.getId() == id);
+		Assert.assertTrue("Scale " + scale.getId() + " should have cv id " + CvId.SCALES.getId(),
+				scale.getVocabularyId() == CvId.SCALES.getId());
+		Assert.assertFalse("Scale " + scale.getId() + " should not be obsolete", scale.isObsolete());
 	}
+
+	@Test
+	public void testGetScaleById_DontFilterObsolete() throws Exception {
+		CVTermDao cvtermDao = new CVTermDao();
+		cvtermDao.setSession(this.sessionProvder.getSession());
+
+		// set testScale to obsolete
+		int id = this.testScale.getId();
+		CVTerm testScaleCvTerm = cvtermDao.getById(id);
+		testScaleCvTerm.setIsObsolete(true);
+		cvtermDao.update(testScaleCvTerm);
+
+		boolean filterObsolete = false;
+		Scale scale = this.manager.getScaleById(id, filterObsolete);
+		Assert.assertNotNull(scale);
+		Assert.assertTrue("Scale should have id " + id, scale.getId() == id);
+		Assert.assertTrue("Scale " + scale.getId() + " should have cv id " + CvId.SCALES.getId(),
+				scale.getVocabularyId() == CvId.SCALES.getId());
+		Assert.assertTrue("Scale " + scale.getId() + " should be obsolete", scale.isObsolete());
+
+		// revert changes
+		testScaleCvTerm.setIsObsolete(false);
+		cvtermDao.update(testScaleCvTerm);
+	}
+
 
 	@Test
 	public void testAddScale() throws Exception {

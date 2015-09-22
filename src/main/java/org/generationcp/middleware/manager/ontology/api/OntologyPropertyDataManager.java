@@ -26,13 +26,23 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 public interface OntologyPropertyDataManager {
 
 	/**
-	 * Given the termId, retrieve the Property POJO.
+	 * Given the termId, retrieve the Property POJO. Return null if obsolete.
 	 *
 	 * @param id the term id having cvId = Property
 	 * @return {@link Property}
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Property getProperty(int id) throws MiddlewareException;
+
+	/**
+	 * Given the termId, retrieve the Property POJO. Return null if obsolete and filterObsolete is true.
+	 *
+	 * @param id the term id having cvId = Property
+	 * @param filterObsolete flag to determine if obsolete property will be filtered
+	 * @return {@link Property}
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Property getProperty(int id, boolean filterObsolete) throws MiddlewareException;
 
 	/**
 	 * Get all properties

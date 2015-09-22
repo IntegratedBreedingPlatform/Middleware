@@ -25,13 +25,23 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 public interface OntologyScaleDataManager {
 
 	/**
-	 * This will fetch Scale by scaleId*
-	 * 
+	 * This will fetch Scale by scaleId. Return null if obsolete.
+	 *
 	 * @param scaleId select scale by scaleId
 	 * @return @link Scale
 	 * @throws MiddlewareException
 	 */
 	Scale getScaleById(int scaleId) throws MiddlewareException;
+
+	/**
+	 * This will fetch Scale by scaleId. Return null if obsolete and filterObsolete is true.
+	 *
+	 * @param scaleId select scale by scaleId
+	 * @param filterObsolete flag to determine if obsolete scale will be filtered
+	 * @return @link Scale
+	 * @throws MiddlewareException
+	 */
+	Scale getScaleById(int scaleId, boolean filterObsolete) throws MiddlewareException;
 
 	/**
 	 * Get all scales from db

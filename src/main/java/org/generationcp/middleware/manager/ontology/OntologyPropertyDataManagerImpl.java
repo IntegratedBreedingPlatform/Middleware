@@ -49,13 +49,18 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
 	@Override
 	public Property getProperty(int id) throws MiddlewareException {
+		return this.getProperty(id, true);
+	}
+
+	@Override
+	public Property getProperty(int id, boolean filterObsolete) throws MiddlewareException {
 
 		CVTerm term = this.getCvTermDao().getById(id);
 
 		this.checkTermIsProperty(term);
 
 		try {
-			List<Property> properties = this.getProperties(false, new ArrayList<>(Collections.singletonList(id)));
+			List<Property> properties = this.getProperties(false, new ArrayList<>(Collections.singletonList(id)), filterObsolete);
 			if (properties.size() == 0) {
 				return null;
 			}
@@ -131,14 +136,28 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 	}
 
 	/**
-	 * This will fetch list of properties by passing propertyIds This method is private and consumed by other methods
-	 * 
-	 * @param fetchAll will tell weather query should get all properties or not.
-	 * @param propertyIds will tell weather propertyIds should be pass to filter result. Combination of these two will give flexible usage.
+	 * This will fetch list of non-obsolete properties by passing propertyIds. This method is private and consumed by other methods.
+	 *
+	 * @param fetchAll will tell whether query should get all non-obsolete properties or not.
+	 * @param propertyIds will tell whether propertyIds should be pass to filter result. Combination of these two will give flexible usage.
 	 * @return List<Property>
 	 * @throws MiddlewareException
 	 */
 	private List<Property> getProperties(Boolean fetchAll, List propertyIds) throws MiddlewareException {
+		return this.getProperties(fetchAll, propertyIds, true);
+	}
+
+	/**
+	 * This will fetch list of properties by passing propertyIds. This method is private and consumed by other methods. Obsolete properties
+	 * will be filtered if filterObsolete is true
+	 *
+	 * @param fetchAll will tell whether query should get all properties or not.
+	 * @param propertyIds will tell whether propertyIds should be pass to filter result. Combination of these two will give flexible usage.
+	 * @param filterObsolete will tell whether obsolete properties will be filtered
+	 * @return List<Property>
+	 * @throws MiddlewareException
+	 */
+	private List<Property> getProperties(Boolean fetchAll, List propertyIds, boolean filterObsolete) throws MiddlewareException {
 
 		Map<Integer, Property> map = new HashMap<>();
 
@@ -157,23 +176,28 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 				filterClause = " and p.cvterm_id in (:propertyIds)";
 			}
 
+			String filterObsoleteClause = "";
+			if (filterObsolete) {
+				filterObsoleteClause = " and p." + this.getCvTermDao().SHOULD_NOT_OBSOLETE;
+			}
+
 			SQLQuery query =
 					this.getActiveSession()
-							.createSQLQuery(
-									"select p.cvterm_id pId, p.name pName, p.definition pDescription, p.cv_id pVocabularyId, p.is_obsolete pObsolete"
-											+ ", tp.value cropOntologyId"
-											+ ", GROUP_CONCAT(cs.name SEPARATOR ',') AS classes"
-											+ "  from cvterm p"
-											+ " LEFT JOIN cvtermprop tp ON tp.cvterm_id = p.cvterm_id AND tp.type_id = "
-											+ TermId.CROP_ONTOLOGY_ID.getId()
-											+ " LEFT JOIN (select cvtr.subject_id PropertyId, o.cv_id, o.cvterm_id, o.name, o.definition, o.is_obsolete "
-											+ " from cvterm o inner join cvterm_relationship cvtr on cvtr.object_id = o.cvterm_id and cvtr.type_id = "
-											+ TermId.IS_A.getId() + ")" + " cs on cs.PropertyId = p.cvterm_id" + " where p.cv_id = "
-											+ CvId.PROPERTIES.getId() + " and p." + this.getCvTermDao().SHOULD_NOT_OBSOLETE + filterClause
-											+ " Group BY p.cvterm_id Order BY p.name ")
-							.addScalar("pId", new org.hibernate.type.IntegerType()).addScalar("pName").addScalar("pDescription")
-							.addScalar("pVocabularyId", new org.hibernate.type.IntegerType())
-							.addScalar("pObsolete", new org.hibernate.type.IntegerType()).addScalar("cropOntologyId").addScalar("classes");
+					.createSQLQuery(
+							"select p.cvterm_id pId, p.name pName, p.definition pDescription, p.cv_id pVocabularyId, p.is_obsolete pObsolete"
+									+ ", tp.value cropOntologyId"
+									+ ", GROUP_CONCAT(cs.name SEPARATOR ',') AS classes"
+									+ "  from cvterm p"
+									+ " LEFT JOIN cvtermprop tp ON tp.cvterm_id = p.cvterm_id AND tp.type_id = "
+									+ TermId.CROP_ONTOLOGY_ID.getId()
+									+ " LEFT JOIN (select cvtr.subject_id PropertyId, o.cv_id, o.cvterm_id, o.name, o.definition, o.is_obsolete "
+									+ " from cvterm o inner join cvterm_relationship cvtr on cvtr.object_id = o.cvterm_id and cvtr.type_id = "
+									+ TermId.IS_A.getId() + ")" + " cs on cs.PropertyId = p.cvterm_id" + " where p.cv_id = "
+							+ CvId.PROPERTIES.getId() + filterObsoleteClause + filterClause
+									+ " Group BY p.cvterm_id Order BY p.name ")
+					.addScalar("pId", new org.hibernate.type.IntegerType()).addScalar("pName").addScalar("pDescription")
+					.addScalar("pVocabularyId", new org.hibernate.type.IntegerType())
+					.addScalar("pObsolete", new org.hibernate.type.IntegerType()).addScalar("cropOntologyId").addScalar("classes");
 
 			if (propertyIds.size() > 0) {
 				query.setParameterList("propertyIds", propertyIds);

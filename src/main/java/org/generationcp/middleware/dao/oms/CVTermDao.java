@@ -1312,13 +1312,19 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	/*-------------------------    AREA FOR USED/CREATED METHOD FOR BMS-36:ONTOLOGY MANAGER REDESIGN -------------------------- */
 
 	public List<CVTerm> getAllByCvId(Integer cvId) throws MiddlewareQueryException {
+		return this.getAllByCvId(cvId, true);
+	}
+
+	public List<CVTerm> getAllByCvId(Integer cvId, boolean filterObsolete) throws MiddlewareQueryException {
 
 		List<CVTerm> terms;
 
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("cvId", cvId));
-			criteria.add(Restrictions.eq("isObsolete", 0));
+			if (filterObsolete) {
+				criteria.add(Restrictions.eq("isObsolete", 0));
+			}
 			criteria.addOrder(Order.asc("name"));
 
 			terms = criteria.list();
@@ -1331,10 +1337,18 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	public List<CVTerm> getAllByCvId(CvId cvId) throws MiddlewareQueryException {
-		return this.getAllByCvId(cvId.getId());
+		return this.getAllByCvId(cvId, true);
+	}
+
+	public List<CVTerm> getAllByCvId(CvId cvId, boolean filterObsolete) throws MiddlewareQueryException {
+		return this.getAllByCvId(cvId.getId(), filterObsolete);
 	}
 
 	public List<CVTerm> getAllByCvId(List<Integer> termIds, CvId cvId) throws MiddlewareQueryException {
+		return this.getAllByCvId(termIds, cvId, true);
+	}
+
+	public List<CVTerm> getAllByCvId(List<Integer> termIds, CvId cvId, boolean filterObsolete) throws MiddlewareQueryException {
 
 		List<CVTerm> terms;
 
@@ -1342,7 +1356,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.in("cvTermId", termIds));
 			criteria.add(Restrictions.eq("cvId", cvId.getId()));
-			criteria.add(Restrictions.eq("isObsolete", 0));
+			if (filterObsolete) {
+				criteria.add(Restrictions.eq("isObsolete", 0));
+			}
 			criteria.addOrder(Order.asc("name"));
 
 			terms = criteria.list();

@@ -34,11 +34,25 @@ public interface OntologyVariableDataManager {
 	List<Variable> getWithFilter(VariableFilter variableFilter) throws MiddlewareException;
 
 	/**
-	 * Return variable by Id * @return Variable
-	 * 
+	 * Return variable by Id with details based on programUuid. Filter obsolete terms by default.
+	 *
+	 * @param programUuid as the unique id of the program
+	 * @param id as the variable Id
+	 * @return Variable
 	 * @throws MiddlewareException*
 	 */
 	Variable getVariable(String programUuid, Integer id) throws MiddlewareException;
+
+	/**
+	 * Return variable by Id with details based on programUuid. Don't filter obsolete terms if filterObsolete is false.
+	 *
+	 * @param programUuid as the unique id of the program
+	 * @param id as the variable Id
+	 * @param filterObsolete as flag if obsolete terms will be filtered
+	 * @return Variable
+	 * @throws MiddlewareException*
+	 */
+	Variable getVariable(String programUuid, Integer id, boolean filterObsolete);
 
 	/**
 	 * @throws MiddlewareException*

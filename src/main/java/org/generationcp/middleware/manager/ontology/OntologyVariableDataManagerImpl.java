@@ -421,6 +421,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	@Override
 	public Variable getVariable(String programUuid, Integer id) throws MiddlewareException {
+		return this.getVariable(programUuid, id, true);
+	}
+
+	@Override
+	public Variable getVariable(String programUuid, Integer id, boolean filterObsolete) throws MiddlewareException {
 
 		try {
 
@@ -437,11 +442,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(term.getCvTermId());
 				for (CVTermRelationship r : relationships) {
 					if (Objects.equals(r.getTypeId(), TermId.HAS_METHOD.getId())) {
-						variable.setMethod(this.methodManager.getMethod(r.getObjectId()));
+						variable.setMethod(this.methodManager.getMethod(r.getObjectId(), filterObsolete));
 					} else if (Objects.equals(r.getTypeId(), TermId.HAS_PROPERTY.getId())) {
-						variable.setProperty(this.propertyManager.getProperty(r.getObjectId()));
+						variable.setProperty(this.propertyManager.getProperty(r.getObjectId(), filterObsolete));
 					} else if (Objects.equals(r.getTypeId(), TermId.HAS_SCALE.getId())) {
-						variable.setScale(this.scaleManager.getScaleById(r.getObjectId()));
+						variable.setScale(this.scaleManager.getScaleById(r.getObjectId(), filterObsolete));
 					}
 				}
 

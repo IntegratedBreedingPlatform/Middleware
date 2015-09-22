@@ -58,13 +58,16 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 		super(sessionProvider);
 	}
 
-
-
 	@Override
 	public Scale getScaleById(int scaleId) throws MiddlewareException {
+		return this.getScaleById(scaleId, true);
+	}
+
+	@Override
+	public Scale getScaleById(int scaleId, boolean filterObsolete) throws MiddlewareException {
 
 		try {
-			List<Scale> scales = this.getScales(false, new ArrayList<>(Collections.singletonList(scaleId)));
+			List<Scale> scales = this.getScales(false, new ArrayList<>(Collections.singletonList(scaleId)), filterObsolete);
 			if (scales.isEmpty()) {
 				return null;
 			}
@@ -84,14 +87,28 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	}
 
 	/**
-	 * This will fetch list of Scales by passing scaleIds This method is private and consumed by other methods
+	 * This will fetch list of non-obsolete scales by passing scaleIds This method is private and consumed by other methods
 	 *
-	 * @param fetchAll will tell weather query should get all scales or not.
-	 * @param scaleIds will tell weather scaleIds should be pass to filter result. Combination of these two will give flexible usage.
+	 * @param fetchAll will tell whether query should get all non-obsolete scales or not.
+	 * @param scaleIds will tell whether scaleIds should be pass to filter result. Combination of these two will give flexible usage.
 	 * @return List<Scale>
 	 * @throws MiddlewareException
 	 */
 	private List<Scale> getScales(Boolean fetchAll, List<Integer> scaleIds) throws MiddlewareException {
+		return this.getScales(fetchAll, scaleIds, true);
+	}
+
+	/**
+	 * This will fetch list of Scales by passing scaleIds This method is private and consumed by other methods. This will filter obsolete
+	 * scales if filterObsolete is true.
+	 *
+	 * @param fetchAll will tell whether query should get all scales or not.
+	 * @param scaleIds will tell whether scaleIds should be passed to filter result. Combination of these two will give flexible usage.
+	 * @param filterObsolete will tell whether obsolete scales will be filtered
+	 * @return List<Scale>
+	 * @throws MiddlewareException
+	 */
+	private List<Scale> getScales(Boolean fetchAll, List<Integer> scaleIds, boolean filterObsolete) throws MiddlewareException {
 		Map<Integer, org.generationcp.middleware.domain.ontology.Scale> map = new HashMap<>();
 
 		if (scaleIds == null) {
@@ -104,8 +121,8 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 		try {
 
-			List<CVTerm> terms =
-					fetchAll ? this.getCvTermDao().getAllByCvId(CvId.SCALES) : this.getCvTermDao().getAllByCvId(scaleIds, CvId.SCALES);
+			List<CVTerm> terms = fetchAll ? this.getCvTermDao().getAllByCvId(CvId.SCALES, filterObsolete)
+					: this.getCvTermDao().getAllByCvId(scaleIds, CvId.SCALES, filterObsolete);
 			for (CVTerm s : terms) {
 				if (fetchAll) {
 					scaleIds.add(s.getCvTermId());
@@ -113,11 +130,15 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 				map.put(s.getCvTermId(), new Scale(Term.fromCVTerm(s)));
 			}
 
-			Query query =
-					this.getActiveSession()
-							.createSQLQuery(
-									"select p.* from cvtermprop p inner join cvterm t on p.cvterm_id = t.cvterm_id where t.is_obsolete =0 and t.cv_id = "
-											+ CvId.SCALES.getId()).addEntity(CVTermProperty.class);
+			String filterObsoleteClause = "";
+			if (filterObsolete) {
+				filterObsoleteClause = "t.is_obsolete = 0 and";
+			}
+
+			Query query = this.getActiveSession()
+					.createSQLQuery("select p.* from cvtermprop p inner join cvterm t on p.cvterm_id = t.cvterm_id where "
+							+ filterObsoleteClause + " t.cv_id = " + CvId.SCALES.getId())
+					.addEntity(CVTermProperty.class);
 
 			List properties = query.list();
 
