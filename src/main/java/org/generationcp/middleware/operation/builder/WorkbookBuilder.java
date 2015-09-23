@@ -66,11 +66,11 @@ public class WorkbookBuilder extends Builder {
 		super(sessionProviderForLocal);
 	}
 
-	public Workbook create(final int id) throws MiddlewareException {
+	public Workbook create(final int id) {
 		return this.create(id, StudyType.N);
 	}
 
-	public Workbook create(final int id, final StudyType studyType) throws MiddlewareException {
+	public Workbook create(final int id, final StudyType studyType) {
 		final boolean isTrial = studyType == StudyType.T;
 		final Workbook workbook = new Workbook();
 
@@ -250,7 +250,7 @@ public class WorkbookBuilder extends Builder {
 		return workbook;
 	}
 
-	private List<MeasurementRow> getTrialObservations(final Workbook workbook, final boolean isTrial) throws MiddlewareException {
+	private List<MeasurementRow> getTrialObservations(final Workbook workbook, final boolean isTrial) {
 		List<MeasurementRow> trialObservations = null;
 		if (!isTrial) {
 			trialObservations =
@@ -261,7 +261,7 @@ public class WorkbookBuilder extends Builder {
 		return trialObservations;
 	}
 
-	protected void checkMeasurementDataset(final Integer dataSetId) throws MiddlewareQueryException {
+	protected void checkMeasurementDataset(final Integer dataSetId) {
 		// if study has no measurementDataset, throw an error as it is an invalid template
 		if (dataSetId == null || dataSetId.equals(0)) {
 			throw new MiddlewareQueryException(ErrorCode.STUDY_FORMAT_INVALID.getCode(), "The term you entered is invalid");
@@ -302,7 +302,7 @@ public class WorkbookBuilder extends Builder {
 		return projPropRoleMap;
 	}
 
-	public Workbook createStudyVariableSettings(final int id, final boolean isNursery) throws MiddlewareException {
+	public Workbook createStudyVariableSettings(final int id, final boolean isNursery) {
 		final Workbook workbook = new Workbook();
 		final Study study = this.getStudyBuilder().createStudy(id);
 		Integer dataSetId = null, trialDatasetId = null;
@@ -498,8 +498,7 @@ public class WorkbookBuilder extends Builder {
 							final boolean isEditable =
 									NonEditableFactors.find(variable.getVariableType().getStandardVariable().getId()) == null ? true
 											: false;
-							MeasurementData measurementData = null;
-							measurementData =
+							final MeasurementData measurementData =
 									new MeasurementData(variable.getVariableType().getLocalName(), variable.getValue(), isEditable,
 											this.getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
 											condition);
@@ -519,7 +518,7 @@ public class WorkbookBuilder extends Builder {
 							final boolean isEditable =
 									NonEditableFactors.find(variable.getVariableType().getStandardVariable().getId()) == null ? true
 											: false;
-							MeasurementData measurementData = null;
+							final MeasurementData measurementData;
 							if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE
 									.getId()) {
 								final Integer id =
@@ -596,7 +595,7 @@ public class WorkbookBuilder extends Builder {
 		return PhenotypicType.VARIATE == stdVar.getPhenotypicType() && stdVar.getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId();
 	}
 
-	private List<ValueReference> getAllBreedingMethods() throws MiddlewareQueryException {
+	private List<ValueReference> getAllBreedingMethods() {
 		final List<ValueReference> list = new ArrayList<ValueReference>();
 		final List<Method> methodList = this.getGermplasmDataManager().getAllMethodsNotGenerative();
 
@@ -812,8 +811,7 @@ public class WorkbookBuilder extends Builder {
 		return "";
 	}
 
-	private VariableList getSingleRowOfEmptyTrialVariables(final Workbook workbook, final int studyId, final int measurementDatasetId)
-			throws MiddlewareException {
+	private VariableList getSingleRowOfEmptyTrialVariables(final Workbook workbook, final int studyId, final int measurementDatasetId) {
 		final DmsProject trialProject = this.getDataSetBuilder().getTrialDataset(studyId);
 		final DataSet dataset = this.getDataSetBuilder().build(trialProject.getProjectId());
 		final VariableTypeList typeList = dataset.getFactorsByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
@@ -825,7 +823,7 @@ public class WorkbookBuilder extends Builder {
 		return list;
 	}
 
-	private VariableList getTrialConstants(final int trialDatasetId) throws MiddlewareException {
+	private VariableList getTrialConstants(final int trialDatasetId) {
 		final DataSet dataset = this.getDataSetBuilder().build(trialDatasetId);
 		final VariableTypeList typeList = dataset.getVariableTypes().getVariates();
 
@@ -837,7 +835,7 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	public List<MeasurementRow> buildTrialObservations(final int trialDatasetId, final List<MeasurementVariable> factorList,
-			final List<MeasurementVariable> variateList) throws MiddlewareException {
+			final List<MeasurementVariable> variateList) {
 
 		final int totalRows = (int) this.getStudyDataManager().countExperiments(trialDatasetId);
 		final List<Experiment> experiments = this.getStudyDataManager().getExperiments(trialDatasetId, 0, totalRows);
@@ -922,7 +920,7 @@ public class WorkbookBuilder extends Builder {
 		return list;
 	}
 
-	public int getMeasurementDataSetId(final int studyId, final String studyName) throws MiddlewareException {
+	public int getMeasurementDataSetId(final int studyId, final String studyName) {
 		final List<DatasetReference> datasetRefList = this.getStudyDataManager().getDatasetReferences(studyId);
 		if (datasetRefList != null) {
 			for (final DatasetReference datasetRef : datasetRefList) {
@@ -941,7 +939,7 @@ public class WorkbookBuilder extends Builder {
 		}
 	}
 
-	public int getTrialDataSetId(final int studyId, final String studyName) throws MiddlewareException {
+	public int getTrialDataSetId(final int studyId, final String studyName) {
 		final List<DatasetReference> datasetRefList = this.getStudyDataManager().getDatasetReferences(studyId);
 		if (datasetRefList != null) {
 			for (final DatasetReference datasetRef : datasetRefList) {
@@ -1018,8 +1016,7 @@ public class WorkbookBuilder extends Builder {
 		return observations;
 	}
 
-	public void setTreatmentFactorValues(final List<TreatmentVariable> treatmentVariables, final int measurementDatasetId)
-			throws MiddlewareQueryException {
+	public void setTreatmentFactorValues(final List<TreatmentVariable> treatmentVariables, final int measurementDatasetId) {
 
 		for (final TreatmentVariable treatmentVariable : treatmentVariables) {
 			final List<String> values =
