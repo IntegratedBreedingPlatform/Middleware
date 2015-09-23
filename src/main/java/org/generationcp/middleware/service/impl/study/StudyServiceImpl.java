@@ -5,14 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.Service;
-import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
@@ -34,19 +31,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private StudyGermplasmListService studyGermplasmListService;
 
-	private DataImportService dataImportService;
-
 	public StudyServiceImpl() {
 		super();
 	}
 
-	public StudyServiceImpl(HibernateSessionProvider sessionProvider) {
+	public StudyServiceImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
-		Session currentSession = this.getCurrentSession();
+		final Session currentSession = this.getCurrentSession();
 		this.trialTraits = new TraitServiceImpl(currentSession);
 		this.studyMeasurements = new StudyMeasurements(this.getCurrentSession());
 		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(this.getCurrentSession());
-		this.dataImportService = new DataImportServiceImpl(sessionProvider);
 	}
 
 	/**
@@ -55,20 +49,18 @@ public class StudyServiceImpl extends Service implements StudyService {
 	 * @param trialTraits
 	 * @param trialMeasurements
 	 */
-	StudyServiceImpl(final TraitService trialTraits, final StudyMeasurements trialMeasurements, 
-			final StudyGermplasmListService studyGermplasmListServiceImpl,
-			final DataImportService dataImportService) {
+	StudyServiceImpl(final TraitService trialTraits, final StudyMeasurements trialMeasurements,
+			final StudyGermplasmListService studyGermplasmListServiceImpl) {
 		this.trialTraits = trialTraits;
 		this.studyMeasurements = trialMeasurements;
 		this.studyGermplasmListService = studyGermplasmListServiceImpl;
-		this.dataImportService = dataImportService;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<StudySummary> listAllStudies(final String programUniqueId) throws MiddlewareQueryException {
 
-		List<StudySummary> studySummaries = new ArrayList<StudySummary>();
+		final List<StudySummary> studySummaries = new ArrayList<StudySummary>();
 
 		String sql =
 				"SELECT DISTINCT " + "	p.project_id AS id, " + "	p.name AS name, " + "	p.description AS title, "
@@ -92,27 +84,27 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		List<Object[]> list = null;
 		try {
-			Query query =
+			final Query query =
 					this.getCurrentSession().createSQLQuery(sql).addScalar("id").addScalar("name").addScalar("title")
-							.addScalar("programUUID").addScalar("studyTypeId").addScalar("objective").addScalar("startDate")
-							.addScalar("endDate");
+					.addScalar("programUUID").addScalar("studyTypeId").addScalar("objective").addScalar("startDate")
+					.addScalar("endDate");
 			list = query.list();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in listAllStudies() query in StudyServiceImpl: " + e.getMessage(), e);
 		}
 
 		if (list != null && !list.isEmpty()) {
-			for (Object[] row : list) {
-				Integer id = (Integer) row[0];
-				String name = (String) row[1];
-				String title = (String) row[2];
-				String programUUID = (String) row[3];
-				String studyTypeId = (String) row[4];
-				String objective = (String) row[5];
-				String startDate = (String) row[6];
-				String endDate = (String) row[7];
+			for (final Object[] row : list) {
+				final Integer id = (Integer) row[0];
+				final String name = (String) row[1];
+				final String title = (String) row[2];
+				final String programUUID = (String) row[3];
+				final String studyTypeId = (String) row[4];
+				final String objective = (String) row[5];
+				final String startDate = (String) row[6];
+				final String endDate = (String) row[7];
 
-				StudySummary studySummary =
+				final StudySummary studySummary =
 						new StudySummary(id, name, title, objective, StudyType.getStudyTypeById(Integer.valueOf(studyTypeId)), startDate,
 								endDate, programUUID);
 				studySummaries.add(studySummary);
@@ -130,7 +122,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<ObservationDto> getSingleObservation(final int studyIdentifier, int measurementIdentifier) {
+	public List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier) {
 
 		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
 
@@ -144,9 +136,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 		final Session currentSession = this.getCurrentSession();
 		final Observations observations = new Observations(currentSession);
 		try {
-			ObservationDto updatedMeasurement = observations.updataObsevationTraits(middlewareMeasurement);
+			final ObservationDto updatedMeasurement = observations.updataObsevationTraits(middlewareMeasurement);
 			return updatedMeasurement;
-		} catch (RuntimeException e) {
+		} catch (final RuntimeException e) {
 			throw e; // or display error message
 		}
 	}
@@ -155,10 +147,4 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public List<StudyGermplasmDto> getStudyGermplasmList(final Integer studyIdentifer) {
 		return this.studyGermplasmListService.getGermplasmList(studyIdentifer);
 	}
-	
-	@Override
-	public Integer addNewStudy(Workbook workbook, String programUUID) throws MiddlewareQueryException {
-		return dataImportService.saveDataset(workbook, true, false, programUUID);
-	}
-
 }
