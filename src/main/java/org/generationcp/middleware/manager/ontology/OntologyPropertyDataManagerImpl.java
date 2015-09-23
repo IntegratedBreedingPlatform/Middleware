@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -28,6 +27,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Strings;
+
 /**
  * Implements {@link OntologyPropertyDataManagerImpl}
  */
@@ -42,18 +43,18 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 	public OntologyPropertyDataManagerImpl() {
 		super();
 	}
-	
+
 	public OntologyPropertyDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}
 
 	@Override
-	public Property getProperty(int id) throws MiddlewareException {
+	public Property getProperty(int id) {
 		return this.getProperty(id, true);
 	}
 
 	@Override
-	public Property getProperty(int id, boolean filterObsolete) throws MiddlewareException {
+	public Property getProperty(int id, boolean filterObsolete) {
 
 		CVTerm term = this.getCvTermDao().getById(id);
 
@@ -61,7 +62,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
 		try {
 			List<Property> properties = this.getProperties(false, new ArrayList<>(Collections.singletonList(id)), filterObsolete);
-			if (properties.size() == 0) {
+			if (properties.isEmpty()) {
 				return null;
 			}
 			return properties.get(0);
@@ -71,7 +72,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public List<Property> getAllProperties() throws MiddlewareException {
+	public List<Property> getAllProperties() {
 		try {
 			return this.getProperties(true, null);
 		} catch (HibernateException e) {
@@ -80,20 +81,20 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareException {
+	public List<Property> getAllPropertiesWithClass(String className) {
 		return this.getAllPropertiesWithClass(new String[] {className});
 	}
 
 	@Override
-	public List<Property> getAllPropertiesWithClassAndVariableType(String[] classes, String[] variableTypes) throws MiddlewareException {
+	public List<Property> getAllPropertiesWithClassAndVariableType(String[] classes, String[] variableTypes) {
 		try {
 			String classFilter = !(Objects.equals(classes, null) || classes.length == 0) ? " and dt.name in (:classes) " : "";
 			String variableTypeFilter =
 					!(Objects.equals(variableTypes, null) || variableTypes.length == 0) ? " and c.value in (:variableTypes) " : "";
 
-			SQLQuery query = getActiveSession().createSQLQuery(
-                    "SELECT DISTINCT p.cvterm_id FROM cvterm p join cvterm_relationship cvtr on p.cvterm_id = cvtr.subject_id " +
-                            " inner join cvterm dt on dt.cvterm_id = cvtr.object_id where cvtr.type_id = " + TermId.IS_A.getId() +
+			SQLQuery query = this.getActiveSession().createSQLQuery(
+					"SELECT DISTINCT p.cvterm_id FROM cvterm p join cvterm_relationship cvtr on p.cvterm_id = cvtr.subject_id " +
+							" inner join cvterm dt on dt.cvterm_id = cvtr.object_id where cvtr.type_id = " + TermId.IS_A.getId() +
 							" and p.cv_id = 1010 and p.is_obsolete = 0 " + classFilter + " and exists " +
 							" (SELECT 1 from cvtermprop c INNER JOIN cvterm_relationship pvtr on c.cvterm_id = pvtr.subject_id " +
 							" where c.type_id = " + TermId.VARIABLE_TYPE.getId() + " and pvtr.object_id = p.cvterm_id" + variableTypeFilter
@@ -116,7 +117,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public List<Property> getAllPropertiesWithClass(String[] classes) throws MiddlewareException {
+	public List<Property> getAllPropertiesWithClass(String[] classes) {
 		try {
 
 			SQLQuery query = this.getActiveSession().createSQLQuery(
@@ -141,9 +142,8 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 	 * @param fetchAll will tell whether query should get all non-obsolete properties or not.
 	 * @param propertyIds will tell whether propertyIds should be pass to filter result. Combination of these two will give flexible usage.
 	 * @return List<Property>
-	 * @throws MiddlewareException
 	 */
-	private List<Property> getProperties(Boolean fetchAll, List propertyIds) throws MiddlewareException {
+	private List<Property> getProperties(Boolean fetchAll, List propertyIds) {
 		return this.getProperties(fetchAll, propertyIds, true);
 	}
 
@@ -155,24 +155,24 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 	 * @param propertyIds will tell whether propertyIds should be pass to filter result. Combination of these two will give flexible usage.
 	 * @param filterObsolete will tell whether obsolete properties will be filtered
 	 * @return List<Property>
-	 * @throws MiddlewareException
 	 */
-	private List<Property> getProperties(Boolean fetchAll, List propertyIds, boolean filterObsolete) throws MiddlewareException {
+	private List<Property> getProperties(Boolean fetchAll, List<Integer> propertyIds, boolean filterObsolete) {
 
 		Map<Integer, Property> map = new HashMap<>();
 
-		if (propertyIds == null) {
-			propertyIds = new ArrayList<>();
+		List<Integer> termIds = propertyIds;
+		if (termIds == null) {
+			termIds = new ArrayList<>();
 		}
 
-		if (!fetchAll && propertyIds.size() == 0) {
+		if (!fetchAll && termIds.isEmpty()) {
 			return new ArrayList<>();
 		}
 
 		try {
 
 			String filterClause = "";
-			if (propertyIds.size() > 0) {
+			if (!termIds.isEmpty()) {
 				filterClause = " and p.cvterm_id in (:propertyIds)";
 			}
 
@@ -193,14 +193,14 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 									+ " LEFT JOIN (select cvtr.subject_id PropertyId, o.cv_id, o.cvterm_id, o.name, o.definition, o.is_obsolete "
 									+ " from cvterm o inner join cvterm_relationship cvtr on cvtr.object_id = o.cvterm_id and cvtr.type_id = "
 									+ TermId.IS_A.getId() + ")" + " cs on cs.PropertyId = p.cvterm_id" + " where p.cv_id = "
-							+ CvId.PROPERTIES.getId() + filterObsoleteClause + filterClause
+									+ CvId.PROPERTIES.getId() + filterObsoleteClause + filterClause
 									+ " Group BY p.cvterm_id Order BY p.name ")
 					.addScalar("pId", new org.hibernate.type.IntegerType()).addScalar("pName").addScalar("pDescription")
 					.addScalar("pVocabularyId", new org.hibernate.type.IntegerType())
 					.addScalar("pObsolete", new org.hibernate.type.IntegerType()).addScalar("cropOntologyId").addScalar("classes");
 
-			if (propertyIds.size() > 0) {
-				query.setParameterList("propertyIds", propertyIds);
+			if (!termIds.isEmpty()) {
+				query.setParameterList("propertyIds", termIds);
 			}
 
 			List result = query.list();
@@ -225,10 +225,9 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 				if (items[6] != null) {
 					String classes = (String) items[6];
 					for (String c : classes.split(",")) {
-						if (Strings.isNullOrEmpty(c)) {
-							continue;
+						if (!Strings.isNullOrEmpty(c)) {
+							property.addClass(c.trim());
 						}
-						property.addClass(c.trim());
 					}
 				}
 
@@ -257,7 +256,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 			throw new MiddlewareQueryException("Error at getProperties :" + e.getMessage(), e);
 		}
 
-		ArrayList<Property> properties = new ArrayList<>(map.values());
+		List<Property> properties = new ArrayList<>(map.values());
 
 		Collections.sort(properties, new Comparator<org.generationcp.middleware.domain.ontology.Property>() {
 
@@ -271,7 +270,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public void addProperty(Property property) throws MiddlewareException {
+	public void addProperty(Property property) {
 
 		CVTerm term = this.getCvTermDao().getByNameAndCvId(property.getName(), CvId.PROPERTIES.getId());
 
@@ -295,26 +294,20 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
 			for (String c : property.getClasses()) {
 
-				// Discarding empty or null strings
-				if (c == null) {
-					continue;
+				if (c != null) {
+					c = c.trim();
 				}
 
-				c = c.trim();
-
-				if (Strings.isNullOrEmpty(c.trim())) {
+				if (Strings.isNullOrEmpty(c)) {
 					continue;
 				}
 
 				Term classTerm = null;
 				for (Term tClass : allClasses) {
-
-					if (c.compareToIgnoreCase(tClass.getName()) != 0) {
-						continue;
+					if (c.compareToIgnoreCase(tClass.getName()) == 0) {
+						classTerm = tClass;
+						break;
 					}
-
-					classTerm = tClass;
-					break;
 				}
 
 				// Add new term if does not exist
@@ -335,7 +328,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public void updateProperty(Property property) throws MiddlewareException {
+	public void updateProperty(Property property) {
 
 		CVTerm term = this.getCvTermDao().getById(property.getId());
 
@@ -370,14 +363,12 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 			}
 
 			for (String c : property.getClasses()) {
-				// Discarding empty or null strings
-				if (c == null) {
-					continue;
+
+				if (c != null) {
+					c = c.trim();
 				}
 
-				c = c.trim();
-
-				if (Strings.isNullOrEmpty(c.trim())) {
+				if (Strings.isNullOrEmpty(c)) {
 					continue;
 				}
 
@@ -385,12 +376,11 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
 				for (Term tClass : allClasses) {
 
-					if (c.compareToIgnoreCase(tClass.getName()) != 0) {
-						continue;
+					if (c.compareToIgnoreCase(tClass.getName()) == 0) {
+						classTerm = tClass;
+						break;
 					}
 
-					classTerm = tClass;
-					break;
 				}
 
 				// Add new term if does not exist
@@ -422,7 +412,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public void deleteProperty(Integer propertyId) throws MiddlewareException {
+	public void deleteProperty(Integer propertyId) {
 
 		CVTerm term = this.getCvTermDao().getById(propertyId);
 
@@ -454,7 +444,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 		}
 	}
 
-	private void checkTermIsProperty(CVTerm term) throws MiddlewareException {
+	private void checkTermIsProperty(CVTerm term) {
 
 		if (term == null) {
 			throw new MiddlewareException(OntologyPropertyDataManagerImpl.PROPERTY_DOES_NOT_EXIST);
@@ -465,7 +455,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 		}
 	}
 
-	private Term addTraitClass(String className) throws MiddlewareException {
+	private Term addTraitClass(String className) {
 
 		// Check weather class term exist with CV 1011.
 		CVTerm classTerm = this.getCvTermDao().getByNameAndCvId(className, CvId.TRAIT_CLASS.getId());
@@ -478,7 +468,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 		return Term.fromCVTerm(classTerm);
 	}
 
-	private void removeTraitClass(Integer termId) throws MiddlewareException {
+	private void removeTraitClass(Integer termId) {
 
 		CVTerm term = this.getCvTermDao().getById(termId);
 

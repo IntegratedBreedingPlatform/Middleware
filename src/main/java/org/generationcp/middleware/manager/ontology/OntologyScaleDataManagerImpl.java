@@ -10,11 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -38,6 +33,12 @@ import org.generationcp.middleware.util.Util;
 import org.hibernate.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
+
 @Transactional
 public class OntologyScaleDataManagerImpl extends DataManager implements OntologyScaleDataManager {
 
@@ -53,18 +54,18 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	public OntologyScaleDataManagerImpl() {
 		super();
 	}
-	
+
 	public OntologyScaleDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}
 
 	@Override
-	public Scale getScaleById(int scaleId) throws MiddlewareException {
+	public Scale getScaleById(int scaleId) {
 		return this.getScaleById(scaleId, true);
 	}
 
 	@Override
-	public Scale getScaleById(int scaleId, boolean filterObsolete) throws MiddlewareException {
+	public Scale getScaleById(int scaleId, boolean filterObsolete) {
 
 		try {
 			List<Scale> scales = this.getScales(false, new ArrayList<>(Collections.singletonList(scaleId)), filterObsolete);
@@ -78,7 +79,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	}
 
 	@Override
-	public List<Scale> getAllScales() throws MiddlewareException {
+	public List<Scale> getAllScales() {
 		try {
 			return this.getScales(true, null);
 		} catch (Exception e) {
@@ -92,9 +93,8 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	 * @param fetchAll will tell whether query should get all non-obsolete scales or not.
 	 * @param scaleIds will tell whether scaleIds should be pass to filter result. Combination of these two will give flexible usage.
 	 * @return List<Scale>
-	 * @throws MiddlewareException
 	 */
-	private List<Scale> getScales(Boolean fetchAll, List<Integer> scaleIds) throws MiddlewareException {
+	private List<Scale> getScales(Boolean fetchAll, List<Integer> scaleIds) {
 		return this.getScales(fetchAll, scaleIds, true);
 	}
 
@@ -106,26 +106,26 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	 * @param scaleIds will tell whether scaleIds should be passed to filter result. Combination of these two will give flexible usage.
 	 * @param filterObsolete will tell whether obsolete scales will be filtered
 	 * @return List<Scale>
-	 * @throws MiddlewareException
 	 */
-	private List<Scale> getScales(Boolean fetchAll, List<Integer> scaleIds, boolean filterObsolete) throws MiddlewareException {
+	private List<Scale> getScales(Boolean fetchAll, List<Integer> scaleIds, boolean filterObsolete) {
 		Map<Integer, org.generationcp.middleware.domain.ontology.Scale> map = new HashMap<>();
 
-		if (scaleIds == null) {
-			scaleIds = new ArrayList<>();
+		List<Integer> termIds = scaleIds;
+		if (termIds == null) {
+			termIds = new ArrayList<>();
 		}
 
-		if (!fetchAll && scaleIds.size() == 0) {
+		if (!fetchAll && termIds.isEmpty()) {
 			return new ArrayList<>(map.values());
 		}
 
 		try {
 
 			List<CVTerm> terms = fetchAll ? this.getCvTermDao().getAllByCvId(CvId.SCALES, filterObsolete)
-					: this.getCvTermDao().getAllByCvId(scaleIds, CvId.SCALES, filterObsolete);
+					: this.getCvTermDao().getAllByCvId(termIds, CvId.SCALES, filterObsolete);
 			for (CVTerm s : terms) {
 				if (fetchAll) {
-					scaleIds.add(s.getCvTermId());
+					termIds.add(s.getCvTermId());
 				}
 				map.put(s.getCvTermId(), new Scale(Term.fromCVTerm(s)));
 			}
@@ -167,7 +167,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 									+ "FROM cvterm_relationship r inner join cvterm t on r.object_id = t.cvterm_id "
 									+ "where r.subject_id in (:scaleIds)");
 
-			query.setParameterList("scaleIds", scaleIds);
+			query.setParameterList("scaleIds", termIds);
 
 			List result = query.list();
 
@@ -207,7 +207,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	}
 
 	@Override
-	public void addScale(Scale scale) throws MiddlewareException {
+	public void addScale(Scale scale) {
 
 		CVTerm term = this.getCvTermDao().getByNameAndCvId(scale.getName(), CvId.SCALES.getId());
 
@@ -275,7 +275,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	}
 
 	@Override
-	public void updateScale(Scale scale) throws MiddlewareException {
+	public void updateScale(Scale scale) {
 
 		if (Objects.equals(scale.getDataType(), null)) {
 			throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_DATA_TYPE_SHOULD_NOT_EMPTY);
@@ -460,7 +460,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 	}
 
-	void updatingValues(CvTermPropertyDao cvTermPropertyDao, Scale scale, String scaleSize, int termId) throws MiddlewareQueryException {
+	void updatingValues(CvTermPropertyDao cvTermPropertyDao, Scale scale, String scaleSize, int termId) {
 		if (!Strings.isNullOrEmpty(scaleSize)) {
 			cvTermPropertyDao.save(scale.getId(), termId, String.valueOf(scaleSize), 0);
 		} else {
@@ -472,7 +472,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	}
 
 	@Override
-	public void deleteScale(int scaleId) throws MiddlewareException {
+	public void deleteScale(int scaleId) {
 
 		CVTerm term = this.getCvTermDao().getById(scaleId);
 
