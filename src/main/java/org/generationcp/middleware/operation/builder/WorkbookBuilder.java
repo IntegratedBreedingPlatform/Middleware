@@ -56,7 +56,6 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
 public class WorkbookBuilder extends Builder {
 
-	private final Map<String, String> labelMap = new HashMap<String, String>();
 	private static final List<Integer> EXPERIMENTAL_DESIGN_VARIABLES = Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
 			TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId(), TermId.BLOCKS_PER_REPLICATE.getId(),
 			TermId.REPLICATIONS_MAP.getId(), TermId.NO_OF_REPS_IN_COLS.getId(), TermId.NO_OF_ROWS_IN_REPS.getId(),
