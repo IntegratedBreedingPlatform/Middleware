@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2013, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.operation.builder;
@@ -227,7 +227,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStandardVariablesInProjects() throws MiddlewareException {
+	public void testGetStandardVariablesInProjects() {
 		List<String> headers = this.createLocalVariableNamesOfProjectTestData();
 		Map<String, List<StandardVariable>> stdVars = standardVariableBuilder.getStandardVariablesInProjects(headers, null);
 		assertNotNull(stdVars);
@@ -248,6 +248,24 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 					assertEquals(PhenotypicType.TRIAL_DESIGN, standardVariable.getPhenotypicType());
 				}
 			}
+		}
+	}
+
+	@Test
+	public void testGetStandardVariablesInProjects_HeaderNoMatchFromTheOntology() {
+		List<String> headers = new ArrayList<>();
+		headers.add("UNKNOWN_TRAIT_NAME1");
+
+		Map<String, List<StandardVariable>> stdVars = standardVariableBuilder.getStandardVariablesInProjects(headers, null);
+		assertNotNull(stdVars);
+		assertEquals(headers.size(), stdVars.size());
+		for (String header : stdVars.keySet()) {
+
+			assertTrue(headers.contains(header));
+
+			List<StandardVariable> headerStandardVariables = stdVars.get(header);
+			assertTrue("If the header name doesn't match any Standard Variables, the variable list must be empty",
+					headerStandardVariables.isEmpty());
 		}
 	}
 
