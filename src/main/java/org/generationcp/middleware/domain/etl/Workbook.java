@@ -772,7 +772,11 @@ public class Workbook {
 	}
 
 	public Integer getStudyId() {
-		return this.studyId;
+		if (this.studyId == null && this.getStudyDetails().getId() != null) {
+			return this.getStudyDetails().getId();
+		} else {
+			return studyId;
+		}
 	}
 
 	public void setStudyId(Integer studyId) {
