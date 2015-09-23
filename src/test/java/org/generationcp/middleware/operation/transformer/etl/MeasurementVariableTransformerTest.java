@@ -100,6 +100,11 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 		if (isInTrialDataset) {
 			return PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
 		}
+
+		if (role == null) {
+			return "";
+		}
+
 		return role.getLabelList().get(0);
 	}
 
