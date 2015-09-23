@@ -60,11 +60,6 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	}
 
 	@Override
-	public Scale getScaleById(int scaleId) {
-		return this.getScaleById(scaleId, true);
-	}
-
-	@Override
 	public Scale getScaleById(int scaleId, boolean filterObsolete) {
 
 		try {
@@ -81,21 +76,10 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	@Override
 	public List<Scale> getAllScales() {
 		try {
-			return this.getScales(true, null);
+			return this.getScales(true, null, true);
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error at getAllScales" + e.getMessage(), e);
 		}
-	}
-
-	/**
-	 * This will fetch list of non-obsolete scales by passing scaleIds This method is private and consumed by other methods
-	 *
-	 * @param fetchAll will tell whether query should get all non-obsolete scales or not.
-	 * @param scaleIds will tell whether scaleIds should be pass to filter result. Combination of these two will give flexible usage.
-	 * @return List<Scale>
-	 */
-	private List<Scale> getScales(Boolean fetchAll, List<Integer> scaleIds) {
-		return this.getScales(fetchAll, scaleIds, true);
 	}
 
 	/**

@@ -78,14 +78,14 @@ public class VariableDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetVariable() throws Exception {
-		Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId());
+		Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
 		Assert.assertNotNull(variable);
 	}
 
 	@Test
 	public void testUpdateVariable() throws Exception {
 		this.variableManager.updateVariable(this.testVariableInfo);
-		Variable updatedVariable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId());
+		Variable updatedVariable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
 		Assert.assertNotNull(updatedVariable);
 	}
 
@@ -138,6 +138,8 @@ public class VariableDataManagerImplTest extends IntegrationTestBase {
 	@After
 	public void tearDown() throws Exception {
 		this.variableManager.deleteVariable(this.testVariableInfo.getId());
+		// explicitly flush the session to make sure all cvterm relationships are removed from the session
+		this.sessionProvder.getSession().flush();
 		this.methodManager.deleteMethod(this.testMethod.getId());
 		this.propertyManager.deleteProperty(this.testProperty.getId());
 		this.scaleManager.deleteScale(this.testScale.getId());

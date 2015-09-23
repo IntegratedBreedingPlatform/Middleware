@@ -48,11 +48,6 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 	}
 
 	@Override
-	public Method getMethod(int id) {
-		return this.getMethod(id, true);
-	}
-
-	@Override
 	public Method getMethod(int id, boolean filterObsolete) {
 		List<Method> methods = this.getMethods(false, new ArrayList<>(Collections.singletonList(id)), filterObsolete);
 		if (methods.isEmpty()) {
@@ -63,18 +58,7 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 
 	@Override
 	public List<Method> getAllMethods() {
-		return this.getMethods(true, null);
-	}
-
-	/**
-	 * This will fetch list of methods by passing methodIds. It filters out obsolete methods by default.
-	 *
-	 * @param fetchAll will tell whether query should get all methods or not.
-	 * @param methodIds will tell whether methodIds should be pass to filter result. Combination of these two will give flexible usage.
-	 * @return List<Method>
-	 */
-	private List<Method> getMethods(Boolean fetchAll, List<Integer> methodIds) {
-		return this.getMethods(fetchAll, methodIds, true);
+		return this.getMethods(true, null, true);
 	}
 
 	/**

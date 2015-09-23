@@ -50,7 +50,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 
 	@Test
 	public void testGetPropertyById() throws Exception {
-		Property property = this.propertyDataManager.getProperty(this.testProperty.getId());
+		Property property = this.propertyDataManager.getProperty(this.testProperty.getId(), true);
 		Assert.assertNotNull(property);
 		property.print(2);
 		Assert.assertTrue("Property should have id " + this.testProperty.getId(), property.getId() == this.testProperty.getId());
@@ -115,7 +115,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 		this.testProperty.getClasses().clear();
 		this.testProperty.addClass(OntologyDataCreationUtil.getNewRandomName());
 		this.propertyDataManager.updateProperty(this.testProperty);
-		Property updatedProperty = this.propertyDataManager.getProperty(this.testProperty.getId());
+		Property updatedProperty = this.propertyDataManager.getProperty(this.testProperty.getId(), true);
 		Assert.assertEquals(updatedProperty.getDefinition(), "new definition");
 		Assert.assertEquals(updatedProperty.getCropOntologyId(), "CO_322:0000047");
 		Assert.assertEquals(updatedProperty.getClasses().size(), 1);

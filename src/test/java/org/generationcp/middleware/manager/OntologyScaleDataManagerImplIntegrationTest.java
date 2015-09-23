@@ -65,7 +65,7 @@ public class OntologyScaleDataManagerImplIntegrationTest extends IntegrationTest
 	@Test
 	public void testGetScaleById() throws Exception {
 		int id = 6025;
-		Scale scale = this.manager.getScaleById(id);
+		Scale scale = this.manager.getScaleById(id, true);
 		Assert.assertNotNull(scale);
 		Assert.assertEquals("CSSI", scale.getName());
 		Assert.assertTrue("Scale should have id " + id, scale.getId() == id);
@@ -104,7 +104,7 @@ public class OntologyScaleDataManagerImplIntegrationTest extends IntegrationTest
 		Assert.assertNotNull(this.testScale.getId());
 		Assert.assertTrue(this.testScale.getId() > 0);
 		Debug.println(IntegrationTestBase.INDENT, "From db:  " + this.testScale);
-		Scale scaleFromDb = this.manager.getScaleById(this.testScale.getId());
+		Scale scaleFromDb = this.manager.getScaleById(this.testScale.getId(), true);
 		Assert.assertEquals(this.testScale.getName(), scaleFromDb.getName());
 		Assert.assertEquals(this.testScale.getDataType(), scaleFromDb.getDataType());
 		Assert.assertEquals(this.testScale.getMinValue(), scaleFromDb.getMinValue());
@@ -123,7 +123,7 @@ public class OntologyScaleDataManagerImplIntegrationTest extends IntegrationTest
 		Assert.assertNotNull(scale.getId());
 		Assert.assertTrue(scale.getId() > 0);
 		Debug.println(IntegrationTestBase.INDENT, "From db:  " + scale);
-		Scale scaleFromDb = this.manager.getScaleById(scale.getId());
+		Scale scaleFromDb = this.manager.getScaleById(scale.getId(), true);
 		Assert.assertEquals(scale.getName(), scaleFromDb.getName());
 		Assert.assertEquals(scale.getDataType(), scaleFromDb.getDataType());
 		Assert.assertEquals(scale.getMinValue(), scaleFromDb.getMinValue());
@@ -147,7 +147,7 @@ public class OntologyScaleDataManagerImplIntegrationTest extends IntegrationTest
 		this.manager.updateScale(scale);
 
 		Debug.println(IntegrationTestBase.INDENT, "From db:  " + scale);
-		Scale scaleFromDb = this.manager.getScaleById(scale.getId());
+		Scale scaleFromDb = this.manager.getScaleById(scale.getId(), true);
 		Assert.assertEquals(scale.getName(), scaleFromDb.getName());
 		Assert.assertEquals(scale.getDataType(), scaleFromDb.getDataType());
 		Assert.assertEquals(scale.getMinValue(), scaleFromDb.getMinValue());
@@ -163,7 +163,7 @@ public class OntologyScaleDataManagerImplIntegrationTest extends IntegrationTest
 		this.testScale.setMinValue(null);
 		this.testScale.setMaxValue(null);
 		this.manager.updateScale(this.testScale);
-		Scale updatedScale = this.manager.getScaleById(this.testScale.getId());
+		Scale updatedScale = this.manager.getScaleById(this.testScale.getId(), true);
 		Assert.assertEquals(updatedScale.getDefinition(), this.testScale.getDefinition());
 		Debug.println(IntegrationTestBase.INDENT, "From db:  " + this.testScale);
 	}

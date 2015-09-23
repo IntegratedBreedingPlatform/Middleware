@@ -421,11 +421,6 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public Variable getVariable(String programUuid, Integer id) {
-		return this.getVariable(programUuid, id, true);
-	}
-
-	@Override
 	public Variable getVariable(String programUuid, Integer id, boolean filterObsolete) {
 
 		try {

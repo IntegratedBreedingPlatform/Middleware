@@ -1257,10 +1257,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	/*-------------------------    AREA FOR USED/CREATED METHOD FOR BMS-36:ONTOLOGY MANAGER REDESIGN -------------------------- */
 
-	public List<CVTerm> getAllByCvId(Integer cvId) {
-		return this.getAllByCvId(cvId, true);
-	}
-
 	public List<CVTerm> getAllByCvId(Integer cvId, boolean filterObsolete) {
 
 		List<CVTerm> terms;
@@ -1282,16 +1278,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return terms;
 	}
 
-	public List<CVTerm> getAllByCvId(CvId cvId) {
-		return this.getAllByCvId(cvId, true);
-	}
-
 	public List<CVTerm> getAllByCvId(CvId cvId, boolean filterObsolete) {
 		return this.getAllByCvId(cvId.getId(), filterObsolete);
-	}
-
-	public List<CVTerm> getAllByCvId(List<Integer> termIds, CvId cvId) {
-		return this.getAllByCvId(termIds, cvId, true);
 	}
 
 	public List<CVTerm> getAllByCvId(List<Integer> termIds, CvId cvId, boolean filterObsolete) {

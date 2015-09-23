@@ -49,11 +49,6 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public Property getProperty(int id) {
-		return this.getProperty(id, true);
-	}
-
-	@Override
 	public Property getProperty(int id, boolean filterObsolete) {
 
 		CVTerm term = this.getCvTermDao().getById(id);
@@ -74,7 +69,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 	@Override
 	public List<Property> getAllProperties() {
 		try {
-			return this.getProperties(true, null);
+			return this.getProperties(true, null, true);
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error at getAllProperties :" + e.getMessage(), e);
 		}
@@ -110,7 +105,7 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
 			List propertyIds = query.list();
 
-			return this.getProperties(false, propertyIds);
+			return this.getProperties(false, propertyIds, true);
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error at getAllPropertiesWithClass :" + e.getMessage(), e);
 		}
@@ -129,22 +124,11 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
 			List propertyIds = query.list();
 
-			return this.getProperties(false, propertyIds);
+			return this.getProperties(false, propertyIds, true);
 
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error at getAllPropertiesWithClass :" + e.getMessage(), e);
 		}
-	}
-
-	/**
-	 * This will fetch list of non-obsolete properties by passing propertyIds. This method is private and consumed by other methods.
-	 *
-	 * @param fetchAll will tell whether query should get all non-obsolete properties or not.
-	 * @param propertyIds will tell whether propertyIds should be pass to filter result. Combination of these two will give flexible usage.
-	 * @return List<Property>
-	 */
-	private List<Property> getProperties(Boolean fetchAll, List propertyIds) {
-		return this.getProperties(fetchAll, propertyIds, true);
 	}
 
 	/**

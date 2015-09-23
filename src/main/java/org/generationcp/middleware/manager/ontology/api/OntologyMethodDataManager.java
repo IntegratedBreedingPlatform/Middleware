@@ -23,14 +23,6 @@ import org.generationcp.middleware.domain.ontology.Method;
 public interface OntologyMethodDataManager {
 
 	/**
-	 * Gets the method with the given id. Returns null if obsolete.
-	 *
-	 * @param id the id to match
-	 * @return the matching method
-	 */
-	Method getMethod(int id);
-
-	/**
 	 * Gets the method with the given id. Return null if obsolete and filterObsolete is true.
 	 *
 	 * @param id the id to match

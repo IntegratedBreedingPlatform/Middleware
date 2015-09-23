@@ -24,14 +24,6 @@ import org.generationcp.middleware.domain.ontology.Property;
 public interface OntologyPropertyDataManager {
 
 	/**
-	 * Given the termId, retrieve the Property POJO. Return null if obsolete.
-	 *
-	 * @param id the term id having cvId = Property
-	 * @return {@link Property}
-	 */
-	Property getProperty(int id);
-
-	/**
 	 * Given the termId, retrieve the Property POJO. Return null if obsolete and filterObsolete is true.
 	 *
 	 * @param id the term id having cvId = Property

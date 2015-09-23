@@ -24,14 +24,6 @@ import org.generationcp.middleware.domain.ontology.Scale;
 public interface OntologyScaleDataManager {
 
 	/**
-	 * This will fetch Scale by scaleId. Return null if obsolete.
-	 *
-	 * @param scaleId select scale by scaleId
-	 * @return @link Scale
-	 */
-	Scale getScaleById(int scaleId);
-
-	/**
 	 * This will fetch Scale by scaleId. Return null if obsolete and filterObsolete is true.
 	 *
 	 * @param scaleId select scale by scaleId

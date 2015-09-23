@@ -204,7 +204,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllByCvId_CvIdAsInt() {
-		List<CVTerm> nonObsoleteMethods = dao.getAllByCvId(CvId.METHODS.getId());
+		List<CVTerm> nonObsoleteMethods = dao.getAllByCvId(CvId.METHODS.getId(), true);
 		Assert.assertNotNull(nonObsoleteMethods);
 		for (CVTerm cvTerm : nonObsoleteMethods) {
 			Assert.assertTrue("All methods should have cv id " + CvId.METHODS.getId(), cvTerm.getCv().intValue() == CvId.METHODS.getId());
@@ -213,22 +213,9 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllByCvId() {
-		List<CVTerm> scales = dao.getAllByCvId(CvId.SCALES);
-		Assert.assertNotNull(scales);
-		for (CVTerm cvTerm : scales) {
-			Assert.assertTrue("All scales should have cv id " + CvId.SCALES.getId(), cvTerm.getCv().intValue() == CvId.SCALES.getId());
-			Assert.assertFalse("Scale " + cvTerm.getCvTermId() + " should be non-obsolete", cvTerm.isObsolete());
-		}
-	}
-
-	@Test
 	public void testGetAllByCvId_FilterObsolete() {
-		List<CVTerm> properties = dao.getAllByCvId(CvId.PROPERTIES);
 		List<CVTerm> nonObsoleteProperties = dao.getAllByCvId(CvId.PROPERTIES, true);
-		Assert.assertNotNull(properties);
 		Assert.assertNotNull(nonObsoleteProperties);
-		Assert.assertEquals("Non-obsolete properties should be " + properties.size(), properties.size(), nonObsoleteProperties.size());
 		for (CVTerm cvTerm : nonObsoleteProperties) {
 			Assert.assertTrue("All properties should have cv id " + CvId.PROPERTIES.getId(),
 					cvTerm.getCv().intValue() == CvId.PROPERTIES.getId());
@@ -238,7 +225,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllByCvId_DontFilterObsolete() {
-		List<CVTerm> nonObsoleteProperties = dao.getAllByCvId(CvId.PROPERTIES);
+		List<CVTerm> nonObsoleteProperties = dao.getAllByCvId(CvId.PROPERTIES, true);
 		List<CVTerm> allProperties = dao.getAllByCvId(CvId.PROPERTIES, false);
 		Assert.assertNotNull(allProperties);
 		int numberOfObsoleteProperties = 0;
@@ -256,9 +243,9 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllByCvId_ListOfCvTermIds() {
+	public void testGetAllByCvId_ListOfCvTermIds_FilterObsolete() {
 		List<Integer> termIds = Arrays.asList(METHOD_APPLIED, METHOD_ASSIGNED, METHOD_ENUMERATED);
-		List<CVTerm> nonObsoleteMethods = dao.getAllByCvId(termIds, CvId.METHODS);
+		List<CVTerm> nonObsoleteMethods = dao.getAllByCvId(termIds, CvId.METHODS, true);
 		Assert.assertNotNull(nonObsoleteMethods);
 		Assert.assertEquals("Methods " + termIds.toString() + " should all be non-obsolete", 3, nonObsoleteMethods.size());
 		for (CVTerm cvTerm : nonObsoleteMethods) {
