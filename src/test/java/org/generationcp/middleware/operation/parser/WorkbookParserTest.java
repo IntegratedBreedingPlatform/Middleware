@@ -4,16 +4,19 @@ package org.generationcp.middleware.operation.parser;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.operation.parser.WorkbookParser.Section;
+import org.generationcp.middleware.util.Message;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -199,6 +202,199 @@ public class WorkbookParserTest {
 		}
 
 		return sampleWorkbook;
+	}
+
+	@Test
+	public void testExtractMeasurementVariablesForSection() {
+		Section section = Section.CONDITION;
+		String[] headers = WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS;
+		Workbook sampleWorkbook =
+				this.createWorkbookWithSectionHeaders(section.toString(), headers);
+		this.addSectionVariableDetailsToWorkbook(sampleWorkbook,
+				this.createVariableDetailsListTestData(section, headers));
+		List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+		List<Message> errorMessages = new ArrayList<Message>();
+		this.workbookParser.setErrorMessages(errorMessages);
+		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
+		Assert.assertTrue("There should be no error after extracting the measurement variables", errorMessages.isEmpty());
+	}
+
+	@Test
+	public void testExtractMeasurementVariablesForSection_WithEmptyVariableDetails() {
+		Section section = Section.CONDITION;
+		String[] headers = WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS;
+		Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headers);
+		this.addSectionVariableDetailsToWorkbook(sampleWorkbook, this.createVariableDetailsListTestData(section, headers));
+		// add row with errors for testing
+		int rowWithErrorInSheet = 6;
+		String[] invalidVariableDetails = new String[headers.length + 1];
+		this.fillVariableDetails(invalidVariableDetails, "", "", "", "", "", "", "WITH ERROR", "");
+		this.addRowOfSectionVariableDetailsToSheet(sampleWorkbook.getSheetAt(0), rowWithErrorInSheet, invalidVariableDetails);
+
+		List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+		List<Message> errorMessages = new ArrayList<Message>();
+		this.workbookParser.setErrorMessages(errorMessages);
+		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
+
+		// assertions
+		Assert.assertEquals("There should be 7 errors after extracting the measurement variables", 7, errorMessages.size());
+		int errorIndex = 0;
+		int rowWithError = rowWithErrorInSheet + 1;
+		for (Message message : errorMessages) {
+			switch (errorIndex) {
+				case 0:
+					Assert.assertEquals("error.missing.field.name", message.getMessageKey());
+					break;
+				case 1:
+					Assert.assertEquals("error.missing.field.description", message.getMessageKey());
+					break;
+				case 2:
+					Assert.assertEquals("error.missing.field.property", message.getMessageKey());
+					break;
+				case 3:
+					Assert.assertEquals("error.missing.field.scale", message.getMessageKey());
+					break;
+				case 4:
+					Assert.assertEquals("error.missing.field.method", message.getMessageKey());
+					break;
+				case 5:
+					Assert.assertEquals("error.missing.field.datatype", message.getMessageKey());
+					break;
+				case 6:
+					Assert.assertEquals("error.missing.field.label", message.getMessageKey());
+					break;
+				default:
+					break;
+			}
+			Assert.assertEquals("Error should be found in row " + rowWithError, rowWithError,
+					Integer.parseInt(message.getMessageParams()[0]));
+			errorIndex++;
+		}
+	}
+
+	@Test
+	public void testExtractMeasurementVariablesForSection_WithIncorrectDataTypeAndLabel() {
+		Section section = Section.FACTOR;
+		String[] headers = WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS;
+		Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headers);
+		this.addSectionVariableDetailsToWorkbook(sampleWorkbook, this.createVariableDetailsListTestData(section, headers));
+		// add row with errors for testing
+		int rowWithErrorInSheet = 6;
+		String[] invalidVariableDetails = new String[headers.length + 1];
+		this.fillVariableDetails(invalidVariableDetails, "NAME " + rowWithErrorInSheet, "DESCRIPTION " + rowWithErrorInSheet,
+				"PROPERTY" + rowWithErrorInSheet, "SCALE" + rowWithErrorInSheet, "METHOD" + rowWithErrorInSheet, "Numeric", "WITH ERROR",
+				"Invalid label");
+		this.addRowOfSectionVariableDetailsToSheet(sampleWorkbook.getSheetAt(0), rowWithErrorInSheet, invalidVariableDetails);
+
+		List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
+		List<Message> errorMessages = new ArrayList<Message>();
+		this.workbookParser.setErrorMessages(errorMessages);
+		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
+
+		// assertions
+		Assert.assertEquals("There should be 2 errors after extracting the measurement variables", 2, errorMessages.size());
+		int errorIndex = 0;
+		int rowWithError = rowWithErrorInSheet + 1;
+		for (Message message : errorMessages) {
+			switch (errorIndex) {
+				case 0:
+					Assert.assertEquals("error.unsupported.datatype", message.getMessageKey());
+					break;
+				case 1:
+					Assert.assertEquals("error.invalid.field.label", message.getMessageKey());
+					Assert.assertEquals("Error should be found in row " + rowWithError, rowWithError,
+							Integer.parseInt(message.getMessageParams()[0]));
+					break;
+				default:
+					break;
+			}
+			errorIndex++;
+		}
+	}
+
+	private List<String[]> createVariableDetailsListTestData(Section section, String[] headers) {
+		List<String[]> variableDetailsList = new ArrayList<>();
+		String variableName = null;
+		String description = null;
+		String property = null;
+		String scale = null;
+		String method = null;
+		String dataType = null;
+		String value = null;
+		String label = null;
+		for (int i = 1; i <= 5; i++) {
+			String[] variableDetails = new String[headers.length + 1];
+			variableName = "NAME " + i;
+			description = "DESCRIPTION " + i;
+			property = "PROPERTY" + i;
+			scale = "SCALE" + i;
+			method = "METHOD" + i;
+			if (i % 2 == 0) {
+				dataType = "C";
+			} else {
+				dataType = "N";
+			}
+			switch (section) {
+				case CONDITION:
+					value = Integer.toString(i);
+					if (i <= 2) {
+						label = PhenotypicType.STUDY.getLabelList().get(0);
+					} else {
+						label = PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
+					}
+					break;
+				case FACTOR:
+					value = "";
+					if (i <= 2) {
+						label = PhenotypicType.GERMPLASM.getLabelList().get(0);
+					} else {
+						label = PhenotypicType.TRIAL_DESIGN.getLabelList().get(0);
+					}
+					break;
+				case CONSTANT:
+					value = Integer.toString(i);
+					label = PhenotypicType.VARIATE.getLabelList().get(0);
+					break;
+				case VARIATE:
+					value = "";
+					label = PhenotypicType.VARIATE.getLabelList().get(0);
+					break;
+				default:
+					break;
+			}
+			this.fillVariableDetails(variableDetails, variableName, description, property, scale, method, dataType, value, label);
+			variableDetailsList.add(variableDetails);
+		}
+		return variableDetailsList;
+	}
+
+	private void fillVariableDetails(String[] variableDetails, String variableName, String description, String property, String scale,
+			String method, String dataType, String value, String label) {
+		variableDetails[0] = variableName;
+		variableDetails[1] = description;
+		variableDetails[2] = property;
+		variableDetails[3] = scale;
+		variableDetails[4] = method;
+		variableDetails[5] = dataType;
+		variableDetails[6] = value;
+		variableDetails[7] = label;
+	}
+
+	private void addSectionVariableDetailsToWorkbook(Workbook sampleWorkbook, List<String[]> variableDetailsList) {
+		Sheet firstSheet = sampleWorkbook.getSheetAt(0);
+		int rowNumber = 1;
+		for (String[] variableDetails : variableDetailsList) {
+			this.addRowOfSectionVariableDetailsToSheet(firstSheet, rowNumber, variableDetails);
+			rowNumber++;
+		}
+	}
+
+	private void addRowOfSectionVariableDetailsToSheet(Sheet sheet, int rowNumber, String[] variableDetails) {
+		Row row = sheet.createRow(rowNumber);
+		for (int i = 0; i < variableDetails.length; i++) {
+			Cell cell = row.createCell(i);
+			cell.setCellValue(variableDetails[i]);
+		}
 	}
 
 }
