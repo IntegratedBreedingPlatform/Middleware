@@ -308,25 +308,25 @@ public class WorkbookBuilder extends Builder {
 		Study study = this.getStudyBuilder().createStudy(id);
 		Integer dataSetId = null, trialDatasetId = null;
 		// get observation dataset
-		if (dataSetId == null) {
-			List<DatasetReference> datasetRefList = this.getStudyDataManager().getDatasetReferences(id);
-			if (datasetRefList != null) {
-				StudyType studyType = StudyType.N;
-				if (!isNursery) {
-					studyType = StudyType.T;
-				}
-				StudyDetails studyDetails = this.getStudyDataManager().getStudyDetails(studyType, id);
-				workbook.setStudyDetails(studyDetails);
-				for (DatasetReference datasetRef : datasetRefList) {
-					if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName())
-							|| datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
-						dataSetId = datasetRef.getId();
-					} else if (datasetRef.getName().equals("TRIAL_" + studyDetails.getStudyName())) {
-						trialDatasetId = datasetRef.getId();
-					}
+
+		List<DatasetReference> datasetRefList = this.getStudyDataManager().getDatasetReferences(id);
+		if (datasetRefList != null) {
+			StudyType studyType = StudyType.N;
+			if (!isNursery) {
+				studyType = StudyType.T;
+			}
+			StudyDetails studyDetails = this.getStudyDataManager().getStudyDetails(studyType, id);
+			workbook.setStudyDetails(studyDetails);
+			for (DatasetReference datasetRef : datasetRefList) {
+				if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyDetails.getStudyName())
+						|| datasetRef.getName().equals("MEASUREMENT EFECT_" + studyDetails.getStudyName())) {
+					dataSetId = datasetRef.getId();
+				} else if (datasetRef.getName().equals("TRIAL_" + studyDetails.getStudyName())) {
+					trialDatasetId = datasetRef.getId();
 				}
 			}
 		}
+
 
 		// if dataset is not found, get dataset with Plot Data type
 		if (dataSetId == null || dataSetId == 0) {
