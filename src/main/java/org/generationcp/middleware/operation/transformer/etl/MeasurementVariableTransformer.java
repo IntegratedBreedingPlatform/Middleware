@@ -133,6 +133,10 @@ public class MeasurementVariableTransformer extends Transformer {
 	}
 
 	private String getLabelBasedOnRole(PhenotypicType role) {
+		if (role == null) {
+			return "";
+		}
+
 		return role.getLabelList().get(0);
 	}
 }
