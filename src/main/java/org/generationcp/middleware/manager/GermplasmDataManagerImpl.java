@@ -767,7 +767,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 			throw new MiddlewareQueryException(
 					"Error encountered while saving Germplasm: GermplasmDataManager.addOrUpdateGermplasms(germplasms=" + germplasms
-					+ ", operation=" + operation + "): " + e.getMessage(), e);
+							+ ", operation=" + operation + "): " + e.getMessage(), e);
 		}
 
 		return idGermplasmsSaved;
@@ -789,7 +789,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 			throw new MiddlewareQueryException(
 					"Error encountered while saving Progenitor: GermplasmDataManager.addOrUpdateProgenitors(progenitors=" + progenitors
-					+ "): " + e.getMessage(), e);
+							+ "): " + e.getMessage(), e);
 		}
 		return progenitorsSaved;
 	}
@@ -822,7 +822,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public Integer addGermplasm(final Germplasm germplasm, final Name preferredName) throws MiddlewareQueryException {
 		final List<Pair<Germplasm, Name>> pairList = new ArrayList<>();
 		pairList.add(new ImmutablePair<Germplasm, Name>(germplasm, preferredName));
-		final List<Integer> ids = this.addGermplasms(pairList);
+		final List<Integer> ids = this.addGermplasm(pairList);
 		return !ids.isEmpty() ? ids.get(0) : null;
 	}
 
@@ -834,11 +834,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			pairList.add(pair);
 		}
 
-		return this.addGermplasms(pairList);
+		return this.addGermplasm(pairList);
 	}
 
 	@Override
-	public List<Integer> addGermplasms(final List<Pair<Germplasm, Name>> germplasms) {
+	public List<Integer> addGermplasm(final List<Pair<Germplasm, Name>> germplasms) {
 		final List<Integer> isGermplasmsSaved = new ArrayList<>();
 		try {
 
@@ -949,8 +949,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(final List<String> germplasmNames,
-			final GetGermplasmByNameModes mode)
-			throws MiddlewareQueryException {
+			final GetGermplasmByNameModes mode) throws MiddlewareQueryException {
 		final List<String> namesToUse = GermplasmDataManagerUtil.getNamesToUseByMode(germplasmNames, mode);
 		return this.getNameDao().getGermplasmNameDetailsByNames(namesToUse, mode);
 	}
@@ -1061,8 +1060,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Germplasm> searchForGermplasm(final String q, final Operation o, final boolean includeParents,
-			final boolean withInventoryOnly)
-			throws MiddlewareQueryException {
+			final boolean withInventoryOnly) throws MiddlewareQueryException {
 		return this.getGermplasmDao().searchForGermplasms(q, o, includeParents, withInventoryOnly);
 	}
 
@@ -1222,7 +1220,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 			throw new MiddlewareQueryException(
 					"Error encountered while deleting ProgramFavorite: GermplasmDataManager.deleteProgramFavorite(favorite=" + favorite
-					+ "): " + e.getMessage(), e);
+							+ "): " + e.getMessage(), e);
 		}
 
 	}
@@ -1258,7 +1256,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 			throw new MiddlewareQueryException(
 					"Error encountered while deleting methods: GermplasmDataManager.deleteProgramMethodsByUniqueId(uniqueId=" + programUUID
-					+ "): " + e.getMessage(), e);
+							+ "): " + e.getMessage(), e);
 		}
 	}
 

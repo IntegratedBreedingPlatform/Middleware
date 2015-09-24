@@ -767,7 +767,7 @@ public interface GermplasmDataManager {
 	 */
 	List<Integer> addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws MiddlewareQueryException;
 
-	List<Integer> addGermplasms(List<Pair<Germplasm, Name>> germplasms);
+	List<Integer> addGermplasm(List<Pair<Germplasm, Name>> germplasms);
 
 	/**
 	 * Given a UserDefinedField object, add new record for the given parameter.
