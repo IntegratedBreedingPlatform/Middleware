@@ -77,6 +77,7 @@ public class WorkbookParser {
 
 	private int currentRow;
 	private List<Message> errorMessages;
+	private boolean hasIncorrectDatatypeValue = false;
 
 	// GCP-5815
 	private org.generationcp.middleware.domain.etl.Workbook currentWorkbook;
@@ -151,6 +152,7 @@ public class WorkbookParser {
 
 		this.currentRow = 0;
 		this.errorMessages = new LinkedList<Message>();
+		this.hasIncorrectDatatypeValue = false;
 
 		try {
 
@@ -425,6 +427,9 @@ public class WorkbookParser {
 
 			if (StringUtils.isEmpty(var.getDataType())) {
 				this.errorMessages.add(new Message("error.missing.field.datatype", Integer.toString(this.currentRow + 1)));
+			} else if (!this.hasIncorrectDatatypeValue && !"N".equals(var.getDataType()) && !"C".equals(var.getDataType())) {
+				this.hasIncorrectDatatypeValue = true;
+				this.errorMessages.add(new Message("error.unsupported.datatype"));
 			}
 
 			if (!Section.VARIATE.toString().equals(name)
@@ -439,7 +444,7 @@ public class WorkbookParser {
 					|| Section.CONDITION.toString().equals(name)) {
 				PhenotypicType role = PhenotypicType
 						.getPhenotypicTypeForLabel(var.getLabel());
-				if (role == null) {
+				if (role == null || role == PhenotypicType.VARIATE) {
 					this.errorMessages.add(new Message(
 							"error.invalid.field.label", Integer
 									.toString(this.currentRow + 1)));
@@ -591,6 +596,14 @@ public class WorkbookParser {
 		FormulaEvaluator formulaEval = wb.getCreationHelper().createFormulaEvaluator();
 		DataFormatter formatter = new DataFormatter();
 		return formatter.formatCellValue(cell, formulaEval);
+	}
+
+	public List<Message> getErrorMessages() {
+		return this.errorMessages;
+	}
+
+	public void setErrorMessages(List<Message> errorMessages) {
+		this.errorMessages = errorMessages;
 	}
 
 }

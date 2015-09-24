@@ -20,11 +20,11 @@ public class StudyGermplasmListServiceImpl implements StudyGermplasmListService 
 	}
 
 	@Override
-	public List<StudyGermplasmDto> getGermplasmList(int studyBusinessIdentifier) {
+	public List<StudyGermplasmDto> getGermplasmList(final int studyBusinessIdentifier) {
 
 		final Criteria listDataCriteria =
 				this.currentSession.createCriteria(ListDataProject.class).createAlias("list", "l")
-						.add(Restrictions.eq("l.projectId", studyBusinessIdentifier));
+				.add(Restrictions.eq("l.projectId", studyBusinessIdentifier));
 		final List<ListDataProject> list = listDataCriteria.list();
 		final List<StudyGermplasmDto> studyGermplasmDtos = new ArrayList<StudyGermplasmDto>();
 		Integer index = 0;
@@ -33,7 +33,7 @@ public class StudyGermplasmListServiceImpl implements StudyGermplasmListService 
 			studyGermplasmDto.setCross(listDataProject.getGroupName());
 			studyGermplasmDto.setDesignation(listDataProject.getDesignation());
 			studyGermplasmDto.setEntryCode(listDataProject.getEntryCode());
-			studyGermplasmDto.setEntryNo(listDataProject.getEntryId().toString());
+			studyGermplasmDto.setEntryNumber(listDataProject.getEntryId());
 			studyGermplasmDto.setGermplasmId(listDataProject.getGermplasmId());
 			++index;
 			studyGermplasmDto.setPosition(index.toString());

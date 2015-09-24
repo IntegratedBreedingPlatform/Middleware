@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
@@ -29,6 +30,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.OntologyDataCreationUtil;
@@ -81,14 +83,58 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 	@Test
 	public void testGetVariable() throws Exception {
-		Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId());
+		Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
 		Assert.assertNotNull(variable);
+		Assert.assertEquals("Variable should has the id " + this.testVariableInfo.getId(), this.testVariableInfo.getId(), variable.getId());
+		Assert.assertFalse("Variable should not be obsolete.", variable.isObsolete());
+	}
+
+	@Test
+	public void testGetVariable_DontFilterObsolete() throws Exception {
+		CVTermDao cvtermDao = new CVTermDao();
+		cvtermDao.setSession(this.sessionProvder.getSession());
+
+		// set property, scale, method and variable to obsolete
+		CVTerm testPropertyCvTerm = cvtermDao.getById(this.testProperty.getId());
+		testPropertyCvTerm.setIsObsolete(true);
+		cvtermDao.update(testPropertyCvTerm);
+
+		CVTerm testScaleCvTerm = cvtermDao.getById(this.testScale.getId());
+		testScaleCvTerm.setIsObsolete(true);
+		cvtermDao.update(testScaleCvTerm);
+
+		CVTerm testMethodCvTerm = cvtermDao.getById(this.testMethod.getId());
+		testMethodCvTerm.setIsObsolete(true);
+		cvtermDao.update(testMethodCvTerm);
+
+		CVTerm testVariableCvTerm = cvtermDao.getById(this.testVariableInfo.getId());
+		testVariableCvTerm.setIsObsolete(true);
+		cvtermDao.update(testVariableCvTerm);
+
+		Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), false);
+		Assert.assertNotNull(variable);
+		Assert.assertEquals("Variable should has the id " + this.testVariableInfo.getId(), this.testVariableInfo.getId(), variable.getId());
+		Assert.assertTrue("Variable should be obsolete.", variable.isObsolete());
+
+		// revert changes
+		testPropertyCvTerm.setIsObsolete(false);
+		cvtermDao.update(testPropertyCvTerm);
+
+		testScaleCvTerm.setIsObsolete(false);
+		cvtermDao.update(testScaleCvTerm);
+
+		testMethodCvTerm.setIsObsolete(false);
+		cvtermDao.update(testMethodCvTerm);
+
+		testVariableCvTerm.setIsObsolete(false);
+		cvtermDao.update(testVariableCvTerm);
+
 	}
 
 	@Test
 	public void testUpdateVariable() throws Exception {
 		this.variableManager.updateVariable(this.testVariableInfo);
-		Variable updatedVariable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId());
+		Variable updatedVariable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
 		Assert.assertNotNull(updatedVariable);
 	}
 
