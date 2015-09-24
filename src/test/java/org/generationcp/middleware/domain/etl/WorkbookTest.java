@@ -668,12 +668,28 @@ public class WorkbookTest {
 
 		List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 
-		int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
+		List<MeasurementVariable> factors = workbook.getFactors();
+		List<MeasurementVariable> variates = workbook.getVariates();
+
+		int noOfFactors = factors.size();
+		int noOfVariates = variates.size();
+		int totalMeasurementVariableCount = noOfFactors + noOfVariates;
 
 		Assert.assertEquals(
 				"MeasurementDatasetVariablesView size should be the total no of non trial factors, variates and trial_instance",
 				totalMeasurementVariableCount + 1, list.size());
 
+		// Testing the order of the variables
+		Assert.assertEquals("Expecting that the TRIAL_INSTANCE is the first variable from the list.", 8170, list.get(0).getTermId());
+		for (int i = 1; i < totalMeasurementVariableCount; i++) {
+			if (i < noOfFactors) {
+				Assert.assertEquals("Expecting the next variables are of factors type.", list.get(i + 1).getTermId(), factors.get(i)
+						.getTermId());
+			} else if (i + 1 < totalMeasurementVariableCount) {
+				Assert.assertEquals("Expecting the next variables are of variates type.", list.get(i + 1).getTermId(),
+						variates.get(i - noOfFactors).getTermId());
+			}
+		}
 	}
 
 	@Test
