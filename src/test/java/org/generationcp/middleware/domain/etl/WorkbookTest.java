@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.etl;
@@ -146,9 +146,9 @@ public class WorkbookTest {
 	private static final String SITE_SOIL_PH = "SITE_SOIL_PH";
 
 	public static final String[] G_NAMES = {"TIANDOUGOU-9", "KENINKENI-27", "SM114-1A-1-1-1B", "SM114-1A-14-1-1B", "SM114-1A-361-1-1B",
-		"SM114-1A-86-1-1B", "SM114-1A-115-1-1B", "SM114-1A-281-1-1B", "SM114-1A-134-1-1B", "SM114-1A-69-1-1B", "SM114-1A-157-1-1B",
-		"SM114-1A-179-1-1B", "TIANDOUGOU-9", "SM114-1A-36-1-1B", "SM114-1A-201-1-1B", "SM114-1A-31-1-1B", "SM114-1A-353-1-1B",
-		"SM114-1A-26-1-1B", "SM114-1A-125-1-1B", "SM114-1A-384-1-1B"};
+			"SM114-1A-86-1-1B", "SM114-1A-115-1-1B", "SM114-1A-281-1-1B", "SM114-1A-134-1-1B", "SM114-1A-69-1-1B", "SM114-1A-157-1-1B",
+			"SM114-1A-179-1-1B", "TIANDOUGOU-9", "SM114-1A-36-1-1B", "SM114-1A-201-1-1B", "SM114-1A-31-1-1B", "SM114-1A-353-1-1B",
+			"SM114-1A-26-1-1B", "SM114-1A-125-1-1B", "SM114-1A-384-1-1B"};
 
 	private static Workbook workbook;
 	private static List<Workbook> workbooks;
@@ -370,12 +370,12 @@ public class WorkbookTest {
 		List<MeasurementVariable> variates = currentWorkbook.getVariates();
 		MeasurementVariable measurementVariable =
 				WorkbookTest
-				.createMeasurementVariable(
-						WorkbookTest.CRUST_ID,
-						WorkbookTest.CRUST,
-						"Score for the severity of common rust, (In highlands and mid altitude, Puccinia sorghi) symptoms rated on a scale from 1 (= clean, no infection) to 5 (= severely diseased).",
-						WorkbookTest.SCORE_1_5, WorkbookTest.VISUAL_SCORING, WorkbookTest.COMMON_RUST, WorkbookTest.CHAR, null,
-						WorkbookTest.PLOT, TermId.CATEGORICAL_VARIABLE.getId(), PhenotypicType.VARIATE);
+						.createMeasurementVariable(
+								WorkbookTest.CRUST_ID,
+								WorkbookTest.CRUST,
+								"Score for the severity of common rust, (In highlands and mid altitude, Puccinia sorghi) symptoms rated on a scale from 1 (= clean, no infection) to 5 (= severely diseased).",
+								WorkbookTest.SCORE_1_5, WorkbookTest.VISUAL_SCORING, WorkbookTest.COMMON_RUST, WorkbookTest.CHAR, null,
+								WorkbookTest.PLOT, TermId.CATEGORICAL_VARIABLE.getId(), PhenotypicType.VARIATE);
 
 		measurementVariable.setOperation(Operation.ADD);
 
