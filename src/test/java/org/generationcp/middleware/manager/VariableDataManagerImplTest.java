@@ -32,7 +32,6 @@ import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.OntologyDataCreationUtil;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -133,15 +132,5 @@ public class VariableDataManagerImplTest extends IntegrationTestBase {
 		this.testVariableInfo.addVariableType(VariableType.ANALYSIS);
 		this.testVariableInfo.setIsFavorite(true);
 		this.variableManager.addVariable(this.testVariableInfo);
-	}
-
-	@After
-	public void tearDown() throws Exception {
-		this.variableManager.deleteVariable(this.testVariableInfo.getId());
-		// explicitly flush the session to make sure all cvterm relationships are removed from the session
-		this.sessionProvder.getSession().flush();
-		this.methodManager.deleteMethod(this.testMethod.getId());
-		this.propertyManager.deleteProperty(this.testProperty.getId());
-		this.scaleManager.deleteScale(this.testScale.getId());
 	}
 }
