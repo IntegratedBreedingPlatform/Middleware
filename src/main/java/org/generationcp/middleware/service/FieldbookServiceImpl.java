@@ -18,10 +18,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.NameDAO;
@@ -358,7 +358,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Integer saveNurseryAdvanceGermplasmList(Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listDataItems,
+	public Integer saveNurseryAdvanceGermplasmList(List<Pair<Germplasm, List<Name>>> germplasms, List<Pair<Germplasm, GermplasmListData>> listDataItems,
 			GermplasmList germplasmList) throws MiddlewareQueryException {
 
 		GermplasmDAO germplasmDao = this.getGermplasmDao();
@@ -366,14 +366,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
 
 		long startTime = System.currentTimeMillis();
-
+		
 		try {
 			germplasmListDao.save(germplasmList);
-
+			int counter = 0;
 			// Save germplasms, names, list data
-			for (Germplasm germplasm : germplasms.keySet()) {
-
-				GermplasmListData germplasmListData = listDataItems.get(germplasm);
+			for (Pair<Germplasm, List<Name>> pair : germplasms) {
+				Germplasm germplasm = pair.getLeft();
+				GermplasmListData germplasmListData = listDataItems.get(counter).getRight();
 
 				Germplasm germplasmFound = null;
 
@@ -396,7 +396,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 				// Save germplasm and name entries if non-existing
 				if (germplasmFound == null || germplasmFound.getGid() == null) {
-					List<Name> nameList = germplasms.get(germplasm);
+					List<Name> nameList = germplasms.get(counter).getRight();
 					// Lgid could not be null in the DB, so we are saving a value before saving it to the DB
 					if (germplasm.getLgid() == null) {
 						germplasm.setLgid(germplasm.getGid() != null ? germplasm.getGid() : Integer.valueOf(0));
@@ -418,6 +418,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				germplasmListData.setGid(germplasm.getGid());
 				germplasmListData.setList(germplasmList);
 				this.getGermplasmListDataDAO().save(germplasmListData);
+				counter++;
 			}
 
 		} catch (Exception e) {
@@ -434,7 +435,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Integer saveGermplasmList(Map<Germplasm, GermplasmListData> listDataItems, GermplasmList germplasmList)
+	public Integer saveGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList)
 			throws MiddlewareQueryException {
 
 
@@ -446,12 +447,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		try {
 
 			germplasmListDao.save(germplasmList);
-
+			
 			// Save germplasms, names, list data
-			for (Entry<Germplasm, GermplasmListData> entry : listDataItems.entrySet()) {
+			for (Pair<Germplasm, GermplasmListData> pair : listDataItems) {
 
-				Germplasm germplasm = entry.getKey();
-				GermplasmListData germplasmListData = entry.getValue();
+				Germplasm germplasm = pair.getLeft();
+				GermplasmListData germplasmListData = pair.getRight();
 
 				germplasmListData.setGid(germplasm.getGid());
 				germplasmListData.setList(germplasmList);

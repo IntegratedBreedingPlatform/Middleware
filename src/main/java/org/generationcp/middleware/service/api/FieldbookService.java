@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -251,7 +252,7 @@ public interface FieldbookService {
 	 * @return The id of the newly-created germplasm list
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer saveNurseryAdvanceGermplasmList(Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listDataItems,
+	Integer saveNurseryAdvanceGermplasmList(List<Pair<Germplasm, List<Name>>> germplasms, List<Pair<Germplasm, GermplasmListData>> listDataItems,
 			GermplasmList germplasmList) throws MiddlewareQueryException;
 
 	/**
@@ -887,7 +888,7 @@ public interface FieldbookService {
 	 * @return The id of the newly-created germplasm list
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer saveGermplasmList(Map<Germplasm, GermplasmListData> listDataItems, GermplasmList germplasmList) throws MiddlewareQueryException;
+	Integer saveGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList) throws MiddlewareQueryException;
 
 	void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds) throws MiddlewareException;
 

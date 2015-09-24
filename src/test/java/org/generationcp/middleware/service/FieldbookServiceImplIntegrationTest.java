@@ -13,10 +13,10 @@ package org.generationcp.middleware.service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.StudyTestDataUtil;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
@@ -386,50 +386,41 @@ public class FieldbookServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testSaveNurseryAdvanceGermplasmListCimmytWheat() throws MiddlewareQueryException {
-		Map<Germplasm, List<Name>> germplasms = new HashMap<Germplasm, List<Name>>();
-		Map<Germplasm, GermplasmListData> listData = new HashMap<Germplasm, GermplasmListData>();
+		List<Pair<Germplasm, List<Name>>> germplasms = new ArrayList<>();
+		List<Pair<Germplasm, GermplasmListData>> listData = new ArrayList<>();
 		GermplasmList germplasmList = this.createGermplasmsCimmytWheat(germplasms, listData);
 
 		Integer listId = this.fieldbookService.saveNurseryAdvanceGermplasmList(germplasms, listData, germplasmList);
 
 		Assert.assertTrue(listId != null);
 
-		Debug.println(IntegrationTestBase.INDENT, "Germplasm List Added: ");
-		Debug.println(IntegrationTestBase.INDENT * 2, germplasmList.toString());
-		Debug.println(IntegrationTestBase.INDENT, "Germplasms Added: ");
-		Debug.printObjects(IntegrationTestBase.INDENT * 2, new ArrayList<Germplasm>(germplasms.keySet()));
+		this.debugPrint(germplasms, germplasmList);
 	}
 
 	@Test
 	public void testSaveNurseryAdvanceGermplasmListOtherCrop() throws MiddlewareQueryException {
-		Map<Germplasm, List<Name>> germplasms = new HashMap<Germplasm, List<Name>>();
-		Map<Germplasm, GermplasmListData> listData = new HashMap<Germplasm, GermplasmListData>();
+		List<Pair<Germplasm, List<Name>>> germplasms = new ArrayList<>();
+		List<Pair<Germplasm, GermplasmListData>> listData = new ArrayList<>();
 		GermplasmList germplasmList = this.createGermplasmsOtherCrop(germplasms, listData);
 
 		Integer listId = this.fieldbookService.saveNurseryAdvanceGermplasmList(germplasms, listData, germplasmList);
 
 		Assert.assertTrue(listId != null);
 
-		Debug.println(IntegrationTestBase.INDENT, "Germplasm List Added: ");
-		Debug.println(IntegrationTestBase.INDENT * 2, germplasmList.toString());
-		Debug.println(IntegrationTestBase.INDENT, "Germplasms Added: ");
-		Debug.printObjects(IntegrationTestBase.INDENT * 2, new ArrayList<Germplasm>(germplasms.keySet()));
+		this.debugPrint(germplasms, germplasmList);
 	}
 
 	@Test
 	public void testSaveCrossesGermplasmListCimmytWheat() throws MiddlewareQueryException {
-		Map<Germplasm, List<Name>> germplasms = new HashMap<Germplasm, List<Name>>();
-		Map<Germplasm, GermplasmListData> listData = new HashMap<Germplasm, GermplasmListData>();
+		List<Pair<Germplasm, List<Name>>> germplasms = new ArrayList<>();
+		List<Pair<Germplasm, GermplasmListData>> listData = new ArrayList<>();
 		GermplasmList germplasmList = this.createGermplasmsCimmytWheat(germplasms, listData);
 
 		Integer listId = this.fieldbookService.saveGermplasmList(listData, germplasmList);
 
 		Assert.assertTrue(listId != null && listId < 0);
 
-		Debug.println(IntegrationTestBase.INDENT, "Germplasm List Added: ");
-		Debug.println(IntegrationTestBase.INDENT * 2, germplasmList.toString());
-		Debug.println(IntegrationTestBase.INDENT, "Germplasms Added: ");
-		Debug.printObjects(IntegrationTestBase.INDENT * 2, new ArrayList<Germplasm>(germplasms.keySet()));
+		this.debugPrint(germplasms, germplasmList);
 	}
 
 	@Test
@@ -459,7 +450,7 @@ public class FieldbookServiceImplIntegrationTest extends IntegrationTestBase {
 		Debug.println("");
 	}
 
-	private GermplasmList createGermplasmsCimmytWheat(Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listData) {
+	private GermplasmList createGermplasmsCimmytWheat(List<Pair<Germplasm, List<Name>>> germplasms, List<Pair<Germplasm, GermplasmListData>> listData) {
 
 		int numberOfEntries = 3;
 
@@ -484,17 +475,17 @@ public class FieldbookServiceImplIntegrationTest extends IntegrationTestBase {
 			n.setNstat(Integer.valueOf(0));
 			names.add(n);
 
-			germplasms.put(g, names);
+			germplasms.add(new ImmutablePair<Germplasm, List<Name>>(g, names));
 
 			GermplasmListData germplasmListData = this.createGermplasmListData();
-			listData.put(g, germplasmListData);
+			listData.add(new ImmutablePair<Germplasm, GermplasmListData>(g, germplasmListData));
 
 		}
 
 		return germList;
 	}
 
-	private GermplasmList createGermplasmsOtherCrop(Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listData) {
+	private GermplasmList createGermplasmsOtherCrop(List<Pair<Germplasm, List<Name>>> germplasms, List<Pair<Germplasm, GermplasmListData>> listData) {
 
 		int numberOfEntries = 3;
 
@@ -505,10 +496,10 @@ public class FieldbookServiceImplIntegrationTest extends IntegrationTestBase {
 
 			List<Name> names = new ArrayList<Name>();
 			names.add(this.createGermplasmName(1));
-			germplasms.put(g, names);
+			germplasms.add(new ImmutablePair<Germplasm, List<Name>>(g, names));
 
 			GermplasmListData germplasmListData = this.createGermplasmListData();
-			listData.put(g, germplasmListData);
+			listData.add(new ImmutablePair<Germplasm, GermplasmListData>(g, germplasmListData));
 		}
 
 		return germList;
@@ -818,5 +809,15 @@ public class FieldbookServiceImplIntegrationTest extends IntegrationTestBase {
 		}
 		Assert.assertEquals(code, method.getMcode());
 	}
-
+	
+	private void debugPrint(List<Pair<Germplasm, List<Name>>> germplasms, GermplasmList germplasmList) {
+		Debug.println(IntegrationTestBase.INDENT, "Germplasm List Added: ");
+		Debug.println(IntegrationTestBase.INDENT * 2, germplasmList.toString());
+		Debug.println(IntegrationTestBase.INDENT, "Germplasms Added: ");
+		List<Germplasm> germList = new ArrayList<>();
+		for (Pair<Germplasm, List<Name>> pair : germplasms) {
+			germList.add(pair.getLeft());
+		}
+		Debug.printObjects(IntegrationTestBase.INDENT * 2, new ArrayList<Germplasm>(germList));
+	}
 }
