@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -245,7 +246,7 @@ public class Workbook {
 	}
 
 	public List<MeasurementVariable> getMeasurementDatasetVariablesView() {
-		Set<MeasurementVariable> list = new HashSet<MeasurementVariable>();
+		Set<MeasurementVariable> list = new LinkedHashSet<MeasurementVariable>();
 		if (!this.isNursery()) {
 			MeasurementVariable trialFactor = null;
 			if (this.getTrialFactors() != null) {
