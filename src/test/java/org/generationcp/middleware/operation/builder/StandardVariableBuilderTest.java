@@ -52,7 +52,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCreate_List() throws MiddlewareException {
+	public void testCreateList() throws MiddlewareException {
 		List<Integer> standardVariableIds = new ArrayList<Integer>();
 		standardVariableIds.add(TermId.ENTRY_NO.getId());
 		standardVariableIds.add(TermId.GID.getId());
@@ -75,7 +75,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCreate_EmptyList() throws MiddlewareException {
+	public void testCreateEmptyList() throws MiddlewareException {
 		List<Integer> standardVariableIds = new ArrayList<Integer>();
 
 		List<StandardVariable> standardVariables = standardVariableBuilder.create(standardVariableIds, null);
@@ -84,7 +84,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCreate_NullList() throws MiddlewareException {
+	public void testCreateNullList() throws MiddlewareException {
 		List<Integer> standardVariableIds = null;
 
 		List<StandardVariable> standardVariables = standardVariableBuilder.create(standardVariableIds, null);
@@ -93,7 +93,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testFindOrSave_Find() throws MiddlewareException {
+	public void testFindOrSaveFindExisting() throws MiddlewareException {
 		String name = "TRIAL_INSTANCE";
 		String description = "Trial instance - enumerated (number)";
 		String property = "Trial instance";
@@ -118,7 +118,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testFindOrSave_Save() throws MiddlewareException {
+	public void testFindOrSaveSaveNewStandardVariable() throws MiddlewareException {
 		String name = "Test Variable Name";
 		String description = "Test Variable Name Description";
 		String property = "Test Property";
@@ -151,7 +151,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByName_NotFound() throws MiddlewareException {
+	public void testGetByNameNotFound() throws MiddlewareException {
 		String name = "VAR_123456";
 		StandardVariable standardVariable = standardVariableBuilder.getByName(name, null);
 		assertNull(standardVariable);
@@ -170,7 +170,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByPropertyScaleMethod_NotFound() throws MiddlewareException {
+	public void testGetByPropertyScaleMethodNotFound() throws MiddlewareException {
 		int propertyId = 1;
 		int scaleId = 2;
 		int methodId = 3;
@@ -192,7 +192,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByPropertyScaleMethodRole_NotFound() throws MiddlewareException {
+	public void testGetByPropertyScaleMethodRoleNotFound() throws MiddlewareException {
 		int propertyId = 1;
 		int scaleId = 2;
 		int methodId = 3;
@@ -227,7 +227,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStandardVariablesInProjects_HeaderNoMatchFromTheOntology() {
+	public void testGetStandardVariablesInProjectsHeaderNoMatchFromTheOntology() {
 		List<String> headers = new ArrayList<>();
 		headers.add("UNKNOWN_TRAIT_NAME1");
 

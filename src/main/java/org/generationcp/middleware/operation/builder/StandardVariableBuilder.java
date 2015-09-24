@@ -307,7 +307,7 @@ public class StandardVariableBuilder extends Builder {
 
 			Map<Integer, VariableType> mapVariableTypes = standardVariableIdsWithTypeInProjects.get(name.toUpperCase());
 
-			if (mapVariableTypes == null || mapVariableTypes != null && mapVariableTypes.keySet().isEmpty()) {
+			if (mapVariableTypes == null || mapVariableTypes.keySet().isEmpty()) {
 				names.add(name);
 			}
 		}
@@ -324,7 +324,7 @@ public class StandardVariableBuilder extends Builder {
 
 			Map<Integer, VariableType> mapVariableTypes = standardVariableIdsWithTypeInProjects.get(name.toUpperCase());
 
-			if (mapVariableTypes == null || mapVariableTypes != null && mapVariableTypes.keySet().isEmpty()) {
+			if (mapVariableTypes == null || mapVariableTypes.keySet().isEmpty()) {
 				names.add(name);
 			}
 		}
