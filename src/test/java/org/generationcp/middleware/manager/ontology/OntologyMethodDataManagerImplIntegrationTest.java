@@ -75,12 +75,12 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 		List<CVTermProperty> methodCreatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(methodTerms, methodCreatedDateProperties, testCreatedDate);
 
-		Map<Integer, String> createDateMap = new HashMap<>();
+		Map<Integer, String> createdDateMap = new HashMap<>();
 
 		// Fetch Created Date Properties and save it using propertyDao
 		for (CVTermProperty property : methodCreatedDateProperties) {
             this.propertyDao.save(property);
-			createDateMap.put(property.getCvTermId(), property.getValue());
+			createdDateMap.put(property.getCvTermId(), property.getValue());
 		}
 
 		Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
@@ -104,7 +104,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 			String message = "The %s for method '" + m.getId() + "' was not added correctly.";
 			if (termMap.containsKey(m.getId())) {
 				CVTerm methodTerm = termMap.get(m.getId());
-				String createdDateProperty = createDateMap.get(m.getId());
+				String createdDateProperty = createdDateMap.get(m.getId());
 				String updatedDateProperty = updateDateMap.get(m.getId());
 
 				Assert.assertEquals(String.format(message, "Name"), methodTerm.getName(), m.getName());
