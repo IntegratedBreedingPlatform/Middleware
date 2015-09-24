@@ -12,7 +12,6 @@
 package org.generationcp.middleware.service;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -661,17 +660,6 @@ public class FieldbookServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testGetGidsByName() throws Exception {
 		String name = "CG7";
 		System.out.println("GIDS = " + this.fieldbookService.getGermplasmIdsByName(name));
-	}
-
-	@Test
-	public void testGetAllTreatmentFactors() throws Exception {
-		List<Integer> hiddenFields = Arrays.asList(8200, 8380, 8210, 8220, 8400, 8410, 8581, 8582);
-		List<StandardVariableReference> variables = this.fieldbookService.getAllTreatmentLevels(hiddenFields);
-		if (variables != null) {
-			for (StandardVariableReference variable : variables) {
-				System.out.println(variable);
-			}
-		}
 	}
 
 	@Test
