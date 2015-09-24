@@ -69,13 +69,8 @@ public class OntologyPropertyDataManagerImpl implements OntologyPropertyDataMana
 
 	@Override
 	public Property getProperty(int id) throws MiddlewareException {
-
-		CVTerm term = this.ontologyDaoFactory.getCvTermDao().getById(id);
-
-		this.checkTermIsProperty(term);
-
 		List<Property> properties = this.getProperties(false, new ArrayList<>(Collections.singletonList(id)));
-		if (properties.size() == 0) {
+		if (properties.isEmpty()) {
 			return null;
 		}
 		return properties.get(0);
@@ -119,15 +114,11 @@ public class OntologyPropertyDataManagerImpl implements OntologyPropertyDataMana
 		Map<Integer, Property> map = this.ontologyCommonDAO.getPropertiesWithCropOntologyAndTraits(fetchAll, propertyIds);
 
 		// Created, modified from CVTermProperty
-		List propertyProp = this.ontologyDaoFactory.getCvTermPropertyDao().getByCvId(CvId.PROPERTIES.getId());
+		List propertyProp = this.ontologyDaoFactory.getCvTermPropertyDao().getByCvTermIds(new ArrayList<>(map.keySet()));
 		for (Object p : propertyProp) {
 			CVTermProperty property = (CVTermProperty) p;
 
 			Property ontologyProperty = map.get(property.getCvTermId());
-
-			if (ontologyProperty == null) {
-				continue;
-			}
 
 			if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
 				ontologyProperty.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));

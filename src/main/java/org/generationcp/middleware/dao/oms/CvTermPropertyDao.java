@@ -58,22 +58,6 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
 		}
 	}
 
-	public List getByCvId(Integer cvId) throws MiddlewareQueryException {
-		try {
-
-			Query query =
-					this.getSession()
-					.createSQLQuery(
-							"select p.* from cvtermprop p inner join cvterm t on p.cvterm_id = t.cvterm_id where t.is_obsolete =0 and t.cv_id = "
-									+ cvId).addEntity(CVTermProperty.class);
-
-			return query.list();
-
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error at getByCvId", e);
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<CVTermProperty> getByCvTermAndType(int cvTermId, int typeId) throws MiddlewareQueryException {
 		List<CVTermProperty> properties = new ArrayList<>();

@@ -70,12 +70,12 @@ class OntologyCommonDAOImpl implements OntologyCommonDAO {
 			propertyIds = new ArrayList<>();
 		}
 
-		if (!fetchAll && propertyIds.size() == 0) {
+		if (!fetchAll && propertyIds.isEmpty()) {
 			return new HashMap<>();
 		}
 
 		String filterClause = "";
-		if (propertyIds.size() > 0) {
+		if (!propertyIds.isEmpty()) {
 			filterClause = " and p.cvterm_id in (:propertyIds)";
 		}
 
@@ -95,7 +95,7 @@ class OntologyCommonDAOImpl implements OntologyCommonDAO {
 					.addScalar("pVocabularyId", new org.hibernate.type.IntegerType())
 					.addScalar("pObsolete", new org.hibernate.type.IntegerType()).addScalar("cropOntologyId").addScalar("classes");
 
-			if (propertyIds.size() > 0) {
+            if (!propertyIds.isEmpty()) {
 				query.setParameterList("propertyIds", propertyIds);
 			}
 

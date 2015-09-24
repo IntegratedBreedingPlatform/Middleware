@@ -72,6 +72,12 @@ public class TestDataHelper {
 		return property;
 	}
 
+	public static void fillTestPropertiesCvTerms(List<CVTerm> terms, int count) {
+		for (int i = 0; i < count; i++) {
+			terms.add(getTestCvTerm(CvId.PROPERTIES));
+		}
+	}
+
 	/**
 	 * Appends random number to string to make name unique
 	 */
