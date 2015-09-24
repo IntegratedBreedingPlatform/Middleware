@@ -288,10 +288,11 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
 				Term classTerm = null;
 				for (Term tClass : allClasses) {
-					if (c.compareToIgnoreCase(tClass.getName()) == 0) {
-						classTerm = tClass;
-						break;
+					if (c.compareToIgnoreCase(tClass.getName()) != 0) {
+						continue;
 					}
+					classTerm = tClass;
+					break;
 				}
 
 				// Add new term if does not exist
