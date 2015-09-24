@@ -134,6 +134,18 @@ public class InventoryServiceImplTest {
 
 	}
 
+	@Test
+	public void testGetCurrentNotationNumberForBreederIdentifier_WithNoMatch() throws MiddlewareException {
+		final List<String> inventoryIDs = new ArrayList<>();
+		inventoryIDs.add("DUMMY1-1");
+
+		final String breederIdentifier = "PRE";
+		Mockito.doReturn(inventoryIDs).when(this.transactionDAO).getInventoryIDsWithBreederIdentifier(breederIdentifier);
+		final Integer currentNotationNumber = this.inventoryServiceImpl.getCurrentNotationNumberForBreederIdentifier(breederIdentifier);
+		Assert.assertEquals("0 must be returned because PRE is not found in DUMMY1-1", 0, currentNotationNumber.intValue());
+
+	}
+
 	@Test(expected = MiddlewareQueryException.class)
 	public void testAddLotAndTransaction_LotAlreadyExists() {
 		final InventoryDetails details = this.createInventoryDetailsTestData(1, 1, TEST_GID, TEST_LOCATION_ID, TEST_SCALE_ID);
