@@ -21,10 +21,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,7 +54,31 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testCreateObsoleteVariable() throws MiddlewareException {
+		CVTermDao cvtermDao = new CVTermDao();
+		cvtermDao.setSession(this.sessionProvder.getSession());
+
+		// set variable to obsolete
+		int id = TermId.TRIAL_INSTANCE_FACTOR.getId();
+		CVTerm variable = cvtermDao.getById(id);
+		variable.setIsObsolete(true);
+		cvtermDao.update(variable);
+
+		StandardVariable standardVariable = standardVariableBuilder.create(id, null);
+		assertNotNull(standardVariable);
+		assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), standardVariable.getId());
+		assertEquals(TRIAL_INSTANCE_PROPERTY_ID, standardVariable.getProperty().getId());
+		assertEquals(TRIAL_INSTANCE_SCALE_ID, standardVariable.getScale().getId());
+		assertEquals(TRIAL_INSTANCE_METHOD_ID, standardVariable.getMethod().getId());
+
+		// revert changes
+		variable.setIsObsolete(false);
+		cvtermDao.update(variable);
+	}
+
+	@Test
 	public void testCreateList() throws MiddlewareException {
+
 		List<Integer> standardVariableIds = new ArrayList<Integer>();
 		standardVariableIds.add(TermId.ENTRY_NO.getId());
 		standardVariableIds.add(TermId.GID.getId());
@@ -68,7 +94,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 				assertEquals(4040, standardVariable.getMethod().getId());
 			} else if (standardVariable.getId() == TermId.GID.getId()) {
 				assertEquals(2205, standardVariable.getProperty().getId());
-				assertEquals(6010, standardVariable.getScale().getId());
+				assertEquals(1907, standardVariable.getScale().getId());
 				assertEquals(4030, standardVariable.getMethod().getId());
 			}
 		}

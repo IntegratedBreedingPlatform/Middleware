@@ -54,7 +54,9 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	public StandardVariable create(int standardVariableId, String programUUID) {
-		Variable variable = this.getOntologyVariableDataManager().getVariable(programUUID, standardVariableId);
+
+		Variable variable = this.getOntologyVariableDataManager().getVariable(programUUID, standardVariableId, false);
+
 		return this.getStandardVariableTransformer().transformVariable(variable);
 	}
 

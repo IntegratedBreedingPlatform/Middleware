@@ -1,5 +1,5 @@
 /*******************************************************************************
- * 
+ *
  * Copyright (c) 2012, All Rights Reserved.
  *
  * Generation Challenge Programme (GCP)
@@ -15,8 +15,6 @@ package org.generationcp.middleware.manager.ontology.api;
 import java.util.List;
 
 import org.generationcp.middleware.domain.ontology.Method;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 /**
  * This is the API for retrieving {@link Method}
@@ -25,44 +23,40 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 public interface OntologyMethodDataManager {
 
 	/**
-	 * Gets the method with the given id.
+	 * Gets the method with the given id. Return null if obsolete and filterObsolete is true.
 	 *
 	 * @param id the id to match
+	 * @param filterObsolete the flag to determine if obsolete method will be filtered
 	 * @return the matching method
-	 * @throws MiddlewareException the middleware query exception
 	 */
-	Method getMethod(int id) throws MiddlewareException;
+	Method getMethod(int id, boolean filterObsolete);
 
 	/**
 	 * Gets the all methods from Central and Local.
 	 *
 	 * @return All the methods
-	 * @throws MiddlewareException the middleware query exception
 	 */
-	List<Method> getAllMethods() throws MiddlewareException;
+	List<Method> getAllMethods();
 
 	/**
 	 * Adds a method. If the method is already found in the local database, it simply retrieves the record found.
-	 * 
+	 *
 	 * @param method to be added
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void addMethod(Method method) throws MiddlewareException;
+	void addMethod(Method method);
 
 	/**
 	 * Updates the given method. This searches for the id. If it exists, the entry in the database is replaced with the new value.
-	 * 
+	 *
 	 * @param method The Method to update
-	 * @throws MiddlewareException the middleware exception
 	 */
-	void updateMethod(Method method) throws MiddlewareException;
+	void updateMethod(Method method);
 
 	/**
 	 * Delete method.
 	 *
 	 * @param id the cv term id
-	 * @throws MiddlewareException the middleware query exception
 	 */
-	void deleteMethod(int id) throws MiddlewareException;
+	void deleteMethod(int id);
 
 }

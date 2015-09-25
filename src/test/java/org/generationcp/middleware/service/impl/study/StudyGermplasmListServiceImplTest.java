@@ -60,12 +60,12 @@ public class StudyGermplasmListServiceImplTest {
 		assertEquals("The two lists must be equal.", Collections.<StudyGermplasmDto>singletonList(expectedGermplasm), actualGermplasmList);
 	}
 
-	private StudyGermplasmDto getResultingStudyGermplasmDto(GermplasmList germplasmList, ListDataProject listDataProject) {
+	private StudyGermplasmDto getResultingStudyGermplasmDto(final GermplasmList germplasmList, final ListDataProject listDataProject) {
 		final StudyGermplasmDto studyGermplasmDto = new StudyGermplasmDto();
 		studyGermplasmDto.setCross(listDataProject.getGroupName());
 		studyGermplasmDto.setDesignation(listDataProject.getDesignation());
 		studyGermplasmDto.setEntryCode(listDataProject.getEntryCode());
-		studyGermplasmDto.setEntryNo(listDataProject.getEntryId().toString());
+		studyGermplasmDto.setEntryNumber(listDataProject.getEntryId());
 		studyGermplasmDto.setGermplasmId(listDataProject.getGermplasmId());
 		studyGermplasmDto.setPosition("1");
 		studyGermplasmDto.setSeedSource(listDataProject.getSeedSource());
