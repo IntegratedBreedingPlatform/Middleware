@@ -304,8 +304,8 @@ public class StandardVariableBuilder extends Builder {
 		List<String> headerNamesNotFoundInProjectProperty = new ArrayList<String>();
 		for (String name : headerNames) {
 
-			if (standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase())
-					&& standardVariableIdsWithTypeInProjects.get(name.toUpperCase()).keySet().isEmpty()) {
+			if (!standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase())
+					|| standardVariableIdsWithTypeInProjects.get(name.toUpperCase()).keySet().isEmpty()) {
 				headerNamesNotFoundInProjectProperty.add(name);
 			}
 
@@ -321,8 +321,8 @@ public class StandardVariableBuilder extends Builder {
 		List<String> headerNamesNotFoundInProjectPropAndTerms = new ArrayList<>();
 		for (String name : headerNames) {
 
-			if (standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase())
-					&& standardVariableIdsWithTypeInProjects.get(name.toUpperCase()).keySet().isEmpty()) {
+			if (!standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase())
+					|| standardVariableIdsWithTypeInProjects.get(name.toUpperCase()).keySet().isEmpty()) {
 				headerNamesNotFoundInProjectPropAndTerms.add(name);
 			}
 
