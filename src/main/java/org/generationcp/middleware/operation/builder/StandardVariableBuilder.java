@@ -304,7 +304,8 @@ public class StandardVariableBuilder extends Builder {
 		// Exclude header items with result from step 1
 		names = new ArrayList<String>();
 		for (String name : headers) {
-			Set<Integer> varIds = standardVariableIdsWithTypeInProjects.get(name.toUpperCase()).keySet();
+			Set<Integer> varIds = (standardVariableIdsWithTypeInProjects.get(name.toUpperCase()) == null) ? null :
+				standardVariableIdsWithTypeInProjects.get(name.toUpperCase()).keySet();
 			if (varIds == null || varIds.isEmpty()) {
 				names.add(name);
 			}
@@ -319,7 +320,8 @@ public class StandardVariableBuilder extends Builder {
 		// Exclude header items with result from step 2
 		names = new ArrayList<String>();
 		for (String name : headers) {
-			Set<Integer> varIds = standardVariableIdsWithTypeInProjects.get(name.toUpperCase()).keySet();
+			Set<Integer> varIds = (standardVariableIdsWithTypeInProjects.get(name.toUpperCase()) == null) ? null :
+				standardVariableIdsWithTypeInProjects.get(name.toUpperCase()).keySet();
 			if (varIds == null || varIds.isEmpty()) {
 				names.add(name);
 			}
