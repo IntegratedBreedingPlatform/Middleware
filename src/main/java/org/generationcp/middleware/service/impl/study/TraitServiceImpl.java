@@ -27,8 +27,8 @@ public class TraitServiceImpl implements TraitService {
 	}
 
 	@Override
-	public List<TraitDto> getTraits(final int studyBusinessIdentifier) {
-		final List<TraitDto> list = this.getTraitListForTrail(studyBusinessIdentifier);
+	public List<TraitDto> getTraits(final int studyIdentifier) {
+		final List<TraitDto> list = this.getTraitListForStudy(studyIdentifier);
 		if (list != null && !list.isEmpty()) {
 			return Collections.unmodifiableList(list);
 		}
@@ -36,11 +36,11 @@ public class TraitServiceImpl implements TraitService {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<TraitDto> getTraitListForTrail(final int projectBusinessIdentifier) {
+	private List<TraitDto> getTraitListForStudy(final int studyIdentifier) {
 		final SQLQuery traitSqlQuery = this.session.createSQLQuery(TraitServiceImpl.STUDY_TRAITS_QUERY);
 		traitSqlQuery.addScalar("cvterm_id");
 		traitSqlQuery.addScalar("name");
-		traitSqlQuery.setParameter(0, projectBusinessIdentifier);
+		traitSqlQuery.setParameter(0, studyIdentifier);
 		final List<Object[]> list = traitSqlQuery.list();
 		final List<TraitDto> traitList = new ArrayList<TraitDto>();
 		for (final Object[] rows : list) {
