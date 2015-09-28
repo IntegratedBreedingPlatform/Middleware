@@ -87,7 +87,6 @@
     </bean> 
     
     <bean id="inventoryService" class="org.generationcp.middleware.service.InventoryServiceImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean> 
     
     <bean id="presetDataManager" class="org.generationcp.middleware.manager.PresetDataManagerImpl">
