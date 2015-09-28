@@ -230,8 +230,8 @@ public interface FieldbookService {
 	 * @return The id of the newly-created germplasm list
 	 */
 
-	Integer saveNurseryAdvanceGermplasmList(List<Pair<Germplasm, List<Name>>> germplasms, List<Pair<Germplasm, GermplasmListData>> listDataItems,
-			GermplasmList germplasmList);
+	Integer saveNurseryAdvanceGermplasmList(List<Pair<Germplasm, List<Name>>> germplasms,
+			List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList);
 
 	/**
 	 * Used for retrieving the Cimmyt Wheat Germplasm name.
@@ -797,7 +797,6 @@ public interface FieldbookService {
 	 * @return The id of the newly-created germplasm list
 	 */
 	Integer saveGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList);
-
 
 	void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds);
 
