@@ -510,6 +510,8 @@ public class Workbook {
 		builder.append(this.variates);
 		builder.append(", observations=");
 		builder.append(this.observations);
+		builder.append(", trialObservations=");
+		builder.append(this.trialObservations);
 		builder.append(", trialHeaders=");
 		builder.append(this.trialHeaders);
 		builder.append(", trialVariables=");
