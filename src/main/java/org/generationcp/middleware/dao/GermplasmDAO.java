@@ -70,192 +70,72 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Germplasm> getByName(String name, Operation operation, Integer status, GermplasmNameType type, int start, int numOfRows)
-			throws MiddlewareQueryException {
-		try {
-			StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid "
-					+ "WHERE g.gid!=g.grplce AND g.grplce = 0 ");
+	public List<Germplasm> getByNamePermutations(String name, Operation operation, int start, int numOfRows) throws MiddlewareQueryException {
 
-			if (operation == null || operation == Operation.EQUAL) {
-				queryString.append("AND n.nval = :name ");
-			} else if (operation == Operation.LIKE) {
-				queryString.append("AND n.nval LIKE :name ");
-			}
+        //Converting supplied value to combination of names that can exists in names
+        List<String> names = GermplasmDataManagerUtil.createNamePermutations(name);
 
-			if (status != null && status != 0) {
-				queryString.append("AND n.nstat = :nstat ");
-			} else {
-				queryString.append("AND n.nstat != " + GermplasmDAO.STATUS_DELETED);
-			}
+        if (names == null || names.isEmpty()) {
+            return new ArrayList<>();
+        }
 
-			if (type != null) {
-				queryString.append("AND n.ntype = :ntype ");
-			}
+        try {
 
-			SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
-			query.setParameter("name", name);
-			query.addEntity("g", Germplasm.class);
+            String originalName = names.get(0);
+            String standardizedName = names.get(1);
+            String noSpaceName = names.get(2);
 
-			if (status != null && status != 0) {
-				query.setParameter("nstat", status);
-			}
+            // Search using = by default
+            SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_BY_NAME_ALL_MODES_USING_EQUAL);
+            if (operation == Operation.LIKE) {
+                query = this.getSession().createSQLQuery(Germplasm.GET_BY_NAME_ALL_MODES_USING_LIKE);
+            }
 
-			if (type != null) {
-				query.setParameter("ntype", Integer.valueOf(type.getUserDefinedFieldID()));
-			}
+            // Set the parameters
+            query.setParameter("name", originalName);
+            query.setParameter("noSpaceName", noSpaceName);
+            query.setParameter("standardizedName", standardizedName);
 
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
+            query.addEntity("g", Germplasm.class);
+            query.setFirstResult(start);
+            query.setMaxResults(numOfRows);
 
-			return query.list();
-
+            return query.list();
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByName(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getByName(names=" + names + ") query from Germplasm: " + e.getMessage(), e);
 		}
-		return new ArrayList<Germplasm>();
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Integer> getIdsByName(String name, int start, int numOfRows) throws MiddlewareQueryException {
-		try {
-			StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT DISTINCT n.gid FROM names n LEFT JOIN germplsm g ON g.gid = n.gid AND g.gid!=g.grplce  "
-					+ "WHERE n.nval = :name ");
+	public long countByNamePermutations(String name, Operation operation) throws MiddlewareQueryException {
 
-			SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
-			query.setParameter("name", name);
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
+        //Converting supplied value to combination of names that can exists in names
+        List<String> names = GermplasmDataManagerUtil.createNamePermutations(name);
 
-			return query.list();
+        if (names == null || names.isEmpty()) {
+            return 0;
+        }
 
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getIdsByName(name=" + name + ") query from GermplasmDAO: " + e.getMessage(), e);
-		}
+        try {
+            String originalName = names.get(0);
+            String standardizedName = names.get(1);
+            String noSpaceName = names.get(2);
 
-		return new ArrayList<Integer>();
-	}
+            // Count using = by default
+            SQLQuery query = this.getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_ALL_MODES_USING_EQUAL);
+            if (operation == Operation.LIKE) {
+                query = this.getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_ALL_MODES_USING_LIKE);
+            }
 
-	@SuppressWarnings("unchecked")
-	public List<Germplasm> getGermplasmByIds(List<Integer> germplasmIds, int start, int numOfRows) throws MiddlewareQueryException {
-		try {
-			StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT DISTINCT {g.*} FROM germplsm g WHERE g.gid!=grplce " + "AND g.gid IN (:ids) ");
+            // Set the parameters
+            query.setParameter("name", originalName);
+            query.setParameter("noSpaceName", noSpaceName);
+            query.setParameter("standardizedName", standardizedName);
 
-			SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
-			query.setParameterList("ids", germplasmIds);
-			query.addEntity("g", Germplasm.class);
-
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
-
-			return query.list();
+            return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error with getGermplasmByIds(ids=" + germplasmIds.toString() + ") query from Germplasm: " + e.getMessage(), e);
+            throw new MiddlewareQueryException("Error with countByName(names=" + names + ") query from Germplasm: " + e.getMessage(), e);
 		}
-		return new ArrayList<Germplasm>();
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Germplasm> getByName(List<String> names, Operation operation, int start, int numOfRows) throws MiddlewareQueryException {
-		try {
-			if (names != null && !names.isEmpty()) {
-				String originalName = names.get(0);
-				String standardizedName = names.get(1);
-				String noSpaceName = names.get(2);
-
-				// Search using = by default
-				SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_BY_NAME_ALL_MODES_USING_EQUAL);
-				if (operation == Operation.LIKE) {
-					query = this.getSession().createSQLQuery(Germplasm.GET_BY_NAME_ALL_MODES_USING_LIKE);
-				}
-
-				// Set the parameters
-				query.setParameter("name", originalName);
-				query.setParameter("noSpaceName", noSpaceName);
-				query.setParameter("standardizedName", standardizedName);
-
-				query.addEntity("g", Germplasm.class);
-				query.setFirstResult(start);
-				query.setMaxResults(numOfRows);
-
-				return query.list();
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByName(names=" + names + ") query from Germplasm: " + e.getMessage(), e);
-		}
-		return new ArrayList<Germplasm>();
-	}
-
-	public long countByName(String name, Operation operation, Integer status, GermplasmNameType type) throws MiddlewareQueryException {
-		try {
-			StringBuilder queryString = new StringBuilder();
-			queryString
-					.append("SELECT COUNT(DISTINCT n.gid) FROM names n LEFT OUTER JOIN germplsm g ON g.gid = n.gid AND g.gid!=g.grplce AND g.grplce = 0 WHERE ");
-
-			if (operation == null || operation == Operation.EQUAL) {
-				queryString.append("n.nval = :name ");
-			} else if (operation == Operation.LIKE) {
-				queryString.append("n.nval LIKE :name ");
-			}
-
-			if (status != null && status != 0) {
-				queryString.append("AND n.nstat = :nstat ");
-			} else {
-				queryString.append("AND n.nstat != " + GermplasmDAO.STATUS_DELETED);
-			}
-
-			if (type != null) {
-				queryString.append("AND n.ntype = :ntype ");
-			}
-
-			SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
-			query.setParameter("name", name);
-
-			if (status != null && status != 0) {
-				query.setParameter("nstat", status);
-			}
-
-			if (type != null) {
-				query.setParameter("ntype", Integer.valueOf(type.getUserDefinedFieldID()));
-			}
-
-			return ((BigInteger) query.uniqueResult()).longValue();
-
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countByName(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
-		}
-		return 0;
-	}
-
-	public long countByName(List<String> names, Operation operation) throws MiddlewareQueryException {
-		try {
-			if (names != null) {
-				String originalName = names.get(0);
-				String standardizedName = names.get(1);
-				String noSpaceName = names.get(2);
-
-				// Count using = by default
-				SQLQuery query = this.getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_ALL_MODES_USING_EQUAL);
-				if (operation == Operation.LIKE) {
-					query = this.getSession().createSQLQuery(Germplasm.COUNT_BY_NAME_ALL_MODES_USING_LIKE);
-				}
-
-				// Set the parameters
-				query.setParameter("name", originalName);
-				query.setParameter("noSpaceName", noSpaceName);
-				query.setParameter("standardizedName", standardizedName);
-
-				return ((BigInteger) query.uniqueResult()).longValue();
-			}
-
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countByName(names=" + names + ") query from Germplasm: " + e.getMessage(), e);
-		}
-		return 0;
 	}
 
 	@SuppressWarnings("unchecked")

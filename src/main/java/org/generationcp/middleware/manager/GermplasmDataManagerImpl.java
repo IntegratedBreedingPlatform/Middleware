@@ -80,43 +80,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, GetGermplasmByNameModes mode, Operation op,
-			Integer status, GermplasmNameType type, Database instance) throws MiddlewareQueryException {
-		String nameToUse = GermplasmDataManagerUtil.getNameToUseByMode(name, mode);
-		return this.getGermplasmDao().getByName(nameToUse, op, status, type, start, numOfRows);
-	}
-
-	@Override
 	public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
-		List<String> names = GermplasmDataManagerUtil.createNamePermutations(name);
-		return this.getGermplasmDao().getByName(names, op, start, numOfRows);
-	}
-
-	@Override
-	public long countGermplasmByName(String name, GetGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type,
-			Database instance) throws MiddlewareQueryException {
-		String nameToUse = GermplasmDataManagerUtil.getNameToUseByMode(name, mode);
-		return this.getGermplasmDao().countByName(nameToUse, op, status, type);
+		return this.getGermplasmDao().getByNamePermutations(name, op, start, numOfRows);
 	}
 
 	@Override
 	public long countGermplasmByName(String name, Operation operation) throws MiddlewareQueryException {
-		List<String> names = GermplasmDataManagerUtil.createNamePermutations(name);
-		return this.getGermplasmDao().countByName(names, operation);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	@Override
-	public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows) throws MiddlewareQueryException {
-		List<Germplasm> germplasms = new ArrayList<Germplasm>();
-		// get first all the IDs
-		List<Integer> germplasmIds = new ArrayList<Integer>();
-		germplasmIds.addAll(this.getGermplasmDao().getIdsByName(name, start, numOfRows));
-		germplasms.addAll(this.getGermplasmDao().getGermplasmByIds(germplasmIds, start, numOfRows));
-		return germplasms;
+		return this.getGermplasmDao().countByNamePermutations(name, operation);
 	}
 
 	@Override
@@ -1306,7 +1276,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	/**
 	 * Local method for getting a particular germplasm's Name.
 	 *
-	 * @param namesMap The Map containing Names for a germplasm. This is usually provided by getGermplasmParentNamesForStudy() in
+	 * @param names The Map containing Names for a germplasm. This is usually provided by getGermplasmParentNamesForStudy() in
 	 *        GermplasmDAO.
 	 * @param ntype the name type, i.e. Pedigree, Selection History, Cross Name,etc.
 	 * @return an instance of Name representing the searched name, or an empty Name instance if it doesn't exist

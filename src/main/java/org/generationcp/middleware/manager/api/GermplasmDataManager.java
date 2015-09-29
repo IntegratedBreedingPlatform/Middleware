@@ -42,31 +42,6 @@ import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 public interface GermplasmDataManager {
 
 	/**
-	 * Searches for all germplasm records which matches the given name. Three searching modes are available; normal search, the spaces on
-	 * the name will be removed, the name will be standardize before searching. The three modes can be specified using the enum
-	 * GetGermplasmByNameModes.
-	 *
-	 * Names to be included in the search may be limited by name status. Accepted values are 0 - 10. If the given status is zero all names
-	 * will be included in the search.
-	 *
-	 * Names to be included in the search may be limited by name type. The enum GermplasmNameType is used to specify the type of names to be
-	 * included in the search. If the given type is null, all names will be included in the search.
-	 *
-	 * @param name - search string for the name of the germplasm
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param mode - can be normal, spaces removed, name standardized
-	 * @param op - can be EQUAL OR LIKE
-	 * @param status - nstat of the names to be included in the search
-	 * @param type - name type
-	 * @param instance - can be Database.LOCAL or Database.CENTRAL
-	 * @return List of Germplasm POJOs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, GetGermplasmByNameModes mode, Operation op, Integer status,
-			GermplasmNameType type, Database instance) throws MiddlewareQueryException;
-
-	/**
 	 * Searches for all germplasm records which matches the given name. It will match records having the following names: (1) the given name
 	 * as it is, (2) the name with standardization performed on it, and (3) name with spaces removed.
 	 *
@@ -78,41 +53,6 @@ public interface GermplasmDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
-
-	/**
-	 * Searches for all germplasm records which matches the given name. It will match records having the given name as it is,
-	 *
-	 * @param name - search string for the name of the germplasm
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @return List of Germplasm POJOs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	 */
-	@Deprecated
-	List<Germplasm> getGermplasmByName(String name, int start, int numOfRows) throws MiddlewareQueryException;
-
-	/**
-	 * Returns the number of germplasm records with any name matching the given parameter. Search modes can also be specified like in using
-	 * the getGermplasmByName() method.
-	 *
-	 * Names to be included in the search may be limited by name status. Accepted values are 0 - 10. If the given status is zero all names
-	 * will be included in the search.
-	 *
-	 * Names to be included in the search may be limited by name type. The enum GermplasmNameType is used to specify the type of names to be
-	 * included in the search. If the given type is null, all names will be included in the search.
-	 *
-	 * @param name - search string for the name of the germplasm
-	 * @param mode - can be normal, spaces removed, name standardized
-	 * @param op - can be EQUAL OR LIKE
-	 * @param status - nstat of the names to be included in the search
-	 * @param type - name type
-	 * @param instance - can be Database.LOCAL or Database.CENTRAL
-	 * @return number of germplasm records
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	long countGermplasmByName(String name, GetGermplasmByNameModes mode, Operation op, Integer status, GermplasmNameType type,
-			Database instance) throws MiddlewareQueryException;
 
 	/**
 	 * Returns the number of germplasm records with any name matching the given parameter. It will count records having the following names:
@@ -987,7 +927,7 @@ public interface GermplasmDataManager {
 	/**
 	 * Gets the method by name.
 	 *
-	 * @param code the code
+	 * @param name the code
 	 * @return the method by name
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -996,7 +936,7 @@ public interface GermplasmDataManager {
 	/**
 	 * Gets the method by name.
 	 *
-	 * @param code the code
+	 * @param name the code
 	 * @param programUUID - uniqueID of the current program
 	 * @return the method by name
 	 * @throws MiddlewareQueryException the middleware query exception
@@ -1048,7 +988,7 @@ public interface GermplasmDataManager {
 	/**
 	 * Saves a favorite method/location
 	 *
-	 * @param ProgramFavorite to be saved
+	 * @param favorite to be saved
 	 * @return none
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -1066,7 +1006,7 @@ public interface GermplasmDataManager {
 	/**
 	 * Deletes a favorite method/location
 	 *
-	 * @param code the code
+	 * @param favorite the code
 	 * @return none
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -1077,7 +1017,7 @@ public interface GermplasmDataManager {
 	 *
 	 * @param prefix
 	 * @param suffix
-	 * @param nameType
+	 * @param count
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
@@ -1086,9 +1026,7 @@ public interface GermplasmDataManager {
 	/**
 	 * check if name and standardized version of it already exists.
 	 *
-	 * @param prefix
-	 * @param count
-	 * @param suffix
+	 * @param name
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */

@@ -129,137 +129,40 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetGermplasmByName() throws Exception {
-		String name = "CML502RLT";
+		String name = "(CML454 X CML451)-B-3-1-1";
 
-		List<Germplasm> germplasmList =
-				this.germplasmDataManager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.EQUAL, null, null,
-						Database.CENTRAL);
+		List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByName(name, 0, 5, Operation.EQUAL);
 		Assert.assertTrue(germplasmList != null);
 
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByName(" + name + "): ");
 		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
 	}
 
-	@Test
-	public void testGetGermplasmByNameOriginalStandardizedAndNoSpace() throws Exception {
-		String name = "IR  65";
-		List<Germplasm> germplasmList =
-				this.germplasmDataManager.getGermplasmByName(name, 0,
-						Long.valueOf(this.germplasmDataManager.countGermplasmByName(name, Operation.EQUAL)).intValue(), Operation.EQUAL);
+    @Test
+    public void testCountGermplasmByName() throws Exception {
+        String name = "(CML454 X CML451)-B-3-1-1";
+        long count = this.germplasmDataManager.countGermplasmByName(name, Operation.EQUAL);
+        Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByName(" + name + "): " + count);
+    }
 
-		Debug.println(IntegrationTestBase.INDENT,
-				"testGetGermplasmByNameOriginalStandardizedAndNoSpace(" + name + "): " + germplasmList.size());
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
+    @Test
+    public void testGetGermplasmByNameUsingLike() throws Exception {
+        String name = "IR%";
 
-		name = "IR 65%";
-		germplasmList =
-				this.germplasmDataManager.getGermplasmByName(name, 0,
-						Long.valueOf(this.germplasmDataManager.countGermplasmByName(name, Operation.LIKE)).intValue(), Operation.LIKE);
-	}
+        List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByName(name, 0, 5, Operation.LIKE);
+        Assert.assertTrue(germplasmList != null);
 
-	@Test
-	public void testCountGermplasmByName() throws Exception {
-		String name = "IR 10";
-		long count =
-				this.germplasmDataManager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, Operation.EQUAL, null, null,
-						Database.CENTRAL);
-		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByName(" + name + "): " + count);
-	}
+        Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByNameUsingLike(" + name + "): ");
+        Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
+    }
 
-	@Test
-	public void testCountGermplasmByNameOriginalStandardizedAndNoSpace() throws Exception {
-		String name = "IR  65";
-		long count = this.germplasmDataManager.countGermplasmByName(name, Operation.EQUAL);
-		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByNameOriginalStandardizedAndNoSpace(" + name + "): " + count);
-	}
+    @Test
+    public void testCountGermplasmByNameUsingLike() throws Exception {
+        String name = "IR%";
 
-	@Test
-	public void testGetGermplasmByNameUsingLike() throws Exception {
-		String name = "IR%";
-
-		List<Germplasm> germplasmList =
-				this.germplasmDataManager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.LIKE, null, null,
-						Database.CENTRAL);
-		Assert.assertTrue(germplasmList != null);
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByNameUsingLike(" + name + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
-	}
-
-	@Test
-	public void testCountGermplasmByNameUsingLike() throws Exception {
-		String name = "IR%";
-
-		long count =
-				this.germplasmDataManager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, Operation.LIKE, null, null,
-						Database.CENTRAL);
-		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByNameUsingLike(" + name + ") RESULTS:" + count);
-	}
-
-	@Test
-	public void testGetGermplasmByNameWithStatus() throws Exception {
-		String name = "IR 64";
-		List<Germplasm> germplasmList =
-				this.germplasmDataManager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.EQUAL,
-						Integer.valueOf(1), null, Database.CENTRAL);
-		Assert.assertTrue(germplasmList != null);
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByNameWithStatus(" + name + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
-	}
-
-	@Test
-	public void testCountGermplasmByNameWithStatus() throws Exception {
-		String name = "IR 64";
-		long count =
-				this.germplasmDataManager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, Operation.EQUAL, Integer.valueOf(1),
-						null, Database.CENTRAL);
-		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByNameWithStatus(" + name + "): " + count);
-	}
-
-	@Test
-	public void testGetGermplasmByNameWithStatusAndType() throws Exception {
-		String name = "IR 64";
-		List<Germplasm> germplasmList =
-				this.germplasmDataManager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.EQUAL,
-						Integer.valueOf(1), GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
-		Assert.assertTrue(germplasmList != null);
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByNameWithStatusAndType(" + name + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
-	}
-
-	@Test
-	public void testCountGermplasmByNameWithStatusAndType() throws Exception {
-		String name = "IR 64";
-		long count =
-				this.germplasmDataManager.countGermplasmByName(name, GetGermplasmByNameModes.NORMAL, Operation.EQUAL, Integer.valueOf(1),
-						GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
-		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByNameWithStatusAndType(" + name + "): " + count);
-	}
-
-	@Test
-	public void testGetGermplasmByNameWithStatusUsingLike() throws Exception {
-		String name = "IR%";
-		List<Germplasm> germplasmList =
-				this.germplasmDataManager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.LIKE,
-						Integer.valueOf(1), null, Database.CENTRAL);
-		Assert.assertTrue(germplasmList != null);
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByNameWithStatusUsingLike(" + name + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
-	}
-
-	@Test
-	public void testGetGermplasmByNameWithStatusAndTypeUsingLike() throws Exception {
-		String name = "IR%";
-		List<Germplasm> germplasmList =
-				this.germplasmDataManager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.LIKE,
-						Integer.valueOf(1), GermplasmNameType.RELEASE_NAME, Database.CENTRAL);
-		Assert.assertTrue(germplasmList != null);
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByNameWithStatusAndTypeUsingLike(" + name + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
-	}
+        long count = this.germplasmDataManager.countGermplasmByName(name, Operation.LIKE);
+        Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByNameUsingLike(" + name + ") RESULTS:" + count);
+    }
 
 	@Test
 	public void testGetGermplasmByLocationNameUsingEqual() throws Exception {
