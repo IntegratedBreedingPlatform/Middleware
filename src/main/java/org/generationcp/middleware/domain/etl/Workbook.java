@@ -90,8 +90,8 @@ public class Workbook {
 		this.reset();
 	}
 
-	public Workbook(StudyDetails studyDetails, List<MeasurementVariable> conditions, List<MeasurementVariable> factors,
-			List<MeasurementVariable> constants, List<MeasurementVariable> variates, List<MeasurementRow> observations) {
+	public Workbook(final StudyDetails studyDetails, final List<MeasurementVariable> conditions, final List<MeasurementVariable> factors,
+			final List<MeasurementVariable> constants, final List<MeasurementVariable> variates, final List<MeasurementRow> observations) {
 		this.studyDetails = studyDetails;
 		this.conditions = conditions;
 		this.factors = factors;
@@ -121,7 +121,7 @@ public class Workbook {
 		return this.studyDetails;
 	}
 
-	public void setStudyDetails(StudyDetails studyDetails) {
+	public void setStudyDetails(final StudyDetails studyDetails) {
 		this.studyDetails = studyDetails;
 	}
 
@@ -129,7 +129,7 @@ public class Workbook {
 		return this.conditions;
 	}
 
-	public void setConditions(List<MeasurementVariable> conditions) {
+	public void setConditions(final List<MeasurementVariable> conditions) {
 		this.conditions = conditions;
 	}
 
@@ -137,7 +137,7 @@ public class Workbook {
 		return this.factors;
 	}
 
-	public void setFactors(List<MeasurementVariable> factors) {
+	public void setFactors(final List<MeasurementVariable> factors) {
 		this.factors = factors;
 	}
 
@@ -145,7 +145,7 @@ public class Workbook {
 		return this.variates;
 	}
 
-	public void setVariates(List<MeasurementVariable> variates) {
+	public void setVariates(final List<MeasurementVariable> variates) {
 		this.variates = variates;
 	}
 
@@ -153,7 +153,7 @@ public class Workbook {
 		return this.constants;
 	}
 
-	public void setConstants(List<MeasurementVariable> constants) {
+	public void setConstants(final List<MeasurementVariable> constants) {
 		this.constants = constants;
 	}
 
@@ -161,7 +161,7 @@ public class Workbook {
 		return this.observations;
 	}
 
-	public void setObservations(List<MeasurementRow> observations) {
+	public void setObservations(final List<MeasurementRow> observations) {
 		this.observations = observations;
 	}
 
@@ -169,7 +169,7 @@ public class Workbook {
 		return this.studyDetails.isNursery();
 	}
 
-	public void setMeasurementDatasetVariables(List<MeasurementVariable> measurementDatasetVariables) {
+	public void setMeasurementDatasetVariables(final List<MeasurementVariable> measurementDatasetVariables) {
 		this.measurementDatasetVariables = measurementDatasetVariables;
 	}
 
@@ -186,18 +186,18 @@ public class Workbook {
 		return this.measurementDatasetVariables;
 	}
 
-	public List<MeasurementRow> arrangeMeasurementObservation(List<MeasurementRow> observations) {
+	public List<MeasurementRow> arrangeMeasurementObservation(final List<MeasurementRow> observations) {
 
 		if (this.columnOrderedLists != null && !this.columnOrderedLists.isEmpty()) {
-			for (MeasurementRow row : observations) {
+			for (final MeasurementRow row : observations) {
 				// we need to arrange each data list
-				List<MeasurementData> measureDataList = row.getDataList();
-				List<MeasurementData> newMeasureData = new ArrayList<MeasurementData>();
-				for (Integer termId : this.columnOrderedLists) {
+				final List<MeasurementData> measureDataList = row.getDataList();
+				final List<MeasurementData> newMeasureData = new ArrayList<MeasurementData>();
+				for (final Integer termId : this.columnOrderedLists) {
 					int index = 0;
 					boolean isFound = false;
 					for (index = 0; index < measureDataList.size(); index++) {
-						MeasurementData measurementData = measureDataList.get(index);
+						final MeasurementData measurementData = measureDataList.get(index);
 						if (termId.intValue() == measurementData.getMeasurementVariable().getTermId()) {
 							newMeasureData.add(measurementData);
 							isFound = true;
@@ -216,17 +216,17 @@ public class Workbook {
 		return observations;
 	}
 
-	public List<MeasurementVariable> arrangeMeasurementVariables(List<MeasurementVariable> varList) {
-		List<MeasurementVariable> tempVarList = new ArrayList<MeasurementVariable>();
-		List<MeasurementVariable> copyVarList = new ArrayList<MeasurementVariable>();
+	public List<MeasurementVariable> arrangeMeasurementVariables(final List<MeasurementVariable> varList) {
+		final List<MeasurementVariable> tempVarList = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> copyVarList = new ArrayList<MeasurementVariable>();
 		copyVarList.addAll(varList);
 		if (this.columnOrderedLists != null && !this.columnOrderedLists.isEmpty()) {
 			// we order the list based on column orders
-			for (Integer termId : this.columnOrderedLists) {
+			for (final Integer termId : this.columnOrderedLists) {
 				int index = 0;
 				boolean isFound = false;
 				for (index = 0; index < copyVarList.size(); index++) {
-					MeasurementVariable measurementVar = copyVarList.get(index);
+					final MeasurementVariable measurementVar = copyVarList.get(index);
 					if (termId.intValue() == measurementVar.getTermId()) {
 						tempVarList.add(measurementVar);
 						isFound = true;
@@ -252,11 +252,11 @@ public class Workbook {
 	 * @return measurement dataset variable list
 	 */
 	public List<MeasurementVariable> getMeasurementDatasetVariablesView() {
-		Set<MeasurementVariable> list = new LinkedHashSet<MeasurementVariable>();
+		final Set<MeasurementVariable> list = new HashSet<MeasurementVariable>();
 		if (!this.isNursery()) {
 			MeasurementVariable trialFactor = null;
 			if (this.getTrialFactors() != null) {
-				for (MeasurementVariable var : this.getTrialConditions()) {
+				for (final MeasurementVariable var : this.getTrialConditions()) {
 					if (var.getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 						trialFactor = var;
 						break;
@@ -277,7 +277,7 @@ public class Workbook {
 		if (this.measurementDatasetVariablesMap == null) {
 			this.measurementDatasetVariablesMap = new HashMap<String, MeasurementVariable>();
 			this.getMeasurementDatasetVariables();
-			for (MeasurementVariable var : this.measurementDatasetVariables) {
+			for (final MeasurementVariable var : this.measurementDatasetVariables) {
 				this.measurementDatasetVariablesMap.put(Integer.toString(var.getTermId()), var);
 			}
 		}
@@ -300,7 +300,7 @@ public class Workbook {
 
 	public List<MeasurementVariable> getTrialVariables() {
 
-		Set<MeasurementVariable> unique = new HashSet<>();
+		final Set<MeasurementVariable> unique = new HashSet<>();
 
 		if (this.trialVariables == null) {
 			unique.addAll(this.getConditionsAndConstants(false));
@@ -330,8 +330,8 @@ public class Workbook {
 		return this.germplasmFactors;
 	}
 
-	private List<MeasurementVariable> getConditionsAndConstants(boolean isStudy) {
-		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+	private List<MeasurementVariable> getConditionsAndConstants(final boolean isStudy) {
+		final List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
 		if (isStudy) {
 			if (this.studyConditions == null && this.studyConstants == null) {
 				this.studyConditions = this.getStudyConditions();
@@ -388,10 +388,10 @@ public class Workbook {
 		return this.trialConditions;
 	}
 
-	public List<MeasurementVariable> getVariables(List<MeasurementVariable> variables, boolean isStudy) {
-		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+	public List<MeasurementVariable> getVariables(final List<MeasurementVariable> variables, final boolean isStudy) {
+		final List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
 		if (variables != null && !variables.isEmpty()) {
-			for (MeasurementVariable variable : variables) {
+			for (final MeasurementVariable variable : variables) {
 				if (isStudy && variable.getLabel().toUpperCase().startsWith(Workbook.STUDY_LABEL) || !isStudy
 						&& !variable.getLabel().toUpperCase().startsWith(Workbook.STUDY_LABEL)) {
 					list.add(variable);
@@ -401,10 +401,10 @@ public class Workbook {
 		return list;
 	}
 
-	private List<MeasurementVariable> getNonTrialVariables(List<MeasurementVariable> variables) {
-		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+	private List<MeasurementVariable> getNonTrialVariables(final List<MeasurementVariable> variables) {
+		final List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
 		if (variables != null && !variables.isEmpty()) {
-			for (MeasurementVariable variable : variables) {
+			for (final MeasurementVariable variable : variables) {
 				if (!PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel().toUpperCase())) {
 					list.add(variable);
 				}
@@ -413,10 +413,10 @@ public class Workbook {
 		return list;
 	}
 
-	private List<MeasurementVariable> getGermplasmVariables(List<MeasurementVariable> variables) {
-		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+	private List<MeasurementVariable> getGermplasmVariables(final List<MeasurementVariable> variables) {
+		final List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
 		if (variables != null && !variables.isEmpty()) {
-			for (MeasurementVariable variable : variables) {
+			for (final MeasurementVariable variable : variables) {
 				if (PhenotypicType.GERMPLASM.getLabelList().contains(variable.getLabel().toUpperCase())) {
 					list.add(variable);
 				}
@@ -425,10 +425,10 @@ public class Workbook {
 		return list;
 	}
 
-	private List<MeasurementVariable> getTrialVariables(List<MeasurementVariable> variables) {
-		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+	private List<MeasurementVariable> getTrialVariables(final List<MeasurementVariable> variables) {
+		final List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
 		if (variables != null && !variables.isEmpty()) {
-			for (MeasurementVariable variable : variables) {
+			for (final MeasurementVariable variable : variables) {
 				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel().toUpperCase())) {
 					list.add(variable);
 				}
@@ -440,9 +440,9 @@ public class Workbook {
 	public List<String> getTrialHeaders() {
 		if (this.trialHeaders == null) {
 			this.trialHeaders = new ArrayList<String>();
-			List<MeasurementVariable> variables = this.getTrialVariables();
+			final List<MeasurementVariable> variables = this.getTrialVariables();
 			if (variables != null && !variables.isEmpty()) {
-				for (MeasurementVariable variable : variables) {
+				for (final MeasurementVariable variable : variables) {
 					if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel().toUpperCase())) {
 						this.trialHeaders.add(variable.getName());
 					}
@@ -453,7 +453,7 @@ public class Workbook {
 	}
 
 	public List<MeasurementVariable> getAllVariables() {
-		List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
 		if (this.conditions != null) {
 			variableList.addAll(this.conditions);
 		}
@@ -471,7 +471,7 @@ public class Workbook {
 	}
 
 	public List<MeasurementVariable> getNonVariateVariables() {
-		List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
 		if (this.conditions != null) {
 			variableList.addAll(this.conditions);
 		}
@@ -483,7 +483,7 @@ public class Workbook {
 	}
 
 	public List<MeasurementVariable> getVariateVariables() {
-		List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> variableList = new ArrayList<MeasurementVariable>();
 		if (this.constants != null) {
 			variableList.addAll(this.constants);
 		}
@@ -498,13 +498,13 @@ public class Workbook {
 		return this.isCheckFactorAddedOnly;
 	}
 
-	public void setCheckFactorAddedOnly(boolean isCheckFactorAddedOnly) {
+	public void setCheckFactorAddedOnly(final boolean isCheckFactorAddedOnly) {
 		this.isCheckFactorAddedOnly = isCheckFactorAddedOnly;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("Workbook [studyDetails=");
 		builder.append(this.studyDetails);
 		builder.append(", conditions=");
@@ -570,7 +570,7 @@ public class Workbook {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -580,7 +580,7 @@ public class Workbook {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		Workbook other = (Workbook) obj;
+		final Workbook other = (Workbook) obj;
 		if (this.conditions == null) {
 			if (other.conditions != null) {
 				return false;
@@ -699,7 +699,7 @@ public class Workbook {
 		return true;
 	}
 
-	public void print(int indent) {
+	public void print(final int indent) {
 		Debug.println(indent, "Workbook: ");
 
 		if (this.studyDetails != null) {
@@ -710,7 +710,7 @@ public class Workbook {
 
 		if (this.conditions != null) {
 			Debug.println(indent + 3, "Conditions: ");
-			for (MeasurementVariable variable : this.conditions) {
+			for (final MeasurementVariable variable : this.conditions) {
 				variable.print(indent + 6);
 			}
 		} else {
@@ -719,7 +719,7 @@ public class Workbook {
 
 		if (this.factors != null) {
 			Debug.println(indent + 3, "Factors: ");
-			for (MeasurementVariable variable : this.factors) {
+			for (final MeasurementVariable variable : this.factors) {
 				variable.print(indent + 6);
 			}
 		} else {
@@ -728,7 +728,7 @@ public class Workbook {
 
 		if (this.constants != null) {
 			Debug.println(indent + 3, "Constants: ");
-			for (MeasurementVariable variable : this.constants) {
+			for (final MeasurementVariable variable : this.constants) {
 				variable.print(indent + 6);
 			}
 		} else {
@@ -737,7 +737,7 @@ public class Workbook {
 
 		if (this.variates != null) {
 			Debug.println(indent + 3, "Variates: ");
-			for (MeasurementVariable variable : this.variates) {
+			for (final MeasurementVariable variable : this.variates) {
 				variable.print(indent + 6);
 			}
 		} else {
@@ -747,7 +747,7 @@ public class Workbook {
 		if (this.observations != null) {
 
 			Debug.println(indent + 3, "Observations: ");
-			for (MeasurementRow row : this.observations) {
+			for (final MeasurementRow row : this.observations) {
 				row.print(indent + 6);
 			}
 		} else {
@@ -760,11 +760,12 @@ public class Workbook {
 		return this.variableMap;
 	}
 
-	public void setVariableMap(Map<String, ?> variableMap) {
+	public void setVariableMap(final Map<String, ?> variableMap) {
 		this.variableMap = variableMap;
 	}
 
-	public void populateStudyAndDatasetIds(int studyId, int trialDatasetId, int measurementDatasetId, int meansDatasetId) {
+	public void populateStudyAndDatasetIds(final int studyId, final int trialDatasetId, final int measurementDatasetId,
+			final int meansDatasetId) {
 		this.studyId = studyId;
 		this.trialDatasetId = trialDatasetId;
 		this.measurementDatesetId = measurementDatasetId;
@@ -779,7 +780,7 @@ public class Workbook {
 		}
 	}
 
-	public void setStudyId(Integer studyId) {
+	public void setStudyId(final Integer studyId) {
 		this.studyId = studyId;
 	}
 
@@ -787,7 +788,7 @@ public class Workbook {
 		return this.trialDatasetId;
 	}
 
-	public void setTrialDatasetId(Integer trialDatasetId) {
+	public void setTrialDatasetId(final Integer trialDatasetId) {
 		this.trialDatasetId = trialDatasetId;
 	}
 
@@ -795,16 +796,16 @@ public class Workbook {
 		return this.measurementDatesetId;
 	}
 
-	public void setMeasurementDatesetId(Integer measurementDatesetId) {
+	public void setMeasurementDatesetId(final Integer measurementDatesetId) {
 		this.measurementDatesetId = measurementDatesetId;
 	}
 
 	public Map<Long, List<MeasurementRow>> segregateByTrialInstances() {
-		Map<Long, List<MeasurementRow>> map = new HashMap<Long, List<MeasurementRow>>();
+		final Map<Long, List<MeasurementRow>> map = new HashMap<Long, List<MeasurementRow>>();
 
 		if (this.observations != null) {
-			for (MeasurementRow row : this.observations) {
-				Long locationId = row.getLocationId();
+			for (final MeasurementRow row : this.observations) {
+				final Long locationId = row.getLocationId();
 				List<MeasurementRow> list = map.get(locationId);
 				if (list == null) {
 					list = new ArrayList<MeasurementRow>();
@@ -823,7 +824,7 @@ public class Workbook {
 			if (this.trialObservations != null && !this.trialObservations.isEmpty()) {
 				this.totalNumberOfInstances = this.trialObservations.size();
 			} else {
-				Map<Long, List<MeasurementRow>> map = this.segregateByTrialInstances();
+				final Map<Long, List<MeasurementRow>> map = this.segregateByTrialInstances();
 				this.totalNumberOfInstances = map.size();
 			}
 		}
@@ -840,13 +841,13 @@ public class Workbook {
 	/**
 	 * @param trialObservations the trialObservations to set
 	 */
-	public void setTrialObservations(List<MeasurementRow> trialObservations) {
+	public void setTrialObservations(final List<MeasurementRow> trialObservations) {
 		this.trialObservations = trialObservations;
 	}
 
-	public MeasurementRow getTrialObservation(long locationId) {
+	public MeasurementRow getTrialObservation(final long locationId) {
 		if (this.trialObservations != null) {
-			for (MeasurementRow row : this.trialObservations) {
+			for (final MeasurementRow row : this.trialObservations) {
 				if (row.getLocationId() == locationId) {
 					return row;
 				}
@@ -857,11 +858,11 @@ public class Workbook {
 
 	public List<MeasurementRow> getSortedTrialObservations() {
 		if (this.trialObservations != null) {
-			List<MeasurementRow> rows = new ArrayList<MeasurementRow>();
-			Map<Long, List<MeasurementRow>> map = this.segregateByTrialInstances();
-			List<Long> keys = new ArrayList<Long>(map.keySet());
+			final List<MeasurementRow> rows = new ArrayList<MeasurementRow>();
+			final Map<Long, List<MeasurementRow>> map = this.segregateByTrialInstances();
+			final List<Long> keys = new ArrayList<Long>(map.keySet());
 			Collections.sort(keys);
-			for (Long key : keys) {
+			for (final Long key : keys) {
 				rows.addAll(map.get(key));
 			}
 
@@ -870,17 +871,17 @@ public class Workbook {
 		return new ArrayList<MeasurementRow>();
 	}
 
-	public void updateTrialObservationsWithReferenceList(List<List<ValueReference>> trialList) {
+	public void updateTrialObservationsWithReferenceList(final List<List<ValueReference>> trialList) {
 		// assumes rows are in the same order and size
 		if (trialList != null && !trialList.isEmpty() && this.trialObservations != null
 				&& this.trialObservations.size() == trialList.size()) {
 
 			int i = 0;
-			for (List<ValueReference> trialRow : trialList) {
-				List<MeasurementData> dataList = this.trialObservations.get(i).getDataList();
+			for (final List<ValueReference> trialRow : trialList) {
+				final List<MeasurementData> dataList = this.trialObservations.get(i).getDataList();
 
-				for (ValueReference trialCell : trialRow) {
-					MeasurementData data = this.getMeasurementDataById(dataList, trialCell.getId());
+				for (final ValueReference trialCell : trialRow) {
+					final MeasurementData data = this.getMeasurementDataById(dataList, trialCell.getId());
 					if (data != null) {
 						data.setValue(trialCell.getName());
 					}
@@ -890,9 +891,9 @@ public class Workbook {
 		}
 	}
 
-	public MeasurementData getMeasurementDataById(List<MeasurementData> data, int id) {
+	public MeasurementData getMeasurementDataById(final List<MeasurementData> data, final int id) {
 		if (data != null && !data.isEmpty()) {
-			for (MeasurementData cell : data) {
+			for (final MeasurementData cell : data) {
 				if (cell.getMeasurementVariable().getTermId() == id) {
 					return cell;
 				}
@@ -905,7 +906,7 @@ public class Workbook {
 		return this.treatmentFactors;
 	}
 
-	public void setTreatmentFactors(List<TreatmentVariable> treatmentFactors) {
+	public void setTreatmentFactors(final List<TreatmentVariable> treatmentFactors) {
 		this.treatmentFactors = treatmentFactors;
 	}
 
@@ -913,13 +914,13 @@ public class Workbook {
 		return this.exportArrangedObservations;
 	}
 
-	public void setExportArrangedObservations(List<MeasurementRow> exportArrangedObservations) {
+	public void setExportArrangedObservations(final List<MeasurementRow> exportArrangedObservations) {
 		this.exportArrangedObservations = exportArrangedObservations;
 	}
 
 	public String getStudyName() {
 		if (this.getStudyConditions() != null) {
-			for (MeasurementVariable condition : this.getStudyConditions()) {
+			for (final MeasurementVariable condition : this.getStudyConditions()) {
 				if (condition.getTermId() == TermId.STUDY_NAME.getId()) {
 					return condition.getValue();
 				}
@@ -938,7 +939,7 @@ public class Workbook {
 	/**
 	 * @param originalObservations the originalObservations to set
 	 */
-	public void setOriginalObservations(List<MeasurementRow> originalObservations) {
+	public void setOriginalObservations(final List<MeasurementRow> originalObservations) {
 		this.originalObservations = originalObservations;
 	}
 
@@ -946,7 +947,7 @@ public class Workbook {
 		return this.importType;
 	}
 
-	public void setImportType(Integer importType) {
+	public void setImportType(final Integer importType) {
 		this.importType = importType;
 	}
 
@@ -954,7 +955,7 @@ public class Workbook {
 		return this.meansDatasetId;
 	}
 
-	public void setMeansDatasetId(Integer meansDatasetId) {
+	public void setMeansDatasetId(final Integer meansDatasetId) {
 		this.meansDatasetId = meansDatasetId;
 	}
 
@@ -962,7 +963,7 @@ public class Workbook {
 		return this.expDesignVariables;
 	}
 
-	public void setExpDesignVariables(List<StandardVariable> expDesignVariables) {
+	public void setExpDesignVariables(final List<StandardVariable> expDesignVariables) {
 		this.expDesignVariables = expDesignVariables;
 	}
 
@@ -976,7 +977,7 @@ public class Workbook {
 	/**
 	 * @param experimentalDesignVariables the experimentalDesignVariables to set
 	 */
-	public void setExperimentalDesignVariables(List<MeasurementVariable> list) {
+	public void setExperimentalDesignVariables(final List<MeasurementVariable> list) {
 		this.experimentalDesignVariables = new ExperimentalDesignVariable(list);
 	}
 
@@ -984,7 +985,7 @@ public class Workbook {
 		return this.importConditionsCopy;
 	}
 
-	public void setImportConditionsCopy(List<MeasurementVariable> importConditionsCopy) {
+	public void setImportConditionsCopy(final List<MeasurementVariable> importConditionsCopy) {
 		this.importConditionsCopy = importConditionsCopy;
 	}
 
@@ -992,7 +993,7 @@ public class Workbook {
 		return this.importConstantsCopy;
 	}
 
-	public void setImportConstantsCopy(List<MeasurementVariable> importConstantsCopy) {
+	public void setImportConstantsCopy(final List<MeasurementVariable> importConstantsCopy) {
 		this.importConstantsCopy = importConstantsCopy;
 	}
 
@@ -1000,7 +1001,7 @@ public class Workbook {
 		return this.importTrialObservationsCopy;
 	}
 
-	public void setImportTrialObservationsCopy(List<MeasurementRow> importTrialObservationsCopy) {
+	public void setImportTrialObservationsCopy(final List<MeasurementRow> importTrialObservationsCopy) {
 		this.importTrialObservationsCopy = importTrialObservationsCopy;
 	}
 
@@ -1012,7 +1013,7 @@ public class Workbook {
 		return this.hasExistingDataOverwrite;
 	}
 
-	public void setHasExistingDataOverwrite(boolean hasExistingDataOverwrite) {
+	public void setHasExistingDataOverwrite(final boolean hasExistingDataOverwrite) {
 		this.hasExistingDataOverwrite = hasExistingDataOverwrite;
 	}
 
@@ -1020,7 +1021,7 @@ public class Workbook {
 		return this.columnOrderedLists;
 	}
 
-	public void setColumnOrderedLists(List<Integer> columnOrderedLists) {
+	public void setColumnOrderedLists(final List<Integer> columnOrderedLists) {
 		this.columnOrderedLists = columnOrderedLists;
 	}
 
