@@ -217,6 +217,8 @@ public class MeasurementVariable {
 		builder.append(this.property);
 		builder.append(", dataType=");
 		builder.append(this.dataType);
+		builder.append(", role=");
+		builder.append(this.role);
 		builder.append(", value=");
 		builder.append(this.value);
 		builder.append(", label=");

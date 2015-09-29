@@ -33,6 +33,10 @@ import org.junit.Test;
 
 public class CvTermDaoTest extends IntegrationTestBase {
 
+	private static final int METHOD_APPLIED = 4020;
+	private static final int METHOD_ASSIGNED = 4030;
+	private static final int METHOD_ENUMERATED = 4040;
+
 	private static CVTermDao dao;
 
 	@Before
@@ -194,6 +198,81 @@ public class CvTermDaoTest extends IntegrationTestBase {
 				Debug.println(4, id + " (size = " + properties.size() + ") : " + properties);
 			} else {
 				Debug.println(4, id + " (size = 0) : " + null);
+			}
+		}
+	}
+
+	@Test
+	public void testGetAllByCvId_CvIdAsInt() {
+		List<CVTerm> nonObsoleteMethods = dao.getAllByCvId(CvId.METHODS.getId(), true);
+		Assert.assertNotNull(nonObsoleteMethods);
+		for (CVTerm cvTerm : nonObsoleteMethods) {
+			Assert.assertTrue("All methods should have cv id " + CvId.METHODS.getId(), cvTerm.getCv().intValue() == CvId.METHODS.getId());
+			Assert.assertFalse("Method " + cvTerm.getCvTermId() + " should be non-obsolete", cvTerm.isObsolete());
+		}
+	}
+
+	@Test
+	public void testGetAllByCvId_FilterObsolete() {
+		List<CVTerm> nonObsoleteProperties = dao.getAllByCvId(CvId.PROPERTIES, true);
+		Assert.assertNotNull(nonObsoleteProperties);
+		for (CVTerm cvTerm : nonObsoleteProperties) {
+			Assert.assertTrue("All properties should have cv id " + CvId.PROPERTIES.getId(),
+					cvTerm.getCv().intValue() == CvId.PROPERTIES.getId());
+			Assert.assertFalse("Property " + cvTerm.getCvTermId() + " should be non-obsolete", cvTerm.isObsolete());
+		}
+	}
+
+	@Test
+	public void testGetAllByCvId_DontFilterObsolete() {
+		List<CVTerm> nonObsoleteProperties = dao.getAllByCvId(CvId.PROPERTIES, true);
+		List<CVTerm> allProperties = dao.getAllByCvId(CvId.PROPERTIES, false);
+		Assert.assertNotNull(allProperties);
+		int numberOfObsoleteProperties = 0;
+		for (CVTerm cvTerm : allProperties) {
+			Assert.assertTrue("All properties should have cv id " + CvId.PROPERTIES.getId(),
+					cvTerm.getCv().intValue() == CvId.PROPERTIES.getId());
+			if(cvTerm.isObsolete()) {
+				numberOfObsoleteProperties++;
+			}
+		}
+		int expectedNumberOfNonObsoleteProperties = nonObsoleteProperties.size();
+		int actualNumberOfNonObsoleteProperties = allProperties.size() - numberOfObsoleteProperties;
+		Assert.assertEquals("Non-obsolete properties should be " + expectedNumberOfNonObsoleteProperties,
+				expectedNumberOfNonObsoleteProperties, actualNumberOfNonObsoleteProperties);
+	}
+
+	@Test
+	public void testGetAllByCvId_ListOfCvTermIds_FilterObsolete() {
+		List<Integer> termIds = Arrays.asList(METHOD_APPLIED, METHOD_ASSIGNED, METHOD_ENUMERATED);
+		List<CVTerm> nonObsoleteMethods = dao.getAllByCvId(termIds, CvId.METHODS, true);
+		Assert.assertNotNull(nonObsoleteMethods);
+		Assert.assertEquals("Methods " + termIds.toString() + " should all be non-obsolete", 3, nonObsoleteMethods.size());
+		for (CVTerm cvTerm : nonObsoleteMethods) {
+			Assert.assertTrue("All methods should have cv id " + CvId.METHODS.getId(), cvTerm.getCv().intValue() == CvId.METHODS.getId());
+			Assert.assertFalse("Method " + cvTerm.getCvTermId() + " should be non-obsolete", cvTerm.isObsolete());
+		}
+	}
+
+	@Test
+	public void testGetAllByCvId_ListOfCvTermIds_DontFilterObsolete() {
+		boolean filterObsolete = false;
+		List<CVTerm> allProperties = dao.getAllByCvId(CvId.PROPERTIES, filterObsolete);
+		List<Integer> obsoletePropertyIds = new ArrayList<>();
+		for (CVTerm cvTerm : allProperties) {
+			if (cvTerm.isObsolete()) {
+				obsoletePropertyIds.add(cvTerm.getCvTermId());
+			}
+		}
+		if (!obsoletePropertyIds.isEmpty()) {
+			List<CVTerm> obsoleteProperties = dao.getAllByCvId(obsoletePropertyIds, CvId.PROPERTIES, filterObsolete);
+			Assert.assertNotNull(obsoleteProperties);
+			Assert.assertEquals("Obsolete properties should be " + obsoletePropertyIds.size(), obsoletePropertyIds.size(),
+					obsoleteProperties.size());
+			for (CVTerm cvTerm : obsoleteProperties) {
+				Assert.assertTrue("All properties should have cv id " + CvId.PROPERTIES.getId(),
+						cvTerm.getCv().intValue() == CvId.PROPERTIES.getId());
+				Assert.assertTrue("Property " + cvTerm.getCvTermId() + " should be obsolete", cvTerm.isObsolete());
 			}
 		}
 	}
