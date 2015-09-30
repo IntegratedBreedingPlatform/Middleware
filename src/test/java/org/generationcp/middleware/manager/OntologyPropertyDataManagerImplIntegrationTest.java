@@ -14,10 +14,10 @@ package org.generationcp.middleware.manager;
 import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
-import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.OntologyDataCreationUtil;
@@ -32,9 +32,6 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 
 	@Autowired
 	private OntologyPropertyDataManager propertyDataManager;
-	@Autowired
-	private TermDataManager termDataManager;
-
 	private Property testProperty;
 
 	private static final String CLASS_NAME = "newClass";
@@ -53,9 +50,39 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 
 	@Test
 	public void testGetPropertyById() throws Exception {
-		Property property = this.propertyDataManager.getProperty(this.testProperty.getId());
+		Property property = this.propertyDataManager.getProperty(this.testProperty.getId(), true);
 		Assert.assertNotNull(property);
 		property.print(2);
+		Assert.assertTrue("Property should have id " + this.testProperty.getId(), property.getId() == this.testProperty.getId());
+		Assert.assertTrue("Property " + property.getId() + " should have cv id " + CvId.PROPERTIES.getId(),
+				property.getVocabularyId() == CvId.PROPERTIES.getId());
+		Assert.assertFalse("Property " + property.getId() + " should not be obsolete", property.isObsolete());
+
+	}
+
+	@Test
+	public void testGetPropertyById_DontFilterObsolete() throws Exception {
+		CVTermDao cvtermDao = new CVTermDao();
+		cvtermDao.setSession(this.sessionProvder.getSession());
+
+		// set testProperty to obsolete
+		int id = this.testProperty.getId();
+		CVTerm testPropertyCvTerm = cvtermDao.getById(id);
+		testPropertyCvTerm.setIsObsolete(true);
+		cvtermDao.update(testPropertyCvTerm);
+
+		boolean filterObsolete = false;
+		Property property = this.propertyDataManager.getProperty(id, filterObsolete);
+		Assert.assertNotNull(property);
+		Assert.assertTrue("Property should have id " + id, property.getId() == id);
+		Assert.assertTrue("Property " + property.getId() + " should have cv id " + CvId.PROPERTIES.getId(),
+				property.getVocabularyId() == CvId.PROPERTIES.getId());
+		Assert.assertFalse("Property " + property.getId() + " should not be obsolete", property.isObsolete());
+
+		// revert changes
+		testPropertyCvTerm.setIsObsolete(false);
+		cvtermDao.update(testPropertyCvTerm);
+
 	}
 
 	@Test
@@ -73,6 +100,9 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 		List<Property> properties = this.propertyDataManager.getAllProperties();
 		for (Property p : properties) {
 			p.print(2);
+			Assert.assertTrue("Property " + p.getId() + " should have cv id " + CvId.PROPERTIES.getId(),
+					p.getVocabularyId() == CvId.PROPERTIES.getId());
+			Assert.assertFalse("Property " + p.getId() + " should not be obsolete", p.isObsolete());
 		}
 		Debug.println("Properties: " + properties.size());
 		Assert.assertTrue(properties.size() > 0);
@@ -85,7 +115,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 		this.testProperty.getClasses().clear();
 		this.testProperty.addClass(OntologyDataCreationUtil.getNewRandomName());
 		this.propertyDataManager.updateProperty(this.testProperty);
-		Property updatedProperty = this.propertyDataManager.getProperty(this.testProperty.getId());
+		Property updatedProperty = this.propertyDataManager.getProperty(this.testProperty.getId(), true);
 		Assert.assertEquals(updatedProperty.getDefinition(), "new definition");
 		Assert.assertEquals(updatedProperty.getCropOntologyId(), "CO_322:0000047");
 		Assert.assertEquals(updatedProperty.getClasses().size(), 1);

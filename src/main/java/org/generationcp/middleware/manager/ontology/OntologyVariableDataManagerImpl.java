@@ -13,8 +13,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import com.google.common.base.Function;
-import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -48,6 +46,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Function;
+import com.google.common.base.Strings;
 
 /**
  * Implements {@link OntologyVariableDataManagerImpl}
@@ -86,7 +87,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public List<Variable> getWithFilter(VariableFilter variableFilter) throws MiddlewareException {
+	public List<Variable> getWithFilter(VariableFilter variableFilter) {
 
 		Map<Integer, Variable> map = new HashMap<>();
 
@@ -235,19 +236,19 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			// this query will get variables using filter
 			SQLQuery query =
 					this.getActiveSession()
-							.createSQLQuery(
-									"select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, vo.alias g_alias, vo.expected_min g_min_value, vo.expected_max g_max_value, vpo.alias p_alias, vpo.expected_min p_min_value, vpo.expected_max p_max_value, pf.id fid from cvterm v "
-											+ "left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id "
-											+ "left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id "
-											+ "left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id "
-											+ "left join variable_overrides vo on vo.cvterm_id = v.cvterm_id and vo.program_uuid is null "
-											+ "left join variable_overrides vpo on vpo.cvterm_id = v.cvterm_id and vpo.program_uuid = :programUuid "
-											+ "left join program_favorites pf on pf.entity_id = v.cvterm_id and pf.program_uuid = :programUuid and pf.entity_type = 'VARIABLES' "
-											+ "WHERE (v.cv_id = 1040) " + filterClause).addScalar("vid").addScalar("vn").addScalar("vd")
-							.addScalar("pid").addScalar("pn").addScalar("pd").addScalar("mid").addScalar("mn").addScalar("md")
-							.addScalar("sid").addScalar("sn").addScalar("sd").addScalar("g_alias").addScalar("g_min_value")
-									.addScalar("g_max_value").addScalar("p_alias").addScalar("p_min_value").addScalar("p_max_value")
-							.addScalar("fid");
+					.createSQLQuery(
+							"select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, vo.alias g_alias, vo.expected_min g_min_value, vo.expected_max g_max_value, vpo.alias p_alias, vpo.expected_min p_min_value, vpo.expected_max p_max_value, pf.id fid from cvterm v "
+									+ "left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id "
+									+ "left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id "
+									+ "left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id "
+									+ "left join variable_overrides vo on vo.cvterm_id = v.cvterm_id and vo.program_uuid is null "
+									+ "left join variable_overrides vpo on vpo.cvterm_id = v.cvterm_id and vpo.program_uuid = :programUuid "
+									+ "left join program_favorites pf on pf.entity_id = v.cvterm_id and pf.program_uuid = :programUuid and pf.entity_type = 'VARIABLES' "
+									+ "WHERE (v.cv_id = 1040) " + filterClause).addScalar("vid").addScalar("vn").addScalar("vd")
+					.addScalar("pid").addScalar("pn").addScalar("pd").addScalar("mid").addScalar("mn").addScalar("md")
+					.addScalar("sid").addScalar("sn").addScalar("sd").addScalar("g_alias").addScalar("g_min_value")
+					.addScalar("g_max_value").addScalar("p_alias").addScalar("p_min_value").addScalar("p_max_value")
+					.addScalar("fid");
 
 			query.setParameter("programUuid", variableFilter.getProgramUuid());
 
@@ -318,10 +319,10 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			// Fetch Property Class, Data Type and Categories from cvterm_relationship
 			SQLQuery rQuery =
 					this.getActiveSession()
-							.createSQLQuery(
-									"select tr.subject_id sid, tr.type_id tid, tr.object_id rid, t.name rn, t.definition rd from cvterm_relationship tr inner join cvterm t on t.cvterm_id = tr.object_id "
-											+ "where tr.subject_id in (:propertyIds) or tr.subject_id in (:scaleIds)").addScalar("sid")
-									.addScalar("tid").addScalar("rid").addScalar("rn").addScalar("rd");
+					.createSQLQuery(
+							"select tr.subject_id sid, tr.type_id tid, tr.object_id rid, t.name rn, t.definition rd from cvterm_relationship tr inner join cvterm t on t.cvterm_id = tr.object_id "
+									+ "where tr.subject_id in (:propertyIds) or tr.subject_id in (:scaleIds)").addScalar("sid")
+					.addScalar("tid").addScalar("rid").addScalar("rn").addScalar("rd");
 
 			rQuery.setParameterList("propertyIds", pMap.keySet());
 			rQuery.setParameterList("scaleIds", sMap.keySet());
@@ -354,7 +355,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 							"select t.cvterm_id tid, t.cv_id cvid, tp.type_id typeid, tp.value value from cvtermprop tp "
 									+ "inner join cvterm t on t.cvterm_id = tp.cvterm_id "
 									+ "WHERE tp.cvterm_id in(:methodIds) or tp.cvterm_id in(:propertyIds) or tp.cvterm_id in(:scaleIds) or tp.cvterm_id in(:variableIds)")
-									.addScalar("tid").addScalar("cvid").addScalar("typeid").addScalar("value");
+					.addScalar("tid").addScalar("cvid").addScalar("typeid").addScalar("value");
 
 			// set parameter to query
 			pQuery.setParameterList("methodIds", mMap.keySet());
@@ -420,7 +421,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public Variable getVariable(String programUuid, Integer id) throws MiddlewareException {
+	public Variable getVariable(String programUuid, Integer id, boolean filterObsolete) {
 
 		try {
 
@@ -429,75 +430,70 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 			this.checkTermIsVariable(term);
 
-			try {
+			Variable variable = new Variable(Term.fromCVTerm(term));
 
-				Variable variable = new Variable(Term.fromCVTerm(term));
-
-				// load scale, method and property data
-				List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(term.getCvTermId());
-				for (CVTermRelationship r : relationships) {
-					if (Objects.equals(r.getTypeId(), TermId.HAS_METHOD.getId())) {
-						variable.setMethod(this.methodManager.getMethod(r.getObjectId()));
-					} else if (Objects.equals(r.getTypeId(), TermId.HAS_PROPERTY.getId())) {
-						variable.setProperty(this.propertyManager.getProperty(r.getObjectId()));
-					} else if (Objects.equals(r.getTypeId(), TermId.HAS_SCALE.getId())) {
-						variable.setScale(this.scaleManager.getScaleById(r.getObjectId()));
-					}
+			// load scale, method and property data
+			List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(term.getCvTermId());
+			for (CVTermRelationship r : relationships) {
+				if (Objects.equals(r.getTypeId(), TermId.HAS_METHOD.getId())) {
+					variable.setMethod(this.methodManager.getMethod(r.getObjectId(), filterObsolete));
+				} else if (Objects.equals(r.getTypeId(), TermId.HAS_PROPERTY.getId())) {
+					variable.setProperty(this.propertyManager.getProperty(r.getObjectId(), filterObsolete));
+				} else if (Objects.equals(r.getTypeId(), TermId.HAS_SCALE.getId())) {
+					variable.setScale(this.scaleManager.getScaleById(r.getObjectId(), filterObsolete));
 				}
-
-				// Variable Types, Created, modified from CVTermProperty
-				List properties = this.getCvTermPropertyDao().getByCvTermId(term.getCvTermId());
-
-				for (Object p : properties) {
-					CVTermProperty property = (CVTermProperty) p;
-
-					if (Objects.equals(property.getTypeId(), TermId.VARIABLE_TYPE.getId())) {
-						variable.addVariableType(VariableType.getByName(property.getValue()));
-					} else if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
-						variable.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
-					} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
-						variable.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
-					}
-				}
-
-				// Variable alias and expected range
-				VariableOverrides overrides = this.getVariableProgramOverridesDao().getByVariableAndProgram(id, programUuid);
-
-				if (overrides != null) {
-					variable.setAlias(overrides.getAlias());
-					variable.setMinValue(overrides.getExpectedMin());
-					variable.setMaxValue(overrides.getExpectedMax());
-				}
-
-				// Get favorite from ProgramFavoriteDAO
-				ProgramFavorite programFavorite =
-						this.getProgramFavoriteDao().getProgramFavorite(programUuid, ProgramFavorite.FavoriteType.VARIABLE,
-								term.getCvTermId());
-				variable.setIsFavorite(programFavorite != null);
-
-				// setting variable studies
-				variable.setStudies((int) this.getDmsProjectDao().countByVariable(id));
-
-				// setting variable observations, first observations will be null so set it to 0
-				variable.setObservations(0);
-				for (VariableType v : variable.getVariableTypes()) {
-					long observation = this.getExperimentDao().countByObservedVariable(id, v.getId());
-					variable.setObservations((int) (variable.getObservations() + observation));
-				}
-
-				return variable;
-
-			} catch (HibernateException e) {
-				throw new MiddlewareQueryException("Error in getVariable", e);
 			}
 
+			// Variable Types, Created, modified from CVTermProperty
+			List properties = this.getCvTermPropertyDao().getByCvTermId(term.getCvTermId());
+
+			for (Object p : properties) {
+				CVTermProperty property = (CVTermProperty) p;
+
+				if (Objects.equals(property.getTypeId(), TermId.VARIABLE_TYPE.getId())) {
+					variable.addVariableType(VariableType.getByName(property.getValue()));
+				} else if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
+					variable.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+				} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
+					variable.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
+				}
+			}
+
+			// Variable alias and expected range
+			VariableOverrides overrides = this.getVariableProgramOverridesDao().getByVariableAndProgram(id, programUuid);
+
+			if (overrides != null) {
+				variable.setAlias(overrides.getAlias());
+				variable.setMinValue(overrides.getExpectedMin());
+				variable.setMaxValue(overrides.getExpectedMax());
+			}
+
+			// Get favorite from ProgramFavoriteDAO
+			ProgramFavorite programFavorite =
+					this.getProgramFavoriteDao().getProgramFavorite(programUuid, ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
+			variable.setIsFavorite(programFavorite != null);
+
+			// setting variable studies
+			variable.setStudies((int) this.getDmsProjectDao().countByVariable(id));
+
+			// setting variable observations, first observations will be null so set it to 0
+			variable.setObservations(0);
+			for (VariableType v : variable.getVariableTypes()) {
+				long observation = this.getExperimentDao().countByObservedVariable(id, v.getId());
+				variable.setObservations((int) (variable.getObservations() + observation));
+			}
+
+			return variable;
+
+
+
 		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error in getting standard variable summaries from standard_variable_summary view", e);
+			throw new MiddlewareQueryException("Error in getVariable", e);
 		}
 	}
 
 	@Override
-	public void processTreatmentFactorHasPairValue(List<Variable> summaryList, List<Integer> hiddenFields) throws MiddlewareException {
+	public void processTreatmentFactorHasPairValue(List<Variable> summaryList, List<Integer> hiddenFields) {
 		for (Variable variable : summaryList) {
 			variable.setHasPair(this.getCvTermDao().hasPossibleTreatmentPairs(variable.getId(), variable.getProperty().getId(),
 					hiddenFields));
@@ -505,7 +501,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public void addVariable(OntologyVariableInfo variableInfo) throws MiddlewareException {
+	public void addVariable(OntologyVariableInfo variableInfo) {
 
 		CVTerm term = this.getCvTermDao().getByNameAndCvId(variableInfo.getName(), CvId.VARIABLES.getId());
 
@@ -570,7 +566,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public void updateVariable(OntologyVariableInfo variableInfo) throws MiddlewareException {
+	public void updateVariable(OntologyVariableInfo variableInfo) {
 
 		VariableInfoDaoElements elements = new VariableInfoDaoElements();
 		elements.setVariableId(variableInfo.getId());
@@ -695,7 +691,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public void deleteVariable(Integer id) throws MiddlewareException {
+	public void deleteVariable(Integer id) {
 
 		CVTerm term = this.getCvTermDao().getById(id);
 
@@ -738,29 +734,27 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		}
 	}
 
-	// TODO: Follow DmsProjectDao query COUNT_PROJECTS_WITH_VARIABLE.
 	@Override
-	public Integer getVariableObservations(int variableId) throws MiddlewareException {
+	public Integer getVariableObservations(int variableId) {
 
-		// Note: Taken from {@link DmsProjectDao.countByVariable()}
-		final String COUNT_PROJECTS_WITH_VARIABLE =
+		final String numOfProjectsWithVariable =
 				"SELECT count(pp.project_id) " + " FROM projectprop pp " + " WHERE NOT EXISTS( " + " SELECT 1 FROM projectprop stat "
 						+ " WHERE stat.project_id = pp.project_id " + " AND stat.type_id = " + TermId.STUDY_STATUS.getId()
 						+ " AND value = " + TermId.DELETED_STUDY.getId() + ") " + " AND pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
 						+ " AND pp.value = :variableId";
 
-		SQLQuery query = this.getActiveSession().createSQLQuery(COUNT_PROJECTS_WITH_VARIABLE);
+		SQLQuery query = this.getActiveSession().createSQLQuery(numOfProjectsWithVariable);
 		query.setParameter("variableId", variableId);
 		return ((BigInteger) query.uniqueResult()).intValue();
 	}
 
 	// TODO: Follow DmsProjectDao countExperimentByVariable. This requires STORED_IN and that needs to deprecated.
 	@Override
-	public Integer getVariableStudies(int variableId) throws MiddlewareException {
+	public Integer getVariableStudies(int variableId) {
 		return 0;
 	}
 
-	private void checkTermIsVariable(CVTerm term) throws MiddlewareException {
+	private void checkTermIsVariable(CVTerm term) {
 
 		if (term == null) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_DOES_NOT_EXIST);
@@ -771,7 +765,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		}
 	}
 
-	private void fillDaoElementsAndCheckForUsage(VariableInfoDaoElements elements) throws MiddlewareException {
+	private void fillDaoElementsAndCheckForUsage(VariableInfoDaoElements elements) {
 
 		// check required elements
 		Util.checkAndThrowForNullObjects(elements.getVariableId());

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * 
+ *
  * Copyright (c) 2012, All Rights Reserved.
  *
  * Generation Challenge Programme (GCP)
@@ -15,7 +15,6 @@ package org.generationcp.middleware.manager.ontology.api;
 import java.util.List;
 
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 
@@ -29,55 +28,54 @@ public interface OntologyVariableDataManager {
 	 *
 	 * @param variableFilter have filter data that needs to be applied
 	 * @return List<Variable>
-	 * @throws MiddlewareException
 	 */
-	List<Variable> getWithFilter(VariableFilter variableFilter) throws MiddlewareException;
+	List<Variable> getWithFilter(VariableFilter variableFilter);
 
 	/**
-	 * Return variable by Id * @return Variable
-	 * 
-	 * @throws MiddlewareException*
+	 * Return variable by Id with details based on programUuid. Don't filter obsolete terms if filterObsolete is false.
+	 *
+	 * @param programUuid as the unique id of the program
+	 * @param id as the variable Id
+	 * @param filterObsolete as flag if obsolete terms will be filtered
+	 * @return Variable
 	 */
-	Variable getVariable(String programUuid, Integer id) throws MiddlewareException;
+	Variable getVariable(String programUuid, Integer id, boolean filterObsolete);
 
 	/**
-	 * @throws MiddlewareException*
+	 * @param OntologyVariableInfo
 	 */
-	void addVariable(OntologyVariableInfo variableInfo) throws MiddlewareException;
+	void addVariable(OntologyVariableInfo variableInfo);
 
 	/**
 	 *
 	 * @param summaryList
 	 * @param hiddenFields
-	 * @throws MiddlewareException
 	 */
-	void processTreatmentFactorHasPairValue(List<Variable> summaryList, List<Integer> hiddenFields) throws MiddlewareException;
+	void processTreatmentFactorHasPairValue(List<Variable> summaryList, List<Integer> hiddenFields);
 
 	/**
-	 * @throws MiddlewareException*
+	 * @param OntologyVariableInfo
 	 */
-	void updateVariable(OntologyVariableInfo variableInfo) throws MiddlewareException;
+	void updateVariable(OntologyVariableInfo variableInfo);
 
 	/**
-	 * @throws MiddlewareException*
+	 * @param id
 	 */
-	void deleteVariable(Integer id) throws MiddlewareException;
+	void deleteVariable(Integer id);
 
 	/**
 	 * This function defines total observations carried from this variable.
-	 * 
+	 *
 	 * @param variableId variable id to get observations
 	 * @return Total observations
-	 * @throws MiddlewareException
 	 */
-	Integer getVariableObservations(int variableId) throws MiddlewareException;
+	Integer getVariableObservations(int variableId);
 
 	/**
 	 * This function defines total studies taken from this variable.
-	 * 
+	 *
 	 * @param variableId variable id to get observations
 	 * @return Total studies
-	 * @throws MiddlewareException
 	 */
-	Integer getVariableStudies(int variableId) throws MiddlewareException;
+	Integer getVariableStudies(int variableId);
 }
