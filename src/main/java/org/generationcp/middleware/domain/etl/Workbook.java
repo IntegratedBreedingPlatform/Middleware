@@ -245,6 +245,12 @@ public class Workbook {
 		return varList;
 	}
 
+	/**
+	 * This method handles the retrieval of the measurement dataset variables which includes the following: TRIAL_INSTANCE, FACTORS,
+	 * VARIATES. The order of insertion matters that's why we used LinkedHashSet on this method to preserve the order of insertion.
+	 * 
+	 * @return measurement dataset variable list
+	 */
 	public List<MeasurementVariable> getMeasurementDatasetVariablesView() {
 		Set<MeasurementVariable> list = new LinkedHashSet<MeasurementVariable>();
 		if (!this.isNursery()) {
