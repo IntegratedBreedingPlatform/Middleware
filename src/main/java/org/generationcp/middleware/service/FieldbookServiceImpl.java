@@ -373,10 +373,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				final GermplasmListData germplasmListData = listDataItems.get(counter).getRight();
 
 				Germplasm germplasmFound = null;
-
 				// Check if germplasm exists
 				if (germplasm.getGid() != null) {
-
 					// Check if the given gid exists
 					germplasmFound = this.getGermplasmDataManager().getGermplasmByGID(germplasm.getGid());
 

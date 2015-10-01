@@ -39,16 +39,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FieldbookServiceImplTest {
-
-	@Mock
-	Germplasm germplasm;
-
-	@Mock
-	Name name;
-
-	@Mock
-	GermplasmListData listData;
-
 	@Mock
 	Session session;
 
@@ -67,9 +57,6 @@ public class FieldbookServiceImplTest {
 	@Mock
 	GermplasmDataManager germplasmDataManager;
 
-	@Mock
-	GermplasmList germplasmList;
-
 	private List<Pair<Germplasm, List<Name>>> germplasms;
 
 	private List<Pair<Germplasm, GermplasmListData>> listDataItems;
@@ -79,7 +66,6 @@ public class FieldbookServiceImplTest {
 
 	@Before
 	public void setUp() {
-		Mockito.doReturn(this.name).when(this.germplasm).getPreferredName();
 		Mockito.doReturn(this.session).when(this.sessionProvider).getSession();
 		Mockito.doReturn(this.query).when(this.session).createSQLQuery(Matchers.anyString());
 		this.dbBroker.setSessionProvider(this.sessionProvider);
@@ -89,27 +75,48 @@ public class FieldbookServiceImplTest {
 
 	@Test
 	public void testSaveNurseryAdvanceGermplasmListSuccess() {
+		GermplasmList germplasmList = createGermplasmlist();
 		final Integer out =
-				this.fieldbookServiceImpl.saveNurseryAdvanceGermplasmList(this.germplasms, this.listDataItems, this.germplasmList);
-		Assert.assertEquals("List Id should be 0", (Integer) 0, out);
+				this.fieldbookServiceImpl.saveNurseryAdvanceGermplasmList(this.germplasms, this.listDataItems, germplasmList);
+		Assert.assertEquals("List Id should be 1", (Integer) 1, out);
 	}
-
+	
 	@Test
 	public void testSaveGermplasmListSuccess() {
-		final Integer out = this.fieldbookServiceImpl.saveGermplasmList(this.listDataItems, this.germplasmList);
-		Assert.assertEquals("List Id should be 0", (Integer) 0, out);
+		GermplasmList germplasmList = createGermplasmlist();
+		final Integer out = this.fieldbookServiceImpl.saveGermplasmList(this.listDataItems, germplasmList);
+		Assert.assertEquals("List Id should be 1", (Integer) 1, out);
 	}
 
 	private List<Pair<Germplasm, List<Name>>> createGermplasms() {
 		final List<Pair<Germplasm, List<Name>>> germplasms = new ArrayList<>();
-		final List<Name> names = Arrays.asList(this.name);
-		germplasms.add(new ImmutablePair<Germplasm, List<Name>>(this.germplasm, names));
+		final Name name = new Name();
+		final Germplasm germplasm = createGermplasm();
+		final List<Name> names = Arrays.asList(name);
+		germplasms.add(new ImmutablePair<Germplasm, List<Name>>(germplasm, names));
 		return germplasms;
+	}
+
+	private Germplasm createGermplasm() {
+		Germplasm germplasm = new Germplasm();
+		germplasm.setGid(1);
+		Name preferredName = new Name();
+		preferredName.setNval("1005");
+		germplasm.setPreferredName(preferredName);
+		return germplasm;
 	}
 
 	private List<Pair<Germplasm, GermplasmListData>> createListDataItems() {
 		final List<Pair<Germplasm, GermplasmListData>> listDataItems = new ArrayList<>();
-		listDataItems.add(new ImmutablePair<Germplasm, GermplasmListData>(this.germplasm, this.listData));
+		final Germplasm germplasm = createGermplasm();
+		GermplasmListData listData = new GermplasmListData();
+		listDataItems.add(new ImmutablePair<Germplasm, GermplasmListData>(germplasm, listData));
 		return listDataItems;
+	}
+	
+	private GermplasmList createGermplasmlist() {
+		GermplasmList germplasmList = new GermplasmList();
+		germplasmList.setId(1);
+		return germplasmList;
 	}
 }
