@@ -304,6 +304,21 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		studyTestDataUtil.deleteTestData(folderWithUUID.getProjectId());
 		studyTestDataUtil.deleteTestData(folderWithoutUUID.getProjectId());
 	}
+	
+	@Test
+	public void testGetAllFolders() {
+
+		final StudyTestDataUtil studyTestDataUtil = new StudyTestDataUtil(this.manager, this.ontologyManager);
+
+		studyTestDataUtil.createFolderTestData(this.commonTestProject.getUniqueID());
+		studyTestDataUtil.createFolderTestData(null);
+
+		final List<FolderReference> allFolders = this.manager.getAllFolders();
+		// We only assert that there are minimum two folders that we added in test.
+		// The test database might already have some pre-init and developer created folders too which we dont want the test to depend on
+		// because we do not reset the test database for each test run yet.
+		Assert.assertTrue(allFolders.size() > 2);
+	}
 
 	@Test
 	public void testGetDatasetNodesByStudyId() throws Exception {
