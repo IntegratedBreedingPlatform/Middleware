@@ -12,7 +12,6 @@
 package org.generationcp.middleware.pojos.germplasm;
 
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Name;
 
 public class SingleGermplasmCrossElement implements GermplasmCrossElement {
 
@@ -31,11 +30,11 @@ public class SingleGermplasmCrossElement implements GermplasmCrossElement {
 	@Override
 	public String toString() {
 		if (this.germplasm != null) {
-			Name nameObject = this.germplasm.getPreferredName();
-			if (nameObject == null) {
-				return this.germplasm.getGid().toString();
-			} else {
-				return nameObject.getNval();
+			String crossName = this.germplasm.getCrossName();
+			if(crossName != null){
+				return crossName;
+			}else {
+				return "Unknown";
 			}
 		} else {
 			return "Unknown";
