@@ -66,7 +66,6 @@ import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.generationcp.middleware.util.DatabaseBroker;
 import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -784,6 +783,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<FolderReference> getFolderTree() throws MiddlewareQueryException {
 		return this.getFolderBuilder().buildFolderTree();
+	}
+	
+	@Override
+	public List<FolderReference> getAllFolders() {
+		return this.getDmsProjectDao().getAllFolders();
 	}
 
 	@Override

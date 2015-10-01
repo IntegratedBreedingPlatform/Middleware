@@ -617,6 +617,12 @@ public interface StudyDataManager {
 	 */
 	List<FolderReference> getFolderTree() throws MiddlewareQueryException;
 
+	
+	/**
+	 * Retrieves a flat list (no tree structuring) of all folders.
+	 */
+	List<FolderReference> getAllFolders();
+	
 	/**
 	 * Count plots with plants selectedof dataset.
 	 * 
