@@ -34,6 +34,8 @@ import javax.persistence.Transient;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.interfaces.GermplasmExportSource;
 import org.generationcp.middleware.util.Debug;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -46,6 +48,7 @@ import org.hibernate.annotations.NotFoundAction;
 @NamedQueries({@NamedQuery(name = "deleteGermplasmListDataByListId", query = "UPDATE GermplasmListData SET status = 9 WHERE list = :listId")})
 @Entity
 @Table(name = "listdata")
+@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="listdata")
 public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	private static final long serialVersionUID = 1L;
