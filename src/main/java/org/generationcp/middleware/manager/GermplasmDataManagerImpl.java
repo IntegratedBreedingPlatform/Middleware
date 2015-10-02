@@ -12,8 +12,6 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -395,6 +393,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		}
 
 		return results;
+	}
+
+	@Override
+	public List<Method> getNonGenerativeMethodsByID(List<Integer> ids) {
+		return this.getMethodDao().getMethodsNotGenerativeById(ids);
 	}
 
 	@Override

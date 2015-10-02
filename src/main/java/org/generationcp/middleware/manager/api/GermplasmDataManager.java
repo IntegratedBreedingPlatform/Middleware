@@ -942,6 +942,8 @@ public interface GermplasmDataManager {
 	 */
 	List<Method> getMethodsByIDs(List<Integer> ids) throws MiddlewareQueryException;
 
+	List<Method> getNonGenerativeMethodsByID(List<Integer> ids);
+
 	/**
 	 * Get gDates given GIDs.
 	 *
