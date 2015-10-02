@@ -158,16 +158,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Location> getFavoriteLocationByProjectId(List<Long> locationIds) {
-		List<Location> locationList = new ArrayList<Location>();
-
-		for (int i = 0; i < locationIds.size(); i++) {
-			Integer locationId = Integer.valueOf(locationIds.get(i).toString());
-			Location location = this.getLocationDataManager().getLocationByID(locationId);
-
-			locationList.add(location);
-		}
-		return locationList;
+	public List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds) {
+		return this.getLocationDataManager().getLocationsByIDs(locationIds);
 	}
 
 	@Override
@@ -326,6 +318,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return methodList;
 	}
 
+	// TODO : optimize / remove loop
 	@Override
 	public List<Method> getFavoriteBreedingMethods(List<Integer> methodIds, boolean filterOutGenerative) {
 		List<Method> methodList = new ArrayList<Method>();
@@ -352,6 +345,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return methodList;
 	}
 
+	// TODO : optimize / remove loop
 	@Override
 	public Integer saveNurseryAdvanceGermplasmList(Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listDataItems,
 			GermplasmList germplasmList) {
@@ -991,16 +985,17 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Long> getFavoriteProjectLocationIds(String programUUID) {
+	public List<Integer> getFavoriteProjectLocationIds(String programUUID) {
 		List<ProgramFavorite> favList =
 				this.getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
-		List<Long> longVals = new ArrayList<Long>();
+		List<Integer> favoriteList = new ArrayList<>();
 		if (favList != null && !favList.isEmpty()) {
 			for (ProgramFavorite fav : favList) {
-				longVals.add(Long.valueOf(Integer.toString(fav.getEntityId())));
+				favoriteList.add(fav.getEntityId());
+
 			}
 		}
-		return longVals;
+		return favoriteList;
 	}
 
 	@Override
