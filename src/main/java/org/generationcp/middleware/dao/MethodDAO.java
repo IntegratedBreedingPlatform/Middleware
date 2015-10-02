@@ -37,7 +37,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 	@SuppressWarnings("unchecked")
 	public List<Method> getMethodsByIds(List<Integer> ids) throws MiddlewareQueryException {
 		try {
-			return this.getSession().createCriteria(Method.class).add(Restrictions.in("mid", ids)).list();
+			return this.getSession().createCriteria(Method.class).add(Restrictions.in("mid", ids)).addOrder(Order.asc("mname")).list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(this.getLogExceptionMessage("getMethodsByIds", "", null, e.getMessage(), "Method"), e);
 		}
