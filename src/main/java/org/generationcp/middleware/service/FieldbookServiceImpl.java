@@ -318,30 +318,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return methodList;
 	}
 
-	// TODO : optimize / remove loop
 	@Override
 	public List<Method> getFavoriteBreedingMethods(List<Integer> methodIds, boolean filterOutGenerative) {
-		List<Method> methodList = new ArrayList<Method>();
-		List<Integer> validMethodClasses = new ArrayList<Integer>();
-		validMethodClasses.addAll(Method.BULKED_CLASSES);
-		validMethodClasses.addAll(Method.NON_BULKED_CLASSES);
-		for (int i = 0; i < methodIds.size(); i++) {
-			Integer methodId = methodIds.get(i);
-			Method method = this.getGermplasmDataManager().getMethodByID(methodId);
-			// filter out generative method types
-
-			if (method == null) {
-				continue;
-			}
-			if (!filterOutGenerative) {
-				methodList.add(method);
-			} else if ((method.getMtype() == null || !"GEN".equals(method.getMtype())) && method.getGeneq() != null
-					&& validMethodClasses.contains(method.getGeneq())) {
-				methodList.add(method);
-			}
+		List<Method> methodList;
+		if (filterOutGenerative) {
+			methodList = getGermplasmDataManager().getNonGenerativeMethodsByID(methodIds);
+		} else {
+			methodList = getGermplasmDataManager().getMethodsByIDs(methodIds);
 		}
 
-		FieldbookListUtil.sortMethodNamesInAscendingOrder(methodList);
 		return methodList;
 	}
 
