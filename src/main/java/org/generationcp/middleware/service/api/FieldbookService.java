@@ -155,7 +155,7 @@ public interface FieldbookService {
 	 * @param locationIds the location ids
 	 * @return the favorite locations based on the given project id
 	 */
-	List<Location> getFavoriteLocationByProjectId(List<Long> locationIds);
+	List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
 
 	/**
 	 * Gets the study.
@@ -735,7 +735,7 @@ public interface FieldbookService {
 	 * @param programUUID - unique id of program
 	 * @return the favorite project location ids
 	 */
-	List<Long> getFavoriteProjectLocationIds(String programUUID);
+	List<Integer> getFavoriteProjectLocationIds(String programUUID);
 
 	/**
 	 * Gets the favorite project methods.
@@ -810,8 +810,7 @@ public interface FieldbookService {
 	 **/
 	StandardVariable getStandardVariableByName(String name, String programUUID);
 
-	List<StandardVariableReference> filterStandardVariablesByIsAIds(List<StandardVariableReference> standardReferences,
-			List<Integer> isAIds);
+	List<StandardVariableReference> filterStandardVariablesByIsAIds(List<StandardVariableReference> standardReferences, List<Integer> isAIds);
 
 	Location getLocationByName(String locationName, Operation op);
 }
