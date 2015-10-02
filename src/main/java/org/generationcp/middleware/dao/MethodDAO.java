@@ -265,6 +265,25 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		return new ArrayList<Method>();
 	}
 
+	public List<Method> getMethodsNotGenerativeById(List<Integer> ids) throws MiddlewareQueryException {
+		try {
+			List<Integer> validMethodClasses = new ArrayList<>();
+			validMethodClasses.addAll(Method.BULKED_CLASSES);
+			validMethodClasses.addAll(Method.NON_BULKED_CLASSES);
+
+			Criteria criteria = this.getSession().createCriteria(Method.class);
+			criteria.add(Restrictions.ne("mtype", "GEN"));
+			criteria.add(Restrictions.in("geneq", validMethodClasses));
+			criteria.add(Restrictions.in("mid", ids));
+			criteria.addOrder(Order.asc("mname"));
+
+			return criteria.list();
+		} catch (HibernateException e) {
+			this.logAndThrowException(this.getLogExceptionMessage("getMethodsNotGenerativeById", "", null, e.getMessage(), "Method"), e);
+		}
+		return new ArrayList<>();
+	}
+
 	public long countByGroup(String group) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = this.getSession().createCriteria(Method.class);
