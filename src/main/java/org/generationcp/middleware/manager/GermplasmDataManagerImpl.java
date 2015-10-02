@@ -585,23 +585,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	@Deprecated
 	public List<Location> getLocationsByIDs(final List<Integer> ids) throws MiddlewareQueryException {
-		final List<Location> results = new ArrayList<Location>();
-
-		if (ids != null && !ids.isEmpty()) {
-			results.addAll(this.getLocationDao().getLocationByIds(ids));
-		}
-
-		Collections.sort(results, new Comparator<Object>() {
-
-			@Override
-			public int compare(final Object obj1, final Object obj2) {
-				final Location loc1 = (Location) obj1;
-				final Location loc2 = (Location) obj2;
-				return loc1.getLname().compareToIgnoreCase(loc2.getLname());
-			}
-		});
-
-		return results;
+		return this.getLocationDao().getLocationByIds(ids);
 	}
 
 	@Override
