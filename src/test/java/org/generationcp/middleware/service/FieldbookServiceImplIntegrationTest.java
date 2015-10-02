@@ -753,11 +753,11 @@ public class FieldbookServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetFavoriteLocationByProjectId() throws MiddlewareQueryException {
-		List<Long> locationIds = new ArrayList<Long>();
-		locationIds.add(1L);
-		locationIds.add(2L);
+		List<Integer> locationIds = new ArrayList<>();
+		locationIds.add(1);
+		locationIds.add(2);
 
-		List<Location> locations = this.fieldbookService.getFavoriteLocationByProjectId(locationIds);
+		List<Location> locations = this.fieldbookService.getFavoriteLocationByLocationIDs(locationIds);
 
 		Assert.assertEquals("Expecting to return the same number of Location objects from the input of List of Ids", locationIds.size(),
 				locations.size());
