@@ -61,6 +61,7 @@ import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingABHRow;
 import org.generationcp.middleware.pojos.gdms.MappingAllelicSNPRow;
 import org.generationcp.middleware.pojos.gdms.MappingAllelicSSRDArTRow;
+import org.generationcp.middleware.pojos.gdms.MappingData;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
@@ -242,6 +243,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public String getMapNameById(Integer mapID) throws MiddlewareQueryException {
 		return this.getMapDao().getMapNameById(mapID);
+	}
+	
+	@Override
+	public List<Dataset> getAllDatasets() {
+		return this.getDatasetDao().getAll();
 	}
 
 	@Override
@@ -2867,5 +2873,10 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public List<CharValues> getCharValuesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
 		return this.getCharValuesDao().getCharValuesByMarkerIds(markerIds);
+	}
+
+	@Override
+	public List<MappingData> getAllMappingData() {
+		return this.getMappingDataDao().getAll();
 	}
 }
