@@ -82,7 +82,7 @@ public interface StudyDataManager {
 	 * @return List of Folder POJOs or empty list if none found
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<FolderReference> getRootFolders(String programUUID) throws MiddlewareQueryException;
+	List<Reference> getRootFolders(String programUUID);
 
 	/**
 	 * Returns list of children of a folder given its ID. Retrieves from central if the given ID is positive, otherwise retrieves from

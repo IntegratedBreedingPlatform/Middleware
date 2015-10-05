@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -439,20 +438,19 @@ public interface FieldbookService {
 	TermId getStudyType(int studyId);
 
 	/**
-	 * Returns list of root or top-level folders from specified database.
+	 * Returns list of root or top-level folders and studies.
 	 *
 	 * @param programUUID program's unique id
 	 * @return List of Folder POJOs or empty list if none found
 	 */
-	List<FolderReference> getRootFolders(String programUUID);
+	List<Reference> getRootFolders(String programUUID);
 
 	/**
-	 * Returns list of children of a folder given its ID. Retrieves from central if the given ID is positive, otherwise retrieves from
-	 * local.
+	 * Returns list of children of a folder given its ID. 
 	 *
 	 * @param folderId The id of the folder to match
 	 * @param programUUID unique id of the program
-	 * @return List of AbstractNode (FolderNode, StudyNode) POJOs or empty list if none found
+	 * @return List of containing study (StudyReference) and folder (FolderReference) references or empty list if none found
 	 */
 	List<Reference> getChildrenOfFolder(int folderId, String programUUID);
 

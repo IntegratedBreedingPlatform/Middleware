@@ -72,7 +72,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	private static final Integer STUDY_ID = 10010;
 	private static final Integer DATASET_ID = 10045;
-	private static final Integer ROOT_STUDY_FOLDER = 1;
 
 	@Autowired
 	private StudyDataManager manager;
@@ -257,7 +256,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetRootFolders() throws Exception {
-		List<FolderReference> rootFolders = this.manager.getRootFolders(this.commonTestProject.getUniqueID());
+		List<Reference> rootFolders = this.manager.getRootFolders(this.commonTestProject.getUniqueID());
 		Assert.assertNotNull(rootFolders);
 		// this should contain the nursery and trial templates
 		Assert.assertFalse(rootFolders.isEmpty());
@@ -272,9 +271,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse(rootFolders.isEmpty());
 
 		Debug.println(IntegrationTestBase.INDENT, "testGetRootFolders(): " + rootFolders.size());
-		for (FolderReference node : rootFolders) {
+		for (Reference node : rootFolders) {
 			Debug.println(IntegrationTestBase.INDENT, "   " + node);
-			Assert.assertEquals(node.getParentFolderId(), StudyDataManagerImplTest.ROOT_STUDY_FOLDER);
+			if (node.isFolder()) {
+				Assert.assertEquals(((FolderReference) node).getParentFolderId(), DmsProject.SYSTEM_FOLDER_ID);
+			}
 		}
 	}
 
@@ -925,6 +926,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		VariableTypeList variableTypeList = new VariableTypeList();
 
 		DMSVariableType grainYieldSem = this.createVariableType(18140, "GRAIN_YIELD_SUMMARY_STAT", "test", 100);
+		grainYieldSem.setRole(PhenotypicType.VARIATE);
 		variableTypeList.add(grainYieldSem);
 
 		return variableTypeList;
@@ -939,6 +941,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Variable var = new Variable();
 		var.setValue(value);
 		var.setVariableType(vtype);
+		vtype.setRole(PhenotypicType.VARIATE);
 		return var;
 	}
 
@@ -950,6 +953,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		vtype.setLocalDescription(description);
 		vtype.setRank(rank);
 		vtype.setStandardVariable(stdVar);
+		vtype.setRole(PhenotypicType.VARIATE);
 
 		return vtype;
 	}
@@ -1418,11 +1422,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			studyTestDataUtil.createStudyTestData(uniqueId);
 			studyTestDataUtil.createStudyTestDataWithActiveStatus(uniqueId);
 
-			List<FolderReference> programStudiesAndFolders = studyTestDataUtil.getLocalRootFolders(this.commonTestProject.getUniqueID());
+			List<? extends  Reference> programStudiesAndFolders = studyTestDataUtil.getRootFolders(this.commonTestProject.getUniqueID());
 			Assert.assertEquals("Current Program with programUUID " + this.commonTestProject.getUniqueID() + " should return 3 children",
 					3, programStudiesAndFolders.size());
 			this.manager.deleteProgramStudies(this.commonTestProject.getUniqueID());
-			programStudiesAndFolders = studyTestDataUtil.getLocalRootFolders(this.commonTestProject.getUniqueID());
+			programStudiesAndFolders = studyTestDataUtil.getRootFolders(this.commonTestProject.getUniqueID());
 			Assert.assertEquals("Current Program with programUUID " + this.commonTestProject.getUniqueID() + " should return no children",
 					0, programStudiesAndFolders.size());
 		} catch (MiddlewareException e) {

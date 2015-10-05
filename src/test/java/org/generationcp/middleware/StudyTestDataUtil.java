@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.generationcp.middleware.domain.dms.DMSVariableType;
-import org.generationcp.middleware.domain.dms.FolderReference;
+import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudyValues;
@@ -131,7 +131,7 @@ public class StudyTestDataUtil {
 		this.studyDataManager.deleteEmptyFolder(projectId, null);
 	}
 
-	public List<FolderReference> getLocalRootFolders(String uniqueId) throws MiddlewareQueryException {
+	public List<Reference> getRootFolders(String uniqueId) throws MiddlewareQueryException {
 		return this.studyDataManager.getRootFolders(uniqueId);
 	}
 

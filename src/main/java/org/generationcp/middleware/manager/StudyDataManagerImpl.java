@@ -125,7 +125,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<FolderReference> getRootFolders(String programUUID) throws MiddlewareQueryException {
+	public List<Reference> getRootFolders(String programUUID) {
 		return this.getDmsProjectDao().getRootFolders(programUUID);
 	}
 

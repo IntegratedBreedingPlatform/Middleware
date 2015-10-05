@@ -55,15 +55,23 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private static final String PROGRAM_UUID = "program_uuid";
 
-	private static final String GET_CHILDREN_OF_FOLDER = "SELECT DISTINCT subject.project_id, subject.name,  subject.description "
-			+ "		, (CASE WHEN (type_id = " + TermId.IS_STUDY.getId() + ") THEN 1 ELSE 0 END) AS is_study, subject."
-			+ DmsProjectDao.PROGRAM_UUID + " " + "FROM project subject "
-			+ "		INNER JOIN project_relationship pr on subject.project_id = pr.subject_project_id  " + "WHERE (pr.type_id = "
-			+ TermId.HAS_PARENT_FOLDER.getId() + " or pr.type_id = " + TermId.IS_STUDY.getId() + ") "
-			+ "		AND pr.object_project_id = :folderId " + "		AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-			+ TermId.STUDY_STATUS.getId() + "     	AND pp.project_id = subject.project_id AND pp.value = " + "         "
-			+ TermId.DELETED_STUDY.getId() + ") " + " AND (subject.program_uuid = :program_uuid OR subject.program_uuid IS NULL)"
-			+ " ORDER BY name ";
+	/**
+	 * Type of study and whether study is deleted are stored in projectprops table.
+	 * Which folder the study is in, is defined in the project_relationship table.
+	 */
+	private static final String GET_CHILDREN_OF_FOLDER =
+			"SELECT subject.project_id, subject.name,  subject.description, "
+					+ "	(CASE WHEN (pr.type_id = " + TermId.IS_STUDY.getId() + ") THEN 1 ELSE 0 END) AS is_study, "
+					+ "    subject.program_uuid, "
+					+ "    prop.value "
+					+ " FROM project subject "
+					+ "	INNER JOIN project_relationship pr on subject.project_id = pr.subject_project_id "
+					+ "	LEFT OUTER JOIN projectprop prop ON prop.project_id = subject.project_id AND prop.type_id = " + TermId.STUDY_TYPE.getId()
+					+ "    WHERE (pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() + " or pr.type_id = " + TermId.IS_STUDY.getId() + ")"
+					+ "		AND pr.object_project_id = :folderId "
+					+ "     AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = " + TermId.STUDY_STATUS.getId() + " AND pp.project_id = subject.project_id AND pp.value = " + TermId.DELETED_STUDY.getId() + ") "
+					+ "     AND (subject.program_uuid = :program_uuid OR subject.program_uuid IS NULL) "
+					+ "	ORDER BY name";
 
 	private static final String GET_STUDIES_OF_FOLDER = "SELECT  DISTINCT pr.subject_project_id "
 			+ "FROM    project_relationship pr, project p " + "WHERE   pr.type_id = " + TermId.IS_STUDY.getId() + " "
@@ -71,13 +79,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "		AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = " + TermId.STUDY_STATUS.getId()
 			+ "     	AND pp.project_id = p.project_id AND pp.value = " + "         " + TermId.DELETED_STUDY.getId() + ") "
 			+ "ORDER BY p.name ";
-
-	private static final String GET_ROOT_FOLDERS = "SELECT DISTINCT p.project_id, p.name, p.description " + " FROM project p "
-			+ " INNER JOIN project_relationship pr ON pr.subject_project_id = p.project_id " + " WHERE pr.object_project_id = "
-			+ DmsProject.SYSTEM_FOLDER_ID + " AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-			+ TermId.STUDY_STATUS.getId() + "     	AND pp.project_id = p.project_id AND pp.value = " + "         "
-			+ TermId.DELETED_STUDY.getId() + ") " + " AND (p.program_uuid = :program_uuid OR p.program_uuid IS NULL)"
-			+ " ORDER BY p.project_id ";
 
 	private static final String COUNT_PROJECTS_WITH_VARIABLE = "SELECT count(pp.project_id) " + " FROM projectprop pp "
 			+ " WHERE NOT EXISTS( " + " SELECT 1 FROM projectprop stat " + " WHERE stat.project_id = pp.project_id "
@@ -96,31 +97,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "UNION SELECT pr.subject_project_id " + "FROM project_relationship pr, project p " + "WHERE pr.type_id = "
 			+ TermId.HAS_PARENT_FOLDER.getId() + " " + "AND pr.subject_project_id = p.project_id " + "AND p.program_uuid = :program_uuid ";
 
-	public List<FolderReference> getRootFolders(String programUUID) throws MiddlewareQueryException {
-
-		List<FolderReference> folderList = new ArrayList<FolderReference>();
-		try {
-			Query query = this.getSession().createSQLQuery(DmsProjectDao.GET_ROOT_FOLDERS);
-			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
-			List<Object[]> list = query.list();
-
-			if (list != null && !list.isEmpty()) {
-				for (Object[] row : list) {
-					Integer id = (Integer) row[0]; // project.id
-					String name = (String) row[1]; // project.name
-					String description = (String) row[2]; // project.description
-					folderList.add(new FolderReference(DmsProject.SYSTEM_FOLDER_ID, id, name, description, programUUID));
-				}
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getRootFolders query from Project: " + e.getMessage(), e);
-		}
-
-		return folderList;
-
+	public List<Reference> getRootFolders(String programUUID) {
+		return getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID);
 	}
 
-	public List<Reference> getChildrenOfFolder(Integer folderId, String programUUID) throws MiddlewareQueryException {
+	public List<Reference> getChildrenOfFolder(Integer folderId, String programUUID) {
 
 		List<Reference> childrenNodes = new ArrayList<Reference>();
 
@@ -141,16 +122,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				Integer isStudy = ((Integer) row[3]).intValue();
 				// project.program_uuid
 				String projectUUID = (String) row[4];
-
-				if (isStudy > 0) {
-					childrenNodes.add(new StudyReference(id, name, description, projectUUID));
+				
+				if (isStudy == 1) {
+					String studyTypeRaw = (String) row[5];				
+					StudyType studyType = studyTypeRaw != null ? StudyType.getStudyTypeById(Integer.valueOf(studyTypeRaw)) : null;
+					childrenNodes.add(new StudyReference(id, name, description, projectUUID, studyType));
 				} else {
 					childrenNodes.add(new FolderReference(id, name, description, projectUUID));
 				}
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getChildrenOfFolder query from Project: " + e.getMessage(), e);
+			this.logAndThrowException("Error retrieving study folder tree, folderId=" + folderId + " programUUID=" + programUUID + ":" + e.getMessage(), e);
 		}
 
 		return childrenNodes;
