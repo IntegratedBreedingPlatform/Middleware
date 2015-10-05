@@ -56,21 +56,30 @@ public class DatasetUtil {
 		return studyDataManager.getDataSetsByType(studyId, DataSetType.MEANS_DATA).get(0);
 	}
 
-	public static Integer getPlotDataSetId(StudyDataManager studyDataManager, int studyId) throws MiddlewareException {
+	public static Integer getPlotDataSetId(StudyDataManager studyDataManager, int studyId) {
+		DataSet plotDataset = getPlotDataSet(studyDataManager, studyId);
+		if (plotDataset != null) {
+			return plotDataset.getId();
+		}
+		return null;
+	}
+
+	public static DataSet getPlotDataSet(StudyDataManager studyDataManager, int studyId) {
 		List<DataSet> plotDatasets = studyDataManager.getDataSetsByType(studyId, DataSetType.PLOT_DATA);
+		if (plotDatasets == null) {
+			return null;
+		}
+		if (plotDatasets.size() == 1) {
+			return plotDatasets.get(0);
+		}
 		for (DataSet dataSet : plotDatasets) {
 			String name = dataSet.getName();
-
-			// old or new name for measurements/plot
 			if (name != null
 					&& (name.startsWith(DatasetUtil.OLD_PLOT_DATASET_NAME_PREFIX) || name
 							.endsWith(DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX))) {
-				return dataSet.getId();
-			} else if (name != null
-					&& (name.startsWith(DatasetUtil.OLD_SUMMARY_DATASET_NAME_PREFIX) || name
-							.endsWith(DatasetUtil.NEW_SUMMARY_DATASET_NAME_SUFFIX))) {
-				continue;
-			} else {
+				return dataSet;
+			} else if (name == null || name != null && !name.startsWith(DatasetUtil.OLD_SUMMARY_DATASET_NAME_PREFIX)
+					&& !name.endsWith(DatasetUtil.NEW_SUMMARY_DATASET_NAME_SUFFIX)) {
 				if (dataSet != null && dataSet.getVariableTypes().getVariableTypes() != null) {
 					boolean aPlotDataset = false;
 					for (DMSVariableType variableType : dataSet.getVariableTypes().getVariableTypes()) {
@@ -80,7 +89,7 @@ public class DatasetUtil {
 						}
 					}
 					if (aPlotDataset) {
-						return dataSet.getId();
+						return dataSet;
 					}
 				}
 			}
