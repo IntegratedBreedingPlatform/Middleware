@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.NameDAO;
@@ -875,6 +876,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
+	public List<Integer> addGermplasmNames(List<Name> names) {
+		return this.getGermplasmDataManager().addGermplasmName(names);
+	}
+
+	@Override
 	public Integer addGermplasm(String nameValue, int userId) {
 		Name name = new Name(null, null, 1, 1, userId, nameValue, 0, 0, 0);
 		Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, userId, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
@@ -884,6 +890,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Integer addGermplasm(Germplasm germplasm, Name name) {
 		return this.getGermplasmDataManager().addGermplasm(germplasm, name);
+	}
+
+	public List<Integer> addGermplasm(List<Pair<Germplasm, Name>> germplasmPairs) {
+		return this.getGermplasmDataManager().addGermplasm(germplasmPairs);
 	}
 
 	@Override

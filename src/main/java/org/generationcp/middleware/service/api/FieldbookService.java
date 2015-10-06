@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -619,6 +620,13 @@ public interface FieldbookService {
 	Integer addGermplasmName(String nameValue, int gid, int userId, int nameTypeId, int locationId, Integer date);
 
 	/**
+	 *
+	 * @param names The list of germplasm names to be added into the system
+	 * @return
+	 */
+	List<Integer> addGermplasmNames(List<Name> names);
+
+	/**
 	 * Adds a new Germplasm.
 	 *
 	 * @param nameValue the name value
@@ -635,6 +643,13 @@ public interface FieldbookService {
 	 * @return the integer
 	 */
 	Integer addGermplasm(Germplasm germplasm, Name name);
+
+	/**
+	 *
+	 * @param germplasmPairs
+	 * @return
+	 */
+	List<Integer> addGermplasm(List<Pair<Germplasm, Name>> germplasmPairs);
 
 	/**
 	 * Get an id from the project table that matches the name (regardless if it's a study or a folder).
