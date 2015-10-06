@@ -16,6 +16,7 @@ import java.util.List;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.util.Debug;
 
@@ -58,6 +59,8 @@ public class MeasurementVariable {
 	private Operation operation;
 
 	private PhenotypicType role;
+
+	private VariableType variableType;
 
 	public MeasurementVariable() {
 	}
@@ -202,35 +205,33 @@ public class MeasurementVariable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("MeasurementVariable [termId=");
-		builder.append(this.termId);
-		builder.append(", name=");
-		builder.append(this.name);
-		builder.append(", description=");
-		builder.append(this.description);
-		builder.append(", scale=");
-		builder.append(this.scale);
-		builder.append(", method=");
-		builder.append(this.method);
-		builder.append(", property=");
-		builder.append(this.property);
-		builder.append(", dataType=");
-		builder.append(this.dataType);
-		builder.append(", role=");
-		builder.append(this.role);
-		builder.append(", value=");
-		builder.append(this.value);
-		builder.append(", label=");
-		builder.append(this.label);
-		builder.append(", isFactor=");
-		builder.append(this.isFactor);
-		builder.append("]");
-		return builder.toString();
+		return "MeasurementVariable{" +
+				"termId=" + termId +
+				", name='" + name + '\'' +
+				", description='" + description + '\'' +
+				", scale='" + scale + '\'' +
+				", method='" + method + '\'' +
+				", property='" + property + '\'' +
+				", dataType='" + dataType + '\'' +
+				", value='" + value + '\'' +
+				", label='" + label + '\'' +
+				", isFactor=" + isFactor +
+				", dataTypeId=" + dataTypeId +
+				", possibleValues=" + possibleValues +
+				", possibleValuesString='" + possibleValuesString + '\'' +
+				", minRange=" + minRange +
+				", maxRange=" + maxRange +
+				", required=" + required +
+				", treatmentLabel='" + treatmentLabel + '\'' +
+				", operation=" + operation +
+				", role=" + role +
+				", variableType=" + variableType +
+				'}';
 	}
 
 	public void print(int indent) {
 		Debug.println(indent, "MeasurementVariable: ");
+		Debug.println(indent + 3, "termId: " + this.termId);
 		Debug.println(indent + 3, "Name: " + this.name);
 		Debug.println(indent + 3, "Description: " + this.description);
 		Debug.println(indent + 3, "Scale: " + this.scale);
@@ -239,6 +240,17 @@ public class MeasurementVariable {
 		Debug.println(indent + 3, "Data Type: " + this.dataType);
 		Debug.println(indent + 3, "Value: " + this.value);
 		Debug.println(indent + 3, "Label: " + this.label);
+		Debug.println(indent + 3, "isFactor: " + this.isFactor);
+		Debug.println(indent + 3, "dataTypeId: " + this.dataTypeId);
+		Debug.println(indent + 3, "possibleValues: " + this.possibleValues);
+		Debug.println(indent + 3, "possibleValuesString: " + this.possibleValuesString);
+		Debug.println(indent + 3, "minRange: " + this.minRange);
+		Debug.println(indent + 3, "maxRange: " + this.maxRange);
+		Debug.println(indent + 3, "required: " + this.required);
+		Debug.println(indent + 3, "treatmentLabel: " + this.treatmentLabel);
+		Debug.println(indent + 3, "operation: " + this.operation);
+		Debug.println(indent + 3, "role: " + this.role);
+		Debug.println(indent + 3, "variableType: " + this.variableType);
 	}
 
 	public boolean isFactor() {
@@ -352,6 +364,14 @@ public class MeasurementVariable {
 
 	public void setRole(PhenotypicType role) {
 		this.role = role;
+	}
+
+	public VariableType getVariableType() {
+		return variableType;
+	}
+
+	public void setVariableType(VariableType variableType) {
+		this.variableType = variableType;
 	}
 
 	/**
