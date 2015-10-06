@@ -51,6 +51,8 @@ public class VariableTypeBuilder extends Builder {
 		variableType.setRole(variableInfo.getRole());
 		variableType.getStandardVariable().setPhenotypicType(variableInfo.getRole());
 
+		variableType.setVariableType(variableInfo.getVariableType());
+
 		return variableType;
 	}
 }
