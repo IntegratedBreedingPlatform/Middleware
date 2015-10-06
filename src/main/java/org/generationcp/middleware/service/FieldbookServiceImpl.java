@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
@@ -27,7 +26,6 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.Study;
@@ -740,30 +738,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		return treatmentPairs;
-	}
-
-	@Override
-	public TermId getStudyType(final int studyId) {
-		final String value = this.getProjectPropertyDao().getValueByProjectIdAndTypeId(studyId, TermId.STUDY_TYPE.getId());
-		if (value != null && NumberUtils.isNumber(value)) {
-			return TermId.getById(Integer.valueOf(value));
-		}
-		return null;
-	}
-
-	@Override
-	public List<Reference> getRootFolders(String programUUID) {
-		return this.getStudyDataManager().getRootFolders(programUUID);
-	}
-
-	@Override
-	public List<Reference> getChildrenOfFolder(final int folderId, final String programUUID) {
-		return this.getStudyDataManager().getChildrenOfFolder(folderId, programUUID);
-	}
-
-	@Override
-	public boolean isStudy(final int id) {
-		return this.getStudyDataManager().isStudy(id);
 	}
 
 	@Override

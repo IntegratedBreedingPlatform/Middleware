@@ -77,21 +77,19 @@ public interface StudyDataManager {
 	Integer getStudyIdByNameAndProgramUUID(String studyName, String programUUID) throws MiddlewareQueryException;
 
 	/**
-	 * Returns list of root or top-level folders from specified database.
-	 * 
+	 * Returns list of root or top-level folders and studies.
+	 *
+	 * @param programUUID program's unique id
 	 * @return List of Folder POJOs or empty list if none found
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Reference> getRootFolders(String programUUID);
 
 	/**
-	 * Returns list of children of a folder given its ID. Retrieves from central if the given ID is positive, otherwise retrieves from
-	 * local.
-	 * 
+	 * Returns list of children of a folder given its ID. 
+	 *
 	 * @param folderId The id of the folder to match
-	 * @param programUUID the program UUID
-	 * @return List of AbstractNode (FolderNode, StudyNode) POJOs or empty list if none found
-	 * @throws MiddlewareQueryException the middleware query exception
+	 * @param programUUID unique id of the program
+	 * @return List of containing study (StudyReference) and folder (FolderReference) references or empty list if none found
 	 */
 	List<Reference> getChildrenOfFolder(int folderId, String programUUID) throws MiddlewareQueryException;
 
