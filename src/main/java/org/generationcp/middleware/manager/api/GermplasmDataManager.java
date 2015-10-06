@@ -14,9 +14,9 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.manager.Operation;
@@ -72,11 +72,10 @@ public interface GermplasmDataManager {
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @param op - can be EQUAL like LIKE
-	 * @param instance - can be Database.CENTRAL or Database.LOCAL
 	 * @return List of Germplasm POJOs
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op, Database instance)
+	List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op)
 			throws MiddlewareQueryException;
 
 	/**
@@ -84,11 +83,10 @@ public interface GermplasmDataManager {
 	 *
 	 * @param name - search string for the name of the locations
 	 * @param op - can be EQUAL like LIKE
-	 * @param instance - can be Database.CENTRAL or Database.LOCAL
 	 * @return Number of Germplasms
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countGermplasmByLocationName(String name, Operation op, Database instance) throws MiddlewareQueryException;
+	long countGermplasmByLocationName(String name, Operation op) throws MiddlewareQueryException;
 
 	/**
 	 * Please use LocationDataManager.getAllCountry().
@@ -103,15 +101,14 @@ public interface GermplasmDataManager {
 	List<Country> getAllCountry() throws MiddlewareQueryException;
 
 	/**
-	 * Retrieves all the Germplasm entries from the given database instance.
+	 * Retrieves all the Germplasm entries
 	 *
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param instance - can be Database.CENTRAL or Database.LOCAL
 	 * @return All the germplasms from the database instance satisfying the start and numOfRows parameters
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Germplasm> getAllGermplasm(int start, int numOfRows, Database instance) throws MiddlewareQueryException;
+	List<Germplasm> getAllGermplasm(int start, int numOfRows) throws MiddlewareQueryException;
 
 	/**
 	 * Returns the germplasm records that were created by the methods with names matching the given parameter.
@@ -120,11 +117,10 @@ public interface GermplasmDataManager {
 	 * @param start - the starting index of the sublist of results to be returned
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @param op - can be EQUAL or LIKE
-	 * @param instance - can be Database.CENTRAL or Database.LOCAL
 	 * @return List of Germplasm POJOS
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Germplasm> getGermplasmByMethodName(String name, int start, int numOfRows, Operation op, Database instance)
+	List<Germplasm> getGermplasmByMethodName(String name, int start, int numOfRows, Operation op)
 			throws MiddlewareQueryException;
 
 	/**
@@ -132,11 +128,10 @@ public interface GermplasmDataManager {
 	 *
 	 * @param name - search string for the name of the methods
 	 * @param op - can be equal or like
-	 * @param instance - can be Database.CENTRAL or Database.LOCAL
 	 * @return number of germplasm records
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countGermplasmByMethodName(String name, Operation op, Database instance) throws MiddlewareQueryException;
+	long countGermplasmByMethodName(String name, Operation op) throws MiddlewareQueryException;
 
 	/**
 	 * Returns the germplasm record identified by the given id.
@@ -713,6 +708,8 @@ public interface GermplasmDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Integer> addGermplasm(Map<Germplasm, Name> germplasmNameMap) throws MiddlewareQueryException;
+
+	List<Integer> addGermplasm(List<Pair<Germplasm, Name>> germplasms);
 
 	/**
 	 * Given a UserDefinedField object, add new record for the given parameter.

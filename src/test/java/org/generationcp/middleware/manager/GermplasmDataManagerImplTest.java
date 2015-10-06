@@ -105,13 +105,13 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 	public void testGetMethodsByIDs() throws Exception {
 
 		// Attempt to get all locations so we can proceed
-		List<Method> locationList = this.germplasmDataManager.getAllMethods();
+		final List<Method> locationList = this.germplasmDataManager.getAllMethods();
 		Assert.assertTrue(locationList != null);
 		Assert.assertTrue("we cannot proceed test if size < 0", locationList.size() > 0);
 
-		List<Integer> ids = new ArrayList<Integer>();
+		final List<Integer> ids = new ArrayList<Integer>();
 
-		for (Method ls : locationList) {
+		for (final Method ls : locationList) {
 			ids.add(ls.getMid());
 
 			// only get subset of locations
@@ -120,7 +120,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 			}
 		}
 
-		List<Method> results = this.germplasmDataManager.getMethodsByIDs(ids);
+		final List<Method> results = this.germplasmDataManager.getMethodsByIDs(ids);
 		Assert.assertTrue(results != null);
 		Assert.assertTrue(results.size() < 5);
 
@@ -129,9 +129,10 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetGermplasmByName() throws Exception {
-		String name = "(CML454 X CML451)-B-3-1-1";
+		final String name = "CML502RLT";
 
-		List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByName(name, 0, 5, Operation.EQUAL);
+		final List<Germplasm> germplasmList =
+				this.germplasmDataManager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.EQUAL, null, null);
 		Assert.assertTrue(germplasmList != null);
 
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByName(" + name + "): ");
@@ -166,23 +167,23 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetGermplasmByLocationNameUsingEqual() throws Exception {
-		String name = "Philippines";
-		List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByLocationName(name, 0, 5, Operation.EQUAL, Database.CENTRAL);
+		final String name = "Philippines";
+		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByLocationName(name, 0, 5, Operation.EQUAL);
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByLocationNameUsingEqual(" + name + "): ");
 		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
 	}
 
 	@Test
 	public void testCountGermplasmByLocationNameUsingEqual() throws Exception {
-		String name = "Philippines";
-		long count = this.germplasmDataManager.countGermplasmByLocationName(name, Operation.EQUAL, Database.CENTRAL);
+		final String name = "Philippines";
+		final long count = this.germplasmDataManager.countGermplasmByLocationName(name, Operation.EQUAL);
 		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByLocationNameUsingEqual(" + name + "): " + count);
 	}
 
 	@Test
 	public void testGetGermplasmByLocationNameUsingLike() throws Exception {
-		String name = "International%";
-		List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByLocationName(name, 0, 5, Operation.LIKE, Database.CENTRAL);
+		final String name = "International%";
+		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByLocationName(name, 0, 5, Operation.LIKE);
 		Assert.assertTrue(germplasmList != null);
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByLocationNameUsingLike(" + name + "): ");
 		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
@@ -190,16 +191,16 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountGermplasmByLocationNameUsingLike() throws Exception {
-		String name = "International%";
-		long count = this.germplasmDataManager.countGermplasmByLocationName(name, Operation.LIKE, Database.CENTRAL);
+		final String name = "International%";
+		final long count = this.germplasmDataManager.countGermplasmByLocationName(name, Operation.LIKE);
 		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByLocationNameUsingLike(" + name + "): " + count);
 	}
 
 	@Test
 	public void testGetGermplasmByMethodNameUsingEqual() throws Exception {
-		String name = "SINGLE CROSS";
+		final String name = "SINGLE CROSS";
 
-		List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByMethodName(name, 0, 5, Operation.EQUAL, Database.CENTRAL);
+		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByMethodName(name, 0, 5, Operation.EQUAL);
 		Assert.assertTrue(germplasmList != null);
 
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByMethodNameUsingEqual(" + name + "): ");
@@ -208,16 +209,16 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountGermplasmByMethodNameUsingEqual() throws Exception {
-		String name = "SINGLE CROSS";
-		long count = this.germplasmDataManager.countGermplasmByMethodName(name, Operation.EQUAL, Database.CENTRAL);
+		final String name = "SINGLE CROSS";
+		final long count = this.germplasmDataManager.countGermplasmByMethodName(name, Operation.EQUAL);
 		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByMethodNameUsingEqual(" + name + "): " + count);
 	}
 
 	@Test
 	public void testGetGermplasmByMethodNameUsingLike() throws Exception {
-		String name = "%CROSS%";
+		final String name = "%CROSS%";
 
-		List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByMethodName(name, 0, 5, Operation.LIKE, Database.CENTRAL);
+		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByMethodName(name, 0, 5, Operation.LIKE);
 		Assert.assertTrue(germplasmList != null);
 
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByMethodNameUsingLike(" + name + "): ");
@@ -226,22 +227,22 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountGermplasmByMethodNameUsingLike() throws Exception {
-		String name = "%CROSS%";
-		long count = this.germplasmDataManager.countGermplasmByMethodName(name, Operation.LIKE, Database.CENTRAL);
+		final String name = "%CROSS%";
+		final long count = this.germplasmDataManager.countGermplasmByMethodName(name, Operation.LIKE);
 		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByMethodNameUsingLike(" + name + "): " + count);
 	}
 
 	@Test
 	public void testGetGermplasmByGID() throws Exception {
-		Integer gid = Integer.valueOf(50533);
-		Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(gid);
+		final Integer gid = Integer.valueOf(50533);
+		final Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(gid);
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByGID(" + gid + "): " + germplasm);
 	}
 
 	@Test
 	public void testGetGermplasmWithPrefName() throws Exception {
-		Integer gid = Integer.valueOf(50533);
-		Germplasm germplasm = this.germplasmDataManager.getGermplasmWithPrefName(gid);
+		final Integer gid = Integer.valueOf(50533);
+		final Germplasm germplasm = this.germplasmDataManager.getGermplasmWithPrefName(gid);
 
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmWithPrefName(" + gid + "): " + germplasm);
 		if (germplasm != null) {
@@ -251,65 +252,65 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetGermplasmWithPrefAbbrev() throws Exception {
-		Integer gid = Integer.valueOf(151);
-		Germplasm germplasm = this.germplasmDataManager.getGermplasmWithPrefAbbrev(gid);
+		final Integer gid = Integer.valueOf(151);
+		final Germplasm germplasm = this.germplasmDataManager.getGermplasmWithPrefAbbrev(gid);
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmWithPrefAbbrev(" + gid + "): " + germplasm);
 	}
 
 	@Test
 	public void testGetGermplasmNameByID() throws Exception {
-		Integer gid = Integer.valueOf(42268);
-		Name name = this.germplasmDataManager.getGermplasmNameByID(gid);
+		final Integer gid = Integer.valueOf(42268);
+		final Name name = this.germplasmDataManager.getGermplasmNameByID(gid);
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmNameByID(" + gid + "): " + name);
 	}
 
 	@Test
 	public void testGetNamesByGID() throws Exception {
-		Integer gid = Integer.valueOf(2434138);
-		List<Name> names = this.germplasmDataManager.getNamesByGID(gid, null, null);
+		final Integer gid = Integer.valueOf(2434138);
+		final List<Name> names = this.germplasmDataManager.getNamesByGID(gid, null, null);
 		Debug.println(IntegrationTestBase.INDENT, "testGetNamesByGID(" + gid + "): " + names.size());
 		Debug.printObjects(names);
 	}
 
 	@Test
 	public void testGetPreferredNameByGID() throws Exception {
-		Integer gid = Integer.valueOf(1);
+		final Integer gid = Integer.valueOf(1);
 		Debug.println(IntegrationTestBase.INDENT,
 				"testGetPreferredNameByGID(" + gid + "): " + this.germplasmDataManager.getPreferredNameByGID(gid));
 	}
 
 	@Test
 	public void testGetPreferredNameValueByGID() throws Exception {
-		Integer gid = Integer.valueOf(1);
+		final Integer gid = Integer.valueOf(1);
 		Debug.println(IntegrationTestBase.INDENT,
 				"testGetPreferredNameValueByGID(" + gid + "): " + this.germplasmDataManager.getPreferredNameValueByGID(gid));
 	}
 
 	@Test
 	public void testGetPreferredAbbrevByGID() throws Exception {
-		Integer gid = Integer.valueOf(1);
+		final Integer gid = Integer.valueOf(1);
 		Debug.println(IntegrationTestBase.INDENT,
 				"testGetPreferredAbbrevByGID(" + gid + "): " + this.germplasmDataManager.getPreferredAbbrevByGID(gid));
 	}
 
 	@Test
 	public void testGetPreferredIdByGID() throws Exception {
-		Integer gid = Integer.valueOf(986634);
+		final Integer gid = Integer.valueOf(986634);
 		Debug.println(IntegrationTestBase.INDENT,
 				"testGetPreferredIdByGID(" + gid + "): " + this.germplasmDataManager.getPreferredIdByGID(gid));
 	}
 
 	@Test
 	public void testGetPreferredIdsByListId() throws Exception {
-		Integer listId = Integer.valueOf(2591);
+		final Integer listId = Integer.valueOf(2591);
 		Debug.println(IntegrationTestBase.INDENT,
 				"testGetPreferredIdsByListId(" + listId + "): " + this.germplasmDataManager.getPreferredIdsByListId(listId));
 	}
 
 	@Test
 	public void testGetNameByGIDAndNval() throws Exception {
-		Integer gid = Integer.valueOf(225266);
-		String nVal = "C 65-44";
+		final Integer gid = Integer.valueOf(225266);
+		final String nVal = "C 65-44";
 		Debug.println(IntegrationTestBase.INDENT, "testGetNameByGIDAndNval(" + gid + ", " + nVal + ", GetGermplasmByNameModes.NORMAL) : "
 				+ this.germplasmDataManager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.NORMAL));
 		Debug.println(
@@ -324,28 +325,28 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetNamesByGIDWithStatus() throws Exception {
-		Integer gid = Integer.valueOf(50533);
-		Integer status = Integer.valueOf(1);
-		GermplasmNameType type = null;
-		List<Name> names = this.germplasmDataManager.getNamesByGID(gid, status, type);
+		final Integer gid = Integer.valueOf(50533);
+		final Integer status = Integer.valueOf(1);
+		final GermplasmNameType type = null;
+		final List<Name> names = this.germplasmDataManager.getNamesByGID(gid, status, type);
 		Debug.println(IntegrationTestBase.INDENT, "testGetNamesByGIDWithStatus(gid=" + gid + ", status" + status + ", type=" + type + "): "
 				+ names);
 	}
 
 	@Test
 	public void testGetNamesByGIDWithStatusAndType() throws Exception {
-		Integer gid = Integer.valueOf(50533);
-		Integer status = Integer.valueOf(8);
-		GermplasmNameType type = GermplasmNameType.INTERNATIONAL_TESTING_NUMBER;
-		List<Name> names = this.germplasmDataManager.getNamesByGID(gid, status, type);
+		final Integer gid = Integer.valueOf(50533);
+		final Integer status = Integer.valueOf(8);
+		final GermplasmNameType type = GermplasmNameType.INTERNATIONAL_TESTING_NUMBER;
+		final List<Name> names = this.germplasmDataManager.getNamesByGID(gid, status, type);
 		Debug.println(IntegrationTestBase.INDENT, "testGetNamesByGIDWithStatusAndType(gid=" + gid + ", status" + status + ", type=" + type
 				+ "): " + names);
 	}
 
 	@Test
 	public void testGetAttributesByGID() throws Exception {
-		Integer gid = Integer.valueOf(50533);
-		List<Attribute> attributes = this.germplasmDataManager.getAttributesByGID(gid);
+		final Integer gid = Integer.valueOf(50533);
+		final List<Attribute> attributes = this.germplasmDataManager.getAttributesByGID(gid);
 		Debug.println(IntegrationTestBase.INDENT, "testGetAttributesByGID(" + gid + "): " + attributes);
 	}
 
@@ -377,8 +378,8 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddMethods() throws MiddlewareQueryException {
-		List<Method> methods = new ArrayList<Method>();
-		String programUUID = UUID.randomUUID().toString();
+		final List<Method> methods = new ArrayList<Method>();
+		final String programUUID = UUID.randomUUID().toString();
 		methods.add(new Method(null, "GEN", "S", "UGM", "yesno", "description 1", Integer.valueOf(0), Integer.valueOf(0), Integer
 				.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610),
 				programUUID));
@@ -389,11 +390,11 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 				.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610),
 				programUUID));
 
-		List<Integer> methodsAdded = this.germplasmDataManager.addMethod(methods);
+		final List<Integer> methodsAdded = this.germplasmDataManager.addMethod(methods);
 		Debug.println(IntegrationTestBase.INDENT, "testAddMethods() Methods added: " + methodsAdded.size());
 
-		for (Integer id : methodsAdded) {
-			Method method = this.germplasmDataManager.getMethodByID(id);
+		for (final Integer id : methodsAdded) {
+			final Method method = this.germplasmDataManager.getMethodByID(id);
 			Debug.println(IntegrationTestBase.INDENT, method);
 			this.germplasmDataManager.deleteMethod(method);
 		}
@@ -401,8 +402,8 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetMethodsByUniqueID() throws MiddlewareQueryException {
-		String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
-		List<Method> methodsFilteredByProgramUUID = this.germplasmDataManager.getMethodsByUniqueID(programUUID);
+		final String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
+		final List<Method> methodsFilteredByProgramUUID = this.germplasmDataManager.getMethodsByUniqueID(programUUID);
 		Assert.assertNotNull("Expecting to have returned results.", methodsFilteredByProgramUUID);
 		Debug.println(IntegrationTestBase.INDENT, "testGetMethodsByUniqueID(programUUID=" + programUUID + "): "
 				+ methodsFilteredByProgramUUID.size());
@@ -411,23 +412,23 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetMethodsByType() throws MiddlewareQueryException {
-		String type = "GEN"; // Tested with rice and cowpea
-		int start = 0;
-		int numOfRows = 5;
+		final String type = "GEN"; // Tested with rice and cowpea
+		final int start = 0;
+		final int numOfRows = 5;
 
-		List<Method> methods = this.germplasmDataManager.getMethodsByType(type);
+		final List<Method> methods = this.germplasmDataManager.getMethodsByType(type);
 		Assert.assertNotNull("Expecting to have returned results.", methods);
 		Debug.println(IntegrationTestBase.INDENT, "testGetMethodsByType(type=" + type + "): " + methods.size());
 		Debug.printObjects(IntegrationTestBase.INDENT * 2, methods);
 
-		String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
-		List<Method> methodsFilteredByProgramUUID = this.germplasmDataManager.getMethodsByType(type, programUUID);
+		final String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
+		final List<Method> methodsFilteredByProgramUUID = this.germplasmDataManager.getMethodsByType(type, programUUID);
 		Assert.assertNotNull("Expecting to have returned results.", methodsFilteredByProgramUUID);
 		Debug.println(IntegrationTestBase.INDENT, "testGetMethodsByType(type=" + type + ", programUUID=" + programUUID + "): "
 				+ methodsFilteredByProgramUUID.size());
 		Debug.printObjects(IntegrationTestBase.INDENT * 2, methodsFilteredByProgramUUID);
 
-		List<Method> methodList = this.germplasmDataManager.getMethodsByType(type, start, numOfRows);
+		final List<Method> methodList = this.germplasmDataManager.getMethodsByType(type, start, numOfRows);
 		Assert.assertNotNull("Expecting to have returned results.", methodList);
 		Debug.println(IntegrationTestBase.INDENT, "testGetMethodsByType(type=" + type + ", start=" + start + ", numOfRows=" + numOfRows
 				+ "): " + methodList.size());
@@ -436,8 +437,8 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountMethodsByUniqueID() throws Exception {
-		String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
-		long count = this.germplasmDataManager.countMethodsByUniqueID(programUUID);
+		final String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
+		final long count = this.germplasmDataManager.countMethodsByUniqueID(programUUID);
 		Assert.assertTrue("Expecting to have returned results.", count > 0);
 		Debug.println(IntegrationTestBase.INDENT, "testCountMethodsByUniqueID(programUUID=" + programUUID + "): " + count);
 	}
@@ -445,13 +446,13 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testCountMethodsByType() throws Exception {
 		String type = "GEN";
-		long count = this.germplasmDataManager.countMethodsByType(type);
+		final long count = this.germplasmDataManager.countMethodsByType(type);
 		Assert.assertTrue("Expecting to have returned results.", count > 0);
 		Debug.println(IntegrationTestBase.INDENT, "testCountMethodsByType(type=" + type + "): " + count);
 
 		type = "GEN";
-		String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
-		long countWithProgramUUID = this.germplasmDataManager.countMethodsByType(type, programUUID);
+		final String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
+		final long countWithProgramUUID = this.germplasmDataManager.countMethodsByType(type, programUUID);
 		Assert.assertTrue("Expecting to have returned results.", count > 0);
 		Debug.println(IntegrationTestBase.INDENT, "testCountMethodsByType(type=" + type + "): " + countWithProgramUUID);
 
@@ -461,15 +462,15 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetMethodsByGroup() throws MiddlewareQueryException {
-		String group = "S"; // Tested with rice and cowpea
-		int start = 0;
-		int numOfRows = 5;
+		final String group = "S"; // Tested with rice and cowpea
+		final int start = 0;
+		final int numOfRows = 5;
 
-		List<Method> methods = this.germplasmDataManager.getMethodsByGroup(group);
+		final List<Method> methods = this.germplasmDataManager.getMethodsByGroup(group);
 		Debug.println(IntegrationTestBase.INDENT, "testGetMethodsByGroup(group=" + group + "): " + methods.size());
 		Debug.printObjects(IntegrationTestBase.INDENT * 2, methods);
 
-		List<Method> methodList = this.germplasmDataManager.getMethodsByGroup(group, start, numOfRows);
+		final List<Method> methodList = this.germplasmDataManager.getMethodsByGroup(group, start, numOfRows);
 		Debug.println(IntegrationTestBase.INDENT, "testGetMethodsByGroup(group=" + group + ", start=" + start + ", numOfRows=" + numOfRows
 				+ "): " + methodList.size());
 		Debug.printObjects(IntegrationTestBase.INDENT, methodList);
@@ -477,29 +478,29 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetMethodsByGroupIncludesGgroup() throws MiddlewareQueryException {
-		String group = "O"; // Tested with rice and cowpea
-		List<Method> methods = this.germplasmDataManager.getMethodsByGroupIncludesGgroup(group);
+		final String group = "O"; // Tested with rice and cowpea
+		final List<Method> methods = this.germplasmDataManager.getMethodsByGroupIncludesGgroup(group);
 		Debug.println(IntegrationTestBase.INDENT, "testGetMethodsByGroup(group=" + group + "): " + methods.size());
 		Debug.printObjects(IntegrationTestBase.INDENT, methods);
 	}
 
 	@Test
 	public void testGetMethodsByGroupAndType() throws MiddlewareQueryException {
-		String group = "O"; // Tested with rice and cowpea
-		String type = "GEN"; // Tested with rice and cowpea
+		final String group = "O"; // Tested with rice and cowpea
+		final String type = "GEN"; // Tested with rice and cowpea
 
-		List<Method> methods = this.germplasmDataManager.getMethodsByGroupAndType(group, type);
+		final List<Method> methods = this.germplasmDataManager.getMethodsByGroupAndType(group, type);
 		Debug.println(IntegrationTestBase.INDENT, "testGetMethodsByGroupAndType(group=" + group + "and " + type + "): " + methods.size());
 		Debug.printObjects(IntegrationTestBase.INDENT, methods);
 	}
 
 	@Test
 	public void testGetMethodsByGroupAndTypeAndName() throws MiddlewareQueryException {
-		String group = "O"; // Tested with rice and cowpea
-		String type = "GEN"; // Tested with rice and cowpea
-		String name = "ALLO-POLYPLOID CF"; // Tested with rice and cowpea
+		final String group = "O"; // Tested with rice and cowpea
+		final String type = "GEN"; // Tested with rice and cowpea
+		final String name = "ALLO-POLYPLOID CF"; // Tested with rice and cowpea
 
-		List<Method> methods = this.germplasmDataManager.getMethodsByGroupAndTypeAndName(group, type, name);
+		final List<Method> methods = this.germplasmDataManager.getMethodsByGroupAndTypeAndName(group, type, name);
 		Debug.println(IntegrationTestBase.INDENT, "testGetMethodsByGroupAndTypeAndName(group=" + group + " and type=" + type + " and name="
 				+ name + "): " + methods.size());
 		Debug.printObjects(IntegrationTestBase.INDENT, methods);
@@ -507,14 +508,15 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountMethodsByGroup() throws Exception {
-		String group = "S"; // Tested with rice and cowpea
-		long count = this.germplasmDataManager.countMethodsByGroup(group);
+		final String group = "S"; // Tested with rice and cowpea
+		final long count = this.germplasmDataManager.countMethodsByGroup(group);
 		Debug.println(IntegrationTestBase.INDENT, "testCountMethodsByGroup(group=" + group + "): " + count);
 	}
 
 	@Test
 	public void testGetGermplasmDetailsByGermplasmNames() throws Exception {
-		List<String> germplasmNames = Arrays.asList("C 65 CU   79", "C 65 CU 80", "C 65 CU 81", "Kevin 64", "Kevin 65", " BASMATI   370");
+		final List<String> germplasmNames =
+				Arrays.asList("C 65 CU   79", "C 65 CU 80", "C 65 CU 81", "Kevin 64", "Kevin 65", " BASMATI   370");
 		// SQL TO VERIFY (CENTRAL AND LOCAL): select gid, nid, nval from names where nval in (:germplasmNames);
 
 		List<GermplasmNameDetails> results =
@@ -540,10 +542,10 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testUpdateGermplasmName() throws Exception {
-		Integer nameId = 1; // Assumption: id=1 exists
-		Name name = this.germplasmDataManager.getGermplasmNameByID(nameId);
+		final Integer nameId = 1; // Assumption: id=1 exists
+		final Name name = this.germplasmDataManager.getGermplasmNameByID(nameId);
 		if (name != null) {
-			String nameBefore = name.toString();
+			final String nameBefore = name.toString();
 			name.setLocationId(this.locationManager.getLocationByID(1).getLocid()); // Assumption: location with
 			// id=1 exists
 			this.germplasmDataManager.updateGermplasmName(name);
@@ -554,8 +556,8 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddGermplasmAttribute() throws Exception {
-		Integer gid = Integer.valueOf(50533);
-		Attribute attribute = new Attribute();
+		final Integer gid = Integer.valueOf(50533);
+		final Attribute attribute = new Attribute();
 		attribute.setAdate(0);
 		attribute.setAval("aval");
 		attribute.setGermplasmId(gid);
@@ -563,15 +565,15 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		attribute.setUserId(0);
 		attribute.setReferenceId(0);
 		attribute.setTypeId(0);
-		Integer id = this.germplasmDataManager.addGermplasmAttribute(attribute);
+		final Integer id = this.germplasmDataManager.addGermplasmAttribute(attribute);
 		Debug.println(IntegrationTestBase.INDENT, "testAddGermplasmAttribute(" + gid + "): " + id + " = " + attribute);
 	}
 
 	@Test
 	public void testUpdateGermplasmAttribute() throws Exception {
-		Integer attributeId = 1; // Assumption: attribute with id = 1 exists
+		final Integer attributeId = 1; // Assumption: attribute with id = 1 exists
 
-		Attribute attribute = this.germplasmDataManager.getAttributeById(attributeId);
+		final Attribute attribute = this.germplasmDataManager.getAttributeById(attributeId);
 
 		if (attribute != null) {
 			String attributeString = "";
@@ -593,42 +595,43 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		// String tableName="LOCATION";
 		// String fieldType="LTYPE";
 
-		String tableName = "ATRIBUTS";
-		String fieldType = "ATTRIBUTE";
-		List<UserDefinedField> userDefineField = this.germplasmDataManager.getUserDefinedFieldByFieldTableNameAndType(tableName, fieldType);
+		final String tableName = "ATRIBUTS";
+		final String fieldType = "ATTRIBUTE";
+		final List<UserDefinedField> userDefineField =
+				this.germplasmDataManager.getUserDefinedFieldByFieldTableNameAndType(tableName, fieldType);
 		Debug.println(IntegrationTestBase.INDENT,
 				"testGetUserDefineFieldByTableNameAndType(type=" + tableName + "): " + userDefineField.size());
-		for (UserDefinedField u : userDefineField) {
+		for (final UserDefinedField u : userDefineField) {
 			Debug.println(IntegrationTestBase.INDENT, u);
 		}
 	}
 
 	@Test
 	public void testGetCrossExpansion() throws Exception {
-		CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties();
+		final CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties();
 		crossExpansionProperties.setDefaultLevel(1);
 		Debug.println(this.pedigreeService.getCrossExpansion(Integer.valueOf(1), crossExpansionProperties));
 	}
 
 	@Test
 	public void testGetNextSequenceNumberForCrossName() throws MiddlewareQueryException {
-		String prefix = "IR";
+		final String prefix = "IR";
 		Debug.println("Next number in sequence for prefix (" + prefix + ") is : "
 				+ this.germplasmDataManager.getNextSequenceNumberForCrossName(prefix));
 	}
 
 	@Test
 	public void testGetPreferredIdsByGIDs() throws MiddlewareQueryException {
-		List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
-		Map<Integer, String> results = this.germplasmDataManager.getPrefferedIdsByGIDs(gids);
-		for (Integer gid : results.keySet()) {
+		final List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
+		final Map<Integer, String> results = this.germplasmDataManager.getPrefferedIdsByGIDs(gids);
+		for (final Integer gid : results.keySet()) {
 			Debug.println(IntegrationTestBase.INDENT, gid + " : " + results.get(gid));
 		}
 	}
 
 	@Test
 	public void testGetAllMethods() throws Exception {
-		List<Method> results = this.germplasmDataManager.getAllMethods();
+		final List<Method> results = this.germplasmDataManager.getAllMethods();
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 		Debug.printObjects(IntegrationTestBase.INDENT, results);
@@ -636,7 +639,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllMethodsNotGenerative() throws Exception {
-		List<Method> results = this.germplasmDataManager.getAllMethodsNotGenerative();
+		final List<Method> results = this.germplasmDataManager.getAllMethodsNotGenerative();
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 		Debug.printObjects(IntegrationTestBase.INDENT, results);
@@ -644,21 +647,21 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllGermplasm() throws Exception {
-		List<Germplasm> germplasms = this.germplasmDataManager.getAllGermplasm(0, 100, Database.CENTRAL);
+		final List<Germplasm> germplasms = this.germplasmDataManager.getAllGermplasm(0, 100);
 		Debug.printObjects(IntegrationTestBase.INDENT, germplasms);
 	}
 
 	@Test
 	public void testGetBibliographicalReferenceById() throws Exception {
-		Integer id = Integer.valueOf(1);
-		Bibref bibref = this.germplasmDataManager.getBibliographicReferenceByID(id);
+		final Integer id = Integer.valueOf(1);
+		final Bibref bibref = this.germplasmDataManager.getBibliographicReferenceByID(id);
 		Debug.println(IntegrationTestBase.INDENT, "testGetBibliographicalReferenceById(" + id + "): " + bibref);
 	}
 
 	@Test
 	public void testGetMethodByID() throws Exception {
-		Integer id = Integer.valueOf(4);
-		Method methodid = this.germplasmDataManager.getMethodByID(id);
+		final Integer id = Integer.valueOf(4);
+		final Method methodid = this.germplasmDataManager.getMethodByID(id);
 		Assert.assertNotNull(methodid);
 		Debug.println(IntegrationTestBase.INDENT, "testGetMethodByID(" + id + "): ");
 		Debug.println(IntegrationTestBase.INDENT, methodid);
@@ -666,31 +669,31 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetUserDefinedFieldByID() throws Exception {
-		Integer id = Integer.valueOf(1);
-		UserDefinedField result = this.germplasmDataManager.getUserDefinedFieldByID(id);
+		final Integer id = Integer.valueOf(1);
+		final UserDefinedField result = this.germplasmDataManager.getUserDefinedFieldByID(id);
 		Assert.assertNotNull(result);
 		Debug.println(IntegrationTestBase.INDENT, result);
 	}
 
 	@Test
 	public void testGetBibliographicReferenceByID() throws Exception {
-		Bibref bibref = new Bibref();
+		final Bibref bibref = new Bibref();
 		final PodamFactory factory = new PodamFactoryImpl();
 		factory.populatePojo(bibref, Bibref.class);
 		// Let hibernate generate id.
 		bibref.setRefid(null);
 		this.germplasmDataManager.addBibliographicReference(bibref);
 
-		Bibref result = this.germplasmDataManager.getBibliographicReferenceByID(bibref.getRefid());
+		final Bibref result = this.germplasmDataManager.getBibliographicReferenceByID(bibref.getRefid());
 		Debug.println(IntegrationTestBase.INDENT, result);
 	}
 
 	@Test
 	public void testGetGermplasmByLocationId() throws Exception {
-		String name = "RCH";
-		int locationID = 0;
+		final String name = "RCH";
+		final int locationID = 0;
 
-		List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByLocationId(name, locationID);
+		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByLocationId(name, locationID);
 		Assert.assertTrue(germplasmList != null);
 
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByLocationId(" + name + "): ");
@@ -699,10 +702,10 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetGermplasmByGidRange() throws Exception {
-		int startGID = 1;
-		int endGID = 5;
+		final int startGID = 1;
+		final int endGID = 5;
 
-		List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByGidRange(startGID, endGID);
+		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByGidRange(startGID, endGID);
 		Assert.assertTrue(germplasmList != null);
 
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByGidRange(" + startGID + "," + endGID + "): ");
@@ -711,87 +714,87 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetGermplasmByGIDList() throws Exception {
-		List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
+		final List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
 
-		List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasms(gids);
+		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasms(gids);
 		Assert.assertTrue(germplasmList != null);
 
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByGidList(" + gids + "): ");
-		for (Germplasm g : germplasmList) {
+		for (final Germplasm g : germplasmList) {
 			Debug.println(IntegrationTestBase.INDENT, g);
 		}
 	}
 
 	@Test
 	public void testGetPreferredNamesByGIDs() throws MiddlewareQueryException {
-		List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
-		Map<Integer, String> results = this.germplasmDataManager.getPreferredNamesByGids(gids);
-		for (Integer gid : results.keySet()) {
+		final List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
+		final Map<Integer, String> results = this.germplasmDataManager.getPreferredNamesByGids(gids);
+		for (final Integer gid : results.keySet()) {
 			Debug.println(IntegrationTestBase.INDENT, gid + " : " + results.get(gid));
 		}
 	}
 
 	@Test
 	public void testGetLocationNamesByGIDs() throws MiddlewareQueryException {
-		List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
-		Map<Integer, String> results = this.germplasmDataManager.getLocationNamesByGids(gids);
-		for (Integer gid : results.keySet()) {
+		final List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
+		final Map<Integer, String> results = this.germplasmDataManager.getLocationNamesByGids(gids);
+		for (final Integer gid : results.keySet()) {
 			Debug.println(IntegrationTestBase.INDENT, gid + " : " + results.get(gid));
 		}
 	}
 
 	@Test
 	public void testSearchGermplasm() throws MiddlewareQueryException {
-		String q = "CML";
-		List<Germplasm> results = this.germplasmDataManager.searchForGermplasm(q, Operation.LIKE, true, false);
+		final String q = "CML";
+		final List<Germplasm> results = this.germplasmDataManager.searchForGermplasm(q, Operation.LIKE, true, false);
 		Debug.println(IntegrationTestBase.INDENT, "searchForGermplasm(" + q + "): " + results.size() + " matches found.");
 	}
 
 	@Test
 	public void getGermplasmDatesByGids() throws MiddlewareQueryException {
-		List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
-		Map<Integer, Integer> results = this.germplasmDataManager.getGermplasmDatesByGids(gids);
+		final List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
+		final Map<Integer, Integer> results = this.germplasmDataManager.getGermplasmDatesByGids(gids);
 		Debug.println(IntegrationTestBase.INDENT, "getGermplasmDatesByGids(" + gids + "): ");
 		Debug.println(IntegrationTestBase.INDENT, results.toString());
 	}
 
 	@Test
 	public void getMethodsByGids() throws MiddlewareQueryException {
-		List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
-		Map<Integer, Object> results = this.germplasmDataManager.getMethodsByGids(gids);
+		final List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
+		final Map<Integer, Object> results = this.germplasmDataManager.getMethodsByGids(gids);
 		Debug.println(IntegrationTestBase.INDENT, "getGermplasmDatesByGids(" + gids + "): ");
 		Debug.println(IntegrationTestBase.INDENT, results.toString());
 	}
 
 	@Test
 	public void getAttributeTypesByGIDList() throws MiddlewareQueryException {
-		List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
-		List<UserDefinedField> results = this.germplasmDataManager.getAttributeTypesByGIDList(gids);
+		final List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
+		final List<UserDefinedField> results = this.germplasmDataManager.getAttributeTypesByGIDList(gids);
 		Debug.println(IntegrationTestBase.INDENT, "getAttributeTypesByGIDList(" + gids + "): ");
-		for (UserDefinedField field : results) {
+		for (final UserDefinedField field : results) {
 			Debug.println(IntegrationTestBase.INDENT, field.getFname());
 		}
 	}
 
 	@Test
 	public void getAttributeValuesByTypeAndGIDList() throws MiddlewareQueryException {
-		List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
-		Integer attributeType = 1115;
-		Map<Integer, String> results = this.germplasmDataManager.getAttributeValuesByTypeAndGIDList(attributeType, gids);
+		final List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
+		final Integer attributeType = 1115;
+		final Map<Integer, String> results = this.germplasmDataManager.getAttributeValuesByTypeAndGIDList(attributeType, gids);
 		Debug.println(IntegrationTestBase.INDENT, "getAttributeValuesByTypeAndGIDList(" + attributeType + ", " + gids + "): ");
 		Debug.println(IntegrationTestBase.INDENT, results.toString());
 	}
 
 	@Test
 	public void getMethodClasses() throws MiddlewareQueryException {
-		List<Term> terms = this.germplasmDataManager.getMethodClasses();
+		final List<Term> terms = this.germplasmDataManager.getMethodClasses();
 		System.out.println(terms);
 	}
 
 	@Test
 	public void testGetMethodByName() throws Exception {
-		String name = "breeders seed";
-		Method method = this.germplasmDataManager.getMethodByName(name);
+		final String name = "breeders seed";
+		final Method method = this.germplasmDataManager.getMethodByName(name);
 		Assert.assertNotNull(method);
 		Debug.println(IntegrationTestBase.INDENT, "testGetMethodByName(" + name + "): ");
 		Debug.println(IntegrationTestBase.INDENT, method);
@@ -799,16 +802,16 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetMethodByNameWithProgramUUID() throws Exception {
-		String name = "breeders seed";
-		String programUUID = this.commonTestProject.getUniqueID();
-		Method method = this.germplasmDataManager.getMethodByName(name, programUUID);
+		final String name = "breeders seed";
+		final String programUUID = this.commonTestProject.getUniqueID();
+		final Method method = this.germplasmDataManager.getMethodByName(name, programUUID);
 		Assert.assertNotNull("Expecting the return method is not null.", method);
 	}
 
 	@Test
 	public void testGetMethodByCode() throws Exception {
-		String code = "VBS";
-		Method method = this.germplasmDataManager.getMethodByCode(code);
+		final String code = "VBS";
+		final Method method = this.germplasmDataManager.getMethodByCode(code);
 		Assert.assertNotNull(method);
 		Debug.println(IntegrationTestBase.INDENT, "testGetMethodByCode(" + code + "): ");
 		Debug.println(IntegrationTestBase.INDENT, method);
@@ -816,15 +819,15 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetMethodByCodeWithProgramUUID() throws Exception {
-		String code = "VBS";
-		String programUUID = this.commonTestProject.getUniqueID();
-		Method method = this.germplasmDataManager.getMethodByCode(code, programUUID);
+		final String code = "VBS";
+		final String programUUID = this.commonTestProject.getUniqueID();
+		final Method method = this.germplasmDataManager.getMethodByCode(code, programUUID);
 		Assert.assertNotNull("Expecting the return method is not null.", method);
 	}
 
 	@Test
 	public void testAddUserDefinedField() throws Exception {
-		UserDefinedField field = new UserDefinedField();
+		final UserDefinedField field = new UserDefinedField();
 		field.setFtable("ATRIBUTS");
 		field.setFtype("ATTRIBUTE");
 		field.setFcode("MATURITY");
@@ -838,7 +841,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		field.setFdate(20041116);
 		field.setScaleid(0);
 
-		Integer success = this.germplasmDataManager.addUserDefinedField(field);
+		final Integer success = this.germplasmDataManager.addUserDefinedField(field);
 		Assert.assertTrue(success > 0);
 
 		Debug.println(IntegrationTestBase.INDENT, "testAddUserDefinedField(" + field + "): ");
@@ -846,7 +849,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddAttribute() throws Exception {
-		Attribute attr = new Attribute();
+		final Attribute attr = new Attribute();
 		attr.setGermplasmId(237431);
 		attr.setTypeId(1);
 		attr.setUserId(1);
@@ -860,7 +863,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 		Debug.println(IntegrationTestBase.INDENT, "testAddAttribute(" + attr + "): ");
 
-		Attribute readAttribute = this.germplasmDataManager.getAttributeById(attr.getAid());
+		final Attribute readAttribute = this.germplasmDataManager.getAttributeById(attr.getAid());
 		Assert.assertNotNull(readAttribute);
 		Debug.println(IntegrationTestBase.INDENT, "testGetAttributeById(" + attr.getAid() + ") Results:");
 		Debug.println(IntegrationTestBase.INDENT, readAttribute);
@@ -869,9 +872,9 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void getProgramMethodsAndDeleteByUniqueId() {
 		// create program locations
-		String programUUID = this.commonTestProject.getUniqueID();
-		Method testMethod1 = this.createMethodTestData(programUUID);
-		Method testMethod2 = this.createMethodTestData(programUUID);
+		final String programUUID = this.commonTestProject.getUniqueID();
+		final Method testMethod1 = this.createMethodTestData(programUUID);
+		final Method testMethod2 = this.createMethodTestData(programUUID);
 		try {
 			this.germplasmDataManager.addMethod(testMethod1);
 			this.germplasmDataManager.addMethod(testMethod2);
@@ -882,13 +885,13 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 			this.germplasmDataManager.deleteProgramMethodsByUniqueId(programUUID);
 			methodList = this.germplasmDataManager.getProgramMethods(programUUID);
 			Assert.assertTrue("There should be no program methods with programUUID[" + programUUID + "]", methodList.isEmpty());
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			Assert.fail("Getting and deleting of program methods failed ");
 		}
 	}
 
-	private Method createMethodTestData(String programUUID) {
-		Method method = new Method();
+	private Method createMethodTestData(final String programUUID) {
+		final Method method = new Method();
 		method.setUniqueID(programUUID);
 		method.setMname("TEST-LOCATION" + System.currentTimeMillis());
 		method.setMdesc("TEST-LOCATION-DESC" + System.currentTimeMillis());
@@ -908,7 +911,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetGermplasmWithMethodType() throws Exception {
-		Integer gid = 1;
+		final Integer gid = 1;
 		this.germplasmDataManager.getGermplasmWithMethodType(gid);
 	}
 }
