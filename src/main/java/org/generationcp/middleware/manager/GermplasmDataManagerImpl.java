@@ -86,7 +86,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op, Database instance)
+	public List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op)
 			throws MiddlewareQueryException {
 		List<Germplasm> germplasms = new ArrayList<Germplasm>();
 		final GermplasmDAO dao = this.getGermplasmDao();

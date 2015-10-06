@@ -42,7 +42,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
@@ -132,7 +131,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		final String name = "CML502RLT";
 
 		final List<Germplasm> germplasmList =
-				this.germplasmDataManager.getGermplasmByName(name, 0, 5, GetGermplasmByNameModes.NORMAL, Operation.EQUAL, null, null);
+				this.germplasmDataManager.getGermplasmByName(name, 0, 5, Operation.EQUAL);
 		Assert.assertTrue(germplasmList != null);
 
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByName(" + name + "): ");

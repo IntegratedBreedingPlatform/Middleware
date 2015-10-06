@@ -34,7 +34,7 @@ public class SingleGermplasmCrossElement implements GermplasmCrossElement {
 			if(crossName != null){
 				return crossName;
 			}else {
-				return "Unknown";
+				return "";
 			}
 		} else {
 			return "Unknown";
