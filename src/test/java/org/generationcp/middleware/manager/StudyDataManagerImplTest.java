@@ -256,7 +256,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetRootFolders() throws Exception {
-		List<Reference> rootFolders = this.manager.getRootFolders(this.commonTestProject.getUniqueID());
+		List<Reference> rootFolders = this.manager.getRootFolders(this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
 		Assert.assertNotNull(rootFolders);
 		// this should contain the nursery and trial templates
 		Assert.assertFalse(rootFolders.isEmpty());
@@ -266,7 +266,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		studyTestDataUtil.createFolderTestData(uniqueId);
 		studyTestDataUtil.createStudyTestData(uniqueId);
 
-		rootFolders = this.manager.getRootFolders(this.commonTestProject.getUniqueID());
+		rootFolders = this.manager.getRootFolders(this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
 		Assert.assertNotNull(rootFolders);
 		Assert.assertFalse(rootFolders.isEmpty());
 
@@ -289,7 +289,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		List<Integer> folderIds = Arrays.asList(25000, 1);
 		for (Integer folderId : folderIds) {
 			Debug.println(IntegrationTestBase.INDENT, " folderId = " + folderId);
-			List<Reference> childrenNodes = this.manager.getChildrenOfFolder(folderId, this.commonTestProject.getUniqueID());
+			List<Reference> childrenNodes = this.manager.getChildrenOfFolder(folderId, this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
 			Assert.assertNotNull(childrenNodes);
 			Assert.assertTrue(childrenNodes.size() > 0);
 			Debug.println(IntegrationTestBase.INDENT, "testGetChildrenOfFolder(folderId=" + folderId + "): " + childrenNodes.size());

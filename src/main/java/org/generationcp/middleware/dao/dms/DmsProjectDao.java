@@ -59,7 +59,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	 * Type of study and whether study is deleted are stored in projectprops table.
 	 * Which folder the study is in, is defined in the project_relationship table.
 	 */
-	private static final String GET_CHILDREN_OF_FOLDER =
+	static final String GET_CHILDREN_OF_FOLDER =
 			"SELECT subject.project_id, subject.name,  subject.description, "
 					+ "	(CASE WHEN (pr.type_id = " + TermId.IS_STUDY.getId() + ") THEN 1 ELSE 0 END) AS is_study, "
 					+ "    subject.program_uuid, "
@@ -71,6 +71,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					+ "		AND pr.object_project_id = :folderId "
 					+ "     AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = " + TermId.STUDY_STATUS.getId() + " AND pp.project_id = subject.project_id AND pp.value = " + TermId.DELETED_STUDY.getId() + ") "
 					+ "     AND (subject.program_uuid = :program_uuid OR subject.program_uuid IS NULL) "
+					+ "     AND (prop.value in (:studyTypeIds) or prop.value IS NULL)"  // the OR here for value = null is required for folders.
 					+ "	ORDER BY name";
 
 	private static final String GET_STUDIES_OF_FOLDER = "SELECT  DISTINCT pr.subject_project_id "
@@ -97,18 +98,29 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "UNION SELECT pr.subject_project_id " + "FROM project_relationship pr, project p " + "WHERE pr.type_id = "
 			+ TermId.HAS_PARENT_FOLDER.getId() + " " + "AND pr.subject_project_id = p.project_id " + "AND p.program_uuid = :program_uuid ";
 
-	public List<Reference> getRootFolders(String programUUID) {
-		return getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID);
+	public List<Reference> getRootFolders(String programUUID, List<StudyType> studyTypes) {
+		return getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID, studyTypes);
 	}
 
-	public List<Reference> getChildrenOfFolder(Integer folderId, String programUUID) {
+	public List<Reference> getChildrenOfFolder(Integer folderId, String programUUID, List<StudyType> studyTypes) {
 
 		List<Reference> childrenNodes = new ArrayList<Reference>();
+		
+		if (studyTypes == null || studyTypes.isEmpty()) {
+			throw new MiddlewareQueryException("Missing required parameter. At least one study type must be specified.");
+		}
 
 		try {
 			Query query = this.getSession().createSQLQuery(DmsProjectDao.GET_CHILDREN_OF_FOLDER);
 			query.setParameter("folderId", folderId);
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
+			
+			List<Integer> stydyTypeIds = new ArrayList<>();
+			for (StudyType studyType : studyTypes) {
+				stydyTypeIds.add(studyType.getId());
+			}
+			query.setParameterList("studyTypeIds", stydyTypeIds);
+
 			List<Object[]> list = query.list();
 
 			for (Object[] row : list) {

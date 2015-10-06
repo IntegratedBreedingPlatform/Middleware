@@ -125,13 +125,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<Reference> getRootFolders(String programUUID) {
-		return this.getDmsProjectDao().getRootFolders(programUUID);
+	public List<Reference> getRootFolders(String programUUID, List<StudyType> studyTypes) {
+		return this.getDmsProjectDao().getRootFolders(programUUID, studyTypes);
 	}
 
 	@Override
-	public List<Reference> getChildrenOfFolder(int folderId, String programUUID) throws MiddlewareQueryException {
-		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID);
+	public List<Reference> getChildrenOfFolder(int folderId, String programUUID, List<StudyType> studyTypes) throws MiddlewareQueryException {
+		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, studyTypes);
 	}
 
 	@Override
@@ -677,7 +677,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("Folder is not existing");
 		}
 		// check if folder has no children
-		List<Reference> children = dmsProjectDao.getChildrenOfFolder(id, programUUID);
+		List<Reference> children = dmsProjectDao.getChildrenOfFolder(id, programUUID, StudyType.nurseriesAndTrials());
 		if (children != null && !children.isEmpty()) {
 			throw new MiddlewareQueryException("Folder is not empty");
 		}

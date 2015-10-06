@@ -14,7 +14,6 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -47,7 +46,7 @@ public class StudyTestDataUtil {
 		return dmsProject;
 	}
 
-	public DmsProject createStudyTestData(String uniqueId) throws MiddlewareException {
+	public DmsProject createStudyTestData(String uniqueId) {
 		String name = "Study Name " + new Random().nextInt(10000);
 		String description = "Study Description";
 
@@ -79,7 +78,7 @@ public class StudyTestDataUtil {
 		return dmsProject;
 	}
 
-	public DmsProject createStudyTestDataWithActiveStatus(String uniqueId) throws MiddlewareException {
+	public DmsProject createStudyTestDataWithActiveStatus(String uniqueId) {
 		String name = "Study Name " + new Random().nextInt(10000);
 		String description = "Study Description";
 
@@ -115,7 +114,7 @@ public class StudyTestDataUtil {
 		return dmsProject;
 	}
 
-	public Variable createVariable(int termId, String value, int rank, String uniqueId) throws MiddlewareException {
+	public Variable createVariable(int termId, String value, int rank, String uniqueId) {
 		StandardVariable stVar = this.ontologyManager.getStandardVariable(termId,uniqueId);
 
 		DMSVariableType vtype = new DMSVariableType();
@@ -127,12 +126,12 @@ public class StudyTestDataUtil {
 		return var;
 	}
 
-	public void deleteTestData(int projectId) throws MiddlewareQueryException {
+	public void deleteTestData(int projectId) {
 		this.studyDataManager.deleteEmptyFolder(projectId, null);
 	}
 
-	public List<Reference> getRootFolders(String uniqueId) throws MiddlewareQueryException {
-		return this.studyDataManager.getRootFolders(uniqueId);
+	public List<Reference> getRootFolders(String uniqueId) {
+		return this.studyDataManager.getRootFolders(uniqueId, StudyType.nurseriesAndTrials());
 	}
 
 }
