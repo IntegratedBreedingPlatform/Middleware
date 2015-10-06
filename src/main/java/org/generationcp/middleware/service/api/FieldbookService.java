@@ -17,9 +17,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -429,40 +427,6 @@ public interface FieldbookService {
 	 * @return list of all possible treatment pairs
 	 */
 	List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId, List<Integer> hiddenFields);
-
-	/**
-	 * Returns the study type.
-	 *
-	 * @param studyId the study id
-	 * @return the study type
-	 */
-	TermId getStudyType(int studyId);
-
-	/**
-	 * Returns list of root or top-level folders from specified database.
-	 *
-	 * @param programUUID program's unique id
-	 * @return List of Folder POJOs or empty list if none found
-	 */
-	List<FolderReference> getRootFolders(String programUUID);
-
-	/**
-	 * Returns list of children of a folder given its ID. Retrieves from central if the given ID is positive, otherwise retrieves from
-	 * local.
-	 *
-	 * @param folderId The id of the folder to match
-	 * @param programUUID unique id of the program
-	 * @return List of AbstractNode (FolderNode, StudyNode) POJOs or empty list if none found
-	 */
-	List<Reference> getChildrenOfFolder(int folderId, String programUUID);
-
-	/**
-	 * Check if the given id is an existing study.
-	 *
-	 * @param id the id
-	 * @return true, if is study
-	 */
-	boolean isStudy(int id);
 
 	/**
 	 * Get lOcation by id.

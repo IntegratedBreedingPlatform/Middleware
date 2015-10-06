@@ -411,6 +411,7 @@
 						<include>**/ObservationsTest.java</include>
 						<include>**/QueryTest.java</include>
 						<include>**/StudyMeasurementsTest.java</include>
+						<include>**/DmsProjectDaoTest.java</include>
 
 						<!-- New Ontology Manager Tests -->
 						<include>**/CvTermDaoTest.java</include>
