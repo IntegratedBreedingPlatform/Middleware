@@ -89,15 +89,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<StudyDetails> getAllLocalNurseryDetails(final String programUUID) {
-		final List<StudyDetails> studyDetailList = this.getStudyDataManager().getAllStudyDetails(StudyType.N, programUUID);
-		return FieldbookListUtil.removeStudyDetailsWithEmptyRows(studyDetailList);
+	public List<StudyDetails> getAllLocalNurseryDetails(String programUUID) {
+		return this.getStudyDataManager().getAllStudyDetails(StudyType.N, programUUID);
 	}
 
 	@Override
-	public List<StudyDetails> getAllLocalTrialStudyDetails(final String programUUID) {
-		final List<StudyDetails> studyDetailList = this.getStudyDataManager().getAllStudyDetails(StudyType.T, programUUID);
-		return FieldbookListUtil.removeStudyDetailsWithEmptyRows(studyDetailList);
+	public List<StudyDetails> getAllLocalTrialStudyDetails(String programUUID) {
+		return this.getStudyDataManager().getAllStudyDetails(StudyType.T, programUUID);
 	}
 
 	@Override
