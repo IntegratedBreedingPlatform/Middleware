@@ -38,7 +38,6 @@ public class VariableInfoBuilder {
 		ProjectProperty localNameProperty = this.findLocalNameProperty(stdVariableProperty.getValue(), properties);
 		ProjectProperty localDescriptionProperty = this.findLocalDescriptionProperty(properties);
 		ProjectProperty treatmentLabelProperty = this.findTreatmentLabelProperty(properties);
-		PhenotypicType role = this.findRole(properties);
 
 		VariableInfo variableDef = new VariableInfo();
 		variableDef.setLocalName(localNameProperty == null ? null : localNameProperty.getValue());
@@ -51,7 +50,14 @@ public class VariableInfoBuilder {
 			variableDef.setTreatmentLabel(treatmentLabelProperty.getValue());
 		}
 
-		variableDef.setRole(role);
+		for (ProjectProperty property : properties) {
+			VariableType varType = VariableType.getById(property.getTypeId());
+			if (varType != null) {
+				variableDef.setRole(varType.getRole());
+				variableDef.setVariableType(varType);
+			}
+		}
+
 		return variableDef;
 	}
 
@@ -73,16 +79,6 @@ public class VariableInfoBuilder {
 		return null;
 	}
 
-	private PhenotypicType findRole(Set<ProjectProperty> properties) {
-		for (ProjectProperty property : properties) {
-			VariableType varType = VariableType.getById(property.getTypeId());
-			if (varType != null) {
-				return varType.getRole();
-			}
-		}
-		return null;
-	}
-	
 	private ProjectProperty findLocalNameProperty(String stdVariableIdStr, Set<ProjectProperty> properties) {
 		Integer stdVariableId = Integer.parseInt(stdVariableIdStr);
 		for (ProjectProperty property : properties) {
