@@ -787,4 +787,15 @@ public interface StudyDataManager {
 	 */
 	public List<String> getAllSharedProjectNames() throws MiddlewareQueryException;
 
+	/**
+	 * Checks whether the specified locationIds exist in a given dataset
+	 * 
+	 * @param locationIds list of location ids
+	 * @param dataSetId the id of the dataset
+	 * @param experimentTypeId the experiment type
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	boolean checkIfAnyLocationIDsExistInExperiments(int studyId, DataSetType dataSetType, List<Integer> locationIds);
+
 }

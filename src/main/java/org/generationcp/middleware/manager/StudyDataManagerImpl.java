@@ -1062,4 +1062,20 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public List<String> getAllSharedProjectNames() throws MiddlewareQueryException {
 		return this.getDmsProjectDao().getAllSharedProjectNames();
 	}
+
+	@Override
+	public boolean checkIfAnyLocationIDsExistInExperiments(int studyId, DataSetType dataSetType, List<Integer> locationIds) {
+
+		List<DmsProject> datasetProjects =
+				this.getDmsProjectDao().getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(),
+						String.valueOf(dataSetType.getId()));
+
+		if (!datasetProjects.isEmpty()) {
+			int dataSetId = datasetProjects.get(0).getProjectId();
+			return this.getExperimentDao().checkIfAnyLocationIDsExistInExperiments(dataSetId, locationIds);
+		} else {
+			return false;
+		}
+
+	}
 }
