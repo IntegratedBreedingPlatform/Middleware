@@ -66,7 +66,6 @@ import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.generationcp.middleware.util.DatabaseBroker;
 import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -126,13 +125,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<FolderReference> getRootFolders(String programUUID) throws MiddlewareQueryException {
-		return this.getDmsProjectDao().getRootFolders(programUUID);
+	public List<Reference> getRootFolders(String programUUID, List<StudyType> studyTypes) {
+		return this.getDmsProjectDao().getRootFolders(programUUID, studyTypes);
 	}
 
 	@Override
-	public List<Reference> getChildrenOfFolder(int folderId, String programUUID) throws MiddlewareQueryException {
-		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID);
+	public List<Reference> getChildrenOfFolder(int folderId, String programUUID, List<StudyType> studyTypes) throws MiddlewareQueryException {
+		return this.getDmsProjectDao().getChildrenOfFolder(folderId, programUUID, studyTypes);
 	}
 
 	@Override
@@ -678,7 +677,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("Folder is not existing");
 		}
 		// check if folder has no children
-		List<Reference> children = dmsProjectDao.getChildrenOfFolder(id, programUUID);
+		List<Reference> children = dmsProjectDao.getChildrenOfFolder(id, programUUID, StudyType.nurseriesAndTrials());
 		if (children != null && !children.isEmpty()) {
 			throw new MiddlewareQueryException("Folder is not empty");
 		}
@@ -784,6 +783,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<FolderReference> getFolderTree() throws MiddlewareQueryException {
 		return this.getFolderBuilder().buildFolderTree();
+	}
+	
+	@Override
+	public List<FolderReference> getAllFolders() {
+		return this.getDmsProjectDao().getAllFolders();
 	}
 
 	@Override
