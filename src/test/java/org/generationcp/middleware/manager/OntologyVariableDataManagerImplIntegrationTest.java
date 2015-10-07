@@ -83,12 +83,23 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 	@Test
 	public void testGetVariable() throws Exception {
-		Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
+		Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, true);
 		Assert.assertNotNull(variable);
 		Assert.assertEquals("Variable should has the id " + this.testVariableInfo.getId(), this.testVariableInfo.getId(), variable.getId());
 		Assert.assertFalse("Variable should not be obsolete.", variable.isObsolete());
+
+		Assert.assertEquals("Study usage should be 0", new Integer(0), variable.getStudies() );
+		Assert.assertEquals("Observation usage should be 0", new Integer(0), variable.getObservations());
+
 	}
 
+	@Test
+	public void testNotRetrievingVariableUsageStatistics() throws Exception {
+		Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
+		Assert.assertNotNull(variable);
+		Assert.assertEquals("Study usage should be -1 i.e. unknow.", new Integer(-1), variable.getStudies() );
+		Assert.assertEquals("Observation usage should be -1 i.e. unknow.", new Integer(-1), variable.getObservations());
+	}
 	@Test
 	public void testGetVariable_DontFilterObsolete() throws Exception {
 		CVTermDao cvtermDao = new CVTermDao();
