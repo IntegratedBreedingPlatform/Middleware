@@ -2879,4 +2879,46 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	public List<MappingData> getAllMappingData() {
 		return this.getMappingDataDao().getAll();
 	}
+
+	// --- Added by Matthew transferring GDMS SQL to middleware -- //
+	
+	@Override
+	public List<Object> getUniqueAccMetaDataSetByDatasetId(String datasetId) {
+		return this.getAccMetadataSetDao().getUniqueAccMetaDatsetByDatasetId(datasetId);
+	}
+
+	@Override
+	public List<Object> getUniqueCharAllelesByDataset(String datasetId) {
+		return this.getCharValuesDao().getUniqueAllelesByDatasetId(datasetId);
+	}
+
+	@Override
+	public List<QtlDetails> getAllQtlDetails() {
+		return this.getQtlDetailsDao().getAll();
+	}
+
+	@Override
+	public List<Qtl> getAllQtl() {
+		return this.getQtlDao().getAll();
+	}
+
+	@Override
+	public List<Object> getUniqueCharAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids) {
+		return this.getCharValuesDao().getUniqueCharAllelesByGidsAndMids(gids, mids);
+	}
+
+	@Override
+	public List<Object> getUniqueAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids) {
+		return this.getAlleleValuesDao().getUniqueAllelesByGidsAndMids(gids, mids);
+	}
+
+	@Override
+	public List<Object> getUniqueMapPopAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids) {
+		return this.getMappingPopValuesDao().getUniqueMapPopAllelesByGidsAndMids(gids, mids);
+	}
+
+	@Override
+	public List<Object> getUniqueAccMetaDataSetByGids(List gids) {
+		return this.getAccMetadataSetDao().getUniqueAccMetaDatsetByGids(gids);
+	}
 }

@@ -22,6 +22,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.SetOperation;
 import org.generationcp.middleware.pojos.gdms.AccMetadataSet;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
@@ -65,7 +66,12 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 
 	public static final String COUNT_NIDS_BY_DATASET_IDS =
 			"SELECT COUNT(DISTINCT nid) FROM gdms_acc_metadataset WHERE dataset_id IN (:datasetIds)";
+	
+	public static final String GET_GID_NIC_SAMPLE_ID_BY_DATASET = "SELECT distinct gid,nid, acc_sample_id from gdms_acc_metadataset where dataset_id = (:datasetId) order by gid, nid,acc_sample_id asc";
 
+	public static final String GET_UNIQUE_ACC_METADATASET_BY_GIDS = "select distinct gid,nid, acc_sample_id from gdms_acc_metadataset where gid in (:gids)" 
+			+ " order by gid, nid,acc_sample_id asc";
+	
 	@SuppressWarnings("unchecked")
 	public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException {
 		try {
@@ -79,7 +85,7 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 		}
 		return new ArrayList<Integer>();
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	public List<AccMetadataSet> getByDatasetIdsAndNotInGids(List<Integer> datasetIds, List<Integer> gids, int start, int numOfRows)
 			throws MiddlewareQueryException {
@@ -326,6 +332,36 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 		}
 		return dataValues;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Object> getUniqueAccMetaDatsetByDatasetId(String datasetId) throws MiddlewareQueryException {
+		try {
+				SQLQuery query = this.getSession().createSQLQuery(AccMetadataSetDAO.GET_GID_NIC_SAMPLE_ID_BY_DATASET);
+				query.setParameter("datasetId", datasetId);
+				query.addScalar("gid", Hibernate.INTEGER);
+				query.addScalar("nid", Hibernate.INTEGER);
+				query.addScalar("acc_sample_id", Hibernate.INTEGER);				
+				return query.list();
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error with getUniqueAccMetaDatasetByDatasetId(" + datasetId + ") query from AccMetadataSet: " + e.getMessage(), e);
+		}
+		return new ArrayList<Object>();
+	}	
+	
+	@SuppressWarnings("unchecked")
+	public List<Object> getUniqueAccMetaDatsetByGids(List<Integer> gids) throws MiddlewareQueryException {
+		try {
+				SQLQuery query = this.getSession().createSQLQuery(AccMetadataSetDAO.GET_UNIQUE_ACC_METADATASET_BY_GIDS);
+				query.setParameterList("gids", gids);
+				query.addScalar("gid", Hibernate.INTEGER);
+				query.addScalar("nid", Hibernate.INTEGER);
+				query.addScalar("acc_sample_id", Hibernate.INTEGER);				
+				return query.list();
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error with getUniqueAccMetaDatasetByGids(" + gids + ") query from AccMetadataSet: " + e.getMessage(), e);
+		}
+		return new ArrayList<Object>();
+	}	
 
 	@SuppressWarnings("rawtypes")
 	public boolean isExisting(AccMetadataSet accMetadataSet) throws MiddlewareQueryException {

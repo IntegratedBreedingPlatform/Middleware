@@ -2203,4 +2203,27 @@ public interface GenotypicDataManager {
 	 * @return List of MappingData instances
 	 */
 	List<MappingData> getAllMappingData();
+	
+	// Added by Matthew to move GDMS SQL to middleware : services not heavily understood
+	
+	List<Object> getUniqueAccMetaDataSetByDatasetId(String datasetId);
+	
+	List<Object> getUniqueAccMetaDataSetByGids(List gids);
+
+	List<Object> getUniqueCharAllelesByDataset(String datasetId);
+	
+	List<QtlDetails> getAllQtlDetails();
+
+	// I have a feeling we may need to paginate this guy ..... see the other limited getAllQtl
+	List<Qtl> getAllQtl();
+	
+	// AlleleValues (AlleleValueDao)
+	List<Object> getUniqueAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids);
+	
+	// Char Alleles (CharValueDAO)
+	List<Object> getUniqueCharAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids);
+
+	// Map Pop Alleles (MappingPopValueDAO)
+	List<Object> getUniqueMapPopAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids);
+
 }
