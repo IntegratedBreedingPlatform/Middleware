@@ -37,9 +37,10 @@ public interface OntologyVariableDataManager {
 	 * @param programUuid as the unique id of the program
 	 * @param id as the variable Id
 	 * @param filterObsolete as flag if obsolete terms will be filtered
-	 * @return Variable
+	 * @param calculateVariableUsage will populate variable usage into the studies and observation fields fields in {@link Variable} object.
+	 * @return the requested {@link Variable}
 	 */
-	Variable getVariable(String programUuid, Integer id, boolean filterObsolete);
+	Variable getVariable(String programUuid, Integer id, boolean filterObsolete, boolean calculateVariableUsage);
 
 	/**
 	 * @param OntologyVariableInfo

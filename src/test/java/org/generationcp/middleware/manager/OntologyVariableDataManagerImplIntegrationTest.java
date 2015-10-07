@@ -83,7 +83,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 	@Test
 	public void testGetVariable() throws Exception {
-		Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
+		Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
 		Assert.assertNotNull(variable);
 		Assert.assertEquals("Variable should has the id " + this.testVariableInfo.getId(), this.testVariableInfo.getId(), variable.getId());
 		Assert.assertFalse("Variable should not be obsolete.", variable.isObsolete());
@@ -111,7 +111,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		testVariableCvTerm.setIsObsolete(true);
 		cvtermDao.update(testVariableCvTerm);
 
-		Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), false);
+		Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), false, false);
 		Assert.assertNotNull(variable);
 		Assert.assertEquals("Variable should has the id " + this.testVariableInfo.getId(), this.testVariableInfo.getId(), variable.getId());
 		Assert.assertTrue("Variable should be obsolete.", variable.isObsolete());
@@ -134,7 +134,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	@Test
 	public void testUpdateVariable() throws Exception {
 		this.variableManager.updateVariable(this.testVariableInfo);
-		Variable updatedVariable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true);
+		Variable updatedVariable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
 		Assert.assertNotNull(updatedVariable);
 	}
 
