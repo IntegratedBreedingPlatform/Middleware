@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.util.Debug;
 
 /**
@@ -22,6 +23,8 @@ import org.generationcp.middleware.util.Debug;
 public class StudyReference extends Reference {
 
 	private Integer numberOfEnvironments;
+	
+	private StudyType studyType;
 
 	public StudyReference(Integer id, String name) {
 		super.setId(id);
@@ -37,6 +40,11 @@ public class StudyReference extends Reference {
 		this(id, name, description);
 		super.setProgramUUID(programUUID);
 	}
+	
+	public StudyReference(Integer id, String name, String description, String programUUID, StudyType studyType) {
+		this(id, name, description, programUUID);
+		this.studyType = studyType;
+	}
 
 	public StudyReference(Integer id, String name, String description, Integer numberOfEnvironments) {
 		this(id, name, description);
@@ -49,6 +57,14 @@ public class StudyReference extends Reference {
 
 	public void setNumberOfEnvironments(Integer numberOfEnvironments) {
 		this.numberOfEnvironments = numberOfEnvironments;
+	}
+	
+	public StudyType getStudyType() {
+		return studyType;
+	}
+
+	public void setStudyType(StudyType studyType) {
+		this.studyType = studyType;
 	}
 
 	@Override
