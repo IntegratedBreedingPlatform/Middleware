@@ -14,6 +14,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 
 /**
  * http://wiki.cimmyt.org/confluence/display/MBP/Business+Rules+for+Mapping+to+Chado
@@ -27,6 +30,7 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @Table(name = "projectprop", uniqueConstraints = {@UniqueConstraint(columnNames = {"project_id", "type_id", "rank"})})
+@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="projectprop")
 public class ProjectProperty implements Serializable {
 
 	private static final long serialVersionUID = 7517773605676616639L;

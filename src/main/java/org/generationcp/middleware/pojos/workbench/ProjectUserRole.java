@@ -25,15 +25,18 @@ import javax.persistence.Table;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.pojos.User;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * POJO for workbench_project_user_role table.
- * 
+ *
  * @author Joyce Avestro
- * 
+ *
  */
 @Entity
 @Table(name = "workbench_project_user_role")
+@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="workbench_project_user_role")
 public class ProjectUserRole implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -116,7 +119,7 @@ public class ProjectUserRole implements Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#hashCode()
 	 */
 	@Override
@@ -126,7 +129,7 @@ public class ProjectUserRole implements Serializable {
 
 	/*
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see java.lang.Object#equals(java.lang.Object)
 	 */
 	@Override

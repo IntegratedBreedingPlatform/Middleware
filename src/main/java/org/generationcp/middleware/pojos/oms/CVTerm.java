@@ -22,6 +22,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_cvterm
  *
@@ -34,6 +37,7 @@ import javax.persistence.UniqueConstraint;
 @Entity
 @Table(name = "cvterm", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "cv_id", "is_obsolete"}),
 		@UniqueConstraint(columnNames = {"dbxref_id"})})
+@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="cvterm")
 public class CVTerm implements Serializable {
 
 	private static final long serialVersionUID = 1L;
