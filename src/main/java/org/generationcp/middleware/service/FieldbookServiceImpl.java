@@ -90,18 +90,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<StudyDetails> getAllLocalNurseryDetails(final String programUUID) {
-		final List<StudyDetails> studyDetailList = this.getStudyDataManager().getAllStudyDetails(StudyType.N, programUUID);
-		return FieldbookListUtil.removeStudyDetailsWithEmptyRows(studyDetailList);
-	}
-
-	@Override
-	public List<StudyDetails> getAllLocalTrialStudyDetails(final String programUUID) {
-		final List<StudyDetails> studyDetailList = this.getStudyDataManager().getAllStudyDetails(StudyType.T, programUUID);
-		return FieldbookListUtil.removeStudyDetailsWithEmptyRows(studyDetailList);
-	}
-
-	@Override
 	public List<FieldMapInfo> getFieldMapInfoOfTrial(final List<Integer> trialIdList,
 			final CrossExpansionProperties crossExpansionProperties) {
 		return this.getStudyDataManager().getFieldMapInfoOfStudy(trialIdList, StudyType.T, crossExpansionProperties);
@@ -292,7 +280,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 										this.getPhenotypeSaver().saveOrUpdate(row.getExperimentId(), variate.getTermId(),
 												field.getcValueId() != null && !"".equals(field.getcValueId()) ? field.getcValueId()
 														: field.getValue(),
-												phenotype, field.isCustomCategoricalValue(), variate.getDataTypeId());
+														phenotype, field.isCustomCategoricalValue(), variate.getDataTypeId());
 									}
 								}
 							}
@@ -399,7 +387,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		FieldbookServiceImpl.LOG
-				.debug("========== saveNurseryAdvanceGermplasmList Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
+		.debug("========== saveNurseryAdvanceGermplasmList Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
 
 		return germplasmList.getId();
 
@@ -590,7 +578,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	private void createPropertyList(final Set<Integer> propertyVariableList, final List<Integer> propertyIds) {
 		for (final Integer propertyId : propertyIds) {
 			propertyVariableList
-					.addAll(this.getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), propertyId));
+			.addAll(this.getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), propertyId));
 		}
 	}
 

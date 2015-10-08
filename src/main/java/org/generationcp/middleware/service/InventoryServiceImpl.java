@@ -209,7 +209,7 @@ public class InventoryServiceImpl implements InventoryService {
 				&& !GermplasmListType.LST.toString().equals(germplasmListType)) {
 			germplasmListId = this.inventoryDaoFactory.getGermplasmListDAO().getListDataListIDFromListDataProjectListID(germplasmListId);
 		}
-		return this.inventoryDaoFactory.getGermplasmListDataDAO().getByListId(germplasmListId, 0, Integer.MAX_VALUE);
+		return this.inventoryDaoFactory.getGermplasmListDataDAO().getByListId(germplasmListId);
 	}
 
 	/**
