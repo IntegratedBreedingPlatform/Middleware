@@ -23,6 +23,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 /**
  * http://gmod.org/wiki/Chado_Natural_Diversity_Module#Table:_nd_experiment_stock
  *
@@ -33,6 +36,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "nd_experiment_stock")
+@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="nd_experiment_stock")
 public class ExperimentStock implements Serializable {
 
 	private static final long serialVersionUID = -3361812145612014083L;
