@@ -52,6 +52,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.util.DatasetUtil;
 
 public class WorkbookBuilder extends Builder {
 
@@ -922,18 +923,27 @@ public class WorkbookBuilder extends Builder {
 
 	public int getMeasurementDataSetId(final int studyId, final String studyName) {
 		final List<DatasetReference> datasetRefList = this.getStudyDataManager().getDatasetReferences(studyId);
-		if (datasetRefList != null) {
-			for (final DatasetReference datasetRef : datasetRefList) {
-				if (datasetRef.getName().equals("MEASUREMENT EFEC_" + studyName)
-						|| datasetRef.getName().equals("MEASUREMENT EFECT_" + studyName)) {
-					return datasetRef.getId();
-				}
+		for (final DatasetReference datasetRef : datasetRefList) {
+			String datasetName = datasetRef.getName();
+			if (datasetName.endsWith(DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX)) {
+				return datasetRef.getId();
+			}
+
+			// Legacy daatset naming convention handling
+			if (datasetName.startsWith(DatasetUtil.OLD_PLOT_DATASET_NAME_PREFIX)) {
+				return datasetRef.getId();
+			}
+
+			// Legacy daatset naming convention handling
+			if (datasetName.endsWith(DatasetUtil.OLD_PLOT_DATASET_NAME_SUFFIX)) {
+				return datasetRef.getId();
 			}
 		}
-		// if not found in the list using the name, get dataset with Plot Data type
-		final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(studyId, DataSetType.PLOT_DATA);
-		if (dataset != null) {
-			return dataset.getId();
+		// if not found (which should be extremely rare) in the dataset ref list using the name, 
+		// get dataset reference by dataset type in projectprops
+		final DatasetReference datasetRef = this.getStudyDataManager().findOneDataSetReferenceByType(studyId, DataSetType.PLOT_DATA);
+		if (datasetRef != null) {
+			return datasetRef.getId();
 		} else {
 			return 0;
 		}

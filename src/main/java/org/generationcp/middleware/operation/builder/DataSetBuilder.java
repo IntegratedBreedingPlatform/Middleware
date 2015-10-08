@@ -124,7 +124,7 @@ public class DataSetBuilder extends Builder {
 			throw new MiddlewareQueryException("no.dataset.found", "No datasets found for study " + studyId);
 		}
 		for (DatasetReference datasetReference : datasetReferences) {
-			if (datasetReference.getName().endsWith(DatasetUtil.NEW_SUMMARY_DATASET_NAME_SUFFIX)) {
+			if (datasetReference.getName().endsWith(DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX)) {
 				return this.getDmsProjectById(datasetReference.getId());
 			}
 		}
