@@ -31,7 +31,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -50,22 +49,6 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
  *
  */
 public interface FieldbookService {
-
-	/**
-	 * Retrieves all the study details of the nurseries stored in local database.
-	 *
-	 * @param programUUID unique id of the program
-	 * @return all local nursery details
-	 */
-	List<StudyDetails> getAllLocalNurseryDetails(String programUUID);
-
-	/**
-	 * Retrieves all the details of the trial studies stored in local database.
-	 *
-	 * @param programUUID unique id of the program
-	 * @return all local trial study details
-	 */
-	List<StudyDetails> getAllLocalTrialStudyDetails(String programUUID);
 
 	/**
 	 * Gets the field map info (entries, reps, plots and counts) of the given trial.
