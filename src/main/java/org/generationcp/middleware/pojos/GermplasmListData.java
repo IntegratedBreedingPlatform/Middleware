@@ -28,6 +28,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -42,10 +43,11 @@ import org.hibernate.annotations.NotFoundAction;
 /**
  * POJO for listdata table.
  *
- * @author Kevin Manansala
  *
  */
-@NamedQueries({@NamedQuery(name = "deleteGermplasmListDataByListId", query = "UPDATE GermplasmListData SET status = 9 WHERE list = :listId")})
+@NamedQueries({
+	@NamedQuery(name = "deleteGermplasmListDataByListId", query = "UPDATE GermplasmListData SET status = 9 WHERE list = :listId"),
+})
 @Entity
 @Table(name = "listdata")
 @Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="listdata")
@@ -99,6 +101,10 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	@OneToMany(mappedBy = "listData", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
 	private List<ListDataProperty> properties = new ArrayList<ListDataProperty>();
+
+	@OneToOne
+	@JoinColumn(name = "gid", nullable = false, insertable=false, updatable=false)
+	private Germplasm germplasm;
 
 	@Transient
 	private ListDataInventory inventoryInfo;
@@ -237,6 +243,22 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	public void setInventoryInfo(ListDataInventory inventoryInfo) {
 		this.inventoryInfo = inventoryInfo;
+	}
+
+
+	/**
+	 * @return the germplasm
+	 */
+	public Germplasm getGermplasm() {
+		return this.germplasm;
+	}
+
+
+	/**
+	 * @param germplasm the germplasm to set
+	 */
+	public void setGermplasm(Germplasm germplasm) {
+		this.germplasm = germplasm;
 	}
 
 	@Override
