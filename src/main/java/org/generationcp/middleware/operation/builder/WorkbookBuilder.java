@@ -53,6 +53,11 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.util.DatasetUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 public class WorkbookBuilder extends Builder {
 
@@ -66,6 +71,8 @@ public class WorkbookBuilder extends Builder {
 			TermId.REPLICATIONS_MAP.getId(), TermId.NO_OF_REPS_IN_COLS.getId(), TermId.NO_OF_ROWS_IN_REPS.getId(),
 			TermId.NO_OF_COLS_IN_REPS.getId(), TermId.NO_OF_CROWS_LATINIZE.getId(), TermId.NO_OF_CCOLS_LATINIZE.getId(),
 			TermId.NO_OF_CBLKS_LATINIZE.getId());
+	
+	private static final Logger LOG = LoggerFactory.getLogger(WorkbookBuilder.class);
 
 	public WorkbookBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
@@ -76,6 +83,9 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	public Workbook create(final int id, final StudyType studyType) {
+		
+		Monitor monitor = MonitorFactory.start("Build Workbook for studyId: " + id);
+		
 		final boolean isTrial = studyType == StudyType.T;
 		final Workbook workbook = new Workbook();
 
@@ -250,9 +260,10 @@ public class WorkbookBuilder extends Builder {
 		workbook.setExperimentalDesignVariables(expDesignVariables);
 
 		final List<MeasurementRow> trialObservations = this.getTrialObservations(workbook, isTrial);
-
 		workbook.setTrialObservations(trialObservations);
+		LOG.debug("" + monitor.stop());
 		return workbook;
+		
 	}
 
 	private List<MeasurementRow> getTrialObservations(final Workbook workbook, final boolean isTrial) {
@@ -813,15 +824,20 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	private VariableList getSingleRowOfEmptyTrialVariables(final Workbook workbook, final int studyId, final int measurementDatasetId) {
-		final DmsProject trialProject = this.getDataSetBuilder().getTrialDataset(studyId);
-		final DataSet dataset = this.getDataSetBuilder().build(trialProject.getProjectId());
-		final VariableTypeList typeList = dataset.getFactorsByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
-		final VariableList list = new VariableList();
-		for (final DMSVariableType type : typeList.getVariableTypes()) {
-			list.add(new Variable(type, (String) null));
+		Monitor monitor = MonitorFactory.start("getSingleRowOfEmptyTrialVariables");
+		try {
+			final DmsProject trialProject = this.getDataSetBuilder().getTrialDataset(studyId);
+			final DataSet dataset = this.getDataSetBuilder().build(trialProject.getProjectId());
+			final VariableTypeList typeList = dataset.getFactorsByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
+			final VariableList list = new VariableList();
+			for (final DMSVariableType type : typeList.getVariableTypes()) {
+				list.add(new Variable(type, (String) null));
+			}
+			workbook.setTrialDatasetId(dataset.getId());
+			return list;
+		} finally {
+			LOG.debug("" + monitor.stop());
 		}
-		workbook.setTrialDatasetId(dataset.getId());
-		return list;
 	}
 
 	private VariableList getTrialConstants(final int trialDatasetId) {
