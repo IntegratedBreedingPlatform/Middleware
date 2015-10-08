@@ -158,7 +158,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds) {
+	public List<Location> getFavoriteLocationByLocationIDs(final List<Integer> locationIds) {
 		return this.getLocationDataManager().getLocationsByIDs(locationIds);
 	}
 
@@ -318,8 +318,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Method> getFavoriteBreedingMethods(List<Integer> methodIds, boolean filterOutGenerative) {
-		List<Method> methodList;
+	public List<Method> getFavoriteBreedingMethods(final List<Integer> methodIds, final boolean filterOutGenerative) {
+		final List<Method> methodList;
 		if (filterOutGenerative) {
 			methodList = getGermplasmDataManager().getNonGenerativeMethodsByID(methodIds);
 		} else {
@@ -852,14 +852,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Integer> addGermplasmNames(List<Name> names) {
+	public List<Integer> addGermplasmNames(final List<Name> names) {
 		return this.getGermplasmDataManager().addGermplasmName(names);
 	}
 
 	@Override
-	public Integer addGermplasm(String nameValue, int userId) {
-		Name name = new Name(null, null, 1, 1, userId, nameValue, 0, 0, 0);
-		Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, userId, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
+	public Integer addGermplasm(final String nameValue, final int userId) {
+		final Name name = new Name(null, null, 1, 1, userId, nameValue, 0, 0, 0);
+		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, userId, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
 		return this.getGermplasmDataManager().addGermplasm(germplasm, name);
 	}
 
@@ -868,7 +868,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return this.getGermplasmDataManager().addGermplasm(germplasm, name);
 	}
 
-	public List<Integer> addGermplasm(List<Pair<Germplasm, Name>> germplasmPairs) {
+	public List<Integer> addGermplasm(final List<Pair<Germplasm, Name>> germplasmPairs) {
 		return this.getGermplasmDataManager().addGermplasm(germplasmPairs);
 	}
 
@@ -956,12 +956,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Integer> getFavoriteProjectLocationIds(String programUUID) {
-		List<ProgramFavorite> favList =
+	public List<Integer> getFavoriteProjectLocationIds(final String programUUID) {
+		final List<ProgramFavorite> favList =
 				this.getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
-		List<Integer> favoriteList = new ArrayList<>();
+		final List<Integer> favoriteList = new ArrayList<>();
 		if (favList != null && !favList.isEmpty()) {
-			for (ProgramFavorite fav : favList) {
+			for (final ProgramFavorite fav : favList) {
 				favoriteList.add(fav.getEntityId());
 
 			}
