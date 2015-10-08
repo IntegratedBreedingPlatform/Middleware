@@ -55,15 +55,24 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private static final String PROGRAM_UUID = "program_uuid";
 
-	private static final String GET_CHILDREN_OF_FOLDER = "SELECT DISTINCT subject.project_id, subject.name,  subject.description "
-			+ "		, (CASE WHEN (type_id = " + TermId.IS_STUDY.getId() + ") THEN 1 ELSE 0 END) AS is_study, subject."
-			+ DmsProjectDao.PROGRAM_UUID + " " + "FROM project subject "
-			+ "		INNER JOIN project_relationship pr on subject.project_id = pr.subject_project_id  " + "WHERE (pr.type_id = "
-			+ TermId.HAS_PARENT_FOLDER.getId() + " or pr.type_id = " + TermId.IS_STUDY.getId() + ") "
-			+ "		AND pr.object_project_id = :folderId " + "		AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-			+ TermId.STUDY_STATUS.getId() + "     	AND pp.project_id = subject.project_id AND pp.value = " + "         "
-			+ TermId.DELETED_STUDY.getId() + ") " + " AND (subject.program_uuid = :program_uuid OR subject.program_uuid IS NULL)"
-			+ " ORDER BY name ";
+	/**
+	 * Type of study and whether study is deleted are stored in projectprops table.
+	 * Which folder the study is in, is defined in the project_relationship table.
+	 */
+	static final String GET_CHILDREN_OF_FOLDER =
+			"SELECT subject.project_id, subject.name,  subject.description, "
+					+ "	(CASE WHEN (pr.type_id = " + TermId.IS_STUDY.getId() + ") THEN 1 ELSE 0 END) AS is_study, "
+					+ "    subject.program_uuid, "
+					+ "    prop.value "
+					+ " FROM project subject "
+					+ "	INNER JOIN project_relationship pr on subject.project_id = pr.subject_project_id "
+					+ "	LEFT OUTER JOIN projectprop prop ON prop.project_id = subject.project_id AND prop.type_id = " + TermId.STUDY_TYPE.getId()
+					+ "    WHERE (pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() + " or pr.type_id = " + TermId.IS_STUDY.getId() + ")"
+					+ "		AND pr.object_project_id = :folderId "
+					+ "     AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = " + TermId.STUDY_STATUS.getId() + " AND pp.project_id = subject.project_id AND pp.value = " + TermId.DELETED_STUDY.getId() + ") "
+					+ "     AND (subject.program_uuid = :program_uuid OR subject.program_uuid IS NULL) "
+					+ "     AND (prop.value in (:studyTypeIds) or prop.value IS NULL)"  // the OR here for value = null is required for folders.
+					+ "	ORDER BY name";
 
 	private static final String GET_STUDIES_OF_FOLDER = "SELECT  DISTINCT pr.subject_project_id "
 			+ "FROM    project_relationship pr, project p " + "WHERE   pr.type_id = " + TermId.IS_STUDY.getId() + " "
@@ -71,13 +80,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "		AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = " + TermId.STUDY_STATUS.getId()
 			+ "     	AND pp.project_id = p.project_id AND pp.value = " + "         " + TermId.DELETED_STUDY.getId() + ") "
 			+ "ORDER BY p.name ";
-
-	private static final String GET_ROOT_FOLDERS = "SELECT DISTINCT p.project_id, p.name, p.description " + " FROM project p "
-			+ " INNER JOIN project_relationship pr ON pr.subject_project_id = p.project_id " + " WHERE pr.object_project_id = "
-			+ DmsProject.SYSTEM_FOLDER_ID + " AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-			+ TermId.STUDY_STATUS.getId() + "     	AND pp.project_id = p.project_id AND pp.value = " + "         "
-			+ TermId.DELETED_STUDY.getId() + ") " + " AND (p.program_uuid = :program_uuid OR p.program_uuid IS NULL)"
-			+ " ORDER BY p.project_id ";
 
 	private static final String COUNT_PROJECTS_WITH_VARIABLE = "SELECT count(pp.project_id) " + " FROM projectprop pp "
 			+ " WHERE NOT EXISTS( " + " SELECT 1 FROM projectprop stat " + " WHERE stat.project_id = pp.project_id "
@@ -96,38 +98,29 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "UNION SELECT pr.subject_project_id " + "FROM project_relationship pr, project p " + "WHERE pr.type_id = "
 			+ TermId.HAS_PARENT_FOLDER.getId() + " " + "AND pr.subject_project_id = p.project_id " + "AND p.program_uuid = :program_uuid ";
 
-	public List<FolderReference> getRootFolders(String programUUID) throws MiddlewareQueryException {
-
-		List<FolderReference> folderList = new ArrayList<FolderReference>();
-		try {
-			Query query = this.getSession().createSQLQuery(DmsProjectDao.GET_ROOT_FOLDERS);
-			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
-			List<Object[]> list = query.list();
-
-			if (list != null && !list.isEmpty()) {
-				for (Object[] row : list) {
-					Integer id = (Integer) row[0]; // project.id
-					String name = (String) row[1]; // project.name
-					String description = (String) row[2]; // project.description
-					folderList.add(new FolderReference(DmsProject.SYSTEM_FOLDER_ID, id, name, description, programUUID));
-				}
-			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getRootFolders query from Project: " + e.getMessage(), e);
-		}
-
-		return folderList;
-
+	public List<Reference> getRootFolders(String programUUID, List<StudyType> studyTypes) {
+		return getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID, studyTypes);
 	}
 
-	public List<Reference> getChildrenOfFolder(Integer folderId, String programUUID) throws MiddlewareQueryException {
+	public List<Reference> getChildrenOfFolder(Integer folderId, String programUUID, List<StudyType> studyTypes) {
 
 		List<Reference> childrenNodes = new ArrayList<Reference>();
+		
+		if (studyTypes == null || studyTypes.isEmpty()) {
+			throw new MiddlewareQueryException("Missing required parameter. At least one study type must be specified.");
+		}
 
 		try {
 			Query query = this.getSession().createSQLQuery(DmsProjectDao.GET_CHILDREN_OF_FOLDER);
 			query.setParameter("folderId", folderId);
 			query.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
+			
+			List<Integer> stydyTypeIds = new ArrayList<>();
+			for (StudyType studyType : studyTypes) {
+				stydyTypeIds.add(studyType.getId());
+			}
+			query.setParameterList("studyTypeIds", stydyTypeIds);
+
 			List<Object[]> list = query.list();
 
 			for (Object[] row : list) {
@@ -141,16 +134,18 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				Integer isStudy = ((Integer) row[3]).intValue();
 				// project.program_uuid
 				String projectUUID = (String) row[4];
-
-				if (isStudy > 0) {
-					childrenNodes.add(new StudyReference(id, name, description, projectUUID));
+				
+				if (isStudy == 1) {
+					String studyTypeRaw = (String) row[5];				
+					StudyType studyType = studyTypeRaw != null ? StudyType.getStudyTypeById(Integer.valueOf(studyTypeRaw)) : null;
+					childrenNodes.add(new StudyReference(id, name, description, projectUUID, studyType));
 				} else {
 					childrenNodes.add(new FolderReference(id, name, description, projectUUID));
 				}
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getChildrenOfFolder query from Project: " + e.getMessage(), e);
+			this.logAndThrowException("Error retrieving study folder tree, folderId=" + folderId + " programUUID=" + programUUID + ":" + e.getMessage(), e);
 		}
 
 		return childrenNodes;
@@ -463,66 +458,65 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		StringBuilder sqlString =
 				new StringBuilder()
-				.append("SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
-				.append("ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
-				.append(", ppPIid.value AS piId, gpSiteId.value AS siteId, count(de.nd_experiment_id) AS rowCount ")
-				.append("FROM project p ")
-				.append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
-				.append("                   AND ppNursery.type_id = ")
-				.append(TermId.STUDY_TYPE.getId())
-				.append(" ")
-				.append("                   AND ppNursery.value = ")
-				.append(studyType.getId())
-				.append(" ")
-				.append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
-				.append("                   AND ppObjective.type_id =  ")
-				.append(TermId.STUDY_OBJECTIVE.getId())
-				.append(" ")
-				.append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
-				.append("                   AND ppStartDate.type_id =  ")
-				.append(TermId.START_DATE.getId())
-				.append(" ")
-				.append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
-				.append("                   AND ppEndDate.type_id =  ")
-				.append(TermId.END_DATE.getId())
-				.append(" ")
-				.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
-				.append("                   AND ppPI.type_id =  ")
-				.append(TermId.PI_NAME.getId())
-				.append(" ")
-				.append("   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
-				.append("                   AND ppPIid.type_id =  ")
-				.append(TermId.PI_ID.getId())
-				.append(" ")
-				.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
-				.append("       LEFT JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
-				.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
-				.append("           AND gpSiteName.type_id =  ")
-				.append(TermId.TRIAL_LOCATION.getId())
-				.append(" ")
-				.append("       LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id ")
-				.append("           AND gpSiteId.type_id =  ")
-				.append(TermId.LOCATION_ID.getId())
-				.append(" ")
-				.append("       LEFT JOIN project_relationship pr ON pr.object_project_id = p.project_id and pr.type_id = ")
-				.append(TermId.BELONGS_TO_STUDY.getId())
-				.append("       LEFT JOIN nd_experiment_project de ON de.project_id = pr.subject_project_id ")
-				.append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ")
-				.append(TermId.STUDY_STATUS.getId())
-				.append(" ")
-				.append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ")
-				.append(TermId.DELETED_STUDY.getId())
-				.append(") ")
-				.append("   AND (p.")
-				.append(DmsProjectDao.PROGRAM_UUID)
-				.append(" = :")
-				.append(DmsProjectDao.PROGRAM_UUID)
-				.append(" ")
-				.append("   OR p.")
-				.append(DmsProjectDao.PROGRAM_UUID)
-				.append(" IS NULL) ")
-				.append("    GROUP BY p.name, p.description, ppObjective.value, ppStartDate.value, ppEndDate.value, ppPI.value, gpSiteName.value, p.project_id, ppPIid.value, ")
-				.append("   gpSiteId.value ").append("               ORDER BY p.name ");
+		.append("SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
+		.append("ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
+		.append(", ppPIid.value AS piId, gpSiteId.value AS siteId ")
+		.append("FROM project p ")
+		.append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
+		.append("                   AND ppNursery.type_id = ")
+		.append(TermId.STUDY_TYPE.getId())
+		.append(" ")
+		.append("                   AND ppNursery.value = ")
+		.append(studyType.getId())
+		.append(" ")
+		.append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
+		.append("                   AND ppObjective.type_id =  ")
+		.append(TermId.STUDY_OBJECTIVE.getId())
+		.append(" ")
+		.append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
+		.append("                   AND ppStartDate.type_id =  ")
+		.append(TermId.START_DATE.getId())
+		.append(" ")
+		.append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
+		.append("                   AND ppEndDate.type_id =  ")
+		.append(TermId.END_DATE.getId())
+		.append(" ")
+		.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
+		.append("                   AND ppPI.type_id =  ")
+		.append(TermId.PI_NAME.getId())
+		.append(" ")
+		.append("   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
+		.append("                   AND ppPIid.type_id =  ")
+		.append(TermId.PI_ID.getId())
+		.append(" ")
+		.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
+		.append("       LEFT JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
+		.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
+		.append("           AND gpSiteName.type_id =  ")
+		.append(TermId.TRIAL_LOCATION.getId())
+		.append(" ")
+		.append("       LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id ")
+		.append("           AND gpSiteId.type_id =  ")
+		.append(TermId.LOCATION_ID.getId())
+		.append(" ")
+		.append("       LEFT JOIN project_relationship pr ON pr.object_project_id = p.project_id and pr.type_id = ")
+		.append(TermId.BELONGS_TO_STUDY.getId())
+		.append(" WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ")
+		.append(TermId.STUDY_STATUS.getId())
+		.append(" ")
+		.append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ")
+		.append(TermId.DELETED_STUDY.getId())
+		.append(") ")
+		.append("   AND (p.")
+		.append(DmsProjectDao.PROGRAM_UUID)
+		.append(" = :")
+		.append(DmsProjectDao.PROGRAM_UUID)
+		.append(" ")
+		.append("   OR p.")
+		.append(DmsProjectDao.PROGRAM_UUID)
+		.append(" IS NULL) ")
+		.append("    GROUP BY p.name, p.description, ppObjective.value, ppStartDate.value, ppEndDate.value, ppPI.value, gpSiteName.value, p.project_id, ppPIid.value, ")
+		.append("   gpSiteId.value ").append("               ORDER BY p.name ");
 
 		List<Object[]> list = null;
 
@@ -530,7 +524,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			Query query =
 					this.getSession().createSQLQuery(sqlString.toString()).addScalar("name").addScalar("title").addScalar("objective")
 					.addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("siteName").addScalar("id")
-					.addScalar("piId").addScalar("siteId").addScalar("rowCount")
+					.addScalar("piId").addScalar("siteId")
 					.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 			this.setStartAndNumOfRows(query, start, numOfRows);
 			list = query.list();
@@ -553,13 +547,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			Integer id = (Integer) row[7];
 			String piId = (String) row[8];
 			String siteId = (String) row[9];
-			BigInteger rowCount = (BigInteger) row[10];
 
 			StudyDetails study =
 					new StudyDetails(id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId);
-			if (row[10] != null) {
-				study.setRowCount(rowCount.intValue());
-			}
 			studyDetails.add(study);
 		}
 		return studyDetails;
@@ -590,45 +580,45 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			StringBuilder sqlString =
 					new StringBuilder()
-					.append("SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
-					.append("ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
-					.append(", ppPIid.value AS piId, gpSiteId.value AS siteId, ppFolder.object_project_id AS folderId, p.program_uuid AS programUUID ")
-					.append("FROM project p ")
-					.append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
-					.append("                   AND ppNursery.type_id = ")
-					.append(TermId.STUDY_TYPE.getId())
-					.append(" ")
-					.append("                   AND ppNursery.value = ")
-					.append(studyType.getId())
-					.append(" ")
-					.append("   INNER JOIN project_relationship ppFolder ON p.project_id = ppFolder.subject_project_id ")
-					.append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
-					.append("                   AND ppObjective.type_id =  ")
-					.append(TermId.STUDY_OBJECTIVE.getId())
-					.append(" ")
-					.append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
-					.append("                   AND ppStartDate.type_id =  ")
-					.append(TermId.START_DATE.getId())
-					.append(" ")
-					.append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
-					.append("                   AND ppEndDate.type_id =  ")
-					.append(TermId.END_DATE.getId())
-					.append(" ")
-					.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
-					.append("                   AND ppPI.type_id =  ")
-					.append(TermId.PI_NAME.getId())
-					.append(" ")
-					.append("   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
-					.append("                   AND ppPIid.type_id =  ")
-					.append(TermId.PI_ID.getId())
-					.append(" ")
-					.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
-					.append("       LEFT JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
-					.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
-					.append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
-					.append("       LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id ")
-					.append("           AND gpSiteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ")
-					.append("  WHERE p.project_id = ").append(studyId);
+			.append("SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
+			.append("ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
+			.append(", ppPIid.value AS piId, gpSiteId.value AS siteId, ppFolder.object_project_id AS folderId, p.program_uuid AS programUUID ")
+			.append("FROM project p ")
+			.append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
+			.append("                   AND ppNursery.type_id = ")
+			.append(TermId.STUDY_TYPE.getId())
+			.append(" ")
+			.append("                   AND ppNursery.value = ")
+			.append(studyType.getId())
+			.append(" ")
+			.append("   INNER JOIN project_relationship ppFolder ON p.project_id = ppFolder.subject_project_id ")
+			.append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
+			.append("                   AND ppObjective.type_id =  ")
+			.append(TermId.STUDY_OBJECTIVE.getId())
+			.append(" ")
+			.append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
+			.append("                   AND ppStartDate.type_id =  ")
+			.append(TermId.START_DATE.getId())
+			.append(" ")
+			.append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
+			.append("                   AND ppEndDate.type_id =  ")
+			.append(TermId.END_DATE.getId())
+			.append(" ")
+			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
+			.append("                   AND ppPI.type_id =  ")
+			.append(TermId.PI_NAME.getId())
+			.append(" ")
+			.append("   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
+			.append("                   AND ppPIid.type_id =  ")
+			.append(TermId.PI_ID.getId())
+			.append(" ")
+			.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
+			.append("       LEFT JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
+			.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
+			.append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
+			.append("       LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id ")
+			.append("           AND gpSiteId.type_id =  ").append(TermId.LOCATION_ID.getId()).append(" ")
+			.append("  WHERE p.project_id = ").append(studyId);
 
 			Query query =
 					this.getSession().createSQLQuery(sqlString.toString()).addScalar("name").addScalar("title").addScalar("objective")
@@ -669,41 +659,41 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			StringBuilder sqlString =
 					new StringBuilder()
-					.append("SELECT COUNT(1) ")
-					.append("FROM project p ")
-					.append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
-					.append("                   AND ppNursery.type_id = ")
-					.append(TermId.STUDY_TYPE.getId())
-					.append(" ")
-					.append("                   AND ppNursery.value = ")
-					.append(studyType.getId())
-					.append(" ")
-					.append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
-					.append("                   AND ppObjective.type_id =  ")
-					.append(TermId.STUDY_OBJECTIVE.getId())
-					.append(" ")
-					.append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
-					.append("                   AND ppStartDate.type_id =  ")
-					.append(TermId.START_DATE.getId())
-					.append(" ")
-					.append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
-					.append("                   AND ppEndDate.type_id =  ")
-					.append(TermId.END_DATE.getId())
-					.append(" ")
-					.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
-					.append("                   AND ppPI.type_id =  ")
-					.append(TermId.PI_NAME.getId())
-					.append(" ")
-					.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
-					.append("       LEFT JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
-					.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
-					.append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
-					.append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ")
-					.append(TermId.STUDY_STATUS.getId()).append(" ")
-					.append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ")
-					.append(TermId.DELETED_STUDY.getId()).append(") ").append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID)
-					.append(" = :").append(DmsProjectDao.PROGRAM_UUID).append(" ").append("   OR p.")
-					.append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ");
+			.append("SELECT COUNT(1) ")
+			.append("FROM project p ")
+			.append("   INNER JOIN projectprop ppNursery ON p.project_id = ppNursery.project_id ")
+			.append("                   AND ppNursery.type_id = ")
+			.append(TermId.STUDY_TYPE.getId())
+			.append(" ")
+			.append("                   AND ppNursery.value = ")
+			.append(studyType.getId())
+			.append(" ")
+			.append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
+			.append("                   AND ppObjective.type_id =  ")
+			.append(TermId.STUDY_OBJECTIVE.getId())
+			.append(" ")
+			.append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
+			.append("                   AND ppStartDate.type_id =  ")
+			.append(TermId.START_DATE.getId())
+			.append(" ")
+			.append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
+			.append("                   AND ppEndDate.type_id =  ")
+			.append(TermId.END_DATE.getId())
+			.append(" ")
+			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
+			.append("                   AND ppPI.type_id =  ")
+			.append(TermId.PI_NAME.getId())
+			.append(" ")
+			.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
+			.append("       LEFT JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
+			.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
+			.append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
+			.append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ")
+			.append(TermId.STUDY_STATUS.getId()).append(" ")
+			.append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ")
+			.append(TermId.DELETED_STUDY.getId()).append(") ").append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID)
+			.append(" = :").append(DmsProjectDao.PROGRAM_UUID).append(" ").append("   OR p.")
+			.append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ");
 
 			Query query = this.getSession().createSQLQuery(sqlString.toString()).setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 
@@ -727,64 +717,64 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			StringBuilder sqlString =
 					new StringBuilder()
-					.append("SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
-					.append("ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id, ppStudy.value AS studyType ")
-					.append(", ppPIid.value AS piId, gpSiteId.value AS siteId ")
-					.append("FROM project p ")
-					.append("   INNER JOIN projectprop ppStudy ON p.project_id = ppStudy.project_id ")
-					.append("                   AND ppStudy.type_id = ")
-					.append(TermId.STUDY_TYPE.getId())
-					.append(" ")
-					.append("                   AND ppStudy.value in (")
-					.append(TermId.NURSERY.getId())
-					.append(",")
-					.append(TermId.TRIAL.getId())
-					.append(") ")
-					.append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
-					.append("                   AND ppObjective.type_id =  ")
-					.append(TermId.STUDY_OBJECTIVE.getId())
-					.append(" ")
-					// 8030
-					.append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
-					.append("                   AND ppStartDate.type_id =  ")
-					.append(TermId.START_DATE.getId())
-					.append(" ")
-					// 8050
-					.append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
-					.append("                   AND ppEndDate.type_id =  ")
-					.append(TermId.END_DATE.getId())
-					.append(" ")
-					// 8060
-					.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
-					.append("                   AND ppPI.type_id =  ")
-					.append(TermId.PI_NAME.getId())
-					.append(" ")
-					// 8100
-					.append("   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
-					.append("                   AND ppPIid.type_id =  ")
-					.append(TermId.PI_ID.getId())
-					.append(" ")
-					.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
-					.append("       INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
-					.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
-					.append("           AND gpSiteName.type_id =  ")
-					.append(TermId.TRIAL_LOCATION.getId())
-					.append(" ")
-					// 8180
-					.append("       LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id ")
-					.append("           AND gpSiteId.type_id =  ").append(TermId.LOCATION_ID.getId())
-					.append(" ")
-					.append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ")
-					.append(TermId.STUDY_STATUS.getId())
-					.append(" ")
-					// 8006
-					.append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ")
-					.append(TermId.DELETED_STUDY.getId())
-					.append(") ")
-					// 12990
-					.append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID).append(" = :").append(DmsProjectDao.PROGRAM_UUID)
-					.append(" ").append("   OR p.").append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ")
-					.append("               ORDER BY p.name ");
+			.append("SELECT DISTINCT p.name AS name, p.description AS title, ppObjective.value AS objective, ppStartDate.value AS startDate, ")
+			.append("ppEndDate.value AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id, ppStudy.value AS studyType ")
+			.append(", ppPIid.value AS piId, gpSiteId.value AS siteId ")
+			.append("FROM project p ")
+			.append("   INNER JOIN projectprop ppStudy ON p.project_id = ppStudy.project_id ")
+			.append("                   AND ppStudy.type_id = ")
+			.append(TermId.STUDY_TYPE.getId())
+			.append(" ")
+			.append("                   AND ppStudy.value in (")
+			.append(TermId.NURSERY.getId())
+			.append(",")
+			.append(TermId.TRIAL.getId())
+			.append(") ")
+			.append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
+			.append("                   AND ppObjective.type_id =  ")
+			.append(TermId.STUDY_OBJECTIVE.getId())
+			.append(" ")
+			// 8030
+			.append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
+			.append("                   AND ppStartDate.type_id =  ")
+			.append(TermId.START_DATE.getId())
+			.append(" ")
+			// 8050
+			.append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
+			.append("                   AND ppEndDate.type_id =  ")
+			.append(TermId.END_DATE.getId())
+			.append(" ")
+			// 8060
+			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
+			.append("                   AND ppPI.type_id =  ")
+			.append(TermId.PI_NAME.getId())
+			.append(" ")
+			// 8100
+			.append("   LEFT JOIN projectprop ppPIid ON p.project_id = ppPIid.project_id ")
+			.append("                   AND ppPIid.type_id =  ")
+			.append(TermId.PI_ID.getId())
+			.append(" ")
+			.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
+			.append("       INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
+			.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
+			.append("           AND gpSiteName.type_id =  ")
+			.append(TermId.TRIAL_LOCATION.getId())
+			.append(" ")
+			// 8180
+			.append("       LEFT JOIN nd_geolocationprop gpSiteId ON e.nd_geolocation_id = gpSiteId.nd_geolocation_id ")
+			.append("           AND gpSiteId.type_id =  ").append(TermId.LOCATION_ID.getId())
+			.append(" ")
+			.append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ")
+			.append(TermId.STUDY_STATUS.getId())
+			.append(" ")
+			// 8006
+			.append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ")
+			.append(TermId.DELETED_STUDY.getId())
+			.append(") ")
+			// 12990
+			.append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID).append(" = :").append(DmsProjectDao.PROGRAM_UUID)
+			.append(" ").append("   OR p.").append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ")
+			.append("               ORDER BY p.name ");
 
 			Query query =
 					this.getSession().createSQLQuery(sqlString.toString()).addScalar("name").addScalar("title").addScalar("objective")
@@ -826,53 +816,53 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			StringBuilder sqlString =
 					new StringBuilder()
-					.append("SELECT COUNT(1) ")
-					.append("FROM project p ")
-					.append("   INNER JOIN projectprop ppStudy ON p.project_id = ppStudy.project_id ")
-					.append("                   AND ppStudy.type_id = ")
-					.append(TermId.STUDY_TYPE.getId())
-					.append(" ")
-					.append("                   AND ppStudy.value in (")
-					.append(TermId.NURSERY.getId())
-					.append(",")
-					.append(TermId.TRIAL.getId())
-					.append(") ")
-					.append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
-					.append("                   AND ppObjective.type_id =  ")
-					.append(TermId.STUDY_OBJECTIVE.getId())
-					.append(" ")
-					// 8030
-					.append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
-					.append("                   AND ppStartDate.type_id =  ")
-					.append(TermId.START_DATE.getId())
-					.append(" ")
-					// 8050
-					.append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
-					.append("                   AND ppEndDate.type_id =  ")
-					.append(TermId.END_DATE.getId())
-					.append(" ")
-					// 8060
-					.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
-					.append("                   AND ppPI.type_id =  ")
-					.append(TermId.PI_NAME.getId())
-					.append(" ")
-					// 8100
-					.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
-					.append("       INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
-					.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
-					.append("           AND gpSiteName.type_id =  ")
-					.append(TermId.TRIAL_LOCATION.getId())
-					.append(" ")
-					// 8180
-					.append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ")
-					.append(TermId.STUDY_STATUS.getId())
-					.append(" ")
-					// 8006
-					.append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ")
-					.append(TermId.DELETED_STUDY.getId()).append(") ")
-					// 12990
-					.append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID).append(" = :").append(DmsProjectDao.PROGRAM_UUID)
-					.append(" ").append("   OR p.").append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ");
+			.append("SELECT COUNT(1) ")
+			.append("FROM project p ")
+			.append("   INNER JOIN projectprop ppStudy ON p.project_id = ppStudy.project_id ")
+			.append("                   AND ppStudy.type_id = ")
+			.append(TermId.STUDY_TYPE.getId())
+			.append(" ")
+			.append("                   AND ppStudy.value in (")
+			.append(TermId.NURSERY.getId())
+			.append(",")
+			.append(TermId.TRIAL.getId())
+			.append(") ")
+			.append("   LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id ")
+			.append("                   AND ppObjective.type_id =  ")
+			.append(TermId.STUDY_OBJECTIVE.getId())
+			.append(" ")
+			// 8030
+			.append("   LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id ")
+			.append("                   AND ppStartDate.type_id =  ")
+			.append(TermId.START_DATE.getId())
+			.append(" ")
+			// 8050
+			.append("   LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id ")
+			.append("                   AND ppEndDate.type_id =  ")
+			.append(TermId.END_DATE.getId())
+			.append(" ")
+			// 8060
+			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
+			.append("                   AND ppPI.type_id =  ")
+			.append(TermId.PI_NAME.getId())
+			.append(" ")
+			// 8100
+			.append("   LEFT JOIN nd_experiment_project ep ON p.project_id = ep.project_id ")
+			.append("       INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
+			.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
+			.append("           AND gpSiteName.type_id =  ")
+			.append(TermId.TRIAL_LOCATION.getId())
+			.append(" ")
+			// 8180
+			.append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id =  ")
+			.append(TermId.STUDY_STATUS.getId())
+			.append(" ")
+			// 8006
+			.append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ")
+			.append(TermId.DELETED_STUDY.getId()).append(") ")
+			// 12990
+			.append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID).append(" = :").append(DmsProjectDao.PROGRAM_UUID)
+			.append(" ").append("   OR p.").append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ");
 
 			Query query = this.getSession().createSQLQuery(sqlString.toString()).setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 

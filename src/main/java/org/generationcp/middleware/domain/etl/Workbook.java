@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -244,8 +245,14 @@ public class Workbook {
 		return varList;
 	}
 
+	/**
+	 * This method handles the retrieval of the measurement dataset variables which includes the following: TRIAL_INSTANCE, FACTORS,
+	 * VARIATES. The order of insertion matters that's why we used LinkedHashSet on this method to preserve the order of insertion.
+	 * 
+	 * @return measurement dataset variable list
+	 */
 	public List<MeasurementVariable> getMeasurementDatasetVariablesView() {
-		final Set<MeasurementVariable> list = new HashSet<MeasurementVariable>();
+		Set<MeasurementVariable> list = new LinkedHashSet<MeasurementVariable>();
 		if (!this.isNursery()) {
 			MeasurementVariable trialFactor = null;
 			if (this.getTrialFactors() != null) {
@@ -510,6 +517,8 @@ public class Workbook {
 		builder.append(this.variates);
 		builder.append(", observations=");
 		builder.append(this.observations);
+		builder.append(", trialObservations=");
+		builder.append(this.trialObservations);
 		builder.append(", trialHeaders=");
 		builder.append(this.trialHeaders);
 		builder.append(", trialVariables=");

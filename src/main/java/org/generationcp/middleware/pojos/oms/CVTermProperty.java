@@ -22,6 +22,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_cvtermsynonym
  *
@@ -30,6 +33,7 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @Table(name = "cvtermprop", uniqueConstraints = {@UniqueConstraint(columnNames = {"cvterm_id", "type_id", "value", "rank"})})
+@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="cvtermprop")
 public class CVTermProperty implements Serializable {
 
 	private static final long serialVersionUID = -6496723408899540369L;
