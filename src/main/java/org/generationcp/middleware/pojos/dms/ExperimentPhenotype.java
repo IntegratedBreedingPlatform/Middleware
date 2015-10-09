@@ -22,6 +22,9 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 /**
  * http://gmod.org/wiki/Chado_Natural_Diversity_Module#Table:_nd_experiment_phenotype
  *
@@ -35,6 +38,7 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @Table(name = "nd_experiment_phenotype", uniqueConstraints = {@UniqueConstraint(columnNames = {"nd_experiment_id", "phenotype_id"})})
+@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="nd_experiment_phenotype")
 public class ExperimentPhenotype implements Serializable {
 
 	private static final long serialVersionUID = 1L;

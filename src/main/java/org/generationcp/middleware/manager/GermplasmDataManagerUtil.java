@@ -353,7 +353,7 @@ public class GermplasmDataManagerUtil {
 	}
 
 	public static List<String> createNamePermutations(String name) {
-		List<String> names = new ArrayList<String>();
+		List<String> names = new ArrayList<>();
 		names.add(name);
 		names.add(GermplasmDataManagerUtil.standardizeName(name));
 		names.add(GermplasmDataManagerUtil.removeSpaces(name));

@@ -2,6 +2,7 @@
 package org.generationcp.middleware.manager.ontology;
 
 import java.math.BigInteger;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -57,7 +58,7 @@ import com.google.common.base.Strings;
 public class OntologyVariableDataManagerImpl extends DataManager implements OntologyVariableDataManager {
 
 	private static final String VARIABLE_DOES_NOT_EXIST = "Variable does not exist";
-	private static final String TERM_IS_NOT_VARIABLE = "Term is not Variable";
+	private static final String TERM_IS_NOT_VARIABLE = "The term {0} is not Variable.";
 	private static final String VARIABLE_EXIST_WITH_SAME_NAME = "Variable exist with same name";
 	private static final String CAN_NOT_DELETE_USED_VARIABLE = "Used variable can not be deleted";
 
@@ -245,10 +246,10 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 									+ "left join variable_overrides vpo on vpo.cvterm_id = v.cvterm_id and vpo.program_uuid = :programUuid "
 									+ "left join program_favorites pf on pf.entity_id = v.cvterm_id and pf.program_uuid = :programUuid and pf.entity_type = 'VARIABLES' "
 									+ "WHERE (v.cv_id = 1040) " + filterClause).addScalar("vid").addScalar("vn").addScalar("vd")
-					.addScalar("pid").addScalar("pn").addScalar("pd").addScalar("mid").addScalar("mn").addScalar("md")
-					.addScalar("sid").addScalar("sn").addScalar("sd").addScalar("g_alias").addScalar("g_min_value")
-					.addScalar("g_max_value").addScalar("p_alias").addScalar("p_min_value").addScalar("p_max_value")
-					.addScalar("fid");
+									.addScalar("pid").addScalar("pn").addScalar("pd").addScalar("mid").addScalar("mn").addScalar("md")
+									.addScalar("sid").addScalar("sn").addScalar("sd").addScalar("g_alias").addScalar("g_min_value")
+									.addScalar("g_max_value").addScalar("p_alias").addScalar("p_min_value").addScalar("p_max_value")
+									.addScalar("fid");
 
 			query.setParameter("programUuid", variableFilter.getProgramUuid());
 
@@ -322,7 +323,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 					.createSQLQuery(
 							"select tr.subject_id sid, tr.type_id tid, tr.object_id rid, t.name rn, t.definition rd from cvterm_relationship tr inner join cvterm t on t.cvterm_id = tr.object_id "
 									+ "where tr.subject_id in (:propertyIds) or tr.subject_id in (:scaleIds)").addScalar("sid")
-					.addScalar("tid").addScalar("rid").addScalar("rn").addScalar("rd");
+									.addScalar("tid").addScalar("rid").addScalar("rn").addScalar("rd");
 
 			rQuery.setParameterList("propertyIds", pMap.keySet());
 			rQuery.setParameterList("scaleIds", sMap.keySet());
@@ -355,7 +356,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 							"select t.cvterm_id tid, t.cv_id cvid, tp.type_id typeid, tp.value value from cvtermprop tp "
 									+ "inner join cvterm t on t.cvterm_id = tp.cvterm_id "
 									+ "WHERE tp.cvterm_id in(:methodIds) or tp.cvterm_id in(:propertyIds) or tp.cvterm_id in(:scaleIds) or tp.cvterm_id in(:variableIds)")
-					.addScalar("tid").addScalar("cvid").addScalar("typeid").addScalar("value");
+									.addScalar("tid").addScalar("cvid").addScalar("typeid").addScalar("value");
 
 			// set parameter to query
 			pQuery.setParameterList("methodIds", mMap.keySet());
@@ -421,7 +422,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public Variable getVariable(String programUuid, Integer id, boolean filterObsolete) {
+	public Variable getVariable(String programUuid, Integer id, boolean filterObsolete, boolean calculateVariableUsage) {
 
 		try {
 
@@ -473,14 +474,21 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 					this.getProgramFavoriteDao().getProgramFavorite(programUuid, ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
 			variable.setIsFavorite(programFavorite != null);
 
-			// setting variable studies
-			variable.setStudies((int) this.getDmsProjectDao().countByVariable(id));
+			if(calculateVariableUsage) {
+				// setting variable studies
+				variable.setStudies((int) this.getDmsProjectDao().countByVariable(id));
 
-			// setting variable observations, first observations will be null so set it to 0
-			variable.setObservations(0);
-			for (VariableType v : variable.getVariableTypes()) {
-				long observation = this.getExperimentDao().countByObservedVariable(id, v.getId());
-				variable.setObservations((int) (variable.getObservations() + observation));
+				// setting variable observations, first observations will be null so set it to 0
+				variable.setObservations(0);
+				for (VariableType v : variable.getVariableTypes()) {
+					long observation = this.getExperimentDao().countByObservedVariable(id, v.getId());
+					variable.setObservations((int) (variable.getObservations() + observation));
+				}
+			} else {
+				final int unknownUsage = -1;
+				variable.setStudies(unknownUsage);
+				variable.setObservations(unknownUsage);
+
 			}
 
 			return variable;
@@ -761,7 +769,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		}
 
 		if (term.getCv() != CvId.VARIABLES.getId()) {
-			throw new MiddlewareException(OntologyVariableDataManagerImpl.TERM_IS_NOT_VARIABLE);
+			throw new MiddlewareException(MessageFormat.format(OntologyVariableDataManagerImpl.TERM_IS_NOT_VARIABLE, term.getName()));
 		}
 	}
 

@@ -56,7 +56,7 @@ public interface StudyDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Study getStudy(int studyId) throws MiddlewareException;
-
+	
 	/**
 	 * Gets the study.
 	 * 
@@ -77,23 +77,22 @@ public interface StudyDataManager {
 	Integer getStudyIdByNameAndProgramUUID(String studyName, String programUUID) throws MiddlewareQueryException;
 
 	/**
-	 * Returns list of root or top-level folders from specified database.
-	 * 
+	 * Returns list of root or top-level folders and studies.
+	 *
+	 * @param programUUID program's unique id
+	 * @param studyTypes specify types of studies to filter. Must not be null or empty.
 	 * @return List of Folder POJOs or empty list if none found
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<FolderReference> getRootFolders(String programUUID) throws MiddlewareQueryException;
+	List<Reference> getRootFolders(String programUUID, List<StudyType> studyTypes);
 
 	/**
-	 * Returns list of children of a folder given its ID. Retrieves from central if the given ID is positive, otherwise retrieves from
-	 * local.
-	 * 
+	 * Returns list of children of a folder given its ID. 
+	 *
 	 * @param folderId The id of the folder to match
-	 * @param programUUID the program UUID
-	 * @return List of AbstractNode (FolderNode, StudyNode) POJOs or empty list if none found
-	 * @throws MiddlewareQueryException the middleware query exception
+	 * @param programUUID unique id of the program
+	 * @return List of containing study (StudyReference) and folder (FolderReference) references or empty list if none found
 	 */
-	List<Reference> getChildrenOfFolder(int folderId, String programUUID) throws MiddlewareQueryException;
+	List<Reference> getChildrenOfFolder(int folderId, String programUUID, List<StudyType> studyTypes);
 
 	/**
 	 * Returns the list of DataSet references for a specific study. Retrieves from central if the given ID is positive, otherwise retrieves
@@ -617,6 +616,12 @@ public interface StudyDataManager {
 	 */
 	List<FolderReference> getFolderTree() throws MiddlewareQueryException;
 
+	
+	/**
+	 * Retrieves a flat list (no tree structuring) of all folders.
+	 */
+	List<FolderReference> getAllFolders();
+	
 	/**
 	 * Count plots with plants selectedof dataset.
 	 * 

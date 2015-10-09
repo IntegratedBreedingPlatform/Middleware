@@ -27,6 +27,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_project
  *
@@ -39,6 +42,7 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity()
 @Table(name = "project", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
+@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="project")
 public class DmsProject implements Serializable {
 
 	private static final long serialVersionUID = 464731947805951726L;
