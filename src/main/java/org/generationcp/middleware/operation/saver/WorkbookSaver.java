@@ -241,7 +241,6 @@ public class WorkbookSaver extends Saver {
 			workbook.setStudyDetails(null);
 			workbook.setVariates(null);
 		} else {
-			workbook.setStudyId(studyId);
 			workbook.setTrialDatasetId(trialDatasetId);
 			workbook.setMeasurementDatesetId(datasetId);
 		}
@@ -855,7 +854,7 @@ public class WorkbookSaver extends Saver {
 							programUUID);
 		}
 
-		workbook.populateStudyAndDatasetIds(studyId, trialDatasetId, measurementDatasetId, meansDatasetId);
+		workbook.populateDatasetIds(trialDatasetId, measurementDatasetId, meansDatasetId);
 
 		if (WorkbookSaver.LOG.isDebugEnabled()) {
 			WorkbookSaver.LOG.debug("studyId = " + studyId);
@@ -877,7 +876,7 @@ public class WorkbookSaver extends Saver {
 	@SuppressWarnings("unchecked")
 	public void saveProjectData(Workbook workbook, String programUUID) throws Exception {
 
-		int studyId = workbook.getStudyId();
+		int studyId = workbook.getStudyDetails().getId();
 		int trialDatasetId = workbook.getTrialDatasetId();
 		int measurementDatasetId = workbook.getMeasurementDatesetId() != null ? workbook.getMeasurementDatesetId() : 0;
 		int meansDatasetId = workbook.getMeansDatasetId() != null ? workbook.getMeansDatasetId() : 0;
