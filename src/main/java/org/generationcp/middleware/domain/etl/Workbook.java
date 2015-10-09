@@ -68,7 +68,6 @@ public class Workbook {
 	// added for optimization
 	private Map<String, MeasurementVariable> measurementDatasetVariablesMap;
 
-	private Integer studyId;
 	private Integer trialDatasetId;
 	private Integer measurementDatesetId;
 	private Integer meansDatasetId;
@@ -764,24 +763,10 @@ public class Workbook {
 		this.variableMap = variableMap;
 	}
 
-	public void populateStudyAndDatasetIds(final int studyId, final int trialDatasetId, final int measurementDatasetId,
-			final int meansDatasetId) {
-		this.studyId = studyId;
+	public void populateDatasetIds(final int trialDatasetId, final int measurementDatasetId, final int meansDatasetId) {
 		this.trialDatasetId = trialDatasetId;
 		this.measurementDatesetId = measurementDatasetId;
 		this.meansDatasetId = meansDatasetId;
-	}
-
-	public Integer getStudyId() {
-		if (this.studyId == null && this.getStudyDetails().getId() != null) {
-			return this.getStudyDetails().getId();
-		} else {
-			return studyId;
-		}
-	}
-
-	public void setStudyId(final Integer studyId) {
-		this.studyId = studyId;
 	}
 
 	public Integer getTrialDatasetId() {
