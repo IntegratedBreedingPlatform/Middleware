@@ -28,6 +28,7 @@ import org.generationcp.middleware.manager.api.PresetDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyDaoFactory;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
@@ -38,6 +39,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataMana
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.InventoryServiceImpl;
@@ -96,7 +98,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public PedigreeDataManager getPedigreeDataManager() {
-		return new PedigreeDataManagerImpl(sessionProvider, databaseName);
+		return new PedigreeDataManagerImpl(this.sessionProvider, this.databaseName);
 	}
 
 	public CrossStudyDataManager getCrossStudyDataManager() {
@@ -134,6 +136,14 @@ public class ManagerFactory implements Serializable {
 	public OntologyVariableDataManager getOntologyVariableDataManager() {
 		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
 				this.getOntologyScaleDataManager(), this.sessionProvider);
+	}
+
+	public OntologyDaoFactory getOntologyDaoFactory(HibernateSessionProvider sessionProvider) {
+		return new OntologyDaoFactory(sessionProvider);
+	}
+
+	public StandardVariableTransformer getStandardVariableTransformer() {
+		return new StandardVariableTransformer(this.sessionProvider);
 	}
 
 	public PresetDataManager getPresetDataManager() {

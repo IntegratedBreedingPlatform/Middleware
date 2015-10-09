@@ -14,6 +14,9 @@ public class OntologyDaoFactory {
 
 	private HibernateSessionProvider sessionProvider;
 
+	public OntologyDaoFactory() {
+	}
+
 	public OntologyDaoFactory(HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
 	}
