@@ -45,7 +45,7 @@ import org.hibernate.annotations.NotFoundAction;
  * 
  * 
  */
-@NamedQueries({@NamedQuery(name = "deleteGermplasmListDataByListId", query = "UPDATE GermplasmListData SET status = 9 WHERE list = :listId"),})
+@NamedQueries({@NamedQuery(name = "deleteGermplasmListDataByListId", query = "DELETE FROM GermplasmListData WHERE list = :listId"),})
 @Entity
 @Table(name = "listdata")
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL, region = "listdata")
