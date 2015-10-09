@@ -2,6 +2,7 @@
 package org.generationcp.middleware.manager.ontology;
 
 import java.math.BigInteger;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -57,7 +58,7 @@ import com.google.common.base.Strings;
 public class OntologyVariableDataManagerImpl extends DataManager implements OntologyVariableDataManager {
 
 	private static final String VARIABLE_DOES_NOT_EXIST = "Variable does not exist";
-	private static final String TERM_IS_NOT_VARIABLE = "Term is not Variable";
+	private static final String TERM_IS_NOT_VARIABLE = "The term {0} is not Variable.";
 	private static final String VARIABLE_EXIST_WITH_SAME_NAME = "Variable exist with same name";
 	private static final String CAN_NOT_DELETE_USED_VARIABLE = "Used variable can not be deleted";
 
@@ -768,7 +769,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		}
 
 		if (term.getCv() != CvId.VARIABLES.getId()) {
-			throw new MiddlewareException(OntologyVariableDataManagerImpl.TERM_IS_NOT_VARIABLE);
+			throw new MiddlewareException(MessageFormat.format(OntologyVariableDataManagerImpl.TERM_IS_NOT_VARIABLE, term.getName()));
 		}
 	}
 
