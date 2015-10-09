@@ -727,14 +727,6 @@ public class WorkbookTest {
 		assertEquals("3rd element should have term id 10", 10, varList.get(2).getTermId());
 	}
 
-	@Test
-	public void testGetStudyID() {
-		final Integer studyId = 5;
-		final Workbook workbook = createTestWorkbook(DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, NURSERY_NAME, 1, false);
-		workbook.getStudyDetails().setId(studyId);
-
-		assertEquals("Workbook should be able to use the study details ID as the study ID", studyId, workbook.getStudyId());
-	}
 
 	private MeasurementData createMeasurementData(final int termId) {
 		final MeasurementData data = new MeasurementData();
