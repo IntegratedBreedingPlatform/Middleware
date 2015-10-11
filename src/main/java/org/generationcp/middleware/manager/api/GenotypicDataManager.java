@@ -2225,5 +2225,9 @@ public interface GenotypicDataManager {
 
 	// Map Pop Alleles (MappingPopValueDAO)
 	List<Object> getUniqueMapPopAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids);
-
+	
+	public int countAllMarkers();
+	
+	public List<Integer> getMarkerIdsByNames(List<String> names, int start, int numOfRows);
+	
 }

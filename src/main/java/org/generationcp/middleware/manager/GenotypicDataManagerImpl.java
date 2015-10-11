@@ -2921,4 +2921,14 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	public List<Object> getUniqueAccMetaDataSetByGids(List gids) {
 		return this.getAccMetadataSetDao().getUniqueAccMetaDatsetByGids(gids);
 	}
+
+	@Override
+	public List<Integer> getMarkerIdsByNames(List<String> names, int start, int numOfRows) {
+		return this.getMarkerDao().getIdsByNames(names, start, numOfRows);
+	}
+
+	@Override
+	public int countAllMarkers() {
+		return this.getMarkerDao().getAll().size();
+	}
 }
