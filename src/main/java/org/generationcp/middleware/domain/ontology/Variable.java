@@ -93,6 +93,9 @@ public class Variable extends Term {
 		this.scale = scale;
 	}
 
+	/**
+	 * @return negative value if unknown else the actual number of studies that have used the variable.
+	 */
 	public Integer getObservations() {
 		return this.observations;
 	}
@@ -125,6 +128,9 @@ public class Variable extends Term {
 		this.isFavorite = isFavorite;
 	}
 
+	/**
+	 * @return negative value if unknown else the actual number of studies that have used the variable.
+	 */
 	public Integer getStudies() {
 		return this.studies;
 	}
@@ -134,7 +140,7 @@ public class Variable extends Term {
 	}
 
 	public Boolean getHasPair() {
-		return hasPair;
+		return this.hasPair;
 	}
 
 	public void setHasPair(Boolean hasPair) {

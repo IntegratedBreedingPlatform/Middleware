@@ -172,12 +172,9 @@ public interface GermplasmListManager {
 	 * Returns the germplasm list entries that belong to the list identified by the given id.
 	 *
 	 * @param id
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 *
 	 * @return List of GermplasmListData POJOs
 	 */
-	List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException;
+	List<GermplasmListData> getGermplasmListDataByListId(Integer id) throws MiddlewareQueryException;
 
 	/**
 	 * Returns the number of germplasm list entries that belong to the list identified by the given id.

@@ -15,10 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -32,7 +31,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -51,22 +49,6 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
  *
  */
 public interface FieldbookService {
-
-	/**
-	 * Retrieves all the study details of the nurseries stored in local database.
-	 *
-	 * @param programUUID unique id of the program
-	 * @return all local nursery details
-	 */
-	List<StudyDetails> getAllLocalNurseryDetails(String programUUID);
-
-	/**
-	 * Retrieves all the details of the trial studies stored in local database.
-	 *
-	 * @param programUUID unique id of the program
-	 * @return all local trial study details
-	 */
-	List<StudyDetails> getAllLocalTrialStudyDetails(String programUUID);
 
 	/**
 	 * Gets the field map info (entries, reps, plots and counts) of the given trial.
@@ -228,8 +210,9 @@ public interface FieldbookService {
 	 *
 	 * @return The id of the newly-created germplasm list
 	 */
-	Integer saveNurseryAdvanceGermplasmList(Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listDataItems,
-			GermplasmList germplasmList);
+
+	Integer saveNurseryAdvanceGermplasmList(List<Pair<Germplasm, List<Name>>> germplasms,
+			List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList);
 
 	/**
 	 * Used for retrieving the Cimmyt Wheat Germplasm name.
@@ -427,40 +410,6 @@ public interface FieldbookService {
 	 * @return list of all possible treatment pairs
 	 */
 	List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId, List<Integer> hiddenFields);
-
-	/**
-	 * Returns the study type.
-	 *
-	 * @param studyId the study id
-	 * @return the study type
-	 */
-	TermId getStudyType(int studyId);
-
-	/**
-	 * Returns list of root or top-level folders from specified database.
-	 *
-	 * @param programUUID program's unique id
-	 * @return List of Folder POJOs or empty list if none found
-	 */
-	List<FolderReference> getRootFolders(String programUUID);
-
-	/**
-	 * Returns list of children of a folder given its ID. Retrieves from central if the given ID is positive, otherwise retrieves from
-	 * local.
-	 *
-	 * @param folderId The id of the folder to match
-	 * @param programUUID unique id of the program
-	 * @return List of AbstractNode (FolderNode, StudyNode) POJOs or empty list if none found
-	 */
-	List<Reference> getChildrenOfFolder(int folderId, String programUUID);
-
-	/**
-	 * Check if the given id is an existing study.
-	 *
-	 * @param id the id
-	 * @return true, if is study
-	 */
-	boolean isStudy(int id);
 
 	/**
 	 * Get lOcation by id.
@@ -794,7 +743,7 @@ public interface FieldbookService {
 	 *
 	 * @return The id of the newly-created germplasm list
 	 */
-	Integer saveGermplasmList(Map<Germplasm, GermplasmListData> listDataItems, GermplasmList germplasmList);
+	Integer saveGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList);
 
 	void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds);
 

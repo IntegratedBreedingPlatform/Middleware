@@ -1,5 +1,5 @@
 /*******************************************************************************
- * 
+ *
  * Copyright (c) 2012, All Rights Reserved.
  *
  * Generation Challenge Programme (GCP)
@@ -57,9 +57,6 @@ public class StudyDetails implements Serializable {
 	private Integer piId;
 
 	private Integer siteId;
-
-	// row count in both trial dataset and measurement dataset
-	private Integer rowCount;
 
 	// used to display "Add to New Study"
 	private String label;
@@ -228,77 +225,59 @@ public class StudyDetails implements Serializable {
 		this.piName = piName;
 	}
 
-	 public Season getSeason() {
-		 return this.season;
-	 }
+	public Season getSeason() {
+		return this.season;
+	}
 
-	 public void setSeason(Season season) {
-		 this.season = season;
-	 }
-
-	/**
-	  * @return the piId
-	  */
-	 public Integer getPiId() {
-		 return this.piId;
-	 }
-
-	 /**
-	  * @param piId the piId to set
-	  */
-	 public void setPiId(Integer piId) {
-		 this.piId = piId;
-	 }
-
-	 /**
-	  * @return the siteId
-	  */
-	 public Integer getSiteId() {
-		 return this.siteId;
-	 }
-
-	 /**
-	  * @param siteId the siteId to set
-	  */
-	 public void setSiteId(Integer siteId) {
-		 this.siteId = siteId;
-	 }
-
-	/**
-	 * @return the rowCount
-	 */
-	public Integer getRowCount() {
-		return this.rowCount;
+	public void setSeason(Season season) {
+		this.season = season;
 	}
 
 	/**
-	 * @param rowCount the rowCount to set
+	 * @return the piId
 	 */
-	public void setRowCount(Integer rowCount) {
-		this.rowCount = rowCount;
+	public Integer getPiId() {
+		return this.piId;
+	}
+
+	/**
+	 * @param piId the piId to set
+	 */
+	public void setPiId(Integer piId) {
+		this.piId = piId;
+	}
+
+	/**
+	 * @return the siteId
+	 */
+	public Integer getSiteId() {
+		return this.siteId;
+	}
+
+	/**
+	 * @param siteId the siteId to set
+	 */
+	public void setSiteId(Integer siteId) {
+		this.siteId = siteId;
 	}
 
 	public String getLabel() {
-		 return this.label;
-	 }
-
-	 public void setLabel(String label) {
-		 this.label = label;
-	 }
-
-	 public String getProgramUUID() {
-		 return this.programUUID;
-	 }
-
-	 public void setProgramUUID(String programUUID) {
-		 this.programUUID = programUUID;
-	 }
-
-	 public boolean hasRows() {
-		return this.rowCount != null && this.rowCount > 0;
+		return this.label;
 	}
 
-	 @Override
+	public void setLabel(String label) {
+		this.label = label;
+	}
+
+	public String getProgramUUID() {
+		return this.programUUID;
+	}
+
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
@@ -446,21 +425,19 @@ public class StudyDetails implements Serializable {
 		builder.append(this.piId);
 		builder.append(", siteId=");
 		builder.append(this.siteId);
-		builder.append(", rowCount=");
-		builder.append(this.rowCount);
 		builder.append("]");
 		return builder.toString();
 	}
 
-	 public void print(int indent) {
-		 Debug.println(indent, "StudyDetails: ");
+	public void print(int indent) {
+		Debug.println(indent, "StudyDetails: ");
 		Debug.println(indent + 3, "Id: " + this.id);
-		 Debug.println(indent + 3, "Name: " + this.studyName);
+		Debug.println(indent + 3, "Name: " + this.studyName);
 		Debug.println(indent + 3, "Title: " + this.title);
 		Debug.println(indent + 3, "Objective: " + this.objective);
 		Debug.println(indent + 3, "Start Date: " + this.startDate);
 		Debug.println(indent + 3, "End Date: " + this.endDate);
-		 Debug.println(indent + 3, "Study Type: " + this.studyType);
+		Debug.println(indent + 3, "Study Type: " + this.studyType);
 		Debug.println(indent + 3, "Parent Folder Id: " + this.parentFolderId);
 		Debug.println(indent + 3, "Trial Dataset Name: " + this.trialDatasetName);
 		Debug.println(indent + 3, "Measurement Dataset Name: " + this.measurementDatasetName);
@@ -469,6 +446,6 @@ public class StudyDetails implements Serializable {
 		Debug.println(indent + 3, "PI Name: " + this.piName);
 		Debug.println(indent + 3, "PI Id: " + this.piId);
 		Debug.println(indent + 3, "Site Id: " + this.siteId);
-	 }
+	}
 
 }

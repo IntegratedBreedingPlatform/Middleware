@@ -29,6 +29,9 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 /**
  *
  * http://gmod.org/wiki/Chado_Natural_Diversity_Module#Table:_nd_experiment
@@ -45,6 +48,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "nd_experiment")
+@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="nd_experiment")
 public class ExperimentModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -69,8 +73,8 @@ public class ExperimentModel implements Serializable {
 
 	@ManyToOne
 	@JoinTable(name = "nd_experiment_project",
-			joinColumns = {@JoinColumn(name = "nd_experiment_id", insertable = false, updatable = false)},
-			inverseJoinColumns = {@JoinColumn(name = "project_id", insertable = false, updatable = false)})
+	joinColumns = {@JoinColumn(name = "nd_experiment_id", insertable = false, updatable = false)},
+	inverseJoinColumns = {@JoinColumn(name = "project_id", insertable = false, updatable = false)})
 	private DmsProject project;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
