@@ -14,6 +14,7 @@ package org.generationcp.middleware.operation.saver;
 import java.util.HashSet;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -98,12 +99,22 @@ public class StockSaver extends Saver {
 		if (stockModel != null && stockModel.getProperties() != null && !stockModel.getProperties().isEmpty()) {
 			for (StockProperty property : stockModel.getProperties()) {
 				if (property.getTypeId().equals(Integer.valueOf(variable.getVariableType().getId()))) {
-					property.setValue(variable.getValue());
+					property.setValue(this.getStockPropertyValue(variable));
 					return property;
 				}
 			}
 		}
 		return null;
+	}
+
+	private String getStockPropertyValue(Variable variable) {
+		if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+			Enumeration validValue = variable.getVariableType().getStandardVariable().getEnumerationByName(variable.getValue());
+			if (validValue != null) {
+				return validValue.getId().toString();
+			}
+		}
+		return variable.getValue();
 	}
 
 	private StockModel getStockObject(StockModel stockModel) throws MiddlewareQueryException {
@@ -126,7 +137,7 @@ public class StockSaver extends Saver {
 	private StockProperty createProperty(Variable variable) throws MiddlewareQueryException {
 		StockProperty property = new StockProperty();
 		property.setTypeId(variable.getVariableType().getId());
-		property.setValue(variable.getValue());
+		property.setValue(this.getStockPropertyValue(variable));
 		property.setRank(variable.getVariableType().getRank());
 
 		return property;

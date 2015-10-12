@@ -13,6 +13,7 @@ package org.generationcp.middleware.operation.saver;
 
 import java.util.ArrayList;
 
+import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -147,9 +148,19 @@ public class GeolocationSaver extends Saver {
 			property.setType(variable.getVariableType().getId());
 			property.setRank(variable.getVariableType().getRank());
 		}
-		property.setValue(variable.getValue());
+		property.setValue(this.getGeolocationPropertyValue(variable));
 
 		return property;
+	}
+
+	private String getGeolocationPropertyValue(Variable variable) {
+		if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+			Enumeration validValue = variable.getVariableType().getStandardVariable().getEnumerationByName(variable.getValue());
+			if (validValue != null) {
+				return validValue.getId().toString();
+			}
+		}
+		return variable.getValue();
 	}
 
 	private GeolocationProperty getGeolocationProperty(Integer typeId, Geolocation geolocation) {
