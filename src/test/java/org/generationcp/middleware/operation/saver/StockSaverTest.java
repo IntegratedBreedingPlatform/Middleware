@@ -107,9 +107,8 @@ public class StockSaverTest {
 
 	@Test
 	public void testCreateOrUpdate() throws MiddlewareQueryException {
-		VariableList factors = this.createVariableList();
+		final VariableList factors = this.createVariableList();
 		this.stockModel = this.stockSaver.createStock(factors, this.stockModel);
-		for (StockProperty property : this.stockModel.getProperties()) {
 		Assert.assertNotNull(this.stockModel);
 		Assert.assertEquals(StockVariable.ENTRY_NO.getValue(), this.stockModel.getUniqueName());
 		Assert.assertEquals(StockVariable.GID.getValue(), this.stockModel.getDbxrefId().toString());
@@ -117,6 +116,7 @@ public class StockSaverTest {
 		Assert.assertEquals(StockVariable.ENTRY_CODE.getValue(), this.stockModel.getValue());
 		Assert.assertNotNull(this.stockModel.getProperties());
 		Assert.assertEquals(3, this.stockModel.getProperties().size());
+		for (final StockProperty property : this.stockModel.getProperties()) {
 			StockVariable stockVariable = null;
 			switch (property.getTypeId()) {
 				case 1:

@@ -116,9 +116,9 @@ public class GeolocationSaverTest {
 
 	@Test
 	public void testCreateOrUpdate() throws MiddlewareQueryException {
-		MeasurementRow row = this.createMeasurementRow();
-		VariableList factors = this.createVariableList();
-		Geolocation geolocation = this.geolocationSaver.createOrUpdate(factors, row, null);
+		final MeasurementRow row = this.createMeasurementRow();
+		final VariableList factors = this.createVariableList();
+		final Geolocation geolocation = this.geolocationSaver.createOrUpdate(factors, row, null);
 		Assert.assertNotNull(geolocation);
 		Assert.assertEquals(EnvironmentVariable.TRIAL_INSTANCE.getValue(), geolocation.getDescription());
 		Assert.assertEquals(EnvironmentVariable.LATITUDE.getValue(), geolocation.getLatitude().toString());
@@ -128,7 +128,7 @@ public class GeolocationSaverTest {
 		Assert.assertNotNull(geolocation.getProperties());
 		Assert.assertEquals(3, geolocation.getProperties().size());
 		int propertyIndex = 0;
-		for (GeolocationProperty property : geolocation.getProperties()) {
+		for (final GeolocationProperty property : geolocation.getProperties()) {
 			propertyIndex++;
 			EnvironmentVariable environmentVariable = null;
 			switch (propertyIndex) {
@@ -148,7 +148,7 @@ public class GeolocationSaverTest {
 		}
 		Assert.assertEquals(2, geolocation.getVariates().size());
 		int variateIndex = 0;
-		for (Variable variable : geolocation.getVariates().getVariables()) {
+		for (final Variable variable : geolocation.getVariates().getVariables()) {
 			variateIndex++;
 			EnvironmentVariable environmentVariable = null;
 			switch (variateIndex) {
@@ -164,24 +164,24 @@ public class GeolocationSaverTest {
 	}
 
 	private MeasurementRow createMeasurementRow() {
-		MeasurementRow row = new MeasurementRow();
+		final MeasurementRow row = new MeasurementRow();
 		row.setDataList(this.createMeasurementDataList());
 		return row;
 	}
 
 	private List<MeasurementData> createMeasurementDataList() {
-		List<MeasurementData> dataList = new ArrayList<MeasurementData>();
+		final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
 		for (int i = 0; i < 10; i++) {
-			EnvironmentVariable variable = EnvironmentVariable.values()[i];
-			String label = variable.getName();
-			String value = variable.getValue();
+			final EnvironmentVariable variable = EnvironmentVariable.values()[i];
+			final String label = variable.getName();
+			final String value = variable.getValue();
 			dataList.add(this.createMeasurementData(label, value));
 		}
 		return dataList;
 	}
 
-	private MeasurementData createMeasurementData(String label, String value) {
-		MeasurementData measurementData = new MeasurementData();
+	private MeasurementData createMeasurementData(final String label, final String value) {
+		final MeasurementData measurementData = new MeasurementData();
 		measurementData.setLabel(label);
 		measurementData.setValue(value);
 		return measurementData;
@@ -232,9 +232,9 @@ public class GeolocationSaverTest {
 
 	@Test
 	public void testSetGeolocation() {
-		Geolocation geolocation = new Geolocation();
+		final Geolocation geolocation = new Geolocation();
 		for (int i = 0; i < 5; i++) {
-			EnvironmentVariable variable = EnvironmentVariable.values()[i];
+			final EnvironmentVariable variable = EnvironmentVariable.values()[i];
 			this.geolocationSaver.setGeolocation(geolocation, variable.getId(), variable.getValue());
 			switch (i) {
 				case 0:
