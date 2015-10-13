@@ -321,7 +321,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		List<DataSet> datasets = new ArrayList<DataSet>();
 
 		for (DmsProject datasetProject : datasetProjects) {
-			datasets.add(this.getDataSetBuilder().build(datasetProject.getProjectId())); //Second big loop
+			datasets.add(this.getDataSetBuilder().build(datasetProject.getProjectId()));
 		}
 
 		return datasets;
