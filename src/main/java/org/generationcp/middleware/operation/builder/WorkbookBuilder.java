@@ -160,7 +160,7 @@ public class WorkbookBuilder extends Builder {
 		final List<MeasurementRow> observations =
 				this.buildObservations(experiments, variables.getVariates(), factors, variates, isTrial, conditions);
 		final List<TreatmentVariable> treatmentFactors = this.buildTreatmentFactors(variables);
-		final List<ProjectProperty> projectProperties = this.getDataSetBuilder().getTrialDataset(id).getProperties();
+		final List<ProjectProperty> projectProperties = trialProject.getProperties();
 
 		final Map<Integer, org.generationcp.middleware.domain.ontology.VariableType> projectPropRoleMapping =
 				this.generateProjectPropertyRoleMap(projectProperties);
