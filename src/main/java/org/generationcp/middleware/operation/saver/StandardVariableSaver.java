@@ -122,9 +122,8 @@ public class StandardVariableSaver extends Saver {
 		// Save cvterm entry of the new valid value
 		CVTerm cvTerm = this.createCvTerm(enumeration, cvId);
 		enumeration.setId(cvTerm.getCvTermId());
-
 		// save cvterm relationship
-		this.saveCvTermRelationship(variable.getId(), TermId.HAS_VALUE.getId(), enumeration.getId());
+		this.saveCvTermRelationship(variable.getScale().getId(), TermId.HAS_VALUE.getId(), enumeration.getId());
 	}
 
 	private void validateInputEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareException {
