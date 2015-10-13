@@ -49,6 +49,7 @@ import org.hibernate.annotations.BatchSize;
 @Entity
 @Table(name = "nd_experiment")
 @Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="nd_experiment")
+//OneToOne relationship to this entity from ExperimentProject requires batching annotation to be on entity unlike OneToMany which can be on the field.
 @BatchSize(size = 500)
 public class ExperimentModel implements Serializable {
 
