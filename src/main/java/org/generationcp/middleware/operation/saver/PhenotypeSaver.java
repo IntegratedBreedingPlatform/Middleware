@@ -31,7 +31,6 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
-import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
