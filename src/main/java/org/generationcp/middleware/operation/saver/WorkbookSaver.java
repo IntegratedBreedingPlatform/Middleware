@@ -47,6 +47,8 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.util.TimerWatch;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -346,7 +348,7 @@ public class WorkbookSaver extends Saver {
 
 	public int createLocationAndSetToObservations(Workbook workbook, List<MeasurementVariable> trialMV, VariableTypeList trialVariables,
 			Map<Integer, VariableList> trialVariatesMap, boolean isDeleteTrialObservations, String programUUID)
-			throws MiddlewareException {
+					throws MiddlewareException {
 
 		TimerWatch watch = new TimerWatch("transform trial environment");
 		if (workbook.getTrialObservations() != null && workbook.getTrialObservations().size() == 1) {
@@ -506,7 +508,7 @@ public class WorkbookSaver extends Saver {
 			}
 		}
 		return null;
-		
+
 	}
 
 	private String generateTrialDatasetName(String studyName, StudyType studyType) {
@@ -678,21 +680,32 @@ public class WorkbookSaver extends Saver {
 			MeasurementRow row = workbook.getObservations().get(0);
 			variableIndexesList = this.getVariableListTransformer().transformStockIndexes(row, effectVariables, trialHeaders);
 		}
+
 		if (workbook.getObservations() != null) {
-			for (MeasurementRow row : workbook.getObservations()) {
+			Session activeSession = this.getActiveSession();
+			final FlushMode existingFlushMode = activeSession.getFlushMode();
+			activeSession.setFlushMode(FlushMode.MANUAL);
+			try {
+				for (MeasurementRow row : workbook.getObservations()) {
 
-				VariableList stock =
-						this.getVariableListTransformer().transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
-				String stockFactor = this.getStockFactor(stock);
-				Integer stockId = stockMap.get(stockFactor);
+					VariableList stock =
+							this.getVariableListTransformer().transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
+					String stockFactor = this.getStockFactor(stock);
+					Integer stockId = stockMap.get(stockFactor);
 
-				if (stockId == null) {
-					stockId = this.getStockSaver().saveStock(stock);
-					stockMap.put(stockFactor, stockId);
-				} else {
-					this.getStockSaver().saveOrUpdateStock(stock, stockId);
+					if (stockId == null) {
+						stockId = this.getStockSaver().saveStock(stock);
+						stockMap.put(stockFactor, stockId);
+					} else {
+						this.getStockSaver().saveOrUpdateStock(stock, stockId);
+					}
+					row.setStockId(stockId);
 				}
-				row.setStockId(stockId);
+				activeSession.flush();
+			} finally {
+				if(existingFlushMode != null) {
+					activeSession.setFlushMode(existingFlushMode);
+				}
 			}
 		}
 
@@ -710,6 +723,9 @@ public class WorkbookSaver extends Saver {
 		ExperimentValuesTransformer experimentValuesTransformer = this.getExperimentValuesTransformer();
 		ExperimentModelSaver experimentModelSaver = this.getExperimentModelSaver();
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
+		final Session activeSession = this.getActiveSession();
+		final FlushMode existingFlushMode = activeSession.getFlushMode();
+		activeSession.setFlushMode(FlushMode.MANUAL);
 		if (observations != null) {
 			for (MeasurementRow row : observations) {
 				rowWatch.restart("saving row " + i++);
@@ -737,6 +753,9 @@ public class WorkbookSaver extends Saver {
 				}
 			}
 		}
+		activeSession.flush();
+		activeSession.setFlushMode(existingFlushMode);
+
 		rowWatch.stop();
 		watch.stop();
 

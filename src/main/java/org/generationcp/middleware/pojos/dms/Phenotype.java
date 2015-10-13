@@ -39,7 +39,7 @@ public class Phenotype implements Serializable {
 
 	@Id
 	@TableGenerator(name = "phenotypeIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value",
-	pkColumnValue = "phenotype", allocationSize = 5000)
+	pkColumnValue = "phenotype", allocationSize = 500)
 	@GeneratedValue(strategy = GenerationType.TABLE, generator = "phenotypeIdGenerator")
 	@Basic(optional = false)
 	@Column(name = "phenotype_id")

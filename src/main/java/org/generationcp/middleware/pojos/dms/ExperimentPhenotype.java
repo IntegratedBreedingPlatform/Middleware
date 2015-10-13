@@ -46,7 +46,7 @@ public class ExperimentPhenotype implements Serializable {
 
 	@Id
 	@TableGenerator(name = "ndExperimentPhenotypeIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value",
-	pkColumnValue = "nd_experiment_phenotype", allocationSize = 5000)
+	pkColumnValue = "nd_experiment_phenotype", allocationSize = 500)
 	@GeneratedValue(strategy = GenerationType.TABLE, generator = "ndExperimentPhenotypeIdGenerator")
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_phenotype_id")
