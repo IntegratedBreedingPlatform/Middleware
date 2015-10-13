@@ -117,8 +117,8 @@ public class WorkbookBuilder extends Builder {
 		final List<Experiment> experiments = this.getStudyDataManager().getExperiments(dataSetId, 0, (int) expCount, variables);
 		VariableList conditionVariables = null, constantVariables = null, trialConstantVariables = null;
 			
-		final DmsProject trialProject = this.getDataSetBuilder().getTrialDataset(study.getId());
-		final DataSet trialDataSet = this.getDataSetBuilder().build(trialProject.getProjectId());
+		final DmsProject trialDataSetProject = this.getDataSetBuilder().getTrialDataset(study.getId());
+		final DataSet trialDataSet = this.getDataSetBuilder().build(trialDataSetProject.getProjectId());
 		workbook.setTrialDatasetId(trialDataSet.getId());
 		
 		final VariableList trialEnvironmentVariables = this.getTrialEnvironmentVariableList(trialDataSet);
@@ -160,7 +160,7 @@ public class WorkbookBuilder extends Builder {
 		final List<MeasurementRow> observations =
 				this.buildObservations(experiments, variables.getVariates(), factors, variates, isTrial, conditions);
 		final List<TreatmentVariable> treatmentFactors = this.buildTreatmentFactors(variables);
-		final List<ProjectProperty> projectProperties = trialProject.getProperties();
+		final List<ProjectProperty> projectProperties = trialDataSetProject.getProperties();
 
 		final Map<Integer, org.generationcp.middleware.domain.ontology.VariableType> projectPropRoleMapping =
 				this.generateProjectPropertyRoleMap(projectProperties);
