@@ -31,7 +31,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "locdes")
-@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="locdes")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="locdes")
 public class Locdes implements Serializable {
 
 	private static final long serialVersionUID = 1L;

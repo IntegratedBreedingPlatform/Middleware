@@ -48,7 +48,7 @@ import org.hibernate.annotations.NotFoundAction;
 @NamedQueries({@NamedQuery(name = "deleteGermplasmListDataByListId", query = "DELETE FROM GermplasmListData WHERE list = :listId"),})
 @Entity
 @Table(name = "listdata")
-@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL, region = "listdata")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="listdata")
 public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	private static final long serialVersionUID = 1L;

@@ -39,7 +39,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "nd_experiment_phenotype", uniqueConstraints = {@UniqueConstraint(columnNames = {"nd_experiment_id", "phenotype_id"})})
-@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="nd_experiment_phenotype")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="nd_experiment_phenotype")
 public class ExperimentPhenotype implements Serializable {
 
 	private static final long serialVersionUID = 1L;

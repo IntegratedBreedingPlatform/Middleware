@@ -90,7 +90,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @XmlRootElement(name = "germplasm")
 @XmlType(propOrder = {"gid", "gnpgs", "gpid1", "gpid2", "gdate"})
 @XmlAccessorType(XmlAccessType.NONE)
-@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="germplsm")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="germplsm")
 public class Germplasm implements Serializable {
 
 	private static final long serialVersionUID = 1L;
