@@ -37,7 +37,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "nd_experimentprop", uniqueConstraints = {@UniqueConstraint(columnNames = {"nd_experiment_id", "type_id", "rank"})})
-@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="nd_experimentprop")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="nd_experimentprop")
 public class ExperimentProperty implements Serializable {
 
 	private static final long serialVersionUID = 1L;

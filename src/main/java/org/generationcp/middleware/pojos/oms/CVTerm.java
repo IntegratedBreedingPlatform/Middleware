@@ -37,7 +37,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Table(name = "cvterm", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "cv_id", "is_obsolete"}),
 		@UniqueConstraint(columnNames = {"dbxref_id"})})
-@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="cvterm")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="cvterm")
 public class CVTerm implements Serializable {
 
 	private static final long serialVersionUID = 1L;

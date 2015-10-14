@@ -36,8 +36,15 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 public class ExperimentBuilder extends Builder {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(ExperimentBuilder.class);
 	
 	public ExperimentBuilder(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
@@ -86,16 +93,21 @@ public class ExperimentBuilder extends Builder {
 
 	public List<Experiment> build(int projectId, List<TermId> types, int start, int numOfRows, VariableTypeList variableTypes)
 			throws MiddlewareQueryException {
-		List<Experiment> experiments = new ArrayList<Experiment>();
-		List<ExperimentProject> experimentProjects =
-				this.getExperimentProjectDao().getExperimentProjects(projectId, types, start, numOfRows);
-		// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
-		Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentProjects);
+		Monitor monitor = MonitorFactory.start("Build Experiments");
+		try {
+			List<Experiment> experiments = new ArrayList<Experiment>();
+			List<ExperimentProject> experimentProjects =
+					this.getExperimentProjectDao().getExperimentProjects(projectId, types, start, numOfRows);
+			// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
+			Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentProjects);
 
-		for (ExperimentProject experimentProject : experimentProjects) {
-			experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
+			for (ExperimentProject experimentProject : experimentProjects) {
+				experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
+			}
+			return experiments;
+		} finally {
+			LOG.debug("" + monitor.stop());
 		}
-		return experiments;
 	}
 
 	public Experiment buildOne(int projectId, TermId type, VariableTypeList variableTypes) throws MiddlewareQueryException {
@@ -150,7 +162,6 @@ public class ExperimentBuilder extends Builder {
 
 	private void addVariates(ExperimentModel experiment, VariableList variates, VariableTypeList variableTypes)
 			throws MiddlewareQueryException {
-		this.getExperimentDao().refresh(experiment);
 		if (experiment.getPhenotypes() != null) {
 			for (Phenotype phenotype : experiment.getPhenotypes()) {
 				DMSVariableType variableType = variableTypes.findById(phenotype.getObservableId());

@@ -39,7 +39,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "cvterm_relationship")
-@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="cvterm_relationship")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="cvterm_relationship")
 public class CVTermRelationship implements Serializable {
 
 	private static final long serialVersionUID = 1L;

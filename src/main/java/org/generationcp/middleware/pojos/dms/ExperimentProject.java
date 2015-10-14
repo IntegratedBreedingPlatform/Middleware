@@ -54,6 +54,8 @@ public class ExperimentProject implements Serializable {
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "nd_experiment_id")
 	@Fetch(FetchMode.SELECT)
+	// Batching for this relationship is specified on the entity ExperimentModel, because this is a OneToOne relationship. 
+	// This is unlike batching for OneToMany which is specified on the field.
 	private ExperimentModel experiment;
 
 	/**
