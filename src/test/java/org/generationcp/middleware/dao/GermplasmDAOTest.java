@@ -11,12 +11,12 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.ims.Transaction;
@@ -31,23 +31,16 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	private static final String DUMMY_STOCK_ID = "USER-1-1";
 	private static final Integer testGid1 = 1;
-	private static final Integer testGid1_Gpid1 = 2;
-	private static final Integer testGid1_Gpid2 = 3;
-
 	private static Integer testTransactionID;
 	private static String oldInventoryID;
-	private static Integer oldGid1_Gpid1;
-	private static Integer oldGid1_Gpid2;
-
 	private boolean testDataSetup = false;
 
 	private GermplasmDAO dao;
+	private Germplasm testGermplasm;
 
 	@Autowired
 	private InventoryDataManager inventoryDM;
 
-	@Autowired
-	private GermplasmDataManager germplasmDataDM;
 
 	@Before
 	public void setUp() throws Exception {
@@ -60,6 +53,22 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			this.updateInventory();
 			this.updateProgenitors();
 			this.testDataSetup = true;
+		}
+
+		if (this.testGermplasm == null) {
+			this.testGermplasm = new Germplasm();
+			this.testGermplasm.setMethodId(1);
+			this.testGermplasm.setGnpgs(0);
+			this.testGermplasm.setGpid1(0);
+			this.testGermplasm.setGpid2(0);
+			this.testGermplasm.setUserId(1);
+			this.testGermplasm.setLgid(1);
+			this.testGermplasm.setLocationId(1);
+			this.testGermplasm.setGdate(20000101);
+			this.testGermplasm.setGrplce(0);
+			this.testGermplasm.setReferenceId(0);
+			this.testGermplasm.setMgid(0);
+			this.dao.save(this.testGermplasm);
 		}
 	}
 
@@ -212,5 +221,14 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	public void testSearchForGermplasmsEmptyKeyword() throws Exception {
 		List<Germplasm> results = this.dao.searchForGermplasms("", Operation.EQUAL, false, false);
 		Assert.assertTrue(results.isEmpty());
+	}
+
+	@Test
+	public void testGetExistingGIDs() {
+		List<Integer> gidsToVerify = Arrays.asList(new Integer[] {12345678, 8765432, this.testGermplasm.getGid()});
+		List<Integer> existingGids = this.dao.getExistingGIDs(gidsToVerify);
+		Assert.assertFalse(existingGids.isEmpty());
+		Assert.assertEquals(1, existingGids.size());
+		Assert.assertEquals(this.testGermplasm.getGid(), existingGids.get(0));
 	}
 }

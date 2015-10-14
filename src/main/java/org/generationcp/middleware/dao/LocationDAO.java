@@ -765,4 +765,26 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return new ArrayList<Locdes>();
 	}
 
+	public List<Integer> getExistingLocationIds(List<Integer> ids, String programUUID) throws MiddlewareQueryException {
+		List<Integer> locationIds = new ArrayList<Integer>();
+
+		if (ids == null || ids.isEmpty()) {
+			return locationIds;
+		}
+
+		try {
+			Criteria criteria = this.getSession().createCriteria(Location.class);
+			criteria.add(Restrictions.in(LocationDAO.LOCID, ids));
+			criteria.add(Restrictions.or(Restrictions.eq(LocationDAO.UNIQUE_ID, programUUID), Restrictions.isNull(LocationDAO.UNIQUE_ID)));
+			criteria.setProjection(Projections.property(LocationDAO.LOCID));
+			locationIds = criteria.list();
+		} catch (HibernateException e) {
+			this.logAndThrowException(this.getLogExceptionMessage("getByIdsAndProgramUUID",
+					"ids=[" + StringUtils.join(ids, ",") + "],programUUID=[" + programUUID + "]", null, e.getMessage(),
+					LocationDAO.CLASS_NAME_LOCATION),
+					e);
+		}
+		return locationIds;
+	}
+
 }

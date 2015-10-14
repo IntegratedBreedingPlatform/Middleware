@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -29,6 +31,9 @@ import org.hibernate.criterion.Restrictions;
  * 
  */
 public class PersonDAO extends GenericDAO<Person, Integer> {
+
+	private static final String ID = "id";
+	private static final String CLASS_NAME_PERSON = "Person";
 
 	public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException {
 		try {
@@ -183,5 +188,24 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 					e);
 		}
 		return person;
+	}
+
+	public List<Integer> getExistingPersonIds(List<Integer> ids) throws MiddlewareQueryException {
+		List<Integer> personIds = new ArrayList<Integer>();
+
+		if (ids == null || ids.isEmpty()) {
+			return personIds;
+		}
+
+		try {
+			Criteria criteria = this.getSession().createCriteria(Person.class);
+			criteria.add(Restrictions.in(PersonDAO.ID, ids));
+			criteria.setProjection(Projections.property(PersonDAO.ID));
+			personIds = criteria.list();
+		} catch (HibernateException e) {
+			this.logAndThrowException(this.getLogExceptionMessage("getExistingPersonIds", StringUtils.join(ids, ","), null, e.getMessage(),
+					PersonDAO.CLASS_NAME_PERSON), e);
+		}
+		return personIds;
 	}
 }

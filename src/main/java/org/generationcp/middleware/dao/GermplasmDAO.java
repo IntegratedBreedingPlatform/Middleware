@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
@@ -27,9 +28,12 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link Germplasm}.
@@ -45,6 +49,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String Q_STANDARDIZED = "qStandardized";
 	private static final String AVAIL_INV = "availInv";
 	private static final String SEED_RES = "seedRes";
+	private static final String GID = "gid";
+	private static final String GRPLCE = "grplce";
+	private static final String CLASS_NAME_GERMPLASM = "Germplasm";
 
 	@Override
 	public Germplasm getById(Integer gid, boolean lock) throws MiddlewareQueryException {
@@ -871,6 +878,26 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			this.logAndThrowException("Error with getByLGid(lgid=" + lgid + ") query from Germplasm: " + e.getMessage(), e);
 		}
 		return null;
+	}
+
+	public List<Integer> getExistingGIDs(List<Integer> ids) throws MiddlewareQueryException {
+		List<Integer> gids = new ArrayList<Integer>();
+
+		if (ids == null || ids.isEmpty()) {
+			return gids;
+		}
+
+		try {
+			Criteria criteria = this.getSession().createCriteria(Germplasm.class);
+			criteria.add(Restrictions.in(GermplasmDAO.GID, ids));
+			criteria.add(Restrictions.neProperty(GermplasmDAO.GID, GermplasmDAO.GRPLCE));
+			criteria.setProjection(Projections.property(GermplasmDAO.GID));
+			gids = criteria.list();
+		} catch (HibernateException e) {
+			this.logAndThrowException(this.getLogExceptionMessage("getByIdsAndProgramUUID", StringUtils.join(ids, ","), null,
+					e.getMessage(), GermplasmDAO.CLASS_NAME_GERMPLASM), e);
+		}
+		return gids;
 	}
 
 }
