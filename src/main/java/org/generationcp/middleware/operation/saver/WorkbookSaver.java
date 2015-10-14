@@ -533,7 +533,7 @@ public class WorkbookSaver extends Saver {
 
 	private int createStudyIfNecessary(final Workbook workbook, final int studyLocationId, final boolean saveStudyExperiment,
 			final String programUUID)
-					throws Exception {
+			throws Exception {
 		final TimerWatch watch = new TimerWatch("find study");
 
 		Integer studyId = null;
@@ -692,10 +692,10 @@ public class WorkbookSaver extends Saver {
 			try {
 				for (final MeasurementRow row : workbook.getObservations()) {
 
-					final VariableList stock =
-							this.getVariableListTransformer().transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
-					final String stockFactor = this.getStockFactor(stock);
-					Integer stockId = stockMap.get(stockFactor);
+				final VariableList stock =
+						this.getVariableListTransformer().transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
+				final String stockFactor = this.getStockFactor(stock);
+				Integer stockId = stockMap.get(stockFactor);
 
 					if (stockId == null) {
 						stockId = this.getStockSaver().saveStock(stock);
