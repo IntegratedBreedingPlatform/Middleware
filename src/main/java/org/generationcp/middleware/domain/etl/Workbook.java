@@ -251,7 +251,7 @@ public class Workbook {
 	 * @return measurement dataset variable list
 	 */
 	public List<MeasurementVariable> getMeasurementDatasetVariablesView() {
-		Set<MeasurementVariable> list = new LinkedHashSet<MeasurementVariable>();
+		final Set<MeasurementVariable> list = new LinkedHashSet<MeasurementVariable>();
 		if (!this.isNursery()) {
 			MeasurementVariable trialFactor = null;
 			if (this.getTrialFactors() != null) {

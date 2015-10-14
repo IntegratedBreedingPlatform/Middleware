@@ -36,8 +36,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -47,6 +45,8 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.util.TimerWatch;
+import org.hibernate.FlushMode;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -509,7 +509,7 @@ public class WorkbookSaver extends Saver {
 			}
 		}
 		return null;
-		
+
 	}
 
 	private String generateTrialDatasetName(final String studyName, final StudyType studyType) {
@@ -684,21 +684,32 @@ public class WorkbookSaver extends Saver {
 			final MeasurementRow row = workbook.getObservations().get(0);
 			variableIndexesList = this.getVariableListTransformer().transformStockIndexes(row, effectVariables, trialHeaders);
 		}
+
 		if (workbook.getObservations() != null) {
-			for (final MeasurementRow row : workbook.getObservations()) {
+			final Session activeSession = this.getActiveSession();
+			final FlushMode existingFlushMode = activeSession.getFlushMode();
+			activeSession.setFlushMode(FlushMode.MANUAL);
+			try {
+				for (final MeasurementRow row : workbook.getObservations()) {
 
 				final VariableList stock =
 						this.getVariableListTransformer().transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
 				final String stockFactor = this.getStockFactor(stock);
 				Integer stockId = stockMap.get(stockFactor);
 
-				if (stockId == null) {
-					stockId = this.getStockSaver().saveStock(stock);
-					stockMap.put(stockFactor, stockId);
-				} else {
-					this.getStockSaver().saveOrUpdateStock(stock, stockId);
+					if (stockId == null) {
+						stockId = this.getStockSaver().saveStock(stock);
+						stockMap.put(stockFactor, stockId);
+					} else {
+						this.getStockSaver().saveOrUpdateStock(stock, stockId);
+					}
+					row.setStockId(stockId);
 				}
-				row.setStockId(stockId);
+				activeSession.flush();
+			} finally {
+				if(existingFlushMode != null) {
+					activeSession.setFlushMode(existingFlushMode);
+				}
 			}
 		}
 
@@ -716,33 +727,44 @@ public class WorkbookSaver extends Saver {
 		final ExperimentValuesTransformer experimentValuesTransformer = this.getExperimentValuesTransformer();
 		final ExperimentModelSaver experimentModelSaver = this.getExperimentModelSaver();
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
-		if (observations != null) {
-			for (final MeasurementRow row : observations) {
-				rowWatch.restart("saving row " + i++);
-				final ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
-				try {
-					experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
-				} catch (final PhenotypeException e) {
-					WorkbookSaver.LOG.error(e.getMessage(), e);
-					if (exceptions == null) {
-						exceptions = e.getExceptions();
-					} else {
-						for (final Integer standardVariableId : e.getExceptions().keySet()) {
-							final PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
-							if (exceptions.get(standardVariableId) == null) {
-								// add exception
-								exceptions.put(standardVariableId, exception);
-							} else {
-								// add invalid values to the existing map of exceptions for each phenotype
-								for (final String invalidValue : exception.getInvalidValues()) {
-									exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
+		final Session activeSession = this.getActiveSession();
+		final FlushMode existingFlushMode = activeSession.getFlushMode();
+		try {
+			activeSession.setFlushMode(FlushMode.MANUAL);
+			if (observations != null) {
+				for (final MeasurementRow row : observations) {
+					rowWatch.restart("saving row " + i++);
+					final ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
+					try {
+						experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
+					} catch (final PhenotypeException e) {
+						WorkbookSaver.LOG.error(e.getMessage(), e);
+						if (exceptions == null) {
+							exceptions = e.getExceptions();
+						} else {
+							for (final Integer standardVariableId : e.getExceptions().keySet()) {
+								final PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
+								if (exceptions.get(standardVariableId) == null) {
+									// add exception
+									exceptions.put(standardVariableId, exception);
+								} else {
+									// add invalid values to the existing map of exceptions for each phenotype
+									for (final String invalidValue : exception.getInvalidValues()) {
+										exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
+									}
 								}
 							}
 						}
 					}
 				}
 			}
+			activeSession.flush();
+		} finally {
+			if (existingFlushMode != null) {
+				activeSession.setFlushMode(existingFlushMode);
+			}
 		}
+
 		rowWatch.stop();
 		watch.stop();
 

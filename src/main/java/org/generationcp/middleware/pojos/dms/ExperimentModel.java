@@ -28,6 +28,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -48,7 +49,7 @@ import org.hibernate.annotations.BatchSize;
  */
 @Entity
 @Table(name = "nd_experiment")
-@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="nd_experiment")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="nd_experiment")
 //OneToOne relationship to this entity from ExperimentProject requires batching annotation to be on entity unlike OneToMany which can be on the field.
 @BatchSize(size = 500)
 public class ExperimentModel implements Serializable {
@@ -56,7 +57,9 @@ public class ExperimentModel implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+	@TableGenerator(name = "ndExperimentIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value",
+	pkColumnValue = "nd_experiment", allocationSize = 500)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "ndExperimentIdGenerator")
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_id")
 	private Integer ndExperimentId;
