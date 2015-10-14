@@ -100,7 +100,8 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		Assert.assertEquals("Study usage should be -1 i.e. unknow.", new Integer(-1), variable.getStudies() );
 		Assert.assertEquals("Observation usage should be -1 i.e. unknow.", new Integer(-1), variable.getObservations());
 	}
-	@Test
+
+    @Test
 	public void testGetVariable_DontFilterObsolete() throws Exception {
 		CVTermDao cvtermDao = new CVTermDao();
 		cvtermDao.setSession(this.sessionProvder.getSession());
@@ -141,6 +142,24 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		cvtermDao.update(testVariableCvTerm);
 
 	}
+
+    @Test(expected = MiddlewareException.class)
+    public void testAddAnalysisVariableShouldNotClubbedWithOtherVariableType() throws Exception {
+        OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+        variableInfo.setName(OntologyDataCreationUtil.getNewRandomName());
+        variableInfo.addVariableType(VariableType.ANALYSIS);
+        variableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
+        this.variableManager.addVariable(variableInfo);
+        Assert.fail("Analysis variable should not clubbed with other variable type");
+    }
+
+    @Test(expected = MiddlewareException.class)
+    public void testUpdateAnalysisVariableShouldNotClubbedWithOtherVariableType() throws Exception {
+        this.testVariableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
+        this.testVariableInfo.addVariableType(VariableType.ANALYSIS);
+        this.variableManager.updateVariable(this.testVariableInfo);
+        Assert.fail("Analysis variable should not clubbed with other variable type");
+    }
 
 	@Test
 	public void testUpdateVariable() throws Exception {
@@ -190,7 +209,6 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.testVariableInfo.setExpectedMin("0");
 		this.testVariableInfo.setExpectedMax("100");
 		this.testVariableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
-		this.testVariableInfo.addVariableType(VariableType.ANALYSIS);
 		this.testVariableInfo.setIsFavorite(true);
 		this.variableManager.addVariable(this.testVariableInfo);
 	}
