@@ -36,8 +36,6 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -535,7 +533,7 @@ public class WorkbookSaver extends Saver {
 
 	private int createStudyIfNecessary(final Workbook workbook, final int studyLocationId, final boolean saveStudyExperiment,
 			final String programUUID)
-			throws Exception {
+					throws Exception {
 		final TimerWatch watch = new TimerWatch("find study");
 
 		Integer studyId = null;
@@ -692,11 +690,12 @@ public class WorkbookSaver extends Saver {
 			final FlushMode existingFlushMode = activeSession.getFlushMode();
 			activeSession.setFlushMode(FlushMode.MANUAL);
 			try {
-				for (MeasurementRow row : workbook.getObservations()) {
-				final VariableList stock =
-						this.getVariableListTransformer().transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
-				final String stockFactor = this.getStockFactor(stock);
-				Integer stockId = stockMap.get(stockFactor);
+				for (final MeasurementRow row : workbook.getObservations()) {
+
+					final VariableList stock =
+							this.getVariableListTransformer().transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
+					final String stockFactor = this.getStockFactor(stock);
+					Integer stockId = stockMap.get(stockFactor);
 
 					if (stockId == null) {
 						stockId = this.getStockSaver().saveStock(stock);
@@ -730,36 +729,41 @@ public class WorkbookSaver extends Saver {
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
 		final Session activeSession = this.getActiveSession();
 		final FlushMode existingFlushMode = activeSession.getFlushMode();
-		activeSession.setFlushMode(FlushMode.MANUAL);
-		if (observations != null) {
-			for (final MeasurementRow row : observations) {
-				rowWatch.restart("saving row " + i++);
-				final ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
-				try {
-					experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
-				} catch (final PhenotypeException e) {
-					WorkbookSaver.LOG.error(e.getMessage(), e);
-					if (exceptions == null) {
-						exceptions = e.getExceptions();
-					} else {
-						for (final Integer standardVariableId : e.getExceptions().keySet()) {
-							final PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
-							if (exceptions.get(standardVariableId) == null) {
-								// add exception
-								exceptions.put(standardVariableId, exception);
-							} else {
-								// add invalid values to the existing map of exceptions for each phenotype
-								for (final String invalidValue : exception.getInvalidValues()) {
-									exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
+		try {
+			activeSession.setFlushMode(FlushMode.MANUAL);
+			if (observations != null) {
+				for (final MeasurementRow row : observations) {
+					rowWatch.restart("saving row " + i++);
+					final ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
+					try {
+						experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
+					} catch (final PhenotypeException e) {
+						WorkbookSaver.LOG.error(e.getMessage(), e);
+						if (exceptions == null) {
+							exceptions = e.getExceptions();
+						} else {
+							for (final Integer standardVariableId : e.getExceptions().keySet()) {
+								final PhenotypeExceptionDto exception = e.getExceptions().get(standardVariableId);
+								if (exceptions.get(standardVariableId) == null) {
+									// add exception
+									exceptions.put(standardVariableId, exception);
+								} else {
+									// add invalid values to the existing map of exceptions for each phenotype
+									for (final String invalidValue : exception.getInvalidValues()) {
+										exceptions.get(standardVariableId).getInvalidValues().add(invalidValue);
+									}
 								}
 							}
 						}
 					}
 				}
 			}
+			activeSession.flush();
+		} finally {
+			if (existingFlushMode != null) {
+				activeSession.setFlushMode(existingFlushMode);
+			}
 		}
-		activeSession.flush();
-		activeSession.setFlushMode(existingFlushMode);
 
 		rowWatch.stop();
 		watch.stop();

@@ -670,7 +670,12 @@ public class WorkbookTest {
 
 		final List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 
-		final int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
+		final List<MeasurementVariable> factors = workbook.getFactors();
+		final List<MeasurementVariable> variates = workbook.getVariates();
+
+		final int noOfFactors = factors.size();
+		final int noOfVariates = variates.size();
+		final int totalMeasurementVariableCount = noOfFactors + noOfVariates;
 
 		Assert.assertEquals(
 				"MeasurementDatasetVariablesView size should be the total no of non trial factors, variates and trial_instance",
