@@ -650,7 +650,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		if (errors.isEmpty()) {
 			// check invalid records only when there are no more errors in the workbook
-			this.checkForInvalidRecordsOfControlledVariables(workbook, programUUID);
+			errors.put(Constants.OBSERVATION_DATA_ERRORS, this.checkForInvalidRecordsOfControlledVariables(workbook, programUUID));
 		}
 
 		return errors;
