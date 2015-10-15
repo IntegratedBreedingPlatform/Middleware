@@ -12,6 +12,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
@@ -108,11 +109,31 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 	public void deleteByListIdWithList(int listId) throws MiddlewareQueryException {
 		try {
-			SQLQuery statement =
-					this.getSession().createSQLQuery(
-							"delete ldp, lst " + "from listdata_project ldp, listnms lst "
-									+ "where ldp.list_id = lst.listid and ldp.list_id = " + listId);
-			statement.executeUpdate();
+			String nmsListHql = "FROM GermplasmList nms " +
+					"WHERE nms.id = :list_id";
+
+			Query query = this.getSession().createQuery(nmsListHql);
+			query.setParameter("list_id", listId);
+
+			GermplasmList germplasmLists = (GermplasmList)query.uniqueResult();
+
+			// delete listdataproj first
+			String deleteListDataProjHQL = "DELETE FROM ListDataProject ldp " +
+					"WHERE ldp.list = :germplasmLists";
+
+			Query query2 = this.getSession().createQuery(deleteListDataProjHQL);
+			query2.setParameter("germplasmLists", germplasmLists);
+
+			query2.executeUpdate();
+
+			// delete listnms data
+			String deleteNMSHql = "DELETE FROM GermplasmList nms " +
+					"WHERE nms.id = :list_id";
+
+			Query query3 = this.getSession().createQuery(deleteNMSHql);
+			query3.setParameter("list_id", listId);
+			query3.executeUpdate();
+
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in deleteByListId=" + listId + " in ListDataProjectDAO: " + e.getMessage(), e);
 		}

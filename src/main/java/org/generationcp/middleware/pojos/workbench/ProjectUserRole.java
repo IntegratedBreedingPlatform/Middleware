@@ -36,7 +36,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "workbench_project_user_role")
-@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="workbench_project_user_role")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="workbench_project_user_role")
 public class ProjectUserRole implements Serializable {
 
 	private static final long serialVersionUID = 1L;

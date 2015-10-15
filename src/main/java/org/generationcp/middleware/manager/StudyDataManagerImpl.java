@@ -376,6 +376,18 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		return null;
 	}
+	
+	@Override
+	public DatasetReference findOneDataSetReferenceByType(int studyId, DataSetType type) {
+		List<DmsProject> datasetProjects =
+				this.getDmsProjectDao().getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(),
+						String.valueOf(type.getId()));
+		if (datasetProjects != null && !datasetProjects.isEmpty()) {
+			DmsProject dataSetProject = datasetProjects.get(0);
+			return new DatasetReference(dataSetProject.getProjectId(), dataSetProject.getName(), dataSetProject.getDescription());
+		}
+		return null;
+	}
 
 	@Override
 	public void deleteDataSet(int datasetId) throws MiddlewareQueryException {
