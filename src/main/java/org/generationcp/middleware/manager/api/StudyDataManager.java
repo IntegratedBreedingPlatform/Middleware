@@ -95,11 +95,10 @@ public interface StudyDataManager {
 	List<Reference> getChildrenOfFolder(int folderId, String programUUID, List<StudyType> studyTypes);
 
 	/**
-	 * Returns the list of DataSet references for a specific study. Retrieves from central if the given ID is positive, otherwise retrieves
-	 * from local.
+	 * Returns the list of DataSet references for a specific study.
 	 * 
 	 * @param studyId The study id to match
-	 * @return List of DatasetReferences belonging to the study or empty list if none found
+	 * @return List of DatasetReferences belonging to the study or empty list if none found. Never returns null.
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException;
@@ -345,6 +344,18 @@ public interface StudyDataManager {
 	 */
 
 	DataSet findOneDataSetByType(int studyId, DataSetType type) throws MiddlewareException;
+	
+	/**
+	 * Light weight variant of {@link #findOneDataSetByType(int, DataSetType)} which does not load entire DataSet, just a DatasetReference.
+	 * 
+	 * Returns a single dataset reference belonging to the study with the given type. If there is more than one matching dataset, only the first one is
+	 * returned. If there are none, null is returned.
+	 * 
+	 * @param studyId the study id
+	 * @param type the dataset type
+	 * @return the data set reference
+	 */
+	DatasetReference findOneDataSetReferenceByType(int studyId, DataSetType type);
 
 	/**
 	 * Deletes the dataset matching the given ID.

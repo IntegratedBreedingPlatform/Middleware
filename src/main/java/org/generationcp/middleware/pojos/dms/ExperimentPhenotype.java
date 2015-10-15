@@ -20,6 +20,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Cache;
@@ -38,13 +39,15 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "nd_experiment_phenotype", uniqueConstraints = {@UniqueConstraint(columnNames = {"nd_experiment_id", "phenotype_id"})})
-@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="nd_experiment_phenotype")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="nd_experiment_phenotype")
 public class ExperimentPhenotype implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@TableGenerator(name = "ndExperimentPhenotypeIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value",
+	pkColumnValue = "nd_experiment_phenotype", allocationSize = 500)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "ndExperimentPhenotypeIdGenerator")
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_phenotype_id")
 	private Integer experimentPhenotypeId;

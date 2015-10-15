@@ -19,7 +19,6 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.util.Debug;
 
 public class ListInventoryBuilder extends Builder {
 
@@ -172,8 +171,7 @@ public class ListInventoryBuilder extends Builder {
 	 * Retrieve the number of lots with reserved seeds per list entry
 	 */
 	private void retrieveReservedLotCounts(List<GermplasmListData> listEntries, List<Integer> listEntryIds) throws MiddlewareQueryException {
-		Map<Integer, BigInteger> reservedLotCounts = this.getTransactionDao().countLotsWithReservationForListEntries(listEntryIds);
-		Debug.print(0, listEntryIds);
+		Map<Integer, BigInteger> reservedLotCounts = this.getTransactionDao().countLotsWithReservationForListEntries(listEntryIds);		
 		for (GermplasmListData entry : listEntries) {
 			ListDataInventory inventory = entry.getInventoryInfo();
 			if (inventory != null) {
