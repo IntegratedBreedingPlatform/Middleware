@@ -84,7 +84,7 @@ public class WorkbookBuilder extends Builder {
 
 	public Workbook create(final int id, final StudyType studyType) {
 		
-		Monitor monitor = MonitorFactory.start("Build Workbook for studyId: " + id);
+		Monitor monitor = MonitorFactory.start("Build Workbook");
 		
 		final boolean isTrial = studyType == StudyType.T;
 		final Workbook workbook = new Workbook();
@@ -272,7 +272,7 @@ public class WorkbookBuilder extends Builder {
 
 		final List<MeasurementRow> trialObservations = this.getTrialObservations(workbook, isTrial);
 		workbook.setTrialObservations(trialObservations);
-		LOG.debug("" + monitor.stop());
+		LOG.debug("" + monitor.stop() + ". This instance was for studyId: " + id);
 		
 		return workbook;
 	}
