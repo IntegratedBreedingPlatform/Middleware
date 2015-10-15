@@ -20,8 +20,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -58,6 +63,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String ERROR_DUPLICATE_PSM = "error.duplicate.psm";
 	public static final String ERROR_INVALID_VARIABLE_NAME_LENGTH = "error.invalid.variable.name.length";
 	public static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
+	public static final String PERSON_ID_VALUES = "PERSON_ID_VALUES";
+	public static final String LOCATION_ID_VALUES = "LOCATION_ID_VALUES";
+	public static final String GERMPLASM_ID_VALUES = "GERMPLASM_ID_VALUES";
+
+	private LocationDAO locationDAO = new LocationDAO();
+	private PersonDAO personDAO = new PersonDAO();
+	private GermplasmDAO germplasmDAO = new GermplasmDAO();
 
 	public DataImportServiceImpl() {
 		super();
@@ -283,9 +295,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return returnVal;
 	}
 
-	private void checkForDuplicateStudyName(OntologyDataManager ontology, 
+	private void checkForDuplicateStudyName(OntologyDataManager ontology,
 			Workbook workbook, List<Message> messages, String programUUID)
-			throws MiddlewareException, WorkbookParserException {
+					throws MiddlewareException, WorkbookParserException {
 
 		String studyName = workbook.getStudyDetails().getStudyName();
 		String locationDescription = this.getLocationDescription(ontology, workbook,
@@ -701,10 +713,157 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			errors.put(Constants.OBSERVATION_DATA_ERRORS, requiredVariableValueErrors);
 		}
 
+		if (errors.isEmpty()) {
+			// check invalid records only when there are no more errors in the workbook
+			this.checkForInvalidRecordsOfControlledVariables(workbook, programUUID);
+		}
+
 		return errors;
 	}
 
-	private void checkForExistingTrialInstance(OntologyDataManager ontology, 
+	@Override
+	public List<Message> checkForInvalidRecordsOfControlledVariables(Workbook workbook, String programUUID) {
+		List<Message> returnVal = new ArrayList<Message>();
+
+		Map<String, Integer> controlledVariablesMap = this.retrieveControlledVariablesMap(workbook);
+		Map<String, Set<Integer>> idsToVerifyMap = this.initializeIdsToVerifyMap();
+		Map<String, Set<String>> invalidValuesMap = this.initializeInvalidValuesMap();
+
+		for (MeasurementRow measurementRow : workbook.getObservations()) {
+			for (MeasurementData measurementData : measurementRow.getDataList()) {
+				Integer variableId = controlledVariablesMap.get(measurementData.getLabel());
+				if (variableId != null && !StringUtils.isEmpty(measurementData.getValue())) {
+					this.addVariableValueToTheAppropriateMap(variableId, measurementData.getValue(), idsToVerifyMap, invalidValuesMap);
+				}
+			}
+		}
+
+		this.verifyRecordIdsIfExistingElseAddToInvalidList(idsToVerifyMap,invalidValuesMap,programUUID);
+		boolean hasAdditionalErrors = this.addErrorMessagesForInvalidValues(returnVal, invalidValuesMap);
+
+		if (hasAdditionalErrors) {
+			workbook.setInvalidValuesMap(invalidValuesMap);
+		} else {
+			workbook.setInvalidValuesMap(null);
+		}
+		return returnVal;
+	}
+
+	private boolean addErrorMessagesForInvalidValues(List<Message> returnVal, Map<String, Set<String>> invalidValuesMap) {
+		boolean hasAdditionalErrors = false;
+		for (String key : invalidValuesMap.keySet()) {
+			Set<String> invalidValues = invalidValuesMap.get(key);
+			if (!invalidValues.isEmpty()) {
+				hasAdditionalErrors = true;
+				String messageKey = null;
+				if (key.equals(PERSON_ID_VALUES)) {
+					messageKey = "import.missing.person.ids";
+				} else if (key.equals(LOCATION_ID_VALUES)) {
+					messageKey = "import.missing.location.ids";
+				} else if (key.equals(GERMPLASM_ID_VALUES)) {
+					messageKey = "import.missing.germplasm.ids";
+				}
+				returnVal.add(new Message(messageKey, StringUtils.join(invalidValues, ",")));
+			}
+		}
+		return hasAdditionalErrors;
+	}
+	private void verifyRecordIdsIfExistingElseAddToInvalidList(Map<String, Set<Integer>> idsToVerifyMap, Map<String, Set<String>> invalidValuesMap, String programUUID) {
+		this.verifyPersonIdsIfExisting(idsToVerifyMap.get(PERSON_ID_VALUES), invalidValuesMap.get(PERSON_ID_VALUES));
+		this.verifyLocationIdsIfExisting(idsToVerifyMap.get(LOCATION_ID_VALUES),invalidValuesMap.get(LOCATION_ID_VALUES),programUUID);
+		this.verifyGermplasmIdsIfExisting(idsToVerifyMap.get(GERMPLASM_ID_VALUES), invalidValuesMap.get(GERMPLASM_ID_VALUES));
+	}
+
+
+	private void verifyGermplasmIdsIfExisting(Set<Integer> gidsToVerify, Set<String> invalidGids) {
+		this.germplasmDAO.setSession(this.sessionProvider.getSession());
+		List<Integer> existingGermplasmIds = this.germplasmDAO.getExistingGIDs(new ArrayList<>(gidsToVerify));
+		for (Integer gid : gidsToVerify) {
+			if (!existingGermplasmIds.contains(gid)) {
+				invalidGids.add(Integer.toString(gid));
+			}
+		}
+	}
+
+	private void verifyPersonIdsIfExisting(Set<Integer> personIdsToVerify, Set<String> invalidPersonIds) {
+		this.personDAO.setSession(this.sessionProvider.getSession());
+		List<Integer> existingPersonIds = this.personDAO.getExistingPersonIds(new ArrayList<>(personIdsToVerify));
+		for (Integer personId : personIdsToVerify) {
+			if (!existingPersonIds.contains(personId)) {
+				invalidPersonIds.add(Integer.toString(personId));
+			}
+		}
+
+	}
+
+	private void verifyLocationIdsIfExisting(Set<Integer> locationIdsToVerify, Set<String> invalidLocationIds, String programUUID) {
+		this.locationDAO.setSession(this.sessionProvider.getSession());
+		List<Integer> existingLocationIds = this.locationDAO.getExistingLocationIds(new ArrayList<>(locationIdsToVerify), programUUID);
+		for (Integer locationId : locationIdsToVerify) {
+			if (!existingLocationIds.contains(locationId)) {
+				invalidLocationIds.add(Integer.toString(locationId));
+			}
+		}
+	}
+
+	private Map<String, Set<Integer>> initializeIdsToVerifyMap() {
+		Map<String, Set<Integer>> idsToVerifyMap = new HashMap<>();
+		idsToVerifyMap.put(PERSON_ID_VALUES, new TreeSet<Integer>());
+		idsToVerifyMap.put(LOCATION_ID_VALUES, new TreeSet<Integer>());
+		idsToVerifyMap.put(GERMPLASM_ID_VALUES, new TreeSet<Integer>());
+		return idsToVerifyMap;
+	}
+
+	private Map<String, Set<String>> initializeInvalidValuesMap() {
+		Map<String, Set<String>> invalidValuesMap = new HashMap<>();
+		invalidValuesMap.put(PERSON_ID_VALUES, new TreeSet<String>());
+		invalidValuesMap.put(LOCATION_ID_VALUES, new TreeSet<String>());
+		invalidValuesMap.put(GERMPLASM_ID_VALUES, new TreeSet<String>());
+		return invalidValuesMap;
+	}
+
+	private void addVariableValueToTheAppropriateMap(Integer id, String value, Map<String, Set<Integer>> idsToVerifyMap,
+			Map<String, Set<String>> invalidValuesMap) {
+		if (TermId.PI_ID.getId() == id || TermId.COOPERATOOR_ID.getId() == id) {
+			if (!NumberUtils.isNumber(value)) {
+				invalidValuesMap.get(PERSON_ID_VALUES).add(value);
+			} else {
+				idsToVerifyMap.get(PERSON_ID_VALUES).add(Integer.parseInt(value));
+			}
+		} else if (TermId.LOCATION_ID.getId() == id) {
+			if (!NumberUtils.isNumber(value)) {
+				invalidValuesMap.get(LOCATION_ID_VALUES).add(value);
+			} else {
+				idsToVerifyMap.get(LOCATION_ID_VALUES).add(Integer.parseInt(value));
+			}
+		} else if (TermId.GID.getId() == id) {
+			if (!NumberUtils.isNumber(value)) {
+				invalidValuesMap.get(GERMPLASM_ID_VALUES).add(value);
+			} else {
+				idsToVerifyMap.get(GERMPLASM_ID_VALUES).add(Integer.parseInt(value));
+			}
+		}
+	}
+
+	/**
+	 * Controlled variables are the following:
+	 *
+	 * PI_ID(8110) and COOPERATOR_ID(8372) referring to Persons.personid, LOCATION_ID(8190) referring to Location.locid and GID(8240)
+	 * referring to Germplsm.gid
+	 *
+	 */
+	protected Map<String, Integer> retrieveControlledVariablesMap(Workbook workbook) {
+		Map<String, Integer> controlledVariablesMap = new LinkedHashMap<>();
+		for (MeasurementVariable measurementVariable : workbook.getAllVariables()) {
+			if (measurementVariable.getTermId() == TermId.PI_ID.getId() || measurementVariable.getTermId() == TermId.COOPERATOOR_ID.getId()
+					|| measurementVariable.getTermId() == TermId.LOCATION_ID.getId()
+					|| measurementVariable.getTermId() == TermId.GID.getId()) {
+				controlledVariablesMap.put(measurementVariable.getName(), measurementVariable.getTermId());
+			}
+		}
+		return controlledVariablesMap;
+	}
+	private void checkForExistingTrialInstance(OntologyDataManager ontology,
 			Workbook workbook, Map<String, List<Message>> errors,
 			String programUUID) throws MiddlewareException {
 
@@ -783,6 +942,36 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 								trialInstanceNumbers.toString().length() - 1)));
 			}
 
+		}
+	}
+
+	@Override
+	public void discardMissingRecords(Workbook workbook) {
+		Map<String, Set<String>> invalidValuesMap = workbook.getInvalidValuesMap();
+		Map<String, Integer> controlledVariablesMap = this.retrieveControlledVariablesMap(workbook);
+		for (MeasurementRow measurementRow : workbook.getObservations()) {
+			for (MeasurementData measurementData : measurementRow.getDataList()) {
+				Integer variableId = controlledVariablesMap.get(measurementData.getLabel());
+				if (variableId != null && !StringUtils.isEmpty(measurementData.getValue())) {
+					this.discardMissingRecords(measurementData, variableId, invalidValuesMap);
+				}
+			}
+		}
+	}
+
+	private void discardMissingRecords(MeasurementData measurementData, Integer variableId, Map<String, Set<String>> invalidValuesMap) {
+		if (variableId == TermId.PI_ID.getId() || variableId == TermId.COOPERATOOR_ID.getId()) {
+			if (invalidValuesMap.get(PERSON_ID_VALUES).contains(measurementData.getValue())) {
+				measurementData.setValue("");
+			}
+		} else if (variableId == TermId.LOCATION_ID.getId()) {
+			if (invalidValuesMap.get(LOCATION_ID_VALUES).contains(measurementData.getValue())) {
+				measurementData.setValue("");
+			}
+		} else if (variableId == TermId.GID.getId()) {
+			if (invalidValuesMap.get(GERMPLASM_ID_VALUES).contains(measurementData.getValue())) {
+				measurementData.setValue("");
+			}
 		}
 	}
 

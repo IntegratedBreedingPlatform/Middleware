@@ -119,4 +119,8 @@ public interface DataImportService {
 
 	Map<String, List<Message>> validateProjectData(Workbook importData, String programUUID) throws MiddlewareException;
 
+	List<Message> checkForInvalidRecordsOfControlledVariables(Workbook workbook, String programUUID);
+
+	void discardMissingRecords(Workbook workbook);
+
 }
