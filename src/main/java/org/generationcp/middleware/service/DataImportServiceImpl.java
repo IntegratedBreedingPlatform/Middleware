@@ -698,7 +698,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 				} else if (key.equals(GERMPLASM_ID_VALUES)) {
 					messageKey = "import.missing.germplasm.ids";
 				}
-				returnVal.add(new Message(messageKey, StringUtils.join(invalidValues, ",")));
+				returnVal.add(new Message(messageKey, StringUtils.join(invalidValues, ", ")));
 			}
 		}
 		return hasAdditionalErrors;
