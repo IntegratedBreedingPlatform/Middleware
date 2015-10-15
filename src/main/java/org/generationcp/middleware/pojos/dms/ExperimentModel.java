@@ -83,6 +83,8 @@ public class ExperimentModel implements Serializable {
 	inverseJoinColumns = {@JoinColumn(name = "project_id", insertable = false, updatable = false)})
 	private DmsProject project;
 
+	//FIXME Should this not be a OneToOne? Can one experiment have multiple stock (germplasm) rows?
+	//Collection always contains one item currently.
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
 	@BatchSize(size = 500)
 	private List<ExperimentStock> experimentStocks;

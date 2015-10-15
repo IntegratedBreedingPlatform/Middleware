@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -45,11 +47,16 @@ import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 
 /**
  * Implements {@link OntologyVariableDataManagerImpl}
@@ -70,6 +77,10 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	@Autowired
 	private OntologyScaleDataManager scaleManager;
+	
+	private static final ConcurrentMap<Integer, Variable> variableCache = new ConcurrentHashMap<>();
+	
+	private static final Logger LOG = LoggerFactory.getLogger(OntologyVariableDataManagerImpl.class);
 
 	public OntologyVariableDataManagerImpl() {
 		super();
@@ -424,6 +435,13 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@Override
 	public Variable getVariable(String programUuid, Integer id, boolean filterObsolete, boolean calculateVariableUsage) {
 
+		Variable cachedVariable = variableCache.get(id);
+		if (cachedVariable != null) {
+			LOG.debug("Variable for id [{}] found in cahce, returning the cached value.", id);
+			return cachedVariable;
+		}
+
+		Monitor monitor = MonitorFactory.start("Get Variable");				
 		try {
 
 			// Fetch term from db
@@ -490,13 +508,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				variable.setObservations(unknownUsage);
 
 			}
-
+			
+			variableCache.put(id, variable);
+			
 			return variable;
-
-
-
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error in getVariable", e);
+		} finally {
+			LOG.debug("" + monitor.stop() + ". This instance was for variable id: " + id);
 		}
 	}
 
@@ -576,6 +595,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@Override
 	public void updateVariable(OntologyVariableInfo variableInfo) {
 
+		variableCache.remove(variableInfo.getId());
+		
 		VariableInfoDaoElements elements = new VariableInfoDaoElements();
 		elements.setVariableId(variableInfo.getId());
 		elements.setProgramUuid(variableInfo.getProgramUuid());
@@ -700,7 +721,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	@Override
 	public void deleteVariable(Integer id) {
-
+		
+		variableCache.remove(id);
+		
 		CVTerm term = this.getCvTermDao().getById(id);
 
 		this.checkTermIsVariable(term);
@@ -735,7 +758,6 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 			// delete main entity
 			this.getCvTermDao().makeTransient(term);
-
 
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error at updateVariable :" + e.getMessage(), e);

@@ -79,15 +79,14 @@ public class ExperimentBuilder extends Builder {
 
 	private Map<Integer, StockModel> getStockModelMap(List<ExperimentProject> experimentProjects) throws MiddlewareQueryException {
 		Map<Integer, StockModel> stockModelMap = new HashMap<Integer, StockModel>();
-		List<Integer> stockIds = new ArrayList<Integer>();
 		for (ExperimentProject experimentProject : experimentProjects) {
 			List<ExperimentStock> experimentStocks = experimentProject.getExperiment().getExperimentStocks();
 			if (experimentStocks != null && experimentStocks.size() == 1) {
-				stockIds.add(experimentStocks.get(0).getStock().getStockId());
+				StockModel stock = experimentStocks.get(0).getStock();
+				Integer stockId = stock.getStockId();
+				stockModelMap.put(stockId, stock);
 			}
 		}
-		stockModelMap = this.getStockBuilder().get(stockIds);
-
 		return stockModelMap;
 	}
 
