@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -35,11 +34,11 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 	private static final String ID = "id";
 	private static final String CLASS_NAME_PERSON = "Person";
 
-	public boolean isPersonExists(final String firstName, final String lastName) throws MiddlewareQueryException {
+	public boolean isPersonExists(final String firstName, final String lastName) {
 		try {
 			final StringBuilder sql = new StringBuilder();
 			sql.append("SELECT COUNT(1) FROM persons p ").append("WHERE UPPER(p.fname) = :firstName ")
-					.append("AND UPPER(p.lname) = :lastName");
+			.append("AND UPPER(p.lname) = :lastName");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 			query.setParameter("firstName", firstName);
@@ -55,7 +54,7 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 		return false;
 	}
 
-	public boolean isPersonWithEmailExists(final String email) throws MiddlewareQueryException {
+	public boolean isPersonWithEmailExists(final String email) {
 		try {
 			final StringBuilder sql = new StringBuilder();
 			sql.append("SELECT COUNT(1) FROM persons p ").append("WHERE UPPER(p.pemail) = :email");
@@ -73,7 +72,7 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 		return false;
 	}
 
-	public Person getPersonByEmail(final String email) throws MiddlewareQueryException {
+	public Person getPersonByEmail(final String email) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Person.class);
 
@@ -87,13 +86,12 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 		return null;
 	}
 
-	public Person getPersonByEmailAndName(final String email, final String firstName, final String lastName)
-			throws MiddlewareQueryException {
+	public Person getPersonByEmailAndName(final String email, final String firstName, final String lastName) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Person.class);
 
 			criteria.add(Restrictions.eq("email", email)).add(Restrictions.eq("firstName", firstName))
-					.add(Restrictions.eq("lastName", lastName));
+			.add(Restrictions.eq("lastName", lastName));
 
 			final Object result = criteria.uniqueResult();
 			if (result != null) {
@@ -106,11 +104,11 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 		return null;
 	}
 
-	public boolean isPersonWithUsernameAndEmailExists(final String username, final String email) throws MiddlewareQueryException {
+	public boolean isPersonWithUsernameAndEmailExists(final String username, final String email) {
 		try {
 			final StringBuilder sql = new StringBuilder();
 			sql.append("SELECT COUNT(1) FROM USERS users join PERSONS persons on users.personid = persons.personid ")
-					.append("WHERE users.uname = :username and persons.pemail = :email");
+			.append("WHERE users.uname = :username and persons.pemail = :email");
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 			query.setParameter("email", email);
 			query.setParameter("username", username);
@@ -125,7 +123,7 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, String> getPersonNamesByPersonIds(final List<Integer> personIds) throws MiddlewareQueryException {
+	public Map<Integer, String> getPersonNamesByPersonIds(final List<Integer> personIds) {
 		final Map<Integer, String> map = new HashMap<Integer, String>();
 		try {
 			final List<Person> persons = this.getSession().createCriteria(Person.class).add(Restrictions.in("id", personIds)).list();
@@ -142,10 +140,10 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, String> getPersonNamesByUserIds(final List<Integer> userIds) throws MiddlewareQueryException {
+	public Map<Integer, String> getPersonNamesByUserIds(final List<Integer> userIds) {
 		final Map<Integer, String> map = new HashMap<Integer, String>();
 		try {
-			final StringBuffer sqlString = new StringBuffer()
+			final StringBuilder sqlString = new StringBuilder()
 					.append("SELECT DISTINCT users.userid, persons.fname, persons.ioname, persons.lname ")
 					.append("FROM persons JOIN users ON persons.personid = users.personid ").append("WHERE users.userid = :userIds ");
 
@@ -169,7 +167,7 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 		return map;
 	}
 
-	public Person getPersonByName(final String firstName, final String middleName, final String lastName) throws MiddlewareQueryException {
+	public Person getPersonByName(final String firstName, final String middleName, final String lastName) {
 		Person person = null;
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Person.class);
@@ -187,7 +185,7 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 		return person;
 	}
 
-	public List<Integer> getExistingPersonIds(final List<Integer> ids) throws MiddlewareQueryException {
+	public List<Integer> getExistingPersonIds(final List<Integer> ids) {
 		List<Integer> personIds = new ArrayList<Integer>();
 
 		if (ids == null || ids.isEmpty()) {
