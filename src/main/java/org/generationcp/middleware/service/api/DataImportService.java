@@ -40,7 +40,7 @@ public interface DataImportService {
 
 	/**
 	 * Saves a workbook as a local trial or nursery on the new CHADO schema
-	 * 
+	 *
 	 * @param workbook
 	 * @param retainValues if true, values of the workbook items are retained, else they are cleared to conserve memory
 	 * @param isDeleteObservations if true, values of the workbook observations will be removed
@@ -70,7 +70,7 @@ public interface DataImportService {
 
 	/**
 	 * Checks if the name specified is an already existing project name
-	 * 
+	 *
 	 * @param name
 	 * @param programUUID
 	 * @return true or false
@@ -80,7 +80,7 @@ public interface DataImportService {
 
 	/**
 	 * Checks if the experiment is already existing given the project name and location description
-	 * 
+	 *
 	 * @param projectName
 	 * @param locationDescription
 	 * @param programUUID
@@ -92,7 +92,7 @@ public interface DataImportService {
 
 	/**
 	 * Validate the project ontology from the Workbook and return the list of errors
-	 * 
+	 *
 	 * @param workbook
 	 * @return Map<String,List<Message>> - map of errors for each header and global errors
 	 * @throws MiddlewareQueryException
@@ -101,7 +101,7 @@ public interface DataImportService {
 
 	/**
 	 * Saves the project ontology from the Workbook Tables: project, project_relationship, project_properties
-	 * 
+	 *
 	 * @param workbook
 	 * @param programUUID
 	 * @return id of created the study (Table.column = Project.project_id)
@@ -110,7 +110,7 @@ public interface DataImportService {
 
 	/**
 	 * Saves the project ontology from the Workbook Tables: project, project_relationship, project_properties
-	 * 
+	 *
 	 * @param workbook
 	 * @param programUUID
 	 * @return 1 = successful, 0 = failure

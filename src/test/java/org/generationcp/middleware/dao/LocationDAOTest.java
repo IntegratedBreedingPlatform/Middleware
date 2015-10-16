@@ -24,7 +24,6 @@ public class LocationDAOTest extends IntegrationTestBase {
 	private LocationDAO dao;
 	private static final int EXISTING_LOCATION_ID = 1;
 
-
 	@Before
 	public void setUp() throws Exception {
 		if (this.dao == null) {
@@ -35,10 +34,10 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetExistingLocationIds() {
-		List<Integer> locationIdsToVerify = Arrays.asList(new Integer[] {12345678, 8765432, EXISTING_LOCATION_ID});
-		List<Integer> existingLocationIds = this.dao.getExistingLocationIds(locationIdsToVerify, null);
+		final List<Integer> locationIdsToVerify = Arrays.asList(new Integer[] {12345678, 8765432, LocationDAOTest.EXISTING_LOCATION_ID});
+		final List<Integer> existingLocationIds = this.dao.getExistingLocationIds(locationIdsToVerify, null);
 		Assert.assertFalse(existingLocationIds.isEmpty());
 		Assert.assertEquals(1, existingLocationIds.size());
-		Assert.assertEquals(EXISTING_LOCATION_ID, existingLocationIds.get(0).intValue());
+		Assert.assertEquals(LocationDAOTest.EXISTING_LOCATION_ID, existingLocationIds.get(0).intValue());
 	}
 }

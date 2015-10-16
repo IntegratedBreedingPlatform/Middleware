@@ -51,8 +51,8 @@ public class PersonDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetExistingPersonIds() {
-		List<Integer> personIdsToVerify = Arrays.asList(new Integer[] {12345678, 8765432, this.testPerson.getId()});
-		List<Integer> existingPersonIds = this.dao.getExistingPersonIds(personIdsToVerify);
+		final List<Integer> personIdsToVerify = Arrays.asList(new Integer[] {12345678, 8765432, this.testPerson.getId()});
+		final List<Integer> existingPersonIds = this.dao.getExistingPersonIds(personIdsToVerify);
 		Assert.assertFalse(existingPersonIds.isEmpty());
 		Assert.assertEquals(1, existingPersonIds.size());
 		Assert.assertEquals(this.testPerson.getId(), existingPersonIds.get(0));

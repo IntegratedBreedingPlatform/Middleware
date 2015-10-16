@@ -65,9 +65,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String LOCATION_ID_VALUES = "LOCATION_ID_VALUES";
 	public static final String GERMPLASM_ID_VALUES = "GERMPLASM_ID_VALUES";
 
-	private LocationDAO locationDAO = new LocationDAO();
-	private PersonDAO personDAO = new PersonDAO();
-	private GermplasmDAO germplasmDAO = new GermplasmDAO();
+	private final LocationDAO locationDAO = new LocationDAO();
+	private final PersonDAO personDAO = new PersonDAO();
+	private final GermplasmDAO germplasmDAO = new GermplasmDAO();
 
 	public DataImportServiceImpl() {
 		super();
@@ -103,7 +103,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public int saveDataset(final Workbook workbook, final boolean retainValues, final boolean isDeleteObservations, final String programUUID) {
+	public int saveDataset(final Workbook workbook, final boolean retainValues, final boolean isDeleteObservations,
+			final String programUUID) {
 
 		Map<String, ?> variableMap = null;
 		final TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)");
@@ -318,9 +319,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 					variableNameMap.put(measurementVariable.getName(), measurementVariable);
 				}
 
-				final Integer varId =
-						ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(),
-								measurementVariable.getScale(), measurementVariable.getMethod());
+				final Integer varId = ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(),
+						measurementVariable.getScale(), measurementVariable.getMethod());
 
 				if (varId == null) {
 
@@ -328,8 +328,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 							ontologyDataManager.findStandardVariablesByNameOrSynonym(measurementVariable.getName(), programUUID);
 
 					for (final StandardVariable variable : variableSet) {
-						messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), variable
-								.getProperty().getName(), variable.getScale().getName(), variable.getMethod().getName()));
+						messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(),
+								variable.getProperty().getName(), variable.getScale().getName(), variable.getMethod().getName()));
 					}
 
 				}
@@ -341,8 +341,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		}
 	}
 
-	private void checkForDuplicatePSMCombo(final Workbook workbook, final List<Message> messages) throws
-	WorkbookParserException {
+	private void checkForDuplicatePSMCombo(final Workbook workbook, final List<Message> messages) throws WorkbookParserException {
 		Map<String, List<MeasurementVariable>> stdVarMap = this.checkForDuplicates(workbook.getNonVariateVariables(), false);
 		this.addErrorForDuplicates(messages, stdVarMap);
 		stdVarMap = this.checkForDuplicates(workbook.getVariateVariables(), true);
@@ -364,16 +363,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		final Map<String, List<MeasurementVariable>> stdVarMap = new LinkedHashMap<String, List<MeasurementVariable>>();
 		for (final MeasurementVariable measurementVariable : workbookVariables) {
 			// need to retrieve standard variable because of synonyms
-			final Integer standardVariableId =
-					this.getOntologyDataManager().getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(),
-							measurementVariable.getScale(), measurementVariable.getMethod());
+			final Integer standardVariableId = this.getOntologyDataManager().getStandardVariableIdByPropertyScaleMethod(
+					measurementVariable.getProperty(), measurementVariable.getScale(), measurementVariable.getMethod());
 			final String key;
 			if (standardVariableId != null) {
 				key = Integer.toString(standardVariableId);
 			} else {
-				key =
-						measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-"
-								+ measurementVariable.getMethod().toLowerCase();
+				key = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-"
+						+ measurementVariable.getMethod().toLowerCase();
 			}
 			List<MeasurementVariable> vars = stdVarMap.get(key);
 			if (vars == null) {
@@ -399,8 +396,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 				}
 				for (final MeasurementVariable measurementVariable : vars) {
 					this.initializeIfNull(errors, measurementVariable.getName() + ":" + measurementVariable.getTermId());
-					errors.get(measurementVariable.getName() + ":" + measurementVariable.getTermId()).add(
-							new Message(ERROR_DUPLICATE_PSM, duplicates.toString()));
+					errors.get(measurementVariable.getName() + ":" + measurementVariable.getTermId())
+							.add(new Message(DataImportServiceImpl.ERROR_DUPLICATE_PSM, duplicates.toString()));
 				}
 			}
 		}
@@ -418,7 +415,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 					delimiter = ", ";
 					duplicates.append(measurementVariable.getName());
 				}
-				errors.add(new Message(ERROR_DUPLICATE_PSM, duplicates.toString()));
+				errors.add(new Message(DataImportServiceImpl.ERROR_DUPLICATE_PSM, duplicates.toString()));
 			}
 		}
 	}
@@ -452,7 +449,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		// check if multi-location
 		// it means the location is defined in the observation sheet
-		trialInstanceNumber = this.getTrialInstanceNumberFromMeasurementRows(ontology, workbook.getObservations(), workbook.getTrialFactors());
+		trialInstanceNumber =
+				this.getTrialInstanceNumberFromMeasurementRows(ontology, workbook.getObservations(), workbook.getTrialFactors());
 
 		if (workbook.isNursery()) {
 			return "1";
@@ -505,8 +503,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return false;
 	}
 
-	private String getTrialInstanceNumberFromMeasurementRows(final OntologyDataManager ontology,
-			final List<MeasurementRow> measurementRows, final List<MeasurementVariable> trialFactors) {
+	private String getTrialInstanceNumberFromMeasurementRows(final OntologyDataManager ontology, final List<MeasurementRow> measurementRows,
+			final List<MeasurementVariable> trialFactors) {
 
 		// get first row - should contain the study location
 		final MeasurementRow row = measurementRows.get(0);
@@ -518,7 +516,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return null;
 	}
 
-	private String getTrialInstanceNumberFromMeasurementVariables(final OntologyDataManager ontology, final List<MeasurementVariable> list) {
+	private String getTrialInstanceNumberFromMeasurementVariables(final OntologyDataManager ontology,
+			final List<MeasurementVariable> list) {
 		final MeasurementVariable mvar = this.getTrialInstanceNumberMeasurementVariable(ontology, list);
 		if (mvar != null) {
 			return mvar.getValue();
@@ -657,24 +656,24 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public List<Message> checkForInvalidRecordsOfControlledVariables(Workbook workbook, String programUUID) {
-		List<Message> returnVal = new ArrayList<Message>();
+	public List<Message> checkForInvalidRecordsOfControlledVariables(final Workbook workbook, final String programUUID) {
+		final List<Message> returnVal = new ArrayList<Message>();
 
-		Map<String, Integer> controlledVariablesMap = this.retrieveControlledVariablesMap(workbook);
-		Map<String, Set<Integer>> idsToVerifyMap = this.initializeIdsToVerifyMap();
-		Map<String, Set<String>> invalidValuesMap = this.initializeInvalidValuesMap();
+		final Map<String, Integer> controlledVariablesMap = this.retrieveControlledVariablesMap(workbook);
+		final Map<String, Set<Integer>> idsToVerifyMap = this.initializeIdsToVerifyMap();
+		final Map<String, Set<String>> invalidValuesMap = this.initializeInvalidValuesMap();
 
-		for (MeasurementRow measurementRow : workbook.getObservations()) {
-			for (MeasurementData measurementData : measurementRow.getDataList()) {
-				Integer variableId = controlledVariablesMap.get(measurementData.getLabel());
+		for (final MeasurementRow measurementRow : workbook.getObservations()) {
+			for (final MeasurementData measurementData : measurementRow.getDataList()) {
+				final Integer variableId = controlledVariablesMap.get(measurementData.getLabel());
 				if (variableId != null && !StringUtils.isEmpty(measurementData.getValue())) {
 					this.addVariableValueToTheAppropriateMap(variableId, measurementData.getValue(), idsToVerifyMap, invalidValuesMap);
 				}
 			}
 		}
 
-		this.verifyRecordIdsIfExistingElseAddToInvalidList(idsToVerifyMap,invalidValuesMap,programUUID);
-		boolean hasAdditionalErrors = this.addErrorMessagesForInvalidValues(returnVal, invalidValuesMap);
+		this.verifyRecordIdsIfExistingElseAddToInvalidList(idsToVerifyMap, invalidValuesMap, programUUID);
+		final boolean hasAdditionalErrors = this.addErrorMessagesForInvalidValues(returnVal, invalidValuesMap);
 
 		if (hasAdditionalErrors) {
 			workbook.setInvalidValuesMap(invalidValuesMap);
@@ -684,18 +683,18 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return returnVal;
 	}
 
-	private boolean addErrorMessagesForInvalidValues(List<Message> returnVal, Map<String, Set<String>> invalidValuesMap) {
+	private boolean addErrorMessagesForInvalidValues(final List<Message> returnVal, final Map<String, Set<String>> invalidValuesMap) {
 		boolean hasAdditionalErrors = false;
-		for (String key : invalidValuesMap.keySet()) {
-			Set<String> invalidValues = invalidValuesMap.get(key);
+		for (final String key : invalidValuesMap.keySet()) {
+			final Set<String> invalidValues = invalidValuesMap.get(key);
 			if (!invalidValues.isEmpty()) {
 				hasAdditionalErrors = true;
 				String messageKey = null;
-				if (key.equals(PERSON_ID_VALUES)) {
+				if (key.equals(DataImportServiceImpl.PERSON_ID_VALUES)) {
 					messageKey = "import.missing.person.ids";
-				} else if (key.equals(LOCATION_ID_VALUES)) {
+				} else if (key.equals(DataImportServiceImpl.LOCATION_ID_VALUES)) {
 					messageKey = "import.missing.location.ids";
-				} else if (key.equals(GERMPLASM_ID_VALUES)) {
+				} else if (key.equals(DataImportServiceImpl.GERMPLASM_ID_VALUES)) {
 					messageKey = "import.missing.germplasm.ids";
 				}
 				returnVal.add(new Message(messageKey, StringUtils.join(invalidValues, ", ")));
@@ -703,27 +702,31 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		}
 		return hasAdditionalErrors;
 	}
-	private void verifyRecordIdsIfExistingElseAddToInvalidList(Map<String, Set<Integer>> idsToVerifyMap, Map<String, Set<String>> invalidValuesMap, String programUUID) {
-		this.verifyPersonIdsIfExisting(idsToVerifyMap.get(PERSON_ID_VALUES), invalidValuesMap.get(PERSON_ID_VALUES));
-		this.verifyLocationIdsIfExisting(idsToVerifyMap.get(LOCATION_ID_VALUES),invalidValuesMap.get(LOCATION_ID_VALUES),programUUID);
-		this.verifyGermplasmIdsIfExisting(idsToVerifyMap.get(GERMPLASM_ID_VALUES), invalidValuesMap.get(GERMPLASM_ID_VALUES));
+
+	private void verifyRecordIdsIfExistingElseAddToInvalidList(final Map<String, Set<Integer>> idsToVerifyMap,
+			final Map<String, Set<String>> invalidValuesMap, final String programUUID) {
+		this.verifyPersonIdsIfExisting(idsToVerifyMap.get(DataImportServiceImpl.PERSON_ID_VALUES),
+				invalidValuesMap.get(DataImportServiceImpl.PERSON_ID_VALUES));
+		this.verifyLocationIdsIfExisting(idsToVerifyMap.get(DataImportServiceImpl.LOCATION_ID_VALUES),
+				invalidValuesMap.get(DataImportServiceImpl.LOCATION_ID_VALUES), programUUID);
+		this.verifyGermplasmIdsIfExisting(idsToVerifyMap.get(DataImportServiceImpl.GERMPLASM_ID_VALUES),
+				invalidValuesMap.get(DataImportServiceImpl.GERMPLASM_ID_VALUES));
 	}
 
-
-	private void verifyGermplasmIdsIfExisting(Set<Integer> gidsToVerify, Set<String> invalidGids) {
+	private void verifyGermplasmIdsIfExisting(final Set<Integer> gidsToVerify, final Set<String> invalidGids) {
 		this.germplasmDAO.setSession(this.sessionProvider.getSession());
-		List<Integer> existingGermplasmIds = this.germplasmDAO.getExistingGIDs(new ArrayList<>(gidsToVerify));
-		for (Integer gid : gidsToVerify) {
+		final List<Integer> existingGermplasmIds = this.germplasmDAO.getExistingGIDs(new ArrayList<>(gidsToVerify));
+		for (final Integer gid : gidsToVerify) {
 			if (!existingGermplasmIds.contains(gid)) {
 				invalidGids.add(Integer.toString(gid));
 			}
 		}
 	}
 
-	private void verifyPersonIdsIfExisting(Set<Integer> personIdsToVerify, Set<String> invalidPersonIds) {
+	private void verifyPersonIdsIfExisting(final Set<Integer> personIdsToVerify, final Set<String> invalidPersonIds) {
 		this.personDAO.setSession(this.sessionProvider.getSession());
-		List<Integer> existingPersonIds = this.personDAO.getExistingPersonIds(new ArrayList<>(personIdsToVerify));
-		for (Integer personId : personIdsToVerify) {
+		final List<Integer> existingPersonIds = this.personDAO.getExistingPersonIds(new ArrayList<>(personIdsToVerify));
+		for (final Integer personId : personIdsToVerify) {
 			if (!existingPersonIds.contains(personId)) {
 				invalidPersonIds.add(Integer.toString(personId));
 			}
@@ -731,10 +734,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	}
 
-	private void verifyLocationIdsIfExisting(Set<Integer> locationIdsToVerify, Set<String> invalidLocationIds, String programUUID) {
+	private void verifyLocationIdsIfExisting(final Set<Integer> locationIdsToVerify, final Set<String> invalidLocationIds,
+			final String programUUID) {
 		this.locationDAO.setSession(this.sessionProvider.getSession());
-		List<Integer> existingLocationIds = this.locationDAO.getExistingLocationIds(new ArrayList<>(locationIdsToVerify), programUUID);
-		for (Integer locationId : locationIdsToVerify) {
+		final List<Integer> existingLocationIds =
+				this.locationDAO.getExistingLocationIds(new ArrayList<>(locationIdsToVerify), programUUID);
+		for (final Integer locationId : locationIdsToVerify) {
 			if (!existingLocationIds.contains(locationId)) {
 				invalidLocationIds.add(Integer.toString(locationId));
 			}
@@ -742,40 +747,40 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	private Map<String, Set<Integer>> initializeIdsToVerifyMap() {
-		Map<String, Set<Integer>> idsToVerifyMap = new HashMap<>();
-		idsToVerifyMap.put(PERSON_ID_VALUES, new TreeSet<Integer>());
-		idsToVerifyMap.put(LOCATION_ID_VALUES, new TreeSet<Integer>());
-		idsToVerifyMap.put(GERMPLASM_ID_VALUES, new TreeSet<Integer>());
+		final Map<String, Set<Integer>> idsToVerifyMap = new HashMap<>();
+		idsToVerifyMap.put(DataImportServiceImpl.PERSON_ID_VALUES, new TreeSet<Integer>());
+		idsToVerifyMap.put(DataImportServiceImpl.LOCATION_ID_VALUES, new TreeSet<Integer>());
+		idsToVerifyMap.put(DataImportServiceImpl.GERMPLASM_ID_VALUES, new TreeSet<Integer>());
 		return idsToVerifyMap;
 	}
 
 	private Map<String, Set<String>> initializeInvalidValuesMap() {
-		Map<String, Set<String>> invalidValuesMap = new HashMap<>();
-		invalidValuesMap.put(PERSON_ID_VALUES, new TreeSet<String>());
-		invalidValuesMap.put(LOCATION_ID_VALUES, new TreeSet<String>());
-		invalidValuesMap.put(GERMPLASM_ID_VALUES, new TreeSet<String>());
+		final Map<String, Set<String>> invalidValuesMap = new HashMap<>();
+		invalidValuesMap.put(DataImportServiceImpl.PERSON_ID_VALUES, new TreeSet<String>());
+		invalidValuesMap.put(DataImportServiceImpl.LOCATION_ID_VALUES, new TreeSet<String>());
+		invalidValuesMap.put(DataImportServiceImpl.GERMPLASM_ID_VALUES, new TreeSet<String>());
 		return invalidValuesMap;
 	}
 
-	private void addVariableValueToTheAppropriateMap(Integer id, String value, Map<String, Set<Integer>> idsToVerifyMap,
-			Map<String, Set<String>> invalidValuesMap) {
+	private void addVariableValueToTheAppropriateMap(final Integer id, final String value, final Map<String, Set<Integer>> idsToVerifyMap,
+			final Map<String, Set<String>> invalidValuesMap) {
 		if (TermId.PI_ID.getId() == id || TermId.COOPERATOOR_ID.getId() == id) {
 			if (!NumberUtils.isNumber(value)) {
-				invalidValuesMap.get(PERSON_ID_VALUES).add(value);
+				invalidValuesMap.get(DataImportServiceImpl.PERSON_ID_VALUES).add(value);
 			} else {
-				idsToVerifyMap.get(PERSON_ID_VALUES).add(Integer.parseInt(value));
+				idsToVerifyMap.get(DataImportServiceImpl.PERSON_ID_VALUES).add(Integer.parseInt(value));
 			}
 		} else if (TermId.LOCATION_ID.getId() == id) {
 			if (!NumberUtils.isNumber(value)) {
-				invalidValuesMap.get(LOCATION_ID_VALUES).add(value);
+				invalidValuesMap.get(DataImportServiceImpl.LOCATION_ID_VALUES).add(value);
 			} else {
-				idsToVerifyMap.get(LOCATION_ID_VALUES).add(Integer.parseInt(value));
+				idsToVerifyMap.get(DataImportServiceImpl.LOCATION_ID_VALUES).add(Integer.parseInt(value));
 			}
 		} else if (TermId.GID.getId() == id) {
 			if (!NumberUtils.isNumber(value)) {
-				invalidValuesMap.get(GERMPLASM_ID_VALUES).add(value);
+				invalidValuesMap.get(DataImportServiceImpl.GERMPLASM_ID_VALUES).add(value);
 			} else {
-				idsToVerifyMap.get(GERMPLASM_ID_VALUES).add(Integer.parseInt(value));
+				idsToVerifyMap.get(DataImportServiceImpl.GERMPLASM_ID_VALUES).add(Integer.parseInt(value));
 			}
 		}
 	}
@@ -787,9 +792,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 * referring to Germplsm.gid
 	 *
 	 */
-	protected Map<String, Integer> retrieveControlledVariablesMap(Workbook workbook) {
-		Map<String, Integer> controlledVariablesMap = new LinkedHashMap<>();
-		for (MeasurementVariable measurementVariable : workbook.getAllVariables()) {
+	protected Map<String, Integer> retrieveControlledVariablesMap(final Workbook workbook) {
+		final Map<String, Integer> controlledVariablesMap = new LinkedHashMap<>();
+		for (final MeasurementVariable measurementVariable : workbook.getAllVariables()) {
 			if (measurementVariable.getTermId() == TermId.PI_ID.getId() || measurementVariable.getTermId() == TermId.COOPERATOOR_ID.getId()
 					|| measurementVariable.getTermId() == TermId.LOCATION_ID.getId()
 					|| measurementVariable.getTermId() == TermId.GID.getId()) {
@@ -858,9 +863,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 				final List<Integer> variateIds = new ArrayList<Integer>();
 				// check at least one variate
 				variateIds.add(workbook.getVariates().get(0).getTermId());
-				final int numberOfVariatesData =
-						this.getPhenotypeDao().countVariatesDataOfStudy(
-								isMeansDataImport ? workbook.getMeansDatasetId() : workbook.getMeasurementDatesetId(), variateIds);
+				final int numberOfVariatesData = this.getPhenotypeDao().countVariatesDataOfStudy(
+						isMeansDataImport ? workbook.getMeansDatasetId() : workbook.getMeasurementDatesetId(), variateIds);
 				if (numberOfVariatesData > 0) {
 					hasDuplicateTrialInstances = true;
 				}
@@ -872,21 +876,20 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 					trialInstanceNumbers.append(trialInstanceNo);
 					trialInstanceNumbers.append(",");
 				}
-				errors.get(Constants.GLOBAL).add(
-						new Message("error.duplicate.trial.instance", trialInstanceNumbers.toString().substring(0,
-								trialInstanceNumbers.toString().length() - 1)));
+				errors.get(Constants.GLOBAL).add(new Message("error.duplicate.trial.instance",
+						trialInstanceNumbers.toString().substring(0, trialInstanceNumbers.toString().length() - 1)));
 			}
 
 		}
 	}
 
 	@Override
-	public void discardMissingRecords(Workbook workbook) {
-		Map<String, Set<String>> invalidValuesMap = workbook.getInvalidValuesMap();
-		Map<String, Integer> controlledVariablesMap = this.retrieveControlledVariablesMap(workbook);
-		for (MeasurementRow measurementRow : workbook.getObservations()) {
-			for (MeasurementData measurementData : measurementRow.getDataList()) {
-				Integer variableId = controlledVariablesMap.get(measurementData.getLabel());
+	public void discardMissingRecords(final Workbook workbook) {
+		final Map<String, Set<String>> invalidValuesMap = workbook.getInvalidValuesMap();
+		final Map<String, Integer> controlledVariablesMap = this.retrieveControlledVariablesMap(workbook);
+		for (final MeasurementRow measurementRow : workbook.getObservations()) {
+			for (final MeasurementData measurementData : measurementRow.getDataList()) {
+				final Integer variableId = controlledVariablesMap.get(measurementData.getLabel());
 				if (variableId != null && !StringUtils.isEmpty(measurementData.getValue())) {
 					this.discardMissingRecords(measurementData, variableId, invalidValuesMap);
 				}
@@ -894,17 +897,18 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		}
 	}
 
-	private void discardMissingRecords(MeasurementData measurementData, Integer variableId, Map<String, Set<String>> invalidValuesMap) {
+	private void discardMissingRecords(final MeasurementData measurementData, final Integer variableId,
+			final Map<String, Set<String>> invalidValuesMap) {
 		if (variableId == TermId.PI_ID.getId() || variableId == TermId.COOPERATOOR_ID.getId()) {
-			if (invalidValuesMap.get(PERSON_ID_VALUES).contains(measurementData.getValue())) {
+			if (invalidValuesMap.get(DataImportServiceImpl.PERSON_ID_VALUES).contains(measurementData.getValue())) {
 				measurementData.setValue("");
 			}
 		} else if (variableId == TermId.LOCATION_ID.getId()) {
-			if (invalidValuesMap.get(LOCATION_ID_VALUES).contains(measurementData.getValue())) {
+			if (invalidValuesMap.get(DataImportServiceImpl.LOCATION_ID_VALUES).contains(measurementData.getValue())) {
 				measurementData.setValue("");
 			}
 		} else if (variableId == TermId.GID.getId()) {
-			if (invalidValuesMap.get(GERMPLASM_ID_VALUES).contains(measurementData.getValue())) {
+			if (invalidValuesMap.get(DataImportServiceImpl.GERMPLASM_ID_VALUES).contains(measurementData.getValue())) {
 				measurementData.setValue("");
 			}
 		}
