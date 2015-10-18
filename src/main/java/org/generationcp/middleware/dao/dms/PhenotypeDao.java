@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.dao.dms;
@@ -17,8 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
@@ -45,7 +43,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Phenotype}.
- * 
+ *
  */
 @SuppressWarnings("unchecked")
 public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
@@ -599,17 +597,17 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			StringBuilder sql =
 					new StringBuilder()
-							.append("SELECT DISTINCT e.nd_geolocation_id, p.observable_id, trait.name, trait.definition, c_scale.name, cr_type.object_id ")
-							.append("FROM phenotype p ")
-							.append("	INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
-							.append("	INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
-							.append("				AND e.nd_geolocation_id IN (:environmentIds) ")
-							.append("	LEFT JOIN cvterm_relationship cr_scale ON p.observable_id = cr_scale.subject_id AND cr_scale.type_id = 1220 ")
-							.append("	LEFT JOIN cvterm c_scale ON c_scale.cvterm_id = cr_scale.object_id ")
-							.append("	LEFT JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.object_id ")
-							.append("	    AND cr_type.type_id = 1105 ")
-							.append("LEFT JOIN cvterm_relationship cr_property ON p.observable_id = cr_property.subject_id AND cr_property.type_id = 1200 ")
-							.append("LEFT JOIN cvterm trait ON cr_property.object_id = trait.cvterm_id ");
+			.append("SELECT DISTINCT e.nd_geolocation_id, p.observable_id, trait.name, trait.definition, c_scale.name, cr_type.object_id ")
+			.append("FROM phenotype p ")
+			.append("	INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
+			.append("	INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
+			.append("				AND e.nd_geolocation_id IN (:environmentIds) ")
+			.append("	LEFT JOIN cvterm_relationship cr_scale ON p.observable_id = cr_scale.subject_id AND cr_scale.type_id = 1220 ")
+			.append("	LEFT JOIN cvterm c_scale ON c_scale.cvterm_id = cr_scale.object_id ")
+			.append("	LEFT JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.object_id ")
+			.append("	    AND cr_type.type_id = 1105 ")
+			.append("LEFT JOIN cvterm_relationship cr_property ON p.observable_id = cr_property.subject_id AND cr_property.type_id = 1200 ")
+			.append("LEFT JOIN cvterm trait ON cr_property.object_id = trait.cvterm_id ");
 
 			Query query = this.getSession().createSQLQuery(sql.toString()).setParameterList("environmentIds", environmentIds);
 
@@ -642,7 +640,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 			// statement
 			this.getSession().flush();
-			
+
 			// Delete phenotypes and experiment phenotypes
 			String sql =
 					"delete pheno, epheno" + " from nd_experiment_project ep, nd_experiment e,"
@@ -665,7 +663,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 			// statement
 			this.getSession().flush();
-			
+
 			// update the value of phenotypes
 			String sql =
 					"UPDATE nd_experiment_project ep " + "INNER JOIN nd_experiment exp ON ep.nd_experiment_id = exp.nd_experiment_id "
@@ -759,9 +757,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				StringBuilder sql = new StringBuilder();
 
 				sql.append("SELECT COUNT(p.phenotype_id) FROM phenotype p ")
-						.append("INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
-						.append("INNER JOIN nd_experiment_project e ON e.nd_experiment_id = ep.nd_experiment_id ")
-						.append("WHERE e.project_id = ").append(projectId).append(" AND p.observable_id IN (");
+				.append("INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
+				.append("INNER JOIN nd_experiment_project e ON e.nd_experiment_id = ep.nd_experiment_id ")
+				.append("WHERE e.project_id = ").append(projectId).append(" AND p.observable_id IN (");
 				for (int i = 0; i < variateIds.size(); i++) {
 					if (i > 0) {
 						sql.append(",");
@@ -786,9 +784,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				StringBuilder sql = new StringBuilder();
 
 				sql.append("SELECT COUNT(p.phenotype_id) FROM phenotype p ")
-						.append("INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
-						.append("INNER JOIN nd_experiment_project e ON e.nd_experiment_id = ep.nd_experiment_id ")
-						.append("WHERE e.project_id = ").append(projectId).append(" AND p.observable_id IN (");
+				.append("INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
+				.append("INNER JOIN nd_experiment_project e ON e.nd_experiment_id = ep.nd_experiment_id ")
+				.append("WHERE e.project_id = ").append(projectId).append(" AND p.observable_id IN (");
 				for (int i = 0; i < variateIds.size(); i++) {
 					if (i > 0) {
 						sql.append(",");
@@ -814,10 +812,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			StringBuilder sql = new StringBuilder();
 
 			sql.append("SELECT COUNT(p.phenotype_id), p.observable_id FROM phenotype p ")
-					.append("INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
-					.append("INNER JOIN nd_experiment_project e ON e.nd_experiment_id = ep.nd_experiment_id ")
-					.append("WHERE e.project_id = ").append(projectId).append(" AND (p.value <> '' OR p.cvalue_id > 0) ")
-					.append(" GROUP BY p.observable_id ");
+			.append("INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
+			.append("INNER JOIN nd_experiment_project e ON e.nd_experiment_id = ep.nd_experiment_id ")
+			.append("WHERE e.project_id = ").append(projectId).append(" AND (p.value <> '' OR p.cvalue_id > 0) ")
+			.append(" GROUP BY p.observable_id ");
 			Query query = this.getSession().createSQLQuery(sql.toString());
 
 			List<Object[]> result = query.list();
@@ -856,12 +854,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 			// statement
 			this.getSession().flush();
-			
+
 			StringBuilder sql =
 					new StringBuilder().append("DELETE FROM phenotype ").append(" WHERE phenotype_id IN ( ")
-							.append(" SELECT eph.phenotype_id ").append(" FROM nd_experiment_phenotype eph ")
-							.append(" INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = eph.nd_experiment_id ")
-							.append(" AND ep.project_id IN (");
+					.append(" SELECT eph.phenotype_id ").append(" FROM nd_experiment_phenotype eph ")
+					.append(" INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = eph.nd_experiment_id ")
+					.append(" AND ep.project_id IN (");
 			for (int i = 0; i < ids.size(); i++) {
 				if (i > 0) {
 					sql.append(",");
@@ -883,9 +881,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			StringBuilder sql =
 					new StringBuilder().append(" SELECT p.phenotype_id ").append(" FROM phenotype p ")
-							.append(" INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id ")
-							.append(" INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = eph.nd_experiment_id ")
-							.append("   AND ep.project_id = ").append(projectId).append(" WHERE p.observable_id = ").append(typeId);
+					.append(" INNER JOIN nd_experiment_phenotype eph ON eph.phenotype_id = p.phenotype_id ")
+					.append(" INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = eph.nd_experiment_id ")
+					.append("   AND ep.project_id = ").append(projectId).append(" WHERE p.observable_id = ").append(typeId);
 			SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 			List<Integer> list = query.list();
 			if (list != null && !list.isEmpty()) {
@@ -942,19 +940,19 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		StringBuilder sql =
 				new StringBuilder()
-						.append(" SELECT phenotype.observable_id,count(phenotype.observable_id) ")
-						.append(" FROM  ")
-						.append(" nd_experiment_project a ")
-						.append(" INNER JOIN nd_experiment nd_exp ON a.nd_experiment_id = nd_exp.nd_experiment_id ")
-						.append(" INNER JOIN nd_experiment_stock nd_exp_stock ON nd_exp.nd_experiment_id = nd_exp_stock.nd_experiment_id ")
-						.append(" INNER JOIN stock ON nd_exp_stock.stock_id = stock.stock_id ")
-						.append(" LEFT JOIN nd_experiment_phenotype nd_exp_pheno ON nd_exp.nd_experiment_id = nd_exp_pheno.nd_experiment_id ")
-						.append(" LEFT JOIN phenotype  ON nd_exp_pheno.phenotype_id = phenotype.phenotype_id ")
-						.append(" where a.project_id = ").append(projectId).append(" and nd_exp.nd_geolocation_id = ").append(locationId)
-						.append(" and ((phenotype.value <> '' and phenotype.value is not null) or ")
-						.append(" (phenotype.cvalue_id <> '' and phenotype.cvalue_id is not null)) ")
-						.append(" group by nd_exp.nd_geolocation_id, ").append(groupByGermplasm).append(" , phenotype.observable_id ")
-						.append(" having count(phenotype.observable_id) >= 2 LIMIT 1 ");
+		.append(" SELECT phenotype.observable_id,count(phenotype.observable_id) ")
+		.append(" FROM  ")
+		.append(" nd_experiment_project a ")
+		.append(" INNER JOIN nd_experiment nd_exp ON a.nd_experiment_id = nd_exp.nd_experiment_id ")
+		.append(" INNER JOIN nd_experiment_stock nd_exp_stock ON nd_exp.nd_experiment_id = nd_exp_stock.nd_experiment_id ")
+		.append(" INNER JOIN stock ON nd_exp_stock.stock_id = stock.stock_id ")
+		.append(" LEFT JOIN nd_experiment_phenotype nd_exp_pheno ON nd_exp.nd_experiment_id = nd_exp_pheno.nd_experiment_id ")
+		.append(" LEFT JOIN phenotype  ON nd_exp_pheno.phenotype_id = phenotype.phenotype_id ")
+		.append(" where a.project_id = ").append(projectId).append(" and nd_exp.nd_geolocation_id = ").append(locationId)
+		.append(" and ((phenotype.value <> '' and phenotype.value is not null) or ")
+		.append(" (phenotype.cvalue_id <> '' and phenotype.cvalue_id is not null)) ")
+		.append(" group by nd_exp.nd_geolocation_id, ").append(groupByGermplasm).append(" , phenotype.observable_id ")
+		.append(" having count(phenotype.observable_id) >= 2 LIMIT 1 ");
 
 		SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 
@@ -996,7 +994,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	@Override
 	public Phenotype save(final Phenotype phenotype) throws MiddlewareQueryException {
 		try {
-			this.savePhenotypeAndCopyUniquename(phenotype);
+			this.savePhenotype(phenotype);
 			return phenotype;
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error in save(" + phenotype + "): " + e.getMessage(), e);
@@ -1007,7 +1005,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public Phenotype saveOrUpdate(Phenotype entity) throws MiddlewareQueryException {
 		try {
 			if (entity.getPhenotypeId() == null) {
-				this.savePhenotypeAndCopyUniquename(entity);
+				this.savePhenotype(entity);
 			}
 			this.getSession().saveOrUpdate(entity);
 			return entity;
@@ -1020,7 +1018,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public Phenotype merge(Phenotype entity) throws MiddlewareQueryException {
 		try {
 			if (entity.getPhenotypeId() == null) {
-				this.savePhenotypeAndCopyUniquename(entity);
+				this.savePhenotype(entity);
 			}
 			this.getSession().merge(entity);
 			return entity;
@@ -1029,20 +1027,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 	}
 
-	private void savePhenotypeAndCopyUniquename(final Phenotype phenotype) {
-
-		// TODO: why this wierdness. Comments from Graham. Indeed you are correct, there is some information duplicated in the phenotype
-		// table. This was just a problem of fitting our data model into the Chado schema without changing it. Some fields are compulsory
-		// and we had no matching
-		// information to store there so we repeated some fields.
-		// One interesting consequence is that we have some information stored both as text and number and this can be useful because the
-		// cvterm_id stored in the observable_id field sometimes needs to link to the cvterm_id stored in the projectprop.value field when
-		// it is cast as text.
-
+	private void savePhenotype(final Phenotype phenotype) {
 		final Session currentSession = this.getSession();
-		phenotype.setUniqueName(UUID.randomUUID().toString());
 		currentSession.save(phenotype);
-		phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
-		currentSession.update(phenotype);
 	}
 }

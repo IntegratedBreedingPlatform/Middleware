@@ -36,7 +36,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "nd_experiment_stock")
-@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="nd_experiment_stock")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="nd_experiment_stock")
 public class ExperimentStock implements Serializable {
 
 	private static final long serialVersionUID = -3361812145612014083L;

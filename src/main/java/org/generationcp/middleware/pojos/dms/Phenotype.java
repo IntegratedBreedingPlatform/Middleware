@@ -20,7 +20,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.TableGenerator;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_phenotype
@@ -32,18 +32,19 @@ import javax.persistence.UniqueConstraint;
  *
  */
 @Entity
-@Table(name = "phenotype", uniqueConstraints = {@UniqueConstraint(columnNames = {"uniquename"})})
+@Table(name = "phenotype")
 public class Phenotype implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@TableGenerator(name = "phenotypeIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value",
+	pkColumnValue = "phenotype", allocationSize = 500)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "phenotypeIdGenerator")
 	@Basic(optional = false)
 	@Column(name = "phenotype_id")
 	private Integer phenotypeId;
 
-	@Basic(optional = false)
 	@Column(name = "uniquename")
 	private String uniqueName;
 

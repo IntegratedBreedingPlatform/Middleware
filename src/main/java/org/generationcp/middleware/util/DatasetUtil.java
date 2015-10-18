@@ -11,10 +11,13 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 
 public class DatasetUtil {
 
-	public static final String OLD_PLOT_DATASET_NAME_PREFIX = "MEASUREMENT EFEC_";
+	public static final String OLD_PLOT_DATASET_NAME_PREFIX = "MEASUREMENT EFEC";
+	public static final String OLD_PLOT_DATASET_NAME_SUFFIX = "-MEASUREMENT";
 	public static final String NEW_PLOT_DATASET_NAME_SUFFIX = "-PLOTDATA";
-	public static final String OLD_SUMMARY_DATASET_NAME_PREFIX = "TRIAL_";
-	public static final String NEW_SUMMARY_DATASET_NAME_SUFFIX = "-ENVIRONMENT";
+	
+	public static final String OLD_ENVIRONMENT_DATASET_NAME_PREFIX = "TRIAL_";
+	public static final String OLD_ENVIRONMENT_DATASET_NAME_SUFFIX = "-TRIAL";
+	public static final String NEW_ENVIRONMENT_DATASET_NAME_SUFFIX = "-ENVIRONMENT";
 
 	private DatasetUtil() {
 		// a utility class should not have a public constructor
@@ -27,8 +30,8 @@ public class DatasetUtil {
 			for (DataSet dataSet : plotDatasets) {
 				String name = dataSet.getName();
 				if (name != null
-						&& (name.startsWith(DatasetUtil.OLD_SUMMARY_DATASET_NAME_PREFIX) || name
-								.endsWith(DatasetUtil.NEW_SUMMARY_DATASET_NAME_SUFFIX))) {
+						&& (name.startsWith(DatasetUtil.OLD_ENVIRONMENT_DATASET_NAME_PREFIX) || name
+								.endsWith(DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX))) {
 					return dataSet;
 				} else if (name == null || name != null && !name.startsWith(DatasetUtil.OLD_PLOT_DATASET_NAME_PREFIX)
 						&& !name.endsWith(DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX)) {
@@ -78,8 +81,8 @@ public class DatasetUtil {
 					&& (name.startsWith(DatasetUtil.OLD_PLOT_DATASET_NAME_PREFIX) || name
 							.endsWith(DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX))) {
 				return dataSet;
-			} else if (name == null || name != null && !name.startsWith(DatasetUtil.OLD_SUMMARY_DATASET_NAME_PREFIX)
-					&& !name.endsWith(DatasetUtil.NEW_SUMMARY_DATASET_NAME_SUFFIX)) {
+			} else if (name == null || name != null && !name.startsWith(DatasetUtil.OLD_ENVIRONMENT_DATASET_NAME_PREFIX)
+					&& !name.endsWith(DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX)) {
 				if (dataSet != null && dataSet.getVariableTypes().getVariableTypes() != null) {
 					boolean aPlotDataset = false;
 					for (DMSVariableType variableType : dataSet.getVariableTypes().getVariableTypes()) {

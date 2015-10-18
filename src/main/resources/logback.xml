@@ -32,7 +32,7 @@
     </root>
     
     <!-- Set the log levels -->
-    <logger name="org.generationcp" level="DEBUG"/>
+    <logger name="org.generationcp" level="INFO"/>
     <logger name="com.atomikos" level="WARN"/>
     
 </configuration>
