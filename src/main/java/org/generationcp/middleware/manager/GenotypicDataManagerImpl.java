@@ -2931,4 +2931,24 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	public int countAllMarkers() {
 		return this.getMarkerDao().getAll().size();
 	}
+
+	@Override
+	public List<Integer> getDatasetIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException {
+		return this.getAccMetadataSetDao().getDatasetIdsByGermplasmIds(gIds);
+	}
+
+	@Override
+	public List<Integer> getAccMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
+		return this.getAccMetadataSetDao().getNidsByDatasetIds(datasetIds);
+	}
+
+	@Override
+	public List<Object> getMarkersOnMapByMarkerIdsAndMapId(List<Integer> markerIds, Integer mapID) {
+		return this.getMarkerOnMapDao().getMarkersOnMapByMarkerIdsAndMapId(markerIds, mapID);
+	}
+
+	@Override
+	public List<MarkerOnMap> getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(Integer mapId, Integer linkageGroupId, Integer markerId) {
+		return this.getMarkerOnMapDao().getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(mapId, linkageGroupId, markerId);
+	}
 }

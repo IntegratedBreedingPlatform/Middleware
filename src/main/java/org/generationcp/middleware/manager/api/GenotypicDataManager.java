@@ -79,6 +79,15 @@ public interface GenotypicDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException;
+	
+	/**
+	 * Gets the dataset ids by germplasm ids. Searches the acc_metadataset table by giving the list of germplasm ids.
+	 *
+	 * @param gIds the list germplasm ids
+	 * @return the dataset ids matching the given germplasm ids
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<Integer> getDatasetIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException;
 
 	/**
 	 * Gets the Name records matching the given name ids. This method is based on GMS_getNameRecord.
@@ -1755,6 +1764,15 @@ public interface GenotypicDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	long countAccMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns a list of of nIds from AccMetaDataSet given a list of dataset Ids.
+	 *
+	 * @param datasetIds the dataset ids
+	 * @return List of NIDs
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<Integer> getAccMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException;
 
 	/**
 	 * Returns the number of markers from Marker given a list of dataset Ids.
@@ -2230,4 +2248,8 @@ public interface GenotypicDataManager {
 	
 	public List<Integer> getMarkerIdsByNames(List<String> names, int start, int numOfRows);
 	
+	public List<Object> getMarkersOnMapByMarkerIdsAndMapId(List<Integer> markerIds, Integer mapID);
+	
+	public List<MarkerOnMap> getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(Integer mapId, Integer linkageGroupId, Integer markerId);
+
 }

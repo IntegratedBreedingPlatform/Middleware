@@ -37,6 +37,8 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 
 	public static final String GET_NAME_IDS_BY_GERMPLASM_IDS = "SELECT nid " + "FROM gdms_acc_metadataset " + "WHERE gid IN (:gIdList)";
 
+	public static final String GET_DATASET_IDS_BY_GERMPLASM_IDS = "SELECT dataset_id " + "FROM gdms_acc_metadataset " + "WHERE gid IN (:gIdList)";
+
 	public static final String GET_ACC_METADATASETS_BY_GIDS = "SELECT gid, nid, dataset_id " + "FROM gdms_acc_metadataset "
 			+ "WHERE gid IN (:gids) ";
 
@@ -71,6 +73,8 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 
 	public static final String GET_UNIQUE_ACC_METADATASET_BY_GIDS = "select distinct gid,nid, acc_sample_id from gdms_acc_metadataset where gid in (:gids)" 
 			+ " order by gid, nid,acc_sample_id asc";
+
+	private static final String GET_NIDS_BY_DATASET_IDS = "SELECT nid FROM gdms_acc_metadataset WHERE dataset_id IN (:datasetIds)";
 	
 	@SuppressWarnings("unchecked")
 	public List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException {
@@ -82,6 +86,20 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 			}
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error with getNameIdsByGermplasmIds(" + gIds + ") query from AccMetadataSet: " + e.getMessage(), e);
+		}
+		return new ArrayList<Integer>();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Integer> getDatasetIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException {
+		try {
+			if (gIds != null && !gIds.isEmpty()) {
+				SQLQuery query = this.getSession().createSQLQuery(AccMetadataSetDAO.GET_DATASET_IDS_BY_GERMPLASM_IDS);
+				query.setParameterList("gIdList", gIds);
+				return query.list();
+			}
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error with getDatasetIdsByGermplasmIds(" + gIds + ") query from AccMetadataSet: " + e.getMessage(), e);
 		}
 		return new ArrayList<Integer>();
 	}
@@ -247,6 +265,20 @@ public class AccMetadataSetDAO extends GenericDAO<AccMetadataSet, Integer> {
 					"Error with countAccMetadataSetByGids(gids=" + gids + ") query from AccMetadataSet: " + e.getMessage(), e);
 		}
 		return count;
+	}
+	
+	public List<Integer> getNidsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
+		List<Integer> results = new ArrayList<>();
+		try{
+				SQLQuery query = this.getSession().createSQLQuery(AccMetadataSetDAO.GET_NIDS_BY_DATASET_IDS);
+				query.setParameterList("datasetIds", datasetIds);
+				results = query.list();
+
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error with getNidsByDatasetIds=" + datasetIds + ") query from AccMetadataSet: " + e.getMessage(),
+					e);
+		}
+		return results;
 	}
 
 	public long countNidsByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
