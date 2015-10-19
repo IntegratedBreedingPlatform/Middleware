@@ -28,7 +28,6 @@ import org.generationcp.middleware.pojos.dms.ExperimentProject;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.util.DatabaseBroker;
 
 public class ExperimentModelSaver extends Saver {
 

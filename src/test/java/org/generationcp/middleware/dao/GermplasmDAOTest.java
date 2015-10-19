@@ -64,11 +64,11 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	private void updateProgenitors() throws MiddlewareQueryException {
-		Germplasm germplasm1 = this.germplasmDataDM.getGermplasmByGID(GermplasmDAOTest.testGid1);
+		/*Germplasm germplasm1 = this.germplasmDataDM.getGermplasmByGID(GermplasmDAOTest.testGid1);
 		GermplasmDAOTest.oldGid1_Gpid1 = germplasm1.getGpid1();
 		GermplasmDAOTest.oldGid1_Gpid2 = germplasm1.getGpid2();
 		this.germplasmDataDM.updateProgenitor(GermplasmDAOTest.testGid1, GermplasmDAOTest.testGid1_Gpid1, 1);
-		this.germplasmDataDM.updateProgenitor(GermplasmDAOTest.testGid1, GermplasmDAOTest.testGid1_Gpid2, 2);
+		this.germplasmDataDM.updateProgenitor(GermplasmDAOTest.testGid1, GermplasmDAOTest.testGid1_Gpid2, 2);*/
 	}
 
 	private void updateInventory() throws MiddlewareQueryException {

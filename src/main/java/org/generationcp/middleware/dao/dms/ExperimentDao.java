@@ -306,4 +306,37 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			this.logAndThrowException("Error in deleteTrialExperimentsOfStudy=" + datasetId + " in DataSetDao: " + e.getMessage(), e);
 		}
 	}
+
+	public boolean checkIfAnyLocationIDsExistInExperiments(int dataSetId, List<Integer> locationIds) {
+
+		try {
+			String sql =
+					"SELECT count(*) FROM nd_experiment exp "
+							+ "INNER JOIN nd_experiment_project exp_proj ON exp.nd_experiment_id = exp_proj.nd_experiment_id "
+							+ "WHERE exp.nd_geolocation_id in (:locationIds) " + "AND exp_proj.project_id = :dataSetId ";
+
+			SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameterList("locationIds", locationIds);
+			query.setParameter("dataSetId", dataSetId);
+
+			Long count = 0L;
+			final Object obj = query.uniqueResult();
+			if (obj != null) {
+				count = ((Number) obj).longValue();
+			}
+
+			if (count == 0) {
+				return false;
+			} else {
+				return true;
+			}
+
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error at checkIfLocationIDsExistInExperiments=" + locationIds + "," + dataSetId + ","
+					+ " query at ExperimentDao: " + e.getMessage(), e);
+		}
+
+		return false;
+
+	}
 }

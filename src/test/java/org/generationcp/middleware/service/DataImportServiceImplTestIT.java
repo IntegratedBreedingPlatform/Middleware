@@ -314,7 +314,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		Workbook workbook = WorkbookTest.getTestWorkbook();
 		workbook.print(IntegrationTestBase.INDENT);
 		int studyId = this.dataImportService.saveProjectOntology(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
-		workbook.setStudyId(studyId);
+		workbook.getStudyDetails().setId(studyId);
 		workbook.setTrialDatasetId(studyId - 1);
 		workbook.setMeasurementDatesetId(studyId - 2);
 		this.dataImportService.saveProjectData(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);

@@ -138,8 +138,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
-		return this.getGermplasmListDataDAO().getByListId(id, start, numOfRows);
+	public List<GermplasmListData> getGermplasmListDataByListId(Integer id) throws MiddlewareQueryException {
+		return this.getGermplasmListDataDAO().getByListId(id);
 	}
 
 	@Override

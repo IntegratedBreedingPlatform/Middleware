@@ -31,7 +31,6 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
-import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -74,14 +73,9 @@ public class PhenotypeSaver extends Saver {
 		}
 	}
 
-	public void saveOrUpdate(int experimentId, Integer variableId, String value, Phenotype phenotype, Integer dataTypeId)
-			throws MiddlewareQueryException {
-		this.saveOrUpdate(experimentId, variableId, value, phenotype, false, dataTypeId);
-	}
-
-	public void saveOrUpdate(int experimentId, Integer variableId, String value, Phenotype oldPhenotype, boolean isCustomCategoricalValue,
+	public void saveOrUpdate(int experimentId, Integer variableId, String value, Phenotype oldPhenotype,
 			Integer dataTypeId) throws MiddlewareQueryException {
-		Phenotype phenotype = this.createPhenotype(variableId, value, oldPhenotype, isCustomCategoricalValue, dataTypeId);
+		Phenotype phenotype = this.createPhenotype(variableId, value, oldPhenotype, dataTypeId);
 		this.saveOrUpdate(experimentId, phenotype);
 	}
 
@@ -140,7 +134,7 @@ public class PhenotypeSaver extends Saver {
 		}
 	}
 
-	private Phenotype createPhenotype(Integer variableId, String value, Phenotype oldPhenotype, boolean isCustomCategoricalValue,
+	private Phenotype createPhenotype(Integer variableId, String value, Phenotype oldPhenotype,
 			Integer dataTypeId) throws MiddlewareQueryException {
 
 		if ((value == null || "".equals(value.trim())) && (oldPhenotype == null || oldPhenotype.getPhenotypeId() == null)) {
