@@ -35,24 +35,29 @@ public class GeolocationSaverTest {
 	private enum EnvironmentVariable {
 
 		TRIAL_INSTANCE(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.toString(), PhenotypicType.TRIAL_ENVIRONMENT, "1",
-				TermId.NUMERIC_VARIABLE.getId(), null), LATITUDE(TermId.LATITUDE.getId(), TermId.LATITUDE.toString(),
-						PhenotypicType.TRIAL_ENVIRONMENT, "1.5", TermId.NUMERIC_VARIABLE.getId(), null), LONGITUDE(TermId.LONGITUDE.getId(),
-								TermId.LONGITUDE.toString(), PhenotypicType.TRIAL_ENVIRONMENT, "3.6", TermId.NUMERIC_VARIABLE.getId(),
-								null), GEODETIC_DATUM(TermId.GEODETIC_DATUM.getId(), TermId.GEODETIC_DATUM.toString(),
-										PhenotypicType.TRIAL_ENVIRONMENT, "1", TermId.CHARACTER_VARIABLE.getId(), null), ALTITUDE(
-												TermId.ALTITUDE.getId(), TermId.ALTITUDE.toString(), PhenotypicType.TRIAL_ENVIRONMENT,
-												"5.5", TermId.NUMERIC_VARIABLE.getId(), null), ENV_WITH_VALID_VALUE(1, "ENV_1",
-														PhenotypicType.TRIAL_ENVIRONMENT, "3", TermId.CATEGORICAL_VARIABLE.getId(),
-														GeolocationSaverTest.ENV_1_VALID_VALUES), ENV_WITH_CUSTOM_VALUE(2, "ENV_2",
-																PhenotypicType.TRIAL_ENVIRONMENT, "UNKNOWN",
-																TermId.CATEGORICAL_VARIABLE.getId(),
-																GeolocationSaverTest.ENV_2_VALID_VALUES), ENV_NUMERIC(3, "ENV_2",
-																		PhenotypicType.TRIAL_ENVIRONMENT, "5",
-																		TermId.NUMERIC_VARIABLE.getId(), null), VARIATE_1(4, "VARIATE_1",
-																				PhenotypicType.VARIATE, "7",
-																				TermId.NUMERIC_VARIABLE.getId(), null), VARIATE_2(5,
-																						"VARIATE_2", PhenotypicType.VARIATE, "2",
-																						TermId.NUMERIC_VARIABLE.getId(), null);
+				TermId.NUMERIC_VARIABLE.getId(), null), //
+
+		LATITUDE(TermId.LATITUDE.getId(), TermId.LATITUDE.toString(), PhenotypicType.TRIAL_ENVIRONMENT, "1.5",
+				TermId.NUMERIC_VARIABLE.getId(), null), LONGITUDE(TermId.LONGITUDE.getId(), TermId.LONGITUDE.toString(),
+						PhenotypicType.TRIAL_ENVIRONMENT, "3.6", TermId.NUMERIC_VARIABLE.getId(), null), //
+
+		GEODETIC_DATUM(TermId.GEODETIC_DATUM.getId(), TermId.GEODETIC_DATUM.toString(), PhenotypicType.TRIAL_ENVIRONMENT, "1",
+				TermId.CHARACTER_VARIABLE.getId(), null), //
+
+		ALTITUDE(TermId.ALTITUDE.getId(), TermId.ALTITUDE.toString(), PhenotypicType.TRIAL_ENVIRONMENT, "5.5",
+				TermId.NUMERIC_VARIABLE.getId(), null), //
+
+		ENV_WITH_VALID_VALUE(1, "ENV_1", PhenotypicType.TRIAL_ENVIRONMENT, "3", TermId.CATEGORICAL_VARIABLE.getId(),
+				GeolocationSaverTest.ENV_1_VALID_VALUES), //
+
+		ENV_WITH_CUSTOM_VALUE(2, "ENV_2", PhenotypicType.TRIAL_ENVIRONMENT, "UNKNOWN", TermId.CATEGORICAL_VARIABLE.getId(),
+				GeolocationSaverTest.ENV_2_VALID_VALUES), //
+
+		ENV_NUMERIC(3, "ENV_2", PhenotypicType.TRIAL_ENVIRONMENT, "5", TermId.NUMERIC_VARIABLE.getId(), null), //
+
+		VARIATE_1(4, "VARIATE_1", PhenotypicType.VARIATE, "7", TermId.NUMERIC_VARIABLE.getId(), null), //
+
+		VARIATE_2(5, "VARIATE_2", PhenotypicType.VARIATE, "2", TermId.NUMERIC_VARIABLE.getId(), null);
 
 		private final int id;
 		private final String name;

@@ -32,18 +32,23 @@ public class StockSaverTest {
 
 	private enum StockVariable {
 
-		ENTRY_NO(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.toString(), PhenotypicType.GERMPLASM, "1", TermId.NUMERIC_VARIABLE.getId(),
-				null), GID(TermId.GID.getId(), TermId.GID.toString(), PhenotypicType.GERMPLASM, "4",
-						TermId.GERMPLASM_LIST_DATA_TYPE.getId(), null), DESIG(TermId.DESIG.getId(), TermId.DESIG.toString(),
-								PhenotypicType.GERMPLASM, "SDFTY", TermId.GERMPLASM_LIST_DATA_TYPE.getId(),
-								null), ENTRY_CODE(TermId.ENTRY_CODE.getId(), TermId.ENTRY_CODE.toString(), PhenotypicType.GERMPLASM,
-										"CODE1", TermId.CHARACTER_VARIABLE.getId(), null), GERMPLASM_WITH_VALID_VALUE(1, "GERMPLASM_1",
-												PhenotypicType.GERMPLASM, "2", TermId.CATEGORICAL_VARIABLE.getId(),
-												StockSaverTest.GERMPLASM_1_VALID_VALUES), GERMPLASM_WITH_CUSTOM_VALUE(2, "GERMPLASM_2",
-														PhenotypicType.GERMPLASM, "UNKNOWN", TermId.CATEGORICAL_VARIABLE.getId(),
-														StockSaverTest.GERMPLASM_2_VALID_VALUES), GERMPLASM_CHARACTER(3, "GERMPLASM_3",
-																PhenotypicType.GERMPLASM, "GERMPLASM 123",
-																TermId.CHARACTER_VARIABLE.getId(), null);
+		ENTRY_NO(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.toString(), PhenotypicType.GERMPLASM, "1", TermId.NUMERIC_VARIABLE.getId(), null), //
+
+		GID(TermId.GID.getId(), TermId.GID.toString(), PhenotypicType.GERMPLASM, "4", TermId.GERMPLASM_LIST_DATA_TYPE.getId(), null), //
+
+		DESIG(TermId.DESIG.getId(), TermId.DESIG.toString(), PhenotypicType.GERMPLASM, "SDFTY", TermId.GERMPLASM_LIST_DATA_TYPE.getId(),
+				null), //
+
+		ENTRY_CODE(TermId.ENTRY_CODE.getId(), TermId.ENTRY_CODE.toString(), PhenotypicType.GERMPLASM, "CODE1",
+				TermId.CHARACTER_VARIABLE.getId(), null), //
+
+		GERMPLASM_WITH_VALID_VALUE(1, "GERMPLASM_1", PhenotypicType.GERMPLASM, "2", TermId.CATEGORICAL_VARIABLE.getId(),
+				StockSaverTest.GERMPLASM_1_VALID_VALUES), //
+
+		GERMPLASM_WITH_CUSTOM_VALUE(2, "GERMPLASM_2", PhenotypicType.GERMPLASM, "UNKNOWN", TermId.CATEGORICAL_VARIABLE.getId(),
+				StockSaverTest.GERMPLASM_2_VALID_VALUES), //
+
+		GERMPLASM_CHARACTER(3, "GERMPLASM_3", PhenotypicType.GERMPLASM, "GERMPLASM 123", TermId.CHARACTER_VARIABLE.getId(), null);
 
 		private final int id;
 		private final String name;
