@@ -186,6 +186,16 @@ public class Variable implements Serializable, Comparable<Variable> {
 		return value;
 	}
 
+	public String getDatabaseValue() {
+		if (this.variableType.getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+			Enumeration validValue = this.variableType.getStandardVariable().getEnumerationByName(this.value);
+			if (validValue != null) {
+				return validValue.getId().toString();
+			}
+		}
+		return this.value;
+	}
+
 	public void print(int indent) {
 		Debug.println(indent, "Variable: ");
 
