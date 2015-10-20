@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -57,11 +58,9 @@ public class WorkbookTest {
 
 	@Test
 	public void testGetMeasurementDatasetVariablesViewForNursery() {
-
 		workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.N);
 
 		final List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
-
 		final int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
 
 		Assert.assertEquals("MeasurementDatasetVariablesView size should be the total no of non trial factors, variates",
@@ -115,4 +114,32 @@ public class WorkbookTest {
 				.getTermId());
 	}
 
+	@Test
+	public void testGetTrialObservationByTrialInstanceNoForNursery() {
+		workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.N);
+		WorkbookTestDataInitializer.createTrialObservations(1);
+
+		final MeasurementRow trialObservation = workbook.getTrialObservationByTrialInstanceNo(1);
+		Assert.assertNotNull("Expecting that every Nursery created has by default 1 instance level observation.", trialObservation);
+	}
+
+	@Test
+	public void testGetTrialObservationByTrialInstanceNoForTrial() {
+		final int noOfInstances = 2;
+		workbook = WorkbookTestDataInitializer.getTestWorkbook(noOfInstances, StudyType.T);
+		WorkbookTestDataInitializer.createTrialObservations(noOfInstances);
+
+		for (int trialInstanceNo = 1; trialInstanceNo <= noOfInstances; trialInstanceNo++) {
+			final MeasurementRow trialObservation = workbook.getTrialObservationByTrialInstanceNo(trialInstanceNo);
+			Assert.assertNotNull(
+					"Expecting that there will be a corresponding trial observation instance for every valid trial instance no.",
+					trialObservation);
+
+			final MeasurementData measurementData = trialObservation.getMeasurementData(TermId.TRIAL_INSTANCE_FACTOR.getId());
+			Assert.assertEquals("Expecting that the return instance level observation row corresponds to the given trial instance no.",
+					Integer.valueOf(measurementData.getValue()).intValue(), trialInstanceNo);
+
+		}
+
+	}
 }

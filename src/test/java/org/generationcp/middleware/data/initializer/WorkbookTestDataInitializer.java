@@ -108,6 +108,8 @@ public class WorkbookTestDataInitializer {
 	public static final int COOPERATOR_ID_ID = 8372;
 	public static final int COOPERATOR_NAME_ID = 8373;
 	public static final String NUMERIC_VALUE = "1";
+	public static final String SITE = "Site";
+	public static final String SITE_ID = "Site Id";
 
 	public static final Integer LOCATION_ID_1 = 1;
 	public static final Integer LOCATION_ID_2 = 2;
@@ -722,6 +724,56 @@ public class WorkbookTestDataInitializer {
 				}
 			}
 		}
+	}
+
+	public static void createTrialObservations(final int noOfTrialInstances) {
+		final List<MeasurementRow> trialObservations = new ArrayList<MeasurementRow>();
+
+		MeasurementRow row;
+		List<MeasurementData> dataList;
+
+		for (int i = 0; i < noOfTrialInstances; i++) {
+			row = new MeasurementRow();
+			dataList = new ArrayList<MeasurementData>();
+
+			MeasurementData data = new MeasurementData(TRIAL_INSTANCE, String.valueOf(i + 1));
+			data.setMeasurementVariable(getMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getConditions()));
+			dataList.add(data);
+			data = new MeasurementData(PI_NAME, "");
+			data.setMeasurementVariable(getMeasurementVariable(TermId.PI_NAME.getId(), workbook.getConditions()));
+			dataList.add(data);
+			data = new MeasurementData(PI_ID, "");
+			data.setMeasurementVariable(getMeasurementVariable(TermId.PI_ID.getId(), workbook.getConditions()));
+			dataList.add(data);
+			data = new MeasurementData(COOPERATOR, "");
+			data.setMeasurementVariable(getMeasurementVariable(COOPERATOR_NAME_ID, workbook.getConditions()));
+			dataList.add(data);
+			data = new MeasurementData(COOPERATOR_ID, "");
+			data.setMeasurementVariable(getMeasurementVariable(COOPERATOR_ID_ID, workbook.getConditions()));
+			dataList.add(data);
+			data = new MeasurementData(WorkbookTestDataInitializer.SITE, LNAME + "_" + (i + 1));
+			data.setMeasurementVariable(getMeasurementVariable(TermId.TRIAL_LOCATION.getId(), workbook.getConditions()));
+			dataList.add(data);
+			data = new MeasurementData(WorkbookTestDataInitializer.SITE_ID, String.valueOf(i + 1));
+			data.setMeasurementVariable(getMeasurementVariable(TermId.LOCATION_ID.getId(), workbook.getConditions()));
+			dataList.add(data);
+
+			// Check variables
+			data = new MeasurementData("CHECK_START", String.valueOf(i + 1));
+			data.setMeasurementVariable(getMeasurementVariable(TermId.CHECK_START.getId(), workbook.getConditions()));
+			dataList.add(data);
+			data = new MeasurementData("CHECK_INTERVAL", String.valueOf(i + 1));
+			data.setMeasurementVariable(getMeasurementVariable(TermId.CHECK_PLAN.getId(), workbook.getConditions()));
+			dataList.add(data);
+			data = new MeasurementData("CHECK_PLAN", "1");
+			data.setMeasurementVariable(getMeasurementVariable(TermId.CHECK_INTERVAL.getId(), workbook.getConditions()));
+			dataList.add(data);
+
+			row.setDataList(dataList);
+			trialObservations.add(row);
+		}
+
+		workbook.setTrialObservations(trialObservations);
 	}
 
 }
