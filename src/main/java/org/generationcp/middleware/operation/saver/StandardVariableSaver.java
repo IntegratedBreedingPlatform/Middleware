@@ -115,6 +115,11 @@ public class StandardVariableSaver extends Saver {
 
 	}
 
+	/*
+	 * Saves CvTerm and CvTermRelationship in the database
+	 * Checktypes/Enumerations/Categories are now saved under Scale in the new Ontology Design
+	 * See BMS-36 for more information
+	 */
 	public void saveEnumeration(StandardVariable variable, Enumeration enumeration, Integer cvId) throws MiddlewareException {
 
 		this.validateInputEnumeration(variable, enumeration);
