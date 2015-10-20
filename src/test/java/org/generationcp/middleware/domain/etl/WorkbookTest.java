@@ -157,14 +157,14 @@ public class WorkbookTest {
 		return WorkbookTest.createTestWorkbook(WorkbookTest.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, null, 1, false);
 	}
 
-	public static Workbook getTestWorkbook(int noOfObservations, StudyType studyType) {
+	public static Workbook getTestWorkbook(final int noOfObservations, final StudyType studyType) {
 		return WorkbookTest.createTestWorkbook(noOfObservations, studyType, null, 1, false);
 	}
 
-	public static List<Workbook> getTestWorkbooks(int noOfTrial, int noOfObservations) {
+	public static List<Workbook> getTestWorkbooks(final int noOfTrial, final int noOfObservations) {
 		if (WorkbookTest.workbooks == null) {
 			WorkbookTest.workbooks = new ArrayList<Workbook>();
-			String studyName = "pheno_t7" + new Random().nextInt(10000);
+			final String studyName = "pheno_t7" + new Random().nextInt(10000);
 			for (int i = 1; i <= noOfTrial; i++) {
 				WorkbookTest.workbooks.add(WorkbookTest.createTestWorkbook(noOfObservations, StudyType.T, studyName, i, true));
 			}
@@ -172,12 +172,12 @@ public class WorkbookTest {
 		return WorkbookTest.workbooks;
 	}
 
-	public static void setTestWorkbook(Workbook workbookNew) {
+	public static void setTestWorkbook(final Workbook workbookNew) {
 		WorkbookTest.workbook = workbookNew;
 	}
 
-	private static Workbook createTestWorkbook(int noOfObservations, StudyType studyType, String studyName, int trialNo,
-			boolean hasMultipleLocations) {
+	private static Workbook createTestWorkbook(final int noOfObservations, final StudyType studyType, final String studyName,
+			final int trialNo, final boolean hasMultipleLocations) {
 		WorkbookTest.workbook = new Workbook();
 
 		WorkbookTest.createStudyDetails(WorkbookTest.workbook, studyName, studyType);
@@ -190,8 +190,8 @@ public class WorkbookTest {
 		return WorkbookTest.workbook;
 	}
 
-	private static void createStudyDetails(Workbook workbook, String studyName, StudyType studyType) {
-		StudyDetails details = new StudyDetails();
+	private static void createStudyDetails(final Workbook workbook, final String studyName, final StudyType studyType) {
+		final StudyDetails details = new StudyDetails();
 		if (studyName != null) {
 			// this is used for adding multiple locations to one study
 			details.setStudyName(studyName);
@@ -209,24 +209,25 @@ public class WorkbookTest {
 		workbook.setStudyDetails(details);
 	}
 
-	private static MeasurementVariable createMeasurementVariable(int termId, String name, String description, String scale, String method,
-			String property, String dataType, String value, String label, int dataTypeId, PhenotypicType role) {
-		MeasurementVariable variable =
+	private static MeasurementVariable createMeasurementVariable(final int termId, final String name, final String description,
+			final String scale, final String method, final String property, final String dataType, final String value, final String label,
+			final int dataTypeId, final PhenotypicType role) {
+		final MeasurementVariable variable =
 				new MeasurementVariable(termId, name, description, scale, description, property, dataType, value, label);
 		variable.setRole(role);
 		variable.setDataTypeId(dataTypeId);
 		return variable;
 	}
 
-	public static MeasurementVariable createTrialInstanceMeasurementVariable(int trialNo) {
+	public static MeasurementVariable createTrialInstanceMeasurementVariable(final int trialNo) {
 		return WorkbookTest.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), "TRIAL", "TRIAL NUMBER", WorkbookTest.NUMBER,
 				WorkbookTest.ENUMERATED, WorkbookTest.TRIAL_INSTANCE, WorkbookTest.NUMERIC, String.valueOf(trialNo), WorkbookTest.TRIAL,
 				TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT);
 	}
 
-	private static void createConditions(Workbook workbook, boolean withTrial, int trialNo) {
+	private static void createConditions(final Workbook workbook, final boolean withTrial, final int trialNo) {
 		// Create measurement variables and set its dataTypeId
-		List<MeasurementVariable> conditions = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> conditions = new ArrayList<MeasurementVariable>();
 
 		if (withTrial) {
 			conditions.add(WorkbookTest.createTrialInstanceMeasurementVariable(trialNo));
@@ -264,9 +265,9 @@ public class WorkbookTest {
 		workbook.setConditions(conditions);
 	}
 
-	private static void createFactors(Workbook workbook, boolean withEntry, boolean withTrial, int trialNo) {
+	private static void createFactors(final Workbook workbook, final boolean withEntry, final boolean withTrial, final int trialNo) {
 		// Create measurement variables and set its dataTypeId
-		List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
 
 		if (withTrial) {
 			factors.add(WorkbookTest.createTrialInstanceMeasurementVariable(trialNo));
@@ -315,9 +316,9 @@ public class WorkbookTest {
 		workbook.setFactors(factors);
 	}
 
-	private static void createConstants(Workbook workbook) {
+	private static void createConstants(final Workbook workbook) {
 		// Create measurement variables and set its dataTypeId
-		List<MeasurementVariable> constants = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> constants = new ArrayList<MeasurementVariable>();
 
 		constants.add(WorkbookTest.createMeasurementVariable(WorkbookTest.GRAIN_SIZE_ID, "Grain_size",
 				"Grain size - weigh 1000 dry grains (g)", WorkbookTest.GRAIN_SIZE_SCALE, WorkbookTest.DRY_GRAINS,
@@ -326,17 +327,17 @@ public class WorkbookTest {
 		workbook.setConstants(constants);
 	}
 
-	private static void createVariates(Workbook workbook) {
+	private static void createVariates(final Workbook workbook) {
 		// Create measurement variables and set its dataTypeId
-		List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
-		MeasurementVariable measurementVariable =
+		final List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
+		final MeasurementVariable measurementVariable =
 				WorkbookTest.createMeasurementVariable(WorkbookTest.GYLD_ID, WorkbookTest.GYLD, "Grain yield -dry and weigh (kg/ha)",
 						WorkbookTest.KG_HA, WorkbookTest.DRY_AND_WEIGH, WorkbookTest.YIELD, WorkbookTest.NUMERIC,
 						WorkbookTest.NUMERIC_VALUE, WorkbookTest.PLOT, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE);
 
 		variates.add(measurementVariable);
 
-		MeasurementVariable siteSoilPh =
+		final MeasurementVariable siteSoilPh =
 				WorkbookTest.createMeasurementVariable(WorkbookTest.SITE_SOIL_PH_ID, WorkbookTest.SITE_SOIL_PH,
 						"Soil acidity - ph meter (pH)", WorkbookTest.PH, WorkbookTest.MEASURED, WorkbookTest.SOIL_ACIDITY,
 						WorkbookTest.NUMERIC, WorkbookTest.NUMERIC_VALUE, WorkbookTest.STUDY, TermId.NUMERIC_VARIABLE.getId(),
@@ -345,17 +346,17 @@ public class WorkbookTest {
 		workbook.setVariates(variates);
 	}
 
-	private static void createVariatesWithDuplicatePSM(Workbook workbook) {
-		List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
+	private static void createVariatesWithDuplicatePSM(final Workbook workbook) {
+		final List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
 
-		MeasurementVariable gyld =
+		final MeasurementVariable gyld =
 				WorkbookTest.createMeasurementVariable(WorkbookTest.GYLD_ID, WorkbookTest.GYLD, "Grain yield -dry and weigh (kg/ha)",
 						WorkbookTest.KG_HA, WorkbookTest.DRY_AND_WEIGH, WorkbookTest.YIELD, WorkbookTest.NUMERIC,
 						WorkbookTest.NUMERIC_VALUE, WorkbookTest.PLOT, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE);
 
 		variates.add(gyld);
 
-		MeasurementVariable siteSoilPh =
+		final MeasurementVariable siteSoilPh =
 				WorkbookTest.createMeasurementVariable(WorkbookTest.SITE_SOIL_PH_ID, WorkbookTest.SITE_SOIL_PH,
 						"Soil acidity - ph meter (pH)", WorkbookTest.PH, WorkbookTest.MEASURED, WorkbookTest.SOIL_ACIDITY,
 						WorkbookTest.NUMERIC, WorkbookTest.NUMERIC_VALUE, WorkbookTest.PLOT, TermId.NUMERIC_VARIABLE.getId(),
@@ -365,10 +366,10 @@ public class WorkbookTest {
 		workbook.setVariates(variates);
 	}
 
-	public static void addVariatesAndObservations(Workbook currentWorkbook) {
+	public static void addVariatesAndObservations(final Workbook currentWorkbook) {
 
-		List<MeasurementVariable> variates = currentWorkbook.getVariates();
-		MeasurementVariable measurementVariable =
+		final List<MeasurementVariable> variates = currentWorkbook.getVariates();
+		final MeasurementVariable measurementVariable =
 				WorkbookTest
 						.createMeasurementVariable(
 								WorkbookTest.CRUST_ID,
@@ -384,13 +385,13 @@ public class WorkbookTest {
 		WorkbookTest.addObservations(currentWorkbook);
 	}
 
-	private static void createObservations(Workbook workbook, int noOfObservations, boolean withTrial, int trialNo) {
-		List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
+	private static void createObservations(final Workbook workbook, final int noOfObservations, final boolean withTrial, final int trialNo) {
+		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
 
 		MeasurementRow row;
 		List<MeasurementData> dataList;
-		Random random = new Random();
-		DecimalFormat fmt = new DecimalFormat("#.##");
+		final Random random = new Random();
+		final DecimalFormat fmt = new DecimalFormat("#.##");
 
 		// Create n number of observation rows
 		for (int i = 0; i < noOfObservations; i++) {
@@ -426,13 +427,13 @@ public class WorkbookTest {
 		workbook.setObservations(observations);
 	}
 
-	private static void addObservations(Workbook currentWorkbook) {
-		List<MeasurementRow> observations = currentWorkbook.getObservations();
+	private static void addObservations(final Workbook currentWorkbook) {
+		final List<MeasurementRow> observations = currentWorkbook.getObservations();
 
 		MeasurementRow row;
 		List<MeasurementData> dataList;
-		Random random = new Random();
-		DecimalFormat fmt = new DecimalFormat("#.##");
+		final Random random = new Random();
+		final DecimalFormat fmt = new DecimalFormat("#.##");
 
 		// Create n number of observation rows
 		for (int i = 0; i < observations.size(); i++) {
@@ -462,7 +463,7 @@ public class WorkbookTest {
 					crustValue = WorkbookTest.INVALID_CRUST_VALUE_MISSING;
 					break;
 			}
-			MeasurementData measurementData =
+			final MeasurementData measurementData =
 					WorkbookTest.createMeasurementData(WorkbookTest.CRUST, crustValue, WorkbookTest.CRUST_ID,
 							WorkbookTest.workbook.getVariates());
 			measurementData.setcValueId(crustCValueId);
@@ -470,16 +471,17 @@ public class WorkbookTest {
 		}
 	}
 
-	public static MeasurementData createMeasurementData(String label, String value, int termId, List<MeasurementVariable> variables) {
-		MeasurementData data = new MeasurementData(label, value);
+	public static MeasurementData createMeasurementData(final String label, final String value, final int termId,
+			final List<MeasurementVariable> variables) {
+		final MeasurementData data = new MeasurementData(label, value);
 		data.setMeasurementVariable(WorkbookTest.getMeasurementVariable(termId, variables));
 		return data;
 	}
 
-	private static MeasurementVariable getMeasurementVariable(int termId, List<MeasurementVariable> variables) {
+	private static MeasurementVariable getMeasurementVariable(final int termId, final List<MeasurementVariable> variables) {
 		if (variables != null) {
 			// get matching MeasurementVariable object given the term id
-			for (MeasurementVariable var : variables) {
+			for (final MeasurementVariable var : variables) {
 				if (var.getTermId() == termId) {
 					return var;
 				}
@@ -488,7 +490,7 @@ public class WorkbookTest {
 		return null;
 	}
 
-	private static String computeGID(int i) {
+	private static String computeGID(final int i) {
 		int gid = 1000000;
 		if (i < 13) {
 			gid += i - 1;
@@ -498,13 +500,13 @@ public class WorkbookTest {
 		return String.valueOf(gid);
 	}
 
-	private static String randomizeValue(Random random, DecimalFormat fmt, int base) {
-		double value = random.nextDouble() * base;
+	private static String randomizeValue(final Random random, final DecimalFormat fmt, final int base) {
+		final double value = random.nextDouble() * base;
 		return fmt.format(value);
 	}
 
 	public static List<Location> createLocationData() {
-		List<Location> locations = new ArrayList<Location>();
+		final List<Location> locations = new ArrayList<Location>();
 		locations.add(new Location(WorkbookTest.LOCATION_ID_1, WorkbookTest.LTYPE, WorkbookTest.NLLP, WorkbookTest.LNAME + " 1",
 				WorkbookTest.LABBR, WorkbookTest.SNL3ID, WorkbookTest.SNL2ID, WorkbookTest.SNL1ID, WorkbookTest.CNTRYID,
 				WorkbookTest.LRPLCE));
@@ -515,13 +517,13 @@ public class WorkbookTest {
 	}
 
 	public static MeasurementRow createTrialObservationWithoutSite() {
-		Workbook workbook = new Workbook();
+		final Workbook workbook = new Workbook();
 
 		WorkbookTest.createStudyDetails(workbook, null, StudyType.T);
 		WorkbookTest.createConditions(workbook, true, 1);
 
-		MeasurementRow row = new MeasurementRow();
-		List<MeasurementData> dataList = new ArrayList<MeasurementData>();
+		final MeasurementRow row = new MeasurementRow();
+		final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
 
 		dataList.add(WorkbookTest.createMeasurementData(WorkbookTest.TRIAL_INSTANCE, WorkbookTest.NUMERIC_VALUE,
 				TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getConditions()));
@@ -536,14 +538,14 @@ public class WorkbookTest {
 		return row;
 	}
 
-	public static Workbook addEnvironmentAndConstantVariables(Workbook createdWorkbook) {
+	public static Workbook addEnvironmentAndConstantVariables(final Workbook createdWorkbook) {
 		WorkbookTest.addConditions(createdWorkbook.getConditions());
 		WorkbookTest.addConstants(createdWorkbook.getConstants());
 		return createdWorkbook;
 	}
 
-	private static void addConstants(List<MeasurementVariable> constants) {
-		MeasurementVariable variable =
+	private static void addConstants(final List<MeasurementVariable> constants) {
+		final MeasurementVariable variable =
 				WorkbookTest.createMeasurementVariable(WorkbookTest.SOILPH_ID, "SITE_SOIL_PH", "Soil acidity - ph meter (pH)",
 						WorkbookTest.PH, WorkbookTest.PH_METER, WorkbookTest.SOIL_ACIDITY, WorkbookTest.NUMERIC,
 						WorkbookTest.NUMERIC_VALUE, WorkbookTest.TRIAL, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE);
@@ -551,7 +553,7 @@ public class WorkbookTest {
 		constants.add(variable);
 	}
 
-	private static void addConditions(List<MeasurementVariable> conditions) {
+	private static void addConditions(final List<MeasurementVariable> conditions) {
 		MeasurementVariable variable =
 				WorkbookTest.createMeasurementVariable(TermId.TRIAL_LOCATION.getId(), "SITE", "TRIAL SITE NAME", WorkbookTest.DBCV,
 						WorkbookTest.ASSIGNED, WorkbookTest.LOCATION, WorkbookTest.CHAR, "", WorkbookTest.TRIAL,
@@ -567,11 +569,11 @@ public class WorkbookTest {
 		conditions.add(variable);
 	}
 
-	public static boolean areTrialVariablesSame(List<MeasurementVariable> trialVariablesTestData,
-			List<MeasurementVariable> trialVariablesRetrieved) {
+	public static boolean areTrialVariablesSame(final List<MeasurementVariable> trialVariablesTestData,
+			final List<MeasurementVariable> trialVariablesRetrieved) {
 
 		if (trialVariablesTestData != null && trialVariablesRetrieved != null) {
-			for (MeasurementVariable var : trialVariablesTestData) {
+			for (final MeasurementVariable var : trialVariablesTestData) {
 				if (WorkbookTest.notInRetrievedList(var.getTermId(), trialVariablesRetrieved)) {
 					return false;
 				}
@@ -580,8 +582,8 @@ public class WorkbookTest {
 		return true;
 	}
 
-	private static boolean notInRetrievedList(int termId, List<MeasurementVariable> trialVariablesRetrieved) {
-		for (MeasurementVariable var : trialVariablesRetrieved) {
+	private static boolean notInRetrievedList(final int termId, final List<MeasurementVariable> trialVariablesRetrieved) {
+		for (final MeasurementVariable var : trialVariablesRetrieved) {
 			if (termId == var.getTermId()) {
 				return false;
 			}
@@ -589,26 +591,26 @@ public class WorkbookTest {
 		return true;
 	}
 
-	public static void addNewEnvironment(Workbook createdWorkbook) {
+	public static void addNewEnvironment(final Workbook createdWorkbook) {
 		WorkbookTest.addObservations(1, createdWorkbook.getTrialObservations());
 		WorkbookTest.addObservations(1, createdWorkbook.getObservations());
 	}
 
-	private static void addObservations(int newEnvironmentCount, List<MeasurementRow> observations) {
-		List<MeasurementRow> originalObservations = new ArrayList<MeasurementRow>(WorkbookTest.getFirstTrialInstance(observations));
+	private static void addObservations(final int newEnvironmentCount, final List<MeasurementRow> observations) {
+		final List<MeasurementRow> originalObservations = new ArrayList<MeasurementRow>(WorkbookTest.getFirstTrialInstance(observations));
 		int currentObsCount = observations.size() / originalObservations.size();
 
 		for (int i = 0; i < newEnvironmentCount; i++) {
-			List<MeasurementRow> newInstance = new ArrayList<MeasurementRow>();
-			for (MeasurementRow row : originalObservations) {
+			final List<MeasurementRow> newInstance = new ArrayList<MeasurementRow>();
+			for (final MeasurementRow row : originalObservations) {
 				newInstance.add(new MeasurementRow(row));
 			}
 			currentObsCount++;
 			observations.addAll(WorkbookTest.setValuesPerInstance(newInstance, currentObsCount));
 		}
 
-		for (MeasurementRow row : observations) {
-			for (MeasurementData data : row.getDataList()) {
+		for (final MeasurementRow row : observations) {
+			for (final MeasurementData data : row.getDataList()) {
 				if (data.getMeasurementVariable().getTermId() == WorkbookTest.ASPERGILLUS_FLAVUS1_5
 						|| data.getMeasurementVariable().getTermId() == WorkbookTest.ASPERGILLUS_FLAVUSPPB) {
 					data.setValue(String.valueOf(new Random().nextInt(10000)));
@@ -617,11 +619,11 @@ public class WorkbookTest {
 		}
 	}
 
-	private static List<MeasurementRow> getFirstTrialInstance(List<MeasurementRow> observations) {
-		List<MeasurementRow> firstTrialInstance = new ArrayList<MeasurementRow>();
+	private static List<MeasurementRow> getFirstTrialInstance(final List<MeasurementRow> observations) {
+		final List<MeasurementRow> firstTrialInstance = new ArrayList<MeasurementRow>();
 		long oldLocationId = 0;
-		for (MeasurementRow row : observations) {
-			long locationId = row.getLocationId();
+		for (final MeasurementRow row : observations) {
+			final long locationId = row.getLocationId();
 			if (oldLocationId != locationId && oldLocationId != 0) {
 				break;
 			}
@@ -631,9 +633,9 @@ public class WorkbookTest {
 		return firstTrialInstance;
 	}
 
-	private static List<MeasurementRow> setValuesPerInstance(List<MeasurementRow> newInstance, int currentObsCount) {
-		for (MeasurementRow row : newInstance) {
-			for (MeasurementData data : row.getDataList()) {
+	private static List<MeasurementRow> setValuesPerInstance(final List<MeasurementRow> newInstance, final int currentObsCount) {
+		for (final MeasurementRow row : newInstance) {
+			for (final MeasurementData data : row.getDataList()) {
 				if (data.getMeasurementVariable().getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 					data.setValue(String.valueOf(currentObsCount));
 				}
@@ -646,9 +648,9 @@ public class WorkbookTest {
 		return newInstance;
 	}
 
-	public static void deleteExperimentPropVar(Workbook createdWorkbook) {
+	public static void deleteExperimentPropVar(final Workbook createdWorkbook) {
 		if (createdWorkbook.getFactors() != null) {
-			for (MeasurementVariable var : createdWorkbook.getFactors()) {
+			for (final MeasurementVariable var : createdWorkbook.getFactors()) {
 				if (var.getTermId() == WorkbookTest.DAY_OBS) {
 					var.setOperation(Operation.DELETE);
 				}
@@ -656,8 +658,8 @@ public class WorkbookTest {
 		}
 	}
 
-	private MeasurementVariable createMeasurementVariable(Integer termId) {
-		MeasurementVariable var = new MeasurementVariable();
+	private MeasurementVariable createMeasurementVariable(final Integer termId) {
+		final MeasurementVariable var = new MeasurementVariable();
 		var.setTermId(termId);
 		return var;
 	}
@@ -666,14 +668,14 @@ public class WorkbookTest {
 	public void testGetMeasurementDatasetVariablesViewForTrial() {
 		WorkbookTest.getTestWorkbook(1, StudyType.T);
 
-		List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
+		final List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 
-		List<MeasurementVariable> factors = workbook.getFactors();
-		List<MeasurementVariable> variates = workbook.getVariates();
+		final List<MeasurementVariable> factors = workbook.getFactors();
+		final List<MeasurementVariable> variates = workbook.getVariates();
 
-		int noOfFactors = factors.size();
-		int noOfVariates = variates.size();
-		int totalMeasurementVariableCount = noOfFactors + noOfVariates;
+		final int noOfFactors = factors.size();
+		final int noOfVariates = variates.size();
+		final int totalMeasurementVariableCount = noOfFactors + noOfVariates;
 
 		Assert.assertEquals(
 				"MeasurementDatasetVariablesView size should be the total no of non trial factors, variates and trial_instance",
@@ -697,9 +699,9 @@ public class WorkbookTest {
 
 		WorkbookTest.getTestWorkbook(1, StudyType.N);
 
-		List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
+		final List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 
-		int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
+		final int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
 
 		Assert.assertEquals("MeasurementDatasetVariablesView size should be the total no of non trial factors, variates",
 				totalMeasurementVariableCount, list.size());
@@ -708,12 +710,12 @@ public class WorkbookTest {
 
 	@Test
 	public void testArrangeMeasurementVariables() {
-		Workbook workbook = new Workbook();
+		final Workbook workbook = new Workbook();
 		List<MeasurementVariable> varList = new ArrayList<MeasurementVariable>();
 		varList.add(this.createMeasurementVariable(10));
 		varList.add(this.createMeasurementVariable(20));
 		varList.add(this.createMeasurementVariable(30));
-		List<Integer> columnOrderedList = new ArrayList<Integer>();
+		final List<Integer> columnOrderedList = new ArrayList<Integer>();
 		columnOrderedList.add(new Integer(20));
 		columnOrderedList.add(new Integer(30));
 		columnOrderedList.add(new Integer(10));
@@ -725,9 +727,10 @@ public class WorkbookTest {
 		assertEquals("3rd element should have term id 10", 10, varList.get(2).getTermId());
 	}
 
-	private MeasurementData createMeasurementData(int termId) {
-		MeasurementData data = new MeasurementData();
-		MeasurementVariable measurementVariable = new MeasurementVariable();
+
+	private MeasurementData createMeasurementData(final int termId) {
+		final MeasurementData data = new MeasurementData();
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		measurementVariable.setTermId(termId);
 		data.setMeasurementVariable(measurementVariable);
 		return data;
@@ -735,22 +738,22 @@ public class WorkbookTest {
 
 	@Test
 	public void testArrangeMeasurementObservation() {
-		Workbook workbook = new Workbook();
-		List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
-		MeasurementRow row = new MeasurementRow();
-		List<MeasurementData> dataList = new ArrayList<MeasurementData>();
+		final Workbook workbook = new Workbook();
+		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
+		final MeasurementRow row = new MeasurementRow();
+		final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
 		dataList.add(this.createMeasurementData(10));
 		dataList.add(this.createMeasurementData(20));
 		dataList.add(this.createMeasurementData(30));
 		row.setDataList(dataList);
 		observations.add(row);
 
-		List<Integer> columnOrderedList = new ArrayList<Integer>();
+		final List<Integer> columnOrderedList = new ArrayList<Integer>();
 		columnOrderedList.add(new Integer(20));
 		columnOrderedList.add(new Integer(30));
 		columnOrderedList.add(new Integer(10));
 		workbook.setColumnOrderedLists(columnOrderedList);
-		List<MeasurementRow> newObservations = workbook.arrangeMeasurementObservation(observations);
+		final List<MeasurementRow> newObservations = workbook.arrangeMeasurementObservation(observations);
 
 		assertEquals("1st element should have term id 20", 20, newObservations.get(0).getDataList().get(0).getMeasurementVariable()
 				.getTermId());
@@ -765,9 +768,9 @@ public class WorkbookTest {
 	}
 
 	private static Workbook createTestWorkbookWithErrors() {
-		Workbook workbook = new Workbook();
+		final Workbook workbook = new Workbook();
 
-		String studyName = "workbookWithErrors" + new Random().nextInt(10000);
+		final String studyName = "workbookWithErrors" + new Random().nextInt(10000);
 		WorkbookTest.createStudyDetails(workbook, studyName, StudyType.T);
 		WorkbookTest.createConditions(workbook, false, 1);
 		WorkbookTest.createFactors(workbook, false, false, 1);
@@ -778,12 +781,12 @@ public class WorkbookTest {
 		return workbook;
 	}
 
-	public static Workbook getTestWorkbookForWizard(String studyName, int trialNo) {
+	public static Workbook getTestWorkbookForWizard(final String studyName, final int trialNo) {
 		return WorkbookTest.createTestWorkbookForWizard(studyName, trialNo);
 	}
 
-	public static Workbook createTestWorkbookForWizard(String studyName, int trialNo) {
-		Workbook wbook = new Workbook();
+	public static Workbook createTestWorkbookForWizard(final String studyName, final int trialNo) {
+		final Workbook wbook = new Workbook();
 
 		WorkbookTest.createStudyDetails(wbook, studyName, StudyType.T);
 		WorkbookTest.createConditions(wbook, false, trialNo);

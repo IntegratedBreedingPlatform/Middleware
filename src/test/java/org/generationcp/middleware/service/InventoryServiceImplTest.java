@@ -374,7 +374,7 @@ public class InventoryServiceImplTest {
 
 		Mockito.doReturn(germplasmList).when(this.germplasmListDAO).getById(advanceListId);
 		Mockito.doReturn(lstListId).when(this.germplasmListDAO).getListDataListIDFromListDataProjectListID(advanceListId);
-		Mockito.doReturn(germplasmListDataList).when(this.germplasmListDataDAO).getByListId(lstListId, 0, Integer.MAX_VALUE);
+		Mockito.doReturn(germplasmListDataList).when(this.germplasmListDataDAO).getByListId(lstListId);
 		Mockito.doReturn(inventoryDetailsList).when(this.transactionDAO).getInventoryDetailsByTransactionRecordId(germplasmListDataIDList);
 		Mockito.doReturn(locationList).when(this.locationDAO).getByIds(Mockito.anyList());
 		Mockito.doReturn(scaleList).when(this.cvTermDAO).getByIds(Mockito.anyList());
@@ -412,7 +412,7 @@ public class InventoryServiceImplTest {
 
 		Mockito.doReturn(germplasmList).when(this.germplasmListDAO).getById(crossesId);
 		Mockito.doReturn(lstListId).when(this.germplasmListDAO).getListDataListIDFromListDataProjectListID(crossesId);
-		Mockito.doReturn(germplasmListDataList).when(this.germplasmListDataDAO).getByListId(lstListId, 0, Integer.MAX_VALUE);
+		Mockito.doReturn(germplasmListDataList).when(this.germplasmListDataDAO).getByListId(lstListId);
 		Mockito.doReturn(inventoryDetailsList).when(this.transactionDAO).getInventoryDetailsByTransactionRecordId(germplasmListDataIDList);
 		Mockito.doReturn(locationList).when(this.locationDAO).getByIds(Mockito.anyList());
 		Mockito.doReturn(scaleList).when(this.cvTermDAO).getByIds(Mockito.anyList());
@@ -529,7 +529,7 @@ public class InventoryServiceImplTest {
 
 		this.inventoryServiceImpl.getGermplasmListData(germplasmList, germplasmListType);
 
-		Mockito.verify(this.germplasmListDataDAO).getByListId(listId, 0, Integer.MAX_VALUE);
+		Mockito.verify(this.germplasmListDataDAO).getByListId(listId);
 	}
 
 	@Test
@@ -543,7 +543,7 @@ public class InventoryServiceImplTest {
 
 		this.inventoryServiceImpl.getGermplasmListData(germplasmList, germplasmListType);
 
-		Mockito.verify(this.germplasmListDataDAO).getByListId(listDataListId, 0, Integer.MAX_VALUE);
+		Mockito.verify(this.germplasmListDataDAO).getByListId(listDataListId);
 	}
 
 }

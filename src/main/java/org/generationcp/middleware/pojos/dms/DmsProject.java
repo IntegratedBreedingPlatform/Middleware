@@ -42,7 +42,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity()
 @Table(name = "project", uniqueConstraints = {@UniqueConstraint(columnNames = {"name"})})
-@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="project")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="project")
 public class DmsProject implements Serializable {
 
 	private static final long serialVersionUID = 464731947805951726L;
@@ -76,7 +76,7 @@ public class DmsProject implements Serializable {
 	/**
 	 * List of Project Properties
 	 */
-	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private List<ProjectProperty> properties;
 
 	@OneToMany(mappedBy = "subjectProject", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

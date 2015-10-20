@@ -33,7 +33,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "cvtermprop", uniqueConstraints = {@UniqueConstraint(columnNames = {"cvterm_id", "type_id", "value", "rank"})})
-@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="cvtermprop")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="cvtermprop")
 public class CVTermProperty implements Serializable {
 
 	private static final long serialVersionUID = -6496723408899540369L;

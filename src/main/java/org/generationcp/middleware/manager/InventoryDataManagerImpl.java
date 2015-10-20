@@ -524,8 +524,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		return report;
 	}
 
-	private List<GermplasmListData> getGermplasmListDataByListId(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
-		return this.getGermplasmListDataDAO().getByListId(id, start, numOfRows);
+	private List<GermplasmListData> getGermplasmListDataByListId(Integer id) throws MiddlewareQueryException {
+		return this.getGermplasmListDataDAO().getByListId(id);
 	}
 
 	@Override
@@ -542,13 +542,13 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	@Override
 	public List<GermplasmListData> getLotDetailsForList(Integer listId, int start, int numOfRows) throws MiddlewareQueryException {
-		List<GermplasmListData> listEntries = this.getGermplasmListDataByListId(listId, start, numOfRows);
+		List<GermplasmListData> listEntries = this.getGermplasmListDataByListId(listId);
 		return this.getListInventoryBuilder().retrieveInventoryLotsForList(listId, start, numOfRows, listEntries);
 	}
 
 	@Override
 	public List<GermplasmListData> getLotCountsForList(Integer id, int start, int numOfRows) throws MiddlewareQueryException {
-		List<GermplasmListData> listEntries = this.getGermplasmListDataByListId(id, start, numOfRows);
+		List<GermplasmListData> listEntries = this.getGermplasmListDataByListId(id);
 		return this.getListInventoryBuilder().retrieveLotCountsForList(listEntries);
 	}
 

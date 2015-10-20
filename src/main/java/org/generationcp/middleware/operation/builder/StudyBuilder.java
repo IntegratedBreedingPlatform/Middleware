@@ -18,9 +18,16 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 public class StudyBuilder extends Builder {
 
+	private static final Logger LOG = LoggerFactory.getLogger(StudyBuilder.class);
+	
 	public StudyBuilder(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
@@ -35,12 +42,17 @@ public class StudyBuilder extends Builder {
 	}
 
 	public Study createStudy(int studyId, boolean hasVariabletype) throws MiddlewareException {
-		Study study = null;
-		DmsProject project = this.getDmsProjectDao().getById(studyId);
-		if (project != null) {
-			study = this.createStudy(project, hasVariabletype);
+		Monitor monitor = MonitorFactory.start("Build Study");
+		try {
+			Study study = null;
+			DmsProject project = this.getDmsProjectDao().getById(studyId);
+			if (project != null) {
+				study = this.createStudy(project, hasVariabletype);
+			}
+			return study;
+		} finally {
+			LOG.debug("" + monitor.stop());
 		}
-		return study;
 	}
 
 	public Study createStudy(DmsProject project) throws MiddlewareException {

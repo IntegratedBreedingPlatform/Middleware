@@ -376,6 +376,18 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		return null;
 	}
+	
+	@Override
+	public DatasetReference findOneDataSetReferenceByType(int studyId, DataSetType type) {
+		List<DmsProject> datasetProjects =
+				this.getDmsProjectDao().getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(),
+						String.valueOf(type.getId()));
+		if (datasetProjects != null && !datasetProjects.isEmpty()) {
+			DmsProject dataSetProject = datasetProjects.get(0);
+			return new DatasetReference(dataSetProject.getProjectId(), dataSetProject.getName(), dataSetProject.getDescription());
+		}
+		return null;
+	}
 
 	@Override
 	public void deleteDataSet(int datasetId) throws MiddlewareQueryException {
@@ -1065,5 +1077,21 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<String> getAllSharedProjectNames() throws MiddlewareQueryException {
 		return this.getDmsProjectDao().getAllSharedProjectNames();
+	}
+
+	@Override
+	public boolean checkIfAnyLocationIDsExistInExperiments(int studyId, DataSetType dataSetType, List<Integer> locationIds) {
+
+		List<DmsProject> datasetProjects =
+				this.getDmsProjectDao().getDataSetsByStudyAndProjectProperty(studyId, TermId.DATASET_TYPE.getId(),
+						String.valueOf(dataSetType.getId()));
+
+		if (!datasetProjects.isEmpty()) {
+			int dataSetId = datasetProjects.get(0).getProjectId();
+			return this.getExperimentDao().checkIfAnyLocationIDsExistInExperiments(dataSetId, locationIds);
+		} else {
+			return false;
+		}
+
 	}
 }

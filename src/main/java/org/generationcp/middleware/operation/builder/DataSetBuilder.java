@@ -35,6 +35,11 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.util.DatasetUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 public class DataSetBuilder extends Builder {
 
@@ -44,6 +49,8 @@ public class DataSetBuilder extends Builder {
 
 	private static final List<Integer> HIDDEN_DATASET_COLUMNS = Arrays.asList(TermId.DATASET_NAME.getId(), TermId.DATASET_TITLE.getId(),
 			TermId.DATASET_TYPE.getId());
+	
+	private static final Logger LOG = LoggerFactory.getLogger(DataSetBuilder.class);
 
 	public DataSetBuilder(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
@@ -58,12 +65,18 @@ public class DataSetBuilder extends Builder {
 	}
 
 	public DataSet build(int dataSetId) throws MiddlewareException {
-		DataSet dataSet = null;
-		DmsProject project = this.dmsProjectDao.getById(dataSetId);
-		if (project != null) {
-			dataSet = this.createDataSet(project);
+		Monitor monitor = MonitorFactory.start("Build DataSet. dataSetId: " + dataSetId);
+		try {
+			DataSet dataSet = null;
+			DmsProject project = this.dmsProjectDao.getById(dataSetId);
+			if (project != null) {
+				dataSet = this.createDataSet(project);
+			}
+			return dataSet;
+		} finally {
+			LOG.debug("" + monitor.stop());
 		}
-		return dataSet;
+
 	}
 
 	public VariableTypeList getVariableTypes(int dataSetId) throws MiddlewareException {
@@ -124,7 +137,7 @@ public class DataSetBuilder extends Builder {
 			throw new MiddlewareQueryException("no.dataset.found", "No datasets found for study " + studyId);
 		}
 		for (DatasetReference datasetReference : datasetReferences) {
-			if (datasetReference.getName().endsWith(DatasetUtil.NEW_SUMMARY_DATASET_NAME_SUFFIX)) {
+			if (datasetReference.getName().endsWith(DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX)) {
 				return this.getDmsProjectById(datasetReference.getId());
 			}
 		}
