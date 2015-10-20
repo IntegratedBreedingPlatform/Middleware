@@ -126,7 +126,7 @@ public class StockSaver extends Saver {
 	private StockProperty createProperty(Variable variable) throws MiddlewareQueryException {
 		StockProperty property = new StockProperty();
 		property.setTypeId(variable.getVariableType().getId());
-		property.setValue(this.getStockPropertyValue(variable));
+		property.setValue(variable.getDatabaseValue());
 		property.setRank(variable.getVariableType().getRank());
 
 		return property;
