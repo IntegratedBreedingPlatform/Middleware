@@ -431,13 +431,17 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		return variables;
 	}
+	
+	public static void removeCachedVariable(int id){
+		variableCache.remove(id);
+	}
 
 	@Override
 	public Variable getVariable(String programUuid, Integer id, boolean filterObsolete, boolean calculateVariableUsage) {
 
 		Variable cachedVariable = variableCache.get(id);
 		if (cachedVariable != null) {
-			LOG.debug("Variable for id [{}] found in cahce, returning the cached value.", id);
+			LOG.debug("Variable for id [{}] found in cache, returning the cached value.", id);
 			return cachedVariable;
 		}
 
@@ -595,7 +599,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@Override
 	public void updateVariable(OntologyVariableInfo variableInfo) {
 
-		variableCache.remove(variableInfo.getId());
+		OntologyVariableDataManagerImpl.removeCachedVariable(variableInfo.getId());
 		
 		VariableInfoDaoElements elements = new VariableInfoDaoElements();
 		elements.setVariableId(variableInfo.getId());
@@ -722,7 +726,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@Override
 	public void deleteVariable(Integer id) {
 		
-		variableCache.remove(id);
+		OntologyVariableDataManagerImpl.removeCachedVariable(id);
 		
 		CVTerm term = this.getCvTermDao().getById(id);
 
