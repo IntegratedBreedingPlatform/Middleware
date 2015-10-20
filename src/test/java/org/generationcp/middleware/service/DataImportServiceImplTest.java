@@ -27,6 +27,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.util.Message;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -55,6 +56,9 @@ public class DataImportServiceImplTest {
 	protected HibernateSessionProvider sessionProvider;
 
 	@Mock
+	private ServiceDaoFactory serviceDaoFactory;
+
+	@Mock
 	private LocationDAO locationDAO;
 
 	@Mock
@@ -79,6 +83,15 @@ public class DataImportServiceImplTest {
 	private static final String MISSING_LOCATION_IDS_ERROR_KEY = "import.missing.location.ids";
 	private static final String MISSING_PERSON_IDS_ERROR_KEY = "import.missing.person.ids";
 	private static final String MISSING_GERMPLASM_IDS_ERROR_KEY = "import.missing.germplasm.ids";
+
+	@Before
+	public void setup() {
+
+		Mockito.when(this.serviceDaoFactory.getPersonDAO()).thenReturn(this.personDAO);
+		Mockito.when(this.serviceDaoFactory.getLocationDAO()).thenReturn(this.locationDAO);
+		Mockito.when(this.serviceDaoFactory.getGermplasmDAO()).thenReturn(this.germplasmDAO);
+
+	}
 
 	@Test
 	public void testStrictParseWorkbookWithGreaterThan32VarNames() throws Exception {

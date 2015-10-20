@@ -24,9 +24,6 @@ import java.util.TreeSet;
 
 import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.LocationDAO;
-import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -66,11 +63,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String LOCATION_ID_VALUES = "LOCATION_ID_VALUES";
 	public static final String GERMPLASM_ID_VALUES = "GERMPLASM_ID_VALUES";
 
-	private final LocationDAO locationDAO = new LocationDAO();
-	private final PersonDAO personDAO = new PersonDAO();
-	private final GermplasmDAO germplasmDAO = new GermplasmDAO();
 	@Autowired
 	private OntologyDataManagerImpl ontologyDataManagerImpl;
+
+	private ServiceDaoFactory serviceDaoFactory;
 
 	public DataImportServiceImpl() {
 		super();
@@ -79,6 +75,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	public DataImportServiceImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		this.serviceDaoFactory = new ServiceDaoFactory(sessionProvider);
 	}
 
 	/**
@@ -715,8 +712,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	private void verifyGermplasmIdsIfExisting(final Set<Integer> gidsToVerify, final Set<String> invalidGids) {
-		this.germplasmDAO.setSession(this.sessionProvider.getSession());
-		final List<Integer> existingGermplasmIds = this.germplasmDAO.getExistingGIDs(new ArrayList<>(gidsToVerify));
+		final List<Integer> existingGermplasmIds = this.serviceDaoFactory.getGermplasmDAO().getExistingGIDs(new ArrayList<>(gidsToVerify));
 		for (final Integer gid : gidsToVerify) {
 			if (!existingGermplasmIds.contains(gid)) {
 				invalidGids.add(Integer.toString(gid));
@@ -725,8 +721,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	private void verifyPersonIdsIfExisting(final Set<Integer> personIdsToVerify, final Set<String> invalidPersonIds) {
-		this.personDAO.setSession(this.sessionProvider.getSession());
-		final List<Integer> existingPersonIds = this.personDAO.getExistingPersonIds(new ArrayList<>(personIdsToVerify));
+		final List<Integer> existingPersonIds =
+				this.serviceDaoFactory.getPersonDAO().getExistingPersonIds(new ArrayList<>(personIdsToVerify));
 		for (final Integer personId : personIdsToVerify) {
 			if (!existingPersonIds.contains(personId)) {
 				invalidPersonIds.add(Integer.toString(personId));
@@ -737,9 +733,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	private void verifyLocationIdsIfExisting(final Set<Integer> locationIdsToVerify, final Set<String> invalidLocationIds,
 			final String programUUID) {
-		this.locationDAO.setSession(this.sessionProvider.getSession());
 		final List<Integer> existingLocationIds =
-				this.locationDAO.getExistingLocationIds(new ArrayList<>(locationIdsToVerify), programUUID);
+				this.serviceDaoFactory.getLocationDAO().getExistingLocationIds(new ArrayList<>(locationIdsToVerify), programUUID);
 		for (final Integer locationId : locationIdsToVerify) {
 			if (!existingLocationIds.contains(locationId)) {
 				invalidLocationIds.add(Integer.toString(locationId));

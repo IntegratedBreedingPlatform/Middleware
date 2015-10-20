@@ -70,7 +70,7 @@ public class InventoryServiceImplTest {
 	private HibernateSessionProvider sessionProvider;
 
 	@Mock
-	private InventoryDaoFactory inventoryDaoFactory;
+	private ServiceDaoFactory serviceDaoFactory;
 
 	@Mock
 	private LotDAO lotDAO;
@@ -108,15 +108,16 @@ public class InventoryServiceImplTest {
 	@Before
 	public void setup() {
 
-		Mockito.when(this.inventoryDaoFactory.getTransactionDAO()).thenReturn(this.transactionDAO);
-		Mockito.when(this.inventoryDaoFactory.getStockTransactionDAO()).thenReturn(this.stockTransactionDAO);
-		Mockito.when(this.inventoryDaoFactory.getPersonDAO()).thenReturn(this.personDAO);
-		Mockito.when(this.inventoryDaoFactory.getLotDao()).thenReturn(this.lotDAO);
-		Mockito.when(this.inventoryDaoFactory.getLocationDAO()).thenReturn(this.locationDAO);
-		Mockito.when(this.inventoryDaoFactory.getGermplasmListDataDAO()).thenReturn(this.germplasmListDataDAO);
-		Mockito.when(this.inventoryDaoFactory.getGermplasmListDAO()).thenReturn(this.germplasmListDAO);
-		Mockito.when(this.inventoryDaoFactory.getCvTermDao()).thenReturn(this.cvTermDAO);
+		Mockito.when(this.serviceDaoFactory.getTransactionDAO()).thenReturn(this.transactionDAO);
+		Mockito.when(this.serviceDaoFactory.getStockTransactionDAO()).thenReturn(this.stockTransactionDAO);
+		Mockito.when(this.serviceDaoFactory.getPersonDAO()).thenReturn(this.personDAO);
+		Mockito.when(this.serviceDaoFactory.getLotDao()).thenReturn(this.lotDAO);
+		Mockito.when(this.serviceDaoFactory.getLocationDAO()).thenReturn(this.locationDAO);
+		Mockito.when(this.serviceDaoFactory.getGermplasmListDataDAO()).thenReturn(this.germplasmListDataDAO);
+		Mockito.when(this.serviceDaoFactory.getGermplasmListDAO()).thenReturn(this.germplasmListDAO);
+		Mockito.when(this.serviceDaoFactory.getCvTermDao()).thenReturn(this.cvTermDAO);
 	}
+
 
 	@Test
 	public void testGetCurrentNotificationNumber_NullInventoryIds() throws MiddlewareException {
