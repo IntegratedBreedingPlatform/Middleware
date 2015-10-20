@@ -205,28 +205,49 @@ public class MeasurementVariable {
 
 	@Override
 	public String toString() {
-		return "MeasurementVariable{" +
-				"termId=" + termId +
-				", name='" + name + '\'' +
-				", description='" + description + '\'' +
-				", scale='" + scale + '\'' +
-				", method='" + method + '\'' +
-				", property='" + property + '\'' +
-				", dataType='" + dataType + '\'' +
-				", value='" + value + '\'' +
-				", label='" + label + '\'' +
-				", isFactor=" + isFactor +
-				", dataTypeId=" + dataTypeId +
-				", possibleValues=" + possibleValues +
-				", possibleValuesString='" + possibleValuesString + '\'' +
-				", minRange=" + minRange +
-				", maxRange=" + maxRange +
-				", required=" + required +
-				", treatmentLabel='" + treatmentLabel + '\'' +
-				", operation=" + operation +
-				", role=" + role +
-				", variableType=" + variableType +
-				'}';
+		StringBuilder builder = new StringBuilder();
+		builder.append("MeasurementVariable [termId=");
+		builder.append(this.termId);
+		builder.append(", name=");
+		builder.append(this.name);
+		builder.append(", description=");
+		builder.append(this.description);
+		builder.append(", scale=");
+		builder.append(this.scale);
+		builder.append(", method=");
+		builder.append(this.method);
+		builder.append(", property=");
+		builder.append(this.property);
+		builder.append(", dataType=");
+		builder.append(this.dataType);
+		builder.append(", role=");
+		builder.append(this.role);
+		builder.append(", value=");
+		builder.append(this.value);
+		builder.append(", label=");
+		builder.append(this.label);
+        builder.append(", isFactor=");
+        builder.append(this.isFactor);
+        builder.append(", dataTypeId=");
+        builder.append(this.dataTypeId);
+        builder.append(", possibleValues=");
+		builder.append(this.possibleValues);
+        builder.append(", possibleValuesString=");
+        builder.append(this.possibleValuesString);
+        builder.append(", minRange=");
+        builder.append(this.minRange);
+        builder.append(", maxRange=");
+        builder.append(this.maxRange);
+        builder.append(", required=");
+        builder.append(this.required);
+        builder.append(", treatmentLabel=");
+        builder.append(this.treatmentLabel);
+        builder.append(", operation=");
+        builder.append(this.operation);
+        builder.append(", variableType=");
+        builder.append(this.variableType);
+		builder.append("]");
+		return builder.toString();
 	}
 
 	public void print(int indent) {
