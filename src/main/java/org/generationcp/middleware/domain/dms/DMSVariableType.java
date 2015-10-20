@@ -109,22 +109,6 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 	//NOTE: We also add variable type to associated standard variable.
 	public void setVariableType(VariableType variableType) {
 		this.variableType = variableType;
-
-		if(variableType == null) {
-			return;
-		}
-
-		//NOTE: Add Variable Type if Standard Variable is not null
-		if (this.getStandardVariable() != null){
-			Set<VariableType> variableTypes = this.getStandardVariable().getVariableTypes();
-
-			if(variableTypes == null){
-				variableTypes = new HashSet<>();
-			}
-
-			variableTypes.add(variableType);
-			this.getStandardVariable().setVariableTypes(variableTypes);
-		}
 	}
 
 	@Override
