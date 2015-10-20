@@ -211,23 +211,39 @@ public class Variate implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Variate{" +
-				"name='" + name + '\'' +
-				", description='" + description + '\'' +
-				", property='" + property + '\'' +
-				", scale='" + scale + '\'' +
-				", method='" + method + '\'' +
-				", role='" + role + '\'' +
-				", variableType='" + variableType + '\'' +
-				", datatype='" + datatype + '\'' +
-				", dataTypeId=" + dataTypeId +
-				", possibleValues=" + possibleValues +
-				", minRange=" + minRange +
-				", maxRange=" + maxRange +
-				", operation=" + operation +
-				", id=" + id +
-				", storedIn=" + storedIn +
-				'}';
+        StringBuilder builder = new StringBuilder();
+        builder.append("Variate [name=");
+        builder.append(this.name);
+        builder.append(", description=");
+        builder.append(this.description);
+        builder.append(", property=");
+        builder.append(this.property);
+        builder.append(", scale=");
+        builder.append(this.scale);
+        builder.append(", method=");
+        builder.append(this.method);
+        builder.append(", role=");
+        builder.append(this.role);
+        builder.append(", variableType=");
+        builder.append(this.variableType);
+        builder.append(", datatype=");
+        builder.append(this.datatype);
+        builder.append(", dataTypeId=");
+        builder.append(this.dataTypeId);
+        builder.append(", possibleValues=");
+        builder.append(this.possibleValues);
+        builder.append(", minRange=");
+        builder.append(this.minRange);
+        builder.append(", maxRange=");
+        builder.append(this.maxRange);
+        builder.append(", operation=");
+        builder.append(this.operation);
+        builder.append(", id=");
+        builder.append(this.id);
+        builder.append(", storedIn=");
+        builder.append(this.storedIn);
+        builder.append("]");
+        return builder.toString();
 	}
 
 	public void print(int indent) {
