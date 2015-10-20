@@ -145,17 +145,25 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 	}
 
 	@Override
-	public String toString() {
-		return "DMSVariableType{" +
-				"localName='" + localName + '\'' +
-				", localDescription='" + localDescription + '\'' +
-				", rank=" + rank +
-				", standardVariable=" + standardVariable +
-				", treatmentLabel='" + treatmentLabel + '\'' +
-				", role=" + role +
-				", variableType=" + variableType +
-				'}';
-	}
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("DMSVariableType [localName=");
+        builder.append(this.localName);
+        builder.append(", localDescription=");
+        builder.append(this.localDescription);
+        builder.append(", rank=");
+        builder.append(this.rank);
+        builder.append(", standardVariable=");
+        builder.append(this.standardVariable);
+        builder.append(", role=");
+        builder.append(this.role);
+        builder.append(", treatmentLabel=");
+        builder.append(this.treatmentLabel);
+        builder.append(", variableType=");
+        builder.append(this.variableType);
+        builder.append("]");
+        return builder.toString();
+    }
 
 	public void print(int indent) {
 		Debug.println(indent, "DMS Variable Type: ");
@@ -167,7 +175,6 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 		Debug.println(indent + 3, "role: " + this.role);
 		Debug.println(indent + 3, "variableType: " + this.variableType);
 	}
-
 
 	@Override
 	// Sort in ascending order by rank
