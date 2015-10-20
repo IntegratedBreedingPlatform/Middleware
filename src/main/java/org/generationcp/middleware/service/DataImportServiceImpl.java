@@ -47,6 +47,7 @@ import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.util.TimerWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -68,6 +69,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	private final LocationDAO locationDAO = new LocationDAO();
 	private final PersonDAO personDAO = new PersonDAO();
 	private final GermplasmDAO germplasmDAO = new GermplasmDAO();
+	@Autowired
+	private OntologyDataManagerImpl ontologyDataManagerImpl;
 
 	public DataImportServiceImpl() {
 		super();
@@ -158,10 +161,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public Workbook strictParseWorkbook(final File file, final String programUUID) throws WorkbookParserException {
 		final WorkbookParser parser = new WorkbookParser();
 
-		final OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(this.getSessionProvider());
-
 		// partially parse the file to parse the description sheet only at first
-		return this.strictParseWorkbook(file, parser, parser.parseFile(file, true), ontology, programUUID);
+		return this.strictParseWorkbook(file, parser, parser.parseFile(file, true), this.ontologyDataManagerImpl, programUUID);
 	}
 
 	protected Workbook strictParseWorkbook(final File file, final WorkbookParser parser, final Workbook workbook,
