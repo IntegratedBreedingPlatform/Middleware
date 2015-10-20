@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -25,7 +26,6 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.etl.WorkbookTest;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -110,8 +110,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetTrialObservationsForNursery() throws MiddlewareException {
-		WorkbookTest.setTestWorkbook(null);
-		final Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
+		WorkbookTestDataInitializer.setTestWorkbook(null);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
 
 		final int id = this.dataImportService.saveDataset(workbook, null);
 
@@ -146,8 +146,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetTrialObservationsForTrial() throws MiddlewareException {
-		WorkbookTest.setTestWorkbook(null);
-		final Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
+		WorkbookTestDataInitializer.setTestWorkbook(null);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 
 		final int id = this.dataImportService.saveDataset(workbook, null);
 
@@ -286,10 +286,10 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testRemoveTrialDatasetVariables() throws MiddlewareException {
-		WorkbookTest.setTestWorkbook(null);
-		final Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
+		WorkbookTestDataInitializer.setTestWorkbook(null);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 		// add trial instance (also added in conditions)
-		workbook.getFactors().add(WorkbookTest.createTrialInstanceMeasurementVariable(1));
+		workbook.getFactors().add(WorkbookTestDataInitializer.createTrialInstanceMeasurementVariable(1));
 		final VariableTypeList factorsVariableTypeList =
 				this.variableTypeListTransformer.transform(workbook.getFactors(), false, PROGRAM_UUID);
 		final VariableTypeList conditionsVariableTypeList =
