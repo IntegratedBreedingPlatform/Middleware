@@ -89,15 +89,23 @@ public class VariableInfo {
 
 	@Override
 	public String toString() {
-		return "VariableInfo{" +
-				"localName='" + localName + '\'' +
-				", localDescription='" + localDescription + '\'' +
-				", rank=" + rank +
-				", stdVariableId=" + stdVariableId +
-				", treatmentLabel='" + treatmentLabel + '\'' +
-				", role=" + role +
-				", variableType=" + variableType +
-				'}';
+        StringBuilder builder = new StringBuilder();
+        builder.append("VariableInfo [localName=");
+        builder.append(this.localName);
+        builder.append(", localDescription=");
+        builder.append(this.localDescription);
+        builder.append(", stdVariableId=");
+        builder.append(this.stdVariableId);
+        builder.append(", treatmentLabel=");
+        builder.append(this.treatmentLabel);
+        builder.append(", role=");
+        builder.append(this.role);
+        builder.append(", rank=");
+        builder.append(this.rank);
+        builder.append(", variableType=");
+        builder.append(this.variableType);
+        builder.append("]");
+        return builder.toString();
 	}
 
 	public void print(int indent) {
