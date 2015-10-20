@@ -14,6 +14,7 @@ package org.generationcp.middleware.domain.dms;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,7 +29,7 @@ public class VariableList implements Serializable {
 
 	private List<Variable> variables = new ArrayList<Variable>();
 	private VariableTypeList variableTypes = null;
-	private Map<String, Variable> variableMap;
+	private Map<String, Variable> variableMap = new LinkedHashMap<>();
 
 	public void add(Variable variable) {
 		this.variables.add(variable);
@@ -111,8 +112,15 @@ public class VariableList implements Serializable {
 	}
 
 	public Variable findByLocalName(String localName) {
+
+		// added for optimization
+		if (this.variableMap != null && this.variableMap.get(localName) != null) {
+			return this.variableMap.get(localName);
+		}
+
 		if (this.variables != null && localName != null) {
 			for (Variable variable : this.variables) {
+				this.variableMap.put(variable.getVariableType().getLocalName(), variable);
 				if (localName.equals(variable.getVariableType().getLocalName())) {
 					return variable;
 				}
