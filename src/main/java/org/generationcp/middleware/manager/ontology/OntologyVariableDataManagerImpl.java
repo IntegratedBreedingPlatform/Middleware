@@ -61,7 +61,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	private static final String TERM_IS_NOT_VARIABLE = "The term {0} is not Variable.";
 	private static final String VARIABLE_EXIST_WITH_SAME_NAME = "Variable exist with same name";
 	private static final String CAN_NOT_DELETE_USED_VARIABLE = "Used variable can not be deleted";
-    private static final String VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE = "Analysis variable should not clubbed with other variable type";
+    private static final String VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE = "Analysis variable type should not be assigned together with any other variable type";
 
 	@Autowired
 	private OntologyMethodDataManager methodManager;
