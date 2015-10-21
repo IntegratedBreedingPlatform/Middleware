@@ -1,17 +1,18 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos.germplasm;
 
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 
 public class SingleGermplasmCrossElement implements GermplasmCrossElement {
 
@@ -23,18 +24,18 @@ public class SingleGermplasmCrossElement implements GermplasmCrossElement {
 		return this.germplasm;
 	}
 
-	public void setGermplasm(Germplasm germplasm) {
+	public void setGermplasm(final Germplasm germplasm) {
 		this.germplasm = germplasm;
 	}
 
 	@Override
 	public String toString() {
 		if (this.germplasm != null) {
-			String crossName = this.germplasm.getCrossName();
-			if(crossName != null){
-				return crossName;
-			}else {
-				return "";
+			final Name nameObject = this.germplasm.getPreferredName();
+			if (nameObject == null) {
+				return this.germplasm.getGid().toString();
+			} else {
+				return nameObject.getNval();
 			}
 		} else {
 			return "Unknown";
