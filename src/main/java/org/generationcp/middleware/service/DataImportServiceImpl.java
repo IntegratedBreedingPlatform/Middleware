@@ -64,7 +64,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String GERMPLASM_ID_VALUES = "GERMPLASM_ID_VALUES";
 
 	@Autowired
-	private OntologyDataManagerImpl ontologyDataManagerImpl;
+	private OntologyDataManager ontologyDataManager;
 
 	private ServiceDaoFactory serviceDaoFactory;
 
@@ -159,7 +159,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		final WorkbookParser parser = new WorkbookParser();
 
 		// partially parse the file to parse the description sheet only at first
-		return this.strictParseWorkbook(file, parser, parser.parseFile(file, true), this.ontologyDataManagerImpl, programUUID);
+		return this.strictParseWorkbook(file, parser, parser.parseFile(file, true), this.ontologyDataManager, programUUID);
 	}
 
 	protected Workbook strictParseWorkbook(final File file, final WorkbookParser parser, final Workbook workbook,
