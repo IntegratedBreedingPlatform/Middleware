@@ -144,21 +144,21 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	}
 
     @Test(expected = MiddlewareException.class)
-    public void testAddAnalysisVariableShouldNotClubbedWithOtherVariableType() throws Exception {
+    public void testAddAnalysisVariableShouldNotBeAssignedWithOtherVariableType() throws Exception {
         OntologyVariableInfo variableInfo = new OntologyVariableInfo();
         variableInfo.setName(OntologyDataCreationUtil.getNewRandomName());
         variableInfo.addVariableType(VariableType.ANALYSIS);
         variableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
         this.variableManager.addVariable(variableInfo);
-        Assert.fail("Analysis variable should not clubbed with other variable type");
+        Assert.fail("Analysis variable type should not be assigned together with any other variable type");
     }
 
     @Test(expected = MiddlewareException.class)
-    public void testUpdateAnalysisVariableShouldNotClubbedWithOtherVariableType() throws Exception {
+    public void testUpdateAnalysisVariableShouldNotBeAssignedWithOtherVariableType() throws Exception {
         this.testVariableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
         this.testVariableInfo.addVariableType(VariableType.ANALYSIS);
         this.variableManager.updateVariable(this.testVariableInfo);
-        Assert.fail("Analysis variable should not clubbed with other variable type");
+        Assert.fail("Analysis variable type should not be assigned together with any other variable type");
     }
 
 	@Test
