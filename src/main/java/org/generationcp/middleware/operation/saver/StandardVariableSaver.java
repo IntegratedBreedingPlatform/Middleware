@@ -38,11 +38,11 @@ public class StandardVariableSaver extends Saver {
 
 	private static final int CV_VARIABLES = 1040;
 
-	public StandardVariableSaver(HibernateSessionProvider sessionProviderForLocal) {
+	public StandardVariableSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
 
-	public void delete(StandardVariable stdVar) throws MiddlewareException {
+	public void delete(final StandardVariable stdVar) throws MiddlewareException {
 		this.deleteEnumerations(stdVar.getId(), stdVar.getEnumerations());
 
 		if (stdVar.getCropOntologyId() != null) {
@@ -54,7 +54,7 @@ public class StandardVariableSaver extends Saver {
 		this.deleteRelationship(stdVar.getId(), TermId.HAS_PROPERTY.getId(), stdVar.getProperty());
 		this.deleteRelationship(stdVar.getId(), TermId.HAS_METHOD.getId(), stdVar.getMethod());
 
-		List<NameSynonym> nameSynonyms = this.getStandardVariableBuilder().createSynonyms(stdVar.getId());
+		final List<NameSynonym> nameSynonyms = this.getStandardVariableBuilder().createSynonyms(stdVar.getId());
 		this.deleteSynonyms(stdVar.getId(), nameSynonyms);
 
 		if (stdVar.getConstraints() != null) {
@@ -65,21 +65,21 @@ public class StandardVariableSaver extends Saver {
 		this.deleteCvTerm(this.getCvTermDao().getById(stdVar.getId()));
 	}
 
-	public void deleteConstraints(StandardVariable stdVar) throws MiddlewareQueryException {
+	public void deleteConstraints(final StandardVariable stdVar) throws MiddlewareQueryException {
 		if (stdVar.getConstraints() != null) {
 			this.deleteConstraint(stdVar.getId(), TermId.MIN_VALUE.getId(), stdVar.getConstraints().getMinValue());
 			this.deleteConstraint(stdVar.getId(), TermId.MAX_VALUE.getId(), stdVar.getConstraints().getMaxValue());
 		}
 	}
 
-	public Integer save(StandardVariable stdVar) throws MiddlewareQueryException {
-		CVTerm varTerm = this.createCvTerm(stdVar);
-		int varId = varTerm.getCvTermId();
+	public Integer save(final StandardVariable stdVar) throws MiddlewareQueryException {
+		final CVTerm varTerm = this.createCvTerm(stdVar);
+		final int varId = varTerm.getCvTermId();
 		stdVar.setId(varId);
 
 		if (stdVar.getConstraints() != null) {
-			Integer minValueId = this.saveConstraint(varId, TermId.MIN_VALUE.getId(), stdVar.getConstraints().getMinValue());
-			Integer maxValueId = this.saveConstraint(varId, TermId.MAX_VALUE.getId(), stdVar.getConstraints().getMaxValue());
+			final Integer minValueId = this.saveConstraint(varId, TermId.MIN_VALUE.getId(), stdVar.getConstraints().getMinValue());
+			final Integer maxValueId = this.saveConstraint(varId, TermId.MAX_VALUE.getId(), stdVar.getConstraints().getMaxValue());
 			stdVar.getConstraints().setMinValueId(minValueId);
 			stdVar.getConstraints().setMaxValueId(maxValueId);
 		}
@@ -98,16 +98,16 @@ public class StandardVariableSaver extends Saver {
 		return stdVar.getId();
 	}
 
-	public void saveConstraints(int standardVariableId, VariableConstraints constraints) throws MiddlewareQueryException {
+	public void saveConstraints(final int standardVariableId, final VariableConstraints constraints) throws MiddlewareQueryException {
 		if (constraints.getMinValueId() == null) { // add
-			Integer minId = this.saveConstraint(standardVariableId, TermId.MIN_VALUE.getId(), constraints.getMinValue());
+			final Integer minId = this.saveConstraint(standardVariableId, TermId.MIN_VALUE.getId(), constraints.getMinValue());
 			constraints.setMinValueId(minId);
 		} else { // update
 			this.updateConstraint(constraints.getMinValueId(), standardVariableId, TermId.MIN_VALUE.getId(), constraints.getMinValue());
 		}
 
 		if (constraints.getMaxValueId() == null) {// add
-			Integer maxId = this.saveConstraint(standardVariableId, TermId.MAX_VALUE.getId(), constraints.getMaxValue());
+			final Integer maxId = this.saveConstraint(standardVariableId, TermId.MAX_VALUE.getId(), constraints.getMaxValue());
 			constraints.setMaxValueId(maxId);
 		} else { // update
 			this.updateConstraint(constraints.getMaxValueId(), standardVariableId, TermId.MAX_VALUE.getId(), constraints.getMaxValue());
@@ -116,25 +116,25 @@ public class StandardVariableSaver extends Saver {
 	}
 
 	/*
-	 * Saves CvTerm and CvTermRelationship in the database
-	 * Checktypes/Enumerations/Categories are now saved under Scale in the new Ontology Design
-	 * See BMS-36 for more information
+	 * Saves CvTerm and CvTermRelationship in the database Checktypes/Enumerations/Categories are now saved under Scale in the new Ontology
+	 * Design See BMS-36 for more information
 	 */
-	public void saveEnumeration(StandardVariable variable, Enumeration enumeration, Integer cvId) throws MiddlewareException {
+	public void saveEnumeration(final StandardVariable variable, final Enumeration enumeration, final Integer cvId)
+			throws MiddlewareException {
 
 		this.validateInputEnumeration(variable, enumeration);
 
 		// Save cvterm entry of the new valid value
-		CVTerm cvTerm = this.createCvTerm(enumeration, cvId);
+		final CVTerm cvTerm = this.createCvTerm(enumeration, cvId);
 		enumeration.setId(cvTerm.getCvTermId());
 		// save cvterm relationship
 		this.saveCvTermRelationship(variable.getScale().getId(), TermId.HAS_VALUE.getId(), enumeration.getId());
 	}
 
-	private void validateInputEnumeration(StandardVariable variable, Enumeration enumeration) throws MiddlewareException {
-		String name = enumeration.getName();
-		String definition = enumeration.getDescription();
-		StringBuilder errorMessage = new StringBuilder("");
+	private void validateInputEnumeration(final StandardVariable variable, final Enumeration enumeration) throws MiddlewareException {
+		final String name = enumeration.getName();
+		final String definition = enumeration.getDescription();
+		final StringBuilder errorMessage = new StringBuilder("");
 
 		if (StringUtils.isEmpty(name)) {
 			errorMessage.append("\nname is null or empty");
@@ -163,7 +163,7 @@ public class StandardVariableSaver extends Saver {
 
 	}
 
-	private CVTerm createCvTerm(StandardVariable stdVar) throws MiddlewareQueryException {
+	private CVTerm createCvTerm(final StandardVariable stdVar) throws MiddlewareQueryException {
 
 		// check to see if term exists in DB before we create a new one
 		CVTerm cvTerm = this.getCvTermDao().getByNameAndCvId(stdVar.getName(), StandardVariableSaver.CV_VARIABLES);
@@ -183,8 +183,8 @@ public class StandardVariableSaver extends Saver {
 		return cvTerm;
 	}
 
-	private CVTerm createCvTerm(Enumeration enumeration, Integer cvId) throws MiddlewareQueryException {
-		CVTerm cvTerm = new CVTerm();
+	private CVTerm createCvTerm(final Enumeration enumeration, final Integer cvId) throws MiddlewareQueryException {
+		final CVTerm cvTerm = new CVTerm();
 		cvTerm.setCv(cvId);
 		cvTerm.setName(enumeration.getName());
 		cvTerm.setDefinition(enumeration.getDescription());
@@ -194,8 +194,8 @@ public class StandardVariableSaver extends Saver {
 		return cvTerm;
 	}
 
-	public CV createCv(StandardVariable variable) throws MiddlewareQueryException {
-		CV cv = new CV();
+	public CV createCv(final StandardVariable variable) throws MiddlewareQueryException {
+		final CV cv = new CV();
 		cv.setName(String.valueOf(variable.getId()));
 		cv.setDefinition(String.valueOf(variable.getName() + " - " + variable.getDescription()));
 		this.getCvDao().save(cv);
@@ -203,11 +203,11 @@ public class StandardVariableSaver extends Saver {
 
 	}
 
-	private void saveRelationship(int subjectId, int typeId, Term object) throws MiddlewareQueryException {
+	private void saveRelationship(final int subjectId, final int typeId, final Term object) throws MiddlewareQueryException {
 		if (object != null) {
 			// see if this relationship already exists (this saves us from dealing with a Unique Constraint Exception)
 			boolean exists = false;
-			CVTermRelationship relationship = this.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
+			final CVTermRelationship relationship = this.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
 			if (relationship != null && relationship.getObjectId() == object.getId()) {
 
 				// the relationship exists, as stipulated by unique constraint subject-type-object must be unique
@@ -218,22 +218,22 @@ public class StandardVariableSaver extends Saver {
 				this.saveCvTermRelationship(subjectId, typeId, object.getId());
 			}
 		} else {
-			throw new MiddlewareQueryException("The CvTermRelationship field is required for " + subjectId + " with relationship type of "
-					+ typeId);
+			throw new MiddlewareQueryException(
+					"The CvTermRelationship field is required for " + subjectId + " with relationship type of " + typeId);
 		}
 	}
 
-	private void saveCvTermRelationship(int subjectId, int typeId, int objectId) throws MiddlewareQueryException {
-		CVTermRelationship relationship = new CVTermRelationship();
+	private void saveCvTermRelationship(final int subjectId, final int typeId, final int objectId) throws MiddlewareQueryException {
+		final CVTermRelationship relationship = new CVTermRelationship();
 		relationship.setSubjectId(subjectId);
 		relationship.setTypeId(typeId);
 		relationship.setObjectId(objectId);
 		this.getCvTermRelationshipDao().save(relationship);
 	}
 
-	private Integer saveConstraint(int cvTermId, int typeId, Double constraintValue) throws MiddlewareQueryException {
+	private Integer saveConstraint(final int cvTermId, final int typeId, final Double constraintValue) throws MiddlewareQueryException {
 		if (constraintValue != null) {
-			CVTermProperty property = new CVTermProperty();
+			final CVTermProperty property = new CVTermProperty();
 			property.setTypeId(typeId);
 			property.setValue(constraintValue.toString());
 			property.setRank(0);
@@ -244,9 +244,10 @@ public class StandardVariableSaver extends Saver {
 		return null;
 	}
 
-	private void updateConstraint(int constraintId, int cvTermId, int typeId, Double constraintValue) throws MiddlewareQueryException {
+	private void updateConstraint(final int constraintId, final int cvTermId, final int typeId, final Double constraintValue)
+			throws MiddlewareQueryException {
 		if (constraintValue != null) {
-			CVTermProperty property = new CVTermProperty();
+			final CVTermProperty property = new CVTermProperty();
 			property.setCvTermPropertyId(constraintId);
 			property.setTypeId(typeId);
 			property.setValue(constraintValue.toString());
@@ -256,28 +257,28 @@ public class StandardVariableSaver extends Saver {
 		}
 	}
 
-	private void saveEnumerations(int varId, StandardVariable variable) throws MiddlewareQueryException {
-		
-		List<Enumeration> enumerations = variable.getEnumerations();
-		
-		if (enumerations != null && !enumerations.isEmpty()) {
-			for (Enumeration enumeration : enumerations) {
-				
-				if (enumeration.getId() == null){
+	private void saveEnumerations(final int varId, final StandardVariable variable) throws MiddlewareQueryException {
 
-					Integer cvId = this.getEnumerationCvId(variable);
-					CVTerm cvTerm = this.createCvTerm(enumeration, cvId);
+		final List<Enumeration> enumerations = variable.getEnumerations();
+
+		if (enumerations != null && !enumerations.isEmpty()) {
+			for (final Enumeration enumeration : enumerations) {
+
+				if (enumeration.getId() == null) {
+
+					final Integer cvId = this.getEnumerationCvId(variable);
+					final CVTerm cvTerm = this.createCvTerm(enumeration, cvId);
 					enumeration.setId(cvTerm.getCvTermId());
 
 				}
-				
+
 				this.saveCvTermRelationship(varId, TermId.HAS_VALUE.getId(), enumeration.getId());
-				
+
 			}
 		}
 	}
-	
-	private Integer getEnumerationCvId(StandardVariable variable) throws MiddlewareQueryException {
+
+	private Integer getEnumerationCvId(final StandardVariable variable) throws MiddlewareQueryException {
 
 		// Check if cv entry of enumeration already exists
 		// Add cv entry of the standard variable if none found
@@ -289,20 +290,19 @@ public class StandardVariableSaver extends Saver {
 
 		return cvId;
 	}
-	
 
-	public void update(StandardVariable standardVariable) throws MiddlewareQueryException {
-		CVTerm varTerm = this.getStandardVariableBuilder().getCvTerm(standardVariable.getName(), CvId.VARIABLES.getId());
+	public void update(final StandardVariable standardVariable) throws MiddlewareQueryException {
+		final CVTerm varTerm = this.getStandardVariableBuilder().getCvTerm(standardVariable.getName(), CvId.VARIABLES.getId());
 		varTerm.setName(standardVariable.getName());
 		varTerm.setDefinition(standardVariable.getDescription());
 		varTerm.setIsObsolete(false);
 		varTerm.setIsRelationshipType(false);
 		this.getCvTermDao().update(varTerm);
 
-		List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(standardVariable.getId());
+		final List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(standardVariable.getId());
 		if (relationships != null && !relationships.isEmpty()) {
-			for (CVTermRelationship relationship : relationships) {
-				Integer objectId = this.getRelevantObjectIdBasedOnType(relationship.getTypeId(), standardVariable);
+			for (final CVTermRelationship relationship : relationships) {
+				final Integer objectId = this.getRelevantObjectIdBasedOnType(relationship.getTypeId(), standardVariable);
 				// STORED_IN can not be updated.
 
 				if (objectId != null && !objectId.equals(relationship.getObjectId())) {
@@ -314,7 +314,7 @@ public class StandardVariableSaver extends Saver {
 
 	}
 
-	protected Integer getRelevantObjectIdBasedOnType(final Integer typeID, StandardVariable standardVariable) {
+	protected Integer getRelevantObjectIdBasedOnType(final Integer typeID, final StandardVariable standardVariable) {
 		Integer objectId = null;
 
 		if (typeID == TermId.HAS_PROPERTY.getId()) {
@@ -338,19 +338,18 @@ public class StandardVariableSaver extends Saver {
 		return objectId;
 	}
 
-	public String validate(StandardVariable standardVariable, Operation operation) throws MiddlewareQueryException {
+	public String validate(final StandardVariable standardVariable, final Operation operation) throws MiddlewareQueryException {
 
 		StringBuilder errorCodes = null;
 
-		Term term = this.getTermBuilder().findTermByName(standardVariable.getName(), CvId.VARIABLES);
+		final Term term = this.getTermBuilder().findTermByName(standardVariable.getName(), CvId.VARIABLES);
 		if (term != null && operation == Operation.ADD) {
 			errorCodes = new StringBuilder();
 			errorCodes.append(ErrorCode.NON_UNIQUE_NAME.getCode());
 		}
 
-		Integer varId =
-				this.getStandardVariableBuilder().getIdByPropertyScaleMethodRole(standardVariable.getProperty().getId(),
-						standardVariable.getScale().getId(), standardVariable.getMethod().getId(), standardVariable.getPhenotypicType());
+		final Integer varId = this.getStandardVariableBuilder().getIdByPropertyScaleMethodRole(standardVariable.getProperty().getId(),
+				standardVariable.getScale().getId(), standardVariable.getMethod().getId(), standardVariable.getPhenotypicType());
 		if (varId != null && (operation == Operation.ADD || operation == Operation.UPDATE && varId != standardVariable.getId())) {
 			if (errorCodes == null) {
 				errorCodes = new StringBuilder();
@@ -363,7 +362,7 @@ public class StandardVariableSaver extends Saver {
 		return errorCodes != null ? errorCodes.toString() : null;
 	}
 
-	public void saveOrUpdateCropOntologyId(Integer traitId, String cropOntologyId) throws MiddlewareQueryException {
+	public void saveOrUpdateCropOntologyId(final Integer traitId, final String cropOntologyId) throws MiddlewareQueryException {
 
 		CVTermProperty cropOntologyProperty = this.getCvTermPropertyDao().getOneByCvTermAndType(traitId, TermId.CROP_ONTOLOGY_ID.getId());
 		if (cropOntologyProperty != null && cropOntologyProperty.getValue() != null
@@ -397,44 +396,44 @@ public class StandardVariableSaver extends Saver {
 
 	}
 
-	public void deleteEnumeration(int varId, Enumeration enumeration) throws MiddlewareException {
+	public void deleteEnumeration(final int varId, final Enumeration enumeration) throws MiddlewareException {
 		this.deleteCvTermRelationship(varId, TermId.HAS_VALUE.getId(), enumeration.getId());
 		this.deleteCvTerm(this.getCvTermDao().getById(enumeration.getId()));
 	}
 
-	public void deleteEnumerations(int varId, List<Enumeration> enumerations) throws MiddlewareException {
+	public void deleteEnumerations(final int varId, final List<Enumeration> enumerations) throws MiddlewareException {
 		if (enumerations != null && !enumerations.isEmpty()) {
-			for (Enumeration enumeration : enumerations) {
+			for (final Enumeration enumeration : enumerations) {
 				this.deleteEnumeration(varId, enumeration);
 			}
 		}
 	}
 
-	private void deleteCvTermRelationship(int subjectId, int typeId, int objectId) throws MiddlewareException {
-		Term typeTerm = this.getTermBuilder().get(typeId);
+	private void deleteCvTermRelationship(final int subjectId, final int typeId, final int objectId) throws MiddlewareException {
+		final Term typeTerm = this.getTermBuilder().get(typeId);
 		if (typeTerm != null) {
-			CVTermRelationship cvRelationship =
+			final CVTermRelationship cvRelationship =
 					this.getCvTermRelationshipDao().getRelationshipSubjectIdObjectIdByTypeId(subjectId, objectId, typeId);
 			if (cvRelationship != null) {
-				CVTermRelationshipDao dao = this.getCvTermRelationshipDao();
+				final CVTermRelationshipDao dao = this.getCvTermRelationshipDao();
 				try {
 					dao.makeTransient(cvRelationship);
-				} catch (MiddlewareQueryException e) {
+				} catch (final MiddlewareQueryException e) {
 					throw new MiddlewareQueryException(e.getMessage(), e);
 				}
 			}
 		}
 	}
 
-	public void deleteCropOntologyId(Integer traitId, String cropOntologyId) throws MiddlewareQueryException {
-		CVTerm trait = this.getCvTermDao().getById(traitId);
+	public void deleteCropOntologyId(final Integer traitId, final String cropOntologyId) throws MiddlewareQueryException {
+		final CVTerm trait = this.getCvTermDao().getById(traitId);
 		if (trait == null) {
 			throw new MiddlewareQueryException("Specified trait ID for deletion of crop ontology ID is not valid");
 		}
 
-		List<CVTermProperty> traitProperties = this.getTermPropertyBuilder().findProperties(traitId);
+		final List<CVTermProperty> traitProperties = this.getTermPropertyBuilder().findProperties(traitId);
 
-		for (CVTermProperty traitProperty : traitProperties) {
+		for (final CVTermProperty traitProperty : traitProperties) {
 			if (traitProperty.getTypeId() == TermId.CROP_ONTOLOGY_ID.getId()) {
 				if (traitProperty.getValue() != null && !traitProperty.getValue().equals(cropOntologyId)) {
 					this.getCvTermPropertyDao().makeTransient(traitProperty);
@@ -444,41 +443,41 @@ public class StandardVariableSaver extends Saver {
 		}
 	}
 
-	private void deleteRelationship(int subjectId, int typeId, Term object) throws MiddlewareException {
+	private void deleteRelationship(final int subjectId, final int typeId, final Term object) throws MiddlewareException {
 		if (object != null) {
 			this.deleteCvTermRelationship(subjectId, typeId, object.getId());
 		} else {
-			throw new MiddlewareQueryException("The CvTermRelationship field is required for " + subjectId + " with relationship type of "
-					+ typeId);
+			throw new MiddlewareQueryException(
+					"The CvTermRelationship field is required for " + subjectId + " with relationship type of " + typeId);
 		}
 	}
 
-	private void deleteSynonyms(int cvTermId, List<NameSynonym> nameSynonyms) throws MiddlewareQueryException {
+	private void deleteSynonyms(final int cvTermId, final List<NameSynonym> nameSynonyms) throws MiddlewareQueryException {
 		if (nameSynonyms != null && !nameSynonyms.isEmpty()) {
-			List<CVTermSynonym> cvTermSynonyms = this.getCvTermSynonymDao().getByCvTermId(cvTermId);
+			final List<CVTermSynonym> cvTermSynonyms = this.getCvTermSynonymDao().getByCvTermId(cvTermId);
 			if (cvTermSynonyms != null) {
-				for (CVTermSynonym cvTermSynonym : cvTermSynonyms) {
+				for (final CVTermSynonym cvTermSynonym : cvTermSynonyms) {
 					this.getCvTermSynonymDao().makeTransient(cvTermSynonym);
 				}
 			}
 		}
 	}
 
-	private void deleteConstraint(int cvTermId, int typeId, Double constraintValue) throws MiddlewareQueryException {
+	private void deleteConstraint(final int cvTermId, final int typeId, final Double constraintValue) throws MiddlewareQueryException {
 		if (constraintValue != null) {
-			List<CVTermProperty> properties = this.getCvTermPropertyDao().getByCvTermAndType(cvTermId, typeId);
+			final List<CVTermProperty> properties = this.getCvTermPropertyDao().getByCvTermAndType(cvTermId, typeId);
 
-			for (CVTermProperty cvTermProperty : properties) {
+			for (final CVTermProperty cvTermProperty : properties) {
 				this.getCvTermPropertyDao().makeTransient(cvTermProperty);
 			}
 		}
 	}
 
-	public void deleteCvTerm(CVTerm cvTerm) throws MiddlewareQueryException {
-		CVTermDao dao = this.getCvTermDao();
+	public void deleteCvTerm(final CVTerm cvTerm) throws MiddlewareQueryException {
+		final CVTermDao dao = this.getCvTermDao();
 		try {
 			dao.makeTransient(cvTerm);
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 	}

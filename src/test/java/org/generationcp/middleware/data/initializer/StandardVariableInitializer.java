@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.data.initializer;
 
 import java.util.ArrayList;
@@ -9,9 +10,9 @@ import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.Term;
 
 public class StandardVariableInitializer {
-	
-	public static StandardVariable createStdVariable(){
-		StandardVariable stdVariable = new StandardVariable();
+
+	public static StandardVariable createStdVariable() {
+		final StandardVariable stdVariable = new StandardVariable();
 		stdVariable.setName("variable name " + new Random().nextInt(10000));
 		stdVariable.setDescription("variable description");
 		stdVariable.setProperty(new Term(2002, "User", "Database user"));
@@ -25,7 +26,7 @@ public class StandardVariableInitializer {
 		stdVariable.getEnumerations().add(new Enumeration(10002, "PN", "Pedigree nursery", 3));
 		stdVariable.setConstraints(new VariableConstraints(100.0, 999.0));
 		stdVariable.setCropOntologyId("CROP-TEST");
-		
+
 		return stdVariable;
 	}
 }
