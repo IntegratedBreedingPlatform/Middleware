@@ -791,10 +791,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	protected Map<String, Integer> retrieveControlledVariablesMap(final Workbook workbook) {
 		final Map<String, Integer> controlledVariablesMap = new LinkedHashMap<>();
 		for (final MeasurementVariable measurementVariable : workbook.getAllVariables()) {
-			if (measurementVariable.getTermId() == TermId.PI_ID.getId() || measurementVariable.getTermId() == TermId.COOPERATOOR_ID.getId()
-					|| measurementVariable.getTermId() == TermId.LOCATION_ID.getId()
-					|| measurementVariable.getTermId() == TermId.GID.getId()) {
-				controlledVariablesMap.put(measurementVariable.getName(), measurementVariable.getTermId());
+			Integer ontologyId = measurementVariable.getTermId();
+			if (ontologyId == 0) {
+				ontologyId = this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(),
+						measurementVariable.getScale(), measurementVariable.getMethod());
+			}
+			if (ontologyId != null && (ontologyId == TermId.PI_ID.getId() || ontologyId == TermId.COOPERATOOR_ID.getId()
+					|| ontologyId == TermId.LOCATION_ID.getId() || ontologyId == TermId.GID.getId())) {
+				controlledVariablesMap.put(measurementVariable.getName(), ontologyId);
 			}
 		}
 		return controlledVariablesMap;

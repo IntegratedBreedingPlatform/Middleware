@@ -84,6 +84,19 @@ public class DataImportServiceImplTest {
 	private static final String MISSING_PERSON_IDS_ERROR_KEY = "import.missing.person.ids";
 	private static final String MISSING_GERMPLASM_IDS_ERROR_KEY = "import.missing.germplasm.ids";
 
+	private static final String TRIAL_INSTANCE = "Trial instance";
+	private static final String NUMBER = "Number";
+	private static final String ENUMERATED = "Enumerated";
+	private static final String GERMPLASM_ENTRY = "Germplasm entry";
+	private static final String FIELD_PLOT = "Field plot";
+	private static final String PERSON = "Person";
+	private static final String PERSON_ID = "Person id";
+	private static final String CONDUCTED = "Conducted";
+	private static final String LOCATION = "Location";
+	private static final String LOCATION_ID = "Location id";
+	private static final String ASSIGNED = "Assigned";
+	private static final String GERMPLASM_ID = "Germplasm id";
+
 	@Before
 	public void setup() {
 
@@ -337,17 +350,17 @@ public class DataImportServiceImplTest {
 		for (Message message : returnVal) {
 			if (MISSING_LOCATION_IDS_ERROR_KEY.equals(message.getMessageKey())) {
 				List<String> nonEmptyLocationIds = this.getAllNonEmptyValues(LOCATION_IDS_TEST_DATA);
-				Assert.assertEquals(StringUtils.join(new TreeSet<>(nonEmptyLocationIds), ","),
+				Assert.assertEquals(StringUtils.join(new TreeSet<>(nonEmptyLocationIds), ", "),
 						message.getMessageParams()[0]);
 			} else if (MISSING_PERSON_IDS_ERROR_KEY.equals(message.getMessageKey())) {
 				List<String> nonEmptyPiIds = this.getAllNonEmptyValues(PI_IDS_TEST_DATA);
 				List<String> nonEmptyCooperatorIds = this.getAllNonEmptyValues(COOPERATOR_IDS_TEST_DATA);
 				Set<String> nonEmptyPersonIds = new TreeSet<>(nonEmptyPiIds);
 				nonEmptyPersonIds.addAll(nonEmptyCooperatorIds);
-				Assert.assertEquals(StringUtils.join(nonEmptyPersonIds, ","), message.getMessageParams()[0]);
+				Assert.assertEquals(StringUtils.join(nonEmptyPersonIds, ", "), message.getMessageParams()[0]);
 			} else if (MISSING_GERMPLASM_IDS_ERROR_KEY.equals(message.getMessageKey())) {
 				List<String> nonEmptyGermplasmIds = this.getAllNonEmptyValues(GERMPLASM_IDS_TEST_DATA);
-				Assert.assertEquals(StringUtils.join(new TreeSet<>(nonEmptyGermplasmIds), ","),
+				Assert.assertEquals(StringUtils.join(new TreeSet<>(nonEmptyGermplasmIds), ", "),
 						message.getMessageParams()[0]);
 			} else {
 				Assert.fail("We're only expecting errors related to missing location ids, person ids and germplasm ids");
@@ -480,5 +493,109 @@ public class DataImportServiceImplTest {
 		invalidValues.add(GERMPLASM_IDS_TEST_DATA.get(4));
 		invalidValues.add(GERMPLASM_IDS_TEST_DATA.get(5));
 		return invalidValues;
+	}
+
+	@Test
+	public void testCheckForInvalidRecordsOfControlledVariablesFromAutoImport() {
+		Workbook workbookWithControlledVariables = this.createWorkbookWithControlledVariablesWithoutIdTestData();
+		this.setupGetStandardVariableIdByPropertyScaleMethodMocks();
+
+		// test where all non empty controlled variables are VALID values
+		List<String> personIds = new ArrayList<>(PI_IDS_TEST_DATA);
+		personIds.addAll(COOPERATOR_IDS_TEST_DATA);
+		List<Integer> existingPersonIds = this.getAllNumericValues(personIds);
+
+		Mockito.doReturn(existingPersonIds).when(this.personDAO).getExistingPersonIds(Mockito.anyList());
+		Mockito.doReturn(this.getAllNumericValues(LOCATION_IDS_TEST_DATA)).when(this.locationDAO).getExistingLocationIds(Mockito.anyList(),
+				Mockito.anyString());
+		Mockito.doReturn(this.getAllNumericValues(GERMPLASM_IDS_TEST_DATA)).when(this.germplasmDAO).getExistingGIDs(Mockito.anyList());
+
+		List<Message> returnVal =
+				this.dataImportService.checkForInvalidRecordsOfControlledVariables(workbookWithControlledVariables, PROGRAM_UUID);
+
+		Assert.assertTrue(returnVal.isEmpty());
+	}
+
+	@Test
+	public void testCheckForInvalidRecordsOfControlledVariablesWithMissingValuesFromAutoImport() {
+		Workbook workbookWithControlledVariables = this.createWorkbookWithControlledVariablesWithoutIdTestData();
+		this.setupGetStandardVariableIdByPropertyScaleMethodMocks();
+
+		// test where all non empty controlled variables are INVALID values (MISSING)
+		List<Integer> emptyList = new ArrayList<>();
+
+		Mockito.doReturn(emptyList).when(this.personDAO).getExistingPersonIds(Mockito.anyList());
+		Mockito.doReturn(emptyList).when(this.locationDAO).getExistingLocationIds(Mockito.anyList(), Mockito.anyString());
+		Mockito.doReturn(emptyList).when(this.germplasmDAO).getExistingGIDs(Mockito.anyList());
+
+		List<Message> returnVal =
+				this.dataImportService.checkForInvalidRecordsOfControlledVariables(workbookWithControlledVariables, PROGRAM_UUID);
+
+		Assert.assertFalse(returnVal.isEmpty());
+		for (Message message : returnVal) {
+			if (MISSING_LOCATION_IDS_ERROR_KEY.equals(message.getMessageKey())) {
+				List<String> nonEmptyLocationIds = this.getAllNonEmptyValues(LOCATION_IDS_TEST_DATA);
+				Assert.assertEquals(StringUtils.join(new TreeSet<>(nonEmptyLocationIds), ", "), message.getMessageParams()[0]);
+			} else if (MISSING_PERSON_IDS_ERROR_KEY.equals(message.getMessageKey())) {
+				List<String> nonEmptyPiIds = this.getAllNonEmptyValues(PI_IDS_TEST_DATA);
+				List<String> nonEmptyCooperatorIds = this.getAllNonEmptyValues(COOPERATOR_IDS_TEST_DATA);
+				Set<String> nonEmptyPersonIds = new TreeSet<>(nonEmptyPiIds);
+				nonEmptyPersonIds.addAll(nonEmptyCooperatorIds);
+				Assert.assertEquals(StringUtils.join(nonEmptyPersonIds, ", "), message.getMessageParams()[0]);
+			} else if (MISSING_GERMPLASM_IDS_ERROR_KEY.equals(message.getMessageKey())) {
+				List<String> nonEmptyGermplasmIds = this.getAllNonEmptyValues(GERMPLASM_IDS_TEST_DATA);
+				Assert.assertEquals(StringUtils.join(new TreeSet<>(nonEmptyGermplasmIds), ", "), message.getMessageParams()[0]);
+			} else {
+				Assert.fail("We're only expecting errors related to missing location ids, person ids and germplasm ids");
+			}
+
+		}
+	}
+
+	private void setupGetStandardVariableIdByPropertyScaleMethodMocks() {
+		Mockito.doReturn(TermId.TRIAL_INSTANCE_FACTOR.getId()).when(this.ontology)
+		.getStandardVariableIdByPropertyScaleMethod(TRIAL_INSTANCE, NUMBER, ENUMERATED);
+		Mockito.doReturn(TermId.ENTRY_NO.getId()).when(this.ontology).getStandardVariableIdByPropertyScaleMethod(GERMPLASM_ENTRY, NUMBER,
+				ENUMERATED);
+		Mockito.doReturn(TermId.PLOT_NO.getId()).when(this.ontology).getStandardVariableIdByPropertyScaleMethod(FIELD_PLOT, NUMBER,
+				ENUMERATED);
+		Mockito.doReturn(TermId.PI_ID.getId()).when(this.ontology).getStandardVariableIdByPropertyScaleMethod(PERSON, PERSON_ID, ASSIGNED);
+		Mockito.doReturn(TermId.COOPERATOOR_ID.getId()).when(this.ontology).getStandardVariableIdByPropertyScaleMethod(PERSON, PERSON_ID,
+				CONDUCTED);
+		Mockito.doReturn(TermId.LOCATION_ID.getId()).when(this.ontology).getStandardVariableIdByPropertyScaleMethod(LOCATION, LOCATION_ID,
+				ASSIGNED);
+		Mockito.doReturn(TermId.GID.getId()).when(this.ontology).getStandardVariableIdByPropertyScaleMethod(GERMPLASM_ID, GERMPLASM_ID,
+				ASSIGNED);
+
+	}
+
+	private Workbook createWorkbookWithControlledVariablesWithoutIdTestData() {
+		Workbook workbookWithControlledVariables = new Workbook();
+		workbookWithControlledVariables.setFactors(this.createFactorsWithControlledVariablesWithoutIdTestData());
+		workbookWithControlledVariables.setObservations(this.createObservationsWithControlledVariablesTestData());
+		return workbookWithControlledVariables;
+	}
+
+	private List<MeasurementVariable> createFactorsWithControlledVariablesWithoutIdTestData() {
+		List<MeasurementVariable> factors = new ArrayList<>();
+		// required variables
+		factors.add(this.createMeasurementVariableWithoutIdTestData(TermId.TRIAL_INSTANCE_FACTOR.toString(),TRIAL_INSTANCE,NUMBER,ENUMERATED));
+		factors.add(this.createMeasurementVariableWithoutIdTestData(TermId.ENTRY_NO.toString(),GERMPLASM_ENTRY,NUMBER,ENUMERATED));
+		factors.add(this.createMeasurementVariableWithoutIdTestData(TermId.PLOT_NO.toString(),FIELD_PLOT,NUMBER,ENUMERATED));
+		// controlled variables
+		factors.add(this.createMeasurementVariableWithoutIdTestData(TermId.PI_ID.toString(),PERSON,PERSON_ID,ASSIGNED));
+		factors.add(this.createMeasurementVariableWithoutIdTestData(TermId.COOPERATOOR_ID.toString(),PERSON,PERSON_ID,CONDUCTED));
+		factors.add(this.createMeasurementVariableWithoutIdTestData(TermId.LOCATION_ID.toString(),LOCATION,LOCATION_ID,ASSIGNED));
+		factors.add(this.createMeasurementVariableWithoutIdTestData(TermId.GID.toString(),GERMPLASM_ID,GERMPLASM_ID,ASSIGNED));
+		return factors;
+	}
+
+	private MeasurementVariable createMeasurementVariableWithoutIdTestData(String name, String property, String scale, String method) {
+		MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setName(name);
+		measurementVariable.setProperty(property);
+		measurementVariable.setScale(scale);
+		measurementVariable.setMethod(method);
+		return measurementVariable;
 	}
 }
