@@ -27,6 +27,7 @@ import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
+import org.generationcp.middleware.util.InvalidRecords;
 import org.generationcp.middleware.util.Message;
 import org.junit.Assert;
 import org.junit.Before;
@@ -242,10 +243,10 @@ public class DataImportServiceImplTest {
 				Mockito.anyString());
 		Mockito.doReturn(this.getAllNumericValues(GERMPLASM_IDS_TEST_DATA)).when(this.germplasmDAO).getExistingGIDs(Mockito.anyList());
 
-		List<Message> returnVal =
+		InvalidRecords invalidRecords =
 				this.dataImportService.checkForInvalidRecordsOfControlledVariables(workbookWithControlledVariables, PROGRAM_UUID);
 
-		Assert.assertTrue(returnVal.isEmpty());
+		Assert.assertNull(invalidRecords);
 	}
 
 	private List<Integer> getAllNumericValues(List<String> list) {
@@ -333,8 +334,9 @@ public class DataImportServiceImplTest {
 		Mockito.doReturn(emptyList).when(this.locationDAO).getExistingLocationIds(Mockito.anyList(), Mockito.anyString());
 		Mockito.doReturn(emptyList).when(this.germplasmDAO).getExistingGIDs(Mockito.anyList());
 
-		List<Message> returnVal =
+		InvalidRecords invalidRecords =
 				this.dataImportService.checkForInvalidRecordsOfControlledVariables(workbookWithControlledVariables, PROGRAM_UUID);
+		List<Message> returnVal = invalidRecords.getErrorMessages();
 
 		Assert.assertFalse(returnVal.isEmpty());
 		for (Message message : returnVal) {
@@ -376,9 +378,8 @@ public class DataImportServiceImplTest {
 		Map<String, Set<String>> validValuesMap = this.createValidValuesMapTestData();
 		this.createValidValuesMapTestData();
 		Workbook workbookWithControlledVariables = this.createWorkbookWithControlledVariablesTestData();
-		workbookWithControlledVariables.setInvalidValuesMap(invalidValuesMap);
 		// call method to test
-		this.dataImportService.discardMissingRecords(workbookWithControlledVariables);
+		this.dataImportService.discardMissingRecords(workbookWithControlledVariables, invalidValuesMap);
 		// assert statements
 		Map<String, Integer> controlledVariablesMap =
 				this.dataImportService.retrieveControlledVariablesMap(workbookWithControlledVariables);
@@ -500,10 +501,10 @@ public class DataImportServiceImplTest {
 				Mockito.anyString());
 		Mockito.doReturn(this.getAllNumericValues(GERMPLASM_IDS_TEST_DATA)).when(this.germplasmDAO).getExistingGIDs(Mockito.anyList());
 
-		List<Message> returnVal =
+		InvalidRecords invalidRecords =
 				this.dataImportService.checkForInvalidRecordsOfControlledVariables(workbookWithControlledVariables, PROGRAM_UUID);
 
-		Assert.assertTrue(returnVal.isEmpty());
+		Assert.assertNull(invalidRecords);
 	}
 
 	@Test
@@ -518,8 +519,9 @@ public class DataImportServiceImplTest {
 		Mockito.doReturn(emptyList).when(this.locationDAO).getExistingLocationIds(Mockito.anyList(), Mockito.anyString());
 		Mockito.doReturn(emptyList).when(this.germplasmDAO).getExistingGIDs(Mockito.anyList());
 
-		List<Message> returnVal =
+		InvalidRecords invalidRecords =
 				this.dataImportService.checkForInvalidRecordsOfControlledVariables(workbookWithControlledVariables, PROGRAM_UUID);
+		List<Message> returnVal = invalidRecords.getErrorMessages();
 
 		Assert.assertFalse(returnVal.isEmpty());
 		for (Message message : returnVal) {

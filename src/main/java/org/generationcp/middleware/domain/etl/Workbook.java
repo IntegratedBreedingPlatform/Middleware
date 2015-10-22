@@ -85,8 +85,6 @@ public class Workbook {
 	private boolean hasExistingDataOverwrite;
 	private List<Integer> columnOrderedLists;
 
-	// These are used in handling missing records in Import Datasets
-	private Map<String, Set<String>> invalidValuesMap;
 	public Workbook() {
 		this.reset();
 	}
@@ -116,7 +114,6 @@ public class Workbook {
 		this.trialConstants = null;
 		this.treatmentFactors = null;
 		this.hasExistingDataOverwrite = false;
-		this.invalidValuesMap = null;
 	}
 
 	public StudyDetails getStudyDetails() {
@@ -1011,14 +1008,6 @@ public class Workbook {
 
 	public void setColumnOrderedLists(final List<Integer> columnOrderedLists) {
 		this.columnOrderedLists = columnOrderedLists;
-	}
-
-	public Map<String, Set<String>> getInvalidValuesMap() {
-		return this.invalidValuesMap;
-	}
-
-	public void setInvalidValuesMap(Map<String, Set<String>> invalidValuesMap) {
-		this.invalidValuesMap = invalidValuesMap;
 	}
 
 }

@@ -14,9 +14,11 @@ package org.generationcp.middleware.service.api;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
+import org.generationcp.middleware.util.InvalidRecords;
 import org.generationcp.middleware.util.Message;
 
 /**
@@ -111,8 +113,8 @@ public interface DataImportService {
 
 	Map<String, List<Message>> validateProjectData(Workbook importData, String programUUID);
 
-	List<Message> checkForInvalidRecordsOfControlledVariables(Workbook workbook, String programUUID);
+	InvalidRecords checkForInvalidRecordsOfControlledVariables(Workbook workbook, String programUUID);
 
-	void discardMissingRecords(Workbook workbook);
+	void discardMissingRecords(Workbook workbook, Map<String, Set<String>> invalidValuesMap);
 
 }

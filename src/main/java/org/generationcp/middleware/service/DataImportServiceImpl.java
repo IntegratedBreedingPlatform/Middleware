@@ -39,6 +39,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.util.InvalidRecords;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.util.TimerWatch;
 import org.slf4j.Logger;
@@ -641,17 +642,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			errors.put(Constants.OBSERVATION_DATA_ERRORS, requiredVariableValueErrors);
 		}
 
-		if (errors.isEmpty()) {
-			// check invalid records only when there are no more errors in the workbook
-			errors.put(Constants.OBSERVATION_DATA_ERRORS, this.checkForInvalidRecordsOfControlledVariables(workbook, programUUID));
-		}
-
 		return errors;
 	}
 
 	@Override
-	public List<Message> checkForInvalidRecordsOfControlledVariables(final Workbook workbook, final String programUUID) {
-		final List<Message> returnVal = new ArrayList<Message>();
+	public InvalidRecords checkForInvalidRecordsOfControlledVariables(final Workbook workbook, final String programUUID) {
+		final List<Message> errorMessages = new ArrayList<Message>();
 
 		final Map<String, Integer> controlledVariablesMap = this.retrieveControlledVariablesMap(workbook);
 		final Map<String, Set<Integer>> idsToVerifyMap = this.initializeIdsToVerifyMap();
@@ -667,14 +663,15 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		}
 
 		this.verifyRecordIdsIfExistingElseAddToInvalidList(idsToVerifyMap, invalidValuesMap, programUUID);
-		final boolean hasAdditionalErrors = this.addErrorMessagesForInvalidValues(returnVal, invalidValuesMap);
+		final boolean hasErrors = this.addErrorMessagesForInvalidValues(errorMessages, invalidValuesMap);
 
-		if (hasAdditionalErrors) {
-			workbook.setInvalidValuesMap(invalidValuesMap);
-		} else {
-			workbook.setInvalidValuesMap(null);
+		if (hasErrors) {
+			InvalidRecords invalidRecords = new InvalidRecords();
+			invalidRecords.setInvalidRecordsMap(invalidValuesMap);
+			invalidRecords.setErrorMessages(errorMessages);
+			return invalidRecords;
 		}
-		return returnVal;
+		return null;
 	}
 
 	private boolean addErrorMessagesForInvalidValues(final List<Message> returnVal, final Map<String, Set<String>> invalidValuesMap) {
@@ -880,8 +877,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public void discardMissingRecords(final Workbook workbook) {
-		final Map<String, Set<String>> invalidValuesMap = workbook.getInvalidValuesMap();
+	public void discardMissingRecords(final Workbook workbook, final Map<String, Set<String>> invalidValuesMap) {
 		final Map<String, Integer> controlledVariablesMap = this.retrieveControlledVariablesMap(workbook);
 		for (final MeasurementRow measurementRow : workbook.getObservations()) {
 			for (final MeasurementData measurementData : measurementRow.getDataList()) {
