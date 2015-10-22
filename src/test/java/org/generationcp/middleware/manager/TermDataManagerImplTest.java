@@ -95,7 +95,7 @@ public class TermDataManagerImplTest extends IntegrationTestBase {
 		this.testVariableInfo.setExpectedMin("0");
 		this.testVariableInfo.setExpectedMax("100");
 		this.testVariableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
-		this.testVariableInfo.addVariableType(VariableType.ANALYSIS);
+		this.testVariableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
 		this.testVariableInfo.setIsFavorite(true);
 		this.variableManager.addVariable(this.testVariableInfo);
 	}

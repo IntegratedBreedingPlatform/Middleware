@@ -40,6 +40,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -136,7 +137,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			}
 
 		} catch (Exception e) {
-
 			throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
 		}
 	}
@@ -144,20 +144,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException {
 		
-		
-
-
-
 		try {
-
 			for (StandardVariable stdVariable : stdVariableList) {
 				this.getStandardVariableSaver().save(stdVariable);
 			}
-
-
-
 		} catch (Exception e) {
-
 			throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
 		}
 
@@ -165,10 +156,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public void addStandardVariableForMigrator(StandardVariable stdVariable, String programUUID) throws MiddlewareQueryException {
-
-		
-		
-
 		Term existingStdVar = this.findTermByName(stdVariable.getName(), CvId.VARIABLES);
 		if (existingStdVar != null) {
 			throw new MiddlewareQueryException(String.format(
@@ -176,8 +163,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		}
 
 		try {
-
-
 			// check if scale, property and method exists first
 			Term scale = this.findTermByName(stdVariable.getScale().getName(), CvId.SCALES);
 			if (scale == null) {
@@ -792,11 +777,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 		Integer cvId = this.getEnumerationCvId(variable);
 
-		
-		
-
+		OntologyVariableDataManagerImpl.removeCachedVariable(variable.getId());
 		try {
-
+			
 			// Operation is ADD
 			if (enumeration.getId() == null) {
 				this.getStandardVariableSaver().saveEnumeration(variable, enumeration, cvId);
@@ -934,17 +917,12 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public void deleteStandardVariable(int stdVariableId) throws MiddlewareQueryException {
+		OntologyVariableDataManagerImpl.removeCachedVariable(stdVariableId);
 		
-		
-
 		try {
-
 			StandardVariable stdVar = this.getStandardVariable(stdVariableId, null);
 			this.getStandardVariableSaver().delete(stdVar);
-
-
 		} catch (Exception e) {
-
 			throw new MiddlewareQueryException("Error in deleteStandardVariable " + e.getMessage(), e);
 		}
 	}
