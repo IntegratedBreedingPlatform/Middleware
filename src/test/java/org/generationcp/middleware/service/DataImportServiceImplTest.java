@@ -19,7 +19,9 @@ import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -42,9 +44,6 @@ public class DataImportServiceImplTest {
 	public static final int VALID_VARIABLES_COUNT = 5;
 	@Mock
 	private WorkbookParser parser;
-
-	@Mock
-	private Workbook workbook;
 
 	@Mock
 	private OntologyDataManager ontology;
@@ -97,6 +96,9 @@ public class DataImportServiceImplTest {
 	private static final String ASSIGNED = "Assigned";
 	private static final String GERMPLASM_ID = "Germplasm id";
 
+	private static final int STUDY_ID = 1;
+	private static final String STUDY_NAME = "Test Study";
+
 	@Before
 	public void setup() {
 
@@ -108,43 +110,31 @@ public class DataImportServiceImplTest {
 
 	@Test
 	public void testStrictParseWorkbookWithGreaterThan32VarNames() throws Exception {
-		DataImportServiceImpl moleDataImportService = Mockito.spy(this.dataImportService);
-
-		// we just need to test if isTrialInstanceNumberExists works, so lets mock out other dataImportService calls for the moment
-		Mockito.when(this.workbook.isNursery()).thenReturn(true);
-
-		// tip! do note that spy-ed object still calls the real method, may
-		// cause changing internal state as side effect
-		Mockito.when(
-				moleDataImportService.isEntryExists(this.ontology,
-						this.workbook.getFactors())).thenReturn(true);
-		Mockito.when(
-				moleDataImportService.isPlotExists(this.ontology,
-						this.workbook.getFactors())).thenReturn(true);
-		Mockito.when(
-				moleDataImportService.isTrialInstanceNumberExists(
-						this.ontology, this.workbook.getTrialVariables()))
-				.thenReturn(true);
-
-		Mockito.when(this.workbook.getAllVariables()).thenReturn(
-				this.initializeTestMeasurementVariables());
+		Workbook workbook = this.createWorkbookWithInvalidVariableNames();
+		workbook.setStudyDetails(this.createStudyDetailsTestData(StudyType.N));
+		this.setupGetStandardVariableIdByPropertyScaleMethodMocks();
 
 		try {
-			moleDataImportService.strictParseWorkbook(this.file, this.parser, this.workbook, this.ontology,
-					DataImportServiceImplTest.PROGRAM_UUID);
+			this.dataImportService.strictParseWorkbook(this.file, this.parser, workbook, DataImportServiceImplTest.PROGRAM_UUID);
 			Assert.fail("We expects workbookParserException to be thrown");
 		} catch (WorkbookParserException e) {
 
-			Mockito.verify(moleDataImportService).validateMeasurementVariableName(this.workbook.getAllVariables());
-
 			final String[] errorTypes =
-					{DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_LENGTH, DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_CHARACTERS};
+				{DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_LENGTH, DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_CHARACTERS};
 			for (Message error : e.getErrorMessages()) {
 				Assert.assertTrue(
 						"All errors should contain either ERROR_INVALID_VARIABLE_NAME_CHARACTERS or ERROR_INVALID_VARIABLE_NAME_LENGTH",
 						Arrays.asList(errorTypes).contains(error.getMessageKey()));
 			}
 		}
+	}
+
+	private StudyDetails createStudyDetailsTestData(StudyType studyType) {
+		StudyDetails studyDetails = new StudyDetails();
+		studyDetails.setId(STUDY_ID);
+		studyDetails.setStudyName(STUDY_NAME);
+		studyDetails.setStudyType(studyType);
+		return studyDetails;
 	}
 
 	@Test
@@ -574,6 +564,14 @@ public class DataImportServiceImplTest {
 		workbookWithControlledVariables.setFactors(this.createFactorsWithControlledVariablesWithoutIdTestData());
 		workbookWithControlledVariables.setObservations(this.createObservationsWithControlledVariablesTestData());
 		return workbookWithControlledVariables;
+	}
+
+	private Workbook createWorkbookWithInvalidVariableNames() {
+		Workbook workbookWithInvalidVariableNames = new Workbook();
+		workbookWithInvalidVariableNames.setConditions(this.initializeTestMeasurementVariables());
+		workbookWithInvalidVariableNames.setFactors(this.createFactorsWithControlledVariablesWithoutIdTestData());
+		workbookWithInvalidVariableNames.setObservations(this.createObservationsWithControlledVariablesTestData());
+		return workbookWithInvalidVariableNames;
 	}
 
 	private List<MeasurementVariable> createFactorsWithControlledVariablesWithoutIdTestData() {
