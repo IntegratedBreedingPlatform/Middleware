@@ -531,12 +531,13 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 	public List<Location> getLocationByIds(Collection<Integer> ids) throws MiddlewareQueryException {
 		try {
-			return this.getSession().createCriteria(Location.class).add(Restrictions.in(LocationDAO.LOCID, ids)).list();
+			return this.getSession().createCriteria(Location.class).add(Restrictions.in(LocationDAO.LOCID, ids))
+					.addOrder(Order.asc(LocationDAO.LNAME)).list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(String.format("Error with getLocationByIds(id=[%s])", StringUtils.join(ids, ",")), e);
 		}
 
-		return new ArrayList<Location>();
+		return new ArrayList<>();
 	}
 
 	public Map<Integer, String> getLocationNamesByLocationIDs(List<Integer> locIds) throws MiddlewareQueryException {
