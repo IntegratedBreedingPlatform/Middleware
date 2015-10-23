@@ -34,8 +34,9 @@ public enum PhenotypicType {
 	TRIAL_DESIGN(Arrays.asList(TermId.TRIAL_DESIGN_INFO_STORAGE.getId()), Arrays.asList("PLOT", "PLOT_NO", "PLOTNO"), "TRIAL DESIGN"), //
 
 	VARIATE(Arrays.asList(TermId.OBSERVATION_VARIATE.getId(), TermId.CATEGORICAL_VARIATE.getId()), Arrays.asList("STUDY", "PLOT", "TRIAL"),
-			"VARIATE");
+			"VARIATE"),
 
+	UNASSIGNED(new ArrayList<Integer>(), new ArrayList<String>(), "UNASSIGNED");
 
 	private List<Integer> typeStorages;
 	private List<String> labelList;

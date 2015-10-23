@@ -1517,4 +1517,28 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		List<String> sharedProjectNames = this.manager.getAllSharedProjectNames();
 		Assert.assertNotNull(sharedProjectNames);
 	}
+
+	@Test
+	public void testCheckIfAnyLocationIDsExistInExperimentsReturnTrue() {
+
+		Integer locationId = this.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(STUDY_ID, "1");
+		List<Integer> locationIds = new ArrayList<>();
+		locationIds.add(locationId);
+
+		boolean returnValue = this.manager.checkIfAnyLocationIDsExistInExperiments(STUDY_ID, DataSetType.PLOT_DATA, locationIds);
+
+		Assert.assertTrue(returnValue);
+	}
+
+	@Test
+	public void testCheckIfAnyLocationIDsExistInExperimentsReturnFalse() {
+
+		Integer locationId = this.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(STUDY_ID, "999");
+		List<Integer> locationIds = new ArrayList<>();
+		locationIds.add(locationId);
+
+		boolean returnValue = this.manager.checkIfAnyLocationIDsExistInExperiments(STUDY_ID, DataSetType.PLOT_DATA, locationIds);
+
+		Assert.assertFalse(returnValue);
+	}
 }

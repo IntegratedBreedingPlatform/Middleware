@@ -272,7 +272,7 @@ public class DatabaseBroker {
 		return cvTermPropertyDao;
 	}
 
-	public final VariableOverridesDao getVariableProgramOverridesDao() {
+	public VariableOverridesDao getVariableProgramOverridesDao() {
 		VariableOverridesDao variableOverridesDao = new VariableOverridesDao();
 		variableOverridesDao.setSession(this.getActiveSession());
 		return variableOverridesDao;

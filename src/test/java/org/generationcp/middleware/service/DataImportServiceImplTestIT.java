@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.service;
@@ -19,8 +19,8 @@ import java.util.Random;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
+import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.etl.WorkbookTest;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -52,79 +52,79 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 	@Test
 	public void testSaveMultiLocationDataset() throws MiddlewareQueryException {
-		List<Workbook> workbooks = WorkbookTest.getTestWorkbooks(5, 10);
+		final List<Workbook> workbooks = WorkbookTestDataInitializer.getTestWorkbooks(5, 10);
 		int id = 0;
-		for (Workbook workbook : workbooks) {
+		for (final Workbook workbook : workbooks) {
 			// comment these out if you want to let the system generate the dataset names.
-			int randomNumber = new Random().nextInt(10000);
+			final int randomNumber = new Random().nextInt(10000);
 			workbook.getStudyDetails()
-			.setTrialDatasetName("MultiLocationTrial_" + workbook.getStudyDetails().getStudyName() + randomNumber);
+					.setTrialDatasetName("MultiLocationTrial_" + workbook.getStudyDetails().getStudyName() + randomNumber);
 			workbook.getStudyDetails().setMeasurementDatasetName(
 					"MultiLocationMeasurement_" + workbook.getStudyDetails().getStudyName() + randomNumber);
 
 			id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
 		}
-		String name = workbooks.get(0).getStudyDetails() != null ? workbooks.get(0).getStudyDetails().getStudyName() : null;
+		final String name = workbooks.get(0).getStudyDetails() != null ? workbooks.get(0).getStudyDetails().getStudyName() : null;
 		Debug.println(IntegrationTestBase.INDENT, "Created study: " + id + ", name = " + name);
 	}
 
 	@Test
 	public void testSaveTrialDataset() throws MiddlewareException {
-		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
+		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 
-		int id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
+		final int id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
 
-		Workbook createdWorkbook = this.fieldbookService.getTrialDataSet(id);
+		final Workbook createdWorkbook = this.fieldbookService.getTrialDataSet(id);
 
-		WorkbookTest.setTestWorkbook(null);
-		workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
+		WorkbookTestDataInitializer.setTestWorkbook(null);
+		workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 
 		Assert.assertEquals("Expected " + workbook.getTrialConditions().size() + " of records for trial conditions but got "
 				+ createdWorkbook.getTrialConditions().size(), workbook.getTrialConditions().size(), createdWorkbook.getTrialConditions()
 				.size());
 		Assert.assertTrue("Expected the same trial conditions retrieved but found a different condition.",
-				WorkbookTest.areTrialVariablesSame(workbook.getTrialConditions(), createdWorkbook.getTrialConditions()));
+				WorkbookTestDataInitializer.areTrialVariablesSame(workbook.getTrialConditions(), createdWorkbook.getTrialConditions()));
 		Assert.assertEquals("Expected " + workbook.getTrialConstants().size() + " of records for trial constants but got "
 				+ createdWorkbook.getTrialConstants().size(), workbook.getTrialConstants().size(), createdWorkbook.getTrialConstants()
 				.size());
 		Assert.assertTrue("Expected the same trial constants retrieved but found a different constant.",
-				WorkbookTest.areTrialVariablesSame(workbook.getTrialConstants(), createdWorkbook.getTrialConstants()));
+				WorkbookTestDataInitializer.areTrialVariablesSame(workbook.getTrialConstants(), createdWorkbook.getTrialConstants()));
 	}
 
 	@Test
 	public void testSaveNurseryDataset() throws MiddlewareException {
-		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
+		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
 
-		int id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
+		final int id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
 
-		Workbook createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
+		final Workbook createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
 
-		WorkbookTest.setTestWorkbook(null);
-		workbook = WorkbookTest.getTestWorkbook(10, StudyType.T);
+		WorkbookTestDataInitializer.setTestWorkbook(null);
+		workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 
 		Assert.assertEquals("Expected " + workbook.getTrialConditions().size() + " of records for trial conditions but got "
 				+ createdWorkbook.getTrialConditions().size(), workbook.getTrialConditions().size(), createdWorkbook.getTrialConditions()
 				.size());
 		Assert.assertTrue("Expected the same trial conditions retrieved but found a different condition.",
-				WorkbookTest.areTrialVariablesSame(workbook.getTrialConditions(), createdWorkbook.getTrialConditions()));
+				WorkbookTestDataInitializer.areTrialVariablesSame(workbook.getTrialConditions(), createdWorkbook.getTrialConditions()));
 		Assert.assertEquals("Expected " + workbook.getTrialConstants().size() + " of records for trial constants but got "
 				+ createdWorkbook.getTrialConstants().size(), workbook.getTrialConstants().size(), createdWorkbook.getTrialConstants()
 				.size());
 		Assert.assertTrue("Expected the same trial constants retrieved but found a different constant.",
-				WorkbookTest.areTrialVariablesSame(workbook.getTrialConstants(), createdWorkbook.getTrialConstants()));
+				WorkbookTestDataInitializer.areTrialVariablesSame(workbook.getTrialConstants(), createdWorkbook.getTrialConstants()));
 	}
 
 	@Test
 	public void testAddTrialEnvironmentToTrial() throws MiddlewareException {
-		Workbook workbook = WorkbookTest.getTestWorkbook(4, StudyType.T);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(4, StudyType.T);
 
-		int id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
+		final int id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
 
 		Workbook createdWorkbook = this.fieldbookService.getTrialDataSet(id);
 
-		int noOfOrigTrialInstances = createdWorkbook.getTrialObservations().size();
+		final int noOfOrigTrialInstances = createdWorkbook.getTrialObservations().size();
 
-		WorkbookTest.addNewEnvironment(createdWorkbook);
+		WorkbookTestDataInitializer.addNewEnvironment(createdWorkbook);
 
 		this.dataImportService.saveDataset(createdWorkbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
 
@@ -137,14 +137,14 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 	@Test
 	public void testDeletionOfExperimentPropAndStockProp() throws MiddlewareException {
-		WorkbookTest.setTestWorkbook(null);
-		Workbook workbook = WorkbookTest.getTestWorkbook(10, StudyType.N);
+		WorkbookTestDataInitializer.setTestWorkbook(null);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
 
-		int id = this.dataImportService.saveDataset(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
+		final int id = this.dataImportService.saveDataset(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
 
 		Workbook createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
 
-		WorkbookTest.deleteExperimentPropVar(createdWorkbook);
+		WorkbookTestDataInitializer.deleteExperimentPropVar(createdWorkbook);
 
 		this.dataImportService.saveDataset(createdWorkbook, DataImportServiceImplTestIT.PROGRAM_UUID);
 
@@ -158,12 +158,12 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		// Dan V : changed implem so that template path is located in src/test/resources. no need to change per user to reflect file
 		// location
 
-		String fileLocation = this.getClass().getClassLoader().getResource("ricetest2.xls").getFile();
-		File file = new File(fileLocation);
-		Workbook workbook = this.dataImportService.parseWorkbook(file);
+		final String fileLocation = this.getClass().getClassLoader().getResource("ricetest2.xls").getFile();
+		final File file = new File(fileLocation);
+		final Workbook workbook = this.dataImportService.parseWorkbook(file);
 		workbook.print(IntegrationTestBase.INDENT);
 
-		int id = this.dataImportService.saveDataset(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
+		final int id = this.dataImportService.saveDataset(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
 		Debug.println(IntegrationTestBase.INDENT, "Created study:" + id);
 	}
 
@@ -209,56 +209,57 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 	@Test
 	public void testParseWorkbookWithNoTrialNursery() {
-		String fileLocation =
+		final String fileLocation =
 				this.getClass().getClassLoader()
-				.getResource("org/generationcp/middleware/service/test/GCP5799NurseryWorkbookNoTrialEnvironment.xls").getFile();
-		File file = new File(fileLocation);
+						.getResource("org/generationcp/middleware/service/test/GCP5799NurseryWorkbookNoTrialEnvironment.xls").getFile();
+		final File file = new File(fileLocation);
 		try {
 			this.dataImportService.strictParseWorkbook(file, DataImportServiceImplTestIT.PROGRAM_UUID);
-		} catch (WorkbookParserException e) {
+		} catch (final WorkbookParserException e) {
 			Assert.fail("Unable to correctly parse Nursery workbook with no trial condition");
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			Assert.fail("Unexpected exception : " + e.getMessage());
 		}
 	}
 
 	@Test
 	public void testParseWorkbookWithEmptyFields() {
-		String fileLocation =
+		final String fileLocation =
 				this.getClass().getClassLoader().getResource("org/generationcp/middleware/service/test/GCP5802SevenFieldsMissing.xls")
-				.getFile();
-		File file = new File(fileLocation);
+						.getFile();
+		final File file = new File(fileLocation);
 		try {
 			this.dataImportService.strictParseWorkbook(file, DataImportServiceImplTestIT.PROGRAM_UUID);
-		} catch (WorkbookParserException e) {
+		} catch (final WorkbookParserException e) {
 
-			List<Message> messages = e.getErrorMessages();
+			final List<Message> messages = e.getErrorMessages();
 
 			Assert.assertNotNull(messages);
 			// There should be 7 error messages to correspond with the 7 missing fields in the file
 			Assert.assertSame(messages.size(), 7);
 
 			return;
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			Assert.fail("Unexpected exception : " + e.getMessage());
 		}
 
 		Assert.fail("Unable to detect empty fields");
 	}
 
-	protected void testFileAgainstExpectedErrorCondition(String qualifiedFilename, String expectedErrorKey, String errorMessage) {
-		String fileLocation = this.getClass().getClassLoader().getResource(qualifiedFilename).getFile();
+	protected void testFileAgainstExpectedErrorCondition(final String qualifiedFilename, final String expectedErrorKey,
+			final String errorMessage) {
+		final String fileLocation = this.getClass().getClassLoader().getResource(qualifiedFilename).getFile();
 		try {
-			File file = new File(fileLocation);
+			final File file = new File(fileLocation);
 			this.dataImportService.strictParseWorkbook(file, DataImportServiceImplTestIT.PROGRAM_UUID);
-		} catch (WorkbookParserException e) {
-			List<Message> messages = e.getErrorMessages();
+		} catch (final WorkbookParserException e) {
+			final List<Message> messages = e.getErrorMessages();
 
 			Assert.assertNotNull(messages);
 			Assert.assertTrue(messages.size() == 1);
 			Assert.assertEquals(expectedErrorKey, messages.get(0).getMessageKey());
 			return;
-		} catch (MiddlewareException e) {
+		} catch (final MiddlewareException e) {
 			Assert.fail("Unexpected exception : " + e.getMessage());
 		}
 
@@ -268,7 +269,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	@Test
 	public void testCheckIfProjectNameIsExisting() throws Exception {
 		// try to save first then use the name of the saved study
-		Workbook workbook = WorkbookTest.getTestWorkbook();
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
 		workbook.print(IntegrationTestBase.INDENT);
 		this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
 		String name = workbook.getStudyDetails() != null ? workbook.getStudyDetails().getStudyName() : null;
@@ -285,16 +286,16 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	@Test
 	public void getLocationIdByProjectNameAndDescription() throws MiddlewareQueryException {
 		// try to save first then use the name of the saved study
-		Workbook workbook = WorkbookTest.getTestWorkbook();
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
 		workbook.print(IntegrationTestBase.INDENT);
 		this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
-		String name = workbook.getStudyDetails().getStudyName();
+		final String name = workbook.getStudyDetails().getStudyName();
 		Debug.println(IntegrationTestBase.INDENT, "Name: " + name);
-		Integer locationId =
+		final Integer locationId =
 				this.dataImportService.getLocationIdByProjectNameAndDescriptionAndProgramUUID(name, "1",
 						DataImportServiceImplTestIT.PROGRAM_UUID);
 		Assert.assertNotNull(locationId);
-		Geolocation geolocation = this.geolocationDao.getById(locationId);
+		final Geolocation geolocation = this.geolocationDao.getById(locationId);
 		Assert.assertNotNull(geolocation);
 		Assert.assertEquals(locationId, geolocation.getLocationId());
 		Assert.assertEquals("1", geolocation.getDescription());
@@ -302,19 +303,19 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 	@Test
 	public void testSaveProjectOntology() throws MiddlewareQueryException {
-		Workbook workbook = WorkbookTest.getTestWorkbook();
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
 		workbook.print(IntegrationTestBase.INDENT);
-		int id = this.dataImportService.saveProjectOntology(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
+		final int id = this.dataImportService.saveProjectOntology(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
 		Debug.println(IntegrationTestBase.INDENT, "Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
 
 	}
 
 	@Test
 	public void testSaveProjectData() throws MiddlewareQueryException {
-		Workbook workbook = WorkbookTest.getTestWorkbook();
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
 		workbook.print(IntegrationTestBase.INDENT);
-		int studyId = this.dataImportService.saveProjectOntology(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
-		workbook.setStudyId(studyId);
+		final int studyId = this.dataImportService.saveProjectOntology(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
+		workbook.getStudyDetails().setId(studyId);
 		workbook.setTrialDatasetId(studyId - 1);
 		workbook.setMeasurementDatesetId(studyId - 2);
 		this.dataImportService.saveProjectData(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
@@ -324,15 +325,15 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 	@Test
 	public void testValidateProjectOntology() throws MiddlewareException {
-		Workbook workbook = WorkbookTest.getTestWorkbookWithErrors();
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbookWithErrors();
 		workbook.print(IntegrationTestBase.INDENT);
-		Map<String, List<Message>> errors = this.dataImportService.validateProjectOntology(workbook, PROGRAM_UUID);
+		final Map<String, List<Message>> errors = this.dataImportService.validateProjectOntology(workbook, PROGRAM_UUID);
 		Assert.assertNotNull(errors);
 		if (errors != null) {
 			Debug.println(IntegrationTestBase.INDENT, "Errors Identified: ");
-			for (Map.Entry<String, List<Message>> e : errors.entrySet()) {
+			for (final Map.Entry<String, List<Message>> e : errors.entrySet()) {
 				Debug.println(IntegrationTestBase.INDENT + 2, e.getKey());
-				for (Message m : e.getValue()) {
+				for (final Message m : e.getValue()) {
 					if (m.getMessageParams() != null) {
 						Debug.println(IntegrationTestBase.INDENT + 4,
 								"Key: " + m.getMessageKey() + " Params: " + Arrays.asList(m.getMessageParams()));
@@ -346,18 +347,19 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 	@Test
 	public void testValidateProjectData() throws MiddlewareException {
-		String studyName = "validateProjectData_" + new Random().nextInt(10000);
-		int trialNo = 1;
-		Workbook workbook = WorkbookTest.getTestWorkbookForWizard(studyName, trialNo);
+		final String studyName = "validateProjectData_" + new Random().nextInt(10000);
+		final int trialNo = 1;
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbookForWizard(studyName, trialNo);
 		workbook.print(IntegrationTestBase.INDENT);
 		this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
-		Map<String, List<Message>> errors = this.dataImportService.validateProjectData(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
+		final Map<String, List<Message>> errors =
+				this.dataImportService.validateProjectData(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
 		Assert.assertNotNull(errors);
 		if (errors != null) {
 			Debug.println(IntegrationTestBase.INDENT, "Errors Identified: ");
-			for (Map.Entry<String, List<Message>> e : errors.entrySet()) {
+			for (final Map.Entry<String, List<Message>> e : errors.entrySet()) {
 				Debug.println(IntegrationTestBase.INDENT + 2, e.getKey());
-				for (Message m : e.getValue()) {
+				for (final Message m : e.getValue()) {
 					if (m.getMessageParams() != null) {
 						Debug.println(IntegrationTestBase.INDENT + 4,
 								"Key: " + m.getMessageKey() + " Params: " + Arrays.asList(m.getMessageParams()));

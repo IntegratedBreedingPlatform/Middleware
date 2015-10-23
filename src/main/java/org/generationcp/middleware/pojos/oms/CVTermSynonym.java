@@ -34,7 +34,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "cvtermsynonym")
-@Cache(usage=CacheConcurrencyStrategy.TRANSACTIONAL, region="cvtermsynonym")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="cvtermsynonym")
 public class CVTermSynonym implements Serializable {
 
 	private static final long serialVersionUID = 1L;
