@@ -112,33 +112,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetLocationDetailsByIDs() throws Exception {
-
-		// Attempt to get all locations so we can proceed
-		List<Location> locationList = this.manager.getAllLocations();
-		Assert.assertTrue(locationList != null);
-		Assert.assertTrue("we cannot proceed test if size < 0", locationList.size() > 0);
-
-		List<Integer> ids = new ArrayList<Integer>();
-
-		for (Location ls : locationList) {
-			ids.add(ls.getLocid());
-
-			// only get subset of locations
-			if (ids.size() < 5) {
-				break;
-			}
-		}
-
-		List<LocationDetails> results = this.manager.getLocationDetailsByLocationIDs(ids);
-		Assert.assertTrue(results != null);
-		Assert.assertTrue(results.size() < 5);
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetLocationDetailsByIDs(): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, results);
-	}
-
-	@Test
 	public void testGetAllCountry() throws Exception {
 		List<Country> countryList = this.manager.getAllCountry();
 		Assert.assertTrue(countryList != null);
