@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -98,18 +99,34 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 			ids.add(ls.getLocid());
 
 			// only get subset of locations
-			if (ids.size() < 5) {
+			if (ids.size() == 5) {
 				break;
 			}
 		}
 
 		List<Location> results = this.manager.getLocationsByIDs(ids);
-		Assert.assertTrue(results != null);
-		Assert.assertTrue(results.size() < 5);
+		Assert.assertTrue("Result set must not be null", results != null && !results.isEmpty());
+		Assert.assertTrue("Test must only return five results", results.size() == 5);
 
-		Debug.println(IntegrationTestBase.INDENT, "testGetLocationsByIDs(): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, results);
+		for (final Location location : results) {
+			Assert.assertTrue("Make sure location id received is in the actual requested set.", ids.contains(location.getLocid()));
+		}
 	}
+
+	@Test
+	public void testHandlingOfNullOrEmptyLocationIdsInGetLocationsByIDs() throws Exception {
+
+		final List<Location> locationsByIdEmptyTest = this.manager.getLocationsByIDs(Collections.<Integer>emptyList());
+		Assert.assertTrue("Returned result must not be null and must be an empty list", locationsByIdEmptyTest != null
+				&& locationsByIdEmptyTest.isEmpty());
+
+		final List<Location> locationsByIdNullTest = this.manager.getLocationsByIDs(null);
+		Assert.assertTrue("Returned result must not be null and must be an empty list", locationsByIdNullTest != null
+				&& locationsByIdNullTest.isEmpty());
+
+	}
+
+
 
 	@Test
 	public void testGetAllCountry() throws Exception {
