@@ -13,9 +13,9 @@ package org.generationcp.middleware.operation.builder;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
-import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.helper.VariableInfo;
@@ -24,7 +24,7 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 public class VariableInfoBuilder {
 
 	public Set<VariableInfo> create(List<ProjectProperty> properties) {
-		Set<VariableInfo> variableDefs = new HashSet<VariableInfo>();
+		Set<VariableInfo> variableDefs = new HashSet<>();
 		for (ProjectProperty property : properties) {
 			if (this.isStandardVariableType(property)) {
 				variableDefs.add(this.createVariableDef(property, this.filterByRank(properties, property.getRank())));
@@ -112,9 +112,9 @@ public class VariableInfoBuilder {
 	}
 
 	private Set<ProjectProperty> filterByRank(List<ProjectProperty> properties, int rank) {
-		Set<ProjectProperty> filteredProperties = new HashSet<ProjectProperty>();
+		Set<ProjectProperty> filteredProperties = new HashSet<>();
 		for (ProjectProperty property : properties) {
-			if (property.getRank() == rank) {
+			if (Objects.equals(property.getRank(), rank)) {
 				filteredProperties.add(property);
 			}
 		}
