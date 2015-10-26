@@ -390,15 +390,6 @@ public interface LocationDataManager {
 	List<Location> getLocationsByIDs(List<Integer> ids) throws MiddlewareQueryException;
 
 	/**
-	 * Gets the location details by location IDs.
-	 *
-	 * @param ids the Location IDs
-	 * @return the location details corresponding to the given IDs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws MiddlewareQueryException;
-
-	/**
 	 * Gets all fields belonging to the given location.
 	 *
 	 * @param locationId the location id of the parent of the fields to return.
@@ -463,10 +454,10 @@ public interface LocationDataManager {
 	/**
 	 * Save or update the list of locdes object
 	 *
-	 * @param location id
+	 * @param locationId id
 	 * @param locdesList
 	 * @throws MiddlewareQueryException
 	 */
-	public void saveOrUpdateLocdesList(Integer locationId, List<Locdes> locdesList) throws MiddlewareQueryException;
+	void saveOrUpdateLocdesList(Integer locationId, List<Locdes> locdesList) throws MiddlewareQueryException;
 
 }
