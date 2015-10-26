@@ -360,4 +360,37 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		return false;
 	}
 
+	@SuppressWarnings("unchecked")
+	public Map<String, Integer> getMapCountByNamePermutations(List<String> names) throws MiddlewareQueryException {
+
+		if (names == null || names.isEmpty()) {
+			return new HashMap<>();
+		}
+
+		Map<String, Integer> mapCountWithName = new HashMap<>();
+		Map<String, String> mapPermutationValue = new HashMap<>();
+
+		//Converting supplied value to combination of names that can exists in names
+		for(String name : names){
+			mapCountWithName.put(name, 0);
+			List<String> permutations = GermplasmDataManagerUtil.createNamePermutations(name);
+			mapPermutationValue.put(permutations.get(0), name);
+			mapPermutationValue.put(permutations.get(1), name);
+			mapPermutationValue.put(permutations.get(2), name);
+		}
+
+		// Count using = by default
+		Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.in("nval", mapPermutationValue.keySet().toArray()));
+		List<Name> result = criteria.list();
+
+		for(Name name : result){
+			String nval = name.getNval();
+			String originalName = mapPermutationValue.get(nval);
+			mapCountWithName.put(originalName, mapCountWithName.get(originalName) + 1);
+		}
+
+		return mapCountWithName;
+	}
+
 }

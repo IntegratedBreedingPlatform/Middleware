@@ -1283,4 +1283,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public Germplasm getGermplasmByLocalGid(final Integer lgid) {
 		return this.getGermplasmDao().getByLGid(lgid);
 	}
+
+	@Override
+	public Map<String, Integer> getMapCountByNamePermutations(List<String> names) {
+		return this.getNameDao().getMapCountByNamePermutations(names);
+	}
 }
