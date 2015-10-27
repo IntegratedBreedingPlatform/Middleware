@@ -114,9 +114,14 @@ public class ProjectPropertySaver {
 	}
 
 	public void saveVariableType(DmsProject project, DMSVariableType variableType) throws MiddlewareQueryException {
-		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum =
-				this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
-						variableType.getStandardVariable().getPhenotypicType());
+
+		//NOTE: Fetching variable type from ROLE.
+		if(variableType.getVariableType() == null){
+			variableType.setVariableType(this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
+							variableType.getStandardVariable().getPhenotypicType()));
+		}
+
+		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = variableType.getVariableType();
 		this.saveProjectProperty(project, variableTypeEnum.getId(), variableType.getLocalName(), variableType.getRank());
 		this.saveProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType.getRank());
 		this.saveProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), Integer.toString(variableType.getStandardVariable().getId()),
@@ -260,6 +265,7 @@ public class ProjectPropertySaver {
 
 		stdvar.setId(variable.getTermId());
 		varType.setRole(variable.getRole());
+		varType.setVariableType(variable.getVariableType());
 		stdvar.setPhenotypicType(variable.getRole());
 		varType.setLocalName(variable.getName());
 		varType.setLocalDescription(variable.getDescription());

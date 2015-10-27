@@ -12,6 +12,7 @@
 package org.generationcp.middleware.helper;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.util.Debug;
 
 public class VariableInfo {
@@ -27,6 +28,8 @@ public class VariableInfo {
 	private String treatmentLabel;
 	
 	private PhenotypicType role;
+
+	private VariableType variableType;
 
 	public String getLocalName() {
 		return this.localName;
@@ -68,34 +71,51 @@ public class VariableInfo {
 		this.treatmentLabel = treatmentLabel;
 	}
 
-	
 	public PhenotypicType getRole() {
 		return role;
 	}
 
-	
 	public void setRole(PhenotypicType role) {
 		this.role = role;
 	}
 
-	public void print(int indent) {
-		Debug.println(indent, "VariableInfo:");
-		Debug.println(indent + 3, "stdVariableId: " + this.stdVariableId);
-		Debug.println(indent + 3, "localName: " + this.localName);
-		Debug.println(indent + 3, "localDescription: " + this.localDescription);
+	public VariableType getVariableType() {
+		return variableType;
+	}
+
+	public void setVariableType(VariableType variableType) {
+		this.variableType = variableType;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("VariableInfo [localName=");
-		builder.append(this.localName);
-		builder.append(", localDescription=");
-		builder.append(this.localDescription);
-		builder.append(", stdVariableId=");
-		builder.append(this.stdVariableId);
-		builder.append("]");
-		return builder.toString();
+        StringBuilder builder = new StringBuilder();
+        builder.append("VariableInfo [localName=");
+        builder.append(this.localName);
+        builder.append(", localDescription=");
+        builder.append(this.localDescription);
+        builder.append(", stdVariableId=");
+        builder.append(this.stdVariableId);
+        builder.append(", treatmentLabel=");
+        builder.append(this.treatmentLabel);
+        builder.append(", role=");
+        builder.append(this.role);
+        builder.append(", rank=");
+        builder.append(this.rank);
+        builder.append(", variableType=");
+        builder.append(this.variableType);
+        builder.append("]");
+        return builder.toString();
 	}
 
+	public void print(int indent) {
+		Debug.println(indent, "VariableInfo:");
+		Debug.println(indent + 3, "localName: " + this.localName);
+		Debug.println(indent + 3, "localDescription: " + this.localDescription);
+		Debug.println(indent + 3, "rank: " + this.rank);
+		Debug.println(indent + 3, "stdVariableId: " + this.stdVariableId);
+		Debug.println(indent + 3, "treatmentLabel: " + this.treatmentLabel);
+		Debug.println(indent + 3, "role: " + this.role);
+		Debug.println(indent + 3, "variableType: " + this.variableType);
+	}
 }
