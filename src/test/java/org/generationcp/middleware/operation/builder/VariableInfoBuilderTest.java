@@ -21,46 +21,27 @@ public class VariableInfoBuilderTest {
         variableInfoBuilder = new VariableInfoBuilder();
     }
 
+	/**
+	 * Test to verify create method of VariableInfoBuilder.
+	 */
 
     @Test
     public void testCreate(){
 
         List<ProjectProperty> projectProperties = new ArrayList<>();
 
-        ProjectProperty standardVariableProp1 = new ProjectProperty();
-        standardVariableProp1.setProjectPropertyId(1);
-        standardVariableProp1.setRank(2);
-        standardVariableProp1.setTypeId(TermId.STANDARD_VARIABLE.getId());
-        standardVariableProp1.setValue("8007");
-        projectProperties.add(standardVariableProp1);
+		final String standardVariableProp = "8007";
+		final String variableTypeProp = VariableType.TRAIT.getName();
+		final String studyInformationProp = "STUDY Info Type";
+		final String variableDescriptionProp = "STUDY Info Type Description";
+		final String multiFactorialInformationProp = "Multi Factorial Info";
 
-        ProjectProperty studyTypeProp = new ProjectProperty();
-        studyTypeProp.setProjectPropertyId(2);
-        studyTypeProp.setRank(2);
-        studyTypeProp.setTypeId(VariableType.STUDY_DETAIL.getId());
-        studyTypeProp.setValue(VariableType.STUDY_DETAIL.getName());
-        projectProperties.add(studyTypeProp);
 
-        ProjectProperty studyInfoProp = new ProjectProperty();
-        studyInfoProp.setProjectPropertyId(3);
-        studyInfoProp.setRank(2);
-        studyInfoProp.setTypeId(TermId.STUDY_INFORMATION.getId());
-        studyInfoProp.setValue("STUDY Info Type");
-        projectProperties.add(studyInfoProp);
-
-        ProjectProperty varDescriptionProp = new ProjectProperty();
-        varDescriptionProp.setProjectPropertyId(4);
-        varDescriptionProp.setRank(2);
-        varDescriptionProp.setTypeId(TermId.VARIABLE_DESCRIPTION.getId());
-        varDescriptionProp.setValue("STUDY Info Type Description");
-        projectProperties.add(varDescriptionProp);
-
-        ProjectProperty multiFactorialProp = new ProjectProperty();
-        multiFactorialProp.setProjectPropertyId(5);
-        multiFactorialProp.setRank(2);
-        multiFactorialProp.setTypeId(TermId.MULTIFACTORIAL_INFO.getId());
-        multiFactorialProp.setValue("Multi Factorial Info");
-        projectProperties.add(multiFactorialProp);
+        projectProperties.add(this.createProjectProperty(1, 2, TermId.STANDARD_VARIABLE.getId(), standardVariableProp));
+		projectProperties.add(this.createProjectProperty(2, 2, TermId.STUDY_INFORMATION.getId(), studyInformationProp));
+		projectProperties.add(this.createProjectProperty(3, 2, TermId.VARIABLE_DESCRIPTION.getId(), variableDescriptionProp));
+        projectProperties.add(this.createProjectProperty(4, 2, VariableType.TRAIT.getId(), variableTypeProp));
+        projectProperties.add(this.createProjectProperty(5, 2, TermId.MULTIFACTORIAL_INFO.getId(), multiFactorialInformationProp));
 
         Set<VariableInfo> variableInfoSet = variableInfoBuilder.create(projectProperties);
 
@@ -69,11 +50,30 @@ public class VariableInfoBuilderTest {
 
         if(variableInfoSet.size() > 0){
             VariableInfo variableInfo = variableInfoSet.iterator().next();
-			Assert.assertEquals(variableInfo.getLocalName(), studyInfoProp.getValue());
-			Assert.assertEquals(variableInfo.getLocalDescription(), varDescriptionProp.getValue());
-			Assert.assertEquals(variableInfo.getTreatmentLabel(), multiFactorialProp.getValue());
-			Assert.assertEquals(variableInfo.getVariableType().getName(), studyTypeProp.getValue());
+			Assert.assertEquals(variableInfo.getLocalName(), studyInformationProp);
+			Assert.assertEquals(variableInfo.getLocalDescription(), variableDescriptionProp);
+			Assert.assertEquals(variableInfo.getTreatmentLabel(), multiFactorialInformationProp);
+			Assert.assertEquals(variableInfo.getVariableType().getName(), variableTypeProp);
         }
 
     }
+
+	/**
+	 * method to create instance of ProjectProperty based on given raw data.
+	 * @param projectPropId project property id
+	 * @param rank rank
+	 * @param typeId type of property
+	 * @param value value of property
+	 * @return newly created instance of project property.
+	 */
+	private ProjectProperty createProjectProperty(final Integer projectPropId, final Integer rank, final Integer typeId, final String value){
+		ProjectProperty projectProperty = new ProjectProperty();
+
+		projectProperty.setProjectPropertyId(projectPropId);
+		projectProperty.setRank(rank);
+		projectProperty.setTypeId(typeId);
+		projectProperty.setValue(value);
+
+		return projectProperty;
+	}
 }
