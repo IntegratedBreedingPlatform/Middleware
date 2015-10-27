@@ -530,6 +530,11 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 	public List<Location> getLocationByIds(Collection<Integer> ids) throws MiddlewareQueryException {
+
+		if(ids == null || ids.isEmpty()) {
+			return new ArrayList<>();
+		}
+
 		try {
 			return this.getSession().createCriteria(Location.class).add(Restrictions.in(LocationDAO.LOCID, ids))
 					.addOrder(Order.asc(LocationDAO.LNAME)).list();
