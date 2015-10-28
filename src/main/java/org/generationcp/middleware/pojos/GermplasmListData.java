@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos;
@@ -28,24 +28,27 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.interfaces.GermplasmExportSource;
 import org.generationcp.middleware.util.Debug;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 /**
  * POJO for listdata table.
- *
- * @author Kevin Manansala
- *
+ * 
+ * 
  */
-@NamedQueries({@NamedQuery(name = "deleteGermplasmListDataByListId", query = "UPDATE GermplasmListData SET status = 9 WHERE list = :listId")})
+@NamedQueries({@NamedQuery(name = "deleteGermplasmListDataByListId", query = "DELETE FROM GermplasmListData WHERE list = :listId"),})
 @Entity
 @Table(name = "listdata")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="listdata")
 public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	private static final long serialVersionUID = 1L;
@@ -97,6 +100,10 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	@OneToMany(mappedBy = "listData", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
 	private List<ListDataProperty> properties = new ArrayList<ListDataProperty>();
 
+	@OneToOne
+	@JoinColumn(name = "gid", nullable = false, insertable = false, updatable = false)
+	private Germplasm germplasm;
+
 	@Transient
 	private ListDataInventory inventoryInfo;
 
@@ -104,13 +111,13 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	}
 
-	public GermplasmListData(Integer id) {
+	public GermplasmListData(final Integer id) {
 		super();
 		this.id = id;
 	}
 
-	public GermplasmListData(Integer id, GermplasmList list, Integer gid, Integer entryId, String entryCode, String seedSource,
-			String designation, String groupName, Integer status, Integer localRecordId) {
+	public GermplasmListData(final Integer id, final GermplasmList list, final Integer gid, final Integer entryId, final String entryCode,
+			final String seedSource, final String designation, final String groupName, final Integer status, final Integer localRecordId) {
 		super();
 		this.id = id;
 		this.list = list;
@@ -128,7 +135,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 
@@ -136,7 +143,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		return this.list;
 	}
 
-	public void setList(GermplasmList list) {
+	public void setList(final GermplasmList list) {
 		this.list = list;
 	}
 
@@ -144,7 +151,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		return this.gid;
 	}
 
-	public void setGid(Integer gid) {
+	public void setGid(final Integer gid) {
 		this.gid = gid;
 	}
 
@@ -153,7 +160,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		return this.entryId;
 	}
 
-	public void setEntryId(Integer entryId) {
+	public void setEntryId(final Integer entryId) {
 		this.entryId = entryId;
 	}
 
@@ -162,7 +169,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		return this.entryCode;
 	}
 
-	public void setEntryCode(String entryCode) {
+	public void setEntryCode(final String entryCode) {
 		this.entryCode = entryCode;
 	}
 
@@ -171,7 +178,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		return this.seedSource;
 	}
 
-	public void setSeedSource(String seedSource) {
+	public void setSeedSource(final String seedSource) {
 		this.seedSource = seedSource;
 	}
 
@@ -180,7 +187,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		return this.designation;
 	}
 
-	public void setDesignation(String designation) {
+	public void setDesignation(final String designation) {
 		this.designation = designation;
 	}
 
@@ -189,7 +196,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		return this.groupName;
 	}
 
-	public void setGroupName(String groupName) {
+	public void setGroupName(final String groupName) {
 		this.groupName = groupName;
 	}
 
@@ -208,7 +215,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		}
 	}
 
-	public void setStatus(Integer status) {
+	public void setStatus(final Integer status) {
 		this.status = status;
 	}
 
@@ -216,7 +223,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		return this.localRecordId;
 	}
 
-	public void setLocalRecordId(Integer localRecordId) {
+	public void setLocalRecordId(final Integer localRecordId) {
 		this.localRecordId = localRecordId;
 	}
 
@@ -224,7 +231,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		return this.properties;
 	}
 
-	public void setProperties(List<ListDataProperty> properties) {
+	public void setProperties(final List<ListDataProperty> properties) {
 		this.properties = properties;
 	}
 
@@ -232,13 +239,27 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		return this.inventoryInfo;
 	}
 
-	public void setInventoryInfo(ListDataInventory inventoryInfo) {
+	public void setInventoryInfo(final ListDataInventory inventoryInfo) {
 		this.inventoryInfo = inventoryInfo;
+	}
+
+	/**
+	 * @return the germplasm
+	 */
+	public Germplasm getGermplasm() {
+		return this.germplasm;
+	}
+
+	/**
+	 * @param germplasm the germplasm to set
+	 */
+	public void setGermplasm(final Germplasm germplasm) {
+		this.germplasm = germplasm;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("GermplasmListData [id=");
 		builder.append(this.id);
 		builder.append(", gid=");
@@ -270,7 +291,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -280,7 +301,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		GermplasmListData other = (GermplasmListData) obj;
+		final GermplasmListData other = (GermplasmListData) obj;
 		if (this.id == null) {
 			if (other.id != null) {
 				return false;
@@ -291,10 +312,10 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		return true;
 	}
 
-	public void print(int indent) {
+	public void print(final int indent) {
 		Debug.println(indent, this.toString());
 		if (this.properties != null) {
-			for (ListDataProperty property : this.properties) {
+			for (final ListDataProperty property : this.properties) {
 				property.print(indent + 3);
 			}
 		}

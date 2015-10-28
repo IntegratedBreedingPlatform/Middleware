@@ -12,7 +12,7 @@ public class StudyGermplasmDto {
 
 	private String designation;
 
-	private String entryNo;
+	private Integer entryNumber;
 
 	private String entryCode;
 
@@ -32,7 +32,7 @@ public class StudyGermplasmDto {
 	/**
 	 * @param entryType the entryType to set
 	 */
-	public void setEntryType(String entryType) {
+	public void setEntryType(final String entryType) {
 		this.entryType = entryType;
 	}
 
@@ -46,7 +46,7 @@ public class StudyGermplasmDto {
 	/**
 	 * @param germplasmId the germplasmId to set
 	 */
-	public void setGermplasmId(Integer germplasmId) {
+	public void setGermplasmId(final Integer germplasmId) {
 		this.germplasmId = germplasmId;
 	}
 
@@ -61,22 +61,22 @@ public class StudyGermplasmDto {
 	 * @param desingation the desingation to set
 	 *
 	 */
-	public void setDesignation(String designation) {
+	public void setDesignation(final String designation) {
 		this.designation = designation;
 	}
 
 	/**
-	 * @return the entryNo
+	 * @return the entryNumber
 	 */
-	public String getEntryNo() {
-		return this.entryNo;
+	public Integer getEntryNumber() {
+		return this.entryNumber;
 	}
 
 	/**
-	 * @param entryNo the entryNo to set
+	 * @param entryNumber the entryNo to set
 	 */
-	public void setEntryNo(String entryNo) {
-		this.entryNo = entryNo;
+	public void setEntryNumber(final Integer entryNumber) {
+		this.entryNumber = entryNumber;
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class StudyGermplasmDto {
 	/**
 	 * @param position the position to set
 	 */
-	public void setPosition(String position) {
+	public void setPosition(final String position) {
 		this.position = position;
 	}
 
@@ -103,7 +103,7 @@ public class StudyGermplasmDto {
 	/**
 	 * @param cross the cross to set
 	 */
-	public void setCross(String cross) {
+	public void setCross(final String cross) {
 		this.cross = cross;
 	}
 
@@ -117,7 +117,7 @@ public class StudyGermplasmDto {
 	/**
 	 * @param seedSource the seedSource to set
 	 */
-	public void setSeedSource(String seedSource) {
+	public void setSeedSource(final String seedSource) {
 		this.seedSource = seedSource;
 	}
 
@@ -131,7 +131,7 @@ public class StudyGermplasmDto {
 	/**
 	 * @param entryCode the entryCode to set
 	 */
-	public void setEntryCode(String entryCode) {
+	public void setEntryCode(final String entryCode) {
 		this.entryCode = entryCode;
 	}
 
@@ -140,16 +140,16 @@ public class StudyGermplasmDto {
 		if (!(other instanceof StudyGermplasmDto)) {
 			return false;
 		}
-		StudyGermplasmDto castOther = (StudyGermplasmDto) other;
+		final StudyGermplasmDto castOther = (StudyGermplasmDto) other;
 		return new EqualsBuilder().append(this.entryType, castOther.entryType).append(this.germplasmId, castOther.germplasmId)
-				.append(this.designation, castOther.designation).append(this.entryNo, castOther.entryNo)
+				.append(this.designation, castOther.designation).append(this.entryNumber, castOther.entryNumber)
 				.append(this.entryCode, castOther.entryCode).append(this.position, castOther.position).append(this.cross, castOther.cross)
 				.append(this.seedSource, castOther.seedSource).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.entryType).append(this.germplasmId).append(this.designation).append(this.entryNo)
+		return new HashCodeBuilder().append(this.entryType).append(this.germplasmId).append(this.designation).append(this.entryNumber)
 				.append(this.entryCode).append(this.position).append(this.cross).append(this.seedSource).toHashCode();
 	}
 

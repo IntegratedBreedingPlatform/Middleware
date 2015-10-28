@@ -35,7 +35,6 @@ class OntologyCommonDAOImpl implements OntologyCommonDAO {
 	}
 
 	public List<Integer> getAllPropertyIdsWithClassAndVariableType(String[] classes, String[] variableTypes) throws MiddlewareException {
-		try {
 			String classFilter = !(Objects.equals(classes, null) || classes.length == 0) ? " and dt.name in (:classes) " : "";
 			String variableTypeFilter =
 					!(Objects.equals(variableTypes, null) || variableTypes.length == 0) ? " and c.value in (:variableTypes) " : "";
@@ -57,12 +56,9 @@ class OntologyCommonDAOImpl implements OntologyCommonDAO {
 			}
 
 			return query.list();
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error at getAllPropertiesWithClass :" + e.getMessage(), e);
-		}
 	}
 
-	public Map<Integer, Property> getPropertiesWithCropOntologyAndTraits(Boolean fetchAll, List propertyIds) throws MiddlewareException {
+	public Map<Integer, Property> getPropertiesWithCropOntologyAndTraits(Boolean fetchAll, List propertyIds, boolean filterObsolete) throws MiddlewareException {
 
 		Map<Integer, Property> map = new HashMap<>();
 
@@ -79,18 +75,21 @@ class OntologyCommonDAOImpl implements OntologyCommonDAO {
 			filterClause = " and p.cvterm_id in (:propertyIds)";
 		}
 
+		String filterObsoleteClause = "";
+		if (filterObsolete) {
+			filterObsoleteClause = " and p." + this.SHOULD_NOT_OBSOLETE;
+		}
+
 		List result;
 
-		try {
-
-			SQLQuery query = this.sessionProvider.getSession().createSQLQuery(
+		SQLQuery query = this.sessionProvider.getSession().createSQLQuery(
 					"select p.cvterm_id pId, p.name pName, p.definition pDescription, p.cv_id pVocabularyId, p.is_obsolete pObsolete"
 							+ ", tp.value cropOntologyId" + ", GROUP_CONCAT(cs.name SEPARATOR ',') AS classes" + "  from cvterm p"
 							+ " LEFT JOIN cvtermprop tp ON tp.cvterm_id = p.cvterm_id AND tp.type_id = " + TermId.CROP_ONTOLOGY_ID.getId()
 							+ " LEFT JOIN (select cvtr.subject_id PropertyId, o.cv_id, o.cvterm_id, o.name, o.definition, o.is_obsolete "
 							+ " from cvterm o inner join cvterm_relationship cvtr on cvtr.object_id = o.cvterm_id and cvtr.type_id = "
 							+ TermId.IS_A.getId() + ")" + " cs on cs.PropertyId = p.cvterm_id" + " where p.cv_id = " + CvId.PROPERTIES
-							.getId() + " and p." + SHOULD_NOT_OBSOLETE + filterClause + " Group BY p.cvterm_id Order BY p.name ")
+							.getId() + filterObsoleteClause + filterClause + " Group BY p.cvterm_id Order BY p.name ")
 					.addScalar("pId", new org.hibernate.type.IntegerType()).addScalar("pName").addScalar("pDescription")
 					.addScalar("pVocabularyId", new org.hibernate.type.IntegerType())
 					.addScalar("pObsolete", new org.hibernate.type.IntegerType()).addScalar("cropOntologyId").addScalar("classes");
@@ -100,10 +99,6 @@ class OntologyCommonDAOImpl implements OntologyCommonDAO {
 			}
 
 			result = query.list();
-
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error at getAllPropertiesWithClass :" + e.getMessage(), e);
-		}
 
 		for (Object row : result) {
 			Object[] items = (Object[]) row;

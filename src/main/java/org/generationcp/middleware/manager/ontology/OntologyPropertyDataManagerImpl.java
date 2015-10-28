@@ -68,8 +68,8 @@ public class OntologyPropertyDataManagerImpl implements OntologyPropertyDataMana
 	}
 
 	@Override
-	public Property getProperty(int id) throws MiddlewareException {
-		List<Property> properties = this.getProperties(false, new ArrayList<>(Collections.singletonList(id)));
+	public Property getProperty(int id, boolean filterObsolete) throws MiddlewareException {
+		List<Property> properties = this.getProperties(false, new ArrayList<>(Collections.singletonList(id)), filterObsolete);
 		if (properties.isEmpty()) {
 			return null;
 		}
@@ -79,7 +79,7 @@ public class OntologyPropertyDataManagerImpl implements OntologyPropertyDataMana
 	@Override
 	public List<Property> getAllProperties() throws MiddlewareException {
 		try {
-			return this.getProperties(true, null);
+			return this.getProperties(true, null, true);
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error at getAllProperties :" + e.getMessage(), e);
 		}
@@ -98,7 +98,8 @@ public class OntologyPropertyDataManagerImpl implements OntologyPropertyDataMana
 	@Override
 	public List<Property> getAllPropertiesWithClassAndVariableType(String[] classes, String[] variableTypes) throws MiddlewareException {
 		List<Integer> propertyIds = this.ontologyCommonDAO.getAllPropertyIdsWithClassAndVariableType(classes, variableTypes);
-		return this.getProperties(false, propertyIds);
+		// NOTE: Passing fetchAll as false and filterObsolete as true
+		return this.getProperties(false, propertyIds, true);
 	}
 
 	/**
@@ -109,9 +110,9 @@ public class OntologyPropertyDataManagerImpl implements OntologyPropertyDataMana
 	 * @return List<Property>
 	 * @throws MiddlewareException
 	 */
-	private List<Property> getProperties(Boolean fetchAll, List propertyIds) throws MiddlewareException {
+	private List<Property> getProperties(Boolean fetchAll, List propertyIds, boolean filterObsolete) throws MiddlewareException {
 
-		Map<Integer, Property> map = this.ontologyCommonDAO.getPropertiesWithCropOntologyAndTraits(fetchAll, propertyIds);
+		Map<Integer, Property> map = this.ontologyCommonDAO.getPropertiesWithCropOntologyAndTraits(fetchAll, propertyIds, filterObsolete);
 
 		// Created, modified from CVTermProperty
 		List propertyProp = this.ontologyDaoFactory.getCvTermPropertyDao().getByCvTermIds(new ArrayList<>(map.keySet()));

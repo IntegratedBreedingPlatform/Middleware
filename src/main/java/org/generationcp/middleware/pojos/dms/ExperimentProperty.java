@@ -24,6 +24,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 /**
  * http://gmod.org/wiki/Chado_Natural_Diversity_Module#Table:_nd_experimentprop
  *
@@ -34,6 +37,7 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity
 @Table(name = "nd_experimentprop", uniqueConstraints = {@UniqueConstraint(columnNames = {"nd_experiment_id", "type_id", "rank"})})
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="nd_experimentprop")
 public class ExperimentProperty implements Serializable {
 
 	private static final long serialVersionUID = 1L;

@@ -32,13 +32,13 @@ public class TrialTraitsTest {
 		final TraitServiceImpl trailTraits = new TraitServiceImpl(session);
 
 		final SQLQuery mockSqlQuery = Mockito.mock(SQLQuery.class);
-		Mockito.when(session.createSQLQuery(new TraitNamesQuery().getTraitQuery())).thenReturn(mockSqlQuery);
+		Mockito.when(session.createSQLQuery(TraitServiceImpl.STUDY_TRAITS_QUERY)).thenReturn(mockSqlQuery);
 
 		final Object[] sampleTraits = new Object[] {2019, TrialTraitsTest.TEST_TRAIT};
 
 		Mockito.when(mockSqlQuery.list()).thenReturn(Arrays.<Object[]>asList(sampleTraits));
 
-		List<TraitDto> returnedTraits = trailTraits.getTraits(TrialTraitsTest.TEST_TRAIT_ID);
+		final List<TraitDto> returnedTraits = trailTraits.getTraits(TrialTraitsTest.TEST_TRAIT_ID);
 
 		Mockito.verify(mockSqlQuery).setParameter(0, TrialTraitsTest.TEST_TRAIT_ID);
 		// add additional test code here

@@ -28,7 +28,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.persistence.TableGenerator;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.BatchSize;
 /**
  *
  * http://gmod.org/wiki/Chado_Natural_Diversity_Module#Table:_nd_experiment
@@ -45,12 +49,17 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "nd_experiment")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="nd_experiment")
+//OneToOne relationship to this entity from ExperimentProject requires batching annotation to be on entity unlike OneToMany which can be on the field.
+@BatchSize(size = 500)
 public class ExperimentModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+	@TableGenerator(name = "ndExperimentIdGenerator", table = "sequence", pkColumnName = "sequence_name", valueColumnName = "sequence_value",
+	pkColumnValue = "nd_experiment", allocationSize = 500)
+	@GeneratedValue(strategy = GenerationType.TABLE, generator = "ndExperimentIdGenerator")
 	@Basic(optional = false)
 	@Column(name = "nd_experiment_id")
 	private Integer ndExperimentId;
@@ -65,20 +74,25 @@ public class ExperimentModel implements Serializable {
 	private Integer typeId;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
+	@BatchSize(size = 500)
 	private List<ExperimentProperty> properties;
 
 	@ManyToOne
 	@JoinTable(name = "nd_experiment_project",
-			joinColumns = {@JoinColumn(name = "nd_experiment_id", insertable = false, updatable = false)},
-			inverseJoinColumns = {@JoinColumn(name = "project_id", insertable = false, updatable = false)})
+	joinColumns = {@JoinColumn(name = "nd_experiment_id", insertable = false, updatable = false)},
+	inverseJoinColumns = {@JoinColumn(name = "project_id", insertable = false, updatable = false)})
 	private DmsProject project;
 
+	//FIXME Should this not be a OneToOne? Can one experiment have multiple stock (germplasm) rows?
+	//Collection always contains one item currently.
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
+	@BatchSize(size = 500)
 	private List<ExperimentStock> experimentStocks;
 
 	@OneToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "nd_experiment_phenotype", joinColumns = @JoinColumn(name = "nd_experiment_id"), inverseJoinColumns = @JoinColumn(
 			name = "phenotype_id"))
+	@BatchSize(size = 500)
 	private List<Phenotype> phenotypes;
 
 	public ExperimentModel() {

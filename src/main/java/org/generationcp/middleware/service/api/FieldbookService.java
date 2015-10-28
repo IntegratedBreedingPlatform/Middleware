@@ -15,10 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.dms.DatasetReference;
-import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -32,9 +31,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -48,7 +44,6 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
-// TODO: Auto-generated Javadoc
 /**
  * This is the API for Fieldbook requirements.
  *
@@ -56,73 +51,49 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 public interface FieldbookService {
 
 	/**
-	 * Retrieves all the study details of the nurseries stored in local database.
-	 *
-	 * @return all local nursery details
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<StudyDetails> getAllLocalNurseryDetails(String programUUID) throws MiddlewareQueryException;
-
-	/**
-	 * Retrieves all the details of the trial studies stored in local database.
-	 *
-	 * @return all local trial study details
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<StudyDetails> getAllLocalTrialStudyDetails(String programUUID) throws MiddlewareQueryException;
-
-	/**
 	 * Gets the field map info (entries, reps, plots and counts) of the given trial.
 	 *
 	 * @param trialIdList the trial id list
 	 * @return the FieldMapCount object containing the counts
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList, CrossExpansionProperties crossExpansionProperties)
-			throws MiddlewareQueryException;
+	List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList, CrossExpansionProperties crossExpansionProperties);
 
 	/**
 	 * Gets the field map info (entries, reps, plots and counts) of the given nursery.
 	 *
 	 * @param nurseryIdList the nursery id list
 	 * @return the FieldMapCount object containing the counts
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList, CrossExpansionProperties crossExpansionProperties)
-			throws MiddlewareQueryException;
+	List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList, CrossExpansionProperties crossExpansionProperties);
 
 	/**
 	 * Retrieves all locations from central and local databases.
 	 *
 	 * @return List of location references
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Location> getAllLocations() throws MiddlewareQueryException;
+	List<Location> getAllLocations();
 
 	/**
 	 * Gets the all breeding locations.
 	 *
 	 * @return the all breeding locations
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Location> getAllBreedingLocations() throws MiddlewareQueryException;
+	List<Location> getAllBreedingLocations();
 
 	/**
 	 * Gets the all seed locations.
 	 *
 	 * @return the all seed locations
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Location> getAllSeedLocations() throws MiddlewareQueryException;
+	List<Location> getAllSeedLocations();
 
 	/**
 	 * Gets the all breeding methods.
 	 *
 	 * @param filterOutGenerative the filter out generative
 	 * @return All breeding methods
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Method> getAllBreedingMethods(boolean filterOutGenerative) throws MiddlewareQueryException;
+	List<Method> getAllBreedingMethods(boolean filterOutGenerative);
 
 	/**
 	 * Gets the favorite breeding methods.
@@ -130,9 +101,8 @@ public interface FieldbookService {
 	 * @param methodIds the method ids
 	 * @param filterOutGenerative the filter out generative
 	 * @return the favorite breeding methods
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Method> getFavoriteBreedingMethods(List<Integer> methodIds, boolean filterOutGenerative) throws MiddlewareQueryException;
+	List<Method> getFavoriteBreedingMethods(List<Integer> methodIds, boolean filterOutGenerative);
 
 	/**
 	 * Save or update Field Map Properties like row, column, block, total rows, total columns, planting order.
@@ -140,9 +110,8 @@ public interface FieldbookService {
 	 * @param info the info
 	 * @param userId the user id
 	 * @param isNew the is new
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew) throws MiddlewareQueryException;
+	void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew);
 
 	/**
 	 * Retrieve all field map labels in the block of the specified trial instance id.
@@ -150,37 +119,33 @@ public interface FieldbookService {
 	 * @param datasetId the dataset id
 	 * @param geolocationId the geolocation id
 	 * @return all field maps in block by trial instance id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId,
-			CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException;
+			CrossExpansionProperties crossExpansionProperties);
 
 	/**
 	 * Gets the dataset references.
 	 *
 	 * @param studyId the study id of the datasets
 	 * @return the dataset references belonging to the given study id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<DatasetReference> getDatasetReferences(int studyId) throws MiddlewareQueryException;
+	List<DatasetReference> getDatasetReferences(int studyId);
 
 	/**
 	 * Gets the favorite location by project id.
 	 *
 	 * @param locationIds the location ids
 	 * @return the favorite locations based on the given project id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Location> getFavoriteLocationByProjectId(List<Long> locationIds) throws MiddlewareQueryException;
+	List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
 
 	/**
 	 * Gets the study.
 	 *
 	 * @param studyId the study id
 	 * @return the Study corresponding to the given study id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Study getStudy(int studyId) throws MiddlewareException;
+	Study getStudy(int studyId);
 
 	/**
 	 * Returns the variable id given the property, scale, method, and role (P-S-M-R).
@@ -190,45 +155,40 @@ public interface FieldbookService {
 	 * @param method the method
 	 * @param role the role
 	 * @return the standard variable id by property scale method role
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role)
-			throws MiddlewareQueryException;
+	Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role);
 
 	/**
 	 * Gets the germplasm id by name.
 	 *
 	 * @param name the name
 	 * @return the germplasm id by name
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer getGermplasmIdByName(String name) throws MiddlewareQueryException;
+	Integer getGermplasmIdByName(String name);
 
 	/**
 	 * Gets the data set.
 	 *
 	 * @param id the id
 	 * @return the data set
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Workbook getNurseryDataSet(int id) throws MiddlewareException;
+	Workbook getNurseryDataSet(int id);
 
 	/**
 	 * Gets the data set.
 	 *
 	 * @param id the id
 	 * @return the data set
-	 * @throws MiddlewareException the middleware exception
 	 */
-	Workbook getTrialDataSet(int id) throws MiddlewareException;
+	Workbook getTrialDataSet(int id);
 
 	/**
 	 * Saves the measurement rows of a workbook as a local trial or nursery on the new CHADO schema.
 	 *
 	 * @param workbook that contains the measurement rows to save
-	 * @throws MiddlewareQueryException the middleware query exception
+	 * @param programUUID unique id of the program
 	 */
-	void saveMeasurementRows(Workbook workbook, String programUUID) throws MiddlewareException;
+	void saveMeasurementRows(Workbook workbook, String programUUID);
 
 	/**
 	 * Saves germplasm list advanced nursery types. This method saves the germplasms (and corresponding name) if not found in the database.
@@ -249,63 +209,59 @@ public interface FieldbookService {
 	 * @param germplasmList the germplasm list to add
 	 *
 	 * @return The id of the newly-created germplasm list
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer saveNurseryAdvanceGermplasmList(Map<Germplasm, List<Name>> germplasms, Map<Germplasm, GermplasmListData> listDataItems,
-			GermplasmList germplasmList) throws MiddlewareQueryException;
+
+	Integer saveNurseryAdvanceGermplasmList(List<Pair<Germplasm, List<Name>>> germplasms,
+			List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList);
 
 	/**
 	 * Used for retrieving the Cimmyt Wheat Germplasm name.
 	 *
 	 * @param gid the gid
 	 * @return the cimmyt wheat germplasm name by gid
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	String getCimmytWheatGermplasmNameByGid(int gid) throws MiddlewareQueryException;
+	String getCimmytWheatGermplasmNameByGid(int gid);
 
 	/**
 	 * Used for retrieving the breeding method id given a method id.
 	 *
 	 * @param mid the mid
 	 * @return the breeding method by id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Method getBreedingMethodById(int mid) throws MiddlewareQueryException;
+	Method getBreedingMethodById(int mid);
 
 	/**
 	 * Used for retrieving the germplasm given a germplasm id.
 	 *
 	 * @param gid the gid
 	 * @return the germplasm by gid
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Germplasm getGermplasmByGID(int gid) throws MiddlewareQueryException;
+	Germplasm getGermplasmByGID(int gid);
 
 	/**
 	 * Get germplasm list by name.
 	 *
 	 * @param name the name
+	 * @param programUUID unique id of the program
 	 * @return the germplasm list by name
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	GermplasmList getGermplasmListByName(String name, String programUUID) throws MiddlewareQueryException;
+	GermplasmList getGermplasmListByName(String name, String programUUID);
 
 	/**
 	 * Get All distinct values given a standard variable id.
 	 *
 	 * @param stdVarId the std var id
 	 * @return the distinct standard variable values
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException;
+	List<ValueReference> getDistinctStandardVariableValues(int stdVarId);
 
 	/**
 	 * Get all standard variables.
 	 *
+	 * @param programUUID unique id of the program
 	 * @return the all standard variables
-	 * @throws MiddlewareQueryException the middleware exception
 	 */
-	Set<StandardVariable> getAllStandardVariables(String programUUID) throws MiddlewareException;
+	Set<StandardVariable> getAllStandardVariables(String programUUID);
 
 	/**
 	 * Get all distinct values given the PSMR combination.
@@ -315,43 +271,39 @@ public interface FieldbookService {
 	 * @param method the method
 	 * @param role the role
 	 * @return the distinct standard variable values
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<ValueReference> getDistinctStandardVariableValues(String property, String scale, String method, PhenotypicType role)
-			throws MiddlewareQueryException;
+	List<ValueReference> getDistinctStandardVariableValues(String property, String scale, String method, PhenotypicType role);
 
 	/**
 	 * Get a standard variable given an id.
 	 *
 	 * @param id the id
+	 * @param programUUID unique id of the program
 	 * @return the standard variable
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	StandardVariable getStandardVariable(int id, String programUUID) throws MiddlewareException;
+	StandardVariable getStandardVariable(int id, String programUUID);
 
 	/**
 	 * Gets the all nursery types.
 	 *
+	 * @param programUUID unique id of the program
 	 * @return the all nursery types
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<ValueReference> getAllNurseryTypes(String programUUID) throws MiddlewareException;
+	List<ValueReference> getAllNurseryTypes(String programUUID);
 
 	/**
 	 * Gets the all persons.
 	 *
 	 * @return all persons
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Person> getAllPersons() throws MiddlewareQueryException;
+	List<Person> getAllPersons();
 
 	/**
 	 * Returns all Persons from local sorted by first-middle-last followed by all persons from local sorted by first-middle-last.
 	 *
 	 * @return the all persons ordered by local central
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Person> getAllPersonsOrderedByLocalCentral() throws MiddlewareQueryException;
+	List<Person> getAllPersonsOrderedByLocalCentral();
 
 	/**
 	 * Count plots with plants selectedof nursery.
@@ -359,9 +311,8 @@ public interface FieldbookService {
 	 * @param nurseryId the nursery id
 	 * @param variateIds the variate ids
 	 * @return the count
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	int countPlotsWithRecordedVariatesInDataset(int nurseryId, List<Integer> variateIds) throws MiddlewareQueryException;
+	int countPlotsWithRecordedVariatesInDataset(int nurseryId, List<Integer> variateIds);
 
 	/**
 	 * Filter standard variables by mode.
@@ -370,10 +321,9 @@ public interface FieldbookService {
 	 * @param propertyIds the property ids
 	 * @param isRemoveProperties the is remove properties
 	 * @return the list
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds, List<Integer> propertyIds,
-			boolean isRemoveProperties) throws MiddlewareQueryException;
+			boolean isRemoveProperties);
 
 	/**
 	 * Gets the nursery variable settings.
@@ -381,54 +331,48 @@ public interface FieldbookService {
 	 * @param id the id
 	 * @param isNursery the is nursery
 	 * @return the nursery variable settings
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 
-	Workbook getStudyVariableSettings(int id, boolean isNursery) throws MiddlewareException;
+	Workbook getStudyVariableSettings(int id, boolean isNursery);
 
 	/**
 	 * Gets the germplasms.
 	 *
 	 * @param gids the gids
 	 * @return the germplasms
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Germplasm> getGermplasms(List<Integer> gids) throws MiddlewareQueryException;
+	List<Germplasm> getGermplasms(List<Integer> gids);
 
 	/**
 	 * Gets the all field locations.
 	 *
 	 * @param locationId the location id
 	 * @return the all field locations
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Location> getAllFieldLocations(int locationId) throws MiddlewareQueryException;
+	List<Location> getAllFieldLocations(int locationId);
 
 	/**
 	 * Gets the all block locations.
 	 *
 	 * @param fieldId the field id
 	 * @return all block locations
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Location> getAllBlockLocations(int fieldId) throws MiddlewareQueryException;
+	List<Location> getAllBlockLocations(int fieldId);
 
 	/**
 	 * Gets the block information.
 	 *
 	 * @param blockId the block id
 	 * @return the block information
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	FieldmapBlockInfo getBlockInformation(int blockId) throws MiddlewareQueryException;
+	FieldmapBlockInfo getBlockInformation(int blockId);
 
 	/**
 	 * Gets the all fields.
 	 *
 	 * @return all fields
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Location> getAllFields() throws MiddlewareQueryException;
+	List<Location> getAllFields();
 
 	/**
 	 * Adds the field location.
@@ -437,9 +381,8 @@ public interface FieldbookService {
 	 * @param parentLocationId the parentlocation id
 	 * @param currentUserId the current user id
 	 * @return the id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	int addFieldLocation(String fieldName, Integer parentLocationId, Integer currentUserId) throws MiddlewareQueryException;
+	int addFieldLocation(String fieldName, Integer parentLocationId, Integer currentUserId);
 
 	/**
 	 * Adds the block location.
@@ -448,26 +391,16 @@ public interface FieldbookService {
 	 * @param parentFieldId the parent field id
 	 * @param currentUserId the current user id
 	 * @return the id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	int addBlockLocation(String blockName, Integer parentFieldId, Integer currentUserId) throws MiddlewareQueryException;
+	int addBlockLocation(String blockName, Integer parentFieldId, Integer currentUserId);
 
 	/**
 	 * Get all field maps in the same block.
 	 *
 	 * @param blockId the block id
 	 * @return the field maps in the given block
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId) throws MiddlewareQueryException;
-
-	/**
-	 * Get all Treatment Levels.
-	 *
-	 * @return all treatment levels
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<StandardVariableReference> getAllTreatmentLevels(List<Integer> hiddenFields) throws MiddlewareQueryException;
+	List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId);
 
 	/**
 	 * Fetch all the possible pairs of the treatment level variable.
@@ -475,65 +408,24 @@ public interface FieldbookService {
 	 * @param cvTermId the cv term id
 	 * @param propertyId the property id
 	 * @return list of all possible treatment pairs
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId, List<Integer> hiddenFields)
-			throws MiddlewareQueryException;
-
-	/**
-	 * Returns the study type.
-	 *
-	 * @param studyId the study id
-	 * @return the study type
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	TermId getStudyType(int studyId) throws MiddlewareQueryException;
-
-	/**
-	 * Returns list of root or top-level folders from specified database.
-	 *
-	 * @param programUUID program's unique id
-	 * @return List of Folder POJOs or empty list if none found
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<FolderReference> getRootFolders(String programUUID) throws MiddlewareQueryException;
-
-	/**
-	 * Returns list of children of a folder given its ID. Retrieves from central if the given ID is positive, otherwise retrieves from
-	 * local.
-	 *
-	 * @param folderId The id of the folder to match
-	 * @return List of AbstractNode (FolderNode, StudyNode) POJOs or empty list if none found
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<Reference> getChildrenOfFolder(int folderId, String programUUID) throws MiddlewareQueryException;
-
-	/**
-	 * Check if the given id is an existing study.
-	 *
-	 * @param id the id
-	 * @return true, if is study
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	boolean isStudy(int id) throws MiddlewareQueryException;
+	List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId, List<Integer> hiddenFields);
 
 	/**
 	 * Get lOcation by id.
 	 *
 	 * @param id the id
 	 * @return the location by id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Location getLocationById(int id) throws MiddlewareQueryException;
+	Location getLocationById(int id);
 
 	/**
 	 * Get person by id.
 	 *
 	 * @param id the id
 	 * @return the person by id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Person getPersonById(int id) throws MiddlewareQueryException;
+	Person getPersonById(int id);
 
 	/**
 	 * get the dataset id of the measurement dataset of the study.
@@ -541,54 +433,48 @@ public interface FieldbookService {
 	 * @param studyId the study id
 	 * @param studyName the study name
 	 * @return the measurement dataset id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	int getMeasurementDatasetId(int studyId, String studyName) throws MiddlewareException;
+	int getMeasurementDatasetId(int studyId, String studyName);
 
 	/**
 	 * count the number of observations.
 	 *
 	 * @param datasetId the dataset id
 	 * @return the long
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countObservations(int datasetId) throws MiddlewareQueryException;
+	long countObservations(int datasetId);
 
 	/**
 	 * Counts the number of stocks.
 	 *
 	 * @param datasetId the dataset id
 	 * @return the long
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countStocks(int datasetId) throws MiddlewareQueryException;
+	long countStocks(int datasetId);
 
 	/**
 	 * Determines if fieldmap exists.
 	 *
 	 * @param datasetId the dataset id
 	 * @return true, if successful
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	boolean hasFieldMap(int datasetId) throws MiddlewareQueryException;
+	boolean hasFieldMap(int datasetId);
 
 	/**
 	 * Gets the germplasm list by id.
 	 *
 	 * @param listId the list id
 	 * @return the germplasm list by id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	GermplasmList getGermplasmListById(Integer listId) throws MiddlewareQueryException;
+	GermplasmList getGermplasmListById(Integer listId);
 
 	/**
 	 * Gets the owner.
 	 *
 	 * @param userId the user id
 	 * @return the owner
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	String getOwnerListName(Integer userId) throws MiddlewareQueryException;
+	String getOwnerListName(Integer userId);
 
 	/**
 	 * Get study details.
@@ -596,9 +482,8 @@ public interface FieldbookService {
 	 * @param studyType the study type
 	 * @param studyId the study id
 	 * @return the study details
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	StudyDetails getStudyDetails(StudyType studyType, int studyId) throws MiddlewareQueryException;
+	StudyDetails getStudyDetails(StudyType studyType, int studyId);
 
 	/**
 	 * Get the block id of a particular trial instance in a dataset.
@@ -606,27 +491,24 @@ public interface FieldbookService {
 	 * @param datasetId the dataset id
 	 * @param trialInstance the trial instance
 	 * @return the block id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	String getBlockId(int datasetId, String trialInstance) throws MiddlewareQueryException;
+	String getBlockId(int datasetId, String trialInstance);
 
 	/**
 	 * Gets the folder name by id.
 	 *
 	 * @param folderId the folder id
 	 * @return the folder name by id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	String getFolderNameById(Integer folderId) throws MiddlewareQueryException;
+	String getFolderNameById(Integer folderId);
 
 	/**
 	 * Returns true if all instances in the study has fieldmap.
 	 *
 	 * @param studyId the study id
 	 * @return true, if successful
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	boolean checkIfStudyHasFieldmap(int studyId) throws MiddlewareQueryException;
+	boolean checkIfStudyHasFieldmap(int studyId);
 
 	/**
 	 * Builds the Trial Observations from the trial dataset id.
@@ -635,10 +517,9 @@ public interface FieldbookService {
 	 * @param factorList the factor list
 	 * @param variateList the variate list
 	 * @return the list
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList,
-			List<MeasurementVariable> variateList) throws MiddlewareException;
+			List<MeasurementVariable> variateList);
 
 	/**
 	 * Check if study has measurement data.
@@ -646,9 +527,8 @@ public interface FieldbookService {
 	 * @param datasetId the dataset id
 	 * @param variateIds the variate ids
 	 * @return true, if successful
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
+	boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds);
 
 	/**
 	 * Count the number of variates with data.
@@ -656,26 +536,23 @@ public interface FieldbookService {
 	 * @param datasetId the dataset id
 	 * @param variateIds the variate ids
 	 * @return the int
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	int countVariatesWithData(int datasetId, List<Integer> variateIds) throws MiddlewareQueryException;
+	int countVariatesWithData(int datasetId, List<Integer> variateIds);
 
 	/**
 	 * Delete observations of study.
 	 *
 	 * @param datasetId the dataset id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void deleteObservationsOfStudy(int datasetId) throws MiddlewareQueryException;
+	void deleteObservationsOfStudy(int datasetId);
 
 	/**
 	 * Get germplasms by name.
 	 *
 	 * @param name the name
 	 * @return the germplasm ids by name
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Integer> getGermplasmIdsByName(String name) throws MiddlewareQueryException;
+	List<Integer> getGermplasmIdsByName(String name);
 
 	/**
 	 * Add Germplasm Name.
@@ -687,10 +564,15 @@ public interface FieldbookService {
 	 * @param locationId the location id
 	 * @param date the date
 	 * @return the integer
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer addGermplasmName(String nameValue, int gid, int userId, int nameTypeId, int locationId, Integer date)
-			throws MiddlewareQueryException;
+	Integer addGermplasmName(String nameValue, int gid, int userId, int nameTypeId, int locationId, Integer date);
+
+	/**
+	 *
+	 * @param names The list of germplasm names to be added into the system
+	 * @return
+	 */
+	List<Integer> addGermplasmNames(List<Name> names);
 
 	/**
 	 * Adds a new Germplasm.
@@ -698,9 +580,8 @@ public interface FieldbookService {
 	 * @param nameValue the name value
 	 * @param userId the user id
 	 * @return the integer
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer addGermplasm(String nameValue, int userId) throws MiddlewareQueryException;
+	Integer addGermplasm(String nameValue, int userId);
 
 	/**
 	 * Adds the germplasm.
@@ -708,9 +589,15 @@ public interface FieldbookService {
 	 * @param germplasm the germplasm
 	 * @param name the name
 	 * @return the integer
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer addGermplasm(Germplasm germplasm, Name name) throws MiddlewareQueryException;
+	Integer addGermplasm(Germplasm germplasm, Name name);
+
+	/**
+	 *
+	 * @param germplasmPairs
+	 * @return
+	 */
+	List<Integer> addGermplasm(List<Pair<Germplasm, Name>> germplasmPairs);
 
 	/**
 	 * Get an id from the project table that matches the name (regardless if it's a study or a folder).
@@ -718,9 +605,8 @@ public interface FieldbookService {
 	 * @param name the name
 	 * @param programUUID the program UUID
 	 * @return the project id by name
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer getProjectIdByNameAndProgramUUID(String name, String programUUID) throws MiddlewareQueryException;
+	Integer getProjectIdByNameAndProgramUUID(String name, String programUUID);
 
 	/**
 	 * Returns the stanadard variale given the PSMR combination.
@@ -730,13 +616,11 @@ public interface FieldbookService {
 	 * @param method the method
 	 * @param role the role
 	 * @return the measurement variable by property scale method and role
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(String property, String scale, String method,
-			PhenotypicType role, String programUUID) throws MiddlewareException;
+			PhenotypicType role, String programUUID);
 
-	public void setTreatmentFactorValues(List<TreatmentVariable> treatmentFactors, int measurementDatasetID)
-			throws MiddlewareQueryException;
+	public void setTreatmentFactorValues(List<TreatmentVariable> treatmentFactors, int measurementDatasetID);
 
 	/**
 	 * Return the measurement rows of a given dataset.
@@ -744,103 +628,94 @@ public interface FieldbookService {
 	 * @param datasetId the dataset id
 	 * @param isTrial the is trial
 	 * @return the complete dataset
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Workbook getCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareException;
+	Workbook getCompleteDataset(int datasetId, boolean isTrial);
 
 	/**
 	 * Gets the germplasm name types.
 	 *
 	 * @return the germplasm name types
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<UserDefinedField> getGermplasmNameTypes() throws MiddlewareQueryException;
+	List<UserDefinedField> getGermplasmNameTypes();
 
 	/**
 	 * Returns a map of Gid, and list of Names.
 	 *
 	 * @param gids the gids
 	 * @return the names by gids
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Map<Integer, List<Name>> getNamesByGids(List<Integer> gids) throws MiddlewareQueryException;
+	Map<Integer, List<Name>> getNamesByGids(List<Integer> gids);
 
 	/**
 	 * Count germplasm list data by list id.
 	 *
 	 * @param listId the list id
 	 * @return the int
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	int countGermplasmListDataByListId(Integer listId) throws MiddlewareQueryException;
+	int countGermplasmListDataByListId(Integer listId);
 
 	/**
 	 * Count list data project germplasm list data by list id.
 	 *
 	 * @param listId the list id
 	 * @return the int
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	int countListDataProjectGermplasmListDataByListId(Integer listId) throws MiddlewareQueryException;
+	int countListDataProjectGermplasmListDataByListId(Integer listId);
 
 	/**
 	 * Gets the method by code.
 	 *
 	 * @param code the code
+	 * @param programUUID unique id of the program
 	 * @return the method by code
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Method getMethodByCode(String code, String programUUID) throws MiddlewareQueryException;
+	Method getMethodByCode(String code, String programUUID);
 
 	/**
 	 * Gets the method by id.
 	 *
 	 * @param id the id
 	 * @return the method by id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Method getMethodById(int id) throws MiddlewareQueryException;
+	Method getMethodById(int id);
 
 	/**
 	 * Gets the method by name.
 	 *
 	 * @param name the name
 	 * @return the method by name
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Method getMethodByName(String name) throws MiddlewareQueryException;
+	Method getMethodByName(String name);
 
 	/*
 	 * Deletes a study (logical delete).
 	 */
-	void deleteStudy(int studyId, Integer currentUserId) throws UnpermittedDeletionException, MiddlewareException;
+	void deleteStudy(int studyId, Integer currentUserId) throws UnpermittedDeletionException;
 
 	/**
 	 * Gets the favorite project location ids.
 	 *
 	 * @param programUUID - unique id of program
 	 * @return the favorite project location ids
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Long> getFavoriteProjectLocationIds(String programUUID) throws MiddlewareQueryException;
+	List<Integer> getFavoriteProjectLocationIds(String programUUID);
 
 	/**
 	 * Gets the favorite project methods.
 	 *
 	 * @param programUUID - unique id of program
 	 * @return the favorite project methods
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Integer> getFavoriteProjectMethods(String programUUID) throws MiddlewareQueryException;
+	List<Integer> getFavoriteProjectMethods(String programUUID);
 
 	/**
 	 * Returns germplasm lists by project id.
 	 *
 	 * @param projectId
-	 * @return
-	 * @throws MiddlewareQueryException
+	 * @param germplasm list type
+	 * @return List of GermplasmList objects under the given project id and type
 	 */
-	List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType type) throws MiddlewareQueryException;
+	List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType type);
 
 	/**
 	 * Creates or Update a list data project.
@@ -849,34 +724,30 @@ public interface FieldbookService {
 	 * @param type
 	 * @param list
 	 * @return
-	 * @throws MiddlewareQueryException
 	 */
-	int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> list, int userId)
-			throws MiddlewareQueryException;
+	int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> list, int userId);
 
-	void updateGermlasmListInfoStudy(int crossesListId, int studyId) throws MiddlewareQueryException;
+	void updateGermlasmListInfoStudy(int crossesListId, int studyId);
 
 	/**
 	 * Retrieves a list data project
 	 *
 	 * @param listId
 	 * @return
-	 * @throws MiddlewareQueryException
 	 */
-	List<ListDataProject> getListDataProject(int listId) throws MiddlewareQueryException;
+	List<ListDataProject> getListDataProject(int listId);
 
-	ListDataProject getListDataProjectByStudy(int projectId, GermplasmListType type, int plotId) throws MiddlewareQueryException;
+	ListDataProject getListDataProjectByStudy(int projectId, GermplasmListType type, int plotId);
 
-	ListDataProject getListDataProjectByListIdAndEntryNo(int listId, int entryNo) throws MiddlewareQueryException;
+	ListDataProject getListDataProjectByListIdAndEntryNo(int listId, int entryNo);
 
 	/**
 	 * Deletes a list data project given the project_id and the type.
 	 *
 	 * @param projectId
 	 * @param type
-	 * @throws MiddlewareQueryException
 	 */
-	void deleteListDataProjects(int projectId, GermplasmListType type) throws MiddlewareQueryException;
+	void deleteListDataProjects(int projectId, GermplasmListType type);
 
 	/**
 	 * Saves germplasm list crosses types. ListData items are always added to the database, before saving the germplasm list.
@@ -885,26 +756,24 @@ public interface FieldbookService {
 	 * @param germplasmList the germplasm list to add
 	 *
 	 * @return The id of the newly-created germplasm list
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer saveGermplasmList(Map<Germplasm, GermplasmListData> listDataItems, GermplasmList germplasmList) throws MiddlewareQueryException;
+	Integer saveGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList);
 
-	void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds) throws MiddlewareException;
+	void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds);
 
-	boolean setOrderVariableByRank(Workbook workbook) throws MiddlewareException;
+	boolean setOrderVariableByRank(Workbook workbook);
 
-	void addListDataProjectList(List<ListDataProject> listDataProjectList) throws MiddlewareQueryException;
+	void addListDataProjectList(List<ListDataProject> listDataProjectList);
 
 	/**
 	 * Gets the StandardVariable by Name
 	 *
 	 * @param name of the Standard Varible
-	 * @throws MiddlewareQueryException the middleware query exception
+	 * @param programUUID unique id of the program
 	 **/
-	StandardVariable getStandardVariableByName(String name, String programUUID) throws MiddlewareException;
+	StandardVariable getStandardVariableByName(String name, String programUUID);
 
-	List<StandardVariableReference> filterStandardVariablesByIsAIds(List<StandardVariableReference> standardReferences,
-			List<Integer> isAIds);
+	List<StandardVariableReference> filterStandardVariablesByIsAIds(List<StandardVariableReference> standardReferences, List<Integer> isAIds);
 
-	Location getLocationByName(String locationName, Operation op) throws MiddlewareQueryException;
+	Location getLocationByName(String locationName, Operation op);
 }

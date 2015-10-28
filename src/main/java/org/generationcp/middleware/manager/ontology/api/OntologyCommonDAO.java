@@ -10,5 +10,5 @@ public interface OntologyCommonDAO {
 
 	List<Integer> getAllPropertyIdsWithClassAndVariableType(String[] classes, String[] variableTypes) throws MiddlewareException;
 
-	Map<Integer, Property> getPropertiesWithCropOntologyAndTraits(Boolean fetchAll, List propertyIds) throws MiddlewareException;
+	Map<Integer, Property> getPropertiesWithCropOntologyAndTraits(Boolean fetchAll, List propertyIds, boolean filterObsolete) throws MiddlewareException;
 }

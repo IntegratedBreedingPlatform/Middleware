@@ -214,7 +214,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
         this.propertyDao.save(updateProperty);
 
 
-       Property property=this.manager.getProperty(propertyTerm.getCvTermId());
+       Property property=this.manager.getProperty(propertyTerm.getCvTermId(), true);
 
         // Make sure our method exists and is inserted properly and display proper message if it is not inserted properly
         String message = "The %s for property '" + property.getId() + "' was not added correctly.";
@@ -225,6 +225,9 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
         Assert.assertEquals(String.format(message, "UpdatedDate"), testUpdatedDate, property.getDateLastModified());
 
         Assert.assertEquals(String.format(message, "CropOntologyId"), cropOntologyId, property.getCropOntologyId());
-        Assert.assertArrayEquals(String.format(message, "TraitClasses"), isATermNames.toArray(), property.getClasses().toArray());
+		Assert.assertEquals(String.format(message, "Class Size"), isATermNames.size(), property.getClasses().size());
+		for (String termName : isATermNames) {
+			Assert.assertTrue(property.getClasses().contains(termName));
+		}
     }
 }

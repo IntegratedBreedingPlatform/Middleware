@@ -103,7 +103,7 @@ public class OntologyMethodDataManagerImplUnitTest extends UnitTestBase {
 			updateDateMap.put(property.getCvTermId(), property.getValue());
 		}
 
-		Mockito.when(this.cvTermDao.getAllByCvId(CvId.METHODS)).thenReturn(methodTerms);
+		Mockito.when(this.cvTermDao.getAllByCvId(CvId.METHODS, false)).thenReturn(methodTerms);
 
 		List<CVTermProperty> combinedProperties = new ArrayList<>(methodCreatedDateProperties);
 		combinedProperties.addAll(methodUpdatedDateProperties);
@@ -152,14 +152,14 @@ public class OntologyMethodDataManagerImplUnitTest extends UnitTestBase {
 		List<CVTermProperty> methodUpdatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(methodTerm), methodUpdatedDateProperties, testUpdatedDate);
 
-		Mockito.when(this.cvTermDao.getAllByCvId(Collections.singletonList(methodTerm.getCvTermId()), CvId.METHODS))
+		Mockito.when(this.cvTermDao.getAllByCvId(Collections.singletonList(methodTerm.getCvTermId()), CvId.METHODS, false))
 				.thenReturn(Collections.singletonList(methodTerm));
 		List<CVTermProperty> combinedProperties = new ArrayList<>(methodCreatedDateProperties);
 		combinedProperties.addAll(methodUpdatedDateProperties);
 		Mockito.when(this.cvTermPropertyDao.getByCvTermIds(Collections.singletonList(methodTerm.getCvTermId())))
 				.thenReturn(combinedProperties);
 
-		Method method = this.methodDataManager.getMethod(methodTerm.getCvTermId());
+		Method method = this.methodDataManager.getMethod(methodTerm.getCvTermId(), false);
 
 		// Make sure each method data inserted properly, assert them and display proper message
 		String message = "The %s for method '" + method.getId() + "' was not added correctly.";
@@ -175,9 +175,9 @@ public class OntologyMethodDataManagerImplUnitTest extends UnitTestBase {
 	* */
 	@Test
 	public void testGetMethodByIdShouldReturnNullIfTermDoesNotExists() throws Exception {
-		Method method = this.methodDataManager.getMethod(0);
+		Method method = this.methodDataManager.getMethod(0, false);
 		Assert.assertNull(method);
-		Mockito.verify(this.cvTermDao, Mockito.times(1)).getAllByCvId(Collections.singletonList(0), CvId.METHODS);
+		Mockito.verify(this.cvTermDao, Mockito.times(1)).getAllByCvId(Collections.singletonList(0), CvId.METHODS, false);
 	}
 
 	/**

@@ -24,6 +24,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 /**
  * http://gmod.org/wiki/Chado_Tables
  *
@@ -32,7 +35,8 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity()
 @Table(name = "project_relationship", uniqueConstraints = {@UniqueConstraint(columnNames = {"subject_project_id", "object_project_id",
-		"type_id"})})
+"type_id"})})
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="project_relationship")
 public class ProjectRelationship implements Serializable {
 
 	private static final long serialVersionUID = -5199851718622429971L;

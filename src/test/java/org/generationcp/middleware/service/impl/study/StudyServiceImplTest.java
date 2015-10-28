@@ -34,12 +34,13 @@ public class StudyServiceImplTest {
 	 */
 	@Test
 	public void listMeasurementData() throws Exception {
-		TraitService mockTrialTraits = Mockito.mock(TraitService.class);
-		StudyMeasurements mockTrailMeasurements = Mockito.mock(StudyMeasurements.class);
-		StudyServiceImpl result =
-				new StudyServiceImpl(mockTrialTraits, mockTrailMeasurements, Mockito.mock(StudyGermplasmListService.class));
+		final TraitService mockTrialTraits = Mockito.mock(TraitService.class);
+		final StudyMeasurements mockTrailMeasurements = Mockito.mock(StudyMeasurements.class);
+		final StudyGermplasmListService mockStudyGermplasmListService = Mockito.mock(StudyGermplasmListService.class);
 
-		List<TraitDto> projectTraits = Arrays.<TraitDto>asList(new TraitDto(1, "Trait1"), new TraitDto(1, "Trait2"));
+		final StudyServiceImpl result = new StudyServiceImpl(mockTrialTraits, mockTrailMeasurements, mockStudyGermplasmListService);
+
+		final List<TraitDto> projectTraits = Arrays.<TraitDto>asList(new TraitDto(1, "Trait1"), new TraitDto(1, "Trait2"));
 		Mockito.when(mockTrialTraits.getTraits(1234)).thenReturn(projectTraits);
 		final List<MeasurementDto> traits = new ArrayList<MeasurementDto>();
 		traits.add(new MeasurementDto(new TraitDto(1, "traitName"), 9999, "triatValue"));
@@ -56,10 +57,10 @@ public class StudyServiceImplTest {
 
 	@Test
 	public void testlistAllStudies() throws MiddlewareQueryException {
-		Session mockSession = Mockito.mock(Session.class);
-		SQLQuery mockSqlQuery = Mockito.mock(SQLQuery.class);
+		final Session mockSession = Mockito.mock(Session.class);
+		final SQLQuery mockSqlQuery = Mockito.mock(SQLQuery.class);
 
-		HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
+		final HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
 		Mockito.when(mockSessionProvider.getSession()).thenReturn(mockSession);
 		Mockito.when(mockSession.createSQLQuery(Matchers.anyString())).thenReturn(mockSqlQuery);
 		Mockito.when(mockSqlQuery.addScalar(Matchers.anyString())).thenReturn(mockSqlQuery);
@@ -71,12 +72,12 @@ public class StudyServiceImplTest {
 
 		Mockito.when(mockSqlQuery.list()).thenReturn(testResult);
 
-		StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
-		List<StudySummary> studySummaries = studyServiceImpl.listAllStudies("c996de54-3ebb-41ca-8fed-160a33ffffd4");
+		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
+		final List<StudySummary> studySummaries = studyServiceImpl.listAllStudies("c996de54-3ebb-41ca-8fed-160a33ffffd4");
 		Assert.assertNotNull(studySummaries);
 		Assert.assertEquals(1, studySummaries.size());
 
-		StudySummary studySummary = studySummaries.get(0);
+		final StudySummary studySummary = studySummaries.get(0);
 
 		Assert.assertEquals(testDBRow[0], studySummary.getId());
 		Assert.assertEquals(testDBRow[1], studySummary.getName());

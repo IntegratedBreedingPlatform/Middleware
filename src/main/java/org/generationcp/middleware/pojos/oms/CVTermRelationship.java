@@ -21,6 +21,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 
 /**
  *
@@ -36,6 +39,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "cvterm_relationship")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="cvterm_relationship")
 public class CVTermRelationship implements Serializable {
 
 	private static final long serialVersionUID = 1L;

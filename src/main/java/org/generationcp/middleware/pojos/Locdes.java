@@ -21,6 +21,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 /**
  * POJO for locdes table.
  *
@@ -28,6 +31,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "locdes")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="locdes")
 public class Locdes implements Serializable {
 
 	private static final long serialVersionUID = 1L;

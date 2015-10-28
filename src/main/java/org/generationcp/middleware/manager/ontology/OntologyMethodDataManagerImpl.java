@@ -53,8 +53,8 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 	}
 
 	@Override
-	public Method getMethod(int id) throws MiddlewareException {
-		List<Method> methods = this.getMethods(false, new ArrayList<>(Collections.singletonList(id)));
+	public Method getMethod(int id, boolean filterObsolete) throws MiddlewareException {
+		List<Method> methods = this.getMethods(false, new ArrayList<>(Collections.singletonList(id)), filterObsolete);
 		if (methods.isEmpty()) {
 			return null;
 		}
@@ -63,7 +63,7 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 
 	@Override
 	public List<Method> getAllMethods() throws MiddlewareException {
-		return this.getMethods(true, null);
+		return this.getMethods(true, null, true);
 	}
 
 	/**
@@ -71,10 +71,11 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 	 * 
 	 * @param fetchAll will tell wheather query should get all methods or not.
 	 * @param methodIds will tell wheather methodIds should be pass to filter result. Combination of these two will give flexible usage.
+	 * @param filterObsolete will tell whether obsolete methods will be filtered
 	 * @return List<Method>
 	 * @throws MiddlewareException
 	 */
-	private List<Method> getMethods(Boolean fetchAll, List<Integer> methodIds) throws MiddlewareException {
+	private List<Method> getMethods(Boolean fetchAll, List<Integer> methodIds, boolean filterObsolete) {
 
 		Map<Integer, Method> map = new HashMap<>();
 		if (methodIds == null) {
@@ -82,8 +83,8 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 		}
 
 		List<CVTerm> terms = fetchAll ?
-				this.ontologyDaoFactory.getCvTermDao().getAllByCvId(CvId.METHODS) :
-				this.ontologyDaoFactory.getCvTermDao().getAllByCvId(methodIds, CvId.METHODS);
+				this.ontologyDaoFactory.getCvTermDao().getAllByCvId(CvId.METHODS, filterObsolete) :
+				this.ontologyDaoFactory.getCvTermDao().getAllByCvId(methodIds, CvId.METHODS, filterObsolete);
 
 		for (CVTerm m : terms) {
 			Method method = new Method(Term.fromCVTerm(m));

@@ -19,6 +19,9 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_cvtermsynonym
  *
@@ -31,6 +34,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "cvtermsynonym")
+@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="cvtermsynonym")
 public class CVTermSynonym implements Serializable {
 
 	private static final long serialVersionUID = 1L;

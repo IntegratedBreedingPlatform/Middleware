@@ -146,7 +146,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
         this.propertyDao.save(methodUpdatedDateProperty);
 
 		// Fetch all methods and check our method exists or not.
-		Method method = this.manager.getMethod(methodTerm.getCvTermId());
+		Method method = this.manager.getMethod(methodTerm.getCvTermId(), true);
 
 		// Make sure each method data inserted properly, assert them and display proper message if not inserted properly
 		String message = "The %s for method '" + method.getId() + "' was not added correctly.";

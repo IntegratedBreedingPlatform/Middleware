@@ -123,4 +123,12 @@ public abstract class Reference {
 	private String getEntityName() {
 		return this.getClass().getName();
 	}
+	
+	public boolean isFolder() {
+		return this instanceof FolderReference;
+	}
+	
+	public boolean isStudy() {
+		return this instanceof StudyReference;
+	}
 }

@@ -35,17 +35,17 @@ public class ObservationsTest {
 
 	@Before
 	public void setup() {
-		mockSession = Mockito.mock(Session.class);
-		observation = new Observations(mockSession);
+		this.mockSession = Mockito.mock(Session.class);
+		this.observation = new Observations(this.mockSession);
 		final List<MeasurementDto> traitMeasurements = new ArrayList<MeasurementDto>();
-		measurementDto = Mockito.mock(MeasurementDto.class);
-		traitMeasurements.add(measurementDto);
-		
-		observationDto = new ObservationDto(new Integer(1), "TrialInstance", "EntryType", new Integer(100), 
+		this.measurementDto = Mockito.mock(MeasurementDto.class);
+		traitMeasurements.add(this.measurementDto);
+
+		this.observationDto = new ObservationDto(new Integer(1), "TrialInstance", "EntryType", new Integer(100),
 				"GID Designation", "Entry No", "Seed Source", "Repition Number", "Plot Number", traitMeasurements);
 	}
-	
-	
+
+
 	/**
 	 * Run the void updataObsevation(Measurement) method test an insert scenario.
 	 *
@@ -53,25 +53,23 @@ public class ObservationsTest {
 	@Test
 	public void insertTrait() throws Exception {
 
-		when(measurementDto.getTriatValue()).thenReturn("Test Value");
-		when(measurementDto.getTrait()).thenReturn(new TraitDto(999, "Test Trait"));
-		when(mockSession.save(isA(Phenotype.class))).thenAnswer(new Answer<Serializable>() {
+		when(this.measurementDto.getTriatValue()).thenReturn("Test Value");
+		when(this.measurementDto.getTrait()).thenReturn(new TraitDto(999, "Test Trait"));
+		when(this.mockSession.save(isA(Phenotype.class))).thenAnswer(new Answer<Serializable>() {
 			@Override
 			public Serializable answer(InvocationOnMock invocation) throws Throwable {
 				final Object[] arugment = invocation.getArguments();
 				final Phenotype phenotype = (Phenotype) arugment[0];
 				phenotype.setPhenotypeId(999);
-				
+
 				return 1;
 			}
 		});
-		
-		observation.updataObsevationTraits(observationDto);
-		
-		verify(mockSession,times(1)).save(isA(Phenotype.class));
-		verify(mockSession,times(1)).save(isA(ExperimentPhenotype.class));
 
-		verify(mockSession,times(1)).update(isA(Phenotype.class));
+		this.observation.updataObsevationTraits(this.observationDto);
+
+		verify(this.mockSession,times(1)).save(isA(Phenotype.class));
+		verify(this.mockSession,times(1)).save(isA(ExperimentPhenotype.class));
 
 		// add additional test code here
 	}
@@ -83,11 +81,11 @@ public class ObservationsTest {
 	@Test
 	public void updateTrait() throws Exception {
 
-		when(measurementDto.getTriatValue()).thenReturn("Test Value");
-		when(measurementDto.getPhenotypeId()).thenReturn(1);
-		when(measurementDto.getTrait()).thenReturn(new TraitDto(999, "Test Trait"));
-		when(mockSession.get(Phenotype.class, 1)).thenReturn(Mockito.mock(Phenotype.class));
-		observation.updataObsevationTraits(observationDto);
-		verify(mockSession,times(1)).update(isA(Phenotype.class));
+		when(this.measurementDto.getTriatValue()).thenReturn("Test Value");
+		when(this.measurementDto.getPhenotypeId()).thenReturn(1);
+		when(this.measurementDto.getTrait()).thenReturn(new TraitDto(999, "Test Trait"));
+		when(this.mockSession.get(Phenotype.class, 1)).thenReturn(Mockito.mock(Phenotype.class));
+		this.observation.updataObsevationTraits(this.observationDto);
+		verify(this.mockSession,times(1)).update(isA(Phenotype.class));
 	}
 }

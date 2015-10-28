@@ -72,7 +72,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	private static final Integer STUDY_ID = 10010;
 	private static final Integer DATASET_ID = 10045;
-	private static final Integer ROOT_STUDY_FOLDER = 1;
 
 	@Autowired
 	private StudyDataManager manager;
@@ -257,7 +256,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetRootFolders() throws Exception {
-		List<FolderReference> rootFolders = this.manager.getRootFolders(this.commonTestProject.getUniqueID());
+		List<Reference> rootFolders = this.manager.getRootFolders(this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
 		Assert.assertNotNull(rootFolders);
 		// this should contain the nursery and trial templates
 		Assert.assertFalse(rootFolders.isEmpty());
@@ -267,14 +266,16 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		studyTestDataUtil.createFolderTestData(uniqueId);
 		studyTestDataUtil.createStudyTestData(uniqueId);
 
-		rootFolders = this.manager.getRootFolders(this.commonTestProject.getUniqueID());
+		rootFolders = this.manager.getRootFolders(this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
 		Assert.assertNotNull(rootFolders);
 		Assert.assertFalse(rootFolders.isEmpty());
 
 		Debug.println(IntegrationTestBase.INDENT, "testGetRootFolders(): " + rootFolders.size());
-		for (FolderReference node : rootFolders) {
+		for (Reference node : rootFolders) {
 			Debug.println(IntegrationTestBase.INDENT, "   " + node);
-			Assert.assertEquals(node.getParentFolderId(), StudyDataManagerImplTest.ROOT_STUDY_FOLDER);
+			if (node.isFolder()) {
+				Assert.assertEquals(((FolderReference) node).getParentFolderId(), DmsProject.SYSTEM_FOLDER_ID);
+			}
 		}
 	}
 
@@ -288,7 +289,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		List<Integer> folderIds = Arrays.asList(25000, 1);
 		for (Integer folderId : folderIds) {
 			Debug.println(IntegrationTestBase.INDENT, " folderId = " + folderId);
-			List<Reference> childrenNodes = this.manager.getChildrenOfFolder(folderId, this.commonTestProject.getUniqueID());
+			List<Reference> childrenNodes = this.manager.getChildrenOfFolder(folderId, this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
 			Assert.assertNotNull(childrenNodes);
 			Assert.assertTrue(childrenNodes.size() > 0);
 			Debug.println(IntegrationTestBase.INDENT, "testGetChildrenOfFolder(folderId=" + folderId + "): " + childrenNodes.size());
@@ -303,6 +304,21 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		}
 		studyTestDataUtil.deleteTestData(folderWithUUID.getProjectId());
 		studyTestDataUtil.deleteTestData(folderWithoutUUID.getProjectId());
+	}
+	
+	@Test
+	public void testGetAllFolders() {
+
+		final StudyTestDataUtil studyTestDataUtil = new StudyTestDataUtil(this.manager, this.ontologyManager);
+
+		studyTestDataUtil.createFolderTestData(this.commonTestProject.getUniqueID());
+		studyTestDataUtil.createFolderTestData(null);
+
+		final List<FolderReference> allFolders = this.manager.getAllFolders();
+		// We only assert that there are minimum two folders that we added in test.
+		// The test database might already have some pre-init and developer created folders too which we dont want the test to depend on
+		// because we do not reset the test database for each test run yet.
+		Assert.assertTrue(allFolders.size() >= 2);
 	}
 
 	@Test
@@ -910,6 +926,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		VariableTypeList variableTypeList = new VariableTypeList();
 
 		DMSVariableType grainYieldSem = this.createVariableType(18140, "GRAIN_YIELD_SUMMARY_STAT", "test", 100);
+		grainYieldSem.setRole(PhenotypicType.VARIATE);
 		variableTypeList.add(grainYieldSem);
 
 		return variableTypeList;
@@ -924,6 +941,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Variable var = new Variable();
 		var.setValue(value);
 		var.setVariableType(vtype);
+		vtype.setRole(PhenotypicType.VARIATE);
 		return var;
 	}
 
@@ -935,6 +953,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		vtype.setLocalDescription(description);
 		vtype.setRank(rank);
 		vtype.setStandardVariable(stdVar);
+		vtype.setRole(PhenotypicType.VARIATE);
 
 		return vtype;
 	}
@@ -1403,11 +1422,11 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			studyTestDataUtil.createStudyTestData(uniqueId);
 			studyTestDataUtil.createStudyTestDataWithActiveStatus(uniqueId);
 
-			List<FolderReference> programStudiesAndFolders = studyTestDataUtil.getLocalRootFolders(this.commonTestProject.getUniqueID());
+			List<? extends  Reference> programStudiesAndFolders = studyTestDataUtil.getRootFolders(this.commonTestProject.getUniqueID());
 			Assert.assertEquals("Current Program with programUUID " + this.commonTestProject.getUniqueID() + " should return 3 children",
 					3, programStudiesAndFolders.size());
 			this.manager.deleteProgramStudies(this.commonTestProject.getUniqueID());
-			programStudiesAndFolders = studyTestDataUtil.getLocalRootFolders(this.commonTestProject.getUniqueID());
+			programStudiesAndFolders = studyTestDataUtil.getRootFolders(this.commonTestProject.getUniqueID());
 			Assert.assertEquals("Current Program with programUUID " + this.commonTestProject.getUniqueID() + " should return no children",
 					0, programStudiesAndFolders.size());
 		} catch (MiddlewareException e) {
@@ -1497,5 +1516,29 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetAllSharedProjectNames() throws MiddlewareQueryException {
 		List<String> sharedProjectNames = this.manager.getAllSharedProjectNames();
 		Assert.assertNotNull(sharedProjectNames);
+	}
+
+	@Test
+	public void testCheckIfAnyLocationIDsExistInExperimentsReturnTrue() {
+
+		Integer locationId = this.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(STUDY_ID, "1");
+		List<Integer> locationIds = new ArrayList<>();
+		locationIds.add(locationId);
+
+		boolean returnValue = this.manager.checkIfAnyLocationIDsExistInExperiments(STUDY_ID, DataSetType.PLOT_DATA, locationIds);
+
+		Assert.assertTrue(returnValue);
+	}
+
+	@Test
+	public void testCheckIfAnyLocationIDsExistInExperimentsReturnFalse() {
+
+		Integer locationId = this.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(STUDY_ID, "999");
+		List<Integer> locationIds = new ArrayList<>();
+		locationIds.add(locationId);
+
+		boolean returnValue = this.manager.checkIfAnyLocationIDsExistInExperiments(STUDY_ID, DataSetType.PLOT_DATA, locationIds);
+
+		Assert.assertFalse(returnValue);
 	}
 }

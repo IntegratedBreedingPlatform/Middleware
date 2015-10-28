@@ -2,8 +2,6 @@
 package org.generationcp.middleware.service.impl.study;
 
 import java.util.List;
-import java.util.UUID;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -45,14 +43,11 @@ public class Observations {
 
 		final Phenotype phenotype = new Phenotype();
 		// TODO: You need a comment here dude :)
-		phenotype.setUniqueName(UUID.randomUUID().toString());
 		phenotype.setName(observeableId.toString());
 		phenotype.setObservableId(observeableId);
 		phenotype.setValue(triatValue);
 
 		this.session.save(phenotype);
-		phenotype.setUniqueName(phenotype.getPhenotypeId().toString());
-		this.session.update(phenotype);
 
 		final ExperimentPhenotype experimentPhenotype = new ExperimentPhenotype();
 		experimentPhenotype.setPhenotype(phenotype.getPhenotypeId());
