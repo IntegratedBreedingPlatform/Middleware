@@ -35,27 +35,27 @@ class OntologyCommonDAOImpl implements OntologyCommonDAO {
 	}
 
 	public List<Integer> getAllPropertyIdsWithClassAndVariableType(String[] classes, String[] variableTypes) throws MiddlewareException {
-			String classFilter = !(Objects.equals(classes, null) || classes.length == 0) ? " and dt.name in (:classes) " : "";
-			String variableTypeFilter =
-					!(Objects.equals(variableTypes, null) || variableTypes.length == 0) ? " and c.value in (:variableTypes) " : "";
+		String classFilter = !(Objects.equals(classes, null) || classes.length == 0) ? " and dt.name in (:classes) " : "";
+		String variableTypeFilter =
+				!(Objects.equals(variableTypes, null) || variableTypes.length == 0) ? " and c.value in (:variableTypes) " : "";
 
-			SQLQuery query = sessionProvider.getSession().createSQLQuery(
-					"SELECT DISTINCT p.cvterm_id FROM cvterm p join cvterm_relationship cvtr on p.cvterm_id = cvtr.subject_id " +
-							" inner join cvterm dt on dt.cvterm_id = cvtr.object_id where cvtr.type_id = " + TermId.IS_A.getId() +
-							" and p.cv_id = 1010 and p.is_obsolete = 0 " + classFilter + " and exists " +
-							" (SELECT 1 from cvtermprop c INNER JOIN cvterm_relationship pvtr on c.cvterm_id = pvtr.subject_id " +
-							" where c.type_id = " + TermId.VARIABLE_TYPE.getId() + " and pvtr.object_id = p.cvterm_id" + variableTypeFilter
-							+ ")");
+		SQLQuery query = sessionProvider.getSession().createSQLQuery(
+				"SELECT DISTINCT p.cvterm_id FROM cvterm p join cvterm_relationship cvtr on p.cvterm_id = cvtr.subject_id " +
+				" inner join cvterm dt on dt.cvterm_id = cvtr.object_id where cvtr.type_id = " + TermId.IS_A.getId() +
+				" and p.cv_id = 1010 and p.is_obsolete = 0 " + classFilter + " and exists " +
+				" (SELECT 1 from cvtermprop c INNER JOIN cvterm_relationship pvtr on c.cvterm_id = pvtr.subject_id " +
+				" where c.type_id = " + TermId.VARIABLE_TYPE.getId() + " and pvtr.object_id = p.cvterm_id" + variableTypeFilter
+				+ ")");
 
-			if (!classFilter.isEmpty()) {
-				query.setParameterList("classes", classes);
-			}
+		if (!classFilter.isEmpty()) {
+			query.setParameterList("classes", classes);
+		}
 
-			if (!variableTypeFilter.isEmpty()) {
-				query.setParameterList("variableTypes", variableTypes);
-			}
+		if (!variableTypeFilter.isEmpty()) {
+			query.setParameterList("variableTypes", variableTypes);
+		}
 
-			return query.list();
+		return query.list();
 	}
 
 	public Map<Integer, Property> getPropertiesWithCropOntologyAndTraits(Boolean fetchAll, List propertyIds, boolean filterObsolete) throws MiddlewareException {
@@ -83,22 +83,22 @@ class OntologyCommonDAOImpl implements OntologyCommonDAO {
 		List result;
 
 		SQLQuery query = this.sessionProvider.getSession().createSQLQuery(
-					"select p.cvterm_id pId, p.name pName, p.definition pDescription, p.cv_id pVocabularyId, p.is_obsolete pObsolete"
-							+ ", tp.value cropOntologyId" + ", GROUP_CONCAT(cs.name SEPARATOR ',') AS classes" + "  from cvterm p"
-							+ " LEFT JOIN cvtermprop tp ON tp.cvterm_id = p.cvterm_id AND tp.type_id = " + TermId.CROP_ONTOLOGY_ID.getId()
-							+ " LEFT JOIN (select cvtr.subject_id PropertyId, o.cv_id, o.cvterm_id, o.name, o.definition, o.is_obsolete "
-							+ " from cvterm o inner join cvterm_relationship cvtr on cvtr.object_id = o.cvterm_id and cvtr.type_id = "
-							+ TermId.IS_A.getId() + ")" + " cs on cs.PropertyId = p.cvterm_id" + " where p.cv_id = " + CvId.PROPERTIES
-							.getId() + filterObsoleteClause + filterClause + " Group BY p.cvterm_id Order BY p.name ")
-					.addScalar("pId", new org.hibernate.type.IntegerType()).addScalar("pName").addScalar("pDescription")
-					.addScalar("pVocabularyId", new org.hibernate.type.IntegerType())
-					.addScalar("pObsolete", new org.hibernate.type.IntegerType()).addScalar("cropOntologyId").addScalar("classes");
+			"select p.cvterm_id pId, p.name pName, p.definition pDescription, p.cv_id pVocabularyId, p.is_obsolete pObsolete"
+					+ ", tp.value cropOntologyId" + ", GROUP_CONCAT(cs.name SEPARATOR ',') AS classes" + "  from cvterm p"
+					+ " LEFT JOIN cvtermprop tp ON tp.cvterm_id = p.cvterm_id AND tp.type_id = " + TermId.CROP_ONTOLOGY_ID.getId()
+					+ " LEFT JOIN (select cvtr.subject_id PropertyId, o.cv_id, o.cvterm_id, o.name, o.definition, o.is_obsolete "
+					+ " from cvterm o inner join cvterm_relationship cvtr on cvtr.object_id = o.cvterm_id and cvtr.type_id = "
+					+ TermId.IS_A.getId() + ")" + " cs on cs.PropertyId = p.cvterm_id" + " where p.cv_id = " + CvId.PROPERTIES
+					.getId() + filterObsoleteClause + filterClause + " Group BY p.cvterm_id Order BY p.name ")
+			.addScalar("pId", new org.hibernate.type.IntegerType()).addScalar("pName").addScalar("pDescription")
+			.addScalar("pVocabularyId", new org.hibernate.type.IntegerType())
+			.addScalar("pObsolete", new org.hibernate.type.IntegerType()).addScalar("cropOntologyId").addScalar("classes");
 
-            if (!propertyIds.isEmpty()) {
-				query.setParameterList("propertyIds", propertyIds);
-			}
+		if (!propertyIds.isEmpty()) {
+			query.setParameterList("propertyIds", propertyIds);
+		}
 
-			result = query.list();
+		result = query.list();
 
 		for (Object row : result) {
 			Object[] items = (Object[]) row;
