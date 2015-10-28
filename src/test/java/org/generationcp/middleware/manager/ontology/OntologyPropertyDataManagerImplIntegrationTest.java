@@ -5,11 +5,9 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Random;
 import java.util.Set;
 
 import com.google.common.base.Function;
@@ -18,7 +16,6 @@ import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
@@ -63,56 +60,17 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
             termMap.put(term.getCvTermId(), term);
         }
 
-        // Get all classes to check weather the randomly generated classes are exists or not
-        List<Term> allClasses = this.termDao.getTermByCvId(CvId.TRAIT_CLASS.getId());
+		final Integer isATermCount = 5;
 
-        Set<String> restrictedClasses = new HashSet<>();
-
-        // Add all classes to set
-        for (Term term : allClasses) {
-            restrictedClasses.add(term.getName());
-        }
-
-        List<CVTerm> isATerms = new ArrayList<>();
-
-        //Get 5 class names and attach two classes randomly
-        int iCount = 0;
-        while (iCount < 5) {
-            CVTerm classTerm = TestDataHelper.getTestCvTerm(CvId.TRAIT_CLASS);
-            if (restrictedClasses.contains(classTerm.getName())) {
-                continue;
-            }
-            iCount++;
-            isATerms.add(classTerm);
-            this.termDao.save(classTerm);
-        }
+        List<CVTerm> isATerms = TestDataHelper.generateNewIsATerms(isATermCount, this.termDao);
 
         Map<Integer, Set<String>> propertyClassesMap = new HashMap<>();
-        Map<Integer, String> cropOntologyIdMap = new HashMap<>();
 
-        for (CVTerm property : propertyTerms) {
-            //Getting first random is_a
-            Set<String> addedIsA = new HashSet<>();
+		TestDataHelper.fillIsARelationshipsForProperty(propertyTerms, isATerms, propertyClassesMap, this.relationshipDao);
 
-            int isACount = 0;
-            while(isACount < 2){
-                CVTerm isA = isATerms.get(new Random().nextInt(5));
-                if(addedIsA.contains(isA.getName())){
-                    continue;
-                }
-                addedIsA.add(isA.getName());
-                this.relationshipDao.save(property.getCvTermId(), TermId.IS_A.getId(), isA.getCvTermId());
-                isACount ++;
-            }
+		Map<Integer, String> cropOntologyIdMap = new HashMap<>();
 
-            propertyClassesMap.put(property.getCvTermId(), addedIsA);
-
-            String cropOntologyId = TestDataHelper.getNewRandomName("CO:");
-
-            this.propertyDao.updateOrDeleteProperty(property.getCvTermId(), TermId.CROP_ONTOLOGY_ID.getId(), cropOntologyId, 0);
-
-            cropOntologyIdMap.put(property.getCvTermId(), cropOntologyId);
-        }
+		TestDataHelper.fillCropOntologyForProperty(propertyTerms, cropOntologyIdMap, this.propertyDao);
 
         //Save created date
         Map<Integer, String> createdDateMap = new HashMap<>();
@@ -138,12 +96,12 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
             updateDateMap.put(property.getCvTermId(), property.getValue());
         }
 
-        // Fetch all methods and check our last inserted method exists or not
+        // Fetch all properties and check our last inserted property exists or not
         List<Property> properties = this.manager.getAllProperties();
 
-        // Iterate all methods and find our inserted method and assert it
+        // Iterate all properties and find our inserted properties and assert it
         for (Property property : properties) {
-            // Make sure our method exists and is inserted properly and display proper message if it is not inserted properly
+            // Make sure our property exists and is inserted properly and display proper message if it is not inserted properly
             String message = "The %s for property '" + property.getId() + "' was not added correctly.";
             if (termMap.containsKey(property.getId())) {
                 CVTerm propertyTerm = termMap.get(property.getId());
@@ -162,7 +120,6 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
                 Assert.assertArrayEquals(String.format(message, "TraitClasses"), propertyClassesMap.get(property.getId()).toArray(), property.getClasses().toArray());
             }
         }
-
     }
 
     @Test
@@ -170,31 +127,8 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
         CVTerm propertyTerm = TestDataHelper.getTestCvTerm(CvId.PROPERTIES);
         this.termDao.save(propertyTerm);
 
-        // Get all classes to check weather the randomly generated classes are exists or not
-        List<Term> allClasses = this.termDao.getTermByCvId(CvId.TRAIT_CLASS.getId());
-        Set<String> restrictedClasses = new HashSet<>();
-
-        // Add all classes to set
-        for (Term term : allClasses) {
-            restrictedClasses.add(term.getName());
-        }
-
-        List<CVTerm> isATerms = new ArrayList<>();
-        List<String> isATermNames = new ArrayList<>();
-
-        //Get 5 class names and attach two classes randomly
-        int iCount = 0;
-        while (iCount < 2) {
-            CVTerm classTerm = TestDataHelper.getTestCvTerm(CvId.TRAIT_CLASS);
-            if (restrictedClasses.contains(classTerm.getName())) {
-                continue;
-            }
-            iCount++;
-            isATerms.add(classTerm);
-            isATermNames.add(classTerm.getName());
-            this.termDao.save(classTerm);
-        }
-
+		final Integer isATermCount = 2;
+		List<CVTerm> isATerms = TestDataHelper.generateNewIsATerms(isATermCount, this.termDao);
         this.relationshipDao.save(propertyTerm.getCvTermId(), TermId.IS_A.getId(), isATerms.get(0).getCvTermId());
         this.relationshipDao.save(propertyTerm.getCvTermId(), TermId.IS_A.getId(), isATerms.get(1).getCvTermId());
 
@@ -220,7 +154,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 
        Property property=this.manager.getProperty(propertyTerm.getCvTermId(), true);
 
-        // Make sure our method exists and is inserted properly and display proper message if it is not inserted properly
+        // Make sure our property exists and is inserted properly and display proper message if it is not inserted properly
         String message = "The %s for property '" + property.getId() + "' was not added correctly.";
         Assert.assertEquals(String.format(message, "Name"), propertyTerm.getName(), property.getName());
         Assert.assertEquals(String.format(message, "Definition"), propertyTerm.getDefinition(), property.getDefinition());
@@ -229,14 +163,15 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
         Assert.assertEquals(String.format(message, "UpdatedDate"), testUpdatedDate, property.getDateLastModified());
 
         Assert.assertEquals(String.format(message, "CropOntologyId"), cropOntologyId, property.getCropOntologyId());
-		Assert.assertEquals(String.format(message, "Class Size"), isATermNames.size(), property.getClasses().size());
-		for (String termName : isATermNames) {
-			Assert.assertTrue(property.getClasses().contains(termName));
+		Assert.assertEquals(String.format(message, "Class Size"), isATermCount.intValue(), property.getClasses().size());
+		for (CVTerm isATerm : isATerms) {
+			Assert.assertTrue(property.getClasses().contains(isATerm.getName()));
 		}
     }
 
 	/**
 	 * This test inserts property using manager and assert term and created date property
+	 * @throws Exception
 	 */
 	@Test
 	public void testAddPropertyShouldAddNewProperty() throws Exception {
@@ -299,5 +234,113 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 		for(String className : classNames) {
 			Assert.assertTrue(String.format(message, "Class"), property.getClasses().contains(className));
 		}
+	}
+
+	/**
+	 * Test to verify if update property method works expected and assert updated data.
+	 * @throws Exception
+	 */
+	@Test
+	public void testUpdatePropertyShouldUpdateExistingProperty() throws Exception {
+		CVTerm propertyTerm = TestDataHelper.getTestCvTerm(CvId.PROPERTIES);
+		this.termDao.save(propertyTerm);
+
+		final Integer isATermCount = 3;
+		List<CVTerm> isATerms = TestDataHelper.generateNewIsATerms(isATermCount, this.termDao);
+		this.relationshipDao.save(propertyTerm.getCvTermId(), TermId.IS_A.getId(), isATerms.get(0).getCvTermId());
+		this.relationshipDao.save(propertyTerm.getCvTermId(), TermId.IS_A.getId(), isATerms.get(1).getCvTermId());
+
+		String cropOntologyId = TestDataHelper.getNewRandomName("CO:");
+
+		this.propertyDao.updateOrDeleteProperty(propertyTerm.getCvTermId(), TermId.CROP_ONTOLOGY_ID.getId(), cropOntologyId, 0);
+
+		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		List<CVTermProperty> createdDateProperties = new ArrayList<>();
+		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(propertyTerm), createdDateProperties, testCreatedDate);
+
+		CVTermProperty createProperty = createdDateProperties.get(0);
+		this.propertyDao.save(createProperty);
+
+		//Save last modification date
+		Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		List<CVTermProperty> updatedDateProperties = new ArrayList<>();
+		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(propertyTerm), updatedDateProperties, testUpdatedDate);
+
+		CVTermProperty updateProperty = updatedDateProperties.get(0);
+		this.propertyDao.save(updateProperty);
+
+		//Updating updatedProperty via manager
+		Property updatedProperty = new Property();
+		updatedProperty.setId(propertyTerm.getCvTermId());
+		updatedProperty.setName("New Property Name");
+		updatedProperty.setDefinition("New Property Definition");
+		updatedProperty.addClass(isATerms.get(0).getName());
+		updatedProperty.addClass(isATerms.get(2).getName());
+		updatedProperty.setCropOntologyId("CO:123");
+
+		Date date = constructDate(2015, Calendar.JANUARY, 1);
+		this.stubCurrentDate(date);
+
+		this.manager.updateProperty(updatedProperty);
+
+		CVTerm cvterm = this.termDao.getById(updatedProperty.getId());
+
+		// Make sure the inserted data should come as they are inserted and Display proper message if the data doesn't come as expected
+		String message = "The %s for property '" + updatedProperty.getId() + "' was not updated correctly.";
+		Assert.assertEquals(String.format(message, "Name"), updatedProperty.getName(), cvterm.getName());
+		Assert.assertEquals(String.format(message, "Definition"), updatedProperty.getDefinition(), cvterm.getDefinition());
+		Assert.assertEquals(String.format(message, "IsObsolete"), false, cvterm.isObsolete());
+		Assert.assertEquals(String.format(message, "UpdatedDate"), date, updatedProperty.getDateLastModified());
+
+		// Fetch Created date property and assert it
+		List<CVTermProperty> updatedProperties = this.propertyDao.getByCvTermId(updatedProperty.getId());
+		Assert.assertTrue(String.format(message, "Property Size"), updatedProperties.size() == 3);
+
+		CVTermProperty lastUpdateDateProperty = null;
+		CVTermProperty createdDateProperty = null;
+		for (CVTermProperty property : updatedProperties) {
+			if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
+				lastUpdateDateProperty = property;
+			} else if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
+				createdDateProperty = property;
+			}
+		}
+
+		// Assert for Created Date & Last Updated date Property
+		Assert.assertNotNull(createdDateProperty);
+		Assert.assertNotNull(lastUpdateDateProperty);
+
+		Assert.assertEquals(String.format(message, "CreatedDate"), createdDateProperty.getValue(),
+				ISO8601DateParser.toString(testCreatedDate));
+		Assert.assertEquals(String.format(message, "UpdatedDate"), lastUpdateDateProperty.getValue(),
+				ISO8601DateParser.toString(updatedProperty.getDateLastModified()));
+
+		List<Integer> addedClassIds = Util.convertAll(this.relationshipDao.getBySubject(updatedProperty.getId()), new Function<CVTermRelationship, Integer>() {
+
+			@Override
+			public Integer apply(CVTermRelationship x) {
+				return x.getObjectId();
+			}
+		});
+
+		//Fetching class names from cvterm ids.
+		List<String> classNames = Util.convertAll(this.termDao.getByIds(addedClassIds), new Function<CVTerm, String>() {
+
+			@Override
+			public String apply(CVTerm x){
+				return x.getName();
+			}
+		});
+
+		//assert total classes should match classNames
+		Assert.assertEquals(String.format(message, "Class Size"), updatedProperty.getClasses().size(), classNames.size());
+
+		//iterate all class with exist
+		for(String className : classNames) {
+			Assert.assertTrue(String.format(message, "Class"), updatedProperty.getClasses().contains(className));
+		}
+
+		//isA of index 1 should be deleted from cvterm on-fly by update property method as it is not referred to any other property.
+		Assert.assertNull(String.format(message, "Deleted Class"), this.termDao.getById(isATerms.get(1).getCvTermId()));
 	}
 }

@@ -1,10 +1,18 @@
 package org.generationcp.middleware.manager.ontology;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
+import org.generationcp.middleware.dao.oms.CVTermDao;
+import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
+import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
@@ -83,5 +91,85 @@ public class TestDataHelper {
 	 */
 	public static String getNewRandomName(String name) {
 		return name + "_" + new Random().nextInt(100000);
+	}
+
+	/**
+	 * Generate new random classes that are not persisted in database
+	 * @param count Total number of classes (is_a) to be generated
+	 * @param dao CVTermDao for persistence support
+	 * @return List<CVTerm> newly generated is_a term that are not available in database
+	 */
+	public static List<CVTerm> generateNewIsATerms(int count, CVTermDao dao){
+
+		List<CVTerm> isATerms = new ArrayList<>();
+
+		// Get all classes to check weather the randomly generated classes are exists or not
+        List<Term> allClasses = dao.getTermByCvId(CvId.TRAIT_CLASS.getId());
+
+        Set<String> restrictedClasses = new HashSet<>();
+
+        // Add all classes to set
+        for (Term term : allClasses) {
+            restrictedClasses.add(term.getName());
+        }
+
+        //Get class names that are not present in existing database.
+        int iCount = 0;
+        while (iCount < count) {
+            CVTerm classTerm = TestDataHelper.getTestCvTerm(CvId.TRAIT_CLASS);
+            if (restrictedClasses.contains(classTerm.getName())) {
+                continue;
+            }
+            iCount++;
+            isATerms.add(classTerm);
+            dao.save(classTerm);
+        }
+
+		return isATerms;
+	}
+
+	/**
+	 * Random logic applied to select random class (is_a) from list of terms
+	 * @param propertyTerms fill two classes (isA) per property term in map
+	 * @param isATerms Choosing two is_a from isATerms randomly
+	 * @param propertyClassesMap Fill property classes and persist relationship in database
+	 */
+	public static void fillIsARelationshipsForProperty(List<CVTerm> propertyTerms, List<CVTerm> isATerms, Map<Integer, Set<String>> propertyClassesMap, CVTermRelationshipDao cvTermRelationshipDao){
+
+		final Integer assignedIsACountPerProperty = 2;
+		final Integer totalIsACount = isATerms.size();
+
+		for (CVTerm property : propertyTerms) {
+			//Getting first random is_a
+			Set<String> addedIsA = new HashSet<>();
+
+			int isACount = 0;
+			while(isACount < assignedIsACountPerProperty){
+				CVTerm isA = isATerms.get(new Random().nextInt(totalIsACount));
+				if(addedIsA.contains(isA.getName())){
+					continue;
+				}
+				addedIsA.add(isA.getName());
+				cvTermRelationshipDao.save(property.getCvTermId(), TermId.IS_A.getId(), isA.getCvTermId());
+				isACount ++;
+			}
+
+			propertyClassesMap.put(property.getCvTermId(), addedIsA);
+		}
+	}
+
+	/**
+	 * Fill crop ontology id to property term and add to property map.
+	 * @param propertyTerms fill two classes (isA) per property term in map
+	 * @param cropOntologyIdMap crop ontology map to hold property id and crop ontology id data.
+	 * @param cvTermPropertyDao Fill crop ontology for property and persist
+	 */
+	public static void fillCropOntologyForProperty(List<CVTerm> propertyTerms, Map<Integer, String> cropOntologyIdMap, CvTermPropertyDao cvTermPropertyDao){
+
+		for (CVTerm property : propertyTerms) {
+			String cropOntologyId = TestDataHelper.getNewRandomName("CO:");
+			cvTermPropertyDao.updateOrDeleteProperty(property.getCvTermId(), TermId.CROP_ONTOLOGY_ID.getId(), cropOntologyId, 0);
+			cropOntologyIdMap.put(property.getCvTermId(), cropOntologyId);
+		}
 	}
 }
