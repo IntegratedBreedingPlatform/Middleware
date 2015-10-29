@@ -35,23 +35,29 @@ class OntologyCommonDAOImpl implements OntologyCommonDAO {
 	}
 
 	public List<Integer> getAllPropertyIdsWithClassAndVariableType(String[] classes, String[] variableTypes) throws MiddlewareException {
-		String classFilter = !(Objects.equals(classes, null) || classes.length == 0) ? " and dt.name in (:classes) " : "";
-		String variableTypeFilter =
-				!(Objects.equals(variableTypes, null) || variableTypes.length == 0) ? " and c.value in (:variableTypes) " : "";
+
+		boolean shouldFilterByClass = classes != null && classes.length > 0;
+
+		String classFilter = shouldFilterByClass  ? "and p.cvterm_id in (select pt.subject_id from cvterm_relationship pt "
+				+ "inner join cvterm t on t.cvterm_id = pt.object_id  and t.name in (:classes) where pt.type_id = :isA)" : "";
+
+		boolean shouldFilterByVariableType = variableTypes != null && variableTypes.length > 0;
+
+		String variableTypeFilter = shouldFilterByVariableType ? "and p.cvterm_id in (select vpr.object_id from cvterm_relationship vpr "
+				+ "inner join cvtermprop vp on vp.cvterm_id = vpr.subject_id and vp.value in (:variableTypes) and vp.type_id = :variableType)" : "" ;
 
 		SQLQuery query = sessionProvider.getSession().createSQLQuery(
-				"SELECT DISTINCT p.cvterm_id FROM cvterm p join cvterm_relationship cvtr on p.cvterm_id = cvtr.subject_id " +
-				" inner join cvterm dt on dt.cvterm_id = cvtr.object_id where cvtr.type_id = " + TermId.IS_A.getId() +
-				" and p.cv_id = 1010 and p.is_obsolete = 0 " + classFilter + " and exists " +
-				" (SELECT 1 from cvtermprop c INNER JOIN cvterm_relationship pvtr on c.cvterm_id = pvtr.subject_id " +
-				" where c.type_id = " + TermId.VARIABLE_TYPE.getId() + " and pvtr.object_id = p.cvterm_id" + variableTypeFilter
-				+ ")");
+				"select DISTINCT p.cvterm_id from cvterm p where p.cv_id = :propertyTerm " + classFilter + variableTypeFilter);
 
-		if (!classFilter.isEmpty()) {
+		query.setParameter("propertyTerm", CvId.PROPERTIES.getId());
+
+		if (shouldFilterByClass) {
 			query.setParameterList("classes", classes);
+			query.setParameter("isA", TermId.IS_A.getId());
 		}
 
-		if (!variableTypeFilter.isEmpty()) {
+		if (shouldFilterByVariableType) {
+			query.setParameter("variableType", TermId.VARIABLE_TYPE.getId());
 			query.setParameterList("variableTypes", variableTypes);
 		}
 
