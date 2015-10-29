@@ -343,4 +343,143 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 		//isA of index 1 should be deleted from cvterm on-fly by update property method as it is not referred to any other property.
 		Assert.assertNull(String.format(message, "Deleted Class"), this.termDao.getById(isATerms.get(1).getCvTermId()));
 	}
+
+	/**
+	 * Test to verify if delete property method works expected and assert null after deleting property.
+	 * @throws Exception
+	 */
+	@Test
+	public void testDeletePropertyShouldDeleteExistingProperty() throws Exception {
+		// Save Property Term using termDao
+		CVTerm propertyTerm = TestDataHelper.getTestCvTerm(CvId.PROPERTIES);
+		this.termDao.save(propertyTerm);
+
+		final Integer isATermCount = 2;
+		List<CVTerm> isATerms = TestDataHelper.generateNewIsATerms(isATermCount, this.termDao);
+		this.relationshipDao.save(propertyTerm.getCvTermId(), TermId.IS_A.getId(), isATerms.get(0).getCvTermId());
+		this.relationshipDao.save(propertyTerm.getCvTermId(), TermId.IS_A.getId(), isATerms.get(1).getCvTermId());
+
+		String cropOntologyId = TestDataHelper.getNewRandomName("CO:");
+
+		this.propertyDao.updateOrDeleteProperty(propertyTerm.getCvTermId(), TermId.CROP_ONTOLOGY_ID.getId(), cropOntologyId, 0);
+
+		// Fill Test Created Date Property using TestDataHelper
+		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		List<CVTermProperty> createdDateProperties = new ArrayList<>();
+		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(propertyTerm), createdDateProperties, testCreatedDate);
+
+		CVTermProperty createdDateProperty = createdDateProperties.get(0);
+		// Save Property Created Date Property using propertydao
+		this.propertyDao.save(createdDateProperty);
+
+		// Fill Test Updated Date Property using TestDataHelper
+		Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		List<CVTermProperty> updatedDateProperties = new ArrayList<>();
+		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(propertyTerm), updatedDateProperties, testUpdatedDate);
+
+		CVTermProperty updatedDateProperty = updatedDateProperties.get(0);
+		// Save Property Updated Date Property using propertydao
+		this.propertyDao.save(updatedDateProperty);
+
+		// Delete the property
+		this.manager.deleteProperty(propertyTerm.getCvTermId());
+
+		CVTerm cvterm = this.termDao.getById(propertyTerm.getCvTermId());
+
+		// Make sure the property must be deleted and it asserts null
+		String message = "The %s for property '" + propertyTerm.getCvTermId() + "' was not deleted correctly.";
+		Assert.assertNull(String.format(message, "Property"), cvterm);
+
+		// Make sure the properties must be deleted and it asserts null
+		List<CVTermProperty> deletedProperties = this.propertyDao.getByCvTermId(propertyTerm.getCvTermId());
+		Assert.assertTrue(String.format(message, "Property Props"), Objects.equals(deletedProperties.size(), 0));
+
+		List<CVTermRelationship> deletedRelationships = this.relationshipDao.getBySubject(propertyTerm.getCvTermId());
+		Assert.assertTrue(String.format(message, "Property Relationships"), Objects.equals(deletedRelationships.size(), 0));
+	}
+
+	/**
+	 * Test to verify to get property by trait classes and variable types.
+	 * @throws Exception
+	 */
+	@Test
+	public void testGetPropertyByTraitClassShouldGetFullProperty() throws Exception {
+
+		final int testPropertyCount = 3;
+		final int testVariableCount = 5;
+		List<CVTerm> propertyTerms = new ArrayList<>();
+		TestDataHelper.fillTestPropertiesCvTerms(propertyTerms, testPropertyCount);
+
+		Map<Integer, CVTerm> mapPropertyTerm = new HashMap<>();
+		// save 3 properties using termDao
+		for (CVTerm term : propertyTerms) {
+			termDao.save(term);
+			mapPropertyTerm.put(term.getCvTermId(), term);
+		}
+
+		final Integer isATermCount = 3;
+		List<CVTerm> isATerms = TestDataHelper.generateNewIsATerms(isATermCount, this.termDao);
+
+		//Assigning is_a to property. Avoid using loop or randomize for getting more control over assertion
+		this.relationshipDao.save(propertyTerms.get(0).getCvTermId(), TermId.IS_A.getId(), isATerms.get(0).getCvTermId());
+		this.relationshipDao.save(propertyTerms.get(0).getCvTermId(), TermId.IS_A.getId(), isATerms.get(1).getCvTermId());
+		this.relationshipDao.save(propertyTerms.get(1).getCvTermId(), TermId.IS_A.getId(), isATerms.get(0).getCvTermId());
+		this.relationshipDao.save(propertyTerms.get(2).getCvTermId(), TermId.IS_A.getId(), isATerms.get(2).getCvTermId());
+
+		List<CVTerm> variableTerms = new ArrayList<>();
+		TestDataHelper.fillTestVariableCvTerms(variableTerms, testVariableCount);
+		for (CVTerm term : variableTerms) {
+			termDao.save(term);
+		}
+
+		List<String> variableTypeNames = new ArrayList<>();
+
+		for (int typeIndex = 0; typeIndex < 6; typeIndex ++){
+			variableTypeNames.add(TestDataHelper.getNewRandomName("VT:"));
+		}
+
+		//Assigning variable types to variable. Avoid using loop or randomize for getting more control over assertion
+		this.propertyDao.updateOrDeleteProperty(variableTerms.get(0).getCvTermId(), TermId.VARIABLE_TYPE.getId(), variableTypeNames.get(0), 0);
+		this.propertyDao.updateOrDeleteProperty(variableTerms.get(0).getCvTermId(), TermId.VARIABLE_TYPE.getId(), variableTypeNames.get(1), 0);
+		this.propertyDao.updateOrDeleteProperty(variableTerms.get(0).getCvTermId(), TermId.VARIABLE_TYPE.getId(), variableTypeNames.get(2), 0);
+		this.propertyDao.updateOrDeleteProperty(variableTerms.get(1).getCvTermId(), TermId.VARIABLE_TYPE.getId(), variableTypeNames.get(0), 0);
+		this.propertyDao.updateOrDeleteProperty(variableTerms.get(1).getCvTermId(), TermId.VARIABLE_TYPE.getId(), variableTypeNames.get(1), 0);
+		this.propertyDao.updateOrDeleteProperty(variableTerms.get(2).getCvTermId(), TermId.VARIABLE_TYPE.getId(), variableTypeNames.get(3), 0);
+		this.propertyDao.updateOrDeleteProperty(variableTerms.get(3).getCvTermId(), TermId.VARIABLE_TYPE.getId(), variableTypeNames.get(4), 0);
+		this.propertyDao.updateOrDeleteProperty(variableTerms.get(4).getCvTermId(), TermId.VARIABLE_TYPE.getId(), variableTypeNames.get(5),
+				0);
+
+		//Assigning property to variable. Avoid using loop or randomize for getting more control over assertion
+		this.relationshipDao.save(variableTerms.get(0).getCvTermId(), TermId.HAS_PROPERTY.getId(), propertyTerms.get(0).getCvTermId());
+		this.relationshipDao.save(variableTerms.get(1).getCvTermId(), TermId.HAS_PROPERTY.getId(), propertyTerms.get(0).getCvTermId());
+		this.relationshipDao.save(variableTerms.get(2).getCvTermId(), TermId.HAS_PROPERTY.getId(), propertyTerms.get(1).getCvTermId());
+		this.relationshipDao.save(variableTerms.get(3).getCvTermId(), TermId.HAS_PROPERTY.getId(), propertyTerms.get(1).getCvTermId());
+		this.relationshipDao.save(variableTerms.get(4).getCvTermId(), TermId.HAS_PROPERTY.getId(), propertyTerms.get(2).getCvTermId());
+
+
+		//As per data inserted above expect isATerms(2) should return propertyTerms(2)
+		final List<Property> result1 = this.manager.getAllPropertiesWithClassAndVariableType(new String[] {isATerms.get(2).getName()}, null);
+
+		Assert.assertEquals(result1.size(), 1);
+		Assert.assertEquals(result1.get(0).getId(), propertyTerms.get(2).getCvTermId().intValue());
+
+		//will return single property list
+		final List<Property> result2 = this.manager.getAllPropertiesWithClassAndVariableType(null, new String[] {variableTypeNames.get(0), variableTypeNames.get(1)});
+
+		Assert.assertEquals(result2.size(), 1);
+		Assert.assertEquals(result2.get(0).getId(), propertyTerms.get(0).getCvTermId().intValue());
+
+		//will return empty list
+		final List<Property> result3 = this.manager.getAllPropertiesWithClassAndVariableType(new String[] {isATerms.get(1).getName()}, new String[] {variableTypeNames.get(4)});
+
+		Assert.assertTrue(result3.isEmpty());
+
+		//will return 2 properties
+		final List<Property> result4 = this.manager.getAllPropertiesWithClassAndVariableType(new String[] {isATerms.get(0).getName(),
+				isATerms.get(1).getName()}, new String[] {variableTypeNames.get(1), variableTypeNames.get(3)});
+
+		Assert.assertTrue(result4.size() == 2);
+		Assert.assertTrue(mapPropertyTerm.keySet().contains(result4.get(0).getId()));
+		Assert.assertTrue(mapPropertyTerm.keySet().contains(result4.get(1).getId()));
+	}
 }

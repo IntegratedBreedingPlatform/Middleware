@@ -86,6 +86,12 @@ public class TestDataHelper {
 		}
 	}
 
+	public static void fillTestVariableCvTerms(List<CVTerm> terms, int count) {
+		for (int i = 0; i < count; i++) {
+			terms.add(getTestCvTerm(CvId.VARIABLES));
+		}
+	}
+
 	/**
 	 * Appends random number to string to make name unique
 	 */
