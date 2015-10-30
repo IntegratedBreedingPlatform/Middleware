@@ -14,6 +14,7 @@ import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.util.ISO8601DateParser;
@@ -34,6 +35,18 @@ public class TestDataHelper {
 	}
 
 	/**
+	 * Function to fill properties as per the count
+	 * @param properties put property Id and property
+	 * @param count generate no. of count properties
+	 */
+	public static void fillTestProperties(Map<Integer, Property> properties, int count) {
+		for (int i = 0; i < count; i++) {
+			Property property = TestDataHelper.generateProperty();
+			properties.put(property.getId(), property);
+		}
+	}
+
+	/**
 	 * Function to build CVTerm with supplied CvId. The name will be auto generated with CvId
 	 */
 	public static CVTerm getTestCvTerm(CvId cvId) {
@@ -48,12 +61,34 @@ public class TestDataHelper {
 	}
 
 	/**
+	 * Function to generate new property
+	 * @return generated property
+	 */
+	private static Property generateProperty() {
+		Property property = new Property();
+		property.setId(UnitTestDaoIDGenerator.generateId(Property.class));
+		property.setName(getNewRandomName("Name"));
+		property.setDefinition("description");
+		property.setCropOntologyId("CO:1234");
+		property.addClass("Class1");
+		property.addClass("Class2");
+		return property;
+	}
+
+	/**
 	 * Fill properties for created date for any term (Method, Scale, Property, Variable)
 	 * Supplied Current date to control created date.
 	 */
 	public static void fillTestCreatedDateProperties(List<CVTerm> terms, List<CVTermProperty> properties, Date currentDate) {
 		for (CVTerm term : terms) {
 			properties.add(getTestProperty(term.getCvTermId(), TermId.CREATION_DATE, ISO8601DateParser.toString(currentDate), 0));
+		}
+	}
+
+
+	public static void fillTestCreatedDatePropertyProps(List<Property> propertyList, List<CVTermProperty> properties, Date currentDate) {
+		for (Property property : propertyList) {
+			properties.add(getTestProperty(property.getId(), TermId.CREATION_DATE, ISO8601DateParser.toString(currentDate), 0));
 		}
 	}
 
@@ -64,6 +99,12 @@ public class TestDataHelper {
 	public static void fillTestUpdatedDateProperties(List<CVTerm> terms, List<CVTermProperty> properties, Date currentDate) {
 		for (CVTerm term : terms) {
 			properties.add(getTestProperty(term.getCvTermId(), TermId.LAST_UPDATE_DATE, ISO8601DateParser.toString(currentDate), 0));
+		}
+	}
+
+	public static void fillTestUpdatedDatePropertyProps(List<Property> propertyList, List<CVTermProperty> properties, Date currentDate) {
+		for (Property property : propertyList) {
+			properties.add(getTestProperty(property.getId(), TermId.LAST_UPDATE_DATE, ISO8601DateParser.toString(currentDate), 0));
 		}
 	}
 

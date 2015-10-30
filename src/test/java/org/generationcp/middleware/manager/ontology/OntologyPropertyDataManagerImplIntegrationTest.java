@@ -116,8 +116,18 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
                 Assert.assertEquals(String.format(message, "UpdatedDate"), updatedDateProperty,
                         ISO8601DateParser.toString(property.getDateLastModified()));
 
-                Assert.assertEquals(String.format(message, "CropOntologyId"), cropOntologyIdMap.get(property.getId()), property.getCropOntologyId());
-                Assert.assertArrayEquals(String.format(message, "TraitClasses"), propertyClassesMap.get(property.getId()).toArray(), property.getClasses().toArray());
+                Assert.assertEquals(String.format(message, "CropOntologyId"), cropOntologyIdMap.get(property.getId()),
+						property.getCropOntologyId());
+
+				final Set<String> classNames = propertyClassesMap.get(property.getId());
+
+				//assert total classes should match classNames
+				Assert.assertEquals(String.format(message, "Class Size"), property.getClasses().size(), classNames.size());
+
+				//iterate all class with exist
+				for(String className : classNames) {
+					Assert.assertTrue(String.format(message, "Class"), property.getClasses().contains(className));
+				}
             }
         }
     }
