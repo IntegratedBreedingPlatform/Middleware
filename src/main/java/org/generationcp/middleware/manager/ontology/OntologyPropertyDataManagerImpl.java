@@ -78,11 +78,7 @@ public class OntologyPropertyDataManagerImpl implements OntologyPropertyDataMana
 
 	@Override
 	public List<Property> getAllProperties() throws MiddlewareException {
-		try {
-			return this.getProperties(true, null, true);
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error at getAllProperties :" + e.getMessage(), e);
-		}
+		return this.getProperties(true, null, true);
 	}
 
 	//NOTE: This method needs to be removed and use getAllPropertiesWithClassAndVariableType method.
