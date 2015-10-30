@@ -3,7 +3,6 @@ package org.generationcp.middleware.service;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -17,7 +16,7 @@ import com.google.common.base.Preconditions;
 
 /**
  * Class to enable us to save data to the phenotype table and the nd experiment phenotype table in a performant manner.
- *
+ * 
  */
 public class Measurements {
 
@@ -49,7 +48,7 @@ public class Measurements {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param measurementData measurementData used to create your {@link Phenotype} object that can be saved
 	 */
 	Phenotype createPhenotypeFromMeasurement(final MeasurementData measurementData) {
@@ -90,8 +89,7 @@ public class Measurements {
 			for (final MeasurementData measurementData : dataList) {
 
 				// TODO Change the UI so that we are never send back any data which is null
-				if (!measurementData.isEditable() || StringUtils.isBlank(measurementData.getcValueId())
-						&& StringUtils.isBlank(measurementData.getValue())) {
+				if (!measurementData.isEditable()) {
 					continue;
 				}
 				final MeasurementVariable measurementVariable = measurementData.getMeasurementVariable();
@@ -107,5 +105,4 @@ public class Measurements {
 
 		}
 	}
-
 }
