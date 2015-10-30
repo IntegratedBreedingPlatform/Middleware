@@ -19,7 +19,6 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ontology.api.OntologyCommonDAO;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
@@ -29,7 +28,6 @@ import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.util.Clock;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.SystemClock;
-import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
