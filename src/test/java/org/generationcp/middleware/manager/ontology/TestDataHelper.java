@@ -64,7 +64,7 @@ public class TestDataHelper {
 	 * Function to generate new property
 	 * @return generated property
 	 */
-	private static Property generateProperty() {
+	public static Property generateProperty() {
 		Property property = new Property();
 		property.setId(UnitTestDaoIDGenerator.generateId(Property.class));
 		property.setName(getNewRandomName("Name"));

@@ -206,10 +206,6 @@ public class OntologyPropertyDataManagerImpl implements OntologyPropertyDataMana
 
 		for (String className : classes) {
 			// Discarding empty or null strings
-			if (className == null) {
-				continue;
-			}
-
 			className = className.trim();
 
 			if (Strings.isNullOrEmpty(className)) {

@@ -15,10 +15,16 @@ import org.generationcp.middleware.UnitTestBase;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.api.OntologyCommonDAO;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
+import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.util.Util;
+import org.generationcp.middleware.utils.test.UnitTestDaoIDGenerator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -150,5 +156,125 @@ public class OntologyPropertyDataManagerImplUnitTest extends UnitTestBase{
 		final Property property = this.propertyDataManager.getProperty(propertyId, true);
 
 		Assert.assertNull(property);
+	}
+
+	/**
+	 * This test should check dao calls and created date
+	 */
+	@Test
+	public void testAddPropertyShouldVerifyDaoCallsAndSetCreatedDate() throws Exception {
+
+		Property property = new Property();
+		property.setName(TestDataHelper.getNewRandomName("Property"));
+		property.setDefinition("Test Property Name");
+		property.setCropOntologyId("CO:101");
+		property.addClass("Class1");
+		property.addClass("Class2");
+
+		CVTerm cvTerm = new CVTerm();
+		cvTerm.setCvTermId(UnitTestDaoIDGenerator.generateId(CVTerm.class));
+		cvTerm.setCv(CvId.PROPERTIES.getId());
+		cvTerm.setName(property.getName());
+		cvTerm.setDefinition(property.getDefinition());
+		cvTerm.setIsObsolete(false);
+		cvTerm.setIsRelationshipType(false);
+
+		Date date = this.constructDate(2015, Calendar.JANUARY, 1);
+		this.stubCurrentDate(date);
+
+		Mockito.when(this.cvTermDao.getByNameAndCvId(property.getName(), CvId.PROPERTIES.getId())).thenReturn(null);
+		Mockito.when(this.cvTermDao.save(property.getName(), property.getDefinition(), CvId.PROPERTIES)).thenReturn(cvTerm);
+		Mockito.when(this.cvTermRelationshipDao.getBySubjectIdAndTypeId(property.getId(), TermId.IS_A.getId())).thenReturn(
+				new ArrayList<CVTermRelationship>());
+
+		List<String> classes = new ArrayList<>(property.getClasses());
+
+		CVTerm class1 = new CVTerm(100, CvId.TRAIT_CLASS.getId(), classes.get(0), null, null, 0, 0);
+		CVTerm class2 = new CVTerm(101, CvId.TRAIT_CLASS.getId(), classes.get(1), null, null, 0, 0);
+
+		Mockito.when(this.cvTermDao.save(classes.get(0), null, CvId.TRAIT_CLASS)).thenReturn(class1);
+		Mockito.when(this.cvTermDao.save(classes.get(1), null, CvId.TRAIT_CLASS)).thenReturn(class2);
+
+		this.propertyDataManager.addProperty(property);
+
+		// Make sure each property data inserted properly, assert them and display proper message if not inserted properly
+		String message = "The %s for property '" + property.getId() + "' was not added correctly.";
+		Assert.assertNotNull(String.format(message, "Id"), property.getId());
+
+		//check cvid
+		Assert.assertNotNull(String.format(message, "CvId"), property.getVocabularyId());
+
+		Assert.assertEquals(String.format(message, "CreatedDate"), date, property.getDateCreated());
+
+		//Verify save cvterm
+		Mockito.verify(this.cvTermDao).save(property.getName(), property.getDefinition(), CvId.PROPERTIES);
+	}
+
+	/**
+	 * This test should check what if property with same name exists
+	 */
+	@Test(expected = MiddlewareException.class)
+	public void testAddPropertyShouldNotAllowNewPropertyWithSameName() {
+		// Create Property and add it using manager
+		Property property = TestDataHelper.generateProperty();
+
+		CVTerm cvTerm = new CVTerm();
+		cvTerm.setCvTermId(UnitTestDaoIDGenerator.generateId(CVTerm.class));
+		cvTerm.setCv(CvId.PROPERTIES.getId());
+		cvTerm.setName(property.getName());
+		cvTerm.setDefinition(property.getDefinition());
+		cvTerm.setIsObsolete(false);
+		cvTerm.setIsRelationshipType(false);
+
+		Mockito.when(this.cvTermDao.getByNameAndCvId(property.getName(), CvId.PROPERTIES.getId())).thenReturn(cvTerm);
+
+		this.propertyDataManager.addProperty(property);
+	}
+
+	@Test
+	public void testAddPropertyWithEmptyClassName() throws Exception {
+
+		Property property = new Property();
+		property.setName(TestDataHelper.getNewRandomName("Property"));
+		property.setDefinition("Test Property Name");
+		property.setCropOntologyId("CO:101");
+		property.addClass("");
+		property.addClass("Class2");
+
+		CVTerm cvTerm = new CVTerm();
+		cvTerm.setCvTermId(UnitTestDaoIDGenerator.generateId(CVTerm.class));
+		cvTerm.setCv(CvId.PROPERTIES.getId());
+		cvTerm.setName(property.getName());
+		cvTerm.setDefinition(property.getDefinition());
+		cvTerm.setIsObsolete(false);
+		cvTerm.setIsRelationshipType(false);
+
+		Date date = this.constructDate(2015, Calendar.JANUARY, 1);
+		this.stubCurrentDate(date);
+
+		Mockito.when(this.cvTermDao.getByNameAndCvId(property.getName(), CvId.PROPERTIES.getId())).thenReturn(null);
+		Mockito.when(this.cvTermDao.save(property.getName(), property.getDefinition(), CvId.PROPERTIES)).thenReturn(cvTerm);
+		Mockito.when(this.cvTermRelationshipDao.getBySubjectIdAndTypeId(property.getId(), TermId.IS_A.getId())).thenReturn(
+				new ArrayList<CVTermRelationship>());
+
+		List<String> classes = new ArrayList<>(property.getClasses());
+
+		CVTerm class2 = new CVTerm(101, CvId.TRAIT_CLASS.getId(), classes.get(1), null, null, 0, 0);
+
+		Mockito.when(this.cvTermDao.save(classes.get(1), null, CvId.TRAIT_CLASS)).thenReturn(class2);
+
+		this.propertyDataManager.addProperty(property);
+
+		// Make sure each property data inserted properly, assert them and display proper message if not inserted properly
+		String message = "The %s for property '" + property.getId() + "' was not added correctly.";
+		Assert.assertNotNull(String.format(message, "Id"), property.getId());
+
+		//check cvid
+		Assert.assertNotNull(String.format(message, "CvId"), property.getVocabularyId());
+
+		Assert.assertEquals(String.format(message, "CreatedDate"), date, property.getDateCreated());
+
+		//Verify save cvterm
+		Mockito.verify(this.cvTermDao).save(property.getName(), property.getDefinition(), CvId.PROPERTIES);
 	}
 }
