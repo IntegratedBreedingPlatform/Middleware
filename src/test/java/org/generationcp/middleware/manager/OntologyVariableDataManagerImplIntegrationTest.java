@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager;
 
 import java.util.List;
 
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.oms.CVTermDao;
@@ -36,6 +37,7 @@ import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.OntologyDataCreationUtil;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -61,6 +63,12 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	private Property testProperty;
 	private Scale testScale;
 	private OntologyVariableInfo testVariableInfo;
+
+	@BeforeClass
+	public static void setUpOnce() {
+		// Variable caching relies on the context holder to determine current crop database in use
+		ContextHolder.setCurrentCrop("maize");
+	}
 
 	@Test
 	public void testGetAllVariablesUsingFilter() throws MiddlewareException {
@@ -101,7 +109,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		Assert.assertEquals("Observation usage should be -1 i.e. unknow.", new Integer(-1), variable.getObservations());
 	}
 
-    @Test
+	@Test
 	public void testGetVariable_DontFilterObsolete() throws Exception {
 		CVTermDao cvtermDao = new CVTermDao();
 		cvtermDao.setSession(this.sessionProvder.getSession());
@@ -143,23 +151,23 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 	}
 
-    @Test(expected = MiddlewareException.class)
-    public void testAddAnalysisVariableShouldNotBeAssignedWithOtherVariableType() throws Exception {
-        OntologyVariableInfo variableInfo = new OntologyVariableInfo();
-        variableInfo.setName(OntologyDataCreationUtil.getNewRandomName());
-        variableInfo.addVariableType(VariableType.ANALYSIS);
-        variableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
-        this.variableManager.addVariable(variableInfo);
-        Assert.fail("Analysis variable type should not be assigned together with any other variable type");
-    }
+	@Test(expected = MiddlewareException.class)
+	public void testAddAnalysisVariableShouldNotBeAssignedWithOtherVariableType() throws Exception {
+		OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+		variableInfo.setName(OntologyDataCreationUtil.getNewRandomName());
+		variableInfo.addVariableType(VariableType.ANALYSIS);
+		variableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
+		this.variableManager.addVariable(variableInfo);
+		Assert.fail("Analysis variable type should not be assigned together with any other variable type");
+	}
 
-    @Test(expected = MiddlewareException.class)
-    public void testUpdateAnalysisVariableShouldNotBeAssignedWithOtherVariableType() throws Exception {
-        this.testVariableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
-        this.testVariableInfo.addVariableType(VariableType.ANALYSIS);
-        this.variableManager.updateVariable(this.testVariableInfo);
-        Assert.fail("Analysis variable type should not be assigned together with any other variable type");
-    }
+	@Test(expected = MiddlewareException.class)
+	public void testUpdateAnalysisVariableShouldNotBeAssignedWithOtherVariableType() throws Exception {
+		this.testVariableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
+		this.testVariableInfo.addVariableType(VariableType.ANALYSIS);
+		this.variableManager.updateVariable(this.testVariableInfo);
+		Assert.fail("Analysis variable type should not be assigned together with any other variable type");
+	}
 
 	@Test
 	public void testUpdateVariable() throws Exception {
