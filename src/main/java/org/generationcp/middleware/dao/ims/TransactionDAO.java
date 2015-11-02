@@ -541,6 +541,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	}
 
 	public List<String> getSimilarStockIds(List<String> stockIds) throws MiddlewareQueryException {
+		if (null == stockIds || stockIds.isEmpty()) {
+			return new ArrayList<>();
+		}
+
 		try {
 			String sql = "SELECT inventory_id" + " FROM ims_transaction" + " WHERE inventory_id IN (:STOCK_ID_LIST)";
 
@@ -551,7 +555,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 
 		return new ArrayList<>();
-
 	}
 
 	@SuppressWarnings("unchecked")

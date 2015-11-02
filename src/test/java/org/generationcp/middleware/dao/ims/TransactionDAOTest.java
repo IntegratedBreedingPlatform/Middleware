@@ -55,4 +55,12 @@ public class TransactionDAOTest extends IntegrationTestBase {
 			Assert.assertTrue(recordIds.contains(inventoryDetails.getSourceRecordId()));
 		}
 	}
+
+	@Test
+	public void testGetSimilarStockIdsEmptyListParam() {
+		List<String> stockIds = new ArrayList<>();
+		List<String> similarStockIds = this.dao.getSimilarStockIds(stockIds);
+
+		Assert.assertTrue("List should be empty.",similarStockIds.isEmpty());
+	}
 }
