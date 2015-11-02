@@ -26,10 +26,13 @@ public class MeasurementsTest {
 
 	private PhenotypeSaver mockPhenotypeSaver;
 
+	private Measurements measurements;
+
 	@Before
 	public void setup() {
 		this.mockPhenotypeSaver = Mockito.mock(PhenotypeSaver.class);
 		this.mockHibernateSessiong = Mockito.mock(Session.class);
+		this.measurements = new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver);
 	}
 
 	@Test()
@@ -37,8 +40,7 @@ public class MeasurementsTest {
 		final MeasurementData measurementData =
 				MeasurementDataTestDataInitializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "Test Value");
 
-		final Measurements measurements = new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver);
-		final Phenotype phenotypeFromMeasurement = measurements.createPhenotypeFromMeasurement(measurementData);
+		final Phenotype phenotypeFromMeasurement = this.measurements.createPhenotypeFromMeasurement(measurementData);
 
 		Assert.assertEquals("We do not map the assay id and thus it should be null", null, phenotypeFromMeasurement.getAssayId());
 		Assert.assertEquals("We do not map the assay id and thus it should be null", null, phenotypeFromMeasurement.getAttributeId());
@@ -57,8 +59,7 @@ public class MeasurementsTest {
 				MeasurementDataTestDataInitializer.createMeasurementData(TEST_TERM_ID, TermId.CATEGORICAL_VARIABLE.getId(), "1");
 		measurementData.setCustomCategoricalValue(true);
 
-		final Measurements measurements = new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver);
-		final Phenotype phenotypeFromMeasurement = measurements.createPhenotypeFromMeasurement(measurementData);
+		final Phenotype phenotypeFromMeasurement = this.measurements.createPhenotypeFromMeasurement(measurementData);
 
 		Assert.assertEquals("Phenotype value is mapped incorrectly", measurementData.getcValueId(), phenotypeFromMeasurement.getcValueId()
 				.toString());
@@ -66,7 +67,6 @@ public class MeasurementsTest {
 
 	@Test
 	public void testUneditiableMeasurementDataAreSkipped() throws Exception {
-		final Measurements measurements = new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver);
 
 		final MeasurementData testMeasurementData =
 				MeasurementDataTestDataInitializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
@@ -75,14 +75,13 @@ public class MeasurementsTest {
 		final MeasurementRow measurementRow =
 				MeasurementRowTestDataInitializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
 
-		measurements.saveMeasurementData(Collections.<MeasurementRow>singletonList(measurementRow));
+		this.measurements.saveMeasurementData(Collections.<MeasurementRow>singletonList(measurementRow));
 		Mockito.verify(this.mockPhenotypeSaver, Mockito.times(0)).saveOrUpdate(Matchers.anyInt(), Matchers.anyInt(), Matchers.anyString(),
 				(Phenotype) Matchers.anyObject(), Matchers.anyInt());
 	}
 
 	@Test
 	public void makeSureCorrectHibernateFlushTypeIsUsed() throws Exception {
-		final Measurements measurements = new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver);
 
 		final MeasurementData testMeasurementData =
 				MeasurementDataTestDataInitializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
@@ -91,7 +90,7 @@ public class MeasurementsTest {
 				MeasurementRowTestDataInitializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
 
 		Mockito.when(this.mockHibernateSessiong.getFlushMode()).thenReturn(FlushMode.AUTO);
-		measurements.saveMeasurements(Collections.<MeasurementRow>singletonList(measurementRow));
+		this.measurements.saveMeasurements(Collections.<MeasurementRow>singletonList(measurementRow));
 		Mockito.verify(this.mockHibernateSessiong).setFlushMode(FlushMode.MANUAL);
 		Mockito.verify(this.mockHibernateSessiong).flush();
 		Mockito.verify(this.mockHibernateSessiong).setFlushMode(FlushMode.AUTO);
@@ -109,15 +108,13 @@ public class MeasurementsTest {
 
 	private void testSavingMeasurements(final String value, final int variableDataTypeId) {
 
-		final Measurements measurements = new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver);
-
 		final MeasurementData testMeasurementData =
 				MeasurementDataTestDataInitializer.createMeasurementData(TEST_TERM_ID, variableDataTypeId, value);
 
 		final MeasurementRow measurementRow =
 				MeasurementRowTestDataInitializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
 
-		measurements.saveMeasurementData(Collections.<MeasurementRow>singletonList(measurementRow));
+		this.measurements.saveMeasurementData(Collections.<MeasurementRow>singletonList(measurementRow));
 
 		Mockito.verify(this.mockPhenotypeSaver, Mockito.times(1)).saveOrUpdate(Matchers.eq(measurementRow.getExperimentId()),
 				Matchers.eq(MeasurementsTest.TEST_TERM_ID), Matchers.eq(value), (Phenotype) Matchers.anyObject(),
