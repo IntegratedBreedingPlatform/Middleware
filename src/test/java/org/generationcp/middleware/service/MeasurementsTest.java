@@ -72,6 +72,30 @@ public class MeasurementsTest {
 				MeasurementDataTestDataInitializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
 		testMeasurementData.setEditable(false);
 
+		assertIfSaveMeasurementDataIsNotCalled(testMeasurementData);
+	}
+
+	@Test
+	public void testMeasurementDataWithPhenotypicIDSetToZeroAreSkipped() throws Exception {
+
+		final MeasurementData testMeasurementData =
+				MeasurementDataTestDataInitializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
+		testMeasurementData.setPhenotypeId(0);
+
+		assertIfSaveMeasurementDataIsNotCalled(testMeasurementData);
+	}
+
+	@Test
+	public void testMeasurementDataWithNullPhenotypicIDAreSkipped() throws Exception {
+
+		final MeasurementData testMeasurementData =
+				MeasurementDataTestDataInitializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
+		testMeasurementData.setPhenotypeId(null);
+
+		assertIfSaveMeasurementDataIsNotCalled(testMeasurementData);
+	}
+
+	private void assertIfSaveMeasurementDataIsNotCalled(final MeasurementData testMeasurementData) {
 		final MeasurementRow measurementRow =
 				MeasurementRowTestDataInitializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
 
