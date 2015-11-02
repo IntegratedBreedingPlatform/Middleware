@@ -89,7 +89,7 @@ public class Measurements {
 			for (final MeasurementData measurementData : dataList) {
 
 				// TODO Change the UI so that we are never send back any data which is null
-				if (!measurementData.isEditable()) {
+				if (!measurementData.isEditable() || (measurementData.getPhenotypeId() == null || measurementData.getPhenotypeId() == 0)) {
 					continue;
 				}
 				final MeasurementVariable measurementVariable = measurementData.getMeasurementVariable();
