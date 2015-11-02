@@ -138,8 +138,8 @@ public class ManagerFactory implements Serializable {
 				this.getOntologyScaleDataManager(), this.sessionProvider);
 	}
 
-	public OntologyDaoFactory getOntologyDaoFactory(HibernateSessionProvider sessionProvider) {
-		return new OntologyDaoFactory(sessionProvider);
+	public OntologyDaoFactory getOntologyDaoFactory() {
+		return new OntologyDaoFactory(this.sessionProvider);
 	}
 
 	public StandardVariableTransformer getStandardVariableTransformer() {
