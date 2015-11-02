@@ -22,15 +22,19 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyCommonDAO;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.pojos.oms.CV;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
+import org.generationcp.middleware.util.Clock;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.StringUtil;
+import org.generationcp.middleware.util.SystemClock;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Function;
@@ -51,12 +55,27 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	private static final String SCALE_MAX_VALUE_NOT_VALID = "Max value is not valid";
 	private static final String SCALE_IS_REFERRED_TO_VARIABLE = "Scale is referred to variable.";
 
+	@Autowired
+	private OntologyCommonDAO ontologyCommonDAO;
+
+	@Autowired
+	private OntologyDaoFactory ontologyDaoFactory;
+
+	@Autowired
+	protected Clock systemClock;
+
 	public OntologyScaleDataManagerImpl() {
 		super();
 	}
 
+	//TODO:This is temporary hack for managerfactory, builder and service. It should refactor to remove this constructor
 	public OntologyScaleDataManagerImpl(HibernateSessionProvider sessionProvider) {
-		super(sessionProvider);
+		this.ontologyDaoFactory = new OntologyDaoFactory();
+		this.ontologyDaoFactory.setSessionProvider(sessionProvider);
+		OntologyCommonDAOImpl ontologyCommonDAOImpl = new OntologyCommonDAOImpl();
+		ontologyCommonDAOImpl.setSessionProvider(sessionProvider);
+		this.ontologyCommonDAO = ontologyCommonDAOImpl;
+		this.systemClock = new SystemClock();
 	}
 
 	@Override
