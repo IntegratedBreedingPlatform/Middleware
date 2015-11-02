@@ -243,6 +243,7 @@ public class WorkbookSaver extends Saver {
 			workbook.setStudyDetails(null);
 			workbook.setVariates(null);
 		} else {
+			workbook.getStudyDetails().setId(studyId);
 			workbook.setTrialDatasetId(trialDatasetId);
 			workbook.setMeasurementDatesetId(datasetId);
 		}
@@ -884,6 +885,7 @@ public class WorkbookSaver extends Saver {
 							programUUID);
 		}
 
+		workbook.getStudyDetails().setId(studyId);
 		workbook.populateDatasetIds(trialDatasetId, measurementDatasetId, meansDatasetId);
 
 		if (WorkbookSaver.LOG.isDebugEnabled()) {
