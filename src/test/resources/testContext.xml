@@ -136,7 +136,7 @@
     </bean>
     
     <bean id="ontologyScaleDataManager" class="org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+
     </bean>
 
     <bean id="termDataManager" class="org.generationcp.middleware.manager.ontology.TermDataManagerImpl">
