@@ -72,27 +72,51 @@ public class MeasurementsTest {
 				MeasurementDataTestDataInitializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
 		testMeasurementData.setEditable(false);
 
-		assertIfSaveMeasurementDataIsNotCalled(testMeasurementData);
+		this.assertIfSaveMeasurementDataIsNotCalled(testMeasurementData);
 	}
 
 	@Test
-	public void testMeasurementDataWithPhenotypicIDSetToZeroAreSkipped() throws Exception {
+	public void testMeasurementDataWithPhenotypicIDSetToZeroAndBlankValueAreSkipped() throws Exception {
 
 		final MeasurementData testMeasurementData =
 				MeasurementDataTestDataInitializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
 		testMeasurementData.setPhenotypeId(0);
+		testMeasurementData.setValue("");
 
-		assertIfSaveMeasurementDataIsNotCalled(testMeasurementData);
+		this.assertIfSaveMeasurementDataIsNotCalled(testMeasurementData);
 	}
 
 	@Test
-	public void testMeasurementDataWithNullPhenotypicIDAreSkipped() throws Exception {
+	public void testMeasurementDataWithPhenotypicIDSetToZeroAndNullValueAreSkipped() throws Exception {
+
+		final MeasurementData testMeasurementData =
+				MeasurementDataTestDataInitializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
+		testMeasurementData.setPhenotypeId(0);
+		testMeasurementData.setValue(null);
+
+		this.assertIfSaveMeasurementDataIsNotCalled(testMeasurementData);
+	}
+
+	@Test
+	public void testMeasurementDataWithNullPhenotypicIDAndBlankValueAreSkipped() throws Exception {
 
 		final MeasurementData testMeasurementData =
 				MeasurementDataTestDataInitializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
 		testMeasurementData.setPhenotypeId(null);
+		testMeasurementData.setValue("");
 
-		assertIfSaveMeasurementDataIsNotCalled(testMeasurementData);
+		this.assertIfSaveMeasurementDataIsNotCalled(testMeasurementData);
+	}
+
+	@Test
+	public void testMeasurementDataWithNullPhenotypicIDAndNullValueAreSkipped() throws Exception {
+
+		final MeasurementData testMeasurementData =
+				MeasurementDataTestDataInitializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
+		testMeasurementData.setPhenotypeId(null);
+		testMeasurementData.setValue(null);
+
+		this.assertIfSaveMeasurementDataIsNotCalled(testMeasurementData);
 	}
 
 	private void assertIfSaveMeasurementDataIsNotCalled(final MeasurementData testMeasurementData) {
