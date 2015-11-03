@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -28,12 +30,16 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Name}.
  *
  */
 public class NameDAO extends GenericDAO<Name, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(NameDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<Name> getByGIDWithFilters(Integer gid, Integer status, GermplasmNameType type) throws MiddlewareQueryException {
@@ -363,6 +369,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	@SuppressWarnings("unchecked")
 	public Map<String, Integer> getMapCountByNamePermutations(List<String> names) throws MiddlewareQueryException {
 
+		Monitor monitor = MonitorFactory.start("Method Started : getMapCountByNamePermutations ");
+
 		if (names == null || names.isEmpty()) {
 			return new HashMap<>();
 		}
@@ -390,6 +398,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			mapCountWithName.put(originalName, mapCountWithName.get(originalName) + 1);
 		}
 
+		LOG.debug("Method End : getMapCountByNamePermutations " + monitor.stop());
 		return mapCountWithName;
 	}
 
