@@ -10,21 +10,28 @@ import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ontology.api.OntologyCommonDAO;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
+import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.ObjectTypeMapper;
-import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.springframework.transaction.annotation.Transactional;
 
 @SuppressWarnings("unchecked")
-class OntologyCommonDAOImpl implements OntologyCommonDAO {
+@Transactional
+public class OntologyCommonDAOImpl implements OntologyCommonDAO {
 
 	public final String SHOULD_NOT_OBSOLETE = "is_obsolete = 0";
 
 	private HibernateSessionProvider sessionProvider;
+
+	private OntologyDaoFactory ontologyDaoFactory;
 
 	public OntologyCommonDAOImpl() {
 		super();
@@ -32,9 +39,11 @@ class OntologyCommonDAOImpl implements OntologyCommonDAO {
 
 	public void setSessionProvider(HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
+		this.ontologyDaoFactory = new OntologyDaoFactory();
+		this.ontologyDaoFactory.setSessionProvider(sessionProvider);
 	}
 
-	public List<Integer> getAllPropertyIdsWithClassAndVariableType(String[] classes, String[] variableTypes) throws MiddlewareException {
+	public List<Integer> getAllPropertyIdsWithClassAndVariableType(final String[] classes, final String[] variableTypes) throws MiddlewareException {
 
 		boolean shouldFilterByClass = classes != null && classes.length > 0;
 
@@ -64,7 +73,7 @@ class OntologyCommonDAOImpl implements OntologyCommonDAO {
 		return query.list();
 	}
 
-	public Map<Integer, Property> getPropertiesWithCropOntologyAndTraits(Boolean fetchAll, List propertyIds, boolean filterObsolete) throws MiddlewareException {
+	public Map<Integer, Property> getPropertiesWithCropOntologyAndTraits(final Boolean fetchAll, List propertyIds, final boolean filterObsolete) throws MiddlewareException {
 
 		Map<Integer, Property> map = new HashMap<>();
 
@@ -136,5 +145,67 @@ class OntologyCommonDAOImpl implements OntologyCommonDAO {
 		}
 
 		return map;
+	}
+
+	public Map<Integer, Scale> getScalesWithDataTypeAndProperties(final List<Integer> termIds, final Map<Integer, Scale> scaleMap, final Boolean filterObsolete) throws MiddlewareException {
+		String filterObsoleteClause = "";
+		if (filterObsolete) {
+			filterObsoleteClause = "t.is_obsolete = 0 and";
+		}
+
+		SQLQuery query = this.sessionProvider.getSession().createSQLQuery(
+				"select p.* from cvtermprop p inner join cvterm t on p.cvterm_id = t.cvterm_id where " + filterObsoleteClause
+						+ " t.cv_id = " + CvId.SCALES.getId()).addEntity(CVTermProperty.class);
+
+		List properties = query.list();
+
+		for (Object p : properties) {
+			CVTermProperty property = (CVTermProperty) p;
+			Scale scale = scaleMap.get(property.getCvTermId());
+
+			if (scale == null) {
+				continue;
+			}
+
+			if (Objects.equals(property.getTypeId(), TermId.MIN_VALUE.getId())) {
+				scale.setMinValue(property.getValue());
+			} else if (Objects.equals(property.getTypeId(), TermId.MAX_VALUE.getId())) {
+				scale.setMaxValue(property.getValue());
+			} else if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
+				scale.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+			} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
+				scale.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
+			}
+		}
+
+		query = this.sessionProvider.getSession().createSQLQuery(
+				"SELECT r.subject_id, r.type_id, t.cv_id, t.cvterm_id, t.name, t.definition " + "FROM cvterm_relationship r inner join cvterm t on r.object_id = t.cvterm_id "
+						+ "where r.subject_id in (:scaleIds)");
+
+		query.setParameterList("scaleIds", termIds);
+
+		List result = query.list();
+
+		for (Object row : result) {
+			Object[] items = (Object[]) row;
+
+			Integer scaleId = (Integer) items[0];
+
+			Scale scale = scaleMap.get(scaleId);
+
+			if (scale == null) {
+				continue;
+			}
+
+			if (Objects.equals(items[1], TermId.HAS_TYPE.getId())) {
+				scale.setDataType(DataType.getById((Integer) items[3]));
+			} else if (Objects.equals(items[1], TermId.HAS_VALUE.getId())) {
+				scale.addCategory(new TermSummary((Integer) items[3], (String) items[4], (String) items[5]));
+			}
+
+			scaleMap.put(scale.getId(), scale);
+		}
+
+		return scaleMap;
 	}
 }
