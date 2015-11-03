@@ -7,6 +7,7 @@ import org.generationcp.middleware.data.initializer.MeasurementDataTestDataIniti
 import org.generationcp.middleware.data.initializer.MeasurementRowTestDataInitializer;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -69,7 +70,7 @@ public class MeasurementsTest {
 	}
 
 	@Test
-	public void testUneditiableMeasurementDataAreSkipped() throws Exception {
+	public void testUneditableMeasurementDataAreSkipped() throws Exception {
 
 		final MeasurementDataTestDataInitializer measurementDataInit =
 				new MeasurementDataTestDataInitializer(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
@@ -163,10 +164,35 @@ public class MeasurementsTest {
 		this.testSavingMeasurements("Categorical Value", TermId.CATEGORICAL_VARIABLE.getId());
 	}
 
+	/**
+	 * Simple test to ensure that the Phenotype id is set into the measurement data so that the UI does not recreate data. The test does not
+	 * do any logical validation but just ensures that the measurement data is updated with a phenotype id when created. Without this saving
+	 * an updating of measurement data is broken.
+	 */
+	@Test
+	public void testPhenotypeIdSetOnSave() {
+		final Measurements measurements = new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver);
+		final MeasurementData testMeasurementData = Mockito.mock(MeasurementData.class);
+		final MeasurementRowTestDataInitializer measurementRowInit = new MeasurementRowTestDataInitializer(testMeasurementData);
+		final MeasurementRow measurementRow = measurementRowInit.createMeasurementRowWithAtLeast1MeasurementVar();
+		measurementRow.setDataList(Collections.<MeasurementData>singletonList(testMeasurementData));
+
+		// Set up measurement data so that it actually tries to save something.
+		Mockito.when(testMeasurementData.isEditable()).thenReturn(true);
+		Mockito.when(testMeasurementData.getValue()).thenReturn("Test Data");
+		Mockito.when(testMeasurementData.getMeasurementVariable()).thenReturn(Mockito.mock(MeasurementVariable.class));
+
+		final int testPhenotypeId = 245;
+		Mockito.when(testMeasurementData.getPhenotypeId()).thenReturn(testPhenotypeId);
+
+		measurements.saveMeasurementData(Collections.<MeasurementRow>singletonList(measurementRow));
+		Mockito.verify(testMeasurementData).setPhenotypeId(245);
+	}
+
 	private void testSavingMeasurements(final String value, final int variableDataTypeId) {
 
 		final MeasurementDataTestDataInitializer measurementDataInit =
-				new MeasurementDataTestDataInitializer(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
+				new MeasurementDataTestDataInitializer(TEST_TERM_ID, variableDataTypeId, value);
 		final MeasurementData testMeasurementData = measurementDataInit.createMeasurementData();
 
 		final MeasurementRowTestDataInitializer measurementRowInit = new MeasurementRowTestDataInitializer(testMeasurementData);
