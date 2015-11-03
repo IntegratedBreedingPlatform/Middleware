@@ -76,7 +76,6 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 		final Workbook createdWorkbook = this.fieldbookService.getTrialDataSet(id);
 
-		WorkbookTestDataInitializer.setTestWorkbook(null);
 		workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 
 		Assert.assertEquals("Expected " + workbook.getTrialConditions().size() + " of records for trial conditions but got "
@@ -99,7 +98,6 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 		final Workbook createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
 
-		WorkbookTestDataInitializer.setTestWorkbook(null);
 		workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 
 		Assert.assertEquals("Expected " + workbook.getTrialConditions().size() + " of records for trial conditions but got "
@@ -137,7 +135,6 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 	@Test
 	public void testDeletionOfExperimentPropAndStockProp() throws MiddlewareException {
-		WorkbookTestDataInitializer.setTestWorkbook(null);
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
 
 		final int id = this.dataImportService.saveDataset(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);

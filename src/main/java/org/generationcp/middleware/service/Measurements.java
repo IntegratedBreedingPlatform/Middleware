@@ -33,7 +33,8 @@ public class Measurements {
 	 * @param observations list of observations to save
 	 */
 	void saveMeasurements(final List<MeasurementRow> observations) {
-		// Changing the fulsh mode will have huge performance implications. Please be careful when doing this. The current stratergy below
+		// Changing the fulsh mode will have huge performance implications.
+		// Please be careful when doing this. The current stratergy below
 		// facilitates batch inserts.
 		final FlushMode originalFlushMode = this.session.getFlushMode();
 		try {
@@ -89,9 +90,10 @@ public class Measurements {
 			}
 			for (final MeasurementData measurementData : dataList) {
 
-				// TODO Change the UI so that we are never send back any data which is null
-				if (!measurementData.isEditable() || StringUtils.isBlank(measurementData.getcValueId())
-						&& StringUtils.isBlank(measurementData.getValue())) {
+				// TODO Change the UI so that we are never send back any data
+				// which is null
+				if (!measurementData.isEditable() || (measurementData.getPhenotypeId() == null || measurementData.getPhenotypeId() == 0)
+						&& StringUtils.isBlank(measurementData.getcValueId()) && StringUtils.isBlank(measurementData.getValue())) {
 					continue;
 				}
 				final MeasurementVariable measurementVariable = measurementData.getMeasurementVariable();
@@ -102,6 +104,11 @@ public class Measurements {
 				this.phenotypeSaver.saveOrUpdate(measurementRow.getExperimentId(), measurementVariable.getTermId(),
 						measurementData.getcValueId() != null && !"".equals(measurementData.getcValueId()) ? measurementData.getcValueId()
 								: measurementData.getValue(), phenotype, measurementData.getMeasurementVariable().getDataTypeId());
+				// This is not great but essential because the workbook
+				// object must be updated so that it has new phenotype id. This
+				// id is then piped back to the UI and is used in subsequent calls to
+				// determine if we need to update or add phenotype values
+				measurementData.setPhenotypeId(phenotype.getPhenotypeId());
 
 			}
 
