@@ -34,7 +34,6 @@ import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.SystemClock;
 import org.generationcp.middleware.util.Util;
-import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -123,65 +122,8 @@ public class OntologyScaleDataManagerImpl implements OntologyScaleDataManager {
 			map.put(s.getCvTermId(), new Scale(Term.fromCVTerm(s)));
 		}
 
-		String filterObsoleteClause = "";
-		if (filterObsolete) {
-			filterObsoleteClause = "t.is_obsolete = 0 and";
-		}
-
-		Query query = this.ontologyDaoFactory.getActiveSession()
-				.createSQLQuery("select p.* from cvtermprop p inner join cvterm t on p.cvterm_id = t.cvterm_id where "
-						+ filterObsoleteClause + " t.cv_id = " + CvId.SCALES.getId())
-				.addEntity(CVTermProperty.class);
-
-		List properties = query.list();
-
-		for (Object p : properties) {
-			CVTermProperty property = (CVTermProperty) p;
-			Scale scale = map.get(property.getCvTermId());
-
-			if (scale == null) {
-				continue;
-			}
-
-			if (Objects.equals(property.getTypeId(), TermId.MIN_VALUE.getId())) {
-				scale.setMinValue(property.getValue());
-			} else if (Objects.equals(property.getTypeId(), TermId.MAX_VALUE.getId())) {
-				scale.setMaxValue(property.getValue());
-			} else if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
-				scale.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
-			} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
-				scale.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
-			}
-		}
-
-		query = this.ontologyDaoFactory.getActiveSession().createSQLQuery(
-						"SELECT r.subject_id, r.type_id, t.cv_id, t.cvterm_id, t.name, t.definition "
-								+ "FROM cvterm_relationship r inner join cvterm t on r.object_id = t.cvterm_id "
-								+ "where r.subject_id in (:scaleIds)");
-
-		query.setParameterList("scaleIds", termIds);
-
-		List result = query.list();
-
-		for (Object row : result) {
-			Object[] items = (Object[]) row;
-
-			Integer scaleId = (Integer) items[0];
-
-			Scale scale = map.get(scaleId);
-
-			if (scale == null) {
-				continue;
-			}
-
-			if (Objects.equals(items[1], TermId.HAS_TYPE.getId())) {
-				scale.setDataType(DataType.getById((Integer) items[3]));
-			} else if (Objects.equals(items[1], TermId.HAS_VALUE.getId())) {
-				scale.addCategory(new TermSummary((Integer) items[3], (String) items[4], (String) items[5]));
-			}
-		}
-
-		List<Scale> scales = new ArrayList<>(map.values());
+		final Map<Integer, Scale> scalesWithDataTypeAndProperties = this.ontologyCommonDAO.getScalesWithDataTypeAndProperties(termIds, map, filterObsolete);
+		final List<Scale> scales = new ArrayList<>(scalesWithDataTypeAndProperties.values());
 
 		Collections.sort(scales, new Comparator<Scale>() {
 
