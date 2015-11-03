@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.etl;
@@ -117,7 +117,7 @@ public class WorkbookTest {
 	@Test
 	public void testGetTrialObservationByTrialInstanceNoForNursery() {
 		workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.N);
-		WorkbookTestDataInitializer.createTrialObservations(1);
+		WorkbookTestDataInitializer.createTrialObservations(1, workbook);
 
 		final MeasurementRow trialObservation = workbook.getTrialObservationByTrialInstanceNo(1);
 		Assert.assertNotNull("Expecting that every Nursery created has by default 1 instance level observation.", trialObservation);
@@ -127,7 +127,7 @@ public class WorkbookTest {
 	public void testGetTrialObservationByTrialInstanceNoForTrial() {
 		final int noOfInstances = 2;
 		workbook = WorkbookTestDataInitializer.getTestWorkbook(noOfInstances, StudyType.T);
-		WorkbookTestDataInitializer.createTrialObservations(noOfInstances);
+		WorkbookTestDataInitializer.createTrialObservations(noOfInstances, workbook);
 
 		for (int trialInstanceNo = 1; trialInstanceNo <= noOfInstances; trialInstanceNo++) {
 			final MeasurementRow trialObservation = workbook.getTrialObservationByTrialInstanceNo(trialInstanceNo);
