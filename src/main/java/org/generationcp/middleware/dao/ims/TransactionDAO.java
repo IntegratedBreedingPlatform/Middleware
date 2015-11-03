@@ -526,35 +526,21 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	}
 
-	public Boolean isStockIdExists(List<String> stockIds) throws MiddlewareQueryException {
-		try {
-			List<String> result = this.getSimilarStockIds(stockIds);
-			if (null != result && !result.isEmpty()) {
-				return true;
-			}
+	public Boolean isStockIdExists(final List<String> stockIds) {
+		final List<String> result = this.getSimilarStockIds(stockIds);
+		return null != result && !result.isEmpty();
 
-		} catch (Exception e) {
-			this.logAndThrowException("Error at isStockIdExists= at TransactionDAO: " + e.getMessage(), e);
-		}
-
-		return false;
 	}
 
-	public List<String> getSimilarStockIds(List<String> stockIds) throws MiddlewareQueryException {
+	public List<String> getSimilarStockIds(final List<String> stockIds) {
 		if (null == stockIds || stockIds.isEmpty()) {
 			return new ArrayList<>();
 		}
 
-		try {
-			String sql = "SELECT inventory_id" + " FROM ims_transaction" + " WHERE inventory_id IN (:STOCK_ID_LIST)";
+		final String sql = "SELECT inventory_id" + " FROM ims_transaction" + " WHERE inventory_id IN (:STOCK_ID_LIST)";
+		final Query query = this.getSession().createSQLQuery(sql).setParameterList("STOCK_ID_LIST", stockIds);
 
-			Query query = this.getSession().createSQLQuery(sql).setParameterList("STOCK_ID_LIST", stockIds);
-			return query.list();
-		} catch (Exception e) {
-			this.logAndThrowException("Error at isStockIdExists= at TransactionDAO: " + e.getMessage(), e);
-		}
-
-		return new ArrayList<>();
+		return query.list();
 	}
 
 	@SuppressWarnings("unchecked")
