@@ -3,6 +3,7 @@ package org.generationcp.middleware.service;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -89,7 +90,8 @@ public class Measurements {
 			for (final MeasurementData measurementData : dataList) {
 
 				// TODO Change the UI so that we are never send back any data which is null
-				if (!measurementData.isEditable() || (measurementData.getPhenotypeId() == null || measurementData.getPhenotypeId() == 0)) {
+				if (!measurementData.isEditable() || (measurementData.getPhenotypeId() == null || measurementData.getPhenotypeId() == 0)
+						&& StringUtils.isBlank(measurementData.getcValueId()) && StringUtils.isBlank(measurementData.getValue())) {
 					continue;
 				}
 				final MeasurementVariable measurementVariable = measurementData.getMeasurementVariable();
