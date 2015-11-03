@@ -8,10 +8,16 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 
 public class MeasurementRowTestDataInitializer {
 
-	public static MeasurementRow createMeasurementRowWithAtLeast1MeasurementVar(final MeasurementData measurementData) {
+	private final MeasurementData measurementData;
+
+	public MeasurementRowTestDataInitializer(final MeasurementData measurementData) {
+		this.measurementData = measurementData;
+	}
+
+	public MeasurementRow createMeasurementRowWithAtLeast1MeasurementVar() {
 		final MeasurementRow measurementRow = new MeasurementRow();
 		measurementRow.setExperimentId(1);
-		measurementRow.setDataList(Collections.<MeasurementData>singletonList(measurementData));
+		measurementRow.setDataList(Collections.<MeasurementData>singletonList(this.measurementData));
 		return measurementRow;
 	}
 }

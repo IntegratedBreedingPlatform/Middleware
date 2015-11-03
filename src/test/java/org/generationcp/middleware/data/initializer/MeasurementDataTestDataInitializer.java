@@ -7,22 +7,35 @@ import org.generationcp.middleware.domain.oms.TermId;
 
 public class MeasurementDataTestDataInitializer {
 
-	public static MeasurementData createMeasurementData(final int termId, final int variableDataTypeId, final String value) {
+	private final MeasurementVariableTestDataInitializer measurementVariableInit;
+	private final int termId;
+	private final int variableDataTypeId;
+	private final String value;
+
+	public MeasurementDataTestDataInitializer(final int termId, final int variableDataTypeId, final String value) {
+		this.termId = termId;
+		this.variableDataTypeId = variableDataTypeId;
+		this.value = value;
+		this.measurementVariableInit = new MeasurementVariableTestDataInitializer(this.termId, this.variableDataTypeId);
+	}
+
+	public MeasurementData createMeasurementData() {
 		final MeasurementData measurementData = new MeasurementData();
 		measurementData.setAccepted(true);
 
 		measurementData.setDataType("1");
 		measurementData.setEditable(true);
 		measurementData.setLabel("Measurement Data Label");
-		measurementData
-				.setMeasurementVariable(MeasurementVariableTestDataInitializer.createMeasurementVariable(termId, variableDataTypeId));
+
+		measurementData.setMeasurementVariable(this.measurementVariableInit.createMeasurementVariable());
+
 		measurementData.setPhenotypeId(123);
 		measurementData.setVariable(new Variable());
 
-		if (TermId.CATEGORICAL_VARIABLE.getId() == variableDataTypeId) {
-			measurementData.setcValueId(value);
+		if (TermId.CATEGORICAL_VARIABLE.getId() == this.variableDataTypeId) {
+			measurementData.setcValueId(this.value);
 		} else {
-			measurementData.setValue(value);
+			measurementData.setValue(this.value);
 		}
 		return measurementData;
 	}
