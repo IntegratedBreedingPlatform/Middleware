@@ -132,7 +132,7 @@
     </bean>
     
     <bean id="ontologyVariableDataManager" class="org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+
     </bean>
     
     <bean id="ontologyScaleDataManager" class="org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl">
