@@ -19,6 +19,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -36,6 +37,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.OntologyDataManagerImplTestConstants;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase {
 
 	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
+
+	@BeforeClass
+	public static void setUpOnce() {
+		// Variable caching relies on the context holder to determine current crop database in use
+		ContextHolder.setCurrentCrop("maize");
+	}
 
 	@Autowired
 	private OntologyDataManager ontologyDataManager;
