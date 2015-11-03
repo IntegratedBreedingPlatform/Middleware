@@ -96,7 +96,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public List<Variable> getWithFilter(VariableFilter variableFilter) {
+	public List<Variable> getWithFilter(VariableFilter variableFilter) throws MiddlewareQueryException {
 
 		Map<Integer, Variable> map = new HashMap<>();
 
@@ -420,8 +420,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		// sort variable list by variable name
 		Collections.sort(variables, new Comparator<Variable>() {
 
-			@Override
-			public int compare(Variable l, Variable r) {
+			@Override public int compare(Variable l, Variable r) {
 				return l.getName().compareToIgnoreCase(r.getName());
 			}
 		});
@@ -431,7 +430,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 
 	@Override
-	public Variable getVariable(String programUuid, Integer id, boolean filterObsolete, boolean calculateVariableUsage) {
+	public Variable getVariable(String programUuid, Integer id, boolean filterObsolete, boolean calculateVariableUsage) throws MiddlewareQueryException {
 
 		Variable cachedVariable = VariableCache.getFromCache(id);
 		if (cachedVariable != null) {
@@ -517,7 +516,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public void processTreatmentFactorHasPairValue(List<Variable> summaryList, List<Integer> hiddenFields) {
+	public void processTreatmentFactorHasPairValue(List<Variable> summaryList, List<Integer> hiddenFields) throws MiddlewareQueryException {
 		for (Variable variable : summaryList) {
 			variable.setHasPair(this.getCvTermDao().hasPossibleTreatmentPairs(variable.getId(), variable.getProperty().getId(),
 					hiddenFields));
@@ -525,7 +524,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public void addVariable(OntologyVariableInfo variableInfo) {
+	public void addVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException {
 
 		CVTerm term = this.getCvTermDao().getByNameAndCvId(variableInfo.getName(), CvId.VARIABLES.getId());
 
@@ -589,7 +588,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public void updateVariable(OntologyVariableInfo variableInfo) {
+	public void updateVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException {
 
 		VariableCache.removeFromCache(variableInfo.getId());
 
@@ -715,7 +714,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public void deleteVariable(Integer id) {
+	public void deleteVariable(Integer id) throws MiddlewareQueryException {
 
 		VariableCache.removeFromCache(id);
 
@@ -760,7 +759,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public Integer getVariableObservations(int variableId) {
+	public Integer getVariableObservations(int variableId) throws MiddlewareQueryException {
 
 		final String numOfProjectsWithVariable =
 				"SELECT count(pp.project_id) " + " FROM projectprop pp " + " WHERE NOT EXISTS( " + " SELECT 1 FROM projectprop stat "
@@ -775,11 +774,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	// TODO: Follow DmsProjectDao countExperimentByVariable. This requires STORED_IN and that needs to deprecated.
 	@Override
-	public Integer getVariableStudies(int variableId) {
+	public Integer getVariableStudies(int variableId) throws MiddlewareQueryException {
 		return 0;
 	}
 
-	private void checkTermIsVariable(CVTerm term) {
+	private void checkTermIsVariable(CVTerm term) throws MiddlewareQueryException {
 
 		if (term == null) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_DOES_NOT_EXIST);
@@ -790,7 +789,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		}
 	}
 
-	private void fillDaoElementsAndCheckForUsage(VariableInfoDaoElements elements) {
+	private void fillDaoElementsAndCheckForUsage(VariableInfoDaoElements elements) throws MiddlewareQueryException {
 
 		// check required elements
 		Util.checkAndThrowForNullObjects(elements.getVariableId());
