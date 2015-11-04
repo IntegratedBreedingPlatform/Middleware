@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -68,7 +66,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	private static final String TERM_IS_NOT_VARIABLE = "The term {0} is not Variable.";
 	private static final String VARIABLE_EXIST_WITH_SAME_NAME = "Variable exist with same name";
 	private static final String CAN_NOT_DELETE_USED_VARIABLE = "Used variable can not be deleted";
-    private static final String VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE = "Analysis variable type should not be assigned together with any other variable type";
+	private static final String VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE = "Analysis variable type should not be assigned together with any other variable type";
 
 	@Autowired
 	private OntologyMethodDataManager methodManager;
@@ -78,9 +76,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	@Autowired
 	private OntologyScaleDataManager scaleManager;
-	
-	private static final ConcurrentMap<Integer, Variable> variableCache = new ConcurrentHashMap<>();
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(OntologyVariableDataManagerImpl.class);
 
 	public OntologyVariableDataManagerImpl() {
@@ -432,21 +428,17 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		return variables;
 	}
-	
-	public static void removeCachedVariable(int id){
-		variableCache.remove(id);
-	}
+
 
 	@Override
 	public Variable getVariable(String programUuid, Integer id, boolean filterObsolete, boolean calculateVariableUsage) {
 
-		Variable cachedVariable = variableCache.get(id);
+		Variable cachedVariable = VariableCache.getFromCache(id);
 		if (cachedVariable != null) {
-			LOG.debug("Variable for id [{}] found in cache, returning the cached value.", id);
 			return cachedVariable;
 		}
 
-		Monitor monitor = MonitorFactory.start("Get Variable");				
+		Monitor monitor = MonitorFactory.start("Get Variable");
 		try {
 
 			// Fetch term from db
@@ -513,9 +505,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				variable.setObservations(unknownUsage);
 
 			}
-			
-			variableCache.put(id, variable);
-			
+
+			VariableCache.addToCache(id, variable);
+
 			return variable;
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error in getVariable", e);
@@ -541,66 +533,66 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_EXIST_WITH_SAME_NAME);
 		}
 
-        //Throw if variable type is analysis used with other variable types.
-        if(variableInfo.getVariableTypes().contains(VariableType.ANALYSIS) && variableInfo.getVariableTypes().size() > 1) {
-            throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE);
-        }
+		//Throw if variable type is analysis used with other variable types.
+		if(variableInfo.getVariableTypes().contains(VariableType.ANALYSIS) && variableInfo.getVariableTypes().size() > 1) {
+			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE);
+		}
 
-        // Saving term to database.
-        CVTerm savedTerm = this.getCvTermDao().save(variableInfo.getName(), variableInfo.getDescription(), CvId.VARIABLES);
-        variableInfo.setId(savedTerm.getCvTermId());
+		// Saving term to database.
+		CVTerm savedTerm = this.getCvTermDao().save(variableInfo.getName(), variableInfo.getDescription(), CvId.VARIABLES);
+		variableInfo.setId(savedTerm.getCvTermId());
 
-        // Setting method to variable
-        if (variableInfo.getMethodId() != null) {
-            this.getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_METHOD.getId(),
-                    variableInfo.getMethodId());
-        }
+		// Setting method to variable
+		if (variableInfo.getMethodId() != null) {
+			this.getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_METHOD.getId(),
+					variableInfo.getMethodId());
+		}
 
-        // Setting property to variable
-        if (variableInfo.getPropertyId() != null) {
-            this.getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_PROPERTY.getId(),
-                    variableInfo.getPropertyId());
-        }
+		// Setting property to variable
+		if (variableInfo.getPropertyId() != null) {
+			this.getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_PROPERTY.getId(),
+					variableInfo.getPropertyId());
+		}
 
-        // Setting scale to variable
-        if (variableInfo.getScaleId() != null) {
-            this.getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_SCALE.getId(), variableInfo.getScaleId());
-        }
+		// Setting scale to variable
+		if (variableInfo.getScaleId() != null) {
+			this.getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_SCALE.getId(), variableInfo.getScaleId());
+		}
 
-        int rank = 0;
-        for (VariableType type : variableInfo.getVariableTypes()) {
-            CVTermProperty property = new CVTermProperty();
-            property.setCvTermId(variableInfo.getId());
-            property.setTypeId(TermId.VARIABLE_TYPE.getId());
-            property.setValue(type.getName());
-            property.setRank(rank++);
-            this.getCvTermPropertyDao().save(property);
-        }
+		int rank = 0;
+		for (VariableType type : variableInfo.getVariableTypes()) {
+			CVTermProperty property = new CVTermProperty();
+			property.setCvTermId(variableInfo.getId());
+			property.setTypeId(TermId.VARIABLE_TYPE.getId());
+			property.setValue(type.getName());
+			property.setRank(rank++);
+			this.getCvTermPropertyDao().save(property);
+		}
 
-        // Saving min max values
-        if (variableInfo.getExpectedMin() != null || variableInfo.getExpectedMax() != null) {
-            this.getVariableProgramOverridesDao().save(variableInfo.getId(), variableInfo.getProgramUuid(), null,
-                    variableInfo.getExpectedMin(), variableInfo.getExpectedMax());
-        }
+		// Saving min max values
+		if (variableInfo.getExpectedMin() != null || variableInfo.getExpectedMax() != null) {
+			this.getVariableProgramOverridesDao().save(variableInfo.getId(), variableInfo.getProgramUuid(), null,
+					variableInfo.getExpectedMin(), variableInfo.getExpectedMax());
+		}
 
-        // Saving favorite
-        if (variableInfo.isFavorite() != null && variableInfo.isFavorite()) {
-            ProgramFavorite programFavorite = new ProgramFavorite();
-            programFavorite.setEntityId(variableInfo.getId());
-            programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE.getName());
-            programFavorite.setUniqueID(variableInfo.getProgramUuid());
-            this.getProgramFavoriteDao().save(programFavorite);
-        }
+		// Saving favorite
+		if (variableInfo.isFavorite() != null && variableInfo.isFavorite()) {
+			ProgramFavorite programFavorite = new ProgramFavorite();
+			programFavorite.setEntityId(variableInfo.getId());
+			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE.getName());
+			programFavorite.setUniqueID(variableInfo.getProgramUuid());
+			this.getProgramFavoriteDao().save(programFavorite);
+		}
 
-        // Setting last update time.
-        this.getCvTermPropertyDao().save(variableInfo.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
+		// Setting last update time.
+		this.getCvTermPropertyDao().save(variableInfo.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 	}
 
 	@Override
 	public void updateVariable(OntologyVariableInfo variableInfo) {
 
-		OntologyVariableDataManagerImpl.removeCachedVariable(variableInfo.getId());
-		
+		VariableCache.removeFromCache(variableInfo.getId());
+
 		VariableInfoDaoElements elements = new VariableInfoDaoElements();
 		elements.setVariableId(variableInfo.getId());
 		elements.setProgramUuid(variableInfo.getProgramUuid());
@@ -611,10 +603,10 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		this.checkTermIsVariable(term);
 
-        //Throw if variable type is analysis used with other variable types.
-        if(variableInfo.getVariableTypes().contains(VariableType.ANALYSIS) && variableInfo.getVariableTypes().size() > 1) {
-            throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE);
-        }
+		//Throw if variable type is analysis used with other variable types.
+		if(variableInfo.getVariableTypes().contains(VariableType.ANALYSIS) && variableInfo.getVariableTypes().size() > 1) {
+			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE);
+		}
 
 		CVTermRelationship methodRelation = elements.getMethodRelation();
 		CVTermRelationship propertyRelation = elements.getPropertyRelation();
@@ -623,110 +615,110 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		VariableOverrides variableOverrides = elements.getVariableOverrides();
 
 
-        // Updating term to database.
-        if (!(variableInfo.getName().equals(term.getName()) && Objects.equals(variableInfo.getDescription(), term.getDefinition()))) {
-            term.setName(variableInfo.getName());
-            term.setDefinition(variableInfo.getDescription());
-            this.getCvTermDao().merge(term);
-        }
+		// Updating term to database.
+		if (!(variableInfo.getName().equals(term.getName()) && Objects.equals(variableInfo.getDescription(), term.getDefinition()))) {
+			term.setName(variableInfo.getName());
+			term.setDefinition(variableInfo.getDescription());
+			this.getCvTermDao().merge(term);
+		}
 
-        // Setting method to variable
-        if (methodRelation == null) {
-            this.getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_METHOD.getId(),
-                    variableInfo.getMethodId());
-        } else if (!Objects.equals(methodRelation.getObjectId(), variableInfo.getMethodId())) {
-            methodRelation.setObjectId(variableInfo.getMethodId());
-            this.getCvTermRelationshipDao().merge(methodRelation);
-        }
+		// Setting method to variable
+		if (methodRelation == null) {
+			this.getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_METHOD.getId(),
+					variableInfo.getMethodId());
+		} else if (!Objects.equals(methodRelation.getObjectId(), variableInfo.getMethodId())) {
+			methodRelation.setObjectId(variableInfo.getMethodId());
+			this.getCvTermRelationshipDao().merge(methodRelation);
+		}
 
-        // Setting property to variable
-        if (propertyRelation == null) {
-            this.getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_PROPERTY.getId(),
-                    variableInfo.getPropertyId());
-        } else if (!Objects.equals(propertyRelation.getObjectId(), variableInfo.getPropertyId())) {
-            propertyRelation.setObjectId(variableInfo.getPropertyId());
-            this.getCvTermRelationshipDao().merge(propertyRelation);
-        }
+		// Setting property to variable
+		if (propertyRelation == null) {
+			this.getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_PROPERTY.getId(),
+					variableInfo.getPropertyId());
+		} else if (!Objects.equals(propertyRelation.getObjectId(), variableInfo.getPropertyId())) {
+			propertyRelation.setObjectId(variableInfo.getPropertyId());
+			this.getCvTermRelationshipDao().merge(propertyRelation);
+		}
 
-        // Setting scale to variable
-        if (scaleRelation == null) {
-            this.getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_SCALE.getId(), variableInfo.getScaleId());
-        } else if (!Objects.equals(scaleRelation.getObjectId(), variableInfo.getScaleId())) {
-            scaleRelation.setObjectId(variableInfo.getScaleId());
-            this.getCvTermRelationshipDao().merge(scaleRelation);
-        }
+		// Setting scale to variable
+		if (scaleRelation == null) {
+			this.getCvTermRelationshipDao().save(variableInfo.getId(), TermRelationshipId.HAS_SCALE.getId(), variableInfo.getScaleId());
+		} else if (!Objects.equals(scaleRelation.getObjectId(), variableInfo.getScaleId())) {
+			scaleRelation.setObjectId(variableInfo.getScaleId());
+			this.getCvTermRelationshipDao().merge(scaleRelation);
+		}
 
-        // Updating variable types
-        Map<VariableType, CVTermProperty> existingProperties = new HashMap<>();
-        Set<VariableType> existingVariableTypes = new HashSet<>();
+		// Updating variable types
+		Map<VariableType, CVTermProperty> existingProperties = new HashMap<>();
+		Set<VariableType> existingVariableTypes = new HashSet<>();
 
-        // Variable Types from CVTermProperty
-        for (CVTermProperty property : termProperties) {
-            if (Objects.equals(property.getTypeId(), TermId.VARIABLE_TYPE.getId())) {
-                VariableType type = VariableType.getByName(property.getValue());
-                existingVariableTypes.add(type);
-                existingProperties.put(type, property);
-            }
-        }
+		// Variable Types from CVTermProperty
+		for (CVTermProperty property : termProperties) {
+			if (Objects.equals(property.getTypeId(), TermId.VARIABLE_TYPE.getId())) {
+				VariableType type = VariableType.getByName(property.getValue());
+				existingVariableTypes.add(type);
+				existingProperties.put(type, property);
+			}
+		}
 
-        int rank = 0;
-        for (VariableType type : variableInfo.getVariableTypes()) {
+		int rank = 0;
+		for (VariableType type : variableInfo.getVariableTypes()) {
 
-            // skip existing
-            if (existingVariableTypes.contains(type)) {
-                continue;
-            }
+			// skip existing
+			if (existingVariableTypes.contains(type)) {
+				continue;
+			}
 
-            CVTermProperty property = new CVTermProperty();
-            property.setCvTermId(variableInfo.getId());
-            property.setTypeId(TermId.VARIABLE_TYPE.getId());
-            property.setValue(type.getName());
-            property.setRank(rank++);
-            this.getCvTermPropertyDao().save(property);
-        }
+			CVTermProperty property = new CVTermProperty();
+			property.setCvTermId(variableInfo.getId());
+			property.setTypeId(TermId.VARIABLE_TYPE.getId());
+			property.setValue(type.getName());
+			property.setRank(rank++);
+			this.getCvTermPropertyDao().save(property);
+		}
 
-        // Remove variable type properties which are not part of incoming set.
-        Set<VariableType> toRemove = new HashSet<>(existingVariableTypes);
-        toRemove.removeAll(variableInfo.getVariableTypes());
+		// Remove variable type properties which are not part of incoming set.
+		Set<VariableType> toRemove = new HashSet<>(existingVariableTypes);
+		toRemove.removeAll(variableInfo.getVariableTypes());
 
-        for (VariableType type : toRemove) {
-            this.getCvTermPropertyDao().makeTransient(existingProperties.get(type));
-        }
+		for (VariableType type : toRemove) {
+			this.getCvTermPropertyDao().makeTransient(existingProperties.get(type));
+		}
 
-        // Saving alias, min, max values
-        if (!Strings.isNullOrEmpty(variableInfo.getAlias()) || variableInfo.getExpectedMin() != null
-                || variableInfo.getExpectedMax() != null) {
-            this.getVariableProgramOverridesDao().save(variableInfo.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias(),
-                    variableInfo.getExpectedMin(), variableInfo.getExpectedMax());
-        } else if (variableOverrides != null) {
-            this.getVariableProgramOverridesDao().makeTransient(variableOverrides);
-        }
+		// Saving alias, min, max values
+		if (!Strings.isNullOrEmpty(variableInfo.getAlias()) || variableInfo.getExpectedMin() != null
+				|| variableInfo.getExpectedMax() != null) {
+			this.getVariableProgramOverridesDao().save(variableInfo.getId(), variableInfo.getProgramUuid(), variableInfo.getAlias(),
+					variableInfo.getExpectedMin(), variableInfo.getExpectedMax());
+		} else if (variableOverrides != null) {
+			this.getVariableProgramOverridesDao().makeTransient(variableOverrides);
+		}
 
-        // Updating favorite to true if alias is defined
-        ProgramFavorite programFavorite =
-                this.getProgramFavoriteDao().getProgramFavorite(variableInfo.getProgramUuid(), ProgramFavorite.FavoriteType.VARIABLE,
-                        term.getCvTermId());
-        boolean isFavorite = variableInfo.isFavorite() || !Strings.isNullOrEmpty(variableInfo.getAlias());
+		// Updating favorite to true if alias is defined
+		ProgramFavorite programFavorite =
+				this.getProgramFavoriteDao().getProgramFavorite(variableInfo.getProgramUuid(), ProgramFavorite.FavoriteType.VARIABLE,
+						term.getCvTermId());
+		boolean isFavorite = variableInfo.isFavorite() || !Strings.isNullOrEmpty(variableInfo.getAlias());
 
-        if (isFavorite && programFavorite == null) {
-            programFavorite = new ProgramFavorite();
-            programFavorite.setEntityId(variableInfo.getId());
-            programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE.getName());
-            programFavorite.setUniqueID(variableInfo.getProgramUuid());
-            this.getProgramFavoriteDao().save(programFavorite);
-        } else if (!isFavorite && programFavorite != null) {
-            this.getProgramFavoriteDao().makeTransient(programFavorite);
-        }
+		if (isFavorite && programFavorite == null) {
+			programFavorite = new ProgramFavorite();
+			programFavorite.setEntityId(variableInfo.getId());
+			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE.getName());
+			programFavorite.setUniqueID(variableInfo.getProgramUuid());
+			this.getProgramFavoriteDao().save(programFavorite);
+		} else if (!isFavorite && programFavorite != null) {
+			this.getProgramFavoriteDao().makeTransient(programFavorite);
+		}
 
-        this.getCvTermPropertyDao().save(variableInfo.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
+		this.getCvTermPropertyDao().save(variableInfo.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
 	}
 
 	@Override
 	public void deleteVariable(Integer id) {
-		
-		OntologyVariableDataManagerImpl.removeCachedVariable(id);
-		
+
+		VariableCache.removeFromCache(id);
+
 		CVTerm term = this.getCvTermDao().getById(id);
 
 		this.checkTermIsVariable(term);
