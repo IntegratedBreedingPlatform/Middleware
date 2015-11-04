@@ -32,7 +32,8 @@ public interface OntologyVariableDataManager {
 	List<Variable> getWithFilter(VariableFilter variableFilter);
 
 	/**
-	 * Return variable by Id with details based on programUuid. Don't filter obsolete terms if filterObsolete is false.
+	 * Return variable by Id with details based on programUuid. After the first read, the variable is cached in memory. Don't filter
+	 * obsolete terms if filterObsolete is false.
 	 *
 	 * @param programUuid as the unique id of the program
 	 * @param id as the variable Id
