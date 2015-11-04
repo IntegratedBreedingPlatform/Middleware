@@ -59,9 +59,13 @@ public class TransactionDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetSimilarStockIdsEmptyListParam() {
 		final boolean emptyListParamCondition = this.dao.getSimilarStockIds(new ArrayList<String>()).isEmpty();
-		final boolean nullParamCondition = this.dao.getSimilarStockIds(null).isEmpty();
-
 		Assert.assertTrue("List of returned similar stock ids should be empty given empty list", emptyListParamCondition);
+	}
+
+	@Test
+	public void testGetSimilarStockIdsNullParam() {
+		final boolean nullParamCondition = this.dao.getSimilarStockIds(null).isEmpty();
 		Assert.assertTrue("List of returned similar stock ids should be empty given a null parameter", nullParamCondition);
 	}
+
 }
