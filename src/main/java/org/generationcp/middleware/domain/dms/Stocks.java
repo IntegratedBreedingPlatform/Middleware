@@ -11,7 +11,9 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -56,5 +58,14 @@ public class Stocks {
 		for (Stock stock : this.stocks) {
 			stock.print(indent);
 		}
+	}
+
+	public Map<String, Integer> getStockMap(String keyVarName) {
+		Map<String, Integer> stockMap = new LinkedHashMap<>();
+		for (Stock stock : this.stocks) {
+			Variable variableKey = stock.getVariables().findByLocalName(keyVarName);
+			stockMap.put(variableKey.getValue(), stock.getId());
+		}
+		return stockMap;
 	}
 }
