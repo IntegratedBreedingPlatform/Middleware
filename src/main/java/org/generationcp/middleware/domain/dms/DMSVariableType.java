@@ -12,6 +12,8 @@
 package org.generationcp.middleware.domain.dms;
 
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.util.Debug;
@@ -100,13 +102,13 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 		this.role = role;
 	}
 
-	public void print(int indent) {
-		Debug.println(indent, "Variable Type: ");
-		indent += 3;
-		Debug.println(indent, "localName: " + this.localName);
-		Debug.println(indent, "localDescription: " + this.localDescription);
-		Debug.println(indent, "rank: " + this.rank);
-		this.standardVariable.print(indent);
+	public VariableType getVariableType() {
+		return variableType;
+	}
+
+	//NOTE: We also add variable type to associated standard variable.
+	public void setVariableType(VariableType variableType) {
+		this.variableType = variableType;
 	}
 
 	@Override
@@ -127,19 +129,35 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 	}
 
 	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("VariableType [");
-		builder.append(", localName=");
-		builder.append(this.localName);
-		builder.append(", localDescription=");
-		builder.append(this.localDescription);
-		builder.append(", rank=");
-		builder.append(this.rank);
-		builder.append(", standardVariable=");
-		builder.append(this.standardVariable);
-		builder.append("]");
-		return builder.toString();
+    public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("DMSVariableType [localName=");
+        builder.append(this.localName);
+        builder.append(", localDescription=");
+        builder.append(this.localDescription);
+        builder.append(", rank=");
+        builder.append(this.rank);
+        builder.append(", standardVariable=");
+        builder.append(this.standardVariable);
+        builder.append(", role=");
+        builder.append(this.role);
+        builder.append(", treatmentLabel=");
+        builder.append(this.treatmentLabel);
+        builder.append(", variableType=");
+        builder.append(this.variableType);
+        builder.append("]");
+        return builder.toString();
+    }
+
+	public void print(int indent) {
+		Debug.println(indent, "DMS Variable Type: ");
+		Debug.println(indent + 3, "localName: " + this.localName);
+		Debug.println(indent + 3, "localDescription: " + this.localDescription);
+		Debug.println(indent + 3, "rank: " + this.rank);
+		Debug.println(indent + 3, "standardVariable: " + this.standardVariable);
+		Debug.println(indent + 3, "treatmentLabel: " + this.treatmentLabel);
+		Debug.println(indent + 3, "role: " + this.role);
+		Debug.println(indent + 3, "variableType: " + this.variableType);
 	}
 
 	@Override
