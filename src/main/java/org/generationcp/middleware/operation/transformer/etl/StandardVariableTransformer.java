@@ -15,6 +15,10 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 public class StandardVariableTransformer extends Transformer {
+	
+	public StandardVariableTransformer() {
+		super(null);
+	}
 
 	public StandardVariableTransformer(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);

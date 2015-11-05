@@ -13,6 +13,10 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 public class OntologyDaoFactory {
 
 	private HibernateSessionProvider sessionProvider;
+	
+	public OntologyDaoFactory() {
+		
+	}
 
 	public OntologyDaoFactory(HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
