@@ -3,8 +3,7 @@ package org.generationcp.middleware.service;
 
 import java.util.Collections;
 
-import org.generationcp.middleware.data.initializer.MeasurementDataTestDataInitializer;
-import org.generationcp.middleware.data.initializer.MeasurementRowTestDataInitializer;
+import org.generationcp.middleware.data.initializer.MeasurementTestDataInitializer;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -29,6 +28,8 @@ public class MeasurementsTest {
 
 	private Measurements measurements;
 
+	private final MeasurementTestDataInitializer initializer = new MeasurementTestDataInitializer();
+
 	@Before
 	public void setup() {
 		this.mockPhenotypeSaver = Mockito.mock(PhenotypeSaver.class);
@@ -38,9 +39,8 @@ public class MeasurementsTest {
 
 	@Test()
 	public void validateNoramalValueMapping() throws Exception {
-		final MeasurementDataTestDataInitializer measurementDataInit =
-				new MeasurementDataTestDataInitializer(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "Test Value");
-		final MeasurementData testMeasurementData = measurementDataInit.createMeasurementData();
+		final MeasurementData testMeasurementData =
+				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "Test Value");
 
 		final Phenotype phenotypeFromMeasurement = this.measurements.createPhenotypeFromMeasurement(testMeasurementData);
 
@@ -58,9 +58,8 @@ public class MeasurementsTest {
 
 	@Test()
 	public void validateCustomeCategoricalValueMapping() throws Exception {
-		final MeasurementDataTestDataInitializer measurementDataInit =
-				new MeasurementDataTestDataInitializer(TEST_TERM_ID, TermId.CATEGORICAL_VARIABLE.getId(), "1");
-		final MeasurementData testMeasurementData = measurementDataInit.createMeasurementData();
+		final MeasurementData testMeasurementData =
+				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.CATEGORICAL_VARIABLE.getId(), "1");
 		testMeasurementData.setCustomCategoricalValue(true);
 
 		final Phenotype phenotypeFromMeasurement = this.measurements.createPhenotypeFromMeasurement(testMeasurementData);
@@ -71,10 +70,8 @@ public class MeasurementsTest {
 
 	@Test
 	public void testUneditableMeasurementDataAreSkipped() throws Exception {
-
-		final MeasurementDataTestDataInitializer measurementDataInit =
-				new MeasurementDataTestDataInitializer(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
-		final MeasurementData testMeasurementData = measurementDataInit.createMeasurementData();
+		final MeasurementData testMeasurementData =
+				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
 		testMeasurementData.setEditable(false);
 
 		this.assertIfSaveMeasurementDataIsNotCalled(testMeasurementData);
@@ -82,10 +79,8 @@ public class MeasurementsTest {
 
 	@Test
 	public void testMeasurementDataWithPhenotypicIDSetToZeroAndBlankValueAreSkipped() throws Exception {
-
-		final MeasurementDataTestDataInitializer measurementDataInit =
-				new MeasurementDataTestDataInitializer(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
-		final MeasurementData testMeasurementData = measurementDataInit.createMeasurementData();
+		final MeasurementData testMeasurementData =
+				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
 		testMeasurementData.setPhenotypeId(0);
 		testMeasurementData.setValue("");
 
@@ -94,10 +89,8 @@ public class MeasurementsTest {
 
 	@Test
 	public void testMeasurementDataWithPhenotypicIDSetToZeroAndNullValueAreSkipped() throws Exception {
-
-		final MeasurementDataTestDataInitializer measurementDataInit =
-				new MeasurementDataTestDataInitializer(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
-		final MeasurementData testMeasurementData = measurementDataInit.createMeasurementData();
+		final MeasurementData testMeasurementData =
+				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
 		testMeasurementData.setPhenotypeId(0);
 		testMeasurementData.setValue(null);
 
@@ -106,10 +99,8 @@ public class MeasurementsTest {
 
 	@Test
 	public void testMeasurementDataWithNullPhenotypicIDAndBlankValueAreSkipped() throws Exception {
-
-		final MeasurementDataTestDataInitializer measurementDataInit =
-				new MeasurementDataTestDataInitializer(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
-		final MeasurementData testMeasurementData = measurementDataInit.createMeasurementData();
+		final MeasurementData testMeasurementData =
+				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
 		testMeasurementData.setPhenotypeId(null);
 		testMeasurementData.setValue("");
 
@@ -118,10 +109,8 @@ public class MeasurementsTest {
 
 	@Test
 	public void testMeasurementDataWithNullPhenotypicIDAndNullValueAreSkipped() throws Exception {
-
-		final MeasurementDataTestDataInitializer measurementDataInit =
-				new MeasurementDataTestDataInitializer(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
-		final MeasurementData testMeasurementData = measurementDataInit.createMeasurementData();
+		final MeasurementData testMeasurementData =
+				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
 		testMeasurementData.setPhenotypeId(null);
 		testMeasurementData.setValue(null);
 
@@ -129,8 +118,7 @@ public class MeasurementsTest {
 	}
 
 	private void assertIfSaveMeasurementDataIsNotCalled(final MeasurementData testMeasurementData) {
-		final MeasurementRowTestDataInitializer measurementRowInit = new MeasurementRowTestDataInitializer(testMeasurementData);
-		final MeasurementRow measurementRow = measurementRowInit.createMeasurementRowWithAtLeast1MeasurementVar();
+		final MeasurementRow measurementRow = this.initializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
 
 		this.measurements.saveMeasurementData(Collections.<MeasurementRow>singletonList(measurementRow));
 		Mockito.verify(this.mockPhenotypeSaver, Mockito.times(0)).saveOrUpdate(Matchers.anyInt(), Matchers.anyInt(), Matchers.anyString(),
@@ -139,13 +127,9 @@ public class MeasurementsTest {
 
 	@Test
 	public void makeSureCorrectHibernateFlushTypeIsUsed() throws Exception {
-
-		final MeasurementDataTestDataInitializer measurementDataInit =
-				new MeasurementDataTestDataInitializer(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
-		final MeasurementData testMeasurementData = measurementDataInit.createMeasurementData();
-
-		final MeasurementRowTestDataInitializer measurementRowInit = new MeasurementRowTestDataInitializer(testMeasurementData);
-		final MeasurementRow measurementRow = measurementRowInit.createMeasurementRowWithAtLeast1MeasurementVar();
+		final MeasurementData testMeasurementData =
+				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
+		final MeasurementRow measurementRow = this.initializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
 
 		Mockito.when(this.mockHibernateSessiong.getFlushMode()).thenReturn(FlushMode.AUTO);
 		this.measurements.saveMeasurements(Collections.<MeasurementRow>singletonList(measurementRow));
@@ -173,8 +157,7 @@ public class MeasurementsTest {
 	public void testPhenotypeIdSetOnSave() {
 		final Measurements measurements = new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver);
 		final MeasurementData testMeasurementData = Mockito.mock(MeasurementData.class);
-		final MeasurementRowTestDataInitializer measurementRowInit = new MeasurementRowTestDataInitializer(testMeasurementData);
-		final MeasurementRow measurementRow = measurementRowInit.createMeasurementRowWithAtLeast1MeasurementVar();
+		final MeasurementRow measurementRow = this.initializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
 		measurementRow.setDataList(Collections.<MeasurementData>singletonList(testMeasurementData));
 
 		// Set up measurement data so that it actually tries to save something.
@@ -191,12 +174,9 @@ public class MeasurementsTest {
 
 	private void testSavingMeasurements(final String value, final int variableDataTypeId) {
 
-		final MeasurementDataTestDataInitializer measurementDataInit =
-				new MeasurementDataTestDataInitializer(TEST_TERM_ID, variableDataTypeId, value);
-		final MeasurementData testMeasurementData = measurementDataInit.createMeasurementData();
+		final MeasurementData testMeasurementData = this.initializer.createMeasurementData(TEST_TERM_ID, variableDataTypeId, value);
 
-		final MeasurementRowTestDataInitializer measurementRowInit = new MeasurementRowTestDataInitializer(testMeasurementData);
-		final MeasurementRow measurementRow = measurementRowInit.createMeasurementRowWithAtLeast1MeasurementVar();
+		final MeasurementRow measurementRow = this.initializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
 
 		this.measurements.saveMeasurementData(Collections.<MeasurementRow>singletonList(measurementRow));
 
