@@ -107,15 +107,4 @@ public class VariableInfo {
         builder.append("]");
         return builder.toString();
 	}
-
-	public void print(int indent) {
-		Debug.println(indent, "VariableInfo:");
-		Debug.println(indent + 3, "localName: " + this.localName);
-		Debug.println(indent + 3, "localDescription: " + this.localDescription);
-		Debug.println(indent + 3, "rank: " + this.rank);
-		Debug.println(indent + 3, "stdVariableId: " + this.stdVariableId);
-		Debug.println(indent + 3, "treatmentLabel: " + this.treatmentLabel);
-		Debug.println(indent + 3, "role: " + this.role);
-		Debug.println(indent + 3, "variableType: " + this.variableType);
-	}
 }

@@ -45,16 +45,15 @@ public class VariableInfoBuilderTest {
 
         Set<VariableInfo> variableInfoSet = variableInfoBuilder.create(projectProperties);
 
-	  	// Note: Here we only get 1 variable as all the properties will be used to form single variable instance.
-        Assert.assertEquals(1, variableInfoSet.size());
+		String message = "The %s for VariableInfo was not mapped correctly.";
+		// Note: Here we only get 1 variable as all the properties will be used to form single variable instance.
+		Assert.assertEquals(1, variableInfoSet.size());
 
-        if(variableInfoSet.size() > 0){
-            VariableInfo variableInfo = variableInfoSet.iterator().next();
-			Assert.assertEquals(variableInfo.getLocalName(), studyInformationProp);
-			Assert.assertEquals(variableInfo.getLocalDescription(), variableDescriptionProp);
-			Assert.assertEquals(variableInfo.getTreatmentLabel(), multiFactorialInformationProp);
-			Assert.assertEquals(variableInfo.getVariableType().getName(), variableTypeProp);
-        }
+		VariableInfo variableInfo = variableInfoSet.iterator().next();
+		Assert.assertEquals(String.format(message, "Local Name"), studyInformationProp, variableInfo.getLocalName());
+		Assert.assertEquals(String.format(message, "Local Description"), variableDescriptionProp, variableInfo.getLocalDescription());
+		Assert.assertEquals(String.format(message, "Treatment Label"), multiFactorialInformationProp, variableInfo.getTreatmentLabel());
+		Assert.assertEquals(String.format(message, "Variable Type Name"), variableTypeProp, variableInfo.getVariableType().getName());
 
     }
 
