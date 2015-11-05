@@ -142,4 +142,23 @@ public class WorkbookTest {
 		}
 
 	}
+
+	@Test
+	public void testHasExistingExperimentalDesign() {
+		workbook = WorkbookTestDataInitializer.getTestWorkbook();
+		final List<MeasurementVariable> expVariables = new ArrayList<>();
+
+		// we add an RCBD variable which is an experimental design variable
+		expVariables.add(WorkbookTestDataInitializer.createExperimentalRCBDVariable());
+		workbook.setExperimentalDesignVariables(expVariables);
+
+		Assert.assertTrue("Workbook has a design",workbook.hasExistingExperimentalDesign());
+	}
+
+	@Test
+	public void testNoExistingExperimentalDesign() {
+		workbook = WorkbookTestDataInitializer.getTestWorkbook();
+		Assert.assertFalse("Workbook has no design",workbook.hasExistingExperimentalDesign());
+	}
+
 }
