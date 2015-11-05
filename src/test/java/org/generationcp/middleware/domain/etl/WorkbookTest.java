@@ -143,7 +143,7 @@ public class WorkbookTest {
 
 	@Test
 	public void testHasExistingExperimentalDesign() {
-		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
+		Workbook workbook = new Workbook();
 		final List<MeasurementVariable> expVariables = new ArrayList<>();
 
 		// we add an RCBD variable which is an experimental design variable
