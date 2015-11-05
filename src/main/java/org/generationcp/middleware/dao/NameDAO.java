@@ -367,7 +367,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Integer> getMapCountByNamePermutations(List<String> names) throws MiddlewareQueryException {
+	public Map<String, Integer> getCountByNamePermutations(List<String> names) throws MiddlewareQueryException {
 
 		Monitor monitor = MonitorFactory.start("Method Started : getMapCountByNamePermutations ");
 
@@ -388,12 +388,13 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		}
 
 		// Count using = by default
-		Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-		criteria.add(Restrictions.in("nval", mapPermutationValue.keySet().toArray()));
-		List<Name> result = criteria.list();
+		SQLQuery query = this.getSession().createSQLQuery("select n.* FROM names n inner join germplsm g on g.gid = n.gid where nval in (:namelist) and g.gid != g.grplce and g.grplce = 0");
+		query.setParameterList("namelist", mapPermutationValue.keySet().toArray());
+		List<Name> result = query.list();
 
-		for(Name name : result){
-			String nval = name.getNval();
+		for(Object row : result){
+			Object[] items = (Object[]) row;
+			String nval = (String) items[5];
 			String originalName = mapPermutationValue.get(nval);
 			mapCountWithName.put(originalName, mapCountWithName.get(originalName) + 1);
 		}

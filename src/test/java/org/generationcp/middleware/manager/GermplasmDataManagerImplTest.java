@@ -20,6 +20,7 @@ import java.util.UUID;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -66,6 +67,8 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	private NameDAO nameDAO;
 
+	private GermplasmDAO germplasmDAO;
+
 	private Project commonTestProject;
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
@@ -76,6 +79,11 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		if(this.nameDAO == null) {
 			nameDAO = new NameDAO();
 			nameDAO.setSession(this.sessionProvder.getSession());
+		}
+
+		if(this.germplasmDAO == null) {
+			germplasmDAO = new GermplasmDAO();
+			germplasmDAO.setSession(this.sessionProvder.getSession());
 		}
 
 		if (this.germplasmTestDataGenerator == null) {
@@ -925,31 +933,65 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void shouldGetMapForGermplasmCount() throws Exception {
 
-		Name name1 = this.buildNewNameEntity(-1, "I-1RT  /  P 001 A-23 / ");
+
+		Germplasm germplasm1 = new Germplasm();
+		germplasm1.setGid(-1);
+		germplasm1.setMethodId(31);
+		germplasm1.setGnpgs(-1);
+		germplasm1.setGrplce(-1);
+		germplasm1.setGpid1(0);
+		germplasm1.setGpid2(0);
+		germplasm1.setUserId(1);
+		germplasm1.setLgid(0);
+		germplasm1.setLocationId(0);
+		germplasm1.setGdate(20151102);
+		germplasm1.setReferenceId(0);
+
+		this.germplasmDAO.save(germplasm1);
+
+		Germplasm germplasm2 = new Germplasm();
+		germplasm2.setGid(-2);
+		germplasm2.setMethodId(31);
+		germplasm2.setGnpgs(-1);
+		germplasm2.setGrplce(0);
+		germplasm2.setGpid1(0);
+		germplasm2.setGpid2(0);
+		germplasm2.setUserId(1);
+		germplasm2.setLgid(0);
+		germplasm2.setLocationId(0);
+		germplasm2.setGdate(20151103);
+		germplasm2.setReferenceId(0);
+
+		this.germplasmDAO.save(germplasm2);
+
+		Integer gid1 = germplasm1.getGid();
+		Integer gid2 = germplasm2.getGid();
+
+		Name name1 = this.buildNewNameEntity(gid1, "I-1RT  /  P 001 A-23 / ");
 		this.nameDAO.save(name1);
 
-		Name name2 = this.buildNewNameEntity(-1, "I-1RT/P 1 A-23/");
+		Name name2 = this.buildNewNameEntity(gid2, "I-1RT/P 1 A-23/");
 		this.nameDAO.save(name2);
 
-		Name name3 = this.buildNewNameEntity(-1, "I-1RT/P001A-23/");
+		Name name3 = this.buildNewNameEntity(gid2, "I-1RT/P001A-23/");
 		this.nameDAO.save(name3);
 
-		Name name4 = this.buildNewNameEntity(-1, "(CML454 X CML451)-B-3-1-112");
+		Name name4 = this.buildNewNameEntity(gid2, "(CML454 X CML451)-B-3-1-112");
 		this.nameDAO.save(name4);
 
-		Name name5 = this.buildNewNameEntity(-1, "(CML454 X CML451)-B-3-1-112");
+		Name name5 = this.buildNewNameEntity(gid1, "(CML454 X CML451)-B-3-1-112");
 		this.nameDAO.save(name5);
 
-		Name name6 = this.buildNewNameEntity(-1, "(CML454XCML451)-B-3-1-112");
+		Name name6 = this.buildNewNameEntity(gid1, "(CML454XCML451)-B-3-1-112");
 		this.nameDAO.save(name6);
 
 		List<String> names = new ArrayList<>(Arrays.asList("I-1RT  /  P 001 A-23 / ", "(CML454 X CML451)-B-3-1-112"));
 
 		Map<String, Integer> mapCountByNamePermutations = this.germplasmDataManager.getMapCountByNamePermutations(names);
 
-		Assert.assertEquals(mapCountByNamePermutations.size(), 2);
-		Assert.assertEquals(mapCountByNamePermutations.get("I-1RT  /  P 001 A-23 / "), (Integer) 3);
-		Assert.assertEquals(mapCountByNamePermutations.get("(CML454 X CML451)-B-3-1-112"), (Integer) 3);
+		Assert.assertEquals(2, mapCountByNamePermutations.size());
+		Assert.assertEquals((Integer) 2, mapCountByNamePermutations.get("I-1RT  /  P 001 A-23 / "));
+		Assert.assertEquals((Integer) 1, mapCountByNamePermutations.get("(CML454 X CML451)-B-3-1-112"));
 	}
 
 	private Name buildNewNameEntity(Integer germPlasmId, String nval){
