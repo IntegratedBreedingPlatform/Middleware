@@ -150,13 +150,14 @@ public class WorkbookTest {
 		expVariables.add(WorkbookTestDataInitializer.createExperimentalRCBDVariable());
 		workbook.setExperimentalDesignVariables(expVariables);
 
-		Assert.assertTrue("Workbook has a design",workbook.hasExistingExperimentalDesign());
+		Assert.assertTrue("Workbook has a design", workbook.hasExistingExperimentalDesign());
 	}
 
 	@Test
 	public void testNoExistingExperimentalDesign() {
-		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
-		Assert.assertFalse("Workbook has no design",workbook.hasExistingExperimentalDesign());
+		Workbook workbook = new Workbook();
+		Assert.assertFalse("Expected hasExistingExperimentalDesign() to return false when there is no design but it didn't.",
+				workbook.hasExistingExperimentalDesign());
 	}
 
 }
