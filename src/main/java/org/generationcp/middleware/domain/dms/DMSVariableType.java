@@ -1,18 +1,19 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.dms;
 
 import java.io.Serializable;
 
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.util.Debug;
 
 /**
@@ -31,8 +32,10 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 	private StandardVariable standardVariable;
 
 	private String treatmentLabel;
-	
+
 	private PhenotypicType role;
+
+	private VariableType variableType;
 
 	public DMSVariableType() {
 	}
@@ -90,7 +93,7 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 	}
 
 	public PhenotypicType getRole() {
-		return role;
+		return this.role;
 	}
 
 	public void setRole(PhenotypicType role) {
@@ -144,6 +147,14 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 	public int compareTo(DMSVariableType compareValue) {
 		int compareRank = compareValue.getRank();
 		return Integer.valueOf(this.rank).compareTo(compareRank);
+	}
+
+	public VariableType getVariableType() {
+		return this.variableType;
+	}
+
+	public void setVariableType(VariableType variableType) {
+		this.variableType = variableType;
 	}
 
 }

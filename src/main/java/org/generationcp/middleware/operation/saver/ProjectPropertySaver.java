@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.operation.saver;
@@ -78,9 +78,14 @@ public class ProjectPropertySaver {
 	private List<ProjectProperty> createVariableProperties(DmsProject project, DMSVariableType variableType)
 			throws MiddlewareQueryException {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
-		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum =
-				this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(variableType.getRole());
+		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = variableType.getVariableType();
+
+		if (variableTypeEnum == null) {
+			variableTypeEnum = this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(variableType.getRole());
+		}
+
 		int variableTypeId = variableTypeEnum.getId();
+
 		properties.add(new ProjectProperty(project, variableTypeId, variableType.getLocalName(), variableType.getRank()));
 		properties.add(new ProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType
 				.getRank()));
