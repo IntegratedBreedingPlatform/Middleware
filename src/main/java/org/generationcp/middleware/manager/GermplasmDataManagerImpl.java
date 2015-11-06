@@ -1285,7 +1285,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Map<String, Integer> getMapCountByNamePermutations(List<String> names) {
+	public Map<String, Integer> getCountByNamePermutations(List<String> names) {
 		return this.getNameDao().getCountByNamePermutations(names);
 	}
 }

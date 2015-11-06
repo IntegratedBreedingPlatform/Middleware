@@ -11,12 +11,14 @@
 
 package org.generationcp.middleware.manager;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
@@ -987,7 +989,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 		List<String> names = new ArrayList<>(Arrays.asList("I-1RT  /  P 001 A-23 / ", "(CML454 X CML451)-B-3-1-112"));
 
-		Map<String, Integer> mapCountByNamePermutations = this.germplasmDataManager.getMapCountByNamePermutations(names);
+		Map<String, Integer> mapCountByNamePermutations = this.germplasmDataManager.getCountByNamePermutations(names);
 
 		Assert.assertEquals(2, mapCountByNamePermutations.size());
 		Assert.assertEquals((Integer) 2, mapCountByNamePermutations.get("I-1RT  /  P 001 A-23 / "));
@@ -1005,5 +1007,19 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		name.setNval(nval);
 		name.setTypeId(GermplasmNameType.LINE_NAME.getUserDefinedFieldID());
 		return name;
+	}
+
+	/**
+	 * test to verify germplasm permutations should be processed for large amount of data.
+	 * @throws Exception
+	 */
+	@Test
+	public void testShouldLoadAndProcessLargeGermplasmNamePermutations() throws Exception{
+		String fileLocation = GermplasmDataManagerImplTest.class.getClassLoader().getResource("germplasm_designation_name_list.txt").getFile();
+		List<String> nameList = FileUtils.readLines(new File(fileLocation));
+
+		Map<String, Integer> mapCountByNamePermutations = this.germplasmDataManager.getCountByNamePermutations(nameList);
+
+		Assert.assertTrue(mapCountByNamePermutations.size() > 0);
 	}
 }

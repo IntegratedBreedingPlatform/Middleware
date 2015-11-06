@@ -369,7 +369,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	@SuppressWarnings("unchecked")
 	public Map<String, Integer> getCountByNamePermutations(List<String> names) throws MiddlewareQueryException {
 
-		Monitor monitor = MonitorFactory.start("Method Started : getMapCountByNamePermutations ");
+		Monitor getCountByNamePermutations = MonitorFactory.start("Method Started : getCountByNamePermutations ");
 
 		if (names == null || names.isEmpty()) {
 			return new HashMap<>();
@@ -387,19 +387,46 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			mapPermutationValue.put(permutations.get(2), name);
 		}
 
-		// Count using = by default
-		SQLQuery query = this.getSession().createSQLQuery("select n.* FROM names n inner join germplsm g on g.gid = n.gid where nval in (:namelist) and g.gid != g.grplce and g.grplce = 0");
-		query.setParameterList("namelist", mapPermutationValue.keySet().toArray());
-		List<Name> result = query.list();
+		List<String> allDesignationValues = new ArrayList<>(mapPermutationValue.keySet());
 
-		for(Object row : result){
-			Object[] items = (Object[]) row;
-			String nval = (String) items[5];
-			String originalName = mapPermutationValue.get(nval);
+		Integer total = allDesignationValues.size();
+
+		Integer totalBatches = total / 1000;
+
+		LOG.info("Total batch to germplasm designations are {}", totalBatches + 1);
+
+		List<Name> allNameList = new ArrayList<>();
+
+		for (Integer b = 0; b <= totalBatches; b++) {
+
+			LOG.info("Processing batch {}/{}", b + 1, totalBatches + 1);
+
+			Integer start = b * 1000;
+
+			if (start > total) {
+				start = total - 1;
+			}
+
+			Integer end = (b + 1) * 1000;
+
+			if (end > total) {
+				end = total;
+			}
+
+			List<String> batchDesignationValues = allDesignationValues.subList(start, end);
+
+			// Count using = by default
+			SQLQuery query = this.getSession().createSQLQuery("select n.* FROM names n inner join germplsm g on g.gid = n.gid where nval in (:namelist) and g.gid != g.grplce and g.grplce = 0");
+			query.setParameterList("namelist", batchDesignationValues);
+			allNameList.addAll(query.list());
+		}
+
+		for(Name n : allNameList){
+			String originalName = mapPermutationValue.get(n.getNval());
 			mapCountWithName.put(originalName, mapCountWithName.get(originalName) + 1);
 		}
 
-		LOG.debug("Method End : getMapCountByNamePermutations " + monitor.stop());
+		LOG.debug("Method End : getCountByNamePermutations " + getCountByNamePermutations.stop());
 		return mapCountWithName;
 	}
 

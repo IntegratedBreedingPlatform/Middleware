@@ -1068,6 +1068,6 @@ public interface GermplasmDataManager {
 	 * @param names list of names
 	 * @return list of name and it's number of permutations.
 	 */
-	Map<String, Integer> getMapCountByNamePermutations(List<String> names);
+	Map<String, Integer> getCountByNamePermutations(List<String> names);
 
 }
