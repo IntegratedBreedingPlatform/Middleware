@@ -47,7 +47,7 @@ public class MeasurementsTest {
 		final MeasurementRow measurementRow = new MeasurementRow();
 		final List<MeasurementData> dataList = new ArrayList<>();
 		final List<MeasurementRow> rowList = new ArrayList<>();
-		final MeasurementData measurementData = this.getTestMeasurementData();
+		final MeasurementData measurementData = this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
 		final MeasurementVariable variable = new MeasurementVariable();
 
 		variable.setRole(PhenotypicType.TRIAL_DESIGN);
