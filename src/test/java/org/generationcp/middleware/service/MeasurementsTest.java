@@ -45,11 +45,11 @@ public class MeasurementsTest {
 	@Test
 	public void testTrialDesignSaving() {
 
-		MeasurementRow measurementRow = new MeasurementRow();
-		List<MeasurementData> dataList = new ArrayList<>();
-		List<MeasurementRow> rowList = new ArrayList<>();
-		MeasurementData measurementData = this.getTestMeasurementData();
-		MeasurementVariable variable = new MeasurementVariable();
+		final MeasurementRow measurementRow = new MeasurementRow();
+		final List<MeasurementData> dataList = new ArrayList<>();
+		final List<MeasurementRow> rowList = new ArrayList<>();
+		final MeasurementData measurementData = this.getTestMeasurementData();
+		final MeasurementVariable variable = new MeasurementVariable();
 
 		variable.setRole(PhenotypicType.TRIAL_DESIGN);
 		measurementData.setMeasurementVariable(variable);
@@ -169,7 +169,7 @@ public class MeasurementsTest {
 		Mockito.when(testMeasurementData.getValue()).thenReturn("Test Data");
 		Mockito.when(testMeasurementData.getMeasurementVariable()).thenReturn(Mockito.mock(MeasurementVariable.class));
 		
-		int testPhenotypeId = 245;
+		final int testPhenotypeId = 245;
 		Mockito.when(testMeasurementData.getPhenotypeId()).thenReturn(testPhenotypeId);
 
 		measurements.saveMeasurementData(Collections.<MeasurementRow>singletonList(measurementRow));
