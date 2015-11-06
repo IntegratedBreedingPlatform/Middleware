@@ -8,13 +8,16 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import org.generationcp.middleware.dao.oms.CVDao;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.pojos.oms.CV;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.util.ISO8601DateParser;
@@ -55,6 +58,17 @@ public class TestDataHelper {
 		term.setName(getNewRandomName(cvId.toString()));
 		term.setDefinition("description");
 		term.setCv(cvId.getId());
+		term.setIsObsolete(isObsolete);
+		term.setIsRelationshipType(isRelationshipType);
+		return term;
+	}
+
+	public static CVTerm getTestCvTermForScales(Integer cvId) {
+		CVTerm term = new CVTerm();
+		term.setCvTermId(UnitTestDaoIDGenerator.generateId(CVTerm.class));
+		term.setName(getNewRandomName(cvId.toString()));
+		term.setDefinition("description");
+		term.setCv(cvId);
 		term.setIsObsolete(isObsolete);
 		term.setIsRelationshipType(isRelationshipType);
 		return term;
@@ -131,6 +145,23 @@ public class TestDataHelper {
 		for (int i = 0; i < count; i++) {
 			terms.add(getTestCvTerm(CvId.VARIABLES));
 		}
+	}
+
+	public static void fillTestScaleCvTerms(List<CVTerm> terms, int count) {
+		for (int i = 0; i < count; i++) {
+			terms.add(getTestCvTerm(CvId.SCALES));
+		}
+	}
+
+	public static void fillTestScaleCategories(List<CVTerm> terms, Integer cvId) {
+		terms.add(getTestCvTermForScales(cvId));
+	}
+
+	public static void fillCvForCategories(CVTerm term, CV cv, CVDao cvDao) {
+		cv.setName(term.getCvTermId().toString());
+		cv.setDefinition("Definition");
+
+		cvDao.save(cv);
 	}
 
 	/**
@@ -217,6 +248,43 @@ public class TestDataHelper {
 			String cropOntologyId = TestDataHelper.getNewRandomName("CO:");
 			cvTermPropertyDao.updateOrDeleteProperty(property.getCvTermId(), TermId.CROP_ONTOLOGY_ID.getId(), cropOntologyId, 0);
 			cropOntologyIdMap.put(property.getCvTermId(), cropOntologyId);
+		}
+	}
+
+	/**
+	 * Fill Relationships for first number of count scales
+	 * @param scaleTerms List of scales
+	 * @param dataType passed value of data type i.e. Numeric, Categorical, Date or Character
+	 * @param cvTermRelationshipDao used for storing relationship of cvterm and data type
+	 * @param startCount set first number of scales based on the startCount & stopCount ex. startCount=0, stopCount=4. Set first 4 scales datatype
+	 * @param stopCount set first number of scales based on the startCount & stopCount ex. startCount=0, stopCount=4. Set first 4 scales datatype
+	 */
+	public static void fillRelationshipsForScales(List<CVTerm> scaleTerms, DataType dataType,
+			CVTermRelationshipDao cvTermRelationshipDao, int startCount, int stopCount) {
+		for(int i = startCount; i <= stopCount; i++) {
+			cvTermRelationshipDao.save(scaleTerms.get(i).getCvTermId(), TermId.HAS_TYPE.getId(), dataType.getId());
+		}
+	}
+
+
+	/**
+	 * Fill Relationships for scale categories and fill category map using cvterm id and category
+	 * @param scaleTerms List of scales
+	 * @param categoryTerms List of categories
+	 * @param categoryMap contains cvterm id and its category
+	 * @param cvTermRelationshipDao used for storing relationship of cvterm id and its category
+	 * @param startCount set category for scales on the basis of startCount and stopCount ex. startCount=4, stopCount=5. Set category for 2 Scales
+	 * @param stopCount set category for scales on the basis of startCount and stopCount ex. startCount=4, stopCount=5. Set category for 2 Scales
+	 */
+	public static void fillRelationshipsForScaleCategories(List<CVTerm> scaleTerms, List<CVTerm> categoryTerms, Map<Integer, Set<String>> categoryMap,
+			CVTermRelationshipDao cvTermRelationshipDao, int startCount, int stopCount) {
+		Set<String> categories = new HashSet<>();
+		int sTermIndex = 0; // used for referring scaleTerms index
+		for (int i = startCount; i < stopCount; i++) {
+			cvTermRelationshipDao.save(scaleTerms.get(i).getCvTermId(), TermId.HAS_VALUE.getId(), categoryTerms.get(sTermIndex).getCvTermId());
+			categories.add(categoryTerms.get(sTermIndex).getCvTermId().toString());
+			categoryMap.put(scaleTerms.get(i).getCvTermId(), categories);
+			sTermIndex++;
 		}
 	}
 }
