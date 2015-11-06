@@ -1,9 +1,13 @@
 
 package org.generationcp.middleware.service;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.generationcp.middleware.data.initializer.MeasurementTestDataInitializer;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -35,6 +39,27 @@ public class MeasurementsTest {
 		this.mockPhenotypeSaver = Mockito.mock(PhenotypeSaver.class);
 		this.mockHibernateSessiong = Mockito.mock(Session.class);
 		this.measurements = new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver);
+	}
+
+	@Test
+	public void testTrialDesignSaving() {
+
+		final MeasurementRow measurementRow = new MeasurementRow();
+		final List<MeasurementData> dataList = new ArrayList<>();
+		final List<MeasurementRow> rowList = new ArrayList<>();
+		final MeasurementData measurementData = this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
+		final MeasurementVariable variable = new MeasurementVariable();
+
+		variable.setRole(PhenotypicType.TRIAL_DESIGN);
+		measurementData.setMeasurementVariable(variable);
+		dataList.add(measurementData);
+		measurementRow.setDataList(dataList);
+		rowList.add(measurementRow);
+
+		measurements.saveMeasurementData(rowList);
+		Mockito.verify(mockPhenotypeSaver, Mockito.never()).saveOrUpdate(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
+				Mockito.any(Phenotype.class), Mockito.anyInt());
+
 	}
 
 	@Test()
