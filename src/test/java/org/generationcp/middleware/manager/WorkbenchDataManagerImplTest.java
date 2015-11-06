@@ -392,7 +392,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		String added = this.workbenchDataManager.addCropType(cropType);
 		Assert.assertNotNull(added);
 
-		List<CropType> cropTypes = this.workbenchDataManager.getInstalledCentralCrops();
+		List<CropType> cropTypes = this.workbenchDataManager.getInstalledCropDatabses();
 		Assert.assertNotNull(cropTypes);
 		Assert.assertTrue(cropTypes.size() >= 1);
 
