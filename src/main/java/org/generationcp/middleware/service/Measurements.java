@@ -17,7 +17,7 @@ import com.google.common.base.Preconditions;
 
 /**
  * Class to enable us to save data to the phenotype table and the nd experiment phenotype table in a performant manner.
- *
+ * 
  */
 public class Measurements {
 
@@ -50,7 +50,7 @@ public class Measurements {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param measurementData measurementData used to create your {@link Phenotype} object that can be saved
 	 */
 	Phenotype createPhenotypeFromMeasurement(final MeasurementData measurementData) {
@@ -91,7 +91,6 @@ public class Measurements {
 			for (final MeasurementData measurementData : dataList) {
 
 				// TODO Change the UI so that we are never send back any data
-				// which is null
 				if (!measurementData.isEditable() || (measurementData.getPhenotypeId() == null || measurementData.getPhenotypeId() == 0)
 						&& StringUtils.isBlank(measurementData.getcValueId()) && StringUtils.isBlank(measurementData.getValue())) {
 					continue;
@@ -114,5 +113,4 @@ public class Measurements {
 
 		}
 	}
-
 }
