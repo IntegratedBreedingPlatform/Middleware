@@ -17,8 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -32,6 +30,9 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 /**
  * DAO class for {@link Name}.
@@ -76,13 +77,13 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			/**
 			 * List<Criterion> criterions = new ArrayList<Criterion>(); Criterion gidCriterion = Restrictions.eq("germplasmId", gid);
 			 * criterions.add(gidCriterion);
-			 * 
+			 *
 			 * if(status != null && status != 0) { Criterion statusCriterion = Restrictions.eq("nstat", status);
 			 * criterions.add(statusCriterion); }
-			 * 
+			 *
 			 * if(type != null) { Integer typeid = type.getUserDefinedFieldID(); Criterion typeCriterion = Restrictions.eq("type.fldno",
 			 * typeid); criterions.add(typeCriterion); }
-			 * 
+			 *
 			 * List<Name> results = getByCriteria(criterions); return results;
 			 **/
 		} catch (HibernateException e) {
@@ -158,7 +159,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 	/**
 	 * Retrieves the gId and nId pairs for the given germplasm names
-	 * 
+	 *
 	 * @param germplasmNames the list of germplasm names
 	 * @return the list of GidNidElement (gId and nId pairs)
 	 * @throws MiddlewareQueryException
@@ -328,7 +329,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			keyword2 = keyword2.replaceAll("\\s", "");
 			StringBuilder sql = new StringBuilder();
 			sql.append("SELECT nval FROM names ").append(" WHERE (REPLACE(nval, ' ', '') LIKE '").append(keyword1).append("'")
-					.append(" OR REPLACE(nval, ' ', '') LIKE '").append(keyword2).append("')");
+			.append(" OR REPLACE(nval, ' ', '') LIKE '").append(keyword2).append("')");
 
 			Query query = this.getSession().createSQLQuery(sql.toString());
 			return query.list();
@@ -395,7 +396,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 		LOG.info("Total batch to germplasm designations are {}", totalBatches + 1);
 
-		List<Name> allNameList = new ArrayList<>();
+		List<Object[]> allNameList = new ArrayList<>();
 
 		for (Integer b = 0; b <= totalBatches; b++) {
 
@@ -421,8 +422,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			allNameList.addAll(query.list());
 		}
 
-		for(Name n : allNameList){
-			String originalName = mapPermutationValue.get(n.getNval());
+		for (Object[] row : allNameList) {
+			String originalName = mapPermutationValue.get(row[5]);
 			mapCountWithName.put(originalName, mapCountWithName.get(originalName) + 1);
 		}
 
