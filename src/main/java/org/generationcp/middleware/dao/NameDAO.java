@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -28,12 +30,16 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Name}.
  *
  */
 public class NameDAO extends GenericDAO<Name, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(NameDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<Name> getByGIDWithFilters(Integer gid, Integer status, GermplasmNameType type) throws MiddlewareQueryException {
@@ -358,6 +364,70 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			this.logAndThrowException("Error with getAllMatchingNames(" + name + ") query from Name " + e.getMessage(), e);
 		}
 		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Map<String, Integer> getCountByNamePermutations(List<String> names) throws MiddlewareQueryException {
+
+		Monitor getCountByNamePermutations = MonitorFactory.start("Method Started : getCountByNamePermutations ");
+
+		if (names == null || names.isEmpty()) {
+			return new HashMap<>();
+		}
+
+		Map<String, Integer> mapCountWithName = new HashMap<>();
+		Map<String, String> mapPermutationValue = new HashMap<>();
+
+		//Converting supplied value to combination of names that can exists in names
+		for(String name : names){
+			mapCountWithName.put(name, 0);
+			List<String> permutations = GermplasmDataManagerUtil.createNamePermutations(name);
+			mapPermutationValue.put(permutations.get(0), name);
+			mapPermutationValue.put(permutations.get(1), name);
+			mapPermutationValue.put(permutations.get(2), name);
+		}
+
+		List<String> allDesignationValues = new ArrayList<>(mapPermutationValue.keySet());
+
+		Integer total = allDesignationValues.size();
+
+		Integer totalBatches = total / 1000;
+
+		LOG.info("Total batch to germplasm designations are {}", totalBatches + 1);
+
+		List<Name> allNameList = new ArrayList<>();
+
+		for (Integer b = 0; b <= totalBatches; b++) {
+
+			LOG.info("Processing batch {}/{}", b + 1, totalBatches + 1);
+
+			Integer start = b * 1000;
+
+			if (start > total) {
+				start = total - 1;
+			}
+
+			Integer end = (b + 1) * 1000;
+
+			if (end > total) {
+				end = total;
+			}
+
+			List<String> batchDesignationValues = allDesignationValues.subList(start, end);
+
+			// Count using = by default
+			SQLQuery query = this.getSession().createSQLQuery("select n.* FROM names n inner join germplsm g on g.gid = n.gid where nval in (:namelist) and g.gid != g.grplce and g.grplce = 0");
+			query.setParameterList("namelist", batchDesignationValues);
+			allNameList.addAll(query.list());
+		}
+
+		for(Name n : allNameList){
+			String originalName = mapPermutationValue.get(n.getNval());
+			mapCountWithName.put(originalName, mapCountWithName.get(originalName) + 1);
+		}
+
+		LOG.debug("Method End : getCountByNamePermutations " + getCountByNamePermutations.stop());
+		return mapCountWithName;
 	}
 
 }

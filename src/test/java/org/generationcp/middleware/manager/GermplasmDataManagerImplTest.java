@@ -11,15 +11,19 @@
 
 package org.generationcp.middleware.manager;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.io.FileUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -63,6 +67,10 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
+	private NameDAO nameDAO;
+
+	private GermplasmDAO germplasmDAO;
+
 	private Project commonTestProject;
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
@@ -70,6 +78,16 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
+		if(this.nameDAO == null) {
+			nameDAO = new NameDAO();
+			nameDAO.setSession(this.sessionProvder.getSession());
+		}
+
+		if(this.germplasmDAO == null) {
+			germplasmDAO = new GermplasmDAO();
+			germplasmDAO.setSession(this.sessionProvder.getSession());
+		}
+
 		if (this.germplasmTestDataGenerator == null) {
 			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager);
 		}
@@ -470,8 +488,8 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		Debug.printObjects(IntegrationTestBase.INDENT * 2, methods);
 
 		final List<Method> methodList = this.germplasmDataManager.getMethodsByGroup(group, start, numOfRows);
-		Debug.println(IntegrationTestBase.INDENT, "testGetMethodsByGroup(group=" + group + ", start=" + start + ", numOfRows=" + numOfRows
-				+ "): " + methodList.size());
+		Debug.println(IntegrationTestBase.INDENT,
+				"testGetMethodsByGroup(group=" + group + ", start=" + start + ", numOfRows=" + numOfRows + "): " + methodList.size());
 		Debug.printObjects(IntegrationTestBase.INDENT, methodList);
 	}
 
@@ -912,5 +930,96 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 	public void testGetGermplasmWithMethodType() throws Exception {
 		final Integer gid = 1;
 		this.germplasmDataManager.getGermplasmWithMethodType(gid);
+	}
+
+	@Test
+	public void shouldGetMapForGermplasmCount() throws Exception {
+
+
+		Germplasm germplasm1 = new Germplasm();
+		germplasm1.setGid(-1);
+		germplasm1.setMethodId(31);
+		germplasm1.setGnpgs(-1);
+		germplasm1.setGrplce(-1);
+		germplasm1.setGpid1(0);
+		germplasm1.setGpid2(0);
+		germplasm1.setUserId(1);
+		germplasm1.setLgid(0);
+		germplasm1.setLocationId(0);
+		germplasm1.setGdate(20151102);
+		germplasm1.setReferenceId(0);
+
+		this.germplasmDAO.save(germplasm1);
+
+		Germplasm germplasm2 = new Germplasm();
+		germplasm2.setGid(-2);
+		germplasm2.setMethodId(31);
+		germplasm2.setGnpgs(-1);
+		germplasm2.setGrplce(0);
+		germplasm2.setGpid1(0);
+		germplasm2.setGpid2(0);
+		germplasm2.setUserId(1);
+		germplasm2.setLgid(0);
+		germplasm2.setLocationId(0);
+		germplasm2.setGdate(20151103);
+		germplasm2.setReferenceId(0);
+
+		this.germplasmDAO.save(germplasm2);
+
+		Integer gid1 = germplasm1.getGid();
+		Integer gid2 = germplasm2.getGid();
+
+		Name name1 = this.buildNewNameEntity(gid1, "I-1RT  /  P 001 A-23 / ");
+		this.nameDAO.save(name1);
+
+		Name name2 = this.buildNewNameEntity(gid2, "I-1RT/P 1 A-23/");
+		this.nameDAO.save(name2);
+
+		Name name3 = this.buildNewNameEntity(gid2, "I-1RT/P001A-23/");
+		this.nameDAO.save(name3);
+
+		Name name4 = this.buildNewNameEntity(gid2, "(CML454 X CML451)-B-3-1-112");
+		this.nameDAO.save(name4);
+
+		Name name5 = this.buildNewNameEntity(gid1, "(CML454 X CML451)-B-3-1-112");
+		this.nameDAO.save(name5);
+
+		Name name6 = this.buildNewNameEntity(gid1, "(CML454XCML451)-B-3-1-112");
+		this.nameDAO.save(name6);
+
+		List<String> names = new ArrayList<>(Arrays.asList("I-1RT  /  P 001 A-23 / ", "(CML454 X CML451)-B-3-1-112"));
+
+		Map<String, Integer> mapCountByNamePermutations = this.germplasmDataManager.getCountByNamePermutations(names);
+
+		Assert.assertEquals(2, mapCountByNamePermutations.size());
+		Assert.assertEquals((Integer) 2, mapCountByNamePermutations.get("I-1RT  /  P 001 A-23 / "));
+		Assert.assertEquals((Integer) 1, mapCountByNamePermutations.get("(CML454 X CML451)-B-3-1-112"));
+	}
+
+	private Name buildNewNameEntity(Integer germPlasmId, String nval){
+		Name name = new Name();
+		name.setGermplasmId(germPlasmId);
+		name.setLocationId(0);
+		name.setNstat(1);
+		name.setNdate(20150707);
+		name.setReferenceId(0);
+		name.setUserId(1);
+		name.setNval(nval);
+		name.setTypeId(GermplasmNameType.LINE_NAME.getUserDefinedFieldID());
+		return name;
+	}
+
+	/**
+	 * test to verify germplasm permutations should be processed for large amount of data.
+	 * @throws Exception
+	 */
+	@Test
+	public void testShouldLoadAndProcessLargeGermplasmNamePermutations() throws Exception{
+		String fileLocation = GermplasmDataManagerImplTest.class.getClassLoader().getResource("germplasm_designation_name_list.txt").getFile();
+		List<String> nameList = FileUtils.readLines(new File(fileLocation));
+
+		Map<String, Integer> mapCountByNamePermutations = this.germplasmDataManager.getCountByNamePermutations(nameList);
+
+		Assert.assertTrue(mapCountByNamePermutations.size() > 0);
 	}
 }
