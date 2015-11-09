@@ -89,7 +89,7 @@ public class ManagerFactory implements Serializable {
 		return this.sessionProvider;
 	}
 
-	public void setSessionProvider(HibernateSessionProvider sessionProvider) {
+	public void setSessionProvider(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
 	}
 
@@ -98,7 +98,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public PedigreeDataManager getPedigreeDataManager() {
-		return new PedigreeDataManagerImpl(sessionProvider, databaseName);
+		return new PedigreeDataManagerImpl(this.sessionProvider, this.databaseName);
 	}
 
 	public CrossStudyDataManager getCrossStudyDataManager() {
@@ -201,7 +201,7 @@ public class ManagerFactory implements Serializable {
 	/*
 	 * This was exposed so that it can be access in the jUnit
 	 */
-	public PedigreeService getPedigreeService(String profile, String crop) {
+	public PedigreeService getPedigreeService(final String profile, final String crop) {
 		return PedigreeFactory.getPedigreeService(this.sessionProvider, profile, crop);
 	}
 
@@ -223,7 +223,7 @@ public class ManagerFactory implements Serializable {
 		return this.databaseName;
 	}
 
-	public void setDatabaseName(String localDatabaseName) {
+	public void setDatabaseName(final String localDatabaseName) {
 		this.databaseName = localDatabaseName;
 	}
 
@@ -231,7 +231,7 @@ public class ManagerFactory implements Serializable {
 		return this.cropName;
 	}
 
-	public void setCropName(String cropName) {
+	public void setCropName(final String cropName) {
 		this.cropName = cropName;
 	}
 
@@ -239,16 +239,16 @@ public class ManagerFactory implements Serializable {
 		return this.pedigreeProfile;
 	}
 
-	public void setPedigreeProfile(String pedigreeProfile) {
+	public void setPedigreeProfile(final String pedigreeProfile) {
 		this.pedigreeProfile = pedigreeProfile;
 	}
-	
-	public OntologyDaoFactory getOntologyDaoFactory() {
-        return new OntologyDaoFactory(sessionProvider);
-    }
 
-    public StandardVariableTransformer getStandardVariableTransformer() {
-        return new StandardVariableTransformer(this.sessionProvider);
-    }
+	public OntologyDaoFactory getOntologyDaoFactory() {
+		return new OntologyDaoFactory(this.sessionProvider);
+	}
+
+	public StandardVariableTransformer getStandardVariableTransformer() {
+		return new StandardVariableTransformer(this.sessionProvider);
+	}
 
 }

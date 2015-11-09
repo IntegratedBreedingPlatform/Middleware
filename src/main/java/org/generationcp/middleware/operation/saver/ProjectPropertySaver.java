@@ -78,15 +78,15 @@ public class ProjectPropertySaver {
 	private List<ProjectProperty> createVariableProperties(DmsProject project, DMSVariableType variableType)
 			throws MiddlewareQueryException {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
-		
+
 		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = variableType.getVariableType();
 
 		if (variableTypeEnum == null) {
 			variableTypeEnum = this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(variableType.getRole());
 		}
-		
+
 		int variableTypeId = variableTypeEnum.getId();
-		
+
 		properties.add(new ProjectProperty(project, variableTypeId, variableType.getLocalName(), variableType.getRank()));
 		properties.add(new ProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType
 				.getRank()));
@@ -120,31 +120,31 @@ public class ProjectPropertySaver {
 	}
 
 	/***
-	 * Saving project property from DMSVariableType.
-	 * Setting VariableType from Role when DMSVariableType does not have value fro Variable Type.
-	 * DMSVariableType will hold two similar values. Role and VariableType. We should consider using VariableType first and as a fallback
-	 * we should use Role. Next iterations should remove Role from everywhere. Currently we have taken care of setting valid variable type
-	 * from EditNurseryController for Variates (Trait and Selection Methods)
+	 * Saving project property from DMSVariableType. Setting VariableType from Role when DMSVariableType does not have value fro Variable
+	 * Type. DMSVariableType will hold two similar values. Role and VariableType. We should consider using VariableType first and as a
+	 * fallback we should use Role. Next iterations should remove Role from everywhere. Currently we have taken care of setting valid
+	 * variable type from EditNurseryController for Variates (Trait and Selection Methods)
+	 * 
 	 * @param project DMSProject
 	 * @param objDMSVariableType DMSVariableType
 	 * @throws MiddlewareQueryException
 	 */
 	public void saveVariableType(DmsProject project, DMSVariableType objDMSVariableType) throws MiddlewareQueryException {
 
-		if(objDMSVariableType.getVariableType() == null){
+		if (objDMSVariableType.getVariableType() == null) {
 			objDMSVariableType.setVariableType(this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
-							objDMSVariableType.getStandardVariable().getPhenotypicType()));
+					objDMSVariableType.getStandardVariable().getPhenotypicType()));
 		}
 
 		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = objDMSVariableType.getVariableType();
 		this.saveProjectProperty(project, variableTypeEnum.getId(), objDMSVariableType.getLocalName(), objDMSVariableType.getRank());
-		this.saveProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), objDMSVariableType.getLocalDescription(), objDMSVariableType.getRank());
-		this.saveProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), Integer.toString(
-				objDMSVariableType.getStandardVariable().getId()),
+		this.saveProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), objDMSVariableType.getLocalDescription(),
 				objDMSVariableType.getRank());
+		this.saveProjectProperty(project, TermId.STANDARD_VARIABLE.getId(),
+				Integer.toString(objDMSVariableType.getStandardVariable().getId()), objDMSVariableType.getRank());
 		if (objDMSVariableType.getTreatmentLabel() != null && !objDMSVariableType.getTreatmentLabel().isEmpty()) {
-			this.saveProjectProperty(project, TermId.MULTIFACTORIAL_INFO.getId(), objDMSVariableType.getTreatmentLabel(), objDMSVariableType
-					.getRank());
+			this.saveProjectProperty(project, TermId.MULTIFACTORIAL_INFO.getId(), objDMSVariableType.getTreatmentLabel(),
+					objDMSVariableType.getRank());
 		}
 	}
 

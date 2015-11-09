@@ -23,15 +23,15 @@ public class Stocks {
 
 	private final Set<Stock> stocks = new LinkedHashSet<Stock>();
 
-	public void add(Stock trialEnvironment) {
+	public void add(final Stock trialEnvironment) {
 		if (trialEnvironment != null) {
 			this.stocks.add(trialEnvironment);
 		}
 	}
 
-	public Stock findOnlyOneByLocalName(String localName, String value) {
+	public Stock findOnlyOneByLocalName(final String localName, final String value) {
 		Stock found = null;
-		for (Stock stock : this.stocks) {
+		for (final Stock stock : this.stocks) {
 			if (stock.containsValueByLocalName(localName, value)) {
 				if (found == null) {
 					found = stock;
@@ -44,9 +44,9 @@ public class Stocks {
 		return found;
 	}
 
-	public int countByLocalName(String localName, String value) {
+	public int countByLocalName(final String localName, final String value) {
 		int count = 0;
-		for (Stock stock : this.stocks) {
+		for (final Stock stock : this.stocks) {
 			if (stock.containsValueByLocalName(localName, value)) {
 				count++;
 			}
@@ -54,16 +54,16 @@ public class Stocks {
 		return count;
 	}
 
-	public void print(int indent) {
-		for (Stock stock : this.stocks) {
+	public void print(final int indent) {
+		for (final Stock stock : this.stocks) {
 			stock.print(indent);
 		}
 	}
 
-	public Map<String, Integer> getStockMap(String keyVarName) {
-		Map<String, Integer> stockMap = new LinkedHashMap<>();
-		for (Stock stock : this.stocks) {
-			Variable variableKey = stock.getVariables().findByLocalName(keyVarName);
+	public Map<String, Integer> getStockMap(final String keyVarName) {
+		final Map<String, Integer> stockMap = new LinkedHashMap<>();
+		for (final Stock stock : this.stocks) {
+			final Variable variableKey = stock.getVariables().findByLocalName(keyVarName);
 			stockMap.put(variableKey.getValue(), stock.getId());
 		}
 		return stockMap;
