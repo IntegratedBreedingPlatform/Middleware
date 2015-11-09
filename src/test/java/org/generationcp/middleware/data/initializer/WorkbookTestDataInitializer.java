@@ -266,12 +266,16 @@ public class WorkbookTestDataInitializer {
 				WorkbookTestDataInitializer.NUMERIC, String.valueOf(trialNo), WorkbookTestDataInitializer.TRIAL,
 				TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT));
 
-		conditions.add(createMeasurementVariable(WorkbookTestDataInitializer.EXPT_DESIGN_ID, "DESIGN", "EXPERIMENTAL DESIGN",
-				WorkbookTestDataInitializer.TYPE, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.EXPERIMENT_DESIGN,
-				WorkbookTestDataInitializer.CHAR, String.valueOf(TermId.RANDOMIZED_COMPLETE_BLOCK.getId()),
-				WorkbookTestDataInitializer.TRIAL, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT));
+		conditions.add(createExperimentalRCBDVariable());
 
 		workbook.setConditions(conditions);
+	}
+
+	public static MeasurementVariable createExperimentalRCBDVariable() {
+		return createMeasurementVariable(WorkbookTestDataInitializer.EXPT_DESIGN_ID, "DESIGN", "EXPERIMENTAL DESIGN",
+				WorkbookTestDataInitializer.TYPE, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.EXPERIMENT_DESIGN,
+				WorkbookTestDataInitializer.CHAR, String.valueOf(TermId.RANDOMIZED_COMPLETE_BLOCK.getId()),
+				WorkbookTestDataInitializer.TRIAL, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT);
 	}
 
 	public static void createFactors(final Workbook workbook, final boolean withEntry, final boolean withTrial, final int trialNo) {
