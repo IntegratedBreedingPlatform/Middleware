@@ -4,6 +4,7 @@ package org.generationcp.middleware.operation.parser;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -220,7 +221,7 @@ public class WorkbookParserTest {
 	}
 
 	@Test
-	public void testExtractMeasurementVariablesForSection_WithEmptyVariableDetails() {
+	public void testExtractMeasurementVariablesForSectionWithEmptyVariableDetails() {
 		Section section = Section.CONDITION;
 		String[] headers = WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS;
 		Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headers);
@@ -273,7 +274,7 @@ public class WorkbookParserTest {
 	}
 
 	@Test
-	public void testExtractMeasurementVariablesForSection_WithIncorrectDataTypeAndLabel() {
+	public void testExtractMeasurementVariablesForSectionWithIncorrectDataTypeAndLabel() {
 		Section section = Section.FACTOR;
 		String[] headers = WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS;
 		Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headers);
@@ -310,6 +311,34 @@ public class WorkbookParserTest {
 			}
 			errorIndex++;
 		}
+	}
+	
+
+	/**
+	 * Tests ensures that the read measurement variables validates two contiguous empty rows.
+	 */
+	@Test
+	public void testReadMeasurementVariablesEmptyRowValidation() throws Exception {
+		final Workbook mockWorkbook = Mockito.mock(Workbook.class);
+		final WorkbookParser workbookParser = new WorkbookParser();
+		final List<MeasurementVariable> readMeasurementVariables = workbookParser.readMeasurementVariables(mockWorkbook, "CONDITION");
+		
+		Assert.assertTrue("Since the work book is empty we should have an empty list of measurement variables.", readMeasurementVariables.isEmpty());
+		Assert.assertEquals("We must have one error message in the parser error list", 1, workbookParser.getErrorMessages().size());
+
+	}
+
+	/**
+	 * Tests ensures that the extract measurement variables validates two contiguous empty rows.
+	 */
+	@Test
+	public void testExtractMeasurementVariablesEmptyRowValidation() throws Exception {
+		final Workbook mockWorkbook = Mockito.mock(Workbook.class);
+		final WorkbookParser workbookParser = new WorkbookParser();
+		workbookParser.extractMeasurementVariablesForSection(mockWorkbook, "VARIATES", Collections.<MeasurementVariable>emptyList());
+	
+		Assert.assertEquals("We must have one error message in the parser error list", 1, workbookParser.getErrorMessages().size());
+
 	}
 
 	private List<String[]> createVariableDetailsListTestData(Section section, String[] headers) {
