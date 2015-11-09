@@ -20,6 +20,7 @@ import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -75,11 +76,11 @@ public class WorkbookParser {
 	private static final String METHOD = "METHOD";
 	private static final String SCALE = "SCALE";
 
+	// FIXME: We need to consolidate the row incrementation. Have a centralised place to return the next row. 
 	private int currentRow;
-	private List<Message> errorMessages;
+	private List<Message> errorMessages = new ArrayList<>();
 	private boolean hasIncorrectDatatypeValue = false;
 
-	// GCP-5815
 	private org.generationcp.middleware.domain.etl.Workbook currentWorkbook;
 	public static final String[] DEFAULT_EXPECTED_VARIABLE_HEADERS = new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY,
 			WorkbookParser.SCALE, WorkbookParser.METHOD, WorkbookParser.DATA_TYPE, WorkbookParser.VALUE, WorkbookParser.LABEL};
@@ -330,12 +331,19 @@ public class WorkbookParser {
 
 		try {
 
-			while (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 8)) {
-				this.currentRow++;
+
+			// Cannot have more than one empty row in the description worksheet.
+			if(WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 8)) {
+				currentRow++;
 			}
+
+			if(WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 8)) {
+				this.errorMessages.add(new Message("error.to.many.empty.rows", name, Integer.toString(this.currentRow-1), Integer.toString(this.currentRow)));
+				return Collections.<MeasurementVariable>emptyList();
+			}
+	
 			// Check if headers are correct
 
-			// GCP-5815
 			String[] expectedHeaders = null;
 			String[] expectedHeaders2 = null;
 
@@ -379,9 +387,18 @@ public class WorkbookParser {
 	}
 
 	protected void extractMeasurementVariablesForSection(Workbook wb, String name, List<MeasurementVariable> measurementVariables) {
-		do {
-			this.currentRow++;
-		} while (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 8));
+		
+		// Moving to the next line is necessary as at this point one is on the previous row.
+		this.currentRow++;
+		// Cannot have more than one empty row in the description worksheet.
+		if(WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 8)) {
+			currentRow++;
+		}
+
+		if(WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 8)) {
+			this.errorMessages.add(new Message("error.to.many.empty.rows", name, Integer.toString(this.currentRow-1), Integer.toString(this.currentRow)));
+			return;
+		}
 
 		// capture empty sections, and return to avoid spillover
 		String value = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 0);
@@ -546,19 +563,15 @@ public class WorkbookParser {
 	}
 
 	protected static String getCellStringValue(Workbook wb, Integer sheetNumber, Integer rowNumber, Integer columnNumber) {
-		try {
-			Sheet sheet = wb.getSheetAt(sheetNumber);
-			Row row = sheet.getRow(rowNumber);
-			Cell cell = row.getCell(columnNumber);
-			return PoiUtil.getCellStringValue(cell);
-		} catch (IllegalStateException e) {
-			WorkbookParser.LOG.error(e.getMessage(), e);
-			return "";
-
-		} catch (NullPointerException e) {
-			WorkbookParser.LOG.error(e.getMessage(), e);
-			return "";
+		final Sheet sheet = wb.getSheetAt(sheetNumber);
+		if(sheet != null) {
+			final Row row = sheet.getRow(rowNumber);
+			if(row != null) {
+				final Cell cell = row.getCell(columnNumber);
+				return PoiUtil.getCellStringValue(cell);
+			}
 		}
+		return "";
 	}
 
 	// GCP-5815
