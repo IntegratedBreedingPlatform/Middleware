@@ -1063,4 +1063,11 @@ public interface GermplasmDataManager {
 	 */
 	Germplasm getGermplasmByLocalGid(Integer lgid);
 
+	/**
+	 * return list of name and it's permutation count.
+	 * @param names list of names
+	 * @return list of name and it's number of permutations.
+	 */
+	Map<String, Integer> getCountByNamePermutations(List<String> names);
+
 }
