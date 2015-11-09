@@ -13,7 +13,6 @@ package org.generationcp.middleware.manager;
 
 import java.io.Serializable;
 
-import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -142,27 +141,27 @@ public class ManagerFactory implements Serializable {
 		return new PresetDataManagerImpl(this.sessionProvider);
 	}
 
-	public StudyDataManager getStudyDataManager() throws ConfigException {
+	public StudyDataManager getStudyDataManager() {
 		return new StudyDataManagerImpl(this.sessionProvider);
 	}
 
-	public StudyDataManager getNewStudyDataManager() throws ConfigException {
+	public StudyDataManager getNewStudyDataManager() {
 		return new StudyDataManagerImpl(this.sessionProvider, this.databaseName);
 	}
 
-	public OntologyDataManager getNewOntologyDataManager() throws ConfigException {
+	public OntologyDataManager getNewOntologyDataManager() {
 		return new OntologyDataManagerImpl(this.sessionProvider);
 	}
 
-	public InventoryDataManager getInventoryDataManager() throws ConfigException {
+	public InventoryDataManager getInventoryDataManager() {
 		return new InventoryDataManagerImpl(this.sessionProvider, this.databaseName);
 	}
 
-	public UserProgramStateDataManager getUserProgramStateDataManager() throws ConfigException {
+	public UserProgramStateDataManager getUserProgramStateDataManager() {
 		return new UserProgramStateDataManagerImpl(this.sessionProvider);
 	}
 
-	public GenotypicDataManager getGenotypicDataManager() throws ConfigException {
+	public GenotypicDataManager getGenotypicDataManager() {
 		return new GenotypicDataManagerImpl(this.sessionProvider);
 	}
 
@@ -170,19 +169,19 @@ public class ManagerFactory implements Serializable {
 		return new UserDataManagerImpl(this.sessionProvider);
 	}
 
-	public FieldbookService getFieldbookMiddlewareService() throws ConfigException {
+	public FieldbookService getFieldbookMiddlewareService() {
 		return new FieldbookServiceImpl(this.sessionProvider, this.databaseName);
 	}
 
-	public InventoryService getInventoryMiddlewareService() throws ConfigException {
+	public InventoryService getInventoryMiddlewareService() {
 		return new InventoryServiceImpl(this.sessionProvider);
 	}
 
-	public DataImportService getDataImportService() throws ConfigException {
+	public DataImportService getDataImportService() {
 		return new DataImportServiceImpl(this.sessionProvider);
 	}
 
-	public OntologyService getOntologyService() throws ConfigException {
+	public OntologyService getOntologyService() {
 		return new OntologyServiceImpl(this.sessionProvider);
 	}
 
@@ -190,7 +189,7 @@ public class ManagerFactory implements Serializable {
 		return new MBDTDataManagerImpl(this.sessionProvider);
 	}
 
-	public ReportService getReportService() throws ConfigException {
+	public ReportService getReportService() {
 		return new ReportServiceImpl(this.sessionProvider, this.databaseName);
 	}
 

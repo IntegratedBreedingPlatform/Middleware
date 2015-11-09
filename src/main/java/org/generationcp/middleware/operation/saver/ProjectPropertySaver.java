@@ -51,7 +51,7 @@ public class ProjectPropertySaver {
 		this.daoFactory = saver;
 	}
 
-	public List<ProjectProperty> create(DmsProject project, VariableTypeList variableTypeList) throws MiddlewareQueryException {
+	public List<ProjectProperty> create(DmsProject project, VariableTypeList variableTypeList) {
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		List<DMSVariableType> variableTypes = variableTypeList != null ? variableTypeList.getVariableTypes() : null;
 
@@ -64,7 +64,7 @@ public class ProjectPropertySaver {
 		return properties;
 	}
 
-	public void saveProjectProperties(DmsProject project, VariableTypeList variableTypeList) throws MiddlewareQueryException {
+	public void saveProjectProperties(DmsProject project, VariableTypeList variableTypeList) {
 		List<ProjectProperty> properties = this.create(project, variableTypeList);
 		ProjectPropertyDao projectPropertyDao = this.daoFactory.getProjectPropertyDao();
 		for (ProjectProperty property : properties) {
@@ -101,7 +101,7 @@ public class ProjectPropertySaver {
 		return properties;
 	}
 
-	public void saveProjectPropValues(int projectId, VariableList variableList) throws MiddlewareQueryException {
+	public void saveProjectPropValues(int projectId, VariableList variableList) {
 		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
 			for (Variable variable : variableList.getVariables()) {
 				org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum =
@@ -129,7 +129,7 @@ public class ProjectPropertySaver {
 	 * @param objDMSVariableType DMSVariableType
 	 * @throws MiddlewareQueryException
 	 */
-	public void saveVariableType(DmsProject project, DMSVariableType objDMSVariableType) throws MiddlewareQueryException {
+	public void saveVariableType(DmsProject project, DMSVariableType objDMSVariableType) {
 
 		if (objDMSVariableType.getVariableType() == null) {
 			objDMSVariableType.setVariableType(this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
@@ -148,7 +148,7 @@ public class ProjectPropertySaver {
 		}
 	}
 
-	private void saveProjectProperty(DmsProject project, int typeId, String value, int rank) throws MiddlewareQueryException {
+	private void saveProjectProperty(DmsProject project, int typeId, String value, int rank) {
 		ProjectProperty property = new ProjectProperty();
 		property.setTypeId(typeId);
 		property.setValue(value);
@@ -158,7 +158,7 @@ public class ProjectPropertySaver {
 		project.addProperty(property);
 	}
 
-	public void createProjectPropertyIfNecessary(DmsProject project, TermId termId, PhenotypicType role) throws MiddlewareQueryException {
+	public void createProjectPropertyIfNecessary(DmsProject project, TermId termId, PhenotypicType role) {
 		ProjectProperty property = this.daoFactory.getProjectPropertyDao().getByStandardVariableId(project, termId.getId());
 		if (property == null) {
 			int rank = this.daoFactory.getProjectPropertyDao().getNextRank(project.getProjectId());
@@ -179,7 +179,7 @@ public class ProjectPropertySaver {
 	}
 
 	public void saveProjectProperties(DmsProject study, DmsProject trialDataset, DmsProject measurementDataset,
-			List<MeasurementVariable> variables, boolean isConstant) throws MiddlewareQueryException {
+			List<MeasurementVariable> variables, boolean isConstant) {
 
 		if (variables != null) {
 
@@ -221,7 +221,7 @@ public class ProjectPropertySaver {
 	}
 
 	private void insertVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, MeasurementVariable variable,
-			int rank, boolean isConstant, Geolocation geolocation) throws MiddlewareQueryException {
+			int rank, boolean isConstant, Geolocation geolocation) {
 
 		if (PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()) {
 			int datasetRank = this.getNextRank(trialDataset);
@@ -268,7 +268,7 @@ public class ProjectPropertySaver {
 		}
 	}
 
-	private void insertVariable(DmsProject project, MeasurementVariable variable, int rank) throws MiddlewareQueryException {
+	private void insertVariable(DmsProject project, MeasurementVariable variable, int rank) {
 		if (project.getProperties() == null) {
 			project.setProperties(new ArrayList<ProjectProperty>());
 		}
@@ -295,7 +295,7 @@ public class ProjectPropertySaver {
 	}
 
 	private void updateVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, MeasurementVariable variable,
-			boolean isConstant, Geolocation geolocation) throws MiddlewareQueryException {
+			boolean isConstant, Geolocation geolocation) {
 
 		if (PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()) {
 			this.updateVariable(project, variable);
@@ -340,7 +340,7 @@ public class ProjectPropertySaver {
 		}
 	}
 
-	private void updateVariable(DmsProject project, MeasurementVariable variable) throws MiddlewareQueryException {
+	private void updateVariable(DmsProject project, MeasurementVariable variable) {
 		if (project.getProperties() != null) {
 			int rank = this.getRank(project, variable.getTermId());
 			for (ProjectProperty property : project.getProperties()) {
@@ -373,7 +373,7 @@ public class ProjectPropertySaver {
 	}
 
 	private void deleteVariable(DmsProject project, DmsProject trialDataset, DmsProject measurementDataset, PhenotypicType role,
-			int termId, Geolocation geolocation) throws MiddlewareQueryException {
+			int termId, Geolocation geolocation) {
 
 		this.deleteVariable(project, termId);
 		if (PhenotypicType.TRIAL_ENVIRONMENT == role) {
@@ -400,7 +400,7 @@ public class ProjectPropertySaver {
 		}
 	}
 
-	private void deleteVariable(DmsProject project, int termId) throws MiddlewareQueryException {
+	private void deleteVariable(DmsProject project, int termId) {
 		int rank = this.getRank(project, termId);
 		if (project.getProperties() != null && !project.getProperties().isEmpty()) {
 			for (Iterator<ProjectProperty> iterator = project.getProperties().iterator(); iterator.hasNext();) {
@@ -413,7 +413,7 @@ public class ProjectPropertySaver {
 		}
 	}
 
-	private void deleteVariableForFactors(DmsProject project, MeasurementVariable variable) throws MiddlewareQueryException {
+	private void deleteVariableForFactors(DmsProject project, MeasurementVariable variable) {
 		this.deleteVariable(project, variable.getTermId());
 
 		if (variable.getRole() == PhenotypicType.TRIAL_DESIGN) {
@@ -423,7 +423,7 @@ public class ProjectPropertySaver {
 		}
 	}
 
-	public void saveFactors(DmsProject measurementDataset, List<MeasurementVariable> variables) throws MiddlewareQueryException {
+	public void saveFactors(DmsProject measurementDataset, List<MeasurementVariable> variables) {
 		if (variables != null && !variables.isEmpty()) {
 			for (MeasurementVariable variable : variables) {
 				if (variable.getOperation() == Operation.ADD) {
@@ -437,7 +437,7 @@ public class ProjectPropertySaver {
 		}
 	}
 
-	public void updateVariablesRanking(int datasetId, List<Integer> variableIds) throws MiddlewareQueryException {
+	public void updateVariablesRanking(int datasetId, List<Integer> variableIds) {
 		int rank = this.daoFactory.getProjectPropertyDao().getNextRank(datasetId);
 		Map<Integer, List<Integer>> projectPropIDMap =
 				this.daoFactory.getProjectPropertyDao().getProjectPropertyIDsPerVariableId(datasetId);

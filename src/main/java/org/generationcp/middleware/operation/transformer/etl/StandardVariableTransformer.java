@@ -11,7 +11,6 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 public class StandardVariableTransformer extends Transformer {
@@ -24,7 +23,7 @@ public class StandardVariableTransformer extends Transformer {
 		super(sessionProvider);
 	}
 
-	public StandardVariable transformVariable(final Variable variable) throws MiddlewareQueryException {
+	public StandardVariable transformVariable(final Variable variable) {
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(variable.getId());
 		standardVariable.setName(variable.getName());
