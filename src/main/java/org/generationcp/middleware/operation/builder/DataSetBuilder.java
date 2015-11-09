@@ -122,7 +122,7 @@ public class DataSetBuilder extends Builder {
 		return study.getProjectId();
 	}
 
-	private DataSetType getDataSetType(DmsProject project) throws MiddlewareQueryException {
+	private DataSetType getDataSetType(DmsProject project) {
 		for (ProjectProperty property : project.getProperties()) {
 			if (TermId.DATASET_TYPE.getId() == property.getTypeId()) {
 				return DataSetType.findById(Integer.valueOf(property.getValue()));
@@ -131,7 +131,7 @@ public class DataSetBuilder extends Builder {
 		return null;
 	}
 
-	public DmsProject getTrialDataset(int studyId) throws MiddlewareQueryException {
+	public DmsProject getTrialDataset(int studyId) {
 		List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(studyId);
 		if (datasetReferences == null || datasetReferences.isEmpty()) {
 			throw new MiddlewareQueryException("no.dataset.found", "No datasets found for study " + studyId);
@@ -141,7 +141,12 @@ public class DataSetBuilder extends Builder {
 				return this.getDmsProjectById(datasetReference.getId());
 			}
 		}
-		throw new MiddlewareQueryException("no.trial.dataset.found", "Study exists but no environmant dataset for " + studyId);
+		// if not found in the list using the name, get dataset with Summary Data type
+		final DataSet dataset = this.studyDataManager.findOneDataSetByType(studyId, DataSetType.SUMMARY_DATA);
+		if (dataset != null) {
+			return this.getDmsProjectById(dataset.getId());
+		}
+		throw new MiddlewareQueryException("no.trial.dataset.found", "Study exists but no environment dataset for " + studyId);
 	}
 
 	public Workbook buildCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareException {
