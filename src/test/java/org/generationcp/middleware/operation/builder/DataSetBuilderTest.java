@@ -45,7 +45,7 @@ public class DataSetBuilderTest {
 		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID_NOTRIAL)).thenReturn(generateDatasetReferences(false));
 		Mockito.when((this.studyDataManager).getDatasetReferences(STUDY_ID_NODATASETS)).thenReturn(new ArrayList<DatasetReference>());
 		Mockito.when(this.dmsProjectDao.getById(4)).thenReturn(generateDmsProject(4));
-		Mockito.when((this.studyDataManager).findOneDataSetByType(STUDY_ID_NOTRIAL, DataSetType.SUMMARY_DATA)).thenReturn(generateDataset(3));
+		Mockito.when((this.studyDataManager).findOneDataSetReferenceByType(STUDY_ID_NOTRIAL, DataSetType.SUMMARY_DATA)).thenReturn(generateDatasetReference(3));
 		Mockito.when(this.dmsProjectDao.getById(3)).thenReturn(generateDmsProject(3));
 
 		MockitoAnnotations.initMocks(this);
@@ -99,16 +99,9 @@ public class DataSetBuilderTest {
 		return dmsProject;
 	}
 
-	private List<DmsProject> getListOfDatasets() {
-		List<DmsProject> list = new ArrayList<DmsProject>();
-		list.add(generateDmsProject(3));
-		return list;
-	}
-
-	private DataSet generateDataset(int id) {
-		DataSet ds = new DataSet();
-		ds.setId(3);
-		return ds;
+	private DatasetReference generateDatasetReference(int id) {
+		DatasetReference dsr = new DatasetReference(id, "Name");
+		return dsr;
 	}
 
 }

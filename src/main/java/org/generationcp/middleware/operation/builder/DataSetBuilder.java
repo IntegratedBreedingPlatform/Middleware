@@ -141,10 +141,10 @@ public class DataSetBuilder extends Builder {
 				return this.getDmsProjectById(datasetReference.getId());
 			}
 		}
-		// if not found in the list using the name, get dataset with Summary Data type
-		final DataSet dataset = this.studyDataManager.findOneDataSetByType(studyId, DataSetType.SUMMARY_DATA);
-		if (dataset != null) {
-			return this.getDmsProjectById(dataset.getId());
+		// if not found in the list using the name, get dataset reference with Summary Data type
+		final DatasetReference trialDatasetReference = this.studyDataManager.findOneDataSetReferenceByType(studyId, DataSetType.SUMMARY_DATA);
+		if (trialDatasetReference != null) {
+			return this.getDmsProjectById(trialDatasetReference.getId());
 		}
 		throw new MiddlewareQueryException("no.trial.dataset.found", "Study exists but no environment dataset for " + studyId);
 	}
