@@ -101,26 +101,37 @@ public class WorkbookBuilder extends Builder {
 		 *       datatype (Experiment > VariableList > Variable > VariableType > StandardVariable), 
 		 *       iseditable (true for variates, else, false)
 		 */
-
+		
+		// DA
 		final StudyDetails studyDetails = this.getStudyDataManager().getStudyDetails(studyType, id);
-
+		
+		// DA getDMSProject
 		final Study study = this.getStudyBuilder().createStudy(id);
-
+		
+		// DA if name not conventional
+		// FIXME : this heavy id fetch pattern needs changing
 		final int dataSetId = this.getMeasurementDataSetId(id, studyDetails.getStudyName());
+		// validation, bring inline
 		this.checkMeasurementDataset(Integer.valueOf(dataSetId));
 		workbook.setMeasurementDatesetId(dataSetId);
-
-		final long expCount = this.getStudyDataManager().countExperiments(dataSetId);
-		VariableTypeList variables = this.getDataSetBuilder().getVariableTypes(dataSetId);
-		// variable type roles are being set inside getexperiment
 		
+		// PERF : rationale for count - improve
+		final long expCount = this.getStudyDataManager().countExperiments(dataSetId);
+		// Variables required to get Experiments (?)
+		VariableTypeList variables = this.getDataSetBuilder().getVariableTypes(dataSetId);
+		// DA get experiments
 		final List<Experiment> experiments = this.getStudyDataManager().getExperiments(dataSetId, 0, (int) expCount, variables);
-		VariableList conditionVariables = null, constantVariables = null, trialConstantVariables = null;
-			
+		
+		// FIXME : this heavy id fetch pattern needs changing
 		final DmsProject trialDataSetProject = this.getDataSetBuilder().getTrialDataset(study.getId());
 		final DataSet trialDataSet = this.getDataSetBuilder().build(trialDataSetProject.getProjectId());
 		workbook.setTrialDatasetId(trialDataSet.getId());
 		
+		VariableList conditionVariables = null;
+		VariableList constantVariables = null; 
+		VariableList trialConstantVariables = null;
+		// for Trials, conditions and trial environment variables are combined
+		// the trialEnvironmentVariables are filtered from the TrialDataset
 		final VariableList trialEnvironmentVariables = this.getTrialEnvironmentVariableList(trialDataSet);
 		if (isTrial) {
 			conditionVariables = new VariableList();
@@ -131,24 +142,21 @@ public class WorkbookBuilder extends Builder {
 		}
 		constantVariables = study.getConstants();
 		trialConstantVariables = this.getTrialConstants(trialDataSet);
+		// FIXME : I think we are reducing to traits, but difficult to understand
 		variables = this.removeTrialDatasetVariables(variables, trialEnvironmentVariables);
 
+		// we set roles here (study, trial, variate) which seem to match the dataset : reconcile - we might be over-categorising
 		final List<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(conditionVariables, true, true);
 		final List<MeasurementVariable> factors = this.buildFactors(variables, isTrial);
 		final List<MeasurementVariable> constants = this.buildStudyMeasurementVariables(constantVariables, false, true);
 		constants.addAll(this.buildStudyMeasurementVariables(trialConstantVariables, false, false));
 		final List<MeasurementVariable> variates = this.buildVariates(variables, constants);
 		final List<MeasurementVariable> expDesignVariables = new ArrayList<MeasurementVariable>();
-
-		// set possible values of breeding method
-		for (final MeasurementVariable variable : variates) {
-			if (this.getOntologyDataManager().getProperty(variable.getProperty()).getTerm().getId() == TermId.BREEDING_METHOD_PROP.getId()) {
-				variable.setPossibleValues(this.getAllBreedingMethods());
-			}
-		}
-
+		
+		// Nursery case
 		if (!isTrial) {
 			// remove OCC from nursery level conditions for nursery cause its duplicating becuase its being added in conditions and factors
+			// FIXME : redesign dataset or filter earlier
 			final Iterator<MeasurementVariable> iter = conditions.iterator();
 			while (iter.hasNext()) {
 				if (iter.next().getTermId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
@@ -156,7 +164,17 @@ public class WorkbookBuilder extends Builder {
 				}
 			}
 		}
+		
+		// Set possible values of breeding method
+		for (final MeasurementVariable variable : variates) {
+			if (this.getOntologyDataManager().getProperty(variable.getProperty()).getTerm().getId() == TermId.BREEDING_METHOD_PROP.getId()) {
+				// DA get all methods not generative
+				variable.setPossibleValues(this.getAllBreedingMethods());
+			}
+		}
 
+		// Build Observation Unit from a Measurement
+		// DA previous for experiments
 		final List<MeasurementRow> observations =
 				this.buildObservations(experiments, variables.getVariates(), factors, variates, isTrial, conditions);
 		final List<TreatmentVariable> treatmentFactors = this.buildTreatmentFactors(variables);
@@ -167,6 +185,7 @@ public class WorkbookBuilder extends Builder {
 		
 		for (final ProjectProperty projectProperty : projectProperties) {
 			if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
+				// DA IN A LOOP
 				final StandardVariable stdVariable =
 						this.getStandardVariableBuilder().create(Integer.parseInt(projectProperty.getValue()), study.getProgramUUID());
 
@@ -184,13 +203,16 @@ public class WorkbookBuilder extends Builder {
 						String value = null;
 						final int varId = stdVariable.getId();
 						if (varType.getRole() == PhenotypicType.TRIAL_ENVIRONMENT) {
+							// DA geolocation prop access for value
 							value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
 						}
+						// if value is null we have a .... trial instance, or location attribute (lat,long etc)
 						if (value == null) {
 							// set trial env for nursery studies
 							final List<Integer> locIds = this.getExperimentDao().getLocationIdsOfStudy(id);
 							if (locIds != null && !locIds.isEmpty()) {
 								final Integer locId = locIds.get(0);
+								// DA geolocation table
 								final Geolocation geolocation = this.getGeolocationDao().getById(locId);
 								if (geolocation != null) {
 									if (TermId.TRIAL_INSTANCE_FACTOR.getId() == varId) {
@@ -210,11 +232,13 @@ public class WorkbookBuilder extends Builder {
 									}
 								}
 							}
+							// redundant logic?
 							if (value == null) {
 								value = "";
 							}
 						}
-
+						
+						// continuing redundant logic ... 
 						if (value != null) {
 							final MeasurementVariable measurementVariable =
 									new MeasurementVariable(stdVariable.getId(), this.getLocalName(projectProperty.getRank(),
@@ -233,6 +257,7 @@ public class WorkbookBuilder extends Builder {
 								conditions.add(measurementVariable);
 							}
 						}
+					// control flow is unreadable here
 					} else if (isTrial && WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
 
 						final String value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
