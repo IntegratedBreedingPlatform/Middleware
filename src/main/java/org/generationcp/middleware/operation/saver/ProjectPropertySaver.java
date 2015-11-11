@@ -77,10 +77,21 @@ public class ProjectPropertySaver {
 
 	private List<ProjectProperty> createVariableProperties(DmsProject project, DMSVariableType variableType)
 			throws MiddlewareQueryException {
+
 		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum =
 				this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(variableType.getRole());
-		int variableTypeId = variableTypeEnum.getId();
+		int variableTypeId;
+
+		// This makes sure that selection values are actually saved as selections in the projectprop tables. Note roles cannot be used for
+		// this as both selections and traits map to roles. Thus if the role has evaluated to a Trait varible type and the DMSVariableType
+		// is not null use the DMSVariableType as it could be a selection.
+		if (variableTypeEnum == org.generationcp.middleware.domain.ontology.VariableType.TRAIT && variableType.getVariableType() != null) {
+			variableTypeId = variableType.getVariableType().getId();
+		} else {
+			variableTypeId = variableTypeEnum.getId();
+		}
+		
 		properties.add(new ProjectProperty(project, variableTypeId, variableType.getLocalName(), variableType.getRank()));
 		properties.add(new ProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType
 				.getRank()));
@@ -141,6 +152,7 @@ public class ProjectPropertySaver {
 					.getRank());
 		}
 	}
+
 
 	private void saveProjectProperty(DmsProject project, int typeId, String value, int rank) throws MiddlewareQueryException {
 		ProjectProperty property = new ProjectProperty();
