@@ -34,6 +34,7 @@ public class DatasetValuesTransformer extends Transformer {
 			String value = null;
 			for (MeasurementVariable var : mvList) {
 				if (var.getTermId() == varType.getId()) {
+					varType.setVariableType(var.getVariableType());
 					value = var.getValue();
 				}
 			}

@@ -125,6 +125,12 @@ public class MeasurementVariable {
 
 	}
 
+	public MeasurementVariable(int termId, String name, String description, String scale, String method, String property, String dataType,
+			String value, String label, VariableType variableType) {
+		this(termId, name, description, scale, method, property, dataType, value, label);
+		this.variableType = variableType;
+	}
+
 	public int getTermId() {
 		return this.termId;
 	}
