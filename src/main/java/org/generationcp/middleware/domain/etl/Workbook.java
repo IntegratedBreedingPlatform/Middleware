@@ -824,6 +824,25 @@ public class Workbook {
 	}
 
 	/**
+	 * @return the trialObservation based on their trial instance no
+	 */
+	public MeasurementRow getTrialObservationByTrialInstanceNo(final Integer trialInstanceNo) {
+		MeasurementRow trialObservation = null;
+
+		if (this.trialObservations != null && !this.trialObservations.isEmpty()) {
+			for (final MeasurementRow row : this.trialObservations) {
+				final MeasurementData measurementData = row.getMeasurementData(TermId.TRIAL_INSTANCE_FACTOR.getId());
+				if (Integer.valueOf(measurementData.getValue()).intValue() == trialInstanceNo.intValue()) {
+					trialObservation = row;
+					break;
+				}
+			}
+		}
+
+		return trialObservation;
+	}
+
+	/**
 	 * @param trialObservations the trialObservations to set
 	 */
 	public void setTrialObservations(final List<MeasurementRow> trialObservations) {
@@ -1010,4 +1029,8 @@ public class Workbook {
 		this.columnOrderedLists = columnOrderedLists;
 	}
 
+	public boolean hasExistingExperimentalDesign() {
+		final ExperimentalDesignVariable expDesignVar = this.getExperimentalDesignVariables();
+		return expDesignVar != null &&  expDesignVar.getExperimentalDesign() != null && expDesignVar.getExperimentalDesign().getValue() != null;
+	}
 }

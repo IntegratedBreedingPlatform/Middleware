@@ -137,7 +137,7 @@ public interface FieldbookService {
 	 * @param locationIds the location ids
 	 * @return the favorite locations based on the given project id
 	 */
-	List<Location> getFavoriteLocationByProjectId(List<Long> locationIds);
+	List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
 
 	/**
 	 * Gets the study.
@@ -275,7 +275,7 @@ public interface FieldbookService {
 	List<ValueReference> getDistinctStandardVariableValues(String property, String scale, String method, PhenotypicType role);
 
 	/**
-	 * Get a standard variable given an id.
+	 * Get a standard variable given an id. After the first read, the variable is cached in memory.
 	 *
 	 * @param id the id
 	 * @param programUUID unique id of the program
@@ -568,6 +568,13 @@ public interface FieldbookService {
 	Integer addGermplasmName(String nameValue, int gid, int userId, int nameTypeId, int locationId, Integer date);
 
 	/**
+	 *
+	 * @param names The list of germplasm names to be added into the system
+	 * @return
+	 */
+	List<Integer> addGermplasmNames(List<Name> names);
+
+	/**
 	 * Adds a new Germplasm.
 	 *
 	 * @param nameValue the name value
@@ -584,6 +591,13 @@ public interface FieldbookService {
 	 * @return the integer
 	 */
 	Integer addGermplasm(Germplasm germplasm, Name name);
+
+	/**
+	 *
+	 * @param germplasmPairs
+	 * @return
+	 */
+	List<Integer> addGermplasm(List<Pair<Germplasm, Name>> germplasmPairs);
 
 	/**
 	 * Get an id from the project table that matches the name (regardless if it's a study or a folder).
@@ -684,7 +698,7 @@ public interface FieldbookService {
 	 * @param programUUID - unique id of program
 	 * @return the favorite project location ids
 	 */
-	List<Long> getFavoriteProjectLocationIds(String programUUID);
+	List<Integer> getFavoriteProjectLocationIds(String programUUID);
 
 	/**
 	 * Gets the favorite project methods.
@@ -759,8 +773,7 @@ public interface FieldbookService {
 	 **/
 	StandardVariable getStandardVariableByName(String name, String programUUID);
 
-	List<StandardVariableReference> filterStandardVariablesByIsAIds(List<StandardVariableReference> standardReferences,
-			List<Integer> isAIds);
+	List<StandardVariableReference> filterStandardVariablesByIsAIds(List<StandardVariableReference> standardReferences, List<Integer> isAIds);
 
 	Location getLocationByName(String locationName, Operation op);
 }

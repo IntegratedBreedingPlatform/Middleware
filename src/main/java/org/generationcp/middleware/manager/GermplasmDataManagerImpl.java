@@ -12,8 +12,6 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +69,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getAllGermplasm(final int start, final int numOfRows) throws MiddlewareQueryException {
+	public List<Germplasm> getAllGermplasm(final int start, final int numOfRows) {
 		return getGermplasmDao().getAll(start, numOfRows);
 	}
 
@@ -99,7 +97,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public long countGermplasmByLocationName(final String name, final Operation op) throws MiddlewareQueryException {
+	public long countGermplasmByLocationName(final String name, final Operation op) {
 		long count = 0;
 		final GermplasmDAO dao = this.getGermplasmDao();
 		if (op == Operation.EQUAL) {
@@ -111,8 +109,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getGermplasmByMethodName(final String name, final int start, final int numOfRows, final Operation op)
-			throws MiddlewareQueryException {
+	public List<Germplasm> getGermplasmByMethodName(final String name, final int start, final int numOfRows, final Operation op) {
 		List<Germplasm> germplasms = new ArrayList<Germplasm>();
 		final GermplasmDAO dao = this.getGermplasmDao();
 		if (op == Operation.EQUAL) {
@@ -124,7 +121,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public long countGermplasmByMethodName(final String name, final Operation op) throws MiddlewareQueryException {
+	public long countGermplasmByMethodName(final String name, final Operation op) {
 		long count = 0;
 		final GermplasmDAO dao = this.getGermplasmDao();
 		if (op == Operation.EQUAL) {
@@ -136,7 +133,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Germplasm getGermplasmByGID(final Integer gid) throws MiddlewareQueryException {
+	public Germplasm getGermplasmByGID(final Integer gid) {
 		Integer updatedGid = gid;
 		Germplasm germplasm = null;
 		do {
@@ -149,7 +146,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Germplasm getGermplasmWithPrefName(final Integer gid) throws MiddlewareQueryException {
+	public Germplasm getGermplasmWithPrefName(final Integer gid) {
 		final Germplasm germplasm = this.getGermplasmByGID(gid);
 		if (germplasm != null) {
 			final Name preferredName = this.getPreferredNameByGID(germplasm.getGid());
@@ -159,22 +156,22 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Germplasm getGermplasmWithPrefAbbrev(final Integer gid) throws MiddlewareQueryException {
+	public Germplasm getGermplasmWithPrefAbbrev(final Integer gid) {
 		return this.getGermplasmDao().getByGIDWithPrefAbbrev(gid);
 	}
 
 	@Override
-	public Name getGermplasmNameByID(final Integer id) throws MiddlewareQueryException {
+	public Name getGermplasmNameByID(final Integer id) {
 		return this.getNameDao().getById(id, false);
 	}
 
 	@Override
-	public List<Name> getNamesByGID(final Integer gid, final Integer status, final GermplasmNameType type) throws MiddlewareQueryException {
+	public List<Name> getNamesByGID(final Integer gid, final Integer status, final GermplasmNameType type) {
 		return this.getNameDao().getByGIDWithFilters(gid, status, type);
 	}
 
 	@Override
-	public Name getPreferredNameByGID(final Integer gid) throws MiddlewareQueryException {
+	public Name getPreferredNameByGID(final Integer gid) {
 		final List<Name> names = this.getNameDao().getByGIDWithFilters(gid, 1, null);
 		if (!names.isEmpty()) {
 			return names.get(0);
@@ -183,7 +180,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public String getPreferredNameValueByGID(final Integer gid) throws MiddlewareQueryException {
+	public String getPreferredNameValueByGID(final Integer gid) {
 		final List<Name> names = this.getNameDao().getByGIDWithFilters(gid, 1, null);
 		if (!names.isEmpty()) {
 			return names.get(0).getNval();
@@ -192,7 +189,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Name getPreferredAbbrevByGID(final Integer gid) throws MiddlewareQueryException {
+	public Name getPreferredAbbrevByGID(final Integer gid) {
 		final List<Name> names = this.getNameDao().getByGIDWithFilters(gid, 2, null);
 		if (!names.isEmpty()) {
 			return names.get(0);
@@ -201,7 +198,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Name getPreferredIdByGID(final Integer gid) throws MiddlewareQueryException {
+	public Name getPreferredIdByGID(final Integer gid) {
 		final List<Name> names = this.getNameDao().getByGIDWithFilters(gid, 8, null);
 		if (!names.isEmpty()) {
 			return names.get(0);
@@ -210,30 +207,28 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Name> getPreferredIdsByListId(final Integer listId) throws MiddlewareQueryException {
+	public List<Name> getPreferredIdsByListId(final Integer listId) {
 		return this.getNameDao().getPreferredIdsByListId(listId);
 	}
 
 	@Override
-	public Name getNameByGIDAndNval(final Integer gid, final String nval, final GetGermplasmByNameModes mode)
-			throws MiddlewareQueryException {
+	public Name getNameByGIDAndNval(final Integer gid, final String nval, final GetGermplasmByNameModes mode) {
 		return this.getNameDao().getByGIDAndNval(gid, GermplasmDataManagerUtil.getNameToUseByMode(nval, mode));
 	}
 
 	@Override
-	public Integer updateGermplasmPrefName(final Integer gid, final String newPrefName) throws MiddlewareQueryException {
+	public Integer updateGermplasmPrefName(final Integer gid, final String newPrefName) {
 		this.updateGermplasmPrefNameAbbrev(gid, newPrefName, "Name");
 		return gid;
 	}
 
 	@Override
-	public Integer updateGermplasmPrefAbbrev(final Integer gid, final String newPrefAbbrev) throws MiddlewareQueryException {
+	public Integer updateGermplasmPrefAbbrev(final Integer gid, final String newPrefAbbrev) {
 		this.updateGermplasmPrefNameAbbrev(gid, newPrefAbbrev, "Abbreviation");
 		return gid;
 	}
 
-	private void updateGermplasmPrefNameAbbrev(final Integer gid, final String newPrefValue, final String nameOrAbbrev)
-			throws MiddlewareQueryException {
+	private void updateGermplasmPrefNameAbbrev(final Integer gid, final String newPrefValue, final String nameOrAbbrev) {
 
 		try {
 			// begin update transaction
@@ -279,7 +274,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Integer addGermplasmName(final Name name) throws MiddlewareQueryException {
+	public Integer addGermplasmName(final Name name) {
 		final List<Name> names = new ArrayList<Name>();
 		names.add(name);
 		final List<Integer> ids = this.addOrUpdateGermplasmName(names, Operation.ADD);
@@ -287,12 +282,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Integer> addGermplasmName(final List<Name> names) throws MiddlewareQueryException {
+	public List<Integer> addGermplasmName(final List<Name> names) {
 		return this.addOrUpdateGermplasmName(names, Operation.ADD);
 	}
 
 	@Override
-	public Integer updateGermplasmName(final Name name) throws MiddlewareQueryException {
+	public Integer updateGermplasmName(final Name name) {
 		final List<Name> names = new ArrayList<Name>();
 		names.add(name);
 		final List<Integer> ids = this.addOrUpdateGermplasmName(names, Operation.UPDATE);
@@ -300,11 +295,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Integer> updateGermplasmName(final List<Name> names) throws MiddlewareQueryException {
+	public List<Integer> updateGermplasmName(final List<Name> names) {
 		return this.addOrUpdateGermplasmName(names, Operation.UPDATE);
 	}
 
-	private List<Integer> addOrUpdateGermplasmName(final List<Name> names, final Operation operation) throws MiddlewareQueryException {
+	private List<Integer> addOrUpdateGermplasmName(final List<Name> names, final Operation operation) {
 		final List<Integer> idNamesSaved = new ArrayList<Integer>();
 		try {
 
@@ -323,18 +318,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Attribute> getAttributesByGID(final Integer gid) throws MiddlewareQueryException {
+	public List<Attribute> getAttributesByGID(final Integer gid) {
 		return this.getAttributeDao().getByGID(gid);
 	}
 
 	@Override
-	public List<UserDefinedField> getAttributeTypesByGIDList(final List<Integer> gidList) throws MiddlewareQueryException {
+	public List<UserDefinedField> getAttributeTypesByGIDList(final List<Integer> gidList) {
 		return this.getAttributeDao().getAttributeTypesByGIDList(gidList);
 	}
 
 	@Override
-	public Map<Integer, String> getAttributeValuesByTypeAndGIDList(final Integer attributeType, final List<Integer> gidList)
-			throws MiddlewareQueryException {
+	public Map<Integer, String> getAttributeValuesByTypeAndGIDList(final Integer attributeType, final List<Integer> gidList) {
 		final Map<Integer, String> returnMap = new HashMap<Integer, String>();
 		// initialize map with GIDs
 		for (final Integer gid : gidList) {
@@ -351,12 +345,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Method getMethodByID(final Integer id) throws MiddlewareQueryException {
+	public Method getMethodByID(final Integer id) {
 		return this.getMethodDao().getById(id, false);
 	}
 
 	@Override
-	public List<Method> getMethodsByIDs(final List<Integer> ids) throws MiddlewareQueryException {
+	public List<Method> getMethodsByIDs(final List<Integer> ids) {
 		final List<Method> results = new ArrayList<Method>();
 
 		if (!ids.isEmpty()) {
@@ -367,83 +361,87 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Method> getAllMethods() throws MiddlewareQueryException {
+	public List<Method> getNonGenerativeMethodsByID(final List<Integer> ids) {
+		return this.getMethodDao().getMethodsNotGenerativeById(ids);
+	}
+
+	@Override
+	public List<Method> getAllMethods() {
 		return this.getMethodDao().getAllMethod();
 	}
 
 	@Override
-	public List<Method> getAllMethodsNotGenerative() throws MiddlewareQueryException {
+	public List<Method> getAllMethodsNotGenerative() {
 		return this.getMethodDao().getAllMethodsNotGenerative();
 	}
 
 	@Override
-	public long countAllMethods() throws MiddlewareQueryException {
+	public long countAllMethods() {
 		return this.countAll(this.getMethodDao());
 	}
 
 	@Override
-	public List<Method> getMethodsByUniqueID(final String programUUID) throws MiddlewareQueryException {
+	public List<Method> getMethodsByUniqueID(final String programUUID) {
 		return this.getMethodDao().getByUniqueID(programUUID);
 	}
 
 	@Override
-	public long countMethodsByUniqueID(final String programUUID) throws MiddlewareQueryException {
+	public long countMethodsByUniqueID(final String programUUID) {
 		return this.getMethodDao().countByUniqueID(programUUID);
 	}
 
 	@Override
-	public List<Method> getMethodsByType(final String type) throws MiddlewareQueryException {
+	public List<Method> getMethodsByType(final String type) {
 		return this.getMethodDao().getByType(type);
 	}
 
 	@Override
-	public List<Method> getMethodsByType(final String type, final String programUUID) throws MiddlewareQueryException {
+	public List<Method> getMethodsByType(final String type, final String programUUID) {
 		return this.getMethodDao().getByType(type, programUUID);
 	}
 
 	@Override
-	public List<Method> getMethodsByType(final String type, final int start, final int numOfRows) throws MiddlewareQueryException {
+	public List<Method> getMethodsByType(final String type, final int start, final int numOfRows) {
 		return this.getMethodDao().getByType(type, start, numOfRows);
 	}
 
 	@Override
-	public long countMethodsByType(final String type) throws MiddlewareQueryException {
+	public long countMethodsByType(final String type) {
 		return this.getMethodDao().countByType(type);
 	}
 
 	@Override
-	public long countMethodsByType(final String type, final String programUUID) throws MiddlewareQueryException {
+	public long countMethodsByType(final String type, final String programUUID) {
 		return this.getMethodDao().countByType(type, programUUID);
 	}
 
 	@Override
-	public List<Method> getMethodsByGroup(final String group) throws MiddlewareQueryException {
+	public List<Method> getMethodsByGroup(final String group) {
 		return this.getMethodDao().getByGroup(group);
 	}
 
 	@Override
-	public List<Method> getMethodsByGroup(final String group, final int start, final int numOfRows) throws MiddlewareQueryException {
+	public List<Method> getMethodsByGroup(final String group, final int start, final int numOfRows) {
 		return this.getMethodDao().getByGroup(group, start, numOfRows);
 	}
 
 	@Override
-	public List<Method> getMethodsByGroupAndType(final String group, final String type) throws MiddlewareQueryException {
+	public List<Method> getMethodsByGroupAndType(final String group, final String type) {
 		return this.getMethodDao().getByGroupAndType(group, type);
 	}
 
 	@Override
-	public List<Method> getMethodsByGroupAndTypeAndName(final String group, final String type, final String name)
-			throws MiddlewareQueryException {
+	public List<Method> getMethodsByGroupAndTypeAndName(final String group, final String type, final String name) {
 		return this.getMethodDao().getByGroupAndTypeAndName(group, type, name);
 	}
 
 	@Override
-	public long countMethodsByGroup(final String group) throws MiddlewareQueryException {
+	public long countMethodsByGroup(final String group) {
 		return this.getMethodDao().countByGroup(group);
 	}
 
 	@Override
-	public Integer addMethod(final Method method) throws MiddlewareQueryException {
+	public Integer addMethod(final Method method) {
 
 		Integer methodId = null;
 		try {
@@ -462,7 +460,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Method editMethod(final Method method) throws MiddlewareQueryException {
+	public Method editMethod(final Method method) {
 
 		Method recordSaved = null;
 
@@ -486,7 +484,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Integer> addMethod(final List<Method> methods) throws MiddlewareQueryException {
+	public List<Integer> addMethod(final List<Method> methods) {
 
 		final List<Integer> idMethodsSaved = new ArrayList<Integer>();
 		try {
@@ -507,7 +505,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public void deleteMethod(final Method method) throws MiddlewareQueryException {
+	public void deleteMethod(final Method method) {
 
 		try {
 
@@ -521,12 +519,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public UserDefinedField getUserDefinedFieldByID(final Integer id) throws MiddlewareQueryException {
+	public UserDefinedField getUserDefinedFieldByID(final Integer id) {
 		return this.getUserDefinedFieldDao().getById(id, false);
 	}
 
 	@Override
-	public UserDefinedField getUserDefinedFieldByLocalFieldNo(final Integer lfldno) throws MiddlewareQueryException {
+	public UserDefinedField getUserDefinedFieldByLocalFieldNo(final Integer lfldno) {
 		return this.getUserDefinedFieldDao().getByLocalFieldNo(lfldno);
 	}
 
@@ -535,7 +533,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	 */
 	@Override
 	@Deprecated
-	public Country getCountryById(final Integer id) throws MiddlewareQueryException {
+	public Country getCountryById(final Integer id) {
 		return this.getCountryDao().getById(id, false);
 	}
 
@@ -544,7 +542,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	 */
 	@Override
 	@Deprecated
-	public Location getLocationByID(final Integer id) throws MiddlewareQueryException {
+	public Location getLocationByID(final Integer id) {
 		return this.getLocationDao().getById(id, false);
 	}
 
@@ -553,33 +551,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	 */
 	@Override
 	@Deprecated
-	public List<Location> getLocationsByIDs(final List<Integer> ids) throws MiddlewareQueryException {
-		final List<Location> results = new ArrayList<>();
-
-		if (ids != null && !ids.isEmpty()) {
-			results.addAll(this.getLocationDao().getLocationByIds(ids));
-		}
-
-		Collections.sort(results, new Comparator<Object>() {
-
-			@Override
-			public int compare(final Object obj1, final Object obj2) {
-				final Location loc1 = (Location) obj1;
-				final Location loc2 = (Location) obj2;
-				return loc1.getLname().compareToIgnoreCase(loc2.getLname());
-			}
-		});
-
-		return results;
+	public List<Location> getLocationsByIDs(final List<Integer> ids) {
+		return this.getLocationDao().getLocationByIds(ids);
 	}
 
 	@Override
-	public Bibref getBibliographicReferenceByID(final Integer id) throws MiddlewareQueryException {
+	public Bibref getBibliographicReferenceByID(final Integer id) {
 		return this.getBibrefDao().getById(id, false);
 	}
 
 	@Override
-	public Integer addBibliographicReference(final Bibref bibref) throws MiddlewareQueryException {
+	public Integer addBibliographicReference(final Bibref bibref) {
 
 		Integer idBibrefSaved = null;
 		try {
@@ -599,7 +581,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Integer addGermplasmAttribute(final Attribute attribute) throws MiddlewareQueryException {
+	public Integer addGermplasmAttribute(final Attribute attribute) {
 		final List<Attribute> attributes = new ArrayList<>();
 		attributes.add(attribute);
 		final List<Integer> ids = this.addGermplasmAttribute(attributes);
@@ -607,12 +589,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Integer> addGermplasmAttribute(final List<Attribute> attributes) throws MiddlewareQueryException {
+	public List<Integer> addGermplasmAttribute(final List<Attribute> attributes) {
 		return this.addOrUpdateAttributes(attributes, Operation.ADD);
 	}
 
 	@Override
-	public Integer updateGermplasmAttribute(final Attribute attribute) throws MiddlewareQueryException {
+	public Integer updateGermplasmAttribute(final Attribute attribute) {
 		final List<Attribute> attributes = new ArrayList<>();
 		attributes.add(attribute);
 		final List<Integer> ids = this.updateGermplasmAttribute(attributes);
@@ -620,12 +602,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Integer> updateGermplasmAttribute(final List<Attribute> attributes) throws MiddlewareQueryException {
+	public List<Integer> updateGermplasmAttribute(final List<Attribute> attributes) {
 		return this.addOrUpdateAttributes(attributes, Operation.UPDATE);
 	}
 
-	private List<Integer> addOrUpdateAttributes(final List<Attribute> attributes, final Operation operation)
-			throws MiddlewareQueryException {
+	private List<Integer> addOrUpdateAttributes(final List<Attribute> attributes, final Operation operation) {
 
 		final List<Integer> idAttributesSaved = new ArrayList<>();
 		try {
@@ -648,13 +629,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Attribute getAttributeById(final Integer id) throws MiddlewareQueryException {
+	public Attribute getAttributeById(final Integer id) {
 		return this.getAttributeDao().getById(id, false);
 	}
 
 	@Override
-	public Integer updateProgenitor(final Integer gid, final Integer progenitorId, final Integer progenitorNumber)
-			throws MiddlewareQueryException {
+	public Integer updateProgenitor(final Integer gid, final Integer progenitorId, final Integer progenitorNumber) {
 
 		// check if the germplasm record identified by gid exists
 		final Germplasm child = this.getGermplasmByGID(gid);
@@ -721,8 +701,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return progenitorId;
 	}
 
-	private List<Integer> addOrUpdateGermplasms(final List<Germplasm> germplasms, final Operation operation)
-			throws MiddlewareQueryException {
+	private List<Integer> addOrUpdateGermplasms(final List<Germplasm> germplasms, final Operation operation) {
 		final List<Integer> idGermplasmsSaved = new ArrayList<Integer>();
 		try {
 			final GermplasmDAO dao = this.getGermplasmDao();
@@ -742,7 +721,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return idGermplasmsSaved;
 	}
 
-	private int addOrUpdateProgenitors(final List<Progenitor> progenitors) throws MiddlewareQueryException {
+	private int addOrUpdateProgenitors(final List<Progenitor> progenitors) {
 
 		int progenitorsSaved = 0;
 		try {
@@ -764,7 +743,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Integer updateGermplasm(final Germplasm germplasm) throws MiddlewareQueryException {
+	public Integer updateGermplasm(final Germplasm germplasm) {
 		final List<Germplasm> germplasms = new ArrayList<Germplasm>();
 		germplasms.add(germplasm);
 		final List<Integer> ids = this.updateGermplasm(germplasms);
@@ -772,7 +751,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Integer> updateGermplasm(final List<Germplasm> germplasms) throws MiddlewareQueryException {
+	public List<Integer> updateGermplasm(final List<Germplasm> germplasms) {
 		if (germplasms != null) {
 			final List<Integer> gids = new ArrayList<Integer>();
 			for (final Germplasm germplasm : germplasms) {
@@ -788,7 +767,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Integer addGermplasm(final Germplasm germplasm, final Name preferredName) throws MiddlewareQueryException {
+	public Integer addGermplasm(final Germplasm germplasm, final Name preferredName) {
 		final List<Pair<Germplasm, Name>> pairList = new ArrayList<>();
 		pairList.add(new ImmutablePair<Germplasm, Name>(germplasm, preferredName));
 		final List<Integer> ids = this.addGermplasm(pairList);
@@ -796,7 +775,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Integer> addGermplasm(final Map<Germplasm, Name> germplasmNameMap) throws MiddlewareQueryException {
+	public List<Integer> addGermplasm(final Map<Germplasm, Name> germplasmNameMap) {
 		final List<Pair<Germplasm, Name>> pairList = new ArrayList<>();
 		for (final Map.Entry<Germplasm, Name> entry : germplasmNameMap.entrySet()) {
 			final Pair<Germplasm, Name> pair = new ImmutablePair<>(entry.getKey(), entry.getValue());
@@ -835,7 +814,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Integer addUserDefinedField(final UserDefinedField field) throws MiddlewareQueryException {
+	public Integer addUserDefinedField(final UserDefinedField field) {
 
 		try {
 
@@ -852,7 +831,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Integer> addUserDefinedFields(final List<UserDefinedField> fields) throws MiddlewareQueryException {
+	public List<Integer> addUserDefinedFields(final List<UserDefinedField> fields) {
 
 		final List<Integer> isUdfldSaved = new ArrayList<>();
 		try {
@@ -876,7 +855,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Integer addAttribute(final Attribute attr) throws MiddlewareQueryException {
+	public Integer addAttribute(final Attribute attr) {
 
 		Integer isAttrSaved = 0;
 		try {
@@ -895,7 +874,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Integer> addAttributes(final List<Attribute> attrs) throws MiddlewareQueryException {
+	public List<Integer> addAttributes(final List<Attribute> attrs) {
 
 		final List<Integer> isAttrSaved = new ArrayList<Integer>();
 		try {
@@ -918,7 +897,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(final List<String> germplasmNames,
-			final GetGermplasmByNameModes mode) throws MiddlewareQueryException {
+			final GetGermplasmByNameModes mode) {
 		final List<String> namesToUse = GermplasmDataManagerUtil.getNamesToUseByMode(germplasmNames, mode);
 		return this.getNameDao().getGermplasmNameDetailsByNames(namesToUse, mode);
 	}
@@ -928,18 +907,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	 */
 	@Override
 	@Deprecated
-	public List<Country> getAllCountry() throws MiddlewareQueryException {
+	public List<Country> getAllCountry() {
 		return this.getCountryDao().getAllCountry();
 	}
 
 	@Override
-	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final String fieldType)
-			throws MiddlewareQueryException {
+	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final String fieldType) {
 		return this.getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, fieldType);
 	}
 
 	@Override
-	public List<Method> getMethodsByGroupIncludesGgroup(final String group) throws MiddlewareQueryException {
+	public List<Method> getMethodsByGroupIncludesGgroup(final String group) {
 		return this.getMethodDao().getByGroupIncludesGgroup(group);
 	}
 
@@ -948,19 +926,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	 */
 	@Override
 	@Deprecated
-	public List<Location> getAllBreedingLocations() throws MiddlewareQueryException {
+	public List<Location> getAllBreedingLocations() {
 		return getLocationDAO().getAllBreedingLocations();
 	}
 
 	@Override
-	public String getNextSequenceNumberForCrossName(final String prefix) throws MiddlewareQueryException {
+	public String getNextSequenceNumberForCrossName(final String prefix) {
 		String nextSequenceStr = "1";
 		nextSequenceStr = this.getGermplasmDao().getNextSequenceNumberForCrossName(prefix);
 		return nextSequenceStr;
 	}
 
 	@Override
-	public Map<Integer, String> getPrefferedIdsByGIDs(final List<Integer> gids) throws MiddlewareQueryException {
+	public Map<Integer, String> getPrefferedIdsByGIDs(final List<Integer> gids) {
 		final Map<Integer, String> toreturn = new HashMap<Integer, String>();
 
 		if (!gids.isEmpty()) {
@@ -973,19 +951,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getGermplasmByLocationId(final String name, final int locationID) throws MiddlewareQueryException {
+	public List<Germplasm> getGermplasmByLocationId(final String name, final int locationID) {
 		final List<Germplasm> germplasmList = new ArrayList<>();
 		germplasmList.addAll(this.getGermplasmDao().getByLocationId(name, locationID));
 		return germplasmList;
 	}
 
 	@Override
-	public Germplasm getGermplasmWithMethodType(final Integer gid) throws MiddlewareQueryException {
+	public Germplasm getGermplasmWithMethodType(final Integer gid) {
 		return this.getGermplasmDao().getByGIDWithMethodType(gid);
 	}
 
 	@Override
-	public List<Germplasm> getGermplasmByGidRange(final int startGIDParam, final int endGIDParam) throws MiddlewareQueryException {
+	public List<Germplasm> getGermplasmByGidRange(final int startGIDParam, final int endGIDParam) {
 		final List<Germplasm> germplasmList = new ArrayList<>();
 
 		int startGID = startGIDParam;
@@ -1002,14 +980,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getGermplasms(final List<Integer> gids) throws MiddlewareQueryException {
+	public List<Germplasm> getGermplasms(final List<Integer> gids) {
 		final List<Germplasm> germplasmList = new ArrayList<>();
 		germplasmList.addAll(this.getGermplasmDao().getByGIDList(gids));
 		return germplasmList;
 	}
 
 	@Override
-	public Map<Integer, String> getPreferredNamesByGids(final List<Integer> gids) throws MiddlewareQueryException {
+	public Map<Integer, String> getPreferredNamesByGids(final List<Integer> gids) {
 		final Map<Integer, String> toreturn = new HashMap<>();
 
 		if (!gids.isEmpty()) {
@@ -1023,23 +1001,23 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Map<Integer, String> getLocationNamesByGids(final List<Integer> gids) throws MiddlewareQueryException {
+	public Map<Integer, String> getLocationNamesByGids(final List<Integer> gids) {
 		return this.getLocationDao().getLocationNamesMapByGIDs(gids);
 	}
 
 	@Override
 	public List<Germplasm> searchForGermplasm(final String q, final Operation o, final boolean includeParents,
-			final boolean withInventoryOnly) throws MiddlewareQueryException {
+			final boolean withInventoryOnly) {
 		return this.getGermplasmDao().searchForGermplasms(q, o, includeParents, withInventoryOnly);
 	}
 
 	@Override
-	public Map<Integer, Integer> getGermplasmDatesByGids(final List<Integer> gids) throws MiddlewareQueryException {
+	public Map<Integer, Integer> getGermplasmDatesByGids(final List<Integer> gids) {
 		return this.getGermplasmDao().getGermplasmDatesByGids(gids);
 	}
 
 	@Override
-	public Map<Integer, Object> getMethodsByGids(final List<Integer> gids) throws MiddlewareQueryException {
+	public Map<Integer, Object> getMethodsByGids(final List<Integer> gids) {
 
 		final Map<Integer, Object> results = new HashMap<>();
 		Map<Integer, Integer> methodIds = new HashMap<>();
@@ -1054,7 +1032,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Term> getMethodClasses() throws MiddlewareQueryException {
+	public List<Term> getMethodClasses() {
 		final List<Integer> ids = new ArrayList<Integer>();
 		ids.add(TermId.BULKING_BREEDING_METHOD_CLASS.getId());
 		ids.add(TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
@@ -1071,21 +1049,21 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Method getMethodByCode(final String code, final String programUUID) throws MiddlewareQueryException {
+	public Method getMethodByCode(final String code, final String programUUID) {
 		Method method = new Method();
 		method = this.getMethodDao().getByCode(code, programUUID);
 		return method;
 	}
 
 	@Override
-	public Method getMethodByCode(final String code) throws MiddlewareQueryException {
+	public Method getMethodByCode(final String code) {
 		Method method = new Method();
 		method = this.getMethodDao().getByCode(code);
 		return method;
 	}
 
 	@Override
-	public Method getMethodByName(final String name) throws MiddlewareQueryException {
+	public Method getMethodByName(final String name) {
 		List<Method> methods = new ArrayList<Method>();
 		methods = this.getMethodDao().getByName(name);
 		if (methods != null && !methods.isEmpty()) {
@@ -1096,7 +1074,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Method getMethodByName(final String name, final String programUUID) throws MiddlewareQueryException {
+	public Method getMethodByName(final String name, final String programUUID) {
 		List<Method> methods = new ArrayList<Method>();
 		methods = this.getMethodDao().getByName(name, programUUID);
 		if (methods != null && !methods.isEmpty()) {
@@ -1107,28 +1085,27 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getProgenitorsByGIDWithPrefName(final Integer gid) throws MiddlewareQueryException {
+	public List<Germplasm> getProgenitorsByGIDWithPrefName(final Integer gid) {
 		return this.getGermplasmDao().getProgenitorsByGIDWithPrefName(gid);
 	}
 
 	@Override
-	public List<ProgramFavorite> getProgramFavorites(final FavoriteType type, final String programUUID) throws MiddlewareQueryException {
+	public List<ProgramFavorite> getProgramFavorites(final FavoriteType type, final String programUUID) {
 		return this.getProgramFavoriteDao().getProgramFavorites(type, programUUID);
 	}
 
 	@Override
-	public int countProgramFavorites(final FavoriteType type) throws MiddlewareQueryException {
+	public int countProgramFavorites(final FavoriteType type) {
 		return this.getProgramFavoriteDao().countProgramFavorites(type);
 	}
 
 	@Override
-	public List<ProgramFavorite> getProgramFavorites(final FavoriteType type, final int max, final String programUUID)
-			throws MiddlewareQueryException {
+	public List<ProgramFavorite> getProgramFavorites(final FavoriteType type, final int max, final String programUUID) {
 		return this.getProgramFavoriteDao().getProgramFavorites(type, max, programUUID);
 	}
 
 	@Override
-	public void saveProgramFavorites(final List<ProgramFavorite> list) throws MiddlewareQueryException {
+	public void saveProgramFavorites(final List<ProgramFavorite> list) {
 
 		try {
 			final ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
@@ -1146,7 +1123,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public void saveProgramFavorite(final ProgramFavorite favorite) throws MiddlewareQueryException {
+	public void saveProgramFavorite(final ProgramFavorite favorite) {
 
 		try {
 
@@ -1163,7 +1140,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public void deleteProgramFavorites(final List<ProgramFavorite> list) throws MiddlewareQueryException {
+	public void deleteProgramFavorites(final List<ProgramFavorite> list) {
 		try {
 			final ProgramFavoriteDAO dao = this.getProgramFavoriteDao();
 			for (final ProgramFavorite favorite : list) {
@@ -1178,7 +1155,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public void deleteProgramFavorite(final ProgramFavorite favorite) throws MiddlewareQueryException {
+	public void deleteProgramFavorite(final ProgramFavorite favorite) {
 
 		try {
 
@@ -1195,23 +1172,22 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public int getMaximumSequence(final boolean isBulk, final String prefix, final String suffix, final int count)
-			throws MiddlewareQueryException {
+	public int getMaximumSequence(final boolean isBulk, final String prefix, final String suffix, final int count) {
 		return this.getNameBuilder().getMaximumSequence(isBulk, prefix, suffix, count);
 	}
 
 	@Override
-	public boolean checkIfMatches(final String name) throws MiddlewareQueryException {
+	public boolean checkIfMatches(final String name) {
 		return this.getNameDao().checkIfMatches(name);
 	}
 
 	@Override
-	public List<Method> getProgramMethods(final String programUUID) throws MiddlewareQueryException {
+	public List<Method> getProgramMethods(final String programUUID) {
 		return this.getMethodDao().getProgramMethods(programUUID);
 	}
 
 	@Override
-	public void deleteProgramMethodsByUniqueId(final String programUUID) throws MiddlewareQueryException {
+	public void deleteProgramMethodsByUniqueId(final String programUUID) {
 
 		final MethodDAO methodDao = this.getMethodDao();
 		try {
@@ -1304,7 +1280,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Germplasm getGermplasmByLocalGid(final Integer lgid) throws MiddlewareQueryException {
+	public Germplasm getGermplasmByLocalGid(final Integer lgid) {
 		return this.getGermplasmDao().getByLGid(lgid);
+	}
+
+	@Override
+	public Map<String, Integer> getCountByNamePermutations(List<String> names) {
+		return this.getNameDao().getCountByNamePermutations(names);
 	}
 }

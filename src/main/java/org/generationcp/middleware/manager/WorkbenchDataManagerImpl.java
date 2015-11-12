@@ -838,9 +838,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<CropType> getInstalledCentralCrops() throws MiddlewareQueryException {
+	public List<CropType> getInstalledCropDatabses() {
 		return this.getCropTypeDao().getAll();
-
 	}
 
 	@Override
@@ -994,7 +993,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	@Override
 	public Integer addIbdbUserMap(IbdbUserMap userMap) throws MiddlewareQueryException {
-		
+
 
 		try {
 			IbdbUserMap existingMapping = this.getIbdbUserMap(userMap.getWorkbenchUserId(), userMap.getProjectId());

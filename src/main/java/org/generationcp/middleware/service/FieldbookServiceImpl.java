@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
@@ -145,16 +146,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Location> getFavoriteLocationByProjectId(final List<Long> locationIds) {
-		final List<Location> locationList = new ArrayList<Location>();
-
-		for (int i = 0; i < locationIds.size(); i++) {
-			final Integer locationId = Integer.valueOf(locationIds.get(i).toString());
-			final Location location = this.getLocationDataManager().getLocationByID(locationId);
-
-			locationList.add(location);
-		}
-		return locationList;
+	public List<Location> getFavoriteLocationByLocationIDs(final List<Integer> locationIds) {
+		return this.getLocationDataManager().getLocationsByIDs(locationIds);
 	}
 
 	@Override
@@ -283,27 +276,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Method> getFavoriteBreedingMethods(final List<Integer> methodIds, final boolean filterOutGenerative) {
-		final List<Method> methodList = new ArrayList<Method>();
-		final List<Integer> validMethodClasses = new ArrayList<Integer>();
-		validMethodClasses.addAll(Method.BULKED_CLASSES);
-		validMethodClasses.addAll(Method.NON_BULKED_CLASSES);
-		for (int i = 0; i < methodIds.size(); i++) {
-			final Integer methodId = methodIds.get(i);
-			final Method method = this.getGermplasmDataManager().getMethodByID(methodId);
-			// filter out generative method types
-
-			if (method == null) {
-				continue;
-			}
-			if (!filterOutGenerative) {
-				methodList.add(method);
-			} else if ((method.getMtype() == null || !"GEN".equals(method.getMtype())) && method.getGeneq() != null
-					&& validMethodClasses.contains(method.getGeneq())) {
-				methodList.add(method);
-			}
+		final List<Method> methodList;
+		if (filterOutGenerative) {
+			methodList = getGermplasmDataManager().getNonGenerativeMethodsByID(methodIds);
+		} else {
+			methodList = getGermplasmDataManager().getMethodsByIDs(methodIds);
 		}
 
-		FieldbookListUtil.sortMethodNamesInAscendingOrder(methodList);
 		return methodList;
 	}
 
@@ -819,6 +798,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
+	public List<Integer> addGermplasmNames(final List<Name> names) {
+		return this.getGermplasmDataManager().addGermplasmName(names);
+	}
+
+	@Override
 	public Integer addGermplasm(final String nameValue, final int userId) {
 		final Name name = new Name(null, null, 1, 1, userId, nameValue, 0, 0, 0);
 		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, userId, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
@@ -828,6 +812,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Integer addGermplasm(final Germplasm germplasm, final Name name) {
 		return this.getGermplasmDataManager().addGermplasm(germplasm, name);
+	}
+
+	public List<Integer> addGermplasm(final List<Pair<Germplasm, Name>> germplasmPairs) {
+		return this.getGermplasmDataManager().addGermplasm(germplasmPairs);
 	}
 
 	@Override
@@ -914,16 +902,17 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Long> getFavoriteProjectLocationIds(final String programUUID) {
+	public List<Integer> getFavoriteProjectLocationIds(final String programUUID) {
 		final List<ProgramFavorite> favList =
 				this.getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
-		final List<Long> longVals = new ArrayList<Long>();
+		final List<Integer> favoriteList = new ArrayList<>();
 		if (favList != null && !favList.isEmpty()) {
 			for (final ProgramFavorite fav : favList) {
-				longVals.add(Long.valueOf(Integer.toString(fav.getEntityId())));
+				favoriteList.add(fav.getEntityId());
+
 			}
 		}
-		return longVals;
+		return favoriteList;
 	}
 
 	@Override

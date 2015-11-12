@@ -230,66 +230,19 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@SuppressWarnings("rawtypes")
 	@Override
 	public List<Location> getLocationsByIDs(List<Integer> ids) throws MiddlewareQueryException {
-		List<Location> results = new ArrayList<Location>();
-
-		if (ids != null && !ids.isEmpty()) {
-			results.addAll(this.getLocationDao().getLocationByIds(ids));
-		}
-
-		Collections.sort(results, new Comparator() {
-
-			@Override
-			public int compare(Object obj1, Object obj2) {
-				Location loc1 = (Location) obj1;
-				Location loc2 = (Location) obj2;
-				return loc1.getLname().compareToIgnoreCase(loc2.getLname());
-			}
-		});
-
-		return results;
-	}
-
-	@Override
-	public List<LocationDetails> getLocationDetailsByLocationIDs(List<Integer> ids) throws MiddlewareQueryException {
-		List<LocationDetails> results = new ArrayList<LocationDetails>();
-
-		if (ids != null && !ids.isEmpty()) {
-			List<Location> locations = this.getLocationDao().getLocationByIds(ids);
-
-			for (Location l : locations) {
-				Country c = this.getCountryById(l.getCntryid());
-				UserDefinedField udf = this.getUserDefinedFieldByID(l.getLtype());
-
-				LocationDetails ld = new LocationDetails();
-				ld.setCntryid(l.getCntryid());
-				ld.setCountryFullName(c.getIsofull());
-				ld.setLocationAbbreviation(l.getLabbr());
-				ld.setLocationName(l.getLname());
-				ld.setLtype(l.getLtype());
-				ld.setLocationType(udf.getFname());
-				ld.setLocationDescription(udf.getFdesc());
-
-				results.add(ld);
-			}
-		}
-
-		return results;
+		return this.getLocationDao().getLocationByIds(ids);
 	}
 
 	@Override
 	public Integer addLocation(Location location) throws MiddlewareQueryException {
-		
-		
 
 		Integer idLocationSaved = null;
 		try {
-			
 
 			LocationDAO dao = this.getLocationDao();
 
 			Location recordSaved = dao.saveOrUpdate(location);
 			idLocationSaved = recordSaved.getLocid();
-
 
 		} catch (Exception e) {
 
@@ -301,12 +254,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<Integer> addLocation(List<Location> locations) throws MiddlewareQueryException {
-		
-		
 
 		List<Integer> idLocationsSaved = new ArrayList<Integer>();
 		try {
-			
 
 			LocationDAO dao = this.getLocationDao();
 
@@ -314,7 +264,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 				Location recordSaved = dao.saveOrUpdate(location);
 				idLocationsSaved.add(recordSaved.getLocid());
 			}
-
 
 		} catch (Exception e) {
 
@@ -326,13 +275,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public int addLocationAndLocdes(Location location, Locdes locdes) throws MiddlewareQueryException {
-		
-		
 
 		Integer idLocationSaved = null;
 		try {
-			
-
 
 			// Auto-assign IDs for new DB records
 			LocationDAO locationDao = this.getLocationDao();
@@ -343,7 +288,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			locdes.setLocationId(idLocationSaved);
 			locdesDao.saveOrUpdate(locdes);
 
-
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while saving Location: addLocationAndLocdes(" + "location=" + location
 					+ ", locdes=" + locdes + "): " + e.getMessage(), e);
@@ -353,8 +297,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public void deleteLocation(Location location) throws MiddlewareQueryException {
-		
-		
 
 		try {
 
@@ -528,8 +470,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public void deleteProgramLocationsByUniqueId(String programUUID) throws MiddlewareQueryException {
-		
-		
+
 		LocationDAO locationDao = this.getLocationDao();
 		try {
 			List<Location> list = this.getProgramLocations(programUUID);
