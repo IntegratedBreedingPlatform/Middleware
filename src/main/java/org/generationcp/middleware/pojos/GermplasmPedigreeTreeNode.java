@@ -11,7 +11,7 @@
 
 package org.generationcp.middleware.pojos;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -24,7 +24,11 @@ import java.util.List;
 public class GermplasmPedigreeTreeNode {
 
 	private Germplasm germplasm;
-	private List<GermplasmPedigreeTreeNode> linkedNodes = new ArrayList<GermplasmPedigreeTreeNode>();
+
+	/**
+	 * NOTE: The order of the linked nodes must be preserved so we used LinkedList here
+	 */
+	private List<GermplasmPedigreeTreeNode> linkedNodes = new LinkedList<GermplasmPedigreeTreeNode>();
 
 	public Germplasm getGermplasm() {
 		return this.germplasm;
