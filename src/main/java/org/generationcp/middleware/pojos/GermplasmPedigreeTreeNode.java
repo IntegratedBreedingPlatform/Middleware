@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos;
@@ -17,9 +17,9 @@ import java.util.List;
 /**
  * This class represents a node in a GermplasmPedigreeTree. Contains a Germplasm POJO and a List of GermplasmPedigreeTreeNodes containing
  * the linked germplasms.
- *
+ * 
  * @author Kevin Manansala
- *
+ * 
  */
 public class GermplasmPedigreeTreeNode {
 
@@ -30,7 +30,7 @@ public class GermplasmPedigreeTreeNode {
 		return this.germplasm;
 	}
 
-	public void setGermplasm(Germplasm germplasm) {
+	public void setGermplasm(final Germplasm germplasm) {
 		this.germplasm = germplasm;
 	}
 
@@ -43,7 +43,7 @@ public class GermplasmPedigreeTreeNode {
 		return this.linkedNodes;
 	}
 
-	public void setLinkedNodes(List<GermplasmPedigreeTreeNode> parents) {
+	public void setLinkedNodes(final List<GermplasmPedigreeTreeNode> parents) {
 		this.linkedNodes = parents;
 	}
 }
