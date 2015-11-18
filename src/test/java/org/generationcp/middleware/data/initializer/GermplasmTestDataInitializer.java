@@ -15,6 +15,7 @@ public class GermplasmTestDataInitializer {
 		germplasm.setGdate(20150101);
 		germplasm.setGpid1(1);
 		germplasm.setGpid2(2);
+		germplasm.setPreferredName(createGermplasmName(id));
 		return germplasm;
 	}
 
