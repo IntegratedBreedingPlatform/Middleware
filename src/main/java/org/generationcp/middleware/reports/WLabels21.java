@@ -48,7 +48,8 @@ public class WLabels21 extends WLabels05 {
 					.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
 		}
 
-		sb.append(StringUtil.stringOf(" ", colSpan));
+		// CIMMYT text must be have less left margin from the other lines
+		sb.append(StringUtil.stringOf(" ", colSpan - 18));
 		for (int i = 0; i < columns; i++) {
 			sb.append(StringUtil.format("CIMMYT", 10, false)).append(StringUtil.stringOf(" ", 30))
 					.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
