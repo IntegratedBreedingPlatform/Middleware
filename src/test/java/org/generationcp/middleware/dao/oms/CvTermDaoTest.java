@@ -49,7 +49,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	public void testGetTermIdsWithTypeByNameOrSynonyms() throws Exception {
 		Map<String, VariableType> expectedStdVarWithTypeMap = this.createVarNameWithTypeMapTestData();
 
-		List<String> nameOrSynonyms = new ArrayList<String>();
+		List<String> nameOrSynonyms = new ArrayList<>();
 		nameOrSynonyms.addAll(expectedStdVarWithTypeMap.keySet());
 
 		Map<String, Map<Integer, VariableType>> results =
@@ -75,7 +75,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		varNameWithTypeMap.put("CROSS", VariableType.GERMPLASM_DESCRIPTOR);
 		varNameWithTypeMap.put("PLOT_NO", VariableType.EXPERIMENTAL_DESIGN);
 		varNameWithTypeMap.put("REP_NO", VariableType.EXPERIMENTAL_DESIGN);
-		varNameWithTypeMap.put("SITE_SOIL_PH", VariableType.TRAIT);
+		varNameWithTypeMap.put("SITE_SOIL_PH", VariableType.TRIAL_CONDITION);
 		return varNameWithTypeMap;
 	}
 
