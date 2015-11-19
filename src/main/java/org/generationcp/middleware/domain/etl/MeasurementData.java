@@ -13,6 +13,8 @@ package org.generationcp.middleware.domain.etl;
 
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -47,7 +49,7 @@ public class MeasurementData {
 	public MeasurementData() {
 	}
 
-	public MeasurementData(MeasurementData data) {
+	public MeasurementData(final MeasurementData data) {
 		this.label = data.label;
 		this.value = data.value;
 		this.isEditable = data.isEditable;
@@ -57,13 +59,13 @@ public class MeasurementData {
 		this.measurementVariable = data.measurementVariable;
 	}
 
-	public MeasurementData(String label, String value) {
+	public MeasurementData(final String label, final String value) {
 		super();
 		this.label = label;
 		this.value = value;
 	}
 
-	public MeasurementData(String label, String value, boolean isEditable, String dataType) {
+	public MeasurementData(final String label, final String value, final boolean isEditable, final String dataType) {
 		super();
 		this.label = label;
 		this.value = value;
@@ -71,14 +73,15 @@ public class MeasurementData {
 		this.dataType = dataType;
 	}
 
-	public MeasurementData(String label, String value, boolean isEditable, String dataType, Integer valueId) {
+	public MeasurementData(final String label, final String value, final boolean isEditable, final String dataType, final Integer valueId) {
 		this(label, value, isEditable, dataType);
 		if (valueId != null) {
 			this.cValueId = valueId.toString();
 		}
 	}
 
-	public MeasurementData(String label, String value, boolean isEditable, String dataType, MeasurementVariable mvar) {
+	public MeasurementData(final String label, final String value, final boolean isEditable, final String dataType,
+			final MeasurementVariable mvar) {
 		super();
 		this.label = label;
 		this.value = value;
@@ -87,7 +90,8 @@ public class MeasurementData {
 		this.measurementVariable = mvar;
 	}
 
-	public MeasurementData(String label, String value, boolean isEditable, String dataType, Integer valueId, MeasurementVariable mvar) {
+	public MeasurementData(final String label, final String value, final boolean isEditable, final String dataType, final Integer valueId,
+			final MeasurementVariable mvar) {
 		this(label, value, isEditable, dataType, mvar);
 		if (valueId != null) {
 			this.cValueId = valueId.toString();
@@ -98,15 +102,16 @@ public class MeasurementData {
 		return this.label;
 	}
 
-	public void setLabel(String label) {
+	public void setLabel(final String label) {
 		this.label = label;
 	}
 
+	@Nonnull
 	public String getValue() {
 		return this.value == null || "null".equalsIgnoreCase(this.value) ? "" : this.value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(final String value) {
 		this.value = value;
 	}
 
@@ -117,13 +122,13 @@ public class MeasurementData {
 		return this.phenotypeId;
 	}
 
-	public void setPhenotypeId(Integer phenotypeId) {
+	public void setPhenotypeId(final Integer phenotypeId) {
 		this.phenotypeId = phenotypeId;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("MeasurementData [label=");
 		builder.append(this.label);
 		builder.append(", value=");
@@ -138,7 +143,7 @@ public class MeasurementData {
 		return builder.toString();
 	}
 
-	public void print(int indent) {
+	public void print(final int indent) {
 		Debug.println(indent, "MeasurementData: ");
 		Debug.println(indent + 3, "Label: " + this.label);
 		Debug.println(indent + 3, "Value: " + this.value);
@@ -148,7 +153,7 @@ public class MeasurementData {
 		return this.isEditable;
 	}
 
-	public void setEditable(boolean isEditable) {
+	public void setEditable(final boolean isEditable) {
 		this.isEditable = isEditable;
 	}
 
@@ -156,7 +161,7 @@ public class MeasurementData {
 		return this.dataType;
 	}
 
-	public void setDataType(String dataType) {
+	public void setDataType(final String dataType) {
 		this.dataType = dataType;
 	}
 
@@ -170,7 +175,7 @@ public class MeasurementData {
 	/**
 	 * @param measurementVariable the measurementVariable to set
 	 */
-	public void setMeasurementVariable(MeasurementVariable measurementVariable) {
+	public void setMeasurementVariable(final MeasurementVariable measurementVariable) {
 		this.measurementVariable = measurementVariable;
 	}
 
@@ -178,7 +183,7 @@ public class MeasurementData {
 		return this.cValueId;
 	}
 
-	public void setcValueId(String cValueId) {
+	public void setcValueId(final String cValueId) {
 		this.cValueId = cValueId;
 	}
 
@@ -187,8 +192,8 @@ public class MeasurementData {
 				&& !this.getMeasurementVariable().getPossibleValues().isEmpty()) {
 
 			if (NumberUtils.isNumber(this.value)) {
-				List<ValueReference> possibleValues = this.getMeasurementVariable().getPossibleValues();
-				for (ValueReference possibleValue : possibleValues) {
+				final List<ValueReference> possibleValues = this.getMeasurementVariable().getPossibleValues();
+				for (final ValueReference possibleValue : possibleValues) {
 					if (possibleValue.getId().equals(Double.valueOf(this.value).intValue())) {
 						return possibleValue.getDescription();
 					}
@@ -203,8 +208,8 @@ public class MeasurementData {
 					if (MeasurementData.MISSING_VALUE.equalsIgnoreCase(this.value)) {
 						return MeasurementData.MISSING_VALUE;
 					}
-					int intVal = Double.valueOf(this.value).intValue();
-					double doubleVal = Double.valueOf(this.value);
+					final int intVal = Double.valueOf(this.value).intValue();
+					final double doubleVal = Double.valueOf(this.value);
 					if (intVal == doubleVal) {
 						this.value = Integer.toString(intVal);
 						return this.value;
@@ -220,7 +225,7 @@ public class MeasurementData {
 	}
 
 	public MeasurementData copy() {
-		MeasurementData data = new MeasurementData(this.label, this.value, this.isEditable, this.dataType, this.measurementVariable);
+		final MeasurementData data = new MeasurementData(this.label, this.value, this.isEditable, this.dataType, this.measurementVariable);
 		data.setPhenotypeId(this.phenotypeId);
 		data.setcValueId(this.cValueId);
 		data.setCustomCategoricalValue(this.isCustomCategoricalValue);
@@ -228,8 +233,8 @@ public class MeasurementData {
 		return data;
 	}
 
-	public MeasurementData copy(MeasurementVariable oldVar) {
-		MeasurementData data = new MeasurementData(this.label, this.value, this.isEditable, this.dataType, oldVar);
+	public MeasurementData copy(final MeasurementVariable oldVar) {
+		final MeasurementData data = new MeasurementData(this.label, this.value, this.isEditable, this.dataType, oldVar);
 		data.setPhenotypeId(this.phenotypeId);
 		data.setcValueId(this.cValueId);
 		return data;
@@ -239,7 +244,7 @@ public class MeasurementData {
 		return this.isCustomCategoricalValue;
 	}
 
-	public void setCustomCategoricalValue(boolean isCustomCategoricalValue) {
+	public void setCustomCategoricalValue(final boolean isCustomCategoricalValue) {
 		this.isCustomCategoricalValue = isCustomCategoricalValue;
 	}
 
@@ -247,7 +252,7 @@ public class MeasurementData {
 		return this.isAccepted;
 	}
 
-	public void setAccepted(boolean isAccepted) {
+	public void setAccepted(final boolean isAccepted) {
 		this.isAccepted = isAccepted;
 	}
 
@@ -258,9 +263,9 @@ public class MeasurementData {
 	public boolean isDisplayAcceptedValidValues() {
 		if (this.getMeasurementVariable() != null && this.getMeasurementVariable().getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()
 				&& this.getMeasurementVariable().getPossibleValues() != null) {
-			String displayValue = this.getDisplayValue();
+			final String displayValue = this.getDisplayValue();
 			if (displayValue != null && !displayValue.equalsIgnoreCase("") && !MeasurementData.MISSING_VALUE.equals(displayValue)) {
-				for (ValueReference valRef : this.getMeasurementVariable().getPossibleValues()) {
+				for (final ValueReference valRef : this.getMeasurementVariable().getPossibleValues()) {
 					if (valRef.getDescription().equalsIgnoreCase(displayValue)) {
 						return false;
 					}
@@ -269,14 +274,14 @@ public class MeasurementData {
 			}
 		} else if (this.getMeasurementVariable() != null
 				&& this.getMeasurementVariable().getDataTypeId() == TermId.NUMERIC_VARIABLE.getId()) {
-			String displayValue = this.getDisplayValue();
+			final String displayValue = this.getDisplayValue();
 			if (displayValue != null && !displayValue.equalsIgnoreCase("") && !MeasurementData.MISSING_VALUE.equals(displayValue)) {
 				if (this.getMeasurementVariable().getMinRange() != null && this.getMeasurementVariable().getMaxRange() != null) {
 
 					if (!NumberUtils.isNumber(displayValue)) {
 						return false;
 					} else {
-						Double numericValue = Double.valueOf(displayValue);
+						final Double numericValue = Double.valueOf(displayValue);
 						return numericValue > this.getMeasurementVariable().getMaxRange()
 								|| numericValue < this.getMeasurementVariable().getMinRange();
 
@@ -293,7 +298,7 @@ public class MeasurementData {
 		return this.variable;
 	}
 
-	public void setVariable(Variable variable) {
+	public void setVariable(final Variable variable) {
 		this.variable = variable;
 	}
 

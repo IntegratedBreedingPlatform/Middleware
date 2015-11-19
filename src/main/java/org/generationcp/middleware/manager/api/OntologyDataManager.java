@@ -49,7 +49,7 @@ public interface OntologyDataManager {
 	Term getTermById(int termId) throws MiddlewareQueryException;
 
 	/**
-	 * Retrieves a StandardVariable given its id.
+	 * Retrieves a StandardVariable given its id. After the first read, the variable is cached in memory.
 	 *
 	 * @param stdVariableId the std variable id
 	 * @return the standard variable
@@ -534,7 +534,7 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Integer getStandardVariableIdByPropertyIdScaleIdMethodId(Integer propertyId, Integer scaleId, Integer methodId)
-					throws MiddlewareQueryException;
+			throws MiddlewareQueryException;
 
 	/**
 	 * validate if the enumeration is being used.

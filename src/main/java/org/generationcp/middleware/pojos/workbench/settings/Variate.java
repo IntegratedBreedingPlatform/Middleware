@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.util.Debug;
 
 public class Variate implements Serializable {
 
@@ -16,6 +17,7 @@ public class Variate implements Serializable {
 	private String scale;
 	private String method;
 	private String role;
+	private String variableType;
 	private String datatype;
 	private Integer dataTypeId;
 	private List<ValueReference> possibleValues;
@@ -95,6 +97,14 @@ public class Variate implements Serializable {
 
 	public String getDatatype() {
 		return this.datatype;
+	}
+
+	public String getVariableType() {
+		return variableType;
+	}
+
+	public void setVariableType(String variableType) {
+		this.variableType = variableType;
 	}
 
 	public void setDatatype(String datatype) {
@@ -199,4 +209,59 @@ public class Variate implements Serializable {
 		this.storedIn = storedIn;
 	}
 
+	@Override
+	public String toString() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Variate [name=");
+        builder.append(this.name);
+        builder.append(", description=");
+        builder.append(this.description);
+        builder.append(", property=");
+        builder.append(this.property);
+        builder.append(", scale=");
+        builder.append(this.scale);
+        builder.append(", method=");
+        builder.append(this.method);
+        builder.append(", role=");
+        builder.append(this.role);
+        builder.append(", variableType=");
+        builder.append(this.variableType);
+        builder.append(", datatype=");
+        builder.append(this.datatype);
+        builder.append(", dataTypeId=");
+        builder.append(this.dataTypeId);
+        builder.append(", possibleValues=");
+        builder.append(this.possibleValues);
+        builder.append(", minRange=");
+        builder.append(this.minRange);
+        builder.append(", maxRange=");
+        builder.append(this.maxRange);
+        builder.append(", operation=");
+        builder.append(this.operation);
+        builder.append(", id=");
+        builder.append(this.id);
+        builder.append(", storedIn=");
+        builder.append(this.storedIn);
+        builder.append("]");
+        return builder.toString();
+	}
+
+	public void print(int indent) {
+		Debug.println(indent, "Variate: ");
+		Debug.println(indent + 3, "name " + this.name);
+		Debug.println(indent + 3, "description " + this.description);
+		Debug.println(indent + 3, "property: " + this.property);
+		Debug.println(indent + 3, "scale: " + this.scale);
+		Debug.println(indent + 3, "method: " + this.method);
+		Debug.println(indent + 3, "role: " + this.role);
+		Debug.println(indent + 3, "variableType: " + this.variableType);
+		Debug.println(indent + 3, "datatype: " + this.datatype);
+		Debug.println(indent + 3, "dataTypeId: " + this.dataTypeId);
+		Debug.println(indent + 3, "possibleValues: " + this.possibleValues);
+		Debug.println(indent + 3, "minRange: " + this.minRange);
+		Debug.println(indent + 3, "maxRange: " + this.maxRange);
+		Debug.println(indent + 3, "operation: " + this.operation);
+		Debug.println(indent + 3, "id: " + this.id);
+		Debug.println(indent + 3, "storedIn: " + this.storedIn);
+	}
 }

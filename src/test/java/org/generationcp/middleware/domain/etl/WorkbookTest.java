@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.etl;
@@ -24,11 +24,9 @@ import org.junit.Test;
 
 public class WorkbookTest {
 
-	private static Workbook workbook;
-
 	@Test
 	public void testGetMeasurementDatasetVariablesViewForTrial() {
-		workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.T);
+		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.T);
 
 		final List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 
@@ -58,7 +56,7 @@ public class WorkbookTest {
 
 	@Test
 	public void testGetMeasurementDatasetVariablesViewForNursery() {
-		workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.N);
+		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.N);
 
 		final List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 		final int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
@@ -116,8 +114,8 @@ public class WorkbookTest {
 
 	@Test
 	public void testGetTrialObservationByTrialInstanceNoForNursery() {
-		workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.N);
-		WorkbookTestDataInitializer.createTrialObservations(1);
+		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.N);
+		WorkbookTestDataInitializer.createTrialObservations(1, workbook);
 
 		final MeasurementRow trialObservation = workbook.getTrialObservationByTrialInstanceNo(1);
 		Assert.assertNotNull("Expecting that every Nursery created has by default 1 instance level observation.", trialObservation);
@@ -126,8 +124,8 @@ public class WorkbookTest {
 	@Test
 	public void testGetTrialObservationByTrialInstanceNoForTrial() {
 		final int noOfInstances = 2;
-		workbook = WorkbookTestDataInitializer.getTestWorkbook(noOfInstances, StudyType.T);
-		WorkbookTestDataInitializer.createTrialObservations(noOfInstances);
+		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(noOfInstances, StudyType.T);
+		WorkbookTestDataInitializer.createTrialObservations(noOfInstances, workbook);
 
 		for (int trialInstanceNo = 1; trialInstanceNo <= noOfInstances; trialInstanceNo++) {
 			final MeasurementRow trialObservation = workbook.getTrialObservationByTrialInstanceNo(trialInstanceNo);
@@ -142,4 +140,24 @@ public class WorkbookTest {
 		}
 
 	}
+
+	@Test
+	public void testHasExistingExperimentalDesign() {
+		Workbook workbook = new Workbook();
+		final List<MeasurementVariable> expVariables = new ArrayList<>();
+
+		// we add an RCBD variable which is an experimental design variable
+		expVariables.add(WorkbookTestDataInitializer.createExperimentalRCBDVariable());
+		workbook.setExperimentalDesignVariables(expVariables);
+
+		Assert.assertTrue("Workbook has a design", workbook.hasExistingExperimentalDesign());
+	}
+
+	@Test
+	public void testNoExistingExperimentalDesign() {
+		Workbook workbook = new Workbook();
+		Assert.assertFalse("Expected hasExistingExperimentalDesign() to return false when there is no design but it didn't.",
+				workbook.hasExistingExperimentalDesign());
+	}
+
 }

@@ -110,7 +110,6 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetTrialObservationsForNursery() throws MiddlewareException {
-		WorkbookTestDataInitializer.setTestWorkbook(null);
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
 
 		final int id = this.dataImportService.saveDataset(workbook, null);
@@ -146,7 +145,6 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetTrialObservationsForTrial() throws MiddlewareException {
-		WorkbookTestDataInitializer.setTestWorkbook(null);
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 
 		final int id = this.dataImportService.saveDataset(workbook, null);
@@ -286,7 +284,6 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testRemoveTrialDatasetVariables() throws MiddlewareException {
-		WorkbookTestDataInitializer.setTestWorkbook(null);
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 		// add trial instance (also added in conditions)
 		workbook.getFactors().add(WorkbookTestDataInitializer.createTrialInstanceMeasurementVariable(1));
