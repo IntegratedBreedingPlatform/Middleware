@@ -229,14 +229,22 @@ public class WLabels05 extends AbstractReporter {
 			String selHistA = null;
 			String selHistB = null;
 
+			// retrieve trial instance no from study condition when the study is in nursery type
+			// otherwise, from the measurement row
+			if ("Nursery".equalsIgnoreCase(this.studyMeta.get("STUDY_TYPE"))) {
+				record.put("occ", this.studyMeta.get("TRIAL_INSTANCE"));
+			}
+
 			record.put("study", this.studyMeta.get("STUDY_NAME"));
-			record.put("occ", this.studyMeta.get("TRIAL_INSTANCE"));
 			record.put("subProg", this.studyMeta.get("BreedingProgram"));
 			record.put("type", this.studyMeta.get("STUDY_TYPE")); // TODO: a type for nal,int, etc
 			record.put("season", this.studyMeta.get("CROP_SEASON"));
 
 			for (int i = 0; i < headers.size(); i++) {
 				switch (headers.get(i)) {
+					case "TRIAL_INSTANCE":
+						record.put("occ", row.get(i));
+						break;
 					case "ENTRY_NO":
 						record.put("entry", row.get(i));
 						break;
