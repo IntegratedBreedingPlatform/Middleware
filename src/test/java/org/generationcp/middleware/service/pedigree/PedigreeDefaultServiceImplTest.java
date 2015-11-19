@@ -75,7 +75,7 @@ public class PedigreeDefaultServiceImplTest {
 	@Test
 	public void getCrossExpansionUnsupportedMethodGermplasmHasPreferredName() {
 
-		this.initializeGermplasmToExpand(UNKNOWN_GENERATIVE_METHOD_ID);
+		this.initializeGermplasmToExpand(UNKNOWN_GENERATIVE_METHOD_ID, 2);
 
 		Mockito.when(this.germplasmDataManager.getGermplasmWithPrefName(GERMPLASM_ID_TO_EXPAND)).thenReturn(this.germplasmToExpand);
 
@@ -107,7 +107,7 @@ public class PedigreeDefaultServiceImplTest {
 	@Test
 	public void getCrossExpansionUnknownParents() {
 
-		this.initializeGermplasmToExpand(SINGLE_CROSS_METHOD_ID);
+		this.initializeGermplasmToExpand(SINGLE_CROSS_METHOD_ID, 2);
 		this.germplasmToExpand.setGpid1(0);
 		this.germplasmToExpand.setGpid2(0);
 
@@ -122,7 +122,7 @@ public class PedigreeDefaultServiceImplTest {
 	@Test
 	public void getCrossExpansionSingleCrossLevel1() {
 
-		this.initializeGermplasmToExpand(SINGLE_CROSS_METHOD_ID);
+		this.initializeGermplasmToExpand(SINGLE_CROSS_METHOD_ID, 2);
 
 		CrossExpansionProperties crossExpansionProperties = this.createCrossExpansionProperties();
 
@@ -135,7 +135,7 @@ public class PedigreeDefaultServiceImplTest {
 	@Test
 	public void getCrossExpansionSingleCrossLevel2() {
 
-		this.initializeGermplasmToExpand(SINGLE_CROSS_METHOD_ID);
+		this.initializeGermplasmToExpand(SINGLE_CROSS_METHOD_ID, 2);
 
 		CrossExpansionProperties crossExpansionProperties = this.createCrossExpansionProperties();
 		crossExpansionProperties.setDefaultLevel(2);
@@ -149,7 +149,7 @@ public class PedigreeDefaultServiceImplTest {
 	@Test
 	public void getCrossExpansionSingleCrossLevel3() {
 
-		this.initializeGermplasmToExpand(SINGLE_CROSS_METHOD_ID);
+		this.initializeGermplasmToExpand(SINGLE_CROSS_METHOD_ID, 2);
 
 		CrossExpansionProperties crossExpansionProperties = this.createCrossExpansionProperties();
 		crossExpansionProperties.setDefaultLevel(3);
@@ -163,7 +163,7 @@ public class PedigreeDefaultServiceImplTest {
 	@Test
 	public void getCrossExpansionDoubleCross() {
 
-		this.initializeGermplasmToExpand(DOUBLE_CROSS_METHOD_ID);
+		this.initializeGermplasmToExpand(DOUBLE_CROSS_METHOD_ID, 2);
 
 		CrossExpansionProperties crossExpansionProperties = this.createCrossExpansionProperties();
 		crossExpansionProperties.setDefaultLevel(1);
@@ -177,7 +177,7 @@ public class PedigreeDefaultServiceImplTest {
 	@Test
 	public void getCrossExpansionThreeWayCross() {
 
-		this.initializeGermplasmToExpand(THREE_WAY_CROSS_METHOD_ID);
+		this.initializeGermplasmToExpand(THREE_WAY_CROSS_METHOD_ID, 2);
 
 		CrossExpansionProperties crossExpansionProperties = this.createCrossExpansionProperties();
 		crossExpansionProperties.setDefaultLevel(1);
@@ -188,25 +188,48 @@ public class PedigreeDefaultServiceImplTest {
 
 	}
 
-	private void initializeGermplasmToExpand(int methodId) {
+	@Test(expected = UnsupportedOperationException.class)
+	public void getCrossExpansionUnimplementedVariant() {
+		this.pedigreeDefaultService.getCrossExpansion(new Germplasm(), 1, new CrossExpansionProperties());
+	}
 
-		this.germplasmToExpand = this.createGermplasm(GERMPLASM_ID_TO_EXPAND, 98, 97, "ABC-123", methodId);
-		this.firstParent = this.createGermplasm(98, 96, 95, "QRS-456", methodId);
-		this.secondParent = this.createGermplasm(97, 94, 93, "XYZ-789", methodId);
-		this.firstGrandparent1 = this.createGermplasm(96, 92, 91, "AAA-111", methodId);
-		this.firstGrandparent2 = this.createGermplasm(95, 90, 89, "BBB-222", methodId);
-		this.secondGrandparent1 = this.createGermplasm(94, 88, 87, "CCC-333", methodId);
-		this.secondGrandparent2 = this.createGermplasm(93, 86, 85, "DDD-444", methodId);
+	@Test
+	public void getCrossExpansionNonExistantGid() {
+		int nonExistantGermplasm = -987654321;
+		String result = this.pedigreeDefaultService.getCrossExpansion(nonExistantGermplasm, this.createCrossExpansionProperties());
+		Assert.assertEquals("", result);
+	}
 
-		this.firstGrandparent1firstParent = this.createGermplasm(92, 0, 0, "EEE-111", methodId);
-		this.firstGrandparent1secondParent = this.createGermplasm(91, 0, 0, "FFF-222", methodId);
-		this.firstGrandparent2firstParent = this.createGermplasm(90, 0, 0, "GGG-111", methodId);
-		this.firstGrandparent2secondParent = this.createGermplasm(89, 0, 0, "HHH-222", methodId);
+	@Test
+	public void getCrossExpansionForDerivativeOrMaintenanceMethods() {
+		// -ve value pf gnpgs indicates derivative process
+		this.initializeGermplasmToExpand(SINGLE_CROSS_METHOD_ID, -1);
 
-		this.secondGrandparent1firstParent = this.createGermplasm(88, 0, 0, "III-111", methodId);
-		this.secondGrandparent1secondParent = this.createGermplasm(87, 0, 0, "JJJ-222", methodId);
-		this.secondGrandparent2firstParent = this.createGermplasm(86, 0, 0, "KKK-111", methodId);
-		this.secondGrandparent2secondParent = this.createGermplasm(85, 0, 0, "KKK-222", methodId);
+		CrossExpansionProperties crossExpansionProperties = this.createCrossExpansionProperties();
+		String result = this.pedigreeDefaultService.getCrossExpansion(GERMPLASM_ID_TO_EXPAND, crossExpansionProperties);
+
+		Assert.assertEquals("III-111", result);
+	}
+
+	private void initializeGermplasmToExpand(int methodId, int gnpgs) {
+
+		this.germplasmToExpand = this.createGermplasm(GERMPLASM_ID_TO_EXPAND, gnpgs, 98, 97, "ABC-123", methodId);
+		this.firstParent = this.createGermplasm(98, gnpgs, 96, 95, "QRS-456", methodId);
+		this.secondParent = this.createGermplasm(97, gnpgs, 94, 93, "XYZ-789", methodId);
+		this.firstGrandparent1 = this.createGermplasm(96, gnpgs, 92, 91, "AAA-111", methodId);
+		this.firstGrandparent2 = this.createGermplasm(95, gnpgs, 90, 89, "BBB-222", methodId);
+		this.secondGrandparent1 = this.createGermplasm(94, gnpgs, 88, 87, "CCC-333", methodId);
+		this.secondGrandparent2 = this.createGermplasm(93, gnpgs, 86, 85, "DDD-444", methodId);
+
+		this.firstGrandparent1firstParent = this.createGermplasm(92, gnpgs, 0, 0, "EEE-111", methodId);
+		this.firstGrandparent1secondParent = this.createGermplasm(91, gnpgs, 0, 0, "FFF-222", methodId);
+		this.firstGrandparent2firstParent = this.createGermplasm(90, gnpgs, 0, 0, "GGG-111", methodId);
+		this.firstGrandparent2secondParent = this.createGermplasm(89, gnpgs, 0, 0, "HHH-222", methodId);
+
+		this.secondGrandparent1firstParent = this.createGermplasm(88, gnpgs, 0, 0, "III-111", methodId);
+		this.secondGrandparent1secondParent = this.createGermplasm(87, gnpgs, 0, 0, "JJJ-222", methodId);
+		this.secondGrandparent2firstParent = this.createGermplasm(86, gnpgs, 0, 0, "KKK-111", methodId);
+		this.secondGrandparent2secondParent = this.createGermplasm(85, gnpgs, 0, 0, "KKK-222", methodId);
 
 		Mockito.when(this.germplasmDataManager.getGermplasmWithPrefName(99)).thenReturn(this.germplasmToExpand);
 		Mockito.when(this.germplasmDataManager.getGermplasmWithPrefName(98)).thenReturn(this.secondParent);
@@ -242,12 +265,12 @@ public class PedigreeDefaultServiceImplTest {
 
 	}
 
-	private Germplasm createGermplasm(int gid, int gpid1, int gpid2, String germplasmName, int methodId) {
+	private Germplasm createGermplasm(int gid, int gnpgs, int gpid1, int gpid2, String germplasmName, int methodId) {
 
 		Germplasm g = new Germplasm();
 		g.setGid(gid);
 		g.setGdate(Integer.valueOf(20141014));
-		g.setGnpgs(Integer.valueOf(1));
+		g.setGnpgs(Integer.valueOf(gnpgs));
 		g.setGpid1(gpid1);
 		g.setGpid2(gpid2);
 		g.setLgid(Integer.valueOf(0));
