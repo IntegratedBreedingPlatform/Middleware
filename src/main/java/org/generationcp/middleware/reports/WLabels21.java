@@ -10,7 +10,7 @@ public class WLabels21 extends WLabels05 {
 
 	@Override
 	public Reporter createReporter() {
-		Reporter r = new WLabels21();
+		final Reporter r = new WLabels21();
 		r.setFileNameExpression("LABEL21_{trialName}");
 		return r;
 	}
@@ -21,13 +21,13 @@ public class WLabels21 extends WLabels05 {
 	}
 
 	@Override
-	protected String buildRecord(List<List<String>> rows, List<String> headers, int colSpan) {
+	protected String buildRecord(final List<List<String>> rows, final List<String> headers, final int colSpan) {
 
-		List<Map<String, String>> records = this.extractRecordData(rows, headers);
+		final List<Map<String, String>> records = this.extractRecordData(rows, headers);
 
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 
-		int columns = rows.size();
+		final int columns = rows.size();
 
 		// now format
 		sb.append(StringUtil.stringOf(" ", colSpan));
