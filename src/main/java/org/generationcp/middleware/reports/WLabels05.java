@@ -102,13 +102,11 @@ public class WLabels05 extends AbstractReporter {
 
 		for (final MeasurementVariable var : studyConditions) {
 			String trialName = null;
-			switch (var.getName()) {
-				case "STUDY_TITLE":
-					trialName = var.getValue();
-					break;
+			if ("STUDY_TITLE".equalsIgnoreCase(var.getName())) {
+				trialName = var.getValue();
 			}
 
-			if (null != trialName) {
+			if (trialName != null) {
 				params.put("trialName", trialName);
 				break;
 			}
@@ -237,8 +235,13 @@ public class WLabels05 extends AbstractReporter {
 			}
 
 			record.put("study", this.studyMeta.get("STUDY_NAME"));
+
+			// TODO: Needs to finalize the variable needed for the following fields
+			// subProg
+			// type - a type for nal,int, etc
+			// season
 			record.put("subProg", this.studyMeta.get("BreedingProgram"));
-			record.put("type", this.studyMeta.get("STUDY_TYPE")); // TODO: a type for nal,int, etc
+			record.put("type", this.studyMeta.get("STUDY_TYPE"));
 			record.put("season", this.studyMeta.get("CROP_SEASON"));
 
 			for (int i = 0; i < headers.size(); i++) {
@@ -271,6 +274,8 @@ public class WLabels05 extends AbstractReporter {
 						break;
 					case "PLOT_NO":
 						record.put("plot", row.get(i));
+						break;
+					default:
 						break;
 				}
 			}
