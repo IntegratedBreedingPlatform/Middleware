@@ -175,9 +175,9 @@ public class PedigreeDefaultServiceImplTest {
 	}
 
 	@Test
-	public void getCrossExpansionThreeWayCross() {
+	public void getCrossExpansionThreeWayCrossCreatedByFirstParent() {
 
-		this.initializeGermplasmToExpand(THREE_WAY_CROSS_METHOD_ID, 2);
+		this.initializeGermplasmToExpand(THREE_WAY_CROSS_METHOD_ID, 1);
 
 		CrossExpansionProperties crossExpansionProperties = this.createCrossExpansionProperties();
 		crossExpansionProperties.setDefaultLevel(1);
@@ -186,6 +186,22 @@ public class PedigreeDefaultServiceImplTest {
 
 		Assert.assertEquals("CCC-333/DDD-444//QRS-456", result);
 
+	}
+
+	@Test
+	public void getCrossExpansionThreeWayCrossCreatedBySecondParent() {
+
+		this.initializeGermplasmToExpand(THREE_WAY_CROSS_METHOD_ID, 1);
+
+		// Override default mocks to set firstParent = null scenario so that else condition in threeway cross logic can be triggered.
+		Mockito.when(this.germplasmDataManager.getGermplasmByGID(this.germplasmToExpand.getGpid1())).thenReturn(null);
+
+		CrossExpansionProperties crossExpansionProperties = this.createCrossExpansionProperties();
+		crossExpansionProperties.setDefaultLevel(1);
+
+		String result = this.pedigreeDefaultService.getCrossExpansion(GERMPLASM_ID_TO_EXPAND, crossExpansionProperties);
+
+		Assert.assertEquals("AAA-111/BBB-222//XYZ-789", result);
 	}
 
 	@Test(expected = UnsupportedOperationException.class)
