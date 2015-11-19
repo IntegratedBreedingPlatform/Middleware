@@ -64,34 +64,30 @@ public class VariableTypeListTransformerTest extends IntegrationTestBase {
 
 	@Test
 	public void testTransformFactor() throws Exception {
-		boolean isVariate = false;
-		this.testTransform(isVariate);
+		this.testTransform(false);
 	}
 
 	@Test
 	public void testTransformVariate() throws Exception {
-		boolean isVariate = true;
-		this.testTransform(isVariate);
+		this.testTransform(true);
 	}
 
 	private void testTransform(boolean isVariate) throws Exception {
 		List<MeasurementVariable> measurementVariables = this.createMeasurmentVariablesTestData(isVariate);
 		VariableTypeList variableTypeList =
-				VariableTypeListTransformerTest.transformer.transform(measurementVariables, isVariate, PROGRAM_UUID);
+				VariableTypeListTransformerTest.transformer.transform(measurementVariables, PROGRAM_UUID);
 		Assert.assertNotNull(variableTypeList);
 		int i = 0;
+
 		for (DMSVariableType variableType : variableTypeList.getVariableTypes()) {
 			Assert.assertEquals(measurementVariables.get(i).getName(), variableType.getLocalName());
 			Assert.assertEquals(measurementVariables.get(i).getDescription(), variableType.getLocalDescription());
 			Assert.assertEquals(i + 1, variableType.getRank());
 			Assert.assertNotNull(variableType.getStandardVariable());
 			StandardVariable actual = variableType.getStandardVariable();
-			StandardVariable expected = null;
-			if (isVariate) {
-				expected = VariableTypeListTransformerTest.VARIATE_ARR[i];
-			} else {
-				expected = VariableTypeListTransformerTest.FACTOR_ARR[i];
-			}
+
+			StandardVariable expected = isVariate ? VariableTypeListTransformerTest.VARIATE_ARR[i] : VariableTypeListTransformerTest.FACTOR_ARR[i];
+
 			Assert.assertEquals(expected.getName(), actual.getName());
 			Assert.assertEquals(expected.getDescription(), actual.getDescription());
 			Assert.assertEquals(expected.getProperty().getName(), actual.getProperty().getName());
@@ -106,7 +102,7 @@ public class VariableTypeListTransformerTest extends IntegrationTestBase {
 	}
 
 	private List<MeasurementVariable> createMeasurmentVariablesTestData(boolean isVariate) {
-		List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
+		List<MeasurementVariable> list = new ArrayList<>();
 
 		if (!isVariate) {
 			MeasurementVariable variable =
@@ -144,7 +140,7 @@ public class VariableTypeListTransformerTest extends IntegrationTestBase {
 		stdVar.setProperty(new Term(10, variable.getProperty(), variable.getProperty()));
 		stdVar.setScale(new Term(10, variable.getScale(), variable.getScale()));
 		stdVar.setMethod(new Term(10, variable.getMethod(), variable.getMethod()));
-		DataType dataType = null;
+		DataType dataType;
 		if ("N".equals(variable.getDataType())) {
 			dataType = DataType.getById(TermId.NUMERIC_VARIABLE.getId());
 		} else if ("C".equals(variable.getDataType())) {

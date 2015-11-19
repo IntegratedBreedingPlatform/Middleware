@@ -16,13 +16,12 @@ public class VariableTypeListTransformer extends Transformer {
 		super(sessionProviderForLocal);
 	}
 
-	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, 
-			boolean isVariate, String programUUID) throws MiddlewareException {
+	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, String programUUID) throws MiddlewareException {
 
-		return this.transform(measurementVariables, isVariate, 1, programUUID);
+		return this.transform(measurementVariables, 1, programUUID);
 	}
 
-	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, boolean isVariate, int rank, String programUUID)
+	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, int rank, String programUUID)
 			throws MiddlewareException {
 
 		VariableTypeList variableTypeList = new VariableTypeList();

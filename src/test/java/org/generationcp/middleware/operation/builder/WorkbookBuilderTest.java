@@ -288,11 +288,11 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		// add trial instance (also added in conditions)
 		workbook.getFactors().add(WorkbookTestDataInitializer.createTrialInstanceMeasurementVariable(1));
 		final VariableTypeList factorsVariableTypeList =
-				this.variableTypeListTransformer.transform(workbook.getFactors(), false, PROGRAM_UUID);
+				this.variableTypeListTransformer.transform(workbook.getFactors(), PROGRAM_UUID);
 		final VariableTypeList conditionsVariableTypeList =
-				this.variableTypeListTransformer.transform(workbook.getConditions(), false, PROGRAM_UUID);
+				this.variableTypeListTransformer.transform(workbook.getConditions(), PROGRAM_UUID);
 		final VariableTypeList constantsVariableTypeList =
-				this.variableTypeListTransformer.transform(workbook.getConstants(), false, PROGRAM_UUID);
+				this.variableTypeListTransformer.transform(workbook.getConstants(), PROGRAM_UUID);
 		final VariableList conditions =
 				this.transformMeasurementVariablesToVariableList(workbook.getConditions(), conditionsVariableTypeList);
 		final VariableList constants = this.transformMeasurementVariablesToVariableList(workbook.getConstants(), constantsVariableTypeList);
