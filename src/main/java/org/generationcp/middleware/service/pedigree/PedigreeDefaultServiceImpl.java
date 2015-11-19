@@ -38,8 +38,7 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 	}
 
 	@Override
-	public String getCrossExpansion(Integer gid, Integer level, CrossExpansionProperties crossExpansionProperties)
-			throws MiddlewareQueryException {
+	public String getCrossExpansion(Integer gid, Integer level, CrossExpansionProperties crossExpansionProperties) {
 		Germplasm germplasm = this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(gid);
 		if (germplasm != null) {
 			SingleGermplasmCrossElement startElement = new SingleGermplasmCrossElement();
@@ -513,11 +512,11 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 					} else {
 						this.logAndThrowException(
 								"Error with expanding cross, can not find method with id: " + germplasmToExpand.getMethodId(),
-								new Throwable(), PedigreeDefaultServiceImpl.LOG);
+								new Throwable());
 					}
 				}
 			} else {
-				this.logAndThrowException("expandGermplasmCross was incorrectly called", new Throwable(), PedigreeDefaultServiceImpl.LOG);
+				this.logAndThrowException("expandGermplasmCross was incorrectly called", new Throwable());
 			}
 		}
 		return element;
@@ -563,8 +562,8 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 		return toreturn;
 	}
 
-	protected void logAndThrowException(String message, Throwable e, Logger log) throws MiddlewareQueryException {
-		log.error(e.getMessage(), e);
+	protected void logAndThrowException(String message, Throwable e) {
+		LOG.error(e.getMessage(), e);
 		throw new MiddlewareQueryException(message + e.getMessage(), e);
 	}
 }
