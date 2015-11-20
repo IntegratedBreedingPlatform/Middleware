@@ -10,12 +10,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jasperreports.engine.JRDataSource;
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JRParameter;
-import net.sf.jasperreports.engine.JasperExportManager;
-import net.sf.jasperreports.engine.JasperFillManager;
-import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.*;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.engine.query.JsonQueryExecuterFactory;
 import net.sf.jasperreports.export.SimpleXlsReportConfiguration;
@@ -29,7 +24,19 @@ import org.slf4j.LoggerFactory;
  * @author jarojas
  *
  */
-abstract class AbstractReporter implements Reporter {
+public abstract class AbstractReporter implements Reporter {
+
+	public static final String STUDY_CONDITIONS_KEY = "studyConditions";
+	public static final String DATA_SOURCE_KEY = "dataSource";
+	public static final String PROGRAM_NAME_ARG_KEY = "program";
+	public static final String STUDY_NAME_REPORT_KEY = "trialAbbr";
+	public static final String STUDY_TITLE_REPORT_KEY = "trialName";
+	public static final String LOCATION_NAME_REPORT_KEY = "lname";
+	public static final String LOCATION_ID_REPORT_KEY = "lid";
+	public static final String ORGANIZATION_REPORT_KEY = "organization";
+	public static final String PROGRAM_NAME_REPORT_KEY = "program";
+	public static final String COUNTRY_VARIABLE_NAME = "country";
+	public static final String LOCATION_ABBREV_VARIABLE_NAME = "labbr";
 
 	private String fileNameExpr = this.getReportCode() + "-{tid}";
 	private String fileName = null;
