@@ -554,7 +554,7 @@ public interface OntologyDataManager {
 	 */
 	List<NameSynonym> getSynonymsOfTerm(Integer termId) throws MiddlewareQueryException;
 
-	boolean isSeedAmountVariable(String variateProperty) throws MiddlewareQueryException;
+	boolean isSeedAmountProperty(String variateProperty) throws MiddlewareQueryException;
 
 	/**
 	 * Returns the cv id by name

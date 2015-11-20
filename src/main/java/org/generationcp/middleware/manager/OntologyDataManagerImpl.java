@@ -965,7 +965,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public boolean isSeedAmountVariable(String variateProperty) throws MiddlewareQueryException {
+	public boolean isSeedAmountProperty(String variateProperty) throws MiddlewareQueryException {
 		boolean isSeedAmountVar = false;
 
 		if ("INVENTORY AMOUNT".equalsIgnoreCase(variateProperty)) {
