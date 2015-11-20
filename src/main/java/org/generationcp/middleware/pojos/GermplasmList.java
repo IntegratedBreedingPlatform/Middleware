@@ -15,19 +15,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -46,6 +34,8 @@ import org.hibernate.annotations.SQLDelete;
 public class GermplasmList implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	public static final String FOLDER_TYPE = "FOLDER";
+	public static final String LIST_TYPE = "LST";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -416,11 +406,11 @@ public class GermplasmList implements Serializable {
 	}
 
 	public boolean isFolder() {
-		return this.getType() != null && this.getType().equalsIgnoreCase("FOLDER") ? true : false;
+		return this.getType() != null && this.getType().equalsIgnoreCase(FOLDER_TYPE) ? true : false;
 	}
 
 	public boolean isList() {
-		return this.getType() != null && this.getType().equalsIgnoreCase("LST") ? true : false;
+		return this.getType() != null && this.getType().equalsIgnoreCase(LIST_TYPE) ? true : false;
 	}
 
 	public boolean hasParent() {
