@@ -21,12 +21,7 @@ import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.ListDataProperty;
-import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,14 +103,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	@Override
 	public long countGermplasmListByName(String name, Operation operation, Database instance) throws MiddlewareQueryException {
 		return this.getGermplasmListDAO().countByName(name, operation);
-	}
-
-	@Override
-	public List<GermplasmList> getGermplasmListByStatus(Integer status, int start, int numOfRows, Database instance)
-			throws MiddlewareQueryException {
-
-		return this.getFromInstanceByMethod(this.getGermplasmListDAO(), instance, "getByStatus", new Object[] {status, start, numOfRows},
-				new Class[] {Integer.class, Integer.TYPE, Integer.TYPE});
 	}
 
 	@Override
@@ -443,6 +430,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 			throws MiddlewareQueryException {
 
 		return this.getGermplasmListDAO().getByParentFolderId(parentId, programUUID, start, numOfRows);
+	}
+
+	@Override
+	public GermplasmList getLastSavedGermplasmListByUserId(Integer userID, String programUUID) {
+		return this.getGermplasmListDAO().getLastSavedByUserID(userID, programUUID);
 	}
 
 	@Override
