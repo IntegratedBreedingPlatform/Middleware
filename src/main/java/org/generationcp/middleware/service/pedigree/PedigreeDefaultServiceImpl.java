@@ -510,13 +510,11 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 
 						return cross;
 					} else {
-						this.logAndThrowException(
-								"Error with expanding cross, can not find method with id: " + germplasmToExpand.getMethodId(),
-								new Throwable());
+						this.logAndThrowException("Error with expanding cross, can not find method with id: " + germplasmToExpand.getMethodId());
 					}
 				}
 			} else {
-				this.logAndThrowException("expandGermplasmCross was incorrectly called", new Throwable());
+				this.logAndThrowException("expandGermplasmCross was incorrectly called");
 			}
 		}
 		return element;
@@ -562,8 +560,9 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 		return toreturn;
 	}
 
-	protected void logAndThrowException(String message, Throwable e) {
-		LOG.error(e.getMessage(), e);
-		throw new MiddlewareQueryException(message + e.getMessage(), e);
+	private void logAndThrowException(String message) {
+		final MiddlewareQueryException exception = new MiddlewareQueryException(message);
+		LOG.error(message, exception);
+		throw exception;
 	}
 }
