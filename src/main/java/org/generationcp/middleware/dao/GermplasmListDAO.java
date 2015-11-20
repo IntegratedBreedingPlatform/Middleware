@@ -14,6 +14,8 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
@@ -24,11 +26,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.SimpleExpression;
+import org.hibernate.criterion.*;
 
 /**
  * DAO class for {@link GermplasmList}.
@@ -289,6 +287,35 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 					"Error with getByParentFolderId(parentId=" + parentId + ") query from GermplasmList: " + e.getMessage(), e);
 		}
 		return new ArrayList<GermplasmList>();
+	}
+
+	@Nullable
+	public GermplasmList getLastSavedByUserID(Integer userID, String programUUID) {
+		try {
+			if (userID != null) {
+				Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
+				criteria.add(Restrictions.eq("userId", userID));
+				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
+
+				Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
+				Criterion nullProgramUUID = Restrictions.isNull("programUUID");
+				criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
+
+				this.hideSnapshotListTypes(criteria);
+
+				criteria.addOrder(Order.desc("id"));
+
+				List result = criteria.list();
+				if (!result.isEmpty()) {
+					return (GermplasmList) result.get(0);
+				} else {
+					return null;
+				}
+			}
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error with getByUserID(userID=" + userID + ") query from GermplasmList: " + e.getMessage(), e);
+		}
+		return null;
 	}
 
 	/**
