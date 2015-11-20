@@ -213,8 +213,8 @@ public class WorkbookParserTest {
 				this.createWorkbookWithSectionHeaders(section.toString(), headers);
 		this.addSectionVariableDetailsToWorkbook(sampleWorkbook,
 				this.createVariableDetailsListTestData(section, headers));
-		List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
-		List<Message> errorMessages = new ArrayList<Message>();
+		List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		List<Message> errorMessages = new ArrayList<>();
 		this.workbookParser.setErrorMessages(errorMessages);
 		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
 		Assert.assertTrue("There should be no error after extracting the measurement variables", errorMessages.isEmpty());
@@ -230,10 +230,10 @@ public class WorkbookParserTest {
 		int rowWithErrorInSheet = 6;
 		String[] invalidVariableDetails = new String[headers.length + 1];
 		this.fillVariableDetails(invalidVariableDetails, "", "", "", "", "", "", "WITH ERROR", "");
-		this.addRowOfSectionVariableDetailsToSheet(sampleWorkbook.getSheetAt(0), rowWithErrorInSheet, invalidVariableDetails);
+		this.addRowInExistingSheet(sampleWorkbook.getSheetAt(0), rowWithErrorInSheet, invalidVariableDetails);
 
-		List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
-		List<Message> errorMessages = new ArrayList<Message>();
+		List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		List<Message> errorMessages = new ArrayList<>();
 		this.workbookParser.setErrorMessages(errorMessages);
 		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
 
@@ -285,10 +285,10 @@ public class WorkbookParserTest {
 		this.fillVariableDetails(invalidVariableDetails, "NAME " + rowWithErrorInSheet, "DESCRIPTION " + rowWithErrorInSheet,
 				"PROPERTY" + rowWithErrorInSheet, "SCALE" + rowWithErrorInSheet, "METHOD" + rowWithErrorInSheet, "Numeric", "WITH ERROR",
 				"Invalid label");
-		this.addRowOfSectionVariableDetailsToSheet(sampleWorkbook.getSheetAt(0), rowWithErrorInSheet, invalidVariableDetails);
+		this.addRowInExistingSheet(sampleWorkbook.getSheetAt(0), rowWithErrorInSheet, invalidVariableDetails);
 
-		List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
-		List<Message> errorMessages = new ArrayList<Message>();
+		List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		List<Message> errorMessages = new ArrayList<>();
 		this.workbookParser.setErrorMessages(errorMessages);
 		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
 
@@ -343,12 +343,12 @@ public class WorkbookParserTest {
 
 	private List<String[]> createVariableDetailsListTestData(Section section, String[] headers) {
 		List<String[]> variableDetailsList = new ArrayList<>();
-		String variableName = null;
-		String description = null;
-		String property = null;
-		String scale = null;
-		String method = null;
-		String dataType = null;
+		String variableName;
+		String description;
+		String property;
+		String scale;
+		String method;
+		String dataType;
 		String value = null;
 		String label = null;
 		for (int i = 1; i <= 5; i++) {
@@ -413,16 +413,16 @@ public class WorkbookParserTest {
 		Sheet firstSheet = sampleWorkbook.getSheetAt(0);
 		int rowNumber = 1;
 		for (String[] variableDetails : variableDetailsList) {
-			this.addRowOfSectionVariableDetailsToSheet(firstSheet, rowNumber, variableDetails);
+			this.addRowInExistingSheet(firstSheet, rowNumber, variableDetails);
 			rowNumber++;
 		}
 	}
 
-	private void addRowOfSectionVariableDetailsToSheet(Sheet sheet, int rowNumber, String[] variableDetails) {
+	private void addRowInExistingSheet(Sheet sheet, int rowNumber, String[] data) {
 		Row row = sheet.createRow(rowNumber);
-		for (int i = 0; i < variableDetails.length; i++) {
+		for (int i = 0; i < data.length; i++) {
 			Cell cell = row.createCell(i);
-			cell.setCellValue(variableDetails[i]);
+			cell.setCellValue(data[i]);
 		}
 	}
 
