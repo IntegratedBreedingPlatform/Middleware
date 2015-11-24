@@ -18,6 +18,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.junit.Assert;
@@ -251,7 +252,7 @@ public class ProjectPropertySaverTest {
 				Assert.assertEquals("The variable type id must be " + variableType.getId(), variableType.getId(),
 						projectPropertyName.getTypeId());
 			} else {
-				VariableType defaultVariableType = this.mapPhenotypicTypeToDefaultVariableType(role);
+				VariableType defaultVariableType = new StandardVariableBuilder(null).mapPhenotypicTypeToDefaultVariableType(role);
 				Assert.assertEquals("The variable type id must be " + defaultVariableType.getId(), defaultVariableType.getId(),
 						projectPropertyName.getTypeId());
 			}
@@ -326,20 +327,4 @@ public class ProjectPropertySaverTest {
 		standardVariable.setId(id);
 		return standardVariable;
 	}
-
-	private VariableType mapPhenotypicTypeToDefaultVariableType(PhenotypicType role) {
-		if (PhenotypicType.STUDY == role || PhenotypicType.DATASET == role) {
-			return VariableType.STUDY_DETAIL;
-		} else if (PhenotypicType.TRIAL_ENVIRONMENT == role) {
-			return VariableType.ENVIRONMENT_DETAIL;
-		} else if (PhenotypicType.GERMPLASM == role) {
-			return VariableType.GERMPLASM_DESCRIPTOR;
-		} else if (PhenotypicType.TRIAL_DESIGN == role) {
-			return VariableType.EXPERIMENTAL_DESIGN;
-		} else if (PhenotypicType.VARIATE == role) {
-			return VariableType.TRAIT;
-		}
-		return null;
-	}
-
 }
