@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -212,6 +214,132 @@ public class ProjectPropertySaverTest {
 		this.projectPropSaver.updateVariablesRanking(this.datasetId, variableIds);
 
 		return startRank;
+	}
+
+	@Test
+	public void testCreateOfProjectProperties() {
+		List<PhenotypicType> testVarRoles =
+				Arrays.asList(PhenotypicType.STUDY, PhenotypicType.DATASET, PhenotypicType.TRIAL_ENVIRONMENT, PhenotypicType.GERMPLASM,
+						PhenotypicType.TRIAL_DESIGN, PhenotypicType.TRIAL_DESIGN, PhenotypicType.VARIATE, null, PhenotypicType.VARIATE);
+		List<VariableType> testVarVariableTypes =
+				Arrays.asList(null, VariableType.STUDY_DETAIL, null, VariableType.GERMPLASM_DESCRIPTOR, VariableType.EXPERIMENTAL_DESIGN,
+						VariableType.TREATMENT_FACTOR, VariableType.NURSERY_CONDITION, VariableType.TRIAL_CONDITION, null);
+		DmsProject dmsProject = new DmsProject();
+		dmsProject.setProjectId(1);
+		VariableTypeList variableTypeList = this.createVariableTypeListTestData(testVarRoles,testVarVariableTypes);
+		List<ProjectProperty> projectProperties = this.projectPropSaver.create(dmsProject, variableTypeList);
+		Assert.assertNotNull(projectProperties);
+		// a project property record is created for each variable for its name, description, ontology variable and treatment label if
+		// available
+		int expectedNumberOfProjectProperties = variableTypeList.size() * 3 + 1;
+		Assert.assertEquals("The number of project properties should be " + expectedNumberOfProjectProperties,
+				expectedNumberOfProjectProperties,
+				projectProperties.size());
+		int i = 0;
+		Iterator<ProjectProperty> projectPropIterator = projectProperties.iterator();
+		while (projectPropIterator.hasNext()) {
+			DMSVariableType dmsVariableType = variableTypeList.getVariableTypes().get(i);
+			// verify name projectprop record
+			ProjectProperty projectPropertyName = projectPropIterator.next();
+			Assert.assertEquals("The name should be " + dmsVariableType.getLocalName(), dmsVariableType.getLocalName(),
+					projectPropertyName.getValue());
+			Assert.assertEquals("The project id should be " + dmsProject.getProjectId(), dmsProject.getProjectId(), projectPropertyName
+					.getProject().getProjectId());
+			VariableType variableType = testVarVariableTypes.get(i);
+			PhenotypicType role = testVarRoles.get(i);
+			if (variableType != null) {
+				Assert.assertEquals("The variable type id must be " + variableType.getId(), variableType.getId(),
+						projectPropertyName.getTypeId());
+			} else {
+				VariableType defaultVariableType = this.mapPhenotypicTypeToDefaultVariableType(role);
+				Assert.assertEquals("The variable type id must be " + defaultVariableType.getId(), defaultVariableType.getId(),
+						projectPropertyName.getTypeId());
+			}
+			Assert.assertEquals("The rank should " + dmsVariableType.getRank(), dmsVariableType.getRank(), projectPropertyName.getRank()
+					.intValue());
+
+			// verify description projectprop record
+			ProjectProperty projectPropertyDesc = projectPropIterator.next();
+			Assert.assertEquals("The description should be " + dmsVariableType.getLocalDescription(),
+					dmsVariableType.getLocalDescription(), projectPropertyDesc.getValue());
+			Assert.assertEquals("The project id should " + dmsProject.getProjectId(), dmsProject.getProjectId(), projectPropertyDesc
+					.getProject().getProjectId());
+			Assert.assertEquals("The type id must be " + TermId.VARIABLE_DESCRIPTION.getId(), TermId.VARIABLE_DESCRIPTION.getId(),
+					projectPropertyDesc.getTypeId().intValue());
+			Assert.assertEquals("The rank should " + dmsVariableType.getRank(), dmsVariableType.getRank(), projectPropertyDesc.getRank().intValue());
+
+			// verify ontology variable projectprop record
+			ProjectProperty projectPropertyOntologyVar = projectPropIterator.next();
+			Assert.assertEquals("The ontology variable should be " + String.valueOf(dmsVariableType.getId()),
+					String.valueOf(dmsVariableType.getId()), projectPropertyOntologyVar.getValue());
+			Assert.assertEquals("The project id should " + dmsProject.getProjectId(), dmsProject.getProjectId(), projectPropertyOntologyVar
+					.getProject().getProjectId());
+			Assert.assertEquals("The type id must be " + TermId.STANDARD_VARIABLE.getId(), TermId.STANDARD_VARIABLE.getId(),
+					projectPropertyOntologyVar.getTypeId().intValue());
+			Assert.assertEquals("The rank should " + dmsVariableType.getRank(), dmsVariableType.getRank(), projectPropertyOntologyVar
+					.getRank().intValue());
+
+			if (dmsVariableType.getTreatmentLabel() != null && !"".equals(dmsVariableType.getTreatmentLabel())) {
+				// verify treatment label projectprop record
+				ProjectProperty projectPropertyTreatmentLabel = projectPropIterator.next();
+				Assert.assertEquals("The treatment label should be " + dmsVariableType.getTreatmentLabel(),
+						dmsVariableType.getTreatmentLabel(), projectPropertyTreatmentLabel.getValue());
+				Assert.assertEquals("The project id should " + dmsProject.getProjectId(), dmsProject.getProjectId(),
+						projectPropertyTreatmentLabel.getProject().getProjectId());
+				Assert.assertEquals("The type id must be " + TermId.MULTIFACTORIAL_INFO.getId(), TermId.MULTIFACTORIAL_INFO.getId(),
+						projectPropertyTreatmentLabel.getTypeId().intValue());
+				Assert.assertEquals("The rank should " + dmsVariableType.getRank(), dmsVariableType.getRank(),
+						projectPropertyTreatmentLabel
+						.getRank().intValue());
+			}
+			i++;
+		}
+	}
+
+	private VariableTypeList createVariableTypeListTestData(List<PhenotypicType> testVarRoles, List<VariableType> testVarVariableTypes) {
+		VariableTypeList variableTypeList = new VariableTypeList();
+		for (int i = 0; i < testVarRoles.size(); i++) {
+			int rank = i + 1;
+			variableTypeList.add(this.createDMSVariableType("VAR-NAME" + rank, "VAR-DESC-" + rank, rank, testVarRoles.get(i),
+					testVarVariableTypes.get(i)));
+		}
+		return variableTypeList;
+	}
+
+	private DMSVariableType createDMSVariableType(String localName, String localDescription, int rank, PhenotypicType role,
+			VariableType variableType) {
+		DMSVariableType dmsVariableType = new DMSVariableType();
+		dmsVariableType.setLocalName(localName);
+		dmsVariableType.setLocalDescription(localDescription);
+		dmsVariableType.setRank(rank);
+		dmsVariableType.setRole(role);
+		dmsVariableType.setVariableType(variableType);
+		if (variableType != null && variableType.getId() == VariableType.TREATMENT_FACTOR.getId()) {
+			dmsVariableType.setTreatmentLabel("TEST TREATMENT LABEL");
+		}
+		dmsVariableType.setStandardVariable(this.createStandardVariable(rank));
+		return dmsVariableType;
+	}
+
+	private StandardVariable createStandardVariable(int id) {
+		StandardVariable standardVariable = new StandardVariable();
+		standardVariable.setId(id);
+		return standardVariable;
+	}
+
+	private VariableType mapPhenotypicTypeToDefaultVariableType(PhenotypicType role) {
+		if (PhenotypicType.STUDY == role || PhenotypicType.DATASET == role) {
+			return VariableType.STUDY_DETAIL;
+		} else if (PhenotypicType.TRIAL_ENVIRONMENT == role) {
+			return VariableType.ENVIRONMENT_DETAIL;
+		} else if (PhenotypicType.GERMPLASM == role) {
+			return VariableType.GERMPLASM_DESCRIPTOR;
+		} else if (PhenotypicType.TRIAL_DESIGN == role) {
+			return VariableType.EXPERIMENTAL_DESIGN;
+		} else if (PhenotypicType.VARIATE == role) {
+			return VariableType.TRAIT;
+		}
+		return null;
 	}
 
 }
