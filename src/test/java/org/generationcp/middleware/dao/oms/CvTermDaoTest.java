@@ -60,7 +60,8 @@ public class CvTermDaoTest extends IntegrationTestBase {
 			Map<Integer, VariableType> actualStdVarIdWithTypeMap = results.get(name);
 			Debug.println(0, "    Name/Synonym = " + name + ", Terms = " + actualStdVarIdWithTypeMap);
 			if (actualStdVarIdWithTypeMap != null) {
-				Assert.assertTrue(actualStdVarIdWithTypeMap.containsValue(expectedStdVarWithTypeMap.get(name)));
+				final VariableType variableType = expectedStdVarWithTypeMap.get(name);
+				Assert.assertTrue(actualStdVarIdWithTypeMap.containsValue(variableType));
 			}
 		}
 
@@ -75,7 +76,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		varNameWithTypeMap.put("CROSS", VariableType.GERMPLASM_DESCRIPTOR);
 		varNameWithTypeMap.put("PLOT_NO", VariableType.EXPERIMENTAL_DESIGN);
 		varNameWithTypeMap.put("REP_NO", VariableType.EXPERIMENTAL_DESIGN);
-		varNameWithTypeMap.put("SITE_SOIL_PH", VariableType.TRAIT);
+		varNameWithTypeMap.put("SITE_SOIL_PH", VariableType.TRIAL_CONDITION);
 		return varNameWithTypeMap;
 	}
 

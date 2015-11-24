@@ -10,7 +10,6 @@ import org.generationcp.middleware.pojos.germplasm.GermplasmCross;
 import org.generationcp.middleware.pojos.germplasm.GermplasmCrossElement;
 import org.generationcp.middleware.pojos.germplasm.SingleGermplasmCrossElement;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
-import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.slf4j.Logger;
@@ -18,32 +17,29 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
-public class PedigreeDefaultServiceImpl extends Service implements PedigreeService {
+public class PedigreeDefaultServiceImpl implements PedigreeService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
 
+	private PedigreeDataManagerFactory pedigreeDataManagerFactory;
+
 	public PedigreeDefaultServiceImpl() {
-		super();
+
 	}
 
 	public PedigreeDefaultServiceImpl(HibernateSessionProvider sessionProvider) {
-		super(sessionProvider);
-	}
-
-	public PedigreeDefaultServiceImpl(HibernateSessionProvider sessionProvider, String localDatabaseName) {
-		super(sessionProvider, localDatabaseName);
+		this.pedigreeDataManagerFactory = new PedigreeDataManagerFactory(sessionProvider);
 
 	}
 
 	@Override
-	public String getCrossExpansion(Integer gid, CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException {
+	public String getCrossExpansion(Integer gid, CrossExpansionProperties crossExpansionProperties) {
 		return this.getCrossExpansion(gid, null, crossExpansionProperties);
 	}
 
 	@Override
-	public String getCrossExpansion(Integer gid, Integer level, CrossExpansionProperties crossExpansionProperties)
-			throws MiddlewareQueryException {
-		Germplasm germplasm = this.getGermplasmDataManager().getGermplasmWithPrefName(gid);
+	public String getCrossExpansion(Integer gid, Integer level, CrossExpansionProperties crossExpansionProperties) {
+		Germplasm germplasm = this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(gid);
 		if (germplasm != null) {
 			SingleGermplasmCrossElement startElement = new SingleGermplasmCrossElement();
 			startElement.setGermplasm(germplasm);
@@ -56,16 +52,14 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 	}
 
 	@Override
-	public String getCrossExpansion(final Germplasm germplasm, final Integer level, final CrossExpansionProperties crossExpansionProperties)
-			throws MiddlewareQueryException {
+	public String getCrossExpansion(final Germplasm germplasm, final Integer level, final CrossExpansionProperties crossExpansionProperties) {
 
 		// We need to clean up our pedigree service
 		throw new UnsupportedOperationException("This method is curently not supported and"
 				+ " really should not be called from anywhere in the code.");
 	}
 
-	private GermplasmCrossElement expandGermplasmCross(GermplasmCrossElement element, int level, boolean forComplexCross)
-			throws MiddlewareQueryException {
+	private GermplasmCrossElement expandGermplasmCross(GermplasmCrossElement element, int level, boolean forComplexCross) {
 		if (level == 0) {
 			// if the level is zero then there is no need to expand and the
 			// element
@@ -86,7 +80,9 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 					// skip and then expand on the gpid1 parent
 					if (germplasmToExpand.getGpid1() != null && germplasmToExpand.getGpid1() != 0 && !forComplexCross) {
 						SingleGermplasmCrossElement nextElement = new SingleGermplasmCrossElement();
-						Germplasm gpid1Germplasm = this.getGermplasmDataManager().getGermplasmWithPrefName(germplasmToExpand.getGpid1());
+						Germplasm gpid1Germplasm =
+								this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+										germplasmToExpand.getGpid1());
 						if (gpid1Germplasm != null) {
 							nextElement.setGermplasm(gpid1Germplasm);
 							return this.expandGermplasmCross(nextElement, level, forComplexCross);
@@ -99,7 +95,8 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 				} else {
 					GermplasmCross cross = new GermplasmCross();
 
-					Method method = this.getGermplasmDataManager().getMethodByID(germplasmToExpand.getMethodId());
+					Method method =
+							this.pedigreeDataManagerFactory.getGermplasmDataManager().getMethodByID(germplasmToExpand.getMethodId());
 					if (method != null) {
 						String methodName = method.getMname();
 						if (methodName != null) {
@@ -110,11 +107,15 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 
 						if (methodName.contains("single cross")) {
 							// get the immediate parents
-							Germplasm firstParent = this.getGermplasmDataManager().getGermplasmWithPrefName(germplasmToExpand.getGpid1());
+							Germplasm firstParent =
+									this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+											germplasmToExpand.getGpid1());
 							SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
 							firstParentElem.setGermplasm(firstParent);
 
-							Germplasm secondParent = this.getGermplasmDataManager().getGermplasmWithPrefName(germplasmToExpand.getGpid2());
+							Germplasm secondParent =
+									this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+											germplasmToExpand.getGpid2());
 							SingleGermplasmCrossElement secondParentElem = new SingleGermplasmCrossElement();
 							secondParentElem.setGermplasm(secondParent);
 
@@ -137,18 +138,26 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 
 						} else if (methodName.contains("double cross")) {
 							// get the grandparents on both sides
-							Germplasm firstParent = this.getGermplasmDataManager().getGermplasmByGID(germplasmToExpand.getGpid1());
-							Germplasm secondParent = this.getGermplasmDataManager().getGermplasmByGID(germplasmToExpand.getGpid2());
+							Germplasm firstParent =
+									this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmByGID(
+											germplasmToExpand.getGpid1());
+							Germplasm secondParent =
+									this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmByGID(
+											germplasmToExpand.getGpid2());
 
 							Germplasm firstGrandParent = null;
 							SingleGermplasmCrossElement firstGrandParentElem = new SingleGermplasmCrossElement();
 							Germplasm secondGrandParent = null;
 							SingleGermplasmCrossElement secondGrandParentElem = new SingleGermplasmCrossElement();
 							if (firstParent != null) {
-								firstGrandParent = this.getGermplasmDataManager().getGermplasmWithPrefName(firstParent.getGpid1());
+								firstGrandParent =
+										this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+												firstParent.getGpid1());
 								firstGrandParentElem.setGermplasm(firstGrandParent);
 
-								secondGrandParent = this.getGermplasmDataManager().getGermplasmWithPrefName(firstParent.getGpid2());
+								secondGrandParent =
+										this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+												firstParent.getGpid2());
 								secondGrandParentElem.setGermplasm(secondGrandParent);
 							}
 
@@ -157,9 +166,13 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 							Germplasm fourthGrandParent = null;
 							SingleGermplasmCrossElement fourthGrandParentElem = new SingleGermplasmCrossElement();
 							if (secondParent != null) {
-								thirdGrandParent = this.getGermplasmDataManager().getGermplasmWithPrefName(secondParent.getGpid1());
+								thirdGrandParent =
+										this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+												secondParent.getGpid1());
 								thirdGrandParentElem.setGermplasm(thirdGrandParent);
-								fourthGrandParent = this.getGermplasmDataManager().getGermplasmWithPrefName(secondParent.getGpid2());
+								fourthGrandParent =
+										this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+												secondParent.getGpid2());
 								fourthGrandParentElem.setGermplasm(fourthGrandParent);
 							}
 
@@ -242,8 +255,12 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 
 						} else if (methodName.contains("three-way cross")) {
 							// get the two parents first
-							Germplasm firstParent = this.getGermplasmDataManager().getGermplasmByGID(germplasmToExpand.getGpid1());
-							Germplasm secondParent = this.getGermplasmDataManager().getGermplasmByGID(germplasmToExpand.getGpid2());
+							Germplasm firstParent =
+									this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmByGID(
+											germplasmToExpand.getGpid1());
+							Germplasm secondParent =
+									this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmByGID(
+											germplasmToExpand.getGpid2());
 
 							// check for the parent generated by a cross, the
 							// other one should be a derived germplasm
@@ -251,12 +268,14 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 								// the first parent is the one created by a
 								// cross
 								Germplasm firstGrandParent =
-										this.getGermplasmDataManager().getGermplasmWithPrefName(firstParent.getGpid1());
+										this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+												firstParent.getGpid1());
 								SingleGermplasmCrossElement firstGrandParentElem = new SingleGermplasmCrossElement();
 								firstGrandParentElem.setGermplasm(firstGrandParent);
 
 								Germplasm secondGrandParent =
-										this.getGermplasmDataManager().getGermplasmWithPrefName(firstParent.getGpid2());
+										this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+												firstParent.getGpid2());
 								SingleGermplasmCrossElement secondGrandParentElem = new SingleGermplasmCrossElement();
 								secondGrandParentElem.setGermplasm(secondGrandParent);
 
@@ -280,7 +299,9 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 								crossForGrandParents.setNumberOfCrossesBefore(numOfCrossesForGrandParents);
 
 								// make the element for the second parent
-								secondParent = this.getGermplasmDataManager().getGermplasmWithPrefName(germplasmToExpand.getGpid2());
+								secondParent =
+										this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+												germplasmToExpand.getGpid2());
 								SingleGermplasmCrossElement secondParentElem = new SingleGermplasmCrossElement();
 								secondParentElem.setGermplasm(secondParent);
 
@@ -294,12 +315,14 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 								// the second parent is the one created by a
 								// cross
 								Germplasm firstGrandParent =
-										this.getGermplasmDataManager().getGermplasmWithPrefName(secondParent.getGpid1());
+										this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+												secondParent.getGpid1());
 								SingleGermplasmCrossElement firstGrandParentElem = new SingleGermplasmCrossElement();
 								firstGrandParentElem.setGermplasm(firstGrandParent);
 
 								Germplasm secondGrandParent =
-										this.getGermplasmDataManager().getGermplasmWithPrefName(secondParent.getGpid2());
+										this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+												secondParent.getGpid2());
 								SingleGermplasmCrossElement secondGrandParentElem = new SingleGermplasmCrossElement();
 								secondGrandParentElem.setGermplasm(secondGrandParent);
 
@@ -323,7 +346,9 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 								crossForGrandParents.setNumberOfCrossesBefore(numOfCrossesForGrandParents);
 
 								// make the element for the first parent
-								firstParent = this.getGermplasmDataManager().getGermplasmWithPrefName(germplasmToExpand.getGpid1());
+								firstParent =
+										this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+												germplasmToExpand.getGpid1());
 								SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
 								firstParentElem.setGermplasm(firstParent);
 
@@ -345,8 +370,12 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 						} else if (methodName.contains("backcross")) {
 							BackcrossElement backcross = new BackcrossElement();
 
-							Germplasm firstParent = this.getGermplasmDataManager().getGermplasmWithPrefName(germplasmToExpand.getGpid1());
-							Germplasm secondParent = this.getGermplasmDataManager().getGermplasmWithPrefName(germplasmToExpand.getGpid2());
+							Germplasm firstParent =
+									this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+											germplasmToExpand.getGpid1());
+							Germplasm secondParent =
+									this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+											germplasmToExpand.getGpid2());
 
 							boolean itsABackCross = false;
 
@@ -364,9 +393,13 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 
 										Germplasm toCheck = null;
 										if (firstParent.getGid().equals(secondParent.getGpid1()) && secondParent.getGpid2() != null) {
-											toCheck = this.getGermplasmDataManager().getGermplasmWithPrefName(secondParent.getGpid2());
+											toCheck =
+													this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+															secondParent.getGpid2());
 										} else if (firstParent.getGid().equals(secondParent.getGpid2()) && secondParent.getGpid1() != null) {
-											toCheck = this.getGermplasmDataManager().getGermplasmWithPrefName(secondParent.getGpid1());
+											toCheck =
+													this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+															secondParent.getGpid1());
 										}
 										Object[] numOfDosesAndOtherParent =
 												this.determineNumberOfRecurringParent(firstParent.getGid(), toCheck);
@@ -384,9 +417,13 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 
 										Germplasm toCheck = null;
 										if (secondParent.getGid().equals(firstParent.getGpid1()) && firstParent.getGpid2() != null) {
-											toCheck = this.getGermplasmDataManager().getGermplasmWithPrefName(firstParent.getGpid2());
+											toCheck =
+													this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+															firstParent.getGpid2());
 										} else if (secondParent.getGid().equals(firstParent.getGpid2()) && firstParent.getGpid1() != null) {
-											toCheck = this.getGermplasmDataManager().getGermplasmWithPrefName(firstParent.getGpid1());
+											toCheck =
+													this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+															firstParent.getGpid1());
 										}
 										Object[] numOfDosesAndOtherParent =
 												this.determineNumberOfRecurringParent(secondParent.getGid(), toCheck);
@@ -423,11 +460,15 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 							}
 						} else if (methodName.contains("cross") && methodName.contains("complex")) {
 							// get the immediate parents
-							Germplasm firstParent = this.getGermplasmDataManager().getGermplasmWithPrefName(germplasmToExpand.getGpid1());
+							Germplasm firstParent =
+									this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+											germplasmToExpand.getGpid1());
 							SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
 							firstParentElem.setGermplasm(firstParent);
 
-							Germplasm secondParent = this.getGermplasmDataManager().getGermplasmWithPrefName(germplasmToExpand.getGpid2());
+							Germplasm secondParent =
+									this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+											germplasmToExpand.getGpid2());
 							SingleGermplasmCrossElement secondParentElem = new SingleGermplasmCrossElement();
 							secondParentElem.setGermplasm(secondParent);
 
@@ -446,8 +487,12 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 							cross.setSecondParent(expandedSecondParent);
 							cross.setNumberOfCrossesBefore(numOfCrosses);
 						} else if (methodName.contains("cross")) {
-							Germplasm firstParent = this.getGermplasmDataManager().getGermplasmWithPrefName(germplasmToExpand.getGpid1());
-							Germplasm secondParent = this.getGermplasmDataManager().getGermplasmWithPrefName(germplasmToExpand.getGpid2());
+							Germplasm firstParent =
+									this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+											germplasmToExpand.getGpid1());
+							Germplasm secondParent =
+									this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+											germplasmToExpand.getGpid2());
 
 							SingleGermplasmCrossElement firstParentElem = new SingleGermplasmCrossElement();
 							firstParentElem.setGermplasm(firstParent);
@@ -465,13 +510,11 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 
 						return cross;
 					} else {
-						this.logAndThrowException(
-								"Error with expanding cross, can not find method with id: " + germplasmToExpand.getMethodId(),
-								new Throwable(), PedigreeDefaultServiceImpl.LOG);
+						this.logAndThrowException("Error with expanding cross, can not find method with id: " + germplasmToExpand.getMethodId());
 					}
 				}
 			} else {
-				this.logAndThrowException("expandGermplasmCross was incorrectly called", new Throwable(), PedigreeDefaultServiceImpl.LOG);
+				this.logAndThrowException("expandGermplasmCross was incorrectly called");
 			}
 		}
 		return element;
@@ -484,7 +527,7 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 	 * @return an array of 2 Objects, first is an Integer which is the number of doses of the recurring parent, and the other is a Germplasm
 	 *         object representing the parent crossed with the recurring parent.
 	 */
-	private Object[] determineNumberOfRecurringParent(Integer recurringParentGid, Germplasm toCheck) throws MiddlewareQueryException {
+	private Object[] determineNumberOfRecurringParent(Integer recurringParentGid, Germplasm toCheck) {
 		Object[] toreturn = new Object[2];
 		if (toCheck == null) {
 			toreturn[0] = Integer.valueOf(0);
@@ -496,7 +539,7 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 		} else if (toCheck.getGpid1() != null && toCheck.getGpid1().equals(recurringParentGid)) {
 			Germplasm nextToCheck = null;
 			if (toCheck.getGpid2() != null) {
-				nextToCheck = this.getGermplasmDataManager().getGermplasmWithPrefName(toCheck.getGpid2());
+				nextToCheck = this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(toCheck.getGpid2());
 			}
 			Object[] returned = this.determineNumberOfRecurringParent(recurringParentGid, nextToCheck);
 			toreturn[0] = (Integer) returned[0] + 1;
@@ -504,7 +547,7 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 		} else if (toCheck.getGpid2() != null && toCheck.getGpid2().equals(recurringParentGid)) {
 			Germplasm nextToCheck = null;
 			if (toCheck.getGpid1() != null) {
-				nextToCheck = this.getGermplasmDataManager().getGermplasmWithPrefName(toCheck.getGpid1());
+				nextToCheck = this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(toCheck.getGpid1());
 			}
 			Object[] returned = this.determineNumberOfRecurringParent(recurringParentGid, nextToCheck);
 			toreturn[0] = (Integer) returned[0] + 1;
@@ -515,5 +558,11 @@ public class PedigreeDefaultServiceImpl extends Service implements PedigreeServi
 		}
 
 		return toreturn;
+	}
+
+	private void logAndThrowException(String message) {
+		final MiddlewareQueryException exception = new MiddlewareQueryException(message);
+		LOG.error(message, exception);
+		throw exception;
 	}
 }
