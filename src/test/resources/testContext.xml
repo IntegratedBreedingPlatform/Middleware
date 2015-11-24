@@ -62,7 +62,7 @@
     </bean>
     
     <bean id="pedigreeService" class="org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl">
-        <property name="sessionProvider" ref="cropSessionProvider"/>
+        <constructor-arg ref="cropSessionProvider"/>
     </bean>
     
     <bean id="pedigreeDataManager" class="org.generationcp.middleware.manager.PedigreeDataManagerImpl">
