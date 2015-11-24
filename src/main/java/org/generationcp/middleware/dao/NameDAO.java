@@ -28,12 +28,19 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 /**
  * DAO class for {@link Name}.
  *
  */
 public class NameDAO extends GenericDAO<Name, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(NameDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<Name> getByGIDWithFilters(Integer gid, Integer status, GermplasmNameType type) throws MiddlewareQueryException {
@@ -70,13 +77,13 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			/**
 			 * List<Criterion> criterions = new ArrayList<Criterion>(); Criterion gidCriterion = Restrictions.eq("germplasmId", gid);
 			 * criterions.add(gidCriterion);
-			 * 
+			 *
 			 * if(status != null && status != 0) { Criterion statusCriterion = Restrictions.eq("nstat", status);
 			 * criterions.add(statusCriterion); }
-			 * 
+			 *
 			 * if(type != null) { Integer typeid = type.getUserDefinedFieldID(); Criterion typeCriterion = Restrictions.eq("type.fldno",
 			 * typeid); criterions.add(typeCriterion); }
-			 * 
+			 *
 			 * List<Name> results = getByCriteria(criterions); return results;
 			 **/
 		} catch (HibernateException e) {
@@ -152,7 +159,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 	/**
 	 * Retrieves the gId and nId pairs for the given germplasm names
-	 * 
+	 *
 	 * @param germplasmNames the list of germplasm names
 	 * @return the list of GidNidElement (gId and nId pairs)
 	 * @throws MiddlewareQueryException
@@ -322,7 +329,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			keyword2 = keyword2.replaceAll("\\s", "");
 			StringBuilder sql = new StringBuilder();
 			sql.append("SELECT nval FROM names ").append(" WHERE (REPLACE(nval, ' ', '') LIKE '").append(keyword1).append("'")
-					.append(" OR REPLACE(nval, ' ', '') LIKE '").append(keyword2).append("')");
+			.append(" OR REPLACE(nval, ' ', '') LIKE '").append(keyword2).append("')");
 
 			Query query = this.getSession().createSQLQuery(sql.toString());
 			return query.list();
@@ -358,6 +365,70 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			this.logAndThrowException("Error with getAllMatchingNames(" + name + ") query from Name " + e.getMessage(), e);
 		}
 		return false;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Map<String, Integer> getCountByNamePermutations(List<String> names) throws MiddlewareQueryException {
+
+		Monitor getCountByNamePermutations = MonitorFactory.start("Method Started : getCountByNamePermutations ");
+
+		if (names == null || names.isEmpty()) {
+			return new HashMap<>();
+		}
+
+		Map<String, Integer> mapCountWithName = new HashMap<>();
+		Map<String, String> mapPermutationValue = new HashMap<>();
+
+		//Converting supplied value to combination of names that can exists in names
+		for(String name : names){
+			mapCountWithName.put(name, 0);
+			List<String> permutations = GermplasmDataManagerUtil.createNamePermutations(name);
+			mapPermutationValue.put(permutations.get(0), name);
+			mapPermutationValue.put(permutations.get(1), name);
+			mapPermutationValue.put(permutations.get(2), name);
+		}
+
+		List<String> allDesignationValues = new ArrayList<>(mapPermutationValue.keySet());
+
+		Integer total = allDesignationValues.size();
+
+		Integer totalBatches = total / 1000;
+
+		LOG.info("Total batch to germplasm designations are {}", totalBatches + 1);
+
+		List<Object[]> allNameList = new ArrayList<>();
+
+		for (Integer b = 0; b <= totalBatches; b++) {
+
+			LOG.info("Processing batch {}/{}", b + 1, totalBatches + 1);
+
+			Integer start = b * 1000;
+
+			if (start > total) {
+				start = total - 1;
+			}
+
+			Integer end = (b + 1) * 1000;
+
+			if (end > total) {
+				end = total;
+			}
+
+			List<String> batchDesignationValues = allDesignationValues.subList(start, end);
+
+			// Count using = by default
+			SQLQuery query = this.getSession().createSQLQuery("select n.* FROM names n inner join germplsm g on g.gid = n.gid where nval in (:namelist) and g.gid != g.grplce and g.grplce = 0");
+			query.setParameterList("namelist", batchDesignationValues);
+			allNameList.addAll(query.list());
+		}
+
+		for (Object[] row : allNameList) {
+			String originalName = mapPermutationValue.get(row[5]);
+			mapCountWithName.put(originalName, mapCountWithName.get(originalName) + 1);
+		}
+
+		LOG.debug("Method End : getCountByNamePermutations " + getCountByNamePermutations.stop());
+		return mapCountWithName;
 	}
 
 }

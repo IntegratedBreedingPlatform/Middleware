@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -17,7 +18,7 @@ import com.google.common.base.Preconditions;
 
 /**
  * Class to enable us to save data to the phenotype table and the nd experiment phenotype table in a performant manner.
- *
+ * 
  */
 public class Measurements {
 
@@ -33,7 +34,8 @@ public class Measurements {
 	 * @param observations list of observations to save
 	 */
 	void saveMeasurements(final List<MeasurementRow> observations) {
-		// Changing the fulsh mode will have huge performance implications. Please be careful when doing this. The current stratergy below
+		// Changing the fulsh mode will have huge performance implications.
+		// Please be careful when doing this. The current stratergy below
 		// facilitates batch inserts.
 		final FlushMode originalFlushMode = this.session.getFlushMode();
 		try {
@@ -49,7 +51,7 @@ public class Measurements {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param measurementData measurementData used to create your {@link Phenotype} object that can be saved
 	 */
 	Phenotype createPhenotypeFromMeasurement(final MeasurementData measurementData) {
@@ -89,9 +91,10 @@ public class Measurements {
 			}
 			for (final MeasurementData measurementData : dataList) {
 
-				// TODO Change the UI so that we are never send back any data which is null
-				if (!measurementData.isEditable() || StringUtils.isBlank(measurementData.getcValueId())
-						&& StringUtils.isBlank(measurementData.getValue())) {
+				// TODO Change the UI so that we are never send back any data
+				if (!measurementData.isEditable() || (measurementData.getPhenotypeId() == null || measurementData.getPhenotypeId() == 0)
+						&& StringUtils.isBlank(measurementData.getcValueId()) && StringUtils.isBlank(measurementData.getValue())
+						|| measurementData.getMeasurementVariable().getRole() != PhenotypicType.VARIATE) {
 					continue;
 				}
 				final MeasurementVariable measurementVariable = measurementData.getMeasurementVariable();
@@ -102,10 +105,14 @@ public class Measurements {
 				this.phenotypeSaver.saveOrUpdate(measurementRow.getExperimentId(), measurementVariable.getTermId(),
 						measurementData.getcValueId() != null && !"".equals(measurementData.getcValueId()) ? measurementData.getcValueId()
 								: measurementData.getValue(), phenotype, measurementData.getMeasurementVariable().getDataTypeId());
+				// This is not great but essential because the workbook
+				// object must be updated so that it has new phenotype id. This
+				// id is then piped back to the UI and is used in subsequent calls to
+				// determine if we need to update or add phenotype values
+				measurementData.setPhenotypeId(phenotype.getPhenotypeId());
 
 			}
 
 		}
 	}
-
 }

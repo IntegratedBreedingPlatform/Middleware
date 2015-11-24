@@ -28,7 +28,6 @@ public class VariableList implements Serializable {
 
 	private List<Variable> variables = new ArrayList<Variable>();
 	private VariableTypeList variableTypes = null;
-	private Map<String, Variable> variableMap;
 
 	public void add(Variable variable) {
 		this.variables.add(variable);

@@ -18,10 +18,12 @@ import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Variable;
+import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -39,23 +41,33 @@ public class DatasetValuesTransformerTest extends TestOutputFormatter {
 
 	@Test
 	public void testTransform() throws Exception {
-		String datasetName = "DataSet Name here";
-		String datasetDescription = "DataSet Description here";
-		DataSetType dataType = DataSetType.PLOT_DATA;
+		final String datasetName = "DataSet Name here";
+		final String datasetDescription = "DataSet Description here";
+		final DataSetType dataType = DataSetType.PLOT_DATA;
 
-		List<MeasurementVariable> mVarList = this.createMeasurementVariableListTestData();
-		VariableTypeList varTypeList = this.createVariableTypeListTestData();
+		final List<MeasurementVariable> mVarList = this.createMeasurementVariableListTestData();
+		final VariableTypeList varTypeList = this.createVariableTypeListTestData();
 
-		DatasetValues datasetVal =
+		final DatasetValues datasetVal =
 				DatasetValuesTransformerTest.transformer.transform(datasetName, datasetDescription, dataType, mVarList, varTypeList);
 
-		Assert.assertNotNull(datasetVal);
-		Debug.println(TestOutputFormatter.INDENT, datasetVal.toString());
+		Assert.assertNotNull("The transformation must result in valued dataset collection", datasetVal);
+		Assert.assertEquals("Data set name mapping did not work.", datasetName, datasetVal.getName());
+		Assert.assertEquals("Data set description mapping did not work.", datasetDescription, datasetVal.getDescription());
+		Assert.assertEquals("Data set d mapping did not work.", dataType, datasetVal.getType());
+
+		final VariableList variables = datasetVal.getVariables();
+		final List<Variable> newlyMappedVariables = variables.getVariables();
+		for (final Variable variable : newlyMappedVariables) {
+			Assert.assertEquals("According to our test data all variables mapped must be traits", VariableType.TRAIT, variable
+					.getVariableType().getVariableType());
+		}
+
 	}
 
 	private VariableTypeList createVariableTypeListTestData() {
-		VariableTypeList varTypeList = new VariableTypeList();
-		StandardVariable standardVariable = new StandardVariable();
+		final VariableTypeList varTypeList = new VariableTypeList();
+		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(2);
 
 		varTypeList.add(new DMSVariableType("PI Name", "Name of Principal Investigator", standardVariable, 1));
@@ -67,12 +79,16 @@ public class DatasetValuesTransformerTest extends TestOutputFormatter {
 	}
 
 	private List<MeasurementVariable> createMeasurementVariableListTestData() {
-		List<MeasurementVariable> mVarList = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> mVarList = new ArrayList<MeasurementVariable>();
 
-		mVarList.add(new MeasurementVariable("PI Name", "Name of Principal Investigator", "DBCV", "ASSIGNED", "PERSON", "C", "", "STUDY"));
-		mVarList.add(new MeasurementVariable("PI ID", "ID of Principal Investigator", "DBID", "ASSIGNED", "PERSON", "N", "", "STUDY"));
-		mVarList.add(new MeasurementVariable("TRIAL", "TRIAL NUMBER", "NUMBER", "ENUMERATED", "TRIAL INSTANCE", "N", "1", "TRIAL"));
-		mVarList.add(new MeasurementVariable("COOPERATOR", "COOPERATOR NAME", "DBCV", "Conducted", "Person", "C", "", "TRIAL"));
+		mVarList.add(new MeasurementVariable(2, "PI Name", "Name of Principal Investigator", "DBCV", "ASSIGNED", "PERSON", "C", "",
+				"STUDY", VariableType.TRAIT));
+		mVarList.add(new MeasurementVariable(2, "PI ID", "ID of Principal Investigator", "DBID", "ASSIGNED", "PERSON", "N", "", "STUDY",
+				VariableType.TRAIT));
+		mVarList.add(new MeasurementVariable(2, "TRIAL", "TRIAL NUMBER", "NUMBER", "ENUMERATED", "TRIAL INSTANCE", "N", "1", "TRIAL",
+				VariableType.TRAIT));
+		mVarList.add(new MeasurementVariable(2, "COOPERATOR", "COOPERATOR NAME", "DBCV", "Conducted", "Person", "C", "", "TRIAL",
+				VariableType.TRAIT));
 
 		return mVarList;
 	}

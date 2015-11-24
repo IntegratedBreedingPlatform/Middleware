@@ -9,8 +9,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -97,6 +105,77 @@ public class ProjectPropertySaverTest {
 
 		int startRank = this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, newMap);
 		this.verifyUpdateVariablesRankingAssertions(idsToUpdate, newMap, startRank);
+	}
+
+	@Test
+	public void testSaveVariableTypeShouldCheckSuppliedVariableTypeFirstThenRole(){
+		DmsProject dmsProject = new DmsProject();
+		dmsProject.setProjectId(1);
+		dmsProject.setName("ProjectName");
+		dmsProject.setDescription("ProjectDescription");
+		dmsProject.setProgramUUID("UUID");
+
+		DMSVariableType dmsVariableType = new DMSVariableType();
+		dmsVariableType.setLocalName("DMSName");
+		dmsVariableType.setLocalDescription("DMSDescription");
+		dmsVariableType.setRank(1);
+
+		StandardVariable standardVariable = new StandardVariable();
+		standardVariable.setId(1);
+		standardVariable.setName("Name");
+		standardVariable.setDescription("Description");
+		standardVariable.setPhenotypicType(PhenotypicType.STUDY);
+
+		dmsVariableType.setStandardVariable(standardVariable);
+
+		//role and null variable type
+		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType);
+		dmsVariableType.setRole(PhenotypicType.STUDY);
+		dmsVariableType.setVariableType(null);
+
+		Assert.assertEquals("SaveVariableType should add properties to dmsProject as expected", 3, dmsProject.getProperties().size());
+		Assert.assertEquals("SaveVariableType Properties are not matching for supplied Role", VariableType.STUDY_DETAIL.getId(), dmsProject.getProperties().get(
+				0).getTypeId());
+
+		//Clearing properties
+		dmsProject.setProperties(new ArrayList<ProjectProperty>());
+
+		//role and variable type
+		dmsVariableType.setRole(PhenotypicType.STUDY);
+		dmsVariableType.setVariableType(VariableType.ANALYSIS);
+		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType);
+		Assert.assertEquals("SaveVariableType should add properties to dmsProject as expected", 3, dmsProject.getProperties().size());
+		Assert.assertEquals("SaveVariableType Properties are not matching for supplied Variable Type", VariableType.ANALYSIS.getId(), dmsProject.getProperties().get(0).getTypeId());
+
+		//Clearing properties
+		dmsProject.setProperties(new ArrayList<ProjectProperty>());
+
+		//null role and variable type
+		dmsVariableType.setRole(null);
+		dmsVariableType.setVariableType(VariableType.TRAIT);
+		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType);
+
+		Assert.assertEquals("SaveVariableType should add properties to dmsProject as expected", 3, dmsProject.getProperties().size());
+		Assert.assertEquals("SaveVariableType Properties are not matching for supplied Variable Type", VariableType.TRAIT.getId(), dmsProject.getProperties().get(0).getTypeId());
+	}
+
+	@Test
+	public void testCreateVariableTypeShouldMapProperties(){
+		MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setVariableType(VariableType.ANALYSIS);
+		measurementVariable.setRole(PhenotypicType.STUDY);
+
+		int rank = 0;
+		DMSVariableType dmsVariableType = this.projectPropSaver.createVariableType(measurementVariable, rank);
+
+		String message = "Create Variable Type for %s not mapped properly with Properties.";
+
+		Assert.assertNotNull(String.format(message, "DMSVariable Type"), dmsVariableType);
+		StandardVariable standardVariable = dmsVariableType.getStandardVariable();
+		Assert.assertEquals(String.format(message, "Phenotypic Type"), measurementVariable.getRole(), standardVariable.getPhenotypicType());
+		Assert.assertEquals(String.format(message, "Role"), measurementVariable.getRole(), dmsVariableType.getRole());
+		Assert.assertEquals(String.format(message, "Type"), measurementVariable.getVariableType(), dmsVariableType.getVariableType());
+		Assert.assertEquals(String.format(message, "Rank"), rank, dmsVariableType.getRank());
 	}
 
 	private static Map<Integer, List<Integer>> getDummyProjectPropIds() {

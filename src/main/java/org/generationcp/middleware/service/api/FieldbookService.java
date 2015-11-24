@@ -275,7 +275,7 @@ public interface FieldbookService {
 	List<ValueReference> getDistinctStandardVariableValues(String property, String scale, String method, PhenotypicType role);
 
 	/**
-	 * Get a standard variable given an id.
+	 * Get a standard variable given an id. After the first read, the variable is cached in memory.
 	 *
 	 * @param id the id
 	 * @param programUUID unique id of the program

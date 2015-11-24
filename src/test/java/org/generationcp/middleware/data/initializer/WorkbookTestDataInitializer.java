@@ -139,16 +139,9 @@ public class WorkbookTestDataInitializer {
 	public static final String SITE_SOIL_PH = "SITE_SOIL_PH";
 
 	public static final String[] G_NAMES = {"TIANDOUGOU-9", "KENINKENI-27", "SM114-1A-1-1-1B", "SM114-1A-14-1-1B", "SM114-1A-361-1-1B",
-			"SM114-1A-86-1-1B", "SM114-1A-115-1-1B", "SM114-1A-281-1-1B", "SM114-1A-134-1-1B", "SM114-1A-69-1-1B", "SM114-1A-157-1-1B",
-			"SM114-1A-179-1-1B", "TIANDOUGOU-9", "SM114-1A-36-1-1B", "SM114-1A-201-1-1B", "SM114-1A-31-1-1B", "SM114-1A-353-1-1B",
-			"SM114-1A-26-1-1B", "SM114-1A-125-1-1B", "SM114-1A-384-1-1B"};
-
-	private static Workbook workbook;
-	private static List<Workbook> workbooks;
-
-	public static void setTestWorkbook(final Workbook workbookNew) {
-		WorkbookTestDataInitializer.workbook = workbookNew;
-	}
+		"SM114-1A-86-1-1B", "SM114-1A-115-1-1B", "SM114-1A-281-1-1B", "SM114-1A-134-1-1B", "SM114-1A-69-1-1B", "SM114-1A-157-1-1B",
+		"SM114-1A-179-1-1B", "TIANDOUGOU-9", "SM114-1A-36-1-1B", "SM114-1A-201-1-1B", "SM114-1A-31-1-1B", "SM114-1A-353-1-1B",
+		"SM114-1A-26-1-1B", "SM114-1A-125-1-1B", "SM114-1A-384-1-1B"};
 
 	public static Workbook getTestWorkbook() {
 		return createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, null, 1, false);
@@ -167,19 +160,17 @@ public class WorkbookTestDataInitializer {
 	}
 
 	public static List<Workbook> getTestWorkbooks(final int noOfTrial, final int noOfObservations) {
-		if (workbooks == null) {
-			workbooks = new ArrayList<Workbook>();
-			final String studyName = "pheno_t7" + new Random().nextInt(10000);
-			for (int i = 1; i <= noOfTrial; i++) {
-				workbooks.add(createTestWorkbook(noOfObservations, StudyType.T, studyName, i, true));
-			}
+		List<Workbook> workbooks = new ArrayList<Workbook>();
+		final String studyName = "pheno_t7" + new Random().nextInt(10000);
+		for (int i = 1; i <= noOfTrial; i++) {
+			workbooks.add(createTestWorkbook(noOfObservations, StudyType.T, studyName, i, true));
 		}
 		return workbooks;
 	}
 
 	public static Workbook createTestWorkbook(final int noOfObservations, final StudyType studyType, final String studyName,
 			final int trialNo, final boolean hasMultipleLocations) {
-		workbook = new Workbook();
+		Workbook workbook = new Workbook();
 
 		createStudyDetails(workbook, studyName, studyType);
 		createConditions(workbook, !hasMultipleLocations, trialNo);
@@ -275,12 +266,16 @@ public class WorkbookTestDataInitializer {
 				WorkbookTestDataInitializer.NUMERIC, String.valueOf(trialNo), WorkbookTestDataInitializer.TRIAL,
 				TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT));
 
-		conditions.add(createMeasurementVariable(WorkbookTestDataInitializer.EXPT_DESIGN_ID, "DESIGN", "EXPERIMENTAL DESIGN",
-				WorkbookTestDataInitializer.TYPE, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.EXPERIMENT_DESIGN,
-				WorkbookTestDataInitializer.CHAR, String.valueOf(TermId.RANDOMIZED_COMPLETE_BLOCK.getId()),
-				WorkbookTestDataInitializer.TRIAL, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT));
+		conditions.add(createExperimentalRCBDVariable());
 
 		workbook.setConditions(conditions);
+	}
+
+	public static MeasurementVariable createExperimentalRCBDVariable() {
+		return createMeasurementVariable(WorkbookTestDataInitializer.EXPT_DESIGN_ID, "DESIGN", "EXPERIMENTAL DESIGN",
+				WorkbookTestDataInitializer.TYPE, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.EXPERIMENT_DESIGN,
+				WorkbookTestDataInitializer.CHAR, String.valueOf(TermId.RANDOMIZED_COMPLETE_BLOCK.getId()),
+				WorkbookTestDataInitializer.TRIAL, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT);
 	}
 
 	public static void createFactors(final Workbook workbook, final boolean withEntry, final boolean withTrial, final int trialNo) {
@@ -563,7 +558,7 @@ public class WorkbookTestDataInitializer {
 			}
 			final MeasurementData measurementData =
 					createMeasurementData(WorkbookTestDataInitializer.CRUST, crustValue, WorkbookTestDataInitializer.CRUST_ID,
-							workbook.getVariates());
+							currentWorkbook.getVariates());
 			measurementData.setcValueId(crustCValueId);
 			dataList.add(measurementData);
 		}
@@ -726,7 +721,7 @@ public class WorkbookTestDataInitializer {
 		}
 	}
 
-	public static void createTrialObservations(final int noOfTrialInstances) {
+	public static void createTrialObservations(final int noOfTrialInstances, Workbook workbook) {
 		final List<MeasurementRow> trialObservations = new ArrayList<MeasurementRow>();
 
 		MeasurementRow row;

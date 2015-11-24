@@ -1029,4 +1029,8 @@ public class Workbook {
 		this.columnOrderedLists = columnOrderedLists;
 	}
 
+	public boolean hasExistingExperimentalDesign() {
+		final ExperimentalDesignVariable expDesignVar = this.getExperimentalDesignVariables();
+		return expDesignVar != null &&  expDesignVar.getExperimentalDesign() != null && expDesignVar.getExperimentalDesign().getValue() != null;
+	}
 }
