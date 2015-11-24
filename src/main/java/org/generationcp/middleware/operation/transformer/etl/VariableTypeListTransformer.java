@@ -1,6 +1,9 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -28,7 +31,7 @@ public class VariableTypeListTransformer extends Transformer {
 
 		if (measurementVariables != null && !measurementVariables.isEmpty()) {
 			for (MeasurementVariable measurementVariable : measurementVariables) {
-				StandardVariable standardVariable = null;
+				StandardVariable standardVariable;
 				if (measurementVariable.getTermId() != 0) {// in etl v2, standard variables are already created before saving the study
 					standardVariable = this.getStandardVariableBuilder().create(measurementVariable.getTermId(),programUUID);
 				} else {
@@ -45,12 +48,19 @@ public class VariableTypeListTransformer extends Transformer {
 				}
 				
 				standardVariable.setPhenotypicType(measurementVariable.getRole());
+
+				// if variable type not null then assigned single variable type.
+				if(measurementVariable.getVariableType() != null){
+					standardVariable.setVariableTypes(new HashSet<>(new ArrayList<>(
+							Collections.singletonList(measurementVariable.getVariableType()))));
+				}
+
 				measurementVariable.setTermId(standardVariable.getId());
 
 				DMSVariableType variableType =
 						new DMSVariableType(measurementVariable.getName(), measurementVariable.getDescription(), standardVariable, rank++);
+
 				variableType.setTreatmentLabel(measurementVariable.getTreatmentLabel());
-				variableType.setRole(measurementVariable.getRole());
 				variableTypeList.add(variableType);
 
 			}

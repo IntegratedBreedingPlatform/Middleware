@@ -200,7 +200,7 @@ public class StandardVariableBuilder extends Builder {
 		filterOpts.addScaleId(scale.getId());
 
 		List<Variable> variableList = this.getOntologyVariableDataManager().getWithFilter(filterOpts);
-		StandardVariable standardVariable = null;
+		StandardVariable standardVariable;
 		if (variableList == null || variableList.isEmpty()) {
 			OntologyVariableInfo variableInfo =
 					this.createOntologyVariableInfo(name, description, method.getId(), property.getId(), scale.getId(), programUUID, null,
@@ -243,6 +243,10 @@ public class StandardVariableBuilder extends Builder {
 		return variableInfo;
 	}
 
+	/**
+	 * Use OntologyDataHelper to map from PhenotypicType to VariableType correctly.
+	 */
+	@Deprecated
 	public VariableType mapPhenotypicTypeToDefaultVariableType(PhenotypicType role) {
 		if (PhenotypicType.STUDY == role || PhenotypicType.DATASET == role) {
 			return VariableType.STUDY_DETAIL;

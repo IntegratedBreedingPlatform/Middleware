@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -15,6 +17,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.operation.parser.WorkbookParser.Section;
 import org.generationcp.middleware.util.Message;
@@ -339,6 +342,48 @@ public class WorkbookParserTest {
 	
 		Assert.assertEquals("We must have one error message in the parser error list", 1, workbookParser.getErrorMessages().size());
 
+	}
+
+	@Test
+	public void testExtractVariantsWithSelectionSuccess() {
+		Section section = Section.VARIATE;
+		String[] headers = WorkbookParser.EXPECTED_VARIATE_HEADERS_2;
+		Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headers);
+		//this.addSectionVariableDetailsToWorkbook(sampleWorkbook, this.createVariableDetailsListTestData(section, headers));
+
+		int rowWithSelectionsDataInSheet = 1;
+		String[] validVariatsDetails = new String[headers.length + 1];
+
+		this.fillVariableDetails(validVariatsDetails, "NPSEL_Local", "Number of plants selected - counted (number)",
+				"Selections", "Number", "New_Counted", "N", "", "PLOT");
+		this.addRowInExistingSheet(sampleWorkbook.getSheetAt(0), rowWithSelectionsDataInSheet, validVariatsDetails);
+
+		List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		List<Message> errorMessages = new ArrayList<>();
+		this.workbookParser.setErrorMessages(errorMessages);
+		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
+
+		System.out.println("Error Messages:"+errorMessages.size());
+
+		HSSFSheet sheet = (HSSFSheet) sampleWorkbook.getSheetAt(0);
+
+		Assert.assertEquals(1, measurementVariables.size());
+
+		MeasurementVariable mv  = measurementVariables.get(0);
+
+		HSSFRow row = sheet.getRow(1);
+
+		Assert.assertEquals(mv.getName(), row.getCell(0).getStringCellValue());
+		Assert.assertEquals(mv.getDescription(), row.getCell(1).getStringCellValue());
+		Assert.assertEquals(mv.getProperty(), row.getCell(2).getStringCellValue());
+		Assert.assertEquals(mv.getScale(), row.getCell(3).getStringCellValue());
+		Assert.assertEquals(mv.getMethod(), row.getCell(4).getStringCellValue());
+		Assert.assertEquals(mv.getDataType(), row.getCell(5).getStringCellValue());
+		Assert.assertEquals(mv.getValue(), row.getCell(6).getStringCellValue());
+		Assert.assertEquals(mv.getLabel(), row.getCell(7).getStringCellValue());
+
+		//Assert variable type based on property name
+		Assert.assertEquals(mv.getVariableType(), VariableType.SELECTION_METHOD);
 	}
 
 	private List<String[]> createVariableDetailsListTestData(Section section, String[] headers) {

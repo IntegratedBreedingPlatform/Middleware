@@ -12,7 +12,7 @@
 package org.generationcp.middleware.domain.dms;
 
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -46,8 +46,16 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 		this.localName = localName;
 		this.localDescription = localDescription;
 		this.standardVariable = standardVariable;
-		this.rank = rank;
 		this.role = standardVariable.getPhenotypicType();
+
+		//Setting first variable type if exist
+		Set<VariableType> variableTypes = standardVariable.getVariableTypes();
+		if(variableTypes != null){
+			Iterator<VariableType> iterator = variableTypes.iterator();
+			this.variableType = iterator.next();;
+		}
+
+		this.rank = rank;
 	}
 
 	public int getId() {

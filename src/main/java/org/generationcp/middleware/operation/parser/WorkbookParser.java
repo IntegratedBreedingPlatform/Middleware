@@ -42,6 +42,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
+import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.util.PoiUtil;
 import org.generationcp.middleware.util.Util;
@@ -449,12 +450,12 @@ public class WorkbookParser {
 				this.errorMessages.add(new Message("error.unsupported.datatype"));
 			}
 
-			if (!Section.VARIATE.toString().equals(name)
-					&& StringUtils.isEmpty(var.getLabel())) {
-				this.errorMessages.add(new Message("error.missing.field.label",
-						Integer.toString(this.currentRow + 1)));
+			if (!Section.VARIATE.toString().equals(name) && StringUtils.isEmpty(var.getLabel())) {
+				this.errorMessages.add(new Message("error.missing.field.label", Integer.toString(this.currentRow + 1)));
 			} else {
 				var.setRole(PhenotypicType.VARIATE);
+				//NOTE: Explicitly setting variable type for selection method.
+				var.setVariableType(OntologyDataHelper.mapFromPhenotype(PhenotypicType.VARIATE, var.getProperty()));
 			}
 
 			if (Section.FACTOR.toString().equals(name)
