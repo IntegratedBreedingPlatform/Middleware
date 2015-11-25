@@ -239,11 +239,11 @@ public class StandardVariableBuilder extends Builder {
 		variableInfo.setExpectedMin(minValue);
 		variableInfo.setExpectedMax(maxValue);
 
-		variableInfo.addVariableType(this.mapPhenotypicTypeToDefaultVariableType(role));
+		variableInfo.addVariableType(this.mapPhenotypicTypeToDefaultVariableType(role, false));
 		return variableInfo;
 	}
 
-	public VariableType mapPhenotypicTypeToDefaultVariableType(PhenotypicType role) {
+	public VariableType mapPhenotypicTypeToDefaultVariableType(PhenotypicType role, boolean isForAnalysis) {
 		if (PhenotypicType.STUDY == role || PhenotypicType.DATASET == role) {
 			return VariableType.STUDY_DETAIL;
 		} else if (PhenotypicType.TRIAL_ENVIRONMENT == role) {
@@ -252,8 +252,10 @@ public class StandardVariableBuilder extends Builder {
 			return VariableType.GERMPLASM_DESCRIPTOR;
 		} else if (PhenotypicType.TRIAL_DESIGN == role) {
 			return VariableType.EXPERIMENTAL_DESIGN;
-		} else if (PhenotypicType.VARIATE == role) {
+		} else if (PhenotypicType.VARIATE == role && !isForAnalysis) {
 			return VariableType.TRAIT;
+		} else if (PhenotypicType.VARIATE == role && isForAnalysis) {
+			return VariableType.ANALYSIS;
 		}
 		return null;
 	}

@@ -252,7 +252,7 @@ public class ProjectPropertySaverTest {
 				Assert.assertEquals("The variable type id must be " + variableType.getId(), variableType.getId(),
 						projectPropertyName.getTypeId());
 			} else {
-				VariableType defaultVariableType = new StandardVariableBuilder(null).mapPhenotypicTypeToDefaultVariableType(role);
+				VariableType defaultVariableType = new StandardVariableBuilder(null).mapPhenotypicTypeToDefaultVariableType(role, false);
 				Assert.assertEquals("The variable type id must be " + defaultVariableType.getId(), defaultVariableType.getId(),
 						projectPropertyName.getTypeId());
 			}

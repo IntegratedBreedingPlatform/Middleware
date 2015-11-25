@@ -82,7 +82,8 @@ public class ProjectPropertySaver {
 		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = variableType.getVariableType();
 
 		if (variableTypeEnum == null) {
-			variableTypeEnum = this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(variableType.getRole());
+			variableTypeEnum =
+					this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(variableType.getRole(), false);
 		}
 
 		int variableTypeId = variableTypeEnum.getId();
@@ -106,7 +107,7 @@ public class ProjectPropertySaver {
 			for (Variable variable : variableList.getVariables()) {
 				org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum =
 						this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
-								variable.getVariableType().getRole());
+								variable.getVariableType().getRole(), false);
 				if (variableTypeEnum == org.generationcp.middleware.domain.ontology.VariableType.STUDY_DETAIL) {
 					ProjectProperty property = new ProjectProperty();
 					property.setTypeId(variable.getVariableType().getStandardVariable().getId());
@@ -133,7 +134,7 @@ public class ProjectPropertySaver {
 
 		if (objDMSVariableType.getVariableType() == null) {
 			objDMSVariableType.setVariableType(this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
-					objDMSVariableType.getStandardVariable().getPhenotypicType()));
+					objDMSVariableType.getStandardVariable().getPhenotypicType(), false));
 		}
 
 		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = objDMSVariableType.getVariableType();
