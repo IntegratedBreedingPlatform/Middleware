@@ -197,6 +197,12 @@ public class WLabels05 extends AbstractReporter {
 					.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
 		}
 
+		sb.append(StringUtil.stringOf(" ", colSpan));
+		for (int i = 0; i < columns; i++) {
+			sb.append(StringUtil.format("Local Check", 11, true)).append(StringUtil.stringOf(" ", 29))
+					.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
+		}
+
 		return sb.append("\r\n").toString();
 	}
 
