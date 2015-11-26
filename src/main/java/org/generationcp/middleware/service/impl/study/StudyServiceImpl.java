@@ -13,6 +13,7 @@ import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
+import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.study.TraitDto;
@@ -58,7 +59,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<StudySummary> listAllStudies(final String programUniqueId) throws MiddlewareQueryException {
+	public List<StudySummary> listAllStudies(final StudySearchParameters serchParameters) {
 
 		final List<StudySummary> studySummaries = new ArrayList<StudySummary>();
 
@@ -77,8 +78,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 						+ "	  (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id = " + TermId.STUDY_STATUS.getId()
 						+ "         AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  " + TermId.DELETED_STUDY.getId() + ") ";
 
-		if (!StringUtils.isEmpty(programUniqueId)) {
-			sql += " AND p.program_uuid = '" + programUniqueId.trim() + "'";
+		if (!StringUtils.isEmpty(serchParameters.getProgramUniqueId())) {
+			sql += " AND p.program_uuid = '" + serchParameters.getProgramUniqueId().trim() + "'";
 		}
 		sql += " ORDER BY p.name;";
 

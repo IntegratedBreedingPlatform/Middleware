@@ -11,6 +11,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
+import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.study.TraitDto;
 import org.generationcp.middleware.service.api.study.TraitService;
@@ -67,13 +68,15 @@ public class StudyServiceImplTest {
 
 		final Object[] testDBRow =
 			{2007, "Wheat Trial 1", "Wheat Trial 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", "10010", "Wheat Trial 1 Objective",
-						"20150417", "20150422"};
+				"20150417", "20150422"};
 		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow);
 
 		Mockito.when(mockSqlQuery.list()).thenReturn(testResult);
 
 		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
-		final List<StudySummary> studySummaries = studyServiceImpl.listAllStudies("c996de54-3ebb-41ca-8fed-160a33ffffd4");
+		StudySearchParameters searchParameters = new StudySearchParameters();
+		searchParameters.setProgramUniqueId("c996de54-3ebb-41ca-8fed-160a33ffffd4");
+		final List<StudySummary> studySummaries = studyServiceImpl.listAllStudies(searchParameters);
 		Assert.assertNotNull(studySummaries);
 		Assert.assertEquals(1, studySummaries.size());
 
