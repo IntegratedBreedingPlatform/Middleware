@@ -68,7 +68,7 @@ public class StudyServiceImplTest {
 
 		final Object[] testDBRow =
 			{2007, "Wheat Trial 1", "Wheat Trial 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", "10010", "Wheat Trial 1 Objective",
-				"20150417", "20150422"};
+				"20150417", "20150422", "Mr. Breeder", "Auckland", "Summer"};
 		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow);
 
 		Mockito.when(mockSqlQuery.list()).thenReturn(testResult);
@@ -76,7 +76,7 @@ public class StudyServiceImplTest {
 		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
 		StudySearchParameters searchParameters = new StudySearchParameters();
 		searchParameters.setProgramUniqueId("c996de54-3ebb-41ca-8fed-160a33ffffd4");
-		final List<StudySummary> studySummaries = studyServiceImpl.listAllStudies(searchParameters);
+		final List<StudySummary> studySummaries = studyServiceImpl.search(searchParameters);
 		Assert.assertNotNull(studySummaries);
 		Assert.assertEquals(1, studySummaries.size());
 
@@ -90,6 +90,9 @@ public class StudyServiceImplTest {
 		Assert.assertEquals(testDBRow[5], studySummary.getObjective());
 		Assert.assertEquals(testDBRow[6], studySummary.getStartDate());
 		Assert.assertEquals(testDBRow[7], studySummary.getEndDate());
+		Assert.assertEquals(testDBRow[8], studySummary.getPrincipalInvestigator());
+		Assert.assertEquals(testDBRow[9], studySummary.getLocation());
+		Assert.assertEquals(testDBRow[10], studySummary.getSeason());
 
 	}
 }
