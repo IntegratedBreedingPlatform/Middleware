@@ -13,7 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class OntologyScaleDataManagerImplTest {
+public class OntologyScaleDataManagerImplUnitTest {
 
 	private OntologyScaleDataManagerImpl newOsdmi;
 	private CvTermPropertyDao cvTermPropertyDao;
