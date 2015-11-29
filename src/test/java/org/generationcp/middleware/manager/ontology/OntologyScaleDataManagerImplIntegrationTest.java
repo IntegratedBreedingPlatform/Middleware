@@ -2,6 +2,7 @@ package org.generationcp.middleware.manager.ontology;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.generationcp.middleware.dao.oms.CVDao;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -183,5 +185,47 @@ public class OntologyScaleDataManagerImplIntegrationTest extends IntegrationTest
 
 			}
 		}
+	}
+
+	@Test
+	public void testGetScaleByIdShouldGetFullScaleWithIdSupplied() throws Exception {
+		CVTerm scaleTerm = TestDataHelper.getTestCvTerm(CvId.SCALES);
+		this.termDao.save(scaleTerm);
+
+		this.relationshipDao.save(scaleTerm.getCvTermId(), TermId.HAS_TYPE.getId(), DataType.NUMERIC_VARIABLE.getId());
+
+		String min = "5";
+		String max = "10";
+
+		this.propertyDao.updateOrDeleteProperty(scaleTerm.getCvTermId(), TermId.MIN_VALUE.getId(), min, 0);
+		this.propertyDao.updateOrDeleteProperty(scaleTerm.getCvTermId(), TermId.MAX_VALUE.getId(), max, 0);
+
+		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		List<CVTermProperty> createdDateProperties = new ArrayList<>();
+		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(scaleTerm), createdDateProperties, testCreatedDate);
+
+		CVTermProperty createProperty = createdDateProperties.get(0);
+		this.propertyDao.save(createProperty);
+
+		//Save last modification date
+		Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		List<CVTermProperty> updatedDateProperties = new ArrayList<>();
+		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(scaleTerm), updatedDateProperties, testUpdatedDate);
+
+		CVTermProperty updateProperty = updatedDateProperties.get(0);
+		this.propertyDao.save(updateProperty);
+
+		Scale scale = this.manager.getScale(scaleTerm.getCvTermId(), true);
+
+		// Make sure our scale exists and is inserted properly and display proper message if it is not inserted properly
+		String message = "The %s for scale '" + scale.getId() + "' was not added correctly.";
+		Assert.assertEquals(String.format(message, "Name"), scaleTerm.getName(), scale.getName());
+		Assert.assertEquals(String.format(message, "Definition"), scaleTerm.getDefinition(), scale.getDefinition());
+		Assert.assertEquals(String.format(message, "IsObsolete"), scaleTerm.isObsolete(), scale.isObsolete());
+		Assert.assertEquals(String.format(message, "DataType"), DataType.NUMERIC_VARIABLE, scale.getDataType());
+		Assert.assertEquals(String.format(message, "min"), min, scale.getMinValue());
+		Assert.assertEquals(String.format(message, "max"), max, scale.getMaxValue());
+		Assert.assertEquals(String.format(message, "CreatedDate"), testCreatedDate, scale.getDateCreated());
+		Assert.assertEquals(String.format(message, "UpdatedDate"), testUpdatedDate, scale.getDateLastModified());
 	}
 }
