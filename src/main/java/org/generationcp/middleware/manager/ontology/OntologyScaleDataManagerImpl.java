@@ -314,15 +314,14 @@ public class OntologyScaleDataManagerImpl implements OntologyScaleDataManager {
 			}
 		}
 
-		CvTermPropertyDao propertyDao = cvTermPropertyDao;
 		int maxTermId = TermId.MAX_VALUE.getId();
 		int minTermId = TermId.MIN_VALUE.getId();
 		String minScale = scale.getMinValue();
 		String maxScale = scale.getMaxValue();
 
 		// Updating values if present
-		this.updatingValues(propertyDao, scale, minScale, minTermId);
-		this.updatingValues(propertyDao, scale, maxScale, maxTermId);
+		this.updatingValues(cvTermPropertyDao, scale, minScale, minTermId);
+		this.updatingValues(cvTermPropertyDao, scale, maxScale, maxTermId);
 
 		// Getting cvId. Usually this will be available if previous data type is categorical
 		Integer cvId = categoricalValues.isEmpty() ? null : categoricalValues.get(0).getCv();
@@ -383,7 +382,7 @@ public class OntologyScaleDataManagerImpl implements OntologyScaleDataManager {
 		}
 
 		// Save last modified Time
-		propertyDao.save(scale.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
+		cvTermPropertyDao.save(scale.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
 	}
 
