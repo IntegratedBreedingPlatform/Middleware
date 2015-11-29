@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class OntologyPropertyDataManagerImpl implements OntologyPropertyDataManager {
 
+	private static final String PROPERTY_EXIST_WITH_SAME_NAME = "Property exist with same name";
 	private static final String SHOULD_VALID_TRAIT_CLASS = "Term should be of valid TRAIT_CLASS";
 	private static final String PROPERTY_DOES_NOT_EXIST = "Property does not exist with that id";
 	private static final String TERM_IS_NOT_PROPERTY = "That term is not a PROPERTY";
@@ -133,7 +134,7 @@ public class OntologyPropertyDataManagerImpl implements OntologyPropertyDataMana
 		CVTerm term = cvTermDao.getByNameAndCvId(property.getName(), CvId.PROPERTIES.getId());
 
 		if (term != null) {
-			throw new MiddlewareException("Property exist with same name");
+			throw new MiddlewareException(OntologyPropertyDataManagerImpl.PROPERTY_EXIST_WITH_SAME_NAME);
 		}
 
 		// Constant CvId
