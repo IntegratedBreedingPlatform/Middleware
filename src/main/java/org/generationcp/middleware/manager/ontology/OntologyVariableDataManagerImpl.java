@@ -472,7 +472,7 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 				} else if (Objects.equals(r.getTypeId(), TermId.HAS_PROPERTY.getId())) {
 					variable.setProperty(this.propertyManager.getProperty(r.getObjectId(), filterObsolete));
 				} else if (Objects.equals(r.getTypeId(), TermId.HAS_SCALE.getId())) {
-					variable.setScale(this.scaleManager.getScaleById(r.getObjectId(), filterObsolete));
+					variable.setScale(this.scaleManager.getScale(r.getObjectId(), filterObsolete));
 				}
 			}
 
