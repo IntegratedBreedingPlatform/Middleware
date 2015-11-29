@@ -228,4 +228,49 @@ public class OntologyScaleDataManagerImplIntegrationTest extends IntegrationTest
 		Assert.assertEquals(String.format(message, "CreatedDate"), testCreatedDate, scale.getDateCreated());
 		Assert.assertEquals(String.format(message, "UpdatedDate"), testUpdatedDate, scale.getDateLastModified());
 	}
+
+	/**
+	 * This test inserts scale using manager and assert term and other properties
+	 * @throws Exception
+	 */
+	@Test
+	public void testAddScaleShouldAddNewScale() throws Exception {
+		// Create Scale and add it using manager
+		Scale scale = new Scale();
+		scale.setName(TestDataHelper.getNewRandomName("Name"));
+		scale.setDefinition("Test Definition");
+		scale.setDataType(DataType.NUMERIC_VARIABLE);
+		scale.setMinValue("10");
+		scale.setMaxValue("100");
+
+		Date date = this.constructDate(2015, Calendar.JANUARY, 1);
+		this.stubCurrentDate(date);
+
+		this.manager.addScale(scale);
+
+		CVTerm cvterm = this.termDao.getById(scale.getId());
+
+		// Make sure each property data inserted properly, assert them and display proper message if not inserted properly
+		String message = "The %s for scale '" + scale.getId() + "' was not added correctly.";
+		Assert.assertEquals(String.format(message, "Name"), scale.getName(), cvterm.getName());
+		Assert.assertEquals(String.format(message, "Definition"), scale.getDefinition(), cvterm.getDefinition());
+		Assert.assertEquals(String.format(message, "IsObsolete"), false, cvterm.isObsolete());
+		Assert.assertEquals(String.format(message, "CreatedDate"), date, scale.getDateCreated());
+
+		// Fetch Created date property and assert it
+		List<CVTermProperty> addedProperties = this.propertyDao.getByCvTermId(scale.getId());
+		Assert.assertTrue(String.format(message, "Property Size"), addedProperties.size() == 3);
+
+		for (CVTermProperty cvTermProperty : addedProperties) {
+			if (Objects.equals(cvTermProperty.getTypeId(), TermId.CREATION_DATE.getId())) {
+				Assert.assertEquals(String.format(message, "CreatedDate"), cvTermProperty.getValue(), ISO8601DateParser.toString(date));
+			}
+			if (Objects.equals(cvTermProperty.getTypeId(), TermId.MIN_VALUE.getId())) {
+				Assert.assertEquals(String.format(message, "min"), cvTermProperty.getValue(), scale.getMinValue());
+			}
+			if (Objects.equals(cvTermProperty.getTypeId(), TermId.MAX_VALUE.getId())) {
+				Assert.assertEquals(String.format(message, "max"), cvTermProperty.getValue(), scale.getMaxValue());
+			}
+		}
+	}
 }
