@@ -79,7 +79,7 @@ public class OntologyScaleDataManagerImpl implements OntologyScaleDataManager {
 	}
 
 	@Override
-	public Scale getScaleById(int scaleId, boolean filterObsolete) throws MiddlewareException {
+	public Scale getScale(int scaleId, boolean filterObsolete) throws MiddlewareException {
 		List<Scale> scales = this.getScales(false, new ArrayList<>(Collections.singletonList(scaleId)), filterObsolete);
 		if (scales.isEmpty()) {
 			return null;

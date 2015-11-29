@@ -31,7 +31,7 @@ public interface OntologyScaleDataManager {
 	 * @param filterObsolete flag to determine if obsolete scale will be filtered
 	 * @return @link Scale
 	 */
-	Scale getScaleById(int scaleId, boolean filterObsolete) throws MiddlewareException;
+	Scale getScale(int scaleId, boolean filterObsolete) throws MiddlewareException;
 
 	/**
 	 * Get all scales from db
