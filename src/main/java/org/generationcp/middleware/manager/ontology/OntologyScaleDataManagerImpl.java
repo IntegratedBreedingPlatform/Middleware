@@ -199,7 +199,12 @@ public class OntologyScaleDataManagerImpl implements OntologyScaleDataManager {
 		}
 
 		// Save creation time
-		cvTermPropertyDao.save(scale.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
+		scale.setDateCreated(systemClock.now());
+
+		String strValueOfDate = ISO8601DateParser.toString(scale.getDateCreated());
+
+		// Save creation time
+		cvTermPropertyDao.updateOrDeleteProperty(scale.getId(), TermId.CREATION_DATE.getId(), strValueOfDate, 0);
 	}
 
 	@Override
@@ -382,8 +387,12 @@ public class OntologyScaleDataManagerImpl implements OntologyScaleDataManager {
 		}
 
 		// Save last modified Time
-		cvTermPropertyDao.save(scale.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
+		scale.setDateLastModified(systemClock.now());
 
+		String strValueOfDate = ISO8601DateParser.toString(scale.getDateCreated());
+
+		// Save creation time
+		cvTermPropertyDao.updateOrDeleteProperty(scale.getId(), TermId.LAST_UPDATE_DATE.getId(), strValueOfDate, 0);
 	}
 
 	void updatingValues(CvTermPropertyDao cvTermPropertyDao, Scale scale, String scaleSize, int termId) {
