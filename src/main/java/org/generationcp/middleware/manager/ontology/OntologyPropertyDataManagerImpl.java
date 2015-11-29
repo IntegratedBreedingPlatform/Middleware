@@ -79,18 +79,6 @@ public class OntologyPropertyDataManagerImpl implements OntologyPropertyDataMana
 		return this.getProperties(true, null, true);
 	}
 
-	//NOTE: This method needs to be removed and use getAllPropertiesWithClassAndVariableType method.
-	@Override
-	public List<Property> getAllPropertiesWithClass(String className) throws MiddlewareException {
-		return this.getAllPropertiesWithClass(new String[] {className});
-	}
-
-	//NOTE: This method needs to be removed and use getAllPropertiesWithClassAndVariableType method.
-	@Override
-	public List<Property> getAllPropertiesWithClass(String[] classes) throws MiddlewareException {
-		return this.getAllPropertiesWithClassAndVariableType(classes, new String[] {});
-	}
-
 	@Override
 	public List<Property> getAllPropertiesWithClassAndVariableType(String[] classes, String[] variableTypes) throws MiddlewareException {
 		List<Integer> propertyIds = this.ontologyCommonDAO.getAllPropertyIdsWithClassAndVariableType(classes, variableTypes);
