@@ -291,4 +291,8 @@ public class WLabels05 extends AbstractReporter {
 		return mapRows;
 	}
 
+	public void setStudyMeta(final Map<String, String> studyMeta) {
+		this.studyMeta = studyMeta;
+	}
+
 }
