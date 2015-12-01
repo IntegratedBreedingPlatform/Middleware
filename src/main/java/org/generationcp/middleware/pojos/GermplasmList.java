@@ -131,13 +131,13 @@ public class GermplasmList implements Serializable {
 
 	}
 
-	public GermplasmList(Integer id) {
+	public GermplasmList(final Integer id) {
 		super();
 		this.id = id;
 	}
 
-	public GermplasmList(Integer id, String name, Long date, String type, Integer userId, String description, GermplasmList parent,
-			Integer status) {
+	public GermplasmList(final Integer id, final String name, final Long date, final String type, final Integer userId,
+			final String description, final GermplasmList parent, final Integer status) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -149,8 +149,8 @@ public class GermplasmList implements Serializable {
 		this.status = status;
 	}
 
-	public GermplasmList(Integer id, String name, Long date, String type, Integer userId, String description, GermplasmList parent,
-			Integer status, String notes) {
+	public GermplasmList(final Integer id, final String name, final Long date, final String type, final Integer userId,
+			final String description, final GermplasmList parent, final Integer status, final String notes) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -163,9 +163,10 @@ public class GermplasmList implements Serializable {
 		this.notes = notes;
 	}
 
-	public GermplasmList(Integer id, String name, Long date, String type, Integer userId, String description, GermplasmList parent,
-			Integer status, Integer sDate, Integer eDate, Integer listLocation, Integer listRef, Integer projectId, String notes,
-			List<GermplasmListData> listData) {
+	public GermplasmList(final Integer id, final String name, final Long date, final String type, final Integer userId,
+			final String description, final GermplasmList parent, final Integer status, final Integer sDate, final Integer eDate,
+			final Integer listLocation, final Integer listRef, final Integer projectId, final String notes,
+			final List<GermplasmListData> listData) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -188,7 +189,7 @@ public class GermplasmList implements Serializable {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 
@@ -196,7 +197,7 @@ public class GermplasmList implements Serializable {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -204,7 +205,7 @@ public class GermplasmList implements Serializable {
 		return this.date;
 	}
 
-	public void setDate(Long date) {
+	public void setDate(final Long date) {
 		this.date = date;
 	}
 
@@ -212,7 +213,7 @@ public class GermplasmList implements Serializable {
 		return this.type;
 	}
 
-	public void setType(String type) {
+	public void setType(final String type) {
 		this.type = type;
 	}
 
@@ -220,7 +221,7 @@ public class GermplasmList implements Serializable {
 		return this.userId;
 	}
 
-	public void setUserId(Integer userId) {
+	public void setUserId(final Integer userId) {
 		this.userId = userId;
 	}
 
@@ -228,7 +229,7 @@ public class GermplasmList implements Serializable {
 		return this.description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -236,14 +237,14 @@ public class GermplasmList implements Serializable {
 		return this.parent;
 	}
 
-	public void setParent(GermplasmList parent) {
+	public void setParent(final GermplasmList parent) {
 		this.parent = parent;
 	}
 
 	public String getStatusString() {
 		// TODO: make internationalizable
-		List<String> listStatus = new ArrayList<String>();
-		String status = String.format("%04d", this.getStatus());
+		final List<String> listStatus = new ArrayList<String>();
+		final String status = String.format("%04d", this.getStatus());
 
 		if (status.charAt(0) == '1') {
 			listStatus.add("Final");
@@ -264,8 +265,8 @@ public class GermplasmList implements Serializable {
 			listStatus.add("Deleted");
 		}
 
-		StringBuilder sb = new StringBuilder();
-		for (String str : listStatus) {
+		final StringBuilder sb = new StringBuilder();
+		for (final String str : listStatus) {
 			if (sb.length() > 0) {
 				sb.append(", ");
 			}
@@ -279,7 +280,7 @@ public class GermplasmList implements Serializable {
 		return this.status;
 	}
 
-	public void setStatus(Integer status) {
+	public void setStatus(final Integer status) {
 		this.status = status;
 	}
 
@@ -287,7 +288,7 @@ public class GermplasmList implements Serializable {
 		return this.sDate;
 	}
 
-	public void setsDate(Integer sDate) {
+	public void setsDate(final Integer sDate) {
 		this.sDate = sDate;
 	}
 
@@ -295,7 +296,7 @@ public class GermplasmList implements Serializable {
 		return this.eDate;
 	}
 
-	public void seteDate(Integer eDate) {
+	public void seteDate(final Integer eDate) {
 		this.eDate = eDate;
 	}
 
@@ -303,7 +304,7 @@ public class GermplasmList implements Serializable {
 		return this.listLocation;
 	}
 
-	public void setListLocation(Integer listLocation) {
+	public void setListLocation(final Integer listLocation) {
 		this.listLocation = listLocation;
 	}
 
@@ -311,7 +312,7 @@ public class GermplasmList implements Serializable {
 		return this.listRef;
 	}
 
-	public void setListRef(Integer listRef) {
+	public void setListRef(final Integer listRef) {
 		this.listRef = listRef;
 	}
 
@@ -319,7 +320,7 @@ public class GermplasmList implements Serializable {
 		return this.projectId;
 	}
 
-	public void setProjectId(Integer projectId) {
+	public void setProjectId(final Integer projectId) {
 		this.projectId = projectId;
 	}
 
@@ -327,7 +328,7 @@ public class GermplasmList implements Serializable {
 		return this.programUUID;
 	}
 
-	public void setProgramUUID(String programUUID) {
+	public void setProgramUUID(final String programUUID) {
 		this.programUUID = programUUID;
 	}
 
@@ -335,7 +336,7 @@ public class GermplasmList implements Serializable {
 		return this.notes;
 	}
 
-	public void setNotes(String notes) {
+	public void setNotes(final String notes) {
 		this.notes = notes;
 	}
 
@@ -343,14 +344,14 @@ public class GermplasmList implements Serializable {
 		return this.listData;
 	}
 
-	public void setListData(List<GermplasmListData> listData) {
+	public void setListData(final List<GermplasmListData> listData) {
 		this.listData.clear();
 		this.listData.addAll(listData);
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("GermplasmList [id=");
 		builder.append(this.id);
 		builder.append(", name=");
@@ -380,7 +381,7 @@ public class GermplasmList implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -390,7 +391,7 @@ public class GermplasmList implements Serializable {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		GermplasmList other = (GermplasmList) obj;
+		final GermplasmList other = (GermplasmList) obj;
 		if (this.id == null) {
 			if (other.id != null) {
 				return false;
