@@ -94,7 +94,7 @@ public class GermplasmList implements Serializable {
 	public static final String GET_GERMPLASM_LIST_TYPES =
 			"SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid "
 					+ "FROM udflds "
-					+ "WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE' and fcode not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES')";
+					+ "WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE' and fcode not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES', 'FOLDER')";
 
 	public static final String GET_GERMPLASM_NAME_TYPES =
 			"SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid " + "FROM udflds "
