@@ -25,7 +25,9 @@ import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.junit.Before;
 import org.junit.Test;
@@ -140,6 +142,8 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		assertEquals(scale, standardVariable.getScale().getName());
 		assertEquals(method, standardVariable.getMethod().getName());
 		assertEquals(role, standardVariable.getPhenotypicType());
+		VariableType variableType = OntologyDataHelper.mapFromPhenotype(role, property);
+		assertEquals(variableType, standardVariable.getVariableTypes().iterator().next());
 		assertEquals(TermId.NUMERIC_VARIABLE.getId(), standardVariable.getDataType().getId());
 	}
 
@@ -161,6 +165,8 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		assertEquals(scale, standardVariable.getScale().getName());
 		assertEquals(method, standardVariable.getMethod().getName());
 		assertEquals(role, standardVariable.getPhenotypicType());
+		VariableType variableType = OntologyDataHelper.mapFromPhenotype(role, property);
+		assertEquals(variableType, standardVariable.getVariableTypes().iterator().next());
 		assertEquals(TermId.NUMERIC_VARIABLE.getId(), standardVariable.getDataType().getId());
 	}
 
@@ -271,7 +277,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 	}
 
 	private List<String> createLocalVariableNamesOfProjectTestData() {
-		List<String> headers = new ArrayList<String>();
+		List<String> headers = new ArrayList<>();
 		headers.add("TRIAL_INSTANCE");
 		headers.add("ENTRY_NO");
 		headers.add("PLOT_NO");

@@ -13,6 +13,7 @@ package org.generationcp.middleware.operation.builder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,6 +36,7 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -201,18 +203,22 @@ public class StandardVariableBuilder extends Builder {
 
 		List<Variable> variableList = this.getOntologyVariableDataManager().getWithFilter(filterOpts);
 		StandardVariable standardVariable;
+
+		VariableType variableType = OntologyDataHelper.mapFromPhenotype(role, propertyName);
+
 		if (variableList == null || variableList.isEmpty()) {
 			OntologyVariableInfo variableInfo =
 					this.createOntologyVariableInfo(name, description, method.getId(), property.getId(), scale.getId(), programUUID, null,
-							null, role);
+							null, variableType);
 			this.getOntologyVariableDataManager().addVariable(variableInfo);
 			standardVariable = this.create(variableInfo.getId(), programUUID);
-			standardVariable.setPhenotypicType(role);
 		} else {
 			Variable variable = variableList.get(0);
 			standardVariable = this.create(variable.getId(), programUUID);
-			standardVariable.setPhenotypicType(role);
 		}
+
+		standardVariable.setPhenotypicType(role);
+		standardVariable.setVariableTypes(new HashSet<>(new ArrayList<>(Collections.singletonList(variableType))));
 
 		return standardVariable;
 	}
@@ -227,7 +233,7 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	private OntologyVariableInfo createOntologyVariableInfo(String name, String description, int methodId, int propertyId, int scaleId,
-			String programUUID, String minValue, String maxValue, PhenotypicType role) {
+			String programUUID, String minValue, String maxValue, VariableType variableType) {
 		OntologyVariableInfo variableInfo = new OntologyVariableInfo();
 		variableInfo.setName(name);
 		variableInfo.setDescription(description);
@@ -239,7 +245,7 @@ public class StandardVariableBuilder extends Builder {
 		variableInfo.setExpectedMin(minValue);
 		variableInfo.setExpectedMax(maxValue);
 
-		variableInfo.addVariableType(this.mapPhenotypicTypeToDefaultVariableType(role));
+		variableInfo.addVariableType(variableType);
 		return variableInfo;
 	}
 
