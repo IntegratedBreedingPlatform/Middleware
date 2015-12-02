@@ -1,9 +1,6 @@
 
 package org.generationcp.middleware.operation.transformer.etl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -47,14 +44,6 @@ public class VariableTypeListTransformer extends Transformer {
 									programUUID);
 				}
 				
-				standardVariable.setPhenotypicType(measurementVariable.getRole());
-
-				// if variable type not null then assigned single variable type.
-				if(measurementVariable.getVariableType() != null){
-					standardVariable.setVariableTypes(new HashSet<>(new ArrayList<>(
-							Collections.singletonList(measurementVariable.getVariableType()))));
-				}
-
 				measurementVariable.setTermId(standardVariable.getId());
 
 				DMSVariableType variableType =
@@ -62,7 +51,6 @@ public class VariableTypeListTransformer extends Transformer {
 
 				variableType.setTreatmentLabel(measurementVariable.getTreatmentLabel());
 				variableTypeList.add(variableType);
-
 			}
 		}
 
