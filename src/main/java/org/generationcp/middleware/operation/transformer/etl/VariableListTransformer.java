@@ -3,6 +3,7 @@ package org.generationcp.middleware.operation.transformer.etl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -194,30 +195,30 @@ public class VariableListTransformer extends Transformer {
 		return variableList;
 	}
 
-	public VariableList transformTrialEnvironment(List<MeasurementVariable> mVarList, VariableTypeList variableTypeList)
+	public VariableList transformTrialEnvironment(List<MeasurementVariable> measurementVariableList, VariableTypeList variableTypeList)
 			throws MiddlewareQueryException {
 		VariableList variableList = new VariableList();
 
-		if (mVarList != null && variableTypeList != null && variableTypeList.getVariableTypes() != null) {
-			if (mVarList.size() == variableTypeList.getVariableTypes().size()) {
+		if(measurementVariableList == null && variableTypeList == null){
+			return variableList;
+		}
 
-				List<DMSVariableType> varTypes = variableTypeList.getVariableTypes();
-				for (int i = 0, l = mVarList.size(); i < l; i++) {
-					DMSVariableType varTypeFinal = null;
-					String value = mVarList.get(i).getValue();
-					for (DMSVariableType varType : varTypes) {
-						if (mVarList.get(i).getTermId() == varType.getId()) {
-							if (varType.getStandardVariable().getPhenotypicType() == PhenotypicType.TRIAL_ENVIRONMENT
-									|| varType.getStandardVariable().getPhenotypicType() == PhenotypicType.VARIATE) {
-								varTypeFinal = varType;
+		if(measurementVariableList == null || variableTypeList == null || variableTypeList.getVariableTypes() == null) {
+			throw new MiddlewareQueryException("Variables did not match the Measurement Variable List.");
+		}
 
-							}
-						}
-					}
-					variableList.add(new Variable(varTypeFinal, value));
+		List<DMSVariableType> varTypes = variableTypeList.getVariableTypes();
+
+		if (!Objects.equals(measurementVariableList.size(), varTypes.size())) {
+			throw new MiddlewareQueryException("Variables did not match the Measurement Variable List.");
+		}
+
+		for (MeasurementVariable measurementVariable : measurementVariableList) {
+			String value = measurementVariable.getValue();
+			for (DMSVariableType varType : varTypes) {
+				if (measurementVariable.getTermId() == varType.getId()) {
+					variableList.add(new Variable(varType, value));
 				}
-			} else {// else invalid data
-				throw new MiddlewareQueryException("Variables did not match the Measurement Variable List.");
 			}
 		}
 
