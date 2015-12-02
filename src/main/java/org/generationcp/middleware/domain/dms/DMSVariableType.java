@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.util.Debug;
 
 /**
@@ -117,6 +118,24 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 	//NOTE: We also add variable type to associated standard variable.
 	public void setVariableType(VariableType variableType) {
 		this.variableType = variableType;
+	}
+
+	/**
+	 * This will set variable type if null based on role and property name.
+	 */
+	public void setVariableTypeIfNull(){
+
+		if(this.getVariableType() != null) {
+			return;
+		}
+
+		if(this.getRole() == null){
+			return;
+		}
+
+		StandardVariable standardVariable = this.getStandardVariable();
+		String propertyName = standardVariable.getProperty().getName();
+		this.setVariableType(OntologyDataHelper.mapFromPhenotype(this.getRole(), propertyName));
 	}
 
 	@Override
