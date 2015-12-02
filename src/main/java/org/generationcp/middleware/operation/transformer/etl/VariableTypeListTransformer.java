@@ -40,6 +40,7 @@ public class VariableTypeListTransformer extends Transformer {
 									measurementVariable.getScale(),
 									measurementVariable.getMethod(),
 									measurementVariable.getRole(),
+									measurementVariable.getVariableType(),
 									measurementVariable.getDataType(),
 									programUUID);
 				}
