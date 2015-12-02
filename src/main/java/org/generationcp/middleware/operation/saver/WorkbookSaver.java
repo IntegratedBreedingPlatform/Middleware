@@ -79,7 +79,6 @@ public class WorkbookSaver extends Saver {
 		workbook.reset();
 
 		// Create Maps, which we will fill with transformed Workbook Variable Data
-		final Map<String, Map<String, ?>> variableMap = new HashMap<String, Map<String, ?>>();
 		final Map<String, List<String>> headerMap = new HashMap<String, List<String>>();
 		final Map<String, VariableTypeList> variableTypeMap = new HashMap<String, VariableTypeList>();
 		final Map<String, List<MeasurementVariable>> measurementVariableMap = new HashMap<String, List<MeasurementVariable>>();
@@ -99,10 +98,9 @@ public class WorkbookSaver extends Saver {
 		trialVariables.addAll(this.getVariableTypeListTransformer()
 				.transform(workbook.getTrialConstants(), trialVariables.size() + 1, programUUID));
 
-		final List<MeasurementVariable> effectMV = workbook.getMeasurementDatasetVariables();
 		final VariableTypeList effectVariables =
 				this.getVariableTypeListTransformer().transform(workbook.getNonTrialFactors(), programUUID);
-		effectVariables.addAll(this.getVariableTypeListTransformer().transform(workbook.getVariates(), effectVariables.size() + 1,programUUID));
+		effectVariables.addAll(this.getVariableTypeListTransformer().transform(workbook.getVariates(), effectVariables.size() + 1 ,programUUID));
 
 		// -- headers
 		headerMap.put("trialHeaders", trialHeaders);
@@ -112,13 +110,16 @@ public class WorkbookSaver extends Saver {
 		variableTypeMap.put("effectVariables", effectVariables);
 		// -- measurementVariables
 		measurementVariableMap.put("trialMV", trialMV);
+
+		final List<MeasurementVariable> effectMV = workbook.getMeasurementDatasetVariables();
 		measurementVariableMap.put("effectMV", effectMV);
+
 		// load 3 maps into a super Map
+		final Map<String, Map<String, ?>> variableMap = new HashMap<>();
 		variableMap.put("headerMap", headerMap);
 		variableMap.put("variableTypeMap", variableTypeMap);
 		variableMap.put("measurementVariableMap", measurementVariableMap);
 		return variableMap;
-
 	}
 
 	/**
