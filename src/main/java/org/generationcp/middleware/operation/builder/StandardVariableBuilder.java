@@ -187,7 +187,7 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	public StandardVariable findOrSave(String name, String description, String propertyName, String scaleName, String methodName,
-			PhenotypicType role, String dataTypeString, String programUUID) {
+			PhenotypicType role, VariableType variableType, String dataTypeString, String programUUID) {
 
 		TermBuilder termBuilder = this.getTermBuilder();
 		Term property = termBuilder.findOrSaveProperty(propertyName, propertyName, null, termBuilder.getDefaultTraitClasses());
@@ -204,7 +204,9 @@ public class StandardVariableBuilder extends Builder {
 		List<Variable> variableList = this.getOntologyVariableDataManager().getWithFilter(filterOpts);
 		StandardVariable standardVariable;
 
-		VariableType variableType = OntologyDataHelper.mapFromPhenotype(role, propertyName);
+		if(variableType == null){
+			variableType = OntologyDataHelper.mapFromPhenotype(role, propertyName);
+		}
 
 		if (variableList == null || variableList.isEmpty()) {
 			OntologyVariableInfo variableInfo =

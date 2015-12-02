@@ -130,7 +130,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		String datatype = "N";
 		PhenotypicType role = PhenotypicType.TRIAL_ENVIRONMENT;
 		StandardVariable standardVariable =
-				standardVariableBuilder.findOrSave(name, description, property, scale, method, role, datatype, null);
+				standardVariableBuilder.findOrSave(name, description, property, scale, method, role, null, datatype, null);
 		assertNotNull(standardVariable);
 		assertEquals(TermId.TRIAL_INSTANCE_FACTOR.getId(), standardVariable.getId());
 		assertEquals(TRIAL_INSTANCE_PROPERTY_ID, standardVariable.getProperty().getId());
@@ -157,7 +157,7 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 		String datatype = "N";
 		PhenotypicType role = PhenotypicType.TRIAL_ENVIRONMENT;
 		StandardVariable standardVariable =
-				standardVariableBuilder.findOrSave(name, description, property, scale, method, role, datatype, null);
+				standardVariableBuilder.findOrSave(name, description, property, scale, method, role, null, datatype, null);
 		assertNotNull(standardVariable);
 		assertEquals(name, standardVariable.getName());
 		assertEquals(description, standardVariable.getDescription());
