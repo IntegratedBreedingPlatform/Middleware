@@ -78,20 +78,27 @@ public class ProjectPropertySaver {
 	private List<ProjectProperty> createVariableProperties(DmsProject project, DMSVariableType variableType)
 			throws MiddlewareQueryException {
 
-		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
-		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum =
-				this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(variableType.getRole());
+		variableType.setVariableTypeIfNull();
+
+		VariableType variableTypeEnum = variableType.getVariableType();
+
+		if(variableTypeEnum == null) {
+			throw new RuntimeException("Variable do not have a valid variable type.");
+		}
+
 		int variableTypeId;
 
 		// This makes sure that selection values are actually saved as selections in the projectprop tables. Note roles cannot be used for
 		// this as both selections and traits map to roles. Thus if the role has evaluated to a Trait varible type and the DMSVariableType
 		// is not null use the DMSVariableType as it could be a selection.
-		if (variableTypeEnum == org.generationcp.middleware.domain.ontology.VariableType.TRAIT && variableType.getVariableType() != null) {
+		if (variableTypeEnum == org.generationcp.middleware.domain.ontology.VariableType.TRAIT) {
 			variableTypeId = variableType.getVariableType().getId();
 		} else {
 			variableTypeId = variableTypeEnum.getId();
 		}
-		
+
+		List<ProjectProperty> properties = new ArrayList<>();
+
 		properties.add(new ProjectProperty(project, variableTypeId, variableType.getLocalName(), variableType.getRank()));
 		properties.add(new ProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType
 				.getRank()));
@@ -109,9 +116,12 @@ public class ProjectPropertySaver {
 	public void saveProjectPropValues(int projectId, VariableList variableList) throws MiddlewareQueryException {
 		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
 			for (Variable variable : variableList.getVariables()) {
-				org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum =
-						this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
-								variable.getVariableType().getRole());
+
+				DMSVariableType dmsVariableType = variable.getVariableType();
+				dmsVariableType.setVariableTypeIfNull();
+
+				VariableType variableTypeEnum = dmsVariableType.getVariableType();
+
 				if (variableTypeEnum == org.generationcp.middleware.domain.ontology.VariableType.STUDY_DETAIL) {
 					ProjectProperty property = new ProjectProperty();
 					property.setTypeId(variable.getVariableType().getStandardVariable().getId());
@@ -136,10 +146,7 @@ public class ProjectPropertySaver {
 	 */
 	public void saveVariableType(DmsProject project, DMSVariableType objDMSVariableType) throws MiddlewareQueryException {
 
-		if(objDMSVariableType.getVariableType() == null){
-			objDMSVariableType.setVariableType(this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
-							objDMSVariableType.getStandardVariable().getPhenotypicType()));
-		}
+		objDMSVariableType.setVariableTypeIfNull();
 
 		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = objDMSVariableType.getVariableType();
 		this.saveProjectProperty(project, variableTypeEnum.getId(), objDMSVariableType.getLocalName(), objDMSVariableType.getRank());
