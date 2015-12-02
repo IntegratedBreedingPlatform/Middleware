@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -41,6 +42,7 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.util.Message;
@@ -450,25 +452,33 @@ public class WorkbookParser {
 				this.errorMessages.add(new Message("error.unsupported.datatype"));
 			}
 
+			//Validate variable should have label except variates
 			if (!Section.VARIATE.toString().equals(name) && StringUtils.isEmpty(var.getLabel())) {
 				this.errorMessages.add(new Message("error.missing.field.label", Integer.toString(this.currentRow + 1)));
-			} else {
-				var.setRole(PhenotypicType.VARIATE);
-				//NOTE: Explicitly setting variable type for selection method.
-				var.setVariableType(OntologyDataHelper.mapFromPhenotype(PhenotypicType.VARIATE, var.getProperty()));
 			}
 
-			if (Section.FACTOR.toString().equals(name)
-					|| Section.CONDITION.toString().equals(name)) {
-				PhenotypicType role = PhenotypicType
-						.getPhenotypicTypeForLabel(var.getLabel());
+			if (Section.VARIATE.toString().equals(name) || Section.CONSTANT.toString().equals(name)) {
+				var.setRole(PhenotypicType.VARIATE);
+			} else {
+				PhenotypicType role = PhenotypicType.getPhenotypicTypeForLabel(var.getLabel());
 				if (role == null || role == PhenotypicType.VARIATE) {
-					this.errorMessages.add(new Message(
-							"error.invalid.field.label", Integer
-									.toString(this.currentRow + 1)));
+					this.errorMessages.add(new Message("error.invalid.field.label", Integer.toString(this.currentRow + 1)));
 				} else {
 					var.setRole(role);
 				}
+			}
+
+			//NOTE: Explicitly setting variable type
+			if(Section.CONSTANT.toString().equals(name) && this.currentWorkbook != null){
+				StudyType studyType = this.currentWorkbook.getStudyDetails().getStudyType();
+
+				if(Objects.equals(studyType, StudyType.N)){
+					var.setVariableType(VariableType.NURSERY_CONDITION);
+				}else if(Objects.equals(studyType, StudyType.T)){
+					var.setVariableType(VariableType.TRIAL_CONDITION);
+				}
+			}else {
+				var.setVariableType(OntologyDataHelper.mapFromPhenotype(var.getRole(), var.getProperty()));
 			}
 
 			measurementVariables.add(var);

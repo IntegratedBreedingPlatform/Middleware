@@ -223,6 +223,24 @@ public class WorkbookParserTest {
 		Assert.assertTrue("There should be no error after extracting the measurement variables", errorMessages.isEmpty());
 	}
 
+	/**
+	 * Test to extract measurement data for constant section.
+	 */
+	@Test
+	public void testExtractMeasurementVariablesForConstant() {
+		Section section = Section.CONSTANT;
+		String[] headers = WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS;
+		Workbook sampleWorkbook =
+				this.createWorkbookWithSectionHeaders(section.toString(), headers);
+		this.addSectionVariableDetailsToWorkbook(sampleWorkbook,
+				this.createVariableDetailsListTestData(section, headers));
+		List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		List<Message> errorMessages = new ArrayList<>();
+		this.workbookParser.setErrorMessages(errorMessages);
+		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
+		Assert.assertTrue("There should be no error after extracting the measurement variables", errorMessages.isEmpty());
+	}
+
 	@Test
 	public void testExtractMeasurementVariablesForSectionWithEmptyVariableDetails() {
 		Section section = Section.CONDITION;
