@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.NameDAO;
@@ -50,6 +51,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -287,7 +289,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Integer saveNurseryAdvanceGermplasmList(final List<Pair<Germplasm, List<Name>>> germplasms,
-			final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList)
+			final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList,
+			List<Pair<Germplasm, List<Attribute>>> germplasmAttributes)
 					throws MiddlewareQueryException {
 
 		final GermplasmDAO germplasmDao = this.getGermplasmDao();
@@ -340,6 +343,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					for (final Name name : nameList) {
 						name.setGermplasmId(germplasm.getGid());
 						nameDao.save(name);
+					}
+
+					// Save Germplasm attributes
+					List<Attribute> attributesList = germplasmAttributes.get(counter).getRight();
+					AttributeDAO attributeDAO = this.getAttributeDao();
+					for (Attribute attribute : attributesList) {
+						attribute.setGermplasmId(germplasm.getGid());
+						attributeDAO.save(attribute);
 					}
 				}
 
