@@ -196,7 +196,7 @@ public class Util{
      * @return calendar instance
      */
     public static Calendar getCalendarInstance() {
-        Locale currentLocale = Locale.getDefault(Locale.Category.DISPLAY);
+        Locale currentLocale = Locale.getDefault();
         return Calendar.getInstance(currentLocale);
     }
 
@@ -215,7 +215,7 @@ public class Util{
      * @return SimpleDateFormat
      */
     public static SimpleDateFormat getSimpleDateFormat(String format) {
-        Locale currentLocale = Locale.getDefault(Locale.Category.DISPLAY);
+        Locale currentLocale = Locale.getDefault();
         SimpleDateFormat formatter = new SimpleDateFormat(format, currentLocale);
         formatter.setLenient(false);
         return formatter;
