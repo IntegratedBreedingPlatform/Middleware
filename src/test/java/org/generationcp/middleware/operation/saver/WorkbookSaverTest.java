@@ -189,26 +189,27 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		Assert.assertNotEquals(0, trialVariableTypeList.getVariableTypes().size());
 	}
 
-	private StandardVariable transformMeasurementVariableToVariable(MeasurementVariable mv){
+	private StandardVariable transformMeasurementVariableToVariable(MeasurementVariable measurementVariable){
 		StandardVariable standardVariable = new StandardVariable();
 
-		standardVariable.setId(mv.getTermId());
-		standardVariable.setName(mv.getName());
-		standardVariable.setDescription(mv.getDescription());
+		standardVariable.setId(measurementVariable.getTermId());
+		standardVariable.setName(measurementVariable.getName());
+		standardVariable.setDescription(measurementVariable.getDescription());
 
 		Integer methodId = new Random().nextInt(10000);
 		Integer propertyId = new Random().nextInt(10000);
 		Integer scaleId = new Random().nextInt(10000);
 
-		standardVariable.setMethod(new Method(new Term(methodId, mv.getMethod(), "Method Description")));
-		standardVariable.setProperty(new Property(new Term(propertyId, mv.getProperty(), "Property Description")));
-		standardVariable.setScale(new Scale(new Term(scaleId, mv.getScale(), "Scale Description")));
+		standardVariable.setMethod(new Method(new Term(methodId, measurementVariable.getMethod(), "Method Description")));
+		standardVariable.setProperty(new Property(new Term(propertyId, measurementVariable.getProperty(), "Property Description")));
+		standardVariable.setScale(new Scale(new Term(scaleId, measurementVariable.getScale(), "Scale Description")));
 		standardVariable.setDataType(new Term(DataType.NUMERIC_VARIABLE.getId(), DataType.NUMERIC_VARIABLE.getName(), "Data Type Description"));
 		standardVariable.setIsA(new Term(new Random().nextInt(1000), "IsA", "IsA Description"));
-		standardVariable.setPhenotypicType(mv.getRole());
+		standardVariable.setPhenotypicType(measurementVariable.getRole());
 		standardVariable.setCropOntologyId("CO:100");
 		standardVariable.setVariableTypes(new HashSet<>(
-				new ArrayList<>(Collections.singletonList(OntologyDataHelper.mapFromPhenotype(mv.getRole(), mv.getProperty())))));
+				new ArrayList<>(Collections.singletonList(OntologyDataHelper.mapFromPhenotype(measurementVariable.getRole(), measurementVariable
+						.getProperty())))));
 
 		return standardVariable;
 	}
@@ -224,8 +225,8 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 	private VariableTypeList createVariableTypeList(List<MeasurementVariable> measurementVariables, int rank){
 		VariableTypeList variableTypeList = new VariableTypeList();
 
-		for(MeasurementVariable mv : measurementVariables){
-			variableTypeList.add(transformToDMSVariableType(mv, rank));
+		for(MeasurementVariable measurementVariable : measurementVariables){
+			variableTypeList.add(transformToDMSVariableType(measurementVariable, rank));
 		}
 		return variableTypeList;
 	}
