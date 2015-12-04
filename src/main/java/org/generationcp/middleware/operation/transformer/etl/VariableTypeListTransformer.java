@@ -7,8 +7,10 @@ import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 
 public class VariableTypeListTransformer extends Transformer {
 
@@ -29,6 +31,7 @@ public class VariableTypeListTransformer extends Transformer {
 		if (measurementVariables != null && !measurementVariables.isEmpty()) {
 			for (MeasurementVariable measurementVariable : measurementVariables) {
 				StandardVariable standardVariable;
+
 				if (measurementVariable.getTermId() != 0) {// in etl v2, standard variables are already created before saving the study
 					standardVariable = this.getStandardVariableBuilder().create(measurementVariable.getTermId(),programUUID);
 				} else {
@@ -47,11 +50,20 @@ public class VariableTypeListTransformer extends Transformer {
 				
 				measurementVariable.setTermId(standardVariable.getId());
 
-				DMSVariableType variableType =
+				DMSVariableType dmsVariableType =
 						new DMSVariableType(measurementVariable.getName(), measurementVariable.getDescription(), standardVariable, rank++);
 
-				variableType.setTreatmentLabel(measurementVariable.getTreatmentLabel());
-				variableTypeList.add(variableType);
+				VariableType variableType = measurementVariable.getVariableType();
+
+				if(variableType == null){
+					variableType = OntologyDataHelper.mapFromPhenotype(measurementVariable.getRole(), measurementVariable.getProperty());
+				}
+
+				dmsVariableType.setVariableType(variableType);
+				standardVariable.setPhenotypicType(variableType.getRole());
+				dmsVariableType.setRole(variableType.getRole());
+				dmsVariableType.setTreatmentLabel(measurementVariable.getTreatmentLabel());
+				variableTypeList.add(dmsVariableType);
 			}
 		}
 
