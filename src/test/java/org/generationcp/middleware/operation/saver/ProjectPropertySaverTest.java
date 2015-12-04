@@ -341,7 +341,7 @@ public class ProjectPropertySaverTest {
 		dmsVariableType.setStandardVariable(standardVariable);
 		variableTypeList.add(dmsVariableType);
 
-		List<ProjectProperty> properties = this.projectPropSaver.create(dmsProject, variableTypeList);
+		this.projectPropSaver.create(dmsProject, variableTypeList);
 	}
 
 	private static Map<Integer, List<Integer>> getDummyProjectPropIds() {
