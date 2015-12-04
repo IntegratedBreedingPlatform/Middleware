@@ -91,11 +91,7 @@ public class ProjectPropertySaver {
 		// This makes sure that selection values are actually saved as selections in the projectprop tables. Note roles cannot be used for
 		// this as both selections and traits map to roles. Thus if the role has evaluated to a Trait varible type and the DMSVariableType
 		// is not null use the DMSVariableType as it could be a selection.
-		if (variableTypeEnum == org.generationcp.middleware.domain.ontology.VariableType.TRAIT) {
-			variableTypeId = variableType.getVariableType().getId();
-		} else {
-			variableTypeId = variableTypeEnum.getId();
-		}
+		variableTypeId = variableTypeEnum.getId();
 
 		List<ProjectProperty> properties = new ArrayList<>();
 
