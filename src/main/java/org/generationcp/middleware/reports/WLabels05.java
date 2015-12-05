@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class WLabels05 extends AbstractReporter {
-	
 
 	private static final Logger LOG = LoggerFactory.getLogger(WLabels05.class);
 
@@ -33,7 +32,7 @@ public class WLabels05 extends AbstractReporter {
 
 	@Override
 	public Reporter createReporter() {
-		Reporter r = new WLabels05();
+		final Reporter r = new WLabels05();
 		r.setFileNameExpression("LABEL05_{trialName}");
 		return r;
 	}
@@ -55,7 +54,7 @@ public class WLabels05 extends AbstractReporter {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public JasperPrint buildJRPrint(Map<String, Object> args) throws JRException {
+	public JasperPrint buildJRPrint(final Map<String, Object> args) throws JRException {
 
 		Map<String, Object> jrParams = null;
 
@@ -71,20 +70,20 @@ public class WLabels05 extends AbstractReporter {
 		this.dataSource.clear();
 		this.studyMeta.clear();
 
-		for (MeasurementVariable var : (List<MeasurementVariable>) args.get("studyConditions")) {
+		for (final MeasurementVariable var : (List<MeasurementVariable>) args.get("studyConditions")) {
 			this.studyMeta.put(var.getName(), var.getValue());
 		}
 
 		// add headers in first row of dataSource
 		List<String> row = new ArrayList<>();
-		for (MeasurementData data : entries[0].getDataList()) {
+		for (final MeasurementData data : entries[0].getDataList()) {
 			row.add(data.getLabel());
 		}
 		this.dataSource.add(row);
 
-		for (MeasurementRow measurementRow : entries) {
+		for (final MeasurementRow measurementRow : entries) {
 			row = new ArrayList<>();
-			for (MeasurementData data : measurementRow.getDataList()) {
+			for (final MeasurementData data : measurementRow.getDataList()) {
 				row.add(data.getValue());
 			}
 			this.dataSource.add(row);
@@ -95,21 +94,19 @@ public class WLabels05 extends AbstractReporter {
 	}
 
 	@Override
-	public Map<String, Object> buildJRParams(Map<String, Object> args) {
-		Map<String, Object> params = super.buildJRParams(args);
+	public Map<String, Object> buildJRParams(final Map<String, Object> args) {
+		final Map<String, Object> params = super.buildJRParams(args);
 
 		@SuppressWarnings("unchecked")
-		List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get("studyConditions");
+		final List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get("studyConditions");
 
-		for (MeasurementVariable var : studyConditions) {
+		for (final MeasurementVariable var : studyConditions) {
 			String trialName = null;
-			switch (var.getName()) {
-				case "STUDY_TITLE":
-					trialName = var.getValue();
-					break;
+			if ("STUDY_TITLE".equalsIgnoreCase(var.getName())) {
+				trialName = var.getValue();
 			}
 
-			if (null != trialName) {
+			if (trialName != null) {
 				params.put("trialName", trialName);
 				break;
 			}
@@ -119,38 +116,38 @@ public class WLabels05 extends AbstractReporter {
 	}
 
 	@Override
-	public JRDataSource buildJRDataSource(Collection<?> args) {
+	public JRDataSource buildJRDataSource(final Collection<?> args) {
 		return null;
 	}
 
 	@Override
-	public void asOutputStream(OutputStream output) throws BuildReportException {
+	public void asOutputStream(final OutputStream output) throws BuildReportException {
 		try {
-			int columns = 3;
-			int colSpan = 20;
-			StringBuilder sb = new StringBuilder();
+			final int columns = 3;
+			final int colSpan = 20;
+			final StringBuilder sb = new StringBuilder();
 			sb.append(this.buildPrintTestRecord(columns, colSpan));
 
 			for (int i = 1; i < this.dataSource.size() + 1; i = i + columns) {
-				List<List<String>> items =
+				final List<List<String>> items =
 						this.dataSource.subList(i, i + columns < this.dataSource.size() ? i + columns : this.dataSource.size());
 
 				sb.append(this.buildRecord(items, this.dataSource.get(0), colSpan));
 			}
 			output.write(sb.toString().getBytes());
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			WLabels05.LOG.error("Unable to write to output stream", e);
 			throw new BuildReportException(this.getReportCode());
 		}
 	}
 
-	protected String buildRecord(List<List<String>> rows, List<String> headers, int colSpan) {
+	protected String buildRecord(final List<List<String>> rows, final List<String> headers, final int colSpan) {
 
-		List<Map<String, String>> records = this.extractRecordData(rows, headers);
+		final List<Map<String, String>> records = this.extractRecordData(rows, headers);
 
-		StringBuilder sb = new StringBuilder();
+		final StringBuilder sb = new StringBuilder();
 
-		int columns = rows.size();
+		final int columns = rows.size();
 
 		// now format
 		sb.append(StringUtil.stringOf(" ", colSpan));
@@ -169,7 +166,8 @@ public class WLabels05 extends AbstractReporter {
 					.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
 		}
 
-		sb.append(StringUtil.stringOf(" ", colSpan));
+		// CIMMYT text must be have less left margin from the other lines
+		sb.append(StringUtil.stringOf(" ", colSpan - 18));
 		for (int i = 0; i < columns; i++) {
 			sb.append(StringUtil.format("CIMMYT", 10, false)).append(StringUtil.stringOf(" ", 30))
 					.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
@@ -199,13 +197,19 @@ public class WLabels05 extends AbstractReporter {
 					.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
 		}
 
+		sb.append(StringUtil.stringOf(" ", colSpan));
+		for (int i = 0; i < columns; i++) {
+			sb.append(StringUtil.format("Local Check", 11, true)).append(StringUtil.stringOf(" ", 29))
+					.append(i + 1 == columns ? "\r\n" : StringUtil.stringOf(" ", colSpan));
+		}
+
 		return sb.append("\r\n").toString();
 	}
 
-	private String buildPrintTestRecord(int columns, int colSpan) {
-		StringBuilder sb = new StringBuilder();
-		int colSize = 40;
-		int rows = 7;
+	private String buildPrintTestRecord(final int columns, final int colSpan) {
+		final StringBuilder sb = new StringBuilder();
+		final int colSize = 40;
+		final int rows = 7;
 
 		for (int r = 0; r < rows; r++) {
 			sb.append(StringUtil.stringOf(" ", colSpan));
@@ -217,27 +221,40 @@ public class WLabels05 extends AbstractReporter {
 		return sb.append("\r\n").toString();
 	}
 
-	protected List<Map<String, String>> extractRecordData(List<List<String>> rows, List<String> headers) {
-		List<Map<String, String>> mapRows = new ArrayList<>();
+	protected List<Map<String, String>> extractRecordData(final List<List<String>> rows, final List<String> headers) {
+		final List<Map<String, String>> mapRows = new ArrayList<>();
 
 		for (int j = 0; j < rows.size(); j++) {
 
-			Map<String, String> record = new HashMap<>();
-			List<String> row = rows.get(j);
+			final Map<String, String> record = new HashMap<>();
+			final List<String> row = rows.get(j);
 
 			String pedigreeA = null;
 			String pedigreeB = null;
 			String selHistA = null;
 			String selHistB = null;
 
+			// retrieve trial instance no from study condition when the study is in nursery type
+			// otherwise, from the measurement row
+			if ("Nursery".equalsIgnoreCase(this.studyMeta.get("STUDY_TYPE"))) {
+				record.put("occ", this.studyMeta.get("TRIAL_INSTANCE"));
+			}
+
 			record.put("study", this.studyMeta.get("STUDY_NAME"));
-			record.put("occ", this.studyMeta.get("TRIAL_INSTANCE"));
+
+			// TODO: Needs to finalize the variable needed for the following fields
+			// subProg
+			// type - a type for nal,int, etc
+			// season
 			record.put("subProg", this.studyMeta.get("BreedingProgram"));
-			record.put("type", this.studyMeta.get("STUDY_TYPE")); // TODO: a type for nal,int, etc
+			record.put("type", this.studyMeta.get("STUDY_TYPE"));
 			record.put("season", this.studyMeta.get("CROP_SEASON"));
 
 			for (int i = 0; i < headers.size(); i++) {
 				switch (headers.get(i)) {
+					case "TRIAL_INSTANCE":
+						record.put("occ", row.get(i));
+						break;
 					case "ENTRY_NO":
 						record.put("entry", row.get(i));
 						break;
@@ -264,12 +281,18 @@ public class WLabels05 extends AbstractReporter {
 					case "PLOT_NO":
 						record.put("plot", row.get(i));
 						break;
+					default:
+						break;
 				}
 			}
 			mapRows.add(record);
 		}
 
 		return mapRows;
+	}
+
+	public void setStudyMeta(final Map<String, String> studyMeta) {
+		this.studyMeta = studyMeta;
 	}
 
 }

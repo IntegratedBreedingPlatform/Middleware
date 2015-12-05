@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,7 +26,17 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	private static final int TEST_GERMPLASM_LIST_USER_ID = 1;
 	private static final Integer STATUS_ACTIVE = 0;
 	private static final Integer STATUS_DELETED = 9;
-
+	public static List<String> EXCLUDED_GERMPLASM_LIST_TYPES = new ArrayList<String>();
+	
+	static{
+		GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES.add("NURSERY");
+		GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES.add("TRIAL");
+		GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES.add("CHECK");
+		GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES.add("ADVANCED");
+		GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES.add("CROSSES");
+		GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES.add("FOLDER");
+	}
+	
 	@Before
 	public void setUp() throws Exception {
 		GermplasmListDAOTest.dao = new GermplasmListDAO();
@@ -68,6 +79,15 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		Assert.assertEquals("There should be no germplasm list with name " + GermplasmListDAOTest.TEST_GERMPLASM_LIST_NAME, 0,
 				GermplasmListDAOTest.dao.countByName(GermplasmListDAOTest.TEST_GERMPLASM_LIST_NAME, Operation.EQUAL));
 
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void TestGetGermplasmListTypes(){
+		List<String> germplasmListTypes = GermplasmListDAOTest.dao.getGermplasmListTypes();
+		for(String listType: GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES){
+			Assert.assertFalse(listType + " should not be in the Results Array", germplasmListTypes.contains(listType));
+		}
 	}
 
 	private static GermplasmList saveGermplasm(GermplasmList list) throws MiddlewareQueryException {
