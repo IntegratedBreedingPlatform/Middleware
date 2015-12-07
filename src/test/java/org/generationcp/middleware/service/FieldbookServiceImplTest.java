@@ -20,6 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -36,6 +37,8 @@ import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import com.google.common.collect.Lists;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FieldbookServiceImplTest {
@@ -62,6 +65,8 @@ public class FieldbookServiceImplTest {
 
 	private List<Pair<Germplasm, GermplasmListData>> listDataItems;
 
+	private List<Pair<Germplasm, List<Attribute>>> germplasmAttributes;
+
 	@InjectMocks
 	private FieldbookServiceImpl fieldbookServiceImpl;
 
@@ -72,14 +77,23 @@ public class FieldbookServiceImplTest {
 		this.dbBroker.setSessionProvider(this.sessionProvider);
 		this.germplasms = this.createGermplasms();
 		this.listDataItems = this.createListDataItems();
+		this.germplasmAttributes = this.createGermplasmAttributes();
 	}
 
 	@Test
 	public void testSaveNurseryAdvanceGermplasmListSuccess() {
 		final GermplasmList germplasmList = this.createGermplasmlist();
 		final Integer out =
-				this.fieldbookServiceImpl.saveNurseryAdvanceGermplasmList(this.germplasms, this.listDataItems, germplasmList, null);
+				this.fieldbookServiceImpl.saveNurseryAdvanceGermplasmList(this.germplasms, this.listDataItems, germplasmList,
+						this.germplasmAttributes);
 		Assert.assertEquals("List Id should be 1", (Integer) 1, out);
+
+		// Make sure a call to save various things occur.
+		Mockito.verify(this.session).save(germplasmList);
+		Mockito.verify(this.session).save(this.listDataItems.get(0).getLeft());
+		Mockito.verify(this.session).save(this.germplasms.get(0).getLeft());
+		Mockito.verify(this.session).save(this.germplasms.get(0).getRight().get(0));
+		Mockito.verify(this.session).save(this.germplasmAttributes.get(0).getLeft());
 	}
 
 	@Test
@@ -92,6 +106,7 @@ public class FieldbookServiceImplTest {
 	private List<Pair<Germplasm, List<Name>>> createGermplasms() {
 		final List<Pair<Germplasm, List<Name>>> germplasms = new ArrayList<>();
 		final Name name = new Name();
+		name.setNid(1);
 		final Germplasm germplasm = this.createGermplasm();
 		final List<Name> names = Arrays.asList(name);
 		germplasms.add(new ImmutablePair<Germplasm, List<Name>>(germplasm, names));
@@ -113,6 +128,16 @@ public class FieldbookServiceImplTest {
 		final GermplasmListData listData = new GermplasmListData();
 		listDataItems.add(new ImmutablePair<Germplasm, GermplasmListData>(germplasm, listData));
 		return listDataItems;
+	}
+
+	private List<Pair<Germplasm, List<Attribute>>> createGermplasmAttributes() {
+		List<Pair<Germplasm, List<Attribute>>> attrs = new ArrayList<>();
+		final Germplasm germplasm = this.createGermplasm();
+		final Attribute attribute = new Attribute();
+		attribute.setAval("Plot Code");
+		attribute.setTypeId(1552);
+		attrs.add(new ImmutablePair<Germplasm, List<Attribute>>(germplasm, Lists.newArrayList(attribute)));
+		return attrs;
 	}
 
 	private GermplasmList createGermplasmlist() {
