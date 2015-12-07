@@ -1035,9 +1035,11 @@ public class Workbook {
 	}
 
 	public MeasurementVariable findConditionById(int conditionId) {
-		for (MeasurementVariable mv : this.getConditions()) {
-			if (mv.getTermId() == conditionId) {
-				return mv;
+		if (this.getConditions() != null) {
+			for (MeasurementVariable mv : this.getConditions()) {
+				if (mv.getTermId() == conditionId) {
+					return mv;
+				}
 			}
 		}
 		return null;
