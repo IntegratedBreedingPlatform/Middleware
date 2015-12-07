@@ -205,6 +205,14 @@ public abstract class StringUtil {
 		return sb.toString();
 	}
 
+    public static boolean areEqualOrBothEmpty(String string1, String string2) {
+        if (StringUtils.isEmpty(string1) && StringUtils.isEmpty(string2)) {
+            return true;
+        } else {
+            return string1.equals(string2);
+        }
+    }
+
 	/**
 	 * Join the specified list of objects with the specified delimiter. Any null value in the list will be ignored.
 	 * <p>
