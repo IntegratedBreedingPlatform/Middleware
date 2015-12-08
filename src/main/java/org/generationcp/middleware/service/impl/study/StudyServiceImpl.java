@@ -3,12 +3,21 @@ package org.generationcp.middleware.service.impl.study;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -22,6 +31,10 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
 
@@ -31,6 +44,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private StudyGermplasmListService studyGermplasmListService;
 
+	private OntologyVariableDataManager ontologyVariableDataManager;
+
+	private StudyDataManager studyDataManager;
+
+	private LoadingCache<StudyKey, String> studyIdToProgramIdCache;
+	
 	public StudyServiceImpl() {
 		super();
 	}
@@ -41,6 +60,17 @@ public class StudyServiceImpl extends Service implements StudyService {
 		this.trialTraits = new TraitServiceImpl(currentSession);
 		this.studyMeasurements = new StudyMeasurements(this.getCurrentSession());
 		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(this.getCurrentSession());
+		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(new OntologyMethodDataManagerImpl(sessionProvider), 
+				new OntologyPropertyDataManagerImpl(sessionProvider),
+				new OntologyScaleDataManagerImpl(sessionProvider), sessionProvider);
+		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
+		
+		final CacheLoader<StudyKey, String> studyKeyCacheBuilder = new CacheLoader<StudyKey, String>() {
+			public String load(StudyKey key) throws Exception {
+				return studyDataManager.getProject(key.getStudyId()).getProgramUUID();
+			}
+		};
+		studyIdToProgramIdCache = CacheBuilder.newBuilder().expireAfterWrite(100, TimeUnit.MINUTES).build(studyKeyCacheBuilder);
 	}
 
 	/**
@@ -86,8 +116,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 		try {
 			final Query query =
 					this.getCurrentSession().createSQLQuery(sql).addScalar("id").addScalar("name").addScalar("title")
-					.addScalar("programUUID").addScalar("studyTypeId").addScalar("objective").addScalar("startDate")
-					.addScalar("endDate");
+							.addScalar("programUUID").addScalar("studyTypeId").addScalar("objective").addScalar("startDate")
+							.addScalar("endDate");
 			list = query.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in listAllStudies() query in StudyServiceImpl: " + e.getMessage(), e);
@@ -134,12 +164,15 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public ObservationDto updataObservation(final Integer studyIdentifier, final ObservationDto middlewareMeasurement) {
 
 		final Session currentSession = this.getCurrentSession();
-		final Observations observations = new Observations(currentSession);
+		final Observations observations = new Observations(currentSession, ontologyVariableDataManager);
 		try {
-			final ObservationDto updatedMeasurement = observations.updataObsevationTraits(middlewareMeasurement);
+			final ObservationDto updatedMeasurement =
+					observations.updataObsevationTraits(middlewareMeasurement,
+							studyIdToProgramIdCache.get(new StudyKey(studyIdentifier, ContextHolder.getCurrentCrop())));
 			return updatedMeasurement;
-		} catch (final RuntimeException e) {
-			throw e; // or display error message
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException("Unexpected error updating observations. Please contact support for "
+					+ "further assistence.", e); // or
 		}
 	}
 
