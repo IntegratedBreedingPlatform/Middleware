@@ -23,6 +23,7 @@ import org.generationcp.middleware.pojos.gdms.CharValues;
 import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.generationcp.middleware.util.StringUtil;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -72,6 +73,15 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 	public static final String GET_ALLELIC_VALUES_BY_DATASET_ID = "SELECT gid, marker_id,  CONCAT(char_value, '') "
 			+ "           , marker_sample_id, acc_sample_id " + "FROM gdms_char_values " + "WHERE dataset_id = :datasetId "
 			+ "ORDER BY gid ASC, marker_id ASC";
+	
+	//getAllelicValues by datasetId - distinct (not sure of difference wrt query above)
+	public static final String GET_UNIQUE_ALLELIC_VALUES_BY_DATASET_ID = 
+			"SELECT distinct gid,marker_id,char_value,acc_sample_id,marker_sample_id from gdms_char_values where dataset_id= :datasetId"
+					+ " ORDER BY gid, marker_id,acc_sample_id asc";
+	
+	// another transferred query from the Vaadin layer
+	public static final String GET_UNIQUE_ALLELIC_VALUES_BY_GIDS_AND_MIDS = "select distinct gid,marker_id, char_value,acc_sample_id,marker_sample_id from gdms_char_values where"
+			+ " gid in(:gids) and marker_id in (:mids) ORDER BY gid, marker_id,acc_sample_id asc";
 
 	public static final String COUNT_BY_DATASET_ID = "SELECT COUNT(*) " + "FROM gdms_char_values " + "WHERE dataset_id = :datasetId";
 
@@ -281,6 +291,57 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 					"Error with getCharValuesByDatasetId(datasetId=" + datasetId + ") query from CharValues " + e.getMessage(), e);
 		}
 		return toReturn;
+	}
+	
+	@SuppressWarnings({"deprecation", "unchecked"})
+	public List<Object> getUniqueAllelesByDatasetId(String datasetId) {
+		
+		List<Object> results = new ArrayList<>();
+		try {
+			if (datasetId != null) {
+				SQLQuery query =
+						this.getSession().createSQLQuery(CharValuesDAO.GET_UNIQUE_ALLELIC_VALUES_BY_DATASET_ID);
+				query.setParameter("datasetId", datasetId);				
+				query.addScalar("gid", Hibernate.INTEGER);
+				query.addScalar("marker_id", Hibernate.INTEGER);
+				query.addScalar("char_value", Hibernate.STRING);
+				query.addScalar("acc_sample_id", Hibernate.INTEGER);
+				query.addScalar("marker_sample_id", Hibernate.INTEGER);
+				results = query.list();
+
+					}
+		} catch (HibernateException e) {
+			this.logAndThrowException(
+					"Error with getUniqueAllelesByDatasetId(datasetId=" + datasetId + ") query from CharValuesDAO " + e.getMessage(), e);
+		}
+		return results;
+				
+	}
+	
+	@SuppressWarnings({"deprecation", "unchecked"})
+	public List<Object> getUniqueCharAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids) {
+		
+		List<Object> results = new ArrayList<>();
+		try {
+			if (gids != null) {
+				SQLQuery query =
+						this.getSession().createSQLQuery(CharValuesDAO.GET_UNIQUE_ALLELIC_VALUES_BY_GIDS_AND_MIDS);
+				query.setParameterList("gids", gids);				
+				query.setParameterList("mids", mids);				
+				query.addScalar("gid", Hibernate.INTEGER);
+				query.addScalar("marker_id", Hibernate.INTEGER);
+				query.addScalar("char_value", Hibernate.STRING);
+				query.addScalar("acc_sample_id", Hibernate.INTEGER);
+				query.addScalar("marker_sample_id", Hibernate.INTEGER);
+				results = query.list();
+
+					}
+		} catch (HibernateException e) {
+			this.logAndThrowException(
+					"Error with getUniqueAllelesByGidsAndMids(gids=" + gids + ") query from CharValuesDAO " + e.getMessage(), e);
+		}
+		return results;
+				
 	}
 
 	@SuppressWarnings("rawtypes")
