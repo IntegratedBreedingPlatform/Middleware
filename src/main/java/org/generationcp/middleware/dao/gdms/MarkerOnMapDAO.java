@@ -19,6 +19,7 @@ import java.util.Map;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.MarkerOnMap;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -63,6 +64,7 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 					+ e.getMessage(), e);
 		}
 		return null;
+		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -136,6 +138,39 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 
 		return markersOnMap;
 
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<MarkerOnMap> getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(Integer mapId, Integer linkageGroupId, Integer markerId) {
+		List<Object[]> list = new ArrayList<>();
+		List<MarkerOnMap> markersOnMap = new ArrayList<>();
+		String str2MarkerQuerry2 =
+				"SELECT * FROM gdms_markers_onmap WHERE map_id=(:mapId) AND linkage_group=(:linkageGroupId)"
+						+ " AND marker_id != (:markerId)";
+		
+		Query query = this.getSession().createSQLQuery(str2MarkerQuerry2);
+		query.setParameter("mapId", mapId);
+		query.setParameter("linkageGroupId", linkageGroupId);
+		query.setParameter("markerId", markerId);
+		list = query.list();
+		
+		if (list != null && !list.isEmpty()) {
+			for (Object[] row : list) {
+				Integer markerOnMapId = (Integer) row[0];
+				Integer mapId2 = (Integer) row[1];
+				Integer mId = (Integer) row[2];
+				Double startPosition = (Double) row[3];
+				Double endPosition = (Double) row[4];
+				String linkageGroup = (String) row[5];
+
+				markersOnMap.add(new MarkerOnMap(markerOnMapId, mapId2, mId, startPosition.floatValue(), endPosition.floatValue(),
+						linkageGroup));
+			}
+
+		}
+			
+		return markersOnMap;
+		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -250,6 +285,32 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 		}
 
 		return markersOnMap;
+	}
+	
+	// FIXME : not sure if this is the correct DAO - perhaps should be MapDAO
+	public List<Object> getMarkersOnMapByMarkerIdsAndMapId(List<Integer> markerIds, Integer mapID) {
+		
+		List<Object> result = new ArrayList<>();
+		
+		String strQuerry =
+			"SELECT distinct gdms_markers_onmap.marker_id, gdms_map.map_name, gdms_markers_onmap.start_position, gdms_markers_onmap.linkage_group, gdms_map.map_unit FROM "
+					+ "gdms_map join gdms_markers_onmap on gdms_map.map_id=gdms_markers_onmap.map_id where gdms_markers_onmap.marker_id in (:markerIds) "
+					+ "and gdms_map.map_id=(:mapID) "
+					+ "order BY gdms_map.map_name, gdms_markers_onmap.linkage_group, gdms_markers_onmap.start_position asc";
+		
+		SQLQuery query = this.getSession().createSQLQuery(strQuerry);
+		query.setParameterList("markerIds", markerIds);
+		query.setParameter("mapID", mapID);
+
+		query.addScalar("marker_id", Hibernate.INTEGER);
+		query.addScalar("map_name", Hibernate.STRING);
+		query.addScalar("start_position", Hibernate.DOUBLE);
+		query.addScalar("linkage_group", Hibernate.STRING);
+		query.addScalar("map_unit", Hibernate.STRING);
+		result = query.list();
+		
+		return result;
+	
 	}
 
 	@SuppressWarnings("unchecked")
