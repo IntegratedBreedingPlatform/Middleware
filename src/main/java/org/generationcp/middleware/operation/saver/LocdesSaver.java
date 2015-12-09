@@ -18,18 +18,18 @@ import org.generationcp.middleware.util.Util;
 
 public class LocdesSaver extends Saver {
 
-	public LocdesSaver(HibernateSessionProvider sessionProviderForLocal) {
+	public LocdesSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
 
-	public void saveLocationDescriptions(List<FieldMapInfo> infoList, int userId) throws MiddlewareQueryException {
-		Map<Integer, BlockInfo> blockMap = this.extractAllBlockInformation(infoList);
+	public void saveLocationDescriptions(final List<FieldMapInfo> infoList, final int userId) throws MiddlewareQueryException {
+		final Map<Integer, BlockInfo> blockMap = this.extractAllBlockInformation(infoList);
 		if (!blockMap.isEmpty()) {
-			for (Integer blockId : blockMap.keySet()) {
-				BlockInfo blockInfo = blockMap.get(blockId);
+			for (final Integer blockId : blockMap.keySet()) {
+				final BlockInfo blockInfo = blockMap.get(blockId);
 
-				List<Locdes> descriptions = this.getLocdesDao().getByLocation(blockInfo.getBlockId());
-				Map<String, Integer> udfldMap = this.getUdfldMap();
+				final List<Locdes> descriptions = this.getLocdesDao().getByLocation(blockInfo.getBlockId());
+				final Map<String, Integer> udfldMap = this.getUdfldMap();
 
 				this.saveOrUpdateLocdes(blockId, descriptions, this.getId(udfldMap, LocdesType.ROWS_IN_BLOCK),
 						blockInfo.getNumberOfRowsInBlock(), userId);
@@ -48,51 +48,54 @@ public class LocdesSaver extends Saver {
 	}
 
 	private Map<String, Integer> getUdfldMap() throws MiddlewareQueryException {
-		return this.getUserDefinedFieldDao().getByCodesInMap("LOCDES", "DTYPE",
-				Arrays.asList(LocdesType.ROWS_IN_BLOCK.getCode(), LocdesType.RANGES_IN_BLOCK.getCode(), LocdesType.ROWS_IN_PLOT.getCode(),
-						LocdesType.MACHINE_ROW_CAPACITY.getCode(), LocdesType.PLANTING_ORDER.getCode(),
-						LocdesType.DELETED_PLOTS.getCode()));
+		return this.getUserDefinedFieldDao()
+				.getByCodesInMap(
+						"LOCDES",
+						"DTYPE",
+						Arrays.asList(LocdesType.ROWS_IN_BLOCK.getCode(), LocdesType.RANGES_IN_BLOCK.getCode(),
+								LocdesType.ROWS_IN_PLOT.getCode(), LocdesType.MACHINE_ROW_CAPACITY.getCode(),
+								LocdesType.PLANTING_ORDER.getCode(), LocdesType.DELETED_PLOTS.getCode()));
 	}
 
-	private int getId(Map<String, Integer> map, LocdesType type) throws MiddlewareQueryException {
-		Integer id = map.get(type.getCode());
+	private int getId(final Map<String, Integer> map, final LocdesType type) throws MiddlewareQueryException {
+		final Integer id = map.get(type.getCode());
 		if (id == null) {
-			throw new MiddlewareQueryException(
-					"Locdes Type " + type.getCode() + " does not exists, please contact your system administrator");
+			throw new MiddlewareQueryException("Locdes Type " + type.getCode()
+					+ " does not exists, please contact your system administrator");
 		}
 		return id;
 	}
 
-	public void updateDeletedPlots(List<FieldMapInfo> infoList, int userId) throws MiddlewareQueryException {
-		Map<Integer, BlockInfo> blockMap = this.extractAllBlockInformation(infoList);
+	public void updateDeletedPlots(final List<FieldMapInfo> infoList, final int userId) throws MiddlewareQueryException {
+		final Map<Integer, BlockInfo> blockMap = this.extractAllBlockInformation(infoList);
 		if (!blockMap.isEmpty()) {
-			for (Integer blockId : blockMap.keySet()) {
-				BlockInfo blockInfo = blockMap.get(blockId);
-				List<Locdes> descriptions = this.getLocdesDao().getByLocation(blockInfo.getBlockId());
+			for (final Integer blockId : blockMap.keySet()) {
+				final BlockInfo blockInfo = blockMap.get(blockId);
+				final List<Locdes> descriptions = this.getLocdesDao().getByLocation(blockInfo.getBlockId());
 				this.updateDeletedPlots(blockId, descriptions, blockInfo.getDeletedPlots(), userId);
 			}
 		}
 	}
 
-	private void updateDeletedPlots(Integer locId, List<Locdes> descriptions, List<String> deletedPlots, int userId)
+	private void updateDeletedPlots(final Integer locId, final List<Locdes> descriptions, final List<String> deletedPlots, final int userId)
 			throws MiddlewareQueryException {
-		Map<String, Integer> udfldMap = this.getUdfldMap();
-		List<Locdes> savedDeletedPlots = this.findAllLocdes(descriptions, this.getId(udfldMap, LocdesType.DELETED_PLOTS));
+		final Map<String, Integer> udfldMap = this.getUdfldMap();
+		final List<Locdes> savedDeletedPlots = this.findAllLocdes(descriptions, this.getId(udfldMap, LocdesType.DELETED_PLOTS));
 		if (savedDeletedPlots != null && !savedDeletedPlots.isEmpty()) {
-			for (Locdes savedDeletedPlot : savedDeletedPlots) {
+			for (final Locdes savedDeletedPlot : savedDeletedPlots) {
 				this.getLocdesDao().makeTransient(savedDeletedPlot);
 			}
 		}
 		if (deletedPlots != null && !deletedPlots.isEmpty()) {
-			for (String deletedPlot : deletedPlots) {
-				Locdes locdes = this.createLocdes(locId, this.getId(udfldMap, LocdesType.DELETED_PLOTS), deletedPlot, userId);
+			for (final String deletedPlot : deletedPlots) {
+				final Locdes locdes = this.createLocdes(locId, this.getId(udfldMap, LocdesType.DELETED_PLOTS), deletedPlot, userId);
 				this.getLocdesDao().save(locdes);
 			}
 		}
 	}
 
-	public void saveOrUpdateLocdes(Integer locId, List<Locdes> descriptions, int typeId, Object value, int userId)
-			throws MiddlewareQueryException {
+	public void saveOrUpdateLocdes(final Integer locId, final List<Locdes> descriptions, final int typeId, final Object value,
+			final int userId) throws MiddlewareQueryException {
 		if (value != null) {
 			Locdes locdes = this.findLocdes(descriptions, typeId);
 			if (locdes == null) {
@@ -102,9 +105,9 @@ public class LocdesSaver extends Saver {
 		}
 	}
 
-	private Locdes findLocdes(List<Locdes> descriptions, int typeId) {
+	private Locdes findLocdes(final List<Locdes> descriptions, final int typeId) {
 		if (descriptions != null && !descriptions.isEmpty()) {
-			for (Locdes description : descriptions) {
+			for (final Locdes description : descriptions) {
 				if (description.getTypeId() == typeId) {
 					return description;
 				}
@@ -113,10 +116,10 @@ public class LocdesSaver extends Saver {
 		return null;
 	}
 
-	private List<Locdes> findAllLocdes(List<Locdes> descriptions, int typeId) {
-		List<Locdes> list = new ArrayList<Locdes>();
+	private List<Locdes> findAllLocdes(final List<Locdes> descriptions, final int typeId) {
+		final List<Locdes> list = new ArrayList<Locdes>();
 		if (descriptions != null && !descriptions.isEmpty()) {
-			for (Locdes description : descriptions) {
+			for (final Locdes description : descriptions) {
 				if (description.getTypeId() == typeId) {
 					list.add(description);
 				}
@@ -125,8 +128,9 @@ public class LocdesSaver extends Saver {
 		return list;
 	}
 
-	private Locdes createLocdes(Integer locId, int typeId, Object value, int userId) throws MiddlewareQueryException {
-		Locdes locdes = new Locdes();
+	private Locdes createLocdes(final Integer locId, final int typeId, final Object value, final int userId)
+			throws MiddlewareQueryException {
+		final Locdes locdes = new Locdes();
 		locdes.setLocationId(locId);
 		locdes.setTypeId(typeId);
 		locdes.setDval(value.toString());
@@ -136,12 +140,12 @@ public class LocdesSaver extends Saver {
 		return locdes;
 	}
 
-	private Map<Integer, BlockInfo> extractAllBlockInformation(List<FieldMapInfo> infoList) {
-		Map<Integer, BlockInfo> blockMap = new HashMap<Integer, LocdesSaver.BlockInfo>();
+	private Map<Integer, BlockInfo> extractAllBlockInformation(final List<FieldMapInfo> infoList) {
+		final Map<Integer, BlockInfo> blockMap = new HashMap<Integer, LocdesSaver.BlockInfo>();
 
-		for (FieldMapInfo info : infoList) {
-			for (FieldMapDatasetInfo dataset : info.getDatasets()) {
-				for (FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
+		for (final FieldMapInfo info : infoList) {
+			for (final FieldMapDatasetInfo dataset : info.getDatasets()) {
+				for (final FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
 					this.putAllBlockInformationToAMap(trial, blockMap);
 				}
 			}
@@ -150,7 +154,7 @@ public class LocdesSaver extends Saver {
 		return blockMap;
 	}
 
-	private void putAllBlockInformationToAMap(FieldMapTrialInstanceInfo trial, Map<Integer, BlockInfo> blockMap) {
+	private void putAllBlockInformationToAMap(final FieldMapTrialInstanceInfo trial, final Map<Integer, BlockInfo> blockMap) {
 		if (trial.getBlockId() != null) {
 			BlockInfo blockInfo = blockMap.get(trial.getBlockId());
 
@@ -183,7 +187,7 @@ public class LocdesSaver extends Saver {
 			return this.blockId;
 		}
 
-		public void setBlockId(Integer blockId) {
+		public void setBlockId(final Integer blockId) {
 			this.blockId = blockId;
 		}
 
@@ -191,7 +195,7 @@ public class LocdesSaver extends Saver {
 			return this.numberOfRowsInBlock;
 		}
 
-		public void setNumberOfRowsInBlock(Integer numberOfRowsInBlock) {
+		public void setNumberOfRowsInBlock(final Integer numberOfRowsInBlock) {
 			this.numberOfRowsInBlock = numberOfRowsInBlock;
 		}
 
@@ -199,7 +203,7 @@ public class LocdesSaver extends Saver {
 			return this.numberOfRangesInBlock;
 		}
 
-		public void setNumberOfRangesInBlock(Integer numberOfRangesInBlock) {
+		public void setNumberOfRangesInBlock(final Integer numberOfRangesInBlock) {
 			this.numberOfRangesInBlock = numberOfRangesInBlock;
 		}
 
@@ -207,7 +211,7 @@ public class LocdesSaver extends Saver {
 			return this.plantingOrder;
 		}
 
-		public void setPlantingOrder(Integer plantingOrder) {
+		public void setPlantingOrder(final Integer plantingOrder) {
 			this.plantingOrder = plantingOrder;
 		}
 
@@ -215,7 +219,7 @@ public class LocdesSaver extends Saver {
 			return this.numberOfRowsPerPlot;
 		}
 
-		public void setNumberOfRowsPerPlot(Integer numberOfRowsPerPlot) {
+		public void setNumberOfRowsPerPlot(final Integer numberOfRowsPerPlot) {
 			this.numberOfRowsPerPlot = numberOfRowsPerPlot;
 		}
 
@@ -223,7 +227,7 @@ public class LocdesSaver extends Saver {
 			return this.machineRowCapacity;
 		}
 
-		public void setMachineRowCapacity(Integer machineRowCapacity) {
+		public void setMachineRowCapacity(final Integer machineRowCapacity) {
 			this.machineRowCapacity = machineRowCapacity;
 		}
 
@@ -231,7 +235,7 @@ public class LocdesSaver extends Saver {
 			return this.deletedPlots;
 		}
 
-		public void setDeletedPlots(List<String> deletedPlots) {
+		public void setDeletedPlots(final List<String> deletedPlots) {
 			this.deletedPlots = deletedPlots;
 		}
 
