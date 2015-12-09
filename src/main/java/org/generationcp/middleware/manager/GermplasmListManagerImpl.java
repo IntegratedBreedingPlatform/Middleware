@@ -434,7 +434,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public GermplasmList getLastSavedGermplasmListByUserId(Integer userID, String programUUID) {
-		return this.getGermplasmListDAO().getLastSavedByUserID(userID, programUUID);
+		return this.getGermplasmListDAO().getLastCreatedByUserID(userID, programUUID);
 	}
 
 	@Override

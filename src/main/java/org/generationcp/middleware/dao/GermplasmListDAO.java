@@ -292,7 +292,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	@Nullable
-	public GermplasmList getLastSavedByUserID(final Integer userID, final String programUUID) {
+	public GermplasmList getLastCreatedByUserID(final Integer userID, final String programUUID) {
 		try {
 			if (userID != null) {
 				final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
