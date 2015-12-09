@@ -61,6 +61,7 @@ import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingABHRow;
 import org.generationcp.middleware.pojos.gdms.MappingAllelicSNPRow;
 import org.generationcp.middleware.pojos.gdms.MappingAllelicSSRDArTRow;
+import org.generationcp.middleware.pojos.gdms.MappingData;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
@@ -242,6 +243,11 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public String getMapNameById(Integer mapID) throws MiddlewareQueryException {
 		return this.getMapDao().getMapNameById(mapID);
+	}
+	
+	@Override
+	public List<Dataset> getAllDatasets() {
+		return this.getDatasetDao().getAll();
 	}
 
 	@Override
@@ -2867,5 +2873,82 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	@Override
 	public List<CharValues> getCharValuesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
 		return this.getCharValuesDao().getCharValuesByMarkerIds(markerIds);
+	}
+
+	@Override
+	public List<MappingData> getAllMappingData() {
+		return this.getMappingDataDao().getAll();
+	}
+
+	// --- Added by Matthew transferring GDMS SQL to middleware -- //
+	
+	@Override
+	public List<Object> getUniqueAccMetaDataSetByDatasetId(String datasetId) {
+		return this.getAccMetadataSetDao().getUniqueAccMetaDatsetByDatasetId(datasetId);
+	}
+
+	@Override
+	public List<Object> getUniqueCharAllelesByDataset(String datasetId) {
+		return this.getCharValuesDao().getUniqueAllelesByDatasetId(datasetId);
+	}
+
+	@Override
+	public List<QtlDetails> getAllQtlDetails() {
+		return this.getQtlDetailsDao().getAll();
+	}
+
+	@Override
+	public List<Qtl> getAllQtl() {
+		return this.getQtlDao().getAll();
+	}
+
+	@Override
+	public List<Object> getUniqueCharAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids) {
+		return this.getCharValuesDao().getUniqueCharAllelesByGidsAndMids(gids, mids);
+	}
+
+	@Override
+	public List<Object> getUniqueAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids) {
+		return this.getAlleleValuesDao().getUniqueAllelesByGidsAndMids(gids, mids);
+	}
+
+	@Override
+	public List<Object> getUniqueMapPopAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids) {
+		return this.getMappingPopValuesDao().getUniqueMapPopAllelesByGidsAndMids(gids, mids);
+	}
+
+	@Override
+	public List<Object> getUniqueAccMetaDataSetByGids(List gids) {
+		return this.getAccMetadataSetDao().getUniqueAccMetaDatsetByGids(gids);
+	}
+
+	@Override
+	public List<Integer> getMarkerIdsByNames(List<String> names, int start, int numOfRows) {
+		return this.getMarkerDao().getIdsByNames(names, start, numOfRows);
+	}
+
+	@Override
+	public int countAllMarkers() {
+		return this.getMarkerDao().getAll().size();
+	}
+
+	@Override
+	public List<Integer> getDatasetIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException {
+		return this.getAccMetadataSetDao().getDatasetIdsByGermplasmIds(gIds);
+	}
+
+	@Override
+	public List<Integer> getAccMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException {
+		return this.getAccMetadataSetDao().getNidsByDatasetIds(datasetIds);
+	}
+
+	@Override
+	public List<Object> getMarkersOnMapByMarkerIdsAndMapId(List<Integer> markerIds, Integer mapID) {
+		return this.getMarkerOnMapDao().getMarkersOnMapByMarkerIdsAndMapId(markerIds, mapID);
+	}
+
+	@Override
+	public List<MarkerOnMap> getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(Integer mapId, Integer linkageGroupId, Integer markerId) {
+		return this.getMarkerOnMapDao().getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(mapId, linkageGroupId, markerId);
 	}
 }

@@ -14,24 +14,28 @@ public class OntologyDaoFactory {
 
 	private HibernateSessionProvider sessionProvider;
 
-	public OntologyDaoFactory(HibernateSessionProvider sessionProvider) {
+	public OntologyDaoFactory() {
+
+	}
+
+	public OntologyDaoFactory(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
 	}
 
-	public CVTermDao getCvTermDao(){
-		CVTermDao cvTermDao = new CVTermDao();
+	public CVTermDao getCvTermDao() {
+		final CVTermDao cvTermDao = new CVTermDao();
 		cvTermDao.setSession(this.sessionProvider.getSession());
 		return cvTermDao;
 	}
 
-	public CvTermPropertyDao getCvTermPropertyDao(){
-		CvTermPropertyDao cvTermPropertyDao = new CvTermPropertyDao();
+	public CvTermPropertyDao getCvTermPropertyDao() {
+		final CvTermPropertyDao cvTermPropertyDao = new CvTermPropertyDao();
 		cvTermPropertyDao.setSession(this.sessionProvider.getSession());
 		return cvTermPropertyDao;
 	}
 
-	public CVTermRelationshipDao getCvTermRelationshipDao(){
-		CVTermRelationshipDao cvTermRelationshipDao = new CVTermRelationshipDao();
+	public CVTermRelationshipDao getCvTermRelationshipDao() {
+		final CVTermRelationshipDao cvTermRelationshipDao = new CVTermRelationshipDao();
 		cvTermRelationshipDao.setSession(this.sessionProvider.getSession());
 		return cvTermRelationshipDao;
 	}
