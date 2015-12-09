@@ -14,7 +14,7 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.pojos.report.GermplasmEntry;
 import org.generationcp.middleware.pojos.report.Occurrence;
 
-public class WFieldbook23 extends AbstractWheatTrialReporter {
+public class WFieldbook23 extends AbstractWheatNurseryReporter {
 
 	/**
 	 * Enforces obtaining instances through the Factory

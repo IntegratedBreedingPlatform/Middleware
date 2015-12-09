@@ -20,7 +20,7 @@
 	<parameter name="program" class="java.lang.String"/>
 	<parameter name="trialName" class="java.lang.String"/>
 	<parameter name="trialAbbr" class="java.lang.String"/>
-	<parameter name="numReporte" class="java.lang.Integer"/>
+    <parameter name="numReporte" class="java.lang.String"/>
 	<parameter name="lid" class="java.lang.String"/>
 	<parameter name="Ientry" class="java.lang.Integer"/>
 	<parameter name="Fentry" class="java.lang.Integer"/>
