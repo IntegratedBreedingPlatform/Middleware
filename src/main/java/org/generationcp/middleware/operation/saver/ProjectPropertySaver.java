@@ -452,7 +452,7 @@ public class ProjectPropertySaver {
 		rank = this.updateVariableRank(variableIds, rank, projectPropIDMap);
 
 		// if any factors were added but not included in list of variables, update their ranks also so they come last
-		final List<Integer> storedInIds = new ArrayList<Integer>();
+		final List<Integer> storedInIds = new ArrayList<>();
 		storedInIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
 		storedInIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
 		storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());

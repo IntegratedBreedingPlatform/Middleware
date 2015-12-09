@@ -23,6 +23,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
+import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.junit.Assert;
@@ -44,6 +45,8 @@ public class ProjectPropertySaverTest {
 
 	private int datasetId;
 	private Map<Integer, List<Integer>> dummyProjectPropIds;
+
+	private static final String propertyName = "Property Name";
 
 	@Before
 	public void setup() {
@@ -204,14 +207,12 @@ public class ProjectPropertySaverTest {
 		PhenotypicType role = PhenotypicType.STUDY;
 		VariableType variableType = VariableType.STUDY_DETAIL;
 
-		String propertyName = "Property Name";
-
 		StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(new Random().nextInt(10000));
-		standardVariable.setProperty(new Term(new Random().nextInt(1000), propertyName, "Property Description"));
+		standardVariable.setProperty(new Term(new Random().nextInt(1000), ProjectPropertySaverTest.propertyName, "Property Description"));
 		standardVariable.setPhenotypicType(role);
 		standardVariable.setVariableTypes(new HashSet<>(
-				new ArrayList<>(Collections.singletonList(OntologyDataHelper.mapFromPhenotype(role, propertyName)))));
+				new ArrayList<>(Collections.singletonList(OntologyDataHelper.mapFromPhenotype(role, ProjectPropertySaverTest.propertyName)))));
 
 		DMSVariableType dmsVariableType = new DMSVariableType();
 		dmsVariableType.setLocalName("Local Name");
@@ -265,14 +266,12 @@ public class ProjectPropertySaverTest {
 		PhenotypicType role = PhenotypicType.VARIATE;
 		VariableType variableType = VariableType.TRAIT;
 
-		String propertyName = "Property Name";
-
 		StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(new Random().nextInt(10000));
-		standardVariable.setProperty(new Term(new Random().nextInt(1000), propertyName, "Property Description"));
+		standardVariable.setProperty(new Term(new Random().nextInt(1000), ProjectPropertySaverTest.propertyName, "Property Description"));
 		standardVariable.setPhenotypicType(role);
 		standardVariable.setVariableTypes(new HashSet<>(
-				new ArrayList<>(Collections.singletonList(OntologyDataHelper.mapFromPhenotype(role, propertyName)))));
+				new ArrayList<>(Collections.singletonList(OntologyDataHelper.mapFromPhenotype(role, ProjectPropertySaverTest.propertyName)))));
 
 		DMSVariableType dmsVariableType = new DMSVariableType();
 		dmsVariableType.setLocalName("Local Name");
@@ -325,14 +324,12 @@ public class ProjectPropertySaverTest {
 
 		PhenotypicType role = PhenotypicType.UNASSIGNED;
 
-		String propertyName = "Property Name";
-
 		StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(new Random().nextInt(10000));
-		standardVariable.setProperty(new Term(new Random().nextInt(1000), propertyName, "Property Description"));
+		standardVariable.setProperty(new Term(new Random().nextInt(1000), ProjectPropertySaverTest.propertyName, "Property Description"));
 		standardVariable.setPhenotypicType(role);
 		standardVariable.setVariableTypes(new HashSet<>(
-				new ArrayList<>(Collections.singletonList(OntologyDataHelper.mapFromPhenotype(role, propertyName)))));
+				new ArrayList<>(Collections.singletonList(OntologyDataHelper.mapFromPhenotype(role, ProjectPropertySaverTest.propertyName)))));
 
 		DMSVariableType dmsVariableType = new DMSVariableType();
 		dmsVariableType.setLocalName("Local Name");
@@ -492,6 +489,7 @@ public class ProjectPropertySaverTest {
 	private StandardVariable createStandardVariable(final int id) {
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(id);
+		standardVariable.setProperty(new Term(new Random().nextInt(1000), ProjectPropertySaverTest.propertyName, "Property Description"));
 		return standardVariable;
 	}
 }

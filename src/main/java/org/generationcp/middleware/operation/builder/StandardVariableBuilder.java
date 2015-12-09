@@ -216,7 +216,6 @@ public class StandardVariableBuilder extends Builder {
 							null, variableType);
 			this.getOntologyVariableDataManager().addVariable(variableInfo);
 			standardVariable = this.create(variableInfo.getId(), programUUID);
-			standardVariable.setPhenotypicType(role);
 		} else {
 			Variable variable = variableList.get(0);
 			standardVariable = this.create(variable.getId(), programUUID);
@@ -313,7 +312,7 @@ public class StandardVariableBuilder extends Builder {
 
 	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(final List<String> headerNames, final String programUUID) {
 
-		final Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<String, List<StandardVariable>>();
+		final Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<>();
 		Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<String, Map<Integer, VariableType>>();
 
 		// Step 1: Search for DISTINCT standard variables used for projectprop records where projectprop.value equals input name (eg. REP)
@@ -321,7 +320,7 @@ public class StandardVariableBuilder extends Builder {
 
 		// Step 2: If no variable found, search for cvterm (standard variables) with given name.
 		// Exclude header items with result from step 1
-		final List<String> headerNamesNotFoundInProjectProperty = new ArrayList<String>();
+		final List<String> headerNamesNotFoundInProjectProperty = new ArrayList<>();
 		for (final String name : headerNames) {
 
 			if (!standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase())
@@ -452,7 +451,7 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	public List<StandardVariableReference> findAllByProperty(final int propertyId) {
-		final List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
+		final List<StandardVariableReference> list = new ArrayList<>();
 		list.addAll(this.getCvTermDao().getStandardVariablesOfProperty(propertyId));
 		return list;
 	}
