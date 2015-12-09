@@ -49,7 +49,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	private StudyDataManager studyDataManager;
 
 	private LoadingCache<StudyKey, String> studyIdToProgramIdCache;
-	
+
 	public StudyServiceImpl() {
 		super();
 	}
@@ -60,11 +60,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 		this.trialTraits = new TraitServiceImpl(currentSession);
 		this.studyMeasurements = new StudyMeasurements(this.getCurrentSession());
 		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(this.getCurrentSession());
-		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(new OntologyMethodDataManagerImpl(sessionProvider), 
+		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(new OntologyMethodDataManagerImpl(sessionProvider),
 				new OntologyPropertyDataManagerImpl(sessionProvider),
 				new OntologyScaleDataManagerImpl(sessionProvider), sessionProvider);
 		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
-		
+
 		final CacheLoader<StudyKey, String> studyKeyCacheBuilder = new CacheLoader<StudyKey, String>() {
 			public String load(StudyKey key) throws Exception {
 				return studyDataManager.getProject(key.getStudyId()).getProgramUUID();
