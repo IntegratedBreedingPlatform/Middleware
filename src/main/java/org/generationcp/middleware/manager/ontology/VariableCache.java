@@ -45,11 +45,6 @@ public class VariableCache {
 	}
 
 	private static String getCurrentCrop() {
-		final String currentCrop = ContextHolder.getCurrentCrop();
-		if (StringUtils.isBlank(currentCrop)) {
-			// Should only rarely happen, most of the time due to programming errors.
-			throw new IllegalStateException("Unable to use variable cache. Current crop database is unknown.");
-		}
-		return currentCrop;
+		return ContextHolder.getCurrentCrop();
 	}
 }
