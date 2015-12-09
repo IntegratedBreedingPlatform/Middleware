@@ -22,6 +22,7 @@ import org.generationcp.middleware.pojos.gdms.AllelicValueElement;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.generationcp.middleware.util.StringUtil;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -124,6 +125,11 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
 			+ "WHERE gid IN (:gids)";
 
 	public static final String COUNT_BY_GIDS = "SELECT COUNT(*) " + "FROM gdms_allele_values " + "WHERE gid in (:gIdList)";
+	
+	// another transferred query from the Vaadin layer
+	public static final String GET_UNIQUE_ALLELIC_VALUES_BY_GIDS_AND_MIDS = "select distinct gid,marker_id, allele_bin_value,acc_sample_id,marker_sample_id from gdms_allele_values where"
+			+ " gid in(:gids) and marker_id in (:mids) ORDER BY gid, marker_id,acc_sample_id asc";
+
 
 	/**
 	 * Gets the allelic values based on the given dataset id. The result is limited by the start and numOfRows parameters.
@@ -651,6 +657,32 @@ public class AlleleValuesDAO extends GenericDAO<AlleleValues, Integer> {
 					"Error with getAlleleValuesByDatasetId(datasetId=" + datasetId + ") query from AlleleValues " + e.getMessage(), e);
 		}
 		return toReturn;
+	}
+	
+	@SuppressWarnings({"deprecation", "unchecked"})
+	public List<Object> getUniqueAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids) {
+		
+		List<Object> results = new ArrayList<>();
+		try {
+			if (gids != null) {
+				SQLQuery query =
+						this.getSession().createSQLQuery(AlleleValuesDAO.GET_UNIQUE_ALLELIC_VALUES_BY_GIDS_AND_MIDS);
+				query.setParameterList("gids", gids);				
+				query.setParameterList("mids", mids);				
+				query.addScalar("gid", Hibernate.INTEGER);
+				query.addScalar("marker_id", Hibernate.INTEGER);
+				query.addScalar("allele_bin_value", Hibernate.STRING);
+				query.addScalar("acc_sample_id", Hibernate.INTEGER);
+				query.addScalar("marker_sample_id", Hibernate.INTEGER);
+				results = query.list();
+
+					}
+		} catch (HibernateException e) {
+			this.logAndThrowException(
+					"Error with getUniqueAllelesByGidsAndMids(gids=" + gids + ") query from AlleleValuesDAO " + e.getMessage(), e);
+		}
+		return results;
+				
 	}
 
 }

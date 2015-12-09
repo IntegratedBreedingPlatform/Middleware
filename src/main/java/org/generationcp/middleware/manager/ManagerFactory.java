@@ -13,7 +13,6 @@ package org.generationcp.middleware.manager;
 
 import java.io.Serializable;
 
-import org.generationcp.middleware.exceptions.ConfigException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -28,6 +27,7 @@ import org.generationcp.middleware.manager.api.PresetDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
+import org.generationcp.middleware.manager.ontology.OntologyDaoFactory;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
@@ -38,6 +38,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataMana
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
+import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.InventoryServiceImpl;
@@ -87,7 +88,7 @@ public class ManagerFactory implements Serializable {
 		return this.sessionProvider;
 	}
 
-	public void setSessionProvider(HibernateSessionProvider sessionProvider) {
+	public void setSessionProvider(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
 	}
 
@@ -96,7 +97,7 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public PedigreeDataManager getPedigreeDataManager() {
-		return new PedigreeDataManagerImpl(sessionProvider, databaseName);
+		return new PedigreeDataManagerImpl(this.sessionProvider, this.databaseName);
 	}
 
 	public CrossStudyDataManager getCrossStudyDataManager() {
@@ -140,27 +141,27 @@ public class ManagerFactory implements Serializable {
 		return new PresetDataManagerImpl(this.sessionProvider);
 	}
 
-	public StudyDataManager getStudyDataManager() throws ConfigException {
+	public StudyDataManager getStudyDataManager() {
 		return new StudyDataManagerImpl(this.sessionProvider);
 	}
 
-	public StudyDataManager getNewStudyDataManager() throws ConfigException {
+	public StudyDataManager getNewStudyDataManager() {
 		return new StudyDataManagerImpl(this.sessionProvider, this.databaseName);
 	}
 
-	public OntologyDataManager getNewOntologyDataManager() throws ConfigException {
+	public OntologyDataManager getNewOntologyDataManager() {
 		return new OntologyDataManagerImpl(this.sessionProvider);
 	}
 
-	public InventoryDataManager getInventoryDataManager() throws ConfigException {
+	public InventoryDataManager getInventoryDataManager() {
 		return new InventoryDataManagerImpl(this.sessionProvider, this.databaseName);
 	}
 
-	public UserProgramStateDataManager getUserProgramStateDataManager() throws ConfigException {
+	public UserProgramStateDataManager getUserProgramStateDataManager() {
 		return new UserProgramStateDataManagerImpl(this.sessionProvider);
 	}
 
-	public GenotypicDataManager getGenotypicDataManager() throws ConfigException {
+	public GenotypicDataManager getGenotypicDataManager() {
 		return new GenotypicDataManagerImpl(this.sessionProvider);
 	}
 
@@ -168,19 +169,19 @@ public class ManagerFactory implements Serializable {
 		return new UserDataManagerImpl(this.sessionProvider);
 	}
 
-	public FieldbookService getFieldbookMiddlewareService() throws ConfigException {
+	public FieldbookService getFieldbookMiddlewareService() {
 		return new FieldbookServiceImpl(this.sessionProvider, this.databaseName);
 	}
 
-	public InventoryService getInventoryMiddlewareService() throws ConfigException {
+	public InventoryService getInventoryMiddlewareService() {
 		return new InventoryServiceImpl(this.sessionProvider);
 	}
 
-	public DataImportService getDataImportService() throws ConfigException {
+	public DataImportService getDataImportService() {
 		return new DataImportServiceImpl(this.sessionProvider);
 	}
 
-	public OntologyService getOntologyService() throws ConfigException {
+	public OntologyService getOntologyService() {
 		return new OntologyServiceImpl(this.sessionProvider);
 	}
 
@@ -188,7 +189,7 @@ public class ManagerFactory implements Serializable {
 		return new MBDTDataManagerImpl(this.sessionProvider);
 	}
 
-	public ReportService getReportService() throws ConfigException {
+	public ReportService getReportService() {
 		return new ReportServiceImpl(this.sessionProvider, this.databaseName);
 	}
 
@@ -199,7 +200,7 @@ public class ManagerFactory implements Serializable {
 	/*
 	 * This was exposed so that it can be access in the jUnit
 	 */
-	public PedigreeService getPedigreeService(String profile, String crop) {
+	public PedigreeService getPedigreeService(final String profile, final String crop) {
 		return PedigreeFactory.getPedigreeService(this.sessionProvider, profile, crop);
 	}
 
@@ -221,7 +222,7 @@ public class ManagerFactory implements Serializable {
 		return this.databaseName;
 	}
 
-	public void setDatabaseName(String localDatabaseName) {
+	public void setDatabaseName(final String localDatabaseName) {
 		this.databaseName = localDatabaseName;
 	}
 
@@ -229,7 +230,7 @@ public class ManagerFactory implements Serializable {
 		return this.cropName;
 	}
 
-	public void setCropName(String cropName) {
+	public void setCropName(final String cropName) {
 		this.cropName = cropName;
 	}
 
@@ -237,8 +238,16 @@ public class ManagerFactory implements Serializable {
 		return this.pedigreeProfile;
 	}
 
-	public void setPedigreeProfile(String pedigreeProfile) {
+	public void setPedigreeProfile(final String pedigreeProfile) {
 		this.pedigreeProfile = pedigreeProfile;
+	}
+
+	public OntologyDaoFactory getOntologyDaoFactory() {
+		return new OntologyDaoFactory(this.sessionProvider);
+	}
+
+	public StandardVariableTransformer getStandardVariableTransformer() {
+		return new StandardVariableTransformer(this.sessionProvider);
 	}
 
 }

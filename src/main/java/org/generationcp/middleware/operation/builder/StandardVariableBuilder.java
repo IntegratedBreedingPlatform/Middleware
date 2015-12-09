@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.operation.builder;
@@ -49,28 +49,28 @@ public class StandardVariableBuilder extends Builder {
 	private static final String DATA_TYPE_NUMERIC = "N";
 	private static final String DATA_TYPE_CHARACTER = "C";
 
-	public StandardVariableBuilder(HibernateSessionProvider sessionProviderForLocal) {
+	public StandardVariableBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
 
-	public StandardVariable create(int standardVariableId, String programUUID) {
+	public StandardVariable create(final int standardVariableId, final String programUUID) {
 
-		Variable variable = this.getOntologyVariableDataManager().getVariable(programUUID, standardVariableId, false, false);
+		final Variable variable = this.getOntologyVariableDataManager().getVariable(programUUID, standardVariableId, false, false);
 
 		return this.getStandardVariableTransformer().transformVariable(variable);
 	}
 
-	public List<StandardVariable> create(List<Integer> standardVariableIds, String programUUID) {
-		List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
+	public List<StandardVariable> create(final List<Integer> standardVariableIds, final String programUUID) {
+		final List<StandardVariable> standardVariables = new ArrayList<StandardVariable>();
 		if (standardVariableIds != null && !standardVariableIds.isEmpty()) {
-			for (Integer id : standardVariableIds) {
+			for (final Integer id : standardVariableIds) {
 				standardVariables.add(this.create(id, programUUID));
 			}
 		}
 		return standardVariables;
 	}
 
-	public StandardVariableSummary getStandardVariableSummary(Integer standardVariableId) {
+	public StandardVariableSummary getStandardVariableSummary(final Integer standardVariableId) {
 		StandardVariableSummary summary = null;
 		if (standardVariableId != null) {
 			summary = this.getStandardVariableDao().getStandardVariableSummary(standardVariableId);
@@ -84,41 +84,42 @@ public class StandardVariableBuilder extends Builder {
 	/**
 	 * Loads a list of {@link StandardVariableSummary}'s for the given set of standard variable ids from standard_variable_summary database
 	 * view.
-	 * 
+	 *
 	 * @see StandardVariableDao#getStarndardVariableSummaries(List)
 	 */
-	public List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds) {
-		List<StandardVariableSummary> result = new ArrayList<StandardVariableSummary>();
+	public List<StandardVariableSummary> getStandardVariableSummaries(final List<Integer> standardVariableIds) {
+		final List<StandardVariableSummary> result = new ArrayList<StandardVariableSummary>();
 		if (standardVariableIds != null && !standardVariableIds.isEmpty()) {
-			List<StandardVariableSummary> localVariables = this.getStandardVariableDao().getStarndardVariableSummaries(standardVariableIds);
+			final List<StandardVariableSummary> localVariables =
+					this.getStandardVariableDao().getStarndardVariableSummaries(standardVariableIds);
 			this.specialProcessing(localVariables);
 			result.addAll(localVariables);
 		}
 		return result;
 	}
 
-	public List<StandardVariableSummary> getStandardVariableSummariesWithIsAId(List<Integer> isAIds) {
-		List<StandardVariableSummary> result = new ArrayList<StandardVariableSummary>();
+	public List<StandardVariableSummary> getStandardVariableSummariesWithIsAId(final List<Integer> isAIds) {
+		final List<StandardVariableSummary> result = new ArrayList<StandardVariableSummary>();
 		if (isAIds != null && !isAIds.isEmpty()) {
-			List<StandardVariableSummary> localVariables = this.getStandardVariableDao().getStandardVariableSummaryWithIsAId(isAIds);
+			final List<StandardVariableSummary> localVariables = this.getStandardVariableDao().getStandardVariableSummaryWithIsAId(isAIds);
 			result.addAll(localVariables);
 		}
 		return result;
 	}
 
-	private void specialProcessing(List<StandardVariableSummary> summaries) {
+	private void specialProcessing(final List<StandardVariableSummary> summaries) {
 		if (summaries == null || summaries.isEmpty()) {
 			return;
 		}
 
-		for (StandardVariableSummary summary : summaries) {
+		for (final StandardVariableSummary summary : summaries) {
 			// Special hackery for the isA (class) part of the relationship!
 			// Earlier isA (class) part of the standard variables ontology star used to be linked to standard variables directly.
 			// Now this relationship is linked to the "Property" of the standard variable. (facepalm).
 			if (summary.getProperty() != null) {
-				List<CVTermRelationship> propertyCvTermRelationships =
+				final List<CVTermRelationship> propertyCvTermRelationships =
 						this.getCvTermRelationshipDao().getBySubject(summary.getProperty().getId());
-				Term isAOfProperty = this.createTerm(propertyCvTermRelationships, TermId.IS_A);
+				final Term isAOfProperty = this.createTerm(propertyCvTermRelationships, TermId.IS_A);
 				if (isAOfProperty != null) {
 					summary.setIsA(new TermSummary(isAOfProperty.getId(), isAOfProperty.getName(), isAOfProperty.getDefinition()));
 				}
@@ -127,11 +128,11 @@ public class StandardVariableBuilder extends Builder {
 
 	}
 
-	public String getCropOntologyId(Term term) {
+	public String getCropOntologyId(final Term term) {
 		String cropOntologyId = null;
-		List<TermProperty> termProperties = this.createTermProperties(term.getId());
+		final List<TermProperty> termProperties = this.createTermProperties(term.getId());
 		if (termProperties != null && !termProperties.isEmpty()) {
-			for (TermProperty termProperty : termProperties) {
+			for (final TermProperty termProperty : termProperties) {
 				if (TermId.CROP_ONTOLOGY_ID.getId() == termProperty.getTypeId()) {
 					cropOntologyId = termProperty.getValue();
 					break;
@@ -139,7 +140,8 @@ public class StandardVariableBuilder extends Builder {
 			}
 		}
 		if (term != null) {
-			CVTermProperty property = this.getCvTermPropertyDao().getOneByCvTermAndType(term.getId(), TermId.CROP_ONTOLOGY_ID.getId());
+			final CVTermProperty property =
+					this.getCvTermPropertyDao().getOneByCvTermAndType(term.getId(), TermId.CROP_ONTOLOGY_ID.getId());
 			if (property != null) {
 				cropOntologyId = property.getValue();
 			}
@@ -147,8 +149,8 @@ public class StandardVariableBuilder extends Builder {
 		return cropOntologyId;
 	}
 
-	private Integer findTermId(List<CVTermRelationship> cvTermRelationships, TermId relationship) {
-		for (CVTermRelationship cvTermRelationship : cvTermRelationships) {
+	private Integer findTermId(final List<CVTermRelationship> cvTermRelationships, final TermId relationship) {
+		for (final CVTermRelationship cvTermRelationship : cvTermRelationships) {
 			if (cvTermRelationship.getTypeId().equals(relationship.getId())) {
 				return cvTermRelationship.getObjectId();
 			}
@@ -156,8 +158,8 @@ public class StandardVariableBuilder extends Builder {
 		return null;
 	}
 
-	private Term createTerm(List<CVTermRelationship> cvTermRelationships, TermId relationship) {
-		Integer id = this.findTermId(cvTermRelationships, relationship);
+	private Term createTerm(final List<CVTermRelationship> cvTermRelationships, final TermId relationship) {
+		final Integer id = this.findTermId(cvTermRelationships, relationship);
 		if (id != null) {
 			// add to handle missing cvterm_relationship (i.e. is_a)
 			return this.createTerm(id);
@@ -165,51 +167,51 @@ public class StandardVariableBuilder extends Builder {
 		return null;
 	}
 
-	private Term createTerm(Integer id) {
-		CVTerm cvTerm = this.getCvTerm(id);
+	private Term createTerm(final Integer id) {
+		final CVTerm cvTerm = this.getCvTerm(id);
 		return cvTerm != null ? new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition()) : null;
 	}
 
-	public List<NameSynonym> createSynonyms(int cvTermId) {
-		List<CVTermSynonym> synonyms = this.getNameSynonymBuilder().findSynonyms(cvTermId);
+	public List<NameSynonym> createSynonyms(final int cvTermId) {
+		final List<CVTermSynonym> synonyms = this.getNameSynonymBuilder().findSynonyms(cvTermId);
 		return this.getNameSynonymBuilder().create(synonyms);
 	}
 
-	public List<TermProperty> createTermProperties(int cvTermId) {
-		List<CVTermProperty> cvTermProperties = this.getTermPropertyBuilder().findProperties(cvTermId);
+	public List<TermProperty> createTermProperties(final int cvTermId) {
+		final List<CVTermProperty> cvTermProperties = this.getTermPropertyBuilder().findProperties(cvTermId);
 		return this.getTermPropertyBuilder().create(cvTermProperties);
 	}
 
-	private CVTerm getCvTerm(int id) {
+	private CVTerm getCvTerm(final int id) {
 		return this.getCvTermDao().getById(id);
 	}
 
-	public StandardVariable findOrSave(String name, String description, String propertyName, String scaleName, String methodName,
-			PhenotypicType role, String dataTypeString, String programUUID) {
+	public StandardVariable findOrSave(final String name, final String description, final String propertyName, final String scaleName,
+			final String methodName, final PhenotypicType role, final String dataTypeString, final String programUUID) {
 
-		TermBuilder termBuilder = this.getTermBuilder();
-		Term property = termBuilder.findOrSaveProperty(propertyName, propertyName, null, termBuilder.getDefaultTraitClasses());
+		final TermBuilder termBuilder = this.getTermBuilder();
+		final Term property = termBuilder.findOrSaveProperty(propertyName, propertyName, null, termBuilder.getDefaultTraitClasses());
 
-		Term scale = this.getTermBuilder().findOrSaveScale(scaleName, scaleName, this.getDataType(dataTypeString), null, null, null);
-		Term method = this.getTermBuilder().findOrSaveMethod(methodName, methodName);
+		final Term scale = this.getTermBuilder().findOrSaveScale(scaleName, scaleName, this.getDataType(dataTypeString), null, null, null);
+		final Term method = this.getTermBuilder().findOrSaveMethod(methodName, methodName);
 
-		VariableFilter filterOpts = new VariableFilter();
+		final VariableFilter filterOpts = new VariableFilter();
 		filterOpts.setProgramUuid(programUUID);
 		filterOpts.addPropertyId(property.getId());
 		filterOpts.addMethodId(method.getId());
 		filterOpts.addScaleId(scale.getId());
 
-		List<Variable> variableList = this.getOntologyVariableDataManager().getWithFilter(filterOpts);
+		final List<Variable> variableList = this.getOntologyVariableDataManager().getWithFilter(filterOpts);
 		StandardVariable standardVariable = null;
 		if (variableList == null || variableList.isEmpty()) {
-			OntologyVariableInfo variableInfo =
+			final OntologyVariableInfo variableInfo =
 					this.createOntologyVariableInfo(name, description, method.getId(), property.getId(), scale.getId(), programUUID, null,
 							null, role);
 			this.getOntologyVariableDataManager().addVariable(variableInfo);
 			standardVariable = this.create(variableInfo.getId(), programUUID);
 			standardVariable.setPhenotypicType(role);
 		} else {
-			Variable variable = variableList.get(0);
+			final Variable variable = variableList.get(0);
 			standardVariable = this.create(variable.getId(), programUUID);
 			standardVariable.setPhenotypicType(role);
 		}
@@ -217,18 +219,19 @@ public class StandardVariableBuilder extends Builder {
 		return standardVariable;
 	}
 
-	private String getDataType(String dataTypeString) {
-		if (DATA_TYPE_NUMERIC.equals(dataTypeString)) {
+	private String getDataType(final String dataTypeString) {
+		if (StandardVariableBuilder.DATA_TYPE_NUMERIC.equals(dataTypeString)) {
 			return DataType.NUMERIC_VARIABLE.getName();
-		} else if (DATA_TYPE_CHARACTER.equals(dataTypeString)) {
+		} else if (StandardVariableBuilder.DATA_TYPE_CHARACTER.equals(dataTypeString)) {
 			return DataType.CHARACTER_VARIABLE.getName();
 		}
 		return dataTypeString;
 	}
 
-	private OntologyVariableInfo createOntologyVariableInfo(String name, String description, int methodId, int propertyId, int scaleId,
-			String programUUID, String minValue, String maxValue, PhenotypicType role) {
-		OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+	private OntologyVariableInfo createOntologyVariableInfo(final String name, final String description, final int methodId,
+			final int propertyId, final int scaleId, final String programUUID, final String minValue, final String maxValue,
+			final PhenotypicType role) {
+		final OntologyVariableInfo variableInfo = new OntologyVariableInfo();
 		variableInfo.setName(name);
 		variableInfo.setDescription(description);
 		variableInfo.setMethodId(methodId);
@@ -239,11 +242,11 @@ public class StandardVariableBuilder extends Builder {
 		variableInfo.setExpectedMin(minValue);
 		variableInfo.setExpectedMax(maxValue);
 
-		variableInfo.addVariableType(this.mapPhenotypicTypeToDefaultVariableType(role));
+		variableInfo.addVariableType(this.mapPhenotypicTypeToDefaultVariableType(role, false));
 		return variableInfo;
 	}
 
-	public VariableType mapPhenotypicTypeToDefaultVariableType(PhenotypicType role) {
+	public VariableType mapPhenotypicTypeToDefaultVariableType(final PhenotypicType role, final boolean isForAnalysis) {
 		if (PhenotypicType.STUDY == role || PhenotypicType.DATASET == role) {
 			return VariableType.STUDY_DETAIL;
 		} else if (PhenotypicType.TRIAL_ENVIRONMENT == role) {
@@ -252,23 +255,26 @@ public class StandardVariableBuilder extends Builder {
 			return VariableType.GERMPLASM_DESCRIPTOR;
 		} else if (PhenotypicType.TRIAL_DESIGN == role) {
 			return VariableType.EXPERIMENTAL_DESIGN;
-		} else if (PhenotypicType.VARIATE == role) {
+		} else if (PhenotypicType.VARIATE == role && !isForAnalysis) {
 			return VariableType.TRAIT;
+		} else if (PhenotypicType.VARIATE == role && isForAnalysis) {
+			return VariableType.ANALYSIS;
 		}
 		return null;
 	}
 
-	public StandardVariable getByName(String name, String programUUID) {
-		CVTerm cvTerm = this.getCvTermDao().getByName(name);
+	public StandardVariable getByName(final String name, final String programUUID) {
+		final CVTerm cvTerm = this.getCvTermDao().getByName(name);
 		if (cvTerm != null && cvTerm.getCvTermId() != null) {
 			return this.getStandardVariableBuilder().create(cvTerm.getCvTermId(), programUUID);
 		}
 		return null;
 	}
 
-	public StandardVariable getByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId, String programUUID) {
+	public StandardVariable getByPropertyScaleMethod(final Integer propertyId, final Integer scaleId, final Integer methodId,
+			final String programUUID) {
 
-		Integer stdVariableId = this.getIdByPropertyScaleMethod(propertyId, scaleId, methodId);
+		final Integer stdVariableId = this.getIdByPropertyScaleMethod(propertyId, scaleId, methodId);
 		StandardVariable standardVariable = null;
 		if (stdVariableId != null) {
 			standardVariable = this.getStandardVariableBuilder().create(stdVariableId, programUUID);
@@ -276,10 +282,10 @@ public class StandardVariableBuilder extends Builder {
 		return standardVariable;
 	}
 
-	public StandardVariable getByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role,
-			String programUUID) {
+	public StandardVariable getByPropertyScaleMethodRole(final Integer propertyId, final Integer scaleId, final Integer methodId,
+			final PhenotypicType role, final String programUUID) {
 
-		Integer stdVariableId = this.getIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
+		final Integer stdVariableId = this.getIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
 		StandardVariable standardVariable = null;
 		if (stdVariableId != null) {
 			standardVariable = this.getStandardVariableBuilder().create(stdVariableId, programUUID);
@@ -287,15 +293,15 @@ public class StandardVariableBuilder extends Builder {
 		return standardVariable;
 	}
 
-	public Integer getIdByPropertyScaleMethod(Integer propertyId, Integer scaleId, Integer methodId) {
+	public Integer getIdByPropertyScaleMethod(final Integer propertyId, final Integer scaleId, final Integer methodId) {
 		Integer stdVariableId = null;
 		stdVariableId = this.getCvTermDao().getStandadardVariableIdByPropertyScaleMethod(propertyId, scaleId, methodId, "DESC");
 		return stdVariableId;
 	}
 
-	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(List<String> headerNames, String programUUID) {
+	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(final List<String> headerNames, final String programUUID) {
 
-		Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<String, List<StandardVariable>>();
+		final Map<String, List<StandardVariable>> standardVariablesInProjects = new HashMap<String, List<StandardVariable>>();
 		Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<String, Map<Integer, VariableType>>();
 
 		// Step 1: Search for DISTINCT standard variables used for projectprop records where projectprop.value equals input name (eg. REP)
@@ -303,8 +309,8 @@ public class StandardVariableBuilder extends Builder {
 
 		// Step 2: If no variable found, search for cvterm (standard variables) with given name.
 		// Exclude header items with result from step 1
-		List<String> headerNamesNotFoundInProjectProperty = new ArrayList<String>();
-		for (String name : headerNames) {
+		final List<String> headerNamesNotFoundInProjectProperty = new ArrayList<String>();
+		for (final String name : headerNames) {
 
 			if (!standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase())
 					|| standardVariableIdsWithTypeInProjects.get(name.toUpperCase()).keySet().isEmpty()) {
@@ -320,8 +326,8 @@ public class StandardVariableBuilder extends Builder {
 		// using that trait (if any)
 
 		// Exclude header items with result from step 2
-		List<String> headerNamesNotFoundInProjectPropAndTerms = new ArrayList<>();
-		for (String name : headerNames) {
+		final List<String> headerNamesNotFoundInProjectPropAndTerms = new ArrayList<>();
+		for (final String name : headerNames) {
 
 			if (!standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase())
 					|| standardVariableIdsWithTypeInProjects.get(name.toUpperCase()).keySet().isEmpty()) {
@@ -332,13 +338,13 @@ public class StandardVariableBuilder extends Builder {
 
 		standardVariableIdsWithTypeInProjects.putAll(this.getStandardVariableIdsForTraits(headerNamesNotFoundInProjectPropAndTerms));
 
-		for (String name : headerNames) {
-			String upperName = name.toUpperCase();
-			Map<Integer, VariableType> varIdsWithType = standardVariableIdsWithTypeInProjects.get(upperName);
+		for (final String name : headerNames) {
+			final String upperName = name.toUpperCase();
+			final Map<Integer, VariableType> varIdsWithType = standardVariableIdsWithTypeInProjects.get(upperName);
 
 			List<StandardVariable> variables = new ArrayList<StandardVariable>();
 			if (varIdsWithType != null) {
-				List<Integer> standardVariableIds = new ArrayList<Integer>(varIdsWithType.keySet());
+				final List<Integer> standardVariableIds = new ArrayList<Integer>(varIdsWithType.keySet());
 				variables = this.create(standardVariableIds, programUUID);
 				this.setRoleOfVariables(variables, varIdsWithType);
 			}
@@ -347,46 +353,47 @@ public class StandardVariableBuilder extends Builder {
 		return standardVariablesInProjects;
 	}
 
-	private void setRoleOfVariables(List<StandardVariable> variables, Map<Integer, VariableType> varIdsWithType) {
-		for (StandardVariable standardVariable : variables) {
-			VariableType type = varIdsWithType.get(standardVariable.getId());
+	private void setRoleOfVariables(final List<StandardVariable> variables, final Map<Integer, VariableType> varIdsWithType) {
+		for (final StandardVariable standardVariable : variables) {
+			final VariableType type = varIdsWithType.get(standardVariable.getId());
 			standardVariable.setPhenotypicType(type.getRole());
 		}
 	}
 
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(List<String> propertyNames) {
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForProjectProperties(final List<String> propertyNames) {
 		return this.getProjectPropertyDao().getStandardVariableIdsWithTypeByPropertyNames(propertyNames);
 	}
 
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForTerms(List<String> termNames) {
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForTerms(final List<String> termNames) {
 		return this.getCvTermDao().getTermIdsWithTypeByNameOrSynonyms(termNames, CvId.VARIABLES.getId());
 
 	}
 
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsForTraits(List<String> traitNames) {
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsForTraits(final List<String> traitNames) {
 		return this.getCvTermDao().getStandardVariableIdsWithTypeByProperties(traitNames);
 	}
 
-	public Integer getIdByTermId(int cvTermId, TermId termId) {
+	public Integer getIdByTermId(final int cvTermId, final TermId termId) {
 		Integer stdVariableId = null;
 		stdVariableId = this.getCvTermDao().getStandardVariableIdByTermId(cvTermId, termId);
 		return stdVariableId;
 	}
 
-	public CVTerm getCvTerm(String name, int cvId) {
+	public CVTerm getCvTerm(final String name, final int cvId) {
 		return this.getCvTermDao().getByNameAndCvId(name, cvId);
 	}
 
-	public Integer getIdByPropertyScaleMethodRole(Integer propertyId, Integer scaleId, Integer methodId, PhenotypicType role) {
+	public Integer getIdByPropertyScaleMethodRole(final Integer propertyId, final Integer scaleId, final Integer methodId,
+			final PhenotypicType role) {
 		Integer stdVariableId = null;
 		stdVariableId = this.getCvTermDao().getStandadardVariableIdByPropertyScaleMethodRole(propertyId, scaleId, methodId, role);
 		return stdVariableId;
 	}
 
-	public boolean validateEnumerationUsage(int standardVariableId, int enumerationId) {
-		Integer storedInId =
+	public boolean validateEnumerationUsage(final int standardVariableId, final int enumerationId) {
+		final Integer storedInId =
 				this.getCvTermRelationshipDao().getObjectIdByTypeAndSubject(TermId.STORED_IN.getId(), standardVariableId).get(0);
-		String value = String.valueOf(enumerationId);
+		final String value = String.valueOf(enumerationId);
 		if (storedInId == TermId.STUDY_INFO_STORAGE.getId() || storedInId == TermId.DATASET_INFO_STORAGE.getId()) {
 			return !this.isExistsPropertyByTypeAndValue(standardVariableId, value);
 		} else if (storedInId == TermId.GERMPLASM_ENTRY_STORAGE.getId()) {
@@ -402,38 +409,38 @@ public class StandardVariableBuilder extends Builder {
 		}
 	}
 
-	private boolean isExistsGeolocationByTypeAndValue(int factorId, String value) {
-		Set<Integer> geolocationIds = new HashSet<Integer>();
+	private boolean isExistsGeolocationByTypeAndValue(final int factorId, final String value) {
+		final Set<Integer> geolocationIds = new HashSet<Integer>();
 		geolocationIds.addAll(this.getGeolocationPropertyDao().getGeolocationIdsByPropertyTypeAndValue(factorId, value));
 		return !geolocationIds.isEmpty();
 	}
 
-	private boolean isExistsStocksByTypeAndValue(Integer factorId, String value) {
-		Set<Integer> stockIds = new HashSet<Integer>();
+	private boolean isExistsStocksByTypeAndValue(final Integer factorId, final String value) {
+		final Set<Integer> stockIds = new HashSet<Integer>();
 		stockIds.addAll(this.getStockPropertyDao().getStockIdsByPropertyTypeAndValue(factorId, value));
 		return !stockIds.isEmpty();
 	}
 
-	private boolean isExistsExperimentsByTypeAndValue(Integer factorId, String value) {
-		Set<Integer> experimentIds = new HashSet<Integer>();
+	private boolean isExistsExperimentsByTypeAndValue(final Integer factorId, final String value) {
+		final Set<Integer> experimentIds = new HashSet<Integer>();
 		experimentIds.addAll(this.getExperimentPropertyDao().getExperimentIdsByPropertyTypeAndValue(factorId, value));
 		return !experimentIds.isEmpty();
 	}
 
-	private boolean isExistsPropertyByTypeAndValue(Integer factorId, String value) {
-		List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
+	private boolean isExistsPropertyByTypeAndValue(final Integer factorId, final String value) {
+		final List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 		properties.addAll(this.getProjectPropertyDao().getByTypeAndValue(factorId, value));
 		return !properties.isEmpty();
 	}
 
-	private boolean isExistsPhenotypeByTypeAndValue(Integer variateId, String value, boolean isEnum) {
-		List<Phenotype> phenotypes = new ArrayList<Phenotype>();
+	private boolean isExistsPhenotypeByTypeAndValue(final Integer variateId, final String value, final boolean isEnum) {
+		final List<Phenotype> phenotypes = new ArrayList<Phenotype>();
 		phenotypes.addAll(this.getPhenotypeDao().getByTypeAndValue(variateId, value, isEnum));
 		return !phenotypes.isEmpty();
 	}
 
-	public List<StandardVariableReference> findAllByProperty(int propertyId) {
-		List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
+	public List<StandardVariableReference> findAllByProperty(final int propertyId) {
+		final List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
 		list.addAll(this.getCvTermDao().getStandardVariablesOfProperty(propertyId));
 		return list;
 	}
