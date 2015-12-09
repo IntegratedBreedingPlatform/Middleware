@@ -18,11 +18,7 @@ import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.ListDataProperty;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 
 /**
  * This is the API for retrieving information about Germplasm Lists.
@@ -124,20 +120,6 @@ public interface GermplasmListManager {
 	 */
 	@Deprecated
 	long countGermplasmListByName(String name, Operation operation, Database database) throws MiddlewareQueryException;
-
-	/**
-	 * Returns all the Germplasm List records that have the given status.
-	 *
-	 * @param status
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param instance - can either be Database.CENTRAL or Database.LOCAL
-	 *
-	 * @return List of Germplasm POJOs
-	 * @throws MiddlewareQueryException
-	 */
-	List<GermplasmList> getGermplasmListByStatus(Integer status, int start, int numOfRows, Database instance)
-			throws MiddlewareQueryException;
 
 	/**
 	 * Returns the number of Germplasm List records that have the given status.
@@ -442,6 +424,8 @@ public interface GermplasmListManager {
 	 */
 	List<GermplasmList> getGermplasmListByParentFolderId(Integer parentId, String programUUID, int start, int numOfRows)
 			throws MiddlewareQueryException;
+
+	GermplasmList getLastSavedGermplasmListByUserId(Integer userID, String programUUID);
 
 	/**
 	 * Returns a list of {@code GermplasmList} child records given a parent id. Retrieval from the database is done by batch (as specified

@@ -21,12 +21,7 @@ import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.utils.test.Debug;
 import org.hibernate.Query;
@@ -142,16 +137,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmListByName(" + name + "): "
 				+ this.manager.countGermplasmListByName(name, Operation.LIKE, Database.CENTRAL));
 		// Verify using: select count(*) from listnms where liststatus <> 9 and listname like '2002%';
-	}
-
-	@Test
-	public void testGetGermplasmListByStatus() throws Exception {
-		Integer status = Integer.valueOf(1);
-		List<GermplasmList> lists = this.manager.getGermplasmListByStatus(status, 0, 5, Database.CENTRAL);
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmListByStatus(status=" + status + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, lists);
-		// Verify using: select * from listnms where liststatus <> 9 and liststatus = 1;
 	}
 
 	@Test
