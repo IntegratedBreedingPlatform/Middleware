@@ -13,6 +13,7 @@ import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
+import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.study.TraitDto;
@@ -58,36 +59,45 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<StudySummary> listAllStudies(final String programUniqueId) throws MiddlewareQueryException {
+	public List<StudySummary> search(final StudySearchParameters serchParameters) {
 
 		final List<StudySummary> studySummaries = new ArrayList<StudySummary>();
 
-		String sql =
-				"SELECT DISTINCT " + "	p.project_id AS id, " + "	p.name AS name, " + "	p.description AS title, "
-						+ "	p.program_uuid AS programUUID, " + "	ppType.value AS studyTypeId, " + "	ppObjective.value AS objective, "
-						+ "	ppStartDate.value AS startDate, " + "	ppEndDate.value AS endDate " + " FROM " + "	project p "
-						+ "	INNER JOIN projectprop ppType ON p.project_id = ppType.project_id AND ppType.type_id = "
-						+ TermId.STUDY_TYPE.getId()
-						+ "	LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id AND ppObjective.type_id = "
-						+ TermId.STUDY_OBJECTIVE.getId()
-						+ "	LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id AND ppStartDate.type_id = "
-						+ TermId.START_DATE.getId()
-						+ "	LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id AND ppEndDate.type_id = "
-						+ TermId.END_DATE.getId() + "	WHERE NOT EXISTS "
-						+ "	  (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id = " + TermId.STUDY_STATUS.getId()
-						+ "         AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  " + TermId.DELETED_STUDY.getId() + ") ";
+		StringBuffer sql = new StringBuffer()
+		.append("SELECT p.project_id AS id, p.name AS name, p.description AS title, ")
+		.append("	p.program_uuid AS programUUID, ppType.value AS studyTypeId, ppObjective.value AS objective, ")
+		.append("	ppStartDate.value AS startDate, ppEndDate.value AS endDate, ppPI.value AS piName, ppLocation.value AS location, ppSeason.value AS season ")
+		.append(" FROM project p ")
+		.append("  INNER JOIN projectprop ppType ON p.project_id = ppType.project_id AND ppType.type_id = ").append(TermId.STUDY_TYPE.getId())
+		.append("  LEFT JOIN projectprop ppObjective ON p.project_id = ppObjective.project_id AND ppObjective.type_id = ").append(TermId.STUDY_OBJECTIVE.getId())
+		.append("  LEFT JOIN projectprop ppStartDate ON p.project_id = ppStartDate.project_id AND ppStartDate.type_id = ").append(TermId.START_DATE.getId())
+		.append("  LEFT JOIN projectprop ppEndDate ON p.project_id = ppEndDate.project_id AND ppEndDate.type_id = ").append(TermId.END_DATE.getId())
+		.append("  LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id AND ppPI.type_id = ").append(TermId.PI_NAME.getId())
+		.append("  LEFT JOIN projectprop ppLocation ON p.project_id = ppLocation.project_id AND ppLocation.type_id = ").append(TermId.TRIAL_LOCATION.getId())
+		.append("  LEFT JOIN projectprop ppSeason ON p.project_id = ppSeason.project_id AND ppSeason.type_id = ").append(TermId.SEASON_VAR_TEXT.getId())
+		.append(" WHERE NOT EXISTS ")
+		.append("  (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.type_id = ").append(TermId.STUDY_STATUS.getId())
+		.append("    AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ").append(TermId.DELETED_STUDY.getId()).append(")");
 
-		if (!StringUtils.isEmpty(programUniqueId)) {
-			sql += " AND p.program_uuid = '" + programUniqueId.trim() + "'";
+		if (!StringUtils.isEmpty(serchParameters.getProgramUniqueId())) {
+			sql.append(" AND p.program_uuid = '").append(serchParameters.getProgramUniqueId().trim()).append("'");
 		}
-		sql += " ORDER BY p.name;";
+		if (!StringUtils.isEmpty(serchParameters.getPrincipalInvestigator())) {
+			sql.append(" AND ppPI.value LIKE '%").append(serchParameters.getPrincipalInvestigator().trim()).append("%'");
+		}
+		if (!StringUtils.isEmpty(serchParameters.getLocation())) {
+			sql.append(" AND ppLocation.value LIKE '%").append(serchParameters.getLocation().trim()).append("%'");
+		}
+		if (!StringUtils.isEmpty(serchParameters.getSeason())) {
+			sql.append(" AND ppSeason.value LIKE '%").append(serchParameters.getSeason().trim()).append("%'");
+		}
 
 		List<Object[]> list = null;
 		try {
 			final Query query =
-					this.getCurrentSession().createSQLQuery(sql).addScalar("id").addScalar("name").addScalar("title")
+					this.getCurrentSession().createSQLQuery(sql.toString()).addScalar("id").addScalar("name").addScalar("title")
 					.addScalar("programUUID").addScalar("studyTypeId").addScalar("objective").addScalar("startDate")
-					.addScalar("endDate");
+					.addScalar("endDate").addScalar("piName").addScalar("location").addScalar("season");
 			list = query.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in listAllStudies() query in StudyServiceImpl: " + e.getMessage(), e);
@@ -103,10 +113,13 @@ public class StudyServiceImpl extends Service implements StudyService {
 				final String objective = (String) row[5];
 				final String startDate = (String) row[6];
 				final String endDate = (String) row[7];
+				final String pi = (String) row[8];
+				final String location = (String) row[9];
+				final String season = (String) row[10];
 
 				final StudySummary studySummary =
 						new StudySummary(id, name, title, objective, StudyType.getStudyTypeById(Integer.valueOf(studyTypeId)), startDate,
-								endDate, programUUID);
+								endDate, programUUID, pi, location, season);
 				studySummaries.add(studySummary);
 			}
 		}
