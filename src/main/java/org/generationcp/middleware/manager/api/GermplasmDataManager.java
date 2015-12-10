@@ -1070,4 +1070,10 @@ public interface GermplasmDataManager {
 	 */
 	Map<String, Integer> getCountByNamePermutations(List<String> names);
 
+	/**
+	 * @return the UDFLD table record that represents "plot code": ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE. If no record matching these
+	 *         critria is found, an empty record with fldno=0 is returned. Never returns null.
+	 */
+	UserDefinedField getPlotCodeField();
+
 }
