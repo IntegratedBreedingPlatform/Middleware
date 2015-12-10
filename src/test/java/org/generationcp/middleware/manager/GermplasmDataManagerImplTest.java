@@ -622,6 +622,21 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 			Debug.println(IntegrationTestBase.INDENT, u);
 		}
 	}
+	
+	@Test
+	public void testGetPlotCodeField() {
+		UserDefinedField plotCodeField = this.germplasmDataManager.getPlotCodeField();
+		// Should never return null no matter whether the plot code UDFLD is present in the target database or not.
+		Assert.assertNotNull("GermplasmDataManager.getPlotCodeField() should never return null.", plotCodeField);
+		
+		if (plotCodeField.getFldno() != 0) {
+			// Non-zero fldno is a case where the UDFLD table has a record matching ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE
+			// Usually the id of this record is 1552. Not asserting as we dont want tests to depend on primary key values to be exact.
+			Assert.assertEquals("ATRIBUTS", plotCodeField.getFtable());
+			Assert.assertEquals("PASSPORT", plotCodeField.getFtype());
+			Assert.assertEquals("PLOTCODE", plotCodeField.getFcode());
+		}	
+	}
 
 	@Test
 	public void testGetCrossExpansion() throws Exception {

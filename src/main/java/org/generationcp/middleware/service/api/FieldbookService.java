@@ -33,6 +33,7 @@ import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -212,7 +213,7 @@ public interface FieldbookService {
 	 */
 
 	Integer saveNurseryAdvanceGermplasmList(List<Pair<Germplasm, List<Name>>> germplasms,
-			List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList);
+			List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList, List<Pair<Germplasm, List<Attribute>>> germplasmAttributes);
 
 	/**
 	 * Used for retrieving the Cimmyt Wheat Germplasm name.

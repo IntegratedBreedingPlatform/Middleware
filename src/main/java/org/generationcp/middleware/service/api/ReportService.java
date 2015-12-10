@@ -26,7 +26,7 @@ public interface ReportService {
 	 * @throws MiddlewareQueryException
 	 * @throws JRException
 	 */
-	JasperPrint getPrintReport(String code, Integer studyId) throws MiddlewareException, MiddlewareQueryException, JRException,
+	JasperPrint getPrintReport(String code, Integer studyId) throws MiddlewareException, JRException,
 			IOException, BuildReportException;
 
 	/**
@@ -36,7 +36,7 @@ public interface ReportService {
 	 * @param output Out where the report has to be sent. This can be a servlet, file or any other output stream.
 	 * @return a Reporter instance, describirn the report being generated.
 	 */
-	Reporter getStreamReport(String code, Integer studyId, OutputStream output) throws MiddlewareException, MiddlewareQueryException,
+	Reporter getStreamReport(String code, Integer studyId, String programName, OutputStream output) throws MiddlewareException,
 			JRException, IOException, BuildReportException;
 
 	/**
