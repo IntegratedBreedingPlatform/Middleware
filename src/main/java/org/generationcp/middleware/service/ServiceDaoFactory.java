@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service;
 
+import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.LocationDAO;
@@ -11,11 +12,11 @@ import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
-public class InventoryDaoFactory {
+public class ServiceDaoFactory {
 
 	private HibernateSessionProvider sessionProvider;
 
-	public InventoryDaoFactory(HibernateSessionProvider sessionProvider) {
+	public ServiceDaoFactory(HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
 	}
 
@@ -65,6 +66,12 @@ public class InventoryDaoFactory {
 		PersonDAO personDao = new PersonDAO();
 		personDao.setSession(this.sessionProvider.getSession());
 		return personDao;
+	}
+
+	public GermplasmDAO getGermplasmDAO() {
+		GermplasmDAO germplasmDao = new GermplasmDAO();
+		germplasmDao.setSession(this.sessionProvider.getSession());
+		return germplasmDao;
 	}
 
 }

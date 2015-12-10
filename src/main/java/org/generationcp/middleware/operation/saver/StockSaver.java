@@ -98,7 +98,7 @@ public class StockSaver extends Saver {
 		if (stockModel != null && stockModel.getProperties() != null && !stockModel.getProperties().isEmpty()) {
 			for (StockProperty property : stockModel.getProperties()) {
 				if (property.getTypeId().equals(Integer.valueOf(variable.getVariableType().getId()))) {
-					property.setValue(variable.getValue());
+					property.setValue(variable.getDatabaseValue());
 					return property;
 				}
 			}
@@ -126,7 +126,7 @@ public class StockSaver extends Saver {
 	private StockProperty createProperty(Variable variable) throws MiddlewareQueryException {
 		StockProperty property = new StockProperty();
 		property.setTypeId(variable.getVariableType().getId());
-		property.setValue(variable.getValue());
+		property.setValue(variable.getDatabaseValue());
 		property.setRank(variable.getVariableType().getRank());
 
 		return property;

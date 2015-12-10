@@ -147,7 +147,7 @@ public class GeolocationSaver extends Saver {
 			property.setType(variable.getVariableType().getId());
 			property.setRank(variable.getVariableType().getRank());
 		}
-		property.setValue(variable.getValue());
+		property.setValue(variable.getDatabaseValue());
 
 		return property;
 	}
