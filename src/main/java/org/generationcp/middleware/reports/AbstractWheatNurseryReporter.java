@@ -1,11 +1,7 @@
 
 package org.generationcp.middleware.reports;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
@@ -13,20 +9,21 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.report.GermplasmEntry;
 import org.generationcp.middleware.pojos.report.Occurrence;
 
-public abstract class AbstractWheatTrialReporter extends AbstractReporter {
+public abstract class AbstractWheatNurseryReporter extends AbstractReporter {
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Map<String, Object> buildJRParams(Map<String, Object> args) {
 		Map<String, Object> params = super.buildJRParams(args);
 
-		List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get("studyConditions");
+		List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get(STUDY_CONDITIONS_KEY);
 		MeasurementRow[] entries = {};
 
-		entries = ((Collection<MeasurementRow>) args.get("dataSource")).toArray(entries);
+		entries = ((Collection<MeasurementRow>) args.get(DATA_SOURCE_KEY)).toArray(entries);
 
 		int firstEntry = Integer.valueOf(entries[0].getMeasurementData("ENTRY_NO").getValue());
 		int lastEntry = Integer.valueOf(entries[entries.length - 1].getMeasurementData("ENTRY_NO").getValue());
@@ -36,46 +33,54 @@ public abstract class AbstractWheatTrialReporter extends AbstractReporter {
 		params.put("Ientry", firstEntry);
 		params.put("Fentry", lastEntry);
 		params.put("offset", offset);
+		params.put(PROGRAM_NAME_REPORT_KEY, args.get(PROGRAM_NAME_ARG_KEY));
+
 
 		for (MeasurementVariable var : studyConditions) {
-
-			switch (var.getName()) {
-				case "BreedingProgram":
-					params.put("program", var.getValue());
-					break;
-				case "STUDY_NAME":
-					params.put("trialAbbr", var.getValue());
-					break;
-				case "STUDY_TITLE":
-					params.put("trialName", var.getValue());
-					break;
-				case "CROP_SEASON":
+			TermId term = TermId.getById(var.getTermId());
+			if (term != null) {
+				switch (term) {
+					case STUDY_NAME:
+						params.put(STUDY_NAME_REPORT_KEY, var.getValue());
+						break;
+					case STUDY_TITLE:
+						params.put(STUDY_TITLE_REPORT_KEY, var.getValue());
+						break;
+					case TRIAL_INSTANCE_FACTOR:
+						if ("".equalsIgnoreCase(var.getValue())) {
+							params.put("occ", Integer.valueOf(0));
+						} else {
+							params.put("occ", Integer.valueOf(var.getValue()));
+						}
+						break;
+					case TRIAL_LOCATION:
+						params.put(LOCATION_NAME_REPORT_KEY, var.getValue());
+						break;
+					case LOCATION_ID:
+						params.put(LOCATION_ID_REPORT_KEY, var.getValue());
+						break;
+					case STUDY_INSTITUTE:
+						params.put(ORGANIZATION_REPORT_KEY, var.getValue());
+						break;
+				}
+			} else {
+				if (var.getName().equals(COUNTRY_VARIABLE_NAME)) {
+					params.put(COUNTRY_VARIABLE_NAME, var.getValue());
+				} else if (var.getName().equals(LOCATION_ABBREV_VARIABLE_NAME)) {
+					params.put(LOCATION_ABBREV_VARIABLE_NAME, var.getValue());
+				} else if (var.getProperty().equalsIgnoreCase("Season")) {
 					params.put("cycle", var.getValue());
 					params.put("LoCycle", var.getValue());
-					break;
-				case "TRIAL_INSTANCE":
-					if ("".equalsIgnoreCase(var.getValue())) {
-						params.put("occ", Integer.valueOf(0));
-					} else {
-						params.put("occ", Integer.valueOf(var.getValue()));
-					}
-					break;
-				case "LOCATION_NAME":
-					params.put("lname", var.getValue());
-					break;
-				case "LOCATION_NAME_ID":
-					params.put("lid", var.getValue());
-					break;
-				case "STUDY_INSTITUTE":
-					params.put("organization", var.getValue());
-					break;
-				default:
-					params.put("dmsIp", "???");
-					params.put("gmsIp", "???");
-					params.put("version", "v-1");
-					break;
+				}
 			}
+
 		}
+
+		// TODO: pending mappings
+
+		params.put("dmsIp", "???");
+		params.put("gmsIp", "???");
+		params.put("version", "v-1");
 
 		return params;
 	}
@@ -108,14 +113,13 @@ public abstract class AbstractWheatTrialReporter extends AbstractReporter {
 					case "PLOT_NO":
 						entry.setPlot(Integer.valueOf(dataItem.getValue()));
 						break;
-					// TODO: pending mappings
-					default:
-						entry.setsEnt(-99);
-						entry.setsTabbr("???");
-						entry.setSlocycle("???");
-
 				}
 			}
+
+			// TODO: pending mappings
+			entry.setsEnt(-99);
+			entry.setsTabbr("???");
+			entry.setSlocycle("???");
 
 			entries.add(entry);
 		}

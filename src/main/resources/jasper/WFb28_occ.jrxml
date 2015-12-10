@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.0.4.final using JasperReports Library version 6.0.4  -->
-<!-- 2015-07-14T12:14:32 -->
+<!-- Created with Jaspersoft Studio version 6.1.1.final using JasperReports Library version 6.1.1  -->
+<!-- 2015-12-02T04:39:58 -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="WFb28_occ" pageWidth="612" pageHeight="792" columnWidth="612" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="20d8b9f9-b4a9-470e-afa0-5d715dbe21cb">
 	<property name="ireport.zoom" value="1.5"/>
 	<property name="ireport.x" value="0"/>
@@ -12,10 +12,10 @@
 	<parameter name="tid" class="java.lang.Integer"/>
 	<parameter name="occ" class="java.lang.Integer"/>
 	<parameter name="program" class="java.lang.String"/>
-	<parameter name="trialName" class="java.lang.String"/>
-	<parameter name="trialAbbr" class="java.lang.String"/>
-	<parameter name="dmsIp" class="java.lang.String"/>
-	<parameter name="gmsIp" class="java.lang.String"/>
+    <parameter name="trial_name" class="java.lang.String"/>
+    <parameter name="trial_abbr" class="java.lang.String"/>
+    <parameter name="dms_ip" class="java.lang.String"/>
+    <parameter name="gms_ip" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
@@ -77,23 +77,23 @@
 				<subreportParameter name="LoCycle">
 					<subreportParameterExpression><![CDATA[$P{LoCycle}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="dms_ip">
-					<subreportParameterExpression><![CDATA[$P{dmsIp}]]></subreportParameterExpression>
+                <subreportParameter name="dmsIp">
+                    <subreportParameterExpression><![CDATA[$P{dms_ip}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="program">
 					<subreportParameterExpression><![CDATA[$P{program}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="trial_abbr">
-					<subreportParameterExpression><![CDATA[$P{trialAbbr}]]></subreportParameterExpression>
+                <subreportParameter name="trialAbbr">
+                    <subreportParameterExpression><![CDATA[$P{trial_abbr}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="tid">
 					<subreportParameterExpression><![CDATA[$P{tid}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="gms_ip">
-					<subreportParameterExpression><![CDATA[$P{gmsIp}]]></subreportParameterExpression>
+                <subreportParameter name="gmsIp">
+                    <subreportParameterExpression><![CDATA[$P{gms_ip}]]></subreportParameterExpression>
 				</subreportParameter>
-				<subreportParameter name="trial_name">
-					<subreportParameterExpression><![CDATA[$P{trialName}]]></subreportParameterExpression>
+                <subreportParameter name="trialName">
+                    <subreportParameterExpression><![CDATA[$P{trial_name}]]></subreportParameterExpression>
 				</subreportParameter>
 				<subreportParameter name="occ">
 					<subreportParameterExpression><![CDATA[$P{occ}]]></subreportParameterExpression>

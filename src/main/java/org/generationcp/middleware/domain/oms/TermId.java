@@ -11,6 +11,9 @@
 
 package org.generationcp.middleware.domain.oms;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * The cvterm ID constants used in Middleware.
  * 
@@ -162,6 +165,7 @@ public enum TermId {
 	;
 
 	private final int id;
+	private final static Map<Integer, TermId> TERM_ID_MAP = new HashMap<>();
 
 	TermId(int id) {
 		this.id = id;
@@ -171,12 +175,19 @@ public enum TermId {
 		return this.id;
 	}
 
-	public static TermId getById(int id) {
-		for (TermId term : TermId.values()) {
-			if (term.getId() == id) {
-				return term;
+	public static TermId getById(Integer id) {
+		if (id == null) {
+			return null;
+		}
+
+		if (!TERM_ID_MAP.containsKey(id)) {
+			for (TermId term : TermId.values()) {
+				if (term.getId() == id) {
+					return term;
+				}
 			}
 		}
-		return null;
+
+		return TERM_ID_MAP.get(id);
 	}
 }

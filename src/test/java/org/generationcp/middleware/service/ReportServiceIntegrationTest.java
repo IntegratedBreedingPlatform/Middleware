@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.reports.Reporter;
-import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.ReportService;
 import org.junit.Assert;
 import org.junit.Ignore;
@@ -18,13 +17,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 @Ignore
 @RunWith(JUnit4.class)
-public class ReportServiceImplTest extends IntegrationTestBase {
+public class ReportServiceIntegrationTest extends IntegrationTestBase {
 
 	@Autowired
 	private ReportService reportService;
-
-	@Autowired
-	private DataImportService dataImportService;
 
 	private static final int PROJECT_ID = -2; // local nursery;
 	private static final String KEY_MAIZE_FIELDBOOK_NURSERY = "MFbNur";
@@ -60,99 +56,101 @@ public class ReportServiceImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetStreamReport_MaizeNursery() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_ID, ReportServiceImplTest.KEY_MAIZE_FIELDBOOK_NURSERY);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_ID, ReportServiceIntegrationTest.KEY_MAIZE_FIELDBOOK_NURSERY);
 	}
 
 	@Test
 	public void testGetStreamReport_MaizeTrial() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_ID, ReportServiceImplTest.KEY_MAIZE_FIELDBOOK_TRIAL);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_ID, ReportServiceIntegrationTest.KEY_MAIZE_FIELDBOOK_TRIAL);
 
 	}
 
 	@Test
 	public void testGetStreamReport_ShipList() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_ID, ReportServiceImplTest.KEY_MAIZE_FIELDBOOK_SHIPM);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_ID, ReportServiceIntegrationTest.KEY_MAIZE_FIELDBOOK_SHIPM);
 
 	}
 
 	@Test
 	public void testGetStreamReport_WheatFb23() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_WHEAT_CROSSES_ID, ReportServiceImplTest.KEY_WHEAT_FIELDBOOK_23);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_WHEAT_CROSSES_ID,
+				ReportServiceIntegrationTest.KEY_WHEAT_FIELDBOOK_23);
 	}
 
 	@Test
 	public void testGetStreamReport_WheatFb24() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_WHEAT_ID, ReportServiceImplTest.KEY_WHEAT_FIELDBOOK_24);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_WHEAT_ID, ReportServiceIntegrationTest.KEY_WHEAT_FIELDBOOK_24);
 	}
 
 	@Test
 	public void testGetStreamReport_WheatFb25() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_WHEAT_ID, ReportServiceImplTest.KEY_WHEAT_FIELDBOOK_25);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_WHEAT_ID, ReportServiceIntegrationTest.KEY_WHEAT_FIELDBOOK_25);
 	}
 
 	@Test
 	public void testGetStreamReport_WheatFb26() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_WHEAT_ID, ReportServiceImplTest.KEY_WHEAT_FIELDBOOK_26);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_WHEAT_ID, ReportServiceIntegrationTest.KEY_WHEAT_FIELDBOOK_26);
 	}
 
 	@Test
 	public void testGetStreamReport_WheatFb28() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_WHEAT_ID, ReportServiceImplTest.KEY_WHEAT_FIELDBOOK_28);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_WHEAT_ID, ReportServiceIntegrationTest.KEY_WHEAT_FIELDBOOK_28);
 	}
 
 	@Test
 	public void testGetStreamReport_WheatFb29() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_WHEAT_ID, ReportServiceImplTest.KEY_WHEAT_FIELDBOOK_29);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_WHEAT_ID, ReportServiceIntegrationTest.KEY_WHEAT_FIELDBOOK_29);
 	}
 
 	@Test
 	public void testGetStreamReport_WheatFb41() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_WHEAT_ID, ReportServiceImplTest.KEY_WHEAT_FIELDBOOK_41);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_WHEAT_ID, ReportServiceIntegrationTest.KEY_WHEAT_FIELDBOOK_41);
 	}
 
 	@Test
 	public void testGetStreamReport_WheatFb42() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_WHEAT_ID, ReportServiceImplTest.KEY_WHEAT_FIELDBOOK_42);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_WHEAT_ID, ReportServiceIntegrationTest.KEY_WHEAT_FIELDBOOK_42);
 	}
 
 	@Test
 	public void testGetStreamReport_WheatFb43() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_WHEAT_ID, ReportServiceImplTest.KEY_WHEAT_FIELDBOOK_43);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_WHEAT_ID, ReportServiceIntegrationTest.KEY_WHEAT_FIELDBOOK_43);
 	}
 
 	@Test
 	public void testGetStreamReport_WheatFb47() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_WHEAT_CROSSES_ID, ReportServiceImplTest.KEY_WHEAT_FIELDBOOK_47);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_WHEAT_CROSSES_ID,
+				ReportServiceIntegrationTest.KEY_WHEAT_FIELDBOOK_47);
 	}
 
 	@Test
 	public void testGetStreamReport_WheatFb60() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_WHEAT_ID, ReportServiceImplTest.KEY_WHEAT_FIELDBOOK_60);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_WHEAT_ID, ReportServiceIntegrationTest.KEY_WHEAT_FIELDBOOK_60);
 	}
 
 	@Test
 	public void testGetStreamReport_WheatFb61() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_WHEAT_ID, ReportServiceImplTest.KEY_WHEAT_FIELDBOOK_61);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_WHEAT_ID, ReportServiceIntegrationTest.KEY_WHEAT_FIELDBOOK_61);
 	}
 
 	@Test
 	public void testGetStreamReport_WheatTag04() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_WHEAT_CROSSES_ID, ReportServiceImplTest.KEY_WHEAT_TAGS_04);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_WHEAT_CROSSES_ID, ReportServiceIntegrationTest.KEY_WHEAT_TAGS_04);
 	}
 
 	@Test
 	public void testGetStreamReport_WheatTag22() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_WHEAT_CROSSES_ID, ReportServiceImplTest.KEY_WHEAT_TAGS_22);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_WHEAT_CROSSES_ID, ReportServiceIntegrationTest.KEY_WHEAT_TAGS_22);
 	}
 
 	@Test
 	public void testGetStreamReport_WheatLabel05() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_WHEAT_CROSSES_ID, ReportServiceImplTest.KEY_WHEAT_LABELS_05);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_WHEAT_CROSSES_ID, ReportServiceIntegrationTest.KEY_WHEAT_LABELS_05);
 	}
 
 	@Test
 	public void testGetStreamReport_WheatLabel21() {
-		this.assertReportGenerated(ReportServiceImplTest.PROJECT_WHEAT_CROSSES_ID, ReportServiceImplTest.KEY_WHEAT_LABELS_21);
+		this.assertReportGenerated(ReportServiceIntegrationTest.PROJECT_WHEAT_CROSSES_ID, ReportServiceIntegrationTest.KEY_WHEAT_LABELS_21);
 	}
 
 	/**
@@ -169,7 +167,7 @@ public class ReportServiceImplTest extends IntegrationTestBase {
 			try {
 				ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-				Reporter rep = this.reportService.getStreamReport(reportCode, studyId, baos);
+				Reporter rep = this.reportService.getStreamReport(reportCode, studyId, "testReportName", baos);
 
 				Assert.assertTrue("Failed test - empty report for code [" + reportCode + "].", baos.size() > 0);
 
