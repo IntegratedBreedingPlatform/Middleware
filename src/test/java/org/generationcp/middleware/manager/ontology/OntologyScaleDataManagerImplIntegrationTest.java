@@ -23,6 +23,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager
 import org.generationcp.middleware.pojos.oms.CV;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
+import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.junit.Assert;
 import org.junit.Before;
@@ -328,5 +329,56 @@ public class OntologyScaleDataManagerImplIntegrationTest extends IntegrationTest
 				Assert.assertEquals(String.format(message, "Max Value"), cvTermProperty.getValue(), scale.getMaxValue());
 			}
 		}
+	}
+
+	/**
+	 * Test to check deleteScale should delete term and related properties
+	 */
+	@Test
+	public void testDeleteScaleShouldDeleteExistingScale() throws Exception {
+		// Save Scale Term using termDao
+		CVTerm scaleTerm = TestDataHelper.getTestCvTerm(CvId.SCALES);
+		this.termDao.save(scaleTerm);
+
+		this.relationshipDao.save(scaleTerm.getCvTermId(), TermId.HAS_TYPE.getId(), DataType.NUMERIC_VARIABLE.getId());
+
+		String min = "5";
+		String max = "10";
+
+		this.propertyDao.updateOrDeleteProperty(scaleTerm.getCvTermId(), TermId.MIN_VALUE.getId(), min, 0);
+		this.propertyDao.updateOrDeleteProperty(scaleTerm.getCvTermId(), TermId.MAX_VALUE.getId(), max, 0);
+
+		// Fill Test Created Date Property using TestDataHelper
+		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		List<CVTermProperty> scaleCreatedDateProperties = new ArrayList<>();
+		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(scaleTerm), scaleCreatedDateProperties, testCreatedDate);
+
+		CVTermProperty scaleCreatedDateProperty = scaleCreatedDateProperties.get(0);
+		this.propertyDao.save(scaleCreatedDateProperty);
+
+		// Fill Test Updated Date Property using TestDataHelper
+		Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		List<CVTermProperty> scaleUpdatedDateProperties = new ArrayList<>();
+		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(scaleTerm), scaleUpdatedDateProperties, testUpdatedDate);
+
+		CVTermProperty scaleUpdatedDateProperty = scaleUpdatedDateProperties.get(0);
+		this.propertyDao.save(scaleUpdatedDateProperty);
+
+		// Delete the scale
+		this.manager.deleteScale(scaleTerm.getCvTermId());
+
+		CVTerm cvterm = this.termDao.getById(scaleTerm.getCvTermId());
+
+		// Make sure the scale must be deleted and it asserts null
+		String message = "The %s for scale '" + scaleTerm.getCvTermId() + "' was not deleted correctly.";
+		Assert.assertNull(String.format(message, "Term"), cvterm);
+
+		// Make sure the properties must be deleted
+		List<CVTermProperty> deletedProperties = this.propertyDao.getByCvTermId(scaleTerm.getCvTermId());
+		Assert.assertTrue(String.format(message, "Properties"), deletedProperties.size() == 0);
+
+		// Make sure the relationships of scale and data type must be deleted
+		List<CVTermRelationship> deletedRelationships = this.relationshipDao.getBySubject(scaleTerm.getCvTermId());
+		Assert.assertTrue(String.format(message, "Scale Relationships"), Objects.equals(deletedRelationships.size(), 0));
 	}
 }
