@@ -166,7 +166,7 @@ public class OntologyScaleDataManagerImplIntegrationTest extends IntegrationTest
 
 					final Set<String> categories = categoryMap.get(scale.getId());
 
-					if (!Objects.isNull(categories)) {
+					if (categories != null) {
 						Assert.assertEquals(String.format(message, "Categories"), scale.getCategories().size(), categories.size());
 					}
 
@@ -275,63 +275,58 @@ public class OntologyScaleDataManagerImplIntegrationTest extends IntegrationTest
 	}
 
 	/**
-	 * This test will check UpdateMethod should update CvTerm and last modified date property
+	 * This test will check Update scale should update CvTerm and last modified date property
 	 */
 	@Test
-	public void testUpdateScaleShouldUpdateExistingMethod() throws Exception {
-		// Save Method Term using termDao
-		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
-		this.termDao.save(methodTerm);
+	public void testUpdateScaleShouldUpdateExistingScale() throws Exception {
+		// Save Scale Term using termDao
+		CVTerm scaleTerm = TestDataHelper.getTestCvTerm(CvId.SCALES);
+		this.termDao.save(scaleTerm);
 
 		// Fill Test Created Date Property using TestDataHelper
 		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
-		List<CVTermProperty> methodCreatedDateProperties = new ArrayList<>();
-		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(methodTerm), methodCreatedDateProperties, testCreatedDate);
+		List<CVTermProperty> scaleCreatedDateProperties = new ArrayList<>();
+		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(scaleTerm), scaleCreatedDateProperties, testCreatedDate);
 
-		CVTermProperty methodCreatedDateProperty = methodCreatedDateProperties.get(0);
-		this.propertyDao.save(methodCreatedDateProperty);
+		CVTermProperty scaleCreatedDateProperty = scaleCreatedDateProperties.get(0);
+		this.propertyDao.save(scaleCreatedDateProperty);
 
-		//Updating method via manager
-		Scale method = new Method();
-		method.setId(methodTerm.getCvTermId());
-		method.setName("New Method Name");
-		method.setDefinition("New Method Definition");
+		// Updating scale via manager
+		Scale scale = new Scale();
+		scale.setId(scaleTerm.getCvTermId());
+		scale.setName("New Scale Name");
+		scale.setDefinition("New Scale Definition");
+		scale.setDataType(DataType.NUMERIC_VARIABLE);
+		scale.setMinValue("10");
+		scale.setMaxValue("20");
 
-		Date date = constructDate(2015, Calendar.JANUARY, 1);
-		this.stubCurrentDate(date);
+		Date testUpdatedDate = constructDate(2015, Calendar.JANUARY, 1);
+		this.stubCurrentDate(testUpdatedDate);
 
-		this.manager.updateMethod(method);
+		this.manager.updateScale(scale);
 
-		CVTerm cvterm = this.termDao.getById(method.getId());
+		CVTerm cvterm = this.termDao.getById(scale.getId());
 
 		// Make sure the inserted data should come as they are inserted and Display proper message if the data doesn't come as expected
-		String message = "The %s for method '" + method.getId() + "' was not updated correctly.";
-		Assert.assertEquals(String.format(message, "Name"), method.getName(), cvterm.getName());
-		Assert.assertEquals(String.format(message, "Definition"), method.getDefinition(), cvterm.getDefinition());
+		String message = "The %s for scale '" + scale.getId() + "' was not updated correctly.";
+		Assert.assertEquals(String.format(message, "Name"), scale.getName(), cvterm.getName());
+		Assert.assertEquals(String.format(message, "Definition"), scale.getDefinition(), cvterm.getDefinition());
 		Assert.assertEquals(String.format(message, "IsObsolete"), false, cvterm.isObsolete());
-		Assert.assertEquals(String.format(message, "UpdatedDate"), date, method.getDateLastModified());
 
-		// Make sure there are two properties. One for Created date and one for Updated date
+		// Make sure there are two properties. One for Created testUpdatedDate and one for Updated testUpdatedDate
 		List<CVTermProperty> updatedProperties = this.propertyDao.getByCvTermId(cvterm.getCvTermId());
-		Assert.assertTrue(String.format(message, "Properties"), updatedProperties.size() == 2);
+		Assert.assertTrue(String.format(message, "Updated Properties"), updatedProperties.size() == 4);
 
-		CVTermProperty lastUpdateDateProperty = null;
-		CVTermProperty createdDateProperty = null;
-		for (CVTermProperty property : updatedProperties) {
-			if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
-				lastUpdateDateProperty = property;
-			} else if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
-				createdDateProperty = property;
+		for (CVTermProperty cvTermProperty : updatedProperties) {
+			if (Objects.equals(cvTermProperty.getTypeId(), TermId.CREATION_DATE.getId())) {
+				Assert.assertEquals(String.format(message, "Created Date"), cvTermProperty.getValue(), ISO8601DateParser.toString(testCreatedDate));
+			} else if (Objects.equals(cvTermProperty.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
+				Assert.assertEquals(String.format(message, "Updated Date"), cvTermProperty.getValue(), ISO8601DateParser.toString(testUpdatedDate));
+			} else if (Objects.equals(cvTermProperty.getTypeId(), TermId.MIN_VALUE.getId())) {
+				Assert.assertEquals(String.format(message, "Min Value"), cvTermProperty.getValue(), scale.getMinValue());
+			} else if (Objects.equals(cvTermProperty.getTypeId(), TermId.MAX_VALUE.getId())) {
+				Assert.assertEquals(String.format(message, "Max Value"), cvTermProperty.getValue(), scale.getMaxValue());
 			}
 		}
-
-		// Assert for Created Date & Last Updated date Property
-		Assert.assertNotNull(createdDateProperty);
-		Assert.assertNotNull(lastUpdateDateProperty);
-
-		Assert.assertEquals(String.format(message, "CreatedDate"), createdDateProperty.getValue(),
-				ISO8601DateParser.toString(testCreatedDate));
-		Assert.assertEquals(String.format(message, "UpdatedDate"), lastUpdateDateProperty.getValue(),
-				ISO8601DateParser.toString(method.getDateLastModified()));
 	}
 }

@@ -389,7 +389,7 @@ public class OntologyScaleDataManagerImpl implements OntologyScaleDataManager {
 		// Save last modified Time
 		scale.setDateLastModified(systemClock.now());
 
-		String strValueOfDate = ISO8601DateParser.toString(scale.getDateCreated());
+		String strValueOfDate = ISO8601DateParser.toString(scale.getDateLastModified());
 
 		// Save creation time
 		cvTermPropertyDao.updateOrDeleteProperty(scale.getId(), TermId.LAST_UPDATE_DATE.getId(), strValueOfDate, 0);
