@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -286,15 +287,20 @@ public class ProjectPropertySaver {
 	protected DMSVariableType createVariableType(final MeasurementVariable variable, final int rank) {
 		final DMSVariableType varType = new DMSVariableType();
 		final StandardVariable stdvar = new StandardVariable();
-		varType.setStandardVariable(stdvar);
 
-		stdvar.setId(variable.getTermId());
 		varType.setRole(variable.getRole());
 		varType.setVariableType(variable.getVariableType());
-		stdvar.setPhenotypicType(variable.getRole());
 		varType.setLocalName(variable.getName());
 		varType.setLocalDescription(variable.getDescription());
 		varType.setRank(rank);
+
+		stdvar.setId(variable.getTermId());
+		stdvar.setPhenotypicType(variable.getRole());
+		stdvar.setMethod(new Term(0, variable.getMethod(), ""));
+		stdvar.setProperty(new Term(0, variable.getProperty(), ""));
+		stdvar.setScale(new Term(0, variable.getScale(), ""));
+
+		varType.setStandardVariable(stdvar);
 
 		if (variable.getTreatmentLabel() != null && !variable.getTreatmentLabel().isEmpty()) {
 			varType.setTreatmentLabel(variable.getTreatmentLabel());
