@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.NameDAO;
@@ -51,6 +51,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -278,9 +279,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public List<Method> getFavoriteBreedingMethods(final List<Integer> methodIds, final boolean filterOutGenerative) {
 		final List<Method> methodList;
 		if (filterOutGenerative) {
-			methodList = getGermplasmDataManager().getNonGenerativeMethodsByID(methodIds);
+			methodList = this.getGermplasmDataManager().getNonGenerativeMethodsByID(methodIds);
 		} else {
-			methodList = getGermplasmDataManager().getMethodsByIDs(methodIds);
+			methodList = this.getGermplasmDataManager().getMethodsByIDs(methodIds);
 		}
 
 		return methodList;
@@ -288,7 +289,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Integer saveNurseryAdvanceGermplasmList(final List<Pair<Germplasm, List<Name>>> germplasms,
-			final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList)
+			final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList,
+			List<Pair<Germplasm, List<Attribute>>> germplasmAttributes)
 					throws MiddlewareQueryException {
 
 		final GermplasmDAO germplasmDao = this.getGermplasmDao();
@@ -323,6 +325,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					}
 				}
 
+				// This is where the new germplasm saves on advancing.
 				// Save germplasm and name entries if non-existing
 				if (germplasmFound == null || germplasmFound.getGid() == null) {
 					final List<Name> nameList = germplasms.get(counter).getRight();
@@ -340,6 +343,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					for (final Name name : nameList) {
 						name.setGermplasmId(germplasm.getGid());
 						nameDao.save(name);
+					}
+
+					// Save Germplasm attributes
+					List<Attribute> attributesList = germplasmAttributes.get(counter).getRight();
+					AttributeDAO attributeDAO = this.getAttributeDao();
+					for (Attribute attribute : attributesList) {
+						attribute.setGermplasmId(germplasm.getGid());
+						attributeDAO.save(attribute);
 					}
 				}
 
@@ -814,6 +825,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return this.getGermplasmDataManager().addGermplasm(germplasm, name);
 	}
 
+	@Override
 	public List<Integer> addGermplasm(final List<Pair<Germplasm, Name>> germplasmPairs) {
 		return this.getGermplasmDataManager().addGermplasm(germplasmPairs);
 	}

@@ -20,6 +20,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.gdms.AllelicValueWithMarkerIdElement;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -86,6 +87,11 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer> {
 
 	public static final String GET_MARKER_SAMPLE_IDS_BY_GIDS = "SELECT DISTINCT marker_id, marker_sample_id "
 			+ "FROM gdms_mapping_pop_values " + "WHERE gid IN (:gids)";
+	
+	// another transferred query from the Vaadin layer
+	public static final String GET_UNIQUE_MAPPOP_ALLELIC_VALUES_BY_GIDS_AND_MIDS = "select distinct gid,marker_id,map_char_value,acc_sample_id,marker_sample_id from gdms_mapping_pop_values where"
+			+ " gid in(:gids) and marker_id in (:mids) ORDER BY gid, marker_id,acc_sample_id asc";
+
 
 	/**
 	 * Gets the allelic values based on the given dataset id. The result is limited by the start and numOfRows parameters.
@@ -298,6 +304,32 @@ public class MappingPopValuesDAO extends GenericDAO<MappingPopValues, Integer> {
 					+ e.getMessage(), e);
 		}
 		return toReturn;
+	}
+	
+	@SuppressWarnings({"deprecation", "unchecked"})
+	public List<Object> getUniqueMapPopAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids) {
+		
+		List<Object> results = new ArrayList<>();
+		try {
+			if (gids != null) {
+				SQLQuery query =
+						this.getSession().createSQLQuery(MappingPopValuesDAO.GET_UNIQUE_MAPPOP_ALLELIC_VALUES_BY_GIDS_AND_MIDS);
+				query.setParameterList("gids", gids);				
+				query.setParameterList("mids", mids);				
+				query.addScalar("gid", Hibernate.INTEGER);
+				query.addScalar("marker_id", Hibernate.INTEGER);
+				query.addScalar("map_char_value", Hibernate.STRING);
+				query.addScalar("acc_sample_id", Hibernate.INTEGER);
+				query.addScalar("marker_sample_id", Hibernate.INTEGER);
+				results = query.list();
+
+					}
+		} catch (HibernateException e) {
+			this.logAndThrowException(
+					"Error with getUniqueMapPopAllelesByGidsAndMids(gids=" + gids + ") query from MappingPopValuesDAO " + e.getMessage(), e);
+		}
+		return results;
+				
 	}
 
 }
