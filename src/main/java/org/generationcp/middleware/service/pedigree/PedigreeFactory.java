@@ -10,6 +10,10 @@ public class PedigreeFactory {
 	public static final String PROFILE_CIMMYT = "CIMMYT";
 	public static final String PROFILE_DEFAULT = "DEFAULT";
 
+	private PedigreeFactory() {
+		// do nothing
+	}
+
 	public static PedigreeService getPedigreeService(final HibernateSessionProvider sessionProvider, final String pedigreeProfile,
 			final String cropType) {
 		if (PedigreeFactory.isCimmytWheat(pedigreeProfile, cropType)) {
