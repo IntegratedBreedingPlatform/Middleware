@@ -10,11 +10,19 @@ public class PedigreeFactory {
 	public static final String PROFILE_CIMMYT = "CIMMYT";
 	public static final String PROFILE_DEFAULT = "DEFAULT";
 
-	public static PedigreeService getPedigreeService(HibernateSessionProvider sessionProvider, String pedigreeProfile, String cropType) {
-		if (cropType != null && PedigreeFactory.PROFILE_CIMMYT.equalsIgnoreCase(pedigreeProfile)
-				&& CropEnum.WHEAT.toString().equalsIgnoreCase(cropType)) {
+	public static PedigreeService getPedigreeService(final HibernateSessionProvider sessionProvider, final String pedigreeProfile,
+			final String cropType) {
+		if (PedigreeFactory.isCimmytWheat(pedigreeProfile, cropType)) {
 			return new PedigreeCimmytWheatServiceImpl(sessionProvider);
 		}
 		return new PedigreeDefaultServiceImpl(sessionProvider);
+	}
+
+	public static boolean isCimmytWheat(final String profile, final String crop) {
+		if (profile != null && crop != null && profile.equalsIgnoreCase(PedigreeFactory.PROFILE_CIMMYT)
+				&& CropEnum.WHEAT.toString().equalsIgnoreCase(crop)) {
+			return true;
+		}
+		return false;
 	}
 }
