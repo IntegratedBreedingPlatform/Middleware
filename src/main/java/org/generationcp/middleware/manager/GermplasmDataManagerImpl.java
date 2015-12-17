@@ -1288,4 +1288,18 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public Map<String, Integer> getCountByNamePermutations(List<String> names) {
 		return this.getNameDao().getCountByNamePermutations(names);
 	}
+	
+	@Override
+	public UserDefinedField getPlotCodeField() {
+		final List<UserDefinedField> udfldAttributes = this.getUserDefinedFieldByFieldTableNameAndType("ATRIBUTS", "PASSPORT");
+		// Defaulting to a UDFLD with fldno = 0 - this prevents NPEs and DB constraint violations.
+		UserDefinedField plotCodeUdfld = new UserDefinedField(0);
+		for (UserDefinedField userDefinedField : udfldAttributes) {
+			if (userDefinedField.getFcode().equals("PLOTCODE")) {
+				plotCodeUdfld = userDefinedField;
+				break;
+			}
+		}
+		return plotCodeUdfld;
+	}
 }

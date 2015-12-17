@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.etl;
@@ -247,7 +247,7 @@ public class Workbook {
 	/**
 	 * This method handles the retrieval of the measurement dataset variables which includes the following: TRIAL_INSTANCE, FACTORS,
 	 * VARIATES. The order of insertion matters that's why we used LinkedHashSet on this method to preserve the order of insertion.
-	 * 
+	 *
 	 * @return measurement dataset variable list
 	 */
 	public List<MeasurementVariable> getMeasurementDatasetVariablesView() {
@@ -1032,5 +1032,16 @@ public class Workbook {
 	public boolean hasExistingExperimentalDesign() {
 		final ExperimentalDesignVariable expDesignVar = this.getExperimentalDesignVariables();
 		return expDesignVar != null &&  expDesignVar.getExperimentalDesign() != null && expDesignVar.getExperimentalDesign().getValue() != null;
+	}
+
+	public MeasurementVariable findConditionById(int conditionId) {
+		if (this.getConditions() != null) {
+			for (MeasurementVariable mv : this.getConditions()) {
+				if (mv.getTermId() == conditionId) {
+					return mv;
+				}
+			}
+		}
+		return null;
 	}
 }

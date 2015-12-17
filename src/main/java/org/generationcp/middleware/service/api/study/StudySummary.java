@@ -1,6 +1,9 @@
 
 package org.generationcp.middleware.service.api.study;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.generationcp.middleware.domain.oms.StudyType;
 
 /**
@@ -17,13 +20,16 @@ public class StudySummary {
 	private String startDate;
 	private String endDate;
 	private String programUUID;
+	private String principalInvestigator;
+	private String location;
+	private String season;
 
 	public StudySummary() {
 
 	}
 
 	public StudySummary(Integer id, String name, String title, String objective, StudyType type, String startDate, String endDate,
-			String programUUID) {
+			String programUUID, String principalInvestigator, String location, String season) {
 		this.id = id;
 		this.name = name;
 		this.title = title;
@@ -32,6 +38,9 @@ public class StudySummary {
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.programUUID = programUUID;
+		this.principalInvestigator = principalInvestigator;
+		this.location = location;
+		this.season = season;
 	}
 
 	public StudySummary(Integer studyId) {
@@ -102,8 +111,46 @@ public class StudySummary {
 		this.programUUID = programUUID;
 	}
 
+	public String getPrincipalInvestigator() {
+		return this.principalInvestigator;
+	}
+
+	public void setPrincipalInvestigator(String principalInvestigator) {
+		this.principalInvestigator = principalInvestigator;
+	}
+
+	public String getLocation() {
+		return this.location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getSeason() {
+		return this.season;
+	}
+
+	public void setSeason(String season) {
+		this.season = season;
+	}
+
 	@Override
 	public String toString() {
-		return "StudySummary [id=" + this.id + ", name=" + this.name + ", title=" + this.title + ", type=" + this.type + "]";
+		return new ReflectionToStringBuilder(this).toString();
+	}
+
+	@Override
+	public boolean equals(final Object other) {
+		if (!(other instanceof StudySummary)) {
+			return false;
+		}
+		StudySummary castOther = (StudySummary) other;
+		return new EqualsBuilder().append(this.id, castOther.id).isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(this.id).toHashCode();
 	}
 }

@@ -22,6 +22,8 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.google.common.collect.Lists;
+
 public class WorkbookTest {
 
 	@Test
@@ -158,6 +160,32 @@ public class WorkbookTest {
 		Workbook workbook = new Workbook();
 		Assert.assertFalse("Expected hasExistingExperimentalDesign() to return false when there is no design but it didn't.",
 				workbook.hasExistingExperimentalDesign());
+	}
+
+	@Test
+	public void testFindConditionById() {
+		final Workbook workbook = new Workbook();
+
+		Assert.assertNull(workbook.findConditionById(TermId.LOCATION_ABBR.getId()));
+		Assert.assertNull(workbook.findConditionById(TermId.SEASON_VAR.getId()));
+
+		final MeasurementVariable locationMV = new MeasurementVariable();
+		locationMV.setTermId(TermId.LOCATION_ABBR.getId());
+		locationMV.setValue("MEX");
+
+		final MeasurementVariable seasonMV = new MeasurementVariable();
+		seasonMV.setTermId(TermId.SEASON_VAR.getId());
+		seasonMV.setValue("10290");
+
+		workbook.setConditions(Lists.newArrayList(locationMV, seasonMV));
+
+		MeasurementVariable location = workbook.findConditionById(TermId.LOCATION_ABBR.getId());
+		Assert.assertNotNull(location);
+		Assert.assertEquals(locationMV, location);
+
+		MeasurementVariable season = workbook.findConditionById(TermId.SEASON_VAR.getId());
+		Assert.assertNotNull(season);
+		Assert.assertEquals(seasonMV, season);
 	}
 
 }

@@ -38,6 +38,7 @@ import org.generationcp.middleware.pojos.gdms.MapInfo;
 import org.generationcp.middleware.pojos.gdms.MappingABHRow;
 import org.generationcp.middleware.pojos.gdms.MappingAllelicSNPRow;
 import org.generationcp.middleware.pojos.gdms.MappingAllelicSSRDArTRow;
+import org.generationcp.middleware.pojos.gdms.MappingData;
 import org.generationcp.middleware.pojos.gdms.MappingPop;
 import org.generationcp.middleware.pojos.gdms.MappingPopValues;
 import org.generationcp.middleware.pojos.gdms.MappingValueElement;
@@ -78,6 +79,15 @@ public interface GenotypicDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Integer> getNameIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException;
+	
+	/**
+	 * Gets the dataset ids by germplasm ids. Searches the acc_metadataset table by giving the list of germplasm ids.
+	 *
+	 * @param gIds the list germplasm ids
+	 * @return the dataset ids matching the given germplasm ids
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<Integer> getDatasetIdsByGermplasmIds(List<Integer> gIds) throws MiddlewareQueryException;
 
 	/**
 	 * Gets the Name records matching the given name ids. This method is based on GMS_getNameRecord.
@@ -204,6 +214,13 @@ public interface GenotypicDataManager {
 
 	String getMapNameById(Integer mapID) throws MiddlewareQueryException;
 
+	/**
+	 * Fetches all datasets in the DB
+	 * @return List of Dataset POJOs
+	 * 
+	 */
+	List<Dataset> getAllDatasets();
+	
 	/**
 	 * Counts all the dataset names.
 	 *
@@ -1747,6 +1764,15 @@ public interface GenotypicDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	long countAccMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns a list of of nIds from AccMetaDataSet given a list of dataset Ids.
+	 *
+	 * @param datasetIds the dataset ids
+	 * @return List of NIDs
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<Integer> getAccMetadatasetByDatasetIds(List<Integer> datasetIds) throws MiddlewareQueryException;
 
 	/**
 	 * Returns the number of markers from Marker given a list of dataset Ids.
@@ -2189,5 +2215,41 @@ public interface GenotypicDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<CharValues> getCharValuesByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns all Mapping data
+	 * @return List of MappingData instances
+	 */
+	List<MappingData> getAllMappingData();
+	
+	// Added by Matthew to move GDMS SQL to middleware : services not heavily understood
+	
+	List<Object> getUniqueAccMetaDataSetByDatasetId(String datasetId);
+	
+	List<Object> getUniqueAccMetaDataSetByGids(List gids);
+
+	List<Object> getUniqueCharAllelesByDataset(String datasetId);
+	
+	List<QtlDetails> getAllQtlDetails();
+
+	// I have a feeling we may need to paginate this guy ..... see the other limited getAllQtl
+	List<Qtl> getAllQtl();
+	
+	// AlleleValues (AlleleValueDao)
+	List<Object> getUniqueAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids);
+	
+	// Char Alleles (CharValueDAO)
+	List<Object> getUniqueCharAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids);
+
+	// Map Pop Alleles (MappingPopValueDAO)
+	List<Object> getUniqueMapPopAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids);
+	
+	public int countAllMarkers();
+	
+	public List<Integer> getMarkerIdsByNames(List<String> names, int start, int numOfRows);
+	
+	public List<Object> getMarkersOnMapByMarkerIdsAndMapId(List<Integer> markerIds, Integer mapID);
+	
+	public List<MarkerOnMap> getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(Integer mapId, Integer linkageGroupId, Integer markerId);
 
 }
