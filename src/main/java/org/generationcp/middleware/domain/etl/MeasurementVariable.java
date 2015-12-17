@@ -22,8 +22,6 @@ import org.generationcp.middleware.util.Debug;
 
 public class MeasurementVariable {
 
-    public static final String CATEGORICAL_VARIABLE_TYPE = "Categorical";
-
 	private int termId;
 
 	private String name;
