@@ -779,7 +779,24 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		return 0;
 	}
 
-	private void checkTermIsVariable(CVTerm term) {
+    @Override
+    public String retrieveVariableCategoricalValue(String programUuid, Integer variableId, Integer categoricalValueId) {
+        if (variableId == null || categoricalValueId == null) {
+            return null;
+        }
+
+        Variable variable = this.getVariable(programUuid, variableId, true, false);
+        for (TermSummary summary : variable.getScale().getCategories()) {
+            if (summary.getId().equals(categoricalValueId)) {
+                return summary.getDefinition();
+            }
+        }
+
+        return null;
+
+    }
+
+    private void checkTermIsVariable(CVTerm term) {
 
 		if (term == null) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_DOES_NOT_EXIST);
