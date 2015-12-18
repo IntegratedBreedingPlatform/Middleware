@@ -81,4 +81,6 @@ public interface OntologyVariableDataManager {
 	 * @return Total studies
 	 */
 	Integer getVariableStudies(int variableId);
+
+    String retrieveVariableCategoricalValue(String programUuid, Integer variableId, Integer categoricalValueId);
 }
