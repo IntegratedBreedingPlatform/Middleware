@@ -208,8 +208,10 @@ public abstract class StringUtil {
     public static boolean areBothEmptyOrEqual(String string1, String string2) {
         if (StringUtils.isEmpty(string1) && StringUtils.isEmpty(string2)) {
             return true;
+        } else if(string1 != null || string2 != null) {
+          return string1.equals(string2);
         } else {
-            return string1.equals(string2);
+        	return false;
         }
     }
 
