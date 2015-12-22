@@ -22,6 +22,7 @@ import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -79,7 +80,15 @@ public class ProjectPropertySaver {
 	private List<ProjectProperty> createVariableProperties(final DmsProject project, final DMSVariableType variableType)
 			throws MiddlewareQueryException {
 
-		variableType.setVariableTypeIfNull();
+	  	// Setting property, scale and method to standard variable
+	  	final StandardVariableSummary standardVariableSummary =
+			  this.daoFactory.getStandardVariableBuilder().getStandardVariableSummary(variableType.getStandardVariable().getId());
+
+	  	variableType.getStandardVariable().setProperty(new Term(0, standardVariableSummary.getProperty().getName(), ""));
+	  	variableType.getStandardVariable().setScale(new Term(0, standardVariableSummary.getScale().getName(), ""));
+	  	variableType.getStandardVariable().setMethod(new Term(0, standardVariableSummary.getMethod().getName(), ""));
+
+	  	variableType.setVariableTypeIfNull();
 
 		VariableType variableTypeEnum = variableType.getVariableType();
 
