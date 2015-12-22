@@ -152,6 +152,14 @@ public class ProjectPropertySaver {
 	 */
 	public void saveVariableType(final DmsProject project, final DMSVariableType objDMSVariableType) {
 
+	  // Setting property, scale and method to standard variable
+	  	final StandardVariableSummary standardVariableSummary =
+			  this.daoFactory.getStandardVariableBuilder().getStandardVariableSummary(objDMSVariableType.getStandardVariable().getId());
+
+	  	objDMSVariableType.getStandardVariable().setProperty(new Term(0, standardVariableSummary.getProperty().getName(), ""));
+	  	objDMSVariableType.getStandardVariable().setScale(new Term(0, standardVariableSummary.getScale().getName(), ""));
+	  	objDMSVariableType.getStandardVariable().setMethod(new Term(0, standardVariableSummary.getMethod().getName(), ""));
+
 		objDMSVariableType.setVariableTypeIfNull();
 
 		final org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = objDMSVariableType.getVariableType();
