@@ -92,6 +92,10 @@ public class ExperimentalDesignVariable {
 		return this.getByTermId(TermId.NO_OF_CBLKS_LATINIZE);
 	}
 
+	public MeasurementVariable getExperimentalDesignSource() {
+		return this.getByTermId(TermId.EXPT_DESIGN_SOURCE);
+	}
+
 	/**
 	 * @return the variables
 	 */
