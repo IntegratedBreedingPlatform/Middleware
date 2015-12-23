@@ -11,13 +11,13 @@ public class ExperimentalDesignVariable {
 
 	private List<MeasurementVariable> variables;
 
-	public ExperimentalDesignVariable(List<MeasurementVariable> variables) {
+	public ExperimentalDesignVariable(final List<MeasurementVariable> variables) {
 		this.variables = variables;
 	}
 
-	private MeasurementVariable getByTermId(TermId termId) {
+	private MeasurementVariable getByTermId(final TermId termId) {
 		if (this.variables != null) {
-			for (MeasurementVariable variable : this.variables) {
+			for (final MeasurementVariable variable : this.variables) {
 				if (variable.getTermId() == termId.getId()) {
 					return variable;
 				}
@@ -31,10 +31,10 @@ public class ExperimentalDesignVariable {
 	}
 
 	public String getExperimentalDesignDisplay() {
-		MeasurementVariable variable = this.getByTermId(TermId.EXPERIMENT_DESIGN_FACTOR);
+		final MeasurementVariable variable = this.getByTermId(TermId.EXPERIMENT_DESIGN_FACTOR);
 		if (variable != null && variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
 				&& NumberUtils.isNumber(variable.getValue())) {
-			for (ValueReference ref : variable.getPossibleValues()) {
+			for (final ValueReference ref : variable.getPossibleValues()) {
 				if (ref.getId().equals(Integer.valueOf(variable.getValue()))) {
 					return ref.getDescription();
 				}
@@ -56,10 +56,10 @@ public class ExperimentalDesignVariable {
 	}
 
 	public String getReplicationsMapDisplay() {
-		MeasurementVariable variable = this.getReplicationsMap();
+		final MeasurementVariable variable = this.getReplicationsMap();
 		if (variable != null && variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
 				&& NumberUtils.isNumber(variable.getValue())) {
-			for (ValueReference ref : variable.getPossibleValues()) {
+			for (final ValueReference ref : variable.getPossibleValues()) {
 				if (ref.getId().equals(Integer.valueOf(variable.getValue()))) {
 					return ref.getDescription();
 				}
@@ -106,7 +106,7 @@ public class ExperimentalDesignVariable {
 	/**
 	 * @param variables the variables to set
 	 */
-	public void setVariables(List<MeasurementVariable> variables) {
+	public void setVariables(final List<MeasurementVariable> variables) {
 		this.variables = variables;
 	}
 

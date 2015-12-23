@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.oms;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 /**
  * The cvterm ID constants used in Middleware.
- * 
+ *
  */
 public enum TermId {
 
@@ -166,7 +166,7 @@ public enum TermId {
 	private final int id;
 	private final static Map<Integer, TermId> TERM_ID_MAP = new HashMap<>();
 
-	TermId(int id) {
+	TermId(final int id) {
 		this.id = id;
 	}
 
@@ -174,19 +174,19 @@ public enum TermId {
 		return this.id;
 	}
 
-	public static TermId getById(Integer id) {
+	public static TermId getById(final Integer id) {
 		if (id == null) {
 			return null;
 		}
 
-		if (!TERM_ID_MAP.containsKey(id)) {
-			for (TermId term : TermId.values()) {
+		if (!TermId.TERM_ID_MAP.containsKey(id)) {
+			for (final TermId term : TermId.values()) {
 				if (term.getId() == id) {
 					return term;
 				}
 			}
 		}
 
-		return TERM_ID_MAP.get(id);
+		return TermId.TERM_ID_MAP.get(id);
 	}
 }
