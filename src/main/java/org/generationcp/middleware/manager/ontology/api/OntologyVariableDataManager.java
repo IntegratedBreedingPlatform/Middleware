@@ -82,4 +82,6 @@ public interface OntologyVariableDataManager {
 	 * @return Total studies
 	 */
 	Integer getVariableStudies(int variableId) throws MiddlewareQueryException;
+
+    String retrieveVariableCategoricalValue(String programUuid, Integer variableId, Integer categoricalValueId);
 }

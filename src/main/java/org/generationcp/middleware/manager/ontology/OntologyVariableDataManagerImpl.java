@@ -431,7 +431,8 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 		// sort variable list by variable name
 		Collections.sort(variables, new Comparator<Variable>() {
 
-			@Override public int compare(Variable l, Variable r) {
+			@Override
+			public int compare(Variable l, Variable r) {
 				return l.getName().compareToIgnoreCase(r.getName());
 			}
 		});
@@ -809,7 +810,24 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 		return 0;
 	}
 
-	private void checkTermIsVariable(CVTerm term) throws MiddlewareQueryException {
+    @Override
+    public String retrieveVariableCategoricalValue(String programUuid, Integer variableId, Integer categoricalValueId) {
+        if (variableId == null || categoricalValueId == null) {
+            return null;
+        }
+
+        Variable variable = this.getVariable(programUuid, variableId, true, false);
+        for (TermSummary summary : variable.getScale().getCategories()) {
+            if (summary.getId().equals(categoricalValueId)) {
+                return summary.getDefinition();
+            }
+        }
+
+        return null;
+
+    }
+
+    private void checkTermIsVariable(CVTerm term) {
 
 		if (term == null) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_DOES_NOT_EXIST);
