@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.ContextHolder;
@@ -181,7 +180,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
     @Test
     public void testGetCategoricalValue() throws Exception {
         createTestVariableWithCategoricalValue();
-        Scale scale = this.scaleManager.getScaleById(this.testScale.getId(), true);
+        Scale scale = this.scaleManager.getScale(this.testScale.getId(), true);
         TermSummary categorical = scale.getCategories().get(0);
 		Assert.assertEquals("Unable to retrieve the categorical value of a variable", categorical.getDefinition(),
 				this.variableManager.retrieveVariableCategoricalValue(this.testProject.getUniqueID(), this.testVariableInfo.getId(), categorical.getId()));

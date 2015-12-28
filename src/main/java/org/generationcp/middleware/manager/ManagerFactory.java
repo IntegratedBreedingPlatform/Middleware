@@ -242,7 +242,9 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public OntologyDaoFactory getOntologyDaoFactory() {
-		return new OntologyDaoFactory(this.sessionProvider);
+	  OntologyDaoFactory daoFactory = new OntologyDaoFactory();
+	  daoFactory.setSessionProvider(getSessionProvider());
+	  return daoFactory;
 	}
 
 	public StandardVariableTransformer getStandardVariableTransformer() {
