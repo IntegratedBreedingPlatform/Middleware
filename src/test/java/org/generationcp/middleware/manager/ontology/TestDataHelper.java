@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.pojos.oms.CV;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
@@ -46,6 +47,18 @@ public class TestDataHelper {
 		for (int i = 0; i < count; i++) {
 			Property property = TestDataHelper.generateProperty();
 			properties.put(property.getId(), property);
+		}
+	}
+
+	/**
+	 * Function to fill Scales as per the count
+	 * @param scaleMap put scale Id and scale
+	 * @param count generate no. of count scales
+	 */
+	public static void fillTestScales(Map<Integer, Scale> scaleMap, int count) {
+		for (int i = 0; i < count; i++) {
+			Scale scale = TestDataHelper.generateScale();
+			scaleMap.put(scale.getId(), scale);
 		}
 	}
 
@@ -90,6 +103,21 @@ public class TestDataHelper {
 	}
 
 	/**
+	 * Function to generate new scale
+	 * @return generated scale
+	 */
+	public static Scale generateScale() {
+		Scale scale = new Scale();
+		scale.setId(UnitTestDaoIDGenerator.generateId(Scale.class));
+		scale.setName(getNewRandomName("Name"));
+		scale.setDefinition("description");
+		scale.setDataType(DataType.NUMERIC_VARIABLE);
+		scale.setMinValue("10");
+		scale.setMaxValue("100");
+		return scale;
+	}
+
+	/**
 	 * Fill properties for created date for any term (Method, Scale, Property, Variable)
 	 * Supplied Current date to control created date.
 	 */
@@ -106,6 +134,12 @@ public class TestDataHelper {
 		}
 	}
 
+	public static void fillTestCreatedDatePropertyForScale(List<Scale> scaleList, List<CVTermProperty> properties, Date currentDate) {
+		for (Scale scale : scaleList) {
+			properties.add(getTestProperty(scale.getId(), TermId.CREATION_DATE, ISO8601DateParser.toString(currentDate), 0));
+		}
+	}
+
 	/**
 	 * Fill properties for last update date for any term (Method, Scale, Property, Variable)
 	 * Supplied Current date to control modified date.
@@ -119,6 +153,12 @@ public class TestDataHelper {
 	public static void fillTestUpdatedDatePropertyProps(List<Property> propertyList, List<CVTermProperty> properties, Date currentDate) {
 		for (Property property : propertyList) {
 			properties.add(getTestProperty(property.getId(), TermId.LAST_UPDATE_DATE, ISO8601DateParser.toString(currentDate), 0));
+		}
+	}
+
+	public static void fillTestUpdatedDatePropertyForScale(List<Scale> scaleList, List<CVTermProperty> properties, Date currentDate) {
+		for (Scale scale : scaleList) {
+			properties.add(getTestProperty(scale.getId(), TermId.LAST_UPDATE_DATE, ISO8601DateParser.toString(currentDate), 0));
 		}
 	}
 
