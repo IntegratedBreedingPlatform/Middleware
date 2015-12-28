@@ -31,13 +31,19 @@ public class ExperimentalDesignVariable {
 	}
 
 	public String getExperimentalDesignDisplay() {
-		final MeasurementVariable variable = this.getByTermId(TermId.EXPERIMENT_DESIGN_FACTOR);
-		if (variable != null && variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
+		final MeasurementVariable variable = this.getExperimentalDesign();
+		final MeasurementVariable exptDesignSource = this.getExperimentalDesignSource();
+		if (Integer.valueOf(variable.getValue()) == TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId() && exptDesignSource != null) {
+			return "Alpha Lattice";
+		} else if (variable != null && variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
 				&& NumberUtils.isNumber(variable.getValue())) {
 			for (final ValueReference ref : variable.getPossibleValues()) {
 				if (ref.getId().equals(Integer.valueOf(variable.getValue()))) {
 					return ref.getDescription();
 				}
+			}
+			if (exptDesignSource != null) {
+				return "Other design";
 			}
 		}
 		return "";
