@@ -164,7 +164,7 @@ public enum TermId {
 	;
 
 	private final int id;
-	private final static Map<Integer, TermId> TERM_ID_MAP = new HashMap<>();
+	private static final Map<Integer, TermId> TERM_ID_MAP = new HashMap<>();
 
 	TermId(final int id) {
 		this.id = id;
