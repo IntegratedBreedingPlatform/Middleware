@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Ordering;
 import org.generationcp.middleware.UnitTestBase;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
@@ -29,6 +31,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.util.ISO8601DateParser;
+import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.utils.test.UnitTestDaoIDGenerator;
 import org.junit.Assert;
 import org.junit.Before;
@@ -109,29 +112,23 @@ public class OntologyMethodDataManagerImplUnitTest extends UnitTestBase {
 		combinedProperties.addAll(methodUpdatedDateProperties);
 
 		Mockito.when(this.cvTermPropertyDao.getByCvTermIds(new ArrayList<>(termMap.keySet()))).thenReturn(combinedProperties);
+		Mockito.when(this.daoFactory.getCvTermDao().getAllByCvId(CvId.METHODS, true)).thenReturn(methodTerms);
 
 		// Fetch all methods and check our last inserted method exists or not
 		List<Method> methods = this.methodDataManager.getAllMethods();
 
-		// Iterate all methods and find our inserted method and assert it
-		for (Method m : methods) {
-			// Make sure our method exists and is inserted properly and display proper message if it is not inserted properly
-			String message = "The %s for method '" + m.getId() + "' was not added correctly.";
-			if (termMap.containsKey(m.getId())) {
-				CVTerm methodTerm = termMap.get(m.getId());
-				String createdDateProperty = createDateMap.get(m.getId());
-				String updatedDateProperty = updateDateMap.get(m.getId());
+		List<String> methodNames = Util.convertAll(methods, new Function<Method, String>() {
 
-				Assert.assertEquals(String.format(message, "Name"), methodTerm.getName(), m.getName());
-				Assert.assertEquals(String.format(message, "Definition"), methodTerm.getDefinition(), m.getDefinition());
-				Assert.assertEquals(String.format(message, "IsObsolete"), methodTerm.isObsolete(), m.isObsolete());
-				Assert.assertEquals(String.format(message, "CreatedDate"), createdDateProperty,
-						ISO8601DateParser.toString(m.getDateCreated()));
-				Assert.assertEquals(String.format(message, "UpdatedDate"), updatedDateProperty,
-						ISO8601DateParser.toString(m.getDateLastModified()));
-
+			@Override
+			public String apply(Method x) {
+				return x.getName();
 			}
-		}
+		});
+
+		final boolean methodNameIsOrdered = Ordering.natural().isOrdered(methodNames);
+
+		Assert.assertEquals(methodTerms.size(), methods.size());
+		Assert.assertTrue(methodNameIsOrdered);
 	}
 
 	/*
