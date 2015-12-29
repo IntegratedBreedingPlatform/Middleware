@@ -124,6 +124,9 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 					Integer markerId = (Integer) row[2];
 					Double startPosition = (Double) row[3];
 					Double endPosition = (Double) row[4];
+					if(endPosition == null) {
+						endPosition = (Double) row[3];
+					}
 					String linkageGroup = (String) row[5];
 
 					markersOnMap.add(new MarkerOnMap(markerOnMapId, mapId2, markerId, startPosition.floatValue(), endPosition.floatValue(),
