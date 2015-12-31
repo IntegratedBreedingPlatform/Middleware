@@ -3,23 +3,25 @@ package org.generationcp.middleware.service;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
 
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
+import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.reports.AbstractReporter;
 import org.generationcp.middleware.reports.BuildReportException;
 import org.generationcp.middleware.reports.Reporter;
 import org.generationcp.middleware.reports.ReporterFactory;
@@ -45,8 +47,8 @@ public class ReportServiceImpl extends Service implements ReportService {
 	}
 
 	@Override
-	public JasperPrint getPrintReport(String code, Integer studyId) throws MiddlewareException, MiddlewareQueryException, JRException,
-			IOException, BuildReportException {
+	public JasperPrint getPrintReport(String code, Integer studyId) throws MiddlewareException, JRException, IOException,
+			BuildReportException {
 
 		Reporter reporter = this.factory.createReporter(code);
 		Map<String, Object> dataBeans = this.extractFieldbookData(studyId, reporter.isParentsInfoRequired());
@@ -56,11 +58,12 @@ public class ReportServiceImpl extends Service implements ReportService {
 	}
 
 	@Override
-	public Reporter getStreamReport(String code, Integer studyId, OutputStream output) throws MiddlewareException,
-			MiddlewareQueryException, JRException, IOException, BuildReportException {
+	public Reporter getStreamReport(String code, Integer studyId, String programName, OutputStream output) throws MiddlewareException,
+			JRException, IOException, BuildReportException {
 
 		Reporter reporter = this.factory.createReporter(code);
 		Map<String, Object> dataBeans = this.extractFieldbookData(studyId, reporter.isParentsInfoRequired());
+		dataBeans.put(AbstractReporter.PROGRAM_NAME_ARG_KEY, programName);
 
 		reporter.buildJRPrint(dataBeans);
 		reporter.asOutputStream(output);
@@ -79,18 +82,57 @@ public class ReportServiceImpl extends Service implements ReportService {
 		StudyType studyType = this.getStudyDataManager().getStudyType(studyId);
 		Workbook wb = this.getWorkbookBuilder().create(studyId, studyType);
 		List<MeasurementRow> observations = wb.getObservations();
+		List<MeasurementVariable> studyConditions = appendCountryInformation(wb.getConditions());
 
 		if (parentsInfoRequireed) {
 			this.appendParentsInformation(studyId, observations);
 		}
 
 		Map<String, Object> dataBeans = new HashMap<>();
-		dataBeans.put("studyConditions", wb.getConditions()); // List<MeasurementVariable>
+		dataBeans.put("studyConditions", studyConditions); // List<MeasurementVariable>
 		dataBeans.put("dataSource", observations); // list<measurementRow>
 		dataBeans.put("studyObservations", wb.getTrialObservations());// list<measurementRow>
 		dataBeans.put("studyId", studyId);// list<measurementRow>
 
 		return dataBeans;
+	}
+
+	protected List<MeasurementVariable> appendCountryInformation(List<MeasurementVariable> originalConditions) {
+		Integer locationId = null;
+
+		for (MeasurementVariable condition : originalConditions) {
+			TermId term = TermId.getById(condition.getTermId());
+			if (term == TermId.LOCATION_ID) {
+				locationId = Integer.parseInt(condition.getValue());
+			}
+		}
+
+		if (locationId == null) {
+			return originalConditions;
+		} else {
+			List<MeasurementVariable> variables = new ArrayList<>(originalConditions);
+
+			Location location = getLocationDataManager().getLocationByID(locationId);
+
+			if ((location.getCntryid() != null && location.getCntryid() != 0)) {
+				Country country = getCountryDao().getById(location.getCntryid());
+
+				MeasurementVariable countryInfo = new MeasurementVariable();
+				countryInfo.setName(AbstractReporter.COUNTRY_VARIABLE_NAME);
+				countryInfo.setValue(country.getIsofull());
+
+				variables.add(countryInfo);
+			}
+
+			MeasurementVariable abbrevInfo = new MeasurementVariable();
+			abbrevInfo.setName(AbstractReporter.LOCATION_ABBREV_VARIABLE_NAME);
+			abbrevInfo.setValue(location.getLabbr());
+
+			variables.add(abbrevInfo);
+
+			return variables;
+
+		}
 	}
 
 	@Override
