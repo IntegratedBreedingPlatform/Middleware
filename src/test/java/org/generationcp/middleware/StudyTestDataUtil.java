@@ -25,8 +25,8 @@ public class StudyTestDataUtil {
 
 	private OntologyDataManager ontologyManager;
 
-	private static final String TEST_FOLDER_NAME = "TEST_FOLDER_NAME";
-	private static final String TEST_FOLDER_DESC = "TEST_FOLDER_DESC";
+	public static final String TEST_FOLDER_NAME = "TEST_FOLDER_NAME";
+	public static final String TEST_FOLDER_DESC = "TEST_FOLDER_DESC";
 
 	public StudyTestDataUtil(StudyDataManager studyDataManager, OntologyDataManager ontologyManager) {
 		this.studyDataManager = studyDataManager;
