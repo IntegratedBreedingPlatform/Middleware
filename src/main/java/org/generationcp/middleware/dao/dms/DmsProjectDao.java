@@ -943,12 +943,36 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return studyNodes;
 	}
 
+    @SuppressWarnings("rawtypes")
+    public boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID) throws MiddlewareQueryException {
+        try {
+            Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+            criteria.add(Restrictions.eq("name", name));
+            criteria.add(Restrictions.eq("programUUID", programUUID));
+
+            List list = criteria.list();
+            if (list != null && !list.isEmpty()) {
+                return true;
+            }
+
+        } catch (HibernateException e) {
+            this.logAndThrowException("Error in checkIfProjectNameIsExisting=" + name + " query on DmsProjectDao: " + e.getMessage(), e);
+        }
+
+        return false;
+    }
+
 	@SuppressWarnings("rawtypes")
-	public boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID) throws MiddlewareQueryException {
+	public boolean checkIfProjectNameIsExistingInProgramAndParent(String name, String programUUID, Integer parentProjectId) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+            criteria.createAlias("relatedTos", "r");
+            criteria.createAlias("r.objectProject", "objectProject");
 			criteria.add(Restrictions.eq("name", name));
 			criteria.add(Restrictions.eq("programUUID", programUUID));
+
+            // the following restricts the check to within the parent project / folder
+            criteria.add(Restrictions.eq("objectProject.projectId", parentProjectId));
 
 			List list = criteria.list();
 			if (list != null && !list.isEmpty()) {
@@ -956,7 +980,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in checkIfProjectNameIsExisting=" + name + " query on DmsProjectDao: " + e.getMessage(), e);
+			this.logAndThrowException("Error in checkIfProjectNameIsExistingInProgramAndParent=" + name + " query on DmsProjectDao: " + e.getMessage(), e);
 		}
 
 		return false;
