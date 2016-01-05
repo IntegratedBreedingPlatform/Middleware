@@ -71,7 +71,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 			termMap.put(term.getCvTermId(), term);
 		}
 
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> methodCreatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(methodTerms, methodCreatedDateProperties, testCreatedDate);
 
@@ -83,7 +83,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 			createdDateMap.put(property.getCvTermId(), property.getValue());
 		}
 
-		Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		List<CVTermProperty> methodUpdatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(methodTerms, methodUpdatedDateProperties, testUpdatedDate);
 
@@ -130,7 +130,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
         this.termDao.save(methodTerm);
 
 		// Fill Test Created Date Property using TestDataHelper
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> methodCreatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(methodTerm), methodCreatedDateProperties, testCreatedDate);
 
@@ -138,7 +138,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
         this.propertyDao.save(methodCreatedDateProperty);
 
 		// Fill Test Updated Date Property using TestDataHelper
-		Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		List<CVTermProperty> methodUpdatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(methodTerm), methodUpdatedDateProperties, testUpdatedDate);
 
@@ -167,7 +167,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 		method.setName(TestDataHelper.getNewRandomName("Name"));
 		method.setDefinition("Test Definition");
 
-		Date date = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date date = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		this.stubCurrentDate(date);
 
 		this.manager.addMethod(method);
@@ -197,7 +197,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
         this.termDao.save(methodTerm);
 
 		// Fill Test Created Date Property using TestDataHelper
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> methodCreatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(methodTerm), methodCreatedDateProperties, testCreatedDate);
 
@@ -210,7 +210,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
 		method.setName("New Method Name");
 		method.setDefinition("New Method Definition");
 
-		Date date = constructDate(2015, Calendar.JANUARY, 1);
+		Date date = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		this.stubCurrentDate(date);
 
 		this.manager.updateMethod(method);
@@ -258,7 +258,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
         this.termDao.save(methodTerm);
 
 		// Fill Test Created Date Property using TestDataHelper
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> methodCreatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(methodTerm), methodCreatedDateProperties, testCreatedDate);
 
@@ -267,7 +267,7 @@ public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTes
         this.propertyDao.save(methodCreatedDateProperty);
 
 		// Fill Test Updated Date Property using TestDataHelper
-		Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		List<CVTermProperty> methodUpdatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(methodTerm), methodUpdatedDateProperties, testUpdatedDate);
 

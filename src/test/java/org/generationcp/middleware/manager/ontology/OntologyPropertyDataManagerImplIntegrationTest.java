@@ -74,7 +74,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 
         //Save created date
         Map<Integer, String> createdDateMap = new HashMap<>();
-        Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+        Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
         List<CVTermProperty> createdDateProperties = new ArrayList<>();
         TestDataHelper.fillTestCreatedDateProperties(propertyTerms, createdDateProperties, testCreatedDate);
 
@@ -85,7 +85,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 
         //Save last modification date
         Map<Integer, String> updateDateMap = new HashMap<>();
-        Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
+        Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
         List<CVTermProperty> updatedDateProperties = new ArrayList<>();
         TestDataHelper.fillTestUpdatedDateProperties(propertyTerms, updatedDateProperties, testUpdatedDate);
 
@@ -146,7 +146,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 
         this.propertyDao.updateOrDeleteProperty(propertyTerm.getCvTermId(), TermId.CROP_ONTOLOGY_ID.getId(), cropOntologyId, 0);
 
-        Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+        Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
         List<CVTermProperty> createdDateProperties = new ArrayList<>();
         TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(propertyTerm), createdDateProperties, testCreatedDate);
 
@@ -154,7 +154,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
         this.propertyDao.save(createProperty);
 
         //Save last modification date
-        Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
+        Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
         List<CVTermProperty> updatedDateProperties = new ArrayList<>();
         TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(propertyTerm), updatedDateProperties, testUpdatedDate);
 
@@ -193,7 +193,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 		property.addClass("Test Class2");
 		property.setCropOntologyId("CO:321");
 
-		Date date = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date date = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		this.stubCurrentDate(date);
 
 		this.manager.addProperty(property);
@@ -264,7 +264,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 
 		this.propertyDao.updateOrDeleteProperty(propertyTerm.getCvTermId(), TermId.CROP_ONTOLOGY_ID.getId(), cropOntologyId, 0);
 
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> createdDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(propertyTerm), createdDateProperties, testCreatedDate);
 
@@ -272,7 +272,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 		this.propertyDao.save(createProperty);
 
 		//Save last modification date
-		Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		List<CVTermProperty> updatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(propertyTerm), updatedDateProperties, testUpdatedDate);
 
@@ -288,7 +288,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 		updatedProperty.addClass(isATerms.get(2).getName());
 		updatedProperty.setCropOntologyId("CO:123");
 
-		Date date = constructDate(2015, Calendar.JANUARY, 1);
+		Date date = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		this.stubCurrentDate(date);
 
 		this.manager.updateProperty(updatedProperty);
@@ -374,7 +374,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 		this.propertyDao.updateOrDeleteProperty(propertyTerm.getCvTermId(), TermId.CROP_ONTOLOGY_ID.getId(), cropOntologyId, 0);
 
 		// Fill Test Created Date Property using TestDataHelper
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> createdDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(propertyTerm), createdDateProperties, testCreatedDate);
 
@@ -383,7 +383,7 @@ public class OntologyPropertyDataManagerImplIntegrationTest extends IntegrationT
 		this.propertyDao.save(createdDateProperty);
 
 		// Fill Test Updated Date Property using TestDataHelper
-		Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		List<CVTermProperty> updatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(propertyTerm), updatedDateProperties, testUpdatedDate);
 

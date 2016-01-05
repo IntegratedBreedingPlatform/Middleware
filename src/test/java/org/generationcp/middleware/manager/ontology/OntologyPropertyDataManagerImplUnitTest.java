@@ -73,12 +73,12 @@ public class OntologyPropertyDataManagerImplUnitTest extends UnitTestBase{
 		TestDataHelper.fillTestProperties(propertyMap, 3);
 
 		// Fill Test Created Date Property
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> createdDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDatePropertyProps(new ArrayList<>(propertyMap.values()), createdDateProperties, testCreatedDate);
 
 		// Fill Test Updated Date Property
-		Date testUpdatedDate = this.constructDate(2015, Calendar.JUNE, 30);
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.JUNE, 30);
 		List<CVTermProperty> updatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDatePropertyProps(new ArrayList<>(propertyMap.values()), updatedDateProperties, testUpdatedDate);
 
@@ -111,12 +111,12 @@ public class OntologyPropertyDataManagerImplUnitTest extends UnitTestBase{
 		TestDataHelper.fillTestProperties(propertyMap, 1);
 
 		// Fill Test Created Date Property
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> createdDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDatePropertyProps(new ArrayList<>(propertyMap.values()), createdDateProperties, testCreatedDate);
 
 		// Fill Test Updated Date Property
-		Date testUpdatedDate = this.constructDate(2015, Calendar.JUNE, 30);
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.JUNE, 30);
 		List<CVTermProperty> updatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDatePropertyProps(new ArrayList<>(propertyMap.values()), updatedDateProperties, testUpdatedDate);
 
@@ -179,7 +179,7 @@ public class OntologyPropertyDataManagerImplUnitTest extends UnitTestBase{
 		cvTerm.setIsObsolete(false);
 		cvTerm.setIsRelationshipType(false);
 
-		Date date = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date date = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		this.stubCurrentDate(date);
 
 		Mockito.when(this.cvTermDao.getByNameAndCvId(property.getName(), CvId.PROPERTIES.getId())).thenReturn(null);
@@ -249,7 +249,7 @@ public class OntologyPropertyDataManagerImplUnitTest extends UnitTestBase{
 		cvTerm.setIsObsolete(false);
 		cvTerm.setIsRelationshipType(false);
 
-		Date date = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date date = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		this.stubCurrentDate(date);
 
 		Mockito.when(this.cvTermDao.getByNameAndCvId(property.getName(), CvId.PROPERTIES.getId())).thenReturn(null);
@@ -292,7 +292,7 @@ public class OntologyPropertyDataManagerImplUnitTest extends UnitTestBase{
 		Mockito.when(this.cvTermDao.getById(propertyTerm.getCvTermId())).thenReturn(propertyTerm);
 		Mockito.when(this.cvTermDao.merge(propertyTerm)).thenReturn(propertyTerm);
 
-		Date updatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		Date updatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		this.stubCurrentDate(updatedDate);
 
 		this.propertyDataManager.updateProperty(property);
@@ -346,12 +346,12 @@ public class OntologyPropertyDataManagerImplUnitTest extends UnitTestBase{
 		cvTermRelationships.add(cvTermRelationship);
 
 		// Fill Test Created Date Property
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> createdDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(propertyTerm), createdDateProperties, testCreatedDate);
 
 		// Fill Test Updated Date Property
-		Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		List<CVTermProperty> updatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(propertyTerm), updatedDateProperties, testUpdatedDate);
 
@@ -414,12 +414,12 @@ public class OntologyPropertyDataManagerImplUnitTest extends UnitTestBase{
 		cvTermRelationships.add(cvTermRelationship);
 
 		// Fill Test Created Date Property
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> createdDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(propertyTerm), createdDateProperties, testCreatedDate);
 
 		// Fill Test Updated Date Property
-		Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		List<CVTermProperty> updatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(propertyTerm), updatedDateProperties, testUpdatedDate);
 
@@ -451,12 +451,12 @@ public class OntologyPropertyDataManagerImplUnitTest extends UnitTestBase{
 		cvTermRelationships.add(cvTermRelationship);
 
 		// Fill Test Created Date Property
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> createdDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(propertyTerm), createdDateProperties, testCreatedDate);
 
 		// Fill Test Updated Date Property
-		Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		List<CVTermProperty> updatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(propertyTerm), updatedDateProperties, testUpdatedDate);
 

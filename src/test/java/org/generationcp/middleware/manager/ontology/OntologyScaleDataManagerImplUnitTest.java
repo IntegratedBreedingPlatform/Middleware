@@ -130,12 +130,12 @@ public class OntologyScaleDataManagerImplUnitTest extends UnitTestBase {
 		TestDataHelper.fillTestScales(scaleMap, 3);
 
 		// Fill Test Created Date Property
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> createdDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDatePropertyForScale(new ArrayList<>(scaleMap.values()), createdDateProperties, testCreatedDate);
 
 		// Fill Test Updated Date Property
-		Date testUpdatedDate = this.constructDate(2015, Calendar.JUNE, 30);
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.JUNE, 30);
 		List<CVTermProperty> updatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDatePropertyForScale(new ArrayList<>(scaleMap.values()), updatedDateProperties, testUpdatedDate);
 
@@ -183,12 +183,12 @@ public class OntologyScaleDataManagerImplUnitTest extends UnitTestBase {
 		TestDataHelper.fillTestScales(scaleMap, 1);
 
 		// Fill Test created date property
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> createdDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDatePropertyForScale(new ArrayList<>(scaleMap.values()), createdDateProperties, testCreatedDate);
 
 		// Fill Test updated date property
-		Date testUpdatedDate = this.constructDate(2015, Calendar.JUNE, 30);
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.JUNE, 30);
 		List<CVTermProperty> updatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDatePropertyForScale(new ArrayList<>(scaleMap.values()), updatedDateProperties, testUpdatedDate);
 
@@ -248,7 +248,7 @@ public class OntologyScaleDataManagerImplUnitTest extends UnitTestBase {
 		cvTerm.setIsObsolete(false);
 		cvTerm.setIsRelationshipType(false);
 
-		Date date = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date date = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		this.stubCurrentDate(date);
 
 		Mockito.when(this.cvTermDao.getByNameAndCvId(scale.getName(), CvId.SCALES.getId())).thenReturn(null);
@@ -288,7 +288,7 @@ public class OntologyScaleDataManagerImplUnitTest extends UnitTestBase {
 		cvTerm.setIsObsolete(false);
 		cvTerm.setIsRelationshipType(false);
 
-		Date date = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date date = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		this.stubCurrentDate(date);
 
 		Mockito.when(this.cvTermDao.getByNameAndCvId(scale.getName(), CvId.SCALES.getId())).thenReturn(null);
@@ -370,7 +370,7 @@ public class OntologyScaleDataManagerImplUnitTest extends UnitTestBase {
 		TermSummary termSummary = new TermSummary(501, "Category", "Definition");
 		scale.addCategory(termSummary);
 
-		Date updatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		Date updatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		this.stubCurrentDate(updatedDate);
 
 		//Relationship
@@ -431,7 +431,7 @@ public class OntologyScaleDataManagerImplUnitTest extends UnitTestBase {
 		TermSummary termSummary = new TermSummary(501, "Category", "Definition");
 		scale.addCategory(termSummary);
 
-		Date updatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		Date updatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		this.stubCurrentDate(updatedDate);
 
 		//Relationship
@@ -482,7 +482,7 @@ public class OntologyScaleDataManagerImplUnitTest extends UnitTestBase {
 		scale.setMinValue("1");
 		scale.setMaxValue("100");
 
-		Date updatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		Date updatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		this.stubCurrentDate(updatedDate);
 
 		//Relationship
@@ -654,7 +654,7 @@ public class OntologyScaleDataManagerImplUnitTest extends UnitTestBase {
 		CVTerm scaleTerm = TestDataHelper.getTestCvTerm(CvId.SCALES);
 
 		// Fill Test Created Date Property
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> createdDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(scaleTerm), createdDateProperties, testCreatedDate);
 
@@ -702,7 +702,7 @@ public class OntologyScaleDataManagerImplUnitTest extends UnitTestBase {
 		CVTerm scaleTerm = TestDataHelper.getTestCvTerm(CvId.SCALES);
 
 		// Fill Test Created Date Property
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> createdDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(scaleTerm), createdDateProperties, testCreatedDate);
 

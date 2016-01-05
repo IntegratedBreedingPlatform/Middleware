@@ -87,7 +87,7 @@ public class OntologyMethodDataManagerImplUnitTest extends UnitTestBase {
 		}
 
 		// Fill Test Created Date Property
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> methodCreatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(methodTerms, methodCreatedDateProperties, testCreatedDate);
 
@@ -97,7 +97,7 @@ public class OntologyMethodDataManagerImplUnitTest extends UnitTestBase {
 		}
 
 		// Fill Test Updated Date Property
-		Date testUpdatedDate = this.constructDate(2015, Calendar.JUNE, 30);
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.JUNE, 30);
 		List<CVTermProperty> methodUpdatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(methodTerms, methodUpdatedDateProperties, testUpdatedDate);
 
@@ -140,12 +140,12 @@ public class OntologyMethodDataManagerImplUnitTest extends UnitTestBase {
 		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
 
 		// Fill Test Created Date Property
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> methodCreatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(methodTerm), methodCreatedDateProperties, testCreatedDate);
 
 		// Fill Test Updated Date Property
-		Date testUpdatedDate = this.constructDate(2015, Calendar.JUNE, 30);
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.JUNE, 30);
 		List<CVTermProperty> methodUpdatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(methodTerm), methodUpdatedDateProperties, testUpdatedDate);
 
@@ -202,7 +202,7 @@ public class OntologyMethodDataManagerImplUnitTest extends UnitTestBase {
 		Mockito.when(this.cvTermDao.save(method.getName(), method.getDefinition(), CvId.METHODS)).thenReturn(cvTerm);
 
 		//Stubbing createdDate to be used in addMethod
-		Date createdDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date createdDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		this.stubCurrentDate(createdDate);
 
 		this.methodDataManager.addMethod(method);
@@ -274,7 +274,7 @@ public class OntologyMethodDataManagerImplUnitTest extends UnitTestBase {
 		Mockito.when(this.cvTermDao.merge(cvTerm)).thenReturn(cvTerm);
 
 		//Stubbing createdDate to be used in addMethod
-		Date updatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		Date updatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		this.stubCurrentDate(updatedDate);
 
 		this.methodDataManager.updateMethod(method);
@@ -319,12 +319,12 @@ public class OntologyMethodDataManagerImplUnitTest extends UnitTestBase {
 		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
 
 		// Fill Test Created Date Property
-		Date testCreatedDate = this.constructDate(2015, Calendar.JANUARY, 1);
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> methodCreatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(methodTerm), methodCreatedDateProperties, testCreatedDate);
 
 		// Fill Test Updated Date Property
-		Date testUpdatedDate = this.constructDate(2015, Calendar.MAY, 20);
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		List<CVTermProperty> methodUpdatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(methodTerm), methodUpdatedDateProperties, testUpdatedDate);
 

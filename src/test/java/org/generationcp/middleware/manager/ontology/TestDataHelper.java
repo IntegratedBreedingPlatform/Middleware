@@ -1,6 +1,7 @@
 package org.generationcp.middleware.manager.ontology;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -326,5 +327,12 @@ public class TestDataHelper {
 			categoryMap.put(scaleTerms.get(i).getCvTermId(), categories);
 			sTermIndex++;
 		}
+	}
+
+	public static Date constructDate(int year, int month, int day) {
+		// Fill Test Created Date Property using TestDataHelper
+		Calendar cal = Calendar.getInstance();
+		cal.set(year, month, day);
+		return cal.getTime();
 	}
 }
