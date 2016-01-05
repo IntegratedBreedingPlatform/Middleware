@@ -2,10 +2,12 @@ package org.generationcp.middleware.manager.ontology;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 
@@ -17,8 +19,12 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.pojos.oms.CV;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
@@ -327,6 +333,150 @@ public class TestDataHelper {
 			categoryMap.put(scaleTerms.get(i).getCvTermId(), categories);
 			sTermIndex++;
 		}
+	}
+
+	/**
+	 * Function to create Method
+	 * @param termDao used to save Method
+	 * @param methodDataManager used to get method
+	 * @return created Method
+	 */
+	public static Method createMethod(CVTermDao termDao, OntologyMethodDataManager methodDataManager) {
+		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
+		termDao.save(methodTerm);
+
+		return methodDataManager.getMethod(methodTerm.getCvTermId(), true);
+	}
+
+	/**
+	 * Function to create Property
+	 * @param termDao used to save property term
+	 * @param propertyDataManager used to get property
+	 * @return created Property
+	 */
+	public static Property createProperty(CVTermDao termDao, OntologyPropertyDataManager propertyDataManager) {
+		CVTerm propertyTerm = getTestCvTerm(CvId.PROPERTIES);
+		termDao.save(propertyTerm);
+
+		return propertyDataManager.getProperty(propertyTerm.getCvTermId(), true);
+	}
+
+	/**
+	 * Function to fill Is A term for Property
+	 * @param relationshipDao used to save relationship of Property and is a term
+	 * @param termDao used to generate new is a term
+	 * @param propertyTerm used as Property Term
+	 * @param isATermMap map for is a term
+	 */
+	public static void fillIsAPropertyMap(CVTermRelationshipDao relationshipDao, CVTermDao termDao, CVTerm propertyTerm, Map<Integer, CVTerm> isATermMap) {
+		final Integer isATermCount = 2;
+		List<CVTerm> isATerms = generateNewIsATerms(isATermCount, termDao);
+		relationshipDao.save(propertyTerm.getCvTermId(), TermId.IS_A.getId(), isATerms.get(0).getCvTermId());
+
+		isATermMap.put(propertyTerm.getCvTermId(), isATerms.get(0));
+	}
+
+	/**
+	 * Function to fill Crop Ontology Id Map for Property
+	 * @param propertyDao used to save Crop Ontology Id for Property
+	 * @param propertyTerm used as Property Term
+	 * @param cropOntologyMap map for Crop Ontology Id
+	 */
+	public static void fillCropOntologyIdMap(CvTermPropertyDao propertyDao, CVTerm propertyTerm, Map<Integer, String> cropOntologyMap) {
+		String cropOntologyId = getNewRandomName("CO:");
+
+		propertyDao.updateOrDeleteProperty(propertyTerm.getCvTermId(), TermId.CROP_ONTOLOGY_ID.getId(), cropOntologyId, 0);
+		cropOntologyMap.put(propertyTerm.getCvTermId(), cropOntologyId);
+	}
+
+	/**
+	 * Function to create Scale
+	 * @param termDao used to save scale term
+	 * @param scaleDataManager used to get scale
+	 * @return created Scale
+	 */
+	public static Scale createScale(CVTermDao termDao, OntologyScaleDataManager scaleDataManager) {
+		CVTerm scaleTerm = TestDataHelper.getTestCvTerm(CvId.SCALES);
+		termDao.save(scaleTerm);
+
+		return scaleDataManager.getScale(scaleTerm.getCvTermId(), true);
+	}
+
+	/**
+	 * Function to fill Data Types for Scale
+	 * @param relationshipDao used to save relationship for Scale and Data type
+	 * @param scaleTerm used as a Scale Term
+	 * @param dataTypeMap map for Scale Term and its Data Types
+	 */
+	public static void fillDataTypeMap(CVTermRelationshipDao relationshipDao, CVTerm scaleTerm, Map<Integer, DataType> dataTypeMap) {
+		relationshipDao.save(scaleTerm.getCvTermId(), TermId.HAS_TYPE.getId(), DataType.NUMERIC_VARIABLE.getId());
+
+		dataTypeMap.put(scaleTerm.getCvTermId(), DataType.NUMERIC_VARIABLE);
+	}
+
+	/**
+	 * Function to fill Maximum values for Scale
+	 * @param propertyDao used to save maximum value for Scale
+	 * @param scaleTerm used as a Scale Term
+	 * @param maxValuesMap map for Scale Term and its Maximum Value
+	 */
+	public static void fillMaxValuesMap(CvTermPropertyDao propertyDao, CVTerm scaleTerm, Map<Integer, String> maxValuesMap) {
+		Integer High = 500;
+		Integer Low = 100;
+		Integer max = new Random().nextInt(High - Low) + Low;
+
+		maxValuesMap.put(scaleTerm.getCvTermId(), String.valueOf(max));
+
+		propertyDao.updateOrDeleteProperty(scaleTerm.getCvTermId(), TermId.MAX_VALUE.getId(), String.valueOf(max), 0);
+
+	}
+
+	/**
+	 * Function to fill Minimum values for Scale
+	 * @param propertyDao used to save maximum value for Scale
+	 * @param scaleTerm used as a Scale Term
+	 * @param minValuesMap map for Scale Term and its Maximum Value
+	 */
+	public static void fillMinValuesMap(CvTermPropertyDao propertyDao, CVTerm scaleTerm, Map<Integer, String> minValuesMap) {
+		Integer High = 50;
+		Integer Low = 1;
+		Integer min = new Random().nextInt(High - Low) + Low;
+
+		minValuesMap.put(scaleTerm.getCvTermId(), String.valueOf(min));
+
+		propertyDao.updateOrDeleteProperty(scaleTerm.getCvTermId(), TermId.MIN_VALUE.getId(), String.valueOf(min), 0);
+	}
+
+	/**
+	 * Function to fill map for Created Date and Updated Date Properties
+	 * @param propertyDao used to save created date and updated date properties
+	 * @param term used as term
+	 * @param createdDateFlag used to set created date based on its true / false value
+	 * @param dateMap map for data types
+	 */
+	public static void fillTestDateProperties(CvTermPropertyDao propertyDao, CVTerm term, Boolean createdDateFlag, Map<Integer, String> dateMap) {
+		Date testDate = null;
+		List<CVTermProperty> dateProperties = new ArrayList<>();
+
+		if(Objects.equals(createdDateFlag, true)) {
+			testDate = constructDate(2015, Calendar.JANUARY, 1);
+			fillTestCreatedDateProperties(Collections.singletonList(term), dateProperties, testDate);
+		} else if (Objects.equals(createdDateFlag, false)) {
+			testDate = constructDate(2015, Calendar.MAY, 20);
+			fillTestUpdatedDateProperties(Collections.singletonList(term), dateProperties, testDate);
+		}
+
+		// Fetch Created Date Properties and save it using propertyDao
+		for (CVTermProperty property : dateProperties) {
+			propertyDao.save(property);
+			dateMap.put(property.getCvTermId(), property.getValue());
+		}
+	}
+
+	public static Integer randomWithRange(Integer min, Integer max)
+	{
+		Integer range = (max - min) + 1;
+		return (int) (Math.random() * range) + min;
 	}
 
 	public static Date constructDate(int year, int month, int day) {
