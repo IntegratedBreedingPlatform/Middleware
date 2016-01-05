@@ -31,13 +31,6 @@ public abstract class TestBase {
 				+ (double) elapsedTime / 1000000 + " ms = " + (double) elapsedTime / 1000000000 + " s +++++\n");
 	}
 
-	protected Date constructDate(int year, int month, int day) {
-		// Fill Test Created Date Property using TestDataHelper
-		Calendar cal = Calendar.getInstance();
-		cal.set(year, month, day);
-		return cal.getTime();
-	}
-
 	protected abstract void stubCurrentDate(int year, int month, int day);
 
 	protected abstract void stubCurrentDate(Date date);

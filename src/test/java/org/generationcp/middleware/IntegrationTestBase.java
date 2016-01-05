@@ -4,6 +4,7 @@ package org.generationcp.middleware;
 import java.util.Date;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.ontology.TestDataHelper;
 import org.generationcp.middleware.util.CustomClock;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +37,7 @@ public abstract class IntegrationTestBase extends TestBase {
 	private CustomClock customClock;
 
 	protected void stubCurrentDate(int year, int month, int day) {
-		customClock.set(constructDate(year, month, day));
+		customClock.set(TestDataHelper.constructDate(year, month, day));
 	}
 
 	protected void stubCurrentDate(Date date) {
