@@ -27,8 +27,6 @@ import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
