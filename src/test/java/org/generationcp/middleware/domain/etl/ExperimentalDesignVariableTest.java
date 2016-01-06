@@ -28,7 +28,7 @@ public class ExperimentalDesignVariableTest {
 	private static final String RRCDL_DESC = "Resolvable Row-and-Column Design (Latinized)";
 	private static final String ALPHA_LATTICE = "Alpha Lattice";
 	private static final int OTHER_DESIGN_ID = TermId.OTHER_DESIGN.getId();
-	private static final String OTHER_DESIGN_DESC = "Other design";
+	private static final String OTHER_DESIGN_DESC = ExperimentalDesignVariable.CUSTOM_IMPORT_DESIGN;
 
 	@Test
 	public void testGetExperimentalDesignDisplay_RCBD() {

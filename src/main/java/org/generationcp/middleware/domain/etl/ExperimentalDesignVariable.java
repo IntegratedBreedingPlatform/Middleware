@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 
 public class ExperimentalDesignVariable {
 
+	public static final String CUSTOM_IMPORT_DESIGN = "Custom Import Design";
 	private List<MeasurementVariable> variables;
 
 	public ExperimentalDesignVariable(final List<MeasurementVariable> variables) {
@@ -43,7 +44,7 @@ public class ExperimentalDesignVariable {
 				}
 			}
 			if (exptDesignSource != null) {
-				return "Other design";
+				return CUSTOM_IMPORT_DESIGN;
 			}
 		}
 		return "";
