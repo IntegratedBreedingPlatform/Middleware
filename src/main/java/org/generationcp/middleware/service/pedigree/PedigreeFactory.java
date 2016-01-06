@@ -22,6 +22,8 @@ public class PedigreeFactory {
 		return new PedigreeDefaultServiceImpl(sessionProvider);
 	}
 
+	// TODO Remove the duplicate org.generationcp.commons.util.CrossingUtil.isCimmytWheat(String, String) in Commons and update references
+	// to Commons method references.
 	public static boolean isCimmytWheat(final String profile, final String crop) {
 		if (profile != null && crop != null && profile.equalsIgnoreCase(PedigreeFactory.PROFILE_CIMMYT)
 				&& CropEnum.WHEAT.toString().equalsIgnoreCase(crop)) {
