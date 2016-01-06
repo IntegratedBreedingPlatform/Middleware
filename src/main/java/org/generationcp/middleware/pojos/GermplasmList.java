@@ -15,7 +15,19 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -107,7 +119,7 @@ public class GermplasmList implements Serializable {
 					+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) "
 					+ "WHERE listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
 					+ "      OR desig LIKE :q OR listname LIKE :q " + "      OR desig LIKE :qNoSpaces "
-					+ "      OR desig LIKE :qStandardized " + ")";
+					+ "      OR desig LIKE :qStandardized " + ")" + " AND program_uuid = :programUUID";
 
 	public static final String SEARCH_FOR_GERMPLASM_LIST_GID_LIKE =
 			"SELECT DISTINCT listnms.* "
@@ -116,7 +128,7 @@ public class GermplasmList implements Serializable {
 					+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) "
 					+ "WHERE listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND (listdata.gid LIKE :gid "
 					+ "      OR desig LIKE :q OR listname LIKE :q" + "      OR desig LIKE :qNoSpaces "
-					+ "      OR desig LIKE :qStandardized " + ")";
+					+ "      OR desig LIKE :qStandardized " + ")" + " AND program_uuid = :programUUID";
 
 	public static final String SEARCH_FOR_GERMPLASM_LIST_EQUAL =
 			"SELECT DISTINCT listnms.* "
@@ -125,7 +137,8 @@ public class GermplasmList implements Serializable {
 					+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) "
 					+ "WHERE "
 					+ " listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
-					+ "      OR desig = :q OR listname = :q " + "      OR desig = :qNoSpaces " + "      OR desig = :qStandardized " + ")";
+					+ "      OR desig = :q OR listname = :q " + "      OR desig = :qNoSpaces " + "      OR desig = :qStandardized " + ")"
+					+ " AND program_uuid = :programUUID";
 
 	public GermplasmList() {
 

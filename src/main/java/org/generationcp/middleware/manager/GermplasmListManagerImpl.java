@@ -21,7 +21,12 @@ import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.ListDataProperty;
+import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -517,20 +522,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public List<GermplasmList> searchForGermplasmList(String q, Operation o) throws MiddlewareQueryException {
+	public List<GermplasmList> searchForGermplasmList(String q, String programUUID, Operation o) throws MiddlewareQueryException {
 		List<GermplasmList> results = new ArrayList<GermplasmList>();
-		results.addAll(this.getGermplasmListDAO().searchForGermplasmLists(q, o));
-		return results;
-	}
-
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	@Override
-	public List<GermplasmList> searchForGermplasmList(String q, Operation o, boolean searchPublicData) throws MiddlewareQueryException {
-		List<GermplasmList> results = new ArrayList<GermplasmList>();
-		results.addAll(this.getGermplasmListDAO().searchForGermplasmLists(q, o));
+		results.addAll(this.getGermplasmListDAO().searchForGermplasmLists(q, programUUID, o));
 		return results;
 	}
 

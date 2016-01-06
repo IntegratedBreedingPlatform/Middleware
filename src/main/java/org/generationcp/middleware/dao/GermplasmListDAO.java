@@ -26,7 +26,11 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.SimpleExpression;
 
 /**
  * DAO class for {@link GermplasmList}.
@@ -409,7 +413,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	 * @throws MiddlewareQueryException
 	 */
 	@SuppressWarnings("unchecked")
-	public List<GermplasmList> searchForGermplasmLists(final String searchedString, final Operation o) throws MiddlewareQueryException {
+	public List<GermplasmList> searchForGermplasmLists(final String searchedString, String programUUID, final Operation o)
+			throws MiddlewareQueryException {
 		final String q = searchedString.trim();
 		if ("".equals(q)) {
 			return new ArrayList<GermplasmList>();
@@ -439,6 +444,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 			}
 			query.setParameter("gid", q);
+			query.setParameter("programUUID", programUUID);
 
 			query.addEntity("listnms", GermplasmList.class);
 			return query.list();

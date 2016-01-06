@@ -18,7 +18,11 @@ import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.ListDataProperty;
+import org.generationcp.middleware.pojos.UserDefinedField;
 
 /**
  * This is the API for retrieving information about Germplasm Lists.
@@ -471,24 +475,12 @@ public interface GermplasmListManager {
 	 * Search for germplasm lists given a search term Q
 	 *
 	 * @param q string
+	 * @param programUUID string
 	 * @param o operation
 	 * @return - List of germplasm lists
 	 * @throws MiddlewareQueryException
 	 */
-	List<GermplasmList> searchForGermplasmList(String q, Operation o) throws MiddlewareQueryException;
-
-	/**
-	 * Search for germplasm lists given a search term Q
-	 *
-	 * @param q string
-	 * @param o operation
-	 * @param searchPublicData flag to indicate whether public (central) data should be searched
-	 * @return - List of germplasm lists
-	 * @throws MiddlewareQueryException
-	 * @deprecated
-	 */
-	@Deprecated
-	List<GermplasmList> searchForGermplasmList(String q, Operation o, boolean searchPublicData) throws MiddlewareQueryException;
+	List<GermplasmList> searchForGermplasmList(String q, String programUUID, Operation o) throws MiddlewareQueryException;
 
 	/**
 	 * Inserts or updates the ListDataProperty records (columns) corresponding to the ListDataColumn records
