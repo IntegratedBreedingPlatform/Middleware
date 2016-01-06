@@ -257,24 +257,24 @@ public class GermplasmList implements Serializable {
 	public String getStatusString() {
 		// TODO: make internationalizable
 		final List<String> listStatus = new ArrayList<String>();
-		final String status = String.format("%04d", this.getStatus());
+		final String formattedStatus = String.format("%04d", this.getStatus());
 
-		if (status.charAt(0) == '1') {
+		if (formattedStatus.charAt(0) == '1') {
 			listStatus.add("Final");
 		}
-		if (status.charAt(1) == '1') {
+		if (formattedStatus.charAt(1) == '1') {
 			listStatus.add("Locked");
 		}
-		if (status.charAt(2) == '1') {
+		if (formattedStatus.charAt(2) == '1') {
 			listStatus.add("Hidden");
 		}
-		if (status.charAt(3) == '1') {
+		if (formattedStatus.charAt(3) == '1') {
 			listStatus.add("List");
 		}
-		if (status.charAt(3) == '0') {
+		if (formattedStatus.charAt(3) == '0') {
 			listStatus.add("Folder");
 		}
-		if (status.charAt(3) == '9') {
+		if (formattedStatus.charAt(3) == '9') {
 			listStatus.add("Deleted");
 		}
 
@@ -429,18 +429,6 @@ public class GermplasmList implements Serializable {
 
 	public boolean hasParent() {
 		return this.getParent() != null ? true : false;
-	}
-
-	// TODO BMS-148 & BMS-150 check references and remove logic based on -ve/+ve ID.
-	/**
-	 * No local/central lists or -ve vs. +ve IDs in merged DB world.
-	 * 
-	 * @return
-	 * @deprecated
-	 */
-	@Deprecated
-	public boolean isLocalList() {
-		return this.getId() < 0;
 	}
 
 	public boolean isLockedList() {
