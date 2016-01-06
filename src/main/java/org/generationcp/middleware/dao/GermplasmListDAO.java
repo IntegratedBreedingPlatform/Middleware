@@ -126,8 +126,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<GermplasmList> getByName(final String name, final String programUUID, final Operation operation, final int start,
-			final int numOfRows)
-			throws MiddlewareQueryException {
+			final int numOfRows) throws MiddlewareQueryException {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 
