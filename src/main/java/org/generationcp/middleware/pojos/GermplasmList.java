@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos;
@@ -35,9 +35,9 @@ import org.hibernate.annotations.SQLDelete;
 
 /**
  * POJO for listnms table.
- * 
+ *
  * @author Kevin Manansala, Mark Agarrado
- * 
+ *
  */
 
 @Entity
@@ -420,11 +420,11 @@ public class GermplasmList implements Serializable {
 	}
 
 	public boolean isFolder() {
-		return this.getType() != null && this.getType().equalsIgnoreCase(FOLDER_TYPE) ? true : false;
+		return this.getType() != null && this.getType().equalsIgnoreCase(GermplasmList.FOLDER_TYPE) ? true : false;
 	}
 
 	public boolean isList() {
-		return this.getType() != null && this.getType().equalsIgnoreCase(LIST_TYPE) ? true : false;
+		return this.getType() != null && this.getType().equalsIgnoreCase(GermplasmList.LIST_TYPE) ? true : false;
 	}
 
 	public boolean hasParent() {
