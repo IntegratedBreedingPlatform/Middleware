@@ -4,12 +4,12 @@ package org.generationcp.middleware.domain.etl;
 import java.util.List;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.domain.dms.DesignTypeItem;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 
 public class ExperimentalDesignVariable {
 
-	public static final String CUSTOM_IMPORT_DESIGN = "Custom Import Design";
 	private List<MeasurementVariable> variables;
 
 	public ExperimentalDesignVariable(final List<MeasurementVariable> variables) {
@@ -35,7 +35,7 @@ public class ExperimentalDesignVariable {
 		final MeasurementVariable variable = this.getExperimentalDesign();
 		final MeasurementVariable exptDesignSource = this.getExperimentalDesignSource();
 		if (Integer.valueOf(variable.getValue()) == TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId() && exptDesignSource != null) {
-			return "Alpha Lattice";
+			return DesignTypeItem.ALPHA_LATTICE;
 		} else if (variable != null && variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
 				&& NumberUtils.isNumber(variable.getValue())) {
 			for (final ValueReference ref : variable.getPossibleValues()) {
@@ -44,7 +44,7 @@ public class ExperimentalDesignVariable {
 				}
 			}
 			if (exptDesignSource != null) {
-				return CUSTOM_IMPORT_DESIGN;
+				return DesignTypeItem.CUSTOM_IMPORT.getName();
 			}
 		}
 		return "";
