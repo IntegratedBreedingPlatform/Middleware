@@ -38,8 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class GermplasmListManagerImpl extends DataManager implements GermplasmListManager {
 
-	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListManagerImpl.class);
-
 	public GermplasmListManagerImpl() {
 	}
 
