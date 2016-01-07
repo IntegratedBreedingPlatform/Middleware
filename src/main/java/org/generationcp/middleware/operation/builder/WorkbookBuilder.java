@@ -66,12 +66,12 @@ public class WorkbookBuilder extends Builder {
 			TermId.PERSON_DATA_TYPE.getId(), TermId.LOCATION_DATA_TYPE.getId(), TermId.STUDY_DATA_TYPE.getId(),
 			TermId.DATASET_DATA_TYPE.getId(), TermId.GERMPLASM_LIST_DATA_TYPE.getId(), TermId.BREEDING_METHOD_DATA_TYPE.getId());
 
-	private static final List<Integer> EXPERIMENTAL_DESIGN_VARIABLES = Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
+	public static final List<Integer> EXPERIMENTAL_DESIGN_VARIABLES = Arrays.asList(TermId.EXPERIMENT_DESIGN_FACTOR.getId(),
 			TermId.NUMBER_OF_REPLICATES.getId(), TermId.BLOCK_SIZE.getId(), TermId.BLOCKS_PER_REPLICATE.getId(),
 			TermId.REPLICATIONS_MAP.getId(), TermId.NO_OF_REPS_IN_COLS.getId(), TermId.NO_OF_ROWS_IN_REPS.getId(),
 			TermId.NO_OF_COLS_IN_REPS.getId(), TermId.NO_OF_CROWS_LATINIZE.getId(), TermId.NO_OF_CCOLS_LATINIZE.getId(),
-			TermId.NO_OF_CBLKS_LATINIZE.getId());
-	
+			TermId.NO_OF_CBLKS_LATINIZE.getId(), TermId.EXPT_DESIGN_SOURCE.getId());
+
 	private static final Logger LOG = LoggerFactory.getLogger(WorkbookBuilder.class);
 
 	public WorkbookBuilder(final HibernateSessionProvider sessionProviderForLocal) {
@@ -83,52 +83,46 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	public Workbook create(final int id, final StudyType studyType) {
-		
+
 		Monitor monitor = MonitorFactory.start("Build Workbook");
-		
+
 		final boolean isTrial = studyType == StudyType.T;
 		final Workbook workbook = new Workbook();
 
 		/**
-		 * 1. Get the dataset id 
-		 * 2. Count total no. of experiments of the dataset 
-		 * 3. getExperiments 
-		 * 4. Per experiment, transform it to MeasurementRow 
-		 *    a. MeasurementRow (list of MeasurementData) 
-		 *    b. MeasurementData 
-		 *       label (Experiment > VariableList > Variable > localName), 
-		 *       value (Experiment > VariableList > Variable), 
-		 *       datatype (Experiment > VariableList > Variable > VariableType > StandardVariable), 
-		 *       iseditable (true for variates, else, false)
+		 * 1. Get the dataset id 2. Count total no. of experiments of the dataset 3. getExperiments 4. Per experiment, transform it to
+		 * MeasurementRow a. MeasurementRow (list of MeasurementData) b. MeasurementData label (Experiment > VariableList > Variable >
+		 * localName), value (Experiment > VariableList > Variable), datatype (Experiment > VariableList > Variable > VariableType >
+		 * StandardVariable), iseditable (true for variates, else, false)
 		 */
-		
+
 		// DA
 		final StudyDetails studyDetails = this.getStudyDataManager().getStudyDetails(studyType, id);
-		
+
 		// DA getDMSProject
 		final Study study = this.getStudyBuilder().createStudy(id);
-		
+
 		// DA if name not conventional
 		// FIXME : this heavy id fetch pattern needs changing
 		final int dataSetId = this.getMeasurementDataSetId(id, studyDetails.getStudyName());
 		// validation, bring inline
 		this.checkMeasurementDataset(Integer.valueOf(dataSetId));
 		workbook.setMeasurementDatesetId(dataSetId);
-		
+
 		// PERF : rationale for count - improve
 		final long expCount = this.getStudyDataManager().countExperiments(dataSetId);
 		// Variables required to get Experiments (?)
 		VariableTypeList variables = this.getDataSetBuilder().getVariableTypes(dataSetId);
 		// DA get experiments
 		final List<Experiment> experiments = this.getStudyDataManager().getExperiments(dataSetId, 0, (int) expCount, variables);
-		
+
 		// FIXME : this heavy id fetch pattern needs changing
 		final DmsProject trialDataSetProject = this.getDataSetBuilder().getTrialDataset(study.getId());
 		final DataSet trialDataSet = this.getDataSetBuilder().build(trialDataSetProject.getProjectId());
 		workbook.setTrialDatasetId(trialDataSet.getId());
-		
+
 		VariableList conditionVariables = null;
-		VariableList constantVariables = null; 
+		VariableList constantVariables = null;
 		VariableList trialConstantVariables = null;
 		// for Trials, conditions and trial environment variables are combined
 		// the trialEnvironmentVariables are filtered from the TrialDataset
@@ -152,7 +146,7 @@ public class WorkbookBuilder extends Builder {
 		constants.addAll(this.buildStudyMeasurementVariables(trialConstantVariables, false, false));
 		final List<MeasurementVariable> variates = this.buildVariates(variables, constants);
 		final List<MeasurementVariable> expDesignVariables = new ArrayList<MeasurementVariable>();
-		
+
 		// Nursery case
 		if (!isTrial) {
 			// remove OCC from nursery level conditions for nursery cause its duplicating becuase its being added in conditions and factors
@@ -164,7 +158,7 @@ public class WorkbookBuilder extends Builder {
 				}
 			}
 		}
-		
+
 		// Set possible values of breeding method
 		for (final MeasurementVariable variable : variates) {
 			if (this.getOntologyDataManager().getProperty(variable.getProperty()).getTerm().getId() == TermId.BREEDING_METHOD_PROP.getId()) {
@@ -182,7 +176,7 @@ public class WorkbookBuilder extends Builder {
 
 		final Map<Integer, org.generationcp.middleware.domain.ontology.VariableType> projectPropRoleMapping =
 				this.generateProjectPropertyRoleMap(projectProperties);
-		
+
 		for (final ProjectProperty projectProperty : projectProperties) {
 			if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
 				// DA IN A LOOP
@@ -237,8 +231,8 @@ public class WorkbookBuilder extends Builder {
 								value = "";
 							}
 						}
-						
-						// continuing redundant logic ... 
+
+						// continuing redundant logic ...
 						if (value != null) {
 							final MeasurementVariable measurementVariable =
 									new MeasurementVariable(stdVariable.getId(), this.getLocalName(projectProperty.getRank(),
@@ -257,7 +251,7 @@ public class WorkbookBuilder extends Builder {
 								conditions.add(measurementVariable);
 							}
 						}
-					// control flow is unreadable here
+						// control flow is unreadable here
 					} else if (isTrial && WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
 
 						final String value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
@@ -298,7 +292,7 @@ public class WorkbookBuilder extends Builder {
 		final List<MeasurementRow> trialObservations = this.getTrialObservations(workbook, isTrial);
 		workbook.setTrialObservations(trialObservations);
 		LOG.debug("" + monitor.stop() + ". This instance was for studyId: " + id);
-		
+
 		return workbook;
 	}
 
@@ -377,7 +371,6 @@ public class WorkbookBuilder extends Builder {
 				}
 			}
 		}
-
 
 		// if dataset is not found, get dataset with Plot Data type
 		if (dataSetId == null || dataSetId == 0) {
@@ -982,7 +975,7 @@ public class WorkbookBuilder extends Builder {
 				return datasetRef.getId();
 			}
 		}
-		// if not found (which should be extremely rare) in the dataset ref list using the name, 
+		// if not found (which should be extremely rare) in the dataset ref list using the name,
 		// get dataset reference by dataset type in projectprops
 		final DatasetReference datasetRef = this.getStudyDataManager().findOneDataSetReferenceByType(studyId, DataSetType.PLOT_DATA);
 		if (datasetRef != null) {
