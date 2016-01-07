@@ -606,8 +606,9 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 			programFavoriteDao.save(programFavorite);
 		}
 
+		String strValueOfDate = ISO8601DateParser.toString(systemClock.now());
 		// Setting last update time.
-		propertyDao.save(variableInfo.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
+		propertyDao.save(variableInfo.getId(), TermId.CREATION_DATE.getId(), strValueOfDate, 0);
 	}
 
 	@Override
@@ -641,7 +642,6 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 		CVTermRelationship scaleRelation = elements.getScaleRelation();
 		List<CVTermProperty> termProperties = elements.getTermProperties();
 		VariableOverrides variableOverrides = elements.getVariableOverrides();
-
 
 		// Updating term to database.
 		if (!(variableInfo.getName().equals(term.getName()) && Objects.equals(variableInfo.getDescription(), term.getDefinition()))) {
@@ -736,7 +736,10 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 			programFavoriteDao.makeTransient(programFavorite);
 		}
 
-		propertyDao.save(variableInfo.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
+		String strValueOfDate = ISO8601DateParser.toString(systemClock.now());
+
+		// Save creation time
+		propertyDao.save(variableInfo.getId(), TermId.LAST_UPDATE_DATE.getId(), strValueOfDate, 0);
 
 	}
 
