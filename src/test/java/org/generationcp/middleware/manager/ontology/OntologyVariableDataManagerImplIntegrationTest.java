@@ -2,6 +2,7 @@ package org.generationcp.middleware.manager.ontology;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.dao.oms.VariableOverridesDao;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Method;
@@ -28,8 +30,10 @@ import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManage
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
+import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.junit.Assert;
 import org.junit.Before;
@@ -342,6 +346,263 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		}
 	}
 
+	/**
+	 * Test to verify Add Variable should add a new Variable properly
+	 * @throws Exception
+	 */
+	@Test
+	public void testAddVariableShouldAddNewVariable() throws Exception {
+		// Create a Method
+		method = TestDataHelper.createMethod(termDao, methodDataManager);
 
+		// Create a Property and fill Is-A term relationship and crop ontology id
+		property = TestDataHelper.createProperty(termDao, propertyDataManager);
 
+		// Create a Scale and set data type and its values
+		scale = TestDataHelper.createScale(termDao, scaleDataManager);
+
+		String expectedMin = "1";
+		String expectedMax = "50";
+
+		OntologyVariableInfo ontologyVariableInfo = new OntologyVariableInfo();
+		ontologyVariableInfo.setName(TestDataHelper.getNewRandomName("Name"));
+		ontologyVariableInfo.setDescription("Description");
+		ontologyVariableInfo.setIsFavorite(true);
+		ontologyVariableInfo.setMethodId(method.getId());
+		ontologyVariableInfo.setPropertyId(property.getId());
+		ontologyVariableInfo.setScaleId(scale.getId());
+		ontologyVariableInfo.setExpectedMin(expectedMin);
+		ontologyVariableInfo.setExpectedMax(expectedMax);
+		ontologyVariableInfo.setProgramUuid(this.DUMMY_PROGRAM_UUID);
+		ontologyVariableInfo.addVariableType(VariableType.ANALYSIS);
+
+		Date date = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
+		this.stubCurrentDate(date);
+
+		this.variableDataManager.addVariable(ontologyVariableInfo);
+
+		CVTerm variable = this.termDao.getById(ontologyVariableInfo.getId());
+
+		// Make sure each variable data inserted properly, assert them and display proper message if not inserted properly
+		String message = "The %s for Variable '" + variable.getCvTermId() + "' was not added correctly.";
+		Assert.assertEquals(String.format(message, "Name"), variable.getName(), ontologyVariableInfo.getName());
+		Assert.assertEquals(String.format(message, "Definition"), variable.getDefinition(), ontologyVariableInfo.getDescription());
+		Assert.assertEquals(String.format(message, "IsFavorite"), true, ontologyVariableInfo.isFavorite());
+		Assert.assertEquals(String.format(message, "MethodId"), method.getId(), ontologyVariableInfo.getMethodId().intValue());
+		Assert.assertEquals(String.format(message, "PropertyId"), property.getId(), ontologyVariableInfo.getPropertyId().intValue());
+		Assert.assertEquals(String.format(message, "ScaleId"), scale.getId(), ontologyVariableInfo.getScaleId().intValue());
+		Assert.assertTrue(String.format(message, "Variable Type"), ontologyVariableInfo.getVariableTypes().contains(VariableType.ANALYSIS));
+		Assert.assertEquals(String.format(message, "Expected Min"), expectedMin, ontologyVariableInfo.getExpectedMin());
+		Assert.assertEquals(String.format(message, "Expected Max"), expectedMax, ontologyVariableInfo.getExpectedMax());
+
+		// Fetch Created date property and assert it
+		List<CVTermProperty> addedProperties = this.propertyDao.getByCvTermId(variable.getCvTermId());
+		// Added 2 properties: Variable Type and Created Date
+		Assert.assertTrue(String.format(message, "Property Size"), addedProperties.size() == 2);
+
+		for(CVTermProperty property : addedProperties) {
+			if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
+				Assert.assertEquals(String.format(message, "CreatedDate"), property.getValue(), ISO8601DateParser.toString(date));
+			} else if (Objects.equals(property.getTypeId(), TermId.VARIABLE_TYPE.getId())) {
+				Assert.assertEquals(String.format(message, "Variable Type"), property.getValue(), VariableType.ANALYSIS.getName());
+			}
+		}
+	}
+
+	/**
+	 * Test to verify update variable should update variable properly
+	 * @throws Exception
+	 */
+	@Test
+	public void testUpdateVariableShouldUpdateExistingVariable() throws Exception {
+		CVTerm variableTerm = TestDataHelper.getTestCvTerm(CvId.VARIABLES);
+		this.termDao.save(variableTerm);
+
+		Map<Integer, CVTerm> isATermMap = new HashMap<>();
+		Map<Integer, String> cropOntologyIdMap = new HashMap<>();
+		Map<Integer, String> maxValuesMap = new HashMap<>();
+		Map<Integer, String> minValuesMap = new ArrayMap<>();
+
+		// Create a Method and fill its properties
+		method = TestDataHelper.createMethod(this.termDao, methodDataManager);
+
+		// Create a Property and fill is a term relationship and crop ontology id
+		property = TestDataHelper.createProperty(this.termDao, propertyDataManager);
+		TestDataHelper.fillIsAPropertyMap(this.relationshipDao, termDao, property.toCVTerm(), isATermMap);
+		TestDataHelper.fillCropOntologyIdMap(this.propertyDao, property.toCVTerm(), cropOntologyIdMap);
+
+		// Create a Scale and set data type and its values
+		scale = TestDataHelper.createScale(this.termDao, scaleDataManager);
+		relationshipDao.save(scale.getId(), TermId.HAS_TYPE.getId(), DataType.NUMERIC_VARIABLE.getId());
+
+		propertyDao.updateOrDeleteProperty(scale.getId(), TermId.MIN_VALUE.getId(), "10", 0);
+		propertyDao.updateOrDeleteProperty(scale.getId(), TermId.MAX_VALUE.getId(), "100", 0);
+
+		TestDataHelper.fillMaxValuesMap(this.propertyDao, scale.toCVTerm(), maxValuesMap);
+		TestDataHelper.fillMinValuesMap(this.propertyDao, scale.toCVTerm(), minValuesMap);
+
+		this.termDao.save(variableTerm);
+
+		this.relationshipDao.save(variableTerm.getCvTermId(), TermId.HAS_METHOD.getId(), method.getId());
+		this.relationshipDao.save(variableTerm.getCvTermId(), TermId.HAS_PROPERTY.getId(), property.getId());
+		this.relationshipDao.save(variableTerm.getCvTermId(), TermId.HAS_SCALE.getId(), scale.getId());
+
+		// Get Min and Max value of scale and generate expected Min and Max value for variable
+		String maxValue = maxValuesMap.get(scale.getId());
+		String minValue = minValuesMap.get(scale.getId());
+
+		Integer range = (Integer.parseInt(maxValue) - Integer.parseInt(minValue)) + Integer.parseInt(minValue);
+
+		Integer variableMinValue = TestDataHelper.randomWithRange(Integer.parseInt(minValue), range);
+		Integer variableMaxValue = TestDataHelper.randomWithRange(range+1, Integer.parseInt(maxValue));
+
+		this.variableOverridesDao.save(variableTerm.getCvTermId(), this.DUMMY_PROGRAM_UUID, "", variableMinValue.toString(), variableMaxValue.toString());
+
+		// Set Variable Type
+		this.propertyDao.updateOrDeleteProperty(variableTerm.getCvTermId(), TermId.VARIABLE_TYPE.getId(), VariableType.ANALYSIS.getName(), 0);
+
+		// Adding Created Date Property
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
+		List<CVTermProperty> createdDateProperties = new ArrayList<>();
+		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(variableTerm), createdDateProperties, testCreatedDate);
+
+		CVTermProperty createProperty = createdDateProperties.get(0);
+		this.propertyDao.save(createProperty);
+
+		String expectedMin = "10";
+		String expectedMax = "20";
+		String cropOntologyId = "CO:888";
+
+		// Update Variable Info
+		OntologyVariableInfo variable = new OntologyVariableInfo();
+		variable.setId(variableTerm.getCvTermId());
+		variable.setName("Variable Name");
+		variable.setIsFavorite(false);
+		Method updatedMethod = TestDataHelper.createMethod(this.termDao, methodDataManager);
+		variable.setMethodId(updatedMethod.getId());
+		variable.setExpectedMin(expectedMin);
+		variable.setExpectedMax(expectedMax);
+		property.setCropOntologyId(cropOntologyId);
+		variable.setPropertyId(property.getId());
+		variable.setScaleId(scale.getId());
+
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
+		this.stubCurrentDate(testUpdatedDate);
+
+		this.variableDataManager.updateVariable(variable);
+
+		CVTerm cvterm = this.termDao.getById(variable.getId());
+
+		// Make sure the inserted data should come as they are inserted and Display proper message if the data doesn't come as expected
+		String message = "The %s for variable '" + variable.getId() + "' was not updated correctly.";
+		Assert.assertEquals(String.format(message, "Name"), variable.getName(), cvterm.getName());
+		Assert.assertEquals(String.format(message, "Definition"), variable.getDescription(), cvterm.getDefinition());
+		Assert.assertEquals(String.format(message, "MethodId"), variable.getMethodId().intValue(), updatedMethod.getId());
+		Assert.assertEquals(String.format(message, "ScaleId"), variable.getScaleId().intValue(), scale.getId());
+		Assert.assertEquals(String.format(message, "PropertyId"), variable.getPropertyId().intValue(), property.getId());
+		Assert.assertEquals(String.format(message, "Expected Min"), variable.getExpectedMin(), expectedMin);
+		Assert.assertEquals(String.format(message, "Expected Max"), variable.getExpectedMax(), expectedMax);
+		Assert.assertEquals(String.format(message, "CropOntologyId"), property.getCropOntologyId(), cropOntologyId);
+		Assert.assertEquals(String.format(message, "IsObsolete"), false, cvterm.isObsolete());
+		Assert.assertEquals(String.format(message, "IsFavorite"), false, variable.isFavorite());
+
+		// Fetch Created and Updated Date property and assert it
+		List<CVTermProperty> updatedProperties = this.propertyDao.getByCvTermId(cvterm.getCvTermId());
+
+		Assert.assertTrue(String.format(message, "Property Size"), updatedProperties.size() == 2);
+
+		for (CVTermProperty cvTermProperty : updatedProperties) {
+			if (Objects.equals(cvTermProperty.getTypeId(), TermId.CREATION_DATE.getId())) {
+				Assert.assertEquals(String.format(message, "Created Date"), cvTermProperty.getValue(), ISO8601DateParser.toString(testCreatedDate));
+			} else if (Objects.equals(cvTermProperty.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
+				Assert.assertEquals(String.format(message, "Updated Date"), cvTermProperty.getValue(), ISO8601DateParser.toString(testUpdatedDate));
+			}
+		}
+	}
+
+	/**
+	 * Test to verify Delete Variable should delete variable and its relationships with method, property and scale properly
+	 * @throws Exception
+	 */
+	@Test
+	public void testDeleteVariableShouldDeleteExistingVariable() throws Exception {
+		// Add Variable Term
+		CVTerm variableTerm = TestDataHelper.getTestCvTerm(CvId.VARIABLES);
+		this.termDao.save(variableTerm);
+
+		Map<Integer, CVTerm> isATermMap = new HashMap<>();
+		Map<Integer, String> cropOntologyIdMap = new HashMap<>();
+		Map<Integer, String> maxValuesMap = new HashMap<>();
+		Map<Integer, String> minValuesMap = new ArrayMap<>();
+
+		// Create a Method
+		method = TestDataHelper.createMethod(this.termDao, methodDataManager);
+
+		// Create a Property and fill is a term relationship and crop ontology id
+		property = TestDataHelper.createProperty(this.termDao, propertyDataManager);
+		TestDataHelper.fillIsAPropertyMap(this.relationshipDao, termDao, property.toCVTerm(), isATermMap);
+		TestDataHelper.fillCropOntologyIdMap(this.propertyDao, property.toCVTerm(), cropOntologyIdMap);
+
+		// Create a Scale and set data type and its values
+		scale = TestDataHelper.createScale(this.termDao, scaleDataManager);
+		relationshipDao.save(scale.getId(), TermId.HAS_TYPE.getId(), DataType.NUMERIC_VARIABLE.getId());
+
+		propertyDao.updateOrDeleteProperty(scale.getId(), TermId.MIN_VALUE.getId(), "10", 0);
+		propertyDao.updateOrDeleteProperty(scale.getId(), TermId.MAX_VALUE.getId(), "100", 0);
+
+		TestDataHelper.fillMaxValuesMap(this.propertyDao, scale.toCVTerm(), maxValuesMap);
+		TestDataHelper.fillMinValuesMap(this.propertyDao, scale.toCVTerm(), minValuesMap);
+
+		this.termDao.save(variableTerm);
+
+		this.relationshipDao.save(variableTerm.getCvTermId(), TermId.HAS_METHOD.getId(), method.getId());
+		this.relationshipDao.save(variableTerm.getCvTermId(), TermId.HAS_PROPERTY.getId(), property.getId());
+		this.relationshipDao.save(variableTerm.getCvTermId(), TermId.HAS_SCALE.getId(), scale.getId());
+
+		// Get Min and Max value of scale and generate expected Min and Max value for variable
+		String maxValue = maxValuesMap.get(scale.getId());
+		String minValue = minValuesMap.get(scale.getId());
+
+		Integer range = (Integer.parseInt(maxValue) - Integer.parseInt(minValue)) + Integer.parseInt(minValue);
+
+		Integer variableMinValue = TestDataHelper.randomWithRange(Integer.parseInt(minValue), range);
+		Integer variableMaxValue = TestDataHelper.randomWithRange(range+1, Integer.parseInt(maxValue));
+
+		this.variableOverridesDao.save(variableTerm.getCvTermId(), this.DUMMY_PROGRAM_UUID, "", variableMinValue.toString(), variableMaxValue.toString());
+
+		// Set Variable Type
+		this.propertyDao.updateOrDeleteProperty(variableTerm.getCvTermId(), TermId.VARIABLE_TYPE.getId(), VariableType.ANALYSIS.getName(), 0);
+
+		// Adding Created Date Property
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
+		List<CVTermProperty> createdDateProperties = new ArrayList<>();
+		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(variableTerm), createdDateProperties, testCreatedDate);
+
+		CVTermProperty createProperty = createdDateProperties.get(0);
+		this.propertyDao.save(createProperty);
+
+		// Fill Test Updated Date Property using TestDataHelper
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
+		List<CVTermProperty> scaleUpdatedDateProperties = new ArrayList<>();
+		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(variableTerm), scaleUpdatedDateProperties, testUpdatedDate);
+
+		CVTermProperty scaleUpdatedDateProperty = scaleUpdatedDateProperties.get(0);
+		this.propertyDao.save(scaleUpdatedDateProperty);
+
+		this.variableDataManager.deleteVariable(variableTerm.getCvTermId());
+
+		CVTerm cvTerm = this.termDao.getById(variableTerm.getCvTermId());
+
+		// Make sure the variable must be deleted and it asserts null
+		String message = "The %s for Variable '" + variableTerm.getCvTermId() + "' was not deleted correctly.";
+		Assert.assertNull(String.format(message, "Term"), cvTerm);
+
+		// Make sure the properties must be deleted
+		List<CVTermProperty> deletedProperties = this.propertyDao.getByCvTermId(variableTerm.getCvTermId());
+		Assert.assertTrue(String.format(message, "Properties"), deletedProperties.size() == 0);
+
+		// Make sure the relationships of Variable with Method, Scale and Property must be deleted
+		List<CVTermRelationship> deletedRelationships = this.relationshipDao.getBySubject(variableTerm.getCvTermId());
+		Assert.assertTrue(String.format(message, "Variable Relationships"), Objects.equals(deletedRelationships.size(), 0));
+	}
 }
