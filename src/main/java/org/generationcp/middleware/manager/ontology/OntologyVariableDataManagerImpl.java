@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
+import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -40,6 +42,7 @@ import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
+import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.Util;
@@ -614,6 +617,26 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		List<CVTermProperty> termProperties = elements.getTermProperties();
 		VariableOverrides variableOverrides = elements.getVariableOverrides();
 
+        String oldVariableName = term.getName();
+        String newVariableName = variableInfo.getName();
+
+        if(!Objects.equals(oldVariableName, newVariableName)){
+
+            List<CVTermSynonym> byCvTermSynonymList = this.getCvTermSynonymDao().getByCvTermId(term.getCvTermId());
+            boolean synonymFound = false;
+
+            for(CVTermSynonym cvTermSynonym : byCvTermSynonymList){
+                if(Objects.equals(oldVariableName, cvTermSynonym.getSynonym())){
+                    synonymFound = true;
+                    break;
+                }
+            }
+
+            if(!synonymFound){
+                CVTermSynonym cvTermSynonym = CvTermSynonymDao.buildCvTermSynonym(term.getCvTermId(),oldVariableName,NameType.ALTERNATIVE_ENGLISH.getId());
+                this.getCvTermSynonymDao().save(cvTermSynonym);
+            }
+        }
 
 		// Updating term to database.
 		if (!(variableInfo.getName().equals(term.getName()) && Objects.equals(variableInfo.getDescription(), term.getDefinition()))) {
@@ -621,6 +644,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			term.setDefinition(variableInfo.getDescription());
 			this.getCvTermDao().merge(term);
 		}
+
 
 		// Setting method to variable
 		if (methodRelation == null) {
@@ -847,4 +871,5 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		elements.setTermProperties(termProperties);
 		elements.setVariableOverrides(variableOverrides);
 	}
+
 }

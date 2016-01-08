@@ -60,6 +60,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
+
 	private Project testProject;
 	private Method testMethod;
 	private Property testProperty;
@@ -173,10 +174,20 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 	@Test
 	public void testUpdateVariable() throws Exception {
-		this.variableManager.updateVariable(this.testVariableInfo);
+        this.variableManager.updateVariable(this.testVariableInfo);
 		Variable updatedVariable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
 		Assert.assertNotNull(updatedVariable);
 	}
+
+    @Test
+    public void testUpdateVariableWithSavingInSynonym() throws Exception {
+        this.testVariableInfo.setName("UpdatedVariableName");
+        this.variableManager.updateVariable(this.testVariableInfo);
+        Variable updatedVariable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
+        Assert.assertEquals("UpdatedVariableName",updatedVariable.getName());
+        Assert.assertNotNull(updatedVariable);
+
+    }
 
     @Test
     public void testGetCategoricalValue() throws Exception {
