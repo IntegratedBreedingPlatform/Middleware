@@ -775,6 +775,13 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				this.getVariableProgramOverridesDao().makeTransient(overrides);
 			}
 
+            // delete Variable synonym
+            List<CVTermSynonym> cvTermSynonymList = this.getCvTermSynonymDao().getByCvTermId(id);
+
+            for (CVTermSynonym synonym : cvTermSynonymList) {
+                this.getCvTermSynonymDao().makeTransient(synonym);
+            }
+
 			// delete main entity
 			this.getCvTermDao().makeTransient(term);
 
