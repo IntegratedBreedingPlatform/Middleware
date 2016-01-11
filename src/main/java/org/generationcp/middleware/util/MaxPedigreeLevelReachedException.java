@@ -14,7 +14,7 @@ public class MaxPedigreeLevelReachedException extends RuntimeException {
 	private static final long serialVersionUID = 6236813137543486643L;
 	final static MaxPedigreeLevelReachedException instance = new MaxPedigreeLevelReachedException();
 
-	private MaxPedigreeLevelReachedException() {
+	public MaxPedigreeLevelReachedException() {
 		super();
 	}
 
