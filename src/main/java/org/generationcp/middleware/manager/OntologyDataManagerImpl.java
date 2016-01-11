@@ -92,8 +92,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public void addStandardVariable(StandardVariable stdVariable, String programUUID) throws MiddlewareQueryException {
 
-
-
 		Term existingStdVar = this.findTermByName(stdVariable.getName(), CvId.VARIABLES);
 		if (existingStdVar != null) {
 			throw new MiddlewareQueryException(String.format("Error in addStandardVariable, Variable with name \"%s\" already exists",
@@ -101,7 +99,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		}
 
 		try {
-
 
 			// check if scale, property and method exists first
 			Term scale = this.findTermByName(stdVariable.getScale().getName(), CvId.SCALES);
@@ -143,7 +140,7 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public void addStandardVariable(List<StandardVariable> stdVariableList) throws MiddlewareQueryException {
-		
+
 		try {
 			for (StandardVariable stdVariable : stdVariableList) {
 				this.getStandardVariableSaver().save(stdVariable);
@@ -325,9 +322,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			return term;
 		}
 
-
-
-
 		try {
 			if (CvId.VARIABLES.getId() != cvId.getId()) {
 
@@ -345,9 +339,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public void updateTerm(Term term) throws MiddlewareException {
-
-		
-		
 
 		if (term == null) {
 			return;
@@ -428,9 +419,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			return term;
 		}
 
-
-
-
 		try {
 
 			term = this.getTermSaver().save(name, definition, CvId.PROPERTIES);
@@ -441,7 +429,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			} else {
 				throw new MiddlewareQueryException("The isA passed is not a valid Class term: " + isA);
 			}
-
 
 		} catch (Exception e) {
 
@@ -454,12 +441,9 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public Term addOrUpdateTerm(String name, String definition, CvId cvId) throws MiddlewareException {
 
-
-
 		try {
 
 			Term term = this.saveOrUpdateCvTerm(name, definition, cvId);
-
 
 			return term;
 		} catch (MiddlewareQueryException e) {
@@ -472,8 +456,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public void addOrUpdateCropOntologyID(Property property, String cropOntologyID) throws MiddlewareQueryException {
 		assert !StringUtils.isEmpty(cropOntologyID);
-
-
 
 		try {
 
@@ -533,7 +515,12 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		return term;
 	}
 
-	private void saveOrUpdateCvTermRelationship(int subjectId, int objectId, int typeId) throws MiddlewareException {
+    @Override
+    public void addCvTermRelationship(int subjectId, int objectId, int typeId) {
+        this.getTermRelationshipSaver().save(subjectId, typeId, objectId);
+    }
+
+    private void saveOrUpdateCvTermRelationship(int subjectId, int objectId, int typeId) throws MiddlewareException {
 		Term typeTerm = this.getTermById(typeId);
 		if (typeTerm != null) {
 			CVTermRelationship cvRelationship = this.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(subjectId, typeId);
@@ -687,9 +674,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			throw new MiddlewareQueryException(errorCodes, "The variable you entered is invalid");
 		}
 
-
-
-
 		try {
 
 			if (operation == Operation.ADD) {
@@ -697,8 +681,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 			} else {
 				this.getStandardVariableSaver().update(standardVariable);
 			}
-
-
 
 		} catch (Exception e) {
 
@@ -708,9 +690,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public void addOrUpdateStandardVariableConstraints(int standardVariableId, VariableConstraints constraints) throws MiddlewareException {
-
-
-
 
 		try {
 
@@ -725,16 +704,11 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public void deleteStandardVariableLocalConstraints(int standardVariableId) throws MiddlewareQueryException {
 
-
-
-
 		try {
 
 			StandardVariable stdVar = this.getStandardVariable(standardVariableId, null);
 
 			this.getStandardVariableSaver().deleteConstraints(stdVar);
-
-
 
 		} catch (Exception e) {
 
@@ -751,9 +725,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		}
 
 		Integer cvId = this.getEnumerationCvId(variable);
-
-
-
 
 		try {
 
@@ -812,14 +783,10 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public void deleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException {
 
-
-
 		try {
 
 			StandardVariable stdVar = this.getStandardVariable(standardVariableId, null);
 			this.getStandardVariableSaver().deleteEnumeration(standardVariableId, stdVar.getEnumeration(enumerationId));
-
-
 
 		} catch (Exception e) {
 
@@ -829,8 +796,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 
 	@Override
 	public void deleteTerm(int cvTermId, CvId cvId) throws MiddlewareQueryException {
-
-
 
 		try {
 
@@ -847,10 +812,16 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		}
 	}
 
+	public Integer retrieveDerivedAnalysisVariable(Integer originalVariableTermID, Integer analysisMethodID) {
+        if (originalVariableTermID == null || analysisMethodID == null) {
+            return null;
+        }
+
+        return getCvTermRelationshipDao().retrieveAnalysisDerivedVariableID(originalVariableTermID, analysisMethodID);
+	}
+
 	@Override
 	public void deleteTermAndRelationship(int cvTermId, CvId cvId, int typeId, int objectId) throws MiddlewareQueryException {
-
-
 
 		try {
 			if (this.getCvTermRelationshipDao().getRelationshipByObjectId(cvTermId) != null) {
