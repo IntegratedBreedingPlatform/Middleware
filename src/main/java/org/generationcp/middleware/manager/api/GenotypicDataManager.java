@@ -2235,6 +2235,8 @@ public interface GenotypicDataManager {
 	// I have a feeling we may need to paginate this guy ..... see the other limited getAllQtl
 	List<Qtl> getAllQtl();
 	
+	List<QtlDetailElement> getQtlAndQtlDetailsByName(String name, int start, int end);
+	
 	// AlleleValues (AlleleValueDao)
 	List<Object> getUniqueAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids);
 	

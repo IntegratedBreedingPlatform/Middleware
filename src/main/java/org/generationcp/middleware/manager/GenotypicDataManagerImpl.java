@@ -2901,6 +2901,12 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	public List<Qtl> getAllQtl() {
 		return this.getQtlDao().getAll();
 	}
+	
+	// FIXME : sort out this silly pagination attempt
+	@Override
+	public List<QtlDetailElement> getQtlAndQtlDetailsByName(String name, int start, int end) {
+		return this.getQtlDao().getQtlAndQtlDetailsByName(name, start, end);
+	}
 
 	@Override
 	public List<Object> getUniqueCharAllelesByGidsAndMids(List<Integer> gids, List<Integer> mids) {
@@ -2951,4 +2957,5 @@ public class GenotypicDataManagerImpl extends DataManager implements GenotypicDa
 	public List<MarkerOnMap> getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(Integer mapId, Integer linkageGroupId, Integer markerId) {
 		return this.getMarkerOnMapDao().getMarkerOnMapByLinkageGroupAndMapIdAndNotInMarkerId(mapId, linkageGroupId, markerId);
 	}
+
 }
