@@ -4,6 +4,7 @@ package org.generationcp.middleware.domain.etl;
 import java.util.List;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.domain.dms.DesignTypeItem;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 
@@ -11,13 +12,13 @@ public class ExperimentalDesignVariable {
 
 	private List<MeasurementVariable> variables;
 
-	public ExperimentalDesignVariable(List<MeasurementVariable> variables) {
+	public ExperimentalDesignVariable(final List<MeasurementVariable> variables) {
 		this.variables = variables;
 	}
 
-	private MeasurementVariable getByTermId(TermId termId) {
+	private MeasurementVariable getByTermId(final TermId termId) {
 		if (this.variables != null) {
-			for (MeasurementVariable variable : this.variables) {
+			for (final MeasurementVariable variable : this.variables) {
 				if (variable.getTermId() == termId.getId()) {
 					return variable;
 				}
@@ -31,13 +32,19 @@ public class ExperimentalDesignVariable {
 	}
 
 	public String getExperimentalDesignDisplay() {
-		MeasurementVariable variable = this.getByTermId(TermId.EXPERIMENT_DESIGN_FACTOR);
-		if (variable != null && variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
+		final MeasurementVariable variable = this.getExperimentalDesign();
+		final MeasurementVariable exptDesignSource = this.getExperimentalDesignSource();
+		if (Integer.valueOf(variable.getValue()) == TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId() && exptDesignSource != null) {
+			return DesignTypeItem.ALPHA_LATTICE;
+		} else if (variable != null && variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
 				&& NumberUtils.isNumber(variable.getValue())) {
-			for (ValueReference ref : variable.getPossibleValues()) {
+			for (final ValueReference ref : variable.getPossibleValues()) {
 				if (ref.getId().equals(Integer.valueOf(variable.getValue()))) {
 					return ref.getDescription();
 				}
+			}
+			if (exptDesignSource != null) {
+				return DesignTypeItem.CUSTOM_IMPORT.getName();
 			}
 		}
 		return "";
@@ -56,10 +63,10 @@ public class ExperimentalDesignVariable {
 	}
 
 	public String getReplicationsMapDisplay() {
-		MeasurementVariable variable = this.getReplicationsMap();
+		final MeasurementVariable variable = this.getReplicationsMap();
 		if (variable != null && variable.getPossibleValues() != null && !variable.getPossibleValues().isEmpty()
 				&& NumberUtils.isNumber(variable.getValue())) {
-			for (ValueReference ref : variable.getPossibleValues()) {
+			for (final ValueReference ref : variable.getPossibleValues()) {
 				if (ref.getId().equals(Integer.valueOf(variable.getValue()))) {
 					return ref.getDescription();
 				}
@@ -92,6 +99,10 @@ public class ExperimentalDesignVariable {
 		return this.getByTermId(TermId.NO_OF_CBLKS_LATINIZE);
 	}
 
+	public MeasurementVariable getExperimentalDesignSource() {
+		return this.getByTermId(TermId.EXPT_DESIGN_SOURCE);
+	}
+
 	/**
 	 * @return the variables
 	 */
@@ -102,7 +113,7 @@ public class ExperimentalDesignVariable {
 	/**
 	 * @param variables the variables to set
 	 */
-	public void setVariables(List<MeasurementVariable> variables) {
+	public void setVariables(final List<MeasurementVariable> variables) {
 		this.variables = variables;
 	}
 
