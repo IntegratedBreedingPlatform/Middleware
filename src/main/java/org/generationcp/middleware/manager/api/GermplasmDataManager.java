@@ -1077,7 +1077,7 @@ public interface GermplasmDataManager {
 	UserDefinedField getPlotCodeField();
 	
 	/**
-	 * Retrurns value of the plot code (seed source) attribute of the germplasm identified by the given gid. Returns "Unknown" if plot code
+	 * Returns value of the plot code (seed source) where the germplasm was created, identified by the given gid. Returns "Unknown" if plot code
 	 * attribute is not present. Never returns null.
 	 */
 	String getPlotCodeValue(Integer gid);
