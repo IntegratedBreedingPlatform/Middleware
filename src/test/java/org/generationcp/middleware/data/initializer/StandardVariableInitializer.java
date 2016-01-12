@@ -29,4 +29,12 @@ public class StandardVariableInitializer {
 
 		return stdVariable;
 	}
+
+	public static StandardVariable createStdVariable(final Integer id, final String name) {
+		final StandardVariable stdVariable = createStdVariable();
+		stdVariable.setId(id);
+		stdVariable.setName(name);
+		stdVariable.setDescription(name + " Description");
+		return stdVariable;
+	}
 }
