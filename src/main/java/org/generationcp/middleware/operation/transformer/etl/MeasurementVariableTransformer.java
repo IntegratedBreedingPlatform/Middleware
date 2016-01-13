@@ -32,7 +32,7 @@ public class MeasurementVariableTransformer extends Transformer {
 		if (variableTypeList != null && !variableTypeList.isEmpty()) {
 			for (final DMSVariableType variableType : variableTypeList.getVariableTypes()) {
 				final StandardVariable stdVariable = variableType.getStandardVariable();
-				String label = getLabelBasedOnRole(stdVariable.getPhenotypicType());
+				String label = this.getLabelBasedOnRole(stdVariable.getPhenotypicType());
 				if (!isFactor && isTrial) {
 					label = PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
 				}
@@ -69,7 +69,7 @@ public class MeasurementVariableTransformer extends Transformer {
 			for (final Variable variable : variableList.getVariables()) {
 				final DMSVariableType variableType = variable.getVariableType();
 				final StandardVariable stdVariable = variableType.getStandardVariable();
-				String label = getLabelBasedOnRole(stdVariable.getPhenotypicType());
+				String label = this.getLabelBasedOnRole(stdVariable.getPhenotypicType());
 				// for trial constants
 				if (!isFactor && !isStudy) {
 					label = PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
@@ -77,7 +77,7 @@ public class MeasurementVariableTransformer extends Transformer {
 				final MeasurementVariable measurementVariable =
 						new MeasurementVariable(stdVariable.getId(), variableType.getLocalName(), stdVariable.getDescription(), stdVariable
 								.getScale().getName(), stdVariable.getMethod().getName(), stdVariable.getProperty().getName(), stdVariable
-								.getDataType().getName(), "", label);			
+								.getDataType().getName(), "", label);
 				measurementVariable.setRole(variableType.getRole());
 				measurementVariable.setFactor(isFactor);
 				measurementVariable.setValue(variable.getDisplayValue());
@@ -115,8 +115,8 @@ public class MeasurementVariableTransformer extends Transformer {
 		MeasurementVariable measurementVariable = null;
 
 		if (stdVariable != null) {
-			
-			final String label = getLabelBasedOnRole(stdVariable.getPhenotypicType());
+
+			final String label = this.getLabelBasedOnRole(stdVariable.getPhenotypicType());
 
 			measurementVariable =
 					new MeasurementVariable(stdVariable.getId(), stdVariable.getName(), stdVariable.getDescription(), stdVariable
