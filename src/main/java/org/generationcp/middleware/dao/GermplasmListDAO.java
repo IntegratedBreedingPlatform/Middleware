@@ -422,19 +422,26 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			final SQLQuery query;
 
 			if (o.equals(Operation.EQUAL)) {
-				query = this.getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_EQUAL);
+				query =
+						this.getSession().createSQLQuery(
+								this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_EQUAL, programUUID));
 				query.setParameter("gidLength", q.length());
 				query.setParameter("q", q);
 				query.setParameter("qNoSpaces", q.replace(" ", ""));
 				query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
 			} else {
 				if (q.contains("%") || q.contains("_")) {
-					query = this.getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_GID_LIKE);
+					query =
+							this.getSession().createSQLQuery(
+									this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_GID_LIKE,
+											programUUID));
 					query.setParameter("q", q);
 					query.setParameter("qNoSpaces", q.replace(" ", ""));
 					query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
 				} else {
-					query = this.getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST);
+					query =
+							this.getSession().createSQLQuery(
+									this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST, programUUID));
 					query.setParameter("gidLength", q.length());
 					query.setParameter("q", q + "%");
 					query.setParameter("qNoSpaces", q.replace(" ", "") + "%");
@@ -443,7 +450,10 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 			}
 			query.setParameter("gid", q);
-			query.setParameter("programUUID", programUUID);
+
+			if (programUUID != null) {
+				query.setParameter("programUUID", programUUID);
+			}
 
 			query.addEntity("listnms", GermplasmList.class);
 			return query.list();
@@ -452,6 +462,14 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			this.logAndThrowException("Error with searchGermplasmLists(" + q + ") " + e.getMessage(), e);
 		}
 		return new ArrayList<GermplasmList>();
+	}
+
+	private String getSearchForGermplasmListsQueryString(final String initialQueryString, final String programUUID) {
+		String queryString = initialQueryString;
+		if (programUUID != null) {
+			queryString += GermplasmList.FILTER_BY_PROGRAM_UUID;
+		}
+		return queryString;
 	}
 
 	@SuppressWarnings("unchecked")

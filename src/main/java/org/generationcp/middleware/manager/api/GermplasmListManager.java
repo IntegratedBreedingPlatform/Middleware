@@ -437,6 +437,15 @@ public interface GermplasmListManager {
 	 * Search for germplasm lists given a search term Q
 	 *
 	 * @param q string
+	 * @param o operation
+	 * @return - List of germplasm lists
+	 */
+	List<GermplasmList> searchForGermplasmList(String q, Operation o);
+
+	/**
+	 * Search for germplasm lists given a search term Q under a specific program
+	 *
+	 * @param q string
 	 * @param programUUID string
 	 * @param o operation
 	 * @return - List of germplasm lists

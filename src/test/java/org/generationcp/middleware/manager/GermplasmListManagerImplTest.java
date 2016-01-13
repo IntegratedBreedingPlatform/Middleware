@@ -591,6 +591,21 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testSearchGermplasmListProgramAgnostic() throws MiddlewareQueryException {
+		String q = OTHER_PROGRAM_LIST_NAME;
+
+		List<GermplasmList> results = this.manager.searchForGermplasmList(q, Operation.EQUAL);
+		Assert.assertEquals("There should be one result found", 1, results.size());
+		boolean hasMatch = false;
+		for (GermplasmList germplasmList : results) {
+			if (germplasmList.getName().equals(OTHER_PROGRAM_LIST_NAME)) {
+				hasMatch = true;
+			}
+		}
+		Assert.assertTrue(OTHER_PROGRAM_LIST_NAME + " should be found", hasMatch);
+	}
+
+	@Test
 	public void testSaveListDataColumns() throws MiddlewareQueryException {
 		List<ListDataInfo> listDataCollection = new ArrayList<ListDataInfo>();
 

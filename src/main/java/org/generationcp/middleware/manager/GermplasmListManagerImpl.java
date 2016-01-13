@@ -516,6 +516,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
+	public List<GermplasmList> searchForGermplasmList(final String q, final Operation o) {
+		return searchForGermplasmList(q, null, o);
+	}
+
+	@Override
 	public List<GermplasmList> searchForGermplasmList(final String q, final String programUUID, final Operation o) {
 		final List<GermplasmList> results = new ArrayList<GermplasmList>();
 		results.addAll(this.getGermplasmListDAO().searchForGermplasmLists(q, programUUID, o));
