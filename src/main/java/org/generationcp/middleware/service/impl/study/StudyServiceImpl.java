@@ -91,7 +91,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public List<StudySummary> search(final StudySearchParameters serchParameters) {
 
-		final List<StudySummary> studySummaries = new ArrayList<StudySummary>();
+		final List<StudySummary> studySummaries = new ArrayList<>();
 
 		StringBuffer sql = new StringBuffer()
 		.append("SELECT p.project_id AS id, p.name AS name, p.description AS title, ")

@@ -166,11 +166,8 @@ public class ExperimentModelSaver extends Saver {
 	}
 
 	public int moveStudyToNewGeolocation(int studyId) throws MiddlewareQueryException {
-		if (studyId > 0) {
-			throw new MiddlewareQueryException("Can not update central studies");
-		}
 		List<DatasetReference> datasets = this.getDmsProjectDao().getDatasetNodesByStudyId(studyId);
-		List<Integer> ids = new ArrayList<Integer>();
+		List<Integer> ids = new ArrayList<>();
 		ids.add(studyId);
 		if (datasets != null) {
 			for (DatasetReference dataset : datasets) {

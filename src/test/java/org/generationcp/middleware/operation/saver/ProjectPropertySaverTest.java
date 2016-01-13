@@ -5,9 +5,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
 
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -15,9 +18,11 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
@@ -40,6 +45,8 @@ public class ProjectPropertySaverTest {
 
 	private int datasetId;
 	private Map<Integer, List<Integer>> dummyProjectPropIds;
+
+	private static final String propertyName = "Property Name";
 
 	@Before
 	public void setup() {
@@ -74,12 +81,12 @@ public class ProjectPropertySaverTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testUpdateVariablesRanking_NewVariableInDBAndNotInVarListParameter() throws MiddlewareQueryException {
-		final List<Integer> variableIds = new ArrayList<Integer>(ProjectPropertySaverTest.GERMPLASM_PLOT_VARIATE_IDS);
+		final List<Integer> variableIds = new ArrayList<>(ProjectPropertySaverTest.GERMPLASM_PLOT_VARIATE_IDS);
 		Collections.shuffle(variableIds);
 
 		// New variables exist in DB but not included in passed in list of variables
 		final List<Integer> newVariableIds = Arrays.asList(123, 456, 789);
-		final Map<Integer, List<Integer>> newMap = new HashMap<Integer, List<Integer>>(this.dummyProjectPropIds);
+		final Map<Integer, List<Integer>> newMap = new HashMap<>(this.dummyProjectPropIds);
 		for (int i = 0; i < newVariableIds.size(); i++) {
 			final int start = this.dummyProjectPropIds.size() + i * 3;
 			newMap.put(newVariableIds.get(i), Arrays.asList(start + 1, start + 2, start + 3));
@@ -128,12 +135,13 @@ public class ProjectPropertySaverTest {
 		standardVariable.setName("Name");
 		standardVariable.setDescription("Description");
 		standardVariable.setPhenotypicType(PhenotypicType.STUDY);
+		standardVariable.setProperty(new Term(1, "Property Name", "Property Description"));
 
 		dmsVariableType.setStandardVariable(standardVariable);
 
-		// role and null variable type
-		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType);
+		//role and null variable type
 		dmsVariableType.setRole(PhenotypicType.STUDY);
+		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType);
 		dmsVariableType.setVariableType(null);
 
 		Assert.assertEquals("SaveVariableType should add properties to dmsProject as expected", 3, dmsProject.getProperties().size());
@@ -183,12 +191,165 @@ public class ProjectPropertySaverTest {
 		Assert.assertEquals(String.format(message, "Rank"), rank, dmsVariableType.getRank());
 	}
 
+	/**
+	 * Create list of valid project properties from the given dmsproject and dmsvariabletype data.
+	 */
+	@Test
+	public void testCreateProjectProperty(){
+		DmsProject dmsProject = new DmsProject();
+		dmsProject.setProjectId(1);
+		dmsProject.setName("ProjectName");
+		dmsProject.setDescription("ProjectDescription");
+		dmsProject.setProgramUUID("UUID");
+
+		VariableTypeList variableTypeList = new VariableTypeList();
+
+		PhenotypicType role = PhenotypicType.STUDY;
+		VariableType variableType = VariableType.STUDY_DETAIL;
+
+		StandardVariable standardVariable = new StandardVariable();
+		standardVariable.setId(new Random().nextInt(10000));
+		standardVariable.setProperty(new Term(new Random().nextInt(1000), ProjectPropertySaverTest.propertyName, "Property Description"));
+		standardVariable.setPhenotypicType(role);
+		standardVariable.setVariableTypes(new HashSet<>(
+				new ArrayList<>(Collections.singletonList(OntologyDataHelper.mapFromPhenotype(role, ProjectPropertySaverTest.propertyName)))));
+
+		DMSVariableType dmsVariableType = new DMSVariableType();
+		dmsVariableType.setLocalName("Local Name");
+		dmsVariableType.setLocalDescription("Local Description");
+		dmsVariableType.setRank(1);
+		dmsVariableType.setTreatmentLabel("STUDY");
+		dmsVariableType.setRole(role);
+		dmsVariableType.setVariableType(variableType);
+
+		dmsVariableType.setStandardVariable(standardVariable);
+		variableTypeList.add(dmsVariableType);
+
+		List<ProjectProperty> properties = this.projectPropSaver.create(dmsProject, variableTypeList);
+
+		Integer typeId = 0;
+		DmsProject project = null;
+		for(ProjectProperty projectProperty : properties){
+			typeId = projectProperty.getTypeId();
+			project = projectProperty.getProject();
+
+			Assert.assertEquals(dmsProject.getProjectId(), project.getProjectId());
+			Assert.assertEquals(dmsProject.getName(), project.getName());
+			Assert.assertEquals(dmsProject.getDescription(), project.getDescription());
+			Assert.assertEquals(dmsProject.getProgramUUID(), project.getProgramUUID());
+
+			if(Objects.equals(typeId, VariableType.STUDY_DETAIL.getId())){
+				Assert.assertEquals(dmsVariableType.getLocalName(), projectProperty.getValue());
+			} else if(Objects.equals(typeId, TermId.VARIABLE_DESCRIPTION.getId())){
+				Assert.assertEquals(dmsVariableType.getLocalDescription(), projectProperty.getValue());
+			} else if(Objects.equals(typeId, TermId.STANDARD_VARIABLE.getId())){
+				Assert.assertEquals(String.valueOf(dmsVariableType.getId()), projectProperty.getValue());
+			}else if(Objects.equals(typeId, TermId.MULTIFACTORIAL_INFO.getId())){
+				Assert.assertEquals(dmsVariableType.getTreatmentLabel(), projectProperty.getValue());
+			}
+		}
+	}
+
+	/**
+	 * Create list of valid project properties from the given dmsproject and dmsvariabletype data with TRAIT variable type.
+	 */
+	@Test
+	public void testCreateProjectPropertyWithTraitVariableType(){
+		DmsProject dmsProject = new DmsProject();
+		dmsProject.setProjectId(1);
+		dmsProject.setName("ProjectName");
+		dmsProject.setDescription("ProjectDescription");
+		dmsProject.setProgramUUID("UUID");
+
+		VariableTypeList variableTypeList = new VariableTypeList();
+
+		PhenotypicType role = PhenotypicType.VARIATE;
+		VariableType variableType = VariableType.TRAIT;
+
+		StandardVariable standardVariable = new StandardVariable();
+		standardVariable.setId(new Random().nextInt(10000));
+		standardVariable.setProperty(new Term(new Random().nextInt(1000), ProjectPropertySaverTest.propertyName, "Property Description"));
+		standardVariable.setPhenotypicType(role);
+		standardVariable.setVariableTypes(new HashSet<>(
+				new ArrayList<>(Collections.singletonList(OntologyDataHelper.mapFromPhenotype(role, ProjectPropertySaverTest.propertyName)))));
+
+		DMSVariableType dmsVariableType = new DMSVariableType();
+		dmsVariableType.setLocalName("Local Name");
+		dmsVariableType.setLocalDescription("Local Description");
+		dmsVariableType.setRank(1);
+		dmsVariableType.setTreatmentLabel("STUDY");
+		dmsVariableType.setRole(role);
+		dmsVariableType.setVariableType(variableType);
+
+		dmsVariableType.setStandardVariable(standardVariable);
+		variableTypeList.add(dmsVariableType);
+
+		List<ProjectProperty> properties = this.projectPropSaver.create(dmsProject, variableTypeList);
+
+		Integer typeId = 0;
+		DmsProject project = null;
+		for(ProjectProperty projectProperty : properties){
+			typeId = projectProperty.getTypeId();
+			project = projectProperty.getProject();
+
+			Assert.assertEquals(dmsProject.getProjectId(), project.getProjectId());
+			Assert.assertEquals(dmsProject.getName(), project.getName());
+			Assert.assertEquals(dmsProject.getDescription(), project.getDescription());
+			Assert.assertEquals(dmsProject.getProgramUUID(), project.getProgramUUID());
+
+			if(Objects.equals(typeId, VariableType.TRAIT.getId())){
+				Assert.assertEquals(dmsVariableType.getLocalName(), projectProperty.getValue());
+			} else if(Objects.equals(typeId, TermId.VARIABLE_DESCRIPTION.getId())){
+				Assert.assertEquals(dmsVariableType.getLocalDescription(), projectProperty.getValue());
+			} else if(Objects.equals(typeId, TermId.STANDARD_VARIABLE.getId())){
+				Assert.assertEquals(String.valueOf(dmsVariableType.getId()), projectProperty.getValue());
+			}else if(Objects.equals(typeId, TermId.MULTIFACTORIAL_INFO.getId())){
+				Assert.assertEquals(dmsVariableType.getTreatmentLabel(), projectProperty.getValue());
+			}
+		}
+	}
+
+	/**
+	 * This test will expect RuntimeException as not valid role is provided, for that no valid variable type is exist.
+	 */
+	@Test(expected = RuntimeException.class)
+	public void testCreateProjectPropertyThrowRuntimeException(){
+		DmsProject dmsProject = new DmsProject();
+		dmsProject.setProjectId(1);
+		dmsProject.setName("ProjectName");
+		dmsProject.setDescription("ProjectDescription");
+		dmsProject.setProgramUUID("UUID");
+
+		VariableTypeList variableTypeList = new VariableTypeList();
+
+		PhenotypicType role = PhenotypicType.UNASSIGNED;
+
+		StandardVariable standardVariable = new StandardVariable();
+		standardVariable.setId(new Random().nextInt(10000));
+		standardVariable.setProperty(new Term(new Random().nextInt(1000), ProjectPropertySaverTest.propertyName, "Property Description"));
+		standardVariable.setPhenotypicType(role);
+		standardVariable.setVariableTypes(new HashSet<>(
+				new ArrayList<>(Collections.singletonList(OntologyDataHelper.mapFromPhenotype(role, ProjectPropertySaverTest.propertyName)))));
+
+		DMSVariableType dmsVariableType = new DMSVariableType();
+		dmsVariableType.setLocalName("Local Name");
+		dmsVariableType.setLocalDescription("Local Description");
+		dmsVariableType.setRank(1);
+		dmsVariableType.setTreatmentLabel("STUDY");
+		dmsVariableType.setRole(role);
+
+		dmsVariableType.setStandardVariable(standardVariable);
+		variableTypeList.add(dmsVariableType);
+
+		this.projectPropSaver.create(dmsProject, variableTypeList);
+	}
+
 	private static Map<Integer, List<Integer>> getDummyProjectPropIds() {
-		final List<Integer> allVariableIds = new ArrayList<Integer>();
+		final List<Integer> allVariableIds = new ArrayList<>();
 		allVariableIds.addAll(ProjectPropertySaverTest.DATASET_STUDY_TRIAL_IDS);
 		allVariableIds.addAll(ProjectPropertySaverTest.GERMPLASM_PLOT_VARIATE_IDS);
 
-		final Map<Integer, List<Integer>> idsMap = new HashMap<Integer, List<Integer>>();
+		final Map<Integer, List<Integer>> idsMap = new HashMap<>();
 
 		for (int i = 0; i < allVariableIds.size(); i++) {
 			final int start = i * 3;
@@ -328,6 +489,7 @@ public class ProjectPropertySaverTest {
 	private StandardVariable createStandardVariable(final int id) {
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(id);
+		standardVariable.setProperty(new Term(new Random().nextInt(1000), ProjectPropertySaverTest.propertyName, "Property Description"));
 		return standardVariable;
 	}
 }
