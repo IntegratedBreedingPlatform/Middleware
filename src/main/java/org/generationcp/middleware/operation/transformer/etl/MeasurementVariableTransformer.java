@@ -53,6 +53,7 @@ public class MeasurementVariableTransformer extends Transformer {
 				if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
 					measurementVariable.setTreatmentLabel(variableType.getTreatmentLabel());
 				}
+				measurementVariable.setVariableType(variableType.getVariableType());
 				measurementVariables.add(measurementVariable);
 			}
 		}
@@ -89,6 +90,7 @@ public class MeasurementVariableTransformer extends Transformer {
 				if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
 					measurementVariable.setTreatmentLabel(variableType.getTreatmentLabel());
 				}
+				measurementVariable.setVariableType(variableType.getVariableType());
 				measurementVariables.add(measurementVariable);
 			}
 		}
