@@ -68,7 +68,7 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 			final StandardVariable stdVariable = this.getStandardVariable(measurementVariable.getTermId());
 			final DMSVariableType variableType = this.transformMeasurementVariable(measurementVariable, stdVariable);
 			this.validateMeasurementVariable(measurementVariable, variableType, isInTrialDataset);
-			VariableType expectedVariableType = varTypeList.getVariableTypes().get(index).getVariableType();
+			final VariableType expectedVariableType = varTypeList.getVariableTypes().get(index).getVariableType();
 			Assert.assertEquals("Variable type must be " + expectedVariableType, expectedVariableType,
 					measurementVariable.getVariableType());
 			index++;
@@ -136,7 +136,7 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 	}
 
 	private StandardVariable getStandardVariable(final int id) throws MiddlewareException {
-		return this.standardVariableBuilder.create(id,"1234567");
+		return this.standardVariableBuilder.create(id, "1234567");
 	}
 
 	private DMSVariableType transformMeasurementVariable(final MeasurementVariable measurementVariable,
@@ -167,7 +167,7 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 			final StandardVariable stdVariable = this.getStandardVariable(measurementVariable.getTermId());
 			final DMSVariableType variableType = this.transformMeasurementVariable(measurementVariable, stdVariable);
 			this.validateMeasurementVariable(measurementVariable, variableType, isInTrialDataset);
-			VariableType expectedVariableType = varTypeList.getVariableTypes().get(index).getVariableType();
+			final VariableType expectedVariableType = varTypeList.getVariableTypes().get(index).getVariableType();
 			Assert.assertEquals("Variable type must be " + expectedVariableType, expectedVariableType,
 					measurementVariable.getVariableType());
 			index++;
@@ -187,7 +187,7 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 			final StandardVariable stdVariable = this.getStandardVariable(measurementVariable.getTermId());
 			final DMSVariableType variableType = this.transformMeasurementVariable(measurementVariable, stdVariable);
 			this.validateMeasurementVariable(measurementVariable, variableType, isInTrialDataset);
-			VariableType expectedVariableType = varTypeList.getVariableTypes().get(index).getVariableType();
+			final VariableType expectedVariableType = varTypeList.getVariableTypes().get(index).getVariableType();
 			Assert.assertEquals("Variable type must be " + expectedVariableType, expectedVariableType,
 					measurementVariable.getVariableType());
 			index++;
