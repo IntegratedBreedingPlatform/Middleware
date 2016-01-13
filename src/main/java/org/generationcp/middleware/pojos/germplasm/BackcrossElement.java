@@ -1,6 +1,10 @@
 
 package org.generationcp.middleware.pojos.germplasm;
 
+import java.util.List;
+
+import org.generationcp.middleware.pojos.Name;
+
 public class BackcrossElement implements GermplasmCrossElement {
 
 	private static final long serialVersionUID = 6253095292794735301L;
@@ -9,6 +13,12 @@ public class BackcrossElement implements GermplasmCrossElement {
 	GermplasmCrossElement recurringParent;
 	private int numberOfDosesOfRecurringParent;
 	private boolean recurringParentOnTheRight = false;
+
+	private Integer level;
+
+	private List<Name> name;
+
+	private Integer rootLevel;
 
 	public GermplasmCrossElement getParent() {
 		return this.parent;
@@ -43,6 +53,26 @@ public class BackcrossElement implements GermplasmCrossElement {
 	}
 
 	@Override
+	public Integer getRootLevel() {
+		return this.rootLevel;
+	}
+
+	@Override
+	public void setRootLevel(final Integer rootLevel) {
+		this.rootLevel = rootLevel;
+	}
+
+	@Override
+	public void setLevel(Integer level) {
+		this.level = level;
+	}
+
+	@Override
+	public void setNames(List<Name> name) {
+		this.name = name;
+	}
+
+	@Override
 	public String toString() {
 		StringBuilder toreturn = new StringBuilder();
 
@@ -72,4 +102,5 @@ public class BackcrossElement implements GermplasmCrossElement {
 
 		return toreturn.toString();
 	}
+
 }

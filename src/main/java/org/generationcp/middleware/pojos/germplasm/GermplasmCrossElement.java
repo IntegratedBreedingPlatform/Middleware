@@ -12,7 +12,18 @@
 package org.generationcp.middleware.pojos.germplasm;
 
 import java.io.Serializable;
+import java.util.List;
+
+import org.generationcp.middleware.pojos.Name;
 
 public interface GermplasmCrossElement extends Serializable {
+
+		void setLevel(Integer level);
+
+		void setNames(List<Name> name);
+
+		void setRootLevel(Integer rootLevel);
+
+		Integer getRootLevel();
 
 }

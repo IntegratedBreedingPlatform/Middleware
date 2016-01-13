@@ -11,6 +11,10 @@
 
 package org.generationcp.middleware.pojos.germplasm;
 
+import java.util.List;
+
+import org.generationcp.middleware.pojos.Name;
+
 public class GermplasmCross implements GermplasmCrossElement {
 
 	private static final long serialVersionUID = 7519980544099378460L;
@@ -18,6 +22,12 @@ public class GermplasmCross implements GermplasmCrossElement {
 	private GermplasmCrossElement firstParent;
 	private GermplasmCrossElement secondParent;
 	private int numberOfCrossesBefore; // the number of crosses before this cross
+
+	private Integer level;
+
+	private List<Name> name;
+
+	private Integer rootLevel;
 
 	public GermplasmCrossElement getFirstParent() {
 		return this.firstParent;
@@ -41,6 +51,26 @@ public class GermplasmCross implements GermplasmCrossElement {
 
 	public void setNumberOfCrossesBefore(int numberOfCrossesBefore) {
 		this.numberOfCrossesBefore = numberOfCrossesBefore;
+	}
+
+	@Override
+	public Integer getRootLevel() {
+		return this.rootLevel;
+	}
+
+	@Override
+	public void setRootLevel(final Integer rootLevel) {
+		this.rootLevel = rootLevel;
+	}
+
+	@Override
+	public void setLevel(Integer level) {
+		this.level = level;
+	}
+
+	@Override
+	public void setNames(List<Name> name) {
+		this.name = name;
 	}
 
 	@Override
