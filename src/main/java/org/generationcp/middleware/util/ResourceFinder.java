@@ -1,13 +1,13 @@
 /***************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
+ * 
  * @author Kevin L. Manansala
- *
+ * 
  *         This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of
  *         Part F of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  **************************************************************/
 
 package org.generationcp.middleware.util;
@@ -16,12 +16,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class has utility methods used by other classes.
- *
+ * 
  * @author Kevin Manansala
- *
+ * 
  */
 public class ResourceFinder {
 
@@ -42,7 +45,7 @@ public class ResourceFinder {
 	 * 
 	 * @throws FileNotFoundException if the resource cannot be found; or if the 'name' is null or otherwise invalid
 	 **/
-	public static URL locateFile(String name) throws FileNotFoundException {
+	public static URL locateFile(final String name) throws FileNotFoundException {
 
 		if (name == null) {
 			throw new FileNotFoundException("Null file name.");
@@ -51,7 +54,7 @@ public class ResourceFinder {
 		// attempt to create a URL directly
 		try {
 			return new URL(name);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			// let's make another attempt
 		}
 
@@ -60,14 +63,14 @@ public class ResourceFinder {
 		if (file.isAbsolute() || file.exists()) {
 			try {
 				return file.toURI().toURL();
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				throw new FileNotFoundException("Malformed path: " + name);
 			}
 		}
 
 		// attempt to load from the user home directory
 		try {
-			StringBuilder fName = new StringBuilder();
+			final StringBuilder fName = new StringBuilder();
 			fName.append(System.getProperty("user.home"));
 			fName.append(File.separator);
 			fName.append(name);
@@ -75,12 +78,12 @@ public class ResourceFinder {
 			if (file.exists()) {
 				return file.toURI().toURL();
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			// let's make another attempt
 		}
 
 		// attempt to load from the context classpath
-		ClassLoader loader = Thread.currentThread().getContextClassLoader();
+		final ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		URL url = loader.getResource(name);
 		if (url != null) {
 			return url;
@@ -94,6 +97,28 @@ public class ResourceFinder {
 
 		// if all fails
 		throw new FileNotFoundException(name);
+	}
+
+	/**
+	 * Return a list of files under a certain directory path
+	 * 
+	 * @param path
+	 * @return
+	 */
+	public static List<File> getResourceListing(final String path) {
+
+		File directory;
+		try {
+			directory = new File(ResourceFinder.locateFile(path).getFile());
+
+			final List<File> files = new ArrayList<File>(Arrays.asList(directory.listFiles()));
+
+			return files;
+
+		} catch (final FileNotFoundException e) {
+
+		}
+		return new ArrayList<File>();
 	}
 
 }

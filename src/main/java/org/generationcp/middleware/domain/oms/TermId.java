@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.oms;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 /**
  * The cvterm ID constants used in Middleware.
- * 
+ *
  */
 public enum TermId {
 
@@ -48,9 +48,10 @@ public enum TermId {
 
 	// Variate Types
 	, OBSERVATION_VARIATE(1043), CATEGORICAL_VARIATE(1048)
-	
-	//Data Types
-	, PERSON_DATA_TYPE(1131), LOCATION_DATA_TYPE(1132), STUDY_DATA_TYPE(1133), DATASET_DATA_TYPE(1134), GERMPLASM_LIST_DATA_TYPE(1135), BREEDING_METHOD_DATA_TYPE(1136)
+
+	// Data Types
+	, PERSON_DATA_TYPE(1131), LOCATION_DATA_TYPE(1132), STUDY_DATA_TYPE(1133), DATASET_DATA_TYPE(1134), GERMPLASM_LIST_DATA_TYPE(1135), BREEDING_METHOD_DATA_TYPE(
+			1136)
 
 	// Folder, Study, Dataset Nodes
 	, HAS_PARENT_FOLDER(1140), STUDY_HAS_FOLDER(1145), BELONGS_TO_STUDY(1150), IS_STUDY(1145)
@@ -100,11 +101,7 @@ public enum TermId {
 	, NURSERY(10000), TRIAL(10010)
 
 	// Main Factor (Variable)
-	, TRIAL_INSTANCE_FACTOR(8170)
-	, LATITUDE(8191)
-	, LONGITUDE(8192)
-	, GEODETIC_DATUM(8193)
-	, ALTITUDE(8194)
+	, TRIAL_INSTANCE_FACTOR(8170), LATITUDE(8191), LONGITUDE(8192), GEODETIC_DATUM(8193), ALTITUDE(8194)
 
 	, DELETED_STUDY(12990), ACTIVE_STUDY(12960)
 
@@ -126,7 +123,7 @@ public enum TermId {
 
 	// Experimental Design Factor Possible Values
 	, RANDOMIZED_COMPLETE_BLOCK(10110), RESOLVABLE_INCOMPLETE_BLOCK(10130), RESOLVABLE_INCOMPLETE_ROW_COL(10145), RESOLVABLE_INCOMPLETE_BLOCK_LATIN(
-			10166), RESOLVABLE_INCOMPLETE_ROW_COL_LATIN(10167), OTHER_DESIGN(10168)
+			10166), RESOLVABLE_INCOMPLETE_ROW_COL_LATIN(10167), OTHER_DESIGN(10168), EXPT_DESIGN_SOURCE(8165)
 
 	// Replications Map values
 	, REPS_IN_SINGLE_ROW(8143), REPS_IN_SINGLE_COL(8144), REPS_IN_ADJACENT_COLS(8145)
@@ -167,9 +164,9 @@ public enum TermId {
 	;
 
 	private final int id;
-	private final static Map<Integer, TermId> TERM_ID_MAP = new HashMap<>();
+	private static final Map<Integer, TermId> TERM_ID_MAP = new HashMap<>();
 
-	TermId(int id) {
+	TermId(final int id) {
 		this.id = id;
 	}
 
@@ -177,19 +174,19 @@ public enum TermId {
 		return this.id;
 	}
 
-	public static TermId getById(Integer id) {
+	public static TermId getById(final Integer id) {
 		if (id == null) {
 			return null;
 		}
 
-		if (!TERM_ID_MAP.containsKey(id)) {
-			for (TermId term : TermId.values()) {
+		if (!TermId.TERM_ID_MAP.containsKey(id)) {
+			for (final TermId term : TermId.values()) {
 				if (term.getId() == id) {
 					return term;
 				}
 			}
 		}
 
-		return TERM_ID_MAP.get(id);
+		return TermId.TERM_ID_MAP.get(id);
 	}
 }
