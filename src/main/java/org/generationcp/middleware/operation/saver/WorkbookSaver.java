@@ -79,7 +79,6 @@ public class WorkbookSaver extends Saver {
 		workbook.reset();
 
 		// Create Maps, which we will fill with transformed Workbook Variable Data
-		final Map<String, Map<String, ?>> variableMap = new HashMap<String, Map<String, ?>>();
 		final Map<String, List<String>> headerMap = new HashMap<String, List<String>>();
 		final Map<String, VariableTypeList> variableTypeMap = new HashMap<String, VariableTypeList>();
 		final Map<String, List<MeasurementVariable>> measurementVariableMap = new HashMap<String, List<MeasurementVariable>>();
@@ -88,21 +87,20 @@ public class WorkbookSaver extends Saver {
 		final List<MeasurementVariable> trialMV = workbook.getTrialVariables();
 		final List<String> trialHeaders = workbook.getTrialHeaders();
 		final VariableTypeList trialVariables =
-				this.getVariableTypeListTransformer().transform(workbook.getTrialConditions(), false, programUUID);
+				this.getVariableTypeListTransformer().transform(workbook.getTrialConditions(), programUUID);
 		final List<MeasurementVariable> trialFactors = workbook.getTrialFactors();
 		VariableTypeList trialVariableTypeList = null;
 		if (trialFactors != null && !trialFactors.isEmpty()) {// multi-location
-			trialVariableTypeList = this.getVariableTypeListTransformer().transform(trialFactors, false, trialVariables.size() + 1, programUUID);
+			trialVariableTypeList = this.getVariableTypeListTransformer().transform(trialFactors, trialVariables.size() + 1, programUUID);
 			trialVariables.addAll(trialVariableTypeList);
 		}
 		// GCP-6091 end
 		trialVariables.addAll(this.getVariableTypeListTransformer()
-				.transform(workbook.getTrialConstants(), true, trialVariables.size() + 1, programUUID));
+				.transform(workbook.getTrialConstants(), trialVariables.size() + 1, programUUID));
 
-		final List<MeasurementVariable> effectMV = workbook.getMeasurementDatasetVariables();
 		final VariableTypeList effectVariables =
-				this.getVariableTypeListTransformer().transform(workbook.getNonTrialFactors(), false, programUUID);
-		effectVariables.addAll(this.getVariableTypeListTransformer().transform(workbook.getVariates(), true, effectVariables.size() + 1,programUUID));
+				this.getVariableTypeListTransformer().transform(workbook.getNonTrialFactors(), programUUID);
+		effectVariables.addAll(this.getVariableTypeListTransformer().transform(workbook.getVariates(), effectVariables.size() + 1 ,programUUID));
 
 		// -- headers
 		headerMap.put("trialHeaders", trialHeaders);
@@ -112,13 +110,16 @@ public class WorkbookSaver extends Saver {
 		variableTypeMap.put("effectVariables", effectVariables);
 		// -- measurementVariables
 		measurementVariableMap.put("trialMV", trialMV);
+
+		final List<MeasurementVariable> effectMV = workbook.getMeasurementDatasetVariables();
 		measurementVariableMap.put("effectMV", effectMV);
+
 		// load 3 maps into a super Map
+		final Map<String, Map<String, ?>> variableMap = new HashMap<>();
 		variableMap.put("headerMap", headerMap);
 		variableMap.put("variableTypeMap", variableTypeMap);
 		variableMap.put("measurementVariableMap", measurementVariableMap);
 		return variableMap;
-
 	}
 
 	/**
@@ -546,9 +547,8 @@ public class WorkbookSaver extends Saver {
 			watch.restart("transform variables for study");
 			final List<MeasurementVariable> studyMV = workbook.getStudyVariables();
 			final VariableTypeList studyVariables =
-					this.getVariableTypeListTransformer().transform(workbook.getStudyConditions(), false, programUUID);
-			studyVariables.addAll(this.getVariableTypeListTransformer().transform(workbook.getStudyConstants(), true,
-					studyVariables.size() + 1,programUUID));
+					this.getVariableTypeListTransformer().transform(workbook.getStudyConditions(), programUUID);
+			studyVariables.addAll(this.getVariableTypeListTransformer().transform(workbook.getStudyConstants(), studyVariables.size() + 1,programUUID));
 
 			if (workbook.isNursery() && this.getTrialInstanceFactor(workbook.getTrialVariables()) == null) {
 				studyVariables.add(this.createOccVariableType(studyVariables.size() + 1,programUUID));

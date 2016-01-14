@@ -417,7 +417,7 @@ public class WorkbookTestDataInitializer {
 			final String scale, final String method, final String property, final String dataType, final String value, final String label,
 			final int dataTypeId, final PhenotypicType role) {
 		final MeasurementVariable variable =
-				new MeasurementVariable(termId, name, description, scale, description, property, dataType, value, label);
+				new MeasurementVariable(termId, name, description, scale, method, property, dataType, value, label);
 		variable.setRole(role);
 		variable.setDataTypeId(dataTypeId);
 		return variable;

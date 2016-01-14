@@ -2,6 +2,8 @@
 package org.generationcp.middleware.service.api.study;
 
 import java.util.List;
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.EqualsBuilder;
 
 public class ObservationDto {
 
@@ -24,6 +26,8 @@ public class ObservationDto {
 	private final String plotNumber;
 
 	private final List<MeasurementDto> traitMeasurements;
+
+	private transient int hashCode;
 
 	public ObservationDto(final Integer measurementId, final String trialInstance, final String entryType, final Integer gid,
 			final String designation, final String entryNo, final String seedSource, final String repitionNumber, final String plotNumber,
@@ -78,6 +82,29 @@ public class ObservationDto {
 
 	public List<MeasurementDto> getTraitMeasurements() {
 		return this.traitMeasurements;
+	}
+
+	@Override
+	public boolean equals(final Object other) {
+		if (!(other instanceof ObservationDto))
+			return false;
+		ObservationDto castOther = (ObservationDto) other;
+		return new EqualsBuilder().append(measurementId, castOther.measurementId).append(trialInstance, castOther.trialInstance)
+				.append(entryType, castOther.entryType).append(gid, castOther.gid).append(designation, castOther.designation)
+				.append(entryNo, castOther.entryNo).append(seedSource, castOther.seedSource)
+				.append(repitionNumber, castOther.repitionNumber).append(plotNumber, castOther.plotNumber)
+				.append(traitMeasurements, castOther.traitMeasurements).isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		if (hashCode == 0) {
+			hashCode =
+					new HashCodeBuilder().append(measurementId).append(trialInstance).append(entryType).append(gid).append(designation)
+							.append(entryNo).append(seedSource).append(repitionNumber).append(plotNumber).append(traitMeasurements)
+							.toHashCode();
+		}
+		return hashCode;
 	}
 
 }

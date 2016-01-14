@@ -22,10 +22,12 @@ import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -52,7 +54,7 @@ public class ProjectPropertySaver {
 	}
 
 	public List<ProjectProperty> create(final DmsProject project, final VariableTypeList variableTypeList) {
-		final List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
+		final List<ProjectProperty> properties = new ArrayList<>();
 		final List<DMSVariableType> variableTypes = variableTypeList != null ? variableTypeList.getVariableTypes() : null;
 
 		if (variableTypes != null && !variableTypes.isEmpty()) {
@@ -77,17 +79,32 @@ public class ProjectPropertySaver {
 
 	private List<ProjectProperty> createVariableProperties(final DmsProject project, final DMSVariableType variableType)
 			throws MiddlewareQueryException {
-		final List<ProjectProperty> properties = new ArrayList<ProjectProperty>();
 
-		org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = variableType.getVariableType();
+	  	// Setting property, scale and method to standard variable
+	  	final StandardVariableSummary standardVariableSummary =
+			  this.daoFactory.getStandardVariableBuilder().getStandardVariableSummary(variableType.getStandardVariable().getId());
 
-		if (variableTypeEnum == null) {
-			variableTypeEnum =
-					this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(variableType.getRole(), false);
+	  	variableType.getStandardVariable().setProperty(new Term(0, standardVariableSummary.getProperty().getName(), ""));
+	  	variableType.getStandardVariable().setScale(new Term(0, standardVariableSummary.getScale().getName(), ""));
+	  	variableType.getStandardVariable().setMethod(new Term(0, standardVariableSummary.getMethod().getName(), ""));
+
+	  	variableType.setVariableTypeIfNull();
+
+		VariableType variableTypeEnum = variableType.getVariableType();
+
+		if(variableTypeEnum == null) {
+			throw new RuntimeException("Variable do not have a valid variable type.");
 		}
 
-		final int variableTypeId = variableTypeEnum.getId();
+		int variableTypeId;
 
+		// This makes sure that selection values are actually saved as selections in the projectprop tables. Note roles cannot be used for
+		// this as both selections and traits map to roles. Thus if the role has evaluated to a Trait varible type and the DMSVariableType
+		// is not null use the DMSVariableType as it could be a selection.
+		variableTypeId = variableTypeEnum.getId();
+
+		final List<ProjectProperty> properties = new ArrayList<>();
+		
 		properties.add(new ProjectProperty(project, variableTypeId, variableType.getLocalName(), variableType.getRank()));
 		properties.add(new ProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType
 				.getRank()));
@@ -104,10 +121,13 @@ public class ProjectPropertySaver {
 
 	public void saveProjectPropValues(final int projectId, final VariableList variableList) {
 		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
-			for (final Variable variable : variableList.getVariables()) {
-				final org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum =
-						this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
-								variable.getVariableType().getRole(), false);
+			for (Variable variable : variableList.getVariables()) {
+
+				DMSVariableType dmsVariableType = variable.getVariableType();
+				dmsVariableType.setVariableTypeIfNull();
+
+				VariableType variableTypeEnum = dmsVariableType.getVariableType();
+
 				if (variableTypeEnum == org.generationcp.middleware.domain.ontology.VariableType.STUDY_DETAIL) {
 					final ProjectProperty property = new ProjectProperty();
 					property.setTypeId(variable.getVariableType().getStandardVariable().getId());
@@ -132,10 +152,15 @@ public class ProjectPropertySaver {
 	 */
 	public void saveVariableType(final DmsProject project, final DMSVariableType objDMSVariableType) {
 
-		if (objDMSVariableType.getVariableType() == null) {
-			objDMSVariableType.setVariableType(this.daoFactory.getStandardVariableBuilder().mapPhenotypicTypeToDefaultVariableType(
-					objDMSVariableType.getStandardVariable().getPhenotypicType(), false));
-		}
+	  // Setting property, scale and method to standard variable
+	  	final StandardVariableSummary standardVariableSummary =
+			  this.daoFactory.getStandardVariableBuilder().getStandardVariableSummary(objDMSVariableType.getStandardVariable().getId());
+
+	  	objDMSVariableType.getStandardVariable().setProperty(new Term(0, standardVariableSummary.getProperty().getName(), ""));
+	  	objDMSVariableType.getStandardVariable().setScale(new Term(0, standardVariableSummary.getScale().getName(), ""));
+	  	objDMSVariableType.getStandardVariable().setMethod(new Term(0, standardVariableSummary.getMethod().getName(), ""));
+
+		objDMSVariableType.setVariableTypeIfNull();
 
 		final org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = objDMSVariableType.getVariableType();
 		this.saveProjectProperty(project, variableTypeEnum.getId(), objDMSVariableType.getLocalName(), objDMSVariableType.getRank());
@@ -279,15 +304,20 @@ public class ProjectPropertySaver {
 	protected DMSVariableType createVariableType(final MeasurementVariable variable, final int rank) {
 		final DMSVariableType varType = new DMSVariableType();
 		final StandardVariable stdvar = new StandardVariable();
-		varType.setStandardVariable(stdvar);
 
-		stdvar.setId(variable.getTermId());
 		varType.setRole(variable.getRole());
 		varType.setVariableType(variable.getVariableType());
-		stdvar.setPhenotypicType(variable.getRole());
 		varType.setLocalName(variable.getName());
 		varType.setLocalDescription(variable.getDescription());
 		varType.setRank(rank);
+
+		stdvar.setId(variable.getTermId());
+		stdvar.setPhenotypicType(variable.getRole());
+		stdvar.setMethod(new Term(0, variable.getMethod(), ""));
+		stdvar.setProperty(new Term(0, variable.getProperty(), ""));
+		stdvar.setScale(new Term(0, variable.getScale(), ""));
+
+		varType.setStandardVariable(stdvar);
 
 		if (variable.getTreatmentLabel() != null && !variable.getTreatmentLabel().isEmpty()) {
 			varType.setTreatmentLabel(variable.getTreatmentLabel());
@@ -445,7 +475,7 @@ public class ProjectPropertySaver {
 		rank = this.updateVariableRank(variableIds, rank, projectPropIDMap);
 
 		// if any factors were added but not included in list of variables, update their ranks also so they come last
-		final List<Integer> storedInIds = new ArrayList<Integer>();
+		final List<Integer> storedInIds = new ArrayList<>();
 		storedInIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
 		storedInIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
 		storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
