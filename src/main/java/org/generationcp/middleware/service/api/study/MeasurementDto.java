@@ -1,6 +1,9 @@
 
 package org.generationcp.middleware.service.api.study;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang.builder.EqualsBuilder;
+
 /**
  * A trait and its associated measurement.
  *
@@ -59,6 +62,20 @@ public class MeasurementDto {
 	 */
 	public void setTriatValue(String triatValue) {
 		this.triatValue = triatValue;
+	}
+
+	@Override
+	public boolean equals(final Object other) {
+		if (!(other instanceof MeasurementDto))
+			return false;
+		MeasurementDto castOther = (MeasurementDto) other;
+		return new EqualsBuilder().append(trait, castOther.trait).append(phenotypeId, castOther.phenotypeId)
+				.append(triatValue, castOther.triatValue).isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder().append(trait).append(phenotypeId).append(triatValue).toHashCode();
 	}
 
 }

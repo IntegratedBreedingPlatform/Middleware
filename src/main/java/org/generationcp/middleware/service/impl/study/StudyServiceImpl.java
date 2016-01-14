@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.study;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
@@ -49,7 +50,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private StudyDataManager studyDataManager;
 
-	private LoadingCache<StudyKey, String> studyIdToProgramIdCache;
+	private static LoadingCache<StudyKey, String> studyIdToProgramIdCache;
 
 	public StudyServiceImpl() {
 		super();
@@ -192,5 +193,15 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public List<StudyGermplasmDto> getStudyGermplasmList(final Integer studyIdentifer) {
 		return this.studyGermplasmListService.getGermplasmList(studyIdentifer);
+	}
+
+	@Override
+	public String getProgramUUID(final Integer studyIdentifier) {
+		try {
+			return studyIdToProgramIdCache.get(new StudyKey(studyIdentifier, ContextHolder.getCurrentCrop()));
+		} catch (ExecutionException e) {
+			throw new MiddlewareQueryException("Unexpected error updating observations. Please contact support for "
+					+ "further assistence.", e);
+		}
 	}
 }
