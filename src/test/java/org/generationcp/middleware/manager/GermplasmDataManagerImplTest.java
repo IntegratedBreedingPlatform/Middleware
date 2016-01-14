@@ -45,7 +45,9 @@ import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
@@ -636,6 +638,42 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 			Assert.assertEquals("PASSPORT", plotCodeField.getFtype());
 			Assert.assertEquals("PLOTCODE", plotCodeField.getFcode());
 		}	
+	}
+	
+	@Test
+	public void testGetPlotCodeValue() {
+		GermplasmDataManagerImpl unitToTest = new GermplasmDataManagerImpl();
+		
+		// We want to mock away calls to other methods in same unit.
+		GermplasmDataManagerImpl partiallyMockedUnit = Mockito.spy(unitToTest);
+		Integer testGid = 1;
+		
+		// First set up data such that no plot code attribute is associated.
+		Mockito.doReturn(null).when(partiallyMockedUnit).getPlotCodeField();
+		List<Attribute> attributes = new ArrayList<Attribute>();
+		Mockito.doReturn(attributes).when(partiallyMockedUnit).getAttributesByGID(Mockito.anyInt());
+		
+		String plotCode1 = partiallyMockedUnit.getPlotCodeValue(testGid);
+		Assert.assertNotNull("getPlotCodeValue() should never return null.", plotCode1);
+		Assert.assertEquals("Expected `Unknown` returned when there is no plot code attribute present.", "Unknown", plotCode1);
+
+		// Now setup data so that gid has plot code attribute associated with it.
+		UserDefinedField udfld = new UserDefinedField();
+		udfld.setFldno(1152);
+		udfld.setFtable("ATRIBUTS");
+		udfld.setFtype("PASSPORT");
+		udfld.setFcode("PLOTCODE");
+		
+		Mockito.when(partiallyMockedUnit.getPlotCodeField()).thenReturn(udfld);
+		Attribute plotCodeAttr = new Attribute();
+		plotCodeAttr.setTypeId(udfld.getFldno());
+		plotCodeAttr.setAval("The PlotCode Value");
+		attributes.add(plotCodeAttr);
+		Mockito.when(partiallyMockedUnit.getAttributesByGID(testGid)).thenReturn(attributes);
+		
+		String plotCode2 = partiallyMockedUnit.getPlotCodeValue(testGid);
+		Assert.assertNotNull("getPlotCodeValue() should never return null.", plotCode2);
+		Assert.assertEquals("Expected value of plot code attribute returned when plot code attribute is present.", plotCodeAttr.getAval(), plotCode2);
 	}
 
 	@Test
