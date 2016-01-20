@@ -106,9 +106,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 
 		for (final MeasurementVariable condition : originalConditions) {
 			final TermId term = TermId.getById(condition.getTermId());
-			if (term == TermId.LOCATION_ID) {
-				locationId = Integer.parseInt(condition.getValue());
-			}
+			locationId = this.retrieveLocationIdFromCondition(condition, term);
 		}
 
 		if (locationId == null) {
@@ -137,6 +135,23 @@ public class ReportServiceImpl extends Service implements ReportService {
 			return variables;
 
 		}
+	}
+
+	/***
+	 * Retrieves the Location ID from condition variable; Returns null if the condition value is an empty string
+	 * 
+	 * @param locationId
+	 * @param condition
+	 * @param termId
+	 * @return
+	 */
+	Integer retrieveLocationIdFromCondition(final MeasurementVariable condition, final TermId termId) {
+		Integer locationId = null;
+		final String conditionValue = condition.getValue().trim();
+		if (termId == TermId.LOCATION_ID && conditionValue.length() > 0) {
+			locationId = Integer.parseInt(conditionValue);
+		}
+		return locationId;
 	}
 
 	@Override
