@@ -473,12 +473,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 				String ffmt = (String) result[5];
 				String fdesc = (String) result[6];
 				Integer lfldno = (Integer) result[7];
-				User user = this.getUserDao().getById((Integer) result[8], false);
+				Integer fuid = (Integer) result[8];
 				Integer fdate = (Integer) result[9];
 				Integer scaleid = (Integer) result[10];
 
 				UserDefinedField userDefinedField =
-						new UserDefinedField(fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, user, fdate, scaleid);
+						new UserDefinedField(fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid);
 				toReturn.add(userDefinedField);
 			}
 		}
@@ -504,12 +504,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 				String ffmt = (String) result[5];
 				String fdesc = (String) result[6];
 				Integer lfldno = (Integer) result[7];
-				User user = this.getUserDao().getById((Integer) result[8], false);
+				Integer fuid = (Integer) result[8];
 				Integer fdate = (Integer) result[9];
 				Integer scaleid = (Integer) result[10];
 
 				UserDefinedField userDefinedField =
-						new UserDefinedField(fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, user, fdate, scaleid);
+						new UserDefinedField(fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid);
 				toReturn.add(userDefinedField);
 			}
 		}

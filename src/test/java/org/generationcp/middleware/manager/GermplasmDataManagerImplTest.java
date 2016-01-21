@@ -906,8 +906,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		field.setFdesc("-");
 		field.setLfldno(0);
 
-		// requires a seed User in the datase
-		field.setUser(this.userDataManager.getAllUsers().get(0));
+		field.setFuid(1);
 		field.setFdate(20041116);
 		field.setScaleid(0);
 
