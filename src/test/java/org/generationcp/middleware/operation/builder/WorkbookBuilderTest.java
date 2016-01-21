@@ -14,6 +14,7 @@ package org.generationcp.middleware.operation.builder;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -37,6 +38,7 @@ import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +67,12 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	private static final int CUSTOM_VARIATE = 18020;
 
 	private static final String PROGRAM_UUID = "12345678";
+
+	@BeforeClass
+	public static void setUpOnce() {
+		// Variable caching relies on the context holder to determine current crop database in use
+		ContextHolder.setCurrentCrop("maize");
+	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -112,7 +120,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	public void testGetTrialObservationsForNursery() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
 
-		final int id = this.dataImportService.saveDataset(workbook, null);
+		final int id = this.dataImportService.saveDataset(workbook, PROGRAM_UUID);
 
 		final Workbook createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
 
@@ -147,7 +155,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	public void testGetTrialObservationsForTrial() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 
-		final int id = this.dataImportService.saveDataset(workbook, null);
+		final int id = this.dataImportService.saveDataset(workbook, PROGRAM_UUID);
 
 		final Workbook createdWorkbook = this.fieldbookService.getTrialDataSet(id);
 
@@ -287,8 +295,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 		// add trial instance (also added in conditions)
 		workbook.getFactors().add(WorkbookTestDataInitializer.createTrialInstanceMeasurementVariable(1));
-		final VariableTypeList factorsVariableTypeList =
-				this.variableTypeListTransformer.transform(workbook.getFactors(), PROGRAM_UUID);
+		final VariableTypeList factorsVariableTypeList = this.variableTypeListTransformer.transform(workbook.getFactors(), PROGRAM_UUID);
 		final VariableTypeList conditionsVariableTypeList =
 				this.variableTypeListTransformer.transform(workbook.getConditions(), PROGRAM_UUID);
 		final VariableTypeList constantsVariableTypeList =
@@ -327,6 +334,37 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		for (final MeasurementVariable var : measurementVariableLists) {
 			Assert.assertEquals("Should have a phenotype role of Trial Environment", var.getRole(), PhenotypicType.TRIAL_ENVIRONMENT);
 		}
+	}
+
+	@Test
+	public void testBuildTrialObservations() {
+
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
+
+		this.dataImportService.saveDataset(workbook, true, false, PROGRAM_UUID);
+
+		List<MeasurementRow> result =
+				this.workbookBuilder.buildTrialObservations(workbook.getTrialDatasetId(), workbook.getTrialConditions(),
+						workbook.getTrialConstants());
+
+		Assert.assertEquals("The trial observation should only contain one measurement row since the study is Nursery Type", 1,
+				result.size());
+		Assert.assertEquals(5, result.get(0).getDataList().size());
+		Assert.assertTrue(this.isTermIdExists(TermId.TRIAL_INSTANCE_FACTOR.getId(), result.get(0).getDataList()));
+		Assert.assertTrue(this.isTermIdExists(TermId.COOPERATOOR_ID.getId(), result.get(0).getDataList()));
+		Assert.assertTrue(this.isTermIdExists(TermId.COOPERATOR.getId(), result.get(0).getDataList()));
+		Assert.assertTrue(this.isTermIdExists(TermId.LOCATION_ID.getId(), result.get(0).getDataList()));
+		Assert.assertTrue(this.isTermIdExists(TermId.TRIAL_LOCATION.getId(), result.get(0).getDataList()));
+
+	}
+
+	private boolean isTermIdExists(int termId, List<MeasurementData> dataList) {
+		for (MeasurementData data : dataList) {
+			if (data.getMeasurementVariable().getTermId() == termId) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	// derived from VariableListTransformer.transformTrialEnvironment (but with no specific role to filter)

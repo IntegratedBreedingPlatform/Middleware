@@ -681,7 +681,7 @@ public class WorkbookBuilder extends Builder {
 			final boolean isStudy) {
 		final List<MeasurementVariable> measurementVariableLists =
 				this.getMeasurementVariableTransformer().transform(variableList, isFactor, isStudy);
-		setMeasurementVarRoles(measurementVariableLists, isFactor, isStudy);
+		this.setMeasurementVarRoles(measurementVariableLists, isFactor, isStudy);
 		return measurementVariableLists;
 	}
 
@@ -882,7 +882,8 @@ public class WorkbookBuilder extends Builder {
 			for (final Experiment experiment : experiments) {
 				final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
 				for (final Variable variable : experiment.getFactors().getVariables()) {
-					if (variable.getVariableType().getId() == TermId.EXPERIMENT_DESIGN_FACTOR.getId()) {
+					if (variable.getVariableType().getId() == TermId.EXPERIMENT_DESIGN_FACTOR.getId()
+							|| variable.getVariableType().getId() == TermId.EXPT_DESIGN_SOURCE.getId()) {
 						continue;
 					}
 					MeasurementData measurementData = null;
