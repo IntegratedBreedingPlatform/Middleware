@@ -49,7 +49,7 @@ public class MaizePedigreeServiceImplTest extends IntegrationTestBase {
 	@Before
 	public void setup() {
 		this.crossExpansionProperties = new CrossExpansionProperties();
-		this.crossExpansionProperties.setDefaultLevel(5);
+		this.crossExpansionProperties.setDefaultLevel(500);
 		this.crossExpansionProperties.setWheatLevel(0);
 	}
 
@@ -59,14 +59,19 @@ public class MaizePedigreeServiceImplTest extends IntegrationTestBase {
 		for (Germplasm germplasm : allGermplasm) {
 			String crossExpansion = pedigreeService.getCrossExpansion(germplasm.getGid(), crossExpansionProperties);
 			String crossExpansion2 = configurablePedigreeService.getCrossExpansion(germplasm.getGid(), crossExpansionProperties);
-			System.out.println(crossExpansion);
-			System.out.println(crossExpansion2);
+			System.out.println("Normal Service -" + crossExpansion);
+			System.out.println("New Service -" + crossExpansion2);
 
 			Assert.assertEquals(crossExpansion, crossExpansion2);
 		}
-
 	}
 
-
+	@Test
+	public void wheatPedigree30917() throws Exception {
+		String crossExpansion = pedigreeService.getCrossExpansion(30917, crossExpansionProperties);
+		String crossExpansion2 = configurablePedigreeService.getCrossExpansion(30917, crossExpansionProperties);
+		System.out.println("Normal Service -" + crossExpansion);
+		System.out.println("New Service    -" + crossExpansion2);
+	}
 
 }

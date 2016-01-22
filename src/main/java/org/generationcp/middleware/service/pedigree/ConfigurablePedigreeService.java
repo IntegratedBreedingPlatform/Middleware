@@ -74,13 +74,14 @@ public class ConfigurablePedigreeService implements PedigreeService {
 			return element;
 		} else {
 			if (element instanceof SingleGermplasmCrossElement) {
+				// No meta data attached to this single class as it is passed in
 				SingleGermplasmCrossElement singleGermplasm = (SingleGermplasmCrossElement) element;
 				Germplasm germplasmToExpand = singleGermplasm.getGermplasm();
 
 				if (germplasmToExpand == null) {
 					return singleGermplasm;
 				}
-
+				// If this is a maintenance or a derivative crossing
 				if (germplasmToExpand.getGnpgs() < 0) {
 					// for germplasms created via a derivative or maintenance
 					// method
@@ -103,11 +104,14 @@ public class ConfigurablePedigreeService implements PedigreeService {
 					} else {
 						return element;
 					}
+				// If this is a generative crossing
 				} else {
-					GermplasmCross cross = new GermplasmCross();
+					final GermplasmCross cross = new GermplasmCross();
 
 					final Method method =
 							this.pedigreeDataManagerFactory.getGermplasmDataManager().getMethodByID(germplasmToExpand.getMethodId());
+					// Note not a parent element and thus the level is the samel
+					setMetaData(cross, element, germplasmToExpand.getGid(), level);
 
 					if (method != null) {
 						String methodName = method.getMname();
@@ -170,12 +174,14 @@ public class ConfigurablePedigreeService implements PedigreeService {
 										this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
 												firstParent.getGpid1());
 								firstGrandParentElem.setGermplasm(firstGrandParent);
+								// Note sure if this is -1 or -2 since they are grand parents
 								setMetaData(firstGrandParentElem, element, firstGrandParent.getGid(), level-1);
 
 
 								secondGrandParent =
 										this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
 												firstParent.getGpid2());
+								// Note sure if this is -1 or -2 since they are grand parents
 								setMetaData(secondGrandParentElem, element, secondGrandParent.getGid(), level-1);
 
 								secondGrandParentElem.setGermplasm(secondGrandParent);
@@ -190,6 +196,7 @@ public class ConfigurablePedigreeService implements PedigreeService {
 										this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
 												secondParent.getGpid1());
 								thirdGrandParentElem.setGermplasm(thirdGrandParent);
+								// Note sure if this is -1 or -2 since they are grand parents
 								setMetaData(thirdGrandParentElem, element, thirdGrandParent.getGid(), level-1);
 
 								fourthGrandParent =
@@ -197,6 +204,7 @@ public class ConfigurablePedigreeService implements PedigreeService {
 												secondParent.getGpid2());
 
 								fourthGrandParentElem.setGermplasm(fourthGrandParent);
+								// Note sure if this is -1 or -2 since they are grand parents
 								setMetaData(fourthGrandParentElem, element, fourthGrandParent.getGid(), level-1);
 
 							}
@@ -231,6 +239,8 @@ public class ConfigurablePedigreeService implements PedigreeService {
 									numOfCrossesForFirst = ((GermplasmCross) expandedFirstGrandParent).getNumberOfCrossesBefore() + 1;
 								}
 								firstCross.setNumberOfCrossesBefore(numOfCrossesForFirst);
+								setMetaData(firstCross, element, firstParent.getGid(), level-1);
+
 							}
 
 							// create the cross object for the second pair of
@@ -246,6 +256,8 @@ public class ConfigurablePedigreeService implements PedigreeService {
 									numOfCrossesForSecond = ((GermplasmCross) expandedThirdGrandParent).getNumberOfCrossesBefore() + 1;
 								}
 								secondCross.setNumberOfCrossesBefore(numOfCrossesForSecond);
+								setMetaData(secondCross, element, secondParent.getGid(), level-1);
+
 							}
 
 							// create the cross of the two sets of grandparents,
@@ -567,7 +579,6 @@ public class ConfigurablePedigreeService implements PedigreeService {
 
 							return crossElement;
 						}
-						setMetaData(cross, element, germplasmToExpand.getGid(), level);
 						return cross;
 					} else {
 						this.logAndThrowException("Error with expanding cross, can not find method with id: " + germplasmToExpand.getMethodId());
