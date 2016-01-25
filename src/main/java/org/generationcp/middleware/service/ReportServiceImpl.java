@@ -139,8 +139,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 
 	/***
 	 * Retrieves the Location ID from condition variable; Returns null if the condition value is an empty string
-	 * 
-	 * @param locationId
+	 *
 	 * @param condition
 	 * @param termId
 	 * @return
@@ -159,7 +158,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 		return this.factory.getReportKeys();
 	}
 
-	/**
+    /**
 	 * Local method to add information about male and female parents. The information is appended in the form of new {@link MeasurementData}
 	 * elements for each {@link MeasurementRow} provided
 	 * 
@@ -185,15 +184,15 @@ public class ReportServiceImpl extends Service implements ReportService {
 					row.getDataList().add(new MeasurementData("f_cross_name", female.getSelectionHistory()));
 					row.getDataList().add(new MeasurementData("f_tabbr", "NA")); // put source trial abbreviation
 					row.getDataList().add(new MeasurementData("f_locycle", "NA")); // put source trial cycle
-					row.getDataList().add(new MeasurementData("f_ent", "-99")); // put source trial entry
-					row.getDataList().add(new MeasurementData("f_lid", "-99")); // put source location id
+					row.getDataList().add(new MeasurementData("f_ent", "0")); // put source trial entry
+					row.getDataList().add(new MeasurementData("f_lid", "0")); // put source location id
 
 					row.getDataList().add(new MeasurementData("m_selHist", male.getSelectionHistory()));
 					row.getDataList().add(new MeasurementData("m_cross_name", male.getSelectionHistory()));
 					row.getDataList().add(new MeasurementData("m_tabbr", "NA")); // put source trial abbreviation
 					row.getDataList().add(new MeasurementData("m_locycle", "NA")); // put source trial cycle
-					row.getDataList().add(new MeasurementData("m_ent", "-99")); // put source trial entry
-					row.getDataList().add(new MeasurementData("m_lid", "-99")); // put source location id
+					row.getDataList().add(new MeasurementData("m_ent", "0")); // put source trial entry
+					row.getDataList().add(new MeasurementData("m_lid", "0")); // put source location id
 				}
 			}
 		}
