@@ -12,7 +12,9 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -31,6 +33,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
+import org.hibernate.type.LongType;
 
 /**
  * DAO class for {@link GermplasmList}.
@@ -516,5 +519,27 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 		criteria.add(Restrictions.eq("listRef", listRef));
 		return (GermplasmList) criteria.uniqueResult();
+	}
+
+	public List<Object[]> getAllListMetadata() {
+		final StringBuilder sql =
+				new StringBuilder("SELECT ln.listid as listId, COUNT(ld.listid) as count, lu.uname as userName, lp.fname as firstName, lp.lname lastName")
+						.append(" FROM listnms ln ")
+						.append("	INNER JOIN listdata ld ON ln.listid = ld.listid ")
+						.append("   LEFT OUTER JOIN users lu ON ln.listuid = lu.userid ")
+						.append("   LEFT OUTER JOIN persons lp ON lp.personid = lu.personid ")
+						.append(" WHERE  ln.listtype != 'FOLDER' ")
+						.append(" GROUP BY ln.listid;");
+
+		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+		query.addScalar("listId", new LongType());
+		query.addScalar("count", new LongType());
+		query.addScalar("userName");
+		query.addScalar("firstName");
+		query.addScalar("lastName");
+
+		@SuppressWarnings("unchecked")
+		final List<Object[]> queryResults = query.list();
+		return queryResults;
 	}
 }

@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
@@ -500,5 +501,11 @@ public interface GermplasmListManager {
 	 * @param listRef
 	 * @return
 	 */
-	org.generationcp.middleware.pojos.GermplasmList getGermplasmListByListRef(Integer listRef);
+	org.generationcp.middleware.pojos.GermplasmList getGermplasmListByListRef(Integer listRef) throws MiddlewareQueryException;
+	
+	/**
+	 * Retrieves metadata (such as count of entries, list owner) in one go for all lists. This helps avoiding the need to query metadata in
+	 * a loop per list.
+	 */
+	Map<Long, GermplasmListMetadata> getAllGermplasmListMetadata();
 }
