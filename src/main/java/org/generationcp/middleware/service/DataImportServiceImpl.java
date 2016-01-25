@@ -31,7 +31,6 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -41,7 +40,6 @@ import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.util.TimerWatch;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,33 +105,23 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
 
 		} catch (final Exception e) {
-
-			this.logAndThrowException("Error encountered with saving to database: ", e, DataImportServiceImpl.LOG);
-
+			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
 		} finally {
 			timerWatch.stop();
 		}
 
-		// Transaction 2 : save data
 		// Send : Map of 3 sub maps, with data to create Dataset
 		// Receive int (success/fail)
-		final Transaction trans2 = null;
 
 		try {
 
-			final int studyId = this.getWorkbookSaver().saveDataset(workbook, variableMap, retainValues, isDeleteObservations, programUUID);
-
-			return studyId;
+			return this.getWorkbookSaver().saveDataset(workbook, variableMap, retainValues, isDeleteObservations, programUUID);
 
 		} catch (final Exception e) {
-
-			this.logAndThrowException("Error encountered with saving to database: ", e, DataImportServiceImpl.LOG);
-
+			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
 		} finally {
 			timerWatch.stop();
 		}
-
-		return 0;
 	}
 
 	@Override
