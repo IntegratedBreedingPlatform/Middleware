@@ -13,18 +13,29 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.GermplasmListMetadata;
+import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.ListDataProperty;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Strings;
+
 
 /**
  * Implementation of the GermplasmListManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -33,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class GermplasmListManagerImpl extends DataManager implements GermplasmListManager {
 
-	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListManagerImpl.class);
+	static final Logger LOG = LoggerFactory.getLogger(GermplasmListManagerImpl.class);
 
 	public GermplasmListManagerImpl() {
 	}
@@ -514,6 +525,32 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 			}
 		}
 		return toReturn;
+	}
+	
+	@Override
+	public Map<Long, GermplasmListMetadata> getAllGermplasmListMetadata() {
+		Map<Long, GermplasmListMetadata> listMetadata = new HashMap<>();
+
+		List<Object[]> queryResults = this.getGermplasmListDAO().getAllListMetadata();
+
+		for (Object[] row : queryResults) {
+			Long listId = (Long) row[0];
+			Long entryCount = (Long) row[1];
+			String ownerUser = (String) row[2];
+			String ownerFirstName = (String) row[3];
+			String ownerLastName = (String) row[4];
+
+			String owner = "";
+			if (StringUtils.isNotBlank(ownerFirstName) && StringUtils.isNotBlank(ownerLastName)) {
+				owner = ownerFirstName + " " + ownerLastName;
+			} else {
+				owner = Strings.nullToEmpty(ownerUser);
+			}
+
+			listMetadata.put(listId, new GermplasmListMetadata(listId, entryCount, owner));
+		}
+
+		return listMetadata;
 	}
 
 	@Override
