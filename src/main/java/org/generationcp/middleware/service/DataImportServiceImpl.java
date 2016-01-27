@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.service;
@@ -19,10 +19,12 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.Constants;
@@ -31,6 +33,7 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -188,7 +191,44 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		this.checkForInvalidLabel(workbook, messages);
 
+		this.checkForOutOfBoundsData(ontology, workbook, programUUID);
+
 		return workbook;
+	}
+
+	private void checkForOutOfBoundsData(final OntologyDataManager ontologyDataManager, Workbook workbook, final String programUUID) {
+
+		// Get the categorical variates and extract their valid values (possible values)
+		Map<String, List<String>> termIdValidValuesMap = new HashMap<>();
+
+		for (MeasurementVariable measurementVaribale : workbook.getVariates()) {
+			Integer stdVariableId =
+					ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(measurementVaribale.getProperty(),
+							measurementVaribale.getScale(), measurementVaribale.getMethod());
+			if (stdVariableId != null) {
+				StandardVariable stdVariable = ontologyDataManager.getStandardVariable(stdVariableId, programUUID);
+				if (stdVariable.getDataType().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
+					List<String> validValues = new ArrayList<>();
+					for (Enumeration enumeration : stdVariable.getEnumerations()) {
+						validValues.add(enumeration.getName());
+					}
+					termIdValidValuesMap.put(stdVariable.getName(), validValues);
+				}
+
+			}
+		}
+
+		for (MeasurementRow measurementRow : workbook.getObservations()) {
+			for (Entry<String, List<String>> entry : termIdValidValuesMap.entrySet()) {
+				MeasurementData measurementData = measurementRow.getMeasurementData(entry.getKey());
+				if (!entry.getValue().contains(measurementData.getValue())) {
+					workbook.setHasOutOfBoundsData(true);
+					return;
+				}
+			}
+
+		}
+
 	}
 
 	protected List<Message> validateMeasurementVariableName(final List<MeasurementVariable> allVariables) {
@@ -324,8 +364,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		}
 	}
 
-	private void checkForDuplicatePSMCombo(final Workbook workbook, final List<Message> messages) throws
-			WorkbookParserException {
+	private void checkForDuplicatePSMCombo(final Workbook workbook, final List<Message> messages) throws WorkbookParserException {
 		Map<String, List<MeasurementVariable>> stdVarMap = this.checkForDuplicates(workbook.getNonVariateVariables(), false);
 		this.addErrorForDuplicates(messages, stdVarMap);
 		stdVarMap = this.checkForDuplicates(workbook.getVariateVariables(), true);
@@ -428,14 +467,15 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		// check if single location
 		// it means the location is defined in the description sheet)
-		String trialInstanceNumber = getTrialInstanceNumberFromMeasurementVariables(ontology, workbook.getConditions());
+		String trialInstanceNumber = this.getTrialInstanceNumberFromMeasurementVariables(ontology, workbook.getConditions());
 		if (trialInstanceNumber != null) {
 			return trialInstanceNumber;
 		}
 
 		// check if multi-location
 		// it means the location is defined in the observation sheet
-		trialInstanceNumber = getTrialInstanceNumberFromMeasurementRows(ontology, workbook.getObservations(), workbook.getTrialFactors());
+		trialInstanceNumber =
+				this.getTrialInstanceNumberFromMeasurementRows(ontology, workbook.getObservations(), workbook.getTrialFactors());
 
 		if (workbook.isNursery()) {
 			return "1";
@@ -480,7 +520,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	protected Boolean isTrialInstanceNumberExists(final OntologyDataManager ontology, final List<MeasurementVariable> list) {
-		final MeasurementVariable var = getTrialInstanceNumberMeasurementVariable(ontology, list);
+		final MeasurementVariable var = this.getTrialInstanceNumberMeasurementVariable(ontology, list);
 		if (var != null) {
 			var.setRequired(true);
 			return true;
@@ -493,7 +533,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		// get first row - should contain the study location
 		final MeasurementRow row = measurementRows.get(0);
-		final MeasurementVariable var = getTrialInstanceNumberMeasurementVariable(ontology, trialFactors);
+		final MeasurementVariable var = this.getTrialInstanceNumberMeasurementVariable(ontology, trialFactors);
 		if (var != null) {
 			return row.getMeasurementDataValue(var.getName());
 		}
@@ -502,7 +542,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	private String getTrialInstanceNumberFromMeasurementVariables(final OntologyDataManager ontology, final List<MeasurementVariable> list) {
-		final MeasurementVariable mvar = getTrialInstanceNumberMeasurementVariable(ontology, list);
+		final MeasurementVariable mvar = this.getTrialInstanceNumberMeasurementVariable(ontology, list);
 		if (mvar != null) {
 			return mvar.getValue();
 		}
