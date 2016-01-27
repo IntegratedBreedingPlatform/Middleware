@@ -59,6 +59,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 					queryString.append("AND n.ntype = :ntype ");
 				}
 
+				queryString.append("ORDER BY n.nstat, n.nval");
+
 				SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 				query.addEntity("n", Name.class);
 				query.setParameter("gid", gid);
