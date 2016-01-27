@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
@@ -43,8 +42,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(NameDAO.class);
 
 	@SuppressWarnings("unchecked")
-	public List<Name> getByGIDWithFilters(final Integer gid, final Integer status, final GermplasmNameType type)
-			throws MiddlewareQueryException {
+	public List<Name> getByGIDWithFilters(final Integer gid, final Integer status, final GermplasmNameType type) {
 		try {
 			if (gid != null) {
 				final StringBuilder queryString = new StringBuilder();
@@ -97,7 +95,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Name getByGIDAndNval(final Integer gid, final String nval) throws MiddlewareQueryException {
+	public Name getByGIDAndNval(final Integer gid, final String nval) {
 		try {
 			if (gid != null) {
 				final Criteria crit = this.getSession().createCriteria(Name.class);
@@ -119,7 +117,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Name> getNamesByNameIds(final List<Integer> nIds) throws MiddlewareQueryException {
+	public List<Name> getNamesByNameIds(final List<Integer> nIds) {
 		try {
 			if (nIds != null && !nIds.isEmpty()) {
 				final Criteria crit = this.getSession().createCriteria(Name.class);
@@ -133,7 +131,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Name> getPreferredIdsByListId(final Integer listId) throws MiddlewareQueryException {
+	public List<Name> getPreferredIdsByListId(final Integer listId) {
 		try {
 			if (listId != null) {
 				final SQLQuery query = this.getSession().createSQLQuery(Name.GET_PREFERRED_IDS_BY_LIST_ID);
@@ -147,7 +145,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		return new ArrayList<Name>();
 	}
 
-	public Name getNameByNameId(final Integer nId) throws MiddlewareQueryException {
+	public Name getNameByNameId(final Integer nId) {
 		try {
 			if (nId != null) {
 				final Criteria crit = this.getSession().createCriteria(Name.class);
@@ -164,12 +162,10 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	 * Retrieves the gId and nId pairs for the given germplasm names
 	 *
 	 * @param germplasmNames the list of germplasm names
-	 * @return the list of GidNidElement (gId and nId pairs)
-	 * @throws MiddlewareQueryException
+	 * @return the list of GidNidElement (gId and nId pairs) @
 	 */
 	@SuppressWarnings("rawtypes")
-	public List<GermplasmNameDetails> getGermplasmNameDetailsByNames(final List<String> germplasmNames, final GetGermplasmByNameModes mode)
-			throws MiddlewareQueryException {
+	public List<GermplasmNameDetails> getGermplasmNameDetailsByNames(final List<String> germplasmNames, final GetGermplasmByNameModes mode) {
 		final List<GermplasmNameDetails> toReturn = new ArrayList<GermplasmNameDetails>();
 
 		try {
@@ -207,7 +203,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, String> getPrefferedIdsByGIDs(final List<Integer> gids) throws MiddlewareQueryException {
+	public Map<Integer, String> getPrefferedIdsByGIDs(final List<Integer> gids) {
 		final Map<Integer, String> toreturn = new HashMap<Integer, String>();
 		for (final Integer gid : gids) {
 			toreturn.put(gid, null);
@@ -232,7 +228,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, String> getPrefferedNamesByGIDs(final List<Integer> gids) throws MiddlewareQueryException {
+	public Map<Integer, String> getPrefferedNamesByGIDs(final List<Integer> gids) {
 		final Map<Integer, String> toreturn = new HashMap<Integer, String>();
 		for (final Integer gid : gids) {
 			toreturn.put(gid, null);
@@ -257,7 +253,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Name> getNamesByGids(final List<Integer> gids) throws MiddlewareQueryException {
+	public List<Name> getNamesByGids(final List<Integer> gids) {
 		List<Name> toReturn = new ArrayList<Name>();
 
 		if (gids == null || gids.isEmpty()) {
@@ -277,7 +273,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getGidsByName(final String name) throws MiddlewareQueryException {
+	public List<Integer> getGidsByName(final String name) {
 		final List<Integer> gids = new ArrayList<Integer>();
 		try {
 			final String sql = "SELECT gid FROM names where nval = :name";
@@ -290,7 +286,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		return gids;
 	}
 
-	public Map<Integer, List<Name>> getNamesByGidsInMap(final List<Integer> gids) throws MiddlewareQueryException {
+	public Map<Integer, List<Name>> getNamesByGidsInMap(final List<Integer> gids) {
 		final Map<Integer, List<Name>> map = new HashMap<Integer, List<Name>>();
 
 		if (gids == null || gids.isEmpty()) {
@@ -322,7 +318,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<String> getAllMatchingNames(final String prefix, final String suffix) throws MiddlewareQueryException {
+	public List<String> getAllMatchingNames(final String prefix, final String suffix) {
 		final List<String> names = new ArrayList<String>();
 		try {
 			String keyword1 = prefix + "%" + suffix + "%";
@@ -344,7 +340,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public boolean checkIfMatches(final String name) throws MiddlewareQueryException {
+	public boolean checkIfMatches(final String name) {
 		try {
 			final String keyword1 = name.replaceAll("\\s", "");
 			final String keyword2 = GermplasmDataManagerUtil.standardizeName(name).replaceAll("\\s", "");
@@ -371,7 +367,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<String, Integer> getCountByNamePermutations(final List<String> names) throws MiddlewareQueryException {
+	public Map<String, Integer> getCountByNamePermutations(final List<String> names) {
 
 		final Monitor getCountByNamePermutations = MonitorFactory.start("Method Started : getCountByNamePermutations ");
 
