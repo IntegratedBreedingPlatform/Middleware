@@ -125,7 +125,7 @@ public class ResourceFinder {
 	 * For Test Purposes
 	 * TODO need to use this function for the retrieval of a file instead of the static function "locateFile"
 	 */
-	public URL locateFileWrapper(final String name) throws FileNotFoundException{
+	public URL locate(final String name) throws FileNotFoundException{
 		return ResourceFinder.locateFile(name);
 	}
 }
