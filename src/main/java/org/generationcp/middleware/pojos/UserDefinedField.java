@@ -84,10 +84,9 @@ public class UserDefinedField implements Serializable {
 	@Column(name = "lfldno")
 	private Integer lfldno;
 
-	@ManyToOne(targetEntity = User.class)
-	@JoinColumn(name = "fuid", nullable = true)
-	@NotFound(action = NotFoundAction.IGNORE)
-	private User user;
+	@Basic(optional = false)
+	@Column(name = "fuid")
+	private Integer fuid;
 
 	@Basic(optional = false)
 	@Column(name = "fdate")
@@ -104,7 +103,7 @@ public class UserDefinedField implements Serializable {
 	}
 
 	public UserDefinedField(Integer fldno, String ftable, String ftype, String fcode, String fname, String ffmt, String fdesc,
-			Integer lfldno, User user, Integer fdate, Integer scaleid) {
+			Integer lfldno, Integer fuid, Integer fdate, Integer scaleid) {
 		super();
 		this.fldno = fldno;
 		this.ftable = ftable;
@@ -114,7 +113,7 @@ public class UserDefinedField implements Serializable {
 		this.ffmt = ffmt;
 		this.fdesc = fdesc;
 		this.lfldno = lfldno;
-		this.user = user;
+		this.fuid = fuid;
 		this.fdate = fdate;
 		this.scaleid = scaleid;
 	}
@@ -183,12 +182,12 @@ public class UserDefinedField implements Serializable {
 		this.lfldno = lfldno;
 	}
 
-	public User getUser() {
-		return this.user;
+	public Integer getFuid() {
+		return fuid;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setFuid(Integer fuid) {
+		this.fuid = fuid;
 	}
 
 	public Integer getFdate() {
@@ -247,8 +246,8 @@ public class UserDefinedField implements Serializable {
 		builder.append(this.fdesc);
 		builder.append(", lfldno=");
 		builder.append(this.lfldno);
-		builder.append(", user=");
-		builder.append(this.user);
+		builder.append(", fuid=");
+		builder.append(this.fuid);
 		builder.append(", fdate=");
 		builder.append(this.fdate);
 		builder.append(", scaleid=");

@@ -12,10 +12,11 @@
 package org.generationcp.middleware.domain.dms;
 
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.util.Debug;
 
 /**
@@ -46,8 +47,16 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 		this.localName = localName;
 		this.localDescription = localDescription;
 		this.standardVariable = standardVariable;
-		this.rank = rank;
 		this.role = standardVariable.getPhenotypicType();
+
+		//Setting first variable type if exist
+		Set<VariableType> variableTypes = standardVariable.getVariableTypes();
+		if(variableTypes != null){
+			Iterator<VariableType> iterator = variableTypes.iterator();
+			this.variableType = iterator.next();;
+		}
+
+		this.rank = rank;
 	}
 
 	public int getId() {
@@ -109,6 +118,24 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 	//NOTE: We also add variable type to associated standard variable.
 	public void setVariableType(VariableType variableType) {
 		this.variableType = variableType;
+	}
+
+	/**
+	 * This will set variable type if null based on role and property name.
+	 */
+	public void setVariableTypeIfNull(){
+
+		if(this.getVariableType() != null) {
+			return;
+		}
+
+		if(this.getRole() == null){
+			return;
+		}
+
+		StandardVariable standardVariable = this.getStandardVariable();
+		String propertyName = standardVariable.getProperty().getName();
+		this.setVariableType(OntologyDataHelper.mapFromPhenotype(this.getRole(), propertyName));
 	}
 
 	@Override

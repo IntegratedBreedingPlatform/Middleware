@@ -1075,5 +1075,11 @@ public interface GermplasmDataManager {
 	 *         critria is found, an empty record with fldno=0 is returned. Never returns null.
 	 */
 	UserDefinedField getPlotCodeField();
+	
+	/**
+	 * Returns value of the plot code (seed source) where the germplasm was created, identified by the given gid. Returns "Unknown" if plot code
+	 * attribute is not present. Never returns null.
+	 */
+	String getPlotCodeValue(Integer gid);
 
 }

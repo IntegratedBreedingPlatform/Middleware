@@ -139,9 +139,9 @@ public class WorkbookTestDataInitializer {
 	public static final String SITE_SOIL_PH = "SITE_SOIL_PH";
 
 	public static final String[] G_NAMES = {"TIANDOUGOU-9", "KENINKENI-27", "SM114-1A-1-1-1B", "SM114-1A-14-1-1B", "SM114-1A-361-1-1B",
-		"SM114-1A-86-1-1B", "SM114-1A-115-1-1B", "SM114-1A-281-1-1B", "SM114-1A-134-1-1B", "SM114-1A-69-1-1B", "SM114-1A-157-1-1B",
-		"SM114-1A-179-1-1B", "TIANDOUGOU-9", "SM114-1A-36-1-1B", "SM114-1A-201-1-1B", "SM114-1A-31-1-1B", "SM114-1A-353-1-1B",
-		"SM114-1A-26-1-1B", "SM114-1A-125-1-1B", "SM114-1A-384-1-1B"};
+			"SM114-1A-86-1-1B", "SM114-1A-115-1-1B", "SM114-1A-281-1-1B", "SM114-1A-134-1-1B", "SM114-1A-69-1-1B", "SM114-1A-157-1-1B",
+			"SM114-1A-179-1-1B", "TIANDOUGOU-9", "SM114-1A-36-1-1B", "SM114-1A-201-1-1B", "SM114-1A-31-1-1B", "SM114-1A-353-1-1B",
+			"SM114-1A-26-1-1B", "SM114-1A-125-1-1B", "SM114-1A-384-1-1B"};
 
 	public static Workbook getTestWorkbook() {
 		return createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, null, 1, false);
@@ -239,22 +239,22 @@ public class WorkbookTestDataInitializer {
 		conditions.add(createMeasurementVariable(TermId.PI_NAME.getId(), "PI Name", "Name of Principal Investigator",
 				WorkbookTestDataInitializer.DBCV, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.PERSON,
 				WorkbookTestDataInitializer.CHAR, "PI Name Value", WorkbookTestDataInitializer.STUDY, TermId.CHARACTER_VARIABLE.getId(),
-				PhenotypicType.STUDY));
+				withTrial ? PhenotypicType.TRIAL_ENVIRONMENT : PhenotypicType.STUDY));
 
 		conditions.add(createMeasurementVariable(TermId.PI_ID.getId(), "PI ID", "ID of Principal Investigator",
 				WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.PERSON,
 				WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.STUDY,
-				TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.STUDY));
+				TermId.NUMERIC_VARIABLE.getId(), withTrial ? PhenotypicType.TRIAL_ENVIRONMENT : PhenotypicType.STUDY));
 
 		conditions.add(createMeasurementVariable(WorkbookTestDataInitializer.COOPERATOR_NAME_ID, "COOPERATOR", "COOPERATOR NAME",
 				WorkbookTestDataInitializer.DBCV, WorkbookTestDataInitializer.CONDUCTED, WorkbookTestDataInitializer.PERSON,
 				WorkbookTestDataInitializer.CHAR, "John Smith", WorkbookTestDataInitializer.TRIAL, TermId.CHARACTER_VARIABLE.getId(),
-				PhenotypicType.STUDY));
+				withTrial ? PhenotypicType.TRIAL_ENVIRONMENT : PhenotypicType.STUDY));
 
 		conditions.add(createMeasurementVariable(WorkbookTestDataInitializer.COOPERATOR_ID_ID, "COOPERATOR ID", "COOPERATOR ID",
 				WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.CONDUCTED, WorkbookTestDataInitializer.PERSON,
 				WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.TRIAL,
-				TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.STUDY));
+				TermId.NUMERIC_VARIABLE.getId(), withTrial ? PhenotypicType.TRIAL_ENVIRONMENT : PhenotypicType.STUDY));
 
 		conditions.add(createMeasurementVariable(WorkbookTestDataInitializer.LOCATION_NAME_ID, "SITE", "TRIAL SITE NAME",
 				WorkbookTestDataInitializer.DBCV, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.LOCATION,
@@ -417,7 +417,7 @@ public class WorkbookTestDataInitializer {
 			final String scale, final String method, final String property, final String dataType, final String value, final String label,
 			final int dataTypeId, final PhenotypicType role) {
 		final MeasurementVariable variable =
-				new MeasurementVariable(termId, name, description, scale, description, property, dataType, value, label);
+				new MeasurementVariable(termId, name, description, scale, method, property, dataType, value, label);
 		variable.setRole(role);
 		variable.setDataTypeId(dataTypeId);
 		return variable;

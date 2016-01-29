@@ -27,19 +27,17 @@ public class TraitDto {
 
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof TraitDto)) {
+		if (!(other instanceof TraitDto))
 			return false;
-		}
 		TraitDto castOther = (TraitDto) other;
-		return new EqualsBuilder().append(this.traitId, castOther.traitId).append(this.traitName, castOther.traitName).isEquals();
+		return new EqualsBuilder().append(traitId, castOther.traitId).append(traitName, castOther.traitName).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		if (this.hashCode == 0) {
-			this.hashCode = new HashCodeBuilder().append(this.traitId).append(this.traitName).toHashCode();
+		if (hashCode == 0) {
+			hashCode = new HashCodeBuilder().append(traitId).append(traitName).toHashCode();
 		}
-		return this.hashCode;
+		return hashCode;
 	}
-
 }
