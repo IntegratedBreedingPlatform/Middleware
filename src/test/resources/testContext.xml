@@ -63,11 +63,15 @@
 
     <bean id="pedigreeService" class="org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl">
         <constructor-arg ref="cropSessionProvider"/>
+      	<constructor-arg type="java.lang.String" value="maize"/>
+
     </bean>
 
 	<bean id="configurablePedigreeService"
 		class="org.generationcp.middleware.service.pedigree.ConfigurablePedigreeService">
 		<constructor-arg ref="cropSessionProvider" />
+      	<constructor-arg type="java.lang.String" value="maize"/>
+
 	</bean>
 
 

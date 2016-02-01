@@ -187,6 +187,8 @@ public interface GermplasmDataManager {
 	 */
 	List<Name> getNamesByGID(Integer gid, Integer status, GermplasmNameType type);
 
+	List<Name> getByGIDWithListTypeFilters(Integer gid, Integer status, List<Integer> type);
+
 	/**
 	 * Returns the preferred name of the Germplasm identified by the gid parameter.
 	 *
@@ -1058,7 +1060,7 @@ public interface GermplasmDataManager {
 
 	/*
 	 * get the Germplasm from the crop database based on local gid reference
-	 * 
+	 *
 	 * @param lgid
 	 */
 	Germplasm getGermplasmByLocalGid(Integer lgid);
@@ -1075,7 +1077,7 @@ public interface GermplasmDataManager {
 	 *         critria is found, an empty record with fldno=0 is returned. Never returns null.
 	 */
 	UserDefinedField getPlotCodeField();
-	
+
 	/**
 	 * Returns value of the plot code (seed source) where the germplasm was created, identified by the given gid. Returns "Unknown" if plot code
 	 * attribute is not present. Never returns null.

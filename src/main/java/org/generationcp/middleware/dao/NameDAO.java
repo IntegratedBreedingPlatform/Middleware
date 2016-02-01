@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,8 +43,18 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NameDAO.class);
 
+
 	@SuppressWarnings("unchecked")
 	public List<Name> getByGIDWithFilters(Integer gid, Integer status, GermplasmNameType type) throws MiddlewareQueryException {
+		if(type != null) {
+			return getByGIDWithListTypeFilters(gid, status, Collections.<Integer>singletonList(Integer.valueOf(type.getUserDefinedFieldID())));
+		}
+		return getByGIDWithListTypeFilters(gid, status, null);
+
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Name> getByGIDWithListTypeFilters(Integer gid, Integer status, List<Integer> type) throws MiddlewareQueryException {
 		try {
 			if (gid != null) {
 				StringBuilder queryString = new StringBuilder();
@@ -56,7 +67,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				}
 
 				if (type != null) {
-					queryString.append("AND n.ntype = :ntype ");
+					queryString.append("AND n.ntype IN (:ntype) ");
 				}
 
 				SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
@@ -68,7 +79,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				}
 
 				if (type != null) {
-					query.setParameter("ntype", Integer.valueOf(type.getUserDefinedFieldID()));
+					query.setParameterList("ntype", type);
 				}
 
 				return query.list();
@@ -92,6 +103,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		}
 		return new ArrayList<Name>();
 	}
+
 
 	@SuppressWarnings("unchecked")
 	public Name getByGIDAndNval(Integer gid, String nval) throws MiddlewareQueryException {

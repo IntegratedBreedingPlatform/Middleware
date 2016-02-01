@@ -13,6 +13,16 @@ package org.generationcp.middleware.pojos.germplasm;
 
 import java.io.Serializable;
 
-public interface GermplasmCrossElement extends Serializable {
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.service.pedigree.PedigreeDataManagerFactory;
+import org.generationcp.middleware.util.CrossExpansionProperties;
+
+public interface NewGermplasmCrossElement extends Serializable {
+
+		String getCrossExpansionString(final String cropName, final CrossExpansionProperties crossExpansionProperties, PedigreeDataManagerFactory pedigreeDataManagerFactory);
+
+		void setGermplasm(Germplasm germplasm);
+
+		Germplasm getGermplasm();
 
 }

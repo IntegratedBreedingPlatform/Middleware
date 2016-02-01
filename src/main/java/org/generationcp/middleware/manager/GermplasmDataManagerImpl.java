@@ -170,6 +170,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	public List<Name> getByGIDWithListTypeFilters(final Integer gid, final Integer status, final List<Integer> type) {
+		return this.getNameDao().getByGIDWithListTypeFilters(gid, status, type);
+	}
+
+	@Override
 	public Name getPreferredNameByGID(final Integer gid) {
 		final List<Name> names = this.getNameDao().getByGIDWithFilters(gid, 1, null);
 		if (!names.isEmpty()) {
@@ -1287,7 +1292,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public Map<String, Integer> getCountByNamePermutations(List<String> names) {
 		return this.getNameDao().getCountByNamePermutations(names);
 	}
-	
+
 	@Override
 	public UserDefinedField getPlotCodeField() {
 		final List<UserDefinedField> udfldAttributes = this.getUserDefinedFieldByFieldTableNameAndType("ATRIBUTS", "PASSPORT");
@@ -1315,4 +1320,5 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		}
 		return plotCode;
 	}
+
 }

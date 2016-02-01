@@ -11,9 +11,11 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
  */
 public interface PedigreeService {
 
+	String getCropName();
+
 	/**
 	 * Gets the cross expansion.
-	 * 
+	 *
 	 * @param gid the gid
 	 * @param level the level
 	 * @return The cross expansion based on the given gid and level
@@ -23,7 +25,7 @@ public interface PedigreeService {
 	String getCrossExpansion(Integer gid, Integer level, CrossExpansionProperties crossExpansionProperties);
 
 	/**
-	 * 
+	 *
 	 * @param germplasm A preconstructed germplasm object. We need this when generating the cross from the crossing manager.
 	 * @param level the number of levels we are suppose to do the expansion for
 	 * @param crossExpansionProperties default expansion properties
