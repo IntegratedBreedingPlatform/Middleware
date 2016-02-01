@@ -191,12 +191,35 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		this.checkForInvalidLabel(workbook, messages);
 
-		this.checkForOutOfBoundsData(ontology, workbook, programUUID);
+		if (this.checkForOutOfBoundsData(ontology, workbook, programUUID)) {
+			workbook.setHasOutOfBoundsData(true);
+		}
 
 		return workbook;
 	}
 
-	private void checkForOutOfBoundsData(final OntologyDataManager ontologyDataManager, Workbook workbook, final String programUUID) {
+	@Override
+	public boolean checkForOutOfBoundsData(final OntologyDataManager ontologyDataManager, Workbook workbook, final String programUUID) {
+
+		Map<String, List<String>> termIdValidValuesMap =
+				this.getValidValuesMapForCategoricalVariates(ontologyDataManager, workbook, programUUID);
+
+		for (MeasurementRow measurementRow : workbook.getObservations()) {
+			for (Entry<String, List<String>> entry : termIdValidValuesMap.entrySet()) {
+				MeasurementData measurementData = measurementRow.getMeasurementData(entry.getKey());
+				if (!entry.getValue().contains(measurementData.getValue())) {
+					return true;
+				}
+			}
+
+		}
+
+		return false;
+
+	}
+
+	protected Map<String, List<String>> getValidValuesMapForCategoricalVariates(final OntologyDataManager ontologyDataManager,
+			Workbook workbook, final String programUUID) {
 
 		// Get the categorical variates and extract their valid values (possible values)
 		Map<String, List<String>> termIdValidValuesMap = new HashMap<>();
@@ -217,18 +240,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 			}
 		}
-
-		for (MeasurementRow measurementRow : workbook.getObservations()) {
-			for (Entry<String, List<String>> entry : termIdValidValuesMap.entrySet()) {
-				MeasurementData measurementData = measurementRow.getMeasurementData(entry.getKey());
-				if (!entry.getValue().contains(measurementData.getValue())) {
-					workbook.setHasOutOfBoundsData(true);
-					return;
-				}
-			}
-
-		}
-
+		return termIdValidValuesMap;
 	}
 
 	protected List<Message> validateMeasurementVariableName(final List<MeasurementVariable> allVariables) {
