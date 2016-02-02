@@ -3,7 +3,11 @@ package org.generationcp.middleware.service;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -37,32 +41,32 @@ public class ReportServiceImpl extends Service implements ReportService {
 		super();
 	}
 
-	public ReportServiceImpl(HibernateSessionProvider sessionProvider) {
+	public ReportServiceImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}
 
-	public ReportServiceImpl(HibernateSessionProvider sessionProvider, String databaseName) {
+	public ReportServiceImpl(final HibernateSessionProvider sessionProvider, final String databaseName) {
 		super(sessionProvider, databaseName);
 
 	}
 
 	@Override
-	public JasperPrint getPrintReport(String code, Integer studyId) throws MiddlewareException, JRException, IOException,
+	public JasperPrint getPrintReport(final String code, final Integer studyId) throws MiddlewareException, JRException, IOException,
 			BuildReportException {
 
-		Reporter reporter = this.factory.createReporter(code);
-		Map<String, Object> dataBeans = this.extractFieldbookData(studyId, reporter.isParentsInfoRequired());
+		final Reporter reporter = this.factory.createReporter(code);
+		final Map<String, Object> dataBeans = this.extractFieldbookData(studyId, reporter.isParentsInfoRequired());
 
 		return reporter.buildJRPrint(dataBeans);
 
 	}
 
 	@Override
-	public Reporter getStreamReport(String code, Integer studyId, String programName, OutputStream output) throws MiddlewareException,
-			JRException, IOException, BuildReportException {
+	public Reporter getStreamReport(final String code, final Integer studyId, final String programName, final OutputStream output)
+			throws MiddlewareException, JRException, IOException, BuildReportException {
 
-		Reporter reporter = this.factory.createReporter(code);
-		Map<String, Object> dataBeans = this.extractFieldbookData(studyId, reporter.isParentsInfoRequired());
+		final Reporter reporter = this.factory.createReporter(code);
+		final Map<String, Object> dataBeans = this.extractFieldbookData(studyId, reporter.isParentsInfoRequired());
 		dataBeans.put(AbstractReporter.PROGRAM_NAME_ARG_KEY, programName);
 
 		reporter.buildJRPrint(dataBeans);
@@ -77,18 +81,18 @@ public class ReportServiceImpl extends Service implements ReportService {
 	 * @param studyId The study Id to which extract information from.
 	 * @return a Map containing information of the study.
 	 */
-	private Map<String, Object> extractFieldbookData(Integer studyId, boolean parentsInfoRequireed) throws MiddlewareException {
+	private Map<String, Object> extractFieldbookData(final Integer studyId, final boolean parentsInfoRequireed) throws MiddlewareException {
 
-		StudyType studyType = this.getStudyDataManager().getStudyType(studyId);
-		Workbook wb = this.getWorkbookBuilder().create(studyId, studyType);
-		List<MeasurementRow> observations = wb.getObservations();
-		List<MeasurementVariable> studyConditions = appendCountryInformation(wb.getConditions());
+		final StudyType studyType = this.getStudyDataManager().getStudyType(studyId);
+		final Workbook wb = this.getWorkbookBuilder().create(studyId, studyType);
+		final List<MeasurementRow> observations = wb.getObservations();
+		final List<MeasurementVariable> studyConditions = this.appendCountryInformation(wb.getConditions());
 
 		if (parentsInfoRequireed) {
 			this.appendParentsInformation(studyId, observations);
 		}
 
-		Map<String, Object> dataBeans = new HashMap<>();
+		final Map<String, Object> dataBeans = new HashMap<>();
 		dataBeans.put("studyConditions", studyConditions); // List<MeasurementVariable>
 		dataBeans.put("dataSource", observations); // list<measurementRow>
 		dataBeans.put("studyObservations", wb.getTrialObservations());// list<measurementRow>
@@ -97,34 +101,32 @@ public class ReportServiceImpl extends Service implements ReportService {
 		return dataBeans;
 	}
 
-	protected List<MeasurementVariable> appendCountryInformation(List<MeasurementVariable> originalConditions) {
+	protected List<MeasurementVariable> appendCountryInformation(final List<MeasurementVariable> originalConditions) {
 		Integer locationId = null;
 
-		for (MeasurementVariable condition : originalConditions) {
-			TermId term = TermId.getById(condition.getTermId());
-			if (term == TermId.LOCATION_ID) {
-				locationId = Integer.parseInt(condition.getValue());
-			}
+		for (final MeasurementVariable condition : originalConditions) {
+			final TermId term = TermId.getById(condition.getTermId());
+			locationId = this.retrieveLocationIdFromCondition(condition, term);
 		}
 
 		if (locationId == null) {
 			return originalConditions;
 		} else {
-			List<MeasurementVariable> variables = new ArrayList<>(originalConditions);
+			final List<MeasurementVariable> variables = new ArrayList<>(originalConditions);
 
-			Location location = getLocationDataManager().getLocationByID(locationId);
+			final Location location = this.getLocationDataManager().getLocationByID(locationId);
 
 			if ((location.getCntryid() != null && location.getCntryid() != 0)) {
-				Country country = getCountryDao().getById(location.getCntryid());
+				final Country country = this.getCountryDao().getById(location.getCntryid());
 
-				MeasurementVariable countryInfo = new MeasurementVariable();
+				final MeasurementVariable countryInfo = new MeasurementVariable();
 				countryInfo.setName(AbstractReporter.COUNTRY_VARIABLE_NAME);
 				countryInfo.setValue(country.getIsofull());
 
 				variables.add(countryInfo);
 			}
 
-			MeasurementVariable abbrevInfo = new MeasurementVariable();
+			final MeasurementVariable abbrevInfo = new MeasurementVariable();
 			abbrevInfo.setName(AbstractReporter.LOCATION_ABBREV_VARIABLE_NAME);
 			abbrevInfo.setValue(location.getLabbr());
 
@@ -133,6 +135,23 @@ public class ReportServiceImpl extends Service implements ReportService {
 			return variables;
 
 		}
+	}
+
+	/***
+	 * Retrieves the Location ID from condition variable; Returns null if the condition value is an empty string
+	 * 
+	 * @param locationId
+	 * @param condition
+	 * @param termId
+	 * @return
+	 */
+	Integer retrieveLocationIdFromCondition(final MeasurementVariable condition, final TermId termId) {
+		Integer locationId = null;
+		final String conditionValue = condition.getValue().trim();
+		if (termId == TermId.LOCATION_ID && conditionValue.length() > 0) {
+			locationId = Integer.parseInt(conditionValue);
+		}
+		return locationId;
 	}
 
 	@Override
@@ -147,19 +166,19 @@ public class ReportServiceImpl extends Service implements ReportService {
 	 * @param studyId the id for the study which the observations belong to.
 	 * @param observations List of rows representing entries in a study, in which parent information will be appended
 	 */
-	private void appendParentsInformation(Integer studyId, List<MeasurementRow> observations) throws MiddlewareQueryException {
+	private void appendParentsInformation(final Integer studyId, final List<MeasurementRow> observations) throws MiddlewareQueryException {
 		// put germNodes extraction
-		Map<Integer, GermplasmPedigreeTreeNode> germNodes = this.getGermplasmDataManager().getDirectParentsForStudy(studyId);
+		final Map<Integer, GermplasmPedigreeTreeNode> germNodes = this.getGermplasmDataManager().getDirectParentsForStudy(studyId);
 
-		for (MeasurementRow row : observations) {
-			int gid = Integer.valueOf(row.getMeasurementDataValue("GID"));
-			GermplasmPedigreeTreeNode germNode = germNodes.get(gid);
+		for (final MeasurementRow row : observations) {
+			final int gid = Integer.valueOf(row.getMeasurementDataValue("GID"));
+			final GermplasmPedigreeTreeNode germNode = germNodes.get(gid);
 			if (germNode != null) {
-				Germplasm germplasm = germNode.getGermplasm();
+				final Germplasm germplasm = germNode.getGermplasm();
 
 				if (germplasm.getGrplce() >= 0 & germNode.getLinkedNodes().size() == 2) { // is geneative and has parents
-					Germplasm female = germNode.getLinkedNodes().get(0).getGermplasm();
-					Germplasm male = germNode.getLinkedNodes().get(1).getGermplasm();
+					final Germplasm female = germNode.getLinkedNodes().get(0).getGermplasm();
+					final Germplasm male = germNode.getLinkedNodes().get(1).getGermplasm();
 
 					// TODO: pending values for origin of the entries
 					row.getDataList().add(new MeasurementData("f_selHist", female.getSelectionHistory()));

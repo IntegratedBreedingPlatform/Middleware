@@ -83,7 +83,7 @@ public class Saver extends DatabaseBroker {
 		return new StandardVariableBuilder(this.sessionProvider);
 	}
 
-	protected final VariableTypeListTransformer getVariableTypeListTransformer() {
+	protected VariableTypeListTransformer getVariableTypeListTransformer() {
 		return new VariableTypeListTransformer(this.sessionProvider);
 	}
 

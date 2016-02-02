@@ -25,7 +25,6 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ListDataProperty;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -463,20 +462,20 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		for (final Object o : results) {
 			final Object[] result = (Object[]) o;
 			if (result != null) {
-				final Integer fldno = (Integer) result[0];
-				final String ftable = (String) result[1];
-				final String ftype = (String) result[2];
-				final String fcode = (String) result[3];
-				final String fname = (String) result[4];
-				final String ffmt = (String) result[5];
-				final String fdesc = (String) result[6];
-				final Integer lfldno = (Integer) result[7];
-				final User user = this.getUserDao().getById((Integer) result[8], false);
-				final Integer fdate = (Integer) result[9];
-				final Integer scaleid = (Integer) result[10];
+				Integer fldno = (Integer) result[0];
+				String ftable = (String) result[1];
+				String ftype = (String) result[2];
+				String fcode = (String) result[3];
+				String fname = (String) result[4];
+				String ffmt = (String) result[5];
+				String fdesc = (String) result[6];
+				Integer lfldno = (Integer) result[7];
+				Integer fuid = (Integer) result[8];
+				Integer fdate = (Integer) result[9];
+				Integer scaleid = (Integer) result[10];
 
-				final UserDefinedField userDefinedField =
-						new UserDefinedField(fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, user, fdate, scaleid);
+				UserDefinedField userDefinedField =
+						new UserDefinedField(fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid);
 				toReturn.add(userDefinedField);
 			}
 		}
@@ -495,20 +494,20 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		for (final Object o : results) {
 			final Object[] result = (Object[]) o;
 			if (result != null) {
-				final Integer fldno = (Integer) result[0];
-				final String ftable = (String) result[1];
-				final String ftype = (String) result[2];
-				final String fcode = (String) result[3];
-				final String fname = (String) result[4];
-				final String ffmt = (String) result[5];
-				final String fdesc = (String) result[6];
-				final Integer lfldno = (Integer) result[7];
-				final User user = this.getUserDao().getById((Integer) result[8], false);
-				final Integer fdate = (Integer) result[9];
-				final Integer scaleid = (Integer) result[10];
+				Integer fldno = (Integer) result[0];
+				String ftable = (String) result[1];
+				String ftype = (String) result[2];
+				String fcode = (String) result[3];
+				String fname = (String) result[4];
+				String ffmt = (String) result[5];
+				String fdesc = (String) result[6];
+				Integer lfldno = (Integer) result[7];
+				Integer fuid = (Integer) result[8];
+				Integer fdate = (Integer) result[9];
+				Integer scaleid = (Integer) result[10];
 
-				final UserDefinedField userDefinedField =
-						new UserDefinedField(fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, user, fdate, scaleid);
+				UserDefinedField userDefinedField =
+						new UserDefinedField(fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid);
 				toReturn.add(userDefinedField);
 			}
 		}
