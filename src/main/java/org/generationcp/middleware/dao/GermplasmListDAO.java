@@ -12,9 +12,7 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -33,7 +31,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
-import org.hibernate.type.LongType;
+import org.hibernate.type.IntegerType;
 
 /**
  * DAO class for {@link GermplasmList}.
@@ -512,8 +510,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 						.append(" GROUP BY ln.listid;");
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-		query.addScalar("listId", new LongType());
-		query.addScalar("count", new LongType());
+		query.addScalar("listId", new IntegerType());
+		query.addScalar("count", new IntegerType());
 		query.addScalar("userName");
 		query.addScalar("firstName");
 		query.addScalar("lastName");
