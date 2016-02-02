@@ -1,6 +1,8 @@
 
 package org.generationcp.middleware.service.pedigree;
 
+import java.util.Properties;
+
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
@@ -320,10 +322,12 @@ public class PedigreeDefaultServiceImplTest {
 	}
 
 	private CrossExpansionProperties createCrossExpansionProperties() {
+		final Properties mockProperties = Mockito.mock(Properties.class);
+		Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("0");
+
 		CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties();
 		crossExpansionProperties.setDefaultLevel(1);
 		crossExpansionProperties.setProfile(null);
-		crossExpansionProperties.setWheatLevel(0);
 		return crossExpansionProperties;
 	}
 
