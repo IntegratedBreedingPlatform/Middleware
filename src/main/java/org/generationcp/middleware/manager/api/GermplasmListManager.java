@@ -20,6 +20,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.GermplasmListMetadata;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -507,5 +508,5 @@ public interface GermplasmListManager {
 	 * Retrieves metadata (such as count of entries, list owner) in one go for all lists. This helps avoiding the need to query metadata in
 	 * a loop per list.
 	 */
-	Map<Long, GermplasmListMetadata> getAllGermplasmListMetadata();
+	Map<Integer, GermplasmListMetadata> getAllGermplasmListMetadata();
 }

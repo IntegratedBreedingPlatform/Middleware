@@ -526,14 +526,14 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 	
 	@Override
-	public Map<Long, GermplasmListMetadata> getAllGermplasmListMetadata() {
-		Map<Long, GermplasmListMetadata> listMetadata = new HashMap<>();
+	public Map<Integer, GermplasmListMetadata> getAllGermplasmListMetadata() {
+		Map<Integer, GermplasmListMetadata> listMetadata = new HashMap<>();
 
 		List<Object[]> queryResults = this.getGermplasmListDAO().getAllListMetadata();
 
 		for (Object[] row : queryResults) {
-			Long listId = (Long) row[0];
-			Long entryCount = (Long) row[1];
+			Integer listId = (Integer) row[0];
+			Integer entryCount = (Integer) row[1];
 			String ownerUser = (String) row[2];
 			String ownerFirstName = (String) row[3];
 			String ownerLastName = (String) row[4];

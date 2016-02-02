@@ -25,6 +25,7 @@ import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.GermplasmListMetadata;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -681,7 +682,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	
 	@Test
 	public void testGetAllListMetadata() {
-		final Map<Long, GermplasmListMetadata> allGermplasmListMetadata = manager.getAllGermplasmListMetadata();
+		final Map<Integer, GermplasmListMetadata> allGermplasmListMetadata = manager.getAllGermplasmListMetadata();
 		Assert.assertNotNull("getAllGermplasmListMetadata() should never return null.", allGermplasmListMetadata);
 	}
 

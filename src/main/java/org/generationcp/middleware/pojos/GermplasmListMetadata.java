@@ -3,33 +3,33 @@ package org.generationcp.middleware.pojos;
 
 public class GermplasmListMetadata {
 
-	private Long listId;
-	private Long numberOfEntries;
+	private Integer listId;
+	private Integer numberOfEntries;
 	private String ownerName;
 
 	public GermplasmListMetadata() {
 
 	}
 
-	public GermplasmListMetadata(final Long listId, final Long numberOfEntries, final String ownerName) {
+	public GermplasmListMetadata(final Integer listId, final Integer numberOfEntries, final String ownerName) {
 		this.listId = listId;
 		this.numberOfEntries = numberOfEntries;
 		this.ownerName = ownerName;
 	}
 
-	public Long getListId() {
+	public Integer getListId() {
 		return this.listId;
 	}
 
-	public void setListId(Long listId) {
+	public void setListId(Integer listId) {
 		this.listId = listId;
 	}
 
-	public Long getNumberOfEntries() {
+	public Integer getNumberOfEntries() {
 		return this.numberOfEntries;
 	}
 
-	public void setNumberOfEntries(final Long numberOfEntries) {
+	public void setNumberOfEntries(final Integer numberOfEntries) {
 		this.numberOfEntries = numberOfEntries;
 	}
 
