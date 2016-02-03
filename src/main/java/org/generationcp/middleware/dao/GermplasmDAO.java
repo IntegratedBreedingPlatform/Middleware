@@ -30,6 +30,10 @@ import org.generationcp.middleware.pojos.Name;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Germplasm}.
@@ -45,6 +49,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String Q_STANDARDIZED = "qStandardized";
 	private static final String AVAIL_INV = "availInv";
 	private static final String SEED_RES = "seedRes";
+
+	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDAO.class);
 
 	@Override
 	public Germplasm getById(Integer gid, boolean lock) throws MiddlewareQueryException {
@@ -489,6 +495,23 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 		return toreturn;
 
+	}
+
+	public List<Germplasm> getAllChildren(Integer gid) {
+		try {
+			DetachedCriteria criteria = DetachedCriteria.forClass(Germplasm.class);
+			criteria.add(Restrictions.or(Restrictions.eq("gpid1", gid), Restrictions.eq("gpid2", gid))); // = either parent is given gid
+			criteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged
+			criteria.add(Restrictions.neProperty("gid", "grplce")); // = Record is not deleted or replaced.
+			
+			@SuppressWarnings("unchecked")
+			List<Germplasm> children = criteria.getExecutableCriteria(getSession()).list();
+			return children;
+		} catch (HibernateException e) {
+			final String message = "Error with getAllChildren(gid=" + gid + ") query from Germplasm: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 
 	public String getNextSequenceNumberForCrossName(String prefix) throws MiddlewareQueryException {

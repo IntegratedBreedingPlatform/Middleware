@@ -213,4 +213,19 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		List<Germplasm> results = this.dao.searchForGermplasms("", Operation.EQUAL, false, false);
 		Assert.assertTrue(results.isEmpty());
 	}
+
+	@Test
+	public void testGetAllChildren() {
+		final int gid = 955;
+		List<Germplasm> children = this.dao.getAllChildren(gid);
+		Assert.assertNotNull("getAllChildren() should never return null.", children);
+		if (!children.isEmpty()) {
+			for (Germplasm child : children) {
+				// Assert query logic on results.
+				Assert.assertTrue(child.getGpid1() == gid || child.getGpid2() == gid);
+				Assert.assertEquals(new Integer(0), child.getGrplce());
+				Assert.assertTrue(child.getGid() != child.getGrplce());
+			}
+		}
+	}
 }
