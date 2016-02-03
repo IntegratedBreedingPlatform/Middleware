@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.operation.builder;
@@ -85,7 +85,7 @@ public class WorkbookBuilder extends Builder {
 
 	public Workbook create(final int id, final StudyType studyType) {
 
-		Monitor monitor = MonitorFactory.start("Build Workbook");
+		final Monitor monitor = MonitorFactory.start("Build Workbook");
 
 		final boolean isTrial = studyType == StudyType.T;
 		final Workbook workbook = new Workbook();
@@ -292,7 +292,7 @@ public class WorkbookBuilder extends Builder {
 
 		final List<MeasurementRow> trialObservations = this.getTrialObservations(workbook, isTrial);
 		workbook.setTrialObservations(trialObservations);
-		LOG.debug("" + monitor.stop() + ". This instance was for studyId: " + id);
+		WorkbookBuilder.LOG.debug("" + monitor.stop() + ". This instance was for studyId: " + id);
 
 		return workbook;
 	}
@@ -679,7 +679,7 @@ public class WorkbookBuilder extends Builder {
 
 	private String getDataType(final int dataTypeId) {
 		// datatype ids: 1120, 1125, 1128, 1130
-		if (CHARACTER_TYPE_TERM_IDS.contains(dataTypeId)) {
+		if (WorkbookBuilder.CHARACTER_TYPE_TERM_IDS.contains(dataTypeId)) {
 			return "C";
 		} else {
 			return "N";
@@ -861,7 +861,7 @@ public class WorkbookBuilder extends Builder {
 		return "";
 	}
 
-	private VariableList getTrialEnvironmentVariableList(DataSet trialDataset) {
+	private VariableList getTrialEnvironmentVariableList(final DataSet trialDataset) {
 		final VariableTypeList typeList = trialDataset.getFactorsByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
 		final VariableList list = new VariableList();
 		for (final DMSVariableType type : typeList.getVariableTypes()) {
@@ -870,7 +870,7 @@ public class WorkbookBuilder extends Builder {
 		return list;
 	}
 
-	private VariableList getTrialConstants(DataSet trialDataSet) {
+	private VariableList getTrialConstants(final DataSet trialDataSet) {
 		final VariableTypeList typeList = trialDataSet.getVariableTypes().getVariates();
 
 		final VariableList list = new VariableList();
@@ -970,7 +970,7 @@ public class WorkbookBuilder extends Builder {
 	public int getMeasurementDataSetId(final int studyId, final String studyName) {
 		final List<DatasetReference> datasetRefList = this.getStudyDataManager().getDatasetReferences(studyId);
 		for (final DatasetReference datasetRef : datasetRefList) {
-			String datasetName = datasetRef.getName();
+			final String datasetName = datasetRef.getName();
 			if (datasetName.endsWith(DatasetUtil.NEW_PLOT_DATASET_NAME_SUFFIX)) {
 				return datasetRef.getId();
 			}
