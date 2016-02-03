@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2013, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.operation.builder;
@@ -125,7 +125,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	public void testGetTrialObservationsForNursery() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
 
-		final int id = this.dataImportService.saveDataset(workbook, PROGRAM_UUID);
+		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID);
 
 		final Workbook createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
 
@@ -160,7 +160,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	public void testGetTrialObservationsForTrial() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 
-		final int id = this.dataImportService.saveDataset(workbook, PROGRAM_UUID);
+		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID);
 
 		final Workbook createdWorkbook = this.fieldbookService.getTrialDataSet(id);
 
@@ -300,11 +300,12 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 		// add trial instance (also added in conditions)
 		workbook.getFactors().add(WorkbookTestDataInitializer.createTrialInstanceMeasurementVariable(1));
-		final VariableTypeList factorsVariableTypeList = this.variableTypeListTransformer.transform(workbook.getFactors(), PROGRAM_UUID);
+		final VariableTypeList factorsVariableTypeList =
+				this.variableTypeListTransformer.transform(workbook.getFactors(), WorkbookBuilderTest.PROGRAM_UUID);
 		final VariableTypeList conditionsVariableTypeList =
-				this.variableTypeListTransformer.transform(workbook.getConditions(), PROGRAM_UUID);
+				this.variableTypeListTransformer.transform(workbook.getConditions(), WorkbookBuilderTest.PROGRAM_UUID);
 		final VariableTypeList constantsVariableTypeList =
-				this.variableTypeListTransformer.transform(workbook.getConstants(), PROGRAM_UUID);
+				this.variableTypeListTransformer.transform(workbook.getConstants(), WorkbookBuilderTest.PROGRAM_UUID);
 		final VariableList conditions =
 				this.transformMeasurementVariablesToVariableList(workbook.getConditions(), conditionsVariableTypeList);
 		final VariableList constants = this.transformMeasurementVariablesToVariableList(workbook.getConstants(), constantsVariableTypeList);
@@ -346,9 +347,9 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
 
-		this.dataImportService.saveDataset(workbook, true, false, PROGRAM_UUID);
+		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID);
 
-		List<MeasurementRow> result =
+		final List<MeasurementRow> result =
 				this.workbookBuilder.buildTrialObservations(workbook.getTrialDatasetId(), workbook.getTrialConditions(),
 						workbook.getTrialConstants());
 
@@ -363,8 +364,8 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	}
 
-	private boolean isTermIdExists(int termId, List<MeasurementData> dataList) {
-		for (MeasurementData data : dataList) {
+	private boolean isTermIdExists(final int termId, final List<MeasurementData> dataList) {
+		for (final MeasurementData data : dataList) {
 			if (data.getMeasurementVariable().getTermId() == termId) {
 				return true;
 			}
