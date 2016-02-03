@@ -12,6 +12,7 @@ public interface GermplasmGroupingService {
 	 * At the database level, this equates to assigning an mgid for the germplasm and its descendents based on certain rules.
 	 * 
 	 * @param germplasm The germplasm to "fix".
+	 * @param preserveExistingGroup flag to indicate whether existing group (mgid) should be preserved.
 	 */
-	void markFixed(Germplasm germplasm);
+	void markFixed(Germplasm germplasm, boolean preserveExistingGroup);
 }
