@@ -28,12 +28,17 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
 import org.generationcp.middleware.pojos.ErrorCode;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.junit.Assert;
@@ -389,6 +394,91 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		}
 
 		return variableList;
+	}
+
+	@Test
+	public void testCreateMeasurementVariable() {
+		final int termId = TermId.TRIAL_INSTANCE_FACTOR.getId();
+		final StandardVariable stdVariable =
+				this.createStandardVariable(termId, "TRIAL INSTANCE", "Trial instance - enumerated (number)", "Trial instance", "Number",
+						"Enumerated", DataType.NUMERIC_VARIABLE.getName());
+		final VariableType varType = VariableType.ENVIRONMENT_DETAIL;
+		final DmsProject project = this.createDmsProject(1);
+		final int rank = 1;
+		final ProjectProperty localNameProjectProp = this.createProjectProperty(project, varType.getId(), "VAR_NAME", rank);
+		final ProjectProperty localDescProjectProp =
+				this.createProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), "VAR_DESC", rank);
+		final ProjectProperty stdVarProjectProp =
+				this.createProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), Integer.toString(termId), rank);
+		final List<ProjectProperty> projectProperties =
+				this.createProjectProperties(localNameProjectProp, localDescProjectProp, stdVarProjectProp);
+		final String value = "1";
+		final Double minRange = null;
+		final Double maxRange = null;
+		final MeasurementVariable measurementVariable =
+				this.workbookBuilder.createMeasurementVariable(stdVariable, localNameProjectProp, projectProperties, value, minRange,
+						maxRange, varType);
+		Assert.assertNotNull(measurementVariable);
+		Assert.assertEquals(stdVariable.getId(), measurementVariable.getTermId());
+		Assert.assertEquals(localNameProjectProp.getValue(), measurementVariable.getName());
+		Assert.assertEquals(stdVariable.getDescription(), measurementVariable.getDescription());
+		Assert.assertEquals(stdVariable.getProperty().getName(), measurementVariable.getProperty());
+		Assert.assertEquals(stdVariable.getScale().getName(), measurementVariable.getScale());
+		Assert.assertEquals(stdVariable.getMethod().getName(), measurementVariable.getMethod());
+		Assert.assertEquals(stdVariable.getDataType().getName(), measurementVariable.getDataType());
+		Assert.assertEquals(value, measurementVariable.getValue());
+		Assert.assertEquals(minRange, measurementVariable.getMinRange());
+		Assert.assertEquals(maxRange, measurementVariable.getMaxRange());
+		Assert.assertTrue(measurementVariable.isFactor());
+		Assert.assertEquals(stdVariable.getDataType().getId(), measurementVariable.getDataTypeId().intValue());
+		Assert.assertEquals(
+				this.workbookBuilder.getMeasurementVariableTransformer().transformPossibleValues(stdVariable.getEnumerations()),
+				measurementVariable.getPossibleValues());
+		Assert.assertEquals(varType.getRole(), measurementVariable.getRole());
+		Assert.assertEquals(varType, measurementVariable.getVariableType());
+	}
+
+	private List<ProjectProperty> createProjectProperties(final ProjectProperty... projectProps) {
+		final List<ProjectProperty> projectProperties = new ArrayList<>();
+		for (final ProjectProperty projectProperty : projectProps) {
+			projectProperties.add(projectProperty);
+		}
+		return projectProperties;
+	}
+
+	private DmsProject createDmsProject(final int id) {
+		final DmsProject project = new DmsProject();
+		project.setProjectId(id);
+		return project;
+	}
+
+	private ProjectProperty createProjectProperty(final DmsProject project, final Integer typeId, final String value, final int rank) {
+		final ProjectProperty projectProperty = new ProjectProperty();
+		projectProperty.setProject(project);
+		projectProperty.setTypeId(typeId);
+		projectProperty.setValue(value);
+		projectProperty.setRank(rank);
+		return projectProperty;
+	}
+
+	private StandardVariable createStandardVariable(final int id, final String name, final String description, final String property,
+			final String scale, final String method, final String datatype) {
+		final StandardVariable stdVariable = new StandardVariable();
+		stdVariable.setId(id);
+		stdVariable.setName(name);
+		stdVariable.setDescription(description);
+		stdVariable.setProperty(this.createTerm(100, property));
+		stdVariable.setScale(this.createTerm(200, scale));
+		stdVariable.setMethod(this.createTerm(300, method));
+		stdVariable.setDataType(this.createTerm(DataType.getByName(datatype).getId(), datatype));
+		return stdVariable;
+	}
+
+	private Term createTerm(final Integer id, final String name) {
+		final Term term = new Term();
+		term.setId(id);
+		term.setName(name);
+		return term;
 	}
 
 }
