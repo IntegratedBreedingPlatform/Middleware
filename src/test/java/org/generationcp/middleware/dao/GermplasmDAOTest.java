@@ -30,9 +30,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class GermplasmDAOTest extends IntegrationTestBase {
 
 	private static final String DUMMY_STOCK_ID = "USER-1-1";
+    private static final Integer TEST_STUDY_ID = 1;
 	private static final Integer testGid1 = 1;
 	private static final Integer testGid1_Gpid1 = 2;
 	private static final Integer testGid1_Gpid2 = 3;
+    private static final Integer UNKNOWN_GID_VALUE = 0;
 
 	private static Integer testTransactionID;
 	private static String oldInventoryID;
@@ -112,6 +114,18 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertTrue(results.size() == 1);
 
 	}
+    
+    @Test
+    public void testRetrieveStudyParentGIDsKnownValuesOnly() {
+        // reminder : test needs proper test data setup, similar to other tests for this class
+        List<Germplasm> germplasmEntries = this.dao.getGermplasmParentsForStudy(TEST_STUDY_ID);
+
+		for (Germplasm germplasmEntry : germplasmEntries) {
+			Assert.assertNotEquals("Query should not return values that have unknown parent GIDs", UNKNOWN_GID_VALUE, germplasmEntry.getGpid1() );
+            Assert.assertNotEquals("Query should not return values that have unknown parent GIDs", UNKNOWN_GID_VALUE, germplasmEntry.getGpid2() );
+		}
+    }
+    
 
 	@Test
 	public void testSearchForGermplasmsExactMatchGermplasmName() throws Exception {
