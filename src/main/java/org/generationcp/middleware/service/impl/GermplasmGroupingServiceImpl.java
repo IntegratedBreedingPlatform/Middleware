@@ -25,8 +25,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		assignMGID(germplasmToFix, germplasmToFix.getGid(), preserveExistingGroup);
 
 		if (includeDescendants) {
-			GermplasmPedigreeTreeNode descendentsTree = buildDescendentsTree(germplasmToFix, DEFAULT_DESCENDENT_TREE_LEVELS);
-			traverseAssignMGID(descendentsTree, germplasmToFix.getGid(), preserveExistingGroup);
+			GermplasmPedigreeTreeNode descendantsTree = buildDescendantsTree(germplasmToFix, DEFAULT_DESCENDANT_TREE_LEVELS);
+			traverseAssignMGID(descendantsTree, germplasmToFix.getGid(), preserveExistingGroup);
 			// TODO save germplasm nodes in tree where mgid was updated.
 		}
 	}
@@ -38,7 +38,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 	}
 
-	private GermplasmPedigreeTreeNode buildDescendentsTree(Germplasm germplasm, int levels) {
+	private GermplasmPedigreeTreeNode buildDescendantsTree(Germplasm germplasm, int levels) {
 		GermplasmPedigreeTreeNode node = new GermplasmPedigreeTreeNode();
 		node.setGermplasm(germplasm);
 
@@ -49,7 +49,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 		List<Germplasm> allChildren = this.germplasmDAO.getAllChildren(germplasm.getGid());
 		for (Germplasm child : allChildren) {
-			node.getLinkedNodes().add(buildDescendentsTree(child, levels - 1));
+			node.getLinkedNodes().add(buildDescendantsTree(child, levels - 1));
 		}
 		return node;
 	}
