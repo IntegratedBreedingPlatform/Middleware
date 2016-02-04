@@ -23,7 +23,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		Mockito.when(germplasmDAO.getAllChildren(germplasmToFix.getGid())).thenReturn(Lists.newArrayList(child1, child2));
 
-		groupingService.markFixed(germplasmToFix, false);
+		groupingService.markFixed(germplasmToFix, true, false);
 
 		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid when there is no existing mgid.",
 				germplasmToFix.getGid(),

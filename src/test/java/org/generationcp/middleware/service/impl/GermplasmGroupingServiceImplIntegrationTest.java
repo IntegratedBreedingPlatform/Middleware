@@ -30,7 +30,7 @@ public class GermplasmGroupingServiceImplIntegrationTest extends IntegrationTest
 		// TODO integration testing with wheat DB with historic germplasm data loaded. Test gid 165.
 		Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(165);
 		GermplasmGroupingServiceImpl groupingService = new GermplasmGroupingServiceImpl(this.germplasmDAO);
-		groupingService.markFixed(germplasm, true);
+		groupingService.markFixed(germplasm, true, true);
 		Assert.fail("No assertions yet.");
 	}
 }

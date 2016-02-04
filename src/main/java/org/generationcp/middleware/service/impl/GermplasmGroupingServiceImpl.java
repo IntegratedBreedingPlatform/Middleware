@@ -21,13 +21,14 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	@Override
-	public void markFixed(Germplasm germplasmToFix, boolean preserveExistingGroup) {
+	public void markFixed(Germplasm germplasmToFix, boolean includeDescendants, boolean preserveExistingGroup) {
 		assignMGID(germplasmToFix, germplasmToFix.getGid(), preserveExistingGroup);
 
-		GermplasmPedigreeTreeNode descendentsTree = buildDescendentsTree(germplasmToFix, DEFAULT_DESCENDENT_TREE_LEVELS);
-		traverseAssignMGID(descendentsTree, germplasmToFix.getGid(), preserveExistingGroup);
-		// TODO save germplasm nodes in tree where mgid was updated.
-		assert descendentsTree != null;
+		if (includeDescendants) {
+			GermplasmPedigreeTreeNode descendentsTree = buildDescendentsTree(germplasmToFix, DEFAULT_DESCENDENT_TREE_LEVELS);
+			traverseAssignMGID(descendentsTree, germplasmToFix.getGid(), preserveExistingGroup);
+			// TODO save germplasm nodes in tree where mgid was updated.
+		}
 	}
 
 	private void traverseAssignMGID(GermplasmPedigreeTreeNode node, Integer mgidToAssign, boolean preserveExistingGroup) {
