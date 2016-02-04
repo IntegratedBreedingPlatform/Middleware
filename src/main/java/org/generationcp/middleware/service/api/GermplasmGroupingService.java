@@ -5,6 +5,8 @@ import org.generationcp.middleware.pojos.Germplasm;
 
 public interface GermplasmGroupingService {
 
+	int DEFAULT_DESCENDENT_TREE_LEVELS = 5;
+
 	/**
 	 * When a germplasm (line) has reached a certina point in its development and is now being "maintained" rather than further developed,
 	 * Breeders refer to this transition as line becoming "fixed".

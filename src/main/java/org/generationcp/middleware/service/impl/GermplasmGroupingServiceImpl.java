@@ -1,13 +1,18 @@
+
 package org.generationcp.middleware.service.impl;
 
 import java.util.List;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
+
+	private static final Logger LOG = LoggerFactory.getLogger(GermplasmGroupingServiceImpl.class);
 
 	private GermplasmDAO germplasmDAO;
 
@@ -19,12 +24,33 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	public void markFixed(Germplasm germplasmToFix, boolean preserveExistingGroup) {
 		assignMGID(germplasmToFix, germplasmToFix.getGid(), preserveExistingGroup);
 
-		// TODO germplasmDAO.getAllChildren() just gets the immediate descendants at a given level. We need to recurse ang get whole
-		// tree(?).
-		final List<Germplasm> allChildren = this.germplasmDAO.getAllChildren(germplasmToFix.getGid());
-		for (Germplasm child : allChildren) {
-			assignMGID(child, germplasmToFix.getGid(), preserveExistingGroup);
+		GermplasmPedigreeTreeNode descendentsTree = buildDescendentsTree(germplasmToFix, DEFAULT_DESCENDENT_TREE_LEVELS);
+		traverseAssignMGID(descendentsTree, germplasmToFix.getGid(), preserveExistingGroup);
+		// TODO save germplasm nodes in tree where mgid was updated.
+		assert descendentsTree != null;
+	}
+
+	private void traverseAssignMGID(GermplasmPedigreeTreeNode node, Integer mgidToAssign, boolean preserveExistingGroup) {
+		assignMGID(node.getGermplasm(), mgidToAssign, preserveExistingGroup);
+		for (GermplasmPedigreeTreeNode child : node.getLinkedNodes()) {
+			traverseAssignMGID(child, mgidToAssign, preserveExistingGroup);
 		}
+	}
+
+	private GermplasmPedigreeTreeNode buildDescendentsTree(Germplasm germplasm, int levels) {
+		GermplasmPedigreeTreeNode node = new GermplasmPedigreeTreeNode();
+		node.setGermplasm(germplasm);
+
+		if (levels == 0) {
+			LOG.debug("Reached maximum levels specified for this branch. Stopping here and returning.");
+			return node;
+		}
+
+		List<Germplasm> allChildren = this.germplasmDAO.getAllChildren(germplasm.getGid());
+		for (Germplasm child : allChildren) {
+			node.getLinkedNodes().add(buildDescendentsTree(child, levels - 1));
+		}
+		return node;
 	}
 
 	private void assignMGID(Germplasm germplasm, Integer mgidToAssign, boolean preserveExistingGroup) {
