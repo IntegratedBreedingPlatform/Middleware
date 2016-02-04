@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.ContextHolder;
@@ -174,30 +173,40 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 	@Test
 	public void testUpdateVariable() throws Exception {
-        this.variableManager.updateVariable(this.testVariableInfo);
+		this.variableManager.updateVariable(this.testVariableInfo);
 		Variable updatedVariable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
 		Assert.assertNotNull(updatedVariable);
 	}
 
-    @Test
-    public void testUpdateVariableWithSavingInSynonym() throws Exception {
-        this.testVariableInfo.setName("UpdatedVariableName");
-        this.variableManager.updateVariable(this.testVariableInfo);
-        Variable updatedVariable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
-        Assert.assertEquals("UpdatedVariableName",updatedVariable.getName());
-        Assert.assertNotNull(updatedVariable);
+	@Test
+	public void testUpdateVariableWithSavingInSynonym() throws Exception {
+		this.testVariableInfo.setName("UpdatedVariableName");
+		this.variableManager.updateVariable(this.testVariableInfo);
+		Variable updatedVariable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
+		Assert.assertEquals("UpdatedVariableName",updatedVariable.getName());
+		Assert.assertNotNull(updatedVariable);
+	}
 
-    }
+	@Test(expected = MiddlewareException.class)
+	public void testDeleteVariableWithSavingInSynonym() throws Exception {
+		this.testVariableInfo.setName("UpdatedVariableName");
+		this.variableManager.updateVariable(this.testVariableInfo);
+		Variable updatedVariable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
+		Assert.assertEquals(testVariableInfo.getName(),updatedVariable.getName());
+		this.variableManager.deleteVariable(this.testVariableInfo.getId());
+		this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
+		Assert.fail("Variable does not exist");
+	}
 
-    @Test
-    public void testGetCategoricalValue() throws Exception {
-        createTestVariableWithCategoricalValue();
-        Scale scale = this.scaleManager.getScaleById(this.testScale.getId(), true);
-        TermSummary categorical = scale.getCategories().get(0);
+	@Test
+	public void testGetCategoricalValue() throws Exception {
+		createTestVariableWithCategoricalValue();
+		Scale scale = this.scaleManager.getScaleById(this.testScale.getId(), true);
+		TermSummary categorical = scale.getCategories().get(0);
 		Assert.assertEquals("Unable to retrieve the categorical value of a variable", categorical.getDefinition(),
 				this.variableManager.retrieveVariableCategoricalValue(this.testProject.getUniqueID(), this.testVariableInfo.getId(), categorical.getId()));
-        
-    }
+
+	}
 
 	/**
 	 * All test depend on add variable, scale, property, method
@@ -244,46 +253,47 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.variableManager.addVariable(this.testVariableInfo);
 	}
 
-    protected void createTestVariableWithCategoricalValue() {
-        WorkbenchTestDataUtil instance = new WorkbenchTestDataUtil(this.workbenchDataManager);
-        this.testProject = instance.createTestProjectData();
+	protected void createTestVariableWithCategoricalValue() {
+		WorkbenchTestDataUtil instance = new WorkbenchTestDataUtil(this.workbenchDataManager);
+		this.testProject = instance.createTestProjectData();
 
-        this.testMethod = new org.generationcp.middleware.domain.ontology.Method();
-        this.testMethod.setName(OntologyDataCreationUtil.getNewRandomName());
-        this.testMethod.setDefinition("Test Method");
-        this.methodManager.addMethod(this.testMethod);
+		this.testMethod = new org.generationcp.middleware.domain.ontology.Method();
+		this.testMethod.setName(OntologyDataCreationUtil.getNewRandomName());
+		this.testMethod.setName(OntologyDataCreationUtil.getNewRandomName());
+		this.testMethod.setDefinition("Test Method");
+		this.methodManager.addMethod(this.testMethod);
 
-        this.testProperty = new Property();
-        this.testProperty.setName(OntologyDataCreationUtil.getNewRandomName());
-        this.testProperty.setDefinition("Test Property");
-        this.testProperty.setCropOntologyId("CO:0000001");
-        this.testProperty.addClass("My New Class");
-        this.propertyManager.addProperty(this.testProperty);
+		this.testProperty = new Property();
+		this.testProperty.setName(OntologyDataCreationUtil.getNewRandomName());
+		this.testProperty.setDefinition("Test Property");
+		this.testProperty.setCropOntologyId("CO:0000001");
+		this.testProperty.addClass("My New Class");
+		this.propertyManager.addProperty(this.testProperty);
 
-        this.testScale = new Scale();
-        this.testScale.setName(OntologyDataCreationUtil.getNewRandomName());
-        this.testScale.setDefinition("Categorical Scale");
-        this.testScale.setDataType(DataType.CATEGORICAL_VARIABLE);
+		this.testScale = new Scale();
+		this.testScale.setName(OntologyDataCreationUtil.getNewRandomName());
+		this.testScale.setDefinition("Categorical Scale");
+		this.testScale.setDataType(DataType.CATEGORICAL_VARIABLE);
 
 
-        this.testScale.addCategory(new TermSummary(null, "1", "TestDefinition1"));
-        this.testScale.addCategory(new TermSummary(null, "2", "TestDefinition2"));
-        this.testScale.addCategory(new TermSummary(null, "3", "TestDefinition3"));
+		this.testScale.addCategory(new TermSummary(null, "1", "TestDefinition1"));
+		this.testScale.addCategory(new TermSummary(null, "2", "TestDefinition2"));
+		this.testScale.addCategory(new TermSummary(null, "3", "TestDefinition3"));
 
-        this.scaleManager.addScale(this.testScale);
+		this.scaleManager.addScale(this.testScale);
 
-        this.testVariableInfo = new OntologyVariableInfo();
-        this.testVariableInfo.setProgramUuid(this.testProject.getUniqueID());
-        this.testVariableInfo.setName(OntologyDataCreationUtil.getNewRandomName());
-        this.testVariableInfo.setDescription("Test Variable");
-        this.testVariableInfo.setMethodId(this.testMethod.getId());
-        this.testVariableInfo.setPropertyId(this.testProperty.getId());
-        this.testVariableInfo.setScaleId(this.testScale.getId());
-        this.testVariableInfo.setAlias("My alias");
-        this.testVariableInfo.setExpectedMin("0");
-        this.testVariableInfo.setExpectedMax("100");
-        this.testVariableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
-        this.testVariableInfo.setIsFavorite(true);
-        this.variableManager.addVariable(this.testVariableInfo);
-    }
+		this.testVariableInfo = new OntologyVariableInfo();
+		this.testVariableInfo.setProgramUuid(this.testProject.getUniqueID());
+		this.testVariableInfo.setName(OntologyDataCreationUtil.getNewRandomName());
+		this.testVariableInfo.setDescription("Test Variable");
+		this.testVariableInfo.setMethodId(this.testMethod.getId());
+		this.testVariableInfo.setPropertyId(this.testProperty.getId());
+		this.testVariableInfo.setScaleId(this.testScale.getId());
+		this.testVariableInfo.setAlias("My alias");
+		this.testVariableInfo.setExpectedMin("0");
+		this.testVariableInfo.setExpectedMax("100");
+		this.testVariableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
+		this.testVariableInfo.setIsFavorite(true);
+		this.variableManager.addVariable(this.testVariableInfo);
+	}
 }
