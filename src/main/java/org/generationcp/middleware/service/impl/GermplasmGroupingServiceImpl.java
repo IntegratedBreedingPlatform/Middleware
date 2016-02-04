@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.slf4j.Logger;
@@ -22,12 +23,13 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	@Override
 	public void markFixed(Germplasm germplasmToFix, boolean includeDescendants, boolean preserveExistingGroup) {
-		assignMGID(germplasmToFix, germplasmToFix.getGid(), preserveExistingGroup);
 
 		if (includeDescendants) {
-			GermplasmPedigreeTreeNode descendantsTree = buildDescendantsTree(germplasmToFix, DEFAULT_DESCENDANT_TREE_LEVELS);
-			traverseAssignMGID(descendantsTree, germplasmToFix.getGid(), preserveExistingGroup);
-			// TODO save germplasm nodes in tree where mgid was updated.
+			GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
+			tree.setRoot(buildDescendantsTree(germplasmToFix, DEFAULT_DESCENDANT_TREE_LEVELS));
+			traverseAssignMGID(tree.getRoot(), germplasmToFix.getGid(), preserveExistingGroup);
+		} else {
+			assignMGID(germplasmToFix, germplasmToFix.getGid(), preserveExistingGroup);
 		}
 	}
 
@@ -58,5 +60,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		if ((germplasm.getMgid() == null || new Integer(0).equals(germplasm.getMgid())) && !preserveExistingGroup) {
 			germplasm.setMgid(mgidToAssign);
 		}
+		
+		// TODO save germplasm records where mgid was updated or names were created.
 	}
 }
