@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos;
@@ -15,7 +15,19 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
+import javax.persistence.Table;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -23,9 +35,9 @@ import org.hibernate.annotations.SQLDelete;
 
 /**
  * POJO for listnms table.
- * 
+ *
  * @author Kevin Manansala, Mark Agarrado
- * 
+ *
  */
 
 @Entity
@@ -126,6 +138,8 @@ public class GermplasmList implements Serializable {
 					+ "WHERE "
 					+ " listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
 					+ "      OR desig = :q OR listname = :q " + "      OR desig = :qNoSpaces " + "      OR desig = :qStandardized " + ")";
+
+	public static final String FILTER_BY_PROGRAM_UUID = " AND (program_uuid = :programUUID OR program_uuid IS NULL)";
 
 	public GermplasmList() {
 
@@ -244,24 +258,24 @@ public class GermplasmList implements Serializable {
 	public String getStatusString() {
 		// TODO: make internationalizable
 		final List<String> listStatus = new ArrayList<String>();
-		final String status = String.format("%04d", this.getStatus());
+		final String formattedStatus = String.format("%04d", this.getStatus());
 
-		if (status.charAt(0) == '1') {
+		if (formattedStatus.charAt(0) == '1') {
 			listStatus.add("Final");
 		}
-		if (status.charAt(1) == '1') {
+		if (formattedStatus.charAt(1) == '1') {
 			listStatus.add("Locked");
 		}
-		if (status.charAt(2) == '1') {
+		if (formattedStatus.charAt(2) == '1') {
 			listStatus.add("Hidden");
 		}
-		if (status.charAt(3) == '1') {
+		if (formattedStatus.charAt(3) == '1') {
 			listStatus.add("List");
 		}
-		if (status.charAt(3) == '0') {
+		if (formattedStatus.charAt(3) == '0') {
 			listStatus.add("Folder");
 		}
-		if (status.charAt(3) == '9') {
+		if (formattedStatus.charAt(3) == '9') {
 			listStatus.add("Deleted");
 		}
 
@@ -407,27 +421,15 @@ public class GermplasmList implements Serializable {
 	}
 
 	public boolean isFolder() {
-		return this.getType() != null && this.getType().equalsIgnoreCase(FOLDER_TYPE) ? true : false;
+		return this.getType() != null && this.getType().equalsIgnoreCase(GermplasmList.FOLDER_TYPE) ? true : false;
 	}
 
 	public boolean isList() {
-		return this.getType() != null && this.getType().equalsIgnoreCase(LIST_TYPE) ? true : false;
+		return this.getType() != null && this.getType().equalsIgnoreCase(GermplasmList.LIST_TYPE) ? true : false;
 	}
 
 	public boolean hasParent() {
 		return this.getParent() != null ? true : false;
-	}
-
-	// TODO BMS-148 & BMS-150 check references and remove logic based on -ve/+ve ID.
-	/**
-	 * No local/central lists or -ve vs. +ve IDs in merged DB world.
-	 * 
-	 * @return
-	 * @deprecated
-	 */
-	@Deprecated
-	public boolean isLocalList() {
-		return this.getId() < 0;
 	}
 
 	public boolean isLockedList() {
