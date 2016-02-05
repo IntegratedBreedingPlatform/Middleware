@@ -57,7 +57,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	private void assignMGID(Germplasm germplasm, Integer mgidToAssign, boolean preserveExistingGroup) {
-		if ((germplasm.getMgid() == null || new Integer(0).equals(germplasm.getMgid())) && !preserveExistingGroup) {
+		if (!preserveExistingGroup) {
 			germplasm.setMgid(mgidToAssign);
 		}
 		
