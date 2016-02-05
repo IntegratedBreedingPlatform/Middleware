@@ -22,6 +22,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.util.Message;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -59,6 +60,7 @@ public class DataImportServiceImplTest {
 	public static final String[] STRINGS_WITH_INVALID_CHARACTERS = new String[] {"1234", "word@", "_+world=", "!!world!!", "&&&"};
 	public static final String[] STRINGS_WITH_VALID_CHARACTERS = new String[] {"i_am_groot", "hello123world", "%%bangbang",
 			"something_something", "zawaruldoisbig"};
+
 	private static final String PROGRAM_UUID = "123456789";
 	private static final String ENTRY = "ENTRY";
 	private static final String NUMBER = "NUMBER";
@@ -72,6 +74,18 @@ public class DataImportServiceImplTest {
 	private static final String PLOT = "PLOT";
 	private static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
 	private static final String TRIAL = "TRIAL";
+
+	@Before
+	public void init() {
+
+		Mockito.when(
+				this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(EARASP_1_5_PROPERTY, EARASP_1_5_SCALE,
+						EARASP_1_5_METHOD)).thenReturn(EARASP_1_5_TERMID);
+
+		Mockito.when(this.ontologyDataManager.getStandardVariable(EARASP_1_5_TERMID, PROGRAM_UUID)).thenReturn(
+				this.createTestCategoricalStandardVariable(EARASP_1_5_NAME));
+
+	}
 
 	@Test
 	public void testStrictParseWorkbookWithGreaterThan32VarNames() throws Exception {
@@ -145,33 +159,87 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testCheckForOutOfBoundsDataWithValidData() {
 
-		Mockito.when(
-				this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(EARASP_1_5_PROPERTY, EARASP_1_5_SCALE,
-						EARASP_1_5_METHOD)).thenReturn(EARASP_1_5_TERMID);
-
-		Mockito.when(this.ontologyDataManager.getStandardVariable(EARASP_1_5_TERMID, "")).thenReturn(
-				this.createTestCategoricalStandardVariable(EARASP_1_5_NAME));
-
 		Workbook testWorkbook = this.createTestWorkbook(true);
 
-		Assert.assertTrue(this.dataImportService.checkForOutOfBoundsData(this.ontologyDataManager, testWorkbook, ""));
+		Assert.assertTrue(this.dataImportService.checkForOutOfBoundsData(this.ontologyDataManager, testWorkbook, PROGRAM_UUID));
 
 	}
 
 	@Test
 	public void testCheckForOutOfBoundsDataWithInvalidData() {
 
-		Mockito.when(
-				this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(EARASP_1_5_PROPERTY, EARASP_1_5_SCALE,
-						EARASP_1_5_METHOD)).thenReturn(EARASP_1_5_TERMID);
-
-		Mockito.when(this.ontologyDataManager.getStandardVariable(EARASP_1_5_TERMID, "")).thenReturn(
-				this.createTestCategoricalStandardVariable(EARASP_1_5_NAME));
-
 		Workbook testWorkbook = this.createTestWorkbook(false);
 
-		Assert.assertFalse(this.dataImportService.checkForOutOfBoundsData(this.ontologyDataManager, testWorkbook, ""));
+		Assert.assertFalse(this.dataImportService.checkForOutOfBoundsData(this.ontologyDataManager, testWorkbook, PROGRAM_UUID));
 
+	}
+
+	@Test
+	public void testParseWorkbookWithDiscardInvalidValuesIsTrue() throws WorkbookParserException {
+
+		Workbook testWorkbook = this.createTestWorkbook(true);
+
+		Mockito.when(this.parser.parseFile(this.file, false)).thenReturn(testWorkbook);
+
+		this.dataImportService.parseWorkbook(this.file, PROGRAM_UUID, true, this.ontologyDataManager, this.parser);
+
+		Mockito.verify(this.parser).parseAndSetObservationRows(this.file, testWorkbook, true);
+
+		Assert.assertFalse("Make sure the possible values of categorical variates is populated", testWorkbook.getVariates().get(0)
+				.getPossibleValues().isEmpty());
+		Assert.assertEquals("Make sure the datatype of categorical variates is CATEGORICAL_VARIBLE", DataType.CATEGORICAL_VARIABLE.getId(),
+				testWorkbook.getVariates().get(0).getDataTypeId());
+	}
+
+	@Test
+	public void testParseWorkbookWithDiscardInvalidValuesIsFalse() throws WorkbookParserException {
+
+		Workbook testWorkbook = this.createTestWorkbook(true);
+
+		Mockito.when(this.parser.parseFile(this.file, false)).thenReturn(testWorkbook);
+
+		this.dataImportService.parseWorkbook(this.file, PROGRAM_UUID, false, this.ontologyDataManager, this.parser);
+
+		Mockito.verify(this.parser).parseAndSetObservationRows(this.file, testWorkbook, false);
+
+		Assert.assertFalse("Make sure the possible values of categorical variates is populated", testWorkbook.getVariates().get(0)
+				.getPossibleValues().isEmpty());
+		Assert.assertEquals("Make sure the datatype of categorical variates is CATEGORICAL_VARIBLE", DataType.CATEGORICAL_VARIABLE.getId(),
+				testWorkbook.getVariates().get(0).getDataTypeId());
+
+	}
+
+	@Test
+	public void testPopulatePossibleValuesForCategoricalVariatesStandardVariableIsCategorical() {
+
+		List<MeasurementVariable> variates = new ArrayList<>();
+
+		MeasurementVariable testMeasurementVariable =
+				new MeasurementVariable(EARASP_1_5_NAME, "", EARASP_1_5_SCALE, EARASP_1_5_METHOD, EARASP_1_5_PROPERTY, "", "C", "VARIATE");
+		variates.add(testMeasurementVariable);
+
+		this.dataImportService.populatePossibleValuesForCategoricalVariates(variates, PROGRAM_UUID, this.ontologyDataManager);
+
+		Assert.assertFalse(testMeasurementVariable.getPossibleValues().isEmpty());
+		Assert.assertEquals(DataType.CATEGORICAL_VARIABLE.getId(), testMeasurementVariable.getDataTypeId());
+	}
+
+	public void testPopulatePossibleValuesForCategoricalVariatesStandardVariableIsNotCategorical() {
+
+		StandardVariable testStandardVariable = this.createTestCategoricalStandardVariable(EARASP_1_5_NAME);
+		testStandardVariable.setDataType(new Term(TermId.NUMERIC_VARIABLE.getId(), "Numeric variable", ""));
+		Mockito.when(this.ontologyDataManager.getStandardVariable(EARASP_1_5_TERMID, PROGRAM_UUID)).thenReturn(testStandardVariable);
+
+		List<MeasurementVariable> variates = new ArrayList<>();
+
+		MeasurementVariable testMeasurementVariable =
+				new MeasurementVariable(EARASP_1_5_NAME, "", EARASP_1_5_SCALE, EARASP_1_5_METHOD, EARASP_1_5_PROPERTY, "", "C", "VARIATE");
+		variates.add(testMeasurementVariable);
+
+		this.dataImportService.populatePossibleValuesForCategoricalVariates(variates, "", this.ontologyDataManager);
+
+		Assert.assertNull(testMeasurementVariable.getPossibleValues());
+		Assert.assertNull(testMeasurementVariable.getDataTypeId());
 	}
 
 	private StandardVariable createTestCategoricalStandardVariable(String name) {
