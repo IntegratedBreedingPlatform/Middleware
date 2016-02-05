@@ -15,11 +15,13 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.util.Message;
 
 /**
@@ -58,6 +60,18 @@ public interface DataImportService {
 	 * @return workbook
 	 */
 	Workbook parseWorkbook(File file) throws WorkbookParserException;
+
+	/**
+	 * 
+	 * @param file
+	 * @param programUUID
+	 * @param discardOutOfBoundsData
+	 * @param ontologyDataManger
+	 * @return
+	 * @throws WorkbookParserException
+	 */
+	Workbook parseWorkbook(File file, String programUUID, boolean discardInvalidValues, OntologyDataManager ontologyDataManger,
+			WorkbookParser workbookParser) throws WorkbookParserException;
 
 	/**
 	 * 
@@ -129,5 +143,14 @@ public interface DataImportService {
 	 * @return
 	 */
 	boolean checkForOutOfBoundsData(OntologyDataManager ontologyDataManager, Workbook workbook, String programUUID);
+
+	/**
+	 * 
+	 * @param workbook
+	 * @param programUUID
+	 * @param ontologyDataManager
+	 */
+	void populatePossibleValuesForCategoricalVariates(List<MeasurementVariable> variates, String programUUID,
+			OntologyDataManager ontologyDataManager);
 
 }

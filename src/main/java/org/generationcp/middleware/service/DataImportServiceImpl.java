@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.Constants;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -134,7 +135,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// partially parse the file to parse the description sheet only at first
 		final Workbook workbook = parser.parseFile(file, false);
 
-		parser.parseAndSetObservationRows(file, workbook);
+		parser.parseAndSetObservationRows(file, workbook, false);
 
 		return workbook;
 	}
@@ -175,7 +176,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		// this version of the workbookparser method is also capable of throwing a workbookparserexception with a list of messages
 		// containing validation errors inside
-		parser.parseAndSetObservationRows(file, workbook);
+		parser.parseAndSetObservationRows(file, workbook, false);
 
 		// separated the validation of observations from the parsing so that it can be used even in other parsing implementations (e.g., the
 		// one for Wizard style)
@@ -196,6 +197,56 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		}
 
 		return workbook;
+	}
+
+	@Override
+	public Workbook parseWorkbook(File file, String programUUID, boolean discardInvalidValues, OntologyDataManager ontologyDataManager,
+			WorkbookParser workbookParser) throws WorkbookParserException {
+
+		// partially parse the file to parse the description sheet only at first
+		final Workbook workbook = workbookParser.parseFile(file, false);
+
+		this.populatePossibleValuesForCategoricalVariates(workbook.getVariates(), programUUID, ontologyDataManager);
+
+		workbookParser.parseAndSetObservationRows(file, workbook, discardInvalidValues);
+
+		return workbook;
+	}
+
+	@Override
+	public void populatePossibleValuesForCategoricalVariates(List<MeasurementVariable> variates, String programUUID,
+			OntologyDataManager ontologyDataManager) {
+
+		for (MeasurementVariable measurementVariable : variates) {
+
+			Integer standardVariableId = null;
+			if (measurementVariable.getTermId() == 0) {
+				standardVariableId =
+						ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(),
+								measurementVariable.getScale(), measurementVariable.getMethod());
+			} else {
+				standardVariableId = measurementVariable.getTermId();
+			}
+
+			StandardVariable standardVariable = null;
+
+			if (standardVariableId != null) {
+				standardVariable = ontologyDataManager.getStandardVariable(standardVariableId, programUUID);
+			}
+
+			if (standardVariable != null && standardVariable.getDataType().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
+
+				List<ValueReference> possibleValues = new ArrayList<>();
+				if (standardVariable.getEnumerations() != null && !standardVariable.getEnumerations().isEmpty()) {
+					for (Enumeration enumeration : standardVariable.getEnumerations()) {
+						possibleValues.add(new ValueReference(enumeration.getId(), enumeration.getName(), enumeration.getDescription()));
+					}
+
+				}
+				measurementVariable.setPossibleValues(possibleValues);
+				measurementVariable.setDataTypeId(standardVariable.getDataType().getId());
+			}
+		}
 	}
 
 	@Override

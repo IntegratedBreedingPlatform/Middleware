@@ -15,10 +15,12 @@ import java.util.List;
 
 import javax.annotation.Nonnull;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.util.Debug;
 
 public class MeasurementData {
@@ -300,6 +302,29 @@ public class MeasurementData {
 
 	public void setVariable(final Variable variable) {
 		this.variable = variable;
+	}
+
+	/**
+	 * Checks whether the value of MeasurementData is valid or not based on its data type. Returns true if valid.
+	 * 
+	 * @return
+	 */
+	public boolean isCategoricalValueValid() {
+
+		// If the variable is categorical, check if the value has a match in possible values list.
+		if (this.getMeasurementVariable().getDataTypeId() != null
+				&& this.getMeasurementVariable().getDataTypeId().intValue() == DataType.CATEGORICAL_VARIABLE.getId()
+				&& this.getMeasurementVariable().getPossibleValues() != null && StringUtils.isNotBlank(this.value)) {
+			for (ValueReference valueReference : this.getMeasurementVariable().getPossibleValues()) {
+				if (valueReference.getName().equalsIgnoreCase(this.value)) {
+					return true;
+				}
+			}
+			return false;
+		} else {
+			// If the datatype is not categorical just return true.
+			return true;
+		}
 	}
 
 }
