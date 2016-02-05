@@ -11,10 +11,7 @@
 
 package org.generationcp.middleware.pojos.germplasm;
 
-import java.util.List;
-
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.pedigree.PedigreeDataManagerFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 /**
@@ -93,16 +90,17 @@ public class GermplasmCrossNode implements GermplasmCrossElementNode {
 
 		final StringBuilder pedigreeString = new StringBuilder();
 
-		final List<Integer> nameTypeOrder = crossExpansionProperties.getNameTypeOrder(cropName);
-		final List<Name> namesByGID = pedigreeDataManagerFactory.getGermplasmDataManager().getByGIDWithListTypeFilters(germplasm.getGid(), null, nameTypeOrder);
-		if(!rootNode) {
-			if(CrossBuilderUtil.nameTypeBasedResolution(pedigreeString, nameTypeOrder, namesByGID)){
-				return pedigreeString.toString();
-			}
-		}
+//		if(!rootNode && germplasm != null) {
+//			if(CrossBuilderUtil.nameTypeBasedResolution(pedigreeString, pedigreeDataManagerFactory, this.germplasm, crossExpansionProperties.getNameTypeOrder(cropName))){
+//				return pedigreeString.toString();
+//			}
+//		}
+
 
 		if (this.firstParent != null) {
-			pedigreeString.append(this.firstParent.getCrossExpansionString(cropName, crossExpansionProperties, pedigreeDataManagerFactory));
+			if(!CrossBuilderUtil.nameTypeBasedResolution(pedigreeString, pedigreeDataManagerFactory, this.firstParent.getGermplasm(), crossExpansionProperties.getNameTypeOrder(cropName))){
+				pedigreeString.append(this.firstParent.getCrossExpansionString(cropName, crossExpansionProperties, pedigreeDataManagerFactory));
+			}
 		} else {
 			pedigreeString.append("Unknown");
 		}
@@ -122,7 +120,9 @@ public class GermplasmCrossNode implements GermplasmCrossElementNode {
 		}
 
 		if (this.secondParent != null) {
-			pedigreeString.append(this.secondParent.getCrossExpansionString(cropName, crossExpansionProperties, pedigreeDataManagerFactory));
+			if(!CrossBuilderUtil.nameTypeBasedResolution(pedigreeString, pedigreeDataManagerFactory, this.secondParent.getGermplasm(), crossExpansionProperties.getNameTypeOrder(cropName))){
+				pedigreeString.append(this.secondParent.getCrossExpansionString(cropName, crossExpansionProperties, pedigreeDataManagerFactory));
+			}
 		} else {
 			pedigreeString.append("Unknown");
 		}

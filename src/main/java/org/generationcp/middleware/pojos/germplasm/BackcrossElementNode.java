@@ -1,13 +1,13 @@
 
 package org.generationcp.middleware.pojos.germplasm;
 
-import java.util.List;
-
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.pedigree.PedigreeDataManagerFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
+/**
+ * Represents a node in a pedigree tree that is a result of a backcorss.
+ */
 public class BackcrossElementNode implements GermplasmCrossElementNode {
 
 	private static final long serialVersionUID = 6253095292794735301L;
@@ -114,27 +114,33 @@ public class BackcrossElementNode implements GermplasmCrossElementNode {
 
 	public String getCrossExpansionString(final String cropName, final CrossExpansionProperties crossExpansionProperties, final PedigreeDataManagerFactory pedigreeDataManagerFactory) {
 
-		final StringBuilder toreturn = new StringBuilder();
 
-		final List<Integer> nameTypeOrder = crossExpansionProperties.getNameTypeOrder(cropName);
-		final List<Name> namesByGID = pedigreeDataManagerFactory.getGermplasmDataManager().getByGIDWithListTypeFilters(germplasm.getGid(), null, nameTypeOrder);
-		if(!rootNode) {
-			if(CrossBuilderUtil.nameTypeBasedResolution(toreturn, nameTypeOrder, namesByGID)){
-				return toreturn.toString();
-			}
-		}
+//		if(!rootNode && germplasm != null) {
+//			if(CrossBuilderUtil.nameTypeBasedResolution(toreturn, pedigreeDataManagerFactory, this.germplasm, crossExpansionProperties.getNameTypeOrder(cropName))){
+//				return toreturn.toString();
+//			}
+//		}
 
-
-		String parentString = "Unknown";
+		final StringBuilder parentString = new StringBuilder();
 		if (this.parent != null) {
-			parentString = this.parent.getCrossExpansionString(cropName, crossExpansionProperties, pedigreeDataManagerFactory);
+			if(!CrossBuilderUtil.nameTypeBasedResolution(parentString, pedigreeDataManagerFactory, this.parent.getGermplasm(), crossExpansionProperties.getNameTypeOrder(cropName))){
+				parentString.append(this.parent.getCrossExpansionString(cropName, crossExpansionProperties, pedigreeDataManagerFactory));
+			}
+		} else {
+			parentString.append("Unknown");
 		}
 
-		String recurrentParentString = "Unknown";
+
+		final StringBuilder recurrentParentString = new StringBuilder();
 		if (this.recurringParent != null) {
-			recurrentParentString = this.recurringParent.getCrossExpansionString(cropName, crossExpansionProperties, pedigreeDataManagerFactory);
+			if(!CrossBuilderUtil.nameTypeBasedResolution(recurrentParentString, pedigreeDataManagerFactory, this.recurringParent.getGermplasm(), crossExpansionProperties.getNameTypeOrder(cropName))){
+				recurrentParentString.append(this.recurringParent.getCrossExpansionString(cropName, crossExpansionProperties, pedigreeDataManagerFactory));
+			}
+		} else {
+			parentString.append("Unknown");
 		}
 
+		final StringBuilder toreturn = new StringBuilder();
 		if (this.recurringParentOnTheRight) {
 			toreturn.append(parentString);
 			toreturn.append("/");

@@ -1,7 +1,5 @@
 package org.generationcp.middleware.pojos.germplasm;
 
-import java.util.List;
-
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.pedigree.PedigreeDataManagerFactory;
@@ -37,14 +35,10 @@ public class SingleGermplasmCrossElementNode implements GermplasmCrossElementNod
 	public String getCrossExpansionString(String cropName, CrossExpansionProperties crossExpansionProperties, final PedigreeDataManagerFactory pedigreeDataManagerFactory) {
 
 
-		final StringBuilder toreturn = new StringBuilder();
-		if(germplasm != null) {
-			final List<Integer> nameTypeOrder = crossExpansionProperties.getNameTypeOrder(cropName);
-			final List<Name> namesByGID = pedigreeDataManagerFactory.getGermplasmDataManager().getByGIDWithListTypeFilters(germplasm.getGid(), null, nameTypeOrder);
-			if(!rootNode) {
-				if(CrossBuilderUtil.nameTypeBasedResolution(toreturn, nameTypeOrder, namesByGID)){
-					return toreturn.toString();
-				}
+		final StringBuilder pedigreeString = new StringBuilder();
+		if(!rootNode && germplasm != null) {
+			if(CrossBuilderUtil.nameTypeBasedResolution(pedigreeString, pedigreeDataManagerFactory, this.germplasm, crossExpansionProperties.getNameTypeOrder(cropName))){
+				return pedigreeString.toString();
 			}
 		}
 
@@ -69,6 +63,5 @@ public class SingleGermplasmCrossElementNode implements GermplasmCrossElementNod
 	public void setRootNode(boolean rootNode) {
 		this.rootNode = rootNode;
 	}
-
 
 }
