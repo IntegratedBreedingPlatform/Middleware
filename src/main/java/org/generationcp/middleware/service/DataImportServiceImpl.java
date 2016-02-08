@@ -644,7 +644,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		if (!this.isEntryExists(ontology, workbook.getFactors())) {
 			this.initializeIfNull(errors, Constants.MISSING_ENTRY);
-			// DMV : TODO change implem so that backend is agnostic to UI when
+
 			// determining messages
 			errors.get(Constants.MISSING_ENTRY).add(new Message("error.entry.doesnt.exist.wizard"));
 		}
@@ -652,7 +652,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		if ((workbook.getImportType() == null || workbook.getImportType() == DataSetType.PLOT_DATA.getId())
 				&& !this.isPlotExists(ontology, workbook.getFactors())) {
 			this.initializeIfNull(errors, Constants.MISSING_PLOT);
-			// DMV : TODO change implem so that backend is agnostic to UI when determining messages
+
 			errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
 		}
 
@@ -769,7 +769,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			// get and check if trialInstanceNumber already exists
 			final Set<String> locationIds = new LinkedHashSet<String>();
 
-			// TODO MODIFY THIS IF NECESSARY
 			int maxNumOfIterations = 100000;
 			final int observationCount = workbook.getObservations().size();
 			if (observationCount < maxNumOfIterations) {

@@ -79,9 +79,8 @@ public class WorkbookParser {
 	private static final String METHOD = "METHOD";
 	private static final String SCALE = "SCALE";
 
-	public static Integer MAX_ROW_LIMIT = 10000;
+	public static final Integer MAX_ROW_LIMIT = 10000;
 
-	// FIXME: We need to consolidate the row incrementation. Have a centralised place to return the next row.
 	private int currentRow;
 	private List<Message> errorMessages = new ArrayList<>();
 	private boolean hasIncorrectDatatypeValue = false;
@@ -652,7 +651,8 @@ public class WorkbookParser {
 			MeasurementData measurementData = new MeasurementData(measurementVariable.getName(), data);
 			measurementData.setMeasurementVariable(measurementVariable);
 
-			if (discardInvalidValues && !measurementData.isCategoricalValueValid() && measurementVariable.getRole() == PhenotypicType.VARIATE) {
+			if (discardInvalidValues && !measurementData.isCategoricalValueValid()
+					&& measurementVariable.getRole() == PhenotypicType.VARIATE) {
 				measurementData.setValue("");
 			}
 

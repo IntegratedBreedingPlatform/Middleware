@@ -25,6 +25,8 @@ import org.generationcp.middleware.util.Debug;
 
 public class MeasurementData {
 
+	private static final String EMPTY_STRING = "";
+
 	public static final String MISSING_VALUE = "missing";
 
 	private String label;
@@ -41,7 +43,7 @@ public class MeasurementData {
 
 	private MeasurementVariable measurementVariable;
 
-	public boolean isCustomCategoricalValue;
+	private boolean isCustomCategoricalValue;
 
 	private boolean isAccepted;
 
@@ -110,7 +112,7 @@ public class MeasurementData {
 
 	@Nonnull
 	public String getValue() {
-		return this.value == null || "null".equalsIgnoreCase(this.value) ? "" : this.value;
+		return this.value == null || "null".equalsIgnoreCase(this.value) ? EMPTY_STRING : this.value;
 	}
 
 	public void setValue(final String value) {
@@ -206,7 +208,7 @@ public class MeasurementData {
 		} else {
 			if (this.getMeasurementVariable() != null && this.getMeasurementVariable().getDataTypeDisplay() != null
 					&& "N".equalsIgnoreCase(this.getMeasurementVariable().getDataTypeDisplay())) {
-				if (this.value != null && !"".equalsIgnoreCase(this.value) && !"null".equalsIgnoreCase(this.value)) {
+				if (this.value != null && !EMPTY_STRING.equalsIgnoreCase(this.value) && !"null".equalsIgnoreCase(this.value)) {
 					if (MeasurementData.MISSING_VALUE.equalsIgnoreCase(this.value)) {
 						return MeasurementData.MISSING_VALUE;
 					}
@@ -223,7 +225,7 @@ public class MeasurementData {
 				return this.value;
 			}
 		}
-		return "";
+		return EMPTY_STRING;
 	}
 
 	public MeasurementData copy() {
@@ -266,7 +268,7 @@ public class MeasurementData {
 		if (this.getMeasurementVariable() != null && this.getMeasurementVariable().getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()
 				&& this.getMeasurementVariable().getPossibleValues() != null) {
 			final String displayValue = this.getDisplayValue();
-			if (displayValue != null && !displayValue.equalsIgnoreCase("") && !MeasurementData.MISSING_VALUE.equals(displayValue)) {
+			if (displayValue != null && !displayValue.equalsIgnoreCase(EMPTY_STRING) && !MeasurementData.MISSING_VALUE.equals(displayValue)) {
 				for (final ValueReference valRef : this.getMeasurementVariable().getPossibleValues()) {
 					if (valRef.getDescription().equalsIgnoreCase(displayValue)) {
 						return false;
@@ -277,7 +279,7 @@ public class MeasurementData {
 		} else if (this.getMeasurementVariable() != null
 				&& this.getMeasurementVariable().getDataTypeId() == TermId.NUMERIC_VARIABLE.getId()) {
 			final String displayValue = this.getDisplayValue();
-			if (displayValue != null && !displayValue.equalsIgnoreCase("") && !MeasurementData.MISSING_VALUE.equals(displayValue)) {
+			if (displayValue != null && !displayValue.equalsIgnoreCase(EMPTY_STRING) && !MeasurementData.MISSING_VALUE.equals(displayValue)) {
 				if (this.getMeasurementVariable().getMinRange() != null && this.getMeasurementVariable().getMaxRange() != null) {
 
 					if (!NumberUtils.isNumber(displayValue)) {
