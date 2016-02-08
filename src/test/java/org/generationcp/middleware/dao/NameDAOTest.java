@@ -103,8 +103,6 @@ public class NameDAOTest extends IntegrationTestBase {
 
 	private Germplasm createGermplasmTestData(final int dateIntValue) {
 		final Germplasm germplasm = new Germplasm();
-		// set to a big gid number to make sure this test will not conflict with existing data
-		germplasm.setGid(10000);
 		germplasm.setUserId(1);
 		germplasm.setLocationId(0);
 		germplasm.setGdate(dateIntValue);
