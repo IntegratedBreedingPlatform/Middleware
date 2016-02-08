@@ -62,6 +62,8 @@ public interface DataImportService {
 	Workbook parseWorkbook(File file) throws WorkbookParserException;
 
 	/**
+	 * Parses the file to create a workbook object with options to discard the invalid values. If discardOutOfBoundsData is true, all
+	 * invalid values of categorical traits in the file will be removed/discarded and set to empty.
 	 * 
 	 * @param file
 	 * @param programUUID
@@ -135,7 +137,7 @@ public interface DataImportService {
 	Map<String, List<Message>> validateProjectData(Workbook importData, String programUUID) throws MiddlewareException;
 
 	/**
-	 * Checks the Workbook's observation data for out of bounds values. Returns true if there are Out of Bounds data.
+	 * Checks the Workbook's observation data for out-of-bounds values. Returns true if there are out-of-bounds data.
 	 * 
 	 * @param ontologyDataManager
 	 * @param workbook
@@ -145,6 +147,7 @@ public interface DataImportService {
 	boolean checkForOutOfBoundsData(OntologyDataManager ontologyDataManager, Workbook workbook, String programUUID);
 
 	/**
+	 * Populates the measurement variables with their possible values. Only the categorical type variable will be populated.
 	 * 
 	 * @param workbook
 	 * @param programUUID
