@@ -185,7 +185,7 @@ public class WorkbookTestDataInitializer {
 
 	public static Workbook createTestWorkbook(final int noOfObservations, final StudyType studyType, final String studyName,
 			final int trialNo, final boolean hasMultipleLocations) {
-		return WorkbookTestDataInitializer.createTestWorkbook(noOfObservations, studyType, studyName, trialNo, hasMultipleLocations);
+		return WorkbookTestDataInitializer.createTestWorkbook(noOfObservations, studyType, studyName, trialNo, hasMultipleLocations, false);
 	}
 
 	public static Workbook createTestWorkbook(final int noOfObservations, final StudyType studyType, final String studyName,
