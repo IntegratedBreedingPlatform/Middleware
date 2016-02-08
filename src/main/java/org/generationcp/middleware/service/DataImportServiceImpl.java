@@ -258,15 +258,22 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		for (MeasurementRow measurementRow : workbook.getObservations()) {
 			for (Entry<String, List<String>> entry : termIdValidValuesMap.entrySet()) {
 				MeasurementData measurementData = measurementRow.getMeasurementData(entry.getKey());
-				if (!entry.getValue().contains(measurementData.getValue())) {
-					return true;
-				}
+				return this.containsIgnoreCase(entry.getValue(), measurementData.getValue());
 			}
 
 		}
 
 		return false;
 
+	}
+
+	private boolean containsIgnoreCase(List<String> list, String searchFor) {
+		for (String item : list) {
+			if (item.equalsIgnoreCase(searchFor)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	protected Map<String, List<String>> getValidValuesMapForCategoricalVariates(final OntologyDataManager ontologyDataManager,
