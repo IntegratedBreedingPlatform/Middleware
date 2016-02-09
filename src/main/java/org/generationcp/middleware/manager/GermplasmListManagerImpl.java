@@ -549,15 +549,16 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		}
 
 		return listMetadata;
+	}	
+
+	public List<GermplasmList> searchForGermplasmList(final String q, final Operation o) {
+		return searchForGermplasmList(q, null, o);
 	}
 
-	@Override
-	public List<GermplasmList> searchForGermplasmList(String q, Operation o) throws MiddlewareQueryException {
-		List<GermplasmList> results = new ArrayList<GermplasmList>();
-		results.addAll(this.getGermplasmListDAO().searchForGermplasmLists(q, o));
-		return results;
-	}
-
+	/**
+	 * @deprecated
+	 */
+	@Deprecated
 	@Override
 	public List<GermplasmList> searchForGermplasmList(final String q, final String programUUID, final Operation o) {
 		final List<GermplasmList> results = new ArrayList<GermplasmList>();

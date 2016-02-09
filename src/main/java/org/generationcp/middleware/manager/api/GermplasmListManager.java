@@ -509,7 +509,7 @@ public interface GermplasmListManager {
 	 * @param listRef
 	 * @return
 	 */
-	org.generationcp.middleware.pojos.GermplasmList getGermplasmListByListRef(Integer listRef) throws MiddlewareQueryException;
+	org.generationcp.middleware.pojos.GermplasmList getGermplasmListByListRef(Integer listRef);
 	
 	/**
 	 * Retrieves metadata (such as count of entries, list owner) in one go for all lists. This helps avoiding the need to query metadata in
