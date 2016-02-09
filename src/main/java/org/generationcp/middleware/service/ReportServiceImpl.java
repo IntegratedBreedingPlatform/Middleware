@@ -116,7 +116,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 		return dataBeans;
 	}
 
-    private Map<String, Object> extractGermplasmListData(Integer germplasmListID) {
+    protected Map<String, Object> extractGermplasmListData(Integer germplasmListID) {
         // currently, only a blank map is returned as the current requirements for germplasm reports do not require dynamic data
         Map<String, Object> params = new HashMap<>();
         params.put(AbstractReporter.STUDY_CONDITIONS_KEY, new ArrayList<MeasurementVariable>());
