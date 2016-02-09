@@ -26,7 +26,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 		if (includeDescendants) {
 			GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
-			tree.setRoot(buildDescendantsTree(germplasmToFix, DEFAULT_DESCENDANT_TREE_LEVELS));
+			tree.setRoot(buildDescendantsTree(germplasmToFix));
 			traverseAssignMGID(tree.getRoot(), germplasmToFix.getGid(), preserveExistingGroup);
 		} else {
 			assignMGID(germplasmToFix, germplasmToFix.getGid(), preserveExistingGroup);
@@ -40,23 +40,25 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 	}
 
-	private GermplasmPedigreeTreeNode buildDescendantsTree(Germplasm germplasm, int levels) {
+	private GermplasmPedigreeTreeNode buildDescendantsTree(Germplasm germplasm) {
 		GermplasmPedigreeTreeNode node = new GermplasmPedigreeTreeNode();
 		node.setGermplasm(germplasm);
 
-		if (levels == 0) {
-			LOG.debug("Reached maximum levels specified for this branch. Stopping here and returning.");
-			return node;
-		}
-
 		List<Germplasm> allChildren = this.germplasmDAO.getAllChildren(germplasm.getGid());
+
 		for (Germplasm child : allChildren) {
-			node.getLinkedNodes().add(buildDescendantsTree(child, levels - 1));
+			node.getLinkedNodes().add(buildDescendantsTree(child));
 		}
 		return node;
 	}
 
 	private void assignMGID(Germplasm germplasm, Integer mgidToAssign, boolean preserveExistingGroup) {
+
+		if (!preserveExistingGroup && germplasm.getMgid() != null && germplasm.getMgid() != 0) {
+			LOG.warn("Gerplasm with gid [{}] already has mgid [{}]. Service has been asked to ignore it, and assign new mgid [{}].",
+					germplasm.getGid(), germplasm.getMgid(), mgidToAssign);
+		}
+
 		if (!preserveExistingGroup) {
 			germplasm.setMgid(mgidToAssign);
 		}
