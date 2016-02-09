@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
@@ -24,6 +25,7 @@ import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.GermplasmListMetadata;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -676,6 +678,12 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 		List<ListDataProject> listData = this.manager.retrieveSnapshotListDataWithParents(listId);
 		Assert.assertNotNull("It should not be null", listData);
+	}
+	
+	@Test
+	public void testGetAllListMetadata() {
+		final Map<Integer, GermplasmListMetadata> allGermplasmListMetadata = manager.getAllGermplasmListMetadata();
+		Assert.assertNotNull("getAllGermplasmListMetadata() should never return null.", allGermplasmListMetadata);
 	}
 
 }
