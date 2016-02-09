@@ -77,7 +77,9 @@ public class XADatasourceUtilities {
 			final PreparedStatement preparedStatement = connection.prepareStatement("Select db_name from workbench_crop");
 			final ResultSet rs = preparedStatement.executeQuery();
 			while (rs.next()) {
-				cropDatabases.add(rs.getString(1));
+				if(!rs.getString(1).equals("tutorial")) {
+					cropDatabases.add(rs.getString(1));
+				}
 			}
 			LOG.debug(String.format("Found the following crop database '%s'.", cropDatabases.toString().replace(",", ",\n")));
 
