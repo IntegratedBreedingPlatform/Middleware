@@ -51,7 +51,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<GermplasmList> getAllExceptDeleted(final int start, final int numOfRows) throws MiddlewareQueryException {
+	public List<GermplasmList> getAllExceptDeleted(final int start, final int numOfRows) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 			criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
@@ -67,7 +67,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return new ArrayList<GermplasmList>();
 	}
 
-	public long countAllExceptDeleted() throws MiddlewareQueryException {
+	public long countAllExceptDeleted() {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 			criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
@@ -88,7 +88,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<GermplasmList> getByGID(final Integer gid, final int start, final int numOfRows) throws MiddlewareQueryException {
+	public List<GermplasmList> getByGID(final Integer gid, final int start, final int numOfRows) {
 		try {
 			if (gid != null) {
 				final Criteria criteria = this.getSession().createCriteria(GermplasmListData.class);
@@ -109,7 +109,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return new ArrayList<GermplasmList>();
 	}
 
-	public long countByGID(final Integer gid) throws MiddlewareQueryException {
+	public long countByGID(final Integer gid) {
 		try {
 			if (gid != null) {
 				final Criteria criteria = this.getSession().createCriteria(GermplasmListData.class);
@@ -154,7 +154,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return new ArrayList<GermplasmList>();
 	}
 
-	public long countByName(final String name, final Operation operation) throws MiddlewareQueryException {
+	public long countByName(final String name, final Operation operation) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 			criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
@@ -175,7 +175,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<GermplasmList> getByStatus(final Integer status, final int start, final int numOfRows) throws MiddlewareQueryException {
+	public List<GermplasmList> getByStatus(final Integer status, final int start, final int numOfRows) {
 		try {
 			if (status != null) {
 				final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
@@ -194,7 +194,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return new ArrayList<GermplasmList>();
 	}
 
-	public long countByStatus(final Integer status) throws MiddlewareQueryException {
+	public long countByStatus(final Integer status) {
 		try {
 			if (status != null) {
 				final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
@@ -237,7 +237,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return new ArrayList<GermplasmList>();
 	}
 
-	public long countAllTopLevelLists(final String programUUID) throws MiddlewareQueryException {
+	public long countAllTopLevelLists(final String programUUID) {
 		try {
 			final Criterion topFolder = Restrictions.eq("parent.id", 0);
 			final Criterion nullFolder = Restrictions.isNull("parent");
@@ -331,7 +331,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	 * @return number of germplasm list child records of a parent record
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	public long countByParentFolderId(final Integer parentId, final String programUUID) throws MiddlewareQueryException {
+	public long countByParentFolderId(final Integer parentId, final String programUUID) {
 		try {
 			if (parentId != null) {
 				final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
@@ -373,7 +373,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	 * @throws MiddlewareQueryException
 	 */
 	@SuppressWarnings("rawtypes")
-	public List getGermplasmListTypes() throws MiddlewareQueryException {
+	public List getGermplasmListTypes() {
 		try {
 			final Session session = this.getSession();
 			final SQLQuery query = session.createSQLQuery(GermplasmList.GET_GERMPLASM_LIST_TYPES);
@@ -393,7 +393,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	 * @throws MiddlewareQueryException
 	 */
 	@SuppressWarnings("rawtypes")
-	public List getGermplasmNameTypes() throws MiddlewareQueryException {
+	public List getGermplasmNameTypes() {
 		try {
 			final Session session = this.getSession();
 			final SQLQuery query = session.createSQLQuery(GermplasmList.GET_GERMPLASM_NAME_TYPES);
@@ -413,7 +413,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	 * @throws MiddlewareQueryException
 	 */
 	@SuppressWarnings("unchecked")
-	public List<GermplasmList> searchForGermplasmLists(final String searchedString, final Operation o) throws MiddlewareQueryException {
+	public List<GermplasmList> searchForGermplasmLists(final String searchedString, final String programUUID, final Operation o)
+			throws MiddlewareQueryException {
 		final String q = searchedString.trim();
 		if ("".equals(q)) {
 			return new ArrayList<GermplasmList>();
@@ -422,19 +423,26 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			final SQLQuery query;
 
 			if (o.equals(Operation.EQUAL)) {
-				query = this.getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_EQUAL);
+				query =
+						this.getSession().createSQLQuery(
+								this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_EQUAL, programUUID));
 				query.setParameter("gidLength", q.length());
 				query.setParameter("q", q);
 				query.setParameter("qNoSpaces", q.replace(" ", ""));
 				query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
 			} else {
 				if (q.contains("%") || q.contains("_")) {
-					query = this.getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_GID_LIKE);
+					query =
+							this.getSession().createSQLQuery(
+									this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_GID_LIKE,
+											programUUID));
 					query.setParameter("q", q);
 					query.setParameter("qNoSpaces", q.replace(" ", ""));
 					query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
 				} else {
-					query = this.getSession().createSQLQuery(GermplasmList.SEARCH_FOR_GERMPLASM_LIST);
+					query =
+							this.getSession().createSQLQuery(
+									this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST, programUUID));
 					query.setParameter("gidLength", q.length());
 					query.setParameter("q", q + "%");
 					query.setParameter("qNoSpaces", q.replace(" ", "") + "%");
@@ -443,6 +451,10 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 			}
 			query.setParameter("gid", q);
+
+			if (programUUID != null) {
+				query.setParameter("programUUID", programUUID);
+			}
 
 			query.addEntity("listnms", GermplasmList.class);
 			return query.list();
@@ -453,8 +465,16 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return new ArrayList<GermplasmList>();
 	}
 
+	private String getSearchForGermplasmListsQueryString(final String initialQueryString, final String programUUID) {
+		String queryString = initialQueryString;
+		if (programUUID != null) {
+			queryString += GermplasmList.FILTER_BY_PROGRAM_UUID;
+		}
+		return queryString;
+	}
+
 	@SuppressWarnings("unchecked")
-	public List<GermplasmList> getByProjectIdAndType(final int projectId, final GermplasmListType type) throws MiddlewareQueryException {
+	public List<GermplasmList> getByProjectIdAndType(final int projectId, final GermplasmListType type) {
 		final List<GermplasmList> list = new ArrayList<GermplasmList>();
 		try {
 			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
@@ -471,7 +491,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return list;
 	}
 
-	public Integer getListDataListIDFromListDataProjectListID(final Integer listDataProjectListID) throws MiddlewareQueryException {
+	public Integer getListDataListIDFromListDataProjectListID(final Integer listDataProjectListID) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 			criteria.add(Restrictions.eq("id", listDataProjectListID));

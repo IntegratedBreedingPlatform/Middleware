@@ -59,6 +59,8 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	private static List<Integer> testDataIds = new ArrayList<Integer>();
 	private static final Integer STATUS_DELETED = 9;
 	private static final String PROGRAM_UUID = "a7433c01-4f46-4bc8-ae3a-678f0b62ac23";
+	private static final String OTHER_PROGRAM_UUID = "b67d2e71-4f46-4bc8-ae3a-678f0b62ac23";
+	private static final String OTHER_PROGRAM_LIST_NAME = "Other Program List";
 
 	private Integer parentId;
 	private Integer listId;
@@ -66,6 +68,13 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Before
 	public void setUpBefore() throws Exception {
+
+		GermplasmList germplasmListOther =
+				new GermplasmList(null, OTHER_PROGRAM_LIST_NAME, Long.valueOf(20120305), "LST", Integer.valueOf(1), OTHER_PROGRAM_LIST_NAME
+						+ " Desc", null, 1);
+		germplasmListOther.setProgramUUID(GermplasmListManagerImplTest.OTHER_PROGRAM_UUID);
+		this.manager.addGermplasmList(germplasmListOther);
+
 		GermplasmList germplasmListParent =
 				new GermplasmList(null, "Test List #1", Long.valueOf(20120305), "LST", Integer.valueOf(1), "Test Parent List #1", null, 1);
 		germplasmListParent.setProgramUUID(GermplasmListManagerImplTest.PROGRAM_UUID);
@@ -555,16 +564,47 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchGermplasmList() throws MiddlewareQueryException {
-		// String q = "50533";
-		// String q = "philippines";
-		// String q = "HB2009DS";
-		String q = "dinurado";
+		String q = "list";
 
-		List<GermplasmList> results = this.manager.searchForGermplasmList(q, Operation.EQUAL, true);
-		Debug.println(IntegrationTestBase.INDENT, "searchForGermplasmList(" + q + ")");
-		for (GermplasmList g : results) {
-			Debug.println(IntegrationTestBase.INDENT, g.getId() + " : " + g.getName());
+		List<GermplasmList> results = this.manager.searchForGermplasmList(q, GermplasmListManagerImplTest.PROGRAM_UUID, Operation.EQUAL);
+		boolean hasMatch = false;
+		for (GermplasmList germplasmList : results) {
+			if (germplasmList.getName().equals(OTHER_PROGRAM_LIST_NAME)) {
+				hasMatch = true;
+			}
 		}
+		Assert.assertFalse(OTHER_PROGRAM_LIST_NAME + " should not be found", hasMatch);
+	}
+
+	@Test
+	public void testSearchGermplasmListOtherProgram() throws MiddlewareQueryException {
+		String q = OTHER_PROGRAM_LIST_NAME;
+
+		List<GermplasmList> results =
+				this.manager.searchForGermplasmList(q, GermplasmListManagerImplTest.OTHER_PROGRAM_UUID, Operation.EQUAL);
+		Assert.assertEquals("There should be one result found", 1, results.size());
+		boolean hasMatch = false;
+		for (GermplasmList germplasmList : results) {
+			if (germplasmList.getName().equals(OTHER_PROGRAM_LIST_NAME)) {
+				hasMatch = true;
+			}
+		}
+		Assert.assertTrue(OTHER_PROGRAM_LIST_NAME + " should be found", hasMatch);
+	}
+
+	@Test
+	public void testSearchGermplasmListProgramAgnostic() throws MiddlewareQueryException {
+		String q = OTHER_PROGRAM_LIST_NAME;
+
+		List<GermplasmList> results = this.manager.searchForGermplasmList(q, Operation.EQUAL);
+		Assert.assertEquals("There should be one result found", 1, results.size());
+		boolean hasMatch = false;
+		for (GermplasmList germplasmList : results) {
+			if (germplasmList.getName().equals(OTHER_PROGRAM_LIST_NAME)) {
+				hasMatch = true;
+			}
+		}
+		Assert.assertTrue(OTHER_PROGRAM_LIST_NAME + " should be found", hasMatch);
 	}
 
 	@Test
