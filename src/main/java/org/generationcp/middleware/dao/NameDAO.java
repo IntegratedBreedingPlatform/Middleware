@@ -91,7 +91,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 					query.setParameterList("ntype", type);
 				}
 
-				return query.list();
+				final List<Name> names = query.list();
+				Collections.sort(names);
+				return names;
 			}
 
 			/**
