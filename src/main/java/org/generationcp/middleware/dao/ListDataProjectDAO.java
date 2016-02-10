@@ -165,9 +165,9 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 							+ " lp.seed_source as seed_source, " + " lp.duplicate_notes as duplicate_notes " + " from listdata_project lp "
 							+ " left outer join germplsm g on lp.germplasm_id = g.gid "
 							+ " left outer join germplsm mp on g.gpid2 = mp.gid "
-							+ " left outer join mn on mp.gid = mn.gid and mn.nstat = 1 "
+							+ " left outer join names mn on mp.gid = mn.gid and mn.nstat = 1 "
 							+ " left outer join germplsm fp on g.gpid1 = fp.gid "
-							+ " left outer join fn on fp.gid = fn.gid and mn.nstat = 1 "
+							+ " left outer join names fn on fp.gid = fn.gid and mn.nstat = 1 "
 							+ " where lp.list_id = :listId "
 							+ " group by entry_id";
 
