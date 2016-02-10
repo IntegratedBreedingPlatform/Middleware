@@ -2,6 +2,8 @@
 package org.generationcp.middleware.service.impl;
 
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -10,6 +12,8 @@ import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Strings;
 
 public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
@@ -26,7 +30,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 		if (includeDescendants) {
 			GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
-			tree.setRoot(buildDescendantsTree(germplasmToFix));
+			LOG.debug("Building descendant tree for assignment of MGID.");
+			tree.setRoot(buildDescendantsTree(germplasmToFix, 1));
 			traverseAssignMGID(tree.getRoot(), germplasmToFix.getGid(), preserveExistingGroup);
 		} else {
 			assignMGID(germplasmToFix, germplasmToFix.getGid(), preserveExistingGroup);
@@ -40,14 +45,22 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 	}
 
-	private GermplasmPedigreeTreeNode buildDescendantsTree(Germplasm germplasm) {
+	private GermplasmPedigreeTreeNode buildDescendantsTree(Germplasm germplasm, int level) {
 		GermplasmPedigreeTreeNode node = new GermplasmPedigreeTreeNode();
 		node.setGermplasm(germplasm);
 
 		List<Germplasm> allChildren = this.germplasmDAO.getAllChildren(germplasm.getGid());
 
+		String indent = Strings.padStart(">", level + 1, '-');
+		Set<Integer> childrenIds = new TreeSet<>();
+
 		for (Germplasm child : allChildren) {
-			node.getLinkedNodes().add(buildDescendantsTree(child));
+			childrenIds.add(child.getGid());
+		}
+		LOG.debug("{} Level {} (gid: {}) Children: {}  ", indent, level, germplasm.getGid(), childrenIds);
+
+		for (Germplasm child : allChildren) {
+			node.getLinkedNodes().add(buildDescendantsTree(child, level + 1));
 		}
 		return node;
 	}
