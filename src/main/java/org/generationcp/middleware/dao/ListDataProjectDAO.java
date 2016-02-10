@@ -163,9 +163,12 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 							+ " lp.designation as designation, " + " lp.group_name as group_name, " + " fn.nval as fnval, "
 							+ " fp.gid as fpgid, " + " mn.nval as mnval, " + " mp.gid as mpgid, " + " g.gid as gid, "
 							+ " lp.seed_source as seed_source, " + " lp.duplicate_notes as duplicate_notes " + " from listdata_project lp "
-							+ " inner join germplsm g on lp.germplasm_id = g.gid " + " inner join germplsm mp on g.gpid2 = mp.gid "
-							+ " inner join names mn on mp.gid = mn.gid and mn.nstat = 1 " + " inner join germplsm fp on g.gpid1 = fp.gid "
-							+ " inner join names fn on fp.gid = fn.gid and mn.nstat = 1 " + " where lp.list_id = :listId "
+							+ " left outer join germplsm g on lp.germplasm_id = g.gid "
+							+ " left outer join germplsm mp on g.gpid2 = mp.gid "
+							+ " left outer join mn on mp.gid = mn.gid and mn.nstat = 1 "
+							+ " left outer join germplsm fp on g.gpid1 = fp.gid "
+							+ " left outer join fn on fp.gid = fn.gid and mn.nstat = 1 "
+							+ " where lp.list_id = :listId "
 							+ " group by entry_id";
 
 			SQLQuery query = this.getSession().createSQLQuery(queryStr);

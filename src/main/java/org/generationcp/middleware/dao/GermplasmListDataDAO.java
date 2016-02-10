@@ -149,15 +149,20 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 	public List<GermplasmListData> getListDataWithParents(Integer listID) {
 		List<GermplasmListData> germplasmListData = new ArrayList<GermplasmListData>();
+
+		if (listID == null) {
+			return germplasmListData;
+		}
+
 		try {
 
 			String queryStr = "select  lp.lrecid as lrecid,  lp.entryid as entryid,  lp.desig as desig,  lp.grpname as grpname, "
 					+ " fn.nval as fnval,  fp.gid as fpgid,  mn.nval as mnval,  mp.gid as mpgid,  g.gid as gid,  lp.source as source  "
 					+ "from listdata lp  inner join germplsm g on lp.gid = g.gid  "
-					+ "inner join germplsm mp on g.gpid2 = mp.gid  "
-					+ "inner join names mn on mp.gid = mn.gid and mn.nstat = 1  "
-					+ "inner join germplsm fp on g.gpid1 = fp.gid  "
-					+ "inner join names fn on fp.gid = fn.gid and mn.nstat = 1  "
+					+ "left outer join germplsm mp on g.gpid2 = mp.gid  "
+					+ "left outer join names mn on mp.gid = mn.gid and mn.nstat = 1  "
+					+ "left outer join germplsm fp on g.gpid1 = fp.gid  "
+					+ "left outer join names fn on fp.gid = fn.gid and mn.nstat = 1  "
 					+ "where lp.listid = :listId group by entryid";
 
 			SQLQuery query = this.getSession().createSQLQuery(queryStr);

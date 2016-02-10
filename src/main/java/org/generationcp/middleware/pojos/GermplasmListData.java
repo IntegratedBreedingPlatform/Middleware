@@ -110,15 +110,28 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	/***
 	 * The following will only be field when we are getting the parents, otherwise, they won't be set
 	 */
+
+	/**
+	 * The preferred name of the female parent (nval in the database table)
+	 */
 	@Transient
 	private String femaleParent = null;
 
+	/**
+	 * GID of the female parent (gpid1 in the database table)
+	 */
 	@Transient
 	private Integer fgid = null;
 
+	/**
+	 * The preferred name of the male parent (nval in the database table)
+	 */
 	@Transient
 	private String maleParent = "";
 
+	/**
+	 * GID of the male parent (gpid2 in the database table)
+	 */
 	@Transient
 	private Integer mgid = null;
 
