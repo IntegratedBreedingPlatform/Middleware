@@ -1,12 +1,9 @@
 
 package org.generationcp.middleware.reports;
 
-import java.util.List;
 import java.util.Map;
 
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
-
-public class MShipList extends AbstractDynamicReporter {
+public class MShipList extends AbstractReporter {
 
 	@Override
 	public Reporter createReporter() {
@@ -29,34 +26,19 @@ public class MShipList extends AbstractDynamicReporter {
 	public Map<String, Object> buildJRParams(Map<String, Object> args) {
 		Map<String, Object> params = super.buildJRParams(args);
 
-		@SuppressWarnings("unchecked")
-		List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get("studyConditions");
+        // removed previous code placing ?? as value as we need the report blank for the user to manually fill up
 
-		for (MeasurementVariable var : studyConditions) {
-			switch (var.getName()) {
-				case "TRIAL_INSTANCE":
-					params.put("recLastName", "???");
-				params.put("recFirstName", "???");
-				params.put("institution", "???");
-				params.put("shippingAddress", "???");
-				params.put("country", "???");
-				params.put("contactNumber", "???");
-				params.put("phytoInstr", "???");
-				params.put("shippingInstr", "???");
-				params.put("shipFrom", "???");
-					break;
-				case "STUDY_NAME":
-					params.put("shipId", var.getValue()); // is an assembled code, udes for generating filenam.
-				params.put("prepDate", "???");
-				params.put("carrier", "???");
-				params.put("airwayBill", "???");
-				params.put("dateSent", "???");
-				params.put("quantity", "???");
-				params.put("commments", "???");
-					break;
-			}
-		}
+        // placing blank values for the expected parameters so that it does not appear as null in the report
+        this.setBlankParameters(params, "recLastName", "recFirstName","institution", "shippingAddress", "country", "contactNumber", "phytoInstr", "shippingInstr",
+                "shipFrom", "shipId", "prepDate", "carrier", "airwayBill", "dateSent", "quantity", "commments");
+
 		return params;
 	}
+
+    protected void setBlankParameters(Map<String, Object> paramMap, String ... blankItems) {
+        for (String blankItem : blankItems) {
+            paramMap.put(blankItem, "");
+        }
+    }
 
 }
