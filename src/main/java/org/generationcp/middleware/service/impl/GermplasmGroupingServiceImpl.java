@@ -39,18 +39,18 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 		if (includeDescendants) {
 			GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
-			LOG.debug("Building descendant tree for assignment of MGID.");
+			LOG.debug("Building descendant tree for gid {} for assigning group (mgid).", germplasmToFix.getGid());
 			tree.setRoot(buildDescendantsTree(germplasmToFix, 1));
-			traverseAssignMGID(tree.getRoot(), germplasmToFix.getGid(), preserveExistingGroup);
+			traverseAssignGroup(tree.getRoot(), germplasmToFix.getGid(), preserveExistingGroup);
 		} else {
-			assignMGID(germplasmToFix, germplasmToFix.getGid(), preserveExistingGroup);
+			assignGroup(germplasmToFix, germplasmToFix.getGid(), preserveExistingGroup);
 		}
 	}
 
-	private void traverseAssignMGID(GermplasmPedigreeTreeNode node, Integer mgidToAssign, boolean preserveExistingGroup) {
-		assignMGID(node.getGermplasm(), mgidToAssign, preserveExistingGroup);
+	private void traverseAssignGroup(GermplasmPedigreeTreeNode node, Integer groupId, boolean preserveExistingGroup) {
+		assignGroup(node.getGermplasm(), groupId, preserveExistingGroup);
 		for (GermplasmPedigreeTreeNode child : node.getLinkedNodes()) {
-			traverseAssignMGID(child, mgidToAssign, preserveExistingGroup);
+			traverseAssignGroup(child, groupId, preserveExistingGroup);
 		}
 	}
 
@@ -74,15 +74,15 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		return node;
 	}
 
-	private void assignMGID(Germplasm germplasm, Integer mgidToAssign, boolean preserveExistingGroup) {
+	private void assignGroup(Germplasm germplasm, Integer groupId, boolean preserveExistingGroup) {
 
 		if (!preserveExistingGroup && germplasm.getMgid() != null && germplasm.getMgid() != 0) {
 			LOG.warn("Gerplasm with gid [{}] already has mgid [{}]. Service has been asked to ignore it, and assign new mgid [{}].",
-					germplasm.getGid(), germplasm.getMgid(), mgidToAssign);
+					germplasm.getGid(), germplasm.getMgid(), groupId);
 		}
 
 		if (!preserveExistingGroup) {
-			germplasm.setMgid(mgidToAssign);
+			germplasm.setMgid(groupId);
 			this.germplasmDAO.save(germplasm);
 			copySelectionHistory(germplasm);
 		}
