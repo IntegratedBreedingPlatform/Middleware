@@ -6,12 +6,17 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
+import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Strings;
 
@@ -21,11 +26,15 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private GermplasmDAO germplasmDAO;
 
-	public GermplasmGroupingServiceImpl(GermplasmDAO germplasmDAO) {
+	private NameDAO nameDAO;
+
+	public GermplasmGroupingServiceImpl(GermplasmDAO germplasmDAO, NameDAO nameDAO) {
 		this.germplasmDAO = germplasmDAO;
+		this.nameDAO = nameDAO;
 	}
 
 	@Override
+	@Transactional
 	public void markFixed(Germplasm germplasmToFix, boolean includeDescendants, boolean preserveExistingGroup) {
 
 		if (includeDescendants) {
@@ -74,8 +83,29 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 		if (!preserveExistingGroup) {
 			germplasm.setMgid(mgidToAssign);
+			this.germplasmDAO.save(germplasm);
+			copySelectionHistory(germplasm);
 		}
-		
-		// TODO save germplasm records where mgid was updated or names were created.
+	}
+
+	private void copySelectionHistory(Germplasm germplasm) {
+		List<Name> names = this.nameDAO.getByGIDWithFilters(germplasm.getGid(), null, GermplasmNameType.SELECTION_HISTORY);
+
+		if (!names.isEmpty()) {
+			String selectionHistoryNameValue = names.get(0).getNval();
+
+			Name selectionHistoryAtFixation = new Name();
+			selectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
+			selectionHistoryAtFixation.setTypeId(GermplasmNameType.SELECTION_HISTORY_AT_FIXATION.getUserDefinedFieldID());
+			selectionHistoryAtFixation.setNval(selectionHistoryNameValue);
+			selectionHistoryAtFixation.setNstat(1);
+			selectionHistoryAtFixation.setUserId(1); // TODO get current user passed to the service and use here.
+			selectionHistoryAtFixation.setLocationId(0); // TODO get location passed to the service and use here.
+			selectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
+			selectionHistoryAtFixation.setReferenceId(0);
+			this.nameDAO.save(selectionHistoryAtFixation);
+		} else {
+			LOG.warn("No selection history type name was found for germplasm {}.", germplasm.getGid());
+		}
 	}
 }

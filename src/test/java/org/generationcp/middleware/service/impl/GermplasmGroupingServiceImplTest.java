@@ -2,7 +2,10 @@
 package org.generationcp.middleware.service.impl;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,12 +20,23 @@ public class GermplasmGroupingServiceImplTest {
 	@Mock
 	private GermplasmDAO germplasmDAO;
 
+	@Mock
+	private NameDAO nameDAO;
+
 	private GermplasmGroupingServiceImpl germplasmGroupingService;
 
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
-		this.germplasmGroupingService = new GermplasmGroupingServiceImpl(this.germplasmDAO);
+
+		final Name selectionHistoryName = new Name();
+		selectionHistoryName.setNval("SelectionHistory");
+
+		Mockito.when(this.nameDAO.getByGIDWithFilters(Mockito.anyInt(), Mockito.anyInt(), Mockito.eq(GermplasmNameType.SELECTION_HISTORY)))
+				.thenReturn(
+				Lists.newArrayList(selectionHistoryName));
+
+		this.germplasmGroupingService = new GermplasmGroupingServiceImpl(this.germplasmDAO, this.nameDAO);
 	}
 
 	/**
@@ -36,7 +50,8 @@ public class GermplasmGroupingServiceImplTest {
 
 		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(), germplasmToFix.getMgid());
 
-		// TODO assert that the selection history is copied with new name type.
+		Mockito.verify(this.nameDAO, Mockito.times(1)).save(Mockito.any(Name.class));
+		Mockito.verify(this.germplasmDAO, Mockito.times(1)).save(Mockito.any(Germplasm.class));
 	}
 
 	/**
@@ -60,7 +75,8 @@ public class GermplasmGroupingServiceImplTest {
 		Assert.assertEquals("Expecting child1 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child1.getMgid());
 		Assert.assertEquals("Expecting child2 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child2.getMgid());
 
-		// TODO assert that the selection history is copied with new name type.
+		Mockito.verify(this.nameDAO, Mockito.times(3)).save(Mockito.any(Name.class));
+		Mockito.verify(this.germplasmDAO, Mockito.times(3)).save(Mockito.any(Germplasm.class));
 	}
 
 	/**
@@ -84,7 +100,8 @@ public class GermplasmGroupingServiceImplTest {
 		Assert.assertEquals("Expecting child1 mgid to remain the same as before.", new Integer(222), child1.getMgid());
 		Assert.assertEquals("Expecting child2 mgid to remain the same as before.", new Integer(333), child2.getMgid());
 
-		// TODO assert that the selection history is copied with new name type.
+		Mockito.verify(this.nameDAO, Mockito.times(1)).save(Mockito.any(Name.class));
+		Mockito.verify(this.germplasmDAO, Mockito.times(1)).save(Mockito.any(Germplasm.class));
 	}
 
 	/**
@@ -98,6 +115,9 @@ public class GermplasmGroupingServiceImplTest {
 		this.germplasmGroupingService.markFixed(germplasmToFix, false, true);
 
 		Assert.assertEquals("Expecting founder/parent mgid to be preserved.", new Integer(111), germplasmToFix.getMgid());
+
+		Mockito.verify(this.nameDAO, Mockito.never()).save(Mockito.any(Name.class));
+		Mockito.verify(this.germplasmDAO, Mockito.never()).save(Mockito.any(Germplasm.class));
 	}
 
 	/**
@@ -122,6 +142,7 @@ public class GermplasmGroupingServiceImplTest {
 		Assert.assertEquals("Expecting child1 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child1.getMgid());
 		Assert.assertEquals("Expecting child2 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child2.getMgid());
 
-		// TODO assert that the selection history is copied with new name type.
+		Mockito.verify(this.nameDAO, Mockito.times(3)).save(Mockito.any(Name.class));
+		Mockito.verify(this.germplasmDAO, Mockito.times(3)).save(Mockito.any(Germplasm.class));
 	}
 }
