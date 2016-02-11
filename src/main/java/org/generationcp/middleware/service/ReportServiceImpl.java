@@ -75,6 +75,21 @@ public class ReportServiceImpl extends Service implements ReportService {
 		return reporter;
 	}
 
+    @Override
+    public Reporter getStreamGermplasmListReport(String code, Integer germplasmListID, String programName, final OutputStream output)
+            throws MiddlewareException, JRException, IOException, BuildReportException {
+        final Reporter reporter = this.factory.createReporter(code);
+        final Map<String, Object> data = this.extractGermplasmListData(germplasmListID);
+        data.put(AbstractReporter.PROGRAM_NAME_ARG_KEY, programName);
+
+        reporter.buildJRPrint(data);
+        reporter.asOutputStream(output);
+
+        return reporter;
+    }
+
+
+
 	/**
 	 * Creates a Map containing all information needed to generate a report.
 	 * 
@@ -93,13 +108,21 @@ public class ReportServiceImpl extends Service implements ReportService {
 		}
 
 		final Map<String, Object> dataBeans = new HashMap<>();
-		dataBeans.put("studyConditions", studyConditions); // List<MeasurementVariable>
-		dataBeans.put("dataSource", observations); // list<measurementRow>
-		dataBeans.put("studyObservations", wb.getTrialObservations());// list<measurementRow>
-		dataBeans.put("studyId", studyId);// list<measurementRow>
+		dataBeans.put("studyConditions", studyConditions);
+		dataBeans.put("dataSource", observations);
+		dataBeans.put("studyObservations", wb.getTrialObservations());
+		dataBeans.put("studyId", studyId);
 
 		return dataBeans;
 	}
+
+    protected Map<String, Object> extractGermplasmListData(Integer germplasmListID) {
+        // currently, only a blank map is returned as the current requirements for germplasm reports do not require dynamic data
+        Map<String, Object> params = new HashMap<>();
+        params.put(AbstractReporter.STUDY_CONDITIONS_KEY, new ArrayList<MeasurementVariable>());
+        params.put(AbstractReporter.DATA_SOURCE_KEY, new ArrayList());
+        return params;
+    }
 
 	protected List<MeasurementVariable> appendCountryInformation(final List<MeasurementVariable> originalConditions) {
 		Integer locationId = null;
