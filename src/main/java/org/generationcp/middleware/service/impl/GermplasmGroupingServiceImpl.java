@@ -7,6 +7,7 @@ import java.util.TreeSet;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
@@ -27,6 +28,14 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	private GermplasmDAO germplasmDAO;
 
 	private NameDAO nameDAO;
+
+	public GermplasmGroupingServiceImpl(HibernateSessionProvider sessionProvider) {
+		this.germplasmDAO = new GermplasmDAO();
+		this.germplasmDAO.setSession(sessionProvider.getSession());
+
+		this.nameDAO = new NameDAO();
+		this.nameDAO.setSession(sessionProvider.getSession());
+	}
 
 	public GermplasmGroupingServiceImpl(GermplasmDAO germplasmDAO, NameDAO nameDAO) {
 		this.germplasmDAO = germplasmDAO;
