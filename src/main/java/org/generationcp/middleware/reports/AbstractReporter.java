@@ -110,6 +110,14 @@ public abstract class AbstractReporter implements Reporter {
 		return params;
 	}
 
+    // provides a default implementation that returns an empty data source
+    // Implementations of the abstract report that requires dynamic data should provide their own implementation
+    // or subclass AbstractDynamicReporter
+    @Override
+    public JRDataSource buildJRDataSource(Collection<?> dataRecords) {
+        return new JREmptyDataSource();
+    }
+
 	/**
 	 * Obtains the input stream to the .jasper file, specified by getFileName() The reason behind using input stream is that so it can work
 	 * even inside a jar file

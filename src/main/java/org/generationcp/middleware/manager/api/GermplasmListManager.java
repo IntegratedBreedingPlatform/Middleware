@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
@@ -19,6 +20,7 @@ import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.GermplasmListMetadata;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -493,6 +495,13 @@ public interface GermplasmListManager {
 	 */
 	List<ListDataProject> retrieveSnapshotListDataWithParents(Integer listID);
 
+	/**
+	 *
+	 * @param listID
+	 * @return
+	 */
+	List<GermplasmListData> retrieveListDataWithParents(Integer listID);
+
 	Integer retrieveDataListIDFromListDataProjectListID(Integer listDataProjectListID);
 
 	/***
@@ -501,4 +510,10 @@ public interface GermplasmListManager {
 	 * @return
 	 */
 	org.generationcp.middleware.pojos.GermplasmList getGermplasmListByListRef(Integer listRef);
+	
+	/**
+	 * Retrieves metadata (such as count of entries, list owner) in one go for all lists. This helps avoiding the need to query metadata in
+	 * a loop per list.
+	 */
+	Map<Integer, GermplasmListMetadata> getAllGermplasmListMetadata();
 }
