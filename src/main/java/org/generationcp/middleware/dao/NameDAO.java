@@ -46,7 +46,12 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		try {
 			if (gid != null) {
 				final StringBuilder queryString = new StringBuilder();
-				queryString.append("SELECT {n.*} from names n WHERE n.gid = :gid ");
+				queryString.append("SELECT ");
+				queryString.append("CASE n.nstat ");
+				queryString.append("	WHEN NOT 1 THEN 9999 ");
+				queryString.append("	ELSE n.nstat ");
+				queryString.append("END AS 'nameOrdering', ");
+				queryString.append("{n.*} from names n WHERE n.gid = :gid ");
 
 				if (status != null && status != 0) {
 					queryString.append("AND n.nstat = :nstat ");
@@ -58,7 +63,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 					queryString.append("AND n.ntype = :ntype ");
 				}
 
-				queryString.append("ORDER BY n.nstat, n.nval");
+				queryString.append("ORDER BY nameOrdering, n.nval");
 
 				final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 				query.addEntity("n", Name.class);
