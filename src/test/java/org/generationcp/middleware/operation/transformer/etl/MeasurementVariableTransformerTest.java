@@ -4,6 +4,7 @@ package org.generationcp.middleware.operation.transformer.etl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -13,10 +14,12 @@ import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class MeasurementVariableTransformerTest extends IntegrationTestBase {
@@ -24,9 +27,13 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 	private MeasurementVariableTransformer transformer;
 	private StandardVariableBuilder standardVariableBuilder;
 	private static final int SITE_SOIL_PH = 8270;
-
-	// FIXME maize specific cvterm. Change to use something from common cvterms.
 	private static final int CRUST = 20310;
+
+	@BeforeClass
+	public static void setUpOnce() {
+		// Variable caching relies on the context holder to determine current crop database in use
+		ContextHolder.setCurrentCrop("maize");
+	}
 
 	@Before
 	public void setUp() throws Exception {
@@ -55,11 +62,16 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 		final VariableTypeList varTypeList = this.createFactorVariableTypeList();
 		final List<MeasurementVariable> measurementVariables = this.transformer.transform(varTypeList, isFactor);
 		Assert.assertFalse("Measurement variable list should not be empty", measurementVariables.isEmpty());
+		int index = 0;
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
 			Assert.assertTrue("Measurement variable should be a factor", measurementVariable.isFactor());
 			final StandardVariable stdVariable = this.getStandardVariable(measurementVariable.getTermId());
 			final DMSVariableType variableType = this.transformMeasurementVariable(measurementVariable, stdVariable);
 			this.validateMeasurementVariable(measurementVariable, variableType, isInTrialDataset);
+			final VariableType expectedVariableType = varTypeList.getVariableTypes().get(index).getVariableType();
+			Assert.assertEquals("Variable type must be " + expectedVariableType, expectedVariableType,
+					measurementVariable.getVariableType());
+			index++;
 		}
 	}
 
@@ -124,7 +136,7 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 	}
 
 	private StandardVariable getStandardVariable(final int id) throws MiddlewareException {
-		return this.standardVariableBuilder.create(id,"1234567");
+		return this.standardVariableBuilder.create(id, "1234567");
 	}
 
 	private DMSVariableType transformMeasurementVariable(final MeasurementVariable measurementVariable,
@@ -149,11 +161,16 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 		final VariableTypeList varTypeList = this.createVariateVariableTypeList();
 		final List<MeasurementVariable> measurementVariables = this.transformer.transform(varTypeList, isFactor, isInTrialDataset);
 		Assert.assertFalse("Measurement variable list should not be empty", measurementVariables.isEmpty());
+		int index = 0;
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
 			Assert.assertFalse("Measurement variable should not be a factor", measurementVariable.isFactor());
 			final StandardVariable stdVariable = this.getStandardVariable(measurementVariable.getTermId());
 			final DMSVariableType variableType = this.transformMeasurementVariable(measurementVariable, stdVariable);
 			this.validateMeasurementVariable(measurementVariable, variableType, isInTrialDataset);
+			final VariableType expectedVariableType = varTypeList.getVariableTypes().get(index).getVariableType();
+			Assert.assertEquals("Variable type must be " + expectedVariableType, expectedVariableType,
+					measurementVariable.getVariableType());
+			index++;
 		}
 	}
 
@@ -164,11 +181,16 @@ public class MeasurementVariableTransformerTest extends IntegrationTestBase {
 		final VariableTypeList varTypeList = this.createTrialConstantVariableTypeList();
 		final List<MeasurementVariable> measurementVariables = this.transformer.transform(varTypeList, isFactor, isInTrialDataset);
 		Assert.assertFalse("Measurement variable list should not be empty", measurementVariables.isEmpty());
+		int index = 0;
 		for (final MeasurementVariable measurementVariable : measurementVariables) {
 			Assert.assertFalse("Measurement variable should not be a factor", measurementVariable.isFactor());
 			final StandardVariable stdVariable = this.getStandardVariable(measurementVariable.getTermId());
 			final DMSVariableType variableType = this.transformMeasurementVariable(measurementVariable, stdVariable);
 			this.validateMeasurementVariable(measurementVariable, variableType, isInTrialDataset);
+			final VariableType expectedVariableType = varTypeList.getVariableTypes().get(index).getVariableType();
+			Assert.assertEquals("Variable type must be " + expectedVariableType, expectedVariableType,
+					measurementVariable.getVariableType());
+			index++;
 		}
 	}
 
