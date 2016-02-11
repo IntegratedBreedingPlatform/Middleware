@@ -13,7 +13,6 @@ package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,9 +90,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 					query.setParameterList("ntype", type);
 				}
 
-				final List<Name> names = query.list();
-				Collections.sort(names);
-				return names;
+				return query.list();
 			}
 
 			/**

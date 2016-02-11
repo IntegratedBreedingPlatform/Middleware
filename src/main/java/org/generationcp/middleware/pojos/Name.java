@@ -21,8 +21,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-
 /**
  * POJO for names table.
  *
@@ -30,7 +28,7 @@ import org.apache.commons.lang3.builder.CompareToBuilder;
  */
 @Entity
 @Table(name = "names")
-public class Name implements Serializable, Comparable<Name> {
+public class Name implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -45,7 +43,7 @@ public class Name implements Serializable, Comparable<Name> {
 	public static final String GET_PREFFERED_NAMES_BY_GIDS = "SELECT gid, nval " + "FROM names " + "WHERE nstat = 1 AND gid IN (:gids)";
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "nid")
 	private Integer nid;
@@ -83,13 +81,13 @@ public class Name implements Serializable, Comparable<Name> {
 	public Name() {
 	}
 
-	public Name(final Integer nid) {
+	public Name(Integer nid) {
 		super();
 		this.nid = nid;
 	}
 
-	public Name(final Integer nid, final Integer germplasmId, final Integer typeId, final Integer nstat, final Integer userId,
-			final String nval, final Integer locationId, final Integer ndate, final Integer referenceId) {
+	public Name(Integer nid, Integer germplasmId, Integer typeId, Integer nstat, Integer userId, String nval, Integer locationId,
+			Integer ndate, Integer referenceId) {
 		super();
 		this.nid = nid;
 		this.germplasmId = germplasmId;
@@ -106,7 +104,7 @@ public class Name implements Serializable, Comparable<Name> {
 		return this.nid;
 	}
 
-	public void setNid(final Integer nid) {
+	public void setNid(Integer nid) {
 		this.nid = nid;
 	}
 
@@ -114,7 +112,7 @@ public class Name implements Serializable, Comparable<Name> {
 		return this.nstat;
 	}
 
-	public void setNstat(final Integer nstat) {
+	public void setNstat(Integer nstat) {
 		this.nstat = nstat;
 	}
 
@@ -122,7 +120,7 @@ public class Name implements Serializable, Comparable<Name> {
 		return this.nval;
 	}
 
-	public void setNval(final String nval) {
+	public void setNval(String nval) {
 		this.nval = nval;
 	}
 
@@ -130,7 +128,7 @@ public class Name implements Serializable, Comparable<Name> {
 		return this.ndate;
 	}
 
-	public void setNdate(final Integer ndate) {
+	public void setNdate(Integer ndate) {
 		this.ndate = ndate;
 	}
 
@@ -138,7 +136,7 @@ public class Name implements Serializable, Comparable<Name> {
 		return this.germplasmId;
 	}
 
-	public void setGermplasmId(final Integer germplasmId) {
+	public void setGermplasmId(Integer germplasmId) {
 		this.germplasmId = germplasmId;
 	}
 
@@ -146,7 +144,7 @@ public class Name implements Serializable, Comparable<Name> {
 		return this.typeId;
 	}
 
-	public void setTypeId(final Integer typeId) {
+	public void setTypeId(Integer typeId) {
 		this.typeId = typeId;
 	}
 
@@ -154,7 +152,7 @@ public class Name implements Serializable, Comparable<Name> {
 		return this.userId;
 	}
 
-	public void setUserId(final Integer userId) {
+	public void setUserId(Integer userId) {
 		this.userId = userId;
 	}
 
@@ -162,7 +160,7 @@ public class Name implements Serializable, Comparable<Name> {
 		return this.locationId;
 	}
 
-	public void setLocationId(final Integer locationId) {
+	public void setLocationId(Integer locationId) {
 		this.locationId = locationId;
 	}
 
@@ -170,18 +168,18 @@ public class Name implements Serializable, Comparable<Name> {
 		return this.referenceId;
 	}
 
-	public void setReferenceId(final Integer referenceId) {
+	public void setReferenceId(Integer referenceId) {
 		this.referenceId = referenceId;
 	}
 
 	@Override
-	public boolean equals(final Object obj) {
+	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
 		}
 
 		if (obj instanceof Name) {
-			final Name param = (Name) obj;
+			Name param = (Name) obj;
 			if (this.getNid().equals(param.getNid())) {
 				return true;
 			}
@@ -197,7 +195,7 @@ public class Name implements Serializable, Comparable<Name> {
 
 	@Override
 	public String toString() {
-		final StringBuilder builder = new StringBuilder();
+		StringBuilder builder = new StringBuilder();
 		builder.append("Name [nid=");
 		builder.append(this.nid);
 		builder.append(", germplasmId=");
@@ -218,24 +216,6 @@ public class Name implements Serializable, Comparable<Name> {
 		builder.append(this.referenceId);
 		builder.append("]");
 		return builder.toString();
-	}
-
-	@Override
-	public int compareTo(final Name name) {
-		final Integer thisNstat = this.getNstatForComparison(this.getNstat());
-		final Integer otherNstat = this.getNstatForComparison(name.getNstat());
-		final String thisNval = this.getNvalForComparison(this.getNval());
-		final String currentNval = this.getNvalForComparison(name.getNval());
-		return new CompareToBuilder().append(thisNstat, otherNstat).append(thisNval, currentNval).toComparison();
-	}
-
-	private String getNvalForComparison(final String nValForComparison) {
-		return nValForComparison == null ? "" : nValForComparison;
-	}
-
-	private Integer getNstatForComparison(final Integer nStatForComparison) {
-		// this is done so the preferred name (nstat = 1) is always returned first
-		return nStatForComparison == null ? 0 : nStatForComparison == 1 ? -1 : nStatForComparison;
 	}
 
 }
