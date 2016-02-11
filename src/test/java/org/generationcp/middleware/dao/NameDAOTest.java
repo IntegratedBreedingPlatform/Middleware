@@ -29,6 +29,8 @@ public class NameDAOTest extends IntegrationTestBase {
 
 	private static final String PREFERRED_NAME = "PREFERRED";
 	private static final String NOT_PREFERRED_NAME = "NOT PREFFERED";
+	private static final String UNCATEGORIZED_NAME = "UNCATEGORIZED";
+	private static final String DELETED_NAME = "DELETED";
 	private static NameDAO nameDAO;
 	private static GermplasmDAO germplasmDAO;
 
@@ -47,19 +49,28 @@ public class NameDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm = this.createGermplasmTestData(dateIntValue);
 		NameDAOTest.germplasmDAO.save(germplasm);
 		final Name notPreferredName =
-				this.createNameTestData(dateIntValue, germplasm.getGid(), false, NameDAOTest.NOT_PREFERRED_NAME,
+				this.createNameTestData(dateIntValue, germplasm.getGid(), 2, NameDAOTest.NOT_PREFERRED_NAME,
 						GermplasmNameType.DERIVATIVE_NAME);
 		NameDAOTest.nameDAO.save(notPreferredName);
+		final Name uncategorizedName =
+				this.createNameTestData(dateIntValue, germplasm.getGid(), 0, NameDAOTest.UNCATEGORIZED_NAME,
+						GermplasmNameType.DERIVATIVE_NAME);
+		NameDAOTest.nameDAO.save(uncategorizedName);
 		final Name preferredName =
-				this.createNameTestData(dateIntValue, germplasm.getGid(), true, NameDAOTest.PREFERRED_NAME, GermplasmNameType.LINE_NAME);
+				this.createNameTestData(dateIntValue, germplasm.getGid(), 1, NameDAOTest.PREFERRED_NAME, GermplasmNameType.LINE_NAME);
 		NameDAOTest.nameDAO.save(preferredName);
+		final Name deletedName =
+				this.createNameTestData(dateIntValue, germplasm.getGid(), 9, NameDAOTest.DELETED_NAME, GermplasmNameType.LINE_NAME);
+		NameDAOTest.nameDAO.save(deletedName);
 		final List<Name> names = NameDAOTest.nameDAO.getByGIDWithFilters(germplasm.getGid(), 0, null);
 		Assert.assertNotNull("The list should not be empty", names);
-		Assert.assertEquals("Given the test data, there should be 2 items in the list.", 2, names.size());
+		Assert.assertEquals("Given the test data, there should be 3 items in the list.", 3, names.size());
 		Assert.assertTrue("The first name should always be the preferred name if it exists.",
 				names.get(0).getNval().equals(NameDAOTest.PREFERRED_NAME));
 		Assert.assertTrue("Given the test data, the second name should be " + NameDAOTest.NOT_PREFERRED_NAME, names.get(1).getNval()
 				.equals(NameDAOTest.NOT_PREFERRED_NAME));
+		Assert.assertTrue("Given the test data, the third name should be " + NameDAOTest.UNCATEGORIZED_NAME,
+				names.get(2).getNval().equals(NameDAOTest.UNCATEGORIZED_NAME));
 
 	}
 
@@ -69,13 +80,14 @@ public class NameDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm = this.createGermplasmTestData(dateIntValue);
 		NameDAOTest.germplasmDAO.save(germplasm);
 		final Name notPreferredName =
-				this.createNameTestData(dateIntValue, germplasm.getGid(), false, NameDAOTest.NOT_PREFERRED_NAME,
+				this.createNameTestData(dateIntValue, germplasm.getGid(), 2, NameDAOTest.NOT_PREFERRED_NAME,
 						GermplasmNameType.DERIVATIVE_NAME);
 		NameDAOTest.nameDAO.save(notPreferredName);
 		final Name preferredName =
-				this.createNameTestData(dateIntValue, germplasm.getGid(), true, NameDAOTest.PREFERRED_NAME, GermplasmNameType.LINE_NAME);
+				this.createNameTestData(dateIntValue, germplasm.getGid(), 1, NameDAOTest.PREFERRED_NAME, GermplasmNameType.LINE_NAME);
+		NameDAOTest.nameDAO.save(notPreferredName);
 		NameDAOTest.nameDAO.save(preferredName);
-		final List<Name> names = NameDAOTest.nameDAO.getByGIDWithFilters(germplasm.getGid(), 10, null);
+		final List<Name> names = NameDAOTest.nameDAO.getByGIDWithFilters(germplasm.getGid(), 2, null);
 		Assert.assertNotNull("The list should not be empty", names);
 		Assert.assertEquals("Given the test data, there should only be 1 item in the list.", 1, names.size());
 		Assert.assertTrue("Given the test data, the first name should be " + NameDAOTest.NOT_PREFERRED_NAME,
@@ -88,13 +100,13 @@ public class NameDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm = this.createGermplasmTestData(dateIntValue);
 		NameDAOTest.germplasmDAO.save(germplasm);
 		final Name notPreferredName =
-				this.createNameTestData(dateIntValue, germplasm.getGid(), false, NameDAOTest.NOT_PREFERRED_NAME,
+				this.createNameTestData(dateIntValue, germplasm.getGid(), 2, NameDAOTest.NOT_PREFERRED_NAME,
 						GermplasmNameType.DERIVATIVE_NAME);
 		NameDAOTest.nameDAO.save(notPreferredName);
 		final Name preferredName =
-				this.createNameTestData(dateIntValue, germplasm.getGid(), true, NameDAOTest.PREFERRED_NAME, GermplasmNameType.LINE_NAME);
+				this.createNameTestData(dateIntValue, germplasm.getGid(), 1, NameDAOTest.PREFERRED_NAME, GermplasmNameType.LINE_NAME);
 		NameDAOTest.nameDAO.save(preferredName);
-		final List<Name> names = NameDAOTest.nameDAO.getByGIDWithFilters(germplasm.getGid(), 0, GermplasmNameType.LINE_NAME);
+		final List<Name> names = NameDAOTest.nameDAO.getByGIDWithFilters(germplasm.getGid(), null, GermplasmNameType.LINE_NAME);
 		Assert.assertNotNull("The list should not be empty", names);
 		Assert.assertEquals("Given the test data, there should only be 1 item in the list.", 1, names.size());
 		Assert.assertTrue("Given the test data, the first name should be " + NameDAOTest.PREFERRED_NAME,
@@ -117,7 +129,7 @@ public class NameDAOTest extends IntegrationTestBase {
 		return germplasm;
 	}
 
-	public Name createNameTestData(final int dateIntValue, final int gid, final boolean isPreferred, final String nameValue,
+	public Name createNameTestData(final int dateIntValue, final int gid, final Integer nStat, final String nameValue,
 			final GermplasmNameType nType) {
 		final Name name = new Name();
 		name.setGermplasmId(gid);
@@ -127,7 +139,7 @@ public class NameDAOTest extends IntegrationTestBase {
 		name.setLocationId(0);
 		name.setNdate(dateIntValue);
 		name.setReferenceId(0);
-		name.setNstat(isPreferred ? 1 : 10);
+		name.setNstat(nStat);
 		return name;
 	}
 
