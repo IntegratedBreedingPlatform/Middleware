@@ -98,7 +98,7 @@ public class GermplasmCrossNode implements GermplasmCrossElementNode {
 
 
 		if (this.firstParent != null) {
-			if(!CrossBuilderUtil.nameTypeBasedResolution(pedigreeString, pedigreeDataManagerFactory, this.firstParent.getGermplasm(), crossExpansionProperties.getNameTypeOrder(cropName))){
+			if(!CrossBuilderUtil.nameTypeBasedResolution(pedigreeString, pedigreeDataManagerFactory, this.germplasm.getGpid1(), crossExpansionProperties.getNameTypeOrder(cropName))){
 				pedigreeString.append(this.firstParent.getCrossExpansionString(cropName, crossExpansionProperties, pedigreeDataManagerFactory));
 			}
 		} else {
@@ -120,7 +120,7 @@ public class GermplasmCrossNode implements GermplasmCrossElementNode {
 		}
 
 		if (this.secondParent != null) {
-			if(!CrossBuilderUtil.nameTypeBasedResolution(pedigreeString, pedigreeDataManagerFactory, this.secondParent.getGermplasm(), crossExpansionProperties.getNameTypeOrder(cropName))){
+			if(!CrossBuilderUtil.nameTypeBasedResolution(pedigreeString, pedigreeDataManagerFactory, this.getGermplasm().getGpid2(), crossExpansionProperties.getNameTypeOrder(cropName))){
 				pedigreeString.append(this.secondParent.getCrossExpansionString(cropName, crossExpansionProperties, pedigreeDataManagerFactory));
 			}
 		} else {

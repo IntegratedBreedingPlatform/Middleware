@@ -37,7 +37,7 @@ public class SingleGermplasmCrossElementNode implements GermplasmCrossElementNod
 
 		final StringBuilder pedigreeString = new StringBuilder();
 		if(!rootNode && germplasm != null) {
-			if(CrossBuilderUtil.nameTypeBasedResolution(pedigreeString, pedigreeDataManagerFactory, this.germplasm, crossExpansionProperties.getNameTypeOrder(cropName))){
+			if(CrossBuilderUtil.nameTypeBasedResolution(pedigreeString, pedigreeDataManagerFactory, this.germplasm.getGid(), crossExpansionProperties.getNameTypeOrder(cropName))){
 				return pedigreeString.toString();
 			}
 		}

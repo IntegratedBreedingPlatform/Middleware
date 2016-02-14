@@ -123,7 +123,7 @@ public class BackcrossElementNode implements GermplasmCrossElementNode {
 
 		final StringBuilder parentString = new StringBuilder();
 		if (this.parent != null) {
-			if(!CrossBuilderUtil.nameTypeBasedResolution(parentString, pedigreeDataManagerFactory, this.parent.getGermplasm(), crossExpansionProperties.getNameTypeOrder(cropName))){
+			if(!CrossBuilderUtil.nameTypeBasedResolution(parentString, pedigreeDataManagerFactory, this.getGermplasm().getGpid1(), crossExpansionProperties.getNameTypeOrder(cropName))){
 				parentString.append(this.parent.getCrossExpansionString(cropName, crossExpansionProperties, pedigreeDataManagerFactory));
 			}
 		} else {
@@ -133,7 +133,7 @@ public class BackcrossElementNode implements GermplasmCrossElementNode {
 
 		final StringBuilder recurrentParentString = new StringBuilder();
 		if (this.recurringParent != null) {
-			if(!CrossBuilderUtil.nameTypeBasedResolution(recurrentParentString, pedigreeDataManagerFactory, this.recurringParent.getGermplasm(), crossExpansionProperties.getNameTypeOrder(cropName))){
+			if(!CrossBuilderUtil.nameTypeBasedResolution(recurrentParentString, pedigreeDataManagerFactory, this.getGermplasm().getGpid1(), crossExpansionProperties.getNameTypeOrder(cropName))){
 				recurrentParentString.append(this.recurringParent.getCrossExpansionString(cropName, crossExpansionProperties, pedigreeDataManagerFactory));
 			}
 		} else {
