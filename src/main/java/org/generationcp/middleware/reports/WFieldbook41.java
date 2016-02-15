@@ -1,7 +1,7 @@
 
 package org.generationcp.middleware.reports;
 
-public class WFieldbook41 extends AbstractWheatNurseryReporter {
+public class WFieldbook41 extends AbstractTrialReporter {
 
 	@Override
 	public Reporter createReporter() {
@@ -20,5 +20,4 @@ public class WFieldbook41 extends AbstractWheatNurseryReporter {
 		return "WFb41_header.jasper";
 	}
 
-	// TODO : needs to print first and last plot in front page (Iplot & Fplot)
 }

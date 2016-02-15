@@ -107,6 +107,34 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	@Transient
 	private ListDataInventory inventoryInfo;
 
+	/***
+	 * The following will only be field when we are getting the parents, otherwise, they won't be set
+	 */
+
+	/**
+	 * The preferred name of the female parent (nval in the database table)
+	 */
+	@Transient
+	private String femaleParent = null;
+
+	/**
+	 * GID of the female parent (gpid1 in the database table)
+	 */
+	@Transient
+	private Integer fgid = null;
+
+	/**
+	 * The preferred name of the male parent (nval in the database table)
+	 */
+	@Transient
+	private String maleParent = "";
+
+	/**
+	 * GID of the male parent (gpid2 in the database table)
+	 */
+	@Transient
+	private Integer mgid = null;
+
 	public GermplasmListData() {
 
 	}
@@ -323,7 +351,6 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	@Override
 	public Integer getGermplasmId() {
-
 		return this.gid;
 	}
 
@@ -334,42 +361,52 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	@Override
 	public String getFemaleParent() {
-
-		return null;
+		return this.femaleParent;
 	}
 
 	@Override
 	public Integer getFgid() {
-
-		return null;
+		return this.fgid;
 	}
 
 	@Override
 	public String getMaleParent() {
-
-		return "";
+		return this.maleParent;
 	}
 
 	@Override
 	public Integer getMgid() {
-		return null;
+		return this.mgid;
 	}
 
 	@Override
 	public String getCheckTypeDescription() {
-
 		return null;
 	}
 
 	@Override
 	public String getStockIDs() {
-
 		return "";
 	}
 
 	@Override
 	public String getSeedAmount() {
-
 		return "";
+	}
+
+	public void setFemaleParent(String femaleParent) {
+		this.femaleParent = femaleParent;
+	}
+
+	public void setFgid(Integer fgid) {
+		this.fgid = fgid;
+	}
+
+	public void setMaleParent(String maleParent) {
+		this.maleParent = maleParent;
+	}
+
+	public void setMgid(Integer mgid) {
+		this.mgid = mgid;
 	}
 }
