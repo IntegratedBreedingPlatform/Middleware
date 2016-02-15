@@ -49,10 +49,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	@Override
 	@Transactional
 	public void markFixed(Germplasm germplasmToFix, boolean includeDescendants, boolean preserveExistingGroup) {
+		LOG.info("Marking germplasm with gid {} as fixed.", germplasmToFix.getGid());
 
 		if (includeDescendants) {
 			GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
-			LOG.debug("Building descendant tree for gid {} for assigning group (mgid).", germplasmToFix.getGid());
+			LOG.info("Building descendant tree for gid {} for assigning group (mgid).", germplasmToFix.getGid());
 			tree.setRoot(buildDescendantsTree(germplasmToFix, 1));
 			traverseAssignGroup(tree.getRoot(), germplasmToFix.getGid(), preserveExistingGroup);
 		} else {
@@ -79,7 +80,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		for (Germplasm child : allChildren) {
 			childrenIds.add(child.getGid());
 		}
-		LOG.debug("{} Level {} (gid: {}) Children: {}  ", indent, level, germplasm.getGid(), childrenIds);
+		LOG.info("{} Level {} (gid: {}) Children: {}  ", indent, level, germplasm.getGid(), childrenIds);
 
 		for (Germplasm child : allChildren) {
 			node.getLinkedNodes().add(buildDescendantsTree(child, level + 1));
@@ -90,14 +91,14 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	private void assignGroup(Germplasm germplasm, Integer groupId, boolean preserveExistingGroup) {
 
 		if (!preserveExistingGroup && germplasm.getMgid() != null && germplasm.getMgid() != 0 && !germplasm.getMgid().equals(groupId)) {
-			LOG.warn("Gerplasm with gid [{}] already has mgid [{}]. Service has been asked to ignore it, and assign new mgid [{}].",
+			LOG.info("Gerplasm with gid [{}] already has mgid [{}]. Service has been asked to ignore it, and assign new mgid [{}].",
 					germplasm.getGid(), germplasm.getMgid(), groupId);
 		}
 
 		if (!preserveExistingGroup) {
 			germplasm.setMgid(groupId);
 			this.germplasmDAO.save(germplasm);
-			LOG.debug("Saved mgid = [{}] for germplasm with gid = [{}]", germplasm.getMgid(), germplasm.getGid());
+			LOG.info("Saved mgid = [{}] for germplasm with gid = [{}]", germplasm.getMgid(), germplasm.getGid());
 			copySelectionHistory(germplasm);
 		}
 	}
@@ -118,10 +119,10 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			selectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
 			selectionHistoryAtFixation.setReferenceId(0);
 			this.nameDAO.save(selectionHistoryAtFixation);
-			LOG.debug("Selection history at fixation for gid {} saved as germplasm name {} .", germplasm.getGid(),
+			LOG.info("Selection history at fixation for gid {} saved as germplasm name {} .", germplasm.getGid(),
 					selectionHistoryNameValue);
 		} else {
-			LOG.warn("No selection history type name was found for germplasm {}.", germplasm.getGid());
+			LOG.info("No selection history type name was found for germplasm {}.", germplasm.getGid());
 		}
 	}
 }
