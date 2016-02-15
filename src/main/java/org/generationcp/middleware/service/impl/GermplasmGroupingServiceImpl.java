@@ -89,7 +89,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private void assignGroup(Germplasm germplasm, Integer groupId, boolean preserveExistingGroup) {
 
-		if (!preserveExistingGroup && germplasm.getMgid() != null && germplasm.getMgid() != 0) {
+		if (!preserveExistingGroup && germplasm.getMgid() != null && germplasm.getMgid() != 0 && !germplasm.getMgid().equals(groupId)) {
 			LOG.warn("Gerplasm with gid [{}] already has mgid [{}]. Service has been asked to ignore it, and assign new mgid [{}].",
 					germplasm.getGid(), germplasm.getMgid(), groupId);
 		}
