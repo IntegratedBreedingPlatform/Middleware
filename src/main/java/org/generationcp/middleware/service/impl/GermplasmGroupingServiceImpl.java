@@ -29,6 +29,10 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private NameDAO nameDAO;
 
+	public GermplasmGroupingServiceImpl() {
+
+	}
+
 	public GermplasmGroupingServiceImpl(HibernateSessionProvider sessionProvider) {
 		this.germplasmDAO = new GermplasmDAO();
 		this.germplasmDAO.setSession(sessionProvider.getSession());
@@ -93,6 +97,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		if (!preserveExistingGroup) {
 			germplasm.setMgid(groupId);
 			this.germplasmDAO.save(germplasm);
+			LOG.debug("Saved mgid = [{}] for germplasm with gid = [{}]", germplasm.getMgid(), germplasm.getGid());
 			copySelectionHistory(germplasm);
 		}
 	}
@@ -113,6 +118,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			selectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
 			selectionHistoryAtFixation.setReferenceId(0);
 			this.nameDAO.save(selectionHistoryAtFixation);
+			LOG.debug("Selection history at fixation for gid {} saved as germplasm name {} .", germplasm.getGid(),
+					selectionHistoryNameValue);
 		} else {
 			LOG.warn("No selection history type name was found for germplasm {}.", germplasm.getGid());
 		}
