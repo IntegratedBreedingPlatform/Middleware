@@ -25,8 +25,8 @@ public class Debug {
 
 	private static final Logger LOG = LoggerFactory.getLogger(Debug.class);
 
-	private static StringBuffer printIndent(int indent) {
-		StringBuffer sb = new StringBuffer();
+	private static StringBuffer printIndent(final int indent) {
+		final StringBuffer sb = new StringBuffer();
 		for (int i = 0; i < indent; i++) {
 			sb.append(" ");
 		}
@@ -39,14 +39,14 @@ public class Debug {
 	 * @param indent the indent
 	 * @param s the string to print
 	 */
-	public static void println(int indent, String s) {
-		StringBuffer sb = Debug.printIndent(indent);
+	public static void println(final int indent, final String s) {
+		final StringBuffer sb = Debug.printIndent(indent);
 		sb.append(s);
-		System.out.println(sb.toString());
+		Debug.LOG.debug(sb.toString());
 	}
 
-	public static void println(String s) {
-		System.out.println(s);
+	public static void println(final String s) {
+		Debug.println(0, s);
 	}
 
 	/**
@@ -55,11 +55,11 @@ public class Debug {
 	 * @param indent the indent
 	 * @param obj the object to print
 	 */
-	public static void println(int indent, Object obj) {
+	public static void println(final int indent, final Object obj) {
 		Debug.println(indent, obj.toString());
 	}
 
-	public static void print(Object obj) {
+	public static void print(final Object obj) {
 		Debug.print(0, obj);
 	}
 
@@ -69,10 +69,10 @@ public class Debug {
 	 * @param indent the indent
 	 * @param s the String to print
 	 */
-	public static void print(int indent, String s) {
-		StringBuffer sb = Debug.printIndent(indent);
+	public static void print(final int indent, final String s) {
+		final StringBuffer sb = Debug.printIndent(indent);
 		sb.append(s);
-		System.out.print(sb.toString());
+		Debug.LOG.debug(sb.toString());
 	}
 
 	/**
@@ -81,7 +81,7 @@ public class Debug {
 	 * @param indent the indent
 	 * @param obj the object to print
 	 */
-	public static void print(int indent, Object obj) {
+	public static void print(final int indent, final Object obj) {
 		Debug.print(indent, obj.toString());
 	}
 
@@ -91,25 +91,25 @@ public class Debug {
 	 * @param indent the indent
 	 * @param obj the object to print
 	 */
-	public static void printFormattedObject(int indent, Object obj) {
+	public static void printFormattedObject(final int indent, final Object obj) {
 
 		// Print class name
 		Debug.println(indent, obj.getClass().getSimpleName() + ": ");
 
 		// Print fields
-		for (Field field : obj.getClass().getDeclaredFields()) {
+		for (final Field field : obj.getClass().getDeclaredFields()) {
 			field.setAccessible(true); // to access private fields
 			try {
 				Debug.println(indent + 3, field.getName() + " = " + field.get(obj));
-			} catch (IllegalArgumentException e) {
+			} catch (final IllegalArgumentException e) {
 				Debug.LOG.error("Illegal argument to print formatted object", e);
-			} catch (IllegalAccessException e) {
+			} catch (final IllegalAccessException e) {
 				Debug.LOG.error("Illegal access to print formatted object", e);
 			}
 		}
 	}
 
-	public static void printFormattedObject(Object obj) {
+	public static void printFormattedObject(final Object obj) {
 		Debug.printFormattedObject(0, obj);
 	}
 
@@ -119,16 +119,16 @@ public class Debug {
 	 * @param indent the indent
 	 * @param objects the objects to print
 	 */
-	public static void printFormattedObjects(int indent, List<?> objects) {
+	public static void printFormattedObjects(final int indent, final List<?> objects) {
 		if (objects != null && objects.size() > 0) {
-			for (Object obj : objects) {
+			for (final Object obj : objects) {
 				Debug.printFormattedObject(indent, obj);
 			}
 		}
 		Debug.println(indent, "#RECORDS: " + (objects != null ? objects.size() : 0));
 	}
 
-	public static void printFormattedObjects(List<?> objects) {
+	public static void printFormattedObjects(final List<?> objects) {
 		Debug.printFormattedObjects(0, objects);
 	}
 
@@ -138,11 +138,11 @@ public class Debug {
 	 * @param indent the indent
 	 * @param obj the object to print
 	 */
-	public static void printObject(int indent, Object obj) {
+	public static void printObject(final int indent, final Object obj) {
 		Debug.println(indent, obj.toString());
 	}
 
-	public static void printObject(Object obj) {
+	public static void printObject(final Object obj) {
 		Debug.printObject(0, obj);
 	}
 
@@ -152,16 +152,16 @@ public class Debug {
 	 * @param indent the indent
 	 * @param objects the objects to print
 	 */
-	public static void printObjects(int indent, List<?> objects) {
+	public static void printObjects(final int indent, final List<?> objects) {
 		if (objects != null && objects.size() > 0) {
-			for (Object obj : objects) {
+			for (final Object obj : objects) {
 				Debug.printObject(indent, obj);
 			}
 		}
 		Debug.println(indent, "#RECORDS: " + (objects != null ? objects.size() : 0));
 	}
 
-	public static void printObjects(List<?> objects) {
+	public static void printObjects(final List<?> objects) {
 		Debug.printObjects(0, objects);
 	}
 
