@@ -1222,24 +1222,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 			// TODO: compare again new GermplasmNameTypes in merged database
 
-			final GermplasmPedigreeTreeNode femaleNode = new GermplasmPedigreeTreeNode();
-			final Germplasm female = new Germplasm(germ.getGpid1());
-			female.setPreferredName(this.getPreferredName(names));
-			female.setPreferredAbbreviation(this.getNameByType(names, GermplasmNameType.LINE_NAME).getNval());
-			female.setSelectionHistory(this.getNameByType(names, GermplasmNameType.OLD_MUTANT_NAME_1).getNval());
-			female.setCrossName(this.getNameByType(names, GermplasmNameType.CROSS_NAME).getNval());
-			female.setAccessionName(this.getNameByType(names, GermplasmNameType.GERMPLASM_BANK_ACCESSION_NUMBER).getNval());
-			femaleNode.setGermplasm(female);
+			final GermplasmPedigreeTreeNode femaleNode = createGermplasmPedigreeTreeNode(germ.getGpid1(), names);
 
 			names = namesMap.get(germ.getGpid2());
-			final GermplasmPedigreeTreeNode maleNode = new GermplasmPedigreeTreeNode();
-			final Germplasm male = new Germplasm(germ.getGpid2());
-			male.setPreferredName(this.getPreferredName(names));
-			male.setPreferredAbbreviation(this.getNameByType(names, GermplasmNameType.LINE_NAME).getNval());
-			male.setSelectionHistory(this.getNameByType(names, GermplasmNameType.OLD_MUTANT_NAME_1).getNval());
-			male.setCrossName(this.getNameByType(names, GermplasmNameType.CROSS_NAME).getNval());
-			male.setAccessionName(this.getNameByType(names, GermplasmNameType.GERMPLASM_BANK_ACCESSION_NUMBER).getNval());
-			maleNode.setGermplasm(male);
+			final GermplasmPedigreeTreeNode maleNode = createGermplasmPedigreeTreeNode(germ.getGpid2(), names);
 
 			parents.add(femaleNode);
 			parents.add(maleNode);
@@ -1250,6 +1236,24 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		return germNodes;
 	}
+
+    protected GermplasmPedigreeTreeNode createGermplasmPedigreeTreeNode(Integer gid, Map<GermplasmNameType, Name> names) {
+        // this is encountered in cases where parental information is not available (gpid1 or gpid2 does not point to an actual germplasm)
+        if (gid ==0 || gid == null) {
+            return null;
+        }
+
+        final GermplasmPedigreeTreeNode treeNode = new GermplasmPedigreeTreeNode();
+        final Germplasm female = new Germplasm(gid);
+        female.setPreferredName(this.getPreferredName(names));
+        female.setPreferredAbbreviation(this.getNameByType(names, GermplasmNameType.LINE_NAME).getNval());
+        female.setSelectionHistory(this.getNameByType(names, GermplasmNameType.OLD_MUTANT_NAME_1).getNval());
+        female.setCrossName(this.getNameByType(names, GermplasmNameType.CROSS_NAME).getNval());
+        female.setAccessionName(this.getNameByType(names, GermplasmNameType.GERMPLASM_BANK_ACCESSION_NUMBER).getNval());
+        treeNode.setGermplasm(female);
+
+        return treeNode;
+    }
 
 	/**
 	 * Local method for getting a particular germplasm's Name.
