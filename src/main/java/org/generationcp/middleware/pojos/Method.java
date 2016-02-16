@@ -260,6 +260,12 @@ public class Method implements Serializable {
 		this.mattr = mattr;
 	}
 
+	/**
+	 * ID of a CVTerm that defines a "method class".
+	 * 
+	 * METHN of a basic method which has equivalent genetic relationship between progenitors and offspring for the purpose of computing
+	 * coefficients of parentage
+	 */
 	public Integer getGeneq() {
 		return this.geneq;
 	}

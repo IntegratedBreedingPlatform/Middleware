@@ -1,5 +1,7 @@
 package org.generationcp.middleware.service.api;
 
+import java.util.List;
+
 import org.generationcp.middleware.pojos.Germplasm;
 
 
@@ -16,4 +18,11 @@ public interface GermplasmGroupingService {
 	 * @param preserveExistingGroup flag to indicate whether existing group (mgid) should be preserved.
 	 */
 	void markFixed(Germplasm germplasm, boolean includeDescendants, boolean preserveExistingGroup);
+
+	/**
+	 * Service to apply group (MGID) inheritance to newly created crosses.
+	 * 
+	 * @param gidsOfCrossesCreated
+	 */
+	void processGroupInheritance(List<Integer> gidsOfCrossesCreated);
 }

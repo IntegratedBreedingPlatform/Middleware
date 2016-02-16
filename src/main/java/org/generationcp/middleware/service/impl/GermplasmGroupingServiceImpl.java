@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Sets;
 
 public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
@@ -125,4 +126,54 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			LOG.info("No selection history type name was found for germplasm {}.", germplasm.getGid());
 		}
 	}
+
+	@Override
+	public void processGroupInheritance(List<Integer> gidsOfCrossesCreated) {
+
+		Set<Integer> hybridMethods = Sets.newHashSet(416, 417, 418, 419, 426, 321);
+
+		for (Integer crossGID : gidsOfCrossesCreated) {
+
+			Germplasm cross = this.germplasmDAO.getById(crossGID);
+			Germplasm parent1 = this.germplasmDAO.getById(cross.getGpid1());
+			Germplasm parent2 = this.germplasmDAO.getById(cross.getGpid2());
+
+			// Is the crossing method hybrid?
+			if (hybridMethods.contains(cross.getMethodId())) {
+				boolean parent1HasMGID = parent1.getMgid() != null && parent1.getMgid() != 0;
+				boolean parent2HasMGID = parent2.getMgid() != null && parent2.getMgid() != 0;
+				boolean bothParentsHaveMGID = parent1HasMGID && parent2HasMGID;
+
+				// Do both parents have MGIDs?
+				if (bothParentsHaveMGID) {
+
+					boolean crossingFirstTime = true; // TODO need a service to calculate.
+					if (crossingFirstTime) {
+						// Crossing for the first time. Cross starts new group. Copy GID to MGID.
+						cross.setMgid(cross.getGid());
+					} else {
+						// Not the first time cross.
+						// TODO need a service to find previous cross. There might be multiple. How to choose?
+						// Assign MGID of previous cross to new cross.
+
+						// Dont understand following parts. Need clarification.
+						// Warn if no GID present.
+						// Default to assigning new MGID to all instances of the cross.
+						// User can choose to apply only to new cross
+
+						boolean codedNameOrSelectionHistoryPresent = false; // TODO need a service.
+						if (codedNameOrSelectionHistoryPresent) {
+							// Copy Selection history to new cross as additional name
+						}
+					}
+
+				} else {
+					// Both parents don't have MGIDs. Cross does not inherit MGID.
+				}
+			} else {
+				// Breeding method not hybrid. Cross does not inherit MGID.
+			}
+		}
+	}
+
 }
