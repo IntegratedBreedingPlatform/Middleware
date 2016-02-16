@@ -1033,7 +1033,10 @@ public class WorkbookBuilder extends Builder {
 						final boolean isEditable =
 								NonEditableFactors.find(variable.getVariableType().getStandardVariable().getId()) == null ? true : false;
 						MeasurementData measurementData = null;
-						if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+
+						// BMS-2155 make sure that the value for EXP_DESIGN factor returned is the ID and not the name
+						if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()
+								&& variable.getVariableType().getStandardVariable().getId() != TermId.EXPERIMENT_DESIGN_FACTOR.getId()) {
 							final Integer id =
 									variable.getValue() != null && NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable
 											.getValue()) : null;
