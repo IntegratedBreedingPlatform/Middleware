@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.operation.builder;
@@ -122,26 +122,21 @@ public class WorkbookBuilder extends Builder {
 		final DataSet trialDataSet = this.getDataSetBuilder().build(trialDataSetProject.getProjectId());
 		workbook.setTrialDatasetId(trialDataSet.getId());
 
-		VariableList conditionVariables = null;
-		VariableList constantVariables = null;
-		VariableList trialConstantVariables = null;
-		// for Trials, conditions and trial environment variables are combined
+		final VariableList conditionVariables = study.getConditions();
+		final VariableList constantVariables = study.getConstants();
+		final VariableList trialConstantVariables = this.getTrialConstants(trialDataSet);
+
 		// the trialEnvironmentVariables are filtered from the TrialDataset
 		final VariableList trialEnvironmentVariables = this.getTrialEnvironmentVariableList(trialDataSet);
-		if (isTrial) {
-			conditionVariables = new VariableList();
-			conditionVariables.addAll(study.getConditions());
-			conditionVariables.addAll(trialEnvironmentVariables);
-		} else {
-			conditionVariables = study.getConditions();
-		}
-		constantVariables = study.getConstants();
-		trialConstantVariables = this.getTrialConstants(trialDataSet);
 		// FIXME : I think we are reducing to traits, but difficult to understand
 		variables = this.removeTrialDatasetVariables(variables, trialEnvironmentVariables);
 
-		// we set roles here (study, trial, variate) which seem to match the dataset : reconcile - we might be over-categorising
+		// we set roles here (study, trial, variate) which seem to match the dataset : reconcile - we might be over-categorizing
 		final List<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(conditionVariables, true, true);
+		if (isTrial) {
+			// for Trials, conditions and trial environment variables are combined
+			conditions.addAll(this.buildStudyMeasurementVariables(trialEnvironmentVariables, true, false));
+		}
 		final List<MeasurementVariable> factors = this.buildFactors(variables, isTrial);
 		final List<MeasurementVariable> constants = this.buildStudyMeasurementVariables(constantVariables, false, true);
 		constants.addAll(this.buildStudyMeasurementVariables(trialConstantVariables, false, false));
