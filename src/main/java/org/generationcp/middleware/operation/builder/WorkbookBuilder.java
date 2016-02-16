@@ -130,13 +130,7 @@ public class WorkbookBuilder extends Builder {
 		final VariableList trialEnvironmentVariables = this.getTrialEnvironmentVariableList(trialDataSet);
 		// FIXME : I think we are reducing to traits, but difficult to understand
 		variables = this.removeTrialDatasetVariables(variables, trialEnvironmentVariables);
-
-		// we set roles here (study, trial, variate) which seem to match the dataset : reconcile - we might be over-categorizing
-		final List<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(conditionVariables, true, true);
-		if (isTrial) {
-			// for Trials, conditions and trial environment variables are combined
-			conditions.addAll(this.buildStudyMeasurementVariables(trialEnvironmentVariables, true, false));
-		}
+		final List<MeasurementVariable> conditions = this.buildConditionVariables(conditionVariables, trialEnvironmentVariables, isTrial);
 		final List<MeasurementVariable> factors = this.buildFactors(variables, isTrial);
 		final List<MeasurementVariable> constants = this.buildStudyMeasurementVariables(constantVariables, false, true);
 		constants.addAll(this.buildStudyMeasurementVariables(trialConstantVariables, false, false));
@@ -290,6 +284,17 @@ public class WorkbookBuilder extends Builder {
 		WorkbookBuilder.LOG.debug("" + monitor.stop() + ". This instance was for studyId: " + id);
 
 		return workbook;
+	}
+
+	protected List<MeasurementVariable> buildConditionVariables(VariableList studyConditionVariables,
+			VariableList trialEnvironmentVariables, boolean isTrial) {
+		// we set roles here (study, trial, variate) which seem to match the dataset : reconcile - we might be over-categorizing
+		final List<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(studyConditionVariables, true, true);
+		if (isTrial) {
+			// for Trials, conditions and trial environment variables are combined
+			conditions.addAll(this.buildStudyMeasurementVariables(trialEnvironmentVariables, true, false));
+		}
+		return conditions;
 	}
 
 	private List<MeasurementRow> getTrialObservations(final Workbook workbook, final boolean isTrial) {
@@ -856,7 +861,7 @@ public class WorkbookBuilder extends Builder {
 		return "";
 	}
 
-	private VariableList getTrialEnvironmentVariableList(final DataSet trialDataset) {
+	protected VariableList getTrialEnvironmentVariableList(final DataSet trialDataset) {
 		final VariableTypeList typeList = trialDataset.getFactorsByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
 		final VariableList list = new VariableList();
 		for (final DMSVariableType type : typeList.getVariableTypes()) {
@@ -865,7 +870,7 @@ public class WorkbookBuilder extends Builder {
 		return list;
 	}
 
-	private VariableList getTrialConstants(final DataSet trialDataSet) {
+	protected VariableList getTrialConstants(final DataSet trialDataSet) {
 		final VariableTypeList typeList = trialDataSet.getVariableTypes().getVariates();
 
 		final VariableList list = new VariableList();

@@ -364,6 +364,54 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	}
 
+	@Test
+	public void testBuildConditionVariablesOnTrial() {
+		//final int noOfObservations, final StudyType studyType, final String studyName, final int trialNo, final boolean hasMultipleLocations
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(10, StudyType.T, "Test study", 1, true);
+		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID);
+
+		// create measurement variables of condition types
+		final List<MeasurementVariable> conditionMeasurementVariableList = workbook.getStudyConditions();
+		VariableTypeList conditionVariableTypeList = variableTypeListTransformer.transform(conditionMeasurementVariableList, PROGRAM_UUID);
+
+		// create measurement variables of trial environement types
+		final List<MeasurementVariable> trialEnvironmentMeasurementVariableList = workbook.getTrialConditions();
+		VariableTypeList trialEnvironmentVariableTypeList =
+				variableTypeListTransformer.transform(trialEnvironmentMeasurementVariableList, PROGRAM_UUID);
+
+		final VariableList conditionVariables =
+				this.transformMeasurementVariablesToVariableList(conditionMeasurementVariableList, conditionVariableTypeList);
+		final VariableList trialEnvironmentVariables =
+				this.transformMeasurementVariablesToVariableList(trialEnvironmentMeasurementVariableList, trialEnvironmentVariableTypeList);
+
+		final List<MeasurementVariable> result =
+				this.workbookBuilder.buildConditionVariables(conditionVariables, trialEnvironmentVariables, true);
+
+		int noOfConditionsWithTrialEnvironmentPhenotypicType = 0;
+		for (MeasurementVariable measurementVariable : result) {
+			if (measurementVariable.getRole().equals(PhenotypicType.TRIAL_ENVIRONMENT)) {
+				noOfConditionsWithTrialEnvironmentPhenotypicType++;
+			}
+		}
+
+		Assert.assertTrue(
+				"Expecting that the number of condition with trial environment phenotypic type is " + trialEnvironmentVariables.size() +
+						" but returned " + noOfConditionsWithTrialEnvironmentPhenotypicType,
+				trialEnvironmentVariables.size() >= noOfConditionsWithTrialEnvironmentPhenotypicType);
+
+		List<String> trialEnvironmentVariableNames = new ArrayList<String>();
+		for(Variable variable : trialEnvironmentVariables.getVariables()) {
+			trialEnvironmentVariableNames.add(variable.getVariableType().getLocalName());
+		}
+
+		for(MeasurementVariable measurementVariable : result){
+			if(trialEnvironmentVariableNames.contains(measurementVariable.getName())){
+				Assert.assertTrue("Expecting that TRIAL_ENVIRONMENT is set as the phenotypic type for trial environment variables",
+						measurementVariable.getRole().equals(PhenotypicType.TRIAL_ENVIRONMENT) );
+			}
+		}
+	}
+
 	private boolean isTermIdExists(final int termId, final List<MeasurementData> dataList) {
 		for (final MeasurementData data : dataList) {
 			if (data.getMeasurementVariable().getTermId() == termId) {
