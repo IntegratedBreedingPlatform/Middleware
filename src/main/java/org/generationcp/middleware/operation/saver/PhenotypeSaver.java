@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.math.NumberUtils;
+import org.generationcp.middleware.domain.cache.BreedingMethodCache;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypeExceptionDto;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -27,6 +28,8 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.ontology.VariableCache;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype;
@@ -134,8 +137,8 @@ public class PhenotypeSaver extends Saver {
 		}
 	}
 
-	private Phenotype createPhenotype(Integer variableId, String value, Phenotype oldPhenotype,
-			Integer dataTypeId) throws MiddlewareQueryException {
+	protected Phenotype createPhenotype(final Integer variableId, final String value, final Phenotype oldPhenotype, final Integer dataTypeId)
+			throws MiddlewareQueryException {
 
 		if ((value == null || "".equals(value.trim())) && (oldPhenotype == null || oldPhenotype.getPhenotypeId() == null)) {
 			return null;
@@ -143,7 +146,10 @@ public class PhenotypeSaver extends Saver {
 
 		Phenotype phenotype = this.getPhenotypeObject(oldPhenotype);
 
-		if (TermId.CATEGORICAL_VARIABLE.getId() == dataTypeId) {
+		if (NumberUtils.isNumber(value) && isBreedingMethodVariable(variableId)) {
+			phenotype.setcValue(null);
+			phenotype.setValue(getBreedingMethodCode(Double.valueOf(value).intValue()));
+		} else if (TermId.CATEGORICAL_VARIABLE.getId() == dataTypeId) {
 			this.setCategoricalVariatePhenotypeValues(phenotype, value, variableId);
 		} else {
 			phenotype.setValue(value);
@@ -152,6 +158,22 @@ public class PhenotypeSaver extends Saver {
 		phenotype.setName(String.valueOf(variableId));
 
 		return phenotype;
+	}
+
+	protected boolean isBreedingMethodVariable(final Integer variableId) {
+		Integer propertyId = null;
+		final org.generationcp.middleware.domain.ontology.Variable variable = VariableCache.getFromCache(variableId);
+		if (variable != null) {
+			propertyId = variable.getProperty().getId();
+		} else {
+			final CVTermRelationship propertyRelationship =
+					this.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(variableId, TermId.HAS_PROPERTY.getId());
+			propertyId = propertyRelationship.getObjectId();
+		}
+		if (TermId.BREEDING_METHOD_PROP.getId() == propertyId) {
+			return true;
+		}
+		return false;
 	}
 
 	private void setCategoricalVariatePhenotypeValues(Phenotype phenotype, String value, Integer variableId)
@@ -175,6 +197,15 @@ public class PhenotypeSaver extends Saver {
 		}
 	}
 
+	private String getBreedingMethodCode(final Integer methodId) {
+		Method breedingMethod = BreedingMethodCache.getFromCache(methodId);
+		if (breedingMethod == null) {
+			breedingMethod = this.getMethodDao().getById(methodId);
+			BreedingMethodCache.addToCache(breedingMethod.getMid(), breedingMethod);
+		}
+		return breedingMethod.getMcode();
+	}
+
 	protected Map<Integer, String> getPossibleValuesMap(int variableId) throws MiddlewareQueryException {
 		Map<Integer, String> possibleValuesMap = new HashMap<Integer, String>();
 		CVTermRelationship scaleRelationship =
@@ -184,8 +215,8 @@ public class PhenotypeSaver extends Saver {
 					this.getCvTermRelationshipDao().getBySubjectIdAndTypeId(scaleRelationship.getObjectId(), TermId.HAS_VALUE.getId());
 			if (possibleValues != null) {
 				for (CVTermRelationship cvTermRelationship : possibleValues) {
-					possibleValuesMap.put(cvTermRelationship.getObjectId(),
-							this.getCvTermDao().getById(cvTermRelationship.getObjectId()).getName());
+					possibleValuesMap.put(cvTermRelationship.getObjectId(), this.getCvTermDao().getById(cvTermRelationship.getObjectId())
+							.getName());
 				}
 			}
 		}
