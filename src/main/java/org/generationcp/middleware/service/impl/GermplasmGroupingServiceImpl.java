@@ -177,7 +177,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 					} else {
 						// Not the first time cross. Assign MGID of previous cross to new cross.
 						// When there are multiple previous crosses, we choose the oldest created cross with MGID as preference.
-						LOG.info("Previous of the same parents exist: {}.", previousCrosses);
+						LOG.info("Previous cross(es) of the same two parents exist: {}.", previousCrosses);
 						Germplasm previousCrossSelected = null;
 						for (Germplasm previousCross : previousCrosses) {
 							if (previousCross.getMgid() != null && previousCross.getMgid() != 0) {
