@@ -391,8 +391,8 @@ public class Workbook {
 		final List<MeasurementVariable> list = new ArrayList<MeasurementVariable>();
 		if (variables != null && !variables.isEmpty()) {
 			for (final MeasurementVariable variable : variables) {
-				if (isStudy && variable.getLabel().toUpperCase().startsWith(Workbook.STUDY_LABEL) || !isStudy
-						&& !variable.getLabel().toUpperCase().startsWith(Workbook.STUDY_LABEL)) {
+				if (isStudy && variable.getLabel().toUpperCase().startsWith(Workbook.STUDY_LABEL)
+						|| !isStudy && !variable.getLabel().toUpperCase().startsWith(Workbook.STUDY_LABEL)) {
 					list.add(variable);
 				}
 			}
@@ -1031,12 +1031,13 @@ public class Workbook {
 
 	public boolean hasExistingExperimentalDesign() {
 		final ExperimentalDesignVariable expDesignVar = this.getExperimentalDesignVariables();
-		return expDesignVar != null &&  expDesignVar.getExperimentalDesign() != null && expDesignVar.getExperimentalDesign().getValue() != null;
+		return expDesignVar != null && expDesignVar.getExperimentalDesign() != null
+				&& expDesignVar.getExperimentalDesign().getValue() != null;
 	}
 
-	public MeasurementVariable findConditionById(int conditionId) {
+	public MeasurementVariable findConditionById(final int conditionId) {
 		if (this.getConditions() != null) {
-			for (MeasurementVariable mv : this.getConditions()) {
+			for (final MeasurementVariable mv : this.getConditions()) {
 				if (mv.getTermId() == conditionId) {
 					return mv;
 				}
