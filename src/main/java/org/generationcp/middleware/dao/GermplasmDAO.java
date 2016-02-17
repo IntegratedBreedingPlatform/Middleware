@@ -34,6 +34,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.LogicalExpression;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -548,6 +549,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			criteria.add(Restrictions.eq("gnpgs", 2)); // restrict to cases where two parents are involved.
 			criteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged.
 			criteria.add(Restrictions.neProperty("gid", "grplce")); // = Record is not deleted or replaced.
+			criteria.addOrder(Order.asc("gid")); // oldest created cross will be first in list.
 
 			@SuppressWarnings("unchecked")
 			List<Germplasm> previousCrosses = criteria.getExecutableCriteria(getSession()).list();
