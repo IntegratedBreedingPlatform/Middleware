@@ -151,7 +151,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	@Override
-	public void processGroupInheritance(List<Integer> gidsOfCrossesCreated) {
+	public void processGroupInheritanceForCrosses(List<Integer> gidsOfCrossesCreated) {
 
 		Set<Integer> hybridMethods = Sets.newHashSet(416, 417, 418, 419, 426, 321);
 

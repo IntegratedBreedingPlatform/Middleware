@@ -24,5 +24,5 @@ public interface GermplasmGroupingService {
 	 * 
 	 * @param gidsOfCrossesCreated
 	 */
-	void processGroupInheritance(List<Integer> gidsOfCrossesCreated);
+	void processGroupInheritanceForCrosses(List<Integer> gidsOfCrossesCreated);
 }
