@@ -12,6 +12,7 @@ import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.Util;
@@ -20,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Strings;
-import com.google.common.collect.Sets;
 
 public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
@@ -151,16 +151,15 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	@Override
-	public void processGroupInheritanceForCrosses(List<Integer> gidsOfCrossesCreated) {
-		Set<Integer> hybridMethods = Sets.newHashSet(416, 417, 418, 419, 426, 321);
+	public void processGroupInheritanceForCrosses(List<Integer> gidsOfCrosses) {
 
-		for (Integer crossGID : gidsOfCrossesCreated) {
+		for (Integer crossGID : gidsOfCrosses) {
 			Germplasm cross = this.germplasmDAO.getById(crossGID);
 			Germplasm parent1 = this.germplasmDAO.getById(cross.getGpid1());
 			Germplasm parent2 = this.germplasmDAO.getById(cross.getGpid2());
 			LOG.info("Processing group inheritance for cross {}. Parent1 {}, Parent2 {}.", cross, parent1, parent2);
 
-			if (hybridMethods.contains(cross.getMethodId())) {
+			if (Method.isHybrid(cross.getMethodId())) {
 				LOG.info("Breeding method of the cross is hybrid.");
 				boolean parent1HasMGID = parent1.getMgid() != null && parent1.getMgid() != 0;
 				boolean parent2HasMGID = parent2.getMgid() != null && parent2.getMgid() != 0;

@@ -22,7 +22,7 @@ public interface GermplasmGroupingService {
 	/**
 	 * Service to apply group (MGID) inheritance to newly created crosses.
 	 * 
-	 * @param gidsOfCrossesCreated
+	 * @param gidsOfCrossesCreated - Must not be null.
 	 */
 	void processGroupInheritanceForCrosses(List<Integer> gidsOfCrossesCreated);
 
