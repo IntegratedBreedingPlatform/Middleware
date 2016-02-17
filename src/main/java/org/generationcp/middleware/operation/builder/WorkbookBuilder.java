@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.operation.builder;
@@ -122,26 +122,15 @@ public class WorkbookBuilder extends Builder {
 		final DataSet trialDataSet = this.getDataSetBuilder().build(trialDataSetProject.getProjectId());
 		workbook.setTrialDatasetId(trialDataSet.getId());
 
-		VariableList conditionVariables = null;
-		VariableList constantVariables = null;
-		VariableList trialConstantVariables = null;
-		// for Trials, conditions and trial environment variables are combined
+		final VariableList conditionVariables = study.getConditions();
+		final VariableList constantVariables = study.getConstants();
+		final VariableList trialConstantVariables = this.getTrialConstants(trialDataSet);
+
 		// the trialEnvironmentVariables are filtered from the TrialDataset
 		final VariableList trialEnvironmentVariables = this.getTrialEnvironmentVariableList(trialDataSet);
-		if (isTrial) {
-			conditionVariables = new VariableList();
-			conditionVariables.addAll(study.getConditions());
-			conditionVariables.addAll(trialEnvironmentVariables);
-		} else {
-			conditionVariables = study.getConditions();
-		}
-		constantVariables = study.getConstants();
-		trialConstantVariables = this.getTrialConstants(trialDataSet);
 		// FIXME : I think we are reducing to traits, but difficult to understand
 		variables = this.removeTrialDatasetVariables(variables, trialEnvironmentVariables);
-
-		// we set roles here (study, trial, variate) which seem to match the dataset : reconcile - we might be over-categorising
-		final List<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(conditionVariables, true, true);
+		final List<MeasurementVariable> conditions = this.buildConditionVariables(conditionVariables, trialEnvironmentVariables, isTrial);
 		final List<MeasurementVariable> factors = this.buildFactors(variables, isTrial);
 		final List<MeasurementVariable> constants = this.buildStudyMeasurementVariables(constantVariables, false, true);
 		constants.addAll(this.buildStudyMeasurementVariables(trialConstantVariables, false, false));
@@ -295,6 +284,17 @@ public class WorkbookBuilder extends Builder {
 		WorkbookBuilder.LOG.debug("" + monitor.stop() + ". This instance was for studyId: " + id);
 
 		return workbook;
+	}
+
+	protected List<MeasurementVariable> buildConditionVariables(VariableList studyConditionVariables,
+			VariableList trialEnvironmentVariables, boolean isTrial) {
+		// we set roles here (study, trial, variate) which seem to match the dataset : reconcile - we might be over-categorizing
+		final List<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(studyConditionVariables, true, true);
+		if (isTrial) {
+			// for Trials, conditions and trial environment variables are combined
+			conditions.addAll(this.buildStudyMeasurementVariables(trialEnvironmentVariables, true, false));
+		}
+		return conditions;
 	}
 
 	private List<MeasurementRow> getTrialObservations(final Workbook workbook, final boolean isTrial) {
@@ -861,7 +861,7 @@ public class WorkbookBuilder extends Builder {
 		return "";
 	}
 
-	private VariableList getTrialEnvironmentVariableList(final DataSet trialDataset) {
+	protected VariableList getTrialEnvironmentVariableList(final DataSet trialDataset) {
 		final VariableTypeList typeList = trialDataset.getFactorsByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
 		final VariableList list = new VariableList();
 		for (final DMSVariableType type : typeList.getVariableTypes()) {
@@ -870,7 +870,7 @@ public class WorkbookBuilder extends Builder {
 		return list;
 	}
 
-	private VariableList getTrialConstants(final DataSet trialDataSet) {
+	protected VariableList getTrialConstants(final DataSet trialDataSet) {
 		final VariableTypeList typeList = trialDataSet.getVariableTypes().getVariates();
 
 		final VariableList list = new VariableList();
@@ -1033,7 +1033,10 @@ public class WorkbookBuilder extends Builder {
 						final boolean isEditable =
 								NonEditableFactors.find(variable.getVariableType().getStandardVariable().getId()) == null ? true : false;
 						MeasurementData measurementData = null;
-						if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+
+						// BMS-2155 make sure that the value for EXP_DESIGN factor returned is the ID and not the name
+						if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()
+								&& variable.getVariableType().getStandardVariable().getId() != TermId.EXPERIMENT_DESIGN_FACTOR.getId()) {
 							final Integer id =
 									variable.getValue() != null && NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable
 											.getValue()) : null;
