@@ -191,15 +191,13 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 							copySelectionHistoryForCross(cross, previousCrossSelected);
 						}
 					}
-
+					this.germplasmDAO.save(cross);
 				} else {
 					// Both parents don't have MGIDs. Cross does not inherit MGID.
 				}
 			} else {
 				// Breeding method not hybrid. Cross does not inherit MGID.
 			}
-
-			this.germplasmDAO.save(cross);
 		}
 	}
 
