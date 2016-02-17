@@ -156,9 +156,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 		for (Integer crossGID : gidsOfCrossesCreated) {
 			Germplasm cross = this.germplasmDAO.getById(crossGID);
-			LOG.info("Processing group inheritance for germplasm cross {}.", cross);
 			Germplasm parent1 = this.germplasmDAO.getById(cross.getGpid1());
 			Germplasm parent2 = this.germplasmDAO.getById(cross.getGpid2());
+			LOG.info("Processing group inheritance for cross {}. Parent1 {}, Parent2 {}.", cross, parent1, parent2);
 
 			if (hybridMethods.contains(cross.getMethodId())) {
 				LOG.info("Breeding method of the cross is hybrid.");
@@ -167,16 +167,17 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 				boolean bothParentsHaveMGID = parent1HasMGID && parent2HasMGID;
 
 				if (bothParentsHaveMGID) {
-					LOG.info("Both parents have MGIDs. Parent1 mgid {}. Parent2 mgid {}", parent1.getMgid(), parent2.getMgid());
+					LOG.info("Both parents have MGIDs. Parent1 mgid {}. Parent2 mgid {}.", parent1.getMgid(), parent2.getMgid());
 					List<Germplasm> previousCrosses = this.germplasmDAO.getPreviousCrosses(parent1.getGid(), parent2.getGid());
 					boolean crossingFirstTime = previousCrosses.isEmpty();
 					if (crossingFirstTime) {
-						LOG.info("Crossing for the first time. Cross starts new group. Copying gid {} to mgid.");
+						LOG.info("This is a first cross of the two parents. Starting a new group. Setting gid {} to mgid.",
+								cross.getGid());
 						cross.setMgid(cross.getGid());
 					} else {
 						// Not the first time cross. Assign MGID of previous cross to new cross.
 						// When there are multiple previous crosses, we choose the oldest created cross with MGID as preference.
-						LOG.info("Previous crosses exist: {}.", previousCrosses);
+						LOG.info("Previous of the same parents exist: {}.", previousCrosses);
 						Germplasm previousCrossSelected = null;
 						for (Germplasm previousCross : previousCrosses) {
 							if (previousCross.getMgid() != null && previousCross.getMgid() != 0) {
