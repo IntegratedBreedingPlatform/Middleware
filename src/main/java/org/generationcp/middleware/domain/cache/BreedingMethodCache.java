@@ -19,6 +19,10 @@ public class BreedingMethodCache {
 
 	private static final Logger LOG = LoggerFactory.getLogger(BreedingMethodCache.class);
 
+	private BreedingMethodCache() {
+		// utility classes should have a private constructor
+	}
+
 	public static Method getFromCache(final Integer methodId) {
 		final String currentCrop = BreedingMethodCache.getCurrentCrop();
 		final BreedingMethodCacheKey key = new BreedingMethodCacheKey(methodId, currentCrop);
