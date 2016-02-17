@@ -147,7 +147,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 				// Do both parents have MGIDs?
 				if (bothParentsHaveMGID) {
 
-					boolean crossingFirstTime = true; // TODO need a service to calculate.
+					List<Germplasm> previousCrosses = this.germplasmDAO.getPreviousCrosses(parent1.getGid(), parent2.getGid());
+					boolean crossingFirstTime = previousCrosses.isEmpty();
 					if (crossingFirstTime) {
 						// Crossing for the first time. Cross starts new group. Copy GID to MGID.
 						cross.setMgid(cross.getGid());
@@ -173,6 +174,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			} else {
 				// Breeding method not hybrid. Cross does not inherit MGID.
 			}
+
+			this.germplasmDAO.save(cross);
 		}
 	}
 
