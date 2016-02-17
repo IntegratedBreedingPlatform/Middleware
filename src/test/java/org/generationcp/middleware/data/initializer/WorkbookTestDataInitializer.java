@@ -21,7 +21,12 @@ import org.generationcp.middleware.pojos.Location;
 
 public class WorkbookTestDataInitializer {
 
-	public static final int DAY_OBS = 8284;
+	private static final int GW100_G_ID = 51496;
+		private static final String GRAIN_WEIGHT = "100 grain weight";
+		private static final String GW_MEASUREMENT = "100GW measurement";
+		private static final String G = "g";
+		private static final String GW100_G2 = "GW100_g";
+		public static final int DAY_OBS = 8284;
 	public static final int ASPERGILLUS_FLAVUSPPB = 20369;
 	public static final int ASPERGILLUS_FLAVUS1_5 = 20368;
 	public static final String NURSERY_NAME = "Nursery_";
@@ -94,7 +99,7 @@ public class WorkbookTestDataInitializer {
 	public static final int SOILPH_ID = 8270;
 	public static final String GRAIN_SIZE_PROPERTY = "Grain size";
 	public static final String DRY_GRAINS = "Weigh 1000 dry grains";
-	public static final String GRAIN_SIZE_SCALE = "g";
+	public static final String GRAIN_SIZE_SCALE = G;
 
 	// VARIATES
 	public static final String GYLD = "GYLD";
@@ -197,7 +202,7 @@ public class WorkbookTestDataInitializer {
 		createFactors(workbook, true, hasMultipleLocations, trialNo);
 		createConstants(workbook);
 		createVariates(workbook, isForMeansDataset);
-		createObservations(workbook, noOfObservations, hasMultipleLocations, trialNo);
+		createObservations(workbook, noOfObservations, hasMultipleLocations, trialNo, isForMeansDataset);
 		return workbook;
 	}
 
@@ -239,7 +244,7 @@ public class WorkbookTestDataInitializer {
 		createFactors(workbook, false, false, 1);
 		createConstants(workbook);
 		createVariatesWithDuplicatePSM(workbook);
-		createObservations(workbook, 10, false, 1);
+		createObservations(workbook, 10, false, 1, false);
 
 		return workbook;
 	}
@@ -252,7 +257,7 @@ public class WorkbookTestDataInitializer {
 		createFactors(wbook, true, true, trialNo);
 		createConstants(wbook);
 		createVariates(wbook, false);
-		createObservations(wbook, 10, true, trialNo);
+		createObservations(wbook, 10, true, trialNo, false);
 
 		return wbook;
 	}
@@ -434,11 +439,19 @@ public class WorkbookTestDataInitializer {
 							WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.STUDY, TermId.NUMERIC_VARIABLE.getId(),
 							PhenotypicType.VARIATE, false);
 			variates.add(siteSoilPh);
+			
+			final MeasurementVariable gW100_g =
+					createMeasurementVariable(GW100_G_ID, GW100_G2,
+							"Weight of 100 grains randomly selected from the total grains.", G, GW_MEASUREMENT,
+							GRAIN_WEIGHT, WorkbookTestDataInitializer.NUMERIC,
+							"", WorkbookTestDataInitializer.STUDY, TermId.NUMERIC_VARIABLE.getId(),
+							PhenotypicType.VARIATE, false);
+			variates.add(gW100_g);
 		}
 		workbook.setVariates(variates);
 	}
 
-	public static void createObservations(final Workbook workbook, final int noOfObservations, final boolean withTrial, final int trialNo) {
+	public static void createObservations(final Workbook workbook, final int noOfObservations, final boolean withTrial, final int trialNo, final boolean isForMeansDataSet) {
 		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
 
 		MeasurementRow row;
@@ -468,10 +481,17 @@ public class WorkbookTestDataInitializer {
 			dataList.add(createMeasurementData(WorkbookTestDataInitializer.REP, "", TermId.REP_NO.getId(), workbook.getFactors()));
 			dataList.add(createMeasurementData("DAY_OBS", randomizeValue(random, fmt, 5000), WorkbookTestDataInitializer.DAY_OBS,
 					workbook.getFactors()));
-			dataList.add(createMeasurementData(WorkbookTestDataInitializer.GYLD, randomizeValue(random, fmt, 5000),
-					WorkbookTestDataInitializer.GYLD_ID, workbook.getVariates()));
-			dataList.add(createMeasurementData(WorkbookTestDataInitializer.SITE_SOIL_PH, "1", WorkbookTestDataInitializer.SITE_SOIL_PH_ID,
-					workbook.getVariates()));
+			if(isForMeansDataSet){
+				dataList.add(createMeasurementData(WorkbookTestDataInitializer.PLANT_HEIGHT_MEAN, randomizeValue(random, fmt, 5000),
+						WorkbookTestDataInitializer.PLANT_HEIGHT_MEAN_ID, workbook.getVariates()));
+			} else {
+				dataList.add(createMeasurementData(WorkbookTestDataInitializer.GYLD, randomizeValue(random, fmt, 5000),
+						WorkbookTestDataInitializer.GYLD_ID, workbook.getVariates()));
+				dataList.add(createMeasurementData(WorkbookTestDataInitializer.SITE_SOIL_PH, "1", WorkbookTestDataInitializer.SITE_SOIL_PH_ID,
+						workbook.getVariates()));
+				dataList.add(createMeasurementData(GW100_G2, randomizeValue(random, fmt, 5000), 51496,
+						workbook.getVariates(), true));
+			}
 			row.setDataList(dataList);
 			observations.add(row);
 		}
@@ -516,6 +536,14 @@ public class WorkbookTestDataInitializer {
 			final List<MeasurementVariable> variables) {
 		final MeasurementData data = new MeasurementData(label, value);
 		data.setMeasurementVariable(getMeasurementVariable(termId, variables));
+		return data;
+	}
+	
+	public static MeasurementData createMeasurementData(final String label, final String value, final int termId,
+			final List<MeasurementVariable> variables, final boolean isEditable) {
+		final MeasurementData data = new MeasurementData(label, value);
+		data.setMeasurementVariable(getMeasurementVariable(termId, variables));
+		data.setEditable(isEditable);
 		return data;
 	}
 
