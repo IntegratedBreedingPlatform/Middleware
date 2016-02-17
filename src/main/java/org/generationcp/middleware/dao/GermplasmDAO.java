@@ -33,6 +33,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -529,6 +530,31 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		} catch (HibernateException e) {
 			final String message = "Error with getAllChildren(gid=" + gid + ") query from Germplasm: " + e.getMessage();
 			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<Germplasm> getPreviousCrosses(Integer parentA, Integer parenB) {
+		try {
+			DetachedCriteria criteria = DetachedCriteria.forClass(Germplasm.class);
+
+			LogicalExpression aMaleBFemale =
+					Restrictions.and(Restrictions.eq("gpid1", parentA), Restrictions.eq("gpid2", parenB));
+
+			LogicalExpression aFemaleBMale =
+					Restrictions.and(Restrictions.eq("gpid1", parenB), Restrictions.eq("gpid2", parentA));
+
+			criteria.add(Restrictions.or(aMaleBFemale, aFemaleBMale));
+			criteria.add(Restrictions.eq("gnpgs", 2)); // restrict to cases where two parents are involved.
+			criteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged.
+			criteria.add(Restrictions.neProperty("gid", "grplce")); // = Record is not deleted or replaced.
+
+			@SuppressWarnings("unchecked")
+			List<Germplasm> previousCrosses = criteria.getExecutableCriteria(getSession()).list();
+			return previousCrosses;
+		} catch (HibernateException e) {
+			final String message = "Error executing getPreviousCrosses(parent1Gid={}, parent2Gid={}) query: {}";
+			LOG.error(message, parentA, parenB, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}

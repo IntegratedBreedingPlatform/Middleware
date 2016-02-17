@@ -220,4 +220,10 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		List<Germplasm> children = this.dao.getAllChildren(gid);
 		Assert.assertNotNull("getAllChildren() should never return null.", children);
 	}
+
+	@Test
+	public void testGetPreviousCrosses() {
+		List<Germplasm> previousCrosses = this.dao.getPreviousCrosses(11, 3);
+		Assert.assertNotNull("getPreviousCrosses() should never return null.", previousCrosses);
+	}
 }
