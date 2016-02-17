@@ -127,6 +127,29 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 	}
 
+	private void copySelectionHistoryForCross(Germplasm cross, Germplasm previousCross) {
+		List<Name> names = this.nameDAO.getByGIDWithFilters(previousCross.getGid(), null, GermplasmNameType.SELECTION_HISTORY);
+
+		if (!names.isEmpty()) {
+			String selectionHistoryNameValue = names.get(0).getNval();
+
+			Name selectionHistoryOfPreviousCross = new Name();
+			selectionHistoryOfPreviousCross.setGermplasmId(cross.getGid());
+			selectionHistoryOfPreviousCross.setTypeId(GermplasmNameType.SELECTION_HISTORY_AT_FIXATION.getUserDefinedFieldID());
+			selectionHistoryOfPreviousCross.setNval(selectionHistoryNameValue);
+			selectionHistoryOfPreviousCross.setNstat(1);
+			selectionHistoryOfPreviousCross.setUserId(1); // TODO get current user passed to the service and use here.
+			selectionHistoryOfPreviousCross.setLocationId(0); // TODO get location passed to the service and use here.
+			selectionHistoryOfPreviousCross.setNdate(Util.getCurrentDateAsIntegerValue());
+			selectionHistoryOfPreviousCross.setReferenceId(0);
+			this.nameDAO.save(selectionHistoryOfPreviousCross);
+			LOG.info("Selection history {} for cross with gid {} was copied from previous cross with gid {}.", selectionHistoryNameValue,
+					cross.getGid(), previousCross.getGid());
+		} else {
+			LOG.info("No selection history type name was found for previous cross with gid {}.", previousCross.getGid());
+		}
+	}
+
 	@Override
 	public void processGroupInheritance(List<Integer> gidsOfCrossesCreated) {
 
@@ -153,18 +176,19 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 						// Crossing for the first time. Cross starts new group. Copy GID to MGID.
 						cross.setMgid(cross.getGid());
 					} else {
-						// Not the first time cross.
-						// TODO need a service to find previous cross. There might be multiple. How to choose?
-						// Assign MGID of previous cross to new cross.
+						// Not the first time cross. Assign MGID of previous cross to new cross.
+						// When there are multiple previous crosses, we choose the oldest created cross with MGID as preference.
+						Germplasm previousCrossSelected = null;
+						for (Germplasm previousCross : previousCrosses) {
+							if (previousCross.getMgid() != null && previousCross.getMgid() != 0) {
+								previousCrossSelected = previousCross;
+								break;
+							}
+						}
 
-						// Dont understand following parts. Need clarification.
-						// Warn if no GID present.
-						// Default to assigning new MGID to all instances of the cross.
-						// User can choose to apply only to new cross
-
-						boolean codedNameOrSelectionHistoryPresent = false; // TODO need a service.
-						if (codedNameOrSelectionHistoryPresent) {
-							// Copy Selection history to new cross as additional name
+						if (previousCrossSelected != null) {
+							cross.setMgid(previousCrossSelected.getMgid());
+							copySelectionHistoryForCross(cross, previousCrossSelected);
 						}
 					}
 
