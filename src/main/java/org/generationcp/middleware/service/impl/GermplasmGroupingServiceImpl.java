@@ -152,32 +152,31 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	@Override
 	public void processGroupInheritanceForCrosses(List<Integer> gidsOfCrossesCreated) {
-
 		Set<Integer> hybridMethods = Sets.newHashSet(416, 417, 418, 419, 426, 321);
 
 		for (Integer crossGID : gidsOfCrossesCreated) {
-
 			Germplasm cross = this.germplasmDAO.getById(crossGID);
+			LOG.info("Processing group inheritance for germplasm cross {}.", cross);
 			Germplasm parent1 = this.germplasmDAO.getById(cross.getGpid1());
 			Germplasm parent2 = this.germplasmDAO.getById(cross.getGpid2());
 
-			// Is the crossing method hybrid?
 			if (hybridMethods.contains(cross.getMethodId())) {
+				LOG.info("Breeding method of the cross is hybrid.");
 				boolean parent1HasMGID = parent1.getMgid() != null && parent1.getMgid() != 0;
 				boolean parent2HasMGID = parent2.getMgid() != null && parent2.getMgid() != 0;
 				boolean bothParentsHaveMGID = parent1HasMGID && parent2HasMGID;
 
-				// Do both parents have MGIDs?
 				if (bothParentsHaveMGID) {
-
+					LOG.info("Both parents have MGIDs. Parent1 mgid {}. Parent2 mgid {}", parent1.getMgid(), parent2.getMgid());
 					List<Germplasm> previousCrosses = this.germplasmDAO.getPreviousCrosses(parent1.getGid(), parent2.getGid());
 					boolean crossingFirstTime = previousCrosses.isEmpty();
 					if (crossingFirstTime) {
-						// Crossing for the first time. Cross starts new group. Copy GID to MGID.
+						LOG.info("Crossing for the first time. Cross starts new group. Copying gid {} to mgid.");
 						cross.setMgid(cross.getGid());
 					} else {
 						// Not the first time cross. Assign MGID of previous cross to new cross.
 						// When there are multiple previous crosses, we choose the oldest created cross with MGID as preference.
+						LOG.info("Previous crosses exist: {}.", previousCrosses);
 						Germplasm previousCrossSelected = null;
 						for (Germplasm previousCross : previousCrosses) {
 							if (previousCross.getMgid() != null && previousCross.getMgid() != 0) {
@@ -187,16 +186,21 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 						}
 
 						if (previousCrossSelected != null) {
+							LOG.info("Assigning mgid {} from previous cross gid {}.", previousCrossSelected.getMgid(),
+									previousCrossSelected.getGid());
 							cross.setMgid(previousCrossSelected.getMgid());
 							copySelectionHistoryForCross(cross, previousCrossSelected);
+						} else {
+							LOG.info("Previous crosses exist but there is none with MGID.");
+							// TODO check if doing nothing is fine in this case.
 						}
 					}
 					this.germplasmDAO.save(cross);
 				} else {
-					// Both parents don't have MGIDs. Cross does not inherit MGID.
+					LOG.info("Both parents don't have MGIDs. Cross does not inherit MGID.");
 				}
 			} else {
-				// Breeding method not hybrid. Cross does not inherit MGID.
+				LOG.info("Breeding method is not hybrid. Cross does not inherit MGID.");
 			}
 		}
 	}
