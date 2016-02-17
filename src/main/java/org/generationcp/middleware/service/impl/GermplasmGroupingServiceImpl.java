@@ -104,7 +104,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 	}
 
-	private void copySelectionHistory(Germplasm germplasm) {
+	public void copySelectionHistory(Germplasm germplasm) {
 		List<Name> names = this.nameDAO.getByGIDWithFilters(germplasm.getGid(), null, GermplasmNameType.SELECTION_HISTORY);
 
 		if (!names.isEmpty()) {

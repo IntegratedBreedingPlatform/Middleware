@@ -25,4 +25,13 @@ public interface GermplasmGroupingService {
 	 * @param gidsOfCrossesCreated
 	 */
 	void processGroupInheritanceForCrosses(List<Integer> gidsOfCrossesCreated);
+
+	/**
+	 * Service to copy parental selection history name to the submitted germplasm
+	 * 
+	 * @param germplasm - the germplasm to copy to
+	 * 
+	 */
+	void copySelectionHistory(Germplasm germplasm);
+
 }
