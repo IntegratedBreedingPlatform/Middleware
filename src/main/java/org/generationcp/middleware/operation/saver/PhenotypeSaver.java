@@ -25,7 +25,6 @@ import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ontology.VariableCache;
@@ -45,7 +44,7 @@ public class PhenotypeSaver extends Saver {
 		super(sessionProviderForLocal);
 	}
 
-	public void savePhenotypes(final ExperimentModel experimentModel, final VariableList variates) throws MiddlewareQueryException {
+	public void savePhenotypes(final ExperimentModel experimentModel, final VariableList variates) {
 		Map<Integer, PhenotypeExceptionDto> exceptions = null;
 		if (variates != null && variates.getVariables() != null && !variates.getVariables().isEmpty()) {
 			for (final Variable variable : variates.getVariables()) {
@@ -67,7 +66,7 @@ public class PhenotypeSaver extends Saver {
 		}
 	}
 
-	public void save(final int experimentId, final Variable variable) throws MiddlewareQueryException {
+	public void save(final int experimentId, final Variable variable) {
 		Phenotype phenotype = this.createPhenotype(variable);
 		if (phenotype != null) {
 			phenotype = this.getPhenotypeDao().save(phenotype);
@@ -77,12 +76,12 @@ public class PhenotypeSaver extends Saver {
 	}
 
 	public void saveOrUpdate(final int experimentId, final Integer variableId, final String value, final Phenotype oldPhenotype,
-			final Integer dataTypeId) throws MiddlewareQueryException {
+			final Integer dataTypeId) {
 		final Phenotype phenotype = this.createPhenotype(variableId, value, oldPhenotype, dataTypeId);
 		this.saveOrUpdate(experimentId, phenotype);
 	}
 
-	public void savePhenotype(final int experimentId, final Variable variable) throws MiddlewareQueryException {
+	public void savePhenotype(final int experimentId, final Variable variable) {
 		final Phenotype phenotype = this.createPhenotype(variable);
 		if (phenotype != null) {
 			this.getPhenotypeDao().save(phenotype);
@@ -90,7 +89,7 @@ public class PhenotypeSaver extends Saver {
 		}
 	}
 
-	private Phenotype createPhenotype(final Variable variable) throws MiddlewareQueryException {
+	private Phenotype createPhenotype(final Variable variable) {
 		Phenotype phenotype = null;
 		if (variable.getValue() != null && !"".equals(variable.getValue().trim())) {
 
@@ -131,15 +130,14 @@ public class PhenotypeSaver extends Saver {
 		return phenotype;
 	}
 
-	private void saveOrUpdate(final int experimentId, final Phenotype phenotype) throws MiddlewareQueryException {
+	private void saveOrUpdate(final int experimentId, final Phenotype phenotype) {
 		if (phenotype != null) {
 			this.getPhenotypeDao().merge(phenotype);
 			this.saveOrUpdateExperimentPhenotype(experimentId, phenotype.getPhenotypeId());
 		}
 	}
 
-	protected Phenotype createPhenotype(final Integer variableId, final String value, final Phenotype oldPhenotype, final Integer dataTypeId)
-			throws MiddlewareQueryException {
+	protected Phenotype createPhenotype(final Integer variableId, final String value, final Phenotype oldPhenotype, final Integer dataTypeId) {
 
 		if ((value == null || "".equals(value.trim())) && (oldPhenotype == null || oldPhenotype.getPhenotypeId() == null)) {
 			return null;
@@ -177,8 +175,7 @@ public class PhenotypeSaver extends Saver {
 		return false;
 	}
 
-	private void setCategoricalVariatePhenotypeValues(final Phenotype phenotype, final String value, final Integer variableId)
-			throws MiddlewareQueryException {
+	private void setCategoricalVariatePhenotypeValues(final Phenotype phenotype, final String value, final Integer variableId) {
 		if (value == null || "".equals(value)) {
 			phenotype.setcValue(null);
 			phenotype.setValue(null);
@@ -207,7 +204,7 @@ public class PhenotypeSaver extends Saver {
 		return breedingMethod.getMcode();
 	}
 
-	protected Map<Integer, String> getPossibleValuesMap(final int variableId) throws MiddlewareQueryException {
+	protected Map<Integer, String> getPossibleValuesMap(final int variableId) {
 		final Map<Integer, String> possibleValuesMap = new HashMap<Integer, String>();
 		final CVTermRelationship scaleRelationship =
 				this.getCvTermRelationshipDao().getRelationshipBySubjectIdAndTypeId(variableId, TermId.HAS_SCALE.getId());
@@ -224,7 +221,7 @@ public class PhenotypeSaver extends Saver {
 		return possibleValuesMap;
 	}
 
-	private Phenotype getPhenotypeObject(final Phenotype oldPhenotype) throws MiddlewareQueryException {
+	private Phenotype getPhenotypeObject(final Phenotype oldPhenotype) {
 		Phenotype phenotype = oldPhenotype;
 		if (phenotype == null) {
 			phenotype = new Phenotype();
@@ -232,15 +229,15 @@ public class PhenotypeSaver extends Saver {
 		return phenotype;
 	}
 
-	private void saveExperimentPhenotype(final int experimentId, final int phenotypeId) throws MiddlewareQueryException {
+	private void saveExperimentPhenotype(final int experimentId, final int phenotypeId) {
 		this.getExperimentPhenotypeDao().save(this.createExperimentPhenotype(experimentId, phenotypeId));
 	}
 
-	private void saveOrUpdateExperimentPhenotype(final int experimentId, final int phenotypeId) throws MiddlewareQueryException {
+	private void saveOrUpdateExperimentPhenotype(final int experimentId, final int phenotypeId) {
 		this.getExperimentPhenotypeDao().merge(this.createExperimentPhenotype(experimentId, phenotypeId));
 	}
 
-	private ExperimentPhenotype createExperimentPhenotype(final int experimentId, final int phenotypeId) throws MiddlewareQueryException {
+	private ExperimentPhenotype createExperimentPhenotype(final int experimentId, final int phenotypeId) {
 		ExperimentPhenotype experimentPhenotype = this.getExperimentPhenotypeDao().getbyExperimentAndPhenotype(experimentId, phenotypeId);
 
 		if (experimentPhenotype == null || experimentPhenotype.getExperimentPhenotypeId() == null) {
@@ -252,8 +249,7 @@ public class PhenotypeSaver extends Saver {
 
 	}
 
-	public void saveOrUpdatePhenotypeValue(final int projectId, final int variableId, final String value, final int dataTypeId)
-			throws MiddlewareQueryException {
+	public void saveOrUpdatePhenotypeValue(final int projectId, final int variableId, final String value, final int dataTypeId) {
 		if (value != null) {
 			boolean isInsert = false;
 			Integer phenotypeId = this.getPhenotypeDao().getPhenotypeIdByProjectAndType(projectId, variableId);
