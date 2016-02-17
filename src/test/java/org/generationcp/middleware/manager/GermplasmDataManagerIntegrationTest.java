@@ -52,7 +52,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 // TODO This test heavily assumes Rice genealogy data being present. Needs complete revision to seed the test data it needs before starting.
-public class GermplasmDataManagerImplTest extends IntegrationTestBase {
+public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	@Autowired
 	private PedigreeService pedigreeService;
@@ -1060,7 +1060,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 	 */
 	@Test
 	public void testShouldLoadAndProcessLargeGermplasmNamePermutations() throws Exception{
-		final String fileLocation = GermplasmDataManagerImplTest.class.getClassLoader().getResource("germplasm_designation_name_list.txt").getFile();
+		final String fileLocation = GermplasmDataManagerIntegrationTest.class.getClassLoader().getResource("germplasm_designation_name_list.txt").getFile();
 		final List<String> nameList = FileUtils.readLines(new File(fileLocation));
 
 		final Map<String, Integer> mapCountByNamePermutations = this.germplasmDataManager.getCountByNamePermutations(nameList);
