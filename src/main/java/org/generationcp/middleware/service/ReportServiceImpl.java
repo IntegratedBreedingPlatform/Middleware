@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ReportServiceImpl extends Service implements ReportService {
 
-	private final ReporterFactory factory = ReporterFactory.instance();
+    private final ReporterFactory factory = ReporterFactory.instance();
 
 	public ReportServiceImpl() {
 		super();
@@ -75,20 +75,18 @@ public class ReportServiceImpl extends Service implements ReportService {
 		return reporter;
 	}
 
-    @Override
-    public Reporter getStreamGermplasmListReport(String code, Integer germplasmListID, String programName, final OutputStream output)
-            throws MiddlewareException, JRException, IOException, BuildReportException {
-        final Reporter reporter = this.factory.createReporter(code);
-        final Map<String, Object> data = this.extractGermplasmListData(germplasmListID);
-        data.put(AbstractReporter.PROGRAM_NAME_ARG_KEY, programName);
+	@Override
+	public Reporter getStreamGermplasmListReport(final String code, final Integer germplasmListID, final String programName, final OutputStream output)
+			throws MiddlewareException, JRException, IOException, BuildReportException {
+		final Reporter reporter = this.factory.createReporter(code);
+		final Map<String, Object> data = this.extractGermplasmListData(germplasmListID);
+		data.put(AbstractReporter.PROGRAM_NAME_ARG_KEY, programName);
 
-        reporter.buildJRPrint(data);
-        reporter.asOutputStream(output);
+		reporter.buildJRPrint(data);
+		reporter.asOutputStream(output);
 
-        return reporter;
-    }
-
-
+		return reporter;
+	}
 
 	/**
 	 * Creates a Map containing all information needed to generate a report.
@@ -116,13 +114,13 @@ public class ReportServiceImpl extends Service implements ReportService {
 		return dataBeans;
 	}
 
-    protected Map<String, Object> extractGermplasmListData(Integer germplasmListID) {
-        // currently, only a blank map is returned as the current requirements for germplasm reports do not require dynamic data
-        Map<String, Object> params = new HashMap<>();
-        params.put(AbstractReporter.STUDY_CONDITIONS_KEY, new ArrayList<MeasurementVariable>());
-        params.put(AbstractReporter.DATA_SOURCE_KEY, new ArrayList());
-        return params;
-    }
+	protected Map<String, Object> extractGermplasmListData(final Integer germplasmListID) {
+		// currently, only a blank map is returned as the current requirements for germplasm reports do not require dynamic data
+		final Map<String, Object> params = new HashMap<>();
+		params.put(AbstractReporter.STUDY_CONDITIONS_KEY, new ArrayList<MeasurementVariable>());
+		params.put(AbstractReporter.DATA_SOURCE_KEY, new ArrayList());
+		return params;
+	}
 
 	protected List<MeasurementVariable> appendCountryInformation(final List<MeasurementVariable> originalConditions) {
 		Integer locationId = null;
@@ -181,43 +179,53 @@ public class ReportServiceImpl extends Service implements ReportService {
 		return this.factory.getReportKeys();
 	}
 
-    /**
+	/**
 	 * Local method to add information about male and female parents. The information is appended in the form of new {@link MeasurementData}
 	 * elements for each {@link MeasurementRow} provided
 	 * 
 	 * @param studyId the id for the study which the observations belong to.
 	 * @param observations List of rows representing entries in a study, in which parent information will be appended
 	 */
-	private void appendParentsInformation(final Integer studyId, final List<MeasurementRow> observations) throws MiddlewareQueryException {
+	protected void appendParentsInformation(final Integer studyId, final List<MeasurementRow> observations) throws MiddlewareQueryException {
 		// put germNodes extraction
 		final Map<Integer, GermplasmPedigreeTreeNode> germNodes = this.getGermplasmDataManager().getDirectParentsForStudy(studyId);
 
 		for (final MeasurementRow row : observations) {
 			final int gid = Integer.valueOf(row.getMeasurementDataValue("GID"));
 			final GermplasmPedigreeTreeNode germNode = germNodes.get(gid);
-			if (germNode != null) {
-				final Germplasm germplasm = germNode.getGermplasm();
 
-				if (germplasm.getGrplce() >= 0 & germNode.getLinkedNodes().size() == 2) { // is geneative and has parents
-					final Germplasm female = germNode.getLinkedNodes().get(0).getGermplasm();
-					final Germplasm male = germNode.getLinkedNodes().get(1).getGermplasm();
-
-					// TODO: pending values for origin of the entries
-					row.getDataList().add(new MeasurementData("f_selHist", female.getSelectionHistory()));
-					row.getDataList().add(new MeasurementData("f_cross_name", female.getSelectionHistory()));
-					row.getDataList().add(new MeasurementData("f_tabbr", "NA")); // put source trial abbreviation
-					row.getDataList().add(new MeasurementData("f_locycle", "NA")); // put source trial cycle
-					row.getDataList().add(new MeasurementData("f_ent", "0")); // put source trial entry
-					row.getDataList().add(new MeasurementData("f_lid", "0")); // put source location id
-
-					row.getDataList().add(new MeasurementData("m_selHist", male.getSelectionHistory()));
-					row.getDataList().add(new MeasurementData("m_cross_name", male.getSelectionHistory()));
-					row.getDataList().add(new MeasurementData("m_tabbr", "NA")); // put source trial abbreviation
-					row.getDataList().add(new MeasurementData("m_locycle", "NA")); // put source trial cycle
-					row.getDataList().add(new MeasurementData("m_ent", "0")); // put source trial entry
-					row.getDataList().add(new MeasurementData("m_lid", "0")); // put source location id
-				}
+			if (germNode == null) {
+				continue;
 			}
+
+			if (germNode.getLinkedNodes().size() == 2) {
+                final GermplasmPedigreeTreeNode femaleNode = germNode.getLinkedNodes().get(0);
+                final GermplasmPedigreeTreeNode maleNode = germNode.getLinkedNodes().get(1);
+				final Germplasm female = femaleNode == null ? null : femaleNode.getGermplasm();
+				final Germplasm male = maleNode == null ? null : maleNode.getGermplasm();
+
+				// TODO: pending values for origin of the entries (most likely resolved in BMS-2211)
+				row.getDataList().add(
+						new MeasurementData(AbstractReporter.FEMALE_SELECTION_HISTORY_KEY, female == null ? "" : female
+								.getSelectionHistory()));
+				row.getDataList().add(
+						new MeasurementData(AbstractReporter.FEMALE_CROSS_NAME_KEY, female == null ? "" : female.getSelectionHistory()));
+				row.getDataList().add(new MeasurementData(AbstractReporter.FEMALE_TRIAL_ABBREVIATION_KEY, "NA"));
+				row.getDataList().add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_CYCLE_KEY, "NA"));
+				row.getDataList().add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_ENTRY_KEY, "0"));
+				row.getDataList().add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_LOCATION_ID_KEY, "0"));
+
+				row.getDataList().add(
+						new MeasurementData(AbstractReporter.MALE_SELECTION_HISTORY_KEY, male == null ? "" : male.getSelectionHistory()));
+				row.getDataList().add(
+						new MeasurementData(AbstractReporter.MALE_CROSS_NAME_KEY, male == null ? "" : male.getSelectionHistory()));
+
+				row.getDataList().add(new MeasurementData(AbstractReporter.MALE_TRIAL_ABBREVIATION_KEY, "NA"));
+				row.getDataList().add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_CYCLE_KEY, "NA"));
+				row.getDataList().add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_ENTRY_KEY, "0"));
+				row.getDataList().add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_LOCATION_ID_KEY, "0"));
+			}
+
 		}
 	}
 }
