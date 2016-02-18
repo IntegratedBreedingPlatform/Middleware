@@ -529,8 +529,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			return children;
 		} catch (HibernateException e) {
-			final String message = "Error with getAllChildren(gid=" + gid + ") query from Germplasm: " + e.getMessage();
-			LOG.error(message, e);
+			final String message = "Error executing GermplasmDAO.getAllChildren(gid={}) : {}";
+			LOG.error(message, gid, e.getMessage());
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
@@ -555,8 +555,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			List<Germplasm> previousCrosses = criteria.getExecutableCriteria(getSession()).list();
 			return previousCrosses;
 		} catch (HibernateException e) {
-			final String message = "Error executing getPreviousCrosses(parent1Gid={}, parent2Gid={}) query: {}";
-			LOG.error(message, parentA, parenB, e);
+			final String message = "Error executing GermplasmDAO.getPreviousCrosses(parent1Gid={}, parent2Gid={}): {}";
+			LOG.error(message, parentA, parenB, e.getMessage());
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
