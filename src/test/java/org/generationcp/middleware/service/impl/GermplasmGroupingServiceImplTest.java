@@ -147,11 +147,11 @@ public class GermplasmGroupingServiceImplTest {
 	}
 
 	/**
-	 * Basic scenario with data available to go through all main logic steps. Cross with hybrid method, both parents containing mgid,
+	 * First basic scenario with data available to go through all main logic steps. Cross with hybrid method, both parents containing mgid,
 	 * previous crosses existing with mgid.
 	 */
 	@Test
-	public void testProcessGroupInheritanceForCrosses() {
+	public void testProcessGroupInheritanceForCrosses1() {
 
 		Integer crossGid1 = 1;
 		Integer crossGid1Parent1 = 11, crossGid1Parent1MGID = 111;
@@ -190,8 +190,125 @@ public class GermplasmGroupingServiceImplTest {
 		this.germplasmGroupingService.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1, crossGid2));
 
 		Assert.assertEquals("Expected new cross to be assigned MGID from previous cross.", previousCrossMGID, crossGermplasm1.getMgid());
+
+		// Previous crosses should be queried once.
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).getPreviousCrosses(crossGid1Parent1, crossGid1Parent2);
+		// Selection history from previous cross should be copied to the cross once
 		Mockito.verify(this.nameDAO, Mockito.times(1)).save(Mockito.any(Name.class));
+		// One Germplasm record should be saved out of the two that are passed.
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).save(Mockito.any(Germplasm.class));
+	}
+
+	/**
+	 * Basic scenario with data available to go through all main logic steps. Cross with hybrid method, both parents containing mgid, no
+	 * previous crosses existing.
+	 */
+	@Test
+	public void testProcessGroupInheritanceForCrosses2() {
+
+		Integer crossGid1 = 1;
+		Integer crossGid1Parent1 = 11, crossGid1Parent1MGID = 111;
+		Integer crossGid1Parent2 = 12, crossGid1Parent2MGID = 112;
+		Integer hybridMethodId = 416;
+
+		Germplasm crossGermplasm1 = new Germplasm(crossGid1);
+		crossGermplasm1.setMethodId(hybridMethodId);
+		crossGermplasm1.setGpid1(crossGid1Parent1);
+		crossGermplasm1.setGpid2(crossGid1Parent2);
+		crossGermplasm1.setMgid(0);
+		Mockito.when(this.germplasmDAO.getById(crossGid1)).thenReturn(crossGermplasm1);
+
+		Germplasm crossGermplasm1Parent1 = new Germplasm(crossGid1Parent1);
+		crossGermplasm1Parent1.setMgid(crossGid1Parent1MGID);
+		Mockito.when(this.germplasmDAO.getById(crossGid1Parent1)).thenReturn(crossGermplasm1Parent1);
+
+		Germplasm crossGermplasm1Parent2 = new Germplasm(crossGid1Parent2);
+		crossGermplasm1Parent2.setMgid(crossGid1Parent2MGID);
+		Mockito.when(this.germplasmDAO.getById(crossGid1Parent2)).thenReturn(crossGermplasm1Parent2);
+
+		// Just to test, create another cross with non-hybrid method. Expect this to not be processed.
+		Integer crossGid2 = 2;
+		Integer nonHybridMethodId = 416;
+		Germplasm crossGermplasm2 = new Germplasm(crossGid2);
+		crossGermplasm1.setMethodId(nonHybridMethodId);
+		Mockito.when(this.germplasmDAO.getById(crossGid2)).thenReturn(crossGermplasm2);
+
+		this.germplasmGroupingService.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1, crossGid2));
+
+		Assert.assertEquals("Expected new cross to be assigned MGID = GID of the cross when no previous crosses exist.", crossGid1,
+				crossGermplasm1.getMgid());
+		// Previous crosses should be queried once.
+		Mockito.verify(this.germplasmDAO, Mockito.times(1)).getPreviousCrosses(crossGid1Parent1, crossGid1Parent2);
+		// No selection history should be copied.
+		Mockito.verify(this.nameDAO, Mockito.never()).save(Mockito.any(Name.class));
+		// One Germplasm record should be saved out of the two that are passed.
+		Mockito.verify(this.germplasmDAO, Mockito.times(1)).save(Mockito.any(Germplasm.class));
+	}
+
+	/**
+	 * Edge scenario method is hybrid but both parents don't have MGID.
+	 */
+	@Test
+	public void testProcessGroupInheritanceForCrosses3() {
+
+		Integer crossGid1 = 1;
+		Integer crossGid1Parent1 = 11;
+		Integer crossGid1Parent2 = 12;
+		Integer hybridMethodId = 416;
+
+		Germplasm crossGermplasm1 = new Germplasm(crossGid1);
+		crossGermplasm1.setMethodId(hybridMethodId);
+		crossGermplasm1.setGpid1(crossGid1Parent1);
+		crossGermplasm1.setGpid2(crossGid1Parent2);
+		crossGermplasm1.setMgid(0);
+		Mockito.when(this.germplasmDAO.getById(crossGid1)).thenReturn(crossGermplasm1);
+
+		Germplasm crossGermplasm1Parent1 = new Germplasm(crossGid1Parent1);
+		crossGermplasm1Parent1.setMgid(null);
+		Mockito.when(this.germplasmDAO.getById(crossGid1Parent1)).thenReturn(crossGermplasm1Parent1);
+
+		Germplasm crossGermplasm1Parent2 = new Germplasm(crossGid1Parent2);
+		crossGermplasm1Parent2.setMgid(null);
+		Mockito.when(this.germplasmDAO.getById(crossGid1Parent2)).thenReturn(crossGermplasm1Parent2);
+
+
+		this.germplasmGroupingService.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1));
+
+		Assert.assertEquals("Expected no MGID change.", new Integer(0), crossGermplasm1.getMgid());
+		// Previous crosses should never be queried.
+		Mockito.verify(this.germplasmDAO, Mockito.never()).getPreviousCrosses(crossGid1Parent1, crossGid1Parent2);
+		// No selection history should be copied.
+		Mockito.verify(this.nameDAO, Mockito.never()).save(Mockito.any(Name.class));
+		// No Germplasm record should be saved.
+		Mockito.verify(this.germplasmDAO, Mockito.never()).save(Mockito.any(Germplasm.class));
+	}
+
+	/**
+	 * Edge scenario method is not hybrid.
+	 */
+	@Test
+	public void testProcessGroupInheritanceForCrosses4() {
+
+		Integer crossGid1 = 1;
+		Integer crossGid1Parent1 = 11;
+		Integer crossGid1Parent2 = 12;
+		Integer nonHybridMethodId = -999;
+
+		Germplasm crossGermplasm1 = new Germplasm(crossGid1);
+		crossGermplasm1.setMethodId(nonHybridMethodId);
+		crossGermplasm1.setGpid1(crossGid1Parent1);
+		crossGermplasm1.setGpid2(crossGid1Parent2);
+		crossGermplasm1.setMgid(0);
+		Mockito.when(this.germplasmDAO.getById(crossGid1)).thenReturn(crossGermplasm1);
+
+		this.germplasmGroupingService.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1));
+
+		Assert.assertEquals("Expected no MGID change.", new Integer(0), crossGermplasm1.getMgid());
+		// Previous crosses should never be queried.
+		Mockito.verify(this.germplasmDAO, Mockito.never()).getPreviousCrosses(crossGid1Parent1, crossGid1Parent2);
+		// No selection history should be copied.
+		Mockito.verify(this.nameDAO, Mockito.never()).save(Mockito.any(Name.class));
+		// No Germplasm record should be saved.
+		Mockito.verify(this.germplasmDAO, Mockito.never()).save(Mockito.any(Germplasm.class));
 	}
 }
