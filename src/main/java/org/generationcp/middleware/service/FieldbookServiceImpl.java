@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -69,6 +71,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.FieldbookListUtil;
 import org.generationcp.middleware.util.Util;
@@ -79,6 +82,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
+	
+	@Resource
+	private GermplasmGroupingService germplasmGroupingService;
 
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
 
@@ -333,7 +339,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					if (germplasm.getLgid() == null) {
 						germplasm.setLgid(germplasm.getGid() != null ? germplasm.getGid() : Integer.valueOf(0));
 					}
+					// SAVE Germplasm
 					germplasm = germplasmDao.save(germplasm);
+					// inherit selection history names of parent if part of a group
+					if(germplasm.getMgid() > 0) {
+						germplasmGroupingService.copySelectionHistory(germplasm);
+					}
 					// set Lgid to GID if it's value was not set previously
 					if (germplasm.getLgid().equals(Integer.valueOf(0))) {
 						germplasm.setLgid(germplasm.getGid());
@@ -1054,6 +1065,16 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public StandardVariable getStandardVariableByName(final String name, final String programUUID) {
 		return this.getStandardVariableBuilder().getByName(name, programUUID);
+	}
+
+	
+	GermplasmGroupingService getGermplasmGroupingService() {
+		return germplasmGroupingService;
+	}
+
+	
+	void setGermplasmGroupingService(GermplasmGroupingService germplasmGroupingService) {
+		this.germplasmGroupingService = germplasmGroupingService;
 	}
 
 }
