@@ -2,6 +2,7 @@
 package org.generationcp.middleware.service.impl;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -23,6 +24,9 @@ public class GermplasmGroupingServiceImplTest {
 	@Mock
 	private NameDAO nameDAO;
 
+	@Mock
+	private MethodDAO methodDAO;
+
 	private GermplasmGroupingServiceImpl germplasmGroupingService;
 
 	@Before
@@ -36,7 +40,7 @@ public class GermplasmGroupingServiceImplTest {
 				.thenReturn(
 				Lists.newArrayList(selectionHistoryName));
 
-		this.germplasmGroupingService = new GermplasmGroupingServiceImpl(this.germplasmDAO, this.nameDAO);
+		this.germplasmGroupingService = new GermplasmGroupingServiceImpl(this.germplasmDAO, this.nameDAO, this.methodDAO);
 	}
 
 	/**

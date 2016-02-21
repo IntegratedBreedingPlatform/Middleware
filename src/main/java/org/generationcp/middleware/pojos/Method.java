@@ -489,4 +489,8 @@ public class Method implements Serializable {
 		return false;
 	}
 
+	@Transient
+	public boolean isGenerative() {
+		return this.mtype != null && "GEN".equals(this.mtype.trim());
+	}
 }

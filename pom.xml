@@ -424,7 +424,9 @@
 						<include>**/QueryTest.java</include>
 						<include>**/StudyMeasurementsTest.java</include>
 						<include>**/DmsProjectDaoTest.java</include>
-
+						<include>**/GermplasmGroupingServiceImplTest.java</include>
+						<include>**/MethodTest.java</include>
+						
 						<!-- New Ontology Manager Tests -->
 						<include>**/CvTermDaoTest.java</include>
 						<include>**/StandardVariableTest.java</include>
