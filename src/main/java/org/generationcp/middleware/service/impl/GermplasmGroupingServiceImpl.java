@@ -150,6 +150,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 	}
 
+	// Rigorous INFO logging in this method is intentional. Currently we dont have good visualization tools in BMS to verify results of such
+	// complex operations. INFO LOGGing helps.
 	@Override
 	public void processGroupInheritanceForCrosses(List<Integer> gidsOfCrosses) {
 
@@ -157,10 +159,15 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			Germplasm cross = this.germplasmDAO.getById(crossGID);
 			Germplasm parent1 = this.germplasmDAO.getById(cross.getGpid1());
 			Germplasm parent2 = this.germplasmDAO.getById(cross.getGpid2());
-			LOG.info("Processing group inheritance for cross {}. Parent1 {}, Parent2 {}.", cross, parent1, parent2);
+			LOG.info("Processing group inheritance for cross: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.",
+					cross.getGid(), cross.getGpid1(), cross.getGpid2(), cross.getMgid(), cross.getMethodId());
+			LOG.info("Parent 1: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.", parent1.getGid(), parent1.getGpid1(),
+					parent1.getGpid2(), parent1.getMgid(), parent1.getMethodId());
+			LOG.info("Parent 2: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.", parent2.getGid(), parent2.getGpid1(),
+					parent2.getGpid2(), parent2.getMgid(), parent2.getMethodId());
 
 			if (Method.isHybrid(cross.getMethodId())) {
-				LOG.info("Breeding method of the cross is hybrid.");
+				LOG.info("Breeding method of the cross is {} which is hybrid.", cross.getMethod());
 				boolean parent1HasMGID = parent1.getMgid() != null && parent1.getMgid() != 0;
 				boolean parent2HasMGID = parent2.getMgid() != null && parent2.getMgid() != 0;
 				boolean bothParentsHaveMGID = parent1HasMGID && parent2HasMGID;
@@ -197,7 +204,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 					}
 					this.germplasmDAO.save(cross);
 				} else {
-					LOG.info("Both parents don't have MGIDs. Cross does not inherit MGID.");
+					LOG.info("Both parents do not have MGID. No MGID for cross to inherit.");
 				}
 			} else {
 				LOG.info("Breeding method is not hybrid. Cross does not inherit MGID.");
