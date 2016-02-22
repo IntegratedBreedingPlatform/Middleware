@@ -67,9 +67,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	private void traverseAssignGroup(GermplasmPedigreeTreeNode node, Integer groupId, boolean preserveExistingGroup) {
-		assignGroup(node.getGermplasm(), groupId, preserveExistingGroup);
-		for (GermplasmPedigreeTreeNode child : node.getLinkedNodes()) {
-			traverseAssignGroup(child, groupId, preserveExistingGroup);
+		boolean continueProcessing = assignGroup(node.getGermplasm(), groupId, preserveExistingGroup);
+		if (continueProcessing) {
+			for (GermplasmPedigreeTreeNode child : node.getLinkedNodes()) {
+				traverseAssignGroup(child, groupId, preserveExistingGroup);
+			}
 		}
 	}
 
@@ -93,7 +95,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		return node;
 	}
 
-	private void assignGroup(Germplasm germplasm, Integer groupId, boolean preserveExistingGroup) {
+	/**
+	 * Return value is a boolean flag that indicates whether further processing (descendants) should continue or not. Currenlty we stop
+	 * processing based on one rul: when we encounter generative germplasm.
+	 */
+	private boolean assignGroup(Germplasm germplasm, Integer groupId, boolean preserveExistingGroup) {
 
 		if (!preserveExistingGroup && germplasm.getMgid() != null && germplasm.getMgid() != 0 && !germplasm.getMgid().equals(groupId)) {
 			LOG.info("Gerplasm with gid [{}] already has mgid [{}]. Service has been asked to ignore it, and assign new mgid [{}].",
@@ -105,7 +111,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			LOG.info("Method {} ({}), of the germplasm (gid {}) is generative. MGID assignment for generative germplasm is not supported.",
 					germplasm.getMethodId(),
 					method.getMname(), germplasm.getGid());
-			return;
+			return false;
 		}
 
 		if (!preserveExistingGroup) {
@@ -113,7 +119,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			this.germplasmDAO.save(germplasm);
 			LOG.info("Saved mgid = [{}] for germplasm with gid = [{}]", germplasm.getMgid(), germplasm.getGid());
 			copySelectionHistory(germplasm);
+			return true;
 		}
+		return true;
 	}
 
 	public void copySelectionHistory(Germplasm germplasm) {

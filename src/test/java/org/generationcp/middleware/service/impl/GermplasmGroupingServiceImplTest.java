@@ -6,6 +6,7 @@ import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.junit.Assert;
 import org.junit.Before;
@@ -148,6 +149,69 @@ public class GermplasmGroupingServiceImplTest {
 
 		Mockito.verify(this.nameDAO, Mockito.times(3)).save(Mockito.any(Name.class));
 		Mockito.verify(this.germplasmDAO, Mockito.times(3)).save(Mockito.any(Germplasm.class));
+	}
+
+	/**
+	 * Method is generative for parent.
+	 */
+	@Test
+	public void testMarkFixedCase6() {
+		Germplasm germplasmToFix = new Germplasm(1);
+		Integer generativeMethodId = 123;
+		germplasmToFix.setMethodId(generativeMethodId);
+		Integer expectedParentMGID = 111;
+		germplasmToFix.setMgid(expectedParentMGID);
+
+		Method method = new Method(generativeMethodId);
+		method.setMtype("GEN");
+		Mockito.when(this.methodDAO.getById(generativeMethodId)).thenReturn(method);
+
+		Germplasm child1 = new Germplasm(2);
+		child1.setMgid(222);
+
+		Germplasm child2 = new Germplasm(3);
+		child2.setMgid(333);
+
+		Mockito.when(this.germplasmDAO.getAllChildren(germplasmToFix.getGid())).thenReturn(Lists.newArrayList(child1, child2));
+
+		this.germplasmGroupingService.markFixed(germplasmToFix, true, false);
+
+		Assert.assertEquals("Expecting no mgid changes when method is generative.", expectedParentMGID, germplasmToFix.getMgid());
+
+		Mockito.verify(this.nameDAO, Mockito.never()).save(Mockito.any(Name.class));
+		Mockito.verify(this.germplasmDAO, Mockito.never()).save(Mockito.any(Germplasm.class));
+	}
+
+	/**
+	 * Method is generative for one of the descendant.
+	 */
+	@Test
+	public void testMarkFixedCase7() {
+		Germplasm germplasmToFix = new Germplasm(1);
+
+		Integer generativeMethodId = 123;
+		Method method = new Method(generativeMethodId);
+		method.setMtype("GEN");
+		Mockito.when(this.methodDAO.getById(generativeMethodId)).thenReturn(method);
+
+		Germplasm child1 = new Germplasm(2);
+		child1.setMgid(222);
+
+		Germplasm child2 = new Germplasm(3);
+		Integer expectedChild2MGID = 333;
+		child2.setMgid(expectedChild2MGID);
+		child2.setMethodId(generativeMethodId);
+
+		Mockito.when(this.germplasmDAO.getAllChildren(germplasmToFix.getGid())).thenReturn(Lists.newArrayList(child1, child2));
+
+		this.germplasmGroupingService.markFixed(germplasmToFix, true, false);
+
+		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(), germplasmToFix.getMgid());
+		Assert.assertEquals("Expecting child1 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child1.getMgid());
+		Assert.assertEquals("Expecting child2 mgid to remain unchanged as method is generative.", expectedChild2MGID, child2.getMgid());
+
+		Mockito.verify(this.nameDAO, Mockito.times(2)).save(Mockito.any(Name.class));
+		Mockito.verify(this.germplasmDAO, Mockito.times(2)).save(Mockito.any(Germplasm.class));
 	}
 
 	/**
