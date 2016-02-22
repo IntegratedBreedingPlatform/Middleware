@@ -53,7 +53,7 @@ public enum GermplasmNameType {
 	UNRESOLVED_NAME(1027), //
 	CIMMYT_SELECTION_HISTORY(1028), //
 	CIMMYT_WHEAT_PEDIGREE(1029), //
-	SELECTION_HISTORY(1503), //
+	SELECTION_HISTORY(45), //
 	SELECTION_HISTORY_AT_FIXATION(44); // TODO update SELECTION_HISTORY_AT_FIXATION with actual record ID once it is known;
 
 	private final int userDefinedField;

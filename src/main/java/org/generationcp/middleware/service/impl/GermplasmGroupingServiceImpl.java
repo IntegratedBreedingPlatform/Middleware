@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -30,6 +31,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private NameDAO nameDAO;
 
+	private MethodDAO methodDAO;
+
 	public GermplasmGroupingServiceImpl() {
 
 	}
@@ -40,11 +43,15 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 		this.nameDAO = new NameDAO();
 		this.nameDAO.setSession(sessionProvider.getSession());
+
+		this.methodDAO = new MethodDAO();
+		this.methodDAO.setSession(sessionProvider.getSession());
 	}
 
-	public GermplasmGroupingServiceImpl(GermplasmDAO germplasmDAO, NameDAO nameDAO) {
+	public GermplasmGroupingServiceImpl(GermplasmDAO germplasmDAO, NameDAO nameDAO, MethodDAO methodDAO) {
 		this.germplasmDAO = germplasmDAO;
 		this.nameDAO = nameDAO;
+		this.methodDAO = methodDAO;
 	}
 
 	@Override
@@ -63,9 +70,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	private void traverseAssignGroup(GermplasmPedigreeTreeNode node, Integer groupId, boolean preserveExistingGroup) {
-		assignGroup(node.getGermplasm(), groupId, preserveExistingGroup);
-		for (GermplasmPedigreeTreeNode child : node.getLinkedNodes()) {
-			traverseAssignGroup(child, groupId, preserveExistingGroup);
+		boolean continueProcessing = assignGroup(node.getGermplasm(), groupId, preserveExistingGroup);
+		if (continueProcessing) {
+			for (GermplasmPedigreeTreeNode child : node.getLinkedNodes()) {
+				traverseAssignGroup(child, groupId, preserveExistingGroup);
+			}
 		}
 	}
 
@@ -89,11 +98,23 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		return node;
 	}
 
-	private void assignGroup(Germplasm germplasm, Integer groupId, boolean preserveExistingGroup) {
+	/**
+	 * Return value is a boolean flag that indicates whether further processing (descendants) should continue or not. Currenlty we stop
+	 * processing based on one rul: when we encounter generative germplasm.
+	 */
+	private boolean assignGroup(Germplasm germplasm, Integer groupId, boolean preserveExistingGroup) {
 
 		if (!preserveExistingGroup && germplasm.getMgid() != null && germplasm.getMgid() != 0 && !germplasm.getMgid().equals(groupId)) {
 			LOG.info("Gerplasm with gid [{}] already has mgid [{}]. Service has been asked to ignore it, and assign new mgid [{}].",
 					germplasm.getGid(), germplasm.getMgid(), groupId);
+		}
+
+		Method method = this.methodDAO.getById(germplasm.getMethodId());
+		if (method != null && method.isGenerative()) {
+			LOG.info("Method {} ({}), of the germplasm (gid {}) is generative. MGID assignment for generative germplasm is not supported.",
+					germplasm.getMethodId(),
+					method.getMname(), germplasm.getGid());
+			return false;
 		}
 
 		if (!preserveExistingGroup) {
@@ -101,7 +122,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			this.germplasmDAO.save(germplasm);
 			LOG.info("Saved mgid = [{}] for germplasm with gid = [{}]", germplasm.getMgid(), germplasm.getGid());
 			copySelectionHistory(germplasm);
+			return true;
 		}
+		return true;
 	}
 
 	public void copySelectionHistory(Germplasm germplasm) {
@@ -150,6 +173,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 	}
 
+	// Rigorous INFO logging in this method is intentional. Currently we dont have good visualization tools in BMS to verify results of such
+	// complex operations. INFO LOGGing helps.
 	@Override
 	public void processGroupInheritanceForCrosses(List<Integer> gidsOfCrosses) {
 
@@ -157,10 +182,24 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			Germplasm cross = this.germplasmDAO.getById(crossGID);
 			Germplasm parent1 = this.germplasmDAO.getById(cross.getGpid1());
 			Germplasm parent2 = this.germplasmDAO.getById(cross.getGpid2());
-			LOG.info("Processing group inheritance for cross {}. Parent1 {}, Parent2 {}.", cross, parent1, parent2);
+
+			if (cross != null) {
+				LOG.info("Processing group inheritance for cross: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.",
+					cross.getGid(), cross.getGpid1(), cross.getGpid2(), cross.getMgid(), cross.getMethodId());
+			}
+
+			if (parent1 != null) {
+				LOG.info("Parent 1: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.", parent1.getGid(), parent1.getGpid1(),
+					parent1.getGpid2(), parent1.getMgid(), parent1.getMethodId());
+			}
+
+			if (parent2 != null) {
+				LOG.info("Parent 2: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.", parent2.getGid(), parent2.getGpid1(),
+					parent2.getGpid2(), parent2.getMgid(), parent2.getMethodId());
+			}
 
 			if (Method.isHybrid(cross.getMethodId())) {
-				LOG.info("Breeding method of the cross is hybrid.");
+				LOG.info("Breeding method of the cross is {} which is hybrid.", cross.getMethod());
 				boolean parent1HasMGID = parent1.getMgid() != null && parent1.getMgid() != 0;
 				boolean parent2HasMGID = parent2.getMgid() != null && parent2.getMgid() != 0;
 				boolean bothParentsHaveMGID = parent1HasMGID && parent2HasMGID;
@@ -197,7 +236,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 					}
 					this.germplasmDAO.save(cross);
 				} else {
-					LOG.info("Both parents don't have MGIDs. Cross does not inherit MGID.");
+					LOG.info("Both parents do not have MGID. No MGID for cross to inherit.");
 				}
 			} else {
 				LOG.info("Breeding method is not hybrid. Cross does not inherit MGID.");
