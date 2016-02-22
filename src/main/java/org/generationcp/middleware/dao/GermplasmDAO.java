@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +28,16 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Progenitor;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.LogicalExpression;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Germplasm}.
@@ -45,6 +53,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String Q_STANDARDIZED = "qStandardized";
 	private static final String AVAIL_INV = "availInv";
 	private static final String SEED_RES = "seedRes";
+
+	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDAO.class);
 
 	@Override
 	public Germplasm getById(Integer gid, boolean lock) throws MiddlewareQueryException {
@@ -489,6 +499,66 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 		return toreturn;
 
+	}
+
+	public List<Germplasm> getAllChildren(Integer gid) {
+		try {
+			// Find the main children via gpid1 and gpid2
+			DetachedCriteria criteria = DetachedCriteria.forClass(Germplasm.class);
+			criteria.add(Restrictions.or(Restrictions.eq("gpid1", gid), Restrictions.eq("gpid2", gid))); // = either parent is given gid
+			criteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged
+			criteria.add(Restrictions.neProperty("gid", "grplce")); // = Record is not deleted or replaced.
+			
+			@SuppressWarnings("unchecked")
+			List<Germplasm> children = criteria.getExecutableCriteria(getSession()).list();
+
+			// Find additional children via progenitor linkage
+			DetachedCriteria otherChildrenCriteria = DetachedCriteria.forClass(Progenitor.class);
+			otherChildrenCriteria.add(Restrictions.eq("pid", gid));
+			
+			@SuppressWarnings("unchecked")
+			List<Progenitor> otherChildren = otherChildrenCriteria.getExecutableCriteria(getSession()).list();
+			Set<Integer> otherChildrenGids = new HashSet<>();
+			for (Progenitor progenitor : otherChildren) {
+				otherChildrenGids.add(progenitor.getProgntrsPK().getGid());
+			}
+
+			if (!otherChildrenGids.isEmpty()) {
+				children.addAll(getByGIDList(new ArrayList<>(otherChildrenGids)));
+			}
+
+			return children;
+		} catch (HibernateException e) {
+			final String message = "Error executing GermplasmDAO.getAllChildren(gid={}) : {}";
+			LOG.error(message, gid, e.getMessage());
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<Germplasm> getPreviousCrosses(Integer parentA, Integer parenB) {
+		try {
+			DetachedCriteria criteria = DetachedCriteria.forClass(Germplasm.class);
+
+			LogicalExpression aMaleBFemale =
+					Restrictions.and(Restrictions.eq("gpid1", parentA), Restrictions.eq("gpid2", parenB));
+
+			LogicalExpression aFemaleBMale =
+					Restrictions.and(Restrictions.eq("gpid1", parenB), Restrictions.eq("gpid2", parentA));
+
+			criteria.add(Restrictions.or(aMaleBFemale, aFemaleBMale));
+			criteria.add(Restrictions.eq("gnpgs", 2)); // restrict to cases where two parents are involved.
+			criteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged.
+			criteria.add(Restrictions.neProperty("gid", "grplce")); // = Record is not deleted or replaced.
+			criteria.addOrder(Order.asc("gid")); // oldest created cross will be first in list.
+
+			@SuppressWarnings("unchecked")
+			List<Germplasm> previousCrosses = criteria.getExecutableCriteria(getSession()).list();
+			return previousCrosses;
+		} catch (HibernateException e) {
+			final String message = "Error executing GermplasmDAO.getPreviousCrosses(parent1Gid={}, parent2Gid={}): {}";
+			LOG.error(message, parentA, parenB, e.getMessage());
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 
 	public String getNextSequenceNumberForCrossName(String prefix) throws MiddlewareQueryException {
