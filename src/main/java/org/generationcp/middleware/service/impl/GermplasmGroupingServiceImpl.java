@@ -43,6 +43,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 		this.nameDAO = new NameDAO();
 		this.nameDAO.setSession(sessionProvider.getSession());
+
+		this.methodDAO = new MethodDAO();
+		this.methodDAO.setSession(sessionProvider.getSession());
 	}
 
 	public GermplasmGroupingServiceImpl(GermplasmDAO germplasmDAO, NameDAO nameDAO, MethodDAO methodDAO) {
