@@ -454,13 +454,19 @@ public class Germplasm implements Serializable {
 	}
 
 	/**
-	 * @return The type of genesis and number of progenitors.For a derivative process GNPGS =-1 and then GPID1 contains the germplasm
-	 *         groupID and GPID2 the source germplasm ID. For a generative process GNPGS containsthe number of specified parents. (The
-	 *         number of parents required by a method isrecorded by NPRGN on the METHODS TABLE). If GNPGS=1 or 2 then the IDs ofthe
-	 *         progenitors are contained in the GPID1 and GPID2 fields on the GERMPLSMtable. If GNPGS>2 then further IDs are stored on the
-	 *         PROGNTRS table. GNPGS =0 for land race or wild species collections or if none of the parents is known.GNPGS <= NPRGN, but
-	 *         some of the GNPGS specified parents may be unknown inwhich case the corresponding GPIDs are MISSING (0). For example in a
-	 *         simplecross with only male parent known, GNPGS would have to be 2 with GPID1=0 andGPD2 set to GID of the known male parent.
+	 * Represents the type of genesis and number of progenitors.
+	 * 
+	 * <ul>
+	 * <li>For a derivative process GNPGS = -1 and then GPID1 contains the germplasm groupID and GPID2 the source germplasm ID.</li>
+	 * 
+	 * <li>For a generative process GNPGS containsthe number of specified parents. (The number of parents required by a method isrecorded by
+	 * NPRGN on the METHODS TABLE). If GNPGS = 1 or 2 then the IDs ofthe progenitors are contained in the GPID1 and GPID2 fields on the
+	 * GERMPLSM table. If GNPGS>2 then further IDs are stored on the PROGNTRS table.</li>
+	 * 
+	 * <li>GNPGS = 0 for land race or wild species collections or if none of the parents is known.GNPGS <= NPRGN, but some of the GNPGS
+	 * specified parents may be unknown inwhich case the corresponding GPIDs are MISSING (0). For example in a simplecross with only male
+	 * parent known, GNPGS would have to be 2 with GPID1 = 0 and GPID2 set to GID of the known male parent.</li>
+	 * </ul>
 	 */
 	public Integer getGnpgs() {
 		return this.gnpgs;
