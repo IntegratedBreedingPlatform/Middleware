@@ -1,16 +1,17 @@
 
 package org.generationcp.middleware.service.impl;
 
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.generationcp.middleware.pojos.Germplasm;
 
 public class GermplasmGroupingResult {
 
 	private Integer founderGid;
 	private Integer groupMgid;
-	private final Set<Integer> groupMemberGids = new TreeSet<>();
+	private List<Germplasm> groupMembers = new ArrayList<>();
 
 	public Integer getFounderGid() {
 		return this.founderGid;
@@ -28,18 +29,16 @@ public class GermplasmGroupingResult {
 		this.groupMgid = groupMgid;
 	}
 
-	public Set<Integer> getGroupMemberGids() {
-		return this.groupMemberGids;
+	public List<Germplasm> getGroupMembers() {
+		return this.groupMembers;
 	}
 
-	public void addGroupMemberGid(final Integer memberGid) {
-		if (memberGid != null) {
-			this.groupMemberGids.add(memberGid);
-		}
+	public void setGroupMembers(List<Germplasm> groupMembers) {
+		this.groupMembers = groupMembers;
 	}
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).append(this.founderGid).append(this.groupMgid).append(this.groupMemberGids).toString();
+		return new ToStringBuilder(this).append(this.founderGid).append(this.groupMgid).append(this.groupMembers).toString();
 	}
 }

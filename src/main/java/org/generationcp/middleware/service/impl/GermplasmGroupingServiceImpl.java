@@ -59,27 +59,29 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	public GermplasmGroupingResult markFixed(Germplasm germplasmToFix, boolean includeDescendants, boolean preserveExistingGroup) {
 		LOG.info("Marking germplasm with gid {} as fixed.", germplasmToFix.getGid());
 
-		GermplasmGroupingResult groupingResult = new GermplasmGroupingResult();
-		groupingResult.setFounderGid(germplasmToFix.getGid());
 		if (includeDescendants) {
 			GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
 			LOG.info("Building descendant tree for gid {} for assigning group (mgid).", germplasmToFix.getGid());
 			tree.setRoot(buildDescendantsTree(germplasmToFix, 1));
-			traverseAssignGroup(tree.getRoot(), germplasmToFix.getGid(), preserveExistingGroup, groupingResult);
+			traverseAssignGroup(tree.getRoot(), germplasmToFix.getGid(), preserveExistingGroup);
 		} else {
-			assignGroup(germplasmToFix, germplasmToFix.getGid(), preserveExistingGroup, groupingResult);
+			assignGroup(germplasmToFix, germplasmToFix.getGid(), preserveExistingGroup);
 		}
+
+		GermplasmGroupingResult groupingResult = new GermplasmGroupingResult();
+		groupingResult.setFounderGid(germplasmToFix.getGid());
+		groupingResult.setGroupMgid(germplasmToFix.getMgid());
+		groupingResult.setGroupMembers(this.germplasmDAO.getManagementNeighbors(germplasmToFix.getGid(), 0, Integer.MAX_VALUE));
 		return groupingResult;
 	}
 
-	private void traverseAssignGroup(GermplasmPedigreeTreeNode node, Integer groupId, boolean preserveExistingGroup,
-			GermplasmGroupingResult groupingResult) {
+	private void traverseAssignGroup(GermplasmPedigreeTreeNode node, Integer groupId, boolean preserveExistingGroup) {
 
-		boolean continueProcessing = assignGroup(node.getGermplasm(), groupId, preserveExistingGroup, groupingResult);
+		boolean continueProcessing = assignGroup(node.getGermplasm(), groupId, preserveExistingGroup);
 
 		if (continueProcessing) {
 			for (GermplasmPedigreeTreeNode child : node.getLinkedNodes()) {
-				traverseAssignGroup(child, groupId, preserveExistingGroup, groupingResult);
+				traverseAssignGroup(child, groupId, preserveExistingGroup);
 			}
 		}
 	}
@@ -108,7 +110,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	 * Return value is a boolean flag that indicates whether further processing (descendants) should continue or not. Currenlty we stop
 	 * processing based on one rul: when we encounter generative germplasm.
 	 */
-	private boolean assignGroup(Germplasm germplasm, Integer groupId, boolean preserveExistingGroup, GermplasmGroupingResult groupingResult) {
+	private boolean assignGroup(Germplasm germplasm, Integer groupId, boolean preserveExistingGroup) {
 
 		if (!preserveExistingGroup && germplasm.getMgid() != null && germplasm.getMgid() != 0 && !germplasm.getMgid().equals(groupId)) {
 			LOG.info("Gerplasm with gid [{}] already has mgid [{}]. Service has been asked to ignore it, and assign new mgid [{}].",
@@ -124,14 +126,14 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 
 		if (!preserveExistingGroup) {
+			LOG.info("Assigning mgid = [{}] for germplasm with gid = [{}]", groupId, germplasm.getGid());
 			germplasm.setMgid(groupId);
-			groupingResult.setGroupMgid(groupId);
-			groupingResult.addGroupMemberGid(germplasm.getGid());
 			this.germplasmDAO.save(germplasm);
-			LOG.info("Saved mgid = [{}] for germplasm with gid = [{}]", germplasm.getMgid(), germplasm.getGid());
 			copySelectionHistory(germplasm);
-			return true;
+		} else {
+			LOG.info("Retaining the existing mgid = [{}] for germplasm with gid = [{}] as it is.", germplasm.getMgid(), germplasm.getGid());
 		}
+
 		return true;
 	}
 
