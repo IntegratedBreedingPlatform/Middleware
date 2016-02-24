@@ -8,13 +8,14 @@ import java.util.TreeSet;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
@@ -33,6 +34,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private MethodDAO methodDAO;
 
+	private UserDefinedFieldDAO userDefinedFieldDAO;
+
 	public GermplasmGroupingServiceImpl() {
 
 	}
@@ -46,12 +49,17 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 		this.methodDAO = new MethodDAO();
 		this.methodDAO.setSession(sessionProvider.getSession());
+
+		this.userDefinedFieldDAO = new UserDefinedFieldDAO();
+		this.userDefinedFieldDAO.setSession(sessionProvider.getSession());
 	}
 
-	public GermplasmGroupingServiceImpl(GermplasmDAO germplasmDAO, NameDAO nameDAO, MethodDAO methodDAO) {
+	public GermplasmGroupingServiceImpl(GermplasmDAO germplasmDAO, NameDAO nameDAO, MethodDAO methodDAO,
+			UserDefinedFieldDAO userDefinedFieldDAO) {
 		this.germplasmDAO = germplasmDAO;
 		this.nameDAO = nameDAO;
 		this.methodDAO = methodDAO;
+		this.userDefinedFieldDAO = userDefinedFieldDAO;
 	}
 
 	@Override
@@ -137,15 +145,31 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		return true;
 	}
 
+	private String getSelectionHistory(Integer gid) {
+		List<Name> names = this.nameDAO.getByGIDWithFilters(gid, null, null);
+		UserDefinedField selectionHistoryNameType = this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", "SELHIS");
+
+		String matchingName = null;
+		if (!names.isEmpty() && selectionHistoryNameType != null) {
+			for (Name name : names) {
+				if (name.getTypeId().equals(selectionHistoryNameType.getFldno())) {
+					matchingName = name.getNval();
+					break;
+				}
+			}
+		}
+		return matchingName;
+	}
+
 	public void copySelectionHistory(Germplasm germplasm) {
-		List<Name> names = this.nameDAO.getByGIDWithFilters(germplasm.getGid(), null, GermplasmNameType.SELECTION_HISTORY);
 
-		if (!names.isEmpty()) {
-			String selectionHistoryNameValue = names.get(0).getNval();
+		String selectionHistoryNameValue = getSelectionHistory(germplasm.getGid());
 
+		if (selectionHistoryNameValue != null) {
 			Name selectionHistoryAtFixation = new Name();
 			selectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
-			selectionHistoryAtFixation.setTypeId(GermplasmNameType.SELECTION_HISTORY_AT_FIXATION.getUserDefinedFieldID());
+			UserDefinedField selHisFix = this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", "SELHISFIX");
+			selectionHistoryAtFixation.setTypeId(selHisFix.getFldno());
 			selectionHistoryAtFixation.setNval(selectionHistoryNameValue);
 			selectionHistoryAtFixation.setNstat(1);
 			selectionHistoryAtFixation.setUserId(1); // TODO get current user passed to the service and use here.
@@ -161,14 +185,14 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	private void copySelectionHistoryForCross(Germplasm cross, Germplasm previousCross) {
-		List<Name> names = this.nameDAO.getByGIDWithFilters(previousCross.getGid(), null, GermplasmNameType.SELECTION_HISTORY);
 
-		if (!names.isEmpty()) {
-			String selectionHistoryNameValue = names.get(0).getNval();
+		String selectionHistoryNameValue = getSelectionHistory(previousCross.getGid());
 
+		if (selectionHistoryNameValue != null) {
 			Name selectionHistoryOfPreviousCross = new Name();
 			selectionHistoryOfPreviousCross.setGermplasmId(cross.getGid());
-			selectionHistoryOfPreviousCross.setTypeId(GermplasmNameType.SELECTION_HISTORY_AT_FIXATION.getUserDefinedFieldID());
+			UserDefinedField selHisFix = this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", "SELHISFIX");
+			selectionHistoryOfPreviousCross.setTypeId(selHisFix.getFldno());
 			selectionHistoryOfPreviousCross.setNval(selectionHistoryNameValue);
 			selectionHistoryOfPreviousCross.setNstat(1);
 			selectionHistoryOfPreviousCross.setUserId(1); // TODO get current user passed to the service and use here.

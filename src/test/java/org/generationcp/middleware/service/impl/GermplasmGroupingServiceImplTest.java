@@ -4,10 +4,12 @@ package org.generationcp.middleware.service.impl;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,20 +30,30 @@ public class GermplasmGroupingServiceImplTest {
 	@Mock
 	private MethodDAO methodDAO;
 
+	@Mock
+	private UserDefinedFieldDAO userDefinedFieldDAO;
+
 	private GermplasmGroupingServiceImpl germplasmGroupingService;
 
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
 
-		final Name selectionHistoryName = new Name();
+		UserDefinedField selectionHistoryUDFLD = new UserDefinedField(123);
+		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", "SELHIS")).thenReturn(selectionHistoryUDFLD);
+
+		UserDefinedField selHisFixUDFLD = new UserDefinedField(123);
+		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", "SELHISFIX")).thenReturn(selHisFixUDFLD);
+
+		Name selectionHistoryName = new Name();
 		selectionHistoryName.setNval("SelectionHistory");
+		selectionHistoryName.setTypeId(selectionHistoryUDFLD.getFldno());
 
-		Mockito.when(this.nameDAO.getByGIDWithFilters(Mockito.anyInt(), Mockito.anyInt(), Mockito.eq(GermplasmNameType.SELECTION_HISTORY)))
-				.thenReturn(
-				Lists.newArrayList(selectionHistoryName));
+		Mockito.when(this.nameDAO.getByGIDWithFilters(Mockito.anyInt(), Mockito.anyInt(), Mockito.any(GermplasmNameType.class)))
+				.thenReturn(Lists.newArrayList(selectionHistoryName));
 
-		this.germplasmGroupingService = new GermplasmGroupingServiceImpl(this.germplasmDAO, this.nameDAO, this.methodDAO);
+		this.germplasmGroupingService =
+				new GermplasmGroupingServiceImpl(this.germplasmDAO, this.nameDAO, this.methodDAO, this.userDefinedFieldDAO);
 	}
 
 	/**
