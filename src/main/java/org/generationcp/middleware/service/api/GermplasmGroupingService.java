@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.api;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.service.impl.GermplasmGroupingResult;
 
 
 public interface GermplasmGroupingService {
@@ -16,8 +17,10 @@ public interface GermplasmGroupingService {
 	 * @param germplasm The germplasm to "fix".
 	 * @param includeDescendants Whether to include descendants in the new group being created.
 	 * @param preserveExistingGroup flag to indicate whether existing group (mgid) should be preserved.
+	 * 
+	 * @return {@link GermplasmGroupingResult} summary of the result of the grouping process.
 	 */
-	void markFixed(Germplasm germplasm, boolean includeDescendants, boolean preserveExistingGroup);
+	GermplasmGroupingResult markFixed(Germplasm germplasm, boolean includeDescendants, boolean preserveExistingGroup);
 
 	/**
 	 * Service to apply group (MGID) inheritance to newly created crosses.

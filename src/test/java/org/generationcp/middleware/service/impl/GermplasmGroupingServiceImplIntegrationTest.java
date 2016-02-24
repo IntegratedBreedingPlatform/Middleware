@@ -45,7 +45,7 @@ public class GermplasmGroupingServiceImplIntegrationTest extends IntegrationTest
 	public void testIntegration() {
 		Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(1);
 		GermplasmGroupingServiceImpl groupingService = new GermplasmGroupingServiceImpl(this.germplasmDAO, this.nameDAO, this.methodDAO);
-		groupingService.markFixed(germplasm, true, true);
+		groupingService.markFixed(germplasm, true, false);
 		// Fake statement for debugging.
 		Assert.assertTrue(true);
 	}
