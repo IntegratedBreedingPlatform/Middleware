@@ -463,9 +463,10 @@ public class Germplasm implements Serializable {
 	 * NPRGN on the METHODS TABLE). If GNPGS = 1 or 2 then the IDs ofthe progenitors are contained in the GPID1 and GPID2 fields on the
 	 * GERMPLSM table. If GNPGS>2 then further IDs are stored on the PROGNTRS table.</li>
 	 * 
-	 * <li>GNPGS = 0 for land race or wild species collections or if none of the parents is known.GNPGS <= NPRGN, but some of the GNPGS
-	 * specified parents may be unknown inwhich case the corresponding GPIDs are MISSING (0). For example in a simplecross with only male
-	 * parent known, GNPGS would have to be 2 with GPID1 = 0 and GPID2 set to GID of the known male parent.</li>
+	 * <li>GNPGS = 0 for <a href="https://en.wikipedia.org/wiki/Landrace">landrace</a> or wild species collections or if none of the parents
+	 * is known.GNPGS <= NPRGN, but some of the GNPGS specified parents may be unknown inwhich case the corresponding GPIDs are MISSING (0).
+	 * For example in a simplecross with only male parent known, GNPGS would have to be 2 with GPID1 = 0 and GPID2 set to GID of the known
+	 * male parent.</li>
 	 * </ul>
 	 */
 	public Integer getGnpgs() {
