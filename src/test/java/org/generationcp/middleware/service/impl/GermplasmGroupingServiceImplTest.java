@@ -42,14 +42,18 @@ public class GermplasmGroupingServiceImplTest {
 		UserDefinedField selectionHistoryUDFLD = new UserDefinedField(111);
 		selectionHistoryUDFLD.setFtable("NAMES");
 		selectionHistoryUDFLD.setFtype("NAME");
-		selectionHistoryUDFLD.setFcode("SELHIS");
-		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", "SELHIS")).thenReturn(selectionHistoryUDFLD);
+		selectionHistoryUDFLD.setFcode(GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
+		Mockito.when(
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE))
+				.thenReturn(selectionHistoryUDFLD);
 
 		UserDefinedField selHisFixUDFLD = new UserDefinedField(222);
 		selHisFixUDFLD.setFtable("NAMES");
 		selHisFixUDFLD.setFtype("NAME");
-		selHisFixUDFLD.setFcode("SELHISFIX");
-		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", "SELHISFIX")).thenReturn(selHisFixUDFLD);
+		selHisFixUDFLD.setFcode(GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
+		Mockito.when(
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
+						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE)).thenReturn(selHisFixUDFLD);
 
 		Name selectionHistoryName = new Name();
 		selectionHistoryName.setNval("SelectionHistory");

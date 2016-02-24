@@ -28,6 +28,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmGroupingServiceImpl.class);
 
+	static final String SELECTION_HISTORY_NAME_CODE = "DRVNM";
+	static final String SELECTION_HISTORY_AT_FIXATION_NAME_CODE = "SELHISFIX";
+
 	private GermplasmDAO germplasmDAO;
 
 	private NameDAO nameDAO;
@@ -147,7 +150,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private String getSelectionHistory(Integer gid) {
 		List<Name> names = this.nameDAO.getByGIDWithFilters(gid, null, null);
-		UserDefinedField selectionHistoryNameType = this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", "SELHIS");
+		UserDefinedField selectionHistoryNameType =
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
 
 		String matchingName = null;
 		if (!names.isEmpty() && selectionHistoryNameType != null) {
@@ -168,7 +172,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		if (selectionHistoryNameValue != null) {
 			Name selectionHistoryAtFixation = new Name();
 			selectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
-			UserDefinedField selHisFix = this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", "SELHISFIX");
+			UserDefinedField selHisFix =
+					this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
+							GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 			selectionHistoryAtFixation.setTypeId(selHisFix.getFldno());
 			selectionHistoryAtFixation.setNval(selectionHistoryNameValue);
 			selectionHistoryAtFixation.setNstat(1);
@@ -191,7 +197,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		if (selectionHistoryNameValue != null) {
 			Name selectionHistoryOfPreviousCross = new Name();
 			selectionHistoryOfPreviousCross.setGermplasmId(cross.getGid());
-			UserDefinedField selHisFix = this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", "SELHISFIX");
+			UserDefinedField selHisFix =
+					this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
+							GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 			selectionHistoryOfPreviousCross.setTypeId(selHisFix.getFldno());
 			selectionHistoryOfPreviousCross.setNval(selectionHistoryNameValue);
 			selectionHistoryOfPreviousCross.setNstat(1);
