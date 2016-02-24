@@ -39,10 +39,16 @@ public class GermplasmGroupingServiceImplTest {
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
 
-		UserDefinedField selectionHistoryUDFLD = new UserDefinedField(123);
+		UserDefinedField selectionHistoryUDFLD = new UserDefinedField(111);
+		selectionHistoryUDFLD.setFtable("NAMES");
+		selectionHistoryUDFLD.setFtype("NAME");
+		selectionHistoryUDFLD.setFcode("SELHIS");
 		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", "SELHIS")).thenReturn(selectionHistoryUDFLD);
 
-		UserDefinedField selHisFixUDFLD = new UserDefinedField(123);
+		UserDefinedField selHisFixUDFLD = new UserDefinedField(222);
+		selHisFixUDFLD.setFtable("NAMES");
+		selHisFixUDFLD.setFtype("NAME");
+		selHisFixUDFLD.setFcode("SELHISFIX");
 		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", "SELHISFIX")).thenReturn(selHisFixUDFLD);
 
 		Name selectionHistoryName = new Name();
