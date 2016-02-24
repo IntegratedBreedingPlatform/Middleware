@@ -21,6 +21,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.NonUniqueResultException;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -104,17 +105,14 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 				criteria.add(Restrictions.eq("ftable", table));
 				criteria.add(Restrictions.eq("ftype", type));
 				criteria.add(Restrictions.eq("fcode", code));
-
-				@SuppressWarnings("unchecked")
-				List<UserDefinedField> results = criteria.list();
-				if (!results.isEmpty()) {
-					if (results.size() > 1) {
-						// There is no unique constraint on these three fields so this could happen, albeit rarely. Warn log such instances.
-						LOG.warn("Multiple UDFLD records were found with fTable={}, fType={}, fCode={}", table, type, code);
-					}
-					return results.get(0);
-				}
+				return (UserDefinedField) criteria.uniqueResult();
 			}
+		} catch (NonUniqueResultException nonUniqueResultException) {
+			final String message =
+					"Multiple UDFLD records were found with fTable={}, fType={}, fCode={}. Was expecting one uniqe result only : {}";
+			LOG.error(message, table, type, code, nonUniqueResultException.getMessage());
+			throw new MiddlewareQueryException(message, nonUniqueResultException);
+
 		} catch (HibernateException e) {
 			String message = "Error executing UserDefinedFieldDAO.getByTableTypeAndCode(fTable={}, fType={}, fCode={}) : {}";
 			LOG.error(message, table, type, code, e.getMessage());
