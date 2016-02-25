@@ -148,42 +148,80 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		return true;
 	}
 
-	private String getSelectionHistory(Integer gid) {
-		List<Name> names = this.nameDAO.getByGIDWithFilters(gid, null, null);
+	private String getSelectionHistory(Germplasm germplasm) {
+		List<Name> names = germplasm.getNames();
 		UserDefinedField selectionHistoryNameType =
 				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
 
-		String matchingName = null;
+		String selectionHistoryName = null;
 		if (!names.isEmpty() && selectionHistoryNameType != null) {
 			for (Name name : names) {
-				if (name.getTypeId().equals(selectionHistoryNameType.getFldno())) {
-					matchingName = name.getNval();
+				if (selectionHistoryNameType.getFldno().equals(name.getTypeId())) {
+					selectionHistoryName = name.getNval();
 					break;
 				}
 			}
 		}
-		return matchingName;
+		return selectionHistoryName;
 	}
 
 	private void copySelectionHistory(Germplasm germplasm, String selectionHistoryNameValue) {
-		Name selectionHistoryAtFixation = new Name();
-		selectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
-		UserDefinedField selHisFix =
+
+		// 1. Make current preferred name a non-preferred name by setting nstat = 0
+		// because we are about to add a different name as preferred.
+		Name currentPreferredName = null;
+		if (!germplasm.getNames().isEmpty()) {
+			for (Name name : germplasm.getNames()) {
+				if (new Integer(1).equals(name.getNstat())) {
+					currentPreferredName = name;
+					break;
+				}
+			}
+		}
+
+		if (currentPreferredName != null) {
+			currentPreferredName.setNstat(0);
+			this.nameDAO.save(currentPreferredName);
+		}
+
+		// 2. Remove if there is an existing "selection history at fixation"
+		UserDefinedField selHisFixNameType =
 				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
 						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
-		selectionHistoryAtFixation.setTypeId(selHisFix.getFldno());
-		selectionHistoryAtFixation.setNval(selectionHistoryNameValue);
-		selectionHistoryAtFixation.setNstat(1);
-		selectionHistoryAtFixation.setUserId(1); // TODO get current user passed to the service and use here.
-		selectionHistoryAtFixation.setLocationId(0); // TODO get location passed to the service and use here.
-		selectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
-		selectionHistoryAtFixation.setReferenceId(0);
-		this.nameDAO.save(selectionHistoryAtFixation);
+
+		Name existingSelHisFixName = null;
+		if (!germplasm.getNames().isEmpty()) {
+			for (Name name : germplasm.getNames()) {
+				if (selHisFixNameType.getFldno().equals(name.getTypeId())) {
+					existingSelHisFixName = name;
+					break;
+				}
+			}
+		}
+
+		// 3. Copy selection history as "selection history at fixation" and make it a preferred name.
+		if (existingSelHisFixName == null) {
+			Name newSelectionHistoryAtFixation = new Name();
+			newSelectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
+			newSelectionHistoryAtFixation.setTypeId(selHisFixNameType.getFldno());
+			newSelectionHistoryAtFixation.setNval(selectionHistoryNameValue);
+			newSelectionHistoryAtFixation.setNstat(1); // Means it is preferred name.
+			newSelectionHistoryAtFixation.setUserId(1); // TODO get current user passed to the service and use here.
+			newSelectionHistoryAtFixation.setLocationId(0); // TODO get location passed to the service and use here.
+			newSelectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
+			newSelectionHistoryAtFixation.setReferenceId(0);
+			this.nameDAO.save(newSelectionHistoryAtFixation);
+		} else {
+			existingSelHisFixName.setNval(selectionHistoryNameValue);
+			existingSelHisFixName.setNstat(1);
+			existingSelHisFixName.setNdate(Util.getCurrentDateAsIntegerValue());
+			this.nameDAO.save(existingSelHisFixName);
+		}
 	}
 
 	public void copySelectionHistory(Germplasm germplasm) {
 
-		String selectionHistoryNameValue = getSelectionHistory(germplasm.getGid());
+		String selectionHistoryNameValue = getSelectionHistory(germplasm);
 
 		if (selectionHistoryNameValue != null) {
 			copySelectionHistory(germplasm, selectionHistoryNameValue);
@@ -195,7 +233,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private void copySelectionHistoryForCross(Germplasm cross, Germplasm previousCross) {
 
-		String selectionHistoryNameValue = getSelectionHistory(previousCross.getGid());
+		String selectionHistoryNameValue = getSelectionHistory(previousCross);
 
 		if (selectionHistoryNameValue != null) {
 			copySelectionHistory(cross, selectionHistoryNameValue);
