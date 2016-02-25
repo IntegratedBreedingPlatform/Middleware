@@ -79,11 +79,16 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			assignGroup(germplasmToFix, germplasmToFix.getGid(), preserveExistingGroup);
 		}
 
-		GermplasmGroupingResult groupingResult = new GermplasmGroupingResult();
-		groupingResult.setFounderGid(germplasmToFix.getGid());
-		groupingResult.setGroupMgid(germplasmToFix.getMgid());
-		groupingResult.setGroupMembers(this.germplasmDAO.getGroupMembers(germplasmToFix.getGid()));
-		return groupingResult;
+		return getGroupMembers(germplasmToFix);
+	}
+
+	@Override
+	public GermplasmGroupingResult getGroupMembers(Germplasm founder) {
+		GermplasmGroupingResult germplasmGroup = new GermplasmGroupingResult();
+		germplasmGroup.setFounderGid(founder.getGid());
+		germplasmGroup.setGroupMgid(founder.getMgid());
+		germplasmGroup.setGroupMembers(this.germplasmDAO.getGroupMembers(founder.getGid()));
+		return germplasmGroup;
 	}
 
 	private void traverseAssignGroup(GermplasmPedigreeTreeNode node, Integer groupId, boolean preserveExistingGroup) {

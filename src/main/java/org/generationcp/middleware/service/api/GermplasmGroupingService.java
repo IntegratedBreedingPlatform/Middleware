@@ -37,4 +37,9 @@ public interface GermplasmGroupingService {
 	 */
 	void copySelectionHistory(Germplasm germplasm);
 
+	/**
+	 * Get all group members where the given germplasm is a founder. For the founder gid = mgid.
+	 */
+	GermplasmGroupingResult getGroupMembers(Germplasm founder);
+
 }
