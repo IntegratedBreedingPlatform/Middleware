@@ -144,8 +144,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		if (!preserveExistingGroup) {
 			LOG.info("Assigning mgid = [{}] for germplasm with gid = [{}]", groupId, germplasm.getGid());
 			germplasm.setMgid(groupId);
-			this.germplasmDAO.save(germplasm);
 			copySelectionHistory(germplasm);
+			this.germplasmDAO.save(germplasm);
 		} else {
 			LOG.info("Retaining the existing mgid = [{}] for germplasm with gid = [{}] as it is.", germplasm.getMgid(), germplasm.getGid());
 		}
@@ -178,7 +178,6 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 		if (currentPreferredName != null) {
 			currentPreferredName.setNstat(0);
-			this.nameDAO.save(currentPreferredName);
 		}
 
 		// 2. Remove if there is an existing "selection history at fixation"
@@ -207,12 +206,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			newSelectionHistoryAtFixation.setLocationId(0); // TODO get location passed to the service and use here.
 			newSelectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
 			newSelectionHistoryAtFixation.setReferenceId(0);
-			this.nameDAO.save(newSelectionHistoryAtFixation);
+			germplasm.getNames().add(newSelectionHistoryAtFixation);
 		} else {
 			existingSelHisFixName.setNval(selectionHistoryNameValue);
 			existingSelHisFixName.setNstat(1);
 			existingSelHisFixName.setNdate(Util.getCurrentDateAsIntegerValue());
-			this.nameDAO.save(existingSelHisFixName);
 		}
 	}
 
