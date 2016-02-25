@@ -12,17 +12,22 @@
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -357,6 +362,10 @@ public class Germplasm implements Serializable {
 	@Column(name = "mgid")
 	private Integer mgid;
 
+	@OneToMany(fetch = FetchType.LAZY)
+	@JoinColumn(name = "gid")
+	private List<Name> names = new ArrayList<Name>();
+
 	/**
 	 * @OneToMany(mappedBy = "germplasm") private Set<Progenitor> progntr = new HashSet<Progenitor>();
 	 **/
@@ -673,4 +682,14 @@ public class Germplasm implements Serializable {
 		this.accessionName = accessionName;
 	}
 
+	/**
+	 * @return <strong>ALL</strong> name records associated with this germplasm entity.
+	 */
+	public List<Name> getNames() {
+		return names;
+	}
+
+	public void setNames(List<Name> names) {
+		this.names = names;
+	}
 }
