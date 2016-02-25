@@ -6,7 +6,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,11 +13,17 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import com.google.common.base.Function;
+import com.google.common.base.Strings;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
+import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.dao.oms.VariableOverridesDao;
+import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -57,11 +62,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.base.Function;
-import com.google.common.base.Strings;
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
 
 
 /**
@@ -198,7 +198,7 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 
 					List<Integer> scaleIds = listParameters.get("scaleIds");
 					for (Object row : queryResults) {
-						scaleIds.add(this.typeSafeObjectToInteger(row));
+						scaleIds.add(HibernateUtil.typeSafeObjectToInteger(row));
 					}
 
 					// Filtering with data type gives no scale. So no further iteration required.
@@ -771,7 +771,7 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 		try {
 
 			// Delete relationships
-			List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(variableId);
+			List<CVTermRelationship> relationships = this.ontologyDaoFactory.getCvTermRelationshipDao().getBySubject(variableId);
 			for (CVTermRelationship relationship : relationships) {
 				relationshipDao.makeTransient(relationship);
 			}
@@ -843,7 +843,7 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 
 		if(!Objects.equals(oldVariableName, newName)){
 
-			List<CVTermSynonym> byCvTermSynonymList = this.getCvTermSynonymDao().getByCvTermId(term.getCvTermId());
+			List<CVTermSynonym> byCvTermSynonymList = this.ontologyDaoFactory.getCvTermSynonymDao().getByCvTermId(term.getCvTermId());
 			boolean synonymFound = false;
 
 			for(CVTermSynonym cvTermSynonym : byCvTermSynonymList){
@@ -855,17 +855,17 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 
 			if(!synonymFound){
 				CVTermSynonym cvTermSynonym = CvTermSynonymDao.buildCvTermSynonym(term.getCvTermId(),oldVariableName,NameType.ALTERNATIVE_ENGLISH.getId());
-				this.getCvTermSynonymDao().save(cvTermSynonym);
+				this.ontologyDaoFactory.getCvTermSynonymDao().save(cvTermSynonym);
 			}
 		}
 	}
 
 	private void deleteVariableSynonym(int variableId) {
 		// delete Variable synonym
-		List<CVTermSynonym> cvTermSynonymList = this.getCvTermSynonymDao().getByCvTermId(variableId);
+		List<CVTermSynonym> cvTermSynonymList = this.ontologyDaoFactory.getCvTermSynonymDao().getByCvTermId(variableId);
 
 		for (CVTermSynonym synonym : cvTermSynonymList) {
-			this.getCvTermSynonymDao().makeTransient(synonym);
+			this.ontologyDaoFactory.getCvTermSynonymDao().makeTransient(synonym);
 		}
 	}
 

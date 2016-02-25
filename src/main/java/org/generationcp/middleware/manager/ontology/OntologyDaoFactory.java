@@ -8,6 +8,7 @@ import org.generationcp.middleware.dao.oms.CVDao;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
+import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.dao.oms.VariableOverridesDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.hibernate.Session;
@@ -57,6 +58,12 @@ public class OntologyDaoFactory {
 		CVTermRelationshipDao cvTermRelationshipDao = new CVTermRelationshipDao();
 		cvTermRelationshipDao.setSession(this.getActiveSession());
 		return cvTermRelationshipDao;
+	}
+
+	public CvTermSynonymDao getCvTermSynonymDao() {
+		CvTermSynonymDao cvTermSynonymDao = new CvTermSynonymDao();
+		cvTermSynonymDao.setSession(this.getActiveSession());
+		return cvTermSynonymDao;
 	}
 
 	public VariableOverridesDao getVariableProgramOverridesDao() {
