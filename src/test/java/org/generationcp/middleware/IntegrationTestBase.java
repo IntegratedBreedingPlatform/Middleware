@@ -4,6 +4,8 @@ package org.generationcp.middleware;
 import java.util.Date;
 
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.ontology.TestDataHelper;
+import org.generationcp.middleware.util.CustomClock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -63,12 +65,6 @@ public abstract class IntegrationTestBase extends TestBase {
 	public static void setUpOnce() {
 		// Variable caching relies on the context holder to determine current crop database in use
 		ContextHolder.setCurrentCrop("maize");
-	}
-
-	@Before
-	public void beforeEachTest() {
-		LOG.info("+++++ Test : " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + "() started +++++\n");
-		this.startTime = System.nanoTime();
 	}
 
 	protected void stubCurrentDate(int year, int month, int day) {
