@@ -165,26 +165,29 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		return matchingName;
 	}
 
+	private void copySelectionHistory(Germplasm germplasm, String selectionHistoryNameValue) {
+		Name selectionHistoryAtFixation = new Name();
+		selectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
+		UserDefinedField selHisFix =
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
+						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
+		selectionHistoryAtFixation.setTypeId(selHisFix.getFldno());
+		selectionHistoryAtFixation.setNval(selectionHistoryNameValue);
+		selectionHistoryAtFixation.setNstat(1);
+		selectionHistoryAtFixation.setUserId(1); // TODO get current user passed to the service and use here.
+		selectionHistoryAtFixation.setLocationId(0); // TODO get location passed to the service and use here.
+		selectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
+		selectionHistoryAtFixation.setReferenceId(0);
+		this.nameDAO.save(selectionHistoryAtFixation);
+	}
+
 	public void copySelectionHistory(Germplasm germplasm) {
 
 		String selectionHistoryNameValue = getSelectionHistory(germplasm.getGid());
 
 		if (selectionHistoryNameValue != null) {
-			Name selectionHistoryAtFixation = new Name();
-			selectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
-			UserDefinedField selHisFix =
-					this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
-							GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
-			selectionHistoryAtFixation.setTypeId(selHisFix.getFldno());
-			selectionHistoryAtFixation.setNval(selectionHistoryNameValue);
-			selectionHistoryAtFixation.setNstat(1);
-			selectionHistoryAtFixation.setUserId(1); // TODO get current user passed to the service and use here.
-			selectionHistoryAtFixation.setLocationId(0); // TODO get location passed to the service and use here.
-			selectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
-			selectionHistoryAtFixation.setReferenceId(0);
-			this.nameDAO.save(selectionHistoryAtFixation);
-			LOG.info("Selection history at fixation for gid {} saved as germplasm name {} .", germplasm.getGid(),
-					selectionHistoryNameValue);
+			copySelectionHistory(germplasm, selectionHistoryNameValue);
+			LOG.info("Selection history at fixation for gid {} saved as germplasm name {} .", germplasm.getGid(), selectionHistoryNameValue);
 		} else {
 			LOG.info("No selection history type name was found for germplasm {}.", germplasm.getGid());
 		}
@@ -195,19 +198,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		String selectionHistoryNameValue = getSelectionHistory(previousCross.getGid());
 
 		if (selectionHistoryNameValue != null) {
-			Name selectionHistoryOfPreviousCross = new Name();
-			selectionHistoryOfPreviousCross.setGermplasmId(cross.getGid());
-			UserDefinedField selHisFix =
-					this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
-							GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
-			selectionHistoryOfPreviousCross.setTypeId(selHisFix.getFldno());
-			selectionHistoryOfPreviousCross.setNval(selectionHistoryNameValue);
-			selectionHistoryOfPreviousCross.setNstat(1);
-			selectionHistoryOfPreviousCross.setUserId(1); // TODO get current user passed to the service and use here.
-			selectionHistoryOfPreviousCross.setLocationId(0); // TODO get location passed to the service and use here.
-			selectionHistoryOfPreviousCross.setNdate(Util.getCurrentDateAsIntegerValue());
-			selectionHistoryOfPreviousCross.setReferenceId(0);
-			this.nameDAO.save(selectionHistoryOfPreviousCross);
+			copySelectionHistory(cross, selectionHistoryNameValue);
 			LOG.info("Selection history {} for cross with gid {} was copied from previous cross with gid {}.", selectionHistoryNameValue,
 					cross.getGid(), previousCross.getGid());
 		} else {
