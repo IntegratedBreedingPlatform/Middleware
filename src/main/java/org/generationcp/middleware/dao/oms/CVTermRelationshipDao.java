@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.hibernate.Criteria;
@@ -216,4 +217,27 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		CVTermRelationship cvTermRelationship = new CVTermRelationship(null, typeId, subjectId, objectId);
 		return this.save(cvTermRelationship);
 	}
+
+    public Integer retrieveAnalysisDerivedVariableID(Integer originalVariableID, Integer analysisMethodTermID) {
+        try {
+            String sqlQuery =
+                    "select cr.object_id from cvterm_relationship cr WHERE cr.type_id = " + TermId.HAS_ANALYSIS_VARIABLE.getId()
+                            + " and cr.subject_id = :variableID AND EXISTS "
+                            + "(SELECT 1 FROM cvterm_relationship mr WHERE cr.object_id = mr.subject_id AND mr.type_id = "
+                            + TermId.HAS_METHOD.getId() + " AND mr.object_id = :methodID)";
+            SQLQuery query = this.getSession().createSQLQuery(sqlQuery);
+            query.setParameter("variableID", originalVariableID);
+            query.setParameter("methodID", analysisMethodTermID);
+
+            Object result = query.uniqueResult();
+            if (result == null) {
+                return null;
+            } else {
+                return (Integer) result;
+            }
+        } catch (HibernateException e) {
+            this.logAndThrowException("Error in retrieveAnalysisDerivedVariableID in CVTermRelationshipDAO: " + e.getMessage(), e);
+            return null;
+        }
+    }
 }

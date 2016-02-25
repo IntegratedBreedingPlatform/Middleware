@@ -15,7 +15,6 @@ package org.generationcp.middleware.manager.ontology.api;
 import java.util.List;
 
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 
@@ -30,7 +29,7 @@ public interface OntologyVariableDataManager {
 	 * @param variableFilter have filter data that needs to be applied
 	 * @return List<Variable>
 	 */
-	List<Variable> getWithFilter(VariableFilter variableFilter) throws MiddlewareQueryException;
+	List<Variable> getWithFilter(VariableFilter variableFilter);
 
 	/**
 	 * Return variable by Id with details based on programUuid. After the first read, the variable is cached in memory. Don't filter
@@ -43,29 +42,30 @@ public interface OntologyVariableDataManager {
 	 *        If variable usage is not calcualted the value of the studies and observation field is set to -1 which indicated unknow value.
 	 * @return the requested {@link Variable}
 	 */
-	Variable getVariable(String programUuid, Integer id, boolean filterObsolete, boolean calculateVariableUsage) throws MiddlewareQueryException;
+	Variable getVariable(String programUuid, Integer id, boolean filterObsolete, boolean calculateVariableUsage);
 
 	/**
 	 * @param variableInfo
 	 */
-	void addVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException;
+	void addVariable(OntologyVariableInfo variableInfo);
 
 	/**
 	 *
 	 * @param summaryList
 	 * @param hiddenFields
 	 */
-	void processTreatmentFactorHasPairValue(List<Variable> summaryList, List<Integer> hiddenFields) throws MiddlewareQueryException;
+	void processTreatmentFactorHasPairValue(List<Variable> summaryList, List<Integer> hiddenFields);
 
 	/**
 	 * @param variableInfo
 	 */
-	void updateVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException;
+	void updateVariable(OntologyVariableInfo variableInfo);
 
 	/**
-	 * @param id
+	 * This function will delete the variable and related data
+	 * @param variableId variable Id to be deleted
 	 */
-	void deleteVariable(Integer id) throws MiddlewareQueryException;
+	void deleteVariable(Integer variableId);
 
 	/**
 	 * This function defines total observations carried from this variable.
@@ -73,7 +73,7 @@ public interface OntologyVariableDataManager {
 	 * @param variableId variable id to get observations
 	 * @return Total observations
 	 */
-	Integer getVariableObservations(int variableId) throws MiddlewareQueryException;
+	Integer getVariableObservations(int variableId);
 
 	/**
 	 * This function defines total studies taken from this variable.
@@ -81,7 +81,7 @@ public interface OntologyVariableDataManager {
 	 * @param variableId variable id to get observations
 	 * @return Total studies
 	 */
-	Integer getVariableStudies(int variableId) throws MiddlewareQueryException;
+	Integer getVariableStudies(int variableId);
 
-    String retrieveVariableCategoricalValue(String programUuid, Integer variableId, Integer categoricalValueId);
+	String retrieveVariableCategoricalValue(String programUuid, Integer variableId, Integer categoricalValueId);
 }

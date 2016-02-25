@@ -7,8 +7,10 @@ import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 
 public class VariableTypeListTransformer extends Transformer {
 
@@ -16,20 +18,20 @@ public class VariableTypeListTransformer extends Transformer {
 		super(sessionProviderForLocal);
 	}
 
-	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, 
-			boolean isVariate, String programUUID) throws MiddlewareException {
+	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, String programUUID) throws MiddlewareException {
 
-		return this.transform(measurementVariables, isVariate, 1, programUUID);
+		return this.transform(measurementVariables, 1, programUUID);
 	}
 
-	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, boolean isVariate, int rank, String programUUID)
+	public VariableTypeList transform(List<MeasurementVariable> measurementVariables, int rank, String programUUID)
 			throws MiddlewareException {
 
 		VariableTypeList variableTypeList = new VariableTypeList();
 
 		if (measurementVariables != null && !measurementVariables.isEmpty()) {
 			for (MeasurementVariable measurementVariable : measurementVariables) {
-				StandardVariable standardVariable = null;
+				StandardVariable standardVariable;
+
 				if (measurementVariable.getTermId() != 0) {// in etl v2, standard variables are already created before saving the study
 					standardVariable = this.getStandardVariableBuilder().create(measurementVariable.getTermId(),programUUID);
 				} else {
@@ -41,19 +43,27 @@ public class VariableTypeListTransformer extends Transformer {
 									measurementVariable.getScale(),
 									measurementVariable.getMethod(),
 									measurementVariable.getRole(),
+									measurementVariable.getVariableType(),
 									measurementVariable.getDataType(),
 									programUUID);
 				}
 				
-				standardVariable.setPhenotypicType(measurementVariable.getRole());
 				measurementVariable.setTermId(standardVariable.getId());
 
-				DMSVariableType variableType =
+				DMSVariableType dmsVariableType =
 						new DMSVariableType(measurementVariable.getName(), measurementVariable.getDescription(), standardVariable, rank++);
-				variableType.setTreatmentLabel(measurementVariable.getTreatmentLabel());
-				variableType.setRole(measurementVariable.getRole());
-				variableTypeList.add(variableType);
 
+				VariableType variableType = measurementVariable.getVariableType();
+
+				if(variableType == null){
+					variableType = OntologyDataHelper.mapFromPhenotype(measurementVariable.getRole(), measurementVariable.getProperty());
+				}
+
+				dmsVariableType.setVariableType(variableType);
+				standardVariable.setPhenotypicType(variableType.getRole());
+				dmsVariableType.setRole(variableType.getRole());
+				dmsVariableType.setTreatmentLabel(measurementVariable.getTreatmentLabel());
+				variableTypeList.add(dmsVariableType);
 			}
 		}
 

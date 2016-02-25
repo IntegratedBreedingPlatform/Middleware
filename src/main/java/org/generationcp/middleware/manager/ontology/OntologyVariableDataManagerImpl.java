@@ -45,6 +45,7 @@ import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
+import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.util.Clock;
 import org.generationcp.middleware.util.ISO8601DateParser;
@@ -197,7 +198,7 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 
 					List<Integer> scaleIds = listParameters.get("scaleIds");
 					for (Object row : queryResults) {
-						scaleIds.add(HibernateUtil.typeSafeObjectToInteger(row));
+						scaleIds.add(this.typeSafeObjectToInteger(row));
 					}
 
 					// Filtering with data type gives no scale. So no further iteration required.
@@ -543,7 +544,7 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 	}
 
 	@Override
-	public void addVariable(OntologyVariableInfo variableInfo) throws MiddlewareQueryException {
+	public void addVariable(OntologyVariableInfo variableInfo) {
 
 		CVTermDao termDao = this.ontologyDaoFactory.getCvTermDao();
 		CVTermRelationshipDao relationshipDao = this.ontologyDaoFactory.getCvTermRelationshipDao();
@@ -642,6 +643,9 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 		CVTermRelationship scaleRelation = elements.getScaleRelation();
 		List<CVTermProperty> termProperties = elements.getTermProperties();
 		VariableOverrides variableOverrides = elements.getVariableOverrides();
+
+		// Updating synonym
+		this.updateVariableSynonym(term, variableInfo.getName());
 
 		// Updating term to database.
 		if (!(variableInfo.getName().equals(term.getName()) && Objects.equals(variableInfo.getDescription(), term.getDefinition()))) {
@@ -744,21 +748,21 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 	}
 
 	@Override
-	public void deleteVariable(Integer id) throws MiddlewareQueryException {
+	public void deleteVariable(Integer variableId) {
 
-		VariableCache.removeFromCache(id);
+		VariableCache.removeFromCache(variableId);
 
 		CVTermDao termDao = this.ontologyDaoFactory.getCvTermDao();
 		CVTermRelationshipDao relationshipDao = this.ontologyDaoFactory.getCvTermRelationshipDao();
 		CvTermPropertyDao propertyDao = this.ontologyDaoFactory.getCvTermPropertyDao();
 		VariableOverridesDao programOverridesDao = this.ontologyDaoFactory.getVariableProgramOverridesDao();
 
-		CVTerm term = termDao.getById(id);
+		CVTerm term = termDao.getById(variableId);
 
 		this.checkTermIsVariable(term);
 
 		// check usage
-		Integer usage = this.getVariableObservations(id);
+		Integer usage = this.getVariableObservations(variableId);
 
 		if (usage > 0) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.CAN_NOT_DELETE_USED_VARIABLE);
@@ -767,7 +771,7 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 		try {
 
 			// Delete relationships
-			List<CVTermRelationship> relationships = relationshipDao.getBySubject(id);
+			List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(variableId);
 			for (CVTermRelationship relationship : relationships) {
 				relationshipDao.makeTransient(relationship);
 			}
@@ -779,11 +783,14 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 			}
 
 			// delete Variable alias and expected range
-			List<VariableOverrides> variableOverridesList = programOverridesDao.getByVariableId(id);
+			List<VariableOverrides> variableOverridesList = programOverridesDao.getByVariableId(variableId);
 
 			for (VariableOverrides overrides : variableOverridesList) {
 				programOverridesDao.makeTransient(overrides);
 			}
+
+			//delete variable synonym
+			this.deleteVariableSynonym(variableId);
 
 			// delete main entity
 			termDao.makeTransient(term);
@@ -794,7 +801,7 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 	}
 
 	@Override
-	public Integer getVariableObservations(int variableId) throws MiddlewareQueryException {
+	public Integer getVariableObservations(int variableId) {
 
 		final String numOfProjectsWithVariable =
 				"SELECT count(pp.project_id) " + " FROM projectprop pp " + " WHERE NOT EXISTS( " + " SELECT 1 FROM projectprop stat "
@@ -809,28 +816,60 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 
 	// TODO: Follow DmsProjectDao countExperimentByVariable. This requires STORED_IN and that needs to deprecated.
 	@Override
-	public Integer getVariableStudies(int variableId) throws MiddlewareQueryException {
+	public Integer getVariableStudies(int variableId) {
 		return 0;
 	}
 
-    @Override
-    public String retrieveVariableCategoricalValue(String programUuid, Integer variableId, Integer categoricalValueId) {
-        if (variableId == null || categoricalValueId == null) {
-            return null;
-        }
+	@Override
+	public String retrieveVariableCategoricalValue(String programUuid, Integer variableId, Integer categoricalValueId) {
+		if (variableId == null || categoricalValueId == null) {
+			return null;
+		}
 
-        Variable variable = this.getVariable(programUuid, variableId, true, false);
-        for (TermSummary summary : variable.getScale().getCategories()) {
-            if (summary.getId().equals(categoricalValueId)) {
-                return summary.getDefinition();
-            }
-        }
+		Variable variable = this.getVariable(programUuid, variableId, true, false);
+		for (TermSummary summary : variable.getScale().getCategories()) {
+			if (summary.getId().equals(categoricalValueId)) {
+				return summary.getDefinition();
+			}
+		}
 
-        return null;
+		return null;
 
     }
 
-    private void checkTermIsVariable(CVTerm term) {
+	private void updateVariableSynonym(CVTerm term, String newVariableName) {
+		String oldVariableName = term.getName().trim();
+		String newName = newVariableName.trim();
+
+		if(!Objects.equals(oldVariableName, newName)){
+
+			List<CVTermSynonym> byCvTermSynonymList = this.getCvTermSynonymDao().getByCvTermId(term.getCvTermId());
+			boolean synonymFound = false;
+
+			for(CVTermSynonym cvTermSynonym : byCvTermSynonymList){
+				if(Objects.equals(oldVariableName, cvTermSynonym.getSynonym())){
+					synonymFound = true;
+					break;
+				}
+			}
+
+			if(!synonymFound){
+				CVTermSynonym cvTermSynonym = CvTermSynonymDao.buildCvTermSynonym(term.getCvTermId(),oldVariableName,NameType.ALTERNATIVE_ENGLISH.getId());
+				this.getCvTermSynonymDao().save(cvTermSynonym);
+			}
+		}
+	}
+
+	private void deleteVariableSynonym(int variableId) {
+		// delete Variable synonym
+		List<CVTermSynonym> cvTermSynonymList = this.getCvTermSynonymDao().getByCvTermId(variableId);
+
+		for (CVTermSynonym synonym : cvTermSynonymList) {
+			this.getCvTermSynonymDao().makeTransient(synonym);
+		}
+	}
+
+	private void checkTermIsVariable(CVTerm term) {
 
 		if (term == null) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_DOES_NOT_EXIST);

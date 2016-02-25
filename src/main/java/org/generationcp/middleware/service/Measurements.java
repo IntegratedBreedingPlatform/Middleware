@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.hibernate.FlushMode;
@@ -18,7 +19,7 @@ import com.google.common.base.Preconditions;
 
 /**
  * Class to enable us to save data to the phenotype table and the nd experiment phenotype table in a performant manner.
- * 
+ *
  */
 public class Measurements {
 
@@ -51,7 +52,7 @@ public class Measurements {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param measurementData measurementData used to create your {@link Phenotype} object that can be saved
 	 */
 	Phenotype createPhenotypeFromMeasurement(final MeasurementData measurementData) {
@@ -60,7 +61,7 @@ public class Measurements {
 
 		phenotype.setValue(measurementData.getValue());
 		final int cValue = NumberUtils.toInt(measurementData.getcValueId());
-		if (cValue != 0) {
+		if (cValue != 0 && measurementData.getMeasurementVariable().getDataTypeId() == TermId.CATEGORICAL_VARIABLE.getId()) {
 			phenotype.setcValue(cValue);
 		}
 		phenotype.setName(measurementData.getLabel());

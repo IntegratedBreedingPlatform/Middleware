@@ -1,8 +1,10 @@
 
 package org.generationcp.middleware.dao;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.generationcp.middleware.IntegrationTestBase;
@@ -107,5 +109,10 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		list.setProgramUUID(UUID.randomUUID().toString());
 		return list;
 	}
-
+	
+	@Test
+	public void testGetAllListMetadata() {
+		final List<Object[]> listMetadata = GermplasmListDAOTest.dao.getAllListMetadata();
+		Assert.assertNotNull("getAllListMetadata() should never return null.", listMetadata);
+	}
 }

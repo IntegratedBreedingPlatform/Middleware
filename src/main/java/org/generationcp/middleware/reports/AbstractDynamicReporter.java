@@ -250,7 +250,7 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 	public Map<String, Object> buildJRParams(Map<String, Object> args) {
 		Map<String, Object> params = super.buildJRParams(args);
 
-		List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get("studyConditions");
+		List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get(STUDY_CONDITIONS_KEY);
 
 		for (MeasurementVariable var : studyConditions) {
 			switch (var.getName()) {
