@@ -82,7 +82,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		GermplasmGroupingResult groupingResult = new GermplasmGroupingResult();
 		groupingResult.setFounderGid(germplasmToFix.getGid());
 		groupingResult.setGroupMgid(germplasmToFix.getMgid());
-		groupingResult.setGroupMembers(this.germplasmDAO.getManagementNeighbors(germplasmToFix.getGid(), 0, Integer.MAX_VALUE));
+		groupingResult.setGroupMembers(this.germplasmDAO.getGroupMembers(germplasmToFix.getGid()));
 		return groupingResult;
 	}
 
@@ -169,15 +169,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 		// 1. Make current preferred name a non-preferred name by setting nstat = 0
 		// because we are about to add a different name as preferred.
-		Name currentPreferredName = null;
-		if (!germplasm.getNames().isEmpty()) {
-			for (Name name : germplasm.getNames()) {
-				if (new Integer(1).equals(name.getNstat())) {
-					currentPreferredName = name;
-					break;
-				}
-			}
-		}
+		Name currentPreferredName = germplasm.findPreferredName();
 
 		if (currentPreferredName != null) {
 			currentPreferredName.setNstat(0);
