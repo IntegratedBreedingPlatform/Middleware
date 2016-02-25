@@ -14,6 +14,7 @@ package org.generationcp.middleware.pojos;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -33,10 +34,21 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.generationcp.middleware.domain.oms.TermId;
 
+import com.google.common.collect.Sets;
+
 /**
- * POJO for methods table.
- *
- * @author Kevin Manansala, Mark Agarrado
+ * Represents breeding methods. The ICIS model recognizes three classes of breeding methods by which genetic material is advanced:
+ * <ul>
+ * <li>Generative methods: intended to increase allelic diversity by combining alleles from different progenitors through crossing or
+ * mutating genes through mutagenesis, introducing new genes through transformation or combining whole genomes through polyploidization.</li>
+ * <li>Derivative methods: are processes applied to a single source of seed and are designed to reduce or repartition genetic variation.
+ * Example methods are self-fertilization of lines in segregating populations, which reduces allelic diversity through inbreeding (in turn
+ * increasing homozygosity), production of double haploid lines, or randomly mating selected plants within a population.</li>
+ * <li>Maintenance methods: again applied to a single source of seed, represent deliberate attempts to maintain a specifi c level of genetic
+ * variation with the objective of creating new instances of germplasm that are as similar to the source germplasm as possible. Common
+ * examples would be methods used for increases of germplasm accessions, genetic stocks, or foundation seed.</li>
+ * </ul>
+ * 
  */
 @NamedQueries({@NamedQuery(name = "getAllMethods", query = "FROM Method")})
 @Entity
@@ -55,6 +67,8 @@ public class Method implements Serializable {
 			TermId.CULTIVAR_FORMATION_METHOD_CLASS.getId());
 
 	public static final List<Integer> NON_BULKED_CLASSES = Arrays.asList(TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
+
+	public static final Set<Integer> HYBRID_METHODS = Sets.newHashSet(416, 417, 418, 419, 426, 321);
 
 	public static final String GET_ALL = "getAllMethods";
 
@@ -260,6 +274,12 @@ public class Method implements Serializable {
 		this.mattr = mattr;
 	}
 
+	/**
+	 * ID of a CVTerm that defines a "method class".
+	 * 
+	 * METHN of a basic method which has equivalent genetic relationship between progenitors and offspring for the purpose of computing
+	 * coefficients of parentage
+	 */
 	public Integer getGeneq() {
 		return this.geneq;
 	}
@@ -462,4 +482,15 @@ public class Method implements Serializable {
 		return null;
 	}
 
+	public static boolean isHybrid(Integer methodId) {
+		if (methodId != null) {
+			return Method.HYBRID_METHODS.contains(methodId);
+		}
+		return false;
+	}
+
+	@Transient
+	public boolean isGenerative() {
+		return this.mtype != null && "GEN".equals(this.mtype.trim());
+	}
 }

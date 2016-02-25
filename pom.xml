@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-        <version>4.0.0.BETA.9</version>
+        <version>4.0.0.BETA.10</version>
 	<name>Middleware</name>
 
 	<properties>
@@ -424,7 +424,9 @@
 						<include>**/QueryTest.java</include>
 						<include>**/StudyMeasurementsTest.java</include>
 						<include>**/DmsProjectDaoTest.java</include>
-
+						<include>**/GermplasmGroupingServiceImplTest.java</include>
+						<include>**/MethodTest.java</include>
+						
 						<!-- New Ontology Manager Tests -->
 						<include>**/CvTermDaoTest.java</include>
 						<include>**/StandardVariableTest.java</include>
