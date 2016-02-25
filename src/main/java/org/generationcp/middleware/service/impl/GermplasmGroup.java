@@ -7,7 +7,7 @@ import java.util.List;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.generationcp.middleware.pojos.Germplasm;
 
-public class GermplasmGroupingResult {
+public class GermplasmGroup {
 
 	private Integer founderGid;
 	private Integer groupMgid;

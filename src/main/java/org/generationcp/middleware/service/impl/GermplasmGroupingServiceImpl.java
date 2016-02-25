@@ -67,7 +67,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	@Override
 	@Transactional
-	public GermplasmGroupingResult markFixed(Germplasm germplasmToFix, boolean includeDescendants, boolean preserveExistingGroup) {
+	public GermplasmGroup markFixed(Germplasm germplasmToFix, boolean includeDescendants, boolean preserveExistingGroup) {
 		LOG.info("Marking germplasm with gid {} as fixed.", germplasmToFix.getGid());
 
 		if (includeDescendants) {
@@ -83,8 +83,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	@Override
-	public GermplasmGroupingResult getGroupMembers(Germplasm founder) {
-		GermplasmGroupingResult germplasmGroup = new GermplasmGroupingResult();
+	public GermplasmGroup getGroupMembers(Germplasm founder) {
+		GermplasmGroup germplasmGroup = new GermplasmGroup();
 		germplasmGroup.setFounderGid(founder.getGid());
 		germplasmGroup.setGroupMgid(founder.getMgid());
 		germplasmGroup.setGroupMembers(this.germplasmDAO.getGroupMembers(founder.getGid()));
