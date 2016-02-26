@@ -62,9 +62,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		this.trialTraits = new TraitServiceImpl(currentSession);
 		this.studyMeasurements = new StudyMeasurements(this.getCurrentSession());
 		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(this.getCurrentSession());
-		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(new OntologyMethodDataManagerImpl(sessionProvider),
-				new OntologyPropertyDataManagerImpl(sessionProvider),
-				new OntologyScaleDataManagerImpl(sessionProvider), sessionProvider);
+		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl();
 		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
 
 		final CacheLoader<StudyKey, String> studyKeyCacheBuilder = new CacheLoader<StudyKey, String>() {

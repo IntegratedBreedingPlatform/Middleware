@@ -38,6 +38,7 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -159,31 +160,24 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		CVTerm term = null;
 
 		try {
+			Query hibernateQuery = this.getSession().createQuery(
+					"from CVTerm cvt where cvt.cvId = :cvId and cvt.name = :nameOrSynonym " + "UNION "
+							+ "FROM CVTerm cvt INNER JOIN CVTermSynonym syn ON  syn.cvTermId = cvt.cvTermId AND cvt.cv_id = :cvId AND " +
+							" syn.synonym = :nameOrSynonym ");
 
-			StringBuilder sqlString =
-					new StringBuilder().append("SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
-					.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ").append("FROM cvterm cvt ")
-					.append("WHERE cvt.cv_id = :cvId and cvt.name = :nameOrSynonym ").append("UNION ")
-					.append("	SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
-					.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ")
-					.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
-					.append("AND cvt.cv_id = :cvId AND syn.synonym = :nameOrSynonym ");
+			hibernateQuery.setParameter("cvId", cvId);
+			hibernateQuery.setParameter("nameOrSynonym", name);
 
-			SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
-			query.setParameter("cvId", cvId);
-			query.setParameter("nameOrSynonym", name);
-
-			List<Object[]> results = query.list();
-
-			if (!results.isEmpty()) {
-				Object[] row = results.get(0);
-				Integer cvtermId = (Integer) row[0];
-				Integer cvtermCvId = (Integer) row[1];
-				String cvtermName = (String) row[2];
-				String cvtermDefinition = (String) row[3];
-				Integer dbxrefId = (Integer) row[4];
-				Integer isObsolete = (Integer) row[5];
-				Integer isRelationshipType = (Integer) row[6];
+			List<CVTerm> cvTerms = hibernateQuery.list();
+			if (!cvTerms.isEmpty()) {
+				CVTerm row = cvTerms.get(0);
+				Integer cvtermId = row.getCvTermId();
+				Integer cvtermCvId = row.getCv();
+				String cvtermName = row.getName();
+				String cvtermDefinition = row.getDefinition();
+				Integer dbxrefId = row.getDbxRefId();
+				Integer isObsolete = row.isObsolete() ? 1 : 0;
+				Integer isRelationshipType = row.isRelationshipType() ? 1 : 0;
 
 				term = new CVTerm(cvtermId, cvtermCvId, cvtermName, cvtermDefinition, dbxrefId, isObsolete, isRelationshipType);
 			}

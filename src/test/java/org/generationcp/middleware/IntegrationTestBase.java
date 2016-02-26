@@ -1,7 +1,11 @@
 
 package org.generationcp.middleware;
 
+import java.util.Date;
+
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.ontology.TestDataHelper;
+import org.generationcp.middleware.util.CustomClock;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -28,10 +32,13 @@ import org.springframework.transaction.annotation.Transactional;
 // Spring configuration to automatically rollback after test completion.
 @TransactionConfiguration(defaultRollback = true)
 @Transactional
-public abstract class IntegrationTestBase {
+public abstract class IntegrationTestBase extends TestBase {
 
 	private static final Logger LOG = LoggerFactory.getLogger(IntegrationTestBase.class);
 	public static final int INDENT = 3;
+
+	@Autowired
+	private CustomClock customClock;
 
 	@Autowired
 	@Qualifier(value = "cropSessionProvider")
@@ -40,12 +47,6 @@ public abstract class IntegrationTestBase {
 	@Rule
 	public TestName name = new TestName();
 	private long startTime;
-
-	@BeforeClass
-	public static void setUpOnce() {
-		// Variable caching relies on the context holder to determine current crop database in use
-		ContextHolder.setCurrentCrop("maize");
-	}
 
 	@Before
 	public void beforeEachTest() {
@@ -58,6 +59,20 @@ public abstract class IntegrationTestBase {
 		long elapsedTime = System.nanoTime() - this.startTime;
 		LOG.info(" +++++ Test : " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + "() ended, took "
 				+ (double) elapsedTime / 1000000 + " ms = " + (double) elapsedTime / 1000000000 + " s +++++\n");
+	}
+
+	@BeforeClass
+	public static void setUpOnce() {
+		// Variable caching relies on the context holder to determine current crop database in use
+		ContextHolder.setCurrentCrop("maize");
+	}
+
+	protected void stubCurrentDate(int year, int month, int day) {
+		customClock.set(TestDataHelper.constructDate(year, month, day));
+	}
+
+	protected void stubCurrentDate(Date date) {
+		customClock.set(date);
 	}
 
 }

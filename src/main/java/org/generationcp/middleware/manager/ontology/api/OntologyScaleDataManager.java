@@ -15,6 +15,7 @@ package org.generationcp.middleware.manager.ontology.api;
 import java.util.List;
 
 import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 
 /**
  * This is the API for retrieving ontology scale data.
@@ -30,34 +31,34 @@ public interface OntologyScaleDataManager {
 	 * @param filterObsolete flag to determine if obsolete scale will be filtered
 	 * @return @link Scale
 	 */
-	Scale getScaleById(int scaleId, boolean filterObsolete);
+	Scale getScale(int scaleId, boolean filterObsolete) throws MiddlewareException;
 
 	/**
 	 * Get all scales from db
 	 *
 	 * @return All the scales
 	 */
-	List<Scale> getAllScales();
+	List<Scale> getAllScales() throws MiddlewareException;
 
 	/**
 	 * Adds a Scale. If the scale is already found in the local database, it simply retrieves the record found.
 	 *
 	 * @param scale to be added
 	 */
-	void addScale(Scale scale);
+	void addScale(Scale scale) throws MiddlewareException;
 
 	/**
 	 * Updates the given scale. This searches for the id. If it exists, the entry in the database is replaced with the new value.
 	 *
 	 * @param scale The Scale to update
 	 */
-	void updateScale(Scale scale);
+	void updateScale(Scale scale) throws MiddlewareException;
 
 	/**
 	 * Delete method.
 	 *
 	 * @param scaleId the cv term id
 	 */
-	void deleteScale(int scaleId);
+	void deleteScale(int scaleId) throws MiddlewareException;
 
 }

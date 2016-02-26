@@ -123,20 +123,19 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public OntologyMethodDataManager getOntologyMethodDataManager() {
-		return new OntologyMethodDataManagerImpl(this.sessionProvider);
+		return new OntologyMethodDataManagerImpl();
 	}
 
 	public OntologyPropertyDataManager getOntologyPropertyDataManager() {
-		return new OntologyPropertyDataManagerImpl(this.sessionProvider);
+		return new OntologyPropertyDataManagerImpl();
 	}
 
 	public OntologyScaleDataManager getOntologyScaleDataManager() {
-		return new OntologyScaleDataManagerImpl(this.sessionProvider);
+		return new OntologyScaleDataManagerImpl();
 	}
 
 	public OntologyVariableDataManager getOntologyVariableDataManager() {
-		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
-				this.getOntologyScaleDataManager(), this.sessionProvider);
+		return new OntologyVariableDataManagerImpl();
 	}
 
 	public PresetDataManager getPresetDataManager() {
@@ -245,7 +244,9 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public OntologyDaoFactory getOntologyDaoFactory() {
-		return new OntologyDaoFactory(this.sessionProvider);
+	  OntologyDaoFactory daoFactory = new OntologyDaoFactory();
+	  daoFactory.setSessionProvider(getSessionProvider());
+	  return daoFactory;
 	}
 
 	public StandardVariableTransformer getStandardVariableTransformer() {

@@ -59,7 +59,6 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
 
-
 	private Project testProject;
 	private Method testMethod;
 	private Property testProperty;
@@ -201,12 +200,12 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	@Test
 	public void testGetCategoricalValue() throws Exception {
 		createTestVariableWithCategoricalValue();
-		Scale scale = this.scaleManager.getScaleById(this.testScale.getId(), true);
+		Scale scale = this.scaleManager.getScale(this.testScale.getId(), true);
 		TermSummary categorical = scale.getCategories().get(0);
 		Assert.assertEquals("Unable to retrieve the categorical value of a variable", categorical.getDefinition(),
 				this.variableManager.retrieveVariableCategoricalValue(this.testProject.getUniqueID(), this.testVariableInfo.getId(), categorical.getId()));
-
-	}
+        
+    }
 
 	/**
 	 * All test depend on add variable, scale, property, method

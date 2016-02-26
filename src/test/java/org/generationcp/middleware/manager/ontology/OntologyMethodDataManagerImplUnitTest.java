@@ -18,6 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Ordering;
+import org.generationcp.middleware.UnitTestBase;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
@@ -28,10 +31,12 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.util.ISO8601DateParser;
+import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.utils.test.UnitTestDaoIDGenerator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -39,7 +44,10 @@ import org.mockito.MockitoAnnotations;
 /**
  * Unit test class to test Ontology Method Data Manger
  */
-public class MethodDataManagerImplTest {
+public class OntologyMethodDataManagerImplUnitTest extends UnitTestBase {
+
+	@InjectMocks
+	private OntologyMethodDataManagerImpl methodDataManager = new OntologyMethodDataManagerImpl();
 
 	@Mock
 	private CVTermDao cvTermDao;
@@ -53,21 +61,18 @@ public class MethodDataManagerImplTest {
 	@Mock
 	private OntologyDaoFactory daoFactory;
 
-	private OntologyMethodDataManagerImpl methodDataManager;
-
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		this.methodDataManager = new OntologyMethodDataManagerImpl(this.daoFactory);
-		Mockito.when(this.daoFactory.getCvTermDao()).thenReturn(this.cvTermDao);
-		Mockito.when(this.daoFactory.getCvTermPropertyDao()).thenReturn(this.cvTermPropertyDao);
-		Mockito.when(this.daoFactory.getCvTermRelationshipDao()).thenReturn(this.cvTermRelationshipDao);
+		Mockito.when(this.daoFactory.getCvTermDao()).thenReturn(cvTermDao);
+		Mockito.when(this.daoFactory.getCvTermPropertyDao()).thenReturn(cvTermPropertyDao);
+		Mockito.when(this.daoFactory.getCvTermRelationshipDao()).thenReturn(cvTermRelationshipDao);
 	}
 
 	/*
-	 * This test mock 3 terms with cv as Method along with additional properties like Created Date and Last Modified Date
-	 * and ensures that GetAllMethods function will return full method object.
-	 * */
+	* This test mock 3 terms with cv as Method along with additional properties like Created Date and Last Modified Date
+	* and ensures that GetAllMethods function will return full method object.
+	* */
 	@Test
 	public void testGetAllMethodsShouldFetchAndVerify() throws Exception {
 
@@ -81,10 +86,8 @@ public class MethodDataManagerImplTest {
 			termMap.put(term.getCvTermId(), term);
 		}
 
-		// Fill Test Created Date Property using Calendar
-		Calendar cal = Calendar.getInstance();
-		cal.set(2015, Calendar.JANUARY, 1);
-		Date testCreatedDate = cal.getTime();
+		// Fill Test Created Date Property
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> methodCreatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(methodTerms, methodCreatedDateProperties, testCreatedDate);
 
@@ -93,9 +96,8 @@ public class MethodDataManagerImplTest {
 			createDateMap.put(property.getCvTermId(), property.getValue());
 		}
 
-		// Fill Test Updated Date Property using Calendar
-		cal.set(2015, Calendar.MAY, 20);
-		Date testUpdatedDate = cal.getTime();
+		// Fill Test Updated Date Property
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.JUNE, 30);
 		List<CVTermProperty> methodUpdatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(methodTerms, methodUpdatedDateProperties, testUpdatedDate);
 
@@ -104,66 +106,57 @@ public class MethodDataManagerImplTest {
 			updateDateMap.put(property.getCvTermId(), property.getValue());
 		}
 
-		Mockito.when(this.cvTermDao.getAllByCvId(CvId.METHODS, true)).thenReturn(methodTerms);
+		Mockito.when(this.cvTermDao.getAllByCvId(CvId.METHODS, false)).thenReturn(methodTerms);
 
 		List<CVTermProperty> combinedProperties = new ArrayList<>(methodCreatedDateProperties);
 		combinedProperties.addAll(methodUpdatedDateProperties);
 
 		Mockito.when(this.cvTermPropertyDao.getByCvTermIds(new ArrayList<>(termMap.keySet()))).thenReturn(combinedProperties);
+		Mockito.when(this.daoFactory.getCvTermDao().getAllByCvId(CvId.METHODS, true)).thenReturn(methodTerms);
 
 		// Fetch all methods and check our last inserted method exists or not
 		List<Method> methods = this.methodDataManager.getAllMethods();
 
-		// Iterate all methods and find our inserted method and assert it
-		for (Method m : methods) {
-			// Make sure our method exists and is inserted properly and display proper message if it is not inserted properly
-			String message = "The %s for method '" + m.getId() + "' was not added correctly.";
-			if (termMap.containsKey(m.getId())) {
-				CVTerm methodTerm = termMap.get(m.getId());
-				String createdDateProperty = createDateMap.get(m.getId());
-				String updatedDateProperty = updateDateMap.get(m.getId());
+		List<String> methodNames = Util.convertAll(methods, new Function<Method, String>() {
 
-				Assert.assertEquals(String.format(message, "Name"), methodTerm.getName(), m.getName());
-				Assert.assertEquals(String.format(message, "Definition"), methodTerm.getDefinition(), m.getDefinition());
-				Assert.assertEquals(String.format(message, "IsObsolete"), methodTerm.isObsolete(), m.isObsolete());
-				Assert.assertEquals(String.format(message, "CreatedDate"), createdDateProperty,
-						ISO8601DateParser.toString(m.getDateCreated()));
-				Assert.assertEquals(String.format(message, "UpdatedDate"), updatedDateProperty,
-						ISO8601DateParser.toString(m.getDateLastModified()));
-
+			@Override
+			public String apply(Method x) {
+				return x.getName();
 			}
-		}
+		});
+
+		final boolean methodNameIsOrdered = Ordering.natural().isOrdered(methodNames);
+
+		Assert.assertEquals(methodTerms.size(), methods.size());
+		Assert.assertTrue(methodNameIsOrdered);
 	}
 
 	/*
-	 * This test mock one term with cv as Method along with additional properties like Created Date and Last Modified Date
-	 * and ensures that GetMethodById function will return full method object.
-	 * */
+	* This test mock one term with cv as Method along with additional properties like Created Date and Last Modified Date
+	* and ensures that GetMethodById function will return full method object.
+	* */
 	@Test
 	public void testGetMethodByIdShouldFetchAndVerify() throws Exception {
 		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
 
-		// Fill Test Created Date Property using Calendar
-		Calendar cal = Calendar.getInstance();
-		cal.set(2015, Calendar.JANUARY, 1);
-		Date testCreatedDate = cal.getTime();
+		// Fill Test Created Date Property
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> methodCreatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(methodTerm), methodCreatedDateProperties, testCreatedDate);
 
-		// Fill Test Updated Date Property using Calendar
-		cal.set(2015, Calendar.MAY, 20);
-		Date testUpdatedDate = cal.getTime();
+		// Fill Test Updated Date Property
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.JUNE, 30);
 		List<CVTermProperty> methodUpdatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(methodTerm), methodUpdatedDateProperties, testUpdatedDate);
 
-		Mockito.when(this.cvTermDao.getAllByCvId(Collections.singletonList(methodTerm.getCvTermId()), CvId.METHODS, true))
-		.thenReturn(Collections.singletonList(methodTerm));
+		Mockito.when(this.cvTermDao.getAllByCvId(Collections.singletonList(methodTerm.getCvTermId()), CvId.METHODS, false))
+				.thenReturn(Collections.singletonList(methodTerm));
 		List<CVTermProperty> combinedProperties = new ArrayList<>(methodCreatedDateProperties);
 		combinedProperties.addAll(methodUpdatedDateProperties);
 		Mockito.when(this.cvTermPropertyDao.getByCvTermIds(Collections.singletonList(methodTerm.getCvTermId())))
-		.thenReturn(combinedProperties);
+				.thenReturn(combinedProperties);
 
-		Method method = this.methodDataManager.getMethod(methodTerm.getCvTermId(), true);
+		Method method = this.methodDataManager.getMethod(methodTerm.getCvTermId(), false);
 
 		// Make sure each method data inserted properly, assert them and display proper message
 		String message = "The %s for method '" + method.getId() + "' was not added correctly.";
@@ -172,17 +165,16 @@ public class MethodDataManagerImplTest {
 		Assert.assertEquals(String.format(message, "IsObsolete"), methodTerm.isObsolete(), method.isObsolete());
 		Assert.assertEquals(String.format(message, "CreatedDate"), method.getDateCreated(), testCreatedDate);
 		Assert.assertEquals(String.format(message, "UpdatedDate"), method.getDateLastModified(), testUpdatedDate);
-		Assert.assertFalse("Method " + method.getId() + " should not be obsolete", method.isObsolete());
 	}
 
 	/*
-	 * This test will check GetMethodById return null if term with CV as Method does not exists
-	 * */
+	* This test will check GetMethodById return null if term with CV as Method does not exists
+	* */
 	@Test
 	public void testGetMethodByIdShouldReturnNullIfTermDoesNotExists() throws Exception {
-		Method method = this.methodDataManager.getMethod(0,true);
+		Method method = this.methodDataManager.getMethod(0, false);
 		Assert.assertNull(method);
-		Mockito.verify(this.cvTermDao, Mockito.times(1)).getAllByCvId(Collections.singletonList(0), CvId.METHODS, true);
+		Mockito.verify(this.cvTermDao, Mockito.times(1)).getAllByCvId(Collections.singletonList(0), CvId.METHODS, false);
 	}
 
 	/**
@@ -209,7 +201,9 @@ public class MethodDataManagerImplTest {
 
 		Mockito.when(this.cvTermDao.save(method.getName(), method.getDefinition(), CvId.METHODS)).thenReturn(cvTerm);
 
-		//save property dao mocking
+		//Stubbing createdDate to be used in addMethod
+		Date createdDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
+		this.stubCurrentDate(createdDate);
 
 		this.methodDataManager.addMethod(method);
 
@@ -220,7 +214,7 @@ public class MethodDataManagerImplTest {
 		//check cvid
 		Assert.assertNotNull(String.format(message, "CvId"), method.getVocabularyId());
 
-		Assert.assertNotNull(String.format(message, "CreatedDate"), method.getDateCreated());
+		Assert.assertEquals(String.format(message, "CreatedDate"), createdDate, method.getDateCreated());
 
 		//Verify save cvterm
 		Mockito.verify(this.cvTermDao).save(method.getName(), method.getDefinition(), CvId.METHODS);
@@ -270,13 +264,6 @@ public class MethodDataManagerImplTest {
 		cvTerm.setIsObsolete(false);
 		cvTerm.setIsRelationshipType(false);
 
-		// Fill Test Updated Date Property using Calendar
-		Calendar cal = Calendar.getInstance();
-		cal.set(2015, Calendar.MAY, 20);
-		Date testUpdatedDate = cal.getTime();
-		List<CVTermProperty> methodUpdatedDateProperties = new ArrayList<>();
-		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(methodTerm), methodUpdatedDateProperties, testUpdatedDate);
-
 		//Updating method via manager
 		Method method = new Method();
 		method.setId(methodTerm.getCvTermId());
@@ -285,6 +272,10 @@ public class MethodDataManagerImplTest {
 
 		Mockito.when(this.cvTermDao.getById(methodTerm.getCvTermId())).thenReturn(cvTerm);
 		Mockito.when(this.cvTermDao.merge(cvTerm)).thenReturn(cvTerm);
+
+		//Stubbing createdDate to be used in addMethod
+		Date updatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
+		this.stubCurrentDate(updatedDate);
 
 		this.methodDataManager.updateMethod(method);
 
@@ -327,16 +318,13 @@ public class MethodDataManagerImplTest {
 		// Save Method Term using dao
 		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
 
-		// Fill Test Created Date Property using Calendar
-		Calendar cal = Calendar.getInstance();
-		cal.set(2015, Calendar.JANUARY, 1);
-		Date testCreatedDate = cal.getTime();
+		// Fill Test Created Date Property
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> methodCreatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(methodTerm), methodCreatedDateProperties, testCreatedDate);
 
-		// Fill Test Updated Date Property using Calendar
-		cal.set(2015, Calendar.MAY, 20);
-		Date testUpdatedDate = cal.getTime();
+		// Fill Test Updated Date Property
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		List<CVTermProperty> methodUpdatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(methodTerm), methodUpdatedDateProperties, testUpdatedDate);
 
@@ -390,21 +378,5 @@ public class MethodDataManagerImplTest {
 		Mockito.when(this.cvTermDao.getById(methodTerm.getCvTermId())).thenReturn(methodTerm);
 		Mockito.doReturn(true).when(this.cvTermRelationshipDao).isTermReferred(methodTerm.getCvTermId());
 		this.methodDataManager.deleteMethod(methodTerm.getCvTermId());
-	}
-
-	@Test
-	public void testGetMethod_DontFilterObsolete() {
-		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
-		methodTerm.setIsObsolete(true);
-
-		boolean filterObsolete = false;
-		Mockito.when(this.cvTermDao.getAllByCvId(Collections.singletonList(methodTerm.getCvTermId()), CvId.METHODS, filterObsolete))
-		.thenReturn(Collections.singletonList(methodTerm));
-
-		Method method = this.methodDataManager.getMethod(methodTerm.getCvTermId(), filterObsolete);
-		Assert.assertNotNull(method);
-		Assert.assertTrue("Method should have id " + methodTerm.getCvTermId(), methodTerm.getCvTermId().intValue() == method.getId());
-		Assert.assertTrue("Method" + method.getId() + " should be obsolete", method.isObsolete());
-
 	}
 }
