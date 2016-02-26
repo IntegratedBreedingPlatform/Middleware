@@ -146,16 +146,16 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		return true;
 	}
 
-	private String getSelectionHistory(Germplasm germplasm) {
+	private Name getSelectionHistory(Germplasm germplasm) {
 		List<Name> names = germplasm.getNames();
 		UserDefinedField selectionHistoryNameType =
 				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
 
-		String selectionHistoryName = null;
+		Name selectionHistoryName = null;
 		if (!names.isEmpty() && selectionHistoryNameType != null) {
 			for (Name name : names) {
 				if (selectionHistoryNameType.getFldno().equals(name.getTypeId())) {
-					selectionHistoryName = name.getNval();
+					selectionHistoryName = name;
 					break;
 				}
 			}
@@ -174,7 +174,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	 * through the germplasm details screen but will not be the name displayed in lists.
 	 * 
 	 */
-	private void copySelectionHistory(Germplasm germplasm, String selectionHistoryNameValue) {
+	private void copySelectionHistory(Germplasm germplasm, Name selectionHistoryName) {
 
 		// 1. Make current preferred name a non-preferred name by setting nstat = 0
 		// because we are about to add a different name as preferred.
@@ -204,15 +204,15 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			Name newSelectionHistoryAtFixation = new Name();
 			newSelectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
 			newSelectionHistoryAtFixation.setTypeId(selHisFixNameType.getFldno());
-			newSelectionHistoryAtFixation.setNval(selectionHistoryNameValue);
+			newSelectionHistoryAtFixation.setNval(selectionHistoryName.getNval());
 			newSelectionHistoryAtFixation.setNstat(1); // Means it is preferred name.
-			newSelectionHistoryAtFixation.setUserId(1); // TODO get current user passed to the service and use here.
-			newSelectionHistoryAtFixation.setLocationId(0); // TODO get location passed to the service and use here.
+			newSelectionHistoryAtFixation.setUserId(selectionHistoryName.getUserId());
+			newSelectionHistoryAtFixation.setLocationId(selectionHistoryName.getLocationId());
 			newSelectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
 			newSelectionHistoryAtFixation.setReferenceId(0);
 			germplasm.getNames().add(newSelectionHistoryAtFixation);
 		} else {
-			existingSelHisFixName.setNval(selectionHistoryNameValue);
+			existingSelHisFixName.setNval(selectionHistoryName.getNval());
 			existingSelHisFixName.setNstat(1);
 			existingSelHisFixName.setNdate(Util.getCurrentDateAsIntegerValue());
 		}
@@ -220,11 +220,12 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	public void copySelectionHistory(Germplasm germplasm) {
 
-		String selectionHistoryNameValue = getSelectionHistory(germplasm);
+		Name selectionHistoryName = getSelectionHistory(germplasm);
 
-		if (selectionHistoryNameValue != null) {
-			copySelectionHistory(germplasm, selectionHistoryNameValue);
-			LOG.info("Selection history at fixation for gid {} saved as germplasm name {} .", germplasm.getGid(), selectionHistoryNameValue);
+		if (selectionHistoryName != null) {
+			copySelectionHistory(germplasm, selectionHistoryName);
+			LOG.info("Selection history at fixation for gid {} saved as germplasm name {} .", germplasm.getGid(),
+					selectionHistoryName.getNval());
 		} else {
 			LOG.info("No selection history type name was found for germplasm {}.", germplasm.getGid());
 		}
@@ -232,11 +233,12 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private void copySelectionHistoryForCross(Germplasm cross, Germplasm previousCross) {
 
-		String selectionHistoryNameValue = getSelectionHistory(previousCross);
+		Name selectionHistoryName = getSelectionHistory(previousCross);
 
-		if (selectionHistoryNameValue != null) {
-			copySelectionHistory(cross, selectionHistoryNameValue);
-			LOG.info("Selection history {} for cross with gid {} was copied from previous cross with gid {}.", selectionHistoryNameValue,
+		if (selectionHistoryName != null) {
+			copySelectionHistory(cross, selectionHistoryName);
+			LOG.info("Selection history {} for cross with gid {} was copied from previous cross with gid {}.",
+					selectionHistoryName.getNval(),
 					cross.getGid(), previousCross.getGid());
 		} else {
 			LOG.info("No selection history type name was found for previous cross with gid {}.", previousCross.getGid());
