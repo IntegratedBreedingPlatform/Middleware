@@ -163,6 +163,17 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		return selectionHistoryName;
 	}
 
+	/**
+	 * Background: one of the requirements of grouping/coding is that the selection history should not continue to grow after it has been
+	 * decided that the line is finished or fixed. The solution adopted for meeting this requirement while remaining consistent with the
+	 * design of the BMS is to create a new name type to represent the "selection history at fixation". We will call this the
+	 * ftype=‘SELHISFIX’. When setting a line as fixed we create the MGID and copy the selection history name to the ‘SELHISFIX’ name. We
+	 * will set ‘SELHISFIX’ as the preferred name (designation, nstat=1) so that this will be the name that the user sees in lists within
+	 * the BMS. If new germplasm records are made from this record the ‘SELHISFIX’ name will be copied (along with the MGID) and continue to
+	 * be the preferred name. In the background, the ‘selection history’ will continue to grow as it usually does and will be accessible
+	 * through the germplasm details screen but will not be the name displayed in lists.
+	 * 
+	 */
 	private void copySelectionHistory(Germplasm germplasm, String selectionHistoryNameValue) {
 
 		// 1. Make current preferred name a non-preferred name by setting nstat = 0
