@@ -30,29 +30,47 @@ public class GermplasmGroupingServiceImplTest {
 
 	private GermplasmGroupingServiceImpl germplasmGroupingService;
 
+	private Name selectionHistoryNameParent;
+	private Name selectionHistoryNameChild1;
+	private Name selectionHistoryNameChild2;
+
+	private UserDefinedField selectionHistoryNameCode;
+	private UserDefinedField selHisFixNameCode;
+
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
 
-		UserDefinedField selectionHistoryUDFLD = new UserDefinedField(111);
-		selectionHistoryUDFLD.setFtable("NAMES");
-		selectionHistoryUDFLD.setFtype("NAME");
-		selectionHistoryUDFLD.setFcode(GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
+		this.selectionHistoryNameCode = new UserDefinedField(111);
+		this.selectionHistoryNameCode.setFtable("NAMES");
+		this.selectionHistoryNameCode.setFtype("NAME");
+		this.selectionHistoryNameCode.setFcode(GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
 		Mockito.when(
 				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE))
-				.thenReturn(selectionHistoryUDFLD);
+				.thenReturn(this.selectionHistoryNameCode);
 
-		UserDefinedField selHisFixUDFLD = new UserDefinedField(222);
-		selHisFixUDFLD.setFtable("NAMES");
-		selHisFixUDFLD.setFtype("NAME");
-		selHisFixUDFLD.setFcode(GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
+		this.selHisFixNameCode = new UserDefinedField(222);
+		this.selHisFixNameCode.setFtable("NAMES");
+		this.selHisFixNameCode.setFtype("NAME");
+		this.selHisFixNameCode.setFcode(GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 		Mockito.when(
 				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
-						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE)).thenReturn(selHisFixUDFLD);
+						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE)).thenReturn(this.selHisFixNameCode);
 
-		Name selectionHistoryName = new Name();
-		selectionHistoryName.setNval("SelectionHistory");
-		selectionHistoryName.setTypeId(selectionHistoryUDFLD.getFldno());
+		this.selectionHistoryNameParent = new Name();
+		this.selectionHistoryNameParent.setNstat(1);
+		this.selectionHistoryNameParent.setNval("SelectionHistory");
+		this.selectionHistoryNameParent.setTypeId(this.selectionHistoryNameCode.getFldno());
+
+		this.selectionHistoryNameChild1 = new Name();
+		this.selectionHistoryNameChild1.setNstat(1);
+		this.selectionHistoryNameChild1.setNval("SelectionHistoryChild1");
+		this.selectionHistoryNameChild1.setTypeId(this.selectionHistoryNameCode.getFldno());
+
+		this.selectionHistoryNameChild2 = new Name();
+		this.selectionHistoryNameChild2.setNstat(1);
+		this.selectionHistoryNameChild2.setNval("SelectionHistoryChild2");
+		this.selectionHistoryNameChild2.setTypeId(this.selectionHistoryNameCode.getFldno());
 
 		this.germplasmGroupingService = new GermplasmGroupingServiceImpl(this.germplasmDAO, this.methodDAO, this.userDefinedFieldDAO);
 	}
@@ -63,10 +81,18 @@ public class GermplasmGroupingServiceImplTest {
 	@Test
 	public void testMarkFixedCase1() {
 		Germplasm germplasmToFix = new Germplasm(1);
+		germplasmToFix.getNames().add(this.selectionHistoryNameParent);
 
 		this.germplasmGroupingService.markFixed(germplasmToFix, false, false);
 
 		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(), germplasmToFix.getMgid());
+		Assert.assertEquals("Existing selection history should become non-preferred name.", new Integer(0),
+				this.selectionHistoryNameParent.getNstat());
+		Assert.assertEquals("Selection history at fixation should be added as a new name.", 2, germplasmToFix.getNames().size());
+		Assert.assertEquals("Selection history at fixation should be added as a preferred name.", new Integer(1), germplasmToFix.getNames()
+				.get(1).getNstat());
+		Assert.assertEquals("Selection history at fixation should be added as with natype = SELHISFIX code.",
+				this.selHisFixNameCode.getFldno(), germplasmToFix.getNames().get(1).getTypeId());
 
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).save(Mockito.any(Germplasm.class));
 	}
@@ -77,12 +103,15 @@ public class GermplasmGroupingServiceImplTest {
 	@Test
 	public void testMarkFixedCase2() {
 		Germplasm germplasmToFix = new Germplasm(1);
+		germplasmToFix.getNames().add(this.selectionHistoryNameParent);
 
 		Germplasm child1 = new Germplasm(2);
 		child1.setMgid(222);
+		child1.getNames().add(this.selectionHistoryNameChild1);
 
 		Germplasm child2 = new Germplasm(3);
 		child2.setMgid(333);
+		child2.getNames().add(this.selectionHistoryNameChild2);
 
 		Mockito.when(this.germplasmDAO.getAllChildren(germplasmToFix.getGid())).thenReturn(Lists.newArrayList(child1, child2));
 
@@ -91,6 +120,33 @@ public class GermplasmGroupingServiceImplTest {
 		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(), germplasmToFix.getMgid());
 		Assert.assertEquals("Expecting child1 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child1.getMgid());
 		Assert.assertEquals("Expecting child2 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child2.getMgid());
+
+		// Parent selection history name must be copied as selhisfix and as preferred name.
+		Assert.assertEquals("Existing selection history should become non-preferred name for parent.", new Integer(0),
+				this.selectionHistoryNameParent.getNstat());
+		Assert.assertEquals("Selection history at fixation should be added as a new name for parent.", 2, germplasmToFix.getNames().size());
+		Assert.assertEquals("Selection history at fixation should be added as a preferred name for parent.", new Integer(1), germplasmToFix
+				.getNames().get(1).getNstat());
+		Assert.assertEquals("Selection history at fixation should be added as with natype = SELHISFIX code for parent.",
+				this.selHisFixNameCode.getFldno(), germplasmToFix.getNames().get(1).getTypeId());
+
+		// Child1 selection history name must be copied as selhisfix and as preferred name.
+		Assert.assertEquals("Existing selection history should become non-preferred name for child1.", new Integer(0),
+				this.selectionHistoryNameChild1.getNstat());
+		Assert.assertEquals("Selection history at fixation should be added as a new name for child1.", 2, child1.getNames().size());
+		Assert.assertEquals("Selection history at fixation should be added as a preferred name for child1.", new Integer(1), child1
+				.getNames().get(1).getNstat());
+		Assert.assertEquals("Selection history at fixation should be added as with natype = SELHISFIX code for parent.",
+				this.selHisFixNameCode.getFldno(), child1.getNames().get(1).getTypeId());
+
+		// Child2 selection history name must be copied as selhisfix and as preferred name.
+		Assert.assertEquals("Existing selection history should become non-preferred name for child2.", new Integer(0),
+				this.selectionHistoryNameChild2.getNstat());
+		Assert.assertEquals("Selection history at fixation should be added as a new name for child2.", 2, child2.getNames().size());
+		Assert.assertEquals("Selection history at fixation should be added as a preferred name for child2.", new Integer(1), child2
+				.getNames().get(1).getNstat());
+		Assert.assertEquals("Selection history at fixation should be added as with natype = SELHISFIX code for child2.",
+				this.selHisFixNameCode.getFldno(), child2.getNames().get(1).getTypeId());
 
 		Mockito.verify(this.germplasmDAO, Mockito.times(3)).save(Mockito.any(Germplasm.class));
 	}
