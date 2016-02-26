@@ -77,7 +77,6 @@ public class GermplasmGroupingServiceImplTest {
 
 		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(), germplasmToFix.getMgid());
 
-		Mockito.verify(this.nameDAO, Mockito.times(1)).save(Mockito.any(Name.class));
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).save(Mockito.any(Germplasm.class));
 	}
 
@@ -102,7 +101,6 @@ public class GermplasmGroupingServiceImplTest {
 		Assert.assertEquals("Expecting child1 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child1.getMgid());
 		Assert.assertEquals("Expecting child2 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child2.getMgid());
 
-		Mockito.verify(this.nameDAO, Mockito.times(3)).save(Mockito.any(Name.class));
 		Mockito.verify(this.germplasmDAO, Mockito.times(3)).save(Mockito.any(Germplasm.class));
 	}
 
@@ -127,7 +125,6 @@ public class GermplasmGroupingServiceImplTest {
 		Assert.assertEquals("Expecting child1 mgid to remain the same as before.", new Integer(222), child1.getMgid());
 		Assert.assertEquals("Expecting child2 mgid to remain the same as before.", new Integer(333), child2.getMgid());
 
-		Mockito.verify(this.nameDAO, Mockito.times(1)).save(Mockito.any(Name.class));
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).save(Mockito.any(Germplasm.class));
 	}
 
@@ -169,7 +166,6 @@ public class GermplasmGroupingServiceImplTest {
 		Assert.assertEquals("Expecting child1 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child1.getMgid());
 		Assert.assertEquals("Expecting child2 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child2.getMgid());
 
-		Mockito.verify(this.nameDAO, Mockito.times(3)).save(Mockito.any(Name.class));
 		Mockito.verify(this.germplasmDAO, Mockito.times(3)).save(Mockito.any(Germplasm.class));
 	}
 
@@ -232,7 +228,6 @@ public class GermplasmGroupingServiceImplTest {
 		Assert.assertEquals("Expecting child1 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child1.getMgid());
 		Assert.assertEquals("Expecting child2 mgid to remain unchanged as method is generative.", expectedChild2MGID, child2.getMgid());
 
-		Mockito.verify(this.nameDAO, Mockito.times(2)).save(Mockito.any(Name.class));
 		Mockito.verify(this.germplasmDAO, Mockito.times(2)).save(Mockito.any(Germplasm.class));
 	}
 
@@ -283,8 +278,6 @@ public class GermplasmGroupingServiceImplTest {
 
 		// Previous crosses should be queried once.
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).getPreviousCrosses(crossGid1Parent1, crossGid1Parent2);
-		// Selection history from previous cross should be copied to the cross once
-		Mockito.verify(this.nameDAO, Mockito.times(1)).save(Mockito.any(Name.class));
 		// One Germplasm record should be saved out of the two that are passed.
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).save(Mockito.any(Germplasm.class));
 	}
