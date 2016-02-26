@@ -117,19 +117,19 @@ public abstract class Builder extends DatabaseBroker {
 	}
 	
 	protected final OntologyVariableDataManager getOntologyVariableDataManager() {
-		return new OntologyVariableDataManagerImpl(this.sessionProvider);
+		return new OntologyVariableDataManagerImpl();
 	}
 	
 	protected final OntologyMethodDataManager getOntologyMethodDataManager() {
-		return new OntologyMethodDataManagerImpl(this.sessionProvider);
+		return new OntologyMethodDataManagerImpl();
 	}
 	
 	protected final OntologyPropertyDataManager getOntologyPropertyDataManager() {
-		return new OntologyPropertyDataManagerImpl(this.sessionProvider);
+		return new OntologyPropertyDataManagerImpl();
 	}
 
 	protected final OntologyScaleDataManager getOntologyScaleDataManager() {
-		return new OntologyScaleDataManagerImpl(this.sessionProvider);
+		return new OntologyScaleDataManagerImpl();
 	}
 	
 	protected final StandardVariableTransformer getStandardVariableTransformer() {

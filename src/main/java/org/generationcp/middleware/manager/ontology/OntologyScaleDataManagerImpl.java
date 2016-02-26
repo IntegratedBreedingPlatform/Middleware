@@ -4,12 +4,16 @@ package org.generationcp.middleware.manager.ontology;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import com.google.common.base.Function;
+import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
+import com.google.common.base.Strings;
+import com.google.common.collect.Iterables;
 import org.generationcp.middleware.dao.oms.CVDao;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
@@ -22,7 +26,6 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ontology.api.OntologyCommonDAO;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.pojos.oms.CV;
@@ -32,16 +35,9 @@ import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.util.Clock;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.StringUtil;
-import org.generationcp.middleware.util.SystemClock;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.base.Strings;
-import com.google.common.collect.Iterables;
 
 @Transactional
 public class OntologyScaleDataManagerImpl implements OntologyScaleDataManager {
@@ -66,16 +62,6 @@ public class OntologyScaleDataManagerImpl implements OntologyScaleDataManager {
 
 	public OntologyScaleDataManagerImpl() {
 		super();
-	}
-
-	//TODO:This is temporary hack for managerfactory, builder and service. It should refactor to remove this constructor
-	public OntologyScaleDataManagerImpl(HibernateSessionProvider sessionProvider) {
-		this.ontologyDaoFactory = new OntologyDaoFactory();
-		this.ontologyDaoFactory.setSessionProvider(sessionProvider);
-		OntologyCommonDAOImpl ontologyCommonDAOImpl = new OntologyCommonDAOImpl();
-		ontologyCommonDAOImpl.setSessionProvider(sessionProvider);
-		this.ontologyCommonDAO = ontologyCommonDAOImpl;
-		this.systemClock = new SystemClock();
 	}
 
 	@Override
