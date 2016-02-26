@@ -37,8 +37,7 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.hibernate.HibernateUtil;
+import org.generationcp.middleware.manager.ontology.api.OntologyCommonDAO;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
@@ -54,7 +53,6 @@ import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.util.Clock;
 import org.generationcp.middleware.util.ISO8601DateParser;
-import org.generationcp.middleware.util.SystemClock;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -91,343 +89,98 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 	@Autowired
 	private OntologyScaleDataManager scaleManager;
 
+	@Autowired
+	private OntologyCommonDAO ontologyCommonDAO;
+
 	private static final Logger LOG = LoggerFactory.getLogger(OntologyVariableDataManagerImpl.class);
 
 	public OntologyVariableDataManagerImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
 	}
 
-	//TODO:This is temporary hack for managerfactory, builder and service. It should refactor to remove this constructor
-	public OntologyVariableDataManagerImpl(HibernateSessionProvider sessionProvider) {
-		this.ontologyDaoFactory = new OntologyDaoFactory();
-		this.ontologyDaoFactory.setSessionProvider(sessionProvider);
-		this.systemClock = new SystemClock();
-		this.methodManager = new OntologyMethodDataManagerImpl(sessionProvider);
-		this.propertyManager = new OntologyPropertyDataManagerImpl(sessionProvider);
-		this.scaleManager = new OntologyScaleDataManagerImpl(sessionProvider);
-	}
-
 	@Override
 	public List<Variable> getWithFilter(VariableFilter variableFilter) throws MiddlewareQueryException {
 
-		Map<Integer, Variable> map = new HashMap<>();
+		Map<Integer, Variable> variableMap = new HashMap<>();
 
-		try {
+		Map<String, List<Integer>> listParameters = new HashMap<>();
 
-			Map<String, List<Integer>> listParameters = new HashMap<>();
+		// Execute only if fetchAll is false
+		if (!variableFilter.isFetchAll()) {
 
-			String filterClause = "";
+			this.ontologyCommonDAO.makeFilterClauseByIsFavouritesMethodIdsAndPropertyIds(variableFilter, listParameters);
 
-			// Execute only if fetchAll is false
-			if (!variableFilter.isFetchAll()) {
+			// check if property class list is not empty then get properties by classes and add filter clause of it
+			if (!variableFilter.getPropertyClasses().isEmpty()) {
 
-				// check for to fetch favorites variables and add filter clause for it
-				if (variableFilter.isFavoritesOnly()) {
-					filterClause += "  and pf.id is not null";
-				}
+				List<Integer> propertyIds = this.ontologyCommonDAO.getPropertyIdsAndAddToFilterClause(variableFilter, listParameters);
 
-				// check if methodIds not empty and add filter clause of it
-				if (!variableFilter.getMethodIds().isEmpty()) {
-					filterClause += " and vmr.mid in (:methodIds)";
-					listParameters.put("methodIds", variableFilter.getMethodIds());
-				}
-
-				// check if propertyIds not empty and add filter clause of it
-				if (!variableFilter.getPropertyIds().isEmpty()) {
-					filterClause += " and vpr.pid in (:propertyIds)";
-					listParameters.put("propertyIds", variableFilter.getPropertyIds());
-				}
-
-				// check if property class list is not empty then get properties by classes and add filter clause of it
-				if (!variableFilter.getPropertyClasses().isEmpty()) {
-
-					SQLQuery pSQLQuery =
-							this.ontologyDaoFactory.getActiveSession().createSQLQuery(
-									"select subject_id from cvterm_relationship where type_id = " + TermId.IS_A.getId()
-											+ " and object_id in (select cvterm_id from cvterm where name in(:classNames) and cv_id = "
-											+ CvId.TRAIT_CLASS.getId() + ");");
-
-					pSQLQuery.setParameterList("classNames", variableFilter.getPropertyClasses());
-					List queryResults = pSQLQuery.list();
-
-					if (!listParameters.containsKey("propertyIds")) {
-						filterClause += " and vpr.pid in (:propertyIds)";
-						listParameters.put("propertyIds", variableFilter.getPropertyIds());
-					}
-
-					List<Integer> propertyIds = listParameters.get("propertyIds");
-					for (Object row : queryResults) {
-						propertyIds.add(HibernateUtil.typeSafeObjectToInteger(row));
-					}
-
-					// Filtering with class that is invalid. So no further iteration required.
-					if (propertyIds.isEmpty()) {
-						return new ArrayList<>();
-					}
-				}
-
-				// check if scaleIds not empty and add filter clause of it
-				if (!variableFilter.getScaleIds().isEmpty()) {
-					filterClause += " and vsr.sid in (:scaleIds)";
-					listParameters.put("scaleIds", variableFilter.getScaleIds());
-				}
-
-				// check of data type list is not empty then get scales by data types and add filter clause of it
-				if (!variableFilter.getDataTypes().isEmpty()) {
-
-					List<Integer> dataTypeIds = Util.convertAll(variableFilter.getDataTypes(), new Function<DataType, Integer>() {
-
-						@Override
-						public Integer apply(DataType x) {
-							return x.getId();
-						}
-					});
-
-					SQLQuery sSQLQuery =
-							this.ontologyDaoFactory.getActiveSession().createSQLQuery(
-									"select subject_id from cvterm_relationship where type_id = " + TermId.HAS_TYPE.getId()
-									+ " and object_id in(:dataTypeIds)");
-
-					sSQLQuery.setParameterList("dataTypeIds", dataTypeIds);
-					List queryResults = sSQLQuery.list();
-
-					if (!listParameters.containsKey("scaleIds")) {
-						filterClause += " and vsr.sid in (:scaleIds)";
-						listParameters.put("scaleIds", variableFilter.getScaleIds());
-					}
-
-					List<Integer> scaleIds = listParameters.get("scaleIds");
-					for (Object row : queryResults) {
-						scaleIds.add(HibernateUtil.typeSafeObjectToInteger(row));
-					}
-
-					// Filtering with data type gives no scale. So no further iteration required.
-					if (scaleIds.isEmpty()) {
-						return new ArrayList<>();
-					}
-				}
-
-				// check if variableIds not empty and add filter clause of it
-				if (!variableFilter.getVariableIds().isEmpty()) {
-					filterClause += " and v.cvterm_id in (:variableIds)";
-					listParameters.put("variableIds", variableFilter.getVariableIds());
-				}
-
-				// check if excludedVariableIds not empty and add filter clause of it
-				if (!variableFilter.getExcludedVariableIds().isEmpty()) {
-					filterClause += " and v.cvterm_id not in(:excludedVariableIds)";
-					listParameters.put("excludedVariableIds", variableFilter.getExcludedVariableIds());
-				}
-
-				// check of variable type list is not empty then get variables by variable types and add filter clause of it
-				if (!variableFilter.getVariableTypes().isEmpty()) {
-
-					List<String> variableTypeNames =
-							Util.convertAll(variableFilter.getVariableTypes(), new Function<VariableType, String>() {
-
-								@Override
-								public String apply(VariableType x) {
-									return x.getName();
-								}
-							});
-
-					SQLQuery vSQLQuery =
-							this.ontologyDaoFactory.getActiveSession().createSQLQuery(
-									"select cvterm_id from cvtermprop where type_id = 1800 and value in (:variableTypeNames)");
-					vSQLQuery.setParameterList("variableTypeNames", variableTypeNames);
-					List queryResults = vSQLQuery.list();
-
-					if (!listParameters.containsKey("variableIds")) {
-						filterClause += " and v.cvterm_id in (:variableIds)";
-						listParameters.put("variableIds", variableFilter.getVariableIds());
-					}
-
-					List<Integer> variableIds = listParameters.get("variableIds");
-					for (Object row : queryResults) {
-						variableIds.add(HibernateUtil.typeSafeObjectToInteger(row));
-					}
-
-					// Filtering with variable types that is not used or invalid. So no further iteration required.
-					if (variableIds.isEmpty()) {
-						return new ArrayList<>();
-					}
+				// Filtering with class that is invalid. So no further iteration required.
+				if (propertyIds.isEmpty()) {
+					return new ArrayList<>();
 				}
 			}
 
-			// this query will get variables using filter
-			SQLQuery query =
-					this.ontologyDaoFactory.getActiveSession()
-					.createSQLQuery(
-							"select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, vo.alias g_alias, vo.expected_min g_min_value, vo.expected_max g_max_value, vpo.alias p_alias, vpo.expected_min p_min_value, vpo.expected_max p_max_value, pf.id fid from cvterm v "
-									+ "left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id "
-									+ "left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id "
-									+ "left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id "
-									+ "left join variable_overrides vo on vo.cvterm_id = v.cvterm_id and vo.program_uuid is null "
-									+ "left join variable_overrides vpo on vpo.cvterm_id = v.cvterm_id and vpo.program_uuid = :programUuid "
-									+ "left join program_favorites pf on pf.entity_id = v.cvterm_id and pf.program_uuid = :programUuid and pf.entity_type = 'VARIABLES' "
-									+ "WHERE (v.cv_id = 1040) " + filterClause).addScalar("vid").addScalar("vn").addScalar("vd")
-									.addScalar("pid").addScalar("pn").addScalar("pd").addScalar("mid").addScalar("mn").addScalar("md")
-									.addScalar("sid").addScalar("sn").addScalar("sd").addScalar("g_alias").addScalar("g_min_value")
-									.addScalar("g_max_value").addScalar("p_alias").addScalar("p_min_value").addScalar("p_max_value")
-									.addScalar("fid");
+			this.ontologyCommonDAO.makeFilterClauseByScaleIds(variableFilter, listParameters);
 
-			query.setParameter("programUuid", variableFilter.getProgramUuid());
+			// check if data type list is not empty then get scales by data types and add filter clause of it
+			if (!variableFilter.getDataTypes().isEmpty()) {
 
-			// get data from parameter map and apply parameter to query
-			for (String lp : listParameters.keySet()) {
-				query.setParameterList(lp, listParameters.get(lp));
-			}
+				List<Integer> dataTypeIds = Util.convertAll(variableFilter.getDataTypes(), new Function<DataType, Integer>() {
 
-			Map<Integer, Method> mMap = new HashMap<>();
-			Map<Integer, Property> pMap = new HashMap<>();
-			Map<Integer, Scale> sMap = new HashMap<>();
+					@Override
+					public Integer apply(DataType x) {
+						return x.getId();
+					}
+				});
 
-			List queryResults = query.list();
+				List<Integer> scaleIds = this.ontologyCommonDAO.getScaleIdsAndAddToFilterClause(variableFilter, dataTypeIds, listParameters);
 
-			// get result output of query and store related data to variable (expected min/max, alias, method, scale, property, variable
-			// term data)
-			for (Object row : queryResults) {
-				Object[] items = (Object[]) row;
-				Variable variable = new Variable(new Term(HibernateUtil.typeSafeObjectToInteger(items[0]), (String) items[1], (String) items[2]));
-
-				Integer propertyId = HibernateUtil.typeSafeObjectToInteger(items[3]);
-				if (!pMap.containsKey(propertyId)) {
-					pMap.put(propertyId, new Property(
-							new Term(HibernateUtil.typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5])));
-				}
-				variable.setProperty(pMap.get(propertyId));
-
-				Integer methodId = HibernateUtil.typeSafeObjectToInteger(items[6]);
-				if (!mMap.containsKey(methodId)) {
-					mMap.put(methodId, new Method(new Term(HibernateUtil.typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8])));
-				}
-				variable.setMethod(mMap.get(methodId));
-
-				Integer scaleId = HibernateUtil.typeSafeObjectToInteger(items[9]);
-				if (!sMap.containsKey(scaleId)) {
-					sMap.put(scaleId, new Scale(new Term(HibernateUtil.typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11])));
-				}
-
-				variable.setScale(sMap.get(scaleId));
-
-				// Alias, Expected Min Value, Expected Max Value
-				String gAlias = (String) items[12];
-				String gExpMin = (String) items[13];
-				String gExpMax = (String) items[14];
-				String pAlias = (String) items[15];
-				String pExpMin = (String) items[16];
-				String pExpMax = (String) items[17];
-
-				if (pAlias == null && pExpMin == null && pExpMax == null) {
-					variable.setAlias(gAlias);
-					variable.setMinValue(gExpMin);
-					variable.setMaxValue(gExpMax);
-				} else {
-					variable.setAlias(pAlias);
-					variable.setMinValue(pExpMin);
-					variable.setMaxValue(pExpMax);
-				}
-
-				variable.setIsFavorite(items[18] != null);
-				map.put(variable.getId(), variable);
-			}
-
-			// No variable found based on criteria
-			if (map.isEmpty()) {
-				return new ArrayList<>();
-			}
-
-			// Fetch Property Class, Data Type and Categories from cvterm_relationship
-			SQLQuery rQuery =
-					this.ontologyDaoFactory.getActiveSession()
-					.createSQLQuery(
-							"select tr.subject_id sid, tr.type_id tid, tr.object_id rid, t.name rn, t.definition rd from cvterm_relationship tr inner join cvterm t on t.cvterm_id = tr.object_id "
-									+ "where tr.subject_id in (:propertyIds) or tr.subject_id in (:scaleIds)").addScalar("sid")
-									.addScalar("tid").addScalar("rid").addScalar("rn").addScalar("rd");
-
-			rQuery.setParameterList("propertyIds", pMap.keySet());
-			rQuery.setParameterList("scaleIds", sMap.keySet());
-
-			List rQueryResults = rQuery.list();
-
-			for (Object row : rQueryResults) {
-				Object[] items = (Object[]) row;
-
-				Integer subjectId = HibernateUtil.typeSafeObjectToInteger(items[0]);
-				Integer typeId = HibernateUtil.typeSafeObjectToInteger(items[1]);
-				Integer objectId = HibernateUtil.typeSafeObjectToInteger(items[2]);
-
-				String name = (String) items[3];
-				String description = (String) items[4];
-
-				if (Objects.equals(typeId, TermId.IS_A.getId())) {
-					pMap.get(subjectId).addClass(name);
-				} else if (Objects.equals(typeId, TermId.HAS_TYPE.getId())) {
-					sMap.get(subjectId).setDataType(DataType.getById(objectId));
-				} else if (Objects.equals(typeId, TermId.HAS_VALUE.getId())) {
-					sMap.get(subjectId).addCategory(new TermSummary(objectId, name, description));
+				// Filtering with data type gives no scale. So no further iteration required.
+				if (scaleIds.isEmpty()) {
+					return new ArrayList<>();
 				}
 			}
 
-			// Fetch Property CropOntologyId, Scale min-max, Variable Type, Creation and Last Modified date of all terms
-			SQLQuery pQuery =
-					this.ontologyDaoFactory.getActiveSession()
-					.createSQLQuery(
-							"select t.cvterm_id tid, t.cv_id cvid, tp.type_id typeid, tp.value value from cvtermprop tp "
-									+ "inner join cvterm t on t.cvterm_id = tp.cvterm_id "
-									+ "WHERE tp.cvterm_id in(:methodIds) or tp.cvterm_id in(:propertyIds) or tp.cvterm_id in(:scaleIds) or tp.cvterm_id in(:variableIds)")
-									.addScalar("tid").addScalar("cvid").addScalar("typeid").addScalar("value");
+			this.ontologyCommonDAO.makeFilterClauseByVariableIdsAndExcludedVariableIds(variableFilter, listParameters);
 
-			// set parameter to query
-			pQuery.setParameterList("methodIds", mMap.keySet());
-			pQuery.setParameterList("propertyIds", pMap.keySet());
-			pQuery.setParameterList("scaleIds", sMap.keySet());
-			pQuery.setParameterList("variableIds", map.keySet());
+			// check if variable type list is not empty then get variables by variable types and add filter clause of it
+			if (!variableFilter.getVariableTypes().isEmpty()) {
 
-			List pQueryResults = pQuery.list();
+				List<String> variableTypeNames =
+						Util.convertAll(variableFilter.getVariableTypes(), new Function<VariableType, String>() {
 
-			// fetch data from results and add data to related terms
-			for (Object row : pQueryResults) {
-				Object[] items = (Object[]) row;
+							@Override
+							public String apply(VariableType x) {
+								return x.getName();
+							}
+						});
 
-				Integer cvTermId = HibernateUtil.typeSafeObjectToInteger(items[0]);
-				Integer cvId = HibernateUtil.typeSafeObjectToInteger(items[1]);
-				Integer typeId = HibernateUtil.typeSafeObjectToInteger(items[2]);
-				String value = (String) items[3];
+				List<Integer> variableIds = this.ontologyCommonDAO.getVariableIdsAndAddToFilterClause(variableFilter, variableTypeNames, listParameters);
 
-				if (Objects.equals(typeId, TermId.CROP_ONTOLOGY_ID.getId()) && Objects.equals(cvId, CvId.PROPERTIES.getId())) {
-					pMap.get(cvTermId).setCropOntologyId(value);
-				} else if (Objects.equals(typeId, TermId.VARIABLE_TYPE.getId()) && Objects.equals(cvId, CvId.VARIABLES.getId())) {
-					map.get(cvTermId).addVariableType(VariableType.getByName(value));
-				} else if (Objects.equals(typeId, TermId.MIN_VALUE.getId()) && Objects.equals(cvId, CvId.SCALES.getId())) {
-					sMap.get(cvTermId).setMinValue(value);
-				} else if (Objects.equals(typeId, TermId.MAX_VALUE.getId()) && Objects.equals(cvId, CvId.SCALES.getId())) {
-					sMap.get(cvTermId).setMaxValue(value);
-				} else if (Objects.equals(typeId, TermId.CREATION_DATE.getId()) && Objects.equals(cvId, CvId.METHODS.getId())) {
-					mMap.get(cvTermId).setDateCreated(ISO8601DateParser.tryParse(value));
-				} else if (Objects.equals(typeId, TermId.LAST_UPDATE_DATE.getId()) && Objects.equals(cvId, CvId.METHODS.getId())) {
-					mMap.get(cvTermId).setDateLastModified(ISO8601DateParser.tryParse(value));
-				} else if (Objects.equals(typeId, TermId.CREATION_DATE.getId()) && Objects.equals(cvId, CvId.PROPERTIES.getId())) {
-					pMap.get(cvTermId).setDateCreated(ISO8601DateParser.tryParse(value));
-				} else if (Objects.equals(typeId, TermId.LAST_UPDATE_DATE.getId()) && Objects.equals(cvId, CvId.PROPERTIES.getId())) {
-					pMap.get(cvTermId).setDateLastModified(ISO8601DateParser.tryParse(value));
-				} else if (Objects.equals(typeId, TermId.CREATION_DATE.getId()) && Objects.equals(cvId, CvId.SCALES.getId())) {
-					sMap.get(cvTermId).setDateCreated(ISO8601DateParser.tryParse(value));
-				} else if (Objects.equals(typeId, TermId.LAST_UPDATE_DATE.getId()) && Objects.equals(cvId, CvId.SCALES.getId())) {
-					sMap.get(cvTermId).setDateLastModified(ISO8601DateParser.tryParse(value));
-				} else if (Objects.equals(typeId, TermId.CREATION_DATE.getId()) && Objects.equals(cvId, CvId.VARIABLES.getId())) {
-					map.get(cvTermId).setDateCreated(ISO8601DateParser.tryParse(value));
-				} else if (Objects.equals(typeId, TermId.LAST_UPDATE_DATE.getId()) && Objects.equals(cvId, CvId.VARIABLES.getId())) {
-					map.get(cvTermId).setDateLastModified(ISO8601DateParser.tryParse(value));
+				// Filtering with variable types that is not used or invalid. So no further iteration required.
+				if (variableIds.isEmpty()) {
+					return new ArrayList<>();
 				}
-
 			}
-
-		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error in getAllVariables", e);
 		}
 
-		List<Variable> variables = new ArrayList<>(map.values());
+		Map<Integer, Method> methodMap = new HashMap<>();
+		Map<Integer, Property> propertyMap = new HashMap<>();
+		Map<Integer, Scale> scaleMap = new HashMap<>();
+
+		this.ontologyCommonDAO.fillVariableMapUsingFilterClause(variableFilter, listParameters, variableMap, methodMap, propertyMap, scaleMap);
+
+		// No variable found based on criteria
+		if (variableMap.isEmpty()) {
+			return new ArrayList<>();
+		}
+
+		this.ontologyCommonDAO.getVariableRelationships(methodMap, propertyMap, scaleMap);
+
+		this.ontologyCommonDAO.getVariableProperties(variableMap, methodMap, propertyMap, scaleMap);
+
+		List<Variable> variables = new ArrayList<>(variableMap.values());
 
 		// sort variable list by variable name
 		Collections.sort(variables, new Comparator<Variable>() {
