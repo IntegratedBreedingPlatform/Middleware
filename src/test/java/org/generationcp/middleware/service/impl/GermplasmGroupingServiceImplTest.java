@@ -3,9 +3,7 @@ package org.generationcp.middleware.service.impl;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
-import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -23,9 +21,6 @@ public class GermplasmGroupingServiceImplTest {
 
 	@Mock
 	private GermplasmDAO germplasmDAO;
-
-	@Mock
-	private NameDAO nameDAO;
 
 	@Mock
 	private MethodDAO methodDAO;
@@ -59,11 +54,7 @@ public class GermplasmGroupingServiceImplTest {
 		selectionHistoryName.setNval("SelectionHistory");
 		selectionHistoryName.setTypeId(selectionHistoryUDFLD.getFldno());
 
-		Mockito.when(this.nameDAO.getByGIDWithFilters(Mockito.anyInt(), Mockito.anyInt(), Mockito.any(GermplasmNameType.class)))
-				.thenReturn(Lists.newArrayList(selectionHistoryName));
-
-		this.germplasmGroupingService =
-				new GermplasmGroupingServiceImpl(this.germplasmDAO, this.nameDAO, this.methodDAO, this.userDefinedFieldDAO);
+		this.germplasmGroupingService = new GermplasmGroupingServiceImpl(this.germplasmDAO, this.methodDAO, this.userDefinedFieldDAO);
 	}
 
 	/**
@@ -140,7 +131,6 @@ public class GermplasmGroupingServiceImplTest {
 
 		Assert.assertEquals("Expecting founder/parent mgid to be preserved.", new Integer(111), germplasmToFix.getMgid());
 
-		Mockito.verify(this.nameDAO, Mockito.never()).save(Mockito.any(Name.class));
 		Mockito.verify(this.germplasmDAO, Mockito.never()).save(Mockito.any(Germplasm.class));
 	}
 
@@ -196,7 +186,6 @@ public class GermplasmGroupingServiceImplTest {
 
 		Assert.assertEquals("Expecting no mgid changes when method is generative.", expectedParentMGID, germplasmToFix.getMgid());
 
-		Mockito.verify(this.nameDAO, Mockito.never()).save(Mockito.any(Name.class));
 		Mockito.verify(this.germplasmDAO, Mockito.never()).save(Mockito.any(Germplasm.class));
 	}
 
@@ -323,7 +312,6 @@ public class GermplasmGroupingServiceImplTest {
 		// Previous crosses should be queried once.
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).getPreviousCrosses(crossGid1Parent1, crossGid1Parent2);
 		// No selection history should be copied.
-		Mockito.verify(this.nameDAO, Mockito.never()).save(Mockito.any(Name.class));
 		// One Germplasm record should be saved out of the two that are passed.
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).save(Mockito.any(Germplasm.class));
 	}
@@ -361,7 +349,6 @@ public class GermplasmGroupingServiceImplTest {
 		// Previous crosses should never be queried.
 		Mockito.verify(this.germplasmDAO, Mockito.never()).getPreviousCrosses(crossGid1Parent1, crossGid1Parent2);
 		// No selection history should be copied.
-		Mockito.verify(this.nameDAO, Mockito.never()).save(Mockito.any(Name.class));
 		// No Germplasm record should be saved.
 		Mockito.verify(this.germplasmDAO, Mockito.never()).save(Mockito.any(Germplasm.class));
 	}
@@ -390,7 +377,6 @@ public class GermplasmGroupingServiceImplTest {
 		// Previous crosses should never be queried.
 		Mockito.verify(this.germplasmDAO, Mockito.never()).getPreviousCrosses(crossGid1Parent1, crossGid1Parent2);
 		// No selection history should be copied.
-		Mockito.verify(this.nameDAO, Mockito.never()).save(Mockito.any(Name.class));
 		// No Germplasm record should be saved.
 		Mockito.verify(this.germplasmDAO, Mockito.never()).save(Mockito.any(Germplasm.class));
 	}

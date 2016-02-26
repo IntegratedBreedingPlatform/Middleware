@@ -7,7 +7,6 @@ import java.util.TreeSet;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -33,8 +32,6 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private GermplasmDAO germplasmDAO;
 
-	private NameDAO nameDAO;
-
 	private MethodDAO methodDAO;
 
 	private UserDefinedFieldDAO userDefinedFieldDAO;
@@ -47,9 +44,6 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		this.germplasmDAO = new GermplasmDAO();
 		this.germplasmDAO.setSession(sessionProvider.getSession());
 
-		this.nameDAO = new NameDAO();
-		this.nameDAO.setSession(sessionProvider.getSession());
-
 		this.methodDAO = new MethodDAO();
 		this.methodDAO.setSession(sessionProvider.getSession());
 
@@ -57,10 +51,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		this.userDefinedFieldDAO.setSession(sessionProvider.getSession());
 	}
 
-	public GermplasmGroupingServiceImpl(GermplasmDAO germplasmDAO, NameDAO nameDAO, MethodDAO methodDAO,
+	public GermplasmGroupingServiceImpl(GermplasmDAO germplasmDAO, MethodDAO methodDAO,
 			UserDefinedFieldDAO userDefinedFieldDAO) {
 		this.germplasmDAO = germplasmDAO;
-		this.nameDAO = nameDAO;
 		this.methodDAO = methodDAO;
 		this.userDefinedFieldDAO = userDefinedFieldDAO;
 	}
