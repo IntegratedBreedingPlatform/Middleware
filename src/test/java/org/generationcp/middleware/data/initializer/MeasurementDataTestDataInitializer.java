@@ -31,7 +31,7 @@ public class MeasurementDataTestDataInitializer {
 		return measurementData;
 	}
 
-	public MeasurementData createCategoricalMesurementData(final Integer termId, final String label, final String value) {
+	public MeasurementData createCategoricalMeasurementData(final Integer termId, final String label, final String value) {
 		final MeasurementData data = createMeasurementData(termId, label, value,TermId.CATEGORICAL_VARIABLE);
 
 		List<ValueReference> possibleValues = new ArrayList<ValueReference>();

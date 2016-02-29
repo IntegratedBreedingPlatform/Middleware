@@ -102,7 +102,7 @@ public class MeasurementDataTest {
 	@Test
 	public void testGetDisplayValueForCategoricalData() throws Exception {
 		MeasurementData dataWithValue = measurementDataTestDataInitializer
-				.createCategoricalMesurementData(1234,"test_categorical_data","1");
+				.createCategoricalMeasurementData(1234,"test_categorical_data","1");
 
 		CategoricalDisplayValue value = dataWithValue.getDisplayValueForCategoricalData();
 
@@ -116,7 +116,7 @@ public class MeasurementDataTest {
 	@Test
 	public void testGetDisplayValueForCategoricalDataWithInvalidValue() throws Exception {
 		MeasurementData dataWithInvalidValue = measurementDataTestDataInitializer
-				.createCategoricalMesurementData(1234,"test_categorical_data","2");
+				.createCategoricalMeasurementData(1234,"test_categorical_data","2");
 		CategoricalDisplayValue invalidValue = dataWithInvalidValue.getDisplayValueForCategoricalData();
 
 		Assert.assertNotNull(invalidValue);
@@ -129,7 +129,7 @@ public class MeasurementDataTest {
 	@Test
 	public void testGetDisplayValueForCategoricalDataWithNullValue() throws Exception {
 		MeasurementData dataWithInvalidValue = measurementDataTestDataInitializer
-				.createCategoricalMesurementData(1234,"test_categorical_data",null);
+				.createCategoricalMeasurementData(1234,"test_categorical_data",null);
 		CategoricalDisplayValue invalidValue = dataWithInvalidValue.getDisplayValueForCategoricalData();
 
 		Assert.assertNotNull(invalidValue);
