@@ -300,10 +300,17 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 							LOG.info("Assigning mgid {} from the oldest previous cross gid {}.", previousCrossSelected.getMgid(),
 									previousCrossSelected.getGid());
 							cross.setMgid(previousCrossSelected.getMgid());
+							// TODO extend to include coded names as well.
 							copySelectionHistoryForCross(cross, previousCrossSelected);
 						} else {
 							LOG.info("Previous crosses exist but there is none with MGID.");
-							// TODO check if doing nothing is fine in this case.
+							// TODO implement dotted boxes in flowchart for this case.
+							// Dotted box 1
+							// Flowchart says warn user for this case - this will require returning flag back to the caller from service.
+
+							// Dotted box 2
+							// Flowchart says - Default to assigning new MGID to all instances of the cross (looks similar to
+							// crossingFirstTime case). User can choose to apply to the new cross only.
 						}
 					}
 					this.germplasmDAO.save(cross);
