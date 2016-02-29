@@ -271,7 +271,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			}
 
 			if (Method.isHybrid(cross.getMethodId())) {
-				LOG.info("Breeding method of the cross is {} which is hybrid.", cross.getMethod());
+				LOG.info("Breeding method {} of the cross hybrid.", cross.getMethodId());
 				boolean parent1HasMGID = parent1.getMgid() != null && parent1.getMgid() != 0;
 				boolean parent2HasMGID = parent2.getMgid() != null && parent2.getMgid() != 0;
 				boolean bothParentsHaveMGID = parent1HasMGID && parent2HasMGID;
