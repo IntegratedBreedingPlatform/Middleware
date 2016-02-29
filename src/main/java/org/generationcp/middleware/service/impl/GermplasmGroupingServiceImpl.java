@@ -297,7 +297,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 						}
 
 						if (previousCrossSelected != null) {
-							LOG.info("Assigning mgid {} from previous cross gid {}.", previousCrossSelected.getMgid(),
+							LOG.info("Assigning mgid {} from the oldest previous cross gid {}.", previousCrossSelected.getMgid(),
 									previousCrossSelected.getGid());
 							cross.setMgid(previousCrossSelected.getMgid());
 							copySelectionHistoryForCross(cross, previousCrossSelected);
