@@ -281,7 +281,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 				if (bothParentsHaveMGID) {
 					LOG.info("Both parents have MGIDs. Parent1 mgid {}. Parent2 mgid {}.", parent1.getMgid(), parent2.getMgid());
-					List<Germplasm> previousCrosses = this.germplasmDAO.getPreviousCrosses(parent1.getGid(), parent2.getGid());
+					List<Germplasm> previousCrosses = this.germplasmDAO.getPreviousCrosses(cross);
 					boolean crossingFirstTime = previousCrosses.isEmpty();
 					if (crossingFirstTime) {
 						LOG.info("This is a first cross of the two parents. Starting a new group. Setting gid {} to mgid.",

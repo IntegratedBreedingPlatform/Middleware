@@ -556,19 +556,20 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public List<Germplasm> getPreviousCrosses(Integer parentA, Integer parenB) {
+	public List<Germplasm> getPreviousCrosses(Germplasm currentCross) {
 		try {
+			Integer parentA = currentCross.getGpid1();
+			Integer parentB = currentCross.getGpid2();
+
 			DetachedCriteria criteria = DetachedCriteria.forClass(Germplasm.class);
 
-			LogicalExpression aMaleBFemale =
-					Restrictions.and(Restrictions.eq("gpid1", parentA), Restrictions.eq("gpid2", parenB));
+			LogicalExpression aFemaleBMale = Restrictions.and(Restrictions.eq("gpid1", parentA), Restrictions.eq("gpid2", parentB));
+			LogicalExpression bFemaleAMale = Restrictions.and(Restrictions.eq("gpid1", parentB), Restrictions.eq("gpid2", parentA));
 
-			LogicalExpression aFemaleBMale =
-					Restrictions.and(Restrictions.eq("gpid1", parenB), Restrictions.eq("gpid2", parentA));
-
-			criteria.add(Restrictions.or(aMaleBFemale, aFemaleBMale));
+			criteria.add(Restrictions.or(aFemaleBMale, bFemaleAMale));
 			criteria.add(Restrictions.eq("gnpgs", 2)); // restrict to cases where two parents are involved.
 			criteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged.
+			criteria.add(Restrictions.ne("gid", currentCross.getGid())); // Exclude current cross. We are finding "previous" crosses.
 			criteria.add(Restrictions.neProperty("gid", "grplce")); // = Record is not deleted or replaced.
 			criteria.addOrder(Order.asc("gid")); // oldest created cross will be first in list.
 
@@ -576,8 +577,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			List<Germplasm> previousCrosses = criteria.getExecutableCriteria(getSession()).list();
 			return previousCrosses;
 		} catch (HibernateException e) {
-			final String message = "Error executing GermplasmDAO.getPreviousCrosses(parent1Gid={}, parent2Gid={}): {}";
-			LOG.error(message, parentA, parenB, e.getMessage());
+			final String message = "Error executing GermplasmDAO.getPreviousCrosses(currentCross = {}): {}";
+			LOG.error(message, currentCross, e.getMessage());
 			throw new MiddlewareQueryException(message, e);
 		}
 	}

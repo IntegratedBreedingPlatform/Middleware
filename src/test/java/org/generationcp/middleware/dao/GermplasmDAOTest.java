@@ -223,7 +223,10 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetPreviousCrosses() {
-		List<Germplasm> previousCrosses = this.dao.getPreviousCrosses(11, 3);
+		Germplasm currentCross = new Germplasm(3);
+		currentCross.setGpid1(1);
+		currentCross.setGpid2(2);
+		List<Germplasm> previousCrosses = this.dao.getPreviousCrosses(currentCross);
 		Assert.assertNotNull("getPreviousCrosses() should never return null.", previousCrosses);
 	}
 
