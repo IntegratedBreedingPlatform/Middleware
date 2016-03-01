@@ -176,18 +176,36 @@ public class GermplasmGroupingServiceImplTest {
 	}
 
 	/**
-	 * MGID is present. No descendants. Preserve existing mgid.
+	 * MGID is present. No descendants. Preserve existing mgid. Existing mgid is non-zero.
 	 */
 	@Test
-	public void testMarkFixedCase4() {
+	public void testMarkFixedCase4_1() {
+		Integer expectedMGID = new Integer(111);
+
 		Germplasm germplasmToFix = new Germplasm(1);
-		germplasmToFix.setMgid(111);
+		germplasmToFix.setMgid(expectedMGID);
 
 		this.germplasmGroupingService.markFixed(germplasmToFix, false, true);
 
-		Assert.assertEquals("Expecting founder/parent mgid to be preserved.", new Integer(111), germplasmToFix.getMgid());
+		Assert.assertEquals("Expecting founder/parent mgid to be preserved.", expectedMGID, germplasmToFix.getMgid());
 
 		Mockito.verify(this.germplasmDAO, Mockito.never()).save(Mockito.any(Germplasm.class));
+	}
+
+	/**
+	 * MGID is present. No descendants. Preserve existing mgid. Existing mgid is zero.
+	 */
+	@Test
+	public void testMarkFixedCase4_2() {
+		Germplasm germplasmToFix = new Germplasm(123);
+		germplasmToFix.setMgid(0);
+
+		this.germplasmGroupingService.markFixed(germplasmToFix, false, true);
+
+		Assert.assertEquals("Expecting founder/parent mgid to be set to be the same as gid.", germplasmToFix.getGid(),
+				germplasmToFix.getMgid());
+
+		Mockito.verify(this.germplasmDAO, Mockito.times(1)).save(Mockito.any(Germplasm.class));
 	}
 
 	/**

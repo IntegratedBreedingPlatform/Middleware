@@ -121,7 +121,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	 */
 	private boolean assignGroup(Germplasm germplasm, Integer groupId, boolean preserveExistingGroup) {
 
-		if (!preserveExistingGroup && germplasm.getMgid() != null && germplasm.getMgid() != 0 && !germplasm.getMgid().equals(groupId)) {
+		boolean hasMGID = germplasm.getMgid() != null && germplasm.getMgid() != 0;
+
+		if (!preserveExistingGroup && hasMGID && !germplasm.getMgid().equals(groupId)) {
 			LOG.info("Gerplasm with gid [{}] already has mgid [{}]. Service has been asked to ignore it, and assign new mgid [{}].",
 					germplasm.getGid(), germplasm.getMgid(), groupId);
 		}
@@ -134,13 +136,13 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			return false;
 		}
 
-		if (!preserveExistingGroup) {
+		if (preserveExistingGroup && hasMGID) {
+			LOG.info("Retaining the existing mgid = [{}] for germplasm with gid = [{}] as it is.", germplasm.getMgid(), germplasm.getGid());
+		} else {
 			LOG.info("Assigning mgid = [{}] for germplasm with gid = [{}]", groupId, germplasm.getGid());
 			germplasm.setMgid(groupId);
 			copySelectionHistory(germplasm);
 			this.germplasmDAO.save(germplasm);
-		} else {
-			LOG.info("Retaining the existing mgid = [{}] for germplasm with gid = [{}] as it is.", germplasm.getMgid(), germplasm.getGid());
 		}
 
 		return true;
