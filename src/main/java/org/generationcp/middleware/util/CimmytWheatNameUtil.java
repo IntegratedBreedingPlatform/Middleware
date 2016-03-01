@@ -1,11 +1,20 @@
 
 package org.generationcp.middleware.util;
 
+/**
+ * Utility class for helping determine the names used in wheat cross expansions for CIMMYT
+ *
+ *
+ * It is set up such that some properties could be configurable (possibly via Spring), but it is not currently set up that way
+ */
 public class CimmytWheatNameUtil {
 
-	private final String nstatOrderedList;
+    public static final String DEFAULT_NSTAT_ORDER_PRIORITY = "2,1,0";
+    public static final String DEFAULT_NTYPE_ORDER_PRIORITY = "7,6,17,4,1200,13";
+    public static final String DEFAULT_PROVIDED_NAME_UID_RESTRICTION_LIST = "20,47,66,76,84,90";
+    private final String nstatOrderedList;
 	private final String ntypeOrderedList;
-	private final String nuidExcludeList;
+	private String nuidExcludeList;
 
 	private int[] nstatWeightArray;
 	private int[] ntypeWeightArray;
@@ -19,9 +28,8 @@ public class CimmytWheatNameUtil {
 
 	// Some sort of weight calculations
 	public CimmytWheatNameUtil() {
-		this.nstatOrderedList = "2,1,0";
-		this.ntypeOrderedList = "7,6,17,4,1200,13";
-		this.nuidExcludeList = "20,47,66,76,84,90";
+		this.nstatOrderedList = DEFAULT_NSTAT_ORDER_PRIORITY;
+		this.ntypeOrderedList = DEFAULT_NTYPE_ORDER_PRIORITY;
 		this.levelZeroFullName = true;
 		this.initializePreferredNameRules();
 	}
@@ -30,7 +38,7 @@ public class CimmytWheatNameUtil {
 
 		int iTemp = 0;
 		// nstatOrderList
-		String[] nstatArrayString = this.nstatOrderedList.split(",");
+		final String[] nstatArrayString = this.nstatOrderedList.split(",");
 		this.nstatWeightArray = new int[nstatArrayString.length + 1];
 		this.nstatArray = new Integer[nstatArrayString.length + 1];
 		int calculito = -1;
@@ -48,11 +56,11 @@ public class CimmytWheatNameUtil {
 					this.useFullNameInPedigree = false;
 					calculito = 0;
 				}
-			} catch (Exception e) {
+			} catch (final Exception e) {
 			}
 		}
 		// ntypeOrderList
-		String[] ntypeArrayString = this.ntypeOrderedList.split(",");
+		final String[] ntypeArrayString = this.ntypeOrderedList.split(",");
 		this.ntypeWeightArray = new int[ntypeArrayString.length + 1];
 		this.ntypeArray = new Integer[ntypeArrayString.length + 1];
 		int iTemp1 = 0;
@@ -64,23 +72,30 @@ public class CimmytWheatNameUtil {
 			} catch (Exception e) {
 			}
 		}
-		// ntypeOrderList
-		String[] nuidArrayString = this.nuidExcludeList.split(",");
-		this.nuidArray = new Integer[nuidArrayString.length + 1];
-		for (iTemp = nuidArrayString.length; iTemp > 0; iTemp--) {
-			try {
-				this.nuidArray[iTemp] = Integer.valueOf(nuidArrayString[iTemp - 1]);
-			} catch (Exception e) {
-			}
-		}
-		// levelZeroFullName
+
+
 	}
 
-	public Integer[] getNstatArray() {
+    /**
+     * Basically initializes a 1-indexed array based on the provided comma delimited name exclusion list string
+     */
+    public void initializeRestrictedNameUIDArray() {
+        // ntypeOrderList
+        String[] nuidArrayString = this.nuidExcludeList.split(",");
+        this.nuidArray = new Integer[nuidArrayString.length + 1];
+        for (int iTemp = nuidArrayString.length; iTemp > 0; iTemp--) {
+            try {
+                this.nuidArray[iTemp] = Integer.valueOf(nuidArrayString[iTemp - 1]);
+            } catch (Exception e) {
+            }
+        }
+    }
+
+    public Integer[] getNstatArray() {
 		return this.nstatArray;
 	}
 
-	public void setNstatArray(Integer[] nstatArray) {
+	public void setNstatArray(final Integer[] nstatArray) {
 		this.nstatArray = nstatArray;
 	}
 
@@ -88,7 +103,7 @@ public class CimmytWheatNameUtil {
 		return this.nstatWeightArray;
 	}
 
-	public void setNstatWeightArray(int[] nstatWeightArray) {
+	public void setNstatWeightArray(final int[] nstatWeightArray) {
 		this.nstatWeightArray = nstatWeightArray;
 	}
 
@@ -96,7 +111,7 @@ public class CimmytWheatNameUtil {
 		return this.ntypeWeightArray;
 	}
 
-	public void setNtypeWeightArray(int[] ntypeWeightArray) {
+	public void setNtypeWeightArray(final int[] ntypeWeightArray) {
 		this.ntypeWeightArray = ntypeWeightArray;
 	}
 
@@ -104,7 +119,7 @@ public class CimmytWheatNameUtil {
 		return this.ntypeArray;
 	}
 
-	public void setNtypeArray(Integer[] ntypeArray) {
+	public void setNtypeArray(final Integer[] ntypeArray) {
 		this.ntypeArray = ntypeArray;
 	}
 
@@ -112,7 +127,7 @@ public class CimmytWheatNameUtil {
 		return this.useFullNameInPedigree;
 	}
 
-	public void setUseFullNameInPedigree(boolean useFullNameInPedigree) {
+	public void setUseFullNameInPedigree(final boolean useFullNameInPedigree) {
 		this.useFullNameInPedigree = useFullNameInPedigree;
 	}
 
@@ -120,7 +135,7 @@ public class CimmytWheatNameUtil {
 		return this.levelZeroFullName;
 	}
 
-	public void setLevelZeroFullName(boolean levelZeroFullName) {
+	public void setLevelZeroFullName(final boolean levelZeroFullName) {
 		this.levelZeroFullName = levelZeroFullName;
 	}
 
@@ -128,8 +143,11 @@ public class CimmytWheatNameUtil {
 		return this.nuidArray;
 	}
 
-	public void setNuidArray(Integer[] nuidArray) {
+	public void setNuidArray(final Integer[] nuidArray) {
 		this.nuidArray = nuidArray;
 	}
 
+    public void setNuidExcludeList(String nuidExcludeList) {
+        this.nuidExcludeList = nuidExcludeList;
+    }
 }
