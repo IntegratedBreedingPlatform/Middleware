@@ -291,20 +291,20 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 						// Not the first time cross. Assign MGID of previous cross to new cross.
 						// When there are multiple previous crosses, we choose the oldest created cross with MGID as preference.
 						LOG.info("Previous cross(es) of the same two parents exist: {}.", previousCrosses);
-						Germplasm previousCrossSelected = null;
+						Germplasm oldestPreviousCrossWithMGID = null;
 						for (Germplasm previousCross : previousCrosses) {
 							if (previousCross.getMgid() != null && previousCross.getMgid() != 0) {
-								previousCrossSelected = previousCross;
+								oldestPreviousCrossWithMGID = previousCross;
 								break;
 							}
 						}
 
-						if (previousCrossSelected != null) {
-							LOG.info("Assigning mgid {} from the oldest previous cross gid {}.", previousCrossSelected.getMgid(),
-									previousCrossSelected.getGid());
-							cross.setMgid(previousCrossSelected.getMgid());
+						if (oldestPreviousCrossWithMGID != null) {
+							LOG.info("Assigning mgid {} from the oldest previous cross gid {}.", oldestPreviousCrossWithMGID.getMgid(),
+									oldestPreviousCrossWithMGID.getGid());
+							cross.setMgid(oldestPreviousCrossWithMGID.getMgid());
 							// TODO extend to include coded names as well.
-							copySelectionHistoryForCross(cross, previousCrossSelected);
+							copySelectionHistoryForCross(cross, oldestPreviousCrossWithMGID);
 						} else {
 							LOG.info("Previous crosses exist but there is none with MGID. Starting a new group with mgid = gid of current cross.");
 							cross.setMgid(cross.getGid());
