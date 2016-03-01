@@ -251,7 +251,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	// Rigorous INFO logging in this method is intentional. Currently we dont have good visualization tools in BMS to verify results of such
 	// complex operations. INFO LOGGing helps.
 	@Override
-	public void processGroupInheritanceForCrosses(List<Integer> gidsOfCrosses) {
+	public void processGroupInheritanceForCrosses(List<Integer> gidsOfCrosses, boolean applyNewGroupToPreviousCrosses) {
 
 		for (Integer crossGID : gidsOfCrosses) {
 			Germplasm cross = this.germplasmDAO.getById(crossGID);
@@ -306,14 +306,19 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 							// TODO extend to include coded names as well.
 							copySelectionHistoryForCross(cross, previousCrossSelected);
 						} else {
-							LOG.info("Previous crosses exist but there is none with MGID.");
-							// TODO implement dotted boxes in flowchart for this case.
-							// Dotted box 1
-							// Flowchart says warn user for this case - this will require returning flag back to the caller from service.
+							LOG.info("Previous crosses exist but there is none with MGID. Starting a new group with mgid = gid of current cross.");
+							cross.setMgid(cross.getGid());
+							// TODO Flowchart says warn user for this case - this will require returning flag back to the caller from
+							// service.
 
-							// Dotted box 2
-							// Flowchart says - Default to assigning new MGID to all instances of the cross (looks similar to
-							// crossingFirstTime case). User can choose to apply to the new cross only.
+							if (applyNewGroupToPreviousCrosses) {
+								LOG.info("Applying the new mgid {} to the previous crosses as well.", cross.getMgid());
+								for (Germplasm previousCross : previousCrosses) {
+									previousCross.setMgid(cross.getMgid());
+									this.germplasmDAO.save(previousCross);
+								}
+							}
+
 						}
 					}
 					this.germplasmDAO.save(cross);

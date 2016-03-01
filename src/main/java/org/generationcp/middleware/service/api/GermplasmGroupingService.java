@@ -25,8 +25,10 @@ public interface GermplasmGroupingService {
 	 * Service to apply group (MGID) inheritance to newly created crosses.
 	 * 
 	 * @param gidsOfCrossesCreated - Must not be null.
+	 * @param applyGroupingToPreviousCrosses - Whether to apply new group to previous crosses as well when creating a new group for new
+	 *        cross?
 	 */
-	void processGroupInheritanceForCrosses(List<Integer> gidsOfCrossesCreated);
+	void processGroupInheritanceForCrosses(List<Integer> gidsOfCrossesCreated, boolean applyNewGroupToPreviousCrosses);
 
 	/**
 	 * Service to copy parental selection history name to the submitted germplasm
