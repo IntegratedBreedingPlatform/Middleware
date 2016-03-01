@@ -31,25 +31,25 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 		this.cimmytWheatNameUtil = new CimmytWheatNameUtil();
 	}
 
-	public PedigreeCimmytWheatServiceImpl(HibernateSessionProvider sessionProvider) {
+	public PedigreeCimmytWheatServiceImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 		this.cimmytWheatNameUtil = new CimmytWheatNameUtil();
 	}
 
-	public PedigreeCimmytWheatServiceImpl(HibernateSessionProvider sessionProvider, String localDatabaseName) {
+	public PedigreeCimmytWheatServiceImpl(final HibernateSessionProvider sessionProvider, final String localDatabaseName) {
 		super(sessionProvider, localDatabaseName);
 		this.cimmytWheatNameUtil = new CimmytWheatNameUtil();
 	}
 
 	@Override
-	public String getCrossExpansion(Integer gid, CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException {
+	public String getCrossExpansion(final Integer gid, final CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException {
 		return this.getCrossExpansion(gid, null, crossExpansionProperties);
 	}
 
 	@Override
-	public String getCrossExpansion(Integer gid, Integer level, CrossExpansionProperties crossExpansionProperties)
+	public String getCrossExpansion(final Integer gid, final Integer level, final CrossExpansionProperties crossExpansionProperties)
 			throws MiddlewareQueryException {
-		Germplasm germplasm = this.getGermplasmDataManager().getGermplasmWithPrefName(gid);
+		final Germplasm germplasm = this.getGermplasmDataManager().getGermplasmWithPrefName(gid);
 		return this.getCrossExpansion(germplasm, level, crossExpansionProperties);
 	}
 
@@ -58,9 +58,18 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 			throws MiddlewareQueryException {
 		if (germplasm != null) {
 			try {
+                // changed restricted name UIDs so that it can be provided via configuration, as it is most likely dependent on target database environment
+                if (crossExpansionProperties.getRestrictedNameUIDs() == null) {
+                    this.cimmytWheatNameUtil.setNuidExcludeList(CimmytWheatNameUtil.DEFAULT_PROVIDED_NAME_UID_RESTRICTION_LIST);
+                } else {
+                    this.cimmytWheatNameUtil.setNuidExcludeList(crossExpansionProperties.getRestrictedNameUIDs());
+                }
+
+                this.cimmytWheatNameUtil.initializeRestrictedNameUIDArray();
+
 				return this.getCimmytWheatPedigree(germplasm, level == null ? crossExpansionProperties.getWheatLevel() : level,
 						new Germplasm(), 0, 0, 0, 0, 0);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				PedigreeCimmytWheatServiceImpl.LOG.error(e.getMessage(), e);
 				throw new MiddlewareQueryException(e.getMessage(), e);
 			}
@@ -69,12 +78,12 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 		}
 	}
 
-	private List<Name> getCimmytWheatWayNamesList(int gid, List<Integer> ntypeArray, List<Integer> nstatArray, List<Integer> nuiArray)
+	private List<Name> getCimmytWheatWayNamesList(final int gid, final List<Integer> ntypeArray, final List<Integer> nstatArray, final List<Integer> nuiArray)
 			throws MiddlewareQueryException {
 
-		List<Name> nameList = this.getNameDao().getByGIDWithFilters(gid, null, null);
-		List<Name> returnNameList = new ArrayList<Name>();
-		for (Name name : nameList) {
+		final List<Name> nameList = this.getNameDao().getByGIDWithFilters(gid, null, null);
+		final List<Name> returnNameList = new ArrayList<>();
+		for (final Name name : nameList) {
 			if (name.getNstat() != PedigreeCimmytWheatServiceImpl.NSTAT_DELETED && ntypeArray.contains(name.getTypeId())
 					&& nstatArray.contains(name.getNstat()) && !nuiArray.contains(name.getUserId())) {
 				returnNameList.add(name);
@@ -101,29 +110,29 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 
 		PedigreeCimmytWheatServiceImpl.LOG.debug("Armando pedigree con [p_gid] " + grTemp.getGid() + " [nivel] " + level + " [fback] "
 				+ femaleBackcrossGid + " [mback] " + maleBackcrossGid + " [Resp1] " + resp1 + " [Resp2] " + resp2);
-		int xCurrent = 0;
+		int xCurrent;
 		int xMax = 0;
-		String armaPedigree = "";
+		final String armaPedigree;
 		String ped = "";
 		String xPrefName = "";
-		String delimiter = "";
-		String cut = "";
+		final String delimiter;
+		String cut;
 		String p1 = "";
 		String p2 = "";
-		String[] oldp1 = new String[1];
-		String[] oldp2 = new String[1];
-		Germplasm fGpidInfClass = new Germplasm();
-		Germplasm mGpidInfClass = new Germplasm();
+		final String[] oldp1 = new String[1];
+		final String[] oldp2 = new String[1];
+		final Germplasm fGpidInfClass = new Germplasm();
+		final Germplasm mGpidInfClass = new Germplasm();
 		fGpidInfClass.setGpid1(0);
 		fGpidInfClass.setGpid2(0);
 		mGpidInfClass.setGpid1(0);
 		mGpidInfClass.setGpid2(0);
 
-		String longStr;
-		String shortStr;
+		final String longStr;
+		final String shortStr;
 		boolean backCrossFound = false;
-		List<Name> listNL = new ArrayList<Name>();
-		int vecesRep = 0;
+		List<Name> listNL = new ArrayList<>();
+		int vecesRep;
 
 		try {
 
@@ -156,7 +165,7 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 			if (grTemp.getGnpgs() == 2 && grTemp.getGpid1() == maleBackcrossGid && maleBackcrossGid != 0) {
 				backCrossFound = true;
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			PedigreeCimmytWheatServiceImpl.LOG.error(e.getMessage(), e);
 		}
 
@@ -164,7 +173,7 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 			// Name found, but we can only use it if not a backcross
 			Germplasm rsBack = new Germplasm();
 			if (grTemp.getGpid1() != null && grTemp.getGpid1() != 0) {
-				Germplasm temp1 = this.getGermplasmDataManager().getGermplasmByGID(grTemp.getGpid1());
+				final Germplasm temp1 = this.getGermplasmDataManager().getGermplasmByGID(grTemp.getGpid1());
 				if (temp1 != null) {
 					rsBack = temp1;
 				}
@@ -192,7 +201,7 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 			backCrossFound = false;
 		}
 		if (!listNL.isEmpty() && !backCrossFound) {
-			for (Name namesrecord : listNL) {
+			for (final Name namesrecord : listNL) {
 				xCurrent = CrossExpansionUtil.giveNameValue(namesrecord.getTypeId(), namesrecord.getNstat(), this.cimmytWheatNameUtil);
 				// Apply check if the LevelZeroFullName is true or not
 				// If that is the case and we are at level zero, add 200 to xCurrent if NSTAT=1
@@ -334,7 +343,7 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 					if ("".equals(p2)) {
 						p2 = "Missing";
 					}
-					delimiter = CrossExpansionUtil.getNewDelimiter(p1 + p2).toString();
+					delimiter = CrossExpansionUtil.getNewDelimiter(p1 + p2);
 					ped = p1 + delimiter + p2;
 				}
 			}
