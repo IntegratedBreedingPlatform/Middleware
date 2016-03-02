@@ -15,7 +15,9 @@ import org.generationcp.middleware.pojos.report.Occurrence;
 
 public abstract class AbstractNurseryReporter extends AbstractReporter {
 
-	@SuppressWarnings("unchecked")
+    public static final String SEASON_REPORT_KEY = "cycle";
+
+    @SuppressWarnings("unchecked")
 	@Override
 	public Map<String, Object> buildJRParams(Map<String, Object> args) {
 		Map<String, Object> params = super.buildJRParams(args);
@@ -68,7 +70,7 @@ public abstract class AbstractNurseryReporter extends AbstractReporter {
 				} else if (var.getName().equals(LOCATION_ABBREV_VARIABLE_NAME)) {
 					params.put(LOCATION_ABBREV_VARIABLE_NAME, var.getValue());
 				} else if (var.getProperty().equalsIgnoreCase("Season")) {
-					params.put("cycle", var.getValue());
+					params.put(SEASON_REPORT_KEY, var.getValue());
 					params.put("LoCycle", var.getValue());
 				}
 			}
