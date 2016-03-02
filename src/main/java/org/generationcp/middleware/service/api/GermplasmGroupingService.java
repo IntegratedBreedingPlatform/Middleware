@@ -3,7 +3,6 @@ package org.generationcp.middleware.service.api;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.service.impl.GermplasmGroup;
 
 
 public interface GermplasmGroupingService {

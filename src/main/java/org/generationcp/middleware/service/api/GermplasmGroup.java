@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.service.impl;
+package org.generationcp.middleware.service.api;
 
 import java.util.ArrayList;
 import java.util.List;

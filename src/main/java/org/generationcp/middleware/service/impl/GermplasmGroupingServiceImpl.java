@@ -15,6 +15,7 @@ import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.service.api.GermplasmGroup;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
