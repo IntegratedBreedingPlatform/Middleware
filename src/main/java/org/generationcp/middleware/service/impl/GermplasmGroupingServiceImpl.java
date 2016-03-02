@@ -208,7 +208,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			newSelectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
 			newSelectionHistoryAtFixation.setTypeId(selHisFixNameType.getFldno());
 			newSelectionHistoryAtFixation.setNval(selectionHistoryName.getNval());
-			newSelectionHistoryAtFixation.setNstat(1); // Means it is preferred name.
+			newSelectionHistoryAtFixation.setNstat(1); // nstat = 1 means it is preferred name.
 			newSelectionHistoryAtFixation.setUserId(selectionHistoryName.getUserId());
 			newSelectionHistoryAtFixation.setLocationId(selectionHistoryName.getLocationId());
 			newSelectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
@@ -216,7 +216,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			germplasm.getNames().add(newSelectionHistoryAtFixation);
 		} else {
 			existingSelHisFixName.setNval(selectionHistoryName.getNval());
-			existingSelHisFixName.setNstat(1);
+			existingSelHisFixName.setNstat(1); // nstat = 1 means it is preferred name.
 			existingSelHisFixName.setNdate(Util.getCurrentDateAsIntegerValue());
 		}
 	}
