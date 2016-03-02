@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.data.initializer;
 
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -13,34 +12,73 @@ public class MeasurementDataTestDataInitializer {
 
 	public static final String DATA_TYPE_CHAR = "C";
 
+	// This method remains as static for compatibility to older tests that uses this method.
 	public static MeasurementData createMeasurementData(final Integer termId, final String label, final String value) {
-		final MeasurementData measurementData = createMeasurementData(termId, label, value,TermId.CHARACTER_VARIABLE);
+		final MeasurementData measurementData =
+				new MeasurementDataTestDataInitializer().createMeasurementData(termId, label, value, TermId.CHARACTER_VARIABLE);
 		measurementData.setDataType(MeasurementDataTestDataInitializer.DATA_TYPE_CHAR);
 
 		return measurementData;
 	}
 
-	private static MeasurementData createMeasurementData(Integer termId, String label, String value,TermId dataType) {
+	/**
+	 * Create a new measurement data
+	 * @param termId
+	 * @param label
+	 * @param value
+	 * @param dataType
+	 * @return
+	 */
+	public MeasurementData createMeasurementData(Integer termId, String label, String value, TermId dataType) {
 		final MeasurementData measurementData = new MeasurementData(label, value);
+		measurementData.setEditable(false);
+		measurementData.setLabel("");
+		measurementData.setPhenotypeId(0);
+		measurementData.setValue(value);
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		measurementVariable.setTermId(termId);
 		measurementVariable.setDataTypeId(dataType.getId());
+		measurementVariable.setName(label);
+		measurementVariable.setLabel(label);
+		measurementVariable.setPossibleValues(new ArrayList<ValueReference>());
 
 		measurementData.setMeasurementVariable(measurementVariable);
 		return measurementData;
 	}
 
-	public MeasurementData createCategoricalMeasurementData(final Integer termId, final String label, final String value) {
-		final MeasurementData data = createMeasurementData(termId, label, value,TermId.CATEGORICAL_VARIABLE);
+	/**
+	 * Create a categorical measurement data
+	 * @param termId
+	 * @param label
+	 * @param value
+	 * @param possibleValues
+	 * @return
+	 */
+	public MeasurementData createCategoricalMeasurementData(final Integer termId, final String label, final String value,
+			List<ValueReference> possibleValues) {
+		final MeasurementData data = createMeasurementData(termId, label, value, TermId.CATEGORICAL_VARIABLE);
 
-		List<ValueReference> possibleValues = new ArrayList<ValueReference>();
-		possibleValues.add(new ValueReference(1, "Name", "Desc"));
+		final MeasurementVariable measurementVariable = data.getMeasurementVariable();
+		measurementVariable.setPossibleValues(possibleValues);
 
 		data.getMeasurementVariable().setPossibleValues(possibleValues);
 
 		return data;
 	}
 
+	/**
+	 * Create a categorical measurement data with initial ppssibleValue
+	 * @param termId
+	 * @param label
+	 * @param value
+	 * @return
+	 */
+	public MeasurementData createCategoricalMeasurementData(final Integer termId, final String label, final String value) {
+		final List<ValueReference> possibleValues = new ArrayList<>();
+		possibleValues.add(new ValueReference(1, "Name", "Desc"));
+
+		return createCategoricalMeasurementData(termId, label, value, possibleValues);
+	}
 
 }
