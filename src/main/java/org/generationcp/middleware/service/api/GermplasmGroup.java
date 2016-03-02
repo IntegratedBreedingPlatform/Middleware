@@ -10,7 +10,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 public class GermplasmGroup {
 
 	private Integer founderGid;
-	private Integer groupMgid;
+	private Integer groupId;
 	private List<Germplasm> groupMembers = new ArrayList<>();
 
 	public Integer getFounderGid() {
@@ -21,12 +21,12 @@ public class GermplasmGroup {
 		this.founderGid = founderGid;
 	}
 
-	public Integer getGroupMgid() {
-		return this.groupMgid;
+	public Integer getGroupId() {
+		return this.groupId;
 	}
 
-	public void setGroupMgid(final Integer groupMgid) {
-		this.groupMgid = groupMgid;
+	public void setGroupId(Integer groupId) {
+		this.groupId = groupId;
 	}
 
 	public List<Germplasm> getGroupMembers() {
@@ -39,6 +39,6 @@ public class GermplasmGroup {
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).append(this.founderGid).append(this.groupMgid).append(this.groupMembers).toString();
+		return new ToStringBuilder(this).append(this.founderGid).append(this.groupId).append(this.groupMembers).toString();
 	}
 }

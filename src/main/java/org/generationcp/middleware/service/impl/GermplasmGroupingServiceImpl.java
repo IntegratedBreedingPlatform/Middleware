@@ -80,7 +80,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	public GermplasmGroup getGroupMembers(Germplasm founder) {
 		GermplasmGroup germplasmGroup = new GermplasmGroup();
 		germplasmGroup.setFounderGid(founder.getGid());
-		germplasmGroup.setGroupMgid(founder.getMgid());
+		germplasmGroup.setGroupId(founder.getMgid());
 		germplasmGroup.setGroupMembers(this.germplasmDAO.getGroupMembers(founder.getGid()));
 		return germplasmGroup;
 	}
