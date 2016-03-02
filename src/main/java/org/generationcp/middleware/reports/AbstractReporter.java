@@ -37,6 +37,7 @@ public abstract class AbstractReporter implements Reporter {
 	public static final String PROGRAM_NAME_REPORT_KEY = "program";
 	public static final String COUNTRY_VARIABLE_NAME = "country";
 	public static final String LOCATION_ABBREV_VARIABLE_NAME = "labbr";
+    public static final String STUDY_OBSERVATIONS_KEY = "studyObservations";
 
 	private String fileNameExpr = this.getReportCode() + "-{tid}";
 	private String fileName = null;
