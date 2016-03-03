@@ -13,6 +13,8 @@ package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -33,7 +35,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -535,10 +536,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public List<Germplasm> getGroupMembers(Integer gid) {
+	public List<Germplasm> getManagementGroupMembers(Integer mgid) {
+		if (mgid == null || mgid == 0) {
+			return Collections.emptyList();
+		}
 		try {
 			DetachedCriteria criteria = DetachedCriteria.forClass(Germplasm.class);
-			criteria.add(Restrictions.eq("mgid", gid));
+			criteria.add(Restrictions.eq("mgid", mgid));
 			criteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged
 			criteria.add(Restrictions.neProperty("gid", "grplce")); // = Record is not deleted or replaced.
 
@@ -550,35 +554,72 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 			return groupMembers;
 		} catch (HibernateException e) {
-			final String message = "Error executing GermplasmDAO.getGroupMembers(gid={}) : {}";
-			LOG.error(message, gid, e.getMessage());
+			final String message = "Error executing GermplasmDAO.getGroupMembersByGroupId(mgid={}) : {}";
+			LOG.error(message, mgid, e.getMessage());
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
-	public List<Germplasm> getPreviousCrosses(Germplasm currentCross) {
-		try {
-			Integer parentA = currentCross.getGpid1();
-			Integer parentB = currentCross.getGpid2();
+	/**
+	 * <strong>Algorithm for checking parent groups for crosses</strong>
+	 * <p>
+	 * Graham provided the following thoughts on the approach for retrieving the germplasm in male and female MGID groups for crosses:
+	 * <ol>
+	 * <li>Get GID of all lines which have the same MGID as the female -whether the female is a cross or a line, same thing - e.g. 1,2,3
+	 * (all members of the female management group)
+	 * <li>Get all lines which have same MGID as male - 4,5 (all members of the male management group)
+	 * <li>See if any of the crosses 1x4, 1x5, 2x4, 2x5, 3x4 or 3x5 were made before.
+	 * <li>If so assign the new cross to the same group.
+	 * </ol>
+	 * 
+	 * <p>
+	 * Graham also noted that this query is similar to the existing one to retrieve the management group of a germplasm in the germplasm
+	 * details pop-up.
+	 */
+	public List<Germplasm> getPreviousCrossesBetweenParentGroups(Germplasm currentCross) {
+		Germplasm femaleParent = this.getById(currentCross.getGpid1());
+		Germplasm maleParent = this.getById(currentCross.getGpid2());
 
+		List<Germplasm> femaleGroupMembers = this.getManagementGroupMembers(femaleParent.getMgid());
+		List<Germplasm> maleGroupMembers = this.getManagementGroupMembers(maleParent.getMgid());
+
+		List<Germplasm> previousCrossesInGroup = new ArrayList<>();
+		for (Germplasm femaleGroupMember : femaleGroupMembers) {
+			for (Germplasm maleGroupMember : maleGroupMembers) {
+				previousCrossesInGroup.addAll(this.getPreviousCrosses(currentCross, femaleGroupMember, maleGroupMember));
+			}
+		}
+
+		// Sort oldest to newest cross : ascending order of gid
+		Collections.sort(previousCrossesInGroup, new Comparator<Germplasm>() {
+			@Override
+			public int compare(Germplasm o1, Germplasm o2) {
+				return o1.getGid() < o2.getGid() ? -1 : (o1.getGid() == o2.getGid() ? 0 : 1);
+			}
+		});
+
+		return previousCrossesInGroup;
+	}
+
+	public List<Germplasm> getPreviousCrosses(Germplasm currentCross, Germplasm female, Germplasm male) {
+		try {
 			DetachedCriteria criteria = DetachedCriteria.forClass(Germplasm.class);
 
-			LogicalExpression aFemaleBMale = Restrictions.and(Restrictions.eq("gpid1", parentA), Restrictions.eq("gpid2", parentB));
-			LogicalExpression bFemaleAMale = Restrictions.and(Restrictions.eq("gpid1", parentB), Restrictions.eq("gpid2", parentA));
-
-			criteria.add(Restrictions.or(aFemaleBMale, bFemaleAMale));
-			criteria.add(Restrictions.eq("gnpgs", 2)); // restrict to cases where two parents are involved.
+			// (female x male) is not the same as (male x female) so the order is important.
+			criteria.add(Restrictions.eq("gpid1", female.getGid()));
+			criteria.add(Restrictions.eq("gpid2", male.getGid()));
+			criteria.add(Restrictions.eq("gnpgs", 2)); // Restrict to cases where two parents are involved.
 			criteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged.
 			criteria.add(Restrictions.ne("gid", currentCross.getGid())); // Exclude current cross. We are finding "previous" crosses.
 			criteria.add(Restrictions.neProperty("gid", "grplce")); // = Record is not deleted or replaced.
-			criteria.addOrder(Order.asc("gid")); // oldest created cross will be first in list.
+			criteria.addOrder(Order.asc("gid")); // Oldest created cross will be first in list.
 
 			@SuppressWarnings("unchecked")
 			List<Germplasm> previousCrosses = criteria.getExecutableCriteria(getSession()).list();
 			return previousCrosses;
 		} catch (HibernateException e) {
-			final String message = "Error executing GermplasmDAO.getPreviousCrosses(currentCross = {}): {}";
-			LOG.error(message, currentCross, e.getMessage());
+			final String message = "Error executing GermplasmDAO.getPreviousCrosses(female = {}, male = {}): {}";
+			LOG.error(message, female, male, e.getMessage());
 			throw new MiddlewareQueryException(message, e);
 		}
 	}

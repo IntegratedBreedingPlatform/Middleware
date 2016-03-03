@@ -325,7 +325,7 @@ public class GermplasmGroupingServiceImplTest {
 		Germplasm previousCross = new Germplasm(123);
 		Integer previousCrossMGID = 456;
 		previousCross.setMgid(previousCrossMGID);
-		Mockito.when(this.germplasmDAO.getPreviousCrosses(crossGermplasm1))
+		Mockito.when(this.germplasmDAO.getPreviousCrossesBetweenParentGroups(crossGermplasm1))
 				.thenReturn(Lists.newArrayList(previousCross));
 
 		// Just to test, create another cross with non-hybrid method. Expect this to not be processed.
@@ -340,7 +340,7 @@ public class GermplasmGroupingServiceImplTest {
 		Assert.assertEquals("Expected new cross to be assigned MGID from previous cross.", previousCrossMGID, crossGermplasm1.getMgid());
 
 		// Previous crosses should be queried once.
-		Mockito.verify(this.germplasmDAO, Mockito.times(1)).getPreviousCrosses(crossGermplasm1);
+		Mockito.verify(this.germplasmDAO, Mockito.times(1)).getPreviousCrossesBetweenParentGroups(crossGermplasm1);
 		// One Germplasm record should be saved out of the two that are passed.
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).save(Mockito.any(Germplasm.class));
 	}
@@ -384,7 +384,7 @@ public class GermplasmGroupingServiceImplTest {
 		Assert.assertEquals("Expected new cross to be assigned MGID = GID of the cross when no previous crosses exist.", crossGid1,
 				crossGermplasm1.getMgid());
 		// Previous crosses should be queried once.
-		Mockito.verify(this.germplasmDAO, Mockito.times(1)).getPreviousCrosses(crossGermplasm1);
+		Mockito.verify(this.germplasmDAO, Mockito.times(1)).getPreviousCrossesBetweenParentGroups(crossGermplasm1);
 		// No selection history should be copied.
 		// One Germplasm record should be saved out of the two that are passed.
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).save(Mockito.any(Germplasm.class));
@@ -421,7 +421,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		Assert.assertEquals("Expected no MGID change.", new Integer(0), crossGermplasm1.getMgid());
 		// Previous crosses should never be queried.
-		Mockito.verify(this.germplasmDAO, Mockito.never()).getPreviousCrosses(crossGermplasm1);
+		Mockito.verify(this.germplasmDAO, Mockito.never()).getPreviousCrossesBetweenParentGroups(crossGermplasm1);
 		// No selection history should be copied.
 		// No Germplasm record should be saved.
 		Mockito.verify(this.germplasmDAO, Mockito.never()).save(Mockito.any(Germplasm.class));
@@ -449,7 +449,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		Assert.assertEquals("Expected no MGID change.", new Integer(0), crossGermplasm1.getMgid());
 		// Previous crosses should never be queried.
-		Mockito.verify(this.germplasmDAO, Mockito.never()).getPreviousCrosses(crossGermplasm1);
+		Mockito.verify(this.germplasmDAO, Mockito.never()).getPreviousCrossesBetweenParentGroups(crossGermplasm1);
 		// No selection history should be copied.
 		// No Germplasm record should be saved.
 		Mockito.verify(this.germplasmDAO, Mockito.never()).save(Mockito.any(Germplasm.class));
@@ -485,7 +485,7 @@ public class GermplasmGroupingServiceImplTest {
 		// Setup previous cross with MGID.
 		Germplasm previousCross = new Germplasm(123);
 		// No mgid on previous cross
-		Mockito.when(this.germplasmDAO.getPreviousCrosses(crossGermplasm1))
+		Mockito.when(this.germplasmDAO.getPreviousCrossesBetweenParentGroups(crossGermplasm1))
 				.thenReturn(Lists.newArrayList(previousCross));
 
 		this.germplasmGroupingService.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1), true);
@@ -496,7 +496,7 @@ public class GermplasmGroupingServiceImplTest {
 				previousCross.getMgid());
 
 		// Previous crosses should be queried once.
-		Mockito.verify(this.germplasmDAO, Mockito.times(1)).getPreviousCrosses(crossGermplasm1);
+		Mockito.verify(this.germplasmDAO, Mockito.times(1)).getPreviousCrossesBetweenParentGroups(crossGermplasm1);
 		// One Germplasm record should be saved out of the two that are passed.
 		// One other save should occur for saving mgid on previous cross.
 		Mockito.verify(this.germplasmDAO, Mockito.times(2)).save(Mockito.any(Germplasm.class));
