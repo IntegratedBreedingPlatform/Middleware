@@ -12,17 +12,23 @@
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -357,6 +363,10 @@ public class Germplasm implements Serializable {
 	@Column(name = "mgid")
 	private Integer mgid;
 
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "gid")
+	private List<Name> names = new ArrayList<Name>();
+
 	/**
 	 * @OneToMany(mappedBy = "germplasm") private Set<Progenitor> progntr = new HashSet<Progenitor>();
 	 **/
@@ -454,13 +464,20 @@ public class Germplasm implements Serializable {
 	}
 
 	/**
-	 * @return The type of genesis and number of progenitors. For a derivative process GNPGS =-1 and then GPID1 contains the germplasm
-	 *         groupID and GPID2 the source germplasm ID. For a generative process GNPGS contains the number of specified parents. (The
-	 *         number of parents required by a method is recorded by NPRGN on the METHODS TABLE). If GNPGS=1 or 2 then the IDs of the
-	 *         progenitors are contained in the GPID1 and GPID2 fields on the GERMPLSMtable. If GNPGS>2 then further IDs are stored on the
-	 *         PROGNTRS table. GNPGS =0 for land race or wild species collections or if none of the parents is known.GNPGS <= NPRGN, but
-	 *         some of the GNPGS specified parents may be unknown in which case the corresponding GPIDs are MISSING (0). For example in a
-	 *         simplecross with only male parent known, GNPGS would have to be 2 with GPID1=0 andGPD2 set to GID of the known male parent.
+	 * Represents the type of genesis and number of progenitors.
+	 * 
+	 * <ul>
+	 * <li>For a derivative process GNPGS = -1 and then GPID1 contains the germplasm groupID and GPID2 the source germplasm ID.</li>
+	 * 
+	 * <li>For a generative process GNPGS containsthe number of specified parents. (The number of parents required by a method isrecorded by
+	 * NPRGN on the METHODS TABLE). If GNPGS = 1 or 2 then the IDs ofthe progenitors are contained in the GPID1 and GPID2 fields on the
+	 * GERMPLSM table. If GNPGS>2 then further IDs are stored on the PROGNTRS table.</li>
+	 * 
+	 * <li>GNPGS = 0 for <a href="https://en.wikipedia.org/wiki/Landrace">landrace</a> or wild species collections or if none of the parents
+	 * is known.GNPGS <= NPRGN, but some of the GNPGS specified parents may be unknown inwhich case the corresponding GPIDs are MISSING (0).
+	 * For example in a simplecross with only male parent known, GNPGS would have to be 2 with GPID1 = 0 and GPID2 set to GID of the known
+	 * male parent.</li>
+	 * </ul>
 	 */
 	public Integer getGnpgs() {
 		return this.gnpgs;
@@ -666,4 +683,25 @@ public class Germplasm implements Serializable {
 		this.accessionName = accessionName;
 	}
 
+	/**
+	 * @return <strong>ALL</strong> name records associated with this germplasm entity.
+	 */
+	public List<Name> getNames() {
+		return names;
+	}
+
+	public void setNames(List<Name> names) {
+		this.names = names;
+	}
+
+	public Name findPreferredName() {
+		Name preferredName = null;
+		for (Name name : this.getNames()) {
+			if (new Integer(1).equals(name.getNstat())) {
+				preferredName = name;
+				break;
+			}
+		}
+		return preferredName;
+	}
 }
