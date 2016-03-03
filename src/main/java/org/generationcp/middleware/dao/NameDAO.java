@@ -43,7 +43,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(NameDAO.class);
 
 	@SuppressWarnings("unchecked")
-  	public List<Name> getByGIDWithFilters(Integer gid, Integer status, GermplasmNameType type) {
+  	public List<Name> getByGIDWithFilters(final Integer gid, final Integer status, final GermplasmNameType type) {
  		if(type != null) {
  			return getByGIDWithListTypeFilters(gid, status, Collections.<Integer>singletonList(Integer.valueOf(type.getUserDefinedFieldID())));
  		}
@@ -60,7 +60,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
  	 * @throws MiddlewareQueryException
  	 */
  	@SuppressWarnings("unchecked")
- 	public List<Name> getByGIDWithListTypeFilters(Integer gid, Integer status, List<Integer> type) {
+ 	public List<Name> getByGIDWithListTypeFilters(final Integer gid, final Integer status, final List<Integer> type) {
 		try {
 			if (gid != null) {
 				final StringBuilder queryString = new StringBuilder();
