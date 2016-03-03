@@ -18,7 +18,7 @@ public interface PedigreeService {
 	String getCropName();
 
 	/**
-	 * Gets the cross expansion.
+	 * Gets the cross expansion i.e build the pedigree string.
 	 *
 	 * @param gid the gid
 	 * @param level the level
@@ -27,6 +27,7 @@ public interface PedigreeService {
 	String getCrossExpansion(Integer gid, CrossExpansionProperties crossExpansionProperties);
 
 	/**
+	 * Gets the cross expansion i.e build the pedigree string.
 	 * @param gid the GID for which we are generating the pedigree
 	 * @param level the number of generation traversed to generate the pedigree
 	 * @param crossExpansionProperties cross expansion properties configured.
@@ -35,7 +36,7 @@ public interface PedigreeService {
 	String getCrossExpansion(Integer gid, Integer level, CrossExpansionProperties crossExpansionProperties);
 
 	/**
-	 *
+	 * Gets the cross expansion i.e build the pedigree string.
 	 * @param germplasm A preconstructed germplasm object. We need this when generating the cross from the crossing manager.
 	 * @param level the number of levels we are suppose to do the expansion for
 	 * @param crossExpansionProperties default expansion properties
