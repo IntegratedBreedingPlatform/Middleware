@@ -19,7 +19,7 @@ public class PedigreeFactory {
 		if (PedigreeFactory.isCimmytWheat(pedigreeProfile, cropType)) {
 			return new PedigreeCimmytWheatServiceImpl(sessionProvider);
 		}
-		return new ConfigurablePedigreeService(sessionProvider, cropType);
+		return new PedigreeServiceImpl(sessionProvider, cropType);
 	}
 
 	// TODO Remove the duplicate org.generationcp.commons.util.CrossingUtil.isCimmytWheat(String, String) in Commons and update references
