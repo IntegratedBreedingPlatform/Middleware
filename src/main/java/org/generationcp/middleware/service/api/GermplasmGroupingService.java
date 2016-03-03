@@ -16,8 +16,10 @@ public interface GermplasmGroupingService {
 	 * @param germplasm The germplasm to "fix".
 	 * @param includeDescendants Whether to include descendants in the new group being created.
 	 * @param preserveExistingGroup flag to indicate whether existing group (mgid) should be preserved.
+	 * 
+	 * @return {@link GermplasmGroup} summary of the result of the grouping process.
 	 */
-	void markFixed(Germplasm germplasm, boolean includeDescendants, boolean preserveExistingGroup);
+	GermplasmGroup markFixed(Germplasm germplasm, boolean includeDescendants, boolean preserveExistingGroup);
 
 	/**
 	 * Service to apply group (MGID) inheritance to newly created crosses.
@@ -33,5 +35,10 @@ public interface GermplasmGroupingService {
 	 * 
 	 */
 	void copySelectionHistory(Germplasm germplasm);
+
+	/**
+	 * Get all group members where the given germplasm is a founder. For the founder gid = mgid.
+	 */
+	GermplasmGroup getGroupMembers(Germplasm founder);
 
 }
