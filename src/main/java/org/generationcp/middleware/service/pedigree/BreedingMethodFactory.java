@@ -1,0 +1,42 @@
+
+package org.generationcp.middleware.service.pedigree;
+
+import org.apache.commons.lang3.StringUtils;
+
+/**
+ * Factory method that enables us to select the correct breeding method processor according to the germplasm node provided. The breeding
+ * method processor can be used to create the appropriate string.
+ */
+public class BreedingMethodFactory {
+
+	public static BreedingMethodProcessor getMethodProcessor(GermplasmNode germplasmNode) {
+
+		final String methodName = getMethodName(germplasmNode);
+		System.out.println(methodName);
+		if (methodName.contains("single cross")) {
+			return new SingleCrossHybridProcessor();
+		} else if (methodName.contains("double cross")) {
+			return new DoubleCrossProcessor();
+		} else if (methodName.contains("three-way cross")) {
+			return new ThreeWayHybridProcessor();
+		} else if (methodName.contains("backcross")) {
+			return new BackcrossProcessor();
+		} else if (methodName.contains("cross") && methodName.contains("complex")) {
+			return new SingleCrossHybridProcessor(0);
+		} else if (methodName.contains("cross")) {
+			// Talk with Matthew
+			return new Cross();
+		}
+		// No crossing just an inbread
+		return new InbredProcessor();
+	}
+
+	private static String getMethodName(final GermplasmNode germplasmNode) {
+		if (germplasmNode != null && germplasmNode.getMethod() != null && StringUtils.isNotBlank(germplasmNode.getMethod().getMname())) {
+			final String methodName = germplasmNode.getMethod().getMname();
+			return methodName.toLowerCase();
+		}
+		return "";
+	}
+
+}
