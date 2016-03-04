@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.api;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 
 
 public interface GermplasmGroupingService {
@@ -42,5 +43,7 @@ public interface GermplasmGroupingService {
 	 * Get all group members where the given germplasm is a founder. For the founder gid = mgid.
 	 */
 	GermplasmGroup getGroupMembers(Germplasm founder);
+
+	GermplasmPedigreeTree getDescendantTree(Germplasm germplasm);
 
 }

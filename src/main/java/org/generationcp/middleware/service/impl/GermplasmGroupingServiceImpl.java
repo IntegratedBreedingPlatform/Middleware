@@ -65,9 +65,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		LOG.info("Marking germplasm with gid {} as fixed.", germplasmToFix.getGid());
 
 		if (includeDescendants) {
-			GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
-			LOG.info("Building descendant tree for gid {} for assigning group (mgid).", germplasmToFix.getGid());
-			tree.setRoot(buildDescendantsTree(germplasmToFix, 1));
+			GermplasmPedigreeTree tree = getDescendantTree(germplasmToFix);
 			traverseAssignGroup(tree.getRoot(), germplasmToFix.getGid(), preserveExistingGroup);
 		} else {
 			assignGroup(germplasmToFix, germplasmToFix.getGid(), preserveExistingGroup);
@@ -94,6 +92,14 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 				traverseAssignGroup(child, groupId, preserveExistingGroup);
 			}
 		}
+	}
+
+	@Override
+	public GermplasmPedigreeTree getDescendantTree(Germplasm germplasm) {
+		LOG.info("Building descendant tree for gid {}.", germplasm.getGid());
+		GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
+		tree.setRoot(buildDescendantsTree(germplasm, 1));
+		return tree;
 	}
 
 	private GermplasmPedigreeTreeNode buildDescendantsTree(Germplasm germplasm, int level) {
