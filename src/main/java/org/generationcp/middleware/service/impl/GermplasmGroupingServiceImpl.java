@@ -257,7 +257,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	// Rigorous INFO logging in this method is intentional. Currently we dont have good visualization tools in BMS to verify results of such
 	// complex operations. INFO LOGGing helps.
 	@Override
-	public void processGroupInheritanceForCrosses(List<Integer> gidsOfCrosses, boolean applyNewGroupToPreviousCrosses) {
+	public void processGroupInheritanceForCrosses(List<Integer> gidsOfCrosses, boolean applyNewGroupToPreviousCrosses,
+			Set<Integer> hybridMethods) {
 
 		for (Integer crossGID : gidsOfCrosses) {
 			Germplasm cross = this.germplasmDAO.getById(crossGID);
@@ -279,7 +280,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 					parent2.getGpid2(), parent2.getMgid(), parent2.getMethodId());
 			}
 
-			if (Method.isHybrid(cross.getMethodId())) {
+			if (hybridMethods.contains(cross.getMethodId())) {
 				LOG.info("Breeding method {} of the cross is hybrid.", cross.getMethodId());
 				boolean parent1HasMGID = parent1.getMgid() != null && parent1.getMgid() != 0;
 				boolean parent2HasMGID = parent2.getMgid() != null && parent2.getMgid() != 0;

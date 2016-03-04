@@ -1,6 +1,9 @@
 
 package org.generationcp.middleware.util;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 /**
  * Created by EfficioDaniel on 3/31/2015.
  */
@@ -9,6 +12,8 @@ public class CrossExpansionProperties {
 	private String profile;
 	private int wheatLevel;
 	private int defaultLevel;
+
+	private Set<Integer> hybridBreedingMethods = new TreeSet<Integer>();
 
 	public CrossExpansionProperties() {
 
@@ -38,4 +43,11 @@ public class CrossExpansionProperties {
 		this.profile = profile;
 	}
 
+	public Set<Integer> getHybridBreedingMethods() {
+		return this.hybridBreedingMethods;
+	}
+
+	public void setHybridBreedingMethods(Set<Integer> hybridBreedingMethods) {
+		this.hybridBreedingMethods = hybridBreedingMethods;
+	}
 }
