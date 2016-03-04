@@ -226,4 +226,12 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		List<Germplasm> previousCrosses = this.dao.getPreviousCrosses(11, 3);
 		Assert.assertNotNull("getPreviousCrosses() should never return null.", previousCrosses);
 	}
+
+	@Test
+	public void testLoadEntityWithNameCollection() {
+		Germplasm germplasm = this.dao.getById(1);
+		if (germplasm != null) {
+			Assert.assertTrue("If germplasm exists, the name collection can not be empty.", !germplasm.getNames().isEmpty());
+		}
+	}
 }

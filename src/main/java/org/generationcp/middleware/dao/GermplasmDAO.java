@@ -535,6 +535,27 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
+	public List<Germplasm> getGroupMembers(Integer gid) {
+		try {
+			DetachedCriteria criteria = DetachedCriteria.forClass(Germplasm.class);
+			criteria.add(Restrictions.eq("mgid", gid));
+			criteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged
+			criteria.add(Restrictions.neProperty("gid", "grplce")); // = Record is not deleted or replaced.
+
+			@SuppressWarnings("unchecked")
+			List<Germplasm> groupMembers = criteria.getExecutableCriteria(getSession()).list();
+			// Prime the names collection before returning ;)
+			for (Germplasm g : groupMembers) {
+				g.getNames().size();
+			}
+			return groupMembers;
+		} catch (HibernateException e) {
+			final String message = "Error executing GermplasmDAO.getGroupMembers(gid={}) : {}";
+			LOG.error(message, gid, e.getMessage());
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 	public List<Germplasm> getPreviousCrosses(Integer parentA, Integer parenB) {
 		try {
 			DetachedCriteria criteria = DetachedCriteria.forClass(Germplasm.class);
