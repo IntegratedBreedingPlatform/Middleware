@@ -109,7 +109,9 @@ public class MeasurementDataTest {
 		Assert.assertNotNull(value);
 		Assert.assertEquals("value is 1","1",value.getValue());
 		Assert.assertEquals("name is \"Name\"","Name", value.getName());
-		Assert.assertEquals("description is \"Desc\"","Desc", value.getDescription());
+
+		// we now expect Name= Desc views
+		Assert.assertEquals("description is \"Desc\"","Name= Desc", value.getDescription());
 		Assert.assertTrue("value is valid", value.isValid());
 	}
 

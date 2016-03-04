@@ -226,7 +226,12 @@ public class MeasurementData {
 			final List<ValueReference> possibleValues = this.getMeasurementVariable().getPossibleValues();
 			for (final ValueReference possibleValue : possibleValues) {
 				if (possibleValue.getId().equals(Double.valueOf(this.value).intValue())) {
-					return new CategoricalDisplayValue(this.value,possibleValue.getName(),possibleValue.getDescription());
+
+					// if measurement data is a factor, show original description else, get the modified display description
+					final String displayDescription = this.getMeasurementVariable().isFactor() ?
+							possibleValue.getDescription() : possibleValue.getDisplayDescription();
+
+					return new CategoricalDisplayValue(this.value,possibleValue.getName(), displayDescription);
 				}
 			}
 		}
