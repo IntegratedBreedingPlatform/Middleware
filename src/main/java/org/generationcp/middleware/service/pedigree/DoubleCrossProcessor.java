@@ -10,7 +10,7 @@ import com.google.common.base.Optional;
  * Then the two single-cross hybrids produced further are crossed to produce the double-cross. Typically, A and B are closely related and Y
  * and Z are also closely related, but neither A nor B is closely related to Y or Z.
  *
- *						 					A x B	Y x Z
+ *						 				  A x B	   Y x Z
  *						 					 \		/
  * (femaleSingleCrossHybridPedigreeString) 	A/B   Y/Z (maleSingleCrossHybridPedigreeString)
  *						 		  			  \	   /
@@ -21,17 +21,10 @@ public class DoubleCrossProcessor implements BreedingMethodProcessor {
 
 	private InbredProcessor inbredProcessor = new InbredProcessor();;
 
+	private PedigreeStringBuilder pedigreeStringBuilder = new PedigreeStringBuilder();
+
 	@Override
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level, final FixedLineNameResolver fixedLineNameResolver) {
-
-		if(level == 0) {
-			return inbredProcessor.processGermplasmNode(germplasmNode, level-1, fixedLineNameResolver);
-		}
-
-		final Optional<PedigreeString> fixedLineName = PedigreeStringGeneratorUtil.getFixedLineName(germplasmNode, fixedLineNameResolver);
-		if(fixedLineName.isPresent()) {
-			return fixedLineName.get();
-		}
 
 		final PedigreeString femaleSingleCrossHybridPedigreeString =
 				constructPedigreeStringForSingleCrossHybrids(germplasmNode.getFemaleParent(), level, fixedLineNameResolver);
@@ -54,8 +47,8 @@ public class DoubleCrossProcessor implements BreedingMethodProcessor {
 	}
 
 	private PedigreeString constructPedigreeString(final GermplasmNode node, final Integer level, final FixedLineNameResolver fixedLineNameResolver) {
-		final PedigreeString femalePedigreeString = new PedigreeStringBuilder().buildPedigreeString(node.getFemaleParent(), level-1, fixedLineNameResolver);
-		final PedigreeString malePedigreeString = new PedigreeStringBuilder().buildPedigreeString(node.getMaleParent(), level-1, fixedLineNameResolver);
+		final PedigreeString femalePedigreeString = pedigreeStringBuilder.buildPedigreeString(node.getFemaleParent(), level-1, fixedLineNameResolver);
+		final PedigreeString malePedigreeString = pedigreeStringBuilder.buildPedigreeString(node.getMaleParent(), level-1, fixedLineNameResolver);
 		final PedigreeString femaleCrossPedigreeString = new PedigreeString();
 		femaleCrossPedigreeString.setNumberOfCrosses(femalePedigreeString.getNumberOfCrosses() + malePedigreeString.getNumberOfCrosses()
 				+ 1);

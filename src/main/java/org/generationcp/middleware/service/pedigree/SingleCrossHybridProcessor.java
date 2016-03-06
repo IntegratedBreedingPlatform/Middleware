@@ -39,15 +39,6 @@ public class SingleCrossHybridProcessor implements BreedingMethodProcessor {
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
 			final FixedLineNameResolver fixedLineNameResolver) {
 
-		if (level == 0) {
-			return inbredProcessor.processGermplasmNode(germplasmNode, level, fixedLineNameResolver);
-		}
-
-		final Optional<PedigreeString> fixedLineName = PedigreeStringGeneratorUtil.getFixedLineName(germplasmNode, fixedLineNameResolver);
-		if (fixedLineName.isPresent()) {
-			return fixedLineName.get();
-		}
-
 		final GermplasmNode femaleParentNode = germplasmNode.getFemaleParent();
 		final PedigreeString femalePedigreeString;
 		if (femaleParentNode != null) {

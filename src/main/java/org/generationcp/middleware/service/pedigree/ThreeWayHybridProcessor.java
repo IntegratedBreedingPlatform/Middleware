@@ -1,11 +1,15 @@
 
 package org.generationcp.middleware.service.pedigree;
 
-import com.google.common.base.Optional;
 
 /**
  * Result from the cross between one parent that is an F1 hybrid and the other is from an inbred (inbred line or simply a line is a pure
- * breeding strain) line. A x B \ (femaleParentNode) A/B C (maleParentNode) \ / A/B//C
+ * breeding strain) line.
+ * 						 A x B
+ *							\
+ *		 (femaleParentNode) A/B   C (maleParentNode)
+ *							  \	  /
+ *							A/B//C
  *
  */
 public class ThreeWayHybridProcessor implements BreedingMethodProcessor {
@@ -17,15 +21,6 @@ public class ThreeWayHybridProcessor implements BreedingMethodProcessor {
 	@Override
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
 			FixedLineNameResolver fixedLineNameResolver) {
-
-		if (level == 0) {
-			return inbredProcessor.processGermplasmNode(germplasmNode, level - 1, fixedLineNameResolver);
-		}
-
-		final Optional<PedigreeString> fixedLineName = PedigreeStringGeneratorUtil.getFixedLineName(germplasmNode, fixedLineNameResolver);
-		if(fixedLineName.isPresent()) {
-			return fixedLineName.get();
-		}
 
 		final GermplasmNode femaleParentNode = germplasmNode.getFemaleParent();
 		final GermplasmNode maleParentNode = germplasmNode.getMaleParent();
