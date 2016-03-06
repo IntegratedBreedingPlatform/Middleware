@@ -15,9 +15,9 @@ import com.google.common.base.Preconditions;
  * as identical as possible to the recurrent parent with the addition of the gene of interest that has been added through breeding.
  *														[238170 Backcross 2]
  *														/					\
- *												[238169 BC1 (BackCross1)]	[236052 Recurring Parent]
+ *												[238169 BC1 (BackCross1)]	[238167 Recurring Parent]
  *													/					\
- *											[238168 F1 (Progeny)]		[236052 Recurring Parent]
+ *											[238168 BC2 (Progeny)]		[238167 Recurring Parent]
  *											/		\
  *							[236052 Donor Parent]	[238167 Recurring Parent]
  */

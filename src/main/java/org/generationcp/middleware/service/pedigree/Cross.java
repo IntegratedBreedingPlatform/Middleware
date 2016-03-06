@@ -1,6 +1,9 @@
 package org.generationcp.middleware.service.pedigree;
 
 
+/**
+ * This method only does A X B and does not traverse the tree.
+ */
 public class Cross implements BreedingMethodProcessor {
 
 	final InbredProcessor inbredProcessor = new InbredProcessor();

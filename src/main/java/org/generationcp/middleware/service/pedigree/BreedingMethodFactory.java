@@ -12,7 +12,6 @@ public class BreedingMethodFactory {
 	public static BreedingMethodProcessor getMethodProcessor(GermplasmNode germplasmNode) {
 
 		final String methodName = getMethodName(germplasmNode);
-		System.out.println(methodName);
 		if (methodName.contains("single cross")) {
 			return new SingleCrossHybridProcessor();
 		} else if (methodName.contains("double cross")) {
@@ -24,7 +23,6 @@ public class BreedingMethodFactory {
 		} else if (methodName.contains("cross") && methodName.contains("complex")) {
 			return new SingleCrossHybridProcessor(0);
 		} else if (methodName.contains("cross")) {
-			// Talk with Matthew
 			return new Cross();
 		}
 		// No crossing just an inbread
