@@ -714,6 +714,37 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
+	public Integer updateGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList) {
+		final GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
+
+		final long startTime = System.currentTimeMillis();
+
+		try {
+
+			germplasmListDao.update(germplasmList);
+
+			// Save germplasms, names, list data
+			for (final Pair<Germplasm, GermplasmListData> pair : listDataItems) {
+
+				final Germplasm germplasm = pair.getLeft();
+				final GermplasmListData germplasmListData = pair.getRight();
+
+				germplasmListData.setGid(germplasm.getGid());
+				germplasmListData.setList(germplasmList);
+				this.getGermplasmListDataDAO().update(germplasmListData);
+			}
+
+		} catch (final Exception e) {
+			this.logAndThrowException("Error encountered with FieldbookService.updateNurseryCrossesGermplasmList(germplasmList="
+					+ germplasmList + "): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
+		}
+
+		FieldbookServiceImpl.LOG.debug("========== updateGermplasmList Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
+
+		return germplasmList.getId();
+	}
+
+	@Override
 	public Person getPersonById(final int id) {
 		return this.getUserDataManager().getPersonById(id);
 	}
