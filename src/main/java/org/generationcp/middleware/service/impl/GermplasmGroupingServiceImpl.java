@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service.impl;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -289,6 +290,16 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 				if (bothParentsHaveMGID) {
 					LOG.info("Both parents have MGIDs. Parent1 mgid {}. Parent2 mgid {}.", parent1.getMgid(), parent2.getMgid());
 					List<Germplasm> previousCrosses = this.germplasmDAO.getPreviousCrossesBetweenParentGroups(cross);
+
+					// Remove members of the current processing batch from the list of "previous crosses" retrieved.
+					Iterator<Germplasm> previousCrossesIterator = previousCrosses.iterator();
+					while (previousCrossesIterator.hasNext()) {
+						Germplasm previousCross = previousCrossesIterator.next();
+						if (gidsOfCrosses.contains(previousCross.getGid())) {
+							previousCrossesIterator.remove();
+						}
+					}
+
 					boolean crossingFirstTime = previousCrosses.isEmpty();
 					if (crossingFirstTime) {
 						LOG.info("This is a first cross of the two parents. Starting a new group. Setting gid {} to mgid.",
