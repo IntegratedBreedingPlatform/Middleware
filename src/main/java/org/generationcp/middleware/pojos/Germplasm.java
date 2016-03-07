@@ -78,18 +78,23 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 })
 @NamedNativeQueries({
-	@NamedNativeQuery(name = "getGermplasmDescendants",
+		@NamedNativeQuery(name = "getGermplasmDescendants",
 			query = "SELECT DISTINCT g.* FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
-					+ "WHERE (g.gpid1=:gid OR g.gpid2=:gid OR p.pid=:gid) " + "AND g.gid != g.grplce and g.grplce = 0",
-					resultClass = Germplasm.class),
-					@NamedNativeQuery(name = "getGermplasmByPrefName", query = "SELECT g.* FROM germplsm g LEFT JOIN names n ON g.gid = n.gid "
-							+ "AND n.nstat = 1 " + "WHERE n.nval = :name", resultClass = Germplasm.class),
-							@NamedNativeQuery(name = "getProgenitor1", query = "SELECT p.* FROM germplsm g, germplsm p WHERE g.gid = :gid "
-									+ "and g.gpid1 = p.gid and p.gid != p.grplce and p.grplce = 0", resultClass = Germplasm.class),
-									@NamedNativeQuery(name = "getProgenitor2", query = "SELECT p.* FROM germplsm g, germplsm p WHERE g.gid = :gid "
-											+ "and g.gpid2 = p.gid and p.gid != p.grplce and p.grplce = 0", resultClass = Germplasm.class),
-											@NamedNativeQuery(name = "getProgenitor", query = "SELECT g.* FROM germplsm g, progntrs p WHERE g.gid = p.pid "
-													+ "and p.gid = :gid and p.pno = :pno and g.gid != g.grplce and g.grplce = 0", resultClass = Germplasm.class)})
+						+ "WHERE (g.gpid1=:gid OR g.gpid2=:gid OR p.pid=:gid) " + "AND g.gid != g.grplce and g.grplce = 0",
+				resultClass = Germplasm.class), //
+
+		@NamedNativeQuery(name = "getGermplasmByPrefName", query = "SELECT g.* FROM germplsm g LEFT JOIN names n ON g.gid = n.gid "
+				+ "AND n.nstat = 1 " + "WHERE n.nval = :name", resultClass = Germplasm.class), //
+
+		@NamedNativeQuery(name = "getProgenitor1", query = "SELECT p.* FROM germplsm g, germplsm p WHERE g.gid = :gid "
+				+ "and g.gpid1 = p.gid and p.gid != p.grplce and p.grplce = 0", resultClass = Germplasm.class), //
+
+		@NamedNativeQuery(name = "getProgenitor2", query = "SELECT p.* FROM germplsm g, germplsm p WHERE g.gid = :gid "
+				+ "and g.gpid2 = p.gid and p.gid != p.grplce and p.grplce = 0", resultClass = Germplasm.class), //
+
+		@NamedNativeQuery(name = "getProgenitor", query = "SELECT g.* FROM germplsm g, progntrs p WHERE g.gid = p.pid "
+				+ "and p.gid = :gid and p.pno = :pno and g.gid != g.grplce and g.grplce = 0", resultClass = Germplasm.class)} //
+)
 @Entity
 @Table(name = "germplsm")
 // JAXB Element Tags for JSON output
