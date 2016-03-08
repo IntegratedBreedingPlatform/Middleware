@@ -37,7 +37,7 @@ public class CrossExpansionProperties {
 	/**
 	 * This cache will work because {@link CrossExpansionProperties} is/must be configured as a singleton in Spring
 	 */
-	private LoadingCache<String, List<Integer>> nameTypeOrderCache;
+	private LoadingCache<String, List<String>> nameTypeOrderCache;
 
 	/**
 	 * This cache will work because {@link CrossExpansionProperties} is/must be configured as a singleton in Spring
@@ -69,10 +69,10 @@ public class CrossExpansionProperties {
 	private void init() {
 		this.nameTypeOrderCache =
 				CacheBuilder.newBuilder().maximumSize(1000).expireAfterWrite(1000, TimeUnit.MINUTES)
-						.build(new CacheLoader<String, List<Integer>>() {
+						.build(new CacheLoader<String, List<String>>() {
 
 							@Override
-							public List<Integer> load(final String cropName) {
+							public List<String> load(final String cropName) {
 								return CrossExpansionProperties.this.getNameTypeStoppingRulesByCrop(cropName);
 							}
 
@@ -136,23 +136,16 @@ public class CrossExpansionProperties {
 		return new ImmutablePair<String, String>("*", "*");
 	}
 
-	private List<Integer> getNameTypeStoppingRulesByCrop(final String cropName) {
+	private List<String> getNameTypeStoppingRulesByCrop(final String cropName) {
 		final String propertyValue =
 				CrossExpansionProperties.this.props.getProperty(cropName + "." + CrossExpansionProperties.NAME_TYPE_ORDER);
-		final List<Integer> codes = new ArrayList<Integer>();
+		final List<String> codes = new ArrayList<String>();
 
 		if (StringUtils.isNotBlank(propertyValue)) {
 			final String[] stringCodes = propertyValue.trim().split(",");
 			for (final String code : stringCodes) {
-				try {
-					codes.add(Integer.parseInt(code));
-				} catch (final Exception e) {
-					final String errorMessage =
-							String.format(cropName + "." + CrossExpansionProperties.NAME_TYPE_ORDER
-									+ " property is configured incorrectly with a value of '%s'. "
-									+ "Please contact your administrator for further assistance", propertyValue);
-					CrossExpansionProperties.LOG.error(errorMessage, e);
-					throw new MiddlewareException(errorMessage, e);
+				if (StringUtils.isNotBlank(code)) {
+					codes.add(code.trim());
 				}
 			}
 
@@ -160,7 +153,7 @@ public class CrossExpansionProperties {
 		return codes;
 	}
 
-	public List<Integer> getNameTypeOrder(final String cropName) {
+	public List<String> getNameTypeOrder(final String cropName) {
 		try {
 			return this.nameTypeOrderCache.get(cropName);
 		} catch (final ExecutionException e) {

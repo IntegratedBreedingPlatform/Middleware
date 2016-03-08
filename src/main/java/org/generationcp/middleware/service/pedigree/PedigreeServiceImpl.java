@@ -1,11 +1,16 @@
 
 package org.generationcp.middleware.service.pedigree;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -13,11 +18,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Optional;
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 
 @Transactional
 public class PedigreeServiceImpl implements PedigreeService {
@@ -26,11 +30,25 @@ public class PedigreeServiceImpl implements PedigreeService {
 
 	private PedigreeDataManagerFactory pedigreeDataManagerFactory;
 
-	private static LoadingCache<GermplasmKey, Optional<Germplasm>> germplasmCache;
+	private static Cache<CropGermplasmKey, Germplasm> germplasmCache;
 
-	private static LoadingCache<MethodKey, Optional<Method>> methodCache;
+	private static Cache<CropMethodKey, Method> methodCache;
+
+	private static Cache<CropNameTypeKey, List<Integer>> nameTypeCache;
 
 	private String cropName;
+
+	private FunctionBasedGuavaCacheLoader<CropGermplasmKey, Germplasm> germplasmCropBasedCache;
+
+	private FunctionBasedGuavaCacheLoader<CropMethodKey, Method> methodCropBasedCache;
+
+	private FunctionBasedGuavaCacheLoader<CropNameTypeKey, List<Integer>> nameTypeBasedCache;
+
+	static {
+		germplasmCache = CacheBuilder.newBuilder().maximumSize(1000).expireAfterWrite(1000, TimeUnit.MINUTES).build();
+		methodCache = CacheBuilder.newBuilder().maximumSize(1000).expireAfterWrite(1000, TimeUnit.MINUTES).build();
+		nameTypeCache = CacheBuilder.newBuilder().maximumSize(1000).expireAfterWrite(1000, TimeUnit.MINUTES).build();
+	}
 
 	public PedigreeServiceImpl() {
 
@@ -40,30 +58,49 @@ public class PedigreeServiceImpl implements PedigreeService {
 		this.cropName = cropName;
 		this.pedigreeDataManagerFactory = new PedigreeDataManagerFactory(sessionProvider);
 
-		// FIXME This is a broken cache
-		PedigreeServiceImpl.germplasmCache =
-				CacheBuilder.newBuilder().maximumSize(100000).expireAfterWrite(1000, TimeUnit.MINUTES)
-						.build(new CacheLoader<GermplasmKey, Optional<Germplasm>>() {
+		germplasmCropBasedCache =
+				new FunctionBasedGuavaCacheLoader<CropGermplasmKey, Germplasm>(germplasmCache, new Function<CropGermplasmKey, Germplasm>() {
+
+					@Override
+					public Germplasm apply(CropGermplasmKey key) {
+						return PedigreeServiceImpl.this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(
+								key.getGid());
+					}
+				});
+
+		methodCropBasedCache = new FunctionBasedGuavaCacheLoader<CropMethodKey, Method>(methodCache, new Function<CropMethodKey, Method>() {
+
+			@Override
+			public Method apply(CropMethodKey key) {
+				return PedigreeServiceImpl.this.pedigreeDataManagerFactory.getGermplasmDataManager().getMethodByID(key.getMethodId());
+			}
+		});
+
+		nameTypeBasedCache =
+				new FunctionBasedGuavaCacheLoader<CropNameTypeKey, List<Integer>>(nameTypeCache,
+						new Function<CropNameTypeKey, List<Integer>>() {
 
 							@Override
-							public Optional<Germplasm> load(final GermplasmKey key) {
-								Optional<Germplasm> germplasmWithPrefName =
-										Optional.fromNullable(PedigreeServiceImpl.this.pedigreeDataManagerFactory.getGermplasmDataManager()
-												.getGermplasmWithPrefName(key.getGid()));
-								return germplasmWithPrefName;
-							}
-						});
+							public List<Integer> apply(CropNameTypeKey input) {
+								final List<String> nameTypeOrder = input.getNameTypeOrder();
 
-		PedigreeServiceImpl.methodCache =
-				CacheBuilder.newBuilder().maximumSize(100000).expireAfterWrite(1000, TimeUnit.MINUTES)
-						.build(new CacheLoader<MethodKey, Optional<Method>>() {
-
-							@Override
-							public Optional<Method> load(final MethodKey key) {
-								Optional<Method> methodByID =
-										Optional.fromNullable(PedigreeServiceImpl.this.pedigreeDataManagerFactory.getGermplasmDataManager()
-												.getMethodByID(key.getMethodId()));
-								return methodByID;
+								final List<Integer> nameTypeOrderIds = new ArrayList<>();
+								for (final String nameType : nameTypeOrder) {
+									final UserDefinedField userDefinedFieldByTableTypeAndCode =
+											pedigreeDataManagerFactory.getGermplasmDataManager().getUserDefinedFieldByTableTypeAndCode(
+													"NAMES", "NAME", nameType);
+									if (userDefinedFieldByTableTypeAndCode != null) {
+										nameTypeOrderIds.add(userDefinedFieldByTableTypeAndCode.getFldno());
+									} else {
+										throw new MiddlewareException(
+												String.format(
+														"Name type code of '%s' specified in crossing.properties is not present in the"
+																+ " UDFLDS table. Please make sure your properties file is configured correctly."
+																+ " Please contact your administrator for further assistance.",
+														nameType));
+									}
+								}
+								return nameTypeOrderIds;
 							}
 						});
 
@@ -96,8 +133,7 @@ public class PedigreeServiceImpl implements PedigreeService {
 		Preconditions.checkNotNull(gid);
 		Preconditions.checkArgument(gid > 0);
 		// Build the pedigree tree
-		final PedigreeTree pedigreeTree =
-				new PedigreeTree(PedigreeServiceImpl.germplasmCache, PedigreeServiceImpl.methodCache, this.getCropName());
+		final PedigreeTree pedigreeTree = new PedigreeTree(this.germplasmCropBasedCache, this.methodCropBasedCache, this.getCropName());
 		final GermplasmNode gidPedigreeTree = pedigreeTree.buildPedigreeTree(gid);
 
 		// System.out.println(gidPedigreeTree);
@@ -105,10 +141,11 @@ public class PedigreeServiceImpl implements PedigreeService {
 		// Get the cross string
 		final int numberOfLevelsToTraverse = level == null ? crossExpansionProperties.getCropGenerationLevel(this.getCropName()) : level;
 
-		PedigreeStringBuilder pedigreeString = new PedigreeStringBuilder();
+		final PedigreeStringBuilder pedigreeString = new PedigreeStringBuilder();
 
 		return pedigreeString.buildPedigreeString(gidPedigreeTree, numberOfLevelsToTraverse,
-				new FixedLineNameResolver(crossExpansionProperties, pedigreeDataManagerFactory, cropName)).getPedigree();
+				new FixedLineNameResolver(crossExpansionProperties, pedigreeDataManagerFactory, nameTypeBasedCache, cropName))
+				.getPedigree();
 	}
 
 	@Override
