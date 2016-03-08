@@ -1091,4 +1091,13 @@ public interface GermplasmDataManager {
 	 */
 	String getPlotCodeValue(Integer gid);
 
+	/**
+	 * Enables us to query the udflds table
+	 * @param table the ftable value
+	 * @param type the ftype value
+	 * @param code we are looking for
+	 * @return
+	 */
+	UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code);
+
 }

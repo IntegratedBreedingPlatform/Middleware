@@ -1325,4 +1325,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return plotCode;
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getUserDefinedFieldsByCodesInMap(java.lang.String, java.lang.String, java.util.List)
+	 */
+	@Override
+	 public UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code) {
+		return this.getUserDefinedFieldDao()
+				.getByTableTypeAndCode(table, type, code);
+	}
 }
