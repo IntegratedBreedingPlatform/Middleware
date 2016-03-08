@@ -6,6 +6,10 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import com.google.common.base.Optional;
 
+/**
+ * Utility to help us generate pedigree strings.
+ *
+ */
 public class PedigreeStringGeneratorUtil {
 
 	static String gerneratePedigreeString(final PedigreeString femalePedigreeString, final PedigreeString malePedigreeString) {
@@ -13,8 +17,8 @@ public class PedigreeStringGeneratorUtil {
 				+ malePedigreeString.getPedigree();
 	}
 
-	static String gernerateBackcrossPedigreeString(final PedigreeString recurringParentString, final PedigreeString donorParentString,
-			final int numberOfRecurringParents, final boolean isFemaleRecurringParent, final FixedLineNameResolver fixedLineNameResolver) {
+	static String gernerateBackcrossPedigreeString(final PedigreeString donorParentString, final PedigreeString recurringParentString,
+			final FixedLineNameResolver fixedLineNameResolver, final int numberOfRecurringParents, final boolean isFemaleRecurringParent) {
 		return recurringParentString.getPedigree()
 				+ PedigreeStringGeneratorUtil.getSeperator(isFemaleRecurringParent, numberOfRecurringParents, fixedLineNameResolver)
 				+ donorParentString.getPedigree();
@@ -30,7 +34,7 @@ public class PedigreeStringGeneratorUtil {
 		return Optional.fromNullable(null);
 	}
 
-	static String getSeperator(final boolean isFemaleRecurringParent,
+	private static String getSeperator(final boolean isFemaleRecurringParent,
 			final int numberOfCrosses,
 			final FixedLineNameResolver fixedLineNameResolver) {
 
@@ -44,16 +48,16 @@ public class PedigreeStringGeneratorUtil {
 		}
 	}
 
-	static String getSeperator(final int numberOfCrosses) {
+	private static String getSeperator(final int numberOfPreviousCrosses) {
 		// of crosses made
-		if (numberOfCrosses == 0) {
+		if (numberOfPreviousCrosses == 0) {
 			return "/";
-		} else if (numberOfCrosses == 1) {
+		} else if (numberOfPreviousCrosses == 1) {
 			return "//";
-		} else if (numberOfCrosses == 2) {
+		} else if (numberOfPreviousCrosses == 2) {
 			return "///";
 		} else {
-			return "/" + (numberOfCrosses + 1) + "/";
+			return "/" + (numberOfPreviousCrosses + 1) + "/";
 		}
 	}
 }

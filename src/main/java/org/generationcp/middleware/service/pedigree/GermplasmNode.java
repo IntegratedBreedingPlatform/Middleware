@@ -4,11 +4,10 @@ package org.generationcp.middleware.service.pedigree;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
-import org.apache.commons.lang.builder.HashCodeBuilder;
-import org.apache.commons.lang.builder.EqualsBuilder;
 
 public class GermplasmNode {
 

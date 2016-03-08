@@ -23,9 +23,9 @@ import com.google.common.base.Preconditions;
  */
 public class BackcrossProcessor implements BreedingMethodProcessor {
 
-	final PedigreeStringBuilder pedigreeStringBuilder = new PedigreeStringBuilder();
+	final private PedigreeStringBuilder pedigreeStringBuilder = new PedigreeStringBuilder();
 
-	final InbredProcessor inbredProcessor = new InbredProcessor();
+	final private InbredProcessor inbredProcessor = new InbredProcessor();
 
 	@Override
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
@@ -73,7 +73,12 @@ public class BackcrossProcessor implements BreedingMethodProcessor {
 				pedigreeStringBuilder.buildPedigreeString(recurringParent.get(), level - 1, fixedLineNameResolver);
 
 		// Count number of recurring parent
-		final int recurringParentCount = recurringParentCount(femaleParent, recurringParent.get().getGermplasm().getGid());
+		final int recurringParentCount;
+		if (recurringParent.get() == maleParent) {
+			recurringParentCount = recurringParentCount(femaleParent, recurringParent.get().getGermplasm().getGid());
+		} else {
+			recurringParentCount = recurringParentCount(maleParent, recurringParent.get().getGermplasm().getGid());
+		}
 
 		final PedigreeString backcrossPedigreeString =
 				buildBackcrossPedigreeString(femaleParent, recurringParent, recurringParentCount, recurringParentString, donorParentString,
@@ -86,11 +91,11 @@ public class BackcrossProcessor implements BreedingMethodProcessor {
 			final FixedLineNameResolver fixedLineNameResolver) {
 		final PedigreeString backcrossPedigreeString = new PedigreeString();
 		if (recurringParent.get() == femaleParent) {
-			backcrossPedigreeString.setPedigree(PedigreeStringGeneratorUtil.gernerateBackcrossPedigreeString(recurringParentString,
-					nonRecurringParentString, recurringParentCount, true, fixedLineNameResolver));
-		} else {
 			backcrossPedigreeString.setPedigree(PedigreeStringGeneratorUtil.gernerateBackcrossPedigreeString(nonRecurringParentString,
-					recurringParentString, recurringParentCount, false, fixedLineNameResolver));
+					recurringParentString, fixedLineNameResolver, recurringParentCount, true));
+		} else {
+			backcrossPedigreeString.setPedigree(PedigreeStringGeneratorUtil.gernerateBackcrossPedigreeString(recurringParentString,
+					nonRecurringParentString, fixedLineNameResolver, recurringParentCount, false));
 		}
 		return backcrossPedigreeString;
 	}
@@ -181,20 +186,20 @@ public class BackcrossProcessor implements BreedingMethodProcessor {
 			return 0;
 		}
 
-		final Germplasm otherParentGermplasm = donorParent.getGermplasm();
-		final Integer otherParentsFemaleParent = otherParentGermplasm.getGpid1();
-		final Integer otherParentsMaleParent = otherParentGermplasm.getGpid2();
+		final Germplasm donorParentGermplasm = donorParent.getGermplasm();
+		final Integer donorParentsFemaleParent = donorParentGermplasm.getGpid1();
+		final Integer donorParentsMaleParent = donorParentGermplasm.getGpid2();
 
-		if ((otherParentsFemaleParent != null) && !otherParentsFemaleParent.equals(recurringParentGid) && (otherParentsMaleParent != null)
-				&& !otherParentsMaleParent.equals(recurringParentGid)) {
+		if ((donorParentsFemaleParent != null) && !donorParentsFemaleParent.equals(recurringParentGid) && (donorParentsMaleParent != null)
+				&& !donorParentsMaleParent.equals(recurringParentGid)) {
 			return 1;
 		}
 
-		if ((otherParentsFemaleParent != null) && otherParentsFemaleParent.equals(recurringParentGid)) {
+		if ((donorParentsFemaleParent != null) && donorParentsFemaleParent.equals(recurringParentGid)) {
 			return recurringParentCount(donorParent.getMaleParent(), recurringParentGid) + 1;
 		}
 
-		if ((otherParentsMaleParent != null) && otherParentsMaleParent.equals(recurringParentGid)) {
+		if ((donorParentsMaleParent != null) && donorParentsMaleParent.equals(recurringParentGid)) {
 			return recurringParentCount(donorParent.getFemaleParent(), recurringParentGid) + 1;
 		}
 

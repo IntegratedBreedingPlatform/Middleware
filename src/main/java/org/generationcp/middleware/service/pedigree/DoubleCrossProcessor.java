@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.service.pedigree;
 
-import com.google.common.base.Optional;
 
 /**
  * The most prevalent type of hybrid that was grown in the United States in the 1930’s and 1940’s is known as a double-cross hybrid. As the
