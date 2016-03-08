@@ -9,18 +9,17 @@ import org.generationcp.middleware.pojos.Method;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.cache.LoadingCache;
 
 public class PedigreeTree {
 
-	private final LoadingCache<GermplasmKey, Optional<Germplasm>> germplasmCache;
-	private final LoadingCache<MethodKey, Optional<Method>> methodCache;
+	private final FunctionBasedGuavaCacheLoader<CropGermplasmKey, Germplasm> germplasmCache;
+	private final FunctionBasedGuavaCacheLoader<CropMethodKey, Method> methodCache;
 	private final String cropName;
 
-	public PedigreeTree(final LoadingCache<GermplasmKey, Optional<Germplasm>> germplasmCache, final LoadingCache<MethodKey, Optional<Method>> methodCache,
+	public PedigreeTree(final FunctionBasedGuavaCacheLoader<CropGermplasmKey, Germplasm> germplasmCropBasedCache, final FunctionBasedGuavaCacheLoader<CropMethodKey, Method> methodCropBasedCache,
 			final String cropName) {
-		this.germplasmCache = germplasmCache;
-		this.methodCache = methodCache;
+		this.germplasmCache = germplasmCropBasedCache;
+		this.methodCache = methodCropBasedCache;
 		this.cropName = cropName;
 	}
 
@@ -39,10 +38,10 @@ public class PedigreeTree {
 
 	private GermplasmNode buildGermplasmNode(final Integer gid) throws ExecutionException {
 		if (gid != null && gid > 0) {
-			final Optional<Germplasm> germplasm = this.germplasmCache.get(new GermplasmKey(this.cropName, gid));
+			final Optional<Germplasm> germplasm = this.germplasmCache.get(new CropGermplasmKey(this.cropName, gid));
 			if(germplasm.isPresent()) {
 				final GermplasmNode germplasmNode = new GermplasmNode(germplasm.get());
-				final Optional<Method> method = this.methodCache.get(new MethodKey(this.cropName, germplasmNode.getGermplasm().getMethodId()));
+				final Optional<Method> method = this.methodCache.get(new CropMethodKey(this.cropName, germplasmNode.getGermplasm().getMethodId()));
 				if(method.isPresent()) {
 					germplasmNode.setMethod(method.get());
 				}
