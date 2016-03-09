@@ -1,7 +1,6 @@
 package org.generationcp.middleware.service.pedigree.string.processors;
 
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.service.pedigree.BreedingMethodFactory;
 import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.service.pedigree.PedigreeString;
 import org.generationcp.middleware.service.pedigree.string.util.FixedLineNameResolver;
