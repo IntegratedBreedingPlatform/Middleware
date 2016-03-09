@@ -38,6 +38,7 @@ public abstract class AbstractReporter implements Reporter {
 	public static final String COUNTRY_VARIABLE_NAME = "country";
 	public static final String LOCATION_ABBREV_VARIABLE_NAME = "labbr";
     public static final String STUDY_OBSERVATIONS_KEY = "studyObservations";
+    public static final String SEASON_REPORT_KEY = "cycle";
 
 	private String fileNameExpr = this.getReportCode() + "-{tid}";
 	private String fileName = null;
@@ -57,7 +58,7 @@ public abstract class AbstractReporter implements Reporter {
 	 * distribution.
 	 */
 	@Override
-	public JasperPrint buildJRPrint(Map<String, Object> args) throws JRException {
+	public JasperPrint buildJRPrint(final Map<String, Object> args) throws JRException {
 
 		Map<String, Object> jrParams = null;
 		JRDataSource jrDataSource = null;
@@ -71,7 +72,7 @@ public abstract class AbstractReporter implements Reporter {
 			}
 
 		}
-		InputStream jasperReport = this.getTemplateInputStream();
+		final InputStream jasperReport = this.getTemplateInputStream();
 		this.jrPrint = JasperFillManager.fillReport(jasperReport, jrParams, jrDataSource);
 
 		return this.jrPrint;
@@ -86,8 +87,8 @@ public abstract class AbstractReporter implements Reporter {
 	 * @return Map of parameters for a JarperPrint
 	 */
 	@Override
-	public Map<String, Object> buildJRParams(Map<String, Object> args) {
-		Map<String, Object> params = new HashMap<String, Object>();
+	public Map<String, Object> buildJRParams(final Map<String, Object> args) {
+		final Map<String, Object> params = new HashMap<String, Object>();
 
 		if (args.containsKey("datePattern")) {
 			params.put(JsonQueryExecuterFactory.JSON_DATE_PATTERN, args.get("datePattern"));
@@ -106,7 +107,7 @@ public abstract class AbstractReporter implements Reporter {
 		} else {
 			params.put(JRParameter.REPORT_LOCALE, new Locale("en_US"));
 		}
-		ClassLoader loader = AbstractReporter.class.getClassLoader();
+		final ClassLoader loader = AbstractReporter.class.getClassLoader();
 		params.put("SUBREPORT_DIR", loader.getResource("jasper/").toExternalForm());
 		return params;
 	}
@@ -115,21 +116,20 @@ public abstract class AbstractReporter implements Reporter {
     // Implementations of the abstract report that requires dynamic data should provide their own implementation
     // or subclass AbstractDynamicReporter
     @Override
-    public JRDataSource buildJRDataSource(Collection<?> dataRecords) {
+    public JRDataSource buildJRDataSource(final Collection<?> dataRecords) {
         return new JREmptyDataSource();
     }
 
 	/**
 	 * Obtains the input stream to the .jasper file, specified by getFileName() The reason behind using input stream is that so it can work
 	 * even inside a jar file
-	 * 
-	 * @param jasperFileName The name of the compiled .jasper file.
+	 *
 	 * @return
 	 */
 	public InputStream getTemplateInputStream() {
-		String baseJasperDirectory = "jasper/";
+		final String baseJasperDirectory = "jasper/";
 		String jasperFileName = this.getTemplateName();
-		ClassLoader loader = AbstractReporter.class.getClassLoader();
+		final ClassLoader loader = AbstractReporter.class.getClassLoader();
 
 		if (!jasperFileName.endsWith(".jasper")) {
 			jasperFileName = jasperFileName + ".jasper";
@@ -145,9 +145,9 @@ public abstract class AbstractReporter implements Reporter {
 	 * @return
 	 */
 	public InputStream getTemplateCompileInputStream() {
-		String baseJasperDirectory = "jasper/";
+		final String baseJasperDirectory = "jasper/";
 		String jasperFileName = this.getTemplateName();
-		ClassLoader loader = AbstractReporter.class.getClassLoader();
+		final ClassLoader loader = AbstractReporter.class.getClassLoader();
 
 		if (!jasperFileName.endsWith(".jasper")) {
 			jasperFileName = jasperFileName + ".jrxml";
@@ -157,17 +157,17 @@ public abstract class AbstractReporter implements Reporter {
 	}
 
 	@Override
-	public void setFileNameExpression(String fileNameExpr) {
+	public void setFileNameExpression(final String fileNameExpr) {
 		this.fileNameExpr = fileNameExpr;
 	}
 
-	protected String buildOutputFileName(Map<String, Object> jrParams) {
+	protected String buildOutputFileName(final Map<String, Object> jrParams) {
 		String fileName = this.fileNameExpr;
 
-		Matcher paramsMatcher = this.fileNameParamsPattern.matcher(this.fileNameExpr);
+		final Matcher paramsMatcher = this.fileNameParamsPattern.matcher(this.fileNameExpr);
 
 		while (paramsMatcher.find()) {
-			String paramName = paramsMatcher.group().replaceAll("[\\{\\}]", "");
+			final String paramName = paramsMatcher.group().replaceAll("[\\{\\}]", "");
 
 			if (null == jrParams || null == jrParams.get(paramName)) {
 				fileName = fileName.replace(paramsMatcher.group(), "");
@@ -180,11 +180,11 @@ public abstract class AbstractReporter implements Reporter {
 	}
 
 	@Override
-	public void asOutputStream(OutputStream output) throws BuildReportException {
+	public void asOutputStream(final OutputStream output) throws BuildReportException {
 		if (null != this.jrPrint) {
 			try {
 				JasperExportManager.exportReportToPdfStream(this.jrPrint, output);
-			} catch (JRException e) {
+			} catch (final JRException e) {
 				AbstractReporter.LOG.error("Exporting report to PDF was not successful", e);
 			}
 		} else {
@@ -198,9 +198,9 @@ public abstract class AbstractReporter implements Reporter {
 	 * @return
 	 */
 	protected JRXlsxExporter createDefaultExcelExporter() {
-		JRXlsxExporter ex = new JRXlsxExporter();
+		final JRXlsxExporter ex = new JRXlsxExporter();
 
-		SimpleXlsReportConfiguration jrConfig = new SimpleXlsReportConfiguration();
+		final SimpleXlsReportConfiguration jrConfig = new SimpleXlsReportConfiguration();
 		jrConfig.setOnePagePerSheet(false);
 		jrConfig.setDetectCellType(true);
 		jrConfig.setIgnoreCellBorder(true);
@@ -214,7 +214,7 @@ public abstract class AbstractReporter implements Reporter {
 		return this.fileName + "." + this.getFileExtension();
 	}
 
-	public void setFileName(String fileName) {
+	public void setFileName(final String fileName) {
 		this.fileName = fileName;
 	}
 
@@ -228,7 +228,7 @@ public abstract class AbstractReporter implements Reporter {
 		return this.isParentsInfoRequired;
 	}
 
-	protected void setParentInfoRequired(boolean isParentsInfoRequired) {
+	protected void setParentInfoRequired(final boolean isParentsInfoRequired) {
 		this.isParentsInfoRequired = isParentsInfoRequired;
 	}
 }
