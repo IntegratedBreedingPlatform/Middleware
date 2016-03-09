@@ -2,6 +2,13 @@
 package org.generationcp.middleware.service.pedigree;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.service.pedigree.string.processors.BackcrossProcessor;
+import org.generationcp.middleware.service.pedigree.string.processors.BreedingMethodProcessor;
+import org.generationcp.middleware.service.pedigree.string.processors.Cross;
+import org.generationcp.middleware.service.pedigree.string.processors.DoubleCrossProcessor;
+import org.generationcp.middleware.service.pedigree.string.processors.InbredProcessor;
+import org.generationcp.middleware.service.pedigree.string.processors.SingleCrossHybridProcessor;
+import org.generationcp.middleware.service.pedigree.string.processors.ThreeWayHybridProcessor;
 
 /**
  * Factory method that enables us to select the correct breeding method processor according to the germplasm node provided. The breeding

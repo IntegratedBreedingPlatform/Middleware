@@ -3,6 +3,13 @@ package org.generationcp.middleware.service.pedigree;
 
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.service.pedigree.string.processors.BackcrossProcessor;
+import org.generationcp.middleware.service.pedigree.string.processors.BreedingMethodProcessor;
+import org.generationcp.middleware.service.pedigree.string.processors.Cross;
+import org.generationcp.middleware.service.pedigree.string.processors.DoubleCrossProcessor;
+import org.generationcp.middleware.service.pedigree.string.processors.InbredProcessor;
+import org.generationcp.middleware.service.pedigree.string.processors.SingleCrossHybridProcessor;
+import org.generationcp.middleware.service.pedigree.string.processors.ThreeWayHybridProcessor;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

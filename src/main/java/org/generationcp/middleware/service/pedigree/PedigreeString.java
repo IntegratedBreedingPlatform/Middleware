@@ -4,7 +4,7 @@ package org.generationcp.middleware.service.pedigree;
  * Pojo to hold the pedigree string and number of crosses that resulted in the pedigree string.
  *
  */
-class PedigreeString {
+public class PedigreeString {
 
 	/**
 	 * A pedigree string.

@@ -2,6 +2,7 @@
 package org.generationcp.middleware.service.api;
 
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
 /*
