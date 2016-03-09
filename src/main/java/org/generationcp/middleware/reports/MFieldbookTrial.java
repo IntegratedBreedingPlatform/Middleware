@@ -12,8 +12,9 @@ import org.generationcp.middleware.domain.oms.TermId;
 
 public class MFieldbookTrial extends AbstractTrialReporter {
 
+    public static final String PLANTING_DATE_REPORT_KEY = "plantingDate";
     public static final String[] UNIQUE_REPORT_KEYS = (String[]) Arrays.asList("distanceBetweenStations", "rowsHarvested", "collaborator",
-			"plantingDate", "harvestDate", "distanceBetweenRows", "netPlotLength").toArray();
+            PLANTING_DATE_REPORT_KEY, "harvestDate", "distanceBetweenRows", "netPlotLength").toArray();
     public static final String COLLABORATOR_REPORT_KEY = "collaborator";
 
     @Override
@@ -70,9 +71,16 @@ public class MFieldbookTrial extends AbstractTrialReporter {
 
 	protected void provideBlankValues(final Map<String, Object> params) {
 		for (final String uniqueReportKey : UNIQUE_REPORT_KEYS) {
-			if (!params.containsKey(uniqueReportKey)) {
-				params.put(uniqueReportKey, "");
+			if (params.containsKey(uniqueReportKey)) {
+				continue;
 			}
+
+            if (PLANTING_DATE_REPORT_KEY.equals(uniqueReportKey)){
+                // we put in a blank string with 8 characters for planting date because the report expects a date with yyyymmdd format, and performs substring operations
+                params.put(PLANTING_DATE_REPORT_KEY, "        ");
+            } else {
+                params.put(uniqueReportKey, "");
+            }
 		}
 	}
 
@@ -101,7 +109,7 @@ public class MFieldbookTrial extends AbstractTrialReporter {
                 reportParamMap.put("environment", value);
                 break;
             case "PLANTINGDATE":
-                reportParamMap.put("plantingDate", value);
+                reportParamMap.put(PLANTING_DATE_REPORT_KEY, value);
                 break;
             case "HARVESTDATE":
                 reportParamMap.put("harvestDate", value);
