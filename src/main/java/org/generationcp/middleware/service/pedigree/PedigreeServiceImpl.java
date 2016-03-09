@@ -16,6 +16,7 @@ import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.pedigree.string.processors.PedigreeStringBuilder;
 import org.generationcp.middleware.service.pedigree.string.util.FixedLineNameResolver;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.generationcp.middleware.util.FunctionBasedGuavaCacheLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
