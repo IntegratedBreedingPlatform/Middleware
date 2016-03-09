@@ -1,9 +1,7 @@
 
 package org.generationcp.middleware.service.pedigree.string.util;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
