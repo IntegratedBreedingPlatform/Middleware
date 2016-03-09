@@ -44,7 +44,7 @@ import com.google.common.collect.Sets;
  * <li>Derivative methods: are processes applied to a single source of seed and are designed to reduce or repartition genetic variation.
  * Example methods are self-fertilization of lines in segregating populations, which reduces allelic diversity through inbreeding (in turn
  * increasing homozygosity), production of double haploid lines, or randomly mating selected plants within a population.</li>
- * <li>Maintenance methods: again applied to a single source of seed, represent deliberate attempts to maintain a specifi c level of genetic
+ * <li>Maintenance methods: again applied to a single source of seed, represent deliberate attempts to maintain a specific level of genetic
  * variation with the objective of creating new instances of germplasm that are as similar to the source germplasm as possible. Common
  * examples would be methods used for increases of germplasm accessions, genetic stocks, or foundation seed.</li>
  * </ul>
