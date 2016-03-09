@@ -734,9 +734,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				this.getGermplasmListDataDAO().update(germplasmListData);
 			}
 
-		} catch (final Exception e) {
-			this.logAndThrowException("Error encountered with FieldbookService.updateNurseryCrossesGermplasmList(germplasmList="
-					+ germplasmList + "): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
+		} catch (final MiddlewareQueryException e) {
+			FieldbookServiceImpl.LOG.error("Error encountered with FieldbookService.updateNurseryCrossesGermplasmList(germplasmList="
+					+ germplasmList + "): " + e.getMessage());
+			throw e;
 		}
 
 		FieldbookServiceImpl.LOG.debug("========== updateGermplasmList Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
