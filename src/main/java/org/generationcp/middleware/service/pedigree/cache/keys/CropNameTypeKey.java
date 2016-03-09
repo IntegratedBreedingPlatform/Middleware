@@ -3,8 +3,8 @@ package org.generationcp.middleware.service.pedigree.cache.keys;
 
 import java.util.List;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class CropNameTypeKey {
 
@@ -12,13 +12,17 @@ public class CropNameTypeKey {
 
 	private String cropName;
 
-	public CropNameTypeKey(List<String> nameTypeOrder, String cropName) {
+	public CropNameTypeKey() {
+
+	}
+
+	public CropNameTypeKey(final List<String> nameTypeOrder, final String cropName) {
 		this.nameTypeOrder = nameTypeOrder;
 		this.cropName = cropName;
 	}
 
 	public List<String> getNameTypeOrder() {
-		return nameTypeOrder;
+		return this.nameTypeOrder;
 	}
 
 	public void setNameTypeOrder(final List<String> nameTypeOrder) {
@@ -26,7 +30,7 @@ public class CropNameTypeKey {
 	}
 
 	public String getCropName() {
-		return cropName;
+		return this.cropName;
 	}
 
 	public void setCropName(final String cropName) {
@@ -35,15 +39,16 @@ public class CropNameTypeKey {
 
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof CropNameTypeKey))
+		if (!(other instanceof CropNameTypeKey)) {
 			return false;
-		CropNameTypeKey castOther = (CropNameTypeKey) other;
-		return new EqualsBuilder().append(nameTypeOrder, castOther.nameTypeOrder).append(cropName, castOther.cropName).isEquals();
+		}
+		final CropNameTypeKey castOther = (CropNameTypeKey) other;
+		return new EqualsBuilder().append(this.nameTypeOrder, castOther.nameTypeOrder).append(this.cropName, castOther.cropName).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(nameTypeOrder).append(cropName).toHashCode();
+		return new HashCodeBuilder().append(this.nameTypeOrder).append(this.cropName).toHashCode();
 	}
 
 }

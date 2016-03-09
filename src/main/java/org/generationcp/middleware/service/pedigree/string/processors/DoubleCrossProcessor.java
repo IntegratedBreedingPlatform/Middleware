@@ -6,7 +6,6 @@ import org.generationcp.middleware.service.pedigree.PedigreeString;
 import org.generationcp.middleware.service.pedigree.string.util.FixedLineNameResolver;
 import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGeneratorUtil;
 
-
 /**
  * The most prevalent type of hybrid that was grown in the United States in the 1930’s and 1940’s is known as a double-cross hybrid. As the
  * name implies, producing a double-cross hybrid requires two stages of crossing involving two pairs of inbreds (inbred line or simply a
@@ -23,17 +22,18 @@ import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGe
 
 public class DoubleCrossProcessor implements BreedingMethodProcessor {
 
-	private InbredProcessor inbredProcessor = new InbredProcessor();;
+	private final InbredProcessor inbredProcessor = new InbredProcessor();;
 
-	private PedigreeStringBuilder pedigreeStringBuilder = new PedigreeStringBuilder();
+	private final PedigreeStringBuilder pedigreeStringBuilder = new PedigreeStringBuilder();
 
 	@Override
-	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level, final FixedLineNameResolver fixedLineNameResolver) {
+	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
+			final FixedLineNameResolver fixedLineNameResolver) {
 
 		final PedigreeString femaleSingleCrossHybridPedigreeString =
-				constructPedigreeStringForSingleCrossHybrids(germplasmNode.getFemaleParent(), level, fixedLineNameResolver);
+				this.constructPedigreeStringForSingleCrossHybrids(germplasmNode.getFemaleParent(), level, fixedLineNameResolver);
 		final PedigreeString maleSingleCrossHybridPedigreeString =
-				constructPedigreeStringForSingleCrossHybrids(germplasmNode.getMaleParent(), level, fixedLineNameResolver);
+				this.constructPedigreeStringForSingleCrossHybrids(germplasmNode.getMaleParent(), level, fixedLineNameResolver);
 
 		final PedigreeString doubleCrossPedigreeString = new PedigreeString();
 		doubleCrossPedigreeString.setNumberOfCrosses(femaleSingleCrossHybridPedigreeString.getNumberOfCrosses()
@@ -43,23 +43,26 @@ public class DoubleCrossProcessor implements BreedingMethodProcessor {
 		return doubleCrossPedigreeString;
 	}
 
-	private PedigreeString constructPedigreeStringForSingleCrossHybrids(final GermplasmNode singleCrossHybrids, Integer level, final FixedLineNameResolver fixedLineNameResolver) {
+	private PedigreeString constructPedigreeStringForSingleCrossHybrids(final GermplasmNode singleCrossHybrids, final Integer level,
+			final FixedLineNameResolver fixedLineNameResolver) {
 		if (singleCrossHybrids != null) {
-			return constructPedigreeString(singleCrossHybrids, level, fixedLineNameResolver);
+			return this.constructPedigreeString(singleCrossHybrids, level, fixedLineNameResolver);
 		}
-		return inbredProcessor.processGermplasmNode(singleCrossHybrids, level-1, fixedLineNameResolver);
+		return this.inbredProcessor.processGermplasmNode(singleCrossHybrids, level - 1, fixedLineNameResolver);
 	}
 
-	private PedigreeString constructPedigreeString(final GermplasmNode node, final Integer level, final FixedLineNameResolver fixedLineNameResolver) {
-		final PedigreeString femalePedigreeString = pedigreeStringBuilder.buildPedigreeString(node.getFemaleParent(), level-1, fixedLineNameResolver);
-		final PedigreeString malePedigreeString = pedigreeStringBuilder.buildPedigreeString(node.getMaleParent(), level-1, fixedLineNameResolver);
+	private PedigreeString constructPedigreeString(final GermplasmNode node, final Integer level,
+			final FixedLineNameResolver fixedLineNameResolver) {
+		final PedigreeString femalePedigreeString =
+				this.pedigreeStringBuilder.buildPedigreeString(node.getFemaleParent(), level - 1, fixedLineNameResolver);
+		final PedigreeString malePedigreeString =
+				this.pedigreeStringBuilder.buildPedigreeString(node.getMaleParent(), level - 1, fixedLineNameResolver);
 		final PedigreeString femaleCrossPedigreeString = new PedigreeString();
 		femaleCrossPedigreeString.setNumberOfCrosses(femalePedigreeString.getNumberOfCrosses() + malePedigreeString.getNumberOfCrosses()
 				+ 1);
 		femaleCrossPedigreeString
-				.setPedigree(PedigreeStringGeneratorUtil.gerneratePedigreeString(femalePedigreeString, malePedigreeString));
+		.setPedigree(PedigreeStringGeneratorUtil.gerneratePedigreeString(femalePedigreeString, malePedigreeString));
 		return femaleCrossPedigreeString;
 	}
-
 
 }

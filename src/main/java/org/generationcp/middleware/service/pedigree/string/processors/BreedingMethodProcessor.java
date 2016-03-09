@@ -20,5 +20,4 @@ public interface BreedingMethodProcessor {
 	 */
 	PedigreeString processGermplasmNode(GermplasmNode germplasmNode, Integer level, FixedLineNameResolver fixedLineNameResolver);
 
-
 }

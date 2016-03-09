@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.service.pedigree.string.processors;
 
 import org.generationcp.middleware.pojos.Germplasm;
@@ -9,43 +10,44 @@ import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGe
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
-
 public class PedigreeStringBuilder {
 
-	private InbredProcessor inbredProcessor = new InbredProcessor();;
+	private final InbredProcessor inbredProcessor = new InbredProcessor();;
 
-	public PedigreeString buildPedigreeString(final GermplasmNode germplasmNode, final int level, final FixedLineNameResolver fixedLineNameResolver) {
+	public PedigreeString buildPedigreeString(final GermplasmNode germplasmNode, final int level,
+			final FixedLineNameResolver fixedLineNameResolver) {
 
 		Preconditions.checkNotNull(germplasmNode);
 
 		final Optional<PedigreeString> fixedLineName = PedigreeStringGeneratorUtil.getFixedLineName(germplasmNode, fixedLineNameResolver);
-		if(fixedLineName.isPresent()) {
+		if (fixedLineName.isPresent()) {
 			return fixedLineName.get();
 		}
 
-		if(level == 0) {
-			return inbredProcessor.processGermplasmNode(germplasmNode, level, fixedLineNameResolver);
+		if (level == 0) {
+			return this.inbredProcessor.processGermplasmNode(germplasmNode, level, fixedLineNameResolver);
 		}
 
 		final Germplasm nodeGermplasm = germplasmNode.getGermplasm();
 
-		if(nodeGermplasm != null && nodeGermplasm.getGnpgs() < 0 ) {
-			return processDeravaitveSlashMaintenceGermplasm(germplasmNode, level, fixedLineNameResolver);
+		if (nodeGermplasm != null && nodeGermplasm.getGnpgs() < 0) {
+			return this.processDeravaitveSlashMaintenceGermplasm(germplasmNode, level, fixedLineNameResolver);
 		}
 
 		final BreedingMethodProcessor methodProcessor = BreedingMethodFactory.getMethodProcessor(germplasmNode);
 		return methodProcessor.processGermplasmNode(germplasmNode, level, fixedLineNameResolver);
 	}
 
-	private PedigreeString processDeravaitveSlashMaintenceGermplasm(final GermplasmNode germplasmNode, final int level, final FixedLineNameResolver fixedLineNameResolver) {
+	private PedigreeString processDeravaitveSlashMaintenceGermplasm(final GermplasmNode germplasmNode, final int level,
+			final FixedLineNameResolver fixedLineNameResolver) {
 
 		final GermplasmNode femaleParent = germplasmNode.getFemaleParent();
 
-		if(femaleParent != null) {
-			return buildPedigreeString(germplasmNode.getFemaleParent(), level, fixedLineNameResolver);
+		if (femaleParent != null) {
+			return this.buildPedigreeString(germplasmNode.getFemaleParent(), level, fixedLineNameResolver);
 		}
 
-		return inbredProcessor.processGermplasmNode(germplasmNode, level-1, fixedLineNameResolver);
+		return this.inbredProcessor.processGermplasmNode(germplasmNode, level - 1, fixedLineNameResolver);
 
 	}
 

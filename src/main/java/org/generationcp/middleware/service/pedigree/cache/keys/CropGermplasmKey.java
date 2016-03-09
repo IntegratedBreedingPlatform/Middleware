@@ -10,6 +10,10 @@ public class CropGermplasmKey {
 
 	private String cropName;
 
+	public CropGermplasmKey() {
+
+	}
+
 	public CropGermplasmKey(final String cropName, final Integer gid) {
 		this.cropName = cropName;
 		this.gid = gid;
@@ -44,7 +48,5 @@ public class CropGermplasmKey {
 	public int hashCode() {
 		return new HashCodeBuilder().append(this.cropName).append(this.gid).toHashCode();
 	}
-
-
 
 }

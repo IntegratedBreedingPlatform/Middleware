@@ -11,7 +11,10 @@ import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGe
  * a F1 hybrid, are inbreds. Each seed produced from crossing two inbreds has an array (collection) of alleles from each parent. Those two
  * arrays will be different if the inbreds are genetically different, but each seed contains the same female array and the same male array.
  * Thus, all plants of the same single-cross hybrid are genetically identical. At every locus where the two inbred parents possess different
- * alleles, the single-cross hybrid is heterozygous. A B \ / A/B
+ * alleles, the single-cross hybrid is heterozygous.
+ * 	A	 B
+ * 	 \ /
+ * 	 A/B
  */
 public class SingleCrossHybridProcessor implements BreedingMethodProcessor {
 
@@ -19,7 +22,7 @@ public class SingleCrossHybridProcessor implements BreedingMethodProcessor {
 
 	final InbredProcessor inbredProcessor = new InbredProcessor();
 
-	private int levelSubtractor;
+	private final int levelSubtractor;
 
 	/**
 	 * This processor is used by a complex cross. Please note a complex cross does not increment the level ( need to check this) and thus
@@ -36,16 +39,16 @@ public class SingleCrossHybridProcessor implements BreedingMethodProcessor {
 	}
 
 	public int getLevelSubtractor() {
-		return levelSubtractor;
+		return this.levelSubtractor;
 	}
 
 	@Override
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
 			final FixedLineNameResolver fixedLineNameResolver) {
 
-		final PedigreeString femalePedigreeString = getPedigreeString(level, fixedLineNameResolver, germplasmNode.getFemaleParent());
+		final PedigreeString femalePedigreeString = this.getPedigreeString(level, fixedLineNameResolver, germplasmNode.getFemaleParent());
 
-		final PedigreeString malePedigreeString = getPedigreeString(level, fixedLineNameResolver, germplasmNode.getMaleParent());
+		final PedigreeString malePedigreeString = this.getPedigreeString(level, fixedLineNameResolver, germplasmNode.getMaleParent());
 
 		final PedigreeString pedigreeString = new PedigreeString();
 		pedigreeString.setNumberOfCrosses(femalePedigreeString.getNumberOfCrosses() + 1);
@@ -56,9 +59,9 @@ public class SingleCrossHybridProcessor implements BreedingMethodProcessor {
 	private PedigreeString getPedigreeString(final Integer level, final FixedLineNameResolver fixedLineNameResolver,
 			final GermplasmNode germplasmNode) {
 		if (germplasmNode != null) {
-			return pedigreeStringBuilder.buildPedigreeString(germplasmNode, level - levelSubtractor, fixedLineNameResolver);
+			return this.pedigreeStringBuilder.buildPedigreeString(germplasmNode, level - this.levelSubtractor, fixedLineNameResolver);
 		}
-		return inbredProcessor.processGermplasmNode(germplasmNode, level - levelSubtractor, fixedLineNameResolver);
+		return this.inbredProcessor.processGermplasmNode(germplasmNode, level - this.levelSubtractor, fixedLineNameResolver);
 	}
 
 }

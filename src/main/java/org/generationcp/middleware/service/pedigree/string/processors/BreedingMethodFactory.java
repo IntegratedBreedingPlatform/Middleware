@@ -10,9 +10,9 @@ import org.generationcp.middleware.service.pedigree.GermplasmNode;
  */
 public class BreedingMethodFactory {
 
-	public static BreedingMethodProcessor getMethodProcessor(GermplasmNode germplasmNode) {
+	public static BreedingMethodProcessor getMethodProcessor(final GermplasmNode germplasmNode) {
 
-		final String methodName = getMethodName(germplasmNode);
+		final String methodName = BreedingMethodFactory.getMethodName(germplasmNode);
 		if (methodName.contains("single cross")) {
 			return new SingleCrossHybridProcessor();
 		} else if (methodName.contains("double cross")) {

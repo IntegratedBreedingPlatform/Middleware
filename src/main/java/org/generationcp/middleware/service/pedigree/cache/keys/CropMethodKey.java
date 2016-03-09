@@ -10,6 +10,10 @@ public class CropMethodKey {
 
 	private Integer methodId;
 
+	public CropMethodKey() {
+
+	}
+
 	public CropMethodKey(final String cropName, final Integer methodId) {
 		this.cropName = cropName;
 		this.methodId = methodId;

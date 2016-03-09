@@ -24,17 +24,18 @@ public class InbredProcessor implements BreedingMethodProcessor {
 	private static final String UNKNOWN_PEDIGREE_STRING = "Unknown";
 
 	@Override
-	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level, FixedLineNameResolver fixedLineNameResolver) {
+	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
+			final FixedLineNameResolver fixedLineNameResolver) {
 
 		final Optional<PedigreeString> fixedLineName = PedigreeStringGeneratorUtil.getFixedLineName(germplasmNode, fixedLineNameResolver);
-		if(fixedLineName.isPresent()) {
+		if (fixedLineName.isPresent()) {
 			return fixedLineName.get();
 		}
 
 		final PedigreeString pedigreeStringBuilders = new PedigreeString();
 
-		if (germplasmNode == null ||  germplasmNode.getGermplasm() == null) {
-			pedigreeStringBuilders.setPedigree(UNKNOWN_PEDIGREE_STRING);
+		if (germplasmNode == null || germplasmNode.getGermplasm() == null) {
+			pedigreeStringBuilders.setPedigree(InbredProcessor.UNKNOWN_PEDIGREE_STRING);
 			return pedigreeStringBuilders;
 		}
 

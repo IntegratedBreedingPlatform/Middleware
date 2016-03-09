@@ -31,7 +31,6 @@ public class FixedLineNameResolver {
 		this.pedigreeDataManagerFactory = pedigreeDataManagerFactory;
 		this.nameTypeBasedCache = nameTypeBasedCache;
 		this.cropName = cropName;
-
 	}
 
 	public Optional<String> nameTypeBasedResolution(final GermplasmNode germplasmNode) {
