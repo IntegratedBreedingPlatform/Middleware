@@ -34,6 +34,7 @@ public class CrossExpansionProperties {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CrossExpansionProperties.class);
 
+	// FIXME Caching is redundant. Please remove
 	/**
 	 * This cache will work because {@link CrossExpansionProperties} is/must be configured as a singleton in Spring
 	 */

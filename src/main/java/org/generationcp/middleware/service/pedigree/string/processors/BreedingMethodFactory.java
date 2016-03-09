@@ -11,7 +11,7 @@ import org.generationcp.middleware.service.pedigree.GermplasmNode;
 public class BreedingMethodFactory {
 
 	public static BreedingMethodProcessor getMethodProcessor(final GermplasmNode germplasmNode) {
-
+		// FIXME: This is not sustainable. We need to do the logic on unique method codes.
 		final String methodName = BreedingMethodFactory.getMethodName(germplasmNode);
 		if (methodName.contains("single cross")) {
 			return new SingleCrossHybridProcessor();

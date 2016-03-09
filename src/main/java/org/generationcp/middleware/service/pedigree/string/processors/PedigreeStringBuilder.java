@@ -28,17 +28,18 @@ public class PedigreeStringBuilder {
 			return this.inbredProcessor.processGermplasmNode(germplasmNode, level, fixedLineNameResolver);
 		}
 
-		final Germplasm nodeGermplasm = germplasmNode.getGermplasm();
+		final Germplasm germplasm = germplasmNode.getGermplasm();
 
-		if (nodeGermplasm != null && nodeGermplasm.getGnpgs() < 0) {
-			return this.processDeravaitveSlashMaintenceGermplasm(germplasmNode, level, fixedLineNameResolver);
+		// FIXME: Add some comments here
+		if (germplasm != null && germplasm.getGnpgs() < 0) {
+			return this.processDeravaitveOrMaintenceGermplasm(germplasmNode, level, fixedLineNameResolver);
 		}
 
 		final BreedingMethodProcessor methodProcessor = BreedingMethodFactory.getMethodProcessor(germplasmNode);
 		return methodProcessor.processGermplasmNode(germplasmNode, level, fixedLineNameResolver);
 	}
 
-	private PedigreeString processDeravaitveSlashMaintenceGermplasm(final GermplasmNode germplasmNode, final int level,
+	private PedigreeString processDeravaitveOrMaintenceGermplasm(final GermplasmNode germplasmNode, final int level,
 			final FixedLineNameResolver fixedLineNameResolver) {
 
 		final GermplasmNode femaleParent = germplasmNode.getFemaleParent();

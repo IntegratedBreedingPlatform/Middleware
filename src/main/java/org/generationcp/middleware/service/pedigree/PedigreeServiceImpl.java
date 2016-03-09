@@ -3,7 +3,6 @@ package org.generationcp.middleware.service.pedigree;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -51,9 +50,11 @@ public class PedigreeServiceImpl implements PedigreeService {
 	private FunctionBasedGuavaCacheLoader<CropNameTypeKey, List<Integer>> nameTypeBasedCache;
 
 	static {
-		germplasmCache = CacheBuilder.newBuilder().maximumSize(1000).expireAfterWrite(1000, TimeUnit.MINUTES).build();
-		methodCache = CacheBuilder.newBuilder().maximumSize(1000).expireAfterWrite(1000, TimeUnit.MINUTES).build();
-		nameTypeCache = CacheBuilder.newBuilder().maximumSize(1000).expireAfterWrite(1000, TimeUnit.MINUTES).build();
+
+		// FIXME: Invalidation logic may need to applied.
+		germplasmCache = CacheBuilder.newBuilder().maximumSize(10000).expireAfterWrite(1000, TimeUnit.MINUTES).build();
+		methodCache = CacheBuilder.newBuilder().maximumSize(10000).expireAfterWrite(1000, TimeUnit.MINUTES).build();
+		nameTypeCache = CacheBuilder.newBuilder().maximumSize(10000).expireAfterWrite(1000, TimeUnit.MINUTES).build();
 	}
 
 	public PedigreeServiceImpl() {
@@ -139,17 +140,17 @@ public class PedigreeServiceImpl implements PedigreeService {
 		Preconditions.checkNotNull(gid);
 		Preconditions.checkArgument(gid > 0);
 		// Build the pedigree tree
-		final AncestryTree pedigreeTree = new AncestryTree(this.germplasmCropBasedCache, this.methodCropBasedCache, this.getCropName());
-		final GermplasmNode gidPedigreeTree = pedigreeTree.buildPedigreeTree(gid);
+		final AncestryTreeService ancestryTreeService = new AncestryTreeService(this.germplasmCropBasedCache, this.methodCropBasedCache, this.getCropName());
+		final GermplasmNode gidAncestryTree = ancestryTreeService.buildAncestryTree(gid);
 
 		// System.out.println(gidPedigreeTree);
-		gidPedigreeTree.printTree();
+		//gidAncestryTree.printTree();
 		// Get the cross string
 		final int numberOfLevelsToTraverse = level == null ? crossExpansionProperties.getCropGenerationLevel(this.getCropName()) : level;
 
 		final PedigreeStringBuilder pedigreeString = new PedigreeStringBuilder();
 
-		return pedigreeString.buildPedigreeString(gidPedigreeTree, numberOfLevelsToTraverse,
+		return pedigreeString.buildPedigreeString(gidAncestryTree, numberOfLevelsToTraverse,
 				new FixedLineNameResolver(crossExpansionProperties, pedigreeDataManagerFactory, nameTypeBasedCache, cropName))
 				.getPedigree();
 	}

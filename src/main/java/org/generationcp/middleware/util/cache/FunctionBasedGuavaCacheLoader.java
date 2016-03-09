@@ -27,8 +27,7 @@ public class FunctionBasedGuavaCacheLoader<K, V> {
 		final Optional<V> loadedValue = Optional.fromNullable(loader.apply(key));
 		if (loadedValue.isPresent()) {
 			cache.put(key, loadedValue.get());
-			return loadedValue;
 		}
-		return Optional.fromNullable(null);
+		return loadedValue;
 	}
 }
