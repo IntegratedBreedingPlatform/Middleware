@@ -496,28 +496,48 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getDerivativeChildren(gid=" + gid + ") query from Germplasm: " + e.getMessage(), e);
+			this.logAndThrowException("Error with getChildren(gid=" + gid + ", methodType=" + methodType + ") query: " + e.getMessage(), e);
 		}
 		return toreturn;
 
 	}
-
+	
 	public List<Germplasm> getAllChildren(Integer gid) {
 		try {
-			// Find the main children via gpid1 and gpid2
-			DetachedCriteria criteria = DetachedCriteria.forClass(Germplasm.class);
-			criteria.add(Restrictions.or(Restrictions.eq("gpid1", gid), Restrictions.eq("gpid2", gid))); // = either parent is given gid
-			criteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged
-			criteria.add(Restrictions.neProperty("gid", "grplce")); // = Record is not deleted or replaced.
-			
-			@SuppressWarnings("unchecked")
-			List<Germplasm> children = criteria.getExecutableCriteria(getSession()).list();
+			List<Germplasm> children = new ArrayList<>();
+			// Get all derivative children
+			children.addAll(this.getChildren(gid, 'D'));
 
+			// Get all maintenance children
+			children.addAll(this.getChildren(gid, 'M'));
+
+			// Get all generative childern
+			children.addAll(this.getGenerativeChildren(gid));
+			return children;
+		} catch (HibernateException e) {
+			final String message = "Error executing GermplasmDAO.getAllChildren(gid={}) : {}";
+			LOG.error(message, gid, e.getMessage());
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Germplasm> getGenerativeChildren(Integer gid) {
+		try {
+			List<Germplasm> children = new ArrayList<Germplasm>();
+			// Find generative children (gnpgs > 2)
+			DetachedCriteria generativeChildrenCriteria = DetachedCriteria.forClass(Germplasm.class);
+			generativeChildrenCriteria.add(Restrictions.or(Restrictions.eq("gpid1", gid), Restrictions.eq("gpid2", gid)));
+			generativeChildrenCriteria.add(Restrictions.ge("gnpgs", 2)); // = Two or more parents
+			generativeChildrenCriteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged
+			generativeChildrenCriteria.add(Restrictions.neProperty("gid", "grplce")); // = Record is not deleted or replaced.
+
+			children.addAll(generativeChildrenCriteria.getExecutableCriteria(getSession()).list());
+			
 			// Find additional children via progenitor linkage
 			DetachedCriteria otherChildrenCriteria = DetachedCriteria.forClass(Progenitor.class);
 			otherChildrenCriteria.add(Restrictions.eq("pid", gid));
 			
-			@SuppressWarnings("unchecked")
 			List<Progenitor> otherChildren = otherChildrenCriteria.getExecutableCriteria(getSession()).list();
 			Set<Integer> otherChildrenGids = new HashSet<>();
 			for (Progenitor progenitor : otherChildren) {
@@ -526,11 +546,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			if (!otherChildrenGids.isEmpty()) {
 				children.addAll(getByGIDList(new ArrayList<>(otherChildrenGids)));
-			}
-
+			}			
 			return children;
 		} catch (HibernateException e) {
-			final String message = "Error executing GermplasmDAO.getAllChildren(gid={}) : {}";
+			final String message = "Error executing GermplasmDAO.getGenerativeChildren(gid={}) : {}";
 			LOG.error(message, gid, e.getMessage());
 			throw new MiddlewareQueryException(message, e);
 		}
