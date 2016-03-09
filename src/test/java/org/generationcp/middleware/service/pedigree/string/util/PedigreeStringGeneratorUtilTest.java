@@ -11,7 +11,7 @@ import org.generationcp.middleware.service.pedigree.PedigreeDataManagerFactory;
 import org.generationcp.middleware.service.pedigree.PedigreeString;
 import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGeneratorUtil;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.generationcp.middleware.util.FunctionBasedGuavaCacheLoader;
+import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

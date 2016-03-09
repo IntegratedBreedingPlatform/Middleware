@@ -11,7 +11,7 @@ import org.generationcp.middleware.service.pedigree.CropNameTypeKey;
 import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.service.pedigree.PedigreeDataManagerFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
-import org.generationcp.middleware.util.FunctionBasedGuavaCacheLoader;
+import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 
 import com.google.common.base.Optional;
 
