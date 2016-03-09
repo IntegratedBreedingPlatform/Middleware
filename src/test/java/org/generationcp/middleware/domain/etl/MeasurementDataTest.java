@@ -4,13 +4,22 @@ package org.generationcp.middleware.domain.etl;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.data.initializer.MeasurementDataTestDataInitializer;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 
 public class MeasurementDataTest {
+
+	private MeasurementDataTestDataInitializer measurementDataTestDataInitializer;
+
+	@Before
+	public void setUp() throws Exception {
+		measurementDataTestDataInitializer = new MeasurementDataTestDataInitializer();
+	}
 
 	@Test
 	public void testIsCategoricalDisplayAcceptedValidValuesIfVariableIsNonCategorical() {
@@ -88,5 +97,47 @@ public class MeasurementDataTest {
 		Mockito.doReturn("5").when(data).getDisplayValue();
 		Assert.assertTrue("Should return true since dispay value is a custom out of bounds value (accepted value)",
 				data.isCategoricalDisplayAcceptedValidValues());
+	}
+
+	@Test
+	public void testGetDisplayValueForCategoricalData() throws Exception {
+		MeasurementData dataWithValue = measurementDataTestDataInitializer
+				.createCategoricalMeasurementData(1234,"test_categorical_data","1");
+
+		CategoricalDisplayValue value = dataWithValue.getDisplayValueForCategoricalData();
+
+		Assert.assertNotNull(value);
+		Assert.assertEquals("value is 1","1",value.getValue());
+		Assert.assertEquals("name is \"Name\"","Name", value.getName());
+
+		// we now expect Name= Desc views
+		Assert.assertEquals("description is \"Desc\"","Name= Desc", value.getDescription());
+		Assert.assertTrue("value is valid", value.isValid());
+	}
+
+	@Test
+	public void testGetDisplayValueForCategoricalDataWithInvalidValue() throws Exception {
+		MeasurementData dataWithInvalidValue = measurementDataTestDataInitializer
+				.createCategoricalMeasurementData(1234,"test_categorical_data","2");
+		CategoricalDisplayValue invalidValue = dataWithInvalidValue.getDisplayValueForCategoricalData();
+
+		Assert.assertNotNull(invalidValue);
+		Assert.assertEquals("value is 1","2",invalidValue.getValue());
+		Assert.assertEquals("name is \"Name\"","2", invalidValue.getName());
+		Assert.assertEquals("description is \"Desc\"","2", invalidValue.getDescription());
+		Assert.assertFalse("value is not valid", invalidValue.isValid());
+	}
+
+	@Test
+	public void testGetDisplayValueForCategoricalDataWithNullValue() throws Exception {
+		MeasurementData dataWithInvalidValue = measurementDataTestDataInitializer
+				.createCategoricalMeasurementData(1234,"test_categorical_data",null);
+		CategoricalDisplayValue invalidValue = dataWithInvalidValue.getDisplayValueForCategoricalData();
+
+		Assert.assertNotNull(invalidValue);
+		Assert.assertEquals("value is 1","",invalidValue.getValue());
+		Assert.assertEquals("name is \"Name\"","", invalidValue.getName());
+		Assert.assertEquals("description is \"Desc\"","", invalidValue.getDescription());
+		Assert.assertFalse("value is not valid", invalidValue.isValid());
 	}
 }
