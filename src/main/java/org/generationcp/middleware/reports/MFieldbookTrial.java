@@ -8,6 +8,7 @@ import java.util.Map;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.TermId;
 
 public class MFieldbookTrial extends AbstractTrialReporter {
 
@@ -44,6 +45,7 @@ public class MFieldbookTrial extends AbstractTrialReporter {
 
 		@SuppressWarnings("unchecked")
 		final List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get(STUDY_CONDITIONS_KEY);
+        @SuppressWarnings("unchecked")
         final List<MeasurementRow> trialObservations = (List<MeasurementRow>) args.get(STUDY_OBSERVATIONS_KEY);
 
         // attempt to extract values from the study conditions
@@ -52,11 +54,14 @@ public class MFieldbookTrial extends AbstractTrialReporter {
 		}
 
         // attempt to extract values from the observations. only the value from the first measurement row is necessary
-        for (final MeasurementData data : trialObservations.get(0).getDataList()) {
-            mapReportValue(data.getMeasurementVariable(), params, data.getValue());
-        }
+		if (trialObservations.size() > 0) {
 
-		// ensure that null values are not shown for fields whose variables are not present in the trial
+			for (final MeasurementData data : trialObservations.get(0).getDataList()) {
+				mapReportValue(data.getMeasurementVariable(), params, data.getValue());
+			}
+		}
+
+		// ensure that null values are not shown for fields whose variables are not present in the trial / not yet implemented
 		// TODO : look into possibly implementing this as well for the other reports in the system
 		this.provideBlankValues(params);
 
@@ -79,6 +84,15 @@ public class MFieldbookTrial extends AbstractTrialReporter {
      * @param value
      */
     protected void mapReportValue(MeasurementVariable var, Map<String, Object> reportParamMap, String value) {
+        final TermId term = TermId.getById(var.getTermId());
+        if (term != null) {
+            switch (term) {
+                case TRIAL_LOCATION:
+                    reportParamMap.put("location", value);
+                    break;
+            }
+        }
+
         switch (var.getName().toUpperCase()) {
             case "COLLABORATOR":
                 reportParamMap.put(COLLABORATOR_REPORT_KEY, value);
@@ -101,6 +115,8 @@ public class MFieldbookTrial extends AbstractTrialReporter {
             case "ROW SPACING":
                 reportParamMap.put("distanceBetweenRows", value);
                 break;
+            case "SEASON" :
+                reportParamMap.put("season", value);
         }
     }
 }
