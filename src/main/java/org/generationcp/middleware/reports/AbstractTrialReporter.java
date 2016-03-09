@@ -29,8 +29,8 @@ public abstract class AbstractTrialReporter extends AbstractNurseryReporter {
 		entries = ((List<MeasurementRow>) args.get(DATA_SOURCE_KEY));
 
 		// entries in trials are ordered by plot number instead of entry number
-		final int firstPlot = Integer.valueOf(entries.get(0).getMeasurementData("PLOT_NO").getValue());
-		final int lastPlot = Integer.valueOf(entries.get(entries.size() - 1).getMeasurementData("PLOT_NO").getValue());
+		final int firstPlot = Integer.valueOf(entries.get(0).getMeasurementData(TermId.PLOT_NO.getId()).getValue());
+		final int lastPlot = Integer.valueOf(entries.get(entries.size() - 1).getMeasurementData(TermId.PLOT_NO.getId()).getValue());
 
 		final Pair<Integer, Integer> firstLastEntryNumber = getFirstLastEntry(entries);
 
