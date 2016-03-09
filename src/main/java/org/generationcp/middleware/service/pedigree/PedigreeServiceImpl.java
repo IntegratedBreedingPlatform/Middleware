@@ -136,7 +136,7 @@ public class PedigreeServiceImpl implements PedigreeService {
 		Preconditions.checkNotNull(gid);
 		Preconditions.checkArgument(gid > 0);
 		// Build the pedigree tree
-		final PedigreeTree pedigreeTree = new PedigreeTree(this.germplasmCropBasedCache, this.methodCropBasedCache, this.getCropName());
+		final AncestryTree pedigreeTree = new AncestryTree(this.germplasmCropBasedCache, this.methodCropBasedCache, this.getCropName());
 		final GermplasmNode gidPedigreeTree = pedigreeTree.buildPedigreeTree(gid);
 
 		// System.out.println(gidPedigreeTree);
