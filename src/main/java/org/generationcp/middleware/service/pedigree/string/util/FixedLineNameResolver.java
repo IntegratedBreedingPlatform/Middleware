@@ -7,9 +7,9 @@ import java.util.Map;
 
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.service.pedigree.CropNameTypeKey;
 import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.service.pedigree.PedigreeDataManagerFactory;
+import org.generationcp.middleware.service.pedigree.cache.keys.CropNameTypeKey;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 

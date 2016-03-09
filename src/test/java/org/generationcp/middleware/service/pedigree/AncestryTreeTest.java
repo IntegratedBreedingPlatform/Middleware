@@ -11,6 +11,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.service.pedigree.cache.keys.CropGermplasmKey;
+import org.generationcp.middleware.service.pedigree.cache.keys.CropMethodKey;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.junit.Assert;
 import org.junit.Before;

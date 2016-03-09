@@ -6,6 +6,8 @@ import java.util.concurrent.ExecutionException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.service.pedigree.cache.keys.CropGermplasmKey;
+import org.generationcp.middleware.service.pedigree.cache.keys.CropMethodKey;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 
 import com.google.common.base.Optional;

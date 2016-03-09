@@ -5,10 +5,10 @@ import java.util.List;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.service.pedigree.CropNameTypeKey;
 import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.service.pedigree.PedigreeDataManagerFactory;
 import org.generationcp.middleware.service.pedigree.PedigreeString;
+import org.generationcp.middleware.service.pedigree.cache.keys.CropNameTypeKey;
 import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGeneratorUtil;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
