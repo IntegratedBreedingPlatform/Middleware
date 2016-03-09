@@ -7,7 +7,7 @@ import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.service.pedigree.string.processors.BackcrossProcessor;
 import org.generationcp.middleware.service.pedigree.string.processors.BreedingMethodFactory;
 import org.generationcp.middleware.service.pedigree.string.processors.BreedingMethodProcessor;
-import org.generationcp.middleware.service.pedigree.string.processors.Cross;
+import org.generationcp.middleware.service.pedigree.string.processors.SimpleCrossProcessor;
 import org.generationcp.middleware.service.pedigree.string.processors.DoubleCrossProcessor;
 import org.generationcp.middleware.service.pedigree.string.processors.InbredProcessor;
 import org.generationcp.middleware.service.pedigree.string.processors.SingleCrossHybridProcessor;
@@ -65,7 +65,7 @@ public class BreedingMethodFactoryTest {
 	public void testFactoryReturnsNormalCrossProcessor() throws Exception {
 		GermplasmNode germplasmNode = getGermplasmNodeWithMethodName("cross");
 		BreedingMethodProcessor methodProcessor = BreedingMethodFactory.getMethodProcessor(germplasmNode);
-		Assert.assertTrue( methodProcessor instanceof Cross);
+		Assert.assertTrue( methodProcessor instanceof SimpleCrossProcessor);
 	}
 
 	@Test

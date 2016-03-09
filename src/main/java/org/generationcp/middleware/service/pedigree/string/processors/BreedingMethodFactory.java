@@ -24,7 +24,7 @@ public class BreedingMethodFactory {
 		} else if (methodName.contains("cross") && methodName.contains("complex")) {
 			return new SingleCrossHybridProcessor(0);
 		} else if (methodName.contains("cross")) {
-			return new Cross();
+			return new SimpleCrossProcessor();
 		}
 		// No crossing just an inbread
 		return new InbredProcessor();
