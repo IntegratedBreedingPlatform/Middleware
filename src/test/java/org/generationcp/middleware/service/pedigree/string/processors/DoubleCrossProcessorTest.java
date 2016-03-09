@@ -30,24 +30,17 @@ public class DoubleCrossProcessorTest {
 
 	@Test
 	public void testCreationOfAStandardDoubleCross() throws Exception {
-		final GermplasmNode femaleGermplasmNode =
-				PedigreeStringTestUtil.createSingleCrossTestGermplasmNode(new ImmutablePair<Integer, String>(1, "A"),
-						new ImmutablePair<Integer, String>(2, "B"), new ImmutablePair<Integer, String>(3, "C"));
-		final GermplasmNode maleGermplasmNode =
-				PedigreeStringTestUtil.createSingleCrossTestGermplasmNode(new ImmutablePair<Integer, String>(4, "D"),
-						new ImmutablePair<Integer, String>(5, "E"), new ImmutablePair<Integer, String>(6, "F"));
 
-		final GermplasmNode parentGermplasmNode =
-				PedigreeStringTestUtil.createGermplasmNode(6, "G", PedigreeStringTestUtil.DOUBLE_CROSS_METHOD_ID,
-						PedigreeStringTestUtil.DOUBLE_CROSS_METHOD_NAME, PedigreeStringTestUtil.DOUBLE_CROSS_METHOD_NUMBER_OF_PROGENITOR);
-		parentGermplasmNode.setFemaleParent(femaleGermplasmNode);
-		parentGermplasmNode.setMaleParent(maleGermplasmNode);
+		final GermplasmNode parentGermplasmNode = PedigreeStringTestUtil.createDoubleCrossTestGermplasmNode();
+
 		final PedigreeString resultantPedigreeString =
 				doubleCrossProcessor.processGermplasmNode(parentGermplasmNode, new Integer(3), fixedLineNameResolver);
 		assertEquals("Pedigree string is a cross of the female and male children ", "B/C//E/F", resultantPedigreeString.getPedigree());
 		assertEquals("We have crated one cross.", 2, resultantPedigreeString.getNumberOfCrosses());
 
 	}
+
+
 
 	@Test
 	public void testCreationOfDoubleCrossWithMissingMale() throws Exception {

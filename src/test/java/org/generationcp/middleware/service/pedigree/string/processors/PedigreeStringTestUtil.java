@@ -90,6 +90,22 @@ public class PedigreeStringTestUtil {
 		return rootGermplasmNode;
 	}
 
+	static GermplasmNode createDoubleCrossTestGermplasmNode() {
+		final GermplasmNode femaleGermplasmNode =
+				PedigreeStringTestUtil.createSingleCrossTestGermplasmNode(new ImmutablePair<Integer, String>(1, "A"),
+						new ImmutablePair<Integer, String>(2, "B"), new ImmutablePair<Integer, String>(3, "C"));
+		final GermplasmNode maleGermplasmNode =
+				PedigreeStringTestUtil.createSingleCrossTestGermplasmNode(new ImmutablePair<Integer, String>(4, "D"),
+						new ImmutablePair<Integer, String>(5, "E"), new ImmutablePair<Integer, String>(6, "F"));
+		final GermplasmNode parentGermplasmNode =
+				PedigreeStringTestUtil.createGermplasmNode(6, "G", PedigreeStringTestUtil.DOUBLE_CROSS_METHOD_ID,
+						PedigreeStringTestUtil.DOUBLE_CROSS_METHOD_NAME, PedigreeStringTestUtil.DOUBLE_CROSS_METHOD_NUMBER_OF_PROGENITOR);
+
+		parentGermplasmNode.setFemaleParent(femaleGermplasmNode);
+		parentGermplasmNode.setMaleParent(maleGermplasmNode);
+		return parentGermplasmNode;
+	}
+
 	private static void createBackCrossTestGermplasmNode(final GermplasmNode rootNode, final GermplasmNode donorParent,
 			final GermplasmNode recurringParent, final int numberOfTimeToCross, final boolean femaleDonorParent) {
 
