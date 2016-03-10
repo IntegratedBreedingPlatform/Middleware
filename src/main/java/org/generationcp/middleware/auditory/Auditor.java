@@ -1,6 +1,7 @@
 package org.generationcp.middleware.auditory;
 
 import org.generationcp.middleware.pojos.Bibref;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 /**
@@ -15,11 +16,12 @@ public class Auditor {
 	public static final String COULD_NOT_START_AUDITORY = "Could not start auditory";
 	public static final String INVALID_INPUT_DATA = "Invalid input data";
 
-	AuditorManager manager;
+	AuditorDataManager manager;
 
 	Bibref ref;
 
-	public Auditor(AuditorManager manager) {
+	@Autowired
+	public Auditor(AuditorDataManager manager) {
 		this.manager = manager;
 	}
 
