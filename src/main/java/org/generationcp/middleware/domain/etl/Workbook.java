@@ -114,6 +114,7 @@ public class Workbook {
 		this.trialConstants = null;
 		this.treatmentFactors = null;
 		this.hasExistingDataOverwrite = false;
+        this.trialObservations = new ArrayList<>();
 	}
 
 	public StudyDetails getStudyDetails() {
