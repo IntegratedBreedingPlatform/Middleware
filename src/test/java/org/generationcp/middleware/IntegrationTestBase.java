@@ -4,6 +4,7 @@ package org.generationcp.middleware;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
@@ -39,6 +40,12 @@ public abstract class IntegrationTestBase {
 	@Rule
 	public TestName name = new TestName();
 	private long startTime;
+
+	@BeforeClass
+	public static void setUpOnce() {
+		// Variable caching relies on the context holder to determine current crop database in use
+		ContextHolder.setCurrentCrop("maize");
+	}
 
 	@Before
 	public void beforeEachTest() {

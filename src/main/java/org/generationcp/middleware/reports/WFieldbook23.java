@@ -14,7 +14,7 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.pojos.report.GermplasmEntry;
 import org.generationcp.middleware.pojos.report.Occurrence;
 
-public class WFieldbook23 extends AbstractWheatNurseryReporter {
+public class WFieldbook23 extends AbstractNurseryReporter {
 
 	/**
 	 * Enforces obtaining instances through the Factory
@@ -97,9 +97,9 @@ public class WFieldbook23 extends AbstractWheatNurseryReporter {
 
 					// TODO: pending mappings
 					default:
-						entry.setsEnt(-99);
-						entry.setsTabbr("???");
-						entry.setSlocycle("???");
+						entry.setsEnt(0);
+						entry.setsTabbr("");
+						entry.setSlocycle("");
 				}
 			}
 

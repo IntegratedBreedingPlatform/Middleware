@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-    <version>4.0.0.BETA.7</version>
+        <version>4.0.0.BETA.10</version>
 	<name>Middleware</name>
 
 	<properties>
@@ -63,21 +63,21 @@
 			<groupId>net.sf.ehcache</groupId>
 			<artifactId>ehcache-core</artifactId>
 			<!-- We must use version less than 2.5 for now as 2.5+ do not allow multiple CacheManagers with same name to exist in same JVM
-			 See http://stackoverflow.com/questions/33534766/is-there-a-way-to-programatically-set-the-name-of-the-ehcache-on-hibernate-sessi for more context 
+			 See http://stackoverflow.com/questions/33534766/is-there-a-way-to-programatically-set-the-name-of-the-ehcache-on-hibernate-sessi for more context
 			 We can use latest version once we figure out how to provide unique ehcache confuration per databse.-->
 			<version>2.4.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-ehcache</artifactId>
-			<version>3.5.6-Final</version>			
+			<version>3.5.6-Final</version>
 			<exclusions>
 				<exclusion>
 					<groupId>net.sf.ehcache</groupId>
-					<artifactId>ehcache</artifactId>					
+					<artifactId>ehcache</artifactId>
 				</exclusion>
-			</exclusions>			
-		</dependency>		
+			</exclusions>
+		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -424,6 +424,8 @@
 						<include>**/QueryTest.java</include>
 						<include>**/StudyMeasurementsTest.java</include>
 						<include>**/DmsProjectDaoTest.java</include>
+						<include>**/GermplasmGroupingServiceImplTest.java</include>
+						<include>**/MethodTest.java</include>
 
 						<!-- New Ontology Manager Tests -->
 						<include>**/CvTermDaoTest.java</include>
@@ -440,6 +442,18 @@
 						<include>**/WorkbenchDataManagerImplTest.java</include>
 						<include>**/TermDataManagerImplTest.java</include>
 						<include>**/VariableTypeListTransformerTest.java</include>
+
+						<!-- Pedigree String Generation Test -->
+						<include>**/AncestryTreeServiceTest.java</include>
+						<include>**/BackcrossProcessorTest.java</include>
+						<include>**/BreedingMethodFactoryTest.java</include>
+						<include>**/DoubleCrossProcessorTest.java</include>
+						<include>**/InbredProcessorTest.java</include>
+						<include>**/PedigreeStringTestUtil.java</include>
+						<include>**/SimpleCrossProcessorTest.java</include>
+						<include>**/ThreeWayHybridProcessorTest.java</include>
+						<include>**/PedigreeStringGeneratorUtilTest.java</include>
+						<include>**/CrossExpansionPropertiesTest.java</include>
 
 					</includes>
 				</configuration>

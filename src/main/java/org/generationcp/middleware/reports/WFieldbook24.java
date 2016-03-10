@@ -1,7 +1,7 @@
 
 package org.generationcp.middleware.reports;
 
-public class WFieldbook24 extends AbstractWheatNurseryReporter {
+public class WFieldbook24 extends AbstractNurseryReporter {
 
 	@Override
 	public Reporter createReporter() {

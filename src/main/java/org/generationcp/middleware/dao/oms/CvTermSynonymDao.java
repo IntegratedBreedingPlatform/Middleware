@@ -40,4 +40,12 @@ public class CvTermSynonymDao extends GenericDAO<CVTermSynonym, Integer> {
 		}
 		return synonyms;
 	}
+
+    public static CVTermSynonym buildCvTermSynonym(Integer cvTermId,String synonym,Integer typeId){
+        CVTermSynonym cvTermSynonym = new CVTermSynonym();
+        cvTermSynonym.setCvTermId(cvTermId);
+        cvTermSynonym.setSynonym(synonym);
+        cvTermSynonym.setTypeId(typeId);
+        return cvTermSynonym;
+    }
 }

@@ -61,8 +61,12 @@
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
     
+	<bean id="germplasmGroupingService" class="org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl">
+	</bean>
+    
     <bean id="pedigreeService" class="org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl">
         <constructor-arg ref="cropSessionProvider"/>
+        <constructor-arg value="maize"/>
     </bean>
     
     <bean id="pedigreeDataManager" class="org.generationcp.middleware.manager.PedigreeDataManagerImpl">
