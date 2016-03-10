@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service.impl;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -65,9 +66,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		LOG.info("Marking germplasm with gid {} as fixed.", germplasmToFix.getGid());
 
 		if (includeDescendants) {
-			GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
-			LOG.info("Building descendant tree for gid {} for assigning group (mgid).", germplasmToFix.getGid());
-			tree.setRoot(buildDescendantsTree(germplasmToFix, 1));
+			GermplasmPedigreeTree tree = getDescendantTree(germplasmToFix);
 			traverseAssignGroup(tree.getRoot(), germplasmToFix.getGid(), preserveExistingGroup);
 		} else {
 			assignGroup(germplasmToFix, germplasmToFix.getGid(), preserveExistingGroup);
@@ -81,7 +80,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		GermplasmGroup germplasmGroup = new GermplasmGroup();
 		germplasmGroup.setFounderGid(founder.getGid());
 		germplasmGroup.setGroupId(founder.getMgid());
-		germplasmGroup.setGroupMembers(this.germplasmDAO.getGroupMembers(founder.getGid()));
+		germplasmGroup.setGroupMembers(this.germplasmDAO.getManagementGroupMembers(founder.getMgid()));
 		return germplasmGroup;
 	}
 
@@ -94,6 +93,14 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 				traverseAssignGroup(child, groupId, preserveExistingGroup);
 			}
 		}
+	}
+
+	@Override
+	public GermplasmPedigreeTree getDescendantTree(Germplasm germplasm) {
+		LOG.info("Building descendant tree for gid {}.", germplasm.getGid());
+		GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
+		tree.setRoot(buildDescendantsTree(germplasm, 1));
+		return tree;
 	}
 
 	private GermplasmPedigreeTreeNode buildDescendantsTree(Germplasm germplasm, int level) {
@@ -251,7 +258,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	// Rigorous INFO logging in this method is intentional. Currently we dont have good visualization tools in BMS to verify results of such
 	// complex operations. INFO LOGGing helps.
 	@Override
-	public void processGroupInheritanceForCrosses(List<Integer> gidsOfCrosses) {
+	public void processGroupInheritanceForCrosses(List<Integer> gidsOfCrosses, boolean applyNewGroupToPreviousCrosses,
+			Set<Integer> hybridMethods) {
 
 		for (Integer crossGID : gidsOfCrosses) {
 			Germplasm cross = this.germplasmDAO.getById(crossGID);
@@ -273,15 +281,25 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 					parent2.getGpid2(), parent2.getMgid(), parent2.getMethodId());
 			}
 
-			if (Method.isHybrid(cross.getMethodId())) {
-				LOG.info("Breeding method {} of the cross hybrid.", cross.getMethodId());
+			if (hybridMethods.contains(cross.getMethodId())) {
+				LOG.info("Breeding method {} of the cross is hybrid.", cross.getMethodId());
 				boolean parent1HasMGID = parent1.getMgid() != null && parent1.getMgid() != 0;
 				boolean parent2HasMGID = parent2.getMgid() != null && parent2.getMgid() != 0;
 				boolean bothParentsHaveMGID = parent1HasMGID && parent2HasMGID;
 
 				if (bothParentsHaveMGID) {
 					LOG.info("Both parents have MGIDs. Parent1 mgid {}. Parent2 mgid {}.", parent1.getMgid(), parent2.getMgid());
-					List<Germplasm> previousCrosses = this.germplasmDAO.getPreviousCrosses(parent1.getGid(), parent2.getGid());
+					List<Germplasm> previousCrosses = this.germplasmDAO.getPreviousCrossesBetweenParentGroups(cross);
+
+					// Remove members of the current processing batch from the list of "previous crosses" retrieved.
+					Iterator<Germplasm> previousCrossesIterator = previousCrosses.iterator();
+					while (previousCrossesIterator.hasNext()) {
+						Germplasm previousCross = previousCrossesIterator.next();
+						if (gidsOfCrosses.contains(previousCross.getGid())) {
+							previousCrossesIterator.remove();
+						}
+					}
+
 					boolean crossingFirstTime = previousCrosses.isEmpty();
 					if (crossingFirstTime) {
 						LOG.info("This is a first cross of the two parents. Starting a new group. Setting gid {} to mgid.",
@@ -290,30 +308,41 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 					} else {
 						// Not the first time cross. Assign MGID of previous cross to new cross.
 						// When there are multiple previous crosses, we choose the oldest created cross with MGID as preference.
-						LOG.info("Previous cross(es) of the same two parents exist: {}.", previousCrosses);
-						Germplasm previousCrossSelected = null;
+						LOG.info("Previous crosses exist between the female and male parent groups:");
+						for (Germplasm previousCross : previousCrosses) {
+							LOG.info("\t[gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}]", previousCross.getGid(),
+									previousCross.getGpid1(), previousCross.getGpid2(), previousCross.getMgid(),
+									previousCross.getMethodId());
+						}
+
+						Germplasm oldestPreviousCrossWithMGID = null;
 						for (Germplasm previousCross : previousCrosses) {
 							if (previousCross.getMgid() != null && previousCross.getMgid() != 0) {
-								previousCrossSelected = previousCross;
+								oldestPreviousCrossWithMGID = previousCross;
 								break;
 							}
 						}
 
-						if (previousCrossSelected != null) {
-							LOG.info("Assigning mgid {} from the oldest previous cross gid {}.", previousCrossSelected.getMgid(),
-									previousCrossSelected.getGid());
-							cross.setMgid(previousCrossSelected.getMgid());
+						if (oldestPreviousCrossWithMGID != null) {
+							LOG.info("Assigning mgid {} from the oldest previous cross (gid {}).", oldestPreviousCrossWithMGID.getMgid(),
+									oldestPreviousCrossWithMGID.getGid());
+							cross.setMgid(oldestPreviousCrossWithMGID.getMgid());
 							// TODO extend to include coded names as well.
-							copySelectionHistoryForCross(cross, previousCrossSelected);
+							copySelectionHistoryForCross(cross, oldestPreviousCrossWithMGID);
 						} else {
-							LOG.info("Previous crosses exist but there is none with MGID.");
-							// TODO implement dotted boxes in flowchart for this case.
-							// Dotted box 1
-							// Flowchart says warn user for this case - this will require returning flag back to the caller from service.
+							LOG.info("Previous crosses exist but there is none with MGID. Starting a new group with mgid = gid of current cross.");
+							cross.setMgid(cross.getGid());
+							// TODO Flowchart says warn user for this case - this will require returning flag back to the caller from
+							// service.
 
-							// Dotted box 2
-							// Flowchart says - Default to assigning new MGID to all instances of the cross (looks similar to
-							// crossingFirstTime case). User can choose to apply to the new cross only.
+							if (applyNewGroupToPreviousCrosses) {
+								LOG.info("Applying the new mgid {} to the previous crosses as well.", cross.getMgid());
+								for (Germplasm previousCross : previousCrosses) {
+									previousCross.setMgid(cross.getMgid());
+									this.germplasmDAO.save(previousCross);
+								}
+							}
+
 						}
 					}
 					this.germplasmDAO.save(cross);
@@ -325,5 +354,4 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			}
 		}
 	}
-
 }

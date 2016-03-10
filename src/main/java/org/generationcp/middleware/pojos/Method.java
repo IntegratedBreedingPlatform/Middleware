@@ -14,7 +14,6 @@ package org.generationcp.middleware.pojos;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -33,8 +32,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import org.generationcp.middleware.domain.oms.TermId;
-
-import com.google.common.collect.Sets;
 
 /**
  * Represents breeding methods. The ICIS model recognizes three classes of breeding methods by which genetic material is advanced:
@@ -67,8 +64,6 @@ public class Method implements Serializable {
 			TermId.CULTIVAR_FORMATION_METHOD_CLASS.getId());
 
 	public static final List<Integer> NON_BULKED_CLASSES = Arrays.asList(TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
-
-	public static final Set<Integer> HYBRID_METHODS = Sets.newHashSet(416, 417, 418, 419, 426, 321);
 
 	public static final String GET_ALL = "getAllMethods";
 
@@ -480,13 +475,6 @@ public class Method implements Serializable {
 			}
 		}
 		return null;
-	}
-
-	public static boolean isHybrid(Integer methodId) {
-		if (methodId != null) {
-			return Method.HYBRID_METHODS.contains(methodId);
-		}
-		return false;
 	}
 
 	@Transient
