@@ -1,22 +1,35 @@
 
 package org.generationcp.middleware.service.pedigree;
 
-import java.util.ArrayDeque;
-import java.util.Queue;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 
+/**
+ * Tree structure that houses a germplasms entire ancestry.
+ *
+ */
 public class GermplasmNode {
 
+	/**
+	 * The germplasm for which we are housing the tree
+	 */
 	private Germplasm germplasm;
 
+	/**
+	 * The female parent
+	 */
 	private GermplasmNode femaleParent;
 
+	/**
+	 * The male parent
+	 */
 	private GermplasmNode maleParent;
 
+	/**
+	 * The method used create this germplasm i.e method used while crossing the female and male parent.
+	 */
 	private Method method;
 
 	public GermplasmNode(final Germplasm germplasm) {
@@ -55,63 +68,20 @@ public class GermplasmNode {
 		this.method = method;
 	}
 
-	public void printTree() {
-		printThisTree(this);
-	}
-
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof GermplasmNode))
+		if (!(other instanceof GermplasmNode)) {
 			return false;
-		GermplasmNode castOther = (GermplasmNode) other;
-		return new EqualsBuilder().append(germplasm, castOther.germplasm).append(femaleParent, castOther.femaleParent)
-				.append(maleParent, castOther.maleParent).append(method, castOther.method).isEquals();
+		}
+		final GermplasmNode castOther = (GermplasmNode) other;
+		return new EqualsBuilder().append(this.germplasm, castOther.germplasm).append(this.femaleParent, castOther.femaleParent)
+				.append(this.maleParent, castOther.maleParent).append(this.method, castOther.method).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(germplasm).append(femaleParent).append(maleParent).append(method).toHashCode();
+		return new HashCodeBuilder().append(this.germplasm).append(this.femaleParent).append(this.maleParent).append(this.method)
+				.toHashCode();
 	}
 
-	private void printThisTree(final GermplasmNode node) {
-
-		final Queue<GermplasmNode> nodes = new ArrayDeque<GermplasmNode>();
-		nodes.add(node);
-
-		int currentLevel = 1;
-		int depthDecreaseCounter = 1;
-		int nextCounterToIncreaseLeave = 0;
-
-		String tabs = "\t\t\t\t\t\t\t\t\t\t\t\t";
-		System.out.print("1" + tabs);
-		while (!nodes.isEmpty()) {
-			final GermplasmNode currentGermplasmNode = nodes.poll();
-			if(currentGermplasmNode != null && currentGermplasmNode.getGermplasm() != null
-					&& currentGermplasmNode.getGermplasm().getPreferredName() !=null) {
-				System.out.print("\t[" + currentGermplasmNode.getGermplasm().getGid() + " "
-					+ currentGermplasmNode.getGermplasm().getPreferredName().getNval() + "]");
-			}
-			if (currentGermplasmNode.getFemaleParent() != null) {
-				nodes.add(currentGermplasmNode.getFemaleParent());
-				nextCounterToIncreaseLeave++;
-			}
-
-			if (currentGermplasmNode.getMaleParent() != null) {
-				nodes.add(currentGermplasmNode.getMaleParent());
-				nextCounterToIncreaseLeave++;
-			}
-
-			if (--depthDecreaseCounter == 0) {
-				currentLevel++;
-				tabs = tabs.replaceFirst("\t", "");
-				System.out.println();
-				if (!nodes.isEmpty()) {
-					System.out.print(currentLevel + tabs);
-				}
-				depthDecreaseCounter = nextCounterToIncreaseLeave;
-				nextCounterToIncreaseLeave = 0;
-			}
-
-		}
-	}
 }
