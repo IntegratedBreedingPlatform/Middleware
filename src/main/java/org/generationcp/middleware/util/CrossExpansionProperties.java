@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -49,6 +51,8 @@ public class CrossExpansionProperties {
 	 * This cache will work because {@link CrossExpansionProperties} is/must be configured as a singleton in Spring
 	 */
 	private LoadingCache<String, ImmutablePair<String, String>> backcrossNotationCache;
+
+	private Set<Integer> hybridBreedingMethods = new TreeSet<Integer>();
 
 	public CrossExpansionProperties() {
 		try {
@@ -205,4 +209,11 @@ public class CrossExpansionProperties {
 		this.profile = profile;
 	}
 
+	public Set<Integer> getHybridBreedingMethods() {
+		return this.hybridBreedingMethods;
+	}
+
+	public void setHybridBreedingMethods(Set<Integer> hybridBreedingMethods) {
+		this.hybridBreedingMethods = hybridBreedingMethods;
+	}
 }
