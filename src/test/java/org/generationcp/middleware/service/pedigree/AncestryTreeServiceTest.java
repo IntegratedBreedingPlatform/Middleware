@@ -89,7 +89,6 @@ public class AncestryTreeServiceTest {
 
 		final AncestryTreeService pedigreeTree = new AncestryTreeService(this.germplasmCache, this.methodCache, AncestryTreeServiceTest.MAIZE);
 		final GermplasmNode resultNode = pedigreeTree.buildAncestryTree(generateRandomGermplasm.getGid());
-		resultNode.printTree();
 		this.compareGeneratedNodes(generateRandomGermplasm, resultNode);
 	}
 

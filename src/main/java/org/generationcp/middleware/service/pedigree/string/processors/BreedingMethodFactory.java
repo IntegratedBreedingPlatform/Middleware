@@ -3,6 +3,8 @@ package org.generationcp.middleware.service.pedigree.string.processors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.service.pedigree.GermplasmNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Factory method that enables us to select the correct breeding method processor according to the germplasm node provided. The breeding
@@ -10,9 +12,15 @@ import org.generationcp.middleware.service.pedigree.GermplasmNode;
  */
 public class BreedingMethodFactory {
 
+	private static final Logger LOG = LoggerFactory.getLogger(BreedingMethodFactory.class);
+
+
 	public static BreedingMethodProcessor getMethodProcessor(final GermplasmNode germplasmNode) {
 		// FIXME: This is not sustainable. We need to do the logic on unique method codes.
 		final String methodName = BreedingMethodFactory.getMethodName(germplasmNode);
+
+		LOG.debug("Germplasm with GID '%s' has a method name '%s", germplasmNode.getGermplasm().getGid(), methodName);
+
 		if (methodName.contains("single cross")) {
 			return new SingleCrossHybridProcessor();
 		} else if (methodName.contains("double cross")) {
@@ -31,6 +39,7 @@ public class BreedingMethodFactory {
 	}
 
 	private static String getMethodName(final GermplasmNode germplasmNode) {
+
 		if (germplasmNode != null && germplasmNode.getMethod() != null && StringUtils.isNotBlank(germplasmNode.getMethod().getMname())) {
 			final String methodName = germplasmNode.getMethod().getMname();
 			return methodName.toLowerCase();

@@ -5,6 +5,8 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.service.pedigree.PedigreeString;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 
@@ -14,34 +16,51 @@ import com.google.common.base.Optional;
  */
 public class PedigreeStringGeneratorUtil {
 
+	private static final Logger LOG = LoggerFactory.getLogger(PedigreeStringGeneratorUtil.class);
+
 	public static String gerneratePedigreeString(final PedigreeString femalePedigreeString, final PedigreeString malePedigreeString) {
+
+		LOG.debug("Combining pedigree string. FemalePedigreeString '%s', MalePedigreeString '%s', Number of crosses - '%d'",
+				femalePedigreeString.toString(), malePedigreeString.toString(), femalePedigreeString.getNumberOfCrosses());
+
 		return femalePedigreeString.getPedigree() + PedigreeStringGeneratorUtil.getSeperator(femalePedigreeString.getNumberOfCrosses())
 				+ malePedigreeString.getPedigree();
 	}
 
-	public static String gernerateBackcrossPedigreeString(final PedigreeString donorParentString, final PedigreeString recurringParentString,
-			final FixedLineNameResolver fixedLineNameResolver, final int numberOfRecurringParents, final boolean isFemaleRecurringParent) {
+	public static String gernerateBackcrossPedigreeString(final PedigreeString donorParentString,
+			final PedigreeString recurringParentString, final FixedLineNameResolver fixedLineNameResolver,
+			final int numberOfRecurringParents, final boolean isFemaleRecurringParent) {
+
+		LOG.debug("Combining pedigree string. Donor Parent String - '%s', Recurring Parent String - '%s', Number of Recurrsions - '%d'",
+				donorParentString.toString(), recurringParentString.toString(), numberOfRecurringParents);
+
 		return recurringParentString.getPedigree()
 				+ PedigreeStringGeneratorUtil.getSeperator(isFemaleRecurringParent, numberOfRecurringParents, fixedLineNameResolver)
 				+ donorParentString.getPedigree();
 	}
 
-	public static Optional<PedigreeString> getFixedLineName(final GermplasmNode germplasmNode, final FixedLineNameResolver fixedLineNameResolver) {
+	public static Optional<PedigreeString> getFixedLineName(final GermplasmNode germplasmNode,
+			final FixedLineNameResolver fixedLineNameResolver) {
 		final Optional<String> nameTypeBasedResolution = fixedLineNameResolver.nameTypeBasedResolution(germplasmNode);
 		if (nameTypeBasedResolution.isPresent()) {
+
+			final String resolvedNameType = nameTypeBasedResolution.get();
+
+			LOG.debug("Name type of '%s' resolved for gid - '%d'", resolvedNameType, germplasmNode.getGermplasm().getGid());
+
 			final PedigreeString pedigreeString = new PedigreeString();
-			pedigreeString.setPedigree(nameTypeBasedResolution.get());
+			pedigreeString.setPedigree(resolvedNameType);
 			return Optional.fromNullable(pedigreeString);
 		}
 		return Optional.fromNullable(null);
 	}
 
-	private static String getSeperator(final boolean isFemaleRecurringParent,
-			final int numberOfCrosses,
+	private static String getSeperator(final boolean isFemaleRecurringParent, final int numberOfCrosses,
 			final FixedLineNameResolver fixedLineNameResolver) {
 
 		final CrossExpansionProperties crossExpansionProperties = fixedLineNameResolver.getCrossExpansionProperties();
-		final ImmutablePair<String, String> backcrossNotation = crossExpansionProperties.getBackcrossNotation(fixedLineNameResolver.getCropName());
+		final ImmutablePair<String, String> backcrossNotation =
+				crossExpansionProperties.getBackcrossNotation(fixedLineNameResolver.getCropName());
 
 		if (!isFemaleRecurringParent) {
 			return "/" + numberOfCrosses + backcrossNotation.right;

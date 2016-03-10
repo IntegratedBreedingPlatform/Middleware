@@ -5,6 +5,8 @@ import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.service.pedigree.PedigreeString;
 import org.generationcp.middleware.service.pedigree.string.util.FixedLineNameResolver;
 import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGeneratorUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Result from the cross between one parent that is an F1 hybrid and the other is from an inbred (inbred line or simply a line is a pure
@@ -18,13 +20,21 @@ import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGe
  */
 public class ThreeWayHybridProcessor implements BreedingMethodProcessor {
 
+	private static final Logger LOG = LoggerFactory.getLogger(ThreeWayHybridProcessor.class);
+
 	final PedigreeStringBuilder pedigreeStringBuilder = new PedigreeStringBuilder();
 
 	final InbredProcessor inbredProcessor = new InbredProcessor();
 
+
 	@Override
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
 			final FixedLineNameResolver fixedLineNameResolver) {
+
+		if(germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
+			LOG.debug("Germplasm with GID '%d' is being processed by a three way hybrid processor. "
+					, germplasmNode.getGermplasm().getGid());
+		}
 
 		final GermplasmNode femaleParentNode = germplasmNode.getFemaleParent();
 		final GermplasmNode maleParentNode = germplasmNode.getMaleParent();
