@@ -454,6 +454,9 @@
 						<include>**/ThreeWayHybridProcessorTest.java</include>
 						<include>**/PedigreeStringGeneratorUtilTest.java</include>
 						<include>**/CrossExpansionPropertiesTest.java</include>
+						<include>**/MiddlewareGetterAndSetterTestSuite.java</include>
+
+
 
 					</includes>
 				</configuration>
