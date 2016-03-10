@@ -169,6 +169,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return this.getNameDao().getByGIDWithFilters(gid, status, type);
 	}
 
+	/**
+	 * (non-Javadoc)
+	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getByGIDWithListTypeFilters(java.lang.Integer, java.lang.Integer, java.util.List)
+	 */
+	@Override
+	public List<Name> getByGIDWithListTypeFilters(final Integer gid, final Integer status, final List<Integer> type) {
+		return this.getNameDao().getByGIDWithListTypeFilters(gid, status, type);
+	}
+
 	@Override
 	public Name getPreferredNameByGID(final Integer gid) {
 		final List<Name> names = this.getNameDao().getByGIDWithFilters(gid, 1, null);
@@ -1287,7 +1296,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public Map<String, Integer> getCountByNamePermutations(List<String> names) {
 		return this.getNameDao().getCountByNamePermutations(names);
 	}
-	
+
 	@Override
 	public UserDefinedField getPlotCodeField() {
 		final List<UserDefinedField> udfldAttributes = this.getUserDefinedFieldByFieldTableNameAndType("ATRIBUTS", "PASSPORT");
@@ -1314,5 +1323,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			}
 		}
 		return plotCode;
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getUserDefinedFieldsByCodesInMap(java.lang.String, java.lang.String, java.util.List)
+	 */
+	@Override
+	 public UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code) {
+		return this.getUserDefinedFieldDao()
+				.getByTableTypeAndCode(table, type, code);
 	}
 }
