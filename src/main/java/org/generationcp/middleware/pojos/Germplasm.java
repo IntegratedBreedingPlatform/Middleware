@@ -357,9 +357,22 @@ public class Germplasm implements Serializable {
 	@Column(name = "mgid")
 	private Integer mgid;
 
-	/**
-	 * @OneToMany(mappedBy = "germplasm") private Set<Progenitor> progntr = new HashSet<Progenitor>();
-	 **/
+    @Basic(optional = false)
+    @Column(name = "instance_number")
+    private Integer instanceNumber;
+
+    @Basic(optional = false)
+    @Column(name = "plot_number")
+    private Integer plotNumber;
+
+    @Basic(optional = false)
+    @Column(name = "rep_number")
+    private Integer replicationNumber;
+
+
+    /**
+     * @OneToMany(mappedBy = "germplasm") private Set<Progenitor> progntr = new HashSet<Progenitor>();
+     **/
 
 	/**
 	 * This variable is populated only when the Germplasm POJO is retrieved by using GermplasmDataManager.getGermplasmWithPrefName() and
@@ -580,7 +593,31 @@ public class Germplasm implements Serializable {
 		return this.method;
 	}
 
-	@Override
+    public Integer getInstanceNumber() {
+        return instanceNumber;
+    }
+
+    public void setInstanceNumber(Integer instanceNumber) {
+        this.instanceNumber = instanceNumber;
+    }
+
+    public Integer getPlotNumber() {
+        return plotNumber;
+    }
+
+    public void setPlotNumber(Integer plotNumber) {
+        this.plotNumber = plotNumber;
+    }
+
+    public Integer getReplicationNumber() {
+        return replicationNumber;
+    }
+
+    public void setReplicationNumber(Integer replicationNumber) {
+        this.replicationNumber = replicationNumber;
+    }
+
+    @Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
 			return false;
@@ -636,7 +673,13 @@ public class Germplasm implements Serializable {
 		builder.append(this.method);
 		builder.append(", inventoryInfo=");
 		builder.append(this.inventoryInfo);
-		builder.append("]");
+        builder.append(", instanceNumber=");
+        builder.append(this.instanceNumber);
+        builder.append(", plotNumber=");
+        builder.append(this.plotNumber);
+        builder.append(", replicationNumber=");
+        builder.append(this.replicationNumber);
+        builder.append("]");
 		return builder.toString();
 	}
 
