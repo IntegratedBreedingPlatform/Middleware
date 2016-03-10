@@ -7,12 +7,10 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.internal.matchers.NotNull;
 
 import static org.fest.assertions.Assertions.assertThat;
 import static org.fest.assertions.Fail.fail;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -24,7 +22,7 @@ public class AuditorUT {
 	public static final String DUMMY_USERNAME = "DUMMY_USERNAME";
 	public static final int DUMMY_ID = 10;
 	@Mock
-	AuditorManager managerMock;
+	AuditorDataManager managerMock;
 	@Mock
 	private BibrefDAO bibrefDaoMock;
 
