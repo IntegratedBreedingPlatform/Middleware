@@ -39,6 +39,8 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.auditory.Auditable;
+import org.generationcp.middleware.auditory.Auditory;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -102,7 +104,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @XmlType(propOrder = {"gid", "gnpgs", "gpid1", "gpid2", "gdate"})
 @XmlAccessorType(XmlAccessType.NONE)
 @Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="germplsm")
-public class Germplasm implements Serializable {
+public class Germplasm implements Serializable, Auditable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -708,5 +710,10 @@ public class Germplasm implements Serializable {
 			}
 		}
 		return preferredName;
+	}
+
+	@Override
+	public void attachToAuditory(Auditory auditory) {
+		this.referenceId = auditory.getId();
 	}
 }

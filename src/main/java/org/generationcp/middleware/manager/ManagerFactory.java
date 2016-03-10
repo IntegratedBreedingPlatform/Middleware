@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager;
 
 import java.io.Serializable;
 
+import org.generationcp.middleware.auditory.AuditorDataManager;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -137,6 +138,9 @@ public class ManagerFactory implements Serializable {
 	public OntologyVariableDataManager getOntologyVariableDataManager() {
 		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
 				this.getOntologyScaleDataManager(), this.sessionProvider);
+	}
+	public AuditorDataManager getAuditorDataManager() {
+		return new AuditorDataManager(this.sessionProvider);
 	}
 
 	public PresetDataManager getPresetDataManager() {
