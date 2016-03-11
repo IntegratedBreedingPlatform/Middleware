@@ -28,9 +28,11 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.SimpleExpression;
+import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 
 /**
@@ -108,6 +110,35 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		}
 		return new ArrayList<GermplasmList>();
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<GermplasmList> getByGIDandProgramUUID(final Integer gid, final int start, final int numOfRows, final String programUUID) {
+		try {
+			if (gid != null) {
+				final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
+				criteria.createAlias("listData", "l");
+				ProjectionList projectionListForId = Projections.projectionList();
+				ProjectionList projectionList = Projections.projectionList();
+				projectionList.add(Projections.distinct(projectionListForId.add(Projections.property("id"), "id")));
+				projectionList.add(Projections.property("name"), "name");
+				projectionList.add(Projections.property("description"), "description");
+				projectionList.add(Projections.property("date"), "date");
+				criteria.setProjection(projectionList);
+				criteria.add(Restrictions.eq("l.gid", gid));
+				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
+				criteria.add(Restrictions.eq("programUUID", programUUID));
+				criteria.setFirstResult(start);
+				criteria.setMaxResults(numOfRows);
+				criteria.addOrder(Order.asc("name"));
+				this.hideSnapshotListTypes(criteria);
+				criteria.setResultTransformer(Transformers.aliasToBean(GermplasmList.class)); 
+				return criteria.list();
+			}
+		} catch (final HibernateException e) {
+			this.logAndThrowException("Error with getByGid(gid=" + gid + ") query from GermplasmList: " + e.getMessage(), e);
+		}
+		return new ArrayList<GermplasmList>();
+	}
 
 	public long countByGID(final Integer gid) {
 		try {
@@ -121,6 +152,25 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			}
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with countByGID(gid=" + gid + ") query from GermplasmList " + e.getMessage(), e);
+		}
+		return 0;
+	}
+	
+	public long countByGIDandProgramUUID(final Integer gid, final String programUUID) {
+		try {
+			if (gid != null) {
+				final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
+				criteria.createAlias("listData", "l");
+				criteria.add(Restrictions.eq("l.gid", gid));
+				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
+				criteria.add(Restrictions.eq("programUUID", programUUID));
+				this.hideSnapshotListTypes(criteria);
+				
+				criteria.setProjection(Projections.countDistinct("id"));
+				return ((Long) criteria.uniqueResult()).longValue(); // count
+			}
+		} catch (final HibernateException e) {
+			this.logAndThrowException("Error with countByGIDandProgramUUID(gid=" + gid + ") query from GermplasmList " + e.getMessage(), e);
 		}
 		return 0;
 	}
@@ -505,11 +555,22 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 		return 0;
 	}
-
+	
+	//returns all the list of the program regardless of the type and status
 	@SuppressWarnings("unchecked")
 	public List<GermplasmList> getListsByProgram(final String programUUID) {
 		final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 		criteria.add(Restrictions.eq("programUUID", programUUID));
+		return criteria.list();
+	}
+	
+	//returns all the list of the program except the deleted ones and snapshot list
+	@SuppressWarnings("unchecked")
+	public List<GermplasmList> getListsByProgramUUID(final String programUUID) {
+		final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
+		criteria.add(Restrictions.eq("programUUID", programUUID));
+		criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
+		this.hideSnapshotListTypes(criteria);
 		return criteria.list();
 	}
 

@@ -131,8 +131,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public long countGermplasmListByGID(final Integer gid) {
-
 		return this.countAllByMethod(this.getGermplasmListDAO(), "countByGID", new Object[] {gid}, new Class[] {Integer.class});
+	}
+	
+	@Override
+	public long countGermplasmListByGIDandProgramUUID(final Integer gid, final String programUUID) {
+		return this.getGermplasmListDAO().countByGIDandProgramUUID(gid, programUUID);
 	}
 
 	@Override
@@ -606,4 +610,13 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return this.getGermplasmListDAO().getByListRef(listRef);
 	}
 
+	@Override
+	public List<GermplasmList> getGermplasmListByGIDandProgramUUID(Integer gid, int start, int numOfRows, String programUUID) {
+		return this.getGermplasmListDAO().getByGIDandProgramUUID(gid, start, numOfRows, programUUID);
+	}
+
+	@Override
+	public List<GermplasmList> getAllGermplasmListsByProgramUUID(String programUUID) {
+		return this.getGermplasmListDAO().getListsByProgramUUID(programUUID);
+	}
 }
