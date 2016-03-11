@@ -161,6 +161,9 @@ public enum TermId {
 	// added to indicate the trait class of the Means/Summary Statistic standard variables
 	, TREATMENT_MEAN(1610), SUMMARY_STATISTIC(1620)
 
+    // added so that we can represent non existing terms and avoid returning null in case of retrieving term by a given ID
+    , NONEXISTENT(-1)
+
 	;
 
 	private final int id;
@@ -176,17 +179,21 @@ public enum TermId {
 
 	public static TermId getById(final Integer id) {
 		if (id == null) {
-			return null;
+			return NONEXISTENT;
 		}
 
 		if (!TermId.TERM_ID_MAP.containsKey(id)) {
-			for (final TermId term : TermId.values()) {
+            for (final TermId term : TermId.values()) {
 				if (term.getId() == id) {
+                    TERM_ID_MAP.put(id, term);
 					return term;
 				}
 			}
-		}
 
-		return TermId.TERM_ID_MAP.get(id);
+            return NONEXISTENT;
+		} else {
+            return TERM_ID_MAP.get(id);
+        }
+
 	}
 }
