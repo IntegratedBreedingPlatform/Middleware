@@ -403,7 +403,7 @@ public interface StudyDataManager {
 	 * @return true or false
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID) throws MiddlewareQueryException;
+	boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID, Integer parentProjectId) throws MiddlewareQueryException;
 
 	/**
 	 * Count the number of projects the variable was used in the project.

@@ -120,8 +120,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID) throws MiddlewareQueryException {
-		return this.getDmsProjectDao().checkIfProjectNameIsExistingInProgram(name, programUUID);
+	public boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID, Integer parentProjectId) throws MiddlewareQueryException {
+		return this.getDmsProjectDao().checkIfProjectNameIsExistingInProgramAndParent(name, programUUID, parentProjectId);
 	}
 
 	@Override
@@ -608,14 +608,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public boolean renameSubFolder(String newFolderName, int folderId, String programUUID) throws MiddlewareQueryException {
-
-		// check for existing folder name
-		boolean isExisting = this.getDmsProjectDao().checkIfProjectNameIsExistingInProgram(newFolderName, programUUID);
-		if (isExisting) {
-			throw new MiddlewareQueryException("Folder name is not unique");
-		}
-
 		try {
+            // check for existing folder name
+            DmsProject parentFolder = this.getParentFolder(folderId);
+
+            boolean isExisting = this.getDmsProjectDao().checkIfProjectNameIsExistingInProgramAndParent(newFolderName, programUUID, parentFolder.getProjectId());
+            if (isExisting) {
+                throw new MiddlewareQueryException("Folder name is not unique");
+            }
 
 			DmsProject currentFolder = this.getDmsProjectDao().getById(folderId);
 			currentFolder.setName(newFolderName);
@@ -635,7 +635,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		if (parentProject == null) {
 			throw new MiddlewareQueryException("DMS Project is not existing");
 		}
-		boolean isExisting = this.getDmsProjectDao().checkIfProjectNameIsExistingInProgram(name, programUUID);
+		boolean isExisting = this.getDmsProjectDao().checkIfProjectNameIsExistingInProgramAndParent(name, programUUID, parentFolderId);
 		if (isExisting) {
 			throw new MiddlewareQueryException("Folder name is not unique");
 		}

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.StudyTestDataUtil;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
@@ -102,6 +103,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("0");
 		StudyDataManagerImplTest.crossExpansionProperties = new CrossExpansionProperties(mockProperties);
 		StudyDataManagerImplTest.crossExpansionProperties.setDefaultLevel(1);
+
+        ContextHolder.setCurrentCrop("maize");
 	}
 
 	@Test
@@ -148,6 +151,79 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertTrue(variates.getVariableTypes().size() > 0);
 		variates.print(IntegrationTestBase.INDENT);
 	}
+
+    @Test(expected = MiddlewareException.class)
+    public void testAddSubFolderWithDuplicate() throws Exception {
+            // create a folder in the system root
+            int folderID = this.manager.addSubFolder(DmsProject.SYSTEM_FOLDER_ID,
+                    StudyTestDataUtil.TEST_FOLDER_NAME, StudyTestDataUtil.TEST_FOLDER_DESC, this.commonTestProject.getUniqueID());
+            
+            Assert.assertTrue("Unable to establish base environment for testAddSubFolderWithDuplicate test", folderID > 0);
+
+            // attempt to create another folder using the same set of parameters within the same parent
+            this.manager.addSubFolder(DmsProject.SYSTEM_FOLDER_ID,
+                    StudyTestDataUtil.TEST_FOLDER_NAME, StudyTestDataUtil.TEST_FOLDER_DESC, this.commonTestProject.getUniqueID());
+
+    }
+
+    @Test
+    public void testAddSubFolderSameNameDifferentHierarchy() throws Exception {
+		// create a folder in the system root
+		int folderID =
+				this.manager.addSubFolder(DmsProject.SYSTEM_FOLDER_ID, StudyTestDataUtil.TEST_FOLDER_NAME,
+						StudyTestDataUtil.TEST_FOLDER_DESC, this.commonTestProject.getUniqueID());
+
+		Assert.assertTrue("Unable to establish base environment for testAddSubFolderSameNameDifferentHierarchy test", folderID > 0);
+
+		// attempt to create another folder with the same name as a child of the previously created folder
+		int resultID =
+				this.manager.addSubFolder(folderID, StudyTestDataUtil.TEST_FOLDER_NAME, StudyTestDataUtil.TEST_FOLDER_DESC,
+						this.commonTestProject.getUniqueID());
+
+        Assert.assertTrue("Unable to create a folder with the same name but different hierarchy", resultID > 0);
+    }
+
+    @Test(expected = MiddlewareException.class)
+    public void testRenameFolderSameNameSameHierarchy() throws Exception {
+        // create a folder in the system root
+        int folderID =
+                this.manager.addSubFolder(DmsProject.SYSTEM_FOLDER_ID, StudyTestDataUtil.TEST_FOLDER_NAME,
+                        StudyTestDataUtil.TEST_FOLDER_DESC, this.commonTestProject.getUniqueID());
+
+        Assert.assertTrue("Unable to establish base environment for testRenameFolderSameNameSameHierarchy test", folderID > 0);
+
+        // attempt to create another folder within the system folder ID, which we'll attempt to rename later
+        int forRename =
+                this.manager.addSubFolder(DmsProject.SYSTEM_FOLDER_ID, "temp", StudyTestDataUtil.TEST_FOLDER_DESC,
+                        this.commonTestProject.getUniqueID());
+
+        Assert.assertTrue("Unable to establish base environment for testRenameFolderSameNameSameHierarchy test", forRename > 0);
+
+        this.manager.renameSubFolder(StudyTestDataUtil.TEST_FOLDER_NAME, forRename, this.commonTestProject.getUniqueID());
+
+    }
+
+    @Test
+    public void testRenameFolderSameNameDifferentHierarchy() throws Exception {
+        // create a folder in the system root
+        int folderID =
+                this.manager.addSubFolder(DmsProject.SYSTEM_FOLDER_ID, StudyTestDataUtil.TEST_FOLDER_NAME,
+                        StudyTestDataUtil.TEST_FOLDER_DESC, this.commonTestProject.getUniqueID());
+
+        Assert.assertTrue("Unable to establish base environment for testRenameFolderSameNameSameHierarchy test", folderID > 0);
+
+        // attempt to create another folder as a child of the previously created folder
+        int forRename =
+                this.manager.addSubFolder(folderID, "temp", StudyTestDataUtil.TEST_FOLDER_DESC,
+                        this.commonTestProject.getUniqueID());
+
+        Assert.assertTrue("Unable to establish base environment for testRenameFolderSameNameSameHierarchy test", forRename > 0);
+
+        boolean result = this.manager.renameSubFolder(StudyTestDataUtil.TEST_FOLDER_NAME, forRename, this.commonTestProject.getUniqueID());
+
+        Assert.assertTrue("Unable to rename a folder to use the same name as a folder in a different hierarchy", result);
+
+    }
 
 	@Test
 	public void testGetStudiesByFolder() throws Exception {
@@ -1135,12 +1211,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Study study = this.manager.getStudy(10010);
 		String name = study.getName();
 		Debug.println(IntegrationTestBase.INDENT, "Name: " + name);
-		boolean isExisting = this.manager.checkIfProjectNameIsExistingInProgram(name, this.commonTestProject.getUniqueID());
+		boolean isExisting = this.manager.checkIfProjectNameIsExistingInProgram(name, this.commonTestProject.getUniqueID(), 1);
 		Assert.assertTrue(isExisting);
 
 		name = "SHOULDNOTEXISTSTUDY";
 		Debug.println(IntegrationTestBase.INDENT, "Name: " + name);
-		isExisting = this.manager.checkIfProjectNameIsExistingInProgram(name, this.commonTestProject.getUniqueID());
+		isExisting = this.manager.checkIfProjectNameIsExistingInProgram(name, this.commonTestProject.getUniqueID(), 1);
 		Assert.assertFalse(isExisting);
 	}
 
