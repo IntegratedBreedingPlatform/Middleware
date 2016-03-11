@@ -60,7 +60,7 @@ public class MaizeTrialManifest extends AbstractTrialReporter {
 		}
 
 		// attempt to extract values from the observations. only the value from the first measurement row is necessary
-		if (trialObservations.size() > 0) {
+		if (!trialObservations.isEmpty()) {
 
 			for (final MeasurementData data : trialObservations.get(0).getDataList()) {
 				mapReportValue(data.getMeasurementVariable(), params, data.getValue());
