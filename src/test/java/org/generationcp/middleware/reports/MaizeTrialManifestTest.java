@@ -15,14 +15,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MFieldbookTrialTest {
+public class MaizeTrialManifestTest {
     public static final String TEST_SEASON_VALUE = "Wet season";
     public static final String TEST_COLLABORATOR_NAME = "LeafNode";
 
     private static final MeasurementVariable SEASON_MEASUREMENT_VARIABLE = new MeasurementVariable("Crop_season_code", "", "test", "test", "Season", "test", TEST_SEASON_VALUE, "");
     private static final MeasurementVariable COLLABORATOR_MEASUREMENT_VARIABLE = new MeasurementVariable("Collaborator", "", "", "", "", "", TEST_COLLABORATOR_NAME, "");
 
-    private MFieldbookTrial unitUnderTest = new MFieldbookTrial();
+    private MaizeTrialManifest unitUnderTest = new MaizeTrialManifest();
 
 
     @Test
@@ -32,7 +32,7 @@ public class MFieldbookTrialTest {
 
         Assert.assertFalse("Unable to provide empty entries for known fields in the report", paramMap.isEmpty());
 
-        final Object collaborator =  paramMap.get(MFieldbookTrial.COLLABORATOR_REPORT_KEY);
+        final Object collaborator =  paramMap.get(MaizeTrialManifest.COLLABORATOR_REPORT_KEY);
         Assert.assertNotNull("Unable to provide empty entries for known field in the report", collaborator);
         Assert.assertTrue("Value for unknown field is not empty", StringUtils.isEmpty((String) collaborator));
 
@@ -52,7 +52,7 @@ public class MFieldbookTrialTest {
         reportParams.put(AbstractReporter.STUDY_OBSERVATIONS_KEY, trialObservations);
 
         final Map<String, Object> reportValues = this.unitUnderTest.buildJRParams(reportParams);
-        Assert.assertEquals("Unable to provide report with collaborator value", TEST_COLLABORATOR_NAME, reportValues.get(MFieldbookTrial.COLLABORATOR_REPORT_KEY));
+        Assert.assertEquals("Unable to provide report with collaborator value", TEST_COLLABORATOR_NAME, reportValues.get(MaizeTrialManifest.COLLABORATOR_REPORT_KEY));
         Assert.assertEquals("Unable to provide report with season value", TEST_SEASON_VALUE, reportValues.get("season"));
     }
 
@@ -73,7 +73,7 @@ public class MFieldbookTrialTest {
         reportParams.put(AbstractReporter.STUDY_OBSERVATIONS_KEY, trialObservations);
 
         final Map<String, Object> reportValues = this.unitUnderTest.buildJRParams(reportParams);
-        Assert.assertEquals("Unable to provide report with collaborator value", TEST_COLLABORATOR_NAME, reportValues.get(MFieldbookTrial.COLLABORATOR_REPORT_KEY));
+        Assert.assertEquals("Unable to provide report with collaborator value", TEST_COLLABORATOR_NAME, reportValues.get(MaizeTrialManifest.COLLABORATOR_REPORT_KEY));
         Assert.assertEquals("Unable to provide report with season value", TEST_SEASON_VALUE, reportValues.get("season"));
     }
 
