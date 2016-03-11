@@ -41,33 +41,31 @@ public abstract class AbstractNurseryReporter extends AbstractReporter {
 
 		for (final MeasurementVariable var : studyConditions) {
 			final TermId term = TermId.getById(var.getTermId());
-            if (term != null) {
 
-                switch (term) {
-                    case STUDY_NAME:
-                        params.put(STUDY_NAME_REPORT_KEY, var.getValue());
-                        break;
-                    case STUDY_TITLE:
-                        params.put(STUDY_TITLE_REPORT_KEY, var.getValue());
-                        break;
-                    case TRIAL_INSTANCE_FACTOR:
-                        if ("".equalsIgnoreCase(var.getValue())) {
-                            params.put("occ", 0);
-                        } else {
-                            params.put("occ", Integer.valueOf(var.getValue()));
-                        }
-                        break;
-                    case TRIAL_LOCATION:
-                        params.put(LOCATION_NAME_REPORT_KEY, var.getValue());
-                        break;
-                    case LOCATION_ID:
-                        params.put(LOCATION_ID_REPORT_KEY, var.getValue());
-                        break;
-                    case STUDY_INSTITUTE:
-                        params.put(ORGANIZATION_REPORT_KEY, var.getValue());
-                        break;
-                }
-            }
+			switch (term) {
+				case STUDY_NAME:
+					params.put(STUDY_NAME_REPORT_KEY, var.getValue());
+					break;
+				case STUDY_TITLE:
+					params.put(STUDY_TITLE_REPORT_KEY, var.getValue());
+					break;
+				case TRIAL_INSTANCE_FACTOR:
+					if ("".equalsIgnoreCase(var.getValue())) {
+						params.put("occ", 0);
+					} else {
+						params.put("occ", Integer.valueOf(var.getValue()));
+					}
+					break;
+				case TRIAL_LOCATION:
+					params.put(LOCATION_NAME_REPORT_KEY, var.getValue());
+					break;
+				case LOCATION_ID:
+					params.put(LOCATION_ID_REPORT_KEY, var.getValue());
+					break;
+				case STUDY_INSTITUTE:
+					params.put(ORGANIZATION_REPORT_KEY, var.getValue());
+					break;
+			}
 
 			if (var.getName().equals(COUNTRY_VARIABLE_NAME)) {
 				params.put(COUNTRY_VARIABLE_NAME, var.getValue());
@@ -127,7 +125,7 @@ public abstract class AbstractNurseryReporter extends AbstractReporter {
 			entries.add(entry);
 		}
 
-        return new JRBeanCollectionDataSource(Arrays.asList(new Occurrence(entries)));
+		return new JRBeanCollectionDataSource(Arrays.asList(new Occurrence(entries)));
 
 	}
 
