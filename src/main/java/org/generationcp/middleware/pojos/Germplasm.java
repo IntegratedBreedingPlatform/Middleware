@@ -357,15 +357,12 @@ public class Germplasm implements Serializable {
 	@Column(name = "mgid")
 	private Integer mgid;
 
-    @Basic(optional = false)
     @Column(name = "instance_number")
     private Integer instanceNumber;
 
-    @Basic(optional = false)
     @Column(name = "plot_number")
     private Integer plotNumber;
 
-    @Basic(optional = false)
     @Column(name = "rep_number")
     private Integer replicationNumber;
 
