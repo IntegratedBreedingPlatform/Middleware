@@ -23,11 +23,14 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 
 	private PedigreeDataManagerFactory pedigreeDataManagerFactory;
 
+	private String cropName;
+
 	public PedigreeDefaultServiceImpl() {
 
 	}
 
-	public PedigreeDefaultServiceImpl(HibernateSessionProvider sessionProvider) {
+	public PedigreeDefaultServiceImpl(HibernateSessionProvider sessionProvider, final String cropName) {
+		this.cropName = cropName;
 		this.pedigreeDataManagerFactory = new PedigreeDataManagerFactory(sessionProvider);
 
 	}
@@ -521,7 +524,7 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param recurringParentGid
 	 * @param toCheck
 	 * @return an array of 2 Objects, first is an Integer which is the number of doses of the recurring parent, and the other is a Germplasm
@@ -564,5 +567,10 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 		final MiddlewareQueryException exception = new MiddlewareQueryException(message);
 		LOG.error(message, exception);
 		throw exception;
+	}
+
+	@Override
+	public String getCropName() {
+		return cropName;
 	}
 }

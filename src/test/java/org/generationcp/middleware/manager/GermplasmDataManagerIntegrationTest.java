@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -617,22 +618,22 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			Debug.println(IntegrationTestBase.INDENT, u);
 		}
 	}
-	
+
 	@Test
 	public void testGetPlotCodeField() {
 		final UserDefinedField plotCodeField = this.germplasmDataManager.getPlotCodeField();
 		// Should never return null no matter whether the plot code UDFLD is present in the target database or not.
 		Assert.assertNotNull("GermplasmDataManager.getPlotCodeField() should never return null.", plotCodeField);
-		
+
 		if (plotCodeField.getFldno() != 0) {
 			// Non-zero fldno is a case where the UDFLD table has a record matching ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE
 			// Usually the id of this record is 1552. Not asserting as we dont want tests to depend on primary key values to be exact.
 			Assert.assertEquals("ATRIBUTS", plotCodeField.getFtable());
 			Assert.assertEquals("PASSPORT", plotCodeField.getFtype());
 			Assert.assertEquals("PLOTCODE", plotCodeField.getFcode());
-		}	
+		}
 	}
-	
+
 	@Test
 	public void testGetPlotCodeValue() {
 		final GermplasmDataManagerImpl unitToTest = new GermplasmDataManagerImpl();
@@ -656,7 +657,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		udfld.setFtable("ATRIBUTS");
 		udfld.setFtype("PASSPORT");
 		udfld.setFcode("PLOTCODE");
-		
+
 		Mockito.when(partiallyMockedUnit.getPlotCodeField()).thenReturn(udfld);
 		final Attribute plotCodeAttr = new Attribute();
 		plotCodeAttr.setTypeId(udfld.getFldno());
@@ -671,7 +672,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetCrossExpansion() throws Exception {
-		final CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties();
+		final CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties(Mockito.mock(Properties.class));
 		crossExpansionProperties.setDefaultLevel(1);
 		Debug.println(this.pedigreeService.getCrossExpansion(1, crossExpansionProperties));
 	}
