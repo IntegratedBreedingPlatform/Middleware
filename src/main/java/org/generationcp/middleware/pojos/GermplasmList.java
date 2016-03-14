@@ -48,6 +48,8 @@ public class GermplasmList implements Serializable {
 	private static final long serialVersionUID = 1L;
 	public static final String FOLDER_TYPE = "FOLDER";
 	public static final String LIST_TYPE = "LST";
+    public static final String ADVANCED_LIST_TYPE = "ADVANCED";
+    public static final String CROSS_LIST_TYPE = "CROSSES";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
