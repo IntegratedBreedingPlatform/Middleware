@@ -24,9 +24,13 @@ import java.util.List;
 public class GermplasmPedigreeTreeNode {
 
 	private Germplasm germplasm;
+    private final static int FEMALE_PARENT_INDEX = 0;
+    private final static int MALE_PARENT_INDEX = 1;
 
 	/**
 	 * NOTE: The order of the linked nodes must be preserved so we used LinkedList here
+     * TODO move away from ordered link nodes implementation, as it would require null values to act as
+     *  placeholder if one of the earlier values is missing
 	 */
 	private List<GermplasmPedigreeTreeNode> linkedNodes = new LinkedList<GermplasmPedigreeTreeNode>();
 
@@ -50,4 +54,21 @@ public class GermplasmPedigreeTreeNode {
 	public void setLinkedNodes(final List<GermplasmPedigreeTreeNode> parents) {
 		this.linkedNodes = parents;
 	}
+
+    public GermplasmPedigreeTreeNode getFemaleParent() {
+        return this.linkedNodes.get(FEMALE_PARENT_INDEX);
+    }
+
+    public void setMaleParent(GermplasmPedigreeTreeNode maleParent) {
+        this.linkedNodes.set(MALE_PARENT_INDEX, maleParent);
+    }
+
+    public void setFemaleParent(GermplasmPedigreeTreeNode femaleParent) {
+        this.linkedNodes.set(FEMALE_PARENT_INDEX, femaleParent);
+    }
+
+    public GermplasmPedigreeTreeNode getMaleParent() {
+        return this.linkedNodes.get(MALE_PARENT_INDEX);
+    }
+
 }
