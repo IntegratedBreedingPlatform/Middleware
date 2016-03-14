@@ -258,7 +258,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		for (MeasurementRow measurementRow : workbook.getObservations()) {
 			for (Entry<String, List<String>> entry : termIdValidValuesMap.entrySet()) {
 				MeasurementData measurementData = measurementRow.getMeasurementData(entry.getKey());
-				if (!this.containsIgnoreCase(entry.getValue(), measurementData.getValue())) {
+				if (measurementData != null && !this.containsIgnoreCase(entry.getValue(), measurementData.getValue())) {
 					return true;
 				}
 

@@ -142,6 +142,17 @@ public class MeasurementDataTest {
 		Assert.assertTrue(measurementData.isCategoricalValueValid());
 	}
 
+	@Test
+	public void testCategoricalValueValidNullValue() {
+		MeasurementData measurementData = new MeasurementData();
+		MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementData.setMeasurementVariable(measurementVariable);
+		measurementVariable.setDataTypeId(TermId.CATEGORICAL_VARIABLE.getId());
+		measurementVariable.setPossibleValues(this.createTestPossibleValues());
+		measurementData.setValue(null);
+		Assert.assertTrue(measurementData.isCategoricalValueValid());
+	}
+
 	private List<ValueReference> createTestPossibleValues() {
 		List<ValueReference> possibleValues = new ArrayList<>();
 		possibleValues.add(new ValueReference(1, "1", "VALUE 1"));

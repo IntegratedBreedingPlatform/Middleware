@@ -13,8 +13,6 @@ package org.generationcp.middleware.domain.etl;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -102,7 +100,6 @@ public class MeasurementData {
 		this.label = label;
 	}
 
-	@Nonnull
 	public String getValue() {
 		return this.value == null || "null".equalsIgnoreCase(this.value) ? EMPTY_STRING : this.value;
 	}
