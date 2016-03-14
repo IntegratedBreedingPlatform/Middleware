@@ -45,7 +45,7 @@ public interface OntologyVariableDataManager {
 	Variable getVariable(String programUuid, Integer id, boolean filterObsolete, boolean calculateVariableUsage);
 
 	/**
-	 * @param OntologyVariableInfo
+	 * @param variableInfo
 	 */
 	void addVariable(OntologyVariableInfo variableInfo);
 
@@ -57,14 +57,15 @@ public interface OntologyVariableDataManager {
 	void processTreatmentFactorHasPairValue(List<Variable> summaryList, List<Integer> hiddenFields);
 
 	/**
-	 * @param OntologyVariableInfo
+	 * @param variableInfo
 	 */
 	void updateVariable(OntologyVariableInfo variableInfo);
 
 	/**
-	 * @param id
+	 * This function will delete the variable and related data
+	 * @param variableId variable Id to be deleted
 	 */
-	void deleteVariable(Integer id);
+	void deleteVariable(Integer variableId);
 
 	/**
 	 * This function defines total observations carried from this variable.
@@ -82,5 +83,5 @@ public interface OntologyVariableDataManager {
 	 */
 	Integer getVariableStudies(int variableId);
 
-    String retrieveVariableCategoricalValue(String programUuid, Integer variableId, Integer categoricalValueId);
+	String retrieveVariableCategoricalValue(String programUuid, Integer variableId, Integer categoricalValueId);
 }

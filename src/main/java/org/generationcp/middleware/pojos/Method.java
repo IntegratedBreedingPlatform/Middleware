@@ -34,9 +34,18 @@ import javax.xml.bind.annotation.XmlType;
 import org.generationcp.middleware.domain.oms.TermId;
 
 /**
- * POJO for methods table.
- *
- * @author Kevin Manansala, Mark Agarrado
+ * Represents breeding methods. The ICIS model recognizes three classes of breeding methods by which genetic material is advanced:
+ * <ul>
+ * <li>Generative methods: intended to increase allelic diversity by combining alleles from different progenitors through crossing or
+ * mutating genes through mutagenesis, introducing new genes through transformation or combining whole genomes through polyploidization.</li>
+ * <li>Derivative methods: are processes applied to a single source of seed and are designed to reduce or repartition genetic variation.
+ * Example methods are self-fertilization of lines in segregating populations, which reduces allelic diversity through inbreeding (in turn
+ * increasing homozygosity), production of double haploid lines, or randomly mating selected plants within a population.</li>
+ * <li>Maintenance methods: again applied to a single source of seed, represent deliberate attempts to maintain a specific level of genetic
+ * variation with the objective of creating new instances of germplasm that are as similar to the source germplasm as possible. Common
+ * examples would be methods used for increases of germplasm accessions, genetic stocks, or foundation seed.</li>
+ * </ul>
+ * 
  */
 @NamedQueries({@NamedQuery(name = "getAllMethods", query = "FROM Method")})
 @Entity
@@ -260,6 +269,12 @@ public class Method implements Serializable {
 		this.mattr = mattr;
 	}
 
+	/**
+	 * ID of a CVTerm that defines a "method class".
+	 * 
+	 * METHN of a basic method which has equivalent genetic relationship between progenitors and offspring for the purpose of computing
+	 * coefficients of parentage
+	 */
 	public Integer getGeneq() {
 		return this.geneq;
 	}
@@ -462,4 +477,8 @@ public class Method implements Serializable {
 		return null;
 	}
 
+	@Transient
+	public boolean isGenerative() {
+		return this.mtype != null && "GEN".equals(this.mtype.trim());
+	}
 }

@@ -213,4 +213,43 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		List<Germplasm> results = this.dao.searchForGermplasms("", Operation.EQUAL, false, false);
 		Assert.assertTrue(results.isEmpty());
 	}
+
+	@Test
+	public void testGetAllChildren() {
+		final int gid = 2425278;
+		List<Germplasm> children = this.dao.getAllChildren(gid);
+		Assert.assertNotNull("getAllChildren() should never return null.", children);
+	}
+
+	@Test
+	public void testGetPreviousCrosses() {
+		Germplasm female = new Germplasm(2);
+		Germplasm male = new Germplasm(1);
+
+		Germplasm currentCross = new Germplasm(3);
+		currentCross.setGpid1(female.getGid());
+		currentCross.setGpid2(male.getGid());
+
+		List<Germplasm> previousCrosses = this.dao.getPreviousCrosses(currentCross, female, male);
+		Assert.assertNotNull("getPreviousCrosses() should never return null.", previousCrosses);
+	}
+
+	@Test
+	public void testLoadEntityWithNameCollection() {
+		Germplasm germplasm = this.dao.getById(1);
+		if (germplasm != null) {
+			Assert.assertTrue("If germplasm exists, the name collection can not be empty.", !germplasm.getNames().isEmpty());
+		}
+	}
+
+	public void testGetManagementGroupMembers() {
+		List<Germplasm> groupMembers = this.dao.getManagementGroupMembers(1);
+		Assert.assertNotNull("getManagementGroupMembers() should never return null when supplied with proper mgid.", groupMembers);
+
+		this.dao.getManagementGroupMembers(null);
+		Assert.assertTrue("getManagementGroupMembers() should return empty collection when supplied mgid = null.", groupMembers.isEmpty());
+
+		this.dao.getManagementGroupMembers(0);
+		Assert.assertTrue("getManagementGroupMembers() should return empty collection when supplied mgid = 0.", groupMembers.isEmpty());
+	}
 }

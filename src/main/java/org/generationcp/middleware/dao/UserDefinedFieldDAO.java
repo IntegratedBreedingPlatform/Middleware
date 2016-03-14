@@ -16,18 +16,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.NonUniqueResultException;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link UserDefinedField}.
  *
  */
 public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(UserDefinedFieldDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<UserDefinedField> getByFieldTableNameAndType(String tableName, String fieldType) throws MiddlewareQueryException {
@@ -90,5 +96,28 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
 		criteria.add(Restrictions.eq("lfldno", lfldno));
 		return (UserDefinedField) criteria.uniqueResult();
+	}
+
+	public UserDefinedField getByTableTypeAndCode(String table, String type, String code) throws MiddlewareQueryException {
+		try {
+			if (StringUtils.isNotBlank(table) && StringUtils.isNotBlank(type) && StringUtils.isNotBlank(code)) {
+				Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
+				criteria.add(Restrictions.eq("ftable", table));
+				criteria.add(Restrictions.eq("ftype", type));
+				criteria.add(Restrictions.eq("fcode", code));
+				return (UserDefinedField) criteria.uniqueResult();
+			}
+		} catch (NonUniqueResultException nonUniqueResultException) {
+			final String message =
+					"Multiple UDFLD records were found with fTable={}, fType={}, fCode={}. Was expecting one uniqe result only : {}";
+			LOG.error(message, table, type, code, nonUniqueResultException.getMessage());
+			throw new MiddlewareQueryException(message, nonUniqueResultException);
+
+		} catch (HibernateException e) {
+			String message = "Error executing UserDefinedFieldDAO.getByTableTypeAndCode(fTable={}, fType={}, fCode={}) : {}";
+			LOG.error(message, table, type, code, e.getMessage());
+			throw new MiddlewareQueryException(message, e);
+		}
+		return null;
 	}
 }
