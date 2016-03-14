@@ -53,13 +53,9 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 		}
 	}
 
-	public List<InventoryDetails> retrieveInventoryDetailsForListDataProjectListId(Integer listDataProjectListId,
-			GermplasmListType germplasmListType) throws MiddlewareQueryException {
-		List<InventoryDetails> detailsList = new ArrayList<>();
+	public List<InventoryDetails> retrieveInventoryDetailsForListDataProjectListId(Integer listDataProjectListId) throws MiddlewareQueryException {
 
-		if (!germplasmListType.equals(GermplasmListType.ADVANCED) && !germplasmListType.equals(GermplasmListType.CROSSES)) {
-			throw new IllegalArgumentException("This method should only be passed lists of type ADVANCED or CROSSES");
-		}
+        List<InventoryDetails> detailsList = new ArrayList<>();
 
 		String sql =
 				"select lot.lotid, lot.locid, lot.scaleid, lot.userid, "
