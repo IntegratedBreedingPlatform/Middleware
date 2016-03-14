@@ -24,15 +24,18 @@ import java.util.List;
 public class GermplasmPedigreeTreeNode {
 
 	private Germplasm germplasm;
-    private final static int FEMALE_PARENT_INDEX = 0;
-    private final static int MALE_PARENT_INDEX = 1;
 
 	/**
 	 * NOTE: The order of the linked nodes must be preserved so we used LinkedList here
      * TODO move away from ordered link nodes implementation, as it would require null values to act as
      *  placeholder if one of the earlier values is missing
 	 */
-	private List<GermplasmPedigreeTreeNode> linkedNodes = new LinkedList<GermplasmPedigreeTreeNode>();
+	private List<GermplasmPedigreeTreeNode> linkedNodes = new LinkedList<>();
+
+    // providing variables to represent the male and female parent so that they can be set without having to provide null values in the linked list
+    private GermplasmPedigreeTreeNode femaleParent;
+    private GermplasmPedigreeTreeNode maleParent;
+
 
 	public Germplasm getGermplasm() {
 		return this.germplasm;
@@ -55,20 +58,19 @@ public class GermplasmPedigreeTreeNode {
 		this.linkedNodes = parents;
 	}
 
-    public GermplasmPedigreeTreeNode getFemaleParent() {
-        return this.linkedNodes.get(FEMALE_PARENT_INDEX);
+    public void setFemaleParent(GermplasmPedigreeTreeNode femaleParent) {
+        this.femaleParent = femaleParent;
     }
 
     public void setMaleParent(GermplasmPedigreeTreeNode maleParent) {
-        this.linkedNodes.set(MALE_PARENT_INDEX, maleParent);
+        this.maleParent = maleParent;
     }
 
-    public void setFemaleParent(GermplasmPedigreeTreeNode femaleParent) {
-        this.linkedNodes.set(FEMALE_PARENT_INDEX, femaleParent);
+    public GermplasmPedigreeTreeNode getFemaleParent() {
+        return femaleParent;
     }
 
     public GermplasmPedigreeTreeNode getMaleParent() {
-        return this.linkedNodes.get(MALE_PARENT_INDEX);
+        return maleParent;
     }
-
 }
