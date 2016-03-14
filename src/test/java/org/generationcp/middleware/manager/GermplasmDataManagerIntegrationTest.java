@@ -52,7 +52,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
-// TODO This test heavily assumes Rice genealogy data being present. Needs complete revision to seed the test data it needs before starting.
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	@Autowired
