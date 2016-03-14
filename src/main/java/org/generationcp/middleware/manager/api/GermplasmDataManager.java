@@ -32,11 +32,8 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 
-// TODO: Auto-generated Javadoc
 /**
  * This is the API for retrieving Germplasm information.
- *
- * @author Kevin Manansala
  *
  */
 public interface GermplasmDataManager {
@@ -183,16 +180,28 @@ public interface GermplasmDataManager {
 	 * @param status - may be used to filter the results
 	 * @param type - may be used to filter the results
 	 * @return List of Name POJOs
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Name> getNamesByGID(Integer gid, Integer status, GermplasmNameType type);
+
+	/**
+	 * Returns all the names of the Germplasm identified by the gid parameter.
+	 *
+	 * Results may be filtered by name status. Accepted values are 0 - 10. If the given status is zero all names will be included except deleted names
+	 *
+	 * Results may also be filtered by type list. These must be valid integer values
+	 *
+	 * @param gid the germplasm identifier
+	 * @param status the name status used to filter the results
+	 * @param type the type used to filter the results
+	 * @return List of {@link Name}
+	 */
+	List<Name> getByGIDWithListTypeFilters(Integer gid, Integer status, List<Integer> type);
 
 	/**
 	 * Returns the preferred name of the Germplasm identified by the gid parameter.
 	 *
 	 * @param gid - id of the Germplasm
 	 * @return {@code Name} POJO of the Germplasm's preferred name. Returns
-	 * @throws MiddlewareQueryException the middleware query exception {@code null} when no preferred name is found.
 	 */
 	Name getPreferredNameByGID(Integer gid);
 
@@ -1058,7 +1067,7 @@ public interface GermplasmDataManager {
 
 	/*
 	 * get the Germplasm from the crop database based on local gid reference
-	 * 
+	 *
 	 * @param lgid
 	 */
 	Germplasm getGermplasmByLocalGid(Integer lgid);
@@ -1075,11 +1084,20 @@ public interface GermplasmDataManager {
 	 *         critria is found, an empty record with fldno=0 is returned. Never returns null.
 	 */
 	UserDefinedField getPlotCodeField();
-	
+
 	/**
 	 * Returns value of the plot code (seed source) where the germplasm was created, identified by the given gid. Returns "Unknown" if plot code
 	 * attribute is not present. Never returns null.
 	 */
 	String getPlotCodeValue(Integer gid);
+
+	/**
+	 * Enables us to query the udflds table
+	 * @param table the ftable value
+	 * @param type the ftype value
+	 * @param code we are looking for
+	 * @return
+	 */
+	UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code);
 
 }

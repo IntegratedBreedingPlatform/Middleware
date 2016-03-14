@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Map.Entry;
 
 import org.generationcp.middleware.IntegrationTestBase;
@@ -19,6 +20,7 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -39,9 +41,10 @@ public class PedigreeServiceImplTest extends IntegrationTestBase {
 
 	@Before
 	public void setup() {
-		this.crossExpansionProperties = new CrossExpansionProperties();
+		final Properties mockProperties = Mockito.mock(Properties.class);
+		Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("0");
+		this.crossExpansionProperties = new CrossExpansionProperties(mockProperties);
 		this.crossExpansionProperties.setDefaultLevel(1);
-		this.crossExpansionProperties.setWheatLevel(0);
 	}
 
 	@Test

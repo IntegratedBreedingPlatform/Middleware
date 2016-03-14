@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.Random;
 
 import org.generationcp.middleware.IntegrationTestBase;
@@ -97,9 +98,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
 		}
-
-		StudyDataManagerImplTest.crossExpansionProperties = new CrossExpansionProperties();
-		StudyDataManagerImplTest.crossExpansionProperties.setWheatLevel(0);
+		final Properties mockProperties = Mockito.mock(Properties.class);
+		Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("0");
+		StudyDataManagerImplTest.crossExpansionProperties = new CrossExpansionProperties(mockProperties);
 		StudyDataManagerImplTest.crossExpansionProperties.setDefaultLevel(1);
 	}
 
@@ -305,7 +306,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		studyTestDataUtil.deleteTestData(folderWithUUID.getProjectId());
 		studyTestDataUtil.deleteTestData(folderWithoutUUID.getProjectId());
 	}
-	
+
 	@Test
 	public void testGetAllFolders() {
 

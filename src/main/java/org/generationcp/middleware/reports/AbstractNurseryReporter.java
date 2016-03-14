@@ -13,7 +13,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.report.GermplasmEntry;
 import org.generationcp.middleware.pojos.report.Occurrence;
 
-public abstract class AbstractWheatNurseryReporter extends AbstractReporter {
+public abstract class AbstractNurseryReporter extends AbstractReporter {
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -34,7 +34,6 @@ public abstract class AbstractWheatNurseryReporter extends AbstractReporter {
 		params.put("Fentry", lastEntry);
 		params.put("offset", offset);
 		params.put(PROGRAM_NAME_REPORT_KEY, args.get(PROGRAM_NAME_ARG_KEY));
-
 
 		for (MeasurementVariable var : studyConditions) {
 			TermId term = TermId.getById(var.getTermId());
@@ -117,9 +116,9 @@ public abstract class AbstractWheatNurseryReporter extends AbstractReporter {
 			}
 
 			// TODO: pending mappings
-			entry.setsEnt(-99);
-			entry.setsTabbr("???");
-			entry.setSlocycle("???");
+			entry.setsEnt(0);
+			entry.setsTabbr("");
+			entry.setSlocycle("");
 
 			entries.add(entry);
 		}
