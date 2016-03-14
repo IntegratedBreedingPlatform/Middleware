@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ReportServiceImpl extends Service implements ReportService {
 
-    private final ReporterFactory factory = ReporterFactory.instance();
+	private final ReporterFactory factory = ReporterFactory.instance();
 
 	public ReportServiceImpl() {
 		super();
@@ -76,8 +76,8 @@ public class ReportServiceImpl extends Service implements ReportService {
 	}
 
 	@Override
-	public Reporter getStreamGermplasmListReport(final String code, final Integer germplasmListID, final String programName, final OutputStream output)
-			throws MiddlewareException, JRException, IOException, BuildReportException {
+	public Reporter getStreamGermplasmListReport(final String code, final Integer germplasmListID, final String programName,
+			final OutputStream output) throws MiddlewareException, JRException, IOException, BuildReportException {
 		final Reporter reporter = this.factory.createReporter(code);
 		final Map<String, Object> data = this.extractGermplasmListData(germplasmListID);
 		data.put(AbstractReporter.PROGRAM_NAME_ARG_KEY, programName);
@@ -198,33 +198,35 @@ public class ReportServiceImpl extends Service implements ReportService {
 				continue;
 			}
 
-			if (germNode.getLinkedNodes().size() == 2) {
-                final GermplasmPedigreeTreeNode femaleNode = germNode.getLinkedNodes().get(0);
-                final GermplasmPedigreeTreeNode maleNode = germNode.getLinkedNodes().get(1);
-				final Germplasm female = femaleNode == null ? null : femaleNode.getGermplasm();
-				final Germplasm male = maleNode == null ? null : maleNode.getGermplasm();
+			final GermplasmPedigreeTreeNode femaleNode = germNode.getFemaleParent();
+			final GermplasmPedigreeTreeNode maleNode = germNode.getMaleParent();
 
-				// TODO: pending values for origin of the entries (most likely resolved in BMS-2211)
-				row.getDataList().add(
-						new MeasurementData(AbstractReporter.FEMALE_SELECTION_HISTORY_KEY, female == null ? "" : female
-								.getSelectionHistory()));
-				row.getDataList().add(
-						new MeasurementData(AbstractReporter.FEMALE_CROSS_NAME_KEY, female == null ? "" : female.getSelectionHistory()));
-				row.getDataList().add(new MeasurementData(AbstractReporter.FEMALE_TRIAL_ABBREVIATION_KEY, "NA"));
-				row.getDataList().add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_CYCLE_KEY, "NA"));
-				row.getDataList().add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_ENTRY_KEY, "0"));
-				row.getDataList().add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_LOCATION_ID_KEY, "0"));
+            if (femaleNode == null && maleNode == null) {
+                continue;
+            }
 
-				row.getDataList().add(
-						new MeasurementData(AbstractReporter.MALE_SELECTION_HISTORY_KEY, male == null ? "" : male.getSelectionHistory()));
-				row.getDataList().add(
-						new MeasurementData(AbstractReporter.MALE_CROSS_NAME_KEY, male == null ? "" : male.getSelectionHistory()));
+			final Germplasm female = femaleNode == null ? null : femaleNode.getGermplasm();
+			final Germplasm male = maleNode == null ? null : maleNode.getGermplasm();
 
-				row.getDataList().add(new MeasurementData(AbstractReporter.MALE_TRIAL_ABBREVIATION_KEY, "NA"));
-				row.getDataList().add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_CYCLE_KEY, "NA"));
-				row.getDataList().add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_ENTRY_KEY, "0"));
-				row.getDataList().add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_LOCATION_ID_KEY, "0"));
-			}
+			// TODO: pending values for origin of the entries (most likely resolved in BMS-2211)
+			row.getDataList().add(
+					new MeasurementData(AbstractReporter.FEMALE_SELECTION_HISTORY_KEY, female == null ? "" : female.getSelectionHistory()));
+			row.getDataList().add(
+					new MeasurementData(AbstractReporter.FEMALE_CROSS_NAME_KEY, female == null ? "" : female.getSelectionHistory()));
+			row.getDataList().add(new MeasurementData(AbstractReporter.FEMALE_TRIAL_ABBREVIATION_KEY, "NA"));
+			row.getDataList().add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_CYCLE_KEY, "NA"));
+			row.getDataList().add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_ENTRY_KEY, "0"));
+			row.getDataList().add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_LOCATION_ID_KEY, "0"));
+
+			row.getDataList().add(
+					new MeasurementData(AbstractReporter.MALE_SELECTION_HISTORY_KEY, male == null ? "" : male.getSelectionHistory()));
+			row.getDataList()
+					.add(new MeasurementData(AbstractReporter.MALE_CROSS_NAME_KEY, male == null ? "" : male.getSelectionHistory()));
+
+			row.getDataList().add(new MeasurementData(AbstractReporter.MALE_TRIAL_ABBREVIATION_KEY, "NA"));
+			row.getDataList().add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_CYCLE_KEY, "NA"));
+			row.getDataList().add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_ENTRY_KEY, "0"));
+			row.getDataList().add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_LOCATION_ID_KEY, "0"));
 
 		}
 	}
