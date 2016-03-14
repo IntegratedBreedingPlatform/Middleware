@@ -1226,7 +1226,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			final GermplasmPedigreeTreeNode root = new GermplasmPedigreeTreeNode();
 			root.setGermplasm(germ);
 
-			final List<GermplasmPedigreeTreeNode> parents = new ArrayList<>();
 			Map<GermplasmNameType, Name> names = namesMap.get(germ.getGpid1());
 
 			// TODO: compare again new GermplasmNameTypes in merged database
@@ -1236,9 +1235,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			names = namesMap.get(germ.getGpid2());
 			final GermplasmPedigreeTreeNode maleNode = createGermplasmPedigreeTreeNode(germ.getGpid2(), names);
 
-			parents.add(femaleNode);
-			parents.add(maleNode);
-			root.setLinkedNodes(parents);
+			root.setFemaleParent(femaleNode);
+            root.setMaleParent(maleNode);
+
+            // providing legacy support for use of linked nodes to represent parent nodes
+            if (femaleNode != null) {
+                root.getLinkedNodes().add(femaleNode);
+            }
+
+            if (maleNode != null) {
+                root.getLinkedNodes().add(maleNode);
+            }
 
 			germNodes.put(germ.getGid(), root);
 		}
