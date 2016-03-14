@@ -713,7 +713,7 @@ public class Germplasm implements Serializable, Auditable {
 	}
 
 	@Override
-	public void attachToAuditory(Auditory auditory) {
+	public void audit(Auditory auditory) {
 		this.referenceId = auditory.getId();
 	}
 }

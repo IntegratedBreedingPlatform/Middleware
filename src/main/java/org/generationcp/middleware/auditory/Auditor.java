@@ -1,5 +1,9 @@
 package org.generationcp.middleware.auditory;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.generationcp.middleware.manager.api.AuditorDataManager;
 import org.generationcp.middleware.pojos.Bibref;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -15,6 +19,7 @@ public class Auditor {
 	public static final String MISSUSE_OF_AUDITOR_COMPONENT = "Misuse of auditor component";
 	public static final String COULD_NOT_START_AUDITORY = "Could not start auditory";
 	public static final String INVALID_INPUT_DATA = "Invalid input data";
+	public static final String EMPTY_STRING = " ";
 
 	AuditorDataManager manager;
 
@@ -35,8 +40,22 @@ public class Auditor {
 
 			ref = new Bibref();
 			ref.setAuthors(username);
-			ref.setVolume(filename);
-			ref = manager.getBibrefDao().save(ref);
+			ref.setVolume(EMPTY_STRING);
+			ref.setRefid(0);
+			ref.setType(manager.getBibrefType());
+			ref.setEditors(EMPTY_STRING);
+			ref.setAnalyt(EMPTY_STRING);
+			ref.setMonogr(filename);
+			ref.setSeries(EMPTY_STRING);
+			ref.setIssue(EMPTY_STRING);
+			ref.setPagecol(EMPTY_STRING);
+			ref.setPublish(EMPTY_STRING);
+			SimpleDateFormat formatter = new SimpleDateFormat("ddMMyyyy");
+			String date = formatter.format(new Date());
+			ref.setPubdate(Integer.parseInt(date));
+			ref.setPucity(EMPTY_STRING);
+			ref.setPucntry(EMPTY_STRING);
+			ref = manager.save(ref);
 			return this.ref;
 		}catch (Exception ex){
 			throw new AuditoryException(COULD_NOT_START_AUDITORY);
@@ -44,10 +63,14 @@ public class Auditor {
 	}
 
 	public Auditable audit(Auditable auditable) throws AuditoryException {
-		if(ref == null || ref.getId()==0){
+		if(ref == null || ref.getId()==0 || auditable==null){
 			throw new AuditoryException(MISSUSE_OF_AUDITOR_COMPONENT);
 		}
-		auditable.attachToAuditory(ref);
+		auditable.audit(ref);
 		return auditable;
+	}
+
+	public void closeAuditory() {
+		ref=null;
 	}
 }

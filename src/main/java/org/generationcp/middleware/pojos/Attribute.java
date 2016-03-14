@@ -23,6 +23,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+import org.generationcp.middleware.auditory.Auditable;
+import org.generationcp.middleware.auditory.Auditory;
 
 /**
  * POJO for atributs table.
@@ -33,7 +35,7 @@ import javax.persistence.Table;
 		query = "FROM Attribute a WHERE a.germplasmId = :gid AND a.typeId <> 9999 AND a.typeId <> 999")})
 @Entity
 @Table(name = "atributs")
-public class Attribute implements Serializable {
+public class Attribute implements Serializable, Auditable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -199,4 +201,8 @@ public class Attribute implements Serializable {
 		return this.getAid();
 	}
 
+	@Override
+	public void audit(Auditory auditory) {
+		this.referenceId = auditory.getId();
+	}
 }

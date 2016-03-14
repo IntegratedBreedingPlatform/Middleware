@@ -1,6 +1,7 @@
 package org.generationcp.middleware.auditory;
 
 import org.generationcp.middleware.dao.BibrefDAO;
+import org.generationcp.middleware.manager.api.AuditorDataManager;
 import org.generationcp.middleware.pojos.Bibref;
 import org.junit.Before;
 import org.junit.Test;
@@ -27,21 +28,20 @@ public class AuditorUT {
 	private BibrefDAO bibrefDaoMock;
 
 	Auditor auditor;
-
+	Bibref expectedAuditory;
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		auditor = new Auditor(managerMock);
+		expectedAuditory = new Bibref();
+		expectedAuditory.setRefid(DUMMY_ID);
 
 	}
 
 	@Test
 	public void startAuditoryCreatesAuditoryElementWithId() throws Exception {
 		//Given
-		Bibref expectedAuditory = new Bibref();
-		expectedAuditory.setRefid(DUMMY_ID);
-		when(managerMock.getBibrefDao()).thenReturn(bibrefDaoMock);
-		when(bibrefDaoMock.save(any(Bibref.class))).thenReturn(expectedAuditory);
+		when(managerMock.save(any(Bibref.class))).thenReturn(expectedAuditory);
 
 		//When
 		Auditory auditory = auditor.startAuditory(DUMMY_USERNAME, DUMMY_FILENAME);
@@ -55,7 +55,8 @@ public class AuditorUT {
 	public void startAuditoryCreatesAuditoryElementWithFilename() throws Exception {
 		//Given
 		ArgumentCaptor<Bibref> auditoryCaptor = ArgumentCaptor.forClass(Bibref.class);
-		when(managerMock.getBibrefDao()).thenReturn(bibrefDaoMock);
+		when(managerMock.save(any(Bibref.class))).thenReturn(expectedAuditory);
+
 
 		//When
 		auditor.startAuditory(DUMMY_USERNAME, DUMMY_FILENAME);
@@ -70,7 +71,7 @@ public class AuditorUT {
 	public void startAuditoryCreatesAuditoryElementWithUsername() throws Exception {
 		//Given
 		ArgumentCaptor<Bibref> auditoryCaptor = ArgumentCaptor.forClass(Bibref.class);
-		when(managerMock.getBibrefDao()).thenReturn(bibrefDaoMock);
+		when(managerMock.save(any(Bibref.class))).thenReturn(expectedAuditory);
 
 		//When
 		auditor.startAuditory(DUMMY_USERNAME, DUMMY_FILENAME);
@@ -82,9 +83,9 @@ public class AuditorUT {
 	}
 
 	@Test
-	public void failStartAuditoryWhenManagerFails() {
+	public void failStartAuditoryWhenManagerFails() throws AuditoryException {
 		//Given
-		when(managerMock.getBibrefDao()).thenThrow(Exception.class);
+		when(managerMock.save(any(Bibref.class))).thenThrow(Exception.class);
 
 		//When
 		try {
@@ -126,5 +127,18 @@ public class AuditorUT {
 		verify(bibrefDaoMock,never()).save(any(Bibref.class));
 	}
 
+	@Test
+	public void auditableElementIsAttachedToAuditory() throws AuditoryException {
+		Bibref expectedAuditory = new Bibref();
+		expectedAuditory.setRefid(DUMMY_ID);
+		when(managerMock.save(any(Bibref.class))).thenReturn(expectedAuditory);
+		Auditable auditableMock = mock(Auditable.class);
 
+		//When
+		auditor.startAuditory(DUMMY_USERNAME, DUMMY_FILENAME);
+		auditor.audit(auditableMock);
+
+		//Then
+		verify(auditableMock).audit(any(Bibref.class));
+	}
 }
