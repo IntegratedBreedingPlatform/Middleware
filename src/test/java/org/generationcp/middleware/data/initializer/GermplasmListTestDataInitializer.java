@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.util.Util;
 
 public class GermplasmListTestDataInitializer {
 
@@ -18,6 +19,12 @@ public class GermplasmListTestDataInitializer {
 		germplasmList.setDescription("List " + id + " Description");
 		germplasmList.setDate(20150101L);
 		germplasmList.setType("LST");
+		return germplasmList;
+	}
+	
+	public GermplasmList createGermplasmList(String name, Integer userId, String description, GermplasmList parent, Integer status, String programUUID){
+		final GermplasmList germplasmList = new GermplasmList(null, name, Util.getCurrentDateAsLongValue(), "LST", userId, description, parent, status);
+		germplasmList.setProgramUUID(programUUID);
 		return germplasmList;
 	}
 
@@ -97,7 +104,7 @@ public class GermplasmListTestDataInitializer {
 		return germplasmLists;
 	}
 
-protected GermplasmListData createGermplasmListDataItemWithInventoryInfo(int i) {
+	protected GermplasmListData createGermplasmListDataItemWithInventoryInfo(int i) {
 		final GermplasmListData listEntry = new GermplasmListData();
 		listEntry.setId(i);
 		listEntry.setDesignation("Designation " + i);
