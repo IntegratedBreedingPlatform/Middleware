@@ -157,9 +157,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	Name getSelectionHistory(Germplasm germplasm) {
-		UserDefinedField selectionHistoryNameType =
-				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
-
+		UserDefinedField selectionHistoryNameType = getSelectionHistoryNameType();
 		return findNameByType(germplasm, selectionHistoryNameType);
 	}
 
@@ -178,10 +176,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	Name getSelectionHistoryAtFixation(Germplasm germplasm) {
-		UserDefinedField selectionHistoryAtFixationNameType =
-				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
-						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
-
+		UserDefinedField selectionHistoryAtFixationNameType = getSelectionHistoryAtFixationNameType();
 		return findNameByType(germplasm, selectionHistoryAtFixationNameType);
 	}
 
@@ -207,14 +202,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 
 		// 2. Check if there is an existing "selection history at fixation" name
-		UserDefinedField selHisFixNameType =
-				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
-						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
-
 		Name existingSelHisFixName = getSelectionHistoryAtFixation(germplasm);
 
 		// 3. Add a new name as "selection history at fixation" with supplied name value and make it a preferred name.
 		if (existingSelHisFixName == null) {
+			UserDefinedField selHisFixNameType = getSelectionHistoryAtFixationNameType();
 			Name newSelectionHistoryAtFixation = new Name();
 			newSelectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
 			newSelectionHistoryAtFixation.setTypeId(selHisFixNameType.getFldno());
@@ -231,6 +223,29 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			existingSelHisFixName.setNstat(1); // nstat = 1 means it is preferred name.
 			existingSelHisFixName.setNdate(Util.getCurrentDateAsIntegerValue());
 		}
+	}
+
+	UserDefinedField getSelectionHistoryAtFixationNameType() {
+		UserDefinedField selHisFixNameType =
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
+						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
+		if (selHisFixNameType == null) {
+			throw new IllegalStateException(
+					"Missing required reference data: Please ensure User defined field (UDFLD) record for name type '"
+							+ GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE + "' has been setup.");
+		}
+		return selHisFixNameType;
+	}
+
+	UserDefinedField getSelectionHistoryNameType() {
+		UserDefinedField selectionHistoryNameType =
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
+		if (selectionHistoryNameType == null) {
+			throw new IllegalStateException(
+					"Missing required reference data: Please ensure User defined field (UDFLD) record for name type '"
+							+ GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE + "' has been setup.");
+		}
+		return selectionHistoryNameType;
 	}
 
 	private void copySelectionHistory(Germplasm germplasm) {
