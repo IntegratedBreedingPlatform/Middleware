@@ -338,12 +338,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 						germplasm.setLgid(germplasm.getGid() != null ? germplasm.getGid() : Integer.valueOf(0));
 					}
 
-					// Add name entries to germplasm entity. Will be saved through hibernate cascade on germplasm save.
+					germplasm = germplasmDao.save(germplasm);
+
 					for (final Name name : nameList) {
+						// Germplasm and Name entities are currently only mapped as uni-directional OneToMany so we need to manage the Name
+						// side of the relationship link (Name.germplasmId) manually.
+						name.setGermplasmId(germplasm.getGid());
 						germplasm.getNames().add(name);
 					}
-
-					germplasm = germplasmDao.save(germplasm);
 
 					// inherit 'selection history at fixation' names of parent if parent is part of a group (= has mgid)
 					if (germplasm.getMgid() > 0) {
