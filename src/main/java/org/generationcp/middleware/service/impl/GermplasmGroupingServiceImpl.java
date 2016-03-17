@@ -206,14 +206,14 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			currentPreferredName.setNstat(0);
 		}
 
-		// 2. Remove if there is an existing "selection history at fixation"
+		// 2. Check if there is an existing "selection history at fixation" name
 		UserDefinedField selHisFixNameType =
 				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
 						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 
 		Name existingSelHisFixName = getSelectionHistoryAtFixation(germplasm);
 
-		// 3. Copy selection history as "selection history at fixation" and make it a preferred name.
+		// 3. Add a new name as "selection history at fixation" with supplied name value and make it a preferred name.
 		if (existingSelHisFixName == null) {
 			Name newSelectionHistoryAtFixation = new Name();
 			newSelectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
@@ -225,7 +225,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			newSelectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
 			newSelectionHistoryAtFixation.setReferenceId(0);
 			germplasm.getNames().add(newSelectionHistoryAtFixation);
-		} else {
+		} else { 
+			// 4. Update the extisting "selection history at fixation" with supplied name and make it a preferred name.
 			existingSelHisFixName.setNval(nameToCopyFrom.getNval());
 			existingSelHisFixName.setNstat(1); // nstat = 1 means it is preferred name.
 			existingSelHisFixName.setNdate(Util.getCurrentDateAsIntegerValue());
