@@ -25,7 +25,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -300,7 +299,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					throws MiddlewareQueryException {
 
 		final GermplasmDAO germplasmDao = this.getGermplasmDao();
-		final NameDAO nameDao = this.getNameDao();
 		final GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
 
 		final long startTime = System.currentTimeMillis();
@@ -339,21 +337,22 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					if (germplasm.getLgid() == null) {
 						germplasm.setLgid(germplasm.getGid() != null ? germplasm.getGid() : Integer.valueOf(0));
 					}
-					// SAVE Germplasm
-					germplasm = germplasmDao.save(germplasm);
-					// inherit selection history names of parent if part of a group
-					if(germplasm.getMgid() > 0) {
-						germplasmGroupingService.copySelectionHistory(germplasm);
+
+					// Add name entries to germplasm entity. Will be saved through hibernate cascade on germplasm save.
+					for (final Name name : nameList) {
+						germplasm.getNames().add(name);
 					}
+
+					germplasm = germplasmDao.save(germplasm);
+
+					// inherit 'selection history at fixation' names of parent if parent is part of a group (= has mgid)
+					if (germplasm.getMgid() > 0) {
+						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm);
+					}
+
 					// set Lgid to GID if it's value was not set previously
 					if (germplasm.getLgid().equals(Integer.valueOf(0))) {
 						germplasm.setLgid(germplasm.getGid());
-					}
-
-					// Save name entries
-					for (final Name name : nameList) {
-						name.setGermplasmId(germplasm.getGid());
-						nameDao.save(name);
 					}
 
 					// Save Germplasm attributes

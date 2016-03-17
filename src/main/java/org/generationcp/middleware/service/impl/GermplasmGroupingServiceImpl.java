@@ -196,7 +196,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	 * through the germplasm details screen but will not be the name displayed in lists.
 	 * 
 	 */
-	private void copySelectionHistory(Germplasm germplasm, Name selectionHistoryName) {
+	private void addOrUpdateSelectionHistoryAtFixationName(Germplasm germplasm, Name nameToCopyFrom) {
 
 		// 1. Make current preferred name a non-preferred name by setting nstat = 0
 		// because we are about to add a different name as preferred.
@@ -218,44 +218,60 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			Name newSelectionHistoryAtFixation = new Name();
 			newSelectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
 			newSelectionHistoryAtFixation.setTypeId(selHisFixNameType.getFldno());
-			newSelectionHistoryAtFixation.setNval(selectionHistoryName.getNval());
+			newSelectionHistoryAtFixation.setNval(nameToCopyFrom.getNval());
 			newSelectionHistoryAtFixation.setNstat(1); // nstat = 1 means it is preferred name.
-			newSelectionHistoryAtFixation.setUserId(selectionHistoryName.getUserId());
-			newSelectionHistoryAtFixation.setLocationId(selectionHistoryName.getLocationId());
+			newSelectionHistoryAtFixation.setUserId(nameToCopyFrom.getUserId());
+			newSelectionHistoryAtFixation.setLocationId(nameToCopyFrom.getLocationId());
 			newSelectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
 			newSelectionHistoryAtFixation.setReferenceId(0);
 			germplasm.getNames().add(newSelectionHistoryAtFixation);
 		} else {
-			existingSelHisFixName.setNval(selectionHistoryName.getNval());
+			existingSelHisFixName.setNval(nameToCopyFrom.getNval());
 			existingSelHisFixName.setNstat(1); // nstat = 1 means it is preferred name.
 			existingSelHisFixName.setNdate(Util.getCurrentDateAsIntegerValue());
 		}
 	}
 
-	public void copySelectionHistory(Germplasm germplasm) {
+	private void copySelectionHistory(Germplasm germplasm) {
 
-		Name selectionHistoryName = getSelectionHistory(germplasm);
+		Name mySelectionHistory = getSelectionHistory(germplasm);
 
-		if (selectionHistoryName != null) {
-			copySelectionHistory(germplasm, selectionHistoryName);
+		if (mySelectionHistory != null) {
+			addOrUpdateSelectionHistoryAtFixationName(germplasm, mySelectionHistory);
 			LOG.info("Selection history at fixation for gid {} saved as germplasm name {} .", germplasm.getGid(),
-					selectionHistoryName.getNval());
+					mySelectionHistory.getNval());
 		} else {
-			LOG.info("No selection history type name was found for germplasm {}.", germplasm.getGid());
+			LOG.info("No selection history type name was found for germplasm {}. Nothing to copy.", germplasm.getGid());
+		}
+	}
+
+	@Override
+	public void copyParentalSelectionHistoryAtFixation(Germplasm germplasm) {
+
+		Germplasm parent = this.germplasmDAO.getById(germplasm.getGpid2());
+		Name parentSelectionHistoryAtFixation = getSelectionHistoryAtFixation(parent);
+
+		if (parentSelectionHistoryAtFixation != null) {
+			addOrUpdateSelectionHistoryAtFixationName(germplasm, parentSelectionHistoryAtFixation);
+			LOG.info("Selection history at fixation {} was copied from parent with gid {} to the child germplasm with gid {}.",
+					parentSelectionHistoryAtFixation.getNval(), germplasm.getGid(), parent.getGid());
+		} else {
+			LOG.info("No 'selection history at fixation' type name was found for parent germplasm with gid {}. Nothing to copy.",
+					parent.getGid());
 		}
 	}
 
 	private void copySelectionHistoryForCross(Germplasm cross, Germplasm previousCross) {
 
-		Name selectionHistoryName = getSelectionHistory(previousCross);
+		Name previousCrossSelectionHistory = getSelectionHistory(previousCross);
 
-		if (selectionHistoryName != null) {
-			copySelectionHistory(cross, selectionHistoryName);
+		if (previousCrossSelectionHistory != null) {
+			addOrUpdateSelectionHistoryAtFixationName(cross, previousCrossSelectionHistory);
 			LOG.info("Selection history {} for cross with gid {} was copied from previous cross with gid {}.",
-					selectionHistoryName.getNval(),
+					previousCrossSelectionHistory.getNval(),
 					cross.getGid(), previousCross.getGid());
 		} else {
-			LOG.info("No selection history type name was found for previous cross with gid {}.", previousCross.getGid());
+			LOG.info("No selection history type name was found for previous cross with gid {}. Nothing to copy.", previousCross.getGid());
 		}
 	}
 
