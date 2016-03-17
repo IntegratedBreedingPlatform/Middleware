@@ -506,4 +506,34 @@ public class GermplasmGroupingServiceImplTest {
 		// One other save should occur for saving mgid on previous cross.
 		Mockito.verify(this.germplasmDAO, Mockito.times(2)).save(Mockito.any(Germplasm.class));
 	}
+
+	@Test
+	public void testGetSelectionHistory() {
+		Germplasm germplasm = new Germplasm();
+		// Germplasm has no name yet, expect to return null
+		Assert.assertNull(this.germplasmGroupingService.getSelectionHistory(germplasm));
+		
+		// Add a matching name
+		Name selHisNameExpected = new Name(1);
+		selHisNameExpected.setTypeId(this.selectionHistoryNameCode.getFldno());
+		germplasm.getNames().add(selHisNameExpected);
+
+		Name selectionHistoryName = this.germplasmGroupingService.getSelectionHistory(germplasm);
+		Assert.assertEquals(selHisNameExpected, selectionHistoryName);
+	}
+
+	@Test
+	public void testGetSelectionHistoryAtFixation() {
+		Germplasm germplasm = new Germplasm();
+		// Germplasm has no name yet, expect to return null
+		Assert.assertNull(this.germplasmGroupingService.getSelectionHistoryAtFixation(germplasm));
+
+		// Add a matching name
+		Name selHisFixNameExpected = new Name(1);
+		selHisFixNameExpected.setTypeId(this.selHisFixNameCode.getFldno());
+		germplasm.getNames().add(selHisFixNameExpected);
+
+		Name selHisFixNameActual = this.germplasmGroupingService.getSelectionHistoryAtFixation(germplasm);
+		Assert.assertEquals(selHisFixNameExpected, selHisFixNameActual);
+	}
 }
