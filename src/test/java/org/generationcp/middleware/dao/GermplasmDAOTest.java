@@ -242,6 +242,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		}
 	}
 
+	@Test
 	public void testGetManagementGroupMembers() {
 		List<Germplasm> groupMembers = this.dao.getManagementGroupMembers(1);
 		Assert.assertNotNull("getManagementGroupMembers() should never return null when supplied with proper mgid.", groupMembers);
