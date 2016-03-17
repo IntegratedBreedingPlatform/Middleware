@@ -3,6 +3,7 @@ package org.generationcp.middleware.auditory;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.manager.api.AuditorDataManager;
 import org.generationcp.middleware.pojos.Bibref;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -29,6 +30,7 @@ public class AuditorUT {
 
 	Auditor auditor;
 	Bibref expectedAuditory;
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
@@ -48,12 +50,14 @@ public class AuditorUT {
 
 		//Then
 		assertThat(auditory.getId()).isGreaterThan(0);
-		verify(bibrefDaoMock).save(any(Bibref.class));
+		verify(managerMock).save(any(Bibref.class));
 	}
 
 	@Test
 	public void startAuditoryCreatesAuditoryElementWithFilename() throws Exception {
 		//Given
+		UserDefinedField userDefinedField = new UserDefinedField();
+		when(managerMock.getBibrefType()).thenReturn(userDefinedField);
 		ArgumentCaptor<Bibref> auditoryCaptor = ArgumentCaptor.forClass(Bibref.class);
 		when(managerMock.save(any(Bibref.class))).thenReturn(expectedAuditory);
 
@@ -62,7 +66,7 @@ public class AuditorUT {
 		auditor.startAuditory(DUMMY_USERNAME, DUMMY_FILENAME);
 
 		//Then
-		verify(bibrefDaoMock).save(auditoryCaptor.capture());
+		verify(managerMock).save(auditoryCaptor.capture());
 		Bibref capturedAuditory = auditoryCaptor.getValue();
 		assertThat(capturedAuditory.getFilename()).isSameAs(DUMMY_FILENAME);
 	}
@@ -72,12 +76,14 @@ public class AuditorUT {
 		//Given
 		ArgumentCaptor<Bibref> auditoryCaptor = ArgumentCaptor.forClass(Bibref.class);
 		when(managerMock.save(any(Bibref.class))).thenReturn(expectedAuditory);
+		UserDefinedField userDefinedField = new UserDefinedField();
+		when(managerMock.getBibrefType()).thenReturn(userDefinedField);
 
 		//When
 		auditor.startAuditory(DUMMY_USERNAME, DUMMY_FILENAME);
 
 		//Then
-		verify(bibrefDaoMock).save(auditoryCaptor.capture());
+		verify(managerMock).save(auditoryCaptor.capture());
 		Bibref capturedAuditory = auditoryCaptor.getValue();
 		assertThat(capturedAuditory.getUsername()).isSameAs(DUMMY_USERNAME);
 	}
@@ -85,6 +91,8 @@ public class AuditorUT {
 	@Test
 	public void failStartAuditoryWhenManagerFails() throws AuditoryException {
 		//Given
+		UserDefinedField userDefinedField = new UserDefinedField();
+		when(managerMock.getBibrefType()).thenReturn(userDefinedField);
 		when(managerMock.save(any(Bibref.class))).thenThrow(Exception.class);
 
 		//When
@@ -95,13 +103,10 @@ public class AuditorUT {
 			assertThat(e).hasMessage("Could not start auditory");
 		}
 
-		//Then
-		verify(bibrefDaoMock,never()).save(any(Bibref.class));
-
 	}
 
 	@Test
-	public void failStartAuditoryWhenFilenameInputdataIsInvalid() {
+	public void failStartAuditoryWhenFilenameInputdataIsInvalid() throws AuditoryException {
 		//When
 		try {
 			auditor.startAuditory(DUMMY_USERNAME, null);
@@ -111,10 +116,10 @@ public class AuditorUT {
 		}
 
 		//Then
-		verify(bibrefDaoMock,never()).save(any(Bibref.class));
+		verify(managerMock,never()).save(any(Bibref.class));
 	}
 	@Test
-	public void failStartAuditoryWhenUsernameInputdataIsInvalid() {
+	public void failStartAuditoryWhenUsernameInputdataIsInvalid() throws AuditoryException {
 		//When
 		try {
 			auditor.startAuditory(null, DUMMY_FILENAME);
@@ -124,7 +129,7 @@ public class AuditorUT {
 		}
 
 		//Then
-		verify(bibrefDaoMock,never()).save(any(Bibref.class));
+		verify(managerMock,never()).save(any(Bibref.class));
 	}
 
 	@Test
