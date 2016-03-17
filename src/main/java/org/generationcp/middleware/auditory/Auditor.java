@@ -8,10 +8,11 @@ import org.generationcp.middleware.pojos.Bibref;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
 /**
  * This component behaves as an Auditor.
  * Each instance of the object takes care of one and only one Auditory that might audit many elements in the domain model.
-* */
+ */
 @Component
 @Scope("prototype")
 public class Auditor {
@@ -30,13 +31,12 @@ public class Auditor {
 		this.manager = manager;
 	}
 
-
 	public Auditory startAuditory(String username, String filename) throws AuditoryException {
-		if (username==null || username.isEmpty() || filename==null || filename.isEmpty()){
+		if (username == null || username.isEmpty() || filename == null || filename.isEmpty()) {
 			throw new AuditoryException(INVALID_INPUT_DATA);
 		}
 
-		try{
+		try {
 
 			ref = new Bibref();
 			ref.setAuthors(username);
@@ -57,13 +57,13 @@ public class Auditor {
 			ref.setPucntry(EMPTY_STRING);
 			ref = manager.save(ref);
 			return this.ref;
-		}catch (Exception ex){
+		} catch (Exception ex) {
 			throw new AuditoryException(COULD_NOT_START_AUDITORY);
 		}
 	}
 
 	public Auditable audit(Auditable auditable) throws AuditoryException {
-		if(ref == null || ref.getId()==0 || auditable==null){
+		if (ref == null || ref.getId() == 0 || auditable == null) {
 			throw new AuditoryException(MISSUSE_OF_AUDITOR_COMPONENT);
 		}
 		auditable.audit(ref);
@@ -71,6 +71,6 @@ public class Auditor {
 	}
 
 	public void closeAuditory() {
-		ref=null;
+		ref = null;
 	}
 }
