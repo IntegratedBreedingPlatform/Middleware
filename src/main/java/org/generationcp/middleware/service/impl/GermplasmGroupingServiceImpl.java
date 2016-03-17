@@ -156,21 +156,33 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		return true;
 	}
 
-	private Name getSelectionHistory(Germplasm germplasm) {
-		List<Name> names = germplasm.getNames();
+	Name getSelectionHistory(Germplasm germplasm) {
 		UserDefinedField selectionHistoryNameType =
 				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
 
-		Name selectionHistoryName = null;
-		if (!names.isEmpty() && selectionHistoryNameType != null) {
+		return findNameByType(germplasm, selectionHistoryNameType);
+	}
+
+	Name findNameByType(Germplasm germplasm, UserDefinedField nameType) {
+		List<Name> names = germplasm.getNames();
+		Name matchingName = null;
+		if (!names.isEmpty() && nameType != null) {
 			for (Name name : names) {
-				if (selectionHistoryNameType.getFldno().equals(name.getTypeId())) {
-					selectionHistoryName = name;
+				if (nameType.getFldno().equals(name.getTypeId())) {
+					matchingName = name;
 					break;
 				}
 			}
 		}
-		return selectionHistoryName;
+		return matchingName;
+	}
+
+	Name getSelectionHistoryAtFixation(Germplasm germplasm) {
+		UserDefinedField selectionHistoryAtFixationNameType =
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
+						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
+
+		return findNameByType(germplasm, selectionHistoryAtFixationNameType);
 	}
 
 	/**
@@ -199,15 +211,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
 						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 
-		Name existingSelHisFixName = null;
-		if (!germplasm.getNames().isEmpty()) {
-			for (Name name : germplasm.getNames()) {
-				if (selHisFixNameType.getFldno().equals(name.getTypeId())) {
-					existingSelHisFixName = name;
-					break;
-				}
-			}
-		}
+		Name existingSelHisFixName = getSelectionHistoryAtFixation(germplasm);
 
 		// 3. Copy selection history as "selection history at fixation" and make it a preferred name.
 		if (existingSelHisFixName == null) {
