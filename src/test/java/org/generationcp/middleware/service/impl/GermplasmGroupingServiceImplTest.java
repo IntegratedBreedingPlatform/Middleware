@@ -536,4 +536,29 @@ public class GermplasmGroupingServiceImplTest {
 		Name selHisFixNameActual = this.germplasmGroupingService.getSelectionHistoryAtFixation(germplasm);
 		Assert.assertEquals(selHisFixNameExpected, selHisFixNameActual);
 	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testGetSelectionHistoryNameType() {
+
+		Mockito.when(
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE))
+				.thenReturn(null);
+
+		this.germplasmGroupingService.getSelectionHistoryNameType();
+		Assert.fail("When " + GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE
+				+ " name type is not setup in UDFLD table, IllegalStateException is expected which did not happen.");
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testGetSelectionHistoryAtFixationNameType() {
+
+		Mockito.when(
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
+						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE))
+				.thenReturn(null);
+
+		this.germplasmGroupingService.getSelectionHistoryAtFixationNameType();
+		Assert.fail("When " + GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE
+				+ " name type is not setup in UDFLD table, IllegalStateException is expected which did not happen.");
+	}
 }
