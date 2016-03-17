@@ -126,9 +126,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 				criteria.setProjection(projectionList);
 				criteria.add(Restrictions.eq("l.gid", gid));
 				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
-				final Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
-				final Criterion nullProgramUUID = Restrictions.isNull("programUUID");
-				criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
+				this.includeListsWithNoProgramUUID(programUUID, criteria);
 				criteria.setFirstResult(start);
 				criteria.setMaxResults(numOfRows);
 				criteria.addOrder(Order.asc("name"));
@@ -140,6 +138,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			this.logAndThrowException("Error with getByGid(gid=" + gid + ") query from GermplasmList: " + e.getMessage(), e);
 		}
 		return new ArrayList<GermplasmList>();
+	}
+
+	private void includeListsWithNoProgramUUID(final String programUUID, final Criteria criteria) {
+		final Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
+		final Criterion nullProgramUUID = Restrictions.isNull("programUUID");
+		criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
 	}
 
 	public long countByGID(final Integer gid) {
@@ -165,9 +169,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 				criteria.createAlias("listData", "l");
 				criteria.add(Restrictions.eq("l.gid", gid));
 				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
-				final Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
-				final Criterion nullProgramUUID = Restrictions.isNull("programUUID");
-				criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
+				this.includeListsWithNoProgramUUID(programUUID, criteria);
 				this.hideSnapshotListTypes(criteria);
 
 				criteria.setProjection(Projections.countDistinct("id"));
@@ -195,9 +197,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 			criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
 
-			final Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
-			final Criterion nullProgramUUID = Restrictions.isNull("programUUID");
-			criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
+			this.includeListsWithNoProgramUUID(programUUID, criteria);
 
 			criteria.setFirstResult(start);
 			criteria.setMaxResults(numOfRows);
@@ -272,13 +272,11 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		try {
 			final Criterion topFolder = Restrictions.eq("parent.id", 0);
 			final Criterion nullFolder = Restrictions.isNull("parent");
-			final Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
-			final Criterion nullProgramUUID = Restrictions.isNull("programUUID");
 			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 			criteria.add(Restrictions.or(topFolder, nullFolder));
 			criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
-			criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
 
+			this.includeListsWithNoProgramUUID(programUUID, criteria);
 			this.hideSnapshotListTypes(criteria);
 
 			criteria.setFirstResult(start);
@@ -295,14 +293,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		try {
 			final Criterion topFolder = Restrictions.eq("parent.id", 0);
 			final Criterion nullFolder = Restrictions.isNull("parent");
-			final Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
-			final Criterion nullProgramUUID = Restrictions.isNull("programUUID");
 			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 			criteria.add(Restrictions.or(topFolder, nullFolder));
 			criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
-			criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
 
 			this.hideSnapshotListTypes(criteria);
+			this.includeListsWithNoProgramUUID(programUUID, criteria);
 
 			criteria.setProjection(Projections.rowCount());
 			return ((Long) criteria.uniqueResult()).longValue();
@@ -331,9 +327,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 				criteria.add(Restrictions.eq("parent", new GermplasmList(parentId)));
 				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
 
-				final Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
-				final Criterion nullProgramUUID = Restrictions.isNull("programUUID");
-				criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
+				this.includeListsWithNoProgramUUID(programUUID, criteria);
 
 				this.hideSnapshotListTypes(criteria);
 
@@ -357,9 +351,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 				criteria.add(Restrictions.eq("userId", userID));
 				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
 
-				final Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
-				final Criterion nullProgramUUID = Restrictions.isNull("programUUID");
-				criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
+				this.includeListsWithNoProgramUUID(programUUID, criteria);
 
 				this.hideSnapshotListTypes(criteria);
 
@@ -392,9 +384,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 				criteria.add(Restrictions.eq("parent", new GermplasmList(parentId)));
 				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
 
-				final Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
-				final Criterion nullProgramUUID = Restrictions.isNull("programUUID");
-				criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
+				this.includeListsWithNoProgramUUID(programUUID, criteria);
 
 				this.hideSnapshotListTypes(criteria);
 
