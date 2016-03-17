@@ -10,19 +10,19 @@ import org.generationcp.middleware.util.Util;
 
 public class GermplasmTestDataInitializer {
 
-	public Germplasm createGermplasmWithPreferredName(){
-		Name name = new Name(null, null, 1, 1, 1, "Name", 0, 0, 0);
-		Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
+	public Germplasm createGermplasmWithPreferredName() {
+		final Name name = new Name(null, null, 1, 1, 1, "Name", 0, 0, 0);
+		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
 		return germplasm;
 	}
-	
+
 	public static Germplasm createGermplasm(final int id) {
 		final Germplasm germplasm = new Germplasm();
 		germplasm.setGid(id);
 		germplasm.setGdate(20150101);
 		germplasm.setGpid1(1);
 		germplasm.setGpid2(2);
-		germplasm.setPreferredName(createGermplasmName(id));
+		germplasm.setPreferredName(GermplasmTestDataInitializer.createGermplasmName(id));
 		return germplasm;
 	}
 
@@ -38,7 +38,7 @@ public class GermplasmTestDataInitializer {
 		final List<Name> names = new ArrayList<Name>();
 
 		for (int i = 1; i <= noOfEntries; i++) {
-			names.add(createGermplasmName(i));
+			names.add(GermplasmTestDataInitializer.createGermplasmName(i));
 		}
 
 		return names;

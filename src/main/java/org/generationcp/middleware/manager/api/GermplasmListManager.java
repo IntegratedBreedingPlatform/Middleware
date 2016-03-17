@@ -510,7 +510,7 @@ public interface GermplasmListManager {
 	 * @return
 	 */
 	org.generationcp.middleware.pojos.GermplasmList getGermplasmListByListRef(Integer listRef);
-	
+
 	/**
 	 * Retrieves metadata (such as count of entries, list owner) in one go for all lists. This helps avoiding the need to query metadata in
 	 * a loop per list.
@@ -527,7 +527,7 @@ public interface GermplasmListManager {
 	 * @return The count of Germplasm Lists associated with the given Germplasm ID/
 	 */
 	long countGermplasmListByGIDandProgramUUID(Integer gid, String programUUID);
-	
+
 	/**
 	 * Returns the germplasm lists that are associated with the specified GID and programUUID.
 	 *

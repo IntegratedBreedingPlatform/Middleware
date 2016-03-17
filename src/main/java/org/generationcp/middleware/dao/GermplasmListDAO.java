@@ -110,15 +110,15 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		}
 		return new ArrayList<GermplasmList>();
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<GermplasmList> getByGIDandProgramUUID(final Integer gid, final int start, final int numOfRows, final String programUUID) {
 		try {
 			if (gid != null) {
 				final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 				criteria.createAlias("listData", "l");
-				ProjectionList projectionListForId = Projections.projectionList();
-				ProjectionList projectionList = Projections.projectionList();
+				final ProjectionList projectionListForId = Projections.projectionList();
+				final ProjectionList projectionList = Projections.projectionList();
 				projectionList.add(Projections.distinct(projectionListForId.add(Projections.property("id"), "id")));
 				projectionList.add(Projections.property("name"), "name");
 				projectionList.add(Projections.property("description"), "description");
@@ -131,7 +131,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 				criteria.setMaxResults(numOfRows);
 				criteria.addOrder(Order.asc("name"));
 				this.hideSnapshotListTypes(criteria);
-				criteria.setResultTransformer(Transformers.aliasToBean(GermplasmList.class)); 
+				criteria.setResultTransformer(Transformers.aliasToBean(GermplasmList.class));
 				return criteria.list();
 			}
 		} catch (final HibernateException e) {
@@ -155,7 +155,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		}
 		return 0;
 	}
-	
+
 	public long countByGIDandProgramUUID(final Integer gid, final String programUUID) {
 		try {
 			if (gid != null) {
@@ -165,7 +165,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
 				criteria.add(Restrictions.eq("programUUID", programUUID));
 				this.hideSnapshotListTypes(criteria);
-				
+
 				criteria.setProjection(Projections.countDistinct("id"));
 				return ((Long) criteria.uniqueResult()).longValue(); // count
 			}
@@ -473,26 +473,22 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			final SQLQuery query;
 
 			if (o.equals(Operation.EQUAL)) {
-				query =
-						this.getSession().createSQLQuery(
-								this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_EQUAL, programUUID));
+				query = this.getSession().createSQLQuery(
+						this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_EQUAL, programUUID));
 				query.setParameter("gidLength", q.length());
 				query.setParameter("q", q);
 				query.setParameter("qNoSpaces", q.replace(" ", ""));
 				query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
 			} else {
 				if (q.contains("%") || q.contains("_")) {
-					query =
-							this.getSession().createSQLQuery(
-									this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_GID_LIKE,
-											programUUID));
+					query = this.getSession().createSQLQuery(
+							this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_GID_LIKE, programUUID));
 					query.setParameter("q", q);
 					query.setParameter("qNoSpaces", q.replace(" ", ""));
 					query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
 				} else {
-					query =
-							this.getSession().createSQLQuery(
-									this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST, programUUID));
+					query = this.getSession().createSQLQuery(
+							this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST, programUUID));
 					query.setParameter("gidLength", q.length());
 					query.setParameter("q", q + "%");
 					query.setParameter("qNoSpaces", q.replace(" ", "") + "%");
@@ -549,22 +545,22 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 			return (Integer) criteria.uniqueResult();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getListDataListIDFromListDataProjectListID(listDataProjectListID="
-					+ listDataProjectListID + ") query from GermplasmList: " + e.getMessage(), e);
+			this.logAndThrowException("Error with getListDataListIDFromListDataProjectListID(listDataProjectListID=" + listDataProjectListID
+					+ ") query from GermplasmList: " + e.getMessage(), e);
 		}
 
 		return 0;
 	}
-	
-	//returns all the list of the program regardless of the type and status
+
+	// returns all the list of the program regardless of the type and status
 	@SuppressWarnings("unchecked")
 	public List<GermplasmList> getListsByProgram(final String programUUID) {
 		final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 		criteria.add(Restrictions.eq("programUUID", programUUID));
 		return criteria.list();
 	}
-	
-	//returns all the list of the program except the deleted ones and snapshot list
+
+	// returns all the list of the program except the deleted ones and snapshot list
 	@SuppressWarnings("unchecked")
 	public List<GermplasmList> getListsByProgramUUID(final String programUUID) {
 		final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
@@ -581,13 +577,11 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	public List<Object[]> getAllListMetadata() {
-		final StringBuilder sql =
-				new StringBuilder("SELECT ln.listid as listId, COUNT(ld.listid) as count, lu.uname as userName, lp.fname as firstName, lp.lname lastName")
-						.append(" FROM listnms ln ")
-						.append("	INNER JOIN listdata ld ON ln.listid = ld.listid ")
+		final StringBuilder sql = new StringBuilder(
+				"SELECT ln.listid as listId, COUNT(ld.listid) as count, lu.uname as userName, lp.fname as firstName, lp.lname lastName")
+						.append(" FROM listnms ln ").append("	INNER JOIN listdata ld ON ln.listid = ld.listid ")
 						.append("   LEFT OUTER JOIN users lu ON ln.listuid = lu.userid ")
-						.append("   LEFT OUTER JOIN persons lp ON lp.personid = lu.personid ")
-						.append(" WHERE  ln.listtype != 'FOLDER' ")
+						.append("   LEFT OUTER JOIN persons lp ON lp.personid = lu.personid ").append(" WHERE  ln.listtype != 'FOLDER' ")
 						.append(" GROUP BY ln.listid;");
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
