@@ -126,7 +126,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 				criteria.setProjection(projectionList);
 				criteria.add(Restrictions.eq("l.gid", gid));
 				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
-				criteria.add(Restrictions.eq("programUUID", programUUID));
+				final Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
+				final Criterion nullProgramUUID = Restrictions.isNull("programUUID");
+				criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
 				criteria.setFirstResult(start);
 				criteria.setMaxResults(numOfRows);
 				criteria.addOrder(Order.asc("name"));
@@ -163,7 +165,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 				criteria.createAlias("listData", "l");
 				criteria.add(Restrictions.eq("l.gid", gid));
 				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
-				criteria.add(Restrictions.eq("programUUID", programUUID));
+				final Criterion sameProgramUUID = Restrictions.eq("programUUID", programUUID);
+				final Criterion nullProgramUUID = Restrictions.isNull("programUUID");
+				criteria.add(Restrictions.or(sameProgramUUID, nullProgramUUID));
 				this.hideSnapshotListTypes(criteria);
 
 				criteria.setProjection(Projections.countDistinct("id"));
