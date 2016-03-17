@@ -561,4 +561,39 @@ public class GermplasmGroupingServiceImplTest {
 		Assert.fail("When " + GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE
 				+ " name type is not setup in UDFLD table, IllegalStateException is expected which did not happen.");
 	}
+
+	@Test
+	public void testCopyParentalSelectionHistoryAtFixation() {
+
+		// Setup source germplasm which has SELHISFIX name
+		Germplasm advancedGermplasmSource = new Germplasm(2);
+
+		Name selHisFixNameOfParent = new Name(11);
+		selHisFixNameOfParent.setNstat(1);
+		selHisFixNameOfParent.setNval("CML");
+		selHisFixNameOfParent.setTypeId(this.selHisFixNameCode.getFldno());
+		advancedGermplasmSource.getNames().add(selHisFixNameOfParent);
+
+		// Setup advanced germplasm with a name given on advancing
+		Germplasm advancedGermplasm = new Germplasm(3);
+		advancedGermplasm.setGpid1(1);
+		advancedGermplasm.setGpid2(advancedGermplasm.getGpid2());
+
+		Name normalAdvancingNameOfChild = new Name(22);
+		normalAdvancingNameOfChild.setNstat(1); // Set as preferred.
+		normalAdvancingNameOfChild.setNval("CML-1-1-1");
+		normalAdvancingNameOfChild.setTypeId(5);
+		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
+
+		// Setup parent child relationship mock between the two via gpid2
+		Mockito.when(this.germplasmDAO.getById(advancedGermplasm.getGpid2())).thenReturn(advancedGermplasmSource);
+
+		// Invoke the service
+		this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(advancedGermplasm);
+
+		// Expect that the advanced germplasm now has two names (SELHISFIX name for parent gets added)
+		Assert.assertEquals("Advanced germplasm should have one additional name inherited from source (parent).", 2, advancedGermplasm
+				.getNames().size());
+		Assert.assertEquals("Normal advancing name should become non-preferred", new Integer(0), normalAdvancingNameOfChild.getNstat());
+	}
 }
