@@ -156,21 +156,28 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		return true;
 	}
 
-	private Name getSelectionHistory(Germplasm germplasm) {
-		List<Name> names = germplasm.getNames();
-		UserDefinedField selectionHistoryNameType =
-				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
+	Name getSelectionHistory(Germplasm germplasm) {
+		UserDefinedField selectionHistoryNameType = getSelectionHistoryNameType();
+		return findNameByType(germplasm, selectionHistoryNameType);
+	}
 
-		Name selectionHistoryName = null;
-		if (!names.isEmpty() && selectionHistoryNameType != null) {
+	Name findNameByType(Germplasm germplasm, UserDefinedField nameType) {
+		List<Name> names = germplasm.getNames();
+		Name matchingName = null;
+		if (!names.isEmpty() && nameType != null) {
 			for (Name name : names) {
-				if (selectionHistoryNameType.getFldno().equals(name.getTypeId())) {
-					selectionHistoryName = name;
+				if (nameType.getFldno().equals(name.getTypeId())) {
+					matchingName = name;
 					break;
 				}
 			}
 		}
-		return selectionHistoryName;
+		return matchingName;
+	}
+
+	Name getSelectionHistoryAtFixation(Germplasm germplasm) {
+		UserDefinedField selectionHistoryAtFixationNameType = getSelectionHistoryAtFixationNameType();
+		return findNameByType(germplasm, selectionHistoryAtFixationNameType);
 	}
 
 	/**
@@ -184,7 +191,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	 * through the germplasm details screen but will not be the name displayed in lists.
 	 * 
 	 */
-	private void copySelectionHistory(Germplasm germplasm, Name selectionHistoryName) {
+	private void addOrUpdateSelectionHistoryAtFixationName(Germplasm germplasm, Name nameToCopyFrom) {
 
 		// 1. Make current preferred name a non-preferred name by setting nstat = 0
 		// because we are about to add a different name as preferred.
@@ -194,64 +201,93 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			currentPreferredName.setNstat(0);
 		}
 
-		// 2. Remove if there is an existing "selection history at fixation"
-		UserDefinedField selHisFixNameType =
-				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
-						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
+		// 2. Check if there is an existing "selection history at fixation" name
+		Name existingSelHisFixName = getSelectionHistoryAtFixation(germplasm);
 
-		Name existingSelHisFixName = null;
-		if (!germplasm.getNames().isEmpty()) {
-			for (Name name : germplasm.getNames()) {
-				if (selHisFixNameType.getFldno().equals(name.getTypeId())) {
-					existingSelHisFixName = name;
-					break;
-				}
-			}
-		}
-
-		// 3. Copy selection history as "selection history at fixation" and make it a preferred name.
+		// 3. Add a new name as "selection history at fixation" with supplied name value and make it a preferred name.
 		if (existingSelHisFixName == null) {
+			UserDefinedField selHisFixNameType = getSelectionHistoryAtFixationNameType();
 			Name newSelectionHistoryAtFixation = new Name();
 			newSelectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
 			newSelectionHistoryAtFixation.setTypeId(selHisFixNameType.getFldno());
-			newSelectionHistoryAtFixation.setNval(selectionHistoryName.getNval());
+			newSelectionHistoryAtFixation.setNval(nameToCopyFrom.getNval());
 			newSelectionHistoryAtFixation.setNstat(1); // nstat = 1 means it is preferred name.
-			newSelectionHistoryAtFixation.setUserId(selectionHistoryName.getUserId());
-			newSelectionHistoryAtFixation.setLocationId(selectionHistoryName.getLocationId());
+			newSelectionHistoryAtFixation.setUserId(nameToCopyFrom.getUserId());
+			newSelectionHistoryAtFixation.setLocationId(nameToCopyFrom.getLocationId());
 			newSelectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
 			newSelectionHistoryAtFixation.setReferenceId(0);
 			germplasm.getNames().add(newSelectionHistoryAtFixation);
-		} else {
-			existingSelHisFixName.setNval(selectionHistoryName.getNval());
+		} else { 
+			// 4. Update the extisting "selection history at fixation" with supplied name and make it a preferred name.
+			existingSelHisFixName.setNval(nameToCopyFrom.getNval());
 			existingSelHisFixName.setNstat(1); // nstat = 1 means it is preferred name.
 			existingSelHisFixName.setNdate(Util.getCurrentDateAsIntegerValue());
 		}
 	}
 
-	public void copySelectionHistory(Germplasm germplasm) {
+	UserDefinedField getSelectionHistoryAtFixationNameType() {
+		UserDefinedField selHisFixNameType =
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
+						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
+		if (selHisFixNameType == null) {
+			throw new IllegalStateException(
+					"Missing required reference data: Please ensure User defined field (UDFLD) record for name type '"
+							+ GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE + "' has been setup.");
+		}
+		return selHisFixNameType;
+	}
 
-		Name selectionHistoryName = getSelectionHistory(germplasm);
+	UserDefinedField getSelectionHistoryNameType() {
+		UserDefinedField selectionHistoryNameType =
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
+		if (selectionHistoryNameType == null) {
+			throw new IllegalStateException(
+					"Missing required reference data: Please ensure User defined field (UDFLD) record for name type '"
+							+ GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE + "' has been setup.");
+		}
+		return selectionHistoryNameType;
+	}
 
-		if (selectionHistoryName != null) {
-			copySelectionHistory(germplasm, selectionHistoryName);
+	private void copySelectionHistory(Germplasm germplasm) {
+
+		Name mySelectionHistory = getSelectionHistory(germplasm);
+
+		if (mySelectionHistory != null) {
+			addOrUpdateSelectionHistoryAtFixationName(germplasm, mySelectionHistory);
 			LOG.info("Selection history at fixation for gid {} saved as germplasm name {} .", germplasm.getGid(),
-					selectionHistoryName.getNval());
+					mySelectionHistory.getNval());
 		} else {
-			LOG.info("No selection history type name was found for germplasm {}.", germplasm.getGid());
+			LOG.info("No selection history type name was found for germplasm {}. Nothing to copy.", germplasm.getGid());
+		}
+	}
+
+	@Override
+	public void copyParentalSelectionHistoryAtFixation(Germplasm germplasm) {
+
+		Germplasm parent = this.germplasmDAO.getById(germplasm.getGpid2());
+		Name parentSelectionHistoryAtFixation = getSelectionHistoryAtFixation(parent);
+
+		if (parentSelectionHistoryAtFixation != null) {
+			addOrUpdateSelectionHistoryAtFixationName(germplasm, parentSelectionHistoryAtFixation);
+			LOG.info("Selection history at fixation {} was copied from parent with gid {} to the child germplasm with gid {}.",
+					parentSelectionHistoryAtFixation.getNval(), germplasm.getGid(), parent.getGid());
+		} else {
+			LOG.info("No 'selection history at fixation' type name was found for parent germplasm with gid {}. Nothing to copy.",
+					parent.getGid());
 		}
 	}
 
 	private void copySelectionHistoryForCross(Germplasm cross, Germplasm previousCross) {
 
-		Name selectionHistoryName = getSelectionHistory(previousCross);
+		Name previousCrossSelectionHistory = getSelectionHistory(previousCross);
 
-		if (selectionHistoryName != null) {
-			copySelectionHistory(cross, selectionHistoryName);
+		if (previousCrossSelectionHistory != null) {
+			addOrUpdateSelectionHistoryAtFixationName(cross, previousCrossSelectionHistory);
 			LOG.info("Selection history {} for cross with gid {} was copied from previous cross with gid {}.",
-					selectionHistoryName.getNval(),
+					previousCrossSelectionHistory.getNval(),
 					cross.getGid(), previousCross.getGid());
 		} else {
-			LOG.info("No selection history type name was found for previous cross with gid {}.", previousCross.getGid());
+			LOG.info("No selection history type name was found for previous cross with gid {}. Nothing to copy.", previousCross.getGid());
 		}
 	}
 

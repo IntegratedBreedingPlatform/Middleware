@@ -506,4 +506,94 @@ public class GermplasmGroupingServiceImplTest {
 		// One other save should occur for saving mgid on previous cross.
 		Mockito.verify(this.germplasmDAO, Mockito.times(2)).save(Mockito.any(Germplasm.class));
 	}
+
+	@Test
+	public void testGetSelectionHistory() {
+		Germplasm germplasm = new Germplasm();
+		// Germplasm has no name yet, expect to return null
+		Assert.assertNull(this.germplasmGroupingService.getSelectionHistory(germplasm));
+		
+		// Add a matching name
+		Name selHisNameExpected = new Name(1);
+		selHisNameExpected.setTypeId(this.selectionHistoryNameCode.getFldno());
+		germplasm.getNames().add(selHisNameExpected);
+
+		Name selectionHistoryName = this.germplasmGroupingService.getSelectionHistory(germplasm);
+		Assert.assertEquals(selHisNameExpected, selectionHistoryName);
+	}
+
+	@Test
+	public void testGetSelectionHistoryAtFixation() {
+		Germplasm germplasm = new Germplasm();
+		// Germplasm has no name yet, expect to return null
+		Assert.assertNull(this.germplasmGroupingService.getSelectionHistoryAtFixation(germplasm));
+
+		// Add a matching name
+		Name selHisFixNameExpected = new Name(1);
+		selHisFixNameExpected.setTypeId(this.selHisFixNameCode.getFldno());
+		germplasm.getNames().add(selHisFixNameExpected);
+
+		Name selHisFixNameActual = this.germplasmGroupingService.getSelectionHistoryAtFixation(germplasm);
+		Assert.assertEquals(selHisFixNameExpected, selHisFixNameActual);
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testGetSelectionHistoryNameType() {
+
+		Mockito.when(
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE))
+				.thenReturn(null);
+
+		this.germplasmGroupingService.getSelectionHistoryNameType();
+		Assert.fail("When " + GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE
+				+ " name type is not setup in UDFLD table, IllegalStateException is expected which did not happen.");
+	}
+
+	@Test(expected = IllegalStateException.class)
+	public void testGetSelectionHistoryAtFixationNameType() {
+
+		Mockito.when(
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
+						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE))
+				.thenReturn(null);
+
+		this.germplasmGroupingService.getSelectionHistoryAtFixationNameType();
+		Assert.fail("When " + GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE
+				+ " name type is not setup in UDFLD table, IllegalStateException is expected which did not happen.");
+	}
+
+	@Test
+	public void testCopyParentalSelectionHistoryAtFixation() {
+
+		// Setup source germplasm which has SELHISFIX name
+		Germplasm advancedGermplasmSource = new Germplasm(2);
+
+		Name selHisFixNameOfParent = new Name(11);
+		selHisFixNameOfParent.setNstat(1);
+		selHisFixNameOfParent.setNval("CML");
+		selHisFixNameOfParent.setTypeId(this.selHisFixNameCode.getFldno());
+		advancedGermplasmSource.getNames().add(selHisFixNameOfParent);
+
+		// Setup advanced germplasm with a name given on advancing
+		Germplasm advancedGermplasm = new Germplasm(3);
+		advancedGermplasm.setGpid1(1);
+		advancedGermplasm.setGpid2(advancedGermplasm.getGpid2());
+
+		Name normalAdvancingNameOfChild = new Name(22);
+		normalAdvancingNameOfChild.setNstat(1); // Set as preferred.
+		normalAdvancingNameOfChild.setNval("CML-1-1-1");
+		normalAdvancingNameOfChild.setTypeId(5);
+		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
+
+		// Setup parent child relationship mock between the two via gpid2
+		Mockito.when(this.germplasmDAO.getById(advancedGermplasm.getGpid2())).thenReturn(advancedGermplasmSource);
+
+		// Invoke the service
+		this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(advancedGermplasm);
+
+		// Expect that the advanced germplasm now has two names (SELHISFIX name for parent gets added)
+		Assert.assertEquals("Advanced germplasm should have one additional name inherited from source (parent).", 2, advancedGermplasm
+				.getNames().size());
+		Assert.assertEquals("Normal advancing name should become non-preferred", new Integer(0), normalAdvancingNameOfChild.getNstat());
+	}
 }
