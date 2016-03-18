@@ -78,7 +78,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	@Override
 	public GermplasmGroup getGroupMembers(Germplasm founder) {
 		GermplasmGroup germplasmGroup = new GermplasmGroup();
-		germplasmGroup.setFounderGid(founder.getGid());
+
+		Method method = this.methodDAO.getById(founder.getMethodId());
+		founder.setMethod(method);
+
+		germplasmGroup.setFounder(founder);
 		germplasmGroup.setGroupId(founder.getMgid());
 		germplasmGroup.setGroupMembers(this.germplasmDAO.getManagementGroupMembers(founder.getMgid()));
 		return germplasmGroup;
