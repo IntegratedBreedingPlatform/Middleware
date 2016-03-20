@@ -46,16 +46,56 @@ public class GermplasmDataManagerUtil {
 	}
 
 	/**
-	 * Given a germplasm name, apply the standardization procedure to it.
 	 * 
+	 * From ICIS Wiki documentation:
+	 * 
+	 * <p>
+	 * A major problem with identifying germplasm is the detection of minor variants of a name. For example some users hyphenate foreign
+	 * language names while others use spaces or capital letters within a name string of small case letters, some separate a character
+	 * prefix from a number by a space, others do not. Another problem is that different ODBC drivers implement the same SQL search
+	 * differently with respect to case sensitivity. For these reasons, a set of name standardization has been devised with the objective of
+	 * producing the same standardized name from as wide a range of variants as possible.
+	 * 
+	 * <p>
+	 * When a name string is supplied to the ICIS DLL for searching, it is searched as supplied and after standardization. Routines, which
+	 * write names to the database, do not apply the standardization and users must specifically call a standardization routine if they wish
+	 * to standardize names before storing them. Names in the database are not required to be standardized. It is hoped that the resulting
+	 * standardized name is acceptable for presentation, but there will be cases where users insist on having a name, which violates the
+	 * rules. For example CIMMYT prefers that abbreviations contain no spaces. This is allowed but the rule violation should not be used to
+	 * distinguish genotypes, and the standardized name should be given as a synonym. Users will always be able to search for names that
+	 * violate the rules and the correct germplasm should be found. Given a germplasm name, apply the standardization procedure to it.
+	 * 
+	 * <p>
+	 * These standardization rules are applied in order as follows:
+	 * 
+	 * <p>
 	 * (L= any letter; ^= space; N= any numeral, S= any of {-,',[,],+,.})
 	 * 
-	 * a) Capitalize all letters Khao-Dawk-Mali105 becomes KHAO-DAWK-MALI105 b) L( becomes L^( and )L becomes )^L IR64(BPH) becomes IR64
-	 * (BPH) c) N( becomes N^( and )N becomes )^N IR64(5A) becomes IR64 (5A) d) L. becomes L^ IR 63 SEL. becomes IR 64 SEL e) LN becomes L^N
-	 * EXCEPT SLN MALI105 becomes MALI 105 but MALI-F4 IS unchanged f) NL becomes N^L EXCEPT SNL B 533A-1 becomes B 533 A-1 but B 533 A-4B
-	 * is unchanged g) LL-LL becomes LL^LL KHAO-DAWK-MALI 105 becomes KHAO DAWK MALI 105 h) ^0N becomes ^N IRTP 00123 becomes IRTP 123 i) ^^
-	 * becomes ^ j) REMOVE LEADING OR TRAILING ^ k) ^) becomes ) and (^ becomes ( l) L-N becomes L^N when there is only one l) in the name
-	 * and L is not preceded by a space m) ^/ becomes / and /^ becomes /
+	 * <li>Capitalize all letters Khao-Dawk-Mali105 becomes KHAO-DAWK-MALI105
+	 * 
+	 * <li>L( becomes L^( and )L becomes )^L IR64(BPH) becomes IR64 (BPH)
+	 * 
+	 * <li>N( becomes N^( and )N becomes )^N IR64(5A) becomes IR64 (5A)
+	 * 
+	 * <li>L. becomes L^ IR 63 SEL. becomes IR 64 SEL
+	 * 
+	 * <li>LN becomes L^N EXCEPT SLN MALI105 becomes MALI 105 but MALI-F4 IS unchanged
+	 * 
+	 * <li>NL becomes N^L EXCEPT SNL B 533A-1 becomes B 533 A-1 but B 533 A-4B is unchanged
+	 * 
+	 * <li>LL-LL becomes LL^LL KHAO-DAWK-MALI 105 becomes KHAO DAWK MALI 105
+	 * 
+	 * <li>^0N becomes ^N IRTP 00123 becomes IRTP 123
+	 * 
+	 * <li>^^ becomes ^
+	 * 
+	 * <li>REMOVE LEADING OR TRAILING ^
+	 * 
+	 * <li>^) becomes ) and (^ becomes (
+	 * 
+	 * <li>L-N becomes L^N when there is only one l) in the name and L is not preceded by a space
+	 * 
+	 * <li>^/ becomes / and /^ becomes /
 	 * 
 	 * @param name
 	 * @return the standardized germplasm name
