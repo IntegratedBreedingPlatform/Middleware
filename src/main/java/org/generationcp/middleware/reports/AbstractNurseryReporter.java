@@ -65,6 +65,11 @@ public abstract class AbstractNurseryReporter extends AbstractReporter {
 				case STUDY_INSTITUTE:
 					params.put(ORGANIZATION_REPORT_KEY, var.getValue());
 					break;
+                // here we have empty blocks for cases where the term ID is non existent, as well as for cases where the term ID is not captured by the previous cases
+                case NONEXISTENT:
+                    break;
+                default:
+                    break;
 			}
 
 			if (var.getName().equals(COUNTRY_VARIABLE_NAME)) {
