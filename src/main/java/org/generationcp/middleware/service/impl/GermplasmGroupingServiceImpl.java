@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service.impl;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -65,9 +66,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		LOG.info("Marking germplasm with gid {} as fixed.", germplasmToFix.getGid());
 
 		if (includeDescendants) {
-			GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
-			LOG.info("Building descendant tree for gid {} for assigning group (mgid).", germplasmToFix.getGid());
-			tree.setRoot(buildDescendantsTree(germplasmToFix, 1));
+			GermplasmPedigreeTree tree = getDescendantTree(germplasmToFix);
 			traverseAssignGroup(tree.getRoot(), germplasmToFix.getGid(), preserveExistingGroup);
 		} else {
 			assignGroup(germplasmToFix, germplasmToFix.getGid(), preserveExistingGroup);
@@ -79,9 +78,13 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	@Override
 	public GermplasmGroup getGroupMembers(Germplasm founder) {
 		GermplasmGroup germplasmGroup = new GermplasmGroup();
-		germplasmGroup.setFounderGid(founder.getGid());
+
+		Method method = this.methodDAO.getById(founder.getMethodId());
+		founder.setMethod(method);
+
+		germplasmGroup.setFounder(founder);
 		germplasmGroup.setGroupId(founder.getMgid());
-		germplasmGroup.setGroupMembers(this.germplasmDAO.getGroupMembers(founder.getGid()));
+		germplasmGroup.setGroupMembers(this.germplasmDAO.getManagementGroupMembers(founder.getMgid()));
 		return germplasmGroup;
 	}
 
@@ -94,6 +97,14 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 				traverseAssignGroup(child, groupId, preserveExistingGroup);
 			}
 		}
+	}
+
+	@Override
+	public GermplasmPedigreeTree getDescendantTree(Germplasm germplasm) {
+		LOG.info("Building descendant tree for gid {}.", germplasm.getGid());
+		GermplasmPedigreeTree tree = new GermplasmPedigreeTree();
+		tree.setRoot(buildDescendantsTree(germplasm, 1));
+		return tree;
 	}
 
 	private GermplasmPedigreeTreeNode buildDescendantsTree(Germplasm germplasm, int level) {
@@ -149,21 +160,28 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		return true;
 	}
 
-	private Name getSelectionHistory(Germplasm germplasm) {
-		List<Name> names = germplasm.getNames();
-		UserDefinedField selectionHistoryNameType =
-				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
+	Name getSelectionHistory(Germplasm germplasm) {
+		UserDefinedField selectionHistoryNameType = getSelectionHistoryNameType();
+		return findNameByType(germplasm, selectionHistoryNameType);
+	}
 
-		Name selectionHistoryName = null;
-		if (!names.isEmpty() && selectionHistoryNameType != null) {
+	Name findNameByType(Germplasm germplasm, UserDefinedField nameType) {
+		List<Name> names = germplasm.getNames();
+		Name matchingName = null;
+		if (!names.isEmpty() && nameType != null) {
 			for (Name name : names) {
-				if (selectionHistoryNameType.getFldno().equals(name.getTypeId())) {
-					selectionHistoryName = name;
+				if (nameType.getFldno().equals(name.getTypeId())) {
+					matchingName = name;
 					break;
 				}
 			}
 		}
-		return selectionHistoryName;
+		return matchingName;
+	}
+
+	Name getSelectionHistoryAtFixation(Germplasm germplasm) {
+		UserDefinedField selectionHistoryAtFixationNameType = getSelectionHistoryAtFixationNameType();
+		return findNameByType(germplasm, selectionHistoryAtFixationNameType);
 	}
 
 	/**
@@ -177,7 +195,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	 * through the germplasm details screen but will not be the name displayed in lists.
 	 * 
 	 */
-	private void copySelectionHistory(Germplasm germplasm, Name selectionHistoryName) {
+	private void addOrUpdateSelectionHistoryAtFixationName(Germplasm germplasm, Name nameToCopyFrom) {
 
 		// 1. Make current preferred name a non-preferred name by setting nstat = 0
 		// because we are about to add a different name as preferred.
@@ -187,71 +205,101 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			currentPreferredName.setNstat(0);
 		}
 
-		// 2. Remove if there is an existing "selection history at fixation"
-		UserDefinedField selHisFixNameType =
-				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
-						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
+		// 2. Check if there is an existing "selection history at fixation" name
+		Name existingSelHisFixName = getSelectionHistoryAtFixation(germplasm);
 
-		Name existingSelHisFixName = null;
-		if (!germplasm.getNames().isEmpty()) {
-			for (Name name : germplasm.getNames()) {
-				if (selHisFixNameType.getFldno().equals(name.getTypeId())) {
-					existingSelHisFixName = name;
-					break;
-				}
-			}
-		}
-
-		// 3. Copy selection history as "selection history at fixation" and make it a preferred name.
+		// 3. Add a new name as "selection history at fixation" with supplied name value and make it a preferred name.
 		if (existingSelHisFixName == null) {
+			UserDefinedField selHisFixNameType = getSelectionHistoryAtFixationNameType();
 			Name newSelectionHistoryAtFixation = new Name();
 			newSelectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
 			newSelectionHistoryAtFixation.setTypeId(selHisFixNameType.getFldno());
-			newSelectionHistoryAtFixation.setNval(selectionHistoryName.getNval());
+			newSelectionHistoryAtFixation.setNval(nameToCopyFrom.getNval());
 			newSelectionHistoryAtFixation.setNstat(1); // nstat = 1 means it is preferred name.
-			newSelectionHistoryAtFixation.setUserId(selectionHistoryName.getUserId());
-			newSelectionHistoryAtFixation.setLocationId(selectionHistoryName.getLocationId());
+			newSelectionHistoryAtFixation.setUserId(nameToCopyFrom.getUserId());
+			newSelectionHistoryAtFixation.setLocationId(nameToCopyFrom.getLocationId());
 			newSelectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
 			newSelectionHistoryAtFixation.setReferenceId(0);
 			germplasm.getNames().add(newSelectionHistoryAtFixation);
-		} else {
-			existingSelHisFixName.setNval(selectionHistoryName.getNval());
+		} else { 
+			// 4. Update the extisting "selection history at fixation" with supplied name and make it a preferred name.
+			existingSelHisFixName.setNval(nameToCopyFrom.getNval());
 			existingSelHisFixName.setNstat(1); // nstat = 1 means it is preferred name.
 			existingSelHisFixName.setNdate(Util.getCurrentDateAsIntegerValue());
 		}
 	}
 
-	public void copySelectionHistory(Germplasm germplasm) {
+	UserDefinedField getSelectionHistoryAtFixationNameType() {
+		UserDefinedField selHisFixNameType =
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
+						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
+		if (selHisFixNameType == null) {
+			throw new IllegalStateException(
+					"Missing required reference data: Please ensure User defined field (UDFLD) record for name type '"
+							+ GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE + "' has been setup.");
+		}
+		return selHisFixNameType;
+	}
 
-		Name selectionHistoryName = getSelectionHistory(germplasm);
+	UserDefinedField getSelectionHistoryNameType() {
+		UserDefinedField selectionHistoryNameType =
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
+		if (selectionHistoryNameType == null) {
+			throw new IllegalStateException(
+					"Missing required reference data: Please ensure User defined field (UDFLD) record for name type '"
+							+ GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE + "' has been setup.");
+		}
+		return selectionHistoryNameType;
+	}
 
-		if (selectionHistoryName != null) {
-			copySelectionHistory(germplasm, selectionHistoryName);
+	private void copySelectionHistory(Germplasm germplasm) {
+
+		Name mySelectionHistory = getSelectionHistory(germplasm);
+
+		if (mySelectionHistory != null) {
+			addOrUpdateSelectionHistoryAtFixationName(germplasm, mySelectionHistory);
 			LOG.info("Selection history at fixation for gid {} saved as germplasm name {} .", germplasm.getGid(),
-					selectionHistoryName.getNval());
+					mySelectionHistory.getNval());
 		} else {
-			LOG.info("No selection history type name was found for germplasm {}.", germplasm.getGid());
+			LOG.info("No selection history type name was found for germplasm {}. Nothing to copy.", germplasm.getGid());
+		}
+	}
+
+	@Override
+	public void copyParentalSelectionHistoryAtFixation(Germplasm germplasm) {
+
+		Germplasm parent = this.germplasmDAO.getById(germplasm.getGpid2());
+		Name parentSelectionHistoryAtFixation = getSelectionHistoryAtFixation(parent);
+
+		if (parentSelectionHistoryAtFixation != null) {
+			addOrUpdateSelectionHistoryAtFixationName(germplasm, parentSelectionHistoryAtFixation);
+			LOG.info("Selection history at fixation {} was copied from parent with gid {} to the child germplasm with gid {}.",
+					parentSelectionHistoryAtFixation.getNval(), germplasm.getGid(), parent.getGid());
+		} else {
+			LOG.info("No 'selection history at fixation' type name was found for parent germplasm with gid {}. Nothing to copy.",
+					parent.getGid());
 		}
 	}
 
 	private void copySelectionHistoryForCross(Germplasm cross, Germplasm previousCross) {
 
-		Name selectionHistoryName = getSelectionHistory(previousCross);
+		Name previousCrossSelectionHistory = getSelectionHistory(previousCross);
 
-		if (selectionHistoryName != null) {
-			copySelectionHistory(cross, selectionHistoryName);
+		if (previousCrossSelectionHistory != null) {
+			addOrUpdateSelectionHistoryAtFixationName(cross, previousCrossSelectionHistory);
 			LOG.info("Selection history {} for cross with gid {} was copied from previous cross with gid {}.",
-					selectionHistoryName.getNval(),
+					previousCrossSelectionHistory.getNval(),
 					cross.getGid(), previousCross.getGid());
 		} else {
-			LOG.info("No selection history type name was found for previous cross with gid {}.", previousCross.getGid());
+			LOG.info("No selection history type name was found for previous cross with gid {}. Nothing to copy.", previousCross.getGid());
 		}
 	}
 
 	// Rigorous INFO logging in this method is intentional. Currently we dont have good visualization tools in BMS to verify results of such
 	// complex operations. INFO LOGGing helps.
 	@Override
-	public void processGroupInheritanceForCrosses(List<Integer> gidsOfCrosses) {
+	public void processGroupInheritanceForCrosses(List<Integer> gidsOfCrosses, boolean applyNewGroupToPreviousCrosses,
+			Set<Integer> hybridMethods) {
 
 		for (Integer crossGID : gidsOfCrosses) {
 			Germplasm cross = this.germplasmDAO.getById(crossGID);
@@ -273,15 +321,25 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 					parent2.getGpid2(), parent2.getMgid(), parent2.getMethodId());
 			}
 
-			if (Method.isHybrid(cross.getMethodId())) {
-				LOG.info("Breeding method {} of the cross hybrid.", cross.getMethodId());
+			if (hybridMethods.contains(cross.getMethodId())) {
+				LOG.info("Breeding method {} of the cross is hybrid.", cross.getMethodId());
 				boolean parent1HasMGID = parent1.getMgid() != null && parent1.getMgid() != 0;
 				boolean parent2HasMGID = parent2.getMgid() != null && parent2.getMgid() != 0;
 				boolean bothParentsHaveMGID = parent1HasMGID && parent2HasMGID;
 
 				if (bothParentsHaveMGID) {
 					LOG.info("Both parents have MGIDs. Parent1 mgid {}. Parent2 mgid {}.", parent1.getMgid(), parent2.getMgid());
-					List<Germplasm> previousCrosses = this.germplasmDAO.getPreviousCrosses(parent1.getGid(), parent2.getGid());
+					List<Germplasm> previousCrosses = this.germplasmDAO.getPreviousCrossesBetweenParentGroups(cross);
+
+					// Remove members of the current processing batch from the list of "previous crosses" retrieved.
+					Iterator<Germplasm> previousCrossesIterator = previousCrosses.iterator();
+					while (previousCrossesIterator.hasNext()) {
+						Germplasm previousCross = previousCrossesIterator.next();
+						if (gidsOfCrosses.contains(previousCross.getGid())) {
+							previousCrossesIterator.remove();
+						}
+					}
+
 					boolean crossingFirstTime = previousCrosses.isEmpty();
 					if (crossingFirstTime) {
 						LOG.info("This is a first cross of the two parents. Starting a new group. Setting gid {} to mgid.",
@@ -290,30 +348,41 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 					} else {
 						// Not the first time cross. Assign MGID of previous cross to new cross.
 						// When there are multiple previous crosses, we choose the oldest created cross with MGID as preference.
-						LOG.info("Previous cross(es) of the same two parents exist: {}.", previousCrosses);
-						Germplasm previousCrossSelected = null;
+						LOG.info("Previous crosses exist between the female and male parent groups:");
+						for (Germplasm previousCross : previousCrosses) {
+							LOG.info("\t[gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}]", previousCross.getGid(),
+									previousCross.getGpid1(), previousCross.getGpid2(), previousCross.getMgid(),
+									previousCross.getMethodId());
+						}
+
+						Germplasm oldestPreviousCrossWithMGID = null;
 						for (Germplasm previousCross : previousCrosses) {
 							if (previousCross.getMgid() != null && previousCross.getMgid() != 0) {
-								previousCrossSelected = previousCross;
+								oldestPreviousCrossWithMGID = previousCross;
 								break;
 							}
 						}
 
-						if (previousCrossSelected != null) {
-							LOG.info("Assigning mgid {} from the oldest previous cross gid {}.", previousCrossSelected.getMgid(),
-									previousCrossSelected.getGid());
-							cross.setMgid(previousCrossSelected.getMgid());
+						if (oldestPreviousCrossWithMGID != null) {
+							LOG.info("Assigning mgid {} from the oldest previous cross (gid {}).", oldestPreviousCrossWithMGID.getMgid(),
+									oldestPreviousCrossWithMGID.getGid());
+							cross.setMgid(oldestPreviousCrossWithMGID.getMgid());
 							// TODO extend to include coded names as well.
-							copySelectionHistoryForCross(cross, previousCrossSelected);
+							copySelectionHistoryForCross(cross, oldestPreviousCrossWithMGID);
 						} else {
-							LOG.info("Previous crosses exist but there is none with MGID.");
-							// TODO implement dotted boxes in flowchart for this case.
-							// Dotted box 1
-							// Flowchart says warn user for this case - this will require returning flag back to the caller from service.
+							LOG.info("Previous crosses exist but there is none with MGID. Starting a new group with mgid = gid of current cross.");
+							cross.setMgid(cross.getGid());
+							// TODO Flowchart says warn user for this case - this will require returning flag back to the caller from
+							// service.
 
-							// Dotted box 2
-							// Flowchart says - Default to assigning new MGID to all instances of the cross (looks similar to
-							// crossingFirstTime case). User can choose to apply to the new cross only.
+							if (applyNewGroupToPreviousCrosses) {
+								LOG.info("Applying the new mgid {} to the previous crosses as well.", cross.getMgid());
+								for (Germplasm previousCross : previousCrosses) {
+									previousCross.setMgid(cross.getMgid());
+									this.germplasmDAO.save(previousCross);
+								}
+							}
+
 						}
 					}
 					this.germplasmDAO.save(cross);
@@ -325,5 +394,4 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			}
 		}
 	}
-
 }

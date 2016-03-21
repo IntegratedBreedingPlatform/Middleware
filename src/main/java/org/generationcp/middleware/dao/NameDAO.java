@@ -13,10 +13,12 @@ package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
@@ -42,7 +44,24 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(NameDAO.class);
 
 	@SuppressWarnings("unchecked")
-	public List<Name> getByGIDWithFilters(final Integer gid, final Integer status, final GermplasmNameType type) {
+  	public List<Name> getByGIDWithFilters(final Integer gid, final Integer status, final GermplasmNameType type) {
+ 		if(type != null) {
+ 			return getByGIDWithListTypeFilters(gid, status, Collections.<Integer>singletonList(Integer.valueOf(type.getUserDefinedFieldID())));
+ 		}
+ 		return getByGIDWithListTypeFilters(gid, status, null);
+
+ 	}
+
+ 	/**
+ 	 * Get the names associated with a GID
+ 	 * @param gid the gid for which we are getting names
+ 	 * @param status the status of the gid. Note if status is null or 0 we will omit deleted values i.e. status will be set to 9
+ 	 * @param type a list of name types to retrieve. Note if type is null or empty it will be omited from the query
+ 	 * @return
+ 	 * @throws MiddlewareQueryException
+ 	 */
+ 	@SuppressWarnings("unchecked")
+ 	public List<Name> getByGIDWithListTypeFilters(final Integer gid, final Integer status, final List<Integer> type) {
 		try {
 			if (gid != null) {
 				final StringBuilder queryString = new StringBuilder();
@@ -59,8 +78,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 					queryString.append("AND n.nstat != 9 ");
 				}
 
-				if (type != null) {
-					queryString.append("AND n.ntype = :ntype ");
+				if (type != null && !type.isEmpty()) {
+					queryString.append("AND n.ntype IN (:ntype) ");
 				}
 
 				queryString.append("ORDER BY nameOrdering, n.nval");
@@ -73,8 +92,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 					query.setParameter("nstat", status);
 				}
 
-				if (type != null) {
-					query.setParameter("ntype", Integer.valueOf(type.getUserDefinedFieldID()));
+				if (type != null && !type.isEmpty()) {
+					query.setParameterList("ntype", type);
 				}
 
 				return query.list();
@@ -347,19 +366,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	@SuppressWarnings("unchecked")
 	public boolean checkIfMatches(final String name) {
 		try {
-			final String keyword1 = name.replaceAll("\\s", "");
-			final String keyword2 = GermplasmDataManagerUtil.standardizeName(name).replaceAll("\\s", "");
-			String keyword = null;
-			if (keyword1.equals(keyword2)) {
-				keyword = keyword1;
-			}
 			final StringBuilder sql = new StringBuilder();
 			sql.append("SELECT COUNT(nid) FROM names ");
-			if (keyword == null) {
-				sql.append(" WHERE REPLACE(nval, ' ', '') IN ('").append(keyword1).append("', ").append("'").append(keyword2).append("')");
-			} else {
-				sql.append(" WHERE REPLACE(nval, ' ', '') = '").append(keyword).append("'");
-			}
+			sql.append(" WHERE nval = '").append(name).append("'");
 
 			final Query query = this.getSession().createSQLQuery(sql.toString());
 			final List<BigInteger> result = query.list();
