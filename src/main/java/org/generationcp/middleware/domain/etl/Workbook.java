@@ -87,6 +87,7 @@ public class Workbook {
 
 	public Workbook() {
 		this.reset();
+        this.trialObservations = new ArrayList<>();
 	}
 
 	public Workbook(final StudyDetails studyDetails, final List<MeasurementVariable> conditions, final List<MeasurementVariable> factors,
@@ -97,6 +98,7 @@ public class Workbook {
 		this.constants = constants;
 		this.variates = variates;
 		this.observations = observations;
+        this.trialObservations = new ArrayList<>();
 		this.reset();
 	}
 
@@ -114,8 +116,7 @@ public class Workbook {
 		this.trialConstants = null;
 		this.treatmentFactors = null;
 		this.hasExistingDataOverwrite = false;
-        this.trialObservations = new ArrayList<>();
-	}
+    }
 
 	public StudyDetails getStudyDetails() {
 		return this.studyDetails;
