@@ -355,6 +355,13 @@ public interface GermplasmDataManager {
 	List<Method> getAllMethods();
 
 	/**
+	 * Validates the naming rules configuration for the selected breeding method
+	 * @param breedingMethodId
+	 * @return true if the configurarion is present in the DB
+	 */
+	boolean isMethodNamingConfigurationValid(Integer breedingMethodId);
+
+	/**
 	 * Returns all the method records.
 	 *
 	 * @param programUUID - unique id of the current program
