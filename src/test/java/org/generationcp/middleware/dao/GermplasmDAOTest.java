@@ -19,6 +19,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.util.Debug;
 import org.junit.Assert;
@@ -223,7 +224,90 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetPreviousCrosses() {
-		List<Germplasm> previousCrosses = this.dao.getPreviousCrosses(11, 3);
+		Germplasm female = new Germplasm(2);
+		Germplasm male = new Germplasm(1);
+
+		Germplasm currentCross = new Germplasm(3);
+		currentCross.setGpid1(female.getGid());
+		currentCross.setGpid2(male.getGid());
+
+		List<Germplasm> previousCrosses = this.dao.getPreviousCrosses(currentCross, female, male);
 		Assert.assertNotNull("getPreviousCrosses() should never return null.", previousCrosses);
 	}
+
+	@Test
+	public void testLoadEntityWithNameCollection() {
+		Germplasm germplasm = this.dao.getById(1);
+		if (germplasm != null) {
+			Assert.assertTrue("If germplasm exists, the name collection can not be empty.", !germplasm.getNames().isEmpty());
+		}
+	}
+
+	@Test
+	public void testGetManagementGroupMembers() {
+		List<Germplasm> groupMembers = this.dao.getManagementGroupMembers(1);
+		Assert.assertNotNull("getManagementGroupMembers() should never return null when supplied with proper mgid.", groupMembers);
+
+		this.dao.getManagementGroupMembers(null);
+		Assert.assertTrue("getManagementGroupMembers() should return empty collection when supplied mgid = null.", groupMembers.isEmpty());
+
+		this.dao.getManagementGroupMembers(0);
+		Assert.assertTrue("getManagementGroupMembers() should return empty collection when supplied mgid = 0.", groupMembers.isEmpty());
+	}
+
+	@Test
+	public void testSaveGermplasmNamesThroughHibernateCascade() {
+
+		Germplasm germplasm = new Germplasm();
+		germplasm.setMethodId(1);
+		germplasm.setGnpgs(-1);
+		germplasm.setGpid1(0);
+		germplasm.setGpid2(0);
+		germplasm.setUserId(1);
+		germplasm.setLgid(0);
+		germplasm.setLocationId(1);
+		germplasm.setGdate(20160101);
+		germplasm.setReferenceId(0);
+		germplasm.setGrplce(0);
+		germplasm.setMgid(0);
+
+		this.dao.save(germplasm);
+		Assert.assertNotNull(germplasm.getGid());
+
+		Name name1 = new Name();
+		name1.setTypeId(5);
+		name1.setNstat(1);
+		name1.setUserId(1);
+		name1.setNval("Name1");
+		name1.setLocationId(1);
+		name1.setNdate(20160101);
+		name1.setReferenceId(0);
+
+		Name name2 = new Name();
+		name2.setTypeId(5);
+		name2.setNstat(1);
+		name2.setUserId(1);
+		name2.setNval("Name2");
+		name2.setLocationId(1);
+		name2.setNdate(20160101);
+		name2.setReferenceId(0);
+
+		germplasm.getNames().add(name1);
+		germplasm.getNames().add(name2);
+
+		// Name collection mapping is uni-directional OneToMany right now, so the other side of the relationship has to be managed manually.
+		for (Name name : germplasm.getNames()) {
+			name.setGermplasmId(germplasm.getGid());
+		}
+
+		// In real app flush will happen automatically on tx commit. We don't commit tx in tests, so flush manually.
+		this.sessionProvder.getSession().flush();
+
+		for (Name name : germplasm.getNames()) {
+			// No explicit save of name entity anywhere but should still be saved through cascade on flush.
+			Assert.assertNotNull(name.getNid());
+			Assert.assertEquals(germplasm.getGid(), name.getGermplasmId());
+		}
+	}
+
 }

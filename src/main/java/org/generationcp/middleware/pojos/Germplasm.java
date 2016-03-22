@@ -12,17 +12,23 @@
 package org.generationcp.middleware.pojos;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.xml.bind.annotation.XmlAccessType;
@@ -33,6 +39,8 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.auditory.Auditable;
+import org.generationcp.middleware.auditory.Auditory;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -72,18 +80,23 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 })
 @NamedNativeQueries({
-	@NamedNativeQuery(name = "getGermplasmDescendants",
+		@NamedNativeQuery(name = "getGermplasmDescendants",
 			query = "SELECT DISTINCT g.* FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
-					+ "WHERE (g.gpid1=:gid OR g.gpid2=:gid OR p.pid=:gid) " + "AND g.gid != g.grplce and g.grplce = 0",
-					resultClass = Germplasm.class),
-					@NamedNativeQuery(name = "getGermplasmByPrefName", query = "SELECT g.* FROM germplsm g LEFT JOIN names n ON g.gid = n.gid "
-							+ "AND n.nstat = 1 " + "WHERE n.nval = :name", resultClass = Germplasm.class),
-							@NamedNativeQuery(name = "getProgenitor1", query = "SELECT p.* FROM germplsm g, germplsm p WHERE g.gid = :gid "
-									+ "and g.gpid1 = p.gid and p.gid != p.grplce and p.grplce = 0", resultClass = Germplasm.class),
-									@NamedNativeQuery(name = "getProgenitor2", query = "SELECT p.* FROM germplsm g, germplsm p WHERE g.gid = :gid "
-											+ "and g.gpid2 = p.gid and p.gid != p.grplce and p.grplce = 0", resultClass = Germplasm.class),
-											@NamedNativeQuery(name = "getProgenitor", query = "SELECT g.* FROM germplsm g, progntrs p WHERE g.gid = p.pid "
-													+ "and p.gid = :gid and p.pno = :pno and g.gid != g.grplce and g.grplce = 0", resultClass = Germplasm.class)})
+						+ "WHERE (g.gpid1=:gid OR g.gpid2=:gid OR p.pid=:gid) " + "AND g.gid != g.grplce and g.grplce = 0",
+				resultClass = Germplasm.class), //
+
+		@NamedNativeQuery(name = "getGermplasmByPrefName", query = "SELECT g.* FROM germplsm g LEFT JOIN names n ON g.gid = n.gid "
+				+ "AND n.nstat = 1 " + "WHERE n.nval = :name", resultClass = Germplasm.class), //
+
+		@NamedNativeQuery(name = "getProgenitor1", query = "SELECT p.* FROM germplsm g, germplsm p WHERE g.gid = :gid "
+				+ "and g.gpid1 = p.gid and p.gid != p.grplce and p.grplce = 0", resultClass = Germplasm.class), //
+
+		@NamedNativeQuery(name = "getProgenitor2", query = "SELECT p.* FROM germplsm g, germplsm p WHERE g.gid = :gid "
+				+ "and g.gpid2 = p.gid and p.gid != p.grplce and p.grplce = 0", resultClass = Germplasm.class), //
+
+		@NamedNativeQuery(name = "getProgenitor", query = "SELECT g.* FROM germplsm g, progntrs p WHERE g.gid = p.pid "
+				+ "and p.gid = :gid and p.pno = :pno and g.gid != g.grplce and g.grplce = 0", resultClass = Germplasm.class)} //
+)
 @Entity
 @Table(name = "germplsm")
 // JAXB Element Tags for JSON output
@@ -91,7 +104,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @XmlType(propOrder = {"gid", "gnpgs", "gpid1", "gpid2", "gdate"})
 @XmlAccessorType(XmlAccessType.NONE)
 @Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="germplsm")
-public class Germplasm implements Serializable {
+public class Germplasm implements Serializable, Auditable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -357,6 +370,13 @@ public class Germplasm implements Serializable {
 	@Column(name = "mgid")
 	private Integer mgid;
 
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "gid")
+	private List<Name> names = new ArrayList<Name>();
+
+	/**
+	 * @OneToMany(mappedBy = "germplasm") private Set<Progenitor> progntr = new HashSet<Progenitor>();
+	 **/
     @Column(name = "instance_number")
     private Integer instanceNumber;
 
@@ -473,9 +493,10 @@ public class Germplasm implements Serializable {
 	 * NPRGN on the METHODS TABLE). If GNPGS = 1 or 2 then the IDs ofthe progenitors are contained in the GPID1 and GPID2 fields on the
 	 * GERMPLSM table. If GNPGS>2 then further IDs are stored on the PROGNTRS table.</li>
 	 * 
-	 * <li>GNPGS = 0 for land race or wild species collections or if none of the parents is known.GNPGS <= NPRGN, but some of the GNPGS
-	 * specified parents may be unknown inwhich case the corresponding GPIDs are MISSING (0). For example in a simplecross with only male
-	 * parent known, GNPGS would have to be 2 with GPID1 = 0 and GPID2 set to GID of the known male parent.</li>
+	 * <li>GNPGS = 0 for <a href="https://en.wikipedia.org/wiki/Landrace">landrace</a> or wild species collections or if none of the parents
+	 * is known.GNPGS <= NPRGN, but some of the GNPGS specified parents may be unknown inwhich case the corresponding GPIDs are MISSING (0).
+	 * For example in a simplecross with only male parent known, GNPGS would have to be 2 with GPID1 = 0 and GPID2 set to GID of the known
+	 * male parent.</li>
 	 * </ul>
 	 */
 	public Integer getGnpgs() {
@@ -712,4 +733,30 @@ public class Germplasm implements Serializable {
 		this.accessionName = accessionName;
 	}
 
+	/**
+	 * @return <strong>ALL</strong> name records associated with this germplasm entity.
+	 */
+	public List<Name> getNames() {
+		return names;
+	}
+
+	public void setNames(List<Name> names) {
+		this.names = names;
+	}
+
+	public Name findPreferredName() {
+		Name preferredName = null;
+		for (Name name : this.getNames()) {
+			if (new Integer(1).equals(name.getNstat())) {
+				preferredName = name;
+				break;
+			}
+		}
+		return preferredName;
+	}
+
+	@Override
+	public void attachToAuditory(Auditory auditory) {
+		this.referenceId = auditory.getId();
+	}
 }
