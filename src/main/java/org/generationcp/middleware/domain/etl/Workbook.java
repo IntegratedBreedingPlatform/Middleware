@@ -102,6 +102,10 @@ public class Workbook {
 		this.reset();
 	}
 
+    // TODO : rename reset method to something more indicative of its actual purpose : clearDerivedVariables maybe.
+    /**
+     * Used by DatasetImporter to clear ONLY the derived variables of the workbook prior to saving.
+     */
 	public void reset() {
 		this.trialHeaders = null;
 		this.trialVariables = null;
