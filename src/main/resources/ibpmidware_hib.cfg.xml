@@ -22,6 +22,7 @@
         <mapping class="org.generationcp.middleware.pojos.ListDataProject"/>
         <mapping class="org.generationcp.middleware.pojos.Person"/>
         <mapping class="org.generationcp.middleware.pojos.ListDataProperty"/>
+        <mapping class="org.generationcp.middleware.pojos.Configuration"/>       
         
         <mapping class="org.generationcp.middleware.pojos.ims.Lot"/>
         <mapping class="org.generationcp.middleware.pojos.ims.Transaction"/>
