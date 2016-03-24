@@ -31,8 +31,8 @@ public class ThreeWayHybridProcessor implements BreedingMethodProcessor {
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
 			final FixedLineNameResolver fixedLineNameResolver) {
 
-		if(germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
-			LOG.debug("Germplasm with GID '%d' is being processed by a three way hybrid processor. "
+		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
+			LOG.debug("Germplasm with GID '{}' is being processed by a three way hybrid processor. "
 					, germplasmNode.getGermplasm().getGid());
 		}
 
@@ -64,10 +64,8 @@ public class ThreeWayHybridProcessor implements BreedingMethodProcessor {
 		final GermplasmNode singleCrossHybridFemaleParent = singleCrossHybrids.getFemaleParent();
 		final GermplasmNode singleCrossHybridMaleParent = singleCrossHybrids.getMaleParent();
 
-		final PedigreeString singleCrossHybridFemaleParentPedigreeString =
-				this.pedigreeStringBuilder.buildPedigreeString(singleCrossHybridFemaleParent, level - 1, fixedLineNameResolver);
-		final PedigreeString singleCrossHybridMaleParentPedigreeString =
-				this.pedigreeStringBuilder.buildPedigreeString(singleCrossHybridMaleParent, level - 1, fixedLineNameResolver);
+		final PedigreeString singleCrossHybridFemaleParentPedigreeString = getPedigreeString(level, fixedLineNameResolver, singleCrossHybridFemaleParent);
+		final PedigreeString singleCrossHybridMaleParentPedigreeString = getPedigreeString(level, fixedLineNameResolver, singleCrossHybridMaleParent);
 
 		final PedigreeString singleCrossHybridPedigreeString = new PedigreeString();
 		singleCrossHybridPedigreeString.setNumberOfCrosses(singleCrossHybridFemaleParentPedigreeString.getNumberOfCrosses() + 1);
@@ -82,6 +80,14 @@ public class ThreeWayHybridProcessor implements BreedingMethodProcessor {
 				inbreadPedigreeString));
 		return pedigreeString;
 
+	}
+
+	private PedigreeString getPedigreeString(final Integer level, final FixedLineNameResolver fixedLineNameResolver,
+			final GermplasmNode singleCrossHybridFemaleParent) {
+		if(singleCrossHybridFemaleParent != null ) {
+			return this.pedigreeStringBuilder.buildPedigreeString(singleCrossHybridFemaleParent, level - 1, fixedLineNameResolver);
+		}
+		return this.inbredProcessor.processGermplasmNode(singleCrossHybridFemaleParent, level - 1, fixedLineNameResolver);
 	}
 
 }

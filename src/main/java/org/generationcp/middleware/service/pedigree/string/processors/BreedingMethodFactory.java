@@ -19,7 +19,9 @@ public class BreedingMethodFactory {
 		// FIXME: This is not sustainable. We need to do the logic on unique method codes.
 		final String methodName = BreedingMethodFactory.getMethodName(germplasmNode);
 
-		LOG.debug("Germplasm with GID '%s' has a method name '%s", germplasmNode.getGermplasm().getGid(), methodName);
+		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
+			LOG.debug("Germplasm with GID '{}' has a method name '{}'", germplasmNode.getGermplasm().getGid(), methodName);
+		}
 
 		if (methodName.contains("single cross")) {
 			return new SingleCrossHybridProcessor();

@@ -20,7 +20,7 @@ public class PedigreeStringGeneratorUtil {
 
 	public static String gerneratePedigreeString(final PedigreeString femalePedigreeString, final PedigreeString malePedigreeString) {
 
-		LOG.debug("Combining pedigree string. FemalePedigreeString '%s', MalePedigreeString '%s', Number of crosses - '%d'",
+		LOG.debug("Combining pedigree string. FemalePedigreeString '{}', MalePedigreeString '%s', Number of crosses - '{}'",
 				femalePedigreeString.toString(), malePedigreeString.toString(), femalePedigreeString.getNumberOfCrosses());
 
 		return femalePedigreeString.getPedigree() + PedigreeStringGeneratorUtil.getSeperator(femalePedigreeString.getNumberOfCrosses())
@@ -31,7 +31,7 @@ public class PedigreeStringGeneratorUtil {
 			final PedigreeString recurringParentString, final FixedLineNameResolver fixedLineNameResolver,
 			final int numberOfRecurringParents, final boolean isFemaleRecurringParent) {
 
-		LOG.debug("Combining pedigree string. Donor Parent String - '%s', Recurring Parent String - '%s', Number of Recurrsions - '%d'",
+		LOG.debug("Combining pedigree string. Donor Parent String - '%s', Recurring Parent String - '{}', Number of Recurrsions - '{}'",
 				donorParentString.toString(), recurringParentString.toString(), numberOfRecurringParents);
 
 		return recurringParentString.getPedigree()
@@ -46,7 +46,7 @@ public class PedigreeStringGeneratorUtil {
 
 			final String resolvedNameType = nameTypeBasedResolution.get();
 
-			LOG.debug("Name type of '%s' resolved for gid - '%d'", resolvedNameType, germplasmNode.getGermplasm().getGid());
+			LOG.debug("Name type of '{}' resolved for gid - '{}'", resolvedNameType, germplasmNode.getGermplasm().getGid());
 
 			final PedigreeString pedigreeString = new PedigreeString();
 			pedigreeString.setPedigree(resolvedNameType);

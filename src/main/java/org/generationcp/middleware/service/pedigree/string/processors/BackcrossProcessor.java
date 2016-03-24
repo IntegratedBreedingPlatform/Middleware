@@ -40,8 +40,8 @@ public class BackcrossProcessor implements BreedingMethodProcessor {
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
 			final FixedLineNameResolver fixedLineNameResolver) {
 
-		if(germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
-			LOG.debug("Germplasm with GID '%d' has a backcross breeding method. "
+		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
+			LOG.debug("Germplasm with GID '{}' has a backcross breeding method. "
 					+ "Processing using backcross processor.", germplasmNode.getGermplasm().getGid());
 		}
 
@@ -61,7 +61,7 @@ public class BackcrossProcessor implements BreedingMethodProcessor {
 			}
 		}
 
-		LOG.warn("Germplasm with GID '%d' has a backcross breeding method but no recurring parents were found. "
+		LOG.warn("Germplasm with GID '{}' has a backcross breeding method but no recurring parents were found. "
 				+ "Just combining immediate parents. "
 				+ "Please note the rest of the tree is not traversed.", germplasmNode.getGermplasm().getGid());
 

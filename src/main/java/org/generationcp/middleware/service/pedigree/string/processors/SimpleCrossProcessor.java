@@ -21,8 +21,8 @@ public class SimpleCrossProcessor implements BreedingMethodProcessor {
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
 			final FixedLineNameResolver fixedLineNameResolver) {
 
-		if(germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
-			LOG.debug("Germplasm with GID '%d' is being processed by an simple cross processor. "
+		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
+			LOG.debug("Germplasm with GID '{}' is being processed by an simple cross processor. "
 					, germplasmNode.getGermplasm().getGid());
 		}
 

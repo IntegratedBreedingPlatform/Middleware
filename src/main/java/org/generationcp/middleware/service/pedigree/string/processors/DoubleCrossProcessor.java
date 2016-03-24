@@ -36,8 +36,8 @@ public class DoubleCrossProcessor implements BreedingMethodProcessor {
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
 			final FixedLineNameResolver fixedLineNameResolver) {
 
-		if(germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
-			LOG.debug("Germplasm with GID '%d' has a double cross breeding method. "
+		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
+			LOG.debug("Germplasm with GID '{}' has a double cross breeding method. "
 					+ "Processing using double cross processor.", germplasmNode.getGermplasm().getGid());
 		}
 

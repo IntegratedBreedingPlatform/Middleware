@@ -29,8 +29,8 @@ public class PedigreeStringBuilder {
 
 		final Germplasm germplasm = germplasmNode.getGermplasm();
 
-		if(germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
-			LOG.debug("Building pedigree tree for germlasm with gid - '%d'", germplasmNode.getGermplasm().getGid());
+		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
+			LOG.debug("Building pedigree tree for germlasm with gid - '{}'", germplasmNode.getGermplasm().getGid());
 		}
 
 		final Optional<PedigreeString> fixedLineName = PedigreeStringGeneratorUtil.getFixedLineName(germplasmNode, fixedLineNameResolver);
