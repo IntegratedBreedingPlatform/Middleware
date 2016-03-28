@@ -70,7 +70,7 @@ public class PedigreeStringGeneratorUtil {
 	}
 
 	private static String getSeperator(final int numberOfPreviousCrosses) {
-		// of crosses made
+		// number of crosses made determines the slashes in a pedigree string
 		if (numberOfPreviousCrosses == 0) {
 			return "/";
 		} else if (numberOfPreviousCrosses == 1) {

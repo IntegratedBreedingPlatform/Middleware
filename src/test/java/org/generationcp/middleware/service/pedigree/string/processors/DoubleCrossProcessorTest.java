@@ -31,7 +31,7 @@ public class DoubleCrossProcessorTest {
 	@Test
 	public void testCreationOfAStandardDoubleCross() throws Exception {
 
-		final GermplasmNode parentGermplasmNode = PedigreeStringTestUtil.createDoubleCrossTestGermplasmNode();
+		final GermplasmNode parentGermplasmNode = PedigreeStringTestUtil.createDoubleCrossTestGermplasmTree();
 
 		final PedigreeString resultantPedigreeString =
 				doubleCrossProcessor.processGermplasmNode(parentGermplasmNode, new Integer(3), fixedLineNameResolver);
@@ -45,7 +45,7 @@ public class DoubleCrossProcessorTest {
 	@Test
 	public void testCreationOfDoubleCrossWithMissingMale() throws Exception {
 		final GermplasmNode femaleGermplasmNode =
-				PedigreeStringTestUtil.createSingleCrossTestGermplasmNode(new ImmutablePair<Integer, String>(1, "A"),
+				PedigreeStringTestUtil.createSingleCrossTestGermplasmTree(new ImmutablePair<Integer, String>(1, "A"),
 						new ImmutablePair<Integer, String>(2, "B"), new ImmutablePair<Integer, String>(3, "C"));
 
 

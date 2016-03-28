@@ -42,7 +42,7 @@ public class PedigreeStringBuilder {
 			return this.inbredProcessor.processGermplasmNode(germplasmNode, level, fixedLineNameResolver);
 		}
 
-		// Is this germplasm a result of a derivative or maintenance breeding method. If so skip node.
+		// Is this germplasm that is a result of a derivative or maintenance breeding method. If so skip node.
 		if (germplasm != null && germplasm.getGnpgs() < 0) {
 			return this.processDerivativeOrMaintenceGermplasm(germplasmNode, level, fixedLineNameResolver);
 		}

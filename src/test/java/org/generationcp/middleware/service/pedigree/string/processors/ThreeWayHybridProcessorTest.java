@@ -27,7 +27,7 @@ public class ThreeWayHybridProcessorTest {
 
 	@Test
 	public void testCreationOfStandardThreeWayCross() throws Exception {
-		final GermplasmNode threeWayCrossFemaleNode = PedigreeStringTestUtil.createSingleCrossTestGermplasmNode();
+		final GermplasmNode threeWayCrossFemaleNode = PedigreeStringTestUtil.createSingleCrossTestGermplasmTree();
 		final GermplasmNode threeWayCrossMaleNode =
 				PedigreeStringTestUtil.createGermplasmNode(4, "D", PedigreeStringTestUtil.BULK_OR_POPULATION_SAMPLE_METHOD_ID,
 						PedigreeStringTestUtil.BULK_OR_POPULATION_SAMPLE_METHOD_NAME,
@@ -57,7 +57,7 @@ public class ThreeWayHybridProcessorTest {
 						PedigreeStringTestUtil.BULK_OR_POPULATION_SAMPLE_METHOD_NAME,
 						PedigreeStringTestUtil.BULK_OR_POPULATION_SAMPLE_METHOD_NUMBER_OF_PROGENITOR);
 
-		final GermplasmNode threeWayCrossMaleNode = PedigreeStringTestUtil.createSingleCrossTestGermplasmNode();
+		final GermplasmNode threeWayCrossMaleNode = PedigreeStringTestUtil.createSingleCrossTestGermplasmTree();
 
 		final GermplasmNode threeWayCrossParentNode =
 				PedigreeStringTestUtil.createGermplasmNode(5, "E", PedigreeStringTestUtil.THREE_WAY_CROSS_METHOD_ID,
@@ -79,7 +79,7 @@ public class ThreeWayHybridProcessorTest {
 	@Test
 	public void testCreationOfThreeWayCrossWhereMaleParentIsMissing() throws Exception {
 		final GermplasmNode threeWayCrossFemaleNode =
-				PedigreeStringTestUtil.createSingleCrossTestGermplasmNode();
+				PedigreeStringTestUtil.createSingleCrossTestGermplasmTree();
 
 		final GermplasmNode threeWayCrossParentNode =
 				PedigreeStringTestUtil.createGermplasmNode(5, "E", PedigreeStringTestUtil.THREE_WAY_CROSS_METHOD_ID,
@@ -101,7 +101,7 @@ public class ThreeWayHybridProcessorTest {
 	@Test
 	public void testCreationOfThreeWayCrossWhereFemaleParentIsMissing() throws Exception {
 
-		final GermplasmNode threeWayCrossMaleNode = PedigreeStringTestUtil.createSingleCrossTestGermplasmNode();
+		final GermplasmNode threeWayCrossMaleNode = PedigreeStringTestUtil.createSingleCrossTestGermplasmTree();
 		final GermplasmNode threeWayCrossParentNode =
 				PedigreeStringTestUtil.createGermplasmNode(5, "E", PedigreeStringTestUtil.THREE_WAY_CROSS_METHOD_ID,
 						PedigreeStringTestUtil.THREE_WAY_CROSS_METHOD_ID_METHOD_NAME,

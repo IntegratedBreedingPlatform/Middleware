@@ -29,7 +29,7 @@ public class SimpleCrossProcessorTest {
 
 		// Create a double cross because I want to ensure that the Simple cross does not traverse the pedigree tree and just
 		// does a cross on immediate parents
-		final GermplasmNode parentGermplasmNode = PedigreeStringTestUtil.createDoubleCrossTestGermplasmNode();
+		final GermplasmNode parentGermplasmNode = PedigreeStringTestUtil.createDoubleCrossTestGermplasmTree();
 
 		final SimpleCrossProcessor simpleCrossProcessor = new SimpleCrossProcessor();
 		final PedigreeString processGermplasmNode = simpleCrossProcessor.processGermplasmNode(parentGermplasmNode,
@@ -45,7 +45,7 @@ public class SimpleCrossProcessorTest {
 
 		// Create a double cross because I want to ensure that the Simple cross does not traverse the pedigree tree and just
 		// does a cross on immediate parents
-		final GermplasmNode parentGermplasmNode = PedigreeStringTestUtil.createDoubleCrossTestGermplasmNode();
+		final GermplasmNode parentGermplasmNode = PedigreeStringTestUtil.createDoubleCrossTestGermplasmTree();
 		parentGermplasmNode.setFemaleParent(null);
 		parentGermplasmNode.setMaleParent(null);
 
@@ -53,7 +53,7 @@ public class SimpleCrossProcessorTest {
 		final PedigreeString processGermplasmNode = simpleCrossProcessor.processGermplasmNode(parentGermplasmNode,
 				5,
 				fixedLineNameResolver);
-		Assert.assertEquals("Incorrect simple cross gerneation with null parents",
+		Assert.assertEquals("Incorrect simple cross generation with null parents",
 				"Unknown/Unknown",
 				processGermplasmNode.getPedigree());
 	}
