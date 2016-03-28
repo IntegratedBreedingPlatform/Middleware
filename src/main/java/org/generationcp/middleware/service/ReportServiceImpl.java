@@ -12,6 +12,7 @@ import java.util.Set;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -76,7 +77,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 	}
 
     @Override
-    public Reporter getStreamGermplasmListReport(String code, Integer germplasmListID, String programName, final OutputStream output)
+    public Reporter getStreamGermplasmListReport(final String code, final Integer germplasmListID, final String programName, final OutputStream output)
             throws MiddlewareException, JRException, IOException, BuildReportException {
         final Reporter reporter = this.factory.createReporter(code);
         final Map<String, Object> data = this.extractGermplasmListData(germplasmListID);
@@ -116,21 +117,16 @@ public class ReportServiceImpl extends Service implements ReportService {
 		return dataBeans;
 	}
 
-    protected Map<String, Object> extractGermplasmListData(Integer germplasmListID) {
+    protected Map<String, Object> extractGermplasmListData(final Integer germplasmListID) {
         // currently, only a blank map is returned as the current requirements for germplasm reports do not require dynamic data
-        Map<String, Object> params = new HashMap<>();
+        final Map<String, Object> params = new HashMap<>();
         params.put(AbstractReporter.STUDY_CONDITIONS_KEY, new ArrayList<MeasurementVariable>());
         params.put(AbstractReporter.DATA_SOURCE_KEY, new ArrayList());
         return params;
     }
 
 	protected List<MeasurementVariable> appendCountryInformation(final List<MeasurementVariable> originalConditions) {
-		Integer locationId = null;
-
-		for (final MeasurementVariable condition : originalConditions) {
-			final TermId term = TermId.getById(condition.getTermId());
-			locationId = this.retrieveLocationIdFromCondition(condition, term);
-		}
+		final Integer locationId = this.retrieveLocationIdFromCondition(originalConditions);
 
 		if (locationId == null) {
 			return originalConditions;
@@ -161,19 +157,20 @@ public class ReportServiceImpl extends Service implements ReportService {
 	}
 
 	/***
-	 * Retrieves the Location ID from condition variable; Returns null if the condition value is an empty string
+	 * Retrieves the Location ID from the list of condition variables; Returns null if the condition value is an empty string
 	 *
-	 * @param condition
-	 * @param termId
 	 * @return
 	 */
-	Integer retrieveLocationIdFromCondition(final MeasurementVariable condition, final TermId termId) {
+	Integer retrieveLocationIdFromCondition(final List<MeasurementVariable> originalConditions) {
 		Integer locationId = null;
-		final String conditionValue = condition.getValue().trim();
-		if (termId == TermId.LOCATION_ID && conditionValue.length() > 0) {
-			locationId = Integer.parseInt(conditionValue);
-		}
-		return locationId;
+        for (final MeasurementVariable condition : originalConditions) {
+            final TermId term = TermId.getById(condition.getTermId());
+            if (term == TermId.LOCATION_ID && !StringUtils.isEmpty(condition.getValue())) {
+                locationId = Integer.parseInt(condition.getValue());
+            }
+        }
+
+        return locationId;
 	}
 
 	@Override
