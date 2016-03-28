@@ -189,7 +189,7 @@ public class WorkbookTestDataInitializer {
 		final Workbook workbook = new Workbook();
 		setDefaultValues(workbook);
 		createStudyDetails(workbook, studyName, studyType);
-		workbook.setConditions(createConditions(!hasMultipleLocations, trialNo));
+		workbook.setConditions(createConditions(!hasMultipleLocations, trialNo, trialNo));
 		createFactors(workbook, true, hasMultipleLocations, trialNo);
 		createConstants(workbook);
 		createVariates(workbook, isForMeansDataset);
@@ -231,7 +231,7 @@ public class WorkbookTestDataInitializer {
 
 		final String studyName = "workbookWithErrors" + new Random().nextInt(10000);
 		createStudyDetails(workbook, studyName, StudyType.T);
-		workbook.setConditions(createConditions(false, 1));
+		workbook.setConditions(createConditions(false, 1, 1));
 		createFactors(workbook, false, false, 1);
 		createConstants(workbook);
 		createVariatesWithDuplicatePSM(workbook);
@@ -244,7 +244,7 @@ public class WorkbookTestDataInitializer {
 		final Workbook wbook = new Workbook();
 
 		createStudyDetails(wbook, studyName, StudyType.T);
-		wbook.setConditions(createConditions(false, trialNo));
+		wbook.setConditions(createConditions(false, trialNo, trialNo));
 		createFactors(wbook, true, true, trialNo);
 		createConstants(wbook);
 		createVariates(wbook, false);
@@ -272,7 +272,7 @@ public class WorkbookTestDataInitializer {
 		workbook.setStudyDetails(details);
 	}
 
-	public static List<MeasurementVariable> createConditions(final boolean withTrial, final int trialNo) {
+	public static List<MeasurementVariable> createConditions(final boolean withTrial, final int trialNo, final int locationId) {
 		// Create measurement variables and set its dataTypeId
 		final List<MeasurementVariable> conditions = new ArrayList<>();
 
@@ -302,12 +302,12 @@ public class WorkbookTestDataInitializer {
 
 		conditions.add(createMeasurementVariable(TermId.TRIAL_LOCATION.getId(), "SITE", "TRIAL SITE NAME",
 				WorkbookTestDataInitializer.DBCV, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.LOCATION,
-				WorkbookTestDataInitializer.CHAR, "SITE " + trialNo, WorkbookTestDataInitializer.TRIAL, TermId.CHARACTER_VARIABLE.getId(),
+				WorkbookTestDataInitializer.CHAR, "SITE " + locationId, WorkbookTestDataInitializer.TRIAL, TermId.CHARACTER_VARIABLE.getId(),
 				PhenotypicType.TRIAL_ENVIRONMENT, false));
 
 		conditions.add(createMeasurementVariable(TermId.LOCATION_ID.getId(), "SITE ID", "TRIAL SITE ID",
 				WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.LOCATION,
-				WorkbookTestDataInitializer.NUMERIC, String.valueOf(trialNo), WorkbookTestDataInitializer.TRIAL,
+				WorkbookTestDataInitializer.NUMERIC, String.valueOf(locationId), WorkbookTestDataInitializer.TRIAL,
 				TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT, false));
 
 		conditions.add(createExperimentalRCBDVariable());
@@ -660,7 +660,7 @@ public class WorkbookTestDataInitializer {
 		final Workbook workbook = new Workbook();
 
 		createStudyDetails(workbook, null, StudyType.T);
-		workbook.setConditions(createConditions(true, 1));
+		workbook.setConditions(createConditions(true, 1, 1));
 
 		final MeasurementRow row = new MeasurementRow();
 		final List<MeasurementData> dataList = new ArrayList<>();
