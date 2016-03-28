@@ -19,7 +19,9 @@ import org.generationcp.middleware.pojos.report.Occurrence;
 
 public abstract class AbstractNurseryReporter extends AbstractReporter {
 
-	@SuppressWarnings("unchecked")
+    public static final int DEFAULT_OCC_VALUE = 1;
+
+    @SuppressWarnings("unchecked")
 	@Override
 	public Map<String, Object> buildJRParams(final Map<String, Object> args) {
 		final Map<String, Object> params = super.buildJRParams(args);
@@ -51,7 +53,7 @@ public abstract class AbstractNurseryReporter extends AbstractReporter {
 					break;
 				case TRIAL_INSTANCE_FACTOR:
 					if ("".equalsIgnoreCase(var.getValue())) {
-						params.put("occ", 0);
+						params.put("occ", DEFAULT_OCC_VALUE);
 					} else {
 						params.put("occ", Integer.valueOf(var.getValue()));
 					}
