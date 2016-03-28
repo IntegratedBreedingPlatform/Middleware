@@ -447,4 +447,32 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		return mapCountWithName;
 	}
 
+	/**
+	 * Returns a list with all the Names that are permutations of a given name and which type is in the given list of types.
+	 * If the List/Bag of types is empty or null it is assumed that the filter could be ignored.
+	 *
+	 * @param name The name whose permutations are to be looked for.
+	 * @param typeList  List/bag of types in which the name.ntype must be into.
+	 * @return
+	 */
+	public List<Name> getNamesByNvalInTypeList(String name, List<Integer> typeList) {
+
+		List<String> names = GermplasmDataManagerUtil.createNamePermutations(name);
+		String queryString;
+		if (typeList==null || typeList.size()==0){
+			queryString = "select names from Name names where names.nval in (:names)";
+		}else{
+			queryString = "select name from Name name where name.nval in (:names) and name.typeId in (:typeList)";
+		}
+
+		Query query = getSession().createQuery(queryString);
+		query.setParameterList("names", names);
+
+		if (typeList!=null && typeList.size()>0){
+			query.setParameterList("typeList", typeList);
+		}
+
+
+		return query.list();
+	}
 }

@@ -22,6 +22,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.NonUniqueResultException;
+import org.hibernate.Query;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -119,5 +120,33 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 		return null;
+	}
+
+	public List<UserDefinedField> getByTableAndTypeWithoutList(String table, String ftype,List<Integer> excludedIds) throws MiddlewareQueryException {
+		if(table == null || table.isEmpty() || ftype==null || ftype.isEmpty() || excludedIds ==null){
+			String message = "Invalid input parameters.";
+			throw new MiddlewareQueryException(message);
+		}
+
+		try {
+			String queryString = "select udf from UserDefinedField udf where udf.ftable=:table and udf.ftype=:ftype";
+			if(excludedIds.size()>0){
+				queryString = queryString + " and udf.fldno not in (:excludedIds)";
+			}
+
+			Query query = this.getSession().createQuery(queryString);
+			query.setParameter("table",table);
+			query.setParameter("ftype",ftype);
+			if(excludedIds.size()>0){
+				query.setParameterList("excludedIds",excludedIds);
+			}
+
+			return query.list();
+		} catch (Exception e) {
+			String message = "Error executing UserDefinedFieldDAO.getByTableTypeAndCode(fTable={}, fType={}, fCode={}) : {}";
+			LOG.error(message, table, ftype, excludedIds,e.getMessage());
+			throw new MiddlewareQueryException(message, e);
+		}
+
 	}
 }

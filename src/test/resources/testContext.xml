@@ -155,4 +155,10 @@
         <property name="sessionFactory" ref="IBDBV2_MAIZE_MERGED_SessionFactory"/>
         <aop:scoped-proxy proxy-target-class="false"/>
     </bean>
+    <context:component-scan base-package="org.generationcp.breeding.manager.validator"/>
+
+    <bean id="userDefinedFieldsDataManager" class="org.generationcp.middleware.manager.UserDefinedFieldsDataManagerImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
 </beans>

@@ -13,7 +13,7 @@ package org.generationcp.middleware.manager;
 
 import java.io.Serializable;
 
-import org.generationcp.middleware.auditory.AuditorDataManager;
+
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -22,11 +22,13 @@ import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.MBDTDataManager;
+import org.generationcp.middleware.manager.api.NamesDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.PresetDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
+import org.generationcp.middleware.manager.api.UserDefinedFieldsDataManager;
 import org.generationcp.middleware.manager.api.UserProgramStateDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyDaoFactory;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
@@ -139,9 +141,6 @@ public class ManagerFactory implements Serializable {
 		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
 				this.getOntologyScaleDataManager(), this.sessionProvider);
 	}
-	public AuditorDataManager getAuditorDataManager() {
-		return new AuditorDataManager(this.sessionProvider);
-	}
 
 	public PresetDataManager getPresetDataManager() {
 		return new PresetDataManagerImpl(this.sessionProvider);
@@ -193,6 +192,14 @@ public class ManagerFactory implements Serializable {
 
 	public MBDTDataManager getMbdtDataManager() {
 		return new MBDTDataManagerImpl(this.sessionProvider);
+	}
+
+	public UserDefinedFieldsDataManager getUserDefinedFieldsDataManager(){
+		return new UserDefinedFieldsDataManagerImpl(this.sessionProvider,this.databaseName);
+	}
+
+	public NamesDataManager getNamesDataManager(){
+		return new NamesDataManagerImpl(this.sessionProvider,this.databaseName);
 	}
 
 	public ReportService getReportService() {
@@ -259,5 +266,4 @@ public class ManagerFactory implements Serializable {
 	public GermplasmGroupingService getGermplasmGroupingService() {
 		return new GermplasmGroupingServiceImpl(this.sessionProvider);
 	}
-
 }
