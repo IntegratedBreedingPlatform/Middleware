@@ -35,7 +35,7 @@ public class DoubleCrossProcessorTest {
 
 		final PedigreeString resultantPedigreeString =
 				doubleCrossProcessor.processGermplasmNode(parentGermplasmNode, new Integer(3), fixedLineNameResolver);
-		assertEquals("Pedigree string is a cross of the female and male children ", "B/C//E/F", resultantPedigreeString.getPedigree());
+		assertEquals("Incorrect double cross generation", "B/C//E/F", resultantPedigreeString.getPedigree());
 		assertEquals("We have crated one cross.", 2, resultantPedigreeString.getNumberOfCrosses());
 
 	}
@@ -56,8 +56,24 @@ public class DoubleCrossProcessorTest {
 		parentGermplasmNode.setMaleParent(null);
 		final PedigreeString resultantPedigreeString =
 				doubleCrossProcessor.processGermplasmNode(parentGermplasmNode, new Integer(3), fixedLineNameResolver);
-		assertEquals("Pedigree string is a cross of the female and male children ", "B/C//Unknown", resultantPedigreeString.getPedigree());
+		assertEquals("Incorrect double cross generation with missing male parent", "B/C//Unknown", resultantPedigreeString.getPedigree());
 		assertEquals("We have crated one cross.", 1, resultantPedigreeString.getNumberOfCrosses());
+
+	}
+
+	@Test
+	public void testCreationOfDoubleCrossWithNullParents() throws Exception {
+
+		final GermplasmNode parentGermplasmNode =
+				PedigreeStringTestUtil.createGermplasmNode(6, "G", PedigreeStringTestUtil.DOUBLE_CROSS_METHOD_ID,
+						PedigreeStringTestUtil.DOUBLE_CROSS_METHOD_NAME, PedigreeStringTestUtil.DOUBLE_CROSS_METHOD_NUMBER_OF_PROGENITOR);
+		parentGermplasmNode.setFemaleParent(null);
+		parentGermplasmNode.setMaleParent(null);
+		final PedigreeString resultantPedigreeString =
+				doubleCrossProcessor.processGermplasmNode(parentGermplasmNode, new Integer(3), fixedLineNameResolver);
+		assertEquals("Incorret double cross generationw with missing parents.", "Unknown/Unknown", resultantPedigreeString.getPedigree());
+		assertEquals("Note this is 0 which is odd but is the same behaviour as in the original algorithm."
+				+ " Please refer to org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl", 0, resultantPedigreeString.getNumberOfCrosses());
 
 	}
 }

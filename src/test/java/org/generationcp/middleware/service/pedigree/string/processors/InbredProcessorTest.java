@@ -48,7 +48,7 @@ public class InbredProcessorTest {
 	public void testInbredProcessorWhenMissingGermplasmName() throws Exception {
 		final InbredProcessor inbredProcessor = new InbredProcessor();
 		final PedigreeString inbreadPedigreeString = inbredProcessor.processGermplasmNode(new GermplasmNode(new Germplasm(1)), 3, fixedLineNameResolver);
-		assertEquals("Pedigree string is 1 since we inputted a null name value", "1",
+		assertEquals("Pedigree string is the gid i.e. 1 since we inputted a null name value", "1",
 				inbreadPedigreeString.getPedigree());
 	}
 

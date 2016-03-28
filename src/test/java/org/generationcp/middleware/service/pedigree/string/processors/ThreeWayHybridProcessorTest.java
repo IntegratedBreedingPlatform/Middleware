@@ -44,7 +44,7 @@ public class ThreeWayHybridProcessorTest {
 
 		final PedigreeString resultantPedigreeString =
 				threeWayHybridProcessor.processGermplasmNode(threeWayCrossParentNode, new Integer(3), fixedLineNameResolver);
-		assertEquals("Pedigree string is a cross of the female single cross and the male  ", "B/C//D",
+		assertEquals("Incorrect three way cross generation where female parent has the single cross", "B/C//D",
 				resultantPedigreeString.getPedigree());
 		assertEquals("We have crated one cross.", 2, resultantPedigreeString.getNumberOfCrosses());
 
@@ -70,7 +70,7 @@ public class ThreeWayHybridProcessorTest {
 
 		final PedigreeString resultantPedigreeString =
 				threeWayHybridProcessor.processGermplasmNode(threeWayCrossParentNode, new Integer(3), fixedLineNameResolver);
-		assertEquals("Pedigree string is a cross of the female single cross and the male  ", "B/C//D",
+		assertEquals("Incorrect three way cross generation where male parent has the single cross", "B/C//D",
 				resultantPedigreeString.getPedigree());
 		assertEquals("We have crated one cross.", 2, resultantPedigreeString.getNumberOfCrosses());
 
@@ -92,7 +92,7 @@ public class ThreeWayHybridProcessorTest {
 
 		final PedigreeString resultantPedigreeString =
 				threeWayHybridProcessor.processGermplasmNode(threeWayCrossParentNode, new Integer(3), fixedLineNameResolver);
-		assertEquals("Pedigree string is a cross of the female single cross and the male  ", "B/C//Unknown",
+		assertEquals("Incorrect three way cross generation where male parent is null ", "B/C//Unknown",
 				resultantPedigreeString.getPedigree());
 		assertEquals("We have crated one cross.", 2, resultantPedigreeString.getNumberOfCrosses());
 
@@ -113,7 +113,7 @@ public class ThreeWayHybridProcessorTest {
 
 		final PedigreeString resultantPedigreeString =
 				threeWayHybridProcessor.processGermplasmNode(threeWayCrossParentNode, new Integer(3), fixedLineNameResolver);
-		assertEquals("Pedigree string is a cross of the female single cross and the male  ", "B/C//Unknown",
+		assertEquals("Incorrect three way cross generation where female parent is null ", "B/C//Unknown",
 				resultantPedigreeString.getPedigree());
 		assertEquals("We have crated one cross.", 2, resultantPedigreeString.getNumberOfCrosses());
 
@@ -134,7 +134,7 @@ public class ThreeWayHybridProcessorTest {
 
 		final PedigreeString resultantPedigreeString =
 				threeWayHybridProcessor.processGermplasmNode(threeWayCrossParentNode, new Integer(3), fixedLineNameResolver);
-		assertEquals("Pedigree string is a cross of the female single cross and the male  ", "Unknown/Unknown",
+		assertEquals("Incorrect three way cross generation where both parent is null ", "Unknown/Unknown",
 				resultantPedigreeString.getPedigree());
 		assertEquals("We have crated one cross.", 1, resultantPedigreeString.getNumberOfCrosses());
 
