@@ -193,7 +193,7 @@ public class WorkbookTestDataInitializer {
 		Workbook workbook = new Workbook();
 		setDefaultValues(workbook);
 		createStudyDetails(workbook, studyName, studyType);
-		createConditions(workbook, !hasMultipleLocations, trialNo);
+		workbook.setConditions(createConditions(!hasMultipleLocations, trialNo));
 		createFactors(workbook, true, hasMultipleLocations, trialNo);
 		createConstants(workbook);
 		createVariates(workbook, isForMeansDataset);
@@ -235,7 +235,7 @@ public class WorkbookTestDataInitializer {
 
 		final String studyName = "workbookWithErrors" + new Random().nextInt(10000);
 		createStudyDetails(workbook, studyName, StudyType.T);
-		createConditions(workbook, false, 1);
+		workbook.setConditions(createConditions(false, 1));
 		createFactors(workbook, false, false, 1);
 		createConstants(workbook);
 		createVariatesWithDuplicatePSM(workbook);
@@ -248,7 +248,7 @@ public class WorkbookTestDataInitializer {
 		final Workbook wbook = new Workbook();
 
 		createStudyDetails(wbook, studyName, StudyType.T);
-		createConditions(wbook, false, trialNo);
+		wbook.setConditions(createConditions(false, trialNo));
 		createFactors(wbook, true, true, trialNo);
 		createConstants(wbook);
 		createVariates(wbook, false);
@@ -276,7 +276,7 @@ public class WorkbookTestDataInitializer {
 		workbook.setStudyDetails(details);
 	}
 
-	public static void createConditions(final Workbook workbook, final boolean withTrial, final int trialNo) {
+	public static List<MeasurementVariable> createConditions(final boolean withTrial, final int trialNo) {
 		// Create measurement variables and set its dataTypeId
 		final List<MeasurementVariable> conditions = new ArrayList<MeasurementVariable>();
 
@@ -321,7 +321,7 @@ public class WorkbookTestDataInitializer {
 				WorkbookTestDataInitializer.NUMERIC, String.valueOf(trialNo), WorkbookTestDataInitializer.TRIAL,
 				TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE, true));
 
-		workbook.setConditions(conditions);
+		return conditions;
 	}
 
 	public static MeasurementVariable createExperimentalRCBDVariable() {
@@ -664,7 +664,7 @@ public class WorkbookTestDataInitializer {
 		final Workbook workbook = new Workbook();
 
 		createStudyDetails(workbook, null, StudyType.T);
-		createConditions(workbook, true, 1);
+		workbook.setConditions(createConditions(true, 1));
 
 		final MeasurementRow row = new MeasurementRow();
 		final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
