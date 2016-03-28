@@ -113,6 +113,12 @@ public class NameDAOTest extends IntegrationTestBase {
 				names.get(0).getNval().equals(NameDAOTest.PREFERRED_NAME));
 	}
 
+	@Test
+	public void testGetNamesByNvalInTypeList() throws Exception {
+		//TODO: MILDO Add integration test!!!
+
+	}
+
 	private Germplasm createGermplasmTestData(final int dateIntValue) {
 		final Germplasm germplasm = new Germplasm();
 		germplasm.setUserId(1);
