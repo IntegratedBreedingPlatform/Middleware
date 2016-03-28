@@ -107,8 +107,6 @@ public class WorkbookTestDataInitializer {
 	public static final String PI_ID = "PI Id";
 	public static final String COOPERATOR = "COOPERATOR";
 	public static final String COOPERATOR_ID = "COOPERATOR ID";
-	public static final int COOPERATOR_ID_ID = 8372;
-	public static final int COOPERATOR_NAME_ID = 8373;
 	public static final String NUMERIC_VALUE = "1";
 	public static final String SITE = "Site";
 	public static final String SITE_ID = "Site Id";
@@ -132,8 +130,6 @@ public class WorkbookTestDataInitializer {
 	public static final String INVALID_CRUST_VALUE_MISSING = "missing";
 
 	public static final int DEFAULT_NO_OF_OBSERVATIONS = 10;
-	public static final int LOCATION_NAME_ID = 8180;
-	public static final int LOCATION_ID_ID = 8190;
 	public static final int EXPT_DESIGN_ID = 8135;
 	public static final String EXPERIMENT_DESIGN = "Experimental design";
 	public static final String TYPE = "Type";
@@ -212,9 +208,9 @@ public class WorkbookTestDataInitializer {
 			dataList = new ArrayList<MeasurementData>();
 			dataList.add(createMeasurementData(WorkbookTestDataInitializer.TRIAL, String.valueOf(1), TermId.TRIAL_INSTANCE_FACTOR.getId(),
 					workbook.getFactors()));
-			dataList.add(createMeasurementData("SITE", String.valueOf(1), WorkbookTestDataInitializer.LOCATION_NAME_ID,
+			dataList.add(createMeasurementData("SITE", String.valueOf(1), TermId.TRIAL_LOCATION.getId(),
 					workbook.getConditions()));
-			dataList.add(createMeasurementData("SITE ID", String.valueOf(1), WorkbookTestDataInitializer.LOCATION_ID_ID,
+			dataList.add(createMeasurementData("SITE ID", String.valueOf(1), TermId.LOCATION_ID.getId(),
 					workbook.getConditions()));
 			dataList.add(createMeasurementData("PLTHT_UnitErrors", String.valueOf(1),
 					WorkbookTestDataInitializer.PLANT_HEIGHT_UNIT_ERRORS_ID,
@@ -294,22 +290,22 @@ public class WorkbookTestDataInitializer {
 				WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.STUDY,
 				TermId.NUMERIC_VARIABLE.getId(), withTrial ? PhenotypicType.TRIAL_ENVIRONMENT : PhenotypicType.STUDY, false));
 
-		conditions.add(createMeasurementVariable(WorkbookTestDataInitializer.COOPERATOR_NAME_ID, "COOPERATOR", "COOPERATOR NAME",
+		conditions.add(createMeasurementVariable(TermId.COOPERATOR.getId(), "COOPERATOR", "COOPERATOR NAME",
 				WorkbookTestDataInitializer.DBCV, WorkbookTestDataInitializer.CONDUCTED, WorkbookTestDataInitializer.PERSON,
 				WorkbookTestDataInitializer.CHAR, "John Smith", WorkbookTestDataInitializer.TRIAL, TermId.CHARACTER_VARIABLE.getId(),
 				withTrial ? PhenotypicType.TRIAL_ENVIRONMENT : PhenotypicType.STUDY, false));
 
-		conditions.add(createMeasurementVariable(WorkbookTestDataInitializer.COOPERATOR_ID_ID, "COOPERATOR ID", "COOPERATOR ID",
+		conditions.add(createMeasurementVariable(TermId.COOPERATOOR_ID.getId(), "COOPERATOR ID", "COOPERATOR ID",
 				WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.CONDUCTED, WorkbookTestDataInitializer.PERSON,
 				WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.TRIAL,
 				TermId.NUMERIC_VARIABLE.getId(), withTrial ? PhenotypicType.TRIAL_ENVIRONMENT : PhenotypicType.STUDY, false));
 
-		conditions.add(createMeasurementVariable(WorkbookTestDataInitializer.LOCATION_NAME_ID, "SITE", "TRIAL SITE NAME",
+		conditions.add(createMeasurementVariable(TermId.TRIAL_LOCATION.getId(), "SITE", "TRIAL SITE NAME",
 				WorkbookTestDataInitializer.DBCV, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.LOCATION,
 				WorkbookTestDataInitializer.CHAR, "SITE " + trialNo, WorkbookTestDataInitializer.TRIAL, TermId.CHARACTER_VARIABLE.getId(),
 				PhenotypicType.TRIAL_ENVIRONMENT, false));
 
-		conditions.add(createMeasurementVariable(WorkbookTestDataInitializer.LOCATION_ID_ID, "SITE ID", "TRIAL SITE ID",
+		conditions.add(createMeasurementVariable(TermId.LOCATION_ID.getId(), "SITE ID", "TRIAL SITE ID",
 				WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.LOCATION,
 				WorkbookTestDataInitializer.NUMERIC, String.valueOf(trialNo), WorkbookTestDataInitializer.TRIAL,
 				TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT, false));
@@ -673,9 +669,9 @@ public class WorkbookTestDataInitializer {
 				TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getConditions()));
 		dataList.add(createMeasurementData(WorkbookTestDataInitializer.PI_NAME, "", TermId.PI_NAME.getId(), workbook.getConditions()));
 		dataList.add(createMeasurementData(WorkbookTestDataInitializer.PI_ID, "", TermId.PI_ID.getId(), workbook.getConditions()));
-		dataList.add(createMeasurementData(WorkbookTestDataInitializer.COOPERATOR, "", WorkbookTestDataInitializer.COOPERATOR_NAME_ID,
+		dataList.add(createMeasurementData(WorkbookTestDataInitializer.COOPERATOR, "", TermId.COOPERATOR.getId(),
 				workbook.getConditions()));
-		dataList.add(createMeasurementData(WorkbookTestDataInitializer.COOPERATOR_ID, "", WorkbookTestDataInitializer.COOPERATOR_ID_ID,
+		dataList.add(createMeasurementData(WorkbookTestDataInitializer.COOPERATOR_ID, "", TermId.COOPERATOOR_ID.getId(),
 				workbook.getConditions()));
 
 		row.setDataList(dataList);
@@ -824,10 +820,10 @@ public class WorkbookTestDataInitializer {
 			data.setMeasurementVariable(getMeasurementVariable(TermId.PI_ID.getId(), workbook.getConditions()));
 			dataList.add(data);
 			data = new MeasurementData(COOPERATOR, "");
-			data.setMeasurementVariable(getMeasurementVariable(COOPERATOR_NAME_ID, workbook.getConditions()));
+			data.setMeasurementVariable(getMeasurementVariable(TermId.COOPERATOR.getId(), workbook.getConditions()));
 			dataList.add(data);
 			data = new MeasurementData(COOPERATOR_ID, "");
-			data.setMeasurementVariable(getMeasurementVariable(COOPERATOR_ID_ID, workbook.getConditions()));
+			data.setMeasurementVariable(getMeasurementVariable(TermId.COOPERATOOR_ID.getId(), workbook.getConditions()));
 			dataList.add(data);
 			data = new MeasurementData(WorkbookTestDataInitializer.SITE, LNAME + "_" + (i + 1));
 			data.setMeasurementVariable(getMeasurementVariable(TermId.TRIAL_LOCATION.getId(), workbook.getConditions()));
