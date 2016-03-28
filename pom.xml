@@ -462,11 +462,15 @@
 						<include>**/InbredProcessorTest.java</include>
 						<include>**/PedigreeStringTestUtil.java</include>
 						<include>**/SimpleCrossProcessorTest.java</include>
+						<include>**/SingleCrossHybridProcessorTest.java</include>
 						<include>**/ThreeWayHybridProcessorTest.java</include>
 						<include>**/PedigreeStringGeneratorUtilTest.java</include>
 						<include>**/CrossExpansionPropertiesTest.java</include>
-						<include>**/MiddlewareGetterAndSetterTestSuite.java</include>
 						<include>**/PedigreeAlgorithmTest.java</include>
+
+						<!-- Just to improve code coverage i.e. remove noise from actual results. -->
+						<include>**/MiddlewareGetterAndSetterTestSuite.java</include>
+
 					</includes>
 				</configuration>
 			</plugin>
