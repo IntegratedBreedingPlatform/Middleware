@@ -154,7 +154,7 @@ public class WorkbookTestDataInitializer {
 		return createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, null, 1, false, false);
 	}
 
-	public static Workbook getTestWorkbook(boolean isForMeansDataset) {
+	public static Workbook getTestWorkbook(final boolean isForMeansDataset) {
 		return createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, null, 1, false, isForMeansDataset);
 	}
 
@@ -171,7 +171,7 @@ public class WorkbookTestDataInitializer {
 	}
 
 	public static List<Workbook> getTestWorkbooks(final int noOfTrial, final int noOfObservations) {
-		List<Workbook> workbooks = new ArrayList<Workbook>();
+		final List<Workbook> workbooks = new ArrayList<>();
 		final String studyName = "pheno_t7" + new Random().nextInt(10000);
 		for (int i = 1; i <= noOfTrial; i++) {
 			workbooks.add(createTestWorkbook(noOfObservations, StudyType.T, studyName, i, true, false));
@@ -186,7 +186,7 @@ public class WorkbookTestDataInitializer {
 
 	public static Workbook createTestWorkbook(final int noOfObservations, final StudyType studyType, final String studyName,
 			final int trialNo, final boolean hasMultipleLocations, final boolean isForMeansDataset) {
-		Workbook workbook = new Workbook();
+		final Workbook workbook = new Workbook();
 		setDefaultValues(workbook);
 		createStudyDetails(workbook, studyName, studyType);
 		workbook.setConditions(createConditions(!hasMultipleLocations, trialNo));
@@ -197,15 +197,15 @@ public class WorkbookTestDataInitializer {
 		return workbook;
 	}
 
-	public static void setTrialObservations(Workbook workbook) {
-		List<MeasurementRow> trialObservations = new ArrayList<>();
+	public static void setTrialObservations(final Workbook workbook) {
+		final List<MeasurementRow> trialObservations = new ArrayList<>();
 		MeasurementRow row;
 		List<MeasurementData> dataList;
 
 		// Create n number of observation rows
 		for (int i = 0; i < workbook.getObservations().size(); i++) {
 			row = new MeasurementRow();
-			dataList = new ArrayList<MeasurementData>();
+			dataList = new ArrayList<>();
 			dataList.add(createMeasurementData(WorkbookTestDataInitializer.TRIAL, String.valueOf(1), TermId.TRIAL_INSTANCE_FACTOR.getId(),
 					workbook.getFactors()));
 			dataList.add(createMeasurementData("SITE", String.valueOf(1), TermId.TRIAL_LOCATION.getId(),
@@ -221,7 +221,7 @@ public class WorkbookTestDataInitializer {
 		workbook.setTrialObservations(trialObservations);
 	}
 
-	private static void setDefaultValues(Workbook workbook) {
+	private static void setDefaultValues(final Workbook workbook) {
 		workbook.setTreatmentFactors(new ArrayList<TreatmentVariable>());
 		workbook.setMeasurementDatesetId(2);
 	}
@@ -274,7 +274,7 @@ public class WorkbookTestDataInitializer {
 
 	public static List<MeasurementVariable> createConditions(final boolean withTrial, final int trialNo) {
 		// Create measurement variables and set its dataTypeId
-		final List<MeasurementVariable> conditions = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> conditions = new ArrayList<>();
 
 		if (withTrial) {
 			conditions.add(createTrialInstanceMeasurementVariable(trialNo));
@@ -329,7 +329,7 @@ public class WorkbookTestDataInitializer {
 
 	public static void createFactors(final Workbook workbook, final boolean withEntry, final boolean withTrial, final int trialNo) {
 		// Create measurement variables and set its dataTypeId
-		final List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> factors = new ArrayList<>();
 
 		if (withTrial) {
 			factors.add(createTrialInstanceMeasurementVariable(trialNo));
@@ -390,7 +390,7 @@ public class WorkbookTestDataInitializer {
 
 	public static void createConstants(final Workbook workbook) {
 		// Create measurement variables and set its dataTypeId
-		final List<MeasurementVariable> constants = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> constants = new ArrayList<>();
 
 		constants.add(createMeasurementVariable(WorkbookTestDataInitializer.GRAIN_SIZE_ID, "Grain_size",
 				"Grain size - weigh 1000 dry grains (g)", WorkbookTestDataInitializer.GRAIN_SIZE_SCALE,
@@ -402,7 +402,7 @@ public class WorkbookTestDataInitializer {
 
 	public static void createVariates(final Workbook workbook, final boolean isForMeansDataset) {
 		// Create measurement variables and set its dataTypeId
-		final List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> variates = new ArrayList<>();
 
 		if (isForMeansDataset) {
 			final MeasurementVariable measurementVariable =
@@ -435,7 +435,7 @@ public class WorkbookTestDataInitializer {
 	}
 
 	public static void createObservations(final Workbook workbook, final int noOfObservations, final boolean withTrial, final int trialNo) {
-		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
+		final List<MeasurementRow> observations = new ArrayList<>();
 
 		MeasurementRow row;
 		List<MeasurementData> dataList;
@@ -445,7 +445,7 @@ public class WorkbookTestDataInitializer {
 		// Create n number of observation rows
 		for (int i = 0; i < noOfObservations; i++) {
 			row = new MeasurementRow();
-			dataList = new ArrayList<MeasurementData>();
+			dataList = new ArrayList<>();
 			if (withTrial) {
 				dataList.add(createMeasurementData(WorkbookTestDataInitializer.TRIAL, String.valueOf(trialNo),
 						TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getFactors()));
@@ -558,7 +558,7 @@ public class WorkbookTestDataInitializer {
 	}
 
 	private static void createVariatesWithDuplicatePSM(final Workbook workbook) {
-		final List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> variates = new ArrayList<>();
 
 		final MeasurementVariable gyld =
 				WorkbookTestDataInitializer.createMeasurementVariable(WorkbookTestDataInitializer.GYLD_ID,
@@ -644,7 +644,7 @@ public class WorkbookTestDataInitializer {
 	}
 
 	public static List<Location> createLocationData() {
-		final List<Location> locations = new ArrayList<Location>();
+		final List<Location> locations = new ArrayList<>();
 		locations.add(new Location(WorkbookTestDataInitializer.LOCATION_ID_1, WorkbookTestDataInitializer.LTYPE,
 				WorkbookTestDataInitializer.NLLP, WorkbookTestDataInitializer.LNAME + " 1", WorkbookTestDataInitializer.LABBR,
 				WorkbookTestDataInitializer.SNL3ID, WorkbookTestDataInitializer.SNL2ID, WorkbookTestDataInitializer.SNL1ID,
@@ -663,7 +663,7 @@ public class WorkbookTestDataInitializer {
 		workbook.setConditions(createConditions(true, 1));
 
 		final MeasurementRow row = new MeasurementRow();
-		final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
+		final List<MeasurementData> dataList = new ArrayList<>();
 
 		dataList.add(createMeasurementData(WorkbookTestDataInitializer.TRIAL_INSTANCE, WorkbookTestDataInitializer.NUMERIC_VALUE,
 				TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getConditions()));
@@ -739,11 +739,11 @@ public class WorkbookTestDataInitializer {
 	}
 
 	private static void addObservations(final int newEnvironmentCount, final List<MeasurementRow> observations) {
-		final List<MeasurementRow> originalObservations = new ArrayList<MeasurementRow>(getFirstTrialInstance(observations));
+		final List<MeasurementRow> originalObservations = new ArrayList<>(getFirstTrialInstance(observations));
 		int currentObsCount = observations.size() / originalObservations.size();
 
 		for (int i = 0; i < newEnvironmentCount; i++) {
-			final List<MeasurementRow> newInstance = new ArrayList<MeasurementRow>();
+			final List<MeasurementRow> newInstance = new ArrayList<>();
 			for (final MeasurementRow row : originalObservations) {
 				newInstance.add(new MeasurementRow(row));
 			}
@@ -777,7 +777,7 @@ public class WorkbookTestDataInitializer {
 	}
 
 	public static List<MeasurementRow> getFirstTrialInstance(final List<MeasurementRow> observations) {
-		final List<MeasurementRow> firstTrialInstance = new ArrayList<MeasurementRow>();
+		final List<MeasurementRow> firstTrialInstance = new ArrayList<>();
 		long oldLocationId = 0;
 		for (final MeasurementRow row : observations) {
 			final long locationId = row.getLocationId();
@@ -800,15 +800,15 @@ public class WorkbookTestDataInitializer {
 		}
 	}
 
-	public static void createTrialObservations(final int noOfTrialInstances, Workbook workbook) {
-		final List<MeasurementRow> trialObservations = new ArrayList<MeasurementRow>();
+	public static void createTrialObservations(final int noOfTrialInstances, final Workbook workbook) {
+		final List<MeasurementRow> trialObservations = new ArrayList<>();
 
 		MeasurementRow row;
 		List<MeasurementData> dataList;
 
 		for (int i = 0; i < noOfTrialInstances; i++) {
 			row = new MeasurementRow();
-			dataList = new ArrayList<MeasurementData>();
+			dataList = new ArrayList<>();
 
 			MeasurementData data = new MeasurementData(TRIAL_INSTANCE, String.valueOf(i + 1));
 			data.setMeasurementVariable(getMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getConditions()));
