@@ -49,7 +49,7 @@ public class PedigreeStringTestUtil {
 		return germplasmNode;
 	}
 
-	static GermplasmNode createSingleCrossTestGermplasmNode(final ImmutablePair<Integer, String> parent,
+	static GermplasmNode createSingleCrossTestGermplasmTree(final ImmutablePair<Integer, String> parent,
 			final ImmutablePair<Integer, String> female, final ImmutablePair<Integer, String> male) {
 
 		final GermplasmNode parentGermplasmNode =
@@ -66,18 +66,18 @@ public class PedigreeStringTestUtil {
 
 	}
 
-	static GermplasmNode createSingleCrossTestGermplasmNode() {
-		return PedigreeStringTestUtil.createSingleCrossTestGermplasmNode(new ImmutablePair<Integer, String>(1, "A"),
+	static GermplasmNode createSingleCrossTestGermplasmTree() {
+		return PedigreeStringTestUtil.createSingleCrossTestGermplasmTree(new ImmutablePair<Integer, String>(1, "A"),
 				new ImmutablePair<Integer, String>(2, "B"), new ImmutablePair<Integer, String>(3, "C"));
 	}
 
-	static GermplasmNode createBackCrossTestGermplasmNode(final String donorParentName, final String recurringParentName,
+	static GermplasmNode createBackCrossTestGermplasmTree(final String donorParentName, final String recurringParentName,
 			final int numberOfTimeToCross, final boolean femaleDonorParent) {
 		final GermplasmNode rootGermplasmNode =
 				PedigreeStringTestUtil.createGermplasmNode(100, "RootBackcrossNode", PedigreeStringTestUtil.BACKCROSS_METHOD_ID,
 						PedigreeStringTestUtil.BACKCROSS_METHOD_NAME, 2);
 		final GermplasmNode donorParent =
-				PedigreeStringTestUtil.createSingleCrossTestGermplasmNode(new ImmutablePair<Integer, String>(1, donorParentName),
+				PedigreeStringTestUtil.createSingleCrossTestGermplasmTree(new ImmutablePair<Integer, String>(1, donorParentName),
 						new ImmutablePair<Integer, String>(2, "B"), new ImmutablePair<Integer, String>(3, "C"));
 		final GermplasmNode recurringParent =
 				PedigreeStringTestUtil.createGermplasmNode(4, recurringParentName,
@@ -85,17 +85,17 @@ public class PedigreeStringTestUtil {
 						PedigreeStringTestUtil.BULK_OR_POPULATION_SAMPLE_METHOD_NAME,
 						PedigreeStringTestUtil.BULK_OR_POPULATION_SAMPLE_METHOD_NUMBER_OF_PROGENITOR);
 
-		PedigreeStringTestUtil.createBackCrossTestGermplasmNode(rootGermplasmNode, donorParent, recurringParent, numberOfTimeToCross,
+		PedigreeStringTestUtil.createBackCrossTestGermplasmTree(rootGermplasmNode, donorParent, recurringParent, numberOfTimeToCross,
 				femaleDonorParent);
 		return rootGermplasmNode;
 	}
 
-	static GermplasmNode createDoubleCrossTestGermplasmNode() {
+	static GermplasmNode createDoubleCrossTestGermplasmTree() {
 		final GermplasmNode femaleGermplasmNode =
-				PedigreeStringTestUtil.createSingleCrossTestGermplasmNode(new ImmutablePair<Integer, String>(1, "A"),
+				PedigreeStringTestUtil.createSingleCrossTestGermplasmTree(new ImmutablePair<Integer, String>(1, "A"),
 						new ImmutablePair<Integer, String>(2, "B"), new ImmutablePair<Integer, String>(3, "C"));
 		final GermplasmNode maleGermplasmNode =
-				PedigreeStringTestUtil.createSingleCrossTestGermplasmNode(new ImmutablePair<Integer, String>(4, "D"),
+				PedigreeStringTestUtil.createSingleCrossTestGermplasmTree(new ImmutablePair<Integer, String>(4, "D"),
 						new ImmutablePair<Integer, String>(5, "E"), new ImmutablePair<Integer, String>(6, "F"));
 		final GermplasmNode parentGermplasmNode =
 				PedigreeStringTestUtil.createGermplasmNode(6, "G", PedigreeStringTestUtil.DOUBLE_CROSS_METHOD_ID,
@@ -106,7 +106,7 @@ public class PedigreeStringTestUtil {
 		return parentGermplasmNode;
 	}
 
-	private static void createBackCrossTestGermplasmNode(final GermplasmNode rootNode, final GermplasmNode donorParent,
+	private static void createBackCrossTestGermplasmTree(final GermplasmNode rootNode, final GermplasmNode donorParent,
 			final GermplasmNode recurringParent, final int numberOfTimeToCross, final boolean femaleDonorParent) {
 
 		if (numberOfTimeToCross == 0) {
@@ -119,7 +119,7 @@ public class PedigreeStringTestUtil {
 						PedigreeStringTestUtil.BACKCROSS_METHOD_ID, PedigreeStringTestUtil.BACKCROSS_METHOD_NAME, 2);
 		setNodeParents(rootNode, backcrossNode, recurringParent, femaleDonorParent);
 
-		PedigreeStringTestUtil.createBackCrossTestGermplasmNode(backcrossNode, donorParent, recurringParent, numberOfTimeToCross - 1,
+		PedigreeStringTestUtil.createBackCrossTestGermplasmTree(backcrossNode, donorParent, recurringParent, numberOfTimeToCross - 1,
 				femaleDonorParent);
 
 	}

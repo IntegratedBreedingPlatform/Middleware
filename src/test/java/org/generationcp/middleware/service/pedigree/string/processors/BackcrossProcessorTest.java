@@ -4,12 +4,10 @@ package org.generationcp.middleware.service.pedigree.string.processors;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.service.pedigree.PedigreeString;
-import org.generationcp.middleware.service.pedigree.string.processors.BackcrossProcessor;
 import org.generationcp.middleware.service.pedigree.string.util.FixedLineNameResolver;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -40,9 +38,11 @@ public class BackcrossProcessorTest {
 		final BackcrossProcessor backcrossProcessor = new BackcrossProcessor();
 
 		final GermplasmNode createBackCrossTestGermplasmNode =
-				PedigreeStringTestUtil.createBackCrossTestGermplasmNode("DonorParent", "RecurringParent", 5, true);
-				PedigreeString processGermplasmNode =
+				PedigreeStringTestUtil.createBackCrossTestGermplasmTree("DonorParent", "RecurringParent", 5, true);
+
+		final PedigreeString processGermplasmNode =
 				backcrossProcessor.processGermplasmNode(createBackCrossTestGermplasmNode, 5, mockFixedLineNameResolver);
+
 		Assert.assertEquals("B/C/5*RecurringParent", processGermplasmNode.getPedigree());
 	}
 
@@ -52,9 +52,11 @@ public class BackcrossProcessorTest {
 		final BackcrossProcessor backcrossProcessor = new BackcrossProcessor();
 
 		final GermplasmNode createBackCrossTestGermplasmNode =
-				PedigreeStringTestUtil.createBackCrossTestGermplasmNode("DonorParent", "RecurringParent", 5, false);
-		PedigreeString processGermplasmNode =
+				PedigreeStringTestUtil.createBackCrossTestGermplasmTree("DonorParent", "RecurringParent", 5, false);
+
+		final PedigreeString processGermplasmNode =
 				backcrossProcessor.processGermplasmNode(createBackCrossTestGermplasmNode, 5, mockFixedLineNameResolver);
+
 		Assert.assertEquals("RecurringParent*5/B/C", processGermplasmNode.getPedigree());
 	}
 
