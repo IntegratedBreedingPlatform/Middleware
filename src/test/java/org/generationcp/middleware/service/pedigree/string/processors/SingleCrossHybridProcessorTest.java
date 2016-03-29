@@ -28,7 +28,7 @@ public class SingleCrossHybridProcessorTest {
 	@Test
 	public void testCreationOfAStandardSingleCross() throws Exception {
 		final SingleCrossHybridProcessor singleCrossHybridProcessor = new SingleCrossHybridProcessor();
-		final GermplasmNode parentGermplasmNode = PedigreeStringTestUtil.createSingleCrossTestGermplasmNode();
+		final GermplasmNode parentGermplasmNode = PedigreeStringTestUtil.createSingleCrossTestGermplasmTree();
 
 		final PedigreeString resultantPedigreeString = singleCrossHybridProcessor.processGermplasmNode(parentGermplasmNode, new Integer(3), fixedLineNameResolver);
 		assertEquals("Pedigree string is a cross of the female and male children ", "B/C", resultantPedigreeString.getPedigree());

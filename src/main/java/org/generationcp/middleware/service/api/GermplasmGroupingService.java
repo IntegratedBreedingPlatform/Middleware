@@ -36,12 +36,12 @@ public interface GermplasmGroupingService {
 			Set<Integer> hybridMethods);
 
 	/**
-	 * Service to copy parental selection history name to the submitted germplasm
+	 * Service to copy 'selection history at fixation' name of the parent to the submitted child germplasm.
 	 * 
-	 * @param germplasm - the germplasm to copy to
+	 * @param germplasm - the germplasm to copy name to.
 	 * 
 	 */
-	void copySelectionHistory(Germplasm germplasm);
+	void copyParentalSelectionHistoryAtFixation(Germplasm germplasm);
 
 	/**
 	 * Get all group members where the given germplasm is a founder. For the founder gid = mgid.

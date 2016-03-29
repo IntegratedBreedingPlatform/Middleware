@@ -6,6 +6,8 @@ import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.service.pedigree.PedigreeString;
 import org.generationcp.middleware.service.pedigree.string.util.FixedLineNameResolver;
 import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGeneratorUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
@@ -27,13 +29,21 @@ import com.google.common.base.Preconditions;
  */
 public class BackcrossProcessor implements BreedingMethodProcessor {
 
+	private static final Logger LOG = LoggerFactory.getLogger(BackcrossProcessor.class);
+
 	final private PedigreeStringBuilder pedigreeStringBuilder = new PedigreeStringBuilder();
 
 	final private InbredProcessor inbredProcessor = new InbredProcessor();
 
+
 	@Override
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
 			final FixedLineNameResolver fixedLineNameResolver) {
+
+		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
+			LOG.debug("Germplasm with GID '{}' has a backcross breeding method. "
+					+ "Processing using backcross processor.", germplasmNode.getGermplasm().getGid());
+		}
 
 		if (level == 0) {
 			return this.inbredProcessor.processGermplasmNode(germplasmNode, level, fixedLineNameResolver);
@@ -50,6 +60,10 @@ public class BackcrossProcessor implements BreedingMethodProcessor {
 				return this.computeBackcross(femaleParent, maleParent, recurringParent, level, fixedLineNameResolver);
 			}
 		}
+
+		LOG.warn("Germplasm with GID '{}' has a backcross breeding method but no recurring parents were found. "
+				+ "Just combining immediate parents. "
+				+ "Please note the rest of the tree is not traversed.", germplasmNode.getGermplasm().getGid());
 
 		// Not a backcross. Compute pedigree string just using immediate parents.
 		final PedigreeString femaleLeafPedigreeString =
@@ -85,10 +99,9 @@ public class BackcrossProcessor implements BreedingMethodProcessor {
 			recurringParentCount = this.recurringParentCount(maleParent, recurringParent.get().getGermplasm().getGid());
 		}
 
-		final PedigreeString backcrossPedigreeString =
+		return
 				this.buildBackcrossPedigreeString(femaleParent, recurringParent, recurringParentCount, recurringParentString,
 						donorParentString, fixedLineNameResolver);
-		return backcrossPedigreeString;
 	}
 
 	private PedigreeString buildBackcrossPedigreeString(final GermplasmNode femaleParent, final Optional<GermplasmNode> recurringParent,
