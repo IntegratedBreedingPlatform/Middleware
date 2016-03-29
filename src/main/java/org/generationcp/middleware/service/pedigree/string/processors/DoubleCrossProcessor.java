@@ -5,6 +5,8 @@ import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.service.pedigree.PedigreeString;
 import org.generationcp.middleware.service.pedigree.string.util.FixedLineNameResolver;
 import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGeneratorUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * The most prevalent type of hybrid that was grown in the United States in the 1930’s and 1940’s is known as a double-cross hybrid. As the
@@ -22,13 +24,22 @@ import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGe
 
 public class DoubleCrossProcessor implements BreedingMethodProcessor {
 
+	private static final Logger LOG = LoggerFactory.getLogger(DoubleCrossProcessor.class);
+
 	private final InbredProcessor inbredProcessor = new InbredProcessor();;
 
 	private final PedigreeStringBuilder pedigreeStringBuilder = new PedigreeStringBuilder();
 
+
+
 	@Override
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
 			final FixedLineNameResolver fixedLineNameResolver) {
+
+		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
+			LOG.debug("Germplasm with GID '{}' has a double cross breeding method. "
+					+ "Processing using double cross processor.", germplasmNode.getGermplasm().getGid());
+		}
 
 		final PedigreeString femaleSingleCrossHybridPedigreeString =
 				this.constructPedigreeStringForSingleCrossHybrids(germplasmNode.getFemaleParent(), level, fixedLineNameResolver);

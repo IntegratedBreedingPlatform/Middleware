@@ -6,11 +6,19 @@ import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.service.pedigree.PedigreeString;
 import org.generationcp.middleware.service.pedigree.string.util.FixedLineNameResolver;
 import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGeneratorUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
 
+/**
+ * Enables us to construct a Pedigree string from a germplasm and its ancestor history.
+ *
+ */
 public class PedigreeStringBuilder {
+
+	private static final Logger LOG = LoggerFactory.getLogger(PedigreeStringBuilder.class);
 
 	private final InbredProcessor inbredProcessor = new InbredProcessor();;
 
@@ -18,6 +26,12 @@ public class PedigreeStringBuilder {
 			final FixedLineNameResolver fixedLineNameResolver) {
 
 		Preconditions.checkNotNull(germplasmNode);
+
+		final Germplasm germplasm = germplasmNode.getGermplasm();
+
+		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
+			LOG.debug("Building pedigree tree for germlasm with gid - '{}'", germplasmNode.getGermplasm().getGid());
+		}
 
 		final Optional<PedigreeString> fixedLineName = PedigreeStringGeneratorUtil.getFixedLineName(germplasmNode, fixedLineNameResolver);
 		if (fixedLineName.isPresent()) {
@@ -28,23 +42,23 @@ public class PedigreeStringBuilder {
 			return this.inbredProcessor.processGermplasmNode(germplasmNode, level, fixedLineNameResolver);
 		}
 
-		final Germplasm germplasm = germplasmNode.getGermplasm();
-
-		// FIXME: Add some comments here
+		// Is this germplasm that is a result of a derivative or maintenance breeding method. If so skip node.
 		if (germplasm != null && germplasm.getGnpgs() < 0) {
-			return this.processDeravaitveOrMaintenceGermplasm(germplasmNode, level, fixedLineNameResolver);
+			return this.processDerivativeOrMaintenceGermplasm(germplasmNode, level, fixedLineNameResolver);
 		}
 
+		// Get breeding method used to create this germplasm.
 		final BreedingMethodProcessor methodProcessor = BreedingMethodFactory.getMethodProcessor(germplasmNode);
 		return methodProcessor.processGermplasmNode(germplasmNode, level, fixedLineNameResolver);
 	}
 
-	private PedigreeString processDeravaitveOrMaintenceGermplasm(final GermplasmNode germplasmNode, final int level,
+	private PedigreeString processDerivativeOrMaintenceGermplasm(final GermplasmNode germplasmNode, final int level,
 			final FixedLineNameResolver fixedLineNameResolver) {
 
 		final GermplasmNode femaleParent = germplasmNode.getFemaleParent();
 
 		if (femaleParent != null) {
+			// Note derivative or maintenance methods are not consider a level increment
 			return this.buildPedigreeString(germplasmNode.getFemaleParent(), level, fixedLineNameResolver);
 		}
 

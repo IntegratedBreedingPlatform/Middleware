@@ -106,6 +106,7 @@ public class CrossExpansionProperties {
 	}
 
 	private int getGenerationLevelStoppingRulesByCrop(final String cropName) {
+		// FIXME Delivering properties without values is not a good smell.
 		final String propertyValue = this.props.getProperty(cropName + "." + CrossExpansionProperties.GENERATION_LEVEL);
 		if (StringUtils.isNotBlank(propertyValue)) {
 			try {

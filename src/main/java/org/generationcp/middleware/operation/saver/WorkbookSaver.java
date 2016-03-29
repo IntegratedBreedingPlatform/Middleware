@@ -177,7 +177,7 @@ public class WorkbookSaver extends Saver {
 			totalRows = (int) this.getStudyDataManager().countExperiments(trialDatasetId);
 		}
 
-		if ((workbook.getTrialObservations() != null && totalRows != workbook.getTrialObservations().size() && totalRows > 0 || isDeleteObservations)
+		if ((totalRows != workbook.getTrialObservations().size() && totalRows > 0 || isDeleteObservations)
 				&& trialDatasetId != null) {
 			isDeleteTrialObservations = true;
 			// delete measurement data
@@ -191,7 +191,7 @@ public class WorkbookSaver extends Saver {
 			studyLocationId =
 					this.createLocationsAndSetToObservations(locationIds, workbook, trialVariableTypeList, trialHeaders, trialVariatesMap,
 							false, programUUID);
-		} else if (workbook.getTrialObservations() != null && workbook.getTrialObservations().size() > 1) {
+		} else if (workbook.getTrialObservations().size() > 1) {
 			// also a multi-location
 			studyLocationId =
 					this.createLocationsAndSetToObservations(locationIds, workbook, trialVariables, trialHeaders, trialVariatesMap,
@@ -326,7 +326,7 @@ public class WorkbookSaver extends Saver {
 			final VariableTypeList trialVariableTypeList, final List<Integer> locationIds,
 			final Map<Integer, VariableList> trialVariatesMap, final int studyLocationId, final int totalRows,
 			final boolean isDeleteObservations, final String programUUID) {
-		if (workbook.getTrialObservations() != null && totalRows == workbook.getTrialObservations().size() && totalRows > 0
+		if (totalRows == workbook.getTrialObservations().size() && totalRows > 0
 				&& !isDeleteObservations) {
 			this.saveTrialObservations(workbook,programUUID);
 		} else {
@@ -341,7 +341,7 @@ public class WorkbookSaver extends Saver {
 	}
 
 	public void saveTrialObservations(final Workbook workbook, final String programUUID) {
-		if (workbook.getTrialObservations() != null && !workbook.getTrialObservations().isEmpty()) {
+		if (!workbook.getTrialObservations().isEmpty()) {
 			for (final MeasurementRow trialObservation : workbook.getTrialObservations()) {
 				this.getGeolocationSaver().updateGeolocationInformation(trialObservation, workbook.isNursery(), programUUID);
 			}
@@ -353,7 +353,7 @@ public class WorkbookSaver extends Saver {
 			final boolean isDeleteTrialObservations, final String programUUID) {
 
 		final TimerWatch watch = new TimerWatch("transform trial environment");
-		if (workbook.getTrialObservations() != null && workbook.getTrialObservations().size() == 1) {
+		if (workbook.getTrialObservations().size() == 1) {
 			final MeasurementRow trialObs = workbook.getTrialObservations().get(0);
 			for (final MeasurementVariable mv : trialMV) {
 				for (final MeasurementData mvrow : trialObs.getDataList()) {
@@ -384,7 +384,7 @@ public class WorkbookSaver extends Saver {
 		}
 
 		watch.restart("set to observations(total)");
-		if (workbook.getTrialObservations() != null && !workbook.getTrialObservations().isEmpty()) {
+		if (!workbook.getTrialObservations().isEmpty()) {
 			for (final MeasurementRow row : workbook.getTrialObservations()) {
 				row.setLocationId(studyLocationId);
 			}
@@ -406,7 +406,7 @@ public class WorkbookSaver extends Saver {
 		List<MeasurementRow> observations = null;
 		Long geolocationId = null;
 		boolean hasTrialObservations = false;
-		if (workbook.getTrialObservations() != null && !workbook.getTrialObservations().isEmpty()) {
+		if (!workbook.getTrialObservations().isEmpty()) {
 			observations = workbook.getTrialObservations();
 			hasTrialObservations = true;
 			if (workbook.isNursery()) {
