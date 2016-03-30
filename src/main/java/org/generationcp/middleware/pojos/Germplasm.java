@@ -303,7 +303,7 @@ public class Germplasm implements Serializable, Auditable {
 
 	public static final String GET_KNOWN_PARENT_GIDS_BY_STUDY_ID = "select distinct g.gid, G.gpid1, G.gpid2, G.grplce" + " from listnms LNAMES"
 			+ " inner join listdata_project LDATAPROJ on" + "	LNAMES.listid = LDATAPROJ.list_id" + " inner join germplsm G on"
-			+ "	G.gid = LDATAPROJ.germplasm_id and" + "	G.gnpgs > 0 AND G.gpid1 > 0 or G.gpid2 > 0" + " where LNAMES.projectid = :projId";
+			+ "	G.gid = LDATAPROJ.germplasm_id and" + "	G.gnpgs > 0 AND (G.gpid1 > 0 or G.gpid2 > 0)" + " where LNAMES.projectid = :projId";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
