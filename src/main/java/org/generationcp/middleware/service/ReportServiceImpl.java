@@ -194,18 +194,13 @@ public class ReportServiceImpl extends Service implements ReportService {
 			final int gid = Integer.valueOf(row.getMeasurementDataValue("GID"));
 			final GermplasmPedigreeTreeNode germNode = germNodes.get(gid);
 
-			if (germNode == null) {
+			if (germNode == null || (germNode.getFemaleParent() == null && germNode.getMaleParent() == null)) {
 				continue;
 			}
 
 			final GermplasmPedigreeTreeNode femaleNode = germNode.getFemaleParent();
 			final GermplasmPedigreeTreeNode maleNode = germNode.getMaleParent();
-
-            if (femaleNode == null && maleNode == null) {
-                continue;
-            }
-
-			final Germplasm female = femaleNode == null ? null : femaleNode.getGermplasm();
+            final Germplasm female = femaleNode == null ? null : femaleNode.getGermplasm();
 			final Germplasm male = maleNode == null ? null : maleNode.getGermplasm();
 
 			// TODO: pending values for origin of the entries (most likely resolved in BMS-2211)
