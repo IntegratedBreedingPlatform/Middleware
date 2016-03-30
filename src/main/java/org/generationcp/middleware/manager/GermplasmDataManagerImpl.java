@@ -1058,14 +1058,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Method getMethodByCode(final String code, final String programUUID) {
-		final Method method = this.getMethodDao().getByCode(code, programUUID);
-		return method;
+        return this.getMethodDao().getByCode(code, programUUID);
 	}
 
 	@Override
 	public Method getMethodByCode(final String code) {
-		final Method method = this.getMethodDao().getByCode(code);
-		return method;
+        return this.getMethodDao().getByCode(code);
 	}
 
 	@Override
