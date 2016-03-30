@@ -54,8 +54,8 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
-	@Autowired
-	private PedigreeService pedigreeService;
+    @Autowired
+    private PedigreeService pedigreeService;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -636,16 +636,16 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetPlotCodeValue() {
 		final GermplasmDataManagerImpl unitToTest = new GermplasmDataManagerImpl();
-		
+
 		// We want to mock away calls to other methods in same unit.
 		final GermplasmDataManagerImpl partiallyMockedUnit = Mockito.spy(unitToTest);
 		final Integer testGid = 1;
-		
+
 		// First set up data such that no plot code attribute is associated.
 		Mockito.doReturn(null).when(partiallyMockedUnit).getPlotCodeField();
 		final List<Attribute> attributes = new ArrayList<>();
 		Mockito.doReturn(attributes).when(partiallyMockedUnit).getAttributesByGID(Mockito.anyInt());
-		
+
 		final String plotCode1 = partiallyMockedUnit.getPlotCodeValue(testGid);
 		Assert.assertNotNull("getPlotCodeValue() should never return null.", plotCode1);
 		Assert.assertEquals("Expected `Unknown` returned when there is no plot code attribute present.", "Unknown", plotCode1);
@@ -663,7 +663,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		plotCodeAttr.setAval("The PlotCode Value");
 		attributes.add(plotCodeAttr);
 		Mockito.when(partiallyMockedUnit.getAttributesByGID(testGid)).thenReturn(attributes);
-		
+
 		final String plotCode2 = partiallyMockedUnit.getPlotCodeValue(testGid);
 		Assert.assertNotNull("getPlotCodeValue() should never return null.", plotCode2);
 		Assert.assertEquals("Expected value of plot code attribute returned when plot code attribute is present.", plotCodeAttr.getAval(), plotCode2);

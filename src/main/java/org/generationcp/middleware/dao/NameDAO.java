@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
@@ -365,19 +366,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	@SuppressWarnings("unchecked")
 	public boolean checkIfMatches(final String name) {
 		try {
-			final String keyword1 = name.replaceAll("\\s", "");
-			final String keyword2 = GermplasmDataManagerUtil.standardizeName(name).replaceAll("\\s", "");
-			String keyword = null;
-			if (keyword1.equals(keyword2)) {
-				keyword = keyword1;
-			}
 			final StringBuilder sql = new StringBuilder();
 			sql.append("SELECT COUNT(nid) FROM names ");
-			if (keyword == null) {
-				sql.append(" WHERE REPLACE(nval, ' ', '') IN ('").append(keyword1).append("', ").append("'").append(keyword2).append("')");
-			} else {
-				sql.append(" WHERE REPLACE(nval, ' ', '') = '").append(keyword).append("'");
-			}
+			sql.append(" WHERE nval = '").append(name).append("'");
 
 			final Query query = this.getSession().createSQLQuery(sql.toString());
 			final List<BigInteger> result = query.list();

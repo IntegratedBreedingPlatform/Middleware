@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ReportServiceImpl extends Service implements ReportService {
 
-	private final ReporterFactory factory = ReporterFactory.instance();
+    private final ReporterFactory factory = ReporterFactory.instance();
 
 	public ReportServiceImpl() {
 		super();
@@ -106,9 +106,9 @@ public class ReportServiceImpl extends Service implements ReportService {
 		}
 
 		final Map<String, Object> dataBeans = new HashMap<>();
-		dataBeans.put("studyConditions", studyConditions);
-		dataBeans.put("dataSource", observations);
-		dataBeans.put("studyObservations", wb.getTrialObservations());
+		dataBeans.put(AbstractReporter.STUDY_CONDITIONS_KEY, studyConditions);
+		dataBeans.put(AbstractReporter.DATA_SOURCE_KEY, observations);
+		dataBeans.put(AbstractReporter.STUDY_OBSERVATIONS_KEY, wb.getTrialObservations());
 		dataBeans.put("studyId", studyId);
 
 		return dataBeans;
