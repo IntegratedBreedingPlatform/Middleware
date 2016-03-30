@@ -283,12 +283,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			Workbook workbook, final String programUUID) {
 
 		// Get the categorical variates and extract their valid values (possible values)
-		Map<String, List<String>> termIdValidValuesMap = new HashMap<>();
+		Map<String, List<String>> variableValidValues = new HashMap<>();
 
-		for (MeasurementVariable measurementVaribale : workbook.getVariates()) {
+		for (MeasurementVariable measurementVariable : workbook.getVariates()) {
 			Integer stdVariableId =
-					ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(measurementVaribale.getProperty(),
-							measurementVaribale.getScale(), measurementVaribale.getMethod());
+					ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(),
+							measurementVariable.getScale(), measurementVariable.getMethod());
 			if (stdVariableId != null) {
 				StandardVariable stdVariable = ontologyDataManager.getStandardVariable(stdVariableId, programUUID);
 				if (stdVariable.getDataType().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
@@ -296,12 +296,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 					for (Enumeration enumeration : stdVariable.getEnumerations()) {
 						validValues.add(enumeration.getName());
 					}
-					termIdValidValuesMap.put(stdVariable.getName(), validValues);
+					variableValidValues.put(measurementVariable.getName(), validValues);
 				}
 
 			}
 		}
-		return termIdValidValuesMap;
+		return variableValidValues;
 	}
 
 	protected List<Message> validateMeasurementVariableName(final List<MeasurementVariable> allVariables) {
