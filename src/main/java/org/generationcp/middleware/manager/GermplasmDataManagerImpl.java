@@ -73,17 +73,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
+	public List<Germplasm> getGermplasmByName(final String name, final int start, final int numOfRows, final Operation op) throws MiddlewareQueryException {
 		return this.getGermplasmDao().getByNamePermutations(name, op, start, numOfRows);
 	}
 
 	@Override
-	public long countGermplasmByName(String name, Operation operation) throws MiddlewareQueryException {
+	public long countGermplasmByName(final String name, final Operation operation) throws MiddlewareQueryException {
 		return this.getGermplasmDao().countByNamePermutations(name, operation);
 	}
 
 	@Override
-	public List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op)
+	public List<Germplasm> getGermplasmByLocationName(final String name, final int start, final int numOfRows, final Operation op)
 			throws MiddlewareQueryException {
 		List<Germplasm> germplasms = new ArrayList<>();
 		final GermplasmDAO dao = this.getGermplasmDao();
@@ -451,7 +451,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public Integer addMethod(final Method method) {
 
-		Integer methodId;
+		final Integer methodId;
 		try {
 
 			final MethodDAO dao = this.getMethodDao();
@@ -470,7 +470,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public Method editMethod(final Method method) {
 
-		Method recordSaved;
+		final Method recordSaved;
 
 		try {
 
@@ -571,7 +571,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public Integer addBibliographicReference(final Bibref bibref) {
 
-		Integer idBibrefSaved;
+		final Integer idBibrefSaved;
 		try {
 
 			final BibrefDAO dao = this.getBibrefDao();
@@ -940,7 +940,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public String getNextSequenceNumberForCrossName(final String prefix) {
-		String nextSequenceStr;
+		final String nextSequenceStr;
 		nextSequenceStr = this.getGermplasmDao().getNextSequenceNumberForCrossName(prefix);
 		return nextSequenceStr;
 	}
@@ -1028,7 +1028,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public Map<Integer, Object> getMethodsByGids(final List<Integer> gids) {
 
 		final Map<Integer, Object> results = new HashMap<>();
-		Map<Integer, Integer> methodIds;
+		final Map<Integer, Integer> methodIds;
 
 		methodIds = this.getGermplasmDao().getMethodIdsByGids(gids);
 		for (final Map.Entry<Integer, Integer> entry : methodIds.entrySet()) {
@@ -1058,21 +1058,19 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Method getMethodByCode(final String code, final String programUUID) {
-		Method method = new Method();
-		method = this.getMethodDao().getByCode(code, programUUID);
+		final Method method = this.getMethodDao().getByCode(code, programUUID);
 		return method;
 	}
 
 	@Override
 	public Method getMethodByCode(final String code) {
-		Method method = new Method();
-		method = this.getMethodDao().getByCode(code);
+		final Method method = this.getMethodDao().getByCode(code);
 		return method;
 	}
 
 	@Override
 	public Method getMethodByName(final String name) {
-		List<Method> methods;
+		final List<Method> methods;
 		methods = this.getMethodDao().getByName(name);
 		if (methods != null && !methods.isEmpty()) {
 			return methods.get(0);
@@ -1083,7 +1081,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Method getMethodByName(final String name, final String programUUID) {
-		List<Method> methods;
+		final List<Method> methods;
 		methods = this.getMethodDao().getByName(name, programUUID);
 		if (methods != null && !methods.isEmpty()) {
 			return methods.get(0);
@@ -1253,7 +1251,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return germNodes;
 	}
 
-    protected GermplasmPedigreeTreeNode createGermplasmPedigreeTreeNode(Integer gid, Map<GermplasmNameType, Name> names) {
+    protected GermplasmPedigreeTreeNode createGermplasmPedigreeTreeNode(final Integer gid, final Map<GermplasmNameType, Name> names) {
         // this is encountered in cases where parental information is not available (gpid1 or gpid2 does not point to an actual germplasm)
         if (gid ==0 || gid == null) {
             return null;
@@ -1304,7 +1302,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Map<String, Integer> getCountByNamePermutations(List<String> names) {
+	public Map<String, Integer> getCountByNamePermutations(final List<String> names) {
 		return this.getNameDao().getCountByNamePermutations(names);
 	}
 
@@ -1313,7 +1311,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final List<UserDefinedField> udfldAttributes = this.getUserDefinedFieldByFieldTableNameAndType("ATRIBUTS", "PASSPORT");
 		// Defaulting to a UDFLD with fldno = 0 - this prevents NPEs and DB constraint violations.
 		UserDefinedField plotCodeUdfld = new UserDefinedField(0);
-		for (UserDefinedField userDefinedField : udfldAttributes) {
+		for (final UserDefinedField userDefinedField : udfldAttributes) {
 			if (userDefinedField.getFcode().equals("PLOTCODE")) {
 				plotCodeUdfld = userDefinedField;
 				break;
@@ -1323,11 +1321,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public String getPlotCodeValue(Integer gid) {
+	public String getPlotCodeValue(final Integer gid) {
 		String plotCode = "Unknown";
 		final List<Attribute> attributes = this.getAttributesByGID(gid);
 		final UserDefinedField plotCodeAttribute = this.getPlotCodeField();
-		for (Attribute attr : attributes) {
+		for (final Attribute attr : attributes) {
 			if (attr.getTypeId().equals(plotCodeAttribute.getFldno())) {
 				plotCode = attr.getAval();
 				break;
