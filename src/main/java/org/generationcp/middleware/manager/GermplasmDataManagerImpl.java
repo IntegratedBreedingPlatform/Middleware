@@ -767,7 +767,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 					gids.add(germplasm.getGid());
 				}
 			}
-			if (gids != null && !gids.isEmpty()) {
+			if (!gids.isEmpty()) {
 				this.getTransactionDao().cancelUnconfirmedTransactionsForGermplasms(gids);
 			}
 		}
@@ -805,7 +805,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				final Germplasm germplasm = pair.getLeft();
 				final Name name = pair.getRight();
 
-				name.setNstat(Integer.valueOf(1));
+				name.setNstat(1);
 
 				final Germplasm germplasmSaved = dao.save(germplasm);
 				isGermplasmsSaved.add(germplasmSaved.getGid());
@@ -1251,7 +1251,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
     protected GermplasmPedigreeTreeNode createGermplasmPedigreeTreeNode(final Integer gid, final Map<GermplasmNameType, Name> names) {
         // this is encountered in cases where parental information is not available (gpid1 or gpid2 does not point to an actual germplasm)
-        if (gid ==0 || gid == null) {
+        if (gid == null || gid ==0) {
             return null;
         }
 
