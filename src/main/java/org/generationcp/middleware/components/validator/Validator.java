@@ -1,5 +1,7 @@
 package org.generationcp.middleware.components.validator;
 
+import com.google.common.base.Optional;
+
 /**
  * This interface marks a given class as a validator.
  * A Validator responsibility is to validate a given context and fail if the context is invalid.
@@ -13,5 +15,5 @@ package org.generationcp.middleware.components.validator;
  */
 public interface Validator<T> {
 
-	void validate (T context) throws ExecutionException;
+	ErrorCollection validate (T context);
 }
