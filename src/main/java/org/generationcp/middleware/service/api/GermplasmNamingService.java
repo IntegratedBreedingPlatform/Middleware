@@ -8,7 +8,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 
 public interface GermplasmNamingService {
 
-	void applyGroupName(Integer gid, String groupName, UserDefinedField nameType, Integer userId, Integer locationId);
+	GermplasmGroupNamingResult applyGroupName(Integer gid, String groupName, UserDefinedField nameType, Integer userId, Integer locationId);
 
 	int getNextSequence(String prefix);
 

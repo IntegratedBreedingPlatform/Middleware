@@ -49,9 +49,10 @@ public class CodedNameTypeResolver implements GermplasmNameTypeResolver {
 		nameTypeForLevel = this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", levelCode);
 
 		if (nameTypeForLevel == null) {
-			throw new IllegalStateException(
-					"Missing required reference data: Please ensure User defined field (UDFLD) record for name type '" + levelCode
-							+ "' has been setup.");
+			String message = String.format(
+					"Missing required reference data. Please ensure User defined field (UDFLD) record with fTable=NAMES, fType=NAME, fCode=%s is setup.",
+					levelCode);
+			throw new IllegalStateException(message);
 		}
 		return nameTypeForLevel;
 	}

@@ -11,6 +11,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.service.api.GermplasmGroupNamingResult;
 import org.generationcp.middleware.service.api.GermplasmNamingService;
 import org.generationcp.middleware.service.api.GermplasmType;
 import org.generationcp.middleware.util.Util;
@@ -36,23 +37,31 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 	}
 
 	@Override
-	public void applyGroupName(final Integer gid, final String groupName, final UserDefinedField nameType, final Integer userId,
+	public GermplasmGroupNamingResult applyGroupName(final Integer gid, final String groupName, final UserDefinedField nameType,
+			final Integer userId,
 			final Integer locationId) {
+
+		GermplasmGroupNamingResult result = new GermplasmGroupNamingResult();
 
 		final Germplasm germplasm = this.germplasmDAO.getById(gid);
 
 		if (germplasm.getMgid() == null || germplasm.getMgid() == 0) {
-			throw new RuntimeException("Germplasm must be part of a management group for group name assignment.");
+			result.addMessage(
+					String.format("Germplasm (gid: %s) is not part of a management group. Can not assign group name.",
+							germplasm.getGid()));
+			return result;
 		}
 
 		final List<Germplasm> groupMembers = this.germplasmDAO.getManagementGroupMembers(germplasm.getMgid());
 		for (final Germplasm member : groupMembers) {
-			this.addName(member, groupName, nameType, userId, locationId);
+			this.addName(member, groupName, nameType, userId, locationId, result);
 		}
+		
+		return result;
 	}
 
 	private void addName(final Germplasm germplasm, final String groupName, final UserDefinedField nameType, final Integer userId,
-			final Integer locationId) {
+			final Integer locationId, GermplasmGroupNamingResult result) {
 
 		final List<Name> currentNames = germplasm.getNames();
 
@@ -85,8 +94,12 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 
 			germplasm.getNames().add(name);
 			this.germplasmDAO.save(germplasm);
+			result.addMessage(String.format("Germplasm (gid: %s) successfully assigned with %s of type: %s as a preferred name.",
+					germplasm.getGid(), groupName, nameType.getFcode()));
 		} else {
-			throw new RuntimeException(String.format("Germplasm already has a name: %s (type: %s).", existingNameOfGivenType, nameType.getFcode()));
+			result.addMessage(
+					String.format("Germplasm (gid: %s) already has existing name: %s of type: %s. Supplied name %s was not added.",
+							germplasm.getGid(), existingNameOfGivenType.getNval(), nameType.getFcode(), groupName));
 		}
 	}
 
