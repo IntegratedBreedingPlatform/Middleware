@@ -471,6 +471,8 @@
 						<!-- Just to improve code coverage i.e. remove noise from actual results. -->
 						<include>**/MiddlewareGetterAndSetterTestSuite.java</include>
 
+						<include>**/*UT.java</include>
+						<include>**/*IT.java</include>
 					</includes>
 				</configuration>
 			</plugin>
