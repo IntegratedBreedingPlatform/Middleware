@@ -11,7 +11,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.service.api.GermplasmCodingService;
+import org.generationcp.middleware.service.api.GermplasmNamingService;
 import org.generationcp.middleware.service.api.GermplasmType;
 import org.generationcp.middleware.service.api.NameTypeResolver;
 import org.generationcp.middleware.util.Util;
@@ -19,16 +19,16 @@ import org.generationcp.middleware.util.Util;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
-public class GermplasmCodingServiceImpl implements GermplasmCodingService {
+public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 
 	private GermplasmDAO germplasmDAO;
 	private NameDAO nameDAO;
 
-	public GermplasmCodingServiceImpl() {
+	public GermplasmNamingServiceImpl() {
 
 	}
 
-	public GermplasmCodingServiceImpl(final HibernateSessionProvider sessionProvider) {
+	public GermplasmNamingServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.germplasmDAO = new GermplasmDAO();
 		this.germplasmDAO.setSession(sessionProvider.getSession());
 

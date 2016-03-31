@@ -4,7 +4,7 @@ package org.generationcp.middleware.service.api;
 import java.util.List;
 import java.util.Set;
 
-public interface GermplasmCodingService {
+public interface GermplasmNamingService {
 
 	void applyGroupName(Integer gid, String groupName, NameTypeResolver nameTypeResolver, Integer userId, Integer locationId);
 
