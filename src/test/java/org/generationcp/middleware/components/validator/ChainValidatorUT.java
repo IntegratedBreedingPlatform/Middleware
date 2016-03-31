@@ -13,10 +13,10 @@ import static org.mockito.Mockito.when;
 
 /**
  * {@link ChainValidator} is an abstract so this test exists to test it's functionality only once and not to test
- * every validator that extends from ChainValidator. For syntactical reasons the FailLastValidatorUT creates a
- * {@link TestAbstractFailLastValidator} but the tested behavior belongs to the FailFastValidator.
+ * every validator that extends from ChainValidator. For syntactical reasons the ChainValidatorUT creates a
+ * {@link TestChainValidator} but the tested behavior belongs to the ChainValidator.
  *
- * {@link TestAbstractFailLastValidator} is known by the test so the only behavior tested belongs to the ChainValidator.
+ * {@link TestChainValidator} is known by the test so the only behavior tested belongs to the ChainValidator.
  * {@link TestDummyContext} is a context to be validated by the validator.
  */
 public class ChainValidatorUT {
@@ -24,7 +24,6 @@ public class ChainValidatorUT {
 	public static final String ERROR_MESSAGE = "Validation Rule 1 failed";
 	public static final String ANOTHER_ERROR_MESSAGE = "Validation Rule 2 failed";
 
-	public static final int EXPECTED_ERROR_LIST_SIZE = 1;
 	private static final int EXPECTED_ERROR_LIST_SIZE_2 = 2;
 
 	ChainValidator<TestDummyContext> validator;
@@ -60,7 +59,7 @@ public class ChainValidatorUT {
 	@Test
 	public void validatorReturnsRuleSpecificErrorMessageGatherByRuleCollection() throws Exception {
 		validator = stubValidator(failedRule);
-		((TestAbstractFailLastValidator) validator).setRule(anotherFailedRule);
+		((TestChainValidator) validator).setRule(anotherFailedRule);
 
 		ErrorCollection errorCollection = validator.validate(context);
 
@@ -83,13 +82,13 @@ public class ChainValidatorUT {
 	}
 
 	private ChainValidator<TestDummyContext> stubValidator(ValidationRule<TestDummyContext> rule) {
-		validator = new TestAbstractFailLastValidator();
-		((TestAbstractFailLastValidator) validator).setRule(rule);
+		validator = new TestChainValidator();
+		((TestChainValidator) validator).setRule(rule);
 
 		return validator;
 	}
 
-	private class TestAbstractFailLastValidator extends ChainValidator<TestDummyContext> {
+	private class TestChainValidator extends ChainValidator<TestDummyContext> {
 		public void setRule(ValidationRule<TestDummyContext> rule){
 			add(rule);
 		}
