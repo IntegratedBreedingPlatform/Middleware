@@ -5,6 +5,8 @@ import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.service.pedigree.PedigreeString;
 import org.generationcp.middleware.service.pedigree.string.util.FixedLineNameResolver;
 import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGeneratorUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A hybrid plant results from a cross of two genetically different plants. The two parents of a single-cross hybrid, which is also known as
@@ -18,11 +20,14 @@ import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGe
  */
 public class SingleCrossHybridProcessor implements BreedingMethodProcessor {
 
+	private static final Logger LOG = LoggerFactory.getLogger(SingleCrossHybridProcessor.class);
+
 	final PedigreeStringBuilder pedigreeStringBuilder = new PedigreeStringBuilder();
 
 	final InbredProcessor inbredProcessor = new InbredProcessor();
 
 	private final int levelSubtractor;
+
 
 	/**
 	 * This processor is used by a complex cross. Please note a complex cross does not increment the level ( need to check this) and thus
@@ -45,6 +50,11 @@ public class SingleCrossHybridProcessor implements BreedingMethodProcessor {
 	@Override
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
 			final FixedLineNameResolver fixedLineNameResolver) {
+
+		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
+			LOG.debug("Germplasm with GID '{}' is being processed by an single cross processor. "
+					, germplasmNode.getGermplasm().getGid());
+		}
 
 		final PedigreeString femalePedigreeString = this.getPedigreeString(level, fixedLineNameResolver, germplasmNode.getFemaleParent());
 

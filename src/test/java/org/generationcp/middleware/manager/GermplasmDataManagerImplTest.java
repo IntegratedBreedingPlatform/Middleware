@@ -55,8 +55,6 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 // TODO This test heavily assumes Rice genealogy data being present. Needs complete revision to seed the test data it needs before starting.
 public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
-	@Autowired
-	private PedigreeService pedigreeService;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -675,13 +673,6 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		String plotCode2 = partiallyMockedUnit.getPlotCodeValue(testGid);
 		Assert.assertNotNull("getPlotCodeValue() should never return null.", plotCode2);
 		Assert.assertEquals("Expected value of plot code attribute returned when plot code attribute is present.", plotCodeAttr.getAval(), plotCode2);
-	}
-
-	@Test
-	public void testGetCrossExpansion() throws Exception {
-		final CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties(Mockito.mock(Properties.class));
-		crossExpansionProperties.setDefaultLevel(1);
-		Debug.println(this.pedigreeService.getCrossExpansion(Integer.valueOf(1), crossExpansionProperties));
 	}
 
 	@Test
