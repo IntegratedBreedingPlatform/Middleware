@@ -466,6 +466,8 @@
 						<include>**/PedigreeStringGeneratorUtilTest.java</include>
 						<include>**/CrossExpansionPropertiesTest.java</include>
 
+						<include>**/*UT.java</include>
+						<include>**/*IT.java</include>
 					</includes>
 				</configuration>
 			</plugin>
