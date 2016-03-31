@@ -13,7 +13,6 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.GermplasmNamingService;
 import org.generationcp.middleware.service.api.GermplasmType;
-import org.generationcp.middleware.service.api.NameTypeResolver;
 import org.generationcp.middleware.util.Util;
 
 import com.google.common.collect.Lists;
@@ -37,7 +36,7 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 	}
 
 	@Override
-	public void applyGroupName(final Integer gid, final String groupName, final NameTypeResolver nameTypeResolver, final Integer userId,
+	public void applyGroupName(final Integer gid, final String groupName, final UserDefinedField nameType, final Integer userId,
 			final Integer locationId) {
 
 		final Germplasm germplasm = this.germplasmDAO.getById(gid);
@@ -46,7 +45,6 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 			throw new RuntimeException("Germplasm must be part of a management group for group name assignment.");
 		}
 
-		final UserDefinedField nameType = nameTypeResolver.resolve();
 		final List<Germplasm> groupMembers = this.germplasmDAO.getManagementGroupMembers(germplasm.getMgid());
 		for (final Germplasm member : groupMembers) {
 			this.addName(member, groupName, nameType, userId, locationId);

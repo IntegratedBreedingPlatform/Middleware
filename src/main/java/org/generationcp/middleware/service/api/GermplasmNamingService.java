@@ -4,9 +4,11 @@ package org.generationcp.middleware.service.api;
 import java.util.List;
 import java.util.Set;
 
+import org.generationcp.middleware.pojos.UserDefinedField;
+
 public interface GermplasmNamingService {
 
-	void applyGroupName(Integer gid, String groupName, NameTypeResolver nameTypeResolver, Integer userId, Integer locationId);
+	void applyGroupName(Integer gid, String groupName, UserDefinedField nameType, Integer userId, Integer locationId);
 
 	int getNextSequence(String prefix);
 

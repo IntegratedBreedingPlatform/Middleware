@@ -48,11 +48,13 @@ import org.generationcp.middleware.service.ReportServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
+import org.generationcp.middleware.service.api.GermplasmNameTypeResolver;
 import org.generationcp.middleware.service.api.GermplasmNamingService;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.ReportService;
+import org.generationcp.middleware.service.impl.CodedNameTypeResolver;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.GermplasmNamingServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
@@ -264,6 +266,12 @@ public class ManagerFactory implements Serializable {
 
 	public GermplasmNamingService getGermplasmNamingService() {
 		return new GermplasmNamingServiceImpl(this.sessionProvider);
+	}
+
+	public GermplasmNameTypeResolver getGermplasmNameTypeResolver() {
+		// In future we can switch implementation based on profile/crop.
+		// Currently just construct and return the only (CIMMYT maize) impl we have.
+		return new CodedNameTypeResolver(this.sessionProvider);
 	}
 
 }
