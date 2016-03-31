@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-        <version>4.0.0.BETA.10</version>
+        <version>4.0.0.BETA.11</version>
 	<name>Middleware</name>
 
 	<properties>
@@ -466,8 +466,10 @@
 						<include>**/PedigreeStringGeneratorUtilTest.java</include>
 						<include>**/CrossExpansionPropertiesTest.java</include>
 
-						<include>**/*UT.java</include>
-						<include>**/*IT.java</include>
+						<include>**/CheckNameFactorsPresentValidationRuleUT.java</include>
+						<include>**/ShowNameHandlingPopUpValidatorUT.java</include>
+						<include>**/ChainValidatorUT.java</include>
+
 					</includes>
 				</configuration>
 			</plugin>
