@@ -164,6 +164,9 @@ public enum TermId {
     // added so that we can represent non existing terms and avoid returning null in case of retrieving term by a given ID
     , NONEXISTENT(-1)
 
+	//TODO : Should find a way not to hard code
+	, PROJECT_PREFIX(3001)
+	, HABITAT_DESIGNATION(3002)
 	;
 
 	private final int id;
