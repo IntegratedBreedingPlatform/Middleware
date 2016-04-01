@@ -47,9 +47,11 @@ public class ChainValidatorUT {
 		MockitoAnnotations.initMocks(this);
 		context = new TestDummyContext();
 		doThrow(new RuntimeException()).when(unexpectedFailureRule).validate(context);
-		when(failedRule.validate(any(TestDummyContext.class))).thenReturn(Optional.of(ERROR_MESSAGE));
-		when(anotherFailedRule.validate(any(TestDummyContext.class))).thenReturn(Optional.of(ANOTHER_ERROR_MESSAGE));
-		when(successRule.validate(any(TestDummyContext.class))).thenReturn(Optional.<String>absent());
+		ErrorMessage errorMessage = new ErrorMessage(ERROR_MESSAGE);
+		ErrorMessage anotherErrorMessage = new ErrorMessage(ANOTHER_ERROR_MESSAGE);
+		when(failedRule.validate(any(TestDummyContext.class))).thenReturn(Optional.of(errorMessage));
+		when(anotherFailedRule.validate(any(TestDummyContext.class))).thenReturn(Optional.of(anotherErrorMessage));
+		when(successRule.validate(any(TestDummyContext.class))).thenReturn(Optional.<ErrorMessage>absent());
 
 	}
 

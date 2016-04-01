@@ -37,7 +37,7 @@ public abstract class ChainValidator<T> implements Validator<T> {
 		ErrorCollection errors = new ErrorCollection();
 
 		for (ValidationRule<T> rule : rules) {
-			Optional<String> errorValidationMessage = rule.validate(target);
+			Optional<ErrorMessage> errorValidationMessage = rule.validate(target);
 			if (errorValidationMessage.isPresent()) {
 				errors.add(errorValidationMessage.get());
 			}

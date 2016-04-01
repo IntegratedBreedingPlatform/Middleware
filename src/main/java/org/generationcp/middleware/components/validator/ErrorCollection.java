@@ -8,8 +8,8 @@ import java.util.List;
  * The ErrorCollection contains a list of errors found in a {@link Validator}
  *
  */
-public class ErrorCollection implements Iterable<String>{
-	private List<String> errors = new ArrayList<>();
+public class ErrorCollection implements Iterable<ErrorMessage>{
+	private List<ErrorMessage> errors = new ArrayList<>();
 
 	public int size() {
 		return errors.size();
@@ -19,12 +19,12 @@ public class ErrorCollection implements Iterable<String>{
 		return errors.isEmpty();
 	}
 
-	public boolean add(String s) {
-		return errors.add(s);
+	public boolean add(ErrorMessage errorMessage) {
+		return errors.add(errorMessage);
 	}
 
 	@Override
-	public Iterator<String> iterator() {
+	public Iterator<ErrorMessage> iterator() {
 		return errors.iterator();
 	}
 }

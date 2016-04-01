@@ -20,5 +20,5 @@ import com.google.common.base.Optional;
  */
 public interface ValidationRule<T> {
 
-	public Optional<String> validate(T target);
+	public Optional<ErrorMessage> validate(T target);
 }
