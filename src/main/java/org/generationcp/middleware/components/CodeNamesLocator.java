@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.generationcp.middleware.components.validator.ExecutionException;
 import org.generationcp.middleware.manager.api.UserDefinedFieldsDataManager;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+/**
+ * This component handles the configuration mechanism that allows the location of coded names.
+ *
+ */
 @Component
 public class CodeNamesLocator {
 	private Properties namesProperties;
