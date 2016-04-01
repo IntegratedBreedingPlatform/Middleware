@@ -471,8 +471,19 @@
 						<!-- Just to improve code coverage i.e. remove noise from actual results. -->
 						<include>**/MiddlewareGetterAndSetterTestSuite.java</include>
 
-						<include>**/*UT.java</include>
-						<include>**/*IT.java</include>
+						<!-- Generic Components -->
+						<include>**/ChainValidatorUT.java</include>
+						<include>**/CodedNamesLocatorUT.java</include>
+
+						<!-- Germplasm importation validation-->
+						<include>**/CheckNameFactorsPresentValidationRuleUT.java</include>
+						<include>**/ShowNameHandlingPopUpValidatorUT.java</include>
+						<include>**/CheckGermplasmWithoutCodedNamesValidationRuleUT.java</include>
+						<include>**/UserDefinedFieldDAOUT.java</include>
+
+						<include>**/UserDefinedFieldsDataManagerImplIT.java</include>
+						<include>**/NamesDataManagerImplIT.java</include>
+
 					</includes>
 				</configuration>
 			</plugin>
