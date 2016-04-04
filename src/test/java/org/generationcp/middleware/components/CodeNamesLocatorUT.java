@@ -1,6 +1,5 @@
 package org.generationcp.middleware.components;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -8,17 +7,12 @@ import org.generationcp.middleware.manager.api.UserDefinedFieldsDataManager;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.google.common.collect.Lists;
 import static org.fest.assertions.Assertions.assertThat;
-import static org.fest.assertions.Fail.fail;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
