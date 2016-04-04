@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.pojos;
@@ -47,41 +47,41 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  * POJO for germplsm table.
- *
+ * 
  * @author Kevin Manansala, Mark Agarrado, Dennis Billano
  */
 @NamedQueries({
-	@NamedQuery(name = "getAllGermplasm", query = "FROM Germplasm"),
-	@NamedQuery(name = "countAllGermplasm", query = "SELECT COUNT(g) FROM Germplasm g"),
+		@NamedQuery(name = "getAllGermplasm", query = "FROM Germplasm"),
+		@NamedQuery(name = "countAllGermplasm", query = "SELECT COUNT(g) FROM Germplasm g"),
 
-	@NamedQuery(name = "getGermplasmByMethodNameUsingEqual",
-	query = "SELECT g FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname = :name"),
+		@NamedQuery(name = "getGermplasmByMethodNameUsingEqual",
+				query = "SELECT g FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname = :name"),
 
-	@NamedQuery(name = "countGermplasmByMethodNameUsingEqual",
-	query = "SELECT COUNT(g) FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname = :name"),
+		@NamedQuery(name = "countGermplasmByMethodNameUsingEqual",
+				query = "SELECT COUNT(g) FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname = :name"),
 
-	@NamedQuery(name = "getGermplasmByMethodNameUsingLike",
-	query = "SELECT g FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname like :name"),
+		@NamedQuery(name = "getGermplasmByMethodNameUsingLike",
+				query = "SELECT g FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname like :name"),
 
-	@NamedQuery(name = "countGermplasmByMethodNameUsingLike",
-	query = "SELECT COUNT(g) FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname like :name"),
+		@NamedQuery(name = "countGermplasmByMethodNameUsingLike",
+				query = "SELECT COUNT(g) FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname like :name"),
 
-	@NamedQuery(name = "getGermplasmByLocationNameUsingEqual",
-	query = "SELECT g FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname = :name"),
+		@NamedQuery(name = "getGermplasmByLocationNameUsingEqual",
+				query = "SELECT g FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname = :name"),
 
-	@NamedQuery(name = "countGermplasmByLocationNameUsingEqual",
-	query = "SELECT COUNT(g) FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname = :name"),
+		@NamedQuery(name = "countGermplasmByLocationNameUsingEqual",
+				query = "SELECT COUNT(g) FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname = :name"),
 
-	@NamedQuery(name = "getGermplasmByLocationNameUsingLike",
-	query = "SELECT g FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname like :name"),
+		@NamedQuery(name = "getGermplasmByLocationNameUsingLike",
+				query = "SELECT g FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname like :name"),
 
-	@NamedQuery(name = "countGermplasmByLocationNameUsingLike",
-	query = "SELECT COUNT(g) FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname like :name")
+		@NamedQuery(name = "countGermplasmByLocationNameUsingLike",
+				query = "SELECT COUNT(g) FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname like :name")
 
 })
 @NamedNativeQueries({
 		@NamedNativeQuery(name = "getGermplasmDescendants",
-			query = "SELECT DISTINCT g.* FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
+				query = "SELECT DISTINCT g.* FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
 						+ "WHERE (g.gpid1=:gid OR g.gpid2=:gid OR p.pid=:gid) " + "AND g.gid != g.grplce and g.grplce = 0",
 				resultClass = Germplasm.class), //
 
@@ -103,7 +103,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @XmlRootElement(name = "germplasm")
 @XmlType(propOrder = {"gid", "gnpgs", "gpid1", "gpid2", "gdate"})
 @XmlAccessorType(XmlAccessType.NONE)
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="germplsm")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "germplsm")
 public class Germplasm implements Serializable, Auditable {
 
 	private static final long serialVersionUID = 1L;
@@ -430,9 +430,9 @@ public class Germplasm implements Serializable, Auditable {
 	public Germplasm() {
 	}
 
-	public Germplasm(Integer gid, Integer methodId, Integer gnpgs, Integer gpid1, Integer gpid2, Integer userId, Integer lgid,
-			Integer locationId, Integer gdate, Integer referenceId, Integer grplce, Integer mgid, Name preferredName,
-			String preferredAbbreviation, Method method) {
+	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
+			final Integer userId, final Integer lgid, final Integer locationId, final Integer gdate, final Integer referenceId,
+			final Integer grplce, final Integer mgid, final Name preferredName, final String preferredAbbreviation, final Method method) {
 		super();
 		this.gid = gid;
 		this.methodId = methodId;
@@ -451,14 +451,14 @@ public class Germplasm implements Serializable, Auditable {
 		this.method = method;
 	}
 
-	public Germplasm(Integer gid, Integer methodId, Integer gnpgs, Integer gpid1, Integer gpid2, Integer userId, Integer lgid,
-			Integer locationId, Integer gdate, Name preferredName) {
+	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
+			final Integer userId, final Integer lgid, final Integer locationId, final Integer gdate, final Name preferredName) {
 
 		// gref =0, grplce = 0, mgid = 0
 		this(gid, methodId, gnpgs, gpid1, gpid2, userId, lgid, locationId, gdate, 0, 0, 0, preferredName, null, null);
 	}
 
-	public Germplasm(Integer gid) {
+	public Germplasm(final Integer gid) {
 		this.gid = gid;
 	}
 
@@ -466,7 +466,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.gid;
 	}
 
-	public void setGid(Integer gid) {
+	public void setGid(final Integer gid) {
 		this.gid = gid;
 	}
 
@@ -490,7 +490,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.gnpgs;
 	}
 
-	public void setGnpgs(Integer gnpgs) {
+	public void setGnpgs(final Integer gnpgs) {
 		this.gnpgs = gnpgs;
 	}
 
@@ -498,7 +498,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.gpid1;
 	}
 
-	public void setGpid1(Integer gpid1) {
+	public void setGpid1(final Integer gpid1) {
 		this.gpid1 = gpid1;
 	}
 
@@ -506,7 +506,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.gpid2;
 	}
 
-	public void setGpid2(Integer gpid2) {
+	public void setGpid2(final Integer gpid2) {
 		this.gpid2 = gpid2;
 	}
 
@@ -514,7 +514,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.lgid;
 	}
 
-	public void setLgid(Integer lgid) {
+	public void setLgid(final Integer lgid) {
 		this.lgid = lgid;
 	}
 
@@ -522,7 +522,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.gdate;
 	}
 
-	public void setGdate(Integer gdate) {
+	public void setGdate(final Integer gdate) {
 		this.gdate = gdate;
 	}
 
@@ -530,7 +530,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.grplce;
 	}
 
-	public void setGrplce(Integer grplce) {
+	public void setGrplce(final Integer grplce) {
 		this.grplce = grplce;
 	}
 
@@ -538,7 +538,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.mgid;
 	}
 
-	public void setMgid(Integer mgid) {
+	public void setMgid(final Integer mgid) {
 		this.mgid = mgid;
 	}
 
@@ -546,7 +546,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.methodId;
 	}
 
-	public void setMethodId(Integer methodId) {
+	public void setMethodId(final Integer methodId) {
 		this.methodId = methodId;
 	}
 
@@ -554,7 +554,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.userId;
 	}
 
-	public void setUserId(Integer userId) {
+	public void setUserId(final Integer userId) {
 		this.userId = userId;
 	}
 
@@ -562,7 +562,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.locationId;
 	}
 
-	public void setLocationId(Integer locationId) {
+	public void setLocationId(final Integer locationId) {
 		this.locationId = locationId;
 	}
 
@@ -570,7 +570,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.referenceId;
 	}
 
-	public void setReferenceId(Integer referenceId) {
+	public void setReferenceId(final Integer referenceId) {
 		this.referenceId = referenceId;
 	}
 
@@ -578,7 +578,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.preferredName;
 	}
 
-	public void setPreferredName(Name preferredName) {
+	public void setPreferredName(final Name preferredName) {
 		this.preferredName = preferredName;
 	}
 
@@ -586,11 +586,11 @@ public class Germplasm implements Serializable, Auditable {
 		return this.preferredAbbreviation;
 	}
 
-	public void setPreferredAbbreviation(String preferredAbbreviation) {
+	public void setPreferredAbbreviation(final String preferredAbbreviation) {
 		this.preferredAbbreviation = preferredAbbreviation;
 	}
 
-	public void setMethod(Method method) {
+	public void setMethod(final Method method) {
 		this.method = method;
 	}
 
@@ -599,7 +599,7 @@ public class Germplasm implements Serializable, Auditable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -610,7 +610,7 @@ public class Germplasm implements Serializable, Auditable {
 			return false;
 		}
 
-		Germplasm rhs = (Germplasm) obj;
+		final Germplasm rhs = (Germplasm) obj;
 		return new EqualsBuilder().append(this.gid, rhs.gid).isEquals();
 	}
 
@@ -621,7 +621,7 @@ public class Germplasm implements Serializable, Auditable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("Germplasm [gid=");
 		builder.append(this.gid);
 		builder.append(", methodId=");
@@ -662,7 +662,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.inventoryInfo;
 	}
 
-	public void setInventoryInfo(GermplasmInventory inventoryInfo) {
+	public void setInventoryInfo(final GermplasmInventory inventoryInfo) {
 		this.inventoryInfo = inventoryInfo;
 	}
 
@@ -670,7 +670,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.selectionHistory;
 	}
 
-	public void setSelectionHistory(String selectionHistory) {
+	public void setSelectionHistory(final String selectionHistory) {
 		this.selectionHistory = selectionHistory;
 	}
 
@@ -678,7 +678,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.crossName;
 	}
 
-	public void setCrossName(String crossName) {
+	public void setCrossName(final String crossName) {
 		this.crossName = crossName;
 	}
 
@@ -686,7 +686,7 @@ public class Germplasm implements Serializable, Auditable {
 		return this.accessionName;
 	}
 
-	public void setAccessionName(String accessionName) {
+	public void setAccessionName(final String accessionName) {
 		this.accessionName = accessionName;
 	}
 
@@ -694,16 +694,16 @@ public class Germplasm implements Serializable, Auditable {
 	 * @return <strong>ALL</strong> name records associated with this germplasm entity.
 	 */
 	public List<Name> getNames() {
-		return names;
+		return this.names;
 	}
 
-	public void setNames(List<Name> names) {
+	public void setNames(final List<Name> names) {
 		this.names = names;
 	}
 
 	public Name findPreferredName() {
 		Name preferredName = null;
-		for (Name name : this.getNames()) {
+		for (final Name name : this.getNames()) {
 			if (new Integer(1).equals(name.getNstat())) {
 				preferredName = name;
 				break;
@@ -713,7 +713,7 @@ public class Germplasm implements Serializable, Auditable {
 	}
 
 	@Override
-	public void attachToAuditory(Auditory auditory) {
+	public void attachToAuditory(final Auditory auditory) {
 		this.referenceId = auditory.getId();
 	}
 }
