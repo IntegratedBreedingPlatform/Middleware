@@ -42,6 +42,8 @@ public class ListInventoryBuilder extends Builder {
 			gids.add(entry.getGid());
 			entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
 			lrecIds.add(entry.getId());
+			// update the Group ID of germplasm for the current list entry
+			entry.setGroupId(entry.getGermplasm().getMgid());
 		}
 
 		if (listEntries != null && !listEntries.isEmpty()) {
@@ -60,6 +62,8 @@ public class ListInventoryBuilder extends Builder {
 			gids.add(entry.getGid());
 			entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
 			lrecIds.add(entry.getId());
+			// update the Group ID of germplasm for the current list entry
+			entry.setGroupId(entry.getGermplasm().getMgid());
 		}
 		this.retrieveLotCounts(entryIds, listEntries, gids, lrecIds);
 		return listEntries;
