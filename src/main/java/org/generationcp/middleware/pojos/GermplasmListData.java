@@ -135,6 +135,12 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	@Transient
 	private Integer mgid = null;
 
+	/**
+	 * The Group ID of the germplasm. It is mapped to germplsm.mgid column in the database.
+	 */
+	@Transient
+	private Integer groupId = 0;
+
 	public GermplasmListData() {
 
 	}
@@ -409,4 +415,13 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	public void setMgid(final Integer mgid) {
 		this.mgid = mgid;
 	}
+
+	public Integer getGroupId() {
+		return this.groupId;
+	}
+
+	public void setGroupId(final Integer groupId) {
+		this.groupId = groupId;
+	}
+
 }
