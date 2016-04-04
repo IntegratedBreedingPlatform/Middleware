@@ -17,6 +17,12 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+/**
+ *
+ * HQL-JPA Queries are Strings, so once the query was tested to bring the proper result. I want to make sure that the queryString
+ * remains unaltered and if by mistake the query is altered then  the test will fail and show that alteration.
+ *
+ */
 public class UserDefinedFieldDAOUT {
 
 	public static final String DUMMY_TYPE = "DUMMY_TYPE";
