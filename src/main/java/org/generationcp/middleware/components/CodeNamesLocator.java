@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CodeNamesLocator {
+
+	public static final String CODE_NAMES_PROPERTY = "germplasm.code.names.ids";
 	private Properties namesProperties;
 	UserDefinedFieldsDataManager manager;
 
@@ -26,16 +28,16 @@ public class CodeNamesLocator {
 	}
 
 	public List<UserDefinedField> locateNonCodeNames(){
-		List<Integer> ids = getCodedNamesIds();
+		List<Integer> ids = locateCodedNamesIds();
 
 		List<UserDefinedField> codedNamesFactor = manager.getNotCodeNamesFactor(ids);
 
 		return codedNamesFactor;
 	}
 
-	public List<Integer> getCodedNamesIds() {
+	public List<Integer> locateCodedNamesIds() {
 
-		String codeNamesIds = namesProperties.getProperty("code.names.ids");
+		String codeNamesIds = namesProperties.getProperty(CODE_NAMES_PROPERTY);
 		List<Integer> ids = new ArrayList<>();
 		for (String stringId : codeNamesIds.split(",")) {
 			if (!stringId.isEmpty()) {

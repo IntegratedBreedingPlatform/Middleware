@@ -31,6 +31,7 @@ public class CodeNamesLocatorUT {
 	public static final int VALUE_10 = 10;
 	private static final int VALUE_12 = 12;
 	public static final int EXPECTED_VALUE_2 = 2;
+	public static final String GERMPLASM_CODE_NAMES_IDS = "germplasm.code.names.ids";
 	CodeNamesLocator target;
 
 	@Mock
@@ -49,7 +50,7 @@ public class CodeNamesLocatorUT {
 	@Test
 	public void locateNonCodeNamesReturnsAListOfQueriedUDFLDWithoutCodeNameIds() throws Exception {
 
-		when(properties.getProperty("code.names.ids")).thenReturn(CODED_NAMES_IDS);
+		when(properties.getProperty(GERMPLASM_CODE_NAMES_IDS)).thenReturn(CODED_NAMES_IDS);
 		UserDefinedField expectedItem1 = new UserDefinedField(new Integer(VALUE_10));
 		UserDefinedField expectedItem2 = new UserDefinedField(new Integer(VALUE_12));
 		List<UserDefinedField> expectedList = Lists.newArrayList(expectedItem1,expectedItem2);
@@ -67,10 +68,10 @@ public class CodeNamesLocatorUT {
 
 
 	@Test
-	public void getCodedNamesIdsReturnAListOfCodedIdsWhenPropertiesFileExist() throws Exception {
-		when(properties.getProperty("code.names.ids")).thenReturn(CODED_NAMES_IDS);
+	public void locateCodedNamesIdsReturnAListOfCodedIdsWhenPropertiesFileExist() throws Exception {
+		when(properties.getProperty(GERMPLASM_CODE_NAMES_IDS)).thenReturn(CODED_NAMES_IDS);
 
-		List<Integer> codedNamesIds = target.getCodedNamesIds();
+		List<Integer> codedNamesIds = target.locateCodedNamesIds();
 
 		assertThat(codedNamesIds).contains(new Integer(1),new Integer(2),new Integer(3),new Integer(4));
 		assertThat(codedNamesIds).hasSize(EXPECTED_CODEDNAMES_SIZE);
@@ -78,9 +79,9 @@ public class CodeNamesLocatorUT {
 
 	@Test
 	public void getCodedNamesIdsReturnEmptyListWhenPropertyIsEmpty() throws Exception {
-		when(properties.getProperty("code.names.ids")).thenReturn(EMPTY_STRING);
+		when(properties.getProperty(GERMPLASM_CODE_NAMES_IDS)).thenReturn(EMPTY_STRING);
 
-		List<Integer> codedNamesIds = target.getCodedNamesIds();
+		List<Integer> codedNamesIds = target.locateCodedNamesIds();
 
 		assertThat(codedNamesIds).isEmpty();
 	}
