@@ -1,11 +1,15 @@
 package org.generationcp.middleware.components.validator;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import static org.fest.assertions.Assertions.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.doThrow;
@@ -66,7 +70,12 @@ public class ChainValidatorUT {
 		ErrorCollection errorCollection = validator.validate(context);
 
 		assertThat(errorCollection).hasSize(EXPECTED_ERROR_LIST_SIZE_2);
-		assertThat(errorCollection).contains(ERROR_MESSAGE,ANOTHER_ERROR_MESSAGE);
+
+		Iterator<ErrorMessage> iterator = errorCollection.iterator();
+		assertThat(iterator.next().getKey()).isEqualToIgnoringCase(ERROR_MESSAGE);
+		assertThat(iterator.next().getKey()).isEqualToIgnoringCase(ANOTHER_ERROR_MESSAGE);
+
+
 
 
 	}
