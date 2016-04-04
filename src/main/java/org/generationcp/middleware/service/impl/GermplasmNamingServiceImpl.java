@@ -61,7 +61,7 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 	}
 
 	private void addName(final Germplasm germplasm, final String groupName, final UserDefinedField nameType, final Integer userId,
-			final Integer locationId, GermplasmGroupNamingResult result) {
+			final Integer locationId, final GermplasmGroupNamingResult result) {
 
 		final List<Name> currentNames = germplasm.getNames();
 
