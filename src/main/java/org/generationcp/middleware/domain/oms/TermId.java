@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.oms;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 /**
  * The cvterm ID constants used in Middleware.
- *
+ * 
  */
 public enum TermId {
 
@@ -161,8 +161,8 @@ public enum TermId {
 	// added to indicate the trait class of the Means/Summary Statistic standard variables
 	, TREATMENT_MEAN(1610), SUMMARY_STATISTIC(1620)
 
-    // added so that we can represent non existing terms and avoid returning null in case of retrieving term by a given ID
-    , NONEXISTENT(-1)
+	// added so that we can represent non existing terms and avoid returning null in case of retrieving term by a given ID
+	, NONEXISTENT(-1)
 
 	;
 
@@ -183,17 +183,17 @@ public enum TermId {
 		}
 
 		if (!TermId.TERM_ID_MAP.containsKey(id)) {
-            for (final TermId term : TermId.values()) {
+			for (final TermId term : TermId.values()) {
 				if (term.getId() == id) {
-                    TERM_ID_MAP.put(id, term);
+					TERM_ID_MAP.put(id, term);
 					return term;
 				}
 			}
 
-            return NONEXISTENT;
+			return NONEXISTENT;
 		} else {
-            return TERM_ID_MAP.get(id);
-        }
+			return TERM_ID_MAP.get(id);
+		}
 
 	}
 }
