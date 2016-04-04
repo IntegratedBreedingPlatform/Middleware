@@ -365,6 +365,7 @@ public class Germplasm implements Serializable, Auditable {
 
 	/*
 	 * If the current germplasm is a managed sample then MGID contains the GID of the germplasm at the root of the management tree, else 0.
+	 * This the GROUP_ID of the germplasm.
 	 */
 	@Basic(optional = false)
 	@Column(name = "mgid")
