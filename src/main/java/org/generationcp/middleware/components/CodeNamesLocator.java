@@ -22,7 +22,7 @@ public class CodeNamesLocator {
 	UserDefinedFieldsDataManager manager;
 
 	@Autowired
-	public CodeNamesLocator(@Qualifier("codeNamesProperties") Properties namesProperties, UserDefinedFieldsDataManager manager) {
+	public CodeNamesLocator(@Qualifier("crossingProperties") Properties namesProperties, UserDefinedFieldsDataManager manager) {
 		this.namesProperties = namesProperties;
 		this.manager = manager;
 	}
