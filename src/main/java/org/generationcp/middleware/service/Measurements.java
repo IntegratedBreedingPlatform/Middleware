@@ -22,7 +22,7 @@ import com.google.common.base.Preconditions;
 
 /**
  * Class to enable us to save data to the phenotype table and the nd experiment phenotype table in a performant manner.
- *
+ * 
  */
 public class Measurements {
 
@@ -146,6 +146,7 @@ public class Measurements {
 						+ "Defenesive this should never happen.");
 
 				final Phenotype phenotype = this.createPhenotypeFromMeasurement(measurementData);
+
 				this.phenotypeSaver.saveOrUpdate(measurementRow.getExperimentId(), measurementVariable.getTermId(),
 						measurementData.getcValueId() != null && !"".equals(measurementData.getcValueId()) ? measurementData.getcValueId()
 								: measurementData.getValue(), phenotype, measurementData.getMeasurementVariable().getDataTypeId());

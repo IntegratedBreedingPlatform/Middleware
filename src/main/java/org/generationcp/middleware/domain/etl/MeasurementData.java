@@ -11,15 +11,15 @@
 
 package org.generationcp.middleware.domain.etl;
 
+import java.util.List;
+
+import javax.annotation.Nonnull;
+
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
-
-import javax.annotation.Nonnull;
-import java.util.InputMismatchException;
-import java.util.List;
 
 public class MeasurementData {
 
@@ -229,10 +229,11 @@ public class MeasurementData {
 				if (possibleValue.getId().equals(Double.valueOf(this.value).intValue())) {
 
 					// if measurement data is a factor, show original description else, get the modified display description
-					final String displayDescription = this.getMeasurementVariable().isFactor() ?
-							possibleValue.getDescription() : possibleValue.getDisplayDescription();
+					final String displayDescription =
+							this.getMeasurementVariable().isFactor() ? possibleValue.getDescription() : possibleValue
+									.getDisplayDescription();
 
-					return new CategoricalDisplayValue(this.value,possibleValue.getName(), displayDescription);
+					return new CategoricalDisplayValue(this.value, possibleValue.getName(), displayDescription);
 				}
 			}
 		}

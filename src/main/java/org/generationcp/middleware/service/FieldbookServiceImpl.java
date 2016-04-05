@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.service;
@@ -81,7 +81,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
-	
+
 	@Resource
 	private GermplasmGroupingService germplasmGroupingService;
 
@@ -270,15 +270,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	}
 
-
-
 	@Override
 	public List<Method> getAllBreedingMethods(final boolean filterOutGenerative) {
 		final List<Method> methodList =
 				filterOutGenerative ? this.getGermplasmDataManager().getAllMethodsNotGenerative() : this.getGermplasmDataManager()
 						.getAllMethods();
-				FieldbookListUtil.sortMethodNamesInAscendingOrder(methodList);
-				return methodList;
+		FieldbookListUtil.sortMethodNamesInAscendingOrder(methodList);
+		return methodList;
 	}
 
 	@Override
@@ -296,8 +294,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Integer saveNurseryAdvanceGermplasmList(final List<Pair<Germplasm, List<Name>>> germplasms,
 			final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList,
-			List<Pair<Germplasm, List<Attribute>>> germplasmAttributes)
-					throws MiddlewareQueryException {
+			List<Pair<Germplasm, List<Attribute>>> germplasmAttributes) throws MiddlewareQueryException {
 
 		final GermplasmDAO germplasmDao = this.getGermplasmDao();
 		final GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
@@ -1101,12 +1098,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return this.getStandardVariableBuilder().getByName(name, programUUID);
 	}
 
-	
 	GermplasmGroupingService getGermplasmGroupingService() {
-		return germplasmGroupingService;
+		return this.germplasmGroupingService;
 	}
 
-	
 	void setGermplasmGroupingService(GermplasmGroupingService germplasmGroupingService) {
 		this.germplasmGroupingService = germplasmGroupingService;
 	}
