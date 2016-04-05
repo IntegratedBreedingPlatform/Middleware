@@ -108,11 +108,11 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 
 			germplasm.getNames().add(name);
 			this.germplasmDAO.save(germplasm);
-			result.addMessage(String.format("Germplasm (gid: %s) successfully assigned with %s of type: %s as a preferred name.",
+			result.addMessage(String.format("Germplasm (gid: %s) successfully assigned name %s of type %s as a preferred name.",
 					germplasm.getGid(), groupName, nameType.getFcode()));
 		} else {
 			result.addMessage(
-					String.format("Germplasm (gid: %s) already has existing name: %s of type: %s. Supplied name %s was not added.",
+					String.format("Germplasm (gid: %s) already has existing name %s of type %s. Supplied name %s was not added.",
 							germplasm.getGid(), existingNameOfGivenType.getNval(), nameType.getFcode(), groupName));
 		}
 	}

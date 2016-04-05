@@ -166,7 +166,7 @@ public class GermplasmNamingServiceImplTest {
 		Assert.assertTrue(
 				"Expected service to return with validation regarding germplasm g3 not assigned given name because it already has one with same type.",
 				result.getMessages().contains(
-						"Germplasm (gid: 3) already has existing name: ExistingCodedNameOfG3 of type: CODE1. Supplied name ABH05100 was not added."));
+						"Germplasm (gid: 3) already has existing name ExistingCodedNameOfG3 of type CODE1. Supplied name ABH05100 was not added."));
 	}
 
 }
