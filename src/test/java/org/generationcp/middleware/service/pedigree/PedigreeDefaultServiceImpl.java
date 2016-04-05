@@ -16,6 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * This is the original implementation of the pedigree string generation. This is in a test package to ensure that our new implementation
+ * conforms to the old one.
+ *
+ */
 @Transactional
 public class PedigreeDefaultServiceImpl implements PedigreeService {
 
@@ -513,7 +518,8 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 
 						return cross;
 					} else {
-						this.logAndThrowException("Error with expanding cross, can not find method with id: " + germplasmToExpand.getMethodId());
+						this.logAndThrowException("Error with expanding cross, can not find method with id: "
+								+ germplasmToExpand.getMethodId());
 					}
 				}
 			} else {

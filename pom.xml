@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-        <version>4.0.0.BETA.10</version>
+        <version>4.0.0.BETA.11</version>
 	<name>Middleware</name>
 
 	<properties>
@@ -462,9 +462,18 @@
 						<include>**/InbredProcessorTest.java</include>
 						<include>**/PedigreeStringTestUtil.java</include>
 						<include>**/SimpleCrossProcessorTest.java</include>
+						<include>**/SingleCrossHybridProcessorTest.java</include>
 						<include>**/ThreeWayHybridProcessorTest.java</include>
 						<include>**/PedigreeStringGeneratorUtilTest.java</include>
 						<include>**/CrossExpansionPropertiesTest.java</include>
+						<include>**/PedigreeAlgorithmTest.java</include>
+
+						<!-- Just to improve code coverage i.e. remove noise from actual results. -->
+						<include>**/MiddlewareGetterAndSetterTestSuite.java</include>
+
+						<include>**/CheckNameFactorsPresentValidationRuleUT.java</include>
+						<include>**/ShowNameHandlingPopUpValidatorUT.java</include>
+						<include>**/ChainValidatorUT.java</include>
 
 					</includes>
 				</configuration>
