@@ -10,8 +10,6 @@ public interface GermplasmNamingService {
 
 	GermplasmGroupNamingResult applyGroupName(Integer gid, String groupName, UserDefinedField nameType, Integer userId, Integer locationId);
 
-	int getNextSequence(String prefix);
-
 	List<String> getProgramIdentifiers(Integer levelCode);
 
 	List<String> getLocationIdentifiers();

@@ -2,7 +2,6 @@
 package org.generationcp.middleware.service.impl;
 
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -110,11 +109,6 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 					String.format("Germplasm (gid: %s) already has existing name: %s of type: %s. Supplied name %s was not added.",
 							germplasm.getGid(), existingNameOfGivenType.getNval(), nameType.getFcode(), groupName));
 		}
-	}
-
-	@Override
-	public int getNextSequence(final String prefix) {
-		return new Random().nextInt(200);
 	}
 
 	@Override
