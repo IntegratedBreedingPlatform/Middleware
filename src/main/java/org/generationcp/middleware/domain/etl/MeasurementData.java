@@ -33,6 +33,7 @@ public class MeasurementData {
 	private Integer phenotypeId;
 	private MeasurementVariable measurementVariable;
 	private boolean isAccepted;
+	private String oldValue;
 
 	// used to map this object to what is actually saved in the database after saving
 	private Variable variable;
@@ -323,6 +324,14 @@ public class MeasurementData {
 
 	public boolean isNumeric() {
 		return this.getMeasurementVariable().getDataTypeId().equals(TermId.NUMERIC_VARIABLE.getId());
+	}
+
+	public String getOldValue() {
+		return this.oldValue;
+	}
+
+	public void setOldValue(String importedValue) {
+		this.oldValue = importedValue;
 	}
 
 }
