@@ -254,8 +254,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				}
 			}
 
-			if (variates !=null && !variates.isEmpty()) {
-				final Measurements measurements = new Measurements(this.getActiveSession(), this.getPhenotypeSaver());
+			if (variates != null && !variates.isEmpty()) {
+				final Measurements measurements =
+						new Measurements(this.getActiveSession(), this.getPhenotypeSaver(), this.getPhenotypeOutlierSaver());
 				measurements.saveMeasurements(observations);
 			}
 

@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -10,8 +11,10 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.operation.saver.PhenotypeOutlierSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 
@@ -23,12 +26,15 @@ import com.google.common.base.Preconditions;
  */
 public class Measurements {
 
+	private static final String MISSING = "missing";
 	private final PhenotypeSaver phenotypeSaver;
+	private final PhenotypeOutlierSaver phenotypeOutlierSaver;
 	private final Session session;
 
-	Measurements(final Session session, final PhenotypeSaver phenotypeSaver) {
+	Measurements(final Session session, final PhenotypeSaver phenotypeSaver, final PhenotypeOutlierSaver phenotypeOutlierSaver) {
 		this.session = session;
 		this.phenotypeSaver = phenotypeSaver;
+		this.phenotypeOutlierSaver = phenotypeOutlierSaver;
 	}
 
 	/**
@@ -43,6 +49,7 @@ public class Measurements {
 			Preconditions.checkNotNull(observations, "Observation list passed in must cannot be null ");
 			this.session.setFlushMode(FlushMode.MANUAL);
 			this.saveMeasurementData(observations);
+			this.saveOutliers(observations);
 			this.session.flush();
 		} finally {
 			if (this.session != null) {
@@ -52,7 +59,43 @@ public class Measurements {
 	}
 
 	/**
-	 *
+	 * Saves the old value of the measurements marked as missing in the Phenotype_Outlier table.
+	 * 
+	 * @param observations
+	 */
+	private void saveOutliers(List<MeasurementRow> observations) {
+
+		for (final MeasurementRow measurementRow : observations) {
+			final List<MeasurementData> dataList = measurementRow.getDataList();
+
+			if (dataList == null || dataList.isEmpty()) {
+				continue;
+			}
+
+			List<PhenotypeOutlier> outlierList = new ArrayList<PhenotypeOutlier>();
+			for (final MeasurementData measurementData : dataList) {
+
+				// When a measurement is marked as missing, we should log its old value in the outlier table.
+				// And add a log ONLY if the data has changed.
+				if (MISSING.equals(measurementData.getValue()) && !measurementData.getValue().equals(measurementData.getOldValue())) {
+					PhenotypeOutlier phenotypeOutlier = new PhenotypeOutlier();
+					phenotypeOutlier.setPhenotypeId(measurementData.getPhenotypeId());
+					phenotypeOutlier.setValue(measurementData.getOldValue());
+					outlierList.add(phenotypeOutlier);
+				}
+
+				// the new value now becomes the old value, this will be piped back to the UI.
+				measurementData.setOldValue(measurementData.getValue());
+
+			}
+
+			this.phenotypeOutlierSaver.savePhenotypeOutliers(outlierList);
+
+		}
+	}
+
+	/**
+	 * 
 	 * @param measurementData measurementData used to create your {@link Phenotype} object that can be saved
 	 */
 	Phenotype createPhenotypeFromMeasurement(final MeasurementData measurementData) {

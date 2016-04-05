@@ -7,11 +7,11 @@ import java.util.List;
 
 import org.generationcp.middleware.data.initializer.MeasurementTestDataInitializer;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
-import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.operation.saver.PhenotypeOutlierSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.hibernate.FlushMode;
@@ -30,6 +30,8 @@ public class MeasurementsTest {
 
 	private PhenotypeSaver mockPhenotypeSaver;
 
+	private PhenotypeOutlierSaver mockPhenotypeOutlierSaver;
+
 	private Measurements measurements;
 
 	private final MeasurementTestDataInitializer initializer = new MeasurementTestDataInitializer();
@@ -37,8 +39,9 @@ public class MeasurementsTest {
 	@Before
 	public void setup() {
 		this.mockPhenotypeSaver = Mockito.mock(PhenotypeSaver.class);
+		this.mockPhenotypeOutlierSaver = Mockito.mock(PhenotypeOutlierSaver.class);
 		this.mockHibernateSessiong = Mockito.mock(Session.class);
-		this.measurements = new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver);
+		this.measurements = new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver, this.mockPhenotypeOutlierSaver);
 	}
 
 	@Test
@@ -56,8 +59,8 @@ public class MeasurementsTest {
 		measurementRow.setDataList(dataList);
 		rowList.add(measurementRow);
 
-		measurements.saveMeasurementData(rowList);
-		Mockito.verify(mockPhenotypeSaver, Mockito.never()).saveOrUpdate(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
+		this.measurements.saveMeasurementData(rowList);
+		Mockito.verify(this.mockPhenotypeSaver, Mockito.never()).saveOrUpdate(Mockito.anyInt(), Mockito.anyInt(), Mockito.anyString(),
 				Mockito.any(Phenotype.class), Mockito.anyInt());
 
 	}
@@ -180,7 +183,8 @@ public class MeasurementsTest {
 	 */
 	@Test
 	public void testPhenotypeIdSetOnSave() {
-		final Measurements measurements = new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver);
+		final Measurements measurements =
+				new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver, this.mockPhenotypeOutlierSaver);
 		final MeasurementData testMeasurementData = Mockito.mock(MeasurementData.class);
 		final MeasurementRow measurementRow = this.initializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
 		measurementRow.setDataList(Collections.<MeasurementData>singletonList(testMeasurementData));
