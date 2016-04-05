@@ -119,6 +119,11 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 	}
 
 	@Override
+	public List<String> getLocationIdentifiers() {
+		return Lists.newArrayList("CZ", "CA", "CB");
+	}
+
+	@Override
 	public Set<GermplasmType> getGermplasmTypes() {
 		return Sets.newHashSet(GermplasmType.values());
 	}

@@ -14,5 +14,7 @@ public interface GermplasmNamingService {
 
 	List<String> getProgramIdentifiers(Integer levelCode);
 
+	List<String> getLocationIdentifiers();
+
 	Set<GermplasmType> getGermplasmTypes();
 }
