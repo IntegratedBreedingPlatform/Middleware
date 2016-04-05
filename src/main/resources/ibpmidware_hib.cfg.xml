@@ -3,6 +3,8 @@
         "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
+    	<mapping class="org.generationcp.middleware.pojos.KeySequenceRegister"/>
+    	    
         <mapping class="org.generationcp.middleware.pojos.Attribute"/>
         <mapping class="org.generationcp.middleware.pojos.Bibref"/>
         <mapping class="org.generationcp.middleware.pojos.Country"/>

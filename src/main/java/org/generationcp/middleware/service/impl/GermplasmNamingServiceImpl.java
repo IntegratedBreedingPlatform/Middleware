@@ -14,7 +14,10 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.GermplasmGroupNamingResult;
 import org.generationcp.middleware.service.api.GermplasmNamingService;
 import org.generationcp.middleware.service.api.GermplasmType;
+import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.util.Util;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
@@ -23,6 +26,8 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 
 	private GermplasmDAO germplasmDAO;
 	private NameDAO nameDAO;
+
+	private KeySequenceRegisterService keySequenceRegisterService;
 
 	public GermplasmNamingServiceImpl() {
 
@@ -34,9 +39,12 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 
 		this.nameDAO = new NameDAO();
 		this.nameDAO.setSession(sessionProvider.getSession());
+
+		this.keySequenceRegisterService = new KeySequenceRegisterServiceImpl(sessionProvider);
 	}
 
 	@Override
+	@Transactional(propagation = Propagation.MANDATORY)
 	public GermplasmGroupNamingResult applyGroupName(final Integer gid, final String groupName, final UserDefinedField nameType,
 			final Integer userId,
 			final Integer locationId) {
@@ -53,8 +61,9 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		}
 
 		final List<Germplasm> groupMembers = this.germplasmDAO.getManagementGroupMembers(germplasm.getMgid());
+		final String nameWithSequence = groupName + this.keySequenceRegisterService.incrementAndGetNextSequence(groupName);
 		for (final Germplasm member : groupMembers) {
-			this.addName(member, groupName, nameType, userId, locationId, result);
+			this.addName(member, nameWithSequence, nameType, userId, locationId, result);
 		}
 		
 		return result;
