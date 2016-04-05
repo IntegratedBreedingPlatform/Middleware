@@ -109,7 +109,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Test
 	public void testSearchForGermplasmsExactMatchGID() throws Exception {
 
-		List<Germplasm> results = this.dao.searchForGermplasms("1", Operation.EQUAL, false, false);
+		List<Germplasm> results = this.dao.searchForGermplasms("1", Operation.EQUAL, false, false, false);
 		Assert.assertTrue(results.size() == 1);
 
 	}
@@ -117,10 +117,10 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Test
 	public void testSearchForGermplasmsExactMatchGermplasmName() throws Exception {
 
-		List<Germplasm> results = this.dao.searchForGermplasms("(CML454 X CML451)-B-3-1-1", Operation.EQUAL, false, false);
+		List<Germplasm> results = this.dao.searchForGermplasms("(CML454 X CML451)-B-3-1-1", Operation.EQUAL, false, false, false);
 		Assert.assertTrue(results.size() == 1);
 
-		results = this.dao.searchForGermplasms("(CML454 X CML451)", Operation.EQUAL, false, false);
+		results = this.dao.searchForGermplasms("(CML454 X CML451)", Operation.EQUAL, false, false, false);
 		Assert.assertTrue(results.isEmpty());
 
 	}
@@ -128,14 +128,14 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Test
 	public void testSearchForGermplasmsStartsWithGID() throws Exception {
 
-		List<Germplasm> results = this.dao.searchForGermplasms("1%", Operation.LIKE, false, false);
+		List<Germplasm> results = this.dao.searchForGermplasms("1%", Operation.LIKE, false, false, false);
 		Assert.assertFalse(results.isEmpty());
 	}
 
 	@Test
 	public void testSearchForGermplasmsStartsWithGermplasmName() throws Exception {
 
-		List<Germplasm> results = this.dao.searchForGermplasms("(CML454%", Operation.LIKE, false, false);
+		List<Germplasm> results = this.dao.searchForGermplasms("(CML454%", Operation.LIKE, false, false, false);
 		Assert.assertFalse(results.isEmpty());
 
 	}
@@ -143,20 +143,20 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Test
 	public void testSearchForGermplasmsContainsGID() throws Exception {
 
-		List<Germplasm> results = this.dao.searchForGermplasms("%1%", Operation.LIKE, false, false);
+		List<Germplasm> results = this.dao.searchForGermplasms("%1%", Operation.LIKE, false, false, false);
 		Assert.assertFalse(results.isEmpty());
 
-		List<Germplasm> startsWithResults = this.dao.searchForGermplasms("1%", Operation.LIKE, false, false);
+		List<Germplasm> startsWithResults = this.dao.searchForGermplasms("1%", Operation.LIKE, false, false, false);
 		Assert.assertTrue(results.containsAll(startsWithResults));
 	}
 
 	@Test
 	public void testSearchForGermplasmsContainsGermplasmName() throws Exception {
 
-		List<Germplasm> results = this.dao.searchForGermplasms("%CML454%", Operation.LIKE, false, false);
+		List<Germplasm> results = this.dao.searchForGermplasms("%CML454%", Operation.LIKE, false, false, false);
 		Assert.assertFalse(results.isEmpty());
 
-		List<Germplasm> startsWithResults = this.dao.searchForGermplasms("CML454%", Operation.LIKE, false, false);
+		List<Germplasm> startsWithResults = this.dao.searchForGermplasms("CML454%", Operation.LIKE, false, false, false);
 		Assert.assertTrue(results.containsAll(startsWithResults));
 
 	}
@@ -184,34 +184,34 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertFalse(results.isEmpty());
 
 		List<Germplasm> startsWithResults =
-				this.dao.searchForGermplasms(GermplasmDAOTest.DUMMY_STOCK_ID.substring(0, 3) + "%", Operation.LIKE, false, false);
+				this.dao.searchForGermplasms(GermplasmDAOTest.DUMMY_STOCK_ID.substring(0, 3) + "%", Operation.LIKE, false, false, false);
 		Assert.assertTrue(results.containsAll(startsWithResults));
 	}
 
 	@Test
 	public void testSearchForGermplasmsWithInventory() throws Exception {
-		List<Germplasm> results = this.dao.searchForGermplasms("1%", Operation.LIKE, false, false);
-		List<Germplasm> resultsWithInventoryOnly = this.dao.searchForGermplasms("1%", Operation.LIKE, false, true);
+		List<Germplasm> results = this.dao.searchForGermplasms("1%", Operation.LIKE, false, false, false);
+		List<Germplasm> resultsWithInventoryOnly = this.dao.searchForGermplasms("1%", Operation.LIKE, false, true, false);
 		Assert.assertNotEquals(results.size(), resultsWithInventoryOnly.size());
 	}
 
 	@Test
 	public void testSearchForGermplasmsIncludeParents() throws Exception {
-		List<Germplasm> results = this.dao.searchForGermplasms(GermplasmDAOTest.testGid1.toString(), Operation.EQUAL, false, false);
+		List<Germplasm> results = this.dao.searchForGermplasms(GermplasmDAOTest.testGid1.toString(), Operation.EQUAL, false, false, false);
 		List<Germplasm> resultsWithParents =
-				this.dao.searchForGermplasms(GermplasmDAOTest.testGid1.toString(), Operation.EQUAL, true, false);
+				this.dao.searchForGermplasms(GermplasmDAOTest.testGid1.toString(), Operation.EQUAL, true, false, false);
 		Assert.assertNotEquals(results.size(), resultsWithParents.size());
 		Assert.assertEquals(1, results.size());
 		Assert.assertEquals(3, resultsWithParents.size());
 
-		results = this.dao.searchForGermplasms("2", Operation.EQUAL, false, false);
-		resultsWithParents = this.dao.searchForGermplasms("2", Operation.EQUAL, true, false);
+		results = this.dao.searchForGermplasms("2", Operation.EQUAL, false, false, false);
+		resultsWithParents = this.dao.searchForGermplasms("2", Operation.EQUAL, true, false, false);
 		Assert.assertEquals(results.size(), resultsWithParents.size());
 	}
 
 	@Test
 	public void testSearchForGermplasmsEmptyKeyword() throws Exception {
-		List<Germplasm> results = this.dao.searchForGermplasms("", Operation.EQUAL, false, false);
+		List<Germplasm> results = this.dao.searchForGermplasms("", Operation.EQUAL, false, false, false);
 		Assert.assertTrue(results.isEmpty());
 	}
 
