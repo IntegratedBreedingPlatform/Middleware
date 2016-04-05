@@ -15,10 +15,14 @@ import org.generationcp.middleware.domain.inventory.util.LotTransformer;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 
 public class ListInventoryBuilder extends Builder {
 
@@ -42,14 +46,31 @@ public class ListInventoryBuilder extends Builder {
 			gids.add(entry.getGid());
 			entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
 			lrecIds.add(entry.getId());
-			// update the Group ID of germplasm for the current list entry
-			entry.setGroupId(entry.getGermplasm().getMgid());
 		}
 
 		if (listEntries != null && !listEntries.isEmpty()) {
 			this.retrieveLotCounts(listEntryIds, listEntries, gids, lrecIds);
+			this.retrieveGroupId(listEntries, gids);
 		}
 		return listEntries;
+	}
+
+	private void retrieveGroupId(final List<GermplasmListData> listEntries, final List<Integer> gids) {
+
+		final List<Germplasm> germplasmList = this.getGermplasmDataManager().getGermplasms(gids);
+
+		final Map<Integer, Germplasm> germplasmMap = Maps.uniqueIndex(germplasmList, new Function<Germplasm, Integer>() {
+
+			@Override
+			public Integer apply(final Germplasm from) {
+				return from.getGid();
+			}
+		});
+
+		for (final GermplasmListData listEntry : listEntries) {
+			final Integer gid = listEntry.getGid();
+			listEntry.setGroupId(germplasmMap.get(gid).getMgid());
+		}
 	}
 
 	public List<GermplasmListData> retrieveLotCountsForListEntries(final Integer listId, final List<Integer> entryIds)
@@ -62,10 +83,9 @@ public class ListInventoryBuilder extends Builder {
 			gids.add(entry.getGid());
 			entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
 			lrecIds.add(entry.getId());
-			// update the Group ID of germplasm for the current list entry
-			entry.setGroupId(entry.getGermplasm().getMgid());
 		}
 		this.retrieveLotCounts(entryIds, listEntries, gids, lrecIds);
+		this.retrieveGroupId(listEntries, gids);
 		return listEntries;
 	}
 
