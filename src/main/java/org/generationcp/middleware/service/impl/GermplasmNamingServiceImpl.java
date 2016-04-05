@@ -42,6 +42,12 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		this.keySequenceRegisterService = new KeySequenceRegisterServiceImpl(sessionProvider);
 	}
 
+	public GermplasmNamingServiceImpl(GermplasmDAO germplasmDAO, NameDAO nameDAO, KeySequenceRegisterService keySequenceRegisterService) {
+		this.germplasmDAO = germplasmDAO;
+		this.nameDAO = nameDAO;
+		this.keySequenceRegisterService = keySequenceRegisterService;
+	}
+
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
 	public GermplasmGroupNamingResult applyGroupName(final Integer gid, final String groupName, final UserDefinedField nameType,
