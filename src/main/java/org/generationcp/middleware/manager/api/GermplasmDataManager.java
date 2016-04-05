@@ -868,8 +868,7 @@ public interface GermplasmDataManager {
 	 *
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly)
-;
+	List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly, boolean includeMGMembers);
 
 	/**
 	 * Please use LocationDataManager.getLocationsByIDs().

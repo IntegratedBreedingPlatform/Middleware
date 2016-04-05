@@ -782,7 +782,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	 * @return List of Germplasms
 	 * @throws MiddlewareQueryException
 	 */
-	public List<Germplasm> searchForGermplasms(String searchedString, Operation o, boolean includeParents, boolean withInventoryOnly)
+	public List<Germplasm> searchForGermplasms(String searchedString, Operation o, boolean includeParents, boolean withInventoryOnly, boolean includeMGMembers)
 			throws MiddlewareQueryException {
 		String q = searchedString.trim();
 		if ("".equals(q)) {
@@ -792,6 +792,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			Set<Germplasm> result = new LinkedHashSet<Germplasm>();
 			Set<Germplasm> resultParents = new LinkedHashSet<Germplasm>();
+			Set<Germplasm> resultMGMembers = new LinkedHashSet<Germplasm>();
 
 			String additionalQuery = withInventoryOnly ? Germplasm.WHERE_WITH_INVENTORY : "";
 
@@ -829,35 +830,58 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			this.addInventoryInfo(p2Query);
 			result.addAll(this.getSearchForGermplasmsResult(p2Query.list()));
 
-			// Add parents to results if specified by "includeParents" flag
 			if (includeParents) {
-				for (Germplasm g : result) {
-					List<Integer> parentGids = new ArrayList<Integer>();
-					if (g.getGpid1() != null && g.getGpid1() != 0) {
-						parentGids.add(g.getGpid1());
-					}
-					if (g.getGpid2() != null && g.getGpid2() != 0) {
-						parentGids.add(g.getGpid2());
-					}
-
-					if (!parentGids.isEmpty()) {
-						SQLQuery pQuery = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GIDS);
-						pQuery.setParameterList("gids", parentGids);
-						pQuery.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
-						this.addInventoryInfo(pQuery);
-						resultParents.addAll(this.getSearchForGermplasmsResult(pQuery.list()));
-					}
-				}
-
-				result.addAll(resultParents);
+				this.retrieveParents(result, resultParents);
 			}
-
+			
+			if (includeMGMembers) {
+				this.retrieveMGMembers(result, resultMGMembers);
+			}
+			
+			// Add parents and MGMembers to results if specified by "includeParents"  and "includeMGMembers" flag
+			result.addAll(resultParents);
+			result.addAll(resultMGMembers);
 			return new ArrayList<Germplasm>(result);
 
 		} catch (Exception e) {
 			this.logAndThrowException("Error with searchGermplasms(" + q + ") " + e.getMessage(), e);
 		}
 		return new ArrayList<Germplasm>();
+	}
+
+	private void retrieveMGMembers(Set<Germplasm> result, Set<Germplasm> resultMGMembers) {
+		Set<Integer> mGIds = new LinkedHashSet<Integer>();
+		for (Germplasm g : result) {
+			if (g.getMgid() != 0) {
+				mGIds.add(g.getMgid());
+			}
+		}
+		if (!mGIds.isEmpty()) {
+			SQLQuery pQuery = this.getSession().createSQLQuery(Germplasm.SEARCH_MAINTENANCE_GROUP_MEMBERS_BY_MGID);
+			pQuery.setParameterList("mgids", mGIds);
+			pQuery.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
+			this.addInventoryInfo(pQuery);
+			resultMGMembers.addAll(this.getSearchForGermplasmsResult(pQuery.list()));
+		}	
+	}
+
+	private void retrieveParents(Set<Germplasm> result, Set<Germplasm> resultParents) {
+		Set<Integer> parentGids = new LinkedHashSet<Integer>();
+		for (Germplasm g : result) {
+			if (g.getGpid1() != null && g.getGpid1() != 0) {
+				parentGids.add(g.getGpid1());
+			}
+			if (g.getGpid2() != null && g.getGpid2() != 0) {
+				parentGids.add(g.getGpid2());
+			}
+		}
+		if (!parentGids.isEmpty()) {
+			SQLQuery pQuery = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GIDS);
+			pQuery.setParameterList("gids", parentGids);
+			pQuery.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
+			this.addInventoryInfo(pQuery);
+			resultParents.addAll(this.getSearchForGermplasmsResult(pQuery.list()));
+		}
 	}
 
 	private void addInventoryInfo(SQLQuery query) {
