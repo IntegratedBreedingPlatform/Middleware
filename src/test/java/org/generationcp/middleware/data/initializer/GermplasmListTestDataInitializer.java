@@ -54,15 +54,15 @@ public class GermplasmListTestDataInitializer {
 		return listEntries;
 	}
 
-	protected static GermplasmListData createGermplasmListDataItem(int i) {
-			final GermplasmListData listEntry = new GermplasmListData();
-			listEntry.setId(i);
-			listEntry.setDesignation("Designation " + i);
-			listEntry.setEntryCode("EntryCode " + i);
-			listEntry.setEntryId(i);
-			listEntry.setGroupName("GroupName " + i);
-			listEntry.setStatus(1);
-			listEntry.setSeedSource("SeedSource " + i);
+	protected static GermplasmListData createGermplasmListDataItem(final int i) {
+		final GermplasmListData listEntry = new GermplasmListData();
+		listEntry.setId(i);
+		listEntry.setDesignation("Designation " + i);
+		listEntry.setEntryCode("EntryCode " + i);
+		listEntry.setEntryId(i);
+		listEntry.setGroupName("GroupName " + i);
+		listEntry.setStatus(1);
+		listEntry.setSeedSource("SeedSource " + i);
 		listEntry.setGid(i);
 		return listEntry;
 	}
@@ -90,7 +90,7 @@ public class GermplasmListTestDataInitializer {
 		return germplasmLists;
 	}
 
-protected static GermplasmListData createGermplasmListDataItemWithInventoryInfo(int i) {
+	protected static GermplasmListData createGermplasmListDataItemWithInventoryInfo(final int i) {
 		final GermplasmListData listEntry = new GermplasmListData();
 		listEntry.setId(i);
 		listEntry.setDesignation("Designation " + i);
@@ -104,9 +104,9 @@ protected static GermplasmListData createGermplasmListDataItemWithInventoryInfo(
 		return listEntry;
 	}
 
-	protected static ListDataInventory createInventoryInfo(int itemNo, int listDataId, int gid) {
+	protected static ListDataInventory createInventoryInfo(final int itemNo, final int listDataId, final int gid) {
 
-		ListDataInventory listDataInventory = new ListDataInventory(listDataId, gid);
+		final ListDataInventory listDataInventory = new ListDataInventory(listDataId, gid);
 		listDataInventory.setLotCount(0);
 		listDataInventory.setActualInventoryLotCount(0);
 		listDataInventory.setLotRows(new ArrayList<LotDetails>());

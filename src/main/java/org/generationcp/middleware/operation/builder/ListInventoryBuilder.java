@@ -55,11 +55,17 @@ public class ListInventoryBuilder extends Builder {
 		return listEntries;
 	}
 
-	private void retrieveGroupId(final List<GermplasmListData> listEntries, final List<Integer> gids) {
+	/**
+	 * Retrieves GROUP ID(germplsm.mgid) directly from the Germplasm Object
+	 * 
+	 * @param listEntries
+	 * @param gids
+	 */
+	void retrieveGroupId(final List<GermplasmListData> listEntries, final List<Integer> gids) {
 
-		final List<Germplasm> germplasmList = this.getGermplasmDataManager().getGermplasms(gids);
+		final List<Germplasm> germplasms = this.getGermplasmDataManager().getGermplasms(gids);
 
-		final Map<Integer, Germplasm> germplasmMap = Maps.uniqueIndex(germplasmList, new Function<Germplasm, Integer>() {
+		final Map<Integer, Germplasm> germplasmMap = Maps.uniqueIndex(germplasms, new Function<Germplasm, Integer>() {
 
 			@Override
 			public Integer apply(final Germplasm from) {
@@ -69,7 +75,9 @@ public class ListInventoryBuilder extends Builder {
 
 		for (final GermplasmListData listEntry : listEntries) {
 			final Integer gid = listEntry.getGid();
-			listEntry.setGroupId(germplasmMap.get(gid).getMgid());
+			if (germplasmMap.containsKey(gid)) {
+				listEntry.setGroupId(germplasmMap.get(gid).getMgid());
+			}
 		}
 	}
 
