@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao;
 import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -30,10 +31,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 // TODO this test needs "proper" data setup work.
 public class GermplasmDAOTest extends IntegrationTestBase {
 
+	private static Integer GERMPLASM_GID = 1003;
 	private static final String DUMMY_STOCK_ID = "USER-1-1";
 	private static final Integer testGid1 = 1;
 	private static final Integer testGid1_Gpid1 = 2;
 	private static final Integer testGid1_Gpid2 = 3;
+	
+	private static final Integer GROUP_ID = 10;
 
 	private static Integer testTransactionID;
 	private static String oldInventoryID;
@@ -62,14 +66,15 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			this.updateProgenitors();
 			this.testDataSetup = true;
 		}
+		this.initializeGermplasms();
 	}
 
 	private void updateProgenitors() throws MiddlewareQueryException {
-		/*Germplasm germplasm1 = this.germplasmDataDM.getGermplasmByGID(GermplasmDAOTest.testGid1);
+		Germplasm germplasm1 = this.germplasmDataDM.getGermplasmByGID(GermplasmDAOTest.testGid1);
 		GermplasmDAOTest.oldGid1_Gpid1 = germplasm1.getGpid1();
 		GermplasmDAOTest.oldGid1_Gpid2 = germplasm1.getGpid2();
 		this.germplasmDataDM.updateProgenitor(GermplasmDAOTest.testGid1, GermplasmDAOTest.testGid1_Gpid1, 1);
-		this.germplasmDataDM.updateProgenitor(GermplasmDAOTest.testGid1, GermplasmDAOTest.testGid1_Gpid2, 2);*/
+		this.germplasmDataDM.updateProgenitor(GermplasmDAOTest.testGid1, GermplasmDAOTest.testGid1_Gpid2, 2);
 	}
 
 	private void updateInventory() throws MiddlewareQueryException {
@@ -86,7 +91,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetDerivativeChildren() throws Exception {
 		Integer gid = Integer.valueOf(1);
-		// List<Germplasm> results = dao.getDerivativeChildren(gid);
 		List<Germplasm> results = this.dao.getChildren(gid, 'D');
 		Assert.assertNotNull(results);
 		Debug.println(0, "testGetDerivativeChildren(GId=" + gid + ") RESULTS:");
@@ -197,22 +201,26 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchForGermplasmsIncludeParents() throws Exception {
-		List<Germplasm> results = this.dao.searchForGermplasms(GermplasmDAOTest.testGid1.toString(), Operation.EQUAL, false, false, false);
+		List<Germplasm> results = this.dao.searchForGermplasms(GermplasmDAOTest.GERMPLASM_GID.toString(), Operation.EQUAL, false, false, false);
 		List<Germplasm> resultsWithParents =
-				this.dao.searchForGermplasms(GermplasmDAOTest.testGid1.toString(), Operation.EQUAL, true, false, false);
-		Assert.assertNotEquals(results.size(), resultsWithParents.size());
-		Assert.assertEquals(1, results.size());
-		Assert.assertEquals(3, resultsWithParents.size());
-
-		results = this.dao.searchForGermplasms("2", Operation.EQUAL, false, false, false);
-		resultsWithParents = this.dao.searchForGermplasms("2", Operation.EQUAL, true, false, false);
-		Assert.assertEquals(results.size(), resultsWithParents.size());
+				this.dao.searchForGermplasms(GermplasmDAOTest.GERMPLASM_GID.toString(), Operation.EQUAL, true, false, false);
+		Assert.assertEquals("The result should contain only one germplasm", 1, results.size());
+		Assert.assertEquals("The result should contain three germplasms", 3, resultsWithParents.size());
 	}
 
 	@Test
 	public void testSearchForGermplasmsEmptyKeyword() throws Exception {
 		List<Germplasm> results = this.dao.searchForGermplasms("", Operation.EQUAL, false, false, false);
 		Assert.assertTrue(results.isEmpty());
+	}
+	
+	@Test
+	public void testSearchForGermplasmsIncludeMGMembers() throws Exception {
+		List<Germplasm> results = this.dao.searchForGermplasms(GermplasmDAOTest.GERMPLASM_GID.toString(), Operation.EQUAL, false, false, false);
+		List<Germplasm> resultsWithMGMembers =
+				this.dao.searchForGermplasms(GermplasmDAOTest.GERMPLASM_GID.toString(), Operation.EQUAL, false, false, true);
+		Assert.assertEquals("The result should contain only one germplasm", 1, results.size());
+		Assert.assertEquals("The result should contain two germplasms", 2, resultsWithMGMembers.size());
 	}
 
 	@Test
@@ -246,12 +254,12 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetManagementGroupMembers() {
 		List<Germplasm> groupMembers = this.dao.getManagementGroupMembers(1);
-		Assert.assertNotNull("getManagementGroupMembers() should never return null when supplied with proper mgid.", groupMembers);
+		Assert.assertFalse("getManagementGroupMembers() should never return null when supplied with proper mgid.", groupMembers.isEmpty());
 
-		this.dao.getManagementGroupMembers(null);
+		groupMembers = this.dao.getManagementGroupMembers(null);
 		Assert.assertTrue("getManagementGroupMembers() should return empty collection when supplied mgid = null.", groupMembers.isEmpty());
 
-		this.dao.getManagementGroupMembers(0);
+		groupMembers =  this.dao.getManagementGroupMembers(0);
 		Assert.assertTrue("getManagementGroupMembers() should return empty collection when supplied mgid = 0.", groupMembers.isEmpty());
 	}
 
@@ -308,6 +316,19 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			Assert.assertNotNull(name.getNid());
 			Assert.assertEquals(germplasm.getGid(), name.getGermplasmId());
 		}
+	}
+	
+	private void initializeGermplasms() {
+		final Germplasm fParent = GermplasmTestDataInitializer.createGermplasm(1001);
+		this.germplasmDataDM.addGermplasm(fParent, fParent.getPreferredName());
+		final Germplasm mParent = GermplasmTestDataInitializer.createGermplasm(1002);
+		this.germplasmDataDM.addGermplasm(mParent, mParent.getPreferredName());
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(GERMPLASM_GID);
+		germplasm.setMgid(GROUP_ID);
+		GERMPLASM_GID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
+		final Germplasm mgMember = GermplasmTestDataInitializer.createGermplasm(1004);
+		mgMember.setMgid(GROUP_ID);
+		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName());
 	}
 
 }
