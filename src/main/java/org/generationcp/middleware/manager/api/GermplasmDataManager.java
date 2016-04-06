@@ -72,8 +72,7 @@ public interface GermplasmDataManager {
 	 * @return List of Germplasm POJOs
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op)
-;
+	List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op);
 
 	/**
 	 * Returns the number of germplasm records that were created at the locations with names matching the given parameter.
@@ -117,8 +116,7 @@ public interface GermplasmDataManager {
 	 * @return List of Germplasm POJOS
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Germplasm> getGermplasmByMethodName(String name, int start, int numOfRows, Operation op)
-;
+	List<Germplasm> getGermplasmByMethodName(String name, int start, int numOfRows, Operation op);
 
 	/**
 	 * Returns the number of germplasm records that were created by methods with names matching the given parameter.
@@ -186,7 +184,8 @@ public interface GermplasmDataManager {
 	/**
 	 * Returns all the names of the Germplasm identified by the gid parameter.
 	 *
-	 * Results may be filtered by name status. Accepted values are 0 - 10. If the given status is zero all names will be included except deleted names
+	 * Results may be filtered by name status. Accepted values are 0 - 10. If the given status is zero all names will be included except
+	 * deleted names
 	 *
 	 * Results may also be filtered by type list. These must be valid integer values
 	 *
@@ -764,8 +763,7 @@ public interface GermplasmDataManager {
 	 * @return List of GidNidElement based on the specified list of germplasm names
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(List<String> germplasmNames, GetGermplasmByNameModes mode)
-;
+	List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(List<String> germplasmNames, GetGermplasmByNameModes mode);
 
 	/**
 	 * Please use LocationDataManager.getAllBreedingLocations().
@@ -971,8 +969,7 @@ public interface GermplasmDataManager {
 	 * @return list of ProgramFavorite
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, int max, String programUUID)
-;
+	List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, int max, String programUUID);
 
 	/**
 	 * count favorite methods/locations
@@ -1073,25 +1070,27 @@ public interface GermplasmDataManager {
 
 	/**
 	 * return list of name and it's permutation count.
+	 * 
 	 * @param names list of names
 	 * @return list of name and it's number of permutations.
 	 */
 	Map<String, Integer> getCountByNamePermutations(List<String> names);
 
 	/**
-	 * @return the UDFLD table record that represents "plot code": ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE. If no record matching these
-	 *         critria is found, an empty record with fldno=0 is returned. Never returns null.
+	 * @return the UDFLD table record that represents "plot code": ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE. If no record matching
+	 *         these critria is found, an empty record with fldno=0 is returned. Never returns null.
 	 */
 	UserDefinedField getPlotCodeField();
 
 	/**
-	 * Returns value of the plot code (seed source) where the germplasm was created, identified by the given gid. Returns "Unknown" if plot code
-	 * attribute is not present. Never returns null.
+	 * Returns value of the plot code (seed source) where the germplasm was created, identified by the given gid. Returns "Unknown" if plot
+	 * code attribute is not present. Never returns null.
 	 */
 	String getPlotCodeValue(Integer gid);
 
 	/**
 	 * Enables us to query the udflds table
+	 * 
 	 * @param table the ftable value
 	 * @param type the ftype value
 	 * @param code we are looking for
