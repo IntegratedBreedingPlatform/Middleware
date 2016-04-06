@@ -134,6 +134,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
 
 		// partially parse the file to parse the description sheet only at first
+		// Set performValidation to false to disable validation during parsing.
 		final Workbook workbook = parser.parseFile(file, false);
 
 		parser.parseAndSetObservationRows(file, workbook, false);
@@ -220,20 +221,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		for (MeasurementVariable measurementVariable : variates) {
 
-			Integer standardVariableId = null;
-			if (measurementVariable.getTermId() == 0) {
-				standardVariableId =
-						ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(),
-								measurementVariable.getScale(), measurementVariable.getMethod());
-			} else {
-				standardVariableId = measurementVariable.getTermId();
-			}
-
-			StandardVariable standardVariable = null;
-
-			if (standardVariableId != null) {
-				standardVariable = ontologyDataManager.getStandardVariable(standardVariableId, programUUID);
-			}
+			StandardVariable standardVariable =
+					ontologyDataManager.findStandardVariableByTraitScaleMethodNames(measurementVariable.getProperty(),
+							measurementVariable.getScale(), measurementVariable.getMethod(), programUUID);
 
 			if (standardVariable != null && standardVariable.getDataType().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
 
