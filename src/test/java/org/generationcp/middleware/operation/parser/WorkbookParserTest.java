@@ -671,7 +671,7 @@ public class WorkbookParserTest {
 		HSSFSheet observationSheet = excelWorkbook.createSheet("Observation");
 
 		if (withRecords) {
-			int numberOfRows = overMaximumRowLimit ? WorkbookParser.MAX_ROW_LIMIT + 1 : 100;
+			int numberOfRows = overMaximumRowLimit ? WorkbookParser.DEFAULT_MAX_ROW_LIMIT + 1 : 100;
 			for (int i = 0; i <= numberOfRows; i++) {
 
 				// create header row

@@ -61,8 +61,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String ERROR_INVALID_VARIABLE_NAME_LENGTH = "error.invalid.variable.name.length";
 	public static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
 
+	private int maxRowLimit = WorkbookParser.DEFAULT_MAX_ROW_LIMIT;
+
 	public DataImportServiceImpl() {
-		super();
 
 	}
 
@@ -130,7 +131,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	@Override
 	public Workbook parseWorkbook(final File file) throws WorkbookParserException {
-		final WorkbookParser parser = new WorkbookParser();
+		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
 
 		// partially parse the file to parse the description sheet only at first
 		final Workbook workbook = parser.parseFile(file, false);
@@ -142,7 +143,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	@Override
 	public Workbook strictParseWorkbook(final File file, final String programUUID) throws WorkbookParserException {
-		final WorkbookParser parser = new WorkbookParser();
+		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
 
 		final OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(this.getSessionProvider());
 
@@ -825,6 +826,18 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			}
 
 		}
+	}
+
+	public int getMaxRowLimit() {
+		return this.maxRowLimit;
+	}
+
+	public void setMaxRowLimit(int value) {
+
+		if (value > 0) {
+			this.maxRowLimit = value;
+		}
+
 	}
 
 }

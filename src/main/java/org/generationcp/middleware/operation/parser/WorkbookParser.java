@@ -79,11 +79,12 @@ public class WorkbookParser {
 	private static final String METHOD = "METHOD";
 	private static final String SCALE = "SCALE";
 
-	public static final Integer MAX_ROW_LIMIT = 10000;
+	public static int DEFAULT_MAX_ROW_LIMIT = 10000;
 
 	private int currentRow;
 	private List<Message> errorMessages = new ArrayList<>();
 	private boolean hasIncorrectDatatypeValue = false;
+	private int maxRowLimit = DEFAULT_MAX_ROW_LIMIT;
 
 	private org.generationcp.middleware.domain.etl.Workbook currentWorkbook;
 	public static final String[] DEFAULT_EXPECTED_VARIABLE_HEADERS = new String[] {WorkbookParser.DESCRIPTION, WorkbookParser.PROPERTY,
@@ -103,6 +104,14 @@ public class WorkbookParser {
 
 	public enum Section {
 		CONDITION, FACTOR, CONSTANT, VARIATE
+	}
+
+	public WorkbookParser() {
+
+	}
+
+	public WorkbookParser(int maxRowLimit) {
+		this.maxRowLimit = maxRowLimit;
 	}
 
 	/**
@@ -518,9 +527,10 @@ public class WorkbookParser {
 
 		Integer lastRowNum = this.getLastRowNumber(excelWorkbook, WorkbookParser.OBSERVATION_SHEET);
 
-		if (lastRowNum > MAX_ROW_LIMIT) {
+		if (lastRowNum > this.getMaxRowLimit()) {
 			List<Message> messages = new ArrayList<Message>();
-			Message message = new Message("error.observation.over.maximum.limit", new DecimalFormat("###,###,###").format(MAX_ROW_LIMIT));
+			Message message =
+					new Message("error.observation.over.maximum.limit", new DecimalFormat("###,###,###").format(this.getMaxRowLimit()));
 			messages.add(message);
 			throw new WorkbookParserException(messages);
 		}
@@ -716,6 +726,14 @@ public class WorkbookParser {
 
 	public void setErrorMessages(List<Message> errorMessages) {
 		this.errorMessages = errorMessages;
+	}
+
+	public int getMaxRowLimit() {
+		return this.maxRowLimit;
+	}
+
+	public void setMaxRowLimit(int maxRowLimit) {
+		this.maxRowLimit = maxRowLimit;
 	}
 
 }
