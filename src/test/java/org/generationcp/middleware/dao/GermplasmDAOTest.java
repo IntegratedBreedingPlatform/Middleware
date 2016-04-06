@@ -31,7 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 // TODO this test needs "proper" data setup work.
 public class GermplasmDAOTest extends IntegrationTestBase {
 
-	private static Integer GERMPLASM_GID = 1003;
 	private static final String DUMMY_STOCK_ID = "USER-1-1";
 	private static final Integer testGid1 = 1;
 	private static final Integer testGid1_Gpid1 = 2;
@@ -48,6 +47,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	private GermplasmDAO dao;
 
+	private Integer germplasmGID;
+	
 	@Autowired
 	private InventoryDataManager inventoryDM;
 
@@ -201,9 +202,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchForGermplasmsIncludeParents() throws Exception {
-		List<Germplasm> results = this.dao.searchForGermplasms(GermplasmDAOTest.GERMPLASM_GID.toString(), Operation.EQUAL, false, false, false);
+		List<Germplasm> results = this.dao.searchForGermplasms(this.germplasmGID.toString(), Operation.EQUAL, false, false, false);
 		List<Germplasm> resultsWithParents =
-				this.dao.searchForGermplasms(GermplasmDAOTest.GERMPLASM_GID.toString(), Operation.EQUAL, true, false, false);
+				this.dao.searchForGermplasms(this.germplasmGID.toString(), Operation.EQUAL, true, false, false);
 		Assert.assertEquals("The result should contain only one germplasm", 1, results.size());
 		Assert.assertEquals("The result should contain three germplasms", 3, resultsWithParents.size());
 	}
@@ -216,9 +217,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	
 	@Test
 	public void testSearchForGermplasmsIncludeMGMembers() throws Exception {
-		List<Germplasm> results = this.dao.searchForGermplasms(GermplasmDAOTest.GERMPLASM_GID.toString(), Operation.EQUAL, false, false, false);
+		List<Germplasm> results = this.dao.searchForGermplasms(this.germplasmGID.toString(), Operation.EQUAL, false, false, false);
 		List<Germplasm> resultsWithMGMembers =
-				this.dao.searchForGermplasms(GermplasmDAOTest.GERMPLASM_GID.toString(), Operation.EQUAL, false, false, true);
+				this.dao.searchForGermplasms(this.germplasmGID.toString(), Operation.EQUAL, false, false, true);
 		Assert.assertEquals("The result should contain only one germplasm", 1, results.size());
 		Assert.assertEquals("The result should contain two germplasms", 2, resultsWithMGMembers.size());
 	}
@@ -320,12 +321,17 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	
 	private void initializeGermplasms() {
 		final Germplasm fParent = GermplasmTestDataInitializer.createGermplasm(1001);
-		this.germplasmDataDM.addGermplasm(fParent, fParent.getPreferredName());
+		final Integer fParentGID = this.germplasmDataDM.addGermplasm(fParent, fParent.getPreferredName());
+		
 		final Germplasm mParent = GermplasmTestDataInitializer.createGermplasm(1002);
-		this.germplasmDataDM.addGermplasm(mParent, mParent.getPreferredName());
-		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(GERMPLASM_GID);
+		final Integer mParentGID = this.germplasmDataDM.addGermplasm(mParent, mParent.getPreferredName());
+		
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1003);
 		germplasm.setMgid(GROUP_ID);
-		GERMPLASM_GID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
+		germplasm.setGpid1(fParentGID);
+		germplasm.setGpid2(mParentGID);
+		this.germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
+		
 		final Germplasm mgMember = GermplasmTestDataInitializer.createGermplasm(1004);
 		mgMember.setMgid(GROUP_ID);
 		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName());
