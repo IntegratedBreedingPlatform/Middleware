@@ -63,6 +63,8 @@ public class ListInventoryBuilder extends Builder {
 	 */
 	void retrieveGroupId(final List<GermplasmListData> listEntries, final List<Integer> gids) {
 
+		// We retrieve the actual germplasm object here instead of using the Germplasm from GermplasmListData, since sometimes it is null
+		// due to transaction isolation level.
 		final List<Germplasm> germplasms = this.getGermplasmDataManager().getGermplasms(gids);
 
 		final Map<Integer, Germplasm> germplasmMap = Maps.uniqueIndex(germplasms, new Function<Germplasm, Integer>() {
