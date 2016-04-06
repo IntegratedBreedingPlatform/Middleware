@@ -831,11 +831,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			result.addAll(this.getSearchForGermplasmsResult(p2Query.list()));
 
 			if (includeParents) {
-				this.retrieveParents(result, resultParents);
+				resultParents = this.retrieveParents(result);
 			}
 			
 			if (includeMGMembers) {
-				this.retrieveMGMembers(result, resultMGMembers);
+				resultMGMembers = this.retrieveMGMembers(result);
 			}
 			
 			// Add parents and MGMembers to results if specified by "includeParents"  and "includeMGMembers" flag
@@ -849,7 +849,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return new ArrayList<Germplasm>();
 	}
 
-	private void retrieveMGMembers(Set<Germplasm> result, Set<Germplasm> resultMGMembers) {
+	private Set<Germplasm> retrieveMGMembers(Set<Germplasm> result) {
+		Set<Germplasm> resultMGMembers = new LinkedHashSet<Germplasm>();
 		Set<Integer> mGIds = new LinkedHashSet<Integer>();
 		for (Germplasm g : result) {
 			if (g.getMgid() != 0) {
@@ -862,10 +863,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			pQuery.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
 			this.addInventoryInfo(pQuery);
 			resultMGMembers.addAll(this.getSearchForGermplasmsResult(pQuery.list()));
-		}	
+		}
+		return resultMGMembers;
 	}
 
-	private void retrieveParents(Set<Germplasm> result, Set<Germplasm> resultParents) {
+	private Set<Germplasm> retrieveParents(Set<Germplasm> result) {
+		Set<Germplasm> resultParents = new LinkedHashSet<Germplasm>();
 		Set<Integer> parentGids = new LinkedHashSet<Integer>();
 		for (Germplasm g : result) {
 			if (g.getGpid1() != null && g.getGpid1() != 0) {
@@ -882,6 +885,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			this.addInventoryInfo(pQuery);
 			resultParents.addAll(this.getSearchForGermplasmsResult(pQuery.list()));
 		}
+		return resultParents;
 	}
 
 	private void addInventoryInfo(SQLQuery query) {
