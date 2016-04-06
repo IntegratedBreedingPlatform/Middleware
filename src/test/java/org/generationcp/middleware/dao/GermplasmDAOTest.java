@@ -199,13 +199,18 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		List<Germplasm> resultsWithInventoryOnly = this.dao.searchForGermplasms("1%", Operation.LIKE, false, true, false);
 		Assert.assertNotEquals(results.size(), resultsWithInventoryOnly.size());
 	}
-
+	
+	//This method tests if the search includes the parents in the search result when the user specified that it should be.
 	@Test
 	public void testSearchForGermplasmsIncludeParents() throws Exception {
+		//Store the search result where parents is not yet included in the search
 		List<Germplasm> results = this.dao.searchForGermplasms(this.germplasmGID.toString(), Operation.EQUAL, false, false, false);
+		//store the search result where the parents are included in the search
 		List<Germplasm> resultsWithParents =
 				this.dao.searchForGermplasms(this.germplasmGID.toString(), Operation.EQUAL, true, false, false);
+		//The result should return only one value since we searched for exact match of the GID
 		Assert.assertEquals("The result should contain only one germplasm", 1, results.size());
+		//The result should return 3 values since we searched for exact match of the GID and its parents(male and female)
 		Assert.assertEquals("The result should contain three germplasms", 3, resultsWithParents.size());
 	}
 
@@ -215,12 +220,17 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertTrue(results.isEmpty());
 	}
 	
+	//This method tests if the search includes the MG members in the search result when the user specified that it should be.
 	@Test
 	public void testSearchForGermplasmsIncludeMGMembers() throws Exception {
+		//Store the search result where the MG members is not yet included
 		List<Germplasm> results = this.dao.searchForGermplasms(this.germplasmGID.toString(), Operation.EQUAL, false, false, false);
+		//Store the search result where the MG members is included in the search
 		List<Germplasm> resultsWithMGMembers =
 				this.dao.searchForGermplasms(this.germplasmGID.toString(), Operation.EQUAL, false, false, true);
+		//The result should return only one value since we searched for exact match of the GID
 		Assert.assertEquals("The result should contain only one germplasm", 1, results.size());
+		//The result should return 2 values since we searched for exact match of the GID and the MG member (Note that theres's only one MG member in the test data)
 		Assert.assertEquals("The result should contain two germplasms", 2, resultsWithMGMembers.size());
 	}
 
