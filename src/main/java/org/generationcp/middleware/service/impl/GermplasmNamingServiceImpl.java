@@ -1,12 +1,17 @@
 
 package org.generationcp.middleware.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -18,7 +23,6 @@ import org.generationcp.middleware.util.Util;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 public class GermplasmNamingServiceImpl implements GermplasmNamingService {
@@ -27,6 +31,8 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 	private NameDAO nameDAO;
 
 	private KeySequenceRegisterService keySequenceRegisterService;
+
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	public GermplasmNamingServiceImpl() {
 
@@ -40,6 +46,7 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		this.nameDAO.setSession(sessionProvider.getSession());
 
 		this.keySequenceRegisterService = new KeySequenceRegisterServiceImpl(sessionProvider);
+		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(sessionProvider);
 	}
 
 	public GermplasmNamingServiceImpl(GermplasmDAO germplasmDAO, NameDAO nameDAO, KeySequenceRegisterService keySequenceRegisterService) {
@@ -51,8 +58,7 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 	@Override
 	@Transactional(propagation = Propagation.MANDATORY)
 	public GermplasmGroupNamingResult applyGroupName(final Integer gid, final String groupName, final UserDefinedField nameType,
-			final Integer userId,
-			final Integer locationId) {
+			final Integer userId, final Integer locationId) {
 
 		GermplasmGroupNamingResult result = new GermplasmGroupNamingResult();
 
@@ -60,8 +66,7 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 
 		if (germplasm.getMgid() == null || germplasm.getMgid() == 0) {
 			result.addMessage(
-					String.format("Germplasm (gid: %s) is not part of a management group. Can not assign group name.",
-							germplasm.getGid()));
+					String.format("Germplasm (gid: %s) is not part of a management group. Can not assign group name.", germplasm.getGid()));
 			return result;
 		}
 
@@ -70,7 +75,7 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		for (final Germplasm member : groupMembers) {
 			this.addName(member, nameWithSequence, nameType, userId, locationId, result);
 		}
-		
+
 		return result;
 	}
 
@@ -111,25 +116,36 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 			result.addMessage(String.format("Germplasm (gid: %s) successfully assigned name %s of type %s as a preferred name.",
 					germplasm.getGid(), groupName, nameType.getFcode()));
 		} else {
-			result.addMessage(
-					String.format("Germplasm (gid: %s) already has existing name %s of type %s. Supplied name %s was not added.",
-							germplasm.getGid(), existingNameOfGivenType.getNval(), nameType.getFcode(), groupName));
+			result.addMessage(String.format("Germplasm (gid: %s) already has existing name %s of type %s. Supplied name %s was not added.",
+					germplasm.getGid(), existingNameOfGivenType.getNval(), nameType.getFcode(), groupName));
 		}
 	}
 
 	@Override
-	public List<String> getProgramIdentifiers(final Integer levelCode) {
+	public List<String> getProgramIdentifiers(final Integer levelCode, String programUUID) {
+		Variable variable = null;
+		List<String> programIdentifiers = new ArrayList<>();
 		if (levelCode == 1) {
-			return Lists.newArrayList("AB", "BC", "DJ", "EA");
+			variable = this.ontologyVariableDataManager.getVariable(programUUID, 3001, true, false);
+			if (variable == null || !variable.getName().equals("Project_Prefix")) {
+				throw new IllegalStateException(
+						"Missing required reference data. Please ensure an ontology variable with name Project_Prefix (id 3001) has been setup. It is required for Level 1 coding.");
+			}
 		} else if (levelCode == 2) {
-			return Lists.newArrayList("CA", "CB", "CC", "CZ");
+			variable = this.ontologyVariableDataManager.getVariable(programUUID, 3002, true, false);
+			if (variable == null || !variable.getName().equals("CIMMYT_Target_Region")) {
+				throw new IllegalStateException(
+						"Missing required reference data. Please ensure an ontology variable with name CIMMYT_Target_Region (id 3002) has been setup. It is required for Level 2 coding.");
+			}
 		}
-		return Lists.newArrayList();
-	}
 
-	@Override
-	public List<String> getLocationIdentifiers() {
-		return Lists.newArrayList("CZ", "CA", "CB");
+		if (variable != null) {
+			final List<TermSummary> categories = variable.getScale().getCategories();
+			for (TermSummary categoryTerm : categories) {
+				programIdentifiers.add(categoryTerm.getName());
+			}
+		}
+		return programIdentifiers;
 	}
 
 	@Override
