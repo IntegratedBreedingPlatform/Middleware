@@ -853,18 +853,29 @@ public interface GermplasmDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Map<Integer, String> getLocationNamesByGids(List<Integer> gids);
-
+	
 	/**
-	 * Search for germplasms given a search term Q.
-	 *
-	 * @param q - the search term to be used in retrieving the germplasm
-	 * @param o - the operation to be used for the query (equal or like)
-	 * @param includeParents - boolean flag to denote whether parents will be included in search results
+	 * Search for germplasms given a search term
+	 * 
+	 * @param searchedString - the search term to be used
+	 * @param o - like or equal
+	 * @param includeParents boolean flag to denote whether parents will be included in search results
 	 * @param withInventoryOnly - boolean flag to denote whether result will be filtered by those with inventories only
-	 * @return - List of germplasms filtered by the gid, stockID and germplasm name based on the operation and search term, with parents and
-	 *         with inventory only filtered if specified
-	 *
-	 * @throws MiddlewareQueryException the middleware query exception
+	 * @return List of Germplasms
+	 * @throws MiddlewareQueryException
+	 */
+	List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly);
+	
+	/**
+	 * Search for germplasms given a search term
+	 * 
+	 * @param searchedString - the search term to be used
+	 * @param o - like or equal
+	 * @param includeParents boolean flag to denote whether parents will be included in search results
+	 * @param withInventoryOnly - boolean flag to denote whether result will be filtered by those with inventories only
+	 * @param includeMGMembers - boolean flag to denote whether the MG members will be included in the result
+	 * @return List of Germplasms
+	 * @throws MiddlewareQueryException
 	 */
 	List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly, boolean includeMGMembers);
 

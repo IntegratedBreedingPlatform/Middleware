@@ -782,7 +782,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 		return new ArrayList<Germplasm>();
 	}
-
+	
 	/**
 	 * Search for germplasms given a search term
 	 * 
@@ -790,6 +790,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	 * @param o - like or equal
 	 * @param includeParents boolean flag to denote whether parents will be included in search results
 	 * @param withInventoryOnly - boolean flag to denote whether result will be filtered by those with inventories only
+	 * @param includeMGMembers - boolean flag to denote whether the MG members will be included in the result
 	 * @return List of Germplasms
 	 * @throws MiddlewareQueryException
 	 */
