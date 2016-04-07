@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 public class NameDAOUT {
 
 	public static final String DUMMY_NAME = "DUMMY_NAME";
+	public static final String CODE1 = "code1";
 	NameDAO nameDAO;
 
 	@Mock
@@ -39,11 +40,11 @@ public class NameDAOUT {
 	@Test
 	public void getNamesByNvalInTypeListWhenTypeListIsEmpty() throws Exception {
 
-		List<Integer> typeIds = Lists.newArrayList();
+		List<String> typeIds = Lists.newArrayList();
 
 		ArgumentCaptor<String> queryStringCaptor = ArgumentCaptor.forClass(String.class);
 		Query queryMock = mock(Query.class);
-		String expectedQuery = "select names from Name names where names.nval in (:names)";
+		String expectedQuery = "select names from Name names where names.nval = :name";
 
 		when(sessionMock.createQuery(queryStringCaptor.capture())).thenReturn(queryMock);
 
@@ -57,15 +58,14 @@ public class NameDAOUT {
 
 
 	@Test
-	public void getByTableAndTypeWithoutListQueryDoesNotContainListWhenListIsEmpty() throws Exception {
-
-		Integer item1 = 2;
-		List<Integer> typeIds = Lists.newArrayList(item1);
+	public void getByTableAndTypeListWhenListContainsCodedNames() throws Exception {
+		List<String> typeIds = Lists.newArrayList(CODE1);
 
 		ArgumentCaptor<String> queryStringCaptor = ArgumentCaptor.forClass(String.class);
 		Query queryMock = mock(Query.class);
 
-		String expectedQuery = "select name from Name name where name.nval in (:names) and name.typeId in (:typeList)";
+		String expectedQuery = "select name from Name name, UserDefinedField udfld  where name.nval = :name and name.typeId = udfld.fldno "
+				+ " and udfld.fcode in (:fcodeList)";
 
 		when(sessionMock.createQuery(queryStringCaptor.capture())).thenReturn(queryMock);
 

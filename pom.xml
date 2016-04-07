@@ -479,7 +479,10 @@
 						<include>**/CheckNameFactorsPresentValidationRuleUT.java</include>
 						<include>**/ShowNameHandlingPopUpValidatorUT.java</include>
 						<include>**/CheckGermplasmWithoutCodedNamesValidationRuleUT.java</include>
+
+						<!-- DAO Query immutability test-->
 						<include>**/UserDefinedFieldDAOUT.java</include>
+						<include>**/NameDAOUT.java</include>
 
 						<include>**/UserDefinedFieldsDataManagerImplIT.java</include>
 						<include>**/NamesDataManagerImplIT.java</include>

@@ -32,6 +32,8 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 
@@ -452,26 +454,47 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	 * If the List/Bag of types is empty or null it is assumed that the filter could be ignored.
 	 *
 	 * @param name The name whose permutations are to be looked for.
-	 * @param typeList  List/bag of types in which the name.ntype must be into.
+	 * @param fcodeList  List/bag of types in which the name.ntype must be into.
 	 * @return
 	 */
-	public List<Name> getNamesByNvalInTypeList(String name, List<Integer> typeList) {
+	public List<Name> getNamesByNvalInTypeList(String name, List<String> fcodeList) {
 
-		List<String> names = GermplasmDataManagerUtil.createNamePermutations(name);
+
 		String queryString;
-		if (typeList==null || typeList.size()==0){
-			queryString = "select names from Name names where names.nval in (:names)";
+		if (fcodeList==null || fcodeList.size()==0){
+			queryString = "select names from Name names where names.nval = :name";
 		}else{
-			queryString = "select name from Name name where name.nval in (:names) and name.typeId in (:typeList)";
+			queryString = "select name from Name name, UserDefinedField udfld  where name.nval = :name and name.typeId = udfld.fldno "
+					+ " and udfld.fcode in (:fcodeList)";
 		}
 
 		Query query = getSession().createQuery(queryString);
-		query.setParameterList("names", names);
+		query.setParameter("name", name);
 
-		if (typeList!=null && typeList.size()>0){
-			query.setParameterList("typeList", typeList);
+		if (fcodeList!=null && fcodeList.size()>0){
+			query.setParameterList("fcodeList", fcodeList);
 		}
 
+
+		return query.list();
+	}
+
+	public List<Name> getNamesByGIDAndCodedName(Integer gid, List<String> fCodecodedNames) {
+
+		String queryString;
+		if (fCodecodedNames == null || fCodecodedNames.size() == 0) {
+			return Lists.newArrayList();
+		}
+
+		queryString = "select name from Name name, UserDefinedField udfld where name.germplasmId = :gid "
+				+ " and name.typeId = udfld.fldno and udfld.fcode in (:fCodecodedNames)";
+
+		Query query = getSession().createQuery(queryString);
+		query.setParameter("gid", gid);
+
+		if (fCodecodedNames != null && fCodecodedNames.size() > 0) {
+			query.setParameterList("fCodecodedNames", fCodecodedNames);
+		}
 
 		return query.list();
 	}
