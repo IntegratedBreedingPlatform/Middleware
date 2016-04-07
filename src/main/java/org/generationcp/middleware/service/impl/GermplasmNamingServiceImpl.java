@@ -1,29 +1,20 @@
 
 package org.generationcp.middleware.service.impl;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.domain.oms.TermSummary;
-import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
-import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.GermplasmGroupNamingResult;
 import org.generationcp.middleware.service.api.GermplasmNamingService;
-import org.generationcp.middleware.service.api.GermplasmType;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.util.Util;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.collect.Sets;
 
 public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 
@@ -31,8 +22,6 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 	private NameDAO nameDAO;
 
 	private KeySequenceRegisterService keySequenceRegisterService;
-
-	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	public GermplasmNamingServiceImpl() {
 
@@ -46,7 +35,6 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 		this.nameDAO.setSession(sessionProvider.getSession());
 
 		this.keySequenceRegisterService = new KeySequenceRegisterServiceImpl(sessionProvider);
-		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(sessionProvider);
 	}
 
 	public GermplasmNamingServiceImpl(GermplasmDAO germplasmDAO, NameDAO nameDAO, KeySequenceRegisterService keySequenceRegisterService) {
@@ -120,37 +108,4 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 					germplasm.getGid(), existingNameOfGivenType.getNval(), nameType.getFcode(), groupName));
 		}
 	}
-
-	@Override
-	public List<String> getProgramIdentifiers(final Integer levelCode, String programUUID) {
-		Variable variable = null;
-		List<String> programIdentifiers = new ArrayList<>();
-		if (levelCode == 1) {
-			variable = this.ontologyVariableDataManager.getVariable(programUUID, 3001, true, false);
-			if (variable == null || !variable.getName().equals("Project_Prefix")) {
-				throw new IllegalStateException(
-						"Missing required reference data. Please ensure an ontology variable with name Project_Prefix (id 3001) has been setup. It is required for Level 1 coding.");
-			}
-		} else if (levelCode == 2) {
-			variable = this.ontologyVariableDataManager.getVariable(programUUID, 3002, true, false);
-			if (variable == null || !variable.getName().equals("CIMMYT_Target_Region")) {
-				throw new IllegalStateException(
-						"Missing required reference data. Please ensure an ontology variable with name CIMMYT_Target_Region (id 3002) has been setup. It is required for Level 2 coding.");
-			}
-		}
-
-		if (variable != null) {
-			final List<TermSummary> categories = variable.getScale().getCategories();
-			for (TermSummary categoryTerm : categories) {
-				programIdentifiers.add(categoryTerm.getName());
-			}
-		}
-		return programIdentifiers;
-	}
-
-	@Override
-	public Set<GermplasmType> getGermplasmTypes() {
-		return Sets.newHashSet(GermplasmType.values());
-	}
-
 }
