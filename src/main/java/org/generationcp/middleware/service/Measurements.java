@@ -21,7 +21,8 @@ import org.hibernate.Session;
 import com.google.common.base.Preconditions;
 
 /**
- * Class to enable us to save data to the phenotype table and the nd experiment phenotype table in a performant manner.
+ * Class to enable us to save data to the phenotype table, phenotype_outlier table and the nd experiment phenotype table in a performant
+ * manner.
  * 
  */
 public class Measurements {
@@ -59,11 +60,11 @@ public class Measurements {
 	}
 
 	/**
-	 * Saves the old value of the measurements marked as missing in the Phenotype_Outlier table.
+	 * Saves the old value of the measurements that are marked as "missing" to the Phenotype_Outlier table.
 	 * 
 	 * @param observations
 	 */
-	private void saveOutliers(List<MeasurementRow> observations) {
+	void saveOutliers(List<MeasurementRow> observations) {
 
 		for (final MeasurementRow measurementRow : observations) {
 			final List<MeasurementData> dataList = measurementRow.getDataList();
@@ -75,16 +76,14 @@ public class Measurements {
 			List<PhenotypeOutlier> outlierList = new ArrayList<PhenotypeOutlier>();
 			for (final MeasurementData measurementData : dataList) {
 
-				// When a measurement is marked as missing, we should log its old value in the outlier table.
-				// And add a log ONLY if the data has changed.
+				// When a measurement is marked as missing, we should log its old value in the phenotype_outlier table.
+				// Add a log ONLY if the data has changed.
 				if (MISSING.equals(measurementData.getValue()) && !measurementData.getValue().equals(measurementData.getOldValue())) {
-					PhenotypeOutlier phenotypeOutlier = new PhenotypeOutlier();
-					phenotypeOutlier.setPhenotypeId(measurementData.getPhenotypeId());
-					phenotypeOutlier.setValue(measurementData.getOldValue());
-					outlierList.add(phenotypeOutlier);
+
+					outlierList.add(this.createPhenotypeOutlierFromMeasurement(measurementData));
 				}
 
-				// the new value now becomes the old value, this will be piped back to the UI.
+				// After saving, the new value now becomes the old value, this will be piped back to the UI.
 				measurementData.setOldValue(measurementData.getValue());
 
 			}
@@ -92,6 +91,15 @@ public class Measurements {
 			this.phenotypeOutlierSaver.savePhenotypeOutliers(outlierList);
 
 		}
+	}
+
+	PhenotypeOutlier createPhenotypeOutlierFromMeasurement(final MeasurementData measurementData) {
+
+		PhenotypeOutlier phenotypeOutlier = new PhenotypeOutlier();
+		phenotypeOutlier.setPhenotypeId(measurementData.getPhenotypeId());
+		phenotypeOutlier.setValue(measurementData.getOldValue());
+		return phenotypeOutlier;
+
 	}
 
 	/**
