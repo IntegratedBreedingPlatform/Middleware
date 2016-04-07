@@ -186,13 +186,15 @@ public class MeasurementsTest {
 		final Measurements measurements =
 				new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver, this.mockPhenotypeOutlierSaver);
 		final MeasurementData testMeasurementData = Mockito.mock(MeasurementData.class);
+		final MeasurementVariable testMeasurementVariable = new MeasurementVariable();
 		final MeasurementRow measurementRow = this.initializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
 		measurementRow.setDataList(Collections.<MeasurementData>singletonList(testMeasurementData));
 
 		// Set up measurement data so that it actually tries to save something.
+		testMeasurementVariable.setRole(PhenotypicType.VARIATE);
 		Mockito.when(testMeasurementData.isEditable()).thenReturn(true);
 		Mockito.when(testMeasurementData.getValue()).thenReturn("Test Data");
-		Mockito.when(testMeasurementData.getMeasurementVariable()).thenReturn(Mockito.mock(MeasurementVariable.class));
+		Mockito.when(testMeasurementData.getMeasurementVariable()).thenReturn(testMeasurementVariable);
 
 		final int testPhenotypeId = 245;
 		Mockito.when(testMeasurementData.getPhenotypeId()).thenReturn(testPhenotypeId);
@@ -204,6 +206,8 @@ public class MeasurementsTest {
 	private void testSavingMeasurements(final String value, final int variableDataTypeId) {
 
 		final MeasurementData testMeasurementData = this.initializer.createMeasurementData(TEST_TERM_ID, variableDataTypeId, value);
+		final MeasurementVariable testMeasurementVariable = testMeasurementData.getMeasurementVariable();
+		testMeasurementVariable.setRole(PhenotypicType.VARIATE);
 
 		final MeasurementRow measurementRow = this.initializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
 
