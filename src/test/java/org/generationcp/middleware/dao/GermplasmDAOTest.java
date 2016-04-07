@@ -38,13 +38,12 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	private static final Integer GROUP_ID = 10;
 
-
 	private boolean testDataSetup = false;
 
 	private GermplasmDAO dao;
 
 	private Integer germplasmGID;
-	
+
 	private Name preferredName;
 
 	@Autowired
@@ -106,38 +105,49 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchForGermplasmsExactMatchGID() throws Exception {
-		final List<Germplasm> results = this.dao.searchForGermplasms(germplasmGID.toString(), Operation.EQUAL, false, false, false);
+		final List<Germplasm> results = this.dao.searchForGermplasms(this.germplasmGID.toString(), Operation.EQUAL, false, false, false);
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
 	}
 
 	@Test
 	public void testSearchForGermplasmsExactMatchGermplasmName() throws Exception {
-		List<Germplasm> results = this.dao.searchForGermplasms(preferredName.getNval(), Operation.EQUAL, false, false, false);
-		Assert.assertEquals("The results should contain one germplasm since there's only one test data with '"+preferredName.getNval()+"' name", 1, results.size());
+		final List<Germplasm> results = this.dao.searchForGermplasms(this.preferredName.getNval(), Operation.EQUAL, false, false, false);
+		Assert.assertEquals("The results should contain one germplasm since there's only one test data with '"
+				+ this.preferredName.getNval() + "' name", 1, results.size());
 	}
 
 	@Test
 	public void testSearchForGermplasmsStartsWithGID() throws Exception {
-		final List<Germplasm> results = this.dao.searchForGermplasms(germplasmGID.toString() + "%", Operation.LIKE, false, false, false);
-		Assert.assertEquals("The results should contain one germplasm since there's only one test data with gid that starts with " + germplasmGID, 1,results.size());
+		final List<Germplasm> results =
+				this.dao.searchForGermplasms(this.germplasmGID.toString() + "%", Operation.LIKE, false, false, false);
+		Assert.assertEquals(
+				"The results should contain one germplasm since there's only one test data with gid that starts with " + this.germplasmGID,
+				1, results.size());
 	}
 
 	@Test
 	public void testSearchForGermplasmsStartsWithGermplasmName() throws Exception {
-		final List<Germplasm> results = this.dao.searchForGermplasms(preferredName.getNval() + "%", Operation.LIKE, false, false, false);
-		Assert.assertEquals("The results should contain one germplasm since there's only one test data with name that starts with " + preferredName.getNval(), 1, results.size());
+		final List<Germplasm> results =
+				this.dao.searchForGermplasms(this.preferredName.getNval() + "%", Operation.LIKE, false, false, false);
+		Assert.assertEquals("The results should contain one germplasm since there's only one test data with name that starts with "
+				+ this.preferredName.getNval(), 1, results.size());
 	}
 
 	@Test
 	public void testSearchForGermplasmsContainsGID() throws Exception {
-		final List<Germplasm> results = this.dao.searchForGermplasms("%" + germplasmGID.toString() + "%", Operation.LIKE, false, false, false);
-		Assert.assertEquals("The results should contain one germplasm since there's only one test data with gid that contains " + germplasmGID, 1, results.size());
+		final List<Germplasm> results =
+				this.dao.searchForGermplasms("%" + this.germplasmGID.toString() + "%", Operation.LIKE, false, false, false);
+		Assert.assertEquals(
+				"The results should contain one germplasm since there's only one test data with gid that contains " + this.germplasmGID, 1,
+				results.size());
 	}
 
 	@Test
 	public void testSearchForGermplasmsContainsGermplasmName() throws Exception {
-		final List<Germplasm> results = this.dao.searchForGermplasms("%" + preferredName.getNval() + "%", Operation.LIKE, false, false, false);
-		Assert.assertTrue("The results should contain one germplasm since there's only one test data with name that contains " + preferredName.getNval(),results.size() == 1);
+		final List<Germplasm> results =
+				this.dao.searchForGermplasms("%" + this.preferredName.getNval() + "%", Operation.LIKE, false, false, false);
+		Assert.assertTrue("The results should contain one germplasm since there's only one test data with name that contains "
+				+ this.preferredName.getNval(), results.size() == 1);
 	}
 
 	@Test
@@ -176,9 +186,10 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchForGermplasmsIncludeParents() throws Exception {
-		final List<Germplasm> results =
-				this.dao.searchForGermplasms(this.germplasmGID.toString(), Operation.EQUAL, true, false, false);
-		Assert.assertEquals("The result should contain three germplasms(one is the actual result and the other two is the male and female parents)", 3, results.size());
+		final List<Germplasm> results = this.dao.searchForGermplasms(this.germplasmGID.toString(), Operation.EQUAL, true, false, false);
+		Assert.assertEquals(
+				"The result should contain three germplasms(one is the actual result and the other two is the male and female parents)", 3,
+				results.size());
 	}
 
 	@Test
@@ -189,9 +200,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchForGermplasmsIncludeMGMembers() throws Exception {
-		final List<Germplasm> results = 
-				this.dao.searchForGermplasms(this.germplasmGID.toString(), Operation.EQUAL, false, false, true);
-		Assert.assertEquals("The result should contain 2 germplasms (one is the actual result and the other is the MG member)", 2, results.size());
+		final List<Germplasm> results = this.dao.searchForGermplasms(this.germplasmGID.toString(), Operation.EQUAL, false, false, true);
+		Assert.assertEquals("The result should contain 2 germplasms (one is the actual result and the other is the MG member)", 2,
+				results.size());
 	}
 
 	@Test
