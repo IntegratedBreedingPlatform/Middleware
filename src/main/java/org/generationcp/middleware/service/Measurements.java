@@ -27,7 +27,6 @@ import com.google.common.base.Preconditions;
  */
 public class Measurements {
 
-	private static final String MISSING = "missing";
 	private final PhenotypeSaver phenotypeSaver;
 	private final PhenotypeOutlierSaver phenotypeOutlierSaver;
 	private final Session session;
@@ -78,7 +77,8 @@ public class Measurements {
 
 				// When a measurement is marked as missing, we should log its old value in the phenotype_outlier table.
 				// Add a log ONLY if the data has changed.
-				if (MISSING.equals(measurementData.getValue()) && !measurementData.getValue().equals(measurementData.getOldValue())) {
+				if (MeasurementData.MISSING_VALUE.equals(measurementData.getValue())
+						&& !measurementData.getValue().equals(measurementData.getOldValue())) {
 
 					outlierList.add(this.createPhenotypeOutlierFromMeasurement(measurementData));
 				}
