@@ -8,5 +8,5 @@ public interface UserDefinedFieldsDataManager {
 
 
 
-	List<UserDefinedField> getNotCodeNamesFactor(List<Integer> codedIds);
+	List<UserDefinedField> getNotCodeNamesFactor(List<String> codedIds);
 }

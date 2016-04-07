@@ -22,8 +22,8 @@ public class UserDefinedFieldsDataManagerImpl extends DataManager implements Use
 	}
 
 	@Override
-	public List<UserDefinedField> getNotCodeNamesFactor(List<Integer> codedIds) {
-		List<UserDefinedField> namesFactors = getUserDefinedFieldDao().getByTableAndTypeWithoutList(TABLE, FTYPE,codedIds);
+	public List<UserDefinedField> getNotCodeNamesFactor(List<String> codedNames) {
+		List<UserDefinedField> namesFactors = getUserDefinedFieldDao().getByTableAndTypeWithoutList(TABLE, FTYPE,codedNames);
 
 		return namesFactors;
 	}

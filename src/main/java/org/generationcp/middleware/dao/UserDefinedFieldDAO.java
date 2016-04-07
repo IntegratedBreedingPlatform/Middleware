@@ -122,29 +122,29 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		return null;
 	}
 
-	public List<UserDefinedField> getByTableAndTypeWithoutList(String table, String ftype,List<Integer> excludedIds) throws MiddlewareQueryException {
-		if(table == null || table.isEmpty() || ftype==null || ftype.isEmpty() || excludedIds ==null){
+	public List<UserDefinedField> getByTableAndTypeWithoutList(String table, String ftype,List<String> excludedCodedNames) throws MiddlewareQueryException {
+		if(table == null || table.isEmpty() || ftype==null || ftype.isEmpty() || excludedCodedNames ==null){
 			String message = "Invalid input parameters.";
 			throw new MiddlewareQueryException(message);
 		}
 
 		try {
 			String queryString = "select udf from UserDefinedField udf where udf.ftable=:table and udf.ftype=:ftype";
-			if(excludedIds.size()>0){
-				queryString = queryString + " and udf.fldno not in (:excludedIds)";
+			if(excludedCodedNames.size()>0){
+				queryString = queryString + " and udf.fcode not in (:excludedCodedNames)";
 			}
 
 			Query query = this.getSession().createQuery(queryString);
 			query.setParameter("table",table);
 			query.setParameter("ftype",ftype);
-			if(excludedIds.size()>0){
-				query.setParameterList("excludedIds",excludedIds);
+			if(excludedCodedNames.size()>0){
+				query.setParameterList("excludedCodedNames",excludedCodedNames);
 			}
 
 			return query.list();
 		} catch (Exception e) {
 			String message = "Error executing UserDefinedFieldDAO.getByTableTypeAndCode(fTable={}, fType={}, fCode={}) : {}";
-			LOG.error(message, table, ftype, excludedIds,e.getMessage());
+			LOG.error(message, table, ftype, excludedCodedNames,e.getMessage());
 			throw new MiddlewareQueryException(message, e);
 		}
 

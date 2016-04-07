@@ -27,6 +27,7 @@ public class UserDefinedFieldDAOUT {
 
 	public static final String DUMMY_TYPE = "DUMMY_TYPE";
 	public static final String DUMMY_TABLE = "DUMMY_TABLE";
+	public static final String CODE1 = "code1";
 	UserDefinedFieldDAO userDefinedFieldDAO;
 	@Mock
 	Session sessionMock;
@@ -40,16 +41,15 @@ public class UserDefinedFieldDAOUT {
 
 	@Test
 	public void getByTableAndTypeWithoutListQueryIsCompleteWhenListIsNotEmpty() throws Exception {
-		int item1 = 1;
-		List<Integer> excludedIds = newArrayList(item1);
+		List<String> excludedNames = newArrayList(CODE1);
 
 		ArgumentCaptor<String> queryStringCaptor = ArgumentCaptor.forClass(String.class);
 		Query queryMock = mock(Query.class);
 		String expectedQuery =
-				"select udf from UserDefinedField udf where udf.ftable=:table and udf.ftype=:ftype and udf.fldno not in (:excludedIds)";
+				"select udf from UserDefinedField udf where udf.ftable=:table and udf.ftype=:ftype and udf.fcode not in (:excludedCodedNames)";
 		when(sessionMock.createQuery(queryStringCaptor.capture())).thenReturn(queryMock);
 
-		userDefinedFieldDAO.getByTableAndTypeWithoutList(DUMMY_TABLE, DUMMY_TYPE, excludedIds);
+		userDefinedFieldDAO.getByTableAndTypeWithoutList(DUMMY_TABLE, DUMMY_TYPE, excludedNames);
 
 		String usedQuery = queryStringCaptor.getValue();
 
@@ -61,7 +61,7 @@ public class UserDefinedFieldDAOUT {
 	@Test
 	public void getByTableAndTypeWithoutListQueryDoesNotContainListWhenListIsEmpty() throws Exception {
 
-		List<Integer> excludedIds = newArrayList();
+		List<String> excludedNames = newArrayList();
 
 		ArgumentCaptor<String> queryStringCaptor = ArgumentCaptor.forClass(String.class);
 		Query queryMock = mock(Query.class);
@@ -70,7 +70,7 @@ public class UserDefinedFieldDAOUT {
 		when(sessionMock.createQuery(queryStringCaptor.capture())).thenReturn(queryMock);
 
 
-		userDefinedFieldDAO.getByTableAndTypeWithoutList(DUMMY_TABLE, DUMMY_TYPE, excludedIds);
+		userDefinedFieldDAO.getByTableAndTypeWithoutList(DUMMY_TABLE, DUMMY_TYPE, excludedNames);
 
 		String usedQuery = queryStringCaptor.getValue();
 

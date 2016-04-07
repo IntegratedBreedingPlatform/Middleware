@@ -13,16 +13,19 @@ import static org.fest.assertions.api.Assertions.assertThat;
 
 public class UserDefinedFieldsDataManagerImplIT extends IntegrationTestBase {
 
+	public static final String CODE_3 = "code3";
+	public static final String CODE_2 = "code2";
+	public static final String CODE_1 = "code1";
 	@Autowired
 	private UserDefinedFieldsDataManager manager;
 
 	@Test
 	public void getByTableAndTypeWithoutList() throws Exception {
-		List<Integer> ids = Lists.newArrayList(1,2,3,19,20);
+		List<String> names = Lists.newArrayList(CODE_1, CODE_2, CODE_3);
 
-		List<UserDefinedField> list = manager.getNotCodeNamesFactor(ids);
+		List<UserDefinedField> list = manager.getNotCodeNamesFactor(names);
 		for (UserDefinedField userDefinedField : list) {
-			assertThat(userDefinedField.getFuid()).isNotIn(ids);
+			assertThat(userDefinedField.getFcode()).isNotIn(names);
 		}
 
 	}
