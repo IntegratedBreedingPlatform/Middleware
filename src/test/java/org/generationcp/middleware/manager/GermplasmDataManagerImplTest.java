@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -54,8 +55,6 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 // TODO This test heavily assumes Rice genealogy data being present. Needs complete revision to seed the test data it needs before starting.
 public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
-	@Autowired
-	private PedigreeService pedigreeService;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -624,35 +623,35 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 			Debug.println(IntegrationTestBase.INDENT, u);
 		}
 	}
-	
+
 	@Test
 	public void testGetPlotCodeField() {
 		UserDefinedField plotCodeField = this.germplasmDataManager.getPlotCodeField();
 		// Should never return null no matter whether the plot code UDFLD is present in the target database or not.
 		Assert.assertNotNull("GermplasmDataManager.getPlotCodeField() should never return null.", plotCodeField);
-		
+
 		if (plotCodeField.getFldno() != 0) {
 			// Non-zero fldno is a case where the UDFLD table has a record matching ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE
 			// Usually the id of this record is 1552. Not asserting as we dont want tests to depend on primary key values to be exact.
 			Assert.assertEquals("ATRIBUTS", plotCodeField.getFtable());
 			Assert.assertEquals("PASSPORT", plotCodeField.getFtype());
 			Assert.assertEquals("PLOTCODE", plotCodeField.getFcode());
-		}	
+		}
 	}
-	
+
 	@Test
 	public void testGetPlotCodeValue() {
 		GermplasmDataManagerImpl unitToTest = new GermplasmDataManagerImpl();
-		
+
 		// We want to mock away calls to other methods in same unit.
 		GermplasmDataManagerImpl partiallyMockedUnit = Mockito.spy(unitToTest);
 		Integer testGid = 1;
-		
+
 		// First set up data such that no plot code attribute is associated.
 		Mockito.doReturn(null).when(partiallyMockedUnit).getPlotCodeField();
 		List<Attribute> attributes = new ArrayList<Attribute>();
 		Mockito.doReturn(attributes).when(partiallyMockedUnit).getAttributesByGID(Mockito.anyInt());
-		
+
 		String plotCode1 = partiallyMockedUnit.getPlotCodeValue(testGid);
 		Assert.assertNotNull("getPlotCodeValue() should never return null.", plotCode1);
 		Assert.assertEquals("Expected `Unknown` returned when there is no plot code attribute present.", "Unknown", plotCode1);
@@ -663,24 +662,17 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		udfld.setFtable("ATRIBUTS");
 		udfld.setFtype("PASSPORT");
 		udfld.setFcode("PLOTCODE");
-		
+
 		Mockito.when(partiallyMockedUnit.getPlotCodeField()).thenReturn(udfld);
 		Attribute plotCodeAttr = new Attribute();
 		plotCodeAttr.setTypeId(udfld.getFldno());
 		plotCodeAttr.setAval("The PlotCode Value");
 		attributes.add(plotCodeAttr);
 		Mockito.when(partiallyMockedUnit.getAttributesByGID(testGid)).thenReturn(attributes);
-		
+
 		String plotCode2 = partiallyMockedUnit.getPlotCodeValue(testGid);
 		Assert.assertNotNull("getPlotCodeValue() should never return null.", plotCode2);
 		Assert.assertEquals("Expected value of plot code attribute returned when plot code attribute is present.", plotCodeAttr.getAval(), plotCode2);
-	}
-
-	@Test
-	public void testGetCrossExpansion() throws Exception {
-		final CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties();
-		crossExpansionProperties.setDefaultLevel(1);
-		Debug.println(this.pedigreeService.getCrossExpansion(Integer.valueOf(1), crossExpansionProperties));
 	}
 
 	@Test

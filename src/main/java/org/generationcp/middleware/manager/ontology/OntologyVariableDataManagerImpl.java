@@ -481,7 +481,14 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 		ProgramFavorite programFavorite =
 				programFavoriteDao.getProgramFavorite(variableInfo.getProgramUuid(), ProgramFavorite.FavoriteType.VARIABLE,
 						term.getCvTermId());
-		boolean isFavorite = variableInfo.isFavorite() || !Strings.isNullOrEmpty(variableInfo.getAlias());
+
+		String previousAlias = (variableOverrides == null) ? null : variableOverrides.getAlias();
+		String newAlias = (variableInfo.getAlias().equals("")) ? null : variableInfo.getAlias();
+		boolean isFavorite = variableInfo.isFavorite();
+
+		if(newAlias != null && previousAlias == null) {
+			isFavorite = true;
+		}
 
 		if (isFavorite && programFavorite == null) {
 			programFavorite = new ProgramFavorite();

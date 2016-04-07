@@ -25,7 +25,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -300,7 +299,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					throws MiddlewareQueryException {
 
 		final GermplasmDAO germplasmDao = this.getGermplasmDao();
-		final NameDAO nameDao = this.getNameDao();
 		final GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
 
 		final long startTime = System.currentTimeMillis();
@@ -339,21 +337,24 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					if (germplasm.getLgid() == null) {
 						germplasm.setLgid(germplasm.getGid() != null ? germplasm.getGid() : Integer.valueOf(0));
 					}
-					// SAVE Germplasm
+
 					germplasm = germplasmDao.save(germplasm);
-					// inherit selection history names of parent if part of a group
-					if(germplasm.getMgid() > 0) {
-						germplasmGroupingService.copySelectionHistory(germplasm);
+
+					for (final Name name : nameList) {
+						// Germplasm and Name entities are currently only mapped as uni-directional OneToMany so we need to manage the Name
+						// side of the relationship link (Name.germplasmId) manually.
+						name.setGermplasmId(germplasm.getGid());
+						germplasm.getNames().add(name);
 					}
+
+					// inherit 'selection history at fixation' names of parent if parent is part of a group (= has mgid)
+					if (germplasm.getMgid() > 0) {
+						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm);
+					}
+
 					// set Lgid to GID if it's value was not set previously
 					if (germplasm.getLgid().equals(Integer.valueOf(0))) {
 						germplasm.setLgid(germplasm.getGid());
-					}
-
-					// Save name entries
-					for (final Name name : nameList) {
-						name.setGermplasmId(germplasm.getGid());
-						nameDao.save(name);
 					}
 
 					// Save Germplasm attributes
@@ -711,6 +712,38 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			return locations.get(0);
 		}
 		return null;
+	}
+
+	@Override
+	public Integer updateGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList) {
+		final GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
+
+		final long startTime = System.currentTimeMillis();
+
+		try {
+
+			germplasmListDao.update(germplasmList);
+
+			// Save germplasms, names, list data
+			for (final Pair<Germplasm, GermplasmListData> pair : listDataItems) {
+
+				final Germplasm germplasm = pair.getLeft();
+				final GermplasmListData germplasmListData = pair.getRight();
+
+				germplasmListData.setGid(germplasm.getGid());
+				germplasmListData.setList(germplasmList);
+				this.getGermplasmListDataDAO().update(germplasmListData);
+			}
+
+		} catch (final MiddlewareQueryException e) {
+			FieldbookServiceImpl.LOG.error("Error encountered with FieldbookService.updateNurseryCrossesGermplasmList(germplasmList="
+					+ germplasmList + "): " + e.getMessage());
+			throw e;
+		}
+
+		FieldbookServiceImpl.LOG.debug("========== updateGermplasmList Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
+
+		return germplasmList.getId();
 	}
 
 	@Override

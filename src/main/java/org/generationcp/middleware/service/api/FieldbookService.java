@@ -777,4 +777,14 @@ public interface FieldbookService {
 	List<StandardVariableReference> filterStandardVariablesByIsAIds(List<StandardVariableReference> standardReferences, List<Integer> isAIds);
 
 	Location getLocationByName(String locationName, Operation op);
+
+	/**
+	 * Updates germplasm list crosses types. ListData items are always updated in the database, before saving the germplasm list.
+	 *
+	 * @param listDataItems the list data to add - the key of the Map is the germplasm associated to the germplasm list data value
+	 * @param germplasmList the germplasm list to add
+	 *
+	 * @return The id of the newly-created germplasm list
+	 */
+	Integer updateGermplasmList(List<Pair<Germplasm,GermplasmListData>> listDataItems, GermplasmList germplasmList);
 }

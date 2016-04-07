@@ -36,11 +36,6 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 		this.cimmytWheatNameUtil = new CimmytWheatNameUtil();
 	}
 
-	public PedigreeCimmytWheatServiceImpl(HibernateSessionProvider sessionProvider, String localDatabaseName) {
-		super(sessionProvider, localDatabaseName);
-		this.cimmytWheatNameUtil = new CimmytWheatNameUtil();
-	}
-
 	@Override
 	public String getCrossExpansion(Integer gid, CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException {
 		return this.getCrossExpansion(gid, null, crossExpansionProperties);
@@ -58,7 +53,7 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 			throws MiddlewareQueryException {
 		if (germplasm != null) {
 			try {
-				return this.getCimmytWheatPedigree(germplasm, level == null ? crossExpansionProperties.getWheatLevel() : level,
+				return this.getCimmytWheatPedigree(germplasm, level == null ? crossExpansionProperties.getCropGenerationLevel("wheat") : level,
 						new Germplasm(), 0, 0, 0, 0, 0);
 			} catch (Exception e) {
 				PedigreeCimmytWheatServiceImpl.LOG.error(e.getMessage(), e);
@@ -85,7 +80,7 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 
 	/**
 	 * Recursive procedure to generate the pedigree
-	 * 
+	 *
 	 * @param pGid Input GID
 	 * @param level default zero
 	 * @param parentGermplasmClass empty class
@@ -341,6 +336,11 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 		}
 		armaPedigree = ped;
 		return armaPedigree;
+	}
+
+	@Override
+	public String getCropName() {
+		return "wheat";
 	}
 
 }

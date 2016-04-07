@@ -39,105 +39,111 @@
 		<constructor-arg ref="workbenchSessionProvider" />
 		<property name="installationDirectory" value="${workbench.installation_dir}" />
 	</bean>
-	
+
 	<bean id="workbenchSessionProvider"
 		class="org.generationcp.middleware.hibernate.HibernateSessionPerRequestProvider">
 		<property name="sessionFactory" ref="WORKBENCH_SessionFactory" />
 	</bean>
-	
+
     <bean id="ontologyDataManager" class="org.generationcp.middleware.manager.OntologyDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="userDataManager" class="org.generationcp.middleware.manager.UserDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="germplasmDataManager" class="org.generationcp.middleware.manager.GermplasmDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="germplasmListManager" class="org.generationcp.middleware.manager.GermplasmListManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
 	<bean id="germplasmGroupingService" class="org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl">
 	</bean>
-    
-    <bean id="pedigreeService" class="org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl">
+
+    <bean id="oldPedigreeService" class="org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl">
         <constructor-arg ref="cropSessionProvider"/>
+        <constructor-arg value="maize"/>
     </bean>
-    
+
+    <bean id="pedigreeService" class="org.generationcp.middleware.service.pedigree.PedigreeServiceImpl">
+        <constructor-arg ref="cropSessionProvider"/>
+        <constructor-arg value="maize"/>
+    </bean>
+
     <bean id="pedigreeDataManager" class="org.generationcp.middleware.manager.PedigreeDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
         <property name="germplasmDataManager" ref="germplasmDataManager"/>
     </bean>
-    
+
     <bean id="locationDataManager" class="org.generationcp.middleware.manager.LocationDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="crossStudyDataManager" class="org.generationcp.middleware.manager.CrossStudyDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="genotypicDataManager" class="org.generationcp.middleware.manager.GenotypicDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
-    </bean>  
-        
+    </bean>
+
     <bean id="inventoryDataManager" class="org.generationcp.middleware.manager.InventoryDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
-    </bean> 
-    
+    </bean>
+
     <bean id="inventoryService" class="org.generationcp.middleware.service.InventoryServiceImpl">
         <constructor-arg ref="cropSessionProvider"/>
-    </bean> 
-    
+    </bean>
+
     <bean id="presetDataManager" class="org.generationcp.middleware.manager.PresetDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="studyDataManager" class="org.generationcp.middleware.manager.StudyDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="userProgramStateDataManager" class="org.generationcp.middleware.manager.UserProgramStateDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="conformityTestingService" class="org.generationcp.middleware.service.ConformityTestingServiceImpl">
     	<constructor-arg ref="genotypicDataManager"/>
     	<constructor-arg ref="pedigreeDataManager"/>
     </bean>
-    
+
     <bean id="dataImportService" class="org.generationcp.middleware.service.DataImportServiceImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="fieldbookService" class="org.generationcp.middleware.service.FieldbookServiceImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="MBDTDataManager" class="org.generationcp.middleware.manager.MBDTDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="reportService" class="org.generationcp.middleware.service.ReportServiceImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="ontologyMethodDataManager" class="org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl">
 
     </bean>
-    
+
     <bean id="ontologyPropertyDataManager" class="org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl">
 
     </bean>
-    
+
     <bean id="ontologyVariableDataManager" class="org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl">
 
     </bean>
-    
+
     <bean id="ontologyScaleDataManager" class="org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl">
 
     </bean>
@@ -145,7 +151,7 @@
     <bean id="termDataManager" class="org.generationcp.middleware.manager.ontology.TermDataManagerImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="ontologyService" class="org.generationcp.middleware.service.OntologyServiceImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>

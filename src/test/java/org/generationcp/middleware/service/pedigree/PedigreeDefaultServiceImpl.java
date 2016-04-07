@@ -16,6 +16,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * This is the original implementation of the pedigree string generation. This is in a test package to ensure that our new implementation
+ * conforms to the old one.
+ *
+ */
 @Transactional
 public class PedigreeDefaultServiceImpl implements PedigreeService {
 
@@ -23,11 +28,14 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 
 	private PedigreeDataManagerFactory pedigreeDataManagerFactory;
 
+	private String cropName;
+
 	public PedigreeDefaultServiceImpl() {
 
 	}
 
-	public PedigreeDefaultServiceImpl(HibernateSessionProvider sessionProvider) {
+	public PedigreeDefaultServiceImpl(HibernateSessionProvider sessionProvider, final String cropName) {
+		this.cropName = cropName;
 		this.pedigreeDataManagerFactory = new PedigreeDataManagerFactory(sessionProvider);
 
 	}
@@ -510,7 +518,8 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 
 						return cross;
 					} else {
-						this.logAndThrowException("Error with expanding cross, can not find method with id: " + germplasmToExpand.getMethodId());
+						this.logAndThrowException("Error with expanding cross, can not find method with id: "
+								+ germplasmToExpand.getMethodId());
 					}
 				}
 			} else {
@@ -521,7 +530,7 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param recurringParentGid
 	 * @param toCheck
 	 * @return an array of 2 Objects, first is an Integer which is the number of doses of the recurring parent, and the other is a Germplasm
@@ -564,5 +573,10 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 		final MiddlewareQueryException exception = new MiddlewareQueryException(message);
 		LOG.error(message, exception);
 		throw exception;
+	}
+
+	@Override
+	public String getCropName() {
+		return cropName;
 	}
 }

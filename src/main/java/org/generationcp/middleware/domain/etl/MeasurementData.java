@@ -11,36 +11,27 @@
 
 package org.generationcp.middleware.domain.etl;
 
-import java.util.List;
-
-import javax.annotation.Nonnull;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
+import javax.annotation.Nonnull;
+import java.util.InputMismatchException;
+import java.util.List;
+
 public class MeasurementData {
 
 	public static final String MISSING_VALUE = "missing";
-
-	private String label;
-
-	private String value;
-
-	private String cValueId;
-
-	private boolean isEditable;
-
-	private String dataType;
-
-	private Integer phenotypeId;
-
-	private MeasurementVariable measurementVariable;
-
 	public boolean isCustomCategoricalValue;
-
+	private String label;
+	private String value;
+	private String cValueId;
+	private boolean isEditable;
+	private String dataType;
+	private Integer phenotypeId;
+	private MeasurementVariable measurementVariable;
 	private boolean isAccepted;
 
 	// used to map this object to what is actually saved in the database after saving
@@ -188,6 +179,10 @@ public class MeasurementData {
 	}
 
 	public String getDisplayValue() {
+		return this.getDisplayValue(true);
+	}
+
+	public String getDisplayValue(boolean showDescription) {
 		if (this.getMeasurementVariable() != null && this.getMeasurementVariable().getPossibleValues() != null
 				&& !this.getMeasurementVariable().getPossibleValues().isEmpty()) {
 
@@ -195,12 +190,12 @@ public class MeasurementData {
 				final List<ValueReference> possibleValues = this.getMeasurementVariable().getPossibleValues();
 				for (final ValueReference possibleValue : possibleValues) {
 					if (possibleValue.getId().equals(Double.valueOf(this.value).intValue())) {
-						return possibleValue.getDescription();
+						return showDescription ? possibleValue.getDescription() : possibleValue.getName();
 					}
 				}
 			}
 			// this would return the value from the db
-			return this.value;
+			return this.value == null ? "" : this.value;
 		} else {
 			if (this.getMeasurementVariable() != null && this.getMeasurementVariable().getDataTypeDisplay() != null
 					&& "N".equalsIgnoreCase(this.getMeasurementVariable().getDataTypeDisplay())) {
@@ -222,6 +217,26 @@ public class MeasurementData {
 			}
 		}
 		return "";
+	}
+
+	public CategoricalDisplayValue getDisplayValueForCategoricalData() {
+		if (null == this.value || "".equals(this.value)) {
+			return new CategoricalDisplayValue("", "", "", false);
+		} else if (NumberUtils.isNumber(this.value)) {
+			final List<ValueReference> possibleValues = this.getMeasurementVariable().getPossibleValues();
+			for (final ValueReference possibleValue : possibleValues) {
+				if (possibleValue.getId().equals(Double.valueOf(this.value).intValue())) {
+
+					// if measurement data is a factor, show original description else, get the modified display description
+					final String displayDescription = this.getMeasurementVariable().isFactor() ?
+							possibleValue.getDescription() : possibleValue.getDisplayDescription();
+
+					return new CategoricalDisplayValue(this.value,possibleValue.getName(), displayDescription);
+				}
+			}
+		}
+
+		return new CategoricalDisplayValue(this.value, this.value, this.value, false);
 	}
 
 	public MeasurementData copy() {
@@ -300,6 +315,14 @@ public class MeasurementData {
 
 	public void setVariable(final Variable variable) {
 		this.variable = variable;
+	}
+
+	public boolean isCategorical() {
+		return this.getMeasurementVariable().getDataTypeId().equals(TermId.CATEGORICAL_VARIABLE.getId());
+	}
+
+	public boolean isNumeric() {
+		return this.getMeasurementVariable().getDataTypeId().equals(TermId.NUMERIC_VARIABLE.getId());
 	}
 
 }

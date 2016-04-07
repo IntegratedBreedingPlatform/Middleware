@@ -69,6 +69,20 @@ public class ValueReference extends Reference implements Serializable, Comparabl
 	}
 
 	/**
+	 * Not all categorical variables found in crop database are in a=x format where 'a' is name and 'x' is description
+	 * If its not in a=x format, we'll append the name to the description
+	 * @return the updated description
+	 */
+	public String getDisplayDescription() {
+		if (this.getDescription() != null && this.getDescription().split("=",2).length != 2) {
+			// description is not in a=x format we make this then name=description
+			return this.getName() + "= " + this.getDescription();
+		}
+
+		return this.getDescription();
+	}
+
+	/**
 	 * @param key the key to set
 	 */
 	 public void setKey(String key) {
@@ -89,5 +103,4 @@ public class ValueReference extends Reference implements Serializable, Comparabl
 		builder.append("]");
 		return builder.toString();
 	}
-
 }
