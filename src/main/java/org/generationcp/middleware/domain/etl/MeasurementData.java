@@ -331,8 +331,14 @@ public class MeasurementData {
 		return this.oldValue;
 	}
 
-	public void setOldValue(String importedValue) {
-		this.oldValue = importedValue;
+	/**
+	 * Use this to store the original value of the measurement data from importing measurements or data retrieved from the database, so that
+	 * even if the MeasurementData.value is changed, you can still recover the old value.
+	 * 
+	 * @param value
+	 */
+	public void setOldValue(String value) {
+		this.oldValue = value;
 	}
 
 }
