@@ -25,18 +25,36 @@ public class SimpleCrossProcessorTest {
 
 
 	@Test
-	public void testCreationOfAStandardDoubleCross() throws Exception {
+	public void testCreationOfAStandardSimpleCross() throws Exception {
 
 		// Create a double cross because I want to ensure that the Simple cross does not traverse the pedigree tree and just
 		// does a cross on immediate parents
-		final GermplasmNode parentGermplasmNode = PedigreeStringTestUtil.createDoubleCrossTestGermplasmNode();
+		final GermplasmNode parentGermplasmNode = PedigreeStringTestUtil.createDoubleCrossTestGermplasmTree();
 
 		final SimpleCrossProcessor simpleCrossProcessor = new SimpleCrossProcessor();
 		final PedigreeString processGermplasmNode = simpleCrossProcessor.processGermplasmNode(parentGermplasmNode,
 				5,
 				fixedLineNameResolver);
-		Assert.assertEquals("The pedigree string generated must be a simply a crossing of the immediate parents",
+		Assert.assertEquals("Incorrect simple cross generation",
 				"A/D",
+				processGermplasmNode.getPedigree());
+	}
+
+	@Test
+	public void testCreationOfAStandardSimpleCrossWithNullParents() throws Exception {
+
+		// Create a double cross because I want to ensure that the Simple cross does not traverse the pedigree tree and just
+		// does a cross on immediate parents
+		final GermplasmNode parentGermplasmNode = PedigreeStringTestUtil.createDoubleCrossTestGermplasmTree();
+		parentGermplasmNode.setFemaleParent(null);
+		parentGermplasmNode.setMaleParent(null);
+
+		final SimpleCrossProcessor simpleCrossProcessor = new SimpleCrossProcessor();
+		final PedigreeString processGermplasmNode = simpleCrossProcessor.processGermplasmNode(parentGermplasmNode,
+				5,
+				fixedLineNameResolver);
+		Assert.assertEquals("Incorrect simple cross generation with null parents",
+				"Unknown/Unknown",
 				processGermplasmNode.getPedigree());
 	}
 }

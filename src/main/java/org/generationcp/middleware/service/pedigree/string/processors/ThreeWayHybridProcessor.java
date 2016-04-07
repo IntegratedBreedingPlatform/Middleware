@@ -5,6 +5,8 @@ import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.service.pedigree.PedigreeString;
 import org.generationcp.middleware.service.pedigree.string.util.FixedLineNameResolver;
 import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGeneratorUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Result from the cross between one parent that is an F1 hybrid and the other is from an inbred (inbred line or simply a line is a pure
@@ -18,13 +20,21 @@ import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGe
  */
 public class ThreeWayHybridProcessor implements BreedingMethodProcessor {
 
+	private static final Logger LOG = LoggerFactory.getLogger(ThreeWayHybridProcessor.class);
+
 	final PedigreeStringBuilder pedigreeStringBuilder = new PedigreeStringBuilder();
 
 	final InbredProcessor inbredProcessor = new InbredProcessor();
 
+
 	@Override
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
 			final FixedLineNameResolver fixedLineNameResolver) {
+
+		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
+			LOG.debug("Germplasm with GID '{}' is being processed by a three way hybrid processor. "
+					, germplasmNode.getGermplasm().getGid());
+		}
 
 		final GermplasmNode femaleParentNode = germplasmNode.getFemaleParent();
 		final GermplasmNode maleParentNode = germplasmNode.getMaleParent();
@@ -54,10 +64,8 @@ public class ThreeWayHybridProcessor implements BreedingMethodProcessor {
 		final GermplasmNode singleCrossHybridFemaleParent = singleCrossHybrids.getFemaleParent();
 		final GermplasmNode singleCrossHybridMaleParent = singleCrossHybrids.getMaleParent();
 
-		final PedigreeString singleCrossHybridFemaleParentPedigreeString =
-				this.pedigreeStringBuilder.buildPedigreeString(singleCrossHybridFemaleParent, level - 1, fixedLineNameResolver);
-		final PedigreeString singleCrossHybridMaleParentPedigreeString =
-				this.pedigreeStringBuilder.buildPedigreeString(singleCrossHybridMaleParent, level - 1, fixedLineNameResolver);
+		final PedigreeString singleCrossHybridFemaleParentPedigreeString = getPedigreeString(level, fixedLineNameResolver, singleCrossHybridFemaleParent);
+		final PedigreeString singleCrossHybridMaleParentPedigreeString = getPedigreeString(level, fixedLineNameResolver, singleCrossHybridMaleParent);
 
 		final PedigreeString singleCrossHybridPedigreeString = new PedigreeString();
 		singleCrossHybridPedigreeString.setNumberOfCrosses(singleCrossHybridFemaleParentPedigreeString.getNumberOfCrosses() + 1);
@@ -72,6 +80,14 @@ public class ThreeWayHybridProcessor implements BreedingMethodProcessor {
 				inbreadPedigreeString));
 		return pedigreeString;
 
+	}
+
+	private PedigreeString getPedigreeString(final Integer level, final FixedLineNameResolver fixedLineNameResolver,
+			final GermplasmNode singleCrossHybridFemaleParent) {
+		if(singleCrossHybridFemaleParent != null ) {
+			return this.pedigreeStringBuilder.buildPedigreeString(singleCrossHybridFemaleParent, level - 1, fixedLineNameResolver);
+		}
+		return this.inbredProcessor.processGermplasmNode(singleCrossHybridFemaleParent, level - 1, fixedLineNameResolver);
 	}
 
 }

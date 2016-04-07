@@ -8,6 +8,8 @@ import org.generationcp.middleware.service.pedigree.GermplasmNode;
 import org.generationcp.middleware.service.pedigree.PedigreeString;
 import org.generationcp.middleware.service.pedigree.string.util.FixedLineNameResolver;
 import org.generationcp.middleware.service.pedigree.string.util.PedigreeStringGeneratorUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Optional;
 
@@ -18,14 +20,22 @@ import com.google.common.base.Optional;
  */
 public class InbredProcessor implements BreedingMethodProcessor {
 
+	private static final Logger LOG = LoggerFactory.getLogger(InbredProcessor.class);
+
 	/**
 	 * Used in case we cannot determine pedigree string using the preferred name or gid
 	 */
 	private static final String UNKNOWN_PEDIGREE_STRING = "Unknown";
 
+
 	@Override
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
 			final FixedLineNameResolver fixedLineNameResolver) {
+
+		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
+			LOG.debug("Germplasm with GID '{}' is being processed by an inbread processor. "
+					, germplasmNode.getGermplasm().getGid());
+		}
 
 		final Optional<PedigreeString> fixedLineName = PedigreeStringGeneratorUtil.getFixedLineName(germplasmNode, fixedLineNameResolver);
 		if (fixedLineName.isPresent()) {
