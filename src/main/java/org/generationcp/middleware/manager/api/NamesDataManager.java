@@ -6,5 +6,7 @@ import org.generationcp.middleware.pojos.Name;
 
 public interface NamesDataManager {
 
-	List<Name> getNamesByNvalInTypeList(String name, List<Integer> typeList);
+	List<Name> getNamesByNvalInFCodeList(String name, List<String> typeList);
+
+	List<Name> getNameByGIDAndCodedName(Integer gid, List<String> fCodecodedNames);
 }
