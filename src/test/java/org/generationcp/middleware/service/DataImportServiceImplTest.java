@@ -85,6 +85,10 @@ public class DataImportServiceImplTest {
 		Mockito.when(this.ontologyDataManager.getStandardVariable(EARASP_1_5_TERMID, PROGRAM_UUID)).thenReturn(
 				this.createTestCategoricalStandardVariable(EARASP_1_5_NAME));
 
+		Mockito.when(
+				this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames(EARASP_1_5_PROPERTY, EARASP_1_5_SCALE,
+						EARASP_1_5_METHOD, PROGRAM_UUID)).thenReturn(this.createTestCategoricalStandardVariable(EARASP_1_5_NAME));
+
 	}
 
 	@Test
