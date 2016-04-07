@@ -63,12 +63,14 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 						+ "loc.lname, loc.labbr, scale.name, tran.trnqty, tran.comments,tran.inventory_id, tran.sourceid, "
 						+ "d.duplicate_notes, tran.bulk_with, tran.bulk_compl, "
 						+ "ist.listdata_project_id, ist.trnid, tran.recordid, lot.eid, ist.recordid as stockSourceRecordId, "
-                        + "g.instance_number, g.plot_number, g.rep_number "
+                        + "instanceattr.aval as instanceNumber, plotattr.aval as plotNumber, repattr.aval as repNumber  "
 						+ "FROM listdata_project d INNER JOIN ims_stock_transaction ist ON d.listdata_project_id = ist.listdata_project_id "
-                        + "INNER JOIN germplsm g ON g.gid = d.germplasm_id "
 						+ "INNER JOIN listnms ON d.list_id = listnms.listid "
 						+ "INNER JOIN ims_transaction tran ON tran.trnid = ist.trnid INNER JOIN ims_lot lot ON lot.lotid = tran.lotid "
 						+ "LEFT JOIN location loc ON lot.locid = loc.locid LEFT JOIN cvterm scale ON scale.cvterm_id = lot.scaleid "
+						+ "LEFT JOIN atributs plotattr ON plotattr.gid = lot.eid AND plotattr.atype = 2003 "
+						+ "LEFT JOIN atributs repattr ON repattr.gid = lot.eid AND repattr.atype = 2004 "
+						+ "LEFT JOIN atributs instanceattr ON instanceattr.gid = lot.eid AND instanceattr.atype = 2005 "
 						+ "WHERE listnms.listid = :listId ORDER BY d.entry_id";
 
 		try {
@@ -139,7 +141,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 						.addScalar("group_name").addScalar("lname").addScalar("labbr").addScalar("name").addScalar("trnqty")
 						.addScalar("comments").addScalar("inventory_id").addScalar("sourceid").addScalar("duplicate_notes")
 						.addScalar("bulk_with").addScalar("bulk_compl").addScalar("listdata_project_id").addScalar("trnid")
-						.addScalar("recordid").addScalar("eid").addScalar("stockSourceRecordId").addScalar("instance_number").addScalar("plot_number").addScalar("rep_number");;
+						.addScalar("recordid").addScalar("eid").addScalar("stockSourceRecordId").addScalar("instanceNumber").addScalar("plotNumber").addScalar("repNumber");;
 
 		return query;
 	}
@@ -169,9 +171,9 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 		Integer sourceRecordId = (Integer) resultRow[21];
 		Integer lotGid = (Integer) resultRow[22];
 		Integer stockSourceRecordId = (Integer) resultRow[23];
-        Integer instanceNumber = resultRow[24] == null ? null : (Integer) resultRow[24];
-        Integer plotNumber = resultRow[25] == null ? null : (Integer) resultRow[25];
-        Integer replicationNumber = resultRow[26] == null ? null : (Integer) resultRow[26];
+        Integer instanceNumber = resultRow[24] == null ? null : Integer.valueOf((String) resultRow[24]);
+        Integer plotNumber = resultRow[25] == null ? null : Integer.valueOf((String) resultRow[25]);
+        Integer replicationNumber = resultRow[26] == null ? null : Integer.valueOf((String) resultRow[26]);
 
 		InventoryDetails details =
 				new InventoryDetails(gid, designation, lotId, locationId, locationName, userId, amount, sourceId, null, scaleId, scaleName,
