@@ -83,12 +83,14 @@ public class Measurements {
 					outlierList.add(this.createPhenotypeOutlierFromMeasurement(measurementData));
 				}
 
-				// After saving, the new value now becomes the old value, this will be piped back to the UI.
-				measurementData.setOldValue(measurementData.getValue());
-
 			}
 
 			this.phenotypeOutlierSaver.savePhenotypeOutliers(outlierList);
+
+			// After saving, the new value now becomes the old value, this will be piped back to the UI.
+			for (final MeasurementData measurementData : dataList) {
+				measurementData.setOldValue(measurementData.getValue());
+			}
 
 		}
 	}
