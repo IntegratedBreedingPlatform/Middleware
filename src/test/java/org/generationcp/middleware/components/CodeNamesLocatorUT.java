@@ -34,10 +34,13 @@ public class CodeNamesLocatorUT {
 	@Mock
 	UserDefinedFieldsDataManager manager;
 
+	String cropName;
+
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		target = new CodeNamesLocator(properties,manager);
+		cropName = "maize";
 
 	}
 
@@ -50,7 +53,9 @@ public class CodeNamesLocatorUT {
 		List<UserDefinedField> expectedList = Lists.newArrayList(expectedItem1,expectedItem2);
 		when(manager.getNotCodeNamesFactor(anyList())).thenReturn(expectedList);
 
-		List<UserDefinedField> list = target.locateNonCodeNames();
+
+
+		List<UserDefinedField> list = target.locateNonCodeNamesForCrop(cropName);
 
 		assertThat(list).contains(expectedItem1,expectedItem2);
 		assertThat(list).hasSize(EXPECTED_VALUE_2);
@@ -61,22 +66,22 @@ public class CodeNamesLocatorUT {
 
 
 
-	@Test
-	public void locateCodedNamesIdsReturnAListOfCodedIdsWhenPropertiesFileExist() throws Exception {
-		when(properties.getProperty(GERMPLASM_CODE_NAMES_IDS)).thenReturn(CODED_NAMES_IDS);
-
-		List<Integer> codedNamesIds = target.locateCodedNamesIds();
-
-		assertThat(codedNamesIds).contains(new Integer(1),new Integer(2),new Integer(3),new Integer(4));
-		assertThat(codedNamesIds).hasSize(EXPECTED_CODEDNAMES_SIZE);
-	}
-
-	@Test
-	public void getCodedNamesIdsReturnEmptyListWhenPropertyIsEmpty() throws Exception {
-		when(properties.getProperty(GERMPLASM_CODE_NAMES_IDS)).thenReturn(EMPTY_STRING);
-
-		List<Integer> codedNamesIds = target.locateCodedNamesIds();
-
-		assertThat(codedNamesIds).isEmpty();
-	}
+//	@Test
+//	public void locateCodedNamesIdsReturnAListOfCodedIdsWhenPropertiesFileExist() throws Exception {
+//		when(properties.getProperty(GERMPLASM_CODE_NAMES_IDS)).thenReturn(CODED_NAMES_IDS);
+//
+//		List<Integer> codedNamesIds = target.locateCodedNamesIds(cropType);
+//
+//		assertThat(codedNamesIds).contains(new Integer(1),new Integer(2),new Integer(3),new Integer(4));
+//		assertThat(codedNamesIds).hasSize(EXPECTED_CODEDNAMES_SIZE);
+//	}
+//
+//	@Test
+//	public void getCodedNamesIdsReturnEmptyListWhenPropertyIsEmpty() throws Exception {
+//		when(properties.getProperty(GERMPLASM_CODE_NAMES_IDS)).thenReturn(EMPTY_STRING);
+//
+//		List<Integer> codedNamesIds = target.locateCodedNamesIds(cropType);
+//
+//		assertThat(codedNamesIds).isEmpty();
+//	}
 }
