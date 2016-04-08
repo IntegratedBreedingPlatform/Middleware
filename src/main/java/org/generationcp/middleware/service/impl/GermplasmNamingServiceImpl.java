@@ -86,7 +86,7 @@ public class GermplasmNamingServiceImpl implements GermplasmNamingService {
 			// Make the current preferred name as non-preferred by setting nstat = 0
 			final Name currentPreferredName = germplasm.findPreferredName();
 			if (currentPreferredName != null) {
-				currentPreferredName.setNstat(0);
+				currentPreferredName.setNstat(0); // nstat = 0 means it is not a preferred name.
 			}
 
 			final Name name = new Name();
