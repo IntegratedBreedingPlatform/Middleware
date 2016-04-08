@@ -377,15 +377,6 @@ public class Germplasm implements Serializable, Auditable {
 	/**
 	 * @OneToMany(mappedBy = "germplasm") private Set<Progenitor> progntr = new HashSet<Progenitor>();
 	 **/
-    @Column(name = "instance_number")
-    private Integer instanceNumber;
-
-    @Column(name = "plot_number")
-    private Integer plotNumber;
-
-    @Column(name = "rep_number")
-    private Integer replicationNumber;
-
 
     /**
      * @OneToMany(mappedBy = "germplasm") private Set<Progenitor> progntr = new HashSet<Progenitor>();
@@ -611,30 +602,6 @@ public class Germplasm implements Serializable, Auditable {
 		return this.method;
 	}
 
-    public Integer getInstanceNumber() {
-        return instanceNumber;
-    }
-
-    public void setInstanceNumber(Integer instanceNumber) {
-        this.instanceNumber = instanceNumber;
-    }
-
-    public Integer getPlotNumber() {
-        return plotNumber;
-    }
-
-    public void setPlotNumber(Integer plotNumber) {
-        this.plotNumber = plotNumber;
-    }
-
-    public Integer getReplicationNumber() {
-        return replicationNumber;
-    }
-
-    public void setReplicationNumber(Integer replicationNumber) {
-        this.replicationNumber = replicationNumber;
-    }
-
     @Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
@@ -691,13 +658,7 @@ public class Germplasm implements Serializable, Auditable {
 		builder.append(this.method);
 		builder.append(", inventoryInfo=");
 		builder.append(this.inventoryInfo);
-        builder.append(", instanceNumber=");
-        builder.append(this.instanceNumber);
-        builder.append(", plotNumber=");
-        builder.append(this.plotNumber);
-        builder.append(", replicationNumber=");
-        builder.append(this.replicationNumber);
-        builder.append("]");
+		builder.append("]");
 		return builder.toString();
 	}
 
