@@ -49,6 +49,7 @@ public class GermplasmNamingReferenceDataResolverImpl implements GermplasmNaming
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(sessionProvider);
 	}
 
+	// TODO remove hard coded ids/names
 	@Override
 	public UserDefinedField resolveNameType(final int level) {
 		UserDefinedField nameTypeForLevel = null;
@@ -73,6 +74,7 @@ public class GermplasmNamingReferenceDataResolverImpl implements GermplasmNaming
 		return nameTypeForLevel;
 	}
 
+	// TODO remove hard coded ids/names
 	@Override
 	public List<String> getProgramIdentifiers(final Integer levelCode, String programUUID) {
 		Variable variable = null;
