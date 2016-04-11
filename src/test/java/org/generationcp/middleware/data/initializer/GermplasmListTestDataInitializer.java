@@ -64,6 +64,8 @@ public class GermplasmListTestDataInitializer {
 		listEntry.setStatus(1);
 		listEntry.setSeedSource("SeedSource " + i);
 		listEntry.setGid(i);
+		// Default MGID(GROUP ID) is 0
+		listEntry.setMgid(0);
 		return listEntry;
 	}
 
