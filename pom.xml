@@ -437,6 +437,7 @@
 						<include>**/DmsProjectDaoTest.java</include>
 						<include>**/GermplasmGroupingServiceImplTest.java</include>
 						<include>**/GermplasmNamingServiceImplTest.java</include>
+						<include>**/GermplasmNamingReferenceDataResolverImplTest.java</include>
 						<include>**/MethodTest.java</include>
 
 						<!-- New Ontology Manager Tests -->
