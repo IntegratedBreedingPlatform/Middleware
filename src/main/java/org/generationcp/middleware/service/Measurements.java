@@ -76,9 +76,10 @@ public class Measurements {
 			for (final MeasurementData measurementData : dataList) {
 
 				// When a measurement is marked as missing, we should log its old value in the phenotype_outlier table.
-				// Add a log ONLY if the data has changed.
+				// Add a log ONLY if the data has changed and the old value is not empty.
 				if (MeasurementData.MISSING_VALUE.equals(measurementData.getValue())
-						&& !measurementData.getValue().equals(measurementData.getOldValue())) {
+						&& !measurementData.getValue().equals(measurementData.getOldValue())
+						&& !StringUtils.isEmpty(measurementData.getOldValue())) {
 
 					outlierList.add(this.createPhenotypeOutlierFromMeasurement(measurementData));
 				}

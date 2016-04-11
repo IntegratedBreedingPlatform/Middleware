@@ -235,6 +235,33 @@ public class MeasurementsTest {
 	}
 
 	@Test
+	public void testSaveOutlierWithMeasurementDataOldValueIsBlank() {
+
+		int phenotypeId = 123;
+		String measurementOldValue = null;
+
+		final MeasurementData testMeasurementData =
+				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "missing");
+		testMeasurementData.setOldValue(measurementOldValue);
+		testMeasurementData.setPhenotypeId(phenotypeId);
+
+		final MeasurementRow measurementRow = this.initializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
+
+		this.measurements.saveOutliers(Collections.<MeasurementRow>singletonList(measurementRow));
+
+		ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
+
+		Mockito.verify(this.mockPhenotypeOutlierSaver, Mockito.timeout(1)).savePhenotypeOutliers(captor.capture());
+
+		List<PhenotypeOutlier> list = captor.getValue();
+
+		Assert.assertTrue(
+				"PhenotypeOutlier list should be empty. The measurement data is marked as missing but if the original value is blank. No outlier log should be created",
+				list.isEmpty());
+
+	}
+
+	@Test
 	public void testSaveOutlierWithMeasurementDataWithoutMissingValue() {
 
 		int phenotypeId = 123;
