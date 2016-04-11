@@ -6,12 +6,16 @@ import java.util.List;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.dao.oms.CVTermDao;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.GermplasmNamingReferenceDataResolver;
 import org.generationcp.middleware.service.api.GermplasmType;
 
@@ -32,21 +36,25 @@ public class GermplasmNamingReferenceDataResolverImpl implements GermplasmNaming
 	private UserDefinedFieldDAO userDefinedFieldDAO;
 
 	private OntologyVariableDataManager ontologyVariableDataManager;
+	private CVTermDao cvTermDAO;
 
 	public GermplasmNamingReferenceDataResolverImpl() {
 
 	}
 
 	public GermplasmNamingReferenceDataResolverImpl(final UserDefinedFieldDAO userDefinedFieldDAO,
-			final OntologyVariableDataManager ontologyVariableDataManager) {
+			final OntologyVariableDataManager ontologyVariableDataManager, CVTermDao cvTermDao) {
 		this.userDefinedFieldDAO = userDefinedFieldDAO;
 		this.ontologyVariableDataManager = ontologyVariableDataManager;
+		this.cvTermDAO = cvTermDao;
 	}
 
 	public GermplasmNamingReferenceDataResolverImpl(final HibernateSessionProvider sessionProvider) {
 		this.userDefinedFieldDAO = new UserDefinedFieldDAO();
 		this.userDefinedFieldDAO.setSession(sessionProvider.getSession());
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(sessionProvider);
+		this.cvTermDAO = new CVTermDao();
+		this.cvTermDAO.setSession(sessionProvider.getSession());
 	}
 
 	// TODO remove hard coded ids/names
@@ -74,32 +82,32 @@ public class GermplasmNamingReferenceDataResolverImpl implements GermplasmNaming
 		return nameTypeForLevel;
 	}
 
-	// TODO remove hard coded ids/names
 	@Override
-	public List<String> getProgramIdentifiers(final Integer levelCode, String programUUID) {
-		Variable variable = null;
-		List<String> programIdentifiers = new ArrayList<>();
-		if (levelCode == 1) {
-			variable = this.ontologyVariableDataManager.getVariable(programUUID, 3001, true, false);
-			if (variable == null || !variable.getName().equals("Project_Prefix")) {
-				throw new IllegalStateException(
-						"Missing required reference data. Please ensure an ontology variable with name Project_Prefix (id 3001) has been setup. It is required for Level 1 coding.");
-			}
-		} else if (levelCode == 2) {
-			variable = this.ontologyVariableDataManager.getVariable(programUUID, 3002, true, false);
-			if (variable == null || !variable.getName().equals("CIMMYT_Target_Region")) {
-				throw new IllegalStateException(
-						"Missing required reference data. Please ensure an ontology variable with name CIMMYT_Target_Region (id 3002) has been setup. It is required for Level 2 coding.");
-			}
+	public List<String> getCategoryValues(final String variableName, final String programUUID) {
+
+		CVTerm variableTerm = this.cvTermDAO.getByNameAndCvId(variableName, CvId.VARIABLES.getId());
+
+		if (variableTerm == null) {
+			throw new IllegalStateException(
+					String.format("Missing required reference data. Please ensure an ontology variable with name: %s has been setup.",
+							variableName));
 		}
 
-		if (variable != null) {
-			final List<TermSummary> categories = variable.getScale().getCategories();
-			for (TermSummary categoryTerm : categories) {
-				programIdentifiers.add(categoryTerm.getName());
-			}
+		Variable variable = this.ontologyVariableDataManager.getVariable(programUUID, variableTerm.getCvTermId(), true, false);
+
+		if (variable.getScale() != null && variable.getScale().getDataType() != DataType.CATEGORICAL_VARIABLE) {
+			throw new IllegalStateException(
+					String.format(
+							"Reference data setup incorrectly. Please ensure an ontology variable with name: %s has a categorical scale associated with it.",
+							variableName));
 		}
-		return programIdentifiers;
+
+		List<String> categoryValues = new ArrayList<>();
+		List<TermSummary> categories = variable.getScale().getCategories();
+		for (TermSummary categoryTerm : categories) {
+			categoryValues.add(categoryTerm.getName());
+		}
+		return categoryValues;
 	}
 
 	@Override

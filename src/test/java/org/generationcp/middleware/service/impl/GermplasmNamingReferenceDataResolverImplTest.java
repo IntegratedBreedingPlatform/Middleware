@@ -4,11 +4,14 @@ package org.generationcp.middleware.service.impl;
 import java.util.List;
 
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.oms.TermSummary;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.GermplasmType;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,6 +29,9 @@ public class GermplasmNamingReferenceDataResolverImplTest {
 
 	@Mock
 	private OntologyVariableDataManager ontologyVariableDataManager;
+
+	@Mock
+	private CVTermDao cvTermDAO;
 
 	private static final UserDefinedField L1_NAME_TYPE =
 			new UserDefinedField(41, "NAME", "NAMES", "CODE1", "CODE1", "-", "CODE1 Desc", 0, 0, 20160101, 0);
@@ -78,57 +84,49 @@ public class GermplasmNamingReferenceDataResolverImplTest {
 	}
 
 	@Test
-	public void testGetProgramIdentifiersProjectPrefix() {
+	public void testGetCategoryValuesVariableCorrectlySetup() {
+		CVTerm variableTerm = new CVTerm();
+		variableTerm.setCvTermId(3001);
+		Mockito.when(this.cvTermDAO.getByNameAndCvId(Mockito.anyString(), Mockito.anyInt())).thenReturn(variableTerm);
+
 		Variable variable = new Variable();
-		variable.setName("Project_Prefix");
-		variable.setId(3001);
 		Scale scale = new Scale();
+		scale.setDataType(DataType.CATEGORICAL_VARIABLE);
 		TermSummary category1 = new TermSummary(1, "AA", "Administrator Hyderabad");
 		TermSummary category2 = new TermSummary(2, "AE", "Administrator Kenya");
 		scale.addCategory(category1);
 		scale.addCategory(category2);
 		variable.setScale(scale);
 
-		Mockito.when(this.ontologyVariableDataManager.getVariable(Matchers.anyString(), Matchers.eq(3001), Matchers.eq(true),
-				Matchers.eq(false))).thenReturn(variable);
+		Mockito.when(this.ontologyVariableDataManager.getVariable(Matchers.anyString(), Matchers.eq(variableTerm.getCvTermId()),
+				Matchers.eq(true), Matchers.eq(false))).thenReturn(variable);
 
-		List<String> serviceResult = this.service.getProgramIdentifiers(1, "uuidgobbledygook");
+		List<String> serviceResult = this.service.getCategoryValues("Project_Prefix", "uuidgobbledygook");
 		Assert.assertTrue(serviceResult.contains(category1.getName()));
 		Assert.assertTrue(serviceResult.contains(category2.getName()));
 	}
 
-	@Test
-	public void testGetProgramIdentifiersTargetRegion() {
+	@Test(expected = IllegalStateException.class)
+	public void testGetCategoryValuesVariableSetupWithWrongScale() {
+		CVTerm variableTerm = new CVTerm();
+		variableTerm.setCvTermId(3001);
+		Mockito.when(this.cvTermDAO.getByNameAndCvId(Mockito.anyString(), Mockito.anyInt())).thenReturn(variableTerm);
+
 		Variable variable = new Variable();
-		variable.setName("CIMMYT_Target_Region");
-		variable.setId(3002);
 		Scale scale = new Scale();
-		TermSummary category1 = new TermSummary(1, "CA", "CIMMYT Asia office in Hyderabad");
-		TermSummary category2 = new TermSummary(2, "CB", "CIMMYT Latin America office in Cali");
-		scale.addCategory(category1);
-		scale.addCategory(category2);
+		scale.setDataType(DataType.NUMERIC_VARIABLE);
 		variable.setScale(scale);
 
-		Mockito.when(this.ontologyVariableDataManager.getVariable(Matchers.anyString(), Matchers.eq(3002), Matchers.eq(true),
-				Matchers.eq(false))).thenReturn(variable);
+		Mockito.when(this.ontologyVariableDataManager.getVariable(Matchers.anyString(), Matchers.eq(variableTerm.getCvTermId()),
+				Matchers.eq(true), Matchers.eq(false))).thenReturn(variable);
 
-		List<String> serviceResult = this.service.getProgramIdentifiers(2, "uuidgobbledygook");
-		Assert.assertTrue(serviceResult.contains(category1.getName()));
-		Assert.assertTrue(serviceResult.contains(category2.getName()));
+		this.service.getCategoryValues("Project_Prefix", "uuidgobbledygook");
 	}
 
 	@Test(expected = IllegalStateException.class)
-	public void testGetProgramIdentifiersWhenLevel1VariableIsNotSetup() {
-		Mockito.when(this.ontologyVariableDataManager.getVariable(Matchers.anyString(), Matchers.anyInt(), Matchers.eq(true),
-				Matchers.eq(false))).thenReturn(null);
-		this.service.getProgramIdentifiers(1, "uuidgobbledygook");
-	}
-
-	@Test(expected = IllegalStateException.class)
-	public void testGetProgramIdentifiersWhenLevel2VariableIsNotSetup() {
-		Mockito.when(this.ontologyVariableDataManager.getVariable(Matchers.anyString(), Matchers.anyInt(), Matchers.eq(true),
-				Matchers.eq(false))).thenReturn(null);
-		this.service.getProgramIdentifiers(2, "uuidgobbledygook");
+	public void testGetCategoryValuesVariableNotSetup() {
+		Mockito.when(this.cvTermDAO.getByNameAndCvId(Mockito.anyString(), Mockito.anyInt())).thenReturn(null);
+		this.service.getCategoryValues("Project_Prefix", "uuidgobbledygook");
 	}
 
 }

@@ -9,7 +9,7 @@ public interface GermplasmNamingReferenceDataResolver {
 
 	UserDefinedField resolveNameType(int level);
 
-	List<String> getProgramIdentifiers(Integer levelCode, String programUUID);
+	List<String> getCategoryValues(String variableName, String programUUID);
 
 	Set<GermplasmType> getGermplasmTypes();
 }
