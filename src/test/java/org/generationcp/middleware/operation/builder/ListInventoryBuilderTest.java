@@ -30,7 +30,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 	@Before
 	public void setUp() {
 		listInventoryBuilder = new ListInventoryBuilder(this.sessionProvder);
-		germplasmListTestDataInitializer = new GermplasmListTestDataInitializer();
+		this.germplasmListTestDataInitializer = new GermplasmListTestDataInitializer();
 		// initialize germplasm ids
 		gids = this.createListOfGermplasmIds(NO_OF_ENTRIES);
 		this.initializeGermplasms(gids);
@@ -38,7 +38,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testRetrieveGroupId() {
-		final List<GermplasmListData> listEntries = germplasmListTestDataInitializer.createGermplasmListData(NO_OF_ENTRIES);
+		final List<GermplasmListData> listEntries = this.germplasmListTestDataInitializer.createGermplasmListData(NO_OF_ENTRIES);
 
 		listInventoryBuilder.retrieveGroupId(listEntries, gids);
 
