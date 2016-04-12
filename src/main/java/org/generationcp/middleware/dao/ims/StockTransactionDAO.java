@@ -68,9 +68,9 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 						+ "INNER JOIN listnms ON d.list_id = listnms.listid "
 						+ "INNER JOIN ims_transaction tran ON tran.trnid = ist.trnid INNER JOIN ims_lot lot ON lot.lotid = tran.lotid "
 						+ "LEFT JOIN location loc ON lot.locid = loc.locid LEFT JOIN cvterm scale ON scale.cvterm_id = lot.scaleid "
-						+ "LEFT JOIN atributs plotattr ON plotattr.gid = lot.eid AND plotattr.atype = 2003 "
-						+ "LEFT JOIN atributs repattr ON repattr.gid = lot.eid AND repattr.atype = 2004 "
-						+ "LEFT JOIN atributs instanceattr ON instanceattr.gid = lot.eid AND instanceattr.atype = 2005 "
+						+ "LEFT JOIN atributs plotattr ON plotattr.gid = lot.eid AND plotattr.atype = (select fldno from udflds where ftable='ATRIBUTS' and ftype='PASSPORT' and fcode='PLOT_NUMBER') "
+						+ "LEFT JOIN atributs repattr ON repattr.gid = lot.eid AND repattr.atype = (select fldno from udflds where ftable='ATRIBUTS' and ftype='PASSPORT' and fcode='REP_NUMBER') "
+						+ "LEFT JOIN atributs instanceattr ON instanceattr.gid = lot.eid AND instanceattr.atype = (select fldno from udflds where ftable='ATRIBUTS' and ftype='PASSPORT' and fcode='INSTANCE_NUMBER') "
 						+ "WHERE listnms.listid = :listId ORDER BY d.entry_id";
 
 		try {
