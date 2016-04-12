@@ -36,6 +36,7 @@ public class MeasurementData {
 	private MeasurementVariable measurementVariable;
 
 	private boolean isAccepted;
+	private String oldValue;
 
 	// used to map this object to what is actually saved in the database after saving
 	private Variable variable;
@@ -350,6 +351,20 @@ public class MeasurementData {
 	public boolean isNumeric() {
 		return this.getMeasurementVariable().getDataTypeId().equals(TermId.NUMERIC_VARIABLE.getId());
 
+	}
+
+	public String getOldValue() {
+		return this.oldValue;
+	}
+
+	/**
+	 * Use this to store the original value of the measurement data from importing measurements or data retrieved from the database, so that
+	 * even if the MeasurementData.value is changed, you can still recover the old value.
+	 * 
+	 * @param value
+	 */
+	public void setOldValue(String value) {
+		this.oldValue = value;
 	}
 
 }
