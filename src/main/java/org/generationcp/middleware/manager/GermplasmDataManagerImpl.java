@@ -1034,6 +1034,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	 * Overload the previous method to accommodate the added parameter.
 	 */
 	@Override
+	@Transactional(readOnly = true)
 	public List<Germplasm> searchForGermplasm(final String q, final Operation o, final boolean includeParents,
 			final boolean withInventoryOnly, final boolean includeMGMembers) {
 		return this.getGermplasmDao().searchForGermplasms(q, o, includeParents, withInventoryOnly, includeMGMembers);
