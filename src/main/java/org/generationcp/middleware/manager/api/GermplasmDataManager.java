@@ -32,11 +32,8 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 
-// TODO: Auto-generated Javadoc
 /**
  * This is the API for retrieving Germplasm information.
- *
- * @author Kevin Manansala
  *
  */
 public interface GermplasmDataManager {
@@ -75,8 +72,7 @@ public interface GermplasmDataManager {
 	 * @return List of Germplasm POJOs
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op)
-;
+	List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op);
 
 	/**
 	 * Returns the number of germplasm records that were created at the locations with names matching the given parameter.
@@ -120,8 +116,7 @@ public interface GermplasmDataManager {
 	 * @return List of Germplasm POJOS
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Germplasm> getGermplasmByMethodName(String name, int start, int numOfRows, Operation op)
-;
+	List<Germplasm> getGermplasmByMethodName(String name, int start, int numOfRows, Operation op);
 
 	/**
 	 * Returns the number of germplasm records that were created by methods with names matching the given parameter.
@@ -183,16 +178,29 @@ public interface GermplasmDataManager {
 	 * @param status - may be used to filter the results
 	 * @param type - may be used to filter the results
 	 * @return List of Name POJOs
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Name> getNamesByGID(Integer gid, Integer status, GermplasmNameType type);
+
+	/**
+	 * Returns all the names of the Germplasm identified by the gid parameter.
+	 *
+	 * Results may be filtered by name status. Accepted values are 0 - 10. If the given status is zero all names will be included except
+	 * deleted names
+	 *
+	 * Results may also be filtered by type list. These must be valid integer values
+	 *
+	 * @param gid the germplasm identifier
+	 * @param status the name status used to filter the results
+	 * @param type the type used to filter the results
+	 * @return List of {@link Name}
+	 */
+	List<Name> getByGIDWithListTypeFilters(Integer gid, Integer status, List<Integer> type);
 
 	/**
 	 * Returns the preferred name of the Germplasm identified by the gid parameter.
 	 *
 	 * @param gid - id of the Germplasm
 	 * @return {@code Name} POJO of the Germplasm's preferred name. Returns
-	 * @throws MiddlewareQueryException the middleware query exception {@code null} when no preferred name is found.
 	 */
 	Name getPreferredNameByGID(Integer gid);
 
@@ -755,8 +763,7 @@ public interface GermplasmDataManager {
 	 * @return List of GidNidElement based on the specified list of germplasm names
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(List<String> germplasmNames, GetGermplasmByNameModes mode)
-;
+	List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(List<String> germplasmNames, GetGermplasmByNameModes mode);
 
 	/**
 	 * Please use LocationDataManager.getAllBreedingLocations().
@@ -846,21 +853,31 @@ public interface GermplasmDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Map<Integer, String> getLocationNamesByGids(List<Integer> gids);
-
+	
 	/**
-	 * Search for germplasms given a search term Q.
-	 *
-	 * @param q - the search term to be used in retrieving the germplasm
-	 * @param o - the operation to be used for the query (equal or like)
-	 * @param includeParents - boolean flag to denote whether parents will be included in search results
+	 * Search for germplasms given a search term
+	 * 
+	 * @param searchedString - the search term to be used
+	 * @param o - like or equal
+	 * @param includeParents boolean flag to denote whether parents will be included in search results
 	 * @param withInventoryOnly - boolean flag to denote whether result will be filtered by those with inventories only
-	 * @return - List of germplasms filtered by the gid, stockID and germplasm name based on the operation and search term, with parents and
-	 *         with inventory only filtered if specified
-	 *
-	 * @throws MiddlewareQueryException the middleware query exception
+	 * @return List of Germplasms
+	 * @throws MiddlewareQueryException
 	 */
-	List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly)
-;
+	List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly);
+	
+	/**
+	 * Search for germplasms given a search term
+	 * 
+	 * @param searchedString - the search term to be used
+	 * @param o - like or equal
+	 * @param includeParents boolean flag to denote whether parents will be included in search results
+	 * @param withInventoryOnly - boolean flag to denote whether result will be filtered by those with inventories only
+	 * @param includeMGMembers - boolean flag to denote whether the MG members will be included in the result
+	 * @return List of Germplasms
+	 * @throws MiddlewareQueryException
+	 */
+	List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly, boolean includeMGMembers);
 
 	/**
 	 * Please use LocationDataManager.getLocationsByIDs().
@@ -963,8 +980,7 @@ public interface GermplasmDataManager {
 	 * @return list of ProgramFavorite
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, int max, String programUUID)
-;
+	List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, int max, String programUUID);
 
 	/**
 	 * count favorite methods/locations
@@ -1058,28 +1074,39 @@ public interface GermplasmDataManager {
 
 	/*
 	 * get the Germplasm from the crop database based on local gid reference
-	 * 
+	 *
 	 * @param lgid
 	 */
 	Germplasm getGermplasmByLocalGid(Integer lgid);
 
 	/**
 	 * return list of name and it's permutation count.
+	 * 
 	 * @param names list of names
 	 * @return list of name and it's number of permutations.
 	 */
 	Map<String, Integer> getCountByNamePermutations(List<String> names);
 
 	/**
-	 * @return the UDFLD table record that represents "plot code": ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE. If no record matching these
-	 *         critria is found, an empty record with fldno=0 is returned. Never returns null.
+	 * @return the UDFLD table record that represents "plot code": ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE. If no record matching
+	 *         these critria is found, an empty record with fldno=0 is returned. Never returns null.
 	 */
 	UserDefinedField getPlotCodeField();
-	
+
 	/**
-	 * Returns value of the plot code (seed source) where the germplasm was created, identified by the given gid. Returns "Unknown" if plot code
-	 * attribute is not present. Never returns null.
+	 * Returns value of the plot code (seed source) where the germplasm was created, identified by the given gid. Returns "Unknown" if plot
+	 * code attribute is not present. Never returns null.
 	 */
 	String getPlotCodeValue(Integer gid);
+
+	/**
+	 * Enables us to query the udflds table
+	 * 
+	 * @param table the ftable value
+	 * @param type the ftype value
+	 * @param code we are looking for
+	 * @return
+	 */
+	UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code);
 
 }

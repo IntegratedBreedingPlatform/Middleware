@@ -28,14 +28,4 @@ public class MethodTest {
 		method.setMtype("GEN");
 		Assert.assertTrue(method.isGenerative());
 	}
-
-	@Test
-	public void testIsHybrid() {
-		Assert.assertTrue(Method.isHybrid(416));
-		Assert.assertTrue(Method.isHybrid(417));
-		Assert.assertTrue(Method.isHybrid(418));
-		Assert.assertTrue(Method.isHybrid(419));
-		Assert.assertTrue(Method.isHybrid(426));
-		Assert.assertTrue(Method.isHybrid(321));
-	}
 }

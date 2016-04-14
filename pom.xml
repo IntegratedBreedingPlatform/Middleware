@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-        <version>4.0.0.BETA.10</version>
+        <version>4.0.0.BETA.11</version>
 	<name>Middleware</name>
 
 	<properties>
@@ -63,21 +63,21 @@
 			<groupId>net.sf.ehcache</groupId>
 			<artifactId>ehcache-core</artifactId>
 			<!-- We must use version less than 2.5 for now as 2.5+ do not allow multiple CacheManagers with same name to exist in same JVM
-			 See http://stackoverflow.com/questions/33534766/is-there-a-way-to-programatically-set-the-name-of-the-ehcache-on-hibernate-sessi for more context 
+			 See http://stackoverflow.com/questions/33534766/is-there-a-way-to-programatically-set-the-name-of-the-ehcache-on-hibernate-sessi for more context
 			 We can use latest version once we figure out how to provide unique ehcache confuration per databse.-->
 			<version>2.4.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-ehcache</artifactId>
-			<version>3.5.6-Final</version>			
+			<version>3.5.6-Final</version>
 			<exclusions>
 				<exclusion>
 					<groupId>net.sf.ehcache</groupId>
-					<artifactId>ehcache</artifactId>					
+					<artifactId>ehcache</artifactId>
 				</exclusion>
-			</exclusions>			
-		</dependency>		
+			</exclusions>
+		</dependency>
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -281,6 +281,17 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		<!-- Testing -->
+		<dependency>
+			<groupId>org.easytesting</groupId>
+			<artifactId>fest-assert-core</artifactId>
+			<version>2.0M10</version>
+		</dependency>
+		<dependency>
+			<groupId>org.easytesting</groupId>
+			<artifactId>fest-reflect</artifactId>
+			<version>1.4.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -425,8 +436,10 @@
 						<include>**/StudyMeasurementsTest.java</include>
 						<include>**/DmsProjectDaoTest.java</include>
 						<include>**/GermplasmGroupingServiceImplTest.java</include>
+						<include>**/GermplasmNamingServiceImplTest.java</include>
+						<include>**/GermplasmNamingReferenceDataResolverImplTest.java</include>
 						<include>**/MethodTest.java</include>
-						
+
 						<!-- New Ontology Manager Tests -->
 						<include>**/CvTermDaoTest.java</include>
 						<include>**/StandardVariableTest.java</include>
@@ -442,6 +455,24 @@
 						<include>**/WorkbenchDataManagerImplTest.java</include>
 						<include>**/TermDataManagerImplTest.java</include>
 						<include>**/VariableTypeListTransformerTest.java</include>
+
+						<!-- Pedigree String Generation Test -->
+						<include>**/AncestryTreeServiceTest.java</include>
+						<include>**/BackcrossProcessorTest.java</include>
+						<include>**/BreedingMethodFactoryTest.java</include>
+						<include>**/DoubleCrossProcessorTest.java</include>
+						<include>**/InbredProcessorTest.java</include>
+						<include>**/PedigreeStringTestUtil.java</include>
+						<include>**/SimpleCrossProcessorTest.java</include>
+						<include>**/SingleCrossHybridProcessorTest.java</include>
+						<include>**/ThreeWayHybridProcessorTest.java</include>
+						<include>**/PedigreeStringGeneratorUtilTest.java</include>
+						<include>**/CrossExpansionPropertiesTest.java</include>
+						<include>**/PedigreeAlgorithmTest.java</include>
+
+						<include>**/CheckNameFactorsPresentValidationRuleUT.java</include>
+						<include>**/ShowNameHandlingPopUpValidatorUT.java</include>
+						<include>**/ChainValidatorUT.java</include>
 
 					</includes>
 				</configuration>

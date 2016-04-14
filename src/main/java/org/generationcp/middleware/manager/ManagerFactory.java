@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager;
 
 import java.io.Serializable;
 
+import org.generationcp.middleware.auditory.AuditorDataManager;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -47,11 +48,15 @@ import org.generationcp.middleware.service.ReportServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
+import org.generationcp.middleware.service.api.GermplasmNamingReferenceDataResolver;
+import org.generationcp.middleware.service.api.GermplasmNamingService;
 import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.ReportService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
+import org.generationcp.middleware.service.impl.GermplasmNamingReferenceDataResolverImpl;
+import org.generationcp.middleware.service.impl.GermplasmNamingServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,6 +142,9 @@ public class ManagerFactory implements Serializable {
 	public OntologyVariableDataManager getOntologyVariableDataManager() {
 		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
 				this.getOntologyScaleDataManager(), this.sessionProvider);
+	}
+	public AuditorDataManager getAuditorDataManager() {
+		return new AuditorDataManager(this.sessionProvider);
 	}
 
 	public PresetDataManager getPresetDataManager() {
@@ -254,6 +262,16 @@ public class ManagerFactory implements Serializable {
 
 	public GermplasmGroupingService getGermplasmGroupingService() {
 		return new GermplasmGroupingServiceImpl(this.sessionProvider);
+	}
+
+	public GermplasmNamingService getGermplasmNamingService() {
+		return new GermplasmNamingServiceImpl(this.sessionProvider);
+	}
+
+	public GermplasmNamingReferenceDataResolver getGermplasmNamingReferenceDataResolver() {
+		// In future we can switch implementation based on profile/crop.
+		// Currently just construct and return the only (CIMMYT maize) impl we have.
+		return new GermplasmNamingReferenceDataResolverImpl(this.sessionProvider);
 	}
 
 }

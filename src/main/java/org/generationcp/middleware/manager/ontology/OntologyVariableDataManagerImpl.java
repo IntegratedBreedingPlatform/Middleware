@@ -14,10 +14,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import com.google.common.base.Function;
-import com.google.common.base.Strings;
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -57,6 +53,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Function;
+import com.google.common.base.Strings;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 
 /**
  * Implements {@link OntologyVariableDataManagerImpl}
@@ -87,6 +88,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	public OntologyVariableDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		this.propertyManager = new OntologyPropertyDataManagerImpl(sessionProvider);
+		this.methodManager = new OntologyMethodDataManagerImpl(sessionProvider);
+		this.scaleManager = new OntologyScaleDataManagerImpl(sessionProvider);
 	}
 
 	public OntologyVariableDataManagerImpl(OntologyMethodDataManager methodDataManager, OntologyPropertyDataManager propertyDataManager,
@@ -703,7 +707,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		ProgramFavorite programFavorite =
 				this.getProgramFavoriteDao().getProgramFavorite(variableInfo.getProgramUuid(), ProgramFavorite.FavoriteType.VARIABLE,
 						term.getCvTermId());
-		boolean isFavorite = variableInfo.isFavorite() || !Strings.isNullOrEmpty(variableInfo.getAlias());
+
+		String previousAlias = (variableOverrides == null) ? null : variableOverrides.getAlias();
+		String newAlias = (variableInfo.getAlias().equals("")) ? null : variableInfo.getAlias();
+		boolean isFavorite = variableInfo.isFavorite();
+
+		if(newAlias != null && previousAlias == null) {
+			isFavorite = true;
+		}
 
 		if (isFavorite && programFavorite == null) {
 			programFavorite = new ProgramFavorite();
