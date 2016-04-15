@@ -89,15 +89,6 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	@Transient
 	private String checkTypeDescription = null;
 
-    @Transient
-    private Integer instanceNumber;
-
-    @Transient
-    private Integer plotNumber;
-
-    @Transient
-    private Integer replicationNumber;
-
 
 	/**
 	 * @return the listDataProjectId
@@ -276,29 +267,6 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 		this.mgid = mgid;
 	}
 
-    public Integer getInstanceNumber() {
-        return instanceNumber;
-    }
-
-    public void setInstanceNumber(Integer instanceNumber) {
-        this.instanceNumber = instanceNumber;
-    }
-
-    public Integer getPlotNumber() {
-        return plotNumber;
-    }
-
-    public void setPlotNumber(Integer plotNumber) {
-        this.plotNumber = plotNumber;
-    }
-
-    public Integer getReplicationNumber() {
-        return replicationNumber;
-    }
-
-    public void setReplicationNumber(Integer replicationNumber) {
-        this.replicationNumber = replicationNumber;
-    }
 
     @Override
     public String toString() {
@@ -318,10 +286,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
         sb.append(", maleParent='").append(maleParent).append('\'');
         sb.append(", mgid=").append(mgid);
         sb.append(", checkTypeDescription='").append(checkTypeDescription).append('\'');
-        sb.append(", instanceNumber=").append(instanceNumber);
-        sb.append(", plotNumber=").append(plotNumber);
-        sb.append(", replicationNumber=").append(replicationNumber);
-        sb.append('}');
+		sb.append('}');
         return sb.toString();
     }
 

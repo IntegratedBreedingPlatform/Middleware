@@ -162,7 +162,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 					"select " + " lp.listdata_project_id as listdata_project_id, " + " lp.entry_id as entry_id, "
 							+ " lp.designation as designation, " + " lp.group_name as group_name, " + " fn.nval as fnval, "
 							+ " fp.gid as fpgid, " + " mn.nval as mnval, " + " mp.gid as mpgid, "
-                            + " g.gid as gid, g.instance_number, g.plot_number, g.rep_number"
+                            + " g.gid as gid, "
 							+ " lp.seed_source as seed_source, " + " lp.duplicate_notes as duplicate_notes " + " from listdata_project lp "
 							+ " left outer join germplsm g on lp.germplasm_id = g.gid "
 							+ " left outer join germplsm mp on g.gpid2 = mp.gid "
@@ -183,9 +183,6 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			query.addScalar("mnval");
 			query.addScalar("mpgid");
 			query.addScalar("gid");
-            query.addScalar("instance_number");
-            query.addScalar("plot_number");
-            query.addScalar("rep_number");
 			query.addScalar("seed_source");
 			query.addScalar("duplicate_notes");
 
@@ -212,9 +209,6 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			String maleParent = (String) row[6];
 			Integer mgid = (Integer) row[7];
 			Integer gid = (Integer) row[8];
-            Integer instanceNumber = row[9] == null ? null : (Integer) row[9];
-            Integer replicationNumber = row[10] == null ? null : (Integer) row[10];
-            Integer plotNumber = row[11] == null ? null : (Integer) row[11];
 			String seedSource = (String) row[12];
 			String duplicate = (String) row[13];
 
@@ -228,9 +222,6 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			listDataProject.setMaleParent(maleParent);
 			listDataProject.setMgid(mgid);
 			listDataProject.setGermplasmId(gid);
-            listDataProject.setInstanceNumber(instanceNumber);
-            listDataProject.setReplicationNumber(replicationNumber);
-            listDataProject.setPlotNumber(plotNumber);
 			listDataProject.setSeedSource(seedSource);
 
 			listDataProject.setDuplicate(duplicate);
