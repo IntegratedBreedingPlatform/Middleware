@@ -209,8 +209,8 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			String maleParent = (String) row[6];
 			Integer mgid = (Integer) row[7];
 			Integer gid = (Integer) row[8];
-			String seedSource = (String) row[12];
-			String duplicate = (String) row[13];
+			String seedSource = (String) row[9];
+			String duplicate = (String) row[10];
 
 			ListDataProject listDataProject = new ListDataProject();
 			listDataProject.setListDataProjectId(listDataProjectId);
