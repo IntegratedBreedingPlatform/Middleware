@@ -810,10 +810,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 				name.setNstat(Integer.valueOf(1));
 
-				final Germplasm germplasmSaved = dao.save(germplasm);
+				// This method is extended to add new or update existing germplasm
+				// The need is caused by CrossingServiceImpl.save() to update existing germplasm
+				// TODO: Rename this method to better understand the context. Will address this to another task ticket.
+				final Germplasm germplasmSaved = dao.saveOrUpdate(germplasm);
 				isGermplasmsSaved.add(germplasmSaved.getGid());
 				name.setGermplasmId(germplasmSaved.getGid());
-				nameDao.save(name);
+				nameDao.saveOrUpdate(name);
 			}
 
 		} catch (final Exception e) {
