@@ -17,6 +17,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 
 import org.apache.commons.lang3.StringUtils;
+import org.fest.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -389,5 +390,19 @@ public abstract class StringUtil {
 		 }
 		 return value;
 	 }
+
+
+
+	public static String removeBraces(final String str){
+		if(Strings.isNullOrEmpty(str)){
+			return null;
+		}
+
+		if((str.startsWith("<") && str.endsWith(">")) || (str.startsWith("(") && str.endsWith(")"))) {
+			return str.substring(1, str.length() -1);
+		}
+
+		return str;
+	}
 
 }
