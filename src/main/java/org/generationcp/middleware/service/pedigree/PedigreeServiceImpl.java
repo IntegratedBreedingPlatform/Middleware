@@ -54,9 +54,9 @@ public class PedigreeServiceImpl implements PedigreeService {
 	static {
 
 		// FIXME: Invalidation logic may need to applied.
-		germplasmCache = CacheBuilder.newBuilder().maximumSize(10000).expireAfterWrite(1000, TimeUnit.MINUTES).build();
-		methodCache = CacheBuilder.newBuilder().maximumSize(10000).expireAfterWrite(1000, TimeUnit.MINUTES).build();
-		nameTypeCache = CacheBuilder.newBuilder().maximumSize(10000).expireAfterWrite(1000, TimeUnit.MINUTES).build();
+		germplasmCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1000, TimeUnit.MINUTES).build();
+		methodCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1000, TimeUnit.MINUTES).build();
+		nameTypeCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1000, TimeUnit.MINUTES).build();
 	}
 
 	public PedigreeServiceImpl() {
