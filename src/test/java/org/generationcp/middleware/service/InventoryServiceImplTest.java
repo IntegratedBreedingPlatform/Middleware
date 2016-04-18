@@ -308,29 +308,12 @@ public class InventoryServiceImplTest {
 	}
 
 	@Test
-	public void testRetrieveInventoryDetailsForListDataProjectListId_Crosses() throws MiddlewareQueryException {
+	public void testRetrieveInventoryDetailsForListDataProjectListId() throws MiddlewareQueryException {
 		final Integer listId = 1;
-		GermplasmListType listType = GermplasmListType.CROSSES;
 		final List<InventoryDetails> expectedInventoryDetailsList = this.createInventoryDetailsListTestData(listId);
 		Mockito.doReturn(expectedInventoryDetailsList).when(this.stockTransactionDAO)
-				.retrieveInventoryDetailsForListDataProjectListId(listId, listType);
-		final List<InventoryDetails> inventoryDetailsList =
-				this.inventoryServiceImpl.getInventoryListByListDataProjectListId(listId, listType);
-		for (final InventoryDetails inventoryDetails : inventoryDetailsList) {
-			Assert.assertEquals("All inventory details must be belong to the list with id " + listId, listId,
-					inventoryDetails.getSourceId());
-		}
-	}
-
-	@Test
-	public void testRetrieveInventoryDetailsForListDataProjectListId_Advanced() throws MiddlewareQueryException {
-		final Integer listId = 1;
-		GermplasmListType listType = GermplasmListType.ADVANCED;
-		final List<InventoryDetails> expectedInventoryDetailsList = this.createInventoryDetailsListTestData(listId);
-		Mockito.doReturn(expectedInventoryDetailsList).when(this.stockTransactionDAO)
-				.retrieveInventoryDetailsForListDataProjectListId(listId, listType);
-		final List<InventoryDetails> inventoryDetailsList =
-				this.inventoryServiceImpl.getInventoryListByListDataProjectListId(listId, listType);
+				.retrieveInventoryDetailsForListDataProjectListId(listId);
+		final List<InventoryDetails> inventoryDetailsList = this.inventoryServiceImpl.getInventoryListByListDataProjectListId(listId);
 		for (final InventoryDetails inventoryDetails : inventoryDetailsList) {
 			Assert.assertEquals("All inventory details must be belong to the list with id " + listId, listId,
 					inventoryDetails.getSourceId());
@@ -346,10 +329,9 @@ public class InventoryServiceImplTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testRetrieveInventoryDetailsForListDataProjectListId_WrongListType() throws MiddlewareQueryException {
 		final Integer listId = 1;
-		GermplasmListType listType = GermplasmListType.LST;
 		Mockito.doThrow(IllegalArgumentException.class).when(this.stockTransactionDAO)
-				.retrieveInventoryDetailsForListDataProjectListId(listId, listType);
-		this.inventoryServiceImpl.getInventoryListByListDataProjectListId(listId, listType);
+				.retrieveInventoryDetailsForListDataProjectListId(listId);
+		this.inventoryServiceImpl.getInventoryListByListDataProjectListId(listId);
 	}
 
 	@Test

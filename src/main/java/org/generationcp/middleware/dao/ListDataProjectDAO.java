@@ -161,7 +161,8 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			String queryStr =
 					"select " + " lp.listdata_project_id as listdata_project_id, " + " lp.entry_id as entry_id, "
 							+ " lp.designation as designation, " + " lp.group_name as group_name, " + " fn.nval as fnval, "
-							+ " fp.gid as fpgid, " + " mn.nval as mnval, " + " mp.gid as mpgid, " + " g.gid as gid, "
+							+ " fp.gid as fpgid, " + " mn.nval as mnval, " + " mp.gid as mpgid, "
+                            + " g.gid as gid, "
 							+ " lp.seed_source as seed_source, " + " lp.duplicate_notes as duplicate_notes " + " from listdata_project lp "
 							+ " left outer join germplsm g on lp.germplasm_id = g.gid "
 							+ " left outer join germplsm mp on g.gpid2 = mp.gid "
@@ -194,7 +195,8 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		return listDataProjects;
 	}
 
-	private void createListDataProjectRows(List<ListDataProject> listDataProjects, SQLQuery query) {
+    @SuppressWarnings("unchecked")
+    private void createListDataProjectRows(List<ListDataProject> listDataProjects, SQLQuery query) {
 		List<Object[]> result = query.list();
 
 		for (Object[] row : result) {
@@ -221,6 +223,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			listDataProject.setMgid(mgid);
 			listDataProject.setGermplasmId(gid);
 			listDataProject.setSeedSource(seedSource);
+
 			listDataProject.setDuplicate(duplicate);
 
 			listDataProjects.add(listDataProject);
