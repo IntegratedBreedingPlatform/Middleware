@@ -105,6 +105,10 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	private Integer lotGid;
 	private Integer stockSourceRecordId;
 
+    private Integer instanceNumber;
+    private Integer plotNumber;
+    private Integer replicationNumber;
+
 	/**
 	 * Instantiates a new inventory details.
 	 */
@@ -645,6 +649,12 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		builder.append(this.entryId);
 		builder.append(", source=");
 		builder.append(this.source);
+        builder.append(", instanceNumber=");
+        builder.append(this.instanceNumber);
+        builder.append(", plotNumber=");
+        builder.append(this.plotNumber);
+        builder.append(", replicationNumber=");
+        builder.append(this.replicationNumber);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -780,7 +790,31 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.stockSourceRecordId = stockSourceRecordId;
 	}
 
-	public List<String> getBulkWithStockIds() {
+    public Integer getInstanceNumber() {
+        return instanceNumber;
+    }
+
+    public void setInstanceNumber(Integer instanceNumber) {
+        this.instanceNumber = instanceNumber;
+    }
+
+    public Integer getPlotNumber() {
+        return plotNumber;
+    }
+
+    public void setPlotNumber(Integer plotNumber) {
+        this.plotNumber = plotNumber;
+    }
+
+    public Integer getReplicationNumber() {
+        return replicationNumber;
+    }
+
+    public void setReplicationNumber(Integer replicationNumber) {
+        this.replicationNumber = replicationNumber;
+    }
+
+    public List<String> getBulkWithStockIds() {
 		return this.bulkWithStockIds;
 	}
 

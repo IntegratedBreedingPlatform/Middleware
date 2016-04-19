@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -10,25 +11,30 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.operation.saver.PhenotypeOutlierSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.hibernate.FlushMode;
 import org.hibernate.Session;
 
 import com.google.common.base.Preconditions;
 
 /**
- * Class to enable us to save data to the phenotype table and the nd experiment phenotype table in a performant manner.
- *
+ * Class to enable us to save data to the phenotype table, phenotype_outlier table and the nd experiment phenotype table in a performant
+ * manner.
+ * 
  */
 public class Measurements {
 
 	private final PhenotypeSaver phenotypeSaver;
+	private final PhenotypeOutlierSaver phenotypeOutlierSaver;
 	private final Session session;
 
-	Measurements(final Session session, final PhenotypeSaver phenotypeSaver) {
+	Measurements(final Session session, final PhenotypeSaver phenotypeSaver, final PhenotypeOutlierSaver phenotypeOutlierSaver) {
 		this.session = session;
 		this.phenotypeSaver = phenotypeSaver;
+		this.phenotypeOutlierSaver = phenotypeOutlierSaver;
 	}
 
 	/**
@@ -43,6 +49,7 @@ public class Measurements {
 			Preconditions.checkNotNull(observations, "Observation list passed in must cannot be null ");
 			this.session.setFlushMode(FlushMode.MANUAL);
 			this.saveMeasurementData(observations);
+			this.saveOutliers(observations);
 			this.session.flush();
 		} finally {
 			if (this.session != null) {
@@ -52,7 +59,54 @@ public class Measurements {
 	}
 
 	/**
-	 *
+	 * Saves the old value of the measurements that are marked as "missing" to the Phenotype_Outlier table.
+	 * 
+	 * @param observations
+	 */
+	void saveOutliers(List<MeasurementRow> observations) {
+
+		for (final MeasurementRow measurementRow : observations) {
+			final List<MeasurementData> dataList = measurementRow.getDataList();
+
+			if (dataList == null || dataList.isEmpty()) {
+				continue;
+			}
+
+			List<PhenotypeOutlier> outlierList = new ArrayList<PhenotypeOutlier>();
+			for (final MeasurementData measurementData : dataList) {
+
+				// When a measurement is marked as missing, we should log its old value in the phenotype_outlier table.
+				// Add a log ONLY if the data has changed and the old value is not empty.
+				if (MeasurementData.MISSING_VALUE.equals(measurementData.getValue())
+						&& !measurementData.getValue().equals(measurementData.getOldValue())
+						&& !StringUtils.isEmpty(measurementData.getOldValue())) {
+
+					outlierList.add(this.createPhenotypeOutlierFromMeasurement(measurementData));
+				}
+
+			}
+
+			this.phenotypeOutlierSaver.savePhenotypeOutliers(outlierList);
+
+			// After saving, the new value now becomes the old value, this will be piped back to the UI.
+			for (final MeasurementData measurementData : dataList) {
+				measurementData.setOldValue(measurementData.getValue());
+			}
+
+		}
+	}
+
+	PhenotypeOutlier createPhenotypeOutlierFromMeasurement(final MeasurementData measurementData) {
+
+		PhenotypeOutlier phenotypeOutlier = new PhenotypeOutlier();
+		phenotypeOutlier.setPhenotypeId(measurementData.getPhenotypeId());
+		phenotypeOutlier.setValue(measurementData.getOldValue());
+		return phenotypeOutlier;
+
+	}
+
+	/**
+	 * 
 	 * @param measurementData measurementData used to create your {@link Phenotype} object that can be saved
 	 */
 	Phenotype createPhenotypeFromMeasurement(final MeasurementData measurementData) {
@@ -103,6 +157,7 @@ public class Measurements {
 						+ "Defenesive this should never happen.");
 
 				final Phenotype phenotype = this.createPhenotypeFromMeasurement(measurementData);
+
 				this.phenotypeSaver.saveOrUpdate(measurementRow.getExperimentId(), measurementVariable.getTermId(),
 						measurementData.getcValueId() != null && !"".equals(measurementData.getcValueId()) ? measurementData.getcValueId()
 								: measurementData.getValue(), phenotype, measurementData.getMeasurementVariable().getDataTypeId());
