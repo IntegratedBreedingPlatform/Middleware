@@ -395,11 +395,11 @@ public abstract class StringUtil {
 
 	public static String removeBraces(final String str){
 		if(Strings.isNullOrEmpty(str)){
-			return null;
+			return str;
 		}
 
 		if((str.startsWith("<") && str.endsWith(">")) || (str.startsWith("(") && str.endsWith(")"))
-                || (str.startsWith("[") && str.endsWith("]")) || (str.startsWith("(") && str.endsWith(")"))) {
+                || (str.startsWith("[") && str.endsWith("]")) || (str.startsWith("{") && str.endsWith("}"))) {
 			return str.substring(1, str.length() -1);
 		}
 
