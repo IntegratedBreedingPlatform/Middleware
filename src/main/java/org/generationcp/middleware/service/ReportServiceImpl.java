@@ -145,15 +145,12 @@ public class ReportServiceImpl extends Service implements ReportService {
 			if ((location.getCntryid() != null && location.getCntryid() != 0)) {
 				final Country country = this.getCountryDao().getById(location.getCntryid());
 
-				final MeasurementVariable countryInfo = new MeasurementVariable();
-				countryInfo.setName(AbstractReporter.COUNTRY_VARIABLE_NAME);
-				countryInfo.setValue(country.getIsofull());
-
-				variables.add(countryInfo);
+				variables.add(createPlaceholderCountryMeasurementVariable(country.getIsofull()));
 			}
 
 			final MeasurementVariable abbrevInfo = new MeasurementVariable();
 			abbrevInfo.setName(AbstractReporter.LOCATION_ABBREV_VARIABLE_NAME);
+            abbrevInfo.setProperty("");
 			abbrevInfo.setValue(location.getLabbr());
 
 			variables.add(abbrevInfo);
@@ -176,19 +173,13 @@ public class ReportServiceImpl extends Service implements ReportService {
             if ((location.getCntryid() != null && location.getCntryid() != 0)) {
                 final Country country = this.getCountryDao().getById(location.getCntryid());
 
-                final MeasurementData countryInfo = new MeasurementData();
-                final MeasurementVariable countryVar = new MeasurementVariable();
-
-                countryVar.setName(AbstractReporter.COUNTRY_VARIABLE_NAME);
-                countryInfo.setMeasurementVariable(countryVar);
-                countryInfo.setValue(country.getIsofull());
-
-                variables.add(countryInfo);
+                variables.add(createPlaceholderCountryMeasurementData(country.getIsofull()));
             }
 
             final MeasurementData abbrevData = new MeasurementData();
             final MeasurementVariable abbrevInfo = new MeasurementVariable();
             abbrevInfo.setName(AbstractReporter.LOCATION_ABBREV_VARIABLE_NAME);
+            abbrevInfo.setProperty("");
             abbrevData.setValue(location.getLabbr());
             abbrevData.setMeasurementVariable(abbrevInfo);
 
@@ -197,6 +188,24 @@ public class ReportServiceImpl extends Service implements ReportService {
             return variables;
 
         }
+    }
+
+    protected MeasurementVariable createPlaceholderCountryMeasurementVariable(String countryISO) {
+        final MeasurementVariable countryInfo = new MeasurementVariable();
+        countryInfo.setName(AbstractReporter.COUNTRY_VARIABLE_NAME);
+        countryInfo.setValue(countryISO);
+        countryInfo.setProperty("");
+
+        return countryInfo;
+    }
+
+    protected MeasurementData createPlaceholderCountryMeasurementData(String countryISO) {
+        MeasurementData countryData = new MeasurementData();
+        MeasurementVariable countryVariable = createPlaceholderCountryMeasurementVariable(countryISO);
+        countryData.setValue(countryISO);
+        countryData.setMeasurementVariable(countryVariable);
+
+        return countryData;
     }
 
 	/***
