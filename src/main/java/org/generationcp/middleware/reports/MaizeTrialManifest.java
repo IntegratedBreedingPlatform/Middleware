@@ -49,24 +49,6 @@ public class MaizeTrialManifest extends AbstractTrialReporter {
 		// previous computation to the expected key
 		params.put("breedingProgram", params.get(PROGRAM_NAME_REPORT_KEY));
 
-		@SuppressWarnings("unchecked")
-		final List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get(STUDY_CONDITIONS_KEY);
-		@SuppressWarnings("unchecked")
-		final List<MeasurementRow> trialObservations = (List<MeasurementRow>) args.get(STUDY_OBSERVATIONS_KEY);
-
-		// attempt to extract values from the study conditions
-		for (final MeasurementVariable var : studyConditions) {
-			mapReportValue(var, params, var.getValue());
-		}
-
-		// attempt to extract values from the observations. only the value from the first measurement row is necessary
-		if (!trialObservations.isEmpty()) {
-
-			for (final MeasurementData data : trialObservations.get(0).getDataList()) {
-				mapReportValue(data.getMeasurementVariable(), params, data.getValue());
-			}
-		}
-
 		// ensure that null values are not shown for fields whose variables are not present in the trial / not yet implemented
 		// TODO : look into possibly implementing this as well for the other reports in the system
 		this.provideBlankValues(params);
@@ -98,7 +80,9 @@ public class MaizeTrialManifest extends AbstractTrialReporter {
 	 * @param reportParamMap
 	 * @param value
 	 */
-	protected void mapReportValue(MeasurementVariable var, Map<String, Object> reportParamMap, String value) {
+    @Override
+	protected void mapEnvironmentValue(MeasurementVariable var, Map<String, Object> reportParamMap, String value) {
+        super.mapEnvironmentValue(var, reportParamMap, value);
 		final TermId term = TermId.getById(var.getTermId());
 
 		if (term == TermId.TRIAL_LOCATION) {
