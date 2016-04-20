@@ -4,9 +4,7 @@ package org.generationcp.middleware.dao.ims;
 import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,12 +20,11 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testRetrieveInventoryDetailsForListDataProjectListId() throws MiddlewareQueryException {
-		Integer stockListId = 17;
-		List<InventoryDetails> inventoryDetailsList =
-				this.dao.retrieveInventoryDetailsForListDataProjectListId(stockListId);
+	public void testRetrieveInventoryDetailsForListDataProjectListId() {
+		final Integer stockListId = 17;
+		final List<InventoryDetails> inventoryDetailsList = this.dao.retrieveInventoryDetailsForListDataProjectListId(stockListId);
 		Assert.assertNotNull(inventoryDetailsList);
-		for (InventoryDetails inventoryDetails : inventoryDetailsList) {
+		for (final InventoryDetails inventoryDetails : inventoryDetailsList) {
 			Assert.assertNotNull(inventoryDetails.getLotId());
 			Assert.assertNotNull(inventoryDetails.getUserId());
 			Assert.assertNotNull(inventoryDetails.getAmount());
