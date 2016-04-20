@@ -105,13 +105,17 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 						+ "d.germplasm_id, d.entry_id, d.seed_source, d.designation, d.group_name, "
 						+ "loc.lname, loc.labbr, scale.name, summed.total as trnqty, tran.comments,tran.inventory_id, tran.sourceid, "
 						+ "d.duplicate_notes, tran.bulk_with, tran.bulk_compl, "
-						+ "ist.listdata_project_id, ist.trnid, tran.recordid, lot.eid, ist.recordid as stockSourceRecordId "
+						+ "ist.listdata_project_id, ist.trnid, tran.recordid, lot.eid, ist.recordid as stockSourceRecordId, "
+						+ "instanceattr.aval as instanceNumber, plotattr.aval as plotNumber, repattr.aval as repNumber  "
 						+ "FROM listdata_project d INNER JOIN ims_stock_transaction ist ON d.listdata_project_id = ist.listdata_project_id "
 						+ "INNER JOIN listnms ON d.list_id = listnms.listid "
 						+ "INNER JOIN summed_transaction summed ON (summed.recordid = ist.recordid) "
 						+ "INNER JOIN ims_transaction tran ON (tran.trnid = ist.trnid AND tran.recordid = summed.recordid) "
 						+ "INNER JOIN ims_lot lot ON lot.lotid = summed.lotid "
 						+ "LEFT JOIN location loc ON lot.locid = loc.locid LEFT JOIN cvterm scale ON scale.cvterm_id = summed.scaleid "
+						+ "LEFT JOIN atributs plotattr ON plotattr.gid = lot.eid AND plotattr.atype = (select fldno from udflds where ftable='ATRIBUTS' and ftype='PASSPORT' and fcode='PLOT_NUMBER') "
+						+ "LEFT JOIN atributs repattr ON repattr.gid = lot.eid AND repattr.atype = (select fldno from udflds where ftable='ATRIBUTS' and ftype='PASSPORT' and fcode='REP_NUMBER') "
+						+ "LEFT JOIN atributs instanceattr ON instanceattr.gid = lot.eid AND instanceattr.atype = (select fldno from udflds where ftable='ATRIBUTS' and ftype='PASSPORT' and fcode='INSTANCE_NUMBER') "
 						+ "WHERE listnms.listid = :listId ORDER BY d.entry_id";
 
 		try {
