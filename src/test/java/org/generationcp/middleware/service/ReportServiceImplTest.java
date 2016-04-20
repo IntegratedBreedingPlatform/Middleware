@@ -70,14 +70,14 @@ public class ReportServiceImplTest {
         final List<MeasurementVariable> variableList = WorkbookTestDataInitializer.createConditions(false, 1, TEST_LOCATION_ID);
         final int originalConditionSize = variableList.size();
 
-        Mockito.doCallRealMethod().when(mocked).appendCountryInformation(variableList);
+        Mockito.doCallRealMethod().when(mocked).appendCountryInformationFromCondition(variableList);
         Mockito.doCallRealMethod().when(mocked).retrieveLocationIdFromCondition(variableList);
         Mockito.doReturn(locationDataManager).when(mocked).getLocationDataManager();
         Mockito.doReturn(countryDAO).when(mocked).getCountryDao();
 
         Mockito.doReturn(location).when(locationDataManager).getLocationByID(TEST_LOCATION_ID);
         Mockito.doReturn(country).when(countryDAO).getById(TEST_COUNTRY_ID);
-        final List<MeasurementVariable> processed = mocked.appendCountryInformation(variableList);
+        final List<MeasurementVariable> processed = mocked.appendCountryInformationFromCondition(variableList);
 
         Assert.assertTrue("Additional conditions must have been added to the condition list after processing the current location information", processed.size() > originalConditionSize);
         boolean countryVariableFound = false;
@@ -107,7 +107,7 @@ public class ReportServiceImplTest {
         setBlankLocationValue(variableList);
         
         final int originalConditionListSize = variableList.size();
-        final List<MeasurementVariable> processed = reportService.appendCountryInformation(variableList);
+        final List<MeasurementVariable> processed = reportService.appendCountryInformationFromCondition(variableList);
 
         Assert.assertEquals("No additional processing should be done with blank location information", originalConditionListSize, processed.size());
     }
