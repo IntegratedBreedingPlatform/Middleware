@@ -149,7 +149,6 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 						.addScalar("bulk_with").addScalar("bulk_compl").addScalar("listdata_project_id").addScalar("trnid")
 						.addScalar("recordid").addScalar("eid").addScalar("stockSourceRecordId").addScalar("instanceNumber")
 						.addScalar("plotNumber").addScalar("repNumber");
-		;
 
 		return query;
 	}
