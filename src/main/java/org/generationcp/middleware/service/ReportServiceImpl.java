@@ -102,7 +102,14 @@ public class ReportServiceImpl extends Service implements ReportService {
 		final StudyType studyType = this.getStudyDataManager().getStudyType(studyId);
 		final Workbook wb = this.getWorkbookBuilder().create(studyId, studyType);
 		final List<MeasurementRow> observations = wb.getObservations();
-		final List<MeasurementVariable> studyConditions = this.appendCountryInformation(wb.getConditions());
+		final List<MeasurementVariable> studyConditions = this.appendCountryInformationFromCondition(wb.getConditions());
+        final List<MeasurementRow> trialObservations = wb.getTrialObservations();
+
+        if (!trialObservations.isEmpty()) {
+            for (final MeasurementRow trialObservation : trialObservations) {
+                trialObservation.setDataList(this.appendCountryInformationFromObservation(trialObservation.getDataList()));
+            }
+        }
 
 		if (parentsInfoRequireed) {
 			this.appendParentsInformation(studyId, observations);
@@ -125,7 +132,7 @@ public class ReportServiceImpl extends Service implements ReportService {
         return params;
     }
 
-	protected List<MeasurementVariable> appendCountryInformation(final List<MeasurementVariable> originalConditions) {
+	protected List<MeasurementVariable> appendCountryInformationFromCondition(final List<MeasurementVariable> originalConditions) {
 		final Integer locationId = this.retrieveLocationIdFromCondition(originalConditions);
 
 		if (locationId == null) {
@@ -156,6 +163,42 @@ public class ReportServiceImpl extends Service implements ReportService {
 		}
 	}
 
+    protected List<MeasurementData> appendCountryInformationFromObservation(final List<MeasurementData> observations) {
+        final Integer locationId = this.retrieveLocationIdFromObservations(observations);
+
+        if (locationId == null) {
+            return observations;
+        } else {
+            final List<MeasurementData> variables = new ArrayList<>(observations);
+
+            final Location location = this.getLocationDataManager().getLocationByID(locationId);
+
+            if ((location.getCntryid() != null && location.getCntryid() != 0)) {
+                final Country country = this.getCountryDao().getById(location.getCntryid());
+
+                final MeasurementData countryInfo = new MeasurementData();
+                final MeasurementVariable countryVar = new MeasurementVariable();
+
+                countryVar.setName(AbstractReporter.COUNTRY_VARIABLE_NAME);
+                countryInfo.setMeasurementVariable(countryVar);
+                countryInfo.setValue(country.getIsofull());
+
+                variables.add(countryInfo);
+            }
+
+            final MeasurementData abbrevData = new MeasurementData();
+            final MeasurementVariable abbrevInfo = new MeasurementVariable();
+            abbrevInfo.setName(AbstractReporter.LOCATION_ABBREV_VARIABLE_NAME);
+            abbrevData.setValue(location.getLabbr());
+            abbrevData.setMeasurementVariable(abbrevInfo);
+
+            variables.add(abbrevData);
+
+            return variables;
+
+        }
+    }
+
 	/***
 	 * Retrieves the Location ID from the list of condition variables; Returns null if the condition value is an empty string
 	 *
@@ -172,6 +215,23 @@ public class ReportServiceImpl extends Service implements ReportService {
 
         return locationId;
 	}
+
+    /***
+     * Retrieves the Location ID from the list of trial observations; Returns null if the condition value is an empty string
+     *
+     * @return
+     */
+    Integer retrieveLocationIdFromObservations(final List<MeasurementData> observations) {
+        Integer locationId = null;
+        for (final MeasurementData observation : observations) {
+            final TermId term = TermId.getById(observation.getMeasurementVariable().getTermId());
+            if (term == TermId.LOCATION_ID && !StringUtils.isEmpty(observation.getValue())) {
+                locationId = Integer.parseInt(observation.getValue());
+            }
+        }
+
+        return locationId;
+    }
 
 	@Override
 	public Set<String> getReportKeys() {
