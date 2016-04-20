@@ -8,7 +8,6 @@ import java.util.List;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -20,8 +19,7 @@ import org.hibernate.criterion.Restrictions;
  */
 public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 
-	public List<StockTransaction> getTransactionsForListDataProjectIDs(final List<Integer> listDataProjectIDList)
-			throws MiddlewareQueryException {
+	public List<StockTransaction> getTransactionsForListDataProjectIDs(final List<Integer> listDataProjectIDList) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(StockTransaction.class);
 			criteria.createAlias("listDataProject", "ldp");
@@ -35,7 +33,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 		}
 	}
 
-	public boolean listDataProjectListHasStockTransactions(final Integer listDataProjectListId) throws MiddlewareQueryException {
+	public boolean listDataProjectListHasStockTransactions(final Integer listDataProjectListId) {
 		final String sql =
 				"select count(*) from ims_stock_transaction ist "
 						+ "WHERE EXISTS (select 1 from listdata_project ldp where ldp.listdata_project_id = ist.listdata_project_id"
@@ -54,8 +52,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 		}
 	}
 
-	public List<InventoryDetails> retrieveInventoryDetailsForListDataProjectListId(final Integer listDataProjectListId)
-			throws MiddlewareQueryException {
+	public List<InventoryDetails> retrieveInventoryDetailsForListDataProjectListId(final Integer listDataProjectListId) {
 
 		final List<InventoryDetails> detailsList = new ArrayList<>();
 
@@ -95,7 +92,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 	}
 
 	public List<InventoryDetails> retrieveSummedInventoryDetailsForListDataProjectListId(final Integer listDataProjectListId,
-			final GermplasmListType germplasmListType) throws MiddlewareQueryException {
+			final GermplasmListType germplasmListType) {
 		final List<InventoryDetails> detailsList = new ArrayList<>();
 
 		if (!germplasmListType.equals(GermplasmListType.ADVANCED) && !germplasmListType.equals(GermplasmListType.CROSSES)) {
@@ -205,7 +202,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 		return details;
 	}
 
-	public boolean stockHasCompletedBulking(final Integer listId) throws MiddlewareQueryException {
+	public boolean stockHasCompletedBulking(final Integer listId) {
 		final StringBuilder sql = new StringBuilder();
 		sql.append("SELECT COUNT(1) ");
 		sql.append("FROM ims_stock_transaction ist ");
