@@ -84,4 +84,14 @@ public interface OntologyVariableDataManager {
 	Integer getVariableStudies(int variableId);
 
 	String retrieveVariableCategoricalValue(String programUuid, Integer variableId, Integer categoricalValueId);
+
+	/** This function will retrieve categorical name values.
+	 *
+	 * @param programUuid as the unique id of the program
+	 * @param variableId variable id to retrieve value
+	 * @param categoricalValueId categorical value id to retrieve categorical value
+	 * @param removeBraces
+	 * @return categorical value
+	 */
+	String retrieveVariableCategoricalNameValue(String programUuid, Integer variableId, Integer categoricalValueId, boolean removeBraces);
 }
