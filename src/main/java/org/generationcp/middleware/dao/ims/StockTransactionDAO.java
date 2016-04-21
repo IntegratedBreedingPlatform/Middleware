@@ -19,6 +19,8 @@ import org.hibernate.criterion.Restrictions;
  */
 public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 
+	private static final String LIST_ID = "listId";
+
 	public List<StockTransaction> getTransactionsForListDataProjectIDs(final List<Integer> listDataProjectIDList) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(StockTransaction.class);
@@ -41,7 +43,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 
 		try {
 			final Query query = this.getSession().createSQLQuery(sql);
-			query.setInteger("listId", listDataProjectListId);
+			query.setInteger(LIST_ID, listDataProjectListId);
 
 			final Number number = (Number) query.uniqueResult();
 			return number.intValue() > 0;
@@ -74,7 +76,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 
 		try {
 			final Query query = this.setupInventoryDetailQueryObject(sql);
-			query.setInteger("listId", listDataProjectListId);
+			query.setInteger(LIST_ID, listDataProjectListId);
 
 			final List<Object[]> results = query.list();
 
@@ -119,7 +121,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 
 		try {
 			final Query query = this.setupInventoryDetailQueryObject(sql);
-			query.setInteger("listId", listDataProjectListId);
+			query.setInteger(LIST_ID, listDataProjectListId);
 
 			final List<Object[]> results = query.list();
 
@@ -209,7 +211,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 		sql.append("WHERE d.list_id = :listId ");
 		sql.append("AND tran.bulk_compl = 'Completed' ");
 		final Query query = this.getSession().createSQLQuery(sql.toString());
-		query.setInteger("listId", listId);
+		query.setInteger(LIST_ID, listId);
 		final BigInteger numberOfRecords = (BigInteger) query.uniqueResult();
 		if (numberOfRecords.intValue() > 0) {
 			return true;
