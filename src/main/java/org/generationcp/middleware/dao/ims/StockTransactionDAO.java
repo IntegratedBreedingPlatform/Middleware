@@ -138,16 +138,12 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 	}
 
 	protected Query setupInventoryDetailQueryObject(final String querySQL) {
-		final Query query =
-				this.getSession().createSQLQuery(querySQL).addScalar("lotId").addScalar("locid").addScalar("scaleid").addScalar("userid")
-						.addScalar("germplasm_id").addScalar("entry_id").addScalar("seed_source").addScalar("designation")
-						.addScalar("group_name").addScalar("lname").addScalar("labbr").addScalar("name").addScalar("trnqty")
-						.addScalar("comments").addScalar("inventory_id").addScalar("sourceid").addScalar("duplicate_notes")
-						.addScalar("bulk_with").addScalar("bulk_compl").addScalar("listdata_project_id").addScalar("trnid")
-						.addScalar("recordid").addScalar("eid").addScalar("stockSourceRecordId").addScalar("instanceNumber")
-						.addScalar("plotNumber").addScalar("repNumber");
-
-		return query;
+		return this.getSession().createSQLQuery(querySQL).addScalar("lotId").addScalar("locid").addScalar("scaleid").addScalar("userid")
+				.addScalar("germplasm_id").addScalar("entry_id").addScalar("seed_source").addScalar("designation").addScalar("group_name")
+				.addScalar("lname").addScalar("labbr").addScalar("name").addScalar("trnqty").addScalar("comments")
+				.addScalar("inventory_id").addScalar("sourceid").addScalar("duplicate_notes").addScalar("bulk_with")
+				.addScalar("bulk_compl").addScalar("listdata_project_id").addScalar("trnid").addScalar("recordid").addScalar("eid")
+				.addScalar("stockSourceRecordId").addScalar("instanceNumber").addScalar("plotNumber").addScalar("repNumber");
 	}
 
 	protected InventoryDetails convertSQLResultsToInventoryDetails(final Object[] resultRow) {
