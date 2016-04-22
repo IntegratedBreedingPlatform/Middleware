@@ -618,16 +618,14 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	@Test
 	public void testUpdateInventory() throws MiddlewareQueryException {
 		Integer listId = 17;
-		List<InventoryDetails> inventoryDetailList =
-				this.inventoryService.getInventoryListByListDataProjectListId(listId, GermplasmListType.CROSSES);
+		List<InventoryDetails> inventoryDetailList = this.inventoryService.getInventoryListByListDataProjectListId(listId);
 		if (inventoryDetailList != null && !inventoryDetailList.isEmpty()) {
 			InventoryDetails inventoryDetails = inventoryDetailList.get(0);
 			Map<String, Object> originalData = this.getInventorySpecificDetails(inventoryDetails);
 			this.modifyInventoryDetails(inventoryDetails);
 			this.manager.updateInventory(listId, inventoryDetailList);
-			InventoryDetails modifiedInventoryDetails =
-					this.getModifiedInventoryDetails(originalData,
-							this.inventoryService.getInventoryListByListDataProjectListId(listId, GermplasmListType.CROSSES));
+			InventoryDetails modifiedInventoryDetails = this.getModifiedInventoryDetails(originalData,
+							this.inventoryService.getInventoryListByListDataProjectListId(listId));
 			Assert.assertEquals(InventoryDataManagerImplTestIT.TEST_DUPLICATE, modifiedInventoryDetails.getDuplicate());
 			Assert.assertEquals(InventoryDataManagerImplTestIT.TEST_BULK_WITH, modifiedInventoryDetails.getBulkWith());
 			Assert.assertEquals(InventoryDataManagerImplTestIT.TEST_BULK_COMPL, modifiedInventoryDetails.getBulkCompl());

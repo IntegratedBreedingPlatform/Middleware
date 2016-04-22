@@ -30,6 +30,8 @@ public class InventoryDetailsTestDataInitializer {
 			final InventoryDetails invDetails = new InventoryDetails();
 			invDetails.setLotId(id);
 			invDetails.setGid(id);
+            invDetails.setInstanceNumber(1);
+            invDetails.setEntryId(1);
 			inventoryDetails.add(invDetails);
 		}
 

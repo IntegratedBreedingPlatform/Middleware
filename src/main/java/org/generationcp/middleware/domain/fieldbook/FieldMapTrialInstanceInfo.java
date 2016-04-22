@@ -98,7 +98,8 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 
 	private Integer blockId;
 
-	private GermplasmList stockList;
+	/* The total labels needed for each instance*/
+	private Integer labelsNeeded;
 
 	/** The deleted plot coordintes in (row, range) format */
 	private List<String> deletedPlots;
@@ -646,11 +647,11 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 		this.labelHeaders = labelHeaders;
 	}
 
-	public GermplasmList getStockList() {
-		return this.stockList;
+	public Integer getLabelsNeeded() {
+		return labelsNeeded;
 	}
 
-	public void setStockList(GermplasmList stockList) {
-		this.stockList = stockList;
+	public void setLabelsNeeded(Integer labelsNeeded) {
+		this.labelsNeeded = labelsNeeded;
 	}
 }

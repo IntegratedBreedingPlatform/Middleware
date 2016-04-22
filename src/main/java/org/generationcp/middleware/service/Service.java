@@ -55,6 +55,12 @@ import org.generationcp.middleware.operation.saver.GeolocationSaver;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
+import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
+import org.generationcp.middleware.operation.saver.GeolocationSaver;
+import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
+import org.generationcp.middleware.operation.saver.PhenotypeOutlierSaver;
+import org.generationcp.middleware.operation.saver.PhenotypeSaver;
+import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.util.DatabaseBroker;
 import org.slf4j.Logger;
@@ -82,6 +88,10 @@ public abstract class Service extends DatabaseBroker {
 
 	protected final PhenotypeSaver getPhenotypeSaver() {
 		return new PhenotypeSaver(this.sessionProvider);
+	}
+
+	protected final PhenotypeOutlierSaver getPhenotypeOutlierSaver() {
+		return new PhenotypeOutlierSaver(this.sessionProvider);
 	}
 
 	protected final WorkbookSaver getWorkbookSaver() {
