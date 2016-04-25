@@ -120,4 +120,9 @@ public class MaizeTrialManifest extends AbstractTrialReporter {
                 // no default behaviour, added only for SonarCube checking
 		}
 	}
+
+    @Override
+    public String getFileExtension() {
+        return "xlsx";
+    }
 }
