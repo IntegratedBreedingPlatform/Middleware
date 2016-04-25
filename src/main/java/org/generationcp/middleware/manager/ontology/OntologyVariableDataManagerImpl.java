@@ -45,6 +45,7 @@ import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.util.ISO8601DateParser;
+import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -813,6 +814,23 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		return null;
 
+	}
+
+	@Override public String retrieveVariableCategoricalNameValue(String programUuid, Integer variableId, Integer categoricalValueId,
+			boolean removeBraces) {
+
+		if (variableId == null || categoricalValueId == null) {
+			return null;
+		}
+
+		Variable variable = this.getVariable(programUuid, variableId, true, false);
+		for (TermSummary summary : variable.getScale().getCategories()) {
+			if (summary.getId().equals(categoricalValueId)) {
+				return StringUtil.removeBraces(summary.getName());
+			}
+		}
+
+		return null;
 	}
 
 	private void updateVariableSynonym(CVTerm term, String newVariableName) {
