@@ -25,13 +25,12 @@ public class VariableCacheTest {
 
 		// Another variable with same ID but different crop
 		ContextHolder.setCurrentCrop("wheat");
-		Integer variable2Id = variable1Id;
-		Variable variable2 = new Variable();
-		variable2.setId(variable2Id);
+        Variable variable2 = new Variable();
+		variable2.setId(variable1Id);
 
-		VariableCache.addToCache(variable2Id, variable2);
+		VariableCache.addToCache(variable1Id, variable2);
 		Assert.assertEquals(2, VariableCache.getCacheSize());
-		Assert.assertEquals(variable2, VariableCache.getFromCache(variable2Id));
+		Assert.assertEquals(variable2, VariableCache.getFromCache(variable1Id));
 
 		// Test remove operations
 		ContextHolder.setCurrentCrop("maize");
@@ -43,9 +42,9 @@ public class VariableCacheTest {
 
 		ContextHolder.setCurrentCrop("wheat");
 
-		VariableCache.removeFromCache(variable2Id);
+		VariableCache.removeFromCache(variable1Id);
 		Assert.assertEquals(0, VariableCache.getCacheSize());
-		Assert.assertNull(VariableCache.getFromCache(variable2Id));
+		Assert.assertNull(VariableCache.getFromCache(variable1Id));
 
 	}
 
