@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ontology.api.OntologyCommonDAO;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -26,6 +27,7 @@ import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.util.Clock;
 import org.generationcp.middleware.util.ISO8601DateParser;
+import org.generationcp.middleware.util.SystemClock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,8 +53,18 @@ public class OntologyPropertyDataManagerImpl implements OntologyPropertyDataMana
 	protected Clock systemClock;
 
 	public OntologyPropertyDataManagerImpl() {
-		super();
+        // no-arg constructor is required by CGLIB proxying used by Spring 3x and older.
 	}
+
+    //TODO:This is temporary hack for managerFactory, builder and service. It should refactor to remove this constructor
+    public OntologyPropertyDataManagerImpl(HibernateSessionProvider sessionProvider) {
+        this.ontologyDaoFactory = new OntologyDaoFactory();
+        this.ontologyDaoFactory.setSessionProvider(sessionProvider);
+        OntologyCommonDAOImpl ontologyCommonDAOImpl = new OntologyCommonDAOImpl();
+        ontologyCommonDAOImpl.setSessionProvider(sessionProvider);
+        this.ontologyCommonDAO = ontologyCommonDAOImpl;
+        this.systemClock = new SystemClock();
+    }
 
 	@Override
 	public Property getProperty(int id, boolean filterObsolete) throws MiddlewareException {

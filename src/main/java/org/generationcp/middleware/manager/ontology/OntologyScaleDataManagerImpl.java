@@ -26,16 +26,14 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ontology.api.OntologyCommonDAO;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.pojos.oms.CV;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
-import org.generationcp.middleware.util.Clock;
-import org.generationcp.middleware.util.ISO8601DateParser;
-import org.generationcp.middleware.util.StringUtil;
-import org.generationcp.middleware.util.Util;
+import org.generationcp.middleware.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,8 +59,18 @@ public class OntologyScaleDataManagerImpl implements OntologyScaleDataManager {
 	protected Clock systemClock;
 
 	public OntologyScaleDataManagerImpl() {
-		super();
+        // no-arg constructor is required by CGLIB proxying used by Spring 3x and older.
 	}
+
+    //TODO:This is temporary hack for managerFactory, builder and service. It should refactor to remove this constructor
+    public OntologyScaleDataManagerImpl(HibernateSessionProvider sessionProvider) {
+        this.ontologyDaoFactory = new OntologyDaoFactory();
+        this.ontologyDaoFactory.setSessionProvider(sessionProvider);
+        OntologyCommonDAOImpl ontologyCommonDAOImpl = new OntologyCommonDAOImpl();
+        ontologyCommonDAOImpl.setSessionProvider(sessionProvider);
+        this.ontologyCommonDAO = ontologyCommonDAOImpl;
+        this.systemClock = new SystemClock();
+    }
 
 	@Override
 	public Scale getScale(int scaleId, boolean filterObsolete) throws MiddlewareException {

@@ -115,19 +115,19 @@ public abstract class Service extends DatabaseBroker {
 	}
 
 	protected final OntologyMethodDataManager getOntologyMethodDataManager() {
-		return new OntologyMethodDataManagerImpl();
+		return new OntologyMethodDataManagerImpl(this.sessionProvider);
 	}
 
 	protected final OntologyPropertyDataManager getOntologyPropertyDataManager() {
-		return new OntologyPropertyDataManagerImpl();
+		return new OntologyPropertyDataManagerImpl(this.sessionProvider);
 	}
 
 	protected final OntologyScaleDataManager getOntologyScaleDataManager() {
-		return new OntologyScaleDataManagerImpl();
+		return new OntologyScaleDataManagerImpl(this.sessionProvider);
 	}
 
 	protected final OntologyVariableDataManager getOntologyVariableDataManager() {
-		return new OntologyVariableDataManagerImpl();
+		return new OntologyVariableDataManagerImpl(this.sessionProvider);
 	}
 
 	protected final GermplasmDataManager getGermplasmDataManager() {

@@ -15,11 +15,13 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.util.Clock;
 import org.generationcp.middleware.util.ISO8601DateParser;
+import org.generationcp.middleware.util.SystemClock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,8 +42,15 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 	protected Clock systemClock;
 
 	public OntologyMethodDataManagerImpl() {
-		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
+		// no-arg constructor is required by CGLIB proxying used by Spring 3x and older.
 	}
+
+    //TODO:This is temporary hack for managerFactory, builder and service. It should refactor to remove this constructor
+    public OntologyMethodDataManagerImpl(HibernateSessionProvider sessionProvider) {
+        this.ontologyDaoFactory = new OntologyDaoFactory();
+        this.ontologyDaoFactory.setSessionProvider(sessionProvider);
+        this.systemClock = new SystemClock();
+    }
 
 	@Override
 	public Method getMethod(int id, boolean filterObsolete) throws MiddlewareException {

@@ -128,19 +128,19 @@ public class ManagerFactory implements Serializable {
 	}
 
 	public OntologyMethodDataManager getOntologyMethodDataManager() {
-		return new OntologyMethodDataManagerImpl();
+		return new OntologyMethodDataManagerImpl(this.getSessionProvider());
 	}
 
 	public OntologyPropertyDataManager getOntologyPropertyDataManager() {
-		return new OntologyPropertyDataManagerImpl();
+		return new OntologyPropertyDataManagerImpl(this.getSessionProvider());
 	}
 
 	public OntologyScaleDataManager getOntologyScaleDataManager() {
-		return new OntologyScaleDataManagerImpl();
+		return new OntologyScaleDataManagerImpl(this.getSessionProvider());
 	}
 
 	public OntologyVariableDataManager getOntologyVariableDataManager() {
-		return new OntologyVariableDataManagerImpl();
+		return new OntologyVariableDataManagerImpl(this.getSessionProvider());
 	}
 	public AuditorDataManager getAuditorDataManager() {
 		return new AuditorDataManager(this.sessionProvider);

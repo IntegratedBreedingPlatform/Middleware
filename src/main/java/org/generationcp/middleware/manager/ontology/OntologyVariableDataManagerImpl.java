@@ -37,6 +37,7 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ontology.api.OntologyCommonDAO;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
@@ -51,10 +52,7 @@ import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
-import org.generationcp.middleware.util.Clock;
-import org.generationcp.middleware.util.ISO8601DateParser;
-import org.generationcp.middleware.util.StringUtil;
-import org.generationcp.middleware.util.Util;
+import org.generationcp.middleware.util.*;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.slf4j.Logger;
@@ -96,8 +94,22 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 	private static final Logger LOG = LoggerFactory.getLogger(OntologyVariableDataManagerImpl.class);
 
 	public OntologyVariableDataManagerImpl() {
-		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
+		// no-arg constructor is required by CGLIB proxying used by Spring 3x and older.
 	}
+
+    //TODO:This is temporary hack for managerFactory, builder and service. It should refactor to remove this constructor
+    public OntologyVariableDataManagerImpl(HibernateSessionProvider sessionProvider) {
+        this.ontologyDaoFactory = new OntologyDaoFactory();
+        this.ontologyDaoFactory.setSessionProvider(sessionProvider);
+        OntologyCommonDAOImpl ontologyCommonDAOImpl = new OntologyCommonDAOImpl();
+        ontologyCommonDAOImpl.setSessionProvider(sessionProvider);
+        this.ontologyCommonDAO = ontologyCommonDAOImpl;
+        this.systemClock = new SystemClock();
+
+        this.methodManager = new OntologyMethodDataManagerImpl(sessionProvider);
+        this.propertyManager = new OntologyPropertyDataManagerImpl(sessionProvider);
+        this.scaleManager = new OntologyScaleDataManagerImpl(sessionProvider);
+    }
 
 	@Override
 	public List<Variable> getWithFilter(VariableFilter variableFilter) throws MiddlewareQueryException {
