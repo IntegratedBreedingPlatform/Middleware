@@ -1,5 +1,6 @@
 package org.generationcp.middleware.manager.ontology;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -501,4 +502,25 @@ public class OntologyCommonDAOImpl implements OntologyCommonDAO {
 			}
 		}
 	}
+
+    @Override
+    public Integer getVariableObservations(int variableId) {
+
+        final String numOfProjectsWithVariable =
+                "SELECT count(pp.project_id) " + " FROM projectprop pp " + " WHERE NOT EXISTS( " + " SELECT 1 FROM projectprop stat "
+                        + " WHERE stat.project_id = pp.project_id " + " AND stat.type_id = " + TermId.STUDY_STATUS.getId()
+                        + " AND value = " + TermId.DELETED_STUDY.getId() + ") " + " AND pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
+                        + " AND pp.value = :variableId";
+
+        SQLQuery query = this.ontologyDaoFactory.getActiveSession().createSQLQuery(numOfProjectsWithVariable);
+        query.setParameter("variableId", variableId);
+        return ((BigInteger) query.uniqueResult()).intValue();
+    }
+
+    // TODO: Follow DmsProjectDao countExperimentByVariable. This requires STORED_IN and that needs to deprecated.
+    @Override
+    public Integer getVariableStudies(int variableId) {
+        return 0;
+    }
+
 }

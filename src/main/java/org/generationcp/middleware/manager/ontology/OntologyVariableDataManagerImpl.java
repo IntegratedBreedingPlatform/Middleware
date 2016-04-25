@@ -490,20 +490,22 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 			programOverridesDao.makeTransient(variableOverrides);
 		}
 
-		// Updating favorite to true if alias is defined
-		ProgramFavorite programFavorite =
-				programFavoriteDao.getProgramFavorite(variableInfo.getProgramUuid(), ProgramFavorite.FavoriteType.VARIABLE,
-						term.getCvTermId());
+		String previousAlias = variableOverrides == null ? null : variableOverrides.getAlias();
+		String newAlias = variableInfo.getAlias() == null ? null : variableInfo.getAlias();
 
-		String previousAlias = (variableOverrides == null) ? null : variableOverrides.getAlias();
-		String newAlias = (variableInfo.getAlias().equals("")) ? null : variableInfo.getAlias();
-		boolean isFavorite = variableInfo.isFavorite();
+        boolean isFavorite = variableInfo.isFavorite();
 
-		if(newAlias != null && previousAlias == null) {
+        //Setting isFavorite if variable alias is set.
+		if(Strings.isNullOrEmpty(previousAlias) && !Strings.isNullOrEmpty(newAlias)) {
 			isFavorite = true;
 		}
 
-		if (isFavorite && programFavorite == null) {
+        // Updating favorite to true if alias is defined
+        ProgramFavorite programFavorite =
+                programFavoriteDao.getProgramFavorite(variableInfo.getProgramUuid(), ProgramFavorite.FavoriteType.VARIABLE,
+                        term.getCvTermId());
+
+        if (isFavorite && programFavorite == null) {
 			programFavorite = new ProgramFavorite();
 			programFavorite.setEntityId(variableInfo.getId());
 			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE.getName());
@@ -575,22 +577,12 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 
 	@Override
 	public Integer getVariableObservations(int variableId) {
-
-		final String numOfProjectsWithVariable =
-				"SELECT count(pp.project_id) " + " FROM projectprop pp " + " WHERE NOT EXISTS( " + " SELECT 1 FROM projectprop stat "
-						+ " WHERE stat.project_id = pp.project_id " + " AND stat.type_id = " + TermId.STUDY_STATUS.getId()
-						+ " AND value = " + TermId.DELETED_STUDY.getId() + ") " + " AND pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
-						+ " AND pp.value = :variableId";
-
-		SQLQuery query = this.ontologyDaoFactory.getActiveSession().createSQLQuery(numOfProjectsWithVariable);
-		query.setParameter("variableId", variableId);
-		return ((BigInteger) query.uniqueResult()).intValue();
+		return this.ontologyCommonDAO.getVariableObservations(variableId);
 	}
 
-	// TODO: Follow DmsProjectDao countExperimentByVariable. This requires STORED_IN and that needs to deprecated.
 	@Override
 	public Integer getVariableStudies(int variableId) {
-		return 0;
+		return this.ontologyCommonDAO.getVariableStudies(variableId);
 	}
 
 	@Override

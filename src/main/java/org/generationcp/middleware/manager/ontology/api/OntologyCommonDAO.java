@@ -127,4 +127,16 @@ public interface OntologyCommonDAO {
 	 */
 	void getVariableProperties(Map<Integer, Variable> map, Map<Integer, Method> methodMap, Map<Integer, Property> propertyMap, Map<Integer, Scale> scaleMap)
 			throws MiddlewareException;
+
+    /**
+     * Get Observation count
+     * @param variableId Variable Id
+     */
+    Integer getVariableObservations(int variableId);
+
+    /**
+     * Get Variable used in studies
+     * @param variableId Variable Id
+     */
+    Integer getVariableStudies(int variableId);
 }
