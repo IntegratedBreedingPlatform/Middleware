@@ -58,8 +58,8 @@ public abstract class AbstractReporter implements Reporter {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractReporter.class);
 
-    private final static List<String> RECOGNIZED_EXCEL_FORMATS = Arrays.asList("xls", "xlsx");
-    private final static String RECOGNIZED_PDF_FORMAT = "pdf";
+    private static final List<String> RECOGNIZED_EXCEL_FORMATS = Arrays.asList("xls", "xlsx");
+    private static final String RECOGNIZED_PDF_FORMAT = "pdf";
 	
 	@Override
 	public String toString() {
