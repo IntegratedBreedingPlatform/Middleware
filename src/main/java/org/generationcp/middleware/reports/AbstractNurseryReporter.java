@@ -19,7 +19,7 @@ import org.generationcp.middleware.pojos.report.Occurrence;
 
 public abstract class AbstractNurseryReporter extends AbstractReporter {
 
-    public static final int DEFAULT_OCC_VALUE = 1;
+    protected ReportParameterMapper parameterMapper = new ReportParameterMapper();
 
     @SuppressWarnings("unchecked")
 	@Override
@@ -42,9 +42,9 @@ public abstract class AbstractNurseryReporter extends AbstractReporter {
 		params.put(PROGRAM_NAME_REPORT_KEY, args.get(PROGRAM_NAME_ARG_KEY));
 
 		for (final MeasurementVariable var : studyConditions) {
-			mapBasicStudyValues(var, params, var.getValue());
+			parameterMapper.mapBasicStudyValues(var, params, var.getValue());
 
-            mapEnvironmentValue(var, params, var.getValue());
+            parameterMapper.mapEnvironmentValue(var, params, var.getValue());
 		}
 
 		// TODO: pending mappings
@@ -99,57 +99,4 @@ public abstract class AbstractNurseryReporter extends AbstractReporter {
 
 	}
 
-    protected void mapBasicStudyValues(MeasurementVariable var, Map<String, Object> reportParamMap, String value) {
-        final TermId term = TermId.getById(var.getTermId());
-
-        switch (term) {
-            case STUDY_NAME:
-                reportParamMap.put(STUDY_NAME_REPORT_KEY, var.getValue());
-                break;
-            case STUDY_TITLE:
-                reportParamMap.put(STUDY_TITLE_REPORT_KEY, var.getValue());
-                break;
-            default:
-                // aside from the specified items above, no other terms are recognized as basic study values
-                break;
-        }
-
-    }
-
-    protected void mapEnvironmentValue(MeasurementVariable var, Map<String, Object> reportParamMap, String value) {
-        final TermId term = TermId.getById(var.getTermId());
-
-        switch (term) {
-            case TRIAL_INSTANCE_FACTOR:
-                if ("".equalsIgnoreCase(value)) {
-                    reportParamMap.put("occ", DEFAULT_OCC_VALUE);
-                } else {
-                    reportParamMap.put("occ", Integer.valueOf(value));
-                }
-                break;
-            case TRIAL_LOCATION:
-                reportParamMap.put(LOCATION_NAME_REPORT_KEY, value);
-                break;
-            case LOCATION_ID:
-                reportParamMap.put(LOCATION_ID_REPORT_KEY, value);
-                break;
-            case STUDY_INSTITUTE:
-                reportParamMap.put(ORGANIZATION_REPORT_KEY, value);
-                break;
-            // here we have empty blocks for cases where the term ID is non existent, as well as for cases where the term ID is not captured by the previous cases
-            case NONEXISTENT:
-                break;
-            default:
-                break;
-        }
-
-        if (var.getName().equals(COUNTRY_VARIABLE_NAME)) {
-            reportParamMap.put(COUNTRY_VARIABLE_NAME, value);
-        } else if (var.getName().equals(LOCATION_ABBREV_VARIABLE_NAME)) {
-            reportParamMap.put(LOCATION_ABBREV_VARIABLE_NAME, value);
-        } else if (var.getProperty().equalsIgnoreCase("Season")) {
-            reportParamMap.put(SEASON_REPORT_KEY, value);
-            reportParamMap.put("LoCycle", value);
-        }
-    }
 }
