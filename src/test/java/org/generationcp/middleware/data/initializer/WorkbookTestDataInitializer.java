@@ -189,7 +189,7 @@ public class WorkbookTestDataInitializer {
 		final Workbook workbook = new Workbook();
 		setDefaultValues(workbook);
 		createStudyDetails(workbook, studyName, studyType);
-		workbook.setConditions(createConditions(!hasMultipleLocations, trialNo, trialNo));
+		workbook.setConditions(createConditions(!hasMultipleLocations, trialNo, trialNo, studyName));
 		createFactors(workbook, true, hasMultipleLocations, trialNo);
 		createConstants(workbook);
 		createVariates(workbook, isForMeansDataset);
@@ -319,6 +319,16 @@ public class WorkbookTestDataInitializer {
 
 		return conditions;
 	}
+
+    public static List<MeasurementVariable> createConditions(final boolean withTrial, final int trialNo, final int locationId, String studyName) {
+        List<MeasurementVariable> conditions = createConditions(withTrial, trialNo, locationId);
+
+        conditions.add(createMeasurementVariable(TermId.STUDY_NAME.getId(), "STUDY NAME", "Study name", WorkbookTestDataInitializer.NAME,
+                WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.STUDY, WorkbookTestDataInitializer.CHAR, studyName,
+                WorkbookTestDataInitializer.STUDY, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.STUDY, false));
+
+        return conditions;
+    }
 
 	public static MeasurementVariable createExperimentalRCBDVariable() {
 		return createMeasurementVariable(WorkbookTestDataInitializer.EXPT_DESIGN_ID, "DESIGN", "EXPERIMENTAL DESIGN",
