@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
@@ -22,6 +23,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.beust.jcommander.internal.Lists;
+
 public class GermplasmNamingReferenceDataResolverImplTest {
 
 	@Mock
@@ -34,13 +37,13 @@ public class GermplasmNamingReferenceDataResolverImplTest {
 	private CVTermDao cvTermDAO;
 
 	private static final UserDefinedField L1_NAME_TYPE =
-			new UserDefinedField(41, "NAME", "NAMES", "CODE1", "CODE1", "-", "CODE1 Desc", 0, 0, 20160101, 0);
+			new UserDefinedField(41, "NAME", "CODE", "CODE1", "CODE1 Name", "-", "CODE1 Desc", 0, 0, 20160101, 0);
 
 	private static final UserDefinedField L2_NAME_TYPE =
-			new UserDefinedField(42, "NAME", "NAMES", "CODE2", "CODE2", "-", "CODE2 Desc", 0, 0, 20160101, 0);
+			new UserDefinedField(42, "NAME", "CODE", "CODE2", "CODE2 Name", "-", "CODE2 Desc", 0, 0, 20160101, 0);
 
 	private static final UserDefinedField L3_NAME_TYPE =
-			new UserDefinedField(43, "NAME", "NAMES", "CODE3", "CODE3", "-", "CODE3 Desc", 0, 0, 20160101, 0);
+			new UserDefinedField(43, "NAME", "CODE", "CODE3", "CODE3 Name", "-", "CODE3 Desc", 0, 0, 20160101, 0);
 
 	@InjectMocks
 	private final GermplasmNamingReferenceDataResolverImpl service = new GermplasmNamingReferenceDataResolverImpl();
@@ -48,18 +51,8 @@ public class GermplasmNamingReferenceDataResolverImplTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-
-		Mockito.when(
-				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmNamingReferenceDataResolverImpl.NAME_TYPE_LEVEL1))
-				.thenReturn(L1_NAME_TYPE);
-
-		Mockito.when(
-				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmNamingReferenceDataResolverImpl.NAME_TYPE_LEVEL2))
-				.thenReturn(L2_NAME_TYPE);
-
-		Mockito.when(
-				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmNamingReferenceDataResolverImpl.NAME_TYPE_LEVEL3))
-				.thenReturn(L3_NAME_TYPE);
+		Mockito.when(this.userDefinedFieldDAO.getByFieldTableNameAndType("NAMES", "CODE"))
+				.thenReturn(Lists.newArrayList(L3_NAME_TYPE, L2_NAME_TYPE, L1_NAME_TYPE));
 	}
 
 	@Test
@@ -70,10 +63,14 @@ public class GermplasmNamingReferenceDataResolverImplTest {
 	}
 
 	@Test(expected = IllegalStateException.class)
+	public void testResolveNameTypeNotEnoughLevelsSetup() {
+		// We have three levels setup. We request level 4 code. Expect exception.
+		this.service.resolveNameType(4);
+	}
+
+	@Test(expected = IllegalStateException.class)
 	public void testResolveNameTypeWhenNotSetup() {
-		Mockito.when(
-				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmNamingReferenceDataResolverImpl.NAME_TYPE_LEVEL1))
-				.thenReturn(null);
+		Mockito.when(this.userDefinedFieldDAO.getByFieldTableNameAndType("NAMES", "CODE")).thenReturn(new ArrayList<UserDefinedField>());
 		this.service.resolveNameType(1);
 	}
 

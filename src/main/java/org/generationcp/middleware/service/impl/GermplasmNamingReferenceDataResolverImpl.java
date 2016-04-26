@@ -2,6 +2,8 @@
 package org.generationcp.middleware.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 
@@ -29,10 +31,6 @@ import com.google.common.collect.Sets;
  */
 public class GermplasmNamingReferenceDataResolverImpl implements GermplasmNamingReferenceDataResolver {
 
-	static final String NAME_TYPE_LEVEL1 = "CODE1";
-	static final String NAME_TYPE_LEVEL2 = "CODE2";
-	static final String NAME_TYPE_LEVEL3 = "CODE3";
-
 	private UserDefinedFieldDAO userDefinedFieldDAO;
 
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -57,26 +55,27 @@ public class GermplasmNamingReferenceDataResolverImpl implements GermplasmNaming
 		this.cvTermDAO.setSession(sessionProvider.getSession());
 	}
 
-	// TODO remove hard coded ids/names
 	@Override
 	public UserDefinedField resolveNameType(final int level) {
+		final List<UserDefinedField> allCodedNameTypes = this.userDefinedFieldDAO.getByFieldTableNameAndType("NAMES", "CODE");
+
+		Collections.sort(allCodedNameTypes, new Comparator<UserDefinedField>() {
+			@Override
+			public int compare(UserDefinedField udfld1, UserDefinedField udfld2) {
+				return udfld1.getFcode().compareTo(udfld2.getFcode());
+			}
+		});
+
 		UserDefinedField nameTypeForLevel = null;
-		String levelCode = null;
 
-		if (level == 1) {
-			levelCode = GermplasmNamingReferenceDataResolverImpl.NAME_TYPE_LEVEL1;
-		} else if (level == 2) {
-			levelCode = GermplasmNamingReferenceDataResolverImpl.NAME_TYPE_LEVEL2;
-		} else if (level == 3) {
-			levelCode = GermplasmNamingReferenceDataResolverImpl.NAME_TYPE_LEVEL3;
+		if (allCodedNameTypes.size() >= level) {
+			// FIXME using index as a level. 0 = level 1, 1 = level 2 etc from the sorted list.
+			nameTypeForLevel = allCodedNameTypes.get(level - 1);
 		}
-
-		nameTypeForLevel = this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", levelCode);
 
 		if (nameTypeForLevel == null) {
 			String message = String.format(
-					"Missing required reference data. Please ensure User defined field (UDFLD) record with fTable=NAMES, fType=NAME, fCode=%s is setup.",
-					levelCode);
+					"Missing required reference data. Please ensure User defined field (UDFLD) records with fTable=NAMES, fType=CODE are appropriately setup.");
 			throw new IllegalStateException(message);
 		}
 		return nameTypeForLevel;
