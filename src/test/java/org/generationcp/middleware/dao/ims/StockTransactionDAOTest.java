@@ -28,12 +28,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-
 public class StockTransactionDAOTest extends IntegrationTestBase {
 
+	private static final int LIST_ID = 1;
 	private static final String STOCK_ID_PREFIX = "STOCK";
 	private static final int LOCATION_ID = 1;
 	private static final int SCALE_ID = 1;
@@ -43,7 +40,6 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 
 	private StockTransactionDAO dao;
 	private final Map<Integer, Germplasm> germplasmMap = new HashMap<Integer, Germplasm>();
-	private GermplasmList germplasmList;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -66,6 +62,7 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 
+		// initialize data initializer
 		this.inventoryDetailsTestDataInitializer = new InventoryDetailsTestDataInitializer();
 
 		this.dao = new StockTransactionDAO();
@@ -75,7 +72,7 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 		this.initializeGermplasms(NO_OF_ENTRIES);
 
 		// initialize germplasm list and snapshot list
-		this.germplasmListId = this.initializeGermplasmsList(this.germplasmMap);
+		this.initializeGermplasmsListAndListData(this.germplasmMap);
 		this.initLotsAndTransactions(this.germplasmListId);
 	}
 
@@ -133,14 +130,15 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 	@Test
 	public void testRetrieveSummedInventoryDetailsForListDataProjectListIdForAdvancedListType() {
 
-		this.advancedListId = this.initializeGermplasmsListSnapShot(this.germplasmList, GermplasmListType.ADVANCED);
+		this.germplasmListManager.getGermplasmListById(this.germplasmListId);
+		this.advancedListId = this.initializeGermplasmsListSnapShot(this.germplasmListId, GermplasmListType.ADVANCED);
 		this.initStockTransactions(this.germplasmListId, this.advancedListId);
 
 		final GermplasmListType germplasmListType = GermplasmListType.ADVANCED;
 
 		List<InventoryDetails> detailsList = null;
 		try {
-			detailsList = this.dao.retrieveSummedInventoryDetailsForListDataProjectListId(this.germplasmListId, germplasmListType);
+			detailsList = this.dao.retrieveSummedInventoryDetailsForListDataProjectListId(this.advancedListId, germplasmListType);
 		} catch (final IllegalArgumentException e) {
 			Assert.fail("Expecting not to throw an exception when the method receives a list type either CROSSES or ADVANCED.");
 		}
@@ -163,13 +161,15 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 		}
 	}
 
-	private int initializeGermplasmsList(final Map<Integer, Germplasm> germplasmMap) {
-		this.germplasmList =
-				GermplasmListTestDataInitializer.createGermplasmListWithListDataAndInventoryInfo(null,
-						new ArrayList<>(germplasmMap.keySet()));
-		final int listId = this.germplasmListManager.addGermplasmList(this.germplasmList);
-		this.germplasmList.setId(listId);
-		return listId;
+	private void initializeGermplasmsListAndListData(final Map<Integer, Germplasm> germplasmMap) {
+		// initialize germplasm list
+		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(LIST_ID, false);
+		this.germplasmListId = this.germplasmListManager.addGermplasmList(germplasmList);
+
+		// initialize germplasm list data
+		final List<GermplasmListData> germplasmListData =
+				GermplasmListTestDataInitializer.createGermplasmListData(germplasmList, new ArrayList<>(germplasmMap.keySet()), false);
+		this.germplasmListManager.addGermplasmListData(germplasmListData);
 	}
 
 	private void initLotsAndTransactions(final Integer germplasmListId) {
@@ -195,9 +195,7 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 		// retrieve map of lot id that corresponds to the germplasm list data id (lrecId)
 		final Map<Integer, Integer> lotIdLrecIdMap = new HashMap<Integer, Integer>();
 
-		final GermplasmList germplasmList = this.germplasmListManager.getGermplasmListById(germplasmListId);
-
-		final List<GermplasmListData> listEntries = germplasmList.getListData();
+		final List<GermplasmListData> listEntries = this.germplasmListManager.getGermplasmListDataByListId(germplasmListId);
 		for (final GermplasmListData listEntry : listEntries) {
 			final Integer gid = listEntry.getGermplasmId();
 			lotIdLrecIdMap.put(gidLotIdMap.get(gid), listEntry.getId());
@@ -217,11 +215,12 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 
 	}
 
-	private int initializeGermplasmsListSnapShot(final GermplasmList germplasmListId, final GermplasmListType type) {
+	private int initializeGermplasmsListSnapShot(final Integer germplasmListId, final GermplasmListType type) {
+		final GermplasmList germplasmList = this.germplasmListManager.getGermplasmListById(germplasmListId);
+		final List<GermplasmListData> listEntries = this.germplasmListManager.getGermplasmListDataByListId(germplasmListId);
 		final List<ListDataProject> listDataProjectEntries =
-				GermplasmListTestDataInitializer.createListDataSnapShotFromListEntries(this.germplasmList);
-		return this.fieldbookService.saveOrUpdateListDataProject(PROJECT_ID, type, this.germplasmList.getId(), listDataProjectEntries,
-				USER_ID);
+				GermplasmListTestDataInitializer.createListDataSnapShotFromListEntries(germplasmList, listEntries);
+		return this.fieldbookService.saveOrUpdateListDataProject(PROJECT_ID, type, germplasmListId, listDataProjectEntries, USER_ID);
 	}
 
 	private void initStockTransactions(final Integer germplasmListId, final Integer advancedListId) {
@@ -230,20 +229,13 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 		final List<ListDataProject> snapShotListData = this.germplasmListManager.retrieveSnapshotListData(advancedListId);
 
 		// create a map for entryId and listDataProject
-		final ImmutableMap<Integer, ListDataProject> entryIdListDataProject =
-				Maps.uniqueIndex(snapShotListData, new Function<ListDataProject, Integer>() {
-
-					@Override
-					public Integer apply(final ListDataProject from) {
-						return from.getEntryId();
-					}
-				});
-
-		// retrieve list data from germplasm list id
-		final GermplasmList germplasmList = this.germplasmListManager.getGermplasmListById(germplasmListId);
+		final Map<Integer, ListDataProject> entryIdListDataProject = new HashMap<Integer, ListDataProject>();
+		for (final ListDataProject listDataProject : snapShotListData) {
+			entryIdListDataProject.put(listDataProject.getEntryId(), listDataProject);
+		}
 
 		// retrieve germplasm list data
-		final List<GermplasmListData> germplasmListData = germplasmList.getListData();
+		final List<GermplasmListData> germplasmListData = this.germplasmListManager.getGermplasmListDataByListId(germplasmListId);
 
 		// create map for listdataId and ListDataProject
 		final Map<Integer, ListDataProject> listDataIdListDataProject = new HashMap<Integer, ListDataProject>();

@@ -15,21 +15,47 @@ public class GermplasmListTestDataInitializer {
 
 	private static final int USER_ID = 1;
 
+	/**
+	 * create GermplasmList object with basic list details initialized
+	 * 
+	 * @param id
+	 * @return
+	 */
 	public static GermplasmList createGermplasmList(final Integer id) {
+		return createGermplasmList(id, true);
+	}
+
+	/**
+	 * create GermplasmList object with basic list details initialized given the user has an option to set the default id or not
+	 * 
+	 * @param id
+	 * @param setDefaultId - allow to set default id to germplasm list object
+	 * @return
+	 */
+	public static GermplasmList createGermplasmList(final Integer id, final boolean setDefaultId) {
 		final GermplasmList germplasmList = new GermplasmList();
-		germplasmList.setId(id);
+		germplasmList.setId(setDefaultId ? id : null);
 		germplasmList.setName("List " + id);
 		germplasmList.setDescription("List " + id + " Description");
 		germplasmList.setDate(20150101L);
 		germplasmList.setUserId(USER_ID);
 		germplasmList.setType(GermplasmListType.LST.name());
+		germplasmList.setStatus(1);
+		germplasmList.setNotes("Some notes here");
 
 		return germplasmList;
 	}
 
-	public static GermplasmList createGermplasmListWithListData(final int id, final int noOfEntries) {
-		final GermplasmList germplasmList = createGermplasmList(id);
-		germplasmList.setListData(createGermplasmListData(noOfEntries));
+	/**
+	 * Create dummy germplasm list with list data having dummy assigned id
+	 * 
+	 * @param listId
+	 * @param noOfEntries
+	 * @return
+	 */
+	public static GermplasmList createGermplasmListWithListData(final int listId, final int noOfEntries) {
+		final GermplasmList germplasmList = createGermplasmList(listId);
+		germplasmList.setListData(createGermplasmListData(germplasmList, noOfEntries));
 
 		return germplasmList;
 	}
@@ -43,56 +69,61 @@ public class GermplasmListTestDataInitializer {
 	 */
 	public static GermplasmList createGermplasmListWithListDataAndInventoryInfo(final Integer id, final int noOfEntries) {
 		final GermplasmList germplasmList = createGermplasmList(id);
-		germplasmList.setListData(createGermplasmListDataWithInventoryInfo(noOfEntries));
+		germplasmList.setListData(createGermplasmListDataWithInventoryInfo(germplasmList, noOfEntries));
 		return germplasmList;
 	}
 
 	/**
-	 * Create germplasm list with list data and inventory info given the number of entries
+	 * Create list of GermplasmListData with dummy assigned ids
 	 * 
-	 * @param id
-	 * @param gids
+	 * @param germplasmList
+	 * @param itemNo
 	 * @return
 	 */
-	public static GermplasmList createGermplasmListWithListDataAndInventoryInfo(final Integer id, final List<Integer> gids) {
-		final GermplasmList germplasmList = createGermplasmList(id);
-		germplasmList.setListData(createGermplasmListDataWithInventoryInfo(gids));
-		return germplasmList;
-	}
-
-	public static List<GermplasmListData> createGermplasmListData(final Integer itemNo) {
+	public static List<GermplasmListData> createGermplasmListData(final GermplasmList germplasmList, final Integer itemNo) {
 		final List<GermplasmListData> listEntries = new ArrayList<GermplasmListData>();
 		for (int i = 1; i <= itemNo; i++) {
-			final GermplasmListData listEntry = createGermplasmListDataItem(i);
+			final GermplasmListData listEntry = createGermplasmListDataItem(germplasmList, i);
 			listEntries.add(listEntry);
 		}
 
 		return listEntries;
 	}
 
-	public static List<GermplasmListData> createGermplasmListDataWithInventoryInfo(final Integer itemNo) {
+	/**
+	 * Create list of GermplasmListData with user-defined gids where the user has an optioned to set default id or not
+	 * 
+	 * @param germplasmList
+	 * @param gids
+	 * @param setDefaultId
+	 * @return
+	 */
+	public static List<GermplasmListData> createGermplasmListData(final GermplasmList germplasmList, final List<Integer> gids,
+			final boolean setDefaultId) {
 		final List<GermplasmListData> listEntries = new ArrayList<GermplasmListData>();
-		for (int i = 1; i <= itemNo; i++) {
-			final GermplasmListData listEntry = createGermplasmListDataItemWithInventoryInfo(i);
-			listEntries.add(listEntry);
-		}
-
-		return listEntries;
-	}
-
-	private static List<GermplasmListData> createGermplasmListDataWithInventoryInfo(final List<Integer> gids) {
-		final List<GermplasmListData> listEntries = new ArrayList<GermplasmListData>();
+		int ctr = 1;
 		for (final Integer gid : gids) {
-			final GermplasmListData listEntry = createGermplasmListDataItemWithInventoryInfo(gid);
+			final GermplasmListData listEntry = createGermplasmListDataItem(germplasmList, ctr, gid, setDefaultId);
+			listEntries.add(listEntry);
+			ctr++;
+		}
+
+		return listEntries;
+	}
+
+	public static List<GermplasmListData> createGermplasmListDataWithInventoryInfo(final GermplasmList germplasmList, final Integer itemNo) {
+		final List<GermplasmListData> listEntries = new ArrayList<GermplasmListData>();
+		for (int i = 1; i <= itemNo; i++) {
+			final GermplasmListData listEntry = createGermplasmListDataItemWithInventoryInfo(germplasmList, i);
 			listEntries.add(listEntry);
 		}
 
 		return listEntries;
 	}
 
-	public static List<ListDataProject> createListDataSnapShotFromListEntries(final GermplasmList germplasmList) {
+	public static List<ListDataProject> createListDataSnapShotFromListEntries(final GermplasmList germplasmList,
+			final List<GermplasmListData> listEntries) {
 
-		final List<GermplasmListData> listEntries = germplasmList.getListData();
 		final List<ListDataProject> listDataProjectEntries = new ArrayList<ListDataProject>();
 
 		for (final GermplasmListData listEntry : listEntries) {
@@ -113,16 +144,22 @@ public class GermplasmListTestDataInitializer {
 		return listDataProjectEntries;
 	}
 
-	protected static GermplasmListData createGermplasmListDataItem(final int i) {
+	protected static GermplasmListData createGermplasmListDataItem(final GermplasmList germplasmList, final int listDataId) {
+		return createGermplasmListDataItem(germplasmList, listDataId, listDataId, true);
+	}
+
+	protected static GermplasmListData createGermplasmListDataItem(final GermplasmList germplasmList, final int listDataId, final int gid,
+			final boolean setDefaultId) {
 		final GermplasmListData listEntry = new GermplasmListData();
-		listEntry.setId(i);
-		listEntry.setDesignation("Designation " + i);
-		listEntry.setEntryCode("EntryCode " + i);
-		listEntry.setEntryId(i);
-		listEntry.setGroupName("GroupName " + i);
-		listEntry.setStatus(1);
-		listEntry.setSeedSource("SeedSource " + i);
-		listEntry.setGid(i);
+		listEntry.setId(setDefaultId ? listDataId : null);
+		listEntry.setList(germplasmList);
+		listEntry.setDesignation("Designation " + listDataId);
+		listEntry.setEntryCode("EntryCode " + listDataId);
+		listEntry.setEntryId(listDataId);
+		listEntry.setGroupName("GroupName " + listDataId);
+		listEntry.setStatus(listDataId);
+		listEntry.setSeedSource("SeedSource " + listDataId);
+		listEntry.setGid(gid);
 		// Default MGID(GROUP ID) is 0
 		listEntry.setMgid(0);
 		return listEntry;
@@ -151,17 +188,9 @@ public class GermplasmListTestDataInitializer {
 		return germplasmLists;
 	}
 
-	protected static GermplasmListData createGermplasmListDataItemWithInventoryInfo(final int i) {
-		final GermplasmListData listEntry = new GermplasmListData();
-		listEntry.setId(i);
-		listEntry.setDesignation("Designation " + i);
-		listEntry.setEntryCode("EntryCode " + i);
-		listEntry.setEntryId(i);
-		listEntry.setGroupName("GroupName " + i);
-		listEntry.setStatus(1);
-		listEntry.setSeedSource("SeedSource " + i);
-		listEntry.setGid(i);
-		listEntry.setInventoryInfo(createInventoryInfo(i, i, i));
+	protected static GermplasmListData createGermplasmListDataItemWithInventoryInfo(final GermplasmList germplasmList, final int listDataId) {
+		final GermplasmListData listEntry = createGermplasmListDataItem(germplasmList, listDataId, listDataId, true);
+		listEntry.setInventoryInfo(createInventoryInfo(listDataId, listDataId, listDataId));
 		return listEntry;
 	}
 
