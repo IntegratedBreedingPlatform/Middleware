@@ -27,7 +27,10 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 
-
+/**
+ * Report base class that provides logic for dynamic generation of columns and rows in the report
+ * not based on the report template but on the provided data source
+ */
 public abstract class AbstractDynamicReporter extends AbstractReporter {
 
 	public static final String COL_EXPR_PREFIX = "col";
