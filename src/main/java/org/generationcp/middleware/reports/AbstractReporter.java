@@ -3,16 +3,26 @@ package org.generationcp.middleware.reports;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRParameter;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.engine.query.JsonQueryExecuterFactory;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import net.sf.jasperreports.export.SimpleXlsReportConfiguration;
 
 import org.slf4j.Logger;
@@ -47,6 +57,9 @@ public abstract class AbstractReporter implements Reporter {
 	JasperPrint jrPrint;
 
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractReporter.class);
+
+    private final static List<String> RECOGNIZED_EXCEL_FORMATS = Arrays.asList("xls", "xlsx");
+    private final static String RECOGNIZED_PDF_FORMAT = "pdf";
 	
 	@Override
 	public String toString() {
@@ -179,8 +192,20 @@ public abstract class AbstractReporter implements Reporter {
 		return fileName;
 	}
 
-	@Override
-	public void asOutputStream(final OutputStream output) throws BuildReportException {
+    @Override
+    public void asOutputStream(OutputStream output) throws BuildReportException {
+        String targetFileExtension = getFileExtension().toLowerCase();
+        if (targetFileExtension.equals(RECOGNIZED_PDF_FORMAT)) {
+            asPDFOutputStream(output);
+        } else if (RECOGNIZED_EXCEL_FORMATS.contains(targetFileExtension)) {
+            asExcelOutputStream(output);
+        } else {
+            // normally, this should not happen, but just in case
+            throw new BuildReportException("unrecognized.report.extension");
+        }
+    }
+
+    public void asPDFOutputStream(final OutputStream output) throws BuildReportException {
 		if (null != this.jrPrint) {
 			try {
 				JasperExportManager.exportReportToPdfStream(this.jrPrint, output);
@@ -191,6 +216,24 @@ public abstract class AbstractReporter implements Reporter {
 			throw new BuildReportException(this.getReportCode());
 		}
 	}
+
+    public void asExcelOutputStream(OutputStream output) throws BuildReportException {
+        if (null != this.jrPrint) {
+            try {
+
+                JRXlsxExporter ex = this.createDefaultExcelExporter();
+                ex.setExporterInput(new SimpleExporterInput(this.jrPrint));
+                ex.setExporterOutput(new SimpleOutputStreamExporterOutput(output));
+
+                ex.exportReport();
+
+            } catch (JRException e) {
+                LOG.error("Exporting report in Excel format was not successful", e);
+            }
+        } else {
+            throw new BuildReportException(this.getReportCode());
+        }
+    }
 
 	/**
 	 * Does not set the input and output of this exporter, only returns a pre-configured xlsx exporter.

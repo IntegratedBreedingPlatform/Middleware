@@ -275,28 +275,6 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 		return params;
 	}
 
-	/**
-	 * Overrides the default super implementation, in PDF format, to Excel format.
-	 */
-	@Override
-	public void asOutputStream(OutputStream output) throws BuildReportException {
-		if (null != this.jrPrint) {
-			try {
-
-				JRXlsxExporter ex = this.createDefaultExcelExporter();
-				ex.setExporterInput(new SimpleExporterInput(this.jrPrint));
-				ex.setExporterOutput(new SimpleOutputStreamExporterOutput(output));
-
-				ex.exportReport();
-
-			} catch (JRException e) {
-				AbstractDynamicReporter.LOG.error("Exporting report in Excel format was not successful", e);
-			}
-		} else {
-			throw new BuildReportException(this.getReportCode());
-		}
-	}
-
 	@Override
 	public String getFileExtension() {
 		return "xlsx";
