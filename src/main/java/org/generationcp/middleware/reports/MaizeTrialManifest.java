@@ -23,6 +23,7 @@ public class MaizeTrialManifest extends AbstractDynamicReporter {
 	public static final String[] UNIQUE_REPORT_KEYS = (String[]) Arrays.asList(DISTANCE_BETWEEN_STATIONS_REPORT_KEY,
 			ROWS_HARVESTED_REPORT_KEY, COLLABORATOR_REPORT_KEY, PLANTING_DATE_REPORT_KEY, HARVEST_DATE_REPORT_KEY,
 			DISTANCE_BETWEEN_ROWS_REPORT_KEY, NET_PLOT_LENGTH_REPORT_KEY).toArray();
+    public static final String MAIZE_MANIFEST_PROGRAM_KEY = "breedingProgram";
 
     protected ReportParameterMapper parameterMapper = new ReportParameterMapper();
 
@@ -47,10 +48,10 @@ public class MaizeTrialManifest extends AbstractDynamicReporter {
 	public Map<String, Object> buildJRParams(final Map<String, Object> args) {
 		final Map<String, Object> params = super.buildJRParams(args);
 
-		params.put("breedingProgram", args.get(PROGRAM_NAME_ARG_KEY));
+		params.put(MAIZE_MANIFEST_PROGRAM_KEY, args.get(PROGRAM_NAME_ARG_KEY));
 
-        List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get(STUDY_CONDITIONS_KEY);
-        for (MeasurementVariable studyCondition : studyConditions) {
+        final List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get(STUDY_CONDITIONS_KEY);
+        for (final MeasurementVariable studyCondition : studyConditions) {
             this.parameterMapper.mapBasicStudyValues(studyCondition, params, studyCondition.getValue());
             mapEnvironmentValue(studyCondition, params, studyCondition.getValue());
         }
@@ -96,7 +97,7 @@ public class MaizeTrialManifest extends AbstractDynamicReporter {
 	 * @param reportParamMap
 	 * @param value
 	 */
-	protected void mapEnvironmentValue(MeasurementVariable var, Map<String, Object> reportParamMap, String value) {
+	protected void mapEnvironmentValue(final MeasurementVariable var, final Map<String, Object> reportParamMap, final String value) {
         // the previous mapping logic available in nurseries / trials are applied
         // dev note : this functionality is maintained within this class instead of creating a subclass of the ReportParameterMapper
         // as there is currently no reliable way of
