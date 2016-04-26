@@ -170,7 +170,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 
             final Location location = this.getLocationDataManager().getLocationByID(locationId);
 
-            if ((location.getCntryid() != null && location.getCntryid() != 0)) {
+            if (location.getCntryid() != null && location.getCntryid() != 0) {
                 final Country country = this.getCountryDao().getById(location.getCntryid());
 
                 variables.add(createPlaceholderCountryMeasurementData(country.getIsofull()));
