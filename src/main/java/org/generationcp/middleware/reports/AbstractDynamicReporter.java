@@ -2,7 +2,6 @@
 package org.generationcp.middleware.reports;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -21,17 +20,13 @@ import net.sf.jasperreports.engine.design.JRDesignSection;
 import net.sf.jasperreports.engine.design.JRDesignStyle;
 import net.sf.jasperreports.engine.design.JRDesignTextField;
 import net.sf.jasperreports.engine.design.JasperDesign;
-import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.engine.type.HorizontalAlignEnum;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
-import net.sf.jasperreports.export.SimpleExporterInput;
-import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 
 public abstract class AbstractDynamicReporter extends AbstractReporter {
 
@@ -50,8 +45,6 @@ public abstract class AbstractDynamicReporter extends AbstractReporter {
 
 	// The left and right margin in pixels
 	private static final int MARGIN = 10;
-	
-	private static final Logger LOG = LoggerFactory.getLogger(AbstractDynamicReporter.class);
 
 	List<String> columnHeaders = null;
 
