@@ -47,11 +47,11 @@ public abstract class AbstractTrialReporter extends AbstractNurseryReporter {
         // trial environment
         @SuppressWarnings("unchecked")
         final List<MeasurementRow> trialObservations = (List<MeasurementRow>) args.get(STUDY_OBSERVATIONS_KEY);
-        // attempt to extract values from the observations. only the value from the first measurement row is necessary
+        // attempt to extract values from the observations. currently, only the value from the first measurement row is used
         if (!trialObservations.isEmpty()) {
 
             for (final MeasurementData data : trialObservations.get(0).getDataList()) {
-                mapEnvironmentValue(data.getMeasurementVariable(), params, data.getValue());
+                this.parameterMapper.mapEnvironmentValue(data.getMeasurementVariable(), params, data.getValue());
             }
         }
 
