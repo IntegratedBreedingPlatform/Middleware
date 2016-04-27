@@ -161,9 +161,11 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			String queryStr =
 					"select " + " lp.listdata_project_id as listdata_project_id, " + " lp.entry_id as entry_id, "
 							+ " lp.designation as designation, " + " lp.group_name as group_name, " + " fn.nval as fnval, "
-							+ " fp.gid as fpgid, " + " mn.nval as mnval, " + " mp.gid as mpgid, "
+							+ " fp.gid as fpgid, " + " mn.nval as mnval, " + " g.mgid as mgid, "
                             + " g.gid as gid, "
-							+ " lp.seed_source as seed_source, " + " lp.duplicate_notes as duplicate_notes " + " from listdata_project lp "
+							+ " lp.seed_source as seed_source, " + " lp.duplicate_notes as duplicate_notes, " + " lp.check_type as check_type, "
+							+ " lp.entry_code as entry_code"
+							+ " from listdata_project lp "
 							+ " left outer join germplsm g on lp.germplasm_id = g.gid "
 							+ " left outer join germplsm mp on g.gpid2 = mp.gid "
 							+ " left outer join names mn on mp.gid = mn.gid and mn.nstat = 1 "
@@ -181,10 +183,12 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			query.addScalar("fnval");
 			query.addScalar("fpgid");
 			query.addScalar("mnval");
-			query.addScalar("mpgid");
+			query.addScalar("mgid");
 			query.addScalar("gid");
 			query.addScalar("seed_source");
 			query.addScalar("duplicate_notes");
+			query.addScalar("check_type");
+			query.addScalar("entry_code");
 
 			this.createListDataProjectRows(listDataProjects, query);
 
@@ -211,6 +215,8 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			Integer gid = (Integer) row[8];
 			String seedSource = (String) row[9];
 			String duplicate = (String) row[10];
+			Integer checkType = (Integer) row[11];
+			String entryCode = (String) row[12];
 
 			ListDataProject listDataProject = new ListDataProject();
 			listDataProject.setListDataProjectId(listDataProjectId);
@@ -225,6 +231,8 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			listDataProject.setSeedSource(seedSource);
 
 			listDataProject.setDuplicate(duplicate);
+			listDataProject.setCheckType(checkType);
+			listDataProject.setEntryCode(entryCode);
 
 			listDataProjects.add(listDataProject);
 		}
