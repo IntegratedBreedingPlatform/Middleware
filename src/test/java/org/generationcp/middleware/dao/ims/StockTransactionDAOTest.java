@@ -56,7 +56,6 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 	private InventoryDetailsTestDataInitializer inventoryDetailsTestDataInitializer;
 
 	private Integer germplasmListId;
-	private Integer advancedListId;
 	private final Map<Integer, Transaction> listDataIdTransactionMap = new HashMap<Integer, Transaction>();
 
 	@Before
@@ -139,14 +138,32 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 	@Test
 	public void testRetrieveSummedInventoryDetailsForListDataProjectListIdForAdvancedListType() {
 
-		this.advancedListId = this.initializeGermplasmsListSnapShot(this.germplasmListId, GermplasmListType.ADVANCED);
-		this.initStockTransactions(this.germplasmListId, this.advancedListId);
+		final Integer advancedListId = this.initializeGermplasmsListSnapShot(this.germplasmListId, GermplasmListType.CROSSES);
+		this.initStockTransactions(this.germplasmListId, advancedListId);
 
-		final GermplasmListType germplasmListType = GermplasmListType.ADVANCED;
+		final GermplasmListType germplasmListType = GermplasmListType.CROSSES;
 
+		this.testRetrieveSummedInventoryDetailsForListDataProjectListId(advancedListId, germplasmListType);
+
+	}
+
+	@Test
+	public void testRetrieveSummedInventoryDetailsForListDataProjectListIdForCrossListType() {
+
+		final Integer crossListId = this.initializeGermplasmsListSnapShot(this.germplasmListId, GermplasmListType.CROSSES);
+		this.initStockTransactions(this.germplasmListId, crossListId);
+
+		final GermplasmListType germplasmListType = GermplasmListType.CROSSES;
+
+		this.testRetrieveSummedInventoryDetailsForListDataProjectListId(crossListId, germplasmListType);
+
+	}
+
+	private void testRetrieveSummedInventoryDetailsForListDataProjectListId(final Integer snapShotListId,
+			final GermplasmListType germplasmListType) {
 		List<InventoryDetails> detailsList = null;
 		try {
-			detailsList = this.dao.retrieveSummedInventoryDetailsForListDataProjectListId(this.advancedListId, germplasmListType);
+			detailsList = this.dao.retrieveSummedInventoryDetailsForListDataProjectListId(snapShotListId, germplasmListType);
 		} catch (final IllegalArgumentException e) {
 			Assert.fail("Expecting not to throw an exception when the method receives a list type either CROSSES or ADVANCED.");
 		}
