@@ -81,6 +81,15 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 		final Integer stockListId = 17;
 		final List<InventoryDetails> inventoryDetailsList = this.dao.retrieveInventoryDetailsForListDataProjectListId(stockListId);
 		Assert.assertNotNull(inventoryDetailsList);
+		this.assertInventoryDetailsFields(inventoryDetailsList);
+	}
+
+	/**
+	 * This method assert specifically every field of InventoryDetails object
+	 * 
+	 * @param inventoryDetailsList
+	 */
+	private void assertInventoryDetailsFields(final List<InventoryDetails> inventoryDetailsList) {
 		for (final InventoryDetails inventoryDetails : inventoryDetailsList) {
 			Assert.assertNotNull(inventoryDetails.getLotId());
 			Assert.assertNotNull(inventoryDetails.getUserId());
@@ -149,6 +158,8 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 		Assert.assertTrue(
 				"Expecting that details list has content to it after the calling retrieveSummedInventoryDetailsForListDataProjectListId() method.",
 				detailsList.size() > 0);
+
+		this.assertInventoryDetailsFields(detailsList);
 
 	}
 
