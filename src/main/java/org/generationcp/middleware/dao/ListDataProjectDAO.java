@@ -161,11 +161,15 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			String queryStr =
 					"select " + " lp.listdata_project_id as listdata_project_id, " + " lp.entry_id as entry_id, "
 							+ " lp.designation as designation, " + " lp.group_name as group_name, " + " fn.nval as fnval, "
-							+ " fp.gid as fpgid, " + " mn.nval as mnval, " + " mp.gid as mpgid, " + " g.gid as gid, "
+							+ " fp.gid as fpgid, " + " mn.nval as mnval, " + " mp.gid as mpgid, "
+                            + " g.gid as gid, "
 							+ " lp.seed_source as seed_source, " + " lp.duplicate_notes as duplicate_notes " + " from listdata_project lp "
-							+ " inner join germplsm g on lp.germplasm_id = g.gid " + " inner join germplsm mp on g.gpid2 = mp.gid "
-							+ " inner join names mn on mp.gid = mn.gid and mn.nstat = 1 " + " inner join germplsm fp on g.gpid1 = fp.gid "
-							+ " inner join names fn on fp.gid = fn.gid and mn.nstat = 1 " + " where lp.list_id = :listId "
+							+ " left outer join germplsm g on lp.germplasm_id = g.gid "
+							+ " left outer join germplsm mp on g.gpid2 = mp.gid "
+							+ " left outer join names mn on mp.gid = mn.gid and mn.nstat = 1 "
+							+ " left outer join germplsm fp on g.gpid1 = fp.gid "
+							+ " left outer join names fn on fp.gid = fn.gid and mn.nstat = 1 "
+							+ " where lp.list_id = :listId "
 							+ " group by entry_id";
 
 			SQLQuery query = this.getSession().createSQLQuery(queryStr);
@@ -191,7 +195,8 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		return listDataProjects;
 	}
 
-	private void createListDataProjectRows(List<ListDataProject> listDataProjects, SQLQuery query) {
+    @SuppressWarnings("unchecked")
+    private void createListDataProjectRows(List<ListDataProject> listDataProjects, SQLQuery query) {
 		List<Object[]> result = query.list();
 
 		for (Object[] row : result) {
@@ -218,6 +223,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			listDataProject.setMgid(mgid);
 			listDataProject.setGermplasmId(gid);
 			listDataProject.setSeedSource(seedSource);
+
 			listDataProject.setDuplicate(duplicate);
 
 			listDataProjects.add(listDataProject);

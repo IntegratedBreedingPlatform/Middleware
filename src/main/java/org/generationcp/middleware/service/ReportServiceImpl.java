@@ -35,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ReportServiceImpl extends Service implements ReportService {
 
-	private final ReporterFactory factory = ReporterFactory.instance();
+    private final ReporterFactory factory = ReporterFactory.instance();
 
 	public ReportServiceImpl() {
 		super();
@@ -75,6 +75,21 @@ public class ReportServiceImpl extends Service implements ReportService {
 		return reporter;
 	}
 
+    @Override
+    public Reporter getStreamGermplasmListReport(String code, Integer germplasmListID, String programName, final OutputStream output)
+            throws MiddlewareException, JRException, IOException, BuildReportException {
+        final Reporter reporter = this.factory.createReporter(code);
+        final Map<String, Object> data = this.extractGermplasmListData(germplasmListID);
+        data.put(AbstractReporter.PROGRAM_NAME_ARG_KEY, programName);
+
+        reporter.buildJRPrint(data);
+        reporter.asOutputStream(output);
+
+        return reporter;
+    }
+
+
+
 	/**
 	 * Creates a Map containing all information needed to generate a report.
 	 * 
@@ -93,13 +108,21 @@ public class ReportServiceImpl extends Service implements ReportService {
 		}
 
 		final Map<String, Object> dataBeans = new HashMap<>();
-		dataBeans.put("studyConditions", studyConditions); // List<MeasurementVariable>
-		dataBeans.put("dataSource", observations); // list<measurementRow>
-		dataBeans.put("studyObservations", wb.getTrialObservations());// list<measurementRow>
-		dataBeans.put("studyId", studyId);// list<measurementRow>
+		dataBeans.put(AbstractReporter.STUDY_CONDITIONS_KEY, studyConditions);
+		dataBeans.put(AbstractReporter.DATA_SOURCE_KEY, observations);
+		dataBeans.put(AbstractReporter.STUDY_OBSERVATIONS_KEY, wb.getTrialObservations());
+		dataBeans.put("studyId", studyId);
 
 		return dataBeans;
 	}
+
+    protected Map<String, Object> extractGermplasmListData(Integer germplasmListID) {
+        // currently, only a blank map is returned as the current requirements for germplasm reports do not require dynamic data
+        Map<String, Object> params = new HashMap<>();
+        params.put(AbstractReporter.STUDY_CONDITIONS_KEY, new ArrayList<MeasurementVariable>());
+        params.put(AbstractReporter.DATA_SOURCE_KEY, new ArrayList());
+        return params;
+    }
 
 	protected List<MeasurementVariable> appendCountryInformation(final List<MeasurementVariable> originalConditions) {
 		Integer locationId = null;
@@ -139,8 +162,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 
 	/***
 	 * Retrieves the Location ID from condition variable; Returns null if the condition value is an empty string
-	 * 
-	 * @param locationId
+	 *
 	 * @param condition
 	 * @param termId
 	 * @return
@@ -159,7 +181,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 		return this.factory.getReportKeys();
 	}
 
-	/**
+    /**
 	 * Local method to add information about male and female parents. The information is appended in the form of new {@link MeasurementData}
 	 * elements for each {@link MeasurementRow} provided
 	 * 
@@ -185,15 +207,15 @@ public class ReportServiceImpl extends Service implements ReportService {
 					row.getDataList().add(new MeasurementData("f_cross_name", female.getSelectionHistory()));
 					row.getDataList().add(new MeasurementData("f_tabbr", "NA")); // put source trial abbreviation
 					row.getDataList().add(new MeasurementData("f_locycle", "NA")); // put source trial cycle
-					row.getDataList().add(new MeasurementData("f_ent", "-99")); // put source trial entry
-					row.getDataList().add(new MeasurementData("f_lid", "-99")); // put source location id
+					row.getDataList().add(new MeasurementData("f_ent", "0")); // put source trial entry
+					row.getDataList().add(new MeasurementData("f_lid", "0")); // put source location id
 
 					row.getDataList().add(new MeasurementData("m_selHist", male.getSelectionHistory()));
 					row.getDataList().add(new MeasurementData("m_cross_name", male.getSelectionHistory()));
 					row.getDataList().add(new MeasurementData("m_tabbr", "NA")); // put source trial abbreviation
 					row.getDataList().add(new MeasurementData("m_locycle", "NA")); // put source trial cycle
-					row.getDataList().add(new MeasurementData("m_ent", "-99")); // put source trial entry
-					row.getDataList().add(new MeasurementData("m_lid", "-99")); // put source location id
+					row.getDataList().add(new MeasurementData("m_ent", "0")); // put source trial entry
+					row.getDataList().add(new MeasurementData("m_lid", "0")); // put source location id
 				}
 			}
 		}

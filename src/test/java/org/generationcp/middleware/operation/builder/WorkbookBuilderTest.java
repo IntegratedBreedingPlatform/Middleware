@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2013, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.operation.builder;
@@ -28,12 +28,17 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.operation.transformer.etl.MeasurementVariableTransformer;
 import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
 import org.generationcp.middleware.pojos.ErrorCode;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.junit.Assert;
@@ -120,7 +125,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	public void testGetTrialObservationsForNursery() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
 
-		final int id = this.dataImportService.saveDataset(workbook, PROGRAM_UUID);
+		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID);
 
 		final Workbook createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
 
@@ -155,7 +160,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	public void testGetTrialObservationsForTrial() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 
-		final int id = this.dataImportService.saveDataset(workbook, PROGRAM_UUID);
+		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID);
 
 		final Workbook createdWorkbook = this.fieldbookService.getTrialDataSet(id);
 
@@ -295,11 +300,12 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 		// add trial instance (also added in conditions)
 		workbook.getFactors().add(WorkbookTestDataInitializer.createTrialInstanceMeasurementVariable(1));
-		final VariableTypeList factorsVariableTypeList = this.variableTypeListTransformer.transform(workbook.getFactors(), PROGRAM_UUID);
+		final VariableTypeList factorsVariableTypeList =
+				this.variableTypeListTransformer.transform(workbook.getFactors(), WorkbookBuilderTest.PROGRAM_UUID);
 		final VariableTypeList conditionsVariableTypeList =
-				this.variableTypeListTransformer.transform(workbook.getConditions(), PROGRAM_UUID);
+				this.variableTypeListTransformer.transform(workbook.getConditions(), WorkbookBuilderTest.PROGRAM_UUID);
 		final VariableTypeList constantsVariableTypeList =
-				this.variableTypeListTransformer.transform(workbook.getConstants(), PROGRAM_UUID);
+				this.variableTypeListTransformer.transform(workbook.getConstants(), WorkbookBuilderTest.PROGRAM_UUID);
 		final VariableList conditions =
 				this.transformMeasurementVariablesToVariableList(workbook.getConditions(), conditionsVariableTypeList);
 		final VariableList constants = this.transformMeasurementVariablesToVariableList(workbook.getConstants(), constantsVariableTypeList);
@@ -341,9 +347,9 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
 
-		this.dataImportService.saveDataset(workbook, true, false, PROGRAM_UUID);
+		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID);
 
-		List<MeasurementRow> result =
+		final List<MeasurementRow> result =
 				this.workbookBuilder.buildTrialObservations(workbook.getTrialDatasetId(), workbook.getTrialConditions(),
 						workbook.getTrialConstants());
 
@@ -358,8 +364,56 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	}
 
-	private boolean isTermIdExists(int termId, List<MeasurementData> dataList) {
-		for (MeasurementData data : dataList) {
+	@Test
+	public void testBuildConditionVariablesOnTrial() {
+		//final int noOfObservations, final StudyType studyType, final String studyName, final int trialNo, final boolean hasMultipleLocations
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(10, StudyType.T, "Test study", 1, true);
+		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID);
+
+		// create measurement variables of condition types
+		final List<MeasurementVariable> conditionMeasurementVariableList = workbook.getStudyConditions();
+		VariableTypeList conditionVariableTypeList = variableTypeListTransformer.transform(conditionMeasurementVariableList, PROGRAM_UUID);
+
+		// create measurement variables of trial environement types
+		final List<MeasurementVariable> trialEnvironmentMeasurementVariableList = workbook.getTrialConditions();
+		VariableTypeList trialEnvironmentVariableTypeList =
+				variableTypeListTransformer.transform(trialEnvironmentMeasurementVariableList, PROGRAM_UUID);
+
+		final VariableList conditionVariables =
+				this.transformMeasurementVariablesToVariableList(conditionMeasurementVariableList, conditionVariableTypeList);
+		final VariableList trialEnvironmentVariables =
+				this.transformMeasurementVariablesToVariableList(trialEnvironmentMeasurementVariableList, trialEnvironmentVariableTypeList);
+
+		final List<MeasurementVariable> result =
+				this.workbookBuilder.buildConditionVariables(conditionVariables, trialEnvironmentVariables, true);
+
+		int noOfConditionsWithTrialEnvironmentPhenotypicType = 0;
+		for (MeasurementVariable measurementVariable : result) {
+			if (measurementVariable.getRole().equals(PhenotypicType.TRIAL_ENVIRONMENT)) {
+				noOfConditionsWithTrialEnvironmentPhenotypicType++;
+			}
+		}
+
+		Assert.assertTrue(
+				"Expecting that the number of condition with trial environment phenotypic type is " + trialEnvironmentVariables.size() +
+						" but returned " + noOfConditionsWithTrialEnvironmentPhenotypicType,
+				trialEnvironmentVariables.size() >= noOfConditionsWithTrialEnvironmentPhenotypicType);
+
+		List<String> trialEnvironmentVariableNames = new ArrayList<String>();
+		for(Variable variable : trialEnvironmentVariables.getVariables()) {
+			trialEnvironmentVariableNames.add(variable.getVariableType().getLocalName());
+		}
+
+		for(MeasurementVariable measurementVariable : result){
+			if(trialEnvironmentVariableNames.contains(measurementVariable.getName())){
+				Assert.assertTrue("Expecting that TRIAL_ENVIRONMENT is set as the phenotypic type for trial environment variables",
+						measurementVariable.getRole().equals(PhenotypicType.TRIAL_ENVIRONMENT) );
+			}
+		}
+	}
+
+	private boolean isTermIdExists(final int termId, final List<MeasurementData> dataList) {
+		for (final MeasurementData data : dataList) {
 			if (data.getMeasurementVariable().getTermId() == termId) {
 				return true;
 			}
@@ -389,6 +443,91 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		}
 
 		return variableList;
+	}
+
+	@Test
+	public void testCreateMeasurementVariable() {
+		final int termId = TermId.TRIAL_INSTANCE_FACTOR.getId();
+		final StandardVariable stdVariable =
+				this.createStandardVariable(termId, "TRIAL INSTANCE", "Trial instance - enumerated (number)", "Trial instance", "Number",
+						"Enumerated", DataType.NUMERIC_VARIABLE.getName());
+		final VariableType varType = VariableType.ENVIRONMENT_DETAIL;
+		final DmsProject project = this.createDmsProject(1);
+		final int rank = 1;
+		final ProjectProperty localNameProjectProp = this.createProjectProperty(project, varType.getId(), "VAR_NAME", rank);
+		final ProjectProperty localDescProjectProp =
+				this.createProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), "VAR_DESC", rank);
+		final ProjectProperty stdVarProjectProp =
+				this.createProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), Integer.toString(termId), rank);
+		final List<ProjectProperty> projectProperties =
+				this.createProjectProperties(localNameProjectProp, localDescProjectProp, stdVarProjectProp);
+		final String value = "1";
+		final Double minRange = null;
+		final Double maxRange = null;
+		final MeasurementVariable measurementVariable =
+				this.workbookBuilder.createMeasurementVariable(stdVariable, localNameProjectProp, projectProperties, value, minRange,
+						maxRange, varType);
+		Assert.assertNotNull(measurementVariable);
+		Assert.assertEquals(stdVariable.getId(), measurementVariable.getTermId());
+		Assert.assertEquals(localNameProjectProp.getValue(), measurementVariable.getName());
+		Assert.assertEquals(stdVariable.getDescription(), measurementVariable.getDescription());
+		Assert.assertEquals(stdVariable.getProperty().getName(), measurementVariable.getProperty());
+		Assert.assertEquals(stdVariable.getScale().getName(), measurementVariable.getScale());
+		Assert.assertEquals(stdVariable.getMethod().getName(), measurementVariable.getMethod());
+		Assert.assertEquals(stdVariable.getDataType().getName(), measurementVariable.getDataType());
+		Assert.assertEquals(value, measurementVariable.getValue());
+		Assert.assertEquals(minRange, measurementVariable.getMinRange());
+		Assert.assertEquals(maxRange, measurementVariable.getMaxRange());
+		Assert.assertTrue(measurementVariable.isFactor());
+		Assert.assertEquals(stdVariable.getDataType().getId(), measurementVariable.getDataTypeId().intValue());
+		Assert.assertEquals(
+				this.workbookBuilder.getMeasurementVariableTransformer().transformPossibleValues(stdVariable.getEnumerations()),
+				measurementVariable.getPossibleValues());
+		Assert.assertEquals(varType.getRole(), measurementVariable.getRole());
+		Assert.assertEquals(varType, measurementVariable.getVariableType());
+	}
+
+	private List<ProjectProperty> createProjectProperties(final ProjectProperty... projectProps) {
+		final List<ProjectProperty> projectProperties = new ArrayList<>();
+		for (final ProjectProperty projectProperty : projectProps) {
+			projectProperties.add(projectProperty);
+		}
+		return projectProperties;
+	}
+
+	private DmsProject createDmsProject(final int id) {
+		final DmsProject project = new DmsProject();
+		project.setProjectId(id);
+		return project;
+	}
+
+	private ProjectProperty createProjectProperty(final DmsProject project, final Integer typeId, final String value, final int rank) {
+		final ProjectProperty projectProperty = new ProjectProperty();
+		projectProperty.setProject(project);
+		projectProperty.setTypeId(typeId);
+		projectProperty.setValue(value);
+		projectProperty.setRank(rank);
+		return projectProperty;
+	}
+
+	private StandardVariable createStandardVariable(final int id, final String name, final String description, final String property,
+			final String scale, final String method, final String datatype) {
+		final StandardVariable stdVariable = new StandardVariable();
+		stdVariable.setId(id);
+		stdVariable.setName(name);
+		stdVariable.setDescription(description);
+		stdVariable.setProperty(this.createTerm(100, property));
+		stdVariable.setScale(this.createTerm(200, scale));
+		stdVariable.setMethod(this.createTerm(300, method));
+		stdVariable.setDataType(this.createTerm(DataType.getByName(datatype).getId(), datatype));
+		return stdVariable;
+	}
+
+	private Term createTerm(final Integer id, final String name) {
+		final Term term = new Term();
+		term.setId(id);
+		term.setName(name);
+		return term;
 	}
 
 }

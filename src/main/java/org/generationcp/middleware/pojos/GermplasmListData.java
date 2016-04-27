@@ -48,7 +48,7 @@ import org.hibernate.annotations.NotFoundAction;
 @NamedQueries({@NamedQuery(name = "deleteGermplasmListDataByListId", query = "DELETE FROM GermplasmListData WHERE list = :listId"),})
 @Entity
 @Table(name = "listdata")
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="listdata")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "listdata")
 public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	private static final long serialVersionUID = 1L;
@@ -106,6 +106,40 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	@Transient
 	private ListDataInventory inventoryInfo;
+
+	/***
+	 * The following will only be field when we are getting the parents, otherwise, they won't be set
+	 */
+
+	/**
+	 * The preferred name of the female parent (nval in the database table)
+	 */
+	@Transient
+	private String femaleParent = null;
+
+	/**
+	 * GID of the female parent (gpid1 in the database table)
+	 */
+	@Transient
+	private Integer fgid = null;
+
+	/**
+	 * The preferred name of the male parent (nval in the database table)
+	 */
+	@Transient
+	private String maleParent = "";
+
+	/**
+	 * GID of the male parent (gpid2 in the database table)
+	 */
+	@Transient
+	private Integer mgid = null;
+
+	/**
+	 * The Group ID of the germplasm. It is mapped to germplsm.mgid column in the database.
+	 */
+	@Transient
+	private Integer groupId = 0;
 
 	public GermplasmListData() {
 
@@ -323,7 +357,6 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	@Override
 	public Integer getGermplasmId() {
-
 		return this.gid;
 	}
 
@@ -334,42 +367,61 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	@Override
 	public String getFemaleParent() {
-
-		return null;
+		return this.femaleParent;
 	}
 
 	@Override
 	public Integer getFgid() {
-
-		return null;
+		return this.fgid;
 	}
 
 	@Override
 	public String getMaleParent() {
-
-		return "";
+		return this.maleParent;
 	}
 
 	@Override
 	public Integer getMgid() {
-		return null;
+		return this.mgid;
 	}
 
 	@Override
 	public String getCheckTypeDescription() {
-
 		return null;
 	}
 
 	@Override
 	public String getStockIDs() {
-
 		return "";
 	}
 
 	@Override
 	public String getSeedAmount() {
-
 		return "";
 	}
+
+	public void setFemaleParent(final String femaleParent) {
+		this.femaleParent = femaleParent;
+	}
+
+	public void setFgid(final Integer fgid) {
+		this.fgid = fgid;
+	}
+
+	public void setMaleParent(final String maleParent) {
+		this.maleParent = maleParent;
+	}
+
+	public void setMgid(final Integer mgid) {
+		this.mgid = mgid;
+	}
+
+	public Integer getGroupId() {
+		return this.groupId;
+	}
+
+	public void setGroupId(final Integer groupId) {
+		this.groupId = groupId;
+	}
+
 }

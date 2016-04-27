@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.service;
@@ -19,11 +19,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.annotation.Resource;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -69,6 +70,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.FieldbookListUtil;
 import org.generationcp.middleware.util.Util;
@@ -79,6 +81,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
+
+	@Resource
+	private GermplasmGroupingService germplasmGroupingService;
 
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
 
@@ -249,8 +254,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				}
 			}
 
-			if (variates !=null && !variates.isEmpty()) {
-				final Measurements measurements = new Measurements(this.getActiveSession(), this.getPhenotypeSaver());
+			if (variates != null && !variates.isEmpty()) {
+				final Measurements measurements =
+						new Measurements(this.getActiveSession(), this.getPhenotypeSaver(), this.getPhenotypeOutlierSaver());
 				measurements.saveMeasurements(observations);
 			}
 
@@ -264,15 +270,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	}
 
-
-
 	@Override
 	public List<Method> getAllBreedingMethods(final boolean filterOutGenerative) {
 		final List<Method> methodList =
 				filterOutGenerative ? this.getGermplasmDataManager().getAllMethodsNotGenerative() : this.getGermplasmDataManager()
 						.getAllMethods();
-				FieldbookListUtil.sortMethodNamesInAscendingOrder(methodList);
-				return methodList;
+		FieldbookListUtil.sortMethodNamesInAscendingOrder(methodList);
+		return methodList;
 	}
 
 	@Override
@@ -290,11 +294,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Integer saveNurseryAdvanceGermplasmList(final List<Pair<Germplasm, List<Name>>> germplasms,
 			final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList,
-			List<Pair<Germplasm, List<Attribute>>> germplasmAttributes)
-					throws MiddlewareQueryException {
+			List<Pair<Germplasm, List<Attribute>>> germplasmAttributes) throws MiddlewareQueryException {
 
 		final GermplasmDAO germplasmDao = this.getGermplasmDao();
-		final NameDAO nameDao = this.getNameDao();
 		final GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
 
 		final long startTime = System.currentTimeMillis();
@@ -333,16 +335,24 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					if (germplasm.getLgid() == null) {
 						germplasm.setLgid(germplasm.getGid() != null ? germplasm.getGid() : Integer.valueOf(0));
 					}
+
 					germplasm = germplasmDao.save(germplasm);
+
+					for (final Name name : nameList) {
+						// Germplasm and Name entities are currently only mapped as uni-directional OneToMany so we need to manage the Name
+						// side of the relationship link (Name.germplasmId) manually.
+						name.setGermplasmId(germplasm.getGid());
+						germplasm.getNames().add(name);
+					}
+
+					// inherit 'selection history at fixation' names of parent if parent is part of a group (= has mgid)
+					if (germplasm.getMgid() > 0) {
+						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm);
+					}
+
 					// set Lgid to GID if it's value was not set previously
 					if (germplasm.getLgid().equals(Integer.valueOf(0))) {
 						germplasm.setLgid(germplasm.getGid());
-					}
-
-					// Save name entries
-					for (final Name name : nameList) {
-						name.setGermplasmId(germplasm.getGid());
-						nameDao.save(name);
 					}
 
 					// Save Germplasm attributes
@@ -703,6 +713,38 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
+	public Integer updateGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList) {
+		final GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
+
+		final long startTime = System.currentTimeMillis();
+
+		try {
+
+			germplasmListDao.update(germplasmList);
+
+			// Save germplasms, names, list data
+			for (final Pair<Germplasm, GermplasmListData> pair : listDataItems) {
+
+				final Germplasm germplasm = pair.getLeft();
+				final GermplasmListData germplasmListData = pair.getRight();
+
+				germplasmListData.setGid(germplasm.getGid());
+				germplasmListData.setList(germplasmList);
+				this.getGermplasmListDataDAO().update(germplasmListData);
+			}
+
+		} catch (final MiddlewareQueryException e) {
+			FieldbookServiceImpl.LOG.error("Error encountered with FieldbookService.updateNurseryCrossesGermplasmList(germplasmList="
+					+ germplasmList + "): " + e.getMessage());
+			throw e;
+		}
+
+		FieldbookServiceImpl.LOG.debug("========== updateGermplasmList Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
+
+		return germplasmList.getId();
+	}
+
+	@Override
 	public Person getPersonById(final int id) {
 		return this.getUserDataManager().getPersonById(id);
 	}
@@ -1054,6 +1096,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public StandardVariable getStandardVariableByName(final String name, final String programUUID) {
 		return this.getStandardVariableBuilder().getByName(name, programUUID);
+	}
+
+	GermplasmGroupingService getGermplasmGroupingService() {
+		return this.germplasmGroupingService;
+	}
+
+	void setGermplasmGroupingService(GermplasmGroupingService germplasmGroupingService) {
+		this.germplasmGroupingService = germplasmGroupingService;
 	}
 
 }

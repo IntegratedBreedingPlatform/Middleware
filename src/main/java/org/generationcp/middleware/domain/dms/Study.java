@@ -13,6 +13,7 @@ package org.generationcp.middleware.domain.dms;
 
 import java.io.Serializable;
 
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
@@ -65,8 +66,8 @@ public class Study implements Serializable {
 		return this.getDisplayValueAsInt(TermId.PI_ID);
 	}
 
-	public String getType() {
-		return this.getDisplayValue(TermId.STUDY_TYPE);
+	public StudyType getType() {
+		return StudyType.getStudyType(this.getDisplayValue(TermId.STUDY_TYPE));
 	}
 
 	public Integer getStartDate() {

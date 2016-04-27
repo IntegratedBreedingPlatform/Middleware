@@ -12,10 +12,12 @@
 package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -145,4 +147,74 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		return query.executeUpdate();
 	}
 
+	public List<GermplasmListData> getListDataWithParents(Integer listID) {
+		List<GermplasmListData> germplasmListData = new ArrayList<GermplasmListData>();
+
+		if (listID == null) {
+			return germplasmListData;
+		}
+
+		try {
+
+			String queryStr = "select  lp.lrecid as lrecid,  lp.entryid as entryid,  lp.desig as desig,  lp.grpname as grpname, "
+					+ " fn.nval as fnval,  fp.gid as fpgid,  mn.nval as mnval,  mp.gid as mpgid,  g.gid as gid,  lp.source as source  "
+					+ "from listdata lp  inner join germplsm g on lp.gid = g.gid  "
+					+ "left outer join germplsm mp on g.gpid2 = mp.gid  "
+					+ "left outer join names mn on mp.gid = mn.gid and mn.nstat = 1  "
+					+ "left outer join germplsm fp on g.gpid1 = fp.gid  "
+					+ "left outer join names fn on fp.gid = fn.gid and mn.nstat = 1  "
+					+ "where lp.listid = :listId group by entryid";
+
+			SQLQuery query = this.getSession().createSQLQuery(queryStr);
+			query.setParameter("listId", listID);
+			query.addScalar("lrecid");
+			query.addScalar("entryid");
+			query.addScalar("desig");
+			query.addScalar("grpname");
+			query.addScalar("fnval");
+			query.addScalar("fpgid");
+			query.addScalar("mnval");
+			query.addScalar("mpgid");
+			query.addScalar("gid");
+			query.addScalar("source");
+
+			this.createGermplasmListDataRows(germplasmListData, query);
+
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error in getListDataWithParents=" + listID + " in GermplasmListDataDAO: " + e.getMessage(), e);
+		}
+
+		return germplasmListData;
+	}
+
+	private void createGermplasmListDataRows(List<GermplasmListData> germplasmListDataList, SQLQuery query) {
+		List<Object[]> result = query.list();
+
+		for (Object[] row : result) {
+			Integer id = (Integer) row[0];
+			Integer entryId = (Integer) row[1];
+			String designation = (String) row[2];
+			String parentage = (String) row[3];
+			String femaleParent = (String) row[4];
+			Integer fgid = (Integer) row[5];
+			String maleParent = (String) row[6];
+			Integer mgid = (Integer) row[7];
+			Integer gid = (Integer) row[8];
+			String seedSource = (String) row[9];
+
+			GermplasmListData germplasmListData = new GermplasmListData();
+			germplasmListData.setId(id);
+			germplasmListData.setEntryId(entryId);
+			germplasmListData.setDesignation(designation);
+			germplasmListData.setGroupName(parentage);
+			germplasmListData.setFemaleParent(femaleParent);
+			germplasmListData.setFgid(fgid);
+			germplasmListData.setMaleParent(maleParent);
+			germplasmListData.setMgid(mgid);
+			germplasmListData.setGid(gid);
+			germplasmListData.setSeedSource(seedSource);
+
+			germplasmListDataList.add(germplasmListData);
+		}
+	}
 }

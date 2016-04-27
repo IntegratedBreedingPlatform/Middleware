@@ -592,6 +592,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
+	public List<GermplasmListData> retrieveListDataWithParents(Integer listID) {
+		return this.getGermplasmListDataDAO().getListDataWithParents(listID);
+	}
+
+	@Override
 	public Integer retrieveDataListIDFromListDataProjectListID(final Integer listDataProjectListID) {
 		return this.getGermplasmListDAO().getListDataListIDFromListDataProjectListID(listDataProjectListID);
 	}

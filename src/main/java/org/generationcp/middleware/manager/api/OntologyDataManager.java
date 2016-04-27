@@ -286,6 +286,14 @@ public interface OntologyDataManager {
 	 */
 	Term addProperty(String name, String definition, int isA) throws MiddlewareQueryException;
 
+    /**
+     *
+     * @param subjectId
+     * @param objectId
+     * @param typeId
+     */
+    void addCvTermRelationship(int subjectId, int objectId, int typeId);
+
 	/**
 	 * Given the termId, retrieve the Property POJO.
 	 *
@@ -485,6 +493,14 @@ public interface OntologyDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	void deleteTerm(int cvTermId, CvId cvId) throws MiddlewareQueryException;
+
+    /**
+     *
+     * @param originalVariableTermID the term ID of the standard variable that we are retrieving the derived analysis variable of
+     * @param analysisMethodID the term ID representing the analysis method used in deriving the analysis variable
+     * @return the term ID of the derived analysis variable if available, or null if non-existing
+     */
+    Integer retrieveDerivedAnalysisVariable(Integer originalVariableTermID, Integer analysisMethodID);
 
 	/**
 	 * Delete term and relationship.

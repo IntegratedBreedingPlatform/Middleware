@@ -30,34 +30,39 @@ public class MeasurementVariableTransformer extends Transformer {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<MeasurementVariable>();
 
 		if (variableTypeList != null && !variableTypeList.isEmpty()) {
-			for (final DMSVariableType variableType : variableTypeList.getVariableTypes()) {
-				final StandardVariable stdVariable = variableType.getStandardVariable();
-				String label = getLabelBasedOnRole(stdVariable.getPhenotypicType());
-				if (!isFactor && isTrial) {
-					label = PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
-				}
-
-				final MeasurementVariable measurementVariable =
-						new MeasurementVariable(stdVariable.getId(), variableType.getLocalName(), stdVariable.getDescription(), stdVariable
-								.getScale().getName(), stdVariable.getMethod().getName(), stdVariable.getProperty().getName(), stdVariable
-								.getDataType().getName(), "", label);
-				measurementVariable.setRole(variableType.getRole());
-				measurementVariable.setVariableType(variableType.getVariableType());
-				measurementVariable.setFactor(isFactor);
-				measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
-				measurementVariable.setPossibleValues(this.transformPossibleValues(stdVariable.getEnumerations()));
-				if (stdVariable.getConstraints() != null) {
-					measurementVariable.setMinRange(stdVariable.getConstraints().getMinValue());
-					measurementVariable.setMaxRange(stdVariable.getConstraints().getMaxValue());
-				}
-				if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
-					measurementVariable.setTreatmentLabel(variableType.getTreatmentLabel());
-				}
+			for (final DMSVariableType dmsVariableType : variableTypeList.getVariableTypes()) {
+				final MeasurementVariable measurementVariable = this.transform(dmsVariableType, isFactor, isTrial);
 				measurementVariables.add(measurementVariable);
 			}
 		}
 
 		return measurementVariables;
+	}
+
+	public MeasurementVariable transform(final DMSVariableType dmsVariableType, final boolean isFactor, final boolean isTrial) {
+		final StandardVariable stdVariable = dmsVariableType.getStandardVariable();
+		String label = this.getLabelBasedOnRole(stdVariable.getPhenotypicType());
+		if (!isFactor && isTrial) {
+			label = PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
+		}
+
+		final MeasurementVariable measurementVariable =
+				new MeasurementVariable(stdVariable.getId(), dmsVariableType.getLocalName(), stdVariable.getDescription(), stdVariable
+						.getScale().getName(), stdVariable.getMethod().getName(), stdVariable.getProperty().getName(), stdVariable
+						.getDataType().getName(), "", label);
+		measurementVariable.setRole(dmsVariableType.getRole());
+		measurementVariable.setVariableType(dmsVariableType.getVariableType());
+		measurementVariable.setFactor(isFactor);
+		measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
+		measurementVariable.setPossibleValues(this.transformPossibleValues(stdVariable.getEnumerations()));
+		if (stdVariable.getConstraints() != null) {
+			measurementVariable.setMinRange(stdVariable.getConstraints().getMinValue());
+			measurementVariable.setMaxRange(stdVariable.getConstraints().getMaxValue());
+		}
+		if (dmsVariableType.getTreatmentLabel() != null && !"".equals(dmsVariableType.getTreatmentLabel())) {
+			measurementVariable.setTreatmentLabel(dmsVariableType.getTreatmentLabel());
+		}
+		return measurementVariable;
 	}
 
 	public List<MeasurementVariable> transform(final VariableList variableList, final boolean isFactor, final boolean isStudy) {
@@ -66,29 +71,9 @@ public class MeasurementVariableTransformer extends Transformer {
 
 		if (variableList != null && !variableList.isEmpty()) {
 			for (final Variable variable : variableList.getVariables()) {
-				final DMSVariableType variableType = variable.getVariableType();
-				final StandardVariable stdVariable = variableType.getStandardVariable();
-				String label = getLabelBasedOnRole(stdVariable.getPhenotypicType());
-				// for trial constants
-				if (!isFactor && !isStudy) {
-					label = PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().get(0);
-				}
-				final MeasurementVariable measurementVariable =
-						new MeasurementVariable(stdVariable.getId(), variableType.getLocalName(), stdVariable.getDescription(), stdVariable
-								.getScale().getName(), stdVariable.getMethod().getName(), stdVariable.getProperty().getName(), stdVariable
-								.getDataType().getName(), "", label);			
-				measurementVariable.setRole(variableType.getRole());
-				measurementVariable.setFactor(isFactor);
+				final DMSVariableType dmsVariableType = variable.getVariableType();
+				final MeasurementVariable measurementVariable = this.transform(dmsVariableType, isFactor, !isStudy);
 				measurementVariable.setValue(variable.getDisplayValue());
-				measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
-				measurementVariable.setPossibleValues(this.transformPossibleValues(stdVariable.getEnumerations()));
-				if (stdVariable.getConstraints() != null) {
-					measurementVariable.setMinRange(stdVariable.getConstraints().getMinValue());
-					measurementVariable.setMaxRange(stdVariable.getConstraints().getMaxValue());
-				}
-				if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
-					measurementVariable.setTreatmentLabel(variableType.getTreatmentLabel());
-				}
 				measurementVariables.add(measurementVariable);
 			}
 		}
@@ -113,8 +98,8 @@ public class MeasurementVariableTransformer extends Transformer {
 		MeasurementVariable measurementVariable = null;
 
 		if (stdVariable != null) {
-			
-			final String label = getLabelBasedOnRole(stdVariable.getPhenotypicType());
+
+			final String label = this.getLabelBasedOnRole(stdVariable.getPhenotypicType());
 
 			measurementVariable =
 					new MeasurementVariable(stdVariable.getId(), stdVariable.getName(), stdVariable.getDescription(), stdVariable

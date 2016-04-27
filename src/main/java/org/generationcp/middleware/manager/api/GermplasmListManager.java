@@ -495,6 +495,13 @@ public interface GermplasmListManager {
 	 */
 	List<ListDataProject> retrieveSnapshotListDataWithParents(Integer listID);
 
+	/**
+	 *
+	 * @param listID
+	 * @return
+	 */
+	List<GermplasmListData> retrieveListDataWithParents(Integer listID);
+
 	Integer retrieveDataListIDFromListDataProjectListID(Integer listDataProjectListID);
 
 	/***

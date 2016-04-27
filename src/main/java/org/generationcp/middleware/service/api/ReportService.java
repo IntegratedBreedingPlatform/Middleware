@@ -39,6 +39,9 @@ public interface ReportService {
 	Reporter getStreamReport(String code, Integer studyId, String programName, OutputStream output) throws MiddlewareException,
 			JRException, IOException, BuildReportException;
 
+    Reporter getStreamGermplasmListReport(String code, Integer germplasmListID, String programName, final OutputStream output)
+            throws MiddlewareException, JRException, IOException, BuildReportException;
+
 	/**
 	 * Returns a Set of keys available to be passed to a ReporterFactory, for generating a particular report. Only keys returned by this
 	 * method can be used as valid codes for ReporterFacotry's createReporter() method.

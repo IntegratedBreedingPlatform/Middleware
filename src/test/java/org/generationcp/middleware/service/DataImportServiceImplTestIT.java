@@ -31,12 +31,10 @@ import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.util.Message;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@RunWith(JUnit4.class)
 public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 	@Autowired
@@ -49,6 +47,12 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	private GeolocationDao geolocationDao;
 
 	private static final String PROGRAM_UUID = "123456789";
+
+	@Before
+	public void setUp() {
+		this.geolocationDao = new GeolocationDao();
+		this.geolocationDao.setSession(this.sessionProvder.getSession());
+	}
 
 	@Test
 	public void testSaveMultiLocationDataset() throws MiddlewareQueryException {
