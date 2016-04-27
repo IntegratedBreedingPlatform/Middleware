@@ -130,7 +130,6 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 	@Test
 	public void testRetrieveSummedInventoryDetailsForListDataProjectListIdForAdvancedListType() {
 
-		this.germplasmListManager.getGermplasmListById(this.germplasmListId);
 		this.advancedListId = this.initializeGermplasmsListSnapShot(this.germplasmListId, GermplasmListType.ADVANCED);
 		this.initStockTransactions(this.germplasmListId, this.advancedListId);
 
