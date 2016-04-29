@@ -1,0 +1,179 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="mae" id="beta8-1">
+		<preConditions onFail="MARK_RAN">
+	    	<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8165 AND name = 'EXPT_DESIGN_SOURCE';</sqlCheck>
+	   	</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+       
+	        INSERT INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`)
+					VALUES (8165,1040,'EXPT_DESIGN_SOURCE','Source of the experimental design. For example the name of csv file used for custom or preset designs.',NULL,0,0);
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id) VALUES (1200,8165,2140),(1210,8165,4030),(1220,8165,6020);
+
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES (8165,1800,'Environment Detail',0),(8165,1800,'Study Detail',0);
+	    </sql>
+	</changeSet>
+
+	<!-- TODO create separate changelog file for Workbench...
+	<changeSet author="naymesh" id="beta9-1">
+	    <sql dbms="mysql" splitStatements="true">
+				INSERT INTO standard_preset VALUES (null, 10, 'BM_LIST_MGR_CUSTOM_REPORT', 'maize', 'list manager maize cimmyt report', <![CDATA['<?xml version="1.0"?>
+				<reports>
+				<profile>cimmyt</profile>
+				<report>
+				<code>MFbShipList</code>
+				<name>Template for shipments, Maize</name>
+				</report>
+				</reports>']]> );
+	    </sql>
+	</changeSet>
+	-->
+
+	<changeSet author="danv" id="beta9-2">
+	 	<preConditions onFail="MARK_RAN">
+	    	<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id = 1900 AND name = 'has analysis variable';</sqlCheck>
+	    </preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm VALUES (1900, 1000, 'has analysis variable', 'Relationship between a standard variable and a derived analysis variable', null, 0, 1);
+	    </sql>
+
+		<!-- Alternative Liquibase DSL way of inserting..
+	    <insert tableName="cvterm">
+	        <column name="cvterm_id" value="1900"/>
+	        <column name="cv_id" value="1000"/>
+	        <column name="name" value="has analysis variable"/>
+	        <column name="definition" value="Relationship between a standard variable and a derived analysis variable"/>
+	        <column name="dbxref_id" value=""/>
+	        <column name="is_obsolete" value="0"/>
+	        <column name="is_relationshiptype" value="1"/>
+	    </insert>
+		-->
+	</changeSet>
+
+	<changeSet author="naymesh" id="beta10-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'udflds' AND CONSTRAINT_NAME='udflds_uc1' and TABLE_SCHEMA = DATABASE();</sqlCheck>
+		</preConditions>
+	    <addUniqueConstraint columnNames="ftable, ftype, fcode" constraintName="udflds_uc1" tableName="udflds" />
+	</changeSet>
+
+	<changeSet author="naymesh" id="beta10-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM udflds WHERE ftable='NAMES' and ftype='NAME' and fcode='SELHISFIX';</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			INSERT INTO `udflds` (`ftable`, `ftype`, `fcode`, `fname`, `ffmt`, `fdesc`, `lfldno`, `fuid`, `fdate`, `scaleid`)
+					VALUES ('NAMES', 'NAME', 'SELHISFIX', 'Selection history at fixation', '-', '-', '0', '0', '20160216', '0');
+	    </sql>
+	</changeSet>
+
+
+    <changeSet author="naymesh" id="beta11-1" objectQuotingStrategy="QUOTE_ALL_OBJECTS">
+    	<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM information_schema.TABLES WHERE TABLE_NAME = 'key_sequence_register' and TABLE_SCHEMA = DATABASE();</sqlCheck>
+		</preConditions>
+	
+		<!-- <tableExists> preCondition could also be used however it requires schema name. 
+			We do not want to hard code schema name in changelog. If there is a way to derive schema name at runtime e.g. using DATABASE() system function that may work. -->
+    
+        <createTable tableName="key_sequence_register">
+            <column name="key_prefix" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="" unique="true" uniqueConstraintName="key_prefix_unique"/>
+            </column>
+            <column name="last_used_sequence" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="optimistic_lock_number" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="aldrin" id="beta11-2">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM information_schema.statistics  WHERE table_schema = DATABASE()
+				AND table_name = 'phenotype_outlier' AND column_name = 'phenotype_id' AND INDEX_NAME = 'unique';</sqlCheck>
+		</preConditions>
+    	<dropIndex indexName="unique" tableName="phenotype_outlier"/>
+	</changeSet>
+	
+	<changeSet author="aldrin" id="beta11-3">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() 
+				AND TABLE_NAME = 'phenotype_outlier' AND COLUMN_NAME = 'date_modified';</sqlCheck>
+		</preConditions>
+    	<addColumn tableName="phenotype_outlier">
+        	<column name="date_modified" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" afterColumn="value">
+        		<constraints nullable="false"/>
+        	</column>
+    	</addColumn>
+	</changeSet>
+
+	<changeSet author="abhishek" id="beta11-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM udflds where ftable='ATRIBUTS' and ftype='PASSPORT' and fcode='PLOT_NUMBER';</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			insert  into `udflds`(`ftable`,`ftype`,`fcode`,`fname`,`ffmt`,`fdesc`,`lfldno`,`fuid`,`fdate`,`scaleid`) values
+				('ATRIBUTS','PASSPORT','PLOT_NUMBER','Plot Number','-','Plot Number of Advanced Germplasm',0,0,20160407,0);
+	    </sql>
+	</changeSet>
+	
+	<changeSet author="abhishek" id="beta11-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM udflds where ftable='ATRIBUTS' and ftype='PASSPORT' and fcode='REP_NUMBER';</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			insert  into `udflds`(`ftable`,`ftype`,`fcode`,`fname`,`ffmt`,`fdesc`,`lfldno`,`fuid`,`fdate`,`scaleid`) values
+				('ATRIBUTS','PASSPORT','REP_NUMBER','Replication Number','-','Replication Number of Advanced Germplasm',0,0,20160407,0);
+	    </sql>
+	</changeSet>
+	
+	<changeSet author="abhishek" id="beta11-6">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM udflds WHERE ftable='ATRIBUTS' and ftype='PASSPORT' and fcode='INSTANCE_NUMBER';</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			insert  into `udflds`(`ftable`,`ftype`,`fcode`,`fname`,`ffmt`,`fdesc`,`lfldno`,`fuid`,`fdate`,`scaleid`) values
+				('ATRIBUTS','PASSPORT','INSTANCE_NUMBER','Trial Instance Number','-','Trial Instance Number of Advanced Germplasm',0,0,20160407,0);
+	    </sql>
+	</changeSet>
+
+	<changeSet author="naymesh" id="beta11-7">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM udflds WHERE ftable='NAMES' and ftype='NAME' and fcode='CODE1';</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			INSERT INTO `udflds` (`ftable`, `ftype`, `fcode`, `fname`, `ffmt`, `fdesc`, `lfldno`, `fuid`, `fdate`, `scaleid`) VALUES
+				('NAMES','NAME','CODE1','Code 1','-','All inbred lines or OPVs that are declared fixed',0,0,20160401,0);
+	    </sql>
+	</changeSet>
+	
+	<changeSet author="naymesh" id="beta11-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM udflds WHERE ftable='NAMES' and ftype='NAME' and fcode='CODE2';</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			INSERT INTO `udflds` (`ftable`, `ftype`, `fcode`, `fname`, `ffmt`, `fdesc`, `lfldno`, `fuid`, `fdate`, `scaleid`) VALUES
+				('NAMES','NAME','CODE2','Code 2','-','All materials (Hybrids, Lines, and OPVs) in advanced trials ',0,0,20160401,0);
+	    </sql>
+	</changeSet>
+	
+	<changeSet author="naymesh" id="beta11-9">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM udflds WHERE ftable='NAMES' and ftype='NAME' and fcode='CODE3';</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			INSERT INTO `udflds` (`ftable`, `ftype`, `fcode`, `fname`, `ffmt`, `fdesc`, `lfldno`, `fuid`, `fdate`, `scaleid`) VALUES
+				('NAMES','NAME','CODE3','Code 3','-','All finished materials available for release or use in development',0,0,20160401,0);
+	    </sql>
+	</changeSet>
+ </databaseChangeLog>

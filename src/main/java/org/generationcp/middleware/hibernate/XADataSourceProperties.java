@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
-class XADataSourceProperties {
+public class XADataSourceProperties {
 
 	static final String CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT = "connectionpool.borrow.connection.timeout";
 
@@ -62,7 +62,7 @@ class XADataSourceProperties {
 
 	private static final Logger LOG = LoggerFactory.getLogger(XADataSourceProperties.class);
 
-	XADataSourceProperties(final Properties properties) {
+	public XADataSourceProperties(final Properties properties) {
 
 		this.host = this.getPropertyValue(properties, this.host, XADataSourceProperties.DB_HOST);
 		this.port = this.getPropertyValue(properties, this.port, XADataSourceProperties.DB_PORT);
@@ -104,7 +104,7 @@ class XADataSourceProperties {
 	/**
 	 * @return the host
 	 */
-	String getHost() {
+	public String getHost() {
 		return this.host;
 	}
 
@@ -132,7 +132,7 @@ class XADataSourceProperties {
 	/**
 	 * @return the port
 	 */
-	String getPort() {
+	public String getPort() {
 		return this.port;
 	}
 
@@ -146,7 +146,7 @@ class XADataSourceProperties {
 	/**
 	 * @return the userName
 	 */
-	String getUserName() {
+	public String getUserName() {
 		return this.userName;
 	}
 

@@ -36,7 +36,7 @@ public class XADatasourceUtilities {
 	 * @param properties {@link Map} of bean properties that must be set
 	 * @return the newly created root bean definition
 	 */
-	RootBeanDefinition createRootBeanDefinition(final Class<?> klass, final Map<String, Object> attributes,
+	public RootBeanDefinition createRootBeanDefinition(final Class<?> klass, final Map<String, Object> attributes,
 			final Map<String, Object> properties) {
 
 		final RootBeanDefinition rootBeanDefinition = new RootBeanDefinition(klass);
@@ -69,7 +69,7 @@ public class XADatasourceUtilities {
 	 * @param singleConnectionDataSource wraps a single JDBC Connection which is required during startup
 	 * @return a list of crop databases
 	 */
-	List<String> retrieveCropDatabases(final SingleConnectionDataSource singleConnectionDataSource) {
+	public List<String> retrieveCropDatabases(final SingleConnectionDataSource singleConnectionDataSource) {
 		Connection connection = null;
 		final List<String> cropDatabases = new ArrayList<String>();
 		try {
@@ -102,7 +102,7 @@ public class XADatasourceUtilities {
 	 * @return {@link SingleConnectionDataSource} to the workbench database. Only one connection can be made
 	 *        from this object.
 	 */
-	SingleConnectionDataSource getSingleConnectionDataSource(final XADataSourceProperties xaDataSourceProperties) {
+	public SingleConnectionDataSource getSingleConnectionDataSource(final XADataSourceProperties xaDataSourceProperties) {
 		final SingleConnectionDataSource singleConnectionDataSource = new SingleConnectionDataSource();
 		singleConnectionDataSource.setAutoCommit(false);
 		singleConnectionDataSource.setUsername(xaDataSourceProperties.getUserName());

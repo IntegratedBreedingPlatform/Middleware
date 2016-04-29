@@ -292,6 +292,13 @@
 			<artifactId>fest-reflect</artifactId>
 			<version>1.4.1</version>
 		</dependency>
+		
+		<!-- Liquibase -->
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+			<version>3.5.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
