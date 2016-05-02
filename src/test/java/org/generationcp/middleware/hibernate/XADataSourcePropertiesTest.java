@@ -26,7 +26,7 @@ public class XADataSourcePropertiesTest {
 		Assert.assertEquals(xaDataSourceProperties.getXaDriverName(), XATestUtility.CONNECTIONPOOL_XADRIVER_NAME);
 		Assert.assertEquals(xaDataSourceProperties.getBorrowConnectionTimeout(), XATestUtility.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT);
 		Assert.assertEquals(xaDataSourceProperties.getMaintenanceInterval(), XATestUtility.CONNECTIONPOOL_MAINTENANCE_INTERVAL);
-		Assert.assertEquals(xaDataSourceProperties.getTestQuery(), XATestUtility.CONNECTIONPOOL_TEST_QUERY);
+		Assert.assertEquals(xaDataSourceProperties.getReapTimeout(), XATestUtility.CONNECTIONPOOL_REAP_TIMEOUT);
 		Assert.assertEquals(xaDataSourceProperties.getMinPoolSize(), XATestUtility.CONNECTIONPOOL_MIN_POOL_SIZE);
 		Assert.assertEquals(xaDataSourceProperties.getMaxPoolSize(), XATestUtility.CONNECTIONPOOL_MAX_POOL_SIZE);
 		Assert.assertEquals(xaDataSourceProperties.getMaxIdleTime(), XATestUtility.CONNECTIONPOOL_MAX_IDLE_TIME);
@@ -47,12 +47,12 @@ public class XADataSourcePropertiesTest {
 
 		Assert.assertEquals(xaDataSourceProperties.getWorkbenchDbName(), "workbench");
 		Assert.assertEquals(xaDataSourceProperties.getXaDriverName(), "com.mysql.jdbc.jdbc2.optional.MysqlXADataSource");
-		Assert.assertEquals(xaDataSourceProperties.getBorrowConnectionTimeout(), "30");
+		Assert.assertEquals(xaDataSourceProperties.getBorrowConnectionTimeout(), "600");
 		Assert.assertEquals(xaDataSourceProperties.getMaintenanceInterval(), "60");
-		Assert.assertEquals(xaDataSourceProperties.getTestQuery(), "Select 1");
+		Assert.assertEquals(xaDataSourceProperties.getReapTimeout(), "600");
 		Assert.assertEquals(xaDataSourceProperties.getMinPoolSize(), "3");
 		Assert.assertEquals(xaDataSourceProperties.getMaxPoolSize(), "50");
-		Assert.assertEquals(xaDataSourceProperties.getMaxIdleTime(), "30");
+		Assert.assertEquals(xaDataSourceProperties.getMaxIdleTime(), "120");
 
 		Assert.assertEquals(xaDataSourceProperties.getHibernateConfigurationLocation(), "classpath:ibpmidware_hib.cfg.xml");
 

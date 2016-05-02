@@ -20,7 +20,7 @@ public class DataSourceProperties {
 
 	static final String CONNECTIONPOOL_MAX_IDLE_TIME = "connectionpool.max.idle.time";
 
-	static final String CONNECTIONPOOL_TEST_QUERY = "connectionpool.test.query";
+	static final String CONNECTIONPOOL_REAP_TIMEOUT = "connectionpool.reap.timeout";
 
 	static final String CONNECTIONPOOL_XADRIVER_NAME = "connectionpool.xadriver.name";
 
@@ -34,7 +34,7 @@ public class DataSourceProperties {
 
 	static final String DB_PASSWORD = "db.password";
 
-	private String borrowConnectionTimeout = "30";
+	private String borrowConnectionTimeout = "600";
 
 	private String host = "localhost";
 
@@ -46,8 +46,6 @@ public class DataSourceProperties {
 
 	private String port = "3306";
 
-	private String testQuery = "Select 1";
-
 	private String userName = "root";
 
 	private String password = "";
@@ -56,11 +54,11 @@ public class DataSourceProperties {
 
 	private String xaDriverName = "com.mysql.jdbc.jdbc2.optional.MysqlXADataSource";
 
-	private String maxIdleTime = "30";
+	private String maxIdleTime = "120";
 
 	private final String hibernateConfigurationLocation = "classpath:ibpmidware_hib.cfg.xml";
 
-	private static final Logger LOG = LoggerFactory.getLogger(DataSourceProperties.class);
+	private static final Logger LOG = LoggerFactory.getLogger(XADataSourceProperties.class);
 
 	public DataSourceProperties(final Properties properties) {
 
@@ -79,6 +77,7 @@ public class DataSourceProperties {
 		this.minPoolSize = this.getPropertyValue(properties, this.minPoolSize, DataSourceProperties.CONNECTIONPOOL_MIN_POOL_SIZE);
 		this.maxPoolSize = this.getPropertyValue(properties, this.maxPoolSize, DataSourceProperties.CONNECTIONPOOL_MAX_POOL_SIZE);
 		this.maxIdleTime = this.getPropertyValue(properties, this.maxIdleTime, DataSourceProperties.CONNECTIONPOOL_MAX_IDLE_TIME);
+		this.reapTimeout = this.getPropertyValue(properties, this.reapTimeout, DataSourceProperties.CONNECTIONPOOL_REAP_TIMEOUT);
 
 	}
 
@@ -137,13 +136,6 @@ public class DataSourceProperties {
 	}
 
 	/**
-	 * @return the testQuery
-	 */
-	String getTestQuery() {
-		return this.testQuery;
-	}
-
-	/**
 	 * @return the userName
 	 */
 	public String getUserName() {
@@ -183,6 +175,10 @@ public class DataSourceProperties {
 	 */
 	public String getHibernateConfigurationLocation() {
 		return this.hibernateConfigurationLocation;
+	}
+
+	public String getReapTimeout() {
+		return this.reapTimeout ;
 	}
 
 }
