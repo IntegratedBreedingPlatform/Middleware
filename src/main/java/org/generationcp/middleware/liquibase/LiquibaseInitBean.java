@@ -42,7 +42,7 @@ public class LiquibaseInitBean implements BeanDefinitionRegistryPostProcessor {
 
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-		// NOOP
+		// We do not have need overriding or adding properties to beans so this is a NOOP.
 	}
 
 	@Override
@@ -50,42 +50,48 @@ public class LiquibaseInitBean implements BeanDefinitionRegistryPostProcessor {
 		final SingleConnectionDataSource singleConnectionDataSource =
 				this.datasourceUtilities.getSingleConnectionDataSource(this.dataSourceProperties);
 
-		final List<String> cropDatabases = this.datasourceUtilities.retrieveCropDatabases(singleConnectionDataSource);
+		// Workbench
+		LOG.debug(String.format("Creating DataSource and SpringLiquibase beans for database '%s'.",
+				this.dataSourceProperties.getWorkbenchDbName()));
+		this.registerBeanDefinitions(registry, this.dataSourceProperties.getWorkbenchDbName(), this.dataSourceProperties,
+				"db_changelog_workbench.xml");
 
+		// Crop databases
+		final List<String> cropDatabases = this.datasourceUtilities.retrieveCropDatabases(singleConnectionDataSource);
 		for (final String cropDatabase : cropDatabases) {
-			LOG.debug(String.format("Creating '%s' DataSource and SpringLiquibase beans.", cropDatabase));
-			this.registerBeanDefinitions(registry, cropDatabase, this.dataSourceProperties);
+			LOG.debug(String.format("Creating DataSource and SpringLiquibase beans for database '%s'.", cropDatabase));
+			this.registerBeanDefinitions(registry, cropDatabase, this.dataSourceProperties, "db_changelog_crop.xml");
 		}
 	}
 
-	void registerBeanDefinitions(final BeanDefinitionRegistry registry, final String cropDatabaseName,
-			final XADataSourceProperties dataSourceProperties) {
+	void registerBeanDefinitions(final BeanDefinitionRegistry registry, final String databaseName,
+			final XADataSourceProperties dataSourceProperties, final String changeLogName) {
 
 		/* The DataSource root bean definition. */
 		BeanDefinitionBuilder dataSourceBeanDefinitionBuilder =
 				BeanDefinitionBuilder.rootBeanDefinition(DriverManagerDataSource.class)
 				.addPropertyValue("driverClassName", "com.mysql.jdbc.Driver") //
 				.addPropertyValue("url",
-						"jdbc:mysql://" + dataSourceProperties.getHost() + ":" + dataSourceProperties.getPort() + "/" + cropDatabaseName) //
+						"jdbc:mysql://" + dataSourceProperties.getHost() + ":" + dataSourceProperties.getPort() + "/" + databaseName) //
 				.addPropertyValue("username", dataSourceProperties.getUserName()) //
 				.addPropertyValue("password", dataSourceProperties.getPassword()); //
 
-		final String dataSourceBeanName = cropDatabaseName.toUpperCase() + "_LiquibaseDataSource";
+		final String dataSourceBeanName = databaseName.toUpperCase() + "_LiquibaseDataSource";
 		registry.registerBeanDefinition(dataSourceBeanName, dataSourceBeanDefinitionBuilder.getBeanDefinition());
 
-		LOG.debug(String.format("Created data source bean defintion for database '%s' with bean name '%s'.", cropDatabaseName, dataSourceBeanName));
+		LOG.debug(String.format("Created data source bean defintion for database '%s' with bean name '%s'.", databaseName, dataSourceBeanName));
 
 		/* The SpringLiquibase root bean definition. */
 		BeanDefinitionBuilder springLiquibaseBeanDefinitionBuilder = BeanDefinitionBuilder.rootBeanDefinition(SpringLiquibase.class)
 				.addPropertyValue("dataSource", dataSourceBeanDefinitionBuilder.getBeanDefinition()) //
-				.addPropertyValue("changeLog", "classpath:crop_db_changelog.xml") //
+				.addPropertyValue("changeLog", "classpath:" + changeLogName) //
 				.addPropertyValue("dropFirst", false) //
 				.addPropertyValue("shouldRun", true); // TODO drive this via profiles, for PROD we want this false.
 
-		final String springLiquibaseBeanName = cropDatabaseName.toUpperCase() + "_SpringLiquibaseBean";
+		final String springLiquibaseBeanName = databaseName.toUpperCase() + "_SpringLiquibaseBean";
 		registry.registerBeanDefinition(springLiquibaseBeanName, springLiquibaseBeanDefinitionBuilder.getBeanDefinition());
 
-		LOG.debug(String.format("Created SpringLiquibase bean defintion for database '%s' with bean name '%s'.", cropDatabaseName,
+		LOG.debug(String.format("Created SpringLiquibase bean defintion for database '%s' with bean name '%s'.", databaseName,
 				springLiquibaseBeanName));
 	}
 

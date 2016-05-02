@@ -153,7 +153,7 @@ public class XADataSourceProperties {
 	/**
 	 * @return the workbenchDbName
 	 */
-	String getWorkbenchDbName() {
+	public String getWorkbenchDbName() {
 		return this.workbenchDbName;
 	}
 

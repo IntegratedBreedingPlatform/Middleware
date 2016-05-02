@@ -22,22 +22,7 @@
 	    </sql>
 	</changeSet>
 
-	<!-- TODO create separate changelog file for Workbench...
-	<changeSet author="naymesh" id="beta9-1">
-	    <sql dbms="mysql" splitStatements="true">
-				INSERT INTO standard_preset VALUES (null, 10, 'BM_LIST_MGR_CUSTOM_REPORT', 'maize', 'list manager maize cimmyt report', <![CDATA['<?xml version="1.0"?>
-				<reports>
-				<profile>cimmyt</profile>
-				<report>
-				<code>MFbShipList</code>
-				<name>Template for shipments, Maize</name>
-				</report>
-				</reports>']]> );
-	    </sql>
-	</changeSet>
-	-->
-
-	<changeSet author="danv" id="beta9-2">
+	<changeSet author="danv" id="beta9-1">
 	 	<preConditions onFail="MARK_RAN">
 	    	<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id = 1900 AND name = 'has analysis variable';</sqlCheck>
 	    </preConditions>
