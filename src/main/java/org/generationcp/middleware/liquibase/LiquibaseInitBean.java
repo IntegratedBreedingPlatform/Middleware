@@ -22,6 +22,13 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 import liquibase.integration.spring.SpringLiquibase;
 
+/**
+ * Dynamically registers {@link SpringLiquibase} bean definitions into the application context for all crop databases + workbench. The
+ * process of liquibase applying db changes happens as part of SpringLiquibase bean init sequence, see
+ * {@link SpringLiquibase#afterPropertiesSet()}
+ * 
+ * @author Naymesh Mistry
+ */
 public class LiquibaseInitBean implements BeanDefinitionRegistryPostProcessor {
 
 	private XADatasourceUtilities datasourceUtilities;
