@@ -20,7 +20,7 @@ class XADataSourceProperties {
 
 	static final String CONNECTIONPOOL_MAX_IDLE_TIME = "connectionpool.max.idle.time";
 
-	static final String CONNECTIONPOOL_TEST_QUERY = "connectionpool.test.query";
+	static final String CONNECTIONPOOL_REAP_TIMEOUT = "connectionpool.reap.timeout";
 
 	static final String CONNECTIONPOOL_XADRIVER_NAME = "connectionpool.xadriver.name";
 
@@ -34,7 +34,7 @@ class XADataSourceProperties {
 
 	static final String DB_PASSWORD = "db.password";
 
-	private String borrowConnectionTimeout = "30";
+	private String borrowConnectionTimeout = "600";
 
 	private String host = "localhost";
 
@@ -46,8 +46,6 @@ class XADataSourceProperties {
 
 	private String port = "3306";
 
-	private String testQuery = "Select 1";
-
 	private String userName = "root";
 
 	private String password = "";
@@ -56,9 +54,11 @@ class XADataSourceProperties {
 
 	private String xaDriverName = "com.mysql.jdbc.jdbc2.optional.MysqlXADataSource";
 
-	private String maxIdleTime = "30";
+	private String maxIdleTime = "120";
 
 	private final String hibernateConfigurationLocation = "classpath:ibpmidware_hib.cfg.xml";
+
+	private String reapTimeout = "600";
 
 	private static final Logger LOG = LoggerFactory.getLogger(XADataSourceProperties.class);
 
@@ -75,10 +75,10 @@ class XADataSourceProperties {
 						XADataSourceProperties.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT);
 		this.maintenanceInterval =
 				this.getPropertyValue(properties, this.maintenanceInterval, XADataSourceProperties.CONNECTIONPOOL_MAINTENANCE_INTERVAL);
-		this.testQuery = this.getPropertyValue(properties, this.testQuery, XADataSourceProperties.CONNECTIONPOOL_TEST_QUERY);
 		this.minPoolSize = this.getPropertyValue(properties, this.minPoolSize, XADataSourceProperties.CONNECTIONPOOL_MIN_POOL_SIZE);
 		this.maxPoolSize = this.getPropertyValue(properties, this.maxPoolSize, XADataSourceProperties.CONNECTIONPOOL_MAX_POOL_SIZE);
 		this.maxIdleTime = this.getPropertyValue(properties, this.maxIdleTime, XADataSourceProperties.CONNECTIONPOOL_MAX_IDLE_TIME);
+		this.reapTimeout = this.getPropertyValue(properties, this.reapTimeout, XADataSourceProperties.CONNECTIONPOOL_REAP_TIMEOUT);
 
 	}
 
@@ -137,13 +137,6 @@ class XADataSourceProperties {
 	}
 
 	/**
-	 * @return the testQuery
-	 */
-	String getTestQuery() {
-		return this.testQuery;
-	}
-
-	/**
 	 * @return the userName
 	 */
 	String getUserName() {
@@ -183,6 +176,10 @@ class XADataSourceProperties {
 	 */
 	public String getHibernateConfigurationLocation() {
 		return this.hibernateConfigurationLocation;
+	}
+
+	public String getReapTimeout() {
+		return this.reapTimeout ;
 	}
 
 }

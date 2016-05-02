@@ -19,10 +19,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 @Transactional
 public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PedigreeCimmytWheatServiceImpl.class);
 	private final CimmytWheatNameUtil cimmytWheatNameUtil;
 	private static final int NSTAT_DELETED = 9;
 
@@ -38,30 +41,41 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 
 	@Override
 	public String getCrossExpansion(Integer gid, CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException {
-		return this.getCrossExpansion(gid, null, crossExpansionProperties);
+
+			return this.getCrossExpansion(gid, null, crossExpansionProperties);
+
 	}
 
 	@Override
 	public String getCrossExpansion(Integer gid, Integer level, CrossExpansionProperties crossExpansionProperties)
 			throws MiddlewareQueryException {
-		Germplasm germplasm = this.getGermplasmDataManager().getGermplasmWithPrefName(gid);
-		return this.getCrossExpansion(germplasm, level, crossExpansionProperties);
+	
+			Germplasm germplasm = this.getGermplasmDataManager().getGermplasmWithPrefName(gid);
+			return this.getCrossExpansion(germplasm, level, crossExpansionProperties);
 	}
 
 	@Override
 	public String getCrossExpansion(final Germplasm germplasm, final Integer level, final CrossExpansionProperties crossExpansionProperties)
 			throws MiddlewareQueryException {
-		if (germplasm != null) {
-			try {
-				return this.getCimmytWheatPedigree(germplasm, level == null ? crossExpansionProperties.getCropGenerationLevel("wheat") : level,
-						new Germplasm(), 0, 0, 0, 0, 0);
-			} catch (Exception e) {
-				PedigreeCimmytWheatServiceImpl.LOG.error(e.getMessage(), e);
-				throw new MiddlewareQueryException(e.getMessage(), e);
+
+		
+		final Monitor monitor = MonitorFactory.start("org.generationcp.middleware.service.pedigree.PedigreeCimmytWheatServiceImpl.getCrossExpansion()");
+		try {
+			if (germplasm != null) {
+				try {
+					return this.getCimmytWheatPedigree(germplasm, level == null ? crossExpansionProperties.getCropGenerationLevel("wheat") : level,
+							new Germplasm(), 0, 0, 0, 0, 0);
+				} catch (Exception e) {
+					PedigreeCimmytWheatServiceImpl.LOG.error(e.getMessage(), e);
+					throw new MiddlewareQueryException(e.getMessage(), e);
+				}
+			} else {
+				return "";
 			}
-		} else {
-			return "";
+		} finally {
+			PedigreeCimmytWheatServiceImpl.LOG.info("" + monitor.stop());
 		}
+
 	}
 
 	private List<Name> getCimmytWheatWayNamesList(int gid, List<Integer> ntypeArray, List<Integer> nstatArray, List<Integer> nuiArray)

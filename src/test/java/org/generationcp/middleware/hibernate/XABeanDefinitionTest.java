@@ -56,7 +56,7 @@ public class XABeanDefinitionTest {
 				dataSourceBeanDefinitionProperties.get(XABeanDefinition.MAX_POOL_SIZE));
 		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_MIN_POOL_SIZE,
 				dataSourceBeanDefinitionProperties.get(XABeanDefinition.MIN_POOL_SIZE));
-		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_TEST_QUERY, dataSourceBeanDefinitionProperties.get(XABeanDefinition.TEST_QUERY));
+		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_REAP_TIMEOUT, dataSourceBeanDefinitionProperties.get(XABeanDefinition.REAP_TIMEOUT));
 		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT,
 				dataSourceBeanDefinitionProperties.get(XABeanDefinition.BORROW_CONNECTION_TIMEOUT));
 
