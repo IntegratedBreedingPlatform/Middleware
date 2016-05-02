@@ -78,12 +78,9 @@
 
     <changeSet author="naymesh" id="beta11-1" objectQuotingStrategy="QUOTE_ALL_OBJECTS">
     	<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">SELECT count(*) FROM information_schema.TABLES WHERE TABLE_NAME = 'key_sequence_register' and TABLE_SCHEMA = DATABASE();</sqlCheck>
+			<not><tableExists tableName="key_sequence_register"/></not>
 		</preConditions>
-	
-		<!-- <tableExists> preCondition could also be used however it requires schema name. 
-			We do not want to hard code schema name in changelog. If there is a way to derive schema name at runtime e.g. using DATABASE() system function that may work. -->
-    
+		
         <createTable tableName="key_sequence_register">
             <column name="key_prefix" type="VARCHAR(50)">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="" unique="true" uniqueConstraintName="key_prefix_unique"/>
@@ -99,16 +96,14 @@
 
     <changeSet author="aldrin" id="beta11-2">
         <preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">SELECT count(*) FROM information_schema.statistics  WHERE table_schema = DATABASE()
-				AND table_name = 'phenotype_outlier' AND column_name = 'phenotype_id' AND INDEX_NAME = 'unique';</sqlCheck>
+			<indexExists tableName="phenotype_outlier" indexName="unique" columnNames="phenotype_id"/>
 		</preConditions>
     	<dropIndex indexName="unique" tableName="phenotype_outlier"/>
 	</changeSet>
 	
 	<changeSet author="aldrin" id="beta11-3">
         <preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() 
-				AND TABLE_NAME = 'phenotype_outlier' AND COLUMN_NAME = 'date_modified';</sqlCheck>
+			<not><columnExists tableName="phenotype_outlier" columnName="date_modified"/> </not>
 		</preConditions>
     	<addColumn tableName="phenotype_outlier">
         	<column name="date_modified" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" afterColumn="value">
