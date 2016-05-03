@@ -47,6 +47,11 @@ public class LiquibaseInitBean implements BeanDefinitionRegistryPostProcessor {
 		}
 	}
 
+	LiquibaseInitBean(XADatasourceUtilities datasourceUtilities, XADataSourceProperties dataSourceProperties) {
+		this.datasourceUtilities = datasourceUtilities;
+		this.dataSourceProperties = dataSourceProperties;
+	}
+
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
 		// We do not have need overriding or adding properties to beans so this is a NOOP.

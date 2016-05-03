@@ -480,6 +480,8 @@
 						<include>**/CheckNameFactorsPresentValidationRuleUT.java</include>
 						<include>**/ShowNameHandlingPopUpValidatorUT.java</include>
 						<include>**/ChainValidatorUT.java</include>
+						
+						<include>**/LiquibaseInitBeanTest.java</include>
 
 					</includes>
 				</configuration>
