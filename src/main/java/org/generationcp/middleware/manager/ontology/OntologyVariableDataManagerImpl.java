@@ -479,7 +479,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 					variable.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
 				} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
 					variable.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
-				}
+				} else if (Objects.equals(property.getTypeId(), TermId.CROP_ONTOLOGY_ID.getId())) {
+ 					variable.getProperty().setCropOntologyId(property.getValue());
+  				}
 			}
 
 			// Variable alias and expected range

@@ -44,6 +44,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationTestBase {
 
+	private static final String CROP_ONTOLOGY_ID = "CO:0000001";
+
 	@Autowired
 	private OntologyVariableDataManager variableManager;
 
@@ -100,15 +102,15 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 		Assert.assertEquals("Study usage should be 0", new Integer(0), variable.getStudies() );
 		Assert.assertEquals("Observation usage should be 0", new Integer(0), variable.getObservations());
-
+		Assert.assertEquals("Crop ontology id should be " + CROP_ONTOLOGY_ID, CROP_ONTOLOGY_ID, variable.getProperty().getCropOntologyId());
 	}
 
 	@Test
 	public void testNotRetrievingVariableUsageStatistics() throws Exception {
 		Variable variable = this.variableManager.getVariable(this.testProject.getUniqueID(), this.testVariableInfo.getId(), true, false);
 		Assert.assertNotNull(variable);
-		Assert.assertEquals("Study usage should be -1 i.e. unknow.", new Integer(-1), variable.getStudies() );
-		Assert.assertEquals("Observation usage should be -1 i.e. unknow.", new Integer(-1), variable.getObservations());
+		Assert.assertEquals("Study usage should be -1 i.e. unknown.", new Integer(-1), variable.getStudies() );
+		Assert.assertEquals("Observation usage should be -1 i.e. unknown.", new Integer(-1), variable.getObservations());
 	}
 
 	@Test
@@ -226,7 +228,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.testProperty = new Property();
 		this.testProperty.setName(OntologyDataCreationUtil.getNewRandomName());
 		this.testProperty.setDefinition("Test Property");
-		this.testProperty.setCropOntologyId("CO:0000001");
+		this.testProperty.setCropOntologyId(CROP_ONTOLOGY_ID);
 		this.testProperty.addClass("My New Class");
 		this.propertyManager.addProperty(this.testProperty);
 
@@ -266,7 +268,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.testProperty = new Property();
 		this.testProperty.setName(OntologyDataCreationUtil.getNewRandomName());
 		this.testProperty.setDefinition("Test Property");
-		this.testProperty.setCropOntologyId("CO:0000001");
+		this.testProperty.setCropOntologyId(CROP_ONTOLOGY_ID);
 		this.testProperty.addClass("My New Class");
 		this.propertyManager.addProperty(this.testProperty);
 
