@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -28,6 +27,8 @@ import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.ObjectTypeMapper;
 import org.hibernate.SQLQuery;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Strings;
 
 @SuppressWarnings("unchecked")
 @Transactional
@@ -219,6 +220,7 @@ public class OntologyCommonDAOImpl implements OntologyCommonDAO {
 
 	public void makeFilterClauseByIsFavouritesMethodIdsAndPropertyIds(VariableFilter variableFilter, Map<String, List<Integer>> listParameters) throws MiddlewareException {
 		// check to fetch favourite variables and add filter clause for it
+		filterClause = "";
 		if (variableFilter.isFavoritesOnly()) {
 			filterClause += "  and pf.id is not null";
 		}
@@ -307,7 +309,7 @@ public class OntologyCommonDAOImpl implements OntologyCommonDAO {
 	public List<Integer> getVariableIdsAndAddToFilterClause(VariableFilter variableFilter, List<String> variableTypeNames,
 			Map<String, List<Integer>> listParameters) throws MiddlewareException {
 
-		List<Integer> variableIds = new ArrayList<>();
+		List<Integer> variableIds;
 
 		SQLQuery vSQLQuery = this.ontologyDaoFactory.getActiveSession()
 				.createSQLQuery("select cvterm_id from cvtermprop where type_id = 1800 and value in (:variableTypeNames)");
