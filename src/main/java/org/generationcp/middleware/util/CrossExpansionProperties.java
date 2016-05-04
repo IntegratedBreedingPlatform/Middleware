@@ -73,7 +73,7 @@ public class CrossExpansionProperties {
 
 	private void init() {
 		this.nameTypeOrderCache =
-				CacheBuilder.newBuilder().maximumSize(1000).expireAfterWrite(1000, TimeUnit.MINUTES)
+				CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1000, TimeUnit.MINUTES)
 						.build(new CacheLoader<String, List<String>>() {
 
 							@Override
@@ -84,7 +84,7 @@ public class CrossExpansionProperties {
 						});
 
 		this.generationLevelCache =
-				CacheBuilder.newBuilder().maximumSize(1000).expireAfterWrite(1000, TimeUnit.MINUTES)
+				CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1000, TimeUnit.MINUTES)
 						.build(new CacheLoader<String, Integer>() {
 
 							@Override
@@ -95,7 +95,7 @@ public class CrossExpansionProperties {
 						});
 
 		this.backcrossNotationCache =
-				CacheBuilder.newBuilder().maximumSize(1000).expireAfterWrite(1000, TimeUnit.MINUTES)
+				CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1000, TimeUnit.MINUTES)
 						.build(new CacheLoader<String, ImmutablePair<String, String>>() {
 
 							@Override

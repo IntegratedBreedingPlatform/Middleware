@@ -25,7 +25,7 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 	public void testRetrieveInventoryDetailsForListDataProjectListId() throws MiddlewareQueryException {
 		Integer stockListId = 17;
 		List<InventoryDetails> inventoryDetailsList =
-				this.dao.retrieveInventoryDetailsForListDataProjectListId(stockListId, GermplasmListType.CROSSES);
+				this.dao.retrieveInventoryDetailsForListDataProjectListId(stockListId);
 		Assert.assertNotNull(inventoryDetailsList);
 		for (InventoryDetails inventoryDetails : inventoryDetailsList) {
 			Assert.assertNotNull(inventoryDetails.getLotId());

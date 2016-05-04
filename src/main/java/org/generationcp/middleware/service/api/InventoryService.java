@@ -54,8 +54,7 @@ public interface InventoryService {
 	void addLotAndTransaction(InventoryDetails details, GermplasmListData listData, ListDataProject listDataProject)
 			throws MiddlewareQueryException;
 
-	List<InventoryDetails> getInventoryListByListDataProjectListId(Integer listDataProjectListId, GermplasmListType type)
-			throws MiddlewareQueryException;
+	List<InventoryDetails> getInventoryListByListDataProjectListId(Integer listDataProjectListId) throws MiddlewareQueryException;
 
 	List<InventoryDetails> getSummedInventoryListByListDataProjectListId(Integer listDataProjectListId, GermplasmListType type)
 			throws MiddlewareQueryException;

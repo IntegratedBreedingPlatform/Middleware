@@ -14,8 +14,10 @@ package org.generationcp.middleware.dao;
 import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
@@ -32,15 +34,24 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	private static final String DUMMY_STOCK_ID = "USER-1-1";
     private static final Integer TEST_STUDY_ID = 1;
 	private static final Integer testGid1 = 1;
-    private static final Integer UNKNOWN_GID_VALUE = 0;
+	private static final Integer testGid1_Gpid1 = 2;
+	private static final Integer testGid1_Gpid2 = 3;
 
+	private static final Integer GROUP_ID = 10;
 
 	private boolean testDataSetup = false;
 
 	private GermplasmDAO dao;
 
+	private Integer germplasmGID;
+
+	private Name preferredName;
+
 	@Autowired
 	private InventoryDataManager inventoryDM;
+
+	@Autowired
+	private GermplasmDataManager germplasmDataDM;
 
 	@Before
 	public void setUp() throws Exception {
@@ -54,14 +65,12 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			this.updateProgenitors();
 			this.testDataSetup = true;
 		}
+		this.initializeGermplasms();
 	}
 
 	private void updateProgenitors() throws MiddlewareQueryException {
-		/*Germplasm germplasm1 = this.germplasmDataDM.getGermplasmByGID(GermplasmDAOTest.testGid1);
-		GermplasmDAOTest.oldGid1_Gpid1 = germplasm1.getGpid1();
-		GermplasmDAOTest.oldGid1_Gpid2 = germplasm1.getGpid2();
 		this.germplasmDataDM.updateProgenitor(GermplasmDAOTest.testGid1, GermplasmDAOTest.testGid1_Gpid1, 1);
-		this.germplasmDataDM.updateProgenitor(GermplasmDAOTest.testGid1, GermplasmDAOTest.testGid1_Gpid2, 2);*/
+		this.germplasmDataDM.updateProgenitor(GermplasmDAOTest.testGid1, GermplasmDAOTest.testGid1_Gpid2, 2);
 	}
 
 	private void updateInventory() throws MiddlewareQueryException {
@@ -98,12 +107,10 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchForGermplasmsExactMatchGID() throws Exception {
-
-		final List<Germplasm> results = this.dao.searchForGermplasms("1", Operation.EQUAL, false, false);
-		Assert.assertTrue(results.size() == 1);
-
+		final List<Germplasm> results = this.dao.searchForGermplasms(this.germplasmGID.toString(), Operation.EQUAL, false, false, false);
+		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
 	}
-    
+
     @Test
     public void testRetrieveStudyParentGIDsKnownValuesOnly() {
         // reminder : test needs proper test data setup, similar to other tests for this class
@@ -114,53 +121,47 @@ public class GermplasmDAOTest extends IntegrationTestBase {
             Assert.assertNotEquals("Query should not return values that have unknown parent GIDs", UNKNOWN_GID_VALUE, germplasmEntry.getGpid2() );
 		}
     }
-    
+
 
 	@Test
 	public void testSearchForGermplasmsExactMatchGermplasmName() throws Exception {
-
-		List<Germplasm> results = this.dao.searchForGermplasms("(CML454 X CML451)-B-3-1-1", Operation.EQUAL, false, false);
-		Assert.assertTrue(results.size() == 1);
-
-		results = this.dao.searchForGermplasms("(CML454 X CML451)", Operation.EQUAL, false, false);
-		Assert.assertTrue(results.isEmpty());
-
+		final List<Germplasm> results = this.dao.searchForGermplasms(this.preferredName.getNval(), Operation.EQUAL, false, false, false);
+		Assert.assertEquals("The results should contain one germplasm since there's only one test data with '"
+				+ this.preferredName.getNval() + "' name", 1, results.size());
 	}
 
 	@Test
 	public void testSearchForGermplasmsStartsWithGID() throws Exception {
-
-		final List<Germplasm> results = this.dao.searchForGermplasms("1%", Operation.LIKE, false, false);
-		Assert.assertFalse(results.isEmpty());
+		final List<Germplasm> results =
+				this.dao.searchForGermplasms(this.germplasmGID.toString() + "%", Operation.LIKE, false, false, false);
+		Assert.assertEquals(
+				"The results should contain one germplasm since there's only one test data with gid that starts with " + this.germplasmGID,
+				1, results.size());
 	}
 
 	@Test
 	public void testSearchForGermplasmsStartsWithGermplasmName() throws Exception {
-
-		final List<Germplasm> results = this.dao.searchForGermplasms("(CML454%", Operation.LIKE, false, false);
-		Assert.assertFalse(results.isEmpty());
-
+		final List<Germplasm> results =
+				this.dao.searchForGermplasms(this.preferredName.getNval() + "%", Operation.LIKE, false, false, false);
+		Assert.assertEquals("The results should contain one germplasm since there's only one test data with name that starts with "
+				+ this.preferredName.getNval(), 1, results.size());
 	}
 
 	@Test
 	public void testSearchForGermplasmsContainsGID() throws Exception {
-
-		final List<Germplasm> results = this.dao.searchForGermplasms("%1%", Operation.LIKE, false, false);
-		Assert.assertFalse(results.isEmpty());
-
-		final List<Germplasm> startsWithResults = this.dao.searchForGermplasms("1%", Operation.LIKE, false, false);
-		Assert.assertTrue(results.containsAll(startsWithResults));
+		final List<Germplasm> results =
+				this.dao.searchForGermplasms("%" + this.germplasmGID.toString() + "%", Operation.LIKE, false, false, false);
+		Assert.assertEquals(
+				"The results should contain one germplasm since there's only one test data with gid that contains " + this.germplasmGID, 1,
+				results.size());
 	}
 
 	@Test
 	public void testSearchForGermplasmsContainsGermplasmName() throws Exception {
-
-		final List<Germplasm> results = this.dao.searchForGermplasms("%CML454%", Operation.LIKE, false, false);
-		Assert.assertFalse(results.isEmpty());
-
-		final List<Germplasm> startsWithResults = this.dao.searchForGermplasms("CML454%", Operation.LIKE, false, false);
-		Assert.assertTrue(results.containsAll(startsWithResults));
-
+		final List<Germplasm> results =
+				this.dao.searchForGermplasms("%" + this.preferredName.getNval() + "%", Operation.LIKE, false, false, false);
+		Assert.assertTrue("The results should contain one germplasm since there's only one test data with name that contains "
+				+ this.preferredName.getNval(), results.size() == 1);
 	}
 
 	@Test
@@ -186,35 +187,36 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertFalse(results.isEmpty());
 
 		final List<Germplasm> startsWithResults =
-				this.dao.searchForGermplasms(GermplasmDAOTest.DUMMY_STOCK_ID.substring(0, 3) + "%", Operation.LIKE, false, false);
+				this.dao.searchForGermplasms(GermplasmDAOTest.DUMMY_STOCK_ID.substring(0, 3) + "%", Operation.LIKE, false, false, false);
 		Assert.assertTrue(results.containsAll(startsWithResults));
 	}
 
 	@Test
 	public void testSearchForGermplasmsWithInventory() throws Exception {
-		final List<Germplasm> results = this.dao.searchForGermplasms("1%", Operation.LIKE, false, false);
-		final List<Germplasm> resultsWithInventoryOnly = this.dao.searchForGermplasms("1%", Operation.LIKE, false, true);
+		final List<Germplasm> results = this.dao.searchForGermplasms("1%", Operation.LIKE, false, false, false);
+		final List<Germplasm> resultsWithInventoryOnly = this.dao.searchForGermplasms("1%", Operation.LIKE, false, true, false);
 		Assert.assertNotEquals(results.size(), resultsWithInventoryOnly.size());
 	}
 
 	@Test
 	public void testSearchForGermplasmsIncludeParents() throws Exception {
-		List<Germplasm> results = this.dao.searchForGermplasms(GermplasmDAOTest.testGid1.toString(), Operation.EQUAL, false, false);
-		List<Germplasm> resultsWithParents =
-				this.dao.searchForGermplasms(GermplasmDAOTest.testGid1.toString(), Operation.EQUAL, true, false);
-		Assert.assertNotEquals(results.size(), resultsWithParents.size());
-		Assert.assertEquals(1, results.size());
-		Assert.assertEquals(3, resultsWithParents.size());
-
-		results = this.dao.searchForGermplasms("2", Operation.EQUAL, false, false);
-		resultsWithParents = this.dao.searchForGermplasms("2", Operation.EQUAL, true, false);
-		Assert.assertEquals(results.size(), resultsWithParents.size());
+		final List<Germplasm> results = this.dao.searchForGermplasms(this.germplasmGID.toString(), Operation.EQUAL, true, false, false);
+		Assert.assertEquals(
+				"The result should contain three germplasms(one is the actual result and the other two is the male and female parents)", 3,
+				results.size());
 	}
 
 	@Test
 	public void testSearchForGermplasmsEmptyKeyword() throws Exception {
-		final List<Germplasm> results = this.dao.searchForGermplasms("", Operation.EQUAL, false, false);
+		final List<Germplasm> results = this.dao.searchForGermplasms("", Operation.EQUAL, false, false, false);
 		Assert.assertTrue(results.isEmpty());
+	}
+
+	@Test
+	public void testSearchForGermplasmsIncludeMGMembers() throws Exception {
+		final List<Germplasm> results = this.dao.searchForGermplasms(this.germplasmGID.toString(), Operation.EQUAL, false, false, true);
+		Assert.assertEquals("The result should contain 2 germplasms (one is the actual result and the other is the MG member)", 2,
+				results.size());
 	}
 
 	@Test
@@ -247,20 +249,20 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetManagementGroupMembers() {
-		final List<Germplasm> groupMembers = this.dao.getManagementGroupMembers(1);
-		Assert.assertNotNull("getManagementGroupMembers() should never return null when supplied with proper mgid.", groupMembers);
+		List<Germplasm> groupMembers = this.dao.getManagementGroupMembers(1);
+		Assert.assertFalse("getManagementGroupMembers() should never return null when supplied with proper mgid.", groupMembers.isEmpty());
 
-		this.dao.getManagementGroupMembers(null);
+		groupMembers = this.dao.getManagementGroupMembers(null);
 		Assert.assertTrue("getManagementGroupMembers() should return empty collection when supplied mgid = null.", groupMembers.isEmpty());
 
-		this.dao.getManagementGroupMembers(0);
+		groupMembers = this.dao.getManagementGroupMembers(0);
 		Assert.assertTrue("getManagementGroupMembers() should return empty collection when supplied mgid = 0.", groupMembers.isEmpty());
 	}
 
 	@Test
 	public void testSaveGermplasmNamesThroughHibernateCascade() {
 
-		Germplasm germplasm = new Germplasm();
+		final Germplasm germplasm = new Germplasm();
 		germplasm.setMethodId(1);
 		germplasm.setGnpgs(-1);
 		germplasm.setGpid1(0);
@@ -276,7 +278,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.dao.save(germplasm);
 		Assert.assertNotNull(germplasm.getGid());
 
-		Name name1 = new Name();
+		final Name name1 = new Name();
 		name1.setTypeId(5);
 		name1.setNstat(1);
 		name1.setUserId(1);
@@ -285,7 +287,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		name1.setNdate(20160101);
 		name1.setReferenceId(0);
 
-		Name name2 = new Name();
+		final Name name2 = new Name();
 		name2.setTypeId(5);
 		name2.setNstat(1);
 		name2.setUserId(1);
@@ -298,18 +300,37 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		germplasm.getNames().add(name2);
 
 		// Name collection mapping is uni-directional OneToMany right now, so the other side of the relationship has to be managed manually.
-		for (Name name : germplasm.getNames()) {
+		for (final Name name : germplasm.getNames()) {
 			name.setGermplasmId(germplasm.getGid());
 		}
 
 		// In real app flush will happen automatically on tx commit. We don't commit tx in tests, so flush manually.
 		this.sessionProvder.getSession().flush();
 
-		for (Name name : germplasm.getNames()) {
+		for (final Name name : germplasm.getNames()) {
 			// No explicit save of name entity anywhere but should still be saved through cascade on flush.
 			Assert.assertNotNull(name.getNid());
 			Assert.assertEquals(germplasm.getGid(), name.getGermplasmId());
 		}
+	}
+
+	private void initializeGermplasms() {
+		final Germplasm fParent = GermplasmTestDataInitializer.createGermplasm(1001);
+		final Integer fParentGID = this.germplasmDataDM.addGermplasm(fParent, fParent.getPreferredName());
+
+		final Germplasm mParent = GermplasmTestDataInitializer.createGermplasm(1002);
+		final Integer mParentGID = this.germplasmDataDM.addGermplasm(mParent, mParent.getPreferredName());
+
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1003);
+		germplasm.setMgid(GermplasmDAOTest.GROUP_ID);
+		germplasm.setGpid1(fParentGID);
+		germplasm.setGpid2(mParentGID);
+		this.preferredName = germplasm.getPreferredName();
+		this.germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
+
+		final Germplasm mgMember = GermplasmTestDataInitializer.createGermplasm(1004);
+		mgMember.setMgid(GermplasmDAOTest.GROUP_ID);
+		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName());
 	}
 
 }
