@@ -1028,7 +1028,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	public List<Germplasm> getGermplasmParentsForStudy(final int studyId) {
-		final SQLQuery queryGermplasms = this.getSession().createSQLQuery(Germplasm.GET_PARENT_GIDS_BY_STUDY_ID);
+		final SQLQuery queryGermplasms = this.getSession().createSQLQuery(Germplasm.GET_KNOWN_PARENT_GIDS_BY_STUDY_ID);
 		queryGermplasms.setParameter("projId", studyId);
 
 		final List<Germplasm> germplasms = new ArrayList<>();
