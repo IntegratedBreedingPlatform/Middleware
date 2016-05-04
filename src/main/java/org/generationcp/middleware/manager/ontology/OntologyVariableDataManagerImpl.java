@@ -463,11 +463,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			}
 
 			// Variable Types, Created, modified from CVTermProperty
-			final List properties = this.getCvTermPropertyDao().getByCvTermId(term.getCvTermId());
+			final List<CVTermProperty> properties = this.getCvTermPropertyDao().getByCvTermId(term.getCvTermId());
 
-			for (final Object p : properties) {
-				final CVTermProperty property = (CVTermProperty) p;
-
+			for (final CVTermProperty property : properties) {
 				if (Objects.equals(property.getTypeId(), TermId.VARIABLE_TYPE.getId())) {
 					variable.addVariableType(VariableType.getByName(property.getValue()));
 				} else if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
