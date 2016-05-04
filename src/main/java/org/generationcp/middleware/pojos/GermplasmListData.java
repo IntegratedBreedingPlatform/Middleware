@@ -48,7 +48,7 @@ import org.hibernate.annotations.NotFoundAction;
 @NamedQueries({@NamedQuery(name = "deleteGermplasmListDataByListId", query = "DELETE FROM GermplasmListData WHERE list = :listId"),})
 @Entity
 @Table(name = "listdata")
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="listdata")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "listdata")
 public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	private static final long serialVersionUID = 1L;
@@ -134,6 +134,12 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	 */
 	@Transient
 	private Integer mgid = null;
+
+	/**
+	 * The Group ID of the germplasm. It is mapped to germplsm.mgid column in the database.
+	 */
+	@Transient
+	private Integer groupId = 0;
 
 	public GermplasmListData() {
 
@@ -394,19 +400,28 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		return "";
 	}
 
-	public void setFemaleParent(String femaleParent) {
+	public void setFemaleParent(final String femaleParent) {
 		this.femaleParent = femaleParent;
 	}
 
-	public void setFgid(Integer fgid) {
+	public void setFgid(final Integer fgid) {
 		this.fgid = fgid;
 	}
 
-	public void setMaleParent(String maleParent) {
+	public void setMaleParent(final String maleParent) {
 		this.maleParent = maleParent;
 	}
 
-	public void setMgid(Integer mgid) {
+	public void setMgid(final Integer mgid) {
 		this.mgid = mgid;
 	}
+
+	public Integer getGroupId() {
+		return this.groupId;
+	}
+
+	public void setGroupId(final Integer groupId) {
+		this.groupId = groupId;
+	}
+
 }

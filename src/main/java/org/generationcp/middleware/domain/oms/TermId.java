@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.oms;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 /**
  * The cvterm ID constants used in Middleware.
- *
+ * 
  */
 public enum TermId {
 
@@ -147,7 +147,7 @@ public enum TermId {
 	, AVAILABLE_INVENTORY(1700), BREEDING_METHOD_NAME(1701), BREEDING_METHOD_ABBREVIATION(1702), BREEDING_METHOD_NUMBER(1703), BREEDING_METHOD_GROUP(
 			1704), CROSS_FEMALE_GID(1705), CROSS_FEMALE_PREFERRED_NAME(1706), CROSS_MALE_GID(1707), CROSS_MALE_PREFERRED_NAME(1708), GERMPLASM_DATE(
 			1709), GERMPLASM_LOCATION(2110), PREFERRED_ID(1711), PREFERRED_NAME(1712), SEED_RESERVATION(1713), FEMALE_PARENT(1723), MALE_PARENT(
-			1724), FGID(1725), MGID(1726), SEED_AMOUNT_G(8264), NOTES(8390)
+			1724), FGID(1725), MGID(1726), SEED_AMOUNT_G(8264), NOTES(8390), GROUP_ID(1731)
 
 	// Inventory List Column Labels
 	, COMMENT_INVENTORY(1714), LOT_ID_INVENTORY(1715), LOT_LOCATION_INVENTORY(1720), NEW_RESERVED_INVENTORY(1716), RESERVED_INVENTORY(1717), TOTAL_INVENTORY(
@@ -161,9 +161,12 @@ public enum TermId {
 	// added to indicate the trait class of the Means/Summary Statistic standard variables
 	, TREATMENT_MEAN(1610), SUMMARY_STATISTIC(1620)
 
-    // added so that we can represent non existing terms and avoid returning null in case of retrieving term by a given ID
-    , NONEXISTENT(-1)
+	// added so that we can represent non existing terms and avoid returning null in case of retrieving term by a given ID
+	, NONEXISTENT(-1)
 
+	//TODO : Should find a way not to hard code
+	, PROJECT_PREFIX(3001)
+	, HABITAT_DESIGNATION(3002)
 	;
 
 	private final int id;
@@ -183,17 +186,17 @@ public enum TermId {
 		}
 
 		if (!TermId.TERM_ID_MAP.containsKey(id)) {
-            for (final TermId term : TermId.values()) {
+			for (final TermId term : TermId.values()) {
 				if (term.getId() == id) {
-                    TERM_ID_MAP.put(id, term);
+					TERM_ID_MAP.put(id, term);
 					return term;
 				}
 			}
 
-            return NONEXISTENT;
+			return NONEXISTENT;
 		} else {
-            return TERM_ID_MAP.get(id);
-        }
+			return TERM_ID_MAP.get(id);
+		}
 
 	}
 }

@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -49,9 +49,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
- *
+ * 
  * @author Kevin Manansala, Lord Hendrix Barboza
- *
+ * 
  */
 @Transactional
 public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager {
@@ -69,21 +69,22 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Germplasm> getAllGermplasm(final int start, final int numOfRows) {
-		return getGermplasmDao().getAll(start, numOfRows);
+		return this.getGermplasmDao().getAll(start, numOfRows);
 	}
 
 	@Override
-	public List<Germplasm> getGermplasmByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException {
+	public List<Germplasm> getGermplasmByName(final String name, final int start, final int numOfRows, final Operation op)
+			throws MiddlewareQueryException {
 		return this.getGermplasmDao().getByNamePermutations(name, op, start, numOfRows);
 	}
 
 	@Override
-	public long countGermplasmByName(String name, Operation operation) throws MiddlewareQueryException {
+	public long countGermplasmByName(final String name, final Operation operation) throws MiddlewareQueryException {
 		return this.getGermplasmDao().countByNamePermutations(name, operation);
 	}
 
 	@Override
-	public List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op)
+	public List<Germplasm> getGermplasmByLocationName(final String name, final int start, final int numOfRows, final Operation op)
 			throws MiddlewareQueryException {
 		List<Germplasm> germplasms = new ArrayList<Germplasm>();
 		final GermplasmDAO dao = this.getGermplasmDao();
@@ -171,7 +172,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	/**
 	 * (non-Javadoc)
-	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getByGIDWithListTypeFilters(java.lang.Integer, java.lang.Integer, java.util.List)
+	 * 
+	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getByGIDWithListTypeFilters(java.lang.Integer, java.lang.Integer,
+	 *      java.util.List)
 	 */
 	@Override
 	public List<Name> getByGIDWithListTypeFilters(final Integer gid, final Integer status, final List<Integer> type) {
@@ -935,7 +938,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	@Deprecated
 	public List<Location> getAllBreedingLocations() {
-		return getLocationDAO().getAllBreedingLocations();
+		return this.getLocationDAO().getAllBreedingLocations();
 	}
 
 	@Override
@@ -1016,7 +1019,16 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Germplasm> searchForGermplasm(final String q, final Operation o, final boolean includeParents,
 			final boolean withInventoryOnly) {
-		return this.getGermplasmDao().searchForGermplasms(q, o, includeParents, withInventoryOnly);
+		return this.searchForGermplasm(q, o, includeParents, withInventoryOnly, false);
+	}
+
+	/*
+	 * Overload the previous method to accommodate the added parameter.
+	 */
+	@Override
+	public List<Germplasm> searchForGermplasm(final String q, final Operation o, final boolean includeParents,
+			final boolean withInventoryOnly, final boolean includeMGMembers) {
+		return this.getGermplasmDao().searchForGermplasms(q, o, includeParents, withInventoryOnly, includeMGMembers);
 	}
 
 	@Override
@@ -1262,9 +1274,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	/**
 	 * Local method for getting a particular germplasm's Name.
-	 *
-	 * @param names The Map containing Names for a germplasm. This is usually provided by getGermplasmParentNamesForStudy() in
-	 *        GermplasmDAO.
+	 * 
+	 * @param names The Map containing Names for a germplasm. This is usually provided by getGermplasmParentNamesForStudy() in GermplasmDAO.
 	 * @param ntype the name type, i.e. Pedigree, Selection History, Cross Name,etc.
 	 * @return an instance of Name representing the searched name, or an empty Name instance if it doesn't exist
 	 */
@@ -1293,7 +1304,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Map<String, Integer> getCountByNamePermutations(List<String> names) {
+	public Map<String, Integer> getCountByNamePermutations(final List<String> names) {
 		return this.getNameDao().getCountByNamePermutations(names);
 	}
 
@@ -1302,7 +1313,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final List<UserDefinedField> udfldAttributes = this.getUserDefinedFieldByFieldTableNameAndType("ATRIBUTS", "PASSPORT");
 		// Defaulting to a UDFLD with fldno = 0 - this prevents NPEs and DB constraint violations.
 		UserDefinedField plotCodeUdfld = new UserDefinedField(0);
-		for (UserDefinedField userDefinedField : udfldAttributes) {
+		for (final UserDefinedField userDefinedField : udfldAttributes) {
 			if (userDefinedField.getFcode().equals("PLOTCODE")) {
 				plotCodeUdfld = userDefinedField;
 				break;
@@ -1312,11 +1323,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public String getPlotCodeValue(Integer gid) {
+	public String getPlotCodeValue(final Integer gid) {
 		String plotCode = "Unknown";
 		final List<Attribute> attributes = this.getAttributesByGID(gid);
 		final UserDefinedField plotCodeAttribute = this.getPlotCodeField();
-		for (Attribute attr : attributes) {
+		for (final Attribute attr : attributes) {
 			if (attr.getTypeId().equals(plotCodeAttribute.getFldno())) {
 				plotCode = attr.getAval();
 				break;
@@ -1327,11 +1338,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	/**
 	 * (non-Javadoc)
-	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getUserDefinedFieldsByCodesInMap(java.lang.String, java.lang.String, java.util.List)
+	 * 
+	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getUserDefinedFieldsByCodesInMap(java.lang.String,
+	 *      java.lang.String, java.util.List)
 	 */
 	@Override
-	 public UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code) {
-		return this.getUserDefinedFieldDao()
-				.getByTableTypeAndCode(table, type, code);
+	public UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code) {
+		return this.getUserDefinedFieldDao().getByTableTypeAndCode(table, type, code);
 	}
 }

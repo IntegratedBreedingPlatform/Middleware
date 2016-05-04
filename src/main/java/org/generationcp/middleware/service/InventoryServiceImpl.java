@@ -299,10 +299,9 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	@Override
-	public List<InventoryDetails> getInventoryListByListDataProjectListId(final Integer listDataProjectListId, final GermplasmListType type)
+	public List<InventoryDetails> getInventoryListByListDataProjectListId(final Integer listDataProjectListId)
 			throws MiddlewareQueryException {
-		return this.inventoryDaoFactory.getStockTransactionDAO().retrieveInventoryDetailsForListDataProjectListId(listDataProjectListId,
-				type);
+		return this.inventoryDaoFactory.getStockTransactionDAO().retrieveInventoryDetailsForListDataProjectListId(listDataProjectListId);
 	}
 
 	@Override

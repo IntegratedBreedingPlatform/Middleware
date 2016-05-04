@@ -14,10 +14,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import com.google.common.base.Function;
-import com.google.common.base.Strings;
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -49,6 +45,7 @@ import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.util.ISO8601DateParser;
+import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -56,6 +53,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Function;
+import com.google.common.base.Strings;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 
 /**
@@ -87,6 +89,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	public OntologyVariableDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		this.propertyManager = new OntologyPropertyDataManagerImpl(sessionProvider);
+		this.methodManager = new OntologyMethodDataManagerImpl(sessionProvider);
+		this.scaleManager = new OntologyScaleDataManagerImpl(sessionProvider);
 	}
 
 	public OntologyVariableDataManagerImpl(OntologyMethodDataManager methodDataManager, OntologyPropertyDataManager propertyDataManager,
@@ -809,6 +814,23 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		return null;
 
+	}
+
+	@Override public String retrieveVariableCategoricalNameValue(String programUuid, Integer variableId, Integer categoricalValueId,
+			boolean removeBraces) {
+
+		if (variableId == null || categoricalValueId == null) {
+			return null;
+		}
+
+		Variable variable = this.getVariable(programUuid, variableId, true, false);
+		for (TermSummary summary : variable.getScale().getCategories()) {
+			if (summary.getId().equals(categoricalValueId)) {
+				return StringUtil.removeBraces(summary.getName());
+			}
+		}
+
+		return null;
 	}
 
 	private void updateVariableSynonym(CVTerm term, String newVariableName) {

@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-        <version>4.0.0.BETA.11</version>
+        <version>4.0.0.BETA.12</version>
 	<name>Middleware</name>
 
 	<properties>
@@ -436,6 +436,8 @@
 						<include>**/StudyMeasurementsTest.java</include>
 						<include>**/DmsProjectDaoTest.java</include>
 						<include>**/GermplasmGroupingServiceImplTest.java</include>
+						<include>**/GermplasmNamingServiceImplTest.java</include>
+						<include>**/GermplasmNamingReferenceDataResolverImplTest.java</include>
 						<include>**/MethodTest.java</include>
 
 						<!-- New Ontology Manager Tests -->
@@ -467,9 +469,6 @@
 						<include>**/PedigreeStringGeneratorUtilTest.java</include>
 						<include>**/CrossExpansionPropertiesTest.java</include>
 						<include>**/PedigreeAlgorithmTest.java</include>
-
-						<!-- Just to improve code coverage i.e. remove noise from actual results. -->
-						<include>**/MiddlewareGetterAndSetterTestSuite.java</include>
 
 						<include>**/CheckNameFactorsPresentValidationRuleUT.java</include>
 						<include>**/ShowNameHandlingPopUpValidatorUT.java</include>
