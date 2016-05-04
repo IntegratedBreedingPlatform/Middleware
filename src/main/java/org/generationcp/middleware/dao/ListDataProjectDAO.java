@@ -191,7 +191,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			String queryStr =
 					"select " + " lp.listdata_project_id as listdata_project_id, " + " lp.entry_id as entry_id, "
 							+ " lp.designation as designation, " + " lp.group_name as group_name, " + " fn.nval as fnval, "
-							+ " fp.gid as fpgid, " + " mn.nval as mnval, " + " mp.gid as mpgid, "
+							+ " fp.gid as fpgid, " + " mn.nval as mnval, " + " mp.gid as mpgid, " + " g.mgid as mgid, "
                             + " g.gid as gid, "
 							+ " lp.seed_source as seed_source, " + " lp.duplicate_notes as duplicate_notes, " + " lp.check_type as check_type, "
 							+ " lp.entry_code as entry_code"
@@ -214,6 +214,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			query.addScalar("fpgid");
 			query.addScalar("mnval");
 			query.addScalar("mpgid");
+			query.addScalar("mgid");
 			query.addScalar("gid");
 			query.addScalar("seed_source");
 			query.addScalar("duplicate_notes");
@@ -242,11 +243,12 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			Integer fgid = (Integer) row[5];
 			String maleParent = (String) row[6];
 			Integer mpgid = (Integer) row[7];
-			Integer gid = (Integer) row[8];
-			String seedSource = (String) row[9];
-			String duplicate = (String) row[10];
-			Integer checkType = (Integer) row[11];
-			String entryCode = (String) row[12];
+			Integer mgid = (Integer) row [8];
+			Integer gid = (Integer) row[9];
+			String seedSource = (String) row[10];
+			String duplicate = (String) row[11];
+			Integer checkType = (Integer) row[12];
+			String entryCode = (String) row[13];
 
 			ListDataProject listDataProject = new ListDataProject();
 			listDataProject.setListDataProjectId(listDataProjectId);
@@ -257,6 +259,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			listDataProject.setFgid(fgid);
 			listDataProject.setMaleParent(maleParent);
 			listDataProject.setMgid(mpgid);
+			listDataProject.setGroupId(mgid);
 			listDataProject.setGermplasmId(gid);
 			listDataProject.setSeedSource(seedSource);
 
