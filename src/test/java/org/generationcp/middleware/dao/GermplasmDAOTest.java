@@ -39,6 +39,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	private static final Integer GROUP_ID = 10;
 
+    public static final Integer UNKNOWN_GID_VALUE = 0;
+
 	private boolean testDataSetup = false;
 
 	private GermplasmDAO dao;
