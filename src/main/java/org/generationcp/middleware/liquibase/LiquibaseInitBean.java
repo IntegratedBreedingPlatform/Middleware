@@ -66,13 +66,13 @@ public class LiquibaseInitBean implements BeanDefinitionRegistryPostProcessor {
 		LOG.debug(String.format("Creating DataSource and SpringLiquibase beans for database '%s'.",
 				this.dataSourceProperties.getWorkbenchDbName()));
 		this.registerBeanDefinitions(registry, this.dataSourceProperties.getWorkbenchDbName(), this.dataSourceProperties,
-				"db_changelog_workbench.xml");
+				"liquibase/workbench_master.xml");
 
 		// Crop databases
 		final List<String> cropDatabases = this.datasourceUtilities.retrieveCropDatabases(singleConnectionDataSource);
 		for (final String cropDatabase : cropDatabases) {
 			LOG.debug(String.format("Creating DataSource and SpringLiquibase beans for database '%s'.", cropDatabase));
-			this.registerBeanDefinitions(registry, cropDatabase, this.dataSourceProperties, "db_changelog_crop.xml");
+			this.registerBeanDefinitions(registry, cropDatabase, this.dataSourceProperties, "liquibase/crop_master.xml");
 		}
 	}
 

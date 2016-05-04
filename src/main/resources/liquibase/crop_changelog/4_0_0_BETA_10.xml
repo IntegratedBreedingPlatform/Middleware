@@ -1,0 +1,27 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="naymesh" id="1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'udflds' AND CONSTRAINT_NAME='udflds_uc1' and TABLE_SCHEMA = DATABASE();</sqlCheck>
+		</preConditions>
+	    <addUniqueConstraint columnNames="ftable, ftype, fcode" constraintName="udflds_uc1" tableName="udflds" />
+	</changeSet>
+
+	<changeSet author="naymesh" id="2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM udflds WHERE ftable='NAMES' and ftype='NAME' and fcode='SELHISFIX';</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			INSERT INTO `udflds` (`ftable`, `ftype`, `fcode`, `fname`, `ffmt`, `fdesc`, `lfldno`, `fuid`, `fdate`, `scaleid`)
+					VALUES ('NAMES', 'NAME', 'SELHISFIX', 'Selection history at fixation', '-', '-', '0', '0', '20160216', '0');
+	    </sql>
+	</changeSet>
+	
+</databaseChangeLog>
