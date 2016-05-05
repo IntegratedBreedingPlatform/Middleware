@@ -11,5 +11,6 @@
 	<include file="classpath:liquibase/crop_changelog/4_0_0_BETA_09.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:liquibase/crop_changelog/4_0_0_BETA_10.xml" relativeToChangelogFile="false"/>
 	<include file="classpath:liquibase/crop_changelog/4_0_0_BETA_11.xml" relativeToChangelogFile="false"/>
+	<include file="classpath:liquibase/crop_changelog/4_0_0_BETA_12.xml" relativeToChangelogFile="false"/>
 
  </databaseChangeLog>
