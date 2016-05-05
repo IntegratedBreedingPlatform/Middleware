@@ -18,7 +18,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import com.google.common.collect.ImmutableMap;
 import com.mysql.jdbc.PreparedStatement;
 
-public class XATestDatasourceUtilities {
+public class DatasourceUtilitiesTest {
 
 	private static final String PROPERTY1 = "Property1";
 	private static final String PROPERTY2 = "Property2";
@@ -47,31 +47,31 @@ public class XATestDatasourceUtilities {
 		final DatasourceUtilities xaDatasourceUtilities = new DatasourceUtilities();
 
 		final Map<String, Object> attributes =
-				ImmutableMap.<String, Object>of(XATestDatasourceUtilities.ATTRIBUTE1, XATestDatasourceUtilities.ATTRIBUTE_VALUE1,
-						XATestDatasourceUtilities.ATTRIBUTE2, XATestDatasourceUtilities.ATTRIBUTE_VALUE2,
-						XATestDatasourceUtilities.ATTRIBUTE3, XATestDatasourceUtilities.ATTRIBUTE_VALUE3);
+				ImmutableMap.<String, Object>of(DatasourceUtilitiesTest.ATTRIBUTE1, DatasourceUtilitiesTest.ATTRIBUTE_VALUE1,
+						DatasourceUtilitiesTest.ATTRIBUTE2, DatasourceUtilitiesTest.ATTRIBUTE_VALUE2,
+						DatasourceUtilitiesTest.ATTRIBUTE3, DatasourceUtilitiesTest.ATTRIBUTE_VALUE3);
 
 		final Map<String, Object> properties =
-				ImmutableMap.<String, Object>of(XATestDatasourceUtilities.PROPERTY1, XATestDatasourceUtilities.PROPERTY_VALUE1,
-						XATestDatasourceUtilities.PROPERTY2, XATestDatasourceUtilities.PROPERTY_VALUE2,
-						XATestDatasourceUtilities.PROPERTY3, XATestDatasourceUtilities.PROPERTY_VALUE3);
+				ImmutableMap.<String, Object>of(DatasourceUtilitiesTest.PROPERTY1, DatasourceUtilitiesTest.PROPERTY_VALUE1,
+						DatasourceUtilitiesTest.PROPERTY2, DatasourceUtilitiesTest.PROPERTY_VALUE2,
+						DatasourceUtilitiesTest.PROPERTY3, DatasourceUtilitiesTest.PROPERTY_VALUE3);
 
 		final RootBeanDefinition rootBeanDefinition =
 				xaDatasourceUtilities.createRootBeanDefinition(DatasourceUtilities.class, attributes, properties);
-		Assert.assertEquals("Root bean definition must have attribute 1", XATestDatasourceUtilities.ATTRIBUTE_VALUE1,
-				rootBeanDefinition.getAttribute(XATestDatasourceUtilities.ATTRIBUTE1));
-		Assert.assertEquals("Root bean definition must have attribute 2", XATestDatasourceUtilities.ATTRIBUTE_VALUE2,
-				rootBeanDefinition.getAttribute(XATestDatasourceUtilities.ATTRIBUTE2));
-		Assert.assertEquals("Root bean definition must have attribute 3", XATestDatasourceUtilities.ATTRIBUTE_VALUE3,
-				rootBeanDefinition.getAttribute(XATestDatasourceUtilities.ATTRIBUTE3));
+		Assert.assertEquals("Root bean definition must have attribute 1", DatasourceUtilitiesTest.ATTRIBUTE_VALUE1,
+				rootBeanDefinition.getAttribute(DatasourceUtilitiesTest.ATTRIBUTE1));
+		Assert.assertEquals("Root bean definition must have attribute 2", DatasourceUtilitiesTest.ATTRIBUTE_VALUE2,
+				rootBeanDefinition.getAttribute(DatasourceUtilitiesTest.ATTRIBUTE2));
+		Assert.assertEquals("Root bean definition must have attribute 3", DatasourceUtilitiesTest.ATTRIBUTE_VALUE3,
+				rootBeanDefinition.getAttribute(DatasourceUtilitiesTest.ATTRIBUTE3));
 
 		final MutablePropertyValues propertyValues = rootBeanDefinition.getPropertyValues();
-		Assert.assertEquals("Root bean definition must have attribute 1", XATestDatasourceUtilities.PROPERTY_VALUE1, propertyValues
-				.getPropertyValue(XATestDatasourceUtilities.PROPERTY1).getValue());
-		Assert.assertEquals("Root bean definition must have attribute 1", XATestDatasourceUtilities.PROPERTY_VALUE2, propertyValues
-				.getPropertyValue(XATestDatasourceUtilities.PROPERTY2).getValue());
-		Assert.assertEquals("Root bean definition must have attribute 1", XATestDatasourceUtilities.PROPERTY_VALUE3, propertyValues
-				.getPropertyValue(XATestDatasourceUtilities.PROPERTY3).getValue());
+		Assert.assertEquals("Root bean definition must have attribute 1", DatasourceUtilitiesTest.PROPERTY_VALUE1, propertyValues
+				.getPropertyValue(DatasourceUtilitiesTest.PROPERTY1).getValue());
+		Assert.assertEquals("Root bean definition must have attribute 1", DatasourceUtilitiesTest.PROPERTY_VALUE2, propertyValues
+				.getPropertyValue(DatasourceUtilitiesTest.PROPERTY2).getValue());
+		Assert.assertEquals("Root bean definition must have attribute 1", DatasourceUtilitiesTest.PROPERTY_VALUE3, propertyValues
+				.getPropertyValue(DatasourceUtilitiesTest.PROPERTY3).getValue());
 
 	}
 
