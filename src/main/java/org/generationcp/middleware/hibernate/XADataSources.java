@@ -20,13 +20,13 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 public class XADataSources implements BeanDefinitionRegistryPostProcessor {
 
-	private XADatasourceUtilities xaDatasourceUtilities;
+	private DatasourceUtilities xaDatasourceUtilities;
 	private XABeanDefinition xaBeanDefinition;
 	private XADataSourceProperties xaDataSourceProperties;
 
 	public XADataSources() {
 		try {
-			this.xaDatasourceUtilities = new XADatasourceUtilities();
+			this.xaDatasourceUtilities = new DatasourceUtilities();
 			this.xaBeanDefinition = new XABeanDefinition();
 			final Resource resource = new ClassPathResource("/database.properties");
 			final Properties props = PropertiesLoaderUtils.loadProperties(resource);
@@ -38,7 +38,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor {
 		}
 	}
 
-	XADataSources(final XADatasourceUtilities xaDatasourceUtilities, final XABeanDefinition xaBeanDefinition,
+	XADataSources(final DatasourceUtilities xaDatasourceUtilities, final XABeanDefinition xaBeanDefinition,
 			final XADataSourceProperties xaDataSourceProperties) {
 		this.xaDatasourceUtilities = xaDatasourceUtilities;
 		this.xaBeanDefinition = xaBeanDefinition;

@@ -21,11 +21,11 @@ import org.springframework.jdbc.support.JdbcUtils;
 /**
  *	Utilities to help us create bean definitions progrmatically.
  */
-public class XADatasourceUtilities {
+public class DatasourceUtilities {
 
 	private static final String SESSION_FACTORY = "_SessionFactory";
 
-	private static final Logger LOG = LoggerFactory.getLogger(XADatasourceUtilities.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DatasourceUtilities.class);
 
 	/**
 	 * This method enables us to create a root bean definition i.e. programmatically create spring beans. This is doing programmatically
@@ -118,7 +118,7 @@ public class XADatasourceUtilities {
 	 * @return the designated name of programmatically registered session factory
 	 */
 	public static String computeSessionFactoryName(final String cropDatabaseName) {
-		return cropDatabaseName.toUpperCase() + XADatasourceUtilities.SESSION_FACTORY;
+		return cropDatabaseName.toUpperCase() + DatasourceUtilities.SESSION_FACTORY;
 	}
 
 }

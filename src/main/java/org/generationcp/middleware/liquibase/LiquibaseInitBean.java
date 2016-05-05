@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Properties;
 
 import org.generationcp.middleware.hibernate.XADataSourceProperties;
-import org.generationcp.middleware.hibernate.XADatasourceUtilities;
+import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -31,14 +31,14 @@ import liquibase.integration.spring.SpringLiquibase;
  */
 public class LiquibaseInitBean implements BeanDefinitionRegistryPostProcessor {
 
-	private XADatasourceUtilities datasourceUtilities;
+	private DatasourceUtilities datasourceUtilities;
 	private XADataSourceProperties dataSourceProperties;
 
 	private static final Logger LOG = LoggerFactory.getLogger(LiquibaseInitBean.class);
 
 	public LiquibaseInitBean() {
 		try {
-			this.datasourceUtilities = new XADatasourceUtilities();
+			this.datasourceUtilities = new DatasourceUtilities();
 			final Resource resource = new ClassPathResource("/database.properties");
 			final Properties props = PropertiesLoaderUtils.loadProperties(resource);
 			this.dataSourceProperties = new XADataSourceProperties(props);
@@ -47,7 +47,7 @@ public class LiquibaseInitBean implements BeanDefinitionRegistryPostProcessor {
 		}
 	}
 
-	LiquibaseInitBean(XADatasourceUtilities datasourceUtilities, XADataSourceProperties dataSourceProperties) {
+	LiquibaseInitBean(DatasourceUtilities datasourceUtilities, XADataSourceProperties dataSourceProperties) {
 		this.datasourceUtilities = datasourceUtilities;
 		this.dataSourceProperties = dataSourceProperties;
 	}

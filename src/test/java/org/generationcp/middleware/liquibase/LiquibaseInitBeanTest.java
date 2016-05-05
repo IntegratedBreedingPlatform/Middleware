@@ -4,7 +4,7 @@ package org.generationcp.middleware.liquibase;
 import java.util.Properties;
 
 import org.generationcp.middleware.hibernate.XADataSourceProperties;
-import org.generationcp.middleware.hibernate.XADatasourceUtilities;
+import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -19,7 +19,7 @@ public class LiquibaseInitBeanTest {
 	@Test
 	public void testBeanDefinitionRegistations() {
 
-		XADatasourceUtilities dsUtils = Mockito.mock(XADatasourceUtilities.class);
+		DatasourceUtilities dsUtils = Mockito.mock(DatasourceUtilities.class);
 		XADataSourceProperties dsProperties = new XADataSourceProperties(new Properties());
 
 		Mockito.doReturn(Lists.newArrayList("ibdbv2_maize_merged", "ibdbv2_wheat_merged")).when(dsUtils)

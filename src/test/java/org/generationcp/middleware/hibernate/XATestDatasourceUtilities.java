@@ -44,7 +44,7 @@ public class XATestDatasourceUtilities {
 	@Test
 	public void testCreateRootBeanDefinition() throws Exception {
 
-		final XADatasourceUtilities xaDatasourceUtilities = new XADatasourceUtilities();
+		final DatasourceUtilities xaDatasourceUtilities = new DatasourceUtilities();
 
 		final Map<String, Object> attributes =
 				ImmutableMap.<String, Object>of(XATestDatasourceUtilities.ATTRIBUTE1, XATestDatasourceUtilities.ATTRIBUTE_VALUE1,
@@ -57,7 +57,7 @@ public class XATestDatasourceUtilities {
 						XATestDatasourceUtilities.PROPERTY3, XATestDatasourceUtilities.PROPERTY_VALUE3);
 
 		final RootBeanDefinition rootBeanDefinition =
-				xaDatasourceUtilities.createRootBeanDefinition(XADatasourceUtilities.class, attributes, properties);
+				xaDatasourceUtilities.createRootBeanDefinition(DatasourceUtilities.class, attributes, properties);
 		Assert.assertEquals("Root bean definition must have attribute 1", XATestDatasourceUtilities.ATTRIBUTE_VALUE1,
 				rootBeanDefinition.getAttribute(XATestDatasourceUtilities.ATTRIBUTE1));
 		Assert.assertEquals("Root bean definition must have attribute 2", XATestDatasourceUtilities.ATTRIBUTE_VALUE2,
@@ -77,7 +77,7 @@ public class XATestDatasourceUtilities {
 
 	@Test
 	public void testGetSingleConnectionDataSource() throws Exception {
-		final XADatasourceUtilities xaDatasourceUtilities = new XADatasourceUtilities();
+		final DatasourceUtilities xaDatasourceUtilities = new DatasourceUtilities();
 		final XADataSourceProperties xaDataSourceProperties = XATestUtility.mockProperties();
 
 		final SingleConnectionDataSource singleConnectionDataSource =
@@ -92,7 +92,7 @@ public class XATestDatasourceUtilities {
 
 	@Test
 	public void testRetrieveMergedDatabases() throws Exception {
-		final XADatasourceUtilities xaDatasourceUtilities = new XADatasourceUtilities();
+		final DatasourceUtilities xaDatasourceUtilities = new DatasourceUtilities();
 		final SingleConnectionDataSource singleConnectionDataSource = Mockito.mock(SingleConnectionDataSource.class);
 		final Connection mockConnection = Mockito.mock(Connection.class);
 		final PreparedStatement mockPreparedStatement = Mockito.mock(PreparedStatement.class);
@@ -112,7 +112,7 @@ public class XATestDatasourceUtilities {
 
 	@Test(expected = IllegalStateException.class)
 	public void testRetrieveMergedDatabasesExceptionalCase() throws Exception {
-		final XADatasourceUtilities xaDatasourceUtilities = new XADatasourceUtilities();
+		final DatasourceUtilities xaDatasourceUtilities = new DatasourceUtilities();
 		final SingleConnectionDataSource singleConnectionDataSource = Mockito.mock(SingleConnectionDataSource.class);
 		Mockito.when(singleConnectionDataSource.getConnection()).thenThrow(new SQLException("Could not access the database"));
 

@@ -70,7 +70,7 @@ public class XABeanDefinitionTest {
 	@Test
 	public void testCreateAllXADataSources() throws Exception {
 
-		final XADatasourceUtilities mockXaDatasourceUtilities = Mockito.mock(XADatasourceUtilities.class);
+		final DatasourceUtilities mockXaDatasourceUtilities = Mockito.mock(DatasourceUtilities.class);
 		final XABeanDefinition xaBeanDefinition = new XABeanDefinition(mockXaDatasourceUtilities);
 		final BeanDefinitionRegistry mockBeanDefinitionRegistry = Mockito.mock(BeanDefinitionRegistry.class);
 		final SingleConnectionDataSource mockSingleConnectionDataSource = Mockito.mock(SingleConnectionDataSource.class);

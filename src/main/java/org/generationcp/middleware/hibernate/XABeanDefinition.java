@@ -52,16 +52,16 @@ public class XABeanDefinition {
 
 	static final String UNIQUE_RESOURCE_NAME = "uniqueResourceName";
 
-	private XADatasourceUtilities xaDatasourceUtilities = new XADatasourceUtilities();
+	private DatasourceUtilities xaDatasourceUtilities = new DatasourceUtilities();
 
-	private static final Logger LOG = LoggerFactory.getLogger(XADatasourceUtilities.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DatasourceUtilities.class);
 
 	public XABeanDefinition() {
-		this.xaDatasourceUtilities = new XADatasourceUtilities();
+		this.xaDatasourceUtilities = new DatasourceUtilities();
 
 	}
 
-	public XABeanDefinition(final XADatasourceUtilities xaDatasourceUtilities) {
+	public XABeanDefinition(final DatasourceUtilities xaDatasourceUtilities) {
 		this.xaDatasourceUtilities = xaDatasourceUtilities;
 	}
 
