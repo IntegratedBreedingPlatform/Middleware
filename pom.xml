@@ -482,6 +482,10 @@
 						<include>**/ChainValidatorUT.java</include>
 						
 						<include>**/LiquibaseInitBeanTest.java</include>
+						<include>**/DatasourceUtilitiesTest.java</include>
+						<include>**/XABeanDefinitionTest.java</include>
+						<include>**/XADataSourcePropertiesTest.java</include>
+						<include>**/XADataSourcesTest.java</include>
 
 					</includes>
 				</configuration>
