@@ -22,7 +22,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor {
 
 	private DatasourceUtilities xaDatasourceUtilities;
 	private XABeanDefinition xaBeanDefinition;
-	private XADataSourceProperties xaDataSourceProperties;
+	private DataSourceProperties xaDataSourceProperties;
 
 	public XADataSources() {
 		try {
@@ -30,7 +30,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor {
 			this.xaBeanDefinition = new XABeanDefinition();
 			final Resource resource = new ClassPathResource("/database.properties");
 			final Properties props = PropertiesLoaderUtils.loadProperties(resource);
-			this.xaDataSourceProperties = new XADataSourceProperties(props);
+			this.xaDataSourceProperties = new DataSourceProperties(props);
 		} catch (final IOException e) {
 			throw new IllegalStateException(
 					"Unable to get the list of database that we need to register. Please contanct your administrator for further assistance.",
@@ -39,7 +39,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor {
 	}
 
 	XADataSources(final DatasourceUtilities xaDatasourceUtilities, final XABeanDefinition xaBeanDefinition,
-			final XADataSourceProperties xaDataSourceProperties) {
+			final DataSourceProperties xaDataSourceProperties) {
 		this.xaDatasourceUtilities = xaDatasourceUtilities;
 		this.xaBeanDefinition = xaBeanDefinition;
 		this.xaDataSourceProperties = xaDataSourceProperties;

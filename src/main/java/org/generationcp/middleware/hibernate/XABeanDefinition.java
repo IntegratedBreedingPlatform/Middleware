@@ -72,7 +72,7 @@ public class XABeanDefinition {
 	 * @param xaDataSourceProperties applicable xaDataSource properties
 	 */
 	void createAllXARelatedBeans(final SingleConnectionDataSource singleConnectionDataSource, final BeanDefinitionRegistry registry,
-			final XADataSourceProperties xaDataSourceProperties) {
+			final DataSourceProperties xaDataSourceProperties) {
 		LOG.debug("Creating datasource and session factory related beans.");
 		this.createXAConnectionBeans(registry, xaDataSourceProperties.getWorkbenchDbName(), xaDataSourceProperties);
 
@@ -94,7 +94,7 @@ public class XABeanDefinition {
 	 * @param xaDataSourceProperties properties values to be used when creating these beans
 	 */
 	void createXAConnectionBeans(final BeanDefinitionRegistry registry, final String cropDatabaseName,
-			final XADataSourceProperties xaDataSourceProperties) {
+			final DataSourceProperties xaDataSourceProperties) {
 
 		final RootBeanDefinition dataSourceBeanDefinition =
 				this.xaDatasourceUtilities.createRootBeanDefinition(AtomikosDataSourceBean.class, ImmutableMap.<String, Object>of(
@@ -127,7 +127,7 @@ public class XABeanDefinition {
 	 * @return {@link Map} of applicable properties
 	 */
 	Map<String, Object> getDataSourceBeanDefinitionProperties(final String cropDatabaseName,
-			final XADataSourceProperties xaDataSourceProperties) {
+			final DataSourceProperties xaDataSourceProperties) {
 		final Map<String, Object> dataSourceBeanDefinitionProperties = new HashMap<String, Object>();
 
 		dataSourceBeanDefinitionProperties.put(XABeanDefinition.UNIQUE_RESOURCE_NAME,
@@ -152,7 +152,7 @@ public class XABeanDefinition {
 	 * @param xaDataSourceProperties the applicable properties values
 	 * @return database connection properties
 	 */
-	Properties getDatabaseConnectionProperties(final String cropDatabaseName, final XADataSourceProperties xaDataSourceProperties) {
+	Properties getDatabaseConnectionProperties(final String cropDatabaseName, final DataSourceProperties xaDataSourceProperties) {
 		final Properties databaseConnectionProperties = new Properties();
 		databaseConnectionProperties.setProperty(XABeanDefinition.URL, "jdbc:mysql://" + xaDataSourceProperties.getHost() + ":"
 				+ xaDataSourceProperties.getPort() + "/" + cropDatabaseName);

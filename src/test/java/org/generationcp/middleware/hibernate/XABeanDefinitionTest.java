@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableList;
 
 public class XABeanDefinitionTest {
 
-	private final XADataSourceProperties xaDataSourceProperties = XATestUtility.mockProperties();
+	private final DataSourceProperties xaDataSourceProperties = XATestUtility.mockProperties();
 	private final String cropDatabaseName = "TestCrop";
 
 	@Test

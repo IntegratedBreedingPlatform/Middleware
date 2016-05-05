@@ -78,7 +78,7 @@ public class XATestDatasourceUtilities {
 	@Test
 	public void testGetSingleConnectionDataSource() throws Exception {
 		final DatasourceUtilities xaDatasourceUtilities = new DatasourceUtilities();
-		final XADataSourceProperties xaDataSourceProperties = XATestUtility.mockProperties();
+		final DataSourceProperties xaDataSourceProperties = XATestUtility.mockProperties();
 
 		final SingleConnectionDataSource singleConnectionDataSource =
 				xaDatasourceUtilities.getSingleConnectionDataSource(xaDataSourceProperties);

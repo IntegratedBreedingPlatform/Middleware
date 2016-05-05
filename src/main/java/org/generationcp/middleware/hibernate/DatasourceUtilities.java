@@ -102,7 +102,7 @@ public class DatasourceUtilities {
 	 * @return {@link SingleConnectionDataSource} to the workbench database. Only one connection can be made
 	 *        from this object.
 	 */
-	public SingleConnectionDataSource getSingleConnectionDataSource(final XADataSourceProperties xaDataSourceProperties) {
+	public SingleConnectionDataSource getSingleConnectionDataSource(final DataSourceProperties xaDataSourceProperties) {
 		final SingleConnectionDataSource singleConnectionDataSource = new SingleConnectionDataSource();
 		singleConnectionDataSource.setAutoCommit(false);
 		singleConnectionDataSource.setUsername(xaDataSourceProperties.getUserName());

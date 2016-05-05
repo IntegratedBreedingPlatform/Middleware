@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Properties;
 
-import org.generationcp.middleware.hibernate.XADataSourceProperties;
+import org.generationcp.middleware.hibernate.DataSourceProperties;
 import org.generationcp.middleware.hibernate.DatasourceUtilities;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +32,7 @@ import liquibase.integration.spring.SpringLiquibase;
 public class LiquibaseInitBean implements BeanDefinitionRegistryPostProcessor {
 
 	private DatasourceUtilities datasourceUtilities;
-	private XADataSourceProperties dataSourceProperties;
+	private DataSourceProperties dataSourceProperties;
 
 	private static final Logger LOG = LoggerFactory.getLogger(LiquibaseInitBean.class);
 
@@ -41,13 +41,13 @@ public class LiquibaseInitBean implements BeanDefinitionRegistryPostProcessor {
 			this.datasourceUtilities = new DatasourceUtilities();
 			final Resource resource = new ClassPathResource("/database.properties");
 			final Properties props = PropertiesLoaderUtils.loadProperties(resource);
-			this.dataSourceProperties = new XADataSourceProperties(props);
+			this.dataSourceProperties = new DataSourceProperties(props);
 		} catch (final IOException e) {
 			throw new IllegalStateException("Unable to get the list of crop databases to apply liquibase update to.", e);
 		}
 	}
 
-	LiquibaseInitBean(DatasourceUtilities datasourceUtilities, XADataSourceProperties dataSourceProperties) {
+	LiquibaseInitBean(DatasourceUtilities datasourceUtilities, DataSourceProperties dataSourceProperties) {
 		this.datasourceUtilities = datasourceUtilities;
 		this.dataSourceProperties = dataSourceProperties;
 	}
@@ -77,7 +77,7 @@ public class LiquibaseInitBean implements BeanDefinitionRegistryPostProcessor {
 	}
 
 	void registerBeanDefinitions(final BeanDefinitionRegistry registry, final String databaseName,
-			final XADataSourceProperties dataSourceProperties, final String changeLogName) {
+			final DataSourceProperties dataSourceProperties, final String changeLogName) {
 
 		/* The DataSource root bean definition. */
 		BeanDefinitionBuilder dataSourceBeanDefinitionBuilder =

@@ -12,7 +12,7 @@ public class XADataSourcesTest {
 	public void testPostProcessBeanDefinitionRegistry() throws Exception {
 		final XABeanDefinition mockXABeanDefinition = Mockito.mock(XABeanDefinition.class);
 		final DatasourceUtilities mockXaDataSourceUtilities = Mockito.mock(DatasourceUtilities.class);
-		final XADataSourceProperties xaDataSourceProperties = Mockito.mock(XADataSourceProperties.class);
+		final DataSourceProperties xaDataSourceProperties = Mockito.mock(DataSourceProperties.class);
 		final XADataSources xaDataSources = new XADataSources(mockXaDataSourceUtilities, mockXABeanDefinition, xaDataSourceProperties);
 		final SingleConnectionDataSource mockSingleConnectionDataSource = Mockito.mock(SingleConnectionDataSource.class);
 		Mockito.when(mockXaDataSourceUtilities.getSingleConnectionDataSource(xaDataSourceProperties)).thenReturn(
