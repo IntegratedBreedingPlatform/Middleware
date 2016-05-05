@@ -8,10 +8,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
 	<changeSet author="naymesh" id="1">
-		<preConditions onFail="HALT" onFailMessage="Unable to add unique constraint udflds_uc1 for table udflds. Either there is duplicate data or the constraint already exists.">
-			<!-- There must not be any duplicates -->
-			<sqlCheck expectedResult="0">select count(*) as duplicateRows from (select group_concat(fldno) as duplicateFldNos, ftable, ftype, fcode, count(*) as count from udflds group by ftable, ftype, fcode having count > 1) as dupCountTable;</sqlCheck>
-			<!-- AND Check that constraint is not existing already. -->
+		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'udflds' AND CONSTRAINT_NAME='udflds_uc1' and TABLE_SCHEMA = DATABASE();</sqlCheck>
 		</preConditions>
 	    <addUniqueConstraint columnNames="ftable, ftype, fcode" constraintName="udflds_uc1" tableName="udflds" />
