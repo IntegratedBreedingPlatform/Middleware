@@ -13,8 +13,11 @@ package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -69,8 +72,29 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		criteria.add(Restrictions.ne(GERMPLASM_LIST_DATA_TABLE_STATUS_COLUMN, GermplasmListDataDAO.STATUS_DELETED));
 		criteria.add(Restrictions.neProperty(GERMPLASM_GRPLCE_COLUMN, GERMPLASM_GID_COLUMN));
 		criteria.addOrder(Order.asc(GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN));
-		return criteria.list();
+		List<GermplasmListData> germplasmListDataList = criteria.list();
 
+		Map<Integer, GermplasmListData> germplasmData = new HashMap<>();
+
+		for(GermplasmListData gData : germplasmListDataList){
+			germplasmData.put(gData.getGermplasmId(), gData);
+		}
+
+		Criteria germplasmCriteria = this.getSession().createCriteria(Germplasm.class);
+		germplasmCriteria.add(Restrictions.in("gid", germplasmData.keySet()));
+
+		List<Germplasm> germplasmList = germplasmCriteria.list();
+
+		Integer gId = null;
+		for(Germplasm germplasm : germplasmList){
+			gId = germplasm.getGid();
+
+			if(germplasmData.containsKey(gId)){
+				germplasmData.get(gId).setGroupId(germplasm.getMgid());
+			}
+		}
+
+		return new ArrayList<>(germplasmData.values());
 	}
 
 	public long countByListId(final Integer id) {
