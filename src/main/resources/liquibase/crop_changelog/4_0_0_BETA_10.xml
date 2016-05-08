@@ -7,14 +7,29 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<changeSet author="naymesh" id="1">
+
+	<changeSet author="clarissa" id="1">
+		<!-- De-duplication of the UDFLDs in wheat database so that unique constraint (see next changeset) can be applied successfully. -->
+		<preConditions onFail="CONTINUE">
+			<sqlCheck expectedResult="1">select case when 'ibdbv2_wheat_merged' = DATABASE() then 1 else 0 end from dual;</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE from udflds where fldno=1550;
+			DELETE from udflds where fldno=634;
+			DELETE from udflds where fldno=15001;
+			UPDATE udflds set fcode='AUSELHIS' where fldno = 15000;
+			UPDATE udflds set fcode='EUACC' where fldno = 500000004;			
+		</sql>
+	</changeSet>
+
+	<changeSet author="naymesh" id="2">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'udflds' AND CONSTRAINT_NAME='udflds_uc1' and TABLE_SCHEMA = DATABASE();</sqlCheck>
 		</preConditions>
 	    <addUniqueConstraint columnNames="ftable, ftype, fcode" constraintName="udflds_uc1" tableName="udflds" />
 	</changeSet>
 
-	<changeSet author="naymesh" id="2">
+	<changeSet author="naymesh" id="3">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM udflds WHERE ftable='NAMES' and ftype='NAME' and fcode='SELHISFIX';</sqlCheck>
 		</preConditions>
