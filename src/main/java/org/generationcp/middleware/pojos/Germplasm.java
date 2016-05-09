@@ -269,14 +269,14 @@ public class Germplasm implements Serializable, Auditable {
 			+ "SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs "
 			+ "FROM names n, germplsm g " + "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
 			+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid " + "WHERE n.gid = g.gid and g.gid != g.grplce and g.grplce = 0 "
-			+ "AND n.nstat != :deletedStatus AND (n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces) "
+			+ "AND n.nstat != :deletedStatus AND (n.nval LIKE :searchValue OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces) "
 			+ "GROUP BY g.gid " + "LIMIT 5000" + ") " + Germplasm.GERMPLASM_ALIAS + "LEFT JOIN ("
 			+ Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS + Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME = Germplasm.GENERAL_SELECT_FROM + "("
 			+ "SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs "
 			+ "FROM names n, germplsm g " + "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
 			+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid " + "WHERE n.gid = g.gid and g.gid != g.grplce and g.grplce = 0 "
-			+ "AND n.nstat != :deletedStatus AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces) " + "GROUP BY g.gid "
+			+ "AND n.nstat != :deletedStatus AND (n.nval = :searchValue OR n.nval = :qStandardized OR n.nval = :qNoSpaces) " + "GROUP BY g.gid "
 			+ "LIMIT 5000" + ") " + Germplasm.GERMPLASM_ALIAS + "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")"
 			+ Germplasm.INVENTORY_ALIAS + Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_LIST_ID_BY_LIST_NAME = "SELECT listid " + "FROM ( " + "    SELECT listnms.*, "
