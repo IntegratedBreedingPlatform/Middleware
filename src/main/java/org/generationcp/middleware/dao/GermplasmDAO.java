@@ -54,6 +54,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String Q_STANDARDIZED = "qStandardized";
 	private static final String AVAIL_INV = "availInv";
 	private static final String SEED_RES = "seedRes";
+	private static final String METHOD_NAME = "methodName";
+	private static final String LOCATION_NAME = "locationName";
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDAO.class);
 
@@ -840,6 +842,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			p2Query.setParameter("deletedStatus", GermplasmDAO.STATUS_DELETED);
 			p2Query.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
 			this.addInventoryInfo(p2Query);
+			this.addMethodNameAndLocationName(p2Query);
 			result.addAll(this.getSearchForGermplasmsResult(p2Query.list()));
 
 			if (includeParents) {
@@ -906,6 +909,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		query.addScalar(GermplasmDAO.SEED_RES);
 	}
 
+	private void addMethodNameAndLocationName(final SQLQuery query) {
+		// Add method name and location name to query to reduce revisiting database
+		query.addScalar(GermplasmDAO.METHOD_NAME);
+		query.addScalar(GermplasmDAO.LOCATION_NAME);
+	}
+
 	private List<Germplasm> getSearchForGermplasmsResult(final List<Object[]> result) {
 		final List<Germplasm> germplasms = new ArrayList<Germplasm>();
 		if (result != null) {
@@ -923,6 +932,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		inventoryInfo.setActualInventoryLotCount(row[2] != null ? ((BigInteger) row[2]).intValue() : 0);
 		inventoryInfo.setReservedLotCount(row[3] != null ? ((BigInteger) row[3]).intValue() : 0);
 		germplasm.setInventoryInfo(inventoryInfo);
+		germplasm.setMethodName(row[4] != null ? (String) row[4] : "");
+		germplasm.setLocationName(row[5] != null ? (String) row[5] : "");
 		return germplasm;
 	}
 

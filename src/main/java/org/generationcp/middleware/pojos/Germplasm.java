@@ -266,17 +266,19 @@ public class Germplasm implements Serializable, Auditable {
 			+ "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
 			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME_LIKE = Germplasm.GENERAL_SELECT_FROM + "("
-			+ "SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs "
-			+ "FROM names n, germplsm g " + "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
+			+ "SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs, "
+			+ "m.mname methodName, l.lname locationName "
+			+ "FROM names n, methods m, location l, germplsm g " + "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
 			+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid " + "WHERE n.gid = g.gid and g.gid != g.grplce and g.grplce = 0 "
-			+ "AND n.nstat != :deletedStatus AND (n.nval LIKE :searchValue OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces) "
+			+ "AND n.nstat != :deletedStatus AND g.methn = m.mid AND g.glocn = l.locid AND (n.nval LIKE :searchValue OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces) "
 			+ "GROUP BY g.gid " + "LIMIT 5000" + ") " + Germplasm.GERMPLASM_ALIAS + "LEFT JOIN ("
 			+ Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS + Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME = Germplasm.GENERAL_SELECT_FROM + "("
-			+ "SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs "
-			+ "FROM names n, germplsm g " + "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
+			+ "SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs, "
+			+ "m.mname methodName, l.lname locationName "
+			+ "FROM names n, methods m, location l, germplsm g " + "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
 			+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid " + "WHERE n.gid = g.gid and g.gid != g.grplce and g.grplce = 0 "
-			+ "AND n.nstat != :deletedStatus AND (n.nval = :searchValue OR n.nval = :qStandardized OR n.nval = :qNoSpaces) " + "GROUP BY g.gid "
+			+ "AND n.nstat != :deletedStatus AND g.methn = m.mid AND g.glocn = l.locid AND (n.nval = :searchValue OR n.nval = :qStandardized OR n.nval = :qNoSpaces) " + "GROUP BY g.gid "
 			+ "LIMIT 5000" + ") " + Germplasm.GERMPLASM_ALIAS + "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")"
 			+ Germplasm.INVENTORY_ALIAS + Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_LIST_ID_BY_LIST_NAME = "SELECT listid " + "FROM ( " + "    SELECT listnms.*, "
@@ -433,6 +435,22 @@ public class Germplasm implements Serializable, Auditable {
 	 */
 	@Transient
 	private String accessionName = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 * Prevoiusly, all germplasm list is loaded and revisit the DB for each germplasm for getting method name.
+	 * This problem is removed by introducing this variable.
+	 */
+	@Transient
+	private String methodName = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 * Prevoiusly, all germplasm list is loaded and revisit the DB for each germplasm for getting location name.
+	 * This problem is removed by introducing this variable.
+	 */
+	@Transient
+	private String locationName = null;
 
 	public Germplasm() {
 	}
@@ -605,6 +623,22 @@ public class Germplasm implements Serializable, Auditable {
 		return this.method;
 	}
 
+	public String getMethodName() {
+		return methodName;
+	}
+
+	public void setMethodName(String methodName) {
+		this.methodName = methodName;
+	}
+
+	public String getLocationName() {
+		return locationName;
+	}
+
+	public void setLocationName(String locationName) {
+		this.locationName = locationName;
+	}
+
 	@Override
 	public boolean equals(final Object obj) {
 		if (obj == null) {
@@ -661,6 +695,10 @@ public class Germplasm implements Serializable, Auditable {
 		builder.append(this.method);
 		builder.append(", inventoryInfo=");
 		builder.append(this.inventoryInfo);
+		builder.append(", methodName=");
+		builder.append(this.methodName);
+		builder.append(", locationName=");
+		builder.append(this.locationName);
 		builder.append("]");
 		return builder.toString();
 	}
