@@ -18,7 +18,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 import liquibase.integration.spring.SpringLiquibase;
 
@@ -59,8 +58,8 @@ public class LiquibaseInitBean implements BeanDefinitionRegistryPostProcessor {
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-		final SingleConnectionDataSource singleConnectionDataSource =
-				this.datasourceUtilities.getSingleConnectionDataSource(this.dataSourceProperties);
+		final DriverManagerDataSource workbenchDataSource =
+				this.datasourceUtilities.getWorkbenchDataSource(this.dataSourceProperties);
 
 		// Workbench
 		LOG.debug(String.format("Creating DataSource and SpringLiquibase beans for database '%s'.",
@@ -69,7 +68,7 @@ public class LiquibaseInitBean implements BeanDefinitionRegistryPostProcessor {
 				"liquibase/workbench_master.xml");
 
 		// Crop databases
-		final List<String> cropDatabases = this.datasourceUtilities.retrieveCropDatabases(singleConnectionDataSource);
+		final List<String> cropDatabases = this.datasourceUtilities.retrieveCropDatabases(workbenchDataSource);
 		for (final String cropDatabase : cropDatabases) {
 			LOG.debug(String.format("Creating DataSource and SpringLiquibase beans for database '%s'.", cropDatabase));
 			this.registerBeanDefinitions(registry, cropDatabase, this.dataSourceProperties, "liquibase/crop_master.xml");

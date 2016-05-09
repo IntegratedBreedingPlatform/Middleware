@@ -13,7 +13,7 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.MutablePropertyValues;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import com.google.common.collect.ImmutableMap;
 import com.mysql.jdbc.PreparedStatement;
@@ -76,35 +76,35 @@ public class DatasourceUtilitiesTest {
 	}
 
 	@Test
-	public void testGetSingleConnectionDataSource() throws Exception {
+	public void testGetWorkbenchDataSource() throws Exception {
 		final DatasourceUtilities xaDatasourceUtilities = new DatasourceUtilities();
 		final DataSourceProperties xaDataSourceProperties = XATestUtility.mockProperties();
 
-		final SingleConnectionDataSource singleConnectionDataSource =
-				xaDatasourceUtilities.getSingleConnectionDataSource(xaDataSourceProperties);
-		Assert.assertEquals("Username must be what we set it to", XATestUtility.DB_USERNAME, singleConnectionDataSource.getUsername());
-		Assert.assertEquals("Password must be what we set it to", XATestUtility.DB_PASSWORD, singleConnectionDataSource.getPassword());
+		final DriverManagerDataSource workbenchDataSource =
+				xaDatasourceUtilities.getWorkbenchDataSource(xaDataSourceProperties);
+		Assert.assertEquals("Username must be what we set it to", XATestUtility.DB_USERNAME, workbenchDataSource.getUsername());
+		Assert.assertEquals("Password must be what we set it to", XATestUtility.DB_PASSWORD, workbenchDataSource.getPassword());
 
 		Assert.assertEquals("Url must get correctly deriver", "jdbc:mysql://" + XATestUtility.DB_HOST + ":" + XATestUtility.DB_PORT + "/"
-				+ XATestUtility.DB_WORKBENCH_NAME, singleConnectionDataSource.getUrl());
+				+ XATestUtility.DB_WORKBENCH_NAME, workbenchDataSource.getUrl());
 
 	}
 
 	@Test
 	public void testRetrieveMergedDatabases() throws Exception {
 		final DatasourceUtilities xaDatasourceUtilities = new DatasourceUtilities();
-		final SingleConnectionDataSource singleConnectionDataSource = Mockito.mock(SingleConnectionDataSource.class);
+		final DriverManagerDataSource mockWorkbenchDataSource = Mockito.mock(DriverManagerDataSource.class);
 		final Connection mockConnection = Mockito.mock(Connection.class);
 		final PreparedStatement mockPreparedStatement = Mockito.mock(PreparedStatement.class);
 		final ResultSet mockResultSet = Mockito.mock(ResultSet.class);
 
-		Mockito.when(singleConnectionDataSource.getConnection()).thenReturn(mockConnection);
+		Mockito.when(mockWorkbenchDataSource.getConnection()).thenReturn(mockConnection);
 		Mockito.when(mockConnection.prepareStatement(Matchers.anyString())).thenReturn(mockPreparedStatement);
 		Mockito.when(mockPreparedStatement.executeQuery()).thenReturn(mockResultSet);
 		Mockito.when(mockResultSet.next()).thenReturn(true).thenReturn(true).thenReturn(false);
 		Mockito.when(mockResultSet.getString(1)).thenReturn("DB1").thenReturn("DB2");
 
-		final List<String> retrieveMergedDatabases = xaDatasourceUtilities.retrieveCropDatabases(singleConnectionDataSource);
+		final List<String> retrieveMergedDatabases = xaDatasourceUtilities.retrieveCropDatabases(mockWorkbenchDataSource);
 		Assert.assertTrue("Must contain DB1", retrieveMergedDatabases.contains("DB1"));
 		Assert.assertTrue("Must contain DB2", retrieveMergedDatabases.contains("DB2"));
 
@@ -113,9 +113,9 @@ public class DatasourceUtilitiesTest {
 	@Test(expected = IllegalStateException.class)
 	public void testRetrieveMergedDatabasesExceptionalCase() throws Exception {
 		final DatasourceUtilities xaDatasourceUtilities = new DatasourceUtilities();
-		final SingleConnectionDataSource singleConnectionDataSource = Mockito.mock(SingleConnectionDataSource.class);
-		Mockito.when(singleConnectionDataSource.getConnection()).thenThrow(new SQLException("Could not access the database"));
+		final DriverManagerDataSource mockWorkbenchDataSource = Mockito.mock(DriverManagerDataSource.class);
+		Mockito.when(mockWorkbenchDataSource.getConnection()).thenThrow(new SQLException("Could not access the database"));
 
-		xaDatasourceUtilities.retrieveCropDatabases(singleConnectionDataSource);
+		xaDatasourceUtilities.retrieveCropDatabases(mockWorkbenchDataSource);
 	}
 }

@@ -11,7 +11,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 /**
  * Helps us create XA Session Factories for all crop database. This class must be declared as a singleton bean via annotations or via xml
@@ -47,8 +47,8 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor {
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(final BeanDefinitionRegistry registry) throws BeansException {
-		final SingleConnectionDataSource singleConnectionDataSource =
-				this.xaDatasourceUtilities.getSingleConnectionDataSource(this.xaDataSourceProperties);
+		final DriverManagerDataSource singleConnectionDataSource =
+				this.xaDatasourceUtilities.getWorkbenchDataSource(this.xaDataSourceProperties);
 		this.xaBeanDefinition.createAllXARelatedBeans(singleConnectionDataSource, registry, this.xaDataSourceProperties);
 	}
 
