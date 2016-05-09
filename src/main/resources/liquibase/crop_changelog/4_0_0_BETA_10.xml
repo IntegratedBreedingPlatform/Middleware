@@ -39,4 +39,23 @@
 	    </sql>
 	</changeSet>
 	
+	<changeSet author="alejandro" id="4">
+		<!-- Upgrade script to fix maize nursery template. Set correct cvterm type_id for SEED_SOURCE. Change from 1808 (Trait) to 1807 (Selection Method). -->
+		<preConditions onFail="CONTINUE">
+			<sqlCheck expectedResult="1">select case when 'ibdbv2_maize_merged' = DATABASE() then 1 else 0 end from dual;</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			update projectprop set type_id = 1807 where projectprop_id = 25379 AND project_id = 25006 AND value = 'SEED_STORED';		
+		</sql>
+	</changeSet>
+	
+	<changeSet author="alejandro" id="5">
+		<!-- Upgrade script to fix cowpea nursery template. Set correct cvterm type_id for SEED_SOURCE. Change from 1808 (Trait) to 1807 (Selection Method). -->
+		<preConditions onFail="CONTINUE">
+			<sqlCheck expectedResult="1">select case when 'ibdbv2_cowpea_merged' = DATABASE() then 1 else 0 end from dual;</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			update projectprop set type_id = 1807 where projectprop_id = 263 AND project_id = 3008 AND value = 'SEED_AMOUNT_g';		
+		</sql>
+	</changeSet>
 </databaseChangeLog>
