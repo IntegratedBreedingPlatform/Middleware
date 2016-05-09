@@ -7,10 +7,10 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<include file="classpath:liquibase/crop_changelog/4_0_0_BETA_08.xml" relativeToChangelogFile="false"/>
-	<include file="classpath:liquibase/crop_changelog/4_0_0_BETA_09.xml" relativeToChangelogFile="false"/>
-	<include file="classpath:liquibase/crop_changelog/4_0_0_BETA_10.xml" relativeToChangelogFile="false"/>
-	<include file="classpath:liquibase/crop_changelog/4_0_0_BETA_11.xml" relativeToChangelogFile="false"/>
-	<include file="classpath:liquibase/crop_changelog/4_0_0_BETA_12.xml" relativeToChangelogFile="false"/>
+	<include file="crop_changelog/4_0_0_BETA_08.xml" relativeToChangelogFile="true"/>
+	<include file="crop_changelog/4_0_0_BETA_09.xml" relativeToChangelogFile="true"/>
+	<include file="crop_changelog/4_0_0_BETA_10.xml" relativeToChangelogFile="true"/>
+	<include file="crop_changelog/4_0_0_BETA_11.xml" relativeToChangelogFile="true"/>
+	<include file="crop_changelog/4_0_0_BETA_12.xml" relativeToChangelogFile="true"/>
 
  </databaseChangeLog>
