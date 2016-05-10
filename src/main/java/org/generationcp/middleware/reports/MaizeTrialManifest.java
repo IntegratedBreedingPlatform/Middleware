@@ -11,7 +11,7 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 
-public class MaizeTrialManifest extends AbstractTrialReporter {
+public class MaizeTrialManifest extends AbstractDynamicReporter {
 
 	public static final String PLANTING_DATE_REPORT_KEY = "plantingDate";
 	public static final String DISTANCE_BETWEEN_STATIONS_REPORT_KEY = "distanceBetweenStations";
@@ -23,6 +23,9 @@ public class MaizeTrialManifest extends AbstractTrialReporter {
 	public static final String[] UNIQUE_REPORT_KEYS = (String[]) Arrays.asList(DISTANCE_BETWEEN_STATIONS_REPORT_KEY,
 			ROWS_HARVESTED_REPORT_KEY, COLLABORATOR_REPORT_KEY, PLANTING_DATE_REPORT_KEY, HARVEST_DATE_REPORT_KEY,
 			DISTANCE_BETWEEN_ROWS_REPORT_KEY, NET_PLOT_LENGTH_REPORT_KEY).toArray();
+    public static final String MAIZE_MANIFEST_PROGRAM_KEY = "breedingProgram";
+
+    protected ReportParameterMapper parameterMapper = new ReportParameterMapper();
 
 	@Override
 	public Reporter createReporter() {
@@ -45,27 +48,25 @@ public class MaizeTrialManifest extends AbstractTrialReporter {
 	public Map<String, Object> buildJRParams(final Map<String, Object> args) {
 		final Map<String, Object> params = super.buildJRParams(args);
 
-		// this report uses a different key to refer to location name, season, and program name, so we just set the retrieved value from
-		// previous computation to the expected key
-		params.put("breedingProgram", params.get(PROGRAM_NAME_REPORT_KEY));
+		params.put(MAIZE_MANIFEST_PROGRAM_KEY, args.get(PROGRAM_NAME_ARG_KEY));
 
-		@SuppressWarnings("unchecked")
-		final List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get(STUDY_CONDITIONS_KEY);
-		@SuppressWarnings("unchecked")
-		final List<MeasurementRow> trialObservations = (List<MeasurementRow>) args.get(STUDY_OBSERVATIONS_KEY);
+        final List<MeasurementVariable> studyConditions = (List<MeasurementVariable>) args.get(STUDY_CONDITIONS_KEY);
+        for (final MeasurementVariable studyCondition : studyConditions) {
+            this.parameterMapper.mapBasicStudyValues(studyCondition, params, studyCondition.getValue());
+            mapEnvironmentValue(studyCondition, params, studyCondition.getValue());
+        }
 
-		// attempt to extract values from the study conditions
-		for (final MeasurementVariable var : studyConditions) {
-			mapReportValue(var, params, var.getValue());
-		}
+        // update trial report data extraction logic so that study environment entries are also retrieved from the
+        // trial environment
+        @SuppressWarnings("unchecked")
+        final List<MeasurementRow> trialObservations = (List<MeasurementRow>) args.get(STUDY_OBSERVATIONS_KEY);
+        // attempt to extract values from the observations. currently, only the value from the first measurement row is used
+        if (!trialObservations.isEmpty()) {
 
-		// attempt to extract values from the observations. only the value from the first measurement row is necessary
-		if (!trialObservations.isEmpty()) {
-
-			for (final MeasurementData data : trialObservations.get(0).getDataList()) {
-				mapReportValue(data.getMeasurementVariable(), params, data.getValue());
-			}
-		}
+            for (final MeasurementData data : trialObservations.get(0).getDataList()) {
+                mapEnvironmentValue(data.getMeasurementVariable(), params, data.getValue());
+            }
+        }
 
 		// ensure that null values are not shown for fields whose variables are not present in the trial / not yet implemented
 		// TODO : look into possibly implementing this as well for the other reports in the system
@@ -91,14 +92,16 @@ public class MaizeTrialManifest extends AbstractTrialReporter {
 	}
 
 	/**
-	 * Created a separate method for mapping values to expected report keys as values can be extracted from either the study conditions or
-	 * from environment values that can be extracted from the trial observations
-	 * 
+	 *
 	 * @param var
 	 * @param reportParamMap
 	 * @param value
 	 */
-	protected void mapReportValue(MeasurementVariable var, Map<String, Object> reportParamMap, String value) {
+	protected void mapEnvironmentValue(final MeasurementVariable var, final Map<String, Object> reportParamMap, final String value) {
+        // the previous mapping logic available in nurseries / trials are applied
+        // dev note : this functionality is maintained within this class instead of creating a subclass of the ReportParameterMapper
+        // as there is currently no reliable way of
+        this.parameterMapper.mapEnvironmentValue(var, reportParamMap, value);
 		final TermId term = TermId.getById(var.getTermId());
 
 		if (term == TermId.TRIAL_LOCATION) {
@@ -136,4 +139,5 @@ public class MaizeTrialManifest extends AbstractTrialReporter {
                 // no default behaviour, added only for SonarCube checking
 		}
 	}
+
 }
