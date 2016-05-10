@@ -234,29 +234,35 @@ public class Germplasm implements Serializable, Auditable {
 					+ "GROUP BY entity_id";
 	public static final String WHERE_WITH_INVENTORY = "WHERE availInv > 0 ";
 	public static final String SEARCH_GERMPLASM_BY_GID = Germplasm.GENERAL_SELECT_FROM + "("
-			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
+			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs,"
+			+ "m.mname methodName, l.lname locationName " + "FROM methods m, location l, germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
-			+ "WHERE g.gid=:gid AND length(g.gid) = :gidLength AND g.gid!=g.grplce AND g.grplce = 0 " + "GROUP BY g.gid" + ") "
+			+ "WHERE g.gid=:gid AND length(g.gid) = :gidLength AND g.gid!=g.grplce AND g.grplce = 0 "
+			+ "AND g.methn = m.mid AND g.glocn = l.locid " + "GROUP BY g.gid" + ") "
 			+ Germplasm.GERMPLASM_ALIAS + "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
 			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_GERMPLASM_BY_GID_LIKE = Germplasm.GENERAL_SELECT_FROM + "("
-			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
+			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs, "
+			+ "m.mname methodName, l.lname locationName " + "FROM methods m, location l, germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
-			+ "WHERE g.gid LIKE :gid AND g.gid!=g.grplce AND g.grplce = 0 " + "GROUP BY g.gid" + ") " + Germplasm.GERMPLASM_ALIAS
+			+ "WHERE g.gid LIKE :gid AND g.gid!=g.grplce AND g.grplce = 0 " + "AND g.methn = m.mid AND g.glocn = l.locid "
+			+ "GROUP BY g.gid" + ") " + Germplasm.GERMPLASM_ALIAS
 			+ "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
 			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_GERMPLASM_BY_INVENTORY_ID = Germplasm.GENERAL_SELECT_FROM + "("
-			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
+			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs, "
+			+ "m.mname methodName, loc.lname locationName " + "FROM methods m, location loc, germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
 			+ ", ims_lot l, ims_transaction t " + "WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid "
-			+ "AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id = :inventoryID " + "GROUP BY g.gid" + ") "
+			+ "AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id = :inventoryID AND g.methn = m.mid AND g.glocn = loc.locid " + "GROUP BY g.gid" + ") "
 			+ Germplasm.GERMPLASM_ALIAS + "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
 			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_GERMPLASM_BY_INVENTORY_ID_LIKE = Germplasm.GENERAL_SELECT_FROM + "("
-			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
+			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs, "
+			+ "m.mname methodName, loc.lname locationName " + "FROM methods m, location loc, germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
 			+ ", ims_lot l, ims_transaction t " + "WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid "
-			+ "AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id LIKE :inventoryID " + "GROUP BY g.gid" + ") "
+			+ "AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id LIKE :inventoryID AND g.methn = m.mid AND g.glocn = loc.locid " + "GROUP BY g.gid" + ") "
 			+ Germplasm.GERMPLASM_ALIAS + "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
 			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_GERMPLASM_BY_GIDS = Germplasm.GENERAL_SELECT_FROM + "("

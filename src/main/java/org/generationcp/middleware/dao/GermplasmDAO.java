@@ -824,6 +824,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 				p1Query.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
 				this.addInventoryInfo(p1Query);
+				this.addMethodNameAndLocationName(p1Query);
 				result.addAll(this.getSearchForGermplasmsResult(p1Query.list()));
 			}
 			// find germplasms with inventory_id = or like searchValue
@@ -955,6 +956,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		p1Query.setParameter(GermplasmDAO.INVENTORY_ID, searchValue);
 		p1Query.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
 		this.addInventoryInfo(p1Query);
+		this.addMethodNameAndLocationName(p1Query);
 		return this.getSearchForGermplasmsResult(p1Query.list());
 	}
 
