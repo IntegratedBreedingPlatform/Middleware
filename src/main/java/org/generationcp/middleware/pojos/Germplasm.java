@@ -260,10 +260,11 @@ public class Germplasm implements Serializable, Auditable {
 			+ Germplasm.GERMPLASM_ALIAS + "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
 			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_GERMPLASM_BY_GIDS = Germplasm.GENERAL_SELECT_FROM + "("
-			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
+			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + ", m.mname methodName, "
+			+ "l.lname locationName " + "FROM methods m, location l, germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
-			+ "WHERE g.gid IN (:gids) AND g.gid!=g.grplce AND g.grplce = 0 " + "GROUP BY g.gid" + ") " + Germplasm.GERMPLASM_ALIAS
-			+ "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
+			+ "WHERE g.gid IN (:gids) AND g.gid!=g.grplce AND g.grplce = 0 AND g.methn = m.mid AND g.glocn = l.locid " + "GROUP BY g.gid" + ") "
+			+ Germplasm.GERMPLASM_ALIAS + "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
 			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME_LIKE = Germplasm.GENERAL_SELECT_FROM + "("
 			+ "SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs, "
@@ -308,9 +309,10 @@ public class Germplasm implements Serializable, Auditable {
 			+ "	G.gid = LDATAPROJ.germplasm_id and" + "	G.gnpgs >= 0" + " where LNAMES.projectid = :projId";
 
 	public static final String SEARCH_MAINTENANCE_GROUP_MEMBERS_BY_MGID = Germplasm.GENERAL_SELECT_FROM + "("
-			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
+			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs, "
+			+ "m.mname methodName, l.lname locationName " + "FROM methods m, location l, germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
-			+ "WHERE g.mgid IN (:mgids)" + "GROUP BY g.gid" + ") " + Germplasm.GERMPLASM_ALIAS + "LEFT JOIN ("
+			+ "WHERE g.mgid IN (:mgids) AND g.methn = m.mid AND g.glocn = l.locid " + "GROUP BY g.gid" + ") " + Germplasm.GERMPLASM_ALIAS + "LEFT JOIN ("
 			+ Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS + Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 
 	@Id
