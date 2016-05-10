@@ -12,6 +12,7 @@ import java.util.Set;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperPrint;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -76,7 +77,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 	}
 
     @Override
-    public Reporter getStreamGermplasmListReport(String code, Integer germplasmListID, String programName, final OutputStream output)
+    public Reporter getStreamGermplasmListReport(final String code, final Integer germplasmListID, final String programName, final OutputStream output)
             throws MiddlewareException, JRException, IOException, BuildReportException {
         final Reporter reporter = this.factory.createReporter(code);
         final Map<String, Object> data = this.extractGermplasmListData(germplasmListID);
@@ -101,7 +102,14 @@ public class ReportServiceImpl extends Service implements ReportService {
 		final StudyType studyType = this.getStudyDataManager().getStudyType(studyId);
 		final Workbook wb = this.getWorkbookBuilder().create(studyId, studyType);
 		final List<MeasurementRow> observations = wb.getObservations();
-		final List<MeasurementVariable> studyConditions = this.appendCountryInformation(wb.getConditions());
+		final List<MeasurementVariable> studyConditions = this.appendCountryInformationFromCondition(wb.getConditions());
+        final List<MeasurementRow> trialObservations = wb.getTrialObservations();
+
+        if (!trialObservations.isEmpty()) {
+            for (final MeasurementRow trialObservation : trialObservations) {
+                trialObservation.setDataList(this.appendCountryInformationFromObservation(trialObservation.getDataList()));
+            }
+        }
 
 		if (parentsInfoRequireed) {
 			this.appendParentsInformation(studyId, observations);
@@ -116,21 +124,16 @@ public class ReportServiceImpl extends Service implements ReportService {
 		return dataBeans;
 	}
 
-    protected Map<String, Object> extractGermplasmListData(Integer germplasmListID) {
+    protected Map<String, Object> extractGermplasmListData(final Integer germplasmListID) {
         // currently, only a blank map is returned as the current requirements for germplasm reports do not require dynamic data
-        Map<String, Object> params = new HashMap<>();
+        final Map<String, Object> params = new HashMap<>();
         params.put(AbstractReporter.STUDY_CONDITIONS_KEY, new ArrayList<MeasurementVariable>());
         params.put(AbstractReporter.DATA_SOURCE_KEY, new ArrayList());
         return params;
     }
 
-	protected List<MeasurementVariable> appendCountryInformation(final List<MeasurementVariable> originalConditions) {
-		Integer locationId = null;
-
-		for (final MeasurementVariable condition : originalConditions) {
-			final TermId term = TermId.getById(condition.getTermId());
-			locationId = this.retrieveLocationIdFromCondition(condition, term);
-		}
+	protected List<MeasurementVariable> appendCountryInformationFromCondition(final List<MeasurementVariable> originalConditions) {
+		final Integer locationId = this.retrieveLocationIdFromCondition(originalConditions);
 
 		if (locationId == null) {
 			return originalConditions;
@@ -142,15 +145,12 @@ public class ReportServiceImpl extends Service implements ReportService {
 			if ((location.getCntryid() != null && location.getCntryid() != 0)) {
 				final Country country = this.getCountryDao().getById(location.getCntryid());
 
-				final MeasurementVariable countryInfo = new MeasurementVariable();
-				countryInfo.setName(AbstractReporter.COUNTRY_VARIABLE_NAME);
-				countryInfo.setValue(country.getIsofull());
-
-				variables.add(countryInfo);
+				variables.add(createPlaceholderCountryMeasurementVariable(country.getIsofull()));
 			}
 
 			final MeasurementVariable abbrevInfo = new MeasurementVariable();
 			abbrevInfo.setName(AbstractReporter.LOCATION_ABBREV_VARIABLE_NAME);
+            abbrevInfo.setProperty("");
 			abbrevInfo.setValue(location.getLabbr());
 
 			variables.add(abbrevInfo);
@@ -160,21 +160,87 @@ public class ReportServiceImpl extends Service implements ReportService {
 		}
 	}
 
+    protected List<MeasurementData> appendCountryInformationFromObservation(final List<MeasurementData> observations) {
+        final Integer locationId = this.retrieveLocationIdFromObservations(observations);
+
+        if (locationId == null) {
+            return observations;
+        } else {
+            final List<MeasurementData> variables = new ArrayList<>(observations);
+
+            final Location location = this.getLocationDataManager().getLocationByID(locationId);
+
+            if (location.getCntryid() != null && location.getCntryid() != 0) {
+                final Country country = this.getCountryDao().getById(location.getCntryid());
+
+                variables.add(createPlaceholderCountryMeasurementData(country.getIsofull()));
+            }
+
+            final MeasurementData abbrevData = new MeasurementData();
+            final MeasurementVariable abbrevInfo = new MeasurementVariable();
+            abbrevInfo.setName(AbstractReporter.LOCATION_ABBREV_VARIABLE_NAME);
+            abbrevInfo.setProperty("");
+            abbrevData.setValue(location.getLabbr());
+            abbrevData.setMeasurementVariable(abbrevInfo);
+
+            variables.add(abbrevData);
+
+            return variables;
+
+        }
+    }
+
+    protected MeasurementVariable createPlaceholderCountryMeasurementVariable(String countryISO) {
+        final MeasurementVariable countryInfo = new MeasurementVariable();
+        countryInfo.setName(AbstractReporter.COUNTRY_VARIABLE_NAME);
+        countryInfo.setValue(countryISO);
+        countryInfo.setProperty("");
+
+        return countryInfo;
+    }
+
+    protected MeasurementData createPlaceholderCountryMeasurementData(String countryISO) {
+        MeasurementData countryData = new MeasurementData();
+        MeasurementVariable countryVariable = createPlaceholderCountryMeasurementVariable(countryISO);
+        countryData.setValue(countryISO);
+        countryData.setMeasurementVariable(countryVariable);
+
+        return countryData;
+    }
+
 	/***
-	 * Retrieves the Location ID from condition variable; Returns null if the condition value is an empty string
+	 * Retrieves the Location ID from the list of condition variables; Returns null if the condition value is an empty string
 	 *
-	 * @param condition
-	 * @param termId
 	 * @return
 	 */
-	Integer retrieveLocationIdFromCondition(final MeasurementVariable condition, final TermId termId) {
+	Integer retrieveLocationIdFromCondition(final List<MeasurementVariable> originalConditions) {
 		Integer locationId = null;
-		final String conditionValue = condition.getValue().trim();
-		if (termId == TermId.LOCATION_ID && conditionValue.length() > 0) {
-			locationId = Integer.parseInt(conditionValue);
-		}
-		return locationId;
+        for (final MeasurementVariable condition : originalConditions) {
+            final TermId term = TermId.getById(condition.getTermId());
+            if (term == TermId.LOCATION_ID && !StringUtils.isEmpty(condition.getValue())) {
+                locationId = Integer.parseInt(condition.getValue());
+            }
+        }
+
+        return locationId;
 	}
+
+    /***
+     * Retrieves the Location ID from the list of trial observations; Returns null if the condition value is an empty string
+     *
+     * @return
+     */
+    Integer retrieveLocationIdFromObservations(final List<MeasurementData> observations) {
+        Integer locationId = null;
+        for (final MeasurementData observation : observations) {
+            final TermId term = TermId.getById(observation.getMeasurementVariable().getTermId());
+            if (term == TermId.LOCATION_ID && !StringUtils.isEmpty(observation.getValue())) {
+                locationId = Integer.parseInt(observation.getValue());
+            }
+        }
+
+        return locationId;
+    }
 
 	@Override
 	public Set<String> getReportKeys() {
