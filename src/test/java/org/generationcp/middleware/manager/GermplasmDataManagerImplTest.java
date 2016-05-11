@@ -24,6 +24,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -805,7 +806,12 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testSearchGermplasm() throws MiddlewareQueryException {
 		final String q = "CML";
-		final List<Germplasm> results = this.germplasmDataManager.searchForGermplasm(q, Operation.LIKE, true, false, false);
+		final GermplasmSearchParameter searchParameter = new GermplasmSearchParameter(q, Operation.LIKE);
+		searchParameter.setIncludeParents(true);
+		searchParameter.setWithInventoryOnly(false);
+		searchParameter.setIncludeMGMembers(false);
+
+		final List<Germplasm> results = this.germplasmDataManager.searchForGermplasm(searchParameter);
 		Debug.println(IntegrationTestBase.INDENT, "searchForGermplasm(" + q + "): " + results.size() + " matches found.");
 	}
 
