@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.dao;
@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Germplasm}.
- *
+ * 
  */
 public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
@@ -201,8 +201,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.setParameter("name", name);
 			return ((Long) query.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with countByMethodNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(),
-					e);
+			this.logAndThrowException("Error with countByMethodNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
 		}
 		return 0;
 	}
@@ -230,8 +229,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.setParameter("name", name);
 			return ((Long) query.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with countByLocationNameUsingEqual(name=" + name + ") query from Germplasm: " + e.getMessage(),
-					e);
+			this.logAndThrowException(
+					"Error with countByLocationNameUsingEqual(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
 		}
 		return 0;
 	}
@@ -247,8 +246,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			return query.list();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByLocationNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(),
-					e);
+			this.logAndThrowException("Error with getByLocationNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
 		}
 		return new ArrayList<Germplasm>();
 	}
@@ -342,8 +340,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				return progenitors;
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getProgenitorsByGIDWithPrefName(gid=" + gid + ") query from Germplasm: " + e.getMessage(),
-					e);
+			this.logAndThrowException(
+					"Error with getProgenitorsByGIDWithPrefName(gid=" + gid + ") query from Germplasm: " + e.getMessage(), e);
 		}
 		return new ArrayList<Germplasm>();
 	}
@@ -704,9 +702,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return query.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error with getByLocationId(name=" + name + ", locationID=" + locationID + ") query from Germplasm: " + e.getMessage(),
-					e);
+			this.logAndThrowException("Error with getByLocationId(name=" + name + ", locationID=" + locationID + ") query from Germplasm: "
+					+ e.getMessage(), e);
 		}
 		return new ArrayList<Germplasm>();
 	}
@@ -753,9 +750,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return query.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error with getByGIDRange(startGID=" + startGID + ", endGID=" + endGID + ") query from Germplasm: " + e.getMessage(),
-					e);
+			this.logAndThrowException("Error with getByGIDRange(startGID=" + startGID + ", endGID=" + endGID + ") query from Germplasm: "
+					+ e.getMessage(), e);
 		}
 		return new ArrayList<Germplasm>();
 	}
@@ -783,7 +779,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 		return new ArrayList<Germplasm>();
 	}
-	
+
 	/**
 	 * Search for germplasms given a search term
 	 * 
@@ -1062,10 +1058,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		Name name;
 		final Map<Integer, Map<GermplasmNameType, Name>> names = new HashMap<>();
-		int i = 0;
-
 		for (final Object result : resultNames) {
-			i++;
 			final Object resultArray[] = (Object[]) result;
 			final Integer gid = Integer.valueOf(resultArray[0].toString());
 			final Integer ntype = Integer.valueOf(resultArray[1].toString());

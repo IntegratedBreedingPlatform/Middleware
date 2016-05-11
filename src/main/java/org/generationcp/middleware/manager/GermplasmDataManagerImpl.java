@@ -388,8 +388,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		if (breedingMethod == null) {
 			return false;
 		}
-		final boolean isConfigurationNotEmpty = !(breedingMethod.getSuffix() == null && breedingMethod.getSeparator() == null &&
-				breedingMethod.getSnametype() == null && breedingMethod.getPrefix() == null && breedingMethod.getCount() == null);
+		final boolean isConfigurationNotEmpty =
+				!(breedingMethod.getSuffix() == null && breedingMethod.getSeparator() == null && breedingMethod.getSnametype() == null
+						&& breedingMethod.getPrefix() == null && breedingMethod.getCount() == null);
 		return isConfigurationNotEmpty;
 	}
 
