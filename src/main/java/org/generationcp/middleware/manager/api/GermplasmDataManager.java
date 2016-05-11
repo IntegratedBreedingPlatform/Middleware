@@ -870,10 +870,11 @@ public interface GermplasmDataManager {
 	 * @param o - like or equal
 	 * @param includeParents boolean flag to denote whether parents will be included in search results
 	 * @param withInventoryOnly - boolean flag to denote whether result will be filtered by those with inventories only
+	 * @param includeMGMembers - boolean flag to denote whether the management group members (same mgid) will be included in the result
 	 * @return List of Germplasms
 	 * @throws MiddlewareQueryException
 	 */
-	List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly);
+	List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly, boolean includeMGMembers);
 
 	/**
 	 * Search for germplasms given a search term
