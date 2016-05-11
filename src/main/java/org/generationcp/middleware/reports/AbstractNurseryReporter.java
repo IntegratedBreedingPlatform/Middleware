@@ -19,7 +19,9 @@ import org.generationcp.middleware.pojos.report.Occurrence;
 
 public abstract class AbstractNurseryReporter extends AbstractReporter {
 
-	@SuppressWarnings("unchecked")
+    protected ReportParameterMapper parameterMapper = new ReportParameterMapper();
+
+    @SuppressWarnings("unchecked")
 	@Override
 	public Map<String, Object> buildJRParams(final Map<String, Object> args) {
 		final Map<String, Object> params = super.buildJRParams(args);
@@ -40,46 +42,9 @@ public abstract class AbstractNurseryReporter extends AbstractReporter {
 		params.put(PROGRAM_NAME_REPORT_KEY, args.get(PROGRAM_NAME_ARG_KEY));
 
 		for (final MeasurementVariable var : studyConditions) {
-			final TermId term = TermId.getById(var.getTermId());
+			parameterMapper.mapBasicStudyValues(var, params, var.getValue());
 
-			switch (term) {
-				case STUDY_NAME:
-					params.put(STUDY_NAME_REPORT_KEY, var.getValue());
-					break;
-				case STUDY_TITLE:
-					params.put(STUDY_TITLE_REPORT_KEY, var.getValue());
-					break;
-				case TRIAL_INSTANCE_FACTOR:
-					if ("".equalsIgnoreCase(var.getValue())) {
-						params.put("occ", 0);
-					} else {
-						params.put("occ", Integer.valueOf(var.getValue()));
-					}
-					break;
-				case TRIAL_LOCATION:
-					params.put(LOCATION_NAME_REPORT_KEY, var.getValue());
-					break;
-				case LOCATION_ID:
-					params.put(LOCATION_ID_REPORT_KEY, var.getValue());
-					break;
-				case STUDY_INSTITUTE:
-					params.put(ORGANIZATION_REPORT_KEY, var.getValue());
-					break;
-                // here we have empty blocks for cases where the term ID is non existent, as well as for cases where the term ID is not captured by the previous cases
-                case NONEXISTENT:
-                    break;
-                default:
-                    break;
-			}
-
-			if (var.getName().equals(COUNTRY_VARIABLE_NAME)) {
-				params.put(COUNTRY_VARIABLE_NAME, var.getValue());
-			} else if (var.getName().equals(LOCATION_ABBREV_VARIABLE_NAME)) {
-				params.put(LOCATION_ABBREV_VARIABLE_NAME, var.getValue());
-			} else if (var.getProperty().equalsIgnoreCase("Season")) {
-				params.put(SEASON_REPORT_KEY, var.getValue());
-				params.put("LoCycle", var.getValue());
-			}
+            parameterMapper.mapEnvironmentValue(var, params, var.getValue());
 		}
 
 		// TODO: pending mappings
