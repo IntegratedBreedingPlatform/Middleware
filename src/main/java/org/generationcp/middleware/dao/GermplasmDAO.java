@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
@@ -853,6 +854,74 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			// Add parents and MGMembers to results if specified by "includeParents" and "includeMGMembers" flag
 			result.addAll(resultParents);
 			result.addAll(resultMGMembers);
+			return new ArrayList<Germplasm>(result);
+
+		} catch (final Exception e) {
+			this.logAndThrowException("Error with searchGermplasms(" + q + ") " + e.getMessage(), e);
+		}
+		return new ArrayList<Germplasm>();
+	}
+	
+	public List<Germplasm> searchForGermplasms(final GermplasmSearchParameter germplasmSearchParameter) throws MiddlewareQueryException {
+		final String q = germplasmSearchParameter.getSearchKeyword().trim();
+		if ("".equals(q)) {
+			return new ArrayList<Germplasm>();
+		}
+		try {
+
+			final Set<Germplasm> result = new LinkedHashSet<Germplasm>();
+			Set<Germplasm> resultParents = new LinkedHashSet<Germplasm>();
+			Set<Germplasm> resultMGMembers = new LinkedHashSet<Germplasm>();
+
+			final String additionalQuery = germplasmSearchParameter.isWithInventoryOnly() ? Germplasm.WHERE_WITH_INVENTORY : "";
+
+			// find germplasms with GID = or like q
+			if (q.matches("(-)?(%)?[(\\d+)(%|_)?]*(%)?")) {
+				SQLQuery p1Query;
+				if (germplasmSearchParameter.getOperation().equals(Operation.LIKE)) {
+					p1Query = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID_LIKE + additionalQuery);
+					p1Query.setParameter("gid", q);
+				} else {
+					p1Query = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID + additionalQuery);
+					p1Query.setParameter("gidLength", q.length());
+					p1Query.setParameter("gid", q);
+				}
+
+				p1Query.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
+				this.addInventoryInfo(p1Query);
+				result.addAll(this.getSearchForGermplasmsResult(p1Query.list()));
+			}
+			// find germplasms with inventory_id = or like q
+			result.addAll(this.searchForGermplasmsByInventoryId(q, germplasmSearchParameter.getOperation(), additionalQuery));
+
+			// find germplasms with nVal = or like q
+			SQLQuery p2Query;
+			if (germplasmSearchParameter.getOperation().equals(Operation.LIKE)) {
+				p2Query = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME_LIKE + additionalQuery);
+			} else {
+				p2Query = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME + additionalQuery);
+			}
+			p2Query.setParameter("q", q);
+			p2Query.setParameter(GermplasmDAO.Q_NO_SPACES, q.replaceAll(" ", ""));
+			p2Query.setParameter(GermplasmDAO.Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
+			p2Query.setParameter("deletedStatus", GermplasmDAO.STATUS_DELETED);
+			p2Query.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
+			this.addInventoryInfo(p2Query);
+			result.addAll(this.getSearchForGermplasmsResult(p2Query.list()));
+
+			if (germplasmSearchParameter.isIncludeParents()) {
+				resultParents = this.retrieveParents(result);
+			}
+
+			if (germplasmSearchParameter.isIncludeMGMembers()) {
+				resultMGMembers = this.retrieveMGMembers(result);
+			}
+
+			// Add parents and MGMembers to results if specified by "includeParents" and "includeMGMembers" flag
+			result.addAll(resultParents);
+			result.addAll(resultMGMembers);
+			p2Query.setFirstResult(germplasmSearchParameter.getStartingRow());
+			p2Query.setMaxResults(germplasmSearchParameter.getNumberOfEntries());
 			return new ArrayList<Germplasm>(result);
 
 		} catch (final Exception e) {
