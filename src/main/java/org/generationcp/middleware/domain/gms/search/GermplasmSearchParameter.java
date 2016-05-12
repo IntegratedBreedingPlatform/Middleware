@@ -27,6 +27,15 @@ public class GermplasmSearchParameter {
 		this.operation = operation;
 	}
 
+	public GermplasmSearchParameter(final String searchKeyword, final Operation operation, final boolean includeParents,
+			final boolean withInventoryOnly, final boolean includeMGMembers) {
+		this.searchKeyword = searchKeyword;
+		this.operation = operation;
+		this.includeParents = includeParents;
+		this.withInventoryOnly = withInventoryOnly;
+		this.includeMGMembers = includeMGMembers;
+	}
+
 	public String getSearchKeyword() {
 		return this.searchKeyword;
 	}
