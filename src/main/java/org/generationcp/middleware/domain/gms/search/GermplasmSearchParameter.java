@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.domain.gms.search;
 
 import org.generationcp.middleware.manager.Operation;
@@ -81,24 +82,24 @@ public class GermplasmSearchParameter {
 	public void setNumberOfEntries(final int numberOfEntries) {
 		this.numberOfEntries = numberOfEntries;
 	}
-	
+
 	@Override
-	public String toString(){
-		StringBuilder builder = new StringBuilder();
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
 		builder.append("GermplasmSearchParameter [searchKeyword=");
-		builder.append(searchKeyword);
+		builder.append(this.searchKeyword);
 		builder.append(", operation=");
-		builder.append(operation);
+		builder.append(this.operation);
 		builder.append(", includeParents=");
-		builder.append(includeParents);
+		builder.append(this.includeParents);
 		builder.append(", withInventoryOnly=");
-		builder.append(withInventoryOnly);
+		builder.append(this.withInventoryOnly);
 		builder.append(", includeMGMembers=");
-		builder.append(includeMGMembers);
+		builder.append(this.includeMGMembers);
 		builder.append(", startingRow=");
-		builder.append(startingRow);
+		builder.append(this.startingRow);
 		builder.append(", numberOfEntries=");
-		builder.append(numberOfEntries);
+		builder.append(this.numberOfEntries);
 		builder.append("]");
 		return builder.toString();
 	}
