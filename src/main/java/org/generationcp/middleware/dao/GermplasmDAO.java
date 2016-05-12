@@ -1067,42 +1067,43 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	public Integer countSearchForGermplasms(final String q, final Operation o, final boolean includeParents,
 			final boolean withInventoryOnly, final boolean includeMGMembers) {
-		final Set<Integer> searchGermplasmIds = new HashSet<Integer>();
 
+		Integer searchResultsCount = 0;
 		try {
 			final StringBuilder queryString = new StringBuilder();
 			final Map<String, String> params = new HashMap<String, String>();
 
+			queryString.append("SELECT COUNT(GID) FROM (");
 			// 1. find germplasms with GID = or like q
 			if (q.matches("(-)?(%)?[(\\d+)(%|_)?]*(%)?")) {
 				if (o.equals(Operation.LIKE)) {
-					queryString.append("SELECT DISTINCT g.gid FROM germplsm g WHERE g.gid like :gid");
+					queryString.append("SELECT DISTINCT g.gid as GID FROM germplsm g WHERE g.gid like :gid");
 					params.put("gid", q);
 				} else {
 					queryString
-							.append("SELECT DISTINCT g.gid FROM germplsm g WHERE g.gid=:gid AND length(g.gid) = :gidLength AND g.gid!=g.grplce AND g.grplce = 0");
+							.append("SELECT DISTINCT g.gid as GID FROM germplsm g WHERE g.gid=:gid AND length(g.gid) = :gidLength AND g.gid!=g.grplce AND g.grplce = 0");
 					params.put("gidLength", String.valueOf(q.length()));
 					params.put("gid", q);
 				}
-			}
 
-			queryString.append(" UNION ");
+				queryString.append(" UNION ");
+			}
 
 			// 2. find germplasms with inventory_id = or like q
 			if (o.equals(Operation.LIKE)) {
-				queryString.append("SELECT DISTINCT g.gid "
+				queryString.append("SELECT DISTINCT g.gid as GID "
 						+ "FROM germplsm g LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
 						+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid, ims_lot l, ims_transaction t "
 						+ "WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid "
 						+ "AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id LIKE :inventory_id GROUP BY g.gid");
 			} else {
-				queryString.append("SELECT DISTINCT g.gid "
+				queryString.append("SELECT DISTINCT g.gid as GID "
 						+ "FROM germplsm g LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
 						+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid, ims_lot l, ims_transaction t "
 						+ "WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid "
 						+ "AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id = :inventory_id GROUP BY g.gid");
 			}
-			params.put(GermplasmDAO.INVENTORY_ID, q);
+			params.put("inventory_id", q);
 
 			queryString.append(" UNION ");
 
@@ -1114,6 +1115,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				queryString
 						.append("SELECT DISTINCT g.gid as GID FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND g.grplce = 0 AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces)");
 			}
+
+			queryString.append(") GermplasmSearchResults ");
+
 			params.put("q", q);
 			params.put(GermplasmDAO.Q_NO_SPACES, q.replaceAll(" ", ""));
 			params.put(GermplasmDAO.Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
@@ -1123,15 +1127,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				query.setParameter(param.getKey(), param.getValue());
 			}
 
-			query.addEntity("g", Germplasm.class);
-			searchGermplasmIds.addAll(query.list());
-
-			// TODO needs to include parents and management groups members
+			searchResultsCount = ((BigInteger) query.uniqueResult()).intValue();
 
 		} catch (final Exception e) {
 			this.logAndThrowException("Error with searchGermplasms(" + q + ") " + e.getMessage(), e);
 		}
 
-		return searchGermplasmIds.size();
+		return searchResultsCount;
 	}
 }
