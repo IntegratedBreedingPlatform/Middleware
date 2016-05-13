@@ -40,7 +40,7 @@ public class DataSourceProperties {
 
 	private String maintenanceInterval = "60";
 
-	private String maxPoolSize = "50";
+	private String maxPoolSize = "100";
 
 	private String minPoolSize = "3";
 
@@ -57,6 +57,8 @@ public class DataSourceProperties {
 	private String maxIdleTime = "120";
 
 	private final String hibernateConfigurationLocation = "classpath:ibpmidware_hib.cfg.xml";
+
+	private String reapTimeout = "300";
 
 	private static final Logger LOG = LoggerFactory.getLogger(XADataSourceProperties.class);
 

@@ -49,9 +49,9 @@ public class XADataSourcePropertiesTest {
 		Assert.assertEquals(xaDataSourceProperties.getXaDriverName(), "com.mysql.jdbc.jdbc2.optional.MysqlXADataSource");
 		Assert.assertEquals(xaDataSourceProperties.getBorrowConnectionTimeout(), "30");
 		Assert.assertEquals(xaDataSourceProperties.getMaintenanceInterval(), "60");
-		Assert.assertEquals(xaDataSourceProperties.getReapTimeout(), "600");
+		Assert.assertEquals(xaDataSourceProperties.getReapTimeout(), "300");
 		Assert.assertEquals(xaDataSourceProperties.getMinPoolSize(), "3");
-		Assert.assertEquals(xaDataSourceProperties.getMaxPoolSize(), "50");
+		Assert.assertEquals(xaDataSourceProperties.getMaxPoolSize(), "100");
 		Assert.assertEquals(xaDataSourceProperties.getMaxIdleTime(), "120");
 
 		Assert.assertEquals(xaDataSourceProperties.getHibernateConfigurationLocation(), "classpath:ibpmidware_hib.cfg.xml");
