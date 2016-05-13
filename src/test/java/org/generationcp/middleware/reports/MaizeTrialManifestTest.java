@@ -21,6 +21,8 @@ public class MaizeTrialManifestTest {
 
     private static final MeasurementVariable SEASON_MEASUREMENT_VARIABLE = new MeasurementVariable("Crop_season_code", "", "test", "test", "Season", "test", TEST_SEASON_VALUE, "");
     private static final MeasurementVariable COLLABORATOR_MEASUREMENT_VARIABLE = new MeasurementVariable("Collaborator", "", "", "", "", "", TEST_COLLABORATOR_NAME, "");
+    public static final String TEST_STUDY_NAME = "testStudyName";
+    public static final String TEST_PROGRAM_NAME = "testProgram";
 
     private MaizeTrialManifest unitUnderTest = new MaizeTrialManifest();
 
@@ -39,8 +41,29 @@ public class MaizeTrialManifestTest {
     }
 
     @Test
+    public void testBuildBasicReportValues() {
+        final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(1, StudyType.T, TEST_STUDY_NAME, 1, false);
+        final List<MeasurementVariable> conditions = workbook.getStudyConditions();
+        final List<MeasurementRow> observations = workbook.getObservations();
+
+        final Map<String, Object> reportParams = new HashMap<>();
+        reportParams.put(AbstractReporter.STUDY_CONDITIONS_KEY, conditions);
+        reportParams.put(AbstractReporter.DATA_SOURCE_KEY, observations);
+        reportParams.put(AbstractReporter.STUDY_OBSERVATIONS_KEY, workbook.getTrialObservations());
+        reportParams.put(AbstractReporter.PROGRAM_NAME_ARG_KEY, TEST_PROGRAM_NAME);
+
+
+        final Map<String, Object> reportValues = this.unitUnderTest.buildJRParams(reportParams);
+        Assert.assertTrue("Report should be able to provide the study name", reportValues.containsKey(AbstractReporter.STUDY_NAME_REPORT_KEY));
+        Assert.assertEquals("Unable to provide the expected value for study name", TEST_STUDY_NAME, reportValues.get(AbstractReporter.STUDY_NAME_REPORT_KEY));
+
+        Assert.assertTrue("Report should be able to provide the program name", reportValues.containsKey(MaizeTrialManifest.MAIZE_MANIFEST_PROGRAM_KEY));
+        Assert.assertEquals("Unable to provide the expected value for program name", TEST_PROGRAM_NAME, reportValues.get(MaizeTrialManifest.MAIZE_MANIFEST_PROGRAM_KEY));
+    }
+
+    @Test
     public void testBuildReportValuesFromEnvironmentSettings() {
-        final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(1, StudyType.T, "testStudyName", 1, false);
+        final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(1, StudyType.T, TEST_STUDY_NAME, 1, false);
         final List<MeasurementVariable> conditions = workbook.getStudyConditions();
         final List<MeasurementRow> observations = workbook.getObservations();
         final List<MeasurementRow> trialObservations = createTestRowForReport();
