@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.dao;
@@ -112,17 +112,17 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Test
 	public void testSearchForGermplasmsExactMatchGermplasmName() throws Exception {
 		final List<Germplasm> results = this.dao.searchForGermplasms(this.preferredName.getNval(), Operation.EQUAL, false, false, false);
-		Assert.assertEquals("The results should contain one germplasm since there's only one test data with '"
-				+ this.preferredName.getNval() + "' name", 1, results.size());
+		Assert.assertEquals(
+				"The results should contain one germplasm since there's only one test data with '" + this.preferredName.getNval()
+						+ "' name", 1, results.size());
 	}
 
 	@Test
 	public void testSearchForGermplasmsStartsWithGID() throws Exception {
 		final List<Germplasm> results =
 				this.dao.searchForGermplasms(this.germplasmGID.toString() + "%", Operation.LIKE, false, false, false);
-		Assert.assertEquals(
-				"The results should contain one germplasm since there's only one test data with gid that starts with " + this.germplasmGID,
-				1, results.size());
+		Assert.assertEquals("The results should contain one germplasm since there's only one test data with gid that starts with "
+				+ this.germplasmGID, 1, results.size());
 	}
 
 	@Test
@@ -137,9 +137,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	public void testSearchForGermplasmsContainsGID() throws Exception {
 		final List<Germplasm> results =
 				this.dao.searchForGermplasms("%" + this.germplasmGID.toString() + "%", Operation.LIKE, false, false, false);
-		Assert.assertEquals(
-				"The results should contain one germplasm since there's only one test data with gid that contains " + this.germplasmGID, 1,
-				results.size());
+		Assert.assertEquals("The results should contain one germplasm since there's only one test data with gid that contains "
+				+ this.germplasmGID, 1, results.size());
 	}
 
 	@Test
@@ -148,33 +147,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 				this.dao.searchForGermplasms("%" + this.preferredName.getNval() + "%", Operation.LIKE, false, false, false);
 		Assert.assertTrue("The results should contain one germplasm since there's only one test data with name that contains "
 				+ this.preferredName.getNval(), results.size() == 1);
-	}
-
-	@Test
-	public void testSearchForGermplasmsByInventoryId_ExactMatch() throws Exception {
-		final List<Germplasm> results = this.dao.searchForGermplasmsByInventoryId(GermplasmDAOTest.DUMMY_STOCK_ID, Operation.EQUAL, "");
-		Assert.assertNotNull(results);
-		Assert.assertTrue(results.size() == 1);
-	}
-
-	@Test
-	public void testSearchForGermplasmsByInventoryId_StartsWith() throws Exception {
-		final String inventoryID = GermplasmDAOTest.DUMMY_STOCK_ID.substring(0, 3) + "%";
-		final List<Germplasm> results = this.dao.searchForGermplasmsByInventoryId(inventoryID, Operation.LIKE, "");
-		Assert.assertNotNull(results);
-		Assert.assertFalse(results.isEmpty());
-	}
-
-	@Test
-	public void testSearchForGermplasmsByInventoryId_Contains() throws Exception {
-		final String inventoryID = "%" + GermplasmDAOTest.DUMMY_STOCK_ID.substring(0, 3) + "%";
-		final List<Germplasm> results = this.dao.searchForGermplasmsByInventoryId(inventoryID, Operation.LIKE, "");
-		Assert.assertNotNull(results);
-		Assert.assertFalse(results.isEmpty());
-
-		final List<Germplasm> startsWithResults =
-				this.dao.searchForGermplasms(GermplasmDAOTest.DUMMY_STOCK_ID.substring(0, 3) + "%", Operation.LIKE, false, false, false);
-		Assert.assertTrue(results.containsAll(startsWithResults));
 	}
 
 	@Test

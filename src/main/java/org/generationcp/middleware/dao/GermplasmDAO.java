@@ -50,7 +50,6 @@ import com.jamonapi.MonitorFactory;
 public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private static final String STOCK_IDS = "stockIDs";
-	private static final String INVENTORY_ID = "inventoryID";
 	private static final String GERMPLSM = "germplsm";
 	private static final String Q_NO_SPACES = "qNoSpaces";
 	private static final String Q_STANDARDIZED = "qStandardized";
@@ -847,12 +846,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return new ArrayList<Germplasm>(germplasmSearchResult);
 	}
 
-	private void addInventoryInfo(final SQLQuery query) {
-		query.addScalar(GermplasmDAO.STOCK_IDS);
-		query.addScalar(GermplasmDAO.AVAIL_INV);
-		query.addScalar(GermplasmDAO.SEED_RES);
-	}
-
 	private List<Germplasm> getSearchForGermplasmsResult(final List<Object[]> result) {
 		final List<Germplasm> germplasms = new ArrayList<Germplasm>();
 		if (result != null) {
@@ -871,25 +864,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		inventoryInfo.setReservedLotCount(row[3] != null ? ((BigInteger) row[3]).intValue() : 0);
 		germplasm.setInventoryInfo(inventoryInfo);
 		return germplasm;
-	}
-
-	/**
-	 * @param q - inventory / stock id to be searched
-	 * @param o - operation (like, equal)
-	 * @return list of germplasms
-	 */
-	@SuppressWarnings("unchecked")
-	protected List<Germplasm> searchForGermplasmsByInventoryId(final String q, final Operation o, final String additionalQuery) {
-		SQLQuery p1Query;
-		if (o.equals(Operation.LIKE)) {
-			p1Query = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_INVENTORY_ID_LIKE + additionalQuery);
-		} else {
-			p1Query = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_INVENTORY_ID + additionalQuery);
-		}
-		p1Query.setParameter(GermplasmDAO.INVENTORY_ID, q);
-		p1Query.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
-		this.addInventoryInfo(p1Query);
-		return this.getSearchForGermplasmsResult(p1Query.list());
 	}
 
 	public Map<Integer, Integer> getGermplasmDatesByGids(final List<Integer> gids) {
