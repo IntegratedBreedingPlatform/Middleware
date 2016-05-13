@@ -1073,7 +1073,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final StringBuilder queryString = new StringBuilder();
 			final Map<String, String> params = new HashMap<String, String>();
 
-			queryString.append("SELECT COUNT(GID) FROM (");
+			queryString.append("SELECT COUNT(GermplasmSearchResults.GID) FROM (");
+
 			// 1. find germplasms with GID = or like q
 			if (q.matches("(-)?(%)?[(\\d+)(%|_)?]*(%)?")) {
 				if (o.equals(Operation.LIKE)) {
@@ -1117,6 +1118,14 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 
 			queryString.append(") GermplasmSearchResults ");
+
+			if (withInventoryOnly) {
+				queryString.append(" INNER JOIN ");
+				queryString.append("(SELECT GID FROM (SELECT l.eid as GID, SUM(t.trnqty) as availInv from ims_lot l "
+						+ "inner join ims_transaction t on l.lotid = t.lotid GROUP BY l.eid ) "
+						+ "GermplasmWithInventory where availInv > 0 ) ");
+				queryString.append(" GermplasmWithInventory ON GermplasmSearchResults.GID = GermplasmWithInventory.GID ");
+			}
 
 			params.put("q", q);
 			params.put(GermplasmDAO.Q_NO_SPACES, q.replaceAll(" ", ""));
