@@ -47,7 +47,7 @@ public class XADataSourcePropertiesTest {
 
 		Assert.assertEquals(xaDataSourceProperties.getWorkbenchDbName(), "workbench");
 		Assert.assertEquals(xaDataSourceProperties.getXaDriverName(), "com.mysql.jdbc.jdbc2.optional.MysqlXADataSource");
-		Assert.assertEquals(xaDataSourceProperties.getBorrowConnectionTimeout(), "600");
+		Assert.assertEquals(xaDataSourceProperties.getBorrowConnectionTimeout(), "30");
 		Assert.assertEquals(xaDataSourceProperties.getMaintenanceInterval(), "60");
 		Assert.assertEquals(xaDataSourceProperties.getReapTimeout(), "600");
 		Assert.assertEquals(xaDataSourceProperties.getMinPoolSize(), "3");

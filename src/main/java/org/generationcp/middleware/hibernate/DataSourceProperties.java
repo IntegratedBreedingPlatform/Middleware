@@ -34,7 +34,7 @@ public class DataSourceProperties {
 
 	static final String DB_PASSWORD = "db.password";
 
-	private String borrowConnectionTimeout = "600";
+	private String borrowConnectionTimeout = "30";
 
 	private String host = "localhost";
 
