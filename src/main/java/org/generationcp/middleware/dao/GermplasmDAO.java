@@ -793,7 +793,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	 */
 	public List<Germplasm> searchForGermplasms(final String searchedString, final Operation o, final boolean includeParents,
 			final boolean withInventoryOnly, final boolean includeMGMembers) throws MiddlewareQueryException {
-		final String q = searchedString.trim();
+		// use the one that uses the new GermplasmSearchParameter pojo for performing the search
+		return this.searchForGermplasms(new GermplasmSearchParameter(searchedString,o,includeParents,withInventoryOnly,includeMGMembers));
+	}
+	
+	public List<Germplasm> searchForGermplasms(final GermplasmSearchParameter germplasmSearchParameter) throws MiddlewareQueryException {
+		// actual searching here
+		final String q = germplasmSearchParameter.getSearchKeyword().trim();
 		if ("".equals(q)) {
 			return new ArrayList<Germplasm>();
 		}
@@ -803,12 +809,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			Set<Germplasm> resultParents = new LinkedHashSet<Germplasm>();
 			Set<Germplasm> resultMGMembers = new LinkedHashSet<Germplasm>();
 
-			final String additionalQuery = withInventoryOnly ? Germplasm.WHERE_WITH_INVENTORY : "";
+			final String additionalQuery = germplasmSearchParameter.isWithInventoryOnly() ? Germplasm.WHERE_WITH_INVENTORY : "";
 
 			// find germplasms with GID = or like q
 			if (q.matches("(-)?(%)?[(\\d+)(%|_)?]*(%)?")) {
 				SQLQuery p1Query;
-				if (o.equals(Operation.LIKE)) {
+				if (germplasmSearchParameter.getOperation().equals(Operation.LIKE)) {
 					p1Query = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID_LIKE + additionalQuery);
 					p1Query.setParameter("gid", q);
 				} else {
@@ -822,11 +828,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				result.addAll(this.getSearchForGermplasmsResult(p1Query.list()));
 			}
 			// find germplasms with inventory_id = or like q
-			result.addAll(this.searchForGermplasmsByInventoryId(q, o, additionalQuery));
+			result.addAll(this.searchForGermplasmsByInventoryId(q, germplasmSearchParameter.getOperation(), additionalQuery));
 
 			// find germplasms with nVal = or like q
 			SQLQuery p2Query;
-			if (o.equals(Operation.LIKE)) {
+			if (germplasmSearchParameter.getOperation().equals(Operation.LIKE)) {
 				p2Query = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME_LIKE + additionalQuery);
 			} else {
 				p2Query = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME + additionalQuery);
@@ -839,29 +845,23 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			this.addInventoryInfo(p2Query);
 			result.addAll(this.getSearchForGermplasmsResult(p2Query.list()));
 
-			if (includeParents) {
+			if (germplasmSearchParameter.isIncludeParents()) {
 				resultParents = this.retrieveParents(result);
 			}
 
-			if (includeMGMembers) {
+			if (germplasmSearchParameter.isIncludeMGMembers()) {
 				resultMGMembers = this.retrieveMGMembers(result);
 			}
 
 			// Add parents and MGMembers to results if specified by "includeParents" and "includeMGMembers" flag
 			result.addAll(resultParents);
 			result.addAll(resultMGMembers);
-			return new ArrayList<Germplasm>(result);
+			return new ArrayList<>(result);
 
 		} catch (final Exception e) {
 			this.logAndThrowException("Error with searchGermplasms(" + q + ") " + e.getMessage(), e);
 		}
-		return new ArrayList<Germplasm>();
-	}
-	
-	public List<Germplasm> searchForGermplasms(final GermplasmSearchParameter germplasmSearchParameter) throws MiddlewareQueryException {
-		return searchForGermplasms(germplasmSearchParameter.getSearchKeyword(), germplasmSearchParameter.getOperation(),
-				germplasmSearchParameter.isIncludeParents(), germplasmSearchParameter.isWithInventoryOnly(),
-				germplasmSearchParameter.isIncludeMGMembers());
+		return new ArrayList<>();
 	}
 
 	private Set<Germplasm> retrieveMGMembers(final Set<Germplasm> result) {
