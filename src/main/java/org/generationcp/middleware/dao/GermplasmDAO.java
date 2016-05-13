@@ -1074,11 +1074,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final Monitor countSearchForGermplasms = MonitorFactory.start("Method Started : countSearchForGermplasms ");
 
 		Integer searchResultsCount = 0;
+
+		final Set<Integer> gidSearchResults = new HashSet<Integer>();
 		try {
 			final StringBuilder queryString = new StringBuilder();
 			final Map<String, String> params = new HashMap<String, String>();
 
-			queryString.append("SELECT COUNT(GermplasmSearchResults.GID) FROM (");
+			queryString.append("SELECT DISTINCT GermplasmSearchResults.GID FROM (");
 
 			// 1. find germplasms with GID = or like q
 			if (q.matches("(-)?(%)?[(\\d+)(%|_)?]*(%)?")) {
@@ -1136,14 +1138,77 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				query.setParameter(param.getKey(), param.getValue());
 			}
 
-			searchResultsCount = ((BigInteger) query.uniqueResult()).intValue();
+			gidSearchResults.addAll(query.list());
+
+			if (includeParents) {
+				gidSearchResults.addAll(this.retrieveGermplasmParentsResults(gidSearchResults));
+			}
+
+			if (includeMGMembers) {
+				gidSearchResults.addAll(this.retrieveGermplasmGroupMemberResults(gidSearchResults));
+			}
+
+			searchResultsCount = gidSearchResults.size();
 
 		} catch (final Exception e) {
-			this.logAndThrowException("Error with searchGermplasms(" + q + ") " + e.getMessage(), e);
+			this.logAndThrowException("Error with countSearchForGermplasms(" + q + ") " + e.getMessage(), e);
 		}
 
 		GermplasmDAO.LOG.debug("Method End : countSearchForGermplasms " + countSearchForGermplasms.stop());
 
 		return searchResultsCount;
 	}
+
+	private Set<Integer> retrieveGermplasmParentsResults(final Set<Integer> gidSearchResults) {
+		final Set<Integer> gidParentsSearchResults = new HashSet<Integer>();
+		try {
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT DISTINCT GermplasmParents.GID FROM (");
+
+			// female parent
+			queryString.append("SELECT DISTINCT g.gpid1 as GID from germplsm g where g.gpid1 != 0 AND g.gid IN (:gids) ");
+			queryString.append(" UNION ");
+
+			// male parent
+			queryString.append("SELECT DISTINCT g.gpid2 as GID from germplsm g where g.gpid1 != 0 AND g.gid IN (:gids) ");
+			queryString.append(" UNION ");
+
+			// other progenitors
+			queryString.append("SELECT p.gid as GID from progntrs p where p.gid IN (:gids)");
+			queryString.append(") GermplasmParents "
+					+ "INNER JOIN germplsm g on GermplasmParents.GID = g.gid AND g.gid!=g.grplce AND g.grplce = 0");
+
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("gids", gidSearchResults);
+
+			gidParentsSearchResults.addAll(query.list());
+
+		} catch (final HibernateException e) {
+			this.logAndThrowException("Error with retrieveGermplasmGroupMemberResults(GIDS=" + gidSearchResults + ") : " + e.getMessage(),
+					e);
+		}
+
+		return gidParentsSearchResults;
+	}
+
+	private Set<Integer> retrieveGermplasmGroupMemberResults(final Set<Integer> gidSearchResults) {
+		final Set<Integer> gidGroupMembersSearchResults = new HashSet<Integer>();
+		try {
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT members.gid FROM germplsm members INNER JOIN germplsm g ON members.gid = g.mgid "
+					+ "WHERE g.gid!=g.grplce AND g.grplce = 0 AND g.mgid != 0 and g.gid IN (:gids)");
+
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("gids", gidSearchResults);
+
+			gidGroupMembersSearchResults.addAll(query.list());
+
+		} catch (final HibernateException e) {
+			this.logAndThrowException("Error with retrieveGermplasmGroupMemberResults(GIDS=" + gidSearchResults + ") : " + e.getMessage(),
+					e);
+		}
+
+		return gidGroupMembersSearchResults;
+	}
+
 }
