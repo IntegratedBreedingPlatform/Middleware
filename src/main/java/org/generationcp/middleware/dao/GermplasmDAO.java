@@ -1082,12 +1082,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			// 1. find germplasms with GID = or like q
 			if (q.matches("(-)?(%)?[(\\d+)(%|_)?]*(%)?")) {
+				queryString.append("SELECT DISTINCT g.gid as GID FROM germplsm g ");
 				if (o.equals(Operation.LIKE)) {
-					queryString.append("SELECT DISTINCT g.gid as GID FROM germplsm g WHERE g.gid like :gid");
+					queryString.append("WHERE g.gid like :gid ");
 					params.put("gid", q);
 				} else {
-					queryString
-							.append("SELECT DISTINCT g.gid as GID FROM germplsm g WHERE g.gid=:gid AND length(g.gid) = :gidLength AND g.gid!=g.grplce AND g.grplce = 0");
+					queryString.append("WHERE g.gid=:gid AND length(g.gid) = :gidLength ");
 					params.put("gidLength", String.valueOf(q.length()));
 					params.put("gid", q);
 				}
@@ -1096,32 +1096,23 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 
 			// 2. find germplasms with inventory_id = or like q
+			queryString.append("SELECT DISTINCT eid as GID FROM ims_lot l INNER JOIN ims_transaction t on l.lotid = t.lotid ");
 			if (o.equals(Operation.LIKE)) {
-				queryString.append("SELECT DISTINCT g.gid as GID "
-						+ "FROM germplsm g LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
-						+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid, ims_lot l, ims_transaction t "
-						+ "WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid "
-						+ "AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id LIKE :inventory_id GROUP BY g.gid");
+				queryString.append("WHERE t.inventory_id LIKE :inventory_id");
 			} else {
-				queryString.append("SELECT DISTINCT g.gid as GID "
-						+ "FROM germplsm g LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
-						+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid, ims_lot l, ims_transaction t "
-						+ "WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid "
-						+ "AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id = :inventory_id GROUP BY g.gid");
+				queryString.append("WHERE t.inventory_id = :inventory_id");
 			}
 			params.put("inventory_id", q);
 
 			queryString.append(" UNION ");
 
 			// 3. find germplasms with nVal = or like q
+			queryString.append("SELECT DISTINCT n.gid as GID FROM names n ");
 			if (o.equals(Operation.LIKE)) {
-				queryString
-						.append("SELECT DISTINCT g.gid as GID FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND g.grplce = 0 AND (n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces)");
+				queryString.append("WHERE n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces");
 			} else {
-				queryString
-						.append("SELECT DISTINCT g.gid as GID FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND g.grplce = 0 AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces)");
+				queryString.append("WHERE n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces");
 			}
-
 			params.put("q", q);
 			params.put(GermplasmDAO.Q_NO_SPACES, q.replaceAll(" ", ""));
 			params.put(GermplasmDAO.Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
@@ -1135,6 +1126,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 						+ "GermplasmWithInventory where availInv > 0 ) ");
 				queryString.append(" GermplasmWithInventory ON GermplasmSearchResults.GID = GermplasmWithInventory.GID ");
 			}
+
+			// make sure to not include deleted germplasm to the search results and limit the search to 5000 only
+			queryString
+					.append("INNER JOIN germplsm g on GermplasmSearchResults.GID = g.gid AND g.gid!=g.grplce AND g.grplce = 0 LIMIT 5000");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			for (final Map.Entry<String, String> param : params.entrySet()) {
