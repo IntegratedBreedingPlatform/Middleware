@@ -810,15 +810,16 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final Integer startingRow = germplasmSearchParameter.getStartingRow();
 		final Integer noOfEntries = germplasmSearchParameter.getNumberOfEntries();
 
-		if ("".equals(q)) {
-			return new ArrayList<Germplasm>();
-		}
-
 		final Set<Germplasm> germplasmSearchResult = new HashSet<Germplasm>();
 
 		try {
 
 			final Set<Integer> gidSearchResult = this.retrieveGIDSearchResults(q, o, includeParents, withInventoryOnly, includeMGMembers);
+
+			// return an empty germplasm list when there is no GID search results returned
+			if (gidSearchResult.isEmpty()) {
+				return new ArrayList<Germplasm>(germplasmSearchResult);
+			}
 
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT g.*, "
@@ -1026,6 +1027,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private Set<Integer> retrieveGIDSearchResults(final String q, final Operation o, final boolean includeParents,
 			final boolean withInventoryOnly, final boolean includeMGMembers) {
+
+		// return empty search results when keyword is blank or an empty string
+		if ("".equals(q)) {
+			return new HashSet<Integer>();
+		}
+
 		final Set<Integer> gidSearchResults = new HashSet<Integer>();
 		try {
 			final StringBuilder queryString = new StringBuilder();
