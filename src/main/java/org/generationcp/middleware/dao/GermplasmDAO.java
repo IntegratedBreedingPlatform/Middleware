@@ -41,6 +41,9 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 /**
  * DAO class for {@link Germplasm}.
  * 
@@ -857,9 +860,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 		return new ArrayList<Germplasm>();
 	}
-	
+
 	public List<Germplasm> searchForGermplasms(final GermplasmSearchParameter germplasmSearchParameter) throws MiddlewareQueryException {
-		return searchForGermplasms(germplasmSearchParameter.getSearchKeyword(), germplasmSearchParameter.getOperation(),
+		return this.searchForGermplasms(germplasmSearchParameter.getSearchKeyword(), germplasmSearchParameter.getOperation(),
 				germplasmSearchParameter.isIncludeParents(), germplasmSearchParameter.isWithInventoryOnly(),
 				germplasmSearchParameter.isIncludeMGMembers());
 	}
@@ -1068,6 +1071,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public Integer countSearchForGermplasms(final String q, final Operation o, final boolean includeParents,
 			final boolean withInventoryOnly, final boolean includeMGMembers) {
 
+		final Monitor countSearchForGermplasms = MonitorFactory.start("Method Started : countSearchForGermplasms ");
+
 		Integer searchResultsCount = 0;
 		try {
 			final StringBuilder queryString = new StringBuilder();
@@ -1117,6 +1122,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 						.append("SELECT DISTINCT g.gid as GID FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND g.grplce = 0 AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces)");
 			}
 
+			params.put("q", q);
+			params.put(GermplasmDAO.Q_NO_SPACES, q.replaceAll(" ", ""));
+			params.put(GermplasmDAO.Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
+
 			queryString.append(") GermplasmSearchResults ");
 
 			if (withInventoryOnly) {
@@ -1126,10 +1135,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 						+ "GermplasmWithInventory where availInv > 0 ) ");
 				queryString.append(" GermplasmWithInventory ON GermplasmSearchResults.GID = GermplasmWithInventory.GID ");
 			}
-
-			params.put("q", q);
-			params.put(GermplasmDAO.Q_NO_SPACES, q.replaceAll(" ", ""));
-			params.put(GermplasmDAO.Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			for (final Map.Entry<String, String> param : params.entrySet()) {
@@ -1141,6 +1146,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		} catch (final Exception e) {
 			this.logAndThrowException("Error with searchGermplasms(" + q + ") " + e.getMessage(), e);
 		}
+
+		GermplasmDAO.LOG.debug("Method End : countSearchForGermplasms " + countSearchForGermplasms.stop());
 
 		return searchResultsCount;
 	}
