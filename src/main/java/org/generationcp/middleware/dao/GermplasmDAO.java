@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -810,7 +811,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final Integer startingRow = germplasmSearchParameter.getStartingRow();
 		final Integer noOfEntries = germplasmSearchParameter.getNumberOfEntries();
 
-		final Set<Germplasm> germplasmSearchResult = new HashSet<Germplasm>();
+		final Set<Germplasm> germplasmSearchResult = new LinkedHashSet<Germplasm>();
 
 		try {
 
