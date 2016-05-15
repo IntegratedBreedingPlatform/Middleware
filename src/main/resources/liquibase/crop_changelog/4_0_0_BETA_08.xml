@@ -1,0 +1,25 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="mae" id="1">
+		<preConditions onFail="MARK_RAN">
+	    	<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8165 AND name = 'EXPT_DESIGN_SOURCE';</sqlCheck>
+	   	</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+       
+	        INSERT INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`)
+					VALUES (8165,1040,'EXPT_DESIGN_SOURCE','Source of the experimental design. For example the name of csv file used for custom or preset designs.',NULL,0,0);
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id) VALUES (1200,8165,2140),(1210,8165,4030),(1220,8165,6020);
+
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES (8165,1800,'Environment Detail',0),(8165,1800,'Study Detail',0);
+	    </sql>
+	</changeSet>
+	
+</databaseChangeLog>

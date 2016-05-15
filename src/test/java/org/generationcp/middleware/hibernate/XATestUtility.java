@@ -20,29 +20,29 @@ public class XATestUtility {
 	public static final Object CONNECTIONPOOL_MAX_POOL_SIZE = "100";
 	public static final Object CONNECTIONPOOL_MAX_IDLE_TIME = "300";
 
-	static XADataSourceProperties mockProperties() {
+	static DataSourceProperties mockProperties() {
 		final Properties properties = Mockito.mock(Properties.class);
 
-		Mockito.when(properties.get(XADataSourceProperties.DB_HOST)).thenReturn(XATestUtility.DB_HOST);
-		Mockito.when(properties.get(XADataSourceProperties.DB_PORT)).thenReturn(XATestUtility.DB_PORT);
-		Mockito.when(properties.get(XADataSourceProperties.DB_USERNAME)).thenReturn(XATestUtility.DB_USERNAME);
-		Mockito.when(properties.get(XADataSourceProperties.DB_PASSWORD)).thenReturn(XATestUtility.DB_PASSWORD);
-		Mockito.when(properties.get(XADataSourceProperties.DB_WORKBENCH_NAME)).thenReturn(XATestUtility.DB_WORKBENCH_NAME);
-		Mockito.when(properties.get(XADataSourceProperties.CONNECTIONPOOL_XADRIVER_NAME)).thenReturn(
+		Mockito.when(properties.get(DataSourceProperties.DB_HOST)).thenReturn(XATestUtility.DB_HOST);
+		Mockito.when(properties.get(DataSourceProperties.DB_PORT)).thenReturn(XATestUtility.DB_PORT);
+		Mockito.when(properties.get(DataSourceProperties.DB_USERNAME)).thenReturn(XATestUtility.DB_USERNAME);
+		Mockito.when(properties.get(DataSourceProperties.DB_PASSWORD)).thenReturn(XATestUtility.DB_PASSWORD);
+		Mockito.when(properties.get(DataSourceProperties.DB_WORKBENCH_NAME)).thenReturn(XATestUtility.DB_WORKBENCH_NAME);
+		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_XADRIVER_NAME)).thenReturn(
 				XATestUtility.CONNECTIONPOOL_XADRIVER_NAME);
-		Mockito.when(properties.get(XADataSourceProperties.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT)).thenReturn(
+		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT)).thenReturn(
 				XATestUtility.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT);
-		Mockito.when(properties.get(XADataSourceProperties.CONNECTIONPOOL_MAINTENANCE_INTERVAL)).thenReturn(
+		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_MAINTENANCE_INTERVAL)).thenReturn(
 				XATestUtility.CONNECTIONPOOL_MAINTENANCE_INTERVAL);
-		Mockito.when(properties.get(XADataSourceProperties.CONNECTIONPOOL_TEST_QUERY)).thenReturn(XATestUtility.CONNECTIONPOOL_TEST_QUERY);
-		Mockito.when(properties.get(XADataSourceProperties.CONNECTIONPOOL_MIN_POOL_SIZE)).thenReturn(
+		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_TEST_QUERY)).thenReturn(XATestUtility.CONNECTIONPOOL_TEST_QUERY);
+		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_MIN_POOL_SIZE)).thenReturn(
 				XATestUtility.CONNECTIONPOOL_MIN_POOL_SIZE);
-		Mockito.when(properties.get(XADataSourceProperties.CONNECTIONPOOL_MAX_POOL_SIZE)).thenReturn(
+		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_MAX_POOL_SIZE)).thenReturn(
 				XATestUtility.CONNECTIONPOOL_MAX_POOL_SIZE);
-		Mockito.when(properties.get(XADataSourceProperties.CONNECTIONPOOL_MAX_IDLE_TIME)).thenReturn(
+		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_MAX_IDLE_TIME)).thenReturn(
 				XATestUtility.CONNECTIONPOOL_MAX_IDLE_TIME);
 
-		final XADataSourceProperties xaDataSourceProperties = new XADataSourceProperties(properties);
+		final DataSourceProperties xaDataSourceProperties = new DataSourceProperties(properties);
 		return xaDataSourceProperties;
 	}
 }
