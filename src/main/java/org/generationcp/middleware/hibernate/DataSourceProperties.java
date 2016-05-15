@@ -60,7 +60,7 @@ public class DataSourceProperties {
 
 	private String reapTimeout = "300";
 
-	private static final Logger LOG = LoggerFactory.getLogger(XADataSourceProperties.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DataSourceProperties.class);
 
 	public DataSourceProperties(final Properties properties) {
 
@@ -75,7 +75,6 @@ public class DataSourceProperties {
 						DataSourceProperties.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT);
 		this.maintenanceInterval =
 				this.getPropertyValue(properties, this.maintenanceInterval, DataSourceProperties.CONNECTIONPOOL_MAINTENANCE_INTERVAL);
-		this.testQuery = this.getPropertyValue(properties, this.testQuery, DataSourceProperties.CONNECTIONPOOL_TEST_QUERY);
 		this.minPoolSize = this.getPropertyValue(properties, this.minPoolSize, DataSourceProperties.CONNECTIONPOOL_MIN_POOL_SIZE);
 		this.maxPoolSize = this.getPropertyValue(properties, this.maxPoolSize, DataSourceProperties.CONNECTIONPOOL_MAX_POOL_SIZE);
 		this.maxIdleTime = this.getPropertyValue(properties, this.maxIdleTime, DataSourceProperties.CONNECTIONPOOL_MAX_IDLE_TIME);

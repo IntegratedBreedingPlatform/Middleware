@@ -34,8 +34,8 @@ public class XATestUtility {
 				XATestUtility.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT);
 		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_MAINTENANCE_INTERVAL)).thenReturn(
 				XATestUtility.CONNECTIONPOOL_MAINTENANCE_INTERVAL);
-		Mockito.when(properties.get(XADataSourceProperties.CONNECTIONPOOL_REAP_TIMEOUT)).thenReturn(XATestUtility.CONNECTIONPOOL_REAP_TIMEOUT);
-		Mockito.when(properties.get(XADataSourceProperties.CONNECTIONPOOL_MIN_POOL_SIZE)).thenReturn(
+		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_REAP_TIMEOUT)).thenReturn(XATestUtility.CONNECTIONPOOL_REAP_TIMEOUT);
+		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_MIN_POOL_SIZE)).thenReturn(
 				XATestUtility.CONNECTIONPOOL_MIN_POOL_SIZE);
 		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_MAX_POOL_SIZE)).thenReturn(
 				XATestUtility.CONNECTIONPOOL_MAX_POOL_SIZE);
