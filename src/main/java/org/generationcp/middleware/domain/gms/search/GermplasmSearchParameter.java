@@ -1,5 +1,7 @@
-
 package org.generationcp.middleware.domain.gms.search;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.generationcp.middleware.manager.Operation;
 
@@ -22,15 +24,19 @@ public class GermplasmSearchParameter {
 
 	private int numberOfEntries;
 
+	private Map<String, Boolean> sortState;
+
 	public GermplasmSearchParameter(final String searchKeyword, final Operation operation) {
 		this.searchKeyword = searchKeyword;
 		this.operation = operation;
+		this.sortState = new HashMap<>();
 	}
 
 	public GermplasmSearchParameter(final String searchKeyword, final Operation operation, final boolean includeParents,
 			final boolean withInventoryOnly, final boolean includeMGMembers) {
-		this.searchKeyword = searchKeyword;
-		this.operation = operation;
+
+		this(searchKeyword, operation);
+
 		this.includeParents = includeParents;
 		this.withInventoryOnly = withInventoryOnly;
 		this.includeMGMembers = includeMGMembers;
@@ -111,5 +117,13 @@ public class GermplasmSearchParameter {
 		builder.append(this.numberOfEntries);
 		builder.append("]");
 		return builder.toString();
+	}
+
+	public Map<String, Boolean> getSortState() {
+		return sortState;
+	}
+
+	public void setSortState(Map<String, Boolean> sortState) {
+		this.sortState = sortState;
 	}
 }
