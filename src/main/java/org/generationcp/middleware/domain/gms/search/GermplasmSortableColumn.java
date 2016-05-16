@@ -9,7 +9,7 @@ import java.util.Map;
  * This enum class contains the list of columns that can be sorted in Germplasm Search Tables.
  */
 public enum GermplasmSortableColumn {
-	// For now there are only 3 tables allowed to be sorted in Germplasm Search Table
+	// For now there are only 3 columns allowed to be sorted in Germplasm Search Table
 	// Make sure to add another constant for new sortable column in Germplasm Search Table
 	STOCK_IDS("stockIDs", "STOCKID"), SEED_RES("seedRes", "SEED RES"), GROUP_ID("g.mgid", "GROUP ID");
 
