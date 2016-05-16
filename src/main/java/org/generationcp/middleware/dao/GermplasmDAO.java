@@ -826,8 +826,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 					+ "GROUP_CONCAT(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') AS stockIDs, "
 					+ "CAST(SUM(CASE WHEN gt.trnqty = 0 OR isnull(gt.trnqty) THEN 0 ELSE 1 END) AS UNSIGNED) AS availInv, "
 					+ "COUNT(DISTINCT gl.lotid) AS seedRes FROM germplsm g "
-					+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
-					+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid WHERE g.gid IN (:gids) GROUP BY g.gid");
+					+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 "
+					+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid AND gt.trnstat <> 9 WHERE g.gid IN (:gids) GROUP BY g.gid");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("gids", gidSearchResult);
