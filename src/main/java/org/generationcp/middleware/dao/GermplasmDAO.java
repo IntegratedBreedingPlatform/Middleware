@@ -1013,7 +1013,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final StringBuilder queryString = new StringBuilder();
 			final Map<String, String> params = new HashMap<String, String>();
 
-			queryString.append("SELECT DISTINCT GermplasmSearchResults.GID FROM (");
+			queryString.append("SELECT GermplasmSearchResults.GID FROM (");
 
 			// 1. find germplasms with GID = or like q
 			if (q.matches("(-)?(%)?[(\\d+)(%|_)?]*(%)?")) {
