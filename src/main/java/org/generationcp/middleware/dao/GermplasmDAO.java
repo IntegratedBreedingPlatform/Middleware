@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
+import org.generationcp.middleware.domain.gms.search.GermplasmSortableColumn;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
@@ -827,7 +828,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 					+ "CAST(SUM(CASE WHEN gt.trnqty = 0 OR isnull(gt.trnqty) THEN 0 ELSE 1 END) AS UNSIGNED) AS availInv, "
 					+ "COUNT(DISTINCT gl.lotid) AS seedRes FROM germplsm g "
 					+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 "
-					+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid AND gt.trnstat <> 9 WHERE g.gid IN (:gids) GROUP BY g.gid");
+					+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid AND gt.trnstat <> 9 WHERE g.gid IN (:gids) GROUP BY g.gid ");
+
+			queryString.append(this.addSortingColumns(germplasmSearchParameter.getSortState()));
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("gids", gidSearchResult);
@@ -845,6 +848,26 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 
 		return new ArrayList<Germplasm>(germplasmSearchResult);
+	}
+
+	private String addSortingColumns(final Map<String, Boolean> sortState) {
+		if (sortState.isEmpty()) {
+			return "";
+		}
+
+		final StringBuilder sortingQuery = new StringBuilder();
+		sortingQuery.append(" ORDER BY ");
+		for (final Map.Entry<String, Boolean> sortCondition : sortState.entrySet()) {
+			final String order = sortCondition.getValue().equals(true) ? "ASC" : "DESC";
+			sortingQuery.append(" " + GermplasmSortableColumn.get(sortCondition.getKey()).getDbColumnName());
+			sortingQuery.append(" " + order);
+			sortingQuery.append(",");
+		}
+
+		String sortingQueryStr = sortingQuery.toString();
+		// remove unnecessary ',' at end of sorting query
+		sortingQueryStr = sortingQueryStr.substring(0, sortingQuery.lastIndexOf(",")).toString();
+		return sortingQueryStr;
 	}
 
 	private List<Germplasm> getSearchForGermplasmsResult(final List<Object[]> result) {
