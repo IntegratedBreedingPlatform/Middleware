@@ -15,7 +15,7 @@ public class XADataSourcePropertiesTest {
 	@Test
 	public void testXADataSourceProperties() throws Exception {
 
-		final XADataSourceProperties xaDataSourceProperties = XATestUtility.mockProperties();
+		final DataSourceProperties xaDataSourceProperties = XATestUtility.mockProperties();
 
 		Assert.assertEquals(xaDataSourceProperties.getHost(), XATestUtility.DB_HOST);
 		Assert.assertEquals(xaDataSourceProperties.getPort(), XATestUtility.DB_PORT);
@@ -38,7 +38,7 @@ public class XADataSourcePropertiesTest {
 	@Test
 	public void testDefaultValues() throws Exception {
 
-		final XADataSourceProperties xaDataSourceProperties = new XADataSourceProperties(this.properties);
+		final DataSourceProperties xaDataSourceProperties = new DataSourceProperties(this.properties);
 
 		Assert.assertEquals(xaDataSourceProperties.getHost(), "localhost");
 		Assert.assertEquals(xaDataSourceProperties.getPort(), "3306");
