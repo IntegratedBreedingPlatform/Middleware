@@ -810,6 +810,8 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		searchParameter.setIncludeParents(true);
 		searchParameter.setWithInventoryOnly(false);
 		searchParameter.setIncludeMGMembers(false);
+		searchParameter.setStartingRow(0);
+		searchParameter.setNumberOfEntries(25);
 
 		final List<Germplasm> results = this.germplasmDataManager.searchForGermplasm(searchParameter);
 		Debug.println(IntegrationTestBase.INDENT, "searchForGermplasm(" + q + "): " + results.size() + " matches found.");
