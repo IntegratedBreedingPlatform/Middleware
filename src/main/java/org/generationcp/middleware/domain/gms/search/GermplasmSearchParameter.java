@@ -1,6 +1,7 @@
 package org.generationcp.middleware.domain.gms.search;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.generationcp.middleware.manager.Operation;
@@ -29,7 +30,7 @@ public class GermplasmSearchParameter {
 	public GermplasmSearchParameter(final String searchKeyword, final Operation operation) {
 		this.searchKeyword = searchKeyword;
 		this.operation = operation;
-		this.sortState = new HashMap<>();
+		this.sortState = new LinkedHashMap<>();
 	}
 
 	public GermplasmSearchParameter(final String searchKeyword, final Operation operation, final boolean includeParents,
@@ -98,32 +99,38 @@ public class GermplasmSearchParameter {
 		this.numberOfEntries = numberOfEntries;
 	}
 
-	@Override
-	public String toString() {
-		final StringBuilder builder = new StringBuilder();
-		builder.append("GermplasmSearchParameter [searchKeyword=");
-		builder.append(this.searchKeyword);
-		builder.append(", operation=");
-		builder.append(this.operation);
-		builder.append(", includeParents=");
-		builder.append(this.includeParents);
-		builder.append(", withInventoryOnly=");
-		builder.append(this.withInventoryOnly);
-		builder.append(", includeMGMembers=");
-		builder.append(this.includeMGMembers);
-		builder.append(", startingRow=");
-		builder.append(this.startingRow);
-		builder.append(", numberOfEntries=");
-		builder.append(this.numberOfEntries);
-		builder.append("]");
-		return builder.toString();
-	}
-
 	public Map<String, Boolean> getSortState() {
 		return sortState;
 	}
 
-	public void setSortState(Map<String, Boolean> sortState) {
-		this.sortState = sortState;
+	/**
+	 * Setup sort states if any (for sorting the germplasm query results)
+	 * @param sortPropertyIds
+	 * @param sortStates
+	 */
+	public void setSortState(final Object[] sortPropertyIds, final boolean[] sortStates) {
+		if (sortPropertyIds == null || sortPropertyIds.length == 0) {
+			return;
+		}
+
+		sortState.clear();
+
+		for (int i = 0; i < sortPropertyIds.length; i++) {
+			sortState.put(String.valueOf(sortPropertyIds[i]),sortStates[i]);
+		}
+	}
+
+	@Override
+	public String toString() {
+		return "GermplasmSearchParameter{" +
+				"searchKeyword='" + searchKeyword + '\'' +
+				", operation=" + operation +
+				", includeParents=" + includeParents +
+				", withInventoryOnly=" + withInventoryOnly +
+				", includeMGMembers=" + includeMGMembers +
+				", startingRow=" + startingRow +
+				", numberOfEntries=" + numberOfEntries +
+				", sortState=" + sortState +
+				'}';
 	}
 }
