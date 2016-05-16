@@ -31,6 +31,8 @@ public class GermplasmSearchParameter {
 		this.searchKeyword = searchKeyword;
 		this.operation = operation;
 		this.sortState = new LinkedHashMap<>();
+		this.startingRow = 0;
+		this.numberOfEntries = Integer.MAX_VALUE;
 	}
 
 	public GermplasmSearchParameter(final String searchKeyword, final Operation operation, final boolean includeParents,
