@@ -1017,7 +1017,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			// 1. find germplasms with GID = or like q
 			if (q.matches("(-)?(%)?[(\\d+)(%|_)?]*(%)?")) {
-				queryString.append("SELECT DISTINCT g.gid as GID FROM germplsm g ");
+				queryString.append("SELECT g.gid as GID FROM germplsm g ");
 				if (o.equals(Operation.LIKE)) {
 					queryString.append("WHERE g.gid like :gid ");
 					params.put("gid", q);
@@ -1031,7 +1031,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 
 			// 2. find germplasms with inventory_id = or like q
-			queryString.append("SELECT DISTINCT eid as GID FROM ims_lot l "
+			queryString.append("SELECT eid as GID FROM ims_lot l "
 					+ "INNER JOIN ims_transaction t on l.lotid = t.lotid AND l.etype = 'GERMPLSM' ");
 			if (o.equals(Operation.LIKE)) {
 				queryString.append("WHERE t.inventory_id LIKE :inventory_id");
@@ -1043,7 +1043,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			queryString.append(" UNION ");
 
 			// 3. find germplasms with nVal = or like q
-			queryString.append("SELECT DISTINCT n.gid as GID FROM names n ");
+			queryString.append("SELECT n.gid as GID FROM names n ");
 			if (o.equals(Operation.LIKE)) {
 				queryString.append("WHERE n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces");
 			} else {
@@ -1091,14 +1091,14 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final Set<Integer> gidParentsSearchResults = new HashSet<Integer>();
 		try {
 			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT DISTINCT GermplasmParents.GID FROM (");
+			queryString.append("SELECT GermplasmParents.GID FROM (");
 
 			// female parent
-			queryString.append("SELECT DISTINCT g.gpid1 as GID from germplsm g where g.gpid1 != 0 AND g.gid IN (:gids) ");
+			queryString.append("SELECT g.gpid1 as GID from germplsm g where g.gpid1 != 0 AND g.gid IN (:gids) ");
 			queryString.append(" UNION ");
 
 			// male parent
-			queryString.append("SELECT DISTINCT g.gpid2 as GID from germplsm g where g.gpid1 != 0 AND g.gid IN (:gids) ");
+			queryString.append("SELECT g.gpid2 as GID from germplsm g where g.gpid1 != 0 AND g.gid IN (:gids) ");
 			queryString.append(" UNION ");
 
 			// other progenitors
