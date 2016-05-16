@@ -50,7 +50,6 @@ import com.jamonapi.MonitorFactory;
  */
 public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
-	private static final String LIMIT_5000 = " LIMIT 5000 ";
 	private static final String STOCK_IDS = "stockIDs";
 	private static final String GERMPLSM = "germplsm";
 	private static final String Q_NO_SPACES = "qNoSpaces";
@@ -1018,7 +1017,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			// 1. find germplasms with GID = or like q
 			if (q.matches("(-)?(%)?[(\\d+)(%|_)?]*(%)?")) {
-				queryString.append("(SELECT DISTINCT g.gid as GID FROM germplsm g ");
+				queryString.append("SELECT DISTINCT g.gid as GID FROM germplsm g ");
 				if (o.equals(Operation.LIKE)) {
 					queryString.append("WHERE g.gid like :gid ");
 					params.put("gid", q);
@@ -1028,16 +1027,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 					params.put("gid", q);
 				}
 
-				// make sure to not include deleted germplasm to the search results
-				// and limit the final search to 5000 only for search in gid
-				queryString.append(" AND g.gid!=g.grplce AND g.grplce = 0 " + LIMIT_5000 + ")");
 				queryString.append(" UNION ");
 			}
 
 			// 2. find germplasms with inventory_id = or like q
-			queryString.append("(SELECT DISTINCT eid as GID FROM ims_lot l "
-					+ "INNER JOIN germplsm g on l.eid = g.gid AND l.etype = 'GERMPLSM' "
-					+ "INNER JOIN ims_transaction t ON l.lotid = t.lotid ");
+			queryString.append("SELECT DISTINCT eid as GID FROM ims_lot l INNER JOIN ims_transaction t on l.lotid = t.lotid ");
 			if (o.equals(Operation.LIKE)) {
 				queryString.append("WHERE t.inventory_id LIKE :inventory_id");
 			} else {
@@ -1045,37 +1039,31 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 			params.put("inventory_id", q);
 
-			// make sure to not include deleted germplasm to the search results
-			// and limit the search to 5000 only for search in inventory id
-			queryString.append(" AND g.gid!=g.grplce AND g.grplce = 0 " + LIMIT_5000 + ")");
 			queryString.append(" UNION ");
 
 			// 3. find germplasms with nVal = or like q
-			queryString.append("(SELECT DISTINCT n.gid as GID FROM names n INNER JOIN germplsm g on n.gid = g.gid ");
+			queryString.append("SELECT DISTINCT n.gid as GID FROM names n ");
 			if (o.equals(Operation.LIKE)) {
-				queryString.append("WHERE n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces ");
+				queryString.append("WHERE n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces");
 			} else {
-				queryString.append("WHERE n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces ");
+				queryString.append("WHERE n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces");
 			}
 			params.put("q", q);
 			params.put(GermplasmDAO.Q_NO_SPACES, q.replaceAll(" ", ""));
 			params.put(GermplasmDAO.Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
 
-			// make sure to not include deleted germplasm to the search results
-			// and limit the search to 5000 only for search in germplasm name
-			queryString.append(" AND g.gid!=g.grplce AND g.grplce = 0 " + LIMIT_5000 + ")");
 			queryString.append(") GermplasmSearchResults ");
 
 			if (withInventoryOnly) {
 				queryString.append(" INNER JOIN ");
-				queryString.append("(SELECT GID FROM (SELECT l.eid as GID, SUM(t.trnqty) as availInv FROM ims_lot l "
-						+ "INNER JOIN ims_transaction t ON l.lotid = t.lotid AND l.etype = 'GERMPLASM' GROUP BY l.eid ) "
+				queryString.append("(SELECT GID FROM (SELECT l.eid as GID, SUM(t.trnqty) as availInv from ims_lot l "
+						+ "inner join ims_transaction t on l.lotid = t.lotid GROUP BY l.eid ) "
 						+ "GermplasmWithInventory where availInv > 0 ) ");
 				queryString.append(" GermplasmWithInventory ON GermplasmSearchResults.GID = GermplasmWithInventory.GID ");
 			}
 
-			// make sure to limit overall germplasm search by name, gid and inventoryID to 5000 only
-			queryString.append(LIMIT_5000);
+			// make sure to not include deleted germplasm to the search results
+			queryString.append("INNER JOIN germplsm g on GermplasmSearchResults.GID = g.gid AND g.gid!=g.grplce AND g.grplce = 0");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			for (final Map.Entry<String, String> param : params.entrySet()) {
