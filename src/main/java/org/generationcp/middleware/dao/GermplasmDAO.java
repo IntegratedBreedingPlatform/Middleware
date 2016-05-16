@@ -1073,11 +1073,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			gidSearchResults.addAll(query.list());
 
-			if (includeParents) {
+			if (includeParents && !gidSearchResults.isEmpty()) {
 				gidSearchResults.addAll(this.retrieveGIDParentsResults(gidSearchResults));
 			}
 
-			if (includeMGMembers) {
+			if (includeMGMembers && !gidSearchResults.isEmpty()) {
 				gidSearchResults.addAll(this.retrieveGIDGroupMemberResults(gidSearchResults));
 			}
 
