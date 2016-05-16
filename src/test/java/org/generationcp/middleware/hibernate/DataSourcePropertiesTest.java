@@ -15,21 +15,21 @@ public class DataSourcePropertiesTest {
 	@Test
 	public void testXADataSourceProperties() throws Exception {
 
-		final DataSourceProperties xaDataSourceProperties = DataSourceTestUtility.mockProperties();
+		final DataSourceProperties xaDataSourceProperties = XATestUtility.mockProperties();
 
-		Assert.assertEquals(xaDataSourceProperties.getHost(), DataSourceTestUtility.DB_HOST);
-		Assert.assertEquals(xaDataSourceProperties.getPort(), DataSourceTestUtility.DB_PORT);
-		Assert.assertEquals(xaDataSourceProperties.getUserName(), DataSourceTestUtility.DB_USERNAME);
-		Assert.assertEquals(xaDataSourceProperties.getPassword(), DataSourceTestUtility.DB_PASSWORD);
+		Assert.assertEquals(xaDataSourceProperties.getHost(), XATestUtility.DB_HOST);
+		Assert.assertEquals(xaDataSourceProperties.getPort(), XATestUtility.DB_PORT);
+		Assert.assertEquals(xaDataSourceProperties.getUserName(), XATestUtility.DB_USERNAME);
+		Assert.assertEquals(xaDataSourceProperties.getPassword(), XATestUtility.DB_PASSWORD);
 
-		Assert.assertEquals(xaDataSourceProperties.getWorkbenchDbName(), DataSourceTestUtility.DB_WORKBENCH_NAME);
-		Assert.assertEquals(xaDataSourceProperties.getXaDriverName(), DataSourceTestUtility.CONNECTIONPOOL_XADRIVER_NAME);
-		Assert.assertEquals(xaDataSourceProperties.getBorrowConnectionTimeout(), DataSourceTestUtility.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT);
-		Assert.assertEquals(xaDataSourceProperties.getMaintenanceInterval(), DataSourceTestUtility.CONNECTIONPOOL_MAINTENANCE_INTERVAL);
-		Assert.assertEquals(xaDataSourceProperties.getReapTimeout(), DataSourceTestUtility.CONNECTIONPOOL_REAP_TIMEOUT);
-		Assert.assertEquals(xaDataSourceProperties.getMinPoolSize(), DataSourceTestUtility.CONNECTIONPOOL_MIN_POOL_SIZE);
-		Assert.assertEquals(xaDataSourceProperties.getMaxPoolSize(), DataSourceTestUtility.CONNECTIONPOOL_MAX_POOL_SIZE);
-		Assert.assertEquals(xaDataSourceProperties.getMaxIdleTime(), DataSourceTestUtility.CONNECTIONPOOL_MAX_IDLE_TIME);
+		Assert.assertEquals(xaDataSourceProperties.getWorkbenchDbName(), XATestUtility.DB_WORKBENCH_NAME);
+		Assert.assertEquals(xaDataSourceProperties.getXaDriverName(), XATestUtility.CONNECTIONPOOL_XADRIVER_NAME);
+		Assert.assertEquals(xaDataSourceProperties.getBorrowConnectionTimeout(), XATestUtility.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT);
+		Assert.assertEquals(xaDataSourceProperties.getMaintenanceInterval(), XATestUtility.CONNECTIONPOOL_MAINTENANCE_INTERVAL);
+		Assert.assertEquals(xaDataSourceProperties.getReapTimeout(), XATestUtility.CONNECTIONPOOL_REAP_TIMEOUT);
+		Assert.assertEquals(xaDataSourceProperties.getMinPoolSize(), XATestUtility.CONNECTIONPOOL_MIN_POOL_SIZE);
+		Assert.assertEquals(xaDataSourceProperties.getMaxPoolSize(), XATestUtility.CONNECTIONPOOL_MAX_POOL_SIZE);
+		Assert.assertEquals(xaDataSourceProperties.getMaxIdleTime(), XATestUtility.CONNECTIONPOOL_MAX_IDLE_TIME);
 
 		Assert.assertEquals(xaDataSourceProperties.getHibernateConfigurationLocation(), "classpath:ibpmidware_hib.cfg.xml");
 

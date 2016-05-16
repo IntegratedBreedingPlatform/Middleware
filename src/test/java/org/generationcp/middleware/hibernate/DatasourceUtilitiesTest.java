@@ -78,15 +78,15 @@ public class DatasourceUtilitiesTest {
 	@Test
 	public void testGetWorkbenchDataSource() throws Exception {
 		final DatasourceUtilities xaDatasourceUtilities = new DatasourceUtilities();
-		final DataSourceProperties xaDataSourceProperties = DataSourceTestUtility.mockProperties();
+		final DataSourceProperties xaDataSourceProperties = XATestUtility.mockProperties();
 
 		final DriverManagerDataSource workbenchDataSource =
 				xaDatasourceUtilities.getWorkbenchDataSource(xaDataSourceProperties);
-		Assert.assertEquals("Username must be what we set it to", DataSourceTestUtility.DB_USERNAME, workbenchDataSource.getUsername());
-		Assert.assertEquals("Password must be what we set it to", DataSourceTestUtility.DB_PASSWORD, workbenchDataSource.getPassword());
+		Assert.assertEquals("Username must be what we set it to", XATestUtility.DB_USERNAME, workbenchDataSource.getUsername());
+		Assert.assertEquals("Password must be what we set it to", XATestUtility.DB_PASSWORD, workbenchDataSource.getPassword());
 
-		Assert.assertEquals("Url must get correctly deriver", "jdbc:mysql://" + DataSourceTestUtility.DB_HOST + ":" + DataSourceTestUtility.DB_PORT + "/"
-				+ DataSourceTestUtility.DB_WORKBENCH_NAME, workbenchDataSource.getUrl());
+		Assert.assertEquals("Url must get correctly deriver", "jdbc:mysql://" + XATestUtility.DB_HOST + ":" + XATestUtility.DB_PORT + "/"
+				+ XATestUtility.DB_WORKBENCH_NAME, workbenchDataSource.getUrl());
 
 	}
 
