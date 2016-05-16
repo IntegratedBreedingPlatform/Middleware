@@ -58,8 +58,6 @@ public class CrossExpansionProperties {
 		try {
 			final Resource resource = new ClassPathResource("crossing.properties");
 			this.props = PropertiesLoaderUtils.loadProperties(resource);
-			this.profile = props.getProperty("pedigree.profile");
-			this.defaultLevel =  Integer.parseInt(props.getProperty("default.generation.level"));
 		} catch (final IOException e) {
 			final String errorMessage = "Unable to access crossing.properties. Please contact your administrator for further assistance.";
 			CrossExpansionProperties.LOG.error(errorMessage, e);
