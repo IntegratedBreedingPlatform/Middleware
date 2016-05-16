@@ -1031,7 +1031,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 
 			// 2. find germplasms with inventory_id = or like q
-			queryString.append("SELECT DISTINCT eid as GID FROM ims_lot l INNER JOIN ims_transaction t on l.lotid = t.lotid ");
+			queryString.append("SELECT DISTINCT eid as GID FROM ims_lot l "
+					+ "INNER JOIN ims_transaction t on l.lotid = t.lotid AND l.etype = 'GERMPLSM' ");
 			if (o.equals(Operation.LIKE)) {
 				queryString.append("WHERE t.inventory_id LIKE :inventory_id");
 			} else {
@@ -1057,7 +1058,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			if (withInventoryOnly) {
 				queryString.append(" INNER JOIN ");
 				queryString.append("(SELECT GID FROM (SELECT l.eid as GID, SUM(t.trnqty) as availInv from ims_lot l "
-						+ "inner join ims_transaction t on l.lotid = t.lotid GROUP BY l.eid ) "
+						+ "inner join ims_transaction t on l.lotid = t.lotid AND l.etype = 'GERMPLSM' GROUP BY l.eid ) "
 						+ "GermplasmWithInventory where availInv > 0 ) ");
 				queryString.append(" GermplasmWithInventory ON GermplasmSearchResults.GID = GermplasmWithInventory.GID ");
 			}
