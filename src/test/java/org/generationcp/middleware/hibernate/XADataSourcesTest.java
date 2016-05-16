@@ -6,7 +6,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
-public class DataSourcesTest {
+public class XADataSourcesTest {
 
 	@Test
 	public void testPostProcessBeanDefinitionRegistry() throws Exception {
