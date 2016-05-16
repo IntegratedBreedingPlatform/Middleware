@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableList;
 
 public class XABeanDefinitionTest {
 
-	private final DataSourceProperties xaDataSourceProperties = XATestUtility.mockProperties();
+	private final DataSourceProperties xaDataSourceProperties = DataSourceTestUtility.mockProperties();
 	private final String cropDatabaseName = "TestCrop";
 
 	@Test
@@ -28,8 +28,8 @@ public class XABeanDefinitionTest {
 		final Properties databaseConnectionProperties =
 				xaBeanDefinition.getDatabaseConnectionProperties(this.cropDatabaseName, this.xaDataSourceProperties);
 
-		Assert.assertEquals(XATestUtility.DB_USERNAME, databaseConnectionProperties.getProperty(XABeanDefinition.USER));
-		Assert.assertEquals(XATestUtility.DB_PASSWORD, databaseConnectionProperties.getProperty(XABeanDefinition.PASSWORD_PROPERTY));
+		Assert.assertEquals(DataSourceTestUtility.DB_USERNAME, databaseConnectionProperties.getProperty(XABeanDefinition.USER));
+		Assert.assertEquals(DataSourceTestUtility.DB_PASSWORD, databaseConnectionProperties.getProperty(XABeanDefinition.PASSWORD_PROPERTY));
 		Assert.assertEquals("jdbc:mysql://" + this.xaDataSourceProperties.getHost() + ":" + this.xaDataSourceProperties.getPort() + "/"
 				+ this.cropDatabaseName, databaseConnectionProperties.getProperty(XABeanDefinition.URL));
 		Assert.assertEquals("true", databaseConnectionProperties.getProperty(XABeanDefinition.PIN_GLOBAL_TX_TO_PHYSICAL_CONNECTION));
@@ -45,24 +45,24 @@ public class XABeanDefinitionTest {
 		Assert.assertTrue(((String) dataSourceBeanDefinitionProperties.get(XABeanDefinition.UNIQUE_RESOURCE_NAME))
 				.startsWith(XABeanDefinition.XA_PREFIX + this.cropDatabaseName.toUpperCase()));
 
-		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_MAINTENANCE_INTERVAL,
+		Assert.assertEquals(DataSourceTestUtility.CONNECTIONPOOL_MAINTENANCE_INTERVAL,
 				dataSourceBeanDefinitionProperties.get(XABeanDefinition.MAINTENANCE_INTERVAL));
 
-		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_MAINTENANCE_INTERVAL,
+		Assert.assertEquals(DataSourceTestUtility.CONNECTIONPOOL_MAINTENANCE_INTERVAL,
 				dataSourceBeanDefinitionProperties.get(XABeanDefinition.MAINTENANCE_INTERVAL));
-		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_MAX_IDLE_TIME,
+		Assert.assertEquals(DataSourceTestUtility.CONNECTIONPOOL_MAX_IDLE_TIME,
 				dataSourceBeanDefinitionProperties.get(XABeanDefinition.MAX_IDLE_TIME));
-		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_MAX_POOL_SIZE,
+		Assert.assertEquals(DataSourceTestUtility.CONNECTIONPOOL_MAX_POOL_SIZE,
 				dataSourceBeanDefinitionProperties.get(XABeanDefinition.MAX_POOL_SIZE));
-		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_MIN_POOL_SIZE,
+		Assert.assertEquals(DataSourceTestUtility.CONNECTIONPOOL_MIN_POOL_SIZE,
 				dataSourceBeanDefinitionProperties.get(XABeanDefinition.MIN_POOL_SIZE));
-		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_REAP_TIMEOUT, dataSourceBeanDefinitionProperties.get(XABeanDefinition.REAP_TIMEOUT));
-		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT,
+		Assert.assertEquals(DataSourceTestUtility.CONNECTIONPOOL_REAP_TIMEOUT, dataSourceBeanDefinitionProperties.get(XABeanDefinition.REAP_TIMEOUT));
+		Assert.assertEquals(DataSourceTestUtility.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT,
 				dataSourceBeanDefinitionProperties.get(XABeanDefinition.BORROW_CONNECTION_TIMEOUT));
 
-		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_XADRIVER_NAME,
+		Assert.assertEquals(DataSourceTestUtility.CONNECTIONPOOL_XADRIVER_NAME,
 				dataSourceBeanDefinitionProperties.get(XABeanDefinition.XA_DATA_SOURCE_CLASS_NAME));
-		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT,
+		Assert.assertEquals(DataSourceTestUtility.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT,
 				dataSourceBeanDefinitionProperties.get(XABeanDefinition.BORROW_CONNECTION_TIMEOUT));
 		Assert.assertTrue(dataSourceBeanDefinitionProperties.get(XABeanDefinition.XA_PROPERTIES).getClass().equals(Properties.class));
 	}
