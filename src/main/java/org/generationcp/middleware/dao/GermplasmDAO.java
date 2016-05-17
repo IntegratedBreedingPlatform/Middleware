@@ -806,6 +806,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				.searchForGermplasms(new GermplasmSearchParameter(searchedString, o, includeParents, withInventoryOnly, includeMGMembers));
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<Germplasm> searchForGermplasms(final GermplasmSearchParameter germplasmSearchParameter) throws MiddlewareQueryException {
 
 		// actual searching here
@@ -938,6 +939,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final SQLQuery queryNames = this.getSession().createSQLQuery(Germplasm.GET_PARENT_NAMES_BY_STUDY_ID);
 		queryNames.setParameter("projId", studyId);
 
+		@SuppressWarnings("rawtypes")
 		final List resultNames = queryNames.list();
 
 		Name name;
@@ -981,6 +983,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final List<Germplasm> germplasms = new ArrayList<>();
 		Germplasm g;
 
+		@SuppressWarnings("rawtypes")
 		final List resultGermplasms = queryGermplasms.list();
 		for (final Object result : resultGermplasms) {
 			final Object resultArray[] = (Object[]) result;
@@ -1074,6 +1077,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		params.put("deletedStatus", GermplasmDAO.STATUS_DELETED);
 	}
 
+	@SuppressWarnings("unchecked")
 	private Set<Integer> retrieveGIDSearchResults(final String q, final Operation o, final boolean includeParents,
 			final boolean withInventoryOnly, final boolean includeMGMembers) {
 
@@ -1133,6 +1137,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private Set<Integer> retrieveGIDParentsResults(final Set<Integer> gidSearchResults) {
 		try {
 			final Set<Integer> gidParentsSearchResults = new HashSet<Integer>();
@@ -1165,6 +1170,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	private Set<Integer> retrieveGIDGroupMemberResults(final Set<Integer> gidSearchResults) {
 		try {
 			final Set<Integer> gidGroupMembersSearchResults = new HashSet<Integer>();
