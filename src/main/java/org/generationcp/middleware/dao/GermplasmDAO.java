@@ -817,12 +817,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final Integer startingRow = germplasmSearchParameter.getStartingRow();
 		final Integer noOfEntries = germplasmSearchParameter.getNumberOfEntries();
 
-		final Set<Germplasm> germplasmSearchResult = new LinkedHashSet<Germplasm>();
-
 		try {
-
+			final Set<Germplasm> germplasmSearchResult = new LinkedHashSet<Germplasm>();
 			final Set<Integer> gidSearchResult = this.retrieveGIDSearchResults(q, o, includeParents, withInventoryOnly, includeMGMembers);
-
 			// return an empty germplasm list when there is no GID search results returned
 			if (gidSearchResult.isEmpty()) {
 				return new ArrayList<Germplasm>(germplasmSearchResult);
@@ -848,12 +845,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.setMaxResults(noOfEntries);
 
 			germplasmSearchResult.addAll(this.getSearchForGermplasmsResult(query.list()));
+			return new ArrayList<Germplasm>(germplasmSearchResult);
 
-		} catch (final Exception e) {
-			this.logAndThrowException("Error with searchGermplasms(" + q + ") " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			String message = "Error with searchForGermplasms(" + q + ") " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-
-		return new ArrayList<Germplasm>(germplasmSearchResult);
 	}
 
 	private String addSortingColumns(final Map<String, Boolean> sortState) {
@@ -1084,8 +1082,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return new HashSet<Integer>();
 		}
 
-		final Set<Integer> gidSearchResults = new HashSet<Integer>();
 		try {
+			final Set<Integer> gidSearchResults = new HashSet<Integer>();
 			final StringBuilder queryString = new StringBuilder();
 			final Map<String, String> params = new HashMap<String, String>();
 
@@ -1127,15 +1125,17 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				gidSearchResults.addAll(this.retrieveGIDGroupMemberResults(gidSearchResults));
 			}
 
-		} catch (final Exception e) {
-			this.logAndThrowException("Error with countSearchForGermplasms(" + q + ") " + e.getMessage(), e);
+			return gidSearchResults;
+		} catch (final HibernateException e) {
+			String message = "Error with retrieveGIDSearchResults(" + q + ") " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return gidSearchResults;
 	}
 
 	private Set<Integer> retrieveGIDParentsResults(final Set<Integer> gidSearchResults) {
-		final Set<Integer> gidParentsSearchResults = new HashSet<Integer>();
 		try {
+			final Set<Integer> gidParentsSearchResults = new HashSet<Integer>();
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT GermplasmParents.GID FROM (");
 
@@ -1157,17 +1157,17 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			gidParentsSearchResults.addAll(query.list());
 
+			return gidParentsSearchResults;
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with retrieveGermplasmGroupMemberResults(GIDS=" + gidSearchResults + ") : " + e.getMessage(),
-					e);
+			String message = "Error with retrieveGIDParentsResults(GIDS=" + gidSearchResults + ") : " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-
-		return gidParentsSearchResults;
 	}
 
 	private Set<Integer> retrieveGIDGroupMemberResults(final Set<Integer> gidSearchResults) {
-		final Set<Integer> gidGroupMembersSearchResults = new HashSet<Integer>();
 		try {
+			final Set<Integer> gidGroupMembersSearchResults = new HashSet<Integer>();
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT members.gid FROM germplsm members INNER JOIN germplsm g ON members.gid = g.mgid "
 					+ "WHERE g.gid!=g.grplce AND g.grplce = 0 AND g.mgid != 0 and g.gid IN (:gids)");
@@ -1176,13 +1176,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.setParameterList("gids", gidSearchResults);
 
 			gidGroupMembersSearchResults.addAll(query.list());
+			return gidGroupMembersSearchResults;
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with retrieveGermplasmGroupMemberResults(GIDS=" + gidSearchResults + ") : " + e.getMessage(),
-					e);
+			String message = "Error with retrieveGIDGroupMemberResults(GIDS=" + gidSearchResults + ") : " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-
-		return gidGroupMembersSearchResults;
 	}
 
 }
