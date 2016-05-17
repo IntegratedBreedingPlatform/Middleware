@@ -51,6 +51,7 @@ import com.jamonapi.MonitorFactory;
  */
 public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
+	private static final String STATUS_DELETED = "9";
 	private static final String STOCK_IDS = "stockIDs";
 	private static final String GERMPLSM = "germplsm";
 	private static final String Q_NO_SPACES = "qNoSpaces";
@@ -1068,13 +1069,15 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			// 3. find germplasms with nVal = or like q
 			queryString.append("SELECT n.gid as GID FROM names n ");
 			if (o.equals(Operation.LIKE)) {
-				queryString.append("WHERE n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces");
+				queryString
+						.append("WHERE n.nstat != :deletedStatus AND (n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces)");
 			} else {
-				queryString.append("WHERE n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces");
+				queryString.append("WHERE n.nstat != :deletedStatus AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces)");
 			}
 			params.put("q", q);
 			params.put(GermplasmDAO.Q_NO_SPACES, q.replaceAll(" ", ""));
 			params.put(GermplasmDAO.Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
+			params.put("deletedStatus", GermplasmDAO.STATUS_DELETED);
 
 			queryString.append(") GermplasmSearchResults ");
 
