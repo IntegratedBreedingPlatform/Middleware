@@ -58,6 +58,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String Q_STANDARDIZED = "qStandardized";
 	private static final String AVAIL_INV = "availInv";
 	private static final String SEED_RES = "seedRes";
+	// Prevent silly searches from resulting in GIANT IN clauses in search query (which reuses this function).
+	// Old search query had the same hardcoded limit of 5000 anyway so this is not changing existing logic as such. Applies to both
+	// count and search queries. In future we can detect that the search is resulting in more than 5000 matches and go back to the
+	// user asking them to refine search criteria.
+	private static final String LIMIT_CLAUSE = " LIMIT 5000 ";
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDAO.class);
 
@@ -1024,6 +1029,53 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return searchResultsCount;
 	}
 
+	private void searchInGidCriteria(final StringBuilder queryString, final Map<String, String> params, final String q, final Operation o) {
+
+		if (q.matches("(-)?(%)?[(\\d+)(%|_)?]*(%)?")) {
+			queryString.append("SELECT g.gid as GID FROM germplsm g ");
+			if (o.equals(Operation.LIKE)) {
+				queryString.append("WHERE g.gid like :gid " + LIMIT_CLAUSE);
+				params.put("gid", q);
+			} else {
+				queryString.append("WHERE g.gid=:gid AND length(g.gid) = :gidLength " + LIMIT_CLAUSE);
+				params.put("gidLength", String.valueOf(q.length()));
+				params.put("gid", q);
+			}
+			queryString.append(" UNION ");
+		}
+	}
+
+	private void searchInStockIdCriteria(final StringBuilder queryString, final Map<String, String> params, final String q,
+			final Operation o) {
+
+		queryString.append("SELECT eid as GID FROM ims_lot l INNER JOIN ims_transaction t on l.lotid = t.lotid AND l.etype = 'GERMPLSM' ");
+		if (o.equals(Operation.LIKE)) {
+			queryString.append("WHERE t.inventory_id LIKE :inventory_id" + LIMIT_CLAUSE);
+		} else {
+			queryString.append("WHERE t.inventory_id = :inventory_id" + LIMIT_CLAUSE);
+		}
+		params.put("inventory_id", q);
+		queryString.append(" UNION ");
+	}
+
+	private void searchInNamesCriteria(final StringBuilder queryString, final Map<String, String> params, final String q,
+			final Operation o) {
+
+		queryString.append("SELECT n.gid as GID FROM names n ");
+		if (o.equals(Operation.LIKE)) {
+			queryString
+					.append("WHERE n.nstat != :deletedStatus AND (n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces)"
+							+ LIMIT_CLAUSE);
+		} else {
+			queryString.append(
+					"WHERE n.nstat != :deletedStatus AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces)" + LIMIT_CLAUSE);
+		}
+		params.put("q", q);
+		params.put(GermplasmDAO.Q_NO_SPACES, q.replaceAll(" ", ""));
+		params.put(GermplasmDAO.Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
+		params.put("deletedStatus", GermplasmDAO.STATUS_DELETED);
+	}
+
 	private Set<Integer> retrieveGIDSearchResults(final String q, final Operation o, final boolean includeParents,
 			final boolean withInventoryOnly, final boolean includeMGMembers) {
 
@@ -1034,58 +1086,19 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		final Set<Integer> gidSearchResults = new HashSet<Integer>();
 		try {
-			// Prevent silly searches from resulting in GIANT IN clauses in search query (which reuses this function).
-			// Old search query had the same hardcoded limit of 5000 anyway so this is not changing existing logic as such. Applies to both
-			// count and search queries. In future we can detect that the search is resulting in more than 5000 matches and go back to the
-			// user asking them to refine search criteria.
-			final String LIMIT_CLAUSE = " LIMIT 5000 ";
-
 			final StringBuilder queryString = new StringBuilder();
 			final Map<String, String> params = new HashMap<String, String>();
 
 			queryString.append("SELECT GermplasmSearchResults.GID FROM (");
 
 			// 1. find germplasms with GID = or like q
-			if (q.matches("(-)?(%)?[(\\d+)(%|_)?]*(%)?")) {
-				queryString.append("SELECT g.gid as GID FROM germplsm g ");
-				if (o.equals(Operation.LIKE)) {
-					queryString.append("WHERE g.gid like :gid " + LIMIT_CLAUSE);
-					params.put("gid", q);
-				} else {
-					queryString.append("WHERE g.gid=:gid AND length(g.gid) = :gidLength " + LIMIT_CLAUSE);
-					params.put("gidLength", String.valueOf(q.length()));
-					params.put("gid", q);
-				}
-
-				queryString.append(" UNION ");
-			}
+			searchInGidCriteria(queryString, params, q, o);
 
 			// 2. find germplasms with inventory_id = or like q
-			queryString.append("SELECT eid as GID FROM ims_lot l "
-					+ "INNER JOIN ims_transaction t on l.lotid = t.lotid AND l.etype = 'GERMPLSM' ");
-			if (o.equals(Operation.LIKE)) {
-				queryString.append("WHERE t.inventory_id LIKE :inventory_id" + LIMIT_CLAUSE);
-			} else {
-				queryString.append("WHERE t.inventory_id = :inventory_id" + LIMIT_CLAUSE);
-			}
-			params.put("inventory_id", q);
-
-			queryString.append(" UNION ");
+			searchInStockIdCriteria(queryString, params, q, o);
 
 			// 3. find germplasms with nVal = or like q
-			queryString.append("SELECT n.gid as GID FROM names n ");
-			if (o.equals(Operation.LIKE)) {
-				queryString
-						.append("WHERE n.nstat != :deletedStatus AND (n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces)"
-								+ LIMIT_CLAUSE);
-			} else {
-				queryString.append(
-						"WHERE n.nstat != :deletedStatus AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces)" + LIMIT_CLAUSE);
-			}
-			params.put("q", q);
-			params.put(GermplasmDAO.Q_NO_SPACES, q.replaceAll(" ", ""));
-			params.put(GermplasmDAO.Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
-			params.put("deletedStatus", GermplasmDAO.STATUS_DELETED);
+			searchInNamesCriteria(queryString, params, q, o);
 
 			queryString.append(") GermplasmSearchResults ");
 
