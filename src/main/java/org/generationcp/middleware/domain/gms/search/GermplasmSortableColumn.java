@@ -11,7 +11,7 @@ import java.util.Map;
 public enum GermplasmSortableColumn {
 	// For now there are only 3 columns allowed to be sorted in Germplasm Search Table
 	// Make sure to add another constant for new sortable column in Germplasm Search Table
-	STOCK_IDS("stockIDs", "STOCKID"), SEED_RES("seedRes", "SEED RES"), GROUP_ID("g.mgid", "GROUP ID");
+	STOCK_IDS("STOCKID", "stockIDs"), SEED_RES("SEED RES", "seedRes"), GROUP_ID("GROUP ID", "g.mgid");
 
 	// The corresponding column name in the germplasm search table
 	String tableColumnName;
