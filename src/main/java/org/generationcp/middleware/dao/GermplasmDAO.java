@@ -1034,6 +1034,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		final Set<Integer> gidSearchResults = new HashSet<Integer>();
 		try {
+			// Prevent silly searches from resulting in GIANT IN clauses in search query (which reuses this function).
+			// Old search query had the same hardcoded limit of 5000 anyway so this is not changing existing logic as such. Applies to both
+			// count and search queries. In future we can detect that the search is resulting in more than 5000 matches and go back to the
+			// user asking them to refine search criteria.
+			final String LIMIT_CLAUSE = " LIMIT 5000 ";
+
 			final StringBuilder queryString = new StringBuilder();
 			final Map<String, String> params = new HashMap<String, String>();
 
@@ -1043,10 +1049,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			if (q.matches("(-)?(%)?[(\\d+)(%|_)?]*(%)?")) {
 				queryString.append("SELECT g.gid as GID FROM germplsm g ");
 				if (o.equals(Operation.LIKE)) {
-					queryString.append("WHERE g.gid like :gid ");
+					queryString.append("WHERE g.gid like :gid " + LIMIT_CLAUSE);
 					params.put("gid", q);
 				} else {
-					queryString.append("WHERE g.gid=:gid AND length(g.gid) = :gidLength ");
+					queryString.append("WHERE g.gid=:gid AND length(g.gid) = :gidLength " + LIMIT_CLAUSE);
 					params.put("gidLength", String.valueOf(q.length()));
 					params.put("gid", q);
 				}
@@ -1058,9 +1064,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			queryString.append("SELECT eid as GID FROM ims_lot l "
 					+ "INNER JOIN ims_transaction t on l.lotid = t.lotid AND l.etype = 'GERMPLSM' ");
 			if (o.equals(Operation.LIKE)) {
-				queryString.append("WHERE t.inventory_id LIKE :inventory_id");
+				queryString.append("WHERE t.inventory_id LIKE :inventory_id" + LIMIT_CLAUSE);
 			} else {
-				queryString.append("WHERE t.inventory_id = :inventory_id");
+				queryString.append("WHERE t.inventory_id = :inventory_id" + LIMIT_CLAUSE);
 			}
 			params.put("inventory_id", q);
 
@@ -1070,9 +1076,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			queryString.append("SELECT n.gid as GID FROM names n ");
 			if (o.equals(Operation.LIKE)) {
 				queryString
-						.append("WHERE n.nstat != :deletedStatus AND (n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces)");
+						.append("WHERE n.nstat != :deletedStatus AND (n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces)"
+								+ LIMIT_CLAUSE);
 			} else {
-				queryString.append("WHERE n.nstat != :deletedStatus AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces)");
+				queryString.append(
+						"WHERE n.nstat != :deletedStatus AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces)" + LIMIT_CLAUSE);
 			}
 			params.put("q", q);
 			params.put(GermplasmDAO.Q_NO_SPACES, q.replaceAll(" ", ""));
