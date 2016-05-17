@@ -1091,9 +1091,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			if (withInventoryOnly) {
 				queryString.append(" INNER JOIN ");
-				queryString.append("(SELECT GID FROM (SELECT l.eid as GID, SUM(t.trnqty) as availInv from ims_lot l "
-						+ "inner join ims_transaction t on l.lotid = t.lotid AND l.etype = 'GERMPLSM' GROUP BY l.eid ) "
-						+ "GermplasmWithInventory HAVING availInv > 0 ) ");
+				queryString
+						.append("(SELECT l.eid as GID from ims_lot l INNER JOIN ims_transaction t on l.lotid = t.lotid AND l.etype = 'GERMPLSM' GROUP BY l.eid HAVING SUM(t.trnqty) > 0 ) ");
 				queryString.append(" GermplasmWithInventory ON GermplasmSearchResults.GID = GermplasmWithInventory.GID ");
 			}
 
