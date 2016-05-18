@@ -1035,13 +1035,15 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (q.matches("(-)?(%)?[(\\d+)(%|_)?]*(%)?")) {
 			queryString.append("SELECT g.gid as GID FROM germplsm g ");
 			if (o.equals(Operation.LIKE)) {
-				queryString.append("WHERE g.gid like :gid " + LIMIT_CLAUSE);
+				queryString.append("WHERE g.gid like :gid ");
 				params.put("gid", q);
 			} else {
-				queryString.append("WHERE g.gid=:gid AND length(g.gid) = :gidLength " + LIMIT_CLAUSE);
+				queryString.append("WHERE g.gid=:gid AND length(g.gid) = :gidLength ");
 				params.put("gidLength", String.valueOf(q.length()));
 				params.put("gid", q);
 			}
+			// make sure to not include deleted germplasm from the search results
+			queryString.append(" AND g.gid!=g.grplce AND g.grplce = 0 " + LIMIT_CLAUSE);
 			queryString.append(" UNION ");
 		}
 	}
@@ -1049,32 +1051,37 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private void searchInStockIdCriteria(final StringBuilder queryString, final Map<String, String> params, final String q,
 			final Operation o) {
 
-		queryString.append("SELECT eid as GID FROM ims_lot l INNER JOIN ims_transaction t on l.lotid = t.lotid AND l.etype = 'GERMPLSM' ");
+		queryString.append("SELECT eid as GID FROM ims_lot l " + "INNER JOIN germplsm g on l.eid = g.gid "
+				+ "INNER JOIN ims_transaction t on l.lotid = t.lotid AND l.etype = 'GERMPLSM' ");
 		if (o.equals(Operation.LIKE)) {
-			queryString.append("WHERE t.inventory_id LIKE :inventory_id" + LIMIT_CLAUSE);
+			queryString.append("WHERE t.inventory_id LIKE :inventory_id");
 		} else {
-			queryString.append("WHERE t.inventory_id = :inventory_id" + LIMIT_CLAUSE);
+			queryString.append("WHERE t.inventory_id = :inventory_id");
 		}
 		params.put("inventory_id", q);
+
+		// make sure to not include deleted germplasm from the search results
+		queryString.append(" AND g.gid!=g.grplce AND g.grplce = 0 " + LIMIT_CLAUSE);
 		queryString.append(" UNION ");
 	}
 
-	private void searchInNamesCriteria(final StringBuilder queryString, final Map<String, String> params, final String q,
-			final Operation o) {
+	private void searchInNamesCriteria(final StringBuilder queryString, final Map<String, String> params, final String q, final Operation o) {
 
 		queryString.append("SELECT n.gid as GID FROM names n ");
+		queryString.append("INNER JOIN germplsm g on n.gid = g.gid ");
 		if (o.equals(Operation.LIKE)) {
 			queryString
-					.append("WHERE n.nstat != :deletedStatus AND (n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces)"
-							+ LIMIT_CLAUSE);
+					.append("WHERE n.nstat != :deletedStatus AND (n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces)");
 		} else {
-			queryString.append(
-					"WHERE n.nstat != :deletedStatus AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces)" + LIMIT_CLAUSE);
+			queryString.append("WHERE n.nstat != :deletedStatus AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces)");
 		}
 		params.put("q", q);
 		params.put(GermplasmDAO.Q_NO_SPACES, q.replaceAll(" ", ""));
 		params.put(GermplasmDAO.Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
 		params.put("deletedStatus", GermplasmDAO.STATUS_DELETED);
+
+		// make sure to not include deleted germplasm from the search results
+		queryString.append(" AND g.gid!=g.grplce AND g.grplce = 0 " + LIMIT_CLAUSE);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1110,9 +1117,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 						.append("(SELECT l.eid as GID from ims_lot l INNER JOIN ims_transaction t on l.lotid = t.lotid AND l.etype = 'GERMPLSM' GROUP BY l.eid HAVING SUM(t.trnqty) > 0 ) ");
 				queryString.append(" GermplasmWithInventory ON GermplasmSearchResults.GID = GermplasmWithInventory.GID ");
 			}
-
-			// make sure to not include deleted germplasm to the search results
-			queryString.append("INNER JOIN germplsm g on GermplasmSearchResults.GID = g.gid AND g.gid!=g.grplce AND g.grplce = 0");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			for (final Map.Entry<String, String> param : params.entrySet()) {
