@@ -10,7 +10,7 @@
 
 	<changeSet author="alejandro" id="1">
 		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">select count(*) from projectprop where value='8263' and rank=12 and projectprop_id=25378 and project_id=25006 and type_id=1070;</sqlCheck>
+			<sqlCheck expectedResult="1">select count(*) from projectprop where value='8263' and rank=12 and projectprop_id=25378 and project_id=25006 and type_id=1070;</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			update projectprop set value='20364' where value='8263' and rank=12 and projectprop_id=25378 and project_id=25006 and type_id=1070;
