@@ -9,16 +9,16 @@ import org.generationcp.middleware.pojos.Germplasm;
 
 public class GermplasmGroup {
 
-	private Integer founderGid;
+	private Germplasm founder;
 	private Integer groupId;
 	private List<Germplasm> groupMembers = new ArrayList<>();
 
-	public Integer getFounderGid() {
-		return this.founderGid;
+	public Germplasm getFounder() {
+		return founder;
 	}
 
-	public void setFounderGid(final Integer founderGid) {
-		this.founderGid = founderGid;
+	public void setFounder(Germplasm founder) {
+		this.founder = founder;
 	}
 
 	public Integer getGroupId() {
@@ -39,6 +39,6 @@ public class GermplasmGroup {
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).append(this.founderGid).append(this.groupId).append(this.groupMembers).toString();
+		return new ToStringBuilder(this).append(this.founder).append(this.groupId).append(this.groupMembers).toString();
 	}
 }

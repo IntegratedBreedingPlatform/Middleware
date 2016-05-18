@@ -29,8 +29,8 @@ public abstract class AbstractTrialReporter extends AbstractNurseryReporter {
 		entries = ((List<MeasurementRow>) args.get(DATA_SOURCE_KEY));
 
 		// entries in trials are ordered by plot number instead of entry number
-		final int firstPlot = Integer.valueOf(entries.get(0).getMeasurementData("PLOT_NO").getValue());
-		final int lastPlot = Integer.valueOf(entries.get(entries.size() - 1).getMeasurementData("PLOT_NO").getValue());
+		final int firstPlot = Integer.valueOf(entries.get(0).getMeasurementData(TermId.PLOT_NO.getId()).getValue());
+		final int lastPlot = Integer.valueOf(entries.get(entries.size() - 1).getMeasurementData(TermId.PLOT_NO.getId()).getValue());
 
 		final Pair<Integer, Integer> firstLastEntryNumber = getFirstLastEntry(entries);
 
@@ -42,6 +42,18 @@ public abstract class AbstractTrialReporter extends AbstractNurseryReporter {
 		params.put("Ientry", firstLastEntryNumber.getLeft());
 		params.put("Fentry", firstLastEntryNumber.getRight());
 		params.put("offset", offset);
+
+        // update trial report data extraction logic so that study environment entries are also retrieved from the
+        // trial environment
+        @SuppressWarnings("unchecked")
+        final List<MeasurementRow> trialObservations = (List<MeasurementRow>) args.get(STUDY_OBSERVATIONS_KEY);
+        // attempt to extract values from the observations. currently, only the value from the first measurement row is used
+        if (!trialObservations.isEmpty()) {
+
+            for (final MeasurementData data : trialObservations.get(0).getDataList()) {
+                this.parameterMapper.mapEnvironmentValue(data.getMeasurementVariable(), params, data.getValue());
+            }
+        }
 
 		return params;
 	}

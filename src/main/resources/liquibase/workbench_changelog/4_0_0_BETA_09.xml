@@ -1,0 +1,19 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<!-- TODO this is CIMMYT specific, why is it in standard DB changes? Entire 05_IBDBv1_WorkbenchStandardPresetData.sql in DBScripts is also CIMMYT specific.  -->
+	<changeSet author="danv" id="beta9-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM standard_preset where tool_id=10 and tool_section='BM_LIST_MGR_CUSTOM_REPORT' and crop_name='maize';</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			INSERT INTO standard_preset VALUES (null, 10, 'BM_LIST_MGR_CUSTOM_REPORT', 'maize', 'list manager maize cimmyt report', <![CDATA['<?xml version="1.0"?><reports><profile>cimmyt</profile><report><code>MFbShipList</code><name>Template for shipments, Maize</name></report></reports>']]> );
+	    </sql>
+	</changeSet>
+</databaseChangeLog>

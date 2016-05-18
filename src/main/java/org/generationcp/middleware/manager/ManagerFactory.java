@@ -48,11 +48,17 @@ import org.generationcp.middleware.service.ReportServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
+import org.generationcp.middleware.service.api.GermplasmNamingReferenceDataResolver;
+import org.generationcp.middleware.service.api.GermplasmNamingService;
 import org.generationcp.middleware.service.api.InventoryService;
+import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.ReportService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
+import org.generationcp.middleware.service.impl.GermplasmNamingReferenceDataResolverImpl;
+import org.generationcp.middleware.service.impl.GermplasmNamingServiceImpl;
+import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -258,6 +264,20 @@ public class ManagerFactory implements Serializable {
 
 	public GermplasmGroupingService getGermplasmGroupingService() {
 		return new GermplasmGroupingServiceImpl(this.sessionProvider);
+	}
+
+	public GermplasmNamingService getGermplasmNamingService() {
+		return new GermplasmNamingServiceImpl(this.sessionProvider);
+	}
+
+	public GermplasmNamingReferenceDataResolver getGermplasmNamingReferenceDataResolver() {
+		// In future we can switch implementation based on profile/crop.
+		// Currently just construct and return the only (CIMMYT maize) impl we have.
+		return new GermplasmNamingReferenceDataResolverImpl(this.sessionProvider);
+	}
+
+	public KeySequenceRegisterService getKeySequenceRegisterService() {
+		return new KeySequenceRegisterServiceImpl(this.sessionProvider);
 	}
 
 }
