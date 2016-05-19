@@ -32,4 +32,12 @@
 			DELETE FROM workbench_sidebar_category_link where tool_name = 'crossing_manager'
 	    </sql>
 	</changeSet>
+
+	<changeSet author="iryna" id="beta12-4">
+		<preConditions onFail="CONTINUE">
+			<indexExists tableName="workbench_project" indexName="uk_project_name"/>
+		</preConditions>
+		<dropIndex indexName="uk_project_name" tableName="workbench_project"/>
+		<addUniqueConstraint constraintName="uk_project_name" tableName="workbench_project" columnNames="project_name ASC, crop_type ASC"/>
+	</changeSet>
 </databaseChangeLog>
