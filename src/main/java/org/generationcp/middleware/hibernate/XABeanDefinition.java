@@ -18,6 +18,10 @@ import com.google.common.collect.ImmutableMap;
 
 public class XABeanDefinition {
 
+	static final String CACHE_PREP_STMTS = "cachePrepStmts";
+
+	static final String USE_SERVER_PREP_STMTS = "useServerPrepStmts";
+
 	static final String DATA_SOURCE_ATTRIBUTE = "dataSource";
 
 	static final String DATA_SOURCE = "DataSource";
@@ -39,8 +43,8 @@ public class XABeanDefinition {
 	static final String XA_PROPERTIES = "xaProperties";
 
 	static final String BORROW_CONNECTION_TIMEOUT = "borrowConnectionTimeout";
-
-	static final String TEST_QUERY = "testQuery";
+	
+	static final String REAP_TIMEOUT = "reapTimeout";
 
 	static final String MIN_POOL_SIZE = "minPoolSize";
 
@@ -55,6 +59,8 @@ public class XABeanDefinition {
 	private DatasourceUtilities xaDatasourceUtilities = new DatasourceUtilities();
 
 	private static final Logger LOG = LoggerFactory.getLogger(DatasourceUtilities.class);
+
+	
 
 	public XABeanDefinition() {
 		this.xaDatasourceUtilities = new DatasourceUtilities();
@@ -136,9 +142,9 @@ public class XABeanDefinition {
 		dataSourceBeanDefinitionProperties.put(XABeanDefinition.MAINTENANCE_INTERVAL, xaDataSourceProperties.getMaintenanceInterval());
 		dataSourceBeanDefinitionProperties.put(XABeanDefinition.MAX_IDLE_TIME, xaDataSourceProperties.getMaxIdleTime());
 		dataSourceBeanDefinitionProperties.put(XABeanDefinition.MAX_POOL_SIZE, xaDataSourceProperties.getMaxPoolSize());
-
 		dataSourceBeanDefinitionProperties.put(XABeanDefinition.MIN_POOL_SIZE, xaDataSourceProperties.getMinPoolSize());
-		dataSourceBeanDefinitionProperties.put(XABeanDefinition.TEST_QUERY, xaDataSourceProperties.getTestQuery());
+		dataSourceBeanDefinitionProperties.put(XABeanDefinition.REAP_TIMEOUT, xaDataSourceProperties.getReapTimeout());
+
 		dataSourceBeanDefinitionProperties.put(XABeanDefinition.BORROW_CONNECTION_TIMEOUT,
 				xaDataSourceProperties.getBorrowConnectionTimeout());
 		dataSourceBeanDefinitionProperties.put(XABeanDefinition.XA_DATA_SOURCE_CLASS_NAME, xaDataSourceProperties.getXaDriverName());
@@ -160,6 +166,8 @@ public class XABeanDefinition {
 		databaseConnectionProperties.setProperty(XABeanDefinition.USER, xaDataSourceProperties.getUserName());
 		databaseConnectionProperties.setProperty(XABeanDefinition.PASSWORD_PROPERTY, xaDataSourceProperties.getPassword());
 		databaseConnectionProperties.setProperty(XABeanDefinition.PIN_GLOBAL_TX_TO_PHYSICAL_CONNECTION, "true");
+		databaseConnectionProperties.setProperty(USE_SERVER_PREP_STMTS, "true");
+		databaseConnectionProperties.setProperty(CACHE_PREP_STMTS, "true");
 
 		return databaseConnectionProperties;
 	}
