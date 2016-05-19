@@ -1179,8 +1179,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		try {
 			final Set<Integer> gidGroupMembersSearchResults = new HashSet<Integer>();
 			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT members.gid FROM germplsm members INNER JOIN germplsm g ON members.gid = g.mgid "
-					+ "WHERE g.gid!=g.grplce AND g.grplce = 0 AND g.mgid != 0 and g.gid IN (:gids)");
+			queryString.append("SELECT members.gid FROM germplsm members WHERE members.gid!=members.grplce AND members.grplce = 0 "
+					+ "AND members.mgid IN (select g.mgid from germplsm g where g.gid IN (:gids) and g.mgid != 0)");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("gids", gidSearchResults);
