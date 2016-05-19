@@ -15,7 +15,7 @@ public class XATestUtility {
 	public static final Object CONNECTIONPOOL_XADRIVER_NAME = "com.test.XADriver";
 	public static final Object CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT = "300";
 	public static final Object CONNECTIONPOOL_MAINTENANCE_INTERVAL = "350";
-	public static final Object CONNECTIONPOOL_TEST_QUERY = "Select * from TheUniverse";
+	public static final Object CONNECTIONPOOL_REAP_TIMEOUT = "900";
 	public static final Object CONNECTIONPOOL_MIN_POOL_SIZE = "50";
 	public static final Object CONNECTIONPOOL_MAX_POOL_SIZE = "100";
 	public static final Object CONNECTIONPOOL_MAX_IDLE_TIME = "300";
@@ -34,7 +34,7 @@ public class XATestUtility {
 				XATestUtility.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT);
 		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_MAINTENANCE_INTERVAL)).thenReturn(
 				XATestUtility.CONNECTIONPOOL_MAINTENANCE_INTERVAL);
-		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_TEST_QUERY)).thenReturn(XATestUtility.CONNECTIONPOOL_TEST_QUERY);
+		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_REAP_TIMEOUT)).thenReturn(XATestUtility.CONNECTIONPOOL_REAP_TIMEOUT);
 		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_MIN_POOL_SIZE)).thenReturn(
 				XATestUtility.CONNECTIONPOOL_MIN_POOL_SIZE);
 		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_MAX_POOL_SIZE)).thenReturn(
