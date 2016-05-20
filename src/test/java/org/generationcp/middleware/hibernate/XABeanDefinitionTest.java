@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableList;
 
 public class XABeanDefinitionTest {
 
-	private final XADataSourceProperties xaDataSourceProperties = XATestUtility.mockProperties();
+	private final DataSourceProperties xaDataSourceProperties = XATestUtility.mockProperties();
 	private final String cropDatabaseName = "TestCrop";
 
 	@Test
@@ -70,7 +70,7 @@ public class XABeanDefinitionTest {
 	@Test
 	public void testCreateAllXADataSources() throws Exception {
 
-		final XADatasourceUtilities mockXaDatasourceUtilities = Mockito.mock(XADatasourceUtilities.class);
+		final DatasourceUtilities mockXaDatasourceUtilities = Mockito.mock(DatasourceUtilities.class);
 		final XABeanDefinition xaBeanDefinition = new XABeanDefinition(mockXaDatasourceUtilities);
 		final BeanDefinitionRegistry mockBeanDefinitionRegistry = Mockito.mock(BeanDefinitionRegistry.class);
 		final SingleConnectionDataSource mockSingleConnectionDataSource = Mockito.mock(SingleConnectionDataSource.class);

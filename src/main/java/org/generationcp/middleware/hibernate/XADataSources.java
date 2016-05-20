@@ -11,7 +11,7 @@ import org.springframework.beans.factory.support.BeanDefinitionRegistryPostProce
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 /**
  * Helps us create XA Session Factories for all crop database. This class must be declared as a singleton bean via annotations or via xml
@@ -20,17 +20,17 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
 public class XADataSources implements BeanDefinitionRegistryPostProcessor {
 
-	private XADatasourceUtilities xaDatasourceUtilities;
+	private DatasourceUtilities xaDatasourceUtilities;
 	private XABeanDefinition xaBeanDefinition;
-	private XADataSourceProperties xaDataSourceProperties;
+	private DataSourceProperties xaDataSourceProperties;
 
 	public XADataSources() {
 		try {
-			this.xaDatasourceUtilities = new XADatasourceUtilities();
+			this.xaDatasourceUtilities = new DatasourceUtilities();
 			this.xaBeanDefinition = new XABeanDefinition();
 			final Resource resource = new ClassPathResource("/database.properties");
 			final Properties props = PropertiesLoaderUtils.loadProperties(resource);
-			this.xaDataSourceProperties = new XADataSourceProperties(props);
+			this.xaDataSourceProperties = new DataSourceProperties(props);
 		} catch (final IOException e) {
 			throw new IllegalStateException(
 					"Unable to get the list of database that we need to register. Please contanct your administrator for further assistance.",
@@ -38,8 +38,8 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor {
 		}
 	}
 
-	XADataSources(final XADatasourceUtilities xaDatasourceUtilities, final XABeanDefinition xaBeanDefinition,
-			final XADataSourceProperties xaDataSourceProperties) {
+	XADataSources(final DatasourceUtilities xaDatasourceUtilities, final XABeanDefinition xaBeanDefinition,
+			final DataSourceProperties xaDataSourceProperties) {
 		this.xaDatasourceUtilities = xaDatasourceUtilities;
 		this.xaBeanDefinition = xaBeanDefinition;
 		this.xaDataSourceProperties = xaDataSourceProperties;
@@ -47,8 +47,8 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor {
 
 	@Override
 	public void postProcessBeanDefinitionRegistry(final BeanDefinitionRegistry registry) throws BeansException {
-		final SingleConnectionDataSource singleConnectionDataSource =
-				this.xaDatasourceUtilities.getSingleConnectionDataSource(this.xaDataSourceProperties);
+		final DriverManagerDataSource singleConnectionDataSource =
+				this.xaDatasourceUtilities.getWorkbenchDataSource(this.xaDataSourceProperties);
 		this.xaBeanDefinition.createAllXARelatedBeans(singleConnectionDataSource, registry, this.xaDataSourceProperties);
 	}
 

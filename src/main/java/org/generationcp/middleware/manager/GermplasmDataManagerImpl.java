@@ -382,6 +382,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	public boolean isMethodNamingConfigurationValid(final Integer breedingMethodId) {
+		final Method breedingMethod = this.getMethodByID(breedingMethodId);
+		if (breedingMethod == null) {
+			return false;
+		}
+		final boolean isConfigurationNotEmpty = !(breedingMethod.getSuffix() == null && breedingMethod.getSeparator() == null &&
+				breedingMethod.getSnametype() == null && breedingMethod.getPrefix() == null && breedingMethod.getCount() == null);
+		return isConfigurationNotEmpty;
+	}
+
+	@Override
 	public List<Method> getAllMethodsNotGenerative() {
 		return this.getMethodDao().getAllMethodsNotGenerative();
 	}

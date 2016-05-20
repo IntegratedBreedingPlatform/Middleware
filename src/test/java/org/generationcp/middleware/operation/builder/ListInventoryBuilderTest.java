@@ -9,6 +9,7 @@ import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitial
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.junit.Assert;
 import org.junit.Before;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class ListInventoryBuilderTest extends IntegrationTestBase {
 
+	private static final int LIST_ID = 1;
 	private static final int GROUP_ID = 1;
 	private static final int NO_OF_ENTRIES = 5;
 	private static ListInventoryBuilder listInventoryBuilder;
@@ -36,7 +38,8 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testRetrieveGroupId() {
-		final List<GermplasmListData> listEntries = GermplasmListTestDataInitializer.createGermplasmListData(NO_OF_ENTRIES);
+		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmListWithListData(LIST_ID, NO_OF_ENTRIES);
+		final List<GermplasmListData> listEntries = germplasmList.getListData();
 
 		listInventoryBuilder.retrieveGroupId(listEntries, gids);
 

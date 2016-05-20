@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.jdbc.datasource.SingleConnectionDataSource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean;
 
 import com.atomikos.jdbc.AtomikosDataSourceBean;
@@ -52,33 +52,34 @@ public class XABeanDefinition {
 
 	static final String UNIQUE_RESOURCE_NAME = "uniqueResourceName";
 
-	private XADatasourceUtilities xaDatasourceUtilities = new XADatasourceUtilities();
+	private DatasourceUtilities xaDatasourceUtilities = new DatasourceUtilities();
 
-	private static final Logger LOG = LoggerFactory.getLogger(XADatasourceUtilities.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DatasourceUtilities.class);
 
 	public XABeanDefinition() {
-		this.xaDatasourceUtilities = new XADatasourceUtilities();
+		this.xaDatasourceUtilities = new DatasourceUtilities();
 
 	}
 
-	public XABeanDefinition(final XADatasourceUtilities xaDatasourceUtilities) {
+	public XABeanDefinition(final DatasourceUtilities xaDatasourceUtilities) {
 		this.xaDatasourceUtilities = xaDatasourceUtilities;
 	}
 
 	/**
 	 * Create all XA related beans for applicable database i.e. workbench + all applicable cropdatabases
-	 * @param singleConnectionDataSource JDBC connection to the workbench database.
+	 * 
+	 * @param workbenchDataSource JDBC connection to the workbench database.
 	 * @param registry interface to register the data source and session factory bean
 	 * @param xaDataSourceProperties applicable xaDataSource properties
 	 */
-	void createAllXARelatedBeans(final SingleConnectionDataSource singleConnectionDataSource, final BeanDefinitionRegistry registry,
-			final XADataSourceProperties xaDataSourceProperties) {
+	void createAllXARelatedBeans(final DriverManagerDataSource workbenchDataSource, final BeanDefinitionRegistry registry,
+			final DataSourceProperties xaDataSourceProperties) {
 		LOG.debug("Creating datasource and session factory related beans.");
 		this.createXAConnectionBeans(registry, xaDataSourceProperties.getWorkbenchDbName(), xaDataSourceProperties);
 
 		LOG.debug("Retrieve all appliable crop database.");
 
-		final List<String> cropDatabases = this.xaDatasourceUtilities.retrieveCropDatabases(singleConnectionDataSource);
+		final List<String> cropDatabases = this.xaDatasourceUtilities.retrieveCropDatabases(workbenchDataSource);
 
 		for (final String cropDatabase : cropDatabases) {
 			LOG.debug(String.format("Creating '%s' datasource and session factory related beans.", cropDatabase));
@@ -94,7 +95,7 @@ public class XABeanDefinition {
 	 * @param xaDataSourceProperties properties values to be used when creating these beans
 	 */
 	void createXAConnectionBeans(final BeanDefinitionRegistry registry, final String cropDatabaseName,
-			final XADataSourceProperties xaDataSourceProperties) {
+			final DataSourceProperties xaDataSourceProperties) {
 
 		final RootBeanDefinition dataSourceBeanDefinition =
 				this.xaDatasourceUtilities.createRootBeanDefinition(AtomikosDataSourceBean.class, ImmutableMap.<String, Object>of(
@@ -127,7 +128,7 @@ public class XABeanDefinition {
 	 * @return {@link Map} of applicable properties
 	 */
 	Map<String, Object> getDataSourceBeanDefinitionProperties(final String cropDatabaseName,
-			final XADataSourceProperties xaDataSourceProperties) {
+			final DataSourceProperties xaDataSourceProperties) {
 		final Map<String, Object> dataSourceBeanDefinitionProperties = new HashMap<String, Object>();
 
 		dataSourceBeanDefinitionProperties.put(XABeanDefinition.UNIQUE_RESOURCE_NAME,
@@ -152,7 +153,7 @@ public class XABeanDefinition {
 	 * @param xaDataSourceProperties the applicable properties values
 	 * @return database connection properties
 	 */
-	Properties getDatabaseConnectionProperties(final String cropDatabaseName, final XADataSourceProperties xaDataSourceProperties) {
+	Properties getDatabaseConnectionProperties(final String cropDatabaseName, final DataSourceProperties xaDataSourceProperties) {
 		final Properties databaseConnectionProperties = new Properties();
 		databaseConnectionProperties.setProperty(XABeanDefinition.URL, "jdbc:mysql://" + xaDataSourceProperties.getHost() + ":"
 				+ xaDataSourceProperties.getPort() + "/" + cropDatabaseName);
