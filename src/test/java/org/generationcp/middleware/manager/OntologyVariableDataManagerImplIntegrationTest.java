@@ -246,6 +246,10 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.testScale.setMaxValue("100");
 		this.scaleManager.addScale(this.testScale);
 
+		this.buildVariable();
+	}
+
+	private void buildVariable() {
 		this.testVariableInfo = new OntologyVariableInfo();
 		this.testVariableInfo.setProgramUuid(this.testProject.getUniqueID());
 		this.testVariableInfo.setName(OntologyDataCreationUtil.getNewRandomName());
@@ -262,22 +266,6 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	}
 
 	protected void createTestVariableWithCategoricalValue() {
-		final WorkbenchTestDataUtil instance = new WorkbenchTestDataUtil(this.workbenchDataManager);
-		this.testProject = instance.createTestProjectData();
-
-		this.testMethod = new org.generationcp.middleware.domain.ontology.Method();
-		this.testMethod.setName(OntologyDataCreationUtil.getNewRandomName());
-		this.testMethod.setName(OntologyDataCreationUtil.getNewRandomName());
-		this.testMethod.setDefinition("Test Method");
-		this.methodManager.addMethod(this.testMethod);
-
-		this.testProperty = new Property();
-		this.testProperty.setName(OntologyDataCreationUtil.getNewRandomName());
-		this.testProperty.setDefinition("Test Property");
-		this.testProperty.setCropOntologyId(OntologyVariableDataManagerImplIntegrationTest.CROP_ONTOLOGY_ID);
-		this.testProperty.addClass("My New Class");
-		this.propertyManager.addProperty(this.testProperty);
-
 		this.testScale = new Scale();
 		this.testScale.setName(OntologyDataCreationUtil.getNewRandomName());
 		this.testScale.setDefinition("Categorical Scale");
@@ -289,18 +277,6 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 		this.scaleManager.addScale(this.testScale);
 
-		this.testVariableInfo = new OntologyVariableInfo();
-		this.testVariableInfo.setProgramUuid(this.testProject.getUniqueID());
-		this.testVariableInfo.setName(OntologyDataCreationUtil.getNewRandomName());
-		this.testVariableInfo.setDescription("Test Variable");
-		this.testVariableInfo.setMethodId(this.testMethod.getId());
-		this.testVariableInfo.setPropertyId(this.testProperty.getId());
-		this.testVariableInfo.setScaleId(this.testScale.getId());
-		this.testVariableInfo.setAlias("My alias");
-		this.testVariableInfo.setExpectedMin("0");
-		this.testVariableInfo.setExpectedMax("100");
-		this.testVariableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
-		this.testVariableInfo.setIsFavorite(true);
-		this.variableManager.addVariable(this.testVariableInfo);
+		this.buildVariable();
 	}
 }
