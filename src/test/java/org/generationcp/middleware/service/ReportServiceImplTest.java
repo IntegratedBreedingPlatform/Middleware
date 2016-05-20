@@ -20,10 +20,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.Mockito;
-
 import java.util.ArrayList;
-import java.util.List;
 import java.util.List;
 import java.util.Map;
 
@@ -124,6 +121,7 @@ public class ReportServiceImplTest {
 
         Mockito.doCallRealMethod().when(mocked).appendCountryInformationFromCondition(variableList);
         Mockito.doCallRealMethod().when(mocked).retrieveLocationIdFromCondition(variableList);
+        Mockito.doCallRealMethod().when(mocked).createPlaceholderCountryMeasurementVariable(Mockito.anyString());
         Mockito.doReturn(locationDataManager).when(mocked).getLocationDataManager();
         Mockito.doReturn(countryDAO).when(mocked).getCountryDao();
 
