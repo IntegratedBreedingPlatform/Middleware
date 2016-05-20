@@ -7,12 +7,24 @@ import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
+import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.StockTransaction;
+import org.generationcp.middleware.pojos.ims.Transaction;
 
 public class InventoryDetailsTestDataInitializer {
 
+	private static final int PERSON_ID = 1;
+	private static final String LIST_SOURCE_TYPE = "LIST";
+	private static final String GERMPLASM_ENTITY_TYPE = "GERMPLASM";
+	private static final int USER_ID = 1;
 	private static final int NO_OF_STOCK_LIST_ENTRIES = 20;
 
-	public static Map<String, InventoryDetails> createInventoryDetailsMap() {
+	public InventoryDetailsTestDataInitializer() {
+		// do nothing
+	}
+
+	public Map<String, InventoryDetails> createInventoryDetailsMap() {
 		final Map<String, InventoryDetails> inventoryDetails = new HashMap<String, InventoryDetails>();
 
 		for (int i = 1; i <= InventoryDetailsTestDataInitializer.NO_OF_STOCK_LIST_ENTRIES; i++) {
@@ -22,7 +34,7 @@ public class InventoryDetailsTestDataInitializer {
 		return inventoryDetails;
 	}
 
-	public static List<InventoryDetails> createInventoryDetailList(final Integer numOfEntries) {
+	public List<InventoryDetails> createInventoryDetailList(final Integer numOfEntries) {
 		final List<InventoryDetails> inventoryDetails = new ArrayList<InventoryDetails>();
 
 		for (int i = 0; i < numOfEntries; i++) {
@@ -30,11 +42,91 @@ public class InventoryDetailsTestDataInitializer {
 			final InventoryDetails invDetails = new InventoryDetails();
 			invDetails.setLotId(id);
 			invDetails.setGid(id);
-            invDetails.setInstanceNumber(1);
-            invDetails.setEntryId(1);
+			invDetails.setInstanceNumber(1);
+			invDetails.setEntryId(1);
 			inventoryDetails.add(invDetails);
 		}
 
 		return inventoryDetails;
+	}
+
+	public List<Lot> createLots(final List<Integer> gids, final Integer listId, final Integer scaleId, final Integer locId) {
+		final List<Lot> lots = new ArrayList<Lot>();
+
+		for (final Integer gid : gids) {
+			final Lot lot = new Lot();
+			lot.setEntityType(GERMPLASM_ENTITY_TYPE);
+			lot.setUserId(USER_ID);
+			lot.setEntityId(gid);
+			lot.setLocationId(locId);
+			lot.setScaleId(scaleId);
+			lot.setStatus(0);
+			lot.setSource(listId);
+			lot.setComments("Lot for gid: " + gid);
+
+			lots.add(lot);
+		}
+
+		return lots;
+	}
+
+	/**
+	 * This method creates set of transactions with the following parameters:
+	 * 
+	 * @param lots
+	 * @param listId
+	 * @param lotIdLrecIdMap - Map of Lot Id and Germplasm List Data Id
+	 * @param inventoryIdPrefix
+	 * @return
+	 */
+	public List<Transaction> createTransactions(final List<Lot> lots, final Integer listId, final Map<Integer, Integer> lotIdLrecIdMap,
+			final String inventoryIdPrefix) {
+		final List<Transaction> transactions = new ArrayList<Transaction>();
+
+		for (final Lot lot : lots) {
+			final Transaction transaction = new Transaction();
+			transaction.setUserId(USER_ID);
+			transaction.setPersonId(PERSON_ID);
+			transaction.setLot(lot);
+			transaction.setTransactionDate(20160101);
+			transaction.setStatus(0);
+			transaction.setQuantity(Math.random() * lots.size());
+			transaction.setSourceType(LIST_SOURCE_TYPE);
+			transaction.setSourceRecordId(lotIdLrecIdMap.get(lot.getId()));
+			transaction.setInventoryID(inventoryIdPrefix + lot.getId());
+			transaction.setSourceId(listId);
+
+			transactions.add(transaction);
+		}
+
+		return transactions;
+	}
+
+	/**
+	 * Create List of StockTransaction objects based on the following input:
+	 * 
+	 * @param listDataIdTransact - map of listdata_id to transaction
+	 * @param listDataIdListDataProject - map of listdata_id to listdataproject
+	 * @return
+	 */
+	public List<StockTransaction> createStockTransactions(final Map<Integer, Transaction> listDataIdTransact,
+			final Map<Integer, ListDataProject> listDataIdListDataProject) {
+
+		final List<StockTransaction> stockTransactions = new ArrayList<StockTransaction>();
+
+		for (final Map.Entry<Integer, Transaction> entry : listDataIdTransact.entrySet()) {
+			final Integer listDataId = Integer.valueOf(entry.getKey());
+			final Transaction transaction = entry.getValue();
+			final ListDataProject listDataProject = listDataIdListDataProject.get(listDataId);
+
+			final StockTransaction stockTransaction = new StockTransaction();
+			stockTransaction.setSourceRecordId(listDataId);
+			stockTransaction.setTransaction(transaction);
+			stockTransaction.setListDataProject(listDataProject);
+
+			stockTransactions.add(stockTransaction);
+		}
+
+		return stockTransactions;
 	}
 }

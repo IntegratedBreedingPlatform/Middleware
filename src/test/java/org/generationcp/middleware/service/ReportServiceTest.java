@@ -59,7 +59,7 @@ public class ReportServiceTest {
 
 		Mockito.when(countryDAO.getById(TEST_COUNTRY_ID)).thenReturn(testCountry);
 
-		List<MeasurementVariable> populated = unitUnderTest.appendCountryInformation(sampleCondition);
+		List<MeasurementVariable> populated = unitUnderTest.appendCountryInformationFromCondition(sampleCondition);
 		Assert.assertNotEquals("Measurement variables should now contain location abbreviation and country information",
 				sampleCondition.size(), populated.size());
 
