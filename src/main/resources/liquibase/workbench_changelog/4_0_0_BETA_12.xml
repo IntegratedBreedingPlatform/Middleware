@@ -34,10 +34,16 @@
 	</changeSet>
 
 	<changeSet author="iryna" id="beta12-4">
-		<preConditions onFail="CONTINUE">
+		<preConditions onFail="MARK_RAN">
 			<indexExists tableName="workbench_project" indexName="uk_project_name"/>
 		</preConditions>
 		<dropIndex indexName="uk_project_name" tableName="workbench_project"/>
+	</changeSet>
+
+	<changeSet author="iryna" id="beta12-5">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists tableName="workbench_project" indexName="uk_project_name"/></not>
+		</preConditions>
 		<addUniqueConstraint constraintName="uk_project_name" tableName="workbench_project" columnNames="project_name ASC, crop_type ASC"/>
 	</changeSet>
 </databaseChangeLog>
