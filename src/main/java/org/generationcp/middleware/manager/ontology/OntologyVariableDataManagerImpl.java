@@ -453,11 +453,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			// load scale, method and property data
 			final List<CVTermRelationship> relationships = this.getCvTermRelationshipDao().getBySubject(term.getCvTermId());
 			for (final CVTermRelationship r : relationships) {
-				if (Objects.equals(r.getTypeId(), TermId.HAS_METHOD.getId())) {
+				if (r.getTypeId() == TermId.HAS_METHOD.getId()) {
 					variable.setMethod(this.methodManager.getMethod(r.getObjectId(), filterObsolete));
-				} else if (Objects.equals(r.getTypeId(), TermId.HAS_PROPERTY.getId())) {
+				} else if (r.getTypeId() == TermId.HAS_PROPERTY.getId()) {
 					variable.setProperty(this.propertyManager.getProperty(r.getObjectId(), filterObsolete));
-				} else if (Objects.equals(r.getTypeId(), TermId.HAS_SCALE.getId())) {
+				} else if (r.getTypeId() == TermId.HAS_SCALE.getId()) {
 					variable.setScale(this.scaleManager.getScaleById(r.getObjectId(), filterObsolete));
 				}
 			}
@@ -466,13 +466,13 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			final List<CVTermProperty> properties = this.getCvTermPropertyDao().getByCvTermId(term.getCvTermId());
 
 			for (final CVTermProperty property : properties) {
-				if (Objects.equals(property.getTypeId(), TermId.VARIABLE_TYPE.getId())) {
+				if (property.getTypeId() == TermId.VARIABLE_TYPE.getId()) {
 					variable.addVariableType(VariableType.getByName(property.getValue()));
-				} else if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
+				} else if (property.getTypeId() == TermId.CREATION_DATE.getId()) {
 					variable.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
-				} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
+				} else if (property.getTypeId() == TermId.LAST_UPDATE_DATE.getId()) {
 					variable.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
-				} else if (Objects.equals(property.getTypeId(), TermId.CROP_ONTOLOGY_ID.getId())) {
+				} else if (property.getTypeId() == TermId.CROP_ONTOLOGY_ID.getId()) {
 					variable.getProperty().setCropOntologyId(property.getValue());
 				}
 			}
