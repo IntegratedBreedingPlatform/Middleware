@@ -9,8 +9,12 @@
 
 
 	<changeSet author="alejandro" id="1">
+
 		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">select count(*) from projectprop where value='8263' and rank=12 and projectprop_id=25378 and project_id=25006 and type_id=1070;</sqlCheck>
+			<and>
+				<sqlCheck expectedResult="1">select case when 'ibdbv2_maize_merged' = DATABASE() then 1 else 0 end from dual;</sqlCheck>
+				<sqlCheck expectedResult="1">select count(*) from projectprop where value='8263' and rank=12 and projectprop_id=25378 and project_id=25006 and type_id=1070;</sqlCheck>
+			</and>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			update projectprop set value='20364' where value='8263' and rank=12 and projectprop_id=25378 and project_id=25006 and type_id=1070;
