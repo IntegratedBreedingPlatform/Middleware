@@ -69,6 +69,7 @@ public class GermplasmDataManagerDataInitializer {
             femaleGermplasm.setSelectionHistory("femaleSelectionHistory");
             final GermplasmPedigreeTreeNode femaleTreeNode = new GermplasmPedigreeTreeNode();
             femaleTreeNode.setGermplasm(femaleGermplasm);
+            rootNode.setFemaleParent(femaleTreeNode);
             parentNodeList.add(femaleTreeNode);
         }
 
@@ -77,7 +78,7 @@ public class GermplasmDataManagerDataInitializer {
         final GermplasmPedigreeTreeNode maleTreeNode = new GermplasmPedigreeTreeNode();
         maleTreeNode.setGermplasm(maleGermplasm);
         parentNodeList.add(maleTreeNode);
-
+        rootNode.setMaleParent(maleTreeNode);
         rootNode.setLinkedNodes(parentNodeList);
 
 
