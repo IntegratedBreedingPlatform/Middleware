@@ -24,6 +24,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
@@ -42,6 +43,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.auditory.Auditable;
 import org.generationcp.middleware.auditory.Auditory;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
+import org.generationcp.middleware.pedigree.Pedigree;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -50,37 +52,10 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  *
  * @author Kevin Manansala, Mark Agarrado, Dennis Billano
  */
-@NamedQueries({@NamedQuery(name = "getAllGermplasm", query = "FROM Germplasm"),
-		@NamedQuery(name = "countAllGermplasm", query = "SELECT COUNT(g) FROM Germplasm g"),
-
-		@NamedQuery(name = "getGermplasmByMethodNameUsingEqual",
-				query = "SELECT g FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname = :name"),
-
-		@NamedQuery(name = "countGermplasmByMethodNameUsingEqual",
-				query = "SELECT COUNT(g) FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname = :name"),
-
-		@NamedQuery(name = "getGermplasmByMethodNameUsingLike",
-				query = "SELECT g FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname like :name"),
-
-		@NamedQuery(name = "countGermplasmByMethodNameUsingLike",
-				query = "SELECT COUNT(g) FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname like :name"),
-
-		@NamedQuery(name = "getGermplasmByLocationNameUsingEqual",
-				query = "SELECT g FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname = :name"),
-
-		@NamedQuery(name = "countGermplasmByLocationNameUsingEqual",
-				query = "SELECT COUNT(g) FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname = :name"),
-
-		@NamedQuery(name = "getGermplasmByLocationNameUsingLike",
-				query = "SELECT g FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname like :name"),
-
-		@NamedQuery(name = "countGermplasmByLocationNameUsingLike",
-				query = "SELECT COUNT(g) FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname like :name")
-
-})
 @NamedNativeQueries({
 		@NamedNativeQuery(name = "getGermplasmDescendants",
 				query = "SELECT DISTINCT g.* FROM germplsm g LEFT JOIN progntrs p ON g.gid = p.gid "
+						+ "LEFT OUTER JOIN pedigree ps on ps.id = p.pedigree_id "
 						+ "WHERE (g.gpid1=:gid OR g.gpid2=:gid OR p.pid=:gid) " + "AND g.gid != g.grplce and g.grplce = 0",
 				resultClass = Germplasm.class), //
 
@@ -89,16 +64,23 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 				resultClass = Germplasm.class), //
 
 		@NamedNativeQuery(name = "getProgenitor1",
-				query = "SELECT p.* FROM germplsm g, germplsm p WHERE g.gid = :gid "
+				query = "SELECT p.* FROM germplsm g, germplsm p "
+						+ "LEFT OUTER JOIN pedigree ps on ps.id = p.pedigree_id "
+						+ "WHERE g.gid = :gid "
 						+ "and g.gpid1 = p.gid and p.gid != p.grplce and p.grplce = 0",
 				resultClass = Germplasm.class), //
 
 		@NamedNativeQuery(name = "getProgenitor2",
-				query = "SELECT p.* FROM germplsm g, germplsm p WHERE g.gid = :gid "
+				query = "SELECT p.* FROM germplsm g, germplsm p "
+						+ "LEFT OUTER JOIN pedigree ps on ps.id = p.pedigree_id "
+						+ "WHERE g.gid = :gid "
 						+ "and g.gpid2 = p.gid and p.gid != p.grplce and p.grplce = 0",
 				resultClass = Germplasm.class), //
 
-		@NamedNativeQuery(name = "getProgenitor", query = "SELECT g.* FROM germplsm g, progntrs p WHERE g.gid = p.pid "
+		@NamedNativeQuery(name = "getProgenitor", query = "SELECT g.* FROM germplsm g, progntrs p "
+				+ "LEFT OUTER JOIN pedigree ps on ps.id = p.pedigree_id "
+
+				+ "WHERE g.gid = p.pid "
 				+ "and p.gid = :gid and p.pno = :pno and g.gid != g.grplce and g.grplce = 0", resultClass = Germplasm.class)} //
 )
 @Entity
@@ -113,22 +95,10 @@ public class Germplasm implements Serializable, Auditable {
 	private static final long serialVersionUID = 1L;
 
 	// string contants for name of queries
-	public static final String GET_ALL = "getAllGermplasm";
-	public static final String COUNT_ALL = "countAllGermplasm";
-	public static final String GET_BY_PREF_NAME = "getGermplasmByPrefName";
-	public static final String COUNT_BY_PREF_NAME =
-			"SELECT COUNT(g.gid) " + "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " + "WHERE n.nval = :name";
-	public static final String GET_BY_METHOD_NAME_USING_EQUAL = "getGermplasmByMethodNameUsingEqual";
-	public static final String COUNT_BY_METHOD_NAME_USING_EQUAL = "countGermplasmByMethodNameUsingEqual";
-	public static final String GET_BY_METHOD_NAME_USING_LIKE = "getGermplasmByMethodNameUsingLike";
-	public static final String COUNT_BY_METHOD_NAME_USING_LIKE = "countGermplasmByMethodNameUsingLike";
-	public static final String GET_BY_LOCATION_NAME_USING_EQUAL = "getGermplasmByLocationNameUsingEqual";
-	public static final String COUNT_BY_LOCATION_NAME_USING_EQUAL = "countGermplasmByLocationNameUsingEqual";
-	public static final String GET_BY_LOCATION_NAME_USING_LIKE = "getGermplasmByLocationNameUsingLike";
-	public static final String COUNT_BY_LOCATION_NAME_USING_LIKE = "countGermplasmByLocationNameUsingLike";
 
 	public static final String GET_BY_GID_WITH_PREF_NAME =
-			"SELECT {g.*}, {n.*} " + "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " + "WHERE g.gid = :gid";
+			"SELECT {g.*}, {n.*} " + "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid "
+					+ "AND n.nstat = 1 " + "WHERE g.gid = :gid";
 
 	public static final String GET_BY_GID_WITH_PREF_ABBREV =
 			"SELECT {g.*}, {n.*}, {abbrev.*} " + "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
@@ -168,18 +138,6 @@ public class Germplasm implements Serializable, Auditable {
 					+ "JOIN methods m ON g.methn = m.mid AND m.mtype = 'MAN' "
 					+ "WHERE g.gnpgs = -1 AND g.gpid2 = :gid and g.gid != g.grplce and g.grplce = 0";
 
-	public static final String GET_BY_NAME_USING_EQUAL =
-			"SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE " + "nval = :name ";
-
-	public static final String COUNT_BY_NAME_USING_EQUAL =
-			"SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE " + "nval = :name ";
-
-	public static final String GET_BY_NAME_USING_LIKE =
-			"SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE " + "nval LIKE :name ";
-
-	public static final String COUNT_BY_NAME_USING_LIKE =
-			"SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND " + "nval LIKE :name";
-
 	public static final String GET_BY_NAME_ALL_MODES_USING_EQUAL =
 			"SELECT DISTINCT {g.*} FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND g.grplce = 0 AND "
 					+ "( nval = :name OR nval = :noSpaceName OR nval = :standardizedName )";
@@ -196,25 +154,9 @@ public class Germplasm implements Serializable, Auditable {
 			"SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid WHERE g.gid!=g.grplce AND g.grplce = 0 AND "
 					+ "( nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName )";
 
-	public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX =
-			"SELECT CONVERT(REPLACE(nval, :prefix, ''), SIGNED)+1 AS last_number " + "FROM names " + "WHERE nval REGEXP :prefixRegex "
-					+ "ORDER BY last_number DESC LIMIT 1";
-
-	public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX2 =
-			"SELECT CONVERT(REPLACE(nval, :prefix, ''), SIGNED)+1 AS last_number  " + "FROM names "
-					+ "WHERE (SUBSTRING(nval, 1, :prefixLen) = :prefix "
-					+ "AND substring(nval, :prefixLen+1, LENGTH(nval)-:prefixLen) = concat( '', 0 + substring(nval, :prefixLen+1, LENGTH(nval)-:prefixLen))) "
-					+ "OR (SUBSTRING(nval, 1, :prefixLen+1) = :prefix + ' ' "
-					+ "AND substring(nval, :prefixLen+2, LENGTH(nval)-:prefixLen+1) = concat( '', 0 + substring(nval, :prefixLen+2, LENGTH(nval)-:prefixLen+1))) "
-					+ "ORDER BY last_number DESC LIMIT 1";
-
 	public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX3 =
 			"SELECT CONVERT(LTRIM(REPLACE(UPPER(nval), :prefix, '')), SIGNED)+1 AS next_number " + "FROM names "
 					+ "WHERE nval like :prefixLike " + "ORDER BY next_number DESC LIMIT 1";
-
-	public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_WITH_SPACE =
-			"SELECT CONVERT(REPLACE(nval, :prefix, ''), SIGNED)+1 AS last_number " + "FROM names " + "WHERE nval LIKE :prefixLike "
-					+ "ORDER BY last_number DESC LIMIT 1";
 
 	public static final String GET_BY_GID_WITH_METHOD_TYPE = "SELECT {g.*}, {m.*} "
 			+ "FROM germplsm g LEFT JOIN methods m ON g.methn = m.mid " + "WHERE g.gid = :gid AND g.grplce != g.gid AND g.grplce = 0";
@@ -238,56 +180,57 @@ public class Germplasm implements Serializable, Auditable {
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
 			+ "WHERE g.gid=:gid AND length(g.gid) = :gidLength AND g.gid!=g.grplce AND g.grplce = 0 " + "GROUP BY g.gid" + ") "
 			+ Germplasm.GERMPLASM_ALIAS + "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
-			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
+			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY
+			+ " LEFT JOIN pedigree p ON pedigree_id = p.id ";
 	public static final String SEARCH_GERMPLASM_BY_GID_LIKE = Germplasm.GENERAL_SELECT_FROM + "("
 			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
 			+ "WHERE g.gid LIKE :gid AND g.gid!=g.grplce AND g.grplce = 0 " + "GROUP BY g.gid" + ") " + Germplasm.GERMPLASM_ALIAS
 			+ "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
-			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
+			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY
+			+ " LEFT JOIN pedigree p ON pedigree_id = p.id ";
 	public static final String SEARCH_GERMPLASM_BY_INVENTORY_ID = Germplasm.GENERAL_SELECT_FROM + "("
 			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
 			+ ", ims_lot l, ims_transaction t " + "WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid "
 			+ "AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id = :inventoryID " + "GROUP BY g.gid" + ") "
 			+ Germplasm.GERMPLASM_ALIAS + "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
-			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
+			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY
+			+ " LEFT JOIN pedigree p ON pedigree_id = p.id ";
 	public static final String SEARCH_GERMPLASM_BY_INVENTORY_ID_LIKE = Germplasm.GENERAL_SELECT_FROM + "("
 			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
 			+ ", ims_lot l, ims_transaction t " + "WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid "
 			+ "AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id LIKE :inventoryID " + "GROUP BY g.gid" + ") "
 			+ Germplasm.GERMPLASM_ALIAS + "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
-			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
+			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY
+			+ " LEFT JOIN pedigree p ON pedigree_id = p.id ";
 	public static final String SEARCH_GERMPLASM_BY_GIDS = Germplasm.GENERAL_SELECT_FROM + "("
 			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
 			+ "WHERE g.gid IN (:gids) AND g.gid!=g.grplce AND g.grplce = 0 " + "GROUP BY g.gid" + ") " + Germplasm.GERMPLASM_ALIAS
 			+ "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
-			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
+			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY
+			+ " LEFT JOIN pedigree p ON pedigree_id = p.id ";
 	public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME_LIKE = Germplasm.GENERAL_SELECT_FROM + "("
 			+ "SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs "
 			+ "FROM names n, germplsm g " + "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
-			+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid " + "WHERE n.gid = g.gid and g.gid != g.grplce and g.grplce = 0 "
+			+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid " 
+			+ "WHERE n.gid = g.gid and g.gid != g.grplce and g.grplce = 0 "
 			+ "AND n.nstat != :deletedStatus AND (n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces) "
 			+ "GROUP BY g.gid " + "LIMIT 5000" + ") " + Germplasm.GERMPLASM_ALIAS + "LEFT JOIN ("
-			+ Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS + Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
+			+ Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS + Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY 
+			+ " LEFT JOIN pedigree p on germplasm.pedigree_id = p.id ";
 	public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME = Germplasm.GENERAL_SELECT_FROM + "("
 			+ "SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs "
 			+ "FROM names n, germplsm g " + "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
-			+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid " + "WHERE n.gid = g.gid and g.gid != g.grplce and g.grplce = 0 "
+			+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid " 
+			+ "WHERE n.gid = g.gid and g.gid != g.grplce and g.grplce = 0 "
 			+ "AND n.nstat != :deletedStatus AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces) " + "GROUP BY g.gid "
 			+ "LIMIT 5000" + ") " + Germplasm.GERMPLASM_ALIAS + "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")"
-			+ Germplasm.INVENTORY_ALIAS + Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
-	public static final String SEARCH_LIST_ID_BY_LIST_NAME = "SELECT listid " + "FROM ( " + "    SELECT listnms.*, "
-			+ "        (MATCH(listname) AGAINST(:q)) AS searchScore " + "    FROM listnms " + "    WHERE liststatus!=:deletedStatus "
-			+ "    GROUP BY listid  " + "    HAVING searchScore>0 " + ") AS searchResults " + "ORDER BY searchScore DESC ";
-	public static final String SEARCH_LIST_ID_BY_LIST_NAME_EQUAL =
-			"SELECT listid " + "FROM ( " + "    SELECT listnms.*, " + "        (MATCH(listname) AGAINST(:q)) AS searchScore "
-					+ "    FROM listnms " + "    WHERE liststatus!=:deletedStatus " + "        AND listname=:q " + "    GROUP BY listid  "
-					+ "    HAVING searchScore>0 " + ") AS searchResults " + "ORDER BY searchScore DESC ";
-	public static final String SEARCH_GERMPLASM_BY_LIST_ID = "SELECT germplsm.* " + "FROM listdata "
-			+ "	LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) " + "WHERE listid IN (:listids) ";
+			+ Germplasm.INVENTORY_ALIAS + Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY
+			+ " LEFT JOIN pedigree p on germplasm.pedigree_id = p.id ";
+
 	public static final String GET_GERMPLASM_DATES_BY_GIDS = "SELECT gid, gdate " + "FROM germplsm " + "WHERE gid IN (:gids)";
 	public static final String GET_METHOD_IDS_BY_GIDS = "SELECT gid, methn " + "FROM germplsm " + "WHERE gid IN (:gids)";
 	public static final String GET_PARENT_NAMES_BY_STUDY_ID = "select N.gid, N.ntype, N.nval, N.nid, N.nstat" + " from names N"
@@ -309,7 +252,9 @@ public class Germplasm implements Serializable, Auditable {
 			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
 			+ "WHERE g.mgid IN (:mgids)" + "GROUP BY g.gid" + ") " + Germplasm.GERMPLASM_ALIAS + "LEFT JOIN ("
-			+ Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS + Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
+			+ Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS + Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY
+			+ " LEFT JOIN pedigree p on germplasm.pedigree_id = p.id ";
+
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -380,6 +325,14 @@ public class Germplasm implements Serializable, Auditable {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "gid")
 	private List<Name> names = new ArrayList<Name>();
+	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "pedigree_id")
+	// must become false once we have generated all the strings
+	@Basic(optional = true)
+	private Pedigree pedigree;
+	
+	
 
 	/**
 	 * @OneToMany(mappedBy = "germplasm") private Set<Progenitor> progntr = new HashSet<Progenitor>();
@@ -603,6 +556,14 @@ public class Germplasm implements Serializable, Auditable {
 
 	public Method getMethod() {
 		return this.method;
+	}
+	
+	public Pedigree getPedigree() {
+		return pedigree;
+	}
+	
+	public void setPedigree(final Pedigree pedigree) {
+		this.pedigree = pedigree;
 	}
 
 	@Override
