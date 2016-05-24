@@ -234,49 +234,58 @@ public class Germplasm implements Serializable, Auditable {
 					+ "GROUP BY entity_id";
 	public static final String WHERE_WITH_INVENTORY = "WHERE availInv > 0 ";
 	public static final String SEARCH_GERMPLASM_BY_GID = Germplasm.GENERAL_SELECT_FROM + "("
-			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
+			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs,"
+			+ "m.mname methodName, l.lname locationName " + "FROM methods m, location l, germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
-			+ "WHERE g.gid=:gid AND length(g.gid) = :gidLength AND g.gid!=g.grplce AND g.grplce = 0 " + "GROUP BY g.gid" + ") "
+			+ "WHERE g.gid=:gid AND length(g.gid) = :gidLength AND g.gid!=g.grplce AND g.grplce = 0 "
+			+ "AND g.methn = m.mid AND g.glocn = l.locid " + "GROUP BY g.gid" + ") "
 			+ Germplasm.GERMPLASM_ALIAS + "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
 			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_GERMPLASM_BY_GID_LIKE = Germplasm.GENERAL_SELECT_FROM + "("
-			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
+			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs, "
+			+ "m.mname methodName, l.lname locationName " + "FROM methods m, location l, germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
-			+ "WHERE g.gid LIKE :gid AND g.gid!=g.grplce AND g.grplce = 0 " + "GROUP BY g.gid" + ") " + Germplasm.GERMPLASM_ALIAS
+			+ "WHERE g.gid LIKE :gid AND g.gid!=g.grplce AND g.grplce = 0 " + "AND g.methn = m.mid AND g.glocn = l.locid "
+			+ "GROUP BY g.gid" + ") " + Germplasm.GERMPLASM_ALIAS
 			+ "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
 			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_GERMPLASM_BY_INVENTORY_ID = Germplasm.GENERAL_SELECT_FROM + "("
-			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
+			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs, "
+			+ "m.mname methodName, loc.lname locationName " + "FROM methods m, location loc, germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
 			+ ", ims_lot l, ims_transaction t " + "WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid "
-			+ "AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id = :inventoryID " + "GROUP BY g.gid" + ") "
+			+ "AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id = :inventoryID AND g.methn = m.mid AND g.glocn = loc.locid " + "GROUP BY g.gid" + ") "
 			+ Germplasm.GERMPLASM_ALIAS + "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
 			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_GERMPLASM_BY_INVENTORY_ID_LIKE = Germplasm.GENERAL_SELECT_FROM + "("
-			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
+			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs, "
+			+ "m.mname methodName, loc.lname locationName " + "FROM methods m, location loc, germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
 			+ ", ims_lot l, ims_transaction t " + "WHERE t.lotid = l.lotid AND l.etype = 'GERMPLSM' AND l.eid = g.gid "
-			+ "AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id LIKE :inventoryID " + "GROUP BY g.gid" + ") "
+			+ "AND g.grplce != g.gid AND g.grplce = 0 AND t.inventory_id LIKE :inventoryID AND g.methn = m.mid AND g.glocn = loc.locid " + "GROUP BY g.gid" + ") "
 			+ Germplasm.GERMPLASM_ALIAS + "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
 			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_GERMPLASM_BY_GIDS = Germplasm.GENERAL_SELECT_FROM + "("
-			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
+			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + ", m.mname methodName, "
+			+ "l.lname locationName " + "FROM methods m, location l, germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
-			+ "WHERE g.gid IN (:gids) AND g.gid!=g.grplce AND g.grplce = 0 " + "GROUP BY g.gid" + ") " + Germplasm.GERMPLASM_ALIAS
-			+ "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
+			+ "WHERE g.gid IN (:gids) AND g.gid!=g.grplce AND g.grplce = 0 AND g.methn = m.mid AND g.glocn = l.locid " + "GROUP BY g.gid" + ") "
+			+ Germplasm.GERMPLASM_ALIAS + "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS
 			+ Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME_LIKE = Germplasm.GENERAL_SELECT_FROM + "("
-			+ "SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs "
-			+ "FROM names n, germplsm g " + "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
+			+ "SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs, "
+			+ "m.mname methodName, l.lname locationName "
+			+ "FROM names n, methods m, location l, germplsm g " + "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
 			+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid " + "WHERE n.gid = g.gid and g.gid != g.grplce and g.grplce = 0 "
-			+ "AND n.nstat != :deletedStatus AND (n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces) "
+			+ "AND n.nstat != :deletedStatus AND g.methn = m.mid AND g.glocn = l.locid AND (n.nval LIKE :searchValue OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces) "
 			+ "GROUP BY g.gid " + "LIMIT 5000" + ") " + Germplasm.GERMPLASM_ALIAS + "LEFT JOIN ("
 			+ Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS + Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_GERMPLASM_BY_GERMPLASM_NAME = Germplasm.GENERAL_SELECT_FROM + "("
-			+ "SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs "
-			+ "FROM names n, germplsm g " + "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
+			+ "SELECT DISTINCT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs, "
+			+ "m.mname methodName, l.lname locationName "
+			+ "FROM names n, methods m, location l, germplsm g " + "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' "
 			+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid " + "WHERE n.gid = g.gid and g.gid != g.grplce and g.grplce = 0 "
-			+ "AND n.nstat != :deletedStatus AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces) " + "GROUP BY g.gid "
+			+ "AND n.nstat != :deletedStatus AND g.methn = m.mid AND g.glocn = l.locid AND (n.nval = :searchValue OR n.nval = :qStandardized OR n.nval = :qNoSpaces) " + "GROUP BY g.gid "
 			+ "LIMIT 5000" + ") " + Germplasm.GERMPLASM_ALIAS + "LEFT JOIN (" + Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")"
 			+ Germplasm.INVENTORY_ALIAS + Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 	public static final String SEARCH_LIST_ID_BY_LIST_NAME = "SELECT listid " + "FROM ( " + "    SELECT listnms.*, "
@@ -306,9 +315,10 @@ public class Germplasm implements Serializable, Auditable {
 			+ "	G.gid = LDATAPROJ.germplasm_id and" + "	G.gnpgs >= 0" + " where LNAMES.projectid = :projId";
 
 	public static final String SEARCH_MAINTENANCE_GROUP_MEMBERS_BY_MGID = Germplasm.GENERAL_SELECT_FROM + "("
-			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
+			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs, "
+			+ "m.mname methodName, l.lname locationName " + "FROM methods m, location l, germplsm g "
 			+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' " + "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid "
-			+ "WHERE g.mgid IN (:mgids)" + "GROUP BY g.gid" + ") " + Germplasm.GERMPLASM_ALIAS + "LEFT JOIN ("
+			+ "WHERE g.mgid IN (:mgids) AND g.methn = m.mid AND g.glocn = l.locid " + "GROUP BY g.gid" + ") " + Germplasm.GERMPLASM_ALIAS + "LEFT JOIN ("
 			+ Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS + Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 
 	@Id
@@ -433,6 +443,22 @@ public class Germplasm implements Serializable, Auditable {
 	 */
 	@Transient
 	private String accessionName = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 * Prevoiusly, all germplasm list is loaded and revisit the DB for each germplasm for getting method name.
+	 * This problem is removed by introducing this variable.
+	 */
+	@Transient
+	private String methodName = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 * Prevoiusly, all germplasm list is loaded and revisit the DB for each germplasm for getting location name.
+	 * This problem is removed by introducing this variable.
+	 */
+	@Transient
+	private String locationName = null;
 
 	public Germplasm() {
 	}
@@ -605,6 +631,22 @@ public class Germplasm implements Serializable, Auditable {
 		return this.method;
 	}
 
+	public String getMethodName() {
+		return methodName;
+	}
+
+	public void setMethodName(String methodName) {
+		this.methodName = methodName;
+	}
+
+	public String getLocationName() {
+		return locationName;
+	}
+
+	public void setLocationName(String locationName) {
+		this.locationName = locationName;
+	}
+
 	@Override
 	public boolean equals(final Object obj) {
 		if (obj == null) {
@@ -661,6 +703,10 @@ public class Germplasm implements Serializable, Auditable {
 		builder.append(this.method);
 		builder.append(", inventoryInfo=");
 		builder.append(this.inventoryInfo);
+		builder.append(", methodName=");
+		builder.append(this.methodName);
+		builder.append(", locationName=");
+		builder.append(this.locationName);
 		builder.append("]");
 		return builder.toString();
 	}

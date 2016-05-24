@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.dao;
@@ -47,7 +47,7 @@ import com.jamonapi.MonitorFactory;
 
 /**
  * DAO class for {@link Germplasm}.
- * 
+ *
  */
 public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
@@ -58,6 +58,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String Q_STANDARDIZED = "qStandardized";
 	private static final String AVAIL_INV = "availInv";
 	private static final String SEED_RES = "seedRes";
+	private static final String METHOD_NAME = "methodName";
+	private static final String LOCATION_NAME = "locationName";
 	// Prevent silly searches from resulting in GIANT IN clauses in search query (which reuses this function).
 	// Old search query had the same hardcoded limit of 5000 anyway so this is not changing existing logic as such. Applies to both
 	// count and search queries. In future we can detect that the search is resulting in more than 5000 matches and go back to the
@@ -792,7 +794,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	 * Search for germplasms given a search term
 	 * 
 	 * @param searchedString - the search term to be used
-	 * @param o - like or equal
+	 * @param operation - like or equal
 	 * @param includeParents boolean flag to denote whether parents will be included in search results
 	 * @param withInventoryOnly - boolean flag to denote whether result will be filtered by those with inventories only
 	 * @param includeMGMembers - boolean flag to denote whether the MG members will be included in the result
@@ -875,6 +877,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return sortingQueryStr;
 	}
 
+	private void addMethodNameAndLocationName(final SQLQuery query) {
+		// Add method name and location name to query to reduce revisiting database
+		query.addScalar(GermplasmDAO.METHOD_NAME);
+		query.addScalar(GermplasmDAO.LOCATION_NAME);
+	}
+
 	private List<Germplasm> getSearchForGermplasmsResult(final List<Object[]> result) {
 		final List<Germplasm> germplasms = new ArrayList<Germplasm>();
 		if (result != null) {
@@ -892,6 +900,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		inventoryInfo.setActualInventoryLotCount(row[2] != null ? ((BigInteger) row[2]).intValue() : 0);
 		inventoryInfo.setReservedLotCount(row[3] != null ? ((BigInteger) row[3]).intValue() : 0);
 		germplasm.setInventoryInfo(inventoryInfo);
+		germplasm.setMethodName(row[4] != null ? (String) row[4] : "");
+		germplasm.setLocationName(row[5] != null ? (String) row[5] : "");
 		return germplasm;
 	}
 

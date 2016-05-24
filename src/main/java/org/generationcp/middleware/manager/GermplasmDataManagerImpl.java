@@ -1035,7 +1035,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return this.getGermplasmDao().searchForGermplasms(q, o, includeParents, withInventoryOnly, includeMGMembers);
 	}
 
-	
+
 	@Override
 	public List<Germplasm> searchForGermplasm(final GermplasmSearchParameter germplasmSearchParameter) {
 		return this.getGermplasmDao().searchForGermplasms(germplasmSearchParameter);
@@ -1043,7 +1043,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	/**
 	 * Return the count of germplasm search results based on the following parameters:
-	 * 
+	 *
 	 * @param q - keyword
 	 * @param o - operation
 	 * @param includeParents - include the parents of the search germplasm
