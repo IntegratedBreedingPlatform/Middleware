@@ -1,13 +1,27 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
 
-	<!-- Placeholder for schema/data changes (if any) for the Beta.12 release. -->
-	
+	<changeSet author="alejandro" id="1">
+
+		<preConditions onFail="MARK_RAN">
+			<!--
+			 Even though when more than one precondition are written the "and" logic is supposed by default,
+			 I believe to be a good practise to declare it. -->
+			<and>
+				<sqlCheck expectedResult="1">select case when 'ibdbv2_maize_merged' = DATABASE() then 1 else 0 end from dual;</sqlCheck>
+				<sqlCheck expectedResult="1">select count(*) from projectprop where value='8263' and rank=12 and projectprop_id=25378 and project_id=25006 and type_id=1070;</sqlCheck>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			update projectprop set value='20364' where value='8263' and rank=12 and projectprop_id=25378 and project_id=25006 and type_id=1070;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
