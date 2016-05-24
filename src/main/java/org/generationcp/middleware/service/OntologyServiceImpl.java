@@ -220,11 +220,6 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	public Scale getScale(String name) throws MiddlewareQueryException {
 		return new Scale(this.getOntologyDataManager().findTermByName(name, CvId.SCALES));
 	}
-	
-	@Override
-	public Scale getScaleVariable(String name) throws MiddlewareQueryException {
-		return new Scale(this.getOntologyDataManager().findTermByName(name, CvId.VARIABLES));
-	}
 
 	@Override
 	public List<Scale> getAllScales() throws MiddlewareQueryException {
@@ -402,6 +397,11 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	@Override
 	public List<Scale> getAllInventoryScales() throws MiddlewareQueryException {
 		return this.getTermBuilder().getAllInventoryScales();
+	}
+	
+	@Override
+	public Scale getInventoryScaleByName(final String name) throws MiddlewareQueryException {
+		return this.getTermBuilder().getInventoryScaleByName(name);
 	}
 
 	/**

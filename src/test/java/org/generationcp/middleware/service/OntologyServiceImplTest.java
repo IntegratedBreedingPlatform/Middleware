@@ -166,8 +166,8 @@ public class OntologyServiceImplTest extends IntegrationTestBase {
 	}
 	
 	@Test
-	public void testGetScaleVariableByName() throws MiddlewareQueryException {
-		Scale scale = this.ontologyService.getScaleVariable(SEED_AMOUNT_G);
+	public void testGetInventoryScaleByName() throws MiddlewareQueryException {
+		Scale scale = this.ontologyService.getInventoryScaleByName(SEED_AMOUNT_G);
 		Assert.assertNotNull("Scale should not be null", scale);
 		Assert.assertEquals("Scale name should be " + SEED_AMOUNT_G, SEED_AMOUNT_G, scale.getName());
 	}

@@ -1223,17 +1223,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	public List<Scale> getAllInventoryScales() {
 		List<Scale> list = new ArrayList<>();
 		try {
-			StringBuilder sql =
-					new StringBuilder()
-					.append("SELECT pr.subject_id AS id, s.name AS scalename, m.name AS methodname, prs.name as name, prs.definition as definition ")
-					.append(" FROM cvterm_relationship pr ")
-					.append(" INNER JOIN cvterm_relationship mr ON mr.subject_id = pr.subject_id ").append("    AND mr.type_id = ")
-					.append(TermId.HAS_METHOD.getId()).append(" INNER JOIN cvterm m ON m.cvterm_id = mr.object_id ")
-					.append(" INNER JOIN cvterm_relationship sr ON sr.subject_id = pr.subject_id ").append("    AND sr.type_id = ")
-					.append(TermId.HAS_SCALE.getId()).append(" INNER JOIN cvterm s ON s.cvterm_id = sr.object_id ")
-					.append(" INNER JOIN cvterm prs ON prs.cvterm_id = pr.subject_id ").append(" WHERE pr.type_id = ")
-					.append(TermId.HAS_PROPERTY.getId()).append("    AND pr.object_id = ")
-					.append(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
+			StringBuilder sql = this.buildQueryForInventoryScales();
 
 			SQLQuery query =
 					this.getSession().createSQLQuery(sql.toString()).addScalar("id").addScalar("scalename").addScalar("methodname")
@@ -1253,6 +1243,46 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			this.logAndThrowException("Error in getAllInventoryScales in CVTermDao: " + e.getMessage(), e);
 		}
 		return list;
+	}
+	
+	public Scale getInventoryScaleByName(final String name) {
+		Scale scale = new Scale();
+		try {
+			StringBuilder sql = this.buildQueryForInventoryScales();
+			sql.append(" AND prs.name = :name");
+
+			SQLQuery query =
+					this.getSession().createSQLQuery(sql.toString()).addScalar("id").addScalar("scalename").addScalar("methodname")
+					.addScalar("name").addScalar("definition");
+			query.setParameter("name", name);
+			List<Object[]> result = query.list();
+			if (result != null && !result.isEmpty()) {
+				Object[] row  =  result.get(0);
+				String displayName = row[1] + " - " + row[2];
+				scale = new Scale(new Term((Integer) row[0], row[3].toString(), row[4].toString()));
+				scale.setDisplayName(displayName);
+				return scale;
+			}
+
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error in getAllInventoryScales in CVTermDao: " + e.getMessage(), e);
+		}
+		return scale;
+	}
+
+	private StringBuilder buildQueryForInventoryScales() {
+			StringBuilder sql =
+					new StringBuilder()
+					.append("SELECT pr.subject_id AS id, s.name AS scalename, m.name AS methodname, prs.name as name, prs.definition as definition ")
+					.append(" FROM cvterm_relationship pr ")
+					.append(" INNER JOIN cvterm_relationship mr ON mr.subject_id = pr.subject_id ").append("    AND mr.type_id = ")
+					.append(TermId.HAS_METHOD.getId()).append(" INNER JOIN cvterm m ON m.cvterm_id = mr.object_id ")
+					.append(" INNER JOIN cvterm_relationship sr ON sr.subject_id = pr.subject_id ").append("    AND sr.type_id = ")
+					.append(TermId.HAS_SCALE.getId()).append(" INNER JOIN cvterm s ON s.cvterm_id = sr.object_id ")
+					.append(" INNER JOIN cvterm prs ON prs.cvterm_id = pr.subject_id ").append(" WHERE pr.type_id = ")
+					.append(TermId.HAS_PROPERTY.getId()).append("    AND pr.object_id = ")
+					.append(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
+			return sql;
 	}
 
 	/*-------------------------    AREA FOR USED/CREATED METHOD FOR BMS-36:ONTOLOGY MANAGER REDESIGN -------------------------- */
