@@ -63,40 +63,6 @@ public interface GermplasmDataManager {
 	long countGermplasmByName(String name, Operation op);
 
 	/**
-	 * Returns the germplasm records that were created at the locations with names matching the given parameter.
-	 *
-	 * @param name - search string for the name of the locations
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param op - can be EQUAL like LIKE
-	 * @return List of Germplasm POJOs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op);
-
-	/**
-	 * Returns the number of germplasm records that were created at the locations with names matching the given parameter.
-	 *
-	 * @param name - search string for the name of the locations
-	 * @param op - can be EQUAL like LIKE
-	 * @return Number of Germplasms
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	long countGermplasmByLocationName(String name, Operation op);
-
-	/**
-	 * Please use LocationDataManager.getAllCountry().
-	 *
-	 * Returns all country records.
-	 *
-	 * @return List of Location POJOs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 * @deprecated
-	 */
-	@Deprecated
-	List<Country> getAllCountry();
-
-	/**
 	 * Retrieves all the Germplasm entries
 	 *
 	 * @param start - the starting index of the sublist of results to be returned
@@ -105,28 +71,6 @@ public interface GermplasmDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Germplasm> getAllGermplasm(int start, int numOfRows);
-
-	/**
-	 * Returns the germplasm records that were created by the methods with names matching the given parameter.
-	 *
-	 * @param name - search string for the name of the methods
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param op - can be EQUAL or LIKE
-	 * @return List of Germplasm POJOS
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<Germplasm> getGermplasmByMethodName(String name, int start, int numOfRows, Operation op);
-
-	/**
-	 * Returns the number of germplasm records that were created by methods with names matching the given parameter.
-	 *
-	 * @param name - search string for the name of the methods
-	 * @param op - can be equal or like
-	 * @return number of germplasm records
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	long countGermplasmByMethodName(String name, Operation op);
 
 	/**
 	 * Returns the germplasm record identified by the given id.
@@ -145,16 +89,6 @@ public interface GermplasmDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Germplasm getGermplasmWithPrefName(Integer gid);
-
-	/**
-	 * Given a gid, return the Germplasm POJO representing the record identified by the id with its preferred name and preferred
-	 * abbreviation.
-	 *
-	 * @param gid - the id of the germplasm record to be retrieved
-	 * @return the Germplasm POJO representing the record
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	Germplasm getGermplasmWithPrefAbbrev(Integer gid);
 
 	/**
 	 * Returns the Name record identified by the given id.
@@ -806,35 +740,6 @@ public interface GermplasmDataManager {
 	Map<Integer, String> getPrefferedIdsByGIDs(List<Integer> gids);
 
 	/**
-	 * Given the germplasm name and a location ID, returns list of all germplasm with specified name and location id.
-	 *
-	 * @param name - search string for the name of the germplasm
-	 * @param locationID the location id
-	 * @return List of Germplasm POJOs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<Germplasm> getGermplasmByLocationId(String name, int locationID);
-
-	/**
-	 * Given a gid, return the Germplasm POJO representing the record identified by the id with its method type.
-	 *
-	 * @param gid - the id of the germplasm record to be retrieved
-	 * @return the Germplasm POJO representing the record
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	Germplasm getGermplasmWithMethodType(Integer gid);
-
-	/**
-	 * Given a range of gid, return the list of all Germplasm.
-	 *
-	 * @param startGID - the start ID of the range of germplasm gids
-	 * @param endGID - the end ID of the range of germplasm gids
-	 * @return List of Germplasm POJOs
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<Germplasm> getGermplasmByGidRange(int startGID, int endGID);
-
-	/**
 	 * Given a List of GIDs, return the list of all Germplasm.
 	 *
 	 * @param gids the gids
@@ -1115,5 +1020,7 @@ public interface GermplasmDataManager {
 	 * @return
 	 */
 	UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code);
+
+	void addPedigreeString(Germplasm germplasm, String crossExpansion, String profile, int cropGenerationLevel);
 
 }

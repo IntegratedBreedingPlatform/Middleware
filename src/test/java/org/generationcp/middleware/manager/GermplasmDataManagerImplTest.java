@@ -162,7 +162,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetGermplasmByNameUsingLike() throws Exception {
-		final String name = "IR%";
+		final String name = "%";
 
 		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByName(name, 0, 5, Operation.LIKE);
 		Assert.assertTrue(germplasmList != null);
@@ -177,73 +177,6 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 		final long count = this.germplasmDataManager.countGermplasmByName(name, Operation.LIKE);
 		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByNameUsingLike(" + name + ") RESULTS:" + count);
-	}
-
-	@Test
-	public void testGetGermplasmByLocationNameUsingEqual() throws Exception {
-		final String name = "Philippines";
-		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByLocationName(name, 0, 5, Operation.EQUAL);
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByLocationNameUsingEqual(" + name + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
-	}
-
-	@Test
-	public void testCountGermplasmByLocationNameUsingEqual() throws Exception {
-		final String name = "Philippines";
-		final long count = this.germplasmDataManager.countGermplasmByLocationName(name, Operation.EQUAL);
-		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByLocationNameUsingEqual(" + name + "): " + count);
-	}
-
-	@Test
-	public void testGetGermplasmByLocationNameUsingLike() throws Exception {
-		final String name = "International%";
-		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByLocationName(name, 0, 5, Operation.LIKE);
-		Assert.assertTrue(germplasmList != null);
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByLocationNameUsingLike(" + name + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
-	}
-
-	@Test
-	public void testCountGermplasmByLocationNameUsingLike() throws Exception {
-		final String name = "International%";
-		final long count = this.germplasmDataManager.countGermplasmByLocationName(name, Operation.LIKE);
-		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByLocationNameUsingLike(" + name + "): " + count);
-	}
-
-	@Test
-	public void testGetGermplasmByMethodNameUsingEqual() throws Exception {
-		final String name = "SINGLE CROSS";
-
-		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByMethodName(name, 0, 5, Operation.EQUAL);
-		Assert.assertTrue(germplasmList != null);
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByMethodNameUsingEqual(" + name + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
-	}
-
-	@Test
-	public void testCountGermplasmByMethodNameUsingEqual() throws Exception {
-		final String name = "SINGLE CROSS";
-		final long count = this.germplasmDataManager.countGermplasmByMethodName(name, Operation.EQUAL);
-		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByMethodNameUsingEqual(" + name + "): " + count);
-	}
-
-	@Test
-	public void testGetGermplasmByMethodNameUsingLike() throws Exception {
-		final String name = "%CROSS%";
-
-		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByMethodName(name, 0, 5, Operation.LIKE);
-		Assert.assertTrue(germplasmList != null);
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByMethodNameUsingLike(" + name + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
-	}
-
-	@Test
-	public void testCountGermplasmByMethodNameUsingLike() throws Exception {
-		final String name = "%CROSS%";
-		final long count = this.germplasmDataManager.countGermplasmByMethodName(name, Operation.LIKE);
-		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByMethodNameUsingLike(" + name + "): " + count);
 	}
 
 	@Test
@@ -262,13 +195,6 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		if (germplasm != null) {
 			Debug.println("  preferredName = " + germplasm.getPreferredName());
 		}
-	}
-
-	@Test
-	public void testGetGermplasmWithPrefAbbrev() throws Exception {
-		final Integer gid = Integer.valueOf(151);
-		final Germplasm germplasm = this.germplasmDataManager.getGermplasmWithPrefAbbrev(gid);
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmWithPrefAbbrev(" + gid + "): " + germplasm);
 	}
 
 	@Test
@@ -745,30 +671,6 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetGermplasmByLocationId() throws Exception {
-		final String name = "RCH";
-		final int locationID = 0;
-
-		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByLocationId(name, locationID);
-		Assert.assertTrue(germplasmList != null);
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByLocationId(" + name + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
-	}
-
-	@Test
-	public void testGetGermplasmByGidRange() throws Exception {
-		final int startGID = 1;
-		final int endGID = 5;
-
-		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByGidRange(startGID, endGID);
-		Assert.assertTrue(germplasmList != null);
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByGidRange(" + startGID + "," + endGID + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
-	}
-
-	@Test
 	public void testGetGermplasmByGIDList() throws Exception {
 		final List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
 
@@ -962,12 +864,6 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		method.setLmid(0);
 		method.setMdate(0);
 		return method;
-	}
-
-	@Test
-	public void testGetGermplasmWithMethodType() throws Exception {
-		final Integer gid = 1;
-		this.germplasmDataManager.getGermplasmWithMethodType(gid);
 	}
 
 	@Test

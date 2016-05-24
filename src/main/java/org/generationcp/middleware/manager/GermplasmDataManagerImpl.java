@@ -31,6 +31,8 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.pedigree.Pedigree;
+import org.generationcp.middleware.pedigree.PedigreeDAO;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Country;
@@ -84,56 +86,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getGermplasmByLocationName(final String name, final int start, final int numOfRows, final Operation op)
-			throws MiddlewareQueryException {
-		List<Germplasm> germplasms = new ArrayList<Germplasm>();
-		final GermplasmDAO dao = this.getGermplasmDao();
-		if (op == Operation.EQUAL) {
-			germplasms = dao.getByLocationNameUsingEqual(name, start, numOfRows);
-		} else if (op == Operation.LIKE) {
-			germplasms = dao.getByLocationNameUsingLike(name, start, numOfRows);
-		}
-		return germplasms;
-	}
-
-	@Override
-	public long countGermplasmByLocationName(final String name, final Operation op) {
-		long count = 0;
-		final GermplasmDAO dao = this.getGermplasmDao();
-		if (op == Operation.EQUAL) {
-			count = dao.countByLocationNameUsingEqual(name);
-		} else if (op == Operation.LIKE) {
-			count = dao.countByLocationNameUsingLike(name);
-		}
-		return count;
-	}
-
-	@Override
-	public List<Germplasm> getGermplasmByMethodName(final String name, final int start, final int numOfRows, final Operation op) {
-		List<Germplasm> germplasms = new ArrayList<Germplasm>();
-		final GermplasmDAO dao = this.getGermplasmDao();
-		if (op == Operation.EQUAL) {
-			germplasms = dao.getByMethodNameUsingEqual(name, start, numOfRows);
-		} else if (op == Operation.LIKE) {
-			germplasms = dao.getByMethodNameUsingLike(name, start, numOfRows);
-		}
-		return germplasms;
-	}
-
-	@Override
-	public long countGermplasmByMethodName(final String name, final Operation op) {
-		long count = 0;
-		final GermplasmDAO dao = this.getGermplasmDao();
-		if (op == Operation.EQUAL) {
-			count = dao.countByMethodNameUsingEqual(name);
-		} else if (op == Operation.LIKE) {
-			count = dao.countByMethodNameUsingLike(name);
-		}
-		return count;
-	}
-
-	@Override
 	public Germplasm getGermplasmByGID(final Integer gid) {
+	
 		Integer updatedGid = gid;
 		Germplasm germplasm = null;
 		do {
@@ -142,22 +96,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				updatedGid = germplasm.getGrplce();
 			}
 		} while (germplasm != null && !new Integer(0).equals(updatedGid));
+		// Germplasms can be replaced and thus this is looping till it finds the actual germplasm
 		return germplasm;
 	}
 
 	@Override
 	public Germplasm getGermplasmWithPrefName(final Integer gid) {
-		final Germplasm germplasm = this.getGermplasmByGID(gid);
-		if (germplasm != null) {
-			final Name preferredName = this.getPreferredNameByGID(germplasm.getGid());
-			germplasm.setPreferredName(preferredName);
-		}
-		return germplasm;
-	}
-
-	@Override
-	public Germplasm getGermplasmWithPrefAbbrev(final Integer gid) {
-		return this.getGermplasmDao().getByGIDWithPrefAbbrev(gid);
+		return this.getGermplasmByGID(gid);
 	}
 
 	@Override
@@ -924,15 +869,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return this.getNameDao().getGermplasmNameDetailsByNames(namesToUse, mode);
 	}
 
-	/**
-	 * @deprecated
-	 */
-	@Override
-	@Deprecated
-	public List<Country> getAllCountry() {
-		return this.getCountryDao().getAllCountry();
-	}
-
 	@Override
 	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final String fieldType) {
 		return this.getUserDefinedFieldDao().getByFieldTableNameAndType(tableName, fieldType);
@@ -970,35 +906,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			}
 		}
 		return toreturn;
-	}
-
-	@Override
-	public List<Germplasm> getGermplasmByLocationId(final String name, final int locationID) {
-		final List<Germplasm> germplasmList = new ArrayList<>();
-		germplasmList.addAll(this.getGermplasmDao().getByLocationId(name, locationID));
-		return germplasmList;
-	}
-
-	@Override
-	public Germplasm getGermplasmWithMethodType(final Integer gid) {
-		return this.getGermplasmDao().getByGIDWithMethodType(gid);
-	}
-
-	@Override
-	public List<Germplasm> getGermplasmByGidRange(final int startGIDParam, final int endGIDParam) {
-		final List<Germplasm> germplasmList = new ArrayList<>();
-
-		int startGID = startGIDParam;
-		int endGID = endGIDParam;
-		// assumes the lesser value be the start of the range
-		if (endGID < startGID) {
-			final int temp = endGID;
-			endGID = startGID;
-			startGID = temp;
-		}
-
-		germplasmList.addAll(this.getGermplasmDao().getByGIDRange(startGID, endGID));
-		return germplasmList;
 	}
 
 	@Override
@@ -1356,5 +1263,31 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code) {
 		return this.getUserDefinedFieldDao().getByTableTypeAndCode(table, type, code);
+	}
+
+	@Override
+	public void addPedigreeString(Germplasm germplasm, String crossExpansion, String profile, int cropGenerationLevel) {
+	
+		final PedigreeDAO pedigreeDAO = this.getPedigreeDAO();
+		final List<Pedigree> filterByColumnValue = pedigreeDAO.filterByColumnValue("pedigreeString", crossExpansion);
+		
+		if(filterByColumnValue.size() > 1) {
+			throw new IllegalStateException("Should not have more than one pedigree string in the table.");
+		}
+		
+		if(filterByColumnValue.size() == 1) {
+			germplasm.setPedigree(filterByColumnValue.get(0));
+		} else {
+		
+			final Pedigree pedigree = new Pedigree();
+			pedigree.setAlgorithmUsed(profile);
+			pedigree.setLevels(cropGenerationLevel);
+			pedigree.setPedigreeString(crossExpansion);
+			germplasm.setPedigree(pedigree);
+			pedigreeDAO.save(pedigree);
+
+		}
+		this.getGermplasmDao().save(germplasm);
+
 	}
 }

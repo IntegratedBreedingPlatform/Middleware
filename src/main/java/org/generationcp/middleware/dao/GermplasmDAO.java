@@ -27,6 +27,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pedigree.Pedigree;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -50,6 +51,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String STOCK_IDS = "stockIDs";
 	private static final String INVENTORY_ID = "inventoryID";
 	private static final String GERMPLSM = "germplsm";
+	private static final String PEDIGREE = "Pedigree";
+
 	private static final String Q_NO_SPACES = "qNoSpaces";
 	private static final String Q_STANDARDIZED = "qStandardized";
 	private static final String AVAIL_INV = "availInv";
@@ -66,20 +69,34 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public Germplasm getById(final Integer gid) throws MiddlewareQueryException {
 		try {
 			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT g.* FROM germplsm g WHERE gid!=grplce AND gid=:gid LIMIT 1");
+			queryString.append("SELECT g.*, ps.*, n.* FROM germplsm g "
+					+ "LEFT JOIN names n on n.gid = g.gid "
+					+ "LEFT JOIN pedigree ps on g.pedigree_id = ps.id "
+					+ " WHERE g.gid!=grplce AND g.gid=:gid LIMIT 1");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameter("gid", gid);
 			query.addEntity("g", Germplasm.class);
+			query.addEntity("p", Pedigree.class);
+			query.addEntity("n", Name.class);
 
-			return (Germplasm) query.uniqueResult();
-
+			final Object[] uniqueResults = (Object[]) query.uniqueResult();
+			if(uniqueResults !=  null) {
+				return convertArrayToGermplasm(uniqueResults);
+			}
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getById(gid=" + gid + ") query from Germplasm: " + e.getMessage(), e);
 		}
 		return null;
 	}
 
+	private Germplasm convertArrayToGermplasm(final Object[] uniqueResults) {
+		final Germplasm germplasm = (Germplasm) uniqueResults[0];
+		germplasm.setPedigree((Pedigree) uniqueResults[1]);
+		germplasm.setPreferredName((Name) uniqueResults[2]);
+		return germplasm;
+	}
+	
 	@SuppressWarnings("unchecked")
 	public List<Germplasm> getByNamePermutations(final String name, final Operation operation, final int start, final int numOfRows)
 			throws MiddlewareQueryException {
@@ -109,6 +126,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.setParameter("standardizedName", standardizedName);
 
 			query.addEntity("g", Germplasm.class);
+
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 
@@ -148,120 +166,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error with countByName(names=" + names + ") query from Germplasm: " + e.getMessage(), e);
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Germplasm> getByMethodNameUsingEqual(final String name, final int start, final int numOfRows)
-			throws MiddlewareQueryException {
-		try {
-			final Query query = this.getSession().getNamedQuery(Germplasm.GET_BY_METHOD_NAME_USING_EQUAL);
-			query.setParameter("name", name);
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
-
-			return query.list();
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByMethodNameUsingEqual(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
-		}
-		return new ArrayList<Germplasm>();
-	}
-
-	public long countByMethodNameUsingEqual(final String name) throws MiddlewareQueryException {
-		try {
-			final Query query = this.getSession().getNamedQuery(Germplasm.COUNT_BY_METHOD_NAME_USING_EQUAL);
-			query.setParameter("name", name);
-			return ((Long) query.uniqueResult()).longValue();
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with countByMethodNameUsingEqual(name=" + name + ") query from Germplasm: " + e.getMessage(),
-					e);
-		}
-		return 0;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Germplasm> getByMethodNameUsingLike(final String name, final int start, final int numOfRows)
-			throws MiddlewareQueryException {
-		try {
-			final Query query = this.getSession().getNamedQuery(Germplasm.GET_BY_METHOD_NAME_USING_LIKE);
-			query.setParameter("name", name);
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
-
-			return query.list();
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByMethodNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
-		}
-		return new ArrayList<Germplasm>();
-	}
-
-	public long countByMethodNameUsingLike(final String name) throws MiddlewareQueryException {
-		try {
-			final Query query = this.getSession().getNamedQuery(Germplasm.COUNT_BY_METHOD_NAME_USING_LIKE);
-			query.setParameter("name", name);
-			return ((Long) query.uniqueResult()).longValue();
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with countByMethodNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(),
-					e);
-		}
-		return 0;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Germplasm> getByLocationNameUsingEqual(final String name, final int start, final int numOfRows)
-			throws MiddlewareQueryException {
-		try {
-			final Query query = this.getSession().getNamedQuery(Germplasm.GET_BY_LOCATION_NAME_USING_EQUAL);
-			query.setParameter("name", name);
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
-
-			return query.list();
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByLocationNameUsingEqual(name=" + name + ") query from Germplasm: " + e.getMessage(),
-					e);
-		}
-		return new ArrayList<Germplasm>();
-	}
-
-	public long countByLocationNameUsingEqual(final String name) throws MiddlewareQueryException {
-		try {
-			final Query query = this.getSession().getNamedQuery(Germplasm.COUNT_BY_LOCATION_NAME_USING_EQUAL);
-			query.setParameter("name", name);
-			return ((Long) query.uniqueResult()).longValue();
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with countByLocationNameUsingEqual(name=" + name + ") query from Germplasm: " + e.getMessage(),
-					e);
-		}
-		return 0;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Germplasm> getByLocationNameUsingLike(final String name, final int start, final int numOfRows)
-			throws MiddlewareQueryException {
-		try {
-			final Query query = this.getSession().getNamedQuery(Germplasm.GET_BY_LOCATION_NAME_USING_LIKE);
-			query.setParameter("name", name);
-			query.setFirstResult(start);
-			query.setMaxResults(numOfRows);
-
-			return query.list();
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByLocationNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(),
-					e);
-		}
-		return new ArrayList<Germplasm>();
-	}
-
-	public long countByLocationNameUsingLike(final String name) throws MiddlewareQueryException {
-		try {
-			final Query query = this.getSession().getNamedQuery(Germplasm.COUNT_BY_LOCATION_NAME_USING_LIKE);
-			query.setParameter("name", name);
-			return ((Long) query.uniqueResult()).longValue();
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with countByLocationNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(),
-					e);
-		}
-		return 0;
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -822,6 +726,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 				p1Query.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
 				this.addInventoryInfo(p1Query);
+				p1Query.addEntity(GermplasmDAO.PEDIGREE, Pedigree.class);
+
 				result.addAll(this.getSearchForGermplasmsResult(p1Query.list()));
 			}
 			// find germplasms with inventory_id = or like q
@@ -839,7 +745,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			p2Query.setParameter(GermplasmDAO.Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
 			p2Query.setParameter("deletedStatus", GermplasmDAO.STATUS_DELETED);
 			p2Query.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
+
 			this.addInventoryInfo(p2Query);
+			p2Query.addEntity(GermplasmDAO.PEDIGREE, Pedigree.class);
+
 			result.addAll(this.getSearchForGermplasmsResult(p2Query.list()));
 
 			if (includeParents) {
@@ -874,6 +783,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			pQuery.setParameterList("mgids", mGIds);
 			pQuery.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
 			this.addInventoryInfo(pQuery);
+			pQuery.addEntity(GermplasmDAO.PEDIGREE, Pedigree.class);
+
 			resultMGMembers.addAll(this.getSearchForGermplasmsResult(pQuery.list()));
 		}
 		return resultMGMembers;
@@ -895,6 +806,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			pQuery.setParameterList("gids", parentGids);
 			pQuery.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
 			this.addInventoryInfo(pQuery);
+			pQuery.addEntity(GermplasmDAO.PEDIGREE, Pedigree.class);
+
 			resultParents.addAll(this.getSearchForGermplasmsResult(pQuery.list()));
 		}
 		return resultParents;
@@ -923,6 +836,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		inventoryInfo.setActualInventoryLotCount(row[2] != null ? ((BigInteger) row[2]).intValue() : 0);
 		inventoryInfo.setReservedLotCount(row[3] != null ? ((BigInteger) row[3]).intValue() : 0);
 		germplasm.setInventoryInfo(inventoryInfo);
+		germplasm.setPedigree((Pedigree) row[4]);
 		return germplasm;
 	}
 
