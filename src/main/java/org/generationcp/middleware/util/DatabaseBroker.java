@@ -84,6 +84,7 @@ import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.dao.oms.VariableOverridesDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.operation.builder.TermPropertyBuilder;
+import org.generationcp.middleware.pedigree.PedigreeDAO;
 import org.hibernate.Session;
 
 /**
@@ -569,6 +570,12 @@ public class DatabaseBroker {
 		UserProgramTreeStateDAO userProgramTreeStateDAO = new UserProgramTreeStateDAO();
 		userProgramTreeStateDAO.setSession(this.getActiveSession());
 		return userProgramTreeStateDAO;
+	}
+
+	public PedigreeDAO getPedigreeDAO() {
+		final PedigreeDAO pedigreeDAO = new PedigreeDAO();
+		pedigreeDAO.setSession(this.getActiveSession());
+		return pedigreeDAO;
 	}
 
 
