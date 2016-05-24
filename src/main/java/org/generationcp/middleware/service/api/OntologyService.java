@@ -318,7 +318,16 @@ public interface OntologyService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Scale getScale(String name) throws MiddlewareQueryException;
-
+	
+	/**
+	 * Gets the Scale Variable with the given name.
+	 *
+	 * @param name the name to match
+	 * @return the matching scale
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Scale getScaleVariable(String name) throws MiddlewareQueryException;
+	
 	/**
 	 * Gets all scales from Central and Local.
 	 *
