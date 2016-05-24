@@ -30,7 +30,7 @@ public class InbredProcessorTest {
 	@Test
 	public void testInbredProcessorWhenMissingGermplasmNode() throws Exception {
 		final InbredProcessor inbredProcessor = new InbredProcessor();
-		final PedigreeString inbreadPedigreeString = inbredProcessor.processGermplasmNode(null, 3, fixedLineNameResolver);
+		final PedigreeString inbreadPedigreeString = inbredProcessor.processGermplasmNode(null, 3, fixedLineNameResolver, false);
 		assertEquals("Pedigree string is Unknown since we provided a null value", "Unknown",
 				inbreadPedigreeString.getPedigree());
 	}
@@ -38,7 +38,7 @@ public class InbredProcessorTest {
 	@Test
 	public void testInbredProcessorWhenMissingGermplasm() throws Exception {
 		final InbredProcessor inbredProcessor = new InbredProcessor();
-		final PedigreeString inbreadPedigreeString = inbredProcessor.processGermplasmNode(new GermplasmNode(null), 3, fixedLineNameResolver);
+		final PedigreeString inbreadPedigreeString = inbredProcessor.processGermplasmNode(new GermplasmNode(null), 3, fixedLineNameResolver, false);
 		assertEquals("Pedigree string is Unknown since we provided a null value", "Unknown",
 				inbreadPedigreeString.getPedigree());
 	}
@@ -47,7 +47,7 @@ public class InbredProcessorTest {
 	@Test
 	public void testInbredProcessorWhenMissingGermplasmName() throws Exception {
 		final InbredProcessor inbredProcessor = new InbredProcessor();
-		final PedigreeString inbreadPedigreeString = inbredProcessor.processGermplasmNode(new GermplasmNode(new Germplasm(1)), 3, fixedLineNameResolver);
+		final PedigreeString inbreadPedigreeString = inbredProcessor.processGermplasmNode(new GermplasmNode(new Germplasm(1)), 3, fixedLineNameResolver, false);
 		assertEquals("Pedigree string is the gid i.e. 1 since we provided a null name value", "1",
 				inbreadPedigreeString.getPedigree());
 	}
@@ -58,7 +58,7 @@ public class InbredProcessorTest {
 		GermplasmNode inbreadGermplasmNode = PedigreeStringTestUtil.createGermplasmNode(1, "A", PedigreeStringTestUtil.BULK_OR_POPULATION_SAMPLE_METHOD_ID,
 				PedigreeStringTestUtil.BULK_OR_POPULATION_SAMPLE_METHOD_NAME, PedigreeStringTestUtil.BULK_OR_POPULATION_SAMPLE_METHOD_NUMBER_OF_PROGENITOR);
 
-		final PedigreeString inbreadPedigreeString = inbredProcessor.processGermplasmNode(inbreadGermplasmNode, 3, fixedLineNameResolver);
+		final PedigreeString inbreadPedigreeString = inbredProcessor.processGermplasmNode(inbreadGermplasmNode, 3, fixedLineNameResolver, false);
 		assertEquals("Pedigree string is A since it is the preferred name", "A",
 				inbreadPedigreeString.getPedigree());
 	}

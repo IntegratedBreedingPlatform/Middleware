@@ -23,7 +23,7 @@ public class PedigreeStringBuilder {
 	private final InbredProcessor inbredProcessor = new InbredProcessor();;
 
 	public PedigreeString buildPedigreeString(final GermplasmNode germplasmNode, final int level,
-			final FixedLineNameResolver fixedLineNameResolver) {
+			final FixedLineNameResolver fixedLineNameResolver, final boolean originatesFromComplexCross) {
 
 		Preconditions.checkNotNull(germplasmNode);
 
@@ -39,30 +39,30 @@ public class PedigreeStringBuilder {
 		}
 
 		if (level == 0) {
-			return this.inbredProcessor.processGermplasmNode(germplasmNode, level, fixedLineNameResolver);
+			return this.inbredProcessor.processGermplasmNode(germplasmNode, level, fixedLineNameResolver, originatesFromComplexCross);
 		}
 
 		// Is this germplasm that is a result of a derivative or maintenance breeding method. If so skip node.
 		if (germplasm != null && germplasm.getGnpgs() < 0) {
-			return this.processDerivativeOrMaintenceGermplasm(germplasmNode, level, fixedLineNameResolver);
+			return this.processDerivativeOrMaintenceGermplasm(germplasmNode, level, fixedLineNameResolver, originatesFromComplexCross);
 		}
 
 		// Get breeding method used to create this germplasm.
 		final BreedingMethodProcessor methodProcessor = BreedingMethodFactory.getMethodProcessor(germplasmNode);
-		return methodProcessor.processGermplasmNode(germplasmNode, level, fixedLineNameResolver);
+		return methodProcessor.processGermplasmNode(germplasmNode, level, fixedLineNameResolver, originatesFromComplexCross);
 	}
 
 	private PedigreeString processDerivativeOrMaintenceGermplasm(final GermplasmNode germplasmNode, final int level,
-			final FixedLineNameResolver fixedLineNameResolver) {
+			final FixedLineNameResolver fixedLineNameResolver, final boolean originatesFromComplexCross) {
 
 		final GermplasmNode femaleParent = germplasmNode.getFemaleParent();
 
-		if (femaleParent != null) {
+		if (femaleParent != null && !originatesFromComplexCross) {
 			// Note derivative or maintenance methods are not consider a level increment
-			return this.buildPedigreeString(germplasmNode.getFemaleParent(), level, fixedLineNameResolver);
+			return this.buildPedigreeString(germplasmNode.getFemaleParent(), level, fixedLineNameResolver, originatesFromComplexCross);
 		}
 
-		return this.inbredProcessor.processGermplasmNode(germplasmNode, level - 1, fixedLineNameResolver);
+		return this.inbredProcessor.processGermplasmNode(germplasmNode, level - 1, fixedLineNameResolver, originatesFromComplexCross);
 
 	}
 

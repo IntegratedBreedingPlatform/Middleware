@@ -34,7 +34,7 @@ public class SimpleCrossProcessorTest {
 		final SimpleCrossProcessor simpleCrossProcessor = new SimpleCrossProcessor();
 		final PedigreeString processGermplasmNode = simpleCrossProcessor.processGermplasmNode(parentGermplasmNode,
 				5,
-				fixedLineNameResolver);
+				fixedLineNameResolver, false);
 		Assert.assertEquals("Incorrect simple cross generation",
 				"A/D",
 				processGermplasmNode.getPedigree());
@@ -52,7 +52,7 @@ public class SimpleCrossProcessorTest {
 		final SimpleCrossProcessor simpleCrossProcessor = new SimpleCrossProcessor();
 		final PedigreeString processGermplasmNode = simpleCrossProcessor.processGermplasmNode(parentGermplasmNode,
 				5,
-				fixedLineNameResolver);
+				fixedLineNameResolver, false);
 		Assert.assertEquals("Incorrect simple cross generation with null parents",
 				"Unknown/Unknown",
 				processGermplasmNode.getPedigree());
