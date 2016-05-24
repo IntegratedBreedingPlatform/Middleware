@@ -143,21 +143,38 @@ public class PedigreeServiceImpl implements PedigreeService {
 		Preconditions.checkNotNull(gid);
 		Preconditions.checkArgument(gid > 0);
 		LOG.debug(String.format("Building ancestory tree for gid - '%d'", gid));
-		// Build the pedigree tree
-		final AncestryTreeService ancestryTreeService = new AncestryTreeService(this.germplasmCropBasedCache, this.methodCropBasedCache, this.getCropName());
-		final GermplasmNode gidAncestryTree = ancestryTreeService.buildAncestryTree(gid);
 
 		// Get the cross string
 		final int numberOfLevelsToTraverse = level == null ? crossExpansionProperties.getCropGenerationLevel(this.getCropName()) : level;
 
+		long startAncestryTreeService = System.currentTimeMillis();
+		// Build the pedigree tree
+		final AncestryTreeService ancestryTreeService = new AncestryTreeService(this.germplasmCropBasedCache, this.methodCropBasedCache, this.getCropName());
+		final GermplasmNode gidAncestryTree = ancestryTreeService.buildAncestryTree(gid, numberOfLevelsToTraverse + 3);
+
+		long endAncestryTreeService = System.currentTimeMillis();
+
+		long timeTaken = endAncestryTreeService - startAncestryTreeService;
+		System.out.println("Ancestry tree service " + timeTaken);
+
+
 		LOG.debug(String.format("Traversing '%d' number of levels.", numberOfLevelsToTraverse));
+
+		long startPedigreeService = System.currentTimeMillis();
 
 		final PedigreeStringBuilder pedigreeString = new PedigreeStringBuilder();
 
 		LOG.debug(String.format("Building pedigree string for gid '%d'.", gid));
-		return pedigreeString.buildPedigreeString(gidAncestryTree, numberOfLevelsToTraverse,
-				new FixedLineNameResolver(crossExpansionProperties, pedigreeDataManagerFactory, nameTypeBasedCache, cropName))
+
+		String pedigree = pedigreeString.buildPedigreeString(gidAncestryTree, numberOfLevelsToTraverse,
+				new FixedLineNameResolver(crossExpansionProperties, pedigreeDataManagerFactory, nameTypeBasedCache, cropName), false)
 				.getPedigree();
+		long endPedigreeService = System.currentTimeMillis();
+
+		long l = endPedigreeService - startPedigreeService;
+		System.out.println("Pegiree Generation tree service " + l);
+
+		return pedigree;
 	}
 
 	@Override

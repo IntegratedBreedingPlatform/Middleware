@@ -30,7 +30,7 @@ public class InbredProcessor implements BreedingMethodProcessor {
 
 	@Override
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
-			final FixedLineNameResolver fixedLineNameResolver) {
+			final FixedLineNameResolver fixedLineNameResolver, final boolean originatesFromComplexCross) {
 
 		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
 			LOG.debug("Germplasm with GID '{}' is being processed by an inbread processor. "
@@ -56,7 +56,7 @@ public class InbredProcessor implements BreedingMethodProcessor {
 		} else {
 			pedigreeStringBuilders.setPedigree(nameObject.getNval());
 		}
-
+		System.out.println(pedigreeStringBuilders.getPedigree());
 		return pedigreeStringBuilders;
 
 	}
