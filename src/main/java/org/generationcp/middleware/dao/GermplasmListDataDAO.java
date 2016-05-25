@@ -13,6 +13,8 @@ package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +96,17 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			}
 		}
 
-		return new ArrayList<>(germplasmData.values());
+		List<GermplasmListData> germplasmListData = new ArrayList<>(germplasmData.values());
+
+		Collections.sort(germplasmListData, new Comparator<GermplasmListData>() {
+
+			@Override
+			public int compare(GermplasmListData l, GermplasmListData r) {
+				return l.getEntryId().compareTo(r.getEntryId());
+			}
+		});
+
+		return germplasmListData;
 	}
 
 	public long countByListId(final Integer id) {
