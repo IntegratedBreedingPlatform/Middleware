@@ -1255,11 +1255,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 					this.getSession().createSQLQuery(sql.toString()).addScalar("id").addScalar("scalename").addScalar("methodname")
 					.addScalar("name").addScalar("definition");
 			query.setParameter("name", name);
-			List<Object[]> result = query.list();
-			if (result != null && !result.isEmpty()) {
-				Object[] row  =  result.get(0);
-				String displayName = row[1] + " - " + row[2];
-				scale = new Scale(new Term((Integer) row[0], row[3].toString(), row[4].toString()));
+			Object[] result = (Object[]) query.uniqueResult();
+			if (result != null) {
+				String displayName = result[1] + " - " + result[2];
+				scale = new Scale(new Term((Integer) result[0], result[3].toString(), result[4].toString()));
 				scale.setDisplayName(displayName);
 				return scale;
 			}
