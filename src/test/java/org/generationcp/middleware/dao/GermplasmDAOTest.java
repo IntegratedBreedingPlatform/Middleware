@@ -109,6 +109,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final List<Germplasm> results =
 				this.dao.searchForGermplasms(this.createSearchParam(this.germplasmGID.toString(), Operation.EQUAL, false, false, false));
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
+		this.assertPossibleGermplasmFields(results);
 	}
 
 	@Test
@@ -118,6 +119,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(
 				"The results should contain one germplasm since there's only one test data with '" + this.preferredName.getNval()
 						+ "' name", 1, results.size());
+		this.assertPossibleGermplasmFields(results);
 	}
 
 	@Test
@@ -126,6 +128,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 				this.dao.searchForGermplasms(this.createSearchParam(this.germplasmGID.toString() + "%", Operation.LIKE, false, false, false));
 		Assert.assertEquals("The results should contain one germplasm since there's only one test data with gid that starts with "
 				+ this.germplasmGID, 1, results.size());
+		this.assertPossibleGermplasmFields(results);
 	}
 
 	@Test
@@ -134,6 +137,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 				this.dao.searchForGermplasms(this.createSearchParam(this.preferredName.getNval() + "%", Operation.LIKE, false, false, false));
 		Assert.assertEquals("The results should contain one germplasm since there's only one test data with name that starts with "
 				+ this.preferredName.getNval(), 1, results.size());
+		this.assertPossibleGermplasmFields(results);
 	}
 
 	@Test
@@ -143,6 +147,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 						false));
 		Assert.assertEquals("The results should contain one germplasm since there's only one test data with gid that contains "
 				+ this.germplasmGID, 1, results.size());
+		this.assertPossibleGermplasmFields(results);
 	}
 
 	@Test
@@ -152,6 +157,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 						false));
 		Assert.assertTrue("The results should contain one germplasm since there's only one test data with name that contains "
 				+ this.preferredName.getNval(), results.size() == 1);
+		this.assertPossibleGermplasmFields(results);
 	}
 
 	@Test
@@ -159,6 +165,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final List<Germplasm> results = this.dao.searchForGermplasms(this.createSearchParam("1%", Operation.LIKE, false, false, false));
 		final List<Germplasm> resultsWithInventoryOnly = this.dao.searchForGermplasms("1%", Operation.LIKE, false, true, false);
 		Assert.assertNotEquals(results.size(), resultsWithInventoryOnly.size());
+		this.assertPossibleGermplasmFieldsForInventorySearch(resultsWithInventoryOnly);
 	}
 
 	@Test
@@ -168,6 +175,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(
 				"The result should contain three germplasms(one is the actual result and the other two is the male and female parents)", 3,
 				results.size());
+		this.assertPossibleGermplasmFields(results);
 	}
 
 	@Test
@@ -182,6 +190,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 				this.dao.searchForGermplasms(this.createSearchParam(this.germplasmGID.toString(), Operation.EQUAL, false, false, true));
 		Assert.assertEquals("The result should contain 2 germplasms (one is the actual result and the other is the MG member)", 2,
 				results.size());
+		this.assertPossibleGermplasmFields(results);
 	}
 
 	@Test
@@ -307,4 +316,40 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		return searchParam;
 	}
 
+	/**
+	 * Method to assert fields contained by germplasm search germplasmSearchResults.
+	 * Tried to assert general possible fields for Germplasm.
+	 *
+	 * @param germplasmSearchResults Germplasm Search Results
+	 */
+	private void assertPossibleGermplasmFields(List<Germplasm> germplasmSearchResults) {
+		// Assert possible germplasm member fields
+		for (Germplasm germplasm : germplasmSearchResults) {
+			Assert.assertNotEquals("Gpid1 should not be 0", Integer.valueOf(0), germplasm.getGpid1());
+			Assert.assertNotEquals("Gpid2 should not be 0", Integer.valueOf(0), germplasm.getGpid2());
+			Assert.assertNotEquals("Gnpgs should not be 0", Integer.valueOf(0), germplasm.getGnpgs());
+			Assert.assertEquals("Result should contain Method Name", "Unknown generative method", germplasm.getMethodName());
+			Assert.assertEquals("Result should contain Location Name", "Afghanistan", germplasm.getLocationName());
+			Assert.assertEquals("Result should contain Germplasm Number of Progenitor", Integer.valueOf(2), germplasm.getGnpgs());
+			Assert.assertEquals("Result should contain Germplasm Date", Integer.valueOf(20150101), germplasm.getGdate());
+			Assert.assertEquals("Result should contain Reference Id", Integer.valueOf(1), germplasm.getReferenceId());
+		}
+	}
+
+	/**
+	 * Method to assert fields contained by germplasm inventory search inventorySearchResults.
+	 * Tried to assert general possible fields for Germplasm.
+	 *
+	 * @param inventorySearchResults Germplasm Search Results
+	 */
+	private void assertPossibleGermplasmFieldsForInventorySearch(List<Germplasm> inventorySearchResults) {
+		for (Germplasm inventory : inventorySearchResults) {
+			Assert.assertNotNull("Result should contain Inventory Info", inventory.getInventoryInfo());
+			Assert.assertNotNull("Result should contain Method Name", inventory.getMethodName());
+			Assert.assertNotNull("Result should contain Location Name", inventory.getLocationName());
+			Assert.assertNotEquals("Gid should not be 0", Integer.valueOf(0), inventory.getGid());
+			Assert.assertNotNull("Result should contain ReferenceId", inventory.getReferenceId());
+			Assert.assertNotNull("Result should contain Gdate", inventory.getGdate());
+		}
+	}
 }
