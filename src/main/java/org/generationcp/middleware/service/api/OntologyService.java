@@ -318,7 +318,7 @@ public interface OntologyService {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Scale getScale(String name) throws MiddlewareQueryException;
-
+	
 	/**
 	 * Gets all scales from Central and Local.
 	 *
@@ -602,6 +602,15 @@ public interface OntologyService {
 	 * @throws MiddlewareQueryException
 	 */
 	List<Scale> getAllInventoryScales() throws MiddlewareQueryException;
+	
+	/**
+	 * Find inventory scale by name
+	 * 
+	 * @param name
+	 * @return Scale
+	 * @throws MiddlewareQueryException
+	 */
+	Scale getInventoryScaleByName(final String name) throws MiddlewareQueryException;
 
 	List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException;
 }

@@ -87,6 +87,9 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	private Integer mgid = null;
 
 	@Transient
+	private Integer groupId = null;
+
+	@Transient
 	private String checkTypeDescription = null;
 
 
@@ -395,6 +398,14 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	public String getSeedAmount() {
 
 		return "";
+	}
+
+	public Integer getGroupId() {
+		return this.groupId;
+	}
+
+	public void setGroupId(final Integer groupId) {
+		this.groupId = groupId;
 	}
 
 }
