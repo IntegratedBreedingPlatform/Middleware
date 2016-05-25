@@ -101,8 +101,8 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		Collections.sort(germplasmListData, new Comparator<GermplasmListData>() {
 
 			@Override
-			public int compare(GermplasmListData l, GermplasmListData r) {
-				return l.getEntryId().compareTo(r.getEntryId());
+			public int compare(GermplasmListData left, GermplasmListData right) {
+				return left.getEntryId().compareTo(right.getEntryId());
 			}
 		});
 
