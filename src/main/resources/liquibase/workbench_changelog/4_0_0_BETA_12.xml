@@ -46,4 +46,11 @@
 		</preConditions>
 		<addUniqueConstraint constraintName="uk_project_name" tableName="workbench_project" columnNames="project_name ASC, crop_type ASC"/>
 	</changeSet>
+
+	<changeSet author="iryna" id="beta12-6">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_project_backup"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_project_backup"/>
+	</changeSet>
 </databaseChangeLog>
