@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.dao;
@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
+import org.generationcp.middleware.domain.gms.search.GermplasmSortableColumn;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
@@ -40,20 +42,29 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 /**
  * DAO class for {@link Germplasm}.
- *
+ * 
  */
 public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private static final String STATUS_DELETED = "9";
 	private static final String STOCK_IDS = "stockIDs";
-	private static final String INVENTORY_ID = "inventoryID";
 	private static final String GERMPLSM = "germplsm";
 	private static final String Q_NO_SPACES = "qNoSpaces";
 	private static final String Q_STANDARDIZED = "qStandardized";
 	private static final String AVAIL_INV = "availInv";
 	private static final String SEED_RES = "seedRes";
+	private static final String METHOD_NAME = "methodName";
+	private static final String LOCATION_NAME = "locationName";
+	// Prevent silly searches from resulting in GIANT IN clauses in search query (which reuses this function).
+	// Old search query had the same hardcoded limit of 5000 anyway so this is not changing existing logic as such. Applies to both
+	// count and search queries. In future we can detect that the search is resulting in more than 5000 matches and go back to the
+	// user asking them to refine search criteria.
+	private static final String LIMIT_CLAUSE = " LIMIT 5000 ";
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDAO.class);
 
@@ -200,8 +211,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.setParameter("name", name);
 			return ((Long) query.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with countByMethodNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(),
-					e);
+			this.logAndThrowException("Error with countByMethodNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
 		}
 		return 0;
 	}
@@ -229,8 +239,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.setParameter("name", name);
 			return ((Long) query.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with countByLocationNameUsingEqual(name=" + name + ") query from Germplasm: " + e.getMessage(),
-					e);
+			this.logAndThrowException(
+					"Error with countByLocationNameUsingEqual(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
 		}
 		return 0;
 	}
@@ -246,8 +256,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			return query.list();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByLocationNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(),
-					e);
+			this.logAndThrowException("Error with getByLocationNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
 		}
 		return new ArrayList<Germplasm>();
 	}
@@ -341,8 +350,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				return progenitors;
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getProgenitorsByGIDWithPrefName(gid=" + gid + ") query from Germplasm: " + e.getMessage(),
-					e);
+			this.logAndThrowException(
+					"Error with getProgenitorsByGIDWithPrefName(gid=" + gid + ") query from Germplasm: " + e.getMessage(), e);
 		}
 		return new ArrayList<Germplasm>();
 	}
@@ -703,9 +712,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return query.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error with getByLocationId(name=" + name + ", locationID=" + locationID + ") query from Germplasm: " + e.getMessage(),
-					e);
+			this.logAndThrowException("Error with getByLocationId(name=" + name + ", locationID=" + locationID + ") query from Germplasm: "
+					+ e.getMessage(), e);
 		}
 		return new ArrayList<Germplasm>();
 	}
@@ -752,9 +760,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return query.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error with getByGIDRange(startGID=" + startGID + ", endGID=" + endGID + ") query from Germplasm: " + e.getMessage(),
-					e);
+			this.logAndThrowException("Error with getByGIDRange(startGID=" + startGID + ", endGID=" + endGID + ") query from Germplasm: "
+					+ e.getMessage(), e);
 		}
 		return new ArrayList<Germplasm>();
 	}
@@ -782,7 +789,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 		return new ArrayList<Germplasm>();
 	}
-	
+
 	/**
 	 * Search for germplasms given a search term
 	 * 
@@ -796,114 +803,83 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	 */
 	public List<Germplasm> searchForGermplasms(final String searchedString, final Operation o, final boolean includeParents,
 			final boolean withInventoryOnly, final boolean includeMGMembers) throws MiddlewareQueryException {
-		final String q = searchedString.trim();
-		if ("".equals(q)) {
-			return new ArrayList<Germplasm>();
-		}
+		// use the one that uses the new GermplasmSearchParameter pojo for performing the search
+		return this
+				.searchForGermplasms(new GermplasmSearchParameter(searchedString, o, includeParents, withInventoryOnly, includeMGMembers));
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Germplasm> searchForGermplasms(final GermplasmSearchParameter germplasmSearchParameter) throws MiddlewareQueryException {
+
+		// actual searching here
+		final String q = germplasmSearchParameter.getSearchKeyword().trim();
+		final Operation o = germplasmSearchParameter.getOperation();
+		final boolean includeParents = germplasmSearchParameter.isIncludeParents();
+		final boolean withInventoryOnly = germplasmSearchParameter.isWithInventoryOnly();
+		final boolean includeMGMembers = germplasmSearchParameter.isIncludeMGMembers();
+		final Integer startingRow = germplasmSearchParameter.getStartingRow();
+		final Integer noOfEntries = germplasmSearchParameter.getNumberOfEntries();
+
 		try {
-
-			final Set<Germplasm> result = new LinkedHashSet<Germplasm>();
-			Set<Germplasm> resultParents = new LinkedHashSet<Germplasm>();
-			Set<Germplasm> resultMGMembers = new LinkedHashSet<Germplasm>();
-
-			final String additionalQuery = withInventoryOnly ? Germplasm.WHERE_WITH_INVENTORY : "";
-
-			// find germplasms with GID = or like q
-			if (q.matches("(-)?(%)?[(\\d+)(%|_)?]*(%)?")) {
-				SQLQuery p1Query;
-				if (o.equals(Operation.LIKE)) {
-					p1Query = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID_LIKE + additionalQuery);
-					p1Query.setParameter("gid", q);
-				} else {
-					p1Query = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GID + additionalQuery);
-					p1Query.setParameter("gidLength", q.length());
-					p1Query.setParameter("gid", q);
-				}
-
-				p1Query.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
-				this.addInventoryInfo(p1Query);
-				result.addAll(this.getSearchForGermplasmsResult(p1Query.list()));
-			}
-			// find germplasms with inventory_id = or like q
-			result.addAll(this.searchForGermplasmsByInventoryId(q, o, additionalQuery));
-
-			// find germplasms with nVal = or like q
-			SQLQuery p2Query;
-			if (o.equals(Operation.LIKE)) {
-				p2Query = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME_LIKE + additionalQuery);
-			} else {
-				p2Query = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GERMPLASM_NAME + additionalQuery);
-			}
-			p2Query.setParameter("q", q);
-			p2Query.setParameter(GermplasmDAO.Q_NO_SPACES, q.replaceAll(" ", ""));
-			p2Query.setParameter(GermplasmDAO.Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
-			p2Query.setParameter("deletedStatus", GermplasmDAO.STATUS_DELETED);
-			p2Query.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
-			this.addInventoryInfo(p2Query);
-			result.addAll(this.getSearchForGermplasmsResult(p2Query.list()));
-
-			if (includeParents) {
-				resultParents = this.retrieveParents(result);
+			final Set<Germplasm> germplasmSearchResult = new LinkedHashSet<Germplasm>();
+			final Set<Integer> gidSearchResult = this.retrieveGIDSearchResults(q, o, includeParents, withInventoryOnly, includeMGMembers);
+			// return an empty germplasm list when there is no GID search results returned
+			if (gidSearchResult.isEmpty()) {
+				return new ArrayList<Germplasm>(germplasmSearchResult);
 			}
 
-			if (includeMGMembers) {
-				resultMGMembers = this.retrieveMGMembers(result);
-			}
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT g.*, "
+					+ "GROUP_CONCAT(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') AS stockIDs, "
+					+ "CAST(SUM(CASE WHEN gt.trnqty = 0 OR isnull(gt.trnqty) THEN 0 ELSE 1 END) AS UNSIGNED) AS availInv, "
+					+ "COUNT(DISTINCT gl.lotid) AS seedRes, m.mname AS methodName, l.lname AS locationName FROM germplsm g "
+					+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 "
+					+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid AND gt.trnstat <> 9  "
+					+ "LEFT JOIN methods m ON m.mid = g.methn "
+					+ "LEFT JOIN location l ON l.locid = g.glocn "
+					+ "WHERE g.gid IN (:gids) GROUP BY g.gid") ;
 
-			// Add parents and MGMembers to results if specified by "includeParents" and "includeMGMembers" flag
-			result.addAll(resultParents);
-			result.addAll(resultMGMembers);
-			return new ArrayList<Germplasm>(result);
+			queryString.append(this.addSortingColumns(germplasmSearchParameter.getSortState()));
 
-		} catch (final Exception e) {
-			this.logAndThrowException("Error with searchGermplasms(" + q + ") " + e.getMessage(), e);
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("gids", gidSearchResult);
+			query.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
+			query.addScalar(GermplasmDAO.STOCK_IDS);
+			query.addScalar(GermplasmDAO.AVAIL_INV);
+			query.addScalar(GermplasmDAO.SEED_RES);
+			query.addScalar(GermplasmDAO.METHOD_NAME);
+			query.addScalar(GermplasmDAO.LOCATION_NAME);
+			query.setFirstResult(startingRow);
+			query.setMaxResults(noOfEntries);
+
+			germplasmSearchResult.addAll(this.getSearchForGermplasmsResult(query.list()));
+			return new ArrayList<Germplasm>(germplasmSearchResult);
+
+		} catch (final HibernateException e) {
+			String message = "Error with searchForGermplasms(" + q + ") " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<Germplasm>();
 	}
 
-	private Set<Germplasm> retrieveMGMembers(final Set<Germplasm> result) {
-		final Set<Germplasm> resultMGMembers = new LinkedHashSet<Germplasm>();
-		final Set<Integer> mGIds = new LinkedHashSet<Integer>();
-		for (final Germplasm g : result) {
-			if (g.getMgid() != 0) {
-				mGIds.add(g.getMgid());
-			}
+	private String addSortingColumns(final Map<String, Boolean> sortState) {
+		if (sortState.isEmpty()) {
+			return "";
 		}
-		if (!mGIds.isEmpty()) {
-			final SQLQuery pQuery = this.getSession().createSQLQuery(Germplasm.SEARCH_MAINTENANCE_GROUP_MEMBERS_BY_MGID);
-			pQuery.setParameterList("mgids", mGIds);
-			pQuery.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
-			this.addInventoryInfo(pQuery);
-			resultMGMembers.addAll(this.getSearchForGermplasmsResult(pQuery.list()));
-		}
-		return resultMGMembers;
-	}
 
-	private Set<Germplasm> retrieveParents(final Set<Germplasm> result) {
-		final Set<Germplasm> resultParents = new LinkedHashSet<Germplasm>();
-		final Set<Integer> parentGids = new LinkedHashSet<Integer>();
-		for (final Germplasm g : result) {
-			if (g.getGpid1() != null && g.getGpid1() != 0) {
-				parentGids.add(g.getGpid1());
-			}
-			if (g.getGpid2() != null && g.getGpid2() != 0) {
-				parentGids.add(g.getGpid2());
-			}
+		final StringBuilder sortingQuery = new StringBuilder();
+		sortingQuery.append(" ORDER BY ");
+		for (final Map.Entry<String, Boolean> sortCondition : sortState.entrySet()) {
+			final String order = sortCondition.getValue().equals(true) ? "ASC" : "DESC";
+			sortingQuery.append(" " + GermplasmSortableColumn.get(sortCondition.getKey()).getDbColumnName());
+			sortingQuery.append(" " + order);
+			sortingQuery.append(",");
 		}
-		if (!parentGids.isEmpty()) {
-			final SQLQuery pQuery = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_GIDS);
-			pQuery.setParameterList("gids", parentGids);
-			pQuery.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
-			this.addInventoryInfo(pQuery);
-			resultParents.addAll(this.getSearchForGermplasmsResult(pQuery.list()));
-		}
-		return resultParents;
-	}
 
-	private void addInventoryInfo(final SQLQuery query) {
-		query.addScalar(GermplasmDAO.STOCK_IDS);
-		query.addScalar(GermplasmDAO.AVAIL_INV);
-		query.addScalar(GermplasmDAO.SEED_RES);
+		String sortingQueryStr = sortingQuery.toString();
+		// remove unnecessary ',' at end of sorting query
+		sortingQueryStr = sortingQueryStr.substring(0, sortingQuery.lastIndexOf(",")).toString();
+		return sortingQueryStr;
 	}
 
 	private List<Germplasm> getSearchForGermplasmsResult(final List<Object[]> result) {
@@ -923,26 +899,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		inventoryInfo.setActualInventoryLotCount(row[2] != null ? ((BigInteger) row[2]).intValue() : 0);
 		inventoryInfo.setReservedLotCount(row[3] != null ? ((BigInteger) row[3]).intValue() : 0);
 		germplasm.setInventoryInfo(inventoryInfo);
+		germplasm.setMethodName(row[4] != null ? (String) row[4] : "");
+		germplasm.setLocationName(row[5] != null ? (String) row[5] : "");
 		return germplasm;
-	}
-
-	/**
-	 * @param q - inventory / stock id to be searched
-	 * @param o - operation (like, equal)
-	 * @return list of germplasms
-	 */
-	@SuppressWarnings("unchecked")
-	protected List<Germplasm> searchForGermplasmsByInventoryId(final String q, final Operation o, final String additionalQuery) {
-		SQLQuery p1Query;
-		if (o.equals(Operation.LIKE)) {
-			p1Query = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_INVENTORY_ID_LIKE + additionalQuery);
-		} else {
-			p1Query = this.getSession().createSQLQuery(Germplasm.SEARCH_GERMPLASM_BY_INVENTORY_ID + additionalQuery);
-		}
-		p1Query.setParameter(GermplasmDAO.INVENTORY_ID, q);
-		p1Query.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
-		this.addInventoryInfo(p1Query);
-		return this.getSearchForGermplasmsResult(p1Query.list());
 	}
 
 	public Map<Integer, Integer> getGermplasmDatesByGids(final List<Integer> gids) {
@@ -989,14 +948,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final SQLQuery queryNames = this.getSession().createSQLQuery(Germplasm.GET_PARENT_NAMES_BY_STUDY_ID);
 		queryNames.setParameter("projId", studyId);
 
+		@SuppressWarnings("rawtypes")
 		final List resultNames = queryNames.list();
 
 		Name name;
 		final Map<Integer, Map<GermplasmNameType, Name>> names = new HashMap<>();
-		int i = 0;
-
 		for (final Object result : resultNames) {
-			i++;
 			final Object resultArray[] = (Object[]) result;
 			final Integer gid = Integer.valueOf(resultArray[0].toString());
 			final Integer ntype = Integer.valueOf(resultArray[1].toString());
@@ -1035,6 +992,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final List<Germplasm> germplasms = new ArrayList<>();
 		Germplasm g;
 
+		@SuppressWarnings("rawtypes")
 		final List resultGermplasms = queryGermplasms.list();
 		for (final Object result : resultGermplasms) {
 			final Object resultArray[] = (Object[]) result;
@@ -1063,6 +1021,187 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			this.logAndThrowException("Error with getByLGid(lgid=" + lgid + ") query from Germplasm: " + e.getMessage(), e);
 		}
 		return null;
+	}
+
+	public Integer countSearchForGermplasms(final String q, final Operation o, final boolean includeParents,
+			final boolean withInventoryOnly, final boolean includeMGMembers) {
+
+		final Monitor countSearchForGermplasms = MonitorFactory.start("Method Started : countSearchForGermplasms ");
+
+		Integer searchResultsCount = 0;
+
+		final Set<Integer> gidSearchResults = this.retrieveGIDSearchResults(q, o, includeParents, withInventoryOnly, includeMGMembers);
+
+		searchResultsCount = gidSearchResults.size();
+
+		GermplasmDAO.LOG.debug("Method End : countSearchForGermplasms " + countSearchForGermplasms.stop());
+
+		return searchResultsCount;
+	}
+
+	private void searchInGidCriteria(final StringBuilder queryString, final Map<String, String> params, final String q, final Operation o) {
+
+		if (q.matches("(-)?(%)?[(\\d+)(%|_)?]*(%)?")) {
+			queryString.append("SELECT g.gid as GID FROM germplsm g ");
+			if (o.equals(Operation.LIKE)) {
+				queryString.append("WHERE g.gid like :gid ");
+				params.put("gid", q);
+			} else {
+				queryString.append("WHERE g.gid=:gid AND length(g.gid) = :gidLength ");
+				params.put("gidLength", String.valueOf(q.length()));
+				params.put("gid", q);
+			}
+			// make sure to not include deleted germplasm from the search results
+			queryString.append(" AND g.gid!=g.grplce AND g.grplce = 0 " + LIMIT_CLAUSE);
+			queryString.append(" UNION ");
+		}
+	}
+
+	private void searchInStockIdCriteria(final StringBuilder queryString, final Map<String, String> params, final String q,
+			final Operation o) {
+
+		queryString.append("SELECT eid as GID FROM ims_lot l " + "INNER JOIN germplsm g on l.eid = g.gid "
+				+ "INNER JOIN ims_transaction t on l.lotid = t.lotid AND l.etype = 'GERMPLSM' ");
+		if (o.equals(Operation.LIKE)) {
+			queryString.append("WHERE t.inventory_id LIKE :inventory_id");
+		} else {
+			queryString.append("WHERE t.inventory_id = :inventory_id");
+		}
+		params.put("inventory_id", q);
+
+		// make sure to not include deleted germplasm from the search results
+		queryString.append(" AND g.gid!=g.grplce AND g.grplce = 0 " + LIMIT_CLAUSE);
+		queryString.append(" UNION ");
+	}
+
+	private void searchInNamesCriteria(final StringBuilder queryString, final Map<String, String> params, final String q, final Operation o) {
+
+		queryString.append("SELECT n.gid as GID FROM names n ");
+		queryString.append("INNER JOIN germplsm g on n.gid = g.gid ");
+		if (o.equals(Operation.LIKE)) {
+			queryString
+					.append("WHERE n.nstat != :deletedStatus AND (n.nval LIKE :q OR n.nval LIKE :qStandardized OR n.nval LIKE :qNoSpaces)");
+		} else {
+			queryString.append("WHERE n.nstat != :deletedStatus AND (n.nval = :q OR n.nval = :qStandardized OR n.nval = :qNoSpaces)");
+		}
+		params.put("q", q);
+		params.put(GermplasmDAO.Q_NO_SPACES, q.replaceAll(" ", ""));
+		params.put(GermplasmDAO.Q_STANDARDIZED, GermplasmDataManagerUtil.standardizeName(q));
+		params.put("deletedStatus", GermplasmDAO.STATUS_DELETED);
+
+		// make sure to not include deleted germplasm from the search results
+		queryString.append(" AND g.gid!=g.grplce AND g.grplce = 0 " + LIMIT_CLAUSE);
+	}
+
+	@SuppressWarnings("unchecked")
+	private Set<Integer> retrieveGIDSearchResults(final String q, final Operation o, final boolean includeParents,
+			final boolean withInventoryOnly, final boolean includeMGMembers) {
+
+		// return empty search results when keyword is blank or an empty string
+		if ("".equals(q)) {
+			return new HashSet<Integer>();
+		}
+
+		try {
+			final Set<Integer> gidSearchResults = new HashSet<Integer>();
+			final StringBuilder queryString = new StringBuilder();
+			final Map<String, String> params = new HashMap<String, String>();
+
+			queryString.append("SELECT GermplasmSearchResults.GID FROM (");
+
+			// 1. find germplasms with GID = or like q
+			searchInGidCriteria(queryString, params, q, o);
+
+			// 2. find germplasms with inventory_id = or like q
+			searchInStockIdCriteria(queryString, params, q, o);
+
+			// 3. find germplasms with nVal = or like q
+			searchInNamesCriteria(queryString, params, q, o);
+
+			queryString.append(") GermplasmSearchResults ");
+
+			if (withInventoryOnly) {
+				queryString.append(" INNER JOIN ");
+				queryString
+						.append("(SELECT l.eid as GID from ims_lot l INNER JOIN ims_transaction t on l.lotid = t.lotid AND l.etype = 'GERMPLSM' GROUP BY l.eid HAVING SUM(t.trnqty) > 0 ) ");
+				queryString.append(" GermplasmWithInventory ON GermplasmSearchResults.GID = GermplasmWithInventory.GID ");
+			}
+
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			for (final Map.Entry<String, String> param : params.entrySet()) {
+				query.setParameter(param.getKey(), param.getValue());
+			}
+
+			gidSearchResults.addAll(query.list());
+
+			if (includeParents && !gidSearchResults.isEmpty()) {
+				gidSearchResults.addAll(this.retrieveGIDParentsResults(gidSearchResults));
+			}
+
+			if (includeMGMembers && !gidSearchResults.isEmpty()) {
+				gidSearchResults.addAll(this.retrieveGIDGroupMemberResults(gidSearchResults));
+			}
+
+			return gidSearchResults;
+		} catch (final HibernateException e) {
+			String message = "Error with retrieveGIDSearchResults(" + q + ") " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private Set<Integer> retrieveGIDParentsResults(final Set<Integer> gidSearchResults) {
+		try {
+			final Set<Integer> gidParentsSearchResults = new HashSet<Integer>();
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT GermplasmParents.GID FROM (");
+
+			// female parent
+			queryString.append("SELECT g.gpid1 as GID from germplsm g where g.gpid1 != 0 AND g.gid IN (:gids) ");
+			queryString.append(" UNION ");
+
+			// male parent
+			queryString.append("SELECT g.gpid2 as GID from germplsm g where g.gpid1 != 0 AND g.gid IN (:gids) ");
+			queryString.append(" UNION ");
+
+			// other progenitors
+			queryString.append("SELECT p.gid as GID from progntrs p where p.gid IN (:gids)");
+			queryString.append(") GermplasmParents "
+					+ "INNER JOIN germplsm g on GermplasmParents.GID = g.gid AND g.gid!=g.grplce AND g.grplce = 0");
+
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("gids", gidSearchResults);
+
+			gidParentsSearchResults.addAll(query.list());
+
+			return gidParentsSearchResults;
+		} catch (final HibernateException e) {
+			String message = "Error with retrieveGIDParentsResults(GIDS=" + gidSearchResults + ") : " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private Set<Integer> retrieveGIDGroupMemberResults(final Set<Integer> gidSearchResults) {
+		try {
+			final Set<Integer> gidGroupMembersSearchResults = new HashSet<Integer>();
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT members.gid FROM germplsm members WHERE members.gid!=members.grplce AND members.grplce = 0 "
+					+ "AND members.mgid IN (select g.mgid from germplsm g where g.gid IN (:gids) and g.mgid != 0)");
+
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("gids", gidSearchResults);
+
+			gidGroupMembersSearchResults.addAll(query.list());
+			return gidGroupMembersSearchResults;
+
+		} catch (final HibernateException e) {
+			String message = "Error with retrieveGIDGroupMemberResults(GIDS=" + gidSearchResults + ") : " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 
 }

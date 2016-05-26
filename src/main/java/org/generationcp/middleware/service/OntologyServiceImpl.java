@@ -395,8 +395,13 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-					public List<Scale> getAllInventoryScales() throws MiddlewareQueryException {
+	public List<Scale> getAllInventoryScales() throws MiddlewareQueryException {
 		return this.getTermBuilder().getAllInventoryScales();
+	}
+	
+	@Override
+	public Scale getInventoryScaleByName(final String name) throws MiddlewareQueryException {
+		return this.getTermBuilder().getInventoryScaleByName(name);
 	}
 
 	/**
@@ -408,7 +413,7 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	 */
 
 	@Override
-					public List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException {
+	public List<ValueReference> getDistinctStandardVariableValues(int stdVarId) throws MiddlewareQueryException {
 		return this.getValueReferenceBuilder().getDistinctStandardVariableValues(stdVarId);
 	}
 }

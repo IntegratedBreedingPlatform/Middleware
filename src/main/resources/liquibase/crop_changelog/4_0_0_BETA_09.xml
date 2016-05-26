@@ -1,0 +1,30 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="danv" id="1">
+	 	<preConditions onFail="MARK_RAN">
+	    	<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id = 1900 AND name = 'has analysis variable';</sqlCheck>
+	    </preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm VALUES (1900, 1000, 'has analysis variable', 'Relationship between a standard variable and a derived analysis variable', null, 0, 1);
+	    </sql>
+
+		<!-- Alternative Liquibase DSL way of inserting..
+	    <insert tableName="cvterm">
+	        <column name="cvterm_id" value="1900"/>
+	        <column name="cv_id" value="1000"/>
+	        <column name="name" value="has analysis variable"/>
+	        <column name="definition" value="Relationship between a standard variable and a derived analysis variable"/>
+	        <column name="dbxref_id" value=""/>
+	        <column name="is_obsolete" value="0"/>
+	        <column name="is_relationshiptype" value="1"/>
+	    </insert>
+		-->
+	</changeSet>
+</databaseChangeLog>

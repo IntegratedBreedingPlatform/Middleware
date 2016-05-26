@@ -26,6 +26,7 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
+import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -379,6 +380,18 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Method> getAllMethods() {
 		return this.getMethodDao().getAllMethod();
+	}
+
+	@Override
+	public boolean isMethodNamingConfigurationValid(final Integer breedingMethodId) {
+		final Method breedingMethod = this.getMethodByID(breedingMethodId);
+		if (breedingMethod == null) {
+			return false;
+		}
+		final boolean isConfigurationNotEmpty =
+				!(breedingMethod.getSuffix() == null && breedingMethod.getSeparator() == null && breedingMethod.getSnametype() == null
+						&& breedingMethod.getPrefix() == null && breedingMethod.getCount() == null);
+		return isConfigurationNotEmpty;
 	}
 
 	@Override
@@ -1018,17 +1031,30 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Germplasm> searchForGermplasm(final String q, final Operation o, final boolean includeParents,
-			final boolean withInventoryOnly) {
-		return this.searchForGermplasm(q, o, includeParents, withInventoryOnly, false);
-	}
-
-	/*
-	 * Overload the previous method to accommodate the added parameter.
-	 */
-	@Override
-	public List<Germplasm> searchForGermplasm(final String q, final Operation o, final boolean includeParents,
 			final boolean withInventoryOnly, final boolean includeMGMembers) {
 		return this.getGermplasmDao().searchForGermplasms(q, o, includeParents, withInventoryOnly, includeMGMembers);
+	}
+
+	
+	@Override
+	public List<Germplasm> searchForGermplasm(final GermplasmSearchParameter germplasmSearchParameter) {
+		return this.getGermplasmDao().searchForGermplasms(germplasmSearchParameter);
+	}
+
+	/**
+	 * Return the count of germplasm search results based on the following parameters:
+	 * 
+	 * @param q - keyword
+	 * @param o - operation
+	 * @param includeParents - include the parents of the search germplasm
+	 * @param withInventoryOnly - include germplasm with inventory details only
+	 * @param includeMGMembers - include germplasm of the same group of the search germplasm
+	 * @return
+	 */
+	@Override
+	public Integer countSearchForGermplasm(final String q, final Operation o, final boolean includeParents,
+			final boolean withInventoryOnly, final boolean includeMGMembers) {
+		return this.getGermplasmDao().countSearchForGermplasms(q, o, includeParents, withInventoryOnly, includeMGMembers);
 	}
 
 	@Override
