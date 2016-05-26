@@ -146,6 +146,10 @@ public class TermBuilder extends Builder {
 		return list;
 	}
 	
+	public org.generationcp.middleware.domain.oms.Scale getInventoryScaleByName(final String name) throws MiddlewareQueryException {
+		return this.getCvTermDao().getInventoryScaleByName(name);
+	}
+	
 	public Term findOrSaveProperty(String name, String definition, String cropOntologyId, Set<String> traitClasses)
 			throws MiddlewareException {
 		Term term = this.findTermByName(name, CvId.PROPERTIES);

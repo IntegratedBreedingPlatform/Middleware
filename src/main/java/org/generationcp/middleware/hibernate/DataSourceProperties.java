@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Strings;
 
-class XADataSourceProperties {
+public class DataSourceProperties {
 
 	static final String CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT = "connectionpool.borrow.connection.timeout";
 
@@ -20,7 +20,7 @@ class XADataSourceProperties {
 
 	static final String CONNECTIONPOOL_MAX_IDLE_TIME = "connectionpool.max.idle.time";
 
-	static final String CONNECTIONPOOL_TEST_QUERY = "connectionpool.test.query";
+	static final String CONNECTIONPOOL_REAP_TIMEOUT = "connectionpool.reap.timeout";
 
 	static final String CONNECTIONPOOL_XADRIVER_NAME = "connectionpool.xadriver.name";
 
@@ -40,13 +40,11 @@ class XADataSourceProperties {
 
 	private String maintenanceInterval = "60";
 
-	private String maxPoolSize = "50";
+	private String maxPoolSize = "100";
 
 	private String minPoolSize = "3";
 
 	private String port = "3306";
-
-	private String testQuery = "Select 1";
 
 	private String userName = "root";
 
@@ -56,29 +54,31 @@ class XADataSourceProperties {
 
 	private String xaDriverName = "com.mysql.jdbc.jdbc2.optional.MysqlXADataSource";
 
-	private String maxIdleTime = "30";
+	private String maxIdleTime = "120";
 
 	private final String hibernateConfigurationLocation = "classpath:ibpmidware_hib.cfg.xml";
 
-	private static final Logger LOG = LoggerFactory.getLogger(XADataSourceProperties.class);
+	private String reapTimeout = "300";
 
-	XADataSourceProperties(final Properties properties) {
+	private static final Logger LOG = LoggerFactory.getLogger(DataSourceProperties.class);
 
-		this.host = this.getPropertyValue(properties, this.host, XADataSourceProperties.DB_HOST);
-		this.port = this.getPropertyValue(properties, this.port, XADataSourceProperties.DB_PORT);
-		this.userName = this.getPropertyValue(properties, this.userName, XADataSourceProperties.DB_USERNAME);
-		this.password = this.getPropertyValue(properties, this.password, XADataSourceProperties.DB_PASSWORD);
-		this.workbenchDbName = this.getPropertyValue(properties, this.workbenchDbName, XADataSourceProperties.DB_WORKBENCH_NAME);
-		this.xaDriverName = this.getPropertyValue(properties, this.xaDriverName, XADataSourceProperties.CONNECTIONPOOL_XADRIVER_NAME);
+	public DataSourceProperties(final Properties properties) {
+
+		this.host = this.getPropertyValue(properties, this.host, DataSourceProperties.DB_HOST);
+		this.port = this.getPropertyValue(properties, this.port, DataSourceProperties.DB_PORT);
+		this.userName = this.getPropertyValue(properties, this.userName, DataSourceProperties.DB_USERNAME);
+		this.password = this.getPropertyValue(properties, this.password, DataSourceProperties.DB_PASSWORD);
+		this.workbenchDbName = this.getPropertyValue(properties, this.workbenchDbName, DataSourceProperties.DB_WORKBENCH_NAME);
+		this.xaDriverName = this.getPropertyValue(properties, this.xaDriverName, DataSourceProperties.CONNECTIONPOOL_XADRIVER_NAME);
 		this.borrowConnectionTimeout =
 				this.getPropertyValue(properties, this.borrowConnectionTimeout,
-						XADataSourceProperties.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT);
+						DataSourceProperties.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT);
 		this.maintenanceInterval =
-				this.getPropertyValue(properties, this.maintenanceInterval, XADataSourceProperties.CONNECTIONPOOL_MAINTENANCE_INTERVAL);
-		this.testQuery = this.getPropertyValue(properties, this.testQuery, XADataSourceProperties.CONNECTIONPOOL_TEST_QUERY);
-		this.minPoolSize = this.getPropertyValue(properties, this.minPoolSize, XADataSourceProperties.CONNECTIONPOOL_MIN_POOL_SIZE);
-		this.maxPoolSize = this.getPropertyValue(properties, this.maxPoolSize, XADataSourceProperties.CONNECTIONPOOL_MAX_POOL_SIZE);
-		this.maxIdleTime = this.getPropertyValue(properties, this.maxIdleTime, XADataSourceProperties.CONNECTIONPOOL_MAX_IDLE_TIME);
+				this.getPropertyValue(properties, this.maintenanceInterval, DataSourceProperties.CONNECTIONPOOL_MAINTENANCE_INTERVAL);
+		this.minPoolSize = this.getPropertyValue(properties, this.minPoolSize, DataSourceProperties.CONNECTIONPOOL_MIN_POOL_SIZE);
+		this.maxPoolSize = this.getPropertyValue(properties, this.maxPoolSize, DataSourceProperties.CONNECTIONPOOL_MAX_POOL_SIZE);
+		this.maxIdleTime = this.getPropertyValue(properties, this.maxIdleTime, DataSourceProperties.CONNECTIONPOOL_MAX_IDLE_TIME);
+		this.reapTimeout = this.getPropertyValue(properties, this.reapTimeout, DataSourceProperties.CONNECTIONPOOL_REAP_TIMEOUT);
 
 	}
 
@@ -104,7 +104,7 @@ class XADataSourceProperties {
 	/**
 	 * @return the host
 	 */
-	String getHost() {
+	public String getHost() {
 		return this.host;
 	}
 
@@ -132,28 +132,21 @@ class XADataSourceProperties {
 	/**
 	 * @return the port
 	 */
-	String getPort() {
+	public String getPort() {
 		return this.port;
-	}
-
-	/**
-	 * @return the testQuery
-	 */
-	String getTestQuery() {
-		return this.testQuery;
 	}
 
 	/**
 	 * @return the userName
 	 */
-	String getUserName() {
+	public String getUserName() {
 		return this.userName;
 	}
 
 	/**
 	 * @return the workbenchDbName
 	 */
-	String getWorkbenchDbName() {
+	public String getWorkbenchDbName() {
 		return this.workbenchDbName;
 	}
 
@@ -183,6 +176,10 @@ class XADataSourceProperties {
 	 */
 	public String getHibernateConfigurationLocation() {
 		return this.hibernateConfigurationLocation;
+	}
+
+	public String getReapTimeout() {
+		return this.reapTimeout ;
 	}
 
 }
