@@ -272,7 +272,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetProjectByName() throws MiddlewareQueryException {
-		Project project = this.workbenchDataManager.getProjectByName(this.commonTestProject.getProjectName());
+		Project project = this.workbenchDataManager.getProjectByNameAndCrop(this.commonTestProject.getProjectName(), this
+				.commonTestProject.getCropType());
 		Assert.assertEquals(this.commonTestProject.getProjectName(), project.getProjectName());
 	}
 

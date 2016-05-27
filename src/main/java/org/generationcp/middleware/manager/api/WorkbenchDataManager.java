@@ -307,10 +307,11 @@ public interface WorkbenchDataManager {
 	 * Gets a project by name. Should return only one value.
 	 *
 	 * @param projectName - the project name to match
+	 * @param cropType - the crop type to search for a name (name is unique per crop type)
 	 * @return the project matching the given name
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Project getProjectByName(String projectName) throws MiddlewareQueryException;
+	Project getProjectByNameAndCrop(String projectName, CropType cropType) throws MiddlewareQueryException;
 
 	/**
 	 * Gets a project by Uuid. Should return only one value.

@@ -580,8 +580,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Project getProjectByName(String projectName) throws MiddlewareQueryException {
-		return this.getProjectDao().getByName(projectName);
+	public Project getProjectByNameAndCrop(final String projectName, final CropType cropType) throws MiddlewareQueryException {
+		return this.getProjectDao().getProjectByNameAndCrop(projectName, cropType);
 	}
 
 	@Override
