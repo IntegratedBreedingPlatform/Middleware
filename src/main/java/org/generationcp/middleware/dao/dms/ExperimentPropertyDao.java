@@ -81,6 +81,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(" , col.value AS col ")
 							.append(" , blk.value AS block_id ")
 							.append(" , inst.description AS trialInstance ")
+                            //Casting inst.description to signed for natural sort
+                            .append(" , CAST(inst.description as SIGNED) AS casted_trialInstance")
 							.append(" , st.name AS studyName ")
 							.append(" , s.dbxref_id AS gid ")
 							.append(" , ppStartDate.value as startDate ")
@@ -131,7 +133,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("       AND col.type_id = ").append(TermId.COLUMN_NO.getId())
 							.append(" LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
 							.append("       AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
-							.append(" ORDER BY inst.description, eproj.nd_experiment_id ").append(order);
+							.append(" ORDER BY casted_trialInstance, inst.description, eproj.nd_experiment_id ").append(order);
 
 			final Query query =
 					this.getSession().createSQLQuery(sql.toString()).addScalar("datasetId").addScalar("datasetName")

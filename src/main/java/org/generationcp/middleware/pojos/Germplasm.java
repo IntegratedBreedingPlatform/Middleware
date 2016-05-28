@@ -434,6 +434,22 @@ public class Germplasm implements Serializable, Auditable {
 	@Transient
 	private String accessionName = null;
 
+	/**
+	* This variable is populated when the user tries to search germplasm list.
+	* Previously, germplasm list is loaded and revisit the DB for each germplasm for getting method name.
+	* This problem is removed by introducing this variable.
+	*/
+	@Transient
+	private String methodName = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 * Previously, germplasm list is loaded and revisit the DB for each germplasm for getting location name.
+	 * This problem is removed by introducing this variable.
+	 */
+	@Transient
+	private String locationName = null;
+
 	public Germplasm() {
 	}
 
@@ -605,6 +621,22 @@ public class Germplasm implements Serializable, Auditable {
 		return this.method;
 	}
 
+	public String getMethodName() {
+		return methodName;
+	}
+
+	public void setMethodName(String methodName) {
+		this.methodName = methodName;
+	}
+
+	public String getLocationName() {
+		return locationName;
+	}
+
+	public void setLocationName(String locationName) {
+		this.locationName = locationName;
+	}
+
 	@Override
 	public boolean equals(final Object obj) {
 		if (obj == null) {
@@ -661,6 +693,10 @@ public class Germplasm implements Serializable, Auditable {
 		builder.append(this.method);
 		builder.append(", inventoryInfo=");
 		builder.append(this.inventoryInfo);
+		builder.append(", methodName=");
+		builder.append(this.methodName);
+		builder.append(", locationName=");
+		builder.append(this.locationName);
 		builder.append("]");
 		return builder.toString();
 	}

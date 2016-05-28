@@ -13,8 +13,13 @@ package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -69,8 +74,14 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		criteria.add(Restrictions.ne(GERMPLASM_LIST_DATA_TABLE_STATUS_COLUMN, GermplasmListDataDAO.STATUS_DELETED));
 		criteria.add(Restrictions.neProperty(GERMPLASM_GRPLCE_COLUMN, GERMPLASM_GID_COLUMN));
 		criteria.addOrder(Order.asc(GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN));
-		return criteria.list();
-
+		List<GermplasmListData> germplasmListDataList = criteria.list();
+		for (final GermplasmListData germplasmListData : germplasmListDataList) {
+			final Germplasm germplasm = germplasmListData.getGermplasm();
+			if(germplasm != null) {
+				germplasmListData.setGroupId(germplasm.getMgid());
+			}
+		}
+		return germplasmListDataList;
 	}
 
 	public long countByListId(final Integer id) {
