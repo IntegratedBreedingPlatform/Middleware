@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.manager.ontology;
 
-import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,10 +12,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import com.google.common.base.Function;
-import com.google.common.base.Strings;
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
@@ -52,14 +47,16 @@ import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
-import org.generationcp.middleware.util.*;
+import org.generationcp.middleware.util.Clock;
+import org.generationcp.middleware.util.ISO8601DateParser;
+import org.generationcp.middleware.util.StringUtil;
+import org.generationcp.middleware.util.SystemClock;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
-
 
 import com.google.common.base.Function;
 import com.google.common.base.Strings;
@@ -245,12 +242,12 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 				} else if (r.getTypeId() == TermId.HAS_PROPERTY.getId()) {
 					variable.setProperty(this.propertyManager.getProperty(r.getObjectId(), filterObsolete));
 				} else if (r.getTypeId() == TermId.HAS_SCALE.getId()) {
-					variable.setScale(this.scaleManager.getScaleById(r.getObjectId(), filterObsolete));
+					variable.setScale(this.scaleManager.getScale(r.getObjectId(), filterObsolete));
 				}
 			}
 
 			// Variable Types, Created, modified from CVTermProperty
-			final List properties = propertyDao.getByCvTermId(term.getCvTermId());
+			final List<CVTermProperty> properties = propertyDao.getByCvTermId(term.getCvTermId());
 
 			for (final CVTermProperty property : properties) {
 				if (property.getTypeId() == TermId.VARIABLE_TYPE.getId()) {
@@ -275,7 +272,7 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 
 			// Get favorite from ProgramFavoriteDAO
 			final ProgramFavorite programFavorite =
-					this.getProgramFavoriteDao().getProgramFavorite(programUuid, ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
+					programFavoriteDao.getProgramFavorite(programUuid, ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
 			variable.setIsFavorite(programFavorite != null);
 
 			if (calculateVariableUsage) {
@@ -285,7 +282,7 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 				// setting variable observations, first observations will be null so set it to 0
 				variable.setObservations(0);
 				for (final VariableType v : variable.getVariableTypes()) {
-					final long observation = this.getExperimentDao().countByObservedVariable(id, v.getId());
+					final long observation = this.ontologyDaoFactory.getExperimentDao().countByObservedVariable(id, v.getId());
 					variable.setObservations((int) (variable.getObservations() + observation));
 				}
 			} else {
@@ -306,10 +303,10 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 	}
 
 	@Override
-	public void processTreatmentFactorHasPairValue(final List<Variable> summaryList, final List<Integer> hiddenFields) throw MiddlewareQueryException {
+	public void processTreatmentFactorHasPairValue(final List<Variable> summaryList, final List<Integer> hiddenFields) throws MiddlewareQueryException {
 		for (final Variable variable : summaryList) {
 			variable.setHasPair(
-					this.getCvTermDao().hasPossibleTreatmentPairs(variable.getId(), variable.getProperty().getId(), hiddenFields));
+					this.ontologyDaoFactory.getCvTermDao().hasPossibleTreatmentPairs(variable.getId(), variable.getProperty().getId(), hiddenFields));
 		}
 	}
 
@@ -322,7 +319,7 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 		VariableOverridesDao programOverridesDao = this.ontologyDaoFactory.getVariableProgramOverridesDao();
 		ProgramFavoriteDAO programFavoriteDao = this.ontologyDaoFactory.getProgramFavoriteDao();
 
-		final CVTerm term = this.getCvTermDao().getByNameAndCvId(variableInfo.getName(), CvId.VARIABLES.getId());
+		final CVTerm term = termDao.getByNameAndCvId(variableInfo.getName(), CvId.VARIABLES.getId());
 
 		if (term != null) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_EXIST_WITH_SAME_NAME);
@@ -646,7 +643,7 @@ public class OntologyVariableDataManagerImpl implements OntologyVariableDataMana
 			if (!synonymFound) {
 				final CVTermSynonym cvTermSynonym =
 						CvTermSynonymDao.buildCvTermSynonym(term.getCvTermId(), oldVariableName, NameType.ALTERNATIVE_ENGLISH.getId());
-				this.getCvTermSynonymDao().save(cvTermSynonym);
+				this.ontologyDaoFactory.getCvTermSynonymDao().save(cvTermSynonym);
 			}
 		}
 	}
