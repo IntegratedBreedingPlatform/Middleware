@@ -21,6 +21,8 @@ public class DataSourceProperties {
 	static final String CONNECTIONPOOL_MAX_IDLE_TIME = "connectionpool.max.idle.time";
 
 	static final String CONNECTIONPOOL_REAP_TIMEOUT = "connectionpool.reap.timeout";
+	
+	static final String CONNECTIONPOOL_TEST_QUERY = "connectionpool.test.query";
 
 	static final String CONNECTIONPOOL_XADRIVER_NAME = "connectionpool.xadriver.name";
 
@@ -46,6 +48,12 @@ public class DataSourceProperties {
 
 	private String port = "3306";
 
+	/**
+	 * Test query is essential to make sure that we can recover from erroneous connections. Even thought this property is deprecated 
+	 * by Atomikos please do not remove.
+	 */
+	private String testQuery = "Select 1";
+	
 	private String userName = "root";
 
 	private String password = "";
@@ -62,6 +70,7 @@ public class DataSourceProperties {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataSourceProperties.class);
 
+
 	public DataSourceProperties(final Properties properties) {
 
 		this.host = this.getPropertyValue(properties, this.host, DataSourceProperties.DB_HOST);
@@ -75,6 +84,7 @@ public class DataSourceProperties {
 						DataSourceProperties.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT);
 		this.maintenanceInterval =
 				this.getPropertyValue(properties, this.maintenanceInterval, DataSourceProperties.CONNECTIONPOOL_MAINTENANCE_INTERVAL);
+		this.testQuery = this.getPropertyValue(properties, this.testQuery, DataSourceProperties.CONNECTIONPOOL_TEST_QUERY);
 		this.minPoolSize = this.getPropertyValue(properties, this.minPoolSize, DataSourceProperties.CONNECTIONPOOL_MIN_POOL_SIZE);
 		this.maxPoolSize = this.getPropertyValue(properties, this.maxPoolSize, DataSourceProperties.CONNECTIONPOOL_MAX_POOL_SIZE);
 		this.maxIdleTime = this.getPropertyValue(properties, this.maxIdleTime, DataSourceProperties.CONNECTIONPOOL_MAX_IDLE_TIME);
@@ -134,6 +144,13 @@ public class DataSourceProperties {
 	 */
 	public String getPort() {
 		return this.port;
+	}
+
+	/**
+	 * @return the testQuery
+	 */
+	String getTestQuery() {
+		return this.testQuery;
 	}
 
 	/**
