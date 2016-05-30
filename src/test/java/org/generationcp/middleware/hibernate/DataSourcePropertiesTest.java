@@ -12,6 +12,10 @@ public class DataSourcePropertiesTest {
 
 	private final Properties properties = Mockito.mock(Properties.class);
 
+	/**
+	 * This test makes sure that the DataSourceProperties constructor overrides default properties when specified in a property file.
+	 * 
+	 */
 	@Test
 	public void testXADataSourceProperties() throws Exception {
 
@@ -30,6 +34,7 @@ public class DataSourcePropertiesTest {
 		Assert.assertEquals(xaDataSourceProperties.getMinPoolSize(), XATestUtility.CONNECTIONPOOL_MIN_POOL_SIZE);
 		Assert.assertEquals(xaDataSourceProperties.getMaxPoolSize(), XATestUtility.CONNECTIONPOOL_MAX_POOL_SIZE);
 		Assert.assertEquals(xaDataSourceProperties.getMaxIdleTime(), XATestUtility.CONNECTIONPOOL_MAX_IDLE_TIME);
+		Assert.assertEquals(xaDataSourceProperties.getTestQuery(), XATestUtility.CONNECTIONPOOL_TEST_QUERY);
 
 		Assert.assertEquals(xaDataSourceProperties.getHibernateConfigurationLocation(), "classpath:ibpmidware_hib.cfg.xml");
 
@@ -53,6 +58,7 @@ public class DataSourcePropertiesTest {
 		Assert.assertEquals(xaDataSourceProperties.getMinPoolSize(), "3");
 		Assert.assertEquals(xaDataSourceProperties.getMaxPoolSize(), "100");
 		Assert.assertEquals(xaDataSourceProperties.getMaxIdleTime(), "120");
+		Assert.assertEquals(xaDataSourceProperties.getTestQuery(), "Select 1");
 
 		Assert.assertEquals(xaDataSourceProperties.getHibernateConfigurationLocation(), "classpath:ibpmidware_hib.cfg.xml");
 
