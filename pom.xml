@@ -446,6 +446,7 @@
 						<include>**/GermplasmNamingServiceImplTest.java</include>
 						<include>**/GermplasmNamingReferenceDataResolverImplTest.java</include>
 						<include>**/MethodTest.java</include>
+						<include>**/GermplasmListDataDAOTest.java</include>
 
 						<!-- New Ontology Manager Tests -->
 						<include>**/CvTermDaoTest.java</include>
@@ -462,6 +463,8 @@
 						<include>**/WorkbenchDataManagerImplTest.java</include>
 						<include>**/TermDataManagerImplTest.java</include>
 						<include>**/VariableTypeListTransformerTest.java</include>
+
+
 
 						<!-- Pedigree String Generation Test -->
 						<include>**/AncestryTreeServiceTest.java</include>
