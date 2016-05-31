@@ -474,25 +474,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testProjectBackups() throws MiddlewareQueryException {
-		ProjectBackup projectBackup = new ProjectBackup();
-		projectBackup.setProjectId(this.commonTestProject.getProjectId());
-		projectBackup.setBackupPath("target/resource" + this.commonTestProject.getProjectId());
-		projectBackup.setBackupTime(Util.getCurrentDate());
-
-		this.workbenchDataManager.saveOrUpdateProjectBackup(projectBackup);
-		Assert.assertNotNull(projectBackup.getProjectBackupId());
-
-		List<ProjectBackup> projectBackupsAll = this.workbenchDataManager.getProjectBackups();
-		Assert.assertNotNull(projectBackupsAll);
-		Assert.assertTrue(!projectBackupsAll.isEmpty());
-
-		List<ProjectBackup> projectBackups = this.workbenchDataManager.getProjectBackups(this.commonTestProject);
-		Assert.assertNotNull(projectBackups);
-		Assert.assertTrue(!projectBackups.isEmpty());
-	}
-
-	@Test
 	public void testCountAllPersons() throws MiddlewareQueryException {
 		long count = this.workbenchDataManager.countAllPersons();
 		Assert.assertTrue(count > 0);

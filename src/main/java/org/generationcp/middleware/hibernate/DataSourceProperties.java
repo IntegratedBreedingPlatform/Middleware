@@ -20,7 +20,7 @@ public class DataSourceProperties {
 
 	static final String CONNECTIONPOOL_MAX_IDLE_TIME = "connectionpool.max.idle.time";
 
-	static final String CONNECTIONPOOL_TEST_QUERY = "connectionpool.test.query";
+	static final String CONNECTIONPOOL_REAP_TIMEOUT = "connectionpool.reap.timeout";
 
 	static final String CONNECTIONPOOL_XADRIVER_NAME = "connectionpool.xadriver.name";
 
@@ -40,13 +40,11 @@ public class DataSourceProperties {
 
 	private String maintenanceInterval = "60";
 
-	private String maxPoolSize = "50";
+	private String maxPoolSize = "100";
 
 	private String minPoolSize = "3";
 
 	private String port = "3306";
-
-	private String testQuery = "Select 1";
 
 	private String userName = "root";
 
@@ -56,9 +54,11 @@ public class DataSourceProperties {
 
 	private String xaDriverName = "com.mysql.jdbc.jdbc2.optional.MysqlXADataSource";
 
-	private String maxIdleTime = "30";
+	private String maxIdleTime = "120";
 
 	private final String hibernateConfigurationLocation = "classpath:ibpmidware_hib.cfg.xml";
+
+	private String reapTimeout = "300";
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataSourceProperties.class);
 
@@ -75,10 +75,10 @@ public class DataSourceProperties {
 						DataSourceProperties.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT);
 		this.maintenanceInterval =
 				this.getPropertyValue(properties, this.maintenanceInterval, DataSourceProperties.CONNECTIONPOOL_MAINTENANCE_INTERVAL);
-		this.testQuery = this.getPropertyValue(properties, this.testQuery, DataSourceProperties.CONNECTIONPOOL_TEST_QUERY);
 		this.minPoolSize = this.getPropertyValue(properties, this.minPoolSize, DataSourceProperties.CONNECTIONPOOL_MIN_POOL_SIZE);
 		this.maxPoolSize = this.getPropertyValue(properties, this.maxPoolSize, DataSourceProperties.CONNECTIONPOOL_MAX_POOL_SIZE);
 		this.maxIdleTime = this.getPropertyValue(properties, this.maxIdleTime, DataSourceProperties.CONNECTIONPOOL_MAX_IDLE_TIME);
+		this.reapTimeout = this.getPropertyValue(properties, this.reapTimeout, DataSourceProperties.CONNECTIONPOOL_REAP_TIMEOUT);
 
 	}
 
@@ -137,13 +137,6 @@ public class DataSourceProperties {
 	}
 
 	/**
-	 * @return the testQuery
-	 */
-	String getTestQuery() {
-		return this.testQuery;
-	}
-
-	/**
 	 * @return the userName
 	 */
 	public String getUserName() {
@@ -183,6 +176,10 @@ public class DataSourceProperties {
 	 */
 	public String getHibernateConfigurationLocation() {
 		return this.hibernateConfigurationLocation;
+	}
+
+	public String getReapTimeout() {
+		return this.reapTimeout ;
 	}
 
 }

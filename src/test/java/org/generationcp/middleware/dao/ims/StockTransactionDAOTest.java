@@ -102,6 +102,7 @@ public class StockTransactionDAOTest extends IntegrationTestBase {
 			Assert.assertNotNull(inventoryDetails.getSourceRecordId());
 			Assert.assertNotNull(inventoryDetails.getLotGid());
 			Assert.assertNotNull(inventoryDetails.getStockSourceRecordId());
+			Assert.assertNotNull(inventoryDetails.getGroupId());
 			if (inventoryDetails.isBulkingCompleted()) {
 				Assert.assertEquals(InventoryDetails.BULK_COMPL_COMPLETED, inventoryDetails.getBulkCompl());
 			}
