@@ -36,6 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ReportServiceImpl extends Service implements ReportService {
 
+    public static final String DEFAULT_STRING_VALUE = "NA";
+    public static final String BLANK_STRING_VALUE = "";
+    public static final String DEFAULT_INTEGER_STRING_VALUE = "0";
     private final ReporterFactory factory = ReporterFactory.instance();
 
 	public ReportServiceImpl() {
@@ -150,7 +153,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 
 			final MeasurementVariable abbrevInfo = new MeasurementVariable();
 			abbrevInfo.setName(AbstractReporter.LOCATION_ABBREV_VARIABLE_NAME);
-            abbrevInfo.setProperty("");
+            abbrevInfo.setProperty(BLANK_STRING_VALUE);
 			abbrevInfo.setValue(location.getLabbr());
 
 			variables.add(abbrevInfo);
@@ -179,7 +182,7 @@ public class ReportServiceImpl extends Service implements ReportService {
             final MeasurementData abbrevData = new MeasurementData();
             final MeasurementVariable abbrevInfo = new MeasurementVariable();
             abbrevInfo.setName(AbstractReporter.LOCATION_ABBREV_VARIABLE_NAME);
-            abbrevInfo.setProperty("");
+            abbrevInfo.setProperty(BLANK_STRING_VALUE);
             abbrevData.setValue(location.getLabbr());
             abbrevData.setMeasurementVariable(abbrevInfo);
 
@@ -190,18 +193,18 @@ public class ReportServiceImpl extends Service implements ReportService {
         }
     }
 
-    protected MeasurementVariable createPlaceholderCountryMeasurementVariable(String countryISO) {
+    protected MeasurementVariable createPlaceholderCountryMeasurementVariable(final String countryISO) {
         final MeasurementVariable countryInfo = new MeasurementVariable();
         countryInfo.setName(AbstractReporter.COUNTRY_VARIABLE_NAME);
         countryInfo.setValue(countryISO);
-        countryInfo.setProperty("");
+        countryInfo.setProperty(BLANK_STRING_VALUE);
 
         return countryInfo;
     }
 
-    protected MeasurementData createPlaceholderCountryMeasurementData(String countryISO) {
-        MeasurementData countryData = new MeasurementData();
-        MeasurementVariable countryVariable = createPlaceholderCountryMeasurementVariable(countryISO);
+    protected MeasurementData createPlaceholderCountryMeasurementData(final String countryISO) {
+        final MeasurementData countryData = new MeasurementData();
+        final MeasurementVariable countryVariable = createPlaceholderCountryMeasurementVariable(countryISO);
         countryData.setValue(countryISO);
         countryData.setMeasurementVariable(countryVariable);
 
@@ -265,34 +268,59 @@ public class ReportServiceImpl extends Service implements ReportService {
 			final GermplasmPedigreeTreeNode germNode = germNodes.get(gid);
 
 			if (germNode == null || (germNode.getFemaleParent() == null && germNode.getMaleParent() == null)) {
-				continue;
-			}
-
-			final GermplasmPedigreeTreeNode femaleNode = germNode.getFemaleParent();
-			final GermplasmPedigreeTreeNode maleNode = germNode.getMaleParent();
-            final Germplasm female = femaleNode == null ? null : femaleNode.getGermplasm();
-			final Germplasm male = maleNode == null ? null : maleNode.getGermplasm();
-
-			// TODO: pending values for origin of the entries (most likely resolved in BMS-2211)
-			row.getDataList().add(
-					new MeasurementData(AbstractReporter.FEMALE_SELECTION_HISTORY_KEY, female == null ? "" : female.getSelectionHistory()));
-			row.getDataList().add(
-					new MeasurementData(AbstractReporter.FEMALE_CROSS_NAME_KEY, female == null ? "" : female.getSelectionHistory()));
-			row.getDataList().add(new MeasurementData(AbstractReporter.FEMALE_TRIAL_ABBREVIATION_KEY, "NA"));
-			row.getDataList().add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_CYCLE_KEY, "NA"));
-			row.getDataList().add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_ENTRY_KEY, "0"));
-			row.getDataList().add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_LOCATION_ID_KEY, "0"));
-
-			row.getDataList().add(
-					new MeasurementData(AbstractReporter.MALE_SELECTION_HISTORY_KEY, male == null ? "" : male.getSelectionHistory()));
-			row.getDataList()
-					.add(new MeasurementData(AbstractReporter.MALE_CROSS_NAME_KEY, male == null ? "" : male.getSelectionHistory()));
-
-			row.getDataList().add(new MeasurementData(AbstractReporter.MALE_TRIAL_ABBREVIATION_KEY, "NA"));
-			row.getDataList().add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_CYCLE_KEY, "NA"));
-			row.getDataList().add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_ENTRY_KEY, "0"));
-			row.getDataList().add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_LOCATION_ID_KEY, "0"));
+				provideBlankParentInformationValues(row.getDataList());
+			} else {
+                provideParentInformation(germNode, row.getDataList());
+            }
 
 		}
 	}
+
+    void provideParentInformation(final GermplasmPedigreeTreeNode germNode, final List<MeasurementData> dataRow) {
+        final GermplasmPedigreeTreeNode femaleNode = germNode.getFemaleParent();
+        final GermplasmPedigreeTreeNode maleNode = germNode.getMaleParent();
+        final Germplasm female = femaleNode == null ? null : femaleNode.getGermplasm();
+        final Germplasm male = maleNode == null ? null : maleNode.getGermplasm();
+
+        // TODO: pending values for origin of the entries (most likely resolved in BMS-2211)
+        dataRow.add(
+                new MeasurementData(AbstractReporter.FEMALE_SELECTION_HISTORY_KEY, female == null ? BLANK_STRING_VALUE : female.getSelectionHistory()));
+        dataRow.add(
+                new MeasurementData(AbstractReporter.FEMALE_CROSS_NAME_KEY, female == null ? BLANK_STRING_VALUE : female.getSelectionHistory()));
+        dataRow.add(new MeasurementData(AbstractReporter.FEMALE_TRIAL_ABBREVIATION_KEY, DEFAULT_STRING_VALUE));
+        dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_CYCLE_KEY, DEFAULT_STRING_VALUE));
+        dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_ENTRY_KEY, DEFAULT_INTEGER_STRING_VALUE));
+        dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_LOCATION_ID_KEY, DEFAULT_INTEGER_STRING_VALUE));
+
+        dataRow.add(
+                new MeasurementData(AbstractReporter.MALE_SELECTION_HISTORY_KEY, male == null ? BLANK_STRING_VALUE : male.getSelectionHistory()));
+        dataRow
+                .add(new MeasurementData(AbstractReporter.MALE_CROSS_NAME_KEY, male == null ? BLANK_STRING_VALUE : male.getSelectionHistory()));
+
+        dataRow.add(new MeasurementData(AbstractReporter.MALE_TRIAL_ABBREVIATION_KEY, DEFAULT_STRING_VALUE));
+        dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_CYCLE_KEY, DEFAULT_STRING_VALUE));
+        dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_ENTRY_KEY, DEFAULT_INTEGER_STRING_VALUE));
+        dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_LOCATION_ID_KEY, DEFAULT_INTEGER_STRING_VALUE));
+    }
+
+    void provideBlankParentInformationValues(final List<MeasurementData> dataRow) {
+        dataRow.add(
+                new MeasurementData(AbstractReporter.FEMALE_SELECTION_HISTORY_KEY, BLANK_STRING_VALUE));
+        dataRow.add(
+                new MeasurementData(AbstractReporter.FEMALE_CROSS_NAME_KEY, BLANK_STRING_VALUE));
+        dataRow.add(new MeasurementData(AbstractReporter.FEMALE_TRIAL_ABBREVIATION_KEY, BLANK_STRING_VALUE));
+        dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_CYCLE_KEY, BLANK_STRING_VALUE));
+        dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_ENTRY_KEY, DEFAULT_INTEGER_STRING_VALUE));
+        dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_LOCATION_ID_KEY, DEFAULT_INTEGER_STRING_VALUE));
+
+        dataRow.add(
+                new MeasurementData(AbstractReporter.MALE_SELECTION_HISTORY_KEY, BLANK_STRING_VALUE));
+        dataRow
+                .add(new MeasurementData(AbstractReporter.MALE_CROSS_NAME_KEY, BLANK_STRING_VALUE));
+
+        dataRow.add(new MeasurementData(AbstractReporter.MALE_TRIAL_ABBREVIATION_KEY, BLANK_STRING_VALUE));
+        dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_CYCLE_KEY, BLANK_STRING_VALUE));
+        dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_ENTRY_KEY, DEFAULT_INTEGER_STRING_VALUE));
+        dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_LOCATION_ID_KEY, DEFAULT_INTEGER_STRING_VALUE));
+    }
 }
