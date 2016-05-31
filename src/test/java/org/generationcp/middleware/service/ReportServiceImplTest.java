@@ -21,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -76,17 +77,42 @@ public class ReportServiceImplTest {
 
 		Mockito.doReturn(pedigreeTreeNodeMap).when(this.germplasmDataManager).getDirectParentsForStudy(TEST_STUDY_ID);
 		Mockito.doCallRealMethod().when(unitUnderTest).appendParentsInformation(TEST_STUDY_ID, measurementRowList);
+        Mockito.doCallRealMethod().when(unitUnderTest).provideParentInformation(Mockito.any(GermplasmPedigreeTreeNode.class), Mockito.anyList());
 
 		unitUnderTest.appendParentsInformation(TEST_STUDY_ID, measurementRowList);
 
 		final MeasurementRow row = measurementRowList.get(0);
-		Assert.assertEquals("Female selection history should be blank if female parent information is not provided in database", "", row
+		Assert.assertEquals("Female selection history should be blank if female parent information is not provided in database", ReportServiceImpl.BLANK_STRING_VALUE, row
 				.getMeasurementData(AbstractReporter.FEMALE_SELECTION_HISTORY_KEY).getValue());
 		Assert.assertEquals("Male selection history not properly filled in from provided information",
 				GermplasmDataManagerDataInitializer.MALE_SELECTION_HISTORY,
 				row.getMeasurementData(AbstractReporter.MALE_SELECTION_HISTORY_KEY).getValue());
 
 	}
+
+    @Test
+    public void testAppendParentInfoNoParentsAvailable() {
+        // we use partial mocking on the ReportServiceImplementation so as to be able to mock the GermplasmDataManager object
+        final ReportServiceImpl unitUnderTest = Mockito.mock(ReportServiceImpl.class);
+        Mockito.doReturn(this.germplasmDataManager).when(unitUnderTest).getGermplasmDataManager();
+
+        final List<MeasurementRow> measurementRowList = createMeasurementList();
+
+        // here we create a new empty map to simulate a scenario when no parental information is available for the given input
+        Mockito.doReturn(new HashMap<Integer, GermplasmPedigreeTreeNode>()).when(this.germplasmDataManager).getDirectParentsForStudy(TEST_STUDY_ID);
+        Mockito.doCallRealMethod().when(unitUnderTest).appendParentsInformation(TEST_STUDY_ID, measurementRowList);
+        Mockito.doCallRealMethod().when(unitUnderTest).provideBlankParentInformationValues(Mockito.anyList());
+
+        unitUnderTest.appendParentsInformation(TEST_STUDY_ID, measurementRowList);
+
+        final MeasurementRow row = measurementRowList.get(0);
+        Assert.assertEquals("Female selection history should be blank if female parent information is not provided in database", ReportServiceImpl.BLANK_STRING_VALUE, row
+                .getMeasurementData(AbstractReporter.FEMALE_SELECTION_HISTORY_KEY).getValue());
+        Assert.assertEquals("Male selection history should be blank if female parent information is not provided in database",
+                ReportServiceImpl.BLANK_STRING_VALUE,
+                row.getMeasurementData(AbstractReporter.MALE_SELECTION_HISTORY_KEY).getValue());
+
+    }
 
 	protected List<MeasurementRow> createMeasurementList() {
 		final List<MeasurementRow> rowList = new ArrayList<>();
