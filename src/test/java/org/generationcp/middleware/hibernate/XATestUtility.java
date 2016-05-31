@@ -19,6 +19,7 @@ public class XATestUtility {
 	public static final Object CONNECTIONPOOL_MIN_POOL_SIZE = "50";
 	public static final Object CONNECTIONPOOL_MAX_POOL_SIZE = "100";
 	public static final Object CONNECTIONPOOL_MAX_IDLE_TIME = "300";
+	public static final Object CONNECTIONPOOL_TEST_QUERY = "Select 1";
 
 	static DataSourceProperties mockProperties() {
 		final Properties properties = Mockito.mock(Properties.class);
@@ -40,7 +41,11 @@ public class XATestUtility {
 		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_MAX_POOL_SIZE)).thenReturn(
 				XATestUtility.CONNECTIONPOOL_MAX_POOL_SIZE);
 		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_MAX_IDLE_TIME)).thenReturn(
+		
 				XATestUtility.CONNECTIONPOOL_MAX_IDLE_TIME);
+		Mockito.when(properties.get(DataSourceProperties.CONNECTIONPOOL_TEST_QUERY)).thenReturn(
+				XATestUtility.CONNECTIONPOOL_TEST_QUERY);
+		
 
 		final DataSourceProperties xaDataSourceProperties = new DataSourceProperties(properties);
 		return xaDataSourceProperties;
