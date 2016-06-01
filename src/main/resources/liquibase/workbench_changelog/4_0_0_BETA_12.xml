@@ -1,11 +1,8 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
-		http://www.liquibase.org/xml/ns/dbchangelog-ext
-		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
 	<changeSet author="danv" id="beta12-1">
 		<preConditions onFail="MARK_RAN">
@@ -46,4 +43,46 @@
 		</preConditions>
 		<addUniqueConstraint constraintName="uk_project_name" tableName="workbench_project" columnNames="project_name ASC, crop_type ASC"/>
 	</changeSet>
+
+    <changeSet author="keyurbhatt" id="beta12-7">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'germplasm_browser'</sqlCheck>
+            </and>
+            <and>
+                <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'study_browser'</sqlCheck>
+            </and>
+            <and>
+                <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'germplasm_list_browser'</sqlCheck>
+            </and>
+            <and>
+                <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'germplasm_mainheadtohead'</sqlCheck>
+            </and>
+            <and>
+                <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'query_for_adapted_germplasm'</sqlCheck>
+            </and>
+            <and>
+                <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'study_browser_with_id'</sqlCheck>
+            </and>
+            <and>
+                <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'trait_donor_query'</sqlCheck>
+            </and>
+        </preConditions>
+        <sql dbms="mysql" splitStatements="true">
+            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/germplasm/' WHERE `name`='germplasm_browser';
+
+            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/study/' WHERE `name`='study_browser';
+
+            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/germplasmlist/' WHERE `name`='germplasm_list_browser';
+
+            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/Head_to_head_comparison' WHERE `name`='germplasm_mainheadtohead';
+
+            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/Query_For_Adapted_Germplasm' WHERE `name`='query_for_adapted_germplasm';
+
+            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/studybrowser/' WHERE `name`='study_browser_with_id';
+
+            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/Trait_Donors_Query' WHERE `name`='trait_donor_query';
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
