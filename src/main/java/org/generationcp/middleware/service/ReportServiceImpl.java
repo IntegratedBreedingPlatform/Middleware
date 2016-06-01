@@ -36,10 +36,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ReportServiceImpl extends Service implements ReportService {
 
-    public static final String DEFAULT_STRING_VALUE = "NA";
-    public static final String BLANK_STRING_VALUE = "";
-    public static final String DEFAULT_INTEGER_STRING_VALUE = "0";
-    private final ReporterFactory factory = ReporterFactory.instance();
+	public static final String DEFAULT_STRING_VALUE = "NA";
+	public static final String BLANK_STRING_VALUE = "";
+	public static final String DEFAULT_INTEGER_STRING_VALUE = "0";
+	private final ReporterFactory factory = ReporterFactory.instance();
 
 	public ReportServiceImpl() {
 		super();
@@ -79,20 +79,18 @@ public class ReportServiceImpl extends Service implements ReportService {
 		return reporter;
 	}
 
-    @Override
-    public Reporter getStreamGermplasmListReport(final String code, final Integer germplasmListID, final String programName, final OutputStream output)
-            throws MiddlewareException, JRException, IOException, BuildReportException {
-        final Reporter reporter = this.factory.createReporter(code);
-        final Map<String, Object> data = this.extractGermplasmListData(germplasmListID);
-        data.put(AbstractReporter.PROGRAM_NAME_ARG_KEY, programName);
+	@Override
+	public Reporter getStreamGermplasmListReport(final String code, final Integer germplasmListID, final String programName,
+			final OutputStream output) throws MiddlewareException, JRException, IOException, BuildReportException {
+		final Reporter reporter = this.factory.createReporter(code);
+		final Map<String, Object> data = this.extractGermplasmListData(germplasmListID);
+		data.put(AbstractReporter.PROGRAM_NAME_ARG_KEY, programName);
 
-        reporter.buildJRPrint(data);
-        reporter.asOutputStream(output);
+		reporter.buildJRPrint(data);
+		reporter.asOutputStream(output);
 
-        return reporter;
-    }
-
-
+		return reporter;
+	}
 
 	/**
 	 * Creates a Map containing all information needed to generate a report.
@@ -106,13 +104,13 @@ public class ReportServiceImpl extends Service implements ReportService {
 		final Workbook wb = this.getWorkbookBuilder().create(studyId, studyType);
 		final List<MeasurementRow> observations = wb.getObservations();
 		final List<MeasurementVariable> studyConditions = this.appendCountryInformationFromCondition(wb.getConditions());
-        final List<MeasurementRow> trialObservations = wb.getTrialObservations();
+		final List<MeasurementRow> trialObservations = wb.getTrialObservations();
 
-        if (!trialObservations.isEmpty()) {
-            for (final MeasurementRow trialObservation : trialObservations) {
-                trialObservation.setDataList(this.appendCountryInformationFromObservation(trialObservation.getDataList()));
-            }
-        }
+		if (!trialObservations.isEmpty()) {
+			for (final MeasurementRow trialObservation : trialObservations) {
+				trialObservation.setDataList(this.appendCountryInformationFromObservation(trialObservation.getDataList()));
+			}
+		}
 
 		if (parentsInfoRequireed) {
 			this.appendParentsInformation(studyId, observations);
@@ -153,7 +151,7 @@ public class ReportServiceImpl extends Service implements ReportService {
 
 			final MeasurementVariable abbrevInfo = new MeasurementVariable();
 			abbrevInfo.setName(AbstractReporter.LOCATION_ABBREV_VARIABLE_NAME);
-            abbrevInfo.setProperty(BLANK_STRING_VALUE);
+			abbrevInfo.setProperty(BLANK_STRING_VALUE);
 			abbrevInfo.setValue(location.getLabbr());
 
 			variables.add(abbrevInfo);
@@ -163,53 +161,53 @@ public class ReportServiceImpl extends Service implements ReportService {
 		}
 	}
 
-    protected List<MeasurementData> appendCountryInformationFromObservation(final List<MeasurementData> observations) {
-        final Integer locationId = this.retrieveLocationIdFromObservations(observations);
+	protected List<MeasurementData> appendCountryInformationFromObservation(final List<MeasurementData> observations) {
+		final Integer locationId = this.retrieveLocationIdFromObservations(observations);
 
-        if (locationId == null) {
-            return observations;
-        } else {
-            final List<MeasurementData> variables = new ArrayList<>(observations);
+		if (locationId == null) {
+			return observations;
+		} else {
+			final List<MeasurementData> variables = new ArrayList<>(observations);
 
-            final Location location = this.getLocationDataManager().getLocationByID(locationId);
+			final Location location = this.getLocationDataManager().getLocationByID(locationId);
 
-            if (location.getCntryid() != null && location.getCntryid() != 0) {
-                final Country country = this.getCountryDao().getById(location.getCntryid());
+			if (location.getCntryid() != null && location.getCntryid() != 0) {
+				final Country country = this.getCountryDao().getById(location.getCntryid());
 
-                variables.add(createPlaceholderCountryMeasurementData(country.getIsofull()));
-            }
+				variables.add(createPlaceholderCountryMeasurementData(country.getIsofull()));
+			}
 
-            final MeasurementData abbrevData = new MeasurementData();
-            final MeasurementVariable abbrevInfo = new MeasurementVariable();
-            abbrevInfo.setName(AbstractReporter.LOCATION_ABBREV_VARIABLE_NAME);
-            abbrevInfo.setProperty(BLANK_STRING_VALUE);
-            abbrevData.setValue(location.getLabbr());
-            abbrevData.setMeasurementVariable(abbrevInfo);
+			final MeasurementData abbrevData = new MeasurementData();
+			final MeasurementVariable abbrevInfo = new MeasurementVariable();
+			abbrevInfo.setName(AbstractReporter.LOCATION_ABBREV_VARIABLE_NAME);
+			abbrevInfo.setProperty(BLANK_STRING_VALUE);
+			abbrevData.setValue(location.getLabbr());
+			abbrevData.setMeasurementVariable(abbrevInfo);
 
-            variables.add(abbrevData);
+			variables.add(abbrevData);
 
-            return variables;
+			return variables;
 
-        }
-    }
+		}
+	}
 
-    protected MeasurementVariable createPlaceholderCountryMeasurementVariable(final String countryISO) {
-        final MeasurementVariable countryInfo = new MeasurementVariable();
-        countryInfo.setName(AbstractReporter.COUNTRY_VARIABLE_NAME);
-        countryInfo.setValue(countryISO);
-        countryInfo.setProperty(BLANK_STRING_VALUE);
+	protected MeasurementVariable createPlaceholderCountryMeasurementVariable(final String countryISO) {
+		final MeasurementVariable countryInfo = new MeasurementVariable();
+		countryInfo.setName(AbstractReporter.COUNTRY_VARIABLE_NAME);
+		countryInfo.setValue(countryISO);
+		countryInfo.setProperty(BLANK_STRING_VALUE);
 
-        return countryInfo;
-    }
+		return countryInfo;
+	}
 
-    protected MeasurementData createPlaceholderCountryMeasurementData(final String countryISO) {
-        final MeasurementData countryData = new MeasurementData();
-        final MeasurementVariable countryVariable = createPlaceholderCountryMeasurementVariable(countryISO);
-        countryData.setValue(countryISO);
-        countryData.setMeasurementVariable(countryVariable);
+	protected MeasurementData createPlaceholderCountryMeasurementData(final String countryISO) {
+		final MeasurementData countryData = new MeasurementData();
+		final MeasurementVariable countryVariable = createPlaceholderCountryMeasurementVariable(countryISO);
+		countryData.setValue(countryISO);
+		countryData.setMeasurementVariable(countryVariable);
 
-        return countryData;
-    }
+		return countryData;
+	}
 
 	/***
 	 * Retrieves the Location ID from the list of condition variables; Returns null if the condition value is an empty string
@@ -220,32 +218,32 @@ public class ReportServiceImpl extends Service implements ReportService {
 	 */
 	Integer retrieveLocationIdFromCondition(final List<MeasurementVariable> originalConditions) {
 		Integer locationId = null;
-        for (final MeasurementVariable condition : originalConditions) {
-            final TermId term = TermId.getById(condition.getTermId());
-            if (term == TermId.LOCATION_ID && !StringUtils.isEmpty(condition.getValue())) {
-                locationId = Integer.parseInt(condition.getValue());
-            }
-        }
+		for (final MeasurementVariable condition : originalConditions) {
+			final TermId term = TermId.getById(condition.getTermId());
+			if (term == TermId.LOCATION_ID && !StringUtils.isEmpty(condition.getValue())) {
+				locationId = Integer.parseInt(condition.getValue());
+			}
+		}
 
-        return locationId;
+		return locationId;
 	}
 
-    /***
-     * Retrieves the Location ID from the list of trial observations; Returns null if the condition value is an empty string
-     *
-     * @return
-     */
-    Integer retrieveLocationIdFromObservations(final List<MeasurementData> observations) {
-        Integer locationId = null;
-        for (final MeasurementData observation : observations) {
-            final TermId term = TermId.getById(observation.getMeasurementVariable().getTermId());
-            if (term == TermId.LOCATION_ID && !StringUtils.isEmpty(observation.getValue())) {
-                locationId = Integer.parseInt(observation.getValue());
-            }
-        }
+	/***
+	 * Retrieves the Location ID from the list of trial observations; Returns null if the condition value is an empty string
+	 *
+	 * @return
+	 */
+	Integer retrieveLocationIdFromObservations(final List<MeasurementData> observations) {
+		Integer locationId = null;
+		for (final MeasurementData observation : observations) {
+			final TermId term = TermId.getById(observation.getMeasurementVariable().getTermId());
+			if (term == TermId.LOCATION_ID && !StringUtils.isEmpty(observation.getValue())) {
+				locationId = Integer.parseInt(observation.getValue());
+			}
+		}
 
-        return locationId;
-    }
+		return locationId;
+	}
 
 	@Override
 	public Set<String> getReportKeys() {
@@ -270,57 +268,56 @@ public class ReportServiceImpl extends Service implements ReportService {
 			if (germNode == null || (germNode.getFemaleParent() == null && germNode.getMaleParent() == null)) {
 				provideBlankParentInformationValues(row.getDataList());
 			} else {
-                provideParentInformation(germNode, row.getDataList());
-            }
+				provideParentInformation(germNode, row.getDataList());
+			}
 
 		}
 	}
 
-    void provideParentInformation(final GermplasmPedigreeTreeNode germNode, final List<MeasurementData> dataRow) {
-        final GermplasmPedigreeTreeNode femaleNode = germNode.getFemaleParent();
-        final GermplasmPedigreeTreeNode maleNode = germNode.getMaleParent();
-        final Germplasm female = femaleNode == null ? null : femaleNode.getGermplasm();
-        final Germplasm male = maleNode == null ? null : maleNode.getGermplasm();
+	void provideParentInformation(final GermplasmPedigreeTreeNode germNode, final List<MeasurementData> dataRow) {
+		final GermplasmPedigreeTreeNode femaleNode = germNode.getFemaleParent();
+		final GermplasmPedigreeTreeNode maleNode = germNode.getMaleParent();
+		final Germplasm female = femaleNode == null ? null : femaleNode.getGermplasm();
+		final Germplasm male = maleNode == null ? null : maleNode.getGermplasm();
 
-        // TODO: pending values for origin of the entries (most likely resolved in BMS-2211)
-        dataRow.add(
-                new MeasurementData(AbstractReporter.FEMALE_SELECTION_HISTORY_KEY, female == null ? BLANK_STRING_VALUE : female.getSelectionHistory()));
-        dataRow.add(
-                new MeasurementData(AbstractReporter.FEMALE_CROSS_NAME_KEY, female == null ? BLANK_STRING_VALUE : female.getSelectionHistory()));
-        dataRow.add(new MeasurementData(AbstractReporter.FEMALE_TRIAL_ABBREVIATION_KEY, DEFAULT_STRING_VALUE));
-        dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_CYCLE_KEY, DEFAULT_STRING_VALUE));
-        dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_ENTRY_KEY, DEFAULT_INTEGER_STRING_VALUE));
-        dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_LOCATION_ID_KEY, DEFAULT_INTEGER_STRING_VALUE));
+		// TODO: pending values for origin of the entries (most likely resolved in BMS-2211)
+		dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SELECTION_HISTORY_KEY, female == null ? BLANK_STRING_VALUE : female
+				.getSelectionHistory()));
+		dataRow.add(new MeasurementData(AbstractReporter.FEMALE_CROSS_NAME_KEY, female == null ? BLANK_STRING_VALUE : female
+				.getSelectionHistory()));
+		dataRow.add(new MeasurementData(AbstractReporter.FEMALE_TRIAL_ABBREVIATION_KEY, DEFAULT_STRING_VALUE));
+		dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_CYCLE_KEY, DEFAULT_STRING_VALUE));
+		dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_ENTRY_KEY, DEFAULT_INTEGER_STRING_VALUE));
+		dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_LOCATION_ID_KEY, DEFAULT_INTEGER_STRING_VALUE));
 
-        dataRow.add(
-                new MeasurementData(AbstractReporter.MALE_SELECTION_HISTORY_KEY, male == null ? BLANK_STRING_VALUE : male.getSelectionHistory()));
-        dataRow
-                .add(new MeasurementData(AbstractReporter.MALE_CROSS_NAME_KEY, male == null ? BLANK_STRING_VALUE : male.getSelectionHistory()));
+		dataRow.add(new MeasurementData(AbstractReporter.MALE_SELECTION_HISTORY_KEY, male == null ? BLANK_STRING_VALUE : male
+				.getSelectionHistory()));
+		dataRow.add(new MeasurementData(AbstractReporter.MALE_CROSS_NAME_KEY, male == null ? BLANK_STRING_VALUE : male
+				.getSelectionHistory()));
 
-        dataRow.add(new MeasurementData(AbstractReporter.MALE_TRIAL_ABBREVIATION_KEY, DEFAULT_STRING_VALUE));
-        dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_CYCLE_KEY, DEFAULT_STRING_VALUE));
-        dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_ENTRY_KEY, DEFAULT_INTEGER_STRING_VALUE));
-        dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_LOCATION_ID_KEY, DEFAULT_INTEGER_STRING_VALUE));
-    }
+		dataRow.add(new MeasurementData(AbstractReporter.MALE_TRIAL_ABBREVIATION_KEY, DEFAULT_STRING_VALUE));
+		dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_CYCLE_KEY, DEFAULT_STRING_VALUE));
+		dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_ENTRY_KEY, DEFAULT_INTEGER_STRING_VALUE));
+		dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_LOCATION_ID_KEY, DEFAULT_INTEGER_STRING_VALUE));
+	}
 
-    void provideBlankParentInformationValues(final List<MeasurementData> dataRow) {
-        dataRow.add(
-                new MeasurementData(AbstractReporter.FEMALE_SELECTION_HISTORY_KEY, BLANK_STRING_VALUE));
-        dataRow.add(
-                new MeasurementData(AbstractReporter.FEMALE_CROSS_NAME_KEY, BLANK_STRING_VALUE));
-        dataRow.add(new MeasurementData(AbstractReporter.FEMALE_TRIAL_ABBREVIATION_KEY, BLANK_STRING_VALUE));
-        dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_CYCLE_KEY, BLANK_STRING_VALUE));
-        dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_ENTRY_KEY, DEFAULT_INTEGER_STRING_VALUE));
-        dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_LOCATION_ID_KEY, DEFAULT_INTEGER_STRING_VALUE));
+	void provideBlankParentInformationValues(final List<MeasurementData> dataRow) {
+		dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SELECTION_HISTORY_KEY, BLANK_STRING_VALUE));
+		dataRow.add(new MeasurementData(AbstractReporter.FEMALE_CROSS_NAME_KEY, BLANK_STRING_VALUE));
+		dataRow.add(new MeasurementData(AbstractReporter.FEMALE_TRIAL_ABBREVIATION_KEY, BLANK_STRING_VALUE));
+		dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_CYCLE_KEY, BLANK_STRING_VALUE));
 
-        dataRow.add(
-                new MeasurementData(AbstractReporter.MALE_SELECTION_HISTORY_KEY, BLANK_STRING_VALUE));
-        dataRow
-                .add(new MeasurementData(AbstractReporter.MALE_CROSS_NAME_KEY, BLANK_STRING_VALUE));
+		dataRow.add(new MeasurementData(AbstractReporter.MALE_SELECTION_HISTORY_KEY, BLANK_STRING_VALUE));
+		dataRow.add(new MeasurementData(AbstractReporter.MALE_CROSS_NAME_KEY, BLANK_STRING_VALUE));
 
-        dataRow.add(new MeasurementData(AbstractReporter.MALE_TRIAL_ABBREVIATION_KEY, BLANK_STRING_VALUE));
-        dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_CYCLE_KEY, BLANK_STRING_VALUE));
-        dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_ENTRY_KEY, DEFAULT_INTEGER_STRING_VALUE));
-        dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_LOCATION_ID_KEY, DEFAULT_INTEGER_STRING_VALUE));
-    }
+		dataRow.add(new MeasurementData(AbstractReporter.MALE_TRIAL_ABBREVIATION_KEY, BLANK_STRING_VALUE));
+		dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_CYCLE_KEY, BLANK_STRING_VALUE));
+
+		// TODO : the value used here is 0 instead of a proper blank because the report design only supports integer values for this field
+		// and changing it would involve several changes more fit to be done in a separate ticket
+		dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_ENTRY_KEY, DEFAULT_INTEGER_STRING_VALUE));
+		dataRow.add(new MeasurementData(AbstractReporter.FEMALE_SOURCE_TRIAL_LOCATION_ID_KEY, DEFAULT_INTEGER_STRING_VALUE));
+		dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_ENTRY_KEY, DEFAULT_INTEGER_STRING_VALUE));
+		dataRow.add(new MeasurementData(AbstractReporter.MALE_SOURCE_TRIAL_LOCATION_ID_KEY, DEFAULT_INTEGER_STRING_VALUE));
+	}
 }
