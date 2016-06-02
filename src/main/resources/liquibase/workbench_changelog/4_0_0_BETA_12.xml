@@ -46,42 +46,64 @@
 
     <changeSet author="keyurbhatt" id="beta12-7">
         <preConditions onFail="MARK_RAN">
-            <and>
-                <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'germplasm_browser'</sqlCheck>
-            </and>
-            <and>
-                <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'study_browser'</sqlCheck>
-            </and>
-            <and>
-                <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'germplasm_list_browser'</sqlCheck>
-            </and>
-            <and>
-                <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'germplasm_mainheadtohead'</sqlCheck>
-            </and>
-            <and>
-                <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'query_for_adapted_germplasm'</sqlCheck>
-            </and>
-            <and>
-                <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'study_browser_with_id'</sqlCheck>
-            </and>
-            <and>
-                <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'trait_donor_query'</sqlCheck>
-            </and>
+            <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'germplasm_browser'</sqlCheck>
         </preConditions>
         <sql dbms="mysql" splitStatements="true">
-            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/germplasm/' WHERE `name`='germplasm_browser';
+            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/germplasm/' WHERE `name`='germplasm_browser'
+        </sql>
+    </changeSet>
 
-            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/study/' WHERE `name`='study_browser';
+    <changeSet author="keyurbhatt" id="beta12-8">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'study_browser'</sqlCheck>
+        </preConditions>
+        <sql dbms="mysql" splitStatements="true">
+            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/study/' WHERE `name`='study_browser'
+        </sql>
+    </changeSet>
 
-            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/germplasmlist/' WHERE `name`='germplasm_list_browser';
+    <changeSet author="keyurbhatt" id="beta12-9">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'germplasm_list_browser'</sqlCheck>
+        </preConditions>
+        <sql dbms="mysql" splitStatements="true">
+            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/germplasmlist/' WHERE `name`='germplasm_list_browser'
+        </sql>
+    </changeSet>
 
-            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/Head_to_head_comparison' WHERE `name`='germplasm_mainheadtohead';
+    <changeSet author="keyurbhatt" id="beta12-10">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'germplasm_mainheadtohead'</sqlCheck>
+        </preConditions>
+        <sql dbms="mysql" splitStatements="true">
+            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/Head_to_head_comparison' WHERE `name`='germplasm_mainheadtohead'
+        </sql>
+    </changeSet>
 
-            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/Query_For_Adapted_Germplasm' WHERE `name`='query_for_adapted_germplasm';
+    <changeSet author="keyurbhatt" id="beta12-11">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'query_for_adapted_germplasm'</sqlCheck>
+        </preConditions>
+        <sql dbms="mysql" splitStatements="true">
+            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/Query_For_Adapted_Germplasm' WHERE `name`='query_for_adapted_germplasm'
+        </sql>
+    </changeSet>
 
-            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/studybrowser/' WHERE `name`='study_browser_with_id';
+    <changeSet author="keyurbhatt" id="beta12-12">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'study_browser_with_id'</sqlCheck>
+        </preConditions>
+        <sql dbms="mysql" splitStatements="true">
+            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/studybrowser/' WHERE `name`='study_browser_with_id'
+        </sql>
+    </changeSet>
 
-            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/Trait_Donors_Query' WHERE `name`='trait_donor_query';
+    <changeSet author="keyurbhatt" id="beta12-13">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'trait_donor_query'</sqlCheck>
+        </preConditions>
+        <sql dbms="mysql" splitStatements="true">
+            UPDATE `workbench_tool` SET `path`='BreedingManager/maingpsb/Trait_Donors_Query' WHERE `name`='trait_donor_query'
         </sql>
     </changeSet>
 
