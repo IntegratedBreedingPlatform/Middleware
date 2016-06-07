@@ -7,15 +7,19 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-public class XADataSourcePropertiesTest {
+public class DataSourcePropertiesTest {
 
 
 	private final Properties properties = Mockito.mock(Properties.class);
 
+	/**
+	 * This test makes sure that the DataSourceProperties constructor overrides default properties when specified in a property file.
+	 * 
+	 */
 	@Test
 	public void testXADataSourceProperties() throws Exception {
 
-		final XADataSourceProperties xaDataSourceProperties = XATestUtility.mockProperties();
+		final DataSourceProperties xaDataSourceProperties = XATestUtility.mockProperties();
 
 		Assert.assertEquals(xaDataSourceProperties.getHost(), XATestUtility.DB_HOST);
 		Assert.assertEquals(xaDataSourceProperties.getPort(), XATestUtility.DB_PORT);
@@ -26,10 +30,11 @@ public class XADataSourcePropertiesTest {
 		Assert.assertEquals(xaDataSourceProperties.getXaDriverName(), XATestUtility.CONNECTIONPOOL_XADRIVER_NAME);
 		Assert.assertEquals(xaDataSourceProperties.getBorrowConnectionTimeout(), XATestUtility.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT);
 		Assert.assertEquals(xaDataSourceProperties.getMaintenanceInterval(), XATestUtility.CONNECTIONPOOL_MAINTENANCE_INTERVAL);
-		Assert.assertEquals(xaDataSourceProperties.getTestQuery(), XATestUtility.CONNECTIONPOOL_TEST_QUERY);
+		Assert.assertEquals(xaDataSourceProperties.getReapTimeout(), XATestUtility.CONNECTIONPOOL_REAP_TIMEOUT);
 		Assert.assertEquals(xaDataSourceProperties.getMinPoolSize(), XATestUtility.CONNECTIONPOOL_MIN_POOL_SIZE);
 		Assert.assertEquals(xaDataSourceProperties.getMaxPoolSize(), XATestUtility.CONNECTIONPOOL_MAX_POOL_SIZE);
 		Assert.assertEquals(xaDataSourceProperties.getMaxIdleTime(), XATestUtility.CONNECTIONPOOL_MAX_IDLE_TIME);
+		Assert.assertEquals(xaDataSourceProperties.getTestQuery(), XATestUtility.CONNECTIONPOOL_TEST_QUERY);
 
 		Assert.assertEquals(xaDataSourceProperties.getHibernateConfigurationLocation(), "classpath:ibpmidware_hib.cfg.xml");
 
@@ -38,7 +43,7 @@ public class XADataSourcePropertiesTest {
 	@Test
 	public void testDefaultValues() throws Exception {
 
-		final XADataSourceProperties xaDataSourceProperties = new XADataSourceProperties(this.properties);
+		final DataSourceProperties xaDataSourceProperties = new DataSourceProperties(this.properties);
 
 		Assert.assertEquals(xaDataSourceProperties.getHost(), "localhost");
 		Assert.assertEquals(xaDataSourceProperties.getPort(), "3306");
@@ -49,10 +54,11 @@ public class XADataSourcePropertiesTest {
 		Assert.assertEquals(xaDataSourceProperties.getXaDriverName(), "com.mysql.jdbc.jdbc2.optional.MysqlXADataSource");
 		Assert.assertEquals(xaDataSourceProperties.getBorrowConnectionTimeout(), "30");
 		Assert.assertEquals(xaDataSourceProperties.getMaintenanceInterval(), "60");
-		Assert.assertEquals(xaDataSourceProperties.getTestQuery(), "Select 1");
+		Assert.assertEquals(xaDataSourceProperties.getReapTimeout(), "300");
 		Assert.assertEquals(xaDataSourceProperties.getMinPoolSize(), "3");
-		Assert.assertEquals(xaDataSourceProperties.getMaxPoolSize(), "50");
-		Assert.assertEquals(xaDataSourceProperties.getMaxIdleTime(), "30");
+		Assert.assertEquals(xaDataSourceProperties.getMaxPoolSize(), "100");
+		Assert.assertEquals(xaDataSourceProperties.getMaxIdleTime(), "120");
+		Assert.assertEquals(xaDataSourceProperties.getTestQuery(), "Select 1");
 
 		Assert.assertEquals(xaDataSourceProperties.getHibernateConfigurationLocation(), "classpath:ibpmidware_hib.cfg.xml");
 

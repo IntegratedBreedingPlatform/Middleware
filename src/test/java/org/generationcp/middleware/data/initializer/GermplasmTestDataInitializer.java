@@ -31,7 +31,8 @@ public class GermplasmTestDataInitializer {
 		germplasm.setUserId(Integer.valueOf(1));
 		germplasm.setReferenceId(Integer.valueOf(1));
 		germplasm.setLgid(Integer.valueOf(0));
-
+		germplasm.setMethodName("MethodName");
+		germplasm.setLocationName("LocationName");
 		germplasm.setPreferredName(createGermplasmName(id));
 		return germplasm;
 	}

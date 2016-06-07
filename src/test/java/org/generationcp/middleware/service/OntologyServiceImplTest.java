@@ -36,7 +36,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class OntologyServiceImplTest extends IntegrationTestBase {
 
-	private static final String NUMBER_OF_RECORDS = " #RECORDS: ";
+	private static final String SEED_AMOUNT_G = "SEED_AMOUNT_g";
+		private static final String NUMBER_OF_RECORDS = " #RECORDS: ";
 	private static final int AGRONOMIC_TRAIT_CLASS = 1340;
 
 	@Autowired
@@ -162,6 +163,13 @@ public class OntologyServiceImplTest extends IntegrationTestBase {
 		Scale scale = this.ontologyService.getScale("Calculated");
 		Assert.assertNotNull(scale);
 		scale.print(IntegrationTestBase.INDENT);
+	}
+	
+	@Test
+	public void testGetInventoryScaleByName() throws MiddlewareQueryException {
+		Scale scale = this.ontologyService.getInventoryScaleByName(SEED_AMOUNT_G);
+		Assert.assertNotNull("Scale should not be null", scale);
+		Assert.assertEquals("Scale name should be " + SEED_AMOUNT_G, SEED_AMOUNT_G, scale.getName());
 	}
 
 	@Test
