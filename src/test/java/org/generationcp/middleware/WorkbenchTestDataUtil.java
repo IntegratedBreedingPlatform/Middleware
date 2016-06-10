@@ -119,7 +119,8 @@ public class WorkbenchTestDataUtil {
 		WorkbenchRuntimeData workbenchRuntimeData = new WorkbenchRuntimeData();
 		workbenchRuntimeData.setUserId(1);
 		this.workbenchDataManager.updateWorkbenchRuntimeData(workbenchRuntimeData);
-		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.RICE.toString());
+		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString());
+		this.commonTestProject.setCropType(this.cropType);
 
 	}
 
