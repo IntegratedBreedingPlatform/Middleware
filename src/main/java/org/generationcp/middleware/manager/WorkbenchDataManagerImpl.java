@@ -47,7 +47,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
-import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
@@ -399,11 +398,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 				this.deleteProjectUserInfoDao(projectUserInfo);
 			}
 
-			List<IbdbUserMap> ibdbUserMaps = this.getIbdbUserMapsByProjectId(project.getProjectId());
-			for (IbdbUserMap ibdbUserMap : ibdbUserMaps) {
-				this.deleteIbdbProjectBackup(ibdbUserMap);
-			}
-
 			// remove template settings per project
 			TemplateSetting setting = new TemplateSetting();
 			setting.setProjectId(projectId.intValue());
@@ -417,19 +411,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 			this.logAndThrowException("Cannot delete Project Dependencies: WorkbenchDataManager.deleteProjectDependencies(project="
 					+ project + "): " + e.getMessage(), e);
-		}
-	}
-
-	public void deleteIbdbProjectBackup(IbdbUserMap ibdbUserMap) throws MiddlewareQueryException {
-
-		try {
-
-			this.getIbdbUserMapDao().makeTransient(ibdbUserMap);
-
-		} catch (Exception e) {
-
-			this.logAndThrowException("Cannot delete Project: WorkbenchDataManager.deleteIbdbProjectBackup(ibdbUserMap=" + ibdbUserMap
-					+ "): " + e.getMessage(), e);
 		}
 	}
 
