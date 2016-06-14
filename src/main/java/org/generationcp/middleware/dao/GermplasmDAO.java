@@ -738,11 +738,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			queryString.append("SELECT g.*, "
 					+ "GROUP_CONCAT(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') AS stockIDs, "
 					+ "CAST(SUM(CASE WHEN gt.trnqty = 0 OR isnull(gt.trnqty) THEN 0 ELSE 1 END) AS UNSIGNED) AS availInv, "
-					+ "COUNT(DISTINCT gl.lotid) AS seedRes, m.mname AS methodName, l.lname AS locationName FROM germplsm g "
+					+ "COUNT(DISTINCT gl.lotid) AS seedRes, m.mname AS methodName, l.lname AS locationName, ps.*  FROM germplsm g "
 					+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 "
 					+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid AND gt.trnstat <> 9  "
 					+ "LEFT JOIN methods m ON m.mid = g.methn "
 					+ "LEFT JOIN location l ON l.locid = g.glocn "
+					+ "LEFT JOIN pedigree ps on ps.id = g.pedigree_id "
 					+ "WHERE g.gid IN (:gids) GROUP BY g.gid") ;
 
 			queryString.append(this.addSortingColumns(germplasmSearchParameter.getSortState()));
@@ -755,6 +756,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.addScalar(GermplasmDAO.SEED_RES);
 			query.addScalar(GermplasmDAO.METHOD_NAME);
 			query.addScalar(GermplasmDAO.LOCATION_NAME);
+		    query.addScalar(GermplasmDAO.PEDIGREE);
 			query.setFirstResult(startingRow);
 			query.setMaxResults(noOfEntries);
 
@@ -807,6 +809,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		germplasm.setInventoryInfo(inventoryInfo);
 		germplasm.setMethodName(row[4] != null ? (String) row[4] : "");
 		germplasm.setLocationName(row[5] != null ? (String) row[5] : "");
+	    germplasm.setPedigree((Pedigree) row[6]);
 		return germplasm;
 	}
 
