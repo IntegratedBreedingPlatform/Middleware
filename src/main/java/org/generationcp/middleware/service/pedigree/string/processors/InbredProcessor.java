@@ -56,7 +56,6 @@ public class InbredProcessor implements BreedingMethodProcessor {
 		} else {
 			pedigreeStringBuilders.setPedigree(nameObject.getNval());
 		}
-		System.out.println(pedigreeStringBuilders.getPedigree());
 		return pedigreeStringBuilders;
 
 	}
