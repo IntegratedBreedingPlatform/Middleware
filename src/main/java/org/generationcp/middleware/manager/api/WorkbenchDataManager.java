@@ -25,7 +25,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
-import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
@@ -852,40 +851,6 @@ public interface WorkbenchDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Integer addProjectUserMysqlAccount(ProjectUserMysqlAccount record) throws MiddlewareQueryException;
-
-	/**
-	 * Gets the backup projects.
-	 *
-	 * @return the backup projects
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<ProjectBackup> getProjectBackups() throws MiddlewareQueryException;
-
-	/**
-	 * Gets the backup of the specified projects.
-	 *
-	 * @param project the project
-	 * @return the backup projects
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<ProjectBackup> getProjectBackups(Project project) throws MiddlewareQueryException;
-
-	/**
-	 * Save or update backup project.
-	 *
-	 * @param projectBackup - the project backup to save
-	 * @return the project backup saved
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	ProjectBackup saveOrUpdateProjectBackup(ProjectBackup projectBackup) throws MiddlewareQueryException;
-
-	/**
-	 * remove backup project.
-	 *
-	 * @param projectBackup - the project backup to be deleted
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	void deleteProjectBackup(ProjectBackup projectBackup) throws MiddlewareQueryException;
 
 	/**
 	 * Gets the ProjectUserInfoDAO.

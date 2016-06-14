@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -289,6 +290,7 @@ public interface GermplasmDataManager {
 
 	/**
 	 * Validates the naming rules configuration for the selected breeding method
+	 *
 	 * @param breedingMethodId
 	 * @return true if the configurarion is present in the DB
 	 */
@@ -765,7 +767,7 @@ public interface GermplasmDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Map<Integer, String> getLocationNamesByGids(List<Integer> gids);
-	
+
 	/**
 	 * Search for germplasms given a search term
 	 * 
@@ -773,23 +775,20 @@ public interface GermplasmDataManager {
 	 * @param o - like or equal
 	 * @param includeParents boolean flag to denote whether parents will be included in search results
 	 * @param withInventoryOnly - boolean flag to denote whether result will be filtered by those with inventories only
-	 * @return List of Germplasms
-	 * @throws MiddlewareQueryException
-	 */
-	List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly);
-	
-	/**
-	 * Search for germplasms given a search term
-	 * 
-	 * @param searchedString - the search term to be used
-	 * @param o - like or equal
-	 * @param includeParents boolean flag to denote whether parents will be included in search results
-	 * @param withInventoryOnly - boolean flag to denote whether result will be filtered by those with inventories only
-	 * @param includeMGMembers - boolean flag to denote whether the MG members will be included in the result
+	 * @param includeMGMembers - boolean flag to denote whether the management group members (same mgid) will be included in the result
 	 * @return List of Germplasms
 	 * @throws MiddlewareQueryException
 	 */
 	List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly, boolean includeMGMembers);
+
+	/**
+	 * Search for germplasms given a search term
+	 * 
+	 * @param germplasmSearchParameter - contains all data needed for the germplasm search
+	 * @return List of Germplasms
+	 * @throws MiddlewareQueryException
+	 */
+	List<Germplasm> searchForGermplasm(GermplasmSearchParameter germplasmSearchParameter);
 
 	/**
 	 * Please use LocationDataManager.getLocationsByIDs().

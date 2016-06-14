@@ -33,7 +33,10 @@ public class XABeanDefinitionTest {
 		Assert.assertEquals("jdbc:mysql://" + this.xaDataSourceProperties.getHost() + ":" + this.xaDataSourceProperties.getPort() + "/"
 				+ this.cropDatabaseName, databaseConnectionProperties.getProperty(XABeanDefinition.URL));
 		Assert.assertEquals("true", databaseConnectionProperties.getProperty(XABeanDefinition.PIN_GLOBAL_TX_TO_PHYSICAL_CONNECTION));
-
+		Assert.assertEquals("UTF-8", databaseConnectionProperties.getProperty(XABeanDefinition.CHARACTER_ENCODING));
+		Assert.assertEquals("true", databaseConnectionProperties.getProperty(XABeanDefinition.USE_UNICODE));
+		Assert.assertEquals("true", databaseConnectionProperties.getProperty(XABeanDefinition.USE_SERVER_PREP_STMTS));
+		Assert.assertEquals("true", databaseConnectionProperties.getProperty(XABeanDefinition.CACHE_PREP_STMTS));
 	}
 
 	@Test
@@ -57,6 +60,8 @@ public class XABeanDefinitionTest {
 		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_MIN_POOL_SIZE,
 				dataSourceBeanDefinitionProperties.get(XABeanDefinition.MIN_POOL_SIZE));
 		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_REAP_TIMEOUT, dataSourceBeanDefinitionProperties.get(XABeanDefinition.REAP_TIMEOUT));
+		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_TEST_QUERY, dataSourceBeanDefinitionProperties.get(XABeanDefinition.TEST_QUERY));
+
 		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT,
 				dataSourceBeanDefinitionProperties.get(XABeanDefinition.BORROW_CONNECTION_TIMEOUT));
 
@@ -65,8 +70,10 @@ public class XABeanDefinitionTest {
 		Assert.assertEquals(XATestUtility.CONNECTIONPOOL_BORROW_CONNECTION_TIMEOUT,
 				dataSourceBeanDefinitionProperties.get(XABeanDefinition.BORROW_CONNECTION_TIMEOUT));
 		Assert.assertTrue(dataSourceBeanDefinitionProperties.get(XABeanDefinition.XA_PROPERTIES).getClass().equals(Properties.class));
+
 	}
 
+	
 	@Test
 	public void testCreateAllXADataSources() throws Exception {
 

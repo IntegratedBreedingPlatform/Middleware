@@ -109,6 +109,8 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
     private Integer plotNumber;
     private Integer replicationNumber;
 
+	private Integer groupId;
+
 	/**
 	 * Instantiates a new inventory details.
 	 */
@@ -818,4 +820,11 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		return this.bulkWithStockIds;
 	}
 
+	public Integer getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(Integer groupId) {
+		this.groupId = groupId;
+	}
 }

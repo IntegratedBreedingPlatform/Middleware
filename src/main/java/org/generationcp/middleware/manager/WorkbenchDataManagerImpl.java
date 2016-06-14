@@ -19,7 +19,6 @@ import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.IbdbUserMapDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
-import org.generationcp.middleware.dao.ProjectBackupDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.ProjectUserMysqlAccountDAO;
@@ -48,7 +47,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
-import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
@@ -260,14 +258,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return workflowTemplateDao;
 	}
 
-	private ProjectBackupDAO getProjectBackupDao() {
-
-		ProjectBackupDAO projectBackupDao = new ProjectBackupDAO();
-
-		projectBackupDao.setSession(this.getCurrentSession());
-		return projectBackupDao;
-	}
-
 	private WorkbenchSidebarCategoryDAO getWorkbenchSidebarCategoryDao() {
 
 		WorkbenchSidebarCategoryDAO workbenchSidebarCategoryDAO = new WorkbenchSidebarCategoryDAO();
@@ -408,16 +398,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 				this.deleteProjectUserInfoDao(projectUserInfo);
 			}
 
-			List<ProjectBackup> projectBackups = this.getProjectBackups(project);
-			for (ProjectBackup projectBackup : projectBackups) {
-				this.deleteProjectBackup(projectBackup);
-			}
-
-			List<IbdbUserMap> ibdbUserMaps = this.getIbdbUserMapsByProjectId(project.getProjectId());
-			for (IbdbUserMap ibdbUserMap : ibdbUserMaps) {
-				this.deleteIbdbProjectBackup(ibdbUserMap);
-			}
-
 			// remove template settings per project
 			TemplateSetting setting = new TemplateSetting();
 			setting.setProjectId(projectId.intValue());
@@ -431,19 +411,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 			this.logAndThrowException("Cannot delete Project Dependencies: WorkbenchDataManager.deleteProjectDependencies(project="
 					+ project + "): " + e.getMessage(), e);
-		}
-	}
-
-	public void deleteIbdbProjectBackup(IbdbUserMap ibdbUserMap) throws MiddlewareQueryException {
-
-		try {
-
-			this.getIbdbUserMapDao().makeTransient(ibdbUserMap);
-
-		} catch (Exception e) {
-
-			this.logAndThrowException("Cannot delete Project: WorkbenchDataManager.deleteIbdbProjectBackup(ibdbUserMap=" + ibdbUserMap
-					+ "): " + e.getMessage(), e);
 		}
 	}
 
@@ -1214,60 +1181,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		}
 
 		return idsSaved;
-	}
-
-	@Override
-	public List<ProjectBackup> getProjectBackups() throws MiddlewareQueryException {
-		return this.getProjectBackupDao().getAllProjectBackups();
-	}
-
-	@Override
-	public List<ProjectBackup> getProjectBackups(Project project) throws MiddlewareQueryException {
-		if (project == null || project.getProjectId() == null) {
-			return null;
-		}
-
-		return this.getProjectBackupDao().getProjectBackups(project.getProjectId());
-	}
-
-	@Override
-	public ProjectBackup saveOrUpdateProjectBackup(ProjectBackup projectBackup) throws MiddlewareQueryException {
-
-		try {
-
-			if (projectBackup.getBackupPath() != null) {
-
-				List<ProjectBackup> result = this.getProjectBackupDao().getProjectBackupByBackupPath(projectBackup.getBackupPath());
-
-				if (result != null && !result.isEmpty()) {
-					result.get(0).setBackupTime(projectBackup.getBackupTime());
-					projectBackup = result.get(0);
-				}
-			}
-
-			projectBackup = this.getProjectBackupDao().saveOrUpdate(projectBackup);
-
-		} catch (Exception e) {
-
-			this.logAndThrowException("Cannot save ProjectBackup: WorkbenchDataManager.saveOrUpdateProjectBackup(projectBackup="
-					+ projectBackup + "): " + e.getMessage(), e);
-		}
-
-		return projectBackup;
-	}
-
-	@Override
-	public void deleteProjectBackup(ProjectBackup projectBackup) throws MiddlewareQueryException {
-
-		try {
-
-			this.getProjectBackupDao().makeTransient(projectBackup);
-
-		} catch (Exception e) {
-
-			this.logAndThrowException("Cannot delete Project: WorkbenchDataManager.deleteProjectBackup(projectBackup=" + projectBackup
-					+ "): " + e.getMessage(), e);
-		}
 	}
 
 	@Override
