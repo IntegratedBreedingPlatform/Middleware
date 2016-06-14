@@ -44,6 +44,7 @@ public class BackcrossAncestryTree {
 		final GermplasmNode rootGermplasm = new GermplasmNode(germplasm);
 		this.getMethodName(germplasm, rootGermplasm);
 
+		// TODO: Did not understand why this was done in the original algorithm.
 		if (germplasm.getGpid1() > 0) {
 			rootGermplasm.setFemaleParent(this.ancestryTreeService.buildAncestryTree(germplasm.getGpid1(), level - 1));
 		}
@@ -56,6 +57,7 @@ public class BackcrossAncestryTree {
 
 	}
 
+	//TODO you do not need the recurringParentGid
 	private GermplasmNode generateBackcrossTree(final Integer recurringParentGid, final Germplasm germplasm,
 			final GermplasmNode recurringParentNode, final int level) {
 
@@ -65,8 +67,10 @@ public class BackcrossAncestryTree {
 
 		final Integer otherParentFemaleParentGid = germplasm.getGpid1();
 		final Integer otherParentMaleParentGid = germplasm.getGpid2();
+		// Donor parent is found
 		if (otherParentFemaleParentGid != null && !otherParentFemaleParentGid.equals(recurringParentGid) && otherParentMaleParentGid != null
 				&& !otherParentMaleParentGid.equals(recurringParentGid)) {
+			// Build the ancestry tree for the donor parent
 			return this.ancestryTreeService.buildAncestryTree(germplasm.getGid(), level - 1);
 		}
 
