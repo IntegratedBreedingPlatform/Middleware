@@ -16,8 +16,6 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.service.api.PedigreeService;
-import org.generationcp.middleware.service.pedigree.PedgireeBatchProcessorImpl;
-import org.generationcp.middleware.service.pedigree.PedigreeBatchProcessor;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hibernate.SQLQuery;
 import org.junit.Assert;
