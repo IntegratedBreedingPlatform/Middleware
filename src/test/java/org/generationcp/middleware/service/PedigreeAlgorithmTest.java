@@ -3,7 +3,6 @@ package org.generationcp.middleware.service;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
@@ -13,14 +12,12 @@ import java.util.concurrent.Executors;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.hibernate.SQLQuery;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +40,6 @@ public class PedigreeAlgorithmTest extends IntegrationTestBase {
 
 	@Autowired
 	private PedigreeService oldPedigreeService;
-
-	@Autowired
-	private GermplasmDataManager germplasmDataManager;
 
 	private CrossExpansionProperties newCrossExpansionProperties;
 
