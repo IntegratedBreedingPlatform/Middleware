@@ -34,6 +34,9 @@ import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 public class PhenotypeSaver extends Saver {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PhenotypeSaver.class);
@@ -43,24 +46,29 @@ public class PhenotypeSaver extends Saver {
 	}
 
 	public void savePhenotypes(ExperimentModel experimentModel, VariableList variates) throws MiddlewareQueryException {
-		Map<Integer, PhenotypeExceptionDto> exceptions = null;
-		if (variates != null && variates.getVariables() != null && !variates.getVariables().isEmpty()) {
-			for (Variable variable : variates.getVariables()) {
+		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.PhenotypeSaver.savePhenotypes");
+		try {
+			Map<Integer, PhenotypeExceptionDto> exceptions = null;
+			if (variates != null && variates.getVariables() != null && !variates.getVariables().isEmpty()) {
+				for (Variable variable : variates.getVariables()) {
 
-				try {
-					this.save(experimentModel.getNdExperimentId(), variable);
-				} catch (PhenotypeException e) {
-					PhenotypeSaver.LOG.error(e.getMessage(), e);
-					if (exceptions == null) {
-						exceptions = new LinkedHashMap<Integer, PhenotypeExceptionDto>();
+					try {
+						this.save(experimentModel.getNdExperimentId(), variable);
+					} catch (PhenotypeException e) {
+						PhenotypeSaver.LOG.error(e.getMessage(), e);
+						if (exceptions == null) {
+							exceptions = new LinkedHashMap<Integer, PhenotypeExceptionDto>();
+						}
+						exceptions.put(e.getException().getStandardVariableId(), e.getException());
 					}
-					exceptions.put(e.getException().getStandardVariableId(), e.getException());
 				}
 			}
-		}
 
-		if (exceptions != null) {
-			throw new PhenotypeException(exceptions);
+			if (exceptions != null) {
+				throw new PhenotypeException(exceptions);
+			}
+		} finally {
+			monitor.stop();
 		}
 	}
 

@@ -997,6 +997,8 @@ public class WorkbookBuilder extends Builder {
 
 	public int getTrialDataSetId(final int studyId, final String studyName) {
 		final List<DatasetReference> datasetRefList = this.getStudyDataManager().getDatasetReferences(studyId);
+
+		// TODO update this logic to use new conventions.. like in above method for measurement dataset.
 		if (datasetRefList != null) {
 			for (final DatasetReference datasetRef : datasetRefList) {
 				if (datasetRef.getName().equals("TRIAL_" + studyName)) {
@@ -1005,6 +1007,8 @@ public class WorkbookBuilder extends Builder {
 			}
 		}
 		// if not found in the list using the name, get dataset with Summary Data type
+		// TODO Lot of querrying to build the entire dataset and then just use the ID out of it! Use findOneDataSetReferenceByType instead.
+
 		final DataSet dataset = this.getStudyDataManager().findOneDataSetByType(studyId, DataSetType.SUMMARY_DATA);
 		if (dataset != null) {
 			return dataset.getId();

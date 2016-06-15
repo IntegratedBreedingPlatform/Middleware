@@ -17,6 +17,9 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 /**
  * Saves a study (the corresponding Project, ProjectProperty, ProjectRelationship entries) to the database.
  *
@@ -35,6 +38,7 @@ public class StudySaver extends Saver {
 	 */
 	public DmsProject saveStudy(int parentId, VariableTypeList variableTypeList, StudyValues studyValues, boolean saveStudyExperiment,
 			String programUUID) throws Exception {
+		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.StudySaver.saveStudy");
 		DmsProject project = this.getProjectSaver().create(studyValues);
 		project.setProgramUUID(programUUID);
 		try {
@@ -45,11 +49,10 @@ public class StudySaver extends Saver {
 			if (saveStudyExperiment) {
 				this.saveStudyExperiment(project.getProjectId(), studyValues);
 			}
-		} catch (Exception e) {
-			throw e;
+			return project;
+		} finally {
+			monitor.stop();
 		}
-		return project;
-
 	}
 
 	/**

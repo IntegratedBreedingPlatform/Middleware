@@ -23,6 +23,9 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 /**
  * DAO class for {@link CVTermProperty}.
  *
@@ -119,14 +122,21 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
 	}
 
 	public CVTermProperty save(Integer cvTermId, Integer typeId, String value, Integer rank) throws MiddlewareQueryException {
-		CVTermProperty property = this.getOneByCvTermAndType(cvTermId, typeId);
 
-		if (property == null) {
-			return this.save(new CVTermProperty(null, cvTermId, typeId, value, rank));
+		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.CvTermPropertyDao.save");
+
+		try {
+			CVTermProperty property = this.getOneByCvTermAndType(cvTermId, typeId);
+
+			if (property == null) {
+				return this.save(new CVTermProperty(null, cvTermId, typeId, value, rank));
+			}
+
+			property.setValue(value);
+			property.setRank(rank);
+			return this.merge(property);
+		} finally {
+			monitor.stop();
 		}
-
-		property.setValue(value);
-		property.setRank(rank);
-		return this.merge(property);
 	}
 }

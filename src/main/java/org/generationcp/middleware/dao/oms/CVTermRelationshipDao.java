@@ -24,6 +24,9 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 /**
  * DAO class for {@link CVTermRelationship}.
  *
@@ -210,12 +213,19 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 	}
 
 	public CVTermRelationship save(Integer subjectId, Integer typeId, Integer objectId) throws MiddlewareQueryException {
-		CVTermRelationship relationship = this.getRelationshipSubjectIdObjectIdByTypeId(subjectId, objectId, typeId);
-		if (relationship != null) {
-			return relationship;
+
+		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.CVTermRelationshipDao.save");
+
+		try {
+			CVTermRelationship relationship = this.getRelationshipSubjectIdObjectIdByTypeId(subjectId, objectId, typeId);
+			if (relationship != null) {
+				return relationship;
+			}
+			CVTermRelationship cvTermRelationship = new CVTermRelationship(null, typeId, subjectId, objectId);
+			return this.save(cvTermRelationship);
+		} finally {
+			monitor.stop();
 		}
-		CVTermRelationship cvTermRelationship = new CVTermRelationship(null, typeId, subjectId, objectId);
-		return this.save(cvTermRelationship);
 	}
 
     public Integer retrieveAnalysisDerivedVariableID(Integer originalVariableID, Integer analysisMethodTermID) {

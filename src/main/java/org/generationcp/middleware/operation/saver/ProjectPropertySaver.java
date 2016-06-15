@@ -39,6 +39,9 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Hibernate;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 public class ProjectPropertySaver {
 
 	protected static final String PROJECT_PROPERTY_ID = "projectPropertyId";
@@ -469,20 +472,25 @@ public class ProjectPropertySaver {
 	}
 
 	public void updateVariablesRanking(final int datasetId, final List<Integer> variableIds) {
-		int rank = this.daoFactory.getProjectPropertyDao().getNextRank(datasetId);
-		final Map<Integer, List<Integer>> projectPropIDMap =
-				this.daoFactory.getProjectPropertyDao().getProjectPropertyIDsPerVariableId(datasetId);
-		rank = this.updateVariableRank(variableIds, rank, projectPropIDMap);
+		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.ProjectPropertySaver.updateVariablesRanking");
+		try {
+			int rank = this.daoFactory.getProjectPropertyDao().getNextRank(datasetId);
+			final Map<Integer, List<Integer>> projectPropIDMap =
+					this.daoFactory.getProjectPropertyDao().getProjectPropertyIDsPerVariableId(datasetId);
+			rank = this.updateVariableRank(variableIds, rank, projectPropIDMap);
 
-		// if any factors were added but not included in list of variables, update their ranks also so they come last
-		final List<Integer> storedInIds = new ArrayList<>();
-		storedInIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
-		storedInIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
-		storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
+			// if any factors were added but not included in list of variables, update their ranks also so they come last
+			final List<Integer> storedInIds = new ArrayList<>();
+			storedInIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
+			storedInIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
+			storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
 
-		final List<Integer> germplasmPlotVariateIds =
-				this.daoFactory.getProjectPropertyDao().getDatasetVariableIdsForGivenStoredInIds(datasetId, storedInIds, variableIds);
-		this.updateVariableRank(germplasmPlotVariateIds, rank, projectPropIDMap);
+			final List<Integer> germplasmPlotVariateIds =
+					this.daoFactory.getProjectPropertyDao().getDatasetVariableIdsForGivenStoredInIds(datasetId, storedInIds, variableIds);
+			this.updateVariableRank(germplasmPlotVariateIds, rank, projectPropIDMap);
+		} finally {
+			monitor.stop();
+		}
 	}
 
 	// Iterate and update rank, exclude deleted variables

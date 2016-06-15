@@ -79,6 +79,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 @Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
 
@@ -1004,12 +1007,17 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public void deleteListDataProjects(final int projectId, final GermplasmListType type) {
-		// when used in advanced, it will delete all the advance lists (list data projects)
-		final List<GermplasmList> lists = this.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
-		if (lists != null && !lists.isEmpty()) {
-			for (final GermplasmList list : lists) {
-				this.getListDataProjectDAO().deleteByListIdWithList(list.getId());
+		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.FieldbookServiceImpl.deleteListDataProjects");
+		try {
+			// when used in advanced, it will delete all the advance lists (list data projects)
+			final List<GermplasmList> lists = this.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
+			if (lists != null && !lists.isEmpty()) {
+				for (final GermplasmList list : lists) {
+					this.getListDataProjectDAO().deleteByListIdWithList(list.getId());
+				}
 			}
+		} finally {
+			monitor.stop();
 		}
 	}
 
