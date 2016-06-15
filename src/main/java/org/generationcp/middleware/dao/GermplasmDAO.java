@@ -756,7 +756,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.addScalar(GermplasmDAO.SEED_RES);
 			query.addScalar(GermplasmDAO.METHOD_NAME);
 			query.addScalar(GermplasmDAO.LOCATION_NAME);
-		    query.addScalar(GermplasmDAO.PEDIGREE);
+		    query.addEntity(GermplasmDAO.PEDIGREE, Pedigree.class);
 			query.setFirstResult(startingRow);
 			query.setMaxResults(noOfEntries);
 
