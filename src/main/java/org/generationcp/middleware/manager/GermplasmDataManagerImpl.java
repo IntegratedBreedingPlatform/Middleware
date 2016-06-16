@@ -1292,7 +1292,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			pedigreeDAO.save(pedigree);
 
 		}
-		this.getGermplasmDao().save(germplasm);
+		this.getGermplasmDao().saveOrUpdate(germplasm);
 
 	}
 }

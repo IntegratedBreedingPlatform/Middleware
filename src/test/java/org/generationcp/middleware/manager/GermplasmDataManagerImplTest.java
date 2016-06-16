@@ -31,6 +31,8 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pedigree.Pedigree;
+import org.generationcp.middleware.pedigree.PedigreeDAO;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -70,6 +72,8 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	private GermplasmDAO germplasmDAO;
 
+  	private PedigreeDAO pedigreeDAO;
+
 	private Project commonTestProject;
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
@@ -98,6 +102,12 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
+		}
+
+	  	if(this.pedigreeDAO == null){
+		  	this.pedigreeDAO = new PedigreeDAO();
+		  	this.pedigreeDAO.setSession(this.sessionProvder.getSession());
+
 		}
 
 		// Make sure a seed User(1) is present in the crop db otherwise add one
@@ -967,5 +977,87 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		final Map<String, Integer> mapCountByNamePermutations = this.germplasmDataManager.getCountByNamePermutations(nameList);
 
 		Assert.assertTrue(mapCountByNamePermutations.size() > 0);
+	}
+
+  	@Test
+  	public void testAddPedigreeStringWithNoPedigreeMatchFound() throws Exception{
+	  	final Germplasm germplasm = new Germplasm();
+	  	germplasm.setMethodId(31);
+	  	germplasm.setGnpgs(-1);
+	  	germplasm.setGrplce(0);
+	  	germplasm.setGpid1(0);
+	  	germplasm.setGpid2(0);
+	  	germplasm.setUserId(1);
+	  	germplasm.setLgid(0);
+	  	germplasm.setLocationId(0);
+	  	germplasm.setGdate(20151103);
+	  	germplasm.setReferenceId(0);
+
+	  	this.germplasmDAO.save(germplasm);
+
+	  	final String crossExpansion = "(CML454 X CML451)-B-4-1-11231";
+	  	this.germplasmDataManager.addPedigreeString(germplasm, crossExpansion, "default", 0);
+
+	  	final List<Pedigree> filterByColumnValue = pedigreeDAO.filterByColumnValue("pedigreeString", crossExpansion);
+
+	  	Assert.assertEquals(1, filterByColumnValue.size());
+	  	Pedigree pedigree = filterByColumnValue.get(0);
+	  	Assert.assertEquals(crossExpansion, pedigree.getPedigreeString());
+	  	Assert.assertEquals(pedigree.getId(), germplasm.getPedigree().getId());
+	}
+
+  	@Test
+  	public void testAddPedigreeStringWithPedigreeMatchFound() throws Exception{
+		final Germplasm germplasm = new Germplasm();
+		germplasm.setMethodId(30);
+		germplasm.setGnpgs(-1);
+		germplasm.setGrplce(0);
+		germplasm.setGpid1(0);
+		germplasm.setGpid2(0);
+		germplasm.setUserId(1);
+		germplasm.setLgid(0);
+		germplasm.setLocationId(0);
+		germplasm.setGdate(20151103);
+		germplasm.setReferenceId(0);
+
+	  	this.germplasmDAO.save(germplasm);
+
+	  	final String crossExpansion = "(CML454 X CML451)-B-4-1-11231";
+	  	Pedigree pedigreeStr = new Pedigree();
+	  	pedigreeStr.setPedigreeString(crossExpansion);
+	  	pedigreeStr.setAlgorithmUsed("default");
+	  	pedigreeStr.setLevels(0);
+
+	  	this.pedigreeDAO.save(pedigreeStr);
+
+		this.germplasmDataManager.addPedigreeString(germplasm, crossExpansion, "default", 0);
+
+		Assert.assertEquals(pedigreeStr.getId(), germplasm.getPedigree().getId());
+ 	 }
+
+  	@Test
+	public void testAddPedigreeStringWithMultiplePedigreeMatchFoundThrowsException() throws Exception{
+	  	final String crossExpansion = "(CML454 X CML451)-B-4-1-11231";
+	  	Pedigree pedigreeStr = new Pedigree();
+	  	pedigreeStr.setPedigreeString(crossExpansion);
+	  	pedigreeStr.setAlgorithmUsed("default");
+	  	pedigreeStr.setLevels(0);
+
+	  	this.pedigreeDAO.save(pedigreeStr);
+
+	  	Pedigree pedigreeStrTwo = new Pedigree();
+	  	pedigreeStrTwo.setPedigreeString(crossExpansion);
+	  	pedigreeStrTwo.setAlgorithmUsed("default");
+	  	pedigreeStrTwo.setLevels(0);
+
+	  	this.pedigreeDAO.save(pedigreeStrTwo);
+
+	  	try{
+		  this.germplasmDataManager.addPedigreeString(new Germplasm(), crossExpansion, "default", 0);
+		}
+		catch (IllegalStateException e){
+		  Assert.assertEquals("Should not have more than one pedigree string in the table.", e.getMessage());
+		}
+
 	}
 }
