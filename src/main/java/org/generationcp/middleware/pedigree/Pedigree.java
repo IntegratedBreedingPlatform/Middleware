@@ -44,6 +44,9 @@ public class Pedigree implements Serializable {
 	@Column(name = "level_used")
 	public int levels;
 
+  	@Column(name = "invalidate")
+	public int invalidate;
+
 	public Integer getId() {
 		return id;
 	}
@@ -75,4 +78,12 @@ public class Pedigree implements Serializable {
 	public void setLevels(int levels) {
 		this.levels = levels;
 	}
+
+  	public int getInvalidate() {
+		return invalidate;
+	}
+
+  	public void setInvalidate(int invalidate) {
+		this.invalidate = invalidate;
+  	}
 }

@@ -26,6 +26,9 @@
 			<column name="level_used" type="INT">
 				<constraints nullable="false"/>
 			</column>
+			<column name="invalidate" type="INT" defaultValue="0">
+				<constraints nullable="false"/>
+			</column>
 		</createTable>
 		<modifySql dbms="mysql">
 			<append value="ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_general_ci"/>
