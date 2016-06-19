@@ -79,6 +79,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 @Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
 
@@ -201,8 +204,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void saveMeasurementRows(final Workbook workbook, final String programUUID) {
-
+		
 		final long startTime = System.currentTimeMillis();
+
+		Monitor monitor = MonitorFactory.start("ImportStudy:saveMeasurementRows");
 
 		try {
 
@@ -211,9 +216,26 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			final List<MeasurementRow> observations = workbook.getObservations();
 
 			this.getWorkbookSaver().saveWorkbookVariables(workbook);
+			
+			monitor.stop();
+			monitor = MonitorFactory.start("ImportStudy:saveWorkbookVariables");
+			
+			FieldbookServiceImpl.LOG.info("========== saveWorkbookVariables Duration (ms): " + (System.currentTimeMillis() - startTime));
+
 			this.getWorkbookSaver().removeDeletedVariablesAndObservations(workbook);
+			
+			monitor.stop();
+			monitor = MonitorFactory.start("ImportStudy:removeDeletedVariablesAndObservations");
+			
+			FieldbookServiceImpl.LOG.info("========== removeDeletedVariablesAndObservations Duration (ms): " + (System.currentTimeMillis() - startTime));
 
 			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
+
+			monitor.stop();
+			monitor = MonitorFactory.start("ImportStudy:saveVariables");
+
+			FieldbookServiceImpl.LOG.info("========== saveVariables Duration (ms): " + (System.currentTimeMillis() - startTime));
+
 
 			// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
 			final Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
@@ -228,6 +250,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 			// save trial observations
 			this.getWorkbookSaver().saveTrialObservations(workbook, programUUID);
+			
+			monitor.stop();
+			monitor = MonitorFactory.start("ImportStudy:saveVariables");			
+			
+			FieldbookServiceImpl.LOG.info("========== saveTrialObservations Duration (ms): " + (System.currentTimeMillis() - startTime));			
 
 			Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 			if (measurementDatasetId == null) {
@@ -253,7 +280,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					}
 				}
 			}
+			
+			monitor.stop();
+			monitor = MonitorFactory.start("ImportStudy:saveVariables");
 
+			FieldbookServiceImpl.LOG.info("========== createStocksIfNecessary Duration (ms): " + (System.currentTimeMillis() - startTime));
+			
 			if (variates != null && !variates.isEmpty()) {
 				final Measurements measurements =
 						new Measurements(this.getActiveSession(), this.getPhenotypeSaver(), this.getPhenotypeOutlierSaver());
@@ -264,9 +296,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
 		} finally {
 			this.getActiveSession().setFlushMode(FlushMode.AUTO);
+			LOG.info("Exiting Save MeasurementRows " + monitor.stop());
 		}
 
-		FieldbookServiceImpl.LOG.debug("========== saveMeasurementRows Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
+		FieldbookServiceImpl.LOG.info("========== saveMeasurementRows Duration (ms): " + (System.currentTimeMillis() - startTime));
 
 	}
 
