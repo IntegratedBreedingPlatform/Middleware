@@ -29,6 +29,8 @@ public class CrossExpansionProperties {
 	private static final String NAME_TYPE_ORDER = "nametype.order";
 	private static final String BACKCROSS_NOTATION_FEMALE = "backcross.notation.female";
 	private static final String BACKCROSS_NOTATION_MALE = "backcross.notation.male";
+  	private static final String PEDIGREE_PROFILE = "pedigree.profile";
+  	private static final String DEFAULT_GENERATION_LEVEL = "default.generation.level";
 
 	private String profile;
 	private int defaultLevel;
@@ -103,6 +105,22 @@ public class CrossExpansionProperties {
 								return CrossExpansionProperties.this.getBackcrossNotationByCrop(cropName);
 							}
 						});
+
+	  	this.profile = props.getProperty(CrossExpansionProperties.PEDIGREE_PROFILE);
+	  	final String defaultLevel = props.getProperty(CrossExpansionProperties.DEFAULT_GENERATION_LEVEL);
+	  	if(StringUtils.isNotBlank(defaultLevel)){
+		  	try {
+			  	this.defaultLevel = Integer.parseInt(defaultLevel.trim());
+		  	} catch (final Exception e) {
+				final String errorMessage =
+						String.format(CrossExpansionProperties.DEFAULT_GENERATION_LEVEL + " is configured incorrectly with a value of '%s'. "
+								+ "Please contact your administrator for further assistance", defaultLevel);
+						CrossExpansionProperties.LOG.error(errorMessage);
+			  	throw new MiddlewareException(errorMessage, e);
+		  }
+
+		}
+
 	}
 
 	private int getGenerationLevelStoppingRulesByCrop(final String cropName) {

@@ -22,9 +22,13 @@ public class CrossExpansionPropertiesTest {
 		final Properties mockProperties = Mockito.mock(Properties.class);
 		Mockito.when(mockProperties.getProperty("maize.nametype.order")).thenReturn("CODE3,CODE2,CODE1");
 		Mockito.when(mockProperties.getProperty("wheat.nametype.order")).thenReturn("WHEAT_CODE3,WHEAT_CODE4,WHEAT_CODE5");
+		Mockito.when(mockProperties.getProperty("pedigree.profile")).thenReturn("default");
+	  	Mockito.when(mockProperties.getProperty("default.generation.level")).thenReturn("1");
 
 		final CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties(mockProperties);
 
+	  	assertEquals("Profile must be default", "default", crossExpansionProperties.getProfile());
+	  	assertEquals("Default generation level must be 1", 1, crossExpansionProperties.getDefaultLevel());
 		final List<String> nameTypeOrderMaize = crossExpansionProperties.getNameTypeOrder("maize");
 
 		assertTrue("The Name type order must contain number CODE3", nameTypeOrderMaize.contains("CODE3"));
@@ -59,12 +63,15 @@ public class CrossExpansionPropertiesTest {
 	@Test
 	public void testGetCropGenerationLevel() throws Exception {
 		final Properties mockProperties = Mockito.mock(Properties.class);
-		final CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties(mockProperties);
-		crossExpansionProperties.setDefaultLevel(100);
 
-		Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("2");
+	  	Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("2");
 		Mockito.when(mockProperties.getProperty("maize.generation.level")).thenReturn("3");
-		assertEquals(3, crossExpansionProperties.getCropGenerationLevel("maize"));
+	  	Mockito.when(mockProperties.getProperty("pedigree.profile")).thenReturn("default");
+	  	Mockito.when(mockProperties.getProperty("default.generation.level")).thenReturn("100");
+
+	  	final CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties(mockProperties);
+
+	  	assertEquals(3, crossExpansionProperties.getCropGenerationLevel("maize"));
 		assertEquals(2, crossExpansionProperties.getCropGenerationLevel("wheat"));
 
 		// For crops which do not have a generation level specified drop to the default level.
