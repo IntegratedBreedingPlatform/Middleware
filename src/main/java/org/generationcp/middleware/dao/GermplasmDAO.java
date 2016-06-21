@@ -810,17 +810,20 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<Germplasm> searchForGermplasms(final GermplasmSearchParameter germplasmSearchParameter) throws MiddlewareQueryException {
+		
+		final Monitor monitor = MonitorFactory.start("org.generationcp.middleware.dao.GermplasmDAO.searchForGermplasms(GermplasmSearchParameter)");
 
-		// actual searching here
-		final String q = germplasmSearchParameter.getSearchKeyword().trim();
-		final Operation o = germplasmSearchParameter.getOperation();
-		final boolean includeParents = germplasmSearchParameter.isIncludeParents();
-		final boolean withInventoryOnly = germplasmSearchParameter.isWithInventoryOnly();
-		final boolean includeMGMembers = germplasmSearchParameter.isIncludeMGMembers();
-		final Integer startingRow = germplasmSearchParameter.getStartingRow();
-		final Integer noOfEntries = germplasmSearchParameter.getNumberOfEntries();
-
+		final String q = germplasmSearchParameter.getSearchKeyword().trim();;
 		try {
+			// actual searching here
+			final Operation o = germplasmSearchParameter.getOperation();
+			final boolean includeParents = germplasmSearchParameter.isIncludeParents();
+			final boolean withInventoryOnly = germplasmSearchParameter.isWithInventoryOnly();
+			final boolean includeMGMembers = germplasmSearchParameter.isIncludeMGMembers();
+			final Integer startingRow = germplasmSearchParameter.getStartingRow();
+			final Integer noOfEntries = germplasmSearchParameter.getNumberOfEntries();
+
+		
 			final Set<Germplasm> germplasmSearchResult = new LinkedHashSet<Germplasm>();
 			final Set<Integer> gidSearchResult = this.retrieveGIDSearchResults(q, o, includeParents, withInventoryOnly, includeMGMembers);
 			// return an empty germplasm list when there is no GID search results returned
@@ -859,7 +862,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			String message = "Error with searchForGermplasms(" + q + ") " + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
+		}  finally {
+			monitor.stop();
 		}
+		
+		
 	}
 
 	private String addSortingColumns(final Map<String, Boolean> sortState) {
@@ -1026,17 +1033,20 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public Integer countSearchForGermplasms(final String q, final Operation o, final boolean includeParents,
 			final boolean withInventoryOnly, final boolean includeMGMembers) {
 
-		final Monitor countSearchForGermplasms = MonitorFactory.start("Method Started : countSearchForGermplasms ");
+		final Monitor countSearchForGermplasms = MonitorFactory.start("org.generationcp.middleware.dao.GermplasmDAO.countSearchForGermplasms(String, Operation, boolean, boolean, boolean)");
+		try {
 
-		Integer searchResultsCount = 0;
+			Integer searchResultsCount = 0;
+	
+			final Set<Integer> gidSearchResults = this.retrieveGIDSearchResults(q, o, includeParents, withInventoryOnly, includeMGMembers);
+	
+			searchResultsCount = gidSearchResults.size();
+			return searchResultsCount;
+		
+		} finally {
+			countSearchForGermplasms.stop();
+		}
 
-		final Set<Integer> gidSearchResults = this.retrieveGIDSearchResults(q, o, includeParents, withInventoryOnly, includeMGMembers);
-
-		searchResultsCount = gidSearchResults.size();
-
-		GermplasmDAO.LOG.debug("Method End : countSearchForGermplasms " + countSearchForGermplasms.stop());
-
-		return searchResultsCount;
 	}
 
 	private void searchInGidCriteria(final StringBuilder queryString, final Map<String, String> params, final String q, final Operation o) {
