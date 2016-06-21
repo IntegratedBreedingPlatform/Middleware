@@ -442,7 +442,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			return cachedVariable;
 		}
 
-		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.OntologyVariableDataManagerImpl.getVariable");
+		final Monitor monitor = MonitorFactory.start("CreateTrial.OpenTrial.bms.middleware.OntologyVariableDataManagerImpl.getVariable");
 		try {
 
 			// Fetch term from db

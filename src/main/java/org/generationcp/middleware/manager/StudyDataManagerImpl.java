@@ -74,6 +74,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
@@ -222,10 +225,15 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<Experiment> getExperiments(int dataSetId, int start, int numOfRows, VariableTypeList varTypeList)
 			throws MiddlewareException {
-		if (varTypeList == null) {
-			return this.getExperiments(dataSetId, start, numOfRows);
-		} else {
-			return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), start, numOfRows, varTypeList);
+		Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.StudyDataManagerImpl.getExperiments");
+		try {
+			if (varTypeList == null) {
+				return this.getExperiments(dataSetId, start, numOfRows);
+			} else {
+				return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), start, numOfRows, varTypeList);
+			}
+		} finally {
+			monitor.stop();
 		}
 	}
 
@@ -735,9 +743,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyDetails getStudyDetails(StudyType studyType, int studyId) throws MiddlewareQueryException {
-		StudyDetails studyDetails = this.getDmsProjectDao().getStudyDetails(studyType, studyId);
-		this.populateSiteAnPersonIfNecessary(studyDetails);
-		return studyDetails;
+		final Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.StudyDataManagerImpl.getStudyDetails");
+		try {
+			StudyDetails studyDetails = this.getDmsProjectDao().getStudyDetails(studyType, studyId);
+			this.populateSiteAnPersonIfNecessary(studyDetails);
+			return studyDetails;
+		} finally {
+			monitor.stop();
+		}
 	}
 
 	@Override

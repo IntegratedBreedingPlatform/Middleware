@@ -56,43 +56,58 @@ public class ExperimentBuilder extends Builder {
 
 	public List<Experiment> build(int projectId, TermId type, int start, int numOfRows, VariableTypeList variableTypes)
 			throws MiddlewareQueryException {
-		List<Experiment> experiments = new ArrayList<Experiment>();
-		List<ExperimentProject> experimentProjects =
-				this.getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
-		Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentProjects);
-		for (ExperimentProject experimentProject : experimentProjects) {
-			experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
+		final Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.ExperimentBuilder.build.3");
+		try {
+			List<Experiment> experiments = new ArrayList<Experiment>();
+			List<ExperimentProject> experimentProjects =
+					this.getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
+			Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentProjects);
+			for (ExperimentProject experimentProject : experimentProjects) {
+				experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
+			}
+			return experiments;
+		} finally {
+			monitor.stop();
 		}
-		return experiments;
 	}
 
 	public List<Experiment> build(int projectId, TermId type, int start, int numOfRows, VariableTypeList variableTypes,
 			boolean hasVariableType) throws MiddlewareQueryException {
-		List<Experiment> experiments = new ArrayList<Experiment>();
-		List<ExperimentProject> experimentProjects =
-				this.getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
-		for (ExperimentProject experimentProject : experimentProjects) {
-			experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, hasVariableType));
+		Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.ExperimentBuilder.build.1");
+		try {
+			List<Experiment> experiments = new ArrayList<Experiment>();
+			List<ExperimentProject> experimentProjects =
+					this.getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
+			for (ExperimentProject experimentProject : experimentProjects) {
+				experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, hasVariableType));
+			}
+			return experiments;
+		} finally {
+			monitor.stop();
 		}
-		return experiments;
 	}
 
 	private Map<Integer, StockModel> getStockModelMap(List<ExperimentProject> experimentProjects) throws MiddlewareQueryException {
-		Map<Integer, StockModel> stockModelMap = new HashMap<Integer, StockModel>();
-		for (ExperimentProject experimentProject : experimentProjects) {
-			List<ExperimentStock> experimentStocks = experimentProject.getExperiment().getExperimentStocks();
-			if (experimentStocks != null && experimentStocks.size() == 1) {
-				StockModel stock = experimentStocks.get(0).getStock();
-				Integer stockId = stock.getStockId();
-				stockModelMap.put(stockId, stock);
+		final Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.ExperimentBuilder.getStockModelMap");
+		try {
+			Map<Integer, StockModel> stockModelMap = new HashMap<Integer, StockModel>();
+			for (ExperimentProject experimentProject : experimentProjects) {
+				List<ExperimentStock> experimentStocks = experimentProject.getExperiment().getExperimentStocks();
+				if (experimentStocks != null && experimentStocks.size() == 1) {
+					StockModel stock = experimentStocks.get(0).getStock();
+					Integer stockId = stock.getStockId();
+					stockModelMap.put(stockId, stock);
+				}
 			}
+			return stockModelMap;
+		} finally {
+			monitor.stop();
 		}
-		return stockModelMap;
 	}
 
 	public List<Experiment> build(int projectId, List<TermId> types, int start, int numOfRows, VariableTypeList variableTypes)
 			throws MiddlewareQueryException {
-		Monitor monitor = MonitorFactory.start("Build Experiments");
+		Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.ExperimentBuilder.build.2");
 		try {
 			List<Experiment> experiments = new ArrayList<Experiment>();
 			List<ExperimentProject> experimentProjects =
@@ -105,7 +120,7 @@ public class ExperimentBuilder extends Builder {
 			}
 			return experiments;
 		} finally {
-			LOG.debug("" + monitor.stop());
+			monitor.stop();
 		}
 	}
 

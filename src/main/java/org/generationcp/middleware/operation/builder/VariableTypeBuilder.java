@@ -43,7 +43,7 @@ public class VariableTypeBuilder extends Builder {
 
 	public DMSVariableType create(VariableInfo variableInfo, String programUUID) throws MiddlewareException {
 
-		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.VariableTypeBuilder.create");
+		final Monitor monitor = MonitorFactory.start("CreateTrial.OpenTrial.bms.middleware.VariableTypeBuilder.create");
 		try {
 			DMSVariableType variableType = new DMSVariableType();
 

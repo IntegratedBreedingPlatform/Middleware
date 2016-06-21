@@ -54,8 +54,6 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.util.DatasetUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
@@ -73,8 +71,6 @@ public class WorkbookBuilder extends Builder {
 			TermId.NO_OF_COLS_IN_REPS.getId(), TermId.NO_OF_CROWS_LATINIZE.getId(), TermId.NO_OF_CCOLS_LATINIZE.getId(),
 			TermId.NO_OF_CBLKS_LATINIZE.getId(), TermId.EXPT_DESIGN_SOURCE.getId());
 
-	private static final Logger LOG = LoggerFactory.getLogger(WorkbookBuilder.class);
-
 	public WorkbookBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
@@ -85,7 +81,9 @@ public class WorkbookBuilder extends Builder {
 
 	public Workbook create(final int id, final StudyType studyType) {
 
-		final Monitor monitor = MonitorFactory.start("Build Workbook");
+		Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.WorkbookBuilder.create");
+
+		try {
 
 		final boolean isTrial = studyType == StudyType.T;
 		final Workbook workbook = new Workbook();
@@ -122,6 +120,7 @@ public class WorkbookBuilder extends Builder {
 		final DataSet trialDataSet = this.getDataSetBuilder().build(trialDataSetProject.getProjectId());
 		workbook.setTrialDatasetId(trialDataSet.getId());
 
+		Monitor monitor2 = MonitorFactory.start("OpenTrial.bms.middleware.WorkbookBuilder.DecomposeDataset");
 		final VariableList conditionVariables = study.getConditions();
 		final VariableList constantVariables = study.getConstants();
 		final VariableList trialConstantVariables = this.getTrialConstants(trialDataSet);
@@ -135,6 +134,9 @@ public class WorkbookBuilder extends Builder {
 		final List<MeasurementVariable> constants = this.buildStudyMeasurementVariables(constantVariables, false, true);
 		constants.addAll(this.buildStudyMeasurementVariables(trialConstantVariables, false, false));
 		final List<MeasurementVariable> variates = this.buildVariates(variables, constants);
+		
+		monitor2.stop();
+		
 		final List<MeasurementVariable> expDesignVariables = new ArrayList<MeasurementVariable>();
 
 		// Nursery case
@@ -148,14 +150,18 @@ public class WorkbookBuilder extends Builder {
 				}
 			}
 		}
-
-		// Set possible values of breeding method
+		
+		Monitor monitor3 = MonitorFactory.start("OpenTrial.bms.middleware.WorkbookBuilder.BMLoop");
+		// Set possible values of breeding method- watermelon - hits CVTermDao.getByNameAndCvId(String, int) query plan shows use of
+		// temp tables - slow! Possibly no longer needed. Need to check and test if this can be completely removed without affecting any functionality.
 		for (final MeasurementVariable variable : variates) {
-			if (this.getOntologyDataManager().getProperty(variable.getProperty()).getTerm().getId() == TermId.BREEDING_METHOD_PROP.getId()) {
+			if (this.getOntologyDataManager().getProperty(variable.getProperty()).getTerm().getId() == TermId.BREEDING_METHOD_PROP
+					.getId()) {
 				// DA get all methods not generative
 				variable.setPossibleValues(this.getAllBreedingMethods());
 			}
 		}
+		monitor3.stop();
 
 		// Build Observation Unit from a Measurement
 		// DA previous for experiments
@@ -167,6 +173,7 @@ public class WorkbookBuilder extends Builder {
 		final Map<Integer, org.generationcp.middleware.domain.ontology.VariableType> projectPropRoleMapping =
 				this.generateProjectPropertyRoleMap(projectProperties);
 
+		Monitor monitor4 = MonitorFactory.start("OpenTrial.bms.middleware.WorkbookBuilder.MegaCrazyLoop");
 		for (final ProjectProperty projectProperty : projectProperties) {
 			if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
 				// DA IN A LOOP
@@ -269,6 +276,7 @@ public class WorkbookBuilder extends Builder {
 				}
 			}
 		}
+		monitor4.stop();
 
 		workbook.setStudyDetails(studyDetails);
 		workbook.setFactors(factors);
@@ -281,9 +289,12 @@ public class WorkbookBuilder extends Builder {
 
 		final List<MeasurementRow> trialObservations = this.getTrialObservations(workbook, isTrial);
 		workbook.setTrialObservations(trialObservations);
-		WorkbookBuilder.LOG.debug("" + monitor.stop() + ". This instance was for studyId: " + id);
 
 		return workbook;
+
+		} finally {
+			monitor.stop();
+		}
 	}
 
 	protected List<MeasurementVariable> buildConditionVariables(VariableList studyConditionVariables,
@@ -298,14 +309,20 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	private List<MeasurementRow> getTrialObservations(final Workbook workbook, final boolean isTrial) {
-		List<MeasurementRow> trialObservations = null;
-		if (!isTrial) {
-			trialObservations =
-					this.buildTrialObservations(workbook.getTrialDatasetId(), workbook.getTrialConditions(), workbook.getTrialConstants());
-		} else {
-			trialObservations = this.getDataSetBuilder().buildCompleteDataset(workbook.getTrialDatasetId(), isTrial).getObservations();
+		// Might need deeper monitoring..
+		Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.WorkbookBuilder.getTrialObservations");
+		try {
+			List<MeasurementRow> trialObservations = null;
+			if (!isTrial) {
+				trialObservations = this.buildTrialObservations(workbook.getTrialDatasetId(), workbook.getTrialConditions(),
+						workbook.getTrialConstants());
+			} else {
+				trialObservations = this.getDataSetBuilder().buildCompleteDataset(workbook.getTrialDatasetId(), isTrial).getObservations();
+			}
+			return trialObservations;
+		} finally {
+			monitor.stop();
 		}
-		return trialObservations;
 	}
 
 	protected void checkMeasurementDataset(final Integer dataSetId) {
@@ -537,6 +554,10 @@ public class WorkbookBuilder extends Builder {
 			final List<MeasurementVariable> factorList, final List<MeasurementVariable> variateList, final boolean isTrial,
 			final List<MeasurementVariable> conditionList) {
 
+		Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.WorkbookBuilder.buildObservations");
+
+		try {
+
 		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
 		for (final Experiment experiment : experiments) {
 			final int experimentId = experiment.getId();
@@ -612,6 +633,10 @@ public class WorkbookBuilder extends Builder {
 		}
 
 		return observations;
+
+		} finally {
+			monitor.stop();
+		}
 	}
 
 	protected void populateMeasurementData(final List<MeasurementVariable> variateList, final VariableList variates,
@@ -715,6 +740,11 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	private List<TreatmentVariable> buildTreatmentFactors(final VariableTypeList variables) {
+
+		Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.WorkbookBuilder.buildTreatmentFactors");
+
+		try {
+
 		final List<TreatmentVariable> treatmentFactors = new ArrayList<TreatmentVariable>();
 		List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
 		final Map<String, VariableTypeList> treatmentMap = new HashMap<String, VariableTypeList>();
@@ -748,6 +778,9 @@ public class WorkbookBuilder extends Builder {
 		}
 
 		return treatmentFactors;
+		} finally {
+			monitor.stop();
+		}
 	}
 
 	private List<MeasurementVariable> buildFactors(final VariableTypeList variables, final boolean isTrial) {
