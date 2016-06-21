@@ -19,6 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 @Transactional
 public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeService {
 
@@ -51,16 +54,22 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 	@Override
 	public String getCrossExpansion(final Germplasm germplasm, final Integer level, final CrossExpansionProperties crossExpansionProperties)
 			throws MiddlewareQueryException {
-		if (germplasm != null) {
-			try {
-				return this.getCimmytWheatPedigree(germplasm, level == null ? crossExpansionProperties.getCropGenerationLevel("wheat") : level,
-						new Germplasm(), 0, 0, 0, 0, 0);
-			} catch (Exception e) {
-				PedigreeCimmytWheatServiceImpl.LOG.error(e.getMessage(), e);
-				throw new MiddlewareQueryException(e.getMessage(), e);
+
+		final Monitor monitor = MonitorFactory.start("org.generationcp.middleware.service.pedigree.PedigreeCimmytWheatServiceImpl.getCrossExpansion(Germplasm, Integer, CrossExpansionProperties)");
+		try {
+			if (germplasm != null) {
+				try {
+					return this.getCimmytWheatPedigree(germplasm, level == null ? crossExpansionProperties.getCropGenerationLevel("wheat") : level,
+							new Germplasm(), 0, 0, 0, 0, 0);
+				} catch (Exception e) {
+					PedigreeCimmytWheatServiceImpl.LOG.error(e.getMessage(), e);
+					throw new MiddlewareQueryException(e.getMessage(), e);
+				}
+			} else {
+				return "";
 			}
-		} else {
-			return "";
+		} finally {
+			monitor.stop();
 		}
 	}
 
