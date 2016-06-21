@@ -177,7 +177,8 @@ public class XABeanDefinition {
 		databaseConnectionProperties.setProperty(CACHE_PREP_STMTS, "true");
 		databaseConnectionProperties.setProperty(USE_UNICODE, "true");
 		databaseConnectionProperties.setProperty(CHARACTER_ENCODING, "UTF-8");
-
+		databaseConnectionProperties.setProperty("useLocalSessionState", "true");
+		databaseConnectionProperties.setProperty("cacheServerConfiguration", "true");
 		return databaseConnectionProperties;
 	}
 }
