@@ -1107,17 +1107,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Location> getFilteredLocationByTypes(List<Integer> types, String programUUID) {
-		final List<Location> locList = new ArrayList<Location>();
-		for (Iterator<Integer> iterator = types.iterator(); iterator.hasNext();) {
-			Integer type = (Integer) iterator.next();
-			locList.addAll(this.getLocationDataManager().getLocationsByType(type, programUUID));
-		}
-
-		return locList;
-	}
-
-	@Override
 	public List<Method> getFilteredBreedingMethodsByTypes(List<String> types, String programUUID) {
 		List<Method> methodList = new ArrayList<Method>();
 		for (Iterator<String> iterator = types.iterator(); iterator.hasNext();) {

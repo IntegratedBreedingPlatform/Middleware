@@ -788,7 +788,5 @@ public interface FieldbookService {
 	 */
 	Integer updateGermplasmList(List<Pair<Germplasm,GermplasmListData>> listDataItems, GermplasmList germplasmList);
 
-	List<Location> getFilteredLocationByTypes(List<Integer> types, String programUUID);
-
 	List<Method> getFilteredBreedingMethodsByTypes(List<String> types, String programUUID);
 }
