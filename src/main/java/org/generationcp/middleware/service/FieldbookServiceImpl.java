@@ -67,6 +67,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -75,6 +76,7 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.FieldbookListUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.FlushMode;
+import org.hibernate.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -239,16 +241,26 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			// TODO: Possible improvement
 			this.getWorkbookSaver().createStocksIfNecessary(measurementDatasetId, workbook, effectVariables, trialHeaders);
 
-			if (factors != null) {
-				for (final MeasurementVariable factor : factors) {
-					if (NonEditableFactors.find(factor.getTermId()) == null) {
-						for (final MeasurementRow row : observations) {
-							for (final MeasurementData field : row.getDataList()) {
-								if (factor.getName().equals(field.getLabel()) && factor.getRole() == PhenotypicType.TRIAL_DESIGN) {
-									this.getExperimentPropertySaver().saveOrUpdateProperty(
-											this.getExperimentDao().getById(row.getExperimentId()), factor.getTermId(), field.getValue());
-								}
-							}
+			for (final MeasurementRow row : observations) {
+				for (final MeasurementData field : row.getDataList()) {
+					final MeasurementVariable fieldMeasurementVariable = field.getMeasurementVariable();
+					if (fieldMeasurementVariable.getRole() == PhenotypicType.TRIAL_DESIGN) {
+						final Query query = this.getActiveSession().createSQLQuery("UPDATE nd_experimentprop SET value = :value "
+								+ "WHERE nd_experiment_id = :nd_experiment_id and type_id = :type_id");
+						query.setParameter("nd_experiment_id", row.getExperimentId());
+						query.setParameter("type_id", fieldMeasurementVariable.getTermId());
+						query.setParameter("value", field.getValue());
+						final int affectedRows = query.executeUpdate();
+						
+						
+						if(affectedRows == 0) {
+							final Query insertQuery = this.getActiveSession().createSQLQuery("INSERT INTO nd_experimentprop(nd_experiment_id,type_id,value,rank)"
+									+ " VALUES (:nd_experiment_id, :type_id, :value, :rank);");
+							insertQuery.setParameter("nd_experiment_id", row.getExperimentId());
+							insertQuery.setParameter("type_id", fieldMeasurementVariable.getTermId());
+							insertQuery.setParameter("value", field.getValue());
+							insertQuery.setParameter("rank", 0);
+							insertQuery.executeUpdate();
 						}
 					}
 				}
