@@ -787,4 +787,8 @@ public interface FieldbookService {
 	 * @return The id of the newly-created germplasm list
 	 */
 	Integer updateGermplasmList(List<Pair<Germplasm,GermplasmListData>> listDataItems, GermplasmList germplasmList);
+
+	List<Location> getFilteredLocationByTypes(List<Integer> types);
+
+	List<Method> getFilteredBreedingMethodsByTypes(List<String> types);
 }

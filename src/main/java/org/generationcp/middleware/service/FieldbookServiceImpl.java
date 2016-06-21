@@ -1106,4 +1106,26 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		this.germplasmGroupingService = germplasmGroupingService;
 	}
 
+	@Override
+	public List<Location> getFilteredLocationByTypes(List<Integer> types) {
+		final List<Location> locList = new ArrayList<Location>();
+		for (Iterator<Integer> iterator = types.iterator(); iterator.hasNext();) {
+			Integer type = (Integer) iterator.next();
+			locList.addAll(this.getLocationDataManager().getLocationsByType(type));
+		}
+
+		return locList;
+	}
+
+	@Override
+	public List<Method> getFilteredBreedingMethodsByTypes(List<String> types) {
+		List<Method> methodList = new ArrayList<Method>();
+		for (Iterator<String> iterator = types.iterator(); iterator.hasNext();) {
+			String type = (String) iterator.next();
+			methodList.addAll(this.getGermplasmDataManager().getMethodsByType(type));
+		}
+
+		return methodList;
+	}
+
 }
