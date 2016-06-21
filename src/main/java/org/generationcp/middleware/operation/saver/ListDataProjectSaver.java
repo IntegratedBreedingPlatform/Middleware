@@ -11,6 +11,9 @@ import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.util.Util;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 public class ListDataProjectSaver {
 
 	private Saver daoFactory;
@@ -26,35 +29,40 @@ public class ListDataProjectSaver {
 	public int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> listDatas,
 			int userId) throws MiddlewareQueryException {
 
-		boolean isAdvanced = type == GermplasmListType.ADVANCED || type == GermplasmListType.CROSSES;
-		GermplasmList snapList = isAdvanced ? null : this.getGermplasmList(projectId, type);
-		boolean isCreate = snapList == null;
+		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.ListDataProjectSaver.saveOrUpdateListDataProject");
+		try {
+			boolean isAdvanced = type == GermplasmListType.ADVANCED || type == GermplasmListType.CROSSES;
+			GermplasmList snapList = isAdvanced ? null : this.getGermplasmList(projectId, type);
+			boolean isCreate = snapList == null;
 
-		if (isCreate) {
-			snapList = this.createInitialGermplasmList(projectId, originalListId, type);
-		}
-
-		if (originalListId != null) {
-			this.updateGermplasmListInfo(snapList, originalListId, userId);
-		} else {
-			this.setDefaultGermplasmListInfo(snapList, userId);
-		}
-
-		this.daoFactory.getGermplasmListDAO().saveOrUpdate(snapList);
-
-		if (!isCreate && !isAdvanced) {
-			// delete old list data projects
-			this.daoFactory.getListDataProjectDAO().deleteByListId(snapList.getId());
-		}
-
-		if (listDatas != null) {
-			for (ListDataProject listDataProject : listDatas) {
-				this.prepareListDataProjectForSaving(listDataProject, snapList);
-				this.daoFactory.getListDataProjectDAO().save(listDataProject);
+			if (isCreate) {
+				snapList = this.createInitialGermplasmList(projectId, originalListId, type);
 			}
-		}
 
-		return snapList.getId();
+			if (originalListId != null) {
+				this.updateGermplasmListInfo(snapList, originalListId, userId);
+			} else {
+				this.setDefaultGermplasmListInfo(snapList, userId);
+			}
+
+			this.daoFactory.getGermplasmListDAO().saveOrUpdate(snapList);
+
+			if (!isCreate && !isAdvanced) {
+				// delete old list data projects
+				this.daoFactory.getListDataProjectDAO().deleteByListId(snapList.getId());
+			}
+
+			if (listDatas != null) {
+				for (ListDataProject listDataProject : listDatas) {
+					this.prepareListDataProjectForSaving(listDataProject, snapList);
+					this.daoFactory.getListDataProjectDAO().save(listDataProject);
+				}
+			}
+
+			return snapList.getId();
+		} finally {
+			monitor.stop();
+		}
 	}
 
 	private GermplasmList createInitialGermplasmList(int projectId, Integer originalListId, GermplasmListType type)

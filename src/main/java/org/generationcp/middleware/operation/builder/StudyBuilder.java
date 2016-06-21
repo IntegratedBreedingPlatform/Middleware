@@ -42,7 +42,7 @@ public class StudyBuilder extends Builder {
 	}
 
 	public Study createStudy(int studyId, boolean hasVariabletype) throws MiddlewareException {
-		Monitor monitor = MonitorFactory.start("Build Study");
+		final Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.StudyBuilder.createStudy");
 		try {
 			Study study = null;
 			DmsProject project = this.getDmsProjectDao().getById(studyId);
@@ -51,7 +51,7 @@ public class StudyBuilder extends Builder {
 			}
 			return study;
 		} finally {
-			LOG.debug("" + monitor.stop());
+			monitor.stop();
 		}
 	}
 

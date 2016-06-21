@@ -25,6 +25,9 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 /**
  * DAO class for {@link GeolocationProperty}.
  *
@@ -71,6 +74,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 	}
 
 	public String getGeolocationPropValue(int stdVarId, int studyId) throws MiddlewareQueryException {
+		Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.GeolocationPropertyDao.getGeolocationPropValue");
 		try {
 			StringBuilder sql =
 					new StringBuilder().append("SELECT value ").append("FROM nd_experiment e ")
@@ -84,6 +88,8 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		} catch (HibernateException e) {
 			this.logAndThrowException(
 					"Error at getGeolocationPropValue=" + stdVarId + " query on GeolocationPropertyDao: " + e.getMessage(), e);
+		} finally {
+			monitor.stop();
 		}
 		return "";
 	}

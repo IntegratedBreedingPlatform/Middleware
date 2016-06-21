@@ -65,7 +65,7 @@ public class DataSetBuilder extends Builder {
 	}
 
 	public DataSet build(int dataSetId) throws MiddlewareException {
-		Monitor monitor = MonitorFactory.start("Build DataSet. dataSetId: " + dataSetId);
+		Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.DatasetBuilder.build");
 		try {
 			DataSet dataSet = null;
 			DmsProject project = this.dmsProjectDao.getById(dataSetId);
@@ -74,7 +74,7 @@ public class DataSetBuilder extends Builder {
 			}
 			return dataSet;
 		} finally {
-			LOG.debug("" + monitor.stop());
+			monitor.stop();
 		}
 
 	}
@@ -132,21 +132,27 @@ public class DataSetBuilder extends Builder {
 	}
 
 	public DmsProject getTrialDataset(int studyId) {
-		List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(studyId);
-		if (datasetReferences == null || datasetReferences.isEmpty()) {
-			throw new MiddlewareQueryException("no.dataset.found", "No datasets found for study " + studyId);
-		}
-		for (DatasetReference datasetReference : datasetReferences) {
-			if (datasetReference.getName().endsWith(DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX)) {
-				return this.getDmsProjectById(datasetReference.getId());
+		Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.DataSetBuilder.getTrialDataset");
+		try {
+			List<DatasetReference> datasetReferences = this.studyDataManager.getDatasetReferences(studyId);
+			if (datasetReferences == null || datasetReferences.isEmpty()) {
+				throw new MiddlewareQueryException("no.dataset.found", "No datasets found for study " + studyId);
 			}
+			for (DatasetReference datasetReference : datasetReferences) {
+				if (datasetReference.getName().endsWith(DatasetUtil.NEW_ENVIRONMENT_DATASET_NAME_SUFFIX)) {
+					return this.getDmsProjectById(datasetReference.getId());
+				}
+			}
+			// if not found in the list using the name, get dataset reference with Summary Data type
+			final DatasetReference trialDatasetReference =
+					this.studyDataManager.findOneDataSetReferenceByType(studyId, DataSetType.SUMMARY_DATA);
+			if (trialDatasetReference != null) {
+				return this.getDmsProjectById(trialDatasetReference.getId());
+			}
+			throw new MiddlewareQueryException("no.trial.dataset.found", "Study exists but no environment dataset for " + studyId);
+		} finally {
+			monitor.stop();
 		}
-		// if not found in the list using the name, get dataset reference with Summary Data type
-		final DatasetReference trialDatasetReference = this.studyDataManager.findOneDataSetReferenceByType(studyId, DataSetType.SUMMARY_DATA);
-		if (trialDatasetReference != null) {
-			return this.getDmsProjectById(trialDatasetReference.getId());
-		}
-		throw new MiddlewareQueryException("no.trial.dataset.found", "Study exists but no environment dataset for " + studyId);
 	}
 
 	public Workbook buildCompleteDataset(int datasetId, boolean isTrial) throws MiddlewareException {

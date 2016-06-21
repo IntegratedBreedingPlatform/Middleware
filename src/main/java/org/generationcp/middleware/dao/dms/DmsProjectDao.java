@@ -44,6 +44,9 @@ import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 /**
  * DAO class for {@link DmsProject}.
  *
@@ -154,6 +157,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public List<DatasetReference> getDatasetNodesByStudyId(Integer studyId) throws MiddlewareQueryException {
 
+		Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.DmsProjectDao.getDatasetNodesByStudyId");
 		List<DatasetReference> datasetReferences = new ArrayList<DatasetReference>();
 
 		try {
@@ -183,6 +187,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error with getDatasetNodesByStudyId query from Project: " + e.getMessage(), e);
+		} finally {
+			monitor.stop();
 		}
 
 		return datasetReferences;

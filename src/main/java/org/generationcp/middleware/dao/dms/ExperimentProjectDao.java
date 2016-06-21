@@ -26,6 +26,9 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 /**
  * DAO class for {@link ExperimentProject}.
  *
@@ -85,6 +88,8 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 	@SuppressWarnings("unchecked")
 	public List<ExperimentProject> getExperimentProjects(int projectId, List<TermId> types, int start, int numOfRows)
 			throws MiddlewareQueryException {
+		Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.ExperimentProjectDao.getExperimentProjects");
+
 		try {
 
 			List<Integer> lists = new ArrayList<Integer>();
@@ -117,6 +122,8 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 			this.logAndThrowException(
 					"Error at getExperimentProjects=" + projectId + ", " + types + " query at ExperimentProjectDao: " + e.getMessage(), e);
 			return null;
+		} finally {
+			monitor.stop();
 		}
 	}
 

@@ -41,7 +41,6 @@ import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
-import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
@@ -67,7 +66,6 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -80,6 +78,9 @@ import org.hibernate.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 @Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
@@ -251,11 +252,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 						query.setParameter("type_id", fieldMeasurementVariable.getTermId());
 						query.setParameter("value", field.getValue());
 						final int affectedRows = query.executeUpdate();
-						
-						
-						if(affectedRows == 0) {
-							final Query insertQuery = this.getActiveSession().createSQLQuery("INSERT INTO nd_experimentprop(nd_experiment_id,type_id,value,rank)"
-									+ " VALUES (:nd_experiment_id, :type_id, :value, :rank);");
+
+						if (affectedRows == 0) {
+							final Query insertQuery = this.getActiveSession()
+									.createSQLQuery("INSERT INTO nd_experimentprop(nd_experiment_id,type_id,value,rank)"
+											+ " VALUES (:nd_experiment_id, :type_id, :value, :rank);");
 							insertQuery.setParameter("nd_experiment_id", row.getExperimentId());
 							insertQuery.setParameter("type_id", fieldMeasurementVariable.getTermId());
 							insertQuery.setParameter("value", field.getValue());
@@ -1016,12 +1017,17 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public void deleteListDataProjects(final int projectId, final GermplasmListType type) {
-		// when used in advanced, it will delete all the advance lists (list data projects)
-		final List<GermplasmList> lists = this.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
-		if (lists != null && !lists.isEmpty()) {
-			for (final GermplasmList list : lists) {
-				this.getListDataProjectDAO().deleteByListIdWithList(list.getId());
+		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.FieldbookServiceImpl.deleteListDataProjects");
+		try {
+			// when used in advanced, it will delete all the advance lists (list data projects)
+			final List<GermplasmList> lists = this.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
+			if (lists != null && !lists.isEmpty()) {
+				for (final GermplasmList list : lists) {
+					this.getListDataProjectDAO().deleteByListIdWithList(list.getId());
+				}
 			}
+		} finally {
+			monitor.stop();
 		}
 	}
 

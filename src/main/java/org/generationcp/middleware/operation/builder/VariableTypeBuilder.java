@@ -21,6 +21,9 @@ import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 public class VariableTypeBuilder extends Builder {
 
 	public VariableTypeBuilder(HibernateSessionProvider sessionProviderForLocal) {
@@ -39,20 +42,25 @@ public class VariableTypeBuilder extends Builder {
 	}
 
 	public DMSVariableType create(VariableInfo variableInfo, String programUUID) throws MiddlewareException {
-		DMSVariableType variableType = new DMSVariableType();
 
-		variableType.setLocalName(variableInfo.getLocalName());
-		variableType.setLocalDescription(variableInfo.getLocalDescription());
-		variableType.setRank(variableInfo.getRank());
-		variableType.setStandardVariable(this.getStandardVariableBuilder().create(
-				variableInfo.getStdVariableId(),programUUID));
-		variableType.setTreatmentLabel(variableInfo.getTreatmentLabel());
-		
-		variableType.setRole(variableInfo.getRole());
-		variableType.getStandardVariable().setPhenotypicType(variableInfo.getRole());
+		final Monitor monitor = MonitorFactory.start("CreateTrial.OpenTrial.bms.middleware.VariableTypeBuilder.create");
+		try {
+			DMSVariableType variableType = new DMSVariableType();
 
-		variableType.setVariableType(variableInfo.getVariableType());
+			variableType.setLocalName(variableInfo.getLocalName());
+			variableType.setLocalDescription(variableInfo.getLocalDescription());
+			variableType.setRank(variableInfo.getRank());
+			variableType.setStandardVariable(this.getStandardVariableBuilder().create(variableInfo.getStdVariableId(), programUUID));
+			variableType.setTreatmentLabel(variableInfo.getTreatmentLabel());
 
-		return variableType;
+			variableType.setRole(variableInfo.getRole());
+			variableType.getStandardVariable().setPhenotypicType(variableInfo.getRole());
+
+			variableType.setVariableType(variableInfo.getVariableType());
+
+			return variableType;
+		} finally {
+			monitor.stop();
+		}
 	}
 }

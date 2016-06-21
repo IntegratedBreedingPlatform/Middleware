@@ -44,6 +44,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 @Transactional
 public class DataImportServiceImpl extends Service implements DataImportService {
 
@@ -94,7 +97,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public int saveDataset(final Workbook workbook, final boolean retainValues, final boolean isDeleteObservations, final String programUUID) {
 
 		Map<String, ?> variableMap = null;
-		final TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)");
+		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.DataImportServiceImpl.saveDataset");
 		try {
 
 			final boolean isUpdate = workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null;
@@ -104,23 +107,15 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			}
 			variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
 
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
-		} finally {
-			timerWatch.stop();
-		}
-
-		// Send : Map of 3 sub maps, with data to create Dataset
-		// Receive int (success/fail)
-
-		try {
+			// Send : Map of 3 sub maps, with data to create Dataset
+			// Receive int (success/fail)
 
 			return this.getWorkbookSaver().saveDataset(workbook, variableMap, retainValues, isDeleteObservations, programUUID);
 
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
 		} finally {
-			timerWatch.stop();
+			monitor.stop();
 		}
 	}
 

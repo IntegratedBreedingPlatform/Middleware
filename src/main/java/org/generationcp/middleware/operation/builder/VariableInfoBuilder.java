@@ -21,16 +21,25 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 public class VariableInfoBuilder {
 
 	public Set<VariableInfo> create(List<ProjectProperty> properties) {
-		Set<VariableInfo> variableDefs = new HashSet<>();
-		for (ProjectProperty property : properties) {
-			if (this.isStandardVariableType(property)) {
-				variableDefs.add(this.createVariableDef(property, this.filterByRank(properties, property.getRank())));
+		final Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.VariableInfoBuilder.create");
+		try {
+
+			Set<VariableInfo> variableDefs = new HashSet<>();
+			for (ProjectProperty property : properties) {
+				if (this.isStandardVariableType(property)) {
+					variableDefs.add(this.createVariableDef(property, this.filterByRank(properties, property.getRank())));
+				}
 			}
+			return variableDefs;
+		} finally {
+			monitor.stop();
 		}
-		return variableDefs;
 	}
 
 	private VariableInfo createVariableDef(ProjectProperty stdVariableProperty, Set<ProjectProperty> properties) {

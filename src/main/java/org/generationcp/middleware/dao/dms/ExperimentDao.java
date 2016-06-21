@@ -29,6 +29,9 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 /**
  * DAO class for {@link ExperimentModel}.
  *
@@ -191,6 +194,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getLocationIdsOfStudy(int studyId) throws MiddlewareQueryException {
+		Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.ExperimentDao.getLocationIdsOfStudy");
 		try {
 			String sql =
 					"SELECT DISTINCT e.nd_geolocation_id " + " FROM nd_experiment e "
@@ -203,6 +207,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error at getLocationIdsOfStudy=" + studyId + " query at ExperimentDao: " + e.getMessage(), e);
+		} finally {
+			monitor.stop();
 		}
 		return new ArrayList<Integer>();
 	}

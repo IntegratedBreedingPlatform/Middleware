@@ -26,6 +26,9 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.util.StringUtil;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 public class GeolocationSaver extends Saver {
 
 	public GeolocationSaver(HibernateSessionProvider sessionProviderForLocal) {
@@ -213,32 +216,37 @@ public class GeolocationSaver extends Saver {
 
 	public Geolocation saveGeolocationOrRetrieveIfExisting(String studyName, VariableList variableList, MeasurementRow row,
 			boolean isNursery, boolean isDeleteTrialObservations, String programUUID) throws MiddlewareQueryException {
-		Geolocation geolocation = null;
+		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.GeolocationSaver.saveGeolocationOrRetrieveIfExisting");
 
-		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
-			String trialInstanceNumber = null;
-			for (Variable variable : variableList.getVariables()) {
-				String value = variable.getValue();
-				if (TermId.TRIAL_INSTANCE_FACTOR.getId() == variable.getVariableType().getStandardVariable().getId()) {
-					trialInstanceNumber = value;
-					break;
+		try {
+			Geolocation geolocation = null;
+
+			if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
+				String trialInstanceNumber = null;
+				for (Variable variable : variableList.getVariables()) {
+					String value = variable.getValue();
+					if (TermId.TRIAL_INSTANCE_FACTOR.getId() == variable.getVariableType().getStandardVariable().getId()) {
+						trialInstanceNumber = value;
+						break;
+					}
 				}
+				if (isNursery && trialInstanceNumber == null) {
+					trialInstanceNumber = "1";
+				}
+				// check if existing
+				Integer locationId = this.getGeolocationDao().getLocationIdByProjectNameAndDescriptionAndProgramUUID(studyName,
+						trialInstanceNumber, programUUID);
+				if (isDeleteTrialObservations) {
+					locationId = null;
+				}
+				geolocation = this.createOrUpdate(variableList, row, locationId);
+				geolocation.setDescription(trialInstanceNumber);
+				this.getGeolocationDao().saveOrUpdate(geolocation);
+				return geolocation;
 			}
-			if (isNursery && trialInstanceNumber == null) {
-				trialInstanceNumber = "1";
-			}
-			// check if existing
-			Integer locationId =
-					this.getGeolocationDao().getLocationIdByProjectNameAndDescriptionAndProgramUUID(studyName, trialInstanceNumber,
-							programUUID);
-			if (isDeleteTrialObservations) {
-				locationId = null;
-			}
-			geolocation = this.createOrUpdate(variableList, row, locationId);
-			geolocation.setDescription(trialInstanceNumber);
-			this.getGeolocationDao().saveOrUpdate(geolocation);
-			return geolocation;
+			return null;
+		} finally {
+			monitor.stop();
 		}
-		return null;
 	}
 }

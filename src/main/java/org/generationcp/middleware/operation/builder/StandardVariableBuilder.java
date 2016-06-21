@@ -46,6 +46,9 @@ import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 public class StandardVariableBuilder extends Builder {
 
 	private static final String DATA_TYPE_NUMERIC = "N";
@@ -191,40 +194,46 @@ public class StandardVariableBuilder extends Builder {
 	public StandardVariable findOrSave(String name, String description, String propertyName, String scaleName, String methodName,
 			PhenotypicType role, VariableType variableType, String dataTypeString, String programUUID) {
 
-		final TermBuilder termBuilder = this.getTermBuilder();
-		final Term property = termBuilder.findOrSaveProperty(propertyName, propertyName, null, termBuilder.getDefaultTraitClasses());
+		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.StandardVariableBuilder.findOrSave");
 
-		final Term scale = this.getTermBuilder().findOrSaveScale(scaleName, scaleName, this.getDataType(dataTypeString), null, null, null);
-		final Term method = this.getTermBuilder().findOrSaveMethod(methodName, methodName);
+		try {
+			final TermBuilder termBuilder = this.getTermBuilder();
+			final Term property = termBuilder.findOrSaveProperty(propertyName, propertyName, null, termBuilder.getDefaultTraitClasses());
 
-		final VariableFilter filterOpts = new VariableFilter();
-		filterOpts.setProgramUuid(programUUID);
-		filterOpts.addPropertyId(property.getId());
-		filterOpts.addMethodId(method.getId());
-		filterOpts.addScaleId(scale.getId());
+			final Term scale =
+					this.getTermBuilder().findOrSaveScale(scaleName, scaleName, this.getDataType(dataTypeString), null, null, null);
+			final Term method = this.getTermBuilder().findOrSaveMethod(methodName, methodName);
 
-		List<Variable> variableList = this.getOntologyVariableDataManager().getWithFilter(filterOpts);
-		StandardVariable standardVariable;
+			final VariableFilter filterOpts = new VariableFilter();
+			filterOpts.setProgramUuid(programUUID);
+			filterOpts.addPropertyId(property.getId());
+			filterOpts.addMethodId(method.getId());
+			filterOpts.addScaleId(scale.getId());
 
-		if(variableType == null){
-			variableType = OntologyDataHelper.mapFromPhenotype(role, propertyName);
+			List<Variable> variableList = this.getOntologyVariableDataManager().getWithFilter(filterOpts);
+			StandardVariable standardVariable;
+
+			if (variableType == null) {
+				variableType = OntologyDataHelper.mapFromPhenotype(role, propertyName);
+			}
+
+			if (variableList == null || variableList.isEmpty()) {
+				final OntologyVariableInfo variableInfo = this.createOntologyVariableInfo(name, description, method.getId(),
+						property.getId(), scale.getId(), programUUID, null, null, variableType);
+				this.getOntologyVariableDataManager().addVariable(variableInfo);
+				standardVariable = this.create(variableInfo.getId(), programUUID);
+			} else {
+				Variable variable = variableList.get(0);
+				standardVariable = this.create(variable.getId(), programUUID);
+			}
+
+			standardVariable.setPhenotypicType(role);
+			standardVariable.setVariableTypes(new HashSet<>(new ArrayList<>(Collections.singletonList(variableType))));
+
+			return standardVariable;
+		} finally {
+			monitor.stop();
 		}
-
-		if (variableList == null || variableList.isEmpty()) {
-			final OntologyVariableInfo variableInfo =
-					this.createOntologyVariableInfo(name, description, method.getId(), property.getId(), scale.getId(), programUUID, null,
-							null, variableType);
-			this.getOntologyVariableDataManager().addVariable(variableInfo);
-			standardVariable = this.create(variableInfo.getId(), programUUID);
-		} else {
-			Variable variable = variableList.get(0);
-			standardVariable = this.create(variable.getId(), programUUID);
-		}
-
-		standardVariable.setPhenotypicType(role);
-		standardVariable.setVariableTypes(new HashSet<>(new ArrayList<>(Collections.singletonList(variableType))));
-
-		return standardVariable;
 	}
 
 	private String getDataType(final String dataTypeString) {

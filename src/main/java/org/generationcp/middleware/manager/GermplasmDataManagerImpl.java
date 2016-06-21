@@ -48,6 +48,9 @@ import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
  * 
@@ -358,7 +361,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Method getMethodByID(final Integer id) {
-		return this.getMethodDao().getById(id, false);
+		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.GermplasmDataManagerImpl.getMethodByID");
+		try {
+			return this.getMethodDao().getById(id, false);
+		} finally {
+			monitor.stop();
+		}
 	}
 
 	@Override

@@ -42,6 +42,9 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 /**
  * DAO class for {@link CVTerm}.
  */
@@ -156,15 +159,17 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	public CVTerm getByNameAndCvId(String name, int cvId) {
+		Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.CVTermDao.getByNameAndCvId");
+
 		CVTerm term = null;
 
 		try {
 
 			StringBuilder sqlString =
-					new StringBuilder().append("SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
+					new StringBuilder().append("SELECT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
 					.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ").append("FROM cvterm cvt ")
 					.append("WHERE cvt.cv_id = :cvId and cvt.name = :nameOrSynonym ").append("UNION ")
-					.append("	SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
+							.append("	SELECT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
 					.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ")
 					.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
 					.append("AND cvt.cv_id = :cvId AND syn.synonym = :nameOrSynonym ");
@@ -190,6 +195,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error at getByNameAndCvId=" + name + ", " + cvId + " query on CVTermDao: " + e.getMessage(), e);
+		} finally {
+			monitor.stop();
 		}
 
 		return term;

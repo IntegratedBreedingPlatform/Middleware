@@ -177,8 +177,17 @@ public class XABeanDefinition {
 		databaseConnectionProperties.setProperty(CACHE_PREP_STMTS, "true");
 		databaseConnectionProperties.setProperty(USE_UNICODE, "true");
 		databaseConnectionProperties.setProperty(CHARACTER_ENCODING, "UTF-8");
+
+		// useLocalSessionState property form driver doc: Should the driver use the in-transaction state provided by the MySQL protocol to
+		// determine if a commit() or rollback() should actually be sent to the database?
+		// Yes we want to, otherwise very large number of "select @@session.tx_read_only" queries are run by driver before each query which
+		// we consider wasteful.
 		databaseConnectionProperties.setProperty("useLocalSessionState", "true");
+
+		// cacheServerConfiguration from driver doc: Should the driver cache the results of 'SHOW VARIABLES' and 'SHOW COLLATION' on a
+		// per-URL basis? Yes we want to.
 		databaseConnectionProperties.setProperty("cacheServerConfiguration", "true");
+
 		return databaseConnectionProperties;
 	}
 }

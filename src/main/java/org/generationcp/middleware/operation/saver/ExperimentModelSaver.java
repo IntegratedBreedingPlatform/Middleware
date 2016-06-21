@@ -29,6 +29,9 @@ import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 public class ExperimentModelSaver extends Saver {
 
 	public ExperimentModelSaver(HibernateSessionProvider sessionProviderForLocal) {
@@ -36,11 +39,16 @@ public class ExperimentModelSaver extends Saver {
 	}
 
 	public void addExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {
-		TermId myExperimentType = this.mapExperimentType(experimentType);
-		ExperimentModel experimentModel = this.create(projectId, values, myExperimentType);
-		this.getExperimentDao().save(experimentModel);
-		this.addExperimentProject(experimentModel, projectId);
-		this.getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
+		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.ExperimentModelSaver.addExperiment");
+		try {
+			TermId myExperimentType = this.mapExperimentType(experimentType);
+			ExperimentModel experimentModel = this.create(projectId, values, myExperimentType);
+			this.getExperimentDao().save(experimentModel);
+			this.addExperimentProject(experimentModel, projectId);
+			this.getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
+		} finally {
+			monitor.stop();
+		}
 	}
 
 	public void addOrUpdateExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {
@@ -99,20 +107,25 @@ public class ExperimentModelSaver extends Saver {
 	}
 
 	private ExperimentModel create(int projectId, Values values, TermId expType) throws MiddlewareQueryException {
-		ExperimentModel experimentModel = new ExperimentModel();
-		experimentModel.setTypeId(expType.getId());
-		experimentModel.setProperties(this.createProperties(experimentModel, values.getVariableList()));
+		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.ExperimentModelSaver.create");
+		try {
+			ExperimentModel experimentModel = new ExperimentModel();
+			experimentModel.setTypeId(expType.getId());
+			experimentModel.setProperties(this.createProperties(experimentModel, values.getVariableList()));
 
-		if (values.getLocationId() == null && values instanceof StudyValues) {
-			experimentModel.setGeoLocation(this.createNewGeoLocation());
-		} else if (values.getLocationId() != null) {
-			experimentModel.setGeoLocation(this.getGeolocationDao().getById(values.getLocationId()));
+			if (values.getLocationId() == null && values instanceof StudyValues) {
+				experimentModel.setGeoLocation(this.createNewGeoLocation());
+			} else if (values.getLocationId() != null) {
+				experimentModel.setGeoLocation(this.getGeolocationDao().getById(values.getLocationId()));
+			}
+			if (values.getGermplasmId() != null) {
+				experimentModel.setExperimentStocks(new ArrayList<ExperimentStock>());
+				experimentModel.getExperimentStocks().add(this.createExperimentStock(experimentModel, values.getGermplasmId()));
+			}
+			return experimentModel;
+		} finally {
+			monitor.stop();
 		}
-		if (values.getGermplasmId() != null) {
-			experimentModel.setExperimentStocks(new ArrayList<ExperimentStock>());
-			experimentModel.getExperimentStocks().add(this.createExperimentStock(experimentModel, values.getGermplasmId()));
-		}
-		return experimentModel;
 	}
 
 	// GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
@@ -150,10 +163,15 @@ public class ExperimentModelSaver extends Saver {
 	}
 
 	private void addExperimentProject(ExperimentModel experimentModel, int projectId) throws MiddlewareQueryException {
-		ExperimentProject exproj = new ExperimentProject();
-		exproj.setProjectId(projectId);
-		exproj.setExperiment(experimentModel);
-		this.getExperimentProjectDao().save(exproj);
+		final Monitor monitor = MonitorFactory.start("CreateTrial.bms.middleware.ExperimentModelSaver.addExperimentProject");
+		try {
+			ExperimentProject exproj = new ExperimentProject();
+			exproj.setProjectId(projectId);
+			exproj.setExperiment(experimentModel);
+			this.getExperimentProjectDao().save(exproj);
+		} finally {
+			monitor.stop();
+		}
 	}
 
 	private ExperimentStock createExperimentStock(ExperimentModel experiment, int stockId) throws MiddlewareQueryException {
