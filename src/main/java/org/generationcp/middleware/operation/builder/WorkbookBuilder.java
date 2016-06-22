@@ -164,7 +164,7 @@ public class WorkbookBuilder extends Builder {
 		final Map<Integer, org.generationcp.middleware.domain.ontology.VariableType> projectPropRoleMapping =
 				this.generateProjectPropertyRoleMap(projectProperties);
 
-		Monitor monitor4 = MonitorFactory.start("OpenTrial.bms.middleware.WorkbookBuilder.MegaCrazyLoop");
+		Monitor monitor4 = MonitorFactory.start("OpenTrial.bms.middleware.WorkbookBuilder.buildObservationsPostProcess");
 		for (final ProjectProperty projectProperty : projectProperties) {
 			if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
 				// DA IN A LOOP
