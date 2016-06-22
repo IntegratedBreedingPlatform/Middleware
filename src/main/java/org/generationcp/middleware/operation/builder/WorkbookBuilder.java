@@ -53,6 +53,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.DatasetUtil;
 
 import com.jamonapi.Monitor;
@@ -151,17 +152,7 @@ public class WorkbookBuilder extends Builder {
 			}
 		}
 		
-		Monitor monitor3 = MonitorFactory.start("OpenTrial.bms.middleware.WorkbookBuilder.BMLoop");
-		// Set possible values of breeding method- watermelon - hits CVTermDao.getByNameAndCvId(String, int) query plan shows use of
-		// temp tables - slow! Possibly no longer needed. Need to check and test if this can be completely removed without affecting any functionality.
-		for (final MeasurementVariable variable : variates) {
-			if (this.getOntologyDataManager().getProperty(variable.getProperty()).getTerm().getId() == TermId.BREEDING_METHOD_PROP
-					.getId()) {
-				// DA get all methods not generative
-				variable.setPossibleValues(this.getAllBreedingMethods());
-			}
-		}
-		monitor3.stop();
+		populateBreedingMethodPossibleValues(variates);
 
 		// Build Observation Unit from a Measurement
 		// DA previous for experiments
@@ -292,6 +283,26 @@ public class WorkbookBuilder extends Builder {
 
 		return workbook;
 
+		} finally {
+			monitor.stop();
+		}
+	}
+
+	private void populateBreedingMethodPossibleValues(final List<MeasurementVariable> variates) {
+		Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.WorkbookBuilder.populateBreedingMethodPossibleValues");
+
+		try {
+			final CVTerm breedingMethodProperty = getCvTermDao().getById(TermId.BREEDING_METHOD_PROP.getId());
+			List<ValueReference> possibleBreedingMethodValues = null;
+			for (final MeasurementVariable variable : variates) {
+				if (variable.getProperty().equals(breedingMethodProperty.getName())) {
+					if (possibleBreedingMethodValues == null) {
+						// Query only once on first match and reuse for subsequent matches.
+						possibleBreedingMethodValues = this.getAllBreedingMethods();
+					}
+					variable.setPossibleValues(possibleBreedingMethodValues);
+				}
+			}
 		} finally {
 			monitor.stop();
 		}
