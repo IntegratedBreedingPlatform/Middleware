@@ -57,7 +57,7 @@ public class DoubleCrossProcessorTest {
 		final PedigreeString resultantPedigreeString =
 				doubleCrossProcessor.processGermplasmNode(parentGermplasmNode, new Integer(3), fixedLineNameResolver, false);
 		assertEquals("Incorrect double cross generation with missing male parent", "B/C//Unknown", resultantPedigreeString.getPedigree());
-		assertEquals("We have crated one cross.", 1, resultantPedigreeString.getNumberOfCrosses());
+		assertEquals("We have crated one cross.", 2, resultantPedigreeString.getNumberOfCrosses());
 
 	}
 
@@ -72,8 +72,7 @@ public class DoubleCrossProcessorTest {
 		final PedigreeString resultantPedigreeString =
 				doubleCrossProcessor.processGermplasmNode(parentGermplasmNode, new Integer(3), fixedLineNameResolver, false);
 		assertEquals("Incorret double cross generationw with missing parents.", "Unknown/Unknown", resultantPedigreeString.getPedigree());
-		assertEquals("Note this is 0 which is odd but is the same behaviour as in the original algorithm."
-				+ " Please refer to org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl", 0, resultantPedigreeString.getNumberOfCrosses());
+		assertEquals("We have created 1 cross", 1, resultantPedigreeString.getNumberOfCrosses());
 
 	}
 }
