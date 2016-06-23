@@ -1295,4 +1295,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		this.getGermplasmDao().saveOrUpdate(germplasm);
 
 	}
+
+	@Override
+	public void updatePedigreeString(Pedigree pedigree, String crossExpansion, String profile, int cropGenerationLevel) {
+	  	final PedigreeDAO pedigreeDAO = this.getPedigreeDAO();
+	  	pedigree.setAlgorithmUsed(profile);
+	  	pedigree.setLevels(cropGenerationLevel);
+	  	pedigree.setPedigreeString(crossExpansion);
+	  	pedigree.setInvalidate(0);
+	  	pedigreeDAO.saveOrUpdate(pedigree);
+	}
 }

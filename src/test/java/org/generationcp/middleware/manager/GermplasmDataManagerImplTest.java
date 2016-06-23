@@ -1060,4 +1060,26 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		}
 
 	}
+
+  	@Test
+  	public void testUpdatePedigreeString() throws Exception{
+	  	Pedigree oldPedigree = new Pedigree();
+	  	oldPedigree.setPedigreeString("oldPedigree");
+	  	oldPedigree.setAlgorithmUsed("default");
+	  	oldPedigree.setLevels(0);
+	  	oldPedigree.setInvalidate(0);
+
+	  	this.pedigreeDAO.save(oldPedigree);
+
+	  	this.germplasmDataManager.updatePedigreeString(oldPedigree, "newPedigree", "newProfile", 0);
+
+	  	Pedigree newPedigree = this.pedigreeDAO.getById(oldPedigree.getId());
+
+	  	Assert.assertNotNull(newPedigree);
+	  	Assert.assertEquals("newPedigree", newPedigree.getPedigreeString());
+	  	Assert.assertEquals("newProfile", newPedigree.getAlgorithmUsed());
+	  	Assert.assertEquals(0,	newPedigree.getLevels());
+	  	Assert.assertEquals(0, newPedigree.getInvalidate());
+
+	}
 }

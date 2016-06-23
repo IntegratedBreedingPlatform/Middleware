@@ -21,6 +21,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pedigree.Pedigree;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Country;
@@ -1021,6 +1022,8 @@ public interface GermplasmDataManager {
 	UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code);
 
 	void addPedigreeString(Germplasm germplasm, String crossExpansion, String profile, int cropGenerationLevel);
+
+  	void updatePedigreeString(Pedigree pedigree, String crossExpansion, String profile, int cropGenerationLevel);
 
   	/**
   	 * Return the count of germplasm search results based on the following parameters:
