@@ -129,7 +129,7 @@ public class PedigreeAlgorithmTest extends IntegrationTestBase {
 
 	private List<Germplasm> getGermplasmByMethodName(String string, int germplasmStartIndex, int numberOfRows, Operation like) {
 		SQLQuery createSQLQuery = this.sessionProvder.getSession().createSQLQuery("Select * from germplsm g "
-				+ "INNER JOIN Methods m ON g.methn = m.mid "
+				+ "INNER JOIN methods m ON g.methn = m.mid "
 				+ "where m.mname LIKE :mname and g.gid != g.grplce LIMIT " + numberOfRows);
 		createSQLQuery.setParameter("mname", string);
 		createSQLQuery.addEntity(Germplasm.class);
