@@ -138,7 +138,7 @@ public class PedigreeAlgorithmTest extends IntegrationTestBase {
 
 	private long countGermplasmByMethodName(String string, Operation like) {
 		SQLQuery createSQLQuery = this.sessionProvder.getSession().createSQLQuery("Select count(*) from germplsm g "
-							+ "INNER JOIN Methods m ON g.methn = m.mid "
+							+ "INNER JOIN methods m ON g.methn = m.mid "
 							+ "where m.mname LIKE :mname and g.gid != g.grplce");
 		createSQLQuery.setParameter("mname", string);
 
