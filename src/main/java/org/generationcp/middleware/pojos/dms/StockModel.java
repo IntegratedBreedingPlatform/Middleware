@@ -94,7 +94,7 @@ public class StockModel implements Serializable {
 	private Boolean isObsolete;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "stockModel")
-	@BatchSize(size = 500)
+	@BatchSize(size = 10000)
 	private Set<StockProperty> properties;
 
 	public StockModel() {
