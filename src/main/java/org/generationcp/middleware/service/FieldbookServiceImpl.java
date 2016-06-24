@@ -152,10 +152,18 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
+	public List<Location> getFavoriteLocationByLocationIDs(final List<Integer> locationIds, boolean isBreedingLocation) {
+		if(isBreedingLocation){
+			return this.getLocationDataManager().getAllBreedingLocations(locationIds);
+		}
+		return this.getLocationDataManager().getAllSeedingLocations(locationIds);
+	}
+
+	@Override
 	public List<Location> getFavoriteLocationByLocationIDs(final List<Integer> locationIds) {
 		return this.getLocationDataManager().getLocationsByIDs(locationIds);
 	}
-
+	
 	@Override
 	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int geolocationId,
 			final CrossExpansionProperties crossExpansionProperties) {
@@ -286,6 +294,18 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			methodList = this.getGermplasmDataManager().getNonGenerativeMethodsByID(methodIds);
 		} else {
 			methodList = this.getGermplasmDataManager().getMethodsByIDs(methodIds);
+		}
+
+		return methodList;
+	}
+	
+	@Override
+	public List<Method> getFavoriteMethods(final List<Integer> methodIds, final boolean filterOutGenerative) {
+		final List<Method> methodList;
+		if (filterOutGenerative) {
+			methodList = this.getGermplasmDataManager().getNonGenerativeMethodsByID(methodIds);
+		} else {
+			methodList = this.getGermplasmDataManager().getDerivativeAndMaintenanceMethods(methodIds);
 		}
 
 		return methodList;
@@ -1104,17 +1124,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	void setGermplasmGroupingService(GermplasmGroupingService germplasmGroupingService) {
 		this.germplasmGroupingService = germplasmGroupingService;
-	}
-
-	@Override
-	public List<Method> getFilteredBreedingMethodsByTypes(List<String> types, String programUUID) {
-		List<Method> methodList = new ArrayList<Method>();
-		for (Iterator<String> iterator = types.iterator(); iterator.hasNext();) {
-			String type = (String) iterator.next();
-			methodList.addAll(this.getGermplasmDataManager().getMethodsByType(type, programUUID));
-		}
-
-		return methodList;
 	}
 
 }

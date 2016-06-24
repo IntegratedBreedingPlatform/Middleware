@@ -136,9 +136,10 @@ public interface FieldbookService {
 	 * Gets the favorite location by project id.
 	 *
 	 * @param locationIds the location ids
+	 * @param filtered 
 	 * @return the favorite locations based on the given project id
 	 */
-	List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
+	List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds, boolean filtered);
 
 	/**
 	 * Gets the study.
@@ -788,5 +789,7 @@ public interface FieldbookService {
 	 */
 	Integer updateGermplasmList(List<Pair<Germplasm,GermplasmListData>> listDataItems, GermplasmList germplasmList);
 
-	List<Method> getFilteredBreedingMethodsByTypes(List<String> types, String programUUID);
+	public List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
+
+	public List<Method> getFavoriteMethods(List<Integer> methodIds, boolean filterOutGenerative);
 }

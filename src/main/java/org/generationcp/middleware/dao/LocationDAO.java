@@ -770,5 +770,44 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 		return new ArrayList<Locdes>();
 	}
+	
+	public List<Location> getBreedingLocations(List<Integer> ids) throws MiddlewareQueryException {
+		try {
+			List<Integer> validCodes = new ArrayList<Integer>();
+			// 410, 411, 412
+			validCodes.add(410);
+			validCodes.add(411);
+			validCodes.add(412);
+
+			Criteria criteria = this.getSession().createCriteria(Location.class);
+
+			criteria.add(Restrictions.in("locid", ids));
+			criteria.add(Restrictions.in("ltype", validCodes));
+			criteria.addOrder(Order.asc("lname"));
+
+			return criteria.list();
+		} catch (HibernateException e) {
+			this.logAndThrowException(
+					this.getLogExceptionMessage("getBreedingLocations", "", null, e.getMessage(), "Location"), e);
+		}
+		return new ArrayList<Location>();
+	}
+
+	public List<Location> getSeedingLocations(List<Integer> ids, Integer seedLType) throws MiddlewareQueryException {
+		try {
+
+			Criteria criteria = this.getSession().createCriteria(Location.class);
+
+			criteria.add(Restrictions.in("locid", ids));
+			criteria.add(Restrictions.eq("ltype", seedLType));
+			criteria.addOrder(Order.asc("lname"));
+
+			return criteria.list();
+		} catch (HibernateException e) {
+			this.logAndThrowException(
+					this.getLogExceptionMessage("getSeedingLocations", "", null, e.getMessage(), "Location"), e);
+		}
+		return new ArrayList<Location>();
+	}
 
 }
