@@ -13,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 public class AncestryTreeService {
 
@@ -28,7 +30,9 @@ public class AncestryTreeService {
 	}
 
 	GermplasmNode buildAncestryTree(final Integer gid, final int level) {
+		
 		Preconditions.checkNotNull(gid);
+		final Monitor monitor = MonitorFactory.start("org.generationcp.middleware.service.pedigree.AncestryTreeService.buildAncestryTree(Integer, int)");
 
 		try {
 			final GermplasmNode rootGermplasmNode = this.buildGermplasmNode(gid, level);
@@ -37,6 +41,8 @@ public class AncestryTreeService {
 			return rootGermplasmNode;
 		} catch (final ExecutionException e) {
 			throw new MiddlewareQueryException("Unable to create pedigree string", e);
+		} finally {
+			monitor.stop();
 		}
 	}
 
