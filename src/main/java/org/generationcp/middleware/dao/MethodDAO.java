@@ -430,7 +430,9 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			SimpleExpression der = Restrictions.eq("mtype", "DER");
 			SimpleExpression man = Restrictions.eq("mtype", "MAN");
 			criteria.add(Restrictions.or(der, man));
-			criteria.add(Restrictions.in("mid", ids));
+			if (ids.size() > 0){
+				criteria.add(Restrictions.in("mid", ids));
+			}
 			criteria.add(Restrictions.in("geneq", validMethodClasses));
 			criteria.addOrder(Order.asc("mname"));
 
