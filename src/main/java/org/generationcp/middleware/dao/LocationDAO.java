@@ -780,8 +780,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			validCodes.add(412);
 
 			Criteria criteria = this.getSession().createCriteria(Location.class);
-
-			criteria.add(Restrictions.in("locid", ids));
+			if (ids.size() > 0){
+				criteria.add(Restrictions.in("locid", ids));
+			}
 			criteria.add(Restrictions.in("ltype", validCodes));
 			criteria.addOrder(Order.asc("lname"));
 
