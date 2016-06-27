@@ -13,9 +13,12 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.AttributeDAO;
@@ -1271,32 +1274,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public void addPedigreeString(Germplasm germplasm, String crossExpansion, String profile, int cropGenerationLevel) {
-	
-		final PedigreeDAO pedigreeDAO = this.getPedigreeDAO();
-		final List<Pedigree> filterByColumnValue = pedigreeDAO.filterByColumnValue("pedigreeString", crossExpansion);
-		
-		if(filterByColumnValue.size() > 1) {
-			throw new IllegalStateException("Should not have more than one pedigree string in the table.");
-		}
-		
-		if(filterByColumnValue.size() == 1) {
-			germplasm.setPedigree(filterByColumnValue.get(0));
-		} else {
-		
-			final Pedigree pedigree = new Pedigree();
-			pedigree.setAlgorithmUsed(profile);
-			pedigree.setLevels(cropGenerationLevel);
-			pedigree.setPedigreeString(crossExpansion);
-			germplasm.setPedigree(pedigree);
-			pedigreeDAO.save(pedigree);
-
-		}
-		this.getGermplasmDao().saveOrUpdate(germplasm);
-
-	}
-
-	@Override
 	public void updatePedigreeString(Pedigree pedigree, String crossExpansion, String profile, int cropGenerationLevel) {
 	  	final PedigreeDAO pedigreeDAO = this.getPedigreeDAO();
 	  	pedigree.setAlgorithmUsed(profile);
@@ -1305,4 +1282,48 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	  	pedigree.setInvalidate(0);
 	  	pedigreeDAO.saveOrUpdate(pedigree);
 	}
+
+  	@Override
+	public void addPedigreeString(HashMap<Germplasm, String> germplasmPedigreeStringMap, String profile, int cropGenerationLevel) {
+	  	Set<String> pedigreeStrings = new HashSet<>();
+
+	  	pedigreeStrings.addAll(germplasmPedigreeStringMap.values());
+
+
+	  	final PedigreeDAO pedigreeDAO = this.getPedigreeDAO();
+	  	final List<Pedigree> filterPedigreeByPedigreeValues = pedigreeDAO.filterByColumnValues("pedigreeString", new ArrayList<Object>(pedigreeStrings));
+
+
+	  	final HashMap<String, List<Pedigree>> returnPedigreesMap = new HashMap<>();
+	  		for(Pedigree pedigree : filterPedigreeByPedigreeValues){
+		  		String pedigreeString = pedigree.getPedigreeString();
+		  		if(!returnPedigreesMap.containsKey(pedigreeString)){
+				  returnPedigreesMap.put(pedigree.getPedigreeString(), Lists.<Pedigree>newArrayList());
+		  		}
+			  returnPedigreesMap.get(pedigreeString).add(pedigree);
+		}
+
+	  	for(Germplasm germplasm : germplasmPedigreeStringMap.keySet()){
+		  	String pedigreeString = germplasmPedigreeStringMap.get(germplasm);
+
+			List<Pedigree> matchPedigree = returnPedigreesMap.get(pedigreeString);
+		  	if(matchPedigree == null){
+			  	final Pedigree pedigree = new Pedigree();
+			  	pedigree.setAlgorithmUsed(profile);
+			  	pedigree.setLevels(cropGenerationLevel);
+			  	pedigree.setPedigreeString(pedigreeString);
+			  	germplasm.setPedigree(pedigree);
+			  	pedigreeDAO.save(pedigree);
+			}
+			else if(matchPedigree.size() == 1) {
+			  germplasm.setPedigree(matchPedigree.get(0));
+			}
+			else if(matchPedigree.size() > 1) {
+		  		throw new IllegalStateException("Should not have more than one pedigree string in the table.");
+			}
+		  	this.getGermplasmDao().saveOrUpdate(germplasm);
+
+  		}
+	}
+
 }

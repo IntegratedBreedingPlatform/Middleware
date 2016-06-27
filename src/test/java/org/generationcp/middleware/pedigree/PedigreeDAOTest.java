@@ -1,5 +1,6 @@
 package org.generationcp.middleware.pedigree;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -164,14 +165,16 @@ public class PedigreeDAOTest extends IntegrationTestBase {
 		final Germplasm testGermplasm = getTestGermplasm();
 
 		final String pedigreeString = UUID.randomUUID().toString();
-		germplasmDataManager.addPedigreeString(testGermplasm, pedigreeString, "test", 3);
-		
+	  	HashMap<Germplasm, String> germplasmPedigreeStringMap = new HashMap<>();
+	  	germplasmPedigreeStringMap.put(testGermplasm, pedigreeString);
+	  	this.germplasmDataManager.addPedigreeString(germplasmPedigreeStringMap, "test", 3);
+
 		final Germplasm simpleEqualsDatabaseQuery = germplasmDAO.searchForGermplasms(testGermplasm.getGid().toString(), Operation.EQUAL, false, false, false).get(0);
 		final Pedigree savedPedigree = simpleEqualsDatabaseQuery.getPedigree();
-		Assert.assertNotNull("Enusre Pedigree has been retrieved.", savedPedigree);
-		Assert.assertEquals("Enusre Pedigree has been retrieved.", pedigreeString, savedPedigree.getPedigreeString());
-		Assert.assertEquals("Enusre Pedigree has been retrieved.", "test", savedPedigree.getAlgorithmUsed());
-		Assert.assertEquals("Enusre Pedigree has been retrieved.", 3, savedPedigree.getLevels());
+		Assert.assertNotNull("Ensure Pedigree has been retrieved.", savedPedigree);
+		Assert.assertEquals("Ensure Pedigree has been retrieved.", pedigreeString, savedPedigree.getPedigreeString());
+		Assert.assertEquals("Ensure Pedigree has been retrieved.", "test", savedPedigree.getAlgorithmUsed());
+		Assert.assertEquals("Ensure Pedigree has been retrieved.", 3, savedPedigree.getLevels());
 	}
 	
 	private Germplasm getTestGermplasm() {

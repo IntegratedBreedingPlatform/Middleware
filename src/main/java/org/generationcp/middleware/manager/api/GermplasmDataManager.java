@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.manager.api;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -1021,7 +1022,7 @@ public interface GermplasmDataManager {
 	 */
 	UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code);
 
-	void addPedigreeString(Germplasm germplasm, String crossExpansion, String profile, int cropGenerationLevel);
+  	void addPedigreeString(HashMap<Germplasm, String> germplasmPedigreeStringMap, String profile, int cropGenerationLevel);
 
   	void updatePedigreeString(Pedigree pedigree, String crossExpansion, String profile, int cropGenerationLevel);
 

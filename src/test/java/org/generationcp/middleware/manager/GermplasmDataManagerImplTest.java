@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -996,7 +997,10 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 	  	this.germplasmDAO.save(germplasm);
 
 	  	final String crossExpansion = "(CML454 X CML451)-B-4-1-11231";
-	  	this.germplasmDataManager.addPedigreeString(germplasm, crossExpansion, "default", 0);
+
+	  	HashMap<Germplasm, String> germplasmPedigreeStringMap = new HashMap<>();
+	  	germplasmPedigreeStringMap.put(germplasm, crossExpansion);
+	  	this.germplasmDataManager.addPedigreeString(germplasmPedigreeStringMap, "default", 0);
 
 	  	final List<Pedigree> filterByColumnValue = pedigreeDAO.filterByColumnValue("pedigreeString", crossExpansion);
 
@@ -1030,7 +1034,9 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	  	this.pedigreeDAO.save(pedigreeStr);
 
-		this.germplasmDataManager.addPedigreeString(germplasm, crossExpansion, "default", 0);
+	  	HashMap<Germplasm, String> germplasmPedigreeStringMap = new HashMap<>();
+	  	germplasmPedigreeStringMap.put(germplasm, crossExpansion);
+	  	this.germplasmDataManager.addPedigreeString(germplasmPedigreeStringMap, "default", 0);
 
 		Assert.assertEquals(pedigreeStr.getId(), germplasm.getPedigree().getId());
  	 }
@@ -1053,7 +1059,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 	  	this.pedigreeDAO.save(pedigreeStrTwo);
 
 	  	try{
-		  this.germplasmDataManager.addPedigreeString(new Germplasm(), crossExpansion, "default", 0);
+		  this.germplasmDataManager.addPedigreeString(new HashMap<Germplasm, String>(), "default", 0);
 		}
 		catch (IllegalStateException e){
 		  Assert.assertEquals("Should not have more than one pedigree string in the table.", e.getMessage());
