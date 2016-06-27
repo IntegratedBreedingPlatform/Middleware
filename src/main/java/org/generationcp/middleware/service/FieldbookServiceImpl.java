@@ -309,7 +309,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public List<Method> getFavoriteMethods(final List<Integer> methodIds, final Boolean filterOutGenerative) {
 
 		if (filterOutGenerative == null) {
-			return this.getGermplasmDataManager().getAllMethods();
+			return this.getGermplasmDataManager().getMethodsByIDs(methodIds);
 		}
 
 		if (filterOutGenerative) {
