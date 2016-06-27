@@ -36,6 +36,8 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Location}.
@@ -53,6 +55,8 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	private static final String LOCID = "locid";
 	private static final String LTYPE = "ltype";
 	private static final String NAME_OR_OPERATION = "name|operation";
+
+	private static final Logger LOG = LoggerFactory.getLogger(LocationDAO.class);
 
 	public List<Location> getByName(String name, Operation operation) throws MiddlewareQueryException {
 		try {
@@ -771,15 +775,15 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return new ArrayList<Locdes>();
 	}
 	
-	public List<Location> getBreedingLocations(List<Integer> ids) throws MiddlewareQueryException {
+	public List<Location> getBreedingLocations(final List<Integer> ids) throws MiddlewareQueryException {
 		try {
-			List<Integer> validCodes = new ArrayList<Integer>();
+			final List<Integer> validCodes = new ArrayList<Integer>();
 			// 410, 411, 412
 			validCodes.add(410);
 			validCodes.add(411);
 			validCodes.add(412);
 
-			Criteria criteria = this.getSession().createCriteria(Location.class);
+			final Criteria criteria = this.getSession().createCriteria(Location.class);
 			if (ids.size() > 0){
 				criteria.add(Restrictions.in("locid", ids));
 			}
@@ -787,11 +791,10 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			criteria.addOrder(Order.asc("lname"));
 
 			return criteria.list();
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					this.getLogExceptionMessage("getBreedingLocations", "", null, e.getMessage(), "Location"), e);
+		} catch (final HibernateException e) {
+			LocationDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(this.getLogExceptionMessage("getBreedingLocations", "", null, e.getMessage(), "Location"), e);
 		}
-		return new ArrayList<Location>();
 	}
 
 	public List<Location> getSeedingLocations(List<Integer> ids, Integer seedLType) throws MiddlewareQueryException {
