@@ -784,7 +784,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			validCodes.add(412);
 
 			final Criteria criteria = this.getSession().createCriteria(Location.class);
-			if (ids.size() > 0){
+			if (ids.size() > 0) {
 				criteria.add(Restrictions.in("locid", ids));
 			}
 			criteria.add(Restrictions.in("ltype", validCodes));
@@ -793,25 +793,25 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			return criteria.list();
 		} catch (final HibernateException e) {
 			LocationDAO.LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("getBreedingLocations", "", null, e.getMessage(), "Location"), e);
+			throw new MiddlewareQueryException(this.getLogExceptionMessage("getBreedingLocations", "", null, e.getMessage(), "Location"),
+					e);
 		}
 	}
 
-	public List<Location> getSeedingLocations(List<Integer> ids, Integer seedLType) throws MiddlewareQueryException {
+	public List<Location> getSeedingLocations(final List<Integer> ids, final Integer seedLType) throws MiddlewareQueryException {
 		try {
 
-			Criteria criteria = this.getSession().createCriteria(Location.class);
+			final Criteria criteria = this.getSession().createCriteria(Location.class);
 
 			criteria.add(Restrictions.in("locid", ids));
 			criteria.add(Restrictions.eq("ltype", seedLType));
 			criteria.addOrder(Order.asc("lname"));
 
 			return criteria.list();
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					this.getLogExceptionMessage("getSeedingLocations", "", null, e.getMessage(), "Location"), e);
+		} catch (final HibernateException e) {
+			LocationDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(this.getLogExceptionMessage("getSeedingLocations", "", null, e.getMessage(), "Location"), e);
 		}
-		return new ArrayList<Location>();
 	}
 
 }

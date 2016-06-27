@@ -505,14 +505,13 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<Location> getAllBreedingLocations(List<Integer> locationIds) {
+	public List<Location> getAllBreedingLocations(final List<Integer> locationIds) {
 		return this.getLocationDao().getBreedingLocations(locationIds);
 	}
 
 	@Override
-	public List<Location> getAllSeedingLocations(List<Integer> locationIds) {
-		final Integer seedLType = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE,
-				LocationType.SSTORE.getCode());
+	public List<Location> getAllSeedingLocations(final List<Integer> locationIds) {
+		final Integer seedLType = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.getCode());
 		return this.getLocationDao().getSeedingLocations(locationIds, seedLType);
 	}
 

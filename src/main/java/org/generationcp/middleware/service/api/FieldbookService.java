@@ -139,7 +139,7 @@ public interface FieldbookService {
 	 * @param filtered 
 	 * @return the favorite locations based on the given project id
 	 */
-	List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds, boolean filtered);
+	List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds, Boolean filtered);
 
 	/**
 	 * Gets the study.
@@ -791,5 +791,5 @@ public interface FieldbookService {
 
 	public List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
 
-	public List<Method> getFavoriteMethods(List<Integer> methodIds, boolean filterOutGenerative);
+	public List<Method> getFavoriteMethods(List<Integer> methodIds, Boolean filterOutGenerative);
 }

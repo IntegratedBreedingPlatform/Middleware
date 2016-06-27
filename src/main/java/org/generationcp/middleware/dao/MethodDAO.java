@@ -428,27 +428,27 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Method> getDerivativeAndMaintenanceMethods(List<Integer> ids) throws MiddlewareQueryException {
+	public List<Method> getDerivativeAndMaintenanceMethods(final List<Integer> ids) throws MiddlewareQueryException {
 		try {
-			List<Integer> validMethodClasses = new ArrayList<Integer>();
+			final List<Integer> validMethodClasses = new ArrayList<Integer>();
 			validMethodClasses.addAll(Method.BULKED_CLASSES);
 			validMethodClasses.addAll(Method.NON_BULKED_CLASSES);
 
-			Criteria criteria = this.getSession().createCriteria(Method.class);
-			SimpleExpression der = Restrictions.eq("mtype", "DER");
-			SimpleExpression man = Restrictions.eq("mtype", "MAN");
+			final Criteria criteria = this.getSession().createCriteria(Method.class);
+			final SimpleExpression der = Restrictions.eq("mtype", "DER");
+			final SimpleExpression man = Restrictions.eq("mtype", "MAN");
 			criteria.add(Restrictions.or(der, man));
-			if (ids.size() > 0){
+			if (ids.size() > 0) {
 				criteria.add(Restrictions.in("mid", ids));
 			}
 			criteria.add(Restrictions.in("geneq", validMethodClasses));
 			criteria.addOrder(Order.asc("mname"));
 
 			return criteria.list();
-		} catch (HibernateException e) {
-			this.logAndThrowException(this.getLogExceptionMessage("getAllMethodsDerivativeAndManintenance", "", null,
-					e.getMessage(), "Method"), e);
+		} catch (final HibernateException e) {
+			MethodDAO.LOG.error(this.getLogExceptionMessage("getMethodsNotGenerativeById", "", null, e.getMessage(), "Method"), e);
+			throw new MiddlewareQueryException(
+					this.getLogExceptionMessage("getAllMethodsDerivativeAndManintenance", "", null, e.getMessage(), "Method"), e);
 		}
-		return new ArrayList<Method>();
 	}
 }

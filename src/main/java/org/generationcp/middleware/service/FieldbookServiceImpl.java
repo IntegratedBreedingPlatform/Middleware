@@ -152,11 +152,17 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Location> getFavoriteLocationByLocationIDs(final List<Integer> locationIds, boolean isBreedingLocation) {
-		if(isBreedingLocation){
+	public List<Location> getFavoriteLocationByLocationIDs(final List<Integer> locationIds, final Boolean isBreedingLocation) {
+		if (isBreedingLocation == null) {
+			return this.getFavoriteLocationByLocationIDs(locationIds);
+		}
+
+		if (isBreedingLocation) {
 			return this.getLocationDataManager().getAllBreedingLocations(locationIds);
 		}
+
 		return this.getLocationDataManager().getAllSeedingLocations(locationIds);
+
 	}
 
 	@Override
@@ -300,15 +306,17 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 	
 	@Override
-	public List<Method> getFavoriteMethods(final List<Integer> methodIds, final boolean filterOutGenerative) {
-		final List<Method> methodList;
-		if (filterOutGenerative) {
-			methodList = this.getGermplasmDataManager().getNonGenerativeMethodsByID(methodIds);
-		} else {
-			methodList = this.getGermplasmDataManager().getDerivativeAndMaintenanceMethods(methodIds);
+	public List<Method> getFavoriteMethods(final List<Integer> methodIds, final Boolean filterOutGenerative) {
+
+		if (filterOutGenerative == null) {
+			return this.getGermplasmDataManager().getAllMethods();
 		}
 
-		return methodList;
+		if (filterOutGenerative) {
+			return this.getGermplasmDataManager().getNonGenerativeMethodsByID(methodIds);
+		}
+
+		return this.getGermplasmDataManager().getDerivativeAndMaintenanceMethods(methodIds);
 	}
 
 	@Override
