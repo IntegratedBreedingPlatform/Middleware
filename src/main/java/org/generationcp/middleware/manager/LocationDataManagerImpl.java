@@ -14,7 +14,6 @@ package org.generationcp.middleware.manager;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -35,7 +34,6 @@ import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.util.DatabaseBroker;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -504,6 +502,17 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			}
 		}
 
+	}
+
+	@Override
+	public List<Location> getAllBreedingLocations(final List<Integer> locationIds) {
+		return this.getLocationDao().getBreedingLocations(locationIds);
+	}
+
+	@Override
+	public List<Location> getAllSeedingLocations(final List<Integer> locationIds) {
+		final Integer seedLType = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.getCode());
+		return this.getLocationDao().getSeedingLocations(locationIds, seedLType);
 	}
 
 }

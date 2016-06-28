@@ -36,6 +36,8 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Location}.
@@ -53,6 +55,8 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	private static final String LOCID = "locid";
 	private static final String LTYPE = "ltype";
 	private static final String NAME_OR_OPERATION = "name|operation";
+
+	private static final Logger LOG = LoggerFactory.getLogger(LocationDAO.class);
 
 	public List<Location> getByName(String name, Operation operation) throws MiddlewareQueryException {
 		try {
@@ -769,6 +773,45 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			this.logAndThrowException("Error with getByIds() query from Location: " + e.getMessage(), e);
 		}
 		return new ArrayList<Locdes>();
+	}
+	
+	public List<Location> getBreedingLocations(final List<Integer> ids) throws MiddlewareQueryException {
+		try {
+			final List<Integer> validCodes = new ArrayList<Integer>();
+			// 410, 411, 412
+			validCodes.add(410);
+			validCodes.add(411);
+			validCodes.add(412);
+
+			final Criteria criteria = this.getSession().createCriteria(Location.class);
+			if (ids.size() > 0) {
+				criteria.add(Restrictions.in("locid", ids));
+			}
+			criteria.add(Restrictions.in("ltype", validCodes));
+			criteria.addOrder(Order.asc("lname"));
+
+			return criteria.list();
+		} catch (final HibernateException e) {
+			LocationDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(this.getLogExceptionMessage("getBreedingLocations", "", null, e.getMessage(), "Location"),
+					e);
+		}
+	}
+
+	public List<Location> getSeedingLocations(final List<Integer> ids, final Integer seedLType) throws MiddlewareQueryException {
+		try {
+
+			final Criteria criteria = this.getSession().createCriteria(Location.class);
+
+			criteria.add(Restrictions.in("locid", ids));
+			criteria.add(Restrictions.eq("ltype", seedLType));
+			criteria.addOrder(Order.asc("lname"));
+
+			return criteria.list();
+		} catch (final HibernateException e) {
+			LocationDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(this.getLogExceptionMessage("getSeedingLocations", "", null, e.getMessage(), "Location"), e);
+		}
 	}
 
 }
