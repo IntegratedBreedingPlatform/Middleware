@@ -91,7 +91,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Germplasm getGermplasmByGID(final Integer gid) {
-	
+
 		Integer updatedGid = gid;
 		Germplasm germplasm = null;
 		do {
@@ -1326,4 +1326,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
   		}
 	}
 
+
+	@Override
+	public List<Method> getDerivativeAndMaintenanceMethods(final List<Integer> ids) {
+		return this.getMethodDao().getDerivativeAndMaintenanceMethods(ids);
+	}
 }
