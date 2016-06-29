@@ -6,13 +6,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.util.Message;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -25,11 +29,11 @@ public class DataImportServiceImplTest {
 
 	public static final int INVALID_VARIABLES_COUNT = 5;
 	public static final int VALID_VARIABLES_COUNT = 5;
+	private static final String STUDY_NAME = "Study 1";
+	private static final int TRIAL_NO = 1;
+	private static final boolean IS_MULTIPLE_LOCATION = false;
 	@Mock
 	private WorkbookParser parser;
-
-	@Mock
-	private Workbook workbook;
 
 	@Mock
 	private OntologyDataManager ontology;
@@ -45,29 +49,31 @@ public class DataImportServiceImplTest {
 			"something_something", "zawaruldoisbig"};
 	private static final String PROGRAM_UUID = "123456789";
 
+	@Before
+	public void init() {
+
+		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ENTRY, WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED)).thenReturn(
+				TermId.ENTRY_NO.getId());
+		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ID, WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.ASSIGNED)).thenReturn(
+				TermId.GID.getId());
+		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.FIELD_PLOT, WorkbookTestDataInitializer.NESTED_NUMBER, WorkbookTestDataInitializer.ENUMERATED)).thenReturn(
+				TermId.PLOT_NO.getId());
+
+	}
+
 	@Test
 	public void testStrictParseWorkbookWithGreaterThan32VarNames() throws Exception {
-		DataImportServiceImpl moleDataImportService = Mockito.spy(this.dataImportService);
 
-		// we just need to test if isTrialInstanceNumberExists works, so lets mock out other dataImportService calls for the moment
-		Mockito.when(this.workbook.isNursery()).thenReturn(true);
 
-		// tip! do note that spy-ed object still calls the real method, may
-		// cause changing internal state as side effect
-		Mockito.when(
-				moleDataImportService.isTermExists(Mockito.anyInt(), Mockito.anyList(), Mockito.eq(this.ontology)
-						)).thenReturn(true);
+		Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, STUDY_NAME, TRIAL_NO, IS_MULTIPLE_LOCATION);
 
-		Mockito.when(this.workbook.getAllVariables()).thenReturn(
-				this.initializeTestMeasurementVariables());
+		workbook.getAllVariables().addAll(this.initializeTestMeasurementVariables());
 
 		try {
-			moleDataImportService.strictParseWorkbook(this.file, this.parser, this.workbook, this.ontology,
+			dataImportService.strictParseWorkbook(this.file, this.parser, workbook, this.ontology,
 					DataImportServiceImplTest.PROGRAM_UUID);
-			Assert.fail("We expects workbookParserException to be thrown");
+			Assert.fail("We expect workbookParserException to be thrown");
 		} catch (WorkbookParserException e) {
-
-			Mockito.verify(moleDataImportService).validateMeasurementVariableName(this.workbook.getAllVariables());
 
 			final String[] errorTypes =
 					{DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_LENGTH, DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_CHARACTERS};

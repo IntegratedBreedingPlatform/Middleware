@@ -155,7 +155,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// perform validations on the parsed data that require db access
 		final List<Message> messages = new LinkedList<Message>();
 
-		if (!this.isTermExists(TermId.GID.getId(), workbook.getGermplasmFactors(), ontology)) {
+		if (!this.isTermExists(TermId.GID.getId(), workbook.getFactors(), ontology)) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_GID_DOESNT_EXIST));
 		}
 
@@ -628,7 +628,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		this.resetRequiredField(TermId.PLOT_NO.getId(), ontology, workbook.getFactors());
 		this.resetRequiredField(TermId.PLOT_NNO.getId(), ontology, workbook.getFactors());
 		this.resetRequiredField(TermId.ENTRY_NO.getId(), ontology, workbook.getFactors());
-		this.resetRequiredField(TermId.GID.getId(), ontology, workbook.getGermplasmFactors());
+		this.resetRequiredField(TermId.GID.getId(), ontology, workbook.getFactors());
 
 		if (!workbook.isNursery()) {
 			this.resetRequiredField(TermId.TRIAL_INSTANCE_FACTOR.getId(), ontology, workbook.getTrialVariables());
