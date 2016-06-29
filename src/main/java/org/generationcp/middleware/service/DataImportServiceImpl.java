@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -52,10 +53,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String ERROR_MISSING_TRIAL_CONDITION = "error.missing.trial.condition";
 	public static final String ERROR_PLOT_DOESNT_EXIST = "error.plot.doesnt.exist";
 	public static final String ERROR_ENTRY_DOESNT_EXIST = "error.entry.doesnt.exist";
+	public static final String ERROR_GID_DOESNT_EXIST = "error.gid.doesnt.exist";
 	public static final String ERROR_DUPLICATE_STUDY_NAME = "error.duplicate.study.name";
 	public static final String ERROR_DUPLICATE_PSM = "error.duplicate.psm";
 	public static final String ERROR_INVALID_VARIABLE_NAME_LENGTH = "error.invalid.variable.name.length";
 	public static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
+
 
 	public DataImportServiceImpl() {
 		super();
@@ -152,15 +155,19 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// perform validations on the parsed data that require db access
 		final List<Message> messages = new LinkedList<Message>();
 
-		if (!this.isEntryExists(ontology, workbook.getFactors())) {
+		if (!this.isTermExists(TermId.GID.getId(), workbook.getGermplasmFactors(), ontology)) {
+			messages.add(new Message(DataImportServiceImpl.ERROR_GID_DOESNT_EXIST));
+		}
+
+		if (!this.isTermExists(TermId.ENTRY_NO.getId(), workbook.getFactors(), ontology)) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_ENTRY_DOESNT_EXIST));
 		}
 
-		if (!this.isPlotExists(ontology, workbook.getFactors())) {
+		if (!this.isTermExists(TermId.PLOT_NO.getId(), workbook.getFactors(), ontology) && !this.isTermExists(TermId.PLOT_NNO.getId(), workbook.getFactors(), ontology)) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_PLOT_DOESNT_EXIST));
 		}
 
-		if (!workbook.isNursery() && !this.isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())) {
+		if (!workbook.isNursery() && !this.isTermExists(TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getTrialVariables(), ontology)) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_MISSING_TRIAL_CONDITION));
 		}
 
@@ -451,41 +458,21 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(name, programUUID, relationship);
 	}
 
-	protected Boolean isEntryExists(final OntologyDataManager ontology, final List<MeasurementVariable> list) {
-		for (final MeasurementVariable mvar : list) {
+
+	protected boolean isTermExists(final int termId, final List<MeasurementVariable> measurementVariables, final OntologyDataManager ontology) {
+
+		for (final MeasurementVariable mvar : measurementVariables) {
+
 			final Integer varId =
 					ontology.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
 
-			if (varId != null && varId == TermId.ENTRY_NO.getId()) {
-				mvar.setRequired(true);
+			if (varId != null && varId == termId) {
 				return true;
 			}
 		}
 
 		return false;
-	}
 
-	protected Boolean isPlotExists(final OntologyDataManager ontology, final List<MeasurementVariable> list) {
-		for (final MeasurementVariable mvar : list) {
-			final Integer varId =
-					ontology.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
-
-			if (varId != null && (varId == TermId.PLOT_NO.getId() || varId == TermId.PLOT_NNO.getId())) {
-				mvar.setRequired(true);
-				return true;
-			}
-
-		}
-		return false;
-	}
-
-	protected Boolean isTrialInstanceNumberExists(final OntologyDataManager ontology, final List<MeasurementVariable> list) {
-		final MeasurementVariable var = getTrialInstanceNumberMeasurementVariable(ontology, list);
-		if (var != null) {
-			var.setRequired(true);
-			return true;
-		}
-		return false;
 	}
 
 	private String getTrialInstanceNumberFromMeasurementRows(final OntologyDataManager ontology,
@@ -493,32 +480,46 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		// get first row - should contain the study location
 		final MeasurementRow row = measurementRows.get(0);
-		final MeasurementVariable var = getTrialInstanceNumberMeasurementVariable(ontology, trialFactors);
-		if (var != null) {
-			return row.getMeasurementDataValue(var.getName());
+		final Optional<MeasurementVariable> result = findMeasurementVariableByTermId(TermId.TRIAL_INSTANCE_FACTOR.getId(), ontology, trialFactors);
+		if (result.isPresent()) {
+			return row.getMeasurementDataValue(result.get().getName());
 		}
 
 		return null;
 	}
 
 	private String getTrialInstanceNumberFromMeasurementVariables(final OntologyDataManager ontology, final List<MeasurementVariable> list) {
-		final MeasurementVariable mvar = getTrialInstanceNumberMeasurementVariable(ontology, list);
-		if (mvar != null) {
-			return mvar.getValue();
+		final Optional<MeasurementVariable> result = findMeasurementVariableByTermId(TermId.TRIAL_INSTANCE_FACTOR.getId(),ontology, list);
+		if (result.isPresent()) {
+			return result.get().getValue();
 		}
 		return null;
 	}
 
-	private MeasurementVariable getTrialInstanceNumberMeasurementVariable(final OntologyDataManager ontology,
+	private Optional<MeasurementVariable> findMeasurementVariableByTermId(int termId, final OntologyDataManager ontology,
 			final List<MeasurementVariable> list) {
 		for (final MeasurementVariable mvar : list) {
 			final Integer varId =
 					ontology.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
-			if (varId != null && TermId.TRIAL_INSTANCE_FACTOR.getId() == varId) {
-				return mvar;
+			if (varId != null && termId == varId) {
+				return Optional.of(mvar);
 			}
 		}
-		return null;
+		return Optional.absent();
+	}
+
+	/**
+	 * If the term is found in the list, this resets the required field of MeasurementVariable to true.
+	 * @param termId
+	 * @param ontology
+	 * @param list
+	 */
+	private void resetRequiredField(int termId, final OntologyDataManager ontology,
+			final List<MeasurementVariable> list){
+		Optional<MeasurementVariable> result = this.findMeasurementVariableByTermId(termId, ontology, list);
+		if (result.isPresent()) {
+			result.get().setRequired(true);
+		}
 	}
 
 	@Override
@@ -539,21 +540,26 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		final OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(this.getSessionProvider());
 
-		if (!this.isEntryExists(ontology, workbook.getFactors())) {
+
+		// DMV : TODO change implem so that backend is agnostic to UI when determining messages
+
+		if (!this.isTermExists(TermId.ENTRY_NO.getId() , workbook.getFactors(), ontology)) {
 			this.initializeIfNull(errors, Constants.MISSING_ENTRY);
-			// DMV : TODO change implem so that backend is agnostic to UI when
-			// determining messages
 			errors.get(Constants.MISSING_ENTRY).add(new Message("error.entry.doesnt.exist.wizard"));
 		}
 
+		if (!this.isTermExists(TermId.GID.getId(), workbook.getFactors(), ontology)) {
+			this.initializeIfNull(errors, Constants.MISSING_GID);
+			errors.get(Constants.MISSING_GID).add(new Message("error.gid.doesnt.exist.wizard"));
+		}
+
 		if ((workbook.getImportType() == null || workbook.getImportType() == DataSetType.PLOT_DATA.getId())
-				&& !this.isPlotExists(ontology, workbook.getFactors())) {
+				&& !this.isTermExists(TermId.PLOT_NO.getId() , workbook.getFactors(), ontology)) {
 			this.initializeIfNull(errors, Constants.MISSING_PLOT);
-			// DMV : TODO change implem so that backend is agnostic to UI when determining messages
 			errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
 		}
 
-		if (!workbook.isNursery() && !this.isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())) {
+		if (!workbook.isNursery() && !this.isTermExists(TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getTrialVariables(), ontology)) {
 			this.initializeIfNull(errors, Constants.MISSING_TRIAL);
 			errors.get(Constants.MISSING_TRIAL).add(new Message(DataImportServiceImpl.ERROR_MISSING_TRIAL_CONDITION));
 		}
@@ -619,10 +625,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// the following code is a workaround versus the current state management in the ETL Wizard
 		// to re-set the "required" fields to true for checking later on
 
-		this.isPlotExists(ontology, workbook.getFactors());
-		this.isEntryExists(ontology, workbook.getFactors());
+		this.resetRequiredField(TermId.PLOT_NO.getId(), ontology, workbook.getFactors());
+		this.resetRequiredField(TermId.PLOT_NNO.getId(), ontology, workbook.getFactors());
+		this.resetRequiredField(TermId.ENTRY_NO.getId(), ontology, workbook.getFactors());
+		this.resetRequiredField(TermId.GID.getId(), ontology, workbook.getGermplasmFactors());
+
 		if (!workbook.isNursery()) {
-			this.isTrialInstanceNumberExists(ontology, workbook.getTrialVariables());
+			this.resetRequiredField(TermId.TRIAL_INSTANCE_FACTOR.getId(), ontology, workbook.getTrialVariables());
 		}
 
 		final List<Message> requiredVariableValueErrors = this.checkForEmptyRequiredVariables(workbook);
