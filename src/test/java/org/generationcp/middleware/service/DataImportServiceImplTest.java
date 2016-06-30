@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.service;
 
 import java.io.File;
@@ -48,21 +47,23 @@ public class DataImportServiceImplTest {
 	private DataImportServiceImpl dataImportService;
 
 	public static final String[] STRINGS_WITH_INVALID_CHARACTERS = new String[] {"1234", "word@", "_+world=", "!!world!!", "&&&"};
-	public static final String[] STRINGS_WITH_VALID_CHARACTERS = new String[] {"i_am_groot", "hello123world", "%%bangbang",
-			"something_something", "zawaruldoisbig"};
+	public static final String[] STRINGS_WITH_VALID_CHARACTERS =
+			new String[] {"i_am_groot", "hello123world", "%%bangbang", "something_something", "zawaruldoisbig"};
 	private static final String PROGRAM_UUID = "123456789";
 
 	@Before
 	public void init() {
 
-		this.workbook = WorkbookTestDataInitializer.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, STUDY_NAME, TRIAL_NO, IS_MULTIPLE_LOCATION);
+		this.workbook = WorkbookTestDataInitializer
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, STUDY_NAME, TRIAL_NO,
+						IS_MULTIPLE_LOCATION);
 
-		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ENTRY, WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED)).thenReturn(
-				TermId.ENTRY_NO.getId());
-		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ID, WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.ASSIGNED)).thenReturn(
-				TermId.GID.getId());
-		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.FIELD_PLOT, WorkbookTestDataInitializer.NESTED_NUMBER, WorkbookTestDataInitializer.ENUMERATED)).thenReturn(
-				TermId.PLOT_NO.getId());
+		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ENTRY,
+				WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED)).thenReturn(TermId.ENTRY_NO.getId());
+		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ID,
+				WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.ASSIGNED)).thenReturn(TermId.GID.getId());
+		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.FIELD_PLOT,
+				WorkbookTestDataInitializer.NESTED_NUMBER, WorkbookTestDataInitializer.ENUMERATED)).thenReturn(TermId.PLOT_NO.getId());
 
 	}
 
@@ -73,13 +74,12 @@ public class DataImportServiceImplTest {
 		this.workbook.getAllVariables().addAll(this.initializeTestMeasurementVariables());
 
 		try {
-			dataImportService.strictParseWorkbook(this.file, this.parser, workbook, this.ontology,
-					DataImportServiceImplTest.PROGRAM_UUID);
+			dataImportService.strictParseWorkbook(this.file, this.parser, workbook, this.ontology, DataImportServiceImplTest.PROGRAM_UUID);
 			Assert.fail("We expect workbookParserException to be thrown");
 		} catch (WorkbookParserException e) {
 
-			final String[] errorTypes =
-					{DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_LENGTH, DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_CHARACTERS};
+			final String[] errorTypes = {DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_LENGTH,
+					DataImportServiceImpl.ERROR_INVALID_VARIABLE_NAME_CHARACTERS};
 			for (Message error : e.getErrorMessages()) {
 				Assert.assertTrue(
 						"All errors should contain either ERROR_INVALID_VARIABLE_NAME_CHARACTERS or ERROR_INVALID_VARIABLE_NAME_LENGTH",
@@ -131,34 +131,37 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testIsTermExistsTrue() {
 
-		Assert.assertTrue("The entry_no is in the factors list, so it should return true.", this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), this.workbook.getFactors(), ontology));
+		Assert.assertTrue("The entry_no is in the factors list, so it should return true.",
+				this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), this.workbook.getFactors(), ontology));
 
 	}
 
 	@Test
 	public void testIsTermExistsEmptyVariableList() {
 
-		Assert.assertFalse("There are no variables in the list so it should return false.",this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), new ArrayList<MeasurementVariable>(), ontology));
+		Assert.assertFalse("There are no variables in the list so it should return false.",
+				this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), new ArrayList<MeasurementVariable>(), ontology));
 
 	}
 
 	@Test
 	public void testIsTermExistsVariableDoesntExistInOntology() {
 
-		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ENTRY, WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED)).thenReturn(
-				null);
+		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ENTRY,
+				WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED)).thenReturn(null);
 
-		Assert.assertFalse("The entry_no variable is not found in the ontology, so it should return false",this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), this.workbook.getFactors(), ontology));
+		Assert.assertFalse("The entry_no variable is not found in the ontology, so it should return false",
+				this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), this.workbook.getFactors(), ontology));
 
 	}
 
 	@Test
 	public void testFindMeasurementVariableByTermIdMeasurementVariableIsFound() {
 
-		Optional<MeasurementVariable>
-				result = this.dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), ontology, this.workbook.getFactors());
+		Optional<MeasurementVariable> result =
+				this.dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), ontology, this.workbook.getFactors());
 
-		Assert.assertTrue("Measurement variable is found, so the value is present",result.isPresent());
+		Assert.assertTrue("Measurement variable is found, so the value is present", result.isPresent());
 		Assert.assertNotNull(result.get());
 		Assert.assertEquals(TermId.ENTRY_NO.getId(), result.get().getTermId());
 	}
@@ -166,8 +169,8 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testFindMeasurementVariableByTermIdMeasurementVariableIsNotFound() {
 
-		Optional<MeasurementVariable>
-				result = this.dataImportService.findMeasurementVariableByTermId(TermId.BREEDING_METHOD_CODE.getId(), ontology, this.workbook.getFactors());
+		Optional<MeasurementVariable> result = this.dataImportService
+				.findMeasurementVariableByTermId(TermId.BREEDING_METHOD_CODE.getId(), ontology, this.workbook.getFactors());
 
 		Assert.assertFalse("No measurement variable found, so the value is not present", result.isPresent());
 
@@ -178,17 +181,17 @@ public class DataImportServiceImplTest {
 
 		this.dataImportService.resetRequiredField(TermId.ENTRY_NO.getId(), ontology, this.workbook.getFactors());
 
-		Optional<MeasurementVariable> result = this.dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), ontology, this.workbook.getFactors());
+		Optional<MeasurementVariable> result =
+				this.dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), ontology, this.workbook.getFactors());
 
 		if (result.isPresent()) {
 			Assert.assertEquals(TermId.ENTRY_NO.getId(), result.get().getTermId());
-			Assert.assertTrue("The variable's required field should be set to true",result.get().isRequired());
+			Assert.assertTrue("The variable's required field should be set to true", result.get().isRequired());
 		} else {
 			Assert.fail("The variable entry_no should be found because it exists in the list");
 		}
 
 	}
-
 
 	protected List<MeasurementVariable> initializeTestMeasurementVariables() {
 		List<MeasurementVariable> measurementVariables = this.getShortNamedMeasurementVariables();
