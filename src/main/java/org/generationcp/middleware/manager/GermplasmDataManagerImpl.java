@@ -383,6 +383,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
+	public List<Method> getAllMethodsOrderByMname() {
+		return this.getMethodDao().getAllMethodOrderByMname();
+	}
+
+	@Override
 	public boolean isMethodNamingConfigurationValid(final Integer breedingMethodId) {
 		final Method breedingMethod = this.getMethodByID(breedingMethodId);
 		if (breedingMethod == null) {

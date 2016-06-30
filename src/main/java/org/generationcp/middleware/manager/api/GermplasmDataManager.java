@@ -355,6 +355,14 @@ public interface GermplasmDataManager {
 	List<Method> getAllMethods();
 
 	/**
+	 * Returns all the method records ordered by method name.
+	 * 
+	 * @return List of Method POJOs
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<Method> getAllMethodsOrderByMname();
+
+	/**
 	 * Validates the naming rules configuration for the selected breeding method
 	 * 
 	 * @param breedingMethodId
