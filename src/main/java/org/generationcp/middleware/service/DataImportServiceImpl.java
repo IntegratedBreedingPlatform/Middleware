@@ -466,7 +466,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			final Integer varId =
 					ontology.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
 
-			if (varId != null && varId == termId) {
+			if (varId != null && varId.intValue() == termId) {
 				return true;
 			}
 		}
@@ -496,12 +496,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return null;
 	}
 
-	private Optional<MeasurementVariable> findMeasurementVariableByTermId(int termId, final OntologyDataManager ontology,
+	Optional<MeasurementVariable> findMeasurementVariableByTermId(int termId, final OntologyDataManager ontology,
 			final List<MeasurementVariable> list) {
 		for (final MeasurementVariable mvar : list) {
 			final Integer varId =
 					ontology.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
-			if (varId != null && termId == varId) {
+			if (varId != null && termId == varId.intValue()) {
 				return Optional.of(mvar);
 			}
 		}
@@ -514,7 +514,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 * @param ontology
 	 * @param list
 	 */
-	private void resetRequiredField(int termId, final OntologyDataManager ontology,
+	void resetRequiredField(int termId, final OntologyDataManager ontology,
 			final List<MeasurementVariable> list){
 		Optional<MeasurementVariable> result = this.findMeasurementVariableByTermId(termId, ontology, list);
 		if (result.isPresent()) {

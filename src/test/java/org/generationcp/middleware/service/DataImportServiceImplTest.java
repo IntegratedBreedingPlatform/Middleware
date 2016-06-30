@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.common.base.Optional;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
@@ -41,6 +42,8 @@ public class DataImportServiceImplTest {
 	@Mock
 	private File file;
 
+	private Workbook workbook;
+
 	@InjectMocks
 	private DataImportServiceImpl dataImportService;
 
@@ -51,6 +54,8 @@ public class DataImportServiceImplTest {
 
 	@Before
 	public void init() {
+
+		this.workbook = WorkbookTestDataInitializer.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, STUDY_NAME, TRIAL_NO, IS_MULTIPLE_LOCATION);
 
 		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ENTRY, WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED)).thenReturn(
 				TermId.ENTRY_NO.getId());
@@ -64,10 +69,8 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testStrictParseWorkbookWithGreaterThan32VarNames() throws Exception {
 
-
-		Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, STUDY_NAME, TRIAL_NO, IS_MULTIPLE_LOCATION);
-
-		workbook.getAllVariables().addAll(this.initializeTestMeasurementVariables());
+		// Add variables with long names
+		this.workbook.getAllVariables().addAll(this.initializeTestMeasurementVariables());
 
 		try {
 			dataImportService.strictParseWorkbook(this.file, this.parser, workbook, this.ontology,
@@ -124,6 +127,68 @@ public class DataImportServiceImplTest {
 					Arrays.asList(DataImportServiceImplTest.STRINGS_WITH_INVALID_CHARACTERS).contains(message.getMessageParams()[0]));
 		}
 	}
+
+	@Test
+	public void testIsTermExistsTrue() {
+
+		Assert.assertTrue("The entry_no is in the factors list, so it should return true.", this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), this.workbook.getFactors(), ontology));
+
+	}
+
+	@Test
+	public void testIsTermExistsEmptyVariableList() {
+
+		Assert.assertFalse("There are no variables in the list so it should return false.",this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), new ArrayList<MeasurementVariable>(), ontology));
+
+	}
+
+	@Test
+	public void testIsTermExistsVariableDoesntExistInOntology() {
+
+		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ENTRY, WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED)).thenReturn(
+				null);
+
+		Assert.assertFalse("The entry_no variable is not found in the ontology, so it should return false",this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), this.workbook.getFactors(), ontology));
+
+	}
+
+	@Test
+	public void testFindMeasurementVariableByTermIdMeasurementVariableIsFound() {
+
+		Optional<MeasurementVariable>
+				result = this.dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), ontology, this.workbook.getFactors());
+
+		Assert.assertTrue("Measurement variable is found, so the value is present",result.isPresent());
+		Assert.assertNotNull(result.get());
+		Assert.assertEquals(TermId.ENTRY_NO.getId(), result.get().getTermId());
+	}
+
+	@Test
+	public void testFindMeasurementVariableByTermIdMeasurementVariableIsNotFound() {
+
+		Optional<MeasurementVariable>
+				result = this.dataImportService.findMeasurementVariableByTermId(TermId.BREEDING_METHOD_CODE.getId(), ontology, this.workbook.getFactors());
+
+		Assert.assertFalse("No measurement variable found, so the value is not present", result.isPresent());
+
+	}
+
+	@Test
+	public void testResetRequiredField() {
+
+		this.dataImportService.resetRequiredField(TermId.ENTRY_NO.getId(), ontology, this.workbook.getFactors());
+
+		Optional<MeasurementVariable> result = this.dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), ontology, this.workbook.getFactors());
+
+		if (result.isPresent()) {
+			Assert.assertEquals(TermId.ENTRY_NO.getId(), result.get().getTermId());
+			Assert.assertTrue("The variable's required field should be set to true",result.get().isRequired());
+		} else {
+			Assert.fail("The variable entry_no should be found because it exists in the list");
+		}
+
+	}
+
 
 	protected List<MeasurementVariable> initializeTestMeasurementVariables() {
 		List<MeasurementVariable> measurementVariables = this.getShortNamedMeasurementVariables();
