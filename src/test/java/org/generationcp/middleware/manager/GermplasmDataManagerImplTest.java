@@ -698,6 +698,14 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testGetAllMethodsOrderByMname() throws Exception {
+		final List<Method> results = this.germplasmDataManager.getAllMethodsOrderByMname();
+		Assert.assertNotNull(results);
+		Assert.assertTrue(!results.isEmpty());
+		Debug.printObjects(IntegrationTestBase.INDENT, results);
+	}
+
+	@Test
 	public void testGetAllMethodsNotGenerative() throws Exception {
 		final List<Method> results = this.germplasmDataManager.getAllMethodsNotGenerative();
 		Assert.assertNotNull(results);
