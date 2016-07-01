@@ -11,7 +11,9 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -286,6 +288,77 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			Assert.assertNotNull(name.getNid());
 			Assert.assertEquals(germplasm.getGid(), name.getGermplasmId());
 		}
+	}
+
+	@Test
+	public void testCountMatchGermplasmInListAllGidsExist() {
+
+		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasm(1);
+		final Germplasm germplasm2 = GermplasmTestDataInitializer.createGermplasm(2);
+
+		this.dao.save(germplasm1);
+		this.dao.save(germplasm2);
+
+		Set<Integer> gids = new HashSet<>();
+		gids.add(germplasm1.getGid());
+		gids.add(germplasm2.getGid());
+
+		Long result = this.dao.countMatchGermplasmInList(gids);
+
+		Assert.assertEquals("The number of gids in list should match the count of records matched in the database.", gids.size(), result.intValue());
+
+	}
+
+	@Test
+	public void testCountMatchGermplasmInListOnlyOneGidExists() {
+
+		Set<Integer> gids = new HashSet<>();
+		Integer dummyGid = 1000001;
+
+		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasm(1);
+		this.dao.save(germplasm1);
+
+		final Germplasm germplasm = this.dao.getById(dummyGid);
+		Assert.assertNull("Make sure that gid " + dummyGid + " doesn't exist." ,germplasm);
+
+		gids.add(germplasm1.getGid());
+		gids.add(dummyGid);
+
+		Long result = this.dao.countMatchGermplasmInList(gids);
+
+		Assert.assertEquals("Only one gid has a match in the database.", 1, result.intValue());
+
+	}
+
+	@Test
+	public void testCountMatchGermplasmInListNoGidExists() {
+
+		Integer dummyGid = 1000001;
+
+		Set<Integer> gids = new HashSet<>();
+
+		Germplasm germplasm = this.dao.getById(dummyGid);
+
+		Assert.assertNull("We're testing a gid that doesnt exist, so the germplasm should be null." ,germplasm);
+
+		// Add dummy gid that do not exist in the database
+		gids.add(dummyGid);
+
+		Long result = this.dao.countMatchGermplasmInList(gids);
+
+		Assert.assertEquals("The count should be zero because the gid in the list doesn't exist.",0, result.intValue());
+
+	}
+
+	@Test
+	public void testCountMatchGermplasmInListGidListIsNullOrEmpty() {
+
+		Long result1 = this.dao.countMatchGermplasmInList(null);
+		Assert.assertEquals("The count should be zero because the gid list is null", 0, result1.intValue());
+
+		Long result2 = this.dao.countMatchGermplasmInList(new HashSet<Integer>());
+		Assert.assertEquals("The count should be zero because the gid list is empty", 0, result2.intValue());
+
 	}
 
 	private void initializeGermplasms() {
