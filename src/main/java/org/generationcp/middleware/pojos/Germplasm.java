@@ -53,6 +53,8 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @NamedQueries({@NamedQuery(name = "getAllGermplasm", query = "FROM Germplasm"),
 		@NamedQuery(name = "countAllGermplasm", query = "SELECT COUNT(g) FROM Germplasm g"),
 
+		@NamedQuery(name = "countMatchGermplasmInList", query = "SELECT COUNT(g) FROM Germplasm g WHERE g.gid IN (:gids)"),
+
 		@NamedQuery(name = "getGermplasmByMethodNameUsingEqual",
 				query = "SELECT g FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname = :name"),
 
@@ -115,6 +117,7 @@ public class Germplasm implements Serializable, Auditable {
 	// string contants for name of queries
 	public static final String GET_ALL = "getAllGermplasm";
 	public static final String COUNT_ALL = "countAllGermplasm";
+	public static final String COUNT_MATCH_GERMPLASM_IN_LIST = "countMatchGermplasmInList";
 	public static final String GET_BY_PREF_NAME = "getGermplasmByPrefName";
 	public static final String COUNT_BY_PREF_NAME =
 			"SELECT COUNT(g.gid) " + "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " + "WHERE n.nval = :name";

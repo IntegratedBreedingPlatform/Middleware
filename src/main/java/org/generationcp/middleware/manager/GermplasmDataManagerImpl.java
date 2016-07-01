@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -1376,5 +1377,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Method> getDerivativeAndMaintenanceMethods(final List<Integer> ids) {
 		return this.getMethodDao().getDerivativeAndMaintenanceMethods(ids);
+	}
+
+	@Override
+	public long countMatchGermplasmInList(final Set<Integer> gids) {
+		return this.getGermplasmDao().countMatchGermplasmInList(gids);
 	}
 }

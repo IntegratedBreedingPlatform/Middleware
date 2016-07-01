@@ -161,6 +161,24 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
+	public long countMatchGermplasmInList(Set<Integer> gids) throws MiddlewareQueryException {
+
+		if (gids == null || gids.isEmpty()) {
+			return 0;
+		}
+
+		try {
+
+			final Query query = this.getSession().getNamedQuery(Germplasm.COUNT_MATCH_GERMPLASM_IN_LIST);
+			query.setParameterList("gids", gids);
+			return ((Long) query.uniqueResult()).longValue();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with countMatchGermplasmInList(gids) query from Germplasm: " + e.getMessage(), e);
+		}
+
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<Germplasm> getByMethodNameUsingEqual(final String name, final int start, final int numOfRows)
 			throws MiddlewareQueryException {

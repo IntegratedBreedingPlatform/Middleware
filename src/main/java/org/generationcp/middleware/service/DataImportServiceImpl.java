@@ -13,6 +13,7 @@ package org.generationcp.middleware.service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.base.Optional;
+import com.hazelcast.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -34,7 +36,9 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.service.api.DataImportService;
@@ -57,6 +61,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String ERROR_DUPLICATE_PSM = "error.duplicate.psm";
 	public static final String ERROR_INVALID_VARIABLE_NAME_LENGTH = "error.invalid.variable.name.length";
 	public static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
+	public static final String ERROR_INVALID_GIDS_FROM_DATA_FILE = "error.invalid.gids";
 
 	public DataImportServiceImpl() {
 		super();
@@ -85,7 +90,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 * measurementVariableMap.put("effectMV", effectMV);
 	 *
 	 * @param workbook
-	 * @param retainValues if true, values of the workbook items are retained, else they are cleared to conserve memory
+	 * @param retainValues         if true, values of the workbook items are retained, else they are cleared to conserve memory
 	 * @param isDeleteObservations
 	 * @return
 	 * @throws MiddlewareQueryException
@@ -143,20 +148,18 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		final WorkbookParser parser = new WorkbookParser();
 
 		final OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(this.getSessionProvider());
+		final GermplasmDataManager germplasmDataManager = new GermplasmDataManagerImpl(this.getSessionProvider());
 
 		// partially parse the file to parse the description sheet only at first
-		return this.strictParseWorkbook(file, parser, parser.parseFile(file, true), ontology, programUUID);
+		return this.strictParseWorkbook(file, parser, parser.parseFile(file, true), ontology, germplasmDataManager, programUUID);
 	}
 
 	protected Workbook strictParseWorkbook(final File file, final WorkbookParser parser, final Workbook workbook,
-			final OntologyDataManager ontology, final String programUUID) throws WorkbookParserException {
+			final OntologyDataManager ontology, final GermplasmDataManager germplasmDataManager, final String programUUID)
+			throws WorkbookParserException {
 
 		// perform validations on the parsed data that require db access
 		final List<Message> messages = new LinkedList<Message>();
-
-		if (!this.isTermExists(TermId.GID.getId(), workbook.getFactors(), ontology)) {
-			messages.add(new Message(DataImportServiceImpl.ERROR_GID_DOESNT_EXIST));
-		}
 
 		if (!this.isTermExists(TermId.ENTRY_NO.getId(), workbook.getFactors(), ontology)) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_ENTRY_DOESNT_EXIST));
@@ -183,6 +186,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// separated the validation of observations from the parsing so that it can be used even in other parsing implementations (e.g., the
 		// one for Wizard style)
 		messages.addAll(this.checkForEmptyRequiredVariables(workbook));
+
+		this.checkForInvalidGids(germplasmDataManager, ontology, workbook, messages);
 
 		// moved checking below as this needs to parse the contents of the observation sheet for multi-locations
 		this.checkForDuplicateStudyName(ontology, workbook, messages, programUUID);
@@ -509,6 +514,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	/**
 	 * If the term is found in the list, this resets the required field of MeasurementVariable to true.
+	 *
 	 * @param termId
 	 * @param ontology
 	 * @param list
@@ -518,6 +524,85 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		if (result.isPresent()) {
 			result.get().setRequired(true);
 		}
+	}
+
+	void checkForInvalidGids(final GermplasmDataManager germplasmDataManager, final OntologyDataManager ontologyDataManager,
+			final Workbook workbook, final List<Message> messages) {
+
+		Optional<MeasurementVariable> gidResult =
+				findMeasurementVariableByTermId(TermId.GID.getId(), ontologyDataManager, workbook.getFactors());
+		if (gidResult.isPresent()) {
+
+			String gidLabel = gidResult.get().getName();
+			Set<Integer> gids = extractGidsFromObservations(gidLabel, workbook.getObservations());
+
+			if (!checkIfAllObservationHasGid(gidLabel, workbook.getObservations()) || !checkIfAllGidsExistInDatabase(germplasmDataManager,
+					gids)) {
+				messages.add(new Message(DataImportServiceImpl.ERROR_INVALID_GIDS_FROM_DATA_FILE));
+			}
+
+		} else {
+
+			messages.add(new Message(DataImportServiceImpl.ERROR_GID_DOESNT_EXIST));
+
+		}
+
+	}
+
+	/**
+	 * Returns true if the gids in the list are all existing records in the database.
+	 *
+	 * @param germplasmDataManager
+	 * @param gids
+	 * @return
+	 */
+	boolean checkIfAllGidsExistInDatabase(final GermplasmDataManager germplasmDataManager, final Set<Integer> gids) {
+
+		long matchedGermplasmCount = germplasmDataManager.countMatchGermplasmInList(gids);
+
+		// If the number of gids in the list matched the count of germplasm records matched in the database, it means
+		// that all gids searched have existing records in the database.
+		if (gids.size() == matchedGermplasmCount) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+
+	/**
+	 * Returns true if all observation from data file contains gid value.
+	 *
+	 * @param observations
+	 * @return
+	 */
+	boolean checkIfAllObservationHasGid(final String gidLabel, final List<MeasurementRow> observations) {
+
+		for (MeasurementRow observationRow : observations) {
+			String gidString = observationRow.getMeasurementDataValue(gidLabel);
+			if (StringUtil.isNullOrEmpty(gidString)) {
+				return false;
+			}
+		}
+		return true;
+
+	}
+
+	/**
+	 * Gets a list of gids extracted from observation.
+	 *
+	 * @param workbook
+	 * @return
+	 */
+	Set<Integer> extractGidsFromObservations(final String gidLabel, final List<MeasurementRow> observations) {
+		Set<Integer> gids = new HashSet<>();
+		for (MeasurementRow observationRow : observations) {
+			String gidString = observationRow.getMeasurementDataValue(gidLabel);
+			if (gidString != null) {
+				gids.add(Integer.valueOf(gidString));
+			}
+		}
+		return gids;
 	}
 
 	@Override

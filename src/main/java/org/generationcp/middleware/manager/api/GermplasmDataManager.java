@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
@@ -1128,5 +1129,12 @@ public interface GermplasmDataManager {
 	Integer countSearchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly, boolean includeMGMembers);
 
 	List<Method> getDerivativeAndMaintenanceMethods(List<Integer> ids);
+
+	/**
+	 * Returns the count of records that matched the gids in the specified list.
+	 * @param gids - The list of gids to match for in the germplasm table
+	 * @return
+	 */
+	long countMatchGermplasmInList(Set<Integer> gids);
 
 }
