@@ -19,6 +19,8 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.util.Message;
 
 /**
@@ -118,5 +120,9 @@ public interface DataImportService {
 	int saveProjectData(Workbook workbook, String programUUID) throws MiddlewareQueryException;
 
 	Map<String, List<Message>> validateProjectData(Workbook importData, String programUUID) throws MiddlewareException;
+
+
+	void checkForInvalidGids(final GermplasmDataManager germplasmDataManager, final OntologyDataManager ontologyDataManager,
+			final Workbook workbook, final List<Message> messages);
 
 }

@@ -526,7 +526,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		}
 	}
 
-	void checkForInvalidGids(final GermplasmDataManager germplasmDataManager, final OntologyDataManager ontologyDataManager,
+	@Override
+	public void checkForInvalidGids(final GermplasmDataManager germplasmDataManager, final OntologyDataManager ontologyDataManager,
 			final Workbook workbook, final List<Message> messages) {
 
 		Optional<MeasurementVariable> gidResult =
