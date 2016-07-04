@@ -200,6 +200,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		// We only assert that there are minimum two folders that we added in test.
 		// The test database might already have some pre-init and developer created folders too which we dont want the test to depend on
 		// because we do not reset the test database for each test run yet.
-		Assert.assertTrue(allFolders.size() >= 2);
+		Assert.assertTrue("The number of all folders should be greater than or equal to 2", allFolders.size() >= 2);
 	}
 }
