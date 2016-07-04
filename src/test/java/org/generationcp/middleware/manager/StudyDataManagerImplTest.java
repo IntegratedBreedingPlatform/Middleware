@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -28,18 +30,26 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
+import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
+import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.generationcp.middleware.utils.test.FieldMapDataUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -255,5 +265,269 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		DataSetType dataSetType = DataSetType.MEANS_DATA;
 		DataSet dataset = this.manager.findOneDataSetByType(this.studyReference.getId(), dataSetType);
 		Assert.assertEquals("Dataset's name should be " + StudyTestDataInitializer.DATASET_NAME, StudyTestDataInitializer.DATASET_NAME, dataset.getName());
+	}
+
+	@Test
+	public void testGetLocalNameByStandardVariableId() throws Exception {
+		Integer standardVariableId = TermId.STUDY_NAME.getId();
+		String localName = this.manager.getLocalNameByStandardVariableId(this.studyReference.getId(), standardVariableId);
+		Assert.assertEquals("The local name should be " + StudyTestDataInitializer.STUDY_NAME, StudyTestDataInitializer.STUDY_NAME, localName);
+	}
+
+	@Test
+	public void testGetAllStudyDetails() throws Exception {
+		List<StudyDetails> nurseryStudyDetails = this.manager.getAllStudyDetails(StudyType.N, this.commonTestProject.getUniqueID());
+		Assert.assertTrue("The size should be greater than 0 since we are sure that it will return at least one study details", nurseryStudyDetails.size()>0);
+	}
+
+	@Test
+	public void testCountProjectsByVariable() throws Exception {
+		int variableId = TermId.STUDY_NAME.getId();
+		long count = this.manager.countProjectsByVariable(variableId);
+		//Since there is no way for us to know the exact number of project
+		//the count should not be zero since the Basic Nursery Template is always existing
+		Assert.assertTrue("The count should be greater than 0", count > 0);
+	}
+
+	
+	@Test
+	public void testCountExperimentsByVariable() throws Exception {
+		int variableId = 8230;
+		int storedInId = 1041;
+		long count = this.manager.countExperimentsByVariable(variableId, storedInId);
+		Assert.assertTrue("Count should be greater than 0", count > 0);
+	}
+
+	@Test
+	public void testCheckIfProjectNameIsExisting() throws Exception {
+		DmsProject project = this.studyTDI.createFolderTestData(this.commonTestProject.getUniqueID());
+		boolean isExisting = this.manager.checkIfProjectNameIsExistingInProgram(project.getName(), this.commonTestProject.getUniqueID());
+		Assert.assertTrue(isExisting);
+
+		String name = "SHOULDNOTEXISTSTUDY";
+		isExisting = this.manager.checkIfProjectNameIsExistingInProgram(name, this.commonTestProject.getUniqueID());
+		Assert.assertFalse(isExisting);
+	}
+
+	@Test
+	public void testGetFieldMapInfoOfTrial() throws MiddlewareQueryException {
+		List<Integer> trialIdList = new ArrayList<Integer>();
+		trialIdList.addAll(Arrays.asList(this.studyReference.getId()));
+		List<FieldMapInfo> fieldMapInfos =
+				this.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, StudyDataManagerImplTest.crossExpansionProperties);
+		//compare the size to the minimum possible value of field map infos' size
+		Assert.assertTrue("The size should be greater than 0", fieldMapInfos.size()>0);
+	}
+
+	@Test
+	public void testGetParentFolder() throws MiddlewareQueryException {
+		String uniqueId = "001";
+		DmsProject project = this.studyTDI.createFolderTestData(uniqueId);
+		int id = this.manager.addSubFolder(project.getProjectId(), "Sub folder", "Sub Folder",
+				uniqueId);
+		DmsProject proj = this.manager.getParentFolder(id);
+		Assert.assertEquals("The folder names should be equal",  project.getName(), proj.getName());
+	}
+
+
+	@Test
+	public void testGetFolderTree() throws MiddlewareQueryException {
+		List<FolderReference> tree = this.manager.getFolderTree();
+		Assert.assertTrue("The size should be 0 since it is empty", tree.size() == 0);
+		this.studyTDI.createFolderTestData(this.commonTestProject.getUniqueID());
+		tree = this.manager.getFolderTree();
+		Assert.assertTrue("The size should be greater than 0 since it will contain the new folder added", tree.size() > 0);
+	}
+
+	@Test
+	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNotNull() {
+		LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
+
+		FieldmapBlockInfo fieldMapBlockInfo =
+				new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK,
+						FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, FieldMapDataUtil.MACHINE_ROW_CAPACITY,
+						false, null, FieldMapDataUtil.FIELD_ID);
+
+		List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList(true);
+
+		this.manager.setLocationDataManager(locationDataManager);
+
+		try {
+			Mockito.when(locationDataManager.getBlockInformation(FieldMapDataUtil.BLOCK_ID)).thenReturn(fieldMapBlockInfo);
+			this.manager.updateFieldMapWithBlockInformation(infos, fieldMapBlockInfo, false);
+
+			FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
+
+			Assert.assertEquals("Expected " + FieldMapDataUtil.ROWS_IN_BLOCK + " but got " + trialInstance.getRowsInBlock() + " instead.",
+					FieldMapDataUtil.ROWS_IN_BLOCK, trialInstance.getRowsInBlock().intValue());
+			Assert.assertEquals("Expected " + FieldMapDataUtil.RANGES_IN_BLOCK + " but got " + trialInstance.getRangesInBlock()
+					+ " instead.", FieldMapDataUtil.RANGES_IN_BLOCK, trialInstance.getRangesInBlock().intValue());
+			Assert.assertEquals("Expected " + FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT + " but got " + trialInstance.getRowsPerPlot()
+					+ " instead.", FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, trialInstance.getRowsPerPlot().intValue());
+			Assert.assertEquals("Expected " + FieldMapDataUtil.PLANTING_ORDER + " but got " + trialInstance.getPlantingOrder()
+					+ " instead.", FieldMapDataUtil.PLANTING_ORDER, trialInstance.getPlantingOrder().intValue());
+			Assert.assertEquals("Expected " + FieldMapDataUtil.MACHINE_ROW_CAPACITY + " but got " + trialInstance.getMachineRowCapacity()
+					+ " instead.", FieldMapDataUtil.MACHINE_ROW_CAPACITY, trialInstance.getMachineRowCapacity().intValue());
+		} catch (MiddlewareQueryException e) {
+			Assert.fail("Expected mocked value to be returned but used the original call for getBlockInformation instead.");
+		}
+	}
+
+	@Test
+	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNull() {
+		LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
+
+		FieldmapBlockInfo fieldMapBlockInfo =
+				new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK, FieldMapDataUtil.RANGES_IN_BLOCK,
+						FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER, FieldMapDataUtil.MACHINE_ROW_CAPACITY,
+						false, null, FieldMapDataUtil.FIELD_ID);
+
+		List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList(true);
+		FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
+		trialInstance.setBlockId(null);
+
+		this.manager.setLocationDataManager(locationDataManager);
+
+		try {
+			Mockito.when(locationDataManager.getBlockInformation(FieldMapDataUtil.BLOCK_ID)).thenReturn(fieldMapBlockInfo);
+			((StudyDataManagerImpl) this.manager).updateFieldMapWithBlockInformation(infos, fieldMapBlockInfo, false);
+
+			Assert.assertNull("Expected null but got " + trialInstance.getRowsInBlock() + " instead.", trialInstance.getRowsInBlock());
+			Assert.assertNull("Expected null but got " + trialInstance.getRangesInBlock() + " instead.", trialInstance.getRangesInBlock());
+			Assert.assertNull("Expected null but got " + trialInstance.getRowsPerPlot() + " instead.", trialInstance.getRowsPerPlot());
+			Assert.assertNull("Expected null but got " + trialInstance.getPlantingOrder() + " instead.", trialInstance.getPlantingOrder());
+			Assert.assertNull("Expected null but got " + trialInstance.getMachineRowCapacity() + " instead.",
+					trialInstance.getMachineRowCapacity());
+		} catch (MiddlewareQueryException e) {
+			Assert.fail("Expected mocked value to be returned but used the original call for getBlockInformation instead.");
+		}
+	}
+	
+	@Test
+	public void testGetStudyType() {
+		try {
+			Assert.assertEquals("Study type returned did not match.", StudyType.T,
+					this.manager.getStudyType(this.studyReference.getId()));
+		} catch (MiddlewareQueryException e) {
+			Assert.fail("Unexpected exception: " + e.getMessage());
+		}
+	}
+
+	@Test
+	public void testGetStudyTypeNullEdgeCase() {
+		try {
+			final int PRESUMABLY_NON_EXISTENT_STUDY_ID = -1000000;
+			Assert.assertNull("Expected null return value but was non null.", this.manager.getStudyType(PRESUMABLY_NON_EXISTENT_STUDY_ID));
+		} catch (MiddlewareQueryException e) {
+			Assert.fail("Unexpected exception: " + e.getMessage());
+		}
+	}
+
+	@Test
+	public void testDeleteProgramStudies() throws Exception {
+		String uniqueId = "100001001001";
+		this.studyTDI.createFolderTestData(uniqueId);
+		this.studyTDI.addTestStudy(uniqueId);
+
+		List<? extends  Reference> programStudiesAndFolders = this.manager.getRootFolders(uniqueId, StudyType.nurseriesAndTrials());
+		int sizeBeforeDelete = programStudiesAndFolders.size();
+		this.manager.deleteProgramStudies(uniqueId);
+		programStudiesAndFolders = this.manager.getRootFolders(uniqueId, StudyType.nurseriesAndTrials());
+		int sizeAfterDelete = programStudiesAndFolders.size();
+		
+		Assert.assertTrue("The size after the delete should be less than the size before.", sizeAfterDelete < sizeBeforeDelete);
+
+	}
+
+	@Test
+	public void testGetStudyDetails() throws MiddlewareQueryException {
+		List<StudyDetails> studyDetailsList = this.manager.getStudyDetails(StudyType.T, this.commonTestProject.getUniqueID(), 0, 50);
+		//Compare size to one since we are sure that the result will include the test study we added in the set up
+		Assert.assertTrue("The list should at least contain one Study Details", studyDetailsList.size() > 0);
+	}
+
+	@Test
+	public void testGetNurseryAndTrialStudyDetails() throws MiddlewareQueryException {
+		List<StudyDetails> studyDetailsList = this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
+		//Compare size to one since we are sure that the result will include the test study we added in the set up
+		Assert.assertTrue("The list should at least contain one Study Details", studyDetailsList.size() > 0);
+	}
+
+	@Test
+	public void testGetStudyDetails_ByTypeAndId() throws MiddlewareException {
+		StudyDetails studyDetails = this.manager.getStudyDetails(StudyType.T, this.studyReference.getId());
+		Assert.assertNotNull("Study should not be null", studyDetails);
+		Assert.assertEquals("Study should have the id " + studyReference.getId(), studyDetails.getId(), studyDetails.getId());
+	}
+
+	@Test
+	public void testGetGeolocationIdByProjectIdAndTrialInstanceNumber() {
+		try {
+			Integer projectId = 25007;
+			String trialInstanceNumberExpected = "1";
+			Integer geolocationId = this.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(projectId, trialInstanceNumberExpected);
+			if (geolocationId != null) {
+				String trialInstanceNumberActual = this.manager.getTrialInstanceNumberByGeolocationId(geolocationId);
+				Assert.assertEquals(trialInstanceNumberExpected, trialInstanceNumberActual);
+			}
+		} catch (MiddlewareQueryException e) {
+			Assert.fail("Unexpected exception: " + e.getMessage());
+		}
+	}
+
+	@Test
+	public void testGetTrialInstanceNumberByGeolocationId() {
+		try {
+			String trialInstanceNumberExpected = "1";
+			String trialInstanceNumberActual = this.manager.getTrialInstanceNumberByGeolocationId(1);
+			Assert.assertNotNull(trialInstanceNumberActual);
+			Assert.assertEquals(trialInstanceNumberExpected, trialInstanceNumberActual);
+		} catch (MiddlewareQueryException e) {
+			Assert.fail("Unexpected exception: " + e.getMessage());
+		}
+	}
+
+	@Test
+	public void testSaveGeolocationProperty() throws MiddlewareQueryException {
+		Integer stdVarId = TermId.EXPERIMENT_DESIGN_FACTOR.getId();
+		Integer studyId = 25019;
+		String expDesign = this.manager.getGeolocationPropValue(stdVarId, studyId);
+		String newExpDesign = null;
+		if (expDesign != null) {
+			if (TermId.RANDOMIZED_COMPLETE_BLOCK.getId() == Integer.parseInt(expDesign)) {
+				newExpDesign = Integer.toString(TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId());
+			} else if (TermId.RESOLVABLE_INCOMPLETE_BLOCK.getId() == Integer.parseInt(expDesign)) {
+				newExpDesign = Integer.toString(TermId.RANDOMIZED_COMPLETE_BLOCK.getId());
+			}
+			// update experimental design value
+			int ndGeolocationId = this.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(studyId, "1");
+			this.manager.saveGeolocationProperty(ndGeolocationId, stdVarId, newExpDesign);
+			String actualExpDesign = this.manager.getGeolocationPropValue(stdVarId, studyId);
+			Assert.assertEquals(newExpDesign, actualExpDesign);
+			Assert.assertNotEquals(expDesign, actualExpDesign);
+			// revert to previous value
+			this.manager.saveGeolocationProperty(ndGeolocationId, stdVarId, expDesign);
+			actualExpDesign = this.manager.getGeolocationPropValue(stdVarId, studyId);
+			Assert.assertEquals(expDesign, actualExpDesign);
+			Assert.assertNotEquals(newExpDesign, actualExpDesign);
+		}
+	}
+
+	@Test
+	public void testGetAllSharedProjectNames() throws MiddlewareQueryException {
+		List<String> sharedProjectNames = this.manager.getAllSharedProjectNames();
+		Assert.assertNotNull("The shared project names should not be null", sharedProjectNames);
+	}
+
+	@Test
+	public void testCheckIfAnyLocationIDsExistInExperimentsReturnFalse() {
+
+		Integer locationId = this.manager.getGeolocationIdByProjectIdAndTrialInstanceNumber(StudyTestDataInitializer.STUDY_ID, "999");
+		List<Integer> locationIds = new ArrayList<>();
+		locationIds.add(locationId);
+
+		boolean returnValue = this.manager.checkIfAnyLocationIDsExistInExperiments(StudyTestDataInitializer.STUDY_ID, DataSetType.PLOT_DATA, locationIds);
+
+		Assert.assertFalse("The return value should be false", returnValue);
 	}
 }
