@@ -530,4 +530,25 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		Assert.assertFalse("The return value should be false", returnValue);
 	}
+	
+	@Test
+	public void testIsFolderEmptyTrue() {
+		
+		String uniqueId = this.commonTestProject.getUniqueID();
+		DmsProject project = this.studyTDI.createFolderTestData(uniqueId);
+		
+		boolean isEmpty = this.manager.isFolderEmpty(project.getProjectId(), uniqueId, StudyType.nurseriesAndTrials());
+		Assert.assertTrue("The folder should be empty", isEmpty);
+	}
+	
+	@Test
+	public void testIsFolderEmptyFalse() {
+		
+		String uniqueId = this.commonTestProject.getUniqueID();
+		DmsProject project = this.studyTDI.createFolderTestData(uniqueId);
+		this.manager.addSubFolder(project.getProjectId(), "Sub folder", "Sub Folder",
+				uniqueId);
+		boolean isEmpty = this.manager.isFolderEmpty(project.getProjectId(), uniqueId, StudyType.nurseriesAndTrials());
+		Assert.assertFalse("The folder should not be empty", isEmpty);
+	}
 }
