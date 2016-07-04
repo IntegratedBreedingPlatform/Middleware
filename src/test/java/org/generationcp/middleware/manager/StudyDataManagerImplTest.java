@@ -23,6 +23,8 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
+import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
+import org.generationcp.middleware.domain.search.filter.GidStudyQueryFilter;
 import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFilter;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -114,5 +116,51 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		StudyResultSet resultSet = this.manager.searchStudies(new ParentFolderStudyQueryFilter(1), 5);
 		//We are sure that the result set will return at least one study, the study that we added in the setup
 		Assert.assertTrue("The size should be greater than 0.", resultSet.size()>0);
+	}
+
+	@Test
+	public void testSearchStudiesForName() throws Exception {
+		BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
+
+		filter.setName("FooFoo"); 
+		StudyResultSet resultSet = this.manager.searchStudies(filter, 10);
+		Assert.assertTrue("The size should be zero since the name is invalid", resultSet.size() == 0);
+
+		filter.setName(BASIC_NURSERY_TEMPLATE);
+		resultSet = this.manager.searchStudies(filter, 10);
+		
+		//We are sure that the result set will contain at least one study
+		Assert.assertTrue("The size should be greater than zero", resultSet.size() > 0);
+	}
+
+	@Test
+	public void testSearchStudiesForStartDate() throws Exception {
+		BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
+		//start date of basic nursery template
+		filter.setStartDate(START_DATE);
+
+		StudyResultSet resultSet = this.manager.searchStudies(filter, 10);
+		//We are sure that the result set will contain the test study we added in the set up
+		Assert.assertTrue("The size should be greater than 0", resultSet.size() > 0);
+	}
+
+	
+	@Test
+	public void testSearchStudiesForAll() throws Exception {
+		BrowseStudyQueryFilter filter = new BrowseStudyQueryFilter();
+		filter.setStartDate(START_DATE);
+		filter.setName(BASIC_NURSERY_TEMPLATE);
+
+		StudyResultSet resultSet = this.manager.searchStudies(filter, 10);
+		//We are sure that the result set will contain the test study we added in the set up
+		Assert.assertTrue("The size should be greater than 0", resultSet.size() > 0);
+	}
+
+	@Test
+	public void testSearchStudiesByGid() throws Exception {
+		GidStudyQueryFilter filter = new GidStudyQueryFilter(this.studyTDI.getGid());
+		StudyResultSet resultSet = this.manager.searchStudies(filter, 50);
+		//We are sure that the result set will contain the test study we added in the set up
+		Assert.assertTrue("The size should be greater than 0", resultSet.size() > 0);
 	}
 }
