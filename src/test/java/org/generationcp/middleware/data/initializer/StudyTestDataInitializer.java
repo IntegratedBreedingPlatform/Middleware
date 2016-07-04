@@ -3,6 +3,9 @@ package org.generationcp.middleware.data.initializer;
 import java.util.Random;
 
 import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StudyReference;
@@ -140,6 +143,41 @@ public class StudyTestDataInitializer {
 						dmsProject.getProgramUUID());
 		dmsProject.setProjectId(folderId);
 		return dmsProject;
+	}
+	
+	public DatasetReference addTestDataset(int studyId) throws Exception {
+		VariableTypeList typeList = new VariableTypeList();
+
+		DatasetValues datasetValues = new DatasetValues();
+		datasetValues.setName(DATASET_NAME);
+		datasetValues.setDescription("My Dataset Description");
+		datasetValues.setType(DataSetType.MEANS_DATA);
+
+		DMSVariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
+		variableType.setLocalName("Grain Yield");
+		typeList.add(variableType);
+
+		variableType = this.createVariableType(18050, "Disease Pressure", "whatever", 5);
+		variableType.setLocalName("Disease Pressure");
+		typeList.add(variableType);
+
+		variableType = this.createVariableType(8200, "Plot No", "whatever", 6);
+		variableType.setLocalName("Plot No");
+		typeList.add(variableType);
+
+		return this.studyDataManager.addDataSet(studyId, typeList, datasetValues, null);
+	}
+		
+	private DMSVariableType createVariableType(int termId, String name, String description, int rank) throws Exception {
+		StandardVariable stdVar = this.ontologyManager.getStandardVariable(termId, commonTestProject.getUniqueID());
+		DMSVariableType vtype = new DMSVariableType();
+		vtype.setLocalName(name);
+		vtype.setLocalDescription(description);
+		vtype.setRank(rank);
+		vtype.setStandardVariable(stdVar);
+		vtype.setRole(PhenotypicType.TRIAL_ENVIRONMENT);
+
+		return vtype;
 	}
 	
 	public Integer getGid() {
