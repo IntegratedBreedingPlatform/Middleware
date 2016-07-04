@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.data.initializer;
 
 import java.util.Random;
@@ -27,7 +28,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
  * Contains Study related test data initializers
  */
 public class StudyTestDataInitializer {
-	
+
 	public static final String STUDY_NAME = "STUDY NAME";
 	public static final String STUDY_DESCRIPTION = "STUDY DESCRIPTION";
 	public static final Integer STUDY_ID = 10010;
@@ -36,82 +37,84 @@ public class StudyTestDataInitializer {
 	private static final String TEST_FOLDER_DESC = "TEST_FOLDER_DESC";
 	public static final String DATASET_NAME = "DATA SET NAME";
 	public static int DATASET_ID = 255;
-	
-	private StudyDataManagerImpl studyDataManager;
-	private OntologyDataManager ontologyManager;
-	private Project commonTestProject;
-	private GermplasmDataManager germplasmDataDM;
+
+	private final StudyDataManagerImpl studyDataManager;
+	private final OntologyDataManager ontologyManager;
+	private final Project commonTestProject;
+	private final GermplasmDataManager germplasmDataDM;
 	private Integer gid;
-	
-	public StudyTestDataInitializer(final StudyDataManagerImpl studyDataManagerImpl, final OntologyDataManager ontologyDataManager, final Project testProject, final GermplasmDataManager germplasmDataDM) {
+
+	public StudyTestDataInitializer(final StudyDataManagerImpl studyDataManagerImpl, final OntologyDataManager ontologyDataManager,
+			final Project testProject, final GermplasmDataManager germplasmDataDM) {
 		this.studyDataManager = studyDataManagerImpl;
 		this.ontologyManager = ontologyDataManager;
 		this.commonTestProject = testProject;
 		this.germplasmDataDM = germplasmDataDM;
 	}
-	
+
 	public StudyReference addTestStudy() throws Exception {
 		return this.addTestStudy(this.commonTestProject.getUniqueID());
 	}
-	
-	public StudyReference addTestStudy(String uniqueId) throws Exception {
-		VariableTypeList typeList = new VariableTypeList();
-		VariableList variableList = new VariableList();
 
-		Variable variable = this.createVariable(TermId.STUDY_NAME.getId(), STUDY_NAME, 1);
+	public StudyReference addTestStudy(final String uniqueId) throws Exception {
+		final VariableTypeList typeList = new VariableTypeList();
+		final VariableList variableList = new VariableList();
+
+		Variable variable = this.createVariable(TermId.STUDY_NAME.getId(), StudyTestDataInitializer.STUDY_NAME, 1);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
-		variable = this.createVariable(TermId.STUDY_TITLE.getId(), STUDY_DESCRIPTION, 2);
+		variable = this.createVariable(TermId.STUDY_TITLE.getId(), StudyTestDataInitializer.STUDY_DESCRIPTION, 2);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
-		
+
 		variable = this.createVariable(TermId.STUDY_TYPE.getId(), String.valueOf(StudyType.T.getId()), 3, PhenotypicType.STUDY);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
-		
+
 		variable = this.createVariable(TermId.STUDY_STATUS.getId(), String.valueOf(TermId.ACTIVE_STUDY.getId()), 4);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
-		
-		StudyValues studyValues = new StudyValues();
+
+		final StudyValues studyValues = new StudyValues();
 		studyValues.setVariableList(variableList);
 
-		VariableList locationVariableList = this.createTrialEnvironment("Description", "1.0", "2.0", "data", "3.0", "prop1", "prop2");
+		final VariableList locationVariableList = this.createTrialEnvironment("Description", "1.0", "2.0", "data", "3.0", "prop1", "prop2");
 		studyValues.setLocationId(this.studyDataManager.addTrialEnvironment(locationVariableList));
-		
-		Germplasm germplasm  = GermplasmTestDataInitializer.createGermplasm(1);
-		gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
-		VariableList germplasmVariableList = this.createGermplasm("unique name", String.valueOf(gid), "name", "2000", "prop1", "prop2");
+
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
+		this.gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
+		final VariableList germplasmVariableList =
+				this.createGermplasm("unique name", String.valueOf(this.gid), "name", "2000", "prop1", "prop2");
 		studyValues.setGermplasmId(this.studyDataManager.addStock(germplasmVariableList));
 
-		return this.studyDataManager.addStudy(PARENT_FOLDER_ID, typeList, studyValues, uniqueId);
+		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId);
 	}
-		
-	private Variable createVariable(int termId, String value, int rank) throws Exception {
+
+	private Variable createVariable(final int termId, final String value, final int rank) throws Exception {
 		return this.createVariable(termId, value, rank, PhenotypicType.VARIATE);
 	}
-	
-	private Variable createVariable(int termId, String value, int rank, PhenotypicType type) throws Exception {
-		StandardVariable stVar = this.ontologyManager.getStandardVariable(termId, commonTestProject.getUniqueID());
 
-		DMSVariableType vtype = new DMSVariableType();
+	private Variable createVariable(final int termId, final String value, final int rank, final PhenotypicType type) throws Exception {
+		final StandardVariable stVar = this.ontologyManager.getStandardVariable(termId, this.commonTestProject.getUniqueID());
+
+		final DMSVariableType vtype = new DMSVariableType();
 		vtype.setStandardVariable(stVar);
 		vtype.setRank(rank);
-		Variable var = new Variable();
+		final Variable var = new Variable();
 		var.setValue(value);
 		var.setVariableType(vtype);
 		vtype.setLocalName(value);
 		vtype.setRole(type);
 		return var;
 	}
-	
-	private VariableList createTrialEnvironment(String name, String latitude, String longitude, String data, String altitude,
-			String property1, String property2) throws Exception {
-		VariableList variableList = new VariableList();
+
+	private VariableList createTrialEnvironment(final String name, final String latitude, final String longitude, final String data,
+			final String altitude, final String property1, final String property2) throws Exception {
+		final VariableList variableList = new VariableList();
 		variableList.add(this.createVariable(8170, name, 0, PhenotypicType.TRIAL_ENVIRONMENT));
 		variableList.add(this.createVariable(8191, latitude, 0, PhenotypicType.TRIAL_ENVIRONMENT));
-		variableList.add(this.createVariable(8192, longitude, 0,PhenotypicType.TRIAL_ENVIRONMENT));
+		variableList.add(this.createVariable(8192, longitude, 0, PhenotypicType.TRIAL_ENVIRONMENT));
 		variableList.add(this.createVariable(8193, data, 0, PhenotypicType.TRIAL_ENVIRONMENT));
 		variableList.add(this.createVariable(8194, altitude, 0, PhenotypicType.TRIAL_ENVIRONMENT));
 		variableList.add(this.createVariable(8135, property1, 0, PhenotypicType.TRIAL_ENVIRONMENT));
@@ -119,10 +122,10 @@ public class StudyTestDataInitializer {
 		variableList.add(this.createVariable(8195, "999", 0, PhenotypicType.TRIAL_ENVIRONMENT));
 		return variableList;
 	}
-	
-	private VariableList createGermplasm(String name, String gid, String designation, String code, String property1, String property2)
-			throws Exception {
-		VariableList variableList = new VariableList();
+
+	private VariableList createGermplasm(final String name, final String gid, final String designation, final String code,
+			final String property1, final String property2) throws Exception {
+		final VariableList variableList = new VariableList();
 		variableList.add(this.createVariable(8230, name, 1, PhenotypicType.GERMPLASM));
 		variableList.add(this.createVariable(8240, gid, 2, PhenotypicType.GERMPLASM));
 		variableList.add(this.createVariable(8250, designation, 3, PhenotypicType.GERMPLASM));
@@ -131,25 +134,24 @@ public class StudyTestDataInitializer {
 		variableList.add(this.createVariable(8377, property2, 6, PhenotypicType.GERMPLASM));
 		return variableList;
 	}
-	
-	public DmsProject createFolderTestData(String uniqueId) throws MiddlewareQueryException {
-		int randomInt = new Random().nextInt(10000);
-		DmsProject dmsProject = new DmsProject();
-		dmsProject.setName(TEST_FOLDER_NAME + randomInt);
-		dmsProject.setDescription(TEST_FOLDER_DESC + randomInt);
+
+	public DmsProject createFolderTestData(final String uniqueId) throws MiddlewareQueryException {
+		final int randomInt = new Random().nextInt(10000);
+		final DmsProject dmsProject = new DmsProject();
+		dmsProject.setName(StudyTestDataInitializer.TEST_FOLDER_NAME + randomInt);
+		dmsProject.setDescription(StudyTestDataInitializer.TEST_FOLDER_DESC + randomInt);
 		dmsProject.setProgramUUID(uniqueId);
-		int folderId =
-				this.studyDataManager.addSubFolder(DmsProject.SYSTEM_FOLDER_ID, dmsProject.getName(), dmsProject.getDescription(),
-						dmsProject.getProgramUUID());
+		final int folderId = this.studyDataManager.addSubFolder(DmsProject.SYSTEM_FOLDER_ID, dmsProject.getName(),
+				dmsProject.getDescription(), dmsProject.getProgramUUID());
 		dmsProject.setProjectId(folderId);
 		return dmsProject;
 	}
-	
-	public DatasetReference addTestDataset(int studyId) throws Exception {
-		VariableTypeList typeList = new VariableTypeList();
 
-		DatasetValues datasetValues = new DatasetValues();
-		datasetValues.setName(DATASET_NAME);
+	public DatasetReference addTestDataset(final int studyId) throws Exception {
+		final VariableTypeList typeList = new VariableTypeList();
+
+		final DatasetValues datasetValues = new DatasetValues();
+		datasetValues.setName(StudyTestDataInitializer.DATASET_NAME);
 		datasetValues.setDescription("My Dataset Description");
 		datasetValues.setType(DataSetType.MEANS_DATA);
 
@@ -167,10 +169,11 @@ public class StudyTestDataInitializer {
 
 		return this.studyDataManager.addDataSet(studyId, typeList, datasetValues, null);
 	}
-		
-	private DMSVariableType createVariableType(int termId, String name, String description, int rank) throws Exception {
-		StandardVariable stdVar = this.ontologyManager.getStandardVariable(termId, commonTestProject.getUniqueID());
-		DMSVariableType vtype = new DMSVariableType();
+
+	private DMSVariableType createVariableType(final int termId, final String name, final String description, final int rank)
+			throws Exception {
+		final StandardVariable stdVar = this.ontologyManager.getStandardVariable(termId, this.commonTestProject.getUniqueID());
+		final DMSVariableType vtype = new DMSVariableType();
 		vtype.setLocalName(name);
 		vtype.setLocalDescription(description);
 		vtype.setRank(rank);
@@ -179,7 +182,7 @@ public class StudyTestDataInitializer {
 
 		return vtype;
 	}
-	
+
 	public Integer getGid() {
 		return this.gid;
 	}
