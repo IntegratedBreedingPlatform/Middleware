@@ -707,7 +707,19 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("Error encountered with deleteEmptyFolder(id=" + id + "): " + e.getMessage(), e);
 		}
 	}
-
+	
+	@Override
+	public boolean isFolderEmpty(int id, String programUUID, List<StudyType> studyTypes) {
+		DmsProjectDao dmsProjectDao = this.getDmsProjectDao();
+		
+		// check if folder has no children
+		List<Reference> children = dmsProjectDao.getChildrenOfFolder(id, programUUID, studyTypes);
+		if (children == null || children.isEmpty()) {
+			return true;
+		}
+		return false;
+	}
+	
 	@Override
 	public DmsProject getParentFolder(int id) throws MiddlewareQueryException {
 

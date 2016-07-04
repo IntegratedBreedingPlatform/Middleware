@@ -509,7 +509,16 @@ public interface StudyDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	void deleteEmptyFolder(int id, String programUUID) throws MiddlewareQueryException;
-
+	
+	/**
+	 * checks if the folder is empty given the folder id.
+	 * 
+	 * @param id the id
+	 * @param programUUID the programUUID
+	 * @param studyTypes list of StudyType
+	 */
+	boolean isFolderEmpty(int id, String programUUID, List<StudyType> studyTypes);
+	
 	/**
 	 * Returns the parent folder of the project. Accepts a project id.
 	 * 
