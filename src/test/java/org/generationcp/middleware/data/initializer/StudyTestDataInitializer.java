@@ -1,5 +1,7 @@
 package org.generationcp.middleware.data.initializer;
 
+import java.util.Random;
+
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -10,10 +12,12 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.Project;
 
 /*
@@ -123,6 +127,19 @@ public class StudyTestDataInitializer {
 		variableList.add(this.createVariable(8255, property1, 5, PhenotypicType.GERMPLASM));
 		variableList.add(this.createVariable(8377, property2, 6, PhenotypicType.GERMPLASM));
 		return variableList;
+	}
+	
+	public DmsProject createFolderTestData(String uniqueId) throws MiddlewareQueryException {
+		int randomInt = new Random().nextInt(10000);
+		DmsProject dmsProject = new DmsProject();
+		dmsProject.setName(TEST_FOLDER_NAME + randomInt);
+		dmsProject.setDescription(TEST_FOLDER_DESC + randomInt);
+		dmsProject.setProgramUUID(uniqueId);
+		int folderId =
+				this.studyDataManager.addSubFolder(DmsProject.SYSTEM_FOLDER_ID, dmsProject.getName(), dmsProject.getDescription(),
+						dmsProject.getProgramUUID());
+		dmsProject.setProjectId(folderId);
+		return dmsProject;
 	}
 	
 	public Integer getGid() {
