@@ -11,16 +11,20 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.List;
 import java.util.Properties;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.FolderReference;
+import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
@@ -29,6 +33,7 @@ import org.generationcp.middleware.domain.search.filter.ParentFolderStudyQueryFi
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.junit.Assert;
@@ -162,5 +167,39 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		StudyResultSet resultSet = this.manager.searchStudies(filter, 50);
 		//We are sure that the result set will contain the test study we added in the set up
 		Assert.assertTrue("The size should be greater than 0", resultSet.size() > 0);
+	}
+	
+	@Test
+	public void testGetRootFolders() throws Exception {
+		List<Reference> rootFolders = this.manager.getRootFolders(this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
+		Assert.assertNotNull(rootFolders);
+		Assert.assertFalse("Root folders should not be empty because it contains the templates for Nursery and Trial.", rootFolders.isEmpty());
+	}
+
+	@Test
+	public void testGetChildrenOfFolder() throws Exception {
+		
+		String uniqueId = this.commonTestProject.getUniqueID();
+		DmsProject mainFolder = this.studyTDI.createFolderTestData(uniqueId);
+		int subFolderID =  this.manager.addSubFolder(mainFolder.getProjectId(), "Sub folder", "Sub Folder",
+				uniqueId);
+
+		List<Reference> childrenNodes = this.manager.getChildrenOfFolder(mainFolder.getProjectId(), this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
+		Assert.assertNotNull(childrenNodes);
+		Assert.assertTrue("The size should be one.", childrenNodes.size() == 1);
+		Assert.assertTrue("The id of the subFolder should be " + subFolderID,  subFolderID == childrenNodes.get(0).getId());
+	}
+
+	@Test
+	public void testGetAllFolders() {
+
+		this.studyTDI.createFolderTestData(this.commonTestProject.getUniqueID());
+		this.studyTDI.createFolderTestData(null);
+
+		final List<FolderReference> allFolders = this.manager.getAllFolders();
+		// We only assert that there are minimum two folders that we added in test.
+		// The test database might already have some pre-init and developer created folders too which we dont want the test to depend on
+		// because we do not reset the test database for each test run yet.
+		Assert.assertTrue(allFolders.size() >= 2);
 	}
 }
