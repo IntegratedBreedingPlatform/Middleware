@@ -171,6 +171,10 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.inventoryID = stockId;
 		this.amount = seedQuantity;
 	}
+	
+	public Integer getOriginalGid() {
+		return this.gid;
+	}
 
 	/**
 	 * Gets the gid.
