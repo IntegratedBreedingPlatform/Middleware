@@ -342,10 +342,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetFolderTree() throws MiddlewareQueryException {
 		List<FolderReference> tree = this.manager.getFolderTree();
-		Assert.assertTrue("The size should be 0 since it is empty", tree.size() == 0);
+		int sizeBefore = tree.size();
 		this.studyTDI.createFolderTestData(this.commonTestProject.getUniqueID());
 		tree = this.manager.getFolderTree();
-		Assert.assertTrue("The size should be greater than 0 since it will contain the new folder added", tree.size() > 0);
+		int newSize = tree.size();
+		//Cannot assert the exact size so we will check if the size of the tree is incremented by one after adding a new folder
+		Assert.assertTrue("The new size should be equal the  size before + the newly added folder", newSize == (sizeBefore+1));
 	}
 
 	@Test
