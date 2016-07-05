@@ -112,26 +112,26 @@ public class StudyTestDataInitializer {
 	private VariableList createTrialEnvironment(final String name, final String latitude, final String longitude, final String data,
 			final String altitude, final String property1, final String property2) throws Exception {
 		final VariableList variableList = new VariableList();
-		variableList.add(this.createVariable(8170, name, 0, PhenotypicType.TRIAL_ENVIRONMENT));
-		variableList.add(this.createVariable(8191, latitude, 0, PhenotypicType.TRIAL_ENVIRONMENT));
-		variableList.add(this.createVariable(8192, longitude, 0, PhenotypicType.TRIAL_ENVIRONMENT));
-		variableList.add(this.createVariable(8193, data, 0, PhenotypicType.TRIAL_ENVIRONMENT));
-		variableList.add(this.createVariable(8194, altitude, 0, PhenotypicType.TRIAL_ENVIRONMENT));
-		variableList.add(this.createVariable(8135, property1, 0, PhenotypicType.TRIAL_ENVIRONMENT));
-		variableList.add(this.createVariable(8180, property2, 0, PhenotypicType.TRIAL_ENVIRONMENT));
-		variableList.add(this.createVariable(8195, "999", 0, PhenotypicType.TRIAL_ENVIRONMENT));
+		variableList.add(this.createVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), name, 0, PhenotypicType.TRIAL_ENVIRONMENT));
+		variableList.add(this.createVariable(TermId.LATITUDE.getId(), latitude, 0, PhenotypicType.TRIAL_ENVIRONMENT));
+		variableList.add(this.createVariable(TermId.LONGITUDE.getId(), longitude, 0, PhenotypicType.TRIAL_ENVIRONMENT));
+		variableList.add(this.createVariable(TermId.GEODETIC_DATUM.getId(), data, 0, PhenotypicType.TRIAL_ENVIRONMENT));
+		variableList.add(this.createVariable(TermId.ALTITUDE.getId(), altitude, 0, PhenotypicType.TRIAL_ENVIRONMENT));
+		variableList.add(this.createVariable(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), property1, 0, PhenotypicType.TRIAL_ENVIRONMENT));
+		variableList.add(this.createVariable(TermId.TRIAL_LOCATION.getId(), property2, 0, PhenotypicType.TRIAL_ENVIRONMENT));
+		variableList.add(this.createVariable(TermId.SITE_NAME.getId(), "999", 0, PhenotypicType.TRIAL_ENVIRONMENT));
 		return variableList;
 	}
 
 	private VariableList createGermplasm(final String name, final String gid, final String designation, final String code,
 			final String property1, final String property2) throws Exception {
 		final VariableList variableList = new VariableList();
-		variableList.add(this.createVariable(8230, name, 1, PhenotypicType.GERMPLASM));
-		variableList.add(this.createVariable(8240, gid, 2, PhenotypicType.GERMPLASM));
-		variableList.add(this.createVariable(8250, designation, 3, PhenotypicType.GERMPLASM));
-		variableList.add(this.createVariable(8300, code, 4, PhenotypicType.GERMPLASM));
-		variableList.add(this.createVariable(8255, property1, 5, PhenotypicType.GERMPLASM));
-		variableList.add(this.createVariable(8377, property2, 6, PhenotypicType.GERMPLASM));
+		variableList.add(this.createVariable(TermId.ENTRY_NO.getId(), name, 1, PhenotypicType.GERMPLASM));
+		variableList.add(this.createVariable(TermId.GID.getId(), gid, 2, PhenotypicType.GERMPLASM));
+		variableList.add(this.createVariable(TermId.DESIG.getId(), designation, 3, PhenotypicType.GERMPLASM));
+		variableList.add(this.createVariable(TermId.ENTRY_CODE.getId(), code, 4, PhenotypicType.GERMPLASM));
+		variableList.add(this.createVariable(TermId.CHECK.getId(), property1, 5, PhenotypicType.GERMPLASM));
+		variableList.add(this.createVariable(TermId.CROSS.getId(), property2, 6, PhenotypicType.GERMPLASM));
 		return variableList;
 	}
 
