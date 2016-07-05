@@ -155,15 +155,15 @@ public class StudyTestDataInitializer {
 		datasetValues.setDescription("My Dataset Description");
 		datasetValues.setType(DataSetType.MEANS_DATA);
 
-		DMSVariableType variableType = this.createVariableType(18000, "Grain Yield", "whatever", 4);
+		DMSVariableType variableType = this.createVariableType(18000, "Grain Yield", "Grain Yield", 4);
 		variableType.setLocalName("Grain Yield");
 		typeList.add(variableType);
 
-		variableType = this.createVariableType(18050, "Disease Pressure", "whatever", 5);
+		variableType = this.createVariableType(18050, "Disease Pressure", "Disease Pressure", 5);
 		variableType.setLocalName("Disease Pressure");
 		typeList.add(variableType);
 
-		variableType = this.createVariableType(8200, "Plot No", "whatever", 6);
+		variableType = this.createVariableType(TermId.PLOT_NO.getId(), "Plot No", "Plot No", 6);
 		variableType.setLocalName("Plot No");
 		typeList.add(variableType);
 
