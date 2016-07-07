@@ -58,6 +58,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class StudyDataManagerImplTest extends IntegrationTestBase {
 
+	private static final String LOCATION_NAME = "LOCATION NAME";
+
+	private static final String FIELD_NAME = "FIELD NAME";
+
+	private static final String BLOCK_NAME = "BLOCK NAME";
+
 	private static final int START_DATE = 20140627;
 
 	private static final String BASIC_NURSERY_TEMPLATE = "Basic nursery template";
@@ -72,6 +78,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private GermplasmDataManager germplasmDataDM;
+
+	@Autowired
+	private LocationDataManager locationManager;
 
 	private Project commonTestProject;
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -94,7 +103,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("0");
 		StudyDataManagerImplTest.crossExpansionProperties = new CrossExpansionProperties(mockProperties);
 		StudyDataManagerImplTest.crossExpansionProperties.setDefaultLevel(1);
-		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject, this.germplasmDataDM);
+		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject, this.germplasmDataDM,
+				this.locationManager);
 		this.studyReference = this.studyTDI.addTestStudy();
 	}
 
@@ -367,6 +377,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			this.manager.updateFieldMapWithBlockInformation(infos, fieldMapBlockInfo, false);
 
 			final FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
+			trialInstance.setBlockId(this.studyTDI.addTestLocation(StudyDataManagerImplTest.BLOCK_NAME));
+			trialInstance.setFieldId(this.studyTDI.addTestLocation(StudyDataManagerImplTest.FIELD_NAME));
+			trialInstance.setLocationId(this.studyTDI.addTestLocation(StudyDataManagerImplTest.LOCATION_NAME));
+			fieldMapBlockInfo.setFieldId(trialInstance.getFieldId());
 
 			Assert.assertEquals("Expected " + FieldMapDataUtil.ROWS_IN_BLOCK + " but got " + trialInstance.getRowsInBlock() + " instead.",
 					FieldMapDataUtil.ROWS_IN_BLOCK, trialInstance.getRowsInBlock().intValue());
