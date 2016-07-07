@@ -19,8 +19,10 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.workbench.Project;
 
@@ -42,14 +44,16 @@ public class StudyTestDataInitializer {
 	private final OntologyDataManager ontologyManager;
 	private final Project commonTestProject;
 	private final GermplasmDataManager germplasmDataDM;
+	private final LocationDataManager locationDataManager;
 	private Integer gid;
 
 	public StudyTestDataInitializer(final StudyDataManagerImpl studyDataManagerImpl, final OntologyDataManager ontologyDataManager,
-			final Project testProject, final GermplasmDataManager germplasmDataDM) {
+			final Project testProject, final GermplasmDataManager germplasmDataDM, final LocationDataManager locationDataManager) {
 		this.studyDataManager = studyDataManagerImpl;
 		this.ontologyManager = ontologyDataManager;
 		this.commonTestProject = testProject;
 		this.germplasmDataDM = germplasmDataDM;
+		this.locationDataManager = locationDataManager;
 	}
 
 	public StudyReference addTestStudy() throws Exception {
@@ -185,5 +189,22 @@ public class StudyTestDataInitializer {
 
 	public Integer getGid() {
 		return this.gid;
+	}
+	
+	public Integer addTestLocation(String locationName){
+		Location location = new Location();
+		location.setCntryid(1);
+		location.setLabbr("");
+		location.setLname(locationName);
+		location.setLrplce(1);
+		location.setLtype(1);
+		location.setNllp(1);
+		location.setSnl1id(1);
+		location.setSnl2id(1);
+		location.setSnl3id(1);
+		location.setUniqueID(this.commonTestProject.getUniqueID());
+
+		// add the location
+		return this.locationDataManager.addLocation(location);
 	}
 }
