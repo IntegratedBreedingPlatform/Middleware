@@ -460,4 +460,8 @@ public interface LocationDataManager {
 	 */
 	void saveOrUpdateLocdesList(Integer locationId, List<Locdes> locdesList) throws MiddlewareQueryException;
 
+	public List<Location> getAllBreedingLocations(List<Integer> locationIds);
+
+	public List<Location> getAllSeedingLocations(List<Integer> locationIds);
+
 }
