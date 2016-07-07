@@ -454,6 +454,9 @@ public class WorkbookSaver extends Saver {
 
 			if (hasTrialObservations && workbook.getObservations() != null) {
 				for (final MeasurementRow row : workbook.getObservations()) {
+					if(row.getLocationId() > 0) {
+						continue;
+					}
 					final String trialInstance = this.getTrialInstanceNumber(row);
 					if (trialInstance != null) {
 						row.setLocationId(locationMap.get(trialInstance));
@@ -734,6 +737,10 @@ public class WorkbookSaver extends Saver {
 			activeSession.setFlushMode(FlushMode.MANUAL);
 			if (observations != null) {
 				for (final MeasurementRow row : observations) {
+					int experimentId = row.getExperimentId();
+					if(experimentId > 0) {
+						continue;
+					}
 					rowWatch.restart("saving row " + i++);
 					final ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
 					try {
