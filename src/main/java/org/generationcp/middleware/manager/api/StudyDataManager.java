@@ -429,11 +429,14 @@ public interface StudyDataManager {
 	 * 
 	 * @param studyIdList the study id list
 	 * @param studyType Can be either StudyType.T (Trial) or StudyType.N (Nursery)
+	 * @param pedigreeRequired Pedigree generation on the fly could be a very expensive operation for big studies. This flag allows
+	 *        switching it on/off for different client needs. When false, the fieldmap information will NOT be annotated with pedigree
+	 *        information for each germplasm involved.
 	 * @return the FieldMapCount object containing the counts
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType,
-			CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException;
+			CrossExpansionProperties crossExpansionProperties, boolean pedigreeRequired) throws MiddlewareQueryException;
 
 	/**
 	 * Save or Update Field Map Properties like row, column, block, total rows, total columns, planting order.

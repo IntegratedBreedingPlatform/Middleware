@@ -1149,7 +1149,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		List<Integer> trialIdList = new ArrayList<Integer>();
 		trialIdList.addAll(Arrays.asList(Integer.valueOf(-4)));
 		List<FieldMapInfo> fieldMapInfos =
-				this.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, StudyDataManagerImplTest.crossExpansionProperties);
+				this.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, StudyDataManagerImplTest.crossExpansionProperties, true);
 		for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
 			Debug.println(IntegrationTestBase.INDENT, fieldMapInfo.getFieldbookName());
 			if (fieldMapInfo.getDatasets() != null) {
@@ -1188,7 +1188,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		if (nurseryIdList.size() > 0) {
 
 			List<FieldMapInfo> fieldMapInfos =
-					this.manager.getFieldMapInfoOfStudy(nurseryIdList, StudyType.N, StudyDataManagerImplTest.crossExpansionProperties);
+					this.manager.getFieldMapInfoOfStudy(nurseryIdList, StudyType.N, StudyDataManagerImplTest.crossExpansionProperties,
+							true);
 			for (FieldMapInfo fieldMapInfo : fieldMapInfos) {
 				Debug.println(IntegrationTestBase.INDENT, fieldMapInfo.getFieldbookName());
 				if (fieldMapInfo.getDatasets() != null) {
@@ -1221,7 +1222,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		}
 
 		List<FieldMapInfo> info =
-				this.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, StudyDataManagerImplTest.crossExpansionProperties);
+				this.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, StudyDataManagerImplTest.crossExpansionProperties, true);
 
 		this.manager.saveOrUpdateFieldmapProperties(info, -1, false);
 	}

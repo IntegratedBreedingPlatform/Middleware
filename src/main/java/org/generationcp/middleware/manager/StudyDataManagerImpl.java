@@ -458,7 +458,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType,
-			CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException {
+			CrossExpansionProperties crossExpansionProperties, boolean pedigreeRequired) throws MiddlewareQueryException {
 		List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
 		final Map<Integer, String> pedigreeStringMap = new HashMap<>();
 		for (Integer studyId : studyIdList) {
@@ -476,7 +476,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			List<FieldMapDatasetInfo> fieldMapDatasetInfos = this.getExperimentPropertyDao().getFieldMapLabels(studyId);
 			fieldMapInfo.setDatasets(fieldMapDatasetInfos);
 
-			if (fieldMapDatasetInfos != null) {
+			if (fieldMapDatasetInfos != null && pedigreeRequired) {
 				this.setPedigree(fieldMapDatasetInfos, crossExpansionProperties, pedigreeStringMap);
 			}
 
