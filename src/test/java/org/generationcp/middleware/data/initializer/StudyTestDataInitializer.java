@@ -57,14 +57,26 @@ public class StudyTestDataInitializer {
 	}
 
 	public StudyReference addTestStudy() throws Exception {
-		return this.addTestStudy(this.commonTestProject.getUniqueID());
+		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, this.commonTestProject.getUniqueID(), StudyType.T);
+	}
+	
+	public StudyReference addTestStudy(final String uniqueId) throws Exception {
+		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, uniqueId, StudyType.T);
+	}
+	
+	public StudyReference addTestStudyWithStudyName(final String studyName) throws Exception {
+		return this.addTestStudy(studyName, this.commonTestProject.getUniqueID(), StudyType.T);
+	}
+	
+	public StudyReference addTestStudy(final StudyType studyType, final String studyName ) throws Exception {
+		return this.addTestStudy(studyName, this.commonTestProject.getUniqueID(), studyType);
 	}
 
-	public StudyReference addTestStudy(final String uniqueId) throws Exception {
+	public StudyReference addTestStudy(final String studyName, final String uniqueId, final StudyType studyType) throws Exception {
 		final VariableTypeList typeList = new VariableTypeList();
 		final VariableList variableList = new VariableList();
 
-		Variable variable = this.createVariable(TermId.STUDY_NAME.getId(), StudyTestDataInitializer.STUDY_NAME, 1);
+		Variable variable = this.createVariable(TermId.STUDY_NAME.getId(), studyName, 1);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
@@ -72,7 +84,7 @@ public class StudyTestDataInitializer {
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
-		variable = this.createVariable(TermId.STUDY_TYPE.getId(), String.valueOf(StudyType.T.getId()), 3, PhenotypicType.STUDY);
+		variable = this.createVariable(TermId.STUDY_TYPE.getId(), String.valueOf(studyType.getId()), 3, PhenotypicType.STUDY);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
