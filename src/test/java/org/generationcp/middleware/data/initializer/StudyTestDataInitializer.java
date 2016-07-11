@@ -64,10 +64,6 @@ public class StudyTestDataInitializer {
 		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, uniqueId, StudyType.T);
 	}
 	
-	public StudyReference addTestStudyWithStudyName(final String studyName) throws Exception {
-		return this.addTestStudy(studyName, this.commonTestProject.getUniqueID(), StudyType.T);
-	}
-	
 	public StudyReference addTestStudy(final StudyType studyType, final String studyName ) throws Exception {
 		return this.addTestStudy(studyName, this.commonTestProject.getUniqueID(), studyType);
 	}
