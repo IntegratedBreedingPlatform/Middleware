@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.manager.api;
@@ -44,7 +44,7 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and datasets from the CHADO schema.
- * 
+ *
  */
 public interface StudyDataManager {
 
@@ -56,7 +56,7 @@ public interface StudyDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Study getStudy(int studyId) throws MiddlewareException;
-	
+
 	/**
 	 * Gets the study.
 	 * 
@@ -86,7 +86,7 @@ public interface StudyDataManager {
 	List<Reference> getRootFolders(String programUUID, List<StudyType> studyTypes);
 
 	/**
-	 * Returns list of children of a folder given its ID. 
+	 * Returns list of children of a folder given its ID.
 	 *
 	 * @param folderId The id of the folder to match
 	 * @param programUUID unique id of the program
@@ -211,7 +211,6 @@ public interface StudyDataManager {
 	 */
 	void addDataSetVariableType(int datasetId, DMSVariableType variableType) throws MiddlewareQueryException;
 
-	
 	/**
 	 * Adds an experiment row to the dataset.
 	 * 
@@ -344,12 +343,12 @@ public interface StudyDataManager {
 	 */
 
 	DataSet findOneDataSetByType(int studyId, DataSetType type) throws MiddlewareException;
-	
+
 	/**
 	 * Light weight variant of {@link #findOneDataSetByType(int, DataSetType)} which does not load entire DataSet, just a DatasetReference.
 	 * 
-	 * Returns a single dataset reference belonging to the study with the given type. If there is more than one matching dataset, only the first one is
-	 * returned. If there are none, null is returned.
+	 * Returns a single dataset reference belonging to the study with the given type. If there is more than one matching dataset, only the
+	 * first one is returned. If there are none, null is returned.
 	 * 
 	 * @param studyId the study id
 	 * @param type the dataset type
@@ -514,6 +513,15 @@ public interface StudyDataManager {
 	void deleteEmptyFolder(int id, String programUUID) throws MiddlewareQueryException;
 
 	/**
+	 * checks if the folder is empty given the folder id.
+	 * 
+	 * @param id the id
+	 * @param programUUID the programUUID
+	 * @param studyTypes list of StudyType
+	 */
+	boolean isFolderEmpty(int id, String programUUID, List<StudyType> studyTypes);
+
+	/**
 	 * Returns the parent folder of the project. Accepts a project id.
 	 * 
 	 * @param id the id
@@ -630,12 +638,11 @@ public interface StudyDataManager {
 	 */
 	List<FolderReference> getFolderTree() throws MiddlewareQueryException;
 
-	
 	/**
 	 * Retrieves a flat list (no tree structuring) of all folders.
 	 */
 	List<FolderReference> getAllFolders();
-	
+
 	/**
 	 * Count plots with plants selectedof dataset.
 	 * 
