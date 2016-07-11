@@ -16,6 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
+
 /**
  * This is the original implementation of the pedigree string generation. This is in a test package to ensure that our new implementation
  * conforms to the old one.
@@ -47,15 +50,21 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 
 	@Override
 	public String getCrossExpansion(Integer gid, Integer level, CrossExpansionProperties crossExpansionProperties) {
-		Germplasm germplasm = this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(gid);
-		if (germplasm != null) {
-			SingleGermplasmCrossElement startElement = new SingleGermplasmCrossElement();
-			startElement.setGermplasm(germplasm);
-			GermplasmCrossElement cross =
-					this.expandGermplasmCross(startElement, level == null ? crossExpansionProperties.getDefaultLevel() : level, false);
-			return cross.toString();
-		} else {
-			return "";
+		final Monitor monitor = MonitorFactory.start("org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl.getCrossExpansion(Integer, Integer, CrossExpansionProperties)");
+		
+		try {
+			Germplasm germplasm = this.pedigreeDataManagerFactory.getGermplasmDataManager().getGermplasmWithPrefName(gid);
+			if (germplasm != null) {
+				SingleGermplasmCrossElement startElement = new SingleGermplasmCrossElement();
+				startElement.setGermplasm(germplasm);
+				GermplasmCrossElement cross =
+						this.expandGermplasmCross(startElement, level == null ? crossExpansionProperties.getDefaultLevel() : level, false);
+				return cross.toString();
+			} else {
+				return "";
+			}
+		} finally {
+			monitor.stop();
 		}
 	}
 

@@ -55,17 +55,26 @@ public interface FieldbookService {
 	 * Gets the field map info (entries, reps, plots and counts) of the given trial.
 	 *
 	 * @param trialIdList the trial id list
+	 * @param pedigreeRequired Pedigree generation on the fly could be a very expensive operation for big studies. This flag allows
+	 *        switching it on/off for different client needs. When false, the fieldmap information will NOT be annotated with pedigree
+	 *        information for each germplasm involved.
+	 * 
 	 * @return the FieldMapCount object containing the counts
 	 */
-	List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList, CrossExpansionProperties crossExpansionProperties);
+	List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList, CrossExpansionProperties crossExpansionProperties,
+			boolean pedigreeRequired);
 
 	/**
 	 * Gets the field map info (entries, reps, plots and counts) of the given nursery.
 	 *
+	 * @param pedigreeRequired Pedigree generation on the fly could be a very expensive operation for big studies. This flag allows
+	 *        switching it on/off for different client needs. When false, the fieldmap information will NOT be annotated with pedigree
+	 *        information for each germplasm involved.
 	 * @param nurseryIdList the nursery id list
 	 * @return the FieldMapCount object containing the counts
 	 */
-	List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList, CrossExpansionProperties crossExpansionProperties);
+	List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList, CrossExpansionProperties crossExpansionProperties,
+			boolean pedigreeRequired);
 
 	/**
 	 * Retrieves all locations from central and local databases.

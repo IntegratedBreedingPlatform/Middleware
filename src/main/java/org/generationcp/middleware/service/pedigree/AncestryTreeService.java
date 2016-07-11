@@ -9,9 +9,12 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.service.pedigree.cache.keys.CropGermplasmKey;
 import org.generationcp.middleware.service.pedigree.cache.keys.CropMethodKey;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 public class AncestryTreeService {
 
@@ -26,20 +29,24 @@ public class AncestryTreeService {
 		this.cropName = cropName;
 	}
 
-	GermplasmNode buildAncestryTree(final Integer gid) {
+	GermplasmNode buildAncestryTree(final Integer gid, final int level) {
+		
 		Preconditions.checkNotNull(gid);
+		final Monitor monitor = MonitorFactory.start("org.generationcp.middleware.service.pedigree.AncestryTreeService.buildAncestryTree(Integer, int)");
 
 		try {
-			final GermplasmNode rootGermplasmNode = this.buildGermplasmNode(gid);
+			final GermplasmNode rootGermplasmNode = this.buildGermplasmNode(gid, level);
 			// post condition check
 			Preconditions.checkNotNull(rootGermplasmNode);
 			return rootGermplasmNode;
 		} catch (final ExecutionException e) {
 			throw new MiddlewareQueryException("Unable to create pedigree string", e);
+		} finally {
+			monitor.stop();
 		}
 	}
 
-	private GermplasmNode buildGermplasmNode(final Integer gid) throws ExecutionException {
+	private GermplasmNode buildGermplasmNode(final Integer gid, final int level) throws ExecutionException {
 		if (gid != null && gid > 0) {
 			final Optional<Germplasm> germplasm = this.germplasmCache.get(new CropGermplasmKey(this.cropName, gid));
 			if(germplasm.isPresent()) {
@@ -48,7 +55,12 @@ public class AncestryTreeService {
 				if(method.isPresent()) {
 					germplasmNode.setMethod(method.get());
 				}
-				this.buildAncestoryTree(germplasmNode);
+				String mname = method.get().getMname();
+				if(StringUtils.isNotBlank(mname) && mname.toLowerCase().contains("backcross")) {
+					final BackcrossAncestryTree backcrossAncestryTree = new BackcrossAncestryTree(germplasmCache, methodCache, cropName);
+					return backcrossAncestryTree.generateBackcrossAncestryTree(germplasm.get(), level);
+				}
+				this.buildAncestoryTree(germplasmNode, level);
 				return germplasmNode;
 			}
 
@@ -56,11 +68,30 @@ public class AncestryTreeService {
 		return null;
 	}
 
-	private void buildAncestoryTree(final GermplasmNode germplasmNode) throws ExecutionException {
+	private void buildAncestoryTree(final GermplasmNode germplasmNode, final int level) throws ExecutionException {
 		Preconditions.checkNotNull(germplasmNode);
+		
+		// If we have reached a negative level time to stop traversing the tree
+		if(level < 0) {
+			return;
+		}
+
+		// 
 		final Germplasm rootGermplasm = germplasmNode.getGermplasm();
-		germplasmNode.setFemaleParent(this.buildGermplasmNode(rootGermplasm.getGpid1()));
-		germplasmNode.setMaleParent(this.buildGermplasmNode(rootGermplasm.getGpid2()));
+		
+		// If a generative germplasm, decrease level and traverse
+		if(rootGermplasm.getGnpgs() > 0) {
+			germplasmNode.setFemaleParent(this.buildGermplasmNode(rootGermplasm.getGpid1(), level - 1));
+		} else {
+		// Do not decrease level for derivative germplasm	
+			germplasmNode.setFemaleParent(this.buildGermplasmNode(rootGermplasm.getGpid1(), level));
+		}
+		
+		// Male germplasm to be traversed normally according to level
+		germplasmNode.setMaleParent(this.buildGermplasmNode(rootGermplasm.getGpid2(), level - 1));
+
+		
+		
 	}
 
 }
