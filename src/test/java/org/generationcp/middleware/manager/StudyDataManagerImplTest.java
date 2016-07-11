@@ -214,21 +214,19 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<Reference> childrenNodes = this.manager.getChildrenOfFolder(mainFolder.getProjectId(),
 				this.commonTestProject.getUniqueID(), StudyType.nurseriesAndTrials());
 		Assert.assertNotNull(childrenNodes);
-		Assert.assertTrue("The size should be one.", childrenNodes.size() == 1);
+		Assert.assertEquals("The size should be one.", 1, childrenNodes.size());
 		Assert.assertTrue("The id of the subFolder should be " + subFolderID, subFolderID == childrenNodes.get(0).getId());
 	}
 
 	@Test
 	public void testGetAllFolders() {
-
+		final int originalSize = this.manager.getAllFolders().size();
 		this.studyTDI.createFolderTestData(this.commonTestProject.getUniqueID());
 		this.studyTDI.createFolderTestData(null);
 
-		final List<FolderReference> allFolders = this.manager.getAllFolders();
-		// We only assert that there are minimum two folders that we added in test.
-		// The test database might already have some pre-init and developer created folders too which we dont want the test to depend on
-		// because we do not reset the test database for each test run yet.
-		Assert.assertTrue("The number of all folders should be greater than or equal to 2", allFolders.size() >= 2);
+		final int newSize = this.manager.getAllFolders().size();
+		// We only assert that there are two folders added.
+		Assert.assertEquals("The new size should be equal to the original size + 2", originalSize+2, newSize);
 	}
 
 	@Test
@@ -298,17 +296,22 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetAllStudyDetails() throws Exception {
 		final List<StudyDetails> nurseryStudyDetails = this.manager.getAllStudyDetails(StudyType.N, this.commonTestProject.getUniqueID());
-		Assert.assertTrue("The size should be greater than 0 since we are sure that it will return at least one study details",
-				nurseryStudyDetails.size() > 0);
+		final int sizeBeforeAddingNewNursery = nurseryStudyDetails.size();
+		this.studyTDI.addTestStudy(StudyType.N, "NEW NURSERY");
+		final List<StudyDetails> updatedNurseryStudyDetails = this.manager.getAllStudyDetails(StudyType.N, this.commonTestProject.getUniqueID());
+		final int sizeAfterAddingNewNursery = updatedNurseryStudyDetails.size();
+		Assert.assertEquals("The size after adding new nursery should be equal to the size before adding a new nursery + 1",
+				sizeAfterAddingNewNursery, sizeBeforeAddingNewNursery + 1);
 	}
 
 	@Test
 	public void testCountProjectsByVariable() throws Exception {
 		final int variableId = TermId.STUDY_NAME.getId();
-		final long count = this.manager.countProjectsByVariable(variableId);
-		// Since there is no way for us to know the exact number of project
-		// the count should not be zero since the Basic Nursery Template is always existing
-		Assert.assertTrue("The count should be greater than 0", count > 0);
+		final long originalCount = this.manager.countProjectsByVariable(variableId);
+		this.studyTDI.addTestStudy("NEW STUDY");
+		final long updatedCount = this.manager.countProjectsByVariable(variableId);
+		Assert.assertEquals("The size after adding new study should be equal to the size before adding a new study + 1",
+				updatedCount, originalCount + 1);
 	}
 
 	@Test
@@ -480,18 +483,27 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudyDetails() throws MiddlewareQueryException {
-		final List<StudyDetails> studyDetailsList = this.manager.getStudyDetails(StudyType.T, this.commonTestProject.getUniqueID(), 0, 50);
-		// Compare size to one since we are sure that the result will include the test study we added in the set up
-		Assert.assertTrue("The list should at least contain one Study Details", studyDetailsList.size() > 0);
+	public void testGetStudyDetails() throws Exception {
+		final List<StudyDetails> trialStudyDetails = this.manager.getStudyDetails(StudyType.T, this.commonTestProject.getUniqueID(), 0, 50);
+		final int sizeBeforeAddingNewTrial = trialStudyDetails.size();
+		this.studyTDI.addTestStudy(StudyType.T, "NEW TRIAL");
+		final List<StudyDetails> updatedTrialStudyDetails = this.manager.getStudyDetails(StudyType.T, this.commonTestProject.getUniqueID(), 0, 50);
+		final int sizeAfterAddingNewTrial = updatedTrialStudyDetails.size();
+		Assert.assertEquals("The size after adding new trial should be equal to the size before adding a new trial + 1",
+				sizeAfterAddingNewTrial, sizeBeforeAddingNewTrial + 1);
 	}
 
 	@Test
-	public void testGetNurseryAndTrialStudyDetails() throws MiddlewareQueryException {
+	public void testGetNurseryAndTrialStudyDetails() throws Exception {
 		final List<StudyDetails> studyDetailsList =
 				this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
-		// Compare size to one since we are sure that the result will include the test study we added in the set up
-		Assert.assertTrue("The list should at least contain one Study Details", studyDetailsList.size() > 0);
+		final int sizeBeforeAddingNewStudy = studyDetailsList.size();
+		this.studyTDI.addTestStudy(StudyType.N, "NEW NURSERY");
+		this.studyTDI.addTestStudy(StudyType.T, "NEW TRIAL");
+		final List<StudyDetails> newStudyDetailsList =
+				this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
+		final int sizeAfterAddingNewStudy = newStudyDetailsList.size();
+		Assert.assertEquals("The new size should be equal to the size before adding a new study plus 2.", sizeAfterAddingNewStudy, sizeBeforeAddingNewStudy + 2);
 	}
 
 	@Test
