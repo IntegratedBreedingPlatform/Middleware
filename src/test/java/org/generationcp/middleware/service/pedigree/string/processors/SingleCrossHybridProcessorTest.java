@@ -30,7 +30,7 @@ public class SingleCrossHybridProcessorTest {
 		final SingleCrossHybridProcessor singleCrossHybridProcessor = new SingleCrossHybridProcessor();
 		final GermplasmNode parentGermplasmNode = PedigreeStringTestUtil.createSingleCrossTestGermplasmTree();
 
-		final PedigreeString resultantPedigreeString = singleCrossHybridProcessor.processGermplasmNode(parentGermplasmNode, new Integer(3), fixedLineNameResolver);
+		final PedigreeString resultantPedigreeString = singleCrossHybridProcessor.processGermplasmNode(parentGermplasmNode, new Integer(3), fixedLineNameResolver, false);
 		assertEquals("Pedigree string is a cross of the female and male children ", "B/C", resultantPedigreeString.getPedigree());
 		assertEquals("We have crated one cross.", 1, resultantPedigreeString.getNumberOfCrosses());
 
@@ -52,7 +52,7 @@ public class SingleCrossHybridProcessorTest {
 				PedigreeStringTestUtil.BULK_OR_POPULATION_SAMPLE_METHOD_ID, PedigreeStringTestUtil.BULK_OR_POPULATION_SAMPLE_METHOD_NAME,
 				PedigreeStringTestUtil.BULK_OR_POPULATION_SAMPLE_METHOD_NUMBER_OF_PROGENITOR));
 
-		final PedigreeString resultantPedigreeString = singleCrossHybridProcessor.processGermplasmNode(parentGermplasmNode, new Integer(3), fixedLineNameResolver);
+		final PedigreeString resultantPedigreeString = singleCrossHybridProcessor.processGermplasmNode(parentGermplasmNode, new Integer(3), fixedLineNameResolver, false);
 		assertEquals("Pedigree string is 2/3 since we do not have a preferred name.", "2/3", resultantPedigreeString.getPedigree());
 		assertEquals("We have crated one cross.", 1, resultantPedigreeString.getNumberOfCrosses());
 
@@ -65,7 +65,7 @@ public class SingleCrossHybridProcessorTest {
 				PedigreeStringTestUtil.createGermplasmNode(1, "A", PedigreeStringTestUtil.SINGLE_CROSS_METHOD_ID,
 						PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NAME, PedigreeStringTestUtil.SINGLE_CROSS_METHOD_NUMBER_OF_PROGENITOR);
 
-		final PedigreeString resultantPedigreeString = singleCrossHybridProcessor.processGermplasmNode(parentGermplasmNode, new Integer(3), fixedLineNameResolver);
+		final PedigreeString resultantPedigreeString = singleCrossHybridProcessor.processGermplasmNode(parentGermplasmNode, new Integer(3), fixedLineNameResolver, false);
 		assertEquals("Pedigree string is Unknown/Unknow since we cannot " + "determine the name or the GID", "Unknown/Unknown",
 				resultantPedigreeString.getPedigree());
 		assertEquals("We have crated one cross.", 1, resultantPedigreeString.getNumberOfCrosses());
@@ -81,7 +81,7 @@ public class SingleCrossHybridProcessorTest {
 		parentGermplasmNode.setFemaleParent(new GermplasmNode(null));
 		parentGermplasmNode.setMaleParent(new GermplasmNode(null));
 
-		final PedigreeString resultantPedigreeString = singleCrossHybridProcessor.processGermplasmNode(parentGermplasmNode, new Integer(3), fixedLineNameResolver);
+		final PedigreeString resultantPedigreeString = singleCrossHybridProcessor.processGermplasmNode(parentGermplasmNode, new Integer(3), fixedLineNameResolver, false);
 		assertEquals("Pedigree string is Unknown/Unknow since we cannot " + "determine the name or the GID", "Unknown/Unknown",
 				resultantPedigreeString.getPedigree());
 		assertEquals("We have crated one cross.", 1, resultantPedigreeString.getNumberOfCrosses());
