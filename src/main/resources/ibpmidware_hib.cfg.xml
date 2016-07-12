@@ -70,7 +70,6 @@
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkflowTemplate"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ToolConfiguration"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount"/>
-        <mapping class="org.generationcp.middleware.pojos.workbench.ProjectBackup"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.UserInfo"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.IbdbUserMap"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.SecurityQuestion"/>

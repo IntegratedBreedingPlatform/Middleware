@@ -1127,4 +1127,6 @@ public interface GermplasmDataManager {
 	 */
 	Integer countSearchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly, boolean includeMGMembers);
 
+	List<Method> getDerivativeAndMaintenanceMethods(List<Integer> ids);
+
 }
