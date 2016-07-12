@@ -177,8 +177,7 @@ public class WorkbookSaver extends Saver {
 			totalRows = (int) this.getStudyDataManager().countExperiments(trialDatasetId);
 		}
 
-		if ((totalRows != workbook.getTrialObservations().size() && totalRows > 0 || isDeleteObservations)
-				&& trialDatasetId != null) {
+		if (isDeleteObservations && trialDatasetId != null) {
 			isDeleteTrialObservations = true;
 			// delete measurement data
 			this.getExperimentDestroyer().deleteExperimentsByStudy(datasetId);
@@ -625,7 +624,13 @@ public class WorkbookSaver extends Saver {
 	private void createTrialExperiment(final int trialProjectId, final int locationId, final VariableList trialVariates) {
 		final TimerWatch watch = new TimerWatch("save trial experiments");
 		final ExperimentValues trialDatasetValues = this.createTrialExperimentValues(locationId, trialVariates);
-		this.getExperimentModelSaver().addExperiment(trialProjectId, ExperimentType.TRIAL_ENVIRONMENT, trialDatasetValues);
+
+		List<Integer> locationIds = new ArrayList<>();
+		locationIds.add(locationId);
+		if (!this.getExperimentDao().checkIfAnyLocationIDsExistInExperiments(trialProjectId, locationIds)) {
+			this.getExperimentModelSaver().addExperiment(trialProjectId, ExperimentType.TRIAL_ENVIRONMENT, trialDatasetValues);
+		}
+
 		watch.stop();
 	}
 
