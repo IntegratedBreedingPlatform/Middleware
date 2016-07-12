@@ -25,6 +25,9 @@ import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.SimpleExpression;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Method}.
@@ -33,6 +36,8 @@ import org.hibernate.criterion.Restrictions;
 public class MethodDAO extends GenericDAO<Method, Integer> {
 
 	private static final String UNIQUE_ID = "uniqueID";
+
+	private static final Logger LOG = LoggerFactory.getLogger(MethodDAO.class);
 
 	@SuppressWarnings("unchecked")
 	public List<Method> getMethodsByIds(List<Integer> ids) throws MiddlewareQueryException {
@@ -265,23 +270,27 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		return new ArrayList<Method>();
 	}
 
-	public List<Method> getMethodsNotGenerativeById(List<Integer> ids) throws MiddlewareQueryException {
+	@SuppressWarnings("unchecked")
+	public List<Method> getMethodsNotGenerativeById(final List<Integer> ids) throws MiddlewareQueryException {
 		try {
-			List<Integer> validMethodClasses = new ArrayList<>();
+			final List<Integer> validMethodClasses = new ArrayList<>();
 			validMethodClasses.addAll(Method.BULKED_CLASSES);
 			validMethodClasses.addAll(Method.NON_BULKED_CLASSES);
 
-			Criteria criteria = this.getSession().createCriteria(Method.class);
+			final Criteria criteria = this.getSession().createCriteria(Method.class);
 			criteria.add(Restrictions.ne("mtype", "GEN"));
 			criteria.add(Restrictions.in("geneq", validMethodClasses));
-			criteria.add(Restrictions.in("mid", ids));
+			if (ids.size() > 0) {
+				criteria.add(Restrictions.in("mid", ids));
+			}
 			criteria.addOrder(Order.asc("mname"));
 
 			return criteria.list();
-		} catch (HibernateException e) {
-			this.logAndThrowException(this.getLogExceptionMessage("getMethodsNotGenerativeById", "", null, e.getMessage(), "Method"), e);
+		} catch (final HibernateException e) {
+			MethodDAO.LOG.error(this.getLogExceptionMessage("getMethodsNotGenerativeById", "", null, e.getMessage(), "Method"), e);
+			throw new MiddlewareQueryException(this.getLogExceptionMessage("getMethodsNotGenerativeById", "", null, e.getMessage(),
+					"Method"), e);
 		}
-		return new ArrayList<>();
 	}
 
 	public long countByGroup(String group) throws MiddlewareQueryException {
@@ -416,5 +425,30 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 					this.getLogExceptionMessage("getProgramMethods", "programUUID", programUUID, e.getMessage(), "Method"), e);
 		}
 		return method;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Method> getDerivativeAndMaintenanceMethods(final List<Integer> ids) throws MiddlewareQueryException {
+		try {
+			final List<Integer> validMethodClasses = new ArrayList<Integer>();
+			validMethodClasses.addAll(Method.BULKED_CLASSES);
+			validMethodClasses.addAll(Method.NON_BULKED_CLASSES);
+
+			final Criteria criteria = this.getSession().createCriteria(Method.class);
+			final SimpleExpression der = Restrictions.eq("mtype", "DER");
+			final SimpleExpression man = Restrictions.eq("mtype", "MAN");
+			criteria.add(Restrictions.or(der, man));
+			if (ids.size() > 0) {
+				criteria.add(Restrictions.in("mid", ids));
+			}
+			criteria.add(Restrictions.in("geneq", validMethodClasses));
+			criteria.addOrder(Order.asc("mname"));
+
+			return criteria.list();
+		} catch (final HibernateException e) {
+			MethodDAO.LOG.error(this.getLogExceptionMessage("getMethodsNotGenerativeById", "", null, e.getMessage(), "Method"), e);
+			throw new MiddlewareQueryException(
+					this.getLogExceptionMessage("getAllMethodsDerivativeAndManintenance", "", null, e.getMessage(), "Method"), e);
+		}
 	}
 }

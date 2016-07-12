@@ -34,7 +34,7 @@ public class DoubleCrossProcessor implements BreedingMethodProcessor {
 
 	@Override
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
-			final FixedLineNameResolver fixedLineNameResolver) {
+			final FixedLineNameResolver fixedLineNameResolver, final boolean originatesFromComplexCross) {
 
 		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
 			LOG.debug("Germplasm with GID '{}' has a double cross breeding method. "
@@ -42,38 +42,43 @@ public class DoubleCrossProcessor implements BreedingMethodProcessor {
 		}
 
 		final PedigreeString femaleSingleCrossHybridPedigreeString =
-				this.constructPedigreeStringForSingleCrossHybrids(germplasmNode.getFemaleParent(), level, fixedLineNameResolver);
+				this.constructPedigreeStringForSingleCrossHybrids(germplasmNode.getFemaleParent(), level, fixedLineNameResolver, originatesFromComplexCross);
 		final PedigreeString maleSingleCrossHybridPedigreeString =
-				this.constructPedigreeStringForSingleCrossHybrids(germplasmNode.getMaleParent(), level, fixedLineNameResolver);
+				this.constructPedigreeStringForSingleCrossHybrids(germplasmNode.getMaleParent(), level, fixedLineNameResolver, originatesFromComplexCross);
 
 		final PedigreeString doubleCrossPedigreeString = new PedigreeString();
-		doubleCrossPedigreeString.setNumberOfCrosses(femaleSingleCrossHybridPedigreeString.getNumberOfCrosses()
-				+ maleSingleCrossHybridPedigreeString.getNumberOfCrosses());
+		doubleCrossPedigreeString.setNumberOfCrosses(femaleSingleCrossHybridPedigreeString.getNumberOfCrosses() + 1);
 		doubleCrossPedigreeString.setPedigree(PedigreeStringGeneratorUtil.gerneratePedigreeString(femaleSingleCrossHybridPedigreeString,
 				maleSingleCrossHybridPedigreeString));
 		return doubleCrossPedigreeString;
 	}
 
 	private PedigreeString constructPedigreeStringForSingleCrossHybrids(final GermplasmNode singleCrossHybrids, final Integer level,
-			final FixedLineNameResolver fixedLineNameResolver) {
+			final FixedLineNameResolver fixedLineNameResolver, final boolean originatesFromComplexCross) {
 		if (singleCrossHybrids != null) {
-			return this.constructPedigreeString(singleCrossHybrids, level, fixedLineNameResolver);
+			return this.constructPedigreeString(singleCrossHybrids, level, fixedLineNameResolver, originatesFromComplexCross);
 		}
-		return this.inbredProcessor.processGermplasmNode(singleCrossHybrids, level - 1, fixedLineNameResolver);
+		return this.inbredProcessor.processGermplasmNode(singleCrossHybrids, level - 1, fixedLineNameResolver, originatesFromComplexCross);
 	}
 
 	private PedigreeString constructPedigreeString(final GermplasmNode node, final Integer level,
-			final FixedLineNameResolver fixedLineNameResolver) {
-		final PedigreeString femalePedigreeString =
-				this.pedigreeStringBuilder.buildPedigreeString(node.getFemaleParent(), level - 1, fixedLineNameResolver);
-		final PedigreeString malePedigreeString =
-				this.pedigreeStringBuilder.buildPedigreeString(node.getMaleParent(), level - 1, fixedLineNameResolver);
+			final FixedLineNameResolver fixedLineNameResolver, final boolean originatesFromComplexCross) {
+		final PedigreeString femalePedigreeString = getPedigreeString(node.getFemaleParent(), level, fixedLineNameResolver, originatesFromComplexCross);
+		final PedigreeString malePedigreeString = getPedigreeString(node.getMaleParent(), level, fixedLineNameResolver, originatesFromComplexCross);
 		final PedigreeString femaleCrossPedigreeString = new PedigreeString();
 		femaleCrossPedigreeString.setNumberOfCrosses(femalePedigreeString.getNumberOfCrosses() + malePedigreeString.getNumberOfCrosses()
-				+ 1);
+					+ 1);
 		femaleCrossPedigreeString
 		.setPedigree(PedigreeStringGeneratorUtil.gerneratePedigreeString(femalePedigreeString, malePedigreeString));
 		return femaleCrossPedigreeString;
 	}
 
+	private PedigreeString getPedigreeString(final GermplasmNode node, final Integer level, final FixedLineNameResolver fixedLineNameResolver,
+			final boolean originatesFromComplexCross) {
+		if(node != null) {
+			return this.pedigreeStringBuilder.buildPedigreeString(node, level - 1, fixedLineNameResolver, originatesFromComplexCross);
+		} 
+		return this.inbredProcessor.processGermplasmNode(node, level - 1, fixedLineNameResolver, originatesFromComplexCross);
+
+	}
 }

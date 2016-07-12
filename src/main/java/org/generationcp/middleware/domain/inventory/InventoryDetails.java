@@ -171,9 +171,20 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.inventoryID = stockId;
 		this.amount = seedQuantity;
 	}
+	
+	/**
+	 * Gets the original gid of the inventory
+	 *
+	 * @return the gid
+	 */
+	public Integer getOriginalGid() {
+		return this.gid;
+	}
 
 	/**
-	 * Gets the gid.
+	 * Gets the gid displayed for the given inventory. 
+	 * Note that if the inventory is a bulking donor, it returns null. 
+	 * To get the original gid of the inventory, use getOriginalGid()
 	 *
 	 * @return the gid
 	 */
