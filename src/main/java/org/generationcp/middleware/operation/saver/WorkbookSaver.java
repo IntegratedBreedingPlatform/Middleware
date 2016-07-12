@@ -185,16 +185,16 @@ public class WorkbookSaver extends Saver {
 			this.resetTrialObservations(workbook.getTrialObservations());
 		}
 
-		if (trialVariableTypeList != null && !isDeleteObservations) {
-			// multi-location for data loader
-			studyLocationId =
-					this.createLocationsAndSetToObservations(locationIds, workbook, trialVariableTypeList, trialHeaders, trialVariatesMap,
-							false, programUUID);
-		} else if (workbook.getTrialObservations().size() > 1) {
+		 if (workbook.getTrialObservations().size() > 1) {
 			// also a multi-location
 			studyLocationId =
 					this.createLocationsAndSetToObservations(locationIds, workbook, trialVariables, trialHeaders, trialVariatesMap,
 							isDeleteTrialObservations, programUUID);
+		} else if (trialVariableTypeList != null && !isDeleteObservations) {
+			// multi-location for data loader
+			studyLocationId =
+					this.createLocationsAndSetToObservations(locationIds, workbook, trialVariableTypeList, trialHeaders, trialVariatesMap,
+							false, programUUID);
 		} else {
 			studyLocationId =
 					this.createLocationAndSetToObservations(workbook, trialMV, trialVariables, trialVariatesMap, isDeleteTrialObservations,
