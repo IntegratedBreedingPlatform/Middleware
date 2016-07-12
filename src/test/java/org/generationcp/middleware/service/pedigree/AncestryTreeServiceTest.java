@@ -88,7 +88,7 @@ public class AncestryTreeServiceTest {
 		final Germplasm generateRandomGermplasm = this.generateRandomGermplasm(2);
 
 		final AncestryTreeService pedigreeTree = new AncestryTreeService(this.germplasmCache, this.methodCache, AncestryTreeServiceTest.MAIZE);
-		final GermplasmNode resultNode = pedigreeTree.buildAncestryTree(generateRandomGermplasm.getGid());
+		final GermplasmNode resultNode = pedigreeTree.buildAncestryTree(generateRandomGermplasm.getGid(), 10);
 		this.compareGeneratedNodes(generateRandomGermplasm, resultNode);
 	}
 
@@ -140,6 +140,7 @@ public class AncestryTreeServiceTest {
 	private Germplasm generateTestGermplasm(final int gid, final int methodId) {
 		final Germplasm germplasm = new Germplasm();
 		germplasm.setGid(gid);
+		germplasm.setGnpgs(2);
 		final Method method = new Method(methodId);
 		germplasm.setMethod(method);
 		germplasm.setMethodId(methodId);
