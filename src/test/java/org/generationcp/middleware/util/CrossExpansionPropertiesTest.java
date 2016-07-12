@@ -1,13 +1,11 @@
 package org.generationcp.middleware.util;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import java.util.List;
 import java.util.Properties;
 
-import static org.junit.Assert.*;
-
-import org.generationcp.middleware.manager.StudyDataManagerImplTest;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 

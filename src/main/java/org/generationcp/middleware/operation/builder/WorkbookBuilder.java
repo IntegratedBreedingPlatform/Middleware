@@ -53,6 +53,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.DatasetUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,14 +149,8 @@ public class WorkbookBuilder extends Builder {
 				}
 			}
 		}
-
-		// Set possible values of breeding method
-		for (final MeasurementVariable variable : variates) {
-			if (this.getOntologyDataManager().getProperty(variable.getProperty()).getTerm().getId() == TermId.BREEDING_METHOD_PROP.getId()) {
-				// DA get all methods not generative
-				variable.setPossibleValues(this.getAllBreedingMethods());
-			}
-		}
+		
+		populateBreedingMethodPossibleValues(variates);
 
 		// Build Observation Unit from a Measurement
 		// DA previous for experiments
@@ -284,6 +279,26 @@ public class WorkbookBuilder extends Builder {
 		WorkbookBuilder.LOG.debug("" + monitor.stop() + ". This instance was for studyId: " + id);
 
 		return workbook;
+	}
+
+	private void populateBreedingMethodPossibleValues(final List<MeasurementVariable> variates) {
+		Monitor monitor = MonitorFactory.start("OpenTrial.bms.middleware.WorkbookBuilder.populateBreedingMethodPossibleValues");
+
+		try {
+			final CVTerm breedingMethodProperty = getCvTermDao().getById(TermId.BREEDING_METHOD_PROP.getId());
+			List<ValueReference> possibleBreedingMethodValues = null;
+			for (final MeasurementVariable variable : variates) {
+				if (variable.getProperty().equals(breedingMethodProperty.getName())) {
+					if (possibleBreedingMethodValues == null) {
+						// Query only once on first match and reuse for subsequent matches.
+						possibleBreedingMethodValues = this.getAllBreedingMethods();
+					}
+					variable.setPossibleValues(possibleBreedingMethodValues);
+				}
+			}
+		} finally {
+			monitor.stop();
+		}
 	}
 
 	protected List<MeasurementVariable> buildConditionVariables(VariableList studyConditionVariables,

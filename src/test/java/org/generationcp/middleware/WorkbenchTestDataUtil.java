@@ -22,6 +22,7 @@ public class WorkbenchTestDataUtil {
 	private User testUser1, testUser2;
 	private Person testPerson1, testPerson2;
 	private ProjectActivity testProjectActivity1, testProjectActivity2;
+	private CropType cropType;
 
 	public WorkbenchTestDataUtil(WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
@@ -65,7 +66,7 @@ public class WorkbenchTestDataUtil {
 		int uniqueId = new Random().nextInt(10000);
 		project.setProjectName("Test Project " + uniqueId);
 		project.setStartDate(new Date(System.currentTimeMillis()));
-		project.setCropType(this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.RICE.toString()));
+		project.setCropType(this.cropType);
 		project.setLastOpenDate(new Date(System.currentTimeMillis()));
 		project.setUniqueID(Integer.toString(uniqueId));
 		return project;
@@ -118,6 +119,8 @@ public class WorkbenchTestDataUtil {
 		WorkbenchRuntimeData workbenchRuntimeData = new WorkbenchRuntimeData();
 		workbenchRuntimeData.setUserId(1);
 		this.workbenchDataManager.updateWorkbenchRuntimeData(workbenchRuntimeData);
+		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString());
+		this.commonTestProject.setCropType(this.cropType);
 
 	}
 
@@ -126,6 +129,10 @@ public class WorkbenchTestDataUtil {
 			this.commonTestProject = this.createTestProjectData();
 		}
 		return this.commonTestProject;
+	}
+
+	public CropType getCommonCropType() {
+		return this.cropType;
 	}
 
 	public User getTestUser1() {
