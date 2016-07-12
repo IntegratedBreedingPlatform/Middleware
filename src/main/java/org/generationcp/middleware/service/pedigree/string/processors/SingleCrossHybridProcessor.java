@@ -49,16 +49,16 @@ public class SingleCrossHybridProcessor implements BreedingMethodProcessor {
 
 	@Override
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
-			final FixedLineNameResolver fixedLineNameResolver) {
+			final FixedLineNameResolver fixedLineNameResolver, final boolean originatesFromComplexCross) {
 
 		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
 			LOG.debug("Germplasm with GID '{}' is being processed by an single cross processor. "
 					, germplasmNode.getGermplasm().getGid());
 		}
+		
+		final PedigreeString femalePedigreeString = this.getPedigreeString(level, fixedLineNameResolver, germplasmNode.getFemaleParent(), originatesFromComplexCross);
 
-		final PedigreeString femalePedigreeString = this.getPedigreeString(level, fixedLineNameResolver, germplasmNode.getFemaleParent());
-
-		final PedigreeString malePedigreeString = this.getPedigreeString(level, fixedLineNameResolver, germplasmNode.getMaleParent());
+		final PedigreeString malePedigreeString = this.getPedigreeString(level, fixedLineNameResolver, germplasmNode.getMaleParent(), originatesFromComplexCross);
 
 		final PedigreeString pedigreeString = new PedigreeString();
 		pedigreeString.setNumberOfCrosses(femalePedigreeString.getNumberOfCrosses() + 1);
@@ -67,11 +67,12 @@ public class SingleCrossHybridProcessor implements BreedingMethodProcessor {
 	}
 
 	private PedigreeString getPedigreeString(final Integer level, final FixedLineNameResolver fixedLineNameResolver,
-			final GermplasmNode germplasmNode) {
+			final GermplasmNode germplasmNode, final boolean originatesFromComplexCross) {
+		boolean complexCross = levelSubtractor == 0 ? true : originatesFromComplexCross;
 		if (germplasmNode != null) {
-			return this.pedigreeStringBuilder.buildPedigreeString(germplasmNode, level - this.levelSubtractor, fixedLineNameResolver);
+			return this.pedigreeStringBuilder.buildPedigreeString(germplasmNode, level - this.levelSubtractor, fixedLineNameResolver, complexCross);
 		}
-		return this.inbredProcessor.processGermplasmNode(germplasmNode, level - this.levelSubtractor, fixedLineNameResolver);
+		return this.inbredProcessor.processGermplasmNode(germplasmNode, level - this.levelSubtractor, fixedLineNameResolver, complexCross);
 	}
 
 }

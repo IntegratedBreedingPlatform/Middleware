@@ -19,7 +19,7 @@ public class SimpleCrossProcessor implements BreedingMethodProcessor {
 
 	@Override
 	public PedigreeString processGermplasmNode(final GermplasmNode germplasmNode, final Integer level,
-			final FixedLineNameResolver fixedLineNameResolver) {
+			final FixedLineNameResolver fixedLineNameResolver, final boolean originatesFromComplexCross) {
 
 		if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
 			LOG.debug("Germplasm with GID '{}' is being processed by an simple cross processor. "
@@ -27,9 +27,9 @@ public class SimpleCrossProcessor implements BreedingMethodProcessor {
 		}
 
 		final PedigreeString femaleLeafPedigreeString =
-				this.inbredProcessor.processGermplasmNode(germplasmNode.getFemaleParent(), level - 1, fixedLineNameResolver);
+				this.inbredProcessor.processGermplasmNode(germplasmNode.getFemaleParent(), level - 1, fixedLineNameResolver, originatesFromComplexCross);
 		final PedigreeString maleLeafPedigreeString =
-				this.inbredProcessor.processGermplasmNode(germplasmNode.getMaleParent(), level - 1, fixedLineNameResolver);
+				this.inbredProcessor.processGermplasmNode(germplasmNode.getMaleParent(), level - 1, fixedLineNameResolver, originatesFromComplexCross);
 
 		final PedigreeString pedigreeString = new PedigreeString();
 		pedigreeString.setPedigree(PedigreeStringGeneratorUtil.gerneratePedigreeString(femaleLeafPedigreeString, maleLeafPedigreeString));

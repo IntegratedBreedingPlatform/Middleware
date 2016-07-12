@@ -55,17 +55,26 @@ public interface FieldbookService {
 	 * Gets the field map info (entries, reps, plots and counts) of the given trial.
 	 *
 	 * @param trialIdList the trial id list
+	 * @param pedigreeRequired Pedigree generation on the fly could be a very expensive operation for big studies. This flag allows
+	 *        switching it on/off for different client needs. When false, the fieldmap information will NOT be annotated with pedigree
+	 *        information for each germplasm involved.
+	 * 
 	 * @return the FieldMapCount object containing the counts
 	 */
-	List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList, CrossExpansionProperties crossExpansionProperties);
+	List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList, CrossExpansionProperties crossExpansionProperties,
+			boolean pedigreeRequired);
 
 	/**
 	 * Gets the field map info (entries, reps, plots and counts) of the given nursery.
 	 *
+	 * @param pedigreeRequired Pedigree generation on the fly could be a very expensive operation for big studies. This flag allows
+	 *        switching it on/off for different client needs. When false, the fieldmap information will NOT be annotated with pedigree
+	 *        information for each germplasm involved.
 	 * @param nurseryIdList the nursery id list
 	 * @return the FieldMapCount object containing the counts
 	 */
-	List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList, CrossExpansionProperties crossExpansionProperties);
+	List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList, CrossExpansionProperties crossExpansionProperties,
+			boolean pedigreeRequired);
 
 	/**
 	 * Retrieves all locations from central and local databases.
@@ -136,9 +145,10 @@ public interface FieldbookService {
 	 * Gets the favorite location by project id.
 	 *
 	 * @param locationIds the location ids
+	 * @param filtered 
 	 * @return the favorite locations based on the given project id
 	 */
-	List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
+	List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds, Boolean filtered);
 
 	/**
 	 * Gets the study.
@@ -787,4 +797,8 @@ public interface FieldbookService {
 	 * @return The id of the newly-created germplasm list
 	 */
 	Integer updateGermplasmList(List<Pair<Germplasm,GermplasmListData>> listDataItems, GermplasmList germplasmList);
+
+	public List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
+
+	public List<Method> getFavoriteMethods(List<Integer> methodIds, Boolean filterOutGenerative);
 }
