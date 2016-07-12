@@ -323,7 +323,7 @@ public class Workbook {
 
 	public List<MeasurementVariable> getTrialFactors() {
 		if (this.trialFactors == null || this.trialFactors.isEmpty()) {
-			this.trialFactors = this.getTrialVariables(this.factors);
+			this.trialFactors = this.getTrialVariables(this.conditions);
 		}
 		return this.trialFactors;
 	}
