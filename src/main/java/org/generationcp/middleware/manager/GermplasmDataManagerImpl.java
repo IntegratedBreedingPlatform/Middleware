@@ -1379,4 +1379,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code) {
 		return this.getUserDefinedFieldDao().getByTableTypeAndCode(table, type, code);
 	}
+	
+	@Override
+	public List<Method> getDerivativeAndMaintenanceMethods(final List<Integer> ids) {
+		return this.getMethodDao().getDerivativeAndMaintenanceMethods(ids);
+	}
 }
