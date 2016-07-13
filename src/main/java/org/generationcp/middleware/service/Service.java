@@ -130,7 +130,7 @@ public abstract class Service extends DatabaseBroker {
 		return new OntologyVariableDataManagerImpl(this.sessionProvider);
 	}
 
-	protected final GermplasmDataManager getGermplasmDataManager() {
+	protected GermplasmDataManager getGermplasmDataManager() {
 		return new GermplasmDataManagerImpl(this.sessionProvider, this.databaseName);
 	}
 

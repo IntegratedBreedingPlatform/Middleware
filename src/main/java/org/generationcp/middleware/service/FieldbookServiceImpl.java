@@ -97,14 +97,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<FieldMapInfo> getFieldMapInfoOfTrial(final List<Integer> trialIdList,
-			final CrossExpansionProperties crossExpansionProperties) {
-		return this.getStudyDataManager().getFieldMapInfoOfStudy(trialIdList, StudyType.T, crossExpansionProperties);
+			final CrossExpansionProperties crossExpansionProperties, boolean pedigreeRequired) {
+		return this.getStudyDataManager().getFieldMapInfoOfStudy(trialIdList, StudyType.T, crossExpansionProperties, pedigreeRequired);
 	}
 
 	@Override
 	public List<FieldMapInfo> getFieldMapInfoOfNursery(final List<Integer> nurseryIdList,
-			final CrossExpansionProperties crossExpansionProperties) {
-		return this.getStudyDataManager().getFieldMapInfoOfStudy(nurseryIdList, StudyType.N, crossExpansionProperties);
+			final CrossExpansionProperties crossExpansionProperties, boolean pedigreeRequired) {
+		return this.getStudyDataManager().getFieldMapInfoOfStudy(nurseryIdList, StudyType.N, crossExpansionProperties, pedigreeRequired);
 	}
 
 	@Override
@@ -152,10 +152,24 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
+	public List<Location> getFavoriteLocationByLocationIDs(final List<Integer> locationIds, final Boolean isBreedingLocation) {
+		if (isBreedingLocation == null) {
+			return this.getFavoriteLocationByLocationIDs(locationIds);
+		}
+
+		if (isBreedingLocation) {
+			return this.getLocationDataManager().getAllBreedingLocations(locationIds);
+		}
+
+		return this.getLocationDataManager().getAllSeedingLocations(locationIds);
+
+	}
+
+	@Override
 	public List<Location> getFavoriteLocationByLocationIDs(final List<Integer> locationIds) {
 		return this.getLocationDataManager().getLocationsByIDs(locationIds);
 	}
-
+	
 	@Override
 	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int geolocationId,
 			final CrossExpansionProperties crossExpansionProperties) {
@@ -289,6 +303,20 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		return methodList;
+	}
+	
+	@Override
+	public List<Method> getFavoriteMethods(final List<Integer> methodIds, final Boolean filterOutGenerative) {
+
+		if (filterOutGenerative == null) {
+			return this.getGermplasmDataManager().getMethodsByIDs(methodIds);
+		}
+
+		if (filterOutGenerative) {
+			return this.getGermplasmDataManager().getNonGenerativeMethodsByID(methodIds);
+		}
+
+		return this.getGermplasmDataManager().getDerivativeAndMaintenanceMethods(methodIds);
 	}
 
 	@Override
