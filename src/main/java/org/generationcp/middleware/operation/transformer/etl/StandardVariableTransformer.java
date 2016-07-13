@@ -35,12 +35,14 @@ public class StandardVariableTransformer extends Transformer {
 		if (dataType != null) {
 			standardVariable.setDataType(new Term(dataType.getId(), dataType.getName(), dataType.getName()));
 		}
-		if (variable.getMinValue() != null && variable.getMaxValue() != null) {
-			standardVariable.setConstraints(new VariableConstraints(0, 0, Double.parseDouble(variable.getMinValue()), Double
-					.parseDouble(variable.getMaxValue())));
-		} else if (variable.getScale().getMinValue() != null && variable.getScale().getMaxValue() != null) {
-			standardVariable.setConstraints(new VariableConstraints(0, 0, Double.parseDouble(variable.getScale().getMinValue()), Double
-					.parseDouble(variable.getScale().getMaxValue())));
+		if (variable.getMinValue() != null || variable.getMaxValue() != null) {
+			standardVariable.setConstraints(new VariableConstraints(0, 0,
+					variable.getMinValue() != null ? Double.parseDouble(variable.getMinValue()) : null,
+					variable.getMaxValue() != null ? Double.parseDouble(variable.getMaxValue()) : null));
+		} else if (variable.getScale().getMinValue() != null || variable.getScale().getMaxValue() != null) {
+			standardVariable.setConstraints(new VariableConstraints(0, 0,
+					variable.getScale().getMinValue() != null ? Double.parseDouble(variable.getScale().getMinValue()) : null,
+					variable.getScale().getMaxValue() != null ? Double.parseDouble(variable.getScale().getMaxValue()) : null));
 		}
 		standardVariable.setEnumerations(this.getValidValues(variable));
 		standardVariable.setCropOntologyId(variable.getProperty().getCropOntologyId());
