@@ -47,10 +47,22 @@ public abstract class AbstractReporter implements Reporter {
 	public static final String PROGRAM_NAME_REPORT_KEY = "program";
 	public static final String COUNTRY_VARIABLE_NAME = "country";
 	public static final String LOCATION_ABBREV_VARIABLE_NAME = "labbr";
+    public static final String FEMALE_SELECTION_HISTORY_KEY = "f_selHist";
+    public static final String FEMALE_CROSS_NAME_KEY = "f_cross_name";
+    public static final String FEMALE_TRIAL_ABBREVIATION_KEY = "f_tabbr";
+    public static final String FEMALE_SOURCE_TRIAL_CYCLE_KEY = "f_locycle";
+    public static final String FEMALE_SOURCE_TRIAL_ENTRY_KEY = "f_ent";
+    public static final String FEMALE_SOURCE_TRIAL_LOCATION_ID_KEY = "f_lid";
+    public static final String MALE_SELECTION_HISTORY_KEY = "m_selHist";
+    public static final String MALE_CROSS_NAME_KEY = "m_cross_name";
+    public static final String MALE_TRIAL_ABBREVIATION_KEY = "m_tabbr";
+    public static final String MALE_SOURCE_TRIAL_CYCLE_KEY = "m_locycle";
+    public static final String MALE_SOURCE_TRIAL_ENTRY_KEY = "m_ent";
+    public static final String MALE_SOURCE_TRIAL_LOCATION_ID_KEY = "m_lid";
     public static final String STUDY_OBSERVATIONS_KEY = "studyObservations";
     public static final String SEASON_REPORT_KEY = "cycle";
 
-	private String fileNameExpr = this.getReportCode() + "-{tid}";
+    private String fileNameExpr = this.getReportCode() + "-{tid}";
 	private String fileName = null;
 	private final Pattern fileNameParamsPattern = Pattern.compile("\\{[\\w-_]*\\}");
 	private boolean isParentsInfoRequired = false;

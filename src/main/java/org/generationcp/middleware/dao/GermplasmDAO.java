@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.dao;
@@ -47,7 +47,7 @@ import com.jamonapi.MonitorFactory;
 
 /**
  * DAO class for {@link Germplasm}.
- * 
+ *
  */
 public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
@@ -174,7 +174,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getByMethodNameUsingEqual(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
 		}
-		return new ArrayList<Germplasm>();
+		return new ArrayList<>();
 	}
 
 	public long countByMethodNameUsingEqual(final String name) throws MiddlewareQueryException {
@@ -202,7 +202,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getByMethodNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
 		}
-		return new ArrayList<Germplasm>();
+		return new ArrayList<>();
 	}
 
 	public long countByMethodNameUsingLike(final String name) throws MiddlewareQueryException {
@@ -230,7 +230,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			this.logAndThrowException("Error with getByLocationNameUsingEqual(name=" + name + ") query from Germplasm: " + e.getMessage(),
 					e);
 		}
-		return new ArrayList<Germplasm>();
+		return new ArrayList<>();
 	}
 
 	public long countByLocationNameUsingEqual(final String name) throws MiddlewareQueryException {
@@ -258,7 +258,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getByLocationNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
 		}
-		return new ArrayList<Germplasm>();
+		return new ArrayList<>();
 	}
 
 	public long countByLocationNameUsingLike(final String name) throws MiddlewareQueryException {
@@ -353,7 +353,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			this.logAndThrowException(
 					"Error with getProgenitorsByGIDWithPrefName(gid=" + gid + ") query from Germplasm: " + e.getMessage(), e);
 		}
-		return new ArrayList<Germplasm>();
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -370,7 +370,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getGermplasmDescendantByGID(gid=" + gid + ") query from Germplasm: " + e.getMessage(), e);
 		}
-		return new ArrayList<Germplasm>();
+		return new ArrayList<>();
 	}
 
 	public Germplasm getProgenitorByGID(final Integer gid, final Integer proNo) throws MiddlewareQueryException {
@@ -470,7 +470,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	public List<Germplasm> getGroupRelatives(final Integer gid, final int start, final int numRows) throws MiddlewareQueryException {
-		final List<Germplasm> toreturn = new ArrayList<Germplasm>();
+		final List<Germplasm> toreturn = new ArrayList<>();
 		try {
 			if (gid != null) {
 				final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_GROUP_RELATIVES);
@@ -496,7 +496,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	public List<Germplasm> getChildren(final Integer gid, final char methodType) throws MiddlewareQueryException {
-		final List<Germplasm> toreturn = new ArrayList<Germplasm>();
+		final List<Germplasm> toreturn = new ArrayList<>();
 		try {
 			final String queryString = methodType == 'D' ? Germplasm.GET_DERIVATIVE_CHILDREN : Germplasm.GET_MAINTENANCE_CHILDREN;
 			final SQLQuery query = this.getSession().createSQLQuery(queryString);
@@ -715,7 +715,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			this.logAndThrowException("Error with getByLocationId(name=" + name + ", locationID=" + locationID + ") query from Germplasm: "
 					+ e.getMessage(), e);
 		}
-		return new ArrayList<Germplasm>();
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -763,14 +763,14 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			this.logAndThrowException("Error with getByGIDRange(startGID=" + startGID + ", endGID=" + endGID + ") query from Germplasm: "
 					+ e.getMessage(), e);
 		}
-		return new ArrayList<Germplasm>();
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<Germplasm> getByGIDList(final List<Integer> gids) throws MiddlewareQueryException {
 
 		if (gids.isEmpty()) {
-			return new ArrayList<Germplasm>();
+			return new ArrayList<>();
 		}
 
 		try {
@@ -787,7 +787,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getByGIDList(gids=" + gids.toString() + ") query from Germplasm: " + e.getMessage(), e);
 		}
-		return new ArrayList<Germplasm>();
+		return new ArrayList<>();
 	}
 
 	/**
@@ -986,7 +986,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	public List<Germplasm> getGermplasmParentsForStudy(final int studyId) {
-		final SQLQuery queryGermplasms = this.getSession().createSQLQuery(Germplasm.GET_PARENT_GIDS_BY_STUDY_ID);
+		final SQLQuery queryGermplasms = this.getSession().createSQLQuery(Germplasm.GET_KNOWN_PARENT_GIDS_BY_STUDY_ID);
 		queryGermplasms.setParameter("projId", studyId);
 
 		final List<Germplasm> germplasms = new ArrayList<>();
