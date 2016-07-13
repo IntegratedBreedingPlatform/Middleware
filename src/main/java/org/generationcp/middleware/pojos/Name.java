@@ -21,6 +21,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.generationcp.middleware.auditory.Auditable;
+import org.generationcp.middleware.auditory.Auditory;
+
 /**
  * POJO for names table.
  *
@@ -28,7 +31,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "names")
-public class Name implements Serializable {
+public class Name implements Serializable, Auditable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -218,4 +221,8 @@ public class Name implements Serializable {
 		return builder.toString();
 	}
 
+	@Override
+	public void audit(Auditory auditory) {
+		this.referenceId=auditory.getId();
+	}
 }

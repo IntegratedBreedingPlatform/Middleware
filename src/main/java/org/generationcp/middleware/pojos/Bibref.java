@@ -320,7 +320,7 @@ public class Bibref implements Serializable, Auditory {
 
 	@Override
 	public String getFilename() {
-		return volume;
+		return monogr;
 	}
 
 	@Override
