@@ -97,14 +97,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<FieldMapInfo> getFieldMapInfoOfTrial(final List<Integer> trialIdList,
-			final CrossExpansionProperties crossExpansionProperties) {
-		return this.getStudyDataManager().getFieldMapInfoOfStudy(trialIdList, StudyType.T, crossExpansionProperties);
+			final CrossExpansionProperties crossExpansionProperties, boolean pedigreeRequired) {
+		return this.getStudyDataManager().getFieldMapInfoOfStudy(trialIdList, StudyType.T, crossExpansionProperties, pedigreeRequired);
 	}
 
 	@Override
 	public List<FieldMapInfo> getFieldMapInfoOfNursery(final List<Integer> nurseryIdList,
-			final CrossExpansionProperties crossExpansionProperties) {
-		return this.getStudyDataManager().getFieldMapInfoOfStudy(nurseryIdList, StudyType.N, crossExpansionProperties);
+			final CrossExpansionProperties crossExpansionProperties, boolean pedigreeRequired) {
+		return this.getStudyDataManager().getFieldMapInfoOfStudy(nurseryIdList, StudyType.N, crossExpansionProperties, pedigreeRequired);
 	}
 
 	@Override
