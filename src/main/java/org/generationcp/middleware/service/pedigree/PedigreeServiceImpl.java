@@ -27,6 +27,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 @Transactional
 public class PedigreeServiceImpl implements PedigreeService {
@@ -54,9 +56,9 @@ public class PedigreeServiceImpl implements PedigreeService {
 	static {
 
 		// FIXME: Invalidation logic may need to applied.
-		germplasmCache = CacheBuilder.newBuilder().maximumSize(10000).expireAfterWrite(1000, TimeUnit.MINUTES).build();
-		methodCache = CacheBuilder.newBuilder().maximumSize(10000).expireAfterWrite(1000, TimeUnit.MINUTES).build();
-		nameTypeCache = CacheBuilder.newBuilder().maximumSize(10000).expireAfterWrite(1000, TimeUnit.MINUTES).build();
+		germplasmCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1000, TimeUnit.MINUTES).build();
+		methodCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1000, TimeUnit.MINUTES).build();
+		nameTypeCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(1000, TimeUnit.MINUTES).build();
 	}
 
 	public PedigreeServiceImpl() {
@@ -140,24 +142,32 @@ public class PedigreeServiceImpl implements PedigreeService {
 	 */
 	@Override
 	public String getCrossExpansion(final Integer gid, final Integer level, final CrossExpansionProperties crossExpansionProperties) {
-		Preconditions.checkNotNull(gid);
-		Preconditions.checkArgument(gid > 0);
-		LOG.debug(String.format("Building ancestory tree for gid - '%d'", gid));
-		// Build the pedigree tree
-		final AncestryTreeService ancestryTreeService = new AncestryTreeService(this.germplasmCropBasedCache, this.methodCropBasedCache, this.getCropName());
-		final GermplasmNode gidAncestryTree = ancestryTreeService.buildAncestryTree(gid);
+		final Monitor monitor = MonitorFactory.start("org.generationcp.middleware.service.pedigree.PedigreeServiceImpl.getCrossExpansion(Integer, Integer, CrossExpansionProperties)");
 
-		// Get the cross string
-		final int numberOfLevelsToTraverse = level == null ? crossExpansionProperties.getCropGenerationLevel(this.getCropName()) : level;
-
-		LOG.debug(String.format("Traversing '%d' number of levels.", numberOfLevelsToTraverse));
-
-		final PedigreeStringBuilder pedigreeString = new PedigreeStringBuilder();
-
-		LOG.debug(String.format("Building pedigree string for gid '%d'.", gid));
-		return pedigreeString.buildPedigreeString(gidAncestryTree, numberOfLevelsToTraverse,
-				new FixedLineNameResolver(crossExpansionProperties, pedigreeDataManagerFactory, nameTypeBasedCache, cropName))
-				.getPedigree();
+		try {
+			Preconditions.checkNotNull(gid);
+			Preconditions.checkArgument(gid > 0);
+			LOG.debug(String.format("Building ancestory tree for gid - '%d'", gid));
+	
+			// Get the cross string
+			final int numberOfLevelsToTraverse = level == null ? crossExpansionProperties.getCropGenerationLevel(this.getCropName()) : level;
+	
+			// Build the pedigree tree
+			final AncestryTreeService ancestryTreeService = new AncestryTreeService(this.germplasmCropBasedCache, this.methodCropBasedCache, this.getCropName());
+			final GermplasmNode gidAncestryTree = ancestryTreeService.buildAncestryTree(gid, numberOfLevelsToTraverse + 3);
+	
+			LOG.debug(String.format("Traversing '%d' number of levels.", numberOfLevelsToTraverse));
+	
+			final PedigreeStringBuilder pedigreeString = new PedigreeStringBuilder();
+	
+			LOG.debug(String.format("Building pedigree string for gid '%d'.", gid));
+	
+			return pedigreeString.buildPedigreeString(gidAncestryTree, numberOfLevelsToTraverse,
+					new FixedLineNameResolver(crossExpansionProperties, pedigreeDataManagerFactory, nameTypeBasedCache, cropName), false)
+					.getPedigree();
+		} finally {
+			monitor.stop();
+		}
 	}
 
 	@Override

@@ -87,7 +87,11 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	private Integer mgid = null;
 
 	@Transient
+	private Integer groupId = null;
+
+	@Transient
 	private String checkTypeDescription = null;
+
 
 	/**
 	 * @return the listDataProjectId
@@ -266,20 +270,30 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 		this.mgid = mgid;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "ListDataProject [listDataProjectId=" + this.listDataProjectId + ", list=" + this.list + ", germplasmId=" + this.germplasmId
-				+ ", checkType=" + this.checkType + ", entryId=" + this.entryId + ", entryCode=" + this.entryCode + ", seedSource="
-				+ this.seedSource + ", designation=" + this.designation + ", groupName=" + this.groupName + ", duplicate=" + this.duplicate
-				+ "]";
-	}
 
-	public Boolean isPedigreeDupe() {
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("ListDataProject{");
+        sb.append("listDataProjectId=").append(listDataProjectId);
+        sb.append(", list=").append(list);
+        sb.append(", germplasmId=").append(germplasmId);
+        sb.append(", checkType=").append(checkType);
+        sb.append(", entryId=").append(entryId);
+        sb.append(", entryCode='").append(entryCode).append('\'');
+        sb.append(", seedSource='").append(seedSource).append('\'');
+        sb.append(", designation='").append(designation).append('\'');
+        sb.append(", groupName='").append(groupName).append('\'');
+        sb.append(", duplicate='").append(duplicate).append('\'');
+        sb.append(", femaleParent='").append(femaleParent).append('\'');
+        sb.append(", fgid=").append(fgid);
+        sb.append(", maleParent='").append(maleParent).append('\'');
+        sb.append(", mgid=").append(mgid);
+        sb.append(", checkTypeDescription='").append(checkTypeDescription).append('\'');
+		sb.append('}');
+        return sb.toString();
+    }
+
+    public Boolean isPedigreeDupe() {
 		if (this.duplicate != null) {
 			return this.duplicate.contains(ListDataProject.PEDIGREE_DUPE);
 		}
@@ -384,6 +398,14 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	public String getSeedAmount() {
 
 		return "";
+	}
+
+	public Integer getGroupId() {
+		return this.groupId;
+	}
+
+	public void setGroupId(final Integer groupId) {
+		this.groupId = groupId;
 	}
 
 }

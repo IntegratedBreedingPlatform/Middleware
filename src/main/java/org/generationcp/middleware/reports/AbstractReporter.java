@@ -3,16 +3,26 @@ package org.generationcp.middleware.reports;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JRParameter;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.engine.query.JsonQueryExecuterFactory;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import net.sf.jasperreports.export.SimpleXlsReportConfiguration;
 
 import org.slf4j.Logger;
@@ -37,16 +47,31 @@ public abstract class AbstractReporter implements Reporter {
 	public static final String PROGRAM_NAME_REPORT_KEY = "program";
 	public static final String COUNTRY_VARIABLE_NAME = "country";
 	public static final String LOCATION_ABBREV_VARIABLE_NAME = "labbr";
+    public static final String FEMALE_SELECTION_HISTORY_KEY = "f_selHist";
+    public static final String FEMALE_CROSS_NAME_KEY = "f_cross_name";
+    public static final String FEMALE_TRIAL_ABBREVIATION_KEY = "f_tabbr";
+    public static final String FEMALE_SOURCE_TRIAL_CYCLE_KEY = "f_locycle";
+    public static final String FEMALE_SOURCE_TRIAL_ENTRY_KEY = "f_ent";
+    public static final String FEMALE_SOURCE_TRIAL_LOCATION_ID_KEY = "f_lid";
+    public static final String MALE_SELECTION_HISTORY_KEY = "m_selHist";
+    public static final String MALE_CROSS_NAME_KEY = "m_cross_name";
+    public static final String MALE_TRIAL_ABBREVIATION_KEY = "m_tabbr";
+    public static final String MALE_SOURCE_TRIAL_CYCLE_KEY = "m_locycle";
+    public static final String MALE_SOURCE_TRIAL_ENTRY_KEY = "m_ent";
+    public static final String MALE_SOURCE_TRIAL_LOCATION_ID_KEY = "m_lid";
     public static final String STUDY_OBSERVATIONS_KEY = "studyObservations";
     public static final String SEASON_REPORT_KEY = "cycle";
 
-	private String fileNameExpr = this.getReportCode() + "-{tid}";
+    private String fileNameExpr = this.getReportCode() + "-{tid}";
 	private String fileName = null;
 	private final Pattern fileNameParamsPattern = Pattern.compile("\\{[\\w-_]*\\}");
 	private boolean isParentsInfoRequired = false;
 	JasperPrint jrPrint;
 
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractReporter.class);
+
+    private static final List<String> RECOGNIZED_EXCEL_FORMATS = Arrays.asList("xls", "xlsx");
+    private static final String RECOGNIZED_PDF_FORMAT = "pdf";
 	
 	@Override
 	public String toString() {
@@ -179,8 +204,20 @@ public abstract class AbstractReporter implements Reporter {
 		return fileName;
 	}
 
-	@Override
-	public void asOutputStream(final OutputStream output) throws BuildReportException {
+    @Override
+    public void asOutputStream(OutputStream output) throws BuildReportException {
+        String targetFileExtension = getFileExtension().toLowerCase();
+        if (targetFileExtension.equals(RECOGNIZED_PDF_FORMAT)) {
+            asPDFOutputStream(output);
+        } else if (RECOGNIZED_EXCEL_FORMATS.contains(targetFileExtension)) {
+            asExcelOutputStream(output);
+        } else {
+            // normally, this should not happen, but just in case
+            throw new BuildReportException("unrecognized.report.extension");
+        }
+    }
+
+    public void asPDFOutputStream(final OutputStream output) throws BuildReportException {
 		if (null != this.jrPrint) {
 			try {
 				JasperExportManager.exportReportToPdfStream(this.jrPrint, output);
@@ -191,6 +228,24 @@ public abstract class AbstractReporter implements Reporter {
 			throw new BuildReportException(this.getReportCode());
 		}
 	}
+
+    public void asExcelOutputStream(OutputStream output) throws BuildReportException {
+        if (null != this.jrPrint) {
+            try {
+
+                JRXlsxExporter ex = this.createDefaultExcelExporter();
+                ex.setExporterInput(new SimpleExporterInput(this.jrPrint));
+                ex.setExporterOutput(new SimpleOutputStreamExporterOutput(output));
+
+                ex.exportReport();
+
+            } catch (JRException e) {
+                LOG.error("Exporting report in Excel format was not successful", e);
+            }
+        } else {
+            throw new BuildReportException(this.getReportCode());
+        }
+    }
 
 	/**
 	 * Does not set the input and output of this exporter, only returns a pre-configured xlsx exporter.

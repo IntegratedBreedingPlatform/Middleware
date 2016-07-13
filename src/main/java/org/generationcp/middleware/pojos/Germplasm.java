@@ -301,9 +301,9 @@ public class Germplasm implements Serializable, Auditable {
 			+ "	LNAMES.listid = LDATAPROJ.list_id" + "	inner join germplsm G on" + "	G.gid = LDATAPROJ.germplasm_id and"
 			+ "	G.gnpgs >= 0" + "	where LNAMES.projectid = :projId" + " ) T on " + " N.gid = T.gid";
 
-	public static final String GET_PARENT_GIDS_BY_STUDY_ID = "select distinct g.gid, G.gpid1, G.gpid2, G.grplce" + " from listnms LNAMES"
+	public static final String GET_KNOWN_PARENT_GIDS_BY_STUDY_ID = "select distinct g.gid, G.gpid1, G.gpid2, G.grplce" + " from listnms LNAMES"
 			+ " inner join listdata_project LDATAPROJ on" + "	LNAMES.listid = LDATAPROJ.list_id" + " inner join germplsm G on"
-			+ "	G.gid = LDATAPROJ.germplasm_id and" + "	G.gnpgs >= 0" + " where LNAMES.projectid = :projId";
+			+ "	G.gid = LDATAPROJ.germplasm_id and" + "	G.gnpgs > 0 AND (G.gpid1 > 0 or G.gpid2 > 0)" + " where LNAMES.projectid = :projId";
 
 	public static final String SEARCH_MAINTENANCE_GROUP_MEMBERS_BY_MGID = Germplasm.GENERAL_SELECT_FROM + "("
 			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
@@ -433,6 +433,22 @@ public class Germplasm implements Serializable, Auditable {
 	 */
 	@Transient
 	private String accessionName = null;
+
+	/**
+	* This variable is populated when the user tries to search germplasm list.
+	* Previously, germplasm list is loaded and revisit the DB for each germplasm for getting method name.
+	* This problem is removed by introducing this variable.
+	*/
+	@Transient
+	private String methodName = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 * Previously, germplasm list is loaded and revisit the DB for each germplasm for getting location name.
+	 * This problem is removed by introducing this variable.
+	 */
+	@Transient
+	private String locationName = null;
 
 	public Germplasm() {
 	}
@@ -605,6 +621,22 @@ public class Germplasm implements Serializable, Auditable {
 		return this.method;
 	}
 
+	public String getMethodName() {
+		return methodName;
+	}
+
+	public void setMethodName(String methodName) {
+		this.methodName = methodName;
+	}
+
+	public String getLocationName() {
+		return locationName;
+	}
+
+	public void setLocationName(String locationName) {
+		this.locationName = locationName;
+	}
+
 	@Override
 	public boolean equals(final Object obj) {
 		if (obj == null) {
@@ -661,6 +693,10 @@ public class Germplasm implements Serializable, Auditable {
 		builder.append(this.method);
 		builder.append(", inventoryInfo=");
 		builder.append(this.inventoryInfo);
+		builder.append(", methodName=");
+		builder.append(this.methodName);
+		builder.append(", locationName=");
+		builder.append(this.locationName);
 		builder.append("]");
 		return builder.toString();
 	}

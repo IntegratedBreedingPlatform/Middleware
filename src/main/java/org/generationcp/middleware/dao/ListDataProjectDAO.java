@@ -2,20 +2,25 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 
 public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
@@ -37,12 +42,37 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<ListDataProject> getByListId(int listId) throws MiddlewareQueryException {
-		List<ListDataProject> list = new ArrayList<ListDataProject>();
+		List<ListDataProject> list = new ArrayList<>();
 		try {
-			Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
+
+			DetachedCriteria listDataProjectCriteria = DetachedCriteria.forClass(ListDataProject.class);
+			listDataProjectCriteria.setProjection(Property.forName("germplasmId"));
+			listDataProjectCriteria.add(Restrictions.eq("list", new GermplasmList(listId)));
+
+			Criteria germplasmCriteria = getSession().createCriteria(Germplasm.class);
+			germplasmCriteria.add(Property.forName("gid").in(listDataProjectCriteria));
+
+			List<Germplasm> germplasmList = germplasmCriteria.list();
+
+			Criteria criteria = this.getSession().createCriteria(ListDataProject.class, "listDataProject");
 			criteria.add(Restrictions.eq("list", new GermplasmList(listId)));
 			criteria.addOrder(Order.asc("entryId"));
-			return criteria.list();
+
+			List<ListDataProject> listDataProjects = criteria.list();
+
+			Map<Integer, Integer> mgidMap = new HashMap<>();
+
+			for(Germplasm germplasm : germplasmList){
+				mgidMap.put(germplasm.getGid(), germplasm.getMgid());
+			}
+
+			for(ListDataProject ldp : listDataProjects){
+				if(mgidMap.containsKey(ldp.getGermplasmId())){
+					ldp.setGroupId(mgidMap.get(ldp.getGermplasmId()));
+				}
+			}
+
+			return listDataProjects;
 
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error with getByListId(listId=" + listId + ") query from ListDataProjectDAO: " + e.getMessage(), e);
@@ -161,8 +191,11 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			String queryStr =
 					"select " + " lp.listdata_project_id as listdata_project_id, " + " lp.entry_id as entry_id, "
 							+ " lp.designation as designation, " + " lp.group_name as group_name, " + " fn.nval as fnval, "
-							+ " fp.gid as fpgid, " + " mn.nval as mnval, " + " mp.gid as mpgid, " + " g.gid as gid, "
-							+ " lp.seed_source as seed_source, " + " lp.duplicate_notes as duplicate_notes " + " from listdata_project lp "
+							+ " fp.gid as fpgid, " + " mn.nval as mnval, " + " mp.gid as mpgid, " + " g.mgid as mgid, "
+                            + " g.gid as gid, "
+							+ " lp.seed_source as seed_source, " + " lp.duplicate_notes as duplicate_notes, " + " lp.check_type as check_type, "
+							+ " lp.entry_code as entry_code"
+							+ " from listdata_project lp "
 							+ " left outer join germplsm g on lp.germplasm_id = g.gid "
 							+ " left outer join germplsm mp on g.gpid2 = mp.gid "
 							+ " left outer join names mn on mp.gid = mn.gid and mn.nstat = 1 "
@@ -181,9 +214,12 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			query.addScalar("fpgid");
 			query.addScalar("mnval");
 			query.addScalar("mpgid");
+			query.addScalar("mgid");
 			query.addScalar("gid");
 			query.addScalar("seed_source");
 			query.addScalar("duplicate_notes");
+			query.addScalar("check_type");
+			query.addScalar("entry_code");
 
 			this.createListDataProjectRows(listDataProjects, query);
 
@@ -194,7 +230,8 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		return listDataProjects;
 	}
 
-	private void createListDataProjectRows(List<ListDataProject> listDataProjects, SQLQuery query) {
+    @SuppressWarnings("unchecked")
+    private void createListDataProjectRows(List<ListDataProject> listDataProjects, SQLQuery query) {
 		List<Object[]> result = query.list();
 
 		for (Object[] row : result) {
@@ -205,10 +242,13 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			String femaleParent = (String) row[4];
 			Integer fgid = (Integer) row[5];
 			String maleParent = (String) row[6];
-			Integer mgid = (Integer) row[7];
-			Integer gid = (Integer) row[8];
-			String seedSource = (String) row[9];
-			String duplicate = (String) row[10];
+			Integer mpgid = (Integer) row[7];
+			Integer mgid = (Integer) row [8];
+			Integer gid = (Integer) row[9];
+			String seedSource = (String) row[10];
+			String duplicate = (String) row[11];
+			Integer checkType = (Integer) row[12];
+			String entryCode = (String) row[13];
 
 			ListDataProject listDataProject = new ListDataProject();
 			listDataProject.setListDataProjectId(listDataProjectId);
@@ -218,10 +258,14 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			listDataProject.setFemaleParent(femaleParent);
 			listDataProject.setFgid(fgid);
 			listDataProject.setMaleParent(maleParent);
-			listDataProject.setMgid(mgid);
+			listDataProject.setMgid(mpgid);
+			listDataProject.setGroupId(mgid);
 			listDataProject.setGermplasmId(gid);
 			listDataProject.setSeedSource(seedSource);
+
 			listDataProject.setDuplicate(duplicate);
+			listDataProject.setCheckType(checkType);
+			listDataProject.setEntryCode(entryCode);
 
 			listDataProjects.add(listDataProject);
 		}

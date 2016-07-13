@@ -1,0 +1,56 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="danv" id="beta12-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='mbdt'</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_sidebar_category_link where tool_name = 'mbdt'
+	    </sql>
+	</changeSet>
+	
+	<changeSet author="danv" id="beta12-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='optimas'</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_sidebar_category_link where tool_name = 'optimas'
+	    </sql>
+	</changeSet>
+	<changeSet author="danv" id="beta12-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='crossing_manager'</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_sidebar_category_link where tool_name = 'crossing_manager'
+	    </sql>
+	</changeSet>
+
+	<changeSet author="iryna" id="beta12-4">
+		<preConditions onFail="MARK_RAN">
+			<indexExists tableName="workbench_project" indexName="uk_project_name"/>
+		</preConditions>
+		<dropIndex indexName="uk_project_name" tableName="workbench_project"/>
+	</changeSet>
+
+	<changeSet author="iryna" id="beta12-5">
+		<preConditions onFail="MARK_RAN">
+			<not><indexExists tableName="workbench_project" indexName="uk_project_name"/></not>
+		</preConditions>
+		<addUniqueConstraint constraintName="uk_project_name" tableName="workbench_project" columnNames="project_name ASC, crop_type ASC"/>
+	</changeSet>
+
+	<changeSet author="iryna" id="beta12-6">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="workbench_project_backup"/>
+		</preConditions>
+		<dropTable cascadeConstraints="true"  tableName="workbench_project_backup"/>
+	</changeSet>
+</databaseChangeLog>

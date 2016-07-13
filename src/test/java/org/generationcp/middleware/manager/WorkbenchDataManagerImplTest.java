@@ -29,7 +29,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
-import org.generationcp.middleware.pojos.workbench.ProjectBackup;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -41,7 +40,6 @@ import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
-import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
@@ -203,7 +201,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddProject() throws MiddlewareQueryException {
-		Project project = this.workbenchTestDataUtil.createTestProjectData();
+		final Project project = this.workbenchTestDataUtil.createTestProjectData();
 		this.workbenchDataManager.addProject(project);
 		Assert.assertNotNull("Expected id of a newly saved record in workbench_project.", project.getProjectId());
 
@@ -272,7 +270,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetProjectByName() throws MiddlewareQueryException {
-		Project project = this.workbenchDataManager.getProjectByName(this.commonTestProject.getProjectName());
+		final Project project = this.workbenchDataManager.getProjectByNameAndCrop(this.commonTestProject.getProjectName(), this
+				.commonTestProject.getCropType());
 		Assert.assertEquals(this.commonTestProject.getProjectName(), project.getProjectName());
 	}
 
@@ -471,25 +470,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(this.commonTestProject.getProjectId(), record.getProject().getProjectId());
 		Assert.assertEquals(this.testUser1.getUserid(), record.getUser().getUserid());
 		Debug.println(IntegrationTestBase.INDENT, record.toString());
-	}
-
-	@Test
-	public void testProjectBackups() throws MiddlewareQueryException {
-		ProjectBackup projectBackup = new ProjectBackup();
-		projectBackup.setProjectId(this.commonTestProject.getProjectId());
-		projectBackup.setBackupPath("target/resource" + this.commonTestProject.getProjectId());
-		projectBackup.setBackupTime(Util.getCurrentDate());
-
-		this.workbenchDataManager.saveOrUpdateProjectBackup(projectBackup);
-		Assert.assertNotNull(projectBackup.getProjectBackupId());
-
-		List<ProjectBackup> projectBackupsAll = this.workbenchDataManager.getProjectBackups();
-		Assert.assertNotNull(projectBackupsAll);
-		Assert.assertTrue(!projectBackupsAll.isEmpty());
-
-		List<ProjectBackup> projectBackups = this.workbenchDataManager.getProjectBackups(this.commonTestProject);
-		Assert.assertNotNull(projectBackups);
-		Assert.assertTrue(!projectBackups.isEmpty());
 	}
 
 	@Test

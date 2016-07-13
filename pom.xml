@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-        <version>4.0.0.BETA.11</version>
+        <version>4.0.0.BETA.13</version>
 	<name>Middleware</name>
 
 	<properties>
@@ -292,6 +292,13 @@
 			<artifactId>fest-reflect</artifactId>
 			<version>1.4.1</version>
 		</dependency>
+		
+		<!-- Liquibase -->
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+			<version>3.5.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -439,6 +446,7 @@
 						<include>**/GermplasmNamingServiceImplTest.java</include>
 						<include>**/GermplasmNamingReferenceDataResolverImplTest.java</include>
 						<include>**/MethodTest.java</include>
+						<include>**/GermplasmListDataDAOTest.java</include>
 
 						<!-- New Ontology Manager Tests -->
 						<include>**/CvTermDaoTest.java</include>
@@ -455,6 +463,8 @@
 						<include>**/WorkbenchDataManagerImplTest.java</include>
 						<include>**/TermDataManagerImplTest.java</include>
 						<include>**/VariableTypeListTransformerTest.java</include>
+
+
 
 						<!-- Pedigree String Generation Test -->
 						<include>**/AncestryTreeServiceTest.java</include>
@@ -473,6 +483,12 @@
 						<include>**/CheckNameFactorsPresentValidationRuleUT.java</include>
 						<include>**/ShowNameHandlingPopUpValidatorUT.java</include>
 						<include>**/ChainValidatorUT.java</include>
+						
+						<include>**/LiquibaseInitBeanTest.java</include>
+						<include>**/DatasourceUtilitiesTest.java</include>
+						<include>**/XABeanDefinitionTest.java</include>
+						<include>**/XADataSourcePropertiesTest.java</include>
+						<include>**/XADataSourcesTest.java</include>
 
 					</includes>
 				</configuration>

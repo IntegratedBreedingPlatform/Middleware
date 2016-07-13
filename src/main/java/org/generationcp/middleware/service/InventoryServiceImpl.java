@@ -12,6 +12,7 @@
 
 package org.generationcp.middleware.service;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,6 +24,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -177,17 +179,24 @@ public class InventoryServiceImpl implements InventoryService {
 			final List<GermplasmListData> dataList) {
 		final List<GermplasmListData> forFill = new ArrayList<>();
 
-		final Map<Integer, InventoryDetails> listDataIdToInventoryDetailsMap = new HashMap<>();
+		final Map<Integer, List<InventoryDetails>> listDataIdToInventoryDetailsMap = new HashMap<>();
+
 		for (final InventoryDetails inventoryDetails : detailList) {
-			listDataIdToInventoryDetailsMap.put(inventoryDetails.getSourceRecordId(), inventoryDetails);
+		    Integer recordId = inventoryDetails.getSourceRecordId();
+		  if (!listDataIdToInventoryDetailsMap.containsKey(recordId)) {
+			listDataIdToInventoryDetailsMap.put(recordId, Lists.<InventoryDetails>newArrayList());
+		  }
+		  listDataIdToInventoryDetailsMap.get(recordId).add(inventoryDetails);
 		}
 
 		for (final GermplasmListData germplasmListData : dataList) {
-			final InventoryDetails inventoryDetails = listDataIdToInventoryDetailsMap.get(germplasmListData.getId());
+			final List<InventoryDetails> inventoryDetails = listDataIdToInventoryDetailsMap.get(germplasmListData.getId());
 			if (inventoryDetails != null) {
-				inventoryDetails.copyFromGermplasmListData(germplasmListData);
-				inventoryDetails.setSourceId(germplasmList.getId());
-				inventoryDetails.setSourceName(germplasmList.getName());
+			  for(InventoryDetails inventoryDetailsList: inventoryDetails) {
+				inventoryDetailsList.copyFromGermplasmListData(germplasmListData);
+				inventoryDetailsList.setSourceId(germplasmList.getId());
+				inventoryDetailsList.setSourceName(germplasmList.getName());
+			  }
 			} else {
 				forFill.add(germplasmListData);
 			}
@@ -299,10 +308,9 @@ public class InventoryServiceImpl implements InventoryService {
 	}
 
 	@Override
-	public List<InventoryDetails> getInventoryListByListDataProjectListId(final Integer listDataProjectListId, final GermplasmListType type)
+	public List<InventoryDetails> getInventoryListByListDataProjectListId(final Integer listDataProjectListId)
 			throws MiddlewareQueryException {
-		return this.inventoryDaoFactory.getStockTransactionDAO().retrieveInventoryDetailsForListDataProjectListId(listDataProjectListId,
-				type);
+		return this.inventoryDaoFactory.getStockTransactionDAO().retrieveInventoryDetailsForListDataProjectListId(listDataProjectListId);
 	}
 
 	@Override

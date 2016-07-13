@@ -41,7 +41,7 @@ public class BackcrossProcessorTest {
 				PedigreeStringTestUtil.createBackCrossTestGermplasmTree("DonorParent", "RecurringParent", 5, true);
 
 		final PedigreeString processGermplasmNode =
-				backcrossProcessor.processGermplasmNode(createBackCrossTestGermplasmNode, 5, mockFixedLineNameResolver);
+				backcrossProcessor.processGermplasmNode(createBackCrossTestGermplasmNode, 5, mockFixedLineNameResolver, false);
 
 		Assert.assertEquals("B/C/5*RecurringParent", processGermplasmNode.getPedigree());
 	}
@@ -55,7 +55,7 @@ public class BackcrossProcessorTest {
 				PedigreeStringTestUtil.createBackCrossTestGermplasmTree("DonorParent", "RecurringParent", 5, false);
 
 		final PedigreeString processGermplasmNode =
-				backcrossProcessor.processGermplasmNode(createBackCrossTestGermplasmNode, 5, mockFixedLineNameResolver);
+				backcrossProcessor.processGermplasmNode(createBackCrossTestGermplasmNode, 5, mockFixedLineNameResolver, false);
 
 		Assert.assertEquals("RecurringParent*5/B/C", processGermplasmNode.getPedigree());
 	}
@@ -68,7 +68,7 @@ public class BackcrossProcessorTest {
 				PedigreeStringTestUtil.createGermplasmNode(100, "RootBackcrossNode", PedigreeStringTestUtil.BACKCROSS_METHOD_ID,
 						PedigreeStringTestUtil.BACKCROSS_METHOD_NAME, 2);
 		PedigreeString processGermplasmNode =
-				backcrossProcessor.processGermplasmNode(createBackCrossTestGermplasmNode, 5, mockFixedLineNameResolver);
+				backcrossProcessor.processGermplasmNode(createBackCrossTestGermplasmNode, 5, mockFixedLineNameResolver, false);
 		Assert.assertEquals("Unknown/Unknown", processGermplasmNode.getPedigree());
 	}
 }

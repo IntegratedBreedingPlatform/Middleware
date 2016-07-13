@@ -1,8 +1,8 @@
 
 package org.generationcp.middleware.service.impl;
 
+import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.pojos.KeySequenceRegisterDAO;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Propagation;
