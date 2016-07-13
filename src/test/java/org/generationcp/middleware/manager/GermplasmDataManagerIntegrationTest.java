@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -40,6 +41,8 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
@@ -51,8 +54,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
-// TODO This test heavily assumes Rice genealogy data being present. Needs complete revision to seed the test data it needs before starting.
-public class GermplasmDataManagerImplTest extends IntegrationTestBase {
+public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
+
+    @Autowired
+    private PedigreeService pedigreeService;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -125,7 +130,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertTrue(locationList != null);
 		Assert.assertTrue("we cannot proceed test if size < 0", locationList.size() > 0);
 
-		final List<Integer> ids = new ArrayList<Integer>();
+		final List<Integer> ids = new ArrayList<>();
 
 		for (final Method ls : locationList) {
 			ids.add(ls.getMid());
@@ -249,14 +254,14 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetGermplasmByGID() throws Exception {
-		final Integer gid = Integer.valueOf(50533);
+		final Integer gid = 50533;
 		final Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(gid);
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByGID(" + gid + "): " + germplasm);
 	}
 
 	@Test
 	public void testGetGermplasmWithPrefName() throws Exception {
-		final Integer gid = Integer.valueOf(50533);
+		final Integer gid = 50533;
 		final Germplasm germplasm = this.germplasmDataManager.getGermplasmWithPrefName(gid);
 
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmWithPrefName(" + gid + "): " + germplasm);
@@ -267,21 +272,21 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetGermplasmWithPrefAbbrev() throws Exception {
-		final Integer gid = Integer.valueOf(151);
+		final Integer gid = 151;
 		final Germplasm germplasm = this.germplasmDataManager.getGermplasmWithPrefAbbrev(gid);
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmWithPrefAbbrev(" + gid + "): " + germplasm);
 	}
 
 	@Test
 	public void testGetGermplasmNameByID() throws Exception {
-		final Integer gid = Integer.valueOf(42268);
+		final Integer gid = 42268;
 		final Name name = this.germplasmDataManager.getGermplasmNameByID(gid);
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmNameByID(" + gid + "): " + name);
 	}
 
 	@Test
 	public void testGetNamesByGID() throws Exception {
-		final Integer gid = Integer.valueOf(2434138);
+		final Integer gid = 2434138;
 		final List<Name> names = this.germplasmDataManager.getNamesByGID(gid, null, null);
 		Debug.println(IntegrationTestBase.INDENT, "testGetNamesByGID(" + gid + "): " + names.size());
 		Debug.printObjects(names);
@@ -289,42 +294,42 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetPreferredNameByGID() throws Exception {
-		final Integer gid = Integer.valueOf(1);
+		final Integer gid = 1;
 		Debug.println(IntegrationTestBase.INDENT,
 				"testGetPreferredNameByGID(" + gid + "): " + this.germplasmDataManager.getPreferredNameByGID(gid));
 	}
 
 	@Test
 	public void testGetPreferredNameValueByGID() throws Exception {
-		final Integer gid = Integer.valueOf(1);
+		final Integer gid = 1;
 		Debug.println(IntegrationTestBase.INDENT,
 				"testGetPreferredNameValueByGID(" + gid + "): " + this.germplasmDataManager.getPreferredNameValueByGID(gid));
 	}
 
 	@Test
 	public void testGetPreferredAbbrevByGID() throws Exception {
-		final Integer gid = Integer.valueOf(1);
+		final Integer gid = 1;
 		Debug.println(IntegrationTestBase.INDENT,
 				"testGetPreferredAbbrevByGID(" + gid + "): " + this.germplasmDataManager.getPreferredAbbrevByGID(gid));
 	}
 
 	@Test
 	public void testGetPreferredIdByGID() throws Exception {
-		final Integer gid = Integer.valueOf(986634);
+		final Integer gid = 986634;
 		Debug.println(IntegrationTestBase.INDENT,
 				"testGetPreferredIdByGID(" + gid + "): " + this.germplasmDataManager.getPreferredIdByGID(gid));
 	}
 
 	@Test
 	public void testGetPreferredIdsByListId() throws Exception {
-		final Integer listId = Integer.valueOf(2591);
+		final Integer listId = 2591;
 		Debug.println(IntegrationTestBase.INDENT,
 				"testGetPreferredIdsByListId(" + listId + "): " + this.germplasmDataManager.getPreferredIdsByListId(listId));
 	}
 
 	@Test
 	public void testGetNameByGIDAndNval() throws Exception {
-		final Integer gid = Integer.valueOf(225266);
+		final Integer gid = 225266;
 		final String nVal = "C 65-44";
 		Debug.println(IntegrationTestBase.INDENT, "testGetNameByGIDAndNval(" + gid + ", " + nVal + ", GetGermplasmByNameModes.NORMAL) : "
 				+ this.germplasmDataManager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.NORMAL));
@@ -340,8 +345,8 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetNamesByGIDWithStatus() throws Exception {
-		final Integer gid = Integer.valueOf(50533);
-		final Integer status = Integer.valueOf(1);
+		final Integer gid = 50533;
+		final Integer status = 1;
 		final GermplasmNameType type = null;
 		final List<Name> names = this.germplasmDataManager.getNamesByGID(gid, status, type);
 		Debug.println(IntegrationTestBase.INDENT, "testGetNamesByGIDWithStatus(gid=" + gid + ", status" + status + ", type=" + type + "): "
@@ -350,8 +355,8 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetNamesByGIDWithStatusAndType() throws Exception {
-		final Integer gid = Integer.valueOf(50533);
-		final Integer status = Integer.valueOf(8);
+		final Integer gid = 50533;
+		final Integer status = 8;
 		final GermplasmNameType type = GermplasmNameType.INTERNATIONAL_TESTING_NUMBER;
 		final List<Name> names = this.germplasmDataManager.getNamesByGID(gid, status, type);
 		Debug.println(IntegrationTestBase.INDENT, "testGetNamesByGIDWithStatusAndType(gid=" + gid + ", status" + status + ", type=" + type
@@ -360,7 +365,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAttributesByGID() throws Exception {
-		final Integer gid = Integer.valueOf(50533);
+		final Integer gid = 50533;
 		final List<Attribute> attributes = this.germplasmDataManager.getAttributesByGID(gid);
 		Debug.println(IntegrationTestBase.INDENT, "testGetAttributesByGID(" + gid + "): " + attributes);
 	}
@@ -393,7 +398,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddMethods() throws MiddlewareQueryException {
-		final List<Method> methods = new ArrayList<Method>();
+		final List<Method> methods = new ArrayList<>();
 		final String programUUID = UUID.randomUUID().toString();
 		methods.add(new Method(null, "GEN", "S", "UGM", "yesno", "description 1", Integer.valueOf(0), Integer.valueOf(0), Integer
 				.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610),
@@ -571,7 +576,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddGermplasmAttribute() throws Exception {
-		final Integer gid = Integer.valueOf(50533);
+		final Integer gid = 50533;
 		final Attribute attribute = new Attribute();
 		attribute.setAdate(0);
 		attribute.setAval("aval");
@@ -591,8 +596,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 		final Attribute attribute = this.germplasmDataManager.getAttributeById(attributeId);
 
 		if (attribute != null) {
-			String attributeString = "";
-			attributeString = attribute.toString();
+			final String attributeString = attribute.toString();
 			attribute.setAdate(0);
 			attribute.setLocationId(0);
 			attribute.setUserId(0);
@@ -607,9 +611,6 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetUserDefinedFieldByFieldTable() throws MiddlewareQueryException {
-		// String tableName="LOCATION";
-		// String fieldType="LTYPE";
-
 		final String tableName = "ATRIBUTS";
 		final String fieldType = "ATTRIBUTE";
 		final List<UserDefinedField> userDefineField =
@@ -674,6 +675,13 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testGetCrossExpansion() throws Exception {
+		final CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties(Mockito.mock(Properties.class));
+		crossExpansionProperties.setDefaultLevel(1);
+		Debug.println(this.pedigreeService.getCrossExpansion(1, crossExpansionProperties));
+	}
+
+	@Test
 	public void testGetNextSequenceNumberForCrossName() throws MiddlewareQueryException {
 		final String prefix = "IR";
 		Debug.println("Next number in sequence for prefix (" + prefix + ") is : "
@@ -721,14 +729,14 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetBibliographicalReferenceById() throws Exception {
-		final Integer id = Integer.valueOf(1);
+		final Integer id = 1;
 		final Bibref bibref = this.germplasmDataManager.getBibliographicReferenceByID(id);
 		Debug.println(IntegrationTestBase.INDENT, "testGetBibliographicalReferenceById(" + id + "): " + bibref);
 	}
 
 	@Test
 	public void testGetMethodByID() throws Exception {
-		final Integer id = Integer.valueOf(4);
+		final Integer id = 4;
 		final Method methodid = this.germplasmDataManager.getMethodByID(id);
 		Assert.assertNotNull(methodid);
 		Debug.println(IntegrationTestBase.INDENT, "testGetMethodByID(" + id + "): ");
@@ -737,7 +745,7 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetUserDefinedFieldByID() throws Exception {
-		final Integer id = Integer.valueOf(1);
+		final Integer id = 1;
 		final UserDefinedField result = this.germplasmDataManager.getUserDefinedFieldByID(id);
 		Assert.assertNotNull(result);
 		Debug.println(IntegrationTestBase.INDENT, result);
@@ -1067,13 +1075,12 @@ public class GermplasmDataManagerImplTest extends IntegrationTestBase {
 
 	/**
 	 * test to verify germplasm permutations should be processed for large amount of data.
-	 * 
+	 *
 	 * @throws Exception
 	 */
 	@Test
-	public void testShouldLoadAndProcessLargeGermplasmNamePermutations() throws Exception {
-		final String fileLocation =
-				GermplasmDataManagerImplTest.class.getClassLoader().getResource("germplasm_designation_name_list.txt").getFile();
+	public void testShouldLoadAndProcessLargeGermplasmNamePermutations() throws Exception{
+		final String fileLocation = GermplasmDataManagerIntegrationTest.class.getClassLoader().getResource("germplasm_designation_name_list.txt").getFile();
 		final List<String> nameList = FileUtils.readLines(new File(fileLocation));
 
 		final Map<String, Integer> mapCountByNamePermutations = this.germplasmDataManager.getCountByNamePermutations(nameList);
