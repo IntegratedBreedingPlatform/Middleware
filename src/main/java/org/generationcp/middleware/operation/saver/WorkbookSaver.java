@@ -321,25 +321,51 @@ public class WorkbookSaver extends Saver {
 		}
 	}
 
+	/**
+	 * Creates trial observation records in the database if they don't exist. If a trial observation already exists it will be updated.
+	 *
+	 * @param trialDatasetId
+	 * @param workbook
+	 * @param trialVariableTypeList
+	 * @param locationIds
+	 * @param trialVariatesMap
+	 * @param studyLocationId
+	 * @param totalRows
+	 * @param isDeleteObservations
+	 * @param programUUID
+	 */
 	public void saveOrUpdateTrialObservations(final int trialDatasetId, final Workbook workbook,
 			final VariableTypeList trialVariableTypeList, final List<Integer> locationIds,
 			final Map<Integer, VariableList> trialVariatesMap, final int studyLocationId, final int totalRows,
 			final boolean isDeleteObservations, final String programUUID) {
-		if (totalRows == workbook.getTrialObservations().size() && totalRows > 0
-				&& !isDeleteObservations) {
-			this.saveTrialObservations(workbook,programUUID);
-		} else {
-			if (locationIds != null && !locationIds.isEmpty()) {// multi-location
-				for (final Integer locationId : locationIds) {
+
+		if (!workbook.isNursery() && !workbook.getTrialObservations().isEmpty()) {
+
+			for (final MeasurementRow trialObservation : workbook.getTrialObservations()) {
+
+				int locationId = (int) trialObservation.getLocationId();
+
+				// Update the trial observation's information if it exists.
+				if (this.getExperimentDao().checkIfAnyLocationIDsExistInExperiments(trialDatasetId, Arrays.asList(locationId))) {
+					this.getGeolocationSaver().updateGeolocationInformation(trialObservation, workbook.isNursery(), programUUID);
+				} else {
 					this.createTrialExperiment(trialDatasetId, locationId, trialVariatesMap.get(locationId));
 				}
-			} else {
-				this.createTrialExperiment(trialDatasetId, studyLocationId, trialVariatesMap.get(studyLocationId));
 			}
+		} else {
+			// We only create one trial experiment for Nursery. This is only invoked during the creation of a nursery.
+			this.createTrialExperiment(trialDatasetId, studyLocationId, trialVariatesMap.get(studyLocationId));
+
 		}
+
 	}
 
-	public void saveTrialObservations(final Workbook workbook, final String programUUID) {
+	/**
+	 * Updates the trial observation details in the database.
+	 * @param workbook
+	 * @param programUUID
+	 */
+	public void updateTrialObservations(final Workbook workbook, final String programUUID) {
 		if (!workbook.getTrialObservations().isEmpty()) {
 			for (final MeasurementRow trialObservation : workbook.getTrialObservations()) {
 				this.getGeolocationSaver().updateGeolocationInformation(trialObservation, workbook.isNursery(), programUUID);
@@ -621,16 +647,16 @@ public class WorkbookSaver extends Saver {
 		return trialDatasetId;
 	}
 
+	/**
+	 * Creates a new trial environment experiment.
+	 * @param trialProjectId
+	 * @param locationId
+	 * @param trialVariates
+	 */
 	private void createTrialExperiment(final int trialProjectId, final int locationId, final VariableList trialVariates) {
 		final TimerWatch watch = new TimerWatch("save trial experiments");
 		final ExperimentValues trialDatasetValues = this.createTrialExperimentValues(locationId, trialVariates);
-
-		List<Integer> locationIds = new ArrayList<>();
-		locationIds.add(locationId);
-		if (!this.getExperimentDao().checkIfAnyLocationIDsExistInExperiments(trialProjectId, locationIds)) {
-			this.getExperimentModelSaver().addExperiment(trialProjectId, ExperimentType.TRIAL_ENVIRONMENT, trialDatasetValues);
-		}
-
+		this.getExperimentModelSaver().addExperiment(trialProjectId, ExperimentType.TRIAL_ENVIRONMENT, trialDatasetValues);
 		watch.stop();
 	}
 

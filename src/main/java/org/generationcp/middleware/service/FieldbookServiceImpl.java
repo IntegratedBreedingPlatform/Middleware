@@ -241,7 +241,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			final VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
 
 			// save trial observations
-			this.getWorkbookSaver().saveTrialObservations(workbook, programUUID);
+			this.getWorkbookSaver().updateTrialObservations(workbook, programUUID);
 
 			Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 			if (measurementDatasetId == null) {
