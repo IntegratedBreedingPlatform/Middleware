@@ -4,7 +4,6 @@ package org.generationcp.middleware.manager.ontology;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +19,10 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
+import org.generationcp.middleware.util.Clock;
 import org.generationcp.middleware.util.ISO8601DateParser;
+import org.generationcp.middleware.util.SystemClock;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -33,22 +35,25 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 	private static final String TERM_IS_NOT_METHOD = "That term is not a METHOD";
 	private static final String METHOD_IS_REFERRED_TO_VARIABLE = "Method is referred to variable.";
 
+	@Autowired
 	private OntologyDaoFactory ontologyDaoFactory;
 
+	@Autowired
+	protected Clock systemClock;
+
 	public OntologyMethodDataManagerImpl() {
-		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
+		// no-arg constructor is required by CGLIB proxying used by Spring 3x and older.
 	}
 
-	public OntologyMethodDataManagerImpl(HibernateSessionProvider sessionProvider) {
-		this.ontologyDaoFactory = new OntologyDaoFactory(sessionProvider);
-	}
-
-	public OntologyMethodDataManagerImpl(OntologyDaoFactory ontologyDaoFactory) {
-		this.ontologyDaoFactory = ontologyDaoFactory;
-	}
+    //TODO:This is temporary hack for managerFactory, builder and service. It should refactor to remove this constructor
+    public OntologyMethodDataManagerImpl(HibernateSessionProvider sessionProvider) {
+        this.ontologyDaoFactory = new OntologyDaoFactory();
+        this.ontologyDaoFactory.setSessionProvider(sessionProvider);
+        this.systemClock = new SystemClock();
+    }
 
 	@Override
-	public Method getMethod(int id, boolean filterObsolete) {
+	public Method getMethod(int id, boolean filterObsolete) throws MiddlewareException {
 		List<Method> methods = this.getMethods(false, new ArrayList<>(Collections.singletonList(id)), filterObsolete);
 		if (methods.isEmpty()) {
 			return null;
@@ -57,28 +62,29 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 	}
 
 	@Override
-	public List<Method> getAllMethods() {
+	public List<Method> getAllMethods() throws MiddlewareException {
 		return this.getMethods(true, null, true);
 	}
 
 	/**
-	 * This will fetch list of methods by passing methodIds. It does not filter out obsolete methods if filterObsolete is false.
-	 *
+	 * This will fetch list of methods by passing methodIds
+	 * 
 	 * @param fetchAll will tell wheather query should get all methods or not.
 	 * @param methodIds will tell wheather methodIds should be pass to filter result. Combination of these two will give flexible usage.
 	 * @param filterObsolete will tell whether obsolete methods will be filtered
 	 * @return List<Method>
+	 * @throws MiddlewareException
 	 */
 	private List<Method> getMethods(Boolean fetchAll, List<Integer> methodIds, boolean filterObsolete) {
 
 		Map<Integer, Method> map = new HashMap<>();
-		List<Integer> termIds = methodIds;
-		if (termIds == null) {
-			termIds = new ArrayList<>();
+		if (methodIds == null) {
+			methodIds = new ArrayList<>();
 		}
 
-		List<CVTerm> terms = fetchAll ? this.ontologyDaoFactory.getCvTermDao().getAllByCvId(CvId.METHODS, filterObsolete)
-				: this.ontologyDaoFactory.getCvTermDao().getAllByCvId(termIds, CvId.METHODS, filterObsolete);
+		List<CVTerm> terms = fetchAll ?
+				this.ontologyDaoFactory.getCvTermDao().getAllByCvId(CvId.METHODS, filterObsolete) :
+				this.ontologyDaoFactory.getCvTermDao().getAllByCvId(methodIds, CvId.METHODS, filterObsolete);
 
 		for (CVTerm m : terms) {
 			Method method = new Method(Term.fromCVTerm(m));
@@ -100,7 +106,7 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 			}
 		}
 
-		List<Method> methods = new ArrayList<>(map.values());
+		ArrayList<Method> methods = new ArrayList<>(map.values());
 
 		Collections.sort(methods, new Comparator<Method>() {
 
@@ -115,7 +121,7 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 
 
 	@Override
-	public void addMethod(Method method) {
+	public void addMethod(Method method) throws MiddlewareException {
 
 		CVTerm term = this.ontologyDaoFactory.getCvTermDao().getByNameAndCvId(method.getName(), CvId.METHODS.getId());
 
@@ -129,8 +135,9 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 		term = this.ontologyDaoFactory.getCvTermDao().save(method.getName(), method.getDefinition(), CvId.METHODS);
 		method.setId(term.getCvTermId());
 
-		method.setDateCreated(new Date());
+		method.setDateCreated(systemClock.now());
 
+		// Save creation time
 		String stringDateValue = ISO8601DateParser.toString(method.getDateCreated());
 
 		// Save creation time
@@ -138,7 +145,7 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 	}
 
 	@Override
-	public void updateMethod(Method method) {
+	public void updateMethod(Method method) throws MiddlewareException {
 
 		CVTerm term = this.ontologyDaoFactory.getCvTermDao().getById(method.getId());
 
@@ -152,16 +159,16 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 
 		this.ontologyDaoFactory.getCvTermDao().merge(term);
 
-		method.setDateLastModified(new Date());
+		method.setDateLastModified(systemClock.now());
 
 		// Save last modified Time
 		this.ontologyDaoFactory.getCvTermPropertyDao()
-		.save(method.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(method.getDateLastModified()), 0);
+				.save(method.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(method.getDateLastModified()), 0);
 
 	}
 
 	@Override
-	public void deleteMethod(int id) {
+	public void deleteMethod(int id) throws MiddlewareException {
 
 		CVTerm term = this.ontologyDaoFactory.getCvTermDao().getById(id);
 
@@ -180,7 +187,7 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 		this.ontologyDaoFactory.getCvTermDao().makeTransient(term);
 	}
 
-	private void checkTermIsMethod(CVTerm term) {
+	private void checkTermIsMethod(CVTerm term) throws MiddlewareException {
 
 		if (term == null) {
 			throw new MiddlewareException(OntologyMethodDataManagerImpl.METHOD_DOES_NOT_EXIST);

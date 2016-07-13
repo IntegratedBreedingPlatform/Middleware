@@ -117,8 +117,7 @@ public abstract class Builder extends DatabaseBroker {
 	}
 	
 	protected final OntologyVariableDataManager getOntologyVariableDataManager() {
-		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
-				this.getOntologyScaleDataManager(), this.sessionProvider);
+		return new OntologyVariableDataManagerImpl(this.sessionProvider);
 	}
 	
 	protected final OntologyMethodDataManager getOntologyMethodDataManager() {

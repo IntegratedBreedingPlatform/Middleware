@@ -37,21 +37,7 @@ public interface OntologyPropertyDataManager {
 	 */
 	List<Property> getAllProperties();
 
-	/**
-	 * Get all properties by className
-	 *
-	 * @return property
-	 */
-	List<Property> getAllPropertiesWithClass(String className);
-
-	public List<Property> getAllPropertiesWithClassAndVariableType(String[] classes, String[] variableTypes);
-
-	/**
-	 * Get all properties given list of classnames
-	 *
-	 * @return property
-	 */
-	List<Property> getAllPropertiesWithClass(String[] classes);
+	List<Property> getAllPropertiesWithClassAndVariableType(String[] classes, String[] variableTypes);
 
 	/**
 	 * Adds a new property to the database. This is new method which ignores isA flat relationship to define single class per property

@@ -81,9 +81,12 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		CVTerm cvTerm = dao.getByNameAndCvId(term.getName(), cv.getCvId());
 
 		Assert.assertNotNull(cvTerm);
+		Assert.assertEquals(term.getCvTermId(), cvTerm.getCvTermId());
 		Assert.assertEquals(term.getCv(), cvTerm.getCv());
 		Assert.assertEquals(term.getName(), cvTerm.getName());
 		Assert.assertEquals(term.getDefinition(), cvTerm.getDefinition());
+		Assert.assertEquals(term.isObsolete(), cvTerm.isObsolete());
+		Assert.assertEquals(term.isRelationshipType(), cvTerm.isRelationshipType());
 	}
 
 }

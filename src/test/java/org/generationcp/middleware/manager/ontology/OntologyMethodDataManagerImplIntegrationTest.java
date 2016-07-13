@@ -37,24 +37,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 /**
  * Integration test class to test Ontology Method Data Manger
  */
-public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
+public class OntologyMethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 
 	@Autowired
 	private OntologyMethodDataManager manager;
 
-	private final CVTermDao dao = new CVTermDao();
-	private final CvTermPropertyDao propertyDao = new CvTermPropertyDao();
+	@Autowired
+	private OntologyDaoFactory daoFactory;
+
+	private CVTermDao termDao;
+	private CvTermPropertyDao propertyDao;
 
 	@Before
 	public void setUp() throws Exception {
-		this.dao.setSession(this.sessionProvder.getSession());
-		this.propertyDao.setSession(this.sessionProvder.getSession());
+		this.termDao = this.daoFactory.getCvTermDao();
+		this.propertyDao = this.daoFactory.getCvTermPropertyDao();
 	}
 
 	/*
-	 * This test inserts 3 terms with cv as Method along with additional properties like Created Date and Last Modified Date
-	 * and ensures that GetAllMethods function will return full method object.
-	 * */
+	* This test inserts 3 terms with cv as Method along with additional properties like Created Date and Last Modified Date
+	* and ensures that GetAllMethods function will return full method object.
+	* */
 	@Test
 	public void testGetAllMethodsShouldGetFullMethods() {
 		List<CVTerm> methodTerms = new ArrayList<>();
@@ -62,30 +65,25 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 		TestDataHelper.fillTestMethodsCvTerms(methodTerms, 3);
 
 		Map<Integer, CVTerm> termMap = new HashMap<>();
-		// save 3 methods using dao
+		// save 3 methods using termDao
 		for (CVTerm term : methodTerms) {
-			this.dao.save(term);
+			this.termDao.save(term);
 			termMap.put(term.getCvTermId(), term);
 		}
 
-		// Fill Test Created Date Property using Calendar
-		Calendar cal = Calendar.getInstance();
-		cal.set(2015, Calendar.JANUARY, 1);
-		Date testCreatedDate = cal.getTime();
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> methodCreatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(methodTerms, methodCreatedDateProperties, testCreatedDate);
 
-		Map<Integer, String> createDateMap = new HashMap<>();
+		Map<Integer, String> createdDateMap = new HashMap<>();
 
 		// Fetch Created Date Properties and save it using propertyDao
 		for (CVTermProperty property : methodCreatedDateProperties) {
-			this.propertyDao.save(property);
-			createDateMap.put(property.getCvTermId(), property.getValue());
+            this.propertyDao.save(property);
+			createdDateMap.put(property.getCvTermId(), property.getValue());
 		}
 
-		// Fill Test Updated Date Property using Calendar
-		cal.set(2015, Calendar.MAY, 20);
-		Date testUpdatedDate = cal.getTime();
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		List<CVTermProperty> methodUpdatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(methodTerms, methodUpdatedDateProperties, testUpdatedDate);
 
@@ -93,7 +91,7 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 
 		// Fetch Updated Date Property and save it using propertyDao
 		for (CVTermProperty property : methodUpdatedDateProperties) {
-			this.propertyDao.save(property);
+            this.propertyDao.save(property);
 			updateDateMap.put(property.getCvTermId(), property.getValue());
 		}
 
@@ -106,7 +104,7 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 			String message = "The %s for method '" + m.getId() + "' was not added correctly.";
 			if (termMap.containsKey(m.getId())) {
 				CVTerm methodTerm = termMap.get(m.getId());
-				String createdDateProperty = createDateMap.get(m.getId());
+				String createdDateProperty = createdDateMap.get(m.getId());
 				String updatedDateProperty = updateDateMap.get(m.getId());
 
 				Assert.assertEquals(String.format(message, "Name"), methodTerm.getName(), m.getName());
@@ -122,33 +120,30 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	/*
-	 * This test inserts one term with cv as Method along with additional properties like Created Date and Last Modified Date
-	 * and ensures that GetMethodById function will return full method object.
-	 * */
+	* This test inserts one term with cv as Method along with additional properties like Created Date and Last Modified Date
+	* and ensures that GetMethodById function will return full method object.
+	* */
 	@Test
 	public void testGetMethodByIdShouldGetFullMethodWithIdSupplied() throws Exception {
-		// Save Method Term using dao
+		// Save Method Term using termDao
 		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
-		this.dao.save(methodTerm);
+        this.termDao.save(methodTerm);
 
 		// Fill Test Created Date Property using TestDataHelper
-		Calendar cal = Calendar.getInstance();
-		cal.set(2015, Calendar.JANUARY, 1);
-		Date testCreatedDate = cal.getTime();
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> methodCreatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(methodTerm), methodCreatedDateProperties, testCreatedDate);
 
 		CVTermProperty methodCreatedDateProperty = methodCreatedDateProperties.get(0);
-		this.propertyDao.save(methodCreatedDateProperty);
+        this.propertyDao.save(methodCreatedDateProperty);
 
 		// Fill Test Updated Date Property using TestDataHelper
-		cal.set(2015, Calendar.MAY, 20);
-		Date testUpdatedDate = cal.getTime();
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		List<CVTermProperty> methodUpdatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(methodTerm), methodUpdatedDateProperties, testUpdatedDate);
 
 		CVTermProperty methodUpdatedDateProperty = methodUpdatedDateProperties.get(0);
-		this.propertyDao.save(methodUpdatedDateProperty);
+        this.propertyDao.save(methodUpdatedDateProperty);
 
 		// Fetch all methods and check our method exists or not.
 		Method method = this.manager.getMethod(methodTerm.getCvTermId(), true);
@@ -160,7 +155,6 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(String.format(message, "IsObsolete"), methodTerm.isObsolete(), method.isObsolete());
 		Assert.assertEquals(String.format(message, "CreatedDate"), method.getDateCreated(), testCreatedDate);
 		Assert.assertEquals(String.format(message, "UpdatedDate"), method.getDateLastModified(), testUpdatedDate);
-		Assert.assertFalse("Method " + method.getId() + " should not be obsolete", method.isObsolete());
 	}
 
 	/**
@@ -173,22 +167,24 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 		method.setName(TestDataHelper.getNewRandomName("Name"));
 		method.setDefinition("Test Definition");
 
+		Date date = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
+		this.stubCurrentDate(date);
+
 		this.manager.addMethod(method);
 
-		CVTerm cvterm = this.dao.getById(method.getId());
+		CVTerm cvterm = this.termDao.getById(method.getId());
 
 		// Make sure each method data inserted properly, assert them and display proper message if not inserted properly
 		String message = "The %s for method '" + method.getId() + "' was not added correctly.";
 		Assert.assertEquals(String.format(message, "Name"), method.getName(), cvterm.getName());
 		Assert.assertEquals(String.format(message, "Definition"), method.getDefinition(), cvterm.getDefinition());
 		Assert.assertEquals(String.format(message, "IsObsolete"), false, cvterm.isObsolete());
-		Assert.assertNotNull(String.format(message, "CreatedDate"), method.getDateCreated());
+		Assert.assertEquals(String.format(message, "CreatedDate"), date, method.getDateCreated());
 
 		// Fetch Created date property and assert it
 		List<CVTermProperty> addedProperties = this.propertyDao.getByCvTermId(method.getId());
 		Assert.assertTrue(String.format(message, "CreatedDate"), addedProperties.size() == 1);
-		Assert.assertEquals(String.format(message, "CreatedDate"), addedProperties.get(0).getValue(),
-				ISO8601DateParser.toString(method.getDateCreated()));
+		Assert.assertEquals(String.format(message, "CreatedDate"), addedProperties.get(0).getValue(), ISO8601DateParser.toString(date));
 	}
 
 	/**
@@ -196,35 +192,37 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 	 */
 	@Test
 	public void testUpdateMethodShouldUpdateExistingMethod() throws Exception {
-		// Save Method Term using dao
+		// Save Method Term using termDao
 		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
-		this.dao.save(methodTerm);
+        this.termDao.save(methodTerm);
 
 		// Fill Test Created Date Property using TestDataHelper
-		Calendar cal = Calendar.getInstance();
-		cal.set(2015, Calendar.JANUARY, 1);
-		Date testCreatedDate = cal.getTime();
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> methodCreatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(methodTerm), methodCreatedDateProperties, testCreatedDate);
 
 		CVTermProperty methodCreatedDateProperty = methodCreatedDateProperties.get(0);
-		this.propertyDao.save(methodCreatedDateProperty);
+        this.propertyDao.save(methodCreatedDateProperty);
 
 		//Updating method via manager
 		Method method = new Method();
 		method.setId(methodTerm.getCvTermId());
 		method.setName("New Method Name");
 		method.setDefinition("New Method Definition");
+
+		Date date = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
+		this.stubCurrentDate(date);
+
 		this.manager.updateMethod(method);
 
-		CVTerm cvterm = this.dao.getById(method.getId());
+		CVTerm cvterm = this.termDao.getById(method.getId());
 
 		// Make sure the inserted data should come as they are inserted and Display proper message if the data doesn't come as expected
 		String message = "The %s for method '" + method.getId() + "' was not updated correctly.";
 		Assert.assertEquals(String.format(message, "Name"), method.getName(), cvterm.getName());
 		Assert.assertEquals(String.format(message, "Definition"), method.getDefinition(), cvterm.getDefinition());
 		Assert.assertEquals(String.format(message, "IsObsolete"), false, cvterm.isObsolete());
-		Assert.assertNotNull(String.format(message, "UpdatedDate"), method.getDateLastModified());
+		Assert.assertEquals(String.format(message, "UpdatedDate"), date, method.getDateLastModified());
 
 		// Make sure there are two properties. One for Created date and one for Updated date
 		List<CVTermProperty> updatedProperties = this.propertyDao.getByCvTermId(cvterm.getCvTermId());
@@ -255,35 +253,32 @@ public class MethodDataManagerImplIntegrationTest extends IntegrationTestBase {
 	 */
 	@Test
 	public void testDeleteMethodShouldDeleteExistingMethod() throws Exception {
-		// Save Method Term using dao
+		// Save Method Term using termDao
 		CVTerm methodTerm = TestDataHelper.getTestCvTerm(CvId.METHODS);
-		this.dao.save(methodTerm);
+        this.termDao.save(methodTerm);
 
 		// Fill Test Created Date Property using TestDataHelper
-		Calendar cal = Calendar.getInstance();
-		cal.set(2015, Calendar.JANUARY, 1);
-		Date testCreatedDate = cal.getTime();
+		Date testCreatedDate = TestDataHelper.constructDate(2015, Calendar.JANUARY, 1);
 		List<CVTermProperty> methodCreatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestCreatedDateProperties(Collections.singletonList(methodTerm), methodCreatedDateProperties, testCreatedDate);
 
 		CVTermProperty methodCreatedDateProperty = methodCreatedDateProperties.get(0);
 		// Save Method Created Date Property using propertydao
-		this.propertyDao.save(methodCreatedDateProperty);
+        this.propertyDao.save(methodCreatedDateProperty);
 
 		// Fill Test Updated Date Property using TestDataHelper
-		cal.set(2015, Calendar.MAY, 20);
-		Date testUpdatedDate = cal.getTime();
+		Date testUpdatedDate = TestDataHelper.constructDate(2015, Calendar.MAY, 20);
 		List<CVTermProperty> methodUpdatedDateProperties = new ArrayList<>();
 		TestDataHelper.fillTestUpdatedDateProperties(Collections.singletonList(methodTerm), methodUpdatedDateProperties, testUpdatedDate);
 
 		CVTermProperty methodUpdatedDateProperty = methodUpdatedDateProperties.get(0);
 		// Save Method Updated Date Property using propertydao
-		this.propertyDao.save(methodUpdatedDateProperty);
+        this.propertyDao.save(methodUpdatedDateProperty);
 
 		// Delete the method
 		this.manager.deleteMethod(methodTerm.getCvTermId());
 
-		CVTerm cvterm = this.dao.getById(methodTerm.getCvTermId());
+		CVTerm cvterm = this.termDao.getById(methodTerm.getCvTermId());
 
 		// Make sure the method must be deleted and it asserts null
 		String message = "The %s for method '" + methodTerm.getCvTermId() + "' was not deleted correctly.";
