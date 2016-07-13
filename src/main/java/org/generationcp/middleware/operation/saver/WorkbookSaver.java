@@ -184,6 +184,8 @@ public class WorkbookSaver extends Saver {
 			// reset trial observation details such as experimentid, stockid and geolocationid
 			this.resetTrialObservations(workbook.getTrialObservations());
 		}
+		
+		deleteRemovedLocationsIfExisting(workbook.getToBeDeletedLocationIds());
 
 		 if (workbook.getTrialObservations().size() > 1) {
 			// also a multi-location
@@ -251,6 +253,13 @@ public class WorkbookSaver extends Saver {
 		this.createMeasurementEffectExperiments(datasetId, effectVariables, workbook.getObservations(), trialHeaders);
 
 		return studyId;
+	}
+
+	private void deleteRemovedLocationsIfExisting(List<Integer> toBeDeletedLocationIds) {
+		if(toBeDeletedLocationIds != null && !toBeDeletedLocationIds.isEmpty()) {
+			//TODO: fix deletion of experiments
+			toBeDeletedLocationIds.clear();
+		}
 	}
 
 	public void removeDeletedVariablesAndObservations(final Workbook workbook) {

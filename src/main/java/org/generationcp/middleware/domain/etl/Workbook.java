@@ -84,6 +84,9 @@ public class Workbook {
 	private List<StandardVariable> expDesignVariables;
 	private boolean hasExistingDataOverwrite;
 	private List<Integer> columnOrderedLists;
+	
+	//use this to track list of nd_geolocation_id to be deleted
+	private List<Integer> toBeDeletedLocationIds = new ArrayList<>();
 
 	public Workbook() {
 		this.reset();
@@ -1051,4 +1054,16 @@ public class Workbook {
 		}
 		return null;
 	}
+
+	
+	public List<Integer> getToBeDeletedLocationIds() {
+		return toBeDeletedLocationIds;
+	}
+
+	
+	public void setToBeDeletedLocationIds(List<Integer> toBeDeletedLocationIds) {
+		this.toBeDeletedLocationIds = toBeDeletedLocationIds;
+	}
+	
+	
 }
