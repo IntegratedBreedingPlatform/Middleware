@@ -383,8 +383,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public boolean isMethodNamingConfigurationValid(final Integer breedingMethodId) {
-		final Method breedingMethod = this.getMethodByID(breedingMethodId);
+	public boolean isMethodNamingConfigurationValid(final Method breedingMethod) {
 		if (breedingMethod == null) {
 			return false;
 		}
