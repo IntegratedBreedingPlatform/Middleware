@@ -28,7 +28,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.generationcp.middleware.auditory.Auditory;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -44,7 +43,7 @@ import org.hibernate.annotations.NotFoundAction;
 @XmlType(propOrder = {"refid", "typeFname", "pubdate", "authors", "editors", "analyt", "series", "volume", "issue", "publish", "pucity",
 		"pucntry"})
 @XmlAccessorType(XmlAccessType.NONE)
-public class Bibref implements Serializable, Auditory {
+public class Bibref implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -311,25 +310,5 @@ public class Bibref implements Serializable, Auditory {
 		builder.append(this.pucntry);
 		builder.append("]");
 		return builder.toString();
-	}
-
-	@Override
-	public int getId() {
-		return refid;
-	}
-
-	@Override
-	public String getFilename() {
-		return volume;
-	}
-
-	@Override
-	public String getUsername() {
-		return authors;
-	}
-
-	@Override
-	public int getDate() {
-		return pubdate;
 	}
 }
