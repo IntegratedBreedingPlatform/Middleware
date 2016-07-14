@@ -181,7 +181,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			messages.add(new Message(DataImportServiceImpl.ERROR_ENTRY_DOESNT_EXIST));
 		}
 
-		if (!this.isTermExists(TermId.PLOT_NO.getId(), workbook.getFactors(), ontology) || !this.isTermExists(TermId.PLOT_NNO.getId(), workbook.getFactors(), ontology)) {
+		if (!this.isTermExists(TermId.PLOT_NO.getId(), workbook.getFactors(), ontology) && !this.isTermExists(TermId.PLOT_NNO.getId(), workbook.getFactors(), ontology)) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_PLOT_DOESNT_EXIST));
 		}
 
@@ -752,7 +752,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		}
 
 		if ((workbook.getImportType() == null || workbook.getImportType() == DataSetType.PLOT_DATA.getId()) && (!this
-				.isTermExists(TermId.PLOT_NO.getId(), workbook.getFactors(), ontology) || !this
+				.isTermExists(TermId.PLOT_NO.getId(), workbook.getFactors(), ontology) && !this
 				.isTermExists(TermId.PLOT_NNO.getId(), workbook.getFactors(), ontology) )) {
 			this.initializeIfNull(errors, Constants.MISSING_PLOT);
 			errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
