@@ -357,10 +357,10 @@ public interface GermplasmDataManager {
 	/**
 	 * Validates the naming rules configuration for the selected breeding method
 	 * 
-	 * @param breedingMethodId
+	 * @param breedingMethod
 	 * @return true if the configurarion is present in the DB
 	 */
-	boolean isMethodNamingConfigurationValid(Integer breedingMethodId);
+	boolean isMethodNamingConfigurationValid(Method breedingMethod);
 
 	/**
 	 * Returns all the method records.
