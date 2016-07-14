@@ -181,7 +181,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			messages.add(new Message(DataImportServiceImpl.ERROR_ENTRY_DOESNT_EXIST));
 		}
 
-		if (!this.isTermExists(TermId.PLOT_NO.getId(), workbook.getFactors(), ontology)) {
+		if (!this.isTermExists(TermId.PLOT_NO.getId(), workbook.getFactors(), ontology) || !this.isTermExists(TermId.PLOT_NNO.getId(), workbook.getFactors(), ontology)) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_PLOT_DOESNT_EXIST));
 		}
 
@@ -751,8 +751,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			errors.get(Constants.MISSING_GID).add(new Message("error.gid.doesnt.exist.wizard"));
 		}
 
-		if ((workbook.getImportType() == null || workbook.getImportType() == DataSetType.PLOT_DATA.getId()) && !this
-				.isTermExists(TermId.PLOT_NO.getId(), workbook.getFactors(), ontology)) {
+		if ((workbook.getImportType() == null || workbook.getImportType() == DataSetType.PLOT_DATA.getId()) && (!this
+				.isTermExists(TermId.PLOT_NO.getId(), workbook.getFactors(), ontology) || !this
+				.isTermExists(TermId.PLOT_NNO.getId(), workbook.getFactors(), ontology) )) {
 			this.initializeIfNull(errors, Constants.MISSING_PLOT);
 			errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
 		}
@@ -824,6 +825,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// to re-set the "required" fields to true for checking later on
 
 		this.resetRequiredField(TermId.PLOT_NO.getId(), ontology, workbook.getFactors());
+		this.resetRequiredField(TermId.PLOT_NNO.getId(), ontology, workbook.getFactors());
 		this.resetRequiredField(TermId.ENTRY_NO.getId(), ontology, workbook.getFactors());
 		this.resetRequiredField(TermId.GID.getId(), ontology, workbook.getFactors());
 
