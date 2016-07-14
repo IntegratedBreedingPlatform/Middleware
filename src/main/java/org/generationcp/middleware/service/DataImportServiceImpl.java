@@ -1,11 +1,21 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
+<<<<<<< HEAD
  * <p/>
  * Generation Challenge Programme (GCP)
  * <p/>
  * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+=======
+ * 
+ * Generation Challenge Programme (GCP)
+ * 
+ * 
+ * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
+ * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ * 
+>>>>>>> master
  *******************************************************************************/
 
 package org.generationcp.middleware.service;
@@ -19,20 +29,24 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import com.google.common.base.Optional;
 import com.hazelcast.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.Constants;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -63,8 +77,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
 	public static final String ERROR_INVALID_GIDS_FROM_DATA_FILE = "error.invalid.gids";
 
+	private int maxRowLimit = WorkbookParser.DEFAULT_MAX_ROW_LIMIT;
+
 	public DataImportServiceImpl() {
-		super();
 
 	}
 
@@ -133,19 +148,20 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	@Override
 	public Workbook parseWorkbook(final File file) throws WorkbookParserException {
-		final WorkbookParser parser = new WorkbookParser();
+		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
 
 		// partially parse the file to parse the description sheet only at first
+		// Set performValidation to false to disable validation during parsing.
 		final Workbook workbook = parser.parseFile(file, false);
 
-		parser.parseAndSetObservationRows(file, workbook);
+		parser.parseAndSetObservationRows(file, workbook, false);
 
 		return workbook;
 	}
 
 	@Override
 	public Workbook strictParseWorkbook(final File file, final String programUUID) throws WorkbookParserException {
-		final WorkbookParser parser = new WorkbookParser();
+		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
 
 		final OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(this.getSessionProvider());
 		final GermplasmDataManager germplasmDataManager = new GermplasmDataManagerImpl(this.getSessionProvider());
@@ -181,7 +197,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		// this version of the workbookparser method is also capable of throwing a workbookparserexception with a list of messages
 		// containing validation errors inside
-		parser.parseAndSetObservationRows(file, workbook);
+		parser.parseAndSetObservationRows(file, workbook, false);
 
 		// separated the validation of observations from the parsing so that it can be used even in other parsing implementations (e.g., the
 		// one for Wizard style)
@@ -199,7 +215,105 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		this.checkForInvalidLabel(workbook, messages);
 
+		if (this.checkForOutOfBoundsData(ontology, workbook, programUUID)) {
+			workbook.setHasOutOfBoundsData(true);
+		}
+
 		return workbook;
+	}
+
+	@Override
+	public Workbook parseWorkbook(File file, String programUUID, boolean discardInvalidValues, OntologyDataManager ontologyDataManager,
+			WorkbookParser workbookParser) throws WorkbookParserException {
+
+		// partially parse the file to parse the description sheet only at first
+		final Workbook workbook = workbookParser.parseFile(file, false);
+
+		this.populatePossibleValuesForCategoricalVariates(workbook.getVariates(), programUUID, ontologyDataManager);
+
+		workbookParser.parseAndSetObservationRows(file, workbook, discardInvalidValues);
+
+		return workbook;
+	}
+
+	@Override
+	public void populatePossibleValuesForCategoricalVariates(List<MeasurementVariable> variates, String programUUID,
+			OntologyDataManager ontologyDataManager) {
+
+		for (MeasurementVariable measurementVariable : variates) {
+
+			StandardVariable standardVariable =
+					ontologyDataManager.findStandardVariableByTraitScaleMethodNames(measurementVariable.getProperty(),
+							measurementVariable.getScale(), measurementVariable.getMethod(), programUUID);
+
+			if (standardVariable != null && standardVariable.getDataType().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
+
+				List<ValueReference> possibleValues = new ArrayList<>();
+				if (standardVariable.getEnumerations() != null && !standardVariable.getEnumerations().isEmpty()) {
+					for (Enumeration enumeration : standardVariable.getEnumerations()) {
+						possibleValues.add(new ValueReference(enumeration.getId(), enumeration.getName(), enumeration.getDescription()));
+					}
+
+				}
+				measurementVariable.setPossibleValues(possibleValues);
+				measurementVariable.setDataTypeId(standardVariable.getDataType().getId());
+			}
+		}
+	}
+
+	@Override
+	public boolean checkForOutOfBoundsData(final OntologyDataManager ontologyDataManager, Workbook workbook, final String programUUID) {
+
+		Map<String, List<String>> termIdValidValuesMap =
+				this.getValidValuesMapForCategoricalVariates(ontologyDataManager, workbook, programUUID);
+
+		for (MeasurementRow measurementRow : workbook.getObservations()) {
+			for (Entry<String, List<String>> entry : termIdValidValuesMap.entrySet()) {
+				MeasurementData measurementData = measurementRow.getMeasurementData(entry.getKey());
+				if (measurementData != null && !this.containsIgnoreCase(entry.getValue(), measurementData.getValue())) {
+					return true;
+				}
+
+			}
+
+		}
+
+		return false;
+
+	}
+
+	private boolean containsIgnoreCase(List<String> list, String searchFor) {
+		for (String item : list) {
+			if (item.equalsIgnoreCase(searchFor)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected Map<String, List<String>> getValidValuesMapForCategoricalVariates(final OntologyDataManager ontologyDataManager,
+			Workbook workbook, final String programUUID) {
+
+		// Get the categorical variates and extract their valid values (possible values)
+		Map<String, List<String>> variableValidValues = new HashMap<>();
+
+		for (MeasurementVariable measurementVariable : workbook.getVariates()) {
+			Integer stdVariableId =
+					ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(),
+							measurementVariable.getScale(), measurementVariable.getMethod());
+			if (stdVariableId != null) {
+				StandardVariable stdVariable = ontologyDataManager.getStandardVariable(stdVariableId, programUUID);
+				if (stdVariable.getDataType().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
+					List<String> validValues = new ArrayList<>();
+					for (Enumeration enumeration : stdVariable.getEnumerations()) {
+						validValues.add(enumeration.getName());
+					}
+					variableValidValues.put(measurementVariable.getName(), validValues);
+				}
+
+			}
+		}
+		return variableValidValues;
 	}
 
 	protected List<Message> validateMeasurementVariableName(final List<MeasurementVariable> allVariables) {
@@ -437,14 +551,15 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		// check if single location
 		// it means the location is defined in the description sheet)
-		String trialInstanceNumber = getTrialInstanceNumberFromMeasurementVariables(ontology, workbook.getConditions());
+		String trialInstanceNumber = this.getTrialInstanceNumberFromMeasurementVariables(ontology, workbook.getConditions());
 		if (trialInstanceNumber != null) {
 			return trialInstanceNumber;
 		}
 
 		// check if multi-location
 		// it means the location is defined in the observation sheet
-		trialInstanceNumber = getTrialInstanceNumberFromMeasurementRows(ontology, workbook.getObservations(), workbook.getTrialFactors());
+		trialInstanceNumber =
+				this.getTrialInstanceNumberFromMeasurementRows(ontology, workbook.getObservations(), workbook.getTrialFactors());
 
 		if (workbook.isNursery()) {
 			return "1";
@@ -757,7 +872,6 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			// get and check if trialInstanceNumber already exists
 			final Set<String> locationIds = new LinkedHashSet<String>();
 
-			// TODO MODIFY THIS IF NECESSARY
 			int maxNumOfIterations = 100000;
 			final int observationCount = workbook.getObservations().size();
 			if (observationCount < maxNumOfIterations) {
@@ -803,6 +917,18 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			}
 
 		}
+	}
+
+	public int getMaxRowLimit() {
+		return this.maxRowLimit;
+	}
+
+	public void setMaxRowLimit(int value) {
+
+		if (value > 0) {
+			this.maxRowLimit = value;
+		}
+
 	}
 
 }

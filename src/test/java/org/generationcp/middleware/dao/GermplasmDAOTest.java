@@ -35,11 +35,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class GermplasmDAOTest extends IntegrationTestBase {
 
 	private static final String DUMMY_STOCK_ID = "USER-1-1";
+    private static final Integer TEST_STUDY_ID = 1;
 	private static final Integer testGid1 = 1;
 	private static final Integer testGid1_Gpid1 = 2;
 	private static final Integer testGid1_Gpid2 = 3;
 
 	private static final Integer GROUP_ID = 10;
+
+    public static final Integer UNKNOWN_GID_VALUE = 0;
 
 	private boolean testDataSetup = false;
 
@@ -86,7 +89,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetDerivativeChildren() throws Exception {
-		final Integer gid = Integer.valueOf(1);
+		final Integer gid = 1;
+		// List<Germplasm> results = dao.getDerivativeChildren(gid);
 		final List<Germplasm> results = this.dao.getChildren(gid, 'D');
 		Assert.assertNotNull(results);
 		Debug.println(0, "testGetDerivativeChildren(GId=" + gid + ") RESULTS:");
@@ -97,7 +101,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetMaintenanceChildren() throws Exception {
-		final Integer gid = Integer.valueOf(1);
+		final Integer gid = 1;
 		final List<Germplasm> results = this.dao.getChildren(gid, 'M');
 		Assert.assertNotNull(results);
 		Debug.println(0, "testGetMaintenanceChildren(GId=" + gid + ") RESULTS:");
@@ -113,6 +117,18 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
 		this.assertPossibleGermplasmFields(results);
 	}
+
+    @Test
+    public void testRetrieveStudyParentGIDsKnownValuesOnly() {
+        // reminder : test needs proper test data setup, similar to other tests for this class
+        final List<Germplasm> germplasmEntries = this.dao.getGermplasmParentsForStudy(TEST_STUDY_ID);
+
+		for (final Germplasm germplasmEntry : germplasmEntries) {
+			Assert.assertNotEquals("Query should not return values that have unknown parent GIDs", UNKNOWN_GID_VALUE, germplasmEntry.getGpid1() );
+            Assert.assertNotEquals("Query should not return values that have unknown parent GIDs", UNKNOWN_GID_VALUE, germplasmEntry.getGpid2() );
+		}
+    }
+
 
 	@Test
 	public void testSearchForGermplasmsExactMatchGermplasmName() throws Exception {

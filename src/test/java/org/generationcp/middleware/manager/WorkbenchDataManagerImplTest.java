@@ -201,7 +201,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddProject() throws MiddlewareQueryException {
-		Project project = this.workbenchTestDataUtil.createTestProjectData();
+		final Project project = this.workbenchTestDataUtil.createTestProjectData();
 		this.workbenchDataManager.addProject(project);
 		Assert.assertNotNull("Expected id of a newly saved record in workbench_project.", project.getProjectId());
 
@@ -270,7 +270,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetProjectByName() throws MiddlewareQueryException {
-		Project project = this.workbenchDataManager.getProjectByName(this.commonTestProject.getProjectName());
+		final Project project = this.workbenchDataManager.getProjectByNameAndCrop(this.commonTestProject.getProjectName(), this
+				.commonTestProject.getCropType());
 		Assert.assertEquals(this.commonTestProject.getProjectName(), project.getProjectName());
 	}
 

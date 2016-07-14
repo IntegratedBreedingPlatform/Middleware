@@ -1,7 +1,7 @@
 
-package org.generationcp.middleware.pojos;
+package org.generationcp.middleware.dao;
 
-import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.pojos.KeySequenceRegister;
 
 public class KeySequenceRegisterDAO extends GenericDAO<KeySequenceRegister, String> {
 

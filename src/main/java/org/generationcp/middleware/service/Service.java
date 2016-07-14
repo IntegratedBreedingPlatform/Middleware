@@ -126,7 +126,7 @@ public abstract class Service extends DatabaseBroker {
 				this.getOntologyScaleDataManager(), this.sessionProvider);
 	}
 
-	protected final GermplasmDataManager getGermplasmDataManager() {
+	protected GermplasmDataManager getGermplasmDataManager() {
 		return new GermplasmDataManagerImpl(this.sessionProvider, this.databaseName);
 	}
 
