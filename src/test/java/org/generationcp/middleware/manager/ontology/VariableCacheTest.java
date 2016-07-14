@@ -3,7 +3,9 @@ package org.generationcp.middleware.manager.ontology;
 
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class VariableCacheTest {
@@ -71,5 +73,15 @@ public class VariableCacheTest {
 		ContextHolder.setCurrentCrop(null);
 		VariableCache.removeFromCache(1);
 		Assert.fail("Expected IllegalStateException when current crop is unknown and invoking remove from VariableCache");
+	}
+
+	@BeforeClass
+	public static void init() {
+		VariableCache.clearCache();
+	}
+
+	@AfterClass
+	public static void cleanUp() {
+		VariableCache.clearCache();
 	}
 }
