@@ -26,12 +26,14 @@ import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 
+@Ignore("This is just for setting up some performance level data volumes. Not intended to run regularly on CI.")
 @TransactionConfiguration(defaultRollback = false)
 public class PerfDataSetupTest extends IntegrationTestBase {
 
