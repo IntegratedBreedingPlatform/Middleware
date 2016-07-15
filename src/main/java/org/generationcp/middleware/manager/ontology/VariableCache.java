@@ -4,7 +4,6 @@ package org.generationcp.middleware.manager.ontology;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.slf4j.Logger;
@@ -42,6 +41,11 @@ public class VariableCache {
 	// For tests only
 	static int getCacheSize() {
 		return VariableCache.VARIABLE_CACHE.size();
+	}
+
+	// For tests only
+	static void clearCache() {
+		VariableCache.VARIABLE_CACHE.clear();
 	}
 
 	private static String getCurrentCrop() {

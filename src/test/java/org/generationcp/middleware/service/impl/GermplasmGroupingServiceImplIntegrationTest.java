@@ -10,9 +10,11 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+@Ignore("This is just a test harness for integration testing of grouping functionality.")
 public class GermplasmGroupingServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Autowired

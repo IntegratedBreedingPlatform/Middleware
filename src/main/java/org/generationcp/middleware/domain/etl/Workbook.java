@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.etl;
@@ -83,6 +83,7 @@ public class Workbook {
 	private Integer importType;
 	private List<StandardVariable> expDesignVariables;
 	private boolean hasExistingDataOverwrite;
+	private boolean hasOutOfBoundsData;
 	private List<Integer> columnOrderedLists;
 	
 	//use this to track list of nd_geolocation_id to be deleted
@@ -90,7 +91,7 @@ public class Workbook {
 
 	public Workbook() {
 		this.reset();
-        this.trialObservations = new ArrayList<>();
+		this.trialObservations = new ArrayList<>();
 	}
 
 	public Workbook(final StudyDetails studyDetails, final List<MeasurementVariable> conditions, final List<MeasurementVariable> factors,
@@ -101,14 +102,14 @@ public class Workbook {
 		this.constants = constants;
 		this.variates = variates;
 		this.observations = observations;
-        this.trialObservations = new ArrayList<>();
+		this.trialObservations = new ArrayList<>();
 		this.reset();
 	}
 
-    // TODO : rename reset method to something more indicative of its actual purpose : clearDerivedVariables maybe.
-    /**
-     * Used by DatasetImporter to clear ONLY the derived variables of the workbook prior to saving.
-     */
+	// TODO : rename reset method to something more indicative of its actual purpose : clearDerivedVariables maybe.
+	/**
+	 * Used by DatasetImporter to clear ONLY the derived variables of the workbook prior to saving.
+	 */
 	public void reset() {
 		this.trialHeaders = null;
 		this.trialVariables = null;
@@ -123,7 +124,8 @@ public class Workbook {
 		this.trialConstants = null;
 		this.treatmentFactors = null;
 		this.hasExistingDataOverwrite = false;
-    }
+		this.hasOutOfBoundsData = false;
+	}
 
 	public StudyDetails getStudyDetails() {
 		return this.studyDetails;
@@ -256,7 +258,7 @@ public class Workbook {
 	/**
 	 * This method handles the retrieval of the measurement dataset variables which includes the following: TRIAL_INSTANCE, FACTORS,
 	 * VARIATES. The order of insertion matters that's why we used LinkedHashSet on this method to preserve the order of insertion.
-	 *
+	 * 
 	 * @return measurement dataset variable list
 	 */
 	public List<MeasurementVariable> getMeasurementDatasetVariablesView() {
@@ -1030,6 +1032,14 @@ public class Workbook {
 		this.hasExistingDataOverwrite = hasExistingDataOverwrite;
 	}
 
+	public boolean hasOutOfBoundsData() {
+		return this.hasOutOfBoundsData;
+	}
+
+	public void setHasOutOfBoundsData(final boolean hasOutOfBoundsData) {
+		this.hasOutOfBoundsData = hasOutOfBoundsData;
+	}
+
 	public List<Integer> getColumnOrderedLists() {
 		return this.columnOrderedLists;
 	}
@@ -1054,7 +1064,6 @@ public class Workbook {
 		}
 		return null;
 	}
-
 	
 	public List<Integer> getToBeDeletedLocationIds() {
 		return toBeDeletedLocationIds;
@@ -1064,6 +1073,5 @@ public class Workbook {
 	public void setToBeDeletedLocationIds(List<Integer> toBeDeletedLocationIds) {
 		this.toBeDeletedLocationIds = toBeDeletedLocationIds;
 	}
-	
-	
+
 }
