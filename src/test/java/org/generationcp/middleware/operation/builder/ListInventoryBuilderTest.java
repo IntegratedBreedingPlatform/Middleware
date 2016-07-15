@@ -28,11 +28,11 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
+	
 
 	@Before
 	public void setUp() {
 		listInventoryBuilder = new ListInventoryBuilder(this.sessionProvder);
-
 		// initialize germplasm ids
 		gids = this.createListOfGermplasmIds(NO_OF_ENTRIES);
 		this.initializeGermplasms(gids);
