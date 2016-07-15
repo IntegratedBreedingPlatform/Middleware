@@ -38,12 +38,14 @@ import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 
+@Ignore("This is just for seeding some test data. Not intended to run regularly on CI.")
 @TransactionConfiguration(defaultRollback = false)
 public class DataSetupTest extends IntegrationTestBase {
 
