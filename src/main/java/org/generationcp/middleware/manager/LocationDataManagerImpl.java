@@ -60,6 +60,11 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
+	public List<Location> getAllLocations(int start, int numOfRows) {
+		return this.getLocationDao().getAll(start, numOfRows);
+	}
+
+	@Override
 	public List<Location> getAllLocalLocations(int start, int numOfRows) throws MiddlewareQueryException {
 		return this.getLocationDao().getAll(start, numOfRows);
 	}

@@ -52,6 +52,14 @@ public interface LocationDataManager {
 	List<Location> getAllLocations() throws MiddlewareQueryException;
 
 	/**
+	 * Paginataed version of {@link #getAllLocations()} call.
+	 * 
+	 * @param start Start index/page offset
+	 * @param numOfRows page size.
+	 */
+	List<Location> getAllLocations(int start, int numOfRows);
+
+	/**
 	 * Returns all Local Locations.
 	 *
 	 * @param start - the starting index of the sublist of results to be returned
