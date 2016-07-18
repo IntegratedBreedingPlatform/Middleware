@@ -407,13 +407,13 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 		final Integer totalBatches = total / 1000;
 
-		NameDAO.LOG.info("Total batch to germplasm designations are {}", totalBatches + 1);
+		NameDAO.LOG.debug("Total batch to germplasm designations are {}", totalBatches + 1);
 
 		final List<Object[]> allNameList = new ArrayList<>();
 
 		for (Integer b = 0; b <= totalBatches; b++) {
 
-			NameDAO.LOG.info("Processing batch {}/{}", b + 1, totalBatches + 1);
+			NameDAO.LOG.debug("Processing batch {}/{}", b + 1, totalBatches + 1);
 
 			Integer start = b * 1000;
 

@@ -47,13 +47,10 @@
 		<addUniqueConstraint constraintName="uk_project_name" tableName="workbench_project" columnNames="project_name ASC, crop_type ASC"/>
 	</changeSet>
 
-	<changeSet author="abhishekptl" id="beta12-6">
+	<changeSet author="iryna" id="beta12-6">
 		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'dataset_importer'</sqlCheck>
+			<tableExists tableName="workbench_project_backup"/>
 		</preConditions>
-		<sql dbms="mysql" splitStatements="true">
-			UPDATE workbench_tool SET path='Fieldbook/etl/' WHERE name='dataset_importer'
-		</sql>
+		<dropTable cascadeConstraints="true"  tableName="workbench_project_backup"/>
 	</changeSet>
-
 </databaseChangeLog>
