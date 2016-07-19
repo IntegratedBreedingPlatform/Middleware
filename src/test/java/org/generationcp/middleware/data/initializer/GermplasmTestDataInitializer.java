@@ -16,7 +16,7 @@ public class GermplasmTestDataInitializer {
 		return germplasm;
 	}
 
-	public static Germplasm createGermplasm(final int id) {
+	public static Germplasm createGermplasm(final Integer id) {
 		final Germplasm germplasm = new Germplasm();
 		germplasm.setGid(id);
 		germplasm.setGdate(20150101);
