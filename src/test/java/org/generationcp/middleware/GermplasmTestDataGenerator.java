@@ -10,21 +10,21 @@ public class GermplasmTestDataGenerator {
 
 	GermplasmDataManager germplasmDataManager;
 
-	public GermplasmTestDataGenerator(GermplasmDataManager manager) {
+	public GermplasmTestDataGenerator(final GermplasmDataManager manager) {
 		this.germplasmDataManager = manager;
 	}
 
-	public Integer[] createGermplasmRecords(int numberOfGermplasm, String prefix) throws MiddlewareQueryException {
-		Integer[] gids = new Integer[numberOfGermplasm];
+	public Integer[] createGermplasmRecords(final int numberOfGermplasm, final String prefix) throws MiddlewareQueryException {
+		final Integer[] gids = new Integer[numberOfGermplasm];
 		for (int i = 0; i < numberOfGermplasm; i++) {
 			gids[i] = this.createGermplasm(prefix + i);
 		}
 		return gids;
 	}
 
-	private Integer createGermplasm(String germplasmName) throws MiddlewareQueryException {
+	private Integer createGermplasm(final String germplasmName) throws MiddlewareQueryException {
 
-		Germplasm g = new Germplasm();
+		final Germplasm g = new Germplasm();
 		g.setGdate(Integer.valueOf(20141014));
 		g.setGnpgs(Integer.valueOf(0));
 		g.setGpid1(Integer.valueOf(0));
@@ -38,7 +38,7 @@ public class GermplasmTestDataGenerator {
 		g.setReferenceId(Integer.valueOf(1));
 		g.setLgid(Integer.valueOf(1));
 
-		Name n = new Name();
+		final Name n = new Name();
 		n.setLocationId(Integer.valueOf(1));
 		n.setNdate(Integer.valueOf(20141014));
 		n.setNval(germplasmName);

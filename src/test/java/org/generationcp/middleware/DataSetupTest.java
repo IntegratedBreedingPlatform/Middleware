@@ -201,7 +201,7 @@ public class DataSetupTest extends IntegrationTestBase {
 
 		return program.getUniqueID();
 	}
-	
+
 	public void createNursery(final String programUUID) throws MiddlewareException {
 		// Germplasm
 		final Integer[] gids =
@@ -213,7 +213,6 @@ public class DataSetupTest extends IntegrationTestBase {
 
 		final int randomInt = new Random().nextInt(100);
 
-		
 		// Germplasm list
 		final GermplasmList germplasmList =
 				new GermplasmList(null, "Test Germplasm List " + randomInt, Long.valueOf(20141014), "LST", Integer.valueOf(1),
@@ -411,7 +410,7 @@ public class DataSetupTest extends IntegrationTestBase {
 		// Assert list data got saved with Nursery
 		final List<ListDataProject> listDataProject = this.middlewareFieldbookService.getListDataProject(nurseryListId);
 		Assert.assertEquals(germplasmListData.size(), listDataProject.size());
-		
+
 		return nurseryStudyId;
 	}
 
@@ -436,16 +435,15 @@ public class DataSetupTest extends IntegrationTestBase {
 		return variable;
 	}
 
-	
-	public void setGermplasmListManager(GermplasmListManager germplasmListManager) {
+	public void setGermplasmListManager(final GermplasmListManager germplasmListManager) {
 		this.germplasmListManager = germplasmListManager;
 	}
-	
-	public void setDataImportService(DataImportService dataImportService) {
+
+	public void setDataImportService(final DataImportService dataImportService) {
 		this.dataImportService = dataImportService;
 	}
-	
-	public void setMiddlewareFieldbookService(FieldbookService middlewareFieldbookService) {
+
+	public void setMiddlewareFieldbookService(final FieldbookService middlewareFieldbookService) {
 		this.middlewareFieldbookService = middlewareFieldbookService;
 	}
 

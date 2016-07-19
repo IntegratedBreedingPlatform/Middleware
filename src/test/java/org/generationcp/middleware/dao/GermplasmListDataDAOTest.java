@@ -1,11 +1,6 @@
 
 package org.generationcp.middleware.dao;
 
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
@@ -54,28 +49,27 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	public void testCountByListId() throws Exception {
 
 		final SQLQuery mockSqlQuery = Mockito.mock(SQLQuery.class);
-		when(this.mockHibernateSession.createSQLQuery(anyString())).thenReturn(mockSqlQuery);
+		Mockito.when(this.mockHibernateSession.createSQLQuery(Matchers.anyString())).thenReturn(mockSqlQuery);
 		final BigInteger exampleNumberOfListDataEntries = new BigInteger("50");
-		when(mockSqlQuery.uniqueResult()).thenReturn(exampleNumberOfListDataEntries);
+		Mockito.when(mockSqlQuery.uniqueResult()).thenReturn(exampleNumberOfListDataEntries);
 
 		final int listId = 1;
 
 		this.germplasmListDataDAO.countByListId(listId);
 
-		verify(mockSqlQuery).setParameter(GermplasmListDataDAO.GERMPLASM_LIST_DATA_LIST_ID_COLUMN, listId);
+		Mockito.verify(mockSqlQuery).setParameter(GermplasmListDataDAO.GERMPLASM_LIST_DATA_LIST_ID_COLUMN, listId);
 
 	}
 
 	@Test
 	public void testDeleteByListId() throws Exception {
 
-
 		final Query mockQuery = Mockito.mock(Query.class);
-		when(this.mockHibernateSession.getNamedQuery(GermplasmListData.DELETE_BY_LIST_ID)).thenReturn(mockQuery);
+		Mockito.when(this.mockHibernateSession.getNamedQuery(GermplasmListData.DELETE_BY_LIST_ID)).thenReturn(mockQuery);
 		final int listId = 1;
 		this.germplasmListDataDAO.deleteByListId(listId);
-		verify(mockQuery).setInteger(GermplasmListDataDAO.GERMPLASM_LIST_DATA_LIST_ID_COLUMN, listId);
-		verify(mockQuery).executeUpdate();
+		Mockito.verify(mockQuery).setInteger(GermplasmListDataDAO.GERMPLASM_LIST_DATA_LIST_ID_COLUMN, listId);
+		Mockito.verify(mockQuery).executeUpdate();
 	}
 
 	@Test
@@ -83,16 +77,16 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
 		final int listId = 1;
 		final Criteria mockCriteria = Mockito.mock(Criteria.class);
-		when(this.mockHibernateSession.createCriteria(GermplasmListData.class)).thenReturn(mockCriteria);
+		Mockito.when(this.mockHibernateSession.createCriteria(GermplasmListData.class)).thenReturn(mockCriteria);
 
 		this.germplasmListDataDAO.getByIds(Collections.singletonList(listId));
 
-		verify(mockCriteria).createAlias(GermplasmListDataDAO.GERMPLASM_TABLE, GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS);
+		Mockito.verify(mockCriteria).createAlias(GermplasmListDataDAO.GERMPLASM_TABLE, GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS);
 
 		// Simple and Property Expression
-		verify(mockCriteria, times(3)).add(Matchers.any(Criterion.class));
-		verify(mockCriteria).addOrder(Matchers.any(Order.class));
-		verify(mockCriteria).list();
+		Mockito.verify(mockCriteria, Mockito.times(3)).add(Matchers.any(Criterion.class));
+		Mockito.verify(mockCriteria).addOrder(Matchers.any(Order.class));
+		Mockito.verify(mockCriteria).list();
 
 	}
 
@@ -103,18 +97,18 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	public void testGetByListId() {
 		final int listId = 1;
 		final Criteria mockCriteria = Mockito.mock(Criteria.class);
-		when(this.mockHibernateSession.createCriteria(GermplasmListData.class)).thenReturn(mockCriteria);
+		Mockito.when(this.mockHibernateSession.createCriteria(GermplasmListData.class)).thenReturn(mockCriteria);
 
 		this.germplasmListDataDAO.getByListId(listId);
 
-		verify(mockCriteria).createAlias(GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE,
+		Mockito.verify(mockCriteria).createAlias(GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE,
 				GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE_ALIAS);
-		verify(mockCriteria).createAlias(GermplasmListDataDAO.GERMPLASM_TABLE, GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS);
+		Mockito.verify(mockCriteria).createAlias(GermplasmListDataDAO.GERMPLASM_TABLE, GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS);
 
 		// Simple and Property Expression
-		verify(mockCriteria, times(3)).add(Matchers.any(Criterion.class));
-		verify(mockCriteria).addOrder(Matchers.any(Order.class));
-		verify(mockCriteria).list();
+		Mockito.verify(mockCriteria, Mockito.times(3)).add(Matchers.any(Criterion.class));
+		Mockito.verify(mockCriteria).addOrder(Matchers.any(Order.class));
+		Mockito.verify(mockCriteria).list();
 
 	}
 
@@ -124,18 +118,18 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		final int entryId = 100;
 
 		final Criteria mockCriteria = Mockito.mock(Criteria.class);
-		when(this.mockHibernateSession.createCriteria(GermplasmListData.class)).thenReturn(mockCriteria);
+		Mockito.when(this.mockHibernateSession.createCriteria(GermplasmListData.class)).thenReturn(mockCriteria);
 
 		this.germplasmListDataDAO.getByListIdAndEntryId(listId, entryId);
 
-		verify(mockCriteria).createAlias(GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE,
+		Mockito.verify(mockCriteria).createAlias(GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE,
 				GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE_ALIAS);
-		verify(mockCriteria).createAlias(GermplasmListDataDAO.GERMPLASM_TABLE, GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS);
+		Mockito.verify(mockCriteria).createAlias(GermplasmListDataDAO.GERMPLASM_TABLE, GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS);
 
 		// Simple and Property Expression
-		verify(mockCriteria, times(4)).add(Matchers.any(Criterion.class));
-		verify(mockCriteria).addOrder(Matchers.any(Order.class));
-		verify(mockCriteria).uniqueResult();
+		Mockito.verify(mockCriteria, Mockito.times(4)).add(Matchers.any(Criterion.class));
+		Mockito.verify(mockCriteria).addOrder(Matchers.any(Order.class));
+		Mockito.verify(mockCriteria).uniqueResult();
 	}
 
 	@Test
@@ -144,48 +138,42 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		final int lrecId = 100;
 
 		final Criteria mockCriteria = Mockito.mock(Criteria.class);
-		when(this.mockHibernateSession.createCriteria(GermplasmListData.class)).thenReturn(mockCriteria);
+		Mockito.when(this.mockHibernateSession.createCriteria(GermplasmListData.class)).thenReturn(mockCriteria);
 
 		this.germplasmListDataDAO.getByListIdAndLrecId(listId, lrecId);
 
-		verify(mockCriteria).createAlias(GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE,
+		Mockito.verify(mockCriteria).createAlias(GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE,
 				GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE_ALIAS);
-		verify(mockCriteria).createAlias(GermplasmListDataDAO.GERMPLASM_TABLE, GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS);
+		Mockito.verify(mockCriteria).createAlias(GermplasmListDataDAO.GERMPLASM_TABLE, GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS);
 
 		// Simple and Property Expression
-		verify(mockCriteria, times(4)).add(Matchers.any(Criterion.class));
-		verify(mockCriteria).addOrder(Matchers.any(Order.class));
-		verify(mockCriteria).uniqueResult();
+		Mockito.verify(mockCriteria, Mockito.times(4)).add(Matchers.any(Criterion.class));
+		Mockito.verify(mockCriteria).addOrder(Matchers.any(Order.class));
+		Mockito.verify(mockCriteria).uniqueResult();
 	}
-	
+
 	@Test
 	public void testGetListDataWithParents() {
 		this.setSessionOfDaosToRealHibernateSession();
 		final Germplasm parentGermplasm = this.createTestParentGermplasmWithPreferredAndNonpreferredNames();
 		final Germplasm childGermplasm = this.createTestChildGermplasm(parentGermplasm);
 		final GermplasmListData listData = this.createTestListData(childGermplasm);
-		List<GermplasmListData> listDataList = this.germplasmListDataDAO.getListDataWithParents(listData.getList().getId());
-		Assert.assertEquals("There should be only 1 list data under the list with id" + listData.getList().getId(), 
-				1, listDataList.size());
+		final List<GermplasmListData> listDataList = this.germplasmListDataDAO.getListDataWithParents(listData.getList().getId());
+		Assert.assertEquals("There should be only 1 list data under the list with id" + listData.getList().getId(), 1, listDataList.size());
 		for (final GermplasmListData currentGermplasmListData : listDataList) {
-			Assert.assertEquals("List data id should be " + listData.getId(), 
-					listData.getId(), currentGermplasmListData.getId());
-			Assert.assertEquals("Entry id should be " + listData.getEntryId(), 
-					listData.getEntryId(), currentGermplasmListData.getEntryId());
-			Assert.assertEquals("Desig should be " + listData.getDesignation(), 
-					listData.getDesignation(), currentGermplasmListData.getDesignation());
-			Assert.assertEquals("Group name should be " + listData.getGroupName(), 
-					listData.getGroupName(), currentGermplasmListData.getGroupName());
-			Assert.assertEquals("Female gid should be " + listData.getFgid(), 
-					listData.getFgid(), currentGermplasmListData.getFgid());
-			Assert.assertEquals("Male gid should be " + listData.getMgid(), 
-					listData.getMgid(), currentGermplasmListData.getMgid());
-			Assert.assertEquals("Gid should be " + listData.getGid(), 
-					listData.getGid(), currentGermplasmListData.getGid());
-			Assert.assertEquals("Seed source should be " + listData.getSeedSource(), 
-					listData.getSeedSource(), currentGermplasmListData.getSeedSource());
-			Assert.assertEquals("Female parent should be " + parentGermplasm.getPreferredName().getNval(), 
-					parentGermplasm.getPreferredName().getNval(), currentGermplasmListData.getFemaleParent());
+			Assert.assertEquals("List data id should be " + listData.getId(), listData.getId(), currentGermplasmListData.getId());
+			Assert.assertEquals("Entry id should be " + listData.getEntryId(), listData.getEntryId(), currentGermplasmListData.getEntryId());
+			Assert.assertEquals("Desig should be " + listData.getDesignation(), listData.getDesignation(),
+					currentGermplasmListData.getDesignation());
+			Assert.assertEquals("Group name should be " + listData.getGroupName(), listData.getGroupName(),
+					currentGermplasmListData.getGroupName());
+			Assert.assertEquals("Female gid should be " + listData.getFgid(), listData.getFgid(), currentGermplasmListData.getFgid());
+			Assert.assertEquals("Male gid should be " + listData.getMgid(), listData.getMgid(), currentGermplasmListData.getMgid());
+			Assert.assertEquals("Gid should be " + listData.getGid(), listData.getGid(), currentGermplasmListData.getGid());
+			Assert.assertEquals("Seed source should be " + listData.getSeedSource(), listData.getSeedSource(),
+					currentGermplasmListData.getSeedSource());
+			Assert.assertEquals("Female parent should be " + parentGermplasm.getPreferredName().getNval(), parentGermplasm
+					.getPreferredName().getNval(), currentGermplasmListData.getFemaleParent());
 		}
 	}
 
@@ -198,13 +186,14 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
 	private GermplasmListData createTestListData(final Germplasm childGermplasm) {
 		final GermplasmList germplasmList = this.createTestList();
-		final GermplasmListData listData = new GermplasmListDataTestDataInitializer().createGermplasmListData(germplasmList,childGermplasm.getGid(),1);
+		final GermplasmListData listData =
+				new GermplasmListDataTestDataInitializer().createGermplasmListData(germplasmList, childGermplasm.getGid(), 1);
 		listData.setFgid(childGermplasm.getGpid1());
 		listData.setMgid(childGermplasm.getGpid2());
 		this.germplasmListDataDAO.save(listData);
 		return listData;
 	}
-	
+
 	private GermplasmList createTestList() {
 		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(null, false);
 		this.germplasmListDAO.save(germplasmList);
@@ -216,14 +205,14 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		this.germplasmDAO.save(germplasm);
 		final Name preferredName = germplasm.getPreferredName();
 		preferredName.setGermplasmId(germplasm.getGid());
-		Name otherName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid(), "Other Name ");
+		final Name otherName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid(), "Other Name ");
 		otherName.setNstat(0);
 		this.nameDAO.save(preferredName);
 		this.nameDAO.save(otherName);
 		return germplasm;
 	}
-	
-	private Germplasm createTestChildGermplasm(Germplasm parentGermplasm) {
+
+	private Germplasm createTestChildGermplasm(final Germplasm parentGermplasm) {
 		final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName();
 		germplasm.setGpid1(parentGermplasm.getGid());
 		germplasm.setGpid2(parentGermplasm.getGid());

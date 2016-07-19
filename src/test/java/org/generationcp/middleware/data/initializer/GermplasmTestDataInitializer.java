@@ -33,12 +33,12 @@ public class GermplasmTestDataInitializer {
 		germplasm.setLgid(Integer.valueOf(0));
 		germplasm.setMethodName("MethodName");
 		germplasm.setLocationName("LocationName");
-		germplasm.setPreferredName(createGermplasmName(id));
+		germplasm.setPreferredName(GermplasmTestDataInitializer.createGermplasmName(id));
 		return germplasm;
 	}
 
 	public static Name createGermplasmName(final int gid) {
-		return createGermplasmName(gid, "Name " + gid);
+		return GermplasmTestDataInitializer.createGermplasmName(gid, "Name " + gid);
 	}
 
 	public static Name createGermplasmName(final int gid, final String germplasmName) {
