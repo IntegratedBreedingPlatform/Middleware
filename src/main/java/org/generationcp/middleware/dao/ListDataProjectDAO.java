@@ -98,13 +98,16 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		return result;
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({"rawtypes"})
 	public ListDataProject getByStudy(int studyId, GermplasmListType listType, int plotNo) throws MiddlewareQueryException {
 		try {
 
 			String queryStr =
-					"select ldp.* FROM nd_experiment_project neproj," + " nd_experimentprop nd_ep, nd_experiment_stock nd_stock, stock,"
-							+ " listdata_project ldp, project_relationship pr, projectprop pp, listnms nms"
+					"select ldp.listdata_project_id, ldp.list_id, ldp.germplasm_id, ldp.check_type, ldp.entry_id,"
+							+ " ldp.entry_code, ldp.seed_source, n.nval as designation, ldp.group_name, ldp.duplicate_notes"
+							+ " FROM nd_experiment_project neproj," + " nd_experimentprop nd_ep, nd_experiment_stock nd_stock, stock,"
+							+ " listdata_project ldp LEFT OUTER JOIN names n on n.gid = ldp.germplasm_id and n.nstat = 1,"
+							+ " project_relationship pr, projectprop pp, listnms nms"
 							+ " WHERE nd_ep.type_id IN (:PLOT_NO_TERM_IDS)" + " AND nms.projectid = pr.object_project_id"
 							+ " AND nms.listid = ldp.list_id" + " AND pp.project_id = pr.subject_project_id"
 							+ " AND nms.projectid = :STUDY_ID" + " AND pp.value = :DATASET_TYPE"

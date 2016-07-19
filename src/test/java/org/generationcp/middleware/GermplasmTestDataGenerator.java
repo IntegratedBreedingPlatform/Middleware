@@ -45,6 +45,7 @@ public class GermplasmTestDataGenerator {
 		n.setReferenceId(Integer.valueOf(1));
 		n.setTypeId(Integer.valueOf(1));
 		n.setUserId(Integer.valueOf(1));
+		n.setNstat(1);
 
 		this.germplasmDataManager.addGermplasm(g, n);
 
