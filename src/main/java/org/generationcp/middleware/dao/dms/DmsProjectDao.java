@@ -46,6 +46,7 @@ import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.StringType;
 
 /**
  * DAO class for {@link DmsProject}.
@@ -56,7 +57,17 @@ import org.hibernate.criterion.Restrictions;
 @SuppressWarnings("unchecked")
 public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
+	private static final Integer SEASON_VAR_TEXT = Integer.valueOf(TermId.SEASON_VAR_TEXT.getId());
+
+	private static final Integer LOCATION_ABBR = Integer.valueOf(TermId.LOCATION_ABBR.getId());
+
+	private static final int DELETED_STUDY = TermId.DELETED_STUDY.getId();
+
+	private static final int STUDY_STATUS = TermId.STUDY_STATUS.getId();
+
 	private static final String PROGRAM_UUID = "program_uuid";
+	
+	private static final int START_DATE = TermId.START_DATE.getId();
 
 	/**
 	 * Type of study and whether study is deleted are stored in projectprops table.
@@ -1072,16 +1083,22 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public List<DmsProject> findPagedPrograms(final String programDbId, final String locationDbId, final String seasonDbId,
 			final Integer pageSize, final Integer page) {
-		Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+
+		final DetachedCriteria inactive = DetachedCriteria.forClass(ProjectProperty.class);
+		inactive.add(Restrictions.eq("typeId", Integer.valueOf(STUDY_STATUS)));
+		inactive.add(Restrictions.eq("value", String.valueOf(DELETED_STUDY)));
+		inactive.setProjection(Projections.property("project.projectId"));
+		criteria.add(Property.forName("projectId").notIn(inactive));
 
 		if (programDbId != null) {
 			criteria.add(Restrictions.eq("programUUID", programDbId));
 		}
 
 		if (locationDbId != null) {
-			DetachedCriteria ppLocation = DetachedCriteria.forClass(ProjectProperty.class);
+			final DetachedCriteria ppLocation = DetachedCriteria.forClass(ProjectProperty.class);
 
-			ppLocation.add(Restrictions.eq("typeId", 8189));
+			ppLocation.add(Restrictions.eq("typeId", LOCATION_ABBR));
 			ppLocation.add(Restrictions.ilike("value", '%' + locationDbId.toLowerCase() + '%'));
 			ppLocation.setProjection(Projections.property("project.projectId"));
 
@@ -1089,23 +1106,26 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 
 		if (seasonDbId != null) {
-			DetachedCriteria ppStartDate = DetachedCriteria.forClass(ProjectProperty.class);
+			final DetachedCriteria ppStartDate = DetachedCriteria.forClass(ProjectProperty.class);
 
-			ppStartDate.add(Restrictions.eq("typeId", 8050));
-			ppStartDate.add(Restrictions.ilike("value", '%' + seasonDbId.toLowerCase() + '%'));
+			ppStartDate.add(Restrictions.eq("typeId", Integer.valueOf(START_DATE)));
 			ppStartDate.setProjection(Projections.property("project.projectId"));
+			ppStartDate.add(Restrictions.sqlRestriction("lower(substring(value, 1, 4)) like ?", '%' + seasonDbId.toLowerCase() + '%',
+					new StringType()));
 
-			DetachedCriteria ppSeason = DetachedCriteria.forClass(ProjectProperty.class);
-			ppSeason.add(Restrictions.eq("typeId", 8371));
+			final DetachedCriteria ppSeason = DetachedCriteria.forClass(ProjectProperty.class);
+			ppSeason.add(Restrictions.eq("typeId", SEASON_VAR_TEXT));
 			ppSeason.add(Restrictions.ilike("value", '%' + seasonDbId.toLowerCase() + '%'));
 			ppSeason.setProjection(Projections.property("project.projectId"));
 
 			criteria.add(Restrictions.or(Property.forName("projectId").in(ppStartDate), Property.forName("projectId").in(ppSeason)));
 		}
 
-		criteria.setFirstResult(page);
-		criteria.setMaxResults(pageSize);
-
+		if(page != null && pageSize != null){
+			criteria.setFirstResult(page);
+			criteria.setMaxResults(pageSize);
+		}
+		
 		criteria.addOrder(Order.asc("projectId"));
 
 		return criteria.list();

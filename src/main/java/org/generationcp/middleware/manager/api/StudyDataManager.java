@@ -811,4 +811,6 @@ public interface StudyDataManager {
 
 	List<StudySummary> findPagedProjects (String programDbId, String locationDbId, String seasonDbId, Integer pageSize, Integer page);
 
+	Long countAllPrograms(String programDbId, String locationDbId, String seasonDbId);
+
 }
