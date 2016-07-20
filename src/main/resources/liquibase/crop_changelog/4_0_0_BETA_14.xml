@@ -1,0 +1,62 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+
+	<changeSet author="naymesh" id="1" objectQuotingStrategy="QUOTE_ALL_OBJECTS">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="plant_samples" />
+			</not>
+		</preConditions>
+		<createTable tableName="plant_samples">
+			<column name="id" type="INT" autoIncrement="true">
+				<constraints nullable="false" primaryKey="true" primaryKeyName="" />
+			</column>
+			<column name="plot_id" type="INT">
+				<constraints nullable="false" />	
+			</column>
+			<column name="plant_id" type="varchar(45)">
+				<constraints nullable="false" />
+			</column>
+			<column name="sample_id" type="varchar(45)">
+				<constraints nullable="false" />
+			</column>
+			<column name="taken_by" type="varchar(45)" />
+			<column name="sample_date" type="varchar(45)" />
+			<column name="notes" type="varchar(256)" />
+		</createTable>
+		<modifySql dbms="mysql">
+			<append value="ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_general_ci" />
+		</modifySql>
+	</changeSet>
+
+	<changeSet author="naymesh" id="2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'plant_samples' AND CONSTRAINT_NAME='fk_plot_id' and TABLE_SCHEMA = DATABASE();</sqlCheck>
+		</preConditions>
+		<addForeignKeyConstraint 
+			constraintName="fk_plot_id"  
+			baseTableName="plant_samples"  
+			baseColumnNames="plot_id" 
+			referencedTableName="nd_experiment" 
+			referencedColumnNames="nd_experiment_id"
+			onDelete="NO ACTION"
+			onUpdate="NO ACTION"/>
+	</changeSet>
+	
+	<changeSet author="naymesh" id="3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'plant_samples' AND CONSTRAINT_NAME='uc_plot_plant' and TABLE_SCHEMA = DATABASE();</sqlCheck>
+		</preConditions>	
+		<addUniqueConstraint 
+			tableName="plant_samples" 
+			columnNames="plot_id, plant_id" 
+			constraintName="uc_plot_plant"/>
+	</changeSet>
+
+</databaseChangeLog>
