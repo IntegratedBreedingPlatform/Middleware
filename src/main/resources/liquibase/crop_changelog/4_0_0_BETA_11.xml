@@ -106,4 +106,14 @@
 	    </sql>
 	</changeSet>
 	
+	<changeSet author="matthew" id="10">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id=1731;</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			INSERT INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`) VALUES
+				('1731','1000','GROUP ID','Group ID of a germplasm',NULL,0,0);
+	    </sql>	
+	</changeSet>
+	
 </databaseChangeLog>
