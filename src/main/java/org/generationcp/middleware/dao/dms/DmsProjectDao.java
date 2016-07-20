@@ -1066,4 +1066,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 		return results;
 	}
+
+	public List<DmsProject> findPagedPrograms (final String programDbId, final String locationDbId, final String seasonDbId, final Integer pageSize, final Integer page){
+		return null;
+	}
 }
