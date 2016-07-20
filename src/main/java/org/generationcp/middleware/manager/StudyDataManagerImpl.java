@@ -1102,8 +1102,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<StudySummary> findPagedProjects (final String programDbId, final String locationDbId, final String seasonDbId, final Integer pageSize, final Integer page) {
-		//call this.getDmsProjectDao().findPagedPrograms(programDbId, locationDbId, seasonDbId, pageSize, page);
+	public List<StudySummary> findPagedProjects(final String programDbId, final String locationDbId, final String seasonDbId,
+			final Integer pageSize, final Integer page) {
+		List<DmsProject> result = this.getDmsProjectDao().findPagedPrograms(programDbId, locationDbId, seasonDbId, pageSize, page);
 		// convert from DmsProject to StudySummary
 		return null;
 	}

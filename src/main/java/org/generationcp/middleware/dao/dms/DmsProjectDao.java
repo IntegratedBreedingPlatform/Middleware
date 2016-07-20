@@ -33,15 +33,18 @@ import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 
 /**
@@ -1067,7 +1070,45 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return results;
 	}
 
-	public List<DmsProject> findPagedPrograms (final String programDbId, final String locationDbId, final String seasonDbId, final Integer pageSize, final Integer page){
-		return null;
+	public List<DmsProject> findPagedPrograms(final String programDbId, final String locationDbId, final String seasonDbId,
+			final Integer pageSize, final Integer page) {
+		Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+
+		if (programDbId != null) {
+			criteria.add(Restrictions.eq("programUUID", programDbId));
+		}
+
+		if (locationDbId != null) {
+			DetachedCriteria ppLocation = DetachedCriteria.forClass(ProjectProperty.class);
+
+			ppLocation.add(Restrictions.eq("typeId", 8189));
+			ppLocation.add(Restrictions.ilike("value", '%' + locationDbId.toLowerCase() + '%'));
+			ppLocation.setProjection(Projections.property("project.projectId"));
+
+			criteria.add(Property.forName("projectId").in(ppLocation));
+		}
+
+		if (seasonDbId != null) {
+			DetachedCriteria ppStartDate = DetachedCriteria.forClass(ProjectProperty.class);
+
+			ppStartDate.add(Restrictions.eq("typeId", 8050));
+			ppStartDate.add(Restrictions.ilike("value", '%' + seasonDbId.toLowerCase() + '%'));
+			ppStartDate.setProjection(Projections.property("project.projectId"));
+
+			DetachedCriteria ppSeason = DetachedCriteria.forClass(ProjectProperty.class);
+			ppSeason.add(Restrictions.eq("typeId", 8371));
+			ppSeason.add(Restrictions.ilike("value", '%' + seasonDbId.toLowerCase() + '%'));
+			ppSeason.setProjection(Projections.property("project.projectId"));
+
+			criteria.add(Restrictions.or(Property.forName("projectId").in(ppStartDate), Property.forName("projectId").in(ppSeason)));
+		}
+
+		criteria.setFirstResult(page);
+		criteria.setMaxResults(pageSize);
+
+		criteria.addOrder(Order.asc("projectId"));
+
+		return criteria.list();
+
 	}
 }
