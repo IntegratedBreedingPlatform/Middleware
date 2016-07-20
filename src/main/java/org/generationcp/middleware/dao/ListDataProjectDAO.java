@@ -200,7 +200,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 							+ " left outer join germplsm mp on g.gpid2 = mp.gid "
 							+ " left outer join names mn on mp.gid = mn.gid and mn.nstat = 1 "
 							+ " left outer join germplsm fp on g.gpid1 = fp.gid "
-							+ " left outer join names fn on fp.gid = fn.gid and mn.nstat = 1 " + " where lp.list_id = :listId "
+							+ " left outer join names fn on fp.gid = fn.gid and fn.nstat = 1 " + " where lp.list_id = :listId "
 							+ " group by entry_id";
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryStr);

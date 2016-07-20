@@ -103,7 +103,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		final ListDataProject listDataProject = this.listDataProjectDAO.getByStudy(studyId, GermplasmListType.NURSERY, plotNo);
 		Assert.assertNotNull("The list data project should not be null", listDataProject);
 		final String expectedPreferredName = "GP-VARIETY-1";
-		Assert.assertEquals("The preferred name must be the preferred name" + expectedPreferredName, expectedPreferredName,
+		Assert.assertEquals("The preferred name must be " + expectedPreferredName, expectedPreferredName,
 				listDataProject.getDesignation());
 	}
 
@@ -124,6 +124,25 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 			otherName.setNstat(0);
 			nameDAO.save(otherName);
 		}
+	}
+	
+	@Test
+	public void testGetListDataProjectWithParents() {
+		//setup data
+		final int studyId = this.createNurseryTestData();
+		final int plotNo = 1;
+		final ListDataProject testListDataProject = this.listDataProjectDAO.getByStudy(studyId, GermplasmListType.NURSERY, plotNo);
+		final int listId = testListDataProject.getList().getId();
+		//get result of method being tested
+		final List<ListDataProject> listDataProjects = this.listDataProjectDAO.getListDataProjectWithParents(listId);
+		//verify result
+		Assert.assertNotNull("The list should not be null", listDataProjects);
+		for (final ListDataProject listDataProject : listDataProjects) {
+			final String expectedPreferredName = "GP-VARIETY-" + listDataProject.getEntryId();
+			Assert.assertEquals("The preferred name must be " + expectedPreferredName, expectedPreferredName,
+					listDataProject.getDesignation());
+		}
+		
 	}
 
 }
