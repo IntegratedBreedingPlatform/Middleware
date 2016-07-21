@@ -1129,7 +1129,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public List<StudySummary> findPagedProjects(final String programDbId, final String locationDbId, final String seasonDbId,
 			final Integer pageSize, final Integer page) throws MiddlewareQueryException {
 		final List<DmsProject> dmsProjects =
-				this.getDmsProjectDao().findPagedPrograms(programDbId, locationDbId, seasonDbId, pageSize, page);
+				this.getDmsProjectDao().findPagedProjects(programDbId, locationDbId, seasonDbId, pageSize, page);
 		final List<StudySummary> studySummaries = Lists.newArrayList();
 		for (final DmsProject dmsProject : dmsProjects) {
 			final StudySummary studySummary = new StudySummary();
