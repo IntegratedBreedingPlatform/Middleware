@@ -1138,7 +1138,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			String key = null;
 			String valueKey = "";
 			for (ProjectProperty prop: sortedProperties) {
-					if (prop.getTypeId() == TermId.VARIABLE_DESCRIPTION.getId()){
+					if (prop.getTypeId() == 1805){
 						key = prop.getValue();
 					}
 					if (prop.getTypeId() == TermId.STANDARD_VARIABLE.getId()) {
@@ -1149,7 +1149,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 							studySummary.addYear(prop.getValue().substring(0,4));
 							props.put(key, prop.getValue());
 						} else {
-							if (valueKey.equals(String.valueOf(TermId.SEASON_VAR.getId()))) {
+							if (valueKey.equals(String.valueOf(TermId.SEASON_VAR_TEXT.getId()))) {
 								studySummary.addSeason(prop.getValue());
 							} else {
 								if (valueKey.equals(String.valueOf(TermId.LOCATION_ID.getId()))) {
@@ -1167,7 +1167,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			}
 			studySummary.setOptionalInfo(props);
 			studySummary.setName(dmsProject.getName());
-			studySummary.setProgramDbId(dmsProject.getProjectId());
+			studySummary.setProgramDbId(dmsProject.getProgramUUID());
 			studySummary.setStudyDbid(dmsProject.getProjectId());
 			studySummaries.add(studySummary);
 		}

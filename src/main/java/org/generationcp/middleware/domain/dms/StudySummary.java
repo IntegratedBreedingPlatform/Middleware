@@ -23,7 +23,7 @@ public class StudySummary implements Serializable {
 
     private Integer locationId;
 
-    private Integer programDbId;
+    private String programDbId;
 
     private Map<String, String> optionalInfo = new HashMap<>();
 
@@ -91,11 +91,11 @@ public class StudySummary implements Serializable {
         return this;
     }
 
-    public Integer getProgramDbId() {
+    public String getProgramDbId() {
         return programDbId;
     }
 
-    public StudySummary setProgramDbId(final Integer programDbId) {
+    public StudySummary setProgramDbId(final String programDbId) {
         this.programDbId = programDbId;
         return this;
     }
