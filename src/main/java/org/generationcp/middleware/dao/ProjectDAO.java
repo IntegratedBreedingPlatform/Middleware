@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -65,21 +66,10 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		query.executeUpdate();
 	}
 
-	public void deleteDatabase(String projectName) {
-		SQLQuery query = this.getSession().createSQLQuery("drop schema `" + projectName + "`;");
-
-		query.executeUpdate();
-	}
-
-	public Project getByName(String projectName) throws MiddlewareQueryException {
-		try {
-			Criteria criteria =
-					this.getSession().createCriteria(Project.class).add(Restrictions.eq("projectName", projectName)).setMaxResults(1);
-			return (Project) criteria.uniqueResult();
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByName(projectName=" + projectName + ") query from Project: " + e.getMessage(), e);
-		}
-		return null;
+	public Project getProjectByNameAndCrop(final String projectName, final CropType cropType) throws MiddlewareQueryException {
+		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("projectName", projectName)).add
+				(Restrictions.eq("cropType", cropType)).setMaxResults(1);
+		return (Project) criteria.uniqueResult();
 	}
 
 	public Project getLastOpenedProject(Integer userId) throws MiddlewareQueryException {

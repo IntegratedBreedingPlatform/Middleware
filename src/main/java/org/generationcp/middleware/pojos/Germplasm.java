@@ -39,8 +39,6 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.middleware.auditory.Auditable;
-import org.generationcp.middleware.auditory.Auditory;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -108,7 +106,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @XmlType(propOrder = {"gid", "gnpgs", "gpid1", "gpid2", "gdate"})
 @XmlAccessorType(XmlAccessType.NONE)
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "germplsm")
-public class Germplasm implements Serializable, Auditable {
+public class Germplasm implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -301,9 +299,9 @@ public class Germplasm implements Serializable, Auditable {
 			+ "	LNAMES.listid = LDATAPROJ.list_id" + "	inner join germplsm G on" + "	G.gid = LDATAPROJ.germplasm_id and"
 			+ "	G.gnpgs >= 0" + "	where LNAMES.projectid = :projId" + " ) T on " + " N.gid = T.gid";
 
-	public static final String GET_PARENT_GIDS_BY_STUDY_ID = "select distinct g.gid, G.gpid1, G.gpid2, G.grplce" + " from listnms LNAMES"
+	public static final String GET_KNOWN_PARENT_GIDS_BY_STUDY_ID = "select distinct g.gid, G.gpid1, G.gpid2, G.grplce" + " from listnms LNAMES"
 			+ " inner join listdata_project LDATAPROJ on" + "	LNAMES.listid = LDATAPROJ.list_id" + " inner join germplsm G on"
-			+ "	G.gid = LDATAPROJ.germplasm_id and" + "	G.gnpgs >= 0" + " where LNAMES.projectid = :projId";
+			+ "	G.gid = LDATAPROJ.germplasm_id and" + "	G.gnpgs > 0 AND (G.gpid1 > 0 or G.gpid2 > 0)" + " where LNAMES.projectid = :projId";
 
 	public static final String SEARCH_MAINTENANCE_GROUP_MEMBERS_BY_MGID = Germplasm.GENERAL_SELECT_FROM + "("
 			+ "SELECT g.*, group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') as stockIDs " + "FROM germplsm g "
@@ -753,10 +751,5 @@ public class Germplasm implements Serializable, Auditable {
 			}
 		}
 		return preferredName;
-	}
-
-	@Override
-	public void attachToAuditory(final Auditory auditory) {
-		this.referenceId = auditory.getId();
 	}
 }

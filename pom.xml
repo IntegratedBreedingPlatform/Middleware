@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-        <version>4.0.0.BETA.12</version>
+        <version>4.0.0.BETA.14</version>
 	<name>Middleware</name>
 
 	<properties>
@@ -402,93 +402,6 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.18</version>
-				<configuration>
-					<includes>
-						<include>**/WorkbenchDataManagerImplTest.java</include>
-						<include>**/GermplasmDataManagerImplTest.java</include>
-						<include>**/UserDataManagerImplTest.java</include>
-						<include>**/CrossStudyDataManagerImplTest.java</include>
-						<include>**/GermplasmDataManagerUtilTest.java</include>
-						<include>**/GermplasmAddUpdateFunctionsTest.java</include>
-						<include>**/LocationDataManagerImplTest.java</include>
-
-						<include>**/BreedersQueryDaoTest.java</include>
-						<include>**/GermplasmListDAOTest.java</include>
-						<include>**/ConformityInputTransformerTest.java</include>
-						<include>**/MeasurementDataTest.java</include>
-						<include>**/WorkbookTest.java</include>
-						<include>**/DataSetBuilderTest.java</include>
-						<include>**/WorkbookParserTest.java</include>
-						<include>**/ListDataProjectSaverTest.java</include>
-						<include>**/ProjectPropertySaverTest.java</include>
-						<include>**/WorkbookSaverTest.java</include>
-						<include>**/DatasetValuesTransformerTest.java</include>
-						<include>**/ExperimentValuesTransformerTest.java</include>
-						<include>**/StudyValuesTransformerTest.java</include>
-						<include>**/GDMSPojosSimpleTest.java</include>
-						<include>**/GMSPojosSimpleTest.java</include>
-						<include>**/IMSPojosSimpleTest.java</include>
-						<include>**/ListDataProjectTest.java</include>
-						<include>**/FieldbookListUtilTest.java</include>
-						<include>**/UtilTest.java</include>
-						<include>**/TrialTraitsTest.java</include>
-						<include>**/StudyServiceImplTest.java</include>
-						<include>**/ObservationsTest.java</include>
-						<include>**/QueryTest.java</include>
-						<include>**/StudyMeasurementsTest.java</include>
-						<include>**/DmsProjectDaoTest.java</include>
-						<include>**/GermplasmGroupingServiceImplTest.java</include>
-						<include>**/GermplasmNamingServiceImplTest.java</include>
-						<include>**/GermplasmNamingReferenceDataResolverImplTest.java</include>
-						<include>**/MethodTest.java</include>
-
-						<!-- New Ontology Manager Tests -->
-						<include>**/CvTermDaoTest.java</include>
-						<include>**/StandardVariableTest.java</include>
-						<include>**/VariableOverridesDaoTest.java</include>
-						<include>**/OntologyMethodDataManagerImplTest.java</include>
-						<include>**/OntologyMethodDataManagerImplIntegrationTest.java</include>
-						<include>**/OntologyPropertyDataManagerImplIntegrationTest.java</include>
-						<include>**/OntologyScaleDataManagerImplIntegrationTest.java</include>
-						<include>**/OntologyVariableDataManagerImplIntegrationTest.java</include>
-
-						<!-- Standard Variable references Tests -->
-						<include>**/ExperimentBuilderTest.java</include>
-						<include>**/WorkbenchDataManagerImplTest.java</include>
-						<include>**/TermDataManagerImplTest.java</include>
-						<include>**/VariableTypeListTransformerTest.java</include>
-
-						<!-- Pedigree String Generation Test -->
-						<include>**/AncestryTreeServiceTest.java</include>
-						<include>**/BackcrossProcessorTest.java</include>
-						<include>**/BreedingMethodFactoryTest.java</include>
-						<include>**/DoubleCrossProcessorTest.java</include>
-						<include>**/InbredProcessorTest.java</include>
-						<include>**/PedigreeStringTestUtil.java</include>
-						<include>**/SimpleCrossProcessorTest.java</include>
-						<include>**/SingleCrossHybridProcessorTest.java</include>
-						<include>**/ThreeWayHybridProcessorTest.java</include>
-						<include>**/PedigreeStringGeneratorUtilTest.java</include>
-						<include>**/CrossExpansionPropertiesTest.java</include>
-						<include>**/PedigreeAlgorithmTest.java</include>
-
-						<include>**/CheckNameFactorsPresentValidationRuleUT.java</include>
-						<include>**/ShowNameHandlingPopUpValidatorUT.java</include>
-						<include>**/ChainValidatorUT.java</include>
-						
-						<include>**/LiquibaseInitBeanTest.java</include>
-						<include>**/DatasourceUtilitiesTest.java</include>
-						<include>**/XABeanDefinitionTest.java</include>
-						<include>**/XADataSourcePropertiesTest.java</include>
-						<include>**/XADataSourcesTest.java</include>
-
-					</includes>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>

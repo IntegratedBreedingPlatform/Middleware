@@ -4,12 +4,14 @@ package org.ibp.test.utilities;
 import java.lang.reflect.Method;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 
 import junit.framework.TestCase;
 
 /**
  * Test the getter, setters, equals and hash code methods
  */
+@Ignore("This is just a utility class to help run the suit. Ignoring so that JUnit does not try to run this as test.")
 public class GetterAndSetterTestCase extends TestCase {
 
 	private final Object expected;
