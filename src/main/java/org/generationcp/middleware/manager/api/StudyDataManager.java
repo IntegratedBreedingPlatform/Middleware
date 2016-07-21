@@ -851,7 +851,7 @@ public interface StudyDataManager {
 	 * @return Number of programs
 	 * @throws MiddlewareQueryException
 	 */
-	Long countAllPrograms(String programDbId, String locationDbId, String seasonDbId) throws MiddlewareQueryException;
+	Long countAllStudies(String programDbId, String locationDbId, String seasonDbId) throws MiddlewareQueryException;
 
 	List<TermSummary> getStudyDetailsAsTable(Integer studyIdentifier);
 

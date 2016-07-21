@@ -1186,7 +1186,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Long countAllPrograms(final String programDbId, final String locationDbId, final String seasonDbId)
+	public Long countAllStudies(final String programDbId, final String locationDbId, final String seasonDbId)
 			throws MiddlewareQueryException {
 		return Long.valueOf(this.findPagedProjects(programDbId, locationDbId, seasonDbId, null, null).size());
 	}
