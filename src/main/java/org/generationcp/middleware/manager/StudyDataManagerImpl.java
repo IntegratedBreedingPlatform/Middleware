@@ -46,7 +46,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.StudyResultSetByGid;
 import org.generationcp.middleware.domain.search.StudyResultSetByNameStartDateSeasonCountry;
@@ -1159,7 +1158,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 						studySummary.addYear(prop.getValue().substring(0, 4));
 						props.put(key, prop.getValue());
 					} else {
-						if (valueKey.equals(String.valueOf(TermId.SEASON_VAR.getId()))) {
+							if (valueKey.equals(String.valueOf(TermId.SEASON_VAR_TEXT.getId()))) {
 							studySummary.addSeason(prop.getValue());
 						} else {
 							if (valueKey.equals(String.valueOf(TermId.LOCATION_ID.getId()))) {
