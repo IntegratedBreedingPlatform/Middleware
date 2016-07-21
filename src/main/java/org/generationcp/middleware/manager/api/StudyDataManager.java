@@ -808,9 +808,30 @@ public interface StudyDataManager {
 	 */
 	boolean checkIfAnyLocationIDsExistInExperiments(int studyId, DataSetType dataSetType, List<Integer> locationIds);
 
+	/**
+	 *
+	 * Retrieves all the StudySummaries of the DMS Project that matches the conditions: SeasonDbId, LocationDbId and ProgramDbId
+	 *
+	 * @param programDbId Program Identifier
+	 * @param locationDbId Location Abbreviation
+	 * @param seasonDbId Season or Year
+	 * @param pageSize Page Size
+	 * @param page Page
+	 * @return List of StudySummary
+	 * @throws MiddlewareQueryException
+	 */
+	List<StudySummary> findPagedProjects (String programDbId, String locationDbId, String seasonDbId, Integer pageSize, Integer page) throws MiddlewareQueryException;
 
-	List<StudySummary> findPagedProjects (String programDbId, String locationDbId, String seasonDbId, Integer pageSize, Integer page);
-
-	Long countAllPrograms(String programDbId, String locationDbId, String seasonDbId);
+	/**
+	 *
+	 * Count how many DMS Project matches the conditions: programDBid, locationDbId and SeasonDbId
+	 *
+	 * @param programDbId
+	 * @param locationDbId
+	 * @param seasonDbId
+	 * @return Number of programs
+	 * @throws MiddlewareQueryException
+	 */
+	Long countAllPrograms(String programDbId, String locationDbId, String seasonDbId) throws MiddlewareQueryException;
 
 }

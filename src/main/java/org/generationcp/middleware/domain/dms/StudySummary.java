@@ -21,7 +21,7 @@ public class StudySummary implements Serializable {
 
     private List<String> seasons = Lists.newArrayList();
 
-    private String locationId;
+    private Integer locationId;
 
     private Integer programDbId;
 
@@ -82,11 +82,11 @@ public class StudySummary implements Serializable {
         return this;
     }
 
-    public String getLocationId() {
+    public Integer getLocationId() {
         return locationId;
     }
 
-    public StudySummary setLocationId(final String locationId) {
+    public StudySummary setLocationId(final Integer locationId) {
         this.locationId = locationId;
         return this;
     }

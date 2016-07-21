@@ -13,7 +13,6 @@ package org.generationcp.middleware.manager;
 
 import java.util.*;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
@@ -1118,7 +1117,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<StudySummary> findPagedProjects (final String programDbId, final String locationDbId, final String seasonDbId, final Integer pageSize, final Integer page) {
+	public List<StudySummary> findPagedProjects (final String programDbId, final String locationDbId, final String seasonDbId, final Integer pageSize, final Integer page) throws MiddlewareQueryException{
 		List<DmsProject> dmsProjects = this.getDmsProjectDao().findPagedPrograms(programDbId, locationDbId, seasonDbId, pageSize, page);
 		List<StudySummary> studySummaries = Lists.newArrayList();
 		for (DmsProject dmsProject : dmsProjects) {
@@ -1139,29 +1138,30 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			String key = null;
 			String valueKey = "";
 			for (ProjectProperty prop: sortedProperties) {
-					if (prop.getTypeId() == 1060){
+					if (prop.getTypeId() == TermId.VARIABLE_DESCRIPTION.getId()){
 						key = prop.getValue();
 					}
-					if (prop.getTypeId() == 1070) {
+					if (prop.getTypeId() == TermId.STANDARD_VARIABLE.getId()) {
 						valueKey = prop.getValue();
 					}
-					if (valueKey.equals(prop.getTypeId().toString())) {
-						switch (valueKey) {
-							case "8050":
-								studySummary.addYear(prop.getValue().substring(0,4));
-								props.put(key, prop.getValue());
-								break;
-							case "8371":
+					if (valueKey.equals(String.valueOf(prop.getTypeId()))) {
+						if (valueKey.equals(String.valueOf(TermId.START_DATE.getId()))){
+							studySummary.addYear(prop.getValue().substring(0,4));
+							props.put(key, prop.getValue());
+						} else {
+							if (valueKey.equals(String.valueOf(TermId.SEASON_VAR.getId()))) {
 								studySummary.addSeason(prop.getValue());
-								break;
-							case "8189":
-								studySummary.setLocationId(prop.getValue());
-							case "8070":
-								studySummary.setType(StudyType.getStudyTypeById(Integer.valueOf(prop.getValue())).getName());
-								break;
-							default:
-								props.put(key, prop.getValue());
-								break;
+							} else {
+								if (valueKey.equals(String.valueOf(TermId.LOCATION_ID.getId()))) {
+									studySummary.setLocationId((prop.getValue()!=null && !prop.getValue().equals("")) ? Integer.valueOf(prop.getValue()) : null);
+								} else {
+									if (valueKey.equals(String.valueOf(TermId.STUDY_TYPE.getId()))) {
+										studySummary.setType(StudyType.getStudyTypeById(Integer.valueOf(prop.getValue())).getName());
+									} else  {
+										props.put(key, prop.getValue());
+									}
+								}
+							}
 						}
 					}
 			}
@@ -1175,7 +1175,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 	
 	@Override
-	public Long countAllPrograms(final String programDbId, final String locationDbId, final String seasonDbId) {
+	public Long countAllPrograms(final String programDbId, final String locationDbId, final String seasonDbId) throws MiddlewareQueryException{
 		return Long.valueOf(this.findPagedProjects(programDbId, locationDbId, seasonDbId, null, null).size());
 	}
 }
