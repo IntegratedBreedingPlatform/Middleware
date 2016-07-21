@@ -853,6 +853,6 @@ public interface StudyDataManager {
 	 */
 	Long countAllPrograms(String programDbId, String locationDbId, String seasonDbId) throws MiddlewareQueryException;
 
-	
+	List<TermSummary> getStudyDetailsAsTable(Integer studyIdentifier);
 
 }
