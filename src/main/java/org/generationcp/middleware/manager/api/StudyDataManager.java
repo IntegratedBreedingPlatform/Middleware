@@ -13,10 +13,28 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 
-import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.DataSet;
+import org.generationcp.middleware.domain.dms.DataSetType;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.DatasetValues;
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.dms.ExperimentValues;
+import org.generationcp.middleware.domain.dms.FolderReference;
+import org.generationcp.middleware.domain.dms.Reference;
+import org.generationcp.middleware.domain.dms.Stocks;
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.StudyValues;
+import org.generationcp.middleware.domain.dms.TrialEnvironments;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.workbench.StudyNode;
@@ -820,7 +838,8 @@ public interface StudyDataManager {
 	 * @return List of StudySummary
 	 * @throws MiddlewareQueryException
 	 */
-	List<StudySummary> findPagedProjects (String programDbId, String locationDbId, String seasonDbId, Integer pageSize, Integer page) throws MiddlewareQueryException;
+	List<StudySummary> findPagedProjects(String programDbId, String locationDbId, String seasonDbId, Integer pageSize, Integer page)
+			throws MiddlewareQueryException;
 
 	/**
 	 *
@@ -833,5 +852,7 @@ public interface StudyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	Long countAllPrograms(String programDbId, String locationDbId, String seasonDbId) throws MiddlewareQueryException;
+
+	
 
 }

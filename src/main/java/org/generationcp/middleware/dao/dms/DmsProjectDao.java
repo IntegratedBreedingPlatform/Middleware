@@ -1088,8 +1088,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		criteria.add(Restrictions.eq("pr.typeId", TermId.IS_STUDY.getId()));
 
 		final DetachedCriteria inactive = DetachedCriteria.forClass(ProjectProperty.class);
-		inactive.add(Restrictions.eq("typeId", Integer.valueOf(STUDY_STATUS)));
-		inactive.add(Restrictions.eq("value", String.valueOf(DELETED_STUDY)));
+		inactive.add(Restrictions.eq("typeId", Integer.valueOf(DmsProjectDao.STUDY_STATUS)));
+		inactive.add(Restrictions.eq("value", String.valueOf(DmsProjectDao.DELETED_STUDY)));
 		inactive.setProjection(Projections.property("project.projectId"));
 		criteria.add(Property.forName("projectId").notIn(inactive));
 
@@ -1100,7 +1100,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (locationDbId != null) {
 			final DetachedCriteria ppLocation = DetachedCriteria.forClass(ProjectProperty.class);
 
-			ppLocation.add(Restrictions.eq("typeId", LOCATION_ABBR));
+			ppLocation.add(Restrictions.eq("typeId", DmsProjectDao.LOCATION_ABBR));
 			ppLocation.add(Restrictions.ilike("value", '%' + locationDbId.toLowerCase() + '%'));
 			ppLocation.setProjection(Projections.property("project.projectId"));
 
@@ -1110,24 +1110,24 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (seasonDbId != null) {
 			final DetachedCriteria ppStartDate = DetachedCriteria.forClass(ProjectProperty.class);
 
-			ppStartDate.add(Restrictions.eq("typeId", Integer.valueOf(START_DATE)));
+			ppStartDate.add(Restrictions.eq("typeId", Integer.valueOf(DmsProjectDao.START_DATE)));
 			ppStartDate.setProjection(Projections.property("project.projectId"));
 			ppStartDate.add(Restrictions.sqlRestriction("lower(substring(value, 1, 4)) like ?", '%' + seasonDbId.toLowerCase() + '%',
 					new StringType()));
 
 			final DetachedCriteria ppSeason = DetachedCriteria.forClass(ProjectProperty.class);
-			ppSeason.add(Restrictions.eq("typeId", SEASON_VAR_TEXT));
+			ppSeason.add(Restrictions.eq("typeId", DmsProjectDao.SEASON_VAR_TEXT));
 			ppSeason.add(Restrictions.ilike("value", '%' + seasonDbId.toLowerCase() + '%'));
 			ppSeason.setProjection(Projections.property("project.projectId"));
 
 			criteria.add(Restrictions.or(Property.forName("projectId").in(ppStartDate), Property.forName("projectId").in(ppSeason)));
 		}
 
-		if(page != null && pageSize != null){
+		if (page != null && pageSize != null) {
 			criteria.setFirstResult(page);
 			criteria.setMaxResults(pageSize);
 		}
-		
+
 		criteria.addOrder(Order.asc("projectId"));
 
 		return criteria.list();
