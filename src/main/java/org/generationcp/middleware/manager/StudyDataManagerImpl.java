@@ -11,11 +11,13 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
+import org.apache.commons.digester.annotations.rules.SetTop;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
@@ -61,10 +63,7 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
-import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
+import org.generationcp.middleware.pojos.dms.*;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -1119,11 +1118,60 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<StudySummary> findPagedProjects(final String programDbId, final String locationDbId, final String seasonDbId,
-			final Integer pageSize, final Integer page) {
-		List<DmsProject> result = this.getDmsProjectDao().findPagedPrograms(programDbId, locationDbId, seasonDbId, pageSize, page);
-		// convert from DmsProject to StudySummary
-		return null;
+	public List<StudySummary> findPagedProjects (final String programDbId, final String locationDbId, final String seasonDbId, final Integer pageSize, final Integer page) {
+		List<DmsProject> dmsProjects = this.getDmsProjectDao().findPagedPrograms(programDbId, locationDbId, seasonDbId, pageSize, page);
+		List<StudySummary> studySummaries = Lists.newArrayList();
+		for (DmsProject dmsProject : dmsProjects) {
+			StudySummary studySummary = new StudySummary();
+
+			List<ProjectProperty> sortedProperties = Ordering.natural()
+					.from(new Comparator<ProjectProperty>() {
+							  @Override
+							  public int compare(final ProjectProperty o1, final ProjectProperty o2) {
+								  Integer rankCompare = o1.getRank()-o2.getRank();
+								  return rankCompare==0 ? o1.getTypeId()-o2.getTypeId() : rankCompare;
+							  }
+						  }
+					)
+					.immutableSortedCopy(dmsProject.getProperties());
+
+			Map<String, String> props = Maps.newHashMap();
+			String key = null;
+			String valueKey = "";
+			for (ProjectProperty prop: sortedProperties) {
+					if (prop.getTypeId() == 1060){
+						key = prop.getValue();
+					}
+					if (prop.getTypeId() == 1070) {
+						valueKey = prop.getValue();
+					}
+					if (valueKey.equals(prop.getTypeId().toString())) {
+						switch (valueKey) {
+							case "8050":
+								studySummary.addYear(prop.getValue().substring(0,4));
+								props.put(key, prop.getValue());
+								break;
+							case "8371":
+								studySummary.addSeason(prop.getValue());
+								break;
+							case "8189":
+								studySummary.setLocationId(prop.getValue());
+							case "8070":
+								studySummary.setType(StudyType.getStudyTypeById(Integer.valueOf(prop.getValue())).getName());
+								break;
+							default:
+								props.put(key, prop.getValue());
+								break;
+						}
+					}
+			}
+			studySummary.setOptionalInfo(props);
+			studySummary.setName(dmsProject.getName());
+			studySummary.setProgramDbId(dmsProject.getProjectId());
+			studySummary.setStudyDbid(dmsProject.getProjectId());
+			studySummaries.add(studySummary);
+		}
+		return studySummaries;
 	}
 	
 	@Override

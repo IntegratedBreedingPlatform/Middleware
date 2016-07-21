@@ -1,5 +1,6 @@
 package org.generationcp.middleware.domain.dms;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.oms.StudyType;
 
 import java.io.Serializable;
@@ -14,17 +15,17 @@ public class StudySummary implements Serializable {
 
     private String name;
 
-    private StudyType type;
+    private String type;
 
-    private List<String> years;
+    private List<String> years = Lists.newArrayList();
 
-    private List<String> seasons;
+    private List<String> seasons = Lists.newArrayList();
 
     private String locationId;
 
-    private String programDbId;
+    private Integer programDbId;
 
-    private Map<String, Object> optionalInfo = new HashMap<>();
+    private Map<String, String> optionalInfo = new HashMap<>();
 
     public Integer getStudyDbid() {
         return studyDbid;
@@ -44,11 +45,11 @@ public class StudySummary implements Serializable {
         return this;
     }
 
-    public StudyType getType() {
+    public String getType() {
         return type;
     }
 
-    public StudySummary setType(final StudyType type) {
+    public StudySummary setType(final String type) {
         this.type = type;
         return this;
     }
@@ -62,12 +63,22 @@ public class StudySummary implements Serializable {
         return this;
     }
 
+    public StudySummary addYear (final String year){
+        this.years.add(year);
+        return this;
+    }
+
     public List<String> getSeasons() {
         return seasons;
     }
 
     public StudySummary setSeasons(final List<String> seasons) {
         this.seasons = seasons;
+        return this;
+    }
+
+    public StudySummary addSeason (final String season){
+        this.seasons.add(season);
         return this;
     }
 
@@ -80,20 +91,20 @@ public class StudySummary implements Serializable {
         return this;
     }
 
-    public String getProgramDbId() {
+    public Integer getProgramDbId() {
         return programDbId;
     }
 
-    public StudySummary setProgramDbId(final String programDbId) {
+    public StudySummary setProgramDbId(final Integer programDbId) {
         this.programDbId = programDbId;
         return this;
     }
 
-    public Map<String, Object> getOptionalInfo() {
+    public Map<String, String> getOptionalInfo() {
         return optionalInfo;
     }
 
-    public StudySummary setOptionalInfo(final Map<String, Object> optionalInfo) {
+    public StudySummary setOptionalInfo(final Map<String, String> optionalInfo) {
         this.optionalInfo = optionalInfo;
         return this;
     }
