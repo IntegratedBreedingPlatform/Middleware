@@ -56,21 +56,35 @@ public class PoiUtil {
 		workBook.setRepeatingRowsAndColumns(sheetIndex, fromCol, toCol, fromRow, toRow);
 	}
 
-	public static Double getCellNumericValue(Cell cell) {
+	public static Double getCellNumericValue(final Cell cell) {
 		return cell == null ? null : cell.getNumericCellValue();
 	}
 
-	public static String getCellStringValue(Workbook wb, Integer sheetNumber, Integer rowNumber, Integer columnNumber) {
+	public static String getCellStringValue(final Workbook wb, final Integer sheetNumber, final Integer rowNumber, final Integer columnNumber) {
 
-		Sheet sheet = wb.getSheetAt(sheetNumber);
-		Row row = sheet.getRow(rowNumber);
+		final Sheet sheet = wb.getSheetAt(sheetNumber);
+		final Row row = sheet.getRow(rowNumber);
 
 		if (null == row) {
 			return null;
 		}
 
-		Cell cell = row.getCell(columnNumber);
+		final Cell cell = row.getCell(columnNumber);
 		return PoiUtil.getCellStringValue(cell);
+
+	}
+
+	public static Double getCellNumericValue(final Workbook wb, final Integer sheetNumber, final Integer rowNumber, final Integer columnNumber) {
+
+		final Sheet sheet = wb.getSheetAt(sheetNumber);
+		final Row row = sheet.getRow(rowNumber);
+
+		if (null == row) {
+			return null;
+		}
+
+		final Cell cell = row.getCell(columnNumber);
+		return PoiUtil.getCellNumericValue(cell);
 
 	}
 
