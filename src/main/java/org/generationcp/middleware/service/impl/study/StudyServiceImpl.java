@@ -21,6 +21,7 @@ import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerI
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.api.study.StudyDetailDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
@@ -203,5 +204,15 @@ public class StudyServiceImpl extends Service implements StudyService {
 			throw new MiddlewareQueryException("Unexpected error updating observations. Please contact support for "
 					+ "further assistence.", e);
 		}
+	}
+	
+	@Override
+	public StudyDetailDto getStudyDetails(final int studyIdentifier) {
+
+		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
+
+		List list = this.studyMeasurements.getAllStudyDetails(studyIdentifier, traits);
+		
+		return null;
 	}
 }

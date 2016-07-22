@@ -23,8 +23,7 @@ public class StudyMeasurements {
 	}
 
 	List<ObservationDto> getAllMeasurements(final int projectBusinessIdentifier, final List<TraitDto> traits) {
-		final String generateQuery = this.measurementQuery.getObservationQuery(traits);
-		return this.executeQueryAndMapResults(projectBusinessIdentifier, traits, generateQuery);
+		return this.executeQueryAndMapResults(projectBusinessIdentifier, traits);
 	}
 
 	List<ObservationDto> getMeasurement(final int projectBusinessIdentifier, final List<TraitDto> traits, final Integer measurementId) {
@@ -40,14 +39,22 @@ public class StudyMeasurements {
 		return measurement;
 	}
 
-	@SuppressWarnings("unchecked")
-	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier, final List<TraitDto> traits,
-			final String generateQuery) {
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier, final List<TraitDto> traits) {
+		
+		List result = getAllStudyDetails(projectBusinessIdentifier, traits);
+		
+		return this.mapResults(result, traits);
+	}
+
+	public List getAllStudyDetails(final int projectBusinessIdentifier, final List<TraitDto> traits) {
+		final String generateQuery = this.measurementQuery.getObservationQuery(traits);
 		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(traits, generateQuery);
 
 		this.setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery);
 
-		return this.mapResults(createSQLQuery.list(), traits);
+		List result = createSQLQuery.list();
+		return result;
 	}
 
 	@SuppressWarnings("unchecked")
