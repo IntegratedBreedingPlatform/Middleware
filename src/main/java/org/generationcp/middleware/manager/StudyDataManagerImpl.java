@@ -46,7 +46,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.StudyResultSetByGid;
 import org.generationcp.middleware.domain.search.StudyResultSetByNameStartDateSeasonCountry;
@@ -1189,29 +1188,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public Long countAllStudies(final String programDbId, final String locationDbId, final String seasonDbId)
 			throws MiddlewareQueryException {
 		return Long.valueOf(this.findPagedProjects(programDbId, locationDbId, seasonDbId, null, null).size());
-	}
-	
-	@Override
-	public List<TermSummary> getStudyDetailsAsTable(final Integer studyIdentifier) {
-		final List<TermSummary> traitList = new ArrayList<TermSummary>();
-		final VariableTypeList variates = this.getAllStudyVariates(studyIdentifier);
-		final List<DMSVariableType> variateDetails = variates.getVariableTypes();
-		for (final DMSVariableType variateDetail : variateDetails) {
-			final TermSummary trait = this.buildTrait(variateDetail);
-
-			traitList.add(trait);
-		}
-
-		return traitList;
-	}
-
-	private TermSummary buildTrait(final DMSVariableType variateDetail) {
-
-		final Integer id = Integer.valueOf(variateDetail.getId());
-		final String name = variateDetail.getStandardVariable().getName();
-		final String description = variateDetail.getStandardVariable().getDescription();
-		final TermSummary trait = new TermSummary(id, name, description);
-		return trait;
 	}
 
 }
