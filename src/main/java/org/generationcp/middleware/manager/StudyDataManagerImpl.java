@@ -1153,7 +1153,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 								studySummary.addSeason(prop.getValue());
 							} else {
 								if (valueKey.equals(String.valueOf(TermId.LOCATION_ID.getId()))) {
-									studySummary.setLocationId((prop.getValue()!=null && !prop.getValue().equals("")) ? Integer.valueOf(prop.getValue()) : null);
+									studySummary.setLocationId(!StringUtils.isEmpty(prop.getValue()) ? Integer.valueOf(prop.getValue()) : null);
 								} else {
 									if (valueKey.equals(String.valueOf(TermId.STUDY_TYPE.getId()))) {
 										studySummary.setType(StudyType.getStudyTypeById(Integer.valueOf(prop.getValue())).getName());
@@ -1165,10 +1165,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 						}
 					}
 			}
-			studySummary.setOptionalInfo(props);
-			studySummary.setName(dmsProject.getName());
-			studySummary.setProgramDbId(dmsProject.getProgramUUID());
-			studySummary.setStudyDbid(dmsProject.getProjectId());
+			studySummary.setOptionalInfo(props)
+					.setName(dmsProject.getName())
+					.setProgramDbId(dmsProject.getProgramUUID())
+					.setStudyDbid(dmsProject.getProjectId());
 			studySummaries.add(studySummary);
 		}
 		return studySummaries;
