@@ -1084,8 +1084,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public List<DmsProject> findPagedProjects(final String programDbId, final String locationDbId, final String seasonDbId,
 			final Integer pageSize, final Integer page) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-		criteria.createAlias("relatedTos", "pr");
-		criteria.add(Restrictions.eq("pr.typeId", TermId.IS_STUDY.getId()));
+		criteria.createAlias("properties", "pr");
+		criteria.add(Restrictions.eq("pr.typeId", TermId.STUDY_TYPE.getId()));
 
 		final DetachedCriteria inactive = DetachedCriteria.forClass(ProjectProperty.class);
 		inactive.add(Restrictions.eq("typeId", Integer.valueOf(DmsProjectDao.STUDY_STATUS)));
