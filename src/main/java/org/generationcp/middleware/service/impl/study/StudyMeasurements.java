@@ -47,13 +47,14 @@ public class StudyMeasurements {
 		return this.mapResults(result, traits);
 	}
 
-	public List getAllStudyDetails(final int projectBusinessIdentifier, final List<TraitDto> traits) {
+	@SuppressWarnings("unchecked")
+	public List<Object[]> getAllStudyDetails(final int projectBusinessIdentifier, final List<TraitDto> traits) {
 		final String generateQuery = this.measurementQuery.getObservationQuery(traits);
 		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(traits, generateQuery);
 
 		this.setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery);
 
-		List result = createSQLQuery.list();
+		List<Object[]> result = createSQLQuery.list();
 		return result;
 	}
 

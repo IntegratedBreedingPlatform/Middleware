@@ -14,6 +14,10 @@ class ObservationQuery {
 	 * @return A query that can be used to retrieve study measurements data including traits
 	 */
 	String getObservationQuery(final List<TraitDto> traits) {
+
+		final String columnNamesFromTraitNames = this.getColumnNamesFromTraitNames(traits);
+		final String orderByTraitId = getOrderByTraitId(traits);
+		
 		return "SELECT \n" + "    nde.nd_experiment_id,\n" + "    gl.description AS TRIAL_INSTANCE,\n" + "    (SELECT \n"
 				+ "            iispcvt.definition\n" + "        FROM\n" + "            stockprop isp\n" + "                INNER JOIN\n"
 				+ "            cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id\n" + "                INNER JOIN\n"
@@ -29,7 +33,7 @@ class ObservationQuery {
 				+ "    (SELECT \n" + "            ndep.value\n" + "        FROM\n" + "            nd_experimentprop ndep\n"
 				+ "                INNER JOIN\n" + "            cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id\n" + "        WHERE\n"
 				+ "            ndep.nd_experiment_id = ep.nd_experiment_id\n" + "                AND ispcvt.name = 'PLOT_NO') PLOT_NO\n"
-				+ this.getColumnNamesFromTraitNames(traits) +
+				+ columnNamesFromTraitNames +
 
 				"FROM\n" + "    Project p\n" + "        INNER JOIN\n"
 				+ "    project_relationship pr ON p.project_id = pr.subject_project_id\n" + "        INNER JOIN\n"
@@ -39,7 +43,8 @@ class ObservationQuery {
 				+ "    nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id\n" + "        INNER JOIN\n"
 				+ "    Stock s ON s.stock_id = es.stock_id\n" + this.getTraitDeatilsJoin(traits) + "WHERE\n" + "    p.project_id = ("
 				+ "Select p.project_id from project_relationship pr\n" + "INNER JOIN project p on p.project_id = pr.subject_project_id\n"
-				+ "where (pr.object_project_id = ? and name LIKE '%PLOTDATA'))";
+				+ "where (pr.object_project_id = ? and name LIKE '%PLOTDATA'))"
+				+ " ORDER BY " + orderByTraitId;
 	}
 
 	String getSingleObservationQuery(final List<TraitDto> traits) {
@@ -83,6 +88,23 @@ class ObservationQuery {
 				+ "    INNER JOIN nd_experiment_phenotype nep ON nep.phenotype_id = pt.phenotype_id\n" + "    WHERE\n"
 				+ "        svdo.name = ? ) " + trait.getTraitName() + " ON " + trait.getTraitName()
 				+ ".nd_experiment_id = nde.nd_experiment_id\n";
+	}
+	
+	private String getOrderByTraitId(final List<TraitDto> traits) {
+		final StringBuffer columnNames = new StringBuffer();
+		int size = traits.size();
+		for (int i = 0; i < size; i++) {
+			if (i == 0) {
+				columnNames.append(", \n");
+			}
+			columnNames.append(traits.get(i).getTraitName() + "_PhenotypeId"
+					+ "\n");
+
+			if (!(i == size - 1)) {
+				columnNames.append(" , ");
+			}
+		}
+		return columnNames.toString();
 	}
 
 }

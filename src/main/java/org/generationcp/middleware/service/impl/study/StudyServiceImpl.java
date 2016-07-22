@@ -2,6 +2,8 @@
 package org.generationcp.middleware.service.impl.study;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Ordering;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
@@ -211,8 +214,60 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
 
-		List list = this.studyMeasurements.getAllStudyDetails(studyIdentifier, traits);
-		
-		return null;
+		final List<Object[]> results = this.studyMeasurements.getAllStudyDetails(studyIdentifier, traits);
+
+		final List<Integer> observationVariableDbId = new ArrayList<Integer>();
+
+		final List<String> observationVariableName = new ArrayList<String>();
+
+		final List<List<String>> data = new ArrayList<List<String>>();
+
+		Ordering.natural();
+		final List<TraitDto> sortedTraits = Ordering.from(new Comparator<TraitDto>() {
+
+			@Override
+			public int compare(final TraitDto o1, final TraitDto o2) {
+				final Integer idCompare = o1.getTraitId() - o2.getTraitId();
+				return idCompare == 0 ? o1.getTraitId() - o2.getTraitId() : idCompare;
+			}
+		}).immutableSortedCopy(traits);
+
+		for (final Iterator<TraitDto> iterator = sortedTraits.iterator(); iterator.hasNext();) {
+			final TraitDto traitDto = iterator.next();
+			observationVariableDbId.add(traitDto.getTraitId());
+			observationVariableName.add(traitDto.getTraitName());
+		}
+
+		if (results != null && !results.isEmpty()) {
+			for (final Object[] row : results) {
+				// List of lists, specifying the plotId, block, rep, germplasmId, and the phenotypic values
+				final List<String> list = new ArrayList<String>();
+
+				// plotId
+				list.add((String) row[8]);
+
+				// block
+				// TODO get this data
+
+				// rep
+				list.add((String) row[7]);
+
+				// gid
+				list.add((String) row[3]);
+
+				// phenotypic values
+				int counterTwo = 1;
+				for (int i = 0; i < traits.size(); i++) {
+					list.add((String) row[8 + counterTwo]);
+					counterTwo += 2;
+				}
+
+				data.add(list);
+			}
+
+		}
+		final StudyDetailDto dto = new StudyDetailDto(studyIdentifier, observationVariableDbId, observationVariableName, data);
+		return dto;
 	}
 }
+
