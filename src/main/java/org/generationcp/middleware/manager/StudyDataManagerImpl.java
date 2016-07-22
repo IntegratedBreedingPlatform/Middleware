@@ -11,12 +11,12 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
-import org.apache.commons.digester.annotations.rules.SetTop;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
@@ -46,6 +46,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.search.StudyResultSet;
 import org.generationcp.middleware.domain.search.StudyResultSetByGid;
 import org.generationcp.middleware.domain.search.StudyResultSetByNameStartDateSeasonCountry;
@@ -62,7 +63,11 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.dms.*;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -73,6 +78,10 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
@@ -1117,53 +1126,54 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<StudySummary> findPagedProjects (final String programDbId, final String locationDbId, final String seasonDbId, final Integer pageSize, final Integer page) throws MiddlewareQueryException{
-		List<DmsProject> dmsProjects = this.getDmsProjectDao().findPagedPrograms(programDbId, locationDbId, seasonDbId, pageSize, page);
-		List<StudySummary> studySummaries = Lists.newArrayList();
-		for (DmsProject dmsProject : dmsProjects) {
-			StudySummary studySummary = new StudySummary();
+	public List<StudySummary> findPagedProjects(final String programDbId, final String locationDbId, final String seasonDbId,
+			final Integer pageSize, final Integer page) throws MiddlewareQueryException {
+		final List<DmsProject> dmsProjects =
+				this.getDmsProjectDao().findPagedProjects(programDbId, locationDbId, seasonDbId, pageSize, page);
+		final List<StudySummary> studySummaries = Lists.newArrayList();
+		for (final DmsProject dmsProject : dmsProjects) {
+			final StudySummary studySummary = new StudySummary();
 
-			List<ProjectProperty> sortedProperties = Ordering.natural()
-					.from(new Comparator<ProjectProperty>() {
-							  @Override
-							  public int compare(final ProjectProperty o1, final ProjectProperty o2) {
-								  Integer rankCompare = o1.getRank()-o2.getRank();
-								  return rankCompare==0 ? o1.getTypeId()-o2.getTypeId() : rankCompare;
-							  }
-						  }
-					)
-					.immutableSortedCopy(dmsProject.getProperties());
+			Ordering.natural();
+			final List<ProjectProperty> sortedProperties = Ordering.from(new Comparator<ProjectProperty>() {
 
-			Map<String, String> props = Maps.newHashMap();
+				@Override
+				public int compare(final ProjectProperty o1, final ProjectProperty o2) {
+					final Integer rankCompare = o1.getRank() - o2.getRank();
+					return rankCompare == 0 ? o1.getTypeId() - o2.getTypeId() : rankCompare;
+				}
+			}).immutableSortedCopy(dmsProject.getProperties());
+
+			final Map<String, String> props = Maps.newHashMap();
 			String key = null;
 			String valueKey = "";
-			for (ProjectProperty prop: sortedProperties) {
-					if (prop.getTypeId() == 1805){
-						key = prop.getValue();
-					}
-					if (prop.getTypeId() == TermId.STANDARD_VARIABLE.getId()) {
-						valueKey = prop.getValue();
-					}
-					if (valueKey.equals(String.valueOf(prop.getTypeId()))) {
-						if (valueKey.equals(String.valueOf(TermId.START_DATE.getId()))){
-							studySummary.addYear(prop.getValue().substring(0,4));
-							props.put(key, prop.getValue());
+			for (final ProjectProperty prop : sortedProperties) {
+				if (prop.getTypeId() == TermId.VARIABLE_DESCRIPTION.getId()) {
+					key = prop.getValue();
+				}
+				if (prop.getTypeId() == TermId.STANDARD_VARIABLE.getId()) {
+					valueKey = prop.getValue();
+				}
+				if (valueKey.equals(String.valueOf(prop.getTypeId()))) {
+					if (valueKey.equals(String.valueOf(TermId.START_DATE.getId()))) {
+						studySummary.addYear(prop.getValue().substring(0, 4));
+						props.put(key, prop.getValue());
+					} else {
+						if (valueKey.equals(String.valueOf(TermId.SEASON_VAR_TEXT.getId()))) {
+							studySummary.addSeason(prop.getValue());
 						} else {
-							if (valueKey.equals(String.valueOf(TermId.SEASON_VAR_TEXT.getId()))) {
-								studySummary.addSeason(prop.getValue());
+							if (valueKey.equals(String.valueOf(TermId.LOCATION_ID.getId()))) {
+								studySummary.setLocationId(!StringUtils.isEmpty(prop.getValue()) ? Integer.valueOf(prop.getValue()) : null);
 							} else {
-								if (valueKey.equals(String.valueOf(TermId.LOCATION_ID.getId()))) {
-									studySummary.setLocationId(!StringUtils.isEmpty(prop.getValue()) ? Integer.valueOf(prop.getValue()) : null);
+								if (valueKey.equals(String.valueOf(TermId.STUDY_TYPE.getId()))) {
+									studySummary.setType(StudyType.getStudyTypeById(Integer.valueOf(prop.getValue())).getName());
 								} else {
-									if (valueKey.equals(String.valueOf(TermId.STUDY_TYPE.getId()))) {
-										studySummary.setType(StudyType.getStudyTypeById(Integer.valueOf(prop.getValue())).getName());
-									} else  {
-										props.put(key, prop.getValue());
-									}
+									props.put(key, prop.getValue());
 								}
 							}
 						}
 					}
+				}
 			}
 			studySummary.setOptionalInfo(props)
 					.setName(dmsProject.getName())
@@ -1173,9 +1183,34 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		return studySummaries;
 	}
-	
+
 	@Override
-	public Long countAllPrograms(final String programDbId, final String locationDbId, final String seasonDbId) throws MiddlewareQueryException{
+	public Long countAllStudies(final String programDbId, final String locationDbId, final String seasonDbId)
+			throws MiddlewareQueryException {
 		return Long.valueOf(this.findPagedProjects(programDbId, locationDbId, seasonDbId, null, null).size());
 	}
+	
+	@Override
+	public List<TermSummary> getStudyDetailsAsTable(final Integer studyIdentifier) {
+		final List<TermSummary> traitList = new ArrayList<TermSummary>();
+		final VariableTypeList variates = this.getAllStudyVariates(studyIdentifier);
+		final List<DMSVariableType> variateDetails = variates.getVariableTypes();
+		for (final DMSVariableType variateDetail : variateDetails) {
+			final TermSummary trait = this.buildTrait(variateDetail);
+
+			traitList.add(trait);
+		}
+
+		return traitList;
+	}
+
+	private TermSummary buildTrait(final DMSVariableType variateDetail) {
+
+		final Integer id = Integer.valueOf(variateDetail.getId());
+		final String name = variateDetail.getStandardVariable().getName();
+		final String description = variateDetail.getStandardVariable().getDescription();
+		final TermSummary trait = new TermSummary(id, name, description);
+		return trait;
+	}
+
 }
