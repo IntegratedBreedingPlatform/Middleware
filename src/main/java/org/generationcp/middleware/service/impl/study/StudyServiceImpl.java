@@ -219,18 +219,18 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
 
-		final List<Object[]> results = this.studyMeasurements.getAllStudyDetails(studyIdentifier, traits);
-
-		final List<Integer> observationVariableDbId = new ArrayList<Integer>();
-
-		final List<String> observationVariableName = new ArrayList<String>();
-
 		final List<TraitDto> sortedTraits = Ordering.from(new Comparator<TraitDto>() {
 			@Override
 			public int compare(final TraitDto o1, final TraitDto o2) {
 				return o1.getTraitId() - o2.getTraitId();
 			}
 		}).immutableSortedCopy(traits);
+
+		final List<Object[]> results = this.studyMeasurements.getAllStudyDetails(studyIdentifier, sortedTraits);
+
+		final List<Integer> observationVariableDbId = new ArrayList<Integer>();
+
+		final List<String> observationVariableName = new ArrayList<String>();
 
 		for (final Iterator<TraitDto> iterator = sortedTraits.iterator(); iterator.hasNext();) {
 			final TraitDto traitDto = iterator.next();
