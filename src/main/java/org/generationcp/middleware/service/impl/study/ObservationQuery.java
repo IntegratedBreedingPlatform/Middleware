@@ -3,14 +3,21 @@ package org.generationcp.middleware.service.impl.study;
 
 import java.util.List;
 
+import com.google.common.base.Function;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
+import org.apache.commons.collections.ListUtils;
+import org.fest.util.Collections;
 import org.generationcp.middleware.service.api.study.TraitDto;
+
+import javax.annotation.Nullable;
 
 class ObservationQuery {
 
 	/**
 	 * Constructs a query that will enable us to retrieve study measurement data.
 	 * 
-	 * @param traitNames list of traits that we need to construct a query for.
+	 * @param traits list of traits that we need to construct a query for.
 	 * @return A query that can be used to retrieve study measurements data including traits
 	 */
 	String getObservationQuery(final List<TraitDto> traits) {
@@ -44,7 +51,7 @@ class ObservationQuery {
 				+ "    Stock s ON s.stock_id = es.stock_id\n" + this.getTraitDeatilsJoin(traits) + "WHERE\n" + "    p.project_id = ("
 				+ "Select p.project_id from project_relationship pr\n" + "INNER JOIN project p on p.project_id = pr.subject_project_id\n"
 				+ "where (pr.object_project_id = ? and name LIKE '%PLOTDATA'))"
-				+ " ORDER BY " + orderByTraitId;
+				+ (Collections.isNullOrEmpty(traits)?"":" ORDER BY " + orderByTraitId);
 	}
 
 	String getSingleObservationQuery(final List<TraitDto> traits) {
@@ -90,21 +97,14 @@ class ObservationQuery {
 				+ ".nd_experiment_id = nde.nd_experiment_id\n";
 	}
 	
-	private String getOrderByTraitId(final List<TraitDto> traits) {
-		final StringBuffer columnNames = new StringBuffer();
-		int size = traits.size();
-		for (int i = 0; i < size; i++) {
-			if (i == 0) {
-				columnNames.append(", \n");
+	private static String getOrderByTraitId(final List<TraitDto> traits) {
+		return Joiner.on(",").join(Lists.transform(traits, new Function<TraitDto, String>() {
+			@Nullable
+			@Override
+			public String apply(final TraitDto traitDto) {
+				return traitDto.getTraitName() + "_PhenotypeId";
 			}
-			columnNames.append(traits.get(i).getTraitName() + "_PhenotypeId"
-					+ "\n");
-
-			if (!(i == size - 1)) {
-				columnNames.append(" , ");
-			}
-		}
-		return columnNames.toString();
+		}));
 	}
 
 }

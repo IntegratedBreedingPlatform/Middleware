@@ -8,7 +8,10 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.fest.util.Collections;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -40,6 +43,8 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Ordering;
+
+import javax.annotation.Nullable;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
@@ -220,15 +225,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		final List<String> observationVariableName = new ArrayList<String>();
 
-		final List<List<String>> data = new ArrayList<List<String>>();
-
-		Ordering.natural();
 		final List<TraitDto> sortedTraits = Ordering.from(new Comparator<TraitDto>() {
-
 			@Override
 			public int compare(final TraitDto o1, final TraitDto o2) {
-				final Integer idCompare = o1.getTraitId() - o2.getTraitId();
-				return idCompare == 0 ? o1.getTraitId() - o2.getTraitId() : idCompare;
+				return o1.getTraitId() - o2.getTraitId();
 			}
 		}).immutableSortedCopy(traits);
 
@@ -238,35 +238,41 @@ public class StudyServiceImpl extends Service implements StudyService {
 			observationVariableName.add(traitDto.getTraitName());
 		}
 
-		if (results != null && !results.isEmpty()) {
-			for (final Object[] row : results) {
-				// List of lists, specifying the plotId, block, rep, germplasmId, and the phenotypic values
-				final List<String> list = new ArrayList<String>();
+		List<List<String>> data = Lists.newArrayList();
+		if (!Collections.isNullOrEmpty(results)) {
+			data = Lists.transform(results, new Function<Object[], List<String>>() {
+				@Nullable
+				@Override
+				public List<String> apply(final Object[] row) {
+					List<String> entry = Lists.newArrayList();
+					// plotId
+					entry.add((String) row[8]);
 
-				// plotId
-				list.add((String) row[8]);
+					// block
+					// TODO get this data
 
-				// block
-				// TODO get this data
+					// rep
+					entry.add((String) row[7]);
 
-				// rep
-				list.add((String) row[7]);
+					// gid
+					entry.add(String.valueOf(row[3]));
 
-				// gid
-				list.add((String) row[3]);
-
-				// phenotypic values
-				int counterTwo = 1;
-				for (int i = 0; i < traits.size(); i++) {
-					list.add((String) row[8 + counterTwo]);
-					counterTwo += 2;
+					// phenotypic values
+					int counterTwo = 1;
+					for (int i = 0; i < traits.size(); i++) {
+						entry.add((String) row[8 + counterTwo]);
+						counterTwo += 2;
+					}
+					return entry;
 				}
-
-				data.add(list);
-			}
-
+			});
 		}
-		final StudyDetailDto dto = new StudyDetailDto(studyIdentifier, observationVariableDbId, observationVariableName, data);
+
+		final StudyDetailDto dto = new StudyDetailDto()
+			.setStudyDbId(studyIdentifier)
+			.setObservationVariableDbId(observationVariableDbId)
+			.setObservationVariableName(observationVariableName)
+			.setData(data);
 		return dto;
 	}
 }
