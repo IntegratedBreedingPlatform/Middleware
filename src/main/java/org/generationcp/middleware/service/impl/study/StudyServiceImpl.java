@@ -220,13 +220,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
 
 		final List<TraitDto> sortedTraits = Ordering.from(new Comparator<TraitDto>() {
+
 			@Override
 			public int compare(final TraitDto o1, final TraitDto o2) {
 				return o1.getTraitId() - o2.getTraitId();
 			}
 		}).immutableSortedCopy(traits);
 
-		final List<Object[]> results = this.studyMeasurements.getAllStudyDetails(studyIdentifier, sortedTraits);
+		final List<Object[]> results = this.studyMeasurements.getAllStudyDetailsAsTable(studyIdentifier, sortedTraits);
 
 		final List<Integer> observationVariableDbId = new ArrayList<Integer>();
 
@@ -241,15 +242,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 		List<List<String>> data = Lists.newArrayList();
 		if (!CollectionUtils.isEmpty(results)) {
 			data = Lists.transform(results, new Function<Object[], List<String>>() {
+
 				@Nullable
 				@Override
 				public List<String> apply(final Object[] row) {
-					List<String> entry = Lists.newArrayList();
+					final List<String> entry = Lists.newArrayList();
 					// plotId
 					entry.add((String) row[8]);
 
 					// block
-					// TODO get this data
+					entry.add((String) row[9]);
 
 					// rep
 					entry.add((String) row[7]);
@@ -260,7 +262,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 					// phenotypic values
 					int counterTwo = 1;
 					for (int i = 0; i < traits.size(); i++) {
-						entry.add((String) row[8 + counterTwo]);
+						final Object rowValue = row[9 + counterTwo];
+
+						if (rowValue != null) {
+							entry.add(String.valueOf(rowValue));
+						} else {
+							entry.add((String) rowValue);
+						}
+
 						counterTwo += 2;
 					}
 					return entry;
@@ -268,11 +277,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 			});
 		}
 
-		final StudyDetailDto dto = new StudyDetailDto()
-			.setStudyDbId(studyIdentifier)
-			.setObservationVariableDbId(observationVariableDbId)
-			.setObservationVariableName(observationVariableName)
-			.setData(data);
+		final StudyDetailDto dto = new StudyDetailDto().setStudyDbId(studyIdentifier).setObservationVariableDbId(observationVariableDbId)
+				.setObservationVariableName(observationVariableName).setData(data);
 		return dto;
 	}
 }
