@@ -149,7 +149,8 @@ public class QueryTest {
 				"(\n" +
 				"pr.object_project_id = ?\n" + 
 				"and name LIKE '%PLOTDATA'\n" + 
-				")\n)";
+				")\n)"
+				+ "ORDER BY PH_cm_PhenotypeId";
 	}
 
 }
