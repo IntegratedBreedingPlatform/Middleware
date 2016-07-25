@@ -1,12 +1,12 @@
 package org.generationcp.middleware.data.initializer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MeasurementDataTestDataInitializer {
 
@@ -18,6 +18,12 @@ public class MeasurementDataTestDataInitializer {
 				new MeasurementDataTestDataInitializer().createMeasurementData(termId, label, value, TermId.CHARACTER_VARIABLE);
 		measurementData.setDataType(MeasurementDataTestDataInitializer.DATA_TYPE_CHAR);
 
+		return measurementData;
+	}
+	
+	public MeasurementData createMeasurementData(final String value, final MeasurementVariable mv) {
+		final MeasurementData measurementData = new MeasurementData("label", value);
+		measurementData.setMeasurementVariable(mv);
 		return measurementData;
 	}
 
