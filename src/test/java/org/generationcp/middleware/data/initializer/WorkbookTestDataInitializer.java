@@ -149,6 +149,14 @@ public class WorkbookTestDataInitializer {
 	public static final int PLANT_HEIGHT_UNIT_ERRORS_ID = 18210;
 	public static final int PLANT_HEIGHT_MEAN_ID = 18180;
 
+	public Workbook createWorkbook(StudyType studyType) {
+		Workbook workbook = new Workbook();
+		StudyDetails studyDetails = new StudyDetails();
+		studyDetails.setStudyType(studyType);
+		workbook.setStudyDetails(studyDetails);
+		return workbook;
+	}
+	
 	public static final String[] G_NAMES = {"TIANDOUGOU-9", "KENINKENI-27", "SM114-1A-1-1-1B", "SM114-1A-14-1-1B", "SM114-1A-361-1-1B",
 			"SM114-1A-86-1-1B", "SM114-1A-115-1-1B", "SM114-1A-281-1-1B", "SM114-1A-134-1-1B", "SM114-1A-69-1-1B", "SM114-1A-157-1-1B",
 			"SM114-1A-179-1-1B", "TIANDOUGOU-9", "SM114-1A-36-1-1B", "SM114-1A-201-1-1B", "SM114-1A-31-1-1B", "SM114-1A-353-1-1B",
