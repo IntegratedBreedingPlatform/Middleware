@@ -84,7 +84,7 @@ public class Person implements Comparable<Person>, Serializable {
 	public Person() {
 	}
 
-	public Person(String firstName, String middleName, String lastName) {
+	public Person(final String firstName, final String middleName, final String lastName) {
 		this.firstName = firstName;
 		this.middleName = middleName;
 		this.lastName = lastName;
@@ -96,7 +96,7 @@ public class Person implements Comparable<Person>, Serializable {
 	 * @return the copy of this Person object.
 	 */
 	public Person copy() {
-		Person person = new Person();
+		final Person person = new Person();
 		person.setFirstName(this.firstName);
 		person.setLastName(this.lastName);
 		person.setMiddleName(this.middleName);
