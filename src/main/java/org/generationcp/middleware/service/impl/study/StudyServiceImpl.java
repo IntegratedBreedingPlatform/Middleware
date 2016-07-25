@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
+import org.springframework.util.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.fest.util.Collections;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -239,7 +239,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 
 		List<List<String>> data = Lists.newArrayList();
-		if (!Collections.isNullOrEmpty(results)) {
+		if (!CollectionUtils.isEmpty(results)) {
 			data = Lists.transform(results, new Function<Object[], List<String>>() {
 				@Nullable
 				@Override
