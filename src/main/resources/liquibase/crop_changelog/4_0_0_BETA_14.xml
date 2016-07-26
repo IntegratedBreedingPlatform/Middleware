@@ -1,0 +1,51 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+
+	<changeSet author="chavdahard" id="beta14-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id = 1732 AND name = 'FEMALE PLOT';</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `is_obsolete`, `is_relationshiptype`) VALUES ('1732', '1000', 'FEMALE PLOT', 'Female Plot Number', '0', '0');
+		</sql>
+
+	</changeSet>
+
+	<changeSet author="chavdahard" id="beta14-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id = 1733 AND name = 'MALE PLOT';</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `is_obsolete`, `is_relationshiptype`) VALUES ('1733', '1000', 'MALE PLOT', 'Male Plot Number', '0', '0');
+		</sql>
+
+	</changeSet>
+
+	<changeSet author="chavdahard" id="beta14-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id = 1734 AND name = 'CROSSING DATE';</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `is_obsolete`, `is_relationshiptype`) VALUES ('1734', '1000', 'CROSSING DATE', 'Crossing date', '0', '0');
+		</sql>
+
+	</changeSet>
+
+	<changeSet author="chavdahard" id="beta14-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id = 1735 AND name = 'MALE NURSERY';</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `is_obsolete`, `is_relationshiptype`) VALUES ('1735', '1000', 'MALE NURSERY', 'Male Nursery', '0', '0');
+		</sql>
+
+	</changeSet>
+
+</databaseChangeLog>
