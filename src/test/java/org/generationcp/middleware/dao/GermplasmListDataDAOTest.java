@@ -172,8 +172,10 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 			Assert.assertEquals("Gid should be " + listData.getGid(), listData.getGid(), currentGermplasmListData.getGid());
 			Assert.assertEquals("Seed source should be " + listData.getSeedSource(), listData.getSeedSource(),
 					currentGermplasmListData.getSeedSource());
-			Assert.assertEquals("Female parent should be " + parentGermplasm.getPreferredName().getNval(), parentGermplasm
+			Assert.assertEquals("Female Parent designation should be " + parentGermplasm.getPreferredName().getNval(), parentGermplasm
 					.getPreferredName().getNval(), currentGermplasmListData.getFemaleParent());
+			Assert.assertEquals("Male Parent designation should be " + parentGermplasm.getPreferredName().getNval(), parentGermplasm
+					.getPreferredName().getNval(), currentGermplasmListData.getMaleParent());
 		}
 	}
 
