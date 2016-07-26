@@ -716,6 +716,17 @@ public class PoiUtil {
 		}
 	}
 
+	/**
+	 * Wrapper for {@link org.apache.poi.ss.usermodel.Row#getLastCellNum() getLastCellNum}
+	 * 
+	 * @param sheet
+	 * @param rowNo
+	 * @return
+	 */
+	public static int getLastCellNum(Sheet sheet, final int rowNo) {
+		return sheet.getRow(rowNo).getLastCellNum();
+	}
+
 	public static Integer getLastRowNum(Sheet sheet) {
 		Integer lastRowNum = sheet.getLastRowNum() + 1;
 
