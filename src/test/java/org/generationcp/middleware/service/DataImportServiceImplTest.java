@@ -98,6 +98,9 @@ public class DataImportServiceImplTest {
 				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, STUDY_NAME, TRIAL_NO,
 						IS_MULTIPLE_LOCATION);
 
+		Mockito.when(this.ontology
+				.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.TRIAL, WorkbookTestDataInitializer.NUMBER,
+						WorkbookTestDataInitializer.ENUMERATED)).thenReturn(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ENTRY,
 				WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED)).thenReturn(TermId.ENTRY_NO.getId());
 		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ID,
@@ -242,9 +245,9 @@ public class DataImportServiceImplTest {
 	}
 
 	@Test
-	public void testResetRequiredField() {
+	public void testSetRequiredField() {
 
-		this.dataImportService.resetRequiredField(TermId.ENTRY_NO.getId(), ontology, this.workbook.getFactors());
+		this.dataImportService.setRequiredField(TermId.ENTRY_NO.getId(), ontology, this.workbook.getFactors());
 
 		final Optional<MeasurementVariable> result =
 				this.dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), ontology, this.workbook.getFactors());
@@ -255,6 +258,57 @@ public class DataImportServiceImplTest {
 		} else {
 			Assert.fail("The variable entry_no should be found because it exists in the list");
 		}
+
+	}
+
+	@Test
+	public void testSetRequiredFieldsForTrial() {
+
+		Workbook trialWorkbook = WorkbookTestDataInitializer
+				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.T, STUDY_NAME, TRIAL_NO, true);
+
+		this.dataImportService.setRequiredFields(ontology, trialWorkbook);
+
+		Optional<MeasurementVariable> optionalPlotNo =
+				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NO.getId(), ontology, trialWorkbook.getFactors());
+		Optional<MeasurementVariable> optionalEntryNo =
+				dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), ontology, trialWorkbook.getFactors());
+		Optional<MeasurementVariable> optionalGid =
+				dataImportService.findMeasurementVariableByTermId(TermId.GID.getId(), ontology, trialWorkbook.getFactors());
+		Optional<MeasurementVariable> optionalTrialInstance = dataImportService
+				.findMeasurementVariableByTermId(TermId.TRIAL_INSTANCE_FACTOR.getId(), ontology, trialWorkbook.getTrialVariables());
+		Optional<MeasurementVariable> optionalPlotNNo =
+				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NNO.getId(), ontology, trialWorkbook.getFactors());
+
+		Assert.assertTrue(optionalPlotNo.get().isRequired());
+		Assert.assertTrue(optionalEntryNo.get().isRequired());
+		Assert.assertTrue(optionalGid.get().isRequired());
+		Assert.assertTrue(optionalTrialInstance.get().isRequired());
+		Assert.assertFalse(optionalPlotNNo.isPresent());
+
+	}
+
+	@Test
+	public void testSetRequiredFieldsForNursery() {
+
+		this.dataImportService.setRequiredFields(ontology, this.workbook);
+
+		Optional<MeasurementVariable> optionalPlotNo =
+				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NO.getId(), ontology, this.workbook.getFactors());
+		Optional<MeasurementVariable> optionalEntryNo =
+				dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), ontology, this.workbook.getFactors());
+		Optional<MeasurementVariable> optionalGid =
+				dataImportService.findMeasurementVariableByTermId(TermId.GID.getId(), ontology, this.workbook.getFactors());
+		Optional<MeasurementVariable> optionalTrialInstance = dataImportService
+				.findMeasurementVariableByTermId(TermId.TRIAL_INSTANCE_FACTOR.getId(), ontology, this.workbook.getTrialVariables());
+		Optional<MeasurementVariable> optionalPlotNNo =
+				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NNO.getId(), ontology, this.workbook.getFactors());
+
+		Assert.assertTrue(optionalPlotNo.get().isRequired());
+		Assert.assertTrue(optionalEntryNo.get().isRequired());
+		Assert.assertTrue(optionalGid.get().isRequired());
+		Assert.assertFalse(optionalTrialInstance.get().isRequired());
+		Assert.assertFalse(optionalPlotNNo.isPresent());
 
 	}
 

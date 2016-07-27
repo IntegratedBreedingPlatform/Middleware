@@ -199,6 +199,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// containing validation errors inside
 		parser.parseAndSetObservationRows(file, workbook, false);
 
+		this.setRequiredFields(ontology, workbook);
+
 		// separated the validation of observations from the parsing so that it can be used even in other parsing implementations (e.g., the
 		// one for Wizard style)
 		messages.addAll(this.checkForEmptyRequiredVariables(workbook));
@@ -634,7 +636,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 * @param ontology
 	 * @param list
 	 */
-	void resetRequiredField(final int termId, final OntologyDataManager ontology, final List<MeasurementVariable> list) {
+	void setRequiredField(final int termId, final OntologyDataManager ontology, final List<MeasurementVariable> list) {
 		final Optional<MeasurementVariable> result = this.findMeasurementVariableByTermId(termId, ontology, list);
 		if (result.isPresent()) {
 			result.get().setRequired(true);
@@ -714,7 +716,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		Set<Integer> gids = new HashSet<>();
 		for (MeasurementRow observationRow : observations) {
 			String gidString = observationRow.getMeasurementDataValue(gidLabel);
-			if (gidString != null) {
+			if (StringUtils.isNotBlank(gidString)) {
 				gids.add(Integer.valueOf(gidString));
 			}
 		}
@@ -823,15 +825,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		// the following code is a workaround versus the current state management in the ETL Wizard
 		// to re-set the "required" fields to true for checking later on
-
-		this.resetRequiredField(TermId.PLOT_NO.getId(), ontology, workbook.getFactors());
-		this.resetRequiredField(TermId.PLOT_NNO.getId(), ontology, workbook.getFactors());
-		this.resetRequiredField(TermId.ENTRY_NO.getId(), ontology, workbook.getFactors());
-		this.resetRequiredField(TermId.GID.getId(), ontology, workbook.getFactors());
-
-		if (!workbook.isNursery()) {
-			this.resetRequiredField(TermId.TRIAL_INSTANCE_FACTOR.getId(), ontology, workbook.getTrialVariables());
-		}
+		this.setRequiredFields(ontology, workbook);
 
 		final List<Message> requiredVariableValueErrors = this.checkForEmptyRequiredVariables(workbook);
 
@@ -840,6 +834,19 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		}
 
 		return errors;
+	}
+
+	protected void setRequiredFields(final OntologyDataManager ontology, final Workbook workbook) {
+
+		this.setRequiredField(TermId.PLOT_NO.getId(), ontology, workbook.getFactors());
+		this.setRequiredField(TermId.PLOT_NNO.getId(), ontology, workbook.getFactors());
+		this.setRequiredField(TermId.ENTRY_NO.getId(), ontology, workbook.getFactors());
+		this.setRequiredField(TermId.GID.getId(), ontology, workbook.getFactors());
+
+		if (!workbook.isNursery()) {
+			this.setRequiredField(TermId.TRIAL_INSTANCE_FACTOR.getId(), ontology, workbook.getTrialVariables());
+		}
+
 	}
 
 	private void checkForExistingTrialInstance(final OntologyDataManager ontology, final Workbook workbook,
