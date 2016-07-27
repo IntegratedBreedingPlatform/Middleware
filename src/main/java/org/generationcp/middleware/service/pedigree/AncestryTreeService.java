@@ -18,13 +18,13 @@ import com.jamonapi.MonitorFactory;
 
 public class AncestryTreeService {
 
-	private final FunctionBasedGuavaCacheLoader<CropGermplasmKey, Germplasm> germplasmCache;
+	private final GermplasmCache germplasmCache;
 	private final FunctionBasedGuavaCacheLoader<CropMethodKey, Method> methodCache;
 	private final String cropName;
 
-	public AncestryTreeService(final FunctionBasedGuavaCacheLoader<CropGermplasmKey, Germplasm> germplasmCropBasedCache, final FunctionBasedGuavaCacheLoader<CropMethodKey, Method> methodCropBasedCache,
+	public AncestryTreeService(final GermplasmCache germplasmAncestryCache, final FunctionBasedGuavaCacheLoader<CropMethodKey, Method> methodCropBasedCache,
 			final String cropName) {
-		this.germplasmCache = germplasmCropBasedCache;
+		this.germplasmCache = germplasmAncestryCache;
 		this.methodCache = methodCropBasedCache;
 		this.cropName = cropName;
 	}
@@ -48,7 +48,7 @@ public class AncestryTreeService {
 
 	private GermplasmNode buildGermplasmNode(final Integer gid, final int level) throws ExecutionException {
 		if (gid != null && gid > 0) {
-			final Optional<Germplasm> germplasm = this.germplasmCache.get(new CropGermplasmKey(this.cropName, gid));
+			final Optional<Germplasm> germplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, gid));
 			if(germplasm.isPresent()) {
 				final GermplasmNode germplasmNode = new GermplasmNode(germplasm.get());
 				final Optional<Method> method = this.methodCache.get(new CropMethodKey(this.cropName, germplasmNode.getGermplasm().getMethodId()));
@@ -69,6 +69,7 @@ public class AncestryTreeService {
 	}
 
 	private void buildAncestoryTree(final GermplasmNode germplasmNode, final int level) throws ExecutionException {
+
 		Preconditions.checkNotNull(germplasmNode);
 		
 		// If we have reached a negative level time to stop traversing the tree
@@ -89,8 +90,6 @@ public class AncestryTreeService {
 		
 		// Male germplasm to be traversed normally according to level
 		germplasmNode.setMaleParent(this.buildGermplasmNode(rootGermplasm.getGpid2(), level - 1));
-
-		
 		
 	}
 

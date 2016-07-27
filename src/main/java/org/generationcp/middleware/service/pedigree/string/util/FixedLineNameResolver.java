@@ -39,9 +39,8 @@ public class FixedLineNameResolver {
 			final Integer gid = germplasm.getGid();
 			if (gid != null && gid > 0) {
 				final Optional<List<Integer>> nameTypeOrder = nameTypeBasedCache.get(new CropNameTypeKey(crossExpansionProperties.getNameTypeOrder(cropName), cropName));
-				if(nameTypeOrder.isPresent()) {
-					final List<Name> namesByGID =
-							pedigreeDataManagerFactory.getGermplasmDataManager().getByGIDWithListTypeFilters(gid, null, nameTypeOrder.get());
+				if(nameTypeOrder.isPresent() && !nameTypeOrder.get().isEmpty()) {
+					final List<Name> namesByGID = germplasm.getNames();
 					for (final Integer nameType : nameTypeOrder.get()) {
 						if (namesByGID != null) {
 							for (final Name name : namesByGID) {

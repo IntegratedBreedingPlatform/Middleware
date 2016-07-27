@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.Random;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 
 import org.generationcp.middleware.IntegrationTestBase;
@@ -64,34 +63,40 @@ public class PedigreeAlgorithmTest extends IntegrationTestBase {
 
 	@Test
 	public void compareGermplasmGeneratedByTheNewAndOldAlgorithm() {
-		List<ListenableFuture<Void>> futures = new ArrayList<>();
 
-		futures.addAll(compareGermplasmGeneratedByDifferentAlgorithms("Backcross"));
-		futures.addAll(compareGermplasmGeneratedByDifferentAlgorithms("Single cross"));
-		futures.addAll(compareGermplasmGeneratedByDifferentAlgorithms("Double cross"));
-		futures.addAll(compareGermplasmGeneratedByDifferentAlgorithms("Three-way cross"));
-		futures.addAll(compareGermplasmGeneratedByDifferentAlgorithms("Female complex top cross"));
-		futures.addAll(compareGermplasmGeneratedByDifferentAlgorithms("Unknown derivative method"));
-		futures.addAll(compareGermplasmGeneratedByDifferentAlgorithms("Collection population"));
-		futures.addAll(compareGermplasmGeneratedByDifferentAlgorithms("Unknown generative method"));
+		compareGermplasmGeneratedByDifferentAlgorithms("Backcross");
+		compareGermplasmGeneratedByDifferentAlgorithms("Single cross");
+		compareGermplasmGeneratedByDifferentAlgorithms("Double cross");
+		compareGermplasmGeneratedByDifferentAlgorithms("Three-way cross");
+		compareGermplasmGeneratedByDifferentAlgorithms("Female complex top cross");
+		compareGermplasmGeneratedByDifferentAlgorithms("Unknown derivative method");
+		compareGermplasmGeneratedByDifferentAlgorithms("Collection population");
+		compareGermplasmGeneratedByDifferentAlgorithms("Unknown generative method");
 		// A breeding method found in a CIMMYT database
-		futures.addAll(compareGermplasmGeneratedByDifferentAlgorithms("Pool"));
-		futures.addAll(compareGermplasmGeneratedByDifferentAlgorithms("Selected pollen cross"));
-		
-		for (ListenableFuture<Void> listenableFuture : futures) {
-			try {
-				listenableFuture.get();
-			} catch (InterruptedException | ExecutionException e) {
-				Assert.fail("Exception while running compareGermplasmGeneratedByTheNewAndOldAlgorithm test." + e.getMessage());
-			}
-		}
+		compareGermplasmGeneratedByDifferentAlgorithms("Pool");
+		compareGermplasmGeneratedByDifferentAlgorithms("Selected pollen cross");
 
 	}
 
+//	@Test
+//	public void simpleTest() {
+//		
+//		for (int i = 35; i < 50000; i++) {
+//			SQLQuery createSQLQuery = this.sessionProvder.getSession().createSQLQuery("Select gid from germplsm g LIMIT " + ((i-1)*5000) + ",5000");
+//			final List<Integer> list = createSQLQuery.list();
+//			if(list.isEmpty()) {
+//				break;
+//			}
+//			pedigreeService.getCrossExpansions(new HashSet<>(list), null, newCrossExpansionProperties);
+//			System.out.println(i*5000 + " - Done");
+//		}
+//		
+//	}
+	
 	public List<ListenableFuture<Void>> compareGermplasmGeneratedByDifferentAlgorithms(final String methodName) {
 		
 		
-		final List<Germplasm> randomlySelectGermplasm = randomlySelectGermplasm(1, methodName);
+		final List<Germplasm> randomlySelectGermplasm = randomlySelectGermplasm(1000, methodName);
 		List<ListenableFuture<Void>> futures = new ArrayList<>();
 
 		for (final Germplasm germplasm : randomlySelectGermplasm) {
