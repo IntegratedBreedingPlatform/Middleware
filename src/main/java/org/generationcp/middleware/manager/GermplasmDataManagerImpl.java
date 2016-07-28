@@ -56,6 +56,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -1401,21 +1403,28 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	 */
 	@Override
 	public List<Germplasm> getGermplasmWithAllNamesAndAncestry(Set<Integer> gids, int numberOfLevelsToTraverse) {
-		final StringBuilder commaSeperatedListOfGids = getGidsAsCommaSeperatedList(gids);
+		final Monitor monitor = MonitorFactory.start("org.generationcp.middleware.manager.GermplasmDataManagerImpl"
+				+ ".getGermplasmWithAllNamesAndAncestry(Set<Integer> - SetSize("+gids.size()+") , int)");
 
-		final SQLQuery storedProcedure =
-				this.getActiveSession().createSQLQuery("CALL getGermplasmWithNamesAndAncestry(:gids, :numberOfLevelsToTraverse) ");
-		storedProcedure.setParameter("gids", commaSeperatedListOfGids.toString());
-		storedProcedure.setParameter("numberOfLevelsToTraverse", numberOfLevelsToTraverse);
-
-		storedProcedure.addEntity("g", Germplasm.class);
-		storedProcedure.addJoin("n", "g.names");
-		// Be very careful changing anything here.
-		// The entity has been added again because the distinct root entity works on the 
-		// Last added entity
-		storedProcedure.addEntity("g", Germplasm.class);
-		storedProcedure.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-		return storedProcedure.list();
+		try {
+			final StringBuilder commaSeperatedListOfGids = getGidsAsCommaSeperatedList(gids);
+	
+			final SQLQuery storedProcedure =
+					this.getActiveSession().createSQLQuery("CALL getGermplasmWithNamesAndAncestry(:gids, :numberOfLevelsToTraverse) ");
+			storedProcedure.setParameter("gids", commaSeperatedListOfGids.toString());
+			storedProcedure.setParameter("numberOfLevelsToTraverse", numberOfLevelsToTraverse);
+	
+			storedProcedure.addEntity("g", Germplasm.class);
+			storedProcedure.addJoin("n", "g.names");
+			// Be very careful changing anything here.
+			// The entity has been added again because the distinct root entity works on the 
+			// Last added entity
+			storedProcedure.addEntity("g", Germplasm.class);
+			storedProcedure.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+			return storedProcedure.list();
+		} finally {
+			monitor.stop();
+		}
 
 	}
 
