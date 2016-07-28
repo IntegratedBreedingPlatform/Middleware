@@ -142,6 +142,37 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 			final String expectedPreferredName = "GP-VARIETY-" + listDataProject.getEntryId();
 			Assert.assertEquals("The preferred name must be " + expectedPreferredName, expectedPreferredName,
 					listDataProject.getDesignation());
+			//test at least one of the records for the other fields
+			if(listDataProject.getListDataProjectId() == testListDataProject.getListDataProjectId()) {
+				Assert.assertEquals("The entryId must be " + testListDataProject.getEntryId(), testListDataProject.getEntryId(),
+						listDataProject.getEntryId());
+				Assert.assertEquals("The designation must be " + testListDataProject.getDesignation(), testListDataProject.getDesignation(),
+						listDataProject.getDesignation());
+				Assert.assertEquals("The groupName must be " + testListDataProject.getGroupName(), testListDataProject.getGroupName(),
+						listDataProject.getGroupName());
+				Assert.assertEquals("The femaleParent must be " + testListDataProject.getFemaleParent(), testListDataProject.getFemaleParent(),
+						listDataProject.getFemaleParent());
+				Assert.assertEquals("The fgid must be " + testListDataProject.getFgid(), testListDataProject.getFgid(),
+						listDataProject.getFgid());
+				Assert.assertEquals("The maleParent must be " + testListDataProject.getMaleParent(), testListDataProject.getMaleParent(),
+						listDataProject.getMaleParent());
+				Assert.assertEquals("The mgid must be " + testListDataProject.getMgid(), testListDataProject.getMgid(),
+						listDataProject.getMgid());
+				Assert.assertEquals("The groupId must be " + testListDataProject.getGroupId(), testListDataProject.getGroupId(),
+						listDataProject.getGroupId());
+				Assert.assertEquals("The germplasmId must be " + testListDataProject.getGermplasmId(), testListDataProject.getGermplasmId(),
+						listDataProject.getGermplasmId());
+				Assert.assertEquals("The seedSource must be " + testListDataProject.getSeedSource(), testListDataProject.getSeedSource(),
+						listDataProject.getSeedSource());
+				Assert.assertEquals("The duplicate must be " + testListDataProject.getDuplicate(), testListDataProject.getDuplicate(),
+						listDataProject.getDuplicate());
+				Assert.assertEquals("The duplicate must be " + testListDataProject.getDuplicate(), testListDataProject.getDuplicate(),
+						listDataProject.getDuplicate());
+				Assert.assertEquals("The checkType must be " + testListDataProject.getCheckType(), testListDataProject.getCheckType(),
+						listDataProject.getCheckType());
+				Assert.assertEquals("The entryCode must be " + testListDataProject.getEntryCode(), testListDataProject.getEntryCode(),
+						listDataProject.getEntryCode());
+			}
 		}
 		
 	}
