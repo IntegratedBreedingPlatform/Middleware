@@ -748,7 +748,7 @@ public interface FieldbookService {
 	 */
 	List<ListDataProject> getListDataProject(int listId);
 
-	ListDataProject getListDataProjectByStudy(int projectId, GermplasmListType type, int plotId);
+	ListDataProject getListDataProjectByStudyListTypeAndPlotNo(int projectId, GermplasmListType type, int plotId);
 
 	ListDataProject getListDataProjectByListIdAndEntryNo(int listId, int entryNo);
 

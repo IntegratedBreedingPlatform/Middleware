@@ -97,10 +97,10 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByStudy() {
+	public void testGetByStudyListTypeAndPlotNo() {
 		final int studyId = this.createNurseryTestData();
 		final int plotNo = 1;
-		final ListDataProject listDataProject = this.listDataProjectDAO.getByStudy(studyId, GermplasmListType.NURSERY, plotNo);
+		final ListDataProject listDataProject = this.listDataProjectDAO.getByStudyListTypeAndPlotNo(studyId, GermplasmListType.NURSERY, plotNo);
 		Assert.assertNotNull("The list data project should not be null", listDataProject);
 		final String expectedPreferredName = "GP-VARIETY-1";
 		Assert.assertEquals("The preferred name must be " + expectedPreferredName, expectedPreferredName,
@@ -131,7 +131,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		//setup data
 		final int studyId = this.createNurseryTestData();
 		final int plotNo = 1;
-		final ListDataProject testListDataProject = this.listDataProjectDAO.getByStudy(studyId, GermplasmListType.NURSERY, plotNo);
+		final ListDataProject testListDataProject = this.listDataProjectDAO.getByStudyListTypeAndPlotNo(studyId, GermplasmListType.NURSERY, plotNo);
 		final int listId = testListDataProject.getList().getId();
 		//get result of method being tested
 		final List<ListDataProject> listDataProjects = this.listDataProjectDAO.getListDataProjectWithParents(listId);

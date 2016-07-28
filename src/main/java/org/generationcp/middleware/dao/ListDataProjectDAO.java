@@ -100,7 +100,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 	}
 
 	@SuppressWarnings({"rawtypes"})
-	public ListDataProject getByStudy(final int studyId, final GermplasmListType listType, final int plotNo)
+	public ListDataProject getByStudyListTypeAndPlotNo(final int studyId, final GermplasmListType listType, final int plotNo)
 			throws MiddlewareQueryException {
 		try {
 
