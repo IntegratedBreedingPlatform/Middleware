@@ -7,8 +7,13 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<include file="workbench_changelog/4_0_0_BETA_09.xml" relativeToChangelogFile="true"/>
-	<include file="workbench_changelog/4_0_0_BETA_12.xml" relativeToChangelogFile="true"/>
-	<include file="workbench_changelog/4_0_0_BETA_14.xml" relativeToChangelogFile="true"/>
-	
+	<changeSet author="abhishekptl" id="beta14-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'dataset_importer'</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE workbench_tool SET path='Fieldbook/etl/' WHERE name='dataset_importer'
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
