@@ -139,7 +139,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		//verify result
 		Assert.assertNotNull("The list should not be null", listDataProjects);
 		for (final ListDataProject listDataProject : listDataProjects) {
-			final String expectedPreferredName = "GP-VARIETY-" + listDataProject.getEntryId();
+			final String expectedPreferredName = DataSetupTest.GERMPLSM_PREFIX + listDataProject.getEntryId();
 			Assert.assertEquals("The preferred name must be " + expectedPreferredName, expectedPreferredName,
 					listDataProject.getDesignation());
 			//test at least one of the records for the other fields
