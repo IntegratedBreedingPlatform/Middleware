@@ -717,14 +717,25 @@ public class PoiUtil {
 	}
 
 	/**
-	 * Wrapper for {@link org.apache.poi.ss.usermodel.Row#getLastCellNum() getLastCellNum}
+	 * Gets the 1-based index of the last cell contained in this row or -1 if the row does not contain any cells.
 	 * 
 	 * @param sheet
 	 * @param rowNo
-	 * @return
+	 * @return 
 	 */
-	public static int getLastCellNum(Sheet sheet, final int rowNo) {
-		return sheet.getRow(rowNo).getLastCellNum();
+	public static int getLastCellNum(final Sheet sheet, final int rowNo) {
+		if (sheet == null || sheet.getRow(rowNo) == null) {
+			return -1;
+		}
+		short index = sheet.getRow(rowNo).getLastCellNum();
+		while (index > 0 && (sheet.getRow(rowNo).getCell(index - 1) == null
+				|| StringUtils.isBlank(sheet.getRow(rowNo).getCell(index - 1).getStringCellValue()))) {
+			index--;
+		}
+		if (index == 0) {
+			return -1;
+		}
+		return index;
 	}
 
 	public static Integer getLastRowNum(Sheet sheet) {
