@@ -13,6 +13,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.Name;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -105,8 +106,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		try {
 
 			final String queryStr =
-					"select ldp.listdata_project_id, ldp.list_id, ldp.germplasm_id, ldp.check_type, ldp.entry_id,"
-							+ " ldp.entry_code, ldp.seed_source, n.nval as designation, ldp.group_name, ldp.duplicate_notes"
+					"select {ldp.*}, {n.*}"
 							+ " FROM nd_experiment_project neproj," + " nd_experimentprop nd_ep, nd_experiment_stock nd_stock, stock,"
 							+ " listdata_project ldp LEFT OUTER JOIN names n on n.gid = ldp.germplasm_id and n.nstat = 1,"
 							+ " project_relationship pr, projectprop pp, listnms nms" + " WHERE nd_ep.type_id IN (:PLOT_NO_TERM_IDS)"
@@ -123,6 +123,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryStr);
 			query.addEntity("ldp", ListDataProject.class);
+			query.addEntity("n", Name.class);
 			query.setParameter("LIST_TYPE", listType.name());
 			query.setParameter("STUDY_ID", studyId);
 			query.setParameter("PLOT_NO", plotNo);
@@ -131,7 +132,11 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 			final List resultList = query.list();
 			if (!resultList.isEmpty()) {
-				return (ListDataProject) resultList.get(0);
+				final Object[] result = (Object[]) resultList.get(0);
+				final ListDataProject listDataProject = (ListDataProject) result[0];
+				final Name prefName = (Name) result[1];
+				listDataProject.setDesignation(prefName.getNval());
+				return listDataProject;
 			}
 
 		} catch (final HibernateException e) {
