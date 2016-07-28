@@ -29,13 +29,10 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.SimpleExpression;
 import org.hibernate.criterion.Subqueries;
-import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 
 /**
@@ -45,14 +42,12 @@ import org.hibernate.type.IntegerType;
 public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	public static final Integer STATUS_DELETED = 9;
-	protected static final List<SimpleExpression> RETRICTED_LIST = new ArrayList<SimpleExpression>();
+	protected static final Criterion RESTRICTED_LIST;
 
 	static {
-		GermplasmListDAO.RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
-		GermplasmListDAO.RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
-		GermplasmListDAO.RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
-		GermplasmListDAO.RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
-		GermplasmListDAO.RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.CROSSES.toString()));
+		RESTRICTED_LIST = Restrictions
+				.not(Restrictions.in("type", new String[] {GermplasmListType.NURSERY.toString(), GermplasmListType.TRIAL.toString(),
+						GermplasmListType.CHECK.toString(), GermplasmListType.ADVANCED.toString(), GermplasmListType.CROSSES.toString()}));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -322,7 +317,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		try {
 			if (parentId != null) {
 				final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
-				criteria.add(Restrictions.eq("parent", new GermplasmList(parentId)));
+				criteria.add(Restrictions.eq("parent.id", parentId));
 				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
 
 				this.addCriteriaForProgramUUIDInLists(programUUID, criteria);
@@ -338,7 +333,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			this.logAndThrowException(
 					"Error with getByParentFolderId(parentId=" + parentId + ") query from GermplasmList: " + e.getMessage(), e);
 		}
-		return new ArrayList<GermplasmList>();
+		return new ArrayList<>();
 	}
 
 	@Nullable
@@ -379,7 +374,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		try {
 			if (parentId != null) {
 				final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
-				criteria.add(Restrictions.eq("parent", new GermplasmList(parentId)));
+				criteria.add(Restrictions.eq("parent.id", parentId));
 				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
 
 				this.addCriteriaForProgramUUIDInLists(programUUID, criteria);
@@ -397,13 +392,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	protected void hideSnapshotListTypes(final Criteria criteria) {
-		for (final SimpleExpression restriction : this.getRestrictedSnapshopTypes()) {
-			criteria.add(restriction);
-		}
+		criteria.add(this.getRestrictedSnapshopTypes());
+
 	}
 
-	protected List<SimpleExpression> getRestrictedSnapshopTypes() {
-		return GermplasmListDAO.RETRICTED_LIST;
+	protected Criterion getRestrictedSnapshopTypes() {
+		return GermplasmListDAO.RESTRICTED_LIST;
 	}
 
 	/**
