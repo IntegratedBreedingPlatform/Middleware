@@ -495,12 +495,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				// setting variable studies
 				variable.setStudies((int) this.getDmsProjectDao().countByVariable(id));
 
-				// setting variable observations, first observations will be null so set it to 0
+				// setting variable observations to 0 and remove heavy calculation queries not needed to determine if it is editable or not
 				variable.setObservations(0);
-				for (final VariableType v : variable.getVariableTypes()) {
-					final long observation = this.getExperimentDao().countByObservedVariable(id, v.getId());
-					variable.setObservations((int) (variable.getObservations() + observation));
-				}
+
 			} else {
 				final int unknownUsage = -1;
 				variable.setStudies(unknownUsage);
