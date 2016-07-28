@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Lists;
-import org.springframework.util.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.StudyType;
@@ -38,13 +35,13 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
-
-import javax.annotation.Nullable;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
@@ -229,56 +226,81 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		final List<Object[]> results = this.studyMeasurements.getAllStudyDetailsAsTable(studyIdentifier, sortedTraits);
 
-		final List<Integer> observationVariableDbId = new ArrayList<Integer>();
+		final List<Integer> observationVariableDbIds = new ArrayList<Integer>();
 
-		final List<String> observationVariableName = new ArrayList<String>();
+		final List<String> observationVariableNames = new ArrayList<String>();
 
 		for (final Iterator<TraitDto> iterator = sortedTraits.iterator(); iterator.hasNext();) {
 			final TraitDto traitDto = iterator.next();
-			observationVariableDbId.add(traitDto.getTraitId());
-			observationVariableName.add(traitDto.getTraitName());
+			observationVariableDbIds.add(traitDto.getTraitId());
+			observationVariableNames.add(traitDto.getTraitName());
 		}
 
 		List<List<String>> data = Lists.newArrayList();
+
+
 		if (!CollectionUtils.isEmpty(results)) {
-			data = Lists.transform(results, new Function<Object[], List<String>>() {
 
-				@Nullable
-				@Override
-				public List<String> apply(final Object[] row) {
-					final List<String> entry = Lists.newArrayList();
-					// plotId
-					entry.add((String) row[8]);
+			for (Object[] row : results) {
+				final List<String> entry = Lists.newArrayList();
 
-					// block
-					entry.add((String) row[9]);
+				// trial instance
+				entry.add((String) row[1]);
+				entry.add("StudyInstance-" + (String) row[1]);
 
-					// rep
-					entry.add((String) row[7]);
+				// gid
+				entry.add(String.valueOf(row[3]));
 
-					// gid
-					entry.add(String.valueOf(row[3]));
+				// germplasm Name/designation
+				entry.add(String.valueOf(row[4]));
 
-					// phenotypic values
-					int counterTwo = 1;
-					for (int i = 0; i < traits.size(); i++) {
-						final Object rowValue = row[9 + counterTwo];
+				// observation Db Id = nd_experiment_id
+				entry.add(String.valueOf(row[0]));
 
-						if (rowValue != null) {
-							entry.add(String.valueOf(rowValue));
-						} else {
-							entry.add((String) rowValue);
-						}
+				// PlotNumber
+				entry.add((String) row[8]);
 
-						counterTwo += 2;
+				// replication number
+				entry.add((String) row[7]);
+
+				// blockNumber
+				entry.add((String) row[9]);
+
+				// Timestamp
+				entry.add("UnknownTimestamp");
+
+				// entry type
+				entry.add(String.valueOf(row[2]));
+
+				// X = row
+				entry.add(String.valueOf(row[10]));
+
+				// Y = col
+				entry.add(String.valueOf(row[11]));
+
+				// phenotypic values
+				int counterTwo = 1;
+				for (int i = 0; i < traits.size(); i++) {
+					final Object rowValue = row[11 + counterTwo];
+
+					if (rowValue != null) {
+						entry.add(String.valueOf(rowValue));
+					} else {
+						entry.add((String) rowValue);
 					}
-					return entry;
+
+					counterTwo += 2;
 				}
-			});
+				data.add(entry);
+			}
 		}
 
-		final StudyDetailDto dto = new StudyDetailDto().setStudyDbId(studyIdentifier).setObservationVariableDbId(observationVariableDbId)
-				.setObservationVariableName(observationVariableName).setData(data);
+		final StudyDetailDto dto = new StudyDetailDto().setStudyDbId(studyIdentifier).setObservationVariableDbIds(observationVariableDbIds)
+				.setObservationVariableNames(observationVariableNames).setData(data);
+
+		dto.setHeaderRow(Lists.newArrayList("locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
+				"plotName", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y"));
+
 		return dto;
 	}
 }

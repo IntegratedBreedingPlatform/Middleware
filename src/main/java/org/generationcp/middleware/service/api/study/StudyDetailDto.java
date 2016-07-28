@@ -6,10 +6,12 @@ public class StudyDetailDto {
 	
     private Integer studyDbId;
 
-    private List<Integer> observationVariableDbId;
+	private List<Integer> observationVariableDbIds;
     
-    private List<String> observationVariableName;
+	private List<String> observationVariableNames;
     
+	private List<String> headerRow;
+
     private List<List<String>> data;
 
 	public Integer getStudyDbId() {
@@ -21,22 +23,30 @@ public class StudyDetailDto {
 		return this;
 	}
 
-	public List<Integer> getObservationVariableDbId() {
-		return observationVariableDbId;
+	public List<Integer> getObservationVariableDbIds() {
+		return observationVariableDbIds;
 	}
 
-	public StudyDetailDto setObservationVariableDbId(final List<Integer> observationVariableDbId) {
-		this.observationVariableDbId = observationVariableDbId;
+	public StudyDetailDto setObservationVariableDbIds(List<Integer> observationVariableDbIds) {
+		this.observationVariableDbIds = observationVariableDbIds;
 		return this;
 	}
 
-	public List<String> getObservationVariableName() {
-		return observationVariableName;
+	public List<String> getObservationVariableNames() {
+		return observationVariableNames;
 	}
 
-	public StudyDetailDto setObservationVariableName(final List<String> observationVariableName) {
-		this.observationVariableName = observationVariableName;
+	public StudyDetailDto setObservationVariableNames(List<String> observationVariableNames) {
+		this.observationVariableNames = observationVariableNames;
 		return this;
+	}
+
+	public List<String> getHeaderRow() {
+		return headerRow;
+	}
+
+	public void setHeaderRow(List<String> headerRow) {
+		this.headerRow = headerRow;
 	}
 
 	public List<List<String>> getData() {

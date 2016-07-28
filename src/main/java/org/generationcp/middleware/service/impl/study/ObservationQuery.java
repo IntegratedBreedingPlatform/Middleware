@@ -35,6 +35,14 @@ class ObservationQuery {
 			+ "                INNER JOIN\n" + "            cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id\n" + "        WHERE\n"
 			+ "            ndep.nd_experiment_id = ep.nd_experiment_id\n" + "                AND ispcvt.name = 'BLOCK_NO') BLOCK_NO\n";
 
+	final String rowNumberText = "(SELECT  ndep.value   FROM    nd_experimentprop ndep"
+			+ "            INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id"
+			+ "            WHERE ndep.nd_experiment_id = ep.nd_experiment_id  AND ispcvt.name = 'ROW') ROW_NO";
+
+	final String columnNumberText = "(SELECT  ndep.value   FROM    nd_experimentprop ndep"
+			+ "            INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id"
+			+ "            WHERE ndep.nd_experiment_id = ep.nd_experiment_id  AND ispcvt.name = 'COL') COL_NO";
+
 	/**
 	 * Constructs a query that will enable us to retrieve study measurement data.
 	 * 
@@ -55,7 +63,7 @@ class ObservationQuery {
 				fromText + whereText + orderByText;
 	}
 
-	String getObservationQueryWithBlockNo(final List<TraitDto> traits) {
+	String getObservationQueryWithBlockRowCol(final List<TraitDto> traits) {
 
 		final String columnNamesFromTraitNames = this.getColumnNamesFromTraitNames(traits);
 		final String orderByTraitId = getOrderByTraitId(traits);
@@ -64,7 +72,7 @@ class ObservationQuery {
 
 		final String orderByText = getOrderByExpression(traits, orderByTraitId);
 
-		return selectText + ", " + blockNoText + columnNamesFromTraitNames +
+		return selectText + ", " + blockNoText + ", " + rowNumberText + "," + columnNumberText + columnNamesFromTraitNames +
 
 				fromText + whereText + orderByText;
 	}

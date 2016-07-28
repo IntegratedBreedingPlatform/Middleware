@@ -135,8 +135,8 @@ public class StudyMeasurements {
 	
 	@SuppressWarnings("unchecked")
 	public List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier, final List<TraitDto> traits) {
-		final String generateQuery = this.measurementQuery.getObservationQueryWithBlockNo(traits);
-		final SQLQuery createSQLQuery = this.createQueryAndAddScalarWithBlocNo(traits, generateQuery);
+		final String generateQuery = this.measurementQuery.getObservationQueryWithBlockRowCol(traits);
+		final SQLQuery createSQLQuery = this.createQueryAndAddScalarWithBlockRowCol(traits, generateQuery);
 
 		this.setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery);
 
@@ -144,11 +144,13 @@ public class StudyMeasurements {
 		return result;
 	}
 
-	private SQLQuery createQueryAndAddScalarWithBlocNo(final List<TraitDto> traits, final String generateQuery) {
+	private SQLQuery createQueryAndAddScalarWithBlockRowCol(final List<TraitDto> traits, final String generateQuery) {
 		final SQLQuery createSQLQuery = this.session.createSQLQuery(generateQuery);
 
 		this.addScalar(createSQLQuery);
 		createSQLQuery.addScalar("BLOCK_NO");
+		createSQLQuery.addScalar("ROW_NO");
+		createSQLQuery.addScalar("COL_NO");
 		this.addScalarForTraits(traits, createSQLQuery);
 		return createSQLQuery;
 	}
