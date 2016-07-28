@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class ListDataProjectDAOTest extends IntegrationTestBase {
 
+	private static final String GERMPLASM_PREFERRED_NAME_PREFIX = DataSetupTest.GERMPLSM_PREFIX + "PR-";
 	private ListDataProjectDAO listDataProjectDAO;
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 	private DataSetupTest dataSetupTest;
@@ -102,7 +103,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		final int plotNo = 1;
 		final ListDataProject listDataProject = this.listDataProjectDAO.getByStudyListTypeAndPlotNo(studyId, GermplasmListType.NURSERY, plotNo);
 		Assert.assertNotNull("The list data project should not be null", listDataProject);
-		final String expectedPreferredName = "GP-VARIETY-1";
+		final String expectedPreferredName = GERMPLASM_PREFERRED_NAME_PREFIX + plotNo;
 		Assert.assertEquals("The preferred name must be " + expectedPreferredName, expectedPreferredName,
 				listDataProject.getDesignation());
 	}
@@ -110,7 +111,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 	private int createNurseryTestData() {
 		final String programUUID = "884fefcc-1cbd-4e0f-9186-ceeef3aa3b78";
 		final Integer[] gids =
-				this.germplasmTestDataGenerator.createGermplasmRecords(DataSetupTest.NUMBER_OF_GERMPLASM, DataSetupTest.GERMPLSM_PREFIX);
+				this.germplasmTestDataGenerator.createGermplasmRecords(DataSetupTest.NUMBER_OF_GERMPLASM, GERMPLASM_PREFERRED_NAME_PREFIX);
 		final int nurseryId = this.dataSetupTest.createNursery(programUUID, gids);
 		this.createNonpreferredNamesOfGermplasms(gids);
 		return nurseryId;
