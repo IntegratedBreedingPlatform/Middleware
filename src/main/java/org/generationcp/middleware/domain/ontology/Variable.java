@@ -176,7 +176,7 @@ public class Variable extends Term {
 
 		if (this.variableTypes != null) {
 			Debug.println(indent + 3, "Variable Types:" + this.variableTypes);
-	}
+		}
 
 		if (this.property != null) {
 			Debug.println(indent + 3, "property:" + this.property);
