@@ -71,6 +71,12 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	@Column(name = "duplicate_notes")
 	private String duplicate;
 
+	@Column(name = "notes")
+	private String notes;
+
+	@Column(name = "crossing_date")
+	private String crossingDate;
+
 	/***
 	 * The following will only be field when getListDataProjectWithParents() is called, otherwise, it will always be null
 	 */
@@ -234,6 +240,22 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 		this.duplicate = duplicate;
 	}
 
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
+	}
+
+	public String getCrossingDate() {
+		return crossingDate;
+	}
+
+	public void setCrossingDate(String crossingDate) {
+		this.crossingDate = crossingDate;
+	}
+
 	@Override
 	public String getFemaleParent() {
 		return this.femaleParent;
@@ -289,6 +311,8 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
         sb.append(", maleParent='").append(maleParent).append('\'');
         sb.append(", mgid=").append(mgid);
         sb.append(", checkTypeDescription='").append(checkTypeDescription).append('\'');
+        sb.append(", notes='").append(notes).append('\'');
+        sb.append(", crossingDate='").append(crossingDate).append('\'');
 		sb.append('}');
         return sb.toString();
     }
