@@ -67,15 +67,7 @@ public interface OntologyVariableDataManager {
 	 */
 	void deleteVariable(Integer variableId);
 
-	/**
-	 * This function defines total observations carried from this variable.
-	 *
-	 * @param variableId variable id to get observations
-	 * @return Total observations
-	 */
-	Integer getVariableObservations(int variableId);
-
-	/**
+  	/**
 	 * This function defines total studies taken from this variable.
 	 *
 	 * @param variableId variable id to get observations

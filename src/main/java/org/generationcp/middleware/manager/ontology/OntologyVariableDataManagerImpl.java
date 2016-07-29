@@ -729,9 +729,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		this.checkTermIsVariable(term);
 
 		// check usage
-		final Integer usage = this.getVariableObservations(variableId);
+		final Boolean usage = this.isVariableUsed(variableId);
 
-		if (usage > 0) {
+		if (usage) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.CAN_NOT_DELETE_USED_VARIABLE);
 		}
 
@@ -765,19 +765,6 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error at updateVariable :" + e.getMessage(), e);
 		}
-	}
-
-	@Override
-	public Integer getVariableObservations(final int variableId) {
-
-		final String numOfProjectsWithVariable = "SELECT count(pp.project_id)  FROM projectprop pp "
-				+ " WHERE pp.type_id = " + TermId.STANDARD_VARIABLE.getId() + " AND pp.value = :variableId "
-				+ " AND pp.project_id not in ( SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = pp.project_id "
-				+ " AND stat.type_id = " + TermId.STUDY_STATUS.getId() + " AND value = " + TermId.DELETED_STUDY.getId() + ") ";
-
-		final SQLQuery query = this.getActiveSession().createSQLQuery(numOfProjectsWithVariable);
-		query.setParameter("variableId", variableId);
-		return ((BigInteger) query.uniqueResult()).intValue();
 	}
 
 	// TODO: Follow DmsProjectDao countExperimentByVariable. This requires STORED_IN and that needs to deprecated.
