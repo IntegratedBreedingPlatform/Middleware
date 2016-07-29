@@ -244,9 +244,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 			for (Object[] row : results) {
 				final List<String> entry = Lists.newArrayList();
 
-				// trial instance
+				// locationDbId = trial instance number
+				// In brapi this will equate to studyDbId
+				// TODO Update query and use nd_geolocation_id instead. For now instance number will be ok.
 				entry.add((String) row[1]);
-				entry.add("StudyInstance-" + (String) row[1]);
+
+				// locationName = For now just concat instance number with some prefix
+				// TODO Could also use LOCATION_ABBR or LOCATION_NAME from nd_geolocationprops if present.
+				entry.add("Study-" + (String) row[1]);
 
 				// gid
 				entry.add(String.valueOf(row[3]));
@@ -299,7 +304,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				.setObservationVariableNames(observationVariableNames).setData(data);
 
 		dto.setHeaderRow(Lists.newArrayList("locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
-				"plotName", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y"));
+				"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y"));
 
 		return dto;
 	}
