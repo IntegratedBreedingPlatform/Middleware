@@ -44,6 +44,8 @@ public class Variable extends Term {
 
 	private Boolean hasPair;
 
+  	private Boolean hasUsage;
+
 	public Variable() {
 		this.setVocabularyId(CvId.VARIABLES.getId());
 	}
@@ -147,6 +149,14 @@ public class Variable extends Term {
 		this.hasPair = hasPair;
 	}
 
+  	public Boolean getHasUsage() {
+		return hasUsage;
+  	}
+
+  	public void setHasUsage(Boolean hasUsage) {
+		this.hasUsage = hasUsage;
+  	}
+
 	@Override
 	public String toString() {
 		return "Variable{" + "alias='" + this.alias + '\'' + ", variableTypes=" + this.variableTypes + ", property=" + this.property
@@ -166,7 +176,7 @@ public class Variable extends Term {
 
 		if (this.variableTypes != null) {
 			Debug.println(indent + 3, "Variable Types:" + this.variableTypes);
-		}
+	}
 
 		if (this.property != null) {
 			Debug.println(indent + 3, "property:" + this.property);

@@ -492,11 +492,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			variable.setIsFavorite(programFavorite != null);
 
 			if (calculateVariableUsage) {
-				// setting variable studies
-				variable.setStudies((int) this.getDmsProjectDao().countByVariable(id));
-
-				// setting variable observations to 0 and remove heavy calculation queries not needed to determine if it is editable or not
+			  	// setting variable observations and study to 0 and remove heavy calculation queries not needed to determine if it is editable or not
+				variable.setStudies(0);
 				variable.setObservations(0);
+
+			  	variable.setHasUsage(this.isVariableUsed(id));
 
 			} else {
 				final int unknownUsage = -1;
@@ -821,7 +821,20 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		return null;
 	}
 
-	private void updateVariableSynonym(final CVTerm term, final String newVariableName) {
+  	@Override
+  	public boolean isVariableUsed(final int variableId) {
+	  	final String variableUsageCount = "SELECT *  FROM projectprop pp "
+			  + " WHERE pp.type_id = " + TermId.STANDARD_VARIABLE.getId() + " AND pp.value = :variableId "
+			  + " AND pp.project_id not in ( SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = pp.project_id "
+			  + " AND stat.type_id = " + TermId.STUDY_STATUS.getId() + " AND value = " + TermId.DELETED_STUDY.getId() + ") limit 1";
+
+	  	final SQLQuery query = this.getActiveSession().createSQLQuery(variableUsageCount);
+	  	query.setParameter("variableId", variableId);
+	  	List list = query.list();
+	  	return list.size() > 0;
+  	}
+
+  private void updateVariableSynonym(final CVTerm term, final String newVariableName) {
 		final String oldVariableName = term.getName().trim();
 		final String newName = newVariableName.trim();
 

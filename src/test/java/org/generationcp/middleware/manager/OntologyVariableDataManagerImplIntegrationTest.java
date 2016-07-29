@@ -102,6 +102,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 		Assert.assertEquals("Study usage should be 0", new Integer(0), variable.getStudies());
 		Assert.assertEquals("Observation usage should be 0", new Integer(0), variable.getObservations());
+	  	Assert.assertFalse("Variable usage should be false",  variable.getHasUsage());
 		Assert.assertEquals("Crop ontology id should be " + OntologyVariableDataManagerImplIntegrationTest.CROP_ONTOLOGY_ID,
 				OntologyVariableDataManagerImplIntegrationTest.CROP_ONTOLOGY_ID, variable.getProperty().getCropOntologyId());
 	}
@@ -216,6 +217,12 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 	}
 
+  	@Test
+	public void testIsVariableUsedReturnsFalse() throws Exception{
+	  boolean hasUsage = this.variableManager.isVariableUsed(testVariableInfo.getId());
+	  Assert.assertFalse("Variable should have no usage", hasUsage);
+	}
+
 	/**
 	 * All test depend on add variable, scale, property, method
 	 *
@@ -263,6 +270,8 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.testVariableInfo.addVariableType(VariableType.GERMPLASM_DESCRIPTOR);
 		this.testVariableInfo.setIsFavorite(true);
 		this.variableManager.addVariable(this.testVariableInfo);
+
+
 	}
 
 	protected void createTestVariableWithCategoricalValue() {
