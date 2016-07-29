@@ -13,7 +13,7 @@
 			</not>
 		</preConditions>
 		<addColumn tableName="listdata_project">
-			<column name="crossing_date" type="varchar(255)" />
+			<column name="crossing_date" type="INT" />
 		</addColumn>
 	</changeSet>
 	<changeSet author="nahuel" id="2">

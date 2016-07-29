@@ -111,7 +111,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	private String notes;
 
 	@Transient
-	private String crossingDate;
+	private Integer crossingDate;
 
 	/***
 	 * The following will only be field when we are getting the parents, otherwise, they won't be set
@@ -173,7 +173,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	public GermplasmListData(final Integer id, final GermplasmList list, final Integer gid, final Integer entryId, final String entryCode,
 			final String seedSource, final String designation, final String groupName, final Integer status, final Integer localRecordId,
-			final String notes, final String crossingDate) {
+			final String notes, final Integer crossingDate) {
 		this(id, list, gid, entryId, entryCode, seedSource, designation, groupName, status, localRecordId);
 		this.notes = notes;
 		this.crossingDate = crossingDate;
@@ -299,11 +299,11 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		this.notes = notes;
 	}
 
-	public String getCrossingDate() {
+	public Integer getCrossingDate() {
 		return crossingDate;
 	}
 
-	public void setCrossingDate(String crossingDate) {
+	public void setCrossingDate(Integer crossingDate) {
 		this.crossingDate = crossingDate;
 	}
 

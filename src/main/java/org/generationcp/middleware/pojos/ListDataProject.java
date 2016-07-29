@@ -75,7 +75,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	private String notes;
 
 	@Column(name = "crossing_date")
-	private String crossingDate;
+	private Integer crossingDate;
 
 	/***
 	 * The following will only be field when getListDataProjectWithParents() is called, otherwise, it will always be null
@@ -248,11 +248,11 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 		this.notes = notes;
 	}
 
-	public String getCrossingDate() {
+	public Integer getCrossingDate() {
 		return crossingDate;
 	}
 
-	public void setCrossingDate(String crossingDate) {
+	public void setCrossingDate(Integer crossingDate) {
 		this.crossingDate = crossingDate;
 	}
 
