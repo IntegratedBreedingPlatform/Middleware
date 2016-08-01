@@ -22,7 +22,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,8 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class UserDataManagerImpl extends DataManager implements UserDataManager {
-
-	private static final Logger LOG = LoggerFactory.getLogger(UserDataManagerImpl.class);
 
 	public UserDataManagerImpl() {
 		super();
