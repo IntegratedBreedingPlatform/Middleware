@@ -719,12 +719,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllListMetadata() {
-		final Map<Integer, GermplasmListMetadata> allGermplasmListMetadata = this.manager.getAllGermplasmListMetadata();
-		Assert.assertNotNull("getAllGermplasmListMetadata() should never return null.", allGermplasmListMetadata);
-	}
-
-	@Test
 	public void testGetAllGermplasmListsByProgramUUID() {
 		final List<GermplasmList> germplasmLists =
 				this.manager.getAllGermplasmListsByProgramUUID(GermplasmListManagerImplTest.LIST_PROGRAM_UUID);

@@ -134,8 +134,15 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllListMetadata() {
-		final List<Object[]> listMetadata = GermplasmListDAOTest.dao.getAllListMetadata();
-		Assert.assertNotNull("getAllListMetadata() should never return null.", listMetadata);
+		final List<GermplasmList> germplasmLists = GermplasmListDAOTest.dao.getListsByProgramUUID(GermplasmListDAOTest.PROGRAM_UUID);
+		
+		final List<Integer> germplasmListIds = new ArrayList<>();
+		for (final GermplasmList germplasmList : germplasmLists) {
+			germplasmListIds.add(germplasmList.getId());
+		}
+		
+		final List<Object[]> listMetadata = GermplasmListDAOTest.dao.getAllListMetadata(germplasmListIds);
+		Assert.assertEquals("Meta data size must be the same as the list size", listMetadata.size(), germplasmLists.size());
 	}
 
 	@Test

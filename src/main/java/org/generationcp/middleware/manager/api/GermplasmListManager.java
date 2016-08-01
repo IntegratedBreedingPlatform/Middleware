@@ -512,10 +512,11 @@ public interface GermplasmListManager {
 	org.generationcp.middleware.pojos.GermplasmList getGermplasmListByListRef(Integer listRef);
 
 	/**
-	 * Retrieves metadata (such as count of entries, list owner) in one go for all lists. This helps avoiding the need to query metadata in
-	 * a loop per list.
+	 * Retrieves metadata (such as count of entries, list owner) in one go for lists ids provide.
+	 * This helps avoiding the need to query metadata in
+	 * @param germplasmListParent ids for which we should retrieve metadata
 	 */
-	Map<Integer, GermplasmListMetadata> getAllGermplasmListMetadata();
+	Map<Integer, GermplasmListMetadata> getGermplasmListMetadata(List<GermplasmList> germplasmListParent);
 
 	List<GermplasmList> getAllGermplasmListsByProgramUUID(String currentProgramUUID);
 

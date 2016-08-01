@@ -530,10 +530,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public Map<Integer, GermplasmListMetadata> getAllGermplasmListMetadata() {
+	public Map<Integer, GermplasmListMetadata> getGermplasmListMetadata(final List<GermplasmList> listIds) {
+		final List<Integer> listIdsFromGermplasmList = getListIdsFromGermplasmList(listIds);
 		final Map<Integer, GermplasmListMetadata> listMetadata = new HashMap<>();
 
-		final List<Object[]> queryResults = this.getGermplasmListDAO().getAllListMetadata();
+		final List<Object[]> queryResults = this.getGermplasmListDAO().getAllListMetadata(listIdsFromGermplasmList);
 
 		for (final Object[] row : queryResults) {
 			final Integer listId = (Integer) row[0];
@@ -555,6 +556,16 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return listMetadata;
 	}
 
+	private List<Integer> getListIdsFromGermplasmList(final List<GermplasmList> germplasmListParent) {
+		final List<Integer> listIdsToRetrieveCount = new ArrayList<>();
+		for (final GermplasmList parentList : germplasmListParent) {
+			if(!parentList.isFolder()) {
+				listIdsToRetrieveCount.add(parentList.getId());
+			}
+		}
+		return listIdsToRetrieveCount;
+	}
+	
 	@Override
 	public List<GermplasmList> searchForGermplasmList(final String q, final Operation o) {
 		return this.searchForGermplasmList(q, null, o);
