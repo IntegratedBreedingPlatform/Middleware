@@ -93,7 +93,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	@Column(name = "lrstatus")
 	private Integer status;
 
-	@Basic(optional = false)
+	@Basic(optional = true)
 	@Column(name = "llrecid")
 	private Integer localRecordId;
 
