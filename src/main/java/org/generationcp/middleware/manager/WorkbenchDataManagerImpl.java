@@ -1008,7 +1008,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId) throws MiddlewareQueryException {
+	public Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId) {
 
 		Integer ibdbUserId = null;
 		try {
