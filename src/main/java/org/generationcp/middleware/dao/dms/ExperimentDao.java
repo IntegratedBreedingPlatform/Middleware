@@ -22,6 +22,15 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
+import org.generationcp.middleware.pojos.dms.ExperimentProject;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.generationcp.middleware.pojos.dms.ExperimentStock;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -338,5 +347,32 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		return false;
 
+	}
+	
+	public void deleteEnvironmentsAndRelationshipsByLocationIds(List<Integer> locationIds) throws MiddlewareQueryException {
+		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+			
+			SQLQuery statement =
+					this.getSession().createSQLQuery(
+							"delete g, e, gprop, ep, es, epheno, pheno, eprop from nd_geolocation g "
+									+ "inner join nd_experiment e on g.nd_geolocation_id = e.nd_geolocation_id "
+									+ "left join nd_geolocationprop gprop on g.nd_geolocation_id = gprop.nd_geolocation_id "
+									+ "left join nd_experiment_project ep on e.nd_experiment_id = ep.nd_experiment_id "
+									+ "left join nd_experiment_stock es on e.nd_experiment_id = es.nd_experiment_id "
+									+ "left join nd_experiment_phenotype epheno on e.nd_experiment_id = epheno.nd_experiment_id "
+									+ "left join phenotype pheno on epheno.phenotype_id = pheno.phenotype_id "
+									+ "left join nd_experimentprop eprop on eprop.nd_experiment_id = e.nd_experiment_id "
+									+ "where g.nd_geolocation_id in (:locationIds) "
+									+ "and e.type_id != " + TermId.STUDY_INFORMATION.getId());
+			statement.setParameterList("locationIds", locationIds);
+			statement.executeUpdate();
+			
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error in deleteEnvironmentsAndRelationshipsByLocationIds=" + locationIds + " in DataSetDao: " + e.getMessage(), e);
+		}
 	}
 }

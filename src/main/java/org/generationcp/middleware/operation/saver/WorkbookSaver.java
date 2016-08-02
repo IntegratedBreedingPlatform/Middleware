@@ -257,7 +257,7 @@ public class WorkbookSaver extends Saver {
 
 	private void deleteRemovedLocationsIfExisting(List<Integer> toBeDeletedLocationIds) {
 		if(toBeDeletedLocationIds != null && !toBeDeletedLocationIds.isEmpty()) {
-			//TODO: fix deletion of experiments
+			this.getExperimentDao().deleteEnvironmentsAndRelationshipsByLocationIds(toBeDeletedLocationIds);
 			toBeDeletedLocationIds.clear();
 		}
 	}
@@ -784,7 +784,8 @@ public class WorkbookSaver extends Saver {
 					rowWatch.restart("saving row " + i++);
 					final ExperimentValues experimentValues = experimentValuesTransformer.transform(row, effectVariables, trialHeaders);
 					try {
-						experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
+						experimentId = experimentModelSaver.addExperiment(datasetId, ExperimentType.PLOT, experimentValues);
+						row.setExperimentId(experimentId);
 					} catch (final PhenotypeException e) {
 						WorkbookSaver.LOG.error(e.getMessage(), e);
 						if (exceptions == null) {

@@ -35,12 +35,13 @@ public class ExperimentModelSaver extends Saver {
 		super(sessionProviderForLocal);
 	}
 
-	public void addExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {
+	public int addExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {
 		TermId myExperimentType = this.mapExperimentType(experimentType);
 		ExperimentModel experimentModel = this.create(projectId, values, myExperimentType);
 		this.getExperimentDao().save(experimentModel);
 		this.addExperimentProject(experimentModel, projectId);
 		this.getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
+		return experimentModel.getNdExperimentId();
 	}
 
 	public void addOrUpdateExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {
