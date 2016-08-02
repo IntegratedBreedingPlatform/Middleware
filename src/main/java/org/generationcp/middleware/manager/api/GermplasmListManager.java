@@ -510,10 +510,32 @@ public interface GermplasmListManager {
 	 * @return
 	 */
 	org.generationcp.middleware.pojos.GermplasmList getGermplasmListByListRef(Integer listRef);
-	
+
 	/**
 	 * Retrieves metadata (such as count of entries, list owner) in one go for all lists. This helps avoiding the need to query metadata in
 	 * a loop per list.
 	 */
 	Map<Integer, GermplasmListMetadata> getAllGermplasmListMetadata();
+
+	List<GermplasmList> getAllGermplasmListsByProgramUUID(String currentProgramUUID);
+
+	/**
+	 * Returns the number of germplasm lists that are associated with the specified GID and programUUID.
+	 *
+	 * @param gid - the Germplasm ID associated with the Germplasm Lists to be returned.
+	 * @param programUUID - the unique id of the the current program the user is in.
+	 * @return The count of Germplasm Lists associated with the given Germplasm ID/
+	 */
+	long countGermplasmListByGIDandProgramUUID(Integer gid, String programUUID);
+
+	/**
+	 * Returns the germplasm lists that are associated with the specified GID and programUUID.
+	 *
+	 * @param gid - the Germplasm ID associated with the Germplasm Lists to be returned.
+	 * @param start - start number of page
+	 * @param numOfRows - number of rows per page
+	 * @param programUUID - the unique id of the the current program the user is in.
+	 * @return The count of Germplasm Lists associated with the given Germplasm ID/
+	 */
+	List<GermplasmList> getGermplasmListByGIDandProgramUUID(Integer gid, int start, int numOfRows, String programUUID);
 }
