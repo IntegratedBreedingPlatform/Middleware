@@ -90,6 +90,13 @@ public class Person implements Comparable<Person>, Serializable {
 		this.lastName = lastName;
 	}
 
+	public Person(final Integer id, final String firstName, final String middleName, final String lastName) {
+		this.id = id;
+		this.firstName = firstName;
+		this.middleName = middleName;
+		this.lastName = lastName;
+	}
+
 	/**
 	 * Create a copy of this Person object. Note that this method does not copy the {@link Person#id} field.
 	 * 
@@ -168,9 +175,9 @@ public class Person implements Comparable<Person>, Serializable {
 	}
 
 	public String getDisplayName() {
-		String displayFirstName = this.firstName == null || Util.isOneOf(this.firstName, "-", "'-'") ? "" : this.firstName;
-		String displayMiddleName = this.middleName == null || Util.isOneOf(this.middleName, "-", "'-'") ? "" : this.middleName;
-		String displayLastName = this.lastName == null || Util.isOneOf(this.lastName, "-", "'-'") ? "" : this.lastName;
+		final String displayFirstName = this.firstName == null || Util.isOneOf(this.firstName, "-", "'-'") ? "" : this.firstName;
+		final String displayMiddleName = this.middleName == null || Util.isOneOf(this.middleName, "-", "'-'") ? "" : this.middleName;
+		final String displayLastName = this.lastName == null || Util.isOneOf(this.lastName, "-", "'-'") ? "" : this.lastName;
 		return StringUtil.joinIgnoreEmpty(" ", displayFirstName, displayMiddleName, displayLastName);
 	}
 
