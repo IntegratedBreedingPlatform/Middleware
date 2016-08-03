@@ -11,9 +11,11 @@
 
 package org.generationcp.middleware.manager;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.UserDAO;
@@ -22,7 +24,13 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
+import org.hibernate.HibernateException;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Function;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 /**
  * Implementation of the UserDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -30,17 +38,44 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class UserDataManagerImpl extends DataManager implements UserDataManager {
 
+	private static Cache<String, List<User>> localUserCache =
+			CacheBuilder.newBuilder().maximumSize(10).expireAfterWrite(60, TimeUnit.MINUTES).build();
+
+	private static FunctionBasedGuavaCacheLoader<String, List<User>> functionBasedGuavaCacheLoader;
+
 	public UserDataManagerImpl() {
 		super();
+		bingLoadingFunctionsToCache();
 	}
 
 	public UserDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		bingLoadingFunctionsToCache();
+	}
+	
+	private void bingLoadingFunctionsToCache() {
+		functionBasedGuavaCacheLoader =
+				new FunctionBasedGuavaCacheLoader<String, List<User>>(localUserCache, new Function<String, List<User>>() {
+
+					@Override
+					public List<User> apply(final String key) {
+						return UserDataManagerImpl.this.getUserDao().getAll();
+					}
+				});
 	}
 
+
+
+	@SuppressWarnings("deprecation")
 	@Override
 	public List<User> getAllUsers() throws MiddlewareQueryException {
-		return this.getUserDao().getAll();
+		String databaseConnectionUrl;
+		try {
+			databaseConnectionUrl = this.getActiveSession().connection().getMetaData().getURL();
+		} catch (HibernateException | SQLException e) {
+			throw new MiddlewareQueryException("Unable to connect to the database. Please contact admin for further information.",e);
+		}
+		return functionBasedGuavaCacheLoader.get(databaseConnectionUrl).get();
 	}
 
 	@Override
@@ -52,7 +87,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	public Integer addUser(User user) throws MiddlewareQueryException {
 		Integer idUserSaved = null;
 		try {
-
+			localUserCache.invalidateAll();
 			UserDAO dao = this.getUserDao();
 
 			User recordSaved = dao.saveOrUpdate(user);
@@ -68,6 +103,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	@Override
 	public Integer updateUser(User user) throws MiddlewareQueryException {
 		try {
+			localUserCache.invalidateAll();
 			this.getUserDao().saveOrUpdate(user);
 		} catch (Exception e) {
 
@@ -85,6 +121,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	@Override
 	public void deleteUser(User user) throws MiddlewareQueryException {
 		try {
+			localUserCache.invalidateAll();
 			this.getUserDao().makeTransient(user);
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while deleting User: UserDataManager.deleteUser(user=" + user + "): "

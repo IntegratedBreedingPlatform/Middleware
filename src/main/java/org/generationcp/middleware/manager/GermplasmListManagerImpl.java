@@ -11,11 +11,13 @@
 
 package org.generationcp.middleware.manager;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
@@ -29,10 +31,16 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListMetadata;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ListDataProperty;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
+import org.hibernate.HibernateException;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Function;
 import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 
 /**
  * Implementation of the GermplasmListManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -40,16 +48,36 @@ import com.google.common.base.Strings;
 @SuppressWarnings("unchecked")
 @Transactional
 public class GermplasmListManagerImpl extends DataManager implements GermplasmListManager {
+	
+	private static Cache<String, List<UserDefinedField>> germplasmListTypeCache =
+			CacheBuilder.newBuilder().maximumSize(10).expireAfterWrite(10, TimeUnit.MINUTES).build();
+	private FunctionBasedGuavaCacheLoader<String, List<UserDefinedField>> functionBasedGuavaCacheLoader;
 
 	public GermplasmListManagerImpl() {
+		bindFunctionToCache();	
+	}
+
+	private void bindFunctionToCache() {
+		functionBasedGuavaCacheLoader =
+				new FunctionBasedGuavaCacheLoader<String, List<UserDefinedField>>(germplasmListTypeCache, new Function<String, List<UserDefinedField>>() {
+
+					@Override
+					public List<UserDefinedField> apply(final String key) {
+						return GermplasmListManagerImpl.this.getGermpasmListTypesFromDb();
+					}
+				});
 	}
 
 	public GermplasmListManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
+		bindFunctionToCache();	
+
 	}
 
 	public GermplasmListManagerImpl(final HibernateSessionProvider sessionProvider, final String databaseName) {
 		super(sessionProvider, databaseName);
+		bindFunctionToCache();	
+
 	}
 
 	@Override
@@ -190,22 +218,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public List<GermplasmList> getAllTopLevelListsBatched(final String programUUID, final int batchSize) {
-		final List<GermplasmList> topLevelFolders = new ArrayList<GermplasmList>();
-
-		final long topLevelCount = this.getGermplasmListDAO().countAllTopLevelLists(programUUID);
-		int start = 0;
-		while (start < topLevelCount) {
-			topLevelFolders.addAll(this.getGermplasmListDAO().getAllTopLevelLists(programUUID, start, batchSize));
-			start += batchSize;
-		}
-
-		return topLevelFolders;
-	}
-
-	@Override
-	public long countAllTopLevelLists(final String programUUID) {
-		return this.getGermplasmListDAO().countAllTopLevelLists(programUUID);
+	public List<GermplasmList> getAllTopLevelLists(final String programUUID) {
+		return this.getGermplasmListDAO().getAllTopLevelLists(programUUID);
 	}
 
 	@Override
@@ -439,10 +453,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public List<GermplasmList> getGermplasmListByParentFolderId(final Integer parentId, final String programUUID, final int start,
-			final int numOfRows) {
+	public List<GermplasmList> getGermplasmListByParentFolderId(final Integer parentId, final String programUUID) {
 
-		return this.getGermplasmListDAO().getByParentFolderId(parentId, programUUID, start, numOfRows);
+		return this.getGermplasmListDAO().getByParentFolderId(parentId, programUUID);
 	}
 
 	@Override
@@ -453,24 +466,23 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	@Override
 	public List<GermplasmList> getGermplasmListByParentFolderIdBatched(final Integer parentId, final String programUUID,
 			final int batchSize) {
-		final List<GermplasmList> childLists = new ArrayList<GermplasmList>();
-		int start = 0;
-		final long childListCount = this.getGermplasmListDAO().countByParentFolderId(parentId, programUUID);
-		while (start < childListCount) {
-			childLists.addAll(this.getGermplasmListDAO().getByParentFolderId(parentId, programUUID, start, batchSize));
-			start += batchSize;
-		}
-		return childLists;
+		return this.getGermplasmListDAO().getByParentFolderId(parentId, programUUID);
 	}
 
-	@Override
-	public long countGermplasmListByParentFolderId(final Integer parentId, final String programUUID) {
-		return this.getGermplasmListDAO().countByParentFolderId(parentId, programUUID);
-	}
-
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({"rawtypes", "deprecation"})
 	@Override
 	public List<UserDefinedField> getGermplasmListTypes() {
+		try {
+			final String url = this.getActiveSession().connection().getMetaData().getURL();
+			return functionBasedGuavaCacheLoader.get(url).get();
+
+		} catch (HibernateException | SQLException e) {
+			throw new MiddlewareQueryException("Problems connecting to the database. P"
+					+ "lease contact administrator for assistance.", e);
+		}
+	}
+
+	private List<UserDefinedField> getGermpasmListTypesFromDb() {
 		final List<UserDefinedField> toReturn = new ArrayList<UserDefinedField>();
 
 		final List results = this.getGermplasmListDAO().getGermplasmListTypes();
@@ -501,6 +513,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	@SuppressWarnings("rawtypes")
 	@Override
 	public List<UserDefinedField> getGermplasmNameTypes() {
+		
+		
 		final List<UserDefinedField> toReturn = new ArrayList<UserDefinedField>();
 
 		final List results = this.getFromInstanceByMethod(this.getGermplasmListDAO(), Database.LOCAL, "getGermplasmNameTypes",
@@ -632,4 +646,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	public List<GermplasmList> getAllGermplasmListsByProgramUUID(final String programUUID) {
 		return this.getGermplasmListDAO().getListsByProgramUUID(programUUID);
 	}
+
+
 }
