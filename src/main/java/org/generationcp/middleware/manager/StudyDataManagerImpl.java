@@ -1147,10 +1147,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			String key = null;
 			String valueKey = "";
 			for (final ProjectProperty prop : sortedProperties) {
-				if (prop.getTypeId() == TermId.VARIABLE_DESCRIPTION.getId()) {
+				if (prop.getTypeId().equals(TermId.VARIABLE_DESCRIPTION.getId())) {
 					key = prop.getValue();
 				}
-				if (prop.getTypeId() == TermId.STANDARD_VARIABLE.getId()) {
+				if (prop.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
 					valueKey = prop.getValue();
 				}
 				if (valueKey.equals(String.valueOf(prop.getTypeId()))) {
