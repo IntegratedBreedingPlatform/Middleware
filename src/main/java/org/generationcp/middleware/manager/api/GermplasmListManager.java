@@ -223,18 +223,9 @@ public interface GermplasmListManager {
 	 * Though retrieval is by batch, this method still returns all of the top level folders as a single list.
 	 *
 	 * @param programUUID - the program UUID
-	 * @param batchSize - the number of records to be retrieved per iteration
 	 * @return - List of GermplasmList POJOs
 	 */
-	List<GermplasmList> getAllTopLevelListsBatched(String programUUID, int batchSize);
-
-	/**
-	 * Returns the number of Top Level Germplasm List Folders with the same or null program UUID.
-	 *
-	 * @param programUUID
-	 * @return The count of all top level lists on the specified instance.
-	 */
-	long countAllTopLevelLists(String programUUID);
+	List<GermplasmList> getAllTopLevelLists(String programUUID);
 
 	/**
 	 * Inserts a single {@code GermplasmList} object into the database.
@@ -392,11 +383,9 @@ public interface GermplasmListManager {
 	 *
 	 * @param parentId - the ID of the parent to retrieve the child lists
 	 * @param programUUID - the program UUID of the program where to retrieve the child lists
-	 * @param start - the starting point to retrieve the results
-	 * @param numOfRows - the number of rows from the starting point to be retrieved
 	 * @return Returns a List of GermplasmList POJOs for the child lists
 	 */
-	List<GermplasmList> getGermplasmListByParentFolderId(Integer parentId, String programUUID, int start, int numOfRows);
+	List<GermplasmList> getGermplasmListByParentFolderId(Integer parentId, String programUUID);
 
 	GermplasmList getLastSavedGermplasmListByUserId(Integer userID, String programUUID);
 
@@ -411,15 +400,6 @@ public interface GermplasmListManager {
 	 * @return Returns a List of GermplasmList POJOs for the child lists
 	 */
 	List<GermplasmList> getGermplasmListByParentFolderIdBatched(Integer parentId, String programUUID, int batchSize);
-
-	/**
-	 * Returns the number of {@code GermplasmList} child records given a parent id.
-	 *
-	 * @param parentId the parent id
-	 * @param programUUID the program UUID
-	 * @return number of germplasm list child records of a parent record
-	 */
-	long countGermplasmListByParentFolderId(Integer parentId, String programUUID);
 
 	/**
 	 * Return a List of UserDefinedField POJOs representing records from the udflds table of IBDB which are the types of germplasm lists.

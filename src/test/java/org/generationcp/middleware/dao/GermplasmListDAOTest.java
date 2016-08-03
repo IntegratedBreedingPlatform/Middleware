@@ -105,7 +105,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void TestGetGermplasmListTypes() {
+	public void testGetGermplasmListTypes() {
 		final List<String> germplasmListTypes = GermplasmListDAOTest.dao.getGermplasmListTypes();
 		for (final String listType : GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES) {
 			Assert.assertFalse(listType + " should not be in the Results Array", germplasmListTypes.contains(listType));

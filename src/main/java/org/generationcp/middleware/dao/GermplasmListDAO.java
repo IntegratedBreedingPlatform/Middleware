@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
@@ -21,8 +22,11 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -36,6 +40,10 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.type.IntegerType;
 
+import com.google.common.base.Function;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+
 /**
  * DAO class for {@link GermplasmList}.
  *
@@ -44,7 +52,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	public static final Integer STATUS_DELETED = 9;
 	protected static final Criterion RESTRICTED_LIST;
-
+	
 	static {
 		RESTRICTED_LIST = Restrictions
 				.not(Restrictions.in("type", new String[] {GermplasmListType.NURSERY.toString(), GermplasmListType.TRIAL.toString(),
@@ -261,7 +269,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<GermplasmList> getAllTopLevelLists(final String programUUID, final int start, final int numOfRows)
+	public List<GermplasmList> getAllTopLevelLists(final String programUUID)
 			throws MiddlewareQueryException {
 		try {
 			final Criterion topFolder = Restrictions.eq("parent.id", 0);
@@ -273,33 +281,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			this.addCriteriaForProgramUUIDInLists(programUUID, criteria);
 			this.hideSnapshotListTypes(criteria);
 
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
 			criteria.addOrder(Order.asc("name"));
 			return criteria.list();
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getAllTopLevelLists() query from GermplasmList: " + e.getMessage(), e);
 		}
 		return new ArrayList<GermplasmList>();
-	}
-
-	public long countAllTopLevelLists(final String programUUID) {
-		try {
-			final Criterion topFolder = Restrictions.eq("parent.id", 0);
-			final Criterion nullFolder = Restrictions.isNull("parent");
-			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
-			criteria.add(Restrictions.or(topFolder, nullFolder));
-			criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
-
-			this.hideSnapshotListTypes(criteria);
-			this.addCriteriaForProgramUUIDInLists(programUUID, criteria);
-
-			criteria.setProjection(Projections.rowCount());
-			return ((Long) criteria.uniqueResult()).longValue();
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with countAllTopLevelLists() query from GermplasmList: " + e.getMessage(), e);
-		}
-		return 0;
 	}
 
 	/**
@@ -313,7 +300,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
 	@SuppressWarnings("unchecked")
-	public List<GermplasmList> getByParentFolderId(final Integer parentId, final String programUUID, final int start, final int numOfRows)
+	public List<GermplasmList> getByParentFolderId(final Integer parentId, final String programUUID)
 			throws MiddlewareQueryException {
 		try {
 			if (parentId != null) {
@@ -325,8 +312,6 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 				this.hideSnapshotListTypes(criteria);
 
-				criteria.setFirstResult(start);
-				criteria.setMaxResults(numOfRows);
 				criteria.addOrder(Order.asc("name"));
 				return criteria.list();
 			}
@@ -362,34 +347,6 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			this.logAndThrowException("Error with getByUserID(userID=" + userID + ") query from GermplasmList: " + e.getMessage(), e);
 		}
 		return null;
-	}
-
-	/**
-	 * Count germplasm list children.
-	 *
-	 * @param parentId the parent id
-	 * @return number of germplasm list child records of a parent record
-	 * @throws MiddlewareQueryException the MiddlewareQueryException
-	 */
-	public long countByParentFolderId(final Integer parentId, final String programUUID) {
-		try {
-			if (parentId != null) {
-				final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
-				criteria.add(Restrictions.eq("parent.id", parentId));
-				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
-
-				this.addCriteriaForProgramUUIDInLists(programUUID, criteria);
-
-				this.hideSnapshotListTypes(criteria);
-
-				criteria.setProjection(Projections.rowCount());
-				return ((Long) criteria.uniqueResult()).longValue();
-			}
-		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error with countByParentFolderId(parentId=" + parentId + ") query from GermplasmList: " + e.getMessage(), e);
-		}
-		return 0;
 	}
 
 	protected void hideSnapshotListTypes(final Criteria criteria) {
