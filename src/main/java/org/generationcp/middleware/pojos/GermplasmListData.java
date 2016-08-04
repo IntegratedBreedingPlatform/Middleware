@@ -107,6 +107,12 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	@Transient
 	private ListDataInventory inventoryInfo;
 
+	@Transient
+	private String notes;
+
+	@Transient
+	private Integer crossingDate;
+
 	/***
 	 * The following will only be field when we are getting the parents, otherwise, they won't be set
 	 */
@@ -166,6 +172,14 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		this.groupName = groupName;
 		this.status = status;
 		this.localRecordId = localRecordId;
+	}
+
+	public GermplasmListData(final Integer id, final GermplasmList list, final Integer gid, final Integer entryId, final String entryCode,
+			final String seedSource, final String designation, final String groupName, final Integer status, final Integer localRecordId,
+			final String notes, final Integer crossingDate) {
+		this(id, list, gid, entryId, entryCode, seedSource, designation, groupName, status, localRecordId);
+		this.notes = notes;
+		this.crossingDate = crossingDate;
 	}
 
 	public Integer getId() {
@@ -280,6 +294,22 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		this.inventoryInfo = inventoryInfo;
 	}
 
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(String notes) {
+		this.notes = notes;
+	}
+
+	public Integer getCrossingDate() {
+		return crossingDate;
+	}
+
+	public void setCrossingDate(Integer crossingDate) {
+		this.crossingDate = crossingDate;
+	}
+
 	/**
 	 * @return the germplasm
 	 */
@@ -315,6 +345,10 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		builder.append(this.status);
 		builder.append(", localRecordId=");
 		builder.append(this.localRecordId);
+		builder.append(", notes=");
+		builder.append(this.notes);
+		builder.append(", crossingDate=");
+		builder.append(this.crossingDate);
 		builder.append("]");
 		return builder.toString();
 	}

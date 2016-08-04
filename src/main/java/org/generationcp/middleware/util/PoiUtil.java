@@ -56,21 +56,35 @@ public class PoiUtil {
 		workBook.setRepeatingRowsAndColumns(sheetIndex, fromCol, toCol, fromRow, toRow);
 	}
 
-	public static Double getCellNumericValue(Cell cell) {
+	public static Double getCellNumericValue(final Cell cell) {
 		return cell == null ? null : cell.getNumericCellValue();
 	}
 
-	public static String getCellStringValue(Workbook wb, Integer sheetNumber, Integer rowNumber, Integer columnNumber) {
+	public static String getCellStringValue(final Workbook wb, final Integer sheetNumber, final Integer rowNumber, final Integer columnNumber) {
 
-		Sheet sheet = wb.getSheetAt(sheetNumber);
-		Row row = sheet.getRow(rowNumber);
+		final Sheet sheet = wb.getSheetAt(sheetNumber);
+		final Row row = sheet.getRow(rowNumber);
 
 		if (null == row) {
 			return null;
 		}
 
-		Cell cell = row.getCell(columnNumber);
+		final Cell cell = row.getCell(columnNumber);
 		return PoiUtil.getCellStringValue(cell);
+
+	}
+
+	public static Double getCellNumericValue(final Workbook wb, final Integer sheetNumber, final Integer rowNumber, final Integer columnNumber) {
+
+		final Sheet sheet = wb.getSheetAt(sheetNumber);
+		final Row row = sheet.getRow(rowNumber);
+
+		if (null == row) {
+			return null;
+		}
+
+		final Cell cell = row.getCell(columnNumber);
+		return PoiUtil.getCellNumericValue(cell);
 
 	}
 
@@ -700,6 +714,28 @@ public class PoiUtil {
 		} else {
 			return resultString;
 		}
+	}
+
+	/**
+	 * Gets the 1-based index of the last cell contained in this row or -1 if the row does not contain any cells.
+	 * 
+	 * @param sheet
+	 * @param rowNo
+	 * @return 
+	 */
+	public static int getLastCellNum(final Sheet sheet, final int rowNo) {
+		if (sheet == null || sheet.getRow(rowNo) == null) {
+			return -1;
+		}
+		short index = sheet.getRow(rowNo).getLastCellNum();
+		while (index > 0 && (sheet.getRow(rowNo).getCell(index - 1) == null
+				|| StringUtils.isBlank(sheet.getRow(rowNo).getCell(index - 1).getStringCellValue()))) {
+			index--;
+		}
+		if (index == 0) {
+			return -1;
+		}
+		return index;
 	}
 
 	public static Integer getLastRowNum(Sheet sheet) {
