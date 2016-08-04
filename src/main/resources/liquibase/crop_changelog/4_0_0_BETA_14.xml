@@ -1,13 +1,132 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
+	<changeSet author="nahuel" id="1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="listdata_project" columnName="crossing_date" />
+			</not>
+		</preConditions>
+		<addColumn tableName="listdata_project">
+			<column name="crossing_date" type="INT" />
+		</addColumn>
+	</changeSet>
+	<changeSet author="nahuel" id="2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="listdata_project" columnName="notes" />
+			</not>
+		</preConditions>
+		<addColumn tableName="listdata_project">
+			<column name="notes" type="varchar(255)" />
+		</addColumn>
+	</changeSet>
 
-	<changeSet author="naymesh" id="1" objectQuotingStrategy="QUOTE_ALL_OBJECTS">
+	<changeSet author="akhil" id="3">
+
+		<preConditions onFail="MARK_RAN">
+			<!--
+			 Even though when more than one precondition are written the "and" logic is supposed by default,
+			 I believe to be a good practise to declare it. -->
+			<and>
+				<sqlCheck expectedResult="1">select case when 'workbench' = database() then 0 else 1 end from dual;</sqlCheck>
+				<sqlCheck expectedResult="0">select count(*) from information_schema.routines where routine_schema = database() 
+												and specific_name = 'getGermplasmWithNamesAndAncestry';</sqlCheck>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			# This procedure recurses and returns the germplasms and its ancestry including any replaced germplasm. 
+			# The result also returns all names associated with the germplasm.
+			# The number of levels traversed is determined by the max level set. 
+			#
+			# The procedure takes two arguments
+			# searchGid - A comma separated list of germplams and ancestry we want to retrieve
+			# maxLevel - The maximum number of levels to traverse
+			#
+			# Be careful with the max levels. A very high value will result in a slow query.
+			#
+			# Normally one would not write a stored procedure but this is currently the best know way to traverse a graph
+			# 
+			# If the group_concat_max_len is not set to at least 150000 the results returned will be incorrect. 
+			# Group_concat was the only way to traverse the tree in a efficient manner. Note using temporary tables is not possible
+			# due to the need for transactions.
+			CREATE PROCEDURE getGermplasmWithNamesAndAncestry 
+			(
+			   searchGid text,
+			   maxLevel int
+			) 
+			BEGIN 
+			     # Variable to hold our in clause as we traverse the tree
+			     DECLARE gidInClause TEXT;
+			     # Current number of level traversed
+			     SET @numberOfLevels = 1;
+
+			     # If we are give a blank gid then just set it to 0
+				 IF TRIM(searchGid) = '' THEN
+					SET searchGid = '0';
+				 END IF;			     
+
+			     # Start off the in clause with the search gids provided.
+			     SET @gidInClause = CONCAT(searchGid);
+				 
+				 # Only loop if you have something to search for
+				 IF searchGid != '0' THEN			
+				     ancestryLoop : WHILE(@numberOfLevels &lt; maxLevel) DO
+				
+						SET @numberOfLevels = @numberOfLevels+1;
+				
+						# The main aim of the query is to create a new in clause adding in all the gid's required on every 
+				        # subsequent traversal. Note results are selected in @gidInClause which results in traversing 
+				        # the next level
+						SET @sql = CONCAT('SELECT GROUP_CONCAT( DISTINCT ancestryTree.gid) INTO @gidInClause
+											FROM (
+												SELECT gpid1 as gid from germplsm where gid in (', @gidInClause ,')
+												UNION
+												SELECT gpid2 as gid from germplsm where gid in (', @gidInClause ,')
+												UNION
+												SELECT grplce as gid from germplsm where gid in (', @gidInClause ,')
+												UNION
+												SELECT gid as gid from germplsm where gid in (', @gidInClause ,')
+											) as ancestryTree');
+				 
+						# Prepare and execute query
+				        PREPARE stmt FROM @sql;
+						EXECUTE stmt;
+						DEALLOCATE PREPARE stmt;
+				        
+				        # Defensive. In case of an input error like a gid that does not exist
+				        # We can end the loop gracefully and continue
+				        IF @gidInClause IS NULL THEN
+							SET @gidInClause = '0';
+							LEAVE ancestryLoop;
+				        END IF;			
+						
+						# Workaround for MySQL Bug https://bugs.mysql.com/bug.php?id=30897. The bug results in a trailing ','
+				        # which breaks our query
+						SET @lastChar = RIGHT(@gidInClause, 1);
+						IF(@lastChar = ',') THEN
+							SET @gidInClause = SUBSTRING(@gidInClause, 1, CHAR_LENGTH(@gidInClause) - 1);
+						END IF;
+				     END WHILE;
+				 END IF;
+			     # Get the final results using the generated in clause
+			     SET @finalSql = CONCAT('Select g.*, n.* from germplsm g left outer join names n on n.gid = g.gid   
+						 where g.gid!=g.grplce AND g.gid  in (', @gidInClause , ') ');
+			     PREPARE stmt FROM @finalSql;
+				 EXECUTE stmt;
+			     DEALLOCATE PREPARE stmt;
+			END
+		</sql>
+
+	</changeSet>
+	
+		<changeSet author="naymesh" id="4" objectQuotingStrategy="QUOTE_ALL_OBJECTS">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="plant_samples" />
@@ -35,7 +154,7 @@
 		</modifySql>
 	</changeSet>
 
-	<changeSet author="naymesh" id="2">
+	<changeSet author="naymesh" id="5">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'plant_samples' AND CONSTRAINT_NAME='fk_plot_id' and TABLE_SCHEMA = DATABASE();</sqlCheck>
 		</preConditions>
@@ -49,7 +168,7 @@
 			onUpdate="NO ACTION"/>
 	</changeSet>
 	
-	<changeSet author="naymesh" id="3">
+	<changeSet author="naymesh" id="6">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'plant_samples' AND CONSTRAINT_NAME='uc_plot_plant' and TABLE_SCHEMA = DATABASE();</sqlCheck>
 		</preConditions>	

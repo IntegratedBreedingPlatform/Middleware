@@ -1014,6 +1014,35 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 	}
 
 	@Test
+	public void testUpdateTerms() throws Exception {
+
+		String termName1 = "Sample Term 1";
+		String termName2 = "Sample Term 2";
+		String termDescription1 = "Sample Term Description 1";
+		String termDescription2 = "Sample Term Description 2";
+
+		Term term1 = this.ontologyDataManager.addTerm(termName1, termDescription1, CvId.SCALES);
+		Term term2 = this.ontologyDataManager.addTerm(termName2, termDescription2, CvId.SCALES);
+
+		// Update the added terms name with new names.
+		List<Term> terms = new ArrayList<>();
+		term1.setName("New Term Name 1");
+		term2.setName("New Term Name 2");
+		terms.add(term1);
+		terms.add(term2);
+
+		this.ontologyDataManager.updateTerms(terms);
+
+		Term newTerm1 = this.ontologyDataManager.getTermById(term1.getId());
+		Term newTerm2 = this.ontologyDataManager.getTermById(term2.getId());
+
+		Assert.assertEquals("The term's name should be updated", "New Term Name 1", newTerm1.getName());
+		Assert.assertEquals("The term's name should be updated", "New Term Name 2", newTerm2.getName());
+
+	}
+
+
+	@Test
 	public void testGetStandardVariableIdByTermId() throws Exception {
 		String propertyName = "property name " + new Random().nextInt(10000);
 		this.ontologyDataManager.addProperty(propertyName, "test property", 1087);
