@@ -285,9 +285,8 @@ public class WorkbookTestDataInitializer {
 			// this is used for adding multiple locations to one study
 			details.setStudyName(studyName);
 		} else {
-			details.setStudyName(
-					(studyType.equals(StudyType.N) ? WorkbookTestDataInitializer.NURSERY_NAME : WorkbookTestDataInitializer.TRIAL_NAME)
-							+ new Random().nextInt(10000));
+			details.setStudyName((studyType.equals(StudyType.N) ? WorkbookTestDataInitializer.NURSERY_NAME
+					: WorkbookTestDataInitializer.TRIAL_NAME) + new Random().nextInt(10000));
 		}
 		details.setTitle(WorkbookTestDataInitializer.TITLE);
 		details.setObjective(WorkbookTestDataInitializer.OBJECTIVE);
@@ -402,11 +401,11 @@ public class WorkbookTestDataInitializer {
 				WorkbookTestDataInitializer.CROSS_HISTORY, WorkbookTestDataInitializer.CHAR, WorkbookTestDataInitializer.STUDY,
 				WorkbookTestDataInitializer.ENTRY, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.GERMPLASM, false));
 
-		factors.add(
-				WorkbookTestDataInitializer.createMeasurementVariable(TermId.SEED_SOURCE.getId(), WorkbookTestDataInitializer.SEED_SOURCE,
-						"The seed source of the germplasm", WorkbookTestDataInitializer.NAME, WorkbookTestDataInitializer.SELECTED,
-						WorkbookTestDataInitializer.SEED_SOURCE, WorkbookTestDataInitializer.CHAR, WorkbookTestDataInitializer.STUDY,
-						WorkbookTestDataInitializer.ENTRY, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.GERMPLASM, false));
+		factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.SEED_SOURCE.getId(),
+				WorkbookTestDataInitializer.SEED_SOURCE, "The seed source of the germplasm", WorkbookTestDataInitializer.NAME,
+				WorkbookTestDataInitializer.SELECTED, WorkbookTestDataInitializer.SEED_SOURCE, WorkbookTestDataInitializer.CHAR,
+				WorkbookTestDataInitializer.STUDY, WorkbookTestDataInitializer.ENTRY, TermId.CHARACTER_VARIABLE.getId(),
+				PhenotypicType.GERMPLASM, false));
 
 		factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.PLOT_NO.getId(), WorkbookTestDataInitializer.PLOT,
 				"Plot number ", WorkbookTestDataInitializer.NESTED_NUMBER, WorkbookTestDataInitializer.ENUMERATED,
@@ -416,8 +415,9 @@ public class WorkbookTestDataInitializer {
 		// Plot Factors
 		factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.BLOCK_NO.getId(), WorkbookTestDataInitializer.BLOCK,
 				"INCOMPLETE BLOCK", WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED,
-				WorkbookTestDataInitializer.BLOCKING_FACTOR, WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE,
-				WorkbookTestDataInitializer.PLOT, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.TRIAL_DESIGN, false));
+				WorkbookTestDataInitializer.BLOCKING_FACTOR, WorkbookTestDataInitializer.NUMERIC,
+				WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.PLOT, TermId.NUMERIC_VARIABLE.getId(),
+				PhenotypicType.TRIAL_DESIGN, false));
 
 		factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.REP_NO.getId(), WorkbookTestDataInitializer.REP,
 				WorkbookTestDataInitializer.REPLICATION, WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED,
@@ -460,19 +460,21 @@ public class WorkbookTestDataInitializer {
 
 			variates.add(measurementVariable);
 		} else {
-			final MeasurementVariable measurementVariable = WorkbookTestDataInitializer.createMeasurementVariable(
-					WorkbookTestDataInitializer.GYLD_ID, WorkbookTestDataInitializer.GYLD, "Grain yield -dry and weigh (kg/ha)",
-					WorkbookTestDataInitializer.KG_HA, WorkbookTestDataInitializer.DRY_AND_WEIGH, WorkbookTestDataInitializer.YIELD,
-					WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.PLOT,
-					TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE, false);
+			final MeasurementVariable measurementVariable =
+					WorkbookTestDataInitializer.createMeasurementVariable(WorkbookTestDataInitializer.GYLD_ID,
+							WorkbookTestDataInitializer.GYLD, "Grain yield -dry and weigh (kg/ha)", WorkbookTestDataInitializer.KG_HA,
+							WorkbookTestDataInitializer.DRY_AND_WEIGH, WorkbookTestDataInitializer.YIELD,
+							WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE,
+							WorkbookTestDataInitializer.PLOT, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE, false);
 
 			variates.add(measurementVariable);
 
-			final MeasurementVariable siteSoilPh = WorkbookTestDataInitializer.createMeasurementVariable(
-					WorkbookTestDataInitializer.SITE_SOIL_PH_ID, WorkbookTestDataInitializer.SITE_SOIL_PH, "Soil acidity - ph meter (pH)",
-					WorkbookTestDataInitializer.PH, WorkbookTestDataInitializer.MEASURED, WorkbookTestDataInitializer.SOIL_ACIDITY,
-					WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.STUDY,
-					TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE, false);
+			final MeasurementVariable siteSoilPh =
+					WorkbookTestDataInitializer.createMeasurementVariable(WorkbookTestDataInitializer.SITE_SOIL_PH_ID,
+							WorkbookTestDataInitializer.SITE_SOIL_PH, "Soil acidity - ph meter (pH)", WorkbookTestDataInitializer.PH,
+							WorkbookTestDataInitializer.MEASURED, WorkbookTestDataInitializer.SOIL_ACIDITY,
+							WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE,
+							WorkbookTestDataInitializer.STUDY, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE, false);
 			variates.add(siteSoilPh);
 
 			final MeasurementVariable gW100_g =
@@ -665,12 +667,15 @@ public class WorkbookTestDataInitializer {
 	public static void addVariatesAndObservations(final Workbook currentWorkbook) {
 
 		final List<MeasurementVariable> variates = currentWorkbook.getVariates();
-		final MeasurementVariable measurementVariable = WorkbookTestDataInitializer.createMeasurementVariable(
-				WorkbookTestDataInitializer.CRUST_ID, WorkbookTestDataInitializer.CRUST,
-				"Score for the severity of common rust, (In highlands and mid altitude, Puccinia sorghi) symptoms rated on a scale from 1 (= clean, no infection) to 5 (= severely diseased).",
-				WorkbookTestDataInitializer.SCORE_1_5, WorkbookTestDataInitializer.VISUAL_SCORING, WorkbookTestDataInitializer.COMMON_RUST,
-				WorkbookTestDataInitializer.CHAR, null, WorkbookTestDataInitializer.PLOT, TermId.CATEGORICAL_VARIABLE.getId(),
-				PhenotypicType.VARIATE, false);
+		final MeasurementVariable measurementVariable =
+				WorkbookTestDataInitializer
+						.createMeasurementVariable(
+								WorkbookTestDataInitializer.CRUST_ID,
+								WorkbookTestDataInitializer.CRUST,
+								"Score for the severity of common rust, (In highlands and mid altitude, Puccinia sorghi) symptoms rated on a scale from 1 (= clean, no infection) to 5 (= severely diseased).",
+								WorkbookTestDataInitializer.SCORE_1_5, WorkbookTestDataInitializer.VISUAL_SCORING,
+								WorkbookTestDataInitializer.COMMON_RUST, WorkbookTestDataInitializer.CHAR, null,
+								WorkbookTestDataInitializer.PLOT, TermId.CATEGORICAL_VARIABLE.getId(), PhenotypicType.VARIATE, false);
 
 		measurementVariable.setOperation(Operation.ADD);
 
@@ -715,8 +720,9 @@ public class WorkbookTestDataInitializer {
 					crustValue = WorkbookTestDataInitializer.INVALID_CRUST_VALUE_MISSING;
 					break;
 			}
-			final MeasurementData measurementData = WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.CRUST,
-					crustValue, WorkbookTestDataInitializer.CRUST_ID, currentWorkbook.getVariates());
+			final MeasurementData measurementData =
+					WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.CRUST, crustValue,
+							WorkbookTestDataInitializer.CRUST_ID, currentWorkbook.getVariates());
 			measurementData.setcValueId(crustCValueId);
 			dataList.add(measurementData);
 		}
@@ -766,26 +772,30 @@ public class WorkbookTestDataInitializer {
 	}
 
 	private static void addConstants(final List<MeasurementVariable> constants) {
-		final MeasurementVariable variable = WorkbookTestDataInitializer.createMeasurementVariable(WorkbookTestDataInitializer.SOILPH_ID,
-				"SITE_SOIL_PH", "Soil acidity - ph meter (pH)", WorkbookTestDataInitializer.PH, WorkbookTestDataInitializer.PH_METER,
-				WorkbookTestDataInitializer.SOIL_ACIDITY, WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE,
-				WorkbookTestDataInitializer.TRIAL, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE, false);
+		final MeasurementVariable variable =
+				WorkbookTestDataInitializer.createMeasurementVariable(WorkbookTestDataInitializer.SOILPH_ID, "SITE_SOIL_PH",
+						"Soil acidity - ph meter (pH)", WorkbookTestDataInitializer.PH, WorkbookTestDataInitializer.PH_METER,
+						WorkbookTestDataInitializer.SOIL_ACIDITY, WorkbookTestDataInitializer.NUMERIC,
+						WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.TRIAL, TermId.NUMERIC_VARIABLE.getId(),
+						PhenotypicType.VARIATE, false);
 		variable.setOperation(Operation.ADD);
 		constants.add(variable);
 	}
 
 	private static void addConditions(final List<MeasurementVariable> conditions) {
-		MeasurementVariable variable = WorkbookTestDataInitializer.createMeasurementVariable(TermId.TRIAL_LOCATION.getId(), "SITE",
-				"TRIAL SITE NAME", WorkbookTestDataInitializer.DBCV, WorkbookTestDataInitializer.ASSIGNED,
-				WorkbookTestDataInitializer.LOCATION, WorkbookTestDataInitializer.CHAR, "", WorkbookTestDataInitializer.TRIAL,
-				TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT, false);
+		MeasurementVariable variable =
+				WorkbookTestDataInitializer.createMeasurementVariable(TermId.TRIAL_LOCATION.getId(), "SITE", "TRIAL SITE NAME",
+						WorkbookTestDataInitializer.DBCV, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.LOCATION,
+						WorkbookTestDataInitializer.CHAR, "", WorkbookTestDataInitializer.TRIAL, TermId.CHARACTER_VARIABLE.getId(),
+						PhenotypicType.TRIAL_ENVIRONMENT, false);
 		variable.setOperation(Operation.ADD);
 		conditions.add(variable);
 
-		variable = WorkbookTestDataInitializer.createMeasurementVariable(TermId.LOCATION_ID.getId(), "SITE ID", "TRIAL SITE ID",
-				WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.LOCATION,
-				WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.TRIAL,
-				TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT, false);
+		variable =
+				WorkbookTestDataInitializer.createMeasurementVariable(TermId.LOCATION_ID.getId(), "SITE ID", "TRIAL SITE ID",
+						WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.LOCATION,
+						WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.TRIAL,
+						TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT, false);
 		variable.setOperation(Operation.ADD);
 		conditions.add(variable);
 	}
@@ -891,45 +901,44 @@ public class WorkbookTestDataInitializer {
 			dataList = new ArrayList<>();
 
 			MeasurementData data = new MeasurementData(WorkbookTestDataInitializer.TRIAL_INSTANCE, String.valueOf(i + 1));
-			data.setMeasurementVariable(
-					WorkbookTestDataInitializer.getMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getConditions()));
+			data.setMeasurementVariable(WorkbookTestDataInitializer.getMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(),
+					workbook.getConditions()));
 			dataList.add(data);
 			data = new MeasurementData(WorkbookTestDataInitializer.PI_NAME, "");
-			data.setMeasurementVariable(
-					WorkbookTestDataInitializer.getMeasurementVariable(TermId.PI_NAME.getId(), workbook.getConditions()));
+			data.setMeasurementVariable(WorkbookTestDataInitializer.getMeasurementVariable(TermId.PI_NAME.getId(), workbook.getConditions()));
 			dataList.add(data);
 			data = new MeasurementData(WorkbookTestDataInitializer.PI_ID, "");
 			data.setMeasurementVariable(WorkbookTestDataInitializer.getMeasurementVariable(TermId.PI_ID.getId(), workbook.getConditions()));
 			dataList.add(data);
 			data = new MeasurementData(WorkbookTestDataInitializer.COOPERATOR, "");
-			data.setMeasurementVariable(
-					WorkbookTestDataInitializer.getMeasurementVariable(TermId.COOPERATOR.getId(), workbook.getConditions()));
+			data.setMeasurementVariable(WorkbookTestDataInitializer.getMeasurementVariable(TermId.COOPERATOR.getId(),
+					workbook.getConditions()));
 			dataList.add(data);
 			data = new MeasurementData(WorkbookTestDataInitializer.COOPERATOR_ID, "");
-			data.setMeasurementVariable(
-					WorkbookTestDataInitializer.getMeasurementVariable(TermId.COOPERATOOR_ID.getId(), workbook.getConditions()));
+			data.setMeasurementVariable(WorkbookTestDataInitializer.getMeasurementVariable(TermId.COOPERATOOR_ID.getId(),
+					workbook.getConditions()));
 			dataList.add(data);
 			data = new MeasurementData(WorkbookTestDataInitializer.SITE, WorkbookTestDataInitializer.LNAME + "_" + (i + 1));
-			data.setMeasurementVariable(
-					WorkbookTestDataInitializer.getMeasurementVariable(TermId.TRIAL_LOCATION.getId(), workbook.getConditions()));
+			data.setMeasurementVariable(WorkbookTestDataInitializer.getMeasurementVariable(TermId.TRIAL_LOCATION.getId(),
+					workbook.getConditions()));
 			dataList.add(data);
 			data = new MeasurementData(WorkbookTestDataInitializer.SITE_ID, String.valueOf(i + 1));
-			data.setMeasurementVariable(
-					WorkbookTestDataInitializer.getMeasurementVariable(TermId.LOCATION_ID.getId(), workbook.getConditions()));
+			data.setMeasurementVariable(WorkbookTestDataInitializer.getMeasurementVariable(TermId.LOCATION_ID.getId(),
+					workbook.getConditions()));
 			dataList.add(data);
 
 			// Check variables
 			data = new MeasurementData("CHECK_START", String.valueOf(i + 1));
-			data.setMeasurementVariable(
-					WorkbookTestDataInitializer.getMeasurementVariable(TermId.CHECK_START.getId(), workbook.getConditions()));
+			data.setMeasurementVariable(WorkbookTestDataInitializer.getMeasurementVariable(TermId.CHECK_START.getId(),
+					workbook.getConditions()));
 			dataList.add(data);
 			data = new MeasurementData("CHECK_INTERVAL", String.valueOf(i + 1));
-			data.setMeasurementVariable(
-					WorkbookTestDataInitializer.getMeasurementVariable(TermId.CHECK_PLAN.getId(), workbook.getConditions()));
+			data.setMeasurementVariable(WorkbookTestDataInitializer.getMeasurementVariable(TermId.CHECK_PLAN.getId(),
+					workbook.getConditions()));
 			dataList.add(data);
 			data = new MeasurementData("CHECK_PLAN", "1");
-			data.setMeasurementVariable(
-					WorkbookTestDataInitializer.getMeasurementVariable(TermId.CHECK_INTERVAL.getId(), workbook.getConditions()));
+			data.setMeasurementVariable(WorkbookTestDataInitializer.getMeasurementVariable(TermId.CHECK_INTERVAL.getId(),
+					workbook.getConditions()));
 			dataList.add(data);
 
 			row.setDataList(dataList);
