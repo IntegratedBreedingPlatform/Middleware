@@ -7,8 +7,28 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
+	<changeSet author="nahuel" id="1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="listdata_project" columnName="crossing_date" />
+			</not>
+		</preConditions>
+		<addColumn tableName="listdata_project">
+			<column name="crossing_date" type="INT" />
+		</addColumn>
+	</changeSet>
+	<changeSet author="nahuel" id="2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="listdata_project" columnName="notes" />
+			</not>
+		</preConditions>
+		<addColumn tableName="listdata_project">
+			<column name="notes" type="varchar(255)" />
+		</addColumn>
+	</changeSet>
 
-	<changeSet author="akhil" id="1">
+	<changeSet author="akhil" id="3">
 
 		<preConditions onFail="MARK_RAN">
 			<!--
@@ -103,6 +123,7 @@
 			     DEALLOCATE PREPARE stmt;
 			END
 		</sql>
+
 	</changeSet>
 
 </databaseChangeLog>
