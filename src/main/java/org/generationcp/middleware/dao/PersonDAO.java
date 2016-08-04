@@ -167,17 +167,17 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 		return map;
 	}
 
-	public Person getPersonByName(String firstName, String middleName, String lastName) throws MiddlewareQueryException {
+	public Person getPersonByName(final String firstName, final String middleName, final String lastName) {
 		Person person = null;
 		try {
-			Criteria criteria = this.getSession().createCriteria(Person.class);
+			final Criteria criteria = this.getSession().createCriteria(Person.class);
 			criteria.add(Restrictions.eq("firstName", firstName));
 			criteria.add(Restrictions.eq("lastName", lastName));
 			criteria.add(Restrictions.eq("middleName", middleName));
 
 			person = (Person) criteria.uniqueResult();
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException(
 					String.format("Error with getPersonByName(firstName=[%s],middleName=[%s],lastName)", firstName, middleName, lastName),
 					e);
