@@ -52,7 +52,7 @@
 					SET searchGid = '0';
 				 END IF;			     
 
-			     # Start off the in clause with the search gid's provided.
+			     # Start off the in clause with the search gids provided.
 			     SET @gidInClause = CONCAT(searchGid);
 				 
 				 # Only loop if you have something to search for
