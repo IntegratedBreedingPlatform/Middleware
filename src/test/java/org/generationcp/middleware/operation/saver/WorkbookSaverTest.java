@@ -49,7 +49,7 @@ import org.mockito.Mockito;
 public class WorkbookSaverTest extends IntegrationTestBase {
 
 	private WorkbookSaver workbookSaver;
-	
+
 	private static final String PROGRAM_UUID = "1234567890";
 	private static final String STUDY_NAME_PREFIX = "studyName";
 	private static final int NO_OF_OBSERVATIONS_PER_TRIAL_INSTANCE = 3;
@@ -57,15 +57,15 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 	@Before
 	public void setUp() {
 		super.beforeEachTest();
-		workbookSaver = new WorkbookSaver(sessionProvder);
+		this.workbookSaver = new WorkbookSaver(this.sessionProvder);
 	}
 
 	@Test
 	public void testPropagationOfTrialFactorsWithTrialVariablesAndWOTrialFactorWithEnvironmentAndVariates() {
-		VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(false);
-		VariableTypeList trialVariables = VariableTypeListDataUtil.createTrialVariableTypeList(true);
+		final VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(false);
+		final VariableTypeList trialVariables = VariableTypeListDataUtil.createTrialVariableTypeList(true);
 
-		VariableTypeList plotVariables = workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
+		final VariableTypeList plotVariables = this.workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
 
 		Assert.assertEquals("Expected an aditional entry for trial instance but found none.", effectVariables.size() + 1,
 				plotVariables.size());
@@ -73,12 +73,11 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 				this.areTrialAndConstantsInList(plotVariables, effectVariables));
 	}
 
-	private boolean areTrialAndConstantsInList(VariableTypeList plotVariables, VariableTypeList effectVariables) {
+	private boolean areTrialAndConstantsInList(final VariableTypeList plotVariables, final VariableTypeList effectVariables) {
 		if (plotVariables != null) {
-			for (DMSVariableType var : plotVariables.getVariableTypes()) {
+			for (final DMSVariableType var : plotVariables.getVariableTypes()) {
 				if (var.getStandardVariable().getId() != TermId.TRIAL_INSTANCE_FACTOR.getId()
-						&& (PhenotypicType.TRIAL_ENVIRONMENT == 
-								var.getRole() || PhenotypicType.VARIATE == var.getRole()
+						&& (PhenotypicType.TRIAL_ENVIRONMENT == var.getRole() || PhenotypicType.VARIATE == var.getRole()
 								&& !this.isInOriginalPlotDataset(var.getStandardVariable().getId(), effectVariables))) {
 					return true;
 				}
@@ -88,9 +87,9 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 		return false;
 	}
 
-	private boolean isInOriginalPlotDataset(int id, VariableTypeList effectVariables) {
+	private boolean isInOriginalPlotDataset(final int id, final VariableTypeList effectVariables) {
 		if (effectVariables != null) {
-			for (DMSVariableType var : effectVariables.getVariableTypes()) {
+			for (final DMSVariableType var : effectVariables.getVariableTypes()) {
 				if (var.getStandardVariable().getId() == id) {
 					return true;
 				}
@@ -101,10 +100,10 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 
 	@Test
 	public void testPropagationOfTrialFactorsWithTrialVariablesAndWOTrialFactorWOEnvironmentAndVariates() {
-		VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(false);
-		VariableTypeList trialVariables = VariableTypeListDataUtil.createTrialVariableTypeList(false);
+		final VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(false);
+		final VariableTypeList trialVariables = VariableTypeListDataUtil.createTrialVariableTypeList(false);
 
-		VariableTypeList plotVariables = workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
+		final VariableTypeList plotVariables = this.workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
 
 		Assert.assertEquals("Expected an aditional entry for trial instance but found none.", effectVariables.size() + 1,
 				plotVariables.size());
@@ -114,30 +113,30 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 
 	@Test
 	public void testPropagationOfTrialFactorsWithTrialVariablesAndTrialFactor() {
-		VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(true);
-		VariableTypeList trialVariables = VariableTypeListDataUtil.createTrialVariableTypeList(false);
+		final VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(true);
+		final VariableTypeList trialVariables = VariableTypeListDataUtil.createTrialVariableTypeList(false);
 
-		VariableTypeList plotVariables = workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
+		final VariableTypeList plotVariables = this.workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
 
 		Assert.assertEquals("Expected no change in the plot dataset but found one.", effectVariables.size(), plotVariables.size());
 	}
 
 	@Test
 	public void testPropagationOfTrialFactorsWOTrialVariablesWithTrialFactor() {
-		VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(true);
-		VariableTypeList trialVariables = null;
+		final VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(true);
+		final VariableTypeList trialVariables = null;
 
-		VariableTypeList plotVariables = workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
+		final VariableTypeList plotVariables = this.workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
 
 		Assert.assertEquals("Expected no change in the plot dataset but found one.", effectVariables.size(), plotVariables.size());
 	}
 
 	@Test
 	public void testPropagationOfTrialFactorsWOTrialVariablesAndTrialFactor() {
-		VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(false);
-		VariableTypeList trialVariables = null;
+		final VariableTypeList effectVariables = VariableTypeListDataUtil.createPlotVariableTypeList(false);
+		final VariableTypeList trialVariables = null;
 
-		VariableTypeList plotVariables = workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
+		final VariableTypeList plotVariables = this.workbookSaver.propagateTrialFactorsIfNecessary(effectVariables, trialVariables);
 
 		Assert.assertEquals("Expected no change in the plot dataset but found one.", effectVariables.size(), plotVariables.size());
 	}
@@ -148,45 +147,48 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 		final String programUUID = "abc";
 		final String studyName = "nursery_1" + new Random().nextInt(10000);
 
-		Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyType.N, studyName, 1, true);
-		WorkbookSaver workbookSaver = Mockito.mock(WorkbookSaver.class, Mockito.CALLS_REAL_METHODS);
+		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyType.N, studyName, 1, true);
+		final WorkbookSaver workbookSaver = Mockito.mock(WorkbookSaver.class, Mockito.CALLS_REAL_METHODS);
 
-		VariableTypeListTransformer transformer = Mockito.mock(VariableTypeListTransformer.class); //new VariableTypeListTransformer(Mockito.mock(HibernateSessionProvider.class));
+		final VariableTypeListTransformer transformer = Mockito.mock(VariableTypeListTransformer.class); // new
+		// VariableTypeListTransformer(Mockito.mock(HibernateSessionProvider.class));
 
-		VariableTypeList trialConditionsVariableTypeList = createVariableTypeList(workbook.getTrialConditions(), 1);
+		final VariableTypeList trialConditionsVariableTypeList = this.createVariableTypeList(workbook.getTrialConditions(), 1);
 		Mockito.doReturn(trialConditionsVariableTypeList).when(transformer).transform(workbook.getTrialConditions(), programUUID);
 
-		VariableTypeList nonTrialFactorsVariableTypeList = createVariableTypeList(workbook.getNonTrialFactors(), 1);
+		final VariableTypeList nonTrialFactorsVariableTypeList = this.createVariableTypeList(workbook.getNonTrialFactors(), 1);
 		Mockito.doReturn(nonTrialFactorsVariableTypeList).when(transformer).transform(workbook.getNonTrialFactors(), programUUID);
 
-		VariableTypeList trialFactorsVariableTypeList= createVariableTypeList(workbook.getTrialFactors(), 1);
-		Mockito.doReturn(trialFactorsVariableTypeList).when(transformer).transform(workbook.getTrialFactors(),
-				workbook.getTrialConditions().size() + 1, programUUID);
+		final VariableTypeList trialFactorsVariableTypeList = this.createVariableTypeList(workbook.getTrialFactors(), 1);
+		Mockito.doReturn(trialFactorsVariableTypeList).when(transformer)
+				.transform(workbook.getTrialFactors(), workbook.getTrialConditions().size() + 1, programUUID);
 
-		VariableTypeList trialConstantsVariableTypeList= createVariableTypeList(workbook.getTrialConstants(), 1);
-		Mockito.doReturn(trialConstantsVariableTypeList).when(transformer).transform(workbook.getTrialConstants(),
-				workbook.getTrialConditions().size() + workbook.getTrialFactors().size() + 1, programUUID);
+		final VariableTypeList trialConstantsVariableTypeList = this.createVariableTypeList(workbook.getTrialConstants(), 1);
+		Mockito.doReturn(trialConstantsVariableTypeList)
+				.when(transformer)
+				.transform(workbook.getTrialConstants(), workbook.getTrialConditions().size() + workbook.getTrialFactors().size() + 1,
+						programUUID);
 
-		VariableTypeList variatesVariableTypeList= createVariableTypeList(workbook.getVariates(), 1);
+		final VariableTypeList variatesVariableTypeList = this.createVariableTypeList(workbook.getVariates(), 1);
 		Mockito.doReturn(variatesVariableTypeList).when(transformer).transform(workbook.getVariates(), 10, programUUID);
 
 		Mockito.doReturn(transformer).when(workbookSaver).getVariableTypeListTransformer();
 
-		Map variableMap = workbookSaver.saveVariables(workbook, programUUID);
+		final Map variableMap = workbookSaver.saveVariables(workbook, programUUID);
 
-		Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
-		Map<String, List<MeasurementVariable>> measurementVariableMap =
+		final Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
+		final Map<String, List<MeasurementVariable>> measurementVariableMap =
 				(Map<String, List<MeasurementVariable>>) variableMap.get("measurementVariableMap");
-		Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
+		final Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
 
 		final List<String> trialHeaders = headerMap.get("trialHeaders");
 
-		VariableTypeList trialVariableTypeList = variableTypeMap.get("trialVariableTypeList");
+		final VariableTypeList trialVariableTypeList = variableTypeMap.get("trialVariableTypeList");
 		final VariableTypeList trialVariables = variableTypeMap.get("trialVariables");
 		final VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
 
 		final List<MeasurementVariable> trialMV = measurementVariableMap.get("trialMV");
-		List<MeasurementVariable> effectMV = measurementVariableMap.get("effectMV");
+		final List<MeasurementVariable> effectMV = measurementVariableMap.get("effectMV");
 
 		Assert.assertNotEquals(0, trialHeaders.size());
 
@@ -198,179 +200,188 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 		Assert.assertNotEquals(0, trialVariableTypeList.getVariableTypes().size());
 	}
 
-	private StandardVariable transformMeasurementVariableToVariable(MeasurementVariable measurementVariable){
-		StandardVariable standardVariable = new StandardVariable();
+	private StandardVariable transformMeasurementVariableToVariable(final MeasurementVariable measurementVariable) {
+		final StandardVariable standardVariable = new StandardVariable();
 
 		standardVariable.setId(measurementVariable.getTermId());
 		standardVariable.setName(measurementVariable.getName());
 		standardVariable.setDescription(measurementVariable.getDescription());
 
-		Integer methodId = new Random().nextInt(10000);
-		Integer propertyId = new Random().nextInt(10000);
-		Integer scaleId = new Random().nextInt(10000);
+		final Integer methodId = new Random().nextInt(10000);
+		final Integer propertyId = new Random().nextInt(10000);
+		final Integer scaleId = new Random().nextInt(10000);
 
 		standardVariable.setMethod(new Method(new Term(methodId, measurementVariable.getMethod(), "Method Description")));
 		standardVariable.setProperty(new Property(new Term(propertyId, measurementVariable.getProperty(), "Property Description")));
 		standardVariable.setScale(new Scale(new Term(scaleId, measurementVariable.getScale(), "Scale Description")));
-		standardVariable.setDataType(new Term(DataType.NUMERIC_VARIABLE.getId(), DataType.NUMERIC_VARIABLE.getName(), "Data Type Description"));
+		standardVariable.setDataType(new Term(DataType.NUMERIC_VARIABLE.getId(), DataType.NUMERIC_VARIABLE.getName(),
+				"Data Type Description"));
 		standardVariable.setIsA(new Term(new Random().nextInt(1000), "IsA", "IsA Description"));
 		standardVariable.setPhenotypicType(measurementVariable.getRole());
 		standardVariable.setCropOntologyId("CO:100");
-		standardVariable.setVariableTypes(new HashSet<>(
-				new ArrayList<>(Collections.singletonList(OntologyDataHelper.mapFromPhenotype(measurementVariable.getRole(), measurementVariable
-						.getProperty())))));
+		standardVariable.setVariableTypes(new HashSet<>(new ArrayList<>(Collections.singletonList(OntologyDataHelper.mapFromPhenotype(
+				measurementVariable.getRole(), measurementVariable.getProperty())))));
 
 		return standardVariable;
 	}
 
-	private DMSVariableType transformToDMSVariableType(MeasurementVariable measurementVariable, int rank){
-		StandardVariable standardVariable = transformMeasurementVariableToVariable(measurementVariable);
+	private DMSVariableType transformToDMSVariableType(final MeasurementVariable measurementVariable, int rank) {
+		final StandardVariable standardVariable = this.transformMeasurementVariableToVariable(measurementVariable);
 
-		DMSVariableType dmsVariableType = new DMSVariableType(measurementVariable.getName(), measurementVariable.getDescription(), standardVariable, rank++);
+		final DMSVariableType dmsVariableType =
+				new DMSVariableType(measurementVariable.getName(), measurementVariable.getDescription(), standardVariable, rank++);
 		dmsVariableType.setTreatmentLabel(measurementVariable.getTreatmentLabel());
 		return dmsVariableType;
 	}
 
-	private VariableTypeList createVariableTypeList(List<MeasurementVariable> measurementVariables, int rank){
-		VariableTypeList variableTypeList = new VariableTypeList();
+	private VariableTypeList createVariableTypeList(final List<MeasurementVariable> measurementVariables, final int rank) {
+		final VariableTypeList variableTypeList = new VariableTypeList();
 
-		for(MeasurementVariable measurementVariable : measurementVariables){
-			variableTypeList.add(transformToDMSVariableType(measurementVariable, rank));
+		for (final MeasurementVariable measurementVariable : measurementVariables) {
+			variableTypeList.add(this.transformToDMSVariableType(measurementVariable, rank));
 		}
 		return variableTypeList;
 	}
-	
-	
-	
+
 	@Test
 	public void testCreateLocationsAndSetToObservationsForTrialWithTrialObservations() {
 		final StudyType studyType = StudyType.T;
 		final boolean withTrialObservations = true;
-		boolean hasMultipleLocations = true;
-		testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations);
+		final boolean hasMultipleLocations = true;
+		this.testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations);
 	}
-	
+
 	@Test
 	public void testCreateLocationsAndSetToObservationsForTrialWithoutTrialObservations() {
 		final StudyType studyType = StudyType.T;
 		final boolean withTrialObservations = false;
-		boolean hasMultipleLocations = true;
-		testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations);
+		final boolean hasMultipleLocations = true;
+		this.testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations);
 	}
-	
+
 	@Test
 	public void testCreateLocationsAndSetToObservationsForTrialWithTrialObservationsSingleLocation() {
 		final StudyType studyType = StudyType.T;
+		// for trial with single location, the method is called when there is a trial observation
 		final boolean withTrialObservations = true;
-		boolean hasMultipleLocations = false;
-		testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations);
+		final boolean hasMultipleLocations = false;
+		this.testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations);
 	}
-	
+
 	@Test
 	public void testCreateLocationsAndSetToObservationsForNurseryWithTrialObservations() {
 		final StudyType studyType = StudyType.N;
-		//for a nursery, the method is only called when there is a trial observation
+		// for a nursery, the method is only called when there is a trial observation
 		final boolean withTrialObservations = true;
-		//nursery can only have 1 location
-		boolean hasMultipleLocations = false;
-		testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations);
+		// nursery can only have 1 location
+		final boolean hasMultipleLocations = false;
+		this.testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations);
 	}
-	
-	public void testCreateLocationsAndSetToObservations(final StudyType studyType, final boolean withTrialObservations, boolean hasMultipleLocations) {
-		//the variable to verify value correctness (location ids created and variates per location id)
+
+	public void testCreateLocationsAndSetToObservations(final StudyType studyType, final boolean withTrialObservations,
+			final boolean hasMultipleLocations) {
+		// the variable to verify value correctness (location ids created and variates per location id)
 		final List<Integer> locationIds = new ArrayList<>();
 		final Map<Integer, VariableList> trialVariatesMap = new HashMap<Integer, VariableList>();
-		//the trial workbook populated with trial observations
+		// the trial workbook populated with trial observations
 		final Workbook workbook = this.createWorkbookTestData(studyType, withTrialObservations, hasMultipleLocations);
 		final VariableTypeList trialFactors = this.getTrialFactors(workbook, withTrialObservations);
 		final List<String> trialHeaders = workbook.getTrialHeaders();
 		final boolean isDeleteTrialObservations = false;
-		
-		//test method
-		final int studyLocationId = workbookSaver.createLocationsAndSetToObservations(locationIds, workbook, trialFactors, 
-				trialHeaders, trialVariatesMap, isDeleteTrialObservations, PROGRAM_UUID);
-		
-		//verify the value of locationIds and the studyLocationId which is the first location id
+
+		// test method
+		final int studyLocationId =
+				this.workbookSaver.createLocationsAndSetToObservations(locationIds, workbook, trialFactors, trialHeaders, trialVariatesMap,
+						isDeleteTrialObservations, WorkbookSaverTest.PROGRAM_UUID);
+
+		// verify the value of locationIds and the studyLocationId which is the first location id
 		int expectedNumberOfLocations = 1;
-		if(hasMultipleLocations) {
+		if (hasMultipleLocations) {
 			expectedNumberOfLocations = 2;
 		}
-		Assert.assertEquals("There should be " + expectedNumberOfLocations + " location ids created", 
-				expectedNumberOfLocations, locationIds.size());
-		int expectedStudyLocationId = new Integer(locationIds.get(0)).intValue();
+		Assert.assertEquals("There should be " + expectedNumberOfLocations + " location ids created", expectedNumberOfLocations,
+				locationIds.size());
+		final int expectedStudyLocationId = new Integer(locationIds.get(0)).intValue();
 		Assert.assertEquals("The studyLocationId should be the first location id created", expectedStudyLocationId, studyLocationId);
-		//verify the value of trial variates per location id
-		for (Integer locationId : locationIds) {
-			VariableList trialVariates = trialVariatesMap.get(locationId);
-			
-			if(withTrialObservations) {
-				//since this is a trial observation, trial constants/variates should be found
+		// verify the value of trial variates per location id
+		for (final Integer locationId : locationIds) {
+			final VariableList trialVariates = trialVariatesMap.get(locationId);
+
+			if (withTrialObservations) {
+				// since this is a trial observation, trial constants/variates should be found
 				Assert.assertNotNull("Trial variates should be found", trialVariates);
 				Assert.assertEquals("There should be two trial variates found", 2, trialVariates.size());
-				List<Integer> expectedTrialVariateIds = Arrays.asList(WorkbookTestDataInitializer.PLANT_HEIGHT_UNIT_ERRORS_ID,
-						WorkbookTestDataInitializer.GRAIN_SIZE_ID);
-				for (Variable variable : trialVariates.getVariables()) {
-					int variableId = variable.getVariableType().getStandardVariable().getId();
-					Assert.assertTrue("The variable id should be found in " + expectedTrialVariateIds, expectedTrialVariateIds.contains(variableId));
+				final List<Integer> expectedTrialVariateIds =
+						Arrays.asList(WorkbookTestDataInitializer.PLANT_HEIGHT_UNIT_ERRORS_ID, WorkbookTestDataInitializer.GRAIN_SIZE_ID);
+				for (final Variable variable : trialVariates.getVariables()) {
+					final int variableId = variable.getVariableType().getStandardVariable().getId();
+					Assert.assertTrue("The variable id should be found in " + expectedTrialVariateIds,
+							expectedTrialVariateIds.contains(variableId));
 				}
 			} else {
 				Assert.assertNull("Trial variates should not be found", trialVariates);
 			}
 		}
-		//verify the locationId set for the trial observation matches the location ids
+		// verify the locationId set for the trial observation matches the location ids
 		for (final MeasurementRow measurementRow : workbook.getTrialObservations()) {
-			Assert.assertTrue("The location id of the measurement row should be one of the location ids created", 
+			Assert.assertTrue("The location id of the measurement row should be one of the location ids created",
 					locationIds.contains(new Long(measurementRow.getLocationId()).intValue()));
 		}
 	}
 
-	private VariableTypeList getTrialFactors(Workbook workbook, boolean withTrialObservations) {
+	private VariableTypeList getTrialFactors(final Workbook workbook, final boolean withTrialObservations) {
 		VariableTypeList trialFactors = new VariableTypeList();
-		//condition variables are only part of trial observations, not observations
-		if(withTrialObservations) {
-			trialFactors = workbookSaver.getVariableTypeListTransformer().
-					transform(workbook.getTrialConditions(), PROGRAM_UUID);
+		// condition variables are only part of trial observations, not observations
+		if (withTrialObservations) {
+			trialFactors =
+					this.workbookSaver.getVariableTypeListTransformer().transform(workbook.getTrialConditions(),
+							WorkbookSaverTest.PROGRAM_UUID);
 		}
 		int rank = trialFactors.size() + 1;
-		trialFactors.addAll(workbookSaver.getVariableTypeListTransformer().transform(workbook.getTrialFactors(), rank, PROGRAM_UUID));
-		//constant variables are only part of trial observations, not observations
-		if(withTrialObservations) {
+		trialFactors.addAll(this.workbookSaver.getVariableTypeListTransformer().transform(workbook.getTrialFactors(), rank,
+				WorkbookSaverTest.PROGRAM_UUID));
+		// constant variables are only part of trial observations, not observations
+		if (withTrialObservations) {
 			rank = trialFactors.size() + 1;
-			trialFactors.addAll(workbookSaver.getVariableTypeListTransformer().transform(workbook.getTrialConstants(), PROGRAM_UUID));
+			trialFactors.addAll(this.workbookSaver.getVariableTypeListTransformer().transform(workbook.getTrialConstants(),
+					WorkbookSaverTest.PROGRAM_UUID));
 		}
 		return trialFactors;
 	}
 
-	private Workbook createWorkbookTestData(StudyType studyType, boolean withTrialObservations, boolean hasMultipleLocations) {
-		String studyName = STUDY_NAME_PREFIX + studyType.getLabel();
-		boolean isForMeansDataset = false;
-		
-		//create observations for trial instance 1
+	private Workbook createWorkbookTestData(final StudyType studyType, final boolean withTrialObservations,
+			final boolean hasMultipleLocations) {
+		final String studyName = WorkbookSaverTest.STUDY_NAME_PREFIX + studyType.getLabel();
+		final boolean isForMeansDataset = false;
+
+		// create observations for trial instance 1
 		int trialInstanceNumber = 1;
-		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(NO_OF_OBSERVATIONS_PER_TRIAL_INSTANCE, studyType, 
-				studyName, trialInstanceNumber, hasMultipleLocations, isForMeansDataset);
+		final Workbook workbook =
+				WorkbookTestDataInitializer.createTestWorkbook(WorkbookSaverTest.NO_OF_OBSERVATIONS_PER_TRIAL_INSTANCE, studyType,
+						studyName, trialInstanceNumber, hasMultipleLocations, isForMeansDataset);
 		workbook.setTrialObservations(new ArrayList<MeasurementRow>());
-		if(withTrialObservations) {
+		if (withTrialObservations) {
 			this.addTrialObservationsFromWorkbook(workbook, workbook.getTrialObservations(), trialInstanceNumber, hasMultipleLocations);
 		}
-		
-		if(hasMultipleLocations) {
-			//create for trial instance 2
+
+		if (hasMultipleLocations) {
+			// create for trial instance 2
 			trialInstanceNumber = 2;
-			final List<MeasurementRow> observationsWithTrialInstace2 = WorkbookTestDataInitializer.createObservations(
-					workbook, NO_OF_OBSERVATIONS_PER_TRIAL_INSTANCE, hasMultipleLocations, trialInstanceNumber, isForMeansDataset);
+			final List<MeasurementRow> observationsWithTrialInstace2 =
+					WorkbookTestDataInitializer.createObservations(workbook, WorkbookSaverTest.NO_OF_OBSERVATIONS_PER_TRIAL_INSTANCE,
+							hasMultipleLocations, trialInstanceNumber, isForMeansDataset);
 			workbook.getObservations().addAll(observationsWithTrialInstace2);
-			if(withTrialObservations) {
+			if (withTrialObservations) {
 				this.addTrialObservationsFromWorkbook(workbook, workbook.getTrialObservations(), trialInstanceNumber, hasMultipleLocations);
 			}
 		}
 		return workbook;
 	}
 
-	private void addTrialObservationsFromWorkbook(final Workbook workbook, final List<MeasurementRow> trialObservations, int trialInstanceNumber,
-			boolean hasMultipleLocations) {
+	private void addTrialObservationsFromWorkbook(final Workbook workbook, final List<MeasurementRow> trialObservations,
+			final int trialInstanceNumber, final boolean hasMultipleLocations) {
 		trialObservations.addAll(WorkbookTestDataInitializer.createTrialObservations(
-			NO_OF_OBSERVATIONS_PER_TRIAL_INSTANCE, String.valueOf(trialInstanceNumber), 
-			workbook.getFactors(), workbook.getConditions(), workbook.getConstants(), hasMultipleLocations));
+				WorkbookSaverTest.NO_OF_OBSERVATIONS_PER_TRIAL_INSTANCE, String.valueOf(trialInstanceNumber), workbook.getFactors(),
+				workbook.getConditions(), workbook.getConstants(), hasMultipleLocations));
 	}
 }
