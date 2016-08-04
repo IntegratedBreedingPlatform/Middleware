@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.Name;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -154,6 +155,10 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		return query.executeUpdate();
 	}
 
+	/**
+	 * This will return all germplasm list data including the details of their parents. Note that we're getting the name of the parents from
+	 * its preferred name which is indicated by nstat = 1
+	 * */
 	public List<GermplasmListData> getListDataWithParents(final Integer listID) {
 		final List<GermplasmListData> germplasmListData = new ArrayList<GermplasmListData>();
 
@@ -165,13 +170,14 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 			final String queryStr =
 					"select  lp.lrecid as lrecid,  lp.entryid as entryid,  lp.desig as desig,  lp.grpname as grpname, "
-							+ " fn.nval as fnval,  fp.gid as fpgid,  mn.nval as mnval,  mp.gid as mpgid,  g.gid as gid,  lp.source as source  "
+							+ "femaleParentName.nval as fnval,  fp.gid as fpgid,  maleParentName.nval as mnval, "
+							+ "mp.gid as mpgid,  g.gid as gid,  lp.source as source "
 							+ "from listdata lp  inner join germplsm g on lp.gid = g.gid  "
 							+ "left outer join germplsm mp on g.gpid2 = mp.gid  "
-							+ "left outer join names mn on mp.gid = mn.gid and mn.nstat = 1  "
-							+ "left outer join germplsm fp on g.gpid1 = fp.gid  "
-							+ "left outer join names fn on fp.gid = fn.gid and fn.nstat = 1  "
-							+ "where lp.listid = :listId group by entryid";
+							+ "left outer join names maleParentName on mp.gid = maleParentName.gid " + "and maleParentName.nstat = "
+							+ Name.NSTAT_PREFERRED_NAME + " " + "left outer join germplsm fp on g.gpid1 = fp.gid  "
+							+ "left outer join names femaleParentName on fp.gid = femaleParentName.gid " + "and femaleParentName.nstat = "
+							+ Name.NSTAT_PREFERRED_NAME + " " + "where lp.listid = :listId group by entryid";
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryStr);
 			query.setParameter("listId", listID);
