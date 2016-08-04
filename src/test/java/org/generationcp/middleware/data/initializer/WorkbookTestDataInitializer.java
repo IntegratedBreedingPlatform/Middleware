@@ -135,7 +135,6 @@ public class WorkbookTestDataInitializer {
 	public static final String INVALID_CRUST_VALUE_MISSING = "missing";
 
 	public static final int DEFAULT_NO_OF_OBSERVATIONS = 10;
-	public static final int EXPT_DESIGN_ID = 8135;
 	public static final String EXPERIMENT_DESIGN = "Experimental design";
 	public static final String TYPE = "Type";
 	public static final int SITE_SOIL_PH_ID = 8270;
@@ -202,37 +201,51 @@ public class WorkbookTestDataInitializer {
 			final int trialNo, final boolean hasMultipleLocations, final boolean isForMeansDataset) {
 		final Workbook workbook = new Workbook();
 		WorkbookTestDataInitializer.setDefaultValues(workbook);
-		WorkbookTestDataInitializer.createStudyDetails(workbook, studyName, studyType);
+		WorkbookTestDataInitializer.createAndSetStudyDetails(workbook, studyName, studyType);
 		workbook.setConditions(WorkbookTestDataInitializer.createConditions(!hasMultipleLocations, trialNo,
 				WorkbookTestDataInitializer.LOCATION_ID_1, studyName));
-		WorkbookTestDataInitializer.createFactors(workbook, true, hasMultipleLocations, trialNo);
-		WorkbookTestDataInitializer.createConstants(workbook);
-		WorkbookTestDataInitializer.createVariates(workbook, isForMeansDataset);
-		WorkbookTestDataInitializer.createObservations(workbook, noOfObservations, hasMultipleLocations, trialNo, isForMeansDataset);
+		WorkbookTestDataInitializer.createAndSetFactors(workbook, true, hasMultipleLocations, trialNo);
+		WorkbookTestDataInitializer.createAndSetConstants(workbook);
+		WorkbookTestDataInitializer.createAndSetVariates(workbook, isForMeansDataset);
+		WorkbookTestDataInitializer.createAndSetObservations(workbook, noOfObservations, hasMultipleLocations, trialNo, isForMeansDataset);
 		return workbook;
 	}
 
 	public static void setTrialObservations(final Workbook workbook) {
+		final List<MeasurementRow> trialObservations =
+				WorkbookTestDataInitializer.createTrialObservations(workbook.getObservations().size(), String.valueOf(1),
+						workbook.getFactors(), workbook.getConditions(), workbook.getConstants());
+		workbook.setTrialObservations(trialObservations);
+	}
+
+	public static List<MeasurementRow> createTrialObservations(final int numberOfObservations, final String trialInstanceNumber,
+			final List<MeasurementVariable> factors, final List<MeasurementVariable> conditions, final List<MeasurementVariable> constants) {
 		final List<MeasurementRow> trialObservations = new ArrayList<>();
 		MeasurementRow row;
 		List<MeasurementData> dataList;
 
 		// Create n number of observation rows
-		for (int i = 0; i < workbook.getObservations().size(); i++) {
+		for (int i = 1; i <= numberOfObservations; i++) {
 			row = new MeasurementRow();
 			dataList = new ArrayList<>();
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.TRIAL, String.valueOf(1),
-					TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getFactors()));
+			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.TRIAL,
+					String.valueOf(trialInstanceNumber), TermId.TRIAL_INSTANCE_FACTOR.getId(), factors));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData("SITE", String.valueOf(1), TermId.TRIAL_LOCATION.getId(),
-					workbook.getConditions()));
+					conditions));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData("SITE ID", String.valueOf(1), TermId.LOCATION_ID.getId(),
-					workbook.getConditions()));
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData("PLTHT_UnitErrors", String.valueOf(1),
-					WorkbookTestDataInitializer.PLANT_HEIGHT_UNIT_ERRORS_ID, workbook.getConditions()));
+					conditions));
+			dataList.add(WorkbookTestDataInitializer.createMeasurementData("DESIGN",
+					String.valueOf(TermId.RANDOMIZED_COMPLETE_BLOCK.getId()), TermId.EXPERIMENT_DESIGN_FACTOR.getId(), conditions));
+			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.PLANT_HEIGHT_UNIT_ERRORS_NAME,
+					String.valueOf(1), WorkbookTestDataInitializer.PLANT_HEIGHT_UNIT_ERRORS_ID, conditions));
+			dataList.add(WorkbookTestDataInitializer.createMeasurementData("Grain_size", String.valueOf(1),
+					WorkbookTestDataInitializer.GRAIN_SIZE_ID, constants));
+
 			row.setDataList(dataList);
 			trialObservations.add(row);
 		}
-		workbook.setTrialObservations(trialObservations);
+
+		return trialObservations;
 	}
 
 	private static void setDefaultValues(final Workbook workbook) {
@@ -244,30 +257,29 @@ public class WorkbookTestDataInitializer {
 		final Workbook workbook = new Workbook();
 
 		final String studyName = "workbookWithErrors" + new Random().nextInt(10000);
-		WorkbookTestDataInitializer.createStudyDetails(workbook, studyName, StudyType.T);
+		WorkbookTestDataInitializer.createAndSetStudyDetails(workbook, studyName, StudyType.T);
 		workbook.setConditions(WorkbookTestDataInitializer.createConditions(false, 1, WorkbookTestDataInitializer.LOCATION_ID_1));
-		WorkbookTestDataInitializer.createFactors(workbook, false, false, 1);
-		WorkbookTestDataInitializer.createConstants(workbook);
-		WorkbookTestDataInitializer.createVariatesWithDuplicatePSM(workbook);
-		WorkbookTestDataInitializer.createObservations(workbook, 10, false, 1, false);
+		WorkbookTestDataInitializer.createAndSetFactors(workbook, false, false, 1);
+		WorkbookTestDataInitializer.createAndSetConstants(workbook);
+		WorkbookTestDataInitializer.createAndSetVariatesWithDuplicatePSM(workbook);
+		WorkbookTestDataInitializer.createAndSetObservations(workbook, 10, false, 1, false);
 
 		return workbook;
 	}
 
 	public static Workbook createTestWorkbookForWizard(final String studyName, final int trialNo) {
 		final Workbook wbook = new Workbook();
-
-		WorkbookTestDataInitializer.createStudyDetails(wbook, studyName, StudyType.T);
+		WorkbookTestDataInitializer.createAndSetStudyDetails(wbook, studyName, StudyType.T);
 		wbook.setConditions(WorkbookTestDataInitializer.createConditions(false, trialNo, WorkbookTestDataInitializer.LOCATION_ID_1));
-		WorkbookTestDataInitializer.createFactors(wbook, true, true, trialNo);
-		WorkbookTestDataInitializer.createConstants(wbook);
-		WorkbookTestDataInitializer.createVariates(wbook, false);
-		WorkbookTestDataInitializer.createObservations(wbook, 10, true, trialNo, false);
+		WorkbookTestDataInitializer.createAndSetFactors(wbook, true, true, trialNo);
+		WorkbookTestDataInitializer.createAndSetConstants(wbook);
+		WorkbookTestDataInitializer.createAndSetVariates(wbook, false);
+		WorkbookTestDataInitializer.createAndSetObservations(wbook, 10, true, trialNo, false);
 
 		return wbook;
 	}
 
-	public static void createStudyDetails(final Workbook workbook, final String studyName, final StudyType studyType) {
+	public static void createAndSetStudyDetails(final Workbook workbook, final String studyName, final StudyType studyType) {
 		final StudyDetails details = new StudyDetails();
 		if (studyName != null) {
 			// this is used for adding multiple locations to one study
@@ -297,24 +309,27 @@ public class WorkbookTestDataInitializer {
 
 		conditions.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.PI_NAME.getId(), "PI Name",
 				"Name of Principal Investigator", WorkbookTestDataInitializer.DBCV, WorkbookTestDataInitializer.ASSIGNED,
-				WorkbookTestDataInitializer.PERSON, WorkbookTestDataInitializer.CHAR, "PI Name Value", WorkbookTestDataInitializer.STUDY,
-				TermId.CHARACTER_VARIABLE.getId(), withTrial ? PhenotypicType.TRIAL_ENVIRONMENT : PhenotypicType.STUDY, false));
+				WorkbookTestDataInitializer.PERSON, WorkbookTestDataInitializer.CHAR, "PI Name Value",
+				withTrial ? WorkbookTestDataInitializer.TRIAL : WorkbookTestDataInitializer.STUDY, TermId.CHARACTER_VARIABLE.getId(),
+				withTrial ? PhenotypicType.TRIAL_ENVIRONMENT : PhenotypicType.STUDY, false));
 
 		conditions.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.PI_ID.getId(), "PI ID", "ID of Principal Investigator",
 				WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.PERSON,
-				WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.STUDY,
-				TermId.NUMERIC_VARIABLE.getId(), withTrial ? PhenotypicType.TRIAL_ENVIRONMENT : PhenotypicType.STUDY, false));
+				WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE,
+				withTrial ? WorkbookTestDataInitializer.TRIAL : WorkbookTestDataInitializer.STUDY, TermId.NUMERIC_VARIABLE.getId(),
+				withTrial ? PhenotypicType.TRIAL_ENVIRONMENT : PhenotypicType.STUDY, false));
 
 		conditions.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.COOPERATOR.getId(), "COOPERATOR", "COOPERATOR NAME",
 				WorkbookTestDataInitializer.DBCV, WorkbookTestDataInitializer.CONDUCTED, WorkbookTestDataInitializer.PERSON,
-				WorkbookTestDataInitializer.CHAR, "John Smith", WorkbookTestDataInitializer.TRIAL, TermId.CHARACTER_VARIABLE.getId(),
+				WorkbookTestDataInitializer.CHAR, "John Smith", withTrial ? WorkbookTestDataInitializer.TRIAL
+						: WorkbookTestDataInitializer.STUDY, TermId.CHARACTER_VARIABLE.getId(),
 				withTrial ? PhenotypicType.TRIAL_ENVIRONMENT : PhenotypicType.STUDY, false));
 
-		conditions
-				.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.COOPERATOOR_ID.getId(), "COOPERATOR ID", "COOPERATOR ID",
-						WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.CONDUCTED, WorkbookTestDataInitializer.PERSON,
-						WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.TRIAL,
-						TermId.NUMERIC_VARIABLE.getId(), withTrial ? PhenotypicType.TRIAL_ENVIRONMENT : PhenotypicType.STUDY, false));
+		conditions.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.COOPERATOOR_ID.getId(), "COOPERATOR ID",
+				"COOPERATOR ID", WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.CONDUCTED,
+				WorkbookTestDataInitializer.PERSON, WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE,
+				withTrial ? WorkbookTestDataInitializer.TRIAL : WorkbookTestDataInitializer.STUDY, TermId.NUMERIC_VARIABLE.getId(),
+				withTrial ? PhenotypicType.TRIAL_ENVIRONMENT : PhenotypicType.STUDY, false));
 
 		conditions.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.TRIAL_LOCATION.getId(), "SITE", "TRIAL SITE NAME",
 				WorkbookTestDataInitializer.DBCV, WorkbookTestDataInitializer.ASSIGNED, WorkbookTestDataInitializer.LOCATION,
@@ -349,14 +364,14 @@ public class WorkbookTestDataInitializer {
 	}
 
 	public static MeasurementVariable createExperimentalRCBDVariable() {
-		return WorkbookTestDataInitializer.createMeasurementVariable(WorkbookTestDataInitializer.EXPT_DESIGN_ID, "DESIGN",
+		return WorkbookTestDataInitializer.createMeasurementVariable(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), "DESIGN",
 				"EXPERIMENTAL DESIGN", WorkbookTestDataInitializer.TYPE, WorkbookTestDataInitializer.ASSIGNED,
 				WorkbookTestDataInitializer.EXPERIMENT_DESIGN, WorkbookTestDataInitializer.CHAR,
 				String.valueOf(TermId.RANDOMIZED_COMPLETE_BLOCK.getId()), WorkbookTestDataInitializer.TRIAL,
 				TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.TRIAL_ENVIRONMENT, false);
 	}
 
-	public static void createFactors(final Workbook workbook, final boolean withEntry, final boolean withTrial, final int trialNo) {
+	public static void createAndSetFactors(final Workbook workbook, final boolean withEntry, final boolean withTrial, final int trialNo) {
 		// Create measurement variables and set its dataTypeId
 		final List<MeasurementVariable> factors = new ArrayList<>();
 
@@ -419,7 +434,7 @@ public class WorkbookTestDataInitializer {
 		workbook.setFactors(factors);
 	}
 
-	public static void createConstants(final Workbook workbook) {
+	public static void createAndSetConstants(final Workbook workbook) {
 		// Create measurement variables and set its dataTypeId
 		final List<MeasurementVariable> constants = new ArrayList<>();
 
@@ -431,7 +446,7 @@ public class WorkbookTestDataInitializer {
 		workbook.setConstants(constants);
 	}
 
-	public static void createVariates(final Workbook workbook, final boolean isForMeansDataset) {
+	public static void createAndSetVariates(final Workbook workbook, final boolean isForMeansDataset) {
 		// Create measurement variables and set its dataTypeId
 		final List<MeasurementVariable> variates = new ArrayList<>();
 
@@ -471,8 +486,14 @@ public class WorkbookTestDataInitializer {
 		workbook.setVariates(variates);
 	}
 
-	public static void createObservations(final Workbook workbook, final int noOfObservations, final boolean withTrial, final int trialNo,
-			final boolean isForMeansDataSet) {
+	public static void createAndSetObservations(final Workbook workbook, final int noOfObservations, final boolean withTrial,
+			final int trialNo, final boolean isForMeansDataSet) {
+		workbook.setObservations(WorkbookTestDataInitializer.createObservations(workbook, noOfObservations, withTrial, trialNo,
+				isForMeansDataSet));
+	}
+
+	public static List<MeasurementRow> createObservations(final Workbook workbook, final int noOfObservations, final boolean withTrial,
+			final int trialNo, final boolean isForMeansDataSet) {
 		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
 
 		MeasurementRow row;
@@ -525,7 +546,7 @@ public class WorkbookTestDataInitializer {
 			observations.add(row);
 		}
 
-		workbook.setObservations(observations);
+		return observations;
 	}
 
 	public static MeasurementVariable createMeasurementVariable(final int termId, final String name, final String description,
@@ -618,22 +639,24 @@ public class WorkbookTestDataInitializer {
 		return null;
 	}
 
-	private static void createVariatesWithDuplicatePSM(final Workbook workbook) {
+	private static void createAndSetVariatesWithDuplicatePSM(final Workbook workbook) {
 		final List<MeasurementVariable> variates = new ArrayList<>();
 
 		final MeasurementVariable gyld =
-				WorkbookTestDataInitializer.createMeasurementVariable(WorkbookTestDataInitializer.GYLD_ID, WorkbookTestDataInitializer.GYLD,
-						"Grain yield -dry and weigh (kg/ha)", WorkbookTestDataInitializer.KG_HA, WorkbookTestDataInitializer.DRY_AND_WEIGH,
-						WorkbookTestDataInitializer.YIELD, WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE,
-						WorkbookTestDataInitializer.PLOT, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE, false);
+				WorkbookTestDataInitializer.createMeasurementVariable(WorkbookTestDataInitializer.GYLD_ID,
+						WorkbookTestDataInitializer.GYLD, "Grain yield -dry and weigh (kg/ha)", WorkbookTestDataInitializer.KG_HA,
+						WorkbookTestDataInitializer.DRY_AND_WEIGH, WorkbookTestDataInitializer.YIELD, WorkbookTestDataInitializer.NUMERIC,
+						WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.PLOT, TermId.NUMERIC_VARIABLE.getId(),
+						PhenotypicType.VARIATE, false);
 
 		variates.add(gyld);
 
-		final MeasurementVariable siteSoilPh = WorkbookTestDataInitializer.createMeasurementVariable(
-				WorkbookTestDataInitializer.SITE_SOIL_PH_ID, WorkbookTestDataInitializer.SITE_SOIL_PH, "Soil acidity - ph meter (pH)",
-				WorkbookTestDataInitializer.PH, WorkbookTestDataInitializer.MEASURED, WorkbookTestDataInitializer.SOIL_ACIDITY,
-				WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.PLOT,
-				TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE, false);
+		final MeasurementVariable siteSoilPh =
+				WorkbookTestDataInitializer.createMeasurementVariable(WorkbookTestDataInitializer.SITE_SOIL_PH_ID,
+						WorkbookTestDataInitializer.SITE_SOIL_PH, "Soil acidity - ph meter (pH)", WorkbookTestDataInitializer.PH,
+						WorkbookTestDataInitializer.MEASURED, WorkbookTestDataInitializer.SOIL_ACIDITY,
+						WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.PLOT,
+						TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE, false);
 		variates.add(siteSoilPh);
 
 		workbook.setVariates(variates);
@@ -715,7 +738,7 @@ public class WorkbookTestDataInitializer {
 	public static MeasurementRow createTrialObservationWithoutSite() {
 		final Workbook workbook = new Workbook();
 
-		WorkbookTestDataInitializer.createStudyDetails(workbook, null, StudyType.T);
+		WorkbookTestDataInitializer.createAndSetStudyDetails(workbook, null, StudyType.T);
 		workbook.setConditions(WorkbookTestDataInitializer.createConditions(true, 1, WorkbookTestDataInitializer.LOCATION_ID_1));
 
 		final MeasurementRow row = new MeasurementRow();
