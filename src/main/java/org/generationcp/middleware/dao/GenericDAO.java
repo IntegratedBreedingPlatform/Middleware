@@ -53,17 +53,17 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		return this.persistentClass;
 	}
 
-	public T getById(ID id) throws MiddlewareQueryException {
+	public T getById(final ID id) {
 		return this.getById(id, false);
 	}
 
 	@SuppressWarnings("unchecked")
-	public T getById(ID id, boolean lock) throws MiddlewareQueryException {
+	public T getById(final ID id, final boolean lock) {
 		if (id == null) {
 			return null;
 		}
 		try {
-			T entity;
+			final T entity;
 			if (lock) {
 				entity = (T) this.getSession().get(this.getPersistentClass(), id, LockOptions.UPGRADE);
 			} else {
@@ -75,7 +75,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		}
 	}
 
-	public List<T> filterByColumnValue(String columnName, Object value) throws MiddlewareQueryException {
+	public List<T> filterByColumnValue(final String columnName, final Object value) {
 		Criterion criterion = value == null ? Restrictions.isNull(columnName) : Restrictions.eq(columnName, value);
 		return this.getByCriteria(new ArrayList<>(Collections.singletonList(criterion)));
 	}
