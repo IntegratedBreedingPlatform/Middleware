@@ -240,15 +240,48 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 		return variableTypeList;
 	}
 	
+	
+	
 	@Test
 	public void testCreateLocationsAndSetToObservationsForTrialWithTrialObservations() {
+		final StudyType studyType = StudyType.T;
+		final boolean withTrialObservations = true;
+		boolean hasMultipleLocations = true;
+		testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations);
+	}
+	
+	@Test
+	public void testCreateLocationsAndSetToObservationsForTrialWithoutTrialObservations() {
+		final StudyType studyType = StudyType.T;
+		final boolean withTrialObservations = false;
+		boolean hasMultipleLocations = true;
+		testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations);
+	}
+	
+	@Test
+	public void testCreateLocationsAndSetToObservationsForTrialWithTrialObservationsSingleLocation() {
+		final StudyType studyType = StudyType.T;
+		final boolean withTrialObservations = true;
+		boolean hasMultipleLocations = false;
+		testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations);
+	}
+	
+	@Test
+	public void testCreateLocationsAndSetToObservationsForNurseryWithTrialObservations() {
+		final StudyType studyType = StudyType.N;
+		//for a nursery, the method is only called when there is a trial observation
+		final boolean withTrialObservations = true;
+		//nursery can only have 1 location
+		boolean hasMultipleLocations = false;
+		testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations);
+	}
+	
+	public void testCreateLocationsAndSetToObservations(final StudyType studyType, final boolean withTrialObservations, boolean hasMultipleLocations) {
 		//the variable to verify value correctness (location ids created and variates per location id)
 		final List<Integer> locationIds = new ArrayList<>();
 		final Map<Integer, VariableList> trialVariatesMap = new HashMap<Integer, VariableList>();
-		final StudyType studyType = StudyType.T;
-		final boolean withTrialObservations = true;
 		//the trial workbook populated with trial observations
-		final Workbook workbook = this.createWorkbookTestData(studyType, withTrialObservations);
+		final Workbook workbook = this.createWorkbookTestData(studyType, withTrialObservations, hasMultipleLocations);
 		final VariableTypeList trialFactors = this.getTrialFactors(workbook, withTrialObservations);
 		final List<String> trialHeaders = workbook.getTrialHeaders();
 		final boolean isDeleteTrialObservations = false;
@@ -258,20 +291,30 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 				trialHeaders, trialVariatesMap, isDeleteTrialObservations, PROGRAM_UUID);
 		
 		//verify the value of locationIds and the studyLocationId which is the first location id
-		Assert.assertEquals("There should be 2 location ids created", 2, locationIds.size());
+		int expectedNumberOfLocations = 1;
+		if(hasMultipleLocations) {
+			expectedNumberOfLocations = 2;
+		}
+		Assert.assertEquals("There should be " + expectedNumberOfLocations + " location ids created", 
+				expectedNumberOfLocations, locationIds.size());
 		int expectedStudyLocationId = new Integer(locationIds.get(0)).intValue();
 		Assert.assertEquals("The studyLocationId should be the first location id created", expectedStudyLocationId, studyLocationId);
 		//verify the value of trial variates per location id
 		for (Integer locationId : locationIds) {
 			VariableList trialVariates = trialVariatesMap.get(locationId);
-			//since this is a trial observation, trial constants/variates should be found
-			Assert.assertNotNull("TrialVariates should not be null", trialVariates);
-			Assert.assertEquals("There should be two trial variates found", 2, trialVariates.size());
-			List<Integer> expectedTrialVariateIds = Arrays.asList(WorkbookTestDataInitializer.PLANT_HEIGHT_UNIT_ERRORS_ID,
-					WorkbookTestDataInitializer.GRAIN_SIZE_ID);
-			for (Variable variable : trialVariates.getVariables()) {
-				int variableId = variable.getVariableType().getStandardVariable().getId();
-				Assert.assertTrue("The variable id should be found in " + expectedTrialVariateIds, expectedTrialVariateIds.contains(variableId));
+			
+			if(withTrialObservations) {
+				//since this is a trial observation, trial constants/variates should be found
+				Assert.assertNotNull("Trial variates should be found", trialVariates);
+				Assert.assertEquals("There should be two trial variates found", 2, trialVariates.size());
+				List<Integer> expectedTrialVariateIds = Arrays.asList(WorkbookTestDataInitializer.PLANT_HEIGHT_UNIT_ERRORS_ID,
+						WorkbookTestDataInitializer.GRAIN_SIZE_ID);
+				for (Variable variable : trialVariates.getVariables()) {
+					int variableId = variable.getVariableType().getStandardVariable().getId();
+					Assert.assertTrue("The variable id should be found in " + expectedTrialVariateIds, expectedTrialVariateIds.contains(variableId));
+				}
+			} else {
+				Assert.assertNull("Trial variates should not be found", trialVariates);
 			}
 		}
 		//verify the locationId set for the trial observation matches the location ids
@@ -298,37 +341,36 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 		return trialFactors;
 	}
 
-	private Workbook createWorkbookTestData(StudyType studyType, boolean withTrialObservations) {
-		//setup data - make sure to create at least 2 environments so we can test different trial instance numbers
-		boolean hasMultipleLocations = true;
+	private Workbook createWorkbookTestData(StudyType studyType, boolean withTrialObservations, boolean hasMultipleLocations) {
 		String studyName = STUDY_NAME_PREFIX + studyType.getLabel();
 		boolean isForMeansDataset = false;
 		
-		
-		//create observations for 2 trial instances
-		//start with trial instance 1
+		//create observations for trial instance 1
 		int trialInstanceNumber = 1;
 		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(NO_OF_OBSERVATIONS_PER_TRIAL_INSTANCE, studyType, 
 				studyName, trialInstanceNumber, hasMultipleLocations, isForMeansDataset);
 		workbook.setTrialObservations(new ArrayList<MeasurementRow>());
 		if(withTrialObservations) {
-			this.addTrialObservationsFromWorkbook(workbook, workbook.getTrialObservations(), trialInstanceNumber);
+			this.addTrialObservationsFromWorkbook(workbook, workbook.getTrialObservations(), trialInstanceNumber, hasMultipleLocations);
 		}
-				
-		//now create for trial instance 2
-		trialInstanceNumber = 2;
-		final List<MeasurementRow> observationsWithTrialInstace2 = WorkbookTestDataInitializer.createObservations(
-				workbook, NO_OF_OBSERVATIONS_PER_TRIAL_INSTANCE, hasMultipleLocations, trialInstanceNumber, isForMeansDataset);
-		workbook.getObservations().addAll(observationsWithTrialInstace2);
-		if(withTrialObservations) {
-			this.addTrialObservationsFromWorkbook(workbook, workbook.getTrialObservations(), trialInstanceNumber);
+		
+		if(hasMultipleLocations) {
+			//create for trial instance 2
+			trialInstanceNumber = 2;
+			final List<MeasurementRow> observationsWithTrialInstace2 = WorkbookTestDataInitializer.createObservations(
+					workbook, NO_OF_OBSERVATIONS_PER_TRIAL_INSTANCE, hasMultipleLocations, trialInstanceNumber, isForMeansDataset);
+			workbook.getObservations().addAll(observationsWithTrialInstace2);
+			if(withTrialObservations) {
+				this.addTrialObservationsFromWorkbook(workbook, workbook.getTrialObservations(), trialInstanceNumber, hasMultipleLocations);
+			}
 		}
 		return workbook;
 	}
 
-	private void addTrialObservationsFromWorkbook(final Workbook workbook, final List<MeasurementRow> trialObservations, int trialInstanceNumber) {
+	private void addTrialObservationsFromWorkbook(final Workbook workbook, final List<MeasurementRow> trialObservations, int trialInstanceNumber,
+			boolean hasMultipleLocations) {
 		trialObservations.addAll(WorkbookTestDataInitializer.createTrialObservations(
 			NO_OF_OBSERVATIONS_PER_TRIAL_INSTANCE, String.valueOf(trialInstanceNumber), 
-			workbook.getFactors(), workbook.getConditions(), workbook.getConstants()));
+			workbook.getFactors(), workbook.getConditions(), workbook.getConstants(), hasMultipleLocations));
 	}
 }

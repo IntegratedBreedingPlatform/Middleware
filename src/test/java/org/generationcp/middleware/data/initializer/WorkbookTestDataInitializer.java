@@ -214,12 +214,13 @@ public class WorkbookTestDataInitializer {
 	public static void setTrialObservations(final Workbook workbook) {
 		final List<MeasurementRow> trialObservations =
 				WorkbookTestDataInitializer.createTrialObservations(workbook.getObservations().size(), String.valueOf(1),
-						workbook.getFactors(), workbook.getConditions(), workbook.getConstants());
+						workbook.getFactors(), workbook.getConditions(), workbook.getConstants(), false);
 		workbook.setTrialObservations(trialObservations);
 	}
 
 	public static List<MeasurementRow> createTrialObservations(final int numberOfObservations, final String trialInstanceNumber,
-			final List<MeasurementVariable> factors, final List<MeasurementVariable> conditions, final List<MeasurementVariable> constants) {
+			final List<MeasurementVariable> factors, final List<MeasurementVariable> conditions, final List<MeasurementVariable> constants,
+			final boolean hasMultipleLocations) {
 		final List<MeasurementRow> trialObservations = new ArrayList<>();
 		MeasurementRow row;
 		List<MeasurementData> dataList;
@@ -228,8 +229,20 @@ public class WorkbookTestDataInitializer {
 		for (int i = 1; i <= numberOfObservations; i++) {
 			row = new MeasurementRow();
 			dataList = new ArrayList<>();
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.TRIAL,
-					String.valueOf(trialInstanceNumber), TermId.TRIAL_INSTANCE_FACTOR.getId(), factors));
+			if (hasMultipleLocations) {
+				dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.TRIAL,
+						String.valueOf(trialInstanceNumber), TermId.TRIAL_INSTANCE_FACTOR.getId(), factors));
+			} else {
+				dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.TRIAL,
+						String.valueOf(trialInstanceNumber), TermId.TRIAL_INSTANCE_FACTOR.getId(), conditions));
+				dataList.add(WorkbookTestDataInitializer.createMeasurementData("PI Name", String.valueOf(1), TermId.PI_NAME.getId(),
+						conditions));
+				dataList.add(WorkbookTestDataInitializer.createMeasurementData("PI ID", String.valueOf(1), TermId.PI_ID.getId(), conditions));
+				dataList.add(WorkbookTestDataInitializer.createMeasurementData("COOPERATOR", String.valueOf(1), TermId.COOPERATOR.getId(),
+						conditions));
+				dataList.add(WorkbookTestDataInitializer.createMeasurementData("COOPERATOR ID", String.valueOf(1),
+						TermId.COOPERATOOR_ID.getId(), conditions));
+			}
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData("SITE", String.valueOf(1), TermId.TRIAL_LOCATION.getId(),
 					conditions));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData("SITE ID", String.valueOf(1), TermId.LOCATION_ID.getId(),
