@@ -7,8 +7,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collections;
-
+import java.util.List;
+import org.junit.Assert;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -25,6 +27,10 @@ public class GermplasmListDataDAOTest {
 
 	private GermplasmListDataDAO germplasmListDataDAO;
 	private Session mockHibernateSession;
+
+
+	public static final String DUMMY_STRING = "DUMMY STRING";
+	public static final Integer TEST_VALUE = 1;
 
 	@Before
 	public void beforeTest() {
@@ -139,6 +145,40 @@ public class GermplasmListDataDAOTest {
 		verify(mockCriteria, times(4)).add(Matchers.any(Criterion.class));
 		verify(mockCriteria).addOrder(Matchers.any(Order.class));
 		verify(mockCriteria).uniqueResult();
+	}
+
+	@Test
+	public void testGetListDataWithParents(){
+		final SQLQuery mockSqlQuery = Mockito.mock(SQLQuery.class);
+		Mockito.when(this.mockHibernateSession.createSQLQuery(anyString())).thenReturn(mockSqlQuery);
+
+		List<Object[]> list = new ArrayList<>();
+		Object [] objects = {TEST_VALUE,TEST_VALUE,DUMMY_STRING,DUMMY_STRING,DUMMY_STRING,
+				TEST_VALUE,DUMMY_STRING,TEST_VALUE,TEST_VALUE,DUMMY_STRING,DUMMY_STRING};
+
+		list.add(objects);
+
+		Mockito.when(mockSqlQuery.list()).thenReturn(list);
+		final Integer listId = 1;
+
+		List<GermplasmListData> result = this.germplasmListDataDAO.getListDataWithParents(listId);
+
+		for(GermplasmListData g : result){
+
+			Assert.assertEquals(GermplasmListDataDAOTest.TEST_VALUE,g.getGid());
+			Assert.assertEquals(GermplasmListDataDAOTest.TEST_VALUE,g.getEntryId());
+			Assert.assertEquals(GermplasmListDataDAOTest.DUMMY_STRING,g.getDesignation());
+			Assert.assertEquals(GermplasmListDataDAOTest.DUMMY_STRING,g.getGroupName());
+			Assert.assertEquals(GermplasmListDataDAOTest.DUMMY_STRING,g.getFemaleParent());
+			Assert.assertEquals(GermplasmListDataDAOTest.TEST_VALUE,g.getFgid());
+			Assert.assertEquals(GermplasmListDataDAOTest.DUMMY_STRING,g.getMaleParent());
+			Assert.assertEquals(GermplasmListDataDAOTest.TEST_VALUE,g.getMgid());
+			Assert.assertEquals(GermplasmListDataDAOTest.TEST_VALUE,g.getGid());
+			Assert.assertEquals(GermplasmListDataDAOTest.DUMMY_STRING,g.getSeedSource());
+			Assert.assertEquals(GermplasmListDataDAOTest.DUMMY_STRING,g.getBreedingMethodName());
+
+		}
+
 	}
 
 }
