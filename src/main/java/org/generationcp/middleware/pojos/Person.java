@@ -84,7 +84,14 @@ public class Person implements Comparable<Person>, Serializable {
 	public Person() {
 	}
 
-	public Person(String firstName, String middleName, String lastName) {
+	public Person(final String firstName, final String middleName, final String lastName) {
+		this.firstName = firstName;
+		this.middleName = middleName;
+		this.lastName = lastName;
+	}
+
+	public Person(final Integer id, final String firstName, final String middleName, final String lastName) {
+		this.id = id;
 		this.firstName = firstName;
 		this.middleName = middleName;
 		this.lastName = lastName;
@@ -96,7 +103,7 @@ public class Person implements Comparable<Person>, Serializable {
 	 * @return the copy of this Person object.
 	 */
 	public Person copy() {
-		Person person = new Person();
+		final Person person = new Person();
 		person.setFirstName(this.firstName);
 		person.setLastName(this.lastName);
 		person.setMiddleName(this.middleName);
@@ -168,9 +175,9 @@ public class Person implements Comparable<Person>, Serializable {
 	}
 
 	public String getDisplayName() {
-		String displayFirstName = this.firstName == null || Util.isOneOf(this.firstName, "-", "'-'") ? "" : this.firstName;
-		String displayMiddleName = this.middleName == null || Util.isOneOf(this.middleName, "-", "'-'") ? "" : this.middleName;
-		String displayLastName = this.lastName == null || Util.isOneOf(this.lastName, "-", "'-'") ? "" : this.lastName;
+		final String displayFirstName = this.firstName == null || Util.isOneOf(this.firstName, "-", "'-'") ? "" : this.firstName;
+		final String displayMiddleName = this.middleName == null || Util.isOneOf(this.middleName, "-", "'-'") ? "" : this.middleName;
+		final String displayLastName = this.lastName == null || Util.isOneOf(this.lastName, "-", "'-'") ? "" : this.lastName;
 		return StringUtil.joinIgnoreEmpty(" ", displayFirstName, displayMiddleName, displayLastName);
 	}
 

@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -47,7 +48,16 @@ import org.generationcp.middleware.pojos.ProgenitorPK;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
+import org.hibernate.Criteria;
+import org.hibernate.SQLQuery;
+import org.hibernate.transform.DistinctResultTransformer;
+import org.hibernate.transform.Transformers;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Iterables;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -57,6 +67,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Transactional
 public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager {
+
+	private static final String GID_SEPARATOR_FOR_STORED_PROCEDURE_CALL = ",";
 
 	public GermplasmDataManagerImpl() {
 	}
@@ -1389,4 +1401,52 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public long countMatchGermplasmInList(final Set<Integer> gids) {
 		return this.getGermplasmDao().countMatchGermplasmInList(gids);
 	}
+
+	/** (non-Javadoc)
+	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getGermplasmWithAllNamesAndAncestry(java.util.Set, int)
+	 */
+	@Override
+	public List<Germplasm> getGermplasmWithAllNamesAndAncestry(Set<Integer> gids, int numberOfLevelsToTraverse) {
+		final Monitor monitor = MonitorFactory.start("org.generationcp.middleware.manager.GermplasmDataManagerImpl"
+				+ ".getGermplasmWithAllNamesAndAncestry(Set<Integer> - SetSize("+gids.size()+") , int)");
+
+		try {
+			final StringBuilder commaSeparatedListOfGids = getGidsAsCommaSeparatedList(gids);
+	
+			final SQLQuery storedProcedure =
+					this.getActiveSession().createSQLQuery("CALL getGermplasmWithNamesAndAncestry(:gids, :numberOfLevelsToTraverse) ");
+			storedProcedure.setParameter("gids", commaSeparatedListOfGids.toString());
+			storedProcedure.setParameter("numberOfLevelsToTraverse", numberOfLevelsToTraverse);
+	
+			storedProcedure.addEntity("g", Germplasm.class);
+			storedProcedure.addJoin("n", "g.names");
+			// Be very careful changing anything here.
+			// The entity has been added again because the distinct root entity works on the 
+			// Last added entity
+			storedProcedure.addEntity("g", Germplasm.class);
+			storedProcedure.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+			return storedProcedure.list();
+		} finally {
+			monitor.stop();
+		}
+
+	}
+
+	private StringBuilder getGidsAsCommaSeparatedList(final Set<Integer> gids) {
+		final StringBuilder commaSeparatedListOfGids = new StringBuilder();
+	
+		for (final Integer input : gids) {
+			if(input != null) {
+				if(commaSeparatedListOfGids.length() == 0) {
+					commaSeparatedListOfGids.append(input.toString());
+				} else {
+					commaSeparatedListOfGids.append(GID_SEPARATOR_FOR_STORED_PROCEDURE_CALL);
+
+					commaSeparatedListOfGids.append(input.toString());
+				}
+			}
+		}
+		return commaSeparatedListOfGids;
+	}
+
 }
