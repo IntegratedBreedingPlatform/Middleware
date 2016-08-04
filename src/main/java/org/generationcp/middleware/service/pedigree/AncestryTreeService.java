@@ -18,7 +18,14 @@ import com.jamonapi.MonitorFactory;
 
 public class AncestryTreeService {
 
+	/**
+	 * This cache is filled by a stored procedure that retrieves germplasm and its ancestry tree.
+	 */
 	private final GermplasmCache germplasmCache;
+	
+	/**
+	 * Cache from which we can fetch breeding methods. We do not expect this cache to be too large.
+	 */
 	private final FunctionBasedGuavaCacheLoader<CropMethodKey, Method> methodCache;
 	private final String cropName;
 

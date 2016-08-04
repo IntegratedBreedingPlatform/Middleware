@@ -32,6 +32,10 @@ import com.google.common.cache.CacheBuilder;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 
+/**
+ * @author Akhil
+ *
+ */
 @Transactional
 public class PedigreeServiceImpl implements PedigreeService {
 
@@ -39,7 +43,7 @@ public class PedigreeServiceImpl implements PedigreeService {
 
 	private PedigreeDataManagerFactory pedigreeDataManagerFactory;
 
-	private static Cache<CropMethodKey, Method> methodCache;
+	private static Cache<CropMethodKey, Method> breedingMethodCache;
 
 	private static Cache<CropNameTypeKey, List<Integer>> nameTypeCache;
 
@@ -53,7 +57,7 @@ public class PedigreeServiceImpl implements PedigreeService {
 	
 	static {
 
-		methodCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(100, TimeUnit.MINUTES).build();
+		breedingMethodCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(100, TimeUnit.MINUTES).build();
 		nameTypeCache = CacheBuilder.newBuilder().maximumSize(100).expireAfterWrite(100, TimeUnit.MINUTES).build();
 	}
 
@@ -66,7 +70,7 @@ public class PedigreeServiceImpl implements PedigreeService {
 		this.pedigreeDataManagerFactory = new PedigreeDataManagerFactory(sessionProvider);
 		this.germplasmDataManager = this.pedigreeDataManagerFactory.getGermplasmDataManager();
 
-		methodCropBasedCache = new FunctionBasedGuavaCacheLoader<CropMethodKey, Method>(methodCache, new Function<CropMethodKey, Method>() {
+		methodCropBasedCache = new FunctionBasedGuavaCacheLoader<CropMethodKey, Method>(breedingMethodCache, new Function<CropMethodKey, Method>() {
 
 			@Override
 			public Method apply(CropMethodKey key) {
@@ -130,10 +134,14 @@ public class PedigreeServiceImpl implements PedigreeService {
 			final GermplasmCache germplasmAncestryCache =
 					new GermplasmCache(germplasmDataManager, getNumberOfLevelsToTraverseInDb(numberOfLevelsToTraverse));
 			// Prime cache
-			germplasmAncestryCache.initialisesCache(this.getCropName(), gids, getNumberOfLevelsToTraverseInDb(numberOfLevelsToTraverse));
-			for (Integer gid : gids) {
+			germplasmAncestryCache.initialiseCache(this.getCropName(), gids, getNumberOfLevelsToTraverseInDb(numberOfLevelsToTraverse));
+			
+			// Please note the cache about has been primed with all germplasm and their ancestry tree and thus will not need to go back to
+			// the database for each germplasm required. It will occasionally go back to the DB in case it cannot find the required gid.
+			// This might happen in the case of backcross because we predetermine the number of crosses for a backcross. 
+			for (final Integer gid : gids) {
 				pedigreeStrings.put(gid,
-						buildPeidgreeString(gid, level, crossExpansionProperties, germplasmAncestryCache, numberOfLevelsToTraverse));
+						buildPedigreeString(gid, level, crossExpansionProperties, germplasmAncestryCache, numberOfLevelsToTraverse));
 			}
 			return pedigreeStrings;
 		} finally {
@@ -157,17 +165,25 @@ public class PedigreeServiceImpl implements PedigreeService {
 			
 			final GermplasmCache germplasmAncestryCache = new GermplasmCache(germplasmDataManager, getNumberOfLevelsToTraverseInDb(numberOfLevelsToTraverse));
 
-			return buildPeidgreeString(gid, level, crossExpansionProperties, germplasmAncestryCache, numberOfLevelsToTraverse);
+			return buildPedigreeString(gid, level, crossExpansionProperties, germplasmAncestryCache, numberOfLevelsToTraverse);
 		} finally {
 			monitor.stop();
 		}
 	}
 
+	/**
+	 * We essentially want to traverse double the number of required levels. This is because every derivative germplasm will point to its
+	 * generative ancestor. Thus we essentially need to traverse twice our required level. The plus three is in case we have a double cross
+	 * at the leaf node. Note this will not catering for a backcross. Encountering backcross will require additional database trips.
+	 * 
+	 * @param numberOfLevelsToTraverse the number of levels up the ancestry tree we need to traverse to generate the tree.
+	 * @return the number of levels to traverse in the DB when retrieving ancestry 
+	 */
 	private int getNumberOfLevelsToTraverseInDb(final int numberOfLevelsToTraverse) {
 		return ((numberOfLevelsToTraverse + 1 )  * 2) + 3;
 	}
 
-	private String buildPeidgreeString(final Integer gid, final Integer level, final CrossExpansionProperties crossExpansionProperties,
+	private String buildPedigreeString(final Integer gid, final Integer level, final CrossExpansionProperties crossExpansionProperties,
 			final GermplasmCache germplasmAncestryCache, final int numberOfLevelsToTraverse) {
 		final Monitor monitor = MonitorFactory.start("org.generationcp.middleware.service.pedigree.PedigreeServiceImpl.buildPeidgreeString(Integer, Integer, CrossExpansionProperties, GermplasmCache, int)");
 

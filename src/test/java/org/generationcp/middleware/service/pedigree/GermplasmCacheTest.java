@@ -19,7 +19,8 @@ import com.google.common.cache.Cache;
 import org.junit.Assert;
 
 /**
- * Integration test to make sure the germplasm cache is working.
+ * Integration test to make sure the germplasm cache is working. This not only tests the cache but the underlying stored procedure.
+ * If you change the stored procedure please update this test.
  *
  */
 public class GermplasmCacheTest extends IntegrationTestBase {
@@ -29,24 +30,25 @@ public class GermplasmCacheTest extends IntegrationTestBase {
 	private GermplasmDataManager germplasmManager;
 
 	@Test
-	public void testInitialisesCache() {
-		final GermplasmCache germplasmCache = new GermplasmCache(germplasmManager, 5);
+	public void testInitialiseCache() {
 
-		runGermplasmTest(germplasmCache, new Function<Set<Integer>, Void>(){
+		final GermplasmCache germplasmCache = new GermplasmCache(germplasmManager, 5);
+		runGermplasmTest(germplasmCache, new Function<Set<Integer>, Void>() {
 
 			@Override
 			public Void apply(Set<Integer> input) {
-				germplasmCache.initialisesCache(TEST_CROP, input, 5);
+				germplasmCache.initialiseCache(TEST_CROP, input, 5);
 				return null;
-			}});
+			}
+		});
 
 	}
-	
+
 	@Test
 	public void testGetGermplasm() {
-		final GermplasmCache germplasmCache = new GermplasmCache(germplasmManager, 5);
 
-		runGermplasmTest(germplasmCache, new Function<Set<Integer>, Void>(){
+		final GermplasmCache germplasmCache = new GermplasmCache(germplasmManager, 5);
+		runGermplasmTest(germplasmCache, new Function<Set<Integer>, Void>() {
 
 			@Override
 			public Void apply(Set<Integer> gids) {
@@ -54,18 +56,19 @@ public class GermplasmCacheTest extends IntegrationTestBase {
 					germplasmCache.getGermplasm(new CropGermplasmKey(TEST_CROP, gid));
 				}
 				return null;
-			}});
+			}
+		});
 
 	}
 
 	private void runGermplasmTest(final GermplasmCache germplasmCache, final Function<Set<Integer>, Void> function) {
-		List<Germplasm> germplasmWithOneJustOneParent = getGermplasmWithOneJustOneLevelAncestry();
+		List<Germplasm> germplasmWithOneJustOneParent = getGermplasmWithJustOneLevelAncestry();
 
 		Set<Integer> testSet = getTestSet(germplasmWithOneJustOneParent);
 		// Underlying database crop name does not matter for the test.
-		
+
 		function.apply(testSet);
-		
+
 		final Cache<CropGermplasmKey, Germplasm> germplasmGoogleGauvaCache = germplasmCache.getGermplasmCache();
 
 		Set<Integer> expectedNumberOfGermplasmCached = getExpectedNumberOfGermplasmCached(germplasmWithOneJustOneParent);
@@ -92,7 +95,7 @@ public class GermplasmCacheTest extends IntegrationTestBase {
 		return testGids;
 	}
 
-	private List<Germplasm> getGermplasmWithOneJustOneLevelAncestry() {
+	private List<Germplasm> getGermplasmWithJustOneLevelAncestry() {
 		SQLQuery createSQLQuery = this.sessionProvder.getSession()
 				.createSQLQuery("Select parent.* FROM germplsm parent "
 						+ "INNER JOIN germplsm kid on parent.gpid1 = kid.gid or parent.gpid2 = kid.gid "

@@ -64,7 +64,7 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 				final Integer numberOfLevelsToTraverse = level == null ? crossExpansionProperties.getCropGenerationLevel("wheat") : level;
 				
 				final GermplasmCache germplasmAncestryCache = new GermplasmCache(this.getGermplasmDataManager(), numberOfLevelsToTraverse);
-				germplasmAncestryCache.initialisesCache(this.getCropName(), Collections.singleton(germplasm.getGid()), getNumberOfLevelsToTraverseInDb(numberOfLevelsToTraverse));
+				germplasmAncestryCache.initialiseCache(this.getCropName(), Collections.singleton(germplasm.getGid()), getNumberOfLevelsToTraverseInDb(numberOfLevelsToTraverse));
 				
 				return this.getCimmytWheatPedigree(germplasm, numberOfLevelsToTraverse ,
 						new Germplasm(), 0, 0, 0, 0, 0, germplasmAncestryCache);
@@ -93,7 +93,7 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 			
 			final GermplasmCache germplasmAncestryCache = new GermplasmCache(this.getGermplasmDataManager(), getNumberOfLevelsToTraverseInDb(numberOfLevelsToTraverse));
 			// Prime cache
-			germplasmAncestryCache.initialisesCache(this.getCropName(), gids, getNumberOfLevelsToTraverseInDb(numberOfLevelsToTraverse));
+			germplasmAncestryCache.initialiseCache(this.getCropName(), gids, getNumberOfLevelsToTraverseInDb(numberOfLevelsToTraverse));
 			for (Integer gid : gids) {
 				pedigreeStrings.put(gid, this.getCimmytWheatPedigree(germplasmAncestryCache.getGermplasm(new CropGermplasmKey(this.getCropName(),gid)).get(), numberOfLevelsToTraverse ,
 						new Germplasm(), 0, 0, 0, 0, 0, germplasmAncestryCache));

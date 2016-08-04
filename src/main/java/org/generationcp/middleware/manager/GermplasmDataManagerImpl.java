@@ -68,7 +68,7 @@ import com.jamonapi.MonitorFactory;
 @Transactional
 public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager {
 
-	private static final String GID_SEPERATOR_FOR_STORED_PROCEDURE_CALL = ",";
+	private static final String GID_SEPARATOR_FOR_STORED_PROCEDURE_CALL = ",";
 
 	public GermplasmDataManagerImpl() {
 	}
@@ -1407,11 +1407,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				+ ".getGermplasmWithAllNamesAndAncestry(Set<Integer> - SetSize("+gids.size()+") , int)");
 
 		try {
-			final StringBuilder commaSeperatedListOfGids = getGidsAsCommaSeperatedList(gids);
+			final StringBuilder commaSeparatedListOfGids = getGidsAsCommaSeparatedList(gids);
 	
 			final SQLQuery storedProcedure =
 					this.getActiveSession().createSQLQuery("CALL getGermplasmWithNamesAndAncestry(:gids, :numberOfLevelsToTraverse) ");
-			storedProcedure.setParameter("gids", commaSeperatedListOfGids.toString());
+			storedProcedure.setParameter("gids", commaSeparatedListOfGids.toString());
 			storedProcedure.setParameter("numberOfLevelsToTraverse", numberOfLevelsToTraverse);
 	
 			storedProcedure.addEntity("g", Germplasm.class);
@@ -1428,21 +1428,21 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	}
 
-	private StringBuilder getGidsAsCommaSeperatedList(final Set<Integer> gids) {
-		final StringBuilder commaSeperatedListOfGids = new StringBuilder();
+	private StringBuilder getGidsAsCommaSeparatedList(final Set<Integer> gids) {
+		final StringBuilder commaSeparatedListOfGids = new StringBuilder();
 	
 		for (final Integer input : gids) {
 			if(input != null) {
-				if(commaSeperatedListOfGids.length() == 0) {
-					commaSeperatedListOfGids.append(input.toString());
+				if(commaSeparatedListOfGids.length() == 0) {
+					commaSeparatedListOfGids.append(input.toString());
 				} else {
-					commaSeperatedListOfGids.append(GID_SEPERATOR_FOR_STORED_PROCEDURE_CALL);
+					commaSeparatedListOfGids.append(GID_SEPARATOR_FOR_STORED_PROCEDURE_CALL);
 
-					commaSeperatedListOfGids.append(input.toString());
+					commaSeparatedListOfGids.append(input.toString());
 				}
 			}
 		}
-		return commaSeperatedListOfGids;
+		return commaSeparatedListOfGids;
 	}
 
 

@@ -51,9 +51,9 @@ public class GermplasmCache {
 					@Override
 					public Germplasm apply(CropGermplasmKey key) {
 						// Get all the ancestor germplasm in the cache
-						final Map<Integer, Germplasm> initialisesCache = initialisesCache(key.getCropName(), Collections.singleton(key.getGid()), numberOfLevels);
+						final Map<Integer, Germplasm> initialisesCache = initialiseCache(key.getCropName(), Collections.singleton(key.getGid()), numberOfLevels);
 
-						// The gid should already be in the cache
+						// Get gid from the map compiled from that database call
 						final Germplasm returnResult = initialisesCache.get(key.getGid());
 
 						// If the germplasm has been replaced get the correct germplasm.
@@ -83,7 +83,7 @@ public class GermplasmCache {
 	 * @param numberOfLevels the number of levels to cache
 	 * @return 
 	 */
-	public Map<Integer, Germplasm> initialisesCache(final String cropName, final Set<Integer> germplasms, final int numberOfLevels) {
+	public Map<Integer, Germplasm> initialiseCache(final String cropName, final Set<Integer> germplasms, final int numberOfLevels) {
 		final List<Germplasm> germplasmWithPrefNameAndAncestry =
 				germplasmDataManager.getGermplasmWithAllNamesAndAncestry(germplasms, numberOfLevels);
 		final Map<Integer, Germplasm> resultsetMap = new HashMap<>();
