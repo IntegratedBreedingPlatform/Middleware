@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
@@ -1128,5 +1129,15 @@ public interface GermplasmDataManager {
 	Integer countSearchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly, boolean includeMGMembers);
 
 	List<Method> getDerivativeAndMaintenanceMethods(List<Integer> ids);
+	
+	/**
+	 * Given a set of gids return the gid and all its parents including all their names.
+	 * 
+	 * @param gids - the id of the germplasm record to be retrieved
+	 * @param numberOfLevels the number of levels to traverse. Be careful do not go crazy
+	 * @return a list of germplasms with all names populated in them
+	 */
+	List<Germplasm> getGermplasmWithAllNamesAndAncestry(Set<Integer> gids, int numberOfLevels);
+
 
 }
