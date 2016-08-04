@@ -21,18 +21,18 @@ public class AncestryTreeService {
 	/**
 	 * This cache is filled by a stored procedure that retrieves germplasm and its ancestry tree.
 	 */
-	private final GermplasmCache germplasmCache;
+	private final GermplasmCache germplasmAncestryCache;
 	
 	/**
 	 * Cache from which we can fetch breeding methods. We do not expect this cache to be too large.
 	 */
-	private final FunctionBasedGuavaCacheLoader<CropMethodKey, Method> methodCache;
+	private final FunctionBasedGuavaCacheLoader<CropMethodKey, Method> breedingMethodCache;
 	private final String cropName;
 
 	public AncestryTreeService(final GermplasmCache germplasmAncestryCache, final FunctionBasedGuavaCacheLoader<CropMethodKey, Method> methodCropBasedCache,
 			final String cropName) {
-		this.germplasmCache = germplasmAncestryCache;
-		this.methodCache = methodCropBasedCache;
+		this.germplasmAncestryCache = germplasmAncestryCache;
+		this.breedingMethodCache = methodCropBasedCache;
 		this.cropName = cropName;
 	}
 
@@ -55,16 +55,16 @@ public class AncestryTreeService {
 
 	private GermplasmNode buildGermplasmNode(final Integer gid, final int level) throws ExecutionException {
 		if (gid != null && gid > 0) {
-			final Optional<Germplasm> germplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, gid));
+			final Optional<Germplasm> germplasm = this.germplasmAncestryCache.getGermplasm(new CropGermplasmKey(this.cropName, gid));
 			if(germplasm.isPresent()) {
 				final GermplasmNode germplasmNode = new GermplasmNode(germplasm.get());
-				final Optional<Method> method = this.methodCache.get(new CropMethodKey(this.cropName, germplasmNode.getGermplasm().getMethodId()));
+				final Optional<Method> method = this.breedingMethodCache.get(new CropMethodKey(this.cropName, germplasmNode.getGermplasm().getMethodId()));
 				if(method.isPresent()) {
 					germplasmNode.setMethod(method.get());
 				}
 				String mname = method.get().getMname();
 				if(StringUtils.isNotBlank(mname) && mname.toLowerCase().contains("backcross")) {
-					final BackcrossAncestryTree backcrossAncestryTree = new BackcrossAncestryTree(germplasmCache, methodCache, cropName);
+					final BackcrossAncestryTree backcrossAncestryTree = new BackcrossAncestryTree(germplasmAncestryCache, breedingMethodCache, cropName);
 					return backcrossAncestryTree.generateBackcrossAncestryTree(germplasm.get(), level);
 				}
 				this.buildAncestoryTree(germplasmNode, level);
