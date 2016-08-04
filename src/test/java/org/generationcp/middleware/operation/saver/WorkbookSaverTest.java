@@ -54,6 +54,8 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 	private static final String STUDY_NAME_PREFIX = "studyName";
 	private static final int NO_OF_OBSERVATIONS_PER_TRIAL_INSTANCE = 3;
 
+	private static final int LOCATION_ID = 1;
+
 	@Before
 	public void setUp() {
 		super.beforeEachTest();
@@ -248,7 +250,8 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 		final StudyType studyType = StudyType.T;
 		final boolean withTrialObservations = true;
 		final boolean hasMultipleLocations = true;
-		this.testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations);
+		final boolean addEnvironment = false;
+		this.testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations, addEnvironment);
 	}
 
 	@Test
@@ -256,7 +259,8 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 		final StudyType studyType = StudyType.T;
 		final boolean withTrialObservations = false;
 		final boolean hasMultipleLocations = true;
-		this.testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations);
+		final boolean addEnvironment = false;
+		this.testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations, addEnvironment);
 	}
 
 	@Test
@@ -265,7 +269,8 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 		// for trial with single location, the method is called when there is a trial observation
 		final boolean withTrialObservations = true;
 		final boolean hasMultipleLocations = false;
-		this.testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations);
+		final boolean addEnvironment = false;
+		this.testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations, addEnvironment);
 	}
 
 	@Test
@@ -275,16 +280,29 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 		final boolean withTrialObservations = true;
 		// nursery can only have 1 location
 		final boolean hasMultipleLocations = false;
-		this.testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations);
+		final boolean addEnvironment = false;
+		this.testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations, false);
+	}
+	
+	@Test
+	public void testCreateLocationsAndSetToObservationsAddEnvironment() {
+		final StudyType studyType = StudyType.T;
+		final boolean withTrialObservations = true;
+		final boolean hasMultipleLocations = true;
+		//test scenario where trial instance 1 is already existing
+		//and we're only adding 1 environment
+		boolean addEnvironment = true;
+		this.testCreateLocationsAndSetToObservations(studyType, withTrialObservations, hasMultipleLocations, addEnvironment);
 	}
 
 	public void testCreateLocationsAndSetToObservations(final StudyType studyType, final boolean withTrialObservations,
-			final boolean hasMultipleLocations) {
+			final boolean hasMultipleLocations, final boolean addEnvironment) {
 		// the variable to verify value correctness (location ids created and variates per location id)
 		final List<Integer> locationIds = new ArrayList<>();
 		final Map<Integer, VariableList> trialVariatesMap = new HashMap<Integer, VariableList>();
 		// the trial workbook populated with trial observations
-		final Workbook workbook = this.createWorkbookTestData(studyType, withTrialObservations, hasMultipleLocations);
+		final Workbook workbook = this.createWorkbookTestData(studyType, withTrialObservations, 
+				hasMultipleLocations, addEnvironment);
 		final VariableTypeList trialFactors = this.getTrialFactors(workbook, withTrialObservations);
 		final List<String> trialHeaders = workbook.getTrialHeaders();
 		final boolean isDeleteTrialObservations = false;
@@ -296,13 +314,16 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 
 		// verify the value of locationIds and the studyLocationId which is the first location id
 		int expectedNumberOfLocations = 1;
-		if (hasMultipleLocations) {
+		if (hasMultipleLocations && !addEnvironment) {
 			expectedNumberOfLocations = 2;
 		}
 		Assert.assertEquals("There should be " + expectedNumberOfLocations + " location ids created", expectedNumberOfLocations,
 				locationIds.size());
-		final int expectedStudyLocationId = new Integer(locationIds.get(0)).intValue();
-		Assert.assertEquals("The studyLocationId should be the first location id created", expectedStudyLocationId, studyLocationId);
+		int expectedStudyLocationId = LOCATION_ID;
+		if(!addEnvironment) {
+			expectedStudyLocationId = new Integer(locationIds.get(0)).intValue();
+		}
+		Assert.assertEquals("The studyLocationId should be the location id of trial instance 1", expectedStudyLocationId, studyLocationId);
 		// verify the value of trial variates per location id
 		for (final Integer locationId : locationIds) {
 			final VariableList trialVariates = trialVariatesMap.get(locationId);
@@ -322,10 +343,15 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 				Assert.assertNull("Trial variates should not be found", trialVariates);
 			}
 		}
-		// verify the locationId set for the trial observation matches the location ids
+		// verify the locationId set for the trial observation matches the expected location ids
+		final List<Integer> observationLocationIds = new ArrayList<>();
+		if(addEnvironment) {
+			observationLocationIds.add(LOCATION_ID);
+		}
+		observationLocationIds.addAll(locationIds);
 		for (final MeasurementRow measurementRow : workbook.getTrialObservations()) {
 			Assert.assertTrue("The location id of the measurement row should be one of the location ids created",
-					locationIds.contains(new Long(measurementRow.getLocationId()).intValue()));
+					observationLocationIds.contains(new Long(measurementRow.getLocationId()).intValue()));
 		}
 	}
 
@@ -350,7 +376,7 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 	}
 
 	private Workbook createWorkbookTestData(final StudyType studyType, final boolean withTrialObservations,
-			final boolean hasMultipleLocations) {
+			final boolean hasMultipleLocations, final boolean addEnvironment) {
 		final String studyName = WorkbookSaverTest.STUDY_NAME_PREFIX + studyType.getLabel();
 		final boolean isForMeansDataset = false;
 
@@ -362,6 +388,10 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 		workbook.setTrialObservations(new ArrayList<MeasurementRow>());
 		if (withTrialObservations) {
 			this.addTrialObservationsFromWorkbook(workbook, workbook.getTrialObservations(), trialInstanceNumber, hasMultipleLocations);
+		}
+		if(addEnvironment) {
+			setLocationIdOfObservations(workbook.getObservations());
+			setLocationIdOfObservations(workbook.getTrialObservations());
 		}
 
 		if (hasMultipleLocations) {
@@ -376,6 +406,12 @@ public class WorkbookSaverTest extends IntegrationTestBase {
 			}
 		}
 		return workbook;
+	}
+
+	private void setLocationIdOfObservations(final List<MeasurementRow> observations) {
+		for (final MeasurementRow measurementRow : observations) {
+			measurementRow.setLocationId(LOCATION_ID);
+		}
 	}
 
 	private void addTrialObservationsFromWorkbook(final Workbook workbook, final List<MeasurementRow> trialObservations,
