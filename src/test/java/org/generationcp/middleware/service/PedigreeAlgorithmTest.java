@@ -78,21 +78,6 @@ public class PedigreeAlgorithmTest extends IntegrationTestBase {
 
 	}
 
-//	@Test
-//	public void simpleTest() {
-//		
-//		for (int i = 35; i < 50000; i++) {
-//			SQLQuery createSQLQuery = this.sessionProvder.getSession().createSQLQuery("Select gid from germplsm g LIMIT " + ((i-1)*5000) + ",5000");
-//			final List<Integer> list = createSQLQuery.list();
-//			if(list.isEmpty()) {
-//				break;
-//			}
-//			pedigreeService.getCrossExpansions(new HashSet<>(list), null, newCrossExpansionProperties);
-//			System.out.println(i*5000 + " - Done");
-//		}
-//		
-//	}
-	
 	public List<ListenableFuture<Void>> compareGermplasmGeneratedByDifferentAlgorithms(final String methodName) {
 		
 		
