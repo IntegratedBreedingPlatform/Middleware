@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * 
  * Generation Challenge Programme (GCP)
- *
- *
+ * 
+ * 
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
+ * 
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -61,9 +61,9 @@ import com.jamonapi.MonitorFactory;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
- *
+ * 
  * @author Kevin Manansala, Lord Hendrix Barboza
- *
+ * 
  */
 @Transactional
 public class GermplasmDataManagerImpl extends DataManager implements GermplasmDataManager {
@@ -186,7 +186,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	/**
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getByGIDWithListTypeFilters(java.lang.Integer, java.lang.Integer,
 	 *      java.util.List)
 	 */
@@ -393,6 +393,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Method> getAllMethods() {
 		return this.getMethodDao().getAllMethod();
+	}
+
+	public List<Method> getAllMethodsOrderByMname() {
+		return this.getMethodDao().getAllMethodOrderByMname();
 	}
 
 	@Override
@@ -1319,7 +1323,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	/**
 	 * Local method for getting a particular germplasm's Name.
-	 *
+	 * 
 	 * @param names The Map containing Names for a germplasm. This is usually provided by getGermplasmParentNamesForStudy() in GermplasmDAO.
 	 * @param ntype the name type, i.e. Pedigree, Selection History, Cross Name,etc.
 	 * @return an instance of Name representing the searched name, or an empty Name instance if it doesn't exist
@@ -1383,7 +1387,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	/**
 	 * (non-Javadoc)
-	 *
+	 * 
 	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getUserDefinedFieldsByCodesInMap(java.lang.String,
 	 *      java.lang.String, java.util.List)
 	 */
