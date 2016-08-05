@@ -171,15 +171,18 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			final String queryStr =
 					"select  lp.lrecid as lrecid,  lp.entryid as entryid,  lp.desig as desig,  lp.grpname as grpname, "
 							+ "femaleParentName.nval as fnval,  fp.gid as fpgid,  maleParentName.nval as mnval, "
-							+ "mp.gid as mpgid,  g.gid as gid,  lp.source as source "
+							+ "mp.gid as mpgid,  g.gid as gid,  lp.source as source, m.mname as mname "
 							+ "from listdata lp  inner join germplsm g on lp.gid = g.gid  "
 							+ "left outer join germplsm mp on g.gpid2 = mp.gid  "
 							+ "left outer join names maleParentName on mp.gid = maleParentName.gid " + "and maleParentName.nstat = "
 							+ Name.NSTAT_PREFERRED_NAME + " " + "left outer join germplsm fp on g.gpid1 = fp.gid  "
 							+ "left outer join names femaleParentName on fp.gid = femaleParentName.gid " + "and femaleParentName.nstat = "
-							+ Name.NSTAT_PREFERRED_NAME + " " + "where lp.listid = :listId group by entryid";
+							+ Name.NSTAT_PREFERRED_NAME + " " 
+							+ "left outer join methods m on m.mid = g.methn "
+							+ "where lp.listid = :listId group by entryid";
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryStr);
+
 			query.setParameter("listId", listID);
 			query.addScalar("lrecid");
 			query.addScalar("entryid");
@@ -191,6 +194,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			query.addScalar("mpgid");
 			query.addScalar("gid");
 			query.addScalar("source");
+			query.addScalar("mname");
 
 			this.createGermplasmListDataRows(germplasmListData, query);
 
@@ -204,19 +208,20 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 	private void createGermplasmListDataRows(final List<GermplasmListData> germplasmListDataList, final SQLQuery query) {
 		final List<Object[]> result = query.list();
 
-		for (final Object[] row : result) {
-			final Integer id = (Integer) row[0];
-			final Integer entryId = (Integer) row[1];
-			final String designation = (String) row[2];
-			final String parentage = (String) row[3];
-			final String femaleParent = (String) row[4];
-			final Integer fgid = (Integer) row[5];
-			final String maleParent = (String) row[6];
-			final Integer mgid = (Integer) row[7];
-			final Integer gid = (Integer) row[8];
-			final String seedSource = (String) row[9];
+		for (Object[] row : result) {
+			Integer id = (Integer) row[0];
+			Integer entryId = (Integer) row[1];
+			String designation = (String) row[2];
+			String parentage = (String) row[3];
+			String femaleParent = (String) row[4];
+			Integer fgid = (Integer) row[5];
+			String maleParent = (String) row[6];
+			Integer mgid = (Integer) row[7];
+			Integer gid = (Integer) row[8];
+			String seedSource = (String) row[9];
+			String methodName = (String) row[10];
 
-			final GermplasmListData germplasmListData = new GermplasmListData();
+			GermplasmListData germplasmListData = new GermplasmListData();
 			germplasmListData.setId(id);
 			germplasmListData.setEntryId(entryId);
 			germplasmListData.setDesignation(designation);
@@ -227,6 +232,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			germplasmListData.setMgid(mgid);
 			germplasmListData.setGid(gid);
 			germplasmListData.setSeedSource(seedSource);
+			germplasmListData.setBreedingMethodName(methodName);
 
 			germplasmListDataList.add(germplasmListData);
 		}

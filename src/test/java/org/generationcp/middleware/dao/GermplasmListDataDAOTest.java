@@ -26,6 +26,10 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	private NameDAO nameDAO;
 	private GermplasmListDAO germplasmListDAO;
 
+
+	public static final String DUMMY_STRING = "DUMMY STRING";
+	public static final Integer TEST_VALUE = 1;
+
 	@Before
 	public void beforeTest() {
 		this.germplasmListDataDAO = new GermplasmListDataDAO();
@@ -221,5 +225,6 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		this.germplasmDAO.save(germplasm);
 		return germplasm;
 	}
+
 
 }

@@ -106,6 +106,14 @@ public interface FieldbookService {
 	List<Method> getAllBreedingMethods(boolean filterOutGenerative);
 
 	/**
+	 * Gets the breeding methods of generative type.
+	 *
+	 * @param filterOutGenerative the filter out generative
+	 * @return All breeding methods
+	 */
+	List<Method> getAllGenerativeMethods(final String programUUID);
+
+	/**
 	 * Gets the favorite breeding methods.
 	 *
 	 * @param methodIds the method ids
