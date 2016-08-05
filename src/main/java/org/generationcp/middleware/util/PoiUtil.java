@@ -464,14 +464,19 @@ public class PoiUtil {
 	 * @return false if all cells in a column is not empty or null true if one or more cells in the column is empty or null.
 	 */
 	public static Boolean columnHasEmpty(Sheet sheet, int columnIndex) {
-		Boolean b = false;
 		int index = 0;
 		try {
 			Row row = sheet.getRow(index);
-			while (row != null) {
+			if (row == null) {
+				return true;
+			}
+			final int lastRowNo = sheet.getLastRowNum();
+			while (index <= lastRowNo) {
+				if (row == null) {
+					return true;
+				}
 				if (PoiUtil.getCellValue(row.getCell(columnIndex)) == null
 						|| "".equalsIgnoreCase(PoiUtil.getCellValue(row.getCell(columnIndex)).toString())) {
-					b = true;
 					return true;
 				}
 				index++;
@@ -480,7 +485,7 @@ public class PoiUtil {
 		} catch (Exception e) {
 			PoiUtil.LOG.error(e.getMessage(), e);
 		}
-		return b;
+		return false;
 	}
 
 	public static Boolean isEmpty(Sheet sheet, int rowIndex, int columnIndex) {
