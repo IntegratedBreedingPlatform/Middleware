@@ -674,11 +674,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		// If the number of gids in the list matched the count of germplasm records matched in the database, it means
 		// that all gids searched have existing records in the database.
-		if (gids.size() == matchedGermplasmCount) {
-			return true;
-		} else {
-			return false;
-		}
+		return gids.size() == matchedGermplasmCount;
+
 
 	}
 
