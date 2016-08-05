@@ -18,17 +18,22 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.PersonNotFoundException;
 import org.generationcp.middleware.pojos.Person;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Person}.
  * 
  */
 public class PersonDAO extends GenericDAO<Person, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(PersonDAO.class);
 
 	public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException {
 		try {
@@ -167,7 +172,7 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 		return map;
 	}
 
-	public Person getPersonByName(final String firstName, final String middleName, final String lastName) {
+	public Person getPersonByName(final String firstName, final String middleName, final String lastName) throws PersonNotFoundException {
 		Person person = null;
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Person.class);
@@ -178,9 +183,15 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 			person = (Person) criteria.uniqueResult();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					String.format("Error with getPersonByName(firstName=[%s],middleName=[%s],lastName)", firstName, middleName, lastName),
-					e);
+			PersonDAO.LOG.error(String.format("Error with getPersonByName(firstName=[%s],middleName=[%s],lastName=[%s])", firstName, middleName,
+					lastName), e);
+			throw new PersonNotFoundException(String.format("Could not find the person (firstName=[%s],middleName=[%s],lastName=[%s])",
+					firstName, middleName, lastName));
+		}
+
+		if (person == null) {
+			throw new PersonNotFoundException(String.format("Could not find the person (firstName=[%s],middleName=[%s],lastName=[%s])",
+					firstName, middleName, lastName));
 		}
 		return person;
 	}

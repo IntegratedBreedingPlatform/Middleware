@@ -18,6 +18,7 @@ import java.util.List;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.PersonNotFoundException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Person;
@@ -170,7 +171,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	}
 
 	@Override
-	public Person getPersonByName(String firstName, String middleName, String lastName) throws MiddlewareQueryException {
+	public Person getPersonByName(final String firstName, final String middleName, final String lastName) throws PersonNotFoundException {
 		return this.getPersonDao().getPersonByName(firstName, middleName, lastName);
 	}
 }

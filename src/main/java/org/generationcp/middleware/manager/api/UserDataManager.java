@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager.api;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.PersonNotFoundException;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 
@@ -152,5 +153,5 @@ public interface UserDataManager {
 	 * @param lastName
 	 * @return
 	 */
-	Person getPersonByName(String firstName, String middleName, String lastName) throws MiddlewareQueryException;
+	Person getPersonByName(String firstName, String middleName, String lastName) throws MiddlewareQueryException, PersonNotFoundException;
 }
