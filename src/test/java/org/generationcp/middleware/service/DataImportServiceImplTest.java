@@ -179,20 +179,6 @@ public class DataImportServiceImplTest {
 		}
 	}
 
-	@Test
-	public void testIsTermExistsTrue() {
-
-		Assert.assertTrue("The entry_no is in the factors list, so it should return true.",
-				this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), this.workbook.getFactors(), this.ontologyDataManager));
-
-	}
-
-	@Test
-	public void testIsTermExistsEmptyVariableList() {
-
-		Assert.assertFalse("There are no variables in the list so it should return false.",
-				this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), new ArrayList<MeasurementVariable>(), this.ontologyDataManager));
-	}
 
 	@Test
 	public void testCheckForOutOfBoundsDataWithValidData() {
@@ -201,16 +187,6 @@ public class DataImportServiceImplTest {
 
 		Assert.assertTrue(this.dataImportService.checkForOutOfBoundsData(testWorkbook, PROGRAM_UUID));
 
-	}
-
-	@Test
-	public void testIsTermExistsVariableDoesntExistInOntology() {
-
-		Mockito.when(this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ENTRY,
-				WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED)).thenReturn(null);
-
-		Assert.assertFalse("The entry_no variable is not found in the ontology, so it should return false",
-				this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), this.workbook.getFactors(), this.ontologyDataManager));
 	}
 
 	@Test
@@ -516,6 +492,20 @@ public class DataImportServiceImplTest {
 
 		Assert.assertNull(testMeasurementVariable.getPossibleValues());
 		Assert.assertNull(testMeasurementVariable.getDataTypeId());
+	}
+
+	@Test
+	public void testGetTermIdsOfMeasurementVariables() {
+
+		Set<Integer> termIds = this.dataImportService.getTermIdsOfMeasurementVariables(this.workbook.getFactors(), this.ontologyDataManager);
+
+		Assert.assertTrue("The termid of entry no should be in the list because it's in the ontology",termIds.contains(TermId.ENTRY_NO.getId()));
+		Assert.assertTrue("The termid of plot no should be in the list because it's in the ontology",termIds.contains(TermId.PLOT_NO.getId()));
+		Assert.assertTrue("The termid of gid should be in the list because it's in the ontology",termIds.contains(TermId.GID.getId()));
+		Assert.assertFalse("The termid of desig should not be in the list because it's not in the ontology", termIds.contains(TermId.DESIG.getId()));
+		Assert.assertFalse("The termid of trial instance not be in the list because it's not in the factors list", termIds.contains(TermId.TRIAL_INSTANCE_FACTOR.getId()));
+
+
 	}
 
 	private StandardVariable createTestCategoricalStandardVariable(String name) {

@@ -171,17 +171,19 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// perform validations on the parsed data that require db access
 		final List<Message> messages = new LinkedList<Message>();
 
-		if (!this.isTermExists(TermId.ENTRY_NO.getId(), workbook.getFactors(), ontologyDataManager)) {
+		Set<Integer> factorsTermIds = getTermIdsOfMeasurementVariables(workbook.getFactors(), ontologyDataManager);
+		Set<Integer> trialVariablesTermIds = getTermIdsOfMeasurementVariables(workbook.getTrialVariables(), ontologyDataManager);
+
+		if (!factorsTermIds.contains(TermId.ENTRY_NO.getId())) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_ENTRY_DOESNT_EXIST));
 		}
 
-		if (!this.isTermExists(TermId.PLOT_NO.getId(), workbook.getFactors(), ontologyDataManager) && !this
-				.isTermExists(TermId.PLOT_NNO.getId(), workbook.getFactors(), ontologyDataManager)) {
+		if (!factorsTermIds.contains(TermId.PLOT_NO.getId()) && !factorsTermIds.contains(TermId.PLOT_NNO.getId())) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_PLOT_DOESNT_EXIST));
 		}
 
-		if (!workbook.isNursery() && !this
-				.isTermExists(TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getTrialVariables(), ontologyDataManager)) {
+		if (!workbook.isNursery() && !trialVariablesTermIds
+				.contains(TermId.TRIAL_INSTANCE_FACTOR.getId())) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_MISSING_TRIAL_CONDITION));
 		}
 
@@ -572,20 +574,21 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(name, programUUID, relationship);
 	}
 
-	protected boolean isTermExists(final int termId, final List<MeasurementVariable> measurementVariables,
-			final OntologyDataManager ontology) {
+	Set<Integer> getTermIdsOfMeasurementVariables(final List<MeasurementVariable> measurementVariables, final OntologyDataManager ontologyDataManager) {
+
+		HashSet<Integer> termIds = new HashSet();
 
 		for (final MeasurementVariable mvar : measurementVariables) {
 
 			final Integer varId =
-					ontology.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
-
-			if (varId != null && varId.intValue() == termId) {
-				return true;
+					ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
+			if (varId != null) {
+				termIds.add(varId);
 			}
 		}
 
-		return false;
+		return termIds;
+	}
 
 	}
 
@@ -730,28 +733,28 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public Map<String, List<Message>> validateProjectOntology(final Workbook workbook, final String programUUID) {
 		final Map<String, List<Message>> errors = new HashMap<String, List<Message>>();
 
-		final OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(this.getSessionProvider());
+		Set<Integer> factorsTermIds = getTermIdsOfMeasurementVariables(workbook.getFactors(), ontologyDataManager);
+		Set<Integer> trialVariablesTermIds = getTermIdsOfMeasurementVariables(workbook.getTrialVariables(), ontologyDataManager);
 
 		// DMV : TODO change implem so that backend is agnostic to UI when determining messages
-
-		if (!this.isTermExists(TermId.ENTRY_NO.getId(), workbook.getFactors(), ontology)) {
+		if (!factorsTermIds.contains(TermId.ENTRY_NO.getId())) {
 			this.initializeIfNull(errors, Constants.MISSING_ENTRY);
 			errors.get(Constants.MISSING_ENTRY).add(new Message("error.entry.doesnt.exist.wizard"));
 		}
 
-		if (!this.isTermExists(TermId.GID.getId(), workbook.getFactors(), ontology)) {
+		if (!factorsTermIds.contains(TermId.GID.getId())) {
 			this.initializeIfNull(errors, Constants.MISSING_GID);
 			errors.get(Constants.MISSING_GID).add(new Message("error.gid.doesnt.exist.wizard"));
 		}
 
 		if ((workbook.getImportType() == null || workbook.getImportType() == DataSetType.PLOT_DATA.getId()) && (
-				!this.isTermExists(TermId.PLOT_NO.getId(), workbook.getFactors(), ontology) && !this
-						.isTermExists(TermId.PLOT_NNO.getId(), workbook.getFactors(), ontology))) {
+				!factorsTermIds.contains(TermId.PLOT_NO.getId()) && !factorsTermIds
+						.contains(TermId.PLOT_NNO.getId()))) {
 			this.initializeIfNull(errors, Constants.MISSING_PLOT);
 			errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
 		}
 
-		if (!workbook.isNursery() && !this.isTermExists(TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getTrialVariables(), ontology)) {
+		if (!workbook.isNursery() && !trialVariablesTermIds.contains(TermId.TRIAL_INSTANCE_FACTOR.getId())) {
 			this.initializeIfNull(errors, Constants.MISSING_TRIAL);
 			errors.get(Constants.MISSING_TRIAL).add(new Message(DataImportServiceImpl.ERROR_MISSING_TRIAL_CONDITION));
 		}
