@@ -540,7 +540,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	/**
-	 * @param listIds a group of ids for which we want to retrive germplasm list
+	 * @param listIds a group of ids for which we want to retrieve germplasm list
 	 * @return the resultant germplasm list
 	 */
 	public List<GermplasmList> getAllGermplasmListsById(final List<Integer> listIds) {
