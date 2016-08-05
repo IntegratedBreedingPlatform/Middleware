@@ -294,6 +294,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
+	public List<Method> getAllGenerativeMethods(final String programUUID) {
+		final List<Method> methodList = this.getGermplasmDataManager().getMethodsByType("GEN", programUUID);
+		return methodList;
+	}
+
+	@Override
 	public List<Method> getFavoriteBreedingMethods(final List<Integer> methodIds, final boolean filterOutGenerative) {
 		final List<Method> methodList;
 		if (filterOutGenerative) {

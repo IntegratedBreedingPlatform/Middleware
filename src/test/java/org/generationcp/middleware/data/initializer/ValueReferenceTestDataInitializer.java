@@ -17,7 +17,7 @@ public class ValueReferenceTestDataInitializer {
 	public ValueReference createValueReference(final int id, final String name) {
 		final ValueReference valueReference = new ValueReference(id, name);
 		valueReference.setProgramUUID(DUMMY_PROGRAM_UUID);
-		valueReference.setDescription("id: " + id + ", name: " + name);
+		valueReference.setDescription(name);
 		return valueReference;
 	}
 
