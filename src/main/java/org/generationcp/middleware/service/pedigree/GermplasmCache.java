@@ -43,7 +43,7 @@ public class GermplasmCache {
 
 		// Cache will expire in 10 minutes so that we do not have old germplasm in case of name changes.
 		// The timeout is a bit meaning less because no request will last 10 minutes.
-		germplasmCache = CacheBuilder.newBuilder().maximumSize(50000).expireAfterWrite(100, TimeUnit.MINUTES).build();
+		germplasmCache = CacheBuilder.from("maximumSize=0").expireAfterWrite(100, TimeUnit.MINUTES).build();
 
 		germplasmCropBasedCache =
 				new FunctionBasedGuavaCacheLoader<CropGermplasmKey, Germplasm>(germplasmCache, new Function<CropGermplasmKey, Germplasm>() {
