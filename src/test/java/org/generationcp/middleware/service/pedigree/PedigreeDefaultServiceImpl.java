@@ -1,6 +1,9 @@
 
 package org.generationcp.middleware.service.pedigree;
 
+import java.util.Map;
+import java.util.Set;
+
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -587,5 +590,10 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 	@Override
 	public String getCropName() {
 		return cropName;
+	}
+
+	@Override
+	public Map<Integer, String> getCrossExpansions(Set<Integer> gids, Integer level, CrossExpansionProperties crossExpansionProperties) {
+		throw new UnsupportedOperationException("Bulk pedigree string genration is not current supported in the test method.");
 	}
 }

@@ -355,6 +355,16 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
+	public void updateTerms(List<Term> terms) {
+
+		for (Term term : terms) {
+			this.getTermSaver().update(term);
+		}
+
+	}
+
+
+	@Override
 	public List<Term> getDataTypes() throws MiddlewareQueryException {
 		List<Integer> dataTypeIds =
 				Arrays.asList(TermId.CLASS.getId(), TermId.NUMERIC_VARIABLE.getId(), TermId.DATE_VARIABLE.getId(),

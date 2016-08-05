@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.StandardPresetDAO;
@@ -566,9 +567,16 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param projectId - the project id
 	 * @return the List of {@link User} records
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<User> getUsersByProjectId(Long projectId) throws MiddlewareQueryException;
+	List<User> getUsersByProjectId(Long projectId);
+
+	/**
+	 * Return a Map of {@link Person} records identified by {@link User} ids associated with a {@link Project}.
+	 *
+	 * @param projectId - the project id
+	 * @return the Maps of {@link Person} records identified by {@link User} ids
+	 */
+	Map<Integer, Person> getPersonsByProjectId(final Long projectId);
 
 	/**
 	 * Returns the number of {@link User} records associated with a {@link Project}.

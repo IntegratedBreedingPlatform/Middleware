@@ -596,6 +596,13 @@ public class Germplasm implements Serializable {
 	}
 
 	public Name getPreferredName() {
+		if(this.preferredName == null) {
+			for (final Name name : this.getNames()) {
+				if(name.getNstat() != null && name.getNstat().equals(new Integer(1))) {
+					this.preferredName = name;
+				}
+			}
+		}
 		return this.preferredName;
 	}
 

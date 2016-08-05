@@ -13,9 +13,12 @@ package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
@@ -60,34 +63,60 @@ public class ProjectUserRoleDAO extends GenericDAO<ProjectUserRole, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<User> getUsersByProjectId(Long projectId) throws MiddlewareQueryException {
-		List<User> users = new ArrayList<User>();
+	public List<User> getUsersByProjectId(final Long projectId) {
+		final List<User> users = new ArrayList<>();
 		try {
 			if (projectId != null) {
-				SQLQuery query = this.getSession().createSQLQuery(ProjectUserRole.GET_USERS_BY_PROJECT_ID);
+				final SQLQuery query = this.getSession().createSQLQuery(ProjectUserRole.GET_USERS_BY_PROJECT_ID);
 				query.setParameter("projectId", projectId);
-				List<Object> results = query.list();
-				for (Object o : results) {
-					Object[] user = (Object[]) o;
-					Integer userId = (Integer) user[0];
-					Integer instalId = (Integer) user[1];
-					Integer uStatus = (Integer) user[2];
-					Integer uAccess = (Integer) user[3];
-					Integer uType = (Integer) user[4];
-					String uName = (String) user[5];
-					String upswd = (String) user[6];
-					Integer personId = (Integer) user[7];
-					Integer aDate = (Integer) user[8];
-					Integer cDate = (Integer) user[9];
-					User u = new User(userId, instalId, uStatus, uAccess, uType, uName, upswd, personId, aDate, cDate);
+				final List<Object> results = query.list();
+				for (final Object o : results) {
+					final Object[] user = (Object[]) o;
+					final Integer userId = (Integer) user[0];
+					final Integer instalId = (Integer) user[1];
+					final Integer uStatus = (Integer) user[2];
+					final Integer uAccess = (Integer) user[3];
+					final Integer uType = (Integer) user[4];
+					final String uName = (String) user[5];
+					final String upswd = (String) user[6];
+					final Integer personId = (Integer) user[7];
+					final Integer aDate = (Integer) user[8];
+					final Integer cDate = (Integer) user[9];
+					final User u = new User(userId, instalId, uStatus, uAccess, uType, uName, upswd, personId, aDate, cDate);
 					users.add(u);
 				}
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in getUsersByProjectId(projectId=" + projectId + ") query from ProjectUser: "
 					+ e.getMessage(), e);
 		}
 		return users;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Map<Integer, Person> getPersonsByProjectId(final Long projectId) {
+		final Map<Integer, Person> persons = new HashMap<>();
+		try {
+			if (projectId != null) {
+				final SQLQuery query = this.getSession().createSQLQuery(ProjectUserRole.GET_PERSONS_BY_PROJECT_ID);
+				query.setParameter("projectId", projectId);
+				final List<Object> results = query.list();
+				for (final Object o : results) {
+					final Object[] person = (Object[]) o;
+					final Integer userId = (Integer) person[0];
+					final Integer personId = (Integer) person[1];
+					final String firstName = (String) person[2];
+					final String middleName = (String) person[3];
+					final String lastName = (String) person[4];
+					final Person p = new Person(personId, firstName, middleName, lastName);
+					persons.put(userId, p);
+				}
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in getUsersByProjectId(projectId=" + projectId + ") query from ProjectUser: "
+					+ e.getMessage(), e);
+		}
+		return persons;
 	}
 
 	public long countUsersByProjectId(Long projectId) throws MiddlewareQueryException {

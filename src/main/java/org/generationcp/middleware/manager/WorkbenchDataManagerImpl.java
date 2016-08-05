@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.generationcp.middleware.dao.CropTypeDAO;
@@ -795,8 +796,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<User> getUsersByProjectId(Long projectId) throws MiddlewareQueryException {
+	public List<User> getUsersByProjectId(final Long projectId) {
 		return this.getProjectUserRoleDao().getUsersByProjectId(projectId);
+	}
+
+	@Override
+	public Map<Integer, Person> getPersonsByProjectId(final Long projectId) {
+		return this.getProjectUserRoleDao().getPersonsByProjectId(projectId);
 	}
 
 	@Override

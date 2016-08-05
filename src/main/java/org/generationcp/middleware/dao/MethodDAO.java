@@ -62,6 +62,18 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
+	public List<Method> getAllMethodOrderByMname() throws MiddlewareQueryException {
+		try {
+			Criteria criteria = this.getSession().createCriteria(Method.class);
+			criteria.addOrder(Order.asc("mname"));
+			return criteria.list();
+		} catch (HibernateException e) {
+			this.logAndThrowException(this.getLogExceptionMessage("getAllMethodOrderByMname", "", null, e.getMessage(), "Method"), e);
+		}
+		return new ArrayList<Method>();
+	}
+
+	@SuppressWarnings("unchecked")
 	public List<Method> getByUniqueID(String programUUID) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = this.getSession().createCriteria(Method.class);

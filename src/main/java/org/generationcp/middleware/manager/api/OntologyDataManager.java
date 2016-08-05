@@ -222,6 +222,14 @@ public interface OntologyDataManager {
 	void updateTerm(Term term) throws MiddlewareException;
 
 	/**
+	 * Updates the terms.
+	 * @param terms
+	 * @throws MiddlewareException
+	 */
+	void updateTerms(List<Term> terms) throws MiddlewareException;
+
+
+	/**
 	 * Returns the list of Term entries based on possible data types.
 	 *
 	 * @return list of data type Term objects
