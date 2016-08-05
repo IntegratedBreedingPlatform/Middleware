@@ -11,12 +11,12 @@ import com.google.common.base.Optional;
 
 public class BackcrossAncestryTree {
 
-	private final FunctionBasedGuavaCacheLoader<CropGermplasmKey, Germplasm> germplasmCache;
+	private final GermplasmCache germplasmCache;
 	private final FunctionBasedGuavaCacheLoader<CropMethodKey, Method> methodCache;
 	private final String cropName;
 	private final AncestryTreeService ancestryTreeService;
 
-	public BackcrossAncestryTree(final FunctionBasedGuavaCacheLoader<CropGermplasmKey, Germplasm> germplasmCropBasedCache,
+	public BackcrossAncestryTree(final GermplasmCache germplasmCropBasedCache,
 			final FunctionBasedGuavaCacheLoader<CropMethodKey, Method> methodCropBasedCache, final String cropName) {
 		this.germplasmCache = germplasmCropBasedCache;
 		this.methodCache = methodCropBasedCache;
@@ -76,7 +76,7 @@ public class BackcrossAncestryTree {
 
 		// Male traversal
 		if (otherParentFemaleParentGid != null && otherParentFemaleParentGid.equals(recurringParentGid)) {
-			final Germplasm maleGermplasm = this.germplasmCache.get(new CropGermplasmKey(this.cropName, otherParentMaleParentGid)).get();
+			final Germplasm maleGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentMaleParentGid)).get();
 			GermplasmNode generateBackcrossTree = this.generateBackcrossTree(recurringParentGid, maleGermplasm, recurringParentNode, level);
 			germplasmNode.setFemaleParent(recurringParentNode);
 			germplasmNode.setMaleParent(generateBackcrossTree);
@@ -84,7 +84,7 @@ public class BackcrossAncestryTree {
 
 		// Female Traversal
 		if (otherParentMaleParentGid != null && otherParentMaleParentGid.equals(recurringParentGid)) {
-			final Germplasm female = this.germplasmCache.get(new CropGermplasmKey(this.cropName, otherParentFemaleParentGid)).get();
+			final Germplasm female = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentFemaleParentGid)).get();
 			GermplasmNode generateBackcrossTree = this.generateBackcrossTree(recurringParentGid, female, recurringParentNode, level);
 			germplasmNode.setFemaleParent(generateBackcrossTree);
 			germplasmNode.setMaleParent(recurringParentNode);
@@ -107,8 +107,8 @@ public class BackcrossAncestryTree {
 	 *         found.
 	 */
 	private Optional<Germplasm> findRecurringParent(final Integer femaleParent, final Integer maleParent) {
-		final Germplasm femaleParentGermplasm = this.germplasmCache.get(new CropGermplasmKey(this.cropName, femaleParent)).get();
-		final Germplasm maleParentGermplasm = this.germplasmCache.get(new CropGermplasmKey(this.cropName, maleParent)).get();
+		final Germplasm femaleParentGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, femaleParent)).get();
+		final Germplasm maleParentGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, maleParent)).get();
 		Germplasm recurringParent = null;
 		if (maleParentGermplasm.getGnpgs() >= 2 && (femaleParentGermplasm.getGid().equals(maleParentGermplasm.getGpid1())
 				|| femaleParentGermplasm.getGid().equals(maleParentGermplasm.getGpid2()))) {

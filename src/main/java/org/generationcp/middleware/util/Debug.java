@@ -41,19 +41,11 @@ public class Debug {
 	public static void println(int indent, String s) {
 		StringBuffer sb = Debug.printIndent(indent);
 		sb.append(s);
-		if (Debug.LOG.isDebugEnabled()) {
-			Debug.LOG.debug(sb.toString());
-		} else {
-			System.out.println(sb.toString());
-		}
+		Debug.LOG.debug(sb.toString());
 	}
 
 	public static void println(String s) {
-		if (Debug.LOG.isDebugEnabled()) {
-			Debug.LOG.debug(s.toString());
-		} else {
-			System.out.println(s.toString());
-		}
+		Debug.LOG.debug(s.toString());
 	}
 
 	/**
@@ -79,11 +71,7 @@ public class Debug {
 	public static void print(int indent, String s) {
 		StringBuffer sb = Debug.printIndent(indent);
 		sb.append(s);
-		if (Debug.LOG.isDebugEnabled()) {
-			Debug.LOG.debug(sb.toString());
-		} else {
-			System.out.print(sb.toString());
-		}
+		Debug.LOG.debug(sb.toString());
 	}
 
 	/**

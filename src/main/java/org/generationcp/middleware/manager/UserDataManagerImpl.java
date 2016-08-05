@@ -134,7 +134,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	}
 
 	@Override
-	public Person getPersonById(int id) throws MiddlewareQueryException {
+	public Person getPersonById(final int id) throws MiddlewareQueryException {
 		return this.getPersonDao().getById(id, false);
 	}
 

@@ -187,6 +187,12 @@ public class XABeanDefinition {
 		// cacheServerConfiguration from driver doc: Should the driver cache the results of 'SHOW VARIABLES' and 'SHOW COLLATION' on a
 		// per-URL basis? Yes we want to.
 		databaseConnectionProperties.setProperty("cacheServerConfiguration", "true");
+		
+		// Removing this property will result in a huge performance impact on the pedigree generation
+		// The stored procedure getGermplasmWithNamesAndAncestry in crop databases uses group concat and thus this property
+		// This ensures that strings in the stored procedure are not silently truncated.
+		databaseConnectionProperties.setProperty("sessionVariables", "group_concat_max_len=500000");
+
 		return databaseConnectionProperties;
 	}
 }
