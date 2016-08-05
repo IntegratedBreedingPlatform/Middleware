@@ -727,14 +727,27 @@ public class PoiUtil {
 		if (sheet == null || sheet.getRow(rowNo) == null) {
 			return -1;
 		}
+
 		short index = sheet.getRow(rowNo).getLastCellNum();
-		while (index > 0 && (sheet.getRow(rowNo).getCell(index - 1) == null
-				|| StringUtils.isBlank(sheet.getRow(rowNo).getCell(index - 1).getStringCellValue()))) {
+
+		while (index > 0) { 
+			Cell cell = sheet.getRow(rowNo).getCell(index - 1);
+			Object cellValue = getCellValue(cell);
+			if (cell == null || cellValue == null) {
+				index--;
+				continue;
+			}
+			if (!StringUtils.isBlank(String.valueOf(cellValue))) {
+				break;
+			}
 			index--;
 		}
+
+		// index is 1-based
 		if (index == 0) {
 			return -1;
 		}
+
 		return index;
 	}
 
