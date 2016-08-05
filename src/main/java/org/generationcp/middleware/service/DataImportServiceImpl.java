@@ -1,21 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
-<<<<<<< HEAD
  * <p/>
  * Generation Challenge Programme (GCP)
  * <p/>
  * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
-=======
- * 
- * Generation Challenge Programme (GCP)
- * 
- * 
- * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
- * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
->>>>>>> master
  *******************************************************************************/
 
 package org.generationcp.middleware.service;
@@ -62,6 +52,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+
 @Transactional
 public class DataImportServiceImpl extends Service implements DataImportService {
 
@@ -78,6 +70,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String ERROR_INVALID_GIDS_FROM_DATA_FILE = "error.invalid.gids";
 
 	private int maxRowLimit = WorkbookParser.DEFAULT_MAX_ROW_LIMIT;
+
+	@Resource
+	private OntologyDataManager ontologyDataManager;
+
+	@Resource
+	private GermplasmDataManager germplasmDataManager;
 
 	public DataImportServiceImpl() {
 
@@ -163,29 +161,29 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public Workbook strictParseWorkbook(final File file, final String programUUID) throws WorkbookParserException {
 		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
 
-		final OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(this.getSessionProvider());
-		final GermplasmDataManager germplasmDataManager = new GermplasmDataManagerImpl(this.getSessionProvider());
-
 		// partially parse the file to parse the description sheet only at first
-		return this.strictParseWorkbook(file, parser, parser.parseFile(file, true), ontology, germplasmDataManager, programUUID);
+		return this.strictParseWorkbook(file, parser, parser.parseFile(file, true), this.ontologyDataManager, this.germplasmDataManager,
+				programUUID);
 	}
 
 	protected Workbook strictParseWorkbook(final File file, final WorkbookParser parser, final Workbook workbook,
-			final OntologyDataManager ontology, final GermplasmDataManager germplasmDataManager, final String programUUID)
+			final OntologyDataManager ontologyDataManager, final GermplasmDataManager germplasmDataManager, final String programUUID)
 			throws WorkbookParserException {
 
 		// perform validations on the parsed data that require db access
 		final List<Message> messages = new LinkedList<Message>();
 
-		if (!this.isTermExists(TermId.ENTRY_NO.getId(), workbook.getFactors(), ontology)) {
+		if (!this.isTermExists(TermId.ENTRY_NO.getId(), workbook.getFactors(), ontologyDataManager)) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_ENTRY_DOESNT_EXIST));
 		}
 
-		if (!this.isTermExists(TermId.PLOT_NO.getId(), workbook.getFactors(), ontology) && !this.isTermExists(TermId.PLOT_NNO.getId(), workbook.getFactors(), ontology)) {
+		if (!this.isTermExists(TermId.PLOT_NO.getId(), workbook.getFactors(), ontologyDataManager) && !this
+				.isTermExists(TermId.PLOT_NNO.getId(), workbook.getFactors(), ontologyDataManager)) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_PLOT_DOESNT_EXIST));
 		}
 
-		if (!workbook.isNursery() && !this.isTermExists(TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getTrialVariables(), ontology)) {
+		if (!workbook.isNursery() && !this
+				.isTermExists(TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getTrialVariables(), ontologyDataManager)) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_MISSING_TRIAL_CONDITION));
 		}
 
@@ -199,25 +197,25 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// containing validation errors inside
 		parser.parseAndSetObservationRows(file, workbook, false);
 
-		this.setRequiredFields(ontology, workbook);
+		this.setRequiredFields(ontologyDataManager, workbook);
 
 		// separated the validation of observations from the parsing so that it can be used even in other parsing implementations (e.g., the
 		// one for Wizard style)
 		messages.addAll(this.checkForEmptyRequiredVariables(workbook));
 
-		this.checkForInvalidGids(germplasmDataManager, ontology, workbook, messages);
+		this.checkForInvalidGids(workbook, messages);
 
 		// moved checking below as this needs to parse the contents of the observation sheet for multi-locations
-		this.checkForDuplicateStudyName(ontology, workbook, messages, programUUID);
+		this.checkForDuplicateStudyName(ontologyDataManager, workbook, messages, programUUID);
 
 		// GCP-6253
-		this.checkForDuplicateVariableNames(ontology, workbook, messages, programUUID);
+		this.checkForDuplicateVariableNames(ontologyDataManager, workbook, messages, programUUID);
 
 		this.checkForDuplicatePSMCombo(workbook, messages);
 
 		this.checkForInvalidLabel(workbook, messages);
 
-		if (this.checkForOutOfBoundsData(ontology, workbook, programUUID)) {
+		if (this.checkForOutOfBoundsData(workbook, programUUID)) {
 			workbook.setHasOutOfBoundsData(true);
 		}
 
@@ -225,13 +223,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public Workbook parseWorkbook(File file, String programUUID, boolean discardInvalidValues, OntologyDataManager ontologyDataManager,
-			WorkbookParser workbookParser) throws WorkbookParserException {
+	public Workbook parseWorkbook(File file, String programUUID, boolean discardInvalidValues, WorkbookParser workbookParser)
+			throws WorkbookParserException {
 
 		// partially parse the file to parse the description sheet only at first
 		final Workbook workbook = workbookParser.parseFile(file, false);
 
-		this.populatePossibleValuesForCategoricalVariates(workbook.getVariates(), programUUID, ontologyDataManager);
+		this.populatePossibleValuesForCategoricalVariates(workbook.getVariates(), programUUID);
 
 		workbookParser.parseAndSetObservationRows(file, workbook, discardInvalidValues);
 
@@ -239,14 +237,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public void populatePossibleValuesForCategoricalVariates(List<MeasurementVariable> variates, String programUUID,
-			OntologyDataManager ontologyDataManager) {
+	public void populatePossibleValuesForCategoricalVariates(List<MeasurementVariable> variates, String programUUID) {
 
 		for (MeasurementVariable measurementVariable : variates) {
 
-			StandardVariable standardVariable =
-					ontologyDataManager.findStandardVariableByTraitScaleMethodNames(measurementVariable.getProperty(),
-							measurementVariable.getScale(), measurementVariable.getMethod(), programUUID);
+			StandardVariable standardVariable = this.ontologyDataManager
+					.findStandardVariableByTraitScaleMethodNames(measurementVariable.getProperty(), measurementVariable.getScale(),
+							measurementVariable.getMethod(), programUUID);
 
 			if (standardVariable != null && standardVariable.getDataType().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
 
@@ -264,10 +261,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public boolean checkForOutOfBoundsData(final OntologyDataManager ontologyDataManager, Workbook workbook, final String programUUID) {
+	public boolean checkForOutOfBoundsData(Workbook workbook, final String programUUID) {
 
 		Map<String, List<String>> termIdValidValuesMap =
-				this.getValidValuesMapForCategoricalVariates(ontologyDataManager, workbook, programUUID);
+				this.getValidValuesMapForCategoricalVariates(this.ontologyDataManager, workbook, programUUID);
 
 		for (MeasurementRow measurementRow : workbook.getObservations()) {
 			for (Entry<String, List<String>> entry : termIdValidValuesMap.entrySet()) {
@@ -300,9 +297,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		Map<String, List<String>> variableValidValues = new HashMap<>();
 
 		for (MeasurementVariable measurementVariable : workbook.getVariates()) {
-			Integer stdVariableId =
-					ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(),
-							measurementVariable.getScale(), measurementVariable.getMethod());
+			Integer stdVariableId = ontologyDataManager
+					.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(), measurementVariable.getScale(),
+							measurementVariable.getMethod());
 			if (stdVariableId != null) {
 				StandardVariable stdVariable = ontologyDataManager.getStandardVariable(stdVariableId, programUUID);
 				if (stdVariable.getDataType().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
@@ -644,18 +641,17 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public void checkForInvalidGids(final GermplasmDataManager germplasmDataManager, final OntologyDataManager ontologyDataManager,
-			final Workbook workbook, final List<Message> messages) {
+	public void checkForInvalidGids(final Workbook workbook, final List<Message> messages) {
 
 		Optional<MeasurementVariable> gidResult =
-				findMeasurementVariableByTermId(TermId.GID.getId(), ontologyDataManager, workbook.getFactors());
+				findMeasurementVariableByTermId(TermId.GID.getId(), this.ontologyDataManager, workbook.getFactors());
 		if (gidResult.isPresent()) {
 
 			String gidLabel = gidResult.get().getName();
 			Set<Integer> gids = extractGidsFromObservations(gidLabel, workbook.getObservations());
 
-			if (!checkIfAllObservationHasGid(gidLabel, workbook.getObservations()) || !checkIfAllGidsExistInDatabase(germplasmDataManager,
-					gids)) {
+			if (!checkIfAllObservationHasGid(gidLabel, workbook.getObservations()) || !checkIfAllGidsExistInDatabase(
+					this.germplasmDataManager, gids)) {
 				messages.add(new Message(DataImportServiceImpl.ERROR_INVALID_GIDS_FROM_DATA_FILE));
 			}
 
@@ -753,9 +749,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			errors.get(Constants.MISSING_GID).add(new Message("error.gid.doesnt.exist.wizard"));
 		}
 
-		if ((workbook.getImportType() == null || workbook.getImportType() == DataSetType.PLOT_DATA.getId()) && (!this
-				.isTermExists(TermId.PLOT_NO.getId(), workbook.getFactors(), ontology) && !this
-				.isTermExists(TermId.PLOT_NNO.getId(), workbook.getFactors(), ontology) )) {
+		if ((workbook.getImportType() == null || workbook.getImportType() == DataSetType.PLOT_DATA.getId()) && (
+				!this.isTermExists(TermId.PLOT_NO.getId(), workbook.getFactors(), ontology) && !this
+						.isTermExists(TermId.PLOT_NNO.getId(), workbook.getFactors(), ontology))) {
 			this.initializeIfNull(errors, Constants.MISSING_PLOT);
 			errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
 		}

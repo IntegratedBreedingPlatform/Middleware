@@ -75,7 +75,7 @@ public interface DataImportService {
 	 * @return
 	 * @throws WorkbookParserException
 	 */
-	Workbook parseWorkbook(File file, String programUUID, boolean discardInvalidValues, OntologyDataManager ontologyDataManger,
+	Workbook parseWorkbook(File file, String programUUID, boolean discardInvalidValues,
 			WorkbookParser workbookParser) throws WorkbookParserException;
 
 	/**
@@ -140,8 +140,7 @@ public interface DataImportService {
 	Map<String, List<Message>> validateProjectData(Workbook importData, String programUUID) throws MiddlewareException;
 
 
-	void checkForInvalidGids(final GermplasmDataManager germplasmDataManager, final OntologyDataManager ontologyDataManager,
-			final Workbook workbook, final List<Message> messages);
+	void checkForInvalidGids(final Workbook workbook, final List<Message> messages);
 
 	/**
 	 * Checks the Workbook's observation data for out-of-bounds values. Returns true if there are out-of-bounds data.
@@ -151,7 +150,7 @@ public interface DataImportService {
 	 * @param programUUID
 	 * @return
 	 */
-	boolean checkForOutOfBoundsData(OntologyDataManager ontologyDataManager, Workbook workbook, String programUUID);
+	boolean checkForOutOfBoundsData(Workbook workbook, String programUUID);
 
 	/**
 	 * Populates the measurement variables with their possible values. Only the categorical type variable will be populated.
@@ -160,8 +159,7 @@ public interface DataImportService {
 	 * @param programUUID
 	 * @param ontologyDataManager
 	 */
-	void populatePossibleValuesForCategoricalVariates(List<MeasurementVariable> variates, String programUUID,
-			OntologyDataManager ontologyDataManager);
+	void populatePossibleValuesForCategoricalVariates(List<MeasurementVariable> variates, String programUUID);
 
 
 }

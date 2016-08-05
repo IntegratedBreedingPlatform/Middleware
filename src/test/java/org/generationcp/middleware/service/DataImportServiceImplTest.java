@@ -58,10 +58,9 @@ public class DataImportServiceImplTest {
 	private WorkbookParser parser;
 
 	@Mock
-	private OntologyDataManager ontology;
+	private OntologyDataManager ontologyDataManager;
 
 	@Mock
-
 	private GermplasmDataManager germplasmDataManager;
 
 	@Mock
@@ -98,20 +97,20 @@ public class DataImportServiceImplTest {
 				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, STUDY_NAME, TRIAL_NO,
 						IS_MULTIPLE_LOCATION);
 
-		Mockito.when(this.ontology
+		Mockito.when(this.ontologyDataManager
 				.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.TRIAL, WorkbookTestDataInitializer.NUMBER,
 						WorkbookTestDataInitializer.ENUMERATED)).thenReturn(TermId.TRIAL_INSTANCE_FACTOR.getId());
-		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ENTRY,
+		Mockito.when(this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ENTRY,
 				WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED)).thenReturn(TermId.ENTRY_NO.getId());
-		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ID,
+		Mockito.when(this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ID,
 				WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.ASSIGNED)).thenReturn(TermId.GID.getId());
-		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.FIELD_PLOT,
+		Mockito.when(this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.FIELD_PLOT,
 				WorkbookTestDataInitializer.NESTED_NUMBER, WorkbookTestDataInitializer.ENUMERATED)).thenReturn(TermId.PLOT_NO.getId());
-		Mockito.when(this.ontology.getStandardVariableIdByPropertyScaleMethod(EARASP_1_5_PROPERTY, EARASP_1_5_SCALE, EARASP_1_5_METHOD))
+		Mockito.when(this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(EARASP_1_5_PROPERTY, EARASP_1_5_SCALE, EARASP_1_5_METHOD))
 				.thenReturn(EARASP_1_5_TERMID);
-		Mockito.when(this.ontology.getStandardVariable(EARASP_1_5_TERMID, PROGRAM_UUID))
+		Mockito.when(this.ontologyDataManager.getStandardVariable(EARASP_1_5_TERMID, PROGRAM_UUID))
 				.thenReturn(this.createTestCategoricalStandardVariable(EARASP_1_5_NAME));
-		Mockito.when(this.ontology
+		Mockito.when(this.ontologyDataManager
 				.findStandardVariableByTraitScaleMethodNames(EARASP_1_5_PROPERTY, EARASP_1_5_SCALE, EARASP_1_5_METHOD, PROGRAM_UUID))
 				.thenReturn(this.createTestCategoricalStandardVariable(EARASP_1_5_NAME));
 
@@ -124,7 +123,7 @@ public class DataImportServiceImplTest {
 		this.workbook.getAllVariables().addAll(this.initializeTestMeasurementVariables());
 
 		try {
-			dataImportService.strictParseWorkbook(this.file, this.parser, workbook, this.ontology, this.germplasmDataManager,
+			dataImportService.strictParseWorkbook(this.file, this.parser, workbook, this.ontologyDataManager, this.germplasmDataManager,
 					DataImportServiceImplTest.PROGRAM_UUID);
 			Assert.fail("We expect workbookParserException to be thrown");
 		} catch (final WorkbookParserException e) {
@@ -184,7 +183,7 @@ public class DataImportServiceImplTest {
 	public void testIsTermExistsTrue() {
 
 		Assert.assertTrue("The entry_no is in the factors list, so it should return true.",
-				this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), this.workbook.getFactors(), ontology));
+				this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), this.workbook.getFactors(), this.ontologyDataManager));
 
 	}
 
@@ -192,7 +191,7 @@ public class DataImportServiceImplTest {
 	public void testIsTermExistsEmptyVariableList() {
 
 		Assert.assertFalse("There are no variables in the list so it should return false.",
-				this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), new ArrayList<MeasurementVariable>(), ontology));
+				this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), new ArrayList<MeasurementVariable>(), this.ontologyDataManager));
 	}
 
 	@Test
@@ -200,18 +199,18 @@ public class DataImportServiceImplTest {
 
 		Workbook testWorkbook = this.createTestWorkbook(true);
 
-		Assert.assertTrue(this.dataImportService.checkForOutOfBoundsData(this.ontology, testWorkbook, PROGRAM_UUID));
+		Assert.assertTrue(this.dataImportService.checkForOutOfBoundsData(testWorkbook, PROGRAM_UUID));
 
 	}
 
 	@Test
 	public void testIsTermExistsVariableDoesntExistInOntology() {
 
-		Mockito.when(ontology.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ENTRY,
+		Mockito.when(this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ENTRY,
 				WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED)).thenReturn(null);
 
 		Assert.assertFalse("The entry_no variable is not found in the ontology, so it should return false",
-				this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), this.workbook.getFactors(), ontology));
+				this.dataImportService.isTermExists(TermId.ENTRY_NO.getId(), this.workbook.getFactors(), this.ontologyDataManager));
 	}
 
 	@Test
@@ -219,7 +218,7 @@ public class DataImportServiceImplTest {
 
 		Workbook testWorkbook = this.createTestWorkbook(false);
 
-		Assert.assertFalse(this.dataImportService.checkForOutOfBoundsData(this.ontology, testWorkbook, PROGRAM_UUID));
+		Assert.assertFalse(this.dataImportService.checkForOutOfBoundsData(testWorkbook, PROGRAM_UUID));
 
 	}
 
@@ -227,7 +226,7 @@ public class DataImportServiceImplTest {
 	public void testFindMeasurementVariableByTermIdMeasurementVariableIsFound() {
 
 		final Optional<MeasurementVariable> result =
-				this.dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), ontology, this.workbook.getFactors());
+				this.dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), this.ontologyDataManager, this.workbook.getFactors());
 
 		Assert.assertTrue("Measurement variable is found, so the value is present", result.isPresent());
 		Assert.assertNotNull(result.get());
@@ -238,7 +237,7 @@ public class DataImportServiceImplTest {
 	public void testFindMeasurementVariableByTermIdMeasurementVariableIsNotFound() {
 
 		final Optional<MeasurementVariable> result = this.dataImportService
-				.findMeasurementVariableByTermId(TermId.BREEDING_METHOD_CODE.getId(), ontology, this.workbook.getFactors());
+				.findMeasurementVariableByTermId(TermId.BREEDING_METHOD_CODE.getId(), this.ontologyDataManager, this.workbook.getFactors());
 
 		Assert.assertFalse("No measurement variable found, so the value is not present", result.isPresent());
 
@@ -247,10 +246,10 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testSetRequiredField() {
 
-		this.dataImportService.setRequiredField(TermId.ENTRY_NO.getId(), ontology, this.workbook.getFactors());
+		this.dataImportService.setRequiredField(TermId.ENTRY_NO.getId(), this.ontologyDataManager, this.workbook.getFactors());
 
 		final Optional<MeasurementVariable> result =
-				this.dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), ontology, this.workbook.getFactors());
+				this.dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), this.ontologyDataManager, this.workbook.getFactors());
 
 		if (result.isPresent()) {
 			Assert.assertEquals(TermId.ENTRY_NO.getId(), result.get().getTermId());
@@ -267,18 +266,18 @@ public class DataImportServiceImplTest {
 		Workbook trialWorkbook = WorkbookTestDataInitializer
 				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.T, STUDY_NAME, TRIAL_NO, true);
 
-		this.dataImportService.setRequiredFields(ontology, trialWorkbook);
+		this.dataImportService.setRequiredFields(this.ontologyDataManager, trialWorkbook);
 
 		Optional<MeasurementVariable> optionalPlotNo =
-				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NO.getId(), ontology, trialWorkbook.getFactors());
+				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NO.getId(), this.ontologyDataManager, trialWorkbook.getFactors());
 		Optional<MeasurementVariable> optionalEntryNo =
-				dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), ontology, trialWorkbook.getFactors());
+				dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), this.ontologyDataManager, trialWorkbook.getFactors());
 		Optional<MeasurementVariable> optionalGid =
-				dataImportService.findMeasurementVariableByTermId(TermId.GID.getId(), ontology, trialWorkbook.getFactors());
+				dataImportService.findMeasurementVariableByTermId(TermId.GID.getId(), this.ontologyDataManager, trialWorkbook.getFactors());
 		Optional<MeasurementVariable> optionalTrialInstance = dataImportService
-				.findMeasurementVariableByTermId(TermId.TRIAL_INSTANCE_FACTOR.getId(), ontology, trialWorkbook.getTrialVariables());
+				.findMeasurementVariableByTermId(TermId.TRIAL_INSTANCE_FACTOR.getId(), this.ontologyDataManager, trialWorkbook.getTrialVariables());
 		Optional<MeasurementVariable> optionalPlotNNo =
-				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NNO.getId(), ontology, trialWorkbook.getFactors());
+				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NNO.getId(), this.ontologyDataManager, trialWorkbook.getFactors());
 
 		Assert.assertTrue(optionalPlotNo.get().isRequired());
 		Assert.assertTrue(optionalEntryNo.get().isRequired());
@@ -291,18 +290,18 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testSetRequiredFieldsForNursery() {
 
-		this.dataImportService.setRequiredFields(ontology, this.workbook);
+		this.dataImportService.setRequiredFields(this.ontologyDataManager, this.workbook);
 
 		Optional<MeasurementVariable> optionalPlotNo =
-				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NO.getId(), ontology, this.workbook.getFactors());
+				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NO.getId(), this.ontologyDataManager, this.workbook.getFactors());
 		Optional<MeasurementVariable> optionalEntryNo =
-				dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), ontology, this.workbook.getFactors());
+				dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), this.ontologyDataManager, this.workbook.getFactors());
 		Optional<MeasurementVariable> optionalGid =
-				dataImportService.findMeasurementVariableByTermId(TermId.GID.getId(), ontology, this.workbook.getFactors());
+				dataImportService.findMeasurementVariableByTermId(TermId.GID.getId(), this.ontologyDataManager, this.workbook.getFactors());
 		Optional<MeasurementVariable> optionalTrialInstance = dataImportService
-				.findMeasurementVariableByTermId(TermId.TRIAL_INSTANCE_FACTOR.getId(), ontology, this.workbook.getTrialVariables());
+				.findMeasurementVariableByTermId(TermId.TRIAL_INSTANCE_FACTOR.getId(), this.ontologyDataManager, this.workbook.getTrialVariables());
 		Optional<MeasurementVariable> optionalPlotNNo =
-				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NNO.getId(), ontology, this.workbook.getFactors());
+				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NNO.getId(), this.ontologyDataManager, this.workbook.getFactors());
 
 		Assert.assertTrue(optionalPlotNo.get().isRequired());
 		Assert.assertTrue(optionalEntryNo.get().isRequired());
@@ -341,7 +340,7 @@ public class DataImportServiceImplTest {
 
 		Mockito.when(this.parser.parseFile(this.file, false)).thenReturn(testWorkbook);
 
-		this.dataImportService.parseWorkbook(this.file, PROGRAM_UUID, true, this.ontology, this.parser);
+		this.dataImportService.parseWorkbook(this.file, PROGRAM_UUID, true, this.parser);
 
 		Mockito.verify(this.parser).parseAndSetObservationRows(this.file, testWorkbook, true);
 
@@ -358,7 +357,7 @@ public class DataImportServiceImplTest {
 
 		Mockito.when(this.parser.parseFile(this.file, false)).thenReturn(testWorkbook);
 
-		this.dataImportService.parseWorkbook(this.file, PROGRAM_UUID, false, this.ontology, this.parser);
+		this.dataImportService.parseWorkbook(this.file, PROGRAM_UUID, false, this.parser);
 
 		Mockito.verify(this.parser).parseAndSetObservationRows(this.file, testWorkbook, false);
 
@@ -418,7 +417,7 @@ public class DataImportServiceImplTest {
 				.thenReturn(Long.valueOf(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS));
 
 		final List<Message> messages = new ArrayList<>();
-		this.dataImportService.checkForInvalidGids(this.germplasmDataManager, this.ontology, this.workbook, messages);
+		this.dataImportService.checkForInvalidGids(this.workbook, messages);
 
 		Assert.assertTrue("All gids exist in the database, so no error message should be added in messages list.", messages.isEmpty());
 
@@ -431,7 +430,7 @@ public class DataImportServiceImplTest {
 		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(Mockito.anySet())).thenReturn(Long.valueOf(0L));
 
 		final List<Message> messages = new ArrayList<>();
-		this.dataImportService.checkForInvalidGids(this.germplasmDataManager, this.ontology, this.workbook, messages);
+		this.dataImportService.checkForInvalidGids(this.workbook, messages);
 
 		Assert.assertTrue(!messages.isEmpty());
 		// Make sure that invalid gids error message is added to the messages list.
@@ -451,7 +450,7 @@ public class DataImportServiceImplTest {
 		}
 
 		final List<Message> messages = new ArrayList<>();
-		this.dataImportService.checkForInvalidGids(this.germplasmDataManager, this.ontology, this.workbook, messages);
+		this.dataImportService.checkForInvalidGids(this.workbook, messages);
 
 		Assert.assertTrue(!messages.isEmpty());
 		// Make sure that gid doesnt exist error message is added to the messages list.
@@ -467,7 +466,7 @@ public class DataImportServiceImplTest {
 				new MeasurementVariable(EARASP_1_5_NAME, "", EARASP_1_5_SCALE, EARASP_1_5_METHOD, EARASP_1_5_PROPERTY, "", "C", "VARIATE");
 		variates.add(testMeasurementVariable);
 
-		this.dataImportService.populatePossibleValuesForCategoricalVariates(variates, PROGRAM_UUID, this.ontology);
+		this.dataImportService.populatePossibleValuesForCategoricalVariates(variates, PROGRAM_UUID);
 
 		Assert.assertFalse(testMeasurementVariable.getPossibleValues().isEmpty());
 		Assert.assertEquals(DataType.CATEGORICAL_VARIABLE.getId(), testMeasurementVariable.getDataTypeId());
@@ -478,7 +477,7 @@ public class DataImportServiceImplTest {
 
 		StandardVariable testStandardVariable = this.createTestCategoricalStandardVariable(EARASP_1_5_NAME);
 		testStandardVariable.setDataType(new Term(TermId.NUMERIC_VARIABLE.getId(), "Numeric variable", ""));
-		Mockito.when(this.ontology.getStandardVariable(EARASP_1_5_TERMID, PROGRAM_UUID)).thenReturn(testStandardVariable);
+		Mockito.when(this.ontologyDataManager.getStandardVariable(EARASP_1_5_TERMID, PROGRAM_UUID)).thenReturn(testStandardVariable);
 
 		List<MeasurementVariable> variates = new ArrayList<>();
 
@@ -486,7 +485,7 @@ public class DataImportServiceImplTest {
 				new MeasurementVariable(EARASP_1_5_NAME, "", EARASP_1_5_SCALE, EARASP_1_5_METHOD, EARASP_1_5_PROPERTY, "", "C", "VARIATE");
 		variates.add(testMeasurementVariable);
 
-		this.dataImportService.populatePossibleValuesForCategoricalVariates(variates, "", this.ontology);
+		this.dataImportService.populatePossibleValuesForCategoricalVariates(variates, "");
 
 		Assert.assertNull(testMeasurementVariable.getPossibleValues());
 		Assert.assertNull(testMeasurementVariable.getDataTypeId());
