@@ -326,10 +326,10 @@ public class DataImportServiceImplTest {
 	}
 
 	@Test
-	public void testCheckIfAllObservationHasGidTrue() {
+	public void testCheckIfAllObservationHasGidAndNumericTrue() {
 
 		Assert.assertTrue(
-				this.dataImportService.checkIfAllObservationHasGid(WorkbookTestDataInitializer.GID, this.workbook.getObservations()));
+				this.dataImportService.checkIfAllObservationHasGidAndNumeric(WorkbookTestDataInitializer.GID, this.workbook.getObservations()));
 
 	}
 
@@ -369,7 +369,7 @@ public class DataImportServiceImplTest {
 	}
 
 	@Test
-	public void testCheckIfAllObservationHasGidFalse() {
+	public void testCheckIfAllObservationHasGidAndNumericGidIsBlank() {
 
 		final List<MeasurementRow> observations = this.workbook.getObservations();
 
@@ -379,9 +379,36 @@ public class DataImportServiceImplTest {
 		measurementData.setValue(null);
 
 		Assert.assertFalse(
-				this.dataImportService.checkIfAllObservationHasGid(WorkbookTestDataInitializer.GID, this.workbook.getObservations()));
+				this.dataImportService.checkIfAllObservationHasGidAndNumeric(WorkbookTestDataInitializer.GID, this.workbook.getObservations()));
+
+		measurementData.setValue("");
+
+		Assert.assertFalse(
+				this.dataImportService.checkIfAllObservationHasGidAndNumeric(WorkbookTestDataInitializer.GID, this.workbook.getObservations()));
+
+		measurementData.setValue(" ");
+
+		Assert.assertFalse(
+				this.dataImportService.checkIfAllObservationHasGidAndNumeric(WorkbookTestDataInitializer.GID, this.workbook.getObservations()));
 
 	}
+
+	@Test
+	public void testCheckIfAllObservationHasGidAndNumericGidIsNotNumeric() {
+
+		final List<MeasurementRow> observations = this.workbook.getObservations();
+
+		// Set the GID to null of one observation to simulate blank gid in data file.
+		final MeasurementRow row = observations.get(0);
+		final MeasurementData measurementData = row.getMeasurementData(WorkbookTestDataInitializer.GID);
+		measurementData.setValue("123AAA");
+
+		Assert.assertFalse("Should return false because the GID contains non numeric characters",
+				this.dataImportService.checkIfAllObservationHasGidAndNumeric(WorkbookTestDataInitializer.GID, this.workbook.getObservations()));
+
+	}
+
+
 
 	@Test
 	public void testCheckIfAllGidsExistInDatabaseAllGidsExist() {

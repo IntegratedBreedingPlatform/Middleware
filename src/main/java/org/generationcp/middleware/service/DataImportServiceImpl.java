@@ -23,7 +23,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.google.common.base.Optional;
-import com.hazelcast.util.StringUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -40,7 +39,6 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -650,7 +648,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			String gidLabel = gidResult.get().getName();
 			Set<Integer> gids = extractGidsFromObservations(gidLabel, workbook.getObservations());
 
-			if (!checkIfAllObservationHasGid(gidLabel, workbook.getObservations()) || !checkIfAllGidsExistInDatabase(
+			if (!checkIfAllObservationHasGidAndNumeric(gidLabel, workbook.getObservations()) || !checkIfAllGidsExistInDatabase(
 					this.germplasmDataManager, gids)) {
 				messages.add(new Message(DataImportServiceImpl.ERROR_INVALID_GIDS_FROM_DATA_FILE));
 			}
@@ -685,16 +683,16 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	/**
-	 * Returns true if all observation from data file contains gid value.
+	 * Returns true if all observation from data file contains gid value and all values are numeric.
 	 *
 	 * @param observations
 	 * @return
 	 */
-	boolean checkIfAllObservationHasGid(final String gidLabel, final List<MeasurementRow> observations) {
+	boolean checkIfAllObservationHasGidAndNumeric(final String gidLabel, final List<MeasurementRow> observations) {
 
 		for (MeasurementRow observationRow : observations) {
 			String gidString = observationRow.getMeasurementDataValue(gidLabel);
-			if (StringUtil.isNullOrEmpty(gidString)) {
+			if (StringUtils.isBlank(gidString) || !StringUtils.isNumeric(gidString)) {
 				return false;
 			}
 		}
@@ -712,7 +710,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		Set<Integer> gids = new HashSet<>();
 		for (MeasurementRow observationRow : observations) {
 			String gidString = observationRow.getMeasurementDataValue(gidLabel);
-			if (StringUtils.isNotBlank(gidString)) {
+			if (StringUtils.isNotBlank(gidString) && StringUtils.isNumeric(gidString)) {
 				gids.add(Integer.valueOf(gidString));
 			}
 		}
