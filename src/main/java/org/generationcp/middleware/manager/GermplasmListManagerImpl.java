@@ -31,7 +31,6 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListMetadata;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.ListDataProperty;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.HibernateException;
@@ -546,6 +545,11 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	@Override
 	public Map<Integer, GermplasmListMetadata> getGermplasmListMetadata(final List<GermplasmList> listIds) {
 		final List<Integer> listIdsFromGermplasmList = getListIdsFromGermplasmList(listIds);
+		return getGermpasmListMetadata(listIdsFromGermplasmList);
+	}
+
+	
+	private Map<Integer, GermplasmListMetadata> getGermpasmListMetadata(final List<Integer> listIdsFromGermplasmList) {
 		final Map<Integer, GermplasmListMetadata> listMetadata = new HashMap<>();
 
 		final List<Object[]> queryResults = this.getGermplasmListDAO().getAllListMetadata(listIdsFromGermplasmList);
@@ -566,7 +570,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 			listMetadata.put(listId, new GermplasmListMetadata(listId, entryCount, owner));
 		}
-
 		return listMetadata;
 	}
 
@@ -645,6 +648,14 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	@Override
 	public List<GermplasmList> getAllGermplasmListsByProgramUUID(final String programUUID) {
 		return this.getGermplasmListDAO().getListsByProgramUUID(programUUID);
+	}
+	
+	/** (non-Javadoc)
+	 * @see org.generationcp.middleware.manager.api.GermplasmListManager#getAllGermplasmListsById(java.util.List)
+	 */
+	@Override
+	public List<GermplasmList> getAllGermplasmListsById(final List<Integer> listIds) {
+		return this.getGermplasmListDAO().getAllGermplasmListsById(listIds);
 	}
 
 

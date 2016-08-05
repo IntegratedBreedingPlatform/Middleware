@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
@@ -519,4 +520,11 @@ public interface GermplasmListManager {
 	 * @return The count of Germplasm Lists associated with the given Germplasm ID/
 	 */
 	List<GermplasmList> getGermplasmListByGIDandProgramUUID(Integer gid, int start, int numOfRows, String programUUID);
+
+	/**
+	 * @param listIds a list of listid for which we want the corresponding germplasm list
+	 * @return the resultant germplasm list
+	 */
+	List<GermplasmList> getAllGermplasmListsById(List<Integer> listIds);
+
 }

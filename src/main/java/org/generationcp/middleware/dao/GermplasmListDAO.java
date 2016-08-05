@@ -14,7 +14,6 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
@@ -22,11 +21,8 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -39,10 +35,6 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.type.IntegerType;
-
-import com.google.common.base.Function;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 
 /**
  * DAO class for {@link GermplasmList}.
@@ -545,5 +537,17 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		@SuppressWarnings("unchecked")
 		final List<Object[]> queryResults = query.list();
 		return queryResults;
+	}
+
+	/**
+	 * @param listIds a group of ids for which we want to retrive germplasm list
+	 * @return the resultant germplasm list
+	 */
+	public List<GermplasmList> getAllGermplasmListsById(final List<Integer> listIds) {
+		final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
+		criteria.add(Restrictions.in("id", listIds));
+		criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
+		criteria.add(Restrictions.eq("type", GermplasmListType.LST.toString()));
+		return criteria.list();
 	}
 }
