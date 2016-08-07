@@ -167,13 +167,14 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 		try {
 
-			String queryStr = "select  lp.lrecid as lrecid,  lp.entryid as entryid,  lp.desig as desig,  lp.grpname as grpname, "
-					+ " fn.nval as fnval,  fp.gid as fpgid,  mn.nval as mnval,  mp.gid as mpgid,  g.gid as gid,  lp.source as source  "
+			String queryStr ="select  lp.lrecid as lrecid,  lp.entryid as entryid,  lp.desig as desig,  lp.grpname as grpname, "
+					+ " fn.nval as fnval,  fp.gid as fpgid,  mn.nval as mnval,  mp.gid as mpgid,  g.gid as gid,  lp.source as source,  m.mname as mname "
 					+ "from listdata lp  inner join germplsm g on lp.gid = g.gid  "
 					+ "left outer join germplsm mp on g.gpid2 = mp.gid  "
 					+ "left outer join names mn on mp.gid = mn.gid and mn.nstat = 1  "
 					+ "left outer join germplsm fp on g.gpid1 = fp.gid  "
 					+ "left outer join names fn on fp.gid = fn.gid and mn.nstat = 1  "
+					+ "left outer join methods m on m.mid = g.methn "
 					+ "where lp.listid = :listId group by entryid";
 
 			SQLQuery query = this.getSession().createSQLQuery(queryStr);
@@ -188,6 +189,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			query.addScalar("mpgid");
 			query.addScalar("gid");
 			query.addScalar("source");
+			query.addScalar("mname");
 
 			this.createGermplasmListDataRows(germplasmListData, query);
 
@@ -212,6 +214,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			Integer mgid = (Integer) row[7];
 			Integer gid = (Integer) row[8];
 			String seedSource = (String) row[9];
+			String methodName = (String) row[10];
 
 			GermplasmListData germplasmListData = new GermplasmListData();
 			germplasmListData.setId(id);
@@ -224,6 +227,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			germplasmListData.setMgid(mgid);
 			germplasmListData.setGid(gid);
 			germplasmListData.setSeedSource(seedSource);
+			germplasmListData.setBreedingMethodName(methodName);
 
 			germplasmListDataList.add(germplasmListData);
 		}
