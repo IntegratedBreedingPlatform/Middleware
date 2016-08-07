@@ -32,8 +32,6 @@ import com.google.common.base.Function;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
-import net.sf.cglib.core.Local;
-
 /**
  * Implementation of the UserDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
  */
