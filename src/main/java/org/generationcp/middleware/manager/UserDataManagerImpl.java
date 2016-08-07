@@ -32,16 +32,25 @@ import com.google.common.base.Function;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
+import net.sf.cglib.core.Local;
+
 /**
  * Implementation of the UserDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
  */
 @Transactional
 public class UserDataManagerImpl extends DataManager implements UserDataManager {
 
+	/**
+	 * Caching all the users in the system. Max is ten because we do not expect to have more than 10 war filed.
+	 * Each war file will create on cache.
+	 */
 	private static Cache<String, List<User>> localUserCache =
 			CacheBuilder.newBuilder().maximumSize(10).expireAfterWrite(60, TimeUnit.MINUTES).build();
 
-	private static FunctionBasedGuavaCacheLoader<String, List<User>> functionBasedGuavaCacheLoader;
+	/**
+	 * Function to load data into the user local cache when required.
+	 */
+	private FunctionBasedGuavaCacheLoader<String, List<User>> functionBasedLocalUserGuavaCacheLoader;
 
 	public UserDataManagerImpl() {
 		super();
@@ -54,14 +63,13 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	}
 	
 	private void bingLoadingFunctionsToCache() {
-		functionBasedGuavaCacheLoader =
-				new FunctionBasedGuavaCacheLoader<String, List<User>>(localUserCache, new Function<String, List<User>>() {
-
-					@Override
-					public List<User> apply(final String key) {
-						return UserDataManagerImpl.this.getUserDao().getAll();
-					}
-				});
+		functionBasedLocalUserGuavaCacheLoader =
+			new FunctionBasedGuavaCacheLoader<String, List<User>>(localUserCache, new Function<String, List<User>>() {
+				@Override
+				public List<User> apply(final String key) {
+					return UserDataManagerImpl.this.getUserDao().getAll();
+				}
+			});
 	}
 
 
@@ -69,13 +77,12 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	@SuppressWarnings("deprecation")
 	@Override
 	public List<User> getAllUsers() throws MiddlewareQueryException {
-		String databaseConnectionUrl;
 		try {
-			databaseConnectionUrl = this.getActiveSession().connection().getMetaData().getURL();
+			final String databaseConnectionUrl = this.getActiveSession().connection().getMetaData().getURL();
+			return functionBasedLocalUserGuavaCacheLoader.get(databaseConnectionUrl).get();
 		} catch (HibernateException | SQLException e) {
-			throw new MiddlewareQueryException("Unable to connect to the database. Please contact admin for further information.",e);
+			throw new MiddlewareQueryException("Unable to connect to the database. Please contact admin for further information.", e);
 		}
-		return functionBasedGuavaCacheLoader.get(databaseConnectionUrl).get();
 	}
 
 	@Override

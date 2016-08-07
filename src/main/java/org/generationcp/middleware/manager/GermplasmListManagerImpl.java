@@ -48,16 +48,21 @@ import com.google.common.cache.CacheBuilder;
 @Transactional
 public class GermplasmListManagerImpl extends DataManager implements GermplasmListManager {
 	
+	/**
+	 * Caches the udflds table. The string is the database url. So the cache is per database url. 
+	 */
 	private static Cache<String, List<UserDefinedField>> germplasmListTypeCache =
 			CacheBuilder.newBuilder().maximumSize(10).expireAfterWrite(10, TimeUnit.MINUTES).build();
-	private FunctionBasedGuavaCacheLoader<String, List<UserDefinedField>> functionBasedGuavaCacheLoader;
+	
+	/** Function that loads the germplasmListTypeCache. Note this cannot be static. **/
+	private FunctionBasedGuavaCacheLoader<String, List<UserDefinedField>> functionBasedGermplasmListTypeGuavaCacheLoader;
 
 	public GermplasmListManagerImpl() {
 		bindFunctionToCache();	
 	}
 
 	private void bindFunctionToCache() {
-		functionBasedGuavaCacheLoader =
+		functionBasedGermplasmListTypeGuavaCacheLoader =
 				new FunctionBasedGuavaCacheLoader<String, List<UserDefinedField>>(germplasmListTypeCache, new Function<String, List<UserDefinedField>>() {
 
 					@Override
@@ -472,8 +477,9 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	@Override
 	public List<UserDefinedField> getGermplasmListTypes() {
 		try {
+			// Get the database url. This is how we will cache the UDFLDS across crops.
 			final String url = this.getActiveSession().connection().getMetaData().getURL();
-			return functionBasedGuavaCacheLoader.get(url).get();
+			return functionBasedGermplasmListTypeGuavaCacheLoader.get(url).get();
 
 		} catch (HibernateException | SQLException e) {
 			throw new MiddlewareQueryException("Problems connecting to the database. P"
