@@ -53,6 +53,25 @@ public class ListDataProjectTest {
 		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
 	}
 	
+	@Test
+	public void testParseDuplicateString() {
+		String duplicate = ListDataProjectTest.TEST_PEDIGREE_DUPE_STRING + " | " + ListDataProjectTest.TEST_PEDIGREE_RECIP_STRING  + " | " + ListDataProjectTest.TEST_PLOT_DUPE_STRING  + " | " + ListDataProjectTest.TEST_PLOT_RECIP_STRING;
+		ldp.setDuplicate(duplicate);
+		
+		//Test for pedigree dupes
+		List<Integer> parsed = ldp.parseDuplicateString(ListDataProject.PEDIGREE_DUPE);
+		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
+		
+		//Test for pedigree recips
+		parsed = ldp.parseDuplicateString(ListDataProject.PEDIGREE_RECIP);
+		Assert.assertEquals("The parsed list's size should be 1", 1, parsed.size());
+		
+		//Test for plot dupes
+		parsed = ldp.parseDuplicateString(ListDataProject.PLOT_DUPE);
+		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
+		
+		//Test for plot recips
+		parsed = ldp.parseDuplicateString(ListDataProject.PLOT_RECIP);
+		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
 	}
-
 }
