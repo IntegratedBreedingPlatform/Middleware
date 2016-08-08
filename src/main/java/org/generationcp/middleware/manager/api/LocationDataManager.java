@@ -468,6 +468,13 @@ public interface LocationDataManager {
 	 */
 	void saveOrUpdateLocdesList(Integer locationId, List<Locdes> locdesList) throws MiddlewareQueryException;
 
+	/**
+	 * get all seeding location records filtered by programUUID
+	 *
+	 * @param programUUID
+	 */
+	public List<Location> getAllSeedingLocations(String programUUID);
+
 	public List<Location> getAllBreedingLocations(List<Integer> locationIds);
 
 	public List<Location> getAllSeedingLocations(List<Integer> locationIds);
