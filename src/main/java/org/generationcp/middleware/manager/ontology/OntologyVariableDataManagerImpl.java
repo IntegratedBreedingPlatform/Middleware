@@ -495,7 +495,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				variable.setStudies(0);
 				variable.setObservations(0);
 
-			  	variable.setHasUsage(this.isVariableUsed(id));
+			  	variable.setHasUsage(this.isVariableUsedInStudy(id));
 
 			} else {
 				final int unknownUsage = -1;
@@ -728,9 +728,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		this.checkTermIsVariable(term);
 
 		// check usage
-		final Boolean usage = this.isVariableUsed(variableId);
+		final Boolean isUsed = this.isVariableUsedInStudy(variableId);
 
-		if (usage) {
+		if (isUsed) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.CAN_NOT_DELETE_USED_VARIABLE);
 		}
 
@@ -808,7 +808,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public boolean isVariableUsed(final int variableId) {
+	public boolean isVariableUsedInStudy(final int variableId) {
 		final String variableUsageCount = "SELECT *  FROM projectprop pp " + " WHERE pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
 				+ " AND pp.value = :variableId "
 				+ " AND pp.project_id not in ( SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = pp.project_id "

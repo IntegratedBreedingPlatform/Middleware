@@ -87,10 +87,11 @@ public interface OntologyVariableDataManager {
 	 */
 	String retrieveVariableCategoricalNameValue(String programUuid, Integer variableId, Integer categoricalValueId, boolean removeBraces);
 
-  	/** This function will give boolean flag if variable is used in any study or not
+	/**
+	 * This function will give boolean flag if variable is used in any study or not
 	 *
 	 * @param variableId variableId for which to retrieve usage flag
 	 * @return boolean return true if variable is used else false
-  	 */
-  	boolean isVariableUsed(final int variableId);
+	 */
+  	boolean isVariableUsedInStudy(final int variableId);
 }

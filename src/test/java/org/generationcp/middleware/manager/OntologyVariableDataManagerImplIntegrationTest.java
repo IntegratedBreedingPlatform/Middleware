@@ -219,7 +219,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
   	@Test
 	public void testIsVariableUsedReturnsFalse() throws Exception{
-	  boolean hasUsage = this.variableManager.isVariableUsed(testVariableInfo.getId());
+	  boolean hasUsage = this.variableManager.isVariableUsedInStudy(testVariableInfo.getId());
 	  Assert.assertFalse("Variable should have no usage", hasUsage);
 	}
 
