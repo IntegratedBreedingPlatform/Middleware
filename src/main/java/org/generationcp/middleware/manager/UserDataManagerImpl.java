@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.base.Function;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-
+	
 /**
  * Implementation of the UserDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
  */
@@ -46,21 +46,22 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 			CacheBuilder.newBuilder().maximumSize(10).expireAfterWrite(60, TimeUnit.MINUTES).build();
 
 	/**
-	 * Function to load data into the user local cache when required.
+	 * Function to load data into the user local cache when required. 
+	 * Note this must be a member variable an not a static variable.
 	 */
 	private FunctionBasedGuavaCacheLoader<String, List<User>> functionBasedLocalUserGuavaCacheLoader;
 
 	public UserDataManagerImpl() {
 		super();
-		bingLoadingFunctionsToCache();
+		bindCacheLoaderFunctionsToLocalUserCache();
 	}
 
 	public UserDataManagerImpl(HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
-		bingLoadingFunctionsToCache();
+		bindCacheLoaderFunctionsToLocalUserCache();
 	}
 	
-	private void bingLoadingFunctionsToCache() {
+	private void bindCacheLoaderFunctionsToLocalUserCache() {
 		functionBasedLocalUserGuavaCacheLoader =
 			new FunctionBasedGuavaCacheLoader<String, List<User>>(localUserCache, new Function<String, List<User>>() {
 				@Override

@@ -49,7 +49,8 @@ import com.google.common.cache.CacheBuilder;
 public class GermplasmListManagerImpl extends DataManager implements GermplasmListManager {
 	
 	/**
-	 * Caches the udflds table. The string is the database url. So the cache is per database url. 
+	 * Caches the udflds table. udflds should be small so this cache should be fine in terms of size. The string is the database url. So the
+	 * cache is per database url.
 	 */
 	private static Cache<String, List<UserDefinedField>> germplasmListTypeCache =
 			CacheBuilder.newBuilder().maximumSize(10).expireAfterWrite(10, TimeUnit.MINUTES).build();
@@ -58,13 +59,12 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	private FunctionBasedGuavaCacheLoader<String, List<UserDefinedField>> functionBasedGermplasmListTypeGuavaCacheLoader;
 
 	public GermplasmListManagerImpl() {
-		bindFunctionToCache();	
+		bindCacheLoaderFunctionToCache();	
 	}
 
-	private void bindFunctionToCache() {
+	private void bindCacheLoaderFunctionToCache() {
 		functionBasedGermplasmListTypeGuavaCacheLoader =
 				new FunctionBasedGuavaCacheLoader<String, List<UserDefinedField>>(germplasmListTypeCache, new Function<String, List<UserDefinedField>>() {
-
 					@Override
 					public List<UserDefinedField> apply(final String key) {
 						return GermplasmListManagerImpl.this.getGermpasmListTypesFromDb();
@@ -74,13 +74,13 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	public GermplasmListManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
-		bindFunctionToCache();	
+		bindCacheLoaderFunctionToCache();	
 
 	}
 
 	public GermplasmListManagerImpl(final HibernateSessionProvider sessionProvider, final String databaseName) {
 		super(sessionProvider, databaseName);
-		bindFunctionToCache();	
+		bindCacheLoaderFunctionToCache();	
 
 	}
 
@@ -657,10 +657,10 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 	
 	/** (non-Javadoc)
-	 * @see org.generationcp.middleware.manager.api.GermplasmListManager#getAllGermplasmListsById(java.util.List)
+	 * @see org.generationcp.middleware.manager.api.GermplasmListManager#getAllGermplasmListsByIds(java.util.List)
 	 */
 	@Override
-	public List<GermplasmList> getAllGermplasmListsById(final List<Integer> listIds) {
+	public List<GermplasmList> getAllGermplasmListsByIds(final List<Integer> listIds) {
 		return this.getGermplasmListDAO().getAllGermplasmListsById(listIds);
 	}
 

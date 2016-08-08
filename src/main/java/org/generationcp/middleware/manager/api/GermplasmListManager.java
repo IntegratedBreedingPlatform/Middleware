@@ -525,6 +525,6 @@ public interface GermplasmListManager {
 	 * @param listIds a list of listid for which we want the corresponding germplasm list
 	 * @return the resultant germplasm list
 	 */
-	List<GermplasmList> getAllGermplasmListsById(List<Integer> listIds);
+	List<GermplasmList> getAllGermplasmListsByIds(List<Integer> listIds);
 
 }
