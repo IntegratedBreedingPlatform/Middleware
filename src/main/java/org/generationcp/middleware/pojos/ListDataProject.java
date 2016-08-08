@@ -380,24 +380,28 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	}
 
 	protected List<Integer> parseDuplicateString(String forRemoval) {
-		String temp = this.duplicate.replace(forRemoval, "");
-		temp = temp.replace(":", "");
-		temp = temp.trim();
-
+		//The duplicate string's value can be "Pedigree Dupe: 2, 3, 4 | Plot Recip: 20" or any other combinations of duplicates and recips so we need to split the string using the "|" delimiter
+		String[] duplicateArray = this.duplicate.split("\\|");
 		List<Integer> returnVal = new ArrayList<>();
-		StringTokenizer tokenizer = new StringTokenizer(temp, ",");
-
-		while (tokenizer.hasMoreTokens()) {
-			String token = tokenizer.nextToken().trim();
-
-			if (token.length() == 0) {
-				continue;
+		for(String duplicateString : duplicateArray){
+			if(duplicateString.contains(forRemoval)){
+				String temp = duplicateString.replace(forRemoval, "");
+				temp = temp.replace(":", "");
+				temp = temp.trim();
+		
+				StringTokenizer tokenizer = new StringTokenizer(temp, ",");
+		
+				while (tokenizer.hasMoreTokens()) {
+					String token = tokenizer.nextToken().trim();
+		
+					if (token.length() == 0) {
+						continue;
+					}
+					returnVal.add(Integer.valueOf(token));
+				}
+				break;
 			}
-
-			returnVal.add(Integer.valueOf(token));
-
 		}
-
 		return returnVal;
 	}
 
