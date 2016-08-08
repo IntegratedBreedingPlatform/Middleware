@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.manager.ontology;
 
-import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -808,20 +807,20 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		return null;
 	}
 
-  	@Override
-  	public boolean isVariableUsed(final int variableId) {
-	  	final String variableUsageCount = "SELECT *  FROM projectprop pp "
-			  + " WHERE pp.type_id = " + TermId.STANDARD_VARIABLE.getId() + " AND pp.value = :variableId "
-			  + " AND pp.project_id not in ( SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = pp.project_id "
-			  + " AND stat.type_id = " + TermId.STUDY_STATUS.getId() + " AND value = " + TermId.DELETED_STUDY.getId() + ") limit 1";
+	@Override
+	public boolean isVariableUsed(final int variableId) {
+		final String variableUsageCount = "SELECT *  FROM projectprop pp " + " WHERE pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
+				+ " AND pp.value = :variableId "
+				+ " AND pp.project_id not in ( SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = pp.project_id "
+				+ " AND stat.type_id = " + TermId.STUDY_STATUS.getId() + " AND value = " + TermId.DELETED_STUDY.getId() + ") limit 1";
 
-	  	final SQLQuery query = this.getActiveSession().createSQLQuery(variableUsageCount);
-	  	query.setParameter("variableId", variableId);
-	  	List list = query.list();
-	  	return list.size() > 0;
-  	}
+		final SQLQuery query = this.getActiveSession().createSQLQuery(variableUsageCount);
+		query.setParameter("variableId", variableId);
+		List list = query.list();
+		return list.size() > 0;
+	}
 
-  private void updateVariableSynonym(final CVTerm term, final String newVariableName) {
+	private void updateVariableSynonym(final CVTerm term, final String newVariableName) {
 		final String oldVariableName = term.getName().trim();
 		final String newName = newVariableName.trim();
 
