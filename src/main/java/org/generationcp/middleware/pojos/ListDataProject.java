@@ -98,7 +98,6 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	@Transient
 	private String checkTypeDescription = null;
 
-
 	/**
 	 * @return the listDataProjectId
 	 */
@@ -109,7 +108,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	/**
 	 * @param listDataProjectId the listDataProjectId to set
 	 */
-	public void setListDataProjectId(Integer listDataProjectId) {
+	public void setListDataProjectId(final Integer listDataProjectId) {
 		this.listDataProjectId = listDataProjectId;
 	}
 
@@ -123,7 +122,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	/**
 	 * @param list the list to set
 	 */
-	public void setList(GermplasmList list) {
+	public void setList(final GermplasmList list) {
 		this.list = list;
 	}
 
@@ -138,7 +137,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	/**
 	 * @param germplasmId the germplasmId to set
 	 */
-	public void setGermplasmId(Integer germplasmId) {
+	public void setGermplasmId(final Integer germplasmId) {
 		this.germplasmId = germplasmId;
 	}
 
@@ -153,7 +152,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	/**
 	 * @param checkType the checkType to set
 	 */
-	public void setCheckType(Integer checkType) {
+	public void setCheckType(final Integer checkType) {
 		this.checkType = checkType;
 	}
 
@@ -168,7 +167,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	/**
 	 * @param entryId the entryId to set
 	 */
-	public void setEntryId(Integer entryId) {
+	public void setEntryId(final Integer entryId) {
 		this.entryId = entryId;
 	}
 
@@ -183,7 +182,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	/**
 	 * @param entryCode the entryCode to set
 	 */
-	public void setEntryCode(String entryCode) {
+	public void setEntryCode(final String entryCode) {
 		this.entryCode = entryCode;
 	}
 
@@ -198,7 +197,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	/**
 	 * @param seedSource the seedSource to set
 	 */
-	public void setSeedSource(String seedSource) {
+	public void setSeedSource(final String seedSource) {
 		this.seedSource = seedSource;
 	}
 
@@ -213,7 +212,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	/**
 	 * @param designation the designation to set
 	 */
-	public void setDesignation(String designation) {
+	public void setDesignation(final String designation) {
 		this.designation = designation;
 	}
 
@@ -228,7 +227,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	/**
 	 * @param groupName the groupName to set
 	 */
-	public void setGroupName(String groupName) {
+	public void setGroupName(final String groupName) {
 		this.groupName = groupName;
 	}
 
@@ -236,23 +235,23 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 		return this.duplicate;
 	}
 
-	public void setDuplicate(String duplicate) {
+	public void setDuplicate(final String duplicate) {
 		this.duplicate = duplicate;
 	}
 
 	public String getNotes() {
-		return notes;
+		return this.notes;
 	}
 
-	public void setNotes(String notes) {
+	public void setNotes(final String notes) {
 		this.notes = notes;
 	}
 
 	public Integer getCrossingDate() {
-		return crossingDate;
+		return this.crossingDate;
 	}
 
-	public void setCrossingDate(Integer crossingDate) {
+	public void setCrossingDate(final Integer crossingDate) {
 		this.crossingDate = crossingDate;
 	}
 
@@ -261,7 +260,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 		return this.femaleParent;
 	}
 
-	public void setFemaleParent(String femaleParent) {
+	public void setFemaleParent(final String femaleParent) {
 		this.femaleParent = femaleParent;
 	}
 
@@ -270,7 +269,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 		return this.fgid;
 	}
 
-	public void setFgid(Integer fgid) {
+	public void setFgid(final Integer fgid) {
 		this.fgid = fgid;
 	}
 
@@ -279,7 +278,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 		return this.maleParent;
 	}
 
-	public void setMaleParent(String maleParent) {
+	public void setMaleParent(final String maleParent) {
 		this.maleParent = maleParent;
 	}
 
@@ -288,36 +287,35 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 		return this.mgid;
 	}
 
-	public void setMgid(Integer mgid) {
+	public void setMgid(final Integer mgid) {
 		this.mgid = mgid;
 	}
 
-
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("ListDataProject{");
-        sb.append("listDataProjectId=").append(listDataProjectId);
-        sb.append(", list=").append(list);
-        sb.append(", germplasmId=").append(germplasmId);
-        sb.append(", checkType=").append(checkType);
-        sb.append(", entryId=").append(entryId);
-        sb.append(", entryCode='").append(entryCode).append('\'');
-        sb.append(", seedSource='").append(seedSource).append('\'');
-        sb.append(", designation='").append(designation).append('\'');
-        sb.append(", groupName='").append(groupName).append('\'');
-        sb.append(", duplicate='").append(duplicate).append('\'');
-        sb.append(", femaleParent='").append(femaleParent).append('\'');
-        sb.append(", fgid=").append(fgid);
-        sb.append(", maleParent='").append(maleParent).append('\'');
-        sb.append(", mgid=").append(mgid);
-        sb.append(", checkTypeDescription='").append(checkTypeDescription).append('\'');
-        sb.append(", notes='").append(notes).append('\'');
-        sb.append(", crossingDate='").append(crossingDate).append('\'');
+	@Override
+	public String toString() {
+		final StringBuffer sb = new StringBuffer("ListDataProject{");
+		sb.append("listDataProjectId=").append(this.listDataProjectId);
+		sb.append(", list=").append(this.list);
+		sb.append(", germplasmId=").append(this.germplasmId);
+		sb.append(", checkType=").append(this.checkType);
+		sb.append(", entryId=").append(this.entryId);
+		sb.append(", entryCode='").append(this.entryCode).append('\'');
+		sb.append(", seedSource='").append(this.seedSource).append('\'');
+		sb.append(", designation='").append(this.designation).append('\'');
+		sb.append(", groupName='").append(this.groupName).append('\'');
+		sb.append(", duplicate='").append(this.duplicate).append('\'');
+		sb.append(", femaleParent='").append(this.femaleParent).append('\'');
+		sb.append(", fgid=").append(this.fgid);
+		sb.append(", maleParent='").append(this.maleParent).append('\'');
+		sb.append(", mgid=").append(this.mgid);
+		sb.append(", checkTypeDescription='").append(this.checkTypeDescription).append('\'');
+		sb.append(", notes='").append(this.notes).append('\'');
+		sb.append(", crossingDate='").append(this.crossingDate).append('\'');
 		sb.append('}');
-        return sb.toString();
-    }
+		return sb.toString();
+	}
 
-    public Boolean isPedigreeDupe() {
+	public Boolean isPedigreeDupe() {
 		if (this.duplicate != null) {
 			return this.duplicate.contains(ListDataProject.PEDIGREE_DUPE);
 		}
@@ -346,7 +344,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	}
 
 	public List<Integer> parsePedigreeDupeInformation() {
-		List<Integer> returnVal = new ArrayList<>();
+		final List<Integer> returnVal = new ArrayList<>();
 
 		if (!this.isPedigreeDupe()) {
 			return returnVal;
@@ -379,21 +377,22 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 		return this.parseDuplicateString(ListDataProject.PEDIGREE_RECIP);
 	}
 
-	protected List<Integer> parseDuplicateString(String forRemoval) {
-		//The duplicate string's value can be "Pedigree Dupe: 2, 3, 4 | Plot Recip: 20" or any other combinations of duplicates and recips so we need to split the string using the "|" delimiter
-		String[] duplicateArray = this.duplicate.split("\\|");
-		List<Integer> returnVal = new ArrayList<>();
-		for(String duplicateString : duplicateArray){
-			if(duplicateString.contains(forRemoval)){
+	protected List<Integer> parseDuplicateString(final String forRemoval) {
+		// The duplicate string's value can be "Pedigree Dupe: 2, 3, 4 | Plot Recip: 20" or any other combinations of duplicates and recips
+		// so we need to split the string using the "|" delimiter
+		final String[] duplicateArray = this.duplicate.split("\\|");
+		final List<Integer> returnVal = new ArrayList<>();
+		for (final String duplicateString : duplicateArray) {
+			if (duplicateString.contains(forRemoval)) {
 				String temp = duplicateString.replace(forRemoval, "");
 				temp = temp.replace(":", "");
 				temp = temp.trim();
-		
-				StringTokenizer tokenizer = new StringTokenizer(temp, ",");
-		
+
+				final StringTokenizer tokenizer = new StringTokenizer(temp, ",");
+
 				while (tokenizer.hasMoreTokens()) {
-					String token = tokenizer.nextToken().trim();
-		
+					final String token = tokenizer.nextToken().trim();
+
 					if (token.length() == 0) {
 						continue;
 					}
@@ -411,7 +410,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 		return this.checkTypeDescription;
 	}
 
-	public void setCheckTypeDescription(String value) {
+	public void setCheckTypeDescription(final String value) {
 		this.checkTypeDescription = value;
 
 	}

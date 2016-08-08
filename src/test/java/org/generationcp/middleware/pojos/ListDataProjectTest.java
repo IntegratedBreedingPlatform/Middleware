@@ -13,65 +13,66 @@ public class ListDataProjectTest {
 	public static final String TEST_PEDIGREE_RECIP_STRING = ListDataProject.PEDIGREE_RECIP + ": 8";
 	public static final String TEST_PLOT_DUPE_STRING = ListDataProject.PLOT_DUPE + ": 2,4";
 	public static final String TEST_PLOT_RECIP_STRING = ListDataProject.PLOT_RECIP + ": 6,11";
-	
+
 	private static ListDataProject ldp;
-	
+
 	@BeforeClass
-	public static void beforeClass(){
-		ldp = new ListDataProject();
+	public static void beforeClass() {
+		ListDataProjectTest.ldp = new ListDataProject();
 	}
-	
+
 	@Test
 	public void testParsePedigreeDupe() {
-		ldp.setDuplicate(ListDataProjectTest.TEST_PEDIGREE_DUPE_STRING);
+		ListDataProjectTest.ldp.setDuplicate(ListDataProjectTest.TEST_PEDIGREE_DUPE_STRING);
 
-		List<Integer> parsed = ldp.parsePedigreeDupeInformation();
+		final List<Integer> parsed = ListDataProjectTest.ldp.parsePedigreeDupeInformation();
 		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
 	}
 
 	@Test
 	public void testParsePedigreeRecip() {
-		ldp.setDuplicate(ListDataProjectTest.TEST_PEDIGREE_RECIP_STRING);
+		ListDataProjectTest.ldp.setDuplicate(ListDataProjectTest.TEST_PEDIGREE_RECIP_STRING);
 
-		List<Integer> parsed = ldp.parsePedigreeReciprocalInformation();
+		final List<Integer> parsed = ListDataProjectTest.ldp.parsePedigreeReciprocalInformation();
 		Assert.assertEquals("The parsed list's size should be 1", 1, parsed.size());
 	}
 
 	@Test
 	public void testParsePlotRecip() {
-		ldp.setDuplicate(ListDataProjectTest.TEST_PLOT_RECIP_STRING);
+		ListDataProjectTest.ldp.setDuplicate(ListDataProjectTest.TEST_PLOT_RECIP_STRING);
 
-		List<Integer> parsed = ldp.parsePlotReciprocalInformation();
+		final List<Integer> parsed = ListDataProjectTest.ldp.parsePlotReciprocalInformation();
 		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
 	}
 
 	@Test
 	public void testParsePlotDuplicate() {
-		ldp.setDuplicate(ListDataProjectTest.TEST_PLOT_DUPE_STRING);
+		ListDataProjectTest.ldp.setDuplicate(ListDataProjectTest.TEST_PLOT_DUPE_STRING);
 
-		List<Integer> parsed = ldp.parsePlotDupeInformation();
+		final List<Integer> parsed = ListDataProjectTest.ldp.parsePlotDupeInformation();
 		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
 	}
-	
+
 	@Test
 	public void testParseDuplicateString() {
-		String duplicate = ListDataProjectTest.TEST_PEDIGREE_DUPE_STRING + " | " + ListDataProjectTest.TEST_PEDIGREE_RECIP_STRING  + " | " + ListDataProjectTest.TEST_PLOT_DUPE_STRING  + " | " + ListDataProjectTest.TEST_PLOT_RECIP_STRING;
-		ldp.setDuplicate(duplicate);
-		
-		//Test for pedigree dupes
-		List<Integer> parsed = ldp.parseDuplicateString(ListDataProject.PEDIGREE_DUPE);
+		final String duplicate = ListDataProjectTest.TEST_PEDIGREE_DUPE_STRING + " | " + ListDataProjectTest.TEST_PEDIGREE_RECIP_STRING
+				+ " | " + ListDataProjectTest.TEST_PLOT_DUPE_STRING + " | " + ListDataProjectTest.TEST_PLOT_RECIP_STRING;
+		ListDataProjectTest.ldp.setDuplicate(duplicate);
+
+		// Test for pedigree dupes
+		List<Integer> parsed = ListDataProjectTest.ldp.parseDuplicateString(ListDataProject.PEDIGREE_DUPE);
 		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
-		
-		//Test for pedigree recips
-		parsed = ldp.parseDuplicateString(ListDataProject.PEDIGREE_RECIP);
+
+		// Test for pedigree recips
+		parsed = ListDataProjectTest.ldp.parseDuplicateString(ListDataProject.PEDIGREE_RECIP);
 		Assert.assertEquals("The parsed list's size should be 1", 1, parsed.size());
-		
-		//Test for plot dupes
-		parsed = ldp.parseDuplicateString(ListDataProject.PLOT_DUPE);
+
+		// Test for plot dupes
+		parsed = ListDataProjectTest.ldp.parseDuplicateString(ListDataProject.PLOT_DUPE);
 		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
-		
-		//Test for plot recips
-		parsed = ldp.parseDuplicateString(ListDataProject.PLOT_RECIP);
+
+		// Test for plot recips
+		parsed = ListDataProjectTest.ldp.parseDuplicateString(ListDataProject.PLOT_RECIP);
 		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
 	}
 }
