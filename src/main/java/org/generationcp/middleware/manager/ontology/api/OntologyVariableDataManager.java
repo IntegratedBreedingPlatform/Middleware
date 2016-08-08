@@ -67,15 +67,7 @@ public interface OntologyVariableDataManager {
 	 */
 	void deleteVariable(Integer variableId);
 
-	/**
-	 * This function defines total observations carried from this variable.
-	 *
-	 * @param variableId variable id to get observations
-	 * @return Total observations
-	 */
-	Integer getVariableObservations(int variableId);
-
-	/**
+  	/**
 	 * This function defines total studies taken from this variable.
 	 *
 	 * @param variableId variable id to get observations
@@ -94,4 +86,12 @@ public interface OntologyVariableDataManager {
 	 * @return categorical value
 	 */
 	String retrieveVariableCategoricalNameValue(String programUuid, Integer variableId, Integer categoricalValueId, boolean removeBraces);
+
+	/**
+	 * This function will give boolean flag if variable is used in any study or not
+	 *
+	 * @param variableId variableId for which to retrieve usage flag
+	 * @return boolean return true if variable is used else false
+	 */
+  	boolean isVariableUsedInStudy(final int variableId);
 }

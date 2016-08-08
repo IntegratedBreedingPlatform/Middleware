@@ -1400,7 +1400,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public List<Method> getDerivativeAndMaintenanceMethods(final List<Integer> ids) {
 		return this.getMethodDao().getDerivativeAndMaintenanceMethods(ids);
 	}
-	
+
+	@Override
+	public long countMatchGermplasmInList(final Set<Integer> gids) {
+		return this.getGermplasmDao().countMatchGermplasmInList(gids);
+	}
 
 	/** (non-Javadoc)
 	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getGermplasmWithAllNamesAndAncestry(java.util.Set, int)
@@ -1448,6 +1452,5 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		}
 		return commaSeparatedListOfGids;
 	}
-
 
 }
