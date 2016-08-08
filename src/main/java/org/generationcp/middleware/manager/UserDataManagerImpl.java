@@ -50,6 +50,20 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	 * Note this must be a member variable an not a static variable.
 	 */
 	private FunctionBasedGuavaCacheLoader<String, List<User>> functionBasedLocalUserGuavaCacheLoader;
+	
+	/**
+	 * Caching all the persons in the system. Max is ten because we do not expect to have more than 10 war filed.
+	 * Each war file will create on cache.
+	 */
+	private static Cache<String, List<Person>> localPersonCache =
+			CacheBuilder.newBuilder().maximumSize(10).expireAfterWrite(60, TimeUnit.MINUTES).build();
+	
+	/**
+	 * Function to load data into the user local cache when required. 
+	 * Note this must be a member variable an not a static variable.
+	 */
+	private FunctionBasedGuavaCacheLoader<String, List<Person>> functionBasedLocalPersonGuavaCacheLoader;
+
 
 	public UserDataManagerImpl() {
 		super();
@@ -69,6 +83,14 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 					return UserDataManagerImpl.this.getUserDao().getAll();
 				}
 			});
+		
+		functionBasedLocalPersonGuavaCacheLoader =
+				new FunctionBasedGuavaCacheLoader<String, List<Person>>(localPersonCache, new Function<String, List<Person>>() {
+					@Override
+					public List<Person> apply(final String key) {
+						return UserDataManagerImpl.this.getPersonDao().getAll();
+					}
+				});
 	}
 
 
@@ -138,7 +160,12 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<Person> getAllPersons() throws MiddlewareQueryException {
-		return this.getPersonDao().getAll();
+		try {
+			final String databaseConnectionUrl = this.getActiveSession().connection().getMetaData().getURL();
+			return functionBasedLocalPersonGuavaCacheLoader.get(databaseConnectionUrl).get();
+		} catch (HibernateException | SQLException e) {
+			throw new MiddlewareQueryException("Unable to connect to the database. Please contact admin for further information.", e);
+		}
 	}
 
 	// TODO BMS-148 Rename method. No loger reads from two DBs.
