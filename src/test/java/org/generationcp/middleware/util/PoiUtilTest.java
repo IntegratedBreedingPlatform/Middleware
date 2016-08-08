@@ -56,27 +56,27 @@ public class PoiUtilTest {
 
 		Assert.assertEquals(-1, PoiUtil.getLastCellNum(null, rowNo));
 	}
-	
+
 	@Test
 	public void testRowAsString() {
 		Assert.assertEquals("", PoiUtil.rowAsString(this.sheet, 0, ""));
-		
-		int rowNo = 33;
-		Row row = this.sheet.createRow(rowNo);
+
+		final int rowNo = 33;
+		final Row row = this.sheet.createRow(rowNo);
 		row.createCell(0).setCellValue("First Cell");
 		row.createCell(1).setCellValue("Second Cell");
 		Assert.assertEquals("First Cell-Second Cell", PoiUtil.rowAsString(this.sheet, rowNo, "-"));
-		
+
 	}
-	
+
 	@Test
 	public void testRowAsStringMaxStringLength() {
-		int maxStringLength = 100;
+		final int maxStringLength = 100;
 
 		Assert.assertEquals("", PoiUtil.rowAsString(this.sheet, 0, "", maxStringLength));
-		
-		int rowNo = 33;
-		Row row = this.sheet.createRow(rowNo);
+
+		final int rowNo = 33;
+		final Row row = this.sheet.createRow(rowNo);
 		row.createCell(0).setCellValue("First Cell");
 		row.createCell(1).setCellValue("Second Cell");
 
@@ -84,25 +84,25 @@ public class PoiUtilTest {
 		Assert.assertEquals("First Cell-", PoiUtil.rowAsString(this.sheet, rowNo, "-", 11));
 		Assert.assertEquals("First Cell-Second", PoiUtil.rowAsString(this.sheet, rowNo, "-", 17));
 	}
-	
+
 	@Test(expected = NullPointerException.class)
 	public void testRowAsStringArrayNullRow() {
-		String[] arr = new String[] {};
+		final String[] arr = new String[] {};
 		Assert.assertArrayEquals(arr, PoiUtil.rowAsStringArray(this.sheet, 0));
 	}
 
 	@Test
 	public void testRowAsStringArrayEmpty() {
-		String[] arr = new String[] {};
+		final String[] arr = new String[] {};
 		this.sheet.createRow(0);
 		Assert.assertArrayEquals(arr, PoiUtil.rowAsStringArray(this.sheet, 0));
 	}
 
 	@Test
 	public void testRowAsStringArrayRange() {
-		String[] arr = new String[] {"First Cell", "Second Cell"};
+		final String[] arr = new String[] {"First Cell", "Second Cell"};
 		this.sheet.createRow(0);
-		Row row = this.sheet.createRow(0);
+		final Row row = this.sheet.createRow(0);
 		row.createCell(0).setCellValue("First Cell");
 		row.createCell(1).setCellValue("Second Cell");
 		Assert.assertArrayEquals(arr, PoiUtil.rowAsStringArray(this.sheet, 0, 0, 17, 100));
@@ -110,51 +110,52 @@ public class PoiUtilTest {
 
 	@Test
 	public void testRowAsStringArrayRangeMax() {
-		String[] arr = new String[] {"First Cell", "Second Cell"};
+		final String[] arr = new String[] {"First Cell", "Second Cell"};
 		this.sheet.createRow(0);
-		Row row = this.sheet.createRow(0);
+		final Row row = this.sheet.createRow(0);
 		row.createCell(0).setCellValue("First Cell");
 		row.createCell(1).setCellValue("Second Cell");
 		Assert.assertArrayEquals(arr, PoiUtil.rowAsStringArray(this.sheet, 0, 0, 17, 12));
 	}
-	
+
 	@Test
 	public void testRowAsStringArray() {
-		String[] arr = new String[] {"First Cell", "Second Cell"};
-		Row row = this.sheet.createRow(0);
+		final String[] arr = new String[] {"First Cell", "Second Cell"};
+		final Row row = this.sheet.createRow(0);
 		row.createCell(0).setCellValue("First Cell");
 		row.createCell(1).setCellValue("Second Cell");
 		Assert.assertArrayEquals(arr, PoiUtil.rowAsStringArray(this.sheet, 0));
 	}
-	
+
 	@Test
 	public void testAsStringArrayColumn() {
 		this.sheet.createRow(0).createCell(0).setCellValue("First Cell");
 		this.sheet.createRow(1).createCell(0).setCellValue("Second Cell");
 		Assert.assertArrayEquals(new String[] {"First Cell", "Second Cell"}, PoiUtil.asStringArrayColumn(this.sheet, 0));
-		this.sheet.getRow(1).getCell(0).setCellValue("");;
+		this.sheet.getRow(1).getCell(0).setCellValue("");
+		;
 		Assert.assertArrayEquals(new String[] {"First Cell", ""}, PoiUtil.asStringArrayColumn(this.sheet, 0));
 		Assert.assertArrayEquals(new String[] {"", ""}, PoiUtil.asStringArrayColumn(this.sheet, 1));
 	}
-	
+
 	@Test
 	public void testColumnHasEmpty() {
 		Assert.assertEquals(true, PoiUtil.columnHasEmpty(this.sheet, 1));
-		Row row = this.sheet.createRow(0);
+		final Row row = this.sheet.createRow(0);
 		row.createCell(1).setCellValue("Second Cell");
 		Assert.assertEquals(true, PoiUtil.columnHasEmpty(this.sheet, 0));
 		Assert.assertEquals(false, PoiUtil.columnHasEmpty(this.sheet, 1));
-		Row row3 = this.sheet.createRow(3);
+		final Row row3 = this.sheet.createRow(3);
 		row3.createCell(0).setCellValue("First Cell");
 		row3.createCell(1).setCellValue("Second Cell");
 		Assert.assertEquals(true, PoiUtil.columnHasEmpty(this.sheet, 0));
 		Assert.assertEquals(true, PoiUtil.columnHasEmpty(this.sheet, 1));
 	}
-	
+
 	@Test
 	public void testRowHasEmpty() {
 		Assert.assertEquals(true, PoiUtil.rowHasEmpty(this.sheet, 0, 1, 4));
-		Row row = this.sheet.createRow(0);
+		final Row row = this.sheet.createRow(0);
 		row.createCell(2).setCellValue("Second Cell");
 		Assert.assertEquals(true, PoiUtil.rowHasEmpty(this.sheet, 0, 1, 2));
 		row.createCell(1).setCellValue("First Cell");
@@ -162,11 +163,11 @@ public class PoiUtilTest {
 		row.getCell(1).setCellValue("");
 		Assert.assertEquals(true, PoiUtil.rowHasEmpty(this.sheet, 0, 1, 2));
 	}
-	
+
 	@Test
 	public void testRowIsEmpty() {
 		Assert.assertEquals(true, PoiUtil.rowIsEmpty(this.sheet, 0, 1, 4));
-		Row row = this.sheet.createRow(0);
+		final Row row = this.sheet.createRow(0);
 		Assert.assertEquals(true, PoiUtil.rowIsEmpty(this.sheet, 0, 1, 4));
 		row.createCell(2).setCellValue("Second Cell");
 		Assert.assertEquals(false, PoiUtil.rowIsEmpty(this.sheet, 0, 1, 4));
