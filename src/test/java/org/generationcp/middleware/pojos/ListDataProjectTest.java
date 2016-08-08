@@ -26,7 +26,7 @@ public class ListDataProjectTest {
 		ldp.setDuplicate(ListDataProjectTest.TEST_PEDIGREE_DUPE_STRING);
 
 		List<Integer> parsed = ldp.parsePedigreeDupeInformation();
-		Assert.assertEquals(2, parsed.size());
+		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
 	}
 
 	@Test
@@ -34,7 +34,7 @@ public class ListDataProjectTest {
 		ldp.setDuplicate(ListDataProjectTest.TEST_PEDIGREE_RECIP_STRING);
 
 		List<Integer> parsed = ldp.parsePedigreeReciprocalInformation();
-		Assert.assertEquals(1, parsed.size());
+		Assert.assertEquals("The parsed list's size should be 1", 1, parsed.size());
 	}
 
 	@Test
@@ -42,7 +42,7 @@ public class ListDataProjectTest {
 		ldp.setDuplicate(ListDataProjectTest.TEST_PLOT_RECIP_STRING);
 
 		List<Integer> parsed = ldp.parsePlotReciprocalInformation();
-		Assert.assertEquals(2, parsed.size());
+		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
 	}
 
 	@Test
@@ -50,7 +50,9 @@ public class ListDataProjectTest {
 		ldp.setDuplicate(ListDataProjectTest.TEST_PLOT_DUPE_STRING);
 
 		List<Integer> parsed = ldp.parsePlotDupeInformation();
-		Assert.assertEquals(2, parsed.size());
+		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
+	}
+	
 	}
 
 }
