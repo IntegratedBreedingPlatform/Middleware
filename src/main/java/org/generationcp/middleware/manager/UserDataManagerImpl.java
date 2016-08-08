@@ -116,6 +116,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 		Integer idUserSaved = null;
 		try {
 			localUserCache.invalidateAll();
+			localPersonCache.invalidateAll();
 			UserDAO dao = this.getUserDao();
 
 			User recordSaved = dao.saveOrUpdate(user);
@@ -132,6 +133,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	public Integer updateUser(User user) throws MiddlewareQueryException {
 		try {
 			localUserCache.invalidateAll();
+			localPersonCache.invalidateAll();
 			this.getUserDao().saveOrUpdate(user);
 		} catch (Exception e) {
 
@@ -150,6 +152,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	public void deleteUser(User user) throws MiddlewareQueryException {
 		try {
 			localUserCache.invalidateAll();
+			localPersonCache.invalidateAll();
 			this.getUserDao().makeTransient(user);
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while deleting User: UserDataManager.deleteUser(user=" + user + "): "
@@ -188,6 +191,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	public Integer addPerson(Person person) throws MiddlewareQueryException {
 		Integer idPersonSaved = null;
 		try {
+			localUserCache.invalidateAll();
+			localPersonCache.invalidateAll();
 			PersonDAO dao = this.getPersonDao();
 			Person recordSaved = dao.saveOrUpdate(person);
 			idPersonSaved = recordSaved.getId();
@@ -206,6 +211,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	@Override
 	public void deletePerson(Person person) throws MiddlewareQueryException {
 		try {
+			localUserCache.invalidateAll();
+			localPersonCache.invalidateAll();
 			this.getPersonDao().makeTransient(person);
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error encountered while deleting Person: UserDataManager.deletePerson(person=" + person
