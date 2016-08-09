@@ -471,4 +471,6 @@ public interface LocationDataManager {
 
 	public List<Location> getAllSeedingLocations(List<Integer> locationIds);
 
+	List<LocationDetails> getFilteredLocations(Integer countryId, Integer locationType, String locationName, String programUUID);
+
 }

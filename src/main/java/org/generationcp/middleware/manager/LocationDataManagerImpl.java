@@ -521,4 +521,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		return this.getLocationDao().getSeedingLocations(locationIds, seedLType);
 	}
 
+	@Override
+	public List<LocationDetails> getFilteredLocations(final Integer countryId, final Integer locationType, final String locationName,
+			final String programUUID) {
+		return this.getLocationDao().getFilteredLocations(countryId, locationType, locationName, programUUID);
+	}
 }
