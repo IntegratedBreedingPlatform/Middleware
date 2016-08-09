@@ -81,11 +81,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "     	AND pp.project_id = p.project_id AND pp.value = " + "         " + TermId.DELETED_STUDY.getId() + ") "
 			+ "ORDER BY p.name ";
 
-    private static final String COUNT_PROJECTS_WITH_VARIABLE = "SELECT count(pp.project_id)  FROM projectprop pp "
-		  + " WHERE pp.type_id = " + TermId.STANDARD_VARIABLE.getId() + " AND pp.value = :variableId "
-		  + " AND pp.project_id not in ( SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = pp.project_id "
-		  + " AND stat.type_id = " + TermId.STUDY_STATUS.getId() + " AND value = " + TermId.DELETED_STUDY.getId() + ") ";
-
 	private static final String GET_ALL_FOLDERS = "SELECT pr.object_project_id, pr.subject_project_id, p.name, p.description "
 			+ " FROM project_relationship pr " + " INNER JOIN project p ON p.project_id = pr.subject_project_id " + " WHERE pr.type_id = "
 			+ TermId.HAS_PARENT_FOLDER.getId();
@@ -960,20 +955,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 
 		return false;
-	}
-
-	public long countByVariable(int variableId) throws MiddlewareQueryException {
-		try {
-			SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.COUNT_PROJECTS_WITH_VARIABLE);
-			query.setParameter("variableId", variableId);
-
-			return ((BigInteger) query.uniqueResult()).longValue();
-
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error at countByVariable=" + variableId + ", " + variableId + " query at DmsProjectDao: " + e.getMessage(), e);
-		}
-		return 0;
 	}
 
 	public List<FolderReference> getAllFolders() throws MiddlewareQueryException {

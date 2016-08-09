@@ -307,16 +307,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountProjectsByVariable() throws Exception {
-		final int variableId = TermId.STUDY_NAME.getId();
-		final long originalCount = this.manager.countProjectsByVariable(variableId);
-		this.studyTDI.addTestStudy("NEW STUDY");
-		final long updatedCount = this.manager.countProjectsByVariable(variableId);
-		Assert.assertEquals("The size after adding new study should be equal to the size before adding a new study + 1",
-				updatedCount, originalCount + 1);
-	}
-
-	@Test
 	public void testCheckIfProjectNameIsExisting() throws Exception {
 		final DmsProject project = this.studyTDI.createFolderTestData(this.commonTestProject.getUniqueID());
 		boolean isExisting = this.manager.checkIfProjectNameIsExistingInProgram(project.getName(), this.commonTestProject.getUniqueID());

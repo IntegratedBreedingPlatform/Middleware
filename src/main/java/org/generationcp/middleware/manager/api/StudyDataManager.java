@@ -405,15 +405,6 @@ public interface StudyDataManager {
 	boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID) throws MiddlewareQueryException;
 
 	/**
-	 * Count the number of projects the variable was used in the project.
-	 * 
-	 * @param variableId the variable id
-	 * @return the long
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	long countProjectsByVariable(int variableId) throws MiddlewareQueryException;
-
-	/**
 	 * Gets the field map information (entries, reps, plots and count) of the given study id and study type.
 	 * 
 	 * @param studyIdList the study id list
