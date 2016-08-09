@@ -414,16 +414,6 @@ public interface StudyDataManager {
 	long countProjectsByVariable(int variableId) throws MiddlewareQueryException;
 
 	/**
-	 * Count the number of experiments the variable was used in the project.
-	 * 
-	 * @param variableId the variable id
-	 * @param variableTypeId the stored in id
-	 * @return the long
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	long countExperimentsByVariable(int variableId, int variableTypeId) throws MiddlewareQueryException;
-
-	/**
 	 * Gets the field map information (entries, reps, plots and count) of the given study id and study type.
 	 * 
 	 * @param studyIdList the study id list

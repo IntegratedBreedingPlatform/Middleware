@@ -326,11 +326,6 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-	public long countExperimentsByVariable(int variableId, int variableTypeId) throws MiddlewareQueryException {
-		return this.getStudyDataManager().countExperimentsByVariable(variableId, variableTypeId);
-	}
-
-	@Override
 	public Term addTerm(String name, String definition, CvId cvId) throws MiddlewareQueryException {
 		return this.getOntologyDataManager().addTerm(name, definition, cvId);
 	}

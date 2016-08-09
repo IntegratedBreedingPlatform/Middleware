@@ -317,14 +317,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountExperimentsByVariable() throws Exception {
-		final int variableId = 8230;
-		final int storedInId = 1041;
-		final long count = this.manager.countExperimentsByVariable(variableId, storedInId);
-		Assert.assertTrue("Count should be greater than 0", count > 0);
-	}
-
-	@Test
 	public void testCheckIfProjectNameIsExisting() throws Exception {
 		final DmsProject project = this.studyTDI.createFolderTestData(this.commonTestProject.getUniqueID());
 		boolean isExisting = this.manager.checkIfProjectNameIsExistingInProgram(project.getName(), this.commonTestProject.getUniqueID());
