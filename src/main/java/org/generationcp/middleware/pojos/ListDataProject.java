@@ -398,6 +398,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 					}
 					returnVal.add(Integer.valueOf(token));
 				}
+				//break, since duplicate string is unique per duplicate type
 				break;
 			}
 		}
