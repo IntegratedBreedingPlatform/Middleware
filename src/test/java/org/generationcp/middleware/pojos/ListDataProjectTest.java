@@ -27,6 +27,7 @@ public class ListDataProjectTest {
 
 		final List<Integer> parsed = ListDataProjectTest.ldp.parsePedigreeDupeInformation();
 		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
+		Assert.assertTrue("The parsed list should contain 10 and 11", parsed.contains(10) && parsed.contains(11));
 	}
 
 	@Test
@@ -35,6 +36,7 @@ public class ListDataProjectTest {
 
 		final List<Integer> parsed = ListDataProjectTest.ldp.parsePedigreeReciprocalInformation();
 		Assert.assertEquals("The parsed list's size should be 1", 1, parsed.size());
+		Assert.assertTrue("The parsed list should contain 8", parsed.contains(8));
 	}
 
 	@Test
@@ -43,6 +45,7 @@ public class ListDataProjectTest {
 
 		final List<Integer> parsed = ListDataProjectTest.ldp.parsePlotReciprocalInformation();
 		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
+		Assert.assertTrue("The parsed list should contain 6 and 11", parsed.contains(6) && parsed.contains(11));
 	}
 
 	@Test
@@ -51,6 +54,7 @@ public class ListDataProjectTest {
 
 		final List<Integer> parsed = ListDataProjectTest.ldp.parsePlotDupeInformation();
 		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
+		Assert.assertTrue("The parsed list should contain 2 and 4", parsed.contains(2) && parsed.contains(4));
 	}
 
 	@Test
@@ -62,17 +66,21 @@ public class ListDataProjectTest {
 		// Test for pedigree dupes
 		List<Integer> parsed = ListDataProjectTest.ldp.parseDuplicateString(ListDataProject.PEDIGREE_DUPE);
 		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
-
+		Assert.assertTrue("The parsed list should contain 10 and 11", parsed.contains(10) && parsed.contains(11));
+		
 		// Test for pedigree recips
 		parsed = ListDataProjectTest.ldp.parseDuplicateString(ListDataProject.PEDIGREE_RECIP);
 		Assert.assertEquals("The parsed list's size should be 1", 1, parsed.size());
-
+		Assert.assertTrue("The parsed list should contain 8", parsed.contains(8));
+		
 		// Test for plot dupes
 		parsed = ListDataProjectTest.ldp.parseDuplicateString(ListDataProject.PLOT_DUPE);
 		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
-
+		Assert.assertTrue("The parsed list should contain 2 and 4", parsed.contains(2) && parsed.contains(4));
+		
 		// Test for plot recips
 		parsed = ListDataProjectTest.ldp.parseDuplicateString(ListDataProject.PLOT_RECIP);
 		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
+		Assert.assertTrue("The parsed list should contain 6 and 11", parsed.contains(6) && parsed.contains(11));
 	}
 }
