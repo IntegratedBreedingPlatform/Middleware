@@ -98,30 +98,15 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddPerson() throws MiddlewareQueryException {
-		Person person = new Person();
-		person.setInstituteId(1);
-		person.setFirstName("Lich");
-		person.setMiddleName("Frozen");
-		person.setLastName("King");
-		person.setPositionName("King of Icewind Dale");
-		person.setTitle("His Highness");
-		person.setExtension("1");
-		person.setFax("2");
-		person.setEmail("lichking@blizzard.com");
-		person.setNotes("notes");
-		person.setContact("3");
-		person.setLanguage(-1);
-		person.setPhone("4");
-
+		Person person = this.personTDI.createPerson();
 		// add the person
 		this.userDataManager.addPerson(person);
 
 		person = this.userDataManager.getPersonById(person.getId());
-		Assert.assertNotNull(person);
-		Debug.println(IntegrationTestBase.INDENT, "testAddPerson() ADDED: " + person);
-
-		// delete the person
-		this.userDataManager.deletePerson(person);
+		Person resultPerson = this.userDataManager.getPersonById(person.getId());
+		Assert.assertEquals("The first names should be equal.", person.getFirstName(), resultPerson.getFirstName());
+		Assert.assertEquals("The last names should be equal.", person.getLastName(), resultPerson.getLastName());
+		Assert.assertEquals("The ids should be equal.", person.getId(), resultPerson.getId());
 	}
 
 	@Test
@@ -150,30 +135,13 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetPersonById() throws Exception {
-
-		// local database
-		Person person = new Person();
-		person.setInstituteId(1);
-		person.setFirstName("Lich");
-		person.setMiddleName("Frozen");
-		person.setLastName("King");
-		person.setPositionName("King of Icewind Dale");
-		person.setTitle("His Highness");
-		person.setExtension("1");
-		person.setFax("2");
-		person.setEmail("lichking@blizzard.com");
-		person.setNotes("notes");
-		person.setContact("3");
-		person.setLanguage(-1);
-		person.setPhone("4");
-
+		Person person = this.personTDI.createPerson();
 		this.userDataManager.addPerson(person);
 
-		Person personid2 = this.userDataManager.getPersonById(person.getId());
-		Assert.assertNotNull(personid2);
-		Debug.println(IntegrationTestBase.INDENT, "Local Database: " + personid2);
-
-		this.userDataManager.deletePerson(person);
+		Person resultPerson = this.userDataManager.getPersonById(person.getId());
+		Assert.assertEquals("The first names should be equal.", person.getFirstName(), resultPerson.getFirstName());
+		Assert.assertEquals("The last names should be equal.", person.getLastName(), resultPerson.getLastName());
+		Assert.assertEquals("The ids should be equal.", person.getId(), resultPerson.getId());
 	}
 
 	@Test
