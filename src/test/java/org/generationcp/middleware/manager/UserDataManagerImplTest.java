@@ -14,12 +14,14 @@ package org.generationcp.middleware.manager;
 import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,7 +29,14 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private UserDataManager userDataManager;
-
+	
+	private static PersonTestDataInitializer personTDI;
+	
+	@BeforeClass
+	public static void beforeClass() {
+		personTDI = new PersonTestDataInitializer();
+	}
+	
 	@Test
 	public void testGetAllUsers() throws Exception {
 		List<User> users = this.userDataManager.getAllUsers();
