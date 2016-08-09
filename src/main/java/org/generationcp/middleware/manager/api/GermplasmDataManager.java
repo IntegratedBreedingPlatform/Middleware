@@ -356,6 +356,14 @@ public interface GermplasmDataManager {
 	List<Method> getAllMethods();
 
 	/**
+	 * Returns all the method records ordered by method name.
+	 * 
+	 * @return List of Method POJOs
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<Method> getAllMethodsOrderByMname();
+
+	/**
 	 * Validates the naming rules configuration for the selected breeding method
 	 * 
 	 * @param breedingMethod
@@ -1139,5 +1147,12 @@ public interface GermplasmDataManager {
 	 */
 	List<Germplasm> getGermplasmWithAllNamesAndAncestry(Set<Integer> gids, int numberOfLevels);
 
+
+	/**
+	 * Returns the count of records that matched the gids in the specified list.
+	 * @param gids - The list of gids to match for in the germplasm table
+	 * @return
+	 */
+	long countMatchGermplasmInList(Set<Integer> gids);
 
 }

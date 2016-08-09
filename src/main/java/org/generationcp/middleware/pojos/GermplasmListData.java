@@ -93,7 +93,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	@Column(name = "lrstatus")
 	private Integer status;
 
-	@Basic(optional = false)
+	@Basic(optional = true)
 	@Column(name = "llrecid")
 	private Integer localRecordId;
 
@@ -146,6 +146,9 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	 */
 	@Transient
 	private Integer groupId = 0;
+
+	@Transient
+	private String breedingMethodName = "";
 
 	public GermplasmListData() {
 
@@ -456,6 +459,13 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	public void setGroupId(final Integer groupId) {
 		this.groupId = groupId;
+	}
+	public String getBreedingMethodName() {
+		return breedingMethodName;
+	}
+
+	public void setBreedingMethodName(String breedingMethodName) {
+		this.breedingMethodName = breedingMethodName;
 	}
 
 }

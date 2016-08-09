@@ -33,7 +33,7 @@ import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 
 /**
- * @author Akhil
+ * Default algorithm for generating pedigree strings.
  *
  */
 @Transactional
