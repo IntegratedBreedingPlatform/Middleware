@@ -766,12 +766,6 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		}
 	}
 
-	// TODO: Follow DmsProjectDao countExperimentByVariable. This requires STORED_IN and that needs to deprecated.
-	@Override
-	public Integer getVariableStudies(final int variableId) {
-		return 0;
-	}
-
 	@Override
 	public String retrieveVariableCategoricalValue(final String programUuid, final Integer variableId, final Integer categoricalValueId) {
 		if (variableId == null || categoricalValueId == null) {
