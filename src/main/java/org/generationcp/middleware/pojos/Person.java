@@ -19,6 +19,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -30,12 +32,17 @@ import org.generationcp.middleware.util.Util;
  * POJO for persons table.
  *
  */
+@NamedQueries({@NamedQuery(name = "getByFullNameWithMiddleName", query = "SELECT p FROM Person p WHERE CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname"),
+	           @NamedQuery(name = "getByFullName", query = "SELECT p FROM Person p WHERE CONCAT(p.firstName, ' ', p.lastName) = :fullname")})
 @Entity
 @Table(name = "persons")
 public class Person implements Comparable<Person>, Serializable {
 
 	private static final long serialVersionUID = -3159738927364282485L;
 
+	public static final String GET_BY_FULLNAME = "getByFullName";
+	public static final String GET_BY_FULLNAME_WITH_MIDDLENAME = "getByFullNameWithMiddleName";
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
@@ -80,7 +87,7 @@ public class Person implements Comparable<Person>, Serializable {
 
 	@Column(name = "contact")
 	private String contact;
-
+	
 	public Person() {
 	}
 
