@@ -717,7 +717,7 @@ public interface WorkbenchDataManager {
 	 *         User ID matching the specified Workbench User ID and Project ID.
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId) throws MiddlewareQueryException;
+	Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId);
 
 	/**
 	 * Save or update the specified {@link WorkbenchRuntimeData}.

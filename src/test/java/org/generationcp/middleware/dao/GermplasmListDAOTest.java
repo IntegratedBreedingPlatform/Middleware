@@ -15,7 +15,7 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
-import org.hibernate.criterion.SimpleExpression;
+import org.hibernate.criterion.Criterion;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,19 +75,17 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListDAO dao = new GermplasmListDAO();
 		final Criteria criteria = Mockito.mock(Criteria.class);
 		dao.hideSnapshotListTypes(criteria);
-		final List<SimpleExpression> restrictedList = dao.getRestrictedSnapshopTypes();
+		final Criterion restrictedList = dao.getRestrictedSnapshopTypes();
 		// this should ensure that the snapshot list types are added int he criteria object
-		for (final SimpleExpression restricted : restrictedList) {
-			Mockito.verify(criteria, Mockito.times(1)).add(restricted);
-		}
-
+		Mockito.verify(criteria, Mockito.times(1)).add(restrictedList);
+		
 	}
 
 	@Test
 	public void testGetRestrictedSnapshopTypes() {
 		final GermplasmListDAO dao = new GermplasmListDAO();
-		final List<SimpleExpression> restrictedList = dao.getRestrictedSnapshopTypes();
-		Assert.assertEquals("Should have 5 restricted snapshot types", 5, restrictedList.size());
+		final Criterion restrictedList = dao.getRestrictedSnapshopTypes();
+		Assert.assertNotNull(restrictedList);
 	}
 
 	@Test
@@ -107,7 +105,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void TestGetGermplasmListTypes() {
+	public void testGetGermplasmListTypes() {
 		final List<String> germplasmListTypes = GermplasmListDAOTest.dao.getGermplasmListTypes();
 		for (final String listType : GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES) {
 			Assert.assertFalse(listType + " should not be in the Results Array", germplasmListTypes.contains(listType));
@@ -134,8 +132,15 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllListMetadata() {
-		final List<Object[]> listMetadata = GermplasmListDAOTest.dao.getAllListMetadata();
-		Assert.assertNotNull("getAllListMetadata() should never return null.", listMetadata);
+		final List<GermplasmList> germplasmLists = GermplasmListDAOTest.dao.getListsByProgramUUID(GermplasmListDAOTest.PROGRAM_UUID);
+		
+		final List<Integer> germplasmListIds = new ArrayList<>();
+		for (final GermplasmList germplasmList : germplasmLists) {
+			germplasmListIds.add(germplasmList.getId());
+		}
+		
+		final List<Object[]> listMetadata = GermplasmListDAOTest.dao.getAllListMetadata(germplasmListIds);
+		Assert.assertEquals("Meta data size must be the same as the list size", listMetadata.size(), germplasmLists.size());
 	}
 
 	@Test

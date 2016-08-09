@@ -518,29 +518,11 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetTopLevelLists() throws Exception {
-		final int count = (int) this.manager.countAllTopLevelLists(GermplasmListManagerImplTest.PROGRAM_UUID);
-		final List<GermplasmList> topLevelFolders =
-				this.manager.getAllTopLevelListsBatched(GermplasmListManagerImplTest.PROGRAM_UUID, count);
-		Debug.println(IntegrationTestBase.INDENT, "testGetTopLevelLists(0, 100, Database.CENTRAL): " + count);
-		Debug.printObjects(IntegrationTestBase.INDENT, topLevelFolders);
-		// Verify using: select * from listnms where liststatus <> 9 and lhierarchy = null or lhierarchy = 0
-	}
-
-	@Test
-	public void testCountTopLevelLists() throws Exception {
-		final long count = this.manager.countAllTopLevelLists(GermplasmListManagerImplTest.PROGRAM_UUID);
-		Debug.println(IntegrationTestBase.INDENT, "testCountTopLevelLists(Database.CENTRAL): " + count);
-		// Verify using: select count(*) from listnms where liststatus <> 9 and lhierarchy = null or lhierarchy = 0
-	}
-
-	@Test
 	public void testGermplasmListByParentFolderId() throws Exception {
 		final Integer parentFolderId = Integer.valueOf(56);
-		final int count = (int) this.manager.countGermplasmListByParentFolderId(parentFolderId, GermplasmListManagerImplTest.PROGRAM_UUID);
 		final List<GermplasmList> children =
-				this.manager.getGermplasmListByParentFolderId(parentFolderId, GermplasmListManagerImplTest.PROGRAM_UUID, 0, count);
-		Debug.println(IntegrationTestBase.INDENT, "testGermplasmListByParentFolderId(" + parentFolderId + "): " + count);
+				this.manager.getGermplasmListByParentFolderId(parentFolderId, GermplasmListManagerImplTest.PROGRAM_UUID);
+		Debug.println(IntegrationTestBase.INDENT, "testGermplasmListByParentFolderId(" + parentFolderId + "): ");
 		Debug.printObjects(IntegrationTestBase.INDENT, children);
 		// Verify using: select * from listnms where liststatus <> 9 and lhierarchy = 56;
 	}
@@ -548,8 +530,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testCountGermplasmListByParentFolderId() throws Exception {
 		final Integer parentFolderId = Integer.valueOf(56);
-		final Long result = this.manager.countGermplasmListByParentFolderId(parentFolderId, GermplasmListManagerImplTest.PROGRAM_UUID);
-		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmListByParentFolderId(" + parentFolderId + "): " + result);
+		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmListByParentFolderId(" + parentFolderId + "): ");
 		// Verify using: select count(*) from listnms where liststatus <> 9 and lhierarchy = 56;
 	}
 
@@ -568,19 +549,19 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllTopLevelListsBatched() throws Exception {
-		final int batchSize = 1;
-		final List<GermplasmList> results = this.manager.getAllTopLevelListsBatched(GermplasmListManagerImplTest.PROGRAM_UUID, batchSize);
-		Assert.assertNotNull(results);
-		Assert.assertTrue(!results.isEmpty());
-		Debug.println(IntegrationTestBase.INDENT, "testGetAllTopLevelListsBatched(" + batchSize + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, results);
-	}
+		public void testGetAllTopLevelLists() throws Exception {
+			final int batchSize = 1;
+			final List<GermplasmList> results = this.manager.getAllTopLevelLists(GermplasmListManagerImplTest.PROGRAM_UUID);
+			Assert.assertNotNull(results);
+			Assert.assertTrue(!results.isEmpty());
+			Debug.println(IntegrationTestBase.INDENT, "testGetAllTopLevelListsBatched(" + batchSize + "): ");
+			Debug.printObjects(IntegrationTestBase.INDENT, results);
+		}
 
 	@Test
 	public void testGetGermplasmListByParentFolderId() throws Exception {
 		final List<GermplasmList> results =
-				this.manager.getGermplasmListByParentFolderId(this.parentId, GermplasmListManagerImplTest.PROGRAM_UUID, 0, 100);
+				this.manager.getGermplasmListByParentFolderId(this.parentId, GermplasmListManagerImplTest.PROGRAM_UUID);
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmListByParentFolderId(" + this.parentId + "): ");
@@ -716,12 +697,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 		final List<ListDataProject> listData = this.manager.retrieveSnapshotListDataWithParents(listId);
 		Assert.assertNotNull("It should not be null", listData);
-	}
-
-	@Test
-	public void testGetAllListMetadata() {
-		final Map<Integer, GermplasmListMetadata> allGermplasmListMetadata = this.manager.getAllGermplasmListMetadata();
-		Assert.assertNotNull("getAllGermplasmListMetadata() should never return null.", allGermplasmListMetadata);
 	}
 
 	@Test
