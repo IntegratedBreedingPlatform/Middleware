@@ -72,7 +72,7 @@ public class GermplasmList implements Serializable {
 	@Column(name = "listdesc")
 	private String description;
 
-	@ManyToOne(targetEntity = GermplasmList.class)
+	@ManyToOne(targetEntity = GermplasmList.class, fetch=FetchType.LAZY)
 	@JoinColumn(name = "lhierarchy")
 	@NotFound(action = NotFoundAction.IGNORE)
 	private GermplasmList parent;
