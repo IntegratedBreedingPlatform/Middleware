@@ -21,7 +21,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
@@ -179,18 +178,6 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 			this.logAndThrowException(
 					String.format("Error with getPersonByName(firstName=[%s],middleName=[%s],lastName)", firstName, middleName, lastName),
 					e);
-		}
-		return person;
-	}
-
-	public Person getPersonByFullName(final String fullname) {
-		Person person = null;
-		try {
-			final Query query = this.getSession().getNamedQuery(Person.GET_BY_FULLNAME);
-			query.setParameter("fullname", fullname);
-			person = (Person) query.uniqueResult();
-		} catch (final HibernateException e) {
-			this.logAndThrowException(String.format("Error with getPersonByFullName(fullname=[%s])", StringUtils.join(fullname, ",")), e);
 		}
 		return person;
 	}

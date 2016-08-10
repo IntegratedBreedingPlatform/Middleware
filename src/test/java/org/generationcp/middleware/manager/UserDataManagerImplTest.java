@@ -192,14 +192,4 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 		this.userDataManager.deleteUser(user);
 
 	}
-
-	@Test
-	public void testGetPersonByFullName() {
-		final Person person = UserDataManagerImplTest.personTDI.createPerson();
-		this.userDataManager.addPerson(person);
-		final Person resultPerson = this.userDataManager.getPersonByFullName(person.getDisplayName());
-		Assert.assertEquals("The first names should be equal.", person.getFirstName(), resultPerson.getFirstName());
-		Assert.assertEquals("The last names should be equal.", person.getLastName(), resultPerson.getLastName());
-		Assert.assertEquals("The ids should be equal.", person.getId(), resultPerson.getId());
-	}
 }
