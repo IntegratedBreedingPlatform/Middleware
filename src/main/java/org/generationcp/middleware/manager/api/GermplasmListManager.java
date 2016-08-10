@@ -13,12 +13,12 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListMetadata;
@@ -494,10 +494,18 @@ public interface GermplasmListManager {
 
 	/**
 	 * Retrieves metadata (such as count of entries, list owner) in one go for lists ids provide.
-	 * This helps avoiding the need to query metadata in
+	 * This helps avoiding the need to query metadata using a single query
 	 * @param germplasmListParent ids for which we should retrieve metadata
 	 */
 	Map<Integer, GermplasmListMetadata> getGermplasmListMetadata(List<GermplasmList> germplasmListParent);
+	
+	/**
+	 * Retrieves number of children in one go for lists ids provide. Note non folder list ids are filtered out.
+	 * This helps avoiding the need to query metadata  using a single query
+	 * @param germplasmListParent ids for which we should retrieve metadata
+	 */
+	Map<Integer, GermplasmFolderMetadata> getGermplasmFolderMetadata(List<GermplasmList> germplasmLists);
+
 
 	List<GermplasmList> getAllGermplasmListsByProgramUUID(String currentProgramUUID);
 
@@ -526,5 +534,6 @@ public interface GermplasmListManager {
 	 * @return the resultant germplasm list
 	 */
 	List<GermplasmList> getAllGermplasmListsByIds(List<Integer> listIds);
+
 
 }
