@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.PersonTestDataInitializer;
+import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Person;
@@ -31,10 +32,11 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 	private UserDataManager userDataManager;
 
 	private static PersonTestDataInitializer personTDI;
-
+	private static UserTestDataInitializer userTDI;
 	@BeforeClass
 	public static void beforeClass() {
 		UserDataManagerImplTest.personTDI = new PersonTestDataInitializer();
+		UserDataManagerImplTest.userTDI = new UserTestDataInitializer();
 	}
 
 	@Test
@@ -53,25 +55,14 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddUser() throws MiddlewareQueryException {
-		User user = new User();
-		user.setInstalid(-1);
-		user.setStatus(-1);
-		user.setAccess(-1);
-		user.setType(-1);
-		user.setName("user_test");
-		user.setPassword("user_password");
-		user.setPersonid(-1);
-		user.setAssignDate(20120101);
-		user.setCloseDate(20120101);
+		User user = UserDataManagerImplTest.userTDI.createUser();
 
 		this.userDataManager.addUser(user);
 
-		user = this.userDataManager.getUserById(user.getUserid());
-		Assert.assertNotNull(user);
-		Debug.println(IntegrationTestBase.INDENT, "testAddUser() ADDED: " + user);
-
-		// cleanup
-		this.userDataManager.deleteUser(user);
+		User resultUser = this.userDataManager.getUserById(user.getUserid());
+		Assert.assertEquals("The user ids should be equal.", user.getUserid(), resultUser.getUserid());
+		Assert.assertEquals("The usernames should be equal.", user.getName(), resultUser.getName());
+		Assert.assertEquals("The Passwords should be equal.", user.getPassword(), resultUser.getPassword());
 	}
 
 	@Test
@@ -146,50 +137,26 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetUserById() throws Exception {
-
-		// local database
-		final User user = new User();
-		user.setInstalid(-1);
-		user.setStatus(-1);
-		user.setAccess(-1);
-		user.setType(-1);
-		user.setName("user_test");
-		user.setPassword("user_password");
-		user.setPersonid(-1);
-		user.setAssignDate(20120101);
-		user.setCloseDate(20120101);
+		User user = UserDataManagerImplTest.userTDI.createUser();
 
 		this.userDataManager.addUser(user);
 
-		final User userid2 = this.userDataManager.getUserById(user.getUserid());
-		Assert.assertNotNull(userid2);
-		Debug.println(IntegrationTestBase.INDENT, "Local Database: " + userid2);
-
-		// cleanup
-		this.userDataManager.deleteUser(user);
+		User resultUser = this.userDataManager.getUserById(user.getUserid());
+		Assert.assertEquals("The user ids should be equal.", user.getUserid(), resultUser.getUserid());
+		Assert.assertEquals("The usernames should be equal.", user.getName(), resultUser.getName());
+		Assert.assertEquals("The Passwords should be equal.", user.getPassword(), resultUser.getPassword());
 	}
 
 	@Test
 	public void testGetUserByUserName() throws Exception {
-		final User user = new User();
-		user.setInstalid(-1);
-		user.setStatus(-1);
-		user.setAccess(-1);
-		user.setType(-1);
-		user.setName("user_test");
-		user.setPassword("user_password");
-		user.setPersonid(-1);
-		user.setAssignDate(20120101);
-		user.setCloseDate(20120101);
-
+		final User user = UserDataManagerImplTest.userTDI.createUser();
+		user.setUserid(null);
 		this.userDataManager.addUser(user);
-
-		final String name = "user_test";
-		final User userName = this.userDataManager.getUserByUserName(name);
-		Assert.assertNotNull(userName);
-		Debug.println(IntegrationTestBase.INDENT, "testGetUserByUserName: " + userName);
-
-		this.userDataManager.deleteUser(user);
-
+		
+		final User resultUser = this.userDataManager.getUserByUserName(user.getName());
+		Assert.assertEquals("The user ids should be equal.", user.getUserid(), resultUser.getUserid());
+		Assert.assertEquals("The usernames should be equal.", user.getName(), resultUser.getName());
+		Assert.assertEquals("The Passwords should be equal.", user.getPassword(), resultUser.getPassword());
+	}
 	}
 }
