@@ -89,6 +89,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(" , gpSeason.value as season ")
 							.append(" , siteId.value AS siteId")
 							.append(" , epropBlock.value AS blockNo ")
+							.append(" , ldp.group_name AS pedigree ")
 							.append(" FROM ")
 							.append(" nd_experiment_project eproj ")
 							.append(" INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = ")
@@ -133,6 +134,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("       AND col.type_id = ").append(TermId.COLUMN_NO.getId())
 							.append(" LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
 							.append("       AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
+							.append("  INNER JOIN listnms nms on nms.projectid = st.project_id ")
+							.append("   INNER JOIN listdata_project ldp on s.dbxref_id = ldp.germplasm_id and ldp.entry_id = epropPlot.value")
 							.append(" ORDER BY casted_trialInstance, inst.description, eproj.nd_experiment_id ").append(order);
 
 			final Query query =
@@ -140,7 +143,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.addScalar("geolocationId").addScalar("siteName").addScalar("experimentId").addScalar("entryNumber")
 							.addScalar("germplasmName").addScalar("rep").addScalar("plotNo").addScalar("row").addScalar("col")
 							.addScalar("block_id").addScalar("trialInstance").addScalar("studyName").addScalar("gid")
-							.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo");
+							.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo").addScalar("pedigree");
 			query.setParameter("projectId", projectId);
 			final List<Object[]> list = query.list();
 			if (list != null && !list.isEmpty()) {
@@ -342,6 +345,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			label.setGid(gid);
 			label.setStartYear(startDate != null && !startDate.equals("null") && startDate.length() > 3 ? startDate.substring(0, 4) : null);
 			label.setSeason(Season.getSeason(season));
+			label.setPedigree((String) row[19]);
 			labels.add(label);
 
 			datasetId = (Integer) row[0];

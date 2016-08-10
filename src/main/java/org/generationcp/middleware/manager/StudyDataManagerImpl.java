@@ -473,10 +473,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			final List<FieldMapDatasetInfo> fieldMapDatasetInfos = this.getExperimentPropertyDao().getFieldMapLabels(studyId);
 			fieldMapInfo.setDatasets(fieldMapDatasetInfos);
 
-			if (fieldMapDatasetInfos != null && pedigreeRequired) {
-				this.setPedigree(fieldMapDatasetInfos, crossExpansionProperties, pedigreeStringMap);
-			}
-
 			fieldMapInfos.add(fieldMapInfo);
 		}
 
