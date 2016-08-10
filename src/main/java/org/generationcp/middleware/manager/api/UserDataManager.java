@@ -155,10 +155,10 @@ public interface UserDataManager {
 	Person getPersonByName(String firstName, String middleName, String lastName) throws MiddlewareQueryException;
 	
 	/**
-	 * Get Person using the fullname
+	 * Get User using the fullname
 	 * 
 	 * @param fullname
 	 * @return
 	 */
-    Person getPersonByFullName(String fullname) throws MiddlewareQueryException;
+    User getUserByFullname(String fullname) throws MiddlewareQueryException;
 }
