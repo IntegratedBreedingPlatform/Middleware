@@ -671,8 +671,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	 * @see org.generationcp.middleware.manager.api.GermplasmListManager#getGermplasmFolderMetadata(java.util.List)
 	 */
 	@Override
-	public Map<Integer, GermplasmFolderMetadata> getGermplasmFolderMetadata(List<GermplasmList> listIds) {
-		final List<Integer> folderIdsToRetrieveFolderCount = getFolderIdsFromGermplasmList(listIds);
+	public Map<Integer, GermplasmFolderMetadata> getGermplasmFolderMetadata(List<GermplasmList> germplasmLists) {
+		final List<Integer> folderIdsToRetrieveFolderCount = getFolderIdsFromGermplasmList(germplasmLists);
 		return this.getGermplasmListDAO().getGermplasmFolderMetadata(folderIdsToRetrieveFolderCount);	
 	}
 
