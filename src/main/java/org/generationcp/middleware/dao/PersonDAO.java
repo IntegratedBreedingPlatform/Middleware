@@ -192,13 +192,6 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 			Query query = this.getSession().getNamedQuery(Person.GET_BY_FULLNAME);
 			query.setParameter("fullname", fullname);
 			person = (Person) query.uniqueResult();
-			//Check if the 
-			if(person == null) {
-				query = this.getSession().getNamedQuery(Person.GET_BY_FULLNAME_WITH_MIDDLENAME);
-				query.setParameter("fullname", fullname);
-				person = (Person) query.uniqueResult();
-			}
-			
 		} catch (HibernateException e) {
 			this.logAndThrowException(String.format("Error with getPersonByFullName(fullname=[%s])", StringUtils.join(fullname, ",")), e);
 		}
