@@ -158,5 +158,22 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals("The usernames should be equal.", user.getName(), resultUser.getName());
 		Assert.assertEquals("The Passwords should be equal.", user.getPassword(), resultUser.getPassword());
 	}
+	
+	@Test
+	public void testGetUserByFullname() {
+		final Person person = UserDataManagerImplTest.personTDI.createPerson();
+		this.userDataManager.addPerson(person);
+		
+		final User user = UserDataManagerImplTest.userTDI.createUser();
+		user.setUserid(null);
+		user.setPersonid(person.getId());
+		user.setPerson(person);
+		this.userDataManager.addUser(user);
+		
+		final User resultUser = this.userDataManager.getUserByFullname(person.getDisplayName());
+		Assert.assertEquals("The user ids should be equal.", user.getUserid(), resultUser.getUserid());
+		Assert.assertEquals("The usernames should be equal.", user.getName(), resultUser.getName());
+		Assert.assertEquals("The Passwords should be equal.", user.getPassword(), resultUser.getPassword());
+		Assert.assertEquals("The personIds should be equal.", person.getId(), resultUser.getPersonid());
 	}
 }
