@@ -29,17 +29,17 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private UserDataManager userDataManager;
-	
+
 	private static PersonTestDataInitializer personTDI;
-	
+
 	@BeforeClass
 	public static void beforeClass() {
-		personTDI = new PersonTestDataInitializer();
+		UserDataManagerImplTest.personTDI = new PersonTestDataInitializer();
 	}
-	
+
 	@Test
 	public void testGetAllUsers() throws Exception {
-		List<User> users = this.userDataManager.getAllUsers();
+		final List<User> users = this.userDataManager.getAllUsers();
 		Assert.assertNotNull(users);
 		Debug.println(IntegrationTestBase.INDENT, "testGetAllUsers(): " + users.size());
 		Debug.printObjects(IntegrationTestBase.INDENT, users);
@@ -47,7 +47,7 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountAllUsers() throws Exception {
-		long count = this.userDataManager.countAllUsers();
+		final long count = this.userDataManager.countAllUsers();
 		Debug.println(IntegrationTestBase.INDENT, "testCountAllUsers(): " + count);
 	}
 
@@ -76,34 +76,34 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllPersons() throws Exception {
-		List<Person> persons = this.userDataManager.getAllPersons();
+		final List<Person> persons = this.userDataManager.getAllPersons();
 		Assert.assertNotNull(persons);
 		Debug.printObjects(IntegrationTestBase.INDENT, persons);
 	}
 
 	@Test
 	public void testGetAllPersonsOrderedByLocalCentral() throws Exception {
-		List<Person> persons = this.userDataManager.getAllPersonsOrderedByLocalCentral();
+		final List<Person> persons = this.userDataManager.getAllPersonsOrderedByLocalCentral();
 		Assert.assertNotNull(persons);
-		for (Person person : persons) {
+		for (final Person person : persons) {
 			Debug.println(person.getDisplayName());
 		}
 	}
 
 	@Test
 	public void testCountAllPersons() throws Exception {
-		long count = this.userDataManager.countAllPersons();
+		final long count = this.userDataManager.countAllPersons();
 		Debug.println(IntegrationTestBase.INDENT, "testCountAllPersons(): " + count);
 	}
 
 	@Test
 	public void testAddPerson() throws MiddlewareQueryException {
-		Person person = this.personTDI.createPerson();
+		Person person = UserDataManagerImplTest.personTDI.createPerson();
 		// add the person
 		this.userDataManager.addPerson(person);
 
 		person = this.userDataManager.getPersonById(person.getId());
-		Person resultPerson = this.userDataManager.getPersonById(person.getId());
+		final Person resultPerson = this.userDataManager.getPersonById(person.getId());
 		Assert.assertEquals("The first names should be equal.", person.getFirstName(), resultPerson.getFirstName());
 		Assert.assertEquals("The last names should be equal.", person.getLastName(), resultPerson.getLastName());
 		Assert.assertEquals("The ids should be equal.", person.getId(), resultPerson.getId());
@@ -125,20 +125,20 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testIsUsernameExists() throws MiddlewareQueryException {
 		Debug.println(IntegrationTestBase.INDENT, "testIsUsernameExists() ");
-		String userName = "GMCLAREN";
+		final String userName = "GMCLAREN";
 		Debug.println(IntegrationTestBase.INDENT,
 				"Existing Username (" + userName + "): " + this.userDataManager.isUsernameExists(userName));
-		String userName2 = "CLAREN";
+		final String userName2 = "CLAREN";
 		Debug.println(IntegrationTestBase.INDENT,
 				"Non-existing Username (" + userName2 + "): " + this.userDataManager.isUsernameExists(userName2));
 	}
 
 	@Test
 	public void testGetPersonById() throws Exception {
-		Person person = this.personTDI.createPerson();
+		final Person person = UserDataManagerImplTest.personTDI.createPerson();
 		this.userDataManager.addPerson(person);
 
-		Person resultPerson = this.userDataManager.getPersonById(person.getId());
+		final Person resultPerson = this.userDataManager.getPersonById(person.getId());
 		Assert.assertEquals("The first names should be equal.", person.getFirstName(), resultPerson.getFirstName());
 		Assert.assertEquals("The last names should be equal.", person.getLastName(), resultPerson.getLastName());
 		Assert.assertEquals("The ids should be equal.", person.getId(), resultPerson.getId());
@@ -148,7 +148,7 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 	public void testGetUserById() throws Exception {
 
 		// local database
-		User user = new User();
+		final User user = new User();
 		user.setInstalid(-1);
 		user.setStatus(-1);
 		user.setAccess(-1);
@@ -161,7 +161,7 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 		this.userDataManager.addUser(user);
 
-		User userid2 = this.userDataManager.getUserById(user.getUserid());
+		final User userid2 = this.userDataManager.getUserById(user.getUserid());
 		Assert.assertNotNull(userid2);
 		Debug.println(IntegrationTestBase.INDENT, "Local Database: " + userid2);
 
@@ -171,7 +171,7 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetUserByUserName() throws Exception {
-		User user = new User();
+		final User user = new User();
 		user.setInstalid(-1);
 		user.setStatus(-1);
 		user.setAccess(-1);
@@ -184,20 +184,20 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 		this.userDataManager.addUser(user);
 
-		String name = "user_test";
-		User userName = this.userDataManager.getUserByUserName(name);
+		final String name = "user_test";
+		final User userName = this.userDataManager.getUserByUserName(name);
 		Assert.assertNotNull(userName);
 		Debug.println(IntegrationTestBase.INDENT, "testGetUserByUserName: " + userName);
 
 		this.userDataManager.deleteUser(user);
 
 	}
-	
+
 	@Test
 	public void testGetPersonByFullName() {
-		Person person  = this.personTDI.createPerson();
+		final Person person = UserDataManagerImplTest.personTDI.createPerson();
 		this.userDataManager.addPerson(person);
-		Person resultPerson = this.userDataManager.getPersonByFullName(person.getDisplayName());
+		final Person resultPerson = this.userDataManager.getPersonByFullName(person.getDisplayName());
 		Assert.assertEquals("The first names should be equal.", person.getFirstName(), resultPerson.getFirstName());
 		Assert.assertEquals("The last names should be equal.", person.getLastName(), resultPerson.getLastName());
 		Assert.assertEquals("The ids should be equal.", person.getId(), resultPerson.getId());
