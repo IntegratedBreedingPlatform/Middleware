@@ -494,14 +494,14 @@ public interface GermplasmListManager {
 
 	/**
 	 * Retrieves metadata (such as count of entries, list owner) in one go for lists ids provide.
-	 * This helps avoiding the need to query metadata using a single query
+	 * This helps avoiding the need to query metadata in a loop for each list
 	 * @param germplasmListParent ids for which we should retrieve metadata
 	 */
 	Map<Integer, GermplasmListMetadata> getGermplasmListMetadata(List<GermplasmList> germplasmListParent);
 	
 	/**
 	 * Retrieves number of children in one go for lists ids provide. Note non folder list ids are filtered out.
-	 * This helps avoiding the need to query metadata  using a single query
+	 * This helps avoiding the need to query metadata in a loop for each folder
 	 * @param germplasmListParent ids for which we should retrieve metadata
 	 */
 	Map<Integer, GermplasmFolderMetadata> getGermplasmFolderMetadata(List<GermplasmList> germplasmLists);
