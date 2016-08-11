@@ -2,7 +2,9 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -10,12 +12,13 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
-import org.hibernate.criterion.SimpleExpression;
+import org.hibernate.criterion.Criterion;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,11 +33,13 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	@Autowired
 	private GermplasmDataManager dataManager;
 
-	private static GermplasmListDAO dao;
+	private GermplasmListDAO dao;
 	private static final String TEST_GERMPLASM_LIST_NAME = "TestGermplasmListName";
 	private static final String TEST_GERMPLASM_LIST_DESC = "TestGermplasmListDesc";
 	private static final long TEST_GERMPLASM_LIST_DATE = 20141103;
 	private static final String TEST_GERMPLASM_LIST_TYPE_LST = "LST";
+	private static final String TEST_GERMPLASM_LIST_TYPE_FOLDER = "FOLDER";
+
 	private static final int TEST_GERMPLASM_LIST_USER_ID = 1;
 	private static final Integer STATUS_ACTIVE = 0;
 	private static final Integer STATUS_DELETED = 9;
@@ -55,11 +60,11 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		GermplasmListDAOTest.dao = new GermplasmListDAO();
-		GermplasmListDAOTest.dao.setSession(this.sessionProvder.getSession());
-		this.list = GermplasmListDAOTest.saveGermplasm(GermplasmListDAOTest.createGermplasmListTestData(
-				GermplasmListDAOTest.TEST_GERMPLASM_LIST_NAME, GermplasmListDAOTest.TEST_GERMPLASM_LIST_DESC,
-				GermplasmListDAOTest.TEST_GERMPLASM_LIST_DATE, GermplasmListDAOTest.TEST_GERMPLASM_LIST_TYPE_LST,
+		this.dao = new GermplasmListDAO();
+		this.dao.setSession(this.sessionProvder.getSession());
+		this.list = saveGermplasm(createGermplasmListTestData(
+				TEST_GERMPLASM_LIST_NAME, GermplasmListDAOTest.TEST_GERMPLASM_LIST_DESC,
+				TEST_GERMPLASM_LIST_DATE, GermplasmListDAOTest.TEST_GERMPLASM_LIST_TYPE_LST,
 				GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE));
 		final Name name = new Name(null, null, 1, 1, 1, "Name", 0, 0, 0);
 		this.germplasm = new Germplasm(null, 0, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
@@ -75,51 +80,49 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListDAO dao = new GermplasmListDAO();
 		final Criteria criteria = Mockito.mock(Criteria.class);
 		dao.hideSnapshotListTypes(criteria);
-		final List<SimpleExpression> restrictedList = dao.getRestrictedSnapshopTypes();
+		final Criterion restrictedList = dao.getRestrictedSnapshopTypes();
 		// this should ensure that the snapshot list types are added int he criteria object
-		for (final SimpleExpression restricted : restrictedList) {
-			Mockito.verify(criteria, Mockito.times(1)).add(restricted);
-		}
-
+		Mockito.verify(criteria, Mockito.times(1)).add(restrictedList);
+		
 	}
 
 	@Test
 	public void testGetRestrictedSnapshopTypes() {
 		final GermplasmListDAO dao = new GermplasmListDAO();
-		final List<SimpleExpression> restrictedList = dao.getRestrictedSnapshopTypes();
-		Assert.assertEquals("Should have 5 restricted snapshot types", 5, restrictedList.size());
+		final Criterion restrictedList = dao.getRestrictedSnapshopTypes();
+		Assert.assertNotNull(restrictedList);
 	}
 
 	@Test
 	public void testCountByName() throws Exception {
 		Assert.assertEquals("There should be one germplasm list with name " + GermplasmListDAOTest.TEST_GERMPLASM_LIST_NAME, 1,
-				GermplasmListDAOTest.dao.countByName(GermplasmListDAOTest.TEST_GERMPLASM_LIST_NAME, Operation.EQUAL));
+				this.dao.countByName(GermplasmListDAOTest.TEST_GERMPLASM_LIST_NAME, Operation.EQUAL));
 
 		this.list.setStatus(GermplasmListDAOTest.STATUS_DELETED);
-		GermplasmListDAOTest.saveGermplasm(this.list);
+		saveGermplasm(this.list);
 		Assert.assertEquals("There should be no germplasm list with name " + GermplasmListDAOTest.TEST_GERMPLASM_LIST_NAME, 0,
-				GermplasmListDAOTest.dao.countByName(GermplasmListDAOTest.TEST_GERMPLASM_LIST_NAME, Operation.EQUAL));
+				this.dao.countByName(GermplasmListDAOTest.TEST_GERMPLASM_LIST_NAME, Operation.EQUAL));
 		// revert status
 		this.list.setStatus(GermplasmListDAOTest.STATUS_ACTIVE);
-		GermplasmListDAOTest.saveGermplasm(this.list);
+		saveGermplasm(this.list);
 
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
-	public void TestGetGermplasmListTypes() {
-		final List<String> germplasmListTypes = GermplasmListDAOTest.dao.getGermplasmListTypes();
+	public void testGetGermplasmListTypes() {
+		final List<String> germplasmListTypes = this.dao.getGermplasmListTypes();
 		for (final String listType : GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES) {
 			Assert.assertFalse(listType + " should not be in the Results Array", germplasmListTypes.contains(listType));
 		}
 	}
 
-	private static GermplasmList saveGermplasm(final GermplasmList list) throws MiddlewareQueryException {
-		final GermplasmList newList = GermplasmListDAOTest.dao.saveOrUpdate(list);
+	private GermplasmList saveGermplasm(final GermplasmList list) throws MiddlewareQueryException {
+		final GermplasmList newList = this.dao.saveOrUpdate(list);
 		return newList;
 	}
 
-	private static GermplasmList createGermplasmListTestData(final String name, final String description, final long date,
+	private GermplasmList createGermplasmListTestData(final String name, final String description, final long date,
 			final String type, final int userId, final int status) throws MiddlewareQueryException {
 		final GermplasmList list = new GermplasmList();
 		list.setName(name);
@@ -134,13 +137,20 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllListMetadata() {
-		final List<Object[]> listMetadata = GermplasmListDAOTest.dao.getAllListMetadata();
-		Assert.assertNotNull("getAllListMetadata() should never return null.", listMetadata);
+		final List<GermplasmList> germplasmLists = this.dao.getListsByProgramUUID(GermplasmListDAOTest.PROGRAM_UUID);
+		
+		final List<Integer> germplasmListIds = new ArrayList<>();
+		for (final GermplasmList germplasmList : germplasmLists) {
+			germplasmListIds.add(germplasmList.getId());
+		}
+		
+		final List<Object[]> listMetadata = this.dao.getAllListMetadata(germplasmListIds);
+		Assert.assertEquals("Meta data size must be the same as the list size", listMetadata.size(), germplasmLists.size());
 	}
 
 	@Test
 	public void testGetListsByProgramUUID() {
-		final List<GermplasmList> germplasmLists = GermplasmListDAOTest.dao.getListsByProgramUUID(GermplasmListDAOTest.PROGRAM_UUID);
+		final List<GermplasmList> germplasmLists = this.dao.getListsByProgramUUID(GermplasmListDAOTest.PROGRAM_UUID);
 		final GermplasmList resultList = germplasmLists.get(0);
 		Assert.assertEquals("The list name should be " + GermplasmListDAOTest.TEST_GERMPLASM_LIST_NAME,
 				GermplasmListDAOTest.TEST_GERMPLASM_LIST_NAME, resultList.getName());
@@ -151,7 +161,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetByGIDandProgramUUID() {
 		final List<GermplasmList> germplasmLists =
-				GermplasmListDAOTest.dao.getByGIDandProgramUUID(this.germplasm.getGid(), 0, 1, GermplasmListDAOTest.PROGRAM_UUID);
+				this.dao.getByGIDandProgramUUID(this.germplasm.getGid(), 0, 1, GermplasmListDAOTest.PROGRAM_UUID);
 		final GermplasmList resultList = germplasmLists.get(0);
 		Assert.assertEquals("The list name should be " + GermplasmListDAOTest.TEST_GERMPLASM_LIST_NAME,
 				GermplasmListDAOTest.TEST_GERMPLASM_LIST_NAME, resultList.getName());
@@ -162,7 +172,35 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	@Test
 	public void testCountByGIDandProgramUUID() {
 		final int result =
-				(int) GermplasmListDAOTest.dao.countByGIDandProgramUUID(this.germplasm.getGid(), GermplasmListDAOTest.PROGRAM_UUID);
+				(int) this.dao.countByGIDandProgramUUID(this.germplasm.getGid(), GermplasmListDAOTest.PROGRAM_UUID);
 		Assert.assertEquals("The count should be 1", 1, result);
+	}
+
+	@Test
+	public void testGetGermplasmFolderMetadata() throws Exception {
+		// Create germplasm test folder
+		final GermplasmList testFolder = createGermplasmListTestData("TestFolder", "Test Folder Description",
+				GermplasmListDAOTest.TEST_GERMPLASM_LIST_DATE, GermplasmListDAOTest.TEST_GERMPLASM_LIST_TYPE_FOLDER,
+				GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE);
+		saveGermplasm(testFolder);
+		final Map<Integer, GermplasmFolderMetadata> result =
+				this.dao.getGermplasmFolderMetadata(Collections.singletonList(testFolder.getId()));
+		final GermplasmFolderMetadata germplasmFolderMetadata = result.get(testFolder.getId());
+		Assert.assertNotNull("Newly created folder should not be null", germplasmFolderMetadata);
+		Assert.assertEquals("Newly created folder should have zero children", 
+				new Integer(0), germplasmFolderMetadata.getNumberOfChildren());
+	}
+
+	@Test
+	public void testGetAllGermplasmListsById() throws Exception {
+		final GermplasmList testList = createGermplasmListTestData("TestList", "Test List Description",
+				GermplasmListDAOTest.TEST_GERMPLASM_LIST_DATE, GermplasmListDAOTest.TEST_GERMPLASM_LIST_TYPE_LST,
+				GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE);	
+		saveGermplasm(testList);
+		final List<GermplasmList> allGermplasmListsById = this.dao.getAllGermplasmListsById(Collections.singletonList(testList.getId()));
+		Assert.assertTrue("Returned results should not be empty", !allGermplasmListsById.isEmpty());
+		Assert.assertEquals("Returned results should contain one item", 
+				1, allGermplasmListsById.size());
+
 	}
 }
