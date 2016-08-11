@@ -11,7 +11,7 @@ public class PersonTestDataInitializer {
 		person.setMiddleName("");
 		person.setLastName("Person");
 		person.setPositionName("Admin");
-		person.setTitle("Amin");
+		person.setTitle("Admin");
 		person.setExtension("1");
 		person.setFax("2");
 		person.setEmail("person@blizzard.com");
