@@ -99,7 +99,10 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 			queryString.append("left outer join exp.properties as rep with rep.typeId = 8210 ");
 			queryString.append("left outer join exp.experimentStocks as es ");
 			queryString.append("left outer join es.stock as st ");
-			queryString.append("where ep.projectId =:p_id and ep.experiment.typeId in (:type_ids) ");
+			// TODO hard coded to first instance only. Make it parameterized.
+			queryString.append(
+					"where ep.projectId =:p_id and ep.experiment.typeId in (:type_ids) and ep.experiment.geoLocation.description = '1' ");
+
 			queryString.append("order by (ep.experiment.geoLocation.description * 1) ASC, ");
 			queryString.append("(plot.value * 1) ASC, ");
 			queryString.append("(rep.value * 1) ASC, ");
@@ -107,8 +110,13 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 			queryString.append("ep.experiment.ndExperimentId ASC");
 
 			Query q =
-					this.getSession().createQuery(queryString.toString()).setParameter("p_id", projectId)
-							.setParameterList("type_ids", lists).setMaxResults(numOfRows).setFirstResult(start);
+					this.getSession().createQuery(queryString.toString())//
+							.setParameter("p_id", projectId) //
+							// TODO hard coded to first instance only. Make it parameterized.
+							// .setParameter("trialInstanceNumber", String.valueOf(trialInstanceNumber))
+							.setParameterList("type_ids", lists) //
+							.setMaxResults(numOfRows) //
+							.setFirstResult(start);
 
 			return q.list();
 		} catch (HibernateException e) {
