@@ -106,8 +106,6 @@ public class ExperimentProjectDao extends GenericDAO<ExperimentProject, Integer>
 			queryString.append("(st.uniqueName * 1) ASC, ");
 			queryString.append("ep.experiment.ndExperimentId ASC");
 
-			// Query q =
-			// getSession().createQuery("from ExperimentProject as ep where ep.projectId =:p_id and ep.experiment.typeId in (:type_ids)")
 			Query q =
 					this.getSession().createQuery(queryString.toString()).setParameter("p_id", projectId)
 							.setParameterList("type_ids", lists).setMaxResults(numOfRows).setFirstResult(start);
