@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListMetadata;
@@ -656,12 +657,33 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return this.getGermplasmListDAO().getListsByProgramUUID(programUUID);
 	}
 	
-	/** (non-Javadoc)
+	/** 
+	 * (non-Javadoc)
 	 * @see org.generationcp.middleware.manager.api.GermplasmListManager#getAllGermplasmListsByIds(java.util.List)
 	 */
 	@Override
 	public List<GermplasmList> getAllGermplasmListsByIds(final List<Integer> listIds) {
 		return this.getGermplasmListDAO().getAllGermplasmListsById(listIds);
+	}
+
+	/**
+	 * (non-Javadoc)
+	 * @see org.generationcp.middleware.manager.api.GermplasmListManager#getGermplasmFolderMetadata(java.util.List)
+	 */
+	@Override
+	public Map<Integer, GermplasmFolderMetadata> getGermplasmFolderMetadata(List<GermplasmList> germplasmLists) {
+		final List<Integer> folderIdsToRetrieveFolderCount = getFolderIdsFromGermplasmList(germplasmLists);
+		return this.getGermplasmListDAO().getGermplasmFolderMetadata(folderIdsToRetrieveFolderCount);	
+	}
+
+	private List<Integer> getFolderIdsFromGermplasmList(List<GermplasmList> listIds) {
+		final List<Integer> folderIdsToRetrieveFolderCount = new ArrayList<>();
+		for (final GermplasmList parentList : listIds) {
+			if(parentList.isFolder()) {
+				folderIdsToRetrieveFolderCount.add(parentList.getId());
+			}
+		}
+		return folderIdsToRetrieveFolderCount;
 	}
 
 
