@@ -1161,8 +1161,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 						if (valueKey.equals(String.valueOf(TermId.SEASON_VAR_TEXT.getId()))) {
 							studySummary.addSeason(prop.getValue());
 						} else {
-							if (valueKey.equals(String.valueOf(TermId.LOCATION_ID.getId()))) {
-								studySummary.setLocationId(!StringUtils.isEmpty(prop.getValue()) ? Integer.valueOf(prop.getValue()) : null);
+							if (valueKey.equals(String.valueOf(TermId.LOCATION_ABBR.getId()))) {
+								studySummary.setLocationId(!StringUtils.isEmpty(prop.getValue()) ? String.valueOf(prop.getValue()) : null);
 							} else {
 								if (valueKey.equals(String.valueOf(TermId.STUDY_TYPE.getId()))) {
 									studySummary.setType(StudyType.getStudyTypeById(Integer.valueOf(prop.getValue())).getName());
