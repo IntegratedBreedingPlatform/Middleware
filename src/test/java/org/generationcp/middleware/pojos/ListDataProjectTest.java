@@ -61,8 +61,10 @@ public class ListDataProjectTest {
 	public void testParseDuplicateString() {
 		final String duplicate = ListDataProjectTest.TEST_PEDIGREE_DUPE_STRING + " | " + ListDataProjectTest.TEST_PEDIGREE_RECIP_STRING
 				+ " | " + ListDataProjectTest.TEST_PLOT_DUPE_STRING + " | " + ListDataProjectTest.TEST_PLOT_RECIP_STRING;
+		
+		//Duplicate string : "Pedigree Dupe: 10,11 | Pedigree Recip: 8 | Plot Dupe: 2,4 | Plot Recip: 6,11"
 		ListDataProjectTest.ldp.setDuplicate(duplicate);
-
+		
 		// Test for pedigree dupes
 		List<Integer> parsed = ListDataProjectTest.ldp.parseDuplicateString(ListDataProject.PEDIGREE_DUPE);
 		Assert.assertEquals("The parsed list's size should be 2", 2, parsed.size());
