@@ -13,7 +13,6 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -50,12 +49,8 @@ import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
-import org.hibernate.transform.DistinctResultTransformer;
-import org.hibernate.transform.Transformers;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
-import com.google.common.collect.Iterables;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 
@@ -1400,7 +1395,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public List<Method> getDerivativeAndMaintenanceMethods(final List<Integer> ids) {
 		return this.getMethodDao().getDerivativeAndMaintenanceMethods(ids);
 	}
-	
+
+	@Override
+	public long countMatchGermplasmInList(final Set<Integer> gids) {
+		return this.getGermplasmDao().countMatchGermplasmInList(gids);
+	}
 
 	/** (non-Javadoc)
 	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getGermplasmWithAllNamesAndAncestry(java.util.Set, int)
@@ -1448,6 +1447,5 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		}
 		return commaSeparatedListOfGids;
 	}
-
 
 }

@@ -46,8 +46,9 @@ import org.hibernate.annotations.NotFoundAction;
 @NamedQueries({@NamedQuery(name = "getUserByNameUsingEqual", query = "SELECT s FROM User s WHERE s.name = :name"),
 		@NamedQuery(name = "getUserByNameUsingLike", query = "SELECT s FROM User s WHERE s.name LIKE :name"),
 		@NamedQuery(name = "countUserByNameUsingEqual", query = "SELECT COUNT(s) FROM User s WHERE s.name = :name"),
-		@NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM User s WHERE s.name LIKE :name")
-
+		@NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM User s WHERE s.name LIKE :name"),
+		@NamedQuery(name = "getByFullName",
+		query = "SELECT u FROM User u, Person p WHERE u.personid = p.id AND (CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)")
 })
 @NamedNativeQueries({@NamedNativeQuery(name = "getAllUsersSorted", query = "SELECT u.* FROM users u, persons p "
 		+ "WHERE u.personid = p.personid ORDER BY fname, lname", resultClass = User.class)})
@@ -61,6 +62,7 @@ public class User implements Serializable, BeanFormState {
 	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
 	public static final String COUNT_BY_NAME_USING_EQUAL = "countUserByNameUsingEqual";
 	public static final String COUNT_BY_NAME_USING_LIKE = "countUserByNameUsingLike";
+	public static final String GET_BY_FULLNAME = "getByFullName";
 	public static final String GET_ALL_USERS_SORTED = "getAllUsersSorted";
 
 	@Id

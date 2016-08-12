@@ -35,7 +35,7 @@ import org.generationcp.middleware.util.Util;
 public class Person implements Comparable<Person>, Serializable {
 
 	private static final long serialVersionUID = -3159738927364282485L;
-
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
@@ -80,7 +80,7 @@ public class Person implements Comparable<Person>, Serializable {
 
 	@Column(name = "contact")
 	private String contact;
-
+	
 	public Person() {
 	}
 
@@ -125,7 +125,7 @@ public class Person implements Comparable<Person>, Serializable {
 		return this.id;
 	}
 
-	public void setId(Integer id) {
+	public void setId(final Integer id) {
 		this.id = id;
 	}
 
@@ -133,7 +133,7 @@ public class Person implements Comparable<Person>, Serializable {
 		return this.firstName;
 	}
 
-	public void setFirstName(String firstName) {
+	public void setFirstName(final String firstName) {
 		this.firstName = firstName;
 	}
 
@@ -141,7 +141,7 @@ public class Person implements Comparable<Person>, Serializable {
 		return this.lastName;
 	}
 
-	public void setLastName(String lastName) {
+	public void setLastName(final String lastName) {
 		this.lastName = lastName;
 	}
 
@@ -149,12 +149,12 @@ public class Person implements Comparable<Person>, Serializable {
 		return this.middleName;
 	}
 
-	public void setMiddleName(String middleName) {
+	public void setMiddleName(final String middleName) {
 		this.middleName = middleName;
 	}
 
 	public String getInitials() {
-		StringBuilder initials = new StringBuilder();
+		final StringBuilder initials = new StringBuilder();
 		if (!StringUtil.isEmptyOrWhitespaceOnly(this.firstName)) {
 			initials.append(this.firstName.trim().charAt(0));
 		}
@@ -185,7 +185,7 @@ public class Person implements Comparable<Person>, Serializable {
 		return this.instituteId;
 	}
 
-	public void setInstituteId(Integer instituteId) {
+	public void setInstituteId(final Integer instituteId) {
 		this.instituteId = instituteId;
 	}
 
@@ -193,7 +193,7 @@ public class Person implements Comparable<Person>, Serializable {
 		return this.title;
 	}
 
-	public void setTitle(String title) {
+	public void setTitle(final String title) {
 		this.title = title;
 	}
 
@@ -201,7 +201,7 @@ public class Person implements Comparable<Person>, Serializable {
 		return this.positionName;
 	}
 
-	public void setPositionName(String positionName) {
+	public void setPositionName(final String positionName) {
 		this.positionName = positionName;
 	}
 
@@ -209,7 +209,7 @@ public class Person implements Comparable<Person>, Serializable {
 		return this.language;
 	}
 
-	public void setLanguage(Integer language) {
+	public void setLanguage(final Integer language) {
 		this.language = language;
 	}
 
@@ -217,7 +217,7 @@ public class Person implements Comparable<Person>, Serializable {
 		return this.phone;
 	}
 
-	public void setPhone(String phone) {
+	public void setPhone(final String phone) {
 		this.phone = phone;
 	}
 
@@ -225,7 +225,7 @@ public class Person implements Comparable<Person>, Serializable {
 		return this.extension;
 	}
 
-	public void setExtension(String extension) {
+	public void setExtension(final String extension) {
 		this.extension = extension;
 	}
 
@@ -233,7 +233,7 @@ public class Person implements Comparable<Person>, Serializable {
 		return this.fax;
 	}
 
-	public void setFax(String fax) {
+	public void setFax(final String fax) {
 		this.fax = fax;
 	}
 
@@ -241,7 +241,7 @@ public class Person implements Comparable<Person>, Serializable {
 		return this.email;
 	}
 
-	public void setEmail(String email) {
+	public void setEmail(final String email) {
 		this.email = email;
 	}
 
@@ -249,7 +249,7 @@ public class Person implements Comparable<Person>, Serializable {
 		return this.notes;
 	}
 
-	public void setNotes(String notes) {
+	public void setNotes(final String notes) {
 		this.notes = notes;
 	}
 
@@ -257,13 +257,13 @@ public class Person implements Comparable<Person>, Serializable {
 		return this.contact;
 	}
 
-	public void setContact(String contact) {
+	public void setContact(final String contact) {
 		this.contact = contact;
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("Person [id=");
 		builder.append(this.id);
 		builder.append(", firstName=");
@@ -302,7 +302,7 @@ public class Person implements Comparable<Person>, Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -313,13 +313,13 @@ public class Person implements Comparable<Person>, Serializable {
 			return false;
 		}
 
-		Person otherObj = (Person) obj;
+		final Person otherObj = (Person) obj;
 
 		return new EqualsBuilder().append(this.id, otherObj.id).isEquals();
 	}
 
 	@Override
-	public int compareTo(Person o) {
+	public int compareTo(final Person o) {
 		if (this.getDisplayName() != null && o != null) {
 			return this.getDisplayName().compareTo(o.getDisplayName());
 		}
