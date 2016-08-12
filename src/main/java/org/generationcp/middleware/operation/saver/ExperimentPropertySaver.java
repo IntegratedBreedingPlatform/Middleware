@@ -174,9 +174,11 @@ public class ExperimentPropertySaver extends Saver {
 			}
 		}
 
-		batchExperimentPropInsertSql.append(";");
-		SQLQuery sqlQuery = this.getActiveSession().createSQLQuery(batchExperimentPropInsertSql.toString());
-		sqlQuery.executeUpdate();
+		if(batchExperimentPropInsertSql.length() != 0){
+			batchExperimentPropInsertSql.append(";");
+			SQLQuery sqlQuery = this.getActiveSession().createSQLQuery(batchExperimentPropInsertSql.toString());
+			sqlQuery.executeUpdate();
+		}
 
 	}
 }
