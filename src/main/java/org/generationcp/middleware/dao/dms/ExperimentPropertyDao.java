@@ -64,6 +64,11 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		List<FieldMapDatasetInfo> datasets = null;
 
 		try {
+			StringBuilder sqlGetListId = new StringBuilder("SELECT min(listid) AS listId from listnms where projectid = :projectId");
+			final Query queryGetListId =
+					this.getSession().createSQLQuery(sqlGetListId.toString()).addScalar("listId");
+			queryGetListId.setParameter("projectId", projectId);
+			final Integer listId = (Integer) queryGetListId.uniqueResult();
 			final String order = projectId > 0 ? "ASC" : "DESC";
 			final StringBuilder sql =
 					new StringBuilder()
@@ -134,8 +139,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("       AND col.type_id = ").append(TermId.COLUMN_NO.getId())
 							.append(" LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
 							.append("       AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
-							.append("  INNER JOIN listnms nms on nms.projectid = st.project_id ")
-							.append("   INNER JOIN listdata_project ldp on s.dbxref_id = ldp.germplasm_id and ldp.entry_id = epropPlot.value")
+							.append("   INNER JOIN (select distinct germplasm_id, group_name from listdata_project where list_id = :listId ) ldp ")
+							.append("        on ldp.germplasm_id = s.dbxref_id")
 							.append(" ORDER BY casted_trialInstance, inst.description, eproj.nd_experiment_id ").append(order);
 
 			final Query query =
@@ -145,6 +150,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.addScalar("block_id").addScalar("trialInstance").addScalar("studyName").addScalar("gid")
 							.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo").addScalar("pedigree");
 			query.setParameter("projectId", projectId);
+			query.setParameter("listId", listId);
 			final List<Object[]> list = query.list();
 			if (list != null && !list.isEmpty()) {
 				datasets = this.createFieldMapDatasetInfo(list);
