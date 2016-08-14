@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.User;
@@ -216,6 +217,18 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			this.logAndThrowException("Error with getByIds() query from User: " + e.getMessage(), e);
 		}
 		return toReturn;
+	}
+	
+	public User getUserByFullname(final String fullname) {
+		User user = null;
+		try {
+			final Query query = this.getSession().getNamedQuery(User.GET_BY_FULLNAME);
+			query.setParameter("fullname", fullname);
+			user = (User) query.uniqueResult();
+		} catch (final HibernateException e) {
+			this.logAndThrowException(String.format("Error with getPersonByFullName(fullname=[%s])", StringUtils.join(fullname, ",")), e);
+		}
+		return user;
 	}
 
 }
