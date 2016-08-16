@@ -1133,7 +1133,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		for (final DmsProject dmsProject : dmsProjects) {
 			final StudySummary studySummary = new StudySummary();
 
-			Ordering.natural();
 			final List<ProjectProperty> sortedProperties = Ordering.from(new Comparator<ProjectProperty>() {
 
 				@Override

@@ -1124,7 +1124,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 
 		if (page != null && pageSize != null) {
-			criteria.setFirstResult(page);
+			criteria.setFirstResult(page-1);
 			criteria.setMaxResults(pageSize);
 		}
 
