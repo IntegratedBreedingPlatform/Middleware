@@ -40,7 +40,7 @@ public class Workbook {
 
 	private List<MeasurementVariable> variates;
 
-	private List<MeasurementRow> observations;
+	private List<MeasurementRow> observations = new ArrayList<>();
 
 	// for exporting only
 	private List<MeasurementRow> exportArrangedObservations;

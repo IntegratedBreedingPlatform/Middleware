@@ -111,12 +111,8 @@ public class WorkbookBuilder extends Builder {
 		this.checkMeasurementDataset(Integer.valueOf(dataSetId));
 		workbook.setMeasurementDatesetId(dataSetId);
 
-		// PERF : rationale for count - improve
-		final long expCount = this.getStudyDataManager().countExperiments(dataSetId);
 		// Variables required to get Experiments (?)
 		VariableTypeList variables = this.getDataSetBuilder().getVariableTypes(dataSetId);
-		// DA get experiments
-		final List<Experiment> experiments = this.getStudyDataManager().getExperiments(dataSetId, 0, (int) expCount, variables);
 
 		// FIXME : this heavy id fetch pattern needs changing
 		final DmsProject trialDataSetProject = this.getDataSetBuilder().getTrialDataset(study.getId());
@@ -152,10 +148,6 @@ public class WorkbookBuilder extends Builder {
 		
 		populateBreedingMethodPossibleValues(variates);
 
-		// Build Observation Unit from a Measurement
-		// DA previous for experiments
-		final List<MeasurementRow> observations =
-				this.buildObservations(experiments, variables.getVariates(), factors, variates, isTrial, conditions);
 		final List<TreatmentVariable> treatmentFactors = this.buildTreatmentFactors(variables);
 		final List<ProjectProperty> projectProperties = trialDataSetProject.getProperties();
 
@@ -270,7 +262,6 @@ public class WorkbookBuilder extends Builder {
 		workbook.setVariates(variates);
 		workbook.setConditions(conditions);
 		workbook.setConstants(constants);
-		workbook.setObservations(observations);
 		workbook.setTreatmentFactors(treatmentFactors);
 		workbook.setExperimentalDesignVariables(expDesignVariables);
 
