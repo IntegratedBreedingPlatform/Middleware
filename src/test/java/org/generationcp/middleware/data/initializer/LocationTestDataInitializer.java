@@ -27,12 +27,21 @@ public class LocationTestDataInitializer {
 	}
 
 	public Location createLocation(final Integer locId, final String lname, final Integer locationType,
-			final String locationAbbreviation) {
+			final String locationAbbreviation, final String programUUID) {
 		final Location location = new Location();
 		location.setLocid(locId);
 		location.setLname(lname);
 		location.setLtype(locationType);
 		location.setLabbr(locationAbbreviation);
+		if (programUUID != null){
+			location.setUniqueID(programUUID);
+		}
+		location.setNllp(0);
+		location.setSnl1id(0);
+		location.setSnl2id(0);
+		location.setSnl3id(0);
+		location.setCntryid(0);
+		location.setLrplce(0);
 		return location;
 	}
 
