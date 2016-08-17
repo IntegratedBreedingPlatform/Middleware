@@ -470,5 +470,16 @@ public interface LocationDataManager {
 	public List<Location> getAllBreedingLocations(List<Integer> locationIds);
 
 	public List<Location> getAllSeedingLocations(List<Integer> locationIds);
+	
+	/**
+	 * Get all breeding locations filtered by programUUID plus it also returns breeding locations
+	 * that have no programUUID (common historical data)
+	 *
+	 * Return a List of Locations which represent the breeding locations stored in the location table of IBDB.
+	 *
+	 * @param programUUID - uniqueID of current program
+	 * @return the breeding locations for program
+	 */
+	List<Location> getAllBreedingLocationsByUniqueID(String programUUID);
 
 }

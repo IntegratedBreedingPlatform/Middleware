@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -813,6 +814,31 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			LocationDAO.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(this.getLogExceptionMessage("getSeedingLocations", "", null, e.getMessage(), "Location"), e);
 		}
+	}
+	
+	public List<Location> getBreedingLocationsByUniqueID(final String programUUID) {
+		List<Location> locations = new ArrayList<Location>();
+
+		if (programUUID == null || programUUID.isEmpty()) {
+			return locations;
+		}
+
+		try {
+			Criteria criteria = this.getSession().createCriteria(Location.class);
+			// filter by programUUID plus return also records with null programUUID (common historical data)
+			criteria.add(Restrictions.or(Restrictions.eq(LocationDAO.UNIQUE_ID, programUUID), Restrictions.isNull(LocationDAO.UNIQUE_ID)));
+			// set location types for Breeding Location 
+			criteria.add(Restrictions.in(LocationDAO.LTYPE, Arrays.asList(Location.BREEDING_LOCATION_TYPE_IDS)));
+			criteria.addOrder(Order.asc("lname"));
+			
+			locations = criteria.list();
+		} catch (HibernateException e) {
+			LocationDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(this.getLogExceptionMessage("getBreedingLocationsByUniqueID", "", null, e.getMessage(), "Location"), e);
+		
+		}
+		return locations;
+			
 	}
 
 }
