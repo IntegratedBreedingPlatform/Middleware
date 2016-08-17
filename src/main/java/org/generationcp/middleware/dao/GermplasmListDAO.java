@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -21,10 +22,13 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
@@ -34,7 +38,12 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
+import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
+import org.hibernate.type.Type;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 
 /**
  * DAO class for {@link GermplasmList}.
@@ -549,5 +558,32 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
 		criteria.add(Restrictions.eq("type", GermplasmListType.LST.toString()));
 		return criteria.list();
+	}
+
+	/**
+	 * @param folderIds a group of folder ids for which we want to return children
+	 * @return the resultant map which contains the folder meta data
+	 */
+	public Map<Integer, GermplasmFolderMetadata> getGermplasmFolderMetadata(final List<Integer> folderIds) {
+		
+		if(folderIds.isEmpty()) {
+			return Collections.<Integer, GermplasmFolderMetadata>emptyMap();
+		}
+		
+		final String folderMetaDataQuery = "SELECT parent.listid AS listId, COUNT(child.listid) AS numberOfChildren FROM listnms parent "
+				+ "LEFT OUTER JOIN listnms child ON child.lhierarchy = parent.listid "
+				+ "WHERE parent.listid IN (:folderIds) GROUP BY parent.listid";
+		final SQLQuery setResultTransformer = this.getSession().createSQLQuery(folderMetaDataQuery);
+		setResultTransformer.setParameterList("folderIds", folderIds);
+		setResultTransformer.addScalar("listId", new IntegerType());
+		setResultTransformer.addScalar("numberOfChildren", new IntegerType());
+		setResultTransformer.setResultTransformer(Transformers.aliasToBean(GermplasmFolderMetadata.class));
+		final List<GermplasmFolderMetadata> list = setResultTransformer.list();
+		return Maps.uniqueIndex(list, new Function<GermplasmFolderMetadata, Integer>() {
+			@Override
+			public Integer apply(final GermplasmFolderMetadata folderMetaData) {
+				return folderMetaData.getListId();
+			}
+		});
 	}
 }

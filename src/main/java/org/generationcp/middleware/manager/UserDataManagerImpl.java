@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -31,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.common.base.Function;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-	
+
 /**
  * Implementation of the UserDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
  */
@@ -39,53 +39,52 @@ import com.google.common.cache.CacheBuilder;
 public class UserDataManagerImpl extends DataManager implements UserDataManager {
 
 	/**
-	 * Caching all the users in the system. Max is ten because we do not expect to have more than 10 war filed.
-	 * Each war file will create on cache.
+	 * Caching all the users in the system. Max is ten because we do not expect to have more than 10 war filed. Each war file will create on
+	 * cache.
 	 */
 	private static Cache<String, List<User>> localUserCache =
 			CacheBuilder.newBuilder().maximumSize(10).expireAfterWrite(60, TimeUnit.MINUTES).build();
 
 	/**
-	 * Function to load data into the user local cache when required. 
-	 * Note this must be a member variable an not a static variable.
+	 * Function to load data into the user local cache when required. Note this must be a member variable an not a static variable.
 	 */
 	private FunctionBasedGuavaCacheLoader<String, List<User>> functionBasedLocalUserGuavaCacheLoader;
-	
+
 	/**
-	 * Caching all the persons in the system. Max is ten because we do not expect to have more than 10 war filed.
-	 * Each war file will create on cache.
+	 * Caching all the persons in the system. Max is ten because we do not expect to have more than 10 war filed. Each war file will create
+	 * on cache.
 	 */
 	private static Cache<String, List<Person>> localPersonCache =
 			CacheBuilder.newBuilder().maximumSize(10).expireAfterWrite(60, TimeUnit.MINUTES).build();
-	
+
 	/**
-	 * Function to load data into the user local cache when required. 
-	 * Note this must be a member variable an not a static variable.
+	 * Function to load data into the user local cache when required. Note this must be a member variable an not a static variable.
 	 */
 	private FunctionBasedGuavaCacheLoader<String, List<Person>> functionBasedLocalPersonGuavaCacheLoader;
 
-
 	public UserDataManagerImpl() {
 		super();
-		bindCacheLoaderFunctionsToLocalUserCache();
+		this.bindCacheLoaderFunctionsToLocalUserCache();
 	}
 
-	public UserDataManagerImpl(HibernateSessionProvider sessionProvider) {
+	public UserDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
-		bindCacheLoaderFunctionsToLocalUserCache();
+		this.bindCacheLoaderFunctionsToLocalUserCache();
 	}
-	
+
 	private void bindCacheLoaderFunctionsToLocalUserCache() {
-		functionBasedLocalUserGuavaCacheLoader =
-			new FunctionBasedGuavaCacheLoader<String, List<User>>(localUserCache, new Function<String, List<User>>() {
-				@Override
-				public List<User> apply(final String key) {
-					return UserDataManagerImpl.this.getUserDao().getAll();
-				}
-			});
-		
-		functionBasedLocalPersonGuavaCacheLoader =
-				new FunctionBasedGuavaCacheLoader<String, List<Person>>(localPersonCache, new Function<String, List<Person>>() {
+		this.functionBasedLocalUserGuavaCacheLoader = new FunctionBasedGuavaCacheLoader<String, List<User>>(
+				UserDataManagerImpl.localUserCache, new Function<String, List<User>>() {
+
+					@Override
+					public List<User> apply(final String key) {
+						return UserDataManagerImpl.this.getUserDao().getAll();
+					}
+				});
+
+		this.functionBasedLocalPersonGuavaCacheLoader = new FunctionBasedGuavaCacheLoader<String, List<Person>>(
+				UserDataManagerImpl.localPersonCache, new Function<String, List<Person>>() {
+
 					@Override
 					public List<Person> apply(final String key) {
 						return UserDataManagerImpl.this.getPersonDao().getAll();
@@ -93,14 +92,12 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 				});
 	}
 
-
-
 	@SuppressWarnings("deprecation")
 	@Override
 	public List<User> getAllUsers() throws MiddlewareQueryException {
 		try {
 			final String databaseConnectionUrl = this.getActiveSession().connection().getMetaData().getURL();
-			return functionBasedLocalUserGuavaCacheLoader.get(databaseConnectionUrl).get();
+			return this.functionBasedLocalUserGuavaCacheLoader.get(databaseConnectionUrl).get();
 		} catch (HibernateException | SQLException e) {
 			throw new MiddlewareQueryException("Unable to connect to the database. Please contact admin for further information.", e);
 		}
@@ -112,51 +109,51 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	}
 
 	@Override
-	public Integer addUser(User user) throws MiddlewareQueryException {
+	public Integer addUser(final User user) throws MiddlewareQueryException {
 		Integer idUserSaved = null;
 		try {
-			localUserCache.invalidateAll();
-			localPersonCache.invalidateAll();
-			UserDAO dao = this.getUserDao();
+			UserDataManagerImpl.localUserCache.invalidateAll();
+			UserDataManagerImpl.localPersonCache.invalidateAll();
+			final UserDAO dao = this.getUserDao();
 
-			User recordSaved = dao.saveOrUpdate(user);
+			final User recordSaved = dao.saveOrUpdate(user);
 			idUserSaved = recordSaved.getUserid();
-		} catch (Exception e) {
-			throw new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): "
-					+ e.getMessage(), e);
-		} 
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+					"Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
+		}
 
 		return idUserSaved;
 	}
 
 	@Override
-	public Integer updateUser(User user) throws MiddlewareQueryException {
+	public Integer updateUser(final User user) throws MiddlewareQueryException {
 		try {
-			localUserCache.invalidateAll();
-			localPersonCache.invalidateAll();
+			UserDataManagerImpl.localUserCache.invalidateAll();
+			UserDataManagerImpl.localPersonCache.invalidateAll();
 			this.getUserDao().saveOrUpdate(user);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 
-			throw new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user=" + user + "): "
-					+ e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					"Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
 		}
 		return user.getUserid();
 	}
 
 	@Override
-	public User getUserById(int id) throws MiddlewareQueryException {
+	public User getUserById(final int id) throws MiddlewareQueryException {
 		return this.getUserDao().getById(id, false);
 	}
 
 	@Override
-	public void deleteUser(User user) throws MiddlewareQueryException {
+	public void deleteUser(final User user) throws MiddlewareQueryException {
 		try {
-			localUserCache.invalidateAll();
-			localPersonCache.invalidateAll();
+			UserDataManagerImpl.localUserCache.invalidateAll();
+			UserDataManagerImpl.localPersonCache.invalidateAll();
 			this.getUserDao().makeTransient(user);
-		} catch (Exception e) {
-			throw new MiddlewareQueryException("Error encountered while deleting User: UserDataManager.deleteUser(user=" + user + "): "
-					+ e.getMessage(), e);
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+					"Error encountered while deleting User: UserDataManager.deleteUser(user=" + user + "): " + e.getMessage(), e);
 		}
 	}
 
@@ -165,7 +162,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	public List<Person> getAllPersons() throws MiddlewareQueryException {
 		try {
 			final String databaseConnectionUrl = this.getActiveSession().connection().getMetaData().getURL();
-			return functionBasedLocalPersonGuavaCacheLoader.get(databaseConnectionUrl).get();
+			return this.functionBasedLocalPersonGuavaCacheLoader.get(databaseConnectionUrl).get();
 		} catch (HibernateException | SQLException e) {
 			throw new MiddlewareQueryException("Unable to connect to the database. Please contact admin for further information.", e);
 		}
@@ -174,9 +171,9 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	// TODO BMS-148 Rename method. No loger reads from two DBs.
 	@Override
 	public List<Person> getAllPersonsOrderedByLocalCentral() throws MiddlewareQueryException {
-		List<Person> toReturn = new ArrayList<Person>();
-		PersonDAO dao = this.getPersonDao();
-		List<Person> persons = dao.getAll();
+		final List<Person> toReturn = new ArrayList<Person>();
+		final PersonDAO dao = this.getPersonDao();
+		final List<Person> persons = dao.getAll();
 		Collections.sort(persons);
 		toReturn.addAll(persons);
 		return toReturn;
@@ -188,17 +185,17 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	}
 
 	@Override
-	public Integer addPerson(Person person) throws MiddlewareQueryException {
+	public Integer addPerson(final Person person) throws MiddlewareQueryException {
 		Integer idPersonSaved = null;
 		try {
-			localUserCache.invalidateAll();
-			localPersonCache.invalidateAll();
-			PersonDAO dao = this.getPersonDao();
-			Person recordSaved = dao.saveOrUpdate(person);
+			UserDataManagerImpl.localUserCache.invalidateAll();
+			UserDataManagerImpl.localPersonCache.invalidateAll();
+			final PersonDAO dao = this.getPersonDao();
+			final Person recordSaved = dao.saveOrUpdate(person);
 			idPersonSaved = recordSaved.getId();
-		} catch (Exception e) {
-			throw new MiddlewareQueryException("Error encountered while saving Person: UserDataManager.addPerson(person=" + person + "): "
-					+ e.getMessage(), e);
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+					"Error encountered while saving Person: UserDataManager.addPerson(person=" + person + "): " + e.getMessage(), e);
 		}
 		return idPersonSaved;
 	}
@@ -209,19 +206,19 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	}
 
 	@Override
-	public void deletePerson(Person person) throws MiddlewareQueryException {
+	public void deletePerson(final Person person) throws MiddlewareQueryException {
 		try {
-			localUserCache.invalidateAll();
-			localPersonCache.invalidateAll();
+			UserDataManagerImpl.localUserCache.invalidateAll();
+			UserDataManagerImpl.localPersonCache.invalidateAll();
 			this.getPersonDao().makeTransient(person);
-		} catch (Exception e) {
-			throw new MiddlewareQueryException("Error encountered while deleting Person: UserDataManager.deletePerson(person=" + person
-					+ "): " + e.getMessage(), e);
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+					"Error encountered while deleting Person: UserDataManager.deletePerson(person=" + person + "): " + e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException {
+	public boolean isPersonExists(final String firstName, final String lastName) throws MiddlewareQueryException {
 		if (this.getPersonDao().isPersonExists(firstName, lastName)) {
 			return true;
 		}
@@ -229,7 +226,7 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	}
 
 	@Override
-	public boolean isUsernameExists(String userName) throws MiddlewareQueryException {
+	public boolean isUsernameExists(final String userName) throws MiddlewareQueryException {
 		if (this.getUserDao().isUsernameExists(userName)) {
 			return true;
 		}
@@ -237,12 +234,17 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	}
 
 	@Override
-	public User getUserByUserName(String userName) throws MiddlewareQueryException {
+	public User getUserByUserName(final String userName) throws MiddlewareQueryException {
 		return this.getUserDao().getUserByUserName(userName);
 	}
 
 	@Override
-	public Person getPersonByName(String firstName, String middleName, String lastName) throws MiddlewareQueryException {
+	public Person getPersonByName(final String firstName, final String middleName, final String lastName) throws MiddlewareQueryException {
 		return this.getPersonDao().getPersonByName(firstName, middleName, lastName);
+	}
+
+	@Override
+	public User getUserByFullname(final String fullname) throws MiddlewareQueryException {
+		return this.getUserDao().getUserByFullname(fullname);
 	}
 }
