@@ -1499,4 +1499,14 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		}
 	}
 
+	@Override
+	public List<Project> getProjectsByCropType(final CropType cropType) {
+		return this.getProjectDao().getProjectsByCropType(cropType);
+	}
+
+	@Override
+	public List<Integer> getAdminUserIdsOfCrop(String crop) {
+		return this.getProjectDao().getAdminUserIdsOfCrop(crop);
+	}
+
 }

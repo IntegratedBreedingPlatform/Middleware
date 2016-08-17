@@ -1016,5 +1016,19 @@ public interface WorkbenchDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException;
+	
+	/**
+	 * Returns the list of projects given the CropType
+	 * @param cropType the crop and its database
+	 * @return Returns the list of projects / programs associated to the crop type
+	 */
+	List<Project> getProjectsByCropType(final CropType cropType);
+	
+	/**
+	 * Returns the list of admin user ids given the CropType
+	 * @param cropName the crop
+	 * @return Returns the list of projects / programs associated to the crop type
+	 */
+	List<Integer> getAdminUserIdsOfCrop(final String crop);
 
 }

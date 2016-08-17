@@ -13,6 +13,8 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Random;
 
@@ -29,6 +31,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
+import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -828,5 +831,81 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 			}
 		}
 		return fulllist;
+	}
+	
+	@Test
+	public void testGetProjectsByCropType() {
+		this.workbenchDataManager.addProject(commonTestProject);
+		final List<Project> projects = this.workbenchDataManager.getProjectsByCropType(commonTestProject.getCropType());
+		Assert.assertNotNull("The list should not be null", projects);
+		boolean commonTestProjectIsFound = false;
+		for (final Project project : projects) {
+		   Assert.assertEquals("The crop type should be the same" , commonTestProject.getCropType(), project.getCropType());
+		   if(project.getProjectId() == commonTestProject.getProjectId()) {
+			   commonTestProjectIsFound = true;
+			   Assert.assertEquals("The unique ID should be the same", commonTestProject.getUniqueID(), project.getUniqueID());
+			   Assert.assertEquals("The project name should be the same", commonTestProject.getProjectName(), project.getProjectName());
+			   Assert.assertEquals("The start date should be the same", commonTestProject.getStartDate(), project.getStartDate());
+			   Assert.assertEquals("The user ID should be the same", commonTestProject.getUserId(), project.getUserId());
+			   Assert.assertEquals("The unique ID should be the same", commonTestProject.getUniqueID(), project.getUniqueID());
+			   Assert.assertEquals("The last open date should be the same", commonTestProject.getLastOpenDate(), project.getLastOpenDate());
+			   Assert.assertEquals("The crop type should be the same", commonTestProject.getCropType(), project.getCropType());
+		   }
+		}
+		Assert.assertTrue("The newly-added project should be found",commonTestProjectIsFound);
+		
+	}
+	
+	@Test
+	public void testGetAdminUserIdsOfCrop() {
+		final Project newProgram = this.createNewProgramWithNewlyCreatedMembers();
+		//based on our test data, we know the admin user is the first member, while the second is a non-admin
+		final Iterator<User> programMembersIterator = newProgram.getMembers().iterator();
+		final User adminUser = programMembersIterator.next();
+		final User nonAdminUser = programMembersIterator.next();
+		//test
+		final List<Integer> adminUserIds = this.workbenchDataManager.getAdminUserIdsOfCrop(newProgram.getCropType().getCropName());
+		Assert.assertNotNull("The list should not be null", adminUserIds);
+		Assert.assertFalse("There should be at least one admin user found", adminUserIds.isEmpty());
+		boolean adminUserFound = false;
+		boolean nonAdminUserFound = false;
+		for (final Integer userId : adminUserIds) {
+			if(userId.equals(adminUser.getUserid())) {
+				adminUserFound = true;	
+			}
+			if(userId.equals(nonAdminUser.getUserid())) {
+				nonAdminUserFound = true;	
+			}
+		}
+		Assert.assertTrue("The admin user should be found", adminUserFound);
+		Assert.assertFalse("The non-admin user should not be found", nonAdminUserFound);
+	}
+
+	private Project createNewProgramWithNewlyCreatedMembers() {
+		//add users
+		final User adminUser = this.workbenchTestDataUtil.getTestUser(true);
+		this.workbenchDataManager.addUser(adminUser);
+		final User nonAdminUser = this.workbenchTestDataUtil.getTestUser(false);
+		this.workbenchDataManager.addUser(nonAdminUser);
+		//add program
+		final Project program = this.workbenchTestDataUtil.createTestProjectData();
+		program.setUserId(adminUser.getUserid());
+		this.workbenchDataManager.addProject(program);
+		//add members
+		addProgramMemberAndSave(program, adminUser);
+		addProgramMemberAndSave(program, nonAdminUser);
+		//note that other details like person and user info are not created as this is just for testing
+		return program;
+	}
+
+	private void addProgramMemberAndSave(final Project program, final User user) {
+		final ProjectUserInfo member = new ProjectUserInfo();
+		member.setProjectId(program.getProjectId().intValue());
+		member.setUserId(user.getUserid());
+		this.workbenchDataManager.saveOrUpdateProjectUserInfo(member);
+		if(program.getMembers() == null) {
+			program.setMembers(new LinkedHashSet());
+		}
+		program.getMembers().add(user);
 	}
 }

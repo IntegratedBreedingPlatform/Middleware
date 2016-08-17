@@ -1,7 +1,9 @@
 
 package org.generationcp.middleware;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -13,6 +15,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
+import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 
 public class WorkbenchTestDataUtil {
@@ -140,6 +143,23 @@ public class WorkbenchTestDataUtil {
 			this.testUser1 = this.createTestUserData();
 		}
 		return this.testUser1;
+	}
+	
+	public User getTestUser(boolean isAdmin) {
+		final User user = this.createTestUserData();
+		if(isAdmin) {
+			final List<UserRole> roles = new ArrayList<>();
+			roles.add(new UserRole(user, "ADMIN"));
+			user.setRoles(roles);
+		}
+		return user;
+	}
+	
+	public ProjectUserInfo getProjectUserInfo(int projectId, int userId) {
+		final ProjectUserInfo pui = new ProjectUserInfo();
+		pui.setProjectId(projectId);
+		pui.setUserId(userId);
+		return pui;
 	}
 
 }
