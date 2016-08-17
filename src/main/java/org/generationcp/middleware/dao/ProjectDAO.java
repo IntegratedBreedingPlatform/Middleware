@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.dao;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -115,5 +116,33 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			this.logAndThrowException("Error with getLastOpenedProjectAnyUser(" + ") query from Project " + e.getMessage(), e);
 		}
 		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Project> getProjectsByCropType(final CropType cropType) {
+		final Criteria criteria = this.getSession().createCriteria(Project.class).add
+				(Restrictions.eq("cropType", cropType));
+		return criteria.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Integer> getAdminUserIdsOfCrop(String crop) {
+		try {
+
+			StringBuilder sb = new StringBuilder();
+			sb.append("SELECT DISTINCT u.userid FROM users u ")
+				.append("INNER JOIN users_roles r ON r.userid = u.userid ")
+				.append("INNER JOIN workbench_project_user_info member ON member.user_id = u.userid ")
+				.append("INNER JOIN workbench_project program ON program.project_id = member.project_id ")
+				.append("WHERE r.role = 'ADMIN' AND program.crop_type = :cropType");
+
+			SQLQuery query = this.getSession().createSQLQuery(sb.toString());
+			query.setParameter("cropType", crop);
+			return query.list();
+
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error with getAdminUserIdsOfCrop(" + crop + ") query from ProjectDAO " + e.getMessage(), e);
+		}
+		return new ArrayList<Integer>();
 	}
 }
