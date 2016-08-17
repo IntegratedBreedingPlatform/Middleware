@@ -31,11 +31,11 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 	public Project getById(final Long projectId) {
 		try {
 			if (projectId != null) {
-				Criteria criteria =
+				final Criteria criteria =
 						this.getSession().createCriteria(Project.class).add(Restrictions.eq("projectId", projectId)).setMaxResults(1);
 				return (Project) criteria.uniqueResult();
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getById(projectId=" + projectId + ") query from Project: " + e.getMessage(), e);
 		}
 		return null;
@@ -45,51 +45,53 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 
 		try {
 			if (projectUuid != null) {
-				Criteria criteria =
+				final Criteria criteria =
 						this.getSession().createCriteria(Project.class).add(Restrictions.eq("uniqueID", projectUuid)).setMaxResults(1);
 				return (Project) criteria.uniqueResult();
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getByUuid(uniqueID=" + projectUuid + ") query from Project: " + e.getMessage(), e);
 		}
 		return null;
 	}
 
-	public void deleteProject(String projectName) {
-		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+	public void deleteProject(final String projectName) {
+		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of
+		// synch with
 		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 		// statement
 		this.getSession().flush();
-		
-		SQLQuery query = this.getSession().createSQLQuery("delete from workbench_project where project_name= '" + projectName + "';");
+
+		final SQLQuery query = this.getSession().createSQLQuery("delete from workbench_project where project_name= '" + projectName + "';");
 
 		query.executeUpdate();
 	}
 
-		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("projectName", projectName)).add
-				(Restrictions.eq("cropType", cropType)).setMaxResults(1);
 	public Project getProjectByNameAndCrop(final String projectName, final CropType cropType) {
+		final Criteria criteria =
+				this.getSession().createCriteria(Project.class).add(Restrictions.eq("projectName", projectName))
+						.add(Restrictions.eq("cropType", cropType)).setMaxResults(1);
 		return (Project) criteria.uniqueResult();
 	}
 
 	public Project getLastOpenedProject(final Integer userId) {
 		try {
 			if (userId != null) {
-				StringBuilder sb = new StringBuilder();
+				final StringBuilder sb = new StringBuilder();
 				sb.append("SELECT {w.*} FROM workbench_project w ")
-				.append("INNER JOIN workbench_project_user_info r ON w.project_id = r.project_id ")
-				.append("WHERE r.user_id = :userId AND r.last_open_date IS NOT NULL ORDER BY r.last_open_date DESC LIMIT 1 ;");
+						.append("INNER JOIN workbench_project_user_info r ON w.project_id = r.project_id ")
+						.append("WHERE r.user_id = :userId AND r.last_open_date IS NOT NULL ORDER BY r.last_open_date DESC LIMIT 1 ;");
 
-				SQLQuery query = this.getSession().createSQLQuery(sb.toString());
+				final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 				query.addEntity("w", Project.class);
 				query.setParameter("userId", userId);
 
 				@SuppressWarnings("unchecked")
-				List<Project> projectList = query.list();
+				final List<Project> projectList = query.list();
 
 				return !projectList.isEmpty() ? projectList.get(0) : null;
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getLastOpenedProject(userId=" + userId + ") query from Project " + e.getMessage(), e);
 		}
 		return null;
@@ -98,48 +100,46 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 	public Project getLastOpenedProjectAnyUser() {
 		try {
 
-			StringBuilder sb = new StringBuilder();
+			final StringBuilder sb = new StringBuilder();
 			sb.append("SELECT {w.*} FROM workbench_project w ")
 					.append("INNER JOIN workbench_project_user_info r ON w.project_id = r.project_id ")
 					.append("WHERE r.last_open_date IS NOT NULL ORDER BY r.last_open_date DESC LIMIT 1 ;");
 
-			SQLQuery query = this.getSession().createSQLQuery(sb.toString());
+			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 			query.addEntity("w", Project.class);
 
 			@SuppressWarnings("unchecked")
-			List<Project> projectList = query.list();
+			final List<Project> projectList = query.list();
 
 			return !projectList.isEmpty() ? projectList.get(0) : null;
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getLastOpenedProjectAnyUser(" + ") query from Project " + e.getMessage(), e);
 		}
 		return null;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<Project> getProjectsByCropType(final CropType cropType) {
-		final Criteria criteria = this.getSession().createCriteria(Project.class).add
-				(Restrictions.eq("cropType", cropType));
+		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("cropType", cropType));
 		return criteria.list();
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getAdminUserIdsOfCrop(String crop) {
+	public List<Integer> getAdminUserIdsOfCrop(final String crop) {
 		try {
 
-			StringBuilder sb = new StringBuilder();
-			sb.append("SELECT DISTINCT u.userid FROM users u ")
-				.append("INNER JOIN users_roles r ON r.userid = u.userid ")
-				.append("INNER JOIN workbench_project_user_info member ON member.user_id = u.userid ")
-				.append("INNER JOIN workbench_project program ON program.project_id = member.project_id ")
-				.append("WHERE r.role = 'ADMIN' AND program.crop_type = :cropType");
+			final StringBuilder sb = new StringBuilder();
+			sb.append("SELECT DISTINCT u.userid FROM users u ").append("INNER JOIN users_roles r ON r.userid = u.userid ")
+					.append("INNER JOIN workbench_project_user_info member ON member.user_id = u.userid ")
+					.append("INNER JOIN workbench_project program ON program.project_id = member.project_id ")
+					.append("WHERE r.role = 'ADMIN' AND program.crop_type = :cropType");
 
-			SQLQuery query = this.getSession().createSQLQuery(sb.toString());
+			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 			query.setParameter("cropType", crop);
 			return query.list();
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getAdminUserIdsOfCrop(" + crop + ") query from ProjectDAO " + e.getMessage(), e);
 		}
 		return new ArrayList<Integer>();

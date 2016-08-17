@@ -36,7 +36,7 @@ public class ProjectDAOTest extends IntegrationTestBase {
 	private static CropTypeDAO cropTypeDAO;
 	private static UserDAO userDAO;
 	private static ProjectUserInfoDAO projectUserInfoDAO;
-	
+
 	@Autowired
 	@Qualifier(value = "workbenchSessionProvider")
 	protected HibernateSessionProvider workbenchSessionProvider;
@@ -60,44 +60,44 @@ public class ProjectDAOTest extends IntegrationTestBase {
 		final List<Project> projects = ProjectDAOTest.projectDAO.getProjectsByCropType(cropType);
 		Assert.assertNotNull("The list should not be null", projects);
 		for (final Project project : projects) {
-		   Assert.assertEquals("The crop type should be the same" , cropType, project.getCropType());
+			Assert.assertEquals("The crop type should be the same", cropType, project.getCropType());
 		}
 	}
-	
+
 	@Test
 	public void testGetAdminUserIdsOfCrop() {
-		String crop = ContextHolder.getCurrentCrop();
-		
+		final String crop = ContextHolder.getCurrentCrop();
+
 		final List<Integer> adminUserIds = ProjectDAOTest.projectDAO.getAdminUserIdsOfCrop(crop);
 		Assert.assertNotNull("The list should not be null", adminUserIds);
-		
-		//check if the users are admin
+
+		// check if the users are admin
 		final List<User> users = ProjectDAOTest.userDAO.getByIds(adminUserIds);
 		for (final User user : users) {
-			List<UserRole> roles = user.getRoles();
+			final List<UserRole> roles = user.getRoles();
 			boolean isAdmin = false;
 			for (final UserRole userRole : roles) {
 				final String role = userRole.getRole();
-				if("ADMIN".equalsIgnoreCase(role)) {
+				if ("ADMIN".equalsIgnoreCase(role)) {
 					isAdmin = true;
 				}
- 			}
-			Assert.assertTrue("The user should be an admin" , isAdmin);
+			}
+			Assert.assertTrue("The user should be an admin", isAdmin);
 		}
-		
-		//check if the users are users of the crop
+
+		// check if the users are users of the crop
 		final List<Integer> cropUserIds = new ArrayList<>();
 		final CropType cropType = ProjectDAOTest.cropTypeDAO.getByName(crop);
 		final List<Project> projects = ProjectDAOTest.projectDAO.getProjectsByCropType(cropType);
 		for (final Project project : projects) {
-			//get users
-			final List<ProjectUserInfo> projectUserInfoList = 
+			// get users
+			final List<ProjectUserInfo> projectUserInfoList =
 					ProjectDAOTest.projectUserInfoDAO.getByProjectId(project.getProjectId().intValue());
 			for (final ProjectUserInfo projectUserInfo : projectUserInfoList) {
-				cropUserIds.add(projectUserInfo.getUserId());	
+				cropUserIds.add(projectUserInfo.getUserId());
 			}
 		}
-		Assert.assertTrue("The users should be crop users" , cropUserIds.containsAll(adminUserIds));
+		Assert.assertTrue("The users should be crop users", cropUserIds.containsAll(adminUserIds));
 	}
 
 }

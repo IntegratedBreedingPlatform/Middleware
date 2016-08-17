@@ -27,12 +27,12 @@ public class WorkbenchTestDataUtil {
 	private ProjectActivity testProjectActivity1, testProjectActivity2;
 	private CropType cropType;
 
-	public WorkbenchTestDataUtil(WorkbenchDataManager workbenchDataManager) {
+	public WorkbenchTestDataUtil(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}
 
 	public Person createTestPersonData() {
-		Person person = new Person();
+		final Person person = new Person();
 		person.setInstituteId(1);
 		person.setFirstName("Test");
 		person.setMiddleName("M");
@@ -50,7 +50,7 @@ public class WorkbenchTestDataUtil {
 	}
 
 	public User createTestUserData() {
-		User user = new User();
+		final User user = new User();
 		user.setInstalid(1);
 		user.setStatus(1);
 		user.setAccess(1);
@@ -64,9 +64,9 @@ public class WorkbenchTestDataUtil {
 	}
 
 	public Project createTestProjectData() throws MiddlewareQueryException {
-		Project project = new Project();
+		final Project project = new Project();
 		project.setUserId(1);
-		int uniqueId = new Random().nextInt(10000);
+		final int uniqueId = new Random().nextInt(10000);
 		project.setProjectName("Test Project " + uniqueId);
 		project.setStartDate(new Date(System.currentTimeMillis()));
 		project.setCropType(this.cropType);
@@ -75,8 +75,8 @@ public class WorkbenchTestDataUtil {
 		return project;
 	}
 
-	public ProjectActivity createTestProjectActivityData(Project project, User user) {
-		ProjectActivity projectActivity = new ProjectActivity();
+	public ProjectActivity createTestProjectActivityData(final Project project, final User user) {
+		final ProjectActivity projectActivity = new ProjectActivity();
 		projectActivity.setProject(project);
 		projectActivity.setName("Project Activity" + new Random().nextInt());
 		projectActivity.setDescription("Some project activity");
@@ -108,18 +108,18 @@ public class WorkbenchTestDataUtil {
 		this.testProjectActivity2 = this.createTestProjectActivityData(this.commonTestProject, this.testUser2);
 		this.workbenchDataManager.addProjectActivity(this.testProjectActivity2);
 
-		UserInfo userInfo = new UserInfo();
+		final UserInfo userInfo = new UserInfo();
 		userInfo.setUserId(3);
 		userInfo.setLoginCount(5);
 		this.workbenchDataManager.insertOrUpdateUserInfo(userInfo);
 
-		ProjectUserInfo pui = new ProjectUserInfo();
+		final ProjectUserInfo pui = new ProjectUserInfo();
 		pui.setProjectId(new Integer(Integer.parseInt(this.commonTestProject.getProjectId().toString())));
 		pui.setUserId(this.commonTestProject.getUserId());
 		pui.setLastOpenDate(new Date());
 		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pui);
 
-		WorkbenchRuntimeData workbenchRuntimeData = new WorkbenchRuntimeData();
+		final WorkbenchRuntimeData workbenchRuntimeData = new WorkbenchRuntimeData();
 		workbenchRuntimeData.setUserId(1);
 		this.workbenchDataManager.updateWorkbenchRuntimeData(workbenchRuntimeData);
 		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString());
@@ -144,18 +144,18 @@ public class WorkbenchTestDataUtil {
 		}
 		return this.testUser1;
 	}
-	
-	public User getTestUser(boolean isAdmin) {
+
+	public User getTestUser(final boolean isAdmin) {
 		final User user = this.createTestUserData();
-		if(isAdmin) {
+		if (isAdmin) {
 			final List<UserRole> roles = new ArrayList<>();
 			roles.add(new UserRole(user, "ADMIN"));
 			user.setRoles(roles);
 		}
 		return user;
 	}
-	
-	public ProjectUserInfo getProjectUserInfo(int projectId, int userId) {
+
+	public ProjectUserInfo getProjectUserInfo(final int projectId, final int userId) {
 		final ProjectUserInfo pui = new ProjectUserInfo();
 		pui.setProjectId(projectId);
 		pui.setUserId(userId);
