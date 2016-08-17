@@ -26,6 +26,16 @@ public class LocationTestDataInitializer {
 		return location;
 	}
 
+	public Location createLocation(final Integer locId, final String lname, final Integer locationType,
+			final String locationAbbreviation) {
+		final Location location = new Location();
+		location.setLocid(locId);
+		location.setLname(lname);
+		location.setLtype(locationType);
+		location.setLabbr(locationAbbreviation);
+		return location;
+	}
+
 	public List<Location> createLocationList(final int noOfLocations) {
 		final List<Location> locations = new ArrayList<Location>();
 
