@@ -59,7 +59,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	private User testUser1;
 
 	@Before
-	public void beforeTest() throws MiddlewareQueryException {
+	public void beforeTest() {
 		if (this.workbenchTestDataUtil == null) {
 			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
 			this.workbenchTestDataUtil.setUpWorkbench();
@@ -75,7 +75,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddUser() throws MiddlewareQueryException {
+	public void testAddUser() {
 		User user = this.workbenchTestDataUtil.createTestUserData();
 		Integer result = this.workbenchDataManager.addUser(user);
 		Assert.assertNotNull("Expected id of a newly saved record in workbench_user.", result);
@@ -85,7 +85,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddPerson() throws MiddlewareQueryException {
+	public void testAddPerson() {
 		Person person = this.workbenchTestDataUtil.createTestPersonData();
 		Integer result = this.workbenchDataManager.addPerson(person);
 		Assert.assertNotNull("Expected id of a newly saved record in persons.", result);
@@ -95,7 +95,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddUsersWithRoles() throws MiddlewareQueryException {
+	public void testAddUsersWithRoles() {
 		// Admin
 		Person adminPerson = new Person();
 		adminPerson.setFirstName("Naymesh");
@@ -203,7 +203,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddProject() throws MiddlewareQueryException {
+	public void testAddProject() {
 		final Project project = this.workbenchTestDataUtil.createTestProjectData();
 		this.workbenchDataManager.addProject(project);
 		Assert.assertNotNull("Expected id of a newly saved record in workbench_project.", project.getProjectId());
@@ -213,7 +213,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testProjectActivity() throws MiddlewareQueryException {
+	public void testProjectActivity() {
 		ProjectActivity projectActivity = this.workbenchTestDataUtil.createTestProjectActivityData(this.commonTestProject, this.testUser1);
 		Integer result = this.workbenchDataManager.addProjectActivity(projectActivity);
 		Assert.assertNotNull("Expected id of a newly saved record in workbench_project_activity", result);
@@ -228,7 +228,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testIbdbUserMap() throws MiddlewareQueryException {
+	public void testIbdbUserMap() {
 		IbdbUserMap userMap = new IbdbUserMap();
 		userMap.setProjectId(this.commonTestProject.getProjectId());
 		userMap.setIbdbUserId(this.testUser1.getUserid() * -1);
@@ -258,35 +258,35 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetProjects() throws MiddlewareQueryException {
+	public void testGetProjects() {
 		List<Project> projects = this.workbenchDataManager.getProjects();
 		Assert.assertNotNull(projects);
 		Assert.assertTrue(!projects.isEmpty());
 	}
 
 	@Test
-	public void testGetToolWithName() throws MiddlewareQueryException {
+	public void testGetToolWithName() {
 		String toolName = "fieldbook_web";
 		Tool tool = this.workbenchDataManager.getToolWithName(toolName);
 		Assert.assertNotNull(tool);
 	}
 
 	@Test
-	public void testGetProjectByName() throws MiddlewareQueryException {
+	public void testGetProjectByName() {
 		final Project project = this.workbenchDataManager.getProjectByNameAndCrop(this.commonTestProject.getProjectName(), this
 				.commonTestProject.getCropType());
 		Assert.assertEquals(this.commonTestProject.getProjectName(), project.getProjectName());
 	}
 
 	@Test
-	public void testGetUserByName() throws MiddlewareQueryException {
+	public void testGetUserByName() {
 		User user = this.workbenchDataManager.getUserByName(this.testUser1.getName(), 0, 1, Operation.EQUAL).get(0);
 		Assert.assertEquals(this.testUser1.getName(), user.getName());
 		Assert.assertEquals(this.testUser1.getUserid(), user.getUserid());
 	}
 
 	@Test
-	public void testWorkbenchDataset() throws MiddlewareQueryException {
+	public void testWorkbenchDataset() {
 		WorkbenchDataset dataset1 = this.createTestWorkbenchDataset(this.commonTestProject);
 		Integer result = this.workbenchDataManager.addWorkbenchDataset(dataset1);
 		Assert.assertNotNull("Expected id of the newly added record in workbench_dataset", result);
@@ -312,7 +312,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testProjectUserRoles() throws MiddlewareQueryException {
+	public void testProjectUserRoles() {
 
 		Role role1 = this.workbenchDataManager.getAllRoles().get(0);
 		Role role2 = this.workbenchDataManager.getAllRoles().get(1);
@@ -349,7 +349,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddToolConfiguration() throws MiddlewareQueryException {
+	public void testAddToolConfiguration() {
 		Long toolId = 1L;
 		ToolConfiguration toolConfig = new ToolConfiguration();
 		Tool tool = new Tool();
@@ -364,7 +364,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetListOfToolConfigurationsByToolId() throws MiddlewareQueryException {
+	public void testGetListOfToolConfigurationsByToolId() {
 		Long toolId = 1L;
 		List<ToolConfiguration> result = this.workbenchDataManager.getListOfToolConfigurationsByToolId(toolId);
 		Debug.println(IntegrationTestBase.INDENT, "testGetListOfToolConfigurationsByToolId(" + toolId + "): ");
@@ -379,7 +379,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetToolConfigurationByToolIdAndConfigKey() throws MiddlewareQueryException {
+	public void testGetToolConfigurationByToolIdAndConfigKey() {
 		Long toolId = 1L;
 		String configKey = "test";
 		ToolConfiguration toolConfig = this.workbenchDataManager.getToolConfigurationByToolIdAndConfigKey(toolId, configKey);
@@ -388,7 +388,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCropType() throws MiddlewareQueryException {
+	public void testCropType() {
 		String cropName = "Coconut";
 		CropType cropType = new CropType(cropName);
 		String added = this.workbenchDataManager.addCropType(cropType);
@@ -404,7 +404,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetRoleById() throws MiddlewareQueryException {
+	public void testGetRoleById() {
 		Integer id = 1; // Assumption: there is a role with id 1
 		Role role = this.workbenchDataManager.getRoleById(id);
 		Assert.assertNotNull(role);
@@ -412,7 +412,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetRoleByNameAndWorkflowTemplate() throws MiddlewareQueryException {
+	public void testGetRoleByNameAndWorkflowTemplate() {
 		String templateName = "MARS";
 		String roleName = "MARS Breeder";
 		WorkflowTemplate workflowTemplate = this.workbenchDataManager.getWorkflowTemplateByName(templateName).get(0);
@@ -423,7 +423,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetRolesByWorkflowTemplate() throws MiddlewareQueryException {
+	public void testGetRolesByWorkflowTemplate() {
 		WorkflowTemplate workflowTemplate = this.workbenchDataManager.getWorkflowTemplates().get(0); // get the
 		// first
 		// template
@@ -440,7 +440,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetWorkflowTemplateByRole() throws MiddlewareQueryException {
+	public void testGetWorkflowTemplateByRole() {
 		Role role = this.workbenchDataManager.getRoleById(this.workbenchDataManager.getAllRoles().get(0).getRoleId());
 		WorkflowTemplate template = this.workbenchDataManager.getWorkflowTemplateByRole(role);
 		Assert.assertNotNull(template);
@@ -448,14 +448,14 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllRoles() throws MiddlewareQueryException {
+	public void testGetAllRoles() {
 		List<Role> roles = this.workbenchDataManager.getAllRoles();
 		Assert.assertNotNull(roles);
 		Assert.assertTrue(!roles.isEmpty());
 	}
 
 	@Test
-	public void testProjectUserMysqlAccount() throws MiddlewareQueryException {
+	public void testProjectUserMysqlAccount() {
 		ProjectUserMysqlAccount recordToSave = new ProjectUserMysqlAccount();
 		recordToSave.setProject(this.commonTestProject);
 		recordToSave.setUser(this.testUser1);
@@ -476,80 +476,80 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountAllPersons() throws MiddlewareQueryException {
+	public void testCountAllPersons() {
 		long count = this.workbenchDataManager.countAllPersons();
 		Assert.assertTrue(count > 0);
 	}
 
 	@Test
-	public void testCountAllUsers() throws MiddlewareQueryException {
+	public void testCountAllUsers() {
 		long count = this.workbenchDataManager.countAllUsers();
 		Assert.assertTrue(count > 0);
 	}
 
 	@Test
-	public void testGetAllPersons() throws MiddlewareQueryException {
+	public void testGetAllPersons() {
 		List<Person> results = this.workbenchDataManager.getAllPersons();
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 	}
 
 	@Test
-	public void testGetAllRolesDesc() throws MiddlewareQueryException {
+	public void testGetAllRolesDesc() {
 		List<Role> results = this.workbenchDataManager.getAllRolesDesc();
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 	}
 
 	@Test
-	public void testGetAllRolesOrderedByLabel() throws MiddlewareQueryException {
+	public void testGetAllRolesOrderedByLabel() {
 		List<Role> results = this.workbenchDataManager.getAllRolesOrderedByLabel();
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 	}
 
 	@Test
-	public void testGetAllTools() throws MiddlewareQueryException {
+	public void testGetAllTools() {
 		List<Tool> results = this.workbenchDataManager.getAllTools();
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 	}
 
 	@Test
-	public void testGetAllUsers() throws MiddlewareQueryException {
+	public void testGetAllUsers() {
 		List<User> results = this.workbenchDataManager.getAllUsers();
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 	}
 
 	@Test
-	public void testGetAllUsersSorted() throws MiddlewareQueryException {
+	public void testGetAllUsersSorted() {
 		List<User> results = this.workbenchDataManager.getAllUsersSorted();
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 	}
 
 	@Test
-	public void testGetLastOpenedProject() throws MiddlewareQueryException {
+	public void testGetLastOpenedProject() {
 		Project results = this.workbenchDataManager.getLastOpenedProject(this.testUser1.getUserid());
 		Assert.assertNotNull(results);
 	}
 
 	@Test
-	public void testGetProjectsList() throws MiddlewareQueryException {
+	public void testGetProjectsList() {
 		List<Project> results = this.workbenchDataManager.getProjects(0, 100);
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 	}
 
 	@Test
-	public void testGetUserById() throws MiddlewareQueryException {
+	public void testGetUserById() {
 		User user = this.workbenchDataManager.getUserById(this.testUser1.getUserid());
 		Assert.assertNotNull(user);
 	}
 
 	@Test
-	public void testGetWorkbenchDatasetById() throws MiddlewareQueryException {
+	public void testGetWorkbenchDatasetById() {
 		WorkbenchDataset testDataset = this.createTestWorkbenchDataset(this.commonTestProject);
 		Integer result = this.workbenchDataManager.addWorkbenchDataset(testDataset);
 
@@ -559,13 +559,13 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetWorkbenchRuntimeData() throws MiddlewareQueryException {
+	public void testGetWorkbenchRuntimeData() {
 		WorkbenchRuntimeData result = this.workbenchDataManager.getWorkbenchRuntimeData();
 		Assert.assertNotNull(result);
 	}
 
 	@Test
-	public void testGetWorkflowTemplateByName() throws MiddlewareQueryException {
+	public void testGetWorkflowTemplateByName() {
 		String name = "Manager";
 		List<WorkflowTemplate> results = this.workbenchDataManager.getWorkflowTemplateByName(name);
 		Assert.assertNotNull(results);
@@ -573,41 +573,41 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetWorkflowTemplatesList() throws MiddlewareQueryException {
+	public void testGetWorkflowTemplatesList() {
 		List<WorkflowTemplate> results = this.workbenchDataManager.getWorkflowTemplates();
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 	}
 
 	@Test
-	public void testDeletePerson() throws MiddlewareQueryException {
+	public void testDeletePerson() {
 		Person person = this.workbenchTestDataUtil.createTestPersonData();
 		this.workbenchDataManager.addPerson(person);
 		this.workbenchDataManager.deletePerson(person);
 	}
 
 	@Test
-	public void testGetWorkflowTemplates() throws MiddlewareQueryException {
+	public void testGetWorkflowTemplates() {
 		List<WorkflowTemplate> results = this.workbenchDataManager.getWorkflowTemplates(0, 100);
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 	}
 
 	@Test
-	public void testGetProjectUserInfoDao() throws MiddlewareQueryException {
+	public void testGetProjectUserInfoDao() {
 		ProjectUserInfoDAO results = this.workbenchDataManager.getProjectUserInfoDao();
 		Assert.assertNotNull(results);
 	}
 
 	@Test
-	public void testGetToolDao() throws MiddlewareQueryException {
+	public void testGetToolDao() {
 		ToolDAO results = this.workbenchDataManager.getToolDao();
 		Assert.assertNotNull(results);
 		Debug.println(IntegrationTestBase.INDENT, results.toString());
 	}
 
 	@Test
-	public void testGetToolsWithType() throws MiddlewareQueryException {
+	public void testGetToolsWithType() {
 		List<Tool> results = this.workbenchDataManager.getToolsWithType(ToolType.NATIVE);
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
@@ -615,7 +615,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetTemplateSettings() throws MiddlewareQueryException {
+	public void testGetTemplateSettings() {
 
 		TemplateSetting templateSetting = this.createTemplateSetting();
 
@@ -637,7 +637,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	}
 
-	private void getTemplateSetting(String filterDescription, TemplateSetting templateSettingFilter) throws MiddlewareQueryException {
+	private void getTemplateSetting(String filterDescription, TemplateSetting templateSettingFilter) {
 		List<TemplateSetting> settings = this.workbenchDataManager.getTemplateSettings(templateSettingFilter);
 		Assert.assertTrue(settings.size() > 0);
 		Debug.println(IntegrationTestBase.INDENT, "Retrieve records by " + filterDescription + ": #records = " + settings.size());
@@ -645,7 +645,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddAndDeleteTemplateSettings() throws MiddlewareQueryException {
+	public void testAddAndDeleteTemplateSettings() {
 		TemplateSetting templateSetting = this.createTemplateSetting();
 
 		this.workbenchDataManager.addTemplateSetting(templateSetting);
@@ -655,14 +655,14 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testDeleteTemplateSettingById() throws MiddlewareQueryException {
+	public void testDeleteTemplateSettingById() {
 		TemplateSetting templateSetting = this.createTemplateSetting();
 		this.workbenchDataManager.addTemplateSetting(templateSetting);
 		Assert.assertNotNull(templateSetting.getTemplateSettingId());
 	}
 
 	@Test
-	public void testUpdateTemplateSettings() throws MiddlewareQueryException {
+	public void testUpdateTemplateSettings() {
 
 		TemplateSetting templateSetting = this.createTemplateSetting();
 		this.workbenchDataManager.addTemplateSetting(templateSetting);
@@ -675,7 +675,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddTemplateSettingsSameIsDefaultProjectAndTool() throws MiddlewareQueryException {
+	public void testAddTemplateSettingsSameIsDefaultProjectAndTool() {
 
 		TemplateSetting templateSetting1 = this.createTemplateSetting();
 		templateSetting1.setIsDefault(Boolean.TRUE);
@@ -696,7 +696,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testUpdateTemplateSettingsSameIsDefaultProjectAndTool() throws MiddlewareQueryException {
+	public void testUpdateTemplateSettingsSameIsDefaultProjectAndTool() {
 
 		TemplateSetting templateSetting1 = this.createTemplateSetting();
 		templateSetting1.setIsDefault(Boolean.FALSE);
@@ -724,7 +724,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	}
 
-	private TemplateSetting createTemplateSetting() throws MiddlewareQueryException {
+	private TemplateSetting createTemplateSetting() {
 		Integer templateSettingId = null;
 		Integer projectId = 1;
 		Tool tool = this.workbenchDataManager.getToolWithName("nursery_manager_fieldbook_web");
@@ -816,7 +816,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals("Should return the same name", "configuration_1_1", result.get(0).getName());
 	}
 
-	protected List<StandardPreset> initializeStandardPresets() throws MiddlewareQueryException {
+	protected List<StandardPreset> initializeStandardPresets() {
 		List<StandardPreset> fulllist = new ArrayList<>();
 		for (int j = 1; j < 3; j++) {
 			for (int i = 1; i < 6; i++) {

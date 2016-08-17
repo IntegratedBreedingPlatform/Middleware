@@ -14,7 +14,6 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.hibernate.Criteria;
@@ -29,7 +28,7 @@ import org.hibernate.criterion.Restrictions;
 public class ProjectDAO extends GenericDAO<Project, Long> {
 
 	@Override
-	public Project getById(Long projectId) throws MiddlewareQueryException {
+	public Project getById(final Long projectId) {
 		try {
 			if (projectId != null) {
 				Criteria criteria =
@@ -42,7 +41,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		return null;
 	}
 
-	public Project getByUuid(String projectUuid) throws MiddlewareQueryException {
+	public Project getByUuid(final String projectUuid) {
 
 		try {
 			if (projectUuid != null) {
@@ -67,13 +66,13 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		query.executeUpdate();
 	}
 
-	public Project getProjectByNameAndCrop(final String projectName, final CropType cropType) throws MiddlewareQueryException {
 		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("projectName", projectName)).add
 				(Restrictions.eq("cropType", cropType)).setMaxResults(1);
+	public Project getProjectByNameAndCrop(final String projectName, final CropType cropType) {
 		return (Project) criteria.uniqueResult();
 	}
 
-	public Project getLastOpenedProject(Integer userId) throws MiddlewareQueryException {
+	public Project getLastOpenedProject(final Integer userId) {
 		try {
 			if (userId != null) {
 				StringBuilder sb = new StringBuilder();
@@ -96,7 +95,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		return null;
 	}
 
-	public Project getLastOpenedProjectAnyUser() throws MiddlewareQueryException {
+	public Project getLastOpenedProjectAnyUser() {
 		try {
 
 			StringBuilder sb = new StringBuilder();
