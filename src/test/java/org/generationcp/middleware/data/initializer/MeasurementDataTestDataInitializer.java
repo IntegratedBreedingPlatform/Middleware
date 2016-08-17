@@ -90,5 +90,12 @@ public class MeasurementDataTestDataInitializer {
 
 		return this.createCategoricalMeasurementData(termId, label, value, possibleValues);
 	}
+	
+	public MeasurementData createMeasurementData(final String value) {
+		final MeasurementData wData = new MeasurementData();
+		wData.setEditable(true);
+		wData.setValue(value);
 
+		return wData;
+	}
 }
