@@ -34,7 +34,6 @@ public class QueryTest {
 		final List<TraitDto> traitNames = new LinkedList<TraitDto>();
 		traitNames.add(new TraitDto(1,"PH_cm"));
 		String result = fixture.getObservationQuery(traitNames);
-		System.out.println(formatString(result));
 		assertEquals("The expected query must match our expected queyr",
 				formatString(expectedQueryForTheQueryGenerationTest()),
 				formatString(result));
@@ -45,111 +44,29 @@ public class QueryTest {
 	}
 
 	private String expectedQueryForTheQueryGenerationTest() {
-		return "    SELECT\n" + 
-				"        nde.nd_experiment_id,\n" + 
-				"        gl.description AS TRIAL_INSTANCE,\n" + 
-				"        (SELECT\n" + 
-				"            iispcvt.definition   \n" + 
-				"        FROM\n" + 
-				"            stockprop isp     \n" + 
-				"        INNER JOIN\n" + 
-				"            cvterm ispcvt \n" + 
-				"                ON ispcvt.cvterm_id = isp.type_id     \n" + 
-				"        INNER JOIN\n" + 
-				"            cvterm iispcvt \n" + 
-				"                ON iispcvt.cvterm_id = isp.value   \n" + 
-				"        WHERE\n" + 
-				"            isp.stock_id = s.stock_id     \n" + 
-				"            AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE,\n" + 
-				"        s.dbxref_id AS GID,\n" + 
-				"        s.name DESIGNATION,\n" + 
-				"        s.uniquename ENTRY_NO,\n" + 
-				"        (SELECT\n" + 
-				"            isp.value   \n" + 
-				"        FROM\n" + 
-				"            stockprop isp     \n" + 
-				"        INNER JOIN\n" + 
-				"            cvterm ispcvt1 \n" + 
-				"                ON ispcvt1.cvterm_id = isp.type_id   \n" + 
-				"        WHERE\n" + 
-				"            isp.stock_id = s.stock_id     \n" + 
-				"            AND ispcvt1.name = 'SEED_SOURCE') SEED_SOURCE,\n" + 
-				"        (SELECT\n" + 
-				"            ndep.value   \n" + 
-				"        FROM\n" + 
-				"            nd_experimentprop ndep     \n" + 
-				"        INNER JOIN\n" + 
-				"            cvterm ispcvt \n" + 
-				"                ON ispcvt.cvterm_id = ndep.type_id   \n" + 
-				"        WHERE\n" + 
-				"            ndep.nd_experiment_id = ep.nd_experiment_id     \n" + 
-				"            AND ispcvt.name = 'REP_NO') REP_NO,\n" + 
-				"        (SELECT\n" + 
-				"            ndep.value   \n" + 
-				"        FROM\n" + 
-				"            nd_experimentprop ndep     \n" + 
-				"        INNER JOIN\n" + 
-				"            cvterm ispcvt \n" + 
-				"                ON ispcvt.cvterm_id = ndep.type_id   \n" + 
-				"        WHERE\n" + 
-				"            ndep.nd_experiment_id = ep.nd_experiment_id     \n" + 
-				"            AND ispcvt.name = 'PLOT_NO') PLOT_NO,\n" + 
-				"        PH_cm.PhenotypeValue  AS PH_cm,\n" + 
-				"        PH_cm.phenotype_id AS PH_cm_PhenotypeId \n" + 
-				"    FROM\n" + 
-				"        Project p   \n" + 
-				"    INNER JOIN\n" + 
-				"        project_relationship pr \n" + 
-				"            ON p.project_id = pr.subject_project_id   \n" + 
-				"    INNER JOIN\n" + 
-				"        nd_experiment_project ep \n" + 
-				"            ON pr.subject_project_id = ep.project_id   \n" + 
-				"    INNER JOIN\n" + 
-				"        nd_experiment nde \n" + 
-				"            ON nde.nd_experiment_id = ep.nd_experiment_id   \n" + 
-				"    INNER JOIN\n" + 
-				"        nd_geolocation gl \n" + 
-				"            ON nde.nd_geolocation_id = gl.nd_geolocation_id   \n" + 
-				"    INNER JOIN\n" + 
-				"        nd_experiment_stock es \n" + 
-				"            ON ep.nd_experiment_id = es.nd_experiment_id   \n" + 
-				"    INNER JOIN\n" + 
-				"        Stock s \n" + 
-				"            ON s.stock_id = es.stock_id   \n" + 
-				"    LEFT OUTER JOIN\n" + 
-				"        (\n" + 
-				"            SELECT\n" + 
-				"                nep.nd_experiment_id,\n" + 
-				"                pt.phenotype_id,\n" + 
-				"                IF(cvterm_id = cvterm_id,\n" + 
-				"                pt.value,\n" + 
-				"                NULL) AS PhenotypeValue  \n" + 
-				"            FROM\n" + 
-				"                phenotype pt  \n" + 
-				"            INNER JOIN\n" + 
-				"                cvterm svdo \n" + 
-				"                    ON svdo.cvterm_id = pt.observable_id  \n" + 
-				"            INNER JOIN\n" + 
-				"                nd_experiment_phenotype nep \n" + 
-				"                    ON nep.phenotype_id = pt.phenotype_id  \n" + 
-				"            WHERE\n" + 
-				"                svdo.name = ?\n" + 
-				"        ) PH_cm \n" + 
-				"            ON PH_cm.nd_experiment_id = nde.nd_experiment_id \n" + 
-				"    WHERE\n" + 
-				"p.project_id= (\n" + 
-				"	Select\n" + 
-				"		p.project_id\n" + 
-				"	from\n" + 
-				"			project_relationshippr\n" + 
-				"	INNER JOIN\n" + 
-				"projectp\n" + 
-				"on p.project_id=pr.subject_project_id\n" + 
-				"where\n" + 
-				"(\n" +
-				"pr.object_project_id = ?\n" + 
-				"and name LIKE '%PLOTDATA'\n" + 
-				")\n)";
+		return "SELECT \n" + "    nde.nd_experiment_id,\n" + "    gl.description AS TRIAL_INSTANCE,\n"
+				+ "    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE, \n"
+				+ "    s.dbxref_id AS GID,\n" + "    s.name DESIGNATION,\n" + "    s.uniquename ENTRY_NO,\n"
+				+ "    (SELECT isp.value FROM stockprop isp INNER JOIN cvterm ispcvt1 ON ispcvt1.cvterm_id = isp.type_id WHERE isp.stock_id = s.stock_id AND ispcvt1.name = 'SEED_SOURCE') SEED_SOURCE, \n"
+				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO, \n"
+				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'PLOT_NO') PLOT_NO, \n"
+				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') BLOCK_NO, \n"
+				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'ROW') ROW_NO, \n"
+				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'COL') COL_NO, \n"
+				+ " MAX(IF(cvterm_variable.name = 'PH_cm', ph.value, NULL)) AS PH_cm, \n"
+				+ " MAX(IF(cvterm_variable.name = 'PH_cm', ph.phenotype_id, NULL)) AS PH_cm_PhenotypeId, \n" + " 1=1 FROM \n"
+				+ "    project p \n" + "        INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
+				+ "        INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id \n"
+				+ "        INNER JOIN nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id \n"
+				+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
+				+ "        INNER JOIN nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id \n"
+				+ "        INNER JOIN stock s ON s.stock_id = es.stock_id \n"
+				+ "        LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
+				+ "        LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n"
+				+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n" + " WHERE \n"
+				+ "		gl.description = :instance_number \n"
+				+ "       AND p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n"
+				+ " GROUP BY nde.nd_experiment_id ORDER BY (1 * REP_NO), (1 * PLOT_NO) ";
 	}
 
 }
