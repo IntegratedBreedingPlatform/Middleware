@@ -55,7 +55,7 @@ class ObservationQuery {
 				" WHERE \n" + 
 				"		gl.description = :instance_number \n" + 
 				"       AND p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n" + 
-				" GROUP BY nde.nd_experiment_id, TRIAL_INSTANCE ");
+				" GROUP BY nde.nd_experiment_id ORDER BY (1 * REP_NO), (1 * PLOT_NO) ");
 				
 				
 		return sqlBuilder.toString();
