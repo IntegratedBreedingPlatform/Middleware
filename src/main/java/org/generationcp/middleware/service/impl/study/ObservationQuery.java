@@ -62,7 +62,7 @@ class ObservationQuery {
 	}
 
 	String getSingleObservationQuery(final List<TraitDto> traits) {
-		return this.getObservationQuery(traits) + "AND nde.nd_experiment_id = ?";
+		return this.getObservationQuery(traits) + "AND nde.nd_experiment_id = :experiment_id";
 
 	}
 }

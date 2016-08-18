@@ -57,8 +57,9 @@ public class StudyMeasurements {
 	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier, final List<TraitDto> traits,
 			final String generateQuery, final Integer measurementId) {
 		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(traits, generateQuery);
-
-		this.setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery, measurementId);
+		createSQLQuery.setParameter("studyId", projectBusinessIdentifier);
+		createSQLQuery.setParameter("instance_number", "1");
+		createSQLQuery.setParameter("experiment_id", measurementId);
 
 		return this.mapResults(createSQLQuery.list(), traits);
 	}
@@ -106,20 +107,4 @@ public class StudyMeasurements {
 		}
 		return Collections.unmodifiableList(measurements);
 	}
-
-	private void setQueryParameters(int projectBusinessIdentifier, List<TraitDto> traits, SQLQuery createSQLQuery, Integer measurementId) {
-		int parameterCounter = this.setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery);
-		createSQLQuery.setParameter(parameterCounter++, measurementId);
-
-	}
-
-	private int setQueryParameters(final int studyIdentifier, final List<TraitDto> projectTraits, final SQLQuery createSQLQuery) {
-		int counter = 0;
-		for (final TraitDto trait : projectTraits) {
-			createSQLQuery.setParameter(counter++, trait.getTraitName());
-		}
-		createSQLQuery.setParameter(counter++, studyIdentifier);
-		return counter;
-	}
-
 }
