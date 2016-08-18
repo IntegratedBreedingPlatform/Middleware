@@ -49,10 +49,10 @@ public class StudyServiceImplTest {
 				new ObservationDto(1, "trialInstance", "entryType", 1234, "designation", "entryNo", "seedSource", "repitionNumber",
 						"plotNumber", traits);
 		final List<ObservationDto> testMeasurements = Collections.<ObservationDto>singletonList(measurement);
-		Mockito.when(mockTrailMeasurements.getAllMeasurements(1234, projectTraits)).thenReturn(testMeasurements);
-		result.getObservations(1234);
+		Mockito.when(mockTrailMeasurements.getAllMeasurements(1234, projectTraits, 1, 1, 100)).thenReturn(testMeasurements);
+		result.getObservations(1234, 1, 1, 100);
 
-		final List<ObservationDto> allMeasurements = mockTrailMeasurements.getAllMeasurements(1234, projectTraits);
+		final List<ObservationDto> allMeasurements = mockTrailMeasurements.getAllMeasurements(1234, projectTraits, 1, 1, 100);
 		Assert.assertEquals(allMeasurements, testMeasurements);
 	}
 

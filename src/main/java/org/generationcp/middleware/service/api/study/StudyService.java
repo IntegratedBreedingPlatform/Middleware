@@ -7,7 +7,7 @@ public interface StudyService {
 
 	List<StudySummary> search(final StudySearchParameters serchParameters);
 
-	List<ObservationDto> getObservations(final int studyIdentifier);
+	List<ObservationDto> getObservations(final int studyIdentifier, final int instanceNumber, final int pageNumber, final int pageSize);
 
 	List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier);
 

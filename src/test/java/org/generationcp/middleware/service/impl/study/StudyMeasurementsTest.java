@@ -57,7 +57,8 @@ public class StudyMeasurementsTest {
 		Mockito.when(this.session.createSQLQuery(new ObservationQuery().getObservationQuery(this.testTraits)))
 				.thenReturn(this.mockSqlQuery);
 
-		List<ObservationDto> returnedMeasurements = this.trailTraits.getAllMeasurements(this.TEST_PROJECT_IDENTIFIER, this.testTraits);
+		List<ObservationDto> returnedMeasurements =
+				this.trailTraits.getAllMeasurements(this.TEST_PROJECT_IDENTIFIER, this.testTraits, 1, 1, 100);
 
 		this.verifyScalarSetting();
 		Mockito.verify(this.mockSqlQuery).setParameter(Matchers.eq("instance_number"), Matchers.anyString());

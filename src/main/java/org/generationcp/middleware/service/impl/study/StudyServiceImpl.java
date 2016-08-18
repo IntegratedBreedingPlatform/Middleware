@@ -158,11 +158,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<ObservationDto> getObservations(final int studyIdentifier) {
+	public List<ObservationDto> getObservations(final int studyIdentifier, final int instanceNumber, final int pageNumber,
+			final int pageSize) {
 
 		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
 
-		return this.studyMeasurements.getAllMeasurements(studyIdentifier, traits);
+		return this.studyMeasurements.getAllMeasurements(studyIdentifier, traits, instanceNumber, pageNumber, pageSize);
 	}
 
 	@Override
