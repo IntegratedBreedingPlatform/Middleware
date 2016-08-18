@@ -10,6 +10,7 @@ import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.TraitDto;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.type.IntegerType;
 
 public class StudyMeasurements {
 
@@ -44,8 +45,10 @@ public class StudyMeasurements {
 	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier, final List<TraitDto> traits,
 			final String generateQuery) {
 		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(traits, generateQuery);
-
-		this.setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery);
+		createSQLQuery.setParameter("studyId", projectBusinessIdentifier);
+		createSQLQuery.setParameter("instance_number", "1");
+		createSQLQuery.setFirstResult(0);
+		createSQLQuery.setMaxResults(100);
 
 		return this.mapResults(createSQLQuery.list(), traits);
 	}
@@ -72,10 +75,13 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar("SEED_SOURCE");
 		createSQLQuery.addScalar("REP_NO");
 		createSQLQuery.addScalar("PLOT_NO");
+		createSQLQuery.addScalar("BLOCK_NO");
+		createSQLQuery.addScalar("ROW_NO");
+		createSQLQuery.addScalar("COL_NO");
 
 		for (final TraitDto trait : traits) {
 			createSQLQuery.addScalar(trait.getTraitName());
-			createSQLQuery.addScalar(trait.getTraitName() + "_PhenotypeId");
+			createSQLQuery.addScalar(trait.getTraitName() + "_PhenotypeId", new IntegerType());
 		}
 		return createSQLQuery;
 	}
@@ -89,14 +95,13 @@ public class StudyMeasurements {
 				final List<MeasurementDto> traitResults = new ArrayList<MeasurementDto>();
 				int counterTwo = 1;
 				for (final TraitDto trait : projectTraits) {
-					traitResults.add(new MeasurementDto(trait, (Integer) row[8 + counterTwo + 1], (String) row[8 + counterTwo]));
+					traitResults.add(new MeasurementDto(trait, (Integer) row[11 + counterTwo + 1], (String) row[11 + counterTwo]));
 					counterTwo += 2;
 				}
 				ObservationDto measurement =
 						new ObservationDto((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[3], (String) row[4],
-								(String) row[5], (String) row[6], (String) row[7], (String) row[7], traitResults);
+								(String) row[5], (String) row[6], (String) row[7], (String) row[8], traitResults);
 				measurements.add(measurement);
-
 			}
 		}
 		return Collections.unmodifiableList(measurements);
