@@ -321,6 +321,15 @@ public interface WorkbenchDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Project getProjectByUuid(String projectUuid) throws MiddlewareQueryException;
+	
+	/**
+	 * Gets a program by uuid and crop
+	 * 
+	 * @param uniqueID
+	 * @param crop
+	 * @return the program for the specified crop
+	 */
+	Project getProgramByUuidAndCrop(String uniqueID, String crop);
 
 	/**
 	 * Updates all the project roles for a project.

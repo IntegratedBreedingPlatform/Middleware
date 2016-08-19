@@ -66,6 +66,12 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		query.executeUpdate();
 	}
 
+	public Project getProgramByUuidAndCrop(final String projectUuid, final String cropType) throws MiddlewareQueryException {
+		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("project_uuid", projectUuid)).add
+				(Restrictions.eq("cropType", cropType)).setMaxResults(1);
+		return (Project) criteria.uniqueResult();
+	}
+	
 	public Project getProjectByNameAndCrop(final String projectName, final CropType cropType) throws MiddlewareQueryException {
 		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("projectName", projectName)).add
 				(Restrictions.eq("cropType", cropType)).setMaxResults(1);
