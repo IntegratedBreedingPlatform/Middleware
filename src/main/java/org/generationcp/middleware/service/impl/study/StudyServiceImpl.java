@@ -30,7 +30,9 @@ import org.generationcp.middleware.service.api.study.TraitDto;
 import org.generationcp.middleware.service.api.study.TraitService;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.type.IntegerType;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.cache.CacheBuilder;
@@ -203,6 +205,41 @@ public class StudyServiceImpl extends Service implements StudyService {
 		} catch (ExecutionException e) {
 			throw new MiddlewareQueryException("Unexpected error updating observations. Please contact support for "
 					+ "further assistence.", e);
+		}
+	}
+	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public List<StudyInstance> getStudyInstances(int studyId) {
+
+		try {
+			String sql = 
+					" select gl.nd_geolocation_id, gl.description"
+					+ "  from \n" 
+					+ "	nd_geolocation gl \n"
+					+ "    inner join nd_experiment nde on nde.nd_geolocation_id = gl.nd_geolocation_id \n"
+					+ "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
+					+ "    inner join project proj on proj.project_id = ndep.project_id \n" 
+					+ " where \n"
+					+ "	   proj.project_id = (select  p.project_id from project_relationship pr inner join project p on p.project_id = pr.subject_project_id where (pr.object_project_id = :studyId and name like '%ENVIRONMENT')) \n"
+					+ "    order by (1 * gl.description) asc";
+
+			SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
+			query.setParameter("studyId", studyId);
+			query.addScalar("nd_geolocation_id", new IntegerType());
+			// Bad design legacy: The nd_geolocation.description column is hijacked to store study instance number.
+			query.addScalar("description", new IntegerType());
+			
+			final List queryResults = query.list();
+			final List<StudyInstance> instances = new ArrayList<>();
+			for (final Object result : queryResults) {				
+				Object[] row = (Object[]) result;
+				instances.add(new StudyInstance((Integer) row[0], (Integer) row[1]));
+			}
+			return instances;
+		} catch (HibernateException he) {
+			throw new MiddlewareQueryException(
+					"Unexpected error in executing getAllStudyInstanceNumbers(studyId = " + studyId + ") query: " + he.getMessage(), he);
 		}
 	}
 }
