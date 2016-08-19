@@ -54,7 +54,7 @@ public class StudyMeasurementsTest {
 	@Test
 	public void allPlotsMeasurementQueryRetrievesDataCorrectly() throws Exception {
 
-		Mockito.when(this.session.createSQLQuery(new ObservationQuery().getObservationQuery(this.testTraits)))
+		Mockito.when(this.session.createSQLQuery(new ObservationQuery().getAllObservationsQuery(this.testTraits)))
 				.thenReturn(this.mockSqlQuery);
 
 		List<ObservationDto> returnedMeasurements =
@@ -82,7 +82,6 @@ public class StudyMeasurementsTest {
 				this.trailTraits.getMeasurement(this.TEST_PROJECT_IDENTIFIER, this.testTraits, this.TEST_PLOT_IDENTIFIER);
 
 		this.verifyScalarSetting();
-		Mockito.verify(this.mockSqlQuery).setParameter(Matchers.eq("instance_number"), Matchers.anyString());
 		Mockito.verify(this.mockSqlQuery).setParameter(Matchers.eq("studyId"), Matchers.eq(this.TEST_PROJECT_IDENTIFIER));
 		Mockito.verify(this.mockSqlQuery).setParameter(Matchers.eq("experiment_id"), Matchers.eq(this.TEST_PLOT_IDENTIFIER));
 

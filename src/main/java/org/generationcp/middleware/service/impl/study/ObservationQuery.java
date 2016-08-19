@@ -13,7 +13,11 @@ class ObservationQuery {
 	 * 
 	 * @param traits list of traits that we need to construct a query for.
 	 */
-	String getObservationQuery(final List<TraitDto> traits) {
+	String getAllObservationsQuery(final List<TraitDto> traits) {
+		return this.getObservationsMainQuery(traits) + getInstanceNumberClause() + getGroupOrderClause();
+	}
+
+	String getObservationsMainQuery(final List<TraitDto> traits) {
 		StringBuilder sqlBuilder = new StringBuilder();
 		
 		sqlBuilder.append( 
@@ -52,17 +56,20 @@ class ObservationQuery {
 				"        LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n" + 
 				"        LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n" + 
 				"        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n" + 
-				" WHERE \n" + 
-				"		gl.description = :instance_number \n" + 
-				"       AND p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n" + 
-				" GROUP BY nde.nd_experiment_id ORDER BY (1 * REP_NO), (1 * PLOT_NO) ");
-				
+				" WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n");				
 				
 		return sqlBuilder.toString();
 	}
 
-	String getSingleObservationQuery(final List<TraitDto> traits) {
-		return this.getObservationQuery(traits) + "AND nde.nd_experiment_id = :experiment_id";
+	String getInstanceNumberClause() {
+		return " AND gl.description = :instance_number \n";
+	}
 
+	String getGroupOrderClause() {
+		return " GROUP BY nde.nd_experiment_id ORDER BY (1 * REP_NO), (1 * PLOT_NO) ";
+	}
+
+	String getSingleObservationQuery(final List<TraitDto> traits) {
+		return this.getObservationsMainQuery(traits) + " AND nde.nd_experiment_id = :experiment_id \n" + getGroupOrderClause();
 	}
 }

@@ -25,7 +25,7 @@ public class StudyMeasurements {
 
 	List<ObservationDto> getAllMeasurements(final int projectBusinessIdentifier, final List<TraitDto> traits, final int instanceNumber,
 			final int pageNumber, final int pageSize) {
-		final String generateQuery = this.measurementQuery.getObservationQuery(traits);
+		final String generateQuery = this.measurementQuery.getAllObservationsQuery(traits);
 		return this.executeQueryAndMapResults(projectBusinessIdentifier, traits, generateQuery, instanceNumber, pageNumber, pageSize);
 	}
 
@@ -60,9 +60,7 @@ public class StudyMeasurements {
 			final String generateQuery, final Integer measurementId) {
 		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(traits, generateQuery);
 		createSQLQuery.setParameter("studyId", projectBusinessIdentifier);
-		createSQLQuery.setParameter("instance_number", "1");
 		createSQLQuery.setParameter("experiment_id", measurementId);
-
 		return this.mapResults(createSQLQuery.list(), traits);
 	}
 
