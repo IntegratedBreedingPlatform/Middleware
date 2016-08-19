@@ -12,7 +12,9 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -20,23 +22,28 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.SimpleExpression;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
+import org.hibernate.type.Type;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Maps;
 
 /**
  * DAO class for {@link GermplasmList}.
@@ -45,14 +52,12 @@ import org.hibernate.type.IntegerType;
 public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	public static final Integer STATUS_DELETED = 9;
-	protected static final List<SimpleExpression> RETRICTED_LIST = new ArrayList<SimpleExpression>();
-
+	protected static final Criterion RESTRICTED_LIST;
+	
 	static {
-		GermplasmListDAO.RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.NURSERY.toString()));
-		GermplasmListDAO.RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.TRIAL.toString()));
-		GermplasmListDAO.RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.CHECK.toString()));
-		GermplasmListDAO.RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.ADVANCED.toString()));
-		GermplasmListDAO.RETRICTED_LIST.add(Restrictions.ne("type", GermplasmListType.CROSSES.toString()));
+		RESTRICTED_LIST = Restrictions
+				.not(Restrictions.in("type", new String[] {GermplasmListType.NURSERY.toString(), GermplasmListType.TRIAL.toString(),
+						GermplasmListType.CHECK.toString(), GermplasmListType.ADVANCED.toString(), GermplasmListType.CROSSES.toString()}));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -265,7 +270,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<GermplasmList> getAllTopLevelLists(final String programUUID, final int start, final int numOfRows)
+	public List<GermplasmList> getAllTopLevelLists(final String programUUID)
 			throws MiddlewareQueryException {
 		try {
 			final Criterion topFolder = Restrictions.eq("parent.id", 0);
@@ -277,33 +282,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			this.addCriteriaForProgramUUIDInLists(programUUID, criteria);
 			this.hideSnapshotListTypes(criteria);
 
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
 			criteria.addOrder(Order.asc("name"));
 			return criteria.list();
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getAllTopLevelLists() query from GermplasmList: " + e.getMessage(), e);
 		}
 		return new ArrayList<GermplasmList>();
-	}
-
-	public long countAllTopLevelLists(final String programUUID) {
-		try {
-			final Criterion topFolder = Restrictions.eq("parent.id", 0);
-			final Criterion nullFolder = Restrictions.isNull("parent");
-			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
-			criteria.add(Restrictions.or(topFolder, nullFolder));
-			criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
-
-			this.hideSnapshotListTypes(criteria);
-			this.addCriteriaForProgramUUIDInLists(programUUID, criteria);
-
-			criteria.setProjection(Projections.rowCount());
-			return ((Long) criteria.uniqueResult()).longValue();
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with countAllTopLevelLists() query from GermplasmList: " + e.getMessage(), e);
-		}
-		return 0;
 	}
 
 	/**
@@ -317,20 +301,18 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
 	@SuppressWarnings("unchecked")
-	public List<GermplasmList> getByParentFolderId(final Integer parentId, final String programUUID, final int start, final int numOfRows)
+	public List<GermplasmList> getByParentFolderId(final Integer parentId, final String programUUID)
 			throws MiddlewareQueryException {
 		try {
 			if (parentId != null) {
 				final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
-				criteria.add(Restrictions.eq("parent", new GermplasmList(parentId)));
+				criteria.add(Restrictions.eq("parent.id", parentId));
 				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
 
 				this.addCriteriaForProgramUUIDInLists(programUUID, criteria);
 
 				this.hideSnapshotListTypes(criteria);
 
-				criteria.setFirstResult(start);
-				criteria.setMaxResults(numOfRows);
 				criteria.addOrder(Order.asc("name"));
 				return criteria.list();
 			}
@@ -338,7 +320,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			this.logAndThrowException(
 					"Error with getByParentFolderId(parentId=" + parentId + ") query from GermplasmList: " + e.getMessage(), e);
 		}
-		return new ArrayList<GermplasmList>();
+		return new ArrayList<>();
 	}
 
 	@Nullable
@@ -368,42 +350,13 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return null;
 	}
 
-	/**
-	 * Count germplasm list children.
-	 *
-	 * @param parentId the parent id
-	 * @return number of germplasm list child records of a parent record
-	 * @throws MiddlewareQueryException the MiddlewareQueryException
-	 */
-	public long countByParentFolderId(final Integer parentId, final String programUUID) {
-		try {
-			if (parentId != null) {
-				final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
-				criteria.add(Restrictions.eq("parent", new GermplasmList(parentId)));
-				criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
-
-				this.addCriteriaForProgramUUIDInLists(programUUID, criteria);
-
-				this.hideSnapshotListTypes(criteria);
-
-				criteria.setProjection(Projections.rowCount());
-				return ((Long) criteria.uniqueResult()).longValue();
-			}
-		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error with countByParentFolderId(parentId=" + parentId + ") query from GermplasmList: " + e.getMessage(), e);
-		}
-		return 0;
-	}
-
 	protected void hideSnapshotListTypes(final Criteria criteria) {
-		for (final SimpleExpression restriction : this.getRestrictedSnapshopTypes()) {
-			criteria.add(restriction);
-		}
+		criteria.add(this.getRestrictedSnapshopTypes());
+
 	}
 
-	protected List<SimpleExpression> getRestrictedSnapshopTypes() {
-		return GermplasmListDAO.RETRICTED_LIST;
+	protected Criterion getRestrictedSnapshopTypes() {
+		return GermplasmListDAO.RESTRICTED_LIST;
 	}
 
 	/**
@@ -568,12 +521,18 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return (GermplasmList) criteria.uniqueResult();
 	}
 
-	public List<Object[]> getAllListMetadata() {
+	public List<Object[]> getAllListMetadata(final List<Integer> listIdsFromGermplasmList) {
+		
+		if(listIdsFromGermplasmList.isEmpty()) {
+			return Collections.emptyList();
+		}
+		
 		final StringBuilder sql = new StringBuilder(
 				"SELECT ln.listid as listId, COUNT(ld.listid) as count, lu.uname as userName, lp.fname as firstName, lp.lname lastName")
 						.append(" FROM listnms ln ").append("	INNER JOIN listdata ld ON ln.listid = ld.listid ")
 						.append("   LEFT OUTER JOIN users lu ON ln.listuid = lu.userid ")
-						.append("   LEFT OUTER JOIN persons lp ON lp.personid = lu.personid ").append(" WHERE  ln.listtype != 'FOLDER' ")
+						.append("   LEFT OUTER JOIN persons lp ON lp.personid = lu.personid ").append(" WHERE ln.listid in (:listids) AND")
+						.append(" ln.listtype != 'FOLDER' ")
 						.append(" GROUP BY ln.listid;");
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
@@ -582,9 +541,49 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		query.addScalar("userName");
 		query.addScalar("firstName");
 		query.addScalar("lastName");
-
+		query.setParameterList("listids", listIdsFromGermplasmList);
+		
 		@SuppressWarnings("unchecked")
 		final List<Object[]> queryResults = query.list();
 		return queryResults;
+	}
+
+	/**
+	 * @param listIds a group of ids for which we want to retrieve germplasm list
+	 * @return the resultant germplasm list
+	 */
+	public List<GermplasmList> getAllGermplasmListsById(final List<Integer> listIds) {
+		final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
+		criteria.add(Restrictions.in("id", listIds));
+		criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
+		criteria.add(Restrictions.eq("type", GermplasmListType.LST.toString()));
+		return criteria.list();
+	}
+
+	/**
+	 * @param folderIds a group of folder ids for which we want to return children
+	 * @return the resultant map which contains the folder meta data
+	 */
+	public Map<Integer, GermplasmFolderMetadata> getGermplasmFolderMetadata(final List<Integer> folderIds) {
+		
+		if(folderIds.isEmpty()) {
+			return Collections.<Integer, GermplasmFolderMetadata>emptyMap();
+		}
+		
+		final String folderMetaDataQuery = "SELECT parent.listid AS listId, COUNT(child.listid) AS numberOfChildren FROM listnms parent "
+				+ "LEFT OUTER JOIN listnms child ON child.lhierarchy = parent.listid "
+				+ "WHERE parent.listid IN (:folderIds) GROUP BY parent.listid";
+		final SQLQuery setResultTransformer = this.getSession().createSQLQuery(folderMetaDataQuery);
+		setResultTransformer.setParameterList("folderIds", folderIds);
+		setResultTransformer.addScalar("listId", new IntegerType());
+		setResultTransformer.addScalar("numberOfChildren", new IntegerType());
+		setResultTransformer.setResultTransformer(Transformers.aliasToBean(GermplasmFolderMetadata.class));
+		final List<GermplasmFolderMetadata> list = setResultTransformer.list();
+		return Maps.uniqueIndex(list, new Function<GermplasmFolderMetadata, Integer>() {
+			@Override
+			public Integer apply(final GermplasmFolderMetadata folderMetaData) {
+				return folderMetaData.getListId();
+			}
+		});
 	}
 }

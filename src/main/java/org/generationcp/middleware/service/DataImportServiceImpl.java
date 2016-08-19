@@ -1,12 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ * <p/>
  * Generation Challenge Programme (GCP)
- * 
- * 
+ * <p/>
+ * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
  *******************************************************************************/
 
 package org.generationcp.middleware.service;
@@ -14,6 +13,7 @@ package org.generationcp.middleware.service;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.annotation.Resource;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.DataSetType;
@@ -38,7 +40,7 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.OntologyDataManagerImpl;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.service.api.DataImportService;
@@ -48,6 +50,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Optional;
+
 @Transactional
 public class DataImportServiceImpl extends Service implements DataImportService {
 
@@ -56,12 +60,20 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public static final String ERROR_MISSING_TRIAL_CONDITION = "error.missing.trial.condition";
 	public static final String ERROR_PLOT_DOESNT_EXIST = "error.plot.doesnt.exist";
 	public static final String ERROR_ENTRY_DOESNT_EXIST = "error.entry.doesnt.exist";
+	public static final String ERROR_GID_DOESNT_EXIST = "error.gid.doesnt.exist";
 	public static final String ERROR_DUPLICATE_STUDY_NAME = "error.duplicate.study.name";
 	public static final String ERROR_DUPLICATE_PSM = "error.duplicate.psm";
 	public static final String ERROR_INVALID_VARIABLE_NAME_LENGTH = "error.invalid.variable.name.length";
 	public static final String ERROR_INVALID_VARIABLE_NAME_CHARACTERS = "error.invalid.variable.name.characters";
+	public static final String ERROR_INVALID_GIDS_FROM_DATA_FILE = "error.invalid.gids";
 
 	private int maxRowLimit = WorkbookParser.DEFAULT_MAX_ROW_LIMIT;
+
+	@Resource
+	private OntologyDataManager ontologyDataManager;
+
+	@Resource
+	private GermplasmDataManager germplasmDataManager;
 
 	public DataImportServiceImpl() {
 
@@ -87,16 +99,17 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 * variableTypeMap.put("trialVariables", trialVariables); // variableTypeMap.put("effectVariables", effectVariables); // --
 	 * measurementVariables (List<MeasurementVariable>) // measurementVariableMap.put("trialMV", trialMV); //
 	 * measurementVariableMap.put("effectMV", effectMV);
-	 * 
+	 *
 	 * @param workbook
-	 * @param retainValues if true, values of the workbook items are retained, else they are cleared to conserve memory
+	 * @param retainValues         if true, values of the workbook items are retained, else they are cleared to conserve memory
 	 * @param isDeleteObservations
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public int saveDataset(final Workbook workbook, final boolean retainValues, final boolean isDeleteObservations, final String programUUID) {
+	public int saveDataset(final Workbook workbook, final boolean retainValues, final boolean isDeleteObservations,
+			final String programUUID) {
 
 		Map<String, ?> variableMap = null;
 		final TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)");
@@ -146,27 +159,28 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public Workbook strictParseWorkbook(final File file, final String programUUID) throws WorkbookParserException {
 		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
 
-		final OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(this.getSessionProvider());
-
 		// partially parse the file to parse the description sheet only at first
-		return this.strictParseWorkbook(file, parser, parser.parseFile(file, true), ontology, programUUID);
+		return this.strictParseWorkbook(file, parser, parser.parseFile(file, true), programUUID);
 	}
 
-	protected Workbook strictParseWorkbook(final File file, final WorkbookParser parser, final Workbook workbook,
-			final OntologyDataManager ontology, final String programUUID) throws WorkbookParserException {
+	protected Workbook strictParseWorkbook(final File file, final WorkbookParser parser, final Workbook workbook, final String programUUID)
+			throws WorkbookParserException {
 
 		// perform validations on the parsed data that require db access
 		final List<Message> messages = new LinkedList<Message>();
 
-		if (!this.isEntryExists(ontology, workbook.getFactors())) {
+		final Set<Integer> factorsTermIds = getTermIdsOfMeasurementVariables(workbook.getFactors());
+		final Set<Integer> trialVariablesTermIds = getTermIdsOfMeasurementVariables(workbook.getTrialVariables());
+
+		if (!factorsTermIds.contains(TermId.ENTRY_NO.getId())) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_ENTRY_DOESNT_EXIST));
 		}
 
-		if (!this.isPlotExists(ontology, workbook.getFactors())) {
+		if (!factorsTermIds.contains(TermId.PLOT_NO.getId()) && !factorsTermIds.contains(TermId.PLOT_NNO.getId())) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_PLOT_DOESNT_EXIST));
 		}
 
-		if (!workbook.isNursery() && !this.isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())) {
+		if (!workbook.isNursery() && !trialVariablesTermIds.contains(TermId.TRIAL_INSTANCE_FACTOR.getId())) {
 			messages.add(new Message(DataImportServiceImpl.ERROR_MISSING_TRIAL_CONDITION));
 		}
 
@@ -180,21 +194,25 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// containing validation errors inside
 		parser.parseAndSetObservationRows(file, workbook, false);
 
+		this.setRequiredFields(workbook);
+
 		// separated the validation of observations from the parsing so that it can be used even in other parsing implementations (e.g., the
 		// one for Wizard style)
 		messages.addAll(this.checkForEmptyRequiredVariables(workbook));
 
+		this.checkForInvalidGids(workbook, messages);
+
 		// moved checking below as this needs to parse the contents of the observation sheet for multi-locations
-		this.checkForDuplicateStudyName(ontology, workbook, messages, programUUID);
+		this.checkForDuplicateStudyName(workbook, messages, programUUID);
 
 		// GCP-6253
-		this.checkForDuplicateVariableNames(ontology, workbook, messages, programUUID);
+		this.checkForDuplicateVariableNames(workbook, messages, programUUID);
 
 		this.checkForDuplicatePSMCombo(workbook, messages);
 
 		this.checkForInvalidLabel(workbook, messages);
 
-		if (this.checkForOutOfBoundsData(ontology, workbook, programUUID)) {
+		if (this.checkForOutOfBoundsData(workbook, programUUID)) {
 			workbook.setHasOutOfBoundsData(true);
 		}
 
@@ -202,13 +220,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public Workbook parseWorkbook(File file, String programUUID, boolean discardInvalidValues, OntologyDataManager ontologyDataManager,
-			WorkbookParser workbookParser) throws WorkbookParserException {
+	public Workbook parseWorkbook(final File file, final String programUUID, final boolean discardInvalidValues, final WorkbookParser workbookParser)
+			throws WorkbookParserException {
 
 		// partially parse the file to parse the description sheet only at first
 		final Workbook workbook = workbookParser.parseFile(file, false);
 
-		this.populatePossibleValuesForCategoricalVariates(workbook.getVariates(), programUUID, ontologyDataManager);
+		this.populatePossibleValuesForCategoricalVariates(workbook.getVariates(), programUUID);
 
 		workbookParser.parseAndSetObservationRows(file, workbook, discardInvalidValues);
 
@@ -216,20 +234,19 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public void populatePossibleValuesForCategoricalVariates(List<MeasurementVariable> variates, String programUUID,
-			OntologyDataManager ontologyDataManager) {
+	public void populatePossibleValuesForCategoricalVariates(final List<MeasurementVariable> variates, final String programUUID) {
 
-		for (MeasurementVariable measurementVariable : variates) {
+		for (final MeasurementVariable measurementVariable : variates) {
 
-			StandardVariable standardVariable =
-					ontologyDataManager.findStandardVariableByTraitScaleMethodNames(measurementVariable.getProperty(),
-							measurementVariable.getScale(), measurementVariable.getMethod(), programUUID);
+			final StandardVariable standardVariable = this.ontologyDataManager
+					.findStandardVariableByTraitScaleMethodNames(measurementVariable.getProperty(), measurementVariable.getScale(),
+							measurementVariable.getMethod(), programUUID);
 
 			if (standardVariable != null && standardVariable.getDataType().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
 
-				List<ValueReference> possibleValues = new ArrayList<>();
+				final List<ValueReference> possibleValues = new ArrayList<>();
 				if (standardVariable.getEnumerations() != null && !standardVariable.getEnumerations().isEmpty()) {
-					for (Enumeration enumeration : standardVariable.getEnumerations()) {
+					for (final Enumeration enumeration : standardVariable.getEnumerations()) {
 						possibleValues.add(new ValueReference(enumeration.getId(), enumeration.getName(), enumeration.getDescription()));
 					}
 
@@ -241,14 +258,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public boolean checkForOutOfBoundsData(final OntologyDataManager ontologyDataManager, Workbook workbook, final String programUUID) {
+	public boolean checkForOutOfBoundsData(final Workbook workbook, final String programUUID) {
 
-		Map<String, List<String>> termIdValidValuesMap =
-				this.getValidValuesMapForCategoricalVariates(ontologyDataManager, workbook, programUUID);
+		final Map<String, List<String>> termIdValidValuesMap =
+				this.getValidValuesMapForCategoricalVariates(workbook, programUUID);
 
-		for (MeasurementRow measurementRow : workbook.getObservations()) {
-			for (Entry<String, List<String>> entry : termIdValidValuesMap.entrySet()) {
-				MeasurementData measurementData = measurementRow.getMeasurementData(entry.getKey());
+		for (final MeasurementRow measurementRow : workbook.getObservations()) {
+			for (final Entry<String, List<String>> entry : termIdValidValuesMap.entrySet()) {
+				final MeasurementData measurementData = measurementRow.getMeasurementData(entry.getKey());
 				if (measurementData != null && !this.containsIgnoreCase(entry.getValue(), measurementData.getValue())) {
 					return true;
 				}
@@ -261,8 +278,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	}
 
-	private boolean containsIgnoreCase(List<String> list, String searchFor) {
-		for (String item : list) {
+	private boolean containsIgnoreCase(final List<String> list, final String searchFor) {
+		for (final String item : list) {
 			if (item.equalsIgnoreCase(searchFor)) {
 				return true;
 			}
@@ -270,21 +287,20 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return false;
 	}
 
-	protected Map<String, List<String>> getValidValuesMapForCategoricalVariates(final OntologyDataManager ontologyDataManager,
-			Workbook workbook, final String programUUID) {
+	protected Map<String, List<String>> getValidValuesMapForCategoricalVariates(final Workbook workbook, final String programUUID) {
 
 		// Get the categorical variates and extract their valid values (possible values)
-		Map<String, List<String>> variableValidValues = new HashMap<>();
+		final Map<String, List<String>> variableValidValues = new HashMap<>();
 
-		for (MeasurementVariable measurementVariable : workbook.getVariates()) {
-			Integer stdVariableId =
-					ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(),
-							measurementVariable.getScale(), measurementVariable.getMethod());
+		for (final MeasurementVariable measurementVariable : workbook.getVariates()) {
+			final Integer stdVariableId = this.ontologyDataManager
+					.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(), measurementVariable.getScale(),
+							measurementVariable.getMethod());
 			if (stdVariableId != null) {
-				StandardVariable stdVariable = ontologyDataManager.getStandardVariable(stdVariableId, programUUID);
+				final StandardVariable stdVariable = ontologyDataManager.getStandardVariable(stdVariableId, programUUID);
 				if (stdVariable.getDataType().getId() == DataType.CATEGORICAL_VARIABLE.getId()) {
-					List<String> validValues = new ArrayList<>();
-					for (Enumeration enumeration : stdVariable.getEnumerations()) {
+					final List<String> validValues = new ArrayList<>();
+					for (final Enumeration enumeration : stdVariable.getEnumerations()) {
 						validValues.add(enumeration.getName());
 					}
 					variableValidValues.put(measurementVariable.getName(), validValues);
@@ -338,8 +354,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		for (final MeasurementRow measurementRow : workbook.getObservations()) {
 			for (final MeasurementData measurementData : measurementRow.getDataList()) {
 				for (final MeasurementVariable requiredMeasurementVariable : requiredMeasurementVariables) {
-					if (measurementData.getLabel().equals(requiredMeasurementVariable.getName())
-							&& StringUtils.isEmpty(measurementData.getValue())) {
+					if (measurementData.getLabel().equals(requiredMeasurementVariable.getName()) && StringUtils
+							.isEmpty(measurementData.getValue())) {
 						returnVal.add(new Message("empty.required.variable", measurementData.getLabel(), Integer.toString(i)));
 					}
 				}
@@ -364,11 +380,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return returnVal;
 	}
 
-	private void checkForDuplicateStudyName(final OntologyDataManager ontology, final Workbook workbook, final List<Message> messages,
+	private void checkForDuplicateStudyName(final Workbook workbook, final List<Message> messages,
 			final String programUUID) throws WorkbookParserException {
 
 		final String studyName = workbook.getStudyDetails().getStudyName();
-		final String locationDescription = this.getLocationDescription(ontology, workbook, programUUID);
+		final String locationDescription = this.getLocationDescription(workbook, programUUID);
 		final Integer locationId = this.getLocationIdByProjectNameAndDescriptionAndProgramUUID(studyName, locationDescription, programUUID);
 
 		// same location and study
@@ -388,7 +404,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		}
 	}
 
-	private void checkForDuplicateVariableNames(final OntologyDataManager ontologyDataManager, final Workbook workbook,
+	private void checkForDuplicateVariableNames(final Workbook workbook,
 			final List<Message> messages, final String programUUID) throws WorkbookParserException {
 		final List<List<MeasurementVariable>> workbookVariables = new ArrayList<List<MeasurementVariable>>();
 		workbookVariables.add(workbook.getConditions());
@@ -405,18 +421,18 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 					variableNameMap.put(measurementVariable.getName(), measurementVariable);
 				}
 
-				final Integer varId =
-						ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(),
-								measurementVariable.getScale(), measurementVariable.getMethod());
+				final Integer varId = this.ontologyDataManager
+						.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(), measurementVariable.getScale(),
+								measurementVariable.getMethod());
 
 				if (varId == null) {
 
 					final Set<StandardVariable> variableSet =
-							ontologyDataManager.findStandardVariablesByNameOrSynonym(measurementVariable.getName(), programUUID);
+							this.ontologyDataManager.findStandardVariablesByNameOrSynonym(measurementVariable.getName(), programUUID);
 
 					for (final StandardVariable variable : variableSet) {
-						messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(), variable
-								.getProperty().getName(), variable.getScale().getName(), variable.getMethod().getName()));
+						messages.add(new Message("error.import.existing.standard.variable.name", measurementVariable.getName(),
+								variable.getProperty().getName(), variable.getScale().getName(), variable.getMethod().getName()));
 					}
 
 				}
@@ -450,16 +466,15 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		final Map<String, List<MeasurementVariable>> stdVarMap = new LinkedHashMap<String, List<MeasurementVariable>>();
 		for (final MeasurementVariable measurementVariable : workbookVariables) {
 			// need to retrieve standard variable because of synonyms
-			final Integer standardVariableId =
-					this.getOntologyDataManager().getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(),
-							measurementVariable.getScale(), measurementVariable.getMethod());
+			final Integer standardVariableId = this.getOntologyDataManager()
+					.getStandardVariableIdByPropertyScaleMethod(measurementVariable.getProperty(), measurementVariable.getScale(),
+							measurementVariable.getMethod());
 			final String key;
 			if (standardVariableId != null) {
 				key = Integer.toString(standardVariableId);
 			} else {
-				key =
-						measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-"
-								+ measurementVariable.getMethod().toLowerCase();
+				key = measurementVariable.getProperty().toLowerCase() + "-" + measurementVariable.getScale().toLowerCase() + "-"
+						+ measurementVariable.getMethod().toLowerCase();
 			}
 			List<MeasurementVariable> vars = stdVarMap.get(key);
 			if (vars == null) {
@@ -485,8 +500,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 				}
 				for (final MeasurementVariable measurementVariable : vars) {
 					this.initializeIfNull(errors, measurementVariable.getName() + ":" + measurementVariable.getTermId());
-					errors.get(measurementVariable.getName() + ":" + measurementVariable.getTermId()).add(
-							new Message(ERROR_DUPLICATE_PSM, duplicates.toString()));
+					errors.get(measurementVariable.getName() + ":" + measurementVariable.getTermId())
+							.add(new Message(ERROR_DUPLICATE_PSM, duplicates.toString()));
 				}
 			}
 		}
@@ -527,11 +542,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	// for single location
-	private String getLocationDescription(final OntologyDataManager ontology, final Workbook workbook, final String programUUID) {
+	private String getLocationDescription(final Workbook workbook, final String programUUID) {
 
 		// check if single location
 		// it means the location is defined in the description sheet)
-		String trialInstanceNumber = this.getTrialInstanceNumberFromMeasurementVariables(ontology, workbook.getConditions());
+		String trialInstanceNumber = this.getTrialInstanceNumberFromMeasurementVariables(workbook.getConditions());
 		if (trialInstanceNumber != null) {
 			return trialInstanceNumber;
 		}
@@ -539,7 +554,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// check if multi-location
 		// it means the location is defined in the observation sheet
 		trialInstanceNumber =
-				this.getTrialInstanceNumberFromMeasurementRows(ontology, workbook.getObservations(), workbook.getTrialFactors());
+				this.getTrialInstanceNumberFromMeasurementRows(workbook.getObservations(), workbook.getTrialFactors());
 
 		if (workbook.isNursery()) {
 			return "1";
@@ -555,74 +570,143 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return this.getDmsProjectDao().getProjectIdByNameAndProgramUUID(name, programUUID, relationship);
 	}
 
-	protected Boolean isEntryExists(final OntologyDataManager ontology, final List<MeasurementVariable> list) {
-		for (final MeasurementVariable mvar : list) {
-			final Integer varId =
-					ontology.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
+	Set<Integer> getTermIdsOfMeasurementVariables(final List<MeasurementVariable> measurementVariables) {
 
-			if (varId != null && varId == TermId.ENTRY_NO.getId()) {
-				mvar.setRequired(true);
-				return true;
+		final HashSet<Integer> termIds = new HashSet<>();
+
+		for (final MeasurementVariable mvar : measurementVariables) {
+
+			final Integer varId =
+					this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(),
+							mvar.getMethod());
+			if (varId != null) {
+				termIds.add(varId);
 			}
 		}
 
-		return false;
+		return termIds;
 	}
 
-	protected Boolean isPlotExists(final OntologyDataManager ontology, final List<MeasurementVariable> list) {
-		for (final MeasurementVariable mvar : list) {
-			final Integer varId =
-					ontology.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
-
-			if (varId != null && (varId == TermId.PLOT_NO.getId() || varId == TermId.PLOT_NNO.getId())) {
-				mvar.setRequired(true);
-				return true;
-			}
-
-		}
-		return false;
-	}
-
-	protected Boolean isTrialInstanceNumberExists(final OntologyDataManager ontology, final List<MeasurementVariable> list) {
-		final MeasurementVariable var = this.getTrialInstanceNumberMeasurementVariable(ontology, list);
-		if (var != null) {
-			var.setRequired(true);
-			return true;
-		}
-		return false;
-	}
-
-	private String getTrialInstanceNumberFromMeasurementRows(final OntologyDataManager ontology,
-			final List<MeasurementRow> measurementRows, final List<MeasurementVariable> trialFactors) {
+	private String getTrialInstanceNumberFromMeasurementRows(final List<MeasurementRow> measurementRows,
+			final List<MeasurementVariable> trialFactors) {
 
 		// get first row - should contain the study location
 		final MeasurementRow row = measurementRows.get(0);
-		final MeasurementVariable var = this.getTrialInstanceNumberMeasurementVariable(ontology, trialFactors);
-		if (var != null) {
-			return row.getMeasurementDataValue(var.getName());
+		final Optional<MeasurementVariable> result =
+				findMeasurementVariableByTermId(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialFactors);
+		if (result.isPresent()) {
+			return row.getMeasurementDataValue(result.get().getName());
 		}
 
 		return null;
 	}
 
-	private String getTrialInstanceNumberFromMeasurementVariables(final OntologyDataManager ontology, final List<MeasurementVariable> list) {
-		final MeasurementVariable mvar = this.getTrialInstanceNumberMeasurementVariable(ontology, list);
-		if (mvar != null) {
-			return mvar.getValue();
+	private String getTrialInstanceNumberFromMeasurementVariables(final List<MeasurementVariable> list) {
+		final Optional<MeasurementVariable> result = findMeasurementVariableByTermId(TermId.TRIAL_INSTANCE_FACTOR.getId(), list);
+		if (result.isPresent()) {
+			return result.get().getValue();
 		}
 		return null;
 	}
 
-	private MeasurementVariable getTrialInstanceNumberMeasurementVariable(final OntologyDataManager ontology,
-			final List<MeasurementVariable> list) {
+	Optional<MeasurementVariable> findMeasurementVariableByTermId(final int termId, final List<MeasurementVariable> list) {
 		for (final MeasurementVariable mvar : list) {
 			final Integer varId =
-					ontology.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
-			if (varId != null && TermId.TRIAL_INSTANCE_FACTOR.getId() == varId) {
-				return mvar;
+					this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(),
+							mvar.getMethod());
+			if (varId != null && termId == varId.intValue()) {
+				return Optional.of(mvar);
 			}
 		}
-		return null;
+		return Optional.absent();
+	}
+
+	/**
+	 * If the term is found in the list, this resets the required field of MeasurementVariable to true.
+	 *
+	 * @param termId
+	 * @param ontology
+	 * @param list
+	 */
+	void setRequiredField(final int termId, final List<MeasurementVariable> list) {
+		final Optional<MeasurementVariable> result = this.findMeasurementVariableByTermId(termId, list);
+		if (result.isPresent()) {
+			result.get().setRequired(true);
+		}
+	}
+
+	@Override
+	public void checkForInvalidGids(final Workbook workbook, final List<Message> messages) {
+
+		final Optional<MeasurementVariable> gidResult =
+				findMeasurementVariableByTermId(TermId.GID.getId(), workbook.getFactors());
+		if (gidResult.isPresent()) {
+
+			final String gidLabel = gidResult.get().getName();
+			final Set<Integer> gids = extractGidsFromObservations(gidLabel, workbook.getObservations());
+
+			if (!checkIfAllObservationHasGidAndNumeric(gidLabel, workbook.getObservations()) || !checkIfAllGidsExistInDatabase(gids)) {
+				messages.add(new Message(DataImportServiceImpl.ERROR_INVALID_GIDS_FROM_DATA_FILE));
+			}
+
+		} else {
+
+			messages.add(new Message(DataImportServiceImpl.ERROR_GID_DOESNT_EXIST));
+
+		}
+
+	}
+
+	/**
+	 * Returns true if the gids in the list are all existing records in the database.
+	 *
+	 * @param germplasmDataManager
+	 * @param gids
+	 * @return
+	 */
+	boolean checkIfAllGidsExistInDatabase(final Set<Integer> gids) {
+
+		final long matchedGermplasmCount = this.germplasmDataManager.countMatchGermplasmInList(gids);
+
+		// If the number of gids in the list matched the count of germplasm records matched in the database, it means
+		// that all gids searched have existing records in the database.
+		return gids.size() == matchedGermplasmCount;
+
+	}
+
+	/**
+	 * Returns true if all observation from data file contains gid value and all values are numeric.
+	 *
+	 * @param observations
+	 * @return
+	 */
+	boolean checkIfAllObservationHasGidAndNumeric(final String gidLabel, final List<MeasurementRow> observations) {
+
+		for (final MeasurementRow observationRow : observations) {
+			final String gidString = observationRow.getMeasurementDataValue(gidLabel);
+			if (StringUtils.isBlank(gidString) || !StringUtils.isNumeric(gidString)) {
+				return false;
+			}
+		}
+		return true;
+
+	}
+
+	/**
+	 * Gets a list of gids extracted from observation.
+	 *
+	 * @param workbook
+	 * @return
+	 */
+	Set<Integer> extractGidsFromObservations(final String gidLabel, final List<MeasurementRow> observations) {
+		final Set<Integer> gids = new HashSet<>();
+		for (final MeasurementRow observationRow : observations) {
+			final String gidString = observationRow.getMeasurementDataValue(gidLabel);
+			if (StringUtils.isNotBlank(gidString) && StringUtils.isNumeric(gidString)) {
+				gids.add(Integer.valueOf(gidString));
+			}
+		}
+		return gids;
 	}
 
 	@Override
@@ -633,31 +717,35 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	@Override
 	public Integer getLocationIdByProjectNameAndDescriptionAndProgramUUID(final String projectName, final String locationDescription,
 			final String programUUID) {
-		return this.getGeolocationDao().getLocationIdByProjectNameAndDescriptionAndProgramUUID(projectName, locationDescription,
-				programUUID);
+		return this.getGeolocationDao()
+				.getLocationIdByProjectNameAndDescriptionAndProgramUUID(projectName, locationDescription, programUUID);
 	}
 
 	@Override
 	public Map<String, List<Message>> validateProjectOntology(final Workbook workbook, final String programUUID) {
 		final Map<String, List<Message>> errors = new HashMap<String, List<Message>>();
 
-		final OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(this.getSessionProvider());
+		final Set<Integer> factorsTermIds = getTermIdsOfMeasurementVariables(workbook.getFactors());
+		final Set<Integer> trialVariablesTermIds = getTermIdsOfMeasurementVariables(workbook.getTrialVariables());
 
-		if (!this.isEntryExists(ontology, workbook.getFactors())) {
+		// DMV : TODO change implem so that backend is agnostic to UI when determining messages
+		if (!factorsTermIds.contains(TermId.ENTRY_NO.getId())) {
 			this.initializeIfNull(errors, Constants.MISSING_ENTRY);
-
-			// determining messages
 			errors.get(Constants.MISSING_ENTRY).add(new Message("error.entry.doesnt.exist.wizard"));
 		}
 
-		if ((workbook.getImportType() == null || workbook.getImportType() == DataSetType.PLOT_DATA.getId())
-				&& !this.isPlotExists(ontology, workbook.getFactors())) {
-			this.initializeIfNull(errors, Constants.MISSING_PLOT);
+		if (!factorsTermIds.contains(TermId.GID.getId())) {
+			this.initializeIfNull(errors, Constants.MISSING_GID);
+			errors.get(Constants.MISSING_GID).add(new Message("error.gid.doesnt.exist.wizard"));
+		}
 
+		if ((workbook.getImportType() == null || workbook.getImportType() == DataSetType.PLOT_DATA.getId()) && (
+				!factorsTermIds.contains(TermId.PLOT_NO.getId()) && !factorsTermIds.contains(TermId.PLOT_NNO.getId()))) {
+			this.initializeIfNull(errors, Constants.MISSING_PLOT);
 			errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
 		}
 
-		if (!workbook.isNursery() && !this.isTrialInstanceNumberExists(ontology, workbook.getTrialVariables())) {
+		if (!workbook.isNursery() && !trialVariablesTermIds.contains(TermId.TRIAL_INSTANCE_FACTOR.getId())) {
 			this.initializeIfNull(errors, Constants.MISSING_TRIAL);
 			errors.get(Constants.MISSING_TRIAL).add(new Message(DataImportServiceImpl.ERROR_MISSING_TRIAL_CONDITION));
 		}
@@ -717,17 +805,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	@Override
 	public Map<String, List<Message>> validateProjectData(final Workbook workbook, final String programUUID) {
 		final Map<String, List<Message>> errors = new HashMap<String, List<Message>>();
-		final OntologyDataManagerImpl ontology = new OntologyDataManagerImpl(this.getSessionProvider());
-		this.checkForExistingTrialInstance(ontology, workbook, errors, programUUID);
+
+		this.checkForExistingTrialInstance(workbook, errors, programUUID);
 
 		// the following code is a workaround versus the current state management in the ETL Wizard
 		// to re-set the "required" fields to true for checking later on
-
-		this.isPlotExists(ontology, workbook.getFactors());
-		this.isEntryExists(ontology, workbook.getFactors());
-		if (!workbook.isNursery()) {
-			this.isTrialInstanceNumberExists(ontology, workbook.getTrialVariables());
-		}
+		this.setRequiredFields(workbook);
 
 		final List<Message> requiredVariableValueErrors = this.checkForEmptyRequiredVariables(workbook);
 
@@ -738,8 +821,19 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return errors;
 	}
 
-	private void checkForExistingTrialInstance(final OntologyDataManager ontology, final Workbook workbook,
-			final Map<String, List<Message>> errors, final String programUUID) {
+	protected void setRequiredFields(final Workbook workbook) {
+
+		this.setRequiredField(TermId.PLOT_NO.getId(), workbook.getFactors());
+		this.setRequiredField(TermId.PLOT_NNO.getId(), workbook.getFactors());
+		this.setRequiredField(TermId.ENTRY_NO.getId(), workbook.getFactors());
+		this.setRequiredField(TermId.GID.getId(), workbook.getFactors());
+
+		if (!workbook.isNursery()) {
+			this.setRequiredField(TermId.TRIAL_INSTANCE_FACTOR.getId(), workbook.getTrialVariables());
+		}
+	}
+
+	private void checkForExistingTrialInstance(final Workbook workbook, final Map<String, List<Message>> errors, final String programUUID) {
 
 		final String studyName = workbook.getStudyDetails().getStudyName();
 		String trialInstanceNumber;
@@ -757,10 +851,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			String trialInstanceHeader = null;
 			final List<MeasurementVariable> trialFactors = workbook.getTrialFactors();
 			for (final MeasurementVariable mvar : trialFactors) {
-				final Integer varId =
-						ontology.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
+				final Integer varId = ontologyDataManager
+						.getStandardVariableIdByPropertyScaleMethod(mvar.getProperty(), mvar.getScale(), mvar.getMethod());
 				if (varId != null) {
-					final StandardVariable svar = ontology.getStandardVariable(varId, programUUID);
+					final StandardVariable svar = ontologyDataManager.getStandardVariable(varId, programUUID);
 					if (svar.getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 						trialInstanceHeader = mvar.getName();
 						break;
@@ -796,9 +890,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 				final List<Integer> variateIds = new ArrayList<Integer>();
 				// check at least one variate
 				variateIds.add(workbook.getVariates().get(0).getTermId());
-				final int numberOfVariatesData =
-						this.getPhenotypeDao().countVariatesDataOfStudy(
-								isMeansDataImport ? workbook.getMeansDatasetId() : workbook.getMeasurementDatesetId(), variateIds);
+				final int numberOfVariatesData = this.getPhenotypeDao()
+						.countVariatesDataOfStudy(isMeansDataImport ? workbook.getMeansDatasetId() : workbook.getMeasurementDatesetId(),
+								variateIds);
 				if (numberOfVariatesData > 0) {
 					hasDuplicateTrialInstances = true;
 				}
@@ -810,9 +904,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 					trialInstanceNumbers.append(trialInstanceNo);
 					trialInstanceNumbers.append(",");
 				}
-				errors.get(Constants.GLOBAL).add(
-						new Message("error.duplicate.trial.instance", trialInstanceNumbers.toString().substring(0,
-								trialInstanceNumbers.toString().length() - 1)));
+				errors.get(Constants.GLOBAL).add(new Message("error.duplicate.trial.instance",
+						trialInstanceNumbers.toString().substring(0, trialInstanceNumbers.toString().length() - 1)));
 			}
 
 		}
@@ -822,7 +915,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return this.maxRowLimit;
 	}
 
-	public void setMaxRowLimit(int value) {
+	public void setMaxRowLimit(final int value) {
 
 		if (value > 0) {
 			this.maxRowLimit = value;
