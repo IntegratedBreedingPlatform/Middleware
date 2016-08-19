@@ -160,6 +160,29 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
+	public int countTotalObservationUnits(final int studyIdentifier, final int instanceNumber) {
+		try {
+			final String sql = "select count(*) as totalObservationUnits from nd_experiment nde \n"
+					+ "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
+					+ "    inner join project proj on proj.project_id = ndep.project_id \n"
+					+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n" 
+					+ " where \n"
+					+ "	proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id where (pr.object_project_id = :studyIdentifier and name like '%PLOTDATA')) \n"
+					+ "    and gl.description = :instanceNumber ";
+			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
+			query.addScalar("totalObservationUnits", new IntegerType());
+			query.setParameter("studyIdentifier", studyIdentifier);
+			query.setParameter("instanceNumber", instanceNumber);
+			return (int) query.uniqueResult();
+		} catch (HibernateException he) {
+			throw new MiddlewareQueryException(
+					String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
+							studyIdentifier, instanceNumber) + he.getMessage(),
+					he);
+		}
+	}
+
+	@Override
 	public List<ObservationDto> getObservations(final int studyIdentifier, final int instanceNumber, final int pageNumber,
 			final int pageSize) {
 
@@ -210,10 +233,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 	
 	@SuppressWarnings("rawtypes")
 	@Override
-	public List<StudyInstance> getStudyInstances(int studyId) {
+	public List<StudyInstance> getStudyInstances(final int studyId) {
 
 		try {
-			String sql = 
+			final String sql =
 					" select gl.nd_geolocation_id, gl.description"
 					+ "  from \n" 
 					+ "	nd_geolocation gl \n"
@@ -224,7 +247,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					+ "	   proj.project_id = (select  p.project_id from project_relationship pr inner join project p on p.project_id = pr.subject_project_id where (pr.object_project_id = :studyId and name like '%ENVIRONMENT')) \n"
 					+ "    order by (1 * gl.description) asc";
 
-			SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
+			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
 			query.setParameter("studyId", studyId);
 			query.addScalar("nd_geolocation_id", new IntegerType());
 			// Bad design legacy: The nd_geolocation.description column is hijacked to store study instance number.
