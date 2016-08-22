@@ -7,35 +7,46 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Assert;
+
+import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
+import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.Name;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.classic.Session;
+import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Order;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
-public class GermplasmListDataDAOTest {
+public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
 	private GermplasmListDataDAO germplasmListDataDAO;
 	private Session mockHibernateSession;
-
-
-	public static final String DUMMY_STRING = "DUMMY STRING";
-	public static final Integer TEST_VALUE = 1;
+	private Session realHibernateSession;
+	private GermplasmDAO germplasmDAO;
+	private NameDAO nameDAO;
+	private GermplasmListDAO germplasmListDAO;
 
 	@Before
 	public void beforeTest() {
 		this.germplasmListDataDAO = new GermplasmListDataDAO();
+		this.germplasmDAO = new GermplasmDAO();
+		this.nameDAO = new NameDAO();
+		this.germplasmListDAO = new GermplasmListDAO();
 		this.mockHibernateSession = Mockito.mock(Session.class);
+		this.realHibernateSession = this.sessionProvder.getSession();
 		this.germplasmListDataDAO.setSession(this.mockHibernateSession);
 	}
 
@@ -148,37 +159,75 @@ public class GermplasmListDataDAOTest {
 	}
 
 	@Test
-	public void testGetListDataWithParents(){
-		final SQLQuery mockSqlQuery = Mockito.mock(SQLQuery.class);
-		Mockito.when(this.mockHibernateSession.createSQLQuery(anyString())).thenReturn(mockSqlQuery);
-
-		List<Object[]> list = new ArrayList<>();
-		Object [] objects = {TEST_VALUE,TEST_VALUE,DUMMY_STRING,DUMMY_STRING,DUMMY_STRING,
-				TEST_VALUE,DUMMY_STRING,TEST_VALUE,TEST_VALUE,DUMMY_STRING,DUMMY_STRING};
-
-		list.add(objects);
-
-		Mockito.when(mockSqlQuery.list()).thenReturn(list);
-		final Integer listId = 1;
-
-		List<GermplasmListData> result = this.germplasmListDataDAO.getListDataWithParents(listId);
-
-		for(GermplasmListData g : result){
-
-			Assert.assertEquals(GermplasmListDataDAOTest.TEST_VALUE,g.getGid());
-			Assert.assertEquals(GermplasmListDataDAOTest.TEST_VALUE,g.getEntryId());
-			Assert.assertEquals(GermplasmListDataDAOTest.DUMMY_STRING,g.getDesignation());
-			Assert.assertEquals(GermplasmListDataDAOTest.DUMMY_STRING,g.getGroupName());
-			Assert.assertEquals(GermplasmListDataDAOTest.DUMMY_STRING,g.getFemaleParent());
-			Assert.assertEquals(GermplasmListDataDAOTest.TEST_VALUE,g.getFgid());
-			Assert.assertEquals(GermplasmListDataDAOTest.DUMMY_STRING,g.getMaleParent());
-			Assert.assertEquals(GermplasmListDataDAOTest.TEST_VALUE,g.getMgid());
-			Assert.assertEquals(GermplasmListDataDAOTest.TEST_VALUE,g.getGid());
-			Assert.assertEquals(GermplasmListDataDAOTest.DUMMY_STRING,g.getSeedSource());
-			Assert.assertEquals(GermplasmListDataDAOTest.DUMMY_STRING,g.getBreedingMethodName());
-
+	public void testGetListDataWithParents() {
+		this.setSessionOfDaosToRealHibernateSession();
+		
+		final Germplasm parentGermplasm = this.createTestParentGermplasmWithPreferredAndNonpreferredNames();
+		final Germplasm childGermplasm = this.createTestChildGermplasm(parentGermplasm);
+		final GermplasmListData listData = this.createTestListData(childGermplasm);
+		final List<GermplasmListData> listDataList = this.germplasmListDataDAO.getListDataWithParents(listData.getList().getId());
+		Assert.assertEquals("There should be only 1 list data under the list with id" + listData.getList().getId(), 1, listDataList.size());
+		
+		for (final GermplasmListData currentGermplasmListData : listDataList) {
+			Assert.assertEquals("List data id should be " + listData.getId(), listData.getId(), currentGermplasmListData.getId());
+			Assert.assertEquals("Entry id should be " + listData.getEntryId(), listData.getEntryId(), currentGermplasmListData.getEntryId());
+			Assert.assertEquals("Desig should be " + listData.getDesignation(), listData.getDesignation(),
+					currentGermplasmListData.getDesignation());
+			Assert.assertEquals("Group name should be " + listData.getGroupName(), listData.getGroupName(),
+					currentGermplasmListData.getGroupName());
+			Assert.assertEquals("Female gid should be " + listData.getFgid(), listData.getFgid(), currentGermplasmListData.getFgid());
+			Assert.assertEquals("Male gid should be " + listData.getMgid(), listData.getMgid(), currentGermplasmListData.getMgid());
+			Assert.assertEquals("Gid should be " + listData.getGid(), listData.getGid(), currentGermplasmListData.getGid());
+			Assert.assertEquals("Seed source should be " + listData.getSeedSource(), listData.getSeedSource(),
+					currentGermplasmListData.getSeedSource());
+			Assert.assertEquals("Female Parent designation should be " + parentGermplasm.getPreferredName().getNval(), parentGermplasm
+					.getPreferredName().getNval(), currentGermplasmListData.getFemaleParent());
+			Assert.assertEquals("Male Parent designation should be " + parentGermplasm.getPreferredName().getNval(), parentGermplasm
+					.getPreferredName().getNval(), currentGermplasmListData.getMaleParent());
 		}
+	}
+	
+	private void setSessionOfDaosToRealHibernateSession() {
+		this.germplasmListDataDAO.setSession(this.realHibernateSession);
+		this.germplasmDAO.setSession(this.realHibernateSession);
+		this.nameDAO.setSession(this.realHibernateSession);
+		this.germplasmListDAO.setSession(this.realHibernateSession);
+	}
 
+	private GermplasmListData createTestListData(final Germplasm childGermplasm) {
+		final GermplasmList germplasmList = this.createTestList();
+		final GermplasmListData listData =
+				new GermplasmListDataTestDataInitializer().createGermplasmListData(germplasmList, childGermplasm.getGid(), 1);
+		listData.setFgid(childGermplasm.getGpid1());
+		listData.setMgid(childGermplasm.getGpid2());
+		this.germplasmListDataDAO.save(listData);
+		return listData;
+	}
+	
+	private GermplasmList createTestList() {
+		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(null, false);
+		this.germplasmListDAO.save(germplasmList);
+		return germplasmList;
+	}
+	
+	private Germplasm createTestParentGermplasmWithPreferredAndNonpreferredNames() {
+		final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName();
+		this.germplasmDAO.save(germplasm);
+		final Name preferredName = germplasm.getPreferredName();
+		preferredName.setGermplasmId(germplasm.getGid());
+		final Name otherName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid(), "Other Name ");
+		otherName.setNstat(0);
+		this.nameDAO.save(preferredName);
+		this.nameDAO.save(otherName);
+		return germplasm;
+	}
+
+	private Germplasm createTestChildGermplasm(final Germplasm parentGermplasm) {
+		final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName();
+		germplasm.setGpid1(parentGermplasm.getGid());
+		germplasm.setGpid2(parentGermplasm.getGid());
+		this.germplasmDAO.save(germplasm);
+		return germplasm;
 	}
 
 }
