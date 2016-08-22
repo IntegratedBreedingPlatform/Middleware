@@ -31,6 +31,9 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 public class GermplasmListDataDAOTest extends IntegrationTestBase {
+	
+	private static final Integer TEST_METHOD_ID = 101;
+	private static final String TEST_METHOD_NAME = "Single cross";
 
 	private GermplasmListDataDAO germplasmListDataDAO;
 	private Session mockHibernateSession;
@@ -169,21 +172,30 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		Assert.assertEquals("There should be only 1 list data under the list with id" + listData.getList().getId(), 1, listDataList.size());
 		
 		for (final GermplasmListData currentGermplasmListData : listDataList) {
-			Assert.assertEquals("List data id should be " + listData.getId(), listData.getId(), currentGermplasmListData.getId());
-			Assert.assertEquals("Entry id should be " + listData.getEntryId(), listData.getEntryId(), currentGermplasmListData.getEntryId());
+			Assert.assertEquals("List data id should be " + listData.getId(), listData.getId(),
+					currentGermplasmListData.getId());
+			Assert.assertEquals("Entry id should be " + listData.getEntryId(), listData.getEntryId(),
+					currentGermplasmListData.getEntryId());
 			Assert.assertEquals("Desig should be " + listData.getDesignation(), listData.getDesignation(),
 					currentGermplasmListData.getDesignation());
 			Assert.assertEquals("Group name should be " + listData.getGroupName(), listData.getGroupName(),
 					currentGermplasmListData.getGroupName());
-			Assert.assertEquals("Female gid should be " + listData.getFgid(), listData.getFgid(), currentGermplasmListData.getFgid());
-			Assert.assertEquals("Male gid should be " + listData.getMgid(), listData.getMgid(), currentGermplasmListData.getMgid());
-			Assert.assertEquals("Gid should be " + listData.getGid(), listData.getGid(), currentGermplasmListData.getGid());
+			Assert.assertEquals("Gid should be " + listData.getGid(), listData.getGid(),
+					currentGermplasmListData.getGid());
 			Assert.assertEquals("Seed source should be " + listData.getSeedSource(), listData.getSeedSource(),
 					currentGermplasmListData.getSeedSource());
-			Assert.assertEquals("Female Parent designation should be " + parentGermplasm.getPreferredName().getNval(), parentGermplasm
-					.getPreferredName().getNval(), currentGermplasmListData.getFemaleParent());
-			Assert.assertEquals("Male Parent designation should be " + parentGermplasm.getPreferredName().getNval(), parentGermplasm
-					.getPreferredName().getNval(), currentGermplasmListData.getMaleParent());
+			Assert.assertEquals("Breeding method name should be " + TEST_METHOD_NAME,
+					TEST_METHOD_NAME, currentGermplasmListData.getBreedingMethodName());
+
+			// Check parent germplasm values
+			Assert.assertEquals("Female Parent GID should be " + listData.getFgid(), listData.getFgid(),
+					currentGermplasmListData.getFgid());
+			Assert.assertEquals("Female Parent GID should be " + listData.getMgid(), listData.getMgid(),
+					currentGermplasmListData.getMgid());
+			Assert.assertEquals("Female Parent designation should be " + parentGermplasm.getPreferredName().getNval(),
+					parentGermplasm.getPreferredName().getNval(), currentGermplasmListData.getFemaleParent());
+			Assert.assertEquals("Male Parent designation should be " + parentGermplasm.getPreferredName().getNval(),
+					parentGermplasm.getPreferredName().getNval(), currentGermplasmListData.getMaleParent());
 		}
 	}
 	
@@ -226,6 +238,7 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName();
 		germplasm.setGpid1(parentGermplasm.getGid());
 		germplasm.setGpid2(parentGermplasm.getGid());
+		germplasm.setMethodId(TEST_METHOD_ID);
 		this.germplasmDAO.save(germplasm);
 		return germplasm;
 	}
