@@ -173,7 +173,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 					+ "left outer join germplsm mp on g.gpid2 = mp.gid  "
 					+ "left outer join names mn on mp.gid = mn.gid and mn.nstat = 1  "
 					+ "left outer join germplsm fp on g.gpid1 = fp.gid  "
-					+ "left outer join names fn on fp.gid = fn.gid and mn.nstat = 1  "
+					+ "left outer join names fn on fp.gid = fn.gid and fn.nstat = 1  "
 					+ "left outer join methods m on m.mid = g.methn "
 					+ "where lp.listid = :listId group by entryid";
 
