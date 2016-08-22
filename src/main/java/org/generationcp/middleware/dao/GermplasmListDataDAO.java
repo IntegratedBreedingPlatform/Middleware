@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.Name;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -158,6 +159,11 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		return query.executeUpdate();
 	}
 
+	/**
+	 * This will return all germplasm list data including the details of their parent germplasm.
+	 * Note that we're getting the name of the parents from its preferred name which is indicated by 
+	 * name record with nstat = 1
+	 * */
 	public List<GermplasmListData> getListDataWithParents(Integer listID) {
 		List<GermplasmListData> germplasmListData = new ArrayList<GermplasmListData>();
 
@@ -168,17 +174,18 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		try {
 
 			String queryStr ="select  lp.lrecid as lrecid,  lp.entryid as entryid,  lp.desig as desig,  lp.grpname as grpname, "
-					+ " fn.nval as fnval,  fp.gid as fpgid,  mn.nval as mnval,  mp.gid as mpgid,  g.gid as gid,  lp.source as source,  m.mname as mname "
+					+ " femaleParentName.nval as fnval,  g.gpid1 as fpgid,  maleParentName.nval as mnval,  g.gpid2 as mpgid,  "
+					+ " g.gid as gid,  lp.source as source,  m.mname as mname "
 					+ "from listdata lp  inner join germplsm g on lp.gid = g.gid  "
-					+ "left outer join germplsm mp on g.gpid2 = mp.gid  "
-					+ "left outer join names mn on mp.gid = mn.gid and mn.nstat = 1  "
-					+ "left outer join germplsm fp on g.gpid1 = fp.gid  "
-					+ "left outer join names fn on fp.gid = fn.gid and fn.nstat = 1  "
+					+ "left outer join names maleParentName on g.gpid2 = maleParentName.gid and maleParentName.nstat = :preferredNameNstat  "
+					+ "left outer join names femaleParentName on g.gpid1 = femaleParentName.gid and femaleParentName.nstat = :preferredNameNstat  "
 					+ "left outer join methods m on m.mid = g.methn "
 					+ "where lp.listid = :listId group by entryid";
 
 			SQLQuery query = this.getSession().createSQLQuery(queryStr);
 			query.setParameter("listId", listID);
+			query.setParameter("preferredNameNstat", Name.NSTAT_PREFERRED_NAME);
+			
 			query.addScalar("lrecid");
 			query.addScalar("entryid");
 			query.addScalar("desig");
