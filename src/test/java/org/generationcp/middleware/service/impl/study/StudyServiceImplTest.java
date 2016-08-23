@@ -95,4 +95,29 @@ public class StudyServiceImplTest {
 		Assert.assertEquals(testDBRow[10], studySummary.getSeason());
 
 	}
+
+	@Test
+	public void testGetStudyInstances() throws Exception {
+		final Session mockSession = Mockito.mock(Session.class);
+		final SQLQuery mockSqlQuery = Mockito.mock(SQLQuery.class);
+
+		final HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
+		Mockito.when(mockSessionProvider.getSession()).thenReturn(mockSession);
+		Mockito.when(mockSession.createSQLQuery(Matchers.anyString())).thenReturn(mockSqlQuery);
+		Mockito.when(mockSqlQuery.addScalar(Matchers.anyString())).thenReturn(mockSqlQuery);
+
+		final Object[] testDBRow = {12345, "Gujarat, India", "GUJ", 1};
+		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow);
+		Mockito.when(mockSqlQuery.list()).thenReturn(testResult);
+
+		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
+
+		final List<StudyInstance> studyInstances = studyServiceImpl.getStudyInstances(123);
+
+		Assert.assertTrue(studyInstances.size() == 1);
+		Assert.assertEquals(testDBRow[0], studyInstances.get(0).getInstanceDbId());
+		Assert.assertEquals(testDBRow[1], studyInstances.get(0).getLocationName());
+		Assert.assertEquals(testDBRow[2], studyInstances.get(0).getLocationAbbreviation());
+		Assert.assertEquals(testDBRow[3], studyInstances.get(0).getInstanceNumber());
+	}
 }
