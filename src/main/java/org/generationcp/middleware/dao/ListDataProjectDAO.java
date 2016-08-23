@@ -13,6 +13,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.Name;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -198,14 +199,16 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 							+ " from listdata_project lp "
 							+ " left outer join germplsm g on lp.germplasm_id = g.gid "
 							+ " left outer join germplsm mp on g.gpid2 = mp.gid "
-							+ " left outer join names mn on mp.gid = mn.gid and mn.nstat = 1 "
+							+ " left outer join names mn on mp.gid = mn.gid and mn.nstat = :preferredNameNstat "
 							+ " left outer join germplsm fp on g.gpid1 = fp.gid "
-							+ " left outer join names fn on fp.gid = fn.gid and mn.nstat = 1 "
+							+ " left outer join names fn on fp.gid = fn.gid and fn.nstat = :preferredNameNstat "
 							+ " where lp.list_id = :listId "
 							+ " group by entry_id";
 
 			SQLQuery query = this.getSession().createSQLQuery(queryStr);
 			query.setParameter("listId", listID);
+			query.setParameter("preferredNameNstat", Name.NSTAT_PREFERRED_NAME);
+			
 			query.addScalar("listdata_project_id");
 			query.addScalar("entry_id");
 			query.addScalar("designation");
