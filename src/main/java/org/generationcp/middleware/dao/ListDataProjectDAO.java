@@ -185,23 +185,26 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		return 0;
 	}
 
+	/**
+	 * This will return all germplasm list data project records including the details of their parent germplasm.
+	 * Note that we're getting the name of the parents from its preferred name which is indicated by 
+	 * name record with nstat = 1
+	 * */
 	public List<ListDataProject> getListDataProjectWithParents(Integer listID) throws MiddlewareQueryException {
 		List<ListDataProject> listDataProjects = new ArrayList<ListDataProject>();
 		try {
 
 			String queryStr =
-					"select " + " lp.listdata_project_id as listdata_project_id, " + " lp.entry_id as entry_id, "
-							+ " lp.designation as designation, " + " lp.group_name as group_name, " + " fn.nval as fnval, "
-							+ " fp.gid as fpgid, " + " mn.nval as mnval, " + " mp.gid as mpgid, " + " g.mgid as mgid, "
+					"select lp.listdata_project_id as listdata_project_id, " + " lp.entry_id as entry_id, "
+							+ " lp.designation as designation, " + " lp.group_name as group_name, " + " femaleParentName.nval as fnval, "
+							+ " g.gpid1 as fpgid, " + " maleParentName.nval as mnval, " + " g.gpid2 as mpgid, " + " g.mgid as mgid, "
                             + " g.gid as gid, "
 							+ " lp.seed_source as seed_source, " + " lp.duplicate_notes as duplicate_notes, " + " lp.check_type as check_type, "
 							+ " lp.entry_code as entry_code"
 							+ " from listdata_project lp "
 							+ " left outer join germplsm g on lp.germplasm_id = g.gid "
-							+ " left outer join germplsm mp on g.gpid2 = mp.gid "
-							+ " left outer join names mn on mp.gid = mn.gid and mn.nstat = :preferredNameNstat "
-							+ " left outer join germplsm fp on g.gpid1 = fp.gid "
-							+ " left outer join names fn on fp.gid = fn.gid and fn.nstat = :preferredNameNstat "
+							+ " left outer join names maleParentName on g.gpid2 = maleParentName.gid and maleParentName.nstat = :preferredNameNstat "
+							+ " left outer join names femaleParentName on g.gpid1 = femaleParentName.gid and femaleParentName.nstat = :preferredNameNstat "
 							+ " where lp.list_id = :listId "
 							+ " group by entry_id";
 
