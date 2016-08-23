@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.hibernate.Criteria;
@@ -126,22 +127,23 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getAdminUserIdsOfCrop(final String crop) {
+	public List<User> getAdminUsersOfCrop(final String crop) {
 		try {
 
 			final StringBuilder sb = new StringBuilder();
-			sb.append("SELECT DISTINCT u.userid FROM users u ").append("INNER JOIN users_roles r ON r.userid = u.userid ")
+			sb.append("SELECT DISTINCT {u.*} FROM users u ").append("INNER JOIN users_roles r ON r.userid = u.userid ")
 					.append("INNER JOIN workbench_project_user_info member ON member.user_id = u.userid ")
 					.append("INNER JOIN workbench_project program ON program.project_id = member.project_id ")
 					.append("WHERE r.role = 'ADMIN' AND program.crop_type = :cropType");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 			query.setParameter("cropType", crop);
+			query.addEntity("u", User.class);
 			return query.list();
 
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getAdminUserIdsOfCrop(" + crop + ") query from ProjectDAO " + e.getMessage(), e);
 		}
-		return new ArrayList<Integer>();
+		return new ArrayList<User>();
 	}
 }

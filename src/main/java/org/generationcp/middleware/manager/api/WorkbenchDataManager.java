@@ -924,11 +924,11 @@ public interface WorkbenchDataManager {
 	List<Project> getProjectsByCropType(final CropType cropType);
 
 	/**
-	 * Returns the list of admin user ids given the CropType
+	 * Returns the list of admin users given the CropType
 	 * 
 	 * @param cropName the crop
-	 * @return Returns the list of projects / programs associated to the crop type
+	 * @return Returns the list of admin users associated to the crop type
 	 */
-	List<Integer> getAdminUserIdsOfCrop(final String crop);
+	List<User> getAdminUsersOfCrop(final String crop);
 
 }

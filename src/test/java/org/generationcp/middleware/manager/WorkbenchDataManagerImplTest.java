@@ -867,16 +867,16 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final User adminUser = programMembersIterator.next();
 		final User nonAdminUser = programMembersIterator.next();
 		// test
-		final List<Integer> adminUserIds = this.workbenchDataManager.getAdminUserIdsOfCrop(newProgram.getCropType().getCropName());
-		Assert.assertNotNull("The list should not be null", adminUserIds);
-		Assert.assertFalse("There should be at least one admin user found", adminUserIds.isEmpty());
+		final List<User> adminUsers = this.workbenchDataManager.getAdminUsersOfCrop(newProgram.getCropType().getCropName());
+		Assert.assertNotNull("The list should not be null", adminUsers);
+		Assert.assertFalse("There should be at least one admin user found", adminUsers.isEmpty());
 		boolean adminUserFound = false;
 		boolean nonAdminUserFound = false;
-		for (final Integer userId : adminUserIds) {
-			if (userId.equals(adminUser.getUserid())) {
+		for (final User user : adminUsers) {
+			if (user.getUserid().equals(adminUser.getUserid())) {
 				adminUserFound = true;
 			}
-			if (userId.equals(nonAdminUser.getUserid())) {
+			if (user.getUserid().equals(nonAdminUser.getUserid())) {
 				nonAdminUserFound = true;
 			}
 		}

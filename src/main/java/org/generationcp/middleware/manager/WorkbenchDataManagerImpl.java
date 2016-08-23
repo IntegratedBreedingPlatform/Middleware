@@ -1504,8 +1504,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Integer> getAdminUserIdsOfCrop(final String crop) {
-		return this.getProjectDao().getAdminUserIdsOfCrop(crop);
+	public List<User> getAdminUsersOfCrop(final String crop) {
+		return this.getProjectDao().getAdminUsersOfCrop(crop);
 	}
 
 }

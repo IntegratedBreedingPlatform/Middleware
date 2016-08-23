@@ -65,13 +65,14 @@ public class ProjectDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAdminUserIdsOfCrop() {
+	public void testGetAdminUsersOfCrop() {
 		final String crop = ContextHolder.getCurrentCrop();
 
-		final List<Integer> adminUserIds = ProjectDAOTest.projectDAO.getAdminUserIdsOfCrop(crop);
-		Assert.assertNotNull("The list should not be null", adminUserIds);
+		final List<User> adminUsers = ProjectDAOTest.projectDAO.getAdminUsersOfCrop(crop);
+		Assert.assertNotNull("The list should not be null", adminUsers);
 
 		// check if the users are admin
+		final List<Integer> adminUserIds = this.getListOfUserIdsFromUsers(adminUsers);
 		final List<User> users = ProjectDAOTest.userDAO.getByIds(adminUserIds);
 		for (final User user : users) {
 			final List<UserRole> roles = user.getRoles();
@@ -98,6 +99,14 @@ public class ProjectDAOTest extends IntegrationTestBase {
 			}
 		}
 		Assert.assertTrue("The users should be crop users", cropUserIds.containsAll(adminUserIds));
+	}
+
+	private List<Integer> getListOfUserIdsFromUsers(final List<User> users) {
+		final List<Integer> userIds = new ArrayList<>();
+		for (final User user : users) {
+			userIds.add(user.getUserid());
+		}
+		return userIds;
 	}
 
 }
