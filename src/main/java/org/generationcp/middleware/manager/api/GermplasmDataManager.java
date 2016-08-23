@@ -1155,4 +1155,12 @@ public interface GermplasmDataManager {
 	 */
 	long countMatchGermplasmInList(Set<Integer> gids);
 
+	/**
+	 * Returns the list of favorite methods in the current program
+	 * @param mType
+	 * @param programUUID
+	 * @return list of favorite methods
+	 */
+	List<Method> getFavoriteMethodsByMType(String mType, String programUUID);
+
 }
