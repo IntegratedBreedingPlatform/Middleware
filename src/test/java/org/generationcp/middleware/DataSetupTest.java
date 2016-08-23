@@ -71,8 +71,8 @@ public class DataSetupTest extends IntegrationTestBase {
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
-	private static final int NUMBER_OF_GERMPLASM = 20;
-	private static final String GERMPLSM_PREFIX = "GP-VARIETY-";
+	public static final int NUMBER_OF_GERMPLASM = 20;
+	public static final String GERMPLSM_PREFIX = "GP-VARIETY-";
 
 	private static final String PROP_BREEDING_METHOD = "Breeding Method";
 	private static final String PROP_INSTITUTE = "Institute";
@@ -204,12 +204,16 @@ public class DataSetupTest extends IntegrationTestBase {
 
 	private void createNursery(final String programUUID) throws MiddlewareException {
 
-		final int randomInt = new Random().nextInt(100);
-
-		// Germplasm
+		// Create Germplasm
 		final Integer[] gids =
 				this.germplasmTestDataGenerator.createGermplasmRecords(DataSetupTest.NUMBER_OF_GERMPLASM, DataSetupTest.GERMPLSM_PREFIX);
 
+		createNurseryForGermplasm(programUUID, gids);
+	}
+
+	public int createNurseryForGermplasm(final String programUUID, final Integer[] gids) {
+		final int randomInt = new Random().nextInt(100);
+		
 		// Germplasm list
 		final GermplasmList germplasmList =
 				new GermplasmList(null, "Test Germplasm List " + randomInt, Long.valueOf(20141014), "LST", Integer.valueOf(1),
@@ -407,6 +411,8 @@ public class DataSetupTest extends IntegrationTestBase {
 		// Assert list data got saved with Nursery
 		final List<ListDataProject> listDataProject = this.middlewareFieldbookService.getListDataProject(nurseryListId);
 		Assert.assertEquals(germplasmListData.size(), listDataProject.size());
+		
+		return nurseryStudyId;
 	}
 
 	private MeasurementVariable createMeasurementVariable(final int termId, final String name, final String description,
@@ -429,5 +435,18 @@ public class DataSetupTest extends IntegrationTestBase {
 
 		return variable;
 	}
+	
+	public void setGermplasmListManager(final GermplasmListManager germplasmListManager) {
+		this.germplasmListManager = germplasmListManager;
+	}
+
+	public void setDataImportService(final DataImportService dataImportService) {
+		this.dataImportService = dataImportService;
+	}
+
+	public void setMiddlewareFieldbookService(final FieldbookService middlewareFieldbookService) {
+		this.middlewareFieldbookService = middlewareFieldbookService;
+	}
+
 
 }
