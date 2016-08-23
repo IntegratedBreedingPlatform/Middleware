@@ -33,6 +33,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.cache.CacheBuilder;
@@ -236,28 +237,35 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public List<StudyInstance> getStudyInstances(final int studyId) {
 
 		try {
-			final String sql =
-					" select gl.nd_geolocation_id, gl.description"
-					+ "  from \n" 
-					+ "	nd_geolocation gl \n"
-					+ "    inner join nd_experiment nde on nde.nd_geolocation_id = gl.nd_geolocation_id \n"
-					+ "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
-					+ "    inner join project proj on proj.project_id = ndep.project_id \n" 
-					+ " where \n"
-					+ "	   proj.project_id = (select  p.project_id from project_relationship pr inner join project p on p.project_id = pr.subject_project_id where (pr.object_project_id = :studyId and name like '%ENVIRONMENT')) \n"
-					+ "    order by (1 * gl.description) asc";
+			final String sql = "select \n" + 
+					"	geoloc.nd_geolocation_id as INSTANCE_DBID, \n" + 
+					"	max(if(geoprop.type_id = 8180, geoprop.value, null)) as LOCATION_NAME, \n" + // 8180 = cvterm for LOCATION_NAME
+					"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
+					"   geoloc.description as INSTANCE_NUMBER \n" +
+					" from \n" + 
+					"	nd_geolocation geoloc \n" + 
+					"    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n" + 
+					"    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n" + 
+					"    inner join project proj on proj.project_id = ndep.project_id \n" + 
+					"    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n" + 
+					" where \n" + 
+					"    proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id " + 
+					"    		where (pr.object_project_id = :studyId and name like '%ENVIRONMENT')) \n" +
+					"    group by geoloc.nd_geolocation_id \n" + 
+					"    order by (1 * geoloc.description) asc ";
 
 			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
 			query.setParameter("studyId", studyId);
-			query.addScalar("nd_geolocation_id", new IntegerType());
-			// Bad design legacy: The nd_geolocation.description column is hijacked to store study instance number.
-			query.addScalar("description", new IntegerType());
+			query.addScalar("INSTANCE_DBID", new IntegerType());
+			query.addScalar("LOCATION_NAME", new StringType());
+			query.addScalar("LOCATION_ABBR", new StringType());
+			query.addScalar("INSTANCE_NUMBER", new IntegerType());
 			
 			final List queryResults = query.list();
 			final List<StudyInstance> instances = new ArrayList<>();
 			for (final Object result : queryResults) {				
 				Object[] row = (Object[]) result;
-				instances.add(new StudyInstance((Integer) row[0], (Integer) row[1]));
+				instances.add(new StudyInstance((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[3]));
 			}
 			return instances;
 		} catch (HibernateException he) {

@@ -9,14 +9,18 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 public class StudyInstance {
 
 	private int instanceDbId;
+	private String locationName;
+	private String locationAbbreviation;
 	private int instanceNumber;
 
 	public StudyInstance() {
 
 	}
 
-	public StudyInstance(final int instanceDbId, final int instanceNumber) {
+	public StudyInstance(final int instanceDbId, final String locationName, final String locationAbbreviation, final int instanceNumber) {
 		this.instanceDbId = instanceDbId;
+		this.locationName = locationName;
+		this.locationAbbreviation = locationAbbreviation;
 		this.instanceNumber = instanceNumber;
 	}
 
@@ -26,6 +30,22 @@ public class StudyInstance {
 
 	public void setInstanceDbId(final int instanceDbId) {
 		this.instanceDbId = instanceDbId;
+	}
+
+	public String getLocationName() {
+		return this.locationName;
+	}
+
+	public void setLocationName(final String locationName) {
+		this.locationName = locationName;
+	}
+
+	public String getLocationAbbreviation() {
+		return this.locationAbbreviation;
+	}
+
+	public void setLocationAbbreviation(final String locationAbbreviation) {
+		this.locationAbbreviation = locationAbbreviation;
 	}
 
 	public int getInstanceNumber() {
@@ -41,7 +61,7 @@ public class StudyInstance {
 		if (!(other instanceof StudyInstance)) {
 			return false;
 		}
-		StudyInstance castOther = (StudyInstance) other;
+		final StudyInstance castOther = (StudyInstance) other;
 		return new EqualsBuilder().append(this.instanceDbId, castOther.instanceDbId).isEquals();
 	}
 
