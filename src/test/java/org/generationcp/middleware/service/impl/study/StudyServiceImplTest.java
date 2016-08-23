@@ -18,9 +18,12 @@ import org.generationcp.middleware.service.api.study.TraitService;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 /**
  * The class <code>StudyServiceImplTest</code> contains tests for the class <code>{@link StudyServiceImpl}</code>.
@@ -28,6 +31,26 @@ import org.mockito.Mockito;
  * @author Akhil
  */
 public class StudyServiceImplTest {
+
+	@Mock
+	private Session mockSession;
+
+	@Mock
+	private SQLQuery mockSqlQuery;
+
+	@Mock
+	private HibernateSessionProvider mockSessionProvider;
+
+	private StudyServiceImpl studyServiceImpl;
+
+	@Before
+	public void setUp() {
+		MockitoAnnotations.initMocks(this);
+		this.studyServiceImpl = new StudyServiceImpl(this.mockSessionProvider);
+		Mockito.when(this.mockSessionProvider.getSession()).thenReturn(this.mockSession);
+		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(this.mockSqlQuery);
+		Mockito.when(this.mockSqlQuery.addScalar(Matchers.anyString())).thenReturn(this.mockSqlQuery);
+	}
 
 	/**
 	 * Run the StudyServiceImpl(HibernateSessionProvider) constructor test.
@@ -45,9 +68,8 @@ public class StudyServiceImplTest {
 		Mockito.when(mockTrialTraits.getTraits(1234)).thenReturn(projectTraits);
 		final List<MeasurementDto> traits = new ArrayList<MeasurementDto>();
 		traits.add(new MeasurementDto(new TraitDto(1, "traitName"), 9999, "triatValue"));
-		final ObservationDto measurement =
-				new ObservationDto(1, "trialInstance", "entryType", 1234, "designation", "entryNo", "seedSource", "repitionNumber",
-						"plotNumber", traits);
+		final ObservationDto measurement = new ObservationDto(1, "trialInstance", "entryType", 1234, "designation", "entryNo", "seedSource",
+				"repitionNumber", "plotNumber", traits);
 		final List<ObservationDto> testMeasurements = Collections.<ObservationDto>singletonList(measurement);
 		Mockito.when(mockTrailMeasurements.getAllMeasurements(1234, projectTraits, 1, 1, 100)).thenReturn(testMeasurements);
 		result.getObservations(1234, 1, 1, 100);
@@ -58,25 +80,16 @@ public class StudyServiceImplTest {
 
 	@Test
 	public void testlistAllStudies() throws MiddlewareQueryException {
-		final Session mockSession = Mockito.mock(Session.class);
-		final SQLQuery mockSqlQuery = Mockito.mock(SQLQuery.class);
 
-		final HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
-		Mockito.when(mockSessionProvider.getSession()).thenReturn(mockSession);
-		Mockito.when(mockSession.createSQLQuery(Matchers.anyString())).thenReturn(mockSqlQuery);
-		Mockito.when(mockSqlQuery.addScalar(Matchers.anyString())).thenReturn(mockSqlQuery);
-
-		final Object[] testDBRow =
-			{2007, "Wheat Trial 1", "Wheat Trial 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", "10010", "Wheat Trial 1 Objective",
-				"20150417", "20150422", "Mr. Breeder", "Auckland", "Summer"};
+		final Object[] testDBRow = {2007, "Wheat Trial 1", "Wheat Trial 1 Title", "c996de54-3ebb-41ca-8fed-160a33ffffd4", "10010",
+				"Wheat Trial 1 Objective", "20150417", "20150422", "Mr. Breeder", "Auckland", "Summer"};
 		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow);
 
-		Mockito.when(mockSqlQuery.list()).thenReturn(testResult);
+		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
 
-		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
-		StudySearchParameters searchParameters = new StudySearchParameters();
+		final StudySearchParameters searchParameters = new StudySearchParameters();
 		searchParameters.setProgramUniqueId("c996de54-3ebb-41ca-8fed-160a33ffffd4");
-		final List<StudySummary> studySummaries = studyServiceImpl.search(searchParameters);
+		final List<StudySummary> studySummaries = this.studyServiceImpl.search(searchParameters);
 		Assert.assertNotNull(studySummaries);
 		Assert.assertEquals(1, studySummaries.size());
 
@@ -98,21 +111,12 @@ public class StudyServiceImplTest {
 
 	@Test
 	public void testGetStudyInstances() throws Exception {
-		final Session mockSession = Mockito.mock(Session.class);
-		final SQLQuery mockSqlQuery = Mockito.mock(SQLQuery.class);
-
-		final HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
-		Mockito.when(mockSessionProvider.getSession()).thenReturn(mockSession);
-		Mockito.when(mockSession.createSQLQuery(Matchers.anyString())).thenReturn(mockSqlQuery);
-		Mockito.when(mockSqlQuery.addScalar(Matchers.anyString())).thenReturn(mockSqlQuery);
 
 		final Object[] testDBRow = {12345, "Gujarat, India", "GUJ", 1};
 		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow);
-		Mockito.when(mockSqlQuery.list()).thenReturn(testResult);
+		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
 
-		final StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
-
-		final List<StudyInstance> studyInstances = studyServiceImpl.getStudyInstances(123);
+		final List<StudyInstance> studyInstances = this.studyServiceImpl.getStudyInstances(123);
 
 		Assert.assertTrue(studyInstances.size() == 1);
 		Assert.assertEquals(testDBRow[0], studyInstances.get(0).getInstanceDbId());
