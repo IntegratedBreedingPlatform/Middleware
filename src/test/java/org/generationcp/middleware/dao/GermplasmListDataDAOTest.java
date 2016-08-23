@@ -10,14 +10,14 @@ import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 
+import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
-import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.Name;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -29,28 +29,30 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	
-	private static final Integer TEST_METHOD_ID = 101;
-	private static final String TEST_METHOD_NAME = "Single cross";
-
 	private GermplasmListDataDAO germplasmListDataDAO;
 	private Session mockHibernateSession;
 	private Session realHibernateSession;
-	private GermplasmDAO germplasmDAO;
-	private NameDAO nameDAO;
 	private GermplasmListDAO germplasmListDAO;
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
+	
+	@Autowired
+	private GermplasmDataManager germplasmManager;
+
 
 	@Before
 	public void beforeTest() {
 		this.germplasmListDataDAO = new GermplasmListDataDAO();
-		this.germplasmDAO = new GermplasmDAO();
-		this.nameDAO = new NameDAO();
 		this.germplasmListDAO = new GermplasmListDAO();
 		this.mockHibernateSession = Mockito.mock(Session.class);
 		this.realHibernateSession = this.sessionProvder.getSession();
-		this.germplasmListDataDAO.setSession(this.mockHibernateSession);
+		
+		if (this.germplasmTestDataGenerator == null) {
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager);
+		}
 	}
 
 	@Test
@@ -165,8 +167,8 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	public void testGetListDataWithParents() {
 		this.setSessionOfDaosToRealHibernateSession();
 		
-		final Germplasm parentGermplasm = this.createTestParentGermplasmWithPreferredAndNonpreferredNames();
-		final Germplasm childGermplasm = this.createTestChildGermplasm(parentGermplasm);
+		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+		final Germplasm childGermplasm = this.germplasmTestDataGenerator.createChildGermplasm(parentGermplasm, "VARIETY");
 		final GermplasmListData listData = this.createTestListData(childGermplasm);
 		final List<GermplasmListData> listDataList = this.germplasmListDataDAO.getListDataWithParents(listData.getList().getId());
 		Assert.assertEquals("There should be only 1 list data under the list with id" + listData.getList().getId(), 1, listDataList.size());
@@ -184,8 +186,8 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 					currentGermplasmListData.getGid());
 			Assert.assertEquals("Seed source should be " + listData.getSeedSource(), listData.getSeedSource(),
 					currentGermplasmListData.getSeedSource());
-			Assert.assertEquals("Breeding method name should be " + TEST_METHOD_NAME,
-					TEST_METHOD_NAME, currentGermplasmListData.getBreedingMethodName());
+			Assert.assertEquals("Breeding method name should be " + GermplasmTestDataGenerator.TEST_METHOD_NAME,
+					GermplasmTestDataGenerator.TEST_METHOD_NAME, currentGermplasmListData.getBreedingMethodName());
 
 			// Check parent germplasm values
 			Assert.assertEquals("Female Parent GID should be " + listData.getFgid(), listData.getFgid(),
@@ -201,8 +203,6 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	
 	private void setSessionOfDaosToRealHibernateSession() {
 		this.germplasmListDataDAO.setSession(this.realHibernateSession);
-		this.germplasmDAO.setSession(this.realHibernateSession);
-		this.nameDAO.setSession(this.realHibernateSession);
 		this.germplasmListDAO.setSession(this.realHibernateSession);
 	}
 
@@ -222,25 +222,4 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		return germplasmList;
 	}
 	
-	private Germplasm createTestParentGermplasmWithPreferredAndNonpreferredNames() {
-		final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName();
-		this.germplasmDAO.save(germplasm);
-		final Name preferredName = germplasm.getPreferredName();
-		preferredName.setGermplasmId(germplasm.getGid());
-		final Name otherName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid(), "Other Name ");
-		otherName.setNstat(0);
-		this.nameDAO.save(preferredName);
-		this.nameDAO.save(otherName);
-		return germplasm;
-	}
-
-	private Germplasm createTestChildGermplasm(final Germplasm parentGermplasm) {
-		final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName();
-		germplasm.setGpid1(parentGermplasm.getGid());
-		germplasm.setGpid2(parentGermplasm.getGid());
-		germplasm.setMethodId(TEST_METHOD_ID);
-		this.germplasmDAO.save(germplasm);
-		return germplasm;
-	}
-
 }
