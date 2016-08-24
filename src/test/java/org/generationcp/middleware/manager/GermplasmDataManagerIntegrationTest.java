@@ -24,6 +24,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.data.initializer.ProgramFavoriteTestDataInitializer;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -39,6 +40,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
@@ -73,9 +75,13 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
-
+	
+	private ProgramFavoriteTestDataInitializer programFavoriteTDI;
+	
 	@Before
 	public void setUp() throws Exception {
+		this.programFavoriteTDI = new ProgramFavoriteTestDataInitializer();
+		
 		if (this.nameDAO == null) {
 			this.nameDAO = new NameDAO();
 			this.nameDAO.setSession(this.sessionProvder.getSession());
@@ -1073,5 +1079,23 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final Map<String, Integer> mapCountByNamePermutations = this.germplasmDataManager.getCountByNamePermutations(nameList);
 
 		Assert.assertTrue(mapCountByNamePermutations.size() > 0);
+	}
+	
+	@Test
+	public void testGetFavoriteMethodsByMType() {
+		final Method method = this.germplasmDataManager.getMethodByID(154);
+		
+		final String programUUID = UUID.randomUUID().toString();
+		final ProgramFavorite programFavorite = this.programFavoriteTDI.createProgramFavorite(method.getMid(), programUUID);
+		this.germplasmDataManager.saveProgramFavorite(programFavorite);
+		
+		final List<Method> methods = this.germplasmDataManager.getFavoriteMethodsByMType(method.getMtype(), programUUID);
+		final Method resultMethod = methods.get(0);
+		Assert.assertEquals("The method code should be " + method.getMcode(), method.getMcode(), resultMethod.getMcode());
+		Assert.assertEquals("The method id should be " + method.getMid(), method.getMid(), resultMethod.getMid());
+		Assert.assertEquals("The method type should be " + method.getMtype(), method.getMtype(), resultMethod.getMtype());
+		Assert.assertEquals("The method group should be " + method.getMgrp(), method.getMgrp(), resultMethod.getMgrp());
+		Assert.assertEquals("The method name should be " + method.getMname(), method.getMname(), resultMethod.getMname());
+		Assert.assertEquals("The method description should be " + method.getMdesc(), method.getMdesc(), resultMethod.getMdesc());
 	}
 }
