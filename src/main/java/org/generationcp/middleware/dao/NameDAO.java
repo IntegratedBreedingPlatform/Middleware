@@ -340,6 +340,38 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 		return map;
 	}
+	
+	public Map<Integer, List<Name>> getNamesByGidsAndNTypeIdsInMap(final List<Integer> gids, final List<Integer> ntypeIds) {
+		final Map<Integer, List<Name>> map = new HashMap<Integer, List<Name>>();
+
+		if (gids == null || gids.isEmpty()) {
+			return map;
+		}
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Name.class);
+			criteria.add(Restrictions.in("germplasmId", gids));
+			criteria.add(Restrictions.in("typeId", ntypeIds));
+
+			final List<Name> list = criteria.list();
+			if (list == null) {
+				return map;
+			}
+			for (final Name name : list) {
+				List<Name> names = map.get(name.getGermplasmId());
+				if (names == null) {
+					names = new ArrayList<Name>();
+					map.put(name.getGermplasmId(), names);
+				}
+				names.add(name);
+			}
+
+		} catch (final HibernateException e) {
+			this.logAndThrowException("Error with getNamesByGidsInMap(gids=" + gids + ") query from Name " + e.getMessage(), e);
+		}
+
+		return map;
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<String> getAllMatchingNames(final String prefix, final String suffix) {

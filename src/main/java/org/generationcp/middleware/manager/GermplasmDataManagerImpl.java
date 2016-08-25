@@ -1400,6 +1400,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public long countMatchGermplasmInList(final Set<Integer> gids) {
 		return this.getGermplasmDao().countMatchGermplasmInList(gids);
 	}
+	
+	@Override
+	public Map<Integer, List<Name>> getNamesByGidsAndNTypeIdsInMap(final List<Integer> gids, final List<Integer> ntypeIds) {
+		return this.getNameDao().getNamesByGidsAndNTypeIdsInMap(gids, ntypeIds);
+	}
 
 	/** (non-Javadoc)
 	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getGermplasmWithAllNamesAndAncestry(java.util.Set, int)
