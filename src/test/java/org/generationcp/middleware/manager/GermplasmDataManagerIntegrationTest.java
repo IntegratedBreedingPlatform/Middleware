@@ -24,6 +24,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -73,9 +74,11 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
-
+	
+	private NameTestDataInitializer nameTDI;
 	@Before
 	public void setUp() throws Exception {
+		this.nameTDI =  new NameTestDataInitializer();
 		if (this.nameDAO == null) {
 			this.nameDAO = new NameDAO();
 			this.nameDAO.setSession(this.sessionProvder.getSession());
@@ -1020,22 +1023,22 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final Integer gid1 = germplasm1.getGid();
 		final Integer gid2 = germplasm2.getGid();
 
-		final Name name1 = this.buildNewNameEntity(gid1, "I-1RT  /  P 001 A-23 / ");
+		final Name name1 = this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "I-1RT  /  P 001 A-23 / ");
 		this.nameDAO.save(name1);
 
-		final Name name2 = this.buildNewNameEntity(gid2, "I-1RT/P 1 A-23/");
+		final Name name2 = this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "I-1RT/P 1 A-23/");
 		this.nameDAO.save(name2);
 
-		final Name name3 = this.buildNewNameEntity(gid2, "I-1RT/P001A-23/");
+		final Name name3 = this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "I-1RT/P001A-23/");
 		this.nameDAO.save(name3);
 
-		final Name name4 = this.buildNewNameEntity(gid2, "(CML454 X CML451)-B-3-1-112");
+		final Name name4 = this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "(CML454 X CML451)-B-3-1-112");
 		this.nameDAO.save(name4);
 
-		final Name name5 = this.buildNewNameEntity(gid1, "(CML454 X CML451)-B-3-1-112");
+		final Name name5 = this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "(CML454 X CML451)-B-3-1-112");
 		this.nameDAO.save(name5);
 
-		final Name name6 = this.buildNewNameEntity(gid1, "(CML454XCML451)-B-3-1-112");
+		final Name name6 = this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "(CML454XCML451)-B-3-1-112");
 		this.nameDAO.save(name6);
 
 		final List<String> names = new ArrayList<>(Arrays.asList("I-1RT  /  P 001 A-23 / ", "(CML454 X CML451)-B-3-1-112"));
@@ -1045,19 +1048,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(2, mapCountByNamePermutations.size());
 		Assert.assertEquals((Integer) 2, mapCountByNamePermutations.get("I-1RT  /  P 001 A-23 / "));
 		Assert.assertEquals((Integer) 1, mapCountByNamePermutations.get("(CML454 X CML451)-B-3-1-112"));
-	}
-
-	private Name buildNewNameEntity(final Integer germPlasmId, final String nval) {
-		final Name name = new Name();
-		name.setGermplasmId(germPlasmId);
-		name.setLocationId(0);
-		name.setNstat(1);
-		name.setNdate(20150707);
-		name.setReferenceId(0);
-		name.setUserId(1);
-		name.setNval(nval);
-		name.setTypeId(GermplasmNameType.LINE_NAME.getUserDefinedFieldID());
-		return name;
 	}
 
 	/**
