@@ -464,14 +464,19 @@ public class PoiUtil {
 	 * @return false if all cells in a column is not empty or null true if one or more cells in the column is empty or null.
 	 */
 	public static Boolean columnHasEmpty(Sheet sheet, int columnIndex) {
-		Boolean b = false;
 		int index = 0;
 		try {
 			Row row = sheet.getRow(index);
-			while (row != null) {
+			if (row == null) {
+				return true;
+			}
+			final int lastRowNo = sheet.getLastRowNum();
+			while (index <= lastRowNo) {
+				if (row == null) {
+					return true;
+				}
 				if (PoiUtil.getCellValue(row.getCell(columnIndex)) == null
 						|| "".equalsIgnoreCase(PoiUtil.getCellValue(row.getCell(columnIndex)).toString())) {
-					b = true;
 					return true;
 				}
 				index++;
@@ -480,7 +485,7 @@ public class PoiUtil {
 		} catch (Exception e) {
 			PoiUtil.LOG.error(e.getMessage(), e);
 		}
-		return b;
+		return false;
 	}
 
 	public static Boolean isEmpty(Sheet sheet, int rowIndex, int columnIndex) {
@@ -727,14 +732,27 @@ public class PoiUtil {
 		if (sheet == null || sheet.getRow(rowNo) == null) {
 			return -1;
 		}
+
 		short index = sheet.getRow(rowNo).getLastCellNum();
-		while (index > 0 && (sheet.getRow(rowNo).getCell(index - 1) == null
-				|| StringUtils.isBlank(sheet.getRow(rowNo).getCell(index - 1).getStringCellValue()))) {
+
+		while (index > 0) { 
+			Cell cell = sheet.getRow(rowNo).getCell(index - 1);
+			Object cellValue = getCellValue(cell);
+			if (cell == null || cellValue == null) {
+				index--;
+				continue;
+			}
+			if (!StringUtils.isBlank(String.valueOf(cellValue))) {
+				break;
+			}
 			index--;
 		}
+
+		// index is 1-based
 		if (index == 0) {
 			return -1;
 		}
+
 		return index;
 	}
 
