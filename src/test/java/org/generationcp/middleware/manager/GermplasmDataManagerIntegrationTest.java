@@ -1064,4 +1064,20 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 		Assert.assertTrue(mapCountByNamePermutations.size() > 0);
 	}
+	
+	@Test
+	public void testGetNamesByGidsAndNTypeIdsInMap(){
+		int GID = 1;
+		
+		Map<Integer, List<Name>> namesMap = this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(Arrays.asList(GID), Arrays.asList(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID()));
+		int sizeBeforeAddingNewName = namesMap.get(GID) != null? namesMap.get(GID).size():0;
+		
+		Name name = this.nameTDI.createName(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(), GID, "DERIVATIVE NAME 00001");
+		name = this.nameDAO.save(name);
+		Map<Integer, List<Name>> newNamesMap = this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(Arrays.asList(GID), Arrays.asList(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID()));
+		int sizeAfterAddingNewName = newNamesMap.get(GID).size();
+		
+		//Assert that the new size has 1 more name, which is the newly added name
+		Assert.assertEquals("Both sizes should be equal.", sizeBeforeAddingNewName + 1, sizeAfterAddingNewName);
+	}
 }
