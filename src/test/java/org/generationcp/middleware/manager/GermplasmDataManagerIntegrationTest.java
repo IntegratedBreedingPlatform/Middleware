@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.manager;
@@ -74,11 +74,12 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
-	
+
 	private NameTestDataInitializer nameTDI;
+
 	@Before
 	public void setUp() throws Exception {
-		this.nameTDI =  new NameTestDataInitializer();
+		this.nameTDI = new NameTestDataInitializer();
 		if (this.nameDAO == null) {
 			this.nameDAO = new NameDAO();
 			this.nameDAO.setSession(this.sessionProvder.getSession());
@@ -330,12 +331,10 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final String nVal = "C 65-44";
 		Debug.println(IntegrationTestBase.INDENT, "testGetNameByGIDAndNval(" + gid + ", " + nVal + ", GetGermplasmByNameModes.NORMAL) : "
 				+ this.germplasmDataManager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.NORMAL));
-		Debug.println(
-				IntegrationTestBase.INDENT,
+		Debug.println(IntegrationTestBase.INDENT,
 				"testGetNameByGIDAndNval(" + gid + ", " + nVal + ", GetGermplasmByNameModes.SPACES_REMOVED) : "
 						+ this.germplasmDataManager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.SPACES_REMOVED));
-		Debug.println(
-				IntegrationTestBase.INDENT,
+		Debug.println(IntegrationTestBase.INDENT,
 				"testGetNameByGIDAndNval(" + gid + ", " + nVal + ", GetGermplasmByNameModes.STANDARDIZED) : "
 						+ this.germplasmDataManager.getNameByGIDAndNval(gid, nVal, GetGermplasmByNameModes.STANDARDIZED));
 	}
@@ -346,8 +345,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final Integer status = 1;
 		final GermplasmNameType type = null;
 		final List<Name> names = this.germplasmDataManager.getNamesByGID(gid, status, type);
-		Debug.println(IntegrationTestBase.INDENT, "testGetNamesByGIDWithStatus(gid=" + gid + ", status" + status + ", type=" + type + "): "
-				+ names);
+		Debug.println(IntegrationTestBase.INDENT,
+				"testGetNamesByGIDWithStatus(gid=" + gid + ", status" + status + ", type=" + type + "): " + names);
 	}
 
 	@Test
@@ -356,8 +355,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final Integer status = 8;
 		final GermplasmNameType type = GermplasmNameType.INTERNATIONAL_TESTING_NUMBER;
 		final List<Name> names = this.germplasmDataManager.getNamesByGID(gid, status, type);
-		Debug.println(IntegrationTestBase.INDENT, "testGetNamesByGIDWithStatusAndType(gid=" + gid + ", status" + status + ", type=" + type
-				+ "): " + names);
+		Debug.println(IntegrationTestBase.INDENT,
+				"testGetNamesByGIDWithStatusAndType(gid=" + gid + ", status" + status + ", type=" + type + "): " + names);
 	}
 
 	@Test
@@ -397,15 +396,15 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	public void testAddMethods() throws MiddlewareQueryException {
 		final List<Method> methods = new ArrayList<>();
 		final String programUUID = UUID.randomUUID().toString();
-		methods.add(new Method(null, "GEN", "S", "UGM", "yesno", "description 1", Integer.valueOf(0), Integer.valueOf(0), Integer
-				.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610),
-				programUUID));
-		methods.add(new Method(null, "GEN", "S", "UGM", "yesno", "description 2", Integer.valueOf(0), Integer.valueOf(0), Integer
-				.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610),
-				programUUID));
-		methods.add(new Method(null, "GEN", "S", "UGM", "yesno", "description 3", Integer.valueOf(0), Integer.valueOf(0), Integer
-				.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610),
-				programUUID));
+		methods.add(new Method(null, "GEN", "S", "UGM", "yesno", "description 1", Integer.valueOf(0), Integer.valueOf(0),
+				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2),
+				Integer.valueOf(19980610), programUUID));
+		methods.add(new Method(null, "GEN", "S", "UGM", "yesno", "description 2", Integer.valueOf(0), Integer.valueOf(0),
+				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2),
+				Integer.valueOf(19980610), programUUID));
+		methods.add(new Method(null, "GEN", "S", "UGM", "yesno", "description 3", Integer.valueOf(0), Integer.valueOf(0),
+				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2),
+				Integer.valueOf(19980610), programUUID));
 
 		final List<Integer> methodsAdded = this.germplasmDataManager.addMethod(methods);
 		Debug.println(IntegrationTestBase.INDENT, "testAddMethods() Methods added: " + methodsAdded.size());
@@ -422,8 +421,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
 		final List<Method> methodsFilteredByProgramUUID = this.germplasmDataManager.getMethodsByUniqueID(programUUID);
 		Assert.assertNotNull("Expecting to have returned results.", methodsFilteredByProgramUUID);
-		Debug.println(IntegrationTestBase.INDENT, "testGetMethodsByUniqueID(programUUID=" + programUUID + "): "
-				+ methodsFilteredByProgramUUID.size());
+		Debug.println(IntegrationTestBase.INDENT,
+				"testGetMethodsByUniqueID(programUUID=" + programUUID + "): " + methodsFilteredByProgramUUID.size());
 		Debug.printObjects(IntegrationTestBase.INDENT * 2, methodsFilteredByProgramUUID);
 	}
 
@@ -441,14 +440,14 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
 		final List<Method> methodsFilteredByProgramUUID = this.germplasmDataManager.getMethodsByType(type, programUUID);
 		Assert.assertNotNull("Expecting to have returned results.", methodsFilteredByProgramUUID);
-		Debug.println(IntegrationTestBase.INDENT, "testGetMethodsByType(type=" + type + ", programUUID=" + programUUID + "): "
-				+ methodsFilteredByProgramUUID.size());
+		Debug.println(IntegrationTestBase.INDENT,
+				"testGetMethodsByType(type=" + type + ", programUUID=" + programUUID + "): " + methodsFilteredByProgramUUID.size());
 		Debug.printObjects(IntegrationTestBase.INDENT * 2, methodsFilteredByProgramUUID);
 
 		final List<Method> methodList = this.germplasmDataManager.getMethodsByType(type, start, numOfRows);
 		Assert.assertNotNull("Expecting to have returned results.", methodList);
-		Debug.println(IntegrationTestBase.INDENT, "testGetMethodsByType(type=" + type + ", start=" + start + ", numOfRows=" + numOfRows
-				+ "): " + methodList.size());
+		Debug.println(IntegrationTestBase.INDENT,
+				"testGetMethodsByType(type=" + type + ", start=" + start + ", numOfRows=" + numOfRows + "): " + methodList.size());
 		Debug.printObjects(IntegrationTestBase.INDENT * 2, methodList);
 	}
 
@@ -488,8 +487,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		Debug.printObjects(IntegrationTestBase.INDENT * 2, methods);
 
 		final List<Method> methodList = this.germplasmDataManager.getMethodsByGroup(group, start, numOfRows);
-		Debug.println(IntegrationTestBase.INDENT, "testGetMethodsByGroup(group=" + group + ", start=" + start + ", numOfRows=" + numOfRows
-				+ "): " + methodList.size());
+		Debug.println(IntegrationTestBase.INDENT,
+				"testGetMethodsByGroup(group=" + group + ", start=" + start + ", numOfRows=" + numOfRows + "): " + methodList.size());
 		Debug.printObjects(IntegrationTestBase.INDENT, methodList);
 	}
 
@@ -518,8 +517,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final String name = "ALLO-POLYPLOID CF"; // Tested with rice and cowpea
 
 		final List<Method> methods = this.germplasmDataManager.getMethodsByGroupAndTypeAndName(group, type, name);
-		Debug.println(IntegrationTestBase.INDENT, "testGetMethodsByGroupAndTypeAndName(group=" + group + " and type=" + type + " and name="
-				+ name + "): " + methods.size());
+		Debug.println(IntegrationTestBase.INDENT,
+				"testGetMethodsByGroupAndTypeAndName(group=" + group + " and type=" + type + " and name=" + name + "): " + methods.size());
 		Debug.printObjects(IntegrationTestBase.INDENT, methods);
 	}
 
@@ -549,9 +548,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		Debug.println(IntegrationTestBase.INDENT, "GetGermplasmByNameModes.STANDARDIZED:");
 		Debug.printObjects(IntegrationTestBase.INDENT, results);
 
-		results =
-				this.germplasmDataManager.getGermplasmNameDetailsByGermplasmNames(germplasmNames,
-						GetGermplasmByNameModes.SPACES_REMOVED_BOTH_SIDES);
+		results = this.germplasmDataManager.getGermplasmNameDetailsByGermplasmNames(germplasmNames,
+				GetGermplasmByNameModes.SPACES_REMOVED_BOTH_SIDES);
 		Debug.println(IntegrationTestBase.INDENT, "GetGermplasmByNameModes.SPACES_REMOVED_BOTH_SIDES:");
 		Debug.printObjects(IntegrationTestBase.INDENT, results);
 
@@ -566,8 +564,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			name.setLocationId(this.locationManager.getLocationByID(1).getLocid()); // Assumption: location with
 			// id=1 exists
 			this.germplasmDataManager.updateGermplasmName(name);
-			Debug.println(IntegrationTestBase.INDENT, "testUpdateGermplasmName(" + nameId + "): " + "\n\tBEFORE: " + nameBefore
-					+ "\n\tAFTER: " + name.toString());
+			Debug.println(IntegrationTestBase.INDENT,
+					"testUpdateGermplasmName(" + nameId + "): " + "\n\tBEFORE: " + nameBefore + "\n\tAFTER: " + name.toString());
 		}
 	}
 
@@ -601,8 +599,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			attribute.setTypeId(0);
 			this.germplasmDataManager.updateGermplasmAttribute(attribute);
 
-			Debug.println(IntegrationTestBase.INDENT, "testUpdateGermplasmAttribute(" + attributeId + "): " + "\ntBEFORE: "
-					+ attributeString + "\ntAFTER: " + attribute);
+			Debug.println(IntegrationTestBase.INDENT,
+					"testUpdateGermplasmAttribute(" + attributeId + "): " + "\ntBEFORE: " + attributeString + "\ntAFTER: " + attribute);
 		}
 	}
 
@@ -1032,10 +1030,12 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final Name name3 = this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "I-1RT/P001A-23/");
 		this.nameDAO.save(name3);
 
-		final Name name4 = this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "(CML454 X CML451)-B-3-1-112");
+		final Name name4 =
+				this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "(CML454 X CML451)-B-3-1-112");
 		this.nameDAO.save(name4);
 
-		final Name name5 = this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "(CML454 X CML451)-B-3-1-112");
+		final Name name5 =
+				this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "(CML454 X CML451)-B-3-1-112");
 		this.nameDAO.save(name5);
 
 		final Name name6 = this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "(CML454XCML451)-B-3-1-112");
@@ -1056,28 +1056,31 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	 * @throws Exception
 	 */
 	@Test
-	public void testShouldLoadAndProcessLargeGermplasmNamePermutations() throws Exception{
-		final String fileLocation = GermplasmDataManagerIntegrationTest.class.getClassLoader().getResource("germplasm_designation_name_list.txt").getFile();
+	public void testShouldLoadAndProcessLargeGermplasmNamePermutations() throws Exception {
+		final String fileLocation =
+				GermplasmDataManagerIntegrationTest.class.getClassLoader().getResource("germplasm_designation_name_list.txt").getFile();
 		final List<String> nameList = FileUtils.readLines(new File(fileLocation));
 
 		final Map<String, Integer> mapCountByNamePermutations = this.germplasmDataManager.getCountByNamePermutations(nameList);
 
 		Assert.assertTrue(mapCountByNamePermutations.size() > 0);
 	}
-	
+
 	@Test
-	public void testGetNamesByGidsAndNTypeIdsInMap(){
-		int GID = 1;
-		
-		Map<Integer, List<Name>> namesMap = this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(Arrays.asList(GID), Arrays.asList(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID()));
-		int sizeBeforeAddingNewName = namesMap.get(GID) != null? namesMap.get(GID).size():0;
-		
+	public void testGetNamesByGidsAndNTypeIdsInMap() {
+		final int GID = 1;
+
+		final Map<Integer, List<Name>> namesMap = this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(Arrays.asList(GID),
+				Arrays.asList(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID()));
+		final int sizeBeforeAddingNewName = namesMap.get(GID) != null ? namesMap.get(GID).size() : 0;
+
 		Name name = this.nameTDI.createName(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(), GID, "DERIVATIVE NAME 00001");
 		name = this.nameDAO.save(name);
-		Map<Integer, List<Name>> newNamesMap = this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(Arrays.asList(GID), Arrays.asList(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID()));
-		int sizeAfterAddingNewName = newNamesMap.get(GID).size();
-		
-		//Assert that the new size has 1 more name, which is the newly added name
+		final Map<Integer, List<Name>> newNamesMap = this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(Arrays.asList(GID),
+				Arrays.asList(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID()));
+		final int sizeAfterAddingNewName = newNamesMap.get(GID).size();
+
+		// Assert that the new size has 1 more name, which is the newly added name
 		Assert.assertEquals("Both sizes should be equal.", sizeBeforeAddingNewName + 1, sizeAfterAddingNewName);
 	}
 }

@@ -20,7 +20,7 @@ public class NameTestDataInitializer {
 		name.setUserId(1);
 		return name;
 	}
-	
+
 	public Name createName(final Integer typeId, final String nVal) {
 		final Name name = new Name();
 		name.setTypeId(typeId);
