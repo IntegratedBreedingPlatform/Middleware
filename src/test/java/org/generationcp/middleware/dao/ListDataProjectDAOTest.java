@@ -1,6 +1,11 @@
 package org.generationcp.middleware.dao;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
@@ -40,6 +45,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 
 	private Germplasm parentGermplasm;
 	private ListDataProject testListDataProject;
+	private Integer studyId;
 
 	@Before
 	public void beforeTest() {
@@ -54,8 +60,11 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		this.dataSetupTest.setMiddlewareFieldbookService(this.middlewareFieldbookService);
 
 		// setup test data
-		final Integer studyId = this.createNurseryTestData();
-		this.testListDataProject = this.listDataProjectDAO.getByStudy(studyId, GermplasmListType.NURSERY, 0);
+		this.studyId = this.createNurseryTestData();
+		final int plotNo = 0;
+		this.testListDataProject = this.listDataProjectDAO
+				.getByStudyAndPlotNumbers(this.studyId, GermplasmListType.NURSERY, Collections.singleton(plotNo))
+				.get(plotNo);
 	}
 
 	@Test
@@ -134,6 +143,51 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 						listDataProject.getMaleParent());
 				Assert.assertEquals("The Male Parent GID must be " + this.parentGermplasm.getGid(),
 						this.parentGermplasm.getGid(), listDataProject.getMgid());
+			}
+		}
+
+	}
+
+	@Test
+	public void testGetByStudyAndPlotNumbersWithAllValidPlots() {
+		final Set<Integer> plotNumbers = new HashSet<>(Arrays.asList(1, 3, 5, 7, 9));
+		final Map<Integer, ListDataProject> plotListDataProjectMap = this.listDataProjectDAO
+				.getByStudyAndPlotNumbers(this.studyId, GermplasmListType.NURSERY, plotNumbers);
+
+		// Expecting ListDataProject to be returned for all plot #s
+		Assert.assertEquals("The # of plot keys in map must be equal to # of input plot numbers.", plotNumbers.size(),
+				plotListDataProjectMap.keySet().size());
+		for (final Integer plotNo : plotNumbers) {
+			final ListDataProject ldp = plotListDataProjectMap.get(plotNo);
+			Assert.assertNotNull("Expecting ListDataProject record to be retrieved for plot#: " + plotNo, ldp);
+
+			// Plot # is equal to Entry ID because nursery had no checks
+			Assert.assertEquals("The Plot number must be equal to Entry ID", plotNo, ldp.getEntryId());
+		}
+	}
+
+	@Test
+	public void testGetByStudyAndPlotNumbersWithInvalidPlots() {
+		// Test nursery has only 20 plots so plot #s 50 and 100 are invalid
+		final Set<Integer> plotNumbers = new HashSet<>(Arrays.asList(1, 3, 5, 7, 9, 50, 100));
+		final Map<Integer, ListDataProject> plotListDataProjectMap = this.listDataProjectDAO
+				.getByStudyAndPlotNumbers(this.studyId, GermplasmListType.NURSERY, plotNumbers);
+
+		// Expecting ListDataProject to be returned for valid plot #s only
+		Assert.assertEquals("The # of plot keys in map must be less than # of input plot numbers.", plotNumbers.size() - 2,
+				plotListDataProjectMap.keySet().size());
+		for (final Integer plotNo : plotNumbers) {
+			final ListDataProject ldp = plotListDataProjectMap.get(plotNo);
+
+			// for invalid plot #s, they should not exist as keys in map
+			if (plotNo == 50 || plotNo == 100) {
+				Assert.assertNull("Expecting no ListDataProject record for plot#: " + plotNo + " but was retrieved",
+						ldp);
+			} else {
+				Assert.assertNotNull("Expecting ListDataProject record to be retrieved for plot#: " + plotNo
+						+ " but was not retrieved", ldp);
+				// Plot # is equal to Entry ID because nursery had no checks
+				Assert.assertEquals("The Plot number must be equal to Entry ID", plotNo, ldp.getEntryId());
 			}
 		}
 
