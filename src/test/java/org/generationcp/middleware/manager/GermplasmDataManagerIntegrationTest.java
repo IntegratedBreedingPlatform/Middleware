@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
@@ -41,12 +40,9 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.service.api.PedigreeService;
-import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
@@ -55,11 +51,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
-@Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
-
-    @Autowired
-    private PedigreeService pedigreeService;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -674,13 +666,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		Assert.assertNotNull("getPlotCodeValue() should never return null.", plotCode2);
 		Assert.assertEquals("Expected value of plot code attribute returned when plot code attribute is present.", plotCodeAttr.getAval(),
 				plotCode2);
-	}
-
-	@Test
-	public void testGetCrossExpansion() throws Exception {
-		final CrossExpansionProperties crossExpansionProperties = new CrossExpansionProperties(Mockito.mock(Properties.class));
-		crossExpansionProperties.setDefaultLevel(1);
-		Debug.println(this.pedigreeService.getCrossExpansion(1, crossExpansionProperties));
 	}
 
 	@Test
