@@ -30,9 +30,9 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.BatchSize;
 /**
  *
  * http://gmod.org/wiki/Chado_Natural_Diversity_Module#Table:_nd_experiment
@@ -51,7 +51,7 @@ import org.hibernate.annotations.BatchSize;
 @Table(name = "nd_experiment")
 @Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="nd_experiment")
 //OneToOne relationship to this entity from ExperimentProject requires batching annotation to be on entity unlike OneToMany which can be on the field.
-@BatchSize(size = 500)
+@BatchSize(size = 5000)
 public class ExperimentModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -74,7 +74,7 @@ public class ExperimentModel implements Serializable {
 	private Integer typeId;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
-	@BatchSize(size = 500)
+	@BatchSize(size = 5000)
 	private List<ExperimentProperty> properties;
 
 	@ManyToOne
@@ -86,13 +86,13 @@ public class ExperimentModel implements Serializable {
 	//FIXME Should this not be a OneToOne? Can one experiment have multiple stock (germplasm) rows?
 	//Collection always contains one item currently.
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
-	@BatchSize(size = 500)
+	@BatchSize(size = 5000)
 	private List<ExperimentStock> experimentStocks;
 
 	@OneToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "nd_experiment_phenotype", joinColumns = @JoinColumn(name = "nd_experiment_id"), inverseJoinColumns = @JoinColumn(
 			name = "phenotype_id"))
-	@BatchSize(size = 500)
+	@BatchSize(size = 5000)
 	private List<Phenotype> phenotypes;
 
 	public ExperimentModel() {
