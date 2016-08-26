@@ -9,7 +9,7 @@
 
 
 	<changeSet author="clarissa" id="1">
-		<!-- De-duplication of the UDFLDs in wheat database so that unique constraint (see changeset 3) can be applied successfully. -->
+		<!-- De-duplication of the UDFLDs in wheat database so that unique constraint (see next changeset) can be applied successfully. -->
 		<preConditions onFail="CONTINUE">
 			<sqlCheck expectedResult="1">select case when 'ibdbv2_wheat_merged' = DATABASE() then 1 else 0 end from dual;</sqlCheck>
 		</preConditions>
@@ -21,25 +21,15 @@
 			UPDATE udflds set fcode='EUACC' where fldno = 500000004;			
 		</sql>
 	</changeSet>
-	
-	<changeSet author="darla" id="2">
-		<!-- De-duplication of the UDFLDs in rice database so that unique constraint (see changeset 3) can be applied successfully. -->
-		<preConditions onFail="CONTINUE">
-			<sqlCheck expectedResult="1">select case when 'ibdbv2_rice_merged' = DATABASE() then 1 else 0 end from dual;</sqlCheck>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="true">
-			DELETE from udflds where fldno in (2002, 2003, 2004, 2005);
-		</sql>
-	</changeSet>
 
-	<changeSet author="naymesh" id="3">
+	<changeSet author="naymesh" id="2">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'udflds' AND CONSTRAINT_NAME='udflds_uc1' and TABLE_SCHEMA = DATABASE();</sqlCheck>
 		</preConditions>
 	    <addUniqueConstraint columnNames="ftable, ftype, fcode" constraintName="udflds_uc1" tableName="udflds" />
 	</changeSet>
 
-	<changeSet author="naymesh" id="4">
+	<changeSet author="naymesh" id="3">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM udflds WHERE ftable='NAMES' and ftype='NAME' and fcode='SELHISFIX';</sqlCheck>
 		</preConditions>
@@ -49,7 +39,7 @@
 	    </sql>
 	</changeSet>
 	
-	<changeSet author="alejandro" id="5">
+	<changeSet author="alejandro" id="4">
 		<!-- Upgrade script to fix maize nursery template. Set correct cvterm type_id for SEED_SOURCE. Change from 1808 (Trait) to 1807 (Selection Method). -->
 		<preConditions onFail="CONTINUE">
 			<sqlCheck expectedResult="1">select case when 'ibdbv2_maize_merged' = DATABASE() then 1 else 0 end from dual;</sqlCheck>
@@ -59,7 +49,7 @@
 		</sql>
 	</changeSet>
 	
-	<changeSet author="alejandro" id="6">
+	<changeSet author="alejandro" id="5">
 		<!-- Upgrade script to fix cowpea nursery template. Set correct cvterm type_id for SEED_SOURCE. Change from 1808 (Trait) to 1807 (Selection Method). -->
 		<preConditions onFail="CONTINUE">
 			<sqlCheck expectedResult="1">select case when 'ibdbv2_cowpea_merged' = DATABASE() then 1 else 0 end from dual;</sqlCheck>
