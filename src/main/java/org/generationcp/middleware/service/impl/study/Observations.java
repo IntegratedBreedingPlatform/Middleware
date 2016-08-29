@@ -34,17 +34,18 @@ public class Observations {
 			final String triatValue = traitMeasurement.getTriatValue();
 			// If blank ignore nothing to update
 			if (StringUtils.isNotBlank(triatValue)) {
-				final Integer traitId = traitMeasurement.getPhenotypeId();
-				final Integer observeableId = traitMeasurement.getTrait().getTraitId();
+				final Integer phenotypeId = traitMeasurement.getPhenotypeId();
+				final Integer traitId = traitMeasurement.getTrait().getTraitId();
 
 				// Update Trait
-				final Variable variable = ontologyVariableDataManager.getVariable(programUuid, observeableId, false, false);
+				final Variable variable = ontologyVariableDataManager.getVariable(programUuid, traitId, false, false);
 
-				if (traitId != null && traitId != 0) {
-					this.updateTrait(variable, traitId, triatValue);
+				if (phenotypeId != null && phenotypeId != 0) {
+					this.updatePhenotype(variable, phenotypeId, triatValue);
 				} else {
-					final Integer phenotypeId = this.insertTrait(variable, triatValue, observeableId, middlewareMeasurement.getMeasurementId());
-					traitMeasurement.setPhenotypeId(phenotypeId);
+					final Integer newPhenotypeId =
+							this.insertPhenotype(variable, triatValue, traitId, middlewareMeasurement.getMeasurementId());
+					traitMeasurement.setPhenotypeId(newPhenotypeId);
 				}
 			}
 		}
@@ -52,7 +53,7 @@ public class Observations {
 
 	}
 
-	private Integer insertTrait(Variable variable, String triatValue, Integer observeableId, Integer measurementId) {
+	private Integer insertPhenotype(Variable variable, String triatValue, Integer observeableId, Integer measurementId) {
 
 		final Phenotype phenotype = new Phenotype();
 		// The name is set to the observable id because that database expects them to be the same.
@@ -94,7 +95,7 @@ public class Observations {
 		}
 	}
 
-	private void updateTrait(final Variable variable, final Integer phenotypeId, final String triatValue) {
+	private void updatePhenotype(final Variable variable, final Integer phenotypeId, final String triatValue) {
 
 		final Phenotype phenotype = (Phenotype) this.session.get(Phenotype.class, phenotypeId);
 		if (phenotype == null) {
