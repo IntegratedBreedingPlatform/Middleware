@@ -455,9 +455,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType,
-			CrossExpansionProperties crossExpansionProperties, boolean pedigreeRequired) throws MiddlewareQueryException {
+			CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException {
 		List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
-		final Map<Integer, String> pedigreeStringMap = new HashMap<>();
 		for (Integer studyId : studyIdList) {
 			FieldMapInfo fieldMapInfo = new FieldMapInfo();
 
@@ -472,10 +471,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 			final List<FieldMapDatasetInfo> fieldMapDatasetInfos = this.getExperimentPropertyDao().getFieldMapLabels(studyId);
 			fieldMapInfo.setDatasets(fieldMapDatasetInfos);
-
-			if (fieldMapDatasetInfos != null && pedigreeRequired) {
-				this.setPedigree(fieldMapDatasetInfos, crossExpansionProperties, pedigreeStringMap);
-			}
 
 			fieldMapInfos.add(fieldMapInfo);
 		}
@@ -581,7 +576,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		final FieldmapBlockInfo blockInfo = this.locationDataManager.getBlockInformation(blockId);
 		this.updateFieldMapWithBlockInformation(fieldMapInfos, blockInfo, true);
 		final Map<Integer, String> pedigreeStringMap = new HashMap<>();
-		// Filter those belonging to the given geolocationId
+//		 Filter those belonging to the given geolocationId
 		for (final FieldMapInfo fieldMapInfo : fieldMapInfos) {
 			final List<FieldMapDatasetInfo> datasetInfoList = fieldMapInfo.getDatasets();
 			if (datasetInfoList != null) {
