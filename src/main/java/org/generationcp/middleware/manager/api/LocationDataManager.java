@@ -618,4 +618,6 @@ public interface LocationDataManager {
 	 */
 	List<Location> getAllBreedingLocationsByUniqueID(String programUUID);
 
+	List<LocationDetails> getFilteredLocations(Integer countryId, Integer locationType, String locationName, String programUUID);
+
 }
