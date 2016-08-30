@@ -95,10 +95,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "     	AND pp.project_id = p.project_id AND pp.value = " + "         " + TermId.DELETED_STUDY.getId() + ") "
 			+ "ORDER BY p.name ";
 
-	private static final String COUNT_PROJECTS_WITH_VARIABLE = "SELECT count(pp.project_id) " + " FROM projectprop pp "
-			+ " WHERE NOT EXISTS( " + " SELECT 1 FROM projectprop stat " + " WHERE stat.project_id = pp.project_id "
-			+ " AND stat.type_id = " + TermId.STUDY_STATUS.getId() + " AND value = " + TermId.DELETED_STUDY.getId() + ") "
-			+ " AND pp.type_id = " + TermId.STANDARD_VARIABLE.getId() + " AND pp.value = :variableId";
+    private static final String COUNT_PROJECTS_WITH_VARIABLE = "SELECT count(pp.project_id)  FROM projectprop pp "
+		  + " WHERE pp.type_id = " + TermId.STANDARD_VARIABLE.getId() + " AND pp.value = :variableId "
+		  + " AND pp.project_id not in ( SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = pp.project_id "
+		  + " AND stat.type_id = " + TermId.STUDY_STATUS.getId() + " AND value = " + TermId.DELETED_STUDY.getId() + ") ";
 
 	private static final String GET_ALL_FOLDERS = "SELECT pr.object_project_id, pr.subject_project_id, p.name, p.description "
 			+ " FROM project_relationship pr " + " INNER JOIN project p ON p.project_id = pr.subject_project_id " + " WHERE pr.type_id = "

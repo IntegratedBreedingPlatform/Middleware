@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.manager.ontology;
 
-import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -492,15 +491,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			variable.setIsFavorite(programFavorite != null);
 
 			if (calculateVariableUsage) {
-				// setting variable studies
-				variable.setStudies((int) this.getDmsProjectDao().countByVariable(id));
-
-				// setting variable observations, first observations will be null so set it to 0
+			  	// setting variable observations and study to 0 and remove heavy calculation queries not needed to determine if it is editable or not
+				variable.setStudies(0);
 				variable.setObservations(0);
-				for (final VariableType v : variable.getVariableTypes()) {
-					final long observation = this.getExperimentDao().countByObservedVariable(id, v.getId());
-					variable.setObservations((int) (variable.getObservations() + observation));
-				}
+
+			  	variable.setHasUsage(this.isVariableUsedInStudy(id));
+
 			} else {
 				final int unknownUsage = -1;
 				variable.setStudies(unknownUsage);
@@ -732,9 +728,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		this.checkTermIsVariable(term);
 
 		// check usage
-		final Integer usage = this.getVariableObservations(variableId);
+		final Boolean isUsed = this.isVariableUsedInStudy(variableId);
 
-		if (usage > 0) {
+		if (isUsed) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.CAN_NOT_DELETE_USED_VARIABLE);
 		}
 
@@ -768,19 +764,6 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error at updateVariable :" + e.getMessage(), e);
 		}
-	}
-
-	@Override
-	public Integer getVariableObservations(final int variableId) {
-
-		final String numOfProjectsWithVariable = "SELECT count(pp.project_id) " + " FROM projectprop pp " + " WHERE NOT EXISTS( "
-				+ " SELECT 1 FROM projectprop stat " + " WHERE stat.project_id = pp.project_id " + " AND stat.type_id = "
-				+ TermId.STUDY_STATUS.getId() + " AND value = " + TermId.DELETED_STUDY.getId() + ") " + " AND pp.type_id = "
-				+ TermId.STANDARD_VARIABLE.getId() + " AND pp.value = :variableId";
-
-		final SQLQuery query = this.getActiveSession().createSQLQuery(numOfProjectsWithVariable);
-		query.setParameter("variableId", variableId);
-		return ((BigInteger) query.uniqueResult()).intValue();
 	}
 
 	// TODO: Follow DmsProjectDao countExperimentByVariable. This requires STORED_IN and that needs to deprecated.
@@ -822,6 +805,19 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		}
 
 		return null;
+	}
+
+	@Override
+	public boolean isVariableUsedInStudy(final int variableId) {
+		final String variableUsageCount = "SELECT *  FROM projectprop pp " + " WHERE pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
+				+ " AND pp.value = :variableId "
+				+ " AND pp.project_id not in ( SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = pp.project_id "
+				+ " AND stat.type_id = " + TermId.STUDY_STATUS.getId() + " AND value = " + TermId.DELETED_STUDY.getId() + ") limit 1";
+
+		final SQLQuery query = this.getActiveSession().createSQLQuery(variableUsageCount);
+		query.setParameter("variableId", variableId);
+		List list = query.list();
+		return list.size() > 0;
 	}
 
 	private void updateVariableSynonym(final CVTerm term, final String newVariableName) {
