@@ -873,4 +873,48 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 	}
 
+	public List<LocationDetails> getFilteredLocations(final Integer countryId, final Integer locationType, final String locationName,
+			final String programUUID) throws MiddlewareQueryException {
+		try {
+
+			final StringBuilder queryString = new StringBuilder();
+
+			queryString.append("SELECT l.lname as location_name,l.locid,l.ltype as ltype,")
+					.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,")
+					.append(" c.cntryid as cntryid, c.isofull as country_full_name, labbr as location_abbreviation,")
+					.append(" ud.fname as location_type,").append(" ud.fdesc as location_description").append(" FROM location l")
+					.append(" LEFT JOIN georef g on l.locid = g.locid").append(" LEFT JOIN cntry c on l.cntryid = c.cntryid")
+					.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype").append(" WHERE (l.program_uuid = '").append(programUUID)
+					.append("'").append(" or l.program_uuid is null) ");
+
+			if (countryId != null) {
+				queryString.append(" AND c.cntryid = ");
+				queryString.append(countryId);
+			}
+
+			if (locationType != null) {
+				queryString.append(" AND l.ltype = ");
+				queryString.append(locationType);
+			}
+
+			if (locationName != null && !locationName.isEmpty()) {
+				queryString.append(" AND l.lname REGEXP '");
+				queryString.append(locationName);
+				queryString.append("' ");
+			}
+
+			queryString.append(" ORDER BY UPPER(l.lname) ");
+
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.addEntity(LocationDetails.class);
+
+			return query.list();
+
+		} catch (final HibernateException e) {
+			this.logAndThrowException(
+					this.getLogExceptionMessage("getFilteredLocations", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+		return new ArrayList<LocationDetails>();
+	}
+
 }
