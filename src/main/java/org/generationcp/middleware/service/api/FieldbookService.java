@@ -768,7 +768,7 @@ public interface FieldbookService {
 	 *            - plot numbers to lookup in given study
 	 * @return map of plot numbers to corresponding ListDataProject record
 	 */
-	Map<Integer, ListDataProject> getListDataProjectByStudy(int projectId, GermplasmListType type,
+	Map<Integer, ListDataProject> getListDataProjectByStudyTypeAndPlotNos(int projectId, GermplasmListType type,
 			Set<Integer> plotIds);
 
 	ListDataProject getListDataProjectByListIdAndEntryNo(int listId, int entryNo);
