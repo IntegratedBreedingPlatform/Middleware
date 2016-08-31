@@ -8,21 +8,6 @@
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
 	<changeSet author="maeisabelle" id="beta15-1">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT 1 FROM users u
-				INNER JOIN users_roles r
-				ON u.userid = r.userid,
-				workbench_project p
-				WHERE r.role = 'ADMIN'
-				AND NOT EXISTS (
-				  SELECT 1 FROM workbench_project_user_info projUser
-				  WHERE projUser.user_id = u.userid
-				  AND projUser.project_id = p.project_id
-				)
-				LIMIT 1
-			</sqlCheck>
-		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO workbench_project_user_info(project_id, user_id)
 			SELECT p.project_id, u.userid 
@@ -40,22 +25,6 @@
 	</changeSet>
 	
 	<changeSet author="maeisabelle" id="beta15-2">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT 1 FROM users u
-				INNER JOIN users_roles r
-				ON u.userid = r.userid,
-				workbench_project p
-				WHERE r.role = 'ADMIN'
-				AND NOT EXISTS (
-				  SELECT 1 FROM workbench_project_user_role workflowRole
-				  WHERE workflowRole.user_id = u.userid
-				  AND workflowRole.project_id = p.project_id
-				  AND workflowRole.role_id = 1
-				)
-				LIMIT 1
-			</sqlCheck>
-		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO workbench_project_user_role(project_id, user_id, role_id)
 			SELECT p.project_id, u.userid, 1
