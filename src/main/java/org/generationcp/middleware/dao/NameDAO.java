@@ -110,8 +110,10 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			 * List<Name> results = getByCriteria(criterions); return results;
 			 **/
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByGIDWithFilters(gid=" + gid + ", status=" + status + ", type=" + type
-					+ ") query from Name " + e.getMessage(), e);
+			String message = "Error with getByGIDWithFilters(gid=" + gid + ", status=" + status + ", type=" + type
+					+ ") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return new ArrayList<Name>();
 	}
@@ -133,7 +135,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				}
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByGIDAndNval(gid=" + gid + ", nval=" + nval + ") query from Name " + e.getMessage(), e);
+			String message = "Error with getByGIDAndNval(gid=" + gid + ", nval=" + nval + ") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return null;
 	}
@@ -147,7 +151,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				return crit.list();
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getNamesByNameIds(nIds=" + nIds + ") query from Name " + e.getMessage(), e);
+			String message = "Error with getNamesByNameIds(nIds=" + nIds + ") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return new ArrayList<Name>();
 	}
@@ -162,7 +168,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				return query.list();
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getPreferredIdsByListId(listId=" + listId + ") query from Name " + e.getMessage(), e);
+			String message = "Error with getPreferredIdsByListId(listId=" + listId + ") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return new ArrayList<Name>();
 	}
@@ -175,7 +183,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				return (Name) crit.uniqueResult();
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getNameByNameId(nId=" + nId + ") query from Name " + e.getMessage(), e);
+			String message = "Error with getNameByNameId(nId=" + nId + ") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return null;
 	}
@@ -218,8 +228,10 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				}
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getGermplasmNameDetailsByNames(germplasmNames=" + germplasmNames + ") query from Name "
-					+ e.getMessage(), e);
+			String message = "Error with getGermplasmNameDetailsByNames(germplasmNames=" + germplasmNames + ") query from Name "
+					+ e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return toReturn;
 	}
@@ -243,7 +255,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				toreturn.put(gid, preferredId);
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getPrefferedIdsByGIDs(gids=" + gids + ") query from Name " + e.getMessage(), e);
+			String message = "Error with getPrefferedIdsByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
 		}
 
 		return toreturn;
@@ -268,7 +282,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				toreturn.put(gid, preferredId);
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getPrefferedNamesByGIDs(gids=" + gids + ") query from Name " + e.getMessage(), e);
+			String message = "Error with getPrefferedNamesByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
 		}
 
 		return toreturn;
@@ -288,7 +304,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 			toReturn = criteria.list();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getNamesByGids(gids=" + gids + ") query from Name " + e.getMessage(), e);
+			String message = "Error with getNamesByGids(gids=" + gids + ") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
 		}
 
 		return toReturn;
@@ -296,16 +314,16 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getGidsByName(final String name) {
-		final List<Integer> gids = new ArrayList<Integer>();
 		try {
 			final String sql = "SELECT gid FROM names where nval = :name";
 			final Query query = this.getSession().createSQLQuery(sql).setParameter("name", name);
 			return query.list();
 
 		} catch (final Exception e) {
-			this.logAndThrowException("Error with NameDAO.getGidsByName(" + name + ") " + e.getMessage(), e);
+			String message = "Error with NameDAO.getGidsByName(" + name + ") " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return gids;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -334,7 +352,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getNamesByGidsInMap(gids=" + gids + ") query from Name " + e.getMessage(), e);
+			String message = "Error with getNamesByGidsInMap(gids=" + gids + ") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
 		}
 
 		return map;
@@ -367,7 +387,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getNamesByGidsInMap(gids=" + gids + ") query from Name " + e.getMessage(), e);
+			String message = "Error with getNamesByGidsInMap(gids=" + gids + ") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
 		}
 
 		return map;
@@ -375,7 +397,6 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<String> getAllMatchingNames(final String prefix, final String suffix) {
-		final List<String> names = new ArrayList<String>();
 		try {
 			String keyword1 = prefix + "%" + suffix + "%";
 			String keyword2 =
@@ -390,9 +411,10 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			return query.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getAllMatchingNames(" + prefix + ", " + suffix + ") query from Name " + e.getMessage(), e);
+			String message = "Error with getAllMatchingNames(" + prefix + ", " + suffix + ") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return names;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -407,9 +429,10 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			return result.get(0).intValue() > 0;
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getAllMatchingNames(" + name + ") query from Name " + e.getMessage(), e);
+			String message = "Error with getAllMatchingNames(" + name + ") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return false;
 	}
 
 	@SuppressWarnings("unchecked")
