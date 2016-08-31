@@ -24,7 +24,6 @@ import org.generationcp.middleware.service.api.GermplasmGroup;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.pedigree.GermplasmCache;
 import org.generationcp.middleware.service.pedigree.cache.keys.CropGermplasmKey;
-import org.generationcp.middleware.util.TransformationUtil;
 import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
-
-import ch.qos.logback.core.util.ContextUtil;
 
 public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
