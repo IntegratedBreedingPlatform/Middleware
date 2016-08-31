@@ -19,12 +19,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 
 /**
  * DAO class for {@link User}.
@@ -32,143 +36,142 @@ import org.hibernate.criterion.Restrictions;
  */
 public class UserDAO extends GenericDAO<User, Integer> {
 
-	public User getByUsernameAndPassword(String username, String password) throws MiddlewareQueryException {
+	public User getByUsernameAndPassword(final String username, final String password) throws MiddlewareQueryException {
 		try {
 			if (username != null && password != null) {
-				Criteria criteria =
-						this.getSession().createCriteria(User.class).add(Restrictions.eq("name", username))
-								.add(Restrictions.eq("password", password));
+				final Criteria criteria = this.getSession().createCriteria(User.class).add(Restrictions.eq("name", username))
+						.add(Restrictions.eq("password", password));
 
 				@SuppressWarnings("unchecked")
-				List<User> users = criteria.list();
+				final List<User> users = criteria.list();
 				return !users.isEmpty() ? users.get(0) : null;
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getByUsernameAndPassword(username=" + username + ") query from User: " + e.getMessage(),
 					e);
 		}
 		return null;
 	}
 
-	public boolean isPasswordSameAsUserName(String username) throws MiddlewareQueryException {
+	public boolean isPasswordSameAsUserName(final String username) throws MiddlewareQueryException {
 		try {
 			if (username != null) {
-				Criteria criteria =
-						this.getSession().createCriteria(User.class).add(Restrictions.eq("name", username))
-								.add(Restrictions.eq("password", username));
+				final Criteria criteria = this.getSession().createCriteria(User.class).add(Restrictions.eq("name", username))
+						.add(Restrictions.eq("password", username));
 
 				@SuppressWarnings("unchecked")
-				List<User> users = criteria.list();
+				final List<User> users = criteria.list();
 				return !users.isEmpty() ? true : false;
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getByUsernameAndPassword(username=" + username + ") query from User: " + e.getMessage(),
 					e);
 		}
 		return false;
 	}
 
-	public boolean changePassword(String userName, String password) throws MiddlewareQueryException {
+	public boolean changePassword(final String userName, final String password) throws MiddlewareQueryException {
 		try {
-			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
+			// of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 			// statement
 			this.getSession().flush();
-			
+
 			if (userName != null && password != null) {
-				String queryString = "UPDATE users SET upswd = :password WHERE uname LIKE :username";
-				Session s = this.getSession();
-				Query q = s.createSQLQuery(queryString);
+				final String queryString = "UPDATE users SET upswd = :password WHERE uname LIKE :username";
+				final Session s = this.getSession();
+				final Query q = s.createSQLQuery(queryString);
 				q.setString("username", userName);
 				q.setString("password", password);
-				int success = q.executeUpdate();
+				final int success = q.executeUpdate();
 
 				return success > 0;
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			this.logAndThrowException(e.getMessage(), e);
 		}
 		return false;
 	}
 
-	public User getUserDetailsByUsername(String username) throws MiddlewareQueryException {
+	public User getUserDetailsByUsername(final String username) throws MiddlewareQueryException {
 		try {
 			if (username != null) {
-				Criteria criteria = this.getSession().createCriteria(User.class).add(Restrictions.eq("name", username));
+				final Criteria criteria = this.getSession().createCriteria(User.class).add(Restrictions.eq("name", username));
 				@SuppressWarnings("unchecked")
-				List<User> users = criteria.list();
+				final List<User> users = criteria.list();
 				return !users.isEmpty() ? users.get(0) : null;
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getByUsernameAndPassword(username=" + username + ") query from User: " + e.getMessage(),
 					e);
 		}
 		return null;
 	}
 
-	public boolean isUsernameExists(String userName) throws MiddlewareQueryException {
+	public boolean isUsernameExists(final String userName) throws MiddlewareQueryException {
 		try {
 			if (userName != null) {
-				Criteria criteria = this.getSession().createCriteria(User.class);
+				final Criteria criteria = this.getSession().createCriteria(User.class);
 				criteria.add(Restrictions.eq("name", userName));
 
 				// used a List in case of dirty data
 				@SuppressWarnings("unchecked")
-				List<User> users = criteria.list();
+				final List<User> users = criteria.list();
 
 				return !users.isEmpty();
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with isUsernameExists(username=" + userName + ") query from User: " + e.getMessage(), e);
 		}
 		return false;
 	}
 
-	public User getUserByUserName(String userName) throws MiddlewareQueryException {
+	public User getUserByUserName(final String userName) throws MiddlewareQueryException {
 		try {
 			if (userName != null) {
-				Criteria criteria = this.getSession().createCriteria(User.class);
+				final Criteria criteria = this.getSession().createCriteria(User.class);
 				criteria.add(Restrictions.eq("name", userName));
 
 				// used a List in case of dirty data
 				@SuppressWarnings("unchecked")
-				List<User> users = criteria.list();
+				final List<User> users = criteria.list();
 
 				return users.isEmpty() ? null : users.get(0);
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with isUsernameExists(username=" + userName + ") query from User: " + e.getMessage(), e);
 		}
 		return null;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<User> getByNameUsingEqual(String name, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<User> getByNameUsingEqual(final String name, final int start, final int numOfRows) throws MiddlewareQueryException {
 		try {
 			if (name != null) {
-				Query query = this.getSession().getNamedQuery(User.GET_BY_NAME_USING_EQUAL);
+				final Query query = this.getSession().getNamedQuery(User.GET_BY_NAME_USING_EQUAL);
 				query.setParameter("name", name);
 				query.setFirstResult(start);
 				query.setMaxResults(numOfRows);
 				return query.list();
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getByNameUsingEqual(name=" + name + ") query from User: " + e.getMessage(), e);
 		}
 		return new ArrayList<User>();
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<User> getByNameUsingLike(String name, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<User> getByNameUsingLike(final String name, final int start, final int numOfRows) throws MiddlewareQueryException {
 		try {
 			if (name != null) {
-				Query query = this.getSession().getNamedQuery(User.GET_BY_NAME_USING_LIKE);
+				final Query query = this.getSession().getNamedQuery(User.GET_BY_NAME_USING_LIKE);
 				query.setParameter("name", name);
 				query.setFirstResult(start);
 				query.setMaxResults(numOfRows);
 				return query.list();
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getByNameUsingLike(name=" + name + ") query from User: " + e.getMessage(), e);
 		}
 		return new ArrayList<User>();
@@ -177,32 +180,32 @@ public class UserDAO extends GenericDAO<User, Integer> {
 	@SuppressWarnings("unchecked")
 	public List<User> getAllUsersSorted() throws MiddlewareQueryException {
 		try {
-			Query query = this.getSession().getNamedQuery(User.GET_ALL_USERS_SORTED);
+			final Query query = this.getSession().getNamedQuery(User.GET_ALL_USERS_SORTED);
 			return query.list();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getAllUsersSorted() query from User: " + e.getMessage(), e);
 		}
 		return new ArrayList<User>();
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getUserIdsByCountryIds(Collection<Integer> countryIds) throws MiddlewareQueryException {
+	public List<Integer> getUserIdsByCountryIds(final Collection<Integer> countryIds) throws MiddlewareQueryException {
 		try {
 			if (countryIds != null && !countryIds.isEmpty()) {
-				Criteria criteria = this.getSession().createCriteria(Locdes.class);
+				final Criteria criteria = this.getSession().createCriteria(Locdes.class);
 				criteria.createAlias("location", "l");
 				criteria.add(Restrictions.in("l.cntryid", countryIds));
 				criteria.setProjection(Projections.distinct(Projections.property("user.userid")));
 				return criteria.list();
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getUserIdsByCountryIds() query from User: " + e.getMessage(), e);
 		}
 		return new ArrayList<Integer>();
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<User> getByIds(List<Integer> ids) throws MiddlewareQueryException {
+	public List<User> getByIds(final List<Integer> ids) throws MiddlewareQueryException {
 		List<User> toReturn = new ArrayList<User>();
 
 		if (ids == null || ids.isEmpty()) {
@@ -210,15 +213,15 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		}
 
 		try {
-			Criteria criteria = this.getSession().createCriteria(User.class);
+			final Criteria criteria = this.getSession().createCriteria(User.class);
 			criteria.add(Restrictions.in("userid", ids));
 			toReturn = criteria.list();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getByIds() query from User: " + e.getMessage(), e);
 		}
 		return toReturn;
 	}
-	
+
 	public User getUserByFullname(final String fullname) {
 		User user = null;
 		try {
@@ -229,6 +232,36 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			this.logAndThrowException(String.format("Error with getPersonByFullName(fullname=[%s])", StringUtils.join(fullname, ",")), e);
 		}
 		return user;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<UserDto> getAllUserDtosSorted() throws MiddlewareQueryException {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(User.class);
+
+			criteria.createAlias("person", "person");
+			criteria.createAlias("roles", "roles");
+
+			final ProjectionList projectionList = Projections.projectionList();
+
+			projectionList.add(Projections.property("userid"), "userId");
+			projectionList.add(Projections.property("name"), "username");
+			projectionList.add(Projections.property("person.firstName"), "firstName");
+			projectionList.add(Projections.property("person.lastName"), "lastName");
+			projectionList.add(Projections.property("roles.role"), "role");
+			projectionList.add(Projections.property("status"), "status");
+
+			criteria.setProjection(projectionList);
+
+			criteria.addOrder(Order.asc("person.lastName"));
+
+			criteria.setResultTransformer(Transformers.aliasToBean(UserDto.class));
+
+			return criteria.list();
+		} catch (final HibernateException e) {
+			this.logAndThrowException("Error with getAllUserDtosSorted() query from User: " + e.getMessage(), e);
+		}
+		return new ArrayList<UserDto>();
 	}
 
 }

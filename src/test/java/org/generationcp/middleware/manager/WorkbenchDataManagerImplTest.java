@@ -40,11 +40,15 @@ import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.google.common.collect.Lists;
 
 public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
@@ -828,5 +832,18 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 			}
 		}
 		return fulllist;
+	}
+	
+	@Test
+	public void testGetAllUserDtosSorted() throws MiddlewareQueryException {
+		List<UserDto> results = this.workbenchDataManager.getAllUserDtosSorted();
+		Assert.assertNotNull(results);
+		Assert.assertTrue(!results.isEmpty());
+
+		WorkbenchDataManager workbenchDataManager = Mockito.mock(WorkbenchDataManager.class);
+		List<UserDto> userDtoList = Lists.newArrayList(new UserDto("username1"), new UserDto("username2"));
+		Mockito.when(workbenchDataManager.getAllUserDtosSorted()).thenReturn(userDtoList);
+
+		Assert.assertEquals(userDtoList.size(), 2);
 	}
 }

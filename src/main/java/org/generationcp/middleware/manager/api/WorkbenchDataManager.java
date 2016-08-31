@@ -42,6 +42,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.generationcp.middleware.service.api.user.UserDto;
 
 /**
  * This is the API used by the Workbench to retrieve Workbench project information.
@@ -1016,5 +1017,7 @@ public interface WorkbenchDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException;
+
+	List<UserDto> getAllUserDtosSorted() throws MiddlewareQueryException;
 
 }

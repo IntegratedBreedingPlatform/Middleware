@@ -64,6 +64,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
@@ -1498,5 +1499,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			this.sessionProvider.close();
 		}
 	}
+	
+	@Override
+	public List<UserDto> getAllUserDtosSorted() throws MiddlewareQueryException {
+		return this.getUserDao().getAllUserDtosSorted();
+
+	}
+	
 
 }
