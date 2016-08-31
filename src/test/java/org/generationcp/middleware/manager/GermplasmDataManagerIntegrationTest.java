@@ -75,11 +75,11 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
-	private NameTestDataInitializer nameTDI;
+	private NameTestDataInitializer nameTestDataInitializaer;
 
 	@Before
 	public void setUp() throws Exception {
-		this.nameTDI = new NameTestDataInitializer();
+		this.nameTestDataInitializaer = new NameTestDataInitializer();
 		if (this.nameDAO == null) {
 			this.nameDAO = new NameDAO();
 			this.nameDAO.setSession(this.sessionProvder.getSession());
@@ -1021,24 +1021,24 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final Integer gid1 = germplasm1.getGid();
 		final Integer gid2 = germplasm2.getGid();
 
-		final Name name1 = this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "I-1RT  /  P 001 A-23 / ");
+		final Name name1 = this.nameTestDataInitializaer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "I-1RT  /  P 001 A-23 / ");
 		this.nameDAO.save(name1);
 
-		final Name name2 = this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "I-1RT/P 1 A-23/");
+		final Name name2 = this.nameTestDataInitializaer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "I-1RT/P 1 A-23/");
 		this.nameDAO.save(name2);
 
-		final Name name3 = this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "I-1RT/P001A-23/");
+		final Name name3 = this.nameTestDataInitializaer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "I-1RT/P001A-23/");
 		this.nameDAO.save(name3);
 
 		final Name name4 =
-				this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "(CML454 X CML451)-B-3-1-112");
+				this.nameTestDataInitializaer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "(CML454 X CML451)-B-3-1-112");
 		this.nameDAO.save(name4);
 
 		final Name name5 =
-				this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "(CML454 X CML451)-B-3-1-112");
+				this.nameTestDataInitializaer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "(CML454 X CML451)-B-3-1-112");
 		this.nameDAO.save(name5);
 
-		final Name name6 = this.nameTDI.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "(CML454XCML451)-B-3-1-112");
+		final Name name6 = this.nameTestDataInitializaer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "(CML454XCML451)-B-3-1-112");
 		this.nameDAO.save(name6);
 
 		final List<String> names = new ArrayList<>(Arrays.asList("I-1RT  /  P 001 A-23 / ", "(CML454 X CML451)-B-3-1-112"));
