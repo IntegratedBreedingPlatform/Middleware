@@ -1068,19 +1068,41 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetNamesByGidsAndNTypeIdsInMap() {
-		final int GID = 1;
-
-		final Map<Integer, List<Name>> namesMap = this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(Arrays.asList(GID),
-				Arrays.asList(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID()));
-		final int sizeBeforeAddingNewName = namesMap.get(GID) != null ? namesMap.get(GID).size() : 0;
-
-		Name name = this.nameTDI.createName(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(), GID, "DERIVATIVE NAME 00001");
-		name = this.nameDAO.save(name);
-		final Map<Integer, List<Name>> newNamesMap = this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(Arrays.asList(GID),
-				Arrays.asList(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID()));
-		final int sizeAfterAddingNewName = newNamesMap.get(GID).size();
-
-		// Assert that the new size has 1 more name, which is the newly added name
+		final int GID1 = 1;
+		final int GID2 = 2;
+		final int GID3 = 3;
+		
+		//Get the names map before adding new names
+		final Map<Integer, List<Name>> namesMap = this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(Arrays.asList(GID1, GID2, GID3),
+				Arrays.asList(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(), GermplasmNameType.LINE_NAME.getUserDefinedFieldID()));
+		
+		//Add new name for germplasm with gid = GID1
+		Name name = this.nameTestDataInitializaer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), GID1, "LINE NAME 00001");
+		this.nameDAO.save(name);
+		
+		//Add new names for germplasm with gid = GID2
+		name = this.nameTestDataInitializaer.createName(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(), GID2, "DERIVATIVE NAME 00001");
+		this.nameDAO.save(name);
+		name = this.nameTestDataInitializaer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), GID2, "LINE NAME 00001");
+		this.nameDAO.save(name);
+		
+		//Get the names map after adding new names
+		final Map<Integer, List<Name>> newNamesMap = this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(Arrays.asList(GID1, GID2, GID3),
+				Arrays.asList(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(), GermplasmNameType.LINE_NAME.getUserDefinedFieldID()));
+		
+		int sizeBeforeAddingNewName = namesMap.get(GID1) != null ? namesMap.get(GID1).size() : 0;
+		int sizeAfterAddingNewName = newNamesMap.get(GID1).size();
+		// Assert that the new size has 1 more name, which is the newly added name for germplasm with gid = GID1
 		Assert.assertEquals("Both sizes should be equal.", sizeBeforeAddingNewName + 1, sizeAfterAddingNewName);
+		
+		sizeBeforeAddingNewName = namesMap.get(GID2) != null ? namesMap.get(GID2).size() : 0;
+		sizeAfterAddingNewName = newNamesMap.get(GID2).size();
+		// Assert that the new size has 2 more names, which is the newly added names for germplasm with gid = GID2
+		Assert.assertEquals("Both sizes should be equal.", sizeBeforeAddingNewName + 2, sizeAfterAddingNewName);
+		
+		sizeBeforeAddingNewName = namesMap.get(GID3) != null ? namesMap.get(GID3).size() : 0;
+		sizeAfterAddingNewName = newNamesMap.get(GID3) != null ? namesMap.get(GID3).size() : 0;
+		// Assert that the new size is the same as the size before adding new names since there are no new names added for germplasm with gid = GID3 
+		Assert.assertEquals("Both sizes should be equal.", sizeBeforeAddingNewName, sizeAfterAddingNewName);
 	}
 }
