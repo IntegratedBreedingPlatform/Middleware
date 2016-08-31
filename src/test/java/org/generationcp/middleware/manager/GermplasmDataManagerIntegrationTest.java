@@ -1093,16 +1093,15 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		int sizeBeforeAddingNewName = namesMap.get(GID1) != null ? namesMap.get(GID1).size() : 0;
 		int sizeAfterAddingNewName = newNamesMap.get(GID1).size();
 		// Assert that the new size has 1 more name, which is the newly added name for germplasm with gid = GID1
-		Assert.assertEquals("Both sizes should be equal.", sizeBeforeAddingNewName + 1, sizeAfterAddingNewName);
+		Assert.assertEquals("Expecting list of names for GID 1 to be incremented by 1 new name.", sizeBeforeAddingNewName + 1, sizeAfterAddingNewName);
 		
 		sizeBeforeAddingNewName = namesMap.get(GID2) != null ? namesMap.get(GID2).size() : 0;
 		sizeAfterAddingNewName = newNamesMap.get(GID2).size();
 		// Assert that the new size has 2 more names, which is the newly added names for germplasm with gid = GID2
-		Assert.assertEquals("Both sizes should be equal.", sizeBeforeAddingNewName + 2, sizeAfterAddingNewName);
+		Assert.assertEquals("Expecting list of names for GID 2 to be incremented by 2 new names.", sizeBeforeAddingNewName + 2, sizeAfterAddingNewName);
 		
 		sizeBeforeAddingNewName = namesMap.get(GID3) != null ? namesMap.get(GID3).size() : 0;
 		sizeAfterAddingNewName = newNamesMap.get(GID3) != null ? namesMap.get(GID3).size() : 0;
-		// Assert that the new size is the same as the size before adding new names since there are no new names added for germplasm with gid = GID3 
-		Assert.assertEquals("Both sizes should be equal.", sizeBeforeAddingNewName, sizeAfterAddingNewName);
+		Assert.assertEquals("Expecting list of names for GID 3 to be constant since there are no new names added for it.", sizeBeforeAddingNewName, sizeAfterAddingNewName);
 	}
 }
