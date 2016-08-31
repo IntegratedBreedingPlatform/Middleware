@@ -43,13 +43,11 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NameDAO.class);
 
-	@SuppressWarnings("unchecked")
-  	public List<Name> getByGIDWithFilters(final Integer gid, final Integer status, final GermplasmNameType type) {
+	public List<Name> getByGIDWithFilters(final Integer gid, final Integer status, final GermplasmNameType type) {
  		if(type != null) {
  			return getByGIDWithListTypeFilters(gid, status, Collections.<Integer>singletonList(Integer.valueOf(type.getUserDefinedFieldID())));
  		}
  		return getByGIDWithListTypeFilters(gid, status, null);
-
  	}
 
  	/**
@@ -310,6 +308,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		return gids;
 	}
 
+	@SuppressWarnings("unchecked")
 	public Map<Integer, List<Name>> getNamesByGidsInMap(final List<Integer> gids) {
 		final Map<Integer, List<Name>> map = new HashMap<Integer, List<Name>>();
 
@@ -341,6 +340,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		return map;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public Map<Integer, List<Name>> getNamesByGidsAndNTypeIdsInMap(final List<Integer> gids, final List<Integer> ntypeIds) {
 		final Map<Integer, List<Name>> map = new HashMap<Integer, List<Name>>();
 
