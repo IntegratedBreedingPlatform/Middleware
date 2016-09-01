@@ -22,6 +22,10 @@ public class UserDto {
 
 	private Integer status;
 
+	public UserDto() {
+		super();
+	}
+
 	public UserDto(String username) {
 		super();
 		this.username = username;
