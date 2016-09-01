@@ -23,10 +23,10 @@ public class StudyMeasurements {
 
 	}
 
-	List<ObservationDto> getAllMeasurements(final int projectBusinessIdentifier, final List<TraitDto> traits, final int instanceNumber,
+	List<ObservationDto> getAllMeasurements(final int projectBusinessIdentifier, final List<TraitDto> traits, final int instanceId,
 			final int pageNumber, final int pageSize) {
 		final String generateQuery = this.measurementQuery.getAllObservationsQuery(traits);
-		return this.executeQueryAndMapResults(projectBusinessIdentifier, traits, generateQuery, instanceNumber, pageNumber, pageSize);
+		return this.executeQueryAndMapResults(projectBusinessIdentifier, traits, generateQuery, instanceId, pageNumber, pageSize);
 	}
 
 	List<ObservationDto> getMeasurement(final int projectBusinessIdentifier, final List<TraitDto> traits, final Integer measurementId) {
@@ -44,10 +44,10 @@ public class StudyMeasurements {
 
 	@SuppressWarnings("unchecked")
 	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier, final List<TraitDto> traits,
-			final String generateQuery, final int instanceNumber, final int pageNumber, final int pageSize) {
+			final String generateQuery, final int instanceId, final int pageNumber, final int pageSize) {
 		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(traits, generateQuery);
 		createSQLQuery.setParameter("studyId", projectBusinessIdentifier);
-		createSQLQuery.setParameter("instance_number", String.valueOf(instanceNumber));
+		createSQLQuery.setParameter("instanceId", String.valueOf(instanceId));
 
 		createSQLQuery.setFirstResult(pageSize * (pageNumber - 1));
 		createSQLQuery.setMaxResults(pageSize);

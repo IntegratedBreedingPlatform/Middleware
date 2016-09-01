@@ -62,7 +62,7 @@ class ObservationQuery {
 	}
 
 	String getInstanceNumberClause() {
-		return " AND gl.description = :instance_number \n";
+		return " AND gl.description = :instanceId \n";
 	}
 
 	String getGroupOrderClause() {

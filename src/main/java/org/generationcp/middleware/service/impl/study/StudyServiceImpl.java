@@ -161,7 +161,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public int countTotalObservationUnits(final int studyIdentifier, final int instanceNumber) {
+	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId) {
 		try {
 			final String sql = "select count(*) as totalObservationUnits from nd_experiment nde \n"
 					+ "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
@@ -169,27 +169,27 @@ public class StudyServiceImpl extends Service implements StudyService {
 					+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n" 
 					+ " where \n"
 					+ "	proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id where (pr.object_project_id = :studyIdentifier and name like '%PLOTDATA')) \n"
-					+ "    and gl.description = :instanceNumber ";
+					+ "    and gl.description = :instanceId ";
 			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
 			query.addScalar("totalObservationUnits", new IntegerType());
 			query.setParameter("studyIdentifier", studyIdentifier);
-			query.setParameter("instanceNumber", instanceNumber);
+			query.setParameter("instanceId", instanceId);
 			return (int) query.uniqueResult();
 		} catch (HibernateException he) {
 			throw new MiddlewareQueryException(
 					String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
-							studyIdentifier, instanceNumber) + he.getMessage(),
+							studyIdentifier, instanceId) + he.getMessage(),
 					he);
 		}
 	}
 
 	@Override
-	public List<ObservationDto> getObservations(final int studyIdentifier, final int instanceNumber, final int pageNumber,
+	public List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber,
 			final int pageSize) {
 
 		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
 
-		return this.studyMeasurements.getAllMeasurements(studyIdentifier, traits, instanceNumber, pageNumber, pageSize);
+		return this.studyMeasurements.getAllMeasurements(studyIdentifier, traits, instanceId, pageNumber, pageSize);
 	}
 
 	@Override

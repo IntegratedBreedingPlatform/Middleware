@@ -9,9 +9,9 @@ public interface StudyService {
 
 	List<StudySummary> search(final StudySearchParameters serchParameters);
 
-	int countTotalObservationUnits(final int studyIdentifier, final int instanceNumber);
+	int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
 
-	List<ObservationDto> getObservations(final int studyIdentifier, final int instanceNumber, final int pageNumber, final int pageSize);
+	List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber, final int pageSize);
 
 	List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier);
 
