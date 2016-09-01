@@ -17,7 +17,7 @@ import org.junit.Test;
  * @author Akhil
  * @version $Revision: 1.0 $
  */
-public class QueryTest {
+public class ObservationQueryTest {
 
 	final BasicFormatterImpl formattedSQL = new BasicFormatterImpl();
 
