@@ -169,7 +169,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n" 
 					+ " where \n"
 					+ "	proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id where (pr.object_project_id = :studyIdentifier and name like '%PLOTDATA')) \n"
-					+ "    and gl.description = :instanceId ";
+					+ "    and gl.nd_geolocation_id = :instanceId ";
 			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
 			query.addScalar("totalObservationUnits", new IntegerType());
 			query.setParameter("studyIdentifier", studyIdentifier);
