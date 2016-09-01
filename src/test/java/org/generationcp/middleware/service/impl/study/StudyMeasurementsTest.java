@@ -61,7 +61,7 @@ public class StudyMeasurementsTest {
 				this.trailTraits.getAllMeasurements(this.TEST_PROJECT_IDENTIFIER, this.testTraits, 1, 1, 100);
 
 		this.verifyScalarSetting();
-		Mockito.verify(this.mockSqlQuery).setParameter(Matchers.eq("instance_number"), Matchers.anyString());
+		Mockito.verify(this.mockSqlQuery).setParameter(Matchers.eq("instanceId"), Matchers.anyString());
 		Mockito.verify(this.mockSqlQuery).setParameter(Matchers.eq("studyId"), Matchers.eq(this.TEST_PROJECT_IDENTIFIER));
 
 		// add additional test code here
