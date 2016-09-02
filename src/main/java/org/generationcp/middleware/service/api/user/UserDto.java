@@ -26,11 +26,6 @@ public class UserDto {
 		super();
 	}
 
-	public UserDto(String username) {
-		super();
-		this.username = username;
-	}
-
 	public  Integer getUserId() {
 		return this.userId;
 	}
