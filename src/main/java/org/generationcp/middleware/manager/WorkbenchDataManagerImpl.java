@@ -1508,4 +1508,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return this.getProjectDao().getAdminUsersOfCrop(crop);
 	}
 
+	@Override
+	public List<User> getAllUsersByRole(final String role) {
+		return this.getUserDao().getAllUsersByRole(role);
+	}
+
 }

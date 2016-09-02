@@ -931,4 +931,13 @@ public interface WorkbenchDataManager {
 	 */
 	List<User> getAdminUsersOfCrop(final String crop);
 
+	/**
+	 * Returns the list of users given the role type
+	 *
+	 * @param cropName the crop
+	 * @return Returns the list of users associated to the role type
+	 */
+	List<User> getAllUsersByRole(final String role);
+
+
 }
