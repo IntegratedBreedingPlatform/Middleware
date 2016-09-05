@@ -135,8 +135,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append("       AND col.type_id = ").append(TermId.COLUMN_NO.getId())
 							.append(" LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
 							.append("       AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
-							.append(" LEFT JOIN listdata_project ldp on ldp.listdata_project_id = pr.object_project_id ")
-							.append("		INNER JOIN listnms lnms ON lnms.projectid = ldp.listdata_project_id AND lnms.listtype in ('TRIAL', 'NURSERY')")
+							.append(" LEFT JOIN listnms lnms ON lnms.projectid = pr.object_project_id AND lnms.listtype in ('TRIAL', 'NURSERY')")
+							.append(" LEFT JOIN listdata_project ldp on ldp.list_id = lnms.listid AND s.dbxref_id = ldp.germplasm_id ")
 							.append(" ORDER BY casted_trialInstance, inst.description, eproj.nd_experiment_id ").append(order);
 
 			final Query query =

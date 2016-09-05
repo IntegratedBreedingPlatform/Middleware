@@ -511,25 +511,6 @@ public interface OntologyService {
 	List<Term> getAllRoles() throws MiddlewareQueryException;
 
 	/**
-	 * Count the number of projects the variable was used.
-	 *
-	 * @param variableId the variable id
-	 * @return the count
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	long countProjectsByVariable(int variableId) throws MiddlewareQueryException;
-
-	/**
-	 * Count the number of experiments the variable was used.
-	 *
-	 * @param variableId the variable id
-	 * @param variableTypeId the stored in id
-	 * @return the count
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	long countExperimentsByVariable(int variableId, int variableTypeId) throws MiddlewareQueryException;
-
-	/**
 	 * Adds a new Term to the database. Creates a new cvterm entry in the local database. Returns a negative id.
 	 *
 	 * @param name the name
