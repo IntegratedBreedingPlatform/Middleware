@@ -58,9 +58,11 @@ public class GeolocationPropertySaver extends Saver {
 
 	private int getMaxRank(List<GeolocationProperty> properties) {
 		int maxRank = 1;
-		for (GeolocationProperty property : properties) {
-			if (property.getRank() >= maxRank) {
-				maxRank = property.getRank() + 1;
+		if(properties != null){
+			for (GeolocationProperty property : properties) {
+				if (property.getRank() >= maxRank) {
+					maxRank = property.getRank() + 1;
+				}
 			}
 		}
 		return maxRank;
