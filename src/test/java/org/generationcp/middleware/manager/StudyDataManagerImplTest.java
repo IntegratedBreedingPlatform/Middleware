@@ -322,7 +322,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<Integer> trialIdList = new ArrayList<Integer>();
 		trialIdList.addAll(Arrays.asList(this.studyReference.getId()));
 		final List<FieldMapInfo> fieldMapInfos =
-				this.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, StudyDataManagerImplTest.crossExpansionProperties, true);
+				this.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, StudyDataManagerImplTest.crossExpansionProperties);
 		// compare the size to the minimum possible value of field map infos' size
 		Assert.assertTrue("The size should be greater than 0", fieldMapInfos.size() > 0);
 	}

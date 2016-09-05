@@ -59,6 +59,8 @@ public class Location implements Serializable, Comparable<Location> {
 			"select l.* from location l, udflds u where l.ltype = u.fldno and u.fcode = 'PROV' order by l.lname";
 
 	public static final int UNKNOWN_LOCATION_ID = 0;
+	
+	public static final Integer[] BREEDING_LOCATION_TYPE_IDS = {410, 411, 412};
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
