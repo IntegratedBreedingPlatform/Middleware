@@ -451,16 +451,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public long countProjectsByVariable(final int variableId) throws MiddlewareQueryException {
-		return this.getDmsProjectDao().countByVariable(variableId);
-	}
-
-	@Override
-	public long countExperimentsByVariable(final int variableId, final int variableTypeId) throws MiddlewareQueryException {
-		return this.getExperimentDao().countByObservedVariable(variableId, variableTypeId);
-	}
-
-	@Override
 	public List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType,
 			CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException {
 		List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
