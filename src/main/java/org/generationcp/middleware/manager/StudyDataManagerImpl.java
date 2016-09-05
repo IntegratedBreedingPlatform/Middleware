@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -64,6 +66,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -74,6 +77,10 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
@@ -1111,4 +1118,69 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 
 	}
+
+	@Override
+	public List<StudySummary> findPagedProjects(final String programDbId, final String locationDbId, final String seasonDbId,
+			final Integer pageSize, final Integer page) throws MiddlewareQueryException {
+		final List<DmsProject> dmsProjects =
+				this.getDmsProjectDao().findPagedProjects(programDbId, locationDbId, seasonDbId, pageSize, page);
+		final List<StudySummary> studySummaries = Lists.newArrayList();
+		for (final DmsProject dmsProject : dmsProjects) {
+			final StudySummary studySummary = new StudySummary();
+
+			final List<ProjectProperty> sortedProperties = Ordering.from(new Comparator<ProjectProperty>() {
+
+				@Override
+				public int compare(final ProjectProperty o1, final ProjectProperty o2) {
+					final Integer rankCompare = o1.getRank() - o2.getRank();
+					return rankCompare == 0 ? o1.getTypeId() - o2.getTypeId() : rankCompare;
+				}
+			}).immutableSortedCopy(dmsProject.getProperties());
+
+			final Map<String, String> props = Maps.newHashMap();
+			String key = null;
+			String valueKey = "";
+			for (final ProjectProperty prop : sortedProperties) {
+				if (prop.getTypeId().equals(TermId.VARIABLE_DESCRIPTION.getId())) {
+					key = prop.getValue();
+				}
+				if (prop.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
+					valueKey = prop.getValue();
+				}
+				if (valueKey.equals(String.valueOf(prop.getTypeId()))) {
+					if (valueKey.equals(String.valueOf(TermId.START_DATE.getId()))) {
+						studySummary.addYear(prop.getValue().substring(0, 4));
+						props.put(key, prop.getValue());
+					} else {
+						if (valueKey.equals(String.valueOf(TermId.SEASON_VAR_TEXT.getId()))) {
+							studySummary.addSeason(prop.getValue());
+						} else {
+							if (valueKey.equals(String.valueOf(TermId.LOCATION_ABBR.getId()))) {
+								studySummary.setLocationId(!StringUtils.isEmpty(prop.getValue()) ? String.valueOf(prop.getValue()) : null);
+							} else {
+								if (valueKey.equals(String.valueOf(TermId.STUDY_TYPE.getId()))) {
+									studySummary.setType(StudyType.getStudyTypeById(Integer.valueOf(prop.getValue())).getName());
+								} else {
+									props.put(key, prop.getValue());
+								}
+							}
+						}
+					}
+				}
+			}
+			studySummary.setOptionalInfo(props)
+					.setName(dmsProject.getName())
+					.setProgramDbId(dmsProject.getProgramUUID())
+					.setStudyDbid(dmsProject.getProjectId());
+			studySummaries.add(studySummary);
+		}
+		return studySummaries;
+	}
+
+	@Override
+	public Long countAllStudies(final String programDbId, final String locationDbId, final String seasonDbId)
+			throws MiddlewareQueryException {
+		return Long.valueOf(this.findPagedProjects(programDbId, locationDbId, seasonDbId, null, null).size());
+	}
+
 }
