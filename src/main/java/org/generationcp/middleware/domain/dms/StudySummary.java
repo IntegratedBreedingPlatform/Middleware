@@ -10,9 +10,6 @@ import com.google.common.collect.Lists;
 
 public class StudySummary implements Serializable {
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = -515769070343491680L;
 
 	private Integer studyDbid;
@@ -28,6 +25,15 @@ public class StudySummary implements Serializable {
 	private String locationId;
 
 	private String programDbId;
+
+	private String programName;
+
+	private String startDate;
+
+	private String endDate;
+
+	private boolean active;
+	// TODO list of instance metadata (id (geoloc id), name (instance number), locationname (LOCABBR or LOC_NAME else instance number)
 
 	private Map<String, String> optionalInfo = new HashMap<>();
 
@@ -101,6 +107,42 @@ public class StudySummary implements Serializable {
 
 	public StudySummary setProgramDbId(final String programDbId) {
 		this.programDbId = programDbId;
+		return this;
+	}
+
+	public String getProgramName() {
+		return this.programName;
+	}
+
+	public StudySummary setProgramName(final String programName) {
+		this.programName = programName;
+		return this;
+	}
+
+	public String getStartDate() {
+		return this.startDate;
+	}
+
+	public StudySummary setStartDate(final String startDate) {
+		this.startDate = startDate;
+		return this;
+	}
+
+	public String getEndDate() {
+		return this.endDate;
+	}
+
+	public StudySummary setEndDate(final String endDate) {
+		this.endDate = endDate;
+		return this;
+	}
+
+	public boolean isActive() {
+		return this.active;
+	}
+
+	public StudySummary setActive(final boolean active) {
+		this.active = active;
 		return this;
 	}
 
