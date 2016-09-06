@@ -10,6 +10,7 @@ import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.TraitDto;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.type.IntegerType;
 
 public class StudyMeasurements {
 
@@ -75,7 +76,7 @@ public class StudyMeasurements {
 	private void addScalarForTraits(final List<TraitDto> traits, final SQLQuery createSQLQuery) {
 		for (final TraitDto trait : traits) {
 			createSQLQuery.addScalar(trait.getTraitName());
-			createSQLQuery.addScalar(trait.getTraitName() + "_PhenotypeId");
+			createSQLQuery.addScalar(trait.getTraitName() + "_PhenotypeId", new IntegerType());
 		}
 	}
 
