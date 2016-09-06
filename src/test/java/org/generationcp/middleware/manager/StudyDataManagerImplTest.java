@@ -307,24 +307,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountProjectsByVariable() throws Exception {
-		final int variableId = TermId.STUDY_NAME.getId();
-		final long originalCount = this.manager.countProjectsByVariable(variableId);
-		this.studyTDI.addTestStudy("NEW STUDY");
-		final long updatedCount = this.manager.countProjectsByVariable(variableId);
-		Assert.assertEquals("The size after adding new study should be equal to the size before adding a new study + 1",
-				updatedCount, originalCount + 1);
-	}
-
-	@Test
-	public void testCountExperimentsByVariable() throws Exception {
-		final int variableId = 8230;
-		final int storedInId = 1041;
-		final long count = this.manager.countExperimentsByVariable(variableId, storedInId);
-		Assert.assertTrue("Count should be greater than 0", count > 0);
-	}
-
-	@Test
 	public void testCheckIfProjectNameIsExisting() throws Exception {
 		final DmsProject project = this.studyTDI.createFolderTestData(this.commonTestProject.getUniqueID());
 		boolean isExisting = this.manager.checkIfProjectNameIsExistingInProgram(project.getName(), this.commonTestProject.getUniqueID());
@@ -340,7 +322,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<Integer> trialIdList = new ArrayList<Integer>();
 		trialIdList.addAll(Arrays.asList(this.studyReference.getId()));
 		final List<FieldMapInfo> fieldMapInfos =
-				this.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, StudyDataManagerImplTest.crossExpansionProperties, true);
+				this.manager.getFieldMapInfoOfStudy(trialIdList, StudyType.T, StudyDataManagerImplTest.crossExpansionProperties);
 		// compare the size to the minimum possible value of field map infos' size
 		Assert.assertTrue("The size should be greater than 0", fieldMapInfos.size() > 0);
 	}

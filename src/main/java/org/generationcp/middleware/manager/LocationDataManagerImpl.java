@@ -65,6 +65,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		return this.getLocationDao().getAll(start, numOfRows);
 	}
 
+
+
 	@Override
 	public long countAllLocations() throws MiddlewareQueryException {
 		return this.countAll(this.getLocationDao());
@@ -563,5 +565,10 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	public List<Location> getAllBreedingLocationsByUniqueID(final String programUUID) {
 		return this.getLocationDao().getBreedingLocationsByUniqueID(programUUID);
 	}
-
+	
+	@Override
+	public List<LocationDetails> getFilteredLocations(final Integer countryId, final Integer locationType, final String locationName,
+			final String programUUID) {
+		return this.getLocationDao().getFilteredLocations(countryId, locationType, locationName, programUUID);
+	}
 }

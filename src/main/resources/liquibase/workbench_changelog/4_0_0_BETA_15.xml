@@ -1,0 +1,74 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="chavdahard" id="beta15-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'germplasm_browser'</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE `workbench_tool` SET `path`='ibpworkbench/maingpsb/germplasm/' WHERE `name`='germplasm_browser'
+		</sql>
+	</changeSet>
+
+	<changeSet author="chavdahard" id="beta15-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'study_browser'</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE `workbench_tool` SET `path`='ibpworkbench/maingpsb/study/' WHERE `name`='study_browser'
+		</sql>
+	</changeSet>
+
+	<changeSet author="chavdahard" id="beta15-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'germplasm_list_browser'</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE `workbench_tool` SET `path`='ibpworkbench/maingpsb/germplasmlist/' WHERE `name`='germplasm_list_browser'
+		</sql>
+	</changeSet>
+
+	<changeSet author="chavdahard" id="beta15-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'germplasm_mainheadtohead'</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE `workbench_tool` SET `path`='ibpworkbench/maingpsb/Head_to_head_comparison' WHERE `name`='germplasm_mainheadtohead'
+		</sql>
+	</changeSet>
+
+	<changeSet author="chavdahard" id="beta15-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'query_for_adapted_germplasm'</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE `workbench_tool` SET `path`='ibpworkbench/maingpsb/Query_For_Adapted_Germplasm' WHERE `name`='query_for_adapted_germplasm'
+		</sql>
+	</changeSet>
+
+	<changeSet author="chavdahard" id="beta15-6">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'study_browser_with_id'</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE `workbench_tool` SET `path`='ibpworkbench/maingpsb/studybrowser/' WHERE `name`='study_browser_with_id'
+		</sql>
+	</changeSet>
+
+	<changeSet author="chavdahard" id="beta15-7">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select count(*) FROM workbench_tool where name = 'trait_donor_query'</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE `workbench_tool` SET `path`='ibpworkbench/maingpsb/Trait_Donors_Query' WHERE `name`='trait_donor_query'
+		</sql>
+	</changeSet>
+
+
+</databaseChangeLog>

@@ -23,8 +23,7 @@ public class StudyMeasurements {
 	}
 
 	List<ObservationDto> getAllMeasurements(final int projectBusinessIdentifier, final List<TraitDto> traits) {
-		final String generateQuery = this.measurementQuery.getObservationQuery(traits);
-		return this.executeQueryAndMapResults(projectBusinessIdentifier, traits, generateQuery);
+		return this.executeQueryAndMapResults(projectBusinessIdentifier, traits);
 	}
 
 	List<ObservationDto> getMeasurement(final int projectBusinessIdentifier, final List<TraitDto> traits, final Integer measurementId) {
@@ -40,14 +39,23 @@ public class StudyMeasurements {
 		return measurement;
 	}
 
+	@SuppressWarnings({"unchecked", "rawtypes"})
+	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier, final List<TraitDto> traits) {
+		
+		List result = getAllStudyDetails(projectBusinessIdentifier, traits);
+		
+		return this.mapResults(result, traits);
+	}
+
 	@SuppressWarnings("unchecked")
-	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier, final List<TraitDto> traits,
-			final String generateQuery) {
+	public List<Object[]> getAllStudyDetails(final int projectBusinessIdentifier, final List<TraitDto> traits) {
+		final String generateQuery = this.measurementQuery.getObservationQuery(traits);
 		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(traits, generateQuery);
 
 		this.setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery);
 
-		return this.mapResults(createSQLQuery.list(), traits);
+		List<Object[]> result = createSQLQuery.list();
+		return result;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -63,6 +71,20 @@ public class StudyMeasurements {
 	private SQLQuery createQueryAndAddScalar(final List<TraitDto> traits, final String generateQuery) {
 		final SQLQuery createSQLQuery = this.session.createSQLQuery(generateQuery);
 
+		this.addScalar(createSQLQuery);
+
+		this.addScalarForTraits(traits, createSQLQuery);
+		return createSQLQuery;
+	}
+
+	private void addScalarForTraits(final List<TraitDto> traits, final SQLQuery createSQLQuery) {
+		for (final TraitDto trait : traits) {
+			createSQLQuery.addScalar(trait.getTraitName());
+			createSQLQuery.addScalar(trait.getTraitName() + "_PhenotypeId");
+		}
+	}
+
+	private void addScalar(final SQLQuery createSQLQuery) {
 		createSQLQuery.addScalar("nd_experiment_id");
 		createSQLQuery.addScalar("TRIAL_INSTANCE");
 		createSQLQuery.addScalar("ENTRY_TYPE");
@@ -72,12 +94,6 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar("SEED_SOURCE");
 		createSQLQuery.addScalar("REP_NO");
 		createSQLQuery.addScalar("PLOT_NO");
-
-		for (final TraitDto trait : traits) {
-			createSQLQuery.addScalar(trait.getTraitName());
-			createSQLQuery.addScalar(trait.getTraitName() + "_PhenotypeId");
-		}
-		return createSQLQuery;
 	}
 
 	private List<ObservationDto> mapResults(final List<Object[]> results, final List<TraitDto> projectTraits) {
@@ -115,6 +131,28 @@ public class StudyMeasurements {
 		}
 		createSQLQuery.setParameter(counter++, studyIdentifier);
 		return counter;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier, final List<TraitDto> traits) {
+		final String generateQuery = this.measurementQuery.getObservationQueryWithBlockRowCol(traits);
+		final SQLQuery createSQLQuery = this.createQueryAndAddScalarWithBlockRowCol(traits, generateQuery);
+
+		this.setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery);
+
+		final List<Object[]> result = createSQLQuery.list();
+		return result;
+	}
+
+	private SQLQuery createQueryAndAddScalarWithBlockRowCol(final List<TraitDto> traits, final String generateQuery) {
+		final SQLQuery createSQLQuery = this.session.createSQLQuery(generateQuery);
+
+		this.addScalar(createSQLQuery);
+		createSQLQuery.addScalar("BLOCK_NO");
+		createSQLQuery.addScalar("ROW_NO");
+		createSQLQuery.addScalar("COL_NO");
+		this.addScalarForTraits(traits, createSQLQuery);
+		return createSQLQuery;
 	}
 
 }
