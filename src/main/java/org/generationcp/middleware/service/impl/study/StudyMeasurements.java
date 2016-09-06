@@ -10,7 +10,6 @@ import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.TraitDto;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.type.IntegerType;
 
 public class StudyMeasurements {
 
@@ -67,6 +66,20 @@ public class StudyMeasurements {
 	private SQLQuery createQueryAndAddScalar(final List<TraitDto> traits, final String generateQuery) {
 		final SQLQuery createSQLQuery = this.session.createSQLQuery(generateQuery);
 
+		this.addScalar(createSQLQuery);
+
+		this.addScalarForTraits(traits, createSQLQuery);
+		return createSQLQuery;
+	}
+
+	private void addScalarForTraits(final List<TraitDto> traits, final SQLQuery createSQLQuery) {
+		for (final TraitDto trait : traits) {
+			createSQLQuery.addScalar(trait.getTraitName());
+			createSQLQuery.addScalar(trait.getTraitName() + "_PhenotypeId");
+		}
+	}
+
+	private void addScalar(final SQLQuery createSQLQuery) {
 		createSQLQuery.addScalar("nd_experiment_id");
 		createSQLQuery.addScalar("TRIAL_INSTANCE");
 		createSQLQuery.addScalar("ENTRY_TYPE");
@@ -79,12 +92,6 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar("BLOCK_NO");
 		createSQLQuery.addScalar("ROW_NO");
 		createSQLQuery.addScalar("COL_NO");
-
-		for (final TraitDto trait : traits) {
-			createSQLQuery.addScalar(trait.getTraitName());
-			createSQLQuery.addScalar(trait.getTraitName() + "_PhenotypeId", new IntegerType());
-		}
-		return createSQLQuery;
 	}
 
 	private List<ObservationDto> mapResults(final List<Object[]> results, final List<TraitDto> projectTraits) {
@@ -106,5 +113,17 @@ public class StudyMeasurements {
 			}
 		}
 		return Collections.unmodifiableList(measurements);
+	}
+
+
+	@SuppressWarnings("unchecked")
+	public List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier, final List<TraitDto> traits) {
+		final String generateQuery = this.measurementQuery.getObservationsMainQuery(traits);
+
+		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(traits, generateQuery);
+		createSQLQuery.setParameter("studyId", projectBusinessIdentifier);
+
+		final List<Object[]> result = createSQLQuery.list();
+		return result;
 	}
 }

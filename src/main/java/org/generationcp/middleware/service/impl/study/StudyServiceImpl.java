@@ -2,6 +2,8 @@
 package org.generationcp.middleware.service.impl.study;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -21,6 +23,7 @@ import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerI
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.api.study.StudyDetailDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
@@ -35,10 +38,13 @@ import org.hibernate.Session;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
@@ -273,4 +279,103 @@ public class StudyServiceImpl extends Service implements StudyService {
 					"Unexpected error in executing getAllStudyInstanceNumbers(studyId = " + studyId + ") query: " + he.getMessage(), he);
 		}
 	}
+
+	@Override
+	public StudyDetailDto getStudyDetails(final int studyIdentifier) {
+
+		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
+
+		final List<TraitDto> sortedTraits = Ordering.from(new Comparator<TraitDto>() {
+
+			@Override
+			public int compare(final TraitDto o1, final TraitDto o2) {
+				return o1.getTraitId() - o2.getTraitId();
+			}
+		}).immutableSortedCopy(traits);
+
+		final List<Object[]> results = this.studyMeasurements.getAllStudyDetailsAsTable(studyIdentifier, sortedTraits);
+
+		final List<Integer> observationVariableDbIds = new ArrayList<Integer>();
+
+		final List<String> observationVariableNames = new ArrayList<String>();
+
+		for (final Iterator<TraitDto> iterator = sortedTraits.iterator(); iterator.hasNext();) {
+			final TraitDto traitDto = iterator.next();
+			observationVariableDbIds.add(traitDto.getTraitId());
+			observationVariableNames.add(traitDto.getTraitName());
+		}
+
+		List<List<String>> data = Lists.newArrayList();
+
+
+		if (!CollectionUtils.isEmpty(results)) {
+
+			for (Object[] row : results) {
+				final List<String> entry = Lists.newArrayList();
+
+				// locationDbId = trial instance number
+				// In brapi this will equate to studyDbId
+				// TODO Update query and use nd_geolocation_id instead. For now instance number will be ok.
+				entry.add((String) row[1]);
+
+				// locationName = For now just concat instance number with some prefix
+				// TODO Could also use LOCATION_ABBR or LOCATION_NAME from nd_geolocationprops if present.
+				entry.add("Study-" + (String) row[1]);
+
+				// gid
+				entry.add(String.valueOf(row[3]));
+
+				// germplasm Name/designation
+				entry.add(String.valueOf(row[4]));
+
+				// observation Db Id = nd_experiment_id
+				entry.add(String.valueOf(row[0]));
+
+				// PlotNumber
+				entry.add((String) row[8]);
+
+				// replication number
+				entry.add((String) row[7]);
+
+				// blockNumber
+				entry.add((String) row[9]);
+
+				// Timestamp
+				entry.add("UnknownTimestamp");
+
+				// entry type
+				entry.add(String.valueOf(row[2]));
+
+				// X = row
+				entry.add(String.valueOf(row[10]));
+
+				// Y = col
+				entry.add(String.valueOf(row[11]));
+
+				// phenotypic values
+				int counterTwo = 1;
+				for (int i = 0; i < traits.size(); i++) {
+					final Object rowValue = row[11 + counterTwo];
+
+					if (rowValue != null) {
+						entry.add(String.valueOf(rowValue));
+					} else {
+						entry.add((String) rowValue);
+					}
+
+					counterTwo += 2;
+				}
+				data.add(entry);
+			}
+		}
+
+		final StudyDetailDto dto = new StudyDetailDto().setStudyDbId(studyIdentifier).setObservationVariableDbIds(observationVariableDbIds)
+				.setObservationVariableNames(observationVariableNames).setData(data);
+
+		dto.setHeaderRow(Lists.newArrayList("locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
+				"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y"));
+
+		return dto;
+	}
 }
+

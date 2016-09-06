@@ -115,5 +115,7 @@
         
         <mapping class="org.generationcp.middleware.pojos.UserProgramTreeState"/>
         
+        <mapping class="org.generationcp.middleware.pojos.Sample"/>
+        
     </session-factory>
 </hibernate-configuration>
