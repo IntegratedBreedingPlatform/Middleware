@@ -1064,6 +1064,21 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public List<DmsProject> findPagedProjects(final String programDbId, final String locationDbId, final String seasonDbId,
 			final Integer pageSize, final Integer page) {
+		final Criteria criteria = buildCoreCriteria(programDbId, locationDbId, seasonDbId);
+		if (page != null && pageSize != null) {
+			criteria.setFirstResult(pageSize * (page - 1));
+			criteria.setMaxResults(pageSize);
+		}
+		return criteria.list();
+	}
+
+	public long countStudies(final String programDbId, final String locationDbId, final String seasonDbId) {
+		final Criteria criteria = buildCoreCriteria(programDbId, locationDbId, seasonDbId);
+		criteria.setProjection(Projections.rowCount());
+		return (long) criteria.uniqueResult();
+	}
+
+	private Criteria buildCoreCriteria(final String programDbId, final String locationDbId, final String seasonDbId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.createAlias("properties", "pr");
 		criteria.add(Restrictions.eq("pr.typeId", TermId.STUDY_TYPE.getId()));
@@ -1104,14 +1119,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			criteria.add(Restrictions.or(Property.forName("projectId").in(ppStartDate), Property.forName("projectId").in(ppSeason)));
 		}
 
-		if (page != null && pageSize != null) {
-			criteria.setFirstResult(page-1);
-			criteria.setMaxResults(pageSize);
-		}
-
 		criteria.addOrder(Order.asc("projectId"));
-
-		return criteria.list();
-
+		return criteria;
 	}
 }
