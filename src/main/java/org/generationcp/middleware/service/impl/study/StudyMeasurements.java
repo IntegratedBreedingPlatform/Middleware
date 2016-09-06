@@ -118,7 +118,7 @@ public class StudyMeasurements {
 
 	@SuppressWarnings("unchecked")
 	public List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier, final List<TraitDto> traits) {
-		final String generateQuery = this.measurementQuery.getObservationsMainQuery(traits);
+		final String generateQuery = this.measurementQuery.getObservationsMainQuery(traits) + this.measurementQuery.getGroupOrderClause();
 
 		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(traits, generateQuery);
 		createSQLQuery.setParameter("studyId", projectBusinessIdentifier);
