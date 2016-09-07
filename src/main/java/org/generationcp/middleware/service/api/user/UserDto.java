@@ -21,6 +21,8 @@ public class UserDto {
 	private String role;
 
 	private Integer status;
+	
+	private String email;
 
 	public UserDto() {
 		super();
@@ -72,6 +74,16 @@ public class UserDto {
 
 	public  void setStatus( Integer status) {
 		this.status = status;
+	}
+
+	
+	public String getEmail() {
+		return email;
+	}
+
+	
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 }

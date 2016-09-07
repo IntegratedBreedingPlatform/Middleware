@@ -250,6 +250,8 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			projectionList.add(Projections.property("person.lastName"), "lastName");
 			projectionList.add(Projections.property("roles.role"), "role");
 			projectionList.add(Projections.property("status"), "status");
+			projectionList.add(Projections.property("person.email"), "email");
+			
 
 			criteria.setProjection(projectionList);
 
