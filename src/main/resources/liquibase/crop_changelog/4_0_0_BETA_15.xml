@@ -29,9 +29,6 @@
 					ON projUser.user_id = u.userid
 					INNER JOIN workbench.workbench_project p
 					ON projUser.project_id = p.project_id
-					INNER JOIN workbench.workbench_crop crop
-					ON crop.crop_name = p.crop_type
-					AND crop.db_name = DATABASE()
 					WHERE NOT EXISTS (
 					  SELECT 1 
 					  FROM persons cropPerson
@@ -56,9 +53,6 @@
 			ON projUser.user_id = u.userid
 			INNER JOIN workbench.workbench_project p
 			ON projUser.project_id = p.project_id
-			INNER JOIN workbench.workbench_crop crop
-			ON crop.crop_name = p.crop_type
-			AND crop.db_name = DATABASE()
 			WHERE NOT EXISTS (
 			  SELECT 1 
 			  FROM persons cropPerson
@@ -78,9 +72,6 @@
 					ON projUser.user_id = u.userid
 					INNER JOIN workbench.workbench_project p
 					ON projUser.project_id = p.project_id
-					INNER JOIN workbench.workbench_crop crop
-					ON crop.crop_name = p.crop_type
-					AND crop.db_name = DATABASE()
 					WHERE NOT EXISTS (
 					  SELECT 1 
 					  FROM users cropUser
@@ -92,8 +83,8 @@
 			</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
-			INSERT INTO users(instalid, ustatus, uaccess, utype, upswd, personid, adate, cdate)
-			SELECT u.instalid, u.ustatus, u.uaccess, u.utype, u.upswd, cropPerson.personid, u.adate, u.cdate
+			INSERT INTO users(instalid, ustatus, uaccess, utype, uname, upswd, personid, adate, cdate)
+			SELECT u.instalid, u.ustatus, u.uaccess, u.utype, u.uname, u.upswd, cropPerson.personid, u.adate, u.cdate
 			FROM workbench.users u
 			INNER JOIN workbench.persons wbPerson
 			ON wbPerson.personid = u.personid
@@ -104,9 +95,6 @@
 			ON projUser.user_id = u.userid
 			INNER JOIN workbench.workbench_project p
 			ON projUser.project_id = p.project_id
-			INNER JOIN workbench.workbench_crop crop
-			ON crop.crop_name = p.crop_type
-			AND crop.db_name = DATABASE()
 			WHERE NOT EXISTS (
 			  SELECT 1 
 			  FROM users cropUser
@@ -126,9 +114,6 @@
 					ON projUser.user_id = u.userid
 					INNER JOIN workbench.workbench_project p
 					ON projUser.project_id = p.project_id
-					INNER JOIN workbench.workbench_crop crop
-					ON crop.crop_name = p.crop_type
-					AND crop.db_name = DATABASE()
 					INNER JOIN users cropUser
 					ON cropUser.uname = u.uname
 					WHERE NOT EXISTS (
@@ -151,9 +136,6 @@
 			ON projUser.user_id = u.userid
 			INNER JOIN workbench.workbench_project p
 			ON projUser.project_id = p.project_id
-			INNER JOIN workbench.workbench_crop crop
-			ON crop.crop_name = p.crop_type
-			AND crop.db_name = DATABASE()
 			INNER JOIN users cropUser
 			ON cropUser.uname = u.uname
 			WHERE NOT EXISTS (
