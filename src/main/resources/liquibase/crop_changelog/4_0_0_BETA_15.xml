@@ -6,15 +6,19 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<changeSet author="darla" id="1">
-		<!-- De-duplication of the UDFLDs in rice database so that unique constraint 
-			(see changeset 3) can be applied successfully. -->
-		<preConditions onFail="CONTINUE">
-			<sqlCheck expectedResult="1">select case when 'ibdbv2_rice_merged' = DATABASE() then 1 else 0 end from dual;</sqlCheck>
+	<changeSet author="akhilm" id="1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">select case when
+				'workbench' !=
+				DATABASE() then 1 else 0 end from dual;
+			</sqlCheck>
+			<not>
+				<indexExists indexName="idx_listnms_projectid" />
+			</not>
 		</preConditions>
-		<sql dbms="mysql" splitStatements="true">
-			DELETE from udflds where fldno in (2002, 2003, 2004, 2005);
-		</sql>
+		<createIndex indexName="idx_listnms_projectid" tableName="listnms"
+			unique="false">
+			<column name="projectid" type="int" />
+		</createIndex>
 	</changeSet>
-
 </databaseChangeLog>
