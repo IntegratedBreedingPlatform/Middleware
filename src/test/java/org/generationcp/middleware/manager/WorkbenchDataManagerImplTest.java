@@ -38,7 +38,6 @@ import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
-import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
@@ -555,11 +554,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(testDataset, readDataset);
 	}
 
-	@Test
-	public void testGetWorkbenchRuntimeData() throws MiddlewareQueryException {
-		WorkbenchRuntimeData result = this.workbenchDataManager.getWorkbenchRuntimeData();
-		Assert.assertNotNull(result);
-	}
 
 	@Test
 	public void testGetWorkflowTemplateByName() throws MiddlewareQueryException {

@@ -13,7 +13,6 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
-import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 
 public class WorkbenchTestDataUtil {
 
@@ -116,9 +115,6 @@ public class WorkbenchTestDataUtil {
 		pui.setLastOpenDate(new Date());
 		this.workbenchDataManager.saveOrUpdateProjectUserInfo(pui);
 
-		WorkbenchRuntimeData workbenchRuntimeData = new WorkbenchRuntimeData();
-		workbenchRuntimeData.setUserId(1);
-		this.workbenchDataManager.updateWorkbenchRuntimeData(workbenchRuntimeData);
 		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString());
 		this.commonTestProject.setCropType(this.cropType);
 
