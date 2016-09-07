@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -403,25 +404,6 @@ public interface StudyDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	boolean checkIfProjectNameIsExistingInProgram(String name, String programUUID) throws MiddlewareQueryException;
-
-	/**
-	 * Count the number of projects the variable was used in the project.
-	 * 
-	 * @param variableId the variable id
-	 * @return the long
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	long countProjectsByVariable(int variableId) throws MiddlewareQueryException;
-
-	/**
-	 * Count the number of experiments the variable was used in the project.
-	 * 
-	 * @param variableId the variable id
-	 * @param variableTypeId the stored in id
-	 * @return the long
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	long countExperimentsByVariable(int variableId, int variableTypeId) throws MiddlewareQueryException;
 
 	/**
 	 * Gets the field map information (entries, reps, plots and count) of the given study id and study type.
@@ -820,5 +802,32 @@ public interface StudyDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	boolean checkIfAnyLocationIDsExistInExperiments(int studyId, DataSetType dataSetType, List<Integer> locationIds);
+
+	/**
+	 *
+	 * Retrieves all the StudySummaries of the DMS Project that matches the conditions: SeasonDbId, LocationDbId and ProgramDbId
+	 *
+	 * @param programDbId Program Identifier
+	 * @param locationDbId Location Abbreviation
+	 * @param seasonDbId Season or Year
+	 * @param pageSize Page Size
+	 * @param page Page
+	 * @return List of StudySummary
+	 * @throws MiddlewareQueryException
+	 */
+	List<StudySummary> findPagedProjects(String programDbId, String locationDbId, String seasonDbId, Integer pageSize, Integer page)
+			throws MiddlewareQueryException;
+
+	/**
+	 *
+	 * Count how many DMS Project matches the conditions: programDBid, locationDbId and SeasonDbId
+	 *
+	 * @param programDbId
+	 * @param locationDbId
+	 * @param seasonDbId
+	 * @return Number of programs
+	 * @throws MiddlewareQueryException
+	 */
+	Long countAllStudies(String programDbId, String locationDbId, String seasonDbId) throws MiddlewareQueryException;
 
 }

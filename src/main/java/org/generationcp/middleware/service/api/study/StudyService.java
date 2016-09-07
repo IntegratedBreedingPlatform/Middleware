@@ -16,4 +16,6 @@ public interface StudyService {
 	List<StudyGermplasmDto> getStudyGermplasmList(Integer studyIdentifer);
 
 	String getProgramUUID(Integer studyIdentifier);
+
+	StudyDetailDto getStudyDetails(int studyIdentifier);
 }
