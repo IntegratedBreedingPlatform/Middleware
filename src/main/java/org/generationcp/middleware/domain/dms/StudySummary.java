@@ -2,9 +2,12 @@
 package org.generationcp.middleware.domain.dms;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.generationcp.middleware.dao.dms.InstanceMetadata;
 
 import com.google.common.collect.Lists;
 
@@ -33,7 +36,8 @@ public class StudySummary implements Serializable {
 	private String endDate;
 
 	private boolean active;
-	// TODO list of instance metadata (id (geoloc id), name (instance number), locationname (LOCABBR or LOC_NAME else instance number)
+
+	private List<InstanceMetadata> instanceMetaData = new ArrayList<>();
 
 	private Map<String, String> optionalInfo = new HashMap<>();
 
@@ -154,4 +158,13 @@ public class StudySummary implements Serializable {
 		this.optionalInfo = optionalInfo;
 		return this;
 	}
+
+	public List<InstanceMetadata> getInstanceMetaData() {
+		return this.instanceMetaData;
+	}
+
+	public void setInstanceMetaData(List<InstanceMetadata> instanceMetaData) {
+		this.instanceMetaData = instanceMetaData;
+	}
+
 }

@@ -1165,7 +1165,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			studySummary.setOptionalInfo(additionalProps)
 					.setName(dmsProject.getName())
 					.setProgramDbId(dmsProject.getProgramUUID())
+					// TODO setProgramName - will need Workbench Query
 					.setStudyDbid(dmsProject.getProjectId());
+
+			studySummary.setInstanceMetaData(this.getInstanceMetadata(dmsProject.getProjectId()));
 			studySummaries.add(studySummary);
 		}
 		return studySummaries;
