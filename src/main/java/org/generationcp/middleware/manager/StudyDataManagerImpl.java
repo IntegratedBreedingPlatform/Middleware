@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -1176,4 +1177,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return this.getDmsProjectDao().countStudies(programDbId, locationDbId, seasonDbId);
 	}
 
+	@Override
+	public List<InstanceMetadata> getInstanceMetadata(int studyId) {
+		return this.getGeolocationDao().getInstanceMetadata(studyId);
+	}
 }
