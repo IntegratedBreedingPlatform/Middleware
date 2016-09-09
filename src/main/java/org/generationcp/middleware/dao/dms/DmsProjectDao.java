@@ -33,16 +33,20 @@ import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.StringType;
 
 /**
  * DAO class for {@link DmsProject}.
@@ -53,7 +57,17 @@ import org.hibernate.criterion.Restrictions;
 @SuppressWarnings("unchecked")
 public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
+	private static final Integer SEASON_VAR_TEXT = Integer.valueOf(TermId.SEASON_VAR_TEXT.getId());
+
+	private static final Integer LOCATION_ABBR = Integer.valueOf(TermId.LOCATION_ABBR.getId());
+
+	private static final int DELETED_STUDY = TermId.DELETED_STUDY.getId();
+
+	private static final int STUDY_STATUS = TermId.STUDY_STATUS.getId();
+
 	private static final String PROGRAM_UUID = "program_uuid";
+	
+	private static final int START_DATE = TermId.START_DATE.getId();
 
 	/**
 	 * Type of study and whether study is deleted are stored in projectprops table.
@@ -80,11 +94,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "		AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = " + TermId.STUDY_STATUS.getId()
 			+ "     	AND pp.project_id = p.project_id AND pp.value = " + "         " + TermId.DELETED_STUDY.getId() + ") "
 			+ "ORDER BY p.name ";
-
-    private static final String COUNT_PROJECTS_WITH_VARIABLE = "SELECT count(pp.project_id)  FROM projectprop pp "
-		  + " WHERE pp.type_id = " + TermId.STANDARD_VARIABLE.getId() + " AND pp.value = :variableId "
-		  + " AND pp.project_id not in ( SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = pp.project_id "
-		  + " AND stat.type_id = " + TermId.STUDY_STATUS.getId() + " AND value = " + TermId.DELETED_STUDY.getId() + ") ";
 
 	private static final String GET_ALL_FOLDERS = "SELECT pr.object_project_id, pr.subject_project_id, p.name, p.description "
 			+ " FROM project_relationship pr " + " INNER JOIN project p ON p.project_id = pr.subject_project_id " + " WHERE pr.type_id = "
@@ -962,20 +971,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return false;
 	}
 
-	public long countByVariable(int variableId) throws MiddlewareQueryException {
-		try {
-			SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.COUNT_PROJECTS_WITH_VARIABLE);
-			query.setParameter("variableId", variableId);
-
-			return ((BigInteger) query.uniqueResult()).longValue();
-
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error at countByVariable=" + variableId + ", " + variableId + " query at DmsProjectDao: " + e.getMessage(), e);
-		}
-		return 0;
-	}
-
 	public List<FolderReference> getAllFolders() throws MiddlewareQueryException {
 		List<FolderReference> folders = new ArrayList<FolderReference>();
 		try {
@@ -1065,5 +1060,66 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			this.logAndThrowException("Error with getAllSharedProjectNames()" + e.getMessage(), e);
 		}
 		return results;
+	}
+
+	public List<DmsProject> findPagedProjects(final String programDbId, final String locationDbId, final String seasonDbId,
+			final Integer pageSize, final Integer page) {
+		final Criteria criteria = buildCoreCriteria(programDbId, locationDbId, seasonDbId);
+		if (page != null && pageSize != null) {
+			criteria.setFirstResult(pageSize * (page - 1));
+			criteria.setMaxResults(pageSize);
+		}
+		return criteria.list();
+	}
+
+	public long countStudies(final String programDbId, final String locationDbId, final String seasonDbId) {
+		final Criteria criteria = buildCoreCriteria(programDbId, locationDbId, seasonDbId);
+		criteria.setProjection(Projections.rowCount());
+		return (long) criteria.uniqueResult();
+	}
+
+	private Criteria buildCoreCriteria(final String programDbId, final String locationDbId, final String seasonDbId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.createAlias("properties", "pr");
+		criteria.add(Restrictions.eq("pr.typeId", TermId.STUDY_TYPE.getId()));
+
+		final DetachedCriteria inactive = DetachedCriteria.forClass(ProjectProperty.class);
+		inactive.add(Restrictions.eq("typeId", Integer.valueOf(DmsProjectDao.STUDY_STATUS)));
+		inactive.add(Restrictions.eq("value", String.valueOf(DmsProjectDao.DELETED_STUDY)));
+		inactive.setProjection(Projections.property("project.projectId"));
+		criteria.add(Property.forName("projectId").notIn(inactive));
+
+		if (programDbId != null) {
+			criteria.add(Restrictions.eq("programUUID", programDbId));
+		}
+
+		if (locationDbId != null) {
+			final DetachedCriteria ppLocation = DetachedCriteria.forClass(ProjectProperty.class);
+
+			ppLocation.add(Restrictions.eq("typeId", DmsProjectDao.LOCATION_ABBR));
+			ppLocation.add(Restrictions.ilike("value", '%' + locationDbId.toLowerCase() + '%'));
+			ppLocation.setProjection(Projections.property("project.projectId"));
+
+			criteria.add(Property.forName("projectId").in(ppLocation));
+		}
+
+		if (seasonDbId != null) {
+			final DetachedCriteria ppStartDate = DetachedCriteria.forClass(ProjectProperty.class);
+
+			ppStartDate.add(Restrictions.eq("typeId", Integer.valueOf(DmsProjectDao.START_DATE)));
+			ppStartDate.setProjection(Projections.property("project.projectId"));
+			ppStartDate.add(Restrictions.sqlRestriction("lower(substring(value, 1, 4)) like ?", '%' + seasonDbId.toLowerCase() + '%',
+					new StringType()));
+
+			final DetachedCriteria ppSeason = DetachedCriteria.forClass(ProjectProperty.class);
+			ppSeason.add(Restrictions.eq("typeId", DmsProjectDao.SEASON_VAR_TEXT));
+			ppSeason.add(Restrictions.ilike("value", '%' + seasonDbId.toLowerCase() + '%'));
+			ppSeason.setProjection(Projections.property("project.projectId"));
+
+			criteria.add(Restrictions.or(Property.forName("projectId").in(ppStartDate), Property.forName("projectId").in(ppSeason)));
+		}
+
+		criteria.addOrder(Order.asc("projectId"));
+		return criteria;
 	}
 }

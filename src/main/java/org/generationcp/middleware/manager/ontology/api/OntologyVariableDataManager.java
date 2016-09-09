@@ -67,14 +67,6 @@ public interface OntologyVariableDataManager {
 	 */
 	void deleteVariable(Integer variableId);
 
-  	/**
-	 * This function defines total studies taken from this variable.
-	 *
-	 * @param variableId variable id to get observations
-	 * @return Total studies
-	 */
-	Integer getVariableStudies(int variableId);
-
 	String retrieveVariableCategoricalValue(String programUuid, Integer variableId, Integer categoricalValueId);
 
 	/** This function will retrieve categorical name values.
