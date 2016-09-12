@@ -62,7 +62,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	private User testUser1;
 
 	@Before
-	public void beforeTest() throws MiddlewareQueryException {
+	public void beforeTest() {
 		if (this.workbenchTestDataUtil == null) {
 			this.workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
 			this.workbenchTestDataUtil.setUpWorkbench();
@@ -98,7 +98,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddUsersWithRoles() throws MiddlewareQueryException {
+	public void testAddUsersWithRoles() {
 		// Admin
 		final Person adminPerson = new Person();
 		adminPerson.setFirstName("Naymesh");
@@ -206,7 +206,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddProject() throws MiddlewareQueryException {
+	public void testAddProject() {
 		final Project project = this.workbenchTestDataUtil.createTestProjectData();
 		this.workbenchDataManager.addProject(project);
 		Assert.assertNotNull("Expected id of a newly saved record in workbench_project.", project.getProjectId());
@@ -316,7 +316,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testProjectUserRoles() throws MiddlewareQueryException {
+	public void testProjectUserRoles() {
 
 		final Role role1 = this.workbenchDataManager.getAllRoles().get(0);
 		final Role role2 = this.workbenchDataManager.getAllRoles().get(1);
@@ -618,7 +618,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetTemplateSettings() throws MiddlewareQueryException {
+	public void testGetTemplateSettings() {
 
 		final TemplateSetting templateSetting = this.createTemplateSetting();
 
@@ -666,7 +666,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testUpdateTemplateSettings() throws MiddlewareQueryException {
+	public void testUpdateTemplateSettings() {
 
 		final TemplateSetting templateSetting = this.createTemplateSetting();
 		this.workbenchDataManager.addTemplateSetting(templateSetting);
@@ -679,7 +679,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddTemplateSettingsSameIsDefaultProjectAndTool() throws MiddlewareQueryException {
+	public void testAddTemplateSettingsSameIsDefaultProjectAndTool() {
 
 		final TemplateSetting templateSetting1 = this.createTemplateSetting();
 		templateSetting1.setIsDefault(Boolean.TRUE);
@@ -700,7 +700,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testUpdateTemplateSettingsSameIsDefaultProjectAndTool() throws MiddlewareQueryException {
+	public void testUpdateTemplateSettingsSameIsDefaultProjectAndTool() {
 
 		final TemplateSetting templateSetting1 = this.createTemplateSetting();
 		templateSetting1.setIsDefault(Boolean.FALSE);
