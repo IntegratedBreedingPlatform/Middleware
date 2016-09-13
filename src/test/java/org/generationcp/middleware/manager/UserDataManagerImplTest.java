@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
@@ -221,5 +222,48 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals("The type values should be equal.", user.getType(), resultUser.getType());
 		Assert.assertEquals("The assign dates should be equal.", user.getAssignDate(), resultUser.getAssignDate());
 		Assert.assertEquals("The close dates should be equal.", user.getCloseDate(), resultUser.getCloseDate());
+	}
+
+	@Test
+	public void testGetUsersByUserNamesUserNameMatched() {
+
+		final Person person = UserDataManagerImplTest.personTDI.createPerson();
+		this.userDataManager.addPerson(person);
+
+		final User user = UserDataManagerImplTest.userTDI.createUser();
+		user.setUserid(null);
+		user.setPersonid(person.getId());
+		user.setPerson(person);
+		this.userDataManager.addUser(user);
+
+		final List<User> users = this.userDataManager.getUsersByUserNames(Arrays.asList(user.getName()));
+
+		Assert.assertFalse(users.isEmpty());
+
+		final User resultUser = users.get(0);
+
+		Assert.assertEquals("The user ids should be equal.", user.getUserid(), resultUser.getUserid());
+		Assert.assertEquals("The usernames should be equal.", user.getName(), resultUser.getName());
+		Assert.assertEquals("The Passwords should be equal.", user.getPassword(), resultUser.getPassword());
+		Assert.assertEquals("The personIds should be equal.", person.getId(), resultUser.getPersonid());
+		Assert.assertEquals("The install ids should be equal.", user.getInstalid(), resultUser.getInstalid());
+		Assert.assertEquals("The status values should be equal.", user.getStatus(), resultUser.getStatus());
+		Assert.assertEquals("The access values should be equal.", user.getAccess(), resultUser.getAccess());
+		Assert.assertEquals("The type values should be equal.", user.getType(), resultUser.getType());
+		Assert.assertEquals("The assign dates should be equal.", user.getAssignDate(), resultUser.getAssignDate());
+		Assert.assertEquals("The close dates should be equal.", user.getCloseDate(), resultUser.getCloseDate());
+
+
+	}
+
+	@Test
+	public void testGetUsersByUserNamesNoUserNameMatched() {
+
+		List<String> dummyUsernames = Arrays.asList("JohnDoe11","JohnDoe12");
+
+		final List<User> users = this.userDataManager.getUsersByUserNames(dummyUsernames);
+
+		Assert.assertTrue(users.isEmpty());
+
 	}
 }

@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -724,6 +725,37 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse(templateSetting2.isDefault());
 
 	}
+
+
+	@Test
+	public void testGetPersonsByIdsPersonIdsMatched() {
+
+		final Person person = this.workbenchTestDataUtil.createTestPersonData();
+		final Integer result = this.workbenchDataManager.addPerson(person);
+		Assert.assertNotNull("Expected id of a newly saved record in persons.", result);
+
+		final List<Person> persons = this.workbenchDataManager.getPersonsByIds(Arrays.asList(result));
+
+		Assert.assertFalse(persons.isEmpty());
+
+		final Person readPerson = persons.get(0);
+
+		Assert.assertEquals(person.getFirstName(), readPerson.getFirstName());
+		Assert.assertEquals(person.getLastName(), readPerson.getLastName());
+
+	}
+
+	@Test
+	public void testGetPersonsByIdsNoPersonIdsMatched() {
+
+		List<Integer> dummyPersonIds = new ArrayList<>();
+		dummyPersonIds.add(123456);
+
+		final List<Person> readPersons = this.workbenchDataManager.getPersonsByIds(dummyPersonIds);
+		Assert.assertTrue(readPersons.isEmpty());
+
+	}
+
 
 	private TemplateSetting createTemplateSetting() {
 		final Integer templateSettingId = null;
