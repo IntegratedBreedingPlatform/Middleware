@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager.api;
 
 import java.util.List;
 
+import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
 import org.generationcp.middleware.domain.dms.DataSetType;
@@ -830,4 +831,5 @@ public interface StudyDataManager {
 	 */
 	Long countAllStudies(String programDbId, String locationDbId, String seasonDbId) throws MiddlewareQueryException;
 
+	List<InstanceMetadata> getInstanceMetadata(int studyId);
 }
