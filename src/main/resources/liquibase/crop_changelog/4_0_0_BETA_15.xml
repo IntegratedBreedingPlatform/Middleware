@@ -23,33 +23,32 @@
 	</changeSet>
 	
 	<changeSet author="maeisabelle" id="2">
-		<!-- Add missing crop persons to the current database from the corresponding workbench persons which are program members of the crop of the current database -->
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT COUNT(*) FROM (
-					SELECT wbPerson.*
-					FROM workbench.persons wbPerson
-					INNER JOIN workbench.users u
-					ON u.personid = wbPerson.personid
-					INNER JOIN workbench.workbench_project_user_info projUser
-					ON projUser.user_id = u.userid
-					INNER JOIN workbench.workbench_project p
-					ON projUser.project_id = p.project_id
-					INNER JOIN workbench.workbench_crop crop
-					ON crop.crop_name = p.crop_type
-					AND crop.db_name = DATABASE()
-					WHERE NOT EXISTS (
-					  SELECT 1 
-					  FROM persons cropPerson
-					  WHERE cropPerson.fname = wbPerson.fname
-					  AND cropPerson.lname = wbPerson.lname
-					)
-					GROUP BY wbPerson.personid
-					LIMIT 1
-				) AS a;
-			</sqlCheck>
-		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench.workbench_project_user_info(project_id, user_id)
+			SELECT p.project_id, u.userid 
+			FROM workbench.users u
+			INNER JOIN workbench.users_roles r
+			ON u.userid = r.userid,
+			workbench.workbench_project p
+			WHERE r.role = 'ADMIN'
+			AND NOT EXISTS (
+			  SELECT 1 FROM workbench.workbench_project_user_info projUser
+			  WHERE projUser.user_id = u.userid
+			  AND projUser.project_id = p.project_id
+			);
+			INSERT INTO workbench.workbench_project_user_role(project_id, user_id, role_id)
+			SELECT p.project_id, u.userid, 1
+			FROM workbench.users u
+			INNER JOIN workbench.users_roles r
+			ON u.userid = r.userid,
+			workbench.workbench_project p
+			WHERE r.role = 'ADMIN'
+			AND NOT EXISTS (
+			  SELECT 1 FROM workbench.workbench_project_user_role workflowRole
+			  WHERE workflowRole.user_id = u.userid
+			  AND workflowRole.project_id = p.project_id
+			  AND workflowRole.role_id = 1
+			);
 			INSERT INTO persons(fname, lname, ioname, institid, ptitle, poname, plangu, pphone, 
 			pextent, pfax, pemail, prole, sperson, eperson, pstatus, pnotes, contact)
 			SELECT wbPerson.fname, wbPerson.lname, wbPerson.ioname, wbPerson.institid, wbPerson.ptitle,
@@ -67,38 +66,10 @@
 			AND crop.db_name = DATABASE()
 			WHERE NOT EXISTS (
 			  SELECT 1 
-			  FROM persons cropPerson
-			  WHERE cropPerson.fname = wbPerson.fname
-			  AND cropPerson.lname = wbPerson.lname
+			  FROM users cropUser
+			  WHERE cropUser.uname = u.uname
 			)
-			GROUP BY wbPerson.personid
-		</sql>
-	</changeSet>
-	
-	<changeSet author="maeisabelle" id="3">
-		<!-- Add missing crop users to the current database from the corresponding workbench users which are program members of the crop of the current database -->
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT COUNT(*) FROM (
-					SELECT u.* FROM workbench.users u
-					INNER JOIN workbench.workbench_project_user_info projUser
-					ON projUser.user_id = u.userid
-					INNER JOIN workbench.workbench_project p
-					ON projUser.project_id = p.project_id
-					INNER JOIN workbench.workbench_crop crop
-					ON crop.crop_name = p.crop_type
-					AND crop.db_name = DATABASE()
-					WHERE NOT EXISTS (
-					  SELECT 1 
-					  FROM users cropUser
-					  WHERE cropUser.uname = u.uname
-					)
-					GROUP BY u.userid
-					LIMIT 1
-				) AS a;
-			</sqlCheck>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="true">
+			GROUP BY wbPerson.personid;
 			INSERT INTO users(instalid, ustatus, uaccess, utype, uname, upswd, personid, adate, cdate)
 			SELECT u.instalid, u.ustatus, u.uaccess, u.utype, u.uname, u.upswd, cropPerson.personid, u.adate, u.cdate
 			FROM workbench.users u
@@ -119,39 +90,7 @@
 			  FROM users cropUser
 			  WHERE cropUser.uname = u.uname
 			)
-			GROUP BY u.userid
-		</sql>
-	</changeSet>
-	
-	<changeSet author="maeisabelle" id="4">
-		<!-- Add missing mapping of projects, wb users and crop users. Make sure to add the correct crop user id by checking the project's crop against the current database -->
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT COUNT(*) FROM (
-					SELECT p.project_id, u.userid as workbench_user_id, cropUser.userid as ibdb_user_id
-					FROM workbench.users u
-					INNER JOIN workbench.workbench_project_user_info projUser
-					ON projUser.user_id = u.userid
-					INNER JOIN workbench.workbench_project p
-					ON projUser.project_id = p.project_id
-					INNER JOIN workbench.workbench_crop crop
-					ON crop.crop_name = p.crop_type
-					AND crop.db_name = DATABASE()
-					INNER JOIN users cropUser
-					ON cropUser.uname = u.uname
-					WHERE NOT EXISTS (
-					  SELECT 1 
-					  FROM workbench.workbench_ibdb_user_map wbToCrop
-					  WHERE wbToCrop.project_id = projUser.project_id
-					  AND wbToCrop.ibdb_user_id = cropUser.userid
-					  AND wbToCrop.workbench_user_id = u.userid
-					)
-					GROUP BY p.project_id,  u.userid, cropUser.userid
-					LIMIT 1
-				) AS a;
-			</sqlCheck>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="true">
+			GROUP BY u.userid;
 			INSERT INTO workbench.workbench_ibdb_user_map(project_id, workbench_user_id, ibdb_user_id)
 			SELECT p.project_id, u.userid as workbench_user_id, cropUser.userid as ibdb_user_id
 			FROM workbench.users u
@@ -168,10 +107,9 @@
 			  SELECT 1 
 			  FROM workbench.workbench_ibdb_user_map wbToCrop
 			  WHERE wbToCrop.project_id = projUser.project_id
-			  AND wbToCrop.ibdb_user_id = cropUser.userid
 			  AND wbToCrop.workbench_user_id = u.userid
 			)
-			GROUP BY p.project_id,  u.userid, cropUser.userid
+			GROUP BY p.project_id,  u.userid, cropUser.userid;
 		</sql>
 	</changeSet>
 
