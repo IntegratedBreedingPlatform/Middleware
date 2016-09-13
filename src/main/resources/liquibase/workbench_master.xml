@@ -11,5 +11,4 @@
 	<include file="workbench_changelog/4_0_0_BETA_12.xml" relativeToChangelogFile="true"/>
 	<include file="workbench_changelog/4_0_0_BETA_14.xml" relativeToChangelogFile="true"/>
 	<include file="workbench_changelog/4_0_0_BETA_15.xml" relativeToChangelogFile="true"/>
-	
 </databaseChangeLog>
