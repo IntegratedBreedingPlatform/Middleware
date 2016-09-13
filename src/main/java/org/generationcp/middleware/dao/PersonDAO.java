@@ -181,21 +181,4 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 		}
 		return person;
 	}
-
-	public Person getPersonByFirstAndLastName(final String firstName, final String lastName) {
-		Person person = null;
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Person.class);
-			criteria.add(Restrictions.eq("firstName", firstName).ignoreCase());
-			criteria.add(Restrictions.eq("lastName", lastName).ignoreCase());
-
-			person = (Person) criteria.uniqueResult();
-
-		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					String.format("Error with getPersonByFirstAndLastName(firstName=[%s],lastName)", firstName, lastName),
-					e);
-		}
-		return person;
-	}
 }
