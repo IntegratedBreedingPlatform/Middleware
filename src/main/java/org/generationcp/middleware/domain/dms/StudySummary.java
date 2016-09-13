@@ -2,17 +2,17 @@
 package org.generationcp.middleware.domain.dms;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.generationcp.middleware.dao.dms.InstanceMetadata;
 
 import com.google.common.collect.Lists;
 
 public class StudySummary implements Serializable {
 
-	/**
-	 *
-	 */
 	private static final long serialVersionUID = -515769070343491680L;
 
 	private Integer studyDbid;
@@ -28,6 +28,16 @@ public class StudySummary implements Serializable {
 	private String locationId;
 
 	private String programDbId;
+
+	private String programName;
+
+	private String startDate;
+
+	private String endDate;
+
+	private boolean active;
+
+	private List<InstanceMetadata> instanceMetaData = new ArrayList<>();
 
 	private Map<String, String> optionalInfo = new HashMap<>();
 
@@ -104,6 +114,42 @@ public class StudySummary implements Serializable {
 		return this;
 	}
 
+	public String getProgramName() {
+		return this.programName;
+	}
+
+	public StudySummary setProgramName(final String programName) {
+		this.programName = programName;
+		return this;
+	}
+
+	public String getStartDate() {
+		return this.startDate;
+	}
+
+	public StudySummary setStartDate(final String startDate) {
+		this.startDate = startDate;
+		return this;
+	}
+
+	public String getEndDate() {
+		return this.endDate;
+	}
+
+	public StudySummary setEndDate(final String endDate) {
+		this.endDate = endDate;
+		return this;
+	}
+
+	public boolean isActive() {
+		return this.active;
+	}
+
+	public StudySummary setActive(final boolean active) {
+		this.active = active;
+		return this;
+	}
+
 	public Map<String, String> getOptionalInfo() {
 		return this.optionalInfo;
 	}
@@ -112,4 +158,13 @@ public class StudySummary implements Serializable {
 		this.optionalInfo = optionalInfo;
 		return this;
 	}
+
+	public List<InstanceMetadata> getInstanceMetaData() {
+		return this.instanceMetaData;
+	}
+
+	public void setInstanceMetaData(List<InstanceMetadata> instanceMetaData) {
+		this.instanceMetaData = instanceMetaData;
+	}
+
 }

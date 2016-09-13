@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -1127,41 +1128,47 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				}
 			}).immutableSortedCopy(dmsProject.getProperties());
 
-			final Map<String, String> props = Maps.newHashMap();
-			String key = null;
+			final Map<String, String> additionalProps = Maps.newHashMap();
+			String additoinalPropKey = null;
 			String valueKey = "";
 			for (final ProjectProperty prop : sortedProperties) {
-				if (prop.getTypeId().equals(TermId.VARIABLE_DESCRIPTION.getId())) {
-					key = prop.getValue();
+				if (prop.getTypeId().equals(1805)) {
+					additoinalPropKey = prop.getValue();
 				}
 				if (prop.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
 					valueKey = prop.getValue();
 				}
 				if (valueKey.equals(String.valueOf(prop.getTypeId()))) {
 					if (valueKey.equals(String.valueOf(TermId.START_DATE.getId()))) {
+						studySummary.setStartDate(prop.getValue());
 						studySummary.addYear(prop.getValue().substring(0, 4));
-						props.put(key, prop.getValue());
+					} else if (valueKey.equals(String.valueOf(TermId.END_DATE.getId()))) {
+						studySummary.setEndDate(prop.getValue());
+					} else if (valueKey.equals(String.valueOf(TermId.SEASON_VAR_TEXT.getId()))) {
+						studySummary.addSeason(prop.getValue());
+					} else if (valueKey.equals(String.valueOf(TermId.LOCATION_ABBR.getId()))) {
+						studySummary.setLocationId(!StringUtils.isEmpty(prop.getValue()) ? String.valueOf(prop.getValue()) : null);
+					} else if (valueKey.equals(String.valueOf(TermId.STUDY_TYPE.getId()))) {
+						studySummary.setType(StudyType.getStudyTypeById(Integer.valueOf(prop.getValue())).getName());
 					} else {
-						if (valueKey.equals(String.valueOf(TermId.SEASON_VAR_TEXT.getId()))) {
-							studySummary.addSeason(prop.getValue());
-						} else {
-							if (valueKey.equals(String.valueOf(TermId.LOCATION_ABBR.getId()))) {
-								studySummary.setLocationId(!StringUtils.isEmpty(prop.getValue()) ? String.valueOf(prop.getValue()) : null);
-							} else {
-								if (valueKey.equals(String.valueOf(TermId.STUDY_TYPE.getId()))) {
-									studySummary.setType(StudyType.getStudyTypeById(Integer.valueOf(prop.getValue())).getName());
-								} else {
-									props.put(key, prop.getValue());
-								}
-							}
-						}
+						additionalProps.put(additoinalPropKey, prop.getValue());
+					}
+				}
+
+				studySummary.setActive(true);
+				if (prop.getTypeId().equals(String.valueOf(TermId.STUDY_STATUS.getId()))) {
+					if (Integer.valueOf(prop.getValue()).equals(TermId.DELETED_STUDY.getId())) {
+						studySummary.setActive(false);
 					}
 				}
 			}
-			studySummary.setOptionalInfo(props)
+			studySummary.setOptionalInfo(additionalProps)
 					.setName(dmsProject.getName())
 					.setProgramDbId(dmsProject.getProgramUUID())
+					// TODO setProgramName - will need Workbench Query
 					.setStudyDbid(dmsProject.getProjectId());
+
+			studySummary.setInstanceMetaData(this.getInstanceMetadata(dmsProject.getProjectId()));
 			studySummaries.add(studySummary);
 		}
 		return studySummaries;
@@ -1173,4 +1180,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return this.getDmsProjectDao().countStudies(programDbId, locationDbId, seasonDbId);
 	}
 
+	@Override
+	public List<InstanceMetadata> getInstanceMetadata(int studyId) {
+		return this.getGeolocationDao().getInstanceMetadata(studyId);
+	}
 }

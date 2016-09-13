@@ -35,6 +35,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.type.IntegerType;
 
 /**
  * DAO class for {@link Geolocation}.
@@ -533,4 +534,67 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		return results;
 	}
 
+	public List<InstanceMetadata> getInstanceMetadata(final int studyId) {
+
+		String queryString = "select \n"
+				+ "    geoloc.nd_geolocation_id as instanceDBId, \n"
+				+ "    geoloc.description as instanceNumber, \n" 
+				+ "    pmain.project_id trialDbId, \n" 
+				+ "    pmain.name as trialName, \n"
+				+ "    proj.name as instanceDatasetName, \n" 
+				+ "    pmain.program_uuid as programDbId, \n"
+				+ "    max(if(geoprop.type_id = 8180, geoprop.value, null)) as LOCATION_NAME, \n"
+				+ "    max(if(geoprop.type_id = 8190, geoprop.value, null)) as LOCATION_ID, \n"
+				+ "    max(if(geoprop.type_id = 8189, geoprop.value, null)) as LOCATION_ABBR, \n"
+				+ "    max(if(geoprop.type_id = 8370, geoprop.value, null)) as CROP_SEASON \n"
+				+ " from  \n"
+				+ " nd_geolocation geoloc \n"
+				+ "    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
+				+ "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
+				+ "    inner join project proj on proj.project_id = ndep.project_id \n"
+				+ "    inner join project_relationship pr on proj.project_id = pr.subject_project_id \n"
+				+ "    inner join project pmain on pmain.project_id = pr.object_project_id and pr.type_id = 1150 \n"
+				+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
+				+ " where nde.type_id = 1020 and pmain.project_id = :studyId \n"
+				+ "    group by geoloc.nd_geolocation_id "
+				+ "    order by geoloc.nd_geolocation_id asc \n";
+		
+		
+		SQLQuery query = getSession().createSQLQuery(queryString);
+
+		query.setParameter("studyId", studyId);
+
+		query.addScalar("instanceDBId", new IntegerType());
+		query.addScalar("instanceNumber");
+		query.addScalar("trialDbId", new IntegerType());
+		query.addScalar("trialName");
+		query.addScalar("instanceDatasetName");
+		query.addScalar("programDbId");
+		query.addScalar("LOCATION_NAME");
+		query.addScalar("LOCATION_ID", new IntegerType());
+		query.addScalar("LOCATION_ABBR");
+		query.addScalar("CROP_SEASON");
+
+		@SuppressWarnings("rawtypes")
+		final List results = query.list();
+
+		List<InstanceMetadata> tiMetadata = new ArrayList<>();
+		for (Object result : results) {
+			final Object[] row = (Object[]) result;
+
+			InstanceMetadata metadata = new InstanceMetadata();
+			metadata.setInstanceDbId((Integer) row[0]);
+			metadata.setInstanceNumber(String.valueOf(row[1]));
+			metadata.setTrialDbId((Integer) row[2]);
+			metadata.setTrialName(String.valueOf(row[3]));
+			metadata.setInstanceDatasetName(String.valueOf(row[4]));
+			metadata.setProgramDbId(String.valueOf(row[5]));
+			metadata.setLocationName(String.valueOf(row[6]));
+			metadata.setLocationDbId((Integer) row[7]);
+			metadata.setLocationAbbreviation(String.valueOf(row[8]));
+			metadata.setSeason(String.valueOf(row[9]));
+			tiMetadata.add(metadata);
+		}
+		return tiMetadata;
+	}
 }
