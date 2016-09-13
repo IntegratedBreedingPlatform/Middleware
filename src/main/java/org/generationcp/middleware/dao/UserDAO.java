@@ -143,6 +143,24 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		return null;
 	}
 
+	public List<User> getUsersByUserNames(List<String> userNames) throws MiddlewareQueryException {
+		try {
+			if (userNames != null && !userNames.isEmpty()) {
+				Criteria criteria = this.getSession().createCriteria(User.class);
+				criteria.add(Restrictions.in("name", userNames));
+
+				// used a List in case of dirty data
+				@SuppressWarnings("unchecked")
+				List<User> users = criteria.list();
+
+				return users;
+			}
+		} catch (HibernateException e) {
+			this.logAndThrowException("Error with getUsersByUserName(usernames) query from User: " + e.getMessage(), e);
+		}
+		return new ArrayList<>();
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<User> getByNameUsingEqual(String name, int start, int numOfRows) throws MiddlewareQueryException {
 		try {

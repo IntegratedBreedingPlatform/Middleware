@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -197,5 +198,15 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 					e);
 		}
 		return person;
+	}
+
+	public List<Person> getPersonsByIds(final List<Integer> personIds) throws MiddlewareQueryException {
+
+		try {
+			return this.getSession().createCriteria(Person.class).add(Restrictions.in("id", personIds)).list();
+		} catch (final HibernateException e) {
+			this.logAndThrowException(String.format("Error with getPersonsByIds(personIds=[%s])", StringUtils.join(personIds, ",")), e);
+		}
+		return new ArrayList<>();
 	}
 }

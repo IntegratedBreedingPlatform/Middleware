@@ -1513,4 +1513,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return this.getUserDao().getAllUsersByRole(role);
 	}
 
+	@Override
+	public List<Person> getPersonsByIds(final List<Integer> personIds) {
+		return this.getPersonDao().getPersonsByIds(personIds);
+	}
+
 }

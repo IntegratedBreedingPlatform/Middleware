@@ -939,5 +939,10 @@ public interface WorkbenchDataManager {
 	 */
 	List<User> getAllUsersByRole(final String role);
 
-
+	/**
+	 * Returns the list of persons given the person ids
+	 * @param personIds
+	 * @return
+	 */
+	List<Person> getPersonsByIds(List<Integer> personIds);
 }

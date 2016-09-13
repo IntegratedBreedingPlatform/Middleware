@@ -171,4 +171,11 @@ public interface UserDataManager {
 	 * @return
 	 */
     User getUserByFullname(String fullname);
+
+	/**
+	 * Get the list of User by given usernames
+	 * @param usernames
+	 * @return
+	 */
+	List<User> getUsersByUserNames(List<String> usernames);
 }
