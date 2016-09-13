@@ -1154,6 +1154,14 @@ public interface GermplasmDataManager {
 	 * @return
 	 */
 	long countMatchGermplasmInList(Set<Integer> gids);
+	
+	/**
+	 * Returns map of list of names with given gids and ntype ids
+	 * @param gids
+	 * @param ntypeIds
+	 * @return map of list of names with gid as key
+	 */
+	Map<Integer, List<Name>> getNamesByGidsAndNTypeIdsInMap(List<Integer> gids, List<Integer> ntypeIds);
 
 	/**
 	 * Returns the list of favorite methods in the current program

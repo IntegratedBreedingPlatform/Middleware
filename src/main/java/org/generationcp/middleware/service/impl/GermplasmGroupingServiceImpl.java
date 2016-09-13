@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service.impl;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -10,6 +11,9 @@ import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
+import org.generationcp.middleware.manager.ManagerFactory;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
@@ -18,11 +22,14 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.GermplasmGroup;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
+import org.generationcp.middleware.service.pedigree.GermplasmCache;
+import org.generationcp.middleware.service.pedigree.cache.keys.CropGermplasmKey;
 import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 
 public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
@@ -37,6 +44,10 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	private MethodDAO methodDAO;
 
 	private UserDefinedFieldDAO userDefinedFieldDAO;
+	
+	private GermplasmDataManager germplasmDataManager;
+
+	private String cropName;
 
 	public GermplasmGroupingServiceImpl() {
 
@@ -51,13 +62,23 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 		this.userDefinedFieldDAO = new UserDefinedFieldDAO();
 		this.userDefinedFieldDAO.setSession(sessionProvider.getSession());
+		
+		this.germplasmDataManager = new GermplasmDataManagerImpl(sessionProvider);
+		
+		final ManagerFactory managerFactory = ManagerFactory.getCurrentManagerFactoryThreadLocal().get();
+		this.cropName = managerFactory.getCropName();
+
+		
 	}
 
 	public GermplasmGroupingServiceImpl(final GermplasmDAO germplasmDAO, final MethodDAO methodDAO,
-			final UserDefinedFieldDAO userDefinedFieldDAO) {
+			final UserDefinedFieldDAO userDefinedFieldDAO, final GermplasmDataManager germplasmDataManager,
+			final String cropName) {
 		this.germplasmDAO = germplasmDAO;
 		this.methodDAO = methodDAO;
 		this.userDefinedFieldDAO = userDefinedFieldDAO;
+		this.germplasmDataManager = germplasmDataManager;
+		this.cropName = cropName;
 	}
 
 	@Override
@@ -298,11 +319,12 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	@Override
 	public void processGroupInheritanceForCrosses(final List<Integer> gidsOfCrosses, final boolean applyNewGroupToPreviousCrosses,
 			final Set<Integer> hybridMethods) {
-
+		final GermplasmCache germplasmCache = new GermplasmCache(germplasmDataManager, 2);
+		germplasmCache.initialiseCache(cropName, new HashSet<>(gidsOfCrosses), 2);
 		for (final Integer crossGID : gidsOfCrosses) {
-			final Germplasm cross = this.germplasmDAO.getById(crossGID);
-			final Germplasm parent1 = this.germplasmDAO.getById(cross.getGpid1());
-			final Germplasm parent2 = this.germplasmDAO.getById(cross.getGpid2());
+			final Germplasm cross = getGermplasmFromOptionalValue(germplasmCache, crossGID);
+			final Germplasm parent1 = getGermplasmFromOptionalValue(germplasmCache, cross.getGpid1());
+			final Germplasm parent2 = getGermplasmFromOptionalValue(germplasmCache, cross.getGpid2());
 
 			if (cross != null) {
 				LOG.info("Processing group inheritance for cross: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.", cross.getGid(),
@@ -390,5 +412,13 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 				LOG.info("Breeding method is not hybrid. Cross does not inherit MGID.");
 			}
 		}
+	}
+
+	private Germplasm getGermplasmFromOptionalValue(final GermplasmCache germplasmCache, final Integer crossGID) {
+		final Optional<Germplasm> germplasm = germplasmCache.getGermplasm(new CropGermplasmKey(cropName, crossGID));
+		if(germplasm.isPresent()) {
+			return germplasm.get();
+		}
+		return null;
 	}
 }
