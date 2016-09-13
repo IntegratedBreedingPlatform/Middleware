@@ -748,7 +748,20 @@ public interface FieldbookService {
 	 */
 	List<ListDataProject> getListDataProject(int listId);
 
-	ListDataProject getListDataProjectByStudy(int projectId, GermplasmListType type, int plotId);
+	/**
+	 * Lookup ListDataProject records associated to given plots in specified
+	 * study
+	 * 
+	 * @param projectId
+	 *            - ID of study
+	 * @param type
+	 *            - type of snapshot list to refer to in given study
+	 * @param plotIds
+	 *            - plot numbers to lookup in given study
+	 * @return map of plot numbers to corresponding ListDataProject record
+	 */
+	Map<Integer, ListDataProject> getListDataProjectByStudyTypeAndPlotNos(int projectId, GermplasmListType type,
+			Set<Integer> plotIds);
 
 	ListDataProject getListDataProjectByListIdAndEntryNo(int listId, int entryNo);
 
