@@ -22,6 +22,7 @@ import org.generationcp.middleware.pojos.User;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -230,5 +231,25 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		}
 		return user;
 	}
+
+	public List<User> getAllUsersByRole(String role)  {
+		try {
+
+			final StringBuilder sb = new StringBuilder();
+			sb.append("SELECT DISTINCT {u.*} FROM users u ").append("INNER JOIN users_roles r ON r.userid = u.userid ")
+					.append("WHERE r.role = :role");
+
+			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
+			query.setParameter("role", role);
+			query.addEntity("u", User.class);
+			return query.list();
+
+		} catch (final HibernateException e) {
+			this.logAndThrowException("Error with getAllUsersByRole(" + role + ") query from UserDAO " + e.getMessage(), e);
+		}
+		return new ArrayList<User>();
+	}
+
+
 
 }
