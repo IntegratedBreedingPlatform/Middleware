@@ -153,16 +153,6 @@ public interface UserDataManager {
 	 * @return
 	 */
 	Person getPersonByName(String firstName, String middleName, String lastName) throws MiddlewareQueryException;
-
-	/**
-	 * Get Person with the specified firstname and lastname
-	 *
-	 * @param firstName
-	 * @param middleName
-	 * @param lastName
-	 * @return
-	 */
-	Person getPersonByFirstAndLastName(String firstName, String lastName) throws MiddlewareQueryException;
 	
 	/**
 	 * Get User using the fullname
@@ -170,5 +160,5 @@ public interface UserDataManager {
 	 * @param fullname
 	 * @return
 	 */
-    User getUserByFullname(String fullname);
+    User getUserByFullname(String fullname) throws MiddlewareQueryException;
 }
