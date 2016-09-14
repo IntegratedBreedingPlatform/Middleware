@@ -2,6 +2,7 @@
 package org.generationcp.middleware.hibernate;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -16,7 +17,7 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 import com.google.common.collect.ImmutableMap;
-import com.mysql.jdbc.PreparedStatement;
+
 
 public class DatasourceUtilitiesTest {
 
