@@ -105,7 +105,7 @@ public class DatasourceUtilities {
 		final DriverManagerDataSource workbenchDataSource = new DriverManagerDataSource();
 		workbenchDataSource.setUsername(xaDataSourceProperties.getUserName());
 		workbenchDataSource.setPassword(xaDataSourceProperties.getPassword());
-		workbenchDataSource.setDriverClassName("com.mysql.jdbc.Driver");
+		workbenchDataSource.setDriverClassName("org.mariadb.jdbc.Driver");
 		workbenchDataSource.setUrl("jdbc:mysql://" + xaDataSourceProperties.getHost() + ":" + xaDataSourceProperties.getPort() + "/"
 				+ xaDataSourceProperties.getWorkbenchDbName());
 		return workbenchDataSource;

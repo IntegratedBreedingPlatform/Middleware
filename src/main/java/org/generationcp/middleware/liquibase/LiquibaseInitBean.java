@@ -81,7 +81,7 @@ public class LiquibaseInitBean implements BeanDefinitionRegistryPostProcessor {
 		/* The DataSource root bean definition. */
 		BeanDefinitionBuilder dataSourceBeanDefinitionBuilder =
 				BeanDefinitionBuilder.rootBeanDefinition(DriverManagerDataSource.class)
-				.addPropertyValue("driverClassName", "com.mysql.jdbc.Driver") //
+				.addPropertyValue("driverClassName", "org.mariadb.jdbc.Driver") //
 				.addPropertyValue("url",
 						"jdbc:mysql://" + dataSourceProperties.getHost() + ":" + dataSourceProperties.getPort() + "/" + databaseName) //
 				.addPropertyValue("username", dataSourceProperties.getUserName()) //
