@@ -280,7 +280,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 	private boolean containsIgnoreCase(final List<String> list, final String searchFor) {
 		for (final String item : list) {
-			if (item.equalsIgnoreCase(searchFor)) {
+			if (item.equalsIgnoreCase(searchFor) || StringUtils.isEmpty(searchFor)) {
 				return true;
 			}
 		}
