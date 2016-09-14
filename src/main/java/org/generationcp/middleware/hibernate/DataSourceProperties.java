@@ -60,7 +60,7 @@ public class DataSourceProperties {
 
 	private String workbenchDbName = "workbench";
 
-	private String xaDriverName = "com.mysql.jdbc.jdbc2.optional.MysqlXADataSource";
+	private String xaDriverName = "org.mariadb.jdbc.MySQLDataSource";
 
 	private String maxIdleTime = "120";
 
