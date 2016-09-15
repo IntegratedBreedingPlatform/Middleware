@@ -116,21 +116,28 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			// statement
 			this.getSession().flush();
 			
-			StringBuilder sql =
-					new StringBuilder().append("DELETE FROM nd_geolocationprop  ").append(" WHERE nd_geolocation_id IN ( ")
-							.append("   SELECT e.nd_geolocation_id ").append("   FROM nd_experiment e ")
-							.append("   INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id ")
-							.append("   INNER JOIN project_relationship pr ON pr.type_id = ").append(TermId.BELONGS_TO_STUDY.getId())
-							.append("     AND (pr.object_project_id = ep.project_id OR pr.subject_project_id = ep.project_id) ")
-							.append("   WHERE pr.object_project_id = ").append(studyId).append(") ").append("   AND type_id = ")
-							.append(termId);
-
-			SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-			query.executeUpdate();
+			executeDeleteStatement(studyId, termId, "pr.subject_project_id");
+			executeDeleteStatement(studyId, termId, "pr.subject_project_id");
 
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error at deleteGeolocationPropertyValueInProject=" + studyId + ", " + termId
 					+ " query on GeolocationPropertyDao: " + e.getMessage(), e);
 		}
+	}
+
+	private void executeDeleteStatement(final int studyId,final int termId,final String joinCriteria) {
+		final StringBuilder sql1 = new StringBuilder().append("Delete ngp.* FROM nd_geolocationprop ngp "
+				+ "INNER JOIN nd_experiment e ON ngp.nd_geolocation_id = e.nd_geolocation_id AND ngp.type_id = :termId "
+				+ "INNER JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
+				+ "INNER JOIN project_relationship pr ON pr.type_id = :belongsToTypeId "
+				+ "			  AND ").append(joinCriteria).append(" = ep.project_id "
+				+ "WHERE pr.object_project_id = :studyId");
+
+		final SQLQuery sqlQuery1 = this.getSession().createSQLQuery(sql1.toString());
+		sqlQuery1.setParameter("studyId", studyId);
+		sqlQuery1.setParameter("termId", termId);
+		sqlQuery1.setParameter("belongsToTypeId", TermId.BELONGS_TO_STUDY.getId());
+
+		sqlQuery1.executeUpdate();
 	}
 }
