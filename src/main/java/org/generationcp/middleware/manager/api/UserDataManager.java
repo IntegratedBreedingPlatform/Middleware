@@ -16,6 +16,7 @@ import java.util.List;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.service.api.user.UserDto;
 
 /**
  * The Interface UserDataManager.
@@ -161,4 +162,11 @@ public interface UserDataManager {
 	 * @return
 	 */
     User getUserByFullname(String fullname) throws MiddlewareQueryException;
+    
+	/**
+	 * Gets the all UserDto Sorted
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<UserDto> getAllUserDtosSorted() throws MiddlewareQueryException;
 }

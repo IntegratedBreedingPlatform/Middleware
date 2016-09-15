@@ -24,6 +24,7 @@ public class UserDto {
 	
 	private String email;
 
+
 	public UserDto() {
 		super();
 	}
@@ -85,5 +86,5 @@ public class UserDto {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-
+	
 }

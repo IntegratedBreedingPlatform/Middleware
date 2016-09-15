@@ -24,6 +24,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.HibernateException;
 import org.springframework.transaction.annotation.Transactional;
@@ -246,5 +247,11 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	@Override
 	public User getUserByFullname(final String fullname) throws MiddlewareQueryException {
 		return this.getUserDao().getUserByFullname(fullname);
+	}
+	
+	@Override
+	public List<UserDto> getAllUserDtosSorted() throws MiddlewareQueryException {
+		return this.getUserDao().getAllUserDtosSorted();
+
 	}
 }
