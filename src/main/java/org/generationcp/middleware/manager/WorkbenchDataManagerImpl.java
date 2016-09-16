@@ -1509,32 +1509,24 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return this.getUserDao().getAllUserDtosSorted();
 
 	}
-	
+
 	@Override
 	public Integer addNewUser(final UserDto userDto) throws MiddlewareQueryException {
 
-		if (isUsernameExists(userDto.getUsername())) {
-			// Error
-			throw new MiddlewareQueryException(ErrorCode.SIGNUP_FIELD_USERNAME_EXISTS.getCode(), "username exists");
-		}
-		if (isPersonWithEmailExists(userDto.getEmail())) {
-			throw new MiddlewareQueryException(ErrorCode.SIGNUP_FIELD_EMAIL_EXISTS.getCode(), "email exists");
-			// Error
-		}
+		Integer idUserSaved = null;
 		// user.access = 0 - Default User
 		// user.instalid = 0 - Access all areas (legacy from the ICIS system) (not used)
 		// user.status = 0 - Unassigned
 		// user.type = 0 - Default user type (not used)
 
-		// userAccount.trimAll();
 		Integer currentDate = Util.getCurrentDateAsIntegerValue();
 		Person person = this.createPerson(userDto);
-		// PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
 		User user = new User();
 		user.setPersonid(person.getId());
 		user.setPerson(person);
 		user.setName(userDto.getUsername());
-		user.setPassword(userDto.getUsername());
+		user.setPassword(userDto.getPassword());
 		user.setAccess(0);
 		user.setAssignDate(currentDate);
 		user.setCloseDate(currentDate);
@@ -1543,9 +1535,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		user.setType(0);
 
 		// add user roles to the particular user
-		user.setRoles(Arrays.asList(new UserRole(user, userDto.getRole())));
+		user.setRoles(Arrays.asList(new UserRole(user, userDto.getRole().toUpperCase())));
 
-		Integer idUserSaved = null;
 		try {
 
 			User recordSaved = this.getUserDao().saveOrUpdate(user);
@@ -1573,23 +1564,20 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		Integer idUserSaved = null;
 
 		try {
-
 			user = this.getUserDao().getById(userDto.getUserId());
+			updatePerson(userDto, user.getPerson());
 
-			// Person person=user.getPerson();
-			// person.setFirstName(userDto.getFirstName());
-			// person.setLastName(userDto.getLastName());
-			// person.setEmail(userDto.getEmail());
-			Person person = updatePerson(userDto, user.getPerson());
-
-			//user.setPerson(person);
 			user.setName(userDto.getUsername());
-			// user.setAccess(0);
 			user.setAssignDate(currentDate);
 			user.setCloseDate(currentDate);
-			// user.setInstalid(0);
 			user.setStatus(userDto.getStatus());
-			// user.setType(0);
+			
+			// update user roles to the particular user
+			UserRole role =	user.getRoles().get(0);
+			if(!role.getRole().equals(userDto.getRole().toUpperCase())){
+				role.setRole(userDto.getRole().toUpperCase());				
+			}
+			
 			this.getUserDao().saveOrUpdate(user);
 			idUserSaved = user.getUserid();
 		} catch (final Exception e) {
@@ -1623,9 +1611,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	private Person updatePerson(final UserDto userDto, final Person person) {
-//		Person person = new Person();
-
-//		person.setId(user.getPersonid());
 		person.setFirstName(userDto.getFirstName());
 		person.setMiddleName("");
 		person.setLastName(userDto.getLastName());
