@@ -67,8 +67,8 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 	}
 
 	public Project getProgramByUuidAndCrop(final String projectUuid, final String cropType) throws MiddlewareQueryException {
-		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("project_uuid", projectUuid)).add
-				(Restrictions.eq("cropType", cropType)).setMaxResults(1);
+		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("uniqueID", projectUuid)).add
+				(Restrictions.eq("cropType.cropName", cropType)).setMaxResults(1);
 		return (Project) criteria.uniqueResult();
 	}
 	
