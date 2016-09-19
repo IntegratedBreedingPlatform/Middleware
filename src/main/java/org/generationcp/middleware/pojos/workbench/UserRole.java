@@ -10,6 +10,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.apache.commons.lang.WordUtils;
 import org.generationcp.middleware.pojos.User;
 
 @Entity
@@ -63,6 +64,10 @@ public class UserRole {
 	@Override
 	public String toString() {
 		return "UserRole [User=" + this.user + ", role=" + this.role + "]";
+	}
+	
+	public String getCapitalizedRole() {
+		return WordUtils.capitalize(this.getRole().toLowerCase());
 	}
 
 }
