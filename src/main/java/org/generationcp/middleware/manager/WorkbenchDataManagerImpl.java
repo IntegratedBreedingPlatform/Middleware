@@ -1511,7 +1511,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Integer addNewUser(final UserDto userDto) throws MiddlewareQueryException {
+	public Integer createUser(final UserDto userDto) throws MiddlewareQueryException {
 
 		Integer idUserSaved = null;
 		// user.access = 0 - Default User

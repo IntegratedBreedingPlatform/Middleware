@@ -1027,13 +1027,13 @@ public interface WorkbenchDataManager {
 	List<UserDto> getAllUserDtosSorted() throws MiddlewareQueryException;
 
 	/**
-	 * Adds the user.
+	 * create the user.
 	 * 
 	 * @param user the user
 	 * @return Returns the id of the {@code UserDto} record added
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
-	public Integer addNewUser(UserDto userDto) throws MiddlewareQueryException;
+	public Integer createUser(UserDto userDto) throws MiddlewareQueryException;
 	
 	/**
 	 * updates the user.
