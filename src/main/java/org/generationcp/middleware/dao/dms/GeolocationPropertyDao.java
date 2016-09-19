@@ -116,7 +116,7 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			// statement
 			this.getSession().flush();
 			
-			executeDeleteStatement(studyId, termId, "pr.subject_project_id");
+			executeDeleteStatement(studyId, termId, "pr.object_project_id");
 			executeDeleteStatement(studyId, termId, "pr.subject_project_id");
 
 		} catch (HibernateException e) {
