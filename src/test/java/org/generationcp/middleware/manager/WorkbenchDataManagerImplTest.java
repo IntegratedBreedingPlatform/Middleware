@@ -11,17 +11,18 @@
 
 package org.generationcp.middleware.manager;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.ToolDAO;
+import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
@@ -47,6 +48,7 @@ import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -60,6 +62,9 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 	private Project commonTestProject;
 	private User testUser1;
+
+	@InjectMocks
+	protected UserDAO userDao;
 
 	@Before
 	public void beforeTest() throws MiddlewareQueryException {
@@ -75,6 +80,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		if (this.testUser1 == null) {
 			this.testUser1 = this.workbenchTestDataUtil.getTestUser1();
 		}
+
 	}
 
 	@Test
@@ -837,24 +843,33 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllUserDtosSorted() throws MiddlewareQueryException {
-		final UserDto user = new UserDto();
-		final String firstName = RandomStringUtils.randomAlphabetic(5);
-		user.setFirstName(firstName);
-		final String lastName = RandomStringUtils.randomAlphabetic(5);
-		user.setLastName(lastName);
-		user.setStatus(0);
-		user.setRole("BREEDER");
-		final Integer userId = ThreadLocalRandom.current().nextInt();
-		user.setUserId(userId);
-		final String username = RandomStringUtils.randomAlphabetic(5);
-		user.setUsername(username);
-
+		final UserDto user = this.workbenchTestDataUtil.createTestUserDTO(25);// = new UserDto();
 		final List<UserDto> users = Lists.newArrayList(user);
-
 		final WorkbenchDataManager workbenchDataManager = Mockito.mock(WorkbenchDataManager.class);
+
 		Mockito.when(workbenchDataManager.getAllUserDtosSorted()).thenReturn(users);
-		Assert.assertNotNull(users);
-		Assert.assertTrue(!users.isEmpty());
-		Assert.assertEquals(users.size(), 1);
+		assertThat("Expected list users not null.", users != null);
+		assertThat("Expected list users not empty.", !users.isEmpty());
+		assertThat("Expected list users size 1.", users.size() == 1);
+
+	}
+
+	@Test
+	public void testCreateUser() throws MiddlewareQueryException {
+		final UserDto userDto = this.workbenchTestDataUtil.createTestUserDTO(0);
+		final Integer result = this.workbenchDataManager.createUser(userDto);
+
+		assertThat("Expected id of a newly saved record in workbench_user.", result != null);
+	}
+
+	@Test
+	public void testUpdateUser() throws MiddlewareQueryException {
+		final UserDto userDto = this.workbenchTestDataUtil.createTestUserDTO(25);
+		final User user = this.workbenchTestDataUtil.createTestUserFromUserDto(25);
+		final WorkbenchDataManager workbenchDataManager = Mockito.mock(WorkbenchDataManager.class);
+		Mockito.when(workbenchDataManager.getUserById(25)).thenReturn(user);
+
+		final Integer result = workbenchDataManager.updateUser(userDto);
+		assertThat("Expected id of userDto saved record in workbench_user.", result != null);
 	}
 }
