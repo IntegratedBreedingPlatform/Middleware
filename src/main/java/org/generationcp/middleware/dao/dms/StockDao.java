@@ -60,18 +60,19 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	public long countStudiesByGid(int gid) throws MiddlewareQueryException {
 
 		try {
-			SQLQuery query =
-					this.getSession()
-							.createSQLQuery(
-									"select count(distinct pr.object_project_id) "
-											+ "from stock s, nd_experiment_stock es, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p "
-											+ "where s.dbxref_id = " + gid + "  and s.stock_id = es.stock_id "
-											+ "  and es.nd_experiment_id = e.nd_experiment_id "
-											+ "  and ep.nd_experiment_id = e.nd_experiment_id "
-											+ "  and pr.subject_project_id = ep.project_id " + "  and pr.object_project_id = p.project_id "
-											+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-											+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = "
-											+ TermId.DELETED_STUDY.getId() + "  ) ");
+			SQLQuery query = this.getSession().
+					createSQLQuery(
+      					"select count(distinct p.project_id) "
+      					+ "FROM stock s "
+                + "LEFT JOIN nd_experiment_stock es ON s.stock_id = es.stock_id "
+                + "LEFT JOIN nd_experiment e on es.nd_experiment_id = e.nd_experiment_id "
+                + "LEFT JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
+                + "LEFT JOIN project_relationship pr ON pr.subject_project_id = ep.project_id "
+                + "LEFT JOIN project p ON pr.object_project_id = p.project_id "
+                + "WHERE s.dbxref_id = " + gid
+                + " AND p.project_id NOT IN (SELECT pp.project_id FROM projectprop pp WHERE pp.type_id = " + TermId.STUDY_STATUS.getId()   
+                + " AND pp.value = " + TermId.DELETED_STUDY.getId() + ")");
+      			
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (HibernateException e) {
@@ -84,18 +85,19 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	public List<StudyReference> getStudiesByGid(int gid, int start, int numOfRows) throws MiddlewareQueryException {
 		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
 		try {
-			SQLQuery query =
-					this.getSession()
-							.createSQLQuery(
-									"select distinct p.project_id, p.name, p.description "
-											+ "from stock s, nd_experiment_stock es, nd_experiment e, nd_experiment_project ep, project_relationship pr, project p "
-											+ "where s.dbxref_id = " + gid + "  and s.stock_id = es.stock_id "
-											+ "  and es.nd_experiment_id = e.nd_experiment_id "
-											+ "  and ep.nd_experiment_id = e.nd_experiment_id "
-											+ "  and pr.subject_project_id = ep.project_id " + "  and pr.object_project_id = p.project_id "
-											+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-											+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = "
-											+ TermId.DELETED_STUDY.getId() + "  ) ");
+			SQLQuery query = this.getSession().
+					createSQLQuery(
+      					"select distinct p.project_id, p.name, p.description "
+      					+ "FROM stock s "
+                + "LEFT JOIN nd_experiment_stock es ON s.stock_id = es.stock_id "
+                + "LEFT JOIN nd_experiment e on es.nd_experiment_id = e.nd_experiment_id "
+                + "LEFT JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
+                + "LEFT JOIN project_relationship pr ON pr.subject_project_id = ep.project_id "
+                + "LEFT JOIN project p ON pr.object_project_id = p.project_id "
+                + "WHERE s.dbxref_id = " + gid
+                + " AND p.project_id NOT IN (SELECT pp.project_id FROM projectprop pp WHERE pp.type_id = " + TermId.STUDY_STATUS.getId()   
+                + " AND pp.value = " + TermId.DELETED_STUDY.getId() + ")");
+      			
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 
