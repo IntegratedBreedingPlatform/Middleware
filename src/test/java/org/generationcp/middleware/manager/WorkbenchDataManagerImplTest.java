@@ -22,7 +22,6 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.ToolDAO;
-import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
@@ -48,7 +47,6 @@ import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -62,9 +60,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 	private Project commonTestProject;
 	private User testUser1;
-
-	@InjectMocks
-	protected UserDAO userDao;
 
 	@Before
 	public void beforeTest() throws MiddlewareQueryException {
@@ -843,7 +838,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAllUserDtosSorted() throws MiddlewareQueryException {
-		final UserDto user = this.workbenchTestDataUtil.createTestUserDTO(25);// = new UserDto();
+		final UserDto user = this.workbenchTestDataUtil.createTestUserDTO(25);
 		final List<UserDto> users = Lists.newArrayList(user);
 		final WorkbenchDataManager workbenchDataManager = Mockito.mock(WorkbenchDataManager.class);
 
@@ -860,16 +855,18 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final Integer result = this.workbenchDataManager.createUser(userDto);
 
 		assertThat("Expected id of a newly saved record in workbench_user.", result != null);
+		assertThat("Expected id of new user distinct of 0", !result.equals(0));
 	}
 
 	@Test
 	public void testUpdateUser() throws MiddlewareQueryException {
-		final UserDto userDto = this.workbenchTestDataUtil.createTestUserDTO(25);
-		final User user = this.workbenchTestDataUtil.createTestUserFromUserDto(25);
-		final WorkbenchDataManager workbenchDataManager = Mockito.mock(WorkbenchDataManager.class);
-		Mockito.when(workbenchDataManager.getUserById(25)).thenReturn(user);
-
+		final UserDto userDto = this.workbenchTestDataUtil.createTestUserDTO(0);
+		final Integer userId = this.workbenchDataManager.createUser(userDto);
+		userDto.setUserId(userId);
+		userDto.setRole("BREEDER");
 		final Integer result = workbenchDataManager.updateUser(userDto);
+		
 		assertThat("Expected id of userDto saved record in workbench_user.", result != null);
+		assertThat("Expected the same id of userDto saved record ", result.equals(userId));
 	}
 }
