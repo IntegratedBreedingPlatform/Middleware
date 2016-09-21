@@ -30,6 +30,7 @@ import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.TemplateSettingDAO;
 import org.generationcp.middleware.dao.ToolConfigurationDAO;
 import org.generationcp.middleware.dao.ToolDAO;
+import org.generationcp.middleware.dao.ToolLicenseInfoDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.UserInfoDAO;
 import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
@@ -56,6 +57,7 @@ import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
+import org.generationcp.middleware.pojos.workbench.ToolLicenseInfo;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
@@ -149,6 +151,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		ProjectUserInfoDAO projectUserInfoDao = new ProjectUserInfoDAO();
 		projectUserInfoDao.setSession(this.getCurrentSession());
 		return projectUserInfoDao;
+	}
+	
+	private ToolLicenseInfoDAO getToolLicenseInfoDAO() {
+		ToolLicenseInfoDAO licenseInfoDAO = new ToolLicenseInfoDAO();
+		licenseInfoDAO.setSession(this.getCurrentSession());
+		return licenseInfoDAO;
 	}
 
 	@Override
@@ -1497,6 +1505,21 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		if (this.sessionProvider != null) {
 			this.sessionProvider.close();
 		}
+	}
+	
+	@Override
+	public List<ToolLicenseInfo> getListOfToolLicenseInfo() {
+		return this.getToolLicenseInfoDAO().getAll();
+	}
+	
+	@Override
+	public ToolLicenseInfo getToolLicenseInfoByToolName(final String toolName) {
+		return this.getToolLicenseInfoDAO().getByToolName(toolName);
+	}
+	
+	@Override
+	public ToolLicenseInfo updateToolLicenseInfo(final ToolLicenseInfo licenseInfo) {
+		return this.getToolLicenseInfoDAO().update(licenseInfo);
 	}
 
 }

@@ -34,6 +34,7 @@ import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
+import org.generationcp.middleware.pojos.workbench.ToolLicenseInfo;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
@@ -1016,5 +1017,28 @@ public interface WorkbenchDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException;
+	
+	/**
+	 * Get the list of tool license information
+	 *
+	 * @return the list of tool license information
+	 */
+	List<ToolLicenseInfo> getListOfToolLicenseInfo();
+	
+	/**
+	 * Get license info by tool name
+	 *
+	 * @param toolName the name of the tool
+	 * @return the tool license information by tool name
+	 */
+	ToolLicenseInfo getToolLicenseInfoByToolName(String toolName);
+
+	/**
+	 * Update license info
+	 *
+	 * @param licenseInfo the ToolLicenseInfo Hibernate Object
+	 * @return the updated ToolLicenseInfo Hibernate Object
+	 */
+	ToolLicenseInfo updateToolLicenseInfo(ToolLicenseInfo licenseInfo);
 
 }
