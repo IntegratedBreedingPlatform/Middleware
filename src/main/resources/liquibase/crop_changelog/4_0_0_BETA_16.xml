@@ -1,0 +1,111 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="darla" id="beta16-1">
+		<sql dbms="mysql" splitStatements="true">
+			<!-- 
+				 Add default ADMIN user to programs he is not yet a member of 					 	-->
+			INSERT INTO workbench.workbench_project_user_info(project_id, user_id)
+			SELECT p.project_id, u.userid 
+			  FROM workbench.users u
+			 INNER JOIN workbench.workbench_project p
+			 WHERE u.uname = 'ADMIN'
+			   AND NOT EXISTS (
+				   SELECT 1 
+				     FROM workbench.workbench_project_user_info projUser
+					WHERE projUser.user_id = u.userid
+					  AND projUser.project_id = p.project_id
+				   );
+			<!-- 
+				 Add entry to workbench_project_user_role for ADMIN user. It's a redundant table 
+				 but currently a record here is needed in order to get projects of user 			-->
+			INSERT INTO workbench.workbench_project_user_role(project_id, user_id, role_id)
+			SELECT p.project_id, u.userid, 1
+			  FROM workbench.users u
+			 INNER JOIN  workbench.workbench_project p
+			 WHERE u.uname = 'ADMIN'
+			   AND NOT EXISTS (
+			  	   SELECT 1 FROM workbench.workbench_project_user_role workflowRole
+			  		WHERE workflowRole.user_id = u.userid
+			  		  AND workflowRole.project_id = p.project_id
+			  		  AND workflowRole.role_id = 1
+				   );
+			<!-- 
+				 Copy record from workbench.person of ADMIN user to crop's person table, if not existing
+			     We use first name, last name and email combination to perform matching					-->
+			INSERT INTO persons(fname, lname, ioname, institid, ptitle, poname, plangu, pphone, 
+			  		pextent, pfax, pemail, prole, sperson, eperson, pstatus, pnotes, contact)
+			SELECT wbPerson.fname, wbPerson.lname, wbPerson.ioname, wbPerson.institid, wbPerson.ptitle,
+				   wbPerson.poname, wbPerson.plangu, wbPerson.pphone, wbPerson.pextent, wbPerson.pfax, wbPerson.pemail,
+				   wbPerson.prole, wbPerson.sperson, wbPerson.eperson, wbPerson.pstatus, wbPerson.pnotes, wbPerson.contact
+			  FROM workbench.persons wbPerson
+			 INNER JOIN workbench.users u 
+					ON u.personid = wbPerson.personid
+			 INNER JOIN workbench.workbench_project_user_info projUser 
+					ON projUser.user_id = u.userid
+			 INNER JOIN workbench.workbench_project p 
+					ON projUser.project_id = p.project_id
+			 INNER JOIN workbench.workbench_crop crop
+					ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+			 WHERE u.uname = 'ADMIN'
+			   AND NOT EXISTS (
+				   SELECT 1 
+					 FROM persons cropPerson
+					WHERE cropPerson.fname = wbPerson.fname 
+			          AND cropPerson.lname= wbPerson.lname 
+					  AND cropPerson.pemail = wbPerson.pemail
+					)
+			<!-- Can return multiple rows - one per program in current crop. Limit to 1 as we will insert only 1 record  -->
+			 LIMIT 1; 
+			<!-- 
+				Copy record from workbench.users to crop's users table if not yet existing 
+				Need to link new user to proper crop person - match by first name, last name, email combination 		-->
+			INSERT INTO users(instalid, ustatus, uaccess, utype, uname, upswd, personid, adate, cdate)
+			SELECT u.instalid, u.ustatus, u.uaccess, u.utype, u.uname, u.upswd, cropPerson.personid, u.adate, u.cdate
+			  FROM workbench.users u
+			 INNER JOIN workbench.persons wbPerson
+					ON wbPerson.personid = u.personid
+			 INNER JOIN persons cropPerson
+					ON cropPerson.fname = wbPerson.fname AND cropPerson.lname = wbPerson.lname
+			        AND cropPerson.pemail = wbPerson.pemail
+			 INNER JOIN workbench.workbench_project_user_info projUser
+					ON projUser.user_id = u.userid
+			 INNER JOIN workbench.workbench_project p
+					ON projUser.project_id = p.project_id
+			 INNER JOIN workbench.workbench_crop crop
+					ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+			 WHERE NOT EXISTS (
+					SELECT 1 
+					  FROM users cropUser
+					 WHERE cropUser.uname = u.uname
+					)
+			<!-- Can return multiple rows - one per program in current crop. Limit to 1 as we will insert only 1 record  -->
+			 LIMIT 1;
+			<!-- 			  
+			     Insert record Into workbench_ibdb_user_map (mapping of workbench user to crop user per program) -->
+			INSERT INTO workbench.workbench_ibdb_user_map(project_id, workbench_user_id, ibdb_user_id) 
+			SELECT p.project_id, u.userid, cropUser.userid
+			  FROM workbench.users u 
+			 INNER JOIN users cropUser ON cropUser.uname = u.uname
+			 INNER JOIN workbench.workbench_project_user_info projUser
+					ON projUser.user_id = u.userid
+			 INNER JOIN workbench.workbench_project p
+					ON projUser.project_id = p.project_id
+			 INNER JOIN workbench.workbench_crop crop
+					ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+			 WHERE u.uname = 'ADMIN'
+			   AND NOT EXISTS (
+				   SELECT 1 
+					 FROM workbench.workbench_ibdb_user_map userMap
+					WHERE userMap.project_id = p.project_id
+			          AND userMap.workbench_user_id = u.userid
+				   );
+		</sql>
+	</changeSet>
+	
+</databaseChangeLog>
