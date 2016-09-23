@@ -383,6 +383,40 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		return lotCounts;
 	}
 
+	@SuppressWarnings("unchecked")
+	public Map<Integer, Object[]> retrieveWithdrawalBalanceWithDistinctTransactionStatus(List<Integer> listEntryIds) throws MiddlewareQueryException {
+		Map<Integer, Object[]> mapWithdrawalStatusEntryWise = new HashMap<Integer, Object[]>();
+
+		try {
+			String sql =
+					"SELECT recordid, sum(trnqty)*-1 as withdrawal, count(distinct trnstat), trnstat, count(distinct l.scaleid),l.scaleid "
+							+ "FROM ims_transaction t " + "INNER JOIN ims_lot l ON l.lotid = t.lotid "
+							+ "WHERE trnqty < 0 AND trnstat <> 9 AND recordid IN (:entryIds) "
+							+ "  AND l.status = 0 AND l.etype = 'GERMPLSM' " + "GROUP BY recordid " + "ORDER BY recordid ";
+			Query query = this.getSession().createSQLQuery(sql).setParameterList("entryIds", listEntryIds);
+			List<Object[]> result = query.list();
+			for (Object[] row : result) {
+				Integer entryId = (Integer) row[0];
+				Double withdrawalBalance = (Double) row[1];
+				BigInteger distinctTranStatCount = (BigInteger) row[2];
+				Integer tranStatus = (Integer) row[3];
+
+				BigInteger distinctWithdrawalScale = (BigInteger) row[4];
+				Integer withdrawalScale = (Integer) row[5];
+
+				mapWithdrawalStatusEntryWise.put(entryId, new Object[]{ withdrawalBalance, distinctTranStatCount, tranStatus,
+						distinctWithdrawalScale, withdrawalScale});
+			}
+
+		} catch (Exception e) {
+			this.logAndThrowException(
+					"Error at retrieveWithdrawalBalanceWithDistinctTransactionStatus=" + listEntryIds + " at TransactionDAO: " + e.getMessage(), e);
+		}
+
+		return mapWithdrawalStatusEntryWise;
+	}
+
+
 	private boolean isGidInInventoryList(List<InventoryDetails> inventoryDetails, Integer gid) {
 		for (InventoryDetails detail : inventoryDetails) {
 			if (detail.getGid().equals(gid)) {

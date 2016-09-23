@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
@@ -55,10 +56,21 @@ public class ListInventoryBuilder extends Builder {
 
 		if (listEntries != null && !listEntries.isEmpty()) {
 			this.retrieveLotCounts(listEntryIds, listEntries, gids, lrecIds);
+			this.retrieveWithdrawalAndStatus(listEntryIds, listEntries, gids, lrecIds);
 			this.retrieveGroupId(listEntries, gids);
 		}
 		return listEntries;
 	}
+
+	private void retrieveWithdrawalAndStatus(final List<Integer> entryIds, final List<GermplasmListData> listEntries, final List<Integer> gids,
+			final List<Integer> lrecIds) throws MiddlewareQueryException {
+		this.retrieveWithdrawalBalance(listEntries, lrecIds);
+		this.setAvailableBalanceScale(listEntries);
+		this.setWithdrawalBalanceScale(listEntries);
+		this.setTransactionStatus(listEntries);
+
+	}
+
 
 	/**
 	 * Retrieves GROUP ID(germplsm.mgid) directly from the Germplasm Object
@@ -112,11 +124,11 @@ public class ListInventoryBuilder extends Builder {
 		this.retrieveAvailableBalLotCounts(listEntries, gids);
 		this.retrieveReservedLotCounts(listEntries, entryIds);
 		this.retrieveStockIds(listEntries, lrecIds);
-		this.retrieveAllLotScaleIdForGermplsmListData(listEntries);
+
 	}
 
-	// This function will add overall scale for germplsm and set in InventoryInfo. Usefull to display scale along with available balance
-	private void retrieveAllLotScaleIdForGermplsmListData(final List<GermplasmListData> listEntries){
+	// This will add overall scale for germplsm and set in InventoryInfo. Useful to display scale along with available balance
+	private void setAvailableBalanceScale(final List<GermplasmListData> listEntries){
 		Set<Integer> setScaleIds = new HashSet<>();
 		Map<Integer, Term> mapScaleTerm = new HashMap<>();
 		for(GermplasmListData entry : listEntries){
@@ -154,14 +166,14 @@ public class ListInventoryBuilder extends Builder {
 							Integer objectId = scaleIdWiseTermId.get(scaleId);
 							if(mapScaleTerm.containsKey(objectId)){
 								Term scale = mapScaleTerm.get(objectId);
-								entry.getInventoryInfo().setScaleForGermplsm(scale);
+								entry.getInventoryInfo().setScaleForGermplsm(scale.getName());
 							}
 							else{
-								entry.getInventoryInfo().setScaleForGermplsm(null);
+								entry.getInventoryInfo().setScaleForGermplsm("");
 							}
 						}
 						else{
-							entry.getInventoryInfo().setScaleForGermplsm(null);
+							entry.getInventoryInfo().setScaleForGermplsm("");
 						}
 
 					}
@@ -170,10 +182,86 @@ public class ListInventoryBuilder extends Builder {
 			}
 		}
 
+	}
 
+	// This will set withdrawal scale for germplsm for selected list entries
+	private void setWithdrawalBalanceScale(final List<GermplasmListData> listEntries){
+		Set<Integer> setScaleIds = new HashSet<>();
+		Map<Integer, Term> mapScaleTerm = new HashMap<>();
+		for(GermplasmListData entry : listEntries){
+			if(entry.getInventoryInfo() != null && entry.getInventoryInfo().getWithdrawalScaleId() != null){
+				setScaleIds.add(entry.getInventoryInfo().getScaleIdForGermplsm());
+			}
+		}
 
+		List<Integer> listScaleIds = Lists.newArrayList(setScaleIds);
+
+		if(!listScaleIds.isEmpty()){
+			Map<Integer, Integer> scaleIdWiseTermId = new HashMap<>();
+			final List<CVTermRelationship> relationshipsOfScales = this.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(listScaleIds,
+					TermId.HAS_SCALE.getId());
+			List<Integer> listObjectIds = new ArrayList<>();
+			if(relationshipsOfScales != null){
+				for(CVTermRelationship relationship : relationshipsOfScales){
+					scaleIdWiseTermId.put(relationship.getSubjectId(), relationship.getObjectId());
+					listObjectIds.add(relationship.getObjectId());
+				}
+
+				List<CVTerm> listScaleCvTerm = this.getCvTermDao().getByIds(listObjectIds);
+
+				for (final CVTerm cvTerm : listScaleCvTerm) {
+					Term term = TermBuilder.mapCVTermToTerm(cvTerm);
+					mapScaleTerm.put(term.getId(), term);
+
+				}
+
+				for(GermplasmListData entry : listEntries){
+					if(entry.getInventoryInfo() != null && entry.getInventoryInfo().getScaleIdForGermplsm() != null){
+						Integer scaleId = entry.getInventoryInfo().getScaleIdForGermplsm();
+
+						if(scaleIdWiseTermId.containsKey(scaleId)){
+							Integer objectId = scaleIdWiseTermId.get(scaleId);
+							if(mapScaleTerm.containsKey(objectId)){
+								Term scale = mapScaleTerm.get(objectId);
+								entry.getInventoryInfo().setWithdrawalScale(scale.getName());
+
+							}
+							else{
+								entry.getInventoryInfo().setWithdrawalScale("");
+							}
+						}
+						else{
+							entry.getInventoryInfo().setWithdrawalScale("");
+						}
+
+					}
+
+				}
+			}
+		}
 
 	}
+
+	private void setTransactionStatus(final List<GermplasmListData> listEntries){
+		for(GermplasmListData entry : listEntries){
+			if(entry.getInventoryInfo() != null){
+				Integer distinctCountWithdrawalStatus = entry.getInventoryInfo().getDistinctCountWithdrawalStatus();
+				if(distinctCountWithdrawalStatus == 0){
+					entry.getInventoryInfo().setTransactionStatus("");
+				}else if(distinctCountWithdrawalStatus == 1){
+					if(entry.getInventoryInfo().getWithdrawalStatus() == 0){
+						entry.getInventoryInfo().setTransactionStatus(GermplasmInventory.RESERVED);
+					}
+					if(entry.getInventoryInfo().getWithdrawalStatus() == 1){
+						entry.getInventoryInfo().setTransactionStatus(GermplasmInventory.COMMITTED);
+					}
+				}else{
+					entry.getInventoryInfo().setTransactionStatus(GermplasmInventory.MIXED);
+				}
+			}
+		}
+	}
+
 
 	private void retrieveStockIds(final List<GermplasmListData> listEntries, final List<Integer> lrecIds) {
 		final Map<Integer, String> stockIDs = this.getTransactionDao().retrieveStockIds(lrecIds);
@@ -304,6 +392,44 @@ public class ListInventoryBuilder extends Builder {
 			}
 		}
 	}
+
+	/*
+	 * Retrieve withdrawal balance per entry along with overall status
+	 */
+	private void retrieveWithdrawalBalance(final List<GermplasmListData> listEntries, final List<Integer> listEntryIds)
+			throws MiddlewareQueryException {
+		final Map<Integer, Object[]> withdrawalData = this.getTransactionDao().retrieveWithdrawalBalanceWithDistinctTransactionStatus(listEntryIds);
+		for (final GermplasmListData entry : listEntries) {
+			final ListDataInventory inventory = entry.getInventoryInfo();
+			if (inventory != null) {
+				final Object[] withdrawalPerRecord = withdrawalData.get(entry.getId());
+ 				if (withdrawalPerRecord != null) {
+					inventory.setWithdrawalBalance((Double)withdrawalPerRecord[0]);
+
+					BigInteger countDistinctStatus = (BigInteger) withdrawalPerRecord[1];
+					inventory.setDistinctCountWithdrawalStatus(countDistinctStatus.intValue());
+					inventory.setWithdrawalStatus((Integer) withdrawalPerRecord[2]);
+
+					BigInteger countWithDrawalScale = (BigInteger) withdrawalPerRecord[3];
+					inventory.setDistinctCountWithdrawalScale(countWithDrawalScale.intValue());
+					inventory.setWithdrawalScaleId((Integer) withdrawalPerRecord[4]);
+
+
+
+				} else {
+					inventory.setWithdrawalBalance(0.0);
+					inventory.setDistinctCountWithdrawalScale(0);
+					inventory.setWithdrawalScaleId(null);
+					inventory.setWithdrawalScale(null);
+
+					inventory.setDistinctCountWithdrawalStatus(0);
+					inventory.setWithdrawalStatus(null);
+					inventory.setTransactionStatus(null);
+				}
+			}
+		}
+	}
+
 
 	/*
 	 * Perform one-retrieval for central/local scales and central/local locations for list of lots
