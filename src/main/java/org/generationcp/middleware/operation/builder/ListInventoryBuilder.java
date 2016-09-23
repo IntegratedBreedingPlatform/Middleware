@@ -5,14 +5,18 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.domain.inventory.util.LotTransformer;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -23,6 +27,7 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
+import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 
 public class ListInventoryBuilder extends Builder {
 
@@ -107,6 +112,67 @@ public class ListInventoryBuilder extends Builder {
 		this.retrieveAvailableBalLotCounts(listEntries, gids);
 		this.retrieveReservedLotCounts(listEntries, entryIds);
 		this.retrieveStockIds(listEntries, lrecIds);
+		this.retrieveAllLotScaleIdForGermplsmListData(listEntries);
+	}
+
+	// This function will add overall scale for germplsm and set in InventoryInfo. Usefull to display scale along with available balance
+	private void retrieveAllLotScaleIdForGermplsmListData(final List<GermplasmListData> listEntries){
+		Set<Integer> setScaleIds = new HashSet<>();
+		Map<Integer, Term> mapScaleTerm = new HashMap<>();
+		for(GermplasmListData entry : listEntries){
+			if(entry.getInventoryInfo() != null && entry.getInventoryInfo().getScaleIdForGermplsm() != null){
+				setScaleIds.add(entry.getInventoryInfo().getScaleIdForGermplsm());
+			}
+		}
+
+		List<Integer> listScaleIds = Lists.newArrayList(setScaleIds);
+
+		if(!listScaleIds.isEmpty()){
+			Map<Integer, Integer> scaleIdWiseTermId = new HashMap<>();
+			final List<CVTermRelationship> relationshipsOfScales = this.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(listScaleIds,
+					TermId.HAS_SCALE.getId());
+			List<Integer> listObjectIds = new ArrayList<>();
+			if(relationshipsOfScales != null){
+				for(CVTermRelationship relationship : relationshipsOfScales){
+					scaleIdWiseTermId.put(relationship.getSubjectId(), relationship.getObjectId());
+					listObjectIds.add(relationship.getObjectId());
+				}
+
+				List<CVTerm> listScaleCvTerm = this.getCvTermDao().getByIds(listObjectIds);
+
+				for (final CVTerm cvTerm : listScaleCvTerm) {
+					Term term = TermBuilder.mapCVTermToTerm(cvTerm);
+					mapScaleTerm.put(term.getId(), term);
+
+				}
+
+				for(GermplasmListData entry : listEntries){
+					if(entry.getInventoryInfo() != null && entry.getInventoryInfo().getScaleIdForGermplsm() != null){
+						Integer scaleId = entry.getInventoryInfo().getScaleIdForGermplsm();
+
+						if(scaleIdWiseTermId.containsKey(scaleId)){
+							Integer objectId = scaleIdWiseTermId.get(scaleId);
+							if(mapScaleTerm.containsKey(objectId)){
+								Term scale = mapScaleTerm.get(objectId);
+								entry.getInventoryInfo().setScaleForGermplsm(scale);
+							}
+							else{
+								entry.getInventoryInfo().setScaleForGermplsm(null);
+							}
+						}
+						else{
+							entry.getInventoryInfo().setScaleForGermplsm(null);
+						}
+
+					}
+
+				}
+			}
+		}
+
+
+
+
 	}
 
 	private void retrieveStockIds(final List<GermplasmListData> listEntries, final List<Integer> lrecIds) {
@@ -183,21 +249,38 @@ public class ListInventoryBuilder extends Builder {
 	}
 
 	/*
-	 * Retrieve the number of lots with available balance per germplasm
+	 * Retrieve the number of lots with available balance per germplasm and available seed balance per germplsm along with overall scaleId
 	 */
 	private void retrieveAvailableBalLotCounts(final List<GermplasmListData> listEntries, final List<Integer> gids)
 			throws MiddlewareQueryException {
-		final Map<Integer, BigInteger[]> lotCounts = this.getLotDao().getLotsWithAvailableBalanceCountAndTotalLotsCount(gids);
+		final Map<Integer, Object[]> lotCounts = this.getLotDao().getLotsWithAvailableBalanceCountAndTotalLotsCount(gids);
 		for (final GermplasmListData entry : listEntries) {
 			final ListDataInventory inventory = entry.getInventoryInfo();
 			if (inventory != null) {
-				final BigInteger[] count = lotCounts.get(entry.getGid());
+				final Object[] count = lotCounts.get(entry.getGid());
 				if (count != null) {
-					inventory.setActualInventoryLotCount(count[0].intValue());
-					inventory.setLotCount(count[1].intValue());
+					BigInteger actualInventoryLotCount = (BigInteger)count[0];
+					inventory.setActualInventoryLotCount(actualInventoryLotCount.intValue());
+
+					BigInteger lotCount = (BigInteger)count[1];
+					inventory.setLotCount(lotCount.intValue());
+
+					Double totalAvailableBalance = (Double) count[2];
+					inventory.setTotalAvailableBalance(totalAvailableBalance.doubleValue());
+
+					BigInteger distinctScaleCount = (BigInteger)count[3];
+					inventory.setDistinctScaleCountForGermplsm(distinctScaleCount.intValue());
+
+					if(count[4] != null){
+						Integer scaleId = (Integer)count[4];
+						inventory.setScaleIdForGermplsm(scaleId.intValue());
+					}
 				} else {
 					inventory.setActualInventoryLotCount(0);
 					inventory.setLotCount(0);
+					inventory.setTotalAvailableBalance(0.0);
+					inventory.setDistinctScaleCountForGermplsm(0);
+					inventory.setScaleIdForGermplsm(null);
 				}
 			}
 		}

@@ -1,6 +1,8 @@
 
 package org.generationcp.middleware.domain.inventory;
 
+import org.generationcp.middleware.domain.oms.Term;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -27,6 +29,18 @@ public class GermplasmInventory implements Serializable {
 
 	// String of StockIDs separated by comma per list entry.
 	private String stockIDs;
+
+	// total seed balance across all lots for germplsm
+	private Double totalAvailableBalance;
+
+	// scaleId of lots if all lots have same scaleId
+	private Integer scaleIdForGermplsm;
+
+	// scale of lots if all lots have same scale
+	private Term scaleForGermplsm;
+
+	// count of different scale across all lots for germplsm
+	private Integer distinctScaleCountForGermplsm;
 
 	// list of lots for germplasm
 	private List<? extends LotDetails> lotRows;
@@ -120,4 +134,35 @@ public class GermplasmInventory implements Serializable {
 		this.lotCount = lotCount;
 	}
 
+	public Double getTotalAvailableBalance() {
+		return totalAvailableBalance;
+	}
+
+	public void setTotalAvailableBalance(Double totalAvailableBalance) {
+		this.totalAvailableBalance = totalAvailableBalance;
+	}
+
+	public Integer getScaleIdForGermplsm() {
+		return scaleIdForGermplsm;
+	}
+
+	public void setScaleIdForGermplsm(Integer scaleIdForGermplsm) {
+		this.scaleIdForGermplsm = scaleIdForGermplsm;
+	}
+
+	public Term getScaleForGermplsm() {
+		return scaleForGermplsm;
+	}
+
+	public void setScaleForGermplsm(Term scaleForGermplsm) {
+		this.scaleForGermplsm = scaleForGermplsm;
+	}
+
+	public Integer getDistinctScaleCountForGermplsm() {
+		return distinctScaleCountForGermplsm;
+	}
+
+	public void setDistinctScaleCountForGermplsm(Integer distinctScaleCountForGermplsm) {
+		this.distinctScaleCountForGermplsm = distinctScaleCountForGermplsm;
+	}
 }

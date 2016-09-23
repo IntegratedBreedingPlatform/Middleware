@@ -296,13 +296,16 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, BigInteger[]> getLotsWithAvailableBalanceCountAndTotalLotsCount(List<Integer> gids) throws MiddlewareQueryException {
-		Map<Integer, BigInteger[]> lotCounts = new HashMap<Integer, BigInteger[]>();
+	public Map<Integer, Object[]> getLotsWithAvailableBalanceCountAndTotalLotsCount(List<Integer> gids) throws MiddlewareQueryException {
+		Map<Integer, Object[]> lotCounts = new HashMap<Integer, Object[]>();
 
 		try {
 			String sql =
-					"SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED), Count(DISTINCT lotid) FROM ( "
-							+ "SELECT i.lotid, i.eid AS entity_id, " + "   SUM(trnqty) AS avail_bal " + "  FROM ims_lot i "
+					"SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED), Count(DISTINCT lotid) "
+							+ ",sum(avail_bal), count(distinct scaleid), scaleid "
+							+ " FROM ( "
+							+ "SELECT i.lotid, i.eid AS entity_id, " + "   SUM(trnqty) AS avail_bal, i.scaleid as scaleid "
+							+  " FROM ims_lot i "
 							+ "  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
 							+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " + " GROUP BY i.lotid ) inv "
 							+ "WHERE avail_bal > -1 " + "GROUP BY entity_id;";
@@ -313,8 +316,14 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				Integer gid = (Integer) row[0];
 				BigInteger lotsWithAvailableBalance = (BigInteger) row[1];
 				BigInteger lotCount = (BigInteger) row[2];
+				Double availableBalance = (Double)row[3];
+				BigInteger distinctScaleIdCount = (BigInteger) row[4];
+				Integer allLotsScaleId = null;
+				if(row[5] != null){
+					allLotsScaleId = (Integer)row[5];
+				}
 
-				lotCounts.put(gid, new BigInteger[] {lotsWithAvailableBalance, lotCount});
+				lotCounts.put(gid, new Object[] {lotsWithAvailableBalance, lotCount, availableBalance, distinctScaleIdCount, allLotsScaleId});
 			}
 
 		} catch (Exception e) {
