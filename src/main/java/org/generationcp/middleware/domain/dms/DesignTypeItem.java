@@ -16,7 +16,8 @@ public class DesignTypeItem {
 
 	public static final String ALPHA_LATTICE = "Alpha Lattice";
 
-	public static final DesignTypeItem AUGMENTED_RANDOMIZED_BLOCK = new DesignTypeItem(4, "Augmented Randomized Block design", "augmentedRandomizedBlockParams.html", false, 0, 0, false);
+	public static final DesignTypeItem AUGMENTED_RANDOMIZED_BLOCK = new DesignTypeItem(7, "Augmented Randomized Block design",
+			"augmentedRandomizedBlockParams.html", false, 0, 0, false);
 
 	private Integer id;
 	private String name;
