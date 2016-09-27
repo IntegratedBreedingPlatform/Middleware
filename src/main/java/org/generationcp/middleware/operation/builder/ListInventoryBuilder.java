@@ -253,7 +253,7 @@ public class ListInventoryBuilder extends Builder {
 						entry.getInventoryInfo().setTransactionStatus(GermplasmInventory.RESERVED);
 					}
 					if(entry.getInventoryInfo().getWithdrawalStatus() == 1){
-						entry.getInventoryInfo().setTransactionStatus(GermplasmInventory.COMMITTED);
+						entry.getInventoryInfo().setTransactionStatus(GermplasmInventory.WITHDRAWN);
 					}
 				}else{
 					entry.getInventoryInfo().setTransactionStatus(GermplasmInventory.MIXED);

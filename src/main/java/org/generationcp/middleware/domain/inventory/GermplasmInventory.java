@@ -18,8 +18,6 @@ public class GermplasmInventory implements Serializable {
 
 	public static final String RESERVED = "Reserved";
 
-	public static final String COMMITTED = "Committed";
-
 	public static final String MIXED = "Mixed";
 
 	public static final String WITHDRAWN = "Withdrawn";
