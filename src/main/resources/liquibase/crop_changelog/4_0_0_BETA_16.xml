@@ -37,7 +37,7 @@
 				   );
 			<!-- 
 				 Copy record from workbench.person of ADMIN user to crop's person table, if not existing
-			     We use first name, last name and email combination to perform matching					-->
+			     We use email address to find matching person										-->
 			INSERT INTO persons(fname, lname, ioname, institid, ptitle, poname, plangu, pphone, 
 			  		pextent, pfax, pemail, prole, sperson, eperson, pstatus, pnotes, contact)
 			SELECT wbPerson.fname, wbPerson.lname, wbPerson.ioname, wbPerson.institid, wbPerson.ptitle,
@@ -56,23 +56,20 @@
 			   AND NOT EXISTS (
 				   SELECT 1 
 					 FROM persons cropPerson
-					WHERE cropPerson.fname = wbPerson.fname 
-			          AND cropPerson.lname= wbPerson.lname 
-					  AND cropPerson.pemail = wbPerson.pemail
+					WHERE cropPerson.pemail = wbPerson.pemail
 					)
 			<!-- Can return multiple rows - one per program in current crop. Limit to 1 as we will insert only 1 record  -->
 			 LIMIT 1; 
 			<!-- 
 				Copy record from workbench.users to crop's users table if not yet existing 
-				Need to link new user to proper crop person - match by first name, last name, email combination 		-->
+				Need to link new user to proper crop person - match person by email address							-->
 			INSERT INTO users(instalid, ustatus, uaccess, utype, uname, upswd, personid, adate, cdate)
 			SELECT u.instalid, u.ustatus, u.uaccess, u.utype, u.uname, u.upswd, cropPerson.personid, u.adate, u.cdate
 			  FROM workbench.users u
 			 INNER JOIN workbench.persons wbPerson
 					ON wbPerson.personid = u.personid
 			 INNER JOIN persons cropPerson
-					ON cropPerson.fname = wbPerson.fname AND cropPerson.lname = wbPerson.lname
-			        AND cropPerson.pemail = wbPerson.pemail
+					ON cropPerson.pemail = wbPerson.pemail
 			 INNER JOIN workbench.workbench_project_user_info projUser
 					ON projUser.user_id = u.userid
 			 INNER JOIN workbench.workbench_project p
