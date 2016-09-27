@@ -22,6 +22,8 @@ public class GermplasmInventory implements Serializable {
 
 	public static final String MIXED = "Mixed";
 
+	public static final String WITHDRAWN = "Withdrawn";
+
 	private Integer gid;
 
 	// number of lots with actual inventory available for given germplasm
