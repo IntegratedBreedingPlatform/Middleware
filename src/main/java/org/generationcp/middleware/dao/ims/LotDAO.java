@@ -15,8 +15,10 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.LotAggregateData;
@@ -54,8 +56,10 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	 * as required by BMS-1052
 	 */
 	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS = "SELECT i.lotid, i.eid, " + "  locid, scaleid, i.comments, "
-			+ "  SUM(CASE WHEN trnstat = 0 THEN trnqty ELSE 0 END) AS actual_balance, " + "  SUM(trnqty) AS available_balance, "
-			+ "  SUM(CASE WHEN trnstat = 0 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS reserved_amt, ";
+			+ "  SUM(CASE WHEN trnstat = 0 AND trnqty > 0 THEN trnqty ELSE 0 END) AS actual_balance, "
+			+ "  CASE WHEN SUM(trnqty) is null THEN 0 ELSE SUM(trnqty) END AS available_balance, "
+			+ "  SUM(CASE WHEN trnstat = 0 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS reserved_amt, "
+			+ "  SUM(CASE WHEN trnstat = 1 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS committed_amt, ";
 
 	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS = LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS
 			+ "  GROUP_CONCAT(inventory_id SEPARATOR ', ') AS stockids ";
@@ -73,13 +77,13 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	private static final String GET_LOTS_FOR_GERMPLASM_WITH_FILTERED_STOCKS = LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_FILTERED_STOCKS
 			+ LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
 
-	private static final String GET_LOTS_FOR_LIST_ENTRIES = "SELECT lot.*, recordid, trnqty * -1 " + "FROM " + "   ("
+	private static final String GET_LOTS_FOR_LIST_ENTRIES = "SELECT lot.*, recordid, trnqty * -1, trnstat " + "FROM " + "   ("
 			+ LotDAO.GET_LOTS_FOR_GERMPLASM + "   ) lot " + " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid "
-			+ "  AND trnstat = 0 AND trnqty < 0 " + "  AND sourceid = :listId AND sourcetype = 'LIST' ";
+			+ "  AND trnstat in (0,1) AND trnqty < 0 " + "  AND sourceid = :listId AND sourcetype = 'LIST' ";
 
-	private static final String GET_LOTS_FOR_LIST = "SELECT lot.*, recordid, trnqty * -1 " + "FROM " + "   ("
+	private static final String GET_LOTS_FOR_LIST = "SELECT lot.*, recordid, trnqty * -1 , trnstat " + "FROM " + "   ("
 			+ LotDAO.GET_LOTS_FOR_GERMPLASM_WITH_FILTERED_STOCKS + "   ) lot " + " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid "
-			+ "  AND trnstat = 0 AND trnqty < 0 " + "  AND sourceid = :listId AND sourcetype = 'LIST' ";
+			+ "  AND trnstat in (0,1) AND trnqty < 0 " + "  AND sourceid = :listId AND sourcetype = 'LIST' ";
 
 	@SuppressWarnings("unchecked")
 	public List<Lot> getByEntityType(String type, int start, int numOfRows) throws MiddlewareQueryException {
@@ -412,6 +416,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		List<Object[]> result = query.list();
 
 		Map<Integer, Double> reservationMap = null;
+		Map<Integer, Set<String>> reservationStatusMap = null;
 		Lot lot = null;
 
 		for (Object[] row : result) {
@@ -419,6 +424,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			if (lot == null || !lot.getId().equals(lotId)) {
 				if (lot != null && reservationMap != null) {
 					lot.getAggregateData().setReservationMap(reservationMap);
+					lot.getAggregateData().setReservationStatusMap(reservationStatusMap);
 				}
 				Integer entityId = (Integer) row[1];
 				Integer locationId = (Integer) row[2];
@@ -427,7 +433,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				Double actualBalance = (Double) row[5];
 				Double availableBalance = (Double) row[6];
 				Double reservedTotal = (Double) row[7];
-				String stockIds = (String) row[8];
+				Double committedTotal = (Double) row[8];
+				String stockIds = (String) row[9];
 
 				lot = new Lot(lotId);
 				lot.setEntityId(entityId);
@@ -439,18 +446,24 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				aggregateData.setActualBalance(actualBalance);
 				aggregateData.setAvailableBalance(availableBalance);
 				aggregateData.setReservedTotal(reservedTotal);
+				aggregateData.setCommittedTotal(committedTotal);
 				aggregateData.setStockIds(stockIds);
 
 				reservationMap = new HashMap<Integer, Double>();
 				aggregateData.setReservationMap(reservationMap);
+
+				reservationStatusMap = new HashMap<>();
+				aggregateData.setReservationStatusMap(reservationStatusMap);
+
 				lot.setAggregateData(aggregateData);
 
 				lots.add(lot);
 			}
 
 			if (withReservationMap) {
-				Integer recordId = (Integer) row[9];
-				Double qty = (Double) row[10];
+				Integer recordId = (Integer) row[10];
+				Double qty = (Double) row[11];
+				Integer transactionState = (Integer) row[12];
 
 				// compute total reserved for entry
 				if (recordId != null && qty != null) {
@@ -458,6 +471,14 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 					Double prevTotal = prevValue == null ? 0d : prevValue;
 					reservationMap.put(recordId, prevTotal + qty);
 				}
+
+				if(transactionState != null){
+					if(!reservationStatusMap.containsKey(recordId)){
+						reservationStatusMap.put(recordId, new HashSet<String>());
+					}
+					reservationStatusMap.get(recordId).add(String.valueOf(transactionState));
+				}
+
 			}
 
 		}
