@@ -15,11 +15,14 @@ public class LotDetails implements Serializable {
 	private Integer entityIdOfLot;
 	private Integer scaleId;
 	private Integer locId;
+	private String lotScaleNameAbbr;
 	private String commentOfLot;
 
 	// computed or looked up values
 	private Double actualLotBalance;
 	private Double availableLotBalance;
+	private Double withdrawalBalance;
+	private String withdrawalStatus;
 	private Location locationOfLot;
 	private Double reservedTotal;
 	private Term scaleOfLot;
@@ -111,6 +114,30 @@ public class LotDetails implements Serializable {
 
 	public void setStockIds(String stockIds) {
 		this.stockIds = stockIds;
+	}
+
+	public Double getWithdrawalBalance() {
+		return withdrawalBalance;
+	}
+
+	public void setWithdrawalBalance(Double withdrawalBalance) {
+		this.withdrawalBalance = withdrawalBalance;
+	}
+
+	public String getWithdrawalStatus() {
+		return withdrawalStatus;
+	}
+
+	public void setWithdrawalStatus(String withdrawalStatus) {
+		this.withdrawalStatus = withdrawalStatus;
+	}
+
+	public String getLotScaleNameAbbr() {
+		return lotScaleNameAbbr;
+	}
+
+	public void setLotScaleNameAbbr(String lotScaleNameAbbr) {
+		this.lotScaleNameAbbr = lotScaleNameAbbr;
 	}
 
 	@Override

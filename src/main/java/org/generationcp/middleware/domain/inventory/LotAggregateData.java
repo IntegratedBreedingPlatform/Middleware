@@ -3,6 +3,7 @@ package org.generationcp.middleware.domain.inventory;
 
 import java.io.Serializable;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * This POJO stores aggregate information about lot such as actual balance, available balance, total reserved etc
@@ -22,10 +23,16 @@ public class LotAggregateData implements Serializable {
 
 	private Double reservedTotal;
 
+	private Double committedTotal;
+
 	private String stockIds;
 
 	// key = record id and value = reserved quantity
 	private Map<Integer, Double> reservationMap;
+
+	// key = record id and value = 0 or 1 status
+	private Map<Integer, Set<String>> reservationStatusMap;
+
 
 	public LotAggregateData(Integer lotId) {
 		super();
@@ -80,6 +87,22 @@ public class LotAggregateData implements Serializable {
 		this.stockIds = stockIds;
 	}
 
+	public Double getCommittedTotal() {
+		return committedTotal;
+	}
+
+	public void setCommittedTotal(Double committedTotal) {
+		this.committedTotal = committedTotal;
+	}
+
+	public Map<Integer, Set<String>> getReservationStatusMap() {
+		return reservationStatusMap;
+	}
+
+	public void setReservationStatusMap(Map<Integer, Set<String>> reservationStatusMap) {
+		this.reservationStatusMap = reservationStatusMap;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -91,6 +114,8 @@ public class LotAggregateData implements Serializable {
 		builder.append(this.availableBalance);
 		builder.append(", reservedTotal=");
 		builder.append(this.reservedTotal);
+		builder.append(", committedTotal=");
+		builder.append(this.committedTotal);
 		if (this.reservationMap != null && !this.reservationMap.isEmpty()) {
 			builder.append(", reservationMap={");
 			for (Integer id : this.reservationMap.keySet()) {
