@@ -161,4 +161,13 @@ public interface UserDataManager {
 	 * @return
 	 */
     User getUserByFullname(String fullname) throws MiddlewareQueryException;
+    
+    /**
+     * Gets person with matching email address. Assumes that email is unique per user/person.
+     * 
+     * @param firstName
+     * @param lastName
+     * @return
+     */
+    Person getPersonByEmail(String email) throws MiddlewareQueryException;
 }

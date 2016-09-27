@@ -33,6 +33,7 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	private static PersonTestDataInitializer personTDI;
 	private static UserTestDataInitializer userTDI;
+	
 	@BeforeClass
 	public static void beforeClass() {
 		UserDataManagerImplTest.personTDI = new PersonTestDataInitializer();
@@ -221,5 +222,28 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals("The type values should be equal.", user.getType(), resultUser.getType());
 		Assert.assertEquals("The assign dates should be equal.", user.getAssignDate(), resultUser.getAssignDate());
 		Assert.assertEquals("The close dates should be equal.", user.getCloseDate(), resultUser.getCloseDate());
+	}
+	
+	@Test
+	public void testGetPersonByEmail() {
+		final Person person = UserDataManagerImplTest.personTDI.createPerson();
+		this.userDataManager.addPerson(person);
+		
+		final Person resultPerson = this.userDataManager.getPersonByEmail(person.getEmail());
+		Assert.assertNotNull(resultPerson);
+		Assert.assertEquals("The first names should be equal.", person.getFirstName(), resultPerson.getFirstName());
+		Assert.assertEquals("The middle names should be equal.", person.getMiddleName(), resultPerson.getMiddleName());
+		Assert.assertEquals("The last names should be equal.", person.getLastName(), resultPerson.getLastName());
+		Assert.assertEquals("The ids should be equal.", person.getId(), resultPerson.getId());
+		Assert.assertEquals("The institute ids should be equal.", person.getInstituteId(), resultPerson.getInstituteId());
+		Assert.assertEquals("The position names should be equal.", person.getPositionName(), resultPerson.getPositionName());
+		Assert.assertEquals("The titles should be equal.", person.getTitle(), resultPerson.getTitle());
+		Assert.assertEquals("The extension values should be equal.", person.getExtension(), resultPerson.getExtension());
+		Assert.assertEquals("The fax values should be equal.", person.getFax(), resultPerson.getFax());
+		Assert.assertEquals("The emails should be equal.", person.getEmail(), resultPerson.getEmail());
+		Assert.assertEquals("The notes should be equal.", person.getNotes(), resultPerson.getNotes());
+		Assert.assertEquals("The contact should be equal.", person.getContact(), resultPerson.getContact());
+		Assert.assertEquals("The language values should be equal.", person.getLanguage(), resultPerson.getLanguage());
+		Assert.assertEquals("The phone values should be equal.", person.getPhone(), resultPerson.getPhone());
 	}
 }
