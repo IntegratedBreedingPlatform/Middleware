@@ -450,6 +450,30 @@ public class ListInventoryBuilder extends Builder {
 			allScales.add(TermBuilder.mapCVTermToTerm(cvTerm));
 		}
 
+		Map<Integer, String> mapScaleAbbrMap = new HashMap<>();
+		Map<Integer, Integer> scaleIdWiseTermId = new HashMap<>();
+		if(!scaleIds.isEmpty()){
+
+			final List<CVTermRelationship> relationshipsOfScales = this.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(scaleIds,
+					TermId.HAS_SCALE.getId());
+			List<Integer> listObjectIds = new ArrayList<>();
+			if(relationshipsOfScales != null){
+				for(CVTermRelationship relationship : relationshipsOfScales){
+					scaleIdWiseTermId.put(relationship.getSubjectId(), relationship.getObjectId());
+					listObjectIds.add(relationship.getObjectId());
+				}
+
+				List<CVTerm> listScaleCvTerm = this.getCvTermDao().getByIds(listObjectIds);
+
+				for (final CVTerm cvTerm : listScaleCvTerm) {
+					Term term = TermBuilder.mapCVTermToTerm(cvTerm);
+					mapScaleAbbrMap.put(term.getId(), term.getName());
+				}
+
+			}
+		}
+
+
 		for (final Location location : allLocations) {
 			final List<LotDetails> lotList = locationLotMap.get(location.getLocid());
 			for (final LotDetails lot : lotList) {
@@ -461,6 +485,16 @@ public class ListInventoryBuilder extends Builder {
 			final List<LotDetails> lotList = scaleLotMap.get(scale.getId());
 			for (final LotDetails lot : lotList) {
 				lot.setScaleOfLot(scale);
+				String scaleAbbr = "";
+				if(scaleIdWiseTermId.containsKey(lot.getScaleId())){
+					Integer hasScaleCvTermId = scaleIdWiseTermId.get(lot.getScaleId());
+
+					if(mapScaleAbbrMap.containsKey(hasScaleCvTermId)){
+						scaleAbbr = mapScaleAbbrMap.get(hasScaleCvTermId);
+					}
+				}
+				lot.setLotScaleNameAbbr(scaleAbbr);
+
 			}
 		}
 	}
