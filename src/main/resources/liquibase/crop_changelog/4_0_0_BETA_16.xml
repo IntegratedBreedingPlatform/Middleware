@@ -54,5 +54,18 @@
 
 	</changeSet>
 
+	<changeSet author="abhishekptl" id="beta16-5">
+
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id = 1737;</sqlCheck>
+		</preConditions>
+
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm VALUES (1737, 1000, 'ACTUAL BALANCE', 'Total of all unreserved seed, plus reserved seed that is not yet committed', null, 0, 0);
+		</sql>
+
+	</changeSet>
+
+
 
 </databaseChangeLog>
