@@ -24,15 +24,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ToolLicenseInfoDAO extends GenericDAO<ToolLicenseInfo, Integer> {
 
-	public ToolLicenseInfo getByToolName(String toolName) {
+	public ToolLicenseInfo getByToolName(final String toolName) {
 		try {
-			Criteria criteria = this.getSession().createCriteria(ToolLicenseInfo.class);
+			final Criteria criteria = this.getSession().createCriteria(ToolLicenseInfo.class);
 			criteria.createAlias("tool", "t");
 			criteria.add(Restrictions.eq("t.toolName", toolName));
 			criteria.setMaxResults(1);
 			return (ToolLicenseInfo) criteria.uniqueResult();
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByToolName(toolName=" + toolName + ") query from ToolLicenseInfoDAO: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			this.logAndThrowException(
+					"Error with getByToolName(toolName=" + toolName + ") query from ToolLicenseInfoDAO: " + e.getMessage(), e);
 		}
 		return null;
 	}

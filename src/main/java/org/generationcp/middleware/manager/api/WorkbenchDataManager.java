@@ -1017,14 +1017,14 @@ public interface WorkbenchDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException;
-	
+
 	/**
 	 * Get the list of tool license information
 	 *
 	 * @return the list of tool license information
 	 */
 	List<ToolLicenseInfo> getListOfToolLicenseInfo();
-	
+
 	/**
 	 * Get license info by tool name
 	 *
