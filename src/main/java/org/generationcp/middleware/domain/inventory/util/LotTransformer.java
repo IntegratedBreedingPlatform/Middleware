@@ -80,7 +80,7 @@ public class LotTransformer {
 								}
 							}
 							else if(statusSet.size() > 1){
-								status = ListDataInventory.WITHDRAWN;
+								status = ListDataInventory.RESERVED;
 							}
 						}
 
