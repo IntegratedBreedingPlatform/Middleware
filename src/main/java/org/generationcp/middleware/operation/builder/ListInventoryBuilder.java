@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.domain.inventory.GermplasmInventory;
+import com.google.common.collect.Sets;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
@@ -65,9 +65,9 @@ public class ListInventoryBuilder extends Builder {
 	private void retrieveWithdrawalAndStatus(final List<Integer> entryIds, final List<GermplasmListData> listEntries, final List<Integer> gids,
 			final List<Integer> lrecIds) throws MiddlewareQueryException {
 		this.retrieveWithdrawalBalance(listEntries, lrecIds);
+		this.retrieveWithdrawalStatus(listEntries, gids);
 		this.setAvailableBalanceScale(listEntries);
 		this.setWithdrawalBalanceScale(listEntries);
-		this.setTransactionStatus(listEntries);
 
 	}
 
@@ -242,26 +242,6 @@ public class ListInventoryBuilder extends Builder {
 
 	}
 
-	private void setTransactionStatus(final List<GermplasmListData> listEntries){
-		for(GermplasmListData entry : listEntries){
-			if(entry.getInventoryInfo() != null){
-				Integer distinctCountWithdrawalStatus = entry.getInventoryInfo().getDistinctCountWithdrawalStatus();
-				if(distinctCountWithdrawalStatus == 0){
-					entry.getInventoryInfo().setTransactionStatus("");
-				}else if(distinctCountWithdrawalStatus == 1){
-					if(entry.getInventoryInfo().getWithdrawalStatus() == 0){
-						entry.getInventoryInfo().setTransactionStatus(GermplasmInventory.RESERVED);
-					}
-					if(entry.getInventoryInfo().getWithdrawalStatus() == 1){
-						entry.getInventoryInfo().setTransactionStatus(GermplasmInventory.WITHDRAWN);
-					}
-				}else{
-					entry.getInventoryInfo().setTransactionStatus(GermplasmInventory.MIXED);
-				}
-			}
-		}
-	}
-
 
 	private void retrieveStockIds(final List<GermplasmListData> listEntries, final List<Integer> lrecIds) {
 		final Map<Integer, String> stockIDs = this.getTransactionDao().retrieveStockIds(lrecIds);
@@ -398,7 +378,7 @@ public class ListInventoryBuilder extends Builder {
 	 */
 	private void retrieveWithdrawalBalance(final List<GermplasmListData> listEntries, final List<Integer> listEntryIds)
 			throws MiddlewareQueryException {
-		final Map<Integer, Object[]> withdrawalData = this.getTransactionDao().retrieveWithdrawalBalanceWithDistinctTransactionStatus(listEntryIds);
+		final Map<Integer, Object[]> withdrawalData = this.getTransactionDao().retrieveWithdrawalBalanceWithDistinctScale(listEntryIds);
 		for (final GermplasmListData entry : listEntries) {
 			final ListDataInventory inventory = entry.getInventoryInfo();
 			if (inventory != null) {
@@ -406,29 +386,142 @@ public class ListInventoryBuilder extends Builder {
  				if (withdrawalPerRecord != null) {
 					inventory.setWithdrawalBalance((Double)withdrawalPerRecord[0]);
 
-					BigInteger countDistinctStatus = (BigInteger) withdrawalPerRecord[1];
-					inventory.setDistinctCountWithdrawalStatus(countDistinctStatus.intValue());
-					inventory.setWithdrawalStatus((Integer) withdrawalPerRecord[2]);
-
-					BigInteger countWithDrawalScale = (BigInteger) withdrawalPerRecord[3];
+					BigInteger countWithDrawalScale = (BigInteger) withdrawalPerRecord[1];
 					inventory.setDistinctCountWithdrawalScale(countWithDrawalScale.intValue());
-					inventory.setWithdrawalScaleId((Integer) withdrawalPerRecord[4]);
-
-
+					inventory.setWithdrawalScaleId((Integer) withdrawalPerRecord[2]);
 
 				} else {
 					inventory.setWithdrawalBalance(0.0);
 					inventory.setDistinctCountWithdrawalScale(0);
 					inventory.setWithdrawalScaleId(null);
 					inventory.setWithdrawalScale(null);
-
-					inventory.setDistinctCountWithdrawalStatus(0);
-					inventory.setWithdrawalStatus(null);
-					inventory.setTransactionStatus(null);
 				}
 			}
 		}
 	}
+
+
+	/*
+	 * Retrieve withdrawal status per entry along with overall status
+	 */
+	private void retrieveWithdrawalStatus(final List<GermplasmListData> listEntries, final List<Integer> gIds)
+			throws MiddlewareQueryException {
+		Integer sourceId = listEntries.get(0).getList().getId();
+		final List<Object[]> withdrawalData = this.getTransactionDao().retrieveWithdrawalStatus(sourceId,gIds);
+
+		final Map<Integer, HashSet<Integer>> germplasmWiseLotsMap = new HashMap<>();
+		final Map<Integer, HashSet<Integer>> lotWiseStatus = new HashMap<>();
+		final Map<Integer, Integer> lotWiseDistinctStatus = new HashMap<>();
+		Integer lotId = null;
+		Integer germplsmId = null;
+		Object tranStatus = null;
+		if(withdrawalData != null && !withdrawalData.isEmpty()){
+			for(Object[] withdrawalStatusData : withdrawalData){
+				lotId = (Integer)withdrawalStatusData[0];
+				germplsmId = (Integer)withdrawalStatusData[1];
+				tranStatus = withdrawalStatusData[3];
+
+				if(!lotWiseDistinctStatus.containsKey(lotId)){
+					lotWiseDistinctStatus.put((Integer)lotId, 0);
+				}
+				Integer lotCount = lotWiseDistinctStatus.get(lotId);
+				lotCount += 1;
+				lotWiseDistinctStatus.put((Integer)lotId, lotCount);
+
+				if(tranStatus != null){
+					if(!lotWiseStatus.containsKey(lotId)){
+						lotWiseStatus.put(lotId, new HashSet<Integer>());
+					}
+					lotWiseStatus.get(lotId).add((Integer)tranStatus);
+				}
+				else{
+					lotWiseStatus.put(lotId, new HashSet<Integer>());
+				}
+
+				if(!germplasmWiseLotsMap.containsKey(germplsmId)){
+					germplasmWiseLotsMap.put(germplsmId, Sets.<Integer>newHashSet());
+				}
+				germplasmWiseLotsMap.get(germplsmId).add(lotId);
+
+			}
+		}
+
+
+		for (final GermplasmListData entry : listEntries) {
+			final ListDataInventory inventory = entry.getInventoryInfo();
+			Integer germplasmId = entry.getGermplasmId();
+			if (inventory != null) {
+				String status = "";
+				if(germplasmWiseLotsMap.containsKey(germplasmId)){
+					HashSet<Integer> germplsLots = germplasmWiseLotsMap.get(germplasmId);
+
+					if(germplsLots.size() == 1){
+						Integer lotID = germplsLots.iterator().next();
+						HashSet<Integer> oneLotStatusSet = lotWiseStatus.get(lotID);
+
+						if(oneLotStatusSet != null){
+							if(oneLotStatusSet.size() == 1){
+								Integer oneLotStatus = oneLotStatusSet.iterator().next();
+								if(oneLotStatus == 1){
+									status = ListDataInventory.WITHDRAWN;
+								}
+								else if(oneLotStatus == 0){
+									status = ListDataInventory.RESERVED;
+								}
+							}
+							else if(oneLotStatusSet.size() > 1){
+								status = ListDataInventory.RESERVED;
+							}
+
+						}
+					}
+					else if(germplsLots.size() > 1){
+						Integer distinctStatusCount = 0;
+						HashSet<Integer> distinctCount = new HashSet<>();
+						HashSet<Integer> distinctStatus = new HashSet<>();
+						for(Integer lotID : germplsLots){
+							distinctStatusCount = lotWiseDistinctStatus.get(lotID);
+							distinctStatus.addAll(lotWiseStatus.get(lotID));
+						}
+
+						if(distinctStatus.size() == 0){
+							status = "";
+						}
+						else if(distinctStatus.size() == 1){
+							Integer singleStatus = distinctStatus.iterator().next();
+							if(singleStatus == 1){
+								status = ListDataInventory.WITHDRAWN;
+							}
+							else if(singleStatus == 0){
+								status = ListDataInventory.RESERVED;
+							}
+						}
+						else{
+							boolean allLotsContainsAllStatus = true;
+							for(Integer lotID : germplsLots){
+								HashSet<Integer> lotStatus = lotWiseStatus.get(lotID);
+
+								if(lotStatus.size() >=1 && !lotStatus.containsAll(distinctStatus)){
+									allLotsContainsAllStatus = false;
+									break;
+								}
+
+							}
+
+							if(allLotsContainsAllStatus){
+								status = ListDataInventory.RESERVED;
+							}else {
+								status = ListDataInventory.MIXED;
+							}
+						}
+					}
+
+				}
+				inventory.setTransactionStatus(status);
+			}
+		}
+	}
+
 
 
 	/*
