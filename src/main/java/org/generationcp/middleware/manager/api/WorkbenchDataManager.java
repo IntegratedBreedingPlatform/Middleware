@@ -939,11 +939,11 @@ public interface WorkbenchDataManager {
 	ToolLicenseInfo getToolLicenseInfoByToolName(String toolName);
 
 	/**
-	 * Update license info
+	 * Save or update the license info
 	 *
 	 * @param licenseInfo the ToolLicenseInfo Hibernate Object
-	 * @return the updated ToolLicenseInfo Hibernate Object
+	 * @return the saved/updated ToolLicenseInfo Hibernate Object
 	 */
-	ToolLicenseInfo updateToolLicenseInfo(ToolLicenseInfo licenseInfo);
+	ToolLicenseInfo saveOrUpdateToolLicenseInfo(ToolLicenseInfo licenseInfo);
 
 }

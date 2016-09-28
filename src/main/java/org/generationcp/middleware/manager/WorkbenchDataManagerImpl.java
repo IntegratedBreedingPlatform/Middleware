@@ -1517,8 +1517,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public ToolLicenseInfo updateToolLicenseInfo(final ToolLicenseInfo licenseInfo) {
-		return this.getToolLicenseInfoDAO().update(licenseInfo);
+	public ToolLicenseInfo saveOrUpdateToolLicenseInfo(final ToolLicenseInfo licenseInfo) {
+		return this.getToolLicenseInfoDAO().saveOrUpdate(licenseInfo);
 	}
 
 }
