@@ -17,7 +17,7 @@
 					VALUES (8831,1040,'NBLKS','Number of blocks in an experimental design.',NULL,0,0);
 
 			INSERT INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`)
-					VALUES (8832,1200,'ED - number of blocks','ED - number of blocks',NULL,0,0);
+					VALUES (8832,1010,'ED - number of blocks','ED - number of blocks',NULL,0,0);
 
 			INSERT INTO cvterm_relationship(type_id, subject_id, object_id) VALUES (1200,8831,8832),(1210,8831,4030),(1220,8831,6020);
 
