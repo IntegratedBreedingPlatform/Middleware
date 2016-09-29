@@ -27,6 +27,8 @@ public class LotAggregateData implements Serializable {
 
 	private String stockIds;
 
+	private Integer transactionId;
+
 	// key = record id and value = reserved quantity
 	private Map<Integer, Double> reservationMap;
 
@@ -101,6 +103,14 @@ public class LotAggregateData implements Serializable {
 
 	public void setReservationStatusMap(Map<Integer, Set<String>> reservationStatusMap) {
 		this.reservationStatusMap = reservationStatusMap;
+	}
+
+	public Integer getTransactionId() {
+		return transactionId;
+	}
+
+	public void setTransactionId(Integer transactionId) {
+		this.transactionId = transactionId;
 	}
 
 	@Override

@@ -16,6 +16,7 @@ public class LotDetails implements Serializable {
 	private Integer scaleId;
 	private Integer locId;
 	private String lotScaleNameAbbr;
+	private String lotScaleMethodName;
 	private String commentOfLot;
 
 	// computed or looked up values
@@ -27,6 +28,7 @@ public class LotDetails implements Serializable {
 	private Double reservedTotal;
 	private Term scaleOfLot;
 	private String stockIds;
+	private Integer transactionId;
 
 	public Integer getLotId() {
 		return this.lotId;
@@ -138,6 +140,22 @@ public class LotDetails implements Serializable {
 
 	public void setLotScaleNameAbbr(String lotScaleNameAbbr) {
 		this.lotScaleNameAbbr = lotScaleNameAbbr;
+	}
+
+	public Integer getTransactionId() {
+		return transactionId;
+	}
+
+	public void setTransactionId(Integer transactionId) {
+		this.transactionId = transactionId;
+	}
+
+	public String getLotScaleMethodName() {
+		return lotScaleMethodName;
+	}
+
+	public void setLotScaleMethodName(String lotScaleMethodName) {
+		this.lotScaleMethodName = lotScaleMethodName;
 	}
 
 	@Override
