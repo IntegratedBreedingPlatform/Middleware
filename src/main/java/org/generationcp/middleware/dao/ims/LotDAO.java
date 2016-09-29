@@ -367,7 +367,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			List<Integer> statusList = Lists.newArrayList();
 			statusList.add(0);
 			statusList.add(1);
-			query.setParameter("statusList", statusList);
+			query.setParameterList("statusList", statusList);
 
 			this.createLotRows(lots, query, true);
 
@@ -391,7 +391,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			List<Integer> statusList = Lists.newArrayList();
 			statusList.add(0);
 			statusList.add(1);
-			query.setParameter("statusList", statusList);
+			query.setParameterList("statusList", statusList);
 
 			this.createLotRows(lots, query, true);
 
@@ -414,7 +414,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.setParameter("listId", listId);
 			List<Integer> statusList = Lists.newArrayList();
 			statusList.add(0);
-			query.setParameter("statusList", statusList);
+			query.setParameterList("statusList", statusList);
 
 			this.createLotRows(lots, query, true);
 
