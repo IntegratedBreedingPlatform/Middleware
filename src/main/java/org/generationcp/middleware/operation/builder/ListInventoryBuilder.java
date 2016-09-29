@@ -305,6 +305,38 @@ public class ListInventoryBuilder extends Builder {
 		return listEntries;
 	}
 
+
+	/**
+	 * Return list of GermplasmListData objects for given list with list of reserved lots associated per germplasm entry
+	 *
+	 * @param listId
+	 * @param start
+	 * @param numOfRows
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	public List<GermplasmListData> retrieveReservedInventoryLotsForList(final Integer listId, final int start, final int numOfRows,
+			final List<GermplasmListData> listEntries) throws MiddlewareQueryException {
+
+		final List<Integer> listEntryIds = new ArrayList<Integer>();
+		final List<Integer> gids = new ArrayList<Integer>();
+		for (final GermplasmListData entry : listEntries) {
+			listEntryIds.add(entry.getId());
+			gids.add(entry.getGid());
+			entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
+		}
+
+		if (listEntries != null && !listEntries.isEmpty()) {
+
+			final List<Lot> lots = this.getLotDao().getReservedLotAggregateDataForList(listId, gids);
+
+			final List<ListEntryLotDetails> lotRows = LotTransformer.extractLotRowsForList(listEntries, lots);
+			this.setLocationsAndScales(lotRows);
+		}
+		return listEntries;
+	}
+
+
 	public List<ListEntryLotDetails> retrieveInventoryLotsForListEntry(final Integer listId, final Integer recordId, final Integer gid)
 			throws MiddlewareQueryException {
 		List<ListEntryLotDetails> lotRows = new ArrayList<ListEntryLotDetails>();
@@ -476,11 +508,8 @@ public class ListInventoryBuilder extends Builder {
 						}
 					}
 					else if(germplsLots.size() > 1){
-						Integer distinctStatusCount = 0;
-						HashSet<Integer> distinctCount = new HashSet<>();
 						HashSet<Integer> distinctStatus = new HashSet<>();
 						for(Integer lotID : germplsLots){
-							distinctStatusCount = lotWiseDistinctStatus.get(lotID);
 							distinctStatus.addAll(lotWiseStatus.get(lotID));
 						}
 
@@ -497,25 +526,40 @@ public class ListInventoryBuilder extends Builder {
 							}
 						}
 						else{
-							boolean allLotsContainsAllStatus = true;
+							Set<Integer> overallStatus = new HashSet<>();
 							for(Integer lotID : germplsLots){
 								HashSet<Integer> lotStatus = lotWiseStatus.get(lotID);
 
-								if(lotStatus.size() >=1 && !lotStatus.containsAll(distinctStatus)){
-									allLotsContainsAllStatus = false;
-									break;
+								if(lotStatus.size() == 1){
+									if(lotStatus.contains(0)){
+										overallStatus.add(0);
+									}
+									else if(lotStatus.contains(1)){
+										overallStatus.add(1);
+									}
+								}
+								else if(lotStatus.size() > 1){
+									overallStatus.add(0);
 								}
 
 							}
 
-							if(allLotsContainsAllStatus){
-								status = ListDataInventory.RESERVED;
-							}else {
+							if(overallStatus.size() == 1){
+								Integer transactionStatus = overallStatus.iterator().next();
+								if(transactionStatus == 0){
+									status = ListDataInventory.RESERVED;
+								}
+								else if(transactionStatus == 1){
+									status = ListDataInventory.WITHDRAWN;
+								}
+
+							}
+							else if(overallStatus.size() > 1){
 								status = ListDataInventory.MIXED;
 							}
+
 						}
 					}
-
 				}
 				inventory.setTransactionStatus(status);
 			}
@@ -544,11 +588,15 @@ public class ListInventoryBuilder extends Builder {
 		}
 
 		Map<Integer, String> mapScaleAbbrMap = new HashMap<>();
+		Map<Integer, String> mapScaleMethodMap = new HashMap<>();
 		Map<Integer, Integer> scaleIdWiseTermId = new HashMap<>();
+		Map<Integer, Integer> scaleIdWiseMethodTermId = new HashMap<>();
 		if(!scaleIds.isEmpty()){
 
 			final List<CVTermRelationship> relationshipsOfScales = this.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(scaleIds,
 					TermId.HAS_SCALE.getId());
+
+
 			List<Integer> listObjectIds = new ArrayList<>();
 			if(relationshipsOfScales != null){
 				for(CVTermRelationship relationship : relationshipsOfScales){
@@ -562,6 +610,26 @@ public class ListInventoryBuilder extends Builder {
 					Term term = TermBuilder.mapCVTermToTerm(cvTerm);
 					mapScaleAbbrMap.put(term.getId(), term.getName());
 				}
+
+			}
+
+			final List<CVTermRelationship> scaleMethodRelationship = this.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(scaleIds,
+					TermId.HAS_METHOD.getId());
+
+			List<Integer> listMethodObjectIds = new ArrayList<>();
+			if(scaleMethodRelationship != null){
+				for(CVTermRelationship relationship : scaleMethodRelationship){
+					scaleIdWiseMethodTermId.put(relationship.getSubjectId(), relationship.getObjectId());
+					listMethodObjectIds.add(relationship.getObjectId());
+				}
+
+				List<CVTerm> listScaleMethodCvTerm = this.getCvTermDao().getByIds(listMethodObjectIds);
+
+				for (final CVTerm cvTerm : listScaleMethodCvTerm) {
+					Term term = TermBuilder.mapCVTermToTerm(cvTerm);
+					mapScaleMethodMap.put(term.getId(), term.getName());
+				}
+
 
 			}
 		}
@@ -578,15 +646,29 @@ public class ListInventoryBuilder extends Builder {
 			final List<LotDetails> lotList = scaleLotMap.get(scale.getId());
 			for (final LotDetails lot : lotList) {
 				lot.setScaleOfLot(scale);
-				String scaleAbbr = "";
+				String scaleName = "";
+
 				if(scaleIdWiseTermId.containsKey(lot.getScaleId())){
 					Integer hasScaleCvTermId = scaleIdWiseTermId.get(lot.getScaleId());
 
 					if(mapScaleAbbrMap.containsKey(hasScaleCvTermId)){
-						scaleAbbr = mapScaleAbbrMap.get(hasScaleCvTermId);
+						scaleName = mapScaleAbbrMap.get(hasScaleCvTermId);
+					}
+
+
+				}
+
+				lot.setLotScaleNameAbbr(scaleName);
+
+				String scaleMethodName = "";
+				if(scaleIdWiseMethodTermId.containsKey(lot.getScaleId())){
+					Integer hasMethodCvTermId = scaleIdWiseMethodTermId.get(lot.getScaleId());
+
+					if(mapScaleMethodMap.containsKey(hasMethodCvTermId)){
+						scaleMethodName = mapScaleMethodMap.get(hasMethodCvTermId);
 					}
 				}
-				lot.setLotScaleNameAbbr(scaleAbbr);
+				lot.setLotScaleMethodName(scaleMethodName);
 
 			}
 		}
