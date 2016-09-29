@@ -66,6 +66,19 @@
 
 	</changeSet>
 
+	<changeSet author="abhishekptl" id="beta16-6">
+
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="ims_transaction"></tableExists>
+		</preConditions>
+
+		<update tableName="ims_transaction">
+			<column name="trnstat" value="1" type="INT(11)" />
+			<where>trnstat = 0 and trnqty &lt; 0</where>
+		</update>
+
+	</changeSet>
+
 
 
 </databaseChangeLog>
