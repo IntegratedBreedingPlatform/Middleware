@@ -30,6 +30,13 @@ public class LotDetails implements Serializable {
 	private String stockIds;
 	private Integer transactionId;
 
+	//for transaction status commited/reserved
+	private Boolean transactionStatus;
+
+	public Boolean getTransactionStatus() {return transactionStatus;}
+
+	public void setTransactionStatus(Boolean transactionStatus) {this.transactionStatus = transactionStatus;}
+
 	public Integer getLotId() {
 		return this.lotId;
 	}
