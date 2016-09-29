@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.LotAggregateData;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -77,13 +78,13 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	private static final String GET_LOTS_FOR_GERMPLASM_WITH_FILTERED_STOCKS = LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_FILTERED_STOCKS
 			+ LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
 
-	private static final String GET_LOTS_FOR_LIST_ENTRIES = "SELECT lot.*, recordid, trnqty * -1, trnstat " + "FROM " + "   ("
+	private static final String GET_LOTS_FOR_LIST_ENTRIES = "SELECT lot.*, recordid, trnqty * -1, trnstat, trnid " + "FROM " + "   ("
 			+ LotDAO.GET_LOTS_FOR_GERMPLASM + "   ) lot " + " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid "
-			+ "  AND trnstat in (0,1) AND trnqty < 0 " + "  AND sourceid = :listId AND sourcetype = 'LIST' ";
+			+ "  AND trnstat in (:statusList) AND trnqty < 0 " + "  AND sourceid = :listId AND sourcetype = 'LIST' ";
 
-	private static final String GET_LOTS_FOR_LIST = "SELECT lot.*, recordid, trnqty * -1 , trnstat " + "FROM " + "   ("
+	private static final String GET_LOTS_FOR_LIST = "SELECT lot.*, recordid, trnqty * -1 , trnstat, trnid " + "FROM " + "   ("
 			+ LotDAO.GET_LOTS_FOR_GERMPLASM_WITH_FILTERED_STOCKS + "   ) lot " + " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid "
-			+ "  AND trnstat in (0,1) AND trnqty < 0 " + "  AND sourceid = :listId AND sourcetype = 'LIST' ";
+			+ "  AND trnstat in (:statusList) AND trnqty < 0 " + "  AND sourceid = :listId AND sourcetype = 'LIST' ";
 
 	@SuppressWarnings("unchecked")
 	public List<Lot> getByEntityType(String type, int start, int numOfRows) throws MiddlewareQueryException {
@@ -363,6 +364,11 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.setParameterList("gids", Collections.singletonList(gid));
 			query.setParameter("listId", listId);
 
+			List<Integer> statusList = Lists.newArrayList();
+			statusList.add(0);
+			statusList.add(1);
+			query.setParameter("statusList", statusList);
+
 			this.createLotRows(lots, query, true);
 
 		} catch (Exception e) {
@@ -382,6 +388,10 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			Query query = this.getSession().createSQLQuery(sql);
 			query.setParameterList("gids", gids);
 			query.setParameter("listId", listId);
+			List<Integer> statusList = Lists.newArrayList();
+			statusList.add(0);
+			statusList.add(1);
+			query.setParameter("statusList", statusList);
 
 			this.createLotRows(lots, query, true);
 
@@ -392,6 +402,29 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 		return lots;
 	}
+
+	public List<Lot> getReservedLotAggregateDataForList(Integer listId, List<Integer> gids) throws MiddlewareQueryException {
+		List<Lot> lots = new ArrayList<Lot>();
+
+		try {
+			String sql = LotDAO.GET_LOTS_FOR_LIST + " ORDER by lot.eid ";
+
+			Query query = this.getSession().createSQLQuery(sql);
+			query.setParameterList("gids", gids);
+			query.setParameter("listId", listId);
+			List<Integer> statusList = Lists.newArrayList();
+			statusList.add(0);
+			query.setParameter("statusList", statusList);
+
+			this.createLotRows(lots, query, true);
+
+		} catch (Exception e) {
+			this.logAndThrowException("Error at getReservedLotAggregateDataForList for list ID = " + listId + " and GIDs = " + gids
+					+ AT_LOT_DAO + e.getMessage(), e);
+		}
+		return lots;
+	}
+
 
 	public List<Lot> getLotAggregateDataForGermplasm(Integer gid) throws MiddlewareQueryException {
 		List<Lot> lots = new ArrayList<Lot>();
@@ -477,6 +510,11 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 						reservationStatusMap.put(recordId, new HashSet<String>());
 					}
 					reservationStatusMap.get(recordId).add(String.valueOf(transactionState));
+				}
+
+				if(row[13] != null){
+					Integer transactionId = (Integer)row[13];
+					lot.getAggregateData().setTransactionId(transactionId);
 				}
 
 			}
