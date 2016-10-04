@@ -7,9 +7,12 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<include file="workbench_changelog/4_0_0_BETA_09.xml" relativeToChangelogFile="true"/>
-	<include file="workbench_changelog/4_0_0_BETA_12.xml" relativeToChangelogFile="true"/>
-	<include file="workbench_changelog/4_0_0_BETA_14.xml" relativeToChangelogFile="true"/>
-	<include file="workbench_changelog/4_0_0_BETA_15.xml" relativeToChangelogFile="true"/>
-	<include file="workbench_changelog/4_0_0_BETA_16.xml" relativeToChangelogFile="true"/>
+	<changeSet author="darla" id="beta16-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'persons' AND CONSTRAINT_NAME='persons_uc1' and TABLE_SCHEMA = DATABASE();</sqlCheck>
+		</preConditions>
+	    <addUniqueConstraint columnNames="pemail" constraintName="persons_uc1" tableName="persons" />
+	</changeSet>
+
+
 </databaseChangeLog>
