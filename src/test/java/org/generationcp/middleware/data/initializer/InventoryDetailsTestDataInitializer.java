@@ -16,7 +16,7 @@ public class InventoryDetailsTestDataInitializer {
 
 	private static final int PERSON_ID = 1;
 	private static final String LIST_SOURCE_TYPE = "LIST";
-	private static final String GERMPLASM_ENTITY_TYPE = "GERMPLASM";
+	private static final String GERMPLASM_ENTITY_TYPE = "GERMPLSM";
 	private static final int USER_ID = 1;
 	private static final int NO_OF_STOCK_LIST_ENTRIES = 20;
 
@@ -91,6 +91,38 @@ public class InventoryDetailsTestDataInitializer {
 			transaction.setTransactionDate(20160101);
 			transaction.setStatus(0);
 			transaction.setQuantity(Math.random() * lots.size());
+			transaction.setSourceType(LIST_SOURCE_TYPE);
+			transaction.setSourceRecordId(lotIdLrecIdMap.get(lot.getId()));
+			transaction.setInventoryID(inventoryIdPrefix + lot.getId());
+			transaction.setSourceId(listId);
+
+			transactions.add(transaction);
+		}
+
+		return transactions;
+	}
+
+	/**
+	 * This method creates set of reserved transactions with the following parameters:
+	 *
+	 * @param lots
+	 * @param listId
+	 * @param lotIdLrecIdMap - Map of Lot Id and Germplasm List Data Id
+	 * @param inventoryIdPrefix
+	 * @return
+	 */
+	public List<Transaction> createReservedTransactions(final List<Lot> lots, final Integer listId, final Map<Integer, Integer> lotIdLrecIdMap,
+			final String inventoryIdPrefix) {
+		final List<Transaction> transactions = new ArrayList<Transaction>();
+
+		for (final Lot lot : lots) {
+			final Transaction transaction = new Transaction();
+			transaction.setUserId(USER_ID);
+			transaction.setPersonId(PERSON_ID);
+			transaction.setLot(lot);
+			transaction.setTransactionDate(20160101);
+			transaction.setStatus(0);
+			transaction.setQuantity(new Double("-100"));
 			transaction.setSourceType(LIST_SOURCE_TYPE);
 			transaction.setSourceRecordId(lotIdLrecIdMap.get(lot.getId()));
 			transaction.setInventoryID(inventoryIdPrefix + lot.getId());
