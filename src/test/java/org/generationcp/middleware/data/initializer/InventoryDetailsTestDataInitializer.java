@@ -6,8 +6,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.beust.jcommander.internal.Lists;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
+import org.generationcp.middleware.domain.inventory.ListDataInventory;
+import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
@@ -161,4 +166,56 @@ public class InventoryDetailsTestDataInitializer {
 
 		return stockTransactions;
 	}
+
+	public static List<GermplasmListData> createGermplasmListDataForReservedEntries(){
+		List germplasmListData = Lists.newArrayList();
+
+		final GermplasmListData listEntry = new GermplasmListData();
+		listEntry.setId(1);
+		listEntry.setDesignation("Des");
+		listEntry.setEntryId(1);
+		listEntry.setGroupName("GroupName");
+		listEntry.setStatus(0);
+		listEntry.setSeedSource("SeedSource");
+		listEntry.setGid(28);
+		listEntry.setMgid(0);
+
+		final List<ListEntryLotDetails> lots = new ArrayList<ListEntryLotDetails>();
+
+		final ListEntryLotDetails lotDetails = new ListEntryLotDetails();
+		lotDetails.setLotId(1);
+		lotDetails.setReservedTotalForEntry(2.0);
+		lotDetails.setLotScaleMethodName("weight");
+		lotDetails.setLotScaleNameAbbr("g");
+		Location location = new Location(1);
+		location.setLname("locName");
+		lotDetails.setLocationOfLot(location);
+		lotDetails.setStockIds("stockIds");
+		lotDetails.setTransactionId(120);
+		lotDetails.setCommentOfLot("comments");
+		lotDetails.setAvailableLotBalance(1.0);
+		lotDetails.setActualLotBalance(5.0);
+		lotDetails.setReservedTotalForEntry(2.0);
+		lotDetails.setReservedTotal(2.0);
+
+		lots.add(lotDetails);
+		ListDataInventory listDataInfo = new ListDataInventory(1,28);
+		listDataInfo.setLotRows(lots);
+		listEntry.setInventoryInfo(listDataInfo);
+		germplasmListData.add(listEntry);
+
+		return germplasmListData;
+	}
+
+
+	public static List<Transaction> createValidReservedTransactions(){
+		Transaction transaction = new Transaction();
+		transaction.setId(110);
+		transaction.setQuantity(-2.0);
+		transaction.setStatus(0);
+		transaction.setComments("comments");
+
+		return Lists.newArrayList(transaction);
+	}
+
 }
