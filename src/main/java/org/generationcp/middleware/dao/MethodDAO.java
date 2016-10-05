@@ -464,10 +464,10 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		}
 	}
 	
-	public List<Method> getFavoriteMethodsByType(final String mType, final String programUUID) throws MiddlewareQueryException {
+	public List<Method> getFavoriteMethodsByMethodType(final String methodType, final String programUUID) throws MiddlewareQueryException {
 		try {
 			Query query = this.getSession().getNamedQuery(Method.GET_FAVORITE_METHODS_BY_TYPE);
-			query.setParameter("mType", mType);
+			query.setParameter("mType", methodType);
 			query.setParameter("programUUID", programUUID);
 			return query.list();
 		} catch (HibernateException e) {

@@ -1169,6 +1169,6 @@ public interface GermplasmDataManager {
 	 * @param programUUID
 	 * @return list of favorite methods
 	 */
-	List<Method> getFavoriteMethodsByMType(String mType, String programUUID);
+	List<Method> getFavoriteMethodsByMethodType(String methodType, String programUUID);
 
 }

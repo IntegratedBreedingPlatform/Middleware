@@ -1078,7 +1078,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final ProgramFavorite programFavorite = this.programFavoriteTDI.createProgramFavorite(method.getMid(), programUUID);
 		this.germplasmDataManager.saveProgramFavorite(programFavorite);
 		
-		final List<Method> methods = this.germplasmDataManager.getFavoriteMethodsByMType(method.getMtype(), programUUID);
+		final List<Method> methods = this.germplasmDataManager.getFavoriteMethodsByMethodType(method.getMtype(), programUUID);
 		final Method resultMethod = methods.get(0);
 		Assert.assertEquals("The method code should be " + method.getMcode(), method.getMcode(), resultMethod.getMcode());
 		Assert.assertEquals("The method id should be " + method.getMid(), method.getMid(), resultMethod.getMid());
