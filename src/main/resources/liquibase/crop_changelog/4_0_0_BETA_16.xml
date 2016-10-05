@@ -79,6 +79,22 @@
 
 	</changeSet>
 
+	<changeSet author="aldrinb" id="1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8831 AND name = 'NBLKS';</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
 
+			INSERT INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`)
+			VALUES (8831,1040,'NBLKS','Number of blocks in an experimental design.',NULL,0,0);
+
+			INSERT INTO `cvterm` (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`)
+			VALUES (8832,1010,'ED - number of blocks','ED - number of blocks',NULL,0,0);
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id) VALUES (1200,8831,8832),(1210,8831,4030),(1220,8831,6020);
+
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES (8831,1800,'Study Detail',0);
+		</sql>
+	</changeSet>
 
 </databaseChangeLog>
