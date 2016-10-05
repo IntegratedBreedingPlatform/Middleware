@@ -14,6 +14,9 @@ public class DesignTypeItem {
 	
 	public static final DesignTypeItem CUSTOM_IMPORT = new DesignTypeItem(3, "Custom Import Design", null, false, 0, 0, false);
 
+	public static final DesignTypeItem AUGMENTED_RANDOMIZED_BLOCK = new DesignTypeItem(4, "Augmented Randomized Block design",
+			"augmentedRandomizedBlockParams.html", false, 0, 0, false);
+
 	public static final String ALPHA_LATTICE = "Alpha Lattice";
 
 	private Integer id;
