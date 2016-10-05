@@ -45,6 +45,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Message;
+import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.TimerWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -266,22 +267,9 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		for (final MeasurementRow measurementRow : workbook.getObservations()) {
 			for (final Entry<String, List<String>> entry : termIdValidValuesMap.entrySet()) {
 				final MeasurementData measurementData = measurementRow.getMeasurementData(entry.getKey());
-				if (measurementData != null && !this.containsIgnoreCase(entry.getValue(), measurementData.getValue())) {
+				if (measurementData != null && !StringUtil.containsIgnoreCase(entry.getValue(), measurementData.getValue())) {
 					return true;
 				}
-
-			}
-
-		}
-
-		return false;
-
-	}
-
-	private boolean containsIgnoreCase(final List<String> list, final String searchFor) {
-		for (final String item : list) {
-			if (item.equalsIgnoreCase(searchFor) || StringUtils.isEmpty(searchFor)) {
-				return true;
 			}
 		}
 		return false;
