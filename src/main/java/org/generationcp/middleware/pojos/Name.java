@@ -31,6 +31,8 @@ import javax.persistence.Table;
 public class Name implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	
+	public static final int NSTAT_PREFERRED_NAME = 1;
 
 	// For getGidAndNidByGermplasmNames()
 	public static final String GET_NAME_DETAILS_BY_NAME = "SELECT gid, nid, nval " + "FROM names " + "WHERE nval IN (:germplasmNameList)";
