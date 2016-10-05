@@ -390,6 +390,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public List<Method> getAllMethods() {
 		return this.getMethodDao().getAllMethod();
 	}
+	
+	@Override
+	public List<Method> getFavoriteMethodsByMethodType(String methodType, String programUUID) {
+		return this.getMethodDao().getFavoriteMethodsByMethodType(methodType, programUUID);
+	}
 
 	@Override
 	public List<Method> getAllMethodsOrderByMname() {
