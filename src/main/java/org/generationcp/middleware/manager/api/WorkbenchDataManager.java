@@ -1024,7 +1024,7 @@ public interface WorkbenchDataManager {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	List<UserDto> getAllUserDtosSorted() throws MiddlewareQueryException;
+	List<UserDto> getAllUsersSortedByLastName() throws MiddlewareQueryException;
 
 	/**
 	 * create the user.
