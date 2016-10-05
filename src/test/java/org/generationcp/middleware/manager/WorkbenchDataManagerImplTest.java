@@ -843,7 +843,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final List<UserDto> users = Lists.newArrayList(user);
 		final WorkbenchDataManager workbenchDataManager = Mockito.mock(WorkbenchDataManager.class);
 
-		Mockito.when(workbenchDataManager.getAllUserDtosSorted()).thenReturn(users);
+		Mockito.when(workbenchDataManager.getAllUsersSortedByLastName()).thenReturn(users);
 		assertThat("Expected list users not null.", users != null);
 		assertThat("Expected list users not empty.", !users.isEmpty());
 		assertThat("Expected list users size 1.", users.size() == 1);
