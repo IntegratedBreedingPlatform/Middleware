@@ -218,4 +218,19 @@ public class InventoryDetailsTestDataInitializer {
 		return Lists.newArrayList(transaction);
 	}
 
+	public static Transaction createReservationTransaction(Double quantity, Integer status, String comments, Lot lot, Integer personId,
+						Integer sourceId, Integer sourceRecordId, String sourceType){
+		Transaction transaction = new Transaction();
+		transaction.setQuantity(quantity);
+		transaction.setStatus(status);
+		transaction.setComments(comments);
+		transaction.setLot(lot);
+		transaction.setPersonId(personId);
+		transaction.setSourceId(sourceId);
+		transaction.setSourceRecordId(sourceRecordId);
+		transaction.setSourceType(sourceType);
+
+		return  transaction;
+	}
+
 }

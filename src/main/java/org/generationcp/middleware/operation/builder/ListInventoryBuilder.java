@@ -62,7 +62,7 @@ public class ListInventoryBuilder extends Builder {
 		return listEntries;
 	}
 
-	private void retrieveWithdrawalAndStatus(final List<Integer> entryIds, final List<GermplasmListData> listEntries, final List<Integer> gids,
+	protected void retrieveWithdrawalAndStatus(final List<Integer> entryIds, final List<GermplasmListData> listEntries, final List<Integer> gids,
 			final List<Integer> lrecIds) throws MiddlewareQueryException {
 		this.retrieveWithdrawalBalance(listEntries, lrecIds);
 		this.retrieveWithdrawalStatus(listEntries, gids);
@@ -128,7 +128,7 @@ public class ListInventoryBuilder extends Builder {
 	}
 
 	// This will add overall scale for germplsm and set in InventoryInfo. Useful to display scale along with available balance
-	private void setAvailableBalanceScale(final List<GermplasmListData> listEntries){
+	protected void setAvailableBalanceScale(final List<GermplasmListData> listEntries){
 		Set<Integer> setScaleIds = new HashSet<>();
 		Map<Integer, Term> mapScaleTerm = new HashMap<>();
 		for(GermplasmListData entry : listEntries){
@@ -408,7 +408,7 @@ public class ListInventoryBuilder extends Builder {
 	/*
 	 * Retrieve withdrawal balance per entry along with overall status
 	 */
-	private void retrieveWithdrawalBalance(final List<GermplasmListData> listEntries, final List<Integer> listEntryIds)
+	protected void retrieveWithdrawalBalance(final List<GermplasmListData> listEntries, final List<Integer> listEntryIds)
 			throws MiddlewareQueryException {
 		final Map<Integer, Object[]> withdrawalData = this.getTransactionDao().retrieveWithdrawalBalanceWithDistinctScale(listEntryIds);
 		for (final GermplasmListData entry : listEntries) {
@@ -436,7 +436,7 @@ public class ListInventoryBuilder extends Builder {
 	/*
 	 * Retrieve withdrawal status per entry along with overall status
 	 */
-	private void retrieveWithdrawalStatus(final List<GermplasmListData> listEntries, final List<Integer> gIds)
+	protected void retrieveWithdrawalStatus(final List<GermplasmListData> listEntries, final List<Integer> gIds)
 			throws MiddlewareQueryException {
 		Integer sourceId = listEntries.get(0).getList().getId();
 		final List<Object[]> withdrawalData = this.getTransactionDao().retrieveWithdrawalStatus(sourceId,gIds);
