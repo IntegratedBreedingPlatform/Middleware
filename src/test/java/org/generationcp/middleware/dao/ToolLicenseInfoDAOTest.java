@@ -9,6 +9,7 @@ import org.generationcp.middleware.pojos.workbench.ToolName;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -27,6 +28,7 @@ public class ToolLicenseInfoDAOTest extends IntegrationTestBase {
 		ToolLicenseInfoDAOTest.dao.setSession(this.workbenchSessionProvider.getSession());
 	}
 
+	@Ignore("Remove this once the liquibase to create the table 'workbench_tool_license_info' is run")
 	@Test
 	public void testGetByToolName() throws Exception {
 		final String expectedToolName = ToolName.mbdt.toString();
