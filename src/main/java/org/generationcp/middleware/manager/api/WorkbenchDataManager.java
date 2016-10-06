@@ -43,6 +43,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.generationcp.middleware.service.api.user.UserDto;
 
 /**
  * This is the API used by the Workbench to retrieve Workbench project information.
@@ -945,5 +946,31 @@ public interface WorkbenchDataManager {
 	 * @return the saved/updated ToolLicenseInfo Hibernate Object
 	 */
 	ToolLicenseInfo saveOrUpdateToolLicenseInfo(ToolLicenseInfo licenseInfo);
+
+	/**
+	 * Gets the all Users Sorted
+	 * 
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<UserDto> getAllUsersSortedByLastName() throws MiddlewareQueryException;
+
+	/**
+	 * create the user.
+	 * 
+	 * @param user the user
+	 * @return Returns the id of the {@code UserDto} record added
+	 * @throws MiddlewareQueryException the MiddlewareQueryException
+	 */
+	public Integer createUser(UserDto userDto) throws MiddlewareQueryException;
+	
+	/**
+	 * updates the user.
+	 * 
+	 * @param user the user to update
+	 * @return Returns the id of the {@code UserDto} record added
+	 * @throws MiddlewareQueryException the MiddlewareQueryException
+	 */
+	public Integer updateUser(UserDto userDto) throws MiddlewareQueryException;
 
 }
