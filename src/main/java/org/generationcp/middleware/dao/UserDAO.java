@@ -29,12 +29,16 @@ import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link User}.
  *
  */
 public class UserDAO extends GenericDAO<User, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(UserDAO.class);
 
 	public User getByUsernameAndPassword(final String username, final String password) throws MiddlewareQueryException {
 		try {
@@ -47,8 +51,9 @@ public class UserDAO extends GenericDAO<User, Integer> {
 				return !users.isEmpty() ? users.get(0) : null;
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByUsernameAndPassword(username=" + username + ") query from User: " + e.getMessage(),
-					e);
+			final String message = "Error with getByUsernameAndPassword(username=" + username + ") query from User: " + e.getMessage();
+			UserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return null;
 	}
@@ -64,13 +69,14 @@ public class UserDAO extends GenericDAO<User, Integer> {
 				return !users.isEmpty() ? true : false;
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByUsernameAndPassword(username=" + username + ") query from User: " + e.getMessage(),
-					e);
+			final String message = "Error with isPasswordSameAsUserName(username=" + username + ") query from User: " + e.getMessage();
+			UserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return false;
 	}
 
-	public boolean changePassword(final String userName, final String password) throws MiddlewareQueryException {
+	public boolean changePassword(final String username, final String password) throws MiddlewareQueryException {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
 			// of synch with
@@ -78,18 +84,20 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			// statement
 			this.getSession().flush();
 
-			if (userName != null && password != null) {
+			if (!StringUtils.isEmpty(username) && !StringUtils.isEmpty(password)) {
 				final String queryString = "UPDATE users SET upswd = :password WHERE uname LIKE :username";
 				final Session s = this.getSession();
 				final Query q = s.createSQLQuery(queryString);
-				q.setString("username", userName);
+				q.setString("username", username);
 				q.setString("password", password);
 				final int success = q.executeUpdate();
 
 				return success > 0;
 			}
 		} catch (final Exception e) {
-			this.logAndThrowException(e.getMessage(), e);
+			final String message = "Error with changePassword(username=" + username + ") query from User: " + e.getMessage();
+			UserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return false;
 	}
@@ -103,17 +111,18 @@ public class UserDAO extends GenericDAO<User, Integer> {
 				return !users.isEmpty() ? users.get(0) : null;
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByUsernameAndPassword(username=" + username + ") query from User: " + e.getMessage(),
-					e);
+			final String message = "Error with getUserDetailsByUsername(username=" + username + ") query from User: " + e.getMessage();
+			UserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return null;
 	}
 
-	public boolean isUsernameExists(final String userName) throws MiddlewareQueryException {
+	public boolean isUsernameExists(final String username) throws MiddlewareQueryException {
 		try {
-			if (userName != null) {
+			if (username != null) {
 				final Criteria criteria = this.getSession().createCriteria(User.class);
-				criteria.add(Restrictions.eq("name", userName));
+				criteria.add(Restrictions.eq("name", username));
 
 				// used a List in case of dirty data
 				@SuppressWarnings("unchecked")
@@ -122,16 +131,18 @@ public class UserDAO extends GenericDAO<User, Integer> {
 				return !users.isEmpty();
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with isUsernameExists(username=" + userName + ") query from User: " + e.getMessage(), e);
+			final String message = "Error with isUsernameExists(username=" + username + ") query from User: " + e.getMessage();
+			UserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return false;
 	}
 
-	public User getUserByUserName(final String userName) throws MiddlewareQueryException {
+	public User getUserByUserName(final String username) throws MiddlewareQueryException {
 		try {
-			if (userName != null) {
+			if (username != null) {
 				final Criteria criteria = this.getSession().createCriteria(User.class);
-				criteria.add(Restrictions.eq("name", userName));
+				criteria.add(Restrictions.eq("name", username));
 
 				// used a List in case of dirty data
 				@SuppressWarnings("unchecked")
@@ -140,7 +151,9 @@ public class UserDAO extends GenericDAO<User, Integer> {
 				return users.isEmpty() ? null : users.get(0);
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with isUsernameExists(username=" + userName + ") query from User: " + e.getMessage(), e);
+			final String message = "Error with getUserByUserName(username=" + username + ") query from User: " + e.getMessage();
+			UserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return null;
 	}
@@ -156,7 +169,9 @@ public class UserDAO extends GenericDAO<User, Integer> {
 				return query.list();
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByNameUsingEqual(name=" + name + ") query from User: " + e.getMessage(), e);
+			final String message = "Error with getByNameUsingEqual(name=" + name + ") query from User: " + e.getMessage();
+			UserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return new ArrayList<User>();
 	}
@@ -172,7 +187,9 @@ public class UserDAO extends GenericDAO<User, Integer> {
 				return query.list();
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByNameUsingLike(name=" + name + ") query from User: " + e.getMessage(), e);
+			final String message = "Error with getByNameUsingLike(name=" + name + ") query from User: " + e.getMessage();
+			UserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return new ArrayList<User>();
 	}
@@ -183,9 +200,10 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			final Query query = this.getSession().getNamedQuery(User.GET_ALL_USERS_SORTED);
 			return query.list();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getAllUsersSorted() query from User: " + e.getMessage(), e);
+			final String message = "Error with getAllUsersSorted query from User: " + e.getMessage();
+			UserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<User>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -199,9 +217,11 @@ public class UserDAO extends GenericDAO<User, Integer> {
 				return criteria.list();
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getUserIdsByCountryIds() query from User: " + e.getMessage(), e);
+			final String message = "Error with getUserIdsByCountryIds query from User: " + e.getMessage();
+			UserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -217,7 +237,9 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			criteria.add(Restrictions.in("userid", ids));
 			toReturn = criteria.list();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByIds() query from User: " + e.getMessage(), e);
+			final String message = "Error with getByIds query from User: " + e.getMessage();
+			UserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return toReturn;
 	}
@@ -229,13 +251,15 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			query.setParameter("fullname", fullname);
 			user = (User) query.uniqueResult();
 		} catch (final HibernateException e) {
-			this.logAndThrowException(String.format("Error with getPersonByFullName(fullname=[%s])", StringUtils.join(fullname, ",")), e);
+			final String message = "Error with getUserByFullname(name=" + fullname + ") query from User: " + e.getMessage();
+			UserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return user;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<UserDto> getAllUserDtosSorted() throws MiddlewareQueryException {
+	public List<UserDto> getAllUsersSortedByLastName() throws MiddlewareQueryException {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(User.class);
 
@@ -261,10 +285,10 @@ public class UserDAO extends GenericDAO<User, Integer> {
 
 			return criteria.list();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getAllUserDtosSorted() query from User: " + e.getMessage(), e);
+			final String message = "Error with getAllUserDtosSorted() query from User: " + e.getMessage();
+			UserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<UserDto>();
 	}
 	
-
 }

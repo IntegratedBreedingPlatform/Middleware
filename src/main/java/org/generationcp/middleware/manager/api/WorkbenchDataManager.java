@@ -1019,12 +1019,12 @@ public interface WorkbenchDataManager {
 	Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException;
 
 	/**
-	 * Gets the all UserDto Sorted
+	 * Gets the all Users Sorted
 	 * 
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	List<UserDto> getAllUserDtosSorted() throws MiddlewareQueryException;
+	List<UserDto> getAllUsersSortedByLastName() throws MiddlewareQueryException;
 
 	/**
 	 * create the user.

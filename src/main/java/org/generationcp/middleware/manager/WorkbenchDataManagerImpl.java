@@ -1504,8 +1504,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 	
 	@Override
-	public List<UserDto> getAllUserDtosSorted() throws MiddlewareQueryException {
-		return this.getUserDao().getAllUserDtosSorted();
+	public List<UserDto> getAllUsersSortedByLastName() throws MiddlewareQueryException {
+		return this.getUserDao().getAllUsersSortedByLastName();
 
 	}
 
