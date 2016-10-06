@@ -163,10 +163,4 @@ public interface UserDataManager {
 	 */
     User getUserByFullname(String fullname) throws MiddlewareQueryException;
     
-	/**
-	 * Gets the all UserDto Sorted
-	 * @return
-	 * @throws MiddlewareQueryException
-	 */
-	List<UserDto> getAllUserDtosSorted() throws MiddlewareQueryException;
 }

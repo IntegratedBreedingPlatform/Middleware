@@ -47,7 +47,8 @@ import org.generationcp.middleware.domain.oms.TermId;
  * </ul>
  * 
  */
-@NamedQueries({@NamedQuery(name = "getAllMethods", query = "FROM Method")})
+@NamedQueries({@NamedQuery(name = "getAllMethods", query = "FROM Method"),
+				@NamedQuery(name = "getFavoriteMethodsByMethodType", query = "Select m FROM Method m, ProgramFavorite pf WHERE pf.entityId = m.mid AND m.mtype=:mType AND pf.uniqueID=:programUUID")})
 @Entity
 @Table(name = "methods")
 // JAXB Element Tags for JSON output
@@ -66,7 +67,9 @@ public class Method implements Serializable {
 	public static final List<Integer> NON_BULKED_CLASSES = Arrays.asList(TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
 
 	public static final String GET_ALL = "getAllMethods";
-
+	
+	public static final String GET_FAVORITE_METHODS_BY_TYPE = "getFavoriteMethodsByMethodType";
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)

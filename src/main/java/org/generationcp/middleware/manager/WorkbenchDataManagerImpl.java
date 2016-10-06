@@ -42,7 +42,6 @@ import org.generationcp.middleware.dao.WorkflowTemplateDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.ErrorCode;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
@@ -1505,13 +1504,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 	
 	@Override
-	public List<UserDto> getAllUserDtosSorted() throws MiddlewareQueryException {
-		return this.getUserDao().getAllUserDtosSorted();
+	public List<UserDto> getAllUsersSortedByLastName() throws MiddlewareQueryException {
+		return this.getUserDao().getAllUsersSortedByLastName();
 
 	}
 
 	@Override
-	public Integer addNewUser(final UserDto userDto) throws MiddlewareQueryException {
+	public Integer createUser(final UserDto userDto) throws MiddlewareQueryException {
 
 		Integer idUserSaved = null;
 		// user.access = 0 - Default User
@@ -1520,7 +1519,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		// user.type = 0 - Default user type (not used)
 
 		Integer currentDate = Util.getCurrentDateAsIntegerValue();
-		Person person = this.createPerson(userDto);
+		Person person = this.setPerson(userDto, new Person());
 
 		User user = new User();
 		user.setPersonid(person.getId());
@@ -1564,20 +1563,20 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		Integer idUserSaved = null;
 
 		try {
-			user = this.getUserDao().getById(userDto.getUserId());
-			updatePerson(userDto, user.getPerson());
+			user = this.getUserById(userDto.getUserId());
+			setPerson(userDto, user.getPerson());
 
 			user.setName(userDto.getUsername());
 			user.setAssignDate(currentDate);
 			user.setCloseDate(currentDate);
 			user.setStatus(userDto.getStatus());
-			
+
 			// update user roles to the particular user
-			UserRole role =	user.getRoles().get(0);
-			if(!role.getRole().equals(userDto.getRole().toUpperCase())){
-				role.setRole(userDto.getRole().toUpperCase());				
+			UserRole role = user.getRoles().get(0);
+			if (!role.getRole().equals(userDto.getRole().toUpperCase())) {
+				role.setRole(userDto.getRole().toUpperCase());
 			}
-			
+
 			this.getUserDao().saveOrUpdate(user);
 			idUserSaved = user.getUserid();
 		} catch (final Exception e) {
@@ -1589,28 +1588,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return idUserSaved;
 	}
 
-	private Person createPerson(final UserDto userDto) {
-		Person person = new Person();
+	private Person setPerson(final UserDto userDto, final Person person) {
 
-		person.setFirstName(userDto.getFirstName());
-		person.setMiddleName("");
-		person.setLastName(userDto.getLastName());
-		person.setEmail(userDto.getEmail());
-		person.setTitle("-");
-		person.setContact("-");
-		person.setExtension("-");
-		person.setFax("-");
-		person.setInstituteId(0);
-		person.setLanguage(0);
-		person.setNotes("-");
-		person.setPositionName("-");
-		person.setPhone("-");
-		this.addPerson(person);
-
-		return person;
-	}
-
-	private Person updatePerson(final UserDto userDto, final Person person) {
 		person.setFirstName(userDto.getFirstName());
 		person.setMiddleName("");
 		person.setLastName(userDto.getLastName());

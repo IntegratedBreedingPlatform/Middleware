@@ -14,6 +14,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
+import org.generationcp.middleware.service.api.user.UserDto;
 
 public class WorkbenchTestDataUtil {
 
@@ -141,5 +142,56 @@ public class WorkbenchTestDataUtil {
 		}
 		return this.testUser1;
 	}
+	
+	public UserDto createTestUserDTO(Integer userId){
+		UserDto userdto = new UserDto();
+		
+		if(userId!=null && !userId.equals(0)){
+			userdto.setUserId(userId);
+		}
+		
+		userdto.setUsername("Cuenyad");
+		userdto.setFirstName("Diego");
+		userdto.setLastName("Cuenya");
+		userdto.setRole("ADMIN");
+		userdto.setPassword("fwgtrgrehgewsdsdeferhkjlkjSli");
+		userdto.setEmail("diego.cuenya@leafnode.io");
+		userdto.setStatus(0);
+		return userdto;
+	}
+	
+	public User createTestUserFromUserDto(Integer userId) {
+		User user = new User();
+		user.setPersonid(22);
+		user.setUserid(userId);
+		user.setPerson(createPersonfromUserDTO());
+		user.setName("Diego");
+		user.setPassword("fwgtrgrehgewsdsdeferhkjlkjSli");
+		user.setAccess(0);
+		user.setAssignDate(20150101);
+		user.setCloseDate(20150101);
+		user.setInstalid(0);
+		user.setStatus(0);
+		user.setType(0);
+		return user;
+	}
 
+	private Person createPersonfromUserDTO(){
+		Person person = new Person();
+		person.setId(22);
+		person.setFirstName("Diego");
+		person.setMiddleName("");
+		person.setLastName("Cuenya");
+		person.setEmail("diego.cuenya@leafnode.io");
+		person.setTitle("-");
+		person.setContact("-");
+		person.setExtension("-");
+		person.setFax("-");
+		person.setInstituteId(0);
+		person.setLanguage(0);
+		person.setNotes("-");
+		person.setPositionName("-");
+		person.setPhone("-");
+		return person;
+	}
 }
