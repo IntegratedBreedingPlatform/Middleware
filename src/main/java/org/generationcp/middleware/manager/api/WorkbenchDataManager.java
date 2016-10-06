@@ -34,6 +34,7 @@ import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
+import org.generationcp.middleware.pojos.workbench.ToolLicenseInfo;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
@@ -53,9 +54,8 @@ public interface WorkbenchDataManager {
 	 * Gets the projects.
 	 *
 	 * @return the projects
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Project> getProjects() throws MiddlewareQueryException;
+	List<Project> getProjects();
 
 	/**
 	 * Gets the projects.
@@ -63,69 +63,61 @@ public interface WorkbenchDataManager {
 	 * @param start - the starting record
 	 * @param numOfRows - the number of rows to retrieve
 	 * @return the projects
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Project> getProjects(int start, int numOfRows) throws MiddlewareQueryException;
+	List<Project> getProjects(int start, int numOfRows);
 
 	/**
 	 * Gets the list of Projects that the specified User is associated with.
 	 *
 	 * @param user - the User associated with the projects to be retrieved
 	 * @return the projects which the specified user is involved
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Project> getProjectsByUser(User user) throws MiddlewareQueryException;
+	List<Project> getProjectsByUser(User user);
 
 	/**
 	 * Save or update project.
 	 *
 	 * @param project - the project to save
 	 * @return the project saved
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Project saveOrUpdateProject(Project project) throws MiddlewareQueryException;
+	Project saveOrUpdateProject(Project project);
 
 	/**
 	 * Save a project.
 	 *
 	 * @param project the project
 	 * @return The Project added
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Project addProject(Project project) throws MiddlewareQueryException;
+	Project addProject(Project project);
 
 	/**
 	 * Update a project using Hibernate's Session.merge() method.
 	 *
 	 * @param project the project
 	 * @return The merged Project.
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Project mergeProject(Project project) throws MiddlewareQueryException;
+	Project mergeProject(Project project);
 
 	/**
 	 * Delete project.
 	 *
 	 * @param project - the project to delete
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void deleteProject(Project project) throws MiddlewareQueryException;
+	void deleteProject(Project project);
 
 	/**
 	 * Delete project dependencies.
 	 *
 	 * @param project - the project to delete dependencies
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void deleteProjectDependencies(Project project) throws MiddlewareQueryException;
+	void deleteProjectDependencies(Project project);
 
 	/**
 	 * Gets the workflow templates.
 	 *
 	 * @return the workflow templates
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<WorkflowTemplate> getWorkflowTemplates() throws MiddlewareQueryException;
+	List<WorkflowTemplate> getWorkflowTemplates();
 
 	/**
 	 * Gets the workflow templates.
@@ -133,18 +125,16 @@ public interface WorkbenchDataManager {
 	 * @param start - the starting record
 	 * @param numOfRows - the number of rows to retrieve
 	 * @return the workflow templates
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows) throws MiddlewareQueryException;
+	List<WorkflowTemplate> getWorkflowTemplates(int start, int numOfRows);
 
 	/**
 	 * Gets the workflow templates based on the given name.
 	 *
 	 * @param name - the name of the workflow template
 	 * @return the workflow templates
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<WorkflowTemplate> getWorkflowTemplateByName(String name) throws MiddlewareQueryException;
+	List<WorkflowTemplate> getWorkflowTemplateByName(String name);
 
 	/**
 	 * Gets the tool DAO directly.
@@ -157,27 +147,24 @@ public interface WorkbenchDataManager {
 	 * Get all tools.
 	 *
 	 * @return The list of all tools.
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Tool> getAllTools() throws MiddlewareQueryException;
+	List<Tool> getAllTools();
 
 	/**
 	 * Gets the tool with the given name.
 	 *
 	 * @param toolName - the tool name to match
 	 * @return the tool with the given name
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Tool getToolWithName(String toolName) throws MiddlewareQueryException;
+	Tool getToolWithName(String toolName);
 
 	/**
 	 * Get the list of tools with the specified type.
 	 *
 	 * @param toolType the tool type
 	 * @return the list of matching tools
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Tool> getToolsWithType(ToolType toolType) throws MiddlewareQueryException;
+	List<Tool> getToolsWithType(ToolType toolType);
 
 	/**
 	 * Changes the password of the user.
@@ -185,9 +172,8 @@ public interface WorkbenchDataManager {
 	 * @param username - the username
 	 * @param password - the new password
 	 * @return true, if is user login is completed
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	boolean changeUserPassword(String username, String password) throws MiddlewareQueryException;
+	boolean changeUserPassword(String username, String password);
 
 	/**
 	 * Checks if is person exists.
@@ -195,9 +181,8 @@ public interface WorkbenchDataManager {
 	 * @param firstName - the first name
 	 * @param lastName - the last name
 	 * @return true, if is person exists
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	boolean isPersonExists(String firstName, String lastName) throws MiddlewareQueryException;
+	boolean isPersonExists(String firstName, String lastName);
 
 	/**
 	 * Checks if person with specified email exists.
@@ -206,7 +191,7 @@ public interface WorkbenchDataManager {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	boolean isPersonWithEmailExists(String email) throws MiddlewareQueryException;
+	boolean isPersonWithEmailExists(String email);
 
 	/**
 	 *
@@ -214,9 +199,9 @@ public interface WorkbenchDataManager {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	Person getPersonByEmail(String email) throws MiddlewareQueryException;
+	Person getPersonByEmail(String email);
 
-	Person getPersonByEmailAndName(String email, String firstName, String lastName) throws MiddlewareQueryException;
+	Person getPersonByEmailAndName(String email, String firstName, String lastName);
 
 	/**
 	 * Checks if person with specified username AND email exists.
@@ -226,25 +211,23 @@ public interface WorkbenchDataManager {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	boolean isPersonWithUsernameAndEmailExists(String username, String email) throws MiddlewareQueryException;
+	boolean isPersonWithUsernameAndEmailExists(String username, String email);
 
 	/**
 	 * Checks if a username exists.
 	 *
 	 * @param userName - the user name to check
 	 * @return true, if is username exists
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	boolean isUsernameExists(String userName) throws MiddlewareQueryException;
+	boolean isUsernameExists(String userName);
 
 	/**
 	 * Get the user info record for the specified user.
 	 *
 	 * @param userId the user id
 	 * @return the user info
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	UserInfo getUserInfo(int userId) throws MiddlewareQueryException;
+	UserInfo getUserInfo(int userId);
 
 	/**
 	 * Get the user info record given the username, not that the username must exist else we'll have null exceptions
@@ -253,56 +236,51 @@ public interface WorkbenchDataManager {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	UserInfo getUserInfoByUsername(String username) throws MiddlewareQueryException;
+	UserInfo getUserInfoByUsername(String username);
 
-	User getUserByUsername(String userName) throws MiddlewareQueryException;
+	User getUserByUsername(String userName);
 
-	UserInfo getUserInfoByResetToken(String token) throws MiddlewareQueryException;
+	UserInfo getUserInfoByResetToken(String token);
 
-	UserInfo updateUserInfo(UserInfo userInfo) throws MiddlewareQueryException;
+	UserInfo updateUserInfo(UserInfo userInfo);
 
 	/**
 	 * Increments the log in count.
 	 *
 	 * @param userId the user id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void incrementUserLogInCount(int userId) throws MiddlewareQueryException;
+	void incrementUserLogInCount(int userId);
 
 	/**
 	 * Insert or update the specified {@link UserInfo} record.
 	 *
 	 * @param userDetails the user details
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void insertOrUpdateUserInfo(UserInfo userDetails) throws MiddlewareQueryException;
+	void insertOrUpdateUserInfo(UserInfo userDetails);
 
 	/**
 	 * Adds the person.
 	 *
 	 * @param person - the Person to add
 	 * @return Returns the id of the {@code Person} record added
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer addPerson(Person person) throws MiddlewareQueryException;
+	Integer addPerson(Person person);
 
 	/**
 	 * Adds a user.
 	 *
 	 * @param user - the user to add
 	 * @return Returns the id of the {@code User} record added
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer addUser(User user) throws MiddlewareQueryException;
+	Integer addUser(User user);
 
 	/**
 	 * Gets a project by id.
 	 *
 	 * @param projectId - the project id to match
 	 * @return the project matching the given id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Project getProjectById(Long projectId) throws MiddlewareQueryException;
+	Project getProjectById(Long projectId);
 
 	/**
 	 * Gets a project by name. Should return only one value.
@@ -310,86 +288,76 @@ public interface WorkbenchDataManager {
 	 * @param projectName - the project name to match
 	 * @param cropType - the crop type to search for a name (name is unique per crop type)
 	 * @return the project matching the given name
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Project getProjectByNameAndCrop(String projectName, CropType cropType) throws MiddlewareQueryException;
+	Project getProjectByNameAndCrop(String projectName, CropType cropType);
 
 	/**
 	 * Gets a project by Uuid. Should return only one value.
 	 *
 	 * @param projectUuid - the project Uuid to match
 	 * @return the project matching the given Uuid
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Project getProjectByUuid(String projectUuid) throws MiddlewareQueryException;
+	Project getProjectByUuid(String projectUuid);
 
 	/**
 	 * Updates all the project roles for a project.
 	 *
 	 * @param project - the project to use
 	 * @param newRoles - the new roles to add
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void updateProjectsRolesForProject(Project project, List<ProjectUserRole> newRoles) throws MiddlewareQueryException;
+	void updateProjectsRolesForProject(Project project, List<ProjectUserRole> newRoles);
 
 	/**
 	 * Registers a workbench dataset.
 	 *
 	 * @param dataset - the workbench dataset to save
 	 * @return Returns the id of the {@code WorkbenchDataset} record added
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer addWorkbenchDataset(WorkbenchDataset dataset) throws MiddlewareQueryException;
+	Integer addWorkbenchDataset(WorkbenchDataset dataset);
 
 	/**
 	 * Gets the workbench dataset by id.
 	 *
 	 * @param datasetId the dataset id
 	 * @return the workench dataset matching the given id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	WorkbenchDataset getWorkbenchDatasetById(Long datasetId) throws MiddlewareQueryException;
+	WorkbenchDataset getWorkbenchDatasetById(Long datasetId);
 
 	/**
 	 * Delete a workbench dataset.
 	 *
 	 * @param dataset the dataset to delete
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void deleteWorkbenchDataset(WorkbenchDataset dataset) throws MiddlewareQueryException;
+	void deleteWorkbenchDataset(WorkbenchDataset dataset);
 
 	/**
 	 * Returns all the Workbench users.
 	 *
 	 * @return A {@code List} of all the {@code User}s in the Workbench database.
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<User> getAllUsers() throws MiddlewareQueryException;
+	List<User> getAllUsers();
 
 	/**
 	 * Returns all the Workbench users ordered by First Name then Last Name.
 	 *
 	 * @return A {@code List} of all the {@code User}s in the Workbench database.
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<User> getAllUsersSorted() throws MiddlewareQueryException;
+	List<User> getAllUsersSorted();
 
 	/**
 	 * Returns number of all Users.
 	 *
 	 * @return the number of all Users
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countAllUsers() throws MiddlewareQueryException;
+	long countAllUsers();
 
 	/**
 	 * Gets the user by id.
 	 *
 	 * @param id - the user id to match
 	 * @return the user matching the given id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	User getUserById(int id) throws MiddlewareQueryException;
+	User getUserById(int id);
 
 	/**
 	 * Gets the user by name.
@@ -399,59 +367,52 @@ public interface WorkbenchDataManager {
 	 * @param numOfRows - the number of rows to retrieve
 	 * @param op the op
 	 * @return the user by name
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<User> getUserByName(String name, int start, int numOfRows, Operation op) throws MiddlewareQueryException;
+	List<User> getUserByName(String name, int start, int numOfRows, Operation op);
 
 	/**
 	 * Deletes a user.
 	 *
 	 * @param user - the User to delete
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void deleteUser(User user) throws MiddlewareQueryException;
+	void deleteUser(User user);
 
 	/**
 	 * Returns all Persons.
 	 *
 	 * @return all Persons
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Person> getAllPersons() throws MiddlewareQueryException;
+	List<Person> getAllPersons();
 
 	/**
 	 * Returns number of all Persons.
 	 *
 	 * @return the number of all Persons
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countAllPersons() throws MiddlewareQueryException;
+	long countAllPersons();
 
 	/**
 	 * Gets the person by id.
 	 *
 	 * @param id - the id to match
 	 * @return the person matching the given id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Person getPersonById(int id) throws MiddlewareQueryException;
+	Person getPersonById(int id);
 
 	/**
 	 * Deletes a person.
 	 *
 	 * @param person - the Person to delete
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void deletePerson(Person person) throws MiddlewareQueryException;
+	void deletePerson(Person person);
 
 	/**
 	 * Returns the project last accessed by the user.
 	 *
 	 * @param userId - the user id to match
 	 * @return the last Project opened by the given user
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Project getLastOpenedProject(Integer userId) throws MiddlewareQueryException;
+	Project getLastOpenedProject(Integer userId);
 
 	/**
 	 * Returns a list of {@link WorkbenchDataset} records by project id.
@@ -460,18 +421,16 @@ public interface WorkbenchDataManager {
 	 * @param start - the starting record
 	 * @param numOfRows - the number of rows to retrieve
 	 * @return the list of {@link WorkbenchDataset}s
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<WorkbenchDataset> getWorkbenchDatasetByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
+	List<WorkbenchDataset> getWorkbenchDatasetByProjectId(Long projectId, int start, int numOfRows);
 
 	/**
 	 * Returns the number of {@link WorkbenchDataset} records by project id.
 	 *
 	 * @param projectId the project id
 	 * @return the number of {@link WorkbenchDataset} records
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countWorkbenchDatasetByProjectId(Long projectId) throws MiddlewareQueryException;
+	long countWorkbenchDatasetByProjectId(Long projectId);
 
 	/**
 	 * Returns a list of {@link WorkbenchDataset} by name.
@@ -481,9 +440,8 @@ public interface WorkbenchDataManager {
 	 * @param start - the starting record
 	 * @param numOfRows - the number of rows to retrieve
 	 * @return the list of {@link WorkbenchDataset}
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<WorkbenchDataset> getWorkbenchDatasetByName(String name, Operation op, int start, int numOfRows) throws MiddlewareQueryException;
+	List<WorkbenchDataset> getWorkbenchDatasetByName(String name, Operation op, int start, int numOfRows);
 
 	/**
 	 * Returns the number of {@link WorkbenchDataset} by name.
@@ -491,9 +449,8 @@ public interface WorkbenchDataManager {
 	 * @param name - the {@link WorkbenchDataset} name
 	 * @param op - the operator; EQUAL, LIKE
 	 * @return the number of {@link WorkbenchDataset}
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countWorkbenchDatasetByName(String name, Operation op) throws MiddlewareQueryException;
+	long countWorkbenchDatasetByName(String name, Operation op);
 
 	/**
 	 * Adds a single project user given a Project object, a User object, and a Role object.
@@ -502,20 +459,18 @@ public interface WorkbenchDataManager {
 	 * @param user the user
 	 * @param role the role of the user in the project
 	 * @return Returns the id of the {@code ProjectUserRole} record added
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer addProjectUserRole(Project project, User user, Role role) throws MiddlewareQueryException;
+	Integer addProjectUserRole(Project project, User user, Role role);
 
 	/**
 	 * Adds a single workbench_project_user_role record.
 	 *
 	 * @param projectUserRole - the ProjectUserRole to save
 	 * @return Returns the id of the {@code ProjectUserRole} record added
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer addProjectUserRole(ProjectUserRole projectUserRole) throws MiddlewareQueryException;
+	Integer addProjectUserRole(ProjectUserRole projectUserRole);
 
-	void deleteProjectUserRolesByProject(Project project) throws MiddlewareQueryException;
+	void deleteProjectUserRolesByProject(Project project);
 
 	void deleteProjectUserRoles(List<ProjectUserRole> oldRoles);
 
@@ -524,44 +479,39 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param projectUserRoles - the records to add
 	 * @return Returns the ids of the {@code ProjectUserRole} records added
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Integer> addProjectUserRole(List<ProjectUserRole> projectUserRoles) throws MiddlewareQueryException;
+	List<Integer> addProjectUserRole(List<ProjectUserRole> projectUserRoles);
 
 	/**
 	 * Adds a project activity.
 	 *
 	 * @param projectActivity - the project activity
 	 * @return Returns the id of the {@code ProjectActivity} record added
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer addProjectActivity(ProjectActivity projectActivity) throws MiddlewareQueryException;
+	Integer addProjectActivity(ProjectActivity projectActivity);
 
 	/**
 	 * Adds project activities.
 	 *
 	 * @param projectActivityList - the project activity list
 	 * @return Returns the ids of the {@code ProjectActivity} records added
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Integer> addProjectActivity(List<ProjectActivity> projectActivityList) throws MiddlewareQueryException;
+	List<Integer> addProjectActivity(List<ProjectActivity> projectActivityList);
 
 	/**
 	 * Retrieves the workbench_project_user_role records based on the given project.
 	 *
 	 * @param project - the Project to match
 	 * @return the associated list of ProjectUser
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<ProjectUserRole> getProjectUserRolesByProject(Project project) throws MiddlewareQueryException;
+	List<ProjectUserRole> getProjectUserRolesByProject(Project project);
 
 	/**
 	 * Deletes the given ProjectUserRole.
 	 *
 	 * @param projectUserRole - the ProjectUserRole to delete
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void deleteProjectUserRole(ProjectUserRole projectUserRole) throws MiddlewareQueryException;
+	void deleteProjectUserRole(ProjectUserRole projectUserRole);
 
 	/**
 	 * Return a List of {@link User} records associated with a {@link Project}.
@@ -584,15 +534,13 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param projectId - the project id
 	 * @return the number of {@link User} records
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countUsersByProjectId(Long projectId) throws MiddlewareQueryException;
+	long countUsersByProjectId(Long projectId);
 
 	/**
 	 * Get the list of all installed central crop databases.
 	 *
 	 * @return the installed central crops
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<CropType> getInstalledCropDatabses();
 
@@ -601,18 +549,16 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param cropName - the crop name to match
 	 * @return the CropType retrieved
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	CropType getCropTypeByName(String cropName) throws MiddlewareQueryException;
+	CropType getCropTypeByName(String cropName);
 
 	/**
 	 * Add a crop type to the database.
 	 *
 	 * @param cropType - the crop type to add
 	 * @return Returns the id of the {@code CropType} record added
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	String addCropType(CropType cropType) throws MiddlewareQueryException;
+	String addCropType(CropType cropType);
 
 	/**
 	 * Return a List of {@link ProjectActivity} records associated with a {@link Project}.
@@ -621,61 +567,54 @@ public interface WorkbenchDataManager {
 	 * @param start - the starting record
 	 * @param numOfRows - the number of rows to retrieve
 	 * @return the List of {@link ProjectActivity} records
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<ProjectActivity> getProjectActivitiesByProjectId(Long projectId, int start, int numOfRows) throws MiddlewareQueryException;
+	List<ProjectActivity> getProjectActivitiesByProjectId(Long projectId, int start, int numOfRows);
 
 	/**
 	 * Delete a project activity.
 	 *
 	 * @param projectActivity - the project activity to delete
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void deleteProjectActivity(ProjectActivity projectActivity) throws MiddlewareQueryException;
+	void deleteProjectActivity(ProjectActivity projectActivity);
 
 	/**
 	 * Returns the number of {@link ProjectActivity} records associated with a {@link Project}.
 	 *
 	 * @param projectId - the project id to match
 	 * @return the number of {@link ProjectActivity} records associated to the given project
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	long countProjectActivitiesByProjectId(Long projectId) throws MiddlewareQueryException;
+	long countProjectActivitiesByProjectId(Long projectId);
 
 	/**
 	 * Adds the tool configuration.
 	 *
 	 * @param toolConfig - the tool config to add
 	 * @return Returns the id of the {@code ToolConfiguration} record added
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer addToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException;
+	Integer addToolConfiguration(ToolConfiguration toolConfig);
 
 	/**
 	 * Update tool configuration.
 	 *
 	 * @param toolConfig - the tool config to update
 	 * @return Returns the id of the updated {@code ToolConfiguration} record
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer updateToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException;
+	Integer updateToolConfiguration(ToolConfiguration toolConfig);
 
 	/**
 	 * Delete tool configuration.
 	 *
 	 * @param toolConfig - the tool config to delete
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void deleteToolConfiguration(ToolConfiguration toolConfig) throws MiddlewareQueryException;
+	void deleteToolConfiguration(ToolConfiguration toolConfig);
 
 	/**
 	 * Gets the list of {@link ToolConfiguration} records by tool id.
 	 *
 	 * @param toolId - the tool id
 	 * @return the list of tool configurations by tool id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<ToolConfiguration> getListOfToolConfigurationsByToolId(Long toolId) throws MiddlewareQueryException;
+	List<ToolConfiguration> getListOfToolConfigurationsByToolId(Long toolId);
 
 	/**
 	 * Gets the {@link ToolConfiguration} by tool id and config key.
@@ -683,20 +622,18 @@ public interface WorkbenchDataManager {
 	 * @param toolId - the tool id
 	 * @param configKey - the config key
 	 * @return the tool configuration by tool id and config key
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	ToolConfiguration getToolConfigurationByToolIdAndConfigKey(Long toolId, String configKey) throws MiddlewareQueryException;
+	ToolConfiguration getToolConfigurationByToolIdAndConfigKey(Long toolId, String configKey);
 
 	/**
 	 * Add a mapping between Workbench user record and the crop databse user record, if it does not already exist.
 	 *
 	 * @param userMap the user map
 	 * @return Returns the id of the {@code IbdbUserMap} record added or that of the existing one if it is already there.
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer addIbdbUserMap(IbdbUserMap userMap) throws MiddlewareQueryException;
+	Integer addIbdbUserMap(IbdbUserMap userMap);
 
-	Integer getCurrentIbdbUserId(Long projectId, Integer workbenchUserId) throws MiddlewareQueryException;
+	Integer getCurrentIbdbUserId(Long projectId, Integer workbenchUserId);
 
 	/**
 	 * Returns the IbdbUserMap object given a combination of a Workbench User ID and a Project ID.
@@ -705,9 +642,8 @@ public interface WorkbenchDataManager {
 	 * @param projectId - the specified Project ID
 	 * @return Returns the IbdbUserMap object associated with the specified Workbench User ID and Project ID. Returns null when there is no
 	 *         IbdbUserMap matching the specified Workbench User ID and Project ID.
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	IbdbUserMap getIbdbUserMap(Integer workbenchUserId, Long projectId) throws MiddlewareQueryException;
+	IbdbUserMap getIbdbUserMap(Integer workbenchUserId, Long projectId);
 
 	/**
 	 * Returns the Local IBDB User ID given a combination of a Workbench User ID and a Project ID.
@@ -716,7 +652,6 @@ public interface WorkbenchDataManager {
 	 * @param projectId - the specified Project ID
 	 * @return Returns the IBDB User ID associated with the specified Workbench User ID and Project ID. Returns null when there is no IBDB
 	 *         User ID matching the specified Workbench User ID and Project ID.
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	Integer getLocalIbdbUserId(Integer workbenchUserId, Long projectId);
 
@@ -725,26 +660,23 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param workbenchRuntimeData the workbench runtime data
 	 * @return Returns the id of the updated {@code WorkbenchRuntimeData} record
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer updateWorkbenchRuntimeData(WorkbenchRuntimeData workbenchRuntimeData) throws MiddlewareQueryException;
+	Integer updateWorkbenchRuntimeData(WorkbenchRuntimeData workbenchRuntimeData);
 
 	/**
 	 * Gets the workbench runtime data.
 	 *
 	 * @return The WorkbenchRuntimeData
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	WorkbenchRuntimeData getWorkbenchRuntimeData() throws MiddlewareQueryException;
+	WorkbenchRuntimeData getWorkbenchRuntimeData();
 
 	/**
 	 * Gets the role by id.
 	 *
 	 * @param id - the role id to match
 	 * @return the role matching the given id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Role getRoleById(Integer id) throws MiddlewareQueryException;
+	Role getRoleById(Integer id);
 
 	/**
 	 * Gets the role by name and workflow template.
@@ -752,27 +684,24 @@ public interface WorkbenchDataManager {
 	 * @param name - the role name to match
 	 * @param workflowTemplate - the workflow template to match
 	 * @return the role matching the given name and workflow template
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Role getRoleByNameAndWorkflowTemplate(String name, WorkflowTemplate workflowTemplate) throws MiddlewareQueryException;
+	Role getRoleByNameAndWorkflowTemplate(String name, WorkflowTemplate workflowTemplate);
 
 	/**
 	 * Gets the roles by workflow template.
 	 *
 	 * @param workflowTemplate - the workflow template to match
 	 * @return the role matching the given workflow template
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Role> getRolesByWorkflowTemplate(WorkflowTemplate workflowTemplate) throws MiddlewareQueryException;
+	List<Role> getRolesByWorkflowTemplate(WorkflowTemplate workflowTemplate);
 
 	/**
 	 * Gets the workflow template of the given role.
 	 *
 	 * @param role - the role to match
 	 * @return the workflow template matching the given role
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	WorkflowTemplate getWorkflowTemplateByRole(Role role) throws MiddlewareQueryException;
+	WorkflowTemplate getWorkflowTemplateByRole(Role role);
 
 	/**
 	 * Gets the roles given the project and user.
@@ -780,58 +709,51 @@ public interface WorkbenchDataManager {
 	 * @param project - the project to match
 	 * @param user - the user to match
 	 * @return the list of roles matching the given workflow template
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Role> getRolesByProjectAndUser(Project project, User user) throws MiddlewareQueryException;
+	List<Role> getRolesByProjectAndUser(Project project, User user);
 
 	/**
 	 * Returns all records from the workbench_role table,.
 	 *
 	 * @return List of Role objects
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Role> getAllRoles() throws MiddlewareQueryException;
+	List<Role> getAllRoles();
 
 	/**
 	 * Returns all records from the workbench_role table, ordered by descending role_id.
 	 *
 	 * @return List of Role objects
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Role> getAllRolesDesc() throws MiddlewareQueryException;
+	List<Role> getAllRolesDesc();
 
 	/**
 	 * Returns all records from the workbench_role table, ordered by ascending label_order.
 	 *
 	 * @return List of Role objects
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Role> getAllRolesOrderedByLabel() throws MiddlewareQueryException;
+	List<Role> getAllRolesOrderedByLabel();
 
 	/**
 	 * Get the workbench setting object.
 	 *
 	 * @return The WorkbenchSetting
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	WorkbenchSetting getWorkbenchSetting() throws MiddlewareQueryException;
+	WorkbenchSetting getWorkbenchSetting();
 
 	/**
 	 * Saves the specified SecurityQuestion object.
 	 *
 	 * @param securityQuestion - the Security Question object to be saved.
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void addSecurityQuestion(SecurityQuestion securityQuestion) throws MiddlewareQueryException;
+	void addSecurityQuestion(SecurityQuestion securityQuestion);
 
 	/**
 	 * Gets all the Security Questions associated with the specified User ID.
 	 *
 	 * @param userId - User ID of the user to get security questions.
 	 * @return - a {@code List} of {@code SecurityQuestion} objects associated with the given User.
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<SecurityQuestion> getQuestionsByUserId(Integer userId) throws MiddlewareQueryException;
+	List<SecurityQuestion> getQuestionsByUserId(Integer userId);
 
 	/**
 	 * Returns the ProjectUserMysqlAccount record identified by the given project id and user id.
@@ -839,7 +761,6 @@ public interface WorkbenchDataManager {
 	 * @param projectId the project id
 	 * @param userId the user id
 	 * @return The ProjectUserMysqlAccount of the given project id and user id.
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	ProjectUserMysqlAccount getProjectUserMysqlAccountByProjectIdAndUserId(Integer projectId, Integer userId)
 			throws MiddlewareQueryException;
@@ -849,58 +770,51 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param records the records
 	 * @return List of ids of the records saved
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Integer> addProjectUserMysqlAccounts(List<ProjectUserMysqlAccount> records) throws MiddlewareQueryException;
+	List<Integer> addProjectUserMysqlAccounts(List<ProjectUserMysqlAccount> records);
 
 	/**
 	 * Stores a ProjectUserMysqlAccount record in the database.
 	 *
 	 * @param record the record
 	 * @return id of the record saved
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer addProjectUserMysqlAccount(ProjectUserMysqlAccount record) throws MiddlewareQueryException;
+	Integer addProjectUserMysqlAccount(ProjectUserMysqlAccount record);
 
 	/**
 	 * Gets the ProjectUserInfoDAO.
 	 *
 	 * @return ProjectUserInfoDAO
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	ProjectUserInfoDAO getProjectUserInfoDao() throws MiddlewareQueryException;
+	ProjectUserInfoDAO getProjectUserInfoDao();
 
 	/**
 	 * Saves or updates the ProjectUserInfo.
 	 *
 	 * @param projectUserInfo the project user info
 	 * @return ProjectUserInfo
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	ProjectUserInfo saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo) throws MiddlewareQueryException;
+	ProjectUserInfo saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo);
 
 	/**
 	 * Gets the all workbench sidebar category.
 	 *
 	 * @return the all workbench sidebar category
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<WorkbenchSidebarCategory> getAllWorkbenchSidebarCategory() throws MiddlewareQueryException;
+	List<WorkbenchSidebarCategory> getAllWorkbenchSidebarCategory();
 
 	/**
 	 * Gets the all workbench sidebar links.
 	 *
 	 * @return the all workbench sidebar links
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinks() throws MiddlewareQueryException;
+	List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinks();
 
 	/**
 	 * Gets the all workbench sidebar links by category id.
 	 *
 	 * @param category the category
 	 * @return the all workbench sidebar links by category id
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(WorkbenchSidebarCategory category)
 			throws MiddlewareQueryException;
@@ -910,58 +824,51 @@ public interface WorkbenchDataManager {
 	 *
 	 * @param templateSettingFilter the template setting filter. Fill only the values to filter. Set all other values to null.
 	 * @return the template settings
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<TemplateSetting> getTemplateSettings(TemplateSetting templateSettingFilter) throws MiddlewareQueryException;
+	List<TemplateSetting> getTemplateSettings(TemplateSetting templateSettingFilter);
 
 	/**
 	 * Adds the template setting.
 	 *
 	 * @param templateSetting the template setting
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer addTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException;
+	Integer addTemplateSetting(TemplateSetting templateSetting);
 
 	/**
 	 * Update template setting.
 	 *
 	 * @param templateSetting the template setting
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void updateTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException;
+	void updateTemplateSetting(TemplateSetting templateSetting);
 
 	/**
 	 * Delete template setting.
 	 *
 	 * @param templateSetting the template setting
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void deleteTemplateSetting(TemplateSetting templateSetting) throws MiddlewareQueryException;
+	void deleteTemplateSetting(TemplateSetting templateSetting);
 
 	/**
 	 * Delete template setting with the given id.
 	 *
 	 * @param id the template setting id to delete
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void deleteTemplateSetting(Integer id) throws MiddlewareQueryException;
+	void deleteTemplateSetting(Integer id);
 
 	/**
 	 * Returns the project last accessed regardless of user.
 	 *
 	 * @return the last Project opened by the given user
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 
-	Project getLastOpenedProjectAnyUser() throws MiddlewareQueryException;
+	Project getLastOpenedProjectAnyUser();
 
 	/**
 	 * Detects whether the selected project in Workbench has changed
 	 *
 	 * @return True if the project has changed, otherwise false
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Boolean isLastOpenedProjectChanged() throws MiddlewareQueryException;
+	Boolean isLastOpenedProjectChanged();
 
 	/**
 	 * Retrive all standard presets with specific crop + tool
@@ -971,16 +878,16 @@ public interface WorkbenchDataManager {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId) throws MiddlewareQueryException;
+	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId);
 
 	/**
 	 * Returns the DAO object for standard preset
 	 *
 	 * @return StandardPresetDAO
 	 */
-	StandardPresetDAO getStandardPresetDAO() throws MiddlewareQueryException;
+	StandardPresetDAO getStandardPresetDAO();
 
-	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId, String toolSection) throws MiddlewareQueryException;
+	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId, String toolSection);
 
 	List<StandardPreset> getStandardPresetFromCropAndToolByName(String presetName, String cropName, int toolId, String toolSection)
 			throws MiddlewareQueryException;
@@ -992,7 +899,7 @@ public interface WorkbenchDataManager {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	StandardPreset saveOrUpdateStandardPreset(StandardPreset standardPreset) throws MiddlewareQueryException;
+	StandardPreset saveOrUpdateStandardPreset(StandardPreset standardPreset);
 
 	/**
 	 * delete a standard preset by id
@@ -1000,7 +907,7 @@ public interface WorkbenchDataManager {
 	 * @param standardPresetId
 	 * @throws MiddlewareQueryException
 	 */
-	void deleteStandardPreset(int standardPresetId) throws MiddlewareQueryException;
+	void deleteStandardPreset(int standardPresetId);
 
 	/**
 	 * Close the sessionProvider
@@ -1014,9 +921,31 @@ public interface WorkbenchDataManager {
 	 * @param projectId - the specified Project ID
 	 * @return Returns the IBDB User ID associated with the specified Workbench User ID and Project ID. Returns null when there is no IBDB
 	 *         User ID matching the specified Workbench User ID and Project ID.
-	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(Integer ibdbUserId, Long projectId) throws MiddlewareQueryException;
+	Integer getWorkbenchUserIdByIBDBUserIdAndProjectId(Integer ibdbUserId, Long projectId);
+
+	/**
+	 * Get the list of tool license information
+	 *
+	 * @return the list of tool license information
+	 */
+	List<ToolLicenseInfo> getListOfToolLicenseInfo();
+
+	/**
+	 * Get license info by tool name
+	 *
+	 * @param toolName the name of the tool
+	 * @return the tool license information by tool name
+	 */
+	ToolLicenseInfo getToolLicenseInfoByToolName(String toolName);
+
+	/**
+	 * Save or update the license info
+	 *
+	 * @param licenseInfo the ToolLicenseInfo Hibernate Object
+	 * @return the saved/updated ToolLicenseInfo Hibernate Object
+	 */
+	ToolLicenseInfo saveOrUpdateToolLicenseInfo(ToolLicenseInfo licenseInfo);
 
 	/**
 	 * Gets the all Users Sorted

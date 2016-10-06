@@ -7,12 +7,52 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<changeSet author="darla" id="beta16-1">
+	<changeSet author="maeisabelle" id="beta16-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+                <tableExists tableName="workbench_tool_license_info"/>
+            </not>
+		</preConditions>
+		<createTable  tableName="workbench_tool_license_info">
+        	<column name="tool_license_info_id" type="INT UNSIGNED" autoIncrement="true">
+	            <constraints primaryKey="true" nullable="false"/>
+	        </column>
+	        <column name="tool_id" type="INT UNSIGNED">
+	        	<constraints nullable="false" foreignKeyName="fk_tool_license_info_tool_id" references="workbench_tool(tool_id)" deleteCascade="true"/>
+	        </column>
+	        <column name="license_path" type="TEXT">
+	            <constraints nullable="false"/>
+	        </column>
+	        <column name="license_hash" type="TEXT"/>
+	        <column name="expiration_date" type="DATE"/>
+    	</createTable>
+	</changeSet>
+	
+	<changeSet author="maeisabelle" id="beta16-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) 
+				FROM workbench_tool_license_info wlicense
+				INNER JOIN workbench_tool wtool 
+				ON wtool.tool_id = wlicense.tool_id
+				WHERE wtool.name = 'breeding_view'
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			REPLACE INTO `workbench_tool_license_info`(tool_id, license_path) 
+			SELECT tool_id, REPLACE(path, 'BreedingView.exe', 'breedingview.lic') as license_path
+			FROM `workbench_tool` 
+			WHERE name = 'breeding_view'
+		</sql>
+	</changeSet>
+	
+	
+	<changeSet author="darla" id="beta16-3">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'persons' AND CONSTRAINT_NAME='persons_uc1' and TABLE_SCHEMA = DATABASE();</sqlCheck>
 		</preConditions>
 	    <addUniqueConstraint columnNames="pemail" constraintName="persons_uc1" tableName="persons" />
-	</changeSet>
+    </changeSet>
 
 
 </databaseChangeLog>
