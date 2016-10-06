@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.manager;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -40,11 +42,15 @@ import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.google.common.collect.Lists;
 
 public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
@@ -828,5 +834,40 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 			}
 		}
 		return fulllist;
+	}
+
+
+	@Test
+	public void testGetAllUserDtosSorted() throws MiddlewareQueryException {
+		final UserDto user = this.workbenchTestDataUtil.createTestUserDTO(25);
+		final List<UserDto> users = Lists.newArrayList(user);
+		final WorkbenchDataManager workbenchDataManager = Mockito.mock(WorkbenchDataManager.class);
+
+		Mockito.when(workbenchDataManager.getAllUsersSortedByLastName()).thenReturn(users);
+		assertThat("Expected list users not null.", users != null);
+		assertThat("Expected list users not empty.", !users.isEmpty());
+		assertThat("Expected list users size 1.", users.size() == 1);
+
+	}
+
+	@Test
+	public void testCreateUser() throws MiddlewareQueryException {
+		final UserDto userDto = this.workbenchTestDataUtil.createTestUserDTO(0);
+		final Integer result = this.workbenchDataManager.createUser(userDto);
+
+		assertThat("Expected id of a newly saved record in workbench_user.", result != null);
+		assertThat("Expected id of new user distinct of 0", !result.equals(0));
+	}
+
+	@Test
+	public void testUpdateUser() throws MiddlewareQueryException {
+		final UserDto userDto = this.workbenchTestDataUtil.createTestUserDTO(0);
+		final Integer userId = this.workbenchDataManager.createUser(userDto);
+		userDto.setUserId(userId);
+		userDto.setRole("BREEDER");
+		final Integer result = workbenchDataManager.updateUser(userDto);
+
+		assertThat("Expected id of userDto saved record in workbench_user.", result != null);
+		assertThat("Expected the same id of userDto saved record ", result.equals(userId));
 	}
 }
