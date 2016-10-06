@@ -13,15 +13,13 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
 public class ListInventoryBuilderTest extends IntegrationTestBase {
 
 	private static final int LIST_ID = 1;
-	private static final int GROUP_ID = 1;
+	private static final int GROUP_ID = 0;
 	private static final int NO_OF_ENTRIES = 5;
 	private static ListInventoryBuilder listInventoryBuilder;
 	private static List<Integer> gids;
