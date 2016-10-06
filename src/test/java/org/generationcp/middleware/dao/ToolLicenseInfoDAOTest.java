@@ -28,7 +28,6 @@ public class ToolLicenseInfoDAOTest extends IntegrationTestBase {
 		ToolLicenseInfoDAOTest.dao.setSession(this.workbenchSessionProvider.getSession());
 	}
 
-	@Ignore("Remove this once the liquibase to create the table 'workbench_tool_license_info' is run")
 	@Test
 	public void testGetByToolName() throws Exception {
 		final String expectedToolName = ToolName.mbdt.toString();
