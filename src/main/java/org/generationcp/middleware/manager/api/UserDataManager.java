@@ -170,4 +170,5 @@ public interface UserDataManager {
      * @return
      */
     Person getPersonByEmail(String email) throws MiddlewareQueryException;
+
 }

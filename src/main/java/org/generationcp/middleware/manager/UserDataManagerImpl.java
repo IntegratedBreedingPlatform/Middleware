@@ -258,8 +258,10 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 		return this.getUserDao().getUserByFullname(fullname);
 	}
 
+
 	@Override
 	public Person getPersonByEmail(final String email) throws MiddlewareQueryException {
 		return this.getPersonDao().getPersonByEmail(email);
 	}
+
 }
