@@ -6,80 +6,113 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<changeSet author="abhishekptl" id="beta16-1">
-
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id = 1736;</sqlCheck>
-		</preConditions>
-
+	<changeSet author="darla" id="beta16-1">
 		<sql dbms="mysql" splitStatements="true">
-			INSERT INTO cvterm VALUES (1736, 1000, 'STATUS', 'Status of the reserved or committed inventory transactions', null, 0, 0);
+			<!--
+				 Add default ADMIN user to programs he is not yet a member of 					 	-->
+			INSERT INTO workbench.workbench_project_user_info(project_id, user_id)
+			SELECT p.project_id, u.userid
+			  FROM workbench.users u
+			 INNER JOIN workbench.workbench_project p
+			 WHERE u.uname = 'ADMIN'
+			   AND NOT EXISTS (
+				   SELECT 1
+				     FROM workbench.workbench_project_user_info projUser
+					WHERE projUser.user_id = u.userid
+					  AND projUser.project_id = p.project_id
+				   );
+			<!--
+				 Add entry to workbench_project_user_role for ADMIN user. It's a redundant table
+				 but currently a record here is needed in order to get projects of user 			-->
+			INSERT INTO workbench.workbench_project_user_role(project_id, user_id, role_id)
+			SELECT p.project_id, u.userid, 1
+			  FROM workbench.users u
+			 INNER JOIN  workbench.workbench_project p
+			 WHERE u.uname = 'ADMIN'
+			   AND NOT EXISTS (
+			  	   SELECT 1 FROM workbench.workbench_project_user_role workflowRole
+			  		WHERE workflowRole.user_id = u.userid
+			  		  AND workflowRole.project_id = p.project_id
+			  		  AND workflowRole.role_id = 1
+				   );
+			<!--
+				 Copy record from workbench.person of ADMIN user to crop's person table, if not existing
+			     We use email address to find matching person										-->
+			INSERT INTO persons(fname, lname, ioname, institid, ptitle, poname, plangu, pphone,
+			  		pextent, pfax, pemail, prole, sperson, eperson, pstatus, pnotes, contact)
+			SELECT wbPerson.fname, wbPerson.lname, wbPerson.ioname, wbPerson.institid, wbPerson.ptitle,
+				   wbPerson.poname, wbPerson.plangu, wbPerson.pphone, wbPerson.pextent, wbPerson.pfax, wbPerson.pemail,
+				   wbPerson.prole, wbPerson.sperson, wbPerson.eperson, wbPerson.pstatus, wbPerson.pnotes, wbPerson.contact
+			  FROM workbench.persons wbPerson
+			 INNER JOIN workbench.users u
+					ON u.personid = wbPerson.personid
+			 INNER JOIN workbench.workbench_project_user_info projUser
+					ON projUser.user_id = u.userid
+			 INNER JOIN workbench.workbench_project p
+					ON projUser.project_id = p.project_id
+			 INNER JOIN workbench.workbench_crop crop
+					ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+			 WHERE u.uname = 'ADMIN'
+			   AND NOT EXISTS (
+				   SELECT 1
+					 FROM persons cropPerson
+					WHERE cropPerson.pemail = wbPerson.pemail
+					)
+			<!-- Can return multiple rows - one per program in current crop. Limit to 1 as we will insert only 1 record  -->
+			 LIMIT 1;
+			<!--
+				Copy record from workbench.users to crop's users table if not yet existing
+				Need to link new user to proper crop person - match person by email address							-->
+			INSERT INTO users(instalid, ustatus, uaccess, utype, uname, upswd, personid, adate, cdate)
+			SELECT u.instalid, u.ustatus, u.uaccess, u.utype, u.uname, u.upswd, cropPerson.personid, u.adate, u.cdate
+			  FROM workbench.users u
+			 INNER JOIN workbench.persons wbPerson
+					ON wbPerson.personid = u.personid
+			 INNER JOIN persons cropPerson
+					ON cropPerson.pemail = wbPerson.pemail
+			 INNER JOIN workbench.workbench_project_user_info projUser
+					ON projUser.user_id = u.userid
+			 INNER JOIN workbench.workbench_project p
+					ON projUser.project_id = p.project_id
+			 INNER JOIN workbench.workbench_crop crop
+					ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+			 WHERE NOT EXISTS (
+					SELECT 1
+					  FROM users cropUser
+					 WHERE cropUser.uname = u.uname
+					)
+			<!-- Can return multiple rows - one per program in current crop. Limit to 1 as we will insert only 1 record  -->
+			 LIMIT 1;
+			<!--
+			     Insert record Into workbench_ibdb_user_map (mapping of workbench user to crop user per program) -->
+			INSERT INTO workbench.workbench_ibdb_user_map(project_id, workbench_user_id, ibdb_user_id)
+			SELECT p.project_id, u.userid, cropUser.userid
+			  FROM workbench.users u
+			 INNER JOIN users cropUser ON cropUser.uname = u.uname
+			 INNER JOIN workbench.workbench_project_user_info projUser
+					ON projUser.user_id = u.userid
+			 INNER JOIN workbench.workbench_project p
+					ON projUser.project_id = p.project_id
+			 INNER JOIN workbench.workbench_crop crop
+					ON crop.crop_name = p.crop_type AND crop.db_name = DATABASE()
+			 WHERE u.uname = 'ADMIN'
+			   AND NOT EXISTS (
+				   SELECT 1
+					 FROM workbench.workbench_ibdb_user_map userMap
+					WHERE userMap.project_id = p.project_id
+			          AND userMap.workbench_user_id = u.userid
+				   );
 		</sql>
-
 	</changeSet>
 
-	<changeSet author="abhishekptl" id="beta16-2">
-
+	<changeSet author="darla" id="beta16-2">
 		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE cvterm_id = 1700;</sqlCheck>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'persons' AND CONSTRAINT_NAME='persons_uc1' and TABLE_SCHEMA = DATABASE();</sqlCheck>
 		</preConditions>
-
-		<sql dbms="mysql" splitStatements="true">
-			update cvterm set name='LOTS' where cvterm_id = 1700;
-		</sql>
-
+	    <addUniqueConstraint columnNames="pemail" constraintName="persons_uc1" tableName="persons" />
 	</changeSet>
 
-	<changeSet author="abhishekptl" id="beta16-3">
-
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE cvterm_id = 1718;</sqlCheck>
-		</preConditions>
-
-		<sql dbms="mysql" splitStatements="true">
-			update cvterm set name='AVAILABLE' where cvterm_id = 1718;
-		</sql>
-
-	</changeSet>
-
-	<changeSet author="abhishekptl" id="beta16-4">
-
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE cvterm_id = 1713;</sqlCheck>
-		</preConditions>
-
-		<sql dbms="mysql" splitStatements="true">
-			update cvterm set name='WITHDRAWAL' where cvterm_id = 1713;
-		</sql>
-
-	</changeSet>
-
-	<changeSet author="abhishekptl" id="beta16-5">
-
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id = 1737;</sqlCheck>
-		</preConditions>
-
-		<sql dbms="mysql" splitStatements="true">
-			INSERT INTO cvterm VALUES (1737, 1000, 'ACTUAL BALANCE', 'Total of all unreserved seed, plus reserved seed that is not yet committed', null, 0, 0);
-		</sql>
-
-	</changeSet>
-
-	<changeSet author="abhishekptl" id="beta16-6">
-
-		<preConditions onFail="MARK_RAN">
-			<tableExists tableName="ims_transaction"></tableExists>
-		</preConditions>
-
-		<update tableName="ims_transaction">
-			<column name="trnstat" value="1" type="INT(11)" />
-			<where>trnstat = 0 and trnqty &lt; 0</where>
-		</update>
-
-	</changeSet>
-
-	<changeSet author="aldrinb" id="1">
+	<changeSet author="aldrinb" id="beta16-3">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8831 AND name = 'NBLKS';</sqlCheck>
 		</preConditions>
@@ -95,6 +128,80 @@
 
 			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES (8831,1800,'Study Detail',0);
 		</sql>
+	</changeSet>
+
+
+	<changeSet author="abhishekptl" id="beta16-4">
+
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id = 1736;</sqlCheck>
+		</preConditions>
+
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm VALUES (1736, 1000, 'STATUS', 'Status of the reserved or committed inventory transactions', null, 0, 0);
+		</sql>
+
+	</changeSet>
+
+	<changeSet author="abhishekptl" id="beta16-5">
+
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE cvterm_id = 1700;</sqlCheck>
+		</preConditions>
+
+		<sql dbms="mysql" splitStatements="true">
+			update cvterm set name='LOTS' where cvterm_id = 1700;
+		</sql>
+
+	</changeSet>
+
+	<changeSet author="abhishekptl" id="beta16-6">
+
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE cvterm_id = 1718;</sqlCheck>
+		</preConditions>
+
+		<sql dbms="mysql" splitStatements="true">
+			update cvterm set name='AVAILABLE' where cvterm_id = 1718;
+		</sql>
+
+	</changeSet>
+
+	<changeSet author="abhishekptl" id="beta16-7">
+
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE cvterm_id = 1713;</sqlCheck>
+		</preConditions>
+
+		<sql dbms="mysql" splitStatements="true">
+			update cvterm set name='WITHDRAWAL' where cvterm_id = 1713;
+		</sql>
+
+	</changeSet>
+
+	<changeSet author="abhishekptl" id="beta16-8">
+
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id = 1737;</sqlCheck>
+		</preConditions>
+
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm VALUES (1737, 1000, 'ACTUAL BALANCE', 'Total of all unreserved seed, plus reserved seed that is not yet committed', null, 0, 0);
+		</sql>
+
+	</changeSet>
+
+	<changeSet author="abhishekptl" id="beta16-9">
+
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="ims_transaction"></tableExists>
+		</preConditions>
+
+		<update tableName="ims_transaction">
+			<column name="trnstat" value="1" type="INT(11)" />
+			<where>trnstat = 0 and trnqty &lt; 0</where>
+		</update>
+
 	</changeSet>
 
 </databaseChangeLog>

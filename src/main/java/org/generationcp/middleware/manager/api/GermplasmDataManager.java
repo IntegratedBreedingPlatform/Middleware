@@ -1163,4 +1163,12 @@ public interface GermplasmDataManager {
 	 */
 	Map<Integer, List<Name>> getNamesByGidsAndNTypeIdsInMap(List<Integer> gids, List<Integer> ntypeIds);
 
+	/**
+	 * Returns the list of favorite methods in the current program
+	 * @param mType
+	 * @param programUUID
+	 * @return list of favorite methods
+	 */
+	List<Method> getFavoriteMethodsByMethodType(String methodType, String programUUID);
+
 }
