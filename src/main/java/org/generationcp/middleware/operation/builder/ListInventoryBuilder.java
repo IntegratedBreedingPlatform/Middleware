@@ -113,6 +113,7 @@ public class ListInventoryBuilder extends Builder {
 		}
 		this.retrieveLotCounts(entryIds, listEntries, gids, lrecIds);
 		this.retrieveGroupId(listEntries, gids);
+		this.retrieveWithdrawalAndStatus(entryIds, listEntries, gids, lrecIds);
 		return listEntries;
 	}
 
