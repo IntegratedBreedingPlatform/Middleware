@@ -16,7 +16,6 @@ import java.util.List;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.service.api.user.UserDto;
 
 /**
  * The Interface UserDataManager.
@@ -163,4 +162,13 @@ public interface UserDataManager {
 	 */
     User getUserByFullname(String fullname) throws MiddlewareQueryException;
     
+    /**
+     * Gets person with matching email address. Assumes that email is unique per user/person.
+     * 
+     * @param firstName
+     * @param lastName
+     * @return
+     */
+    Person getPersonByEmail(String email) throws MiddlewareQueryException;
+
 }

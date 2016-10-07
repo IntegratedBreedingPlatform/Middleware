@@ -24,7 +24,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.HibernateException;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,32 +33,36 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
 /**
- * Implementation of the UserDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
+ * Implementation of the UserDataManager interface. To instantiate this class, a
+ * Hibernate Session must be passed to its constructor.
  */
 @Transactional
 public class UserDataManagerImpl extends DataManager implements UserDataManager {
 
 	/**
-	 * Caching all the users in the system. Max is ten because we do not expect to have more than 10 war filed. Each war file will create on
-	 * cache.
+	 * Caching all the users in the system. Max is ten because we do not expect
+	 * to have more than 10 war filed. Each war file will create on cache.
 	 */
-	private static Cache<String, List<User>> localUserCache =
-			CacheBuilder.newBuilder().maximumSize(10).expireAfterWrite(60, TimeUnit.MINUTES).build();
+	private static Cache<String, List<User>> localUserCache = CacheBuilder.newBuilder().maximumSize(10)
+			.expireAfterWrite(60, TimeUnit.MINUTES).build();
 
 	/**
-	 * Function to load data into the user local cache when required. Note this must be a member variable an not a static variable.
+	 * Function to load data into the user local cache when required. Note this
+	 * must be a member variable an not a static variable.
 	 */
 	private FunctionBasedGuavaCacheLoader<String, List<User>> functionBasedLocalUserGuavaCacheLoader;
 
 	/**
-	 * Caching all the persons in the system. Max is ten because we do not expect to have more than 10 war filed. Each war file will create
-	 * on cache.
+	 * Caching all the persons in the system. Max is ten because we do not
+	 * expect to have more than 10 war filed. Each war file will create on
+	 * cache.
 	 */
-	private static Cache<String, List<Person>> localPersonCache =
-			CacheBuilder.newBuilder().maximumSize(10).expireAfterWrite(60, TimeUnit.MINUTES).build();
+	private static Cache<String, List<Person>> localPersonCache = CacheBuilder.newBuilder().maximumSize(10)
+			.expireAfterWrite(60, TimeUnit.MINUTES).build();
 
 	/**
-	 * Function to load data into the user local cache when required. Note this must be a member variable an not a static variable.
+	 * Function to load data into the user local cache when required. Note this
+	 * must be a member variable an not a static variable.
 	 */
 	private FunctionBasedGuavaCacheLoader<String, List<Person>> functionBasedLocalPersonGuavaCacheLoader;
 
@@ -100,7 +103,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 			final String databaseConnectionUrl = this.getActiveSession().connection().getMetaData().getURL();
 			return this.functionBasedLocalUserGuavaCacheLoader.get(databaseConnectionUrl).get();
 		} catch (HibernateException | SQLException e) {
-			throw new MiddlewareQueryException("Unable to connect to the database. Please contact admin for further information.", e);
+			throw new MiddlewareQueryException(
+					"Unable to connect to the database. Please contact admin for further information.", e);
 		}
 	}
 
@@ -120,8 +124,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 			final User recordSaved = dao.saveOrUpdate(user);
 			idUserSaved = recordSaved.getUserid();
 		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-					"Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user="
+					+ user + "): " + e.getMessage(), e);
 		}
 
 		return idUserSaved;
@@ -135,8 +139,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 			this.getUserDao().saveOrUpdate(user);
 		} catch (final Exception e) {
 
-			throw new MiddlewareQueryException(
-					"Error encountered while saving User: UserDataManager.addUser(user=" + user + "): " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error encountered while saving User: UserDataManager.addUser(user="
+					+ user + "): " + e.getMessage(), e);
 		}
 		return user.getUserid();
 	}
@@ -153,19 +157,19 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 			UserDataManagerImpl.localPersonCache.invalidateAll();
 			this.getUserDao().makeTransient(user);
 		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-					"Error encountered while deleting User: UserDataManager.deleteUser(user=" + user + "): " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error encountered while deleting User: UserDataManager.deleteUser(user="
+					+ user + "): " + e.getMessage(), e);
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public List<Person> getAllPersons() throws MiddlewareQueryException {
 		try {
 			final String databaseConnectionUrl = this.getActiveSession().connection().getMetaData().getURL();
 			return this.functionBasedLocalPersonGuavaCacheLoader.get(databaseConnectionUrl).get();
 		} catch (HibernateException | SQLException e) {
-			throw new MiddlewareQueryException("Unable to connect to the database. Please contact admin for further information.", e);
+			throw new MiddlewareQueryException(
+					"Unable to connect to the database. Please contact admin for further information.", e);
 		}
 	}
 
@@ -196,7 +200,9 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 			idPersonSaved = recordSaved.getId();
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
-					"Error encountered while saving Person: UserDataManager.addPerson(person=" + person + "): " + e.getMessage(), e);
+					"Error encountered while saving Person: UserDataManager.addPerson(person=" + person + "): "
+							+ e.getMessage(),
+					e);
 		}
 		return idPersonSaved;
 	}
@@ -214,7 +220,9 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 			this.getPersonDao().makeTransient(person);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
-					"Error encountered while deleting Person: UserDataManager.deletePerson(person=" + person + "): " + e.getMessage(), e);
+					"Error encountered while deleting Person: UserDataManager.deletePerson(person=" + person + "): "
+							+ e.getMessage(),
+					e);
 		}
 	}
 
@@ -240,13 +248,20 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	}
 
 	@Override
-	public Person getPersonByName(final String firstName, final String middleName, final String lastName) throws MiddlewareQueryException {
+	public Person getPersonByName(final String firstName, final String middleName, final String lastName)
+			throws MiddlewareQueryException {
 		return this.getPersonDao().getPersonByName(firstName, middleName, lastName);
 	}
 
 	@Override
 	public User getUserByFullname(final String fullname) throws MiddlewareQueryException {
 		return this.getUserDao().getUserByFullname(fullname);
+	}
+
+
+	@Override
+	public Person getPersonByEmail(final String email) throws MiddlewareQueryException {
+		return this.getPersonDao().getPersonByEmail(email);
 	}
 
 }

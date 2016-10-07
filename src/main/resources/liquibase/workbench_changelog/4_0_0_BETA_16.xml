@@ -45,6 +45,14 @@
 			WHERE name = 'breeding_view'
 		</sql>
 	</changeSet>
+	
+	
+	<changeSet author="darla" id="beta16-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'persons' AND CONSTRAINT_NAME='persons_uc1' and TABLE_SCHEMA = DATABASE();</sqlCheck>
+		</preConditions>
+	    <addUniqueConstraint columnNames="pemail" constraintName="persons_uc1" tableName="persons" />
+    </changeSet>
 
 
 </databaseChangeLog>
