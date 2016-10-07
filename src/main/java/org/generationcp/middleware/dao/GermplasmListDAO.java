@@ -397,41 +397,36 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	/**
-	 * Get Germplasm Lists with names like Q or germplasms with name like Q or gid equal to Q
+	 * Get Germplasm Lists with:
+	 * 1. names like query string or 
+	 * 2  germplasm with name like query string or 
+	 * 3. gid equal to query string
 	 *
-	 * @param q - the search string with the wildcard character "%" expected to be appended already for LIKE operations
-	 * @param o - LIKE or EQUAL matching operation
+	 * @param searchString - the search string with the wildcard character "%" expected to be appended already for LIKE operations
+	 * @param operation - LIKE or EQUAL matching operation
 	 * @return List of GermplasmLists
 	 * @throws MiddlewareQueryException
 	 */
 	@SuppressWarnings("unchecked")
-	public List<GermplasmList> searchForGermplasmLists(final String searchedString, final String programUUID, final Operation o)
+	public List<GermplasmList> searchForGermplasmLists(final String searchString, final String programUUID, final Operation operation)
 			throws MiddlewareQueryException {
-		final String q = searchedString.trim();
-		if ("".equals(q)) {
+		final String queryString = searchString.trim();
+		if ("".equals(queryString)) {
 			return new ArrayList<GermplasmList>();
 		}
 		try {
-			final SQLQuery query;
+			
+			final SQLQuery query = this.getSession().createSQLQuery(
+					this.getSearchForGermplasmListsQueryString(queryString, programUUID, operation));
 
-			if (o.equals(Operation.EQUAL)) {
-				query = this.getSession().createSQLQuery(
-						this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_EQUAL, programUUID));
-				query.setParameter("gidLength", q.length());
-				query.setParameter("q", q);
-				query.setParameter("qNoSpaces", q.replace(" ", ""));
-				query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
+			if (operation.equals(Operation.EQUAL)) {
+				query.setParameter("gidLength", queryString.length());
 				
-			} else {
-				query = this.getSession().createSQLQuery(
-						this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_GID_LIKE, programUUID));
-				query.setParameter("q", q);
-				query.setParameter("qNoSpaces", q.replace(" ", ""));
-				query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
-
-
-			}
-			query.setParameter("gid", q);
+			} 			
+			query.setParameter("gid", queryString);
+			query.setParameter("q", queryString);
+			query.setParameter("qNoSpaces", queryString.replace(" ", ""));
+			query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(queryString));
 
 			if (programUUID != null) {
 				query.setParameter("programUUID", programUUID);
@@ -441,17 +436,46 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			return query.list();
 
 		} catch (final Exception e) {
-			this.logAndThrowException("Error with searchGermplasmLists(" + q + ") " + e.getMessage(), e);
+			this.logAndThrowException("Error with searchGermplasmLists(" + queryString + ") " + e.getMessage(), e);
 		}
 		return new ArrayList<GermplasmList>();
 	}
 
-	private String getSearchForGermplasmListsQueryString(final String initialQueryString, final String programUUID) {
-		String queryString = initialQueryString;
-		if (programUUID != null) {
-			queryString += GermplasmList.FILTER_BY_PROGRAM_UUID;
+	String getSearchForGermplasmListsQueryString(final String initialQueryString, final String programUUID, final Operation operation) {
+//		String queryString = initialQueryString;
+//		if (programUUID != null) {
+//			queryString += GermplasmList.FILTER_BY_PROGRAM_UUID;
+//		}
+//		return queryString;
+		final StringBuilder queryStringBuilder = new StringBuilder();
+		queryStringBuilder.append("SELECT DISTINCT listnms.* "
+				+ "FROM listnms "
+				+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
+				+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) ");
+		
+		// Exclude snapshot lists, deleted lists and folder type lists
+		queryStringBuilder.append(
+				"WHERE listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND ( ");
+		
+		// Match to GIDs in listdata
+		if (Operation.EQUAL.equals(operation)){
+			queryStringBuilder.append("(listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) ");
+		} else {
+			queryStringBuilder.append("listdata.gid LIKE :gid ");
 		}
-		return queryString;
+		
+		// Match to list name or listdata.desgination or
+		if (Operation.EQUAL.equals(operation)){
+			queryStringBuilder.append(" OR desig = :q OR listname = :q OR desig = :qNoSpaces OR desig = :qStandardized )");
+		} else {
+			queryStringBuilder.append(" OR desig LIKE :q OR listname LIKE :q OR desig LIKE :qNoSpaces OR desig LIKE :qStandardized )");
+		}
+		
+		// Filter to lists in current program plus historical lists
+		if (programUUID != null) {
+			queryStringBuilder.append(" AND (program_uuid = :programUUID OR program_uuid IS NULL)");
+		}
+		return queryStringBuilder.toString();
 	}
 
 	@SuppressWarnings("unchecked")

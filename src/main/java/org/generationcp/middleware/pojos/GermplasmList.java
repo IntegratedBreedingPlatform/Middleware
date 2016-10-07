@@ -113,36 +113,8 @@ public class GermplasmList implements Serializable {
 	public static final String GET_GERMPLASM_NAME_TYPES =
 			"SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid " + "FROM udflds "
 					+ "WHERE ftable = 'NAMES' AND ftype = 'NAME'";
-
-	public static final String SEARCH_FOR_GERMPLASM_LIST =
-			"SELECT DISTINCT listnms.* "
-					+ "FROM listnms "
-					+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
-					+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) "
-					+ "WHERE listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
-					+ "      OR desig LIKE :q OR listname LIKE :q " + "      OR desig LIKE :qNoSpaces "
-					+ "      OR desig LIKE :qStandardized " + ")";
-
-	public static final String SEARCH_FOR_GERMPLASM_LIST_GID_LIKE =
-			"SELECT DISTINCT listnms.* "
-					+ "FROM listnms "
-					+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
-					+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) "
-					+ "WHERE listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND (listdata.gid LIKE :gid "
-					+ "      OR desig LIKE :q OR listname LIKE :q" + "      OR desig LIKE :qNoSpaces "
-					+ "      OR desig LIKE :qStandardized " + ")";
-
-	public static final String SEARCH_FOR_GERMPLASM_LIST_EQUAL =
-			"SELECT DISTINCT listnms.* "
-					+ "FROM listnms "
-					+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
-					+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) "
-					+ "WHERE "
-					+ " listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
-					+ "      OR desig = :q OR listname = :q " + "      OR desig = :qNoSpaces " + "      OR desig = :qStandardized " + ")";
-
-	public static final String FILTER_BY_PROGRAM_UUID = " AND (program_uuid = :programUUID OR program_uuid IS NULL)";
-
+	
+	
 	public GermplasmList() {
 
 	}
