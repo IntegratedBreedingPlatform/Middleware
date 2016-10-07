@@ -26,9 +26,7 @@ import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
@@ -40,7 +38,6 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
-import org.hibernate.type.Type;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
@@ -402,8 +399,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	/**
 	 * Get Germplasm Lists with names like Q or germplasms with name like Q or gid equal to Q
 	 *
-	 * @param q
-	 * @param o - like or equal
+	 * @param q - the search string with the wildcard character "%" expected to be appended already for LIKE operations
+	 * @param o - LIKE or EQUAL matching operation
 	 * @return List of GermplasmLists
 	 * @throws MiddlewareQueryException
 	 */
@@ -424,21 +421,14 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 				query.setParameter("q", q);
 				query.setParameter("qNoSpaces", q.replace(" ", ""));
 				query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
+				
 			} else {
-				if (q.contains("%") || q.contains("_")) {
-					query = this.getSession().createSQLQuery(
-							this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_GID_LIKE, programUUID));
-					query.setParameter("q", q);
-					query.setParameter("qNoSpaces", q.replace(" ", ""));
-					query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
-				} else {
-					query = this.getSession().createSQLQuery(
-							this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST, programUUID));
-					query.setParameter("gidLength", q.length());
-					query.setParameter("q", q + "%");
-					query.setParameter("qNoSpaces", q.replace(" ", "") + "%");
-					query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q) + "%");
-				}
+				query = this.getSession().createSQLQuery(
+						this.getSearchForGermplasmListsQueryString(GermplasmList.SEARCH_FOR_GERMPLASM_LIST_GID_LIKE, programUUID));
+				query.setParameter("q", q);
+				query.setParameter("qNoSpaces", q.replace(" ", ""));
+				query.setParameter("qStandardized", GermplasmDataManagerUtil.standardizeName(q));
+
 
 			}
 			query.setParameter("gid", q);
