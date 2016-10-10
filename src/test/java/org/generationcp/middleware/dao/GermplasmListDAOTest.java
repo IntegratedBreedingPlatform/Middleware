@@ -28,6 +28,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class GermplasmListDAOTest extends IntegrationTestBase {
 
+
+	private static final String KEYWORD = "QWERTY";
+	private static final String TEST_GERMPLASM_LIST_NAME = KEYWORD + " List";
+	private static final String TEST_GERMPLASM_LIST_DESC = "TestGermplasmListDesc";
+	private static final String PROGRAM_UUID = "1001";
+	private static final String TEST_GERMPLASM_NAME = KEYWORD + " Germplasm";
+	
+	private static final String TEST_LIST2_WITH_KEYWORD = "Some Other " + KEYWORD;
+	private static final String TEST_LIST3_WITHOUT_KEYWORD = "Another List";
+	
 	@Autowired
 	private GermplasmListManager germplasmListManager;
 	
@@ -35,9 +45,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	private GermplasmDataManager germplasmDataManager;
 
 	private GermplasmListDAO germplasmListDAO;
-	private static final String TEST_GERMPLASM_LIST_NAME = "TestGermplasmListName";
-	private static final String TEST_GERMPLASM_LIST_DESC = "TestGermplasmListDesc";
-	private static final String PROGRAM_UUID = "1001";
 
 	private static List<String> EXCLUDED_GERMPLASM_LIST_TYPES = new ArrayList<String>();
 	private static GermplasmListTestDataInitializer germplasmListTestDataInitializer;
@@ -69,11 +76,11 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 				GermplasmListTestDataInitializer.DEFAULT_GERMPLASM_LIST_TYPE, PROGRAM_UUID);
 		
 		// Create one germplasm and add as entry under that list
-		final Name name = new Name(null, null, 1, 1, 1, "Name", 0, 0, 0);
+		final Name name = new Name(null, null, 1, 1, 1, TEST_GERMPLASM_NAME, 0, 0, 0);
 		this.germplasm = new Germplasm(null, 0, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
 		this.germplasmDataManager.addGermplasm(this.germplasm, name);
 		final GermplasmListData germplasmListData = new GermplasmListData(null, this.list, this.germplasm.getGid(), 1,
-				"EntryCode", "SeedSource", "Germplasm Name 5", "GroupName", 0, 99995);
+				"EntryCode", "SeedSource", TEST_GERMPLASM_NAME, "GroupName", 0, 99995);
 		this.germplasmListManager.addGermplasmListData(germplasmListData);
 
 	}
@@ -203,5 +210,70 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		Assert.assertEquals("Returned results should contain one item", 1, allGermplasmListsById.size());
 
 	}
+	
+	@Test
+	public void testSearchForGermplasmListsUsingEqualOperation(){
+		/*
+		 *  Create other test lists. Total of 3 lists in DB:
+		 *  1. "QWERTY List" with default germplasm - default list in setup method
+		 *  2. Empty list "Some Other QWERTY"
+		 *  3. "Another List" containing same GID as default germplasm, but different Designation saved in listdata
+		 */
+		this.createOtherTestLists();
+		
+		// Search for default list name "QWERTY List"
+		List<GermplasmList> returnedLists = this.germplasmListDAO.searchForGermplasmLists(TEST_GERMPLASM_LIST_NAME, PROGRAM_UUID, Operation.EQUAL);
+		Assert.assertNotNull(returnedLists);
+		Assert.assertTrue("Expecting only 1 list to be returned with list name=" + this.list.getName(), returnedLists.size() == 1);
+		Assert.assertEquals(this.list.getId(), returnedLists.get(0).getId());
+		
+		// Search for lists by created germplasm's GID
+		String gidString = this.germplasm.getGid().toString();
+		returnedLists = this.germplasmListDAO.searchForGermplasmLists(gidString, PROGRAM_UUID, Operation.EQUAL);
+		Assert.assertNotNull(returnedLists);
+		Assert.assertTrue("Expecting 2 lists to be returned with GID=" + gidString, returnedLists.size() == 2);
+		
+		// Search for lists by created germplasm's designation
+		returnedLists = this.germplasmListDAO.searchForGermplasmLists(TEST_GERMPLASM_NAME, PROGRAM_UUID, Operation.EQUAL);
+		Assert.assertNotNull(returnedLists);
+		Assert.assertTrue("Expecting 1 list to be returned with Designation=" + TEST_GERMPLASM_NAME, returnedLists.size() == 1);
+		Assert.assertEquals(this.list.getId(), returnedLists.get(0).getId());
+	}
+	
+	
+	@Test
+	public void testSearchForGermplasmListsUsingLikeOperation(){
+		/*
+		 *  Create other test lists. Total of 3 lists in DB:
+		 *  1. "QWERTY List" with default germplasm - default list in setup method
+		 *  2. Empty list "Some Other QWERTY"
+		 *  3. "Another List" containing same GID as default germplasm, but different Designation saved in listdata
+		 */
+		this.createOtherTestLists();
+		
+		// Search for lists with keyword starting with keyword "QWERTY"
+		List<GermplasmList> returnedLists = this.germplasmListDAO.searchForGermplasmLists(KEYWORD + "%", PROGRAM_UUID, Operation.LIKE);
+		Assert.assertNotNull(returnedLists);
+		Assert.assertTrue("Expecting only 1 list to be returned starting with keyword=" + KEYWORD, returnedLists.size() == 1);
+		Assert.assertEquals(this.list.getId(), returnedLists.get(0).getId());
+		
+		// Search for lists with keyword containing keyword "QWERTY". 
+		// Names of first two lists contain "QWERTY", 3rd list has listdata.designation containing "QWERTY"
+		returnedLists = this.germplasmListDAO.searchForGermplasmLists("%" + KEYWORD + "%", PROGRAM_UUID, Operation.LIKE);
+		Assert.assertNotNull(returnedLists);
+		Assert.assertTrue("Expecting 3 lists with to be returned containing keyword=" + KEYWORD, returnedLists.size() == 3);
+		
+	}
+	
+	
+	private void createOtherTestLists(){
+		createAndSaveGermplasmList(TEST_LIST2_WITH_KEYWORD, "Some Description", GermplasmListTestDataInitializer.DEFAULT_GERMPLASM_LIST_TYPE, PROGRAM_UUID);
+		final GermplasmList testList = createAndSaveGermplasmList(TEST_LIST3_WITHOUT_KEYWORD, "Some Description", GermplasmListTestDataInitializer.DEFAULT_GERMPLASM_LIST_TYPE, PROGRAM_UUID);
+		final GermplasmListData germplasmListData = new GermplasmListData(null, testList, this.germplasm.getGid(), 1,
+				"EntryCode", "SeedSource", "A-" + KEYWORD, "GroupName", 0, 99995);
+		this.germplasmListManager.addGermplasmListData(germplasmListData);
+	}
+	
+	
 
 }
