@@ -159,9 +159,13 @@ public class LotDetails implements Serializable {
 		this.lotScaleMethodName = lotScaleMethodName;
 	}
 
-	public Boolean getTransactionStatus() {return transactionStatus;}
+	public Boolean getTransactionStatus() {
+		return transactionStatus;
+	}
 
-	public void setTransactionStatus(Boolean transactionStatus) {this.transactionStatus = transactionStatus;}
+	public void setTransactionStatus(Boolean transactionStatus) {
+		this.transactionStatus = transactionStatus;
+	}
 
 	@Override
 	public String toString() {
