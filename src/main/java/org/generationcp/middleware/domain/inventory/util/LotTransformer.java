@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
@@ -39,11 +40,11 @@ public class LotTransformer {
 
 				LotAggregateData aggregateData = lot.getAggregateData();
 				if (aggregateData != null) {
-					lotDetails.setActualLotBalance(aggregateData.getActualBalance());
 					lotDetails.setAvailableLotBalance(aggregateData.getAvailableBalance());
 					lotDetails.setReservedTotal(aggregateData.getReservedTotal());
+					lotDetails.setActualLotBalance(aggregateData.getAvailableBalance() + aggregateData.getReservedTotal());
 					lotDetails.setStockIds(aggregateData.getStockIds());
-
+					lotDetails.setTransactionId(aggregateData.getTransactionId());
 					// get reserved amount for list entry and # reserved for other entries in list for specific lot
 					Map<Integer, Double> reservationMap = aggregateData.getReservationMap();
 					Double sumEntry = 0d;
@@ -59,6 +60,32 @@ public class LotTransformer {
 						}
 						lotDetails.setReservedTotalForEntry(sumEntry);
 						lotDetails.setReservedTotalForOtherEntries(sumOthers);
+						lotDetails.setWithdrawalBalance(sumEntry);
+					}
+
+
+					Map<Integer, Set<String>> statusMap = aggregateData.getReservationStatusMap();
+
+					if(statusMap != null){
+						Set<String> statusSet = statusMap.get(id);
+						String status = "";
+						if(statusSet != null){
+							if(statusSet.size() == 1){
+								status = statusSet.iterator().next();
+								if("0".equals(status)){
+									status = ListDataInventory.RESERVED;
+								}
+								else if("1".equals(status)){
+									status = ListDataInventory.WITHDRAWN;
+								}
+							}
+							else if(statusSet.size() > 1){
+								status = ListDataInventory.RESERVED;
+							}
+						}
+
+						lotDetails.setWithdrawalStatus(status);
+
 					}
 				}
 

@@ -15,15 +15,21 @@ public class LotDetails implements Serializable {
 	private Integer entityIdOfLot;
 	private Integer scaleId;
 	private Integer locId;
+	private String lotScaleNameAbbr;
+	private String lotScaleMethodName;
 	private String commentOfLot;
 
 	// computed or looked up values
 	private Double actualLotBalance;
 	private Double availableLotBalance;
+	private Double withdrawalBalance;
+	private String withdrawalStatus;
 	private Location locationOfLot;
 	private Double reservedTotal;
 	private Term scaleOfLot;
 	private String stockIds;
+	private Integer transactionId;
+	private Boolean transactionStatus;
 
 	public Integer getLotId() {
 		return this.lotId;
@@ -111,6 +117,54 @@ public class LotDetails implements Serializable {
 
 	public void setStockIds(String stockIds) {
 		this.stockIds = stockIds;
+	}
+
+	public Double getWithdrawalBalance() {
+		return withdrawalBalance;
+	}
+
+	public void setWithdrawalBalance(Double withdrawalBalance) {
+		this.withdrawalBalance = withdrawalBalance;
+	}
+
+	public String getWithdrawalStatus() {
+		return withdrawalStatus;
+	}
+
+	public void setWithdrawalStatus(String withdrawalStatus) {
+		this.withdrawalStatus = withdrawalStatus;
+	}
+
+	public String getLotScaleNameAbbr() {
+		return lotScaleNameAbbr;
+	}
+
+	public void setLotScaleNameAbbr(String lotScaleNameAbbr) {
+		this.lotScaleNameAbbr = lotScaleNameAbbr;
+	}
+
+	public Integer getTransactionId() {
+		return transactionId;
+	}
+
+	public void setTransactionId(Integer transactionId) {
+		this.transactionId = transactionId;
+	}
+
+	public String getLotScaleMethodName() {
+		return lotScaleMethodName;
+	}
+
+	public void setLotScaleMethodName(String lotScaleMethodName) {
+		this.lotScaleMethodName = lotScaleMethodName;
+	}
+
+	public Boolean getTransactionStatus() {
+		return transactionStatus;
+	}
+
+	public void setTransactionStatus(Boolean transactionStatus) {
+		this.transactionStatus = transactionStatus;
 	}
 
 	@Override

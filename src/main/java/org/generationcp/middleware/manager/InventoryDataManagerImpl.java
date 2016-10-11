@@ -244,6 +244,11 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	}
 
 	@Override
+	public List<org.generationcp.middleware.pojos.ims.Transaction> getTransactionsByIdList(List<Integer> idList) throws MiddlewareQueryException {
+		return this.getTransactionDao().filterByColumnValues("id", idList);
+	}
+
+	@Override
 	public Set<org.generationcp.middleware.pojos.ims.Transaction> getTransactionsByLotId(Integer id) throws MiddlewareQueryException {
 		Lot lot = this.getLotDao().getById(id, false);
 		return lot.getTransactions();
@@ -544,6 +549,12 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	public List<GermplasmListData> getLotDetailsForList(Integer listId, int start, int numOfRows) throws MiddlewareQueryException {
 		List<GermplasmListData> listEntries = this.getGermplasmListDataByListId(listId);
 		return this.getListInventoryBuilder().retrieveInventoryLotsForList(listId, start, numOfRows, listEntries);
+	}
+
+	@Override
+	public List<GermplasmListData> getReservedLotDetailsForExportList(Integer listId) throws MiddlewareQueryException {
+		List<GermplasmListData> listEntries = this.getGermplasmListDataByListId(listId);
+		return this.getListInventoryBuilder().retrieveReservedInventoryLotsForList(listId, listEntries);
 	}
 
 	@Override

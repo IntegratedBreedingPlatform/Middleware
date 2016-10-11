@@ -142,6 +142,28 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		return relationships;
 	}
 
+	public List<CVTermRelationship> getBySubjectIdsAndTypeId(List<Integer> subjectIds, int typeId) throws MiddlewareQueryException {
+
+		List<CVTermRelationship> relationships = new ArrayList<>();
+
+		try {
+			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("typeId", typeId));
+			criteria.add(Restrictions.in("subjectId", subjectIds));
+
+			relationships = criteria.list();
+			if (relationships == null || relationships.isEmpty()) {
+				return null;
+			}
+
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error with getBySubjectIdsAndTypeId=" + subjectIds + ", " + typeId, e);
+
+		}
+		return relationships;
+	}
+
+
 	@SuppressWarnings("unchecked")
 	public List<CVTermRelationship> getByObjectId(int objectId) throws MiddlewareQueryException {
 
