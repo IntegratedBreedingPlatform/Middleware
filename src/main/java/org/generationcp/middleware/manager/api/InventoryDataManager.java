@@ -528,12 +528,10 @@ public interface InventoryDataManager {
 	 * Returns the germplasm entries of given list id with lot rows and reserved inventory data per entry
 	 *
 	 * @param listId - id of list
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 *
 	 * @return List of GermplasmListData POJOs
 	 */
-	List<GermplasmListData> getReservedLotDetailsForExportList(Integer listId, int start, int numOfRows) throws MiddlewareQueryException;
+	List<GermplasmListData> getReservedLotDetailsForExportList(Integer listId) throws MiddlewareQueryException;
 
 
 	/**

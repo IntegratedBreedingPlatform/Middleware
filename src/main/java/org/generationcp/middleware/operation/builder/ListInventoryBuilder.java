@@ -311,12 +311,11 @@ public class ListInventoryBuilder extends Builder {
 	 * Return list of GermplasmListData objects for given list with list of reserved lots associated per germplasm entry
 	 *
 	 * @param listId
-	 * @param start
-	 * @param numOfRows
+	 * @param listEntries germplsm list entries
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	public List<GermplasmListData> retrieveReservedInventoryLotsForList(final Integer listId, final int start, final int numOfRows,
+	public List<GermplasmListData> retrieveReservedInventoryLotsForList(final Integer listId ,
 			final List<GermplasmListData> listEntries) throws MiddlewareQueryException {
 
 		final List<Integer> listEntryIds = new ArrayList<Integer>();

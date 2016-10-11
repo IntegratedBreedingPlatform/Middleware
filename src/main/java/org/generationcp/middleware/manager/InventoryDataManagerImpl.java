@@ -552,9 +552,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	}
 
 	@Override
-	public List<GermplasmListData> getReservedLotDetailsForExportList(Integer listId, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<GermplasmListData> getReservedLotDetailsForExportList(Integer listId) throws MiddlewareQueryException {
 		List<GermplasmListData> listEntries = this.getGermplasmListDataByListId(listId);
-		return this.getListInventoryBuilder().retrieveReservedInventoryLotsForList(listId, start, numOfRows, listEntries);
+		return this.getListInventoryBuilder().retrieveReservedInventoryLotsForList(listId, listEntries);
 	}
 
 	@Override
