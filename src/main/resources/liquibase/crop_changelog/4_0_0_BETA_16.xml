@@ -137,6 +137,8 @@
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id = 1736;</sqlCheck>
 		</preConditions>
 
+		<comment>New cvterm STATUS for column header</comment>
+
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO cvterm VALUES (1736, 1000, 'STATUS', 'Status of the reserved or committed inventory transactions', null, 0, 0);
 		</sql>
@@ -148,6 +150,8 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE cvterm_id = 1700;</sqlCheck>
 		</preConditions>
+
+		<comment>Updating cvterm AVAILABLE_INVENTORY for column header name change</comment>
 
 		<sql dbms="mysql" splitStatements="true">
 			update cvterm set name='LOTS' where cvterm_id = 1700;
@@ -161,6 +165,8 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE cvterm_id = 1718;</sqlCheck>
 		</preConditions>
 
+		<comment>Updating cvterm TOTAL_INVENTORY for column header name change</comment>
+
 		<sql dbms="mysql" splitStatements="true">
 			update cvterm set name='AVAILABLE' where cvterm_id = 1718;
 		</sql>
@@ -172,6 +178,8 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE cvterm_id = 1713;</sqlCheck>
 		</preConditions>
+
+		<comment>Updating cvterm SEED_RESERVATION for column header name change</comment>
 
 		<sql dbms="mysql" splitStatements="true">
 			update cvterm set name='WITHDRAWAL' where cvterm_id = 1713;
@@ -185,6 +193,8 @@
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id = 1737;</sqlCheck>
 		</preConditions>
 
+		<comment>New cvterm ACTUAL BALANCE for column header</comment>
+
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO cvterm VALUES (1737, 1000, 'ACTUAL BALANCE', 'Total of all unreserved seed, plus reserved seed that is not yet committed', null, 0, 0);
 		</sql>
@@ -196,6 +206,8 @@
 		<preConditions onFail="MARK_RAN">
 			<tableExists tableName="ims_transaction"></tableExists>
 		</preConditions>
+
+		<comment>All existing reserved transactions needs to consider as commit after introducing new commit status=1</comment>
 
 		<update tableName="ims_transaction">
 			<column name="trnstat" value="1" type="INT(11)" />
