@@ -52,7 +52,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			stockIds = criteria.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getStockIdsByProperty=" + value + " in StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStockIdsByProperty=" + value + " in StockDao: " + e.getMessage(), e);
 		}
 		return stockIds;
 	}
@@ -72,9 +72,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in countStudiesByGid=" + gid + " in StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in countStudiesByGid=" + gid + " in StockDao: " + e.getMessage(), e);
 		}
-		return 0;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -99,7 +98,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getStudiesByGid=" + gid + " in StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStudiesByGid=" + gid + " in StockDao: " + e.getMessage(), e);
 		}
 		return studyReferences;
 	}
@@ -120,7 +119,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at findInDataSet=" + datasetId + " at StockDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in findInDataSet=" + datasetId + " at StockDao: " + e.getMessage(), e);
 		}
 		return stockModels;
 	}
