@@ -583,26 +583,26 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 	}
 
-	public Map<Integer, String> retrieveStockIds(List<Integer> lrecIds) {
+	public Map<Integer, String> retrieveStockIds(List<Integer> gIds) {
 
-		Map<Integer, String> lrecIdStockIdMap = new HashMap<>();
+		Map<Integer, String> gIdStockIdMap = new HashMap<>();
 
 		String sql =
-				"SELECT a.lrecid,group_concat(inventory_id SEPARATOR ', ')  " + "FROM listdata a  "
+				"SELECT a.gid,group_concat(inventory_id SEPARATOR ', ')  " + "FROM listdata a  "
 						+ "inner join ims_lot b ON a.gid = b.eid  "
 						+ "INNER JOIN ims_transaction c ON b.lotid = c.lotid and a.lrecid = c.recordid "
-						+ "WHERE a.lrecid in (:lrecids) GROUP BY a.lrecid";
+						+ "WHERE a.gid in (:gIds) GROUP BY a.gid";
 
-		Query query = this.getSession().createSQLQuery(sql).setParameterList("lrecids", lrecIds);
+		Query query = this.getSession().createSQLQuery(sql).setParameterList("gIds", gIds);
 
 		List<Object[]> result = query.list();
 		for (Object[] row : result) {
 			Integer lrecid = (Integer) row[0];
 			String stockIds = (String) row[1];
 
-			lrecIdStockIdMap.put(lrecid, stockIds);
+			gIdStockIdMap.put(lrecid, stockIds);
 		}
-		return lrecIdStockIdMap;
+		return gIdStockIdMap;
 
 	}
 
