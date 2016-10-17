@@ -86,4 +86,6 @@ public interface OntologyVariableDataManager {
 	 * @return boolean return true if variable is used else false
 	 */
   	boolean isVariableUsedInStudy(final int variableId);
+
+	boolean areVariablesUsedInStudy(List<Integer> variablesIds);
 }

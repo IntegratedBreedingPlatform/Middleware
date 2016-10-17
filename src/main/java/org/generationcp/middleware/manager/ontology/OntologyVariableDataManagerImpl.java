@@ -898,5 +898,17 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		elements.setTermProperties(termProperties);
 		elements.setVariableOverrides(variableOverrides);
 	}
+	
+	@Override
+	public boolean areVariablesUsedInStudy(final List<Integer> variablesIds) {
+		final String variableUsageCount = "SELECT *  FROM projectprop pp " + " WHERE pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
+				+ " AND pp.value IN (:variablesIds) "
+				+ " AND pp.project_id not in ( SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = pp.project_id "
+				+ " AND stat.type_id = " + TermId.STUDY_STATUS.getId() + " AND value = " + TermId.DELETED_STUDY.getId() + ") limit 1";
+
+		final SQLQuery query = this.getActiveSession().createSQLQuery(variableUsageCount);
+		query.setParameter("variablesIds", variablesIds);
+		return query.list().size() > 0;
+	}
 
 }
