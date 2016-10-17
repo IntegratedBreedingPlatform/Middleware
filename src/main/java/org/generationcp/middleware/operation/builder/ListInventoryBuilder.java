@@ -189,7 +189,7 @@ public class ListInventoryBuilder extends Builder {
 		Map<Integer, Term> mapScaleTerm = new HashMap<>();
 		for (GermplasmListData entry : listEntries) {
 			if (entry.getInventoryInfo() != null && entry.getInventoryInfo().getWithdrawalScaleId() != null) {
-				setScaleIds.add(entry.getInventoryInfo().getScaleIdForGermplsm());
+				setScaleIds.add(entry.getInventoryInfo().getWithdrawalScaleId());
 			}
 		}
 
@@ -215,8 +215,8 @@ public class ListInventoryBuilder extends Builder {
 				}
 
 				for (GermplasmListData entry : listEntries) {
-					if (entry.getInventoryInfo() != null && entry.getInventoryInfo().getScaleIdForGermplsm() != null) {
-						Integer scaleId = entry.getInventoryInfo().getScaleIdForGermplsm();
+					if (entry.getInventoryInfo() != null && entry.getInventoryInfo().getWithdrawalScaleId() != null) {
+						Integer scaleId = entry.getInventoryInfo().getWithdrawalScaleId();
 
 						if (scaleIdWiseTermId.containsKey(scaleId)) {
 							Integer objectId = scaleIdWiseTermId.get(scaleId);
