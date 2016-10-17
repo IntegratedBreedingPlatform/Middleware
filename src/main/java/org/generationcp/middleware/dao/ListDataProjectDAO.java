@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
+import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -190,6 +191,23 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		} catch (final HibernateException e) {
 			this.logAndThrowException(
 					"Error with countByListId(id=" + id + ") query from ListDataProject " + e.getMessage(), e);
+		}
+		return 0;
+	}
+
+	public long countByListIdAndEntryType(final Integer id, final SystemDefinedEntryType systemDefinedEntryType) {
+		try {
+			if (id != null) {
+				final Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
+				criteria.createAlias("list", "l");
+				criteria.add(Restrictions.eq("l.id", id));
+				criteria.add(Restrictions.eq("checkType", systemDefinedEntryType.getEntryTypeCategoricalId()));
+				criteria.setProjection(Projections.rowCount());
+				return ((Long) criteria.uniqueResult()).longValue(); // count
+			}
+		} catch (final HibernateException e) {
+			this.logAndThrowException(
+					"Error with countByListIdAndEntryType(id=" + id + ") query from ListDataProject " + e.getMessage(), e);
 		}
 		return 0;
 	}

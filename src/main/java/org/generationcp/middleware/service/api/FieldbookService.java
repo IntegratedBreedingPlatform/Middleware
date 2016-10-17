@@ -29,6 +29,7 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
+import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
@@ -747,6 +748,14 @@ public interface FieldbookService {
 	 * @return
 	 */
 	List<ListDataProject> getListDataProject(int listId);
+
+	/**
+	 * Counts the number of ListDataProject with a speficied SystemDefinedEntryType.
+	 * @param listId
+	 * @param systemDefinedEntryType
+	 * @return
+	 */
+	long countListDataProjectByListIdAndEntryType(int listId, SystemDefinedEntryType systemDefinedEntryType);
 
 	ListDataProject getListDataProjectByStudy(int projectId, GermplasmListType type, int plotId);
 
