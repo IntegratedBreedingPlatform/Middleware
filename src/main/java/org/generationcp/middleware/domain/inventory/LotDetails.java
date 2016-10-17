@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.domain.inventory;
 
 import java.io.Serializable;

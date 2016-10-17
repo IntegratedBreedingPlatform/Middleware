@@ -1,12 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ * <p>
  * Generation Challenge Programme (GCP)
- * 
- * 
+ * <p>
+ * <p>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
  *******************************************************************************/
 
 package org.generationcp.middleware.dao.ims;
@@ -21,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.google.common.collect.Lists;
+
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.LotAggregateData;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -34,7 +34,6 @@ import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link Lot}.
- * 
  */
 public class LotDAO extends GenericDAO<Lot, Integer> {
 
@@ -62,29 +61,31 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			+ "  SUM(CASE WHEN trnstat = 0 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS reserved_amt, "
 			+ "  SUM(CASE WHEN trnstat = 1 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS committed_amt, ";
 
-	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS = LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS
-			+ "  GROUP_CONCAT(inventory_id SEPARATOR ', ') AS stockids ";
+	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS =
+			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS + "  GROUP_CONCAT(inventory_id SEPARATOR ', ') AS stockids ";
 
 	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_FILTERED_STOCKS = LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS
 			+ " GROUP_CONCAT(IF(act.sourceid = :listId, inventory_id, null) SEPARATOR ', ') AS stockids ";
 
-	private static final String GET_LOTS_FOR_GERMPLASM_CONDITION = "FROM ims_lot i "
-			+ "LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
-			+ "WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) " + "GROUP BY i.lotid ";
+	private static final String GET_LOTS_FOR_GERMPLASM_CONDITION =
+			"FROM ims_lot i " + "LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
+					+ "WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) " + "GROUP BY i.lotid ";
 
-	private static final String GET_LOTS_FOR_GERMPLASM = LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS
-			+ LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
+	private static final String GET_LOTS_FOR_GERMPLASM =
+			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS + LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
 
-	private static final String GET_LOTS_FOR_GERMPLASM_WITH_FILTERED_STOCKS = LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_FILTERED_STOCKS
-			+ LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
+	private static final String GET_LOTS_FOR_GERMPLASM_WITH_FILTERED_STOCKS =
+			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_FILTERED_STOCKS + LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
 
-	private static final String GET_LOTS_FOR_LIST_ENTRIES = "SELECT lot.*, recordid, trnqty * -1, trnstat, trnid " + "FROM " + "   ("
-			+ LotDAO.GET_LOTS_FOR_GERMPLASM + "   ) lot " + " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid "
-			+ "  AND trnstat in (:statusList) AND trnqty < 0 " + "  AND sourceid = :listId AND sourcetype = 'LIST' ";
+	private static final String GET_LOTS_FOR_LIST_ENTRIES =
+			"SELECT lot.*, recordid, trnqty * -1, trnstat, trnid " + "FROM " + "   (" + LotDAO.GET_LOTS_FOR_GERMPLASM + "   ) lot "
+					+ " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid " + "  AND trnstat in (:statusList) AND trnqty < 0 "
+					+ "  AND sourceid = :listId AND sourcetype = 'LIST' ";
 
-	private static final String GET_LOTS_FOR_LIST = "SELECT lot.*, recordid, trnqty * -1 , trnstat, trnid " + "FROM " + "   ("
-			+ LotDAO.GET_LOTS_FOR_GERMPLASM_WITH_FILTERED_STOCKS + "   ) lot " + " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid "
-			+ "  AND trnstat in (:statusList) AND trnqty < 0 " + "  AND sourceid = :listId AND sourcetype = 'LIST' ";
+	private static final String GET_LOTS_FOR_LIST =
+			"SELECT lot.*, recordid, trnqty * -1 , trnstat, trnid " + "FROM " + "   (" + LotDAO.GET_LOTS_FOR_GERMPLASM_WITH_FILTERED_STOCKS
+					+ "   ) lot " + " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid "
+					+ "  AND trnstat in (:statusList) AND trnqty < 0 " + "  AND sourceid = :listId AND sourcetype = 'LIST' ";
 
 	@SuppressWarnings("unchecked")
 	public List<Lot> getByEntityType(String type, int start, int numOfRows) throws MiddlewareQueryException {
@@ -124,8 +125,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				return criteria.list();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByEntityTypeAndEntityId(type=" + type + ENTITY_ID2 + entityId
-					+ QUERY_FROM_LOT + e.getMessage(), e);
+			this.logAndThrowException(
+					"Error with getByEntityTypeAndEntityId(type=" + type + ENTITY_ID2 + entityId + QUERY_FROM_LOT + e.getMessage(), e);
 		}
 		return new ArrayList<Lot>();
 	}
@@ -140,8 +141,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				return ((Long) criteria.uniqueResult()).longValue();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countByEntityTypeAndEntityId(type=" + type + ENTITY_ID2 + entityId
-					+ QUERY_FROM_LOT + e.getMessage(), e);
+			this.logAndThrowException(
+					"Error with countByEntityTypeAndEntityId(type=" + type + ENTITY_ID2 + entityId + QUERY_FROM_LOT + e.getMessage(), e);
 		}
 		return 0;
 	}
@@ -159,8 +160,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				return criteria.list();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByEntityTypeAndLocationId(type=" + type + LOCATION_ID2 + locationId
-					+ QUERY_FROM_LOT + e.getMessage(), e);
+			this.logAndThrowException(
+					"Error with getByEntityTypeAndLocationId(type=" + type + LOCATION_ID2 + locationId + QUERY_FROM_LOT + e.getMessage(),
+					e);
 		}
 		return new ArrayList<Lot>();
 	}
@@ -175,8 +177,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				return ((Long) criteria.uniqueResult()).longValue();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countByEntityTypeAndLocationId(type=" + type + LOCATION_ID2 + locationId
-					+ QUERY_FROM_LOT + e.getMessage(), e);
+			this.logAndThrowException(
+					"Error with countByEntityTypeAndLocationId(type=" + type + LOCATION_ID2 + locationId + QUERY_FROM_LOT + e.getMessage(),
+					e);
 		}
 		return 0;
 	}
@@ -195,8 +198,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				return criteria.list();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByEntityTypeAndEntityIdAndLocationId(type=" + type + ENTITY_ID2 + entityId
-					+ LOCATION_ID2 + locationId + QUERY_FROM_LOT + e.getMessage(), e);
+			this.logAndThrowException(
+					"Error with getByEntityTypeAndEntityIdAndLocationId(type=" + type + ENTITY_ID2 + entityId + LOCATION_ID2 + locationId
+							+ QUERY_FROM_LOT + e.getMessage(), e);
 		}
 		return new ArrayList<Lot>();
 	}
@@ -213,8 +217,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				return ((Long) criteria.uniqueResult()).longValue();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countByEntityTypeAndEntityIdAndLocationId(type=" + type + ENTITY_ID2 + entityId
-					+ LOCATION_ID2 + locationId + QUERY_FROM_LOT + e.getMessage(), e);
+			this.logAndThrowException(
+					"Error with countByEntityTypeAndEntityIdAndLocationId(type=" + type + ENTITY_ID2 + entityId + LOCATION_ID2 + locationId
+							+ QUERY_FROM_LOT + e.getMessage(), e);
 		}
 		return 0;
 	}
@@ -266,8 +271,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				return criteria.list();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByEntityTypeEntityIdLocationIdAndScaleId(type=" + type + ", entityIds=" + entityIds
-					+ LOCATION_ID2 + locationId + ", scaleId=" + scaleId + QUERY_FROM_LOT + e.getMessage(), e);
+			this.logAndThrowException(
+					"Error with getByEntityTypeEntityIdLocationIdAndScaleId(type=" + type + ", entityIds=" + entityIds + LOCATION_ID2
+							+ locationId + ", scaleId=" + scaleId + QUERY_FROM_LOT + e.getMessage(), e);
 		}
 		return new ArrayList<Lot>();
 	}
@@ -277,12 +283,11 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		Map<Integer, BigInteger> lotCounts = new HashMap<Integer, BigInteger>();
 
 		try {
-			String sql =
-					"SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED) FROM ( "
-							+ "SELECT i.lotid, i.eid AS entity_id, " + "   SUM(trnqty) AS avail_bal " + "  FROM ims_lot i "
-							+ "  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
-							+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " + " GROUP BY i.lotid ) inv "
-							+ "WHERE avail_bal > -1 " + "GROUP BY entity_id;";
+			String sql = "SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED) FROM ( "
+					+ "SELECT i.lotid, i.eid AS entity_id, " + "   SUM(trnqty) AS avail_bal " + "  FROM ims_lot i "
+					+ "  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
+					+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " + " GROUP BY i.lotid ) inv "
+					+ "WHERE avail_bal > -1 " + "GROUP BY entity_id;";
 
 			Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", gids);
 			List<Object[]> result = query.list();
@@ -305,15 +310,12 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		Map<Integer, Object[]> lotCounts = new HashMap<Integer, Object[]>();
 
 		try {
-			String sql =
-					"SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED), Count(DISTINCT lotid) "
-							+ ",sum(avail_bal), count(distinct scaleid), scaleid "
-							+ " FROM ( "
-							+ "SELECT i.lotid, i.eid AS entity_id, " + "   SUM(trnqty) AS avail_bal, i.scaleid as scaleid "
-							+  " FROM ims_lot i "
-							+ "  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
-							+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " + " GROUP BY i.lotid ) inv "
-							+ "WHERE avail_bal > -1 " + "GROUP BY entity_id;";
+			String sql = "SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED), Count(DISTINCT lotid) "
+					+ ",sum(avail_bal), count(distinct scaleid), scaleid " + " FROM ( " + "SELECT i.lotid, i.eid AS entity_id, "
+					+ "   SUM(trnqty) AS avail_bal, i.scaleid as scaleid " + " FROM ims_lot i "
+					+ "  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
+					+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " + " GROUP BY i.lotid ) inv "
+					+ "WHERE avail_bal > -1 " + "GROUP BY entity_id;";
 
 			Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", gids);
 			List<Object[]> result = query.list();
@@ -321,14 +323,15 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				Integer gid = (Integer) row[0];
 				BigInteger lotsWithAvailableBalance = (BigInteger) row[1];
 				BigInteger lotCount = (BigInteger) row[2];
-				Double availableBalance = (Double)row[3];
+				Double availableBalance = (Double) row[3];
 				BigInteger distinctScaleIdCount = (BigInteger) row[4];
 				Integer allLotsScaleId = null;
-				if(row[5] != null){
-					allLotsScaleId = (Integer)row[5];
+				if (row[5] != null) {
+					allLotsScaleId = (Integer) row[5];
 				}
 
-				lotCounts.put(gid, new Object[] {lotsWithAvailableBalance, lotCount, availableBalance, distinctScaleIdCount, allLotsScaleId});
+				lotCounts.put(gid,
+						new Object[] {lotsWithAvailableBalance, lotCount, availableBalance, distinctScaleIdCount, allLotsScaleId});
 			}
 
 		} catch (Exception e) {
@@ -348,8 +351,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				return criteria.list();
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByEntityTypeAndEntityIds(type=" + type + ", entityIds=" + entityIds
-					+ QUERY_FROM_LOT + e.getMessage(), e);
+			this.logAndThrowException(
+					"Error with getByEntityTypeAndEntityIds(type=" + type + ", entityIds=" + entityIds + QUERY_FROM_LOT + e.getMessage(),
+					e);
 		}
 		return new ArrayList<Lot>();
 	}
@@ -372,8 +376,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			this.createLotRows(lots, query, true);
 
 		} catch (Exception e) {
-			this.logAndThrowException("Error at getLotAggregateDataForListEntry for list ID = " + listId + " and GID = " + gid
-					+ AT_LOT_DAO + e.getMessage(), e);
+			this.logAndThrowException(
+					"Error at getLotAggregateDataForListEntry for list ID = " + listId + " and GID = " + gid + AT_LOT_DAO + e.getMessage(),
+					e);
 		}
 
 		return lots;
@@ -396,8 +401,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			this.createLotRows(lots, query, true);
 
 		} catch (Exception e) {
-			this.logAndThrowException("Error at getLotAggregateDataForList for list ID = " + listId + " and GIDs = " + gids
-					+ AT_LOT_DAO + e.getMessage(), e);
+			this.logAndThrowException(
+					"Error at getLotAggregateDataForList for list ID = " + listId + " and GIDs = " + gids + AT_LOT_DAO + e.getMessage(), e);
 		}
 
 		return lots;
@@ -419,12 +424,12 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			this.createLotRows(lots, query, true);
 
 		} catch (Exception e) {
-			this.logAndThrowException("Error at getReservedLotAggregateDataForList for list ID = " + listId + " and GIDs = " + gids
-					+ AT_LOT_DAO + e.getMessage(), e);
+			this.logAndThrowException(
+					"Error at getReservedLotAggregateDataForList for list ID = " + listId + " and GIDs = " + gids + AT_LOT_DAO + e
+							.getMessage(), e);
 		}
 		return lots;
 	}
-
 
 	public List<Lot> getLotAggregateDataForGermplasm(Integer gid) throws MiddlewareQueryException {
 		List<Lot> lots = new ArrayList<Lot>();
@@ -505,15 +510,15 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 					reservationMap.put(recordId, prevTotal + qty);
 				}
 
-				if(transactionState != null){
-					if(!reservationStatusMap.containsKey(recordId)){
+				if (transactionState != null) {
+					if (!reservationStatusMap.containsKey(recordId)) {
 						reservationStatusMap.put(recordId, new HashSet<String>());
 					}
 					reservationStatusMap.get(recordId).add(String.valueOf(transactionState));
 				}
 
-				if(row[13] != null){
-					Integer transactionId = (Integer)row[13];
+				if (row[13] != null) {
+					Integer transactionId = (Integer) row[13];
 					lot.getAggregateData().setTransactionId(transactionId);
 				}
 
