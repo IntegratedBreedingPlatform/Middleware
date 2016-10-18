@@ -120,7 +120,7 @@ public class GermplasmListTestDataInitializer {
 			final List<Integer> gids) {
 		final List<GermplasmListData> listEntries = new ArrayList<GermplasmListData>();
 		for (int i = 1; i <= itemNo; i++) {
-			final GermplasmListData listEntry = createGermplasmListDataItemWithGid(germplasmList, i, gids.get(i - 1));
+			final GermplasmListData listEntry = createGermplasmListDataItemWithGid(germplasmList, gids.get(i - 1), gids.get(i - 1));
 			listEntries.add(listEntry);
 		}
 

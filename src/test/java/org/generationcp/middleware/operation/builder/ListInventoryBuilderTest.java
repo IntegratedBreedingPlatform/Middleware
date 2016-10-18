@@ -203,7 +203,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 
 	private List<Integer> createListOfGermplasmIds(final int noOfEntries) {
 		final List<Integer> gids = new ArrayList<Integer>();
-		int randomNumber = (int) (Math.random() * 100);
+		Integer randomNumber = Integer.MIN_VALUE;
 		for (int i = 1; i <= noOfEntries; i++) {
 			gids.add(randomNumber + i);
 		}
