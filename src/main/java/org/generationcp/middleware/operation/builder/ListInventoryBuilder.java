@@ -685,14 +685,14 @@ public class ListInventoryBuilder extends Builder {
 			lotStatus = "";
 			if (lotStatusMap.containsKey(lot.getId())) {
 				Object[] row = lotStatusMap.get(lot.getId());
-				Integer distinctStatusCount = (Integer) row[0];
-				if (distinctStatusCount > 1) {
+				BigInteger distinctStatusCount = (BigInteger) row[0];
+				if (distinctStatusCount.intValue() > 1) {
 					lotStatus = ListDataInventory.RESERVED;
-				} else if (distinctStatusCount == 1) {
-					BigInteger status = (BigInteger) (BigInteger) row[1];
-					if (status.intValue() == 0) {
+				} else if (distinctStatusCount.intValue() == 1) {
+					Integer status = (Integer) row[1];
+					if (status == 0) {
 						lotStatus = ListDataInventory.RESERVED;
-					} else if (status.intValue() == 1) {
+					} else if (status == 1) {
 						lotStatus = ListDataInventory.WITHDRAWN;
 					}
 				}
