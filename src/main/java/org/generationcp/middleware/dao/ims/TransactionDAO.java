@@ -597,10 +597,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 		List<Object[]> result = query.list();
 		for (Object[] row : result) {
-			Integer lrecid = (Integer) row[0];
+			Integer gid = (Integer) row[0];
 			String stockIds = (String) row[1];
 
-			gIdStockIdMap.put(lrecid, stockIds);
+			gIdStockIdMap.put(gid, stockIds);
 		}
 		return gIdStockIdMap;
 
