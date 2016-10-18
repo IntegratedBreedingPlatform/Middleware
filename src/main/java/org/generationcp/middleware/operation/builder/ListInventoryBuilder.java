@@ -124,7 +124,7 @@ public class ListInventoryBuilder extends Builder {
 		// where listdata.gid may not be the final germplasm displayed
 		this.retrieveAvailableBalLotCounts(listEntries, gids);
 		this.retrieveReservedLotCounts(listEntries, entryIds);
-		this.retrieveStockIds(listEntries, lrecIds);
+		this.retrieveStockIds(listEntries, gids);
 
 	}
 
@@ -239,12 +239,12 @@ public class ListInventoryBuilder extends Builder {
 
 	}
 
-	private void retrieveStockIds(final List<GermplasmListData> listEntries, final List<Integer> lrecIds) {
-		final Map<Integer, String> stockIDs = this.getTransactionDao().retrieveStockIds(lrecIds);
+	private void retrieveStockIds(final List<GermplasmListData> listEntries, final List<Integer> gIds) {
+		final Map<Integer, String> stockIDs = this.getTransactionDao().retrieveStockIds(gIds);
 		for (final GermplasmListData entry : listEntries) {
 			final ListDataInventory inventory = entry.getInventoryInfo();
 			if (inventory != null) {
-				inventory.setStockIDs(stockIDs.get(entry.getId()));
+				inventory.setStockIDs(stockIDs.get(entry.getGid()));
 			}
 		}
 	}
