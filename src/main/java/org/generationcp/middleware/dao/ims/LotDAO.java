@@ -64,15 +64,15 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS =
 			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS + "  GROUP_CONCAT(inventory_id SEPARATOR ', ') AS stockids ";
 
-	private static final String GET_LOTS_FOR_GERMPLASM_CONDITION = "FROM ims_lot i "
-			+ "LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
-			+ "WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) " + "GROUP BY i.lotid ";
+	private static final String GET_LOTS_FOR_GERMPLASM_CONDITION =
+			"FROM ims_lot i " + "LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
+					+ "WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) " + "GROUP BY i.lotid ";
 
 	private static final String GET_LOTS_FOR_GERMPLASM =
 			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS + LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
 
-	private static final String GET_LOTS_FOR_GERMPLASM_WITH_FILTERED_STOCKS = LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS
-			+ LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
+	private static final String GET_LOTS_FOR_GERMPLASM_WITH_FILTERED_STOCKS =
+			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS + LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
 
 	private static final String GET_LOTS_FOR_LIST_ENTRIES =
 			"SELECT lot.*, recordid, trnqty * -1, trnstat, trnid " + "FROM " + "   (" + LotDAO.GET_LOTS_FOR_GERMPLASM + "   ) lot "
