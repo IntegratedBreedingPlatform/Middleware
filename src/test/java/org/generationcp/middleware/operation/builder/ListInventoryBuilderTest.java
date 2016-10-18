@@ -37,6 +37,8 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 	@Autowired
 	private InventoryDataManager inventoryDataManager;
 
+	private GermplasmList germplasmList;
+
 	InventoryDetailsTestDataInitializer inventoryDetailsTestDataInitializer;
 	
 
@@ -46,11 +48,12 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		listInventoryBuilder = new ListInventoryBuilder(this.sessionProvder);
 		gids = this.createListOfGermplasmIds(NO_OF_ENTRIES);
 		this.initializeGermplasms(gids);
+		germplasmList = GermplasmListTestDataInitializer.createGermplasmListWithListData(LIST_ID, NO_OF_ENTRIES, gids);
+		this.listInventoryBuilder.getGermplasmListDAO().save(germplasmList);
 	}
 
 	@Test
 	public void testRetrieveGroupId() {
-		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmListWithListData(LIST_ID, NO_OF_ENTRIES);
 		final List<GermplasmListData> listEntries = germplasmList.getListData();
 
 		listInventoryBuilder.retrieveGroupId(listEntries, gids);
@@ -63,7 +66,6 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testRetrieveWithdrawalBalance(){
-		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmListWithListData(LIST_ID, NO_OF_ENTRIES);
 		final List<GermplasmListData> listEntries = germplasmList.getListData();
 
 		final List<Integer> listEntryId = this.retrieveEntryIdFromListEntries(listEntries);
@@ -104,7 +106,6 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testRetrieveWithdrawalStatusWithReservedTransaction(){
-		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmListWithListData(LIST_ID, NO_OF_ENTRIES);
 		final List<GermplasmListData> listEntries = germplasmList.getListData();
 
 		final List<Integer> listGid = this.retrieveGidFromListEntries(listEntries);
@@ -137,7 +138,6 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testRetrieveLotCountsForList(){
-		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmListWithListData(LIST_ID, NO_OF_ENTRIES);
 		final List<GermplasmListData> listEntries = germplasmList.getListData();
 
 		final List<Integer> listGid = this.retrieveGidFromListEntries(listEntries);
@@ -169,7 +169,6 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 
 	@Test
 	public void testRetrieveInventoryLotsForGermplasm(){
-		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmListWithListData(LIST_ID, NO_OF_ENTRIES);
 		final List<GermplasmListData> listEntries = germplasmList.getListData();
 
 		final List<Integer> listGid = this.retrieveGidFromListEntries(listEntries);
@@ -189,7 +188,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		this.inventoryDataManager.addTransaction(initialTransaction);
 		this.inventoryDataManager.addTransaction(reservationTransaction);
 
-		List<LotDetails> lotDetails = listInventoryBuilder.retrieveInventoryLotsForGermplasm(1);
+		List<LotDetails> lotDetails = listInventoryBuilder.retrieveInventoryLotsForGermplasm(listGid.get(0));
 
 		Assert.assertEquals(1, lotDetails.size());
 		Assert.assertEquals("5.0", lotDetails.get(0).getActualLotBalance().toString());
@@ -210,8 +209,9 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 
 	private List<Integer> createListOfGermplasmIds(final int noOfEntries) {
 		final List<Integer> gids = new ArrayList<Integer>();
+		int randomNumber = (int ) (Math.random() * 100);
 		for (int i = 1; i <= noOfEntries; i++) {
-			gids.add(i);
+			gids.add(randomNumber+i);
 		}
 		return gids;
 	}
