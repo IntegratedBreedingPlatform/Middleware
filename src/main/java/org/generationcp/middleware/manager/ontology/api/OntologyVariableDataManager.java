@@ -15,8 +15,10 @@ package org.generationcp.middleware.manager.ontology.api;
 import java.util.List;
 
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
+import org.generationcp.middleware.pojos.oms.VariableOverrides;
 
 /**
  * This is the API for retrieving ontology variable data.
@@ -88,4 +90,6 @@ public interface OntologyVariableDataManager {
   	boolean isVariableUsedInStudy(final int variableId);
 
 	boolean areVariablesUsedInStudy(List<Integer> variablesIds);
+	
+	public List<VariableOverrides> getVariableOverridesByVariableIds(List<Integer> variableIds);
 }
