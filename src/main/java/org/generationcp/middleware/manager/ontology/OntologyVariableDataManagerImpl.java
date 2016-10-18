@@ -907,7 +907,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				+ " AND stat.type_id = " + TermId.STUDY_STATUS.getId() + " AND value = " + TermId.DELETED_STUDY.getId() + ") limit 1";
 
 		final SQLQuery query = this.getActiveSession().createSQLQuery(variableUsageCount);
-		query.setParameter("variablesIds", variablesIds);
+		query.setParameterList("variablesIds", variablesIds);
 		return query.list().size() > 0;
 	}
 
