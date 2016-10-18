@@ -189,6 +189,8 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		Assert.assertEquals("5.0", lotDetails.get(0).getActualLotBalance().toString());
 		Assert.assertEquals("3.0", lotDetails.get(0).getAvailableLotBalance().toString());
 		Assert.assertEquals("2.0", lotDetails.get(0).getReservedTotal().toString());
+		Assert.assertEquals("2.0", lotDetails.get(0).getWithdrawalBalance().toString());
+		Assert.assertEquals(ListDataInventory.RESERVED, lotDetails.get(0).getWithdrawalStatus());
 		Assert.assertEquals(8234, lotDetails.get(0).getScaleId().intValue());
 		Assert.assertEquals(9007, lotDetails.get(0).getLocId().intValue());
 	}
