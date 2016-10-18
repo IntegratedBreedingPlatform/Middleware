@@ -84,6 +84,10 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 					+ "   ) lot " + " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid "
 					+ "  AND trnstat in (:statusList) AND trnqty < 0 " + "  AND sourceid = :listId AND sourcetype = 'LIST' ";
 
+	private static final String GET_LOTS_STATUS_FOR_GERMPLASM = "SELECT i.lotid, COUNT(DISTINCT (act.trnstat)), act.trnstat"
+			+ " FROM ims_lot i LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9"
+			+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND act.trnqty < 0 AND i.eid IN (:gids)" + "GROUP BY i.lotid ORDER BY lotid";
+
 	@SuppressWarnings("unchecked")
 	public List<Lot> getByEntityType(String type, int start, int numOfRows) throws MiddlewareQueryException {
 		try {
@@ -444,6 +448,29 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		}
 
 		return lots;
+	}
+
+	public Map<Integer, Object[]> getLotStatusDataForGermplasm(Integer gid) throws MiddlewareQueryException {
+		Map<Integer, Object[]> lotStatusCounts = new HashMap<Integer, Object[]>();
+
+		try {
+			String sql = LotDAO.GET_LOTS_STATUS_FOR_GERMPLASM;
+
+			Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", Collections.singletonList(gid));
+			List<Object[]> result = query.list();
+			for (Object[] row : result) {
+				Integer lotId = (Integer) row[0];
+				BigInteger lotDistinctStatusCount = (BigInteger) row[1];
+				Integer distinctStatus = (Integer) row[2];
+
+				lotStatusCounts.put(gid, new Object[] {lotId, lotDistinctStatusCount, distinctStatus});
+			}
+
+		} catch (Exception e) {
+			this.logAndThrowException("Error at getLotStatusDataForGermplasm for GID = " + gid + AT_LOT_DAO + e.getMessage(), e);
+		}
+
+		return lotStatusCounts;
 	}
 
 	@SuppressWarnings("unchecked")

@@ -262,6 +262,8 @@ public class ListInventoryBuilder extends Builder {
 	public List<LotDetails> retrieveInventoryLotsForGermplasm(final Integer gid) throws MiddlewareQueryException {
 		List<LotDetails> lotDetails = null;
 		final List<Lot> lots = this.getLotDao().getLotAggregateDataForGermplasm(gid);
+		final Map<Integer, Object[]> lotStatusDataForGermplasm = this.getLotDao().getLotStatusDataForGermplasm(gid);
+		this.setLotStatusForGermplasm(lots, lotStatusDataForGermplasm);
 		lotDetails = LotTransformer.extraLotDetails(lots);
 		this.setLocationsAndScales(lotDetails);
 		return lotDetails;
@@ -674,6 +676,28 @@ public class ListInventoryBuilder extends Builder {
 				scaleLotMap.put(scaleId, listLot);
 			}
 			scaleIds.add(scaleId);
+		}
+	}
+
+	private void setLotStatusForGermplasm(final List<Lot> lots, final Map<Integer, Object[]> lotStatusMap) {
+		String lotStatus = null;
+		for (Lot lot : lots) {
+			lotStatus = "";
+			if (lotStatusMap.containsKey(lot.getId())) {
+				Object[] row = lotStatusMap.get(lot.getId());
+				Integer distinctStatusCount = (Integer) row[0];
+				if (distinctStatusCount > 1) {
+					lotStatus = ListDataInventory.RESERVED;
+				} else if (distinctStatusCount == 1) {
+					BigInteger status = (BigInteger) (BigInteger) row[1];
+					if (status.intValue() == 0) {
+						lotStatus = ListDataInventory.RESERVED;
+					} else if (status.intValue() == 1) {
+						lotStatus = ListDataInventory.WITHDRAWN;
+					}
+				}
+			}
+			lot.getAggregateData().setLotStatus(lotStatus);
 		}
 	}
 }

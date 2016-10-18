@@ -33,6 +33,8 @@ public class LotAggregateData implements Serializable {
 	// key = record id and value = 0 or 1 status
 	private Map<Integer, Set<String>> reservationStatusMap;
 
+	private String lotStatus;
+
 	public LotAggregateData(Integer lotId) {
 		super();
 		this.lotId = lotId;
@@ -108,6 +110,14 @@ public class LotAggregateData implements Serializable {
 
 	public void setTransactionId(Integer transactionId) {
 		this.transactionId = transactionId;
+	}
+
+	public String getLotStatus() {
+		return lotStatus;
+	}
+
+	public void setLotStatus(String lotStatus) {
+		this.lotStatus = lotStatus;
 	}
 
 	@Override

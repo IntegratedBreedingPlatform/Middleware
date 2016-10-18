@@ -152,6 +152,8 @@ public class LotTransformer {
 					lotDetails.setAvailableLotBalance(aggregateData.getAvailableBalance());
 					lotDetails.setReservedTotal(aggregateData.getReservedTotal());
 					lotDetails.setStockIds(aggregateData.getStockIds());
+					lotDetails.setWithdrawalBalance(aggregateData.getReservedTotal() + aggregateData.getCommittedTotal());
+					lotDetails.setWithdrawalStatus(aggregateData.getLotStatus());
 				}
 
 				returnLotRows.add(lotDetails);
