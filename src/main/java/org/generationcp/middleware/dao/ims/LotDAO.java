@@ -463,7 +463,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				BigInteger lotDistinctStatusCount = (BigInteger) row[1];
 				Integer distinctStatus = (Integer) row[2];
 
-				lotStatusCounts.put(gid, new Object[] {lotId, lotDistinctStatusCount, distinctStatus});
+				lotStatusCounts.put(lotId, new Object[] {lotDistinctStatusCount, distinctStatus});
 			}
 
 		} catch (Exception e) {
