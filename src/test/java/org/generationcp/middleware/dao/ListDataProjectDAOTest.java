@@ -79,20 +79,20 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		final ListDataProject firstListDataProject = listDataProjects.get(0);
 		Assert.assertEquals("The designation must be " + this.testListDataProject.getDesignation(),
 				this.testListDataProject.getDesignation(), firstListDataProject.getDesignation());
-		Assert.assertEquals("The groupName must be " + this.testListDataProject.getGroupName(),
-				this.testListDataProject.getGroupName(), firstListDataProject.getGroupName());
-		Assert.assertEquals("The GID must be " + this.testListDataProject.getGermplasmId(),
-				this.testListDataProject.getGermplasmId(), firstListDataProject.getGermplasmId());
-		Assert.assertEquals("The seedSource must be " + this.testListDataProject.getSeedSource(),
-				this.testListDataProject.getSeedSource(), firstListDataProject.getSeedSource());
-		Assert.assertEquals("The duplicate must be " + this.testListDataProject.getDuplicate(),
-				this.testListDataProject.getDuplicate(), firstListDataProject.getDuplicate());
-		Assert.assertEquals("The duplicate must be " + this.testListDataProject.getDuplicate(),
-				this.testListDataProject.getDuplicate(), firstListDataProject.getDuplicate());
-		Assert.assertEquals("The checkType must be " + this.testListDataProject.getCheckType(),
-				this.testListDataProject.getCheckType(), firstListDataProject.getCheckType());
-		Assert.assertEquals("The entryCode must be " + this.testListDataProject.getEntryCode(),
-				this.testListDataProject.getEntryCode(), firstListDataProject.getEntryCode());
+		Assert.assertEquals("The groupName must be " + this.testListDataProject.getGroupName(), this.testListDataProject.getGroupName(),
+				firstListDataProject.getGroupName());
+		Assert.assertEquals("The GID must be " + this.testListDataProject.getGermplasmId(), this.testListDataProject.getGermplasmId(),
+				firstListDataProject.getGermplasmId());
+		Assert.assertEquals("The seedSource must be " + this.testListDataProject.getSeedSource(), this.testListDataProject.getSeedSource(),
+				firstListDataProject.getSeedSource());
+		Assert.assertEquals("The duplicate must be " + this.testListDataProject.getDuplicate(), this.testListDataProject.getDuplicate(),
+				firstListDataProject.getDuplicate());
+		Assert.assertEquals("The duplicate must be " + this.testListDataProject.getDuplicate(), this.testListDataProject.getDuplicate(),
+				firstListDataProject.getDuplicate());
+		Assert.assertEquals("The checkType must be " + this.testListDataProject.getCheckType(), this.testListDataProject.getCheckType(),
+				firstListDataProject.getCheckType());
+		Assert.assertEquals("The entryCode must be " + this.testListDataProject.getEntryCode(), this.testListDataProject.getEntryCode(),
+				firstListDataProject.getEntryCode());
 	}
 
 	@Test
@@ -110,14 +110,14 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 
 			// test at least one of the records for the other fields
 			if (this.testListDataProject.getListDataProjectId().equals(listDataProject.getListDataProjectId())) {
-				Assert.assertEquals("The entryId must be " + this.testListDataProject.getEntryId(),
-						this.testListDataProject.getEntryId(), listDataProject.getEntryId());
+				Assert.assertEquals("The entryId must be " + this.testListDataProject.getEntryId(), this.testListDataProject.getEntryId(),
+						listDataProject.getEntryId());
 				Assert.assertEquals("The designation must be " + this.testListDataProject.getDesignation(),
 						this.testListDataProject.getDesignation(), listDataProject.getDesignation());
 				Assert.assertEquals("The groupName must be " + this.testListDataProject.getGroupName(),
 						this.testListDataProject.getGroupName(), listDataProject.getGroupName());
-				Assert.assertEquals("The groupId must be " + this.testListDataProject.getGroupId(),
-						this.testListDataProject.getGroupId(), listDataProject.getGroupId());
+				Assert.assertEquals("The groupId must be " + this.testListDataProject.getGroupId(), this.testListDataProject.getGroupId(),
+						listDataProject.getGroupId());
 				Assert.assertEquals("The germplasmId must be " + this.testListDataProject.getGermplasmId(),
 						this.testListDataProject.getGermplasmId(), listDataProject.getGermplasmId());
 				Assert.assertEquals("The seedSource must be " + this.testListDataProject.getSeedSource(),
@@ -135,12 +135,12 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 				final String parentPreferredName = this.parentGermplasm.getPreferredName().getNval();
 				Assert.assertEquals("The Female Parent Designation must be " + parentPreferredName, parentPreferredName,
 						listDataProject.getFemaleParent());
-				Assert.assertEquals("The Female Parent GID must be " + this.parentGermplasm.getGid(),
-						this.parentGermplasm.getGid(), listDataProject.getFgid());
+				Assert.assertEquals("The Female Parent GID must be " + this.parentGermplasm.getGid(), this.parentGermplasm.getGid(),
+						listDataProject.getFgid());
 				Assert.assertEquals("The Male Parent Designation must be " + parentPreferredName, parentPreferredName,
 						listDataProject.getMaleParent());
-				Assert.assertEquals("The Male Parent GID must be " + this.parentGermplasm.getGid(),
-						this.parentGermplasm.getGid(), listDataProject.getMgid());
+				Assert.assertEquals("The Male Parent GID must be " + this.parentGermplasm.getGid(), this.parentGermplasm.getGid(),
+						listDataProject.getMgid());
 			}
 		}
 
@@ -149,22 +149,25 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 	@Test
 	public void testCountByListIdAndEntryType() {
 
-		int userId = 2;
-		long noOfTestEntries = 3;
-		long noOfCheckEntries = 4;
-		int listId = this.testListDataProject.getList().getId();
+		final int userId = 2;
+		final long noOfTestEntries = 3;
+		final long noOfCheckEntries = 4;
+		final int listId = this.testListDataProject.getList().getId();
 
-		List<ListDataProject> listDataProjects = this.createListDataProject( this.testListDataProject.getList(), noOfTestEntries, noOfCheckEntries);
-		listDataProjectSaver.saveOrUpdateListDataProject(studyId, GermplasmListType.NURSERY , listId, listDataProjects , userId);
+		final List<ListDataProject> listDataProjects =
+				this.createListDataProject(this.testListDataProject.getList(), noOfTestEntries, noOfCheckEntries);
+		listDataProjectSaver.saveOrUpdateListDataProject(studyId, GermplasmListType.NURSERY, listId, listDataProjects, userId);
 
-		Assert.assertEquals(String.format("There are only {0} check entries in the list", noOfCheckEntries), noOfCheckEntries, this.listDataProjectDAO.countByListIdAndEntryType(listId, SystemDefinedEntryType.CHECK_ENTRY));
-		Assert.assertEquals(String.format("There are only {0} test entries in the list", noOfTestEntries), noOfTestEntries, this.listDataProjectDAO.countByListIdAndEntryType(listId, SystemDefinedEntryType.TEST_ENTRY));
+		Assert.assertEquals(String.format("There are only {0} check entries in the list", noOfCheckEntries), noOfCheckEntries,
+				this.listDataProjectDAO.countByListIdAndEntryType(listId, SystemDefinedEntryType.CHECK_ENTRY));
+		Assert.assertEquals(String.format("There are only {0} test entries in the list", noOfTestEntries), noOfTestEntries,
+				this.listDataProjectDAO.countByListIdAndEntryType(listId, SystemDefinedEntryType.TEST_ENTRY));
 
 	}
 
-	private List<ListDataProject> createListDataProject(GermplasmList germplasmList, long noOfTestEntries, long noOfCheckEntries) {
+	private List<ListDataProject> createListDataProject(final GermplasmList germplasmList, final long noOfTestEntries, final long noOfCheckEntries) {
 
-		List<ListDataProject> listDataProjects = new ArrayList<>();
+		final List<ListDataProject> listDataProjects = new ArrayList<>();
 		for (int i = 0; i < noOfCheckEntries; i++) {
 			listDataProjects.add(createListDataProject(germplasmList, SystemDefinedEntryType.CHECK_ENTRY));
 		}
@@ -176,10 +179,9 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 
 	}
 
+	private ListDataProject createListDataProject(final GermplasmList germplasmList, final SystemDefinedEntryType systemDefinedEntryType) {
 
-	private ListDataProject createListDataProject(GermplasmList germplasmList, SystemDefinedEntryType systemDefinedEntryType) {
-
-		ListDataProject listDataProject = new ListDataProject();
+		final ListDataProject listDataProject = new ListDataProject();
 		listDataProject.setCheckType(systemDefinedEntryType.getEntryTypeCategoricalId());
 		listDataProject.setSeedSource("");
 		listDataProject.setList(germplasmList);
@@ -198,9 +200,9 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		final String programUUID = "884fefcc-1cbd-4e0f-9186-ceeef3aa3b78";
 		this.parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 
-		final Integer[] gids = this.germplasmTestDataGenerator.createChildrenGermplasm(
-				DataSetupTest.NUMBER_OF_GERMPLASM, ListDataProjectDAOTest.GERMPLASM_PREFERRED_NAME_PREFIX,
-				this.parentGermplasm);
+		final Integer[] gids = this.germplasmTestDataGenerator
+				.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, ListDataProjectDAOTest.GERMPLASM_PREFERRED_NAME_PREFIX,
+						this.parentGermplasm);
 
 		final int nurseryId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids);
 
