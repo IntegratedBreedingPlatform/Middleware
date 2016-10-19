@@ -1,14 +1,15 @@
 package org.generationcp.middleware.dao;
 
-import java.util.List;
-
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
+import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -17,10 +18,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ListDataProjectDAOTest extends IntegrationTestBase {
 
 	private static final String GERMPLASM_PREFERRED_NAME_PREFIX = DataSetupTest.GERMPLSM_PREFIX + "PR-";
 
+	private ListDataProjectSaver listDataProjectSaver;
 	private ListDataProjectDAO listDataProjectDAO;
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
@@ -40,10 +45,12 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 
 	private Germplasm parentGermplasm;
 	private ListDataProject testListDataProject;
+	private Integer studyId;
 
 	@Before
 	public void beforeTest() {
 		this.listDataProjectDAO = new ListDataProjectDAO();
+		this.listDataProjectSaver = new ListDataProjectSaver(this.sessionProvder);
 		this.listDataProjectDAO.setSession(this.sessionProvder.getSession());
 		if (this.germplasmTestDataGenerator == null) {
 			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager);
@@ -54,7 +61,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		this.dataSetupTest.setMiddlewareFieldbookService(this.middlewareFieldbookService);
 
 		// setup test data
-		final Integer studyId = this.createNurseryTestData();
+		studyId = this.createNurseryTestData();
 		this.testListDataProject = this.listDataProjectDAO.getByStudy(studyId, GermplasmListType.NURSERY, 0);
 	}
 
@@ -136,6 +143,49 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 						this.parentGermplasm.getGid(), listDataProject.getMgid());
 			}
 		}
+
+	}
+
+	@Test
+	public void testCountByListIdAndEntryType() {
+
+		int userId = 2;
+		long noOfTestEntries = 3;
+		long noOfCheckEntries = 4;
+		int listId = this.testListDataProject.getList().getId();
+
+		List<ListDataProject> listDataProjects = this.createListDataProject( this.testListDataProject.getList(), noOfTestEntries, noOfCheckEntries);
+		listDataProjectSaver.saveOrUpdateListDataProject(studyId, GermplasmListType.NURSERY , listId, listDataProjects , userId);
+
+		Assert.assertEquals(String.format("There are only {0} check entries in the list", noOfCheckEntries), noOfCheckEntries, this.listDataProjectDAO.countByListIdAndEntryType(listId, SystemDefinedEntryType.CHECK_ENTRY));
+		Assert.assertEquals(String.format("There are only {0} test entries in the list", noOfTestEntries), noOfTestEntries, this.listDataProjectDAO.countByListIdAndEntryType(listId, SystemDefinedEntryType.TEST_ENTRY));
+
+	}
+
+	private List<ListDataProject> createListDataProject(GermplasmList germplasmList, long noOfTestEntries, long noOfCheckEntries) {
+
+		List<ListDataProject> listDataProjects = new ArrayList<>();
+		for (int i = 0; i < noOfCheckEntries; i++) {
+			listDataProjects.add(createListDataProject(germplasmList, SystemDefinedEntryType.CHECK_ENTRY));
+		}
+		for (int i = 0; i < noOfTestEntries; i++) {
+			listDataProjects.add(createListDataProject(germplasmList, SystemDefinedEntryType.TEST_ENTRY));
+		}
+
+		return listDataProjects;
+
+	}
+
+
+	private ListDataProject createListDataProject(GermplasmList germplasmList, SystemDefinedEntryType systemDefinedEntryType) {
+
+		ListDataProject listDataProject = new ListDataProject();
+		listDataProject.setCheckType(systemDefinedEntryType.getEntryTypeCategoricalId());
+		listDataProject.setSeedSource("");
+		listDataProject.setList(germplasmList);
+		listDataProject.setGermplasmId(1);
+
+		return listDataProject;
 
 	}
 
