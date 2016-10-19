@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.ContextHolder;
@@ -33,6 +34,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
 import org.generationcp.middleware.utils.test.OntologyDataCreationUtil;
@@ -287,5 +289,23 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.scaleManager.addScale(this.testScale);
 
 		this.buildVariable();
+	}
+	
+	@Test
+	public void testAreVariablesUsedReturnsFalse() throws Exception {
+		List<Integer> list = new ArrayList<>();
+		list.add(testVariableInfo.getId());
+		boolean hasUsage = this.variableManager.areVariablesUsedInStudy(list);
+		Assert.assertFalse("Variables should have no usage", hasUsage);
+	}
+
+	@Test
+	public void testGetVariableOverridesByVariableIds() throws Exception {
+		List<Integer> list = new ArrayList<>();
+		list.add(testVariableInfo.getId());
+		List<VariableOverrides> override = this.variableManager.getVariableOverridesByVariableIds(list);
+		VariableOverrides variableOverrides = override.get(0);
+		Assert.assertEquals(variableOverrides.getExpectedMin(), "0");
+		Assert.assertEquals(variableOverrides.getExpectedMax(), "100");
 	}
 }
