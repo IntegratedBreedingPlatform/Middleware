@@ -34,12 +34,13 @@ public class WorkbenchTestDataUtil {
 		person.setInstituteId(1);
 		person.setFirstName("Test");
 		person.setMiddleName("M");
-		person.setLastName("Person " + new Random().nextInt());
+		int randomNumber = new Random().nextInt();
+		person.setLastName("Person " + randomNumber);
 		person.setPositionName("King of Icewind Dale");
 		person.setTitle("His Highness");
 		person.setExtension("Ext");
 		person.setFax("Fax");
-		person.setEmail("lichking@blizzard.com");
+		person.setEmail("lichking" + randomNumber + "@blizzard.com");
 		person.setNotes("notes");
 		person.setContact("Contact");
 		person.setLanguage(1);
