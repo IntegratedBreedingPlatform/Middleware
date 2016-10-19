@@ -27,7 +27,7 @@ import org.hibernate.criterion.Restrictions;
 
 public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
-	public void deleteByListId(final int listId) throws MiddlewareQueryException {
+	public void deleteByListId(final int listId) {
 		try {
 			// Please note we are manually flushing because non hibernate based
 			// deletes and updates causes the Hibernate session to get out of
@@ -41,13 +41,14 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 					.createSQLQuery("delete ldp " + "from listdata_project ldp " + "where ldp.list_id = " + listId);
 			statement.executeUpdate();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in deleteByListId=" + listId + " in ListDataProjectDAO: " + e.getMessage(),
+
+			throw new MiddlewareQueryException("Error in deleteByListId=" + listId + " in ListDataProjectDAO: " + e.getMessage(),
 					e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ListDataProject> getByListId(final int listId) throws MiddlewareQueryException {
+	public List<ListDataProject> getByListId(final int listId) {
 		final List<ListDataProject> list = new ArrayList<>();
 		try {
 
@@ -81,14 +82,14 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			return listDataProjects;
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
+			throw new MiddlewareQueryException(
 					"Error with getByListId(listId=" + listId + ") query from ListDataProjectDAO: " + e.getMessage(),
 					e);
 		}
-		return list;
+
 	}
 
-	public ListDataProject getByListIdAndEntryNo(final int listId, final int entryNo) throws MiddlewareQueryException {
+	public ListDataProject getByListIdAndEntryNo(final int listId, final int entryNo) {
 		ListDataProject result = null;
 
 		try {
@@ -99,15 +100,14 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			result = (ListDataProject) criteria.uniqueResult();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByListIdAndEntryNo(listId=" + listId
+			throw new MiddlewareQueryException("Error with getByListIdAndEntryNo(listId=" + listId
 					+ ") query from ListDataProjectDAO: " + e.getMessage(), e);
 		}
 		return result;
 	}
 
 	@SuppressWarnings("rawtypes")
-	public ListDataProject getByStudy(final int studyId, final GermplasmListType listType, final int plotNo)
-			throws MiddlewareQueryException {
+	public ListDataProject getByStudy(final int studyId, final GermplasmListType listType, final int plotNo){
 		try {
 
 			final String queryStr = "select ldp.* FROM nd_experiment_project neproj,"
@@ -141,14 +141,14 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in getStudy=" + studyId + " in ListDataProjectDAO: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getStudy=" + studyId + " in ListDataProjectDAO: " + e.getMessage(), e);
 		}
 
 		return null;
 
 	}
 
-	public void deleteByListIdWithList(final int listId) throws MiddlewareQueryException {
+	public void deleteByListIdWithList(final int listId) {
 		try {
 			final String nmsListHql = "FROM GermplasmList nms " + "WHERE nms.id = :list_id";
 
@@ -174,12 +174,12 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			query3.executeUpdate();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error in deleteByListId=" + listId + " in ListDataProjectDAO: " + e.getMessage(),
+			throw new MiddlewareQueryException("Error in deleteByListId=" + listId + " in ListDataProjectDAO: " + e.getMessage(),
 					e);
 		}
 	}
 
-	public long countByListId(final Integer id) throws MiddlewareQueryException {
+	public long countByListId(final Integer id) {
 		try {
 			if (id != null) {
 				final Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
@@ -189,7 +189,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 				return ((Long) criteria.uniqueResult()).longValue(); // count
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
+			throw new MiddlewareQueryException(
 					"Error with countByListId(id=" + id + ") query from ListDataProject " + e.getMessage(), e);
 		}
 		return 0;
@@ -206,7 +206,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 				return ((Long) criteria.uniqueResult()).longValue(); // count
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
+			throw new MiddlewareQueryException(
 					"Error with countByListIdAndEntryType(id=" + id + ") query from ListDataProject " + e.getMessage(), e);
 		}
 		return 0;
@@ -218,7 +218,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 	 * the parents from its preferred name which is indicated by name record
 	 * with nstat = 1
 	 */
-	public List<ListDataProject> getListDataProjectWithParents(final Integer listID) throws MiddlewareQueryException {
+	public List<ListDataProject> getListDataProjectWithParents(final Integer listID) {
 		final List<ListDataProject> listDataProjects = new ArrayList<ListDataProject>();
 		try {
 
@@ -256,7 +256,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			this.createListDataProjectRows(listDataProjects, query);
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
+			throw new MiddlewareQueryException(
 					"Error in getListDataProjectWithParents=" + listID + " in ListDataProjectDAO: " + e.getMessage(),
 					e);
 		}
