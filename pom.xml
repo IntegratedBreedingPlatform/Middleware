@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-        <version>4.0.0.BETA.16.UAT1</version>
+        <version>4.0.0.BETA.16.UAT3</version>
 	<name>Middleware</name>
 
 	<properties>

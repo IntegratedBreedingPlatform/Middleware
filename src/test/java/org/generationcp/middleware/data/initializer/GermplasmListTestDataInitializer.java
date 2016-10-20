@@ -73,6 +73,13 @@ public class GermplasmListTestDataInitializer {
 		return germplasmList;
 	}
 
+
+	public static GermplasmList createGermplasmListWithListData(final int listId, final int noOfEntries, List<Integer> gIds) {
+		final GermplasmList germplasmList = createGermplasmList(listId);
+		germplasmList.setListData(createGermplasmListData(germplasmList, noOfEntries, gIds));
+		return germplasmList;
+	}
+
 	/**
 	 * Create germplasm list with list data and inventory info given the number of entries
 	 * 
@@ -97,6 +104,23 @@ public class GermplasmListTestDataInitializer {
 		final List<GermplasmListData> listEntries = new ArrayList<GermplasmListData>();
 		for (int i = 1; i <= itemNo; i++) {
 			final GermplasmListData listEntry = createGermplasmListDataItem(germplasmList, i);
+			listEntries.add(listEntry);
+		}
+
+		return listEntries;
+	}
+
+	/**
+	 * Create list of GermplasmListData with dummy assigned ids and  gid
+	 *
+	 * @param germplasmList
+	 * @param itemNo
+	 * @return
+	 */
+	public static List<GermplasmListData> createGermplasmListData(final GermplasmList germplasmList, final Integer itemNo, final List<Integer> gids) {
+		final List<GermplasmListData> listEntries = new ArrayList<GermplasmListData>();
+		for (int i = 1; i <= itemNo; i++) {
+			final GermplasmListData listEntry = createGermplasmListDataItemWithGid(germplasmList, i, gids.get(i-1));
 			listEntries.add(listEntry);
 		}
 
@@ -159,6 +183,10 @@ public class GermplasmListTestDataInitializer {
 
 	protected static GermplasmListData createGermplasmListDataItem(final GermplasmList germplasmList, final int listDataId) {
 		return createGermplasmListDataItem(germplasmList, listDataId, listDataId, true);
+	}
+
+	protected static GermplasmListData createGermplasmListDataItemWithGid(final GermplasmList germplasmList, final int listDataId, final int gid) {
+		return createGermplasmListDataItem(germplasmList, listDataId, gid, true);
 	}
 
 	protected static GermplasmListData createGermplasmListDataItem(final GermplasmList germplasmList, final int listDataId, final int gid,
