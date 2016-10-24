@@ -448,8 +448,8 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 			// Save last modified Time
 			this.getCvTermPropertyDao().save(scale.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
-			//this.deleteRelatedVariablesFromCache(scale);
-			VariableCache.clearCache();
+			this.deleteScalesRelatedVariablesFromCache(Integer.valueOf(scale.getId()));
+
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error at updateScale :" + e.getMessage(), e);
 		}
@@ -457,14 +457,14 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	}
 
 	@Override
-	public void deleteRelatedVariablesFromCache(Scale scale) {
+	public void deleteScalesRelatedVariablesFromCache(final Integer scaleId) {
 		// Note : Get list of relationships related to scale Id
 		final List<TermRelationship> relationships =
-				this.termDataManager.getRelationshipsWithObjectAndType(Integer.valueOf(scale.getId()), TermRelationshipId.HAS_SCALE);
+				this.termDataManager.getRelationshipsWithObjectAndType(scaleId, TermRelationshipId.HAS_SCALE);
 
-		for (Iterator<TermRelationship> iterator = relationships.iterator(); iterator.hasNext();) {
-			TermRelationship termRelationship = (TermRelationship) iterator.next();
-			int variableId = termRelationship.getSubjectTerm().getId();
+		for (final Iterator<TermRelationship> iterator = relationships.iterator(); iterator.hasNext();) {
+			final TermRelationship termRelationship = iterator.next();
+			final int variableId = termRelationship.getSubjectTerm().getId();
 			VariableCache.removeFromCache(variableId);
 		}
 	}
