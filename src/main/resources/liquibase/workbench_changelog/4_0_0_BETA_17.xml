@@ -6,17 +6,8 @@
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
-
-	<changeSet author="mderamos" id="beta17-1">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='germplasm_import'</sqlCheck>
-		</preConditions>
-	    <sql dbms="mysql" splitStatements="true">
-			DELETE FROM workbench_sidebar_category_link where tool_name = 'germplasm_import'
-	    </sql>
-	</changeSet>
 	
-	<changeSet author="mderamos" id="beta17-2">
+	<changeSet author="mderamos" id="beta17-1">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='germplasm_mainheadtohead'</sqlCheck>
 		</preConditions>
@@ -25,7 +16,7 @@
 	    </sql>
 	</changeSet>
 	
-	<changeSet author="mderamos" id="beta17-3">
+	<changeSet author="mderamos" id="beta17-2">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='query_for_adapted_germplasm'</sqlCheck>
 		</preConditions>
@@ -34,7 +25,7 @@
 	    </sql>
 	</changeSet>
 	
-	<changeSet author="mderamos" id="beta17-4">
+	<changeSet author="mderamos" id="beta17-3">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='trait_donor_query'</sqlCheck>
 		</preConditions>
@@ -43,7 +34,7 @@
 	    </sql>
 	</changeSet>
 	
-	<changeSet author="mderamos" id="beta17-5">
+	<changeSet author="mderamos" id="beta17-4">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='bv_meta_analysis'</sqlCheck>
 		</preConditions>
@@ -52,7 +43,7 @@
 	    </sql>
 	</changeSet>
 	
-	<changeSet author="mderamos" id="beta17-6">
+	<changeSet author="mderamos" id="beta17-5">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='breeding_view'</sqlCheck>
 		</preConditions>
@@ -61,7 +52,7 @@
 	    </sql>
 	</changeSet>
 	
-	<changeSet author="mderamos" id="beta17-7">
+	<changeSet author="mderamos" id="beta17-6">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='gdms'</sqlCheck>
 		</preConditions>
@@ -70,7 +61,7 @@
 	    </sql>
 	</changeSet>
 	
-	<changeSet author="mderamos" id="beta17-8">
+	<changeSet author="mderamos" id="beta17-7">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='breeding_planner'</sqlCheck>
 		</preConditions>
@@ -79,13 +70,13 @@
 	    </sql>
 	</changeSet>
 	
-	<changeSet author="mderamos" id="beta17-9">
+	<changeSet author="mderamos" id="beta17-8">
 		<sql dbms="mysql" splitStatements="true">
 			REPLACE INTO workbench_sidebar_category_link VALUES (1,'bm_list_manager_main',1,'manage_list','Manage Germplasm')
 	    </sql>
 	</changeSet>
 	
-	<changeSet author="mderamos" id="beta17-10">
+	<changeSet author="mderamos" id="beta17-9">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category where sidebar_category_name='marker_assisted_breeding'</sqlCheck>
 		</preConditions>
