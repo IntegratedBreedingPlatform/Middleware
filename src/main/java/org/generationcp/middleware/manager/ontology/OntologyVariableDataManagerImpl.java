@@ -916,7 +916,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		try {
 			return this.getVariableProgramOverridesDao().getVariableOverridesByVariableIds(variableIds);
 		} catch (final Exception e) {
-			throw new MiddlewareQueryException("Error at updateVariable :" + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error at getVariableOverridesByVariableIds:" + e.getMessage(), e);
 		}
 	}
 }

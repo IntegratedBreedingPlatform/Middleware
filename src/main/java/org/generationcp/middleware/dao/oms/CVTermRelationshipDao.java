@@ -19,10 +19,12 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,7 @@ import org.slf4j.LoggerFactory;
 public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Integer> {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(CVTermRelationshipDao.class);
+	private static final StringType STRING = new StringType();
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getSubjectIdsByTypeAndObject(Integer typeId, Integer objectId) throws MiddlewareQueryException {
@@ -279,7 +282,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 							+ " AND stat.type_id = " + TermId.STUDY_STATUS.getId() + " AND stat.value = " + TermId.DELETED_STUDY.getId()
 							+ ") AND r_variable.object_id = :scaleId");
 			query.setParameter("scaleId", scaleId);
-			query.addScalar("category", org.hibernate.Hibernate.STRING);
+			query.addScalar("category", STRING);
 			return query.list();
 		} catch (HibernateException e) {
 			final String message = "Error in getCategoriesReferredInPhenotype in CVTermRelationshipDao: " + e.getMessage();

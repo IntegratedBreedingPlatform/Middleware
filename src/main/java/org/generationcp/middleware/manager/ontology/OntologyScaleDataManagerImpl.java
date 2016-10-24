@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -14,6 +15,7 @@ import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TermRelationship;
 import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Scale;
@@ -23,6 +25,8 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.pojos.oms.CV;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
@@ -31,6 +35,7 @@ import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Query;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Function;
@@ -42,6 +47,12 @@ import com.google.common.collect.Iterables;
 @Transactional
 public class OntologyScaleDataManagerImpl extends DataManager implements OntologyScaleDataManager {
 
+	@Autowired
+	private TermDataManager termDataManager;
+	
+	@Autowired
+	private OntologyVariableDataManager ontologyVariableDataManager;
+	
 	private static final String SCALE_DOES_NOT_EXIST = "Scale does not exist";
 	private static final String TERM_IS_NOT_SCALE = "Term is not scale";
 	private static final String SCALE_EXIST_WITH_SAME_NAME = "Scale exist with same name";
@@ -260,7 +271,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 	@Override
 	public void updateScale(Scale scale) {
-
+		
 		if (Objects.equals(scale.getDataType(), null)) {
 			throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_DATA_TYPE_SHOULD_NOT_EMPTY);
 		}
@@ -437,11 +448,25 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 			// Save last modified Time
 			this.getCvTermPropertyDao().save(scale.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
-
+			//this.deleteRelatedVariablesFromCache(scale);
+			VariableCache.clearCache();
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error at updateScale :" + e.getMessage(), e);
 		}
 
+	}
+
+	@Override
+	public void deleteRelatedVariablesFromCache(Scale scale) {
+		// Note : Get list of relationships related to scale Id
+		final List<TermRelationship> relationships =
+				this.termDataManager.getRelationshipsWithObjectAndType(Integer.valueOf(scale.getId()), TermRelationshipId.HAS_SCALE);
+
+		for (Iterator<TermRelationship> iterator = relationships.iterator(); iterator.hasNext();) {
+			TermRelationship termRelationship = (TermRelationship) iterator.next();
+			int variableId = termRelationship.getSubjectTerm().getId();
+			VariableCache.removeFromCache(variableId);
+		}
 	}
 
 	void updatingValues(CvTermPropertyDao cvTermPropertyDao, Scale scale, String scaleSize, int termId) {

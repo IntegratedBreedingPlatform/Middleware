@@ -73,7 +73,7 @@ public class VariableOverridesDao extends GenericDAO<VariableOverrides, Integer>
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-					"Error at getByVariableIds IN " + variableIds + " query on VariableOverridesDao: " + e.getMessage(), e);
+					"Error at getVariableOverridesByVariableIds IN " + variableIds + " query on VariableOverridesDao: " + e.getMessage(), e);
 		}
 
 		return properties;
