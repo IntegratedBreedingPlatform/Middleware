@@ -25,7 +25,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.pojos.oms.CV;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -49,10 +48,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 	@Autowired
 	private TermDataManager termDataManager;
-	
-	@Autowired
-	private OntologyVariableDataManager ontologyVariableDataManager;
-	
+		
 	private static final String SCALE_DOES_NOT_EXIST = "Scale does not exist";
 	private static final String TERM_IS_NOT_SCALE = "Term is not scale";
 	private static final String SCALE_EXIST_WITH_SAME_NAME = "Scale exist with same name";
@@ -456,8 +452,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 	}
 
-	@Override
-	public void deleteScalesRelatedVariablesFromCache(final Integer scaleId) {
+	private void deleteScalesRelatedVariablesFromCache(final Integer scaleId) {
 		// Note : Get list of relationships related to scale Id
 		final List<TermRelationship> relationships =
 				this.termDataManager.getRelationshipsWithObjectAndType(scaleId, TermRelationshipId.HAS_SCALE);

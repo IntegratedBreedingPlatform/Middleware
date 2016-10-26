@@ -60,6 +60,4 @@ public interface OntologyScaleDataManager {
 	 */
 	void deleteScale(int scaleId);
 
-	void deleteScalesRelatedVariablesFromCache(Integer scaleId);
-
 }
