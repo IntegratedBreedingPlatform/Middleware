@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.ontology.VariableCache;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
@@ -41,6 +42,7 @@ import org.generationcp.middleware.utils.test.OntologyDataCreationUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -72,7 +74,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	@BeforeClass
 	public static void setUpOnce() {
 		// Variable caching relies on the context holder to determine current crop database in use
-		ContextHolder.setCurrentCrop("maize");
+		ContextHolder.setCurrentCrop("wheat");
 	}
 
 	@Test
@@ -307,5 +309,25 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		VariableOverrides variableOverrides = override.get(0);
 		Assert.assertEquals(variableOverrides.getExpectedMin(), "0");
 		Assert.assertEquals(variableOverrides.getExpectedMax(), "100");
+	}
+	
+	@Test
+	public void testDeleteVariablesFromCache(){
+		
+		List<Integer> variablesIds = new ArrayList<Integer>();
+		int size = VariableCache.getCacheSize();
+
+		Integer variable1Id = 1;
+		Variable variable1 = new Variable();
+		variable1.setId(variable1Id);
+
+		VariableCache.addToCache(variable1Id, variable1);
+		Assert.assertEquals(size + 1, VariableCache.getCacheSize());
+		Assert.assertEquals(variable1, VariableCache.getFromCache(variable1Id));
+		
+		variablesIds.add(variable1Id);
+		this.variableManager.deleteVariablesFromCache(variablesIds);
+		Assert.assertEquals(size, VariableCache.getCacheSize());
+		Assert.assertNull(VariableCache.getFromCache(variable1Id));
 	}
 }
