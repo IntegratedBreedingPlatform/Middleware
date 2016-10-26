@@ -280,7 +280,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 							+ " WHERE pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
 							+ " AND pp.project_id NOT IN (SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = pp.project_id "
 							+ " AND stat.type_id = " + TermId.STUDY_STATUS.getId() + " AND stat.value = " + TermId.DELETED_STUDY.getId()
-							+ ") AND r_variable.object_id = :scaleId");
+							+ ") AND r_variable.object_id = :scaleId AND ph.value is not null");
 			query.setParameter("scaleId", scaleId);
 			query.addScalar("category", STRING);
 			return query.list();
