@@ -71,8 +71,11 @@
 	</changeSet>
 	
 	<changeSet author="mderamos" id="beta17-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='bm_list_manager_main' AND sidebar_link_title='Manage Lists'</sqlCheck>
+		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
-			REPLACE INTO workbench_sidebar_category_link VALUES (1,'bm_list_manager_main',1,'manage_list','Manage Germplasm')
+			UPDATE workbench_sidebar_category_link SET sidebar_link_title='Manage Germplasm' where tool_name='bm_list_manager_main'
 	    </sql>
 	</changeSet>
 	
