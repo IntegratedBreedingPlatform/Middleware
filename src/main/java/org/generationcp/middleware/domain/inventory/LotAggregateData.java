@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.domain.inventory;
 
 import java.io.Serializable;
@@ -7,9 +6,8 @@ import java.util.Set;
 
 /**
  * This POJO stores aggregate information about lot such as actual balance, available balance, total reserved etc
- * 
- * @author Darla Ani
  *
+ * @author Darla Ani
  */
 public class LotAggregateData implements Serializable {
 
@@ -35,6 +33,7 @@ public class LotAggregateData implements Serializable {
 	// key = record id and value = 0 or 1 status
 	private Map<Integer, Set<String>> reservationStatusMap;
 
+	private String lotStatus;
 
 	public LotAggregateData(Integer lotId) {
 		super();
@@ -111,6 +110,14 @@ public class LotAggregateData implements Serializable {
 
 	public void setTransactionId(Integer transactionId) {
 		this.transactionId = transactionId;
+	}
+
+	public String getLotStatus() {
+		return lotStatus;
+	}
+
+	public void setLotStatus(String lotStatus) {
+		this.lotStatus = lotStatus;
 	}
 
 	@Override

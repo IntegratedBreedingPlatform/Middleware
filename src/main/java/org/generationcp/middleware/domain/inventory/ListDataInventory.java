@@ -1,11 +1,9 @@
-
 package org.generationcp.middleware.domain.inventory;
 
 /**
  * POJO for storing aggregate inventory data for specific GermplasmListData record
  *
  * @author Darla Ani
- *
  */
 public class ListDataInventory extends GermplasmInventory {
 

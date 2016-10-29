@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.domain.inventory.util;
 
 import java.util.ArrayList;
@@ -21,7 +20,7 @@ public class LotTransformer {
 	 * total per lot for specific list entry
 	 *
 	 * @param lots - lot records assumed to have aggregate inventory data
-	 * @param id - listdata id
+	 * @param id   - listdata id
 	 * @return
 	 */
 	public static List<ListEntryLotDetails> extractLotDetailsForListEntry(List<Lot> lots, Integer id) {
@@ -63,23 +62,20 @@ public class LotTransformer {
 						lotDetails.setWithdrawalBalance(sumEntry);
 					}
 
-
 					Map<Integer, Set<String>> statusMap = aggregateData.getReservationStatusMap();
 
-					if(statusMap != null){
+					if (statusMap != null) {
 						Set<String> statusSet = statusMap.get(id);
 						String status = "";
-						if(statusSet != null){
-							if(statusSet.size() == 1){
+						if (statusSet != null) {
+							if (statusSet.size() == 1) {
 								status = statusSet.iterator().next();
-								if("0".equals(status)){
+								if ("0".equals(status)) {
 									status = ListDataInventory.RESERVED;
-								}
-								else if("1".equals(status)){
+								} else if ("1".equals(status)) {
 									status = ListDataInventory.WITHDRAWN;
 								}
-							}
-							else if(statusSet.size() > 1){
+							} else if (statusSet.size() > 1) {
 								status = ListDataInventory.RESERVED;
 							}
 						}
@@ -100,8 +96,7 @@ public class LotTransformer {
 	 * For each entry in germplasm list, add related list of ListEntryLotDetails objects transformed from Lot objects. Return list of
 	 * ListEntryLotDetails for all entries.
 	 *
-	 *
-	 * @param lots - lot records assumed to have aggregate inventory data
+	 * @param lots        - lot records assumed to have aggregate inventory data
 	 * @param listEntries - entries of list
 	 * @return
 	 */
@@ -153,10 +148,12 @@ public class LotTransformer {
 
 				LotAggregateData aggregateData = lot.getAggregateData();
 				if (aggregateData != null) {
-					lotDetails.setActualLotBalance(aggregateData.getActualBalance());
+					lotDetails.setActualLotBalance(aggregateData.getAvailableBalance() + aggregateData.getReservedTotal());
 					lotDetails.setAvailableLotBalance(aggregateData.getAvailableBalance());
 					lotDetails.setReservedTotal(aggregateData.getReservedTotal());
 					lotDetails.setStockIds(aggregateData.getStockIds());
+					lotDetails.setWithdrawalBalance(aggregateData.getReservedTotal() + aggregateData.getCommittedTotal());
+					lotDetails.setWithdrawalStatus(aggregateData.getLotStatus());
 				}
 
 				returnLotRows.add(lotDetails);
