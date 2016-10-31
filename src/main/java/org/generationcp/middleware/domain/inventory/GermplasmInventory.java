@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.domain.inventory;
 
 import org.generationcp.middleware.domain.oms.Term;
@@ -10,7 +9,6 @@ import java.util.List;
  * POJO for storing aggregate inventory information and list of lots associated with germplasm
  *
  * @author Darla Ani
- *
  */
 public class GermplasmInventory implements Serializable {
 
@@ -200,7 +198,6 @@ public class GermplasmInventory implements Serializable {
 	public void setWithdrawalBalance(Double withdrawalBalance) {
 		this.withdrawalBalance = withdrawalBalance;
 	}
-
 
 	public String getWithdrawalScale() {
 		return withdrawalScale;
