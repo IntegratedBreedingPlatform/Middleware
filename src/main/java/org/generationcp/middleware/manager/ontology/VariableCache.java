@@ -39,7 +39,7 @@ public class VariableCache {
 	}
 
 	// For tests only
-	static int getCacheSize() {
+	public static int getCacheSize() {
 		return VariableCache.VARIABLE_CACHE.size();
 	}
 

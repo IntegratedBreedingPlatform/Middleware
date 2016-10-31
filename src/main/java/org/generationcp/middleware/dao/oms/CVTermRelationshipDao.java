@@ -19,16 +19,23 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.StringType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link CVTermRelationship}.
  *
  */
 public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Integer> {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(CVTermRelationshipDao.class);
+	private static final StringType STRING = new StringType();
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getSubjectIdsByTypeAndObject(Integer typeId, Integer objectId) throws MiddlewareQueryException {
@@ -262,4 +269,27 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
             return null;
         }
     }
+    
+	@SuppressWarnings({"unchecked"})
+	public List<String> getCategoriesReferredInPhenotype(int scaleId) throws MiddlewareQueryException {
+		try {
+
+			SQLQuery query = this.getSession()
+					.createSQLQuery("SELECT distinct ph.value category FROM cvterm_relationship r_variable "
+							+ " INNER JOIN projectprop pp ON (pp.value = r_variable.subject_id) INNER JOIN phenotype ph ON ph.observable_id = r_variable.subject_id "
+							+ " WHERE pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
+							+ " AND pp.project_id NOT IN (SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = pp.project_id "
+							+ " AND stat.type_id = " + TermId.STUDY_STATUS.getId() + " AND stat.value = " + TermId.DELETED_STUDY.getId()
+							+ ") AND r_variable.object_id = :scaleId AND ph.value is not null");
+			query.setParameter("scaleId", scaleId);
+			query.addScalar("category", STRING);
+			return query.list();
+		} catch (HibernateException e) {
+			final String message = "Error in getCategoriesReferredInPhenotype in CVTermRelationshipDao: " + e.getMessage();
+			CVTermRelationshipDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+
+		}
+	}
+    
 }
