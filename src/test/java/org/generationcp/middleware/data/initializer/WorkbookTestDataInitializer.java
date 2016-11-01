@@ -583,6 +583,12 @@ public class WorkbookTestDataInitializer {
 		data.setMeasurementVariable(measurementVariable);
 		return data;
 	}
+	
+	public static MeasurementData createMeasurementData(final int termId, final String value) {
+		final MeasurementData data = WorkbookTestDataInitializer.createMeasurementData(termId);
+		data.setValue(value);
+		return data;
+	}
 
 	public static MeasurementVariable createTrialInstanceMeasurementVariable(final int trialNo) {
 		return WorkbookTestDataInitializer.createMeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), "TRIAL", "TRIAL NUMBER",

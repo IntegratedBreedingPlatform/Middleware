@@ -11,10 +11,9 @@
 
 package org.generationcp.middleware.domain.etl;
 
-import static org.junit.Assert.assertEquals;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.oms.StudyType;
@@ -22,9 +21,34 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 public class WorkbookTest {
+
+	private static final String TRIAL_INSTANCE_NO = "1";
+
+	private static final int ENTRY_NO_INDEX = 0;
+	private static final int ENTRY_TYPE_INDEX = 1;
+	private static final int PLOT_NO_INDEX = 2;
+
+	public static final ImmutableList<String> EXPERIMENT_1 = ImmutableList.of("5", "Check Entry", "1");
+	public static final ImmutableList<String> EXPERIMENT_2 = ImmutableList.of("1", "Test Entry", "2");
+	public static final ImmutableList<String> EXPERIMENT_3 = ImmutableList.of("2", "Test Entry", "3");
+	public static final ImmutableList<String> EXPERIMENT_4 = ImmutableList.of("5", "Check Entry", "4");
+	public static final ImmutableList<String> EXPERIMENT_5 = ImmutableList.of("3", "Test Entry", "5");
+	public static final ImmutableList<String> EXPERIMENT_6 = ImmutableList.of("4", "Test Entry", "6");
+
+	private static final List<ImmutableList<String>> ENTRY_NO_ENTRY_TYPE_PLOT_NO_LIST = new ArrayList<>();
+
+	static {
+		WorkbookTest.ENTRY_NO_ENTRY_TYPE_PLOT_NO_LIST.add(WorkbookTest.EXPERIMENT_1);
+		WorkbookTest.ENTRY_NO_ENTRY_TYPE_PLOT_NO_LIST.add(WorkbookTest.EXPERIMENT_2);
+		WorkbookTest.ENTRY_NO_ENTRY_TYPE_PLOT_NO_LIST.add(WorkbookTest.EXPERIMENT_3);
+		WorkbookTest.ENTRY_NO_ENTRY_TYPE_PLOT_NO_LIST.add(WorkbookTest.EXPERIMENT_4);
+		WorkbookTest.ENTRY_NO_ENTRY_TYPE_PLOT_NO_LIST.add(WorkbookTest.EXPERIMENT_5);
+		WorkbookTest.ENTRY_NO_ENTRY_TYPE_PLOT_NO_LIST.add(WorkbookTest.EXPERIMENT_6);
+	}
 
 	@Test
 	public void testGetMeasurementDatasetVariablesViewForTrial() {
@@ -186,6 +210,82 @@ public class WorkbookTest {
 		MeasurementVariable season = workbook.findConditionById(TermId.SEASON_VAR.getId());
 		Assert.assertNotNull(season);
 		Assert.assertEquals(seasonMV, season);
+	}
+
+	@Test
+	public void testGetPlotNumbersOfTestEntriesWithNullObservations() {
+		final Workbook workbook = new Workbook();
+		final Map<String, String> entryNoPlotNoMap = workbook.getPlotNumbersOfTestEntries();
+		Assert.assertTrue("There should be no items found", entryNoPlotNoMap.isEmpty());
+	}
+
+	@Test
+	public void testGetPlotNumbersOfTestEntriesWithEmptyObservations() {
+		final Workbook workbook = new Workbook();
+		workbook.setObservations(new ArrayList<MeasurementRow>());
+		final Map<String, String> entryNoPlotNoMap = workbook.getPlotNumbersOfTestEntries();
+		Assert.assertTrue("There should be no items found", entryNoPlotNoMap.isEmpty());
+	}
+
+	@Test
+	public void testGetPlotNumbersOfTestEntriesWithNoListEntries() {
+		final Workbook workbook = new Workbook();
+		workbook.setObservations(this.createObservationsWithoutListEntries());
+		final Map<String, String> entryNoPlotNoMap = workbook.getPlotNumbersOfTestEntries();
+		Assert.assertTrue("There should be no items found", entryNoPlotNoMap.isEmpty());
+	}
+
+	private List<MeasurementRow> createObservationsWithoutListEntries() {
+		// no list entries means no entry_no found
+		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
+		final MeasurementRow measurementRow = new MeasurementRow();
+		observations.add(measurementRow);
+
+		final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
+		measurementRow.setDataList(dataList);
+
+		dataList.add(WorkbookTestDataInitializer.createMeasurementData(TermId.TRIAL_INSTANCE_FACTOR.getId(), WorkbookTest.TRIAL_INSTANCE_NO));
+
+		return observations;
+	}
+
+	@Test
+	public void testGetPlotNumbersOfTestEntriesWithListEntries() {
+		final Workbook workbook = new Workbook();
+		final List<MeasurementRow> observations = this.createObservationsWithListEntries();
+		workbook.setObservations(observations);
+		final Map<String, String> entryNoPlotNoMap = workbook.getPlotNumbersOfTestEntries();
+		Assert.assertEquals("There should be 4 items found as there are only 4 test entries added in the observations", 4,
+				entryNoPlotNoMap.size());
+		Assert.assertNotEquals("The number of items found should not be equal to the number of observations "
+				+ "as there are non-test entries added in the observations", observations.size(), entryNoPlotNoMap.size());
+	}
+
+	public List<MeasurementRow> createObservationsWithListEntries() {
+		// no list entries means no entry_no found
+		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
+
+		for (final ImmutableList<String> entryNoEntryTypePlotNoData : WorkbookTest.ENTRY_NO_ENTRY_TYPE_PLOT_NO_LIST) {
+
+			final MeasurementRow measurementRow = new MeasurementRow();
+			observations.add(measurementRow);
+
+			final List<MeasurementData> dataList = new ArrayList<MeasurementData>();
+			measurementRow.setDataList(dataList);
+
+			dataList.add(WorkbookTestDataInitializer.createMeasurementData(TermId.TRIAL_INSTANCE_FACTOR.getId(),
+					WorkbookTest.TRIAL_INSTANCE_NO));
+
+			final String entryNo = entryNoEntryTypePlotNoData.get(WorkbookTest.ENTRY_NO_INDEX);
+			final String entryType = entryNoEntryTypePlotNoData.get(WorkbookTest.ENTRY_TYPE_INDEX);
+			final String plotNo = entryNoEntryTypePlotNoData.get(WorkbookTest.PLOT_NO_INDEX);
+
+			dataList.add(WorkbookTestDataInitializer.createMeasurementData(TermId.ENTRY_NO.getId(), entryNo));
+			dataList.add(WorkbookTestDataInitializer.createMeasurementData(TermId.ENTRY_TYPE.getId(), entryType));
+			dataList.add(WorkbookTestDataInitializer.createMeasurementData(TermId.PLOT_NO.getId(), plotNo));
+		}
+
+		return observations;
 	}
 
 }
