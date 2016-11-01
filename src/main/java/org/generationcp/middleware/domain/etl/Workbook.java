@@ -1074,8 +1074,8 @@ public class Workbook {
 			final MeasurementData plotNoData = row.getMeasurementData(TermId.PLOT_NO.getId());
 			final MeasurementData entryTypeData = row.getMeasurementData(TermId.ENTRY_TYPE.getId());
 
-			if (entryNoData != null && plotNoData != null && entryTypeData != null
-					&& testEntryType.equalsIgnoreCase(entryTypeData.getValue())) {
+			if (entryNoData != null && plotNoData != null && (entryTypeData == null || 
+				(entryTypeData != null && testEntryType.equalsIgnoreCase(entryTypeData.getValue())))) {
 				entryNoPlotNoMap.put(entryNoData.getValue(), plotNoData.getValue());
 			}
 		}
