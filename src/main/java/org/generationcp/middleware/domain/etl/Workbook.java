@@ -23,6 +23,7 @@ import java.util.Set;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.util.Debug;
 
@@ -1060,6 +1061,22 @@ public class Workbook {
 			}
 		}
 		return null;
+	}
+	
+	public Map<String, String> getPlotNumbersOfTestEntries() {
+		final Map<String, String> entryNoPlotNoMap = new HashMap<>();
+		final String testEntryType = SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName();
+		for (final MeasurementRow row : this.observations) {
+			final MeasurementData entryNoData = row.getMeasurementData(TermId.ENTRY_NO.getId());
+			final MeasurementData plotNoData = row.getMeasurementData(TermId.PLOT_NO.getId());
+			final MeasurementData entryTypeData = row.getMeasurementData(TermId.ENTRY_TYPE.getId());
+
+			if (entryNoData != null && plotNoData != null && entryTypeData != null
+					&& testEntryType.equalsIgnoreCase(entryTypeData.getValue())) {
+				entryNoPlotNoMap.put(entryNoData.getValue(), plotNoData.getValue());
+			}
+		}
+		return entryNoPlotNoMap;
 	}
 
 }
