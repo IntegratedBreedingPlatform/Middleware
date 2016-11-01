@@ -38,7 +38,7 @@ public class WorkbookTest {
 	public static final ImmutableList<String> EXPERIMENT_WITH_CHECKS_4 = ImmutableList.of("5", "4", "Check Entry");
 	public static final ImmutableList<String> EXPERIMENT_WITH_CHECKS_5 = ImmutableList.of("3", "5", "Test Entry");
 	public static final ImmutableList<String> EXPERIMENT_WITH_CHECKS_6 = ImmutableList.of("4", "6", "Test Entry");
-	
+
 	public static final ImmutableList<String> EXPERIMENT_1 = ImmutableList.of("1", "1");
 	public static final ImmutableList<String> EXPERIMENT_2 = ImmutableList.of("2", "2");
 	public static final ImmutableList<String> EXPERIMENT_3 = ImmutableList.of("3", "3");
@@ -54,7 +54,7 @@ public class WorkbookTest {
 		WorkbookTest.ENTRY_NO_ENTRY_TYPE_PLOT_NO_LIST.add(WorkbookTest.EXPERIMENT_WITH_CHECKS_4);
 		WorkbookTest.ENTRY_NO_ENTRY_TYPE_PLOT_NO_LIST.add(WorkbookTest.EXPERIMENT_WITH_CHECKS_5);
 		WorkbookTest.ENTRY_NO_ENTRY_TYPE_PLOT_NO_LIST.add(WorkbookTest.EXPERIMENT_WITH_CHECKS_6);
-		
+
 		WorkbookTest.ENTRY_NO_PLOT_NO_LIST.add(WorkbookTest.EXPERIMENT_1);
 		WorkbookTest.ENTRY_NO_PLOT_NO_LIST.add(WorkbookTest.EXPERIMENT_2);
 		WorkbookTest.ENTRY_NO_PLOT_NO_LIST.add(WorkbookTest.EXPERIMENT_3);
@@ -63,7 +63,7 @@ public class WorkbookTest {
 
 	@Test
 	public void testGetMeasurementDatasetVariablesViewForTrial() {
-		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.T);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.T);
 
 		final List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 
@@ -93,7 +93,7 @@ public class WorkbookTest {
 
 	@Test
 	public void testGetMeasurementDatasetVariablesViewForNursery() {
-		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.N);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.N);
 
 		final List<MeasurementVariable> list = workbook.getMeasurementDatasetVariablesView();
 		final int totalMeasurementVariableCount = workbook.getFactors().size() + workbook.getVariates().size();
@@ -117,9 +117,9 @@ public class WorkbookTest {
 		workbook.setColumnOrderedLists(columnOrderedList);
 		varList = workbook.arrangeMeasurementVariables(varList);
 
-		assertEquals("1st element should have term id 20", 20, varList.get(0).getTermId());
-		assertEquals("2nd element should have term id 30", 30, varList.get(1).getTermId());
-		assertEquals("3rd element should have term id 10", 10, varList.get(2).getTermId());
+		Assert.assertEquals("1st element should have term id 20", 20, varList.get(0).getTermId());
+		Assert.assertEquals("2nd element should have term id 30", 30, varList.get(1).getTermId());
+		Assert.assertEquals("3rd element should have term id 10", 10, varList.get(2).getTermId());
 	}
 
 	@Test
@@ -141,17 +141,17 @@ public class WorkbookTest {
 		workbook.setColumnOrderedLists(columnOrderedList);
 		final List<MeasurementRow> newObservations = workbook.arrangeMeasurementObservation(observations);
 
-		assertEquals("1st element should have term id 20", 20, newObservations.get(0).getDataList().get(0).getMeasurementVariable()
+		Assert.assertEquals("1st element should have term id 20", 20, newObservations.get(0).getDataList().get(0).getMeasurementVariable()
 				.getTermId());
-		assertEquals("1st element should have term id 30", 30, newObservations.get(0).getDataList().get(1).getMeasurementVariable()
+		Assert.assertEquals("1st element should have term id 30", 30, newObservations.get(0).getDataList().get(1).getMeasurementVariable()
 				.getTermId());
-		assertEquals("1st element should have term id 10", 10, newObservations.get(0).getDataList().get(2).getMeasurementVariable()
+		Assert.assertEquals("1st element should have term id 10", 10, newObservations.get(0).getDataList().get(2).getMeasurementVariable()
 				.getTermId());
 	}
 
 	@Test
 	public void testGetTrialObservationByTrialInstanceNoForNursery() {
-		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.N);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(1, StudyType.N);
 		WorkbookTestDataInitializer.createTrialObservations(1, workbook);
 
 		final MeasurementRow trialObservation = workbook.getTrialObservationByTrialInstanceNo(1);
@@ -161,7 +161,7 @@ public class WorkbookTest {
 	@Test
 	public void testGetTrialObservationByTrialInstanceNoForTrial() {
 		final int noOfInstances = 2;
-		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(noOfInstances, StudyType.T);
+		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(noOfInstances, StudyType.T);
 		WorkbookTestDataInitializer.createTrialObservations(noOfInstances, workbook);
 
 		for (int trialInstanceNo = 1; trialInstanceNo <= noOfInstances; trialInstanceNo++) {
@@ -180,7 +180,7 @@ public class WorkbookTest {
 
 	@Test
 	public void testHasExistingExperimentalDesign() {
-		Workbook workbook = new Workbook();
+		final Workbook workbook = new Workbook();
 		final List<MeasurementVariable> expVariables = new ArrayList<>();
 
 		// we add an RCBD variable which is an experimental design variable
@@ -192,7 +192,7 @@ public class WorkbookTest {
 
 	@Test
 	public void testNoExistingExperimentalDesign() {
-		Workbook workbook = new Workbook();
+		final Workbook workbook = new Workbook();
 		Assert.assertFalse("Expected hasExistingExperimentalDesign() to return false when there is no design but it didn't.",
 				workbook.hasExistingExperimentalDesign());
 	}
@@ -214,11 +214,11 @@ public class WorkbookTest {
 
 		workbook.setConditions(Lists.newArrayList(locationMV, seasonMV));
 
-		MeasurementVariable location = workbook.findConditionById(TermId.LOCATION_ABBR.getId());
+		final MeasurementVariable location = workbook.findConditionById(TermId.LOCATION_ABBR.getId());
 		Assert.assertNotNull(location);
 		Assert.assertEquals(locationMV, location);
 
-		MeasurementVariable season = workbook.findConditionById(TermId.SEASON_VAR.getId());
+		final MeasurementVariable season = workbook.findConditionById(TermId.SEASON_VAR.getId());
 		Assert.assertNotNull(season);
 		Assert.assertEquals(seasonMV, season);
 	}
@@ -259,7 +259,7 @@ public class WorkbookTest {
 
 		return observations;
 	}
-	
+
 	@Test
 	public void testGetPlotNumbersOfTestEntriesWithListEntries() {
 		final Workbook workbook = new Workbook();
@@ -308,7 +308,7 @@ public class WorkbookTest {
 
 		return observations;
 	}
-	
+
 	public List<MeasurementRow> createObservationsWithListEntriesAndChecks() {
 		// no list entries means no entry_no found
 		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
@@ -327,7 +327,7 @@ public class WorkbookTest {
 			final String entryNo = entryNoEntryTypePlotNoData.get(WorkbookTest.ENTRY_NO_INDEX);
 			final String plotNo = entryNoEntryTypePlotNoData.get(WorkbookTest.PLOT_NO_INDEX);
 			final String entryType = entryNoEntryTypePlotNoData.get(WorkbookTest.ENTRY_TYPE_INDEX);
-			
+
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(TermId.ENTRY_NO.getId(), entryNo));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(TermId.PLOT_NO.getId(), plotNo));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(TermId.ENTRY_TYPE.getId(), entryType));

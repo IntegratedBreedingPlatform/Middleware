@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.etl;
@@ -256,7 +256,7 @@ public class Workbook {
 	/**
 	 * This method handles the retrieval of the measurement dataset variables which includes the following: TRIAL_INSTANCE, FACTORS,
 	 * VARIATES. The order of insertion matters that's why we used LinkedHashSet on this method to preserve the order of insertion.
-	 * 
+	 *
 	 * @return measurement dataset variable list
 	 */
 	public List<MeasurementVariable> getMeasurementDatasetVariablesView() {
@@ -400,8 +400,8 @@ public class Workbook {
 		final List<MeasurementVariable> list = new ArrayList<>();
 		if (variables != null && !variables.isEmpty()) {
 			for (final MeasurementVariable variable : variables) {
-				if (isStudy && variable.getLabel().toUpperCase().startsWith(Workbook.STUDY_LABEL)
-						|| !isStudy && !variable.getLabel().toUpperCase().startsWith(Workbook.STUDY_LABEL)) {
+				if (isStudy && variable.getLabel().toUpperCase().startsWith(Workbook.STUDY_LABEL) || !isStudy
+						&& !variable.getLabel().toUpperCase().startsWith(Workbook.STUDY_LABEL)) {
 					list.add(variable);
 				}
 			}
@@ -1074,8 +1074,8 @@ public class Workbook {
 			final MeasurementData plotNoData = row.getMeasurementData(TermId.PLOT_NO.getId());
 			final MeasurementData entryTypeData = row.getMeasurementData(TermId.ENTRY_TYPE.getId());
 
-			if (entryNoData != null && plotNoData != null && (entryTypeData == null || 
-				(entryTypeData != null && testEntryType.equalsIgnoreCase(entryTypeData.getValue())))) {
+			if (entryNoData != null && plotNoData != null
+					&& (entryTypeData == null || entryTypeData != null && testEntryType.equalsIgnoreCase(entryTypeData.getValue()))) {
 				entryNoPlotNoMap.put(entryNoData.getValue(), plotNoData.getValue());
 			}
 		}
