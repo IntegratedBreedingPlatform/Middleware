@@ -77,6 +77,9 @@ public class VariableListTransformer extends Transformer {
 						for (MeasurementData data : nonTrialMD) {
 							if (data.getMeasurementVariable().getTermId() == variableType.getStandardVariable().getId()) {
 								value = data.getcValueId() != null ? data.getcValueId() : data.getValue();
+								if (value.equals("")){
+									value = new Integer(variableType.getStandardVariable().getId()).toString(); //BMS-3173 When add new germplasm descriptor add the termId if the value is empty.
+								}
 								break;
 							}
 						}
