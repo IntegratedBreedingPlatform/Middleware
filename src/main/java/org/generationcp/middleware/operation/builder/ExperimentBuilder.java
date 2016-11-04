@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.base.Strings;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -307,6 +308,11 @@ public class ExperimentBuilder extends Builder {
 			return new Variable(variableType, stockModel.getValue());
 		}
 		String val = this.findStockValue(variableType.getId(), stockModel.getProperties());
+
+		if (standardVariable.getId() == TermId.ENTRY_TYPE.getId()) {
+			return new Variable(variableType, Strings.nullToEmpty(val));
+		}
+
 		if (val != null) {
 			return new Variable(variableType, val);
 		}
