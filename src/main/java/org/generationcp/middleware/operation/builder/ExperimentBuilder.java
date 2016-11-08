@@ -292,7 +292,7 @@ public class ExperimentBuilder extends Builder {
 		}
 	}
 
-	private Variable createGermplasmFactor(StockModel stockModel, DMSVariableType variableType) {
+	protected Variable createGermplasmFactor(StockModel stockModel, DMSVariableType variableType) {
 		StandardVariable standardVariable = variableType.getStandardVariable();
 		
 		if (standardVariable.getId() == TermId.ENTRY_NO.getId()) {
