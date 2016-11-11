@@ -1,6 +1,8 @@
 
 package org.generationcp.middleware;
 
+import java.util.UUID;
+
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.junit.After;
 import org.junit.Before;
@@ -32,6 +34,7 @@ public abstract class IntegrationTestBase {
 
 	private static final Logger LOG = LoggerFactory.getLogger(IntegrationTestBase.class);
 	public static final int INDENT = 3;
+	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
 
 	@Autowired
 	@Qualifier(value = "cropSessionProvider")
@@ -45,6 +48,7 @@ public abstract class IntegrationTestBase {
 	public static void setUpOnce() {
 		// Variable caching relies on the context holder to determine current crop database in use
 		ContextHolder.setCurrentCrop("maize");
+		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 	}
 
 	@Before

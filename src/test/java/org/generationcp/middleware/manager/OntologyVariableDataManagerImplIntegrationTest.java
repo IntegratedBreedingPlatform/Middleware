@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -42,7 +43,6 @@ import org.generationcp.middleware.utils.test.OntologyDataCreationUtil;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -70,11 +70,13 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	private Property testProperty;
 	private Scale testScale;
 	private OntologyVariableInfo testVariableInfo;
+	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
 
 	@BeforeClass
 	public static void setUpOnce() {
 		// Variable caching relies on the context holder to determine current crop database in use
 		ContextHolder.setCurrentCrop("wheat");
+		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 	}
 
 	@Test
