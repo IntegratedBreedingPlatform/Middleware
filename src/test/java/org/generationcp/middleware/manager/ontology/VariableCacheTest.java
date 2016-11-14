@@ -1,6 +1,8 @@
 
 package org.generationcp.middleware.manager.ontology;
 
+import java.util.UUID;
+
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.junit.AfterClass;
@@ -10,10 +12,13 @@ import org.junit.Test;
 
 public class VariableCacheTest {
 
+	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
+
 	@Test
 	public void testVariableCacheOperations() {
 
 		ContextHolder.setCurrentCrop("maize");
+		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 		Assert.assertEquals(0, VariableCache.getCacheSize());
 
 		Integer variable1Id = 1;
@@ -27,6 +32,7 @@ public class VariableCacheTest {
 
 		// Another variable with same ID but different crop
 		ContextHolder.setCurrentCrop("wheat");
+		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 		Integer variable2Id = variable1Id;
 		Variable variable2 = new Variable();
 		variable2.setId(variable2Id);
@@ -37,6 +43,7 @@ public class VariableCacheTest {
 
 		// Test remove operations
 		ContextHolder.setCurrentCrop("maize");
+		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 
 		VariableCache.removeFromCache(variable1Id);
 
@@ -44,6 +51,7 @@ public class VariableCacheTest {
 		Assert.assertNull(VariableCache.getFromCache(variable1Id));
 
 		ContextHolder.setCurrentCrop("wheat");
+		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 
 		VariableCache.removeFromCache(variable2Id);
 		Assert.assertEquals(0, VariableCache.getCacheSize());
@@ -55,6 +63,7 @@ public class VariableCacheTest {
 	public void testVariableCacheGetWithNoCurrentCrop() {
 
 		ContextHolder.setCurrentCrop(null);
+		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 		VariableCache.getFromCache(1);
 		Assert.fail("Expected IllegalStateException when current crop is unknown and invoking get from VariableCache");
 	}
@@ -63,6 +72,7 @@ public class VariableCacheTest {
 	public void testVariableCacheAddWithNoCurrentCrop() {
 
 		ContextHolder.setCurrentCrop(null);
+		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 		VariableCache.addToCache(1, new Variable());
 		Assert.fail("Expected IllegalStateException when current crop is unknown and invoking add to VariableCache");
 	}
@@ -71,6 +81,7 @@ public class VariableCacheTest {
 	public void testVariableCacheRemoveWithNoCurrentCrop() {
 
 		ContextHolder.setCurrentCrop(null);
+		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 		VariableCache.removeFromCache(1);
 		Assert.fail("Expected IllegalStateException when current crop is unknown and invoking remove from VariableCache");
 	}

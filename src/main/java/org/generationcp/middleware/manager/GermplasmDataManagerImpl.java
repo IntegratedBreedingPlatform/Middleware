@@ -844,7 +844,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				final Germplasm germplasm = pair.getLeft();
 				final Name name = pair.getRight();
 
-				name.setNstat(1);
+				if (name.getNstat() == null) {
+					name.setNstat(1);
+				}
 
 				final Germplasm germplasmSaved = dao.save(germplasm);
 				isGermplasmsSaved.add(germplasmSaved.getGid());

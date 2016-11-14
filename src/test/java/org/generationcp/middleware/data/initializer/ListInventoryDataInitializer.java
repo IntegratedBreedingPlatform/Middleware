@@ -47,6 +47,7 @@ public class ListInventoryDataInitializer {
 
 		inventoryInfo.setLotRows(createLotDetails(listDataId));
 		inventoryInfo.setActualInventoryLotCount(1);
+		inventoryInfo.setTotalAvailableBalance(5.0);
 		inventoryInfo.setReservedLotCount(2);
 		inventoryInfo.setDistinctScaleCountForGermplsm(0);
 		inventoryInfo.setDistinctCountWithdrawalScale(0);
