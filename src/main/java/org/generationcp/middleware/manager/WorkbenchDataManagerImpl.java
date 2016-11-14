@@ -319,6 +319,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	public List<Project> getProjects(final int start, final int numOfRows) {
 		return this.getProjectDao().getAll(start, numOfRows);
 	}
+	
+	@Override
+	public List<Project> getProjectsByCrop(final CropType cropType) {
+		return this.getProjectDao().getProjectsByCrop(cropType);
+	}
 
 	@Override
 	public List<Project> getProjectsByUser(final User user) {

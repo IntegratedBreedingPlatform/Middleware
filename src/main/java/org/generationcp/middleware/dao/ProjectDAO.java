@@ -116,4 +116,11 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		}
 		return null;
 	}
+	
+	
+	@SuppressWarnings("unchecked")
+	public List<Project> getProjectsByCrop(final CropType cropType) throws MiddlewareQueryException {
+		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("cropType", cropType));
+		return criteria.list();
+	}
 }
