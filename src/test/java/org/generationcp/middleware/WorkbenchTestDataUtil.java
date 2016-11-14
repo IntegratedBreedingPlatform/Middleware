@@ -195,4 +195,9 @@ public class WorkbenchTestDataUtil {
 		person.setPhone("-");
 		return person;
 	}
+
+	
+	public void setCropType(CropType cropType) {
+		this.cropType = cropType;
+	}
 }

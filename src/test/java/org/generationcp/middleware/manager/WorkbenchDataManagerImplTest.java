@@ -548,6 +548,44 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 	}
+	
+	
+	@Test
+	public void testGetProjectsByCrop() throws MiddlewareQueryException {
+		// Add another maize project and verify projects retrieved for wheat crop
+		final CropType maizeCropType = new CropType(CropType.CropEnum.MAIZE.toString());
+		final int NO_MAIZE_PROJECTS = 2;
+		final List<Project> maizeProjectsBeforeChange = this.workbenchDataManager.getProjectsByCrop(maizeCropType);
+		this.createTestProjectsForCrop(maizeCropType, NO_MAIZE_PROJECTS);
+		this.verifyProjectsRetrievedPerCrop(maizeCropType, maizeProjectsBeforeChange, NO_MAIZE_PROJECTS);
+		
+
+		// Create additional wheat test projects and verify projects retrieved for wheat crop
+		final CropType wheatCropType = new CropType(CropType.CropEnum.WHEAT.toString());
+		final int NO_WHEAT_PROJECTS = 3;
+		final List<Project> wheatProjectsBeforeChange = this.workbenchDataManager.getProjectsByCrop(wheatCropType);
+		this.createTestProjectsForCrop(wheatCropType, NO_WHEAT_PROJECTS);
+		this.verifyProjectsRetrievedPerCrop(wheatCropType, wheatProjectsBeforeChange, NO_WHEAT_PROJECTS);
+	}
+
+	// Verify projects were retrieved properly for specified crop
+	private void verifyProjectsRetrievedPerCrop(final CropType cropType, final List<Project> projectsBeforeChange,
+			final int noOfNewProjects) {
+		final List<Project> projects = this.workbenchDataManager.getProjectsByCrop(cropType);
+		Assert.assertEquals("Number of " + cropType.getCropName() + " projects should have been incremented by " + noOfNewProjects,
+				projectsBeforeChange.size() + noOfNewProjects, projects.size());
+		for (final Project project : projects) {
+			Assert.assertEquals(cropType, project.getCropType());
+		}
+	}
+
+	private void createTestProjectsForCrop(final CropType cropType, int noOfProjects) {
+		this.workbenchTestDataUtil.setCropType(cropType);
+		for (int i=0; i < noOfProjects; i++){
+			final Project project = this.workbenchTestDataUtil.createTestProjectData();
+			this.workbenchDataManager.addProject(project);
+		}
+	}
 
 	@Test
 	public void testGetUserById() throws MiddlewareQueryException {
