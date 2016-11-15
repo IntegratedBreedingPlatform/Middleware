@@ -551,19 +551,24 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetProjectsByCrop() throws MiddlewareQueryException {
-		// Add another maize project and verify projects retrieved for wheat crop
+		// Add another maize project and verify projects retrieved for maize crop
 		final CropType maizeCropType = new CropType(CropType.CropEnum.MAIZE.toString());
-		final int NO_MAIZE_PROJECTS = 2;
+		final int NUM_NEW_MAIZE_PROJECTS = 2;
 		final List<Project> maizeProjectsBeforeChange = this.workbenchDataManager.getProjectsByCrop(maizeCropType);
-		this.createTestProjectsForCrop(maizeCropType, NO_MAIZE_PROJECTS);
-		this.verifyProjectsRetrievedPerCrop(maizeCropType, maizeProjectsBeforeChange, NO_MAIZE_PROJECTS);
+		this.createTestProjectsForCrop(maizeCropType, NUM_NEW_MAIZE_PROJECTS);
+		this.verifyProjectsRetrievedPerCrop(maizeCropType, maizeProjectsBeforeChange, NUM_NEW_MAIZE_PROJECTS);
 
-		// Create additional wheat test projects and verify projects retrieved for wheat crop
-		final CropType wheatCropType = new CropType(CropType.CropEnum.WHEAT.toString());
-		final int NO_WHEAT_PROJECTS = 3;
-		final List<Project> wheatProjectsBeforeChange = this.workbenchDataManager.getProjectsByCrop(wheatCropType);
-		this.createTestProjectsForCrop(wheatCropType, NO_WHEAT_PROJECTS);
-		this.verifyProjectsRetrievedPerCrop(wheatCropType, wheatProjectsBeforeChange, NO_WHEAT_PROJECTS);
+		// for all other installed crops, except for maize, create projects and retrieve projects for that crop
+		final int NUM_NEW_PROJECTS = 3;
+		final List<CropType> installedCrops = this.workbenchDataManager.getInstalledCropDatabses();
+		for (CropType crop : installedCrops) {
+			if (!crop.equals(maizeCropType)) {
+				final List<Project> projectsBeforeChange = this.workbenchDataManager.getProjectsByCrop(crop);
+				this.createTestProjectsForCrop(crop, NUM_NEW_PROJECTS);
+				this.verifyProjectsRetrievedPerCrop(crop, projectsBeforeChange, NUM_NEW_PROJECTS);
+			}
+		}
+		
 	}
 
 	// Verify projects were retrieved properly for specified crop
