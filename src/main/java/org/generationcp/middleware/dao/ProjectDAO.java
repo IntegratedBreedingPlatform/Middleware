@@ -28,69 +28,70 @@ import org.hibernate.criterion.Restrictions;
 public class ProjectDAO extends GenericDAO<Project, Long> {
 
 	@Override
-	public Project getById(Long projectId) throws MiddlewareQueryException {
+	public Project getById(final Long projectId) throws MiddlewareQueryException {
 		try {
 			if (projectId != null) {
-				Criteria criteria =
+				final Criteria criteria =
 						this.getSession().createCriteria(Project.class).add(Restrictions.eq("projectId", projectId)).setMaxResults(1);
 				return (Project) criteria.uniqueResult();
 			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getById(projectId=" + projectId + ") query from Project: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getById(projectId=" + projectId + ") query from Project: " + e.getMessage(), e);
 		}
 		return null;
 	}
 
-	public Project getByUuid(String projectUuid) throws MiddlewareQueryException {
+	public Project getByUuid(final String projectUuid) throws MiddlewareQueryException {
 
 		try {
 			if (projectUuid != null) {
-				Criteria criteria =
+				final Criteria criteria =
 						this.getSession().createCriteria(Project.class).add(Restrictions.eq("uniqueID", projectUuid)).setMaxResults(1);
 				return (Project) criteria.uniqueResult();
 			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByUuid(uniqueID=" + projectUuid + ") query from Project: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getByUuid(uniqueID=" + projectUuid + ") query from Project: " + e.getMessage(), e);
 		}
 		return null;
 	}
 
-	public void deleteProject(String projectName) {
-		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+	public void deleteProject(final String projectName) {
+		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of
+		// synch with
 		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 		// statement
 		this.getSession().flush();
-		
-		SQLQuery query = this.getSession().createSQLQuery("delete from workbench_project where project_name= '" + projectName + "';");
+
+		final SQLQuery query = this.getSession().createSQLQuery("delete from workbench_project where project_name= '" + projectName + "';");
 
 		query.executeUpdate();
 	}
 
 	public Project getProjectByNameAndCrop(final String projectName, final CropType cropType) throws MiddlewareQueryException {
-		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("projectName", projectName)).add
-				(Restrictions.eq("cropType", cropType)).setMaxResults(1);
+		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("projectName", projectName))
+				.add(Restrictions.eq("cropType", cropType)).setMaxResults(1);
 		return (Project) criteria.uniqueResult();
 	}
 
-	public Project getLastOpenedProject(Integer userId) throws MiddlewareQueryException {
+	public Project getLastOpenedProject(final Integer userId) throws MiddlewareQueryException {
 		try {
 			if (userId != null) {
-				StringBuilder sb = new StringBuilder();
+				final StringBuilder sb = new StringBuilder();
 				sb.append("SELECT {w.*} FROM workbench_project w ")
-				.append("INNER JOIN workbench_project_user_info r ON w.project_id = r.project_id ")
-				.append("WHERE r.user_id = :userId AND r.last_open_date IS NOT NULL ORDER BY r.last_open_date DESC LIMIT 1 ;");
+						.append("INNER JOIN workbench_project_user_info r ON w.project_id = r.project_id ")
+						.append("WHERE r.user_id = :userId AND r.last_open_date IS NOT NULL ORDER BY r.last_open_date DESC LIMIT 1 ;");
 
-				SQLQuery query = this.getSession().createSQLQuery(sb.toString());
+				final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 				query.addEntity("w", Project.class);
 				query.setParameter("userId", userId);
 
 				@SuppressWarnings("unchecked")
-				List<Project> projectList = query.list();
+				final List<Project> projectList = query.list();
 
 				return !projectList.isEmpty() ? projectList.get(0) : null;
 			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getLastOpenedProject(userId=" + userId + ") query from Project " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getLastOpenedProject(userId=" + userId + ") query from Project " + e.getMessage(), e);
 		}
 		return null;
 	}
@@ -98,26 +99,24 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 	public Project getLastOpenedProjectAnyUser() throws MiddlewareQueryException {
 		try {
 
-			StringBuilder sb = new StringBuilder();
+			final StringBuilder sb = new StringBuilder();
 			sb.append("SELECT {w.*} FROM workbench_project w ")
 					.append("INNER JOIN workbench_project_user_info r ON w.project_id = r.project_id ")
 					.append("WHERE r.last_open_date IS NOT NULL ORDER BY r.last_open_date DESC LIMIT 1 ;");
 
-			SQLQuery query = this.getSession().createSQLQuery(sb.toString());
+			final SQLQuery query = this.getSession().createSQLQuery(sb.toString());
 			query.addEntity("w", Project.class);
 
 			@SuppressWarnings("unchecked")
-			List<Project> projectList = query.list();
+			final List<Project> projectList = query.list();
 
 			return !projectList.isEmpty() ? projectList.get(0) : null;
 
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getLastOpenedProjectAnyUser(" + ") query from Project " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getLastOpenedProjectAnyUser(" + ") query from Project " + e.getMessage(), e);
 		}
-		return null;
 	}
-	
-	
+
 	@SuppressWarnings("unchecked")
 	public List<Project> getProjectsByCrop(final CropType cropType) throws MiddlewareQueryException {
 		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("cropType", cropType));
