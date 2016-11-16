@@ -43,6 +43,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
+import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -1024,6 +1025,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<ListDataProject> getListDataProject(final int listId) {
 		return this.getListDataProjectDAO().getByListId(listId);
+	}
+
+	@Override
+	public long countListDataProjectByListIdAndEntryType(final int listId, final SystemDefinedEntryType systemDefinedEntryType) {
+		return this.getListDataProjectDAO().countByListIdAndEntryType(listId, systemDefinedEntryType);
 	}
 
 	@Override

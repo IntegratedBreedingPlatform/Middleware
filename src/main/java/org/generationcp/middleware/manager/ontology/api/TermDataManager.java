@@ -18,6 +18,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 /**
  * This is the API for retrieving ontology scale data.
@@ -54,4 +55,6 @@ public interface TermDataManager {
 	 */
 	List<TermRelationship> getRelationshipsWithObjectAndType(Integer objectId, TermRelationshipId relationshipId)
 			throws MiddlewareException;
+	
+	public List<String> getCategoriesReferredInPhenotype(int scaleId) throws MiddlewareQueryException;
 }

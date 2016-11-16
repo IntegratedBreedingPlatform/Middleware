@@ -21,6 +21,13 @@ public class ValueReferenceTestDataInitializer {
 		return valueReference;
 	}
 
+	public ValueReference createValueReference(final int id, final String name, final String description) {
+		final ValueReference valueReference = new ValueReference(id, name);
+		valueReference.setProgramUUID(DUMMY_PROGRAM_UUID);
+		valueReference.setDescription(description);
+		return valueReference;
+	}
+
 	public List<ValueReference> createValueReferenceList(final int noOfEntries) {
 		final List<ValueReference> valueReferenceList = new ArrayList<ValueReference>();
 		for (int i = 1; i <= noOfEntries; i++) {

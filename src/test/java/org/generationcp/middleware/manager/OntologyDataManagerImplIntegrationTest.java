@@ -51,6 +51,7 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 	public static void setUpOnce() {
 		// Variable caching relies on the context holder to determine current crop database in use
 		ContextHolder.setCurrentCrop("maize");
+		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 	}
 
 	@Autowired

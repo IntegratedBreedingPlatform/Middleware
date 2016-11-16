@@ -2,7 +2,9 @@
 package org.generationcp.middleware.pojos.workbench.settings;
 
 import java.io.Serializable;
+import java.util.List;
 
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.manager.Operation;
 
 public class Condition implements Serializable {
@@ -22,6 +24,7 @@ public class Condition implements Serializable {
 	private Operation operation;
 	private int id;
 	private int storedIn;
+	private List<ValueReference> possibleValues;
 
 	public Condition() {
 		super();
@@ -173,4 +176,15 @@ public class Condition implements Serializable {
 		this.storedIn = storedIn;
 	}
 
+	
+	public List<ValueReference> getPossibleValues() {
+		return possibleValues;
+	}
+
+	
+	public void setPossibleValues(List<ValueReference> possibleValues) {
+		this.possibleValues = possibleValues;
+	}
+
+	
 }

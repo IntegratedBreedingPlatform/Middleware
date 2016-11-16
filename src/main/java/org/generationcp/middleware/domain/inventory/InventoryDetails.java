@@ -1,12 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2014, All Rights Reserved.
- *
+ * <p>
  * Generation Challenge Programme (GCP)
- *
- *
+ * <p>
+ * <p>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.inventory;
@@ -105,9 +104,9 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 	private Integer lotGid;
 	private Integer stockSourceRecordId;
 
-    private Integer instanceNumber;
-    private Integer plotNumber;
-    private Integer replicationNumber;
+	private Integer instanceNumber;
+	private Integer plotNumber;
+	private Integer replicationNumber;
 
 	private Integer groupId;
 
@@ -171,7 +170,7 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.inventoryID = stockId;
 		this.amount = seedQuantity;
 	}
-	
+
 	/**
 	 * Gets the original gid of the inventory
 	 *
@@ -662,12 +661,12 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		builder.append(this.entryId);
 		builder.append(", source=");
 		builder.append(this.source);
-        builder.append(", instanceNumber=");
-        builder.append(this.instanceNumber);
-        builder.append(", plotNumber=");
-        builder.append(this.plotNumber);
-        builder.append(", replicationNumber=");
-        builder.append(this.replicationNumber);
+		builder.append(", instanceNumber=");
+		builder.append(this.instanceNumber);
+		builder.append(", plotNumber=");
+		builder.append(this.plotNumber);
+		builder.append(", replicationNumber=");
+		builder.append(this.replicationNumber);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -803,31 +802,31 @@ public class InventoryDetails implements Comparable<InventoryDetails>, Serializa
 		this.stockSourceRecordId = stockSourceRecordId;
 	}
 
-    public Integer getInstanceNumber() {
-        return instanceNumber;
-    }
+	public Integer getInstanceNumber() {
+		return instanceNumber;
+	}
 
-    public void setInstanceNumber(Integer instanceNumber) {
-        this.instanceNumber = instanceNumber;
-    }
+	public void setInstanceNumber(Integer instanceNumber) {
+		this.instanceNumber = instanceNumber;
+	}
 
-    public Integer getPlotNumber() {
-        return plotNumber;
-    }
+	public Integer getPlotNumber() {
+		return plotNumber;
+	}
 
-    public void setPlotNumber(Integer plotNumber) {
-        this.plotNumber = plotNumber;
-    }
+	public void setPlotNumber(Integer plotNumber) {
+		this.plotNumber = plotNumber;
+	}
 
-    public Integer getReplicationNumber() {
-        return replicationNumber;
-    }
+	public Integer getReplicationNumber() {
+		return replicationNumber;
+	}
 
-    public void setReplicationNumber(Integer replicationNumber) {
-        this.replicationNumber = replicationNumber;
-    }
+	public void setReplicationNumber(Integer replicationNumber) {
+		this.replicationNumber = replicationNumber;
+	}
 
-    public List<String> getBulkWithStockIds() {
+	public List<String> getBulkWithStockIds() {
 		return this.bulkWithStockIds;
 	}
 

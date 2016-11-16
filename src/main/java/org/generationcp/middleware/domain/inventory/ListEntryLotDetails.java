@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.domain.inventory;
 
 public class ListEntryLotDetails extends LotDetails implements Cloneable {
