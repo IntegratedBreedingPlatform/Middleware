@@ -849,7 +849,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT g.*, "
 					+ "GROUP_CONCAT(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') AS stockIDs, "
-					+ "COUNT(DISTINCT gl.lotid) AS availInv, "
+					+ "COUNT(DISTINCT gt.lotid) AS availInv, "
 					+ "m.mname AS methodName, l.lname AS locationName FROM germplsm g "
 					+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 "
 					+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid AND gt.trnstat <> 9  "
