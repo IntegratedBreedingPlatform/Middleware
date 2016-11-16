@@ -50,6 +50,14 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	public static final Integer STATUS_DELETED = 9;
 	protected static final Criterion RESTRICTED_LIST;
+	
+	// Exclude deleted lists, snapshot lists and folders, and filter to either existing program or historical lists
+	private static final String LIST_SEARCH_WHERE_CLAUSE = "WHERE listtype NOT IN ('"+ GermplasmListType.NURSERY.toString()+"', "
+			+ "'" + GermplasmListType.TRIAL.toString()+ "', '" + GermplasmListType.CHECK.toString()+ "', '" + GermplasmListType.ADVANCED.toString()+ "', "
+					+ "'" + GermplasmListType.CROSSES.toString()+ "', '" + GermplasmListType.FOLDER.toString()+ "') "
+							+ "AND liststatus != " + STATUS_DELETED + " AND (program_uuid = :programUUID OR program_uuid IS NULL) ";
+	// Prevent "silly" searches by limiting results to be returned
+	private static final String LIMIT_CLAUSE = " LIMIT 500 ";
 
 	static {
 		RESTRICTED_LIST =
@@ -417,10 +425,6 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			final SQLQuery query =
 					this.getSession().createSQLQuery(this.getSearchForGermplasmListsQueryString(queryString, programUUID, operation));
 
-			if (operation.equals(Operation.EQUAL)) {
-				query.setParameter("gidLength", queryString.length());
-
-			}
 			query.setParameter("gid", queryString);
 			query.setParameter("q", queryString);
 			query.setParameter("qNoSpaces", queryString.replace(" ", ""));
@@ -434,7 +438,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			return query.list();
 
 		} catch (final Exception e) {
-			throw new MiddlewareQueryException("Error with searchForGermplasmLists(" + queryString + ", programUUID=" + programUUID
+			throw new MiddlewareQueryException("Error with searchForGermplasmLists(keyword=" + queryString + ", programUUID=" + programUUID
 					+ ", operation=" + operation + ") " + e.getMessage(), e);
 		}
 	}
@@ -442,33 +446,54 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	private String getSearchForGermplasmListsQueryString(final String initialQueryString, final String programUUID,
 			final Operation operation) {
 		final StringBuilder queryStringBuilder = new StringBuilder();
-		queryStringBuilder.append("SELECT DISTINCT listnms.* " + "FROM listnms "
-				+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
-				+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) ");
+		
+		// First query for lists whose names match query string
+		this.searchByListName(operation, queryStringBuilder);
+		
+		// Join first query results with below results
+		queryStringBuilder.append(" UNION ");
 
-		// Exclude snapshot lists, deleted lists and folder type lists
-		queryStringBuilder.append(
-				"WHERE listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND ( ");
+		// Next match search string to listdata.gid or listdata.designation
+		this.searchListDataByGidOrDesignation(operation, queryStringBuilder);
+		
+		System.out.println(queryStringBuilder.toString());
+		return queryStringBuilder.toString();
+	}
 
-		// Match to GIDs in listdata
+	private void searchByListName(final Operation operation, final StringBuilder queryStringBuilder) {
+		queryStringBuilder.append("SELECT DISTINCT listnms.* ");
+		queryStringBuilder.append("FROM listnms ");
+		queryStringBuilder.append(LIST_SEARCH_WHERE_CLAUSE);
 		if (Operation.EQUAL.equals(operation)) {
-			queryStringBuilder.append("(listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) ");
+			queryStringBuilder.append(" AND listname = :q ");
+		} else {
+			queryStringBuilder.append(" AND listname LIKE :q ");
+		}
+		queryStringBuilder.append(LIMIT_CLAUSE);
+	}
+	
+	private void searchListDataByGidOrDesignation(final Operation operation, final StringBuilder queryStringBuilder) {
+		queryStringBuilder.append("SELECT DISTINCT listnms.* ");
+		queryStringBuilder.append("FROM listdata ");
+		queryStringBuilder.append("INNER JOIN listnms ON (listnms.listid = listdata.listid) ");
+		queryStringBuilder.append("INNER JOIN germplsm ON (germplsm.gid=listdata.gid AND germplsm.gid!=germplsm.grplce) ");
+		queryStringBuilder.append(LIST_SEARCH_WHERE_CLAUSE);
+		// exclude deleted list entries
+		queryStringBuilder.append("AND lrstatus != " + STATUS_DELETED + " AND (");
+		
+		// Match by listdata.gid
+		if (Operation.EQUAL.equals(operation)) {
+			queryStringBuilder.append("listdata.gid=:gid ");
 		} else {
 			queryStringBuilder.append("listdata.gid LIKE :gid ");
 		}
-
-		// Match to list name or listdata.desgination or
+		// Match to listdata.designation
 		if (Operation.EQUAL.equals(operation)) {
-			queryStringBuilder.append(" OR desig = :q OR listname = :q OR desig = :qNoSpaces OR desig = :qStandardized )");
+			queryStringBuilder.append(" OR desig = :q OR desig = :qNoSpaces OR desig = :qStandardized ) ");
 		} else {
-			queryStringBuilder.append(" OR desig LIKE :q OR listname LIKE :q OR desig LIKE :qNoSpaces OR desig LIKE :qStandardized )");
+			queryStringBuilder.append(" OR desig LIKE :q OR desig LIKE :qNoSpaces OR desig LIKE :qStandardized ) ");
 		}
-
-		// Filter to lists in current program plus historical lists
-		if (programUUID != null) {
-			queryStringBuilder.append(" AND (program_uuid = :programUUID OR program_uuid IS NULL)");
-		}
-		return queryStringBuilder.toString();
+		queryStringBuilder.append(LIMIT_CLAUSE);
 	}
 
 	@SuppressWarnings("unchecked")
