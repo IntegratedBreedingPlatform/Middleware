@@ -849,8 +849,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT g.*, "
 					+ "GROUP_CONCAT(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') AS stockIDs, "
-					+ "CAST(SUM(CASE WHEN gt.trnqty = 0 OR isnull(gt.trnqty) THEN 0 ELSE 1 END) AS UNSIGNED) AS availInv, "
-					+ "COUNT(DISTINCT gl.lotid) AS seedRes, m.mname AS methodName, l.lname AS locationName FROM germplsm g "
+					+ "COUNT(DISTINCT gl.lotid) AS availInv, "
+					+ "m.mname AS methodName, l.lname AS locationName FROM germplsm g "
 					+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 "
 					+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid AND gt.trnstat <> 9  "
 					+ "LEFT JOIN methods m ON m.mid = g.methn "
@@ -864,7 +864,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
 			query.addScalar(GermplasmDAO.STOCK_IDS);
 			query.addScalar(GermplasmDAO.AVAIL_INV);
-			query.addScalar(GermplasmDAO.SEED_RES);
 			query.addScalar(GermplasmDAO.METHOD_NAME);
 			query.addScalar(GermplasmDAO.LOCATION_NAME);
 			query.setFirstResult(startingRow);
@@ -915,10 +914,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final GermplasmInventory inventoryInfo = new GermplasmInventory(germplasm.getGid());
 		inventoryInfo.setStockIDs((String) row[1]);
 		inventoryInfo.setActualInventoryLotCount(row[2] != null ? ((BigInteger) row[2]).intValue() : 0);
-		inventoryInfo.setReservedLotCount(row[3] != null ? ((BigInteger) row[3]).intValue() : 0);
 		germplasm.setInventoryInfo(inventoryInfo);
-		germplasm.setMethodName(row[4] != null ? (String) row[4] : "");
-		germplasm.setLocationName(row[5] != null ? (String) row[5] : "");
+		germplasm.setMethodName(row[3] != null ? (String) row[3] : "");
+		germplasm.setLocationName(row[4] != null ? (String) row[4] : "");
 		return germplasm;
 	}
 
