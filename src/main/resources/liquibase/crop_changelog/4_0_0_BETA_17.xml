@@ -10,4 +10,8 @@
 		<modifyDataType tableName="listdata_project" columnName="duplicate_notes" newDataType="varchar(600)"/>
 	</changeSet>
 
+	<changeSet author="clarysabel" id="beta17-2">
+		<modifyDataType tableName="ims_transaction" columnName="bulk_with" newDataType="varchar(700)"/>
+	</changeSet>
+
 </databaseChangeLog>
