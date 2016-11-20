@@ -49,6 +49,9 @@ import com.google.common.cache.CacheBuilder;
 @Transactional
 public class GermplasmListManagerImpl extends DataManager implements GermplasmListManager {
 	
+	public static final int MAX_CROSS_NAME_SIZE = 240;
+	public static final String TRUNCATED = "(truncated)";
+	
 	/**
 	 * Caches the udflds table. udflds should be small so this cache should be fine in terms of size. The string is the database url. So the
 	 * cache is per database url.
@@ -365,7 +368,14 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 			final List<Integer> deletedListEntryIds = new ArrayList<Integer>();
 
 			for (final GermplasmListData germplasmListData : germplasmListDatas) {
-
+				
+				String groupName = germplasmListData.getGroupName();
+				if(groupName.length() > MAX_CROSS_NAME_SIZE){
+					groupName = groupName.substring(0, MAX_CROSS_NAME_SIZE - 1);
+					groupName = groupName + TRUNCATED;
+					germplasmListData.setGroupName(groupName);
+				}
+				
 				final GermplasmListData recordSaved = this.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
 				idGermplasmListDataSaved.add(recordSaved.getId());
 				if (germplasmListData.getStatus() != null && germplasmListData.getStatus().intValue() == 9) {
