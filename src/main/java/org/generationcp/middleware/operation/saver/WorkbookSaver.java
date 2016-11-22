@@ -257,10 +257,10 @@ public class WorkbookSaver extends Saver {
 	public void removeDeletedVariablesAndObservations(final Workbook workbook) {
 		this.removeDeletedVariablesInObservations(workbook.getFactors(), workbook.getObservations());
 		this.removeDeletedVariablesInObservations(workbook.getVariates(), workbook.getObservations());
-		this.deleteDeletedVariables(workbook.getConditions());
-		this.deleteDeletedVariables(workbook.getFactors());
-		this.deleteDeletedVariables(workbook.getVariates());
-		this.deleteDeletedVariables(workbook.getConstants());
+		this.removeDeletedVariables(workbook.getConditions());
+		this.removeDeletedVariables(workbook.getFactors());
+		this.removeDeletedVariables(workbook.getVariates());
+		this.removeDeletedVariables(workbook.getConstants());
 		for (Iterator<MeasurementRow> iterator = workbook.getTrialObservations().iterator(); iterator.hasNext();) {
 			MeasurementRow measurementRow = (MeasurementRow) iterator.next();
 			this.removeDeletedVariablesInObservations(measurementRow.getMeasurementVariables(), workbook.getTrialObservations());
@@ -305,7 +305,7 @@ public class WorkbookSaver extends Saver {
 		}
 	}
 
-	private void deleteDeletedVariables(final List<MeasurementVariable> variableList) {
+	private void removeDeletedVariables(final List<MeasurementVariable> variableList) {
 		if (variableList != null) {
 			final Iterator<MeasurementVariable> variable = variableList.iterator();
 			while (variable.hasNext()) {
