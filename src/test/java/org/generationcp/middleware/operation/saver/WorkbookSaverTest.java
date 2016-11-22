@@ -14,6 +14,7 @@ package org.generationcp.middleware.operation.saver;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -23,6 +24,8 @@ import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
+import org.generationcp.middleware.domain.etl.MeasurementData;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.StudyType;
@@ -33,6 +36,7 @@ import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.operation.transformer.etl.VariableTypeListTransformer;
 import org.generationcp.middleware.utils.test.TestOutputFormatter;
@@ -42,9 +46,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+
 public class WorkbookSaverTest extends TestOutputFormatter {
 
 	private static WorkbookSaver workbookSaver;
+
+	private static final String COOPERATOR = "Cooperator";
+	private static final int COOPERATOR_NAME = 8373;
 
 	@BeforeClass
 	public static void setUp() {
@@ -133,6 +141,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		Assert.assertEquals("Expected no change in the plot dataset but found one.", effectVariables.size(), plotVariables.size());
 	}
 
+	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Test
 	public void testSaveVariables() throws Exception {
 
@@ -229,5 +238,71 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 			variableTypeList.add(transformToDMSVariableType(measurementVariable, rank));
 		}
 		return variableTypeList;
+	}
+	
+	@Test
+	public void testRemoveDeletedTrialObservations() throws Exception {
+
+		final String studyName = "nursery_1" + new Random().nextInt(10000);
+
+		Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyType.N, studyName, 1, true);
+		WorkbookSaver workbookSaver = Mockito.mock(WorkbookSaver.class, Mockito.CALLS_REAL_METHODS);
+
+		VariableTypeListTransformer transformer = Mockito.mock(VariableTypeListTransformer.class);
+
+		workbook.setTrialObservations(this.createTrialObservations(1, workbook));
+
+		Mockito.doReturn(transformer).when(workbookSaver).getVariableTypeListTransformer();
+
+		MeasurementRow measurementRow = workbook.getTrialObservations().get(0);
+		List<MeasurementData> dataList = measurementRow.getDataList();
+		for (Iterator<MeasurementData> iterator = dataList.iterator(); iterator.hasNext();) {
+			MeasurementData measurementData = (MeasurementData) iterator.next();
+			MeasurementVariable measurementVariable = measurementData.getMeasurementVariable();
+
+			if (measurementVariable != null && WorkbookSaverTest.COOPERATOR_NAME == measurementVariable.getTermId()) {
+				measurementVariable.setOperation(Operation.DELETE);
+			}
+
+		}
+
+		WorkbookSaverTest.workbookSaver.removeDeletedVariablesAndObservations(workbook);
+
+		Assert.assertTrue(workbook.getTrialObservations().get(0).getMeasurementVariables().size() == 0);
+	}
+	
+	private List<MeasurementRow> createTrialObservations(final int noOfTrialInstances, final Workbook workbook) {
+		final List<MeasurementRow> trialObservations = new ArrayList<MeasurementRow>();
+
+		MeasurementRow row;
+		List<MeasurementData> dataList;
+
+		for (int i = 0; i < noOfTrialInstances; i++) {
+			row = new MeasurementRow();
+			dataList = new ArrayList<MeasurementData>();
+
+			MeasurementData data = new MeasurementData();
+			data = new MeasurementData(WorkbookSaverTest.COOPERATOR, "COOPERATOR_NAME");
+			data.setMeasurementVariable(this.getMeasurementVariable(COOPERATOR_NAME,
+					workbook.getConditions()));
+			dataList.add(data);
+			
+			row.setDataList(dataList);
+			trialObservations.add(row);
+		}
+
+		return trialObservations;
+	}
+	
+	private MeasurementVariable getMeasurementVariable(final int termId, final List<MeasurementVariable> variables) {
+		if (variables != null) {
+			// get matching MeasurementVariable object given the term id
+			for (final MeasurementVariable var : variables) {
+				if (var.getTermId() == termId) {
+					return var;
+				}
+			}
+		}
+		return null;
 	}
 }
