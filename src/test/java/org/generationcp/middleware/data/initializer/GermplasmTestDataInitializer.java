@@ -3,6 +3,7 @@ package org.generationcp.middleware.data.initializer;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
@@ -42,6 +43,27 @@ public class GermplasmTestDataInitializer {
 		germplasm.setMethodName("MethodName");
 		germplasm.setLocationName("LocationName");
 		germplasm.setPreferredName(GermplasmTestDataInitializer.createGermplasmName(id));
+		return germplasm;
+	}
+
+	public static Germplasm createGermplasm(final Integer gDate, final int gpId1, final int gpId2, final int gnpgs, final int lgId,
+			final int grplace, final int locationId, final int methodId , final int mgId, final int userId, final int referenceId,
+			final String methodName, final String locationName) {
+		final Germplasm germplasm = new Germplasm();
+		germplasm.setGdate(gDate);
+		germplasm.setGpid1(gpId1);
+		germplasm.setGpid2(gpId2);
+		germplasm.setGnpgs(gnpgs);
+		germplasm.setLgid(lgId);
+		germplasm.setGrplce(grplace);
+		germplasm.setLocationId(locationId);
+		germplasm.setMethodId(methodId);
+		germplasm.setMgid(mgId);
+		germplasm.setUserId(userId);
+		germplasm.setReferenceId(referenceId);
+		germplasm.setMethodName(methodName);
+		germplasm.setLocationName(locationName);
+		germplasm.setPreferredName(GermplasmTestDataInitializer.createGermplasmName(ThreadLocalRandom.current().nextInt(1, 100)));
 		return germplasm;
 	}
 
