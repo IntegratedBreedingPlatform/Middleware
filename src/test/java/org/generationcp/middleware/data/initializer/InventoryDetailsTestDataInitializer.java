@@ -233,4 +233,19 @@ public class InventoryDetailsTestDataInitializer {
 		return  transaction;
 	}
 
+	public static Lot createLot(Integer userId, String entityType, Integer entityId, Integer locationId, Integer scaleId, Integer status,
+			Integer sourceId, String comments) {
+		Lot lot = new Lot();
+		lot.setUserId(userId);
+		lot.setEntityType(entityType);
+		lot.setEntityId(entityId);
+		lot.setLocationId(locationId);
+		lot.setScaleId(scaleId);
+		lot.setStatus(status);
+		lot.setSource(sourceId);
+		lot.setComments(comments);
+
+		return lot;
+	}
+
 }
