@@ -42,9 +42,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	private static final String DUMMY_STOCK_ID = "USER-1-1";
     private static final Integer TEST_PROJECT_ID = 1;
-	private static final Integer testGid1 = 1;
-	private static final Integer testGid1_Gpid1 = 2;
-	private static final Integer testGid1_Gpid2 = 3;
 
 	private static final Integer GROUP_ID = 10;
 
@@ -92,15 +89,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		if (!this.testDataSetup) {
 			this.updateInventory();
-			this.updateProgenitors();
 			this.testDataSetup = true;
 		}
 		this.initializeGermplasms();
-	}
-
-	private void updateProgenitors() throws MiddlewareQueryException {
-		this.germplasmDataDM.updateProgenitor(GermplasmDAOTest.testGid1, GermplasmDAOTest.testGid1_Gpid1, 1);
-		this.germplasmDataDM.updateProgenitor(GermplasmDAOTest.testGid1, GermplasmDAOTest.testGid1_Gpid2, 2);
 	}
 
 	private void updateInventory() throws MiddlewareQueryException {
@@ -272,9 +263,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final List<Germplasm> results =
 				this.dao.searchForGermplasms(this.createSearchParam(childGermplasm.getGid().toString(), Operation.EQUAL, true, false,
 						false));
-		Assert.assertEquals(
-				"The result should contain three germplasms(one is the actual result and the other two is the male and female parents)", 3,
-				results.size());
 
 		Assert.assertTrue("Result should include both child and parent germplasms", results.size() >=2 );
 		List<Integer> resultGIDs = Lists.newArrayList();
