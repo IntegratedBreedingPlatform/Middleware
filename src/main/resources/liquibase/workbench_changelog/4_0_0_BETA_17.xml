@@ -1,0 +1,90 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+	
+	<changeSet author="mderamos" id="beta17-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='germplasm_mainheadtohead'</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_sidebar_category_link where tool_name = 'germplasm_mainheadtohead'
+	    </sql>
+	</changeSet>
+	
+	<changeSet author="mderamos" id="beta17-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='query_for_adapted_germplasm'</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_sidebar_category_link where tool_name = 'query_for_adapted_germplasm'
+	    </sql>
+	</changeSet>
+	
+	<changeSet author="mderamos" id="beta17-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='trait_donor_query'</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_sidebar_category_link where tool_name = 'trait_donor_query'
+	    </sql>
+	</changeSet>
+	
+	<changeSet author="mderamos" id="beta17-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='bv_meta_analysis'</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_sidebar_category_link where tool_name = 'bv_meta_analysis'
+	    </sql>
+	</changeSet>
+	
+	<changeSet author="mderamos" id="beta17-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='breeding_view'</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_sidebar_category_link where tool_name = 'breeding_view'
+	    </sql>
+	</changeSet>
+	
+	<changeSet author="mderamos" id="beta17-6">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='gdms'</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_sidebar_category_link where tool_name = 'gdms'
+	    </sql>
+	</changeSet>
+	
+	<changeSet author="mderamos" id="beta17-7">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='breeding_planner'</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_sidebar_category_link where tool_name = 'breeding_planner'
+	    </sql>
+	</changeSet>
+	
+	<changeSet author="mderamos" id="beta17-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category_link where tool_name='bm_list_manager_main' AND sidebar_link_title='Manage Lists'</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE workbench_sidebar_category_link SET sidebar_link_title='Manage Germplasm' where tool_name='bm_list_manager_main'
+	    </sql>
+	</changeSet>
+	
+	<changeSet author="mderamos" id="beta17-9">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM workbench_sidebar_category where sidebar_category_name='marker_assisted_breeding'</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_sidebar_category where sidebar_category_name='marker_assisted_breeding'
+	    </sql>
+	</changeSet>
+</databaseChangeLog>

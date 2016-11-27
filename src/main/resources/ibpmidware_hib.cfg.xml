@@ -74,6 +74,7 @@
         <mapping class="org.generationcp.middleware.pojos.workbench.IbdbUserMap"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.SecurityQuestion"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.TemplateSetting"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.ToolLicenseInfo"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSetting"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory"/>

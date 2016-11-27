@@ -229,6 +229,17 @@ public interface InventoryDataManager {
 	 */
 	Transaction getTransactionById(Integer id) throws MiddlewareQueryException;
 
+
+	/**
+	 * Returns the list of Transaction object which represents the record identified by the given id.
+	 *
+	 * @param idList the id
+	 * @return the Transaction of the given id
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<Transaction> getTransactionsByIdList(List<Integer> idList) throws MiddlewareQueryException;
+
+
 	/**
 	 * Return all Transaction records associated with the Lot identified by the given parameter.
 	 *
@@ -512,6 +523,16 @@ public interface InventoryDataManager {
 	 * @return List of GermplasmListData POJOs
 	 */
 	List<GermplasmListData> getLotDetailsForList(Integer listId, int start, int numOfRows) throws MiddlewareQueryException;
+
+	/**
+	 * Returns the germplasm entries of given list id with lot rows and reserved inventory data per entry
+	 *
+	 * @param listId - id of list
+	 *
+	 * @return List of GermplasmListData POJOs
+	 */
+	List<GermplasmListData> getReservedLotDetailsForExportList(Integer listId) throws MiddlewareQueryException;
+
 
 	/**
 	 * Gets number of lots with available balance for germplasm

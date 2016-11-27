@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
@@ -691,5 +691,27 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	@Test
 	public void testGetLotById() throws MiddlewareQueryException {
 		Assert.assertNotNull(this.manager.getLotById(1));
+	}
+
+	@Test
+	public void testGetTransactionsByIdList() throws Exception{
+		List<Transaction> transactions = new ArrayList<Transaction>();
+		Transaction transaction1 = new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0),
+				Integer.valueOf(20140413), 1, 200d, "sample added transaction 1", 0, null, null, null, 100d, 1, null);
+		transactions.add(transaction1);
+
+		Transaction transaction2 = new Transaction(null, 1, this.manager.getLotsByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0),
+				Integer.valueOf(20140518), 1, 300d, "sample added transaction 2", 0, null, null, null, 150d, 1, null);
+		transactions.add(transaction2);
+
+		this.manager.addTransactions(transactions);
+
+		List<Integer> transactionIdList = Lists.newArrayList();
+		transactionIdList.add(transaction1.getId());
+		transactionIdList.add(transaction2.getId());
+
+		List<Transaction> transactionList = this.manager.getTransactionsByIdList(transactionIdList);
+
+		Assert.assertEquals(2, transactionList.size());
 	}
 }

@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -898,5 +899,33 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		elements.setTermProperties(termProperties);
 		elements.setVariableOverrides(variableOverrides);
 	}
+	
+	@Override
+	public boolean areVariablesUsedInStudy(final List<Integer> variablesIds) {
+		final String variableUsageCount = "SELECT *  FROM projectprop pp " + " WHERE pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
+				+ " AND pp.value IN (:variablesIds) "
+				+ " AND pp.project_id not in ( SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = pp.project_id "
+				+ " AND stat.type_id = " + TermId.STUDY_STATUS.getId() + " AND value = " + TermId.DELETED_STUDY.getId() + ") limit 1";
 
+		final SQLQuery query = this.getActiveSession().createSQLQuery(variableUsageCount);
+		query.setParameterList("variablesIds", variablesIds);
+		return query.list().size() > 0;
+	}
+
+	@Override
+	public List<VariableOverrides> getVariableOverridesByVariableIds(final List<Integer> variableIds) {
+		try {
+			return this.getVariableProgramOverridesDao().getVariableOverridesByVariableIds(variableIds);
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException("Error at getVariableOverridesByVariableIds:" + e.getMessage(), e);
+		}
+	}
+	
+	@Override
+	public void deleteVariablesFromCache(final List<Integer> variablesIds) {
+		for (final Iterator<Integer> iterator = variablesIds.iterator(); iterator.hasNext();) {
+			final Integer variableId = iterator.next();
+			VariableCache.removeFromCache(variableId);
+		}
+	}
 }

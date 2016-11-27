@@ -463,4 +463,16 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 					this.getLogExceptionMessage("getAllMethodsDerivativeAndManintenance", "", null, e.getMessage(), "Method"), e);
 		}
 	}
+	
+	public List<Method> getFavoriteMethodsByMethodType(final String methodType, final String programUUID) throws MiddlewareQueryException {
+		try {
+			Query query = this.getSession().getNamedQuery(Method.GET_FAVORITE_METHODS_BY_TYPE);
+			query.setParameter("mType", methodType);
+			query.setParameter("programUUID", programUUID);
+			return query.list();
+		} catch (HibernateException e) {
+			this.logAndThrowException(this.getLogExceptionMessage("getAllMethod", "", null, e.getMessage(), "Method"), e);
+		}
+		return new ArrayList<Method>();
+	}
 }

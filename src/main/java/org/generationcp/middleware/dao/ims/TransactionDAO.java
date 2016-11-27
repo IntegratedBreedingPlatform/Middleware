@@ -383,6 +383,86 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		return lotCounts;
 	}
 
+	@SuppressWarnings("unchecked")
+	public Map<Integer, Object[]> retrieveWithdrawalBalanceWithDistinctScale(List<Integer> listEntryIds) throws MiddlewareQueryException {
+		Map<Integer, Object[]> mapWithdrawalStatusEntryWise = new HashMap<Integer, Object[]>();
+
+		try {
+			String sql =
+					"SELECT recordid, sum(trnqty)*-1 as withdrawal, count(distinct l.scaleid),l.scaleid "
+							+ "FROM ims_transaction t " + "INNER JOIN ims_lot l ON l.lotid = t.lotid "
+							+ "WHERE trnqty < 0 AND trnstat <> 9 AND recordid IN (:entryIds) "
+							+ "  AND l.status = 0 AND l.etype = 'GERMPLSM' " + "GROUP BY recordid " + "ORDER BY recordid ";
+			Query query = this.getSession().createSQLQuery(sql).setParameterList("entryIds", listEntryIds);
+			List<Object[]> result = query.list();
+			for (Object[] row : result) {
+				Integer entryId = (Integer) row[0];
+				Double withdrawalBalance = (Double) row[1];
+
+				BigInteger distinctWithdrawalScale = (BigInteger) row[2];
+				Integer withdrawalScale = (Integer) row[3];
+
+				mapWithdrawalStatusEntryWise.put(entryId, new Object[]{ withdrawalBalance, 	distinctWithdrawalScale, withdrawalScale});
+			}
+
+		} catch (Exception e) {
+			this.logAndThrowException(
+					"Error at retrieveWithdrawalBalanceWithDistinctScale=" + listEntryIds + " at TransactionDAO: " + e.getMessage(), e);
+		}
+
+		return mapWithdrawalStatusEntryWise;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Object[]> retrieveWithdrawalStatus(Integer sourceId, List<Integer> listGids) throws MiddlewareQueryException {
+		List<Object[]> listOfTransactionStatusForGermplsm = new ArrayList<Object[]>();
+
+		try {
+			String sql =
+					"select lot.*,recordid,trnstat  from  (SELECT i.lotid, i.eid FROM ims_lot i "
+							+ " LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
+							+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gIds) GROUP BY i.lotid ) lot "
+							+ " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid   AND trnstat in (0,1) AND trnqty < 0 "
+							+ " AND sourceid = :sourceid AND sourcetype = 'LIST'  ORDER by lot.eid; ";
+			Query query = this.getSession().createSQLQuery(sql);
+			query.setParameterList("gIds", listGids);
+			query.setParameter("sourceid", sourceId);
+
+			List<Object[]> result = query.list();
+			for (Object[] row : result) {
+
+				Integer lotId = null;
+				Integer germplsmId = null;
+				Integer recordId = null;
+				Integer tranStatus = null;
+
+				if(row[0] != null){
+					lotId = (Integer) row[0];
+				}
+
+				if(row[1] != null){
+					germplsmId = (Integer) row[1];
+				}
+				if(row[2] != null){
+					recordId = (Integer) row[2];
+				}
+				if(row[3] != null){
+					tranStatus = (Integer) row[3];
+				}
+
+				listOfTransactionStatusForGermplsm.add(new Object[]{ lotId, germplsmId, recordId, tranStatus });
+			}
+
+		} catch (Exception e) {
+			this.logAndThrowException(
+					"Error at retrieveWithdrawalStatus=" + listGids + " at TransactionDAO: " + e.getMessage(), e);
+		}
+
+		return listOfTransactionStatusForGermplsm;
+	}
+
+
+
 	private boolean isGidInInventoryList(List<InventoryDetails> inventoryDetails, Integer gid) {
 		for (InventoryDetails detail : inventoryDetails) {
 			if (detail.getGid().equals(gid)) {
@@ -503,26 +583,26 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 	}
 
-	public Map<Integer, String> retrieveStockIds(List<Integer> lrecIds) {
+	public Map<Integer, String> retrieveStockIds(List<Integer> gIds) {
 
-		Map<Integer, String> lrecIdStockIdMap = new HashMap<>();
+		Map<Integer, String> gIdStockIdMap = new HashMap<>();
 
 		String sql =
-				"SELECT a.lrecid,group_concat(inventory_id SEPARATOR ', ')  " + "FROM listdata a  "
+				"SELECT a.gid,group_concat(inventory_id SEPARATOR ', ')  " + "FROM listdata a  "
 						+ "inner join ims_lot b ON a.gid = b.eid  "
 						+ "INNER JOIN ims_transaction c ON b.lotid = c.lotid and a.lrecid = c.recordid "
-						+ "WHERE a.lrecid in (:lrecids) GROUP BY a.lrecid";
+						+ "WHERE a.gid in (:gIds) GROUP BY a.gid";
 
-		Query query = this.getSession().createSQLQuery(sql).setParameterList("lrecids", lrecIds);
+		Query query = this.getSession().createSQLQuery(sql).setParameterList("gIds", gIds);
 
 		List<Object[]> result = query.list();
 		for (Object[] row : result) {
-			Integer lrecid = (Integer) row[0];
+			Integer gid = (Integer) row[0];
 			String stockIds = (String) row[1];
 
-			lrecIdStockIdMap.put(lrecid, stockIds);
+			gIdStockIdMap.put(gid, stockIds);
 		}
-		return lrecIdStockIdMap;
+		return gIdStockIdMap;
 
 	}
 

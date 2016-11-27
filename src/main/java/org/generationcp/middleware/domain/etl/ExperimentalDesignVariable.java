@@ -50,6 +50,10 @@ public class ExperimentalDesignVariable {
 		return "";
 	}
 
+	public MeasurementVariable getNumberOfBlocks() {
+		return this.getByTermId(TermId.NBLKS);
+	}
+
 	public MeasurementVariable getNumberOfReplicates() {
 		return this.getByTermId(TermId.NUMBER_OF_REPLICATES);
 	}

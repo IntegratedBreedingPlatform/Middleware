@@ -60,4 +60,22 @@ public class VariableOverridesDao extends GenericDAO<VariableOverrides, Integer>
 		overrides.setExpectedMax(maxValue);
 		return this.merge(overrides);
 	}
+	
+	@SuppressWarnings("unchecked")
+	public List<VariableOverrides> getVariableOverridesByVariableIds(final List<Integer> variableIds) throws MiddlewareException {
+
+		List<VariableOverrides> properties;
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.in("variableId", variableIds));
+			properties = criteria.list();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+					"Error at getVariableOverridesByVariableIds IN " + variableIds + " query on VariableOverridesDao: " + e.getMessage(), e);
+		}
+
+		return properties;
+	}
 }

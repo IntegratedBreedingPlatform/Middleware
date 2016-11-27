@@ -390,6 +390,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public List<Method> getAllMethods() {
 		return this.getMethodDao().getAllMethod();
 	}
+	
+	@Override
+	public List<Method> getFavoriteMethodsByMethodType(String methodType, String programUUID) {
+		return this.getMethodDao().getFavoriteMethodsByMethodType(methodType, programUUID);
+	}
 
 	@Override
 	public List<Method> getAllMethodsOrderByMname() {
@@ -839,7 +844,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				final Germplasm germplasm = pair.getLeft();
 				final Name name = pair.getRight();
 
-				name.setNstat(1);
+				if (name.getNstat() == null) {
+					name.setNstat(1);
+				}
 
 				final Germplasm germplasmSaved = dao.save(germplasm);
 				isGermplasmsSaved.add(germplasmSaved.getGid());

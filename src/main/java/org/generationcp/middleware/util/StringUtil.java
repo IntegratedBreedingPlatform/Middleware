@@ -15,6 +15,7 @@ import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.fest.util.Strings;
@@ -404,6 +405,15 @@ public abstract class StringUtil {
 		}
 
 		return str;
+	}
+
+	public static boolean containsIgnoreCase(final List<String> list, final String searchFor) {
+		for (final String item : list) {
+			if (StringUtils.isEmpty(searchFor) || StringUtils.containsIgnoreCase(item, searchFor)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 }
