@@ -87,4 +87,126 @@
 			DELETE FROM workbench_sidebar_category where sidebar_category_name='marker_assisted_breeding'
 	    </sql>
 	</changeSet>
+	
+	<changeSet author="vanina" id="beta17-10">
+
+		<preConditions onFail="MARK_RAN">
+			<!--
+			 Even though when more than one precondition are written the "and" logic is supposed by default,
+			 I believe to be a good practise to declare it. -->
+			<and>
+				<sqlCheck expectedResult="0">select case when 'workbench' = database() then 0 else 1 end from dual;</sqlCheck>
+				<sqlCheck expectedResult="0">select count(*) from information_schema.routines where routine_schema = database()
+												and specific_name = 'alterWorkbenchCropTable';</sqlCheck>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			CREATE PROCEDURE alterWorkbenchCropTable()
+			BEGIN
+			
+			DECLARE updateDone INT DEFAULT 0;
+			DECLARE valueGenerated VARCHAR(4);
+			DECLARE result INT;
+			DECLARE exist INT;
+			DECLARE cropName VARCHAR(32);
+			DECLARE plotCodePrefix VARCHAR(4);
+			DECLARE cur1 CURSOR FOR SELECT crop_name, plot_code_prefix FROM workbench_crop;
+			DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET updateDone = 1;
+			
+			SELECT 
+			    COUNT(1)
+			INTO exist FROM
+			    INFORMATION_SCHEMA.COLUMNS
+			WHERE
+			    table_name = 'workbench_crop'
+			        AND COLUMN_NAME = 'plot_code_prefix';
+			
+			if(exist = 0)  then
+				ALTER TABLE workbench_crop add COLUMN plot_code_prefix VARCHAR(4);
+			END IF;
+			
+			
+			OPEN cur1;
+			
+			 read_loop: LOOP
+			    FETCH cur1 INTO cropName, plotCodePrefix;
+			    
+			    IF updateDone =1 THEN
+			        LEAVE read_loop;
+			    END IF;
+			    
+			    IF (plotCodePrefix is null) THEN
+					SELECT 
+					    LPAD(CONV(FLOOR(RAND() * POW(36, 6)), 10, 36),
+					            4,
+					            0)
+					INTO @valueGenerated;
+
+					SELECT 
+						COUNT(1)
+					INTO result FROM
+						workbench_crop
+					WHERE
+					plot_code_prefix = @valueGenerated;
+			        
+			        WHILE (result >= 1) DO
+						SELECT 
+					    	LPAD(CONV(FLOOR(RAND() * POW(36, 6)), 10, 36),
+					        	    4,
+					            	0)
+						INTO @valueGenerated;
+						SELECT 
+							COUNT(1)
+						INTO result FROM
+							workbench_crop
+						WHERE
+						plot_code_prefix = @valueGenerated;
+					END WHILE;
+			        
+					UPDATE workbench_crop 
+					SET 
+						plot_code_prefix = @valueGenerated
+					WHERE
+						crop_name = cropName;
+					
+			    END IF;   
+			END LOOP read_loop;
+			CLOSE cur1;
+			END;
+		</sql>
+	</changeSet>
+	
+	<changeSet author="vanina" id="beta17-11">
+
+		<preConditions onFail="MARK_RAN">
+			<!--
+			 Even though when more than one precondition are written the "and" logic is supposed by default,
+			 I believe to be a good practise to declare it. -->
+			<and>
+				<sqlCheck expectedResult="0">select case when 'workbench' = database() then 0 else 1 end from dual;</sqlCheck>
+				<sqlCheck expectedResult="1">select count(*) from information_schema.routines where routine_schema = database()
+												and specific_name = 'alterWorkbenchCropTable';</sqlCheck>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			call alterWorkbenchCropTable();
+		</sql>
+	</changeSet>
+	
+	<changeSet author="vanina" id="beta17-12">
+
+		<preConditions onFail="MARK_RAN">
+			<!--
+			 Even though when more than one precondition are written the "and" logic is supposed by default,
+			 I believe to be a good practise to declare it. -->
+			<and>
+				<sqlCheck expectedResult="0">select case when 'workbench' = database() then 0 else 1 end from dual;</sqlCheck>
+				<sqlCheck expectedResult="1">select count(*) from information_schema.routines where routine_schema = database()
+												and specific_name = 'alterWorkbenchCropTable';</sqlCheck>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE IF EXISTS alterWorkbenchCropTable;
+		</sql>
+	</changeSet>
 </databaseChangeLog>
