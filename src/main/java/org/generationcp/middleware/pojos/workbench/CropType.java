@@ -48,11 +48,22 @@ public class CropType implements Serializable {
 	@Column(name = "schema_version")
 	private String version;
 
+	@Column(name = "plot_code_prefix")
+	private String plotCodePrefix;
+
 	public CropType() {
 	}
 
 	public CropType(String cropName) {
 		this.cropName = cropName;
+	}
+
+	public String getPlotCodePrefix() {
+		return plotCodePrefix;
+	}
+
+	public void setPlotCodePrefix(final String plotCodePrefix) {
+		this.plotCodePrefix = plotCodePrefix;
 	}
 
 	public String getCropName() {
@@ -118,6 +129,8 @@ public class CropType implements Serializable {
 		builder.append(this.dbName);
 		builder.append(", version=");
 		builder.append(this.version);
+		builder.append(", plotCodePrefix=");
+		builder.append(this.plotCodePrefix);
 		builder.append("]");
 		return builder.toString();
 	}
