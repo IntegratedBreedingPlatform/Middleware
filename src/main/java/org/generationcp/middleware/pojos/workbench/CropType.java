@@ -23,7 +23,7 @@ import javax.persistence.Table;
  * 
  */
 @Entity
-@Table(name = "workbench_crop")
+@Table(name = "workbench_crop", schema = "workbench")
 public class CropType implements Serializable {
 
 	private static final long serialVersionUID = 1L;
