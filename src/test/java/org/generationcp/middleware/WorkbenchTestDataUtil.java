@@ -4,6 +4,7 @@ package org.generationcp.middleware;
 import java.util.Date;
 import java.util.Random;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
@@ -151,52 +152,20 @@ public class WorkbenchTestDataUtil {
 			userdto.setUserId(userId);
 		}
 		
-		userdto.setUsername("Cuenyad");
-		userdto.setFirstName("Diego");
-		userdto.setLastName("Cuenya");
+		final String username = RandomStringUtils.randomAlphanumeric(30);
+		userdto.setUsername(username);
+		final String firstName = RandomStringUtils.randomAlphanumeric(20);
+		userdto.setFirstName(firstName);
+		final String lastName = RandomStringUtils.randomAlphanumeric(50);
+		userdto.setLastName(lastName);
 		userdto.setRole("ADMIN");
 		userdto.setPassword("fwgtrgrehgewsdsdeferhkjlkjSli");
-		userdto.setEmail("diego.cuenya@leafnode.io");
+		final String email = RandomStringUtils.randomAlphanumeric(24);
+		userdto.setEmail("test" + email + "@leafnode.io");
 		userdto.setStatus(0);
 		return userdto;
 	}
-	
-	public User createTestUserFromUserDto(Integer userId) {
-		User user = new User();
-		user.setPersonid(22);
-		user.setUserid(userId);
-		user.setPerson(createPersonfromUserDTO());
-		user.setName("Diego");
-		user.setPassword("fwgtrgrehgewsdsdeferhkjlkjSli");
-		user.setAccess(0);
-		user.setAssignDate(20150101);
-		user.setCloseDate(20150101);
-		user.setInstalid(0);
-		user.setStatus(0);
-		user.setType(0);
-		return user;
-	}
 
-	private Person createPersonfromUserDTO(){
-		Person person = new Person();
-		person.setId(22);
-		person.setFirstName("Diego");
-		person.setMiddleName("");
-		person.setLastName("Cuenya");
-		person.setEmail("diego.cuenya@leafnode.io");
-		person.setTitle("-");
-		person.setContact("-");
-		person.setExtension("-");
-		person.setFax("-");
-		person.setInstituteId(0);
-		person.setLanguage(0);
-		person.setNotes("-");
-		person.setPositionName("-");
-		person.setPhone("-");
-		return person;
-	}
-
-	
 	public void setCropType(CropType cropType) {
 		this.cropType = cropType;
 	}
