@@ -199,11 +199,17 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchForGermplasmsStartsWithGermplasmName() throws Exception {
+
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 12, 13, 1, 0, 0 , 1 ,1 ,0, 1 ,1 , "MethodName",
+				"LocationName");
+		germplasm.getPreferredName().setNval("GermplasmName");
+		this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
+
 		final List<Germplasm> results =
-				this.dao.searchForGermplasms(this.createSearchParam(this.preferredName.getNval() + "%", Operation.LIKE, false, false, false));
+				this.dao.searchForGermplasms(this.createSearchParam(germplasm.getPreferredName().getNval() + "%", Operation.LIKE, false, false, false));
 		Assert.assertEquals("The results should contain one germplasm since there's only one test data with name that starts with "
-				+ this.preferredName.getNval(), 1, results.size());
-		this.assertPossibleGermplasmFields(results);
+				+ germplasm.getPreferredName().getNval(), 1, results.size());
+		Assert.assertTrue(germplasm.getPreferredName().getNval().contains("GermplasmName"));
 	}
 
 	@Test
