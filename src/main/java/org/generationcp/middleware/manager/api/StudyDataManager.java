@@ -41,6 +41,7 @@ import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
@@ -832,4 +833,6 @@ public interface StudyDataManager {
 	Long countAllStudies(String programDbId, String locationDbId, String seasonDbId) throws MiddlewareQueryException;
 
 	List<InstanceMetadata> getInstanceMetadata(int studyId);
+
+	Phenotype getPhenotypeById(int phenotypeId);
 }
