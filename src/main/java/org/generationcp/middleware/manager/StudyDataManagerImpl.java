@@ -1190,4 +1190,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public Phenotype getPhenotypeById(int phenotypeId) {
 		return getPhenotypeDao().getById(phenotypeId);
 	}
+
+	@Override
+	public void saveOrUpdatePhenotypeValue(int experimentId, int variableId, String value, Phenotype existingPhenotype, int dataTypeId) {
+		getPhenotypeSaver().saveOrUpdate(experimentId, variableId, value, existingPhenotype, dataTypeId);
+	}
 }

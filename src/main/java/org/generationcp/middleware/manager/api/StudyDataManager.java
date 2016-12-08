@@ -835,4 +835,6 @@ public interface StudyDataManager {
 	List<InstanceMetadata> getInstanceMetadata(int studyId);
 
 	Phenotype getPhenotypeById(int phenotypeId);
+
+	void saveOrUpdatePhenotypeValue(int experimentId, int variableId, String value, Phenotype existingPhenotype, int dataTypeId);
 }
