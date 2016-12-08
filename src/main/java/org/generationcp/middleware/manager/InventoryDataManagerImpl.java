@@ -249,6 +249,11 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	}
 
 	@Override
+	public List<org.generationcp.middleware.pojos.ims.Lot> getLotsByIdList(List<Integer> idList) throws MiddlewareQueryException {
+		return this.getLotDao().filterByColumnValues("id", idList);
+	}
+
+	@Override
 	public Set<org.generationcp.middleware.pojos.ims.Transaction> getTransactionsByLotId(Integer id) throws MiddlewareQueryException {
 		Lot lot = this.getLotDao().getById(id, false);
 		return lot.getTransactions();

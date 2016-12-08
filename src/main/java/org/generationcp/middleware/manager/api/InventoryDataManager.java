@@ -239,6 +239,15 @@ public interface InventoryDataManager {
 	 */
 	List<Transaction> getTransactionsByIdList(List<Integer> idList) throws MiddlewareQueryException;
 
+	/**
+	 * Returns the list of Lot object which represents the record identified by the given id.
+	 *
+	 * @param idList the id
+	 * @return the Lot of the given id
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<Lot> getLotsByIdList(List<Integer> idList) throws MiddlewareQueryException;
+
 
 	/**
 	 * Return all Transaction records associated with the Lot identified by the given parameter.
