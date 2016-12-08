@@ -4,6 +4,7 @@ package org.generationcp.middleware;
 import java.util.Date;
 import java.util.Random;
 
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
@@ -14,6 +15,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
+import org.generationcp.middleware.service.api.user.UserDto;
 
 public class WorkbenchTestDataUtil {
 
@@ -33,12 +35,13 @@ public class WorkbenchTestDataUtil {
 		person.setInstituteId(1);
 		person.setFirstName("Test");
 		person.setMiddleName("M");
-		person.setLastName("Person " + new Random().nextInt());
+		int randomNumber = new Random().nextInt();
+		person.setLastName("Person " + randomNumber);
 		person.setPositionName("King of Icewind Dale");
 		person.setTitle("His Highness");
 		person.setExtension("Ext");
 		person.setFax("Fax");
-		person.setEmail("lichking@blizzard.com");
+		person.setEmail("lichking" + randomNumber + "@blizzard.com");
 		person.setNotes("notes");
 		person.setContact("Contact");
 		person.setLanguage(1);
@@ -141,5 +144,29 @@ public class WorkbenchTestDataUtil {
 		}
 		return this.testUser1;
 	}
+	
+	public UserDto createTestUserDTO(Integer userId){
+		UserDto userdto = new UserDto();
+		
+		if(userId!=null && !userId.equals(0)){
+			userdto.setUserId(userId);
+		}
+		
+		final String username = RandomStringUtils.randomAlphanumeric(30);
+		userdto.setUsername(username);
+		final String firstName = RandomStringUtils.randomAlphanumeric(20);
+		userdto.setFirstName(firstName);
+		final String lastName = RandomStringUtils.randomAlphanumeric(50);
+		userdto.setLastName(lastName);
+		userdto.setRole("ADMIN");
+		userdto.setPassword("fwgtrgrehgewsdsdeferhkjlkjSli");
+		final String email = RandomStringUtils.randomAlphanumeric(24);
+		userdto.setEmail("test" + email + "@leafnode.io");
+		userdto.setStatus(0);
+		return userdto;
+	}
 
+	public void setCropType(CropType cropType) {
+		this.cropType = cropType;
+	}
 }

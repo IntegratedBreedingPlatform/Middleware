@@ -101,4 +101,9 @@ public class TermDataManagerImpl extends DataManager implements TermDataManager 
 
 		return termRelationships;
 	}
+	
+	@Override
+	public List<String> getCategoriesReferredInPhenotype(int scaleId) throws MiddlewareQueryException {
+		return this.getCvTermRelationshipDao().getCategoriesReferredInPhenotype(scaleId);
+	}
 }

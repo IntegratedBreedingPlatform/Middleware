@@ -22,7 +22,8 @@ public class VariableCache {
 
 	public static Variable getFromCache(final Integer variableId) {
 		final String currentCrop = VariableCache.getCurrentCrop();
-		final VariableCacheKey key = new VariableCacheKey(variableId, currentCrop);
+		final String currentProgram = VariableCache.getCurrentProgram();
+		final VariableCacheKey key = new VariableCacheKey(variableId, currentCrop, currentProgram);
 		final Variable variable = VariableCache.VARIABLE_CACHE.get(key);
 		if (variable != null) {
 			VariableCache.LOG.debug("Variable identified by [{}] in [{}] database is in cache.", variableId, currentCrop);
@@ -31,15 +32,17 @@ public class VariableCache {
 	}
 
 	public static void addToCache(final Integer variableId, final Variable variable) {
-		VariableCache.VARIABLE_CACHE.put(new VariableCacheKey(variableId, VariableCache.getCurrentCrop()), variable);
+		VariableCache.VARIABLE_CACHE
+				.put(new VariableCacheKey(variableId, VariableCache.getCurrentCrop(), VariableCache.getCurrentProgram()), variable);
 	}
 
 	public static void removeFromCache(final Integer variableId) {
-		VariableCache.VARIABLE_CACHE.remove(new VariableCacheKey(variableId, VariableCache.getCurrentCrop()));
+		VariableCache.VARIABLE_CACHE
+				.remove(new VariableCacheKey(variableId, VariableCache.getCurrentCrop(), VariableCache.getCurrentProgram()));
 	}
 
 	// For tests only
-	static int getCacheSize() {
+	public static int getCacheSize() {
 		return VariableCache.VARIABLE_CACHE.size();
 	}
 
@@ -50,5 +53,9 @@ public class VariableCache {
 
 	private static String getCurrentCrop() {
 		return ContextHolder.getCurrentCrop();
+	}
+
+	private static String getCurrentProgram() {
+		return ContextHolder.getCurrentProgram();
 	}
 }

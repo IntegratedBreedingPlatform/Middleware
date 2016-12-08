@@ -25,6 +25,7 @@ import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
+import org.generationcp.middleware.data.initializer.ProgramFavoriteTestDataInitializer;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -40,6 +41,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
@@ -74,12 +76,14 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
-
-	private NameTestDataInitializer nameTestDataInitializaer;
+	
+	private ProgramFavoriteTestDataInitializer programFavoriteTestDataInitializer;
+	private NameTestDataInitializer nameTestDataInitializer;
 
 	@Before
 	public void setUp() throws Exception {
-		this.nameTestDataInitializaer = new NameTestDataInitializer();
+		this.nameTestDataInitializer = new NameTestDataInitializer();
+		this.programFavoriteTestDataInitializer = new ProgramFavoriteTestDataInitializer();
 		if (this.nameDAO == null) {
 			this.nameDAO = new NameDAO();
 			this.nameDAO.setSession(this.sessionProvder.getSession());
@@ -1021,24 +1025,24 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final Integer gid1 = germplasm1.getGid();
 		final Integer gid2 = germplasm2.getGid();
 
-		final Name name1 = this.nameTestDataInitializaer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "I-1RT  /  P 001 A-23 / ");
+		final Name name1 = this.nameTestDataInitializer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "I-1RT  /  P 001 A-23 / ");
 		this.nameDAO.save(name1);
 
-		final Name name2 = this.nameTestDataInitializaer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "I-1RT/P 1 A-23/");
+		final Name name2 = this.nameTestDataInitializer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "I-1RT/P 1 A-23/");
 		this.nameDAO.save(name2);
 
-		final Name name3 = this.nameTestDataInitializaer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "I-1RT/P001A-23/");
+		final Name name3 = this.nameTestDataInitializer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "I-1RT/P001A-23/");
 		this.nameDAO.save(name3);
 
 		final Name name4 =
-				this.nameTestDataInitializaer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "(CML454 X CML451)-B-3-1-112");
+				this.nameTestDataInitializer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid2, "(CML454 X CML451)-B-3-1-112");
 		this.nameDAO.save(name4);
 
 		final Name name5 =
-				this.nameTestDataInitializaer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "(CML454 X CML451)-B-3-1-112");
+				this.nameTestDataInitializer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "(CML454 X CML451)-B-3-1-112");
 		this.nameDAO.save(name5);
 
-		final Name name6 = this.nameTestDataInitializaer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "(CML454XCML451)-B-3-1-112");
+		final Name name6 = this.nameTestDataInitializer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), gid1, "(CML454XCML451)-B-3-1-112");
 		this.nameDAO.save(name6);
 
 		final List<String> names = new ArrayList<>(Arrays.asList("I-1RT  /  P 001 A-23 / ", "(CML454 X CML451)-B-3-1-112"));
@@ -1065,7 +1069,25 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 		Assert.assertTrue(mapCountByNamePermutations.size() > 0);
 	}
-
+	
+	@Test
+	public void testGetFavoriteMethodsByMethodType() {
+		final Method method = this.germplasmDataManager.getMethodByID(154);
+		
+		final String programUUID = UUID.randomUUID().toString();
+		final ProgramFavorite programFavorite = this.programFavoriteTestDataInitializer.createProgramFavorite(method.getMid(), programUUID);
+		this.germplasmDataManager.saveProgramFavorite(programFavorite);
+		
+		final List<Method> methods = this.germplasmDataManager.getFavoriteMethodsByMethodType(method.getMtype(), programUUID);
+		final Method resultMethod = methods.get(0);
+		Assert.assertEquals("The method code should be " + method.getMcode(), method.getMcode(), resultMethod.getMcode());
+		Assert.assertEquals("The method id should be " + method.getMid(), method.getMid(), resultMethod.getMid());
+		Assert.assertEquals("The method type should be " + method.getMtype(), method.getMtype(), resultMethod.getMtype());
+		Assert.assertEquals("The method group should be " + method.getMgrp(), method.getMgrp(), resultMethod.getMgrp());
+		Assert.assertEquals("The method name should be " + method.getMname(), method.getMname(), resultMethod.getMname());
+		Assert.assertEquals("The method description should be " + method.getMdesc(), method.getMdesc(), resultMethod.getMdesc());
+	}
+	
 	@Test
 	public void testGetNamesByGidsAndNTypeIdsInMap() {
 		final int GID1 = 1;
@@ -1077,13 +1099,13 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 				Arrays.asList(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(), GermplasmNameType.LINE_NAME.getUserDefinedFieldID()));
 		
 		//Add new name for germplasm with gid = GID1
-		Name name = this.nameTestDataInitializaer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), GID1, "LINE NAME 00001");
+		Name name = this.nameTestDataInitializer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), GID1, "LINE NAME 00001");
 		this.nameDAO.save(name);
 		
 		//Add new names for germplasm with gid = GID2
-		name = this.nameTestDataInitializaer.createName(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(), GID2, "DERIVATIVE NAME 00001");
+		name = this.nameTestDataInitializer.createName(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(), GID2, "DERIVATIVE NAME 00001");
 		this.nameDAO.save(name);
-		name = this.nameTestDataInitializaer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), GID2, "LINE NAME 00001");
+		name = this.nameTestDataInitializer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), GID2, "LINE NAME 00001");
 		this.nameDAO.save(name);
 		
 		//Get the names map after adding new names
