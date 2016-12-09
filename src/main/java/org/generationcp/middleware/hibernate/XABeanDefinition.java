@@ -102,7 +102,7 @@ public class XABeanDefinition {
 
 	/**
 	 * Create the data source and session factory beans
-	 * @param registry interface for registeries that hold bean definitions
+	 * @param registry interface for registries that hold bean definitions
 	 * @param cropDatabaseName the name of the database for which we need to create the data source and session factory beans
 	 * @param xaDataSourceProperties properties values to be used when creating these beans
 	 */
@@ -169,29 +169,29 @@ public class XABeanDefinition {
 	Properties getDatabaseConnectionProperties(final String cropDatabaseName, final DataSourceProperties xaDataSourceProperties) {
 		final Properties databaseConnectionProperties = new Properties();
 		databaseConnectionProperties.setProperty(XABeanDefinition.URL, "jdbc:mysql://" + xaDataSourceProperties.getHost() + ":"
-				+ xaDataSourceProperties.getPort() + "/" + cropDatabaseName);
+				+ xaDataSourceProperties.getPort() + "/" + cropDatabaseName + "?pinGlobalTxToPhysicalConnection=true");
 		databaseConnectionProperties.setProperty(XABeanDefinition.USER, xaDataSourceProperties.getUserName());
 		databaseConnectionProperties.setProperty(XABeanDefinition.PASSWORD_PROPERTY, xaDataSourceProperties.getPassword());
-		databaseConnectionProperties.setProperty(XABeanDefinition.PIN_GLOBAL_TX_TO_PHYSICAL_CONNECTION, "true");
-		databaseConnectionProperties.setProperty(USE_SERVER_PREP_STMTS, "true");
-		databaseConnectionProperties.setProperty(CACHE_PREP_STMTS, "true");
-		databaseConnectionProperties.setProperty(USE_UNICODE, "true");
-		databaseConnectionProperties.setProperty(CHARACTER_ENCODING, "UTF-8");
+		//databaseConnectionProperties.setProperty(XABeanDefinition.PIN_GLOBAL_TX_TO_PHYSICAL_CONNECTION, "true");
+		//databaseConnectionProperties.setProperty(USE_SERVER_PREP_STMTS, "true");
+		//databaseConnectionProperties.setProperty(CACHE_PREP_STMTS, "true");
+		//databaseConnectionProperties.setProperty(USE_UNICODE, "true");
+		//databaseConnectionProperties.setProperty(CHARACTER_ENCODING, "UTF-8");
 
 		// useLocalSessionState property form driver doc: Should the driver use the in-transaction state provided by the MySQL protocol to
 		// determine if a commit() or rollback() should actually be sent to the database?
 		// Yes we want to, otherwise very large number of "select @@session.tx_read_only" queries are run by driver before each query which
 		// we consider wasteful.
-		databaseConnectionProperties.setProperty("useLocalSessionState", "true");
+		//databaseConnectionProperties.setProperty("useLocalSessionState", "true");
 
 		// cacheServerConfiguration from driver doc: Should the driver cache the results of 'SHOW VARIABLES' and 'SHOW COLLATION' on a
 		// per-URL basis? Yes we want to.
-		databaseConnectionProperties.setProperty("cacheServerConfiguration", "true");
+		//databaseConnectionProperties.setProperty("cacheServerConfiguration", "true");
 		
 		// Removing this property will result in a huge performance impact on the pedigree generation
 		// The stored procedure getGermplasmWithNamesAndAncestry in crop databases uses group concat and thus this property
 		// This ensures that strings in the stored procedure are not silently truncated.
-		databaseConnectionProperties.setProperty("sessionVariables", "group_concat_max_len=500000");
+		//databaseConnectionProperties.setProperty("sessionVariables", "group_concat_max_len=500000");
 
 		return databaseConnectionProperties;
 	}
