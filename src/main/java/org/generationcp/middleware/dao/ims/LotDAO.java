@@ -55,7 +55,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	 * NOTE setting the trnstat=0 for actual_balance to include anticipated transaction to the total_amount. This is only temporary change
 	 * as required by BMS-1052
 	 */
-	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS = "SELECT i.lotid, i.eid, " + "  locid, scaleid, i.comments, "
+	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS = "SELECT i.lotid, i.eid, " + "  locid, scaleid, i.comments, i.status,"
 			+ "  SUM(CASE WHEN trnstat = 0 AND trnqty > 0 THEN trnqty ELSE 0 END) AS actual_balance, "
 			+ "  CASE WHEN SUM(trnqty) is null THEN 0 ELSE SUM(trnqty) END AS available_balance, "
 			+ "  SUM(CASE WHEN trnstat = 0 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS reserved_amt, "
@@ -496,17 +496,19 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				Integer locationId = (Integer) row[2];
 				Integer scaleId = (Integer) row[3];
 				String comments = (String) row[4];
-				Double actualBalance = (Double) row[5];
-				Double availableBalance = (Double) row[6];
-				Double reservedTotal = (Double) row[7];
-				Double committedTotal = (Double) row[8];
-				String stockIds = (String) row[9];
+				Integer lotStatus = (Integer) row[5];
+				Double actualBalance = (Double) row[6];
+				Double availableBalance = (Double) row[7];
+				Double reservedTotal = (Double) row[8];
+				Double committedTotal = (Double) row[9];
+				String stockIds = (String) row[10];
 
 				lot = new Lot(lotId);
 				lot.setEntityId(entityId);
 				lot.setLocationId(locationId);
 				lot.setScaleId(scaleId);
 				lot.setComments(comments);
+				lot.setStatus(lotStatus);
 
 				LotAggregateData aggregateData = new LotAggregateData(lotId);
 				aggregateData.setActualBalance(actualBalance);
@@ -527,9 +529,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			}
 
 			if (withReservationMap) {
-				Integer recordId = (Integer) row[10];
-				Double qty = (Double) row[11];
-				Integer transactionState = (Integer) row[12];
+				Integer recordId = (Integer) row[11];
+				Double qty = (Double) row[12];
+				Integer transactionState = (Integer) row[13];
 
 				// compute total reserved for entry
 				if (recordId != null && qty != null) {
@@ -545,8 +547,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 					reservationStatusMap.get(recordId).add(String.valueOf(transactionState));
 				}
 
-				if (row[13] != null) {
-					Integer transactionId = (Integer) row[13];
+				if (row[14] != null) {
+					Integer transactionId = (Integer) row[14];
 					lot.getAggregateData().setTransactionId(transactionId);
 				}
 
