@@ -811,5 +811,5 @@ public interface FieldbookService {
 
 	public List<Method> getFavoriteMethods(List<Integer> methodIds, Boolean filterOutGenerative);
 
-	public String getCropId (final String cropName);
+	public String getPlotCodePrefix(final String cropName);
 }
