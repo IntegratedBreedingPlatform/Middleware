@@ -36,6 +36,7 @@ public class LotTransformer {
 				lotDetails.setScaleId(lot.getScaleId());
 				lotDetails.setEntityIdOfLot(lot.getEntityId());
 				lotDetails.setCommentOfLot(lot.getComments());
+				lotDetails.setLotStatus(lot.getStatus());
 
 				LotAggregateData aggregateData = lot.getAggregateData();
 				if (aggregateData != null) {
@@ -145,6 +146,7 @@ public class LotTransformer {
 				lotDetails.setScaleId(lot.getScaleId());
 				lotDetails.setEntityIdOfLot(lot.getEntityId());
 				lotDetails.setCommentOfLot(lot.getComments());
+				lotDetails.setLotStatus(lot.getStatus());
 
 				LotAggregateData aggregateData = lot.getAggregateData();
 				if (aggregateData != null) {
