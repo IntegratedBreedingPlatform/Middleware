@@ -66,7 +66,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	private static final String GET_LOTS_FOR_GERMPLASM_CONDITION =
 			"FROM ims_lot i " + "LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
-					+ "WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) " + "GROUP BY i.lotid ";
+					+ "WHERE (i.status = 0 OR :includeCloseLots) AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) " + "GROUP BY i.lotid ";
 
 	private static final String GET_LOTS_FOR_GERMPLASM =
 			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS + LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
@@ -368,6 +368,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			Query query = this.getSession().createSQLQuery(sql);
 			query.setParameterList("gids", Collections.singletonList(gid));
 			query.setParameter("listId", listId);
+			query.setParameter("includeCloseLots", 1);
 
 			List<Integer> statusList = Lists.newArrayList();
 			statusList.add(0);
@@ -394,6 +395,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			Query query = this.getSession().createSQLQuery(sql);
 			query.setParameterList("gids", gids);
 			query.setParameter("listId", listId);
+			query.setParameter("includeCloseLots", 0);
 			List<Integer> statusList = Lists.newArrayList();
 			statusList.add(0);
 			statusList.add(1);
@@ -421,6 +423,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			List<Integer> statusList = Lists.newArrayList();
 			statusList.add(0);
 			query.setParameterList("statusList", statusList);
+			query.setParameter("includeCloseLots", 0);
 
 			this.createLotRows(lots, query, true);
 
@@ -440,6 +443,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 			Query query = this.getSession().createSQLQuery(sql);
 			query.setParameterList("gids", Collections.singleton(gid));
+			query.setParameter("includeCloseLots", 1);
 
 			this.createLotRows(lots, query, false);
 
