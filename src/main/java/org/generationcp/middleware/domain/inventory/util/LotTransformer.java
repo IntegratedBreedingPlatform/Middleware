@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.inventory.LotAggregateData;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.LotStatus;
 
 public class LotTransformer {
 
@@ -36,7 +37,8 @@ public class LotTransformer {
 				lotDetails.setScaleId(lot.getScaleId());
 				lotDetails.setEntityIdOfLot(lot.getEntityId());
 				lotDetails.setCommentOfLot(lot.getComments());
-				lotDetails.setLotStatus(lot.getStatus());
+				lotDetails.setLotStatus(lot.getStatus() == LotStatus.ACTIVE.getIntValue() ? LotStatus.ACTIVE.name() : LotStatus.CLOSED.name());
+
 
 				LotAggregateData aggregateData = lot.getAggregateData();
 				if (aggregateData != null) {
@@ -141,7 +143,8 @@ public class LotTransformer {
 				lotDetails.setScaleId(lot.getScaleId());
 				lotDetails.setEntityIdOfLot(lot.getEntityId());
 				lotDetails.setCommentOfLot(lot.getComments());
-				lotDetails.setLotStatus(lot.getStatus());
+				lotDetails.setLotStatus(lot.getStatus() == LotStatus.ACTIVE.getIntValue() ? LotStatus.ACTIVE.name() : LotStatus.CLOSED.name());
+
 
 				LotAggregateData aggregateData = lot.getAggregateData();
 				if (aggregateData != null) {

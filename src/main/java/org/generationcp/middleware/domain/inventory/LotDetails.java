@@ -17,7 +17,7 @@ public class LotDetails implements Serializable {
 	private String lotScaleNameAbbr;
 	private String lotScaleMethodName;
 	private String commentOfLot;
-	private Integer lotStatus;
+	private String lotStatus;
 
 	// computed or looked up values
 	private Double actualLotBalance;
@@ -168,11 +168,11 @@ public class LotDetails implements Serializable {
 		this.transactionStatus = transactionStatus;
 	}
 
-	public Integer getLotStatus() {
+	public String getLotStatus() {
 		return lotStatus;
 	}
 
-	public void setLotStatus(Integer lotStatus) {
+	public void setLotStatus(String lotStatus) {
 		this.lotStatus = lotStatus;
 	}
 
