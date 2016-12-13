@@ -42,25 +42,20 @@ public class LotTransformer {
 				if (aggregateData != null) {
 					lotDetails.setAvailableLotBalance(aggregateData.getAvailableBalance());
 					lotDetails.setReservedTotal(aggregateData.getReservedTotal());
+					lotDetails.setCommittedTotal(aggregateData.getCommittedTotal());
 					lotDetails.setActualLotBalance(aggregateData.getAvailableBalance() + aggregateData.getReservedTotal());
 					lotDetails.setStockIds(aggregateData.getStockIds());
 					lotDetails.setTransactionId(aggregateData.getTransactionId());
-					// get reserved amount for list entry and # reserved for other entries in list for specific lot
+					// get reserved and committed amount for list entry and # reserved for other entries in list for specific lot
 					Map<Integer, Double> reservationMap = aggregateData.getReservationMap();
-					Double sumEntry = 0d;
-					Double sumOthers = 0d;
+					Map<Integer, Double> committedMap = aggregateData.getCommittedMap();
+
 					if (reservationMap != null) {
-						for (Integer recordId : reservationMap.keySet()) {
-							Double reservedAmount = reservationMap.get(recordId);
-							if (id.equals(recordId)) {
-								sumEntry = reservedAmount.doubleValue();
-							} else {
-								sumOthers += reservedAmount.doubleValue();
-							}
-						}
-						lotDetails.setReservedTotalForEntry(sumEntry);
-						lotDetails.setReservedTotalForOtherEntries(sumOthers);
-						lotDetails.setWithdrawalBalance(sumEntry);
+						setAggregateTransactionBalance(reservationMap, lotDetails, id, ListDataInventory.RESERVED);
+					}
+
+					if(committedMap != null) {
+						setAggregateTransactionBalance(committedMap, lotDetails, id, ListDataInventory.COMMITTED);
 					}
 
 					Map<Integer, Set<String>> statusMap = aggregateData.getReservationStatusMap();
@@ -187,4 +182,31 @@ public class LotTransformer {
 		}
 	}
 
+	private static void setAggregateTransactionBalance(Map<Integer, Double> transactionMap, ListEntryLotDetails lotDetails, Integer entryId,
+			String
+			transactionType) {
+		Double sumForEntry = 0d;
+		Double sumForOtherEntries = 0d;
+
+		for (Integer recordId : transactionMap.keySet()) {
+			Double transactionAmount = transactionMap.get(recordId);
+			if (entryId.equals(recordId)) {
+				sumForEntry = transactionAmount.doubleValue();
+			} else {
+				sumForOtherEntries += transactionAmount.doubleValue();
+			}
+		}
+
+		if(ListDataInventory.RESERVED.equals(transactionType)) {
+			lotDetails.setReservedTotalForEntry(sumForEntry);
+			lotDetails.setReservedTotalForOtherEntries(sumForOtherEntries);
+			lotDetails.setWithdrawalBalance(sumForEntry);
+		}
+
+		if(ListDataInventory.COMMITTED.equals(transactionType)) {
+			lotDetails.setCommittedTotalForEntry(sumForEntry);
+			lotDetails.setCommittedTotalForOtherEntries(sumForOtherEntries);
+		}
+
+	}
 }

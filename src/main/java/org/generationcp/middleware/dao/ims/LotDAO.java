@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.inventory.LotAggregateData;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -482,15 +483,17 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		List<Object[]> result = query.list();
 
 		Map<Integer, Double> reservationMap = null;
+		Map<Integer, Double> committedMap = null;
 		Map<Integer, Set<String>> reservationStatusMap = null;
 		Lot lot = null;
 
 		for (Object[] row : result) {
 			Integer lotId = (Integer) row[0];
 			if (lot == null || !lot.getId().equals(lotId)) {
-				if (lot != null && reservationMap != null) {
+				if (lot != null && reservationMap != null && committedMap != null) {
 					lot.getAggregateData().setReservationMap(reservationMap);
 					lot.getAggregateData().setReservationStatusMap(reservationStatusMap);
+					lot.getAggregateData().setCommittedMap(committedMap);
 				}
 				Integer entityId = (Integer) row[1];
 				Integer locationId = (Integer) row[2];
@@ -520,6 +523,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				reservationMap = new HashMap<Integer, Double>();
 				aggregateData.setReservationMap(reservationMap);
 
+				committedMap = new HashMap<>();
+				aggregateData.setCommittedMap(committedMap);
+
 				reservationStatusMap = new HashMap<>();
 				aggregateData.setReservationStatusMap(reservationStatusMap);
 
@@ -533,11 +539,24 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				Double qty = (Double) row[12];
 				Integer transactionState = (Integer) row[13];
 
-				// compute total reserved for entry
-				if (recordId != null && qty != null) {
-					Double prevValue = reservationMap.get(recordId);
-					Double prevTotal = prevValue == null ? 0d : prevValue;
-					reservationMap.put(recordId, prevTotal + qty);
+				// compute total reserved and committed for entry
+				if (recordId != null && qty != null && transactionState != null) {
+					Double prevValue = null;
+					Double prevTotal = null;
+					if(TransactionStatus.RESERVED.getIntValue() == transactionState) {
+						prevValue = reservationMap.get(recordId);
+						prevTotal = prevValue == null ? 0d : prevValue;
+
+						reservationMap.put(recordId, prevTotal + qty);
+					}
+
+					if(TransactionStatus.COMMITTED.getIntValue() == transactionState) {
+						prevValue = committedMap.get(recordId);
+						prevTotal = prevValue == null ? 0d : prevValue;
+
+						committedMap.put(recordId, prevTotal + qty);
+					}
+
 				}
 
 				if (transactionState != null) {
@@ -559,6 +578,11 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		// set last lot's reservation map
 		if (lot != null && reservationMap != null) {
 			lot.getAggregateData().setReservationMap(reservationMap);
+		}
+
+		// set last lot's comiitted map
+		if (lot != null && committedMap != null) {
+			lot.getAggregateData().setCommittedMap(committedMap);
 		}
 	}
 

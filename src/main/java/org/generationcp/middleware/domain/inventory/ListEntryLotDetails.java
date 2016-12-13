@@ -10,6 +10,10 @@ public class ListEntryLotDetails extends LotDetails implements Cloneable {
 
 	private Double reservedTotalForOtherEntries;
 
+	private Double committedTotalForEntry;
+
+	private Double committedTotalForOtherEntries;
+
 	public ListEntryLotDetails() {
 	}
 
@@ -40,6 +44,22 @@ public class ListEntryLotDetails extends LotDetails implements Cloneable {
 
 	public void setReservedTotalForOtherEntries(Double reservedTotalForOtherEntries) {
 		this.reservedTotalForOtherEntries = reservedTotalForOtherEntries;
+	}
+
+	public Double getCommittedTotalForEntry() {
+		return committedTotalForEntry;
+	}
+
+	public void setCommittedTotalForEntry(Double committedTotalForEntry) {
+		this.committedTotalForEntry = committedTotalForEntry;
+	}
+
+	public Double getCommittedTotalForOtherEntries() {
+		return committedTotalForOtherEntries;
+	}
+
+	public void setCommittedTotalForOtherEntries(Double committedTotalForOtherEntries) {
+		this.committedTotalForOtherEntries = committedTotalForOtherEntries;
 	}
 
 	@Override
