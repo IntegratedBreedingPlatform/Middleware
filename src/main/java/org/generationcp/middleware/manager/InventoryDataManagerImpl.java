@@ -650,4 +650,10 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	public Lot getLotById(Integer id) throws MiddlewareQueryException {
 		return this.getLotDao().getById(id, false);
 	}
+
+	@Override
+	public List<TransactionReportRow> getTransactionDetailsForLot(Integer lotId) throws MiddlewareQueryException {
+		return this.getTransactionDao().getTransactionDetailsForLot(lotId);
+	}
+
 }

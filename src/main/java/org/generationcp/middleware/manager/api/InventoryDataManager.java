@@ -611,5 +611,13 @@ public interface InventoryDataManager {
 
 	Lot getLotById(Integer id) throws MiddlewareQueryException;
 
-
+	/**
+	 * Returns a report on all Transaction records with lot status(Active or closed). Included information are:
+	 * userid, lotid, date of the transaction, transaction quantity,list name,person responsible for the transaction,
+	 * status of lot.
+	 * @param lotId - lotid
+	 * @return List of TransactionReportRow objects
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+    List<TransactionReportRow> getTransactionDetailsForLot(Integer lotId) throws MiddlewareQueryException;
 }

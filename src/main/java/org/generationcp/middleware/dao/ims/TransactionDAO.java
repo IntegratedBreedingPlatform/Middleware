@@ -23,6 +23,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -635,5 +636,62 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			this.logAndThrowException("Error at getStockIdsByListId(" + listId + ") at TransactionDAO: " + e.getMessage(), e);
 		}
 		return new ArrayList<String>();
+	}
+
+	public List<TransactionReportRow> getTransactionDetailsForLot(Integer lotId) throws MiddlewareQueryException {
+
+		List<TransactionReportRow> transactions = new ArrayList<>();
+		try {
+			String sql = "SELECT i.userid,i.lotid,i.trndate,i.trnstat,i.trnqty,i.sourceid,l.listname,u.uname,i.comments,"
+					+ "(CASE WHEN i.comments in ('Lot closed', 'Discard') THEN i.comments WHEN trnstat = 0 AND trnqty > 0 THEN 'Deposit' "
+					+ "WHEN trnstat = 0 AND trnqty < 0 THEN 'Reservation' WHEN trnstat = 1 AND trnqty < 0 THEN 'Withdrawal' END) as trntype "
+					+ "FROM ims_transaction i LEFT JOIN listnms l ON l.listid = i.sourceid "
+					+ "LEFT JOIN users u ON u.userid = i.userid WHERE i.lotid = :lotId AND i.trnstat <> 9 ORDER BY i.lotid";
+
+			Query query = this.getSession().createSQLQuery(sql);
+
+			query.setParameter("lotId", lotId);
+
+			this.createTransactionRow(transactions, query);
+
+		} catch (Exception e) {
+			this.logAndThrowException("Error at getTransactionDetailsForLot(" + lotId + ") at TransactionDAO: " + e.getMessage(), e);
+		}
+
+		return transactions;
+	}
+
+	private void createTransactionRow(List<TransactionReportRow> transactionReportRows, Query query) {
+
+		List<Object[]> result = query.list();
+		TransactionReportRow transaction = null;
+		for (Object[] row : result) {
+
+			Integer userId = (Integer) row[0];
+			Integer lotId = (Integer) row[1];
+			Integer trnDate = (Integer) row[2];
+			Integer trnState = (Integer) row[3];
+			Double trnQty = (Double) row[4];
+			Integer listId = (Integer) row[5];
+			String listName = (String) row[6];
+			String userName = (String) row[7];
+			String comments = (String) row[8];
+			String lotStatus = (String) row[9];
+
+			transaction = new TransactionReportRow();
+			transaction.setUserId(userId);
+			transaction.setLotId(lotId);
+			transaction.setDate(trnDate);
+			transaction.setTrnStatus(trnState);
+			transaction.setQuantity(trnQty);
+			transaction.setListId(listId);
+			transaction.setListName(listName);
+			transaction.setUser(userName);
+			transaction.setCommentOfLot(comments);
+			transaction.setLotStatus(lotStatus);
+
+			transactionReportRows.add(transaction);
+		}
+
 	}
 }
