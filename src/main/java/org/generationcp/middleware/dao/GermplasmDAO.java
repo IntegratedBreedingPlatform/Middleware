@@ -55,8 +55,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String GERMPLSM = "germplsm";
 	private static final String Q_NO_SPACES = "qNoSpaces";
 	private static final String Q_STANDARDIZED = "qStandardized";
-	private static final String AVAIL_INV = "availInv";
-	private static final String SEED_RES = "seedRes";
+	private static final String AVAIL_LOTS = "availableLots";
+	private static final String AVAIL_BALANCE = "availableBalance";
 	private static final String METHOD_NAME = "methodName";
 	private static final String LOCATION_NAME = "locationName";
 	// Prevent silly searches from resulting in GIANT IN clauses in search query (which reuses this function).
@@ -850,7 +850,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final StringBuilder queryString = new StringBuilder();
 			queryString
 					.append("SELECT g.*, " + "GROUP_CONCAT(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') AS stockIDs, "
-							+ "COUNT(DISTINCT gt.lotid) AS availInv, " + "m.mname AS methodName, l.lname AS locationName FROM germplsm g "
+							+ "COUNT(DISTINCT gt.lotid) AS availableLots, SUM(gt.trnqty) AS availableBalance," + "m.mname AS methodName, l.lname AS locationName FROM germplsm g "
 							+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 "
 							+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid AND gt.trnstat <> 9  "
 							+ "LEFT JOIN methods m ON m.mid = g.methn " + "LEFT JOIN location l ON l.locid = g.glocn "
@@ -862,7 +862,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.setParameterList("gids", gidSearchResult);
 			query.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
 			query.addScalar(GermplasmDAO.STOCK_IDS);
-			query.addScalar(GermplasmDAO.AVAIL_INV);
+			query.addScalar(GermplasmDAO.AVAIL_LOTS);
+			query.addScalar(GermplasmDAO.AVAIL_BALANCE);
 			query.addScalar(GermplasmDAO.METHOD_NAME);
 			query.addScalar(GermplasmDAO.LOCATION_NAME);
 			query.setFirstResult(startingRow);
@@ -913,9 +914,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final GermplasmInventory inventoryInfo = new GermplasmInventory(germplasm.getGid());
 		inventoryInfo.setStockIDs((String) row[1]);
 		inventoryInfo.setActualInventoryLotCount(row[2] != null ? ((BigInteger) row[2]).intValue() : 0);
+		inventoryInfo.setTotalAvailableBalance(row[3] != null ? (Double) row[3] : 0d);
 		germplasm.setInventoryInfo(inventoryInfo);
-		germplasm.setMethodName(row[3] != null ? (String) row[3] : "");
-		germplasm.setLocationName(row[4] != null ? (String) row[4] : "");
+		germplasm.setMethodName(row[4] != null ? (String) row[4] : "");
+		germplasm.setLocationName(row[5] != null ? (String) row[5] : "");
 		return germplasm;
 	}
 
