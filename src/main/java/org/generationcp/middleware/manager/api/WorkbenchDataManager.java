@@ -805,6 +805,14 @@ public interface WorkbenchDataManager {
 	ProjectUserInfo saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo);
 
 	/**
+	 * Saves a ProjectUserInfo.
+	 * 
+	 * @param projectUserInfo the project user info
+	 * @return ProjectUserInfo
+	 */
+	ProjectUserInfo addProjectUserInfo(ProjectUserInfo projectUserInfo);
+
+	/**
 	 * Gets the all workbench sidebar category.
 	 *
 	 * @return the all workbench sidebar category
