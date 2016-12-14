@@ -83,7 +83,7 @@ class ObservationQuery {
 	}
 
 	private String getFromExpression(final List<TraitDto> traits) {
-		final String fromText = "FROM\n" + "    Project p\n" + "        INNER JOIN\n"
+		final String fromText = " FROM\n" + "    Project p\n" + "        INNER JOIN\n"
 				+ "    project_relationship pr ON p.project_id = pr.subject_project_id\n" + "        INNER JOIN\n"
 				+ "    nd_experiment_project ep ON pr.subject_project_id = ep.project_id\n" + "        INNER JOIN\n"
 				+ "    nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id\n" + "        INNER JOIN\n"
