@@ -13,4 +13,6 @@
 	<include file="workbench_changelog/4_0_0_BETA_15.xml" relativeToChangelogFile="true"/>
 	<include file="workbench_changelog/4_0_0_BETA_16.xml" relativeToChangelogFile="true"/>
 	<include file="workbench_changelog/4_0_0_BETA_17.xml" relativeToChangelogFile="true"/>
+	<include file="workbench_changelog/4_0_0.xml" relativeToChangelogFile="true"/>
+
 </databaseChangeLog>
