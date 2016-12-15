@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.ims.LotStatus;
 
 public class ListInventoryDataInitializer {
 
@@ -97,6 +98,7 @@ public class ListInventoryDataInitializer {
 		lotDetail.setWithdrawalBalance(12.0);
 		lotDetail.setWithdrawalStatus("1");
 		lotDetail.setTransactionStatus(false);
+		lotDetail.setLotStatus(LotStatus.ACTIVE.name());
 		return lotDetail;
 	}
 
