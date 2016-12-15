@@ -99,6 +99,8 @@ public class ListInventoryDataInitializer {
 		lotDetail.setWithdrawalStatus("1");
 		lotDetail.setTransactionStatus(false);
 		lotDetail.setLotStatus(LotStatus.ACTIVE.name());
+		lotDetail.setReservedTotal(200D);
+		lotDetail.setCommittedTotalForEntry(50D);
 		return lotDetail;
 	}
 
