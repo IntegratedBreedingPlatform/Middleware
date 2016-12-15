@@ -30,6 +30,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
+import org.springframework.util.CollectionUtils;
 
 public class ListInventoryBuilder extends Builder {
 
@@ -179,6 +180,47 @@ public class ListInventoryBuilder extends Builder {
 
 				}
 			}
+		}
+
+	}
+
+	public void setAvailableBalanceScaleForGermplasm(final List<Germplasm> germplasmList) {
+		if(!CollectionUtils.isEmpty(germplasmList)) {
+			List<Integer> gids = Lists.newArrayList();
+
+			for(Germplasm germplasm : germplasmList) {
+				gids.add(germplasm.getGid());
+			}
+
+			List<Object[]> lotScalesForGermplsms = this.getLotDao().retrieveLotScalesForGermplasms(gids);
+
+			if(!CollectionUtils.isEmpty(lotScalesForGermplsms)) {
+				Map<Integer, Set<String>> germplsmWiseScales = new HashMap<>();
+
+				for(Object[] entry : lotScalesForGermplsms) {
+					Integer germplasmId = (Integer) entry[0];
+					String scaleName = (String)entry[2];
+
+					if(germplsmWiseScales.containsKey(germplasmId)) {
+						germplsmWiseScales.get(germplasmId).add(scaleName);
+					} else {
+						germplsmWiseScales.put(germplasmId, Sets.newHashSet(scaleName));
+					}
+
+				}
+
+				for(Germplasm germplasm : germplasmList) {
+					if(germplsmWiseScales.containsKey(germplasm.getGid())) {
+						Set<String> scales = germplsmWiseScales.get(germplasm.getGid());
+						if(scales.size() > 1) {
+							germplasm.getInventoryInfo().setScaleForGermplsm(ListDataInventory.MIXED);
+						} else if(scales.size() == 1) {
+							germplasm.getInventoryInfo().setScaleForGermplsm(scales.iterator().next());
+						}
+					}
+				}
+			}
+
 		}
 
 	}

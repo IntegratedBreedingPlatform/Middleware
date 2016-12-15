@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.LotAggregateData;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
@@ -88,6 +89,11 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	private static final String GET_LOTS_STATUS_FOR_GERMPLASM = "SELECT i.lotid, COUNT(DISTINCT (act.trnstat)), act.trnstat"
 			+ " FROM ims_lot i LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9"
 			+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND act.trnqty < 0 AND i.eid IN (:gids)" + "GROUP BY i.lotid ORDER BY lotid";
+
+	private static final String GET_LOT_SCALE_FOR_GERMPLSMS = "select  lot.eid, lot.scaleid, cv.name from ims_lot lot "
+			+ " LEFT JOIN cvterm_relationship cvr ON cvr.subject_id = lot.scaleid AND cvr.type_id ="+ TermId.HAS_SCALE.getId()
+			+ " LEFT JOIN cvterm cv ON cv.cvterm_id = cvr.object_id "
+			+ " where lot.eid in (:gids) AND lot.etype = 'GERMPLSM' AND lot.status <> 9 ORDER BY lot.eid";
 
 	@SuppressWarnings("unchecked")
 	public List<Lot> getByEntityType(String type, int start, int numOfRows) throws MiddlewareQueryException {
@@ -476,6 +482,28 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		}
 
 		return lotStatusCounts;
+	}
+
+	public List<Object[]> retrieveLotScalesForGermplasms(final List<Integer> gids) throws MiddlewareQueryException {
+		List<Object[]> lotScalesForGermplasm = new ArrayList<>();
+
+		try {
+			String sql = LotDAO.GET_LOT_SCALE_FOR_GERMPLSMS;
+
+			Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", gids);
+			List<Object[]> result = query.list();
+			for (Object[] row : result) {
+				Integer gid = (Integer) row[0];
+				Integer scaleId = (Integer) row[1];
+				String scaleName = (String) row[2];
+				lotScalesForGermplasm.add(new Object[] {gid, scaleId, scaleName});
+			}
+
+		} catch (Exception e) {
+			this.logAndThrowException("Error at retrieveLotScalesForGermplasms for GIDss = " + gids+ AT_LOT_DAO + e.getMessage(), e);
+		}
+
+		return lotScalesForGermplasm;
 	}
 
 	@SuppressWarnings("unchecked")
