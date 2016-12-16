@@ -314,7 +314,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, Object[]> getLotsWithAvailableBalanceCountAndTotalLotsCount(List<Integer> gids) throws MiddlewareQueryException {
+	public Map<Integer, Object[]> getAvailableBalanceCountAndTotalLotsCount(List<Integer> gids) throws MiddlewareQueryException {
 		Map<Integer, Object[]> lotCounts = new HashMap<Integer, Object[]>();
 
 		try {

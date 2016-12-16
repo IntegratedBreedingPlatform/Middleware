@@ -390,7 +390,7 @@ public class ListInventoryBuilder extends Builder {
 	 */
 	private void retrieveAvailableBalLotCounts(final List<GermplasmListData> listEntries, final List<Integer> gids)
 			throws MiddlewareQueryException {
-		final Map<Integer, Object[]> lotCounts = this.getLotDao().getLotsWithAvailableBalanceCountAndTotalLotsCount(gids);
+		final Map<Integer, Object[]> lotCounts = this.getLotDao().getAvailableBalanceCountAndTotalLotsCount(gids);
 		for (final GermplasmListData entry : listEntries) {
 			final ListDataInventory inventory = entry.getInventoryInfo();
 			if (inventory != null) {
