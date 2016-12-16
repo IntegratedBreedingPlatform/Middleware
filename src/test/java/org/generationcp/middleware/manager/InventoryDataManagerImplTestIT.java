@@ -20,12 +20,16 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -62,6 +66,9 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 
 	@Autowired
 	private InventoryDataManager manager;
+
+	@Autowired
+	private GermplasmDataManager germplasmDataManager;
 
 	@Autowired
 	private InventoryService inventoryService;
@@ -713,5 +720,27 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		List<Transaction> transactionList = this.manager.getTransactionsByIdList(transactionIdList);
 
 		Assert.assertEquals(2, transactionList.size());
+	}
+
+	@Test
+	public void testGetAvailableBalanceForGermplasms() throws Exception {
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0 , 1 ,1 ,0, 1 ,1 , "MethodName",
+				"LocationName");
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+
+		Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments");
+		this.manager.addLots(Lists.<Lot>newArrayList(lot));
+
+		Transaction transaction = InventoryDetailsTestDataInitializer
+				.createReservationTransaction(2.0, 0, "Deposit", lot, 1, 1, 1, "LIST");
+		this.manager.addTransactions(Lists.<Transaction>newArrayList(transaction));
+
+		List<Germplasm> availableBalanceForGermplasms =
+				this.manager.getAvailableBalanceForGermplasms(Lists.<Germplasm>newArrayList(germplasm));
+
+		Assert.assertEquals(1, availableBalanceForGermplasms.size());
+		Assert.assertEquals(1, availableBalanceForGermplasms.get(0).getInventoryInfo().getActualInventoryLotCount().intValue());
+		Assert.assertEquals("2.0", availableBalanceForGermplasms.get(0).getInventoryInfo().getTotalAvailableBalance().toString());
+		Assert.assertEquals("g", availableBalanceForGermplasms.get(0).getInventoryInfo().getScaleForGermplsm());
 	}
 }

@@ -9,6 +9,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
+import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -193,6 +194,28 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		Assert.assertEquals(ListDataInventory.RESERVED, lotDetails.get(0).getWithdrawalStatus());
 		Assert.assertEquals(8234, lotDetails.get(0).getScaleId().intValue());
 		Assert.assertEquals(9007, lotDetails.get(0).getLocId().intValue());
+	}
+
+	@Test
+	public void testSetAvailableBalanceScaleForGermplasm() throws Exception {
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0 , 1 ,1 ,0, 1 ,1 , "MethodName",
+				"LocationName");
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+		germplasm.setInventoryInfo(new GermplasmInventory(germplasmId));
+
+		Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments");
+		this.inventoryDataManager.addLots(com.google.common.collect.Lists.<Lot>newArrayList(lot));
+
+		Transaction transaction = InventoryDetailsTestDataInitializer
+				.createReservationTransaction(2.0, 0, "Deposit", lot, 1, 1, 1, "LIST");
+		this.inventoryDataManager.addTransactions(com.google.common.collect.Lists.<Transaction>newArrayList(transaction));
+
+		List<Germplasm> germplasmList = Lists.newArrayList(germplasm);
+		listInventoryBuilder.setAvailableBalanceScaleForGermplasm(germplasmList);
+
+		Assert.assertEquals(1, germplasmList.size());
+
+		Assert.assertEquals("g", germplasmList.get(0).getInventoryInfo().getScaleForGermplsm());
 	}
 
 	private void initializeGermplasms(final List<Integer> gids) {
