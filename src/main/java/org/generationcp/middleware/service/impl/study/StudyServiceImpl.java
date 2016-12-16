@@ -249,9 +249,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// TODO Update query and use nd_geolocation_id instead. For now instance number will be ok.
 				entry.add((String) row[1]);
 
-				// locationName = For now just concat instance number with some prefix
-				// TODO Could also use LOCATION_ABBR or LOCATION_NAME from nd_geolocationprops if present.
-				entry.add("Study-" + (String) row[1]);
+				String locationName = (String) row[12];
+				String locationAbbreviation = (String) row[13];
+
+				if (StringUtils.isNotBlank(locationAbbreviation)) {
+					entry.add(locationAbbreviation);
+				} else  if (StringUtils.isNotBlank(locationName)) {
+					entry.add(locationName);
+				} else {
+					entry.add("Study-" + (String) row[1]);
+				}
 
 				// gid
 				entry.add(String.valueOf(row[3]));
@@ -284,9 +291,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 				entry.add(String.valueOf(row[11]));
 
 				// phenotypic values
-				int counterTwo = 1;
+				int columnOffset = 1;
 				for (int i = 0; i < traits.size(); i++) {
-					final Object rowValue = row[11 + counterTwo];
+					final Object rowValue = row[13 + columnOffset];
 
 					if (rowValue != null) {
 						entry.add(String.valueOf(rowValue));
@@ -294,7 +301,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 						entry.add((String) rowValue);
 					}
 
-					counterTwo += 2;
+					// get every other column skipping over PhenotypeId column
+					columnOffset += 2;
 				}
 				data.add(entry);
 			}

@@ -151,6 +151,8 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar("BLOCK_NO");
 		createSQLQuery.addScalar("ROW_NO");
 		createSQLQuery.addScalar("COL_NO");
+		createSQLQuery.addScalar("LocationName");
+		createSQLQuery.addScalar("LocationAbbreviation");
 		this.addScalarForTraits(traits, createSQLQuery);
 		return createSQLQuery;
 	}
