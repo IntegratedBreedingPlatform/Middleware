@@ -12,6 +12,7 @@ import java.util.Set;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
+import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
@@ -395,34 +396,37 @@ public class ListInventoryBuilder extends Builder {
 			final ListDataInventory inventory = entry.getInventoryInfo();
 			if (inventory != null) {
 				final Object[] count = lotCounts.get(entry.getGid());
-				if (count != null) {
-					BigInteger actualInventoryLotCount = (BigInteger) count[0];
-					inventory.setActualInventoryLotCount(actualInventoryLotCount.intValue());
-
-					BigInteger lotCount = (BigInteger) count[1];
-					inventory.setLotCount(lotCount.intValue());
-
-					Double totalAvailableBalance = (Double) count[2];
-					inventory.setTotalAvailableBalance(totalAvailableBalance.doubleValue());
-
-					BigInteger distinctScaleCount = (BigInteger) count[3];
-					inventory.setDistinctScaleCountForGermplsm(distinctScaleCount.intValue());
-
-					if (count[4] != null) {
-						Integer scaleId = (Integer) count[4];
-						inventory.setScaleIdForGermplsm(scaleId.intValue());
-					}
-				} else {
-					inventory.setActualInventoryLotCount(0);
-					inventory.setLotCount(0);
-					inventory.setTotalAvailableBalance(0.0);
-					inventory.setDistinctScaleCountForGermplsm(0);
-					inventory.setScaleIdForGermplsm(null);
-				}
+				this.setAvailableBalanceAndScale(inventory, count);
 			}
 		}
 	}
 
+	public void setAvailableBalanceAndScale(GermplasmInventory listDataInventory, Object[] balanceValues) {
+		if (balanceValues != null) {
+			BigInteger actualInventoryLotCount = (BigInteger) balanceValues[0];
+			listDataInventory.setActualInventoryLotCount(actualInventoryLotCount.intValue());
+
+			BigInteger lotCount = (BigInteger) balanceValues[1];
+			listDataInventory.setLotCount(lotCount.intValue());
+
+			Double totalAvailableBalance = (Double) balanceValues[2];
+			listDataInventory.setTotalAvailableBalance(totalAvailableBalance.doubleValue());
+
+			BigInteger distinctScaleCount = (BigInteger) balanceValues[3];
+			listDataInventory.setDistinctScaleCountForGermplsm(distinctScaleCount.intValue());
+
+			if (balanceValues[4] != null) {
+				Integer scaleId = (Integer) balanceValues[4];
+				listDataInventory.setScaleIdForGermplsm(scaleId.intValue());
+			}
+		} else {
+			listDataInventory.setActualInventoryLotCount(0);
+			listDataInventory.setLotCount(0);
+			listDataInventory.setTotalAvailableBalance(0.0);
+			listDataInventory.setDistinctScaleCountForGermplsm(0);
+			listDataInventory.setScaleIdForGermplsm(null);
+		}
+	}
 	/*
 	 * Retrieve the number of lots with reserved seeds per list entry
 	 */

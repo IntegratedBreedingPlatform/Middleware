@@ -18,6 +18,7 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -620,4 +621,14 @@ public interface InventoryDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
     List<TransactionReportRow> getTransactionDetailsForLot(Integer lotId) throws MiddlewareQueryException;
+
+	/**
+	 * This method will retrieve available balance for germplasm along with its scale
+	 *
+	 * @param germplasms
+	 * @return List of Germplasm with inventoryInfo
+	 * @throws MiddlewareQueryException
+	 */
+	List<Germplasm> getAvailableBalanceForGermplasms(List<Germplasm> germplasms) throws MiddlewareQueryException;
+
 }
