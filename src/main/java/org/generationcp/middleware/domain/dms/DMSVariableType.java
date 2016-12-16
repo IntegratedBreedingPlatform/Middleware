@@ -49,11 +49,11 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 		this.standardVariable = standardVariable;
 		this.role = standardVariable.getPhenotypicType();
 
-		//Setting first variable type if exist
-		Set<VariableType> variableTypes = standardVariable.getVariableTypes();
-		if(variableTypes != null){
-			Iterator<VariableType> iterator = variableTypes.iterator();
-			this.variableType = iterator.next();;
+		// Setting first variable type if exist
+		final Set<VariableType> variableTypes = standardVariable.getVariableTypes();
+		if (variableTypes != null && !variableTypes.isEmpty()) {
+			final Iterator<VariableType> iterator = variableTypes.iterator();
+			this.variableType = iterator.next();
 		}
 
 		this.rank = rank;
