@@ -19,10 +19,8 @@
 	
 	<changeSet author="vanina" id="beta1-2" runAlways="true">
 		<preConditions onFail="MARK_RAN">
-			<and>
 				<sqlCheck expectedResult="0">select count(*) from information_schema.routines where routine_schema = database()
 												and specific_name = 'alterWorkbenchCropTable';</sqlCheck>
-			</and>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="false" >
 			CREATE PROCEDURE alterWorkbenchCropTable()
@@ -89,10 +87,8 @@
 	<changeSet author="vanina" id="beta1-3" runAlways="true">
 
 		<preConditions onFail="MARK_RAN">
-			<and>
 				<sqlCheck expectedResult="1">select count(*) from information_schema.routines where routine_schema = database()
 												and specific_name = 'alterWorkbenchCropTable';</sqlCheck>
-			</and>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="false">
 			call alterWorkbenchCropTable();
@@ -103,10 +99,8 @@
 	<changeSet author="vanina" id="beta1-4" runAlways="true">
 
 		<preConditions onFail="MARK_RAN">
-			<and>
 				<sqlCheck expectedResult="1">select count(*) from information_schema.routines where routine_schema = database()
 												and specific_name = 'alterWorkbenchCropTable';</sqlCheck>
-			</and>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="false">
 			DROP PROCEDURE IF EXISTS alterWorkbenchCropTable;
