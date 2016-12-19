@@ -46,7 +46,7 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	private int bufIndex;
 
 	public StudyResultSetByNameStartDateSeasonCountry(BrowseStudyQueryFilter filter, int numOfRows,
-			HibernateSessionProvider sessionProviderForLocal) throws MiddlewareQueryException {
+			HibernateSessionProvider sessionProviderForLocal) {
 
 		super(sessionProviderForLocal);
 
@@ -69,7 +69,7 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 		this.bufIndex = 0;
 	}
 
-	private List<Integer> getLocationIds(String countryName) throws MiddlewareQueryException {
+	private List<Integer> getLocationIds(String countryName) {
 		List<Integer> locationIds = new ArrayList<Integer>();
 		if (countryName != null) {
 			List<Country> countries = this.getCountryDao().getByIsoFull(countryName);
@@ -78,25 +78,25 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 		return locationIds;
 	}
 
-	private long countStudiesByName(String name) throws MiddlewareQueryException {
+	private long countStudiesByName(String name) {
 		return this.getStudySearchDao().countStudiesByName(name, studySearchMatchingOption);
 	}
 
-	private long countStudiesByStartDate(Integer startDate) throws MiddlewareQueryException {
+	private long countStudiesByStartDate(Integer startDate) {
 		if (startDate != null) {
 			return this.getStudySearchDao().countStudiesByStartDate(startDate);
 		}
 		return 0;
 	}
 
-	private long countStudiesBySeason(Season season) throws MiddlewareQueryException {
+	private long countStudiesBySeason(Season season) {
 		if (season != null) {
 			return this.getStudySearchDao().countStudiesBySeason(season);
 		}
 		return 0;
 	}
 
-	private long countStudiesByCountry() throws MiddlewareQueryException {
+	private long countStudiesByCountry() {
 		if (this.locationIds != null && !this.locationIds.isEmpty()) {
 			return this.getStudySearchDao().countStudiesByLocationIds(this.locationIds);
 		}
@@ -109,7 +109,7 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	}
 
 	@Override
-	public StudyReference next() throws MiddlewareQueryException {
+	public StudyReference next() {
 		if (this.isEmptyBuffer()) {
 			this.fillBuffer();
 		}
@@ -121,7 +121,7 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 		return this.buffer == null || this.bufIndex >= this.buffer.size();
 	}
 
-	private void fillBuffer() throws MiddlewareQueryException {
+	private void fillBuffer() {
 		if (this.currentRow < this.countOfLocalStudiesByName) {
 			this.fillBufferByName(this.currentRow);
 		} else if (this.currentRow < this.countOfLocalStudiesByName) {
@@ -145,22 +145,22 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 		}
 	}
 
-	private void fillBufferByName(int start) throws MiddlewareQueryException {
+	private void fillBufferByName(int start) {
 		this.buffer = this.getStudySearchDao().getStudiesByName(this.name, start, this.numOfRows, studySearchMatchingOption);
 		this.bufIndex = 0;
 	}
 
-	private void fillBufferByStartDate(int start) throws MiddlewareQueryException {
+	private void fillBufferByStartDate(int start) {
 		this.buffer = this.getStudySearchDao().getStudiesByStartDate(this.startDate, start, this.numOfRows);
 		this.bufIndex = 0;
 	}
 
-	private void fillBufferBySeason(int start) throws MiddlewareQueryException {
+	private void fillBufferBySeason(int start) {
 		this.buffer = this.getStudySearchDao().getStudiesBySeason(this.season, start, this.numOfRows);
 		this.bufIndex = 0;
 	}
 
-	private void fillBufferByCountry(int start) throws MiddlewareQueryException {
+	private void fillBufferByCountry(int start) {
 		this.buffer = this.getStudySearchDao().getStudiesByLocationIds(this.locationIds, start, this.numOfRows);
 		this.bufIndex = 0;
 	}

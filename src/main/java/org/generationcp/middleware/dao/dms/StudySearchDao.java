@@ -25,6 +25,8 @@ import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for searching studies stored in {@link DmsProject}.
@@ -34,7 +36,9 @@ import org.hibernate.SQLQuery;
  */
 public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 
-	public long countStudiesByName(String name, StudySearchMatchingOption studySearchMatchingOption) throws MiddlewareQueryException {
+	private static final Logger LOG = LoggerFactory.getLogger(StudySearchDao.class);
+
+	public long countStudiesByName(String name, StudySearchMatchingOption studySearchMatchingOption) {
 		try {
 			SQLQuery query =
 					this.getSession().createSQLQuery(
@@ -48,13 +52,15 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in countStudiesByName=" + name + " in StudyDao: " + e.getMessage(), e);
+			final String message = "Error in countStudiesByName=" + name + " in StudyDao: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return 0;
+
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesByName(String name, int start, int numOfRows, StudySearchMatchingOption studySearchMatchingOption) throws MiddlewareQueryException {
+	public List<StudyReference> getStudiesByName(String name, int start, int numOfRows, StudySearchMatchingOption studySearchMatchingOption) {
 		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
 		try {
 			SQLQuery query =
@@ -75,7 +81,9 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in getStudiesByName=" + name + " in StudyDao: " + e.getMessage(), e);
+			final String message = "Error in getStudiesByName=" + name + " in StudyDao: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return studyReferences;
 	}
@@ -95,7 +103,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public long countStudiesByStartDate(int startDate) throws MiddlewareQueryException {
+	public long countStudiesByStartDate(int startDate) {
 		try {
 			String dateString = String.valueOf(startDate);
 			// pad LIKE wildcard characters
@@ -115,13 +123,14 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in countStudiesByStartDate=" + startDate + " in StudyDao: " + e.getMessage(), e);
+			final String message = "Error in countStudiesByStartDate=" + startDate + " in StudyDao: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return 0;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesByStartDate(int startDate, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<StudyReference> getStudiesByStartDate(int startDate, int start, int numOfRows) {
 
 		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
 		try {
@@ -152,12 +161,14 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in getStudiesByStartDate=" + startDate + " in StudyDao: " + e.getMessage(), e);
+			final String message = "Error in getStudiesByStartDate=" + startDate + " in StudyDao: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return studyReferences;
 	}
 
-	public long countStudiesBySeason(Season season) throws MiddlewareQueryException {
+	public long countStudiesBySeason(Season season) {
 		try {
 			int valueId = 0;
 			if (season == Season.DRY) {
@@ -191,13 +202,15 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in countStudiesBySeason=" + season + " in StudyDao: " + e.getMessage(), e);
+			final String message = "Error in countStudiesBySeason=" + season + " in StudyDao: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return 0;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesBySeason(Season season, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<StudyReference> getStudiesBySeason(Season season, int start, int numOfRows) {
 
 		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
 		try {
@@ -239,12 +252,14 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in getStudiesBySeason=" + season + " in StudyDao: " + e.getMessage(), e);
+			final String message = "Error in getStudiesBySeason=" + season + " in StudyDao: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return studyReferences;
 	}
 
-	public long countStudiesByLocationIds(List<Integer> locationIds) throws MiddlewareQueryException {
+	public long countStudiesByLocationIds(List<Integer> locationIds) {
 		try {
 			SQLQuery query =
 					this.getSession().createSQLQuery(
@@ -264,14 +279,14 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in countStudiesByLocationIds=" + locationIds + " in StudyDao: " + e.getMessage(), e);
+			final String message = "Error in countStudiesByLocationIds=" + locationIds + " in StudyDao: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return 0;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesByLocationIds(List<Integer> locationIds, int start, int numOfRows)
-			throws MiddlewareQueryException {
+	public List<StudyReference> getStudiesByLocationIds(List<Integer> locationIds, int start, int numOfRows) {
 		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
 		try {
 			SQLQuery query =
@@ -299,7 +314,9 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in getStudiesByLocationIds=" + locationIds + " in StudyDao: " + e.getMessage(), e);
+			final String message = "Error in getStudiesByLocationIds=" + locationIds + " in StudyDao: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 		return studyReferences;
 	}
