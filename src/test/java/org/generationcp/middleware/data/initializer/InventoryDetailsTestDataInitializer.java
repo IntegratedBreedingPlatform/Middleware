@@ -233,6 +233,24 @@ public class InventoryDetailsTestDataInitializer {
 		return  transaction;
 	}
 
+	public static Transaction createDepositTransaction(Double quantity, Integer status, String comments, Lot lot, Integer personId,
+			Integer sourceId, Integer sourceRecordId, String sourceType, String inventoryID){
+		Transaction transaction = new Transaction();
+		transaction.setQuantity(quantity);
+		transaction.setStatus(status);
+		transaction.setComments(comments);
+		transaction.setLot(lot);
+		transaction.setPersonId(personId);
+		transaction.setSourceId(sourceId);
+		transaction.setSourceRecordId(sourceRecordId);
+		transaction.setSourceType(sourceType);
+		transaction.setInventoryID(inventoryID);
+
+		return  transaction;
+	}
+
+
+
 	public static Lot createLot(Integer userId, String entityType, Integer entityId, Integer locationId, Integer scaleId, Integer status,
 			Integer sourceId, String comments) {
 		Lot lot = new Lot();
