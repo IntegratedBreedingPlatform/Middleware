@@ -17,9 +17,7 @@ import java.util.List;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.operation.searcher.Searcher;
 import org.generationcp.middleware.pojos.Country;
@@ -35,10 +33,10 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 
 	private final List<Integer> locationIds;
 
-	private final long countOfLocalStudiesByName;
-	private final long countOfLocalStudiesByStartDate;
-	private final long countOfLocalStudiesBySeason;
-	private final long countOfLocalStudiesByCountry;
+	private final long countOfStudiesByName;
+	private final long countOfStudiesByStartDate;
+	private final long countOfStudiesBySeason;
+	private final long countOfStudiesByCountry;
 
 	private int currentRow;
 
@@ -46,9 +44,9 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	private int bufIndex;
 
 	public StudyResultSetByNameStartDateSeasonCountry(BrowseStudyQueryFilter filter, int numOfRows,
-			HibernateSessionProvider sessionProviderForLocal) {
+			HibernateSessionProvider sessionProvider) {
 
-		super(sessionProviderForLocal);
+		super(sessionProvider);
 
 		this.name = filter.getName();
 		this.startDate = filter.getStartDate();
@@ -60,10 +58,10 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 
 		this.locationIds = this.getLocationIds(this.country);
 
-		this.countOfLocalStudiesByName = this.countStudiesByName(this.name);
-		this.countOfLocalStudiesByStartDate = this.countStudiesByStartDate(this.startDate);
-		this.countOfLocalStudiesBySeason = this.countStudiesBySeason(this.season);
-		this.countOfLocalStudiesByCountry = this.countStudiesByCountry();
+		this.countOfStudiesByName = this.countStudiesByName(this.name);
+		this.countOfStudiesByStartDate = this.countStudiesByStartDate(this.startDate);
+		this.countOfStudiesBySeason = this.countStudiesBySeason(this.season);
+		this.countOfStudiesByCountry = this.countStudiesByCountry();
 
 		this.currentRow = 0;
 		this.bufIndex = 0;
@@ -122,25 +120,25 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	}
 
 	private void fillBuffer() {
-		if (this.currentRow < this.countOfLocalStudiesByName) {
+		if (this.currentRow < this.countOfStudiesByName) {
 			this.fillBufferByName(this.currentRow);
-		} else if (this.currentRow < this.countOfLocalStudiesByName) {
-			int start = this.currentRow - (int) this.countOfLocalStudiesByName;
+		} else if (this.currentRow < this.countOfStudiesByName) {
+			int start = this.currentRow - (int) this.countOfStudiesByName;
 			this.fillBufferByName(start);
-		} else if (this.currentRow < this.countOfLocalStudiesByName
-				+ this.countOfLocalStudiesByStartDate) {
-			int start = this.currentRow - (int) this.countOfLocalStudiesByName;
+		} else if (this.currentRow < this.countOfStudiesByName
+				+ this.countOfStudiesByStartDate) {
+			int start = this.currentRow - (int) this.countOfStudiesByName;
 			this.fillBufferByStartDate(start);
-		} else if (this.currentRow < this.countOfLocalStudiesByName
-				+ this.countOfLocalStudiesByStartDate + this.countOfLocalStudiesBySeason) {
+		} else if (this.currentRow < this.countOfStudiesByName
+				+ this.countOfStudiesByStartDate + this.countOfStudiesBySeason) {
 			int start =
-					this.currentRow - (int) this.countOfLocalStudiesByName
-							- (int) this.countOfLocalStudiesByStartDate;
+					this.currentRow - (int) this.countOfStudiesByName
+							- (int) this.countOfStudiesByStartDate;
 			this.fillBufferBySeason(start);
-		} else if (this.currentRow < this.countOfLocalStudiesByName
-				+ this.countOfLocalStudiesByStartDate + this.countOfLocalStudiesBySeason
-				+ this.countOfLocalStudiesByCountry) {
-			int start = this.currentRow - (int) this.countOfLocalStudiesByName - (int) this.countOfLocalStudiesByStartDate - (int) this.countOfLocalStudiesBySeason;
+		} else if (this.currentRow < this.countOfStudiesByName
+				+ this.countOfStudiesByStartDate + this.countOfStudiesBySeason
+				+ this.countOfStudiesByCountry) {
+			int start = this.currentRow - (int) this.countOfStudiesByName - (int) this.countOfStudiesByStartDate - (int) this.countOfStudiesBySeason;
 			this.fillBufferByCountry(start);
 		}
 	}
@@ -167,7 +165,7 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 
 	@Override
 	public long size() {
-		return this.countOfLocalStudiesByName + this.countOfLocalStudiesByStartDate + this.countOfLocalStudiesBySeason
-				+ this.countOfLocalStudiesByCountry;
+		return this.countOfStudiesByName + this.countOfStudiesByStartDate + this.countOfStudiesBySeason
+				+ this.countOfStudiesByCountry;
 	}
 }
