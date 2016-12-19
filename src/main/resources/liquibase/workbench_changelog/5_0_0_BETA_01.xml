@@ -20,10 +20,10 @@
 	<changeSet author="vanina" id="beta1-2" runAlways="true">
 		<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="0">select count(*) from information_schema.routines where routine_schema = database()
-												and specific_name = 'alterWorkbenchCropTable';</sqlCheck>
+												and specific_name = 'createPlotCodePrefix';</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="false" >
-			CREATE PROCEDURE alterWorkbenchCropTable()
+			CREATE PROCEDURE createPlotCodePrefix()
 			BEGIN
 			
 			DECLARE updateDone INT DEFAULT 0;
@@ -88,22 +88,12 @@
 
 		<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">select count(*) from information_schema.routines where routine_schema = database()
-												and specific_name = 'alterWorkbenchCropTable';</sqlCheck>
+												and specific_name = 'createPlotCodePrefix';</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="false">
-			call alterWorkbenchCropTable();
+			call createPlotCodePrefix();
 		</sql>
 
 	</changeSet>
 	
-	<changeSet author="vanina" id="beta1-4" runAlways="true">
-
-		<preConditions onFail="MARK_RAN">
-				<sqlCheck expectedResult="1">select count(*) from information_schema.routines where routine_schema = database()
-												and specific_name = 'alterWorkbenchCropTable';</sqlCheck>
-		</preConditions>
-		<sql dbms="mysql" splitStatements="false">
-			DROP PROCEDURE IF EXISTS alterWorkbenchCropTable;
-		</sql>
-	</changeSet>
 </databaseChangeLog>
