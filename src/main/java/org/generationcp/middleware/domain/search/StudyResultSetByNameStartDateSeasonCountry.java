@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -30,6 +31,7 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	private final Season season;
 	private final String country;
 	private final int numOfRows;
+	private final StudySearchMatchingOption studySearchMatchingOption;
 
 	private final List<Integer> locationIds;
 
@@ -52,6 +54,7 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 		this.startDate = filter.getStartDate();
 		this.season = filter.getSeason();
 		this.country = filter.getCountry();
+		this.studySearchMatchingOption = filter.getStudySearchMatchingOption();
 
 		this.numOfRows = numOfRows;
 
@@ -76,7 +79,7 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	}
 
 	private long countStudiesByName(String name) throws MiddlewareQueryException {
-		return this.getStudySearchDao().countStudiesByName(name);
+		return this.getStudySearchDao().countStudiesByName(name, studySearchMatchingOption);
 	}
 
 	private long countStudiesByStartDate(Integer startDate) throws MiddlewareQueryException {
@@ -120,7 +123,7 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 
 	private void fillBuffer() throws MiddlewareQueryException {
 		if (this.currentRow < this.countOfLocalStudiesByName) {
-			this.fillBufferByName(Database.LOCAL, this.currentRow);
+			this.fillBufferByName(this.currentRow);
 		} else if (this.currentRow < this.countOfLocalStudiesByName) {
 			int start = this.currentRow - (int) this.countOfLocalStudiesByName;
 			this.fillBufferByName(start);
@@ -142,8 +145,8 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 		}
 	}
 
-	private void fillBufferByName(Database database, int start) throws MiddlewareQueryException {
-		this.buffer = this.getStudySearchDao().getStudiesByName(this.name, start, this.numOfRows);
+	private void fillBufferByName(int start) throws MiddlewareQueryException {
+		this.buffer = this.getStudySearchDao().getStudiesByName(this.name, start, this.numOfRows, studySearchMatchingOption);
 		this.bufIndex = 0;
 	}
 

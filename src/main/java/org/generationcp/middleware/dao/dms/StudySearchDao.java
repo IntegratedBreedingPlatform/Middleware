@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -33,14 +34,14 @@ import org.hibernate.SQLQuery;
  */
 public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 
-	public long countStudiesByName(String name) throws MiddlewareQueryException {
+	public long countStudiesByName(String name, StudySearchMatchingOption studySearchMatchingOption) throws MiddlewareQueryException {
 		try {
 			SQLQuery query =
 					this.getSession().createSQLQuery(
 							"select count(distinct p.project_id) " + "from project p "
 									+ " inner join project_relationship r on r.object_project_id = p.project_id and r.type_id"
 									+ " NOT IN (" + TermId.HAS_PARENT_FOLDER.getId() + "," + TermId.STUDY_HAS_FOLDER.getId() + ") "
-									+ "where p.name = '" + name + "'" + "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
+									+ "where p.name " + buildMatchCondition(studySearchMatchingOption, name) + "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
 									+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = "
 									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) ");
 
@@ -53,7 +54,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesByName(String name, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<StudyReference> getStudiesByName(String name, int start, int numOfRows, StudySearchMatchingOption studySearchMatchingOption) throws MiddlewareQueryException {
 		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
 		try {
 			SQLQuery query =
@@ -61,7 +62,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 							"select distinct p.project_id, p.name, p.description " + "from project p "
 									+ " inner join project_relationship r on r.object_project_id = p.project_id and r.type_id"
 									+ " NOT IN (" + TermId.HAS_PARENT_FOLDER.getId() + "," + TermId.STUDY_HAS_FOLDER.getId() + ") "
-									+ "where p.name = '" + name + "'" + "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
+									+ "where p.name " + buildMatchCondition(studySearchMatchingOption, name) + "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
 									+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = "
 									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) ");
 
@@ -77,6 +78,21 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			this.logAndThrowException("Error in getStudiesByName=" + name + " in StudyDao: " + e.getMessage(), e);
 		}
 		return studyReferences;
+	}
+
+	private String buildMatchCondition(StudySearchMatchingOption studySearchMatchingOption, String value) {
+
+		String condition = "";
+
+		if (studySearchMatchingOption == StudySearchMatchingOption.EXACT_MATCHES) {
+			condition  = "= '" + value + "'";
+		} else if (studySearchMatchingOption == StudySearchMatchingOption.MATCHES_CONTAINING) {
+			condition  = "LIKE '%" + value + "%'";
+		} else if (studySearchMatchingOption == StudySearchMatchingOption.MATCHES_STARTING_WITH) {
+			condition  = "LIKE '" + value + "%'";
+		}
+		return condition;
+
 	}
 
 	public long countStudiesByStartDate(int startDate) throws MiddlewareQueryException {
