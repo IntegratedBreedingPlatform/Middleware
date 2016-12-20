@@ -213,6 +213,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 	
 	@Override
 	public StudyDetailDto getStudyDetails(final int studyIdentifier) {
+		return this.getStudyDetails(studyIdentifier, null);
+	}
+
+	@Override
+	public StudyDetailDto getStudyDetails(final int studyIdentifier, Integer instanceDbId) {
 
 		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
 
@@ -224,7 +229,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			}
 		}).immutableSortedCopy(traits);
 
-		final List<Object[]> results = this.studyMeasurements.getAllStudyDetailsAsTable(studyIdentifier, sortedTraits);
+		final List<Object[]> results = this.studyMeasurements.getAllStudyDetailsAsTable(studyIdentifier, sortedTraits, instanceDbId);
 
 		final List<Integer> observationVariableDbIds = new ArrayList<Integer>();
 

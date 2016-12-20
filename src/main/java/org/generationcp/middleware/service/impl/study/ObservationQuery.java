@@ -82,14 +82,19 @@ class ObservationQuery {
 				fromText + whereText + orderByText;
 	}
 
-	String getObservationQueryWithBlockRowCol(final List<TraitDto> traits) {
-
+	String getObservationQueryWithBlockRowCol(final List<TraitDto> traits, Integer instanceId) {
 		final String columnNamesFromTraitNames = this.getColumnNamesFromTraitNames(traits);
 		final String orderByTraitId = getOrderByTraitId(traits);
 
 		final String fromText = getFromExpression(traits);
 
 		final String orderByText = getOrderByExpression(traits, orderByTraitId);
+
+		String whereText = this.whereText;
+
+		if (instanceId != null) {
+			whereText += " AND gl.nd_geolocation_id = :instanceId \n";
+		}
 
 		return selectText + ", " + blockNoText + ", " + rowNumberText + "," + columnNumberText +
 				", " + locationNameSubQuery +
