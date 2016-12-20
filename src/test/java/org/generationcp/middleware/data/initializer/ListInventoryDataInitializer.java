@@ -27,6 +27,18 @@ public class ListInventoryDataInitializer {
 		return inventoryDetails;
 	}
 
+	public static List<GermplasmListData> createGermplasmListDataWithInventoryDetails(int noOfListDataEntries) {
+		List<GermplasmListData> inventoryDetails = new ArrayList<GermplasmListData>();
+
+		for (int i = 0; i < noOfListDataEntries; i++) {
+			int id = i + 1;
+			inventoryDetails.add(createGermplasmListData(id));
+		}
+
+		return inventoryDetails;
+	}
+
+
 	public static GermplasmListData createGermplasmListData(int id) {
 
 		GermplasmListData listData = new GermplasmListData();
@@ -71,6 +83,15 @@ public class ListInventoryDataInitializer {
 		}
 		return lotDetails;
 	}
+
+	public static List<ListEntryLotDetails> createLotDetails(int listDataId, int noOfLots) {
+		List<ListEntryLotDetails> lotDetails = new ArrayList<ListEntryLotDetails>();
+		for (int i = 0; i < noOfLots; i++) {
+			lotDetails.add(createLotDetail(i, listDataId));
+		}
+		return lotDetails;
+	}
+
 
 	public static List<ListEntryLotDetails> createLotDetailsWithEmptyLocationAndScale(int listDataId) {
 		List<ListEntryLotDetails> lotDetails = new ArrayList<ListEntryLotDetails>();
