@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.manager.api;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +24,7 @@ import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.LocationFilters;
 
 /**
  * This is the API for managing Location information.
@@ -619,5 +621,43 @@ public interface LocationDataManager {
 	List<Location> getAllBreedingLocationsByUniqueID(String programUUID);
 
 	List<LocationDetails> getFilteredLocations(Integer countryId, Integer locationType, String locationName, String programUUID);
+	
+	/**
+	 * Returns number of all Locations depending on the filters.
+	 *
+	 * @return the number of all Locations
+	 * @throws MiddlewareQueryException
+	 *             the middleware query exception
+	 */
+	long countLocationsByFilter(final HashMap<String,String> filters) throws MiddlewareQueryException;
 
+	/**
+	 * Returns all Local Locations depending on the filters.
+	 *
+	 * @param start
+	 *            - the starting index of the sublist of results to be returned
+	 * @param numOfRows
+	 *            - the number of rows to be included in the sublist of results
+	 *            to be returned
+	 * @param filters
+	 *            - the filters that to be included in the query
+	 * @return All Locations based on the given start and numOfRows
+	 * @throws MiddlewareQueryException
+	 *             the middleware query exception
+	 */
+	List<LocationFilters> getLocalLocationsByFilter(final int start,final int numOfRows,final HashMap<String,String> filters) throws MiddlewareQueryException;
+
+
+	/**
+	 * Gets the user defined field id of name.
+	 *
+	 * @param tableType
+	 *            the table type
+	 * @param name
+	 *            the name
+	 * @return the user defined field id of code
+	 * @throws MiddlewareQueryException
+	 *             the middleware query exception
+	 */
+	Integer getUserDefinedFieldIdOfName(UDTableType tableType, String name) throws MiddlewareQueryException;
 }

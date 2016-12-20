@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.Georef;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.pojos.LocationFilters;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -915,6 +916,70 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					this.getLogExceptionMessage("getFilteredLocations", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 		return new ArrayList<LocationDetails>();
+	}
+
+
+	public long countLocationsByFilter(final HashMap<String,String> filters) {
+		final Criteria criteria = this.getSession().createCriteria(Location.class);
+		
+		if(filters!= null && filters.size() != 0){
+			if(filters.containsKey("locationType")){
+					
+				final Integer ltype= new Integer(filters.get("locationType"));
+				 criteria.add(Restrictions.eq(LocationDAO.LTYPE, ltype));
+			}else{
+				this.logAndThrowException(this.getLogExceptionMessage("countLocationsByFilter", "", null, "Unrecognized filter",
+						LocationDAO.CLASS_NAME_LOCATION), null);
+			}
+		}
+		
+		try {
+				
+				criteria.setProjection(Projections.rowCount());
+				return ((Long) criteria.uniqueResult()).longValue();
+		} catch (final HibernateException e) {
+			this.logAndThrowException(this.getLogExceptionMessage("countLocationsByFilter", "", null, e.getMessage(),
+					LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+		return 0;
+	}
+
+	public List<LocationFilters> getLocalLocationsByFilter(final int start,final int numOfRows, final HashMap<String,String> filters) {
+		try {
+
+			final StringBuilder queryString = new StringBuilder();
+
+			queryString.append("SELECT l.locid as locationDbId, ud.fname as locationType,")
+					.append(" l.lname as name, labbr as abbreviation,")
+					.append(" c.isothree as countryCode, c.isoabbr as countryName,")
+					.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude")
+					.append(" FROM location l")
+					.append(" LEFT JOIN georef g on l.locid = g.locid")
+					.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid")
+					.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype");
+
+			if(filters!= null && filters.size() != 0){
+				if(filters.containsKey("locationType")){
+					final Integer ltype= new Integer(filters.get("locationType"));
+					queryString.append(" where l.ltype = ");
+					queryString.append(ltype);
+				}
+			}
+			queryString.append(" ORDER BY l.locid ");
+
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setFirstResult(start);
+			query.setMaxResults(numOfRows);
+			query.addEntity(LocationFilters.class);
+			//query.setResultTransformer(Transformers.aliasToBean(LocationFilters.class));
+
+			return query.list();
+
+		} catch (final HibernateException e) {
+			this.logAndThrowException(
+					this.getLogExceptionMessage("getFilteredLocations", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+		return new ArrayList<LocationFilters>();
 	}
 
 }

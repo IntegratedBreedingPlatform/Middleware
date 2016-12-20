@@ -34,6 +34,7 @@ import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.LocationFilters;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -570,5 +571,31 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	public List<LocationDetails> getFilteredLocations(final Integer countryId, final Integer locationType, final String locationName,
 			final String programUUID) {
 		return this.getLocationDao().getFilteredLocations(countryId, locationType, locationName, programUUID);
+	}
+
+	@Override
+	public long countLocationsByFilter(final HashMap<String,String> filters) throws MiddlewareQueryException {
+		return this.getLocationDao().countLocationsByFilter(filters);
+
+	}
+
+	@Override
+	public List<LocationFilters> getLocalLocationsByFilter(final int start,final  int numOfRows,final HashMap<String,String> filters) throws MiddlewareQueryException {
+		return this.getLocationDao().getLocalLocationsByFilter(start, numOfRows, filters);
+
+	}
+	
+	@Override
+	public Integer getUserDefinedFieldIdOfName(final UDTableType tableType, final String name)
+			throws MiddlewareQueryException {
+		final Map<String, UserDefinedField> types = new HashMap<String, UserDefinedField>();
+
+		final List<UserDefinedField> dTypeFields = this.getUserDefinedFieldByFieldTableNameAndType(tableType.getTable(),
+				tableType.getType());
+		for (final UserDefinedField dTypeField : dTypeFields) {
+			types.put(dTypeField.getFname().toUpperCase(), dTypeField);
+		}
+
+		return types.get(name.toUpperCase()) != null ? types.get(name.toUpperCase()).getFldno() : null;
 	}
 }
