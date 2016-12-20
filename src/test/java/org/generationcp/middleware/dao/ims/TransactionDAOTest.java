@@ -13,16 +13,20 @@ import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
+import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,6 +42,9 @@ public class TransactionDAOTest extends IntegrationTestBase {
 	private static final int LOCATION_ID = 1;
 	private static final int SCALE_ID = 1;
 
+	private static final String LOT_DISCARD = "Discard" ;
+	private static final String LOT_DEPOSIT = "Deposit";
+
 	private final Map<Integer, Germplasm> germplasmMap = new HashMap<Integer, Germplasm>();
 
 	private List<GermplasmListData> germplasmListData;
@@ -50,6 +57,9 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 	@Autowired
 	private InventoryDataManager inventoryDataManager;
+
+	@Autowired
+	private UserDataManager userDataManager;
 
 	private InventoryDetailsTestDataInitializer inventoryDetailsTestDataInitializer;
 
@@ -194,6 +204,61 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		for (final Integer transactionId : transactionIds) {
 			final Transaction transaction = this.inventoryDataManager.getTransactionById(transactionId);
 			this.listDataIdTransactionMap.put(transaction.getSourceRecordId(), transaction);
+		}
+
+	}
+
+	@Test
+	public void testGetTransactionDetailsForLot() {
+
+		final Germplasm germplasm =
+				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+
+		UserTestDataInitializer userTestDataInitializer = new UserTestDataInitializer();
+		final User user = userTestDataInitializer.createUser();
+		user.setUserid(null);
+		this.userDataManager.addUser(user);
+
+		Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments");
+		this.inventoryDataManager.addLots(com.google.common.collect.Lists.<Lot>newArrayList(lot));
+
+		Transaction depositTransaction =
+				InventoryDetailsTestDataInitializer.createReservationTransaction(5.0, 0, "Deposit", lot, 1, 1, 1, "LIST");
+		depositTransaction.setTransactionDate(20150101);
+		depositTransaction.setUserId(user.getUserid());
+
+		Transaction closedTransaction =
+				InventoryDetailsTestDataInitializer.createReservationTransaction(-5.0, 1, "Discard", lot, 1, 1, 1, "LIST");
+		closedTransaction.setTransactionDate(20151010);
+		closedTransaction.setUserId(user.getUserid());
+
+		List<Transaction> transactionList = new ArrayList<>();
+		transactionList.add(depositTransaction);
+		transactionList.add(closedTransaction);
+		this.inventoryDataManager.addTransactions(transactionList);
+
+		List<TransactionReportRow> transactionReportRows = this.dao.getTransactionDetailsForLot(lot.getId());
+
+		for (TransactionReportRow reportRow : transactionReportRows) {
+			if (LOT_DEPOSIT.equals(reportRow.getLotStatus())) {
+
+				Assert.assertEquals(depositTransaction.getQuantity(), reportRow.getQuantity());
+				Assert.assertEquals(LOT_DEPOSIT, reportRow.getLotStatus());
+				Assert.assertEquals("user_test", reportRow.getUser());
+				Assert.assertEquals(depositTransaction.getTransactionDate(), reportRow.getDate());
+				Assert.assertEquals(depositTransaction.getComments(), reportRow.getCommentOfLot());
+
+			}
+			if (LOT_DISCARD.equals(reportRow.getLotStatus())) {
+
+				Assert.assertEquals("user_test", reportRow.getUser());
+				Assert.assertEquals(closedTransaction.getTransactionDate(), reportRow.getDate());
+				Assert.assertEquals(closedTransaction.getComments(), reportRow.getCommentOfLot());
+				Assert.assertEquals(closedTransaction.getQuantity(), reportRow.getQuantity());
+				Assert.assertEquals(LOT_DISCARD, reportRow.getLotStatus());
+
+			}
 		}
 
 	}

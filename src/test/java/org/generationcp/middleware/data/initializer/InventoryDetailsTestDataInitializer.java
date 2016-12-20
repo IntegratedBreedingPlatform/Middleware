@@ -16,6 +16,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.StockTransaction;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.report.TransactionReportRow;
 
 public class InventoryDetailsTestDataInitializer {
 
@@ -24,6 +25,12 @@ public class InventoryDetailsTestDataInitializer {
 	private static final String GERMPLASM_ENTITY_TYPE = "GERMPLSM";
 	private static final int USER_ID = 1;
 	private static final int NO_OF_STOCK_LIST_ENTRIES = 20;
+
+	public static final Integer DATE = 19122016;
+	public static final String LIST_NAME = "List1";
+	public static final String USER = "User";
+	public static final String STATUS = "Active";
+	public static final Double AMOUNT = -50.0;
 
 	public InventoryDetailsTestDataInitializer() {
 		// do nothing
@@ -266,4 +273,17 @@ public class InventoryDetailsTestDataInitializer {
 		return lot;
 	}
 
+	public static List<TransactionReportRow> createTransactionReportRowTestData() {
+
+		List<TransactionReportRow> transactionReportRowList = new ArrayList<>();
+		TransactionReportRow transactionReportRows = new TransactionReportRow();
+		transactionReportRows.setListName(LIST_NAME);
+		transactionReportRows.setLotStatus(STATUS);
+		transactionReportRows.setDate(DATE);
+		transactionReportRows.setQuantity(AMOUNT);
+		transactionReportRows.setUser(USER);
+
+		transactionReportRowList.add(transactionReportRows);
+		return transactionReportRowList;
+	}
 }
