@@ -45,10 +45,11 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 							"select count(distinct p.project_id) " + "from project p "
 									+ " inner join project_relationship r on r.object_project_id = p.project_id and r.type_id"
 									+ " NOT IN (" + TermId.HAS_PARENT_FOLDER.getId() + "," + TermId.STUDY_HAS_FOLDER.getId() + ") "
-									+ "where p.name " + buildMatchCondition(studySearchMatchingOption, name) + "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
+									+ "where p.name " + buildMatchCondition(studySearchMatchingOption) + "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
 									+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = "
 									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) ");
 
+			this.assignNameParameter(studySearchMatchingOption, query, name);
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (HibernateException e) {
@@ -68,10 +69,11 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 							"select distinct p.project_id, p.name, p.description " + "from project p "
 									+ " inner join project_relationship r on r.object_project_id = p.project_id and r.type_id"
 									+ " NOT IN (" + TermId.HAS_PARENT_FOLDER.getId() + "," + TermId.STUDY_HAS_FOLDER.getId() + ") "
-									+ "where p.name " + buildMatchCondition(studySearchMatchingOption, name) + "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
+									+ "where p.name " + buildMatchCondition(studySearchMatchingOption) + "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
 									+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = "
 									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) ");
 
+			this.assignNameParameter(studySearchMatchingOption, query, name);
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 
@@ -88,20 +90,36 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		return studyReferences;
 	}
 
-	private String buildMatchCondition(StudySearchMatchingOption studySearchMatchingOption, String value) {
+	private String buildMatchCondition(StudySearchMatchingOption studySearchMatchingOption) {
 
 		String condition = "";
 
 		if (studySearchMatchingOption == StudySearchMatchingOption.EXACT_MATCHES) {
-			condition  = "= '" + value + "'";
+			condition  = "= :name";
 		} else if (studySearchMatchingOption == StudySearchMatchingOption.MATCHES_CONTAINING) {
-			condition  = "LIKE '%" + value + "%'";
+			condition  = "LIKE :name";
 		} else if (studySearchMatchingOption == StudySearchMatchingOption.MATCHES_STARTING_WITH) {
-			condition  = "LIKE '" + value + "%'";
+			condition  = "LIKE :name";
 		}
 		return condition;
 
 	}
+
+	private String assignNameParameter(StudySearchMatchingOption studySearchMatchingOption, SQLQuery query, String name) {
+
+		String condition = "";
+
+		if (studySearchMatchingOption == StudySearchMatchingOption.EXACT_MATCHES) {
+			query.setParameter("name", name);
+		} else if (studySearchMatchingOption == StudySearchMatchingOption.MATCHES_CONTAINING) {
+			query.setParameter("name", "%" + name + "%");
+		} else if (studySearchMatchingOption == StudySearchMatchingOption.MATCHES_STARTING_WITH) {
+			query.setParameter("name", name + "%");
+		}
+		return condition;
+
+	}
+
 
 	public long countStudiesByStartDate(int startDate) {
 		try {
