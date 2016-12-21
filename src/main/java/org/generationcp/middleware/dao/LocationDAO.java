@@ -27,8 +27,8 @@ import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Georef;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
-import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocationFilters;
+import org.generationcp.middleware.pojos.Locdes;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -919,7 +919,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 
-	public long countLocationsByFilter(final HashMap<String,String> filters) {
+	public long countLocationsByFilter(final Map<String,String> filters) {
 		final Criteria criteria = this.getSession().createCriteria(Location.class);
 		
 		if(filters!= null && filters.size() != 0){
@@ -938,13 +938,13 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				criteria.setProjection(Projections.rowCount());
 				return ((Long) criteria.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
-			this.logAndThrowException(this.getLogExceptionMessage("countLocationsByFilter", "", null, e.getMessage(),
-					LocationDAO.CLASS_NAME_LOCATION), e);
+			throw new MiddlewareQueryException(
+					this.getLogExceptionMessage("countLocationsByFilter", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION),
+					e);	
 		}
-		return 0;
 	}
 
-	public List<LocationFilters> getLocalLocationsByFilter(final int start,final int numOfRows, final HashMap<String,String> filters) {
+	public List<LocationFilters> getLocalLocationsByFilter(final int start,final int numOfRows, final Map<String, String> filters) {
 		try {
 
 			final StringBuilder queryString = new StringBuilder();
@@ -971,15 +971,15 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 			query.addEntity(LocationFilters.class);
-			//query.setResultTransformer(Transformers.aliasToBean(LocationFilters.class));
 
 			return query.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					this.getLogExceptionMessage("getFilteredLocations", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
+			LocationDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					this.getLogExceptionMessage("getFilteredLocations", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION),
+					e);
 		}
-		return new ArrayList<LocationFilters>();
 	}
 
 }

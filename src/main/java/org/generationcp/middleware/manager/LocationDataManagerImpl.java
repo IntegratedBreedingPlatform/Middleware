@@ -29,12 +29,12 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
+import org.generationcp.middleware.pojos.LocationFilters;
 import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.LocationFilters;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -574,13 +574,13 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public long countLocationsByFilter(final HashMap<String,String> filters) throws MiddlewareQueryException {
+	public long countLocationsByFilter(final Map<String,String> filters) throws MiddlewareQueryException {
 		return this.getLocationDao().countLocationsByFilter(filters);
 
 	}
 
 	@Override
-	public List<LocationFilters> getLocalLocationsByFilter(final int start,final  int numOfRows,final HashMap<String,String> filters) throws MiddlewareQueryException {
+	public List<LocationFilters> getLocalLocationsByFilter(final int start,final  int numOfRows,final Map<String,String> filters) throws MiddlewareQueryException {
 		return this.getLocationDao().getLocalLocationsByFilter(start, numOfRows, filters);
 
 	}

@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.manager.api;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,10 +20,10 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
+import org.generationcp.middleware.pojos.LocationFilters;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.LocationFilters;
 
 /**
  * This is the API for managing Location information.
@@ -629,7 +628,7 @@ public interface LocationDataManager {
 	 * @throws MiddlewareQueryException
 	 *             the middleware query exception
 	 */
-	long countLocationsByFilter(final HashMap<String,String> filters) throws MiddlewareQueryException;
+	long countLocationsByFilter(final Map<String,String> filters) throws MiddlewareQueryException;
 
 	/**
 	 * Returns all Local Locations depending on the filters.
@@ -645,7 +644,7 @@ public interface LocationDataManager {
 	 * @throws MiddlewareQueryException
 	 *             the middleware query exception
 	 */
-	List<LocationFilters> getLocalLocationsByFilter(final int start,final int numOfRows,final HashMap<String,String> filters) throws MiddlewareQueryException;
+	List<LocationFilters> getLocalLocationsByFilter(final int start,final int numOfRows,final Map<String,String> filters) throws MiddlewareQueryException;
 
 
 	/**
