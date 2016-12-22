@@ -57,4 +57,7 @@ public class XADataSources implements BeanDefinitionRegistryPostProcessor {
 		// Do not need to add any functionality to this method because we just need to override postProcessBeanDefinitionRegistry
 	}
 
+	public DataSourceProperties getXaDataSourceProperties() {
+		return xaDataSourceProperties;
+	}
 }

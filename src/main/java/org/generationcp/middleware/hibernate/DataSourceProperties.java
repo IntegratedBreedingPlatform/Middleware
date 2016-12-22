@@ -66,7 +66,7 @@ public class DataSourceProperties {
 
 	private final String hibernateConfigurationLocation = "classpath:ibpmidware_hib.cfg.xml";
 
-	private String reapTimeout = "3000";
+	private String reapTimeout = "300";
 
 	private static final Logger LOG = LoggerFactory.getLogger(DataSourceProperties.class);
 
@@ -196,7 +196,11 @@ public class DataSourceProperties {
 	}
 
 	public String getReapTimeout() {
-		return this.reapTimeout ;
+		return this.reapTimeout;
+	}
+	
+	public void setReapTimeout(String reapTimeout) {
+		this.reapTimeout = reapTimeout;
 	}
 
 }
