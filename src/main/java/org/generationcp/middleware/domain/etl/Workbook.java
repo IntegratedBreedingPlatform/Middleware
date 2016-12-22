@@ -246,8 +246,8 @@ public class Workbook {
 				}
 			}
 			// we join the new list with the remaining items
-			tempVarList.addAll(copyVarList);
-			return tempVarList;
+			copyVarList.addAll(tempVarList);
+			return copyVarList;
 		}
 		return varList;
 	}
