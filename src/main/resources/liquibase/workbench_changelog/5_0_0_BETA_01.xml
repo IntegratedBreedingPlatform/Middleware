@@ -20,99 +20,105 @@
 
 	<changeSet author="vanina" id="beta1-2" runAlways="true">
 		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">select count(*) from
-				information_schema.routines where routine_schema = database()
-				and
-				specific_name = 'createPlotCodePrefix';
+			<sqlCheck expectedResult="0">SELECT 
+										    COUNT(*)
+										FROM
+										    information_schema.routines
+										WHERE
+										    routine_schema = DATABASE()
+										        AND specific_name = 'createPlotCodePrefix';
 			</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="false">
-			CREATE PROCEDURE
-			createPlotCodePrefix()
-			BEGIN
-
-			DECLARE updateDone INT DEFAULT 0;
-			DECLARE
-			valueGenerated VARCHAR(4) charset
-			UTF8 COLLATE utf8_general_ci;
-			DECLARE result INT;
-			DECLARE cropName
-			VARCHAR(32) charset UTF8 COLLATE
-			utf8_general_ci;
-			DECLARE
-			plotCodePrefix VARCHAR(4) charset UTF8 COLLATE
-			utf8_general_ci;
-			DECLARE cur1 CURSOR FOR SELECT crop_name COLLATE
-			utf8_general_ci,
-			plot_code_prefix COLLATE utf8_general_ci FROM
-			workbench_crop;
-			DECLARE
-			CONTINUE HANDLER FOR SQLSTATE '02000' SET
-			updateDone = 1;
-
-			OPEN cur1;
-
-			read_loop: LOOP
-			FETCH cur1 INTO cropName,
-			plotCodePrefix;
-
-			IF updateDone =1 THEN
-			LEAVE read_loop;
-			END IF;
-
-			IF
-			(plotCodePrefix is null) THEN
-			SELECT
-			LPAD(CONV(FLOOR(RAND() * POW(36,
-			6)), 10, 36),
-			4,
-			0)
-			INTO @valueGenerated;
-
-			SELECT
-			COUNT(1)
-			INTO result FROM
-			workbench_crop
-			WHERE
-			plot_code_prefix = @valueGenerated ;
-
-			WHILE (result
-			>= 1) DO
-			SELECT
-			LPAD(CONV(FLOOR(RAND() * POW(36, 6)), 10, 36),
-			4,
-			0)
-			INTO
-			@valueGenerated;
-			SELECT
-			COUNT(1)
-			INTO result FROM
-			workbench_crop
-			WHERE
-			plot_code_prefix = @valueGenerated;
-			END WHILE;
-
-			UPDATE workbench_crop
-			SET
-			plot_code_prefix = @valueGenerated
-			WHERE
-			crop_name = cropName;
-
-			END
-			IF;
-			END LOOP read_loop;
-			CLOSE cur1;
-			END;
+								CREATE PROCEDURE
+								createPlotCodePrefix()
+								BEGIN
+					
+								DECLARE updateDone INT DEFAULT 0;
+								DECLARE
+								valueGenerated VARCHAR(4) charset
+								UTF8 COLLATE utf8_general_ci;
+								DECLARE result INT;
+								DECLARE cropName
+								VARCHAR(32) charset UTF8 COLLATE
+								utf8_general_ci;
+								DECLARE
+								plotCodePrefix VARCHAR(4) charset UTF8 COLLATE
+								utf8_general_ci;
+								DECLARE cur1 CURSOR FOR SELECT crop_name COLLATE
+								utf8_general_ci,
+								plot_code_prefix COLLATE utf8_general_ci FROM
+								workbench_crop;
+								DECLARE
+								CONTINUE HANDLER FOR SQLSTATE '02000' SET
+								updateDone = 1;
+					
+								OPEN cur1;
+					
+								read_loop: LOOP
+								FETCH cur1 INTO cropName,
+								plotCodePrefix;
+					
+								IF updateDone =1 THEN
+								LEAVE read_loop;
+								END IF;
+					
+								IF
+								(plotCodePrefix is null) THEN
+								SELECT
+								LPAD(CONV(FLOOR(RAND() * POW(36,
+								6)), 10, 36),
+								4,
+								0)
+								INTO @valueGenerated;
+					
+								SELECT 
+					    COUNT(1)
+					INTO result FROM
+					    workbench_crop
+					WHERE
+					    plot_code_prefix = @valueGenerated;
+					
+								WHILE (result
+								>= 1) DO
+								SELECT
+								LPAD(CONV(FLOOR(RAND() * POW(36, 6)), 10, 36),
+								4,
+								0)
+								INTO
+								@valueGenerated;
+								SELECT 
+					    COUNT(1)
+					INTO result FROM
+					    workbench_crop
+					WHERE
+					    plot_code_prefix = @valueGenerated;
+								END WHILE;
+					
+								UPDATE workbench_crop 
+					SET 
+					    plot_code_prefix = @valueGenerated
+					WHERE
+					    crop_name = cropName;
+					
+								END
+								IF;
+								END LOOP read_loop;
+								CLOSE cur1;
+								END;
 		</sql>
 	</changeSet>
 
 	<changeSet author="vanina" id="beta1-3" runAlways="true">
 
 		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">select count(*) from
-				information_schema.routines where routine_schema = database()
-				and
-				specific_name = 'createPlotCodePrefix';
+			<sqlCheck expectedResult="1">SELECT 
+										    COUNT(*)
+										FROM
+										    information_schema.routines
+										WHERE
+										    routine_schema = DATABASE()
+										        AND specific_name = 'createPlotCodePrefix';
 			</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="false">
