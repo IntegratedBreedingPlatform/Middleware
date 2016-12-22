@@ -1,99 +1,124 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
-	
+
 	<changeSet author="vanina" id="beta1-1" runAlways="true">
-        <preConditions onFail="MARK_RAN">
-			<not><columnExists tableName="workbench_crop" columnName="plot_code_prefix"/> </not>
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="workbench_crop" columnName="plot_code_prefix" />
+			</not>
 		</preConditions>
-    	<addColumn tableName="workbench_crop">
-        	<column name="plot_code_prefix" type="VARCHAR(4) CHARSET UTF8 COLLATE utf8_general_ci">
-        	</column>
-    	</addColumn>
+		<addColumn tableName="workbench_crop">
+			<column name="plot_code_prefix" type="VARCHAR(4) CHARSET UTF8 COLLATE utf8_general_ci" />
+
+		</addColumn>
 	</changeSet>
-	
+
 	<changeSet author="vanina" id="beta1-2" runAlways="true">
 		<preConditions onFail="MARK_RAN">
-				<sqlCheck expectedResult="0">select count(*) from information_schema.routines where routine_schema = database()
-												and specific_name = 'createPlotCodePrefix';</sqlCheck>
+			<sqlCheck expectedResult="0">select count(*) from
+				information_schema.routines where routine_schema = database()
+				and
+				specific_name = 'createPlotCodePrefix';
+			</sqlCheck>
 		</preConditions>
-		<sql dbms="mysql" splitStatements="false" >
-			CREATE PROCEDURE createPlotCodePrefix()
+		<sql dbms="mysql" splitStatements="false">
+			CREATE PROCEDURE
+			createPlotCodePrefix()
 			BEGIN
-			
-			DECLARE updateDone INT DEFAULT 0;
-			DECLARE valueGenerated VARCHAR(4) charset UTF8 COLLATE utf8_general_ci;
-			DECLARE result INT;
-			DECLARE cropName VARCHAR(32) charset UTF8 COLLATE utf8_general_ci;
-			DECLARE plotCodePrefix VARCHAR(4) charset UTF8 COLLATE utf8_general_ci;
-			DECLARE cur1 CURSOR FOR SELECT crop_name COLLATE utf8_general_ci, plot_code_prefix COLLATE utf8_general_ci FROM workbench_crop;
-			DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET updateDone = 1;
-			
-			OPEN cur1;
-			
-			 read_loop: LOOP
-			    FETCH cur1 INTO cropName, plotCodePrefix;
-			    
-			    IF updateDone =1 THEN
-			        LEAVE read_loop;
-			    END IF;
-			    
-			    IF (plotCodePrefix is null) THEN
-					SELECT 
-					    LPAD(CONV(FLOOR(RAND() * POW(36, 6)), 10, 36),
-					            4,
-					            0)
-					INTO @valueGenerated;
 
-					SELECT 
-						COUNT(1)
-					INTO result FROM
-						workbench_crop
-					WHERE
-					plot_code_prefix = @valueGenerated ;
-			        
-			        WHILE (result >= 1) DO
-						SELECT 
-					    	LPAD(CONV(FLOOR(RAND() * POW(36, 6)), 10, 36),
-					        	    4,
-					            	0)
-						INTO @valueGenerated;
-						SELECT 
-							COUNT(1)
-						INTO result FROM
-							workbench_crop
-						WHERE
-						plot_code_prefix = @valueGenerated;
-					END WHILE;
-			        
-					UPDATE workbench_crop 
-					SET 
-						plot_code_prefix = @valueGenerated
-					WHERE
-						crop_name = cropName;
-					
-			    END IF;   
+			DECLARE updateDone INT DEFAULT 0;
+			DECLARE
+			valueGenerated VARCHAR(4) charset
+			UTF8 COLLATE utf8_general_ci;
+			DECLARE result INT;
+			DECLARE cropName
+			VARCHAR(32) charset UTF8 COLLATE
+			utf8_general_ci;
+			DECLARE
+			plotCodePrefix VARCHAR(4) charset UTF8 COLLATE
+			utf8_general_ci;
+			DECLARE cur1 CURSOR FOR SELECT crop_name COLLATE
+			utf8_general_ci,
+			plot_code_prefix COLLATE utf8_general_ci FROM
+			workbench_crop;
+			DECLARE
+			CONTINUE HANDLER FOR SQLSTATE '02000' SET
+			updateDone = 1;
+
+			OPEN cur1;
+
+			read_loop: LOOP
+			FETCH cur1 INTO cropName,
+			plotCodePrefix;
+
+			IF updateDone =1 THEN
+			LEAVE read_loop;
+			END IF;
+
+			IF
+			(plotCodePrefix is null) THEN
+			SELECT
+			LPAD(CONV(FLOOR(RAND() * POW(36,
+			6)), 10, 36),
+			4,
+			0)
+			INTO @valueGenerated;
+
+			SELECT
+			COUNT(1)
+			INTO result FROM
+			workbench_crop
+			WHERE
+			plot_code_prefix = @valueGenerated ;
+
+			WHILE (result
+			>= 1) DO
+			SELECT
+			LPAD(CONV(FLOOR(RAND() * POW(36, 6)), 10, 36),
+			4,
+			0)
+			INTO
+			@valueGenerated;
+			SELECT
+			COUNT(1)
+			INTO result FROM
+			workbench_crop
+			WHERE
+			plot_code_prefix = @valueGenerated;
+			END WHILE;
+
+			UPDATE workbench_crop
+			SET
+			plot_code_prefix = @valueGenerated
+			WHERE
+			crop_name = cropName;
+
+			END
+			IF;
 			END LOOP read_loop;
 			CLOSE cur1;
 			END;
 		</sql>
 	</changeSet>
-	
+
 	<changeSet author="vanina" id="beta1-3" runAlways="true">
 
 		<preConditions onFail="MARK_RAN">
-				<sqlCheck expectedResult="1">select count(*) from information_schema.routines where routine_schema = database()
-												and specific_name = 'createPlotCodePrefix';</sqlCheck>
+			<sqlCheck expectedResult="1">select count(*) from
+				information_schema.routines where routine_schema = database()
+				and
+				specific_name = 'createPlotCodePrefix';
+			</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="false">
 			call createPlotCodePrefix();
 		</sql>
 
 	</changeSet>
-	
+
 </databaseChangeLog>
