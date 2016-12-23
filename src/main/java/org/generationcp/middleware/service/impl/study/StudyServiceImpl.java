@@ -289,16 +289,26 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// entry type
 				entry.add(String.valueOf(row[2]));
 
-				// X = row
-				entry.add(String.valueOf(row[10]));
+				Object x = row[11];
+				Object y = row[10];
 
-				// Y = col
-				entry.add(String.valueOf(row[11]));
+				// If there is no row and col design,
+				// get fieldmap row and col
+				if (x == null || y == null) {
+					x = row[14];
+					y = row[15];
+				}
+
+				// X = col
+				entry.add(String.valueOf(x));
+
+				// Y = row
+				entry.add(String.valueOf(y));
 
 				// phenotypic values
 				int columnOffset = 1;
 				for (int i = 0; i < traits.size(); i++) {
-					final Object rowValue = row[13 + columnOffset];
+					final Object rowValue = row[15 + columnOffset];
 
 					if (rowValue != null) {
 						entry.add(String.valueOf(rowValue));

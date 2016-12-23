@@ -50,6 +50,9 @@ class ObservationQuery {
 			"            gp.type_id = " + TermId.LOCATION_ABBR.getId() + " \n" +
 			"                AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS LocationAbbreviation";
 
+	final String fieldmapRowText = "FieldMapRow.value FieldMapRow";
+	final String fieldmapColumnText = "FieldMapCol.value FieldMapColumn";
+
 	final String blockNoText = "    (SELECT \n" + "            ndep.value\n" + "        FROM\n" + "            nd_experimentprop ndep\n"
 			+ "                INNER JOIN\n" + "            cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id\n" + "        WHERE\n"
 			+ "            ndep.nd_experiment_id = ep.nd_experiment_id\n" + "                AND ispcvt.name = 'BLOCK_NO') BLOCK_NO\n";
@@ -99,6 +102,8 @@ class ObservationQuery {
 		return selectText + ", " + blockNoText + ", " + rowNumberText + "," + columnNumberText +
 				", " + locationNameSubQuery +
 				", " + locationAbbreviationSubQuery +
+				", " + fieldmapColumnText +
+				", " + fieldmapRowText +
 				columnNamesFromTraitNames +
 				fromText + whereText + orderByText;
 	}
@@ -115,7 +120,12 @@ class ObservationQuery {
 				+ "    nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id\n" + "        INNER JOIN\n"
 				+ "    nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id\n" + "        INNER JOIN\n"
 				+ "    nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id\n" + "        INNER JOIN\n"
-				+ "    Stock s ON s.stock_id = es.stock_id\n" + this.getTraitDeatilsJoin(traits) + "WHERE\n" + "    p.project_id = ("
+				+ "    Stock s ON s.stock_id = es.stock_id\n" + this.getTraitDeatilsJoin(traits) 
+
+				+ "    LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = ep.nd_experiment_id AND FieldMapRow.type_id = " + TermId.RANGE_NO.getId() + "\n"
+				+ "    LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = ep.nd_experiment_id AND FieldMapCol.type_id = " + TermId.COLUMN_NO.getId() + "\n"
+
+				+ "WHERE\n" + "    p.project_id = ("
 				+ "Select p.project_id from project_relationship pr\n" + "INNER JOIN project p on p.project_id = pr.subject_project_id\n";
 		return fromText;
 	}
