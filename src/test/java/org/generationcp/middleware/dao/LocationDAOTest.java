@@ -1,11 +1,14 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.service.api.location.LocationFiltersDto;
+import org.hamcrest.MatcherAssert;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
@@ -111,5 +114,38 @@ public class LocationDAOTest extends IntegrationTestBase {
 		}
 	}
 
+	@Test
+	public void getLocalLocationsByFilter() {
+		HashMap<String, String> filters = new HashMap<String, String>();
+		filters.put("locationType", "405");
+		final List<LocationFiltersDto> locationList = LocationDAOTest.locationDAO.getLocalLocationsByFilter(1, 100, filters);
+		MatcherAssert.assertThat("Expected list of country location size > zero", locationList != null && locationList.size() > 0);
 
+	}
+
+	@Test
+	public void getLocalLocationsByFilterNotRecoverData() {
+		HashMap<String, String> filters = new HashMap<String, String>();
+		filters.put("locationType", "0040500");
+		final List<LocationFiltersDto> locationList = LocationDAOTest.locationDAO.getLocalLocationsByFilter(1, 100, filters);
+		MatcherAssert.assertThat("Expected did not recover list of locations by locationType = 0040500", locationList.isEmpty());
+
+	}
+
+	@Test
+	public void countLocationsByFilter() {
+		HashMap<String, String> filters = new HashMap<String, String>();
+		filters.put("locationType", "405");
+		long countLocation = LocationDAOTest.locationDAO.countLocationsByFilter(filters);
+		MatcherAssert.assertThat("Expected country location size > zero", countLocation > 0);
+	}
+
+	@Test
+	public void countLocationsByFilterNotFoundLocation() {
+		HashMap<String, String> filters = new HashMap<String, String>();
+		filters.put("locationType", "0040500");
+		long countLocation = LocationDAOTest.locationDAO.countLocationsByFilter(filters);
+		MatcherAssert.assertThat("Expected country location size equals to zero by this locationType = 0040500", countLocation == 0);
+
+	}
 }
