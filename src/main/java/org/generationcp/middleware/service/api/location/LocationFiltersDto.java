@@ -1,83 +1,43 @@
 
-package org.generationcp.middleware.pojos;
+package org.generationcp.middleware.service.api.location;
 
 import java.io.Serializable;
 import java.util.Comparator;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+public class LocationFiltersDto implements Serializable, Comparable<LocationFiltersDto> {
 
-/**
- * POJO for location details query.
- *
- * SELECT l.locid as locationDbId, ud.fname as locationType, l.lname as name, labbr as abbreviation, c.isothree as countryCode, c.isoabbr as
- * countryName, g.lat as latitude, g.lon as longitude, g.alt as altitude FROM location l LEFT JOIN georef g on l.locid = g.locid LEFT JOIN
- * cntry c on l.cntryid = c.cntryid LEFT JOIN udflds ud on ud.fldno = l.ltype WHERE l.ltype = 410 ORDER BY l.locid limit 0, 1000
- *
- * @author Diego Cuenya
- */
-@Entity
-@Table(name = "location")
-// JAXB Element Tags for JSON output
-@XmlRootElement(name = "location")
-@XmlType(propOrder = {"locationDbId", "name", "countryName", "abbreviation", "locationType"})
-@XmlAccessorType(XmlAccessType.NONE)
-public class LocationFilters implements Serializable, Comparable<LocationFilters> {
 
-	private static final long serialVersionUID = 1L;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 2241318661332095315L;
 
-	@Id
-	@Basic(optional = false)
-	@Column(name = "locationDbId")
 	private Integer locationDbId;
 
-	@Basic(optional = false)
-	@Column(name = "locationType")
 	private String locationType;
 
-	@Basic(optional = false)
-	@Column(name = "name")
 	private String name;
 
-	@Basic(optional = false)
-	@Column(name = "abbreviation")
 	private String abbreviation;
 
-	@Basic(optional = false)
-	@Column(name = "countryCode")
 	private String countryCode;
 
-	@Basic(optional = false)
-	@Column(name = "countryName")
 	private String countryName;
 
-	@Basic(optional = true)
-	@Column(name = "latitude")
 	private Double latitude;
 
-	@Basic(optional = true)
-	@Column(name = "longitude")
 	private Double longitude;
 
-	@Basic(optional = true)
-	@Column(name = "altitude")
 	private Double altitude;
 
-	public LocationFilters() {
+	public LocationFiltersDto() {
 	}
 
-	public LocationFilters(Integer locationDbId) {
+	public LocationFiltersDto(Integer locationDbId) {
 		this.locationDbId = locationDbId;
 	}
 
-	public LocationFilters(final Integer locationDbId, final String locationType, final String name, final String abbreviation,
+	public LocationFiltersDto(final Integer locationDbId, final String locationType, final String name, final String abbreviation,
 			final String countryCode, final String countryName, final Double latitude, final Double longitude, final Double altitude) {
 		super();
 		this.locationDbId = locationDbId;
@@ -170,8 +130,8 @@ public class LocationFilters implements Serializable, Comparable<LocationFilters
 			return false;
 		}
 
-		if (obj instanceof LocationDetails) {
-			LocationFilters param = (LocationFilters) obj;
+		if (obj instanceof LocationFiltersDto) {
+			LocationFiltersDto param = (LocationFiltersDto) obj;
 			if (this.getLocationDbId().equals(param.getLocationDbId())) {
 				return true;
 			}
@@ -205,17 +165,17 @@ public class LocationFilters implements Serializable, Comparable<LocationFilters
 	}
 
 	@Override
-	public int compareTo(LocationFilters compareLocation) {
+	public int compareTo(LocationFiltersDto compareLocation) {
 		String compareName = compareLocation.getName();
 
 		// ascending order
 		return this.name.compareTo(compareName);
 	}
 
-	public static Comparator<LocationFilters> LocationNameComparator = new Comparator<LocationFilters>() {
+	public static Comparator<LocationFiltersDto> LocationNameComparator = new Comparator<LocationFiltersDto>() {
 
 		@Override
-		public int compare(LocationFilters location1, LocationFilters location2) {
+		public int compare(LocationFiltersDto location1, LocationFiltersDto location2) {
 			String locationName1 = location1.getName().toUpperCase();
 			String locationName2 = location2.getName().toUpperCase();
 

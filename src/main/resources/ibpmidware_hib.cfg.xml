@@ -12,7 +12,6 @@
         <mapping class="org.generationcp.middleware.pojos.Germplasm"/>
         <mapping class="org.generationcp.middleware.pojos.Location"/>
         <mapping class="org.generationcp.middleware.pojos.LocationDetails"/>
-        <mapping class="org.generationcp.middleware.pojos.LocationFilters"/>
         <mapping class="org.generationcp.middleware.pojos.Locdes"/>
         <mapping class="org.generationcp.middleware.pojos.Method"/>
         <mapping class="org.generationcp.middleware.pojos.Name"/>

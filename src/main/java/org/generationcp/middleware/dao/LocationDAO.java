@@ -27,8 +27,8 @@ import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Georef;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
-import org.generationcp.middleware.pojos.LocationFilters;
 import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.service.api.location.LocationFiltersDto;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -944,41 +944,60 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
-	public List<LocationFilters> getLocalLocationsByFilter(final int start,final int numOfRows, final Map<String, String> filters) {
+	public List<LocationFiltersDto> getLocalLocationsByFilter(final int start, final int numOfRows, final Map<String, String> filters) {
+		final List<LocationFiltersDto> locationList = new ArrayList<LocationFiltersDto>();
+
 		try {
 
-			final StringBuilder queryString = new StringBuilder();
+			final StringBuilder sqlString = new StringBuilder();
 
-			queryString.append("SELECT l.locid as locationDbId, ud.fname as locationType,")
-					.append(" l.lname as name, labbr as abbreviation,")
-					.append(" c.isothree as countryCode, c.isoabbr as countryName,")
-					.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude")
-					.append(" FROM location l")
-					.append(" LEFT JOIN georef g on l.locid = g.locid")
-					.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid")
-					.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype");
+			sqlString.append("SELECT l.locid ,ud.fname ,l.lname ,l.labbr ") //
+					.append("  ,c.isothree ,c.isoabbr ,g.lat ,g.lon ,g.alt ") //
+					.append(" FROM location l ") //
+					.append(" LEFT JOIN georef g on l.locid = g.locid ") //
+					.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid ") //
+					.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype ");
 
-			if(filters!= null && filters.size() != 0){
-				if(filters.containsKey("locationType")){
-					final Integer ltype= new Integer(filters.get("locationType"));
-					queryString.append(" where l.ltype = ");
-					queryString.append(ltype);
+			if (filters != null && filters.size() != 0) {
+				if (filters.containsKey("locationType")) {
+					final Integer ltype = new Integer(filters.get("locationType"));
+					sqlString.append(" where l.ltype = ");
+					sqlString.append(ltype);
 				}
 			}
-			queryString.append(" ORDER BY l.locid ");
 
-			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			sqlString.append(" ORDER BY l.locid ");
+
+			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
-			query.addEntity(LocationFilters.class);
 
-			return query.list();
+			final List<Object[]> results = query.list();
+
+			if (!results.isEmpty()) {
+				for (final Object[] row : results) {
+					final Integer locationDbId = (Integer) row[0];
+					final String locationType = (String) row[1];
+					final String name = (String) row[2];
+					final String abbreviation = (String) row[3];
+					final String countryCode = (String) row[4];
+					final String countryName = (String) row[5];
+					final Double latitude = (Double) row[6];
+					final Double longitude = (Double) row[7];
+					final Double altitude = (Double) row[8];
+
+					locationList.add(new LocationFiltersDto(locationDbId, locationType, name, abbreviation, countryCode, countryName,
+							latitude, longitude, altitude));
+
+				}
+			}
+
+			return locationList;
 
 		} catch (final HibernateException e) {
 			LocationDAO.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(
-					this.getLogExceptionMessage("getFilteredLocations", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION),
-					e);
+					this.getLogExceptionMessage("getLocalLocationsByFilter", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 	}
 
