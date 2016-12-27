@@ -20,10 +20,11 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
-import org.generationcp.middleware.pojos.LocationFilters;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.service.api.location.AdditionalInfoDto;
+import org.generationcp.middleware.service.api.location.LocationFiltersDto;
 
 /**
  * This is the API for managing Location information.
@@ -644,8 +645,8 @@ public interface LocationDataManager {
 	 * @throws MiddlewareQueryException
 	 *             the middleware query exception
 	 */
-	List<LocationFilters> getLocalLocationsByFilter(final int start,final int numOfRows,final Map<String,String> filters) throws MiddlewareQueryException;
-
+	List<LocationFiltersDto> getLocalLocationsByFilter(final int start, final int numOfRows, final Map<String, String> filters)
+			throws MiddlewareQueryException;
 
 	/**
 	 * Gets the user defined field id of name.
@@ -659,4 +660,12 @@ public interface LocationDataManager {
 	 *             the middleware query exception
 	 */
 	Integer getUserDefinedFieldIdOfName(UDTableType tableType, String name) throws MiddlewareQueryException;
+
+	/**
+	 * Returns map with key locid with a Map whit additional info.
+	 *
+	 * @return Returns map with key locid with a Map whit additional info.
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	Map<Integer, AdditionalInfoDto> getListAdditinalInfoLocation() throws MiddlewareQueryException;
 }
