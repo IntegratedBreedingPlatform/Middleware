@@ -35,7 +35,7 @@ import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.location.AdditionalInfoDto;
-import org.generationcp.middleware.service.api.location.LocationFiltersDto;
+import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -581,7 +581,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<LocationFiltersDto> getLocalLocationsByFilter(final int start,final  int numOfRows,final Map<String,String> filters) throws MiddlewareQueryException {
+	public List<LocationDetailsDto> getLocalLocationsByFilter(final int start,final  int numOfRows,final Map<String,String> filters) throws MiddlewareQueryException {
 		return this.getLocationDao().getLocalLocationsByFilter(start, numOfRows, filters);
 
 	}

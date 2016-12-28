@@ -24,7 +24,7 @@ import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.location.AdditionalInfoDto;
-import org.generationcp.middleware.service.api.location.LocationFiltersDto;
+import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 
 /**
  * This is the API for managing Location information.
@@ -645,7 +645,7 @@ public interface LocationDataManager {
 	 * @throws MiddlewareQueryException
 	 *             the middleware query exception
 	 */
-	List<LocationFiltersDto> getLocalLocationsByFilter(final int start, final int numOfRows, final Map<String, String> filters)
+	List<LocationDetailsDto> getLocalLocationsByFilter(final int start, final int numOfRows, final Map<String, String> filters)
 			throws MiddlewareQueryException;
 
 	/**

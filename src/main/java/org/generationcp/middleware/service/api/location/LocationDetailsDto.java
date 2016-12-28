@@ -4,7 +4,7 @@ package org.generationcp.middleware.service.api.location;
 import java.io.Serializable;
 import java.util.Comparator;
 
-public class LocationFiltersDto implements Serializable, Comparable<LocationFiltersDto> {
+public class LocationDetailsDto implements Serializable, Comparable<LocationDetailsDto> {
 
 
 	/**
@@ -30,14 +30,14 @@ public class LocationFiltersDto implements Serializable, Comparable<LocationFilt
 
 	private Double altitude;
 
-	public LocationFiltersDto() {
+	public LocationDetailsDto() {
 	}
 
-	public LocationFiltersDto(Integer locationDbId) {
+	public LocationDetailsDto(Integer locationDbId) {
 		this.locationDbId = locationDbId;
 	}
 
-	public LocationFiltersDto(final Integer locationDbId, final String locationType, final String name, final String abbreviation,
+	public LocationDetailsDto(final Integer locationDbId, final String locationType, final String name, final String abbreviation,
 			final String countryCode, final String countryName, final Double latitude, final Double longitude, final Double altitude) {
 		super();
 		this.locationDbId = locationDbId;
@@ -130,8 +130,8 @@ public class LocationFiltersDto implements Serializable, Comparable<LocationFilt
 			return false;
 		}
 
-		if (obj instanceof LocationFiltersDto) {
-			LocationFiltersDto param = (LocationFiltersDto) obj;
+		if (obj instanceof LocationDetailsDto) {
+			LocationDetailsDto param = (LocationDetailsDto) obj;
 			if (this.getLocationDbId().equals(param.getLocationDbId())) {
 				return true;
 			}
@@ -165,17 +165,17 @@ public class LocationFiltersDto implements Serializable, Comparable<LocationFilt
 	}
 
 	@Override
-	public int compareTo(LocationFiltersDto compareLocation) {
+	public int compareTo(LocationDetailsDto compareLocation) {
 		String compareName = compareLocation.getName();
 
 		// ascending order
 		return this.name.compareTo(compareName);
 	}
 
-	public static Comparator<LocationFiltersDto> LocationNameComparator = new Comparator<LocationFiltersDto>() {
+	public static Comparator<LocationDetailsDto> LocationNameComparator = new Comparator<LocationDetailsDto>() {
 
 		@Override
-		public int compare(LocationFiltersDto location1, LocationFiltersDto location2) {
+		public int compare(LocationDetailsDto location1, LocationDetailsDto location2) {
 			String locationName1 = location1.getName().toUpperCase();
 			String locationName2 = location2.getName().toUpperCase();
 

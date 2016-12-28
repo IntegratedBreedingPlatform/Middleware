@@ -28,7 +28,7 @@ import org.generationcp.middleware.pojos.Georef;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Locdes;
-import org.generationcp.middleware.service.api.location.LocationFiltersDto;
+import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -919,33 +919,33 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 
-	public long countLocationsByFilter(final Map<String,String> filters) {
+	public long countLocationsByFilter(final Map<String, String> filters) {
 		final Criteria criteria = this.getSession().createCriteria(Location.class);
-		
-		if(filters!= null && filters.size() != 0){
-			if(filters.containsKey("locationType")){
-					
-				final Integer ltype= new Integer(filters.get("locationType"));
-				 criteria.add(Restrictions.eq(LocationDAO.LTYPE, ltype));
-			}else{
+
+		if (filters != null && filters.size() != 0) {
+			if (filters.containsKey("locationType")) {
+
+				final Integer ltype = new Integer(filters.get("locationType"));
+				criteria.add(Restrictions.eq(LocationDAO.LTYPE, ltype));
+			} else {
 				this.logAndThrowException(this.getLogExceptionMessage("countLocationsByFilter", "", null, "Unrecognized filter",
 						LocationDAO.CLASS_NAME_LOCATION), null);
 			}
 		}
-		
+
 		try {
-				
-				criteria.setProjection(Projections.rowCount());
-				return ((Long) criteria.uniqueResult()).longValue();
+
+			criteria.setProjection(Projections.rowCount());
+			return ((Long) criteria.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
+			LocationDAO.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(
-					this.getLogExceptionMessage("countLocationsByFilter", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION),
-					e);	
+					this.getLogExceptionMessage("countLocationsByFilter", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 	}
 
-	public List<LocationFiltersDto> getLocalLocationsByFilter(final int start, final int numOfRows, final Map<String, String> filters) {
-		final List<LocationFiltersDto> locationList = new ArrayList<LocationFiltersDto>();
+	public List<LocationDetailsDto> getLocalLocationsByFilter(final int start, final int numOfRows, final Map<String, String> filters) {
+		final List<LocationDetailsDto> locationList = new ArrayList<LocationDetailsDto>();
 
 		try {
 
@@ -986,7 +986,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					final Double longitude = (Double) row[7];
 					final Double altitude = (Double) row[8];
 
-					locationList.add(new LocationFiltersDto(locationDbId, locationType, name, abbreviation, countryCode, countryName,
+					locationList.add(new LocationDetailsDto(locationDbId, locationType, name, abbreviation, countryCode, countryName,
 							latitude, longitude, altitude));
 
 				}

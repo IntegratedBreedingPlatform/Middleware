@@ -7,7 +7,7 @@ import java.util.List;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.service.api.location.LocationFiltersDto;
+import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.hamcrest.MatcherAssert;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -118,7 +118,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	public void getLocalLocationsByFilter() {
 		HashMap<String, String> filters = new HashMap<String, String>();
 		filters.put("locationType", "405");
-		final List<LocationFiltersDto> locationList = LocationDAOTest.locationDAO.getLocalLocationsByFilter(1, 100, filters);
+		final List<LocationDetailsDto> locationList = LocationDAOTest.locationDAO.getLocalLocationsByFilter(1, 100, filters);
 		MatcherAssert.assertThat("Expected list of country location size > zero", locationList != null && locationList.size() > 0);
 
 	}
@@ -127,7 +127,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	public void getLocalLocationsByFilterNotRecoverData() {
 		HashMap<String, String> filters = new HashMap<String, String>();
 		filters.put("locationType", "0040500");
-		final List<LocationFiltersDto> locationList = LocationDAOTest.locationDAO.getLocalLocationsByFilter(1, 100, filters);
+		final List<LocationDetailsDto> locationList = LocationDAOTest.locationDAO.getLocalLocationsByFilter(1, 100, filters);
 		MatcherAssert.assertThat("Expected did not recover list of locations by locationType = 0040500", locationList.isEmpty());
 
 	}
