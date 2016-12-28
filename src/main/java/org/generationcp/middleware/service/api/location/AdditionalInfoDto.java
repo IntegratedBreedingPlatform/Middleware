@@ -16,15 +16,17 @@ public class AdditionalInfoDto implements Serializable {
 	 */
 	private static final long serialVersionUID = -4902812852565213456L;
 	
+	private Integer locationId;
+	
 	private HashMap<String, String> ladditionalInfo;
 
 	public AdditionalInfoDto(final String field, final String value) {
 		ladditionalInfo.put(field, value);
 	}
 
-	public AdditionalInfoDto() {
-		ladditionalInfo = new HashMap<String, String>();
-	}
+//	public AdditionalInfoDto() {
+//		ladditionalInfo = new HashMap<String, String>();
+//	}
 
 	public AdditionalInfoDto(Integer locationId) {
 		ladditionalInfo = new HashMap<String, String>();
@@ -44,11 +46,11 @@ public class AdditionalInfoDto implements Serializable {
 	}
 
 	public void setId(Integer locationId) {
-		addInfo("id", locationId.toString());
+		this.locationId = locationId;
 	}
 
 	public Integer getId() {
-		return ladditionalInfo.containsKey("id") ? new Integer(getInfoValue("id")) : null;
+		return this.locationId;
 	}
 
 	@Override
