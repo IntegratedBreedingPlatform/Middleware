@@ -20,9 +20,16 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 
+	private static final String CLASS_NAME_LOCDES = "Locdes";
+	
+	private static final Logger LOG = LoggerFactory.getLogger(LocdesDAO.class);
+
+	
 	@SuppressWarnings("unchecked")
 	public List<Locdes> getByLocation(Integer locId) throws MiddlewareQueryException {
 		try {
@@ -52,7 +59,8 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 		try {
 			final StringBuilder sqlString = new StringBuilder();
 
-			sqlString.append("SELECT ld.ldid,ld.locid,ld.dtype,ld.duid,ld.dval,ld.ddate,ld.dref ").append(" FROM locdes ld, udflds ud") //
+			sqlString.append("SELECT ld.ldid,ld.locid,ld.dtype,ld.duid,ld.dval,ld.ddate,ld.dref ") //
+					.append(" FROM locdes ld, udflds ud") //
 					.append(" WHERE ld.dtype = ud.fldno");
 
 			if (fcode != null) {
@@ -72,8 +80,9 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 
 			return query.list();
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getAllLocdesByFcode(fcode=" + fcode + ") query from Locdes: " + e.getMessage(), e);
+			LocdesDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					this.getLogExceptionMessage("getAllLocdesByFilters", "", null, e.getMessage(), LocdesDAO.CLASS_NAME_LOCDES), e);
 		}
-		return new ArrayList<Locdes>();
 	}
 }
