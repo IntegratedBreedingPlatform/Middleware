@@ -29,6 +29,7 @@ import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.service.api.location.AdditionalInfoDto;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
@@ -608,4 +609,17 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		}
 	}
 
+	@Test
+	public void testgetUserDefinedFieldIdOfName() throws MiddlewareQueryException {
+		Integer value = this.manager.getUserDefinedFieldIdOfName(org.generationcp.middleware.pojos.UDTableType.LOCATION_LTYPE, "Country");
+		Integer countryId = new Integer(405);
+		Assert.assertEquals("Expected recovered id of the Contry", countryId,value);
+	}
+	
+	@Test
+	public void testgetListAdditinalInfoLocation() throws MiddlewareQueryException {
+		Map<Integer, AdditionalInfoDto> mapAddtionalInfo = this.manager.getListAdditinalInfoLocation();
+		Assert.assertNotNull("Expected recovered a map with data or not", mapAddtionalInfo);
+	
+	}
 }
