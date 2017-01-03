@@ -1,6 +1,8 @@
 
 package org.generationcp.middleware.service.api.study;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+
 import java.util.List;
 
 public interface StudyService {
@@ -17,7 +19,7 @@ public interface StudyService {
 
 	String getProgramUUID(Integer studyIdentifier);
 
-	StudyDetailDto getStudyDetails(int studyIdentifier);
+	TrialObservationTable getTrialObservationTable(int studyIdentifier);
 
 	/**
 	 *
@@ -25,5 +27,12 @@ public interface StudyService {
 	 * @param instanceDbId id for a Trial instance of a Trial (Nursery has 1 instance). If present studyIdentifier will not be used
 	 * @return
 	 */
-	StudyDetailDto getStudyDetails(int studyIdentifier, Integer instanceDbId);
+	TrialObservationTable getTrialObservationTable(int studyIdentifier, Integer instanceDbId);
+
+	/**
+	 *
+	 * @param studyId
+	 * @return StudyDetailsDto
+	 */
+	StudyDetailsDto getStudyDetails(Integer studyId) throws MiddlewareQueryException;
 }

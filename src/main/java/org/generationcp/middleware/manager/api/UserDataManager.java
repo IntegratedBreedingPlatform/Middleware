@@ -171,4 +171,20 @@ public interface UserDataManager {
      */
     Person getPersonByEmail(String email) throws MiddlewareQueryException;
 
+	/**
+	 *
+	 * @param studyId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<User> getUsersAssociatedToStudy (final Integer studyId) throws MiddlewareQueryException;
+
+	/**
+	 *
+	 * @param instanceId
+	 * @return
+	 * @throws MiddlewareQueryException
+	 */
+	List<User> getUsersAssociatedToInstance (final Integer instanceId) throws MiddlewareQueryException;
+
 }

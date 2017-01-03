@@ -264,4 +264,14 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 		return this.getPersonDao().getPersonByEmail(email);
 	}
 
+	@Override
+	public List<User> getUsersAssociatedToStudy(final Integer studyId) throws MiddlewareQueryException {
+		return this.getUserDao().getUsersAssociatedToStudy(studyId);
+	}
+
+	@Override
+	public List<User> getUsersAssociatedToInstance(final Integer instanceId) throws MiddlewareQueryException {
+		return this.getUserDao().getUsersAssociatedToInstance(instanceId);
+	}
+
 }
