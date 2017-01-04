@@ -17,6 +17,7 @@ import java.util.List;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.Person;
@@ -294,9 +295,9 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		}
 	}
 
-	public List<User> getUsersAssociatedToStudy(final Integer studyId) throws MiddlewareQueryException {
+	public List<UserDto> getUsersAssociatedToStudy(final Integer studyId) throws MiddlewareQueryException {
 		Preconditions.checkNotNull(studyId);
-		List<User> users = new ArrayList<>();
+		List<UserDto> users = new ArrayList<>();
 		StringBuilder sql = new StringBuilder().append("SELECT DISTINCT ")
 				.append("    person.personid as personId, person.fname as fName, person.lname as lName, person.pemail as email, role.role as role ")
 				.append("FROM ").append("    cvterm scale ").append("        INNER JOIN ")
@@ -313,17 +314,13 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			List<Object> results = query.list();
 			for (Object obj : results) {
 				Object[] row = (Object[]) obj;
-				User user = new User();
-				Person person = new Person();
-				person.setId((Integer) row[0]);
-				person.setFirstName((String) row[1]);
-				person.setLastName((String) row[2]);
-				person.setEmail((String) row[3]);
-				user.setPerson(person);
-				if (row[4] != null && !((String) row[4]).equalsIgnoreCase("")) {
-					List<UserRole> roles = new ArrayList();
-					roles.add(new UserRole(user, (String) row[4]));
-					user.setRoles(roles);
+				UserDto user = new UserDto();
+				user.setUserId((Integer) row[0]);
+				user.setFirstName((String) row[1]);
+				user.setLastName((String) row[2]);
+				user.setEmail((String) row[3]);
+				if (row[4] instanceof String && !StringUtils.isBlank((String) row[4])) {
+					user.setRole((String) row[4]);
 				}
 				users.add(user);
 			}
@@ -335,9 +332,9 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		}
 	}
 
-	public List<User> getUsersAssociatedToInstance(final Integer instanceId) throws MiddlewareQueryException {
+	public List<UserDto> getUsersAssociatedToInstance(final Integer instanceId) throws MiddlewareQueryException {
 		Preconditions.checkNotNull(instanceId);
-		List<User> users = new ArrayList<>();
+		List<UserDto> users = new ArrayList<>();
 		StringBuilder sql = new StringBuilder().append("SELECT DISTINCT ")
 				.append("    person.personid as personId, person.fname as fName, person.lname as lName, person.pemail as email , role.role as role  ")
 				.append("FROM ").append("    cvterm scale ").append("        INNER JOIN ")
@@ -354,17 +351,13 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			List<Object> results = query.list();
 			for (Object obj : results) {
 				Object[] row = (Object[]) obj;
-				User user = new User();
-				Person person = new Person();
-				person.setId((Integer) row[0]);
-				person.setFirstName((String) row[1]);
-				person.setLastName((String) row[2]);
-				person.setEmail((String) row[3]);
-				user.setPerson(person);
-				if (row[4] != null && !((String) row[4]).equalsIgnoreCase("")) {
-					List<UserRole> roles = new ArrayList();
-					roles.add(new UserRole(user, (String) row[4]));
-					user.setRoles(roles);
+				UserDto user = new UserDto();
+				user.setUserId((Integer) row[0]);
+				user.setFirstName((String) row[1]);
+				user.setLastName((String) row[2]);
+				user.setEmail((String) row[3]);
+				if (row[4] instanceof String && !StringUtils.isBlank((String)row[4])) {
+					user.setRole((String) row[4]);
 				}
 				users.add(user);
 			}

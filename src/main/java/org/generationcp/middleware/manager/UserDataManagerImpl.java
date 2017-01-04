@@ -24,6 +24,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.HibernateException;
 import org.springframework.transaction.annotation.Transactional;
@@ -265,12 +266,12 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	}
 
 	@Override
-	public List<User> getUsersAssociatedToStudy(final Integer studyId) throws MiddlewareQueryException {
+	public List<UserDto> getUsersAssociatedToStudy(final Integer studyId) throws MiddlewareQueryException {
 		return this.getUserDao().getUsersAssociatedToStudy(studyId);
 	}
 
 	@Override
-	public List<User> getUsersAssociatedToInstance(final Integer instanceId) throws MiddlewareQueryException {
+	public List<UserDto> getUsersAssociatedToInstance(final Integer instanceId) throws MiddlewareQueryException {
 		return this.getUserDao().getUsersAssociatedToInstance(instanceId);
 	}
 

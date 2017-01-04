@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.FolderReference;
@@ -1162,7 +1163,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				studyMetadata.setNurseryOrTrialId((row[1] != null) ? (Integer) row[1] : null);
 				studyMetadata.setStudyName((String) row[2]);
 				studyMetadata.setStudyType((String) row[3]);
-				if (row[4] != null && !((String) row[4]).equalsIgnoreCase("")) {
+				if (row[4] instanceof String && !StringUtils.isBlank((String) row[4])) {
 					studyMetadata.addSeason(TermId.getById(Integer.parseInt((String) row[4])).toString());
 				}
 				studyMetadata.setTrialDbId((row[5] != null) ? Integer.parseInt((String) row[5]) : null);

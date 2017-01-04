@@ -354,11 +354,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public StudyDetailsDto getStudyDetails(final Integer studyId) throws MiddlewareQueryException {
 		try {
-			StudyMetadata studyMetadata = this.studyDataManager.getStudyMetadata(studyId);
+			final StudyMetadata studyMetadata = this.studyDataManager.getStudyMetadata(studyId);
 			if (studyMetadata != null) {
 				StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
 				studyDetailsDto.setMetadata(studyMetadata);
-				List<User> users = new ArrayList<>();
+				List<UserDto> users = new ArrayList<>();
 				Map<String, String> properties = new HashMap<>();
 				if (studyMetadata.getStudyType().equalsIgnoreCase(TRIAL_TYPE)) {
 					users.addAll(this.userDataManager.getUsersAssociatedToInstance(studyMetadata.getStudyDbId()));
@@ -369,18 +369,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					users.addAll(this.userDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
 					properties.putAll(studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
 				}
-				// TODO transform users to userDto -> move to mapper
-				List<UserDto> contacts = new ArrayList<>();
-				for (User user : users) {
-					UserDto contact = new UserDto();
-					contact.setUserId(user.getPerson().getId());
-					contact.setEmail(user.getPerson().getEmail());
-					contact.setFirstName(user.getPerson().getFirstName());
-					contact.setLastName(user.getPerson().getLastName());
-					contact.setRole((user.getRoles().size() > 0) ? user.getRoles().get(0).getRole() : "");
-					contacts.add(contact);
-				}
-				studyDetailsDto.setContacts(contacts);
+				studyDetailsDto.setContacts(users);
 				studyDetailsDto.setAdditionalInfo(properties);
 				return studyDetailsDto;
 			}
