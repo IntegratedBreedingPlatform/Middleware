@@ -15,15 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
 import org.generationcp.middleware.domain.search.filter.BrowseStudyQueryFilter;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.operation.searcher.Searcher;
 import org.generationcp.middleware.pojos.Country;
 
-// TODO BMS-148 : Review for how to safely remove the dual db read pattern without breaking any logic.
 public class StudyResultSetByNameStartDateSeasonCountry extends Searcher implements StudyResultSet {
 
 	private final String name;
@@ -31,17 +29,14 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	private final Season season;
 	private final String country;
 	private final int numOfRows;
+	private final StudySearchMatchingOption studySearchMatchingOption;
 
 	private final List<Integer> locationIds;
 
-	private final long countOfLocalStudiesByName;
-	private final long countOfLocalStudiesByStartDate;
-	private final long countOfLocalStudiesBySeason;
-	private final long countOfLocalStudiesByCountry;
-	private final long countOfCentralStudiesByName;
-	private final long countOfCentralStudiesByStartDate;
-	private final long countOfCentralStudiesBySeason;
-	private final long countOfCentralStudiesByCountry;
+	private final long countOfStudiesByName;
+	private final long countOfStudiesByStartDate;
+	private final long countOfStudiesBySeason;
+	private final long countOfStudiesByCountry;
 
 	private int currentRow;
 
@@ -49,33 +44,30 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	private int bufIndex;
 
 	public StudyResultSetByNameStartDateSeasonCountry(BrowseStudyQueryFilter filter, int numOfRows,
-			HibernateSessionProvider sessionProviderForLocal) throws MiddlewareQueryException {
+			HibernateSessionProvider sessionProvider) {
 
-		super(sessionProviderForLocal);
+		super(sessionProvider);
 
 		this.name = filter.getName();
 		this.startDate = filter.getStartDate();
 		this.season = filter.getSeason();
 		this.country = filter.getCountry();
+		this.studySearchMatchingOption = filter.getStudySearchMatchingOption();
 
 		this.numOfRows = numOfRows;
 
 		this.locationIds = this.getLocationIds(this.country);
 
-		this.countOfLocalStudiesByName = this.countStudiesByName(Database.LOCAL, this.name);
-		this.countOfLocalStudiesByStartDate = this.countStudiesByStartDate(Database.LOCAL, this.startDate);
-		this.countOfLocalStudiesBySeason = this.countStudiesBySeason(Database.LOCAL, this.season);
-		this.countOfLocalStudiesByCountry = this.countStudiesByCountry(Database.LOCAL);
-		this.countOfCentralStudiesByName = this.countStudiesByName(Database.CENTRAL, this.name);
-		this.countOfCentralStudiesByStartDate = this.countStudiesByStartDate(Database.CENTRAL, this.startDate);
-		this.countOfCentralStudiesBySeason = this.countStudiesBySeason(Database.CENTRAL, this.season);
-		this.countOfCentralStudiesByCountry = this.countStudiesByCountry(Database.CENTRAL);
+		this.countOfStudiesByName = this.countStudiesByName(this.name);
+		this.countOfStudiesByStartDate = this.countStudiesByStartDate(this.startDate);
+		this.countOfStudiesBySeason = this.countStudiesBySeason(this.season);
+		this.countOfStudiesByCountry = this.countStudiesByCountry();
 
 		this.currentRow = 0;
 		this.bufIndex = 0;
 	}
 
-	private List<Integer> getLocationIds(String countryName) throws MiddlewareQueryException {
+	private List<Integer> getLocationIds(String countryName) {
 		List<Integer> locationIds = new ArrayList<Integer>();
 		if (countryName != null) {
 			List<Country> countries = this.getCountryDao().getByIsoFull(countryName);
@@ -84,25 +76,25 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 		return locationIds;
 	}
 
-	private long countStudiesByName(Database database, String name) throws MiddlewareQueryException {
-		return this.getStudySearchDao().countStudiesByName(name);
+	private long countStudiesByName(String name) {
+		return this.getStudySearchDao().countStudiesByName(name, studySearchMatchingOption);
 	}
 
-	private long countStudiesByStartDate(Database database, Integer startDate) throws MiddlewareQueryException {
+	private long countStudiesByStartDate(Integer startDate) {
 		if (startDate != null) {
 			return this.getStudySearchDao().countStudiesByStartDate(startDate);
 		}
 		return 0;
 	}
 
-	private long countStudiesBySeason(Database database, Season season) throws MiddlewareQueryException {
+	private long countStudiesBySeason(Season season) {
 		if (season != null) {
 			return this.getStudySearchDao().countStudiesBySeason(season);
 		}
 		return 0;
 	}
 
-	private long countStudiesByCountry(Database database) throws MiddlewareQueryException {
+	private long countStudiesByCountry() {
 		if (this.locationIds != null && !this.locationIds.isEmpty()) {
 			return this.getStudySearchDao().countStudiesByLocationIds(this.locationIds);
 		}
@@ -115,7 +107,7 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	}
 
 	@Override
-	public StudyReference next() throws MiddlewareQueryException {
+	public StudyReference next() {
 		if (this.isEmptyBuffer()) {
 			this.fillBuffer();
 		}
@@ -127,78 +119,53 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 		return this.buffer == null || this.bufIndex >= this.buffer.size();
 	}
 
-	private void fillBuffer() throws MiddlewareQueryException {
-		if (this.currentRow < this.countOfLocalStudiesByName) {
-			this.fillBufferByName(Database.LOCAL, this.currentRow);
-		} else if (this.currentRow < this.countOfLocalStudiesByName + this.countOfCentralStudiesByName) {
-			int start = this.currentRow - (int) this.countOfLocalStudiesByName;
-			this.fillBufferByName(Database.CENTRAL, start);
-		} else if (this.currentRow < this.countOfLocalStudiesByName + this.countOfCentralStudiesByName
-				+ this.countOfLocalStudiesByStartDate) {
-			int start = this.currentRow - (int) this.countOfLocalStudiesByName - (int) this.countOfCentralStudiesByName;
-			this.fillBufferByStartDate(Database.LOCAL, start);
-		} else if (this.currentRow < this.countOfLocalStudiesByName + this.countOfCentralStudiesByName
-				+ this.countOfLocalStudiesByStartDate + this.countOfCentralStudiesByStartDate) {
+	private void fillBuffer() {
+		if (this.currentRow < this.countOfStudiesByName) {
+			this.fillBufferByName(this.currentRow);
+		} else if (this.currentRow < this.countOfStudiesByName) {
+			int start = this.currentRow - (int) this.countOfStudiesByName;
+			this.fillBufferByName(start);
+		} else if (this.currentRow < this.countOfStudiesByName
+				+ this.countOfStudiesByStartDate) {
+			int start = this.currentRow - (int) this.countOfStudiesByName;
+			this.fillBufferByStartDate(start);
+		} else if (this.currentRow < this.countOfStudiesByName
+				+ this.countOfStudiesByStartDate + this.countOfStudiesBySeason) {
 			int start =
-					this.currentRow - (int) this.countOfLocalStudiesByName - (int) this.countOfCentralStudiesByName
-							- (int) this.countOfLocalStudiesByStartDate;
-			this.fillBufferByStartDate(Database.CENTRAL, start);
-		} else if (this.currentRow < this.countOfLocalStudiesByName + this.countOfCentralStudiesByName
-				+ this.countOfLocalStudiesByStartDate + this.countOfCentralStudiesByStartDate + this.countOfLocalStudiesBySeason) {
-			int start =
-					this.currentRow - (int) this.countOfLocalStudiesByName - (int) this.countOfCentralStudiesByName
-							- (int) this.countOfLocalStudiesByStartDate - (int) this.countOfCentralStudiesByStartDate;
-			this.fillBufferBySeason(Database.LOCAL, start);
-		} else if (this.currentRow < this.countOfLocalStudiesByName + this.countOfCentralStudiesByName
-				+ this.countOfLocalStudiesByStartDate + this.countOfCentralStudiesByStartDate + this.countOfLocalStudiesBySeason
-				+ this.countOfCentralStudiesBySeason) {
-			int start =
-					this.currentRow - (int) this.countOfLocalStudiesByName - (int) this.countOfCentralStudiesByName
-							- (int) this.countOfLocalStudiesByStartDate - (int) this.countOfCentralStudiesByStartDate
-							- (int) this.countOfLocalStudiesBySeason;
-			this.fillBufferBySeason(Database.CENTRAL, start);
-		} else if (this.currentRow < this.countOfLocalStudiesByName + this.countOfCentralStudiesByName
-				+ this.countOfLocalStudiesByStartDate + this.countOfCentralStudiesByStartDate + this.countOfLocalStudiesBySeason
-				+ this.countOfCentralStudiesBySeason + this.countOfLocalStudiesByCountry) {
-			int start =
-					this.currentRow - (int) this.countOfLocalStudiesByName - (int) this.countOfCentralStudiesByName
-							- (int) this.countOfLocalStudiesByStartDate - (int) this.countOfCentralStudiesByStartDate
-							- (int) this.countOfLocalStudiesBySeason - (int) this.countOfCentralStudiesBySeason;
-			this.fillBufferByCountry(Database.LOCAL, start);
-		} else {
-			int start =
-					this.currentRow - (int) this.countOfLocalStudiesByName - (int) this.countOfCentralStudiesByName
-							- (int) this.countOfLocalStudiesByStartDate - (int) this.countOfCentralStudiesByStartDate
-							- (int) this.countOfLocalStudiesBySeason - (int) this.countOfCentralStudiesBySeason
-							- (int) this.countOfLocalStudiesByCountry;
-			this.fillBufferByCountry(Database.CENTRAL, start);
+					this.currentRow - (int) this.countOfStudiesByName
+							- (int) this.countOfStudiesByStartDate;
+			this.fillBufferBySeason(start);
+		} else if (this.currentRow < this.countOfStudiesByName
+				+ this.countOfStudiesByStartDate + this.countOfStudiesBySeason
+				+ this.countOfStudiesByCountry) {
+			int start = this.currentRow - (int) this.countOfStudiesByName - (int) this.countOfStudiesByStartDate - (int) this.countOfStudiesBySeason;
+			this.fillBufferByCountry(start);
 		}
 	}
 
-	private void fillBufferByName(Database database, int start) throws MiddlewareQueryException {
-		this.buffer = this.getStudySearchDao().getStudiesByName(this.name, start, this.numOfRows);
+	private void fillBufferByName(int start) {
+		this.buffer = this.getStudySearchDao().getStudiesByName(this.name, start, this.numOfRows, studySearchMatchingOption);
 		this.bufIndex = 0;
 	}
 
-	private void fillBufferByStartDate(Database database, int start) throws MiddlewareQueryException {
+	private void fillBufferByStartDate(int start) {
 		this.buffer = this.getStudySearchDao().getStudiesByStartDate(this.startDate, start, this.numOfRows);
 		this.bufIndex = 0;
 	}
 
-	private void fillBufferBySeason(Database database, int start) throws MiddlewareQueryException {
+	private void fillBufferBySeason(int start) {
 		this.buffer = this.getStudySearchDao().getStudiesBySeason(this.season, start, this.numOfRows);
 		this.bufIndex = 0;
 	}
 
-	private void fillBufferByCountry(Database database, int start) throws MiddlewareQueryException {
+	private void fillBufferByCountry(int start) {
 		this.buffer = this.getStudySearchDao().getStudiesByLocationIds(this.locationIds, start, this.numOfRows);
 		this.bufIndex = 0;
 	}
 
 	@Override
 	public long size() {
-		return this.countOfLocalStudiesByName + this.countOfLocalStudiesByStartDate + this.countOfLocalStudiesBySeason
-				+ this.countOfLocalStudiesByCountry + this.countOfCentralStudiesByName + this.countOfCentralStudiesByStartDate
-				+ this.countOfCentralStudiesBySeason + this.countOfCentralStudiesByCountry;
+		return this.countOfStudiesByName + this.countOfStudiesByStartDate + this.countOfStudiesBySeason
+				+ this.countOfStudiesByCountry;
 	}
 }

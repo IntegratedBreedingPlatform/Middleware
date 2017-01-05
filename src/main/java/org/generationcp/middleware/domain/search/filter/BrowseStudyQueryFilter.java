@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.domain.search.filter;
 
+import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
 import org.generationcp.middleware.manager.Season;
 
 public class BrowseStudyQueryFilter implements StudyQueryFilter {
@@ -22,6 +23,8 @@ public class BrowseStudyQueryFilter implements StudyQueryFilter {
 	private String country;
 
 	private Season season;
+
+	private StudySearchMatchingOption studySearchMatchingOption;
 
 	public Integer getStartDate() {
 		return this.startDate;
@@ -53,6 +56,14 @@ public class BrowseStudyQueryFilter implements StudyQueryFilter {
 
 	public void setSeason(Season season) {
 		this.season = season;
+	}
+
+	public StudySearchMatchingOption getStudySearchMatchingOption() {
+		return studySearchMatchingOption;
+	}
+
+	public void setStudySearchMatchingOption(final StudySearchMatchingOption studySearchMatchingOption) {
+		this.studySearchMatchingOption = studySearchMatchingOption;
 	}
 
 	@Override
