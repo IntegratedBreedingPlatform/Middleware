@@ -958,11 +958,18 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid ") //
 					.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype ");
 
+			//TODO Needs to be fixed Map<String, String> should be Map<Enum, String>
 			if (filters != null && filters.size() != 0) {
+				sqlString.append(" where ");
 				if (filters.containsKey("locationType")) {
 					final Integer ltype = new Integer(filters.get("locationType"));
-					sqlString.append(" where l.ltype = ");
+					sqlString.append(" l.ltype = ");
 					sqlString.append(ltype);
+				}
+				if (filters.containsKey("locId")) {
+					final Integer locId = new Integer(filters.get("locId"));
+					sqlString.append(" l.locid = ");
+					sqlString.append(locId);
 				}
 			}
 
