@@ -6,6 +6,11 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
+	<!-- runAlways flag allows to run the changeset everytime, because it needs 
+		to check if there is some new database created (plot_code_prefix = null), 
+		in these cases it needs to populate a new and unique plot_code_prefix for 
+		them. That is the reason why the runAlways flag is set = true. -->
+
 	<changeSet author="vanina" id="beta1-1" runAlways="true">
 		<preConditions onFail="MARK_RAN">
 			<not>
