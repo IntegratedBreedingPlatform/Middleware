@@ -30,6 +30,9 @@ public class LotAggregateData implements Serializable {
 	// key = record id and value = reserved quantity
 	private Map<Integer, Double> reservationMap;
 
+	// key = record id and value = committed quantity
+	private Map<Integer, Double> committedMap;
+
 	// key = record id and value = 0 or 1 status
 	private Map<Integer, Set<String>> reservationStatusMap;
 
@@ -118,6 +121,14 @@ public class LotAggregateData implements Serializable {
 
 	public void setLotStatus(String lotStatus) {
 		this.lotStatus = lotStatus;
+	}
+
+	public Map<Integer, Double> getCommittedMap() {
+		return committedMap;
+	}
+
+	public void setCommittedMap(Map<Integer, Double> committedMap) {
+		this.committedMap = committedMap;
 	}
 
 	@Override

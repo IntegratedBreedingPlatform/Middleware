@@ -13,12 +13,14 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.StockTransactionDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
+import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
@@ -26,6 +28,7 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
@@ -246,6 +249,11 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	@Override
 	public List<org.generationcp.middleware.pojos.ims.Transaction> getTransactionsByIdList(List<Integer> idList) throws MiddlewareQueryException {
 		return this.getTransactionDao().filterByColumnValues("id", idList);
+	}
+
+	@Override
+	public List<org.generationcp.middleware.pojos.ims.Lot> getLotsByIdList(List<Integer> idList) throws MiddlewareQueryException {
+		return this.getLotDao().filterByColumnValues("id", idList);
 	}
 
 	@Override
@@ -645,4 +653,30 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	public Lot getLotById(Integer id) throws MiddlewareQueryException {
 		return this.getLotDao().getById(id, false);
 	}
+
+	@Override
+	public List<TransactionReportRow> getTransactionDetailsForLot(Integer lotId) throws MiddlewareQueryException {
+		return this.getTransactionDao().getTransactionDetailsForLot(lotId);
+	}
+
+	@Override
+	public List<Germplasm> getAvailableBalanceForGermplasms(List<Germplasm> germplasms) throws MiddlewareQueryException {
+		List<Integer> gids = new ArrayList<>();
+
+		for(Germplasm germplasm : germplasms) {
+			gids.add(germplasm.getGid());
+			germplasm.setInventoryInfo(new GermplasmInventory(germplasm.getGid()));
+		}
+
+		Map<Integer, Object[]> availableBalanceCountAndTotalLotsCount = this.getLotDao().getAvailableBalanceCountAndTotalLotsCount(gids);
+
+		for(Germplasm germplasm : germplasms) {
+			Object[] availableBalanceValues = availableBalanceCountAndTotalLotsCount.get(germplasm.getGid());
+			this.getListInventoryBuilder().setAvailableBalanceAndScale(germplasm.getInventoryInfo(), availableBalanceValues);
+		}
+
+		this.getListInventoryBuilder().setAvailableBalanceScaleForGermplasm(germplasms);
+		return germplasms;
+	}
+
 }
