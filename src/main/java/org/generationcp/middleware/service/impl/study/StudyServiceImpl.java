@@ -364,10 +364,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 					users.addAll(this.userDataManager.getUsersAssociatedToInstance(studyMetadata.getStudyDbId()));
 					users.addAll(this.userDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
 					properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByStudy(studyId));
-					properties.putAll(studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
+					properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
 				} else {
 					users.addAll(this.userDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
-					properties.putAll(studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
+					properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
 				}
 				studyDetailsDto.setContacts(users);
 				studyDetailsDto.setAdditionalInfo(properties);
@@ -379,6 +379,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 			StudyServiceImpl.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public StudyServiceImpl setStudyDataManager(final StudyDataManager studyDataManager) {
+		this.studyDataManager = studyDataManager;
+		return this;
+	}
+
+	public StudyServiceImpl setUserDataManager(final UserDataManager userDataManager) {
+		this.userDataManager = userDataManager;
+		return this;
 	}
 }
 
