@@ -24,6 +24,10 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.ims.LotDAO;
+import org.generationcp.middleware.dao.ims.TransactionDAO;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
 import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
 import org.generationcp.middleware.data.initializer.ProgramFavoriteTestDataInitializer;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
@@ -42,6 +46,8 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
+import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
@@ -71,6 +77,10 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	private NameDAO nameDAO;
 
 	private GermplasmDAO germplasmDAO;
+
+	private LotDAO lotDAO;
+
+	private TransactionDAO transactionDAO;
 
 	private Project commonTestProject;
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -106,6 +116,17 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
 		}
+
+		if (this.lotDAO == null) {
+			this.lotDAO = new LotDAO();
+			this.lotDAO.setSession(this.sessionProvder.getSession());
+		}
+
+		if (this.transactionDAO == null) {
+			this.transactionDAO = new TransactionDAO();
+			this.transactionDAO.setSession(this.sessionProvder.getSession());
+		}
+
 
 		// Make sure a seed User(1) is present in the crop db otherwise add one
 		User user = this.userDataManager.getUserById(1);
@@ -824,6 +845,36 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final List<Germplasm> results = this.germplasmDataManager.searchForGermplasm(searchParameter);
 		Debug.println(IntegrationTestBase.INDENT, "searchForGermplasm(" + q + "): " + results.size() + " matches found.");
 	}
+
+	@Test
+	public void testSearchGermplasmWithInventory() throws MiddlewareQueryException {
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0 , 1 ,1 ,0, 1 ,1 , "MethodName",
+				"LocationName");
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+
+		Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments");
+		this.lotDAO.save(lot);
+
+		Transaction transaction = InventoryDetailsTestDataInitializer
+				.createReservationTransaction(2.0, 0, "2 reserved", lot, 1, 1, 1, "LIST");
+		this.transactionDAO.save(transaction);
+
+		final GermplasmSearchParameter searchParameter = new GermplasmSearchParameter(germplasm.getPreferredName().getNval(), Operation.LIKE);
+		searchParameter.setIncludeParents(false);
+		searchParameter.setWithInventoryOnly(true);
+		searchParameter.setIncludeMGMembers(false);
+		searchParameter.setStartingRow(0);
+		searchParameter.setNumberOfEntries(25);
+
+		final List<Germplasm> resultsWithInventoryOnly = this.germplasmDataManager.searchForGermplasm(searchParameter);
+
+		Assert.assertEquals(1, resultsWithInventoryOnly.size());
+		Assert.assertEquals(1, resultsWithInventoryOnly.get(0).getInventoryInfo().getActualInventoryLotCount().intValue());
+		Assert.assertEquals("2.0", resultsWithInventoryOnly.get(0).getInventoryInfo().getTotalAvailableBalance().toString());
+		Assert.assertEquals("g", resultsWithInventoryOnly.get(0).getInventoryInfo().getScaleForGermplsm());
+
+	}
+
 
 	@Test
 	public void getGermplasmDatesByGids() throws MiddlewareQueryException {
