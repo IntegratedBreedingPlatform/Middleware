@@ -18,6 +18,7 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -238,6 +239,15 @@ public interface InventoryDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	List<Transaction> getTransactionsByIdList(List<Integer> idList) throws MiddlewareQueryException;
+
+	/**
+	 * Returns the list of Lot object which represents the record identified by the given id.
+	 *
+	 * @param idList the id
+	 * @return the Lot of the given id
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<Lot> getLotsByIdList(List<Integer> idList) throws MiddlewareQueryException;
 
 
 	/**
@@ -602,5 +612,23 @@ public interface InventoryDataManager {
 
 	Lot getLotById(Integer id) throws MiddlewareQueryException;
 
+	/**
+	 * Returns a report on all Transaction records with lot status(Active or closed). Included information are:
+	 * userid, lotid, date of the transaction, transaction quantity,list name,person responsible for the transaction,
+	 * status of lot.
+	 * @param lotId - lotid
+	 * @return List of TransactionReportRow objects
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+    List<TransactionReportRow> getTransactionDetailsForLot(Integer lotId) throws MiddlewareQueryException;
+
+	/**
+	 * This method will retrieve available balance for germplasm along with its scale
+	 *
+	 * @param germplasms
+	 * @return List of Germplasm with inventoryInfo
+	 * @throws MiddlewareQueryException
+	 */
+	List<Germplasm> getAvailableBalanceForGermplasms(List<Germplasm> germplasms) throws MiddlewareQueryException;
 
 }
