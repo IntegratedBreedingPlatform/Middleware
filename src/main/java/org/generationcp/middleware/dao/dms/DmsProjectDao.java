@@ -114,6 +114,40 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "UNION SELECT pr.subject_project_id " + "FROM project_relationship pr, project p " + "WHERE pr.type_id = "
 			+ TermId.HAS_PARENT_FOLDER.getId() + " " + "AND pr.subject_project_id = p.project_id " + "AND p.program_uuid = :program_uuid ";
 
+	static final String GET_STUDY_METADATA_BY_ID = new StringBuilder().append("SELECT  ").append("    geoloc.nd_geolocation_id AS studyDbId, ")
+			.append("pmain.project_id as trialOrNurseryId, ").append("    CASE ppStudy.value ")
+			.append("        WHEN '10000' THEN pmain.name ")
+			.append("        WHEN '10010' THEN CONCAT(pmain.name, '-', geoloc.description) ").append("        ELSE '' ")
+			.append("    END AS studyName, ").append("    CASE ppStudy.value ").append("        WHEN '10000' THEN 'N' ")
+			.append("        WHEN '10010' THEN 'T' ").append("        ELSE '' ").append("    END AS studyType, ")
+			.append("    CASE ppStudy.value ").append("        WHEN ").append("            '10000' ").append("        THEN ")
+			.append("            MAX(IF(pProp.type_id = 8371, ").append("                pProp.value, ")
+			.append("                NULL)) ").append("        WHEN ").append("            '10010' ").append("        THEN ")
+			.append("            MAX(IF(geoprop.type_id = 8371, ").append("                geoprop.value, ")
+			.append("                NULL)) ").append("    END AS seasonId, ").append("    CASE ppStudy.value ")
+			.append("        WHEN '10000' THEN NULL ").append("        WHEN '10010' THEN pmain.project_id ").append("        ELSE '' ")
+			.append("    END AS trialDbId, ").append("    CASE ppStudy.value ").append("        WHEN '10000' THEN NULL ")
+			.append("        WHEN '10010' THEN pmain.name ").append("        ELSE '' ").append("    END AS trialName, ")
+			.append("    MAX(IF(pProp.type_id = 8050, ").append("        pProp.value, ").append("        NULL)) AS startDate, ")
+			.append("    MAX(IF(pProp.type_id = 8060, ").append("        pProp.value, ").append("        NULL)) AS endDate, ")
+			.append("    MAX(IF(pProp.type_id = 8006, ").append("        pProp.value, ").append("        NULL)) AS active,         ")
+			.append("    CASE ppStudy.value ").append("        WHEN ").append("            '10000' ").append("        THEN ")
+			.append("            MAX(IF(pProp.type_id = 8190, ").append("                pProp.value, ")
+			.append("                NULL)) ").append("        WHEN ").append("            '10010' ").append("        THEN ")
+			.append("            MAX(IF(geoprop.type_id = 8190, ").append("                geoprop.value, ")
+			.append("                NULL)) ").append("    END AS locationId ").append("FROM ").append("    nd_geolocation geoloc ")
+			.append("        INNER JOIN ").append("    nd_experiment nde ON nde.nd_geolocation_id = geoloc.nd_geolocation_id ")
+			.append("        INNER JOIN ").append("    nd_experiment_project ndep ON ndep.nd_experiment_id = nde.nd_experiment_id ")
+			.append("        INNER JOIN ").append("    project proj ON proj.project_id = ndep.project_id ")
+			.append("        INNER JOIN ").append("    project_relationship pr ON proj.project_id = pr.subject_project_id ")
+			.append("        INNER JOIN ").append("    project pmain ON pmain.project_id = pr.object_project_id ")
+			.append("        AND pr.type_id = 1150 ").append("        LEFT OUTER JOIN ")
+			.append("    nd_geolocationprop geoprop ON geoprop.nd_geolocation_id = geoloc.nd_geolocation_id ")
+			.append("        INNER JOIN ").append("    projectprop ppStudy ON pmain.project_id = ppStudy.project_id ")
+			.append("        AND ppStudy.type_id = 8070 ").append("        LEFT OUTER JOIN ")
+			.append("    projectprop pProp ON pmain.project_id = pProp.project_id ").append("WHERE ")
+			.append("    nde.type_id = 1020 and geoloc.nd_geolocation_id = :studyId ").append("GROUP BY geoloc.nd_geolocation_id ").toString();
+
 	public List<Reference> getRootFolders(String programUUID, List<StudyType> studyTypes) {
 		return getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID, studyTypes);
 	}
@@ -1116,62 +1150,37 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public StudyMetadata getStudyMetadata(Integer studyId) throws MiddlewareQueryException {
 		Preconditions.checkNotNull(studyId);
-		StringBuilder sql = new StringBuilder().append("SELECT  ").append("    geoloc.nd_geolocation_id AS studyDbId, ")
-				.append("pmain.project_id as trialOrNurseryId, ").append("    CASE ppStudy.value ")
-				.append("        WHEN '10000' THEN pmain.name ")
-				.append("        WHEN '10010' THEN CONCAT(pmain.name, '-', geoloc.description) ").append("        ELSE '' ")
-				.append("    END AS studyName, ").append("    CASE ppStudy.value ").append("        WHEN '10000' THEN 'N' ")
-				.append("        WHEN '10010' THEN 'T' ").append("        ELSE '' ").append("    END AS studyType, ")
-				.append("    CASE ppStudy.value ").append("        WHEN ").append("            '10000' ").append("        THEN ")
-				.append("            MAX(IF(pProp.type_id = 8371, ").append("                pProp.value, ")
-				.append("                NULL)) ").append("        WHEN ").append("            '10010' ").append("        THEN ")
-				.append("            MAX(IF(geoprop.type_id = 8371, ").append("                geoprop.value, ")
-				.append("                NULL)) ").append("    END AS seasonId, ").append("    CASE ppStudy.value ")
-				.append("        WHEN '10000' THEN NULL ").append("        WHEN '10010' THEN pmain.project_id ").append("        ELSE '' ")
-				.append("    END AS trialDbId, ").append("    CASE ppStudy.value ").append("        WHEN '10000' THEN NULL ")
-				.append("        WHEN '10010' THEN pmain.name ").append("        ELSE '' ").append("    END AS trialName, ")
-				.append("    MAX(IF(pProp.type_id = 8050, ").append("        pProp.value, ").append("        NULL)) AS startDate, ")
-				.append("    MAX(IF(pProp.type_id = 8060, ").append("        pProp.value, ").append("        NULL)) AS endDate, ")
-				.append("    MAX(IF(pProp.type_id = 8006, ").append("        pProp.value, ").append("        NULL)) AS active,         ")
-				.append("    CASE ppStudy.value ").append("        WHEN ").append("            '10000' ").append("        THEN ")
-				.append("            MAX(IF(pProp.type_id = 8190, ").append("                pProp.value, ")
-				.append("                NULL)) ").append("        WHEN ").append("            '10010' ").append("        THEN ")
-				.append("            MAX(IF(geoprop.type_id = 8190, ").append("                geoprop.value, ")
-				.append("                NULL)) ").append("    END AS locationId ").append("FROM ").append("    nd_geolocation geoloc ")
-				.append("        INNER JOIN ").append("    nd_experiment nde ON nde.nd_geolocation_id = geoloc.nd_geolocation_id ")
-				.append("        INNER JOIN ").append("    nd_experiment_project ndep ON ndep.nd_experiment_id = nde.nd_experiment_id ")
-				.append("        INNER JOIN ").append("    project proj ON proj.project_id = ndep.project_id ")
-				.append("        INNER JOIN ").append("    project_relationship pr ON proj.project_id = pr.subject_project_id ")
-				.append("        INNER JOIN ").append("    project pmain ON pmain.project_id = pr.object_project_id ")
-				.append("        AND pr.type_id = 1150 ").append("        LEFT OUTER JOIN ")
-				.append("    nd_geolocationprop geoprop ON geoprop.nd_geolocation_id = geoloc.nd_geolocation_id ")
-				.append("        INNER JOIN ").append("    projectprop ppStudy ON pmain.project_id = ppStudy.project_id ")
-				.append("        AND ppStudy.type_id = 8070 ").append("        LEFT OUTER JOIN ")
-				.append("    projectprop pProp ON pmain.project_id = pProp.project_id ").append("WHERE ")
-				.append("    nde.type_id = 1020 and geoloc.nd_geolocation_id = :studyId ").append("GROUP BY geoloc.nd_geolocation_id ");
-
 		try {
-			Query query = this.getSession().createSQLQuery(sql.toString()).addScalar("studyDbId").addScalar("trialOrNurseryId")
-					.addScalar("studyName").addScalar("studyType").addScalar("seasonId").addScalar("trialDbId").addScalar("trialName")
-					.addScalar("startDate").addScalar("endDate").addScalar("active").addScalar("locationID")
-					.setParameter("studyId", studyId);
+			SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_ID);
+			query.addScalar("studyDbId");
+			query.addScalar("trialOrNurseryId");
+			query.addScalar("studyName");
+			query.addScalar("studyType");
+			query.addScalar("seasonId");
+			query.addScalar("trialDbId");
+			query.addScalar("trialName");
+			query.addScalar("startDate");
+			query.addScalar("endDate");
+			query.addScalar("active");
+			query.addScalar("locationID");
+			query.setParameter("studyId", studyId);
 			Object result = query.uniqueResult();
 			if (result != null) {
 				Object[] row = (Object[]) result;
 				StudyMetadata studyMetadata = new StudyMetadata();
 				studyMetadata.setStudyDbId(studyId);
-				studyMetadata.setNurseryOrTrialId((row[1] != null) ? (Integer) row[1] : null);
-				studyMetadata.setStudyName((String) row[2]);
-				studyMetadata.setStudyType((String) row[3]);
+				studyMetadata.setNurseryOrTrialId((row[1] instanceof Integer) ? (Integer) row[1] : null);
+				studyMetadata.setStudyName((row[2] instanceof String) ? (String) row[2] : null);
+				studyMetadata.setStudyType((row[3] instanceof String) ? (String) row[3] : null);
 				if (row[4] instanceof String && !StringUtils.isBlank((String) row[4])) {
 					studyMetadata.addSeason(TermId.getById(Integer.parseInt((String) row[4])).toString());
 				}
-				studyMetadata.setTrialDbId((row[5] != null) ? Integer.parseInt((String) row[5]) : null);
-				studyMetadata.setTrialName((String) row[6]);
-				studyMetadata.setStartDate((String) row[7]);
-				studyMetadata.setEndDate((String) row[8]);
+				studyMetadata.setTrialDbId((row[5] instanceof String && StringUtils.isNumeric((String) row[5])) ? Integer.parseInt((String) row[5]) : null);
+				studyMetadata.setTrialName((row[6] instanceof String) ? (String) row[6] : null);
+				studyMetadata.setStartDate((row[7] instanceof String) ? (String) row[7] : null);
+				studyMetadata.setEndDate((row[8] instanceof String) ? (String) row[8] : null);
 				studyMetadata.setActive((row[9] != null) ? false : true);
-				studyMetadata.setLocationId((row[10] != null) ? Integer.parseInt((String) row[10]) : null);
+				studyMetadata.setLocationId((row[10] instanceof String) ? Integer.parseInt((String) row[10]) : null);
 				return studyMetadata;
 			} else {
 				return null;
