@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -29,6 +30,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -49,6 +51,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 	private static final String UNIQUE_ID = "uniqueID";
 	private static final String CLASS_NAME_LOCATION = "Location";
+	private static final String LOCATION = "location";
 	private static final String COUNTRY_ID = "cntryid";
 	private static final String COUNTRY = "country";
 	private static final String GET_BY_TYPE = "getByType";
@@ -919,24 +922,23 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 
-	public long countLocationsByFilter(final Map<String, String> filters) {
-		final Criteria criteria = this.getSession().createCriteria(Location.class);
-
-		if (filters != null && filters.size() != 0) {
-			if (filters.containsKey("locationType")) {
-
-				final Integer ltype = new Integer(filters.get("locationType"));
-				criteria.add(Restrictions.eq(LocationDAO.LTYPE, ltype));
-			} else {
-				this.logAndThrowException(this.getLogExceptionMessage("countLocationsByFilter", "", null, "Unrecognized filter",
-						LocationDAO.CLASS_NAME_LOCATION), null);
-			}
-		}
+	public long countLocationsByFilter(final Map<LocationFilters, String> filters) {
 
 		try {
+			final StringBuilder sqlString = new StringBuilder();
 
-			criteria.setProjection(Projections.rowCount());
-			return ((Long) criteria.uniqueResult()).longValue();
+			sqlString.append("SELECT l.locid ") //
+					.append(" FROM location l ") //
+					.append(" LEFT JOIN georef g on g.locid = l.locid ") //
+					.append(" LEFT JOIN cntry c on c.cntryid = l.cntryid ") //
+					.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype ");
+
+			if (!filters.isEmpty()) {
+				sqlString.append(createConditionWhereByFilter(filters));
+
+			}
+			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
+			return query.list().size();
 		} catch (final HibernateException e) {
 			LocationDAO.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(
@@ -944,7 +946,8 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
-	public List<LocationDetailsDto> getLocalLocationsByFilter(final int start, final int numOfRows, final Map<String, String> filters) {
+	public List<LocationDetailsDto> getLocationsByFilter(final int start, final int numOfRows,
+			final Map<LocationFilters, String> filters) {
 		final List<LocationDetailsDto> locationList = new ArrayList<LocationDetailsDto>();
 
 		try {
@@ -958,19 +961,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid ") //
 					.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype ");
 
-			//TODO Needs to be fixed Map<String, String> should be Map<Enum, String>
-			if (filters != null && filters.size() != 0) {
-				sqlString.append(" where ");
-				if (filters.containsKey("locationType")) {
-					final Integer ltype = new Integer(filters.get("locationType"));
-					sqlString.append(" l.ltype = ");
-					sqlString.append(ltype);
-				}
-				if (filters.containsKey("locId")) {
-					final Integer locId = new Integer(filters.get("locId"));
-					sqlString.append(" l.locid = ");
-					sqlString.append(locId);
-				}
+			if (!filters.isEmpty()) {
+				sqlString.append(createConditionWhereByFilter(filters));
+
 			}
 
 			sqlString.append(" ORDER BY l.locid ");
@@ -1008,4 +1001,49 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
+	private String createConditionWhereByFilter(final Map<LocationFilters, String> filters) {
+		final StringBuilder sqlString = new StringBuilder();
+		boolean firstStatement = true;
+		for (Map.Entry<LocationFilters, String> entry : filters.entrySet()) {
+			LocationFilters filter = entry.getKey();
+			String value = entry.getValue();
+
+			if (firstStatement) {
+				sqlString.append(" WHERE");
+				firstStatement = false;
+			} else {
+				sqlString.append(" AND");
+
+			}
+			if (filter.getDataType().equals("String")) {
+				sqlString.append(" " + filter.getStatement() + "= '").append((String) value).append("' ");
+			}
+			if (filter.getDataType().equals("String[]")) {
+				sqlString.append(" " + filter.getStatement() + "in ( ");
+				StringTokenizer st = new StringTokenizer(value,",");
+				boolean firtsValue = true;
+				while (st.hasMoreTokens()) {
+					String valueTK =st.nextToken();
+					if (firtsValue) {
+						sqlString.append("'" + valueTK + "'");
+						firtsValue = false;
+					} else {
+						sqlString.append(",'" + valueTK + "'");
+
+					}
+				}
+				sqlString.append(" )");
+			}
+			if (filter.getDataType().equals("Long")) {
+				Long longValue = Long.valueOf(value);
+				sqlString.append(" " + filter.getStatement() + "= ").append(longValue);
+
+			}
+			if (filter.getDataType().equals("Long[]")) {
+				sqlString.append(" " + filter.getStatement() + "in ( ").append(value).append(" )");
+			}
+		}
+		return sqlString.toString();
+
+	}
 }

@@ -6,7 +6,6 @@ import java.util.Comparator;
 
 public class LocationDetailsDto implements Serializable, Comparable<LocationDetailsDto> {
 
-
 	/**
 	 * 
 	 */
@@ -30,6 +29,8 @@ public class LocationDetailsDto implements Serializable, Comparable<LocationDeta
 
 	private Double altitude;
 
+	private AdditionalInfoDto additionalInfo;
+
 	public LocationDetailsDto() {
 	}
 
@@ -50,6 +51,14 @@ public class LocationDetailsDto implements Serializable, Comparable<LocationDeta
 		this.longitude = longitude;
 		this.altitude = altitude;
 
+	}
+
+	public AdditionalInfoDto getAdditionalInfo() {
+		return additionalInfo;
+	}
+
+	public void setMapAdditionalInfo(AdditionalInfoDto additionalInfoDto) {
+		this.additionalInfo = additionalInfoDto;
 	}
 
 	public Integer getLocationDbId() {
@@ -160,6 +169,8 @@ public class LocationDetailsDto implements Serializable, Comparable<LocationDeta
 		builder.append(this.longitude);
 		builder.append(", altitude=");
 		builder.append(this.altitude);
+		builder.append(", AdditionalInfoDto=");
+		builder.append(this.additionalInfo);
 		builder.append("]");
 		return builder.toString();
 	}

@@ -23,8 +23,8 @@ import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.service.api.location.AdditionalInfoDto;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.service.api.location.LocationFilters;
 
 /**
  * This is the API for managing Location information.
@@ -629,7 +629,7 @@ public interface LocationDataManager {
 	 * @throws MiddlewareQueryException
 	 *             the middleware query exception
 	 */
-	long countLocationsByFilter(final Map<String,String> filters) throws MiddlewareQueryException;
+	long countLocationsByFilter(final Map<LocationFilters,String> filters) throws MiddlewareQueryException;
 
 	/**
 	 * Returns all Local Locations depending on the filters.
@@ -645,7 +645,7 @@ public interface LocationDataManager {
 	 * @throws MiddlewareQueryException
 	 *             the middleware query exception
 	 */
-	List<LocationDetailsDto> getLocalLocationsByFilter(final int start, final int numOfRows, final Map<String, String> filters)
+	List<LocationDetailsDto> getLocalLocationsByFilter(final int start, final int numOfRows, final Map<LocationFilters, String> filters)
 			throws MiddlewareQueryException;
 
 	/**
@@ -667,5 +667,4 @@ public interface LocationDataManager {
 	 * @return Returns map with key locid with a Map whit additional info.
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	Map<Integer, AdditionalInfoDto> getListAdditinalInfoLocation() throws MiddlewareQueryException;
 }

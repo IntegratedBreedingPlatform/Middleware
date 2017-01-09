@@ -53,7 +53,7 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 		}
 		return new ArrayList<Locdes>();
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	public List<Locdes> getAllLocdesByFilters(final String fcode, final Integer locid, final String dval) throws MiddlewareQueryException {
 		try {
