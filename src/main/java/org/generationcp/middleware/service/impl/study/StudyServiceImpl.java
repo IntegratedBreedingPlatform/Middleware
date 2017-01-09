@@ -342,8 +342,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 
 		final TrialObservationTable
-				dto = new TrialObservationTable().setStudyDbId(studyIdentifier).setObservationVariableDbIds(observationVariableDbIds)
-				.setObservationVariableNames(observationVariableNames).setData(data);
+			dto = new TrialObservationTable().setStudyDbId(instanceDbId != null ? instanceDbId : studyIdentifier).setObservationVariableDbIds(observationVariableDbIds)
+			.setObservationVariableNames(observationVariableNames).setData(data);
 
 		dto.setHeaderRow(Lists.newArrayList("locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
 				"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y"));
