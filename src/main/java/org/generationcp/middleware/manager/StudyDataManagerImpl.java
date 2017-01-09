@@ -734,6 +734,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
+	public Integer getProjectIdByStudyDbId(final Integer studyDbId) throws MiddlewareQueryException {
+		return this.getDmsProjectDao().getProjectIdByStudyDbId(studyDbId);
+	}
+
+	@Override
 	public DmsProject getProject(final int id) throws MiddlewareQueryException {
 		return this.getDmsProjectDao().getById(id);
 	}

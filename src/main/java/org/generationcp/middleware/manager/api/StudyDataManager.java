@@ -513,6 +513,14 @@ public interface StudyDataManager {
 	DmsProject getParentFolder(int id) throws MiddlewareQueryException;
 
 	/**
+	 * Return the project id of a study
+	 * @param studyDbId the id of the study
+	 * @return the id of the project
+	 * @throws MiddlewareQueryException
+	 */
+	Integer getProjectIdByStudyDbId(final Integer studyDbId) throws MiddlewareQueryException;
+
+	/**
 	 * Returns the dms project. Accepts a project id.
 	 * 
 	 * @param id the id

@@ -148,6 +148,23 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append("    projectprop pProp ON pmain.project_id = pProp.project_id ").append("WHERE ")
 			.append("    nde.type_id = 1020 and geoloc.nd_geolocation_id = :studyId ").append("GROUP BY geoloc.nd_geolocation_id ").toString();
 
+	static final String GET_PROJECTID_BY_STUDYDBID = "SELECT DISTINCT"
+		+ "      p.project_id"
+		+ " FROM"
+		+ "     project_relationship pr"
+		+ "         INNER JOIN"
+		+ "     project p ON p.project_id = pr.subject_project_id"
+		+ "         INNER JOIN"
+		+ "     nd_experiment_project ep ON pr.subject_project_id = ep.project_id"
+		+ "         INNER JOIN"
+		+ "     nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id"
+		+ "         INNER JOIN"
+		+ "     nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id"
+		+ " WHERE"
+		+ "     gl.nd_geolocation_id = :studyDbId"
+		+ "     AND pr.type_id = " + TermId.IS_STUDY.getId();
+
+
 	public List<Reference> getRootFolders(String programUUID, List<StudyType> studyTypes) {
 		return getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID, studyTypes);
 	}
@@ -1057,6 +1074,17 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			this.logAndThrowException("Error with getDistinctProjectDescription() query from Project " + e.getMessage(), e);
 		}
 		return results;
+	}
+
+	public Integer getProjectIdByStudyDbId(int studyDbId) throws MiddlewareQueryException {
+		try {
+			Query query = this.getSession().createSQLQuery(GET_PROJECTID_BY_STUDYDBID);
+			query.setParameter("studyDbId", studyDbId);
+			return (Integer) query.uniqueResult();
+		} catch (HibernateException e) {
+			this.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
 	}
 
 	public Integer getProjectIdByNameAndProgramUUID(String name, String programUUID) throws MiddlewareQueryException {
