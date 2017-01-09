@@ -616,10 +616,10 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals("Expected recovered id of the Contry", countryId,value);
 	}
 	
-	@Test
-	public void testgetListAdditinalInfoLocation() throws MiddlewareQueryException {
-		Map<Integer, AdditionalInfoDto> mapAddtionalInfo = this.manager.getListAdditinalInfoLocation();
-		Assert.assertNotNull("Expected recovered a map with data or not", mapAddtionalInfo);
-	
-	}
+//	@Test
+//	public void testgetListAdditinalInfoLocation() throws MiddlewareQueryException {
+//		Map<Integer, AdditionalInfoDto> mapAddtionalInfo = this.manager.getListAdditinalInfoLocation();
+//		Assert.assertNotNull("Expected recovered a map with data or not", mapAddtionalInfo);
+//	
+//	}
 }
