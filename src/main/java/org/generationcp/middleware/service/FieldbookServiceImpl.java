@@ -1146,4 +1146,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		this.germplasmGroupingService = germplasmGroupingService;
 	}
 
+	public String getPlotCodePrefix(final String cropName) {
+		return this.getWorkbenchDataManager().getCropTypeByName(cropName).getPlotCodePrefix();
+	}
+
+
 }
