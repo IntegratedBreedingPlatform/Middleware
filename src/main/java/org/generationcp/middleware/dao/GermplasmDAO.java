@@ -1,12 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * <p>
  * Generation Challenge Programme (GCP)
- *
- *
+ * <p>
+ * <p>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
  *******************************************************************************/
 
 package org.generationcp.middleware.dao;
@@ -56,8 +55,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String GERMPLSM = "germplsm";
 	private static final String Q_NO_SPACES = "qNoSpaces";
 	private static final String Q_STANDARDIZED = "qStandardized";
-	private static final String AVAIL_INV = "availInv";
-	private static final String SEED_RES = "seedRes";
+	private static final String AVAIL_LOTS = "availableLots";
+	private static final String AVAIL_BALANCE = "availableBalance";
 	private static final String METHOD_NAME = "methodName";
 	private static final String LOCATION_NAME = "locationName";
 	// Prevent silly searches from resulting in GIANT IN clauses in search query (which reuses this function).
@@ -229,7 +228,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.setParameter("name", name);
 			return ((Long) query.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with countByMethodNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
+			this.logAndThrowException("Error with countByMethodNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(),
+					e);
 		}
 		return 0;
 	}
@@ -257,8 +257,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.setParameter("name", name);
 			return ((Long) query.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error with countByLocationNameUsingEqual(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
+			this.logAndThrowException("Error with countByLocationNameUsingEqual(name=" + name + ") query from Germplasm: " + e.getMessage(),
+					e);
 		}
 		return 0;
 	}
@@ -274,7 +274,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			return query.list();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByLocationNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(), e);
+			this.logAndThrowException("Error with getByLocationNameUsingLike(name=" + name + ") query from Germplasm: " + e.getMessage(),
+					e);
 		}
 		return new ArrayList<>();
 	}
@@ -368,8 +369,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				return progenitors;
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error with getProgenitorsByGIDWithPrefName(gid=" + gid + ") query from Germplasm: " + e.getMessage(), e);
+			this.logAndThrowException("Error with getProgenitorsByGIDWithPrefName(gid=" + gid + ") query from Germplasm: " + e.getMessage(),
+					e);
 		}
 		return new ArrayList<>();
 	}
@@ -600,8 +601,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			criteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged
 			criteria.add(Restrictions.neProperty("gid", "grplce")); // = Record is not deleted or replaced.
 
-			@SuppressWarnings("unchecked")
-			final List<Germplasm> groupMembers = criteria.getExecutableCriteria(this.getSession()).list();
+			@SuppressWarnings("unchecked") final List<Germplasm> groupMembers = criteria.getExecutableCriteria(this.getSession()).list();
 			// Prime the names collection before returning ;)
 			for (final Germplasm g : groupMembers) {
 				g.getNames().size();
@@ -625,7 +625,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	 * <li>See if any of the crosses 1x4, 1x5, 2x4, 2x5, 3x4 or 3x5 were made before.
 	 * <li>If so assign the new cross to the same group.
 	 * </ol>
-	 * 
+	 *
 	 * <p>
 	 * Graham also noted that this query is similar to the existing one to retrieve the management group of a germplasm in the germplasm
 	 * details pop-up.
@@ -669,8 +669,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			criteria.add(Restrictions.neProperty("gid", "grplce")); // = Record is not deleted or replaced.
 			criteria.addOrder(Order.asc("gid")); // Oldest created cross will be first in list.
 
-			@SuppressWarnings("unchecked")
-			final List<Germplasm> previousCrosses = criteria.getExecutableCriteria(this.getSession()).list();
+			@SuppressWarnings("unchecked") final List<Germplasm> previousCrosses = criteria.getExecutableCriteria(this.getSession()).list();
 			return previousCrosses;
 		} catch (final HibernateException e) {
 			final String message = "Error executing GermplasmDAO.getPreviousCrosses(female = {}, male = {}): {}";
@@ -730,8 +729,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return query.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByLocationId(name=" + name + ", locationID=" + locationID + ") query from Germplasm: "
-					+ e.getMessage(), e);
+			this.logAndThrowException(
+					"Error with getByLocationId(name=" + name + ", locationID=" + locationID + ") query from Germplasm: " + e.getMessage(),
+					e);
 		}
 		return new ArrayList<>();
 	}
@@ -778,8 +778,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return query.list();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByGIDRange(startGID=" + startGID + ", endGID=" + endGID + ") query from Germplasm: "
-					+ e.getMessage(), e);
+			this.logAndThrowException(
+					"Error with getByGIDRange(startGID=" + startGID + ", endGID=" + endGID + ") query from Germplasm: " + e.getMessage(),
+					e);
 		}
 		return new ArrayList<>();
 	}
@@ -810,7 +811,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	/**
 	 * Search for germplasms given a search term
-	 * 
+	 *
 	 * @param searchedString - the search term to be used
 	 * @param o - like or equal
 	 * @param includeParents boolean flag to denote whether parents will be included in search results
@@ -847,15 +848,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 
 			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT g.*, "
-					+ "GROUP_CONCAT(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') AS stockIDs, "
-					+ "CAST(SUM(CASE WHEN gt.trnqty = 0 OR isnull(gt.trnqty) THEN 0 ELSE 1 END) AS UNSIGNED) AS availInv, "
-					+ "COUNT(DISTINCT gl.lotid) AS seedRes, m.mname AS methodName, l.lname AS locationName FROM germplsm g "
-					+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 "
-					+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid AND gt.trnstat <> 9  "
-					+ "LEFT JOIN methods m ON m.mid = g.methn "
-					+ "LEFT JOIN location l ON l.locid = g.glocn "
-					+ "WHERE g.gid IN (:gids) GROUP BY g.gid") ;
+			queryString
+					.append("SELECT g.*, " + "GROUP_CONCAT(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') AS stockIDs, "
+							+ "COUNT(DISTINCT gt.lotid) AS availableLots, SUM(gt.trnqty) AS availableBalance," + "m.mname AS methodName, l.lname AS locationName FROM germplsm g "
+							+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 "
+							+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid AND gt.trnstat <> 9  "
+							+ "LEFT JOIN methods m ON m.mid = g.methn " + "LEFT JOIN location l ON l.locid = g.glocn "
+							+ "WHERE g.gid IN (:gids) GROUP BY g.gid");
 
 			queryString.append(this.addSortingColumns(germplasmSearchParameter.getSortState()));
 
@@ -863,8 +862,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.setParameterList("gids", gidSearchResult);
 			query.addEntity(GermplasmDAO.GERMPLSM, Germplasm.class);
 			query.addScalar(GermplasmDAO.STOCK_IDS);
-			query.addScalar(GermplasmDAO.AVAIL_INV);
-			query.addScalar(GermplasmDAO.SEED_RES);
+			query.addScalar(GermplasmDAO.AVAIL_LOTS);
+			query.addScalar(GermplasmDAO.AVAIL_BALANCE);
 			query.addScalar(GermplasmDAO.METHOD_NAME);
 			query.addScalar(GermplasmDAO.LOCATION_NAME);
 			query.setFirstResult(startingRow);
@@ -915,7 +914,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final GermplasmInventory inventoryInfo = new GermplasmInventory(germplasm.getGid());
 		inventoryInfo.setStockIDs((String) row[1]);
 		inventoryInfo.setActualInventoryLotCount(row[2] != null ? ((BigInteger) row[2]).intValue() : 0);
-		inventoryInfo.setReservedLotCount(row[3] != null ? ((BigInteger) row[3]).intValue() : 0);
+		inventoryInfo.setTotalAvailableBalance(row[3] != null ? (Double) row[3] : 0d);
 		germplasm.setInventoryInfo(inventoryInfo);
 		germplasm.setMethodName(row[4] != null ? (String) row[4] : "");
 		germplasm.setLocationName(row[5] != null ? (String) row[5] : "");
@@ -926,8 +925,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final Map<Integer, Integer> resultMap = new HashMap<Integer, Integer>();
 		final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_GERMPLASM_DATES_BY_GIDS);
 		query.setParameterList("gids", gids);
-		@SuppressWarnings("rawtypes")
-		final List results = query.list();
+		@SuppressWarnings("rawtypes") final List results = query.list();
 		for (final Object result : results) {
 			final Object[] resultArray = (Object[]) result;
 			final Integer gid = (Integer) resultArray[0];
@@ -941,8 +939,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final Map<Integer, Integer> resultMap = new HashMap<Integer, Integer>();
 		final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_METHOD_IDS_BY_GIDS);
 		query.setParameterList("gids", gids);
-		@SuppressWarnings("rawtypes")
-		final List results = query.list();
+		@SuppressWarnings("rawtypes") final List results = query.list();
 		for (final Object result : results) {
 			final Object[] resultArray = (Object[]) result;
 			final Integer gid = (Integer) resultArray[0];
@@ -957,7 +954,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	 * germplasm identifier (gid) and the value is a list with all the names ({@link Name}) for such germplasm. This method optimizes data
 	 * returned, because in a study is common that many entries have common parents, so those duplicated parents are omitted in returned
 	 * Map.
-	 * 
+	 *
 	 * @param studyId The ID of the study from which we need to get parents information. Usually this is the ID of a crossing block.
 	 * @return
 	 */
@@ -966,8 +963,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final SQLQuery queryNames = this.getSession().createSQLQuery(Germplasm.GET_PARENT_NAMES_BY_STUDY_ID);
 		queryNames.setParameter("projId", studyId);
 
-		@SuppressWarnings("rawtypes")
-		final List resultNames = queryNames.list();
+		@SuppressWarnings("rawtypes") final List resultNames = queryNames.list();
 
 		Name name;
 		final Map<Integer, Map<GermplasmNameType, Name>> names = new HashMap<>();
@@ -1010,8 +1006,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final List<Germplasm> germplasms = new ArrayList<>();
 		Germplasm g;
 
-		@SuppressWarnings("rawtypes")
-		final List resultGermplasms = queryGermplasms.list();
+		@SuppressWarnings("rawtypes") final List resultGermplasms = queryGermplasms.list();
 		for (final Object result : resultGermplasms) {
 			final Object resultArray[] = (Object[]) result;
 			g = new Germplasm(Integer.valueOf(resultArray[0].toString()));
@@ -1092,7 +1087,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		queryString.append(" UNION ");
 	}
 
-	private void searchInNamesCriteria(final StringBuilder queryString, final Map<String, String> params, final String q, final Operation o) {
+	private void searchInNamesCriteria(final StringBuilder queryString, final Map<String, String> params, final String q,
+			final Operation o) {
 
 		queryString.append("SELECT n.gid as GID FROM names n ");
 		queryString.append("INNER JOIN germplsm g on n.gid = g.gid ");

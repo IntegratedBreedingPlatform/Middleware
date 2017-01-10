@@ -37,6 +37,13 @@ public class TransactionReportRow implements Serializable {
 	private String commentOfLot;
 	private Integer entityIdOfLot;
 	private Person person;
+	private Integer lotId;
+	private String listName;
+	private String user;
+	private Integer userId;
+	private Integer listId;
+	private Integer trnStatus;
+	private String lotStatus;
 
 	public TransactionReportRow() {
 
@@ -96,6 +103,58 @@ public class TransactionReportRow implements Serializable {
 
 	public void setPerson(Person person) {
 		this.person = person;
+	}
+
+	public Integer getLotId() {
+		return lotId;
+	}
+
+	public void setLotId(Integer lotId) {
+		this.lotId = lotId;
+	}
+
+	public String getListName() {
+		return listName;
+	}
+
+	public void setListName(String listName) {
+		this.listName = listName;
+	}
+
+	public String getUser() {
+		return user;
+	}
+
+	public void setUser(String user) {
+		this.user = user;
+	}
+
+	public Integer getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Integer userId) {
+		this.userId = userId;
+	}
+
+	public Integer getListId() {
+		return listId;
+	}
+
+	public void setListId(Integer listId) {
+		this.listId = listId;
+	}
+
+	public void setTrnStatus(Integer trnStatus) {
+		this.trnStatus = trnStatus;
+	}
+
+	public String getLotStatus() {
+		return lotStatus;
+	}
+
+	public void setLotStatus(String lotStatus) {
+		this.lotStatus = lotStatus;
 	}
 
 	@Override

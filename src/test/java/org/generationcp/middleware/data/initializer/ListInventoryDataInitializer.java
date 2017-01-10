@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.ims.LotStatus;
 
 public class ListInventoryDataInitializer {
 
@@ -25,6 +26,18 @@ public class ListInventoryDataInitializer {
 
 		return inventoryDetails;
 	}
+
+	public static List<GermplasmListData> createGermplasmListDataWithInventoryDetails(int noOfListDataEntries) {
+		List<GermplasmListData> inventoryDetails = new ArrayList<GermplasmListData>();
+
+		for (int i = 0; i < noOfListDataEntries; i++) {
+			int id = i + 1;
+			inventoryDetails.add(createGermplasmListData(id));
+		}
+
+		return inventoryDetails;
+	}
+
 
 	public static GermplasmListData createGermplasmListData(int id) {
 
@@ -71,6 +84,15 @@ public class ListInventoryDataInitializer {
 		return lotDetails;
 	}
 
+	public static List<ListEntryLotDetails> createLotDetails(int listDataId, int noOfLots) {
+		List<ListEntryLotDetails> lotDetails = new ArrayList<ListEntryLotDetails>();
+		for (int i = 0; i < noOfLots; i++) {
+			lotDetails.add(createLotDetail(i, listDataId));
+		}
+		return lotDetails;
+	}
+
+
 	public static List<ListEntryLotDetails> createLotDetailsWithEmptyLocationAndScale(int listDataId) {
 		List<ListEntryLotDetails> lotDetails = new ArrayList<ListEntryLotDetails>();
 		for (int i = 0; i < NO_OF_LOTS_PER_LISTDATA; i++) {
@@ -97,6 +119,9 @@ public class ListInventoryDataInitializer {
 		lotDetail.setWithdrawalBalance(12.0);
 		lotDetail.setWithdrawalStatus("1");
 		lotDetail.setTransactionStatus(false);
+		lotDetail.setLotStatus(LotStatus.ACTIVE.name());
+		lotDetail.setReservedTotal(200D);
+		lotDetail.setCommittedTotalForEntry(50D);
 		return lotDetail;
 	}
 
