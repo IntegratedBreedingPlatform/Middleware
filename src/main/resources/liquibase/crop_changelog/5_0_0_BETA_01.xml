@@ -47,5 +47,23 @@
 		</sql>
 
 	</changeSet>
+	
+	<changeSet author="mderamos" id="v5-beta01-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm where cvterm_id='1705' and name='CROSS-FEMALE GID'</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			UPDATE cvterm SET name='FEMALE PEDIGREE', definition='Pedigree of female parent' where cvterm_id='1705'
+	    </sql>
+	</changeSet>
+	
+	<changeSet author="mderamos" id="v5-beta01-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm where cvterm_id='1707' and name='CROSS-MALE GID'</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			UPDATE cvterm SET name='MALE PEDIGREE', definition='Pedigree of male parent' where cvterm_id='1707'
+	    </sql>
+	</changeSet>
 
 </databaseChangeLog>
