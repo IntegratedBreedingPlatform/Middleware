@@ -3,29 +3,25 @@ package org.generationcp.middleware.service.api.location;
 
 public enum LocationFilters {
 
-	LOCATION_TYPE(" l.ltype ","Long"),
-	LOCATIONS_TYPE(" l.ltype ","Long[]"),
-	LOCATIONS_ID  (" l.locid ", "Long"),
-	LOCATIONS_IDS  (" l.locid ", "Long[]"),
-	LOCATION_NAME(" l.lname ","String"),
-	LOCATIONS_NAME(" l.lname ","String[]");
+	LOCATION_TYPE (" l.ltype ","LTYPE"),
+	LOCATION_ID  (" l.locid ","LOCID"),
+	LOCATION_NAME (" l.lname ","LNAME");
 	
 	private final String statement;
-	private final String dataType;
-	
+	private final String parameter;
+
 	
 	public String getStatement() {
 		return statement;
 	}
-
 	
-	public String getDataType() {
-		return dataType;
+	public String getParameter() {
+		return parameter;
 	}
-
-	LocationFilters(final String statement, final String dataType){
+	
+	LocationFilters(final String statement,final String parameter){
 		this.statement=statement;
-		this.dataType=dataType;
+		this.parameter=parameter;
 	}
 	
 }
