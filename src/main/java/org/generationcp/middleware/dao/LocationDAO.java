@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -922,7 +921,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 
-	public long countLocationsByFilter(final Map<LocationFilters, String> filters) {
+	public long countLocationsByFilter(final Map<LocationFilters, Object> filters) {
 
 		try {
 			final StringBuilder sqlString = new StringBuilder();
@@ -938,6 +937,17 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 			}
 			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
+			
+			for (Map.Entry<LocationFilters, Object> entry : filters.entrySet()) {
+				LocationFilters filter = entry.getKey();
+				Object value = entry.getValue();
+				if (value.getClass().isArray()) {
+					query.setParameterList(filter.getParameter(), (Object[])value);
+				}else{
+					query.setParameter(filter.getParameter(), value);
+				}
+			}
+			
 			return query.list().size();
 		} catch (final HibernateException e) {
 			LocationDAO.LOG.error(e.getMessage(), e);
@@ -947,7 +957,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 	public List<LocationDetailsDto> getLocationsByFilter(final int start, final int numOfRows,
-			final Map<LocationFilters, String> filters) {
+			final Map<LocationFilters, Object> filters) {
 		final List<LocationDetailsDto> locationList = new ArrayList<LocationDetailsDto>();
 
 		try {
@@ -972,6 +982,16 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 
+			for (Map.Entry<LocationFilters, Object> entry : filters.entrySet()) {
+				LocationFilters filter = entry.getKey();
+				Object value = entry.getValue();
+				if (value.getClass().isArray()) {
+					query.setParameterList(filter.getParameter(), (Object[])value);
+				}else{
+					query.setParameter(filter.getParameter(), value);
+				}
+			}
+			
 			final List<Object[]> results = query.list();
 
 			if (!results.isEmpty()) {
@@ -1001,46 +1021,21 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
-	private String createConditionWhereByFilter(final Map<LocationFilters, String> filters) {
+	private String createConditionWhereByFilter(final Map<LocationFilters, Object> filters) {
 		final StringBuilder sqlString = new StringBuilder();
-		boolean firstStatement = true;
-		for (Map.Entry<LocationFilters, String> entry : filters.entrySet()) {
+		sqlString.append(" WHERE 1 = 1");
+
+		for (Map.Entry<LocationFilters, Object> entry : filters.entrySet()) {
 			LocationFilters filter = entry.getKey();
-			String value = entry.getValue();
+			Object value = entry.getValue();
 
-			if (firstStatement) {
-				sqlString.append(" WHERE");
-				firstStatement = false;
+			sqlString.append(" AND ");
+
+			if (value.getClass().isArray()) {
+				sqlString.append(filter.getStatement()).append("in (:").append(filter.getParameter()).append(") ");
+
 			} else {
-				sqlString.append(" AND");
-
-			}
-			if (filter.getDataType().equals("String")) {
-				sqlString.append(" " + filter.getStatement() + "= '").append((String) value).append("' ");
-			}
-			if (filter.getDataType().equals("String[]")) {
-				sqlString.append(" " + filter.getStatement() + "in ( ");
-				StringTokenizer st = new StringTokenizer(value,",");
-				boolean firtsValue = true;
-				while (st.hasMoreTokens()) {
-					String valueTK =st.nextToken();
-					if (firtsValue) {
-						sqlString.append("'" + valueTK + "'");
-						firtsValue = false;
-					} else {
-						sqlString.append(",'" + valueTK + "'");
-
-					}
-				}
-				sqlString.append(" )");
-			}
-			if (filter.getDataType().equals("Long")) {
-				Long longValue = Long.valueOf(value);
-				sqlString.append(" " + filter.getStatement() + "= ").append(longValue);
-
-			}
-			if (filter.getDataType().equals("Long[]")) {
-				sqlString.append(" " + filter.getStatement() + "in ( ").append(value).append(" )");
+				sqlString.append(filter.getStatement()).append("= :").append(filter.getParameter()).append(" ");
 			}
 		}
 		return sqlString.toString();

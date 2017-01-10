@@ -576,19 +576,21 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public long countLocationsByFilter(final Map<LocationFilters,String> filters) throws MiddlewareQueryException {
+	public long countLocationsByFilter(final Map<LocationFilters,Object> filters) throws MiddlewareQueryException {
 		return this.getLocationDao().countLocationsByFilter(filters);
 
 	}
 
 	@Override
-	public List<LocationDetailsDto> getLocalLocationsByFilter(final int start,final  int numOfRows,final Map<LocationFilters,String> filters) throws MiddlewareQueryException {
-		List<LocationDetailsDto> locationDetailsDto = this.getLocationDao().getLocationsByFilter(start, numOfRows, filters);
-		
-		for (LocationDetailsDto locationDto: locationDetailsDto){
-			locationDto.setMapAdditionalInfo(getAdditinalInfoLocation(locationDto.getLocationDbId()));
+	public List<LocationDetailsDto> getLocationsByFilter(final int start,final  int numOfRows,final Map<LocationFilters,Object> filters) throws MiddlewareQueryException {
+		List<LocationDetailsDto> locationsDetailsDto = this.getLocationDao().getLocationsByFilter(start, numOfRows, filters);
+		List<String> locations= new ArrayList<String>();
+		for (LocationDetailsDto locationDto: locationsDetailsDto){
+			locations.add(locationDto.getLocationDbId().toString());
+			
 		}
-		return locationDetailsDto;
+		getAdditinalInfoLocation(locationsDetailsDto,locations);
+		return locationsDetailsDto;
 	}
 	
 	@Override
@@ -605,24 +607,35 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		return types.get(name.toUpperCase()) != null ? types.get(name.toUpperCase()).getFldno() : null;
 	}
 
-	private AdditionalInfoDto getAdditinalInfoLocation(final Integer locid) throws MiddlewareQueryException {
-		AdditionalInfoDto additionalInfoDto = getAdditionalInfoFieldMap(locid);
-		return additionalInfoDto;
+	private void getAdditinalInfoLocation(final List<LocationDetailsDto> locationsDetailsDto, final List<String> locations)
+			throws MiddlewareQueryException {
+		Map<Integer, AdditionalInfoDto> mapAdditionalInfoDto = getAdditionalInfoFieldMap(locations);
+		
+		if (!mapAdditionalInfoDto.isEmpty()) {
+			for (LocationDetailsDto locationDto : locationsDetailsDto) {
+
+				if (mapAdditionalInfoDto.containsKey(locationDto.getLocationDbId())) {
+					locationDto.setMapAdditionalInfo(mapAdditionalInfoDto.get(locationDto.getLocationDbId()));
+				}
+			}
+		}
 	}
 
-	private AdditionalInfoDto getAdditionalInfoFieldMap(final Integer locid) {
-		AdditionalInfoDto additionalInfoDto = new AdditionalInfoDto(locid);
+	private Map<Integer, AdditionalInfoDto> getAdditionalInfoFieldMap(final List<String> listLocation) {
+		Map<Integer, AdditionalInfoDto> mapAdditionalInfoDto = new HashMap<Integer, AdditionalInfoDto>();
 		final LocdesDAO locdesDao = this.getLocdesDao();
-		final List<Locdes> listFieldParent = locdesDao.getAllLocdesByFilters(LocdesType.FIELD_PARENT.getCode(), null, locid.toString());
+		String[] locations = new String[listLocation.size()];
+		locations =listLocation.toArray(locations);
+		final List<Locdes> listFieldParent = locdesDao.getAllLocdesByFilters(LocdesType.FIELD_PARENT.getCode(), locations);
 		final Map<String, UserDefinedField> dTypes = this.getUserDefinedFieldMapOfCodeByUDTableType(UDTableType.LOCDES_DTYPE);
 
 		if (listFieldParent.isEmpty()) {
-			return new AdditionalInfoDto(locid);
+			return new HashMap<Integer, AdditionalInfoDto>();
 		}
 
 		for (Locdes fieldParent : listFieldParent) {
 			final Integer locationId = new Integer(fieldParent.getDval());
-			additionalInfoDto = new AdditionalInfoDto(locationId);
+			AdditionalInfoDto additionalInfoDto = new AdditionalInfoDto(locationId);
 
 			additionalInfoDto.addInfo(LocdesType.FIELD_PARENT.getCode(), getLocationName(fieldParent.getLocationId()));
 
@@ -659,9 +672,10 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 					}
 
 				}
+				mapAdditionalInfoDto.put(locationId, additionalInfoDto);
 			}
 		}
-		return additionalInfoDto;
+		return mapAdditionalInfoDto;
 	}
 
 	private String getLocationName(Integer locationId){

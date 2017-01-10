@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Locdes;
 import org.hibernate.Criteria;
@@ -52,6 +53,36 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 			this.logAndThrowException("Error with getByValue(value=" + dval + ") query from Locdes: " + e.getMessage(), e);
 		}
 		return new ArrayList<Locdes>();
+	}
+
+	
+	@SuppressWarnings("unchecked")
+	public List<Locdes> getAllLocdesByFilters(final String fcode,final String[] dval) throws MiddlewareQueryException {
+		try {
+			final StringBuilder sqlString = new StringBuilder();
+
+			sqlString.append("SELECT ld.ldid,ld.locid,ld.dtype,ld.duid,ld.dval,ld.ddate,ld.dref ") //
+					.append(" FROM locdes ld, udflds ud") //
+					.append(" WHERE ld.dtype = ud.fldno");
+
+			if (fcode != null) {
+				sqlString.append(" and ud.fcode= '").append(fcode).append("' ");
+			}
+
+			if (dval != null) {
+		        sqlString.append(" and ld.dval in ('").append(StringUtils.join(dval, "','")).append("')");
+			}
+
+			
+			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
+			query.addEntity(Locdes.class);
+
+			return query.list();
+		} catch (HibernateException e) {
+			LocdesDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					this.getLogExceptionMessage("getAllLocdesByFilters", "", null, e.getMessage(), LocdesDAO.CLASS_NAME_LOCDES), e);
+		}
 	}
 	
 	@SuppressWarnings("unchecked")

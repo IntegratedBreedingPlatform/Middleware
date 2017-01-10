@@ -629,7 +629,7 @@ public interface LocationDataManager {
 	 * @throws MiddlewareQueryException
 	 *             the middleware query exception
 	 */
-	long countLocationsByFilter(final Map<LocationFilters,String> filters) throws MiddlewareQueryException;
+	long countLocationsByFilter(final Map<LocationFilters,Object> filters) throws MiddlewareQueryException;
 
 	/**
 	 * Returns all Local Locations depending on the filters.
@@ -645,7 +645,7 @@ public interface LocationDataManager {
 	 * @throws MiddlewareQueryException
 	 *             the middleware query exception
 	 */
-	List<LocationDetailsDto> getLocalLocationsByFilter(final int start, final int numOfRows, final Map<LocationFilters, String> filters)
+	List<LocationDetailsDto> getLocationsByFilter(final int start, final int numOfRows, final Map<LocationFilters, Object> filters)
 			throws MiddlewareQueryException;
 
 	/**
