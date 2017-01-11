@@ -632,7 +632,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testcountLocationsByFilterNotRecoveredLocation() throws MiddlewareQueryException {
 		Map<LocationFilters, Object> filters = new HashMap<>();
-		filters.put(LocationFilters.LOCATION_TYPE, 405L);
+		filters.put(LocationFilters.LOCATION_TYPE, 101010101010010405L);
 		long countLocation = this.manager.countLocationsByFilter(filters);
 		MatcherAssert.assertThat("Expected country location size equals to zero", countLocation == 0);
 	}
