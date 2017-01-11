@@ -26,11 +26,16 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
+import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.pojos.LocdesType;
+import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.service.api.location.AdditionalInfoDto;
+import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.utils.test.Debug;
+import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -616,10 +621,92 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals("Expected recovered id of the Contry", countryId,value);
 	}
 	
-//	@Test
-//	public void testgetListAdditinalInfoLocation() throws MiddlewareQueryException {
-//		Map<Integer, AdditionalInfoDto> mapAddtionalInfo = this.manager.getListAdditinalInfoLocation();
-//		Assert.assertNotNull("Expected recovered a map with data or not", mapAddtionalInfo);
-//	
-//	}
+	@Test
+	public void testcountLocationsByFilter() throws MiddlewareQueryException {
+		Map<LocationFilters, Object> filters = new HashMap<>();
+		filters.put(LocationFilters.LOCATION_TYPE, 405L);
+		long countLocation = this.manager.countLocationsByFilter(filters);
+		MatcherAssert.assertThat("Expected country location size > zero", countLocation > 0);
+	}
+	
+	@Test
+	public void testcountLocationsByFilterNotRecoveredLocation() throws MiddlewareQueryException {
+		Map<LocationFilters, Object> filters = new HashMap<>();
+		filters.put(LocationFilters.LOCATION_TYPE, 405L);
+		long countLocation = this.manager.countLocationsByFilter(filters);
+		MatcherAssert.assertThat("Expected country location size equals to zero", countLocation == 0);
+	}
+	
+	@Test
+	public void testgetLocationsByFilter() throws MiddlewareQueryException {
+		Map<LocationFilters, Object> filters = new HashMap<>();
+		filters.put(LocationFilters.LOCATION_TYPE, 405L);
+		final List<LocationDetailsDto> locationList = this.manager.getLocationsByFilter(1, 100, filters);
+		MatcherAssert.assertThat("Expected list of location size > zero", locationList.size() > 0);
+	}
+	
+	@Test
+	public void testgetLocationsByFilterNotRecoveredLocation() throws MiddlewareQueryException {
+		Map<LocationFilters, Object> filters = new HashMap<>();
+		filters.put(LocationFilters.LOCATION_TYPE, 0000010000405L);
+		final List<LocationDetailsDto> locationList = this.manager.getLocationsByFilter(1, 100, filters);
+		MatcherAssert.assertThat("Expected list of location size equals to zero", locationList.size() == 0);
+	}
+	
+	
+	@Test
+	public void testgetLocationsByFilterWithAdditionalInfo() throws MiddlewareQueryException {
+		Map<LocationFilters, Object> filters = new HashMap<>();
+		filters.put(LocationFilters.LOCATION_TYPE, 405L); //Filter by COUNTRY
+		List<LocationDetailsDto> locationList = this.manager.getLocationsByFilter(1, 100, filters);
+		LocationDetailsDto locationOrg= null;
+		if(locationList.size()!=0){
+			locationOrg =locationList.get(0);
+			createFieldMap(locationOrg.getLocationDbId());		
+		}
+		filters = new HashMap<>();
+		filters.put(LocationFilters.LOCATION_NAME, locationOrg.getName());
+		locationList = this.manager.getLocationsByFilter(0, 100, filters);
+		MatcherAssert.assertThat("Expected location id", locationList.get(0).getLocationDbId().equals(locationOrg.getLocationDbId()));
+		MatcherAssert.assertThat("Expected name", locationList.get(0).getName().equals(locationOrg.getName()));
+
+		MatcherAssert.assertThat("Expected FIELD_PARENT", locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.FIELD_PARENT.getCode()).equals("FLD_PARENT"));
+		MatcherAssert.assertThat("Expected BLOCK_PARENT", locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.BLOCK_PARENT.getCode()).equals("BLK_PARENT"));
+		
+		MatcherAssert.assertThat("Expected ROWS_IN_BLOCK", locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.ROWS_IN_BLOCK.getCode()).equals("10"));
+		MatcherAssert.assertThat("Expected ROWS_IN_PLOT", locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.ROWS_IN_PLOT.getCode()).equals("20"));
+		MatcherAssert.assertThat("Expected RANGES_IN_BLOCK", locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.RANGES_IN_BLOCK.getCode()).equals("30"));
+		MatcherAssert.assertThat("Expected PLANTING_ORDER", locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.PLANTING_ORDER.getCode()).equals("40"));
+		MatcherAssert.assertThat("Expected MACHINE_ROW_CAPACITY", locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.MACHINE_ROW_CAPACITY.getCode()).equals("50"));
+		MatcherAssert.assertThat("Expected DELETED_PLOTS", locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.DELETED_PLOTS.getCode()).equals("100"));
+
+		
+
+	}
+	
+	private int addLocation(final Integer ldid, final String locationName, final Integer parentId, final Integer currentUserId,
+			final String locCode, final String parentCode) {
+
+		final Integer lType = this.manager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, locCode);
+		final Location location = new Location(null, lType, 0, locationName, "-", 0, 0, 0, 0, 0);
+		final Integer dType = this.manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, parentCode);
+		final Locdes locdes = new Locdes(ldid, null, dType, currentUserId, String.valueOf(parentId), 0, 0);
+
+		return this.manager.addLocationAndLocdes(location, locdes);
+	}
+	
+	private void createFieldMap(final Integer locationId) {
+		int fieldParentId = addLocation(null, "FLD_PARENT", locationId, 1, LocationType.FIELD.getCode(), LocdesType.FIELD_PARENT.getCode());
+		int blockParentId =
+				addLocation(null, "BLK_PARENT", fieldParentId, 1, LocationType.BLOCK.getCode(), LocdesType.BLOCK_PARENT.getCode());
+		List<Locdes> locdesList = new ArrayList<>();
+		locdesList.add(new Locdes(null, blockParentId, 306, 1, "10", 20160720, 0)); // ROWS_IN_BLOCK
+		locdesList.add(new Locdes(null, blockParentId, 308, 1, "20", 20160720, 0)); // ROWS_IN_PLOT
+		locdesList.add(new Locdes(null, blockParentId, 307, 1, "30", 20160720, 0)); // RANGES_IN_BLOCK
+		locdesList.add(new Locdes(null, blockParentId, 309, 1, "40", 20160720, 0)); // PLANTING_ORDER
+		locdesList.add(new Locdes(null, blockParentId, 310, 1, "50", 20160720, 0)); // MACHINE_ROW_CAPACITY
+		locdesList.add(new Locdes(null, blockParentId, 311, 1, "100", 20160720, 0)); // DELETED_PLOT
+
+		this.manager.saveOrUpdateLocdesList(blockParentId, locdesList);
+	}
 }
