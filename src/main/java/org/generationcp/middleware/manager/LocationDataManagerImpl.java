@@ -582,14 +582,18 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<LocationDetailsDto> getLocationsByFilter(final int start,final  int numOfRows,final Map<LocationFilters,Object> filters) throws MiddlewareQueryException {
-		List<LocationDetailsDto> locationsDetailsDto = this.getLocationDao().getLocationsByFilter(start, numOfRows, filters);
-		List<String> locations= new ArrayList<String>();
-		for (LocationDetailsDto locationDto: locationsDetailsDto){
-			locations.add(locationDto.getLocationDbId().toString());
-			
+	public List<LocationDetailsDto> getLocationsByFilter(final int start, final int numOfRows, final Map<LocationFilters, Object> filters)
+			throws MiddlewareQueryException {
+		final List<LocationDetailsDto> locationsDetailsDto = this.getLocationDao().getLocationsByFilter(start, numOfRows, filters);
+		final List<String> locations = new ArrayList<String>();
+
+		if (locationsDetailsDto.size() != 0) {
+			for (LocationDetailsDto locationDto : locationsDetailsDto) {
+				locations.add(locationDto.getLocationDbId().toString());
+
+			}
+			getAdditinalInfoLocation(locationsDetailsDto, locations);
 		}
-		getAdditinalInfoLocation(locationsDetailsDto,locations);
 		return locationsDetailsDto;
 	}
 	
@@ -609,7 +613,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	private void getAdditinalInfoLocation(final List<LocationDetailsDto> locationsDetailsDto, final List<String> locations)
 			throws MiddlewareQueryException {
-		Map<Integer, AdditionalInfoDto> mapAdditionalInfoDto = getAdditionalInfoFieldMap(locations);
+		final Map<Integer, AdditionalInfoDto> mapAdditionalInfoDto = getAdditionalInfoFieldMap(locations);
 		
 		if (!mapAdditionalInfoDto.isEmpty()) {
 			for (LocationDetailsDto locationDto : locationsDetailsDto) {
@@ -622,12 +626,11 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	private Map<Integer, AdditionalInfoDto> getAdditionalInfoFieldMap(final List<String> listLocation) {
-		Map<Integer, AdditionalInfoDto> mapAdditionalInfoDto = new HashMap<Integer, AdditionalInfoDto>();
-		final LocdesDAO locdesDao = this.getLocdesDao();
 		String[] locations = new String[listLocation.size()];
 		locations =listLocation.toArray(locations);
-		final List<Locdes> listFieldParent = locdesDao.getAllLocdesByFilters(LocdesType.FIELD_PARENT.getCode(), locations);
+		final List<Locdes> listFieldParent = this.getLocdesDao().getAllLocdesByFilters(LocdesType.FIELD_PARENT.getCode(), locations);
 		final Map<String, UserDefinedField> dTypes = this.getUserDefinedFieldMapOfCodeByUDTableType(UDTableType.LOCDES_DTYPE);
+		final Map<Integer, AdditionalInfoDto> mapAdditionalInfoDto = new HashMap<Integer, AdditionalInfoDto>();
 
 		if (listFieldParent.isEmpty()) {
 			return new HashMap<Integer, AdditionalInfoDto>();
@@ -640,10 +643,14 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			additionalInfoDto.addInfo(LocdesType.FIELD_PARENT.getCode(), getLocationName(fieldParent.getLocationId()));
 
 			final List<Locdes> listblockParent =
-					locdesDao.getAllLocdesByFilters(LocdesType.BLOCK_PARENT.getCode(), null, fieldParent.getLocationId().toString());
+					this.getLocdesDao().getAllLocdesByFilters(LocdesType.BLOCK_PARENT.getCode(), null, fieldParent.getLocationId().toString());
 
 			int countBlockParent = listblockParent.size() == 1 ? 0 : 1;
 			String concatNumeric = "";
+			
+			if(listblockParent.isEmpty()){
+				mapAdditionalInfoDto.put(locationId, additionalInfoDto);
+			}
 			for (final Locdes lBlockParent : listblockParent) {
 
 				if (countBlockParent > 0) {
