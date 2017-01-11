@@ -6,6 +6,48 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
+	<changeSet author="abhishekptl" id="v5-beta01-1">
+
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE cvterm_id = 1713;</sqlCheck>
+		</preConditions>
+
+		<comment>Updating cvterm WITHDRAWAL for column header name change</comment>
+
+		<sql dbms="mysql" splitStatements="true">
+			update cvterm set name='TOTAL WITHDRAWALS' where cvterm_id = 1713;
+		</sql>
+
+	</changeSet>
+
+	<changeSet author="abhishekptl" id="v5-beta01-2">
+
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id = 1738;</sqlCheck>
+		</preConditions>
+
+		<comment>New cvterm RESERVATION for column header</comment>
+
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm VALUES (1738, 1000, 'RESERVATION', 'Total of single permitted open reservation', null, 0, 0);
+		</sql>
+
+	</changeSet>
+
+	<changeSet author="abhishekptl" id="v5-beta01-3">
+
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE cvterm_id = 1739;</sqlCheck>
+		</preConditions>
+
+		<comment>New cvterm LOT STATUS for column header</comment>
+
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm VALUES (1739, 1000, 'LOT STATUS', 'Lot status active (open) or closed', null, 0, 0);
+		</sql>
+
+	</changeSet>
+
 	<changeSet author="clarysabel" id="beta17-1">
 		<preConditions onFail="MARK_RAN">
 			<and>

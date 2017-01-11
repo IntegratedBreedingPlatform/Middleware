@@ -61,6 +61,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	private GermplasmListDAO germplasmListDAO;
 
+	private MethodDAO methodDAO;
+
 	@Autowired
 	private InventoryDataManager inventoryDM;
 
@@ -84,6 +86,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 			this.germplasmListDAO = new GermplasmListDAO();
 			this.germplasmListDAO.setSession(this.sessionProvder.getSession());
+
+			this.methodDAO = new MethodDAO();
+			this.methodDAO.setSession(this.sessionProvder.getSession());
 
 		}
 
@@ -124,8 +129,11 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 				"LocationName");
 		this.germplasmDataDM.addGermplasm(parentGermplsm, parentGermplsm.getPreferredName());
 
+		List<org.generationcp.middleware.pojos.Method> maintenanceMethods  = this.methodDAO.getByType("MAN", 1, 1);
+
 		final Germplasm maintenanceChildrenGermplsm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, parentGermplsm.getGid(),
-				-1, 0, 0, 1	, 80 ,0, 1 ,1 , "MethodName", "LocationName");
+				-1, 0, 0, 1	, maintenanceMethods.get(0).getMid() ,0, 1 ,1 , "MethodName", "LocationName");
+
 		this.germplasmDataDM.addGermplasm(maintenanceChildrenGermplsm, maintenanceChildrenGermplsm.getPreferredName());
 
 		final List<Germplasm> results = this.dao.getChildren(parentGermplsm.getGid(), 'M');
@@ -199,11 +207,17 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testSearchForGermplasmsStartsWithGermplasmName() throws Exception {
+
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 12, 13, 1, 0, 0 , 1 ,1 ,0, 1 ,1 , "MethodName",
+				"LocationName");
+		germplasm.getPreferredName().setNval("GermplasmName");
+		this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
+
 		final List<Germplasm> results =
-				this.dao.searchForGermplasms(this.createSearchParam(this.preferredName.getNval() + "%", Operation.LIKE, false, false, false));
+				this.dao.searchForGermplasms(this.createSearchParam(germplasm.getPreferredName().getNval() + "%", Operation.LIKE, false, false, false));
 		Assert.assertEquals("The results should contain one germplasm since there's only one test data with name that starts with "
-				+ this.preferredName.getNval(), 1, results.size());
-		this.assertPossibleGermplasmFields(results);
+				+ germplasm.getPreferredName().getNval(), 1, results.size());
+		Assert.assertTrue(germplasm.getPreferredName().getNval().contains("GermplasmName"));
 	}
 
 	@Test
@@ -246,6 +260,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		Assert.assertEquals(1, resultsWithInventoryOnly.size());
 		Assert.assertEquals(1, resultsWithInventoryOnly.get(0).getInventoryInfo().getActualInventoryLotCount().intValue());
+		Assert.assertEquals("2.0", resultsWithInventoryOnly.get(0).getInventoryInfo().getTotalAvailableBalance().toString());
 
 	}
 
