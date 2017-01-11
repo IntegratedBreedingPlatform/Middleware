@@ -48,7 +48,7 @@
 
 	</changeSet>
 
-	<changeSet author="clarysabel" id="beta17-1">
+	<changeSet author="clarysabel" id="bv5-beta01-4">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<columnExists tableName="listdata_project" columnName="duplicate_notes"/>
@@ -65,7 +65,7 @@
 		<modifyDataType tableName="listdata_project" columnName="duplicate_notes" newDataType="varchar(600)"/>
 	</changeSet>
 
-	<changeSet author="clarysabel" id="beta17-2">
+	<changeSet author="clarysabel" id="v5-beta01-5">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<columnExists tableName="ims_transaction" columnName="bulk_with"/>
