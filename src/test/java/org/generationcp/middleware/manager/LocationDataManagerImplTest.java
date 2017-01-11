@@ -36,6 +36,7 @@ import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.generationcp.middleware.utils.test.Debug;
 import org.hamcrest.MatcherAssert;
+import org.hamcrest.core.Is;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -667,43 +668,43 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		filters = new HashMap<>();
 		filters.put(LocationFilters.LOCATION_NAME, locationOrg.getName());
 		locationList = this.manager.getLocationsByFilter(0, 100, filters);
-		MatcherAssert.assertThat("Expected location id", locationList.get(0).getLocationDbId().equals(locationOrg.getLocationDbId()));
-		MatcherAssert.assertThat("Expected name", locationList.get(0).getName().equals(locationOrg.getName()));
-
-		MatcherAssert.assertThat("Expected FIELD_PARENT",
+		MatcherAssert.assertThat("Expected location id=" + locationOrg.getLocationDbId(),
+				locationList.get(0).getLocationDbId().equals(locationOrg.getLocationDbId()));
+		MatcherAssert.assertThat("Expected name=" + locationOrg.getName(), locationList.get(0).getName().equals(locationOrg.getName()));
+		MatcherAssert.assertThat("Expected FIELD_PARENT should have a value =FLD_PARENT",
 				locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.FIELD_PARENT.getCode()).equals("FLD_PARENT"));
-		MatcherAssert.assertThat("Expected BLOCK_PARENT",
+		MatcherAssert.assertThat("Expected BLOCK_PARENT should have a value =BLK_PARENT",
 				locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.BLOCK_PARENT.getCode()).equals("BLK_PARENT"));
-		MatcherAssert.assertThat("Expected ROWS_IN_BLOCK",
+		MatcherAssert.assertThat("Expected ROWS_IN_BLOCK should have a value =10",
 				locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.ROWS_IN_BLOCK.getCode()).equals("10"));
-		MatcherAssert.assertThat("Expected ROWS_IN_PLOT",
+		MatcherAssert.assertThat("Expected ROWS_IN_PLOT should have a value =20",
 				locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.ROWS_IN_PLOT.getCode()).equals("20"));
-		MatcherAssert.assertThat("Expected RANGES_IN_BLOCK",
+		MatcherAssert.assertThat("Expected RANGES_IN_BLOCK should have a value =30",
 				locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.RANGES_IN_BLOCK.getCode()).equals("30"));
-		MatcherAssert.assertThat("Expected PLANTING_ORDER",
+		MatcherAssert.assertThat("Expected PLANTING_ORDER should have a value =40",
 				locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.PLANTING_ORDER.getCode()).equals("40"));
-		MatcherAssert.assertThat("Expected MACHINE_ROW_CAPACITY",
+		MatcherAssert.assertThat("Expected MACHINE_ROW_CAPACITY should have a value =50",
 				locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.MACHINE_ROW_CAPACITY.getCode()).equals("50"));
-		MatcherAssert.assertThat("Expected DELETED_PLOTS",
+		MatcherAssert.assertThat("Expected DELETED_PLOTS should have a value =100",
 				locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.DELETED_PLOTS.getCode()).equals("100"));
 
 	}
 	
-	private int addLocation(final Integer ldid, final String locationName, final Integer parentId, final Integer currentUserId,
+	private int addLocation(final String locationName, final Integer parentId, final Integer currentUserId,
 			final String locCode, final String parentCode) {
 
 		final Integer lType = this.manager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, locCode);
 		final Location location = new Location(null, lType, 0, locationName, "-", 0, 0, 0, 0, 0);
 		final Integer dType = this.manager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, parentCode);
-		final Locdes locdes = new Locdes(ldid, null, dType, currentUserId, String.valueOf(parentId), 0, 0);
+		final Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentId), 0, 0);
 
 		return this.manager.addLocationAndLocdes(location, locdes);
 	}
 
 	private void createFieldMap(final Integer locationId) {
-		int fieldParentId = addLocation(null, "FLD_PARENT", locationId, 1, LocationType.FIELD.getCode(), LocdesType.FIELD_PARENT.getCode());
+		int fieldParentId = addLocation("FLD_PARENT", locationId, 1, LocationType.FIELD.getCode(), LocdesType.FIELD_PARENT.getCode());
 		int blockParentId =
-				addLocation(null, "BLK_PARENT", fieldParentId, 1, LocationType.BLOCK.getCode(), LocdesType.BLOCK_PARENT.getCode());
+				addLocation("BLK_PARENT", fieldParentId, 1, LocationType.BLOCK.getCode(), LocdesType.BLOCK_PARENT.getCode());
 		List<Locdes> locdesList = new ArrayList<>();
 		locdesList.add(new Locdes(null, blockParentId, 306, 1, "10", 20160720, 0)); // ROWS_IN_BLOCK
 		locdesList.add(new Locdes(null, blockParentId, 308, 1, "20", 20160720, 0)); // ROWS_IN_PLOT
