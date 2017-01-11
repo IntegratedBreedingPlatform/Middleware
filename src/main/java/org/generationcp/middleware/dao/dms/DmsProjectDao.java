@@ -30,6 +30,7 @@ import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -114,39 +115,90 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "UNION SELECT pr.subject_project_id " + "FROM project_relationship pr, project p " + "WHERE pr.type_id = "
 			+ TermId.HAS_PARENT_FOLDER.getId() + " " + "AND pr.subject_project_id = p.project_id " + "AND p.program_uuid = :program_uuid ";
 
-	static final String GET_STUDY_METADATA_BY_ID = new StringBuilder().append("SELECT  ").append("    geoloc.nd_geolocation_id AS studyDbId, ")
-			.append("pmain.project_id as trialOrNurseryId, ").append("    CASE ppStudy.value ")
-			.append("        WHEN '10000' THEN pmain.name ")
-			.append("        WHEN '10010' THEN CONCAT(pmain.name, '-', geoloc.description) ").append("        ELSE '' ")
-			.append("    END AS studyName, ").append("    CASE ppStudy.value ").append("        WHEN '10000' THEN 'N' ")
-			.append("        WHEN '10010' THEN 'T' ").append("        ELSE '' ").append("    END AS studyType, ")
-			.append("    CASE ppStudy.value ").append("        WHEN ").append("            '10000' ").append("        THEN ")
-			.append("            MAX(IF(pProp.type_id = 8371, ").append("                pProp.value, ")
-			.append("                NULL)) ").append("        WHEN ").append("            '10010' ").append("        THEN ")
-			.append("            MAX(IF(geoprop.type_id = 8371, ").append("                geoprop.value, ")
-			.append("                NULL)) ").append("    END AS seasonId, ").append("    CASE ppStudy.value ")
-			.append("        WHEN '10000' THEN NULL ").append("        WHEN '10010' THEN pmain.project_id ").append("        ELSE '' ")
-			.append("    END AS trialDbId, ").append("    CASE ppStudy.value ").append("        WHEN '10000' THEN NULL ")
-			.append("        WHEN '10010' THEN pmain.name ").append("        ELSE '' ").append("    END AS trialName, ")
-			.append("    MAX(IF(pProp.type_id = 8050, ").append("        pProp.value, ").append("        NULL)) AS startDate, ")
-			.append("    MAX(IF(pProp.type_id = 8060, ").append("        pProp.value, ").append("        NULL)) AS endDate, ")
-			.append("    MAX(IF(pProp.type_id = 8006, ").append("        pProp.value, ").append("        NULL)) AS active,         ")
-			.append("    CASE ppStudy.value ").append("        WHEN ").append("            '10000' ").append("        THEN ")
-			.append("            MAX(IF(pProp.type_id = 8190, ").append("                pProp.value, ")
-			.append("                NULL)) ").append("        WHEN ").append("            '10010' ").append("        THEN ")
-			.append("            MAX(IF(geoprop.type_id = 8190, ").append("                geoprop.value, ")
-			.append("                NULL)) ").append("    END AS locationId ").append("FROM ").append("    nd_geolocation geoloc ")
-			.append("        INNER JOIN ").append("    nd_experiment nde ON nde.nd_geolocation_id = geoloc.nd_geolocation_id ")
-			.append("        INNER JOIN ").append("    nd_experiment_project ndep ON ndep.nd_experiment_id = nde.nd_experiment_id ")
-			.append("        INNER JOIN ").append("    project proj ON proj.project_id = ndep.project_id ")
-			.append("        INNER JOIN ").append("    project_relationship pr ON proj.project_id = pr.subject_project_id ")
-			.append("        INNER JOIN ").append("    project pmain ON pmain.project_id = pr.object_project_id ")
-			.append("        AND pr.type_id = 1150 ").append("        LEFT OUTER JOIN ")
-			.append("    nd_geolocationprop geoprop ON geoprop.nd_geolocation_id = geoloc.nd_geolocation_id ")
-			.append("        INNER JOIN ").append("    projectprop ppStudy ON pmain.project_id = ppStudy.project_id ")
-			.append("        AND ppStudy.type_id = 8070 ").append("        LEFT OUTER JOIN ")
-			.append("    projectprop pProp ON pmain.project_id = pProp.project_id ").append("WHERE ")
-			.append("    nde.type_id = 1020 and geoloc.nd_geolocation_id = :studyId ").append("GROUP BY geoloc.nd_geolocation_id ").toString();
+	static final String GET_STUDY_METADATA_BY_ID = " SELECT  "
+		+ "     geoloc.nd_geolocation_id AS studyDbId, "
+		+ "     pmain.project_id AS trialOrNurseryId, "
+		+ "     CASE ppStudy.value "
+		+ "         WHEN '10000' THEN pmain.name "
+		+ "         WHEN '10010' THEN CONCAT(pmain.name, '-', geoloc.description) "
+		+ "         ELSE '' "
+		+ "     END AS studyName, "
+		+ "     CASE ppStudy.value "
+		+ "         WHEN '10000' THEN 'N' "
+		+ "         WHEN '10010' THEN 'T' "
+		+ "         ELSE '' "
+		+ "     END AS studyType, "
+		+ "     CASE ppStudy.value "
+		+ "         WHEN "
+		+ "             '10000' "
+		+ "         THEN "
+		+ "             MAX(IF(pProp.type_id = \" + TermId.SEASON_VAR.getId() + \", "
+		+ "                 pProp.value, "
+		+ "                 NULL)) "
+		+ "         WHEN "
+		+ "             '10010' "
+		+ "         THEN "
+		+ "             MAX(IF(geoprop.type_id = " + TermId.SEASON_VAR.getId() + ", "
+		+ "                 geoprop.value, "
+		+ "                 NULL)) "
+		+ "     END AS seasonId, "
+		+ "     CASE ppStudy.value "
+		+ "         WHEN '10000' THEN NULL "
+		+ "         WHEN '10010' THEN pmain.project_id "
+		+ "         ELSE '' "
+		+ "     END AS trialDbId, "
+		+ "     CASE ppStudy.value "
+		+ "         WHEN '10000' THEN NULL "
+		+ "         WHEN '10010' THEN pmain.name "
+		+ "         ELSE '' "
+		+ "     END AS trialName, "
+		+ "     MAX(IF(pProp.type_id = " + TermId.START_DATE.getId() + ", "
+		+ "         pProp.value, "
+		+ "         NULL)) AS startDate, "
+		+ "     MAX(IF(pProp.type_id = " + TermId.END_DATE + ", "
+		+ "         pProp.value, "
+		+ "         NULL)) AS endDate, "
+		+ "     MAX(IF(pProp.type_id = " + TermId.STUDY_STATUS + ", "
+		+ "         pProp.value, "
+		+ "         NULL)) AS active, "
+		+ "     CASE ppStudy.value "
+		+ "         WHEN "
+		+ "             '10000' "
+		+ "         THEN "
+		+ "             MAX(IF(pProp.type_id = " + TermId.LOCATION_ID + ", "
+		+ "                 pProp.value, "
+		+ "                 NULL)) "
+		+ "         WHEN "
+		+ "             '10010' "
+		+ "         THEN "
+		+ "             MAX(IF(geoprop.type_id = " + TermId.LOCATION_ID + ", "
+		+ "                 geoprop.value, "
+		+ "                 NULL)) "
+		+ "     END AS locationId "
+		+ " FROM "
+		+ "     nd_geolocation geoloc "
+		+ "         INNER JOIN "
+		+ "     nd_experiment nde ON nde.nd_geolocation_id = geoloc.nd_geolocation_id "
+		+ "         INNER JOIN "
+		+ "     nd_experiment_project ndep ON ndep.nd_experiment_id = nde.nd_experiment_id "
+		+ "         INNER JOIN "
+		+ "     project proj ON proj.project_id = ndep.project_id "
+		+ "         INNER JOIN "
+		+ "     project_relationship pr ON proj.project_id = pr.subject_project_id "
+		+ "         INNER JOIN "
+		+ "     project pmain ON pmain.project_id = pr.object_project_id "
+		+ "         AND pr.type_id = " + TermId.BELONGS_TO_STUDY
+		+ "         LEFT OUTER JOIN "
+		+ "     nd_geolocationprop geoprop ON geoprop.nd_geolocation_id = geoloc.nd_geolocation_id "
+		+ "         INNER JOIN "
+		+ "     projectprop ppStudy ON pmain.project_id = ppStudy.project_id "
+		+ "         AND ppStudy.type_id = " + TermId.STUDY_TYPE
+		+ "         LEFT OUTER JOIN "
+		+ "     projectprop pProp ON pmain.project_id = pProp.project_id "
+		+ " WHERE "
+		+ "     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT
+		+ "         AND geoloc.nd_geolocation_id = :studyId "
+		+ " GROUP BY geoloc.nd_geolocation_id ";
 
 	static final String GET_PROJECTID_BY_STUDYDBID = "SELECT DISTINCT"
 		+ "      p.project_id"

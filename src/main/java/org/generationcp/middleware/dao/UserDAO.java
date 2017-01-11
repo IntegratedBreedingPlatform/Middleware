@@ -298,18 +298,32 @@ public class UserDAO extends GenericDAO<User, Integer> {
 	public List<UserDto> getUsersAssociatedToStudy(final Integer studyId) throws MiddlewareQueryException {
 		Preconditions.checkNotNull(studyId);
 		List<UserDto> users = new ArrayList<>();
-		StringBuilder sql = new StringBuilder().append("SELECT DISTINCT ")
-				.append("    person.personid as personId, person.fname as fName, person.lname as lName, person.pemail as email, role.role as role ")
-				.append("FROM ").append("    cvterm scale ").append("        INNER JOIN ")
-				.append("    cvterm_relationship r ON (r.object_id = scale.cvterm_id) ").append("        INNER JOIN ")
-				.append("    cvterm variable ON (r.subject_id = variable.cvterm_id) ").append("        INNER JOIN ")
-				.append("    projectprop pp ON (pp.type_id = variable.cvterm_id) ").append("    INNER JOIN workbench.persons person ")
-				.append("    ON (pp.value = person.personid) ")
-				.append("    INNER JOIN workbench.users user on (user.personid = person.personid) ")
-				.append("    left join workbench.users_roles role on (role.userid = user.userid) ").append("WHERE ")
-				.append("    pp.project_id =  :studyId").append("        AND r.object_id = 1901  ");
+		String sql = " SELECT DISTINCT "
+			+ "     person.personid AS personId, "
+			+ "     person.fname AS fName, "
+			+ "     person.lname AS lName, "
+			+ "     person.pemail AS email, "
+			+ "     role.role AS role "
+			+ " FROM "
+			+ "     cvterm scale "
+			+ "         INNER JOIN "
+			+ "     cvterm_relationship r ON (r.object_id = scale.cvterm_id) "
+			+ "         INNER JOIN "
+			+ "     cvterm variable ON (r.subject_id = variable.cvterm_id) "
+			+ "         INNER JOIN "
+			+ "     projectprop pp ON (pp.type_id = variable.cvterm_id) "
+			+ "         INNER JOIN "
+			+ "     workbench.persons person ON (pp.value = person.personid) "
+			+ "         INNER JOIN "
+			+ "     workbench.users user ON (user.personid = person.personid) "
+			+ "         LEFT JOIN "
+			+ "     workbench.users_roles role ON (role.userid = user.userid) "
+			+ " WHERE "
+			+ "     pp.project_id = :studyId "
+			+ "         AND r.object_id = 1901 ";
+
 		try {
-			Query query = this.getSession().createSQLQuery(sql.toString()).addScalar("personId").addScalar("fName").addScalar("lName")
+			Query query = this.getSession().createSQLQuery(sql).addScalar("personId").addScalar("fName").addScalar("lName")
 					.addScalar("email").addScalar("role").setParameter("studyId", studyId);
 			List<Object> results = query.list();
 			for (Object obj : results) {

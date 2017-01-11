@@ -301,24 +301,41 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId) throws MiddlewareQueryException {
 		Preconditions.checkNotNull(studyId);
 		Map<String, String> geoProperties = new HashMap<>();
-		StringBuilder sql =
-				new StringBuilder().append("SELECT  ").append("    propName.value as name, propValue.value as value ").append("FROM ")
-						.append("    projectprop propName ").append("        INNER JOIN ")
-						.append("    projectprop propId ON (propId.type_id = 1070 ").append("        AND propId.rank = propName.rank ")
-						.append("        AND propId.project_id = propName.project_id) ").append("        INNER JOIN ")
-						.append("    projectprop propValue ON (propValue.type_id = propId.value ")
-						.append("        AND propValue.rank = propId.rank ")
-						.append("        AND propId.project_id = propValue.project_id) ").append("WHERE ")
-						.append("    propName.project_id = :studyId ").append("        AND propName.type_id = 1060 ")
-						.append("        AND propId.value NOT IN (8050 , 8060, 8371, 8006, 8190, 8070) ")
-						.append("        AND propId.value NOT IN (SELECT  ").append("            variable.cvterm_id ")
-						.append("        FROM ").append("            cvterm scale ").append("                INNER JOIN ")
-						.append("            cvterm_relationship r ON (r.object_id = scale.cvterm_id) ")
-						.append("                INNER JOIN ").append("            cvterm variable ON (r.subject_id = variable.cvterm_id) ")
-						.append("        WHERE ").append("            object_id = 1901) ");
+		String sql = " SELECT  "
+			+ "     propName.value AS name, propValue.value AS value "
+			+ " FROM "
+			+ "     projectprop propName "
+			+ "         INNER JOIN "
+			+ "     projectprop propId ON (propId.type_id = " + TermId.STANDARD_VARIABLE.getId()
+			+ "         AND propId.rank = propName.rank "
+			+ "         AND propId.project_id = propName.project_id) "
+			+ "         INNER JOIN "
+			+ "     projectprop propValue ON (propValue.type_id = propId.value "
+			+ "         AND propValue.rank = propId.rank "
+			+ "         AND propId.project_id = propValue.project_id) "
+			+ " WHERE "
+			+ "     propName.project_id = :studyId "
+			+ "         AND propName.type_id = " + TermId.VARIABLE_DESCRIPTION
+			+ "         AND propId.value NOT IN ("
+			+ TermId.START_DATE.getId() + " , "
+			+ TermId.END_DATE.getId() + ", "
+			+ TermId.SEASON_VAR + ", "
+			+ TermId.STUDY_STATUS + ", " + TermId.LOCATION_ID + ", "
+			+ TermId.STUDY_TYPE.getId() + ") "
+			+ "         AND propId.value NOT IN (SELECT  "
+			+ "             variable.cvterm_id "
+			+ "         FROM "
+			+ "             cvterm scale "
+			+ "                 INNER JOIN "
+			+ "             cvterm_relationship r ON (r.object_id = scale.cvterm_id) "
+			+ "                 INNER JOIN "
+			+ "             cvterm variable ON (r.subject_id = variable.cvterm_id) "
+			+ "         WHERE "
+			+ "             object_id = 1901) ";
+
 		try {
 			Query query =
-					this.getSession().createSQLQuery(sql.toString()).addScalar("name").addScalar("value").setParameter("studyId", studyId);
+					this.getSession().createSQLQuery(sql).addScalar("name").addScalar("value").setParameter("studyId", studyId);
 			List<Object> results = query.list();
 			for (Object obj : results) {
 				Object[] row = (Object[]) obj;
