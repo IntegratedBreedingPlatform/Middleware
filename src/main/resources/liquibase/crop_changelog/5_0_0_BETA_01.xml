@@ -47,5 +47,57 @@
 		</sql>
 
 	</changeSet>
+	
+	<changeSet author="mderamos" id="v5-beta01-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm where cvterm_id='1705' and name='CROSS-FEMALE GID'</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			UPDATE cvterm SET name='FEMALE PEDIGREE', definition='Pedigree of female parent' where cvterm_id='1705'
+	    </sql>
+	</changeSet>
+	
+	<changeSet author="mderamos" id="v5-beta01-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm where cvterm_id='1707' and name='CROSS-MALE GID'</sqlCheck>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			UPDATE cvterm SET name='MALE PEDIGREE', definition='Pedigree of male parent' where cvterm_id='1707'
+	    </sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v5-beta01-4">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<columnExists tableName="listdata_project" columnName="duplicate_notes"/>
+				<sqlCheck expectedResult="0">
+					SELECT
+					if(DATA_TYPE = 'varchar' and CHARACTER_MAXIMUM_LENGTH = 600, 1, 0) as new_datatype
+					FROM  INFORMATION_SCHEMA.COLUMNS
+					WHERE table_name='listdata_project'
+					AND column_name='duplicate_notes'
+					AND TABLE_SCHEMA = database();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<modifyDataType tableName="listdata_project" columnName="duplicate_notes" newDataType="varchar(600)"/>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v5-beta01-5">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<columnExists tableName="ims_transaction" columnName="bulk_with"/>
+				<sqlCheck expectedResult="0">
+					SELECT
+					if(DATA_TYPE = 'varchar' and CHARACTER_MAXIMUM_LENGTH = 700, 1, 0) as new_datatype
+					FROM  INFORMATION_SCHEMA.COLUMNS
+					WHERE table_name='ims_transaction'
+					AND column_name='bulk_with'
+					AND TABLE_SCHEMA = database();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<modifyDataType tableName="ims_transaction" columnName="bulk_with" newDataType="varchar(700)"/>
+	</changeSet>
 
 </databaseChangeLog>
