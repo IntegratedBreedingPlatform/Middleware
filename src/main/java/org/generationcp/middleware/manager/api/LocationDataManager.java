@@ -634,9 +634,9 @@ public interface LocationDataManager {
 	/**
 	 * Returns all Local Locations depending on the filters.
 	 *
-	 * @param start
+	 * @param pageNumber
 	 *            - the starting index of the sublist of results to be returned
-	 * @param numOfRows
+	 * @param pageSize
 	 *            - the number of rows to be included in the sublist of results
 	 *            to be returned
 	 * @param filters
@@ -645,7 +645,7 @@ public interface LocationDataManager {
 	 * @throws MiddlewareQueryException
 	 *             the middleware query exception
 	 */
-	List<LocationDetailsDto> getLocationsByFilter(final int start, final int numOfRows, final Map<LocationFilters, Object> filters)
+	List<LocationDetailsDto> getLocationsByFilter(final int pageNumber,final int pageSize, final Map<LocationFilters, Object> filters)
 			throws MiddlewareQueryException;
 
 	/**

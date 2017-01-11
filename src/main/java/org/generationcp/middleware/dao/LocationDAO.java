@@ -956,7 +956,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
-	public List<LocationDetailsDto> getLocationsByFilter(final int start, final int numOfRows,
+	public List<LocationDetailsDto> getLocationsByFilter(final int pageNumber,final int pageSize,
 			final Map<LocationFilters, Object> filters) {
 		final List<LocationDetailsDto> locationList = new ArrayList<LocationDetailsDto>();
 
@@ -979,6 +979,8 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			sqlString.append(" ORDER BY l.locid ");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
+			int start = pageSize * (pageNumber - 1);
+			int numOfRows = pageSize;
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 

@@ -582,9 +582,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<LocationDetailsDto> getLocationsByFilter(final int start, final int numOfRows, final Map<LocationFilters, Object> filters)
+	public List<LocationDetailsDto> getLocationsByFilter(final int pageNumber,final int pageSize, final Map<LocationFilters, Object> filters)
 			throws MiddlewareQueryException {
-		final List<LocationDetailsDto> locationsDetailsDto = this.getLocationDao().getLocationsByFilter(start, numOfRows, filters);
+		final List<LocationDetailsDto> locationsDetailsDto = this.getLocationDao().getLocationsByFilter(pageNumber, pageSize, filters);
 		final List<String> locations = new ArrayList<String>();
 
 		if (locationsDetailsDto.size() != 0) {
