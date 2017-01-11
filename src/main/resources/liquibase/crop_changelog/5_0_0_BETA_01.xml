@@ -48,7 +48,7 @@
 
 	</changeSet>
 
-	<changeSet author="clarysabel" id="bv5-beta01-4">
+	<changeSet author="clarysabel" id="v5-beta01-4">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<columnExists tableName="listdata_project" columnName="duplicate_notes"/>
