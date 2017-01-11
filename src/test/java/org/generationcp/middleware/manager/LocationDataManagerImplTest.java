@@ -626,7 +626,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		Map<LocationFilters, Object> filters = new HashMap<>();
 		filters.put(LocationFilters.LOCATION_TYPE, 405L);
 		long countLocation = this.manager.countLocationsByFilter(filters);
-		MatcherAssert.assertThat("Expected country location size > zero", countLocation > 0);
+		MatcherAssert.assertThat("Expected country location size > zero", 0 < countLocation);
 	}
 	
 	@Test
@@ -634,7 +634,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		Map<LocationFilters, Object> filters = new HashMap<>();
 		filters.put(LocationFilters.LOCATION_TYPE, 101010101010010405L);
 		long countLocation = this.manager.countLocationsByFilter(filters);
-		MatcherAssert.assertThat("Expected country location size equals to zero", countLocation == 0);
+		MatcherAssert.assertThat("Expected country location size equals to zero", 0 == countLocation );
 	}
 	
 	@Test
@@ -642,7 +642,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		Map<LocationFilters, Object> filters = new HashMap<>();
 		filters.put(LocationFilters.LOCATION_TYPE, 405L);
 		final List<LocationDetailsDto> locationList = this.manager.getLocationsByFilter(1, 100, filters);
-		MatcherAssert.assertThat("Expected list of location size > zero", locationList.size() > 0);
+		MatcherAssert.assertThat("Expected list of location size > zero", !locationList.isEmpty());
 	}
 	
 	@Test
@@ -650,19 +650,19 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		Map<LocationFilters, Object> filters = new HashMap<>();
 		filters.put(LocationFilters.LOCATION_TYPE, 0000010000405L);
 		final List<LocationDetailsDto> locationList = this.manager.getLocationsByFilter(1, 100, filters);
-		MatcherAssert.assertThat("Expected list of location size equals to zero", locationList.size() == 0);
+		MatcherAssert.assertThat("Expected list of location size equals to zero", locationList.isEmpty());
 	}
 	
 	
 	@Test
 	public void testgetLocationsByFilterWithAdditionalInfo() throws MiddlewareQueryException {
 		Map<LocationFilters, Object> filters = new HashMap<>();
-		filters.put(LocationFilters.LOCATION_TYPE, 405L); //Filter by COUNTRY
+		filters.put(LocationFilters.LOCATION_TYPE, 405L); // Filter by COUNTRY
 		List<LocationDetailsDto> locationList = this.manager.getLocationsByFilter(1, 100, filters);
-		LocationDetailsDto locationOrg= null;
-		if(locationList.size()!=0){
-			locationOrg =locationList.get(0);
-			createFieldMap(locationOrg.getLocationDbId());		
+		LocationDetailsDto locationOrg = null;
+		if (locationList.size() != 0) {
+			locationOrg = locationList.get(0);
+			createFieldMap(locationOrg.getLocationDbId());
 		}
 		filters = new HashMap<>();
 		filters.put(LocationFilters.LOCATION_NAME, locationOrg.getName());
@@ -670,17 +670,22 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		MatcherAssert.assertThat("Expected location id", locationList.get(0).getLocationDbId().equals(locationOrg.getLocationDbId()));
 		MatcherAssert.assertThat("Expected name", locationList.get(0).getName().equals(locationOrg.getName()));
 
-		MatcherAssert.assertThat("Expected FIELD_PARENT", locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.FIELD_PARENT.getCode()).equals("FLD_PARENT"));
-		MatcherAssert.assertThat("Expected BLOCK_PARENT", locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.BLOCK_PARENT.getCode()).equals("BLK_PARENT"));
-		
-		MatcherAssert.assertThat("Expected ROWS_IN_BLOCK", locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.ROWS_IN_BLOCK.getCode()).equals("10"));
-		MatcherAssert.assertThat("Expected ROWS_IN_PLOT", locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.ROWS_IN_PLOT.getCode()).equals("20"));
-		MatcherAssert.assertThat("Expected RANGES_IN_BLOCK", locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.RANGES_IN_BLOCK.getCode()).equals("30"));
-		MatcherAssert.assertThat("Expected PLANTING_ORDER", locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.PLANTING_ORDER.getCode()).equals("40"));
-		MatcherAssert.assertThat("Expected MACHINE_ROW_CAPACITY", locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.MACHINE_ROW_CAPACITY.getCode()).equals("50"));
-		MatcherAssert.assertThat("Expected DELETED_PLOTS", locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.DELETED_PLOTS.getCode()).equals("100"));
-
-		
+		MatcherAssert.assertThat("Expected FIELD_PARENT",
+				locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.FIELD_PARENT.getCode()).equals("FLD_PARENT"));
+		MatcherAssert.assertThat("Expected BLOCK_PARENT",
+				locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.BLOCK_PARENT.getCode()).equals("BLK_PARENT"));
+		MatcherAssert.assertThat("Expected ROWS_IN_BLOCK",
+				locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.ROWS_IN_BLOCK.getCode()).equals("10"));
+		MatcherAssert.assertThat("Expected ROWS_IN_PLOT",
+				locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.ROWS_IN_PLOT.getCode()).equals("20"));
+		MatcherAssert.assertThat("Expected RANGES_IN_BLOCK",
+				locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.RANGES_IN_BLOCK.getCode()).equals("30"));
+		MatcherAssert.assertThat("Expected PLANTING_ORDER",
+				locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.PLANTING_ORDER.getCode()).equals("40"));
+		MatcherAssert.assertThat("Expected MACHINE_ROW_CAPACITY",
+				locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.MACHINE_ROW_CAPACITY.getCode()).equals("50"));
+		MatcherAssert.assertThat("Expected DELETED_PLOTS",
+				locationList.get(0).getAdditionalInfo().getInfoValue(LocdesType.DELETED_PLOTS.getCode()).equals("100"));
 
 	}
 	
@@ -694,7 +699,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 		return this.manager.addLocationAndLocdes(location, locdes);
 	}
-	
+
 	private void createFieldMap(final Integer locationId) {
 		int fieldParentId = addLocation(null, "FLD_PARENT", locationId, 1, LocationType.FIELD.getCode(), LocdesType.FIELD_PARENT.getCode());
 		int blockParentId =
