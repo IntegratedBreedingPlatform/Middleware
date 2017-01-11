@@ -66,4 +66,38 @@
 	    </sql>
 	</changeSet>
 
+	<changeSet author="clarysabel" id="beta17-1">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<columnExists tableName="listdata_project" columnName="duplicate_notes"/>
+				<sqlCheck expectedResult="0">
+					SELECT
+					if(DATA_TYPE = 'varchar' and CHARACTER_MAXIMUM_LENGTH = 600, 1, 0) as new_datatype
+					FROM  INFORMATION_SCHEMA.COLUMNS
+					WHERE table_name='listdata_project'
+					AND column_name='duplicate_notes'
+					AND TABLE_SCHEMA = database();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<modifyDataType tableName="listdata_project" columnName="duplicate_notes" newDataType="varchar(600)"/>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="beta17-2">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<columnExists tableName="ims_transaction" columnName="bulk_with"/>
+				<sqlCheck expectedResult="0">
+					SELECT
+					if(DATA_TYPE = 'varchar' and CHARACTER_MAXIMUM_LENGTH = 700, 1, 0) as new_datatype
+					FROM  INFORMATION_SCHEMA.COLUMNS
+					WHERE table_name='ims_transaction'
+					AND column_name='bulk_with'
+					AND TABLE_SCHEMA = database();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<modifyDataType tableName="ims_transaction" columnName="bulk_with" newDataType="varchar(700)"/>
+	</changeSet>
+
 </databaseChangeLog>
