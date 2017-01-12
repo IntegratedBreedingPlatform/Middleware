@@ -315,12 +315,12 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			+ "         AND propId.project_id = propValue.project_id) "
 			+ " WHERE "
 			+ "     propName.project_id = :studyId "
-			+ "         AND propName.type_id = " + TermId.VARIABLE_DESCRIPTION
+			+ "         AND propName.type_id = " + TermId.VARIABLE_DESCRIPTION.getId()
 			+ "         AND propId.value NOT IN ("
 			+ TermId.START_DATE.getId() + " , "
 			+ TermId.END_DATE.getId() + ", "
-			+ TermId.SEASON_VAR + ", "
-			+ TermId.STUDY_STATUS + ", " + TermId.LOCATION_ID + ", "
+			+ TermId.SEASON_VAR.getId() + ", "
+			+ TermId.STUDY_STATUS.getId() + ", " + TermId.LOCATION_ID.getId() + ", "
 			+ TermId.STUDY_TYPE.getId() + ") "
 			+ "         AND propId.value NOT IN (SELECT  "
 			+ "             variable.cvterm_id "

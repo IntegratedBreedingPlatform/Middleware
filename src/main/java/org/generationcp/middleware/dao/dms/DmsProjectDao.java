@@ -132,7 +132,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "         WHEN "
 		+ "             '10000' "
 		+ "         THEN "
-		+ "             MAX(IF(pProp.type_id = \" + TermId.SEASON_VAR.getId() + \", "
+		+ "             MAX(IF(pProp.type_id = " + TermId.SEASON_VAR.getId() + ", "
 		+ "                 pProp.value, "
 		+ "                 NULL)) "
 		+ "         WHEN "
@@ -155,23 +155,23 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "     MAX(IF(pProp.type_id = " + TermId.START_DATE.getId() + ", "
 		+ "         pProp.value, "
 		+ "         NULL)) AS startDate, "
-		+ "     MAX(IF(pProp.type_id = " + TermId.END_DATE + ", "
+		+ "     MAX(IF(pProp.type_id = " + TermId.END_DATE.getId() + ", "
 		+ "         pProp.value, "
 		+ "         NULL)) AS endDate, "
-		+ "     MAX(IF(pProp.type_id = " + TermId.STUDY_STATUS + ", "
+		+ "     MAX(IF(pProp.type_id = " + TermId.STUDY_STATUS.getId() + ", "
 		+ "         pProp.value, "
 		+ "         NULL)) AS active, "
 		+ "     CASE ppStudy.value "
 		+ "         WHEN "
 		+ "             '10000' "
 		+ "         THEN "
-		+ "             MAX(IF(pProp.type_id = " + TermId.LOCATION_ID + ", "
+		+ "             MAX(IF(pProp.type_id = " + TermId.LOCATION_ID.getId() + ", "
 		+ "                 pProp.value, "
 		+ "                 NULL)) "
 		+ "         WHEN "
 		+ "             '10010' "
 		+ "         THEN "
-		+ "             MAX(IF(geoprop.type_id = " + TermId.LOCATION_ID + ", "
+		+ "             MAX(IF(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", "
 		+ "                 geoprop.value, "
 		+ "                 NULL)) "
 		+ "     END AS locationId "
@@ -187,16 +187,16 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "     project_relationship pr ON proj.project_id = pr.subject_project_id "
 		+ "         INNER JOIN "
 		+ "     project pmain ON pmain.project_id = pr.object_project_id "
-		+ "         AND pr.type_id = " + TermId.BELONGS_TO_STUDY
+		+ "         AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
 		+ "         LEFT OUTER JOIN "
 		+ "     nd_geolocationprop geoprop ON geoprop.nd_geolocation_id = geoloc.nd_geolocation_id "
 		+ "         INNER JOIN "
 		+ "     projectprop ppStudy ON pmain.project_id = ppStudy.project_id "
-		+ "         AND ppStudy.type_id = " + TermId.STUDY_TYPE
+		+ "         AND ppStudy.type_id = " + TermId.STUDY_TYPE.getId()
 		+ "         LEFT OUTER JOIN "
 		+ "     projectprop pProp ON pmain.project_id = pProp.project_id "
 		+ " WHERE "
-		+ "     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT
+		+ "     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
 		+ "         AND geoloc.nd_geolocation_id = :studyId "
 		+ " GROUP BY geoloc.nd_geolocation_id ";
 
