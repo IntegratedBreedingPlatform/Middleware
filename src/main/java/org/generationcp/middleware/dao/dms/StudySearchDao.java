@@ -199,7 +199,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 				SQLQuery query =
 						this.getSession()
 								.createSQLQuery(
-										"SELECT COUNT(DISTINCT p.project_id)"
+										"SELECT COUNT(*) FROM (SELECT DISTINCT p.project_id"
 												+ " FROM project p "
 												+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
 												+ TermId.BELONGS_TO_STUDY.getId()
@@ -214,7 +214,11 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 												+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
 												+ TermId.STUDY_STATUS.getId() + "   AND pp.project_id = p.project_id AND pp.value = "
 												+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId()
-												+ ")) ");
+												+ ")) "
+												+ "  UNION DISTINCT"
+												+ "  SELECT DISTINCT p.project_id FROM project p"
+												+ "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = " + TermId.SEASON_VAR.getId()
+												+ "  WHERE pp.value = '" + valueId + "') projectlist");
 
 				return ((BigInteger) query.uniqueResult()).longValue();
 			}
@@ -258,7 +262,11 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 												+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
 												+ TermId.STUDY_STATUS.getId() + "   AND pp.project_id = p.project_id AND pp.value = "
 												+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId()
-												+ ")) ");
+												+ ")) "
+												+ "  UNION DISTINCT"
+												+ "  SELECT DISTINCT p.project_id, p.name, p.description FROM project p"
+												+ "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = " + TermId.SEASON_VAR.getId()
+												+ "  WHERE pp.value = '" + valueId + "'");
 				query.setFirstResult(start);
 				query.setMaxResults(numOfRows);
 
@@ -281,7 +289,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			SQLQuery query =
 					this.getSession().createSQLQuery(
-							"SELECT COUNT(DISTINCT p.project_id)" + " FROM project p "
+							"SELECT COUNT(*) FROM (SELECT DISTINCT p.project_id FROM project p "
 									+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
 									+ TermId.BELONGS_TO_STUDY.getId() + " INNER JOIN nd_experiment_project ep "
 									+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id "
@@ -293,7 +301,12 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 									+ "		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " + "  	   )"
 									+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = " + TermId.STUDY_STATUS.getId()
 									+ "   AND pp.project_id = p.project_id AND pp.value = "
-									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) ");
+									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) "
+									+ "  UNION DISTINCT"
+									+ "  SELECT DISTINCT p.project_id FROM project p"
+									+ "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = " + TermId.LOCATION_ID.getId()
+									+ "  WHERE pp.value IN (" + this.stringify(locationIds) + ")) locationList;");
+
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (HibernateException e) {
@@ -321,7 +334,11 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 									+ "		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " + "  	   )"
 									+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = " + TermId.STUDY_STATUS.getId()
 									+ "   AND pp.project_id = p.project_id AND pp.value = "
-									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) ");
+									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) "
+									+ "  UNION DISTINCT"
+									+ "  SELECT DISTINCT p.project_id, p.name, p.description FROM project p"
+									+ "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = " + TermId.LOCATION_ID.getId()
+									+ "  WHERE pp.value IN (" + this.stringify(locationIds) + ")");
 
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
