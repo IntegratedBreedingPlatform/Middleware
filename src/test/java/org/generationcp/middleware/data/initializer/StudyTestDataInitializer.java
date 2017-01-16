@@ -17,6 +17,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -59,12 +60,12 @@ public class StudyTestDataInitializer {
 	public StudyReference addTestStudy() throws Exception {
 		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, this.commonTestProject.getUniqueID(), StudyType.T);
 	}
-	
+
 	public StudyReference addTestStudy(final String uniqueId) throws Exception {
 		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, uniqueId, StudyType.T);
 	}
-	
-	public StudyReference addTestStudy(final StudyType studyType, final String studyName ) throws Exception {
+
+	public StudyReference addTestStudy(final StudyType studyType, final String studyName) throws Exception {
 		return this.addTestStudy(studyName, this.commonTestProject.getUniqueID(), studyType);
 	}
 
@@ -88,6 +89,47 @@ public class StudyTestDataInitializer {
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
 
+		final StudyValues studyValues = this.createStudyValues(variableList);
+
+		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId);
+	}
+
+	public StudyReference addTestStudy(final String studyName, final StudyType studyType, final String seasonId, final String locationId) throws Exception {
+
+		final VariableTypeList typeList = new VariableTypeList();
+		final VariableList variableList = new VariableList();
+
+		Variable variable = this.createVariable(TermId.STUDY_NAME.getId(), studyName, 1);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+
+		variable = this.createVariable(TermId.STUDY_TITLE.getId(), StudyTestDataInitializer.STUDY_DESCRIPTION, 2);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+
+		variable = this.createVariable(TermId.STUDY_TYPE.getId(), String.valueOf(studyType.getId()), 3, PhenotypicType.STUDY);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+
+		variable = this.createVariable(TermId.STUDY_STATUS.getId(), String.valueOf(TermId.ACTIVE_STUDY.getId()), 4);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+
+		variable = this.createVariable(TermId.LOCATION_ID.getId(), locationId, 5, PhenotypicType.STUDY);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+
+		variable = this.createVariable(TermId.SEASON_VAR.getId(), seasonId, 6, PhenotypicType.STUDY);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+
+		final StudyValues studyValues = this.createStudyValues(variableList);
+
+		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, this.commonTestProject.getUniqueID());
+	}
+
+	private StudyValues createStudyValues(final VariableList variableList) throws Exception {
+
 		final StudyValues studyValues = new StudyValues();
 		studyValues.setVariableList(variableList);
 
@@ -100,7 +142,8 @@ public class StudyTestDataInitializer {
 				this.createGermplasm("unique name", String.valueOf(this.gid), "name", "2000", "prop1", "prop2");
 		studyValues.setGermplasmId(this.studyDataManager.addStock(germplasmVariableList));
 
-		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId);
+		return studyValues;
+
 	}
 
 	private Variable createVariable(final int termId, final String value, final int rank) throws Exception {
@@ -198,7 +241,7 @@ public class StudyTestDataInitializer {
 	public Integer getGid() {
 		return this.gid;
 	}
-	
+
 	public Integer addTestLocation(String locationName){
 		Location location = new Location();
 		location.setCntryid(1);
