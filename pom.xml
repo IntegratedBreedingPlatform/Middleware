@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-        <version>4.0</version>
+        <version>4.1.SPRINT</version>
 	<name>Middleware</name>
 
 	<properties>
