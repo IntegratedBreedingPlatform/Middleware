@@ -28,6 +28,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -104,6 +105,9 @@ public class GermplasmList implements Serializable {
 	@OneToMany(mappedBy = "list", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
 	@OrderBy("entryId asc")
 	private List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
+	
+	@Transient
+	private String tabLabel;
 
 	public static final String GET_GERMPLASM_LIST_TYPES =
 			"SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid "
@@ -436,6 +440,16 @@ public class GermplasmList implements Serializable {
 
 	public boolean isLockedList() {
 		return this.getStatus() >= 100;
+	}
+
+	
+	public String getTabLabel() {
+		return tabLabel;
+	}
+
+	
+	public void setTabLabel(String tabLabel) {
+		this.tabLabel = tabLabel;
 	}
 
 }

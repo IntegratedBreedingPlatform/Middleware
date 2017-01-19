@@ -1150,5 +1150,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return this.getWorkbenchDataManager().getCropTypeByName(cropName).getPlotCodePrefix();
 	}
 
-
+	public List<GermplasmList> appendTabLabelToList(List<GermplasmList> germplasmCrossesList) {
+		return this.getGermplasmListDAO().appendTabLabelToList(germplasmCrossesList);
+	}
 }

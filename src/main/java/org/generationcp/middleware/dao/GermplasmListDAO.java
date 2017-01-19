@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -26,9 +27,7 @@ import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
@@ -40,7 +39,6 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
-import org.hibernate.type.Type;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
@@ -53,6 +51,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	public static final Integer STATUS_DELETED = 9;
 	protected static final Criterion RESTRICTED_LIST;
+	private static final String CROSSES = "Crosses";
+	private static final String IMPORTED_CROSSES = "Imported Crosses";
+	private static final String DESIGNED_CROSSES = "Designed Crosses";
 	
 	static {
 		RESTRICTED_LIST = Restrictions
@@ -585,5 +586,20 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 				return folderMetaData.getListId();
 			}
 		});
+	}
+
+	public List<GermplasmList> appendTabLabelToList(List<GermplasmList> germplasmCrossesList) {
+		for (Iterator<GermplasmList> iterator = germplasmCrossesList.iterator(); iterator.hasNext();) {
+			GermplasmList germplasmList = (GermplasmList) iterator.next();
+			GermplasmList listReference = this.getById(germplasmList.getListRef());
+			if (GermplasmListType.F1.toString().equals(listReference.getType())) {
+				germplasmList.setTabLabel(CROSSES);
+			} else if (GermplasmListType.F1IMP.toString().equals(listReference.getType())) {
+				germplasmList.setTabLabel(IMPORTED_CROSSES);
+			} else if (GermplasmListType.F1CRT.toString().equals(listReference.getType())) {
+				germplasmList.setTabLabel(DESIGNED_CROSSES);
+			}
+		}
+		return germplasmCrossesList;
 	}
 }
