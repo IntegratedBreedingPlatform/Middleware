@@ -810,4 +810,6 @@ public interface FieldbookService {
 	public List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
 
 	public List<Method> getFavoriteMethods(List<Integer> methodIds, Boolean filterOutGenerative);
+
+	public String getPlotCodePrefix(final String cropName);
 }
