@@ -78,4 +78,9 @@ public interface GermplasmExportSource {
 	 */
 	String getSeedAmount();
 
+	/**
+	 * @return groupId
+	 */
+	Integer getGroupId();
+
 }
