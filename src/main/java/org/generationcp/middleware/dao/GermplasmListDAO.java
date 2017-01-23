@@ -592,12 +592,13 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		for (Iterator<GermplasmList> iterator = germplasmCrossesList.iterator(); iterator.hasNext();) {
 			GermplasmList germplasmList = (GermplasmList) iterator.next();
 			GermplasmList listReference = this.getById(germplasmList.getListRef());
-			if (GermplasmListType.F1.toString().equals(listReference.getType())) {
-				germplasmList.setTabLabel(CROSSES);
-			} else if (GermplasmListType.F1IMP.toString().equals(listReference.getType())) {
+			if (GermplasmListType.F1IMP.toString().equals(listReference.getType())) {
 				germplasmList.setTabLabel(IMPORTED_CROSSES);
 			} else if (GermplasmListType.F1CRT.toString().equals(listReference.getType())) {
 				germplasmList.setTabLabel(DESIGNED_CROSSES);
+			}
+			else{
+				germplasmList.setTabLabel(CROSSES);
 			}
 		}
 		return germplasmCrossesList;
