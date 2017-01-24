@@ -1,0 +1,22 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+	
+	<changeSet author="mderamos" id="v5-beta01-1">
+		<preConditions onFail="MARK_RAN">
+			<not><sqlCheck expectedResult="0">SELECT count(*) FROM program_preset where tool_section='FBK_LABEL_PRINTING'</sqlCheck></not>
+		</preConditions>
+	    <sql dbms="mysql" splitStatements="true">
+			UPDATE program_preset SET tool_section = "PLANTING_LABEL_PRINTING_PRESET" 
+			WHERE configuration LIKE '%plotCodePrefix="true"%';
+			
+			UPDATE program_preset SET tool_section = "INVENTORY_LABEL_PRINTING_PRESET" 
+			WHERE tool_section="FBK_LABEL_PRINTING";
+	    </sql>
+	</changeSet>
+
+</databaseChangeLog>
