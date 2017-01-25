@@ -25,6 +25,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
@@ -44,6 +46,7 @@ import org.hibernate.annotations.SQLDelete;
 @Entity
 @Table(name = "listnms")
 @SQLDelete(sql = "UPDATE listnms SET liststatus = 9 WHERE listid = ?")
+@NamedQueries({@NamedQuery(name = "deleteGermplasmListByListIdPhysically", query = "DELETE FROM GermplasmList WHERE listid = :listid"),})
 public class GermplasmList implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -51,6 +54,8 @@ public class GermplasmList implements Serializable {
 	public static final String LIST_TYPE = "LST";
     public static final String ADVANCED_LIST_TYPE = "ADVANCED";
     public static final String CROSS_LIST_TYPE = "CROSSES";
+	public static final String DELETE_GERMPLASM_LIST_BY_LISTID_PHYSICALLY = "deleteGermplasmListByListIdPhysically";
+	public static final String GERMPLASM_LIST_LIST_ID_COLUMN = "listid";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -261,6 +266,7 @@ public class GermplasmList implements Serializable {
 		this.parent = parent;
 	}
 
+	// TODO Refactor: liststatus is NOT used like a bit array across the system
 	public String getStatusString() {
 		// TODO: make internationalizable
 		final List<String> listStatus = new ArrayList<String>();
