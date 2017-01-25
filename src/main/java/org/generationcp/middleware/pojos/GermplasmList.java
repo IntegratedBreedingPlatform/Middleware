@@ -266,6 +266,7 @@ public class GermplasmList implements Serializable {
 		this.parent = parent;
 	}
 
+	// TODO Refactor: liststatus is NOT used like a bit array across the system
 	public String getStatusString() {
 		// TODO: make internationalizable
 		final List<String> listStatus = new ArrayList<String>();
