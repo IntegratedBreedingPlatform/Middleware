@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
@@ -602,5 +603,11 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			}
 		}
 		return germplasmCrossesList;
+	}
+
+	public int deleteGermplasmListByListIdPhysically(Integer listId) {
+		final Query query = this.getSession().getNamedQuery(GermplasmList.DELETE_GERMPLASM_LIST_BY_LISTID_PHYSICALLY);
+		query.setInteger(GermplasmList.GERMPLASM_LIST_LIST_ID_COLUMN, listId);
+		return query.executeUpdate();
 	}
 }
