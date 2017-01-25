@@ -98,6 +98,9 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	@Transient
 	private String checkTypeDescription = null;
 
+	@Transient
+	private String stockIDs = "";
+
 	/**
 	 * @return the listDataProjectId
 	 */
@@ -418,8 +421,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 
 	@Override
 	public String getStockIDs() {
-
-		return "";
+		return this.stockIDs;
 	}
 
 	@Override
@@ -434,6 +436,10 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 
 	public void setGroupId(final Integer groupId) {
 		this.groupId = groupId;
+	}
+
+	public void setStockIDs(String stockIDs) {
+		this.stockIDs = stockIDs;
 	}
 
 }
