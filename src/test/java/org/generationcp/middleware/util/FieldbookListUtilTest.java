@@ -5,11 +5,36 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
+import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
+import org.generationcp.middleware.data.initializer.ListDataProjectTestDataInitializer;
+import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Method;
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.mockito.runners.MockitoJUnitRunner;
 
+import com.beust.jcommander.internal.Lists;
+import com.beust.jcommander.internal.Maps;
+
+@RunWith(MockitoJUnitRunner.class)
 public class FieldbookListUtilTest {
+
+	private GermplasmListDataTestDataInitializer germplasmListDataTestDataInitializer;
+
+	@Before
+	public void setUp() {
+		germplasmListDataTestDataInitializer = new GermplasmListDataTestDataInitializer();
+
+	}
 
 	@Test
 	public void sortMethodNamesInAscendingOrderTest() throws Exception {
@@ -35,6 +60,48 @@ public class FieldbookListUtilTest {
 		methodName.setMid(id);
 		methodName.setMname(name);
 		return methodName;
+	}
+
+	@Test
+	public void testPopulateStockIdInListDataProject() throws Exception {
+		GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(1);
+		InventoryDataManager inventoryDataManager = Mockito.mock(InventoryDataManager.class);
+
+		Map<Integer, String> mockData = Maps.newHashMap();
+		mockData.put(100, "StockID101, StockID102");
+
+		Mockito.when(inventoryDataManager.retrieveStockIds(Mockito.anyList())).thenReturn(mockData);
+
+		ListDataProject listDataProject = ListDataProjectTestDataInitializer
+				.createListDataProject(germplasmList, 100, 0, 1, "entryCode", "seedSource", "designation", "groupName",
+						"duplicate", "notes", 20170125);
+
+		FieldbookListUtil.populateStockIdInListDataProject(Lists.newArrayList(listDataProject),inventoryDataManager);
+
+		Assert.assertNotNull("StockID field should not be null after populating it");
+		Assert.assertEquals(mockData.get(100), listDataProject.getStockIDs());
+
+	}
+
+	@Test
+	public void testPopulateStockIdInGermplasmListData() throws Exception {
+		GermplasmList germplasmList = GermplasmListTestDataInitializer
+				.createGermplasmList(1);
+
+		Map<Integer, String> mockData = Maps.newHashMap();
+		mockData.put(101, "StockID101, StockID102");
+
+		InventoryDataManager inventoryDataManager = Mockito.mock(InventoryDataManager.class);
+
+		Mockito.when(inventoryDataManager.retrieveStockIds(Mockito.anyList())).thenReturn(mockData);
+		GermplasmListData germplasmListData = germplasmListDataTestDataInitializer.createGermplasmListData(germplasmList, 101, 1);
+
+		FieldbookListUtil.populateStockIdInGermplasmListData(Lists.newArrayList(germplasmListData),inventoryDataManager);
+
+		Assert.assertNotNull("StockID field should not be null after populating it");
+		Assert.assertEquals(mockData.get(101), germplasmListData.getStockIDs());
+
+
 	}
 
 }
