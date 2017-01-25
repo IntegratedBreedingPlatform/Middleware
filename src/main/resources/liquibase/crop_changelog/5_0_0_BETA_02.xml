@@ -6,7 +6,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 	
-	<changeSet author="mderamos" id="v5-beta01-1">
+	<changeSet author="mderamos" id="v5-beta02-1">
 		<preConditions onFail="MARK_RAN">
 			<not><sqlCheck expectedResult="0">SELECT count(*) FROM program_preset where tool_section='FBK_LABEL_PRINTING'</sqlCheck></not>
 		</preConditions>
