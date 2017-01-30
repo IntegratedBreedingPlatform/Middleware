@@ -1472,4 +1472,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return commaSeparatedListOfGids;
 	}
 
+  @Override
+  public Map<Integer, String[]> getParentsInfoByGIDList(List<Integer> gidList) {
+	return this.getGermplasmDao().getParentsInfoByGIDList(gidList);
+  }
+
+
 }
