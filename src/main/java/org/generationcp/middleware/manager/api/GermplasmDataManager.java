@@ -1171,4 +1171,11 @@ public interface GermplasmDataManager {
 	 */
 	List<Method> getFavoriteMethodsByMethodType(String methodType, String programUUID);
 
-}
+  /**
+   * Return the pedigree for a list of germplasms
+    * @param gidList
+   * @return
+   */
+  	Map<Integer, String[]> getParentsInfoByGIDList(List<Integer> gidList);
+
+  }

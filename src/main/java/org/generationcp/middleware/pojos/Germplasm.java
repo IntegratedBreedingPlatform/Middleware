@@ -312,7 +312,11 @@ public class Germplasm implements Serializable {
 			+ "WHERE g.mgid IN (:mgids)" + "GROUP BY g.gid" + ") " + Germplasm.GERMPLASM_ALIAS + "LEFT JOIN ("
 			+ Germplasm.SEARCH_GERMPLASM_WITH_INVENTORY + ")" + Germplasm.INVENTORY_ALIAS + Germplasm.JOIN_ON_GERMPLASM_AND_INVENTORY;
 
-	@Id
+	public static final String GET_PREFERRED_NAME_AND_PARENT_FOR_A_GID_LIST = "select g.gid as gid, ld.grpname as pedigree, "
+			+ " (select n.nval from names n where n.nstat=1 and n.gid = g.gid limit 1) as nval" + "  from germplsm g "
+			+ " inner join listdata ld on (g.gid = ld.gid) " + "where g.gid in (:gidList) " + "group by g.gid";
+
+  @Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "gid")
