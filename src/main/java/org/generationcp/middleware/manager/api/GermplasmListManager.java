@@ -299,10 +299,9 @@ public interface GermplasmListManager {
 	int deleteGermplasmListByListId(Integer listId);
 
 	/**
-	 * <b>WARNING</b>: this method physically removes records from the DB
-	 * Removes the corresponding temporary {@code GermplasmList} record and all
-	 * related Data from the database given the List ID.<br/>
-	 * Temporary Records have a special status and name
+	 * Removes the corresponding {@code GermplasmList} record and all related Data from the database given the List ID.
+	 *
+	 * <b>WARNING</b>: this method physically removes records from the DB<br/>
 	 *
 	 * @param listId - {@code GermplasmList} ID of the Germplasm List record to be deleted.
 	 * @return Returns the number of {@code GermplasmList} records deleted from the database.
