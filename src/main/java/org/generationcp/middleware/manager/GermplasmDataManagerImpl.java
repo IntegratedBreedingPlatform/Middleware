@@ -11,21 +11,11 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.generationcp.middleware.dao.AttributeDAO;
-import org.generationcp.middleware.dao.BibrefDAO;
-import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.MethodDAO;
-import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.ProgenitorDAO;
-import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.dao.*;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
@@ -33,26 +23,14 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.Bibref;
-import org.generationcp.middleware.pojos.Country;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmNameDetails;
-import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.Progenitor;
-import org.generationcp.middleware.pojos.ProgenitorPK;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.util.*;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -162,6 +140,24 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			germplasm.setPreferredName(preferredName);
 		}
 		return germplasm;
+	}
+
+	@Override
+	public List<Germplasm> getSortedGermplasmWithPrefName(final List<Integer> gids) {
+		List<Germplasm> result = new ArrayList<Germplasm>();
+		for (Iterator<Integer> iterator = gids.iterator(); iterator.hasNext(); ) {
+			Integer gid = iterator.next();
+			result.add(this.getGermplasmWithPrefName(gid));
+		}
+		Comparator<Germplasm> comparator = new Comparator<Germplasm>() {
+
+			@Override public int compare(Germplasm left, Germplasm right) {
+				return left.getPreferredName().getNval().compareTo(right.getPreferredName().getNval());
+			}
+		};
+
+		Collections.sort(result, comparator);
+		return result;
 	}
 
 	@Override

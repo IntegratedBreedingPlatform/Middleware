@@ -1171,4 +1171,6 @@ public interface GermplasmDataManager {
 	 */
 	List<Method> getFavoriteMethodsByMethodType(String methodType, String programUUID);
 
+	public List<Germplasm> getSortedGermplasmWithPrefName(final List<Integer> gids);
+
 }
