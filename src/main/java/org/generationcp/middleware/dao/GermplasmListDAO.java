@@ -57,9 +57,10 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	private static final String DESIGNED_CROSSES = "Designed Crosses";
 	
 	static {
-		RESTRICTED_LIST = Restrictions
-				.not(Restrictions.in("type", new String[] {GermplasmListType.NURSERY.toString(), GermplasmListType.TRIAL.toString(),
-						GermplasmListType.CHECK.toString(), GermplasmListType.ADVANCED.toString(), GermplasmListType.CROSSES.toString()}));
+		RESTRICTED_LIST = Restrictions.not(Restrictions.in("type",
+			new String[] {GermplasmListType.NURSERY.toString(), GermplasmListType.TRIAL.toString(), GermplasmListType.CHECK.toString(),
+				GermplasmListType.ADVANCED.toString(), GermplasmListType.CROSSES.toString(), GermplasmListType.F1CRT.toString(),
+				GermplasmListType.F1IMP.toString()}));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -472,7 +473,14 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 			criteria.add(Restrictions.eq("projectId", projectId));
-			criteria.add(Restrictions.eq("type", type.name()));
+			if (GermplasmListType.CROSSES.equals(type)) {
+				criteria.add(Restrictions.disjunction()
+					.add(Restrictions.eq("type", GermplasmListType.CROSSES.name()))
+					.add(Restrictions.eq("type", GermplasmListType.F1CRT.name()))
+					.add(Restrictions.eq("type", GermplasmListType.F1IMP.name())));
+			} else {
+				criteria.add(Restrictions.eq("type", type.name()));
+			}
 			criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
 
 			return criteria.list();
@@ -592,13 +600,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	public List<GermplasmList> appendTabLabelToList(List<GermplasmList> germplasmCrossesList) {
 		for (Iterator<GermplasmList> iterator = germplasmCrossesList.iterator(); iterator.hasNext();) {
 			GermplasmList germplasmList = (GermplasmList) iterator.next();
-			
+
 			if (GermplasmListType.F1IMP.toString().equals(germplasmList.getType())) {
 				germplasmList.setTabLabel(IMPORTED_CROSSES);
 			} else if (GermplasmListType.F1CRT.toString().equals(germplasmList.getType())) {
 				germplasmList.setTabLabel(DESIGNED_CROSSES);
-			}
-			else{
+			} else {
 				germplasmList.setTabLabel(CROSSES);
 			}
 		}

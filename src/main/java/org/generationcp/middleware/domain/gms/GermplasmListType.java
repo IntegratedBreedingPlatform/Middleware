@@ -15,5 +15,21 @@ public enum GermplasmListType {
 	/**
 	 * Crossing tool parent list
 	 */
-	PLCRT
+	PLCRT;
+
+	public static boolean isCrosses(GermplasmListType type) {
+		return CROSSES.equals(type)
+			|| F1CRT.equals(type)
+			|| F1IMP.equals(type);
+	}
+
+	public static boolean isCrosses(String type) {
+		GermplasmListType germplasmListType;
+		try {
+			germplasmListType = GermplasmListType.valueOf(type);
+		} catch (IllegalArgumentException e) {
+			return false;
+		}
+		return isCrosses(germplasmListType);
+	}
 }
