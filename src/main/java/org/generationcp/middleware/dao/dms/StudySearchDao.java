@@ -46,8 +46,8 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 									+ " inner join project_relationship r on r.object_project_id = p.project_id and r.type_id"
 									+ " NOT IN (" + TermId.HAS_PARENT_FOLDER.getId() + "," + TermId.STUDY_HAS_FOLDER.getId() + ") "
 									+ "where p.name " + buildMatchCondition(studySearchMatchingOption) + "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-									+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = "
-									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) ");
+									+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId()
+									+ ") ");
 
 			this.assignNameParameter(studySearchMatchingOption, query, name);
 			return ((BigInteger) query.uniqueResult()).longValue();
@@ -70,8 +70,8 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 									+ " inner join project_relationship r on r.object_project_id = p.project_id and r.type_id"
 									+ " NOT IN (" + TermId.HAS_PARENT_FOLDER.getId() + "," + TermId.STUDY_HAS_FOLDER.getId() + ") "
 									+ "where p.name " + buildMatchCondition(studySearchMatchingOption) + "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-									+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = "
-									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) ");
+									+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId()
+									+ ") ");
 
 			this.assignNameParameter(studySearchMatchingOption, query, name);
 			query.setFirstResult(start);
@@ -135,8 +135,8 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 							"select count(distinct pp.project_id) " + "from projectprop pp " + "where pp.type_id = "
 									+ TermId.START_DATE.getId() + "  and pp.value LIKE :compareDate "
 									+ "	AND NOT EXISTS (SELECT 1 FROM projectprop ss WHERE ss.type_id = " + TermId.STUDY_STATUS.getId()
-									+ "  AND ss.project_id = pp.project_id AND ss.value = "
-									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) ");
+									+ "  AND ss.project_id = pp.project_id AND ss.value = " + TermId.DELETED_STUDY.getId()
+									+ ") ");
 			query.setParameter("compareDate", dateString);
 			return ((BigInteger) query.uniqueResult()).longValue();
 
@@ -166,8 +166,8 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 									+ "where pp.type_id = " + TermId.START_DATE.getId() + "  and pp.value LIKE :compareDate "
 									+ "  and pp.project_id = p.project_id"
 									+ "	AND NOT EXISTS (SELECT 1 FROM projectprop ss WHERE ss.type_id = " + TermId.STUDY_STATUS.getId()
-									+ "  AND ss.project_id = p.project_id AND ss.value = "
-									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) ");
+									+ "  AND ss.project_id = p.project_id AND ss.value = " + TermId.DELETED_STUDY.getId()
+									+ " ) ");
 			query.setParameter("compareDate", dateString);
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
@@ -212,17 +212,16 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 												+ "		SELECT MIN(nd_experiment_id) " + "		  FROM nd_experiment min "
 												+ "		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " + "  	   )"
 												+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-												+ TermId.STUDY_STATUS.getId() + "   AND pp.project_id = p.project_id AND pp.value = "
-												+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId()
-												+ ")) "
+												+ TermId.STUDY_STATUS.getId() + "   AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId()
+												+ " ) "
 												+ "  UNION DISTINCT"
 												+ "  SELECT DISTINCT p.project_id FROM project p"
 												+ "  INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  " + TermId.BELONGS_TO_STUDY.getId()
 												+ "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = " + TermId.SEASON_VAR.getId()
 												+ "  WHERE pp.value = '" + valueId + "'"
 												+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-												+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = "
-												+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + "))"
+												+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId()
+												+ " )"
 												+ ") projectlist");
 
 				return ((BigInteger) query.uniqueResult()).longValue();
@@ -265,17 +264,16 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 												+ "		SELECT MIN(nd_experiment_id) " + "		  FROM nd_experiment min "
 												+ "		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " + "  	   )"
 												+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-												+ TermId.STUDY_STATUS.getId() + "   AND pp.project_id = p.project_id AND pp.value = "
-												+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId()
-												+ ")) "
+												+ TermId.STUDY_STATUS.getId() + "   AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId()
+												+ " ) "
 												+ "  UNION DISTINCT"
 												+ "  SELECT DISTINCT p.project_id, p.name, p.description FROM project p"
 												+ "  INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  " + TermId.BELONGS_TO_STUDY.getId()
 												+ "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = " + TermId.SEASON_VAR.getId()
 												+ "  WHERE pp.value = '" + valueId + "'"
 												+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-												+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = "
-												+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + "))");
+												+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = "  + TermId.DELETED_STUDY.getId()
+												+ " )");
 				query.setFirstResult(start);
 				query.setMaxResults(numOfRows);
 
@@ -309,16 +307,16 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 									+ " 	  (  " + "		SELECT MIN(nd_experiment_id) " + "		  FROM nd_experiment min "
 									+ "		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " + "  	   )"
 									+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = " + TermId.STUDY_STATUS.getId()
-									+ "   AND pp.project_id = p.project_id AND pp.value = "
-									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) "
+									+ "   AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId()
+									+ " ) "
 									+ "  UNION DISTINCT"
 									+ "  SELECT DISTINCT p.project_id FROM project p"
 									+ "  INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  " + TermId.BELONGS_TO_STUDY.getId()
 									+ "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = " + TermId.LOCATION_ID.getId()
 									+ "  WHERE pp.value IN (" + this.stringify(locationIds) + ")"
 									+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-									+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = "
-									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) "
+									+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId()
+									+ " ) "
 									+ ") locationList;");
 
 			return ((BigInteger) query.uniqueResult()).longValue();
@@ -347,16 +345,16 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 									+ " 	  (  " + "		SELECT MIN(nd_experiment_id) " + "		  FROM nd_experiment min "
 									+ "		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " + "  	   )"
 									+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = " + TermId.STUDY_STATUS.getId()
-									+ "   AND pp.project_id = p.project_id AND pp.value = "
-									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) "
+									+ "   AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId()
+									+ " ) "
 									+ "  UNION DISTINCT"
 									+ "  SELECT DISTINCT p.project_id, p.name, p.description FROM project p"
 									+ "  INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  " + TermId.BELONGS_TO_STUDY.getId()
 									+ "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = " + TermId.LOCATION_ID.getId()
 									+ "  WHERE pp.value IN (" + this.stringify(locationIds) + ")"
 									+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-									+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = "
-									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + "))");
+									+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId()
+									+ " )");
 
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
