@@ -53,8 +53,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	public static final Integer STATUS_DELETED = 9;
 	protected static final Criterion RESTRICTED_LIST;
 	private static final String CROSSES = "Crosses";
-	private static final String IMPORTED_CROSSES = "Imported Crosses";
-	private static final String DESIGNED_CROSSES = "Designed Crosses";
+	public static final String IMPORTED_CROSSES = "Imported Crosses";
+	public static final String DESIGNED_CROSSES = "Designed Crosses";
 	
 	static {
 		RESTRICTED_LIST = Restrictions.not(Restrictions.in("type",
