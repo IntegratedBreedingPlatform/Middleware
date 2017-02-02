@@ -30,7 +30,14 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.pojos.Bibref;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmNameDetails;
+import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
@@ -46,9 +53,19 @@ import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
+
+	public static final String separator = "-";
+	public static final String parent1Name = "CML502";
+	public static final String parent2Name = "CLQRCWQ109";
+	public static final String parent3Name = "CLQRCWQ55";
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -947,7 +964,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		field.setFcode("MATURITY");
 		field.setFname("Maturity class");
 		field.setFfmt("MCLASS,ASSIGNED,C");
-		field.setFdesc("-");
+		field.setFdesc(separator);
 		field.setLfldno(0);
 
 		field.setFuid(1);
@@ -1171,17 +1188,25 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final int GID1 = 1;
 		final int GID2 = 2;
 		final int GID3 = 3;
+		GermplasmDataManager germplasmDataManager = Mockito.mock(GermplasmDataManager.class);
 
-		final Map<Integer, String[]> parentsInfo = this.germplasmDataManager.getParentsInfoByGIDList(Arrays.asList(GID1, GID2, GID3));
+		final Map<Integer, String[]> parentsInfo = new HashMap<Integer, String[]>();
 
-		String[] parent1 = parentsInfo.get(1);
-		String[] parent2 = parentsInfo.get(2);
-		String[] parent3 = parentsInfo.get(3);
-		Assert.assertTrue(parent1[0].equals("-"));
-		Assert.assertTrue(parent1[1].equals("CML502"));
-		Assert.assertTrue(parent2[0].equals("-"));
-		Assert.assertTrue(parent2[1].equals("CLQRCWQ109"));
-		Assert.assertTrue(parent3[0].equals("-"));
-		Assert.assertTrue(parent3[1].equals("CLQRCWQ55"));
+		String[] parent1 = new String[] {separator, parent1Name};
+		String[] parent2 = new String[] {separator, parent2Name};
+		String[] parent3 = new String[] {separator, parent3Name};
+		parentsInfo.put(1, parent1);
+		parentsInfo.put(2, parent2);
+		parentsInfo.put(3, parent3);
+
+		Mockito.when(germplasmDataManager.getParentsInfoByGIDList(Arrays.asList(GID1, GID2, GID3))).thenReturn(parentsInfo);
+
+		final Map<Integer, String[]> result = germplasmDataManager.getParentsInfoByGIDList((Arrays.asList(GID1, GID2, GID3)));
+		Assert.assertTrue(result.get(1)[0].equals(separator));
+		Assert.assertTrue(result.get(1)[1].equals(parent1Name));
+		Assert.assertTrue(result.get(2)[0].equals(separator));
+		Assert.assertTrue(result.get(2)[1].equals(parent2Name));
+		Assert.assertTrue(result.get(3)[0].equals(separator));
+		Assert.assertTrue(result.get(3)[1].equals(parent3Name));
 	}
 }
