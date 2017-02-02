@@ -52,9 +52,6 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	public static final Integer STATUS_DELETED = 9;
 	protected static final Criterion RESTRICTED_LIST;
-	private static final String CROSSES = "Crosses";
-	public static final String IMPORTED_CROSSES = "Imported Crosses";
-	public static final String DESIGNED_CROSSES = "Designed Crosses";
 	
 	static {
 		RESTRICTED_LIST = Restrictions.not(Restrictions.in("type",
@@ -588,21 +585,6 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 				return folderMetaData.getListId();
 			}
 		});
-	}
-
-	public List<GermplasmList> appendTabLabelToList(List<GermplasmList> germplasmCrossesList) {
-		for (Iterator<GermplasmList> iterator = germplasmCrossesList.iterator(); iterator.hasNext();) {
-			GermplasmList germplasmList = (GermplasmList) iterator.next();
-
-			if (GermplasmListType.F1IMP.toString().equals(germplasmList.getType())) {
-				germplasmList.setTabLabel(IMPORTED_CROSSES);
-			} else if (GermplasmListType.F1CRT.toString().equals(germplasmList.getType())) {
-				germplasmList.setTabLabel(DESIGNED_CROSSES);
-			} else {
-				germplasmList.setTabLabel(CROSSES);
-			}
-		}
-		return germplasmCrossesList;
 	}
 
 	public int deleteGermplasmListByListIdPhysically(Integer listId) {
