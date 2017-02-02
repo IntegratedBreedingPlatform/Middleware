@@ -56,6 +56,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
 
+import static org.hamcrest.Matchers.lessThan;
+
 public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Autowired
@@ -969,7 +971,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final Date oldExpirationDate = newToolLicenseInfo.getExpirationDate();
 		final String newLicenseHash = "ddkjfksjgkbkgnbkb";
 		final Calendar calendar = Util.getCalendarInstance();
-		calendar.set(Calendar.YEAR, 2017);
+		calendar.add(Calendar.YEAR, 1);
 		final Date newExpirationDate = calendar.getTime();
 		newToolLicenseInfo.setLicenseHash(newLicenseHash);
 		newToolLicenseInfo.setExpirationDate(newExpirationDate);
@@ -985,7 +987,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(newToolLicenseInfo.getLicensePath(), existingToolLicenseInfo.getLicensePath());
 		Assert.assertNotEquals(oldLicenseHash, existingToolLicenseInfo.getLicenseHash());
 		Assert.assertEquals(newLicenseHash, existingToolLicenseInfo.getLicenseHash());
-		Assert.assertNotEquals(oldExpirationDate, existingToolLicenseInfo.getExpirationDate());
+		Assert.assertThat(oldExpirationDate.getTime(), lessThan(existingToolLicenseInfo.getExpirationDate().getTime()));
 		Assert.assertEquals(newExpirationDate, existingToolLicenseInfo.getExpirationDate());
 	}
 }
