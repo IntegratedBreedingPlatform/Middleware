@@ -83,6 +83,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
 
+	private static final String CROSSES = "Crosses";
+	public static final String IMPORTED_CROSSES = "Imported Crosses";
+	public static final String DESIGNED_CROSSES = "Designed Crosses";
+
 	@Resource
 	private GermplasmGroupingService germplasmGroupingService;
 
@@ -1151,6 +1155,19 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	public List<GermplasmList> appendTabLabelToList(List<GermplasmList> germplasmCrossesList) {
-		return this.getGermplasmListDAO().appendTabLabelToList(germplasmCrossesList);
+		{
+			for (Iterator<GermplasmList> iterator = germplasmCrossesList.iterator(); iterator.hasNext();) {
+				GermplasmList germplasmList = (GermplasmList) iterator.next();
+
+				if (GermplasmListType.F1IMP.toString().equals(germplasmList.getType())) {
+					germplasmList.setTabLabel(IMPORTED_CROSSES);
+				} else if (GermplasmListType.F1CRT.toString().equals(germplasmList.getType())) {
+					germplasmList.setTabLabel(DESIGNED_CROSSES);
+				} else {
+					germplasmList.setTabLabel(CROSSES);
+				}
+			}
+			return germplasmCrossesList;
+		}
 	}
 }
