@@ -11,13 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import org.apache.commons.io.FileUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -37,14 +30,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.Bibref;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmNameDetails;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.Name;
-import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
@@ -56,9 +42,11 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
+
+import java.io.File;
+import java.util.*;
 
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
@@ -1176,5 +1164,24 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		sizeBeforeAddingNewName = namesMap.get(GID3) != null ? namesMap.get(GID3).size() : 0;
 		sizeAfterAddingNewName = newNamesMap.get(GID3) != null ? namesMap.get(GID3).size() : 0;
 		Assert.assertEquals("Expecting list of names for GID 3 to be constant since there are no new names added for it.", sizeBeforeAddingNewName, sizeAfterAddingNewName);
+	}
+
+	@Test
+	public void testGetParentsInfoByGIDList() {
+		final int GID1 = 1;
+		final int GID2 = 2;
+		final int GID3 = 3;
+
+		final Map<Integer, String[]> parentsInfo = this.germplasmDataManager.getParentsInfoByGIDList(Arrays.asList(GID1, GID2, GID3));
+
+		String[] parent1 = parentsInfo.get(1);
+		String[] parent2 = parentsInfo.get(2);
+		String[] parent3 = parentsInfo.get(3);
+		Assert.assertTrue(parent1[0].equals("-"));
+		Assert.assertTrue(parent1[1].equals("CML502"));
+		Assert.assertTrue(parent2[0].equals("-"));
+		Assert.assertTrue(parent2[1].equals("CLQRCWQ109"));
+		Assert.assertTrue(parent3[0].equals("-"));
+		Assert.assertTrue(parent3[1].equals("CLQRCWQ55"));
 	}
 }
