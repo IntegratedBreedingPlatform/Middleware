@@ -473,14 +473,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 			criteria.add(Restrictions.eq("projectId", projectId));
-			if (GermplasmListType.CROSSES.equals(type)) {
-				criteria.add(Restrictions.disjunction()
-					.add(Restrictions.eq("type", GermplasmListType.CROSSES.name()))
-					.add(Restrictions.eq("type", GermplasmListType.F1CRT.name()))
-					.add(Restrictions.eq("type", GermplasmListType.F1IMP.name())));
-			} else {
-				criteria.add(Restrictions.eq("type", type.name()));
-			}
+			criteria.add(Restrictions.eq("type", type.name()));
 			criteria.add(Restrictions.ne("status", GermplasmListDAO.STATUS_DELETED));
 
 			return criteria.list();
