@@ -56,6 +56,9 @@ public class GermplasmList implements Serializable {
     public static final String CROSS_LIST_TYPE = "CROSSES";
 	public static final String DELETE_GERMPLASM_LIST_BY_LISTID_PHYSICALLY = "deleteGermplasmListByListIdPhysically";
 	public static final String GERMPLASM_LIST_LIST_ID_COLUMN = "listid";
+	public static final String CROSSES = "Crosses";
+	public static final String IMPORTED_CROSSES = "Imported Crosses";
+	public static final String DESIGNED_CROSSES = "Designed Crosses";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
