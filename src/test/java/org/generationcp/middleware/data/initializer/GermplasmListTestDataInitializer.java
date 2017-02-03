@@ -8,13 +8,18 @@ import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.util.Util;
-
 import org.generationcp.middleware.pojos.ListDataProject;
+import org.generationcp.middleware.util.Util;
 
 public class GermplasmListTestDataInitializer {
 
-	private static final int USER_ID = 1;
+	public static final String DEFAULT_GERMPLASM_LIST_TYPE = "LST";
+	public static final String FOLDER_GERMPLASM_LIST_TYPE = "FOLDER";
+	
+	public  static final int USER_ID = 1;
+
+	public static final Integer STATUS_ACTIVE = 0;
+	public static final Integer STATUS_DELETED = 9;
 
 	/**
 	 * create GermplasmList object with basic list details initialized
@@ -60,6 +65,13 @@ public class GermplasmListTestDataInitializer {
 		return germplasmList;
 	}
 
+	
+	public GermplasmList createGermplasmList(final String name, final String description, final String listType, final String programUUID) {
+		final GermplasmList germplasmList = createGermplasmList(name, USER_ID, description, null, STATUS_ACTIVE, programUUID);
+		germplasmList.setType(listType);
+		return germplasmList;
+	}
+	
 	/**
 	 * Create dummy germplasm list with list data having dummy assigned id
 	 *
