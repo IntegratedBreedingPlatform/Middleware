@@ -50,7 +50,13 @@ public enum NonEditableFactors {
 
 	ENTRY_TYPE(TermId.ENTRY_TYPE.getId()),
 
-	TRIAL_INSTANCE(TermId.TRIAL_INSTANCE_FACTOR.getId());
+	TRIAL_INSTANCE(TermId.TRIAL_INSTANCE_FACTOR.getId()),
+
+	GROUPGID(TermId.GROUPGID.getId()),
+
+	STOCKID(TermId.STOCKID.getId());
+
+
 
 	/** The id. */
 	private int id;
