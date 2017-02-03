@@ -15,7 +15,13 @@ import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-import org.generationcp.middleware.dao.*;
+import org.generationcp.middleware.dao.AttributeDAO;
+import org.generationcp.middleware.dao.BibrefDAO;
+import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.MethodDAO;
+import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
@@ -23,7 +29,18 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.pojos.Bibref;
+import org.generationcp.middleware.pojos.Country;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmNameDetails;
+import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
+import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Progenitor;
+import org.generationcp.middleware.pojos.ProgenitorPK;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
 import org.hibernate.SQLQuery;
@@ -1399,9 +1416,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	/**
 	 * (non-Javadoc)
-	 * 
-	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getUserDefinedFieldsByCodesInMap(java.lang.String,
-	 *      java.lang.String, java.util.List)
+	 *
 	 */
 	@Override
 	public UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code) {
