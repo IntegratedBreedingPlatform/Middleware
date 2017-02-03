@@ -44,17 +44,17 @@ public class FieldbookListUtil {
 
 
 		if (data != null && !data.isEmpty()) {
-			for (final ListDataProject ListData : data) {
+			for (final ListDataProject listData : data) {
 				String stockIdValue = "";
 				if (stockIds != null) {
 					for (final Integer gid : stockIds.keySet()) {
-						if (ListData.getGermplasmId().equals(gid)) {
+						if (listData.getGermplasmId().equals(gid)) {
 							stockIdValue = stockIds.get(gid);
 							break;
 						}
 					}
 				}
-				ListData.setStockIDs(stockIdValue);
+				listData.setStockIDs(stockIdValue);
 			}
 		}
 	}
@@ -70,17 +70,17 @@ public class FieldbookListUtil {
 		Map<Integer, String> stockIds = inventoryDataManager.retrieveStockIds(gids);
 
 		if (data != null && !data.isEmpty()) {
-			for (final GermplasmListData ListData : data) {
+			for (final GermplasmListData listData : data) {
 				String stockIdValue = "";
 				if (stockIds != null) {
 					for (final Integer gid : stockIds.keySet()) {
-						if (ListData.getGid().equals(gid)) {
+						if (listData.getGid().equals(gid)) {
 							stockIdValue = stockIds.get(gid);
 							break;
 						}
 					}
 				}
-				ListData.setStockIDs(stockIdValue);
+				listData.setStockIDs(stockIdValue);
 			}
 		}
 	}
