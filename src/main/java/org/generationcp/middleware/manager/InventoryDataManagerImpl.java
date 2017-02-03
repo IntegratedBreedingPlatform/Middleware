@@ -679,4 +679,9 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		return germplasms;
 	}
 
+	@Override
+	public Map<Integer, String> retrieveStockIds(List<Integer> gids){
+		return this.getTransactionDao().retrieveStockIds(gids);
+	}
+
 }
