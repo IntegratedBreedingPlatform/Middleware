@@ -150,6 +150,9 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	@Transient
 	private String breedingMethodName = "";
 
+	@Transient
+	private String stockIDs = "";
+
   	@Transient
   	private String femalePedigree;
 
@@ -439,7 +442,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	@Override
 	public String getStockIDs() {
-		return "";
+		return this.stockIDs;
 	}
 
 	@Override
@@ -476,6 +479,10 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	public void setBreedingMethodName(String breedingMethodName) {
 		this.breedingMethodName = breedingMethodName;
+	}
+
+	public void setStockIDs(String stockIDs) {
+		this.stockIDs = stockIDs;
 	}
 
 	public String getFemalePedigree() {
