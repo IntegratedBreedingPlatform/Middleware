@@ -94,7 +94,7 @@ public class StudyTestDataInitializer {
 		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId);
 	}
 
-	public StudyReference addTestStudy(final String studyName, final StudyType studyType, final String seasonId, final String locationId) throws Exception {
+	public StudyReference addTestStudy(final String studyName, final StudyType studyType, final String seasonId, final String locationId, final String startDate) throws Exception {
 
 		final VariableTypeList typeList = new VariableTypeList();
 		final VariableList variableList = new VariableList();
@@ -122,6 +122,11 @@ public class StudyTestDataInitializer {
 		variable = this.createVariable(TermId.SEASON_VAR.getId(), seasonId, 6, PhenotypicType.STUDY);
 		typeList.add(variable.getVariableType());
 		variableList.add(variable);
+
+		variable = this.createVariable(TermId.START_DATE.getId(), startDate , 7, PhenotypicType.STUDY);
+		typeList.add(variable.getVariableType());
+		variableList.add(variable);
+
 
 		final StudyValues studyValues = this.createStudyValues(variableList);
 

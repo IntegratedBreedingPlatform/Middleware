@@ -222,6 +222,27 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 	}
 
+	@Test
+	public void testCountStudiesByStartDate() {
+
+		Assert.assertEquals("There should be 3 studies created in the year 2020", 3, studySearchDao.countStudiesByStartDate(2020, PROGRAM_UUID));
+		Assert.assertEquals("There should be 2 studies created in January 2020 ", 2, studySearchDao.countStudiesByStartDate(202001, PROGRAM_UUID));
+		Assert.assertEquals("There should be 1 study created in December 1 2020 ", 1, studySearchDao.countStudiesByStartDate(20201201, PROGRAM_UUID));
+
+	}
+
+	@Test
+	public void testGetStudiesByStartDate() {
+
+		List<StudyReference> studies = studySearchDao.getStudiesByStartDate(20201201, 0, Integer.MAX_VALUE, PROGRAM_UUID);
+		Assert.assertEquals("There should be 1 study created in December 1 2020", 3, studySearchDao.countStudiesByStartDate(2020, PROGRAM_UUID));
+
+		Assert.assertEquals(TEST_TRIAL_NAME_3, studies.get(0).getName());
+
+	}
+
+
+
 	private void createTestStudies() throws Exception {
 
 		final WorkbenchTestDataUtil workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
@@ -236,17 +257,17 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		final StudyReference studyReference1 = studyTestDataInitializer
 				.addTestStudy(TEST_TRIAL_NAME_1, StudyType.T, String.valueOf(TermId.SEASON_DRY.getId()),
-						String.valueOf(LUXEMBOURG_COUNTRY_LOCATION_ID));
+						String.valueOf(LUXEMBOURG_COUNTRY_LOCATION_ID), "20200101");
 		studyTestDataInitializer.addTestDataset(studyReference1.getId());
 
 		final StudyReference studyReference2 = studyTestDataInitializer
 				.addTestStudy(TEST_TRIAL_NAME_2, StudyType.T, String.valueOf(TermId.SEASON_WET.getId()),
-						String.valueOf(LUXEMBOURG_COUNTRY_LOCATION_ID));
+						String.valueOf(LUXEMBOURG_COUNTRY_LOCATION_ID), "20200102");
 		studyTestDataInitializer.addTestDataset(studyReference2.getId());
 
 		final StudyReference studyReference3 = studyTestDataInitializer
 				.addTestStudy(TEST_TRIAL_NAME_3, StudyType.T, String.valueOf(TermId.SEASON_DRY.getId()),
-						String.valueOf(LUXEMBOURG_COUNTRY_LOCATION_ID));
+						String.valueOf(LUXEMBOURG_COUNTRY_LOCATION_ID), "20201201");
 		studyTestDataInitializer.addTestDataset(studyReference3.getId());
 
 	}
