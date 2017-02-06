@@ -628,7 +628,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	private Map<Integer, AdditionalInfoDto> getAdditionalInfoFieldMap(final List<String> listLocation) {
 		String[] locations = new String[listLocation.size()];
 		locations =listLocation.toArray(locations);
-		final List<Locdes> listFieldParent = this.getLocdesDao().getAllLocdesByFilters(LocdesType.FIELD_PARENT.getCode(), locations);
+		final List<Locdes> listFieldParent = this.getLocdesDao().getAllLocationDescriptionsByFilters(LocdesType.FIELD_PARENT.getCode(), locations);
 		final Map<String, UserDefinedField> dTypes = this.getUserDefinedFieldMapOfCodeByUDTableType(UDTableType.LOCDES_DTYPE);
 		final Map<Integer, AdditionalInfoDto> mapAdditionalInfoDto = new HashMap<Integer, AdditionalInfoDto>();
 
@@ -643,7 +643,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			additionalInfoDto.addInfo(LocdesType.FIELD_PARENT.getCode(), getLocationName(fieldParent.getLocationId()));
 
 			final List<Locdes> listblockParent =
-					this.getLocdesDao().getAllLocdesByFilters(LocdesType.BLOCK_PARENT.getCode(), null, fieldParent.getLocationId().toString());
+					this.getLocdesDao().getAllLocationDescriptionsByFilters(LocdesType.BLOCK_PARENT.getCode(), null, fieldParent.getLocationId().toString());
 
 			int countBlockParent = listblockParent.size() == 1 ? 0 : 1;
 			String concatNumeric = "";

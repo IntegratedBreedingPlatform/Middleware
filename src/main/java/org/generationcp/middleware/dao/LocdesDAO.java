@@ -57,7 +57,7 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 
 	
 	@SuppressWarnings("unchecked")
-	public List<Locdes> getAllLocdesByFilters(final String fcode,final String[] dval) throws MiddlewareQueryException {
+	public List<Locdes> getAllLocationDescriptionsByFilters(final String fcode,final String[] dval) throws MiddlewareQueryException {
 		try {
 			final StringBuilder sqlString = new StringBuilder();
 
@@ -81,12 +81,12 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 		} catch (HibernateException e) {
 			LocdesDAO.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(
-					this.getLogExceptionMessage("getAllLocdesByFilters", "", null, e.getMessage(), LocdesDAO.CLASS_NAME_LOCDES), e);
+					this.getLogExceptionMessage("getAllLocationDescriptionsByFilters", "", null, e.getMessage(), LocdesDAO.CLASS_NAME_LOCDES), e);
 		}
 	}
 	
 	@SuppressWarnings("unchecked")
-	public List<Locdes> getAllLocdesByFilters(final String fcode, final Integer locid, final String dval) throws MiddlewareQueryException {
+	public List<Locdes> getAllLocationDescriptionsByFilters(final String fcode, final Integer locid, final String dval) throws MiddlewareQueryException {
 		try {
 			final StringBuilder sqlString = new StringBuilder();
 
@@ -113,7 +113,7 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 		} catch (HibernateException e) {
 			LocdesDAO.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(
-					this.getLogExceptionMessage("getAllLocdesByFilters", "", null, e.getMessage(), LocdesDAO.CLASS_NAME_LOCDES), e);
+					this.getLogExceptionMessage("getAllLocationDescriptionsByFilters", "", null, e.getMessage(), LocdesDAO.CLASS_NAME_LOCDES), e);
 		}
 	}
 }
