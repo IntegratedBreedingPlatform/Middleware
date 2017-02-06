@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.generationcp.middleware.domain.inventory.InventoryDetails;
@@ -630,5 +631,13 @@ public interface InventoryDataManager {
 	 * @throws MiddlewareQueryException
 	 */
 	List<Germplasm> getAvailableBalanceForGermplasms(List<Germplasm> germplasms) throws MiddlewareQueryException;
+
+	/**
+	 * Returns the Map of gid and related stockIds.
+	 *
+	 * @param gids
+	 * @return Map of stockIDs per gid
+	 */
+	Map<Integer, String> retrieveStockIds(List<Integer> gids);
 
 }
