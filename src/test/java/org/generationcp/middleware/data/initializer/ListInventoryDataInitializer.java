@@ -122,6 +122,7 @@ public class ListInventoryDataInitializer {
 		lotDetail.setLotStatus(LotStatus.ACTIVE.name());
 		lotDetail.setReservedTotal(200D);
 		lotDetail.setCommittedTotalForEntry(50D);
+		lotDetail.setEntityIdOfLot(id);
 		return lotDetail;
 	}
 

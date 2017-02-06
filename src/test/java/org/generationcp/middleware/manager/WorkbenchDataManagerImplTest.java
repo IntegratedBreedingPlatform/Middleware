@@ -21,7 +21,6 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
 import org.generationcp.middleware.dao.ToolDAO;
-import org.generationcp.middleware.data.initializer.ToolLicenseInfoInitializer;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
@@ -914,78 +913,4 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		MatcherAssert.assertThat("Expected the same id of userDto saved record ", result.equals(userId));
 	}
 
-	@Test
-	public void testGetListOfToolLicenseInfo() {
-		// create test data and save to database
-		final String expectedToolName = ToolName.mbdt.toString();
-		final ToolLicenseInfo newToolLicenseInfo = this.workbenchDataManager
-				.saveOrUpdateToolLicenseInfo(new ToolLicenseInfoInitializer().createToolLicenseInfo(expectedToolName));
-		// retrieve all list
-		final List<ToolLicenseInfo> toolLicenseInfoList = this.workbenchDataManager.getListOfToolLicenseInfo();
-		// verify result
-		Assert.assertFalse("Result should be not be empty", toolLicenseInfoList.isEmpty());
-		boolean newToolLicenseInfoIsFound = false;
-		for (final ToolLicenseInfo toolLicenseInfo : toolLicenseInfoList) {
-			if (toolLicenseInfo.getLicenseInfoId().equals(newToolLicenseInfo.getLicenseInfoId())) {
-				newToolLicenseInfoIsFound = true;
-				Assert.assertEquals(newToolLicenseInfo.getLicenseInfoId(), toolLicenseInfo.getLicenseInfoId());
-				Assert.assertEquals(newToolLicenseInfo.getTool(), toolLicenseInfo.getTool());
-				Assert.assertEquals(expectedToolName, toolLicenseInfo.getTool().getToolName());
-				Assert.assertEquals(newToolLicenseInfo.getLicensePath(), toolLicenseInfo.getLicensePath());
-				Assert.assertEquals(newToolLicenseInfo.getLicenseHash(), toolLicenseInfo.getLicenseHash());
-				Assert.assertEquals(newToolLicenseInfo.getExpirationDate(), toolLicenseInfo.getExpirationDate());
-			}
-		}
-		Assert.assertTrue("The license info for " + expectedToolName + " should be found", newToolLicenseInfoIsFound);
-	}
-
-	@Test
-	public void testGetToolLicenseInfoByToolName() {
-		// create test data and save to database
-		final String expectedToolName = ToolName.mbdt.toString();
-		final ToolLicenseInfo actualToolLicenseInfo = this.workbenchDataManager
-				.saveOrUpdateToolLicenseInfo(new ToolLicenseInfoInitializer().createToolLicenseInfo(expectedToolName));
-		// retrieve the license info
-		final ToolLicenseInfo expectedToolLicenseInfo = this.workbenchDataManager.getToolLicenseInfoByToolName(expectedToolName);
-		// verify result
-		Assert.assertNotNull(expectedToolLicenseInfo);
-		Assert.assertEquals(expectedToolLicenseInfo.getLicenseInfoId(), actualToolLicenseInfo.getLicenseInfoId());
-		Assert.assertEquals(expectedToolLicenseInfo.getTool(), actualToolLicenseInfo.getTool());
-		Assert.assertEquals(expectedToolName, actualToolLicenseInfo.getTool().getToolName());
-		Assert.assertEquals(expectedToolLicenseInfo.getLicensePath(), actualToolLicenseInfo.getLicensePath());
-		Assert.assertEquals(expectedToolLicenseInfo.getLicenseHash(), actualToolLicenseInfo.getLicenseHash());
-		Assert.assertEquals(expectedToolLicenseInfo.getExpirationDate(), actualToolLicenseInfo.getExpirationDate());
-	}
-
-	@Test
-	public void testSaveOrUpdateToolLicenseInfo() {
-		// create test data and save to database
-		final String expectedToolName = ToolName.mbdt.toString();
-		final ToolLicenseInfo newToolLicenseInfo = this.workbenchDataManager
-				.saveOrUpdateToolLicenseInfo(new ToolLicenseInfoInitializer().createToolLicenseInfo(expectedToolName));
-
-		// update the expiration date and license hash then save changes to the database
-		final String oldLicenseHash = newToolLicenseInfo.getLicenseHash();
-		final Date oldExpirationDate = newToolLicenseInfo.getExpirationDate();
-		final String newLicenseHash = "ddkjfksjgkbkgnbkb";
-		final Calendar calendar = Util.getCalendarInstance();
-		calendar.set(Calendar.YEAR, 2017);
-		final Date newExpirationDate = calendar.getTime();
-		newToolLicenseInfo.setLicenseHash(newLicenseHash);
-		newToolLicenseInfo.setExpirationDate(newExpirationDate);
-		final ToolLicenseInfo existingToolLicenseInfo = this.workbenchDataManager.saveOrUpdateToolLicenseInfo(newToolLicenseInfo);
-
-		// verify result
-		Assert.assertNotNull(newToolLicenseInfo);
-		Assert.assertNotNull(existingToolLicenseInfo);
-		Assert.assertEquals(expectedToolName, newToolLicenseInfo.getTool().getToolName());
-		Assert.assertEquals(expectedToolName, existingToolLicenseInfo.getTool().getToolName());
-		Assert.assertEquals(newToolLicenseInfo.getLicenseInfoId(), existingToolLicenseInfo.getLicenseInfoId());
-		Assert.assertEquals(newToolLicenseInfo.getTool(), existingToolLicenseInfo.getTool());
-		Assert.assertEquals(newToolLicenseInfo.getLicensePath(), existingToolLicenseInfo.getLicensePath());
-		Assert.assertNotEquals(oldLicenseHash, existingToolLicenseInfo.getLicenseHash());
-		Assert.assertEquals(newLicenseHash, existingToolLicenseInfo.getLicenseHash());
-		Assert.assertNotEquals(oldExpirationDate, existingToolLicenseInfo.getExpirationDate());
-		Assert.assertEquals(newExpirationDate, existingToolLicenseInfo.getExpirationDate());
-	}
 }

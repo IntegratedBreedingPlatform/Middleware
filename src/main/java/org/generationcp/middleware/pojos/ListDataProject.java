@@ -77,6 +77,24 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 	@Column(name = "crossing_date")
 	private Integer crossingDate;
 
+	public ListDataProject(){}
+
+	public ListDataProject(GermplasmList list, Integer germplasmId, Integer checkType, Integer entryId, String entryCode, String seedSource,
+			String designation, String groupName, String duplicate, String notes, Integer crossingDate) {
+		this.list = list;
+		this.germplasmId = germplasmId;
+		this.checkType = checkType;
+		this.entryId = entryId;
+		this.entryCode = entryCode;
+		this.seedSource = seedSource;
+		this.designation = designation;
+		this.groupName = groupName;
+		this.duplicate = duplicate;
+		this.notes = notes;
+		this.crossingDate = crossingDate;
+	}
+
+
 	/***
 	 * The following will only be field when getListDataProjectWithParents() is called, otherwise, it will always be null
 	 */
@@ -97,6 +115,9 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 
 	@Transient
 	private String checkTypeDescription = null;
+
+	@Transient
+	private String stockIDs = "";
 
 	/**
 	 * @return the listDataProjectId
@@ -418,8 +439,7 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 
 	@Override
 	public String getStockIDs() {
-
-		return "";
+		return this.stockIDs;
 	}
 
 	@Override
@@ -434,6 +454,10 @@ public class ListDataProject implements Serializable, GermplasmExportSource {
 
 	public void setGroupId(final Integer groupId) {
 		this.groupId = groupId;
+	}
+
+	public void setStockIDs(String stockIDs) {
+		this.stockIDs = stockIDs;
 	}
 
 }
