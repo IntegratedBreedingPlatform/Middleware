@@ -326,18 +326,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			Query query = this.getSession().createSQLQuery(sql).addScalar("personId").addScalar("fName").addScalar("lName")
 					.addScalar("email").addScalar("role").setParameter("studyId", studyId);
 			List<Object> results = query.list();
-			for (Object obj : results) {
-				Object[] row = (Object[]) obj;
-				UserDto user = new UserDto();
-				user.setUserId((Integer) row[0]);
-				user.setFirstName((String) row[1]);
-				user.setLastName((String) row[2]);
-				user.setEmail((String) row[3]);
-				if (row[4] instanceof String && !StringUtils.isBlank((String) row[4])) {
-					user.setRole((String) row[4]);
-				}
-				users.add(user);
-			}
+			mapUsers(users, results);
 			return users;
 		} catch (MiddlewareQueryException e) {
 			final String message = "Error with getUsersAssociatedToStudy() query from studyId: " + studyId;
@@ -346,7 +335,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		}
 	}
 
-	public List<UserDto> getUsersAssociatedToInstance(final Integer instanceId) throws MiddlewareQueryException {
+	public List<UserDto> getUsersForEnvironment(final Integer instanceId) throws MiddlewareQueryException {
 		Preconditions.checkNotNull(instanceId);
 		List<UserDto> users = new ArrayList<>();
 		StringBuilder sql = new StringBuilder().append("SELECT DISTINCT ")
@@ -363,23 +352,27 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			Query query = this.getSession().createSQLQuery(sql.toString()).addScalar("personId").addScalar("fName").addScalar("lName")
 					.addScalar("email").addScalar("role").setParameter("instanceDbId", instanceId);
 			List<Object> results = query.list();
-			for (Object obj : results) {
-				Object[] row = (Object[]) obj;
-				UserDto user = new UserDto();
-				user.setUserId((Integer) row[0]);
-				user.setFirstName((String) row[1]);
-				user.setLastName((String) row[2]);
-				user.setEmail((String) row[3]);
-				if (row[4] instanceof String && !StringUtils.isBlank((String)row[4])) {
-					user.setRole((String) row[4]);
-				}
-				users.add(user);
-			}
+			mapUsers(users, results);
 			return users;
 		} catch (MiddlewareQueryException e) {
-			final String message = "Error with getUsersAssociatedToInstance() query from instanceId: " + instanceId;
+			final String message = "Error with getUsersForEnvironment() query from instanceId: " + instanceId;
 			UserDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	private void mapUsers(List<UserDto> users, List<Object> results) {
+		for (Object obj : results) {
+			Object[] row = (Object[]) obj;
+			UserDto user = new UserDto();
+			user.setUserId((Integer) row[0]);
+			user.setFirstName((String) row[1]);
+			user.setLastName((String) row[2]);
+			user.setEmail((String) row[3]);
+			if (row[4] instanceof String && !StringUtils.isBlank((String) row[4])) {
+				user.setRole((String) row[4]);
+			}
+			users.add(user);
 		}
 	}
 

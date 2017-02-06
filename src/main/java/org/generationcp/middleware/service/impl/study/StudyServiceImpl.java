@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
-import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -26,7 +25,6 @@ import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerI
 import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
@@ -361,7 +359,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				List<UserDto> users = new ArrayList<>();
 				Map<String, String> properties = new HashMap<>();
 				if (studyMetadata.getStudyType().equalsIgnoreCase(TRIAL_TYPE)) {
-					users.addAll(this.userDataManager.getUsersAssociatedToInstance(studyMetadata.getStudyDbId()));
+					users.addAll(this.userDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
 					users.addAll(this.userDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
 					properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByStudy(studyId));
 					properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));

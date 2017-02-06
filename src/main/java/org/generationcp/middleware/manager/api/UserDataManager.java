@@ -185,6 +185,6 @@ public interface UserDataManager {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	List<UserDto> getUsersAssociatedToInstance (final Integer instanceId) throws MiddlewareQueryException;
+	List<UserDto> getUsersForEnvironment(final Integer instanceId) throws MiddlewareQueryException;
 
 }

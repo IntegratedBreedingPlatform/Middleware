@@ -271,8 +271,8 @@ public class UserDataManagerImpl extends DataManager implements UserDataManager 
 	}
 
 	@Override
-	public List<UserDto> getUsersAssociatedToInstance(final Integer instanceId) throws MiddlewareQueryException {
-		return this.getUserDao().getUsersAssociatedToInstance(instanceId);
+	public List<UserDto> getUsersForEnvironment(final Integer instanceId) throws MiddlewareQueryException {
+		return this.getUserDao().getUsersForEnvironment(instanceId);
 	}
 
 }

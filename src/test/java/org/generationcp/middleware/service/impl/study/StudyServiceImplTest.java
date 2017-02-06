@@ -31,7 +31,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * The class <code>StudyServiceImplTest</code> contains tests for the class <code>{@link StudyServiceImpl}</code>.
@@ -199,7 +198,7 @@ public class StudyServiceImplTest {
 		Mockito.when(studyDataManager.getStudyMetadata(metadata.getStudyDbId())).thenReturn(metadata);
 		Mockito.when(userDataManager.getUsersAssociatedToStudy(metadata.getNurseryOrTrialId())).thenReturn(users1);
 		Mockito.when(studyDataManager.getProjectPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties1);
-		Mockito.when(userDataManager.getUsersAssociatedToInstance(metadata.getNurseryOrTrialId())).thenReturn(users2);
+		Mockito.when(userDataManager.getUsersForEnvironment(metadata.getNurseryOrTrialId())).thenReturn(users2);
 		Mockito.when(studyDataManager.getGeolocationPropsAndValuesByStudy(metadata.getNurseryOrTrialId())).thenReturn(properties2);
 
 
