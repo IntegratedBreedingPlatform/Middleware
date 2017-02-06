@@ -136,7 +136,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 					this.getSession().createSQLQuery("select count(distinct p.project_id) from project p "
 							+ " INNER JOIN projectprop projectPropStartDate ON p.project_id = projectPropStartDate.project_id AND projectPropStartDate.type_id = " + TermId.START_DATE.getId() + " AND projectPropStartDate.value LIKE :compareDate "
 							+ "	AND NOT EXISTS (SELECT 1 FROM projectprop ss WHERE ss.type_id = " + TermId.STUDY_STATUS.getId()
-							+ "  AND ss.project_id = pp.project_id AND ss.value = " + TermId.DELETED_STUDY.getId()
+							+ "  AND ss.project_id = projectPropStartDate.project_id AND ss.value = " + TermId.DELETED_STUDY.getId()
 							+ ") WHERE p.program_uuid = :programUUID");
 
 
@@ -169,7 +169,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 							"select distinct p.project_id, p.name, p.description from project p "
 									+ " INNER JOIN projectprop projectPropStartDate ON p.project_id = projectPropStartDate.project_id AND projectPropStartDate.type_id = " + TermId.START_DATE.getId() + " AND projectPropStartDate.value LIKE :compareDate "
 									+ "	AND NOT EXISTS (SELECT 1 FROM projectprop ss WHERE ss.type_id = " + TermId.STUDY_STATUS.getId()
-									+ "  AND ss.project_id = pp.project_id AND ss.value = " + TermId.DELETED_STUDY.getId()
+									+ "  AND ss.project_id = projectPropStartDate.project_id AND ss.value = " + TermId.DELETED_STUDY.getId()
 									+ ") WHERE p.program_uuid = :programUUID");
 
 			query.setParameter("programUUID", programUUID);
