@@ -24,6 +24,8 @@ public class BrowseStudyQueryFilter implements StudyQueryFilter {
 
 	private Season season;
 
+	private String programUUID;
+
 	private StudySearchMatchingOption studySearchMatchingOption;
 
 	public Integer getStartDate() {
@@ -69,7 +71,14 @@ public class BrowseStudyQueryFilter implements StudyQueryFilter {
 	@Override
 	public String toString() {
 		return "StudyQueryFilter [startDate=" + this.startDate + ", name=" + this.name + ", country=" + this.country + ", season="
-				+ this.season + "]";
+				+ this.season + ", programUUID=" + programUUID + "]";
 	}
 
+	public String getProgramUUID() {
+		return programUUID;
+	}
+
+	public void setProgramUUID(String programUUID) {
+		this.programUUID = programUUID;
+	}
 }

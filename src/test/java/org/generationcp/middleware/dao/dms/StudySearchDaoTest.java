@@ -29,6 +29,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	public static final String TEST_TRIAL_NAME_1 = "1 Test Trial Sample";
 	public static final String TEST_TRIAL_NAME_2 = "2 Test Trial Sample";
 	public static final String TEST_TRIAL_NAME_3 = "3 Test Trial Sample";
+	private final String PROGRAM_UUID = "700e62d7-09b2-46af-a79c-b19ba4850681";
 	private final int NO_OF_TEST_STUDIES = 3;
 	private final int LUXEMBOURG_COUNTRY_LOCATION_ID = 127;
 
@@ -55,8 +56,8 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		this.studySearchDao = new StudySearchDao();
 		this.studySearchDao.setSession(this.sessionProvder.getSession());
 
-		numberOfDrySeasonBeforeCreatingTestData = studySearchDao.countStudiesBySeason(Season.DRY);
-		numberOfWetSeasoBeforeCreatingTestData = studySearchDao.countStudiesBySeason(Season.WET);
+		numberOfDrySeasonBeforeCreatingTestData = studySearchDao.countStudiesBySeason(Season.DRY, PROGRAM_UUID);
+		numberOfWetSeasoBeforeCreatingTestData = studySearchDao.countStudiesBySeason(Season.WET, PROGRAM_UUID);
 
 		this.createTestStudies();
 
@@ -68,7 +69,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		final String studyNameSearchKeyword = "TestTrialSample";
 
 		final List<StudyReference> studies =
-				studySearchDao.getStudiesByName(studyNameSearchKeyword, 0, Integer.MAX_VALUE, StudySearchMatchingOption.EXACT_MATCHES);
+				studySearchDao.getStudiesByName(studyNameSearchKeyword, 0, Integer.MAX_VALUE, StudySearchMatchingOption.EXACT_MATCHES,PROGRAM_UUID);
 
 		Assert.assertEquals("No studies should be found, study count should be zero.", 0, studies.size());
 
@@ -80,7 +81,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		final String studyNameSearchKeyword = "1 Test Trial Sample";
 
 		final List<StudyReference> studies =
-				studySearchDao.getStudiesByName(studyNameSearchKeyword, 0, Integer.MAX_VALUE, StudySearchMatchingOption.EXACT_MATCHES);
+				studySearchDao.getStudiesByName(studyNameSearchKeyword, 0, Integer.MAX_VALUE, StudySearchMatchingOption.EXACT_MATCHES, PROGRAM_UUID);
 
 		Assert.assertEquals("Study count should be one.", 1, studies.size());
 		Assert.assertEquals("Searched keyword should exactly match the returned Study name", studyNameSearchKeyword,
@@ -94,7 +95,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		final String studyNameSearchKeyword = "1 Test";
 
 		final List<StudyReference> studies = studySearchDao
-				.getStudiesByName(studyNameSearchKeyword, 0, Integer.MAX_VALUE, StudySearchMatchingOption.MATCHES_STARTING_WITH);
+				.getStudiesByName(studyNameSearchKeyword, 0, Integer.MAX_VALUE, StudySearchMatchingOption.MATCHES_STARTING_WITH, PROGRAM_UUID);
 
 		Assert.assertEquals("Study count should be one.", 1, studies.size());
 		Assert.assertTrue("The returned Study name should start with " + studyNameSearchKeyword,
@@ -108,7 +109,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		final String studyNameSearchKeyword = "Test Trial Sample";
 
 		final List<StudyReference> studies =
-				studySearchDao.getStudiesByName(studyNameSearchKeyword, 0, Integer.MAX_VALUE, StudySearchMatchingOption.MATCHES_CONTAINING);
+				studySearchDao.getStudiesByName(studyNameSearchKeyword, 0, Integer.MAX_VALUE, StudySearchMatchingOption.MATCHES_CONTAINING, PROGRAM_UUID);
 
 		Assert.assertEquals("Study count should be " + NO_OF_TEST_STUDIES, NO_OF_TEST_STUDIES, studies.size());
 
@@ -125,7 +126,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		final String studyNameSearchKeyword = "TestTrialSample";
 
 		Assert.assertEquals("No studies should be found, study count should be zero.", 0,
-				studySearchDao.countStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.EXACT_MATCHES));
+				studySearchDao.countStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.EXACT_MATCHES, PROGRAM_UUID));
 
 	}
 
@@ -135,7 +136,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		final String studyNameSearchKeyword = "1 Test Trial Sample";
 
 		Assert.assertEquals("Study count should be one.", 1,
-				studySearchDao.countStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.EXACT_MATCHES));
+				studySearchDao.countStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.EXACT_MATCHES, PROGRAM_UUID));
 
 	}
 
@@ -145,7 +146,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		final String studyNameSearchKeyword = "1 Test";
 
 		Assert.assertEquals("Study count should be one.", 1,
-				studySearchDao.countStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.MATCHES_STARTING_WITH));
+				studySearchDao.countStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.MATCHES_STARTING_WITH, PROGRAM_UUID));
 
 	}
 
@@ -155,7 +156,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		final String studyNameSearchKeyword = "Test Trial Sample";
 
 		Assert.assertEquals("Study count should be " + NO_OF_TEST_STUDIES, NO_OF_TEST_STUDIES,
-				studySearchDao.countStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.MATCHES_CONTAINING));
+				studySearchDao.countStudiesByName(studyNameSearchKeyword, StudySearchMatchingOption.MATCHES_CONTAINING, PROGRAM_UUID));
 
 	}
 
@@ -166,7 +167,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		locationIds.add(LUXEMBOURG_COUNTRY_LOCATION_ID);
 
 		Assert.assertEquals("There should be " + NO_OF_TEST_STUDIES + " studies that are in Luxembourg", NO_OF_TEST_STUDIES,
-				studySearchDao.countStudiesByLocationIds(locationIds));
+				studySearchDao.countStudiesByLocationIds(locationIds, PROGRAM_UUID));
 
 	}
 
@@ -176,7 +177,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		final List<Integer> locationIds = new ArrayList<>();
 		locationIds.add(LUXEMBOURG_COUNTRY_LOCATION_ID);
 
-		final List<StudyReference> studyReferences = studySearchDao.getStudiesByLocationIds(locationIds, 0, Integer.MAX_VALUE);
+		final List<StudyReference> studyReferences = studySearchDao.getStudiesByLocationIds(locationIds, 0, Integer.MAX_VALUE, PROGRAM_UUID);
 
 		Assert.assertEquals("There should be " + NO_OF_TEST_STUDIES + " studies that are in Luxembourg", NO_OF_TEST_STUDIES,
 				studyReferences.size());
@@ -189,8 +190,8 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		final long expectedActualDrySeasonCount = numberOfDrySeasonBeforeCreatingTestData + NO_OF_DRY_SEASON_STUDIES;
 		final long expectedActualWetSeasonCount = numberOfWetSeasoBeforeCreatingTestData + NO_OF_WET_SEASON_STUDIES;
 
-		Assert.assertEquals(expectedActualDrySeasonCount, studySearchDao.countStudiesBySeason(Season.DRY));
-		Assert.assertEquals(expectedActualWetSeasonCount, studySearchDao.countStudiesBySeason(Season.WET));
+		Assert.assertEquals(expectedActualDrySeasonCount, studySearchDao.countStudiesBySeason(Season.DRY, PROGRAM_UUID));
+		Assert.assertEquals(expectedActualWetSeasonCount, studySearchDao.countStudiesBySeason(Season.WET, PROGRAM_UUID));
 
 	}
 
@@ -200,8 +201,8 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		final long expectedActualDrySeasonCount = numberOfDrySeasonBeforeCreatingTestData + NO_OF_DRY_SEASON_STUDIES;
 		final long expectedActualWetSeasonCount = numberOfWetSeasoBeforeCreatingTestData + NO_OF_WET_SEASON_STUDIES;
 
-		final List<StudyReference> drySeasonStudyReferences = studySearchDao.getStudiesBySeason(Season.DRY, 0, Integer.MAX_VALUE);
-		final List<StudyReference> wetSeasonStudyReferences = studySearchDao.getStudiesBySeason(Season.WET, 0, Integer.MAX_VALUE);
+		final List<StudyReference> drySeasonStudyReferences = studySearchDao.getStudiesBySeason(Season.DRY, 0, Integer.MAX_VALUE, PROGRAM_UUID);
+		final List<StudyReference> wetSeasonStudyReferences = studySearchDao.getStudiesBySeason(Season.WET, 0, Integer.MAX_VALUE, PROGRAM_UUID);
 
 		Assert.assertEquals(expectedActualDrySeasonCount, drySeasonStudyReferences.size());
 		Assert.assertEquals(expectedActualWetSeasonCount, wetSeasonStudyReferences.size());
@@ -225,6 +226,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		final WorkbenchTestDataUtil workbenchTestDataUtil = new WorkbenchTestDataUtil(this.workbenchDataManager);
 		final Project project = workbenchTestDataUtil.createTestProjectData();
+		project.setUniqueID(PROGRAM_UUID);
 
 		final StudyDataManagerImpl studyDataManager = new StudyDataManagerImpl();
 

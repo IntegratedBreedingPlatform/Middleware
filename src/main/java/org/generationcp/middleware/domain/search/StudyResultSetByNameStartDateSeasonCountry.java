@@ -29,6 +29,7 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	private final Season season;
 	private final String country;
 	private final int numOfRows;
+	private final String programUUID;
 	private final StudySearchMatchingOption studySearchMatchingOption;
 
 	private final List<Integer> locationIds;
@@ -52,6 +53,7 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 		this.startDate = filter.getStartDate();
 		this.season = filter.getSeason();
 		this.country = filter.getCountry();
+		this.programUUID = filter.getProgramUUID();
 		this.studySearchMatchingOption = filter.getStudySearchMatchingOption();
 
 		this.numOfRows = numOfRows;
@@ -77,26 +79,26 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	}
 
 	private long countStudiesByName(String name) {
-		return this.getStudySearchDao().countStudiesByName(name, studySearchMatchingOption);
+		return this.getStudySearchDao().countStudiesByName(name, studySearchMatchingOption, programUUID);
 	}
 
 	private long countStudiesByStartDate(Integer startDate) {
 		if (startDate != null) {
-			return this.getStudySearchDao().countStudiesByStartDate(startDate);
+			return this.getStudySearchDao().countStudiesByStartDate(startDate, programUUID);
 		}
 		return 0;
 	}
 
 	private long countStudiesBySeason(Season season) {
 		if (season != null) {
-			return this.getStudySearchDao().countStudiesBySeason(season);
+			return this.getStudySearchDao().countStudiesBySeason(season, programUUID);
 		}
 		return 0;
 	}
 
 	private long countStudiesByCountry() {
 		if (this.locationIds != null && !this.locationIds.isEmpty()) {
-			return this.getStudySearchDao().countStudiesByLocationIds(this.locationIds);
+			return this.getStudySearchDao().countStudiesByLocationIds(this.locationIds, programUUID);
 		}
 		return 0;
 	}
@@ -144,22 +146,22 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	}
 
 	private void fillBufferByName(int start) {
-		this.buffer = this.getStudySearchDao().getStudiesByName(this.name, start, this.numOfRows, studySearchMatchingOption);
+		this.buffer = this.getStudySearchDao().getStudiesByName(this.name, start, this.numOfRows, studySearchMatchingOption, programUUID);
 		this.bufIndex = 0;
 	}
 
 	private void fillBufferByStartDate(int start) {
-		this.buffer = this.getStudySearchDao().getStudiesByStartDate(this.startDate, start, this.numOfRows);
+		this.buffer = this.getStudySearchDao().getStudiesByStartDate(this.startDate, start, this.numOfRows, programUUID);
 		this.bufIndex = 0;
 	}
 
 	private void fillBufferBySeason(int start) {
-		this.buffer = this.getStudySearchDao().getStudiesBySeason(this.season, start, this.numOfRows);
+		this.buffer = this.getStudySearchDao().getStudiesBySeason(this.season, start, this.numOfRows, programUUID);
 		this.bufIndex = 0;
 	}
 
 	private void fillBufferByCountry(int start) {
-		this.buffer = this.getStudySearchDao().getStudiesByLocationIds(this.locationIds, start, this.numOfRows);
+		this.buffer = this.getStudySearchDao().getStudiesByLocationIds(this.locationIds, start, this.numOfRows, programUUID);
 		this.bufIndex = 0;
 	}
 
