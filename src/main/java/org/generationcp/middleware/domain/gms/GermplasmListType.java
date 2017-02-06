@@ -5,6 +5,14 @@ public enum GermplasmListType {
 
 	LST, NURSERY, CHECK, TRIAL, ADVANCED, CROSSES, STOCK, F1,
 	/**
+	 * Imported cross list from a study
+	 */
+	IMP_CROSS,
+	/**
+	 * Designed cross list from a study
+	 */
+	CRT_CROSS,
+	/**
 	 * Imported F1 list
 	 */
 	F1IMP,
@@ -19,8 +27,8 @@ public enum GermplasmListType {
 
 	public static boolean isCrosses(GermplasmListType type) {
 		return CROSSES.equals(type)
-			|| F1CRT.equals(type)
-			|| F1IMP.equals(type);
+			|| IMP_CROSS.equals(type)
+			|| CRT_CROSS.equals(type);
 	}
 
 	public static boolean isCrosses(String type) {

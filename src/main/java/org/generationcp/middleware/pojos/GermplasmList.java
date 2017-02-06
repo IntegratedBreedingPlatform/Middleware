@@ -57,8 +57,8 @@ public class GermplasmList implements Serializable {
 	public static final String DELETE_GERMPLASM_LIST_BY_LISTID_PHYSICALLY = "deleteGermplasmListByListIdPhysically";
 	public static final String GERMPLASM_LIST_LIST_ID_COLUMN = "listid";
 	public static final String CROSSES = "Crosses";
-	public static final String IMPORTED_CROSSES = "Imported Crosses";
-	public static final String DESIGNED_CROSSES = "Designed Crosses";
+	public static final String IMP_CROSS = "Imported Crosses";
+	public static final String CRT_CROSS = "Designed Crosses";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -121,7 +121,7 @@ public class GermplasmList implements Serializable {
 			"SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid "
 					+ "FROM udflds "
 					+ "WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE' "
-				+ "and fcode not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES', 'F1CRT', 'F1IMP', 'FOLDER')";
+				+ "and fcode not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES', 'CRT_CROSS', 'IMP_CROSS', 'FOLDER')";
 
 	public static final String GET_GERMPLASM_NAME_TYPES =
 			"SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid " + "FROM udflds "

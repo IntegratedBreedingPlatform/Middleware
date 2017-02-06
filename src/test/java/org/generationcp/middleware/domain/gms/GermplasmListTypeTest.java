@@ -9,14 +9,14 @@ public class GermplasmListTypeTest {
 
 	@Test
 	public void testIsCrosses() {
-		Assert.assertTrue(isCrosses(F1CRT));
+		Assert.assertTrue(isCrosses(CRT_CROSS));
 		Assert.assertTrue(isCrosses(CROSSES));
-		Assert.assertTrue(isCrosses(F1IMP));
+		Assert.assertTrue(isCrosses(IMP_CROSS));
 		Assert.assertFalse(isCrosses(ADVANCED));
 
-		Assert.assertTrue(isCrosses("F1CRT"));
+		Assert.assertTrue(isCrosses("CRT_CROSS"));
 		Assert.assertTrue(isCrosses("CROSSES"));
-		Assert.assertTrue(isCrosses("F1IMP"));
+		Assert.assertTrue(isCrosses("IMP_CROSS"));
 		Assert.assertFalse(isCrosses("ADVANCED"));
 		Assert.assertFalse(isCrosses(""));
 	}

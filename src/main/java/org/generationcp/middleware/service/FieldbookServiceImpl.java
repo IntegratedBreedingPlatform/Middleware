@@ -1155,10 +1155,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			for (Iterator<GermplasmList> iterator = germplasmCrossesList.iterator(); iterator.hasNext();) {
 				GermplasmList germplasmList = (GermplasmList) iterator.next();
 
-				if (GermplasmListType.F1IMP.toString().equals(germplasmList.getType())) {
-					germplasmList.setTabLabel(GermplasmList.IMPORTED_CROSSES);
-				} else if (GermplasmListType.F1CRT.toString().equals(germplasmList.getType())) {
-					germplasmList.setTabLabel(GermplasmList.DESIGNED_CROSSES);
+				if (GermplasmListType.IMP_CROSS.toString().equals(germplasmList.getType())) {
+					germplasmList.setTabLabel(GermplasmList.IMP_CROSS);
+				} else if (GermplasmListType.CRT_CROSS.toString().equals(germplasmList.getType())) {
+					germplasmList.setTabLabel(GermplasmList.CRT_CROSS);
 				} else {
 					germplasmList.setTabLabel(GermplasmList.CROSSES);
 				}

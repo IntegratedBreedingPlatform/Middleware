@@ -56,8 +56,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	static {
 		RESTRICTED_LIST = Restrictions.not(Restrictions.in("type",
 			new String[] {GermplasmListType.NURSERY.toString(), GermplasmListType.TRIAL.toString(), GermplasmListType.CHECK.toString(),
-				GermplasmListType.ADVANCED.toString(), GermplasmListType.CROSSES.toString(), GermplasmListType.F1CRT.toString(),
-				GermplasmListType.F1IMP.toString()}));
+				GermplasmListType.ADVANCED.toString(), GermplasmListType.CROSSES.toString(), GermplasmListType.CRT_CROSS.toString(),
+				GermplasmListType.IMP_CROSS.toString()}));
 	}
 
 	@SuppressWarnings("unchecked")
