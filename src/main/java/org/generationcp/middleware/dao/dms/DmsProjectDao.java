@@ -19,6 +19,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.FolderReference;
@@ -28,12 +30,14 @@ import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -47,6 +51,8 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.StringType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link DmsProject}.
@@ -56,6 +62,8 @@ import org.hibernate.type.StringType;
  */
 @SuppressWarnings("unchecked")
 public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(DmsProjectDao.class);
 
 	private static final Integer SEASON_VAR_TEXT = Integer.valueOf(TermId.SEASON_VAR_TEXT.getId());
 
@@ -106,6 +114,108 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			+ "AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId() + ") "
 			+ "UNION SELECT pr.subject_project_id " + "FROM project_relationship pr, project p " + "WHERE pr.type_id = "
 			+ TermId.HAS_PARENT_FOLDER.getId() + " " + "AND pr.subject_project_id = p.project_id " + "AND p.program_uuid = :program_uuid ";
+
+	static final String GET_STUDY_METADATA_BY_ID = " SELECT  "
+		+ "     geoloc.nd_geolocation_id AS studyDbId, "
+		+ "     pmain.project_id AS trialOrNurseryId, "
+		+ "     CASE ppStudy.value "
+		+ "         WHEN '10000' THEN pmain.name "
+		+ "         WHEN '10010' THEN CONCAT(pmain.name, '-', geoloc.description) "
+		+ "         ELSE '' "
+		+ "     END AS studyName, "
+		+ "     CASE ppStudy.value "
+		+ "         WHEN '10000' THEN 'N' "
+		+ "         WHEN '10010' THEN 'T' "
+		+ "         ELSE '' "
+		+ "     END AS studyType, "
+		+ "     CASE ppStudy.value "
+		+ "         WHEN "
+		+ "             '10000' "
+		+ "         THEN "
+		+ "             MAX(IF(pProp.type_id = " + TermId.SEASON_VAR.getId() + ", "
+		+ "                 pProp.value, "
+		+ "                 NULL)) "
+		+ "         WHEN "
+		+ "             '10010' "
+		+ "         THEN "
+		+ "             MAX(IF(geoprop.type_id = " + TermId.SEASON_VAR.getId() + ", "
+		+ "                 geoprop.value, "
+		+ "                 NULL)) "
+		+ "     END AS seasonId, "
+		+ "     CASE ppStudy.value "
+		+ "         WHEN '10000' THEN NULL "
+		+ "         WHEN '10010' THEN pmain.project_id "
+		+ "         ELSE '' "
+		+ "     END AS trialDbId, "
+		+ "     CASE ppStudy.value "
+		+ "         WHEN '10000' THEN NULL "
+		+ "         WHEN '10010' THEN pmain.name "
+		+ "         ELSE '' "
+		+ "     END AS trialName, "
+		+ "     MAX(IF(pProp.type_id = " + TermId.START_DATE.getId() + ", "
+		+ "         pProp.value, "
+		+ "         NULL)) AS startDate, "
+		+ "     MAX(IF(pProp.type_id = " + TermId.END_DATE.getId() + ", "
+		+ "         pProp.value, "
+		+ "         NULL)) AS endDate, "
+		+ "     MAX(IF(pProp.type_id = " + TermId.STUDY_STATUS.getId() + ", "
+		+ "         pProp.value, "
+		+ "         NULL)) AS active, "
+		+ "     CASE ppStudy.value "
+		+ "         WHEN "
+		+ "             '10000' "
+		+ "         THEN "
+		+ "             MAX(IF(pProp.type_id = " + TermId.LOCATION_ID.getId() + ", "
+		+ "                 pProp.value, "
+		+ "                 NULL)) "
+		+ "         WHEN "
+		+ "             '10010' "
+		+ "         THEN "
+		+ "             MAX(IF(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", "
+		+ "                 geoprop.value, "
+		+ "                 NULL)) "
+		+ "     END AS locationId "
+		+ " FROM "
+		+ "     nd_geolocation geoloc "
+		+ "         INNER JOIN "
+		+ "     nd_experiment nde ON nde.nd_geolocation_id = geoloc.nd_geolocation_id "
+		+ "         INNER JOIN "
+		+ "     nd_experiment_project ndep ON ndep.nd_experiment_id = nde.nd_experiment_id "
+		+ "         INNER JOIN "
+		+ "     project proj ON proj.project_id = ndep.project_id "
+		+ "         INNER JOIN "
+		+ "     project_relationship pr ON proj.project_id = pr.subject_project_id "
+		+ "         INNER JOIN "
+		+ "     project pmain ON pmain.project_id = pr.object_project_id "
+		+ "         AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId()
+		+ "         LEFT OUTER JOIN "
+		+ "     nd_geolocationprop geoprop ON geoprop.nd_geolocation_id = geoloc.nd_geolocation_id "
+		+ "         INNER JOIN "
+		+ "     projectprop ppStudy ON pmain.project_id = ppStudy.project_id "
+		+ "         AND ppStudy.type_id = " + TermId.STUDY_TYPE.getId()
+		+ "         LEFT OUTER JOIN "
+		+ "     projectprop pProp ON pmain.project_id = pProp.project_id "
+		+ " WHERE "
+		+ "     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
+		+ "         AND geoloc.nd_geolocation_id = :studyId "
+		+ " GROUP BY geoloc.nd_geolocation_id ";
+
+	static final String GET_PROJECTID_BY_STUDYDBID = "SELECT DISTINCT"
+		+ "      p.project_id"
+		+ " FROM"
+		+ "     project_relationship pr"
+		+ "         INNER JOIN"
+		+ "     project p ON p.project_id = pr.subject_project_id"
+		+ "         INNER JOIN"
+		+ "     nd_experiment_project ep ON pr.subject_project_id = ep.project_id"
+		+ "         INNER JOIN"
+		+ "     nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id"
+		+ "         INNER JOIN"
+		+ "     nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id"
+		+ " WHERE"
+		+ "     gl.nd_geolocation_id = :studyDbId"
+		+ "     AND pr.type_id = " + TermId.IS_STUDY.getId();
+
 
 	public List<Reference> getRootFolders(String programUUID, List<StudyType> studyTypes) {
 		return getChildrenOfFolder(DmsProject.SYSTEM_FOLDER_ID, programUUID, studyTypes);
@@ -650,7 +760,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in getStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);
+			this.logAndThrowException("Error in getTrialObservationTable() query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return studyDetails;
 	}
@@ -1018,6 +1128,17 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return results;
 	}
 
+	public Integer getProjectIdByStudyDbId(int studyDbId) throws MiddlewareQueryException {
+		try {
+			Query query = this.getSession().createSQLQuery(GET_PROJECTID_BY_STUDYDBID);
+			query.setParameter("studyDbId", studyDbId);
+			return (Integer) query.uniqueResult();
+		} catch (HibernateException e) {
+			this.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
+	}
+
 	public Integer getProjectIdByNameAndProgramUUID(String name, String programUUID) throws MiddlewareQueryException {
 		try {
 			String sql = "SELECT project_id FROM project WHERE name = :name AND program_uuid = :program_uuid";
@@ -1105,5 +1226,49 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		criteria.addOrder(Order.asc("projectId"));
 		return criteria;
+	}
+
+	public StudyMetadata getStudyMetadata(Integer studyId) throws MiddlewareQueryException {
+		Preconditions.checkNotNull(studyId);
+		try {
+			SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_ID);
+			query.addScalar("studyDbId");
+			query.addScalar("trialOrNurseryId");
+			query.addScalar("studyName");
+			query.addScalar("studyType");
+			query.addScalar("seasonId");
+			query.addScalar("trialDbId");
+			query.addScalar("trialName");
+			query.addScalar("startDate");
+			query.addScalar("endDate");
+			query.addScalar("active");
+			query.addScalar("locationID");
+			query.setParameter("studyId", studyId);
+			Object result = query.uniqueResult();
+			if (result != null) {
+				Object[] row = (Object[]) result;
+				StudyMetadata studyMetadata = new StudyMetadata();
+				studyMetadata.setStudyDbId(studyId);
+				studyMetadata.setNurseryOrTrialId((row[1] instanceof Integer) ? (Integer) row[1] : null);
+				studyMetadata.setStudyName((row[2] instanceof String) ? (String) row[2] : null);
+				studyMetadata.setStudyType((row[3] instanceof String) ? (String) row[3] : null);
+				if (row[4] instanceof String && !StringUtils.isBlank((String) row[4])) {
+					studyMetadata.addSeason(TermId.getById(Integer.parseInt((String) row[4])).toString());
+				}
+				studyMetadata.setTrialDbId((row[5] instanceof String && StringUtils.isNumeric((String) row[5])) ? Integer.parseInt((String) row[5]) : null);
+				studyMetadata.setTrialName((row[6] instanceof String) ? (String) row[6] : null);
+				studyMetadata.setStartDate((row[7] instanceof String) ? (String) row[7] : null);
+				studyMetadata.setEndDate((row[8] instanceof String) ? (String) row[8] : null);
+				studyMetadata.setActive((row[9] != null) ? false : true);
+				studyMetadata.setLocationId((row[10] instanceof String) ? Integer.parseInt((String) row[10]) : null);
+				return studyMetadata;
+			} else {
+				return null;
+			}
+		} catch (HibernateException e) {
+			final String message = "Error with getStudyMetadata() query from study: " + studyId;
+			DmsProjectDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 }

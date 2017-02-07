@@ -1,11 +1,15 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.service.api.location.LocationFilters;
+import org.hamcrest.MatcherAssert;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
@@ -111,5 +115,39 @@ public class LocationDAOTest extends IntegrationTestBase {
 		}
 	}
 
+	@Test
+	public void getLocalLocationsByFilter() {
+		HashMap<LocationFilters, Object> filters = new HashMap<>();
+		filters.put(LocationFilters.LOCATION_TYPE, 405L);
+		final List<LocationDetailsDto> locationList = LocationDAOTest.locationDAO.getLocationsByFilter(1, 100, filters);
+		MatcherAssert.assertThat("Expected list of country location size > zero", locationList != null && locationList.size() > 0);
 
+	}
+
+	@Test
+	public void getLocalLocationsByFilterNotRecoverData() {
+		HashMap<LocationFilters, Object> filters = new HashMap<>();
+		filters.put(LocationFilters.LOCATION_TYPE, 000100000405L);
+		final List<LocationDetailsDto> locationList = LocationDAOTest.locationDAO.getLocationsByFilter(1, 100, filters);
+		MatcherAssert.assertThat("Expected list of location size equals to zero", locationList != null && locationList.size() == 0);
+
+
+	}
+
+	@Test
+	public void countLocationsByFilter() {
+		HashMap<LocationFilters, Object> filters = new HashMap<LocationFilters, Object>();
+		filters.put(LocationFilters.LOCATION_TYPE, 405L);
+		long countLocation = LocationDAOTest.locationDAO.countLocationsByFilter(filters);
+		MatcherAssert.assertThat("Expected country location size > zero", countLocation > 0);
+	}
+
+	@Test
+	public void countLocationsByFilterNotFoundLocation() {
+		HashMap<LocationFilters, Object> filters = new HashMap<LocationFilters, Object>();
+		filters.put(LocationFilters.LOCATION_TYPE, 000100000405L);
+		long countLocation = LocationDAOTest.locationDAO.countLocationsByFilter(filters);
+		MatcherAssert.assertThat("Expected country location size equals to zero by this locationType = 000100000405", countLocation == 0);
+
+	}
 }

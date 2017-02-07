@@ -79,7 +79,7 @@ public class StudyDetails implements Serializable {
 		this.label = studyName;
 	}
 
-	// Used by getStudyDetails
+	// Used by getTrialObservationTable
 	public StudyDetails(Integer id, String studyName, String title, String objective, String startDate, String endDate,
 			StudyType studyType, String piName, String siteName, String piId, String siteId) {
 

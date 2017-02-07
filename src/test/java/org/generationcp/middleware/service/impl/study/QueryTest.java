@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.study.TraitDto;
 import org.hibernate.jdbc.util.BasicFormatterImpl;
 import org.junit.Test;
@@ -136,6 +137,8 @@ public class QueryTest {
 				"                svdo.name = ?\n" + 
 				"        ) PH_cm \n" + 
 				"            ON PH_cm.nd_experiment_id = nde.nd_experiment_id \n" + 
+				"    LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = ep.nd_experiment_id AND FieldMapRow.type_id = " + TermId.RANGE_NO.getId() + "\n" +
+				"    LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = ep.nd_experiment_id AND FieldMapCol.type_id = " + TermId.COLUMN_NO.getId() + "\n" +
 				"    WHERE\n" + 
 				"p.project_id= (\n" + 
 				"	Select\n" + 

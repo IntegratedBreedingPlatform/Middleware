@@ -69,6 +69,7 @@ import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.PlotUtil;
@@ -733,6 +734,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
+	public Integer getProjectIdByStudyDbId(final Integer studyDbId) throws MiddlewareQueryException {
+		return this.getDmsProjectDao().getProjectIdByStudyDbId(studyDbId);
+	}
+
+	@Override
 	public DmsProject getProject(final int id) throws MiddlewareQueryException {
 		return this.getDmsProjectDao().getById(id);
 	}
@@ -1184,4 +1190,20 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public List<InstanceMetadata> getInstanceMetadata(int studyId) {
 		return this.getGeolocationDao().getInstanceMetadata(studyId);
 	}
+
+	@Override
+	public StudyMetadata getStudyMetadata (Integer studyId) throws MiddlewareQueryException {
+		return this.getDmsProjectDao().getStudyMetadata(studyId);
+	}
+
+	@Override
+	public Map<String, String> getGeolocationPropsAndValuesByStudy(final Integer studyId) throws MiddlewareQueryException {
+		return this.getGeolocationPropertyDao().getGeolocationPropsAndValuesByStudy(studyId);
+	}
+
+	@Override
+	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId) throws MiddlewareQueryException {
+		return this.getProjectPropertyDao().getProjectPropsAndValuesByStudy(studyId);
+	}
+
 }
