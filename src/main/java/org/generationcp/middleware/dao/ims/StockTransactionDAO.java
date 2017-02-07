@@ -100,7 +100,7 @@ public class StockTransactionDAO extends GenericDAO<StockTransaction, Integer> {
 			final GermplasmListType germplasmListType) {
 		final List<InventoryDetails> detailsList = new ArrayList<>();
 
-		if (!germplasmListType.equals(GermplasmListType.ADVANCED) && !germplasmListType.equals(GermplasmListType.CROSSES)) {
+		if (!germplasmListType.equals(GermplasmListType.ADVANCED) && !GermplasmListType.isCrosses(germplasmListType)) {
 			throw new IllegalArgumentException("This method should only be passed lists of type ADVANCED or CROSSES");
 		}
 

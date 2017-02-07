@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +27,6 @@ import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -40,7 +40,6 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
-import org.hibernate.type.Type;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
@@ -55,9 +54,10 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	protected static final Criterion RESTRICTED_LIST;
 	
 	static {
-		RESTRICTED_LIST = Restrictions
-				.not(Restrictions.in("type", new String[] {GermplasmListType.NURSERY.toString(), GermplasmListType.TRIAL.toString(),
-						GermplasmListType.CHECK.toString(), GermplasmListType.ADVANCED.toString(), GermplasmListType.CROSSES.toString()}));
+		RESTRICTED_LIST = Restrictions.not(Restrictions.in("type",
+			new String[] {GermplasmListType.NURSERY.toString(), GermplasmListType.TRIAL.toString(), GermplasmListType.CHECK.toString(),
+				GermplasmListType.ADVANCED.toString(), GermplasmListType.CROSSES.toString(), GermplasmListType.CRT_CROSS.toString(),
+				GermplasmListType.IMP_CROSS.toString()}));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -585,5 +585,11 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 				return folderMetaData.getListId();
 			}
 		});
+	}
+
+	public int deleteGermplasmListByListIdPhysically(Integer listId) {
+		final Query query = this.getSession().getNamedQuery(GermplasmList.DELETE_GERMPLASM_LIST_BY_LISTID_PHYSICALLY);
+		query.setInteger(GermplasmList.GERMPLASM_LIST_LIST_ID_COLUMN, listId);
+		return query.executeUpdate();
 	}
 }
