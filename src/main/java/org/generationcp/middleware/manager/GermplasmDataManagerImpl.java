@@ -11,12 +11,8 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.AttributeDAO;
@@ -51,8 +47,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.util.*;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -162,6 +157,24 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			germplasm.setPreferredName(preferredName);
 		}
 		return germplasm;
+	}
+
+	@Override
+	public List<Germplasm> getSortedGermplasmWithPrefName(final List<Integer> gids) {
+		List<Germplasm> result = new ArrayList<Germplasm>();
+		for (Iterator<Integer> iterator = gids.iterator(); iterator.hasNext(); ) {
+			Integer gid = iterator.next();
+			result.add(this.getGermplasmWithPrefName(gid));
+		}
+		Comparator<Germplasm> comparator = new Comparator<Germplasm>() {
+
+			@Override public int compare(Germplasm left, Germplasm right) {
+				return left.getPreferredName().getNval().compareTo(right.getPreferredName().getNval());
+			}
+		};
+
+		Collections.sort(result, comparator);
+		return result;
 	}
 
 	@Override
@@ -1403,9 +1416,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	/**
 	 * (non-Javadoc)
-	 * 
-	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getUserDefinedFieldsByCodesInMap(java.lang.String,
-	 *      java.lang.String, java.util.List)
+	 *
 	 */
 	@Override
 	public UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code) {
@@ -1475,5 +1486,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		}
 		return commaSeparatedListOfGids;
 	}
+
+  @Override
+  public Map<Integer, String[]> getParentsInfoByGIDList(List<Integer> gidList) {
+	return this.getGermplasmDao().getParentsInfoByGIDList(gidList);
+  }
+
 
 }

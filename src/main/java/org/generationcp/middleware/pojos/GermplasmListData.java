@@ -150,6 +150,15 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	@Transient
 	private String breedingMethodName = "";
 
+	@Transient
+	private String stockIDs = "";
+
+  	@Transient
+  	private String femalePedigree;
+
+  	@Transient
+  	private String malePedigree;
+
 	public GermplasmListData() {
 
 	}
@@ -349,6 +358,10 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		builder.append(this.notes);
 		builder.append(", crossingDate=");
 		builder.append(this.crossingDate);
+		builder.append(", femalePedigree=");
+		builder.append(this.femalePedigree);
+		builder.append(", malePedigree=");
+		builder.append(this.malePedigree);
 		builder.append("]");
 		return builder.toString();
 	}
@@ -429,7 +442,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	@Override
 	public String getStockIDs() {
-		return "";
+		return this.stockIDs;
 	}
 
 	@Override
@@ -468,4 +481,23 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		this.breedingMethodName = breedingMethodName;
 	}
 
+	public void setStockIDs(String stockIDs) {
+		this.stockIDs = stockIDs;
+	}
+
+	public String getFemalePedigree() {
+	  return femalePedigree;
+	}
+
+	public void setFemalePedigree(final String femalePedigree) {
+	  this.femalePedigree = femalePedigree;
+	}
+
+	public String getMalePedigree() {
+	  return malePedigree;
+	}
+
+	public void setMalePedigree(final String malePedigree) {
+	  this.malePedigree = malePedigree;
+	}
 }

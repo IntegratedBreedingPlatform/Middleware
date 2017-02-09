@@ -26,7 +26,7 @@ public class ListDataProjectSaver {
 	public int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> listDatas,
 			int userId) throws MiddlewareQueryException {
 
-		boolean isAdvanced = type == GermplasmListType.ADVANCED || type == GermplasmListType.CROSSES;
+		boolean isAdvanced = type == GermplasmListType.ADVANCED || GermplasmListType.isCrosses(type);
 		GermplasmList snapList = isAdvanced ? null : this.getGermplasmList(projectId, type);
 		boolean isCreate = snapList == null;
 

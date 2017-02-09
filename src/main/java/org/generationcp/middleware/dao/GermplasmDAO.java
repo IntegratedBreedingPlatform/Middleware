@@ -1218,4 +1218,25 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
+  	public Map<Integer, String[]> getParentsInfoByGIDList (List<Integer> gidList) {
+	  try {
+		Map<Integer, String[]> pedigreeMap = new HashMap<>();
+		final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_PREFERRED_NAME_AND_PARENT_FOR_A_GID_LIST);
+		query.setParameterList("gidList", gidList);
+		query.addScalar("gid");
+		query.addScalar("pedigree");
+		query.addScalar("nval");
+
+		List<Object[]> results = query.list();
+		for (Object[] result : results) {
+		  pedigreeMap.put((Integer) result[0], new String[] {(String) result[1],(String) result[2]});
+		}
+		return pedigreeMap;
+	  } catch (final HibernateException e) {
+		String message = "Error with getPedigreeByGIDList(GIDS=" + gidList + ") : " + e.getMessage();
+		LOG.error(message, e);
+		throw new MiddlewareQueryException(message, e);
+	  }
+	}
+
 }

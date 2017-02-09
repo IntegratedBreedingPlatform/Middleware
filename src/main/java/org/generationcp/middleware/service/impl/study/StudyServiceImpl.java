@@ -3,8 +3,10 @@ package org.generationcp.middleware.service.impl.study;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +17,9 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.UserDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
@@ -23,7 +27,9 @@ import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerI
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.StudyDetailDto;
+import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.StudyMetadata;
+import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
@@ -31,9 +37,12 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.study.TraitDto;
 import org.generationcp.middleware.service.api.study.TraitService;
+import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -46,6 +55,10 @@ import com.google.common.collect.Ordering;
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
 
+	private static final Logger LOG = LoggerFactory.getLogger(StudyServiceImpl.class);
+
+	private final String TRIAL_TYPE = "T";
+
 	private TraitService trialTraits;
 
 	private StudyMeasurements studyMeasurements;
@@ -55,6 +68,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	private StudyDataManager studyDataManager;
+
+	private UserDataManager userDataManager;
 
 	private static LoadingCache<StudyKey, String> studyIdToProgramIdCache;
 
@@ -72,6 +87,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				new OntologyPropertyDataManagerImpl(sessionProvider),
 				new OntologyScaleDataManagerImpl(sessionProvider), sessionProvider);
 		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
+		this.userDataManager = new UserDataManagerImpl(sessionProvider);
 
 		final CacheLoader<StudyKey, String> studyKeyCacheBuilder = new CacheLoader<StudyKey, String>() {
 			public String load(StudyKey key) throws Exception {
@@ -212,7 +228,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 	
 	@Override
-	public StudyDetailDto getStudyDetails(final int studyIdentifier) {
+	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
+		return this.getTrialObservationTable(studyIdentifier, null);
+	}
+
+	@Override
+	public TrialObservationTable getTrialObservationTable(final int studyIdentifier, Integer instanceDbId) {
 
 		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
 
@@ -224,7 +245,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			}
 		}).immutableSortedCopy(traits);
 
-		final List<Object[]> results = this.studyMeasurements.getAllStudyDetailsAsTable(studyIdentifier, sortedTraits);
+		final List<Object[]> results = this.studyMeasurements.getAllStudyDetailsAsTable(studyIdentifier, sortedTraits, instanceDbId);
 
 		final List<Integer> observationVariableDbIds = new ArrayList<Integer>();
 
@@ -249,9 +270,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// TODO Update query and use nd_geolocation_id instead. For now instance number will be ok.
 				entry.add((String) row[1]);
 
-				// locationName = For now just concat instance number with some prefix
-				// TODO Could also use LOCATION_ABBR or LOCATION_NAME from nd_geolocationprops if present.
-				entry.add("Study-" + (String) row[1]);
+				String locationName = (String) row[12];
+				String locationAbbreviation = (String) row[13];
+
+				if (StringUtils.isNotBlank(locationAbbreviation)) {
+					entry.add(locationAbbreviation);
+				} else  if (StringUtils.isNotBlank(locationName)) {
+					entry.add(locationName);
+				} else {
+					entry.add("Study-" + (String) row[1]);
+				}
 
 				// gid
 				entry.add(String.valueOf(row[3]));
@@ -277,16 +305,26 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// entry type
 				entry.add(String.valueOf(row[2]));
 
-				// X = row
-				entry.add(String.valueOf(row[10]));
+				Object x = row[11];
+				Object y = row[10];
 
-				// Y = col
-				entry.add(String.valueOf(row[11]));
+				// If there is no row and col design,
+				// get fieldmap row and col
+				if (x == null || y == null) {
+					x = row[14];
+					y = row[15];
+				}
+
+				// X = col
+				entry.add(String.valueOf(x));
+
+				// Y = row
+				entry.add(String.valueOf(y));
 
 				// phenotypic values
-				int counterTwo = 1;
+				int columnOffset = 1;
 				for (int i = 0; i < traits.size(); i++) {
-					final Object rowValue = row[11 + counterTwo];
+					final Object rowValue = row[15 + columnOffset];
 
 					if (rowValue != null) {
 						entry.add(String.valueOf(rowValue));
@@ -294,19 +332,62 @@ public class StudyServiceImpl extends Service implements StudyService {
 						entry.add((String) rowValue);
 					}
 
-					counterTwo += 2;
+					// get every other column skipping over PhenotypeId column
+					columnOffset += 2;
 				}
 				data.add(entry);
 			}
 		}
 
-		final StudyDetailDto dto = new StudyDetailDto().setStudyDbId(studyIdentifier).setObservationVariableDbIds(observationVariableDbIds)
-				.setObservationVariableNames(observationVariableNames).setData(data);
+		final TrialObservationTable
+			dto = new TrialObservationTable().setStudyDbId(instanceDbId != null ? instanceDbId : studyIdentifier).setObservationVariableDbIds(observationVariableDbIds)
+			.setObservationVariableNames(observationVariableNames).setData(data);
 
 		dto.setHeaderRow(Lists.newArrayList("locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
 				"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y"));
 
 		return dto;
 	}
+
+	@Override
+	public StudyDetailsDto getStudyDetails(final Integer studyId) throws MiddlewareQueryException {
+		try {
+			final StudyMetadata studyMetadata = this.studyDataManager.getStudyMetadata(studyId);
+			if (studyMetadata != null) {
+				StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
+				studyDetailsDto.setMetadata(studyMetadata);
+				List<UserDto> users = new ArrayList<>();
+				Map<String, String> properties = new HashMap<>();
+				if (studyMetadata.getStudyType().equalsIgnoreCase(TRIAL_TYPE)) {
+					users.addAll(this.userDataManager.getUsersForEnvironment(studyMetadata.getStudyDbId()));
+					users.addAll(this.userDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
+					properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByStudy(studyId));
+					properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
+				} else {
+					users.addAll(this.userDataManager.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
+					properties.putAll(this.studyDataManager.getProjectPropsAndValuesByStudy(studyMetadata.getNurseryOrTrialId()));
+				}
+				studyDetailsDto.setContacts(users);
+				studyDetailsDto.setAdditionalInfo(properties);
+				return studyDetailsDto;
+			}
+			return null;
+		} catch (MiddlewareQueryException e) {
+			final String message = "Error with getStudyDetails() query from study: " + studyId;
+			StudyServiceImpl.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public StudyServiceImpl setStudyDataManager(final StudyDataManager studyDataManager) {
+		this.studyDataManager = studyDataManager;
+		return this;
+	}
+
+	public StudyServiceImpl setUserDataManager(final UserDataManager userDataManager) {
+		this.userDataManager = userDataManager;
+		return this;
+	}
 }
+
 

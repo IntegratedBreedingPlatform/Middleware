@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -42,6 +43,7 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
+import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
 /**
@@ -511,6 +513,14 @@ public interface StudyDataManager {
 	DmsProject getParentFolder(int id) throws MiddlewareQueryException;
 
 	/**
+	 * Return the project id of a study
+	 * @param studyDbId the id of the study
+	 * @return the id of the project
+	 * @throws MiddlewareQueryException
+	 */
+	Integer getProjectIdByStudyDbId(final Integer studyDbId) throws MiddlewareQueryException;
+
+	/**
 	 * Returns the dms project. Accepts a project id.
 	 * 
 	 * @param id the id
@@ -832,4 +842,11 @@ public interface StudyDataManager {
 	Long countAllStudies(String programDbId, String locationDbId, String seasonDbId) throws MiddlewareQueryException;
 
 	List<InstanceMetadata> getInstanceMetadata(int studyId);
+
+	StudyMetadata getStudyMetadata (Integer studyId) throws MiddlewareQueryException;
+
+	Map<String, String> getGeolocationPropsAndValuesByStudy (Integer studyId) throws MiddlewareQueryException;
+
+	Map<String, String> getProjectPropsAndValuesByStudy (Integer studyId) throws MiddlewareQueryException;
+
 }

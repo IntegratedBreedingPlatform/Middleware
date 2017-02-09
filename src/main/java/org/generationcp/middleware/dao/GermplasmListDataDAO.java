@@ -181,12 +181,14 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		try {
 
 			final String queryStr = "select  lp.lrecid as lrecid,  lp.entryid as entryid,  lp.desig as desig,  lp.grpname as grpname, "
-					+ " femaleParentName.nval as fnval,  g.gpid1 as fpgid,  maleParentName.nval as mnval,  g.gpid2 as mpgid,  "
-					+ " g.gid as gid,  lp.source as source,  m.mname as mname "
-					+ "from listdata lp  inner join germplsm g on lp.gid = g.gid  "
-					+ "left outer join names maleParentName on g.gpid2 = maleParentName.gid and maleParentName.nstat = :preferredNameNstat  "
-					+ "left outer join names femaleParentName on g.gpid1 = femaleParentName.gid and femaleParentName.nstat = :preferredNameNstat  "
-					+ "left outer join methods m on m.mid = g.methn " + "where lp.listid = :listId group by entryid";
+				+ " femaleParentName.nval as fnval,  g.gpid1 as fpgid,  maleParentName.nval as mnval,  g.gpid2 as mpgid,  "
+				+ " g.gid as gid,  lp.source as source,  m.mname as mname, "
+				+ " (select nMale.grpName from listdata nMale where nMale.gid = maleParentName.gid limit 1) as malePedigree, "
+				+ "(select nFemale.grpName from listdata nFemale where nFemale.gid = femaleParentName.gid limit 1) as femalePedigree "
+				+ "from listdata lp  inner join germplsm g on lp.gid = g.gid  "
+				+ "left outer join names maleParentName on g.gpid2 = maleParentName.gid and maleParentName.nstat = :preferredNameNstat  "
+				+ "left outer join names femaleParentName on g.gpid1 = femaleParentName.gid and femaleParentName.nstat = :preferredNameNstat  "
+				+ "left outer join methods m on m.mid = g.methn " + "where lp.listid = :listId group by entryid";
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryStr);
 			query.setParameter("listId", listID);
@@ -203,12 +205,13 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			query.addScalar("gid");
 			query.addScalar("source");
 			query.addScalar("mname");
+			query.addScalar("malePedigree");
+			query.addScalar("femalePedigree");
 
 			this.createGermplasmListDataRows(germplasmListData, query);
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error in getListDataWithParents=" + listID + " in GermplasmListDataDAO: " + e.getMessage(), e);
+			this.logAndThrowException("Error in getListDataWithParents=" + listID + " in GermplasmListDataDAO: " + e.getMessage(), e);
 		}
 
 		return germplasmListData;
@@ -231,6 +234,8 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			final Integer gid = (Integer) row[8];
 			final String seedSource = (String) row[9];
 			final String methodName = (String) row[10];
+		  	final String malePedigree = (String) row[11];
+		  	final String femalePedigree = (String) row[12];
 
 			final GermplasmListData germplasmListData = new GermplasmListData();
 			germplasmListData.setId(id);
@@ -244,6 +249,8 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			germplasmListData.setGid(gid);
 			germplasmListData.setSeedSource(seedSource);
 			germplasmListData.setBreedingMethodName(methodName);
+		  	germplasmListData.setFemalePedigree(femalePedigree);
+			germplasmListData.setMalePedigree(malePedigree);
 
 			germplasmListDataList.add(germplasmListData);
 		}

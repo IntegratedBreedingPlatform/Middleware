@@ -6,6 +6,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import org.fest.util.Collections;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.study.TraitDto;
 
 import com.google.common.base.Function;
@@ -30,6 +31,27 @@ class ObservationQuery {
 			+ "    (SELECT \n" + "            ndep.value\n" + "        FROM\n" + "            nd_experimentprop ndep\n"
 			+ "                INNER JOIN\n" + "            cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id\n" + "        WHERE\n"
 			+ "            ndep.nd_experiment_id = ep.nd_experiment_id\n" + "                AND ispcvt.name = 'PLOT_NO') PLOT_NO\n";
+
+	final String locationNameSubQuery = "(SELECT \n" +
+			"            l.lname \n" +
+			"        FROM \n" +
+			"            nd_geolocationprop gp \n" +
+			"                INNER JOIN \n" +
+			"            location l ON l.locid = gp.value \n" +
+			"        WHERE \n" +
+			"            gp.type_id = " + TermId.LOCATION_ID.getId() + " \n" +
+			"                AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS LocationName";
+
+	final String locationAbbreviationSubQuery = "(SELECT \n" +
+			"            gp.value \n" +
+			"        FROM \n" +
+			"            nd_geolocationprop gp \n" +
+			"        WHERE \n" +
+			"            gp.type_id = " + TermId.LOCATION_ABBR.getId() + " \n" +
+			"                AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS LocationAbbreviation";
+
+	final String fieldmapRowText = "FieldMapRow.value FieldMapRow";
+	final String fieldmapColumnText = "FieldMapCol.value FieldMapColumn";
 
 	final String blockNoText = "    (SELECT \n" + "            ndep.value\n" + "        FROM\n" + "            nd_experimentprop ndep\n"
 			+ "                INNER JOIN\n" + "            cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id\n" + "        WHERE\n"
@@ -63,8 +85,7 @@ class ObservationQuery {
 				fromText + whereText + orderByText;
 	}
 
-	String getObservationQueryWithBlockRowCol(final List<TraitDto> traits) {
-
+	String getObservationQueryWithBlockRowCol(final List<TraitDto> traits, Integer instanceId) {
 		final String columnNamesFromTraitNames = this.getColumnNamesFromTraitNames(traits);
 		final String orderByTraitId = getOrderByTraitId(traits);
 
@@ -72,8 +93,18 @@ class ObservationQuery {
 
 		final String orderByText = getOrderByExpression(traits, orderByTraitId);
 
-		return selectText + ", " + blockNoText + ", " + rowNumberText + "," + columnNumberText + columnNamesFromTraitNames +
+		String whereText = this.whereText;
 
+		if (instanceId != null) {
+			whereText += " AND gl.nd_geolocation_id = :instanceId \n";
+		}
+
+		return selectText + ", " + blockNoText + ", " + rowNumberText + "," + columnNumberText +
+				", " + locationNameSubQuery +
+				", " + locationAbbreviationSubQuery +
+				", " + fieldmapColumnText +
+				", " + fieldmapRowText +
+				columnNamesFromTraitNames +
 				fromText + whereText + orderByText;
 	}
 
@@ -83,13 +114,18 @@ class ObservationQuery {
 	}
 
 	private String getFromExpression(final List<TraitDto> traits) {
-		final String fromText = "FROM\n" + "    Project p\n" + "        INNER JOIN\n"
+		final String fromText = " FROM\n" + "    Project p\n" + "        INNER JOIN\n"
 				+ "    project_relationship pr ON p.project_id = pr.subject_project_id\n" + "        INNER JOIN\n"
 				+ "    nd_experiment_project ep ON pr.subject_project_id = ep.project_id\n" + "        INNER JOIN\n"
 				+ "    nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id\n" + "        INNER JOIN\n"
 				+ "    nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id\n" + "        INNER JOIN\n"
 				+ "    nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id\n" + "        INNER JOIN\n"
-				+ "    Stock s ON s.stock_id = es.stock_id\n" + this.getTraitDeatilsJoin(traits) + "WHERE\n" + "    p.project_id = ("
+				+ "    Stock s ON s.stock_id = es.stock_id\n" + this.getTraitDeatilsJoin(traits) 
+
+				+ "    LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = ep.nd_experiment_id AND FieldMapRow.type_id = " + TermId.RANGE_NO.getId() + "\n"
+				+ "    LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = ep.nd_experiment_id AND FieldMapCol.type_id = " + TermId.COLUMN_NO.getId() + "\n"
+
+				+ "WHERE\n" + "    p.project_id = ("
 				+ "Select p.project_id from project_relationship pr\n" + "INNER JOIN project p on p.project_id = pr.subject_project_id\n";
 		return fromText;
 	}

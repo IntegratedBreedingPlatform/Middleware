@@ -31,7 +31,6 @@ import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.TemplateSettingDAO;
 import org.generationcp.middleware.dao.ToolConfigurationDAO;
 import org.generationcp.middleware.dao.ToolDAO;
-import org.generationcp.middleware.dao.ToolLicenseInfoDAO;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.UserInfoDAO;
 import org.generationcp.middleware.dao.WorkbenchDatasetDAO;
@@ -155,12 +154,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		final ProjectUserInfoDAO projectUserInfoDao = new ProjectUserInfoDAO();
 		projectUserInfoDao.setSession(this.getCurrentSession());
 		return projectUserInfoDao;
-	}
-
-	private ToolLicenseInfoDAO getToolLicenseInfoDAO() {
-		final ToolLicenseInfoDAO licenseInfoDAO = new ToolLicenseInfoDAO();
-		licenseInfoDAO.setSession(this.getCurrentSession());
-		return licenseInfoDAO;
 	}
 
 	@Override
@@ -1641,19 +1634,5 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return person;
 	}
 
-	@Override
-	public List<ToolLicenseInfo> getListOfToolLicenseInfo() {
-		return this.getToolLicenseInfoDAO().getAll();
-	}
-
-	@Override
-	public ToolLicenseInfo getToolLicenseInfoByToolName(final String toolName) {
-		return this.getToolLicenseInfoDAO().getByToolName(toolName);
-	}
-
-	@Override
-	public ToolLicenseInfo saveOrUpdateToolLicenseInfo(final ToolLicenseInfo licenseInfo) {
-		return this.getToolLicenseInfoDAO().saveOrUpdate(licenseInfo);
-	}
 
 }
