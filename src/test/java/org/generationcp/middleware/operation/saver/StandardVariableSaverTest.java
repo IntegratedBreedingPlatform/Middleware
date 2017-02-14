@@ -3,7 +3,7 @@ package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.oms.CVTermDao;
-import org.generationcp.middleware.data.initializer.StandardVariableInitializer;
+import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -19,16 +19,19 @@ public class StandardVariableSaverTest extends IntegrationTestBase {
 	private final Integer CVID = 2050;
 	private final String TESTNAME = "Test Name";
 	private final String TESTDEFINITION = "Test Definition";
-
+	
+	private StandardVariableTestDataInitializer standardVariableTestDataInitializer;
+	
 	@Before
 	public void setUp() {
+		this.standardVariableTestDataInitializer = new StandardVariableTestDataInitializer();
 		this.stdVarSaver = new StandardVariableSaver(super.sessionProvder);
 		this.cvtermDao = this.stdVarSaver.getCvTermDao();
 	}
 
 	@Test
 	public void testSaveCheckType() {
-		final StandardVariable stdVar = StandardVariableInitializer.createStdVariable();
+		final StandardVariable stdVar = this.standardVariableTestDataInitializer.createStandardVariable();
 		final Enumeration testEnum = new Enumeration(null, this.TESTNAME, this.TESTDEFINITION, 0);
 		this.stdVarSaver.saveEnumeration(stdVar, testEnum, this.CVID);
 

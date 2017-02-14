@@ -21,4 +21,10 @@ public class PersonTestDataInitializer {
 		person.setPhone("4");
 		return person;
 	}
+	
+	public Person createPerson(int id) {
+		Person person = new Person("First Name", "Middle Name", "Last Name");
+		person.setId(id);
+		return person;
+	}
 }
