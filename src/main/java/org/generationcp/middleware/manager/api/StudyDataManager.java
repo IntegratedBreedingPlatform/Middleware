@@ -12,6 +12,7 @@
 package org.generationcp.middleware.manager.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -43,6 +44,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
+import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
 /**
@@ -720,9 +722,9 @@ public interface StudyDataManager {
 	/**
 	 * Determines if the data for the specified Trial contains at least 2 replicates with values
 	 * 
-	 * @param project_id the project id
-	 * @param location_id the location id
-	 * @param germplamTermId the germplasm CVTerm id
+	 * @param projectId the project id
+	 * @param locationId the location id
+	 * @param germplasmTermId the germplasm CVTerm id
 	 * @return true or false
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -760,7 +762,7 @@ public interface StudyDataManager {
 	 * Gets the geolocation id by project id and trial instance number.
 	 * 
 	 * @param projectId - study id or dataset id
-	 * @param trial instance number
+	 * @param trialInstanceNumber instance number
 	 * @return the geolocation id
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
@@ -798,8 +800,6 @@ public interface StudyDataManager {
 	 * Checks whether the specified locationIds exist in a given dataset
 	 * 
 	 * @param locationIds list of location ids
-	 * @param dataSetId the id of the dataset
-	 * @param experimentTypeId the experiment type
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
@@ -837,4 +837,13 @@ public interface StudyDataManager {
 	Phenotype getPhenotypeById(int phenotypeId);
 
 	void saveOrUpdatePhenotypeValue(int experimentId, int variableId, String value, Phenotype existingPhenotype, int dataTypeId);
+
+	StudyMetadata getStudyMetadata (Integer studyId) throws MiddlewareQueryException;
+
+	Map<String, String> getGeolocationPropsAndValuesByStudy (Integer studyId) throws MiddlewareQueryException;
+
+	Map<String, String> getProjectPropsAndValuesByStudy (Integer studyId) throws MiddlewareQueryException;
+
+	Integer getProjectIdByStudyDbId(final Integer studyDbId);
+
 }

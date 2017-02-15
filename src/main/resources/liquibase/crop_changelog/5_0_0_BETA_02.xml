@@ -19,4 +19,23 @@
 	    </sql>
 	</changeSet>
 
+	<changeSet author="vanina" id="v5-beta02-2">
+
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from udflds where ftable = 'LISTNMS' and fcode in ('F1IMP', 'F1CRT', 'PLCRT');
+			</sqlCheck>
+		</preConditions>
+
+		<comment>Add three new list types to the common scripts.</comment>
+
+		<sql dbms="mysql" splitStatements="true">
+			INSERT  INTO `udflds`(`fldno`,`ftable`,`ftype`,`fcode`,`fname`,`ffmt`,`fdesc`,`lfldno`,`fuid`,`fdate`,`scaleid`) VALUES
+			(727,'LISTNMS','LISTTYPE','F1IMP','Imported F1 list','-','F1 list derived by importing a crossing file',0,0,20161209,0),
+			(728,'LISTNMS','LISTTYPE','F1CRT','Crossing tool F1 list','-','F1 list derived by using the crossing tool',0,0,20161209,0),
+			(729,'LISTNMS','LISTTYPE','PLCRT','Crossing tool parent list','-','Unique parents derived from crosses saved from the crossing tool',0,0,20161209,0);
+		</sql>
+
+	</changeSet>
+
 </databaseChangeLog>

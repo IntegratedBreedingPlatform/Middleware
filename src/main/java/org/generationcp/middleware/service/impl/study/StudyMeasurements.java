@@ -116,6 +116,35 @@ public class StudyMeasurements {
 		return Collections.unmodifiableList(measurements);
 	}
 
+	private void setQueryParameters(int projectBusinessIdentifier, List<TraitDto> traits, SQLQuery createSQLQuery, Integer measurementId) {
+		int parameterCounter = this.setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery);
+		createSQLQuery.setParameter(parameterCounter++, measurementId);
+
+	}
+
+	private int setQueryParameters(final int studyIdentifier, final List<TraitDto> projectTraits, final SQLQuery createSQLQuery) {
+		int counter = 0;
+		for (final TraitDto trait : projectTraits) {
+			createSQLQuery.setParameter(counter++, trait.getTraitName());
+		}
+		createSQLQuery.setParameter(counter++, studyIdentifier);
+		return counter;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier, final List<TraitDto> traits, Integer instanceId) {
+		final String generateQuery = this.measurementQuery.getObservationQueryWithBlockRowCol(traits, instanceId);
+		final SQLQuery createSQLQuery = this.createQueryAndAddScalarWithBlockRowCol(traits, generateQuery);
+
+		this.setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery);
+
+		if (instanceId != null) {
+			createSQLQuery.setParameter("instanceId", instanceId);
+		}
+
+		final List<Object[]> result = createSQLQuery.list();
+		return result;
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier, final List<TraitDto> traits) {
@@ -126,5 +155,20 @@ public class StudyMeasurements {
 
 		final List<Object[]> result = createSQLQuery.list();
 		return result;
+	}
+
+	private SQLQuery createQueryAndAddScalarWithBlockRowCol(final List<TraitDto> traits, final String generateQuery) {
+		final SQLQuery createSQLQuery = this.session.createSQLQuery(generateQuery);
+
+		this.addScalar(createSQLQuery);
+		createSQLQuery.addScalar("BLOCK_NO");
+		createSQLQuery.addScalar("ROW_NO");
+		createSQLQuery.addScalar("COL_NO");
+		createSQLQuery.addScalar("LocationName");
+		createSQLQuery.addScalar("LocationAbbreviation");
+		createSQLQuery.addScalar("FieldMapColumn");
+		createSQLQuery.addScalar("FieldMapRow");
+		this.addScalarForTraits(traits, createSQLQuery);
+		return createSQLQuery;
 	}
 }

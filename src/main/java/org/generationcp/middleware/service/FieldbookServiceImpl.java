@@ -1158,5 +1158,20 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return this.getWorkbenchDataManager().getCropTypeByName(cropName).getPlotCodePrefix();
 	}
 
+	public List<GermplasmList> appendTabLabelToList(List<GermplasmList> germplasmCrossesList) {
+		{
+			for (Iterator<GermplasmList> iterator = germplasmCrossesList.iterator(); iterator.hasNext();) {
+				GermplasmList germplasmList = (GermplasmList) iterator.next();
 
+				if (GermplasmListType.IMP_CROSS.toString().equals(germplasmList.getType())) {
+					germplasmList.setTabLabel(GermplasmList.IMP_CROSS);
+				} else if (GermplasmListType.CRT_CROSS.toString().equals(germplasmList.getType())) {
+					germplasmList.setTabLabel(GermplasmList.CRT_CROSS);
+				} else {
+					germplasmList.setTabLabel(GermplasmList.CROSSES);
+				}
+			}
+			return germplasmCrossesList;
+		}
+	}
 }

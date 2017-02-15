@@ -824,4 +824,6 @@ public interface FieldbookService {
 	public List<Method> getFavoriteMethods(List<Integer> methodIds, Boolean filterOutGenerative);
 
 	public String getPlotCodePrefix(final String cropName);
+
+	public List<GermplasmList> appendTabLabelToList(List<GermplasmList> germplasmCrossesList);
 }

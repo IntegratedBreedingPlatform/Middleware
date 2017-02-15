@@ -11,13 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 import org.apache.commons.io.FileUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -56,11 +49,23 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
+
+	public static final String separator = "-";
+	public static final String parent1Name = "CML502";
+	public static final String parent2Name = "CLQRCWQ109";
+	public static final String parent3Name = "CLQRCWQ55";
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -959,7 +964,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		field.setFcode("MATURITY");
 		field.setFname("Maturity class");
 		field.setFfmt("MCLASS,ASSIGNED,C");
-		field.setFdesc("-");
+		field.setFdesc(separator);
 		field.setLfldno(0);
 
 		field.setFuid(1);
@@ -1176,5 +1181,32 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		sizeBeforeAddingNewName = namesMap.get(GID3) != null ? namesMap.get(GID3).size() : 0;
 		sizeAfterAddingNewName = newNamesMap.get(GID3) != null ? namesMap.get(GID3).size() : 0;
 		Assert.assertEquals("Expecting list of names for GID 3 to be constant since there are no new names added for it.", sizeBeforeAddingNewName, sizeAfterAddingNewName);
+	}
+
+	@Test
+	public void testGetParentsInfoByGIDList() {
+		final int GID1 = 1;
+		final int GID2 = 2;
+		final int GID3 = 3;
+		GermplasmDataManager germplasmDataManager = Mockito.mock(GermplasmDataManager.class);
+
+		final Map<Integer, String[]> parentsInfo = new HashMap<Integer, String[]>();
+
+		String[] parent1 = new String[] {separator, parent1Name};
+		String[] parent2 = new String[] {separator, parent2Name};
+		String[] parent3 = new String[] {separator, parent3Name};
+		parentsInfo.put(1, parent1);
+		parentsInfo.put(2, parent2);
+		parentsInfo.put(3, parent3);
+
+		Mockito.when(germplasmDataManager.getParentsInfoByGIDList(Arrays.asList(GID1, GID2, GID3))).thenReturn(parentsInfo);
+
+		final Map<Integer, String[]> result = germplasmDataManager.getParentsInfoByGIDList((Arrays.asList(GID1, GID2, GID3)));
+		Assert.assertTrue(result.get(1)[0].equals(separator));
+		Assert.assertTrue(result.get(1)[1].equals(parent1Name));
+		Assert.assertTrue(result.get(2)[0].equals(separator));
+		Assert.assertTrue(result.get(2)[1].equals(parent2Name));
+		Assert.assertTrue(result.get(3)[0].equals(separator));
+		Assert.assertTrue(result.get(3)[1].equals(parent3Name));
 	}
 }

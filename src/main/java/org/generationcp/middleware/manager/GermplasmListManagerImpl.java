@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
@@ -286,6 +287,14 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	public int deleteGermplasmListByListId(final Integer listId) {
 		final GermplasmList germplasmList = this.getGermplasmListById(listId);
 		return this.deleteGermplasmList(germplasmList);
+	}
+
+	@Override
+	public int deleteGermplasmListByListIdPhysically(final Integer listId) {
+		Preconditions.checkNotNull(listId, "List id passed cannot be null.");
+		this.deleteGermplasmListDataByListId(listId);
+		this.getGermplasmListDAO().deleteGermplasmListByListIdPhysically(listId);
+		return listId;
 	}
 
 	@Override
