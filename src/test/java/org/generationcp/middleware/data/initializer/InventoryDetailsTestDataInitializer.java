@@ -61,7 +61,6 @@ public class InventoryDetailsTestDataInitializer {
 			invDetails.setReplicationNumber(1);
 			invDetails.setPlotNumber(1);
 			invDetails.setInstanceNumber(1);
-			invDetails.setInstanceNumber(1);
 			invDetails.setEntryId(1);
 			inventoryDetails.add(invDetails);
 		}
