@@ -58,7 +58,7 @@ public class ObservationsTest {
 		traitMeasurements.add(this.measurementDto);
 		this.observationDto =
 				new ObservationDto(new Integer(1), "TrialInstance", "EntryType", new Integer(100), "GID Designation", "Entry No",
-						"Seed Source", "Repition Number", "Plot Number", traitMeasurements);
+						"Seed Source", "Repition Number", "Plot Number", "Block Number", traitMeasurements);
 	}
 
 	/**

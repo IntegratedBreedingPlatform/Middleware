@@ -2,8 +2,9 @@
 package org.generationcp.middleware.service.api.study;
 
 import java.util.List;
-import org.apache.commons.lang.builder.HashCodeBuilder;
+
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class ObservationDto {
 
@@ -25,13 +26,15 @@ public class ObservationDto {
 
 	private final String plotNumber;
 
+	private final String blockNumber;
+
 	private final List<MeasurementDto> traitMeasurements;
 
 	private transient int hashCode;
 
 	public ObservationDto(final Integer measurementId, final String trialInstance, final String entryType, final Integer gid,
 			final String designation, final String entryNo, final String seedSource, final String repitionNumber, final String plotNumber,
-			final List<MeasurementDto> traitMeasurements) {
+			final String blockNumber, final List<MeasurementDto> traitMeasurements) {
 		this.measurementId = measurementId;
 		this.trialInstance = trialInstance;
 		this.entryType = entryType;
@@ -41,6 +44,7 @@ public class ObservationDto {
 		this.seedSource = seedSource;
 		this.repitionNumber = repitionNumber;
 		this.plotNumber = plotNumber;
+		this.blockNumber = blockNumber;
 		this.traitMeasurements = traitMeasurements;
 	}
 
@@ -78,6 +82,10 @@ public class ObservationDto {
 
 	public String getPlotNumber() {
 		return this.plotNumber;
+	}
+
+	public String getBlockNumber() {
+		return this.blockNumber;
 	}
 
 	public List<MeasurementDto> getTraitMeasurements() {

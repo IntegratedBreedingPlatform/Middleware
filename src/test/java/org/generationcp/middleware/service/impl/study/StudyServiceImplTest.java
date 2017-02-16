@@ -79,7 +79,7 @@ public class StudyServiceImplTest {
 		final List<MeasurementDto> traits = new ArrayList<MeasurementDto>();
 		traits.add(new MeasurementDto(new TraitDto(1, "traitName"), 9999, "triatValue"));
 		final ObservationDto measurement = new ObservationDto(1, "trialInstance", "entryType", 1234, "designation", "entryNo", "seedSource",
-				"repitionNumber", "plotNumber", traits);
+				"repitionNumber", "plotNumber", "blockNumber", traits);
 		final List<ObservationDto> testMeasurements = Collections.<ObservationDto>singletonList(measurement);
 		Mockito.when(mockTrailMeasurements.getAllMeasurements(1234, projectTraits, 1, 1, 100)).thenReturn(testMeasurements);
 		result.getObservations(1234, 1, 1, 100);
