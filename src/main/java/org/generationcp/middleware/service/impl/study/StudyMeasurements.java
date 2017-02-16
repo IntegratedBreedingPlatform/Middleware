@@ -116,12 +116,6 @@ public class StudyMeasurements {
 		return Collections.unmodifiableList(measurements);
 	}
 
-	private void setQueryParameters(int projectBusinessIdentifier, List<TraitDto> traits, SQLQuery createSQLQuery, Integer measurementId) {
-		int parameterCounter = this.setQueryParameters(projectBusinessIdentifier, traits, createSQLQuery);
-		createSQLQuery.setParameter(parameterCounter++, measurementId);
-
-	}
-
 	private int setQueryParameters(final int studyIdentifier, final List<TraitDto> projectTraits, final SQLQuery createSQLQuery) {
 		int counter = 0;
 		for (final TraitDto trait : projectTraits) {
