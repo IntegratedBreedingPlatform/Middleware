@@ -9,9 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperPrint;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -32,6 +29,9 @@ import org.generationcp.middleware.reports.Reporter;
 import org.generationcp.middleware.reports.ReporterFactory;
 import org.generationcp.middleware.service.api.ReportService;
 import org.springframework.transaction.annotation.Transactional;
+
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperPrint;
 
 @Transactional
 public class ReportServiceImpl extends Service implements ReportService {
@@ -102,6 +102,8 @@ public class ReportServiceImpl extends Service implements ReportService {
 
 		final StudyType studyType = this.getStudyDataManager().getStudyType(studyId);
 		final Workbook wb = this.getWorkbookBuilder().create(studyId, studyType);
+		// getWorkbookBuilder().create no longer loads observations collection by default. Load only when needed. Like here.
+		this.getWorkbookBuilder().loadAllObservations(wb);
 		final List<MeasurementRow> observations = wb.getObservations();
 		final List<MeasurementVariable> studyConditions = this.appendCountryInformationFromCondition(wb.getConditions());
 		final List<MeasurementRow> trialObservations = wb.getTrialObservations();
