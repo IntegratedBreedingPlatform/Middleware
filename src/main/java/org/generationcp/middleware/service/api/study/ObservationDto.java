@@ -28,6 +28,9 @@ public class ObservationDto {
 
 	private final String blockNumber;
 
+	private String rowNumber;
+	private String columnNumber;
+
 	private final List<MeasurementDto> traitMeasurements;
 
 	private transient int hashCode;
@@ -86,6 +89,22 @@ public class ObservationDto {
 
 	public String getBlockNumber() {
 		return this.blockNumber;
+	}
+
+	public String getColumnNumber() {
+		return this.columnNumber;
+	}
+
+	public void setColumnNumber(String columnNumber) {
+		this.columnNumber = columnNumber;
+	}
+
+	public String getRowNumber() {
+		return this.rowNumber;
+	}
+
+	public void setRowNumber(String rowNumber) {
+		this.rowNumber = rowNumber;
 	}
 
 	public List<MeasurementDto> getTraitMeasurements() {

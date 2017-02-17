@@ -110,6 +110,8 @@ public class StudyMeasurements {
 				ObservationDto measurement =
 						new ObservationDto((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[3], (String) row[4],
 								(String) row[5], (String) row[6], (String) row[7], (String) row[8], (String) row[9], traitResults);
+				measurement.setRowNumber((String) row[10]);
+				measurement.setColumnNumber((String) row[11]);
 				measurements.add(measurement);
 			}
 		}
