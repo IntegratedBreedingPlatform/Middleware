@@ -78,6 +78,7 @@ import org.generationcp.middleware.util.Util;
 import org.hibernate.FlushMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -85,6 +86,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Resource
 	private GermplasmGroupingService germplasmGroupingService;
+	
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
 
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
 
@@ -418,7 +422,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return germplasmList.getId();
 
 	}
-
+	
+	/**
+	 * Saves germplasm list crosses types. ListData items are always added to the database, before saving the germplasm list.
+	 *
+	 * @param listDataItems the list data to add - the key of the Map is the germplasm associated to the germplasm list data value
+	 * @param germplasmList the germplasm list to add
+	 *
+	 * @return The id of the newly-created germplasm list
+	 */
 	@Override
 	public Integer saveGermplasmList(final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList) {
 
@@ -429,17 +441,23 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		try {
 
 			germplasmListDao.save(germplasmList);
-
+			
+			List<Integer> germplasmGids =  new ArrayList<>();
 			// Save germplasms, names, list data
 			for (final Pair<Germplasm, GermplasmListData> pair : listDataItems) {
 
 				final Germplasm germplasm = pair.getLeft();
+				germplasmGids.add(germplasm.getGid());
 				final GermplasmListData germplasmListData = pair.getRight();
 
 				germplasmListData.setGid(germplasm.getGid());
 				germplasmListData.setList(germplasmList);
 				this.getGermplasmListDataDAO().save(germplasmListData);
 			}
+			
+			//For Management Group Settings Processing
+			this.germplasmGroupingService.processGroupInheritanceForCrosses(germplasmGids,
+					false, this.crossExpansionProperties.getHybridBreedingMethods());
 
 		} catch (final Exception e) {
 			this.logAndThrowException("Error encountered with FieldbookService.saveNurseryAdvanceGermplasmList(germplasmList="
