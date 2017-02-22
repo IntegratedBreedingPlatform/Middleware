@@ -28,8 +28,8 @@
 			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
 			VALUES
 			(1200,8201,2120),
-			(1210,8201,4040),
-			(1220,8201,6040);
+			(1210,8201,4030),
+			(1220,8201,6020);
 
 			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
 			VALUES
