@@ -31,6 +31,8 @@ public class Experiment {
 
 	private Map<String, Variable> variatesMap;
 
+	private String plotId;
+
 	public int getId() {
 		return this.id;
 	}
@@ -113,4 +115,11 @@ public class Experiment {
 		return builder.toString();
 	}
 
+	public String getPlotId() {
+		return plotId;
+	}
+
+	public void setPlotId(String plotId) {
+		this.plotId = plotId;
+	}
 }
