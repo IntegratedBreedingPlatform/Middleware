@@ -75,7 +75,7 @@ public class ExperimentModel implements Serializable {
 	private Integer typeId;
 
 	//plot_id
-	@Basic(optional = false)
+	@Basic(optional = true)
 	@Column(name = "plot_id")
 	private String plotId;
 
