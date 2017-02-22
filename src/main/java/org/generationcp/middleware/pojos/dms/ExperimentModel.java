@@ -67,11 +67,17 @@ public class ExperimentModel implements Serializable {
 	// Geolocation
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "nd_geolocation_id")
+
 	private Geolocation geoLocation;
 
 	// References cvterm
 	@Column(name = "type_id")
 	private Integer typeId;
+
+	//plot_id
+	@Basic(optional = false)
+	@Column(name = "plot_id")
+	private String plotId;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
 	@BatchSize(size = 500)
@@ -164,6 +170,14 @@ public class ExperimentModel implements Serializable {
 
 	public void setPhenotypes(List<Phenotype> phenotypes) {
 		this.phenotypes = phenotypes;
+	}
+
+	public void setPlotId(String plotId) {
+		this.plotId = plotId;
+	}
+
+	public String getPlotId() {
+		return plotId;
 	}
 
 	@Override
