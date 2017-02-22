@@ -235,8 +235,10 @@ public class ExperimentModel implements Serializable {
 		builder.append(this.geoLocation);
 		builder.append(", typeId=");
 		builder.append(this.typeId);
+		builder.append(", plotId=");
+		builder.append(this.plotId);
 		builder.append("]");
 		return builder.toString();
 	}
-
+	
 }
