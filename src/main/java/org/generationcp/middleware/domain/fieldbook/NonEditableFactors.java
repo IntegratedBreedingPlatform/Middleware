@@ -54,7 +54,10 @@ public enum NonEditableFactors {
 
 	GROUPGID(TermId.GROUPGID.getId()),
 
-	STOCKID(TermId.STOCKID.getId());
+	STOCKID(TermId.STOCKID.getId()),
+
+	/** The plot id. */
+	PLOT_ID(TermId.PLOT_ID.getId());
 
 
 
