@@ -17,4 +17,25 @@
 		</addColumn>
 	</changeSet>
 
+	<changeSet author="clarysabel" id="v5-beta03-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8201;</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (8201,1040,'PLOT_ID','Field plot id - enumerated (number)',NULL,0,0);
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			VALUES
+			(1200,8201,2120),
+			(1210,8201,4040),
+			(1220,8201,6040);
+
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES
+			(8201,1800,'Experimental Design',0);
+		</sql>
+	</changeSet>
+
+
 </databaseChangeLog>
