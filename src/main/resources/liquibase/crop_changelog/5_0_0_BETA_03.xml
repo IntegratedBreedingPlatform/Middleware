@@ -23,7 +23,7 @@
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
-			VALUES (8201,1040,'PLOT_ID','Field plot id - enumerated (number)',NULL,0,0);
+			VALUES (8201,1040,'PLOT_ID','Field plot id - assigned (text)',NULL,0,0);
 
 			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
 			VALUES

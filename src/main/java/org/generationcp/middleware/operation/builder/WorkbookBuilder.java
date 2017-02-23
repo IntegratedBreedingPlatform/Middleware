@@ -592,21 +592,24 @@ public class WorkbookBuilder extends Builder {
 								this.getDataType(variable.getVariableType().getStandardVariable().getDataType().getId());
 							final MeasurementData measurementData;
 
-							if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE
-								.getId()) {
-								final Integer id = NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
-
+							if (variable.getVariableType().getStandardVariable().getId() == TermId.PLOT_ID.getId()) {
+								final String plotId = experiment.getPlotId();
 								measurementData =
-									new MeasurementData(variable.getVariableType().getLocalName(), variable.getDisplayValue(), isEditable,
-										dataType, id, factor);
+										new MeasurementData(variable.getVariableType().getLocalName(), plotId, isEditable, dataType,
+												factor);
 							} else {
-								if (variable.getVariableType().getStandardVariable().getId() == TermId.PLOT_ID.getId()) {
-									final String plotId = experiment.getPlotId();
-									measurementData = new MeasurementData(variable.getVariableType().getLocalName(), plotId, isEditable, dataType, factor);
+								if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE
+										.getId()) {
+									final Integer id =
+											NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
+
+									measurementData =
+											new MeasurementData(variable.getVariableType().getLocalName(), variable.getDisplayValue(),
+													isEditable, dataType, id, factor);
 								} else {
 									measurementData =
-										new MeasurementData(variable.getVariableType().getLocalName(), variable.getValue(), isEditable,
-											dataType, factor);
+											new MeasurementData(variable.getVariableType().getLocalName(), variable.getValue(), isEditable,
+													dataType, factor);
 								}
 							}
 							measurementDataList.add(measurementData);

@@ -86,6 +86,14 @@ public class Experiment {
 		return this.variatesMap;
 	}
 
+	public String getPlotId() {
+		return this.plotId;
+	}
+
+	public void setPlotId(String plotId) {
+		this.plotId = plotId;
+	}
+
 	public void print(int indent) {
 		Debug.println(indent, "Experiment: " + this.id);
 		Debug.println(indent + 3, "Factors:");
@@ -115,11 +123,4 @@ public class Experiment {
 		return builder.toString();
 	}
 
-	public String getPlotId() {
-		return plotId;
-	}
-
-	public void setPlotId(String plotId) {
-		this.plotId = plotId;
-	}
 }
