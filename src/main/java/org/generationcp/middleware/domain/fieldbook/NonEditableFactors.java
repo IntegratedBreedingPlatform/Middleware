@@ -105,4 +105,19 @@ public enum NonEditableFactors {
 		}
 		return null;
 	}
+
+	/**
+	 * Find.
+	 *
+	 * @param id the id
+	 * @return true if is editable.
+	 */
+	public static boolean isEditable(Integer id) {
+		for (NonEditableFactors factor : NonEditableFactors.values()) {
+			if (factor.getId() == id) {
+				return false;
+			}
+		}
+		return true;
+	}
 }

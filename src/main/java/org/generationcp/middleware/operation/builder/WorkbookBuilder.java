@@ -564,9 +564,10 @@ public class WorkbookBuilder extends Builder {
 					for (final Variable variable : factors.getVariables()) {
 						if (condition.getTermId() == variable.getVariableType().getStandardVariable().getId()
 								&& variable.getVariableType().getStandardVariable().getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
+
 							final boolean isEditable =
-									NonEditableFactors.find(variable.getVariableType().getStandardVariable().getId()) == null ? true
-											: false;
+								NonEditableFactors.isEditable(variable.getVariableType().getStandardVariable().getId());
+
 							final MeasurementData measurementData =
 									new MeasurementData(variable.getVariableType().getLocalName(), variable.getValue(), isEditable,
 											this.getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
@@ -583,25 +584,30 @@ public class WorkbookBuilder extends Builder {
 					if (factor.getTermId() == variable.getVariableType().getStandardVariable().getId()) {
 						found = true;
 						if (isTrial && variable.getVariableType().getStandardVariable().getId() == TermId.TRIAL_INSTANCE_FACTOR.getId()
-								|| PhenotypicType.TRIAL_ENVIRONMENT != variable.getVariableType().getRole()) {
+							|| PhenotypicType.TRIAL_ENVIRONMENT != variable.getVariableType().getRole()) {
+
 							final boolean isEditable =
-									NonEditableFactors.find(variable.getVariableType().getStandardVariable().getId()) == null ? true
-											: false;
+								NonEditableFactors.isEditable(variable.getVariableType().getStandardVariable().getId());
+							final String dataType =
+								this.getDataType(variable.getVariableType().getStandardVariable().getDataType().getId());
 							final MeasurementData measurementData;
+
 							if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE
-									.getId()) {
-								final Integer id =
-										variable.getValue() != null && NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable
-												.getValue()) : null;
+								.getId()) {
+								final Integer id = NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
+
 								measurementData =
-										new MeasurementData(variable.getVariableType().getLocalName(), variable.getDisplayValue(),
-												isEditable, this.getDataType(variable.getVariableType().getStandardVariable().getDataType()
-														.getId()), id, factor);
+									new MeasurementData(variable.getVariableType().getLocalName(), variable.getDisplayValue(), isEditable,
+										dataType, id, factor);
 							} else {
-								measurementData =
+								if (variable.getVariableType().getStandardVariable().getId() == TermId.PLOT_ID.getId()) {
+									final String plotId = experiment.getPlotId();
+									measurementData = new MeasurementData(variable.getVariableType().getLocalName(), plotId, isEditable, dataType, factor);
+								} else {
+									measurementData =
 										new MeasurementData(variable.getVariableType().getLocalName(), variable.getValue(), isEditable,
-												this.getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
-												factor);
+											dataType, factor);
+								}
 							}
 							measurementDataList.add(measurementData);
 							break;
@@ -609,10 +615,10 @@ public class WorkbookBuilder extends Builder {
 					}
 				}
 				if (!found) {
-					final boolean isEditable = NonEditableFactors.find(factor.getTermId()) == null ? true : false;
+					final boolean isEditable = NonEditableFactors.isEditable(factor.getTermId());
+					final String dataType = this.getDataType(factor.getDataTypeId());
 					final MeasurementData measurementData =
-							new MeasurementData(factor.getName(), null, isEditable, this.getDataType(factor.getDataTypeId()),
-									factor.getTermId(), factor);
+						new MeasurementData(factor.getName(), null, isEditable, dataType, factor.getTermId(), factor);
 					measurementDataList.add(measurementData);
 				}
 			}
