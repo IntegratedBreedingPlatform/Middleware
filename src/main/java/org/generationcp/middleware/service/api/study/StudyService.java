@@ -1,10 +1,9 @@
 
 package org.generationcp.middleware.service.api.study;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-
 import java.util.List;
 
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 
 public interface StudyService {
@@ -13,7 +12,8 @@ public interface StudyService {
 
 	int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
 
-	List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber, final int pageSize);
+	List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber, final int pageSize,
+			final String sortBy, final String sortOrder);
 
 	List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier);
 

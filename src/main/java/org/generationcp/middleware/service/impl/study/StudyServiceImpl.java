@@ -28,15 +28,15 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyMetadata;
-import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
+import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.study.TraitDto;
 import org.generationcp.middleware.service.api.study.TraitService;
+import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -207,11 +207,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber,
-			final int pageSize) {
+			final int pageSize, final String sortBy, final String sortOrder) {
 
 		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
 
-		return this.studyMeasurements.getAllMeasurements(studyIdentifier, traits, instanceId, pageNumber, pageSize);
+		return this.studyMeasurements.getAllMeasurements(studyIdentifier, traits, instanceId, pageNumber, pageSize, sortBy, sortOrder);
 	}
 
 	@Override

@@ -33,7 +33,7 @@ public class ObservationQueryTest {
 		ObservationQuery fixture = new ObservationQuery();
 		final List<TraitDto> traitNames = new LinkedList<TraitDto>();
 		traitNames.add(new TraitDto(1, "PH_cm"));
-		String result = fixture.getAllObservationsQuery(traitNames);
+		String result = fixture.getAllObservationsQuery(traitNames, null, null);
 		assertEquals("The generated query must match the expected query.", formatString(expectedQueryForAllMeasurements()),
 				formatString(result));
 	}
@@ -75,7 +75,8 @@ public class ObservationQueryTest {
 				+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
 				+ " WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n"
 				+ "		AND gl.nd_geolocation_id = :instanceId \n"
-				+ " GROUP BY nde.nd_experiment_id ORDER BY (1 * REP_NO), (1 * PLOT_NO) ";
+				+ " GROUP BY nde.nd_experiment_id " 
+				+ " ORDER BY PLOT_NO asc ";
 	}
 
 	private String expectedQueryForSingleMeasurement() {
@@ -101,7 +102,7 @@ public class ObservationQueryTest {
 				+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
 				+ " WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n"
 				+ "		AND nde.nd_experiment_id=:experiment_id \n"
-				+ " GROUP BY nde.nd_experiment_id ORDER BY (1 * REP_NO), (1 * PLOT_NO) ";
+				+ " GROUP BY nde.nd_experiment_id ";
 	}
 
 }

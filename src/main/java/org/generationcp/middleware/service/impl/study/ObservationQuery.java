@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.apache.commons.lang3.StringUtils;
 import org.fest.util.Collections;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.service.api.study.TraitDto;
@@ -14,6 +15,9 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 
 class ObservationQuery {
+
+	final String DEFAULT_SORT_COLUMN = "PLOT_NO";
+	final String DEFAULT_SORT_ORDER = "asc";
 
 	final String whereText = "where (pr.object_project_id = ? and name LIKE '%PLOTDATA'))";
 	final String selectText = "SELECT \n" + "    nde.nd_experiment_id,\n" + "    gl.description AS TRIAL_INSTANCE,\n" + "    (SELECT \n"
@@ -66,8 +70,9 @@ class ObservationQuery {
 			+ "            WHERE ndep.nd_experiment_id = ep.nd_experiment_id  AND ispcvt.name = 'COL') COL_NO";
 
 
-	String getAllObservationsQuery(final List<TraitDto> traits) {
-		return this.getObservationsMainQuery(traits) + getInstanceNumberClause() + getGroupOrderClause();
+	String getAllObservationsQuery(final List<TraitDto> traits, final String sortBy, final String sortOrder) {
+		return this.getObservationsMainQuery(traits) + getInstanceNumberClause() + getGroupingClause()
+				+ getOrderingClause(sortBy, sortOrder);
 	}
 
 	/**
@@ -140,7 +145,7 @@ class ObservationQuery {
 
 	}
 	String getSingleObservationQuery(final List<TraitDto> traits) {
-		return this.getObservationsMainQuery(traits) + " AND nde.nd_experiment_id = :experiment_id \n" + getGroupOrderClause();
+		return this.getObservationsMainQuery(traits) + " AND nde.nd_experiment_id = :experiment_id \n" + getGroupingClause();
 	}
 
 	private String getColumnNamesFromTraitNames(final List<TraitDto> traits) {
@@ -209,8 +214,14 @@ class ObservationQuery {
 		return " AND gl.nd_geolocation_id = :instanceId \n";
 	}
 
-	String getGroupOrderClause() {
-		return " GROUP BY nde.nd_experiment_id ORDER BY (1 * REP_NO), (1 * PLOT_NO) ";
+	String getOrderingClause(final String sortBy, final String sortOrder) {
+		String orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : DEFAULT_SORT_COLUMN;
+		String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : DEFAULT_SORT_ORDER;
+		return " ORDER BY " + orderColumn + " " + direction + " ";
+	}
+
+	String getGroupingClause() {
+		return " GROUP BY nde.nd_experiment_id ";
 	}
 
 	private static String getOrderByTraitId(final List<TraitDto> traits) {

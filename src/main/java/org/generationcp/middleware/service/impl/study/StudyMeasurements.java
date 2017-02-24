@@ -24,8 +24,8 @@ public class StudyMeasurements {
 	}
 
 	List<ObservationDto> getAllMeasurements(final int projectBusinessIdentifier, final List<TraitDto> traits, final int instanceId,
-			final int pageNumber, final int pageSize) {
-		final String generateQuery = this.measurementQuery.getAllObservationsQuery(traits);
+			final int pageNumber, final int pageSize, final String sortBy, final String sortOrder) {
+		final String generateQuery = this.measurementQuery.getAllObservationsQuery(traits, sortBy, sortOrder);
 		return this.executeQueryAndMapResults(projectBusinessIdentifier, traits, generateQuery, instanceId, pageNumber, pageSize);
 	}
 
@@ -144,7 +144,7 @@ public class StudyMeasurements {
 
 	@SuppressWarnings("unchecked")
 	public List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier, final List<TraitDto> traits) {
-		final String generateQuery = this.measurementQuery.getObservationsMainQuery(traits) + this.measurementQuery.getGroupOrderClause();
+		final String generateQuery = this.measurementQuery.getObservationsMainQuery(traits) + this.measurementQuery.getGroupingClause();
 
 		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(traits, generateQuery);
 		createSQLQuery.setParameter("studyId", projectBusinessIdentifier);
