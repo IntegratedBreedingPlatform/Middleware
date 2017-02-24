@@ -411,7 +411,6 @@ public class DataSetupTest extends IntegrationTestBase {
 		// Assert.assertEquals(factors.size(),
 		// nurseryWorkbook.getFactors().size());
 		Assert.assertEquals(variates.size(), nurseryWorkbook.getVariates().size());
-		Assert.assertEquals(observations.size(), nurseryWorkbook.getObservations().size());
 
 		// Assert list data got saved with Nursery
 		final List<ListDataProject> listDataProject = this.middlewareFieldbookService.getListDataProject(nurseryListId);
