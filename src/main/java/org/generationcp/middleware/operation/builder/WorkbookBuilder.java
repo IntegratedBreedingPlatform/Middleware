@@ -618,9 +618,15 @@ public class WorkbookBuilder extends Builder {
 				if (!found) {
 					final boolean isEditable = NonEditableFactors.isEditable(factor.getTermId());
 					final String dataType = this.getDataType(factor.getDataTypeId());
+					final MeasurementData measurementData;
 
-					final MeasurementData measurementData =
-						new MeasurementData(factor.getName(), null, isEditable, dataType, factor.getTermId(), factor);
+					if (factor.getTermId() == TermId.PLOT_ID.getId()) {
+						final String plotId = experiment.getPlotId();
+						measurementData = new MeasurementData(factor.getName(), plotId, isEditable, dataType, factor);
+					} else {
+						measurementData =
+							new MeasurementData(factor.getName(), null, isEditable, dataType, factor.getTermId(), factor);
+					}
 					measurementDataList.add(measurementData);
 				}
 			}
