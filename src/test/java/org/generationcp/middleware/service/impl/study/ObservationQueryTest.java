@@ -76,7 +76,7 @@ public class ObservationQueryTest {
 				+ " WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n"
 				+ "		AND gl.nd_geolocation_id = :instanceId \n"
 				+ " GROUP BY nde.nd_experiment_id " 
-				+ " ORDER BY PLOT_NO asc ";
+				+ " ORDER BY (1*PLOT_NO) asc ";
 	}
 
 	private String expectedQueryForSingleMeasurement() {

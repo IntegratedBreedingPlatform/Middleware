@@ -217,6 +217,14 @@ class ObservationQuery {
 	String getOrderingClause(final String sortBy, final String sortOrder) {
 		String orderColumn = StringUtils.isNotBlank(sortBy) ? sortBy : DEFAULT_SORT_COLUMN;
 		String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : DEFAULT_SORT_ORDER;
+		/**
+		 * Values of these columns are numbers but the database stores it in string format (facepalm). Sorting on them requires multiplying
+		 * with 1 so that they turn into number and are sorted as numbers rather than strings.
+		 */
+		List<String> columnsWithNumbersAsStrings = Lists.newArrayList("ENTRY_NO", "REP_NO", "PLOT_NO", "ROW_NO", "COL_NO", "BLOCK_NO");
+		if (columnsWithNumbersAsStrings.contains(orderColumn)) {
+			orderColumn = "(1 * " + orderColumn + ")";
+		}
 		return " ORDER BY " + orderColumn + " " + direction + " ";
 	}
 
