@@ -54,6 +54,12 @@ public class InventoryDetailsTestDataInitializer {
 			final InventoryDetails invDetails = new InventoryDetails();
 			invDetails.setLotId(id);
 			invDetails.setGid(id);
+			invDetails.setGermplasmName("GermplsmName"+i);
+			invDetails.setCross("Cross"+i);
+			invDetails.setSource("SeedSource"+i);
+			invDetails.setGroupId(i);
+			invDetails.setReplicationNumber(1);
+			invDetails.setPlotNumber(1);
 			invDetails.setInstanceNumber(1);
 			invDetails.setEntryId(1);
 			inventoryDetails.add(invDetails);
