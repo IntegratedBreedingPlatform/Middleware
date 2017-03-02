@@ -86,6 +86,8 @@ public class Workbook {
 	private boolean hasOutOfBoundsData;
 	private List<Integer> columnOrderedLists;
 
+	private Integer plotsIdNotfound;
+
 	public Workbook() {
 		this.reset();
 		this.trialObservations = new ArrayList<>();
@@ -1062,4 +1064,11 @@ public class Workbook {
 		return null;
 	}
 
+	public Integer getPlotsIdNotfound() {
+		return plotsIdNotfound;
+	}
+
+	public void setPlotsIdNotfound(Integer plotsIdNotfound) {
+		this.plotsIdNotfound = plotsIdNotfound;
+	}
 }
