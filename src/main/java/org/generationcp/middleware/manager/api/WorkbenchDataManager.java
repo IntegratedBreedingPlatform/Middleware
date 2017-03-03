@@ -299,12 +299,13 @@ public interface WorkbenchDataManager {
 	Project getProjectByNameAndCrop(String projectName, CropType cropType);
 
 	/**
-	 * Gets a project by Uuid. Should return only one value.
+	 * Gets a project by Uuid and CropType. Should return only one value.
 	 *
-	 * @param projectUuid - the project Uuid to match
-	 * @return the project matching the given Uuid
+	 * @param projectUuid - the project Uuid to match (uuid is unique per crop type)
+	 * @param cropType - the crop type to match
+	 * @return the project matching the given Uuid and crop type
 	 */
-	Project getProjectByUuid(String projectUuid);
+	Project getProjectByUuid(String projectUuid, String cropType);
 
 	/**
 	 * Updates all the project roles for a project.
