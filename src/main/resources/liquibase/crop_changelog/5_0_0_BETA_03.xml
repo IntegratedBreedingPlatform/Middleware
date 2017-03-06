@@ -13,7 +13,7 @@
 			</not>
 		</preConditions>
 		<addColumn tableName="nd_experiment">
-			<column name="plot_id" type="CHAR(11) CHARSET UTF8 COLLATE utf8_general_ci" />
+			<column name="plot_id" type="CHAR(13) CHARSET UTF8 COLLATE utf8_bin" />
 		</addColumn>
 	</changeSet>
 
@@ -37,5 +37,154 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="nahuel" id="v5-beta03-3">
+
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+					COUNT(*)
+				FROM
+                    information_schema.routines
+				WHERE
+                    routine_schema = DATABASE()
+                        AND specific_name = 'upgrade_plot_id';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE upgrade_plot_id;
+		</sql>
+
+	</changeSet>
+    
+	<changeSet author="nahuel" id="v5-beta03-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT
+					COUNT(*)
+				FROM
+					information_schema.routines
+				WHERE
+					routine_schema = DATABASE()
+						AND specific_name = 'upgrade_plot_id';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+            CREATE PROCEDURE upgrade_plot_id()
+            BEGIN
+
+                DECLARE duplicates INT DEFAULT 1;
+                
+                WHILE (duplicates > 0) DO
+                
+                    SET @indexExist := (SELECT count(*)
+                               FROM information_schema.statistics
+                               WHERE table_name = 'nd_experiment' AND index_name = 'idx_plot_id' AND table_schema = database());
+                    
+                    IF @indexExist > 0 THEN
+                        ALTER TABLE nd_experiment 
+                        DROP INDEX idx_plot_id;
+                    END IF;
+                    
+                    
+                    UPDATE nd_experiment nd
+                      INNER JOIN nd_experiment_project ndp ON nd.nd_experiment_id = ndp.nd_experiment_id
+                      INNER JOIN project p ON ndp.project_id = p.project_id
+                    SET plot_id = CONCAT((SELECT plot_code_prefix
+                                          FROM
+                                            workbench.workbench_crop wc
+                                          WHERE
+                                            db_name = DATABASE()),
+                                         'P', 
+                                         left(sha1(CONCAT(uuid(), nd.nd_experiment_id)), 8))
+                    WHERE p.name LIKE '%-PLOTDATA'
+                    AND nd.plot_id IS NULL;
+
+
+                    ALTER TABLE nd_experiment
+                    ADD INDEX idx_plot_id (plot_id ASC);
+
+                    SELECT sum(c)
+                    into duplicates
+                    FROM (SELECT count(1) c
+                          FROM nd_experiment
+                            WHERE plot_id IS NOT NULL
+                          GROUP BY plot_id
+                          HAVING count(1) >= 2) T;
+
+                    IF duplicates > 0 THEN
+                           
+                        UPDATE nd_experiment
+                        SET plot_id = NULL
+                        WHERE nd_experiment_id IN (
+                          SELECT nd_experiment_id
+                          FROM (
+                                 SELECT tt.nd_experiment_id
+                                 FROM nd_experiment tt
+                                 WHERE EXISTS
+                                       (
+                                           SELECT 1
+                                           FROM nd_experiment tt2
+                                           WHERE tt.plot_id = tt2.plot_id
+                                           LIMIT 1, 1
+                                       ) AND tt.plot_id IS NOT NULL) AS T);
+
+                    END IF;
+
+                    
+                END WHILE;
+                
+                SET @indexExist := (SELECT count(*)
+                       FROM information_schema.statistics
+                       WHERE table_name = 'nd_experiment' AND index_name = 'idx_plot_id' AND table_schema = database());
+                
+                IF @indexExist > 0 THEN
+                    ALTER TABLE nd_experiment 
+                    DROP INDEX idx_plot_id;
+                END IF;
+                
+                ALTER TABLE nd_experiment 
+                ADD UNIQUE INDEX idx_plot_id (plot_id ASC);
+
+            END;
+		</sql>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v5-beta03-5">
+
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+					COUNT(*)
+				FROM
+					information_schema.routines
+				WHERE
+					routine_schema = DATABASE()
+						AND specific_name = 'upgrade_plot_id';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			call upgrade_plot_id();
+		</sql>
+
+	</changeSet>
+
+	<changeSet author="nahuel" id="v5-beta03-6">
+
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+					COUNT(*)
+				FROM
+                    information_schema.routines
+				WHERE
+                    routine_schema = DATABASE()
+                        AND specific_name = 'upgrade_plot_id';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE upgrade_plot_id;
+		</sql>
+
+	</changeSet>
 
 </databaseChangeLog>
