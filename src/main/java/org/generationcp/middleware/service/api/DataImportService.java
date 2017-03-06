@@ -21,8 +21,6 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
 
 import org.generationcp.middleware.util.Message;
@@ -40,9 +38,10 @@ public interface DataImportService {
 	 * 
 	 * @param workbook
 	 * @param programUUID
+	 * @param cropPrefix
 	 * @return id of created trial or nursery
 	 */
-	int saveDataset(Workbook workbook, String programUUID) throws MiddlewareQueryException;
+	int saveDataset(final Workbook workbook, final String programUUID, final String cropPrefix) throws MiddlewareQueryException;
 
 	/**
 	 * Saves a workbook as a local trial or nursery on the new CHADO schema
@@ -51,9 +50,10 @@ public interface DataImportService {
 	 * @param retainValues if true, values of the workbook items are retained, else they are cleared to conserve memory
 	 * @param isDeleteObservations if true, values of the workbook observations will be removed
 	 * @param programUUID the program UUID
+	 * @param cropPrefix
 	 * @return id of created trial or nursery
 	 */
-	int saveDataset(Workbook workbook, boolean retainValues, boolean isDeleteObservations, String programUUID)
+	int saveDataset(final Workbook workbook, final boolean retainValues, final boolean isDeleteObservations, final String programUUID, final String cropPrefix)
 			throws MiddlewareQueryException;
 
 	/**
@@ -124,18 +124,20 @@ public interface DataImportService {
 	 * 
 	 * @param workbook
 	 * @param programUUID
+	 * @param cropPrefix
 	 * @return id of created the study (Table.column = Project.project_id)
 	 */
-	int saveProjectOntology(Workbook workbook, String programUUID) throws MiddlewareQueryException;
+	int saveProjectOntology(final Workbook workbook, final String programUUID, final String cropPrefix) throws MiddlewareQueryException;
 
 	/**
 	 * Saves the project ontology from the Workbook Tables: project, project_relationship, project_properties
 	 * 
 	 * @param workbook
 	 * @param programUUID
+	 * @param cropPrefix
 	 * @return 1 = successful, 0 = failure
 	 */
-	int saveProjectData(Workbook workbook, String programUUID) throws MiddlewareQueryException;
+	int saveProjectData(final Workbook workbook, final String programUUID, final String cropPrefix) throws MiddlewareQueryException;
 
 	Map<String, List<Message>> validateProjectData(Workbook importData, String programUUID) throws MiddlewareException;
 

@@ -54,6 +54,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class WorkbookBuilderTest extends IntegrationTestBase {
 
 	private static final Logger LOG = LoggerFactory.getLogger(WorkbookBuilderTest.class);
+	private static final String CROP_PREFIX = "ABCD";
 
 	@Autowired
 	private DataImportService dataImportService;
@@ -128,7 +129,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	public void testGetTrialObservationsForNursery() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
 
-		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID);
+		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID, WorkbookBuilderTest.CROP_PREFIX);
 
 		final Workbook createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
 
@@ -163,7 +164,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	public void testGetTrialObservationsForTrial() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 
-		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID);
+		final int id = this.dataImportService.saveDataset(workbook, WorkbookBuilderTest.PROGRAM_UUID, WorkbookBuilderTest.CROP_PREFIX);
 
 		final Workbook createdWorkbook = this.fieldbookService.getTrialDataSet(id);
 
@@ -350,7 +351,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
 
-		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID);
+		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID, WorkbookBuilderTest.CROP_PREFIX);
 
 		final List<MeasurementRow> result =
 				this.workbookBuilder.buildTrialObservations(workbook.getTrialDatasetId(), workbook.getTrialConditions(),
@@ -371,7 +372,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 	public void testBuildConditionVariablesOnTrial() {
 		//final int noOfObservations, final StudyType studyType, final String studyName, final int trialNo, final boolean hasMultipleLocations
 		final Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(10, StudyType.T, "Test study", 1, true);
-		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID);
+		this.dataImportService.saveDataset(workbook, true, false, WorkbookBuilderTest.PROGRAM_UUID, WorkbookBuilderTest.CROP_PREFIX);
 
 		// create measurement variables of condition types
 		final List<MeasurementVariable> conditionMeasurementVariableList = workbook.getStudyConditions();

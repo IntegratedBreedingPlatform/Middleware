@@ -89,6 +89,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private static CrossExpansionProperties crossExpansionProperties;
 	private StudyReference studyReference;
 	private StudyTestDataInitializer studyTDI;
+	private final String cropPrefix = "ABCD";
 
 	@Before
 	public void setUp() throws Exception {
@@ -107,7 +108,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		StudyDataManagerImplTest.crossExpansionProperties.setDefaultLevel(1);
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject, this.germplasmDataDM,
 				this.locationManager);
-		this.studyReference = this.studyTDI.addTestStudy();
+		
+		this.studyReference = this.studyTDI.addTestStudy(cropPrefix);
 	}
 
 	@Test
@@ -299,7 +301,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetAllStudyDetails() throws Exception {
 		final List<StudyDetails> nurseryStudyDetails = this.manager.getAllStudyDetails(StudyType.N, this.commonTestProject.getUniqueID());
 		final int sizeBeforeAddingNewNursery = nurseryStudyDetails.size();
-		this.studyTDI.addTestStudy(StudyType.N, "NEW NURSERY");
+		this.studyTDI.addTestStudy(StudyType.N, "NEW NURSERY", cropPrefix);
 		final List<StudyDetails> updatedNurseryStudyDetails = this.manager.getAllStudyDetails(StudyType.N, this.commonTestProject.getUniqueID());
 		final int sizeAfterAddingNewNursery = updatedNurseryStudyDetails.size();
 		Assert.assertEquals("The size after adding new nursery should be equal to the size before adding a new nursery + 1",
@@ -454,7 +456,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testDeleteProgramStudies() throws Exception {
 		final String uniqueId = "100001001001";
 		this.studyTDI.createFolderTestData(uniqueId);
-		this.studyTDI.addTestStudy(uniqueId);
+		this.studyTDI.addTestStudy(uniqueId, cropPrefix);
 
 		List<? extends Reference> programStudiesAndFolders = this.manager.getRootFolders(uniqueId, StudyType.nurseriesAndTrials());
 		final int sizeBeforeDelete = programStudiesAndFolders.size();
@@ -470,7 +472,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testGetStudyDetails() throws Exception {
 		final List<StudyDetails> trialStudyDetails = this.manager.getStudyDetails(StudyType.T, this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeBeforeAddingNewTrial = trialStudyDetails.size();
-		this.studyTDI.addTestStudy(StudyType.T, "NEW TRIAL");
+		this.studyTDI.addTestStudy(StudyType.T, "NEW TRIAL", cropPrefix);
 		final List<StudyDetails> updatedTrialStudyDetails = this.manager.getStudyDetails(StudyType.T, this.commonTestProject.getUniqueID(), 0, 50);
 		final int sizeAfterAddingNewTrial = updatedTrialStudyDetails.size();
 		Assert.assertEquals("The size after adding new trial should be equal to the size before adding a new trial + 1",
@@ -482,8 +484,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final List<StudyDetails> studyDetailsList =
 				this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeBeforeAddingNewStudy = studyDetailsList.size();
-		this.studyTDI.addTestStudy(StudyType.N, "NEW NURSERY");
-		this.studyTDI.addTestStudy(StudyType.T, "NEW TRIAL");
+		this.studyTDI.addTestStudy(StudyType.N, "NEW NURSERY", cropPrefix);
+		this.studyTDI.addTestStudy(StudyType.T, "NEW TRIAL", cropPrefix);
 		final List<StudyDetails> newStudyDetailsList =
 				this.manager.getNurseryAndTrialStudyDetails(this.commonTestProject.getUniqueID(), -1, -1);
 		final int sizeAfterAddingNewStudy = newStudyDetailsList.size();

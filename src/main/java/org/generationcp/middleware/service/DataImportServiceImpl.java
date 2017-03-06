@@ -89,8 +89,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 * <p/>
 	 */
 	@Override
-	public int saveDataset(final Workbook workbook, final String programUUID) {
-		return this.saveDataset(workbook, false, false, programUUID);
+	public int saveDataset(final Workbook workbook, final String programUUID, final String cropPrefix) {
+		return this.saveDataset(workbook, false, false, programUUID, cropPrefix);
 	}
 
 	/**
@@ -104,13 +104,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 * @param workbook
 	 * @param retainValues         if true, values of the workbook items are retained, else they are cleared to conserve memory
 	 * @param isDeleteObservations
+	 * @param cropPrefix
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public int saveDataset(final Workbook workbook, final boolean retainValues, final boolean isDeleteObservations,
-			final String programUUID) {
+		final String programUUID, final String cropPrefix) {
 
 		Map<String, ?> variableMap = null;
 		final TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)");
@@ -134,7 +135,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		try {
 
-			return this.getWorkbookSaver().saveDataset(workbook, variableMap, retainValues, isDeleteObservations, programUUID);
+			return this.getWorkbookSaver().saveDataset(workbook, variableMap, retainValues, isDeleteObservations, programUUID, cropPrefix);
 
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error encountered with saving to database: ", e);
@@ -750,14 +751,14 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public int saveProjectOntology(final Workbook workbook, final String programUUID) {
+	public int saveProjectOntology(final Workbook workbook, final String programUUID, final String cropPrefix) {
 
 		final TimerWatch timerWatch = new TimerWatch("saveProjectOntology (grand total)");
 		int studyId = 0;
 
 		try {
 
-			studyId = this.getWorkbookSaver().saveProjectOntology(workbook, programUUID);
+			studyId = this.getWorkbookSaver().saveProjectOntology(workbook, programUUID, cropPrefix);
 
 		} catch (final Exception e) {
 
@@ -771,13 +772,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public int saveProjectData(final Workbook workbook, final String programUUID) {
+	public int saveProjectData(final Workbook workbook, final String programUUID, final String cropPrefix) {
 
 		final TimerWatch timerWatch = new TimerWatch("saveProjectData (grand total)");
 
 		try {
 
-			this.getWorkbookSaver().saveProjectData(workbook, programUUID);
+			this.getWorkbookSaver().saveProjectData(workbook, programUUID, cropPrefix);
 
 		} catch (final Exception e) {
 

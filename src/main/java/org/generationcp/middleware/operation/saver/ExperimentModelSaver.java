@@ -10,9 +10,7 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -29,21 +27,27 @@ import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.ExperimentStock;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ExperimentModelSaver extends Saver {
+
+	private static final String P = "P";
 
 	public ExperimentModelSaver(HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
 
-	public void addExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {
+	public void addExperiment(int projectId, ExperimentType experimentType, Values values, String cropPrefix) throws MiddlewareQueryException {
 		TermId myExperimentType = this.mapExperimentType(experimentType);
-		ExperimentModel experimentModel = this.create(projectId, values, myExperimentType);
+		ExperimentModel experimentModel = this.create(projectId, values, myExperimentType, cropPrefix);
+
 		this.getExperimentDao().save(experimentModel);
 		this.addExperimentProject(experimentModel, projectId);
 		this.getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
 	}
 
-	public void addOrUpdateExperiment(int projectId, ExperimentType experimentType, Values values) throws MiddlewareQueryException {
+	public void addOrUpdateExperiment(int projectId, ExperimentType experimentType, Values values, String cropPrefix) throws MiddlewareQueryException {
 		int experimentId =
 				this.getExperimentProjectDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(),
 						values.getGermplasmId());
@@ -73,7 +77,8 @@ public class ExperimentModelSaver extends Saver {
 				myExperimentType = this.mapExperimentType(experimentType);
 			}
 
-			ExperimentModel experimentModel = this.create(projectId, values, myExperimentType);
+			ExperimentModel experimentModel = this.create(projectId, values, myExperimentType, cropPrefix);
+
 			this.getExperimentDao().save(experimentModel);
 			this.addExperimentProject(experimentModel, projectId);
 			this.getPhenotypeSaver().savePhenotypes(experimentModel, values.getVariableList());
@@ -98,7 +103,7 @@ public class ExperimentModelSaver extends Saver {
 		return null;
 	}
 
-	private ExperimentModel create(int projectId, Values values, TermId expType) throws MiddlewareQueryException {
+	private ExperimentModel create(int projectId, Values values, TermId expType, String cropPrefix) throws MiddlewareQueryException {
 		ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setTypeId(expType.getId());
 		experimentModel.setProperties(this.createProperties(experimentModel, values.getVariableList()));
@@ -112,7 +117,22 @@ public class ExperimentModelSaver extends Saver {
 			experimentModel.setExperimentStocks(new ArrayList<ExperimentStock>());
 			experimentModel.getExperimentStocks().add(this.createExperimentStock(experimentModel, values.getGermplasmId()));
 		}
+
+		if (!(TermId.TRIAL_ENVIRONMENT_EXPERIMENT.equals(expType) && TermId.STUDY_INFORMATION.equals(expType))) {
+			String plotUniqueId = getPlotUniqueId(cropPrefix);
+
+			experimentModel.setPlotId(plotUniqueId);
+		}
+
 		return experimentModel;
+	}
+
+	private String getPlotUniqueId(String cropPrefix) {
+		String plotUniqueId = cropPrefix;
+		plotUniqueId = plotUniqueId + P;
+		plotUniqueId = plotUniqueId + RandomStringUtils.randomAlphanumeric(6);
+		
+		return plotUniqueId;
 	}
 
 	// GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
