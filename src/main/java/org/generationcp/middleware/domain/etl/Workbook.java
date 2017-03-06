@@ -124,6 +124,7 @@ public class Workbook {
 		this.treatmentFactors = null;
 		this.hasExistingDataOverwrite = false;
 		this.hasOutOfBoundsData = false;
+		this.plotsIdNotfound = 0;
 	}
 
 	public StudyDetails getStudyDetails() {
