@@ -305,7 +305,7 @@ public interface WorkbenchDataManager {
 	 * @param cropType - the crop type to match
 	 * @return the project matching the given Uuid and crop type
 	 */
-	Project getProjectByUuid(String projectUuid, String cropType);
+	Project getProjectByUuidAndCrop(String projectUuid, String cropType);
 
 	/**
 	 * Updates all the project roles for a project.
