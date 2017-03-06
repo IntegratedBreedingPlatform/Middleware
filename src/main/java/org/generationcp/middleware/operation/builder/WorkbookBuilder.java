@@ -620,7 +620,7 @@ public class WorkbookBuilder extends Builder {
 					final String dataType = this.getDataType(factor.getDataTypeId());
 					final MeasurementData measurementData;
 
-					if (factor.getTermId() == TermId.PLOT_ID.getId()) {
+					if (isTrial && factor.getTermId() == TermId.PLOT_ID.getId()) {
 						final String plotId = experiment.getPlotId();
 						measurementData = new MeasurementData(factor.getName(), plotId, isEditable, dataType, factor);
 					} else {
