@@ -80,14 +80,12 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	private GermplasmListTestDataInitializer germplasmListTDI;
 	private GermplasmTestDataInitializer germplasmTDI;
-	private GermplasmListDataTestDataInitializer listDataTDI;
 
 	@Before
 	public void setUpBefore() throws Exception {
 		this.germplasmListTDI = new GermplasmListTestDataInitializer();
 		this.germplasmTDI = new GermplasmTestDataInitializer();
-		this.listDataTDI = new GermplasmListDataTestDataInitializer();
-
+	
 		this.testGermplasm = this.germplasmTDI.createGermplasmWithPreferredName();
 		this.dataManager.addGermplasm(this.testGermplasm, this.testGermplasm.getPreferredName());
 
@@ -109,7 +107,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		this.manager.addGermplasmList(germplasmList1);
 
 		final GermplasmListData germplasmListData =
-				this.listDataTDI.createGermplasmListData(germplasmList1, this.testGermplasm.getGid(), 2);
+				GermplasmListDataTestDataInitializer.createGermplasmListData(germplasmList1, this.testGermplasm.getGid(), 2);
 		this.manager.addGermplasmListData(germplasmListData);
 
 		final GermplasmList germplasmList2 = this.germplasmListTDI.createGermplasmList(TEST_LIST_5, Integer.valueOf(1),
@@ -117,7 +115,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		this.manager.addGermplasmList(germplasmList2);
 
 		final GermplasmListData germplasmListData1 =
-				this.listDataTDI.createGermplasmListData(germplasmList2, this.testGermplasm.getGid(), 1);
+				GermplasmListDataTestDataInitializer.createGermplasmListData(germplasmList2, this.testGermplasm.getGid(), 1);
 		this.manager.addGermplasmListData(germplasmListData1);
 
 		final GermplasmList germplasmList3 = this.germplasmListTDI.createGermplasmList(TEST_LIST_3, Integer.valueOf(1),
@@ -129,7 +127,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		this.listId = this.manager.addGermplasmList(germplasmList6);
 
 		final GermplasmListData germplasmListData2 =
-				this.listDataTDI.createGermplasmListData(germplasmList6, this.testGermplasm.getGid(), 1);
+				GermplasmListDataTestDataInitializer.createGermplasmListData(germplasmList6, this.testGermplasm.getGid(), 1);
 		this.manager.addGermplasmListData(germplasmListData2);
 		this.lrecId = germplasmListData2.getId();
 
@@ -138,7 +136,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 						GermplasmListManagerImplTest.GERMPLASM_LIST_DESC, null, 1, GermplasmListManagerImplTest.LIST_PROGRAM_UUID);
 		this.manager.addGermplasmList(testGermplasmList);
 
-		final GermplasmListData listData = this.listDataTDI.createGermplasmListData(testGermplasmList, this.testGermplasm.getGid(), 2);
+		final GermplasmListData listData = GermplasmListDataTestDataInitializer.createGermplasmListData(testGermplasmList, this.testGermplasm.getGid(), 2);
 		this.manager.addGermplasmListData(listData);
 	}
 

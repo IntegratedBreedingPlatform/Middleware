@@ -225,7 +225,7 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
 	private GermplasmListData createTestListDataForList(final Germplasm listDataGermplasm,
 			final GermplasmList listDataGermplasmList) {
-		final GermplasmListData listData = new GermplasmListDataTestDataInitializer().createGermplasmListData(
+		final GermplasmListData listData = GermplasmListDataTestDataInitializer.createGermplasmListData(
 				listDataGermplasmList, listDataGermplasm.getGid(), GermplasmListDataDAOTest.TEST_ENTRY_ID);
 		listData.setFgid(listDataGermplasm.getGpid1());
 		listData.setMgid(listDataGermplasm.getGpid2());
