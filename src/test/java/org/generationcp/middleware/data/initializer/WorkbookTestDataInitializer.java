@@ -66,6 +66,7 @@ public class WorkbookTestDataInitializer {
 	public static final String SCORE_1_5 = "Score (1-5)";
 	public static final String VISUAL_SCORING = "Visual scoring";
 	public static final String COMMON_RUST = "Common rust";
+	public static final String TEXT = "Text";
 
 	// METHODS
 	public static final String ASSIGNED = "ASSIGNED";
@@ -81,7 +82,7 @@ public class WorkbookTestDataInitializer {
 	public static final String TRIAL = "TRIAL";
 	public static final String ENTRY = "ENTRY";
 	public static final String PLOT = "PLOT";
-
+	public static final String PLOT_ID = "PLOT_ID";
 	// DATA TYPES
 	public static final String CHAR = "C";
 	public static final String NUMERIC = "N";
@@ -389,7 +390,7 @@ public class WorkbookTestDataInitializer {
 
 		factors.add(
 				WorkbookTestDataInitializer.createMeasurementVariable(TermId.SEED_SOURCE.getId(), WorkbookTestDataInitializer.SEED_SOURCE,
-						"The seed source of the germplasm", WorkbookTestDataInitializer.NAME, WorkbookTestDataInitializer.SELECTED,
+						"The seed source of the germplasm", WorkbookTestDataInitializer.TEXT, WorkbookTestDataInitializer.SELECTED,
 						WorkbookTestDataInitializer.SEED_SOURCE, WorkbookTestDataInitializer.CHAR, WorkbookTestDataInitializer.STUDY,
 						WorkbookTestDataInitializer.ENTRY, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.GERMPLASM, false));
 
@@ -398,6 +399,10 @@ public class WorkbookTestDataInitializer {
 				WorkbookTestDataInitializer.FIELD_PLOT, WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE,
 				WorkbookTestDataInitializer.PLOT, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.TRIAL_DESIGN, false));
 
+		factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.PLOT_ID.getId(), WorkbookTestDataInitializer.PLOT_ID,
+			"Field plot id - enumerated (number) ", WorkbookTestDataInitializer.TEXT, WorkbookTestDataInitializer.ASSIGNED,
+			WorkbookTestDataInitializer.FIELD_PLOT, WorkbookTestDataInitializer.CHAR, WorkbookTestDataInitializer.STUDY,
+			WorkbookTestDataInitializer.PLOT, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.TRIAL_DESIGN, false));
 		// Plot Factors
 		factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.BLOCK_NO.getId(), WorkbookTestDataInitializer.BLOCK,
 				"INCOMPLETE BLOCK", WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED,
@@ -501,6 +506,8 @@ public class WorkbookTestDataInitializer {
 					TermId.SEED_SOURCE.getId(), workbook.getFactors()));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.PLOT, String.valueOf(i),
 					TermId.PLOT_NO.getId(), workbook.getFactors()));
+			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.PLOT_ID, "PLOT010203P"+String.valueOf(i),
+				TermId.PLOT_ID.getId(), workbook.getFactors()));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.BLOCK, "", TermId.BLOCK_NO.getId(),
 					workbook.getFactors()));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.REP, "", TermId.REP_NO.getId(),
