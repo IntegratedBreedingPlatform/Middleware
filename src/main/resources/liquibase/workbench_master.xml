@@ -15,6 +15,7 @@
 	<include file="workbench_changelog/4_0_0_BETA_17.xml" relativeToChangelogFile="true"/>
 	<include file="workbench_changelog/5_0_0_BETA_01.xml" relativeToChangelogFile="true"/>
 	<include file="workbench_changelog/5_0_0_BETA_02.xml" relativeToChangelogFile="true"/>
-	<include file="workbench_changelog/4_3_0_SPRINT.xml" relativeToChangelogFile="true"/>
+	<!-- This is the new filename convention for liquibase files: 4_x_x.xml -->
+	<include file="workbench_changelog/4_3_0.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
