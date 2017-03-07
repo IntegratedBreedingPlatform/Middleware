@@ -278,6 +278,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		measurementVariableList.add(this.getMeasurementVariable(TermId.ENTRY_CODE.getId(), true));
 		measurementVariableList.add(this.getMeasurementVariable(TermId.ENTRY_NO.getId(), true));
 		measurementVariableList.add(this.getMeasurementVariable(TermId.GID.getId(), true));
+		measurementVariableList.add(this.getMeasurementVariable(TermId.PLOT_ID.getId(), true));
 		measurementVariableList.add(this.getMeasurementVariable(TermId.REP_NO.getId(), true));
 		measurementVariableList.add(this.getMeasurementVariable(TermId.PLOT_NO.getId(), true));
 		measurementVariableList.add(this.getMeasurementVariable(WorkbookBuilderTest.SITE_SOIL_PH, false));
