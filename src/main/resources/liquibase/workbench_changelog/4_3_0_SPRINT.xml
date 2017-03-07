@@ -6,7 +6,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 	
-	<changeSet author="mderamos" id="sprint-4-1-0">
+	<changeSet author="mderamos" id="v4.3.0-1">
 
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM workbench_sidebar_category_link WHERE tool_name = 'germplasm_mainheadtohead';</sqlCheck>
