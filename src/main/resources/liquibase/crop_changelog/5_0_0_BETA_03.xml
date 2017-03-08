@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
@@ -38,151 +38,290 @@
 	</changeSet>
 
 	<changeSet author="nahuel" id="v5-beta03-3">
-
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
-					COUNT(*)
+				COUNT(*)
 				FROM
-                    information_schema.routines
+				information_schema.routines
 				WHERE
-                    routine_schema = DATABASE()
-                        AND specific_name = 'upgrade_plot_id';
+				routine_schema = DATABASE()
+				AND specific_name = 'upgrade_plot_id';
 			</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="false">
 			DROP PROCEDURE upgrade_plot_id;
 		</sql>
-
 	</changeSet>
-    
+
 	<changeSet author="nahuel" id="v5-beta03-4">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT
-					COUNT(*)
+				COUNT(*)
 				FROM
-					information_schema.routines
+				information_schema.routines
 				WHERE
-					routine_schema = DATABASE()
-						AND specific_name = 'upgrade_plot_id';
+				routine_schema = DATABASE()
+				AND specific_name = 'upgrade_plot_id';
 			</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="false">
-            CREATE PROCEDURE upgrade_plot_id()
-            BEGIN
+			CREATE PROCEDURE upgrade_plot_id()
+			BEGIN
 
-                DECLARE duplicates INT DEFAULT 1;
-                
-                WHILE (duplicates > 0) DO
-                
-                    SET @indexExist := (SELECT count(*)
-                               FROM information_schema.statistics
-                               WHERE table_name = 'nd_experiment' AND index_name = 'idx_plot_id' AND table_schema = database());
-                    
-                    IF @indexExist > 0 THEN
-                        ALTER TABLE nd_experiment 
-                        DROP INDEX idx_plot_id;
-                    END IF;
-                    
-                    
-                    UPDATE nd_experiment nd
-                      INNER JOIN nd_experiment_project ndp ON nd.nd_experiment_id = ndp.nd_experiment_id
-                      INNER JOIN project p ON ndp.project_id = p.project_id
-                    SET plot_id = CONCAT((SELECT plot_code_prefix
-                                          FROM
-                                            workbench.workbench_crop wc
-                                          WHERE
-                                            db_name = DATABASE()),
-                                         'P', 
-                                         left(sha1(CONCAT(uuid(), nd.nd_experiment_id)), 8))
-                    WHERE p.name LIKE '%-PLOTDATA'
-                    AND nd.plot_id IS NULL;
+			DECLARE duplicates INT DEFAULT 1;
+
+			WHILE (duplicates > 0) DO
+
+			SET @indexExist := (SELECT count(*)
+			FROM information_schema.statistics
+			WHERE table_name = 'nd_experiment' AND index_name = 'idx_plot_id' AND table_schema = database());
+
+			IF @indexExist > 0 THEN
+			ALTER TABLE nd_experiment
+			DROP INDEX idx_plot_id;
+			END IF;
 
 
-                    ALTER TABLE nd_experiment
-                    ADD INDEX idx_plot_id (plot_id ASC);
+			UPDATE nd_experiment nd
+			INNER JOIN nd_experiment_project ndp ON nd.nd_experiment_id = ndp.nd_experiment_id
+			INNER JOIN project p ON ndp.project_id = p.project_id
+			SET plot_id = CONCAT((SELECT plot_code_prefix
+			FROM
+			workbench.workbench_crop wc
+			WHERE
+			db_name = DATABASE()),
+			'P',
+			left(sha1(CONCAT(uuid(), nd.nd_experiment_id)), 8))
+			WHERE p.name LIKE '%-PLOTDATA'
+			AND nd.plot_id IS NULL;
 
-                    SELECT sum(c)
-                    into duplicates
-                    FROM (SELECT count(1) c
-                          FROM nd_experiment
-                            WHERE plot_id IS NOT NULL
-                          GROUP BY plot_id
-                          HAVING count(1) >= 2) T;
 
-                    IF duplicates > 0 THEN
-                           
-                        UPDATE nd_experiment
-                        SET plot_id = NULL
-                        WHERE nd_experiment_id IN (
-                          SELECT nd_experiment_id
-                          FROM (
-                                 SELECT tt.nd_experiment_id
-                                 FROM nd_experiment tt
-                                 WHERE EXISTS
-                                       (
-                                           SELECT 1
-                                           FROM nd_experiment tt2
-                                           WHERE tt.plot_id = tt2.plot_id
-                                           LIMIT 1, 1
-                                       ) AND tt.plot_id IS NOT NULL) AS T);
+			ALTER TABLE nd_experiment
+			ADD INDEX idx_plot_id (plot_id ASC);
 
-                    END IF;
+			SELECT sum(c)
+			into duplicates
+			FROM (SELECT count(1) c
+			FROM nd_experiment
+			WHERE plot_id IS NOT NULL
+			GROUP BY plot_id
+			HAVING count(1) >= 2) T;
 
-                    
-                END WHILE;
-                
-                SET @indexExist := (SELECT count(*)
-                       FROM information_schema.statistics
-                       WHERE table_name = 'nd_experiment' AND index_name = 'idx_plot_id' AND table_schema = database());
-                
-                IF @indexExist > 0 THEN
-                    ALTER TABLE nd_experiment 
-                    DROP INDEX idx_plot_id;
-                END IF;
-                
-                ALTER TABLE nd_experiment 
-                ADD UNIQUE INDEX idx_plot_id (plot_id ASC);
+			IF duplicates > 0 THEN
 
-            END;
+			UPDATE nd_experiment
+			SET plot_id = NULL
+			WHERE nd_experiment_id IN (
+			SELECT nd_experiment_id
+			FROM (
+			SELECT tt.nd_experiment_id
+			FROM nd_experiment tt
+			WHERE EXISTS
+			(
+			SELECT 1
+			FROM nd_experiment tt2
+			WHERE tt.plot_id = tt2.plot_id
+			LIMIT 1, 1
+			) AND tt.plot_id IS NOT NULL) AS T);
+
+			END IF;
+
+
+			END WHILE;
+
+			SET @indexExist := (SELECT count(*)
+			FROM information_schema.statistics
+			WHERE table_name = 'nd_experiment' AND index_name = 'idx_plot_id' AND table_schema = database());
+
+			IF @indexExist > 0 THEN
+			ALTER TABLE nd_experiment
+			DROP INDEX idx_plot_id;
+			END IF;
+
+			ALTER TABLE nd_experiment
+			ADD UNIQUE INDEX idx_plot_id (plot_id ASC);
+
+			END;
 		</sql>
 	</changeSet>
 
 	<changeSet author="nahuel" id="v5-beta03-5">
-
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
-					COUNT(*)
+				COUNT(*)
 				FROM
-					information_schema.routines
+				information_schema.routines
 				WHERE
-					routine_schema = DATABASE()
-						AND specific_name = 'upgrade_plot_id';
+				routine_schema = DATABASE()
+				AND specific_name = 'upgrade_plot_id';
 			</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="false">
 			call upgrade_plot_id();
 		</sql>
-
 	</changeSet>
 
 	<changeSet author="nahuel" id="v5-beta03-6">
-
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
-					COUNT(*)
+				COUNT(*)
 				FROM
-                    information_schema.routines
+				information_schema.routines
 				WHERE
-                    routine_schema = DATABASE()
-                        AND specific_name = 'upgrade_plot_id';
+				routine_schema = DATABASE()
+				AND specific_name = 'upgrade_plot_id';
 			</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="false">
 			DROP PROCEDURE upgrade_plot_id;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v5-beta03-7">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'create_plot_id';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE create_plot_id;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v5-beta03-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'create_plot_id';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			CREATE PROCEDURE create_plot_id()
+			BEGIN
+			DECLARE projectId INT;
+			DECLARE rankNumber INT;
+			DECLARE ppId INT DEFAULT 0;
+			DECLARE done INT DEFAULT FALSE;
+
+			DECLARE cur1 CURSOR FOR
+			SELECT
+			p.project_id as projectId,
+			(SELECT
+			MAX(rank) + 1
+			FROM
+			projectprop
+			WHERE
+			project_id = p.project_id) as rankNumber
+			FROM
+			project p
+			WHERE
+			p.name LIKE '%-PLOTDATA'
+			AND p.program_uuid IS NOT NULL
+			AND NOT EXISTS( SELECT
+			1
+			FROM
+			projectprop pp
+			WHERE
+			pp.project_id = p.project_id
+			AND pp.value = 'PLOT_ID')
+			;
+
+			DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+			OPEN cur1;
+			read_loop: LOOP FETCH cur1 INTO projectId, rankNumber;
+
+			IF done THEN
+			LEAVE read_loop;
+			END IF;
+
+			SELECT MAX(projectprop_id) + 1
+			INTO @ppId
+			FROM projectprop;
+
+			INSERT INTO projectprop
+			VALUES (@ppId,
+			projectId,
+			1060,
+			'Field plot id - assigned (text)',
+			rankNumber);
+
+			SELECT MAX(projectprop_id) + 1
+			INTO @ppId
+			FROM projectprop;
+
+			INSERT INTO projectprop
+			VALUES (@ppId,
+			projectId,
+			1070,
+			'8201',
+			rankNumber);
+
+			SELECT MAX(projectprop_id) + 1
+			INTO @ppId
+			FROM projectprop;
+
+			INSERT INTO projectprop
+			VALUES (@ppId,
+			projectId,
+			1810,
+			'PLOT_ID',
+			rankNumber);
+
+			END LOOP read_loop;
+
+			CLOSE cur1;
+			END
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v5-beta03-9">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'create_plot_id';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			call create_plot_id();
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v5-beta03-10">
+
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'create_plot_id';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE create_plot_id;
 		</sql>
 
 	</changeSet>
