@@ -595,20 +595,14 @@ public class WorkbookBuilder extends Builder {
 
 							final MeasurementData measurementData;
 
-							if (variable.getVariableType().getStandardVariable().getId() == TermId.PLOT_ID.getId()) {
-								final String plotId = experiment.getPlotId();
-								measurementData = new MeasurementData(localName, plotId, isEditable, dataType, factor);
-							} else {
-								if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE
-										.getId()) {
-									final Integer id =
-											NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
+							if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE
+								.getId()) {
+								final Integer id = NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable.getValue()) : null;
 
-									measurementData =
-										new MeasurementData(localName, variable.getDisplayValue(), isEditable, dataType, id, factor);
-								} else {
-									measurementData = new MeasurementData(localName, variable.getValue(), isEditable, dataType, factor);
-								}
+								measurementData =
+									new MeasurementData(localName, variable.getDisplayValue(), isEditable, dataType, id, factor);
+							} else {
+								measurementData = new MeasurementData(localName, variable.getValue(), isEditable, dataType, factor);
 							}
 							measurementDataList.add(measurementData);
 							break;
@@ -620,7 +614,7 @@ public class WorkbookBuilder extends Builder {
 					final String dataType = this.getDataType(factor.getDataTypeId());
 					final MeasurementData measurementData;
 
-					if (isTrial && factor.getTermId() == TermId.PLOT_ID.getId()) {
+					if (factor.getTermId() == TermId.PLOT_ID.getId()) {
 						final String plotId = experiment.getPlotId();
 						measurementData = new MeasurementData(factor.getName(), plotId, isEditable, dataType, factor);
 					} else {
