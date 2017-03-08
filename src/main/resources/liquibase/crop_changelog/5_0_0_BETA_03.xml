@@ -33,7 +33,7 @@
 
 			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
 			VALUES
-			(8201,1800,'Experimental Design',0);
+			(8201,1800,'Germplasm Descriptor',0);
 		</sql>
 	</changeSet>
 
