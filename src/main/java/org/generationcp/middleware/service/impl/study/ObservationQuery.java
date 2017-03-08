@@ -70,8 +70,9 @@ class ObservationQuery {
 			+ "            WHERE ndep.nd_experiment_id = ep.nd_experiment_id  AND ispcvt.name = 'COL') COL_NO";
 
 
-	String getAllObservationsQuery(final List<TraitDto> traits, final String sortBy, final String sortOrder) {
-		return this.getObservationsMainQuery(traits) + getInstanceNumberClause() + getGroupingClause()
+	String getAllObservationsQuery(final List<TraitDto> traits, List<String> germplasmDescriptors, final String sortBy,
+			final String sortOrder) {
+		return this.getObservationsMainQuery(traits, germplasmDescriptors) + getInstanceNumberClause() + getGroupingClause()
 				+ getOrderingClause(sortBy, sortOrder);
 	}
 
@@ -144,8 +145,10 @@ class ObservationQuery {
 		return this.getObservationQuery(traits) + "AND nde.nd_experiment_id = ?";
 
 	}
-	String getSingleObservationQuery(final List<TraitDto> traits) {
-		return this.getObservationsMainQuery(traits) + " AND nde.nd_experiment_id = :experiment_id \n" + getGroupingClause();
+
+	String getSingleObservationQuery(final List<TraitDto> traits, List<String> germplasmDescriptors) {
+		return this.getObservationsMainQuery(traits, germplasmDescriptors) + " AND nde.nd_experiment_id = :experiment_id \n"
+				+ getGroupingClause();
 	}
 
 	private String getColumnNamesFromTraitNames(final List<TraitDto> traits) {
@@ -166,7 +169,7 @@ class ObservationQuery {
 		return columnNames.toString();
 	}
 
-	String getObservationsMainQuery(final List<TraitDto> traits) {
+	String getObservationsMainQuery(final List<TraitDto> traits, List<String> germplasmDescriptors) {
 		StringBuilder sqlBuilder = new StringBuilder();
 		
 		sqlBuilder.append( 
@@ -177,7 +180,7 @@ class ObservationQuery {
 				"    s.dbxref_id AS GID,\n" + 
 				"    s.name DESIGNATION,\n" + 
 				"    s.uniquename ENTRY_NO,\n" + 
-				"    (SELECT isp.value FROM stockprop isp INNER JOIN cvterm ispcvt1 ON ispcvt1.cvterm_id = isp.type_id WHERE isp.stock_id = s.stock_id AND ispcvt1.name = 'SEED_SOURCE') SEED_SOURCE, \n" +
+				"    s.value as ENTRY_CODE,\n" +
 				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO, \n" + 
 				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'PLOT_NO') PLOT_NO, \n" + 
 				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') BLOCK_NO, \n" + 
@@ -193,6 +196,14 @@ class ObservationQuery {
 					trait.getTraitName(), trait.getTraitName() + "_PhenotypeId"));
 		}
 		
+		if (!germplasmDescriptors.isEmpty()) {
+			String germplasmDescriptorClauseFormat =
+					"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '%s') '%s', \n";
+			for (String gpFactor : germplasmDescriptors) {
+				sqlBuilder.append(String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor));
+			}
+		}
+
 		sqlBuilder.append(
 				" 1=1 FROM \n" + 
 				"    project p \n" + 

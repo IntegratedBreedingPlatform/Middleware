@@ -15,6 +15,8 @@ import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
+import com.beust.jcommander.internal.Lists;
+
 /**
  * The class <code>TrialMeasurementsTest</code> contains tests for the class <code>{@link StudyMeasurements}</code>.
  *
@@ -25,6 +27,7 @@ public class StudyMeasurementsTest {
 	private StudyMeasurements trailTraits;
 	private SQLQuery mockSqlQuery;
 	private List<TraitDto> testTraits;
+	private List<String> germplasmDescriptors;
 	private Object[] testRows;
 	private List<Object[]> sampleMeasurements;
 
@@ -39,9 +42,10 @@ public class StudyMeasurementsTest {
 
 		this.mockSqlQuery = Mockito.mock(SQLQuery.class);
 		this.testTraits = Arrays.asList(new TraitDto(1, "Trait1"), new TraitDto(2, "Trait2"));
+		this.germplasmDescriptors = Lists.newArrayList("STOCK_ID");
 		this.testRows =
 				new Object[] {1, "TRIAL_INSTACE", "ENTRY_TYPE", 20000, "DESIGNATION", "ENTRY_NO", "SEED_SOURCE", "REPITION_NUMBER",
-						"PLOT_NUMBER", "BLOCK_NO", "ROW_NO", "COL_NO", "Trait1Value", 1000, "Trait2Value", 2000};
+						"PLOT_NUMBER", "BLOCK_NO", "ROW_NO", "COL_NO", "Trait1Value", 1000, "Trait2Value", 2000, "Stock_Id_Value"};
 		this.sampleMeasurements = Arrays.<Object[]>asList(this.testRows);
 		Mockito.when(this.mockSqlQuery.list()).thenReturn(this.sampleMeasurements);
 
@@ -54,11 +58,13 @@ public class StudyMeasurementsTest {
 	@Test
 	public void allPlotsMeasurementQueryRetrievesDataCorrectly() throws Exception {
 
-		Mockito.when(this.session.createSQLQuery(new ObservationQuery().getAllObservationsQuery(this.testTraits, null, null)))
+		Mockito.when(this.session
+				.createSQLQuery(new ObservationQuery().getAllObservationsQuery(this.testTraits, this.germplasmDescriptors, null, null)))
 				.thenReturn(this.mockSqlQuery);
 
 		List<ObservationDto> returnedMeasurements =
-				this.trailTraits.getAllMeasurements(this.TEST_PROJECT_IDENTIFIER, this.testTraits, 1, 1, 100, null, null);
+				this.trailTraits.getAllMeasurements(this.TEST_PROJECT_IDENTIFIER, this.testTraits, this.germplasmDescriptors, 1, 1, 100,
+						null, null);
 
 		this.verifyScalarSetting();
 		Mockito.verify(this.mockSqlQuery).setParameter(Matchers.eq("instanceId"), Matchers.anyString());
@@ -75,11 +81,14 @@ public class StudyMeasurementsTest {
 	 */
 	@Test
 	public void singlePlotMeasurementsQueryRetrievesDataCorrectly() throws Exception {
-		Mockito.when(this.session.createSQLQuery(new ObservationQuery().getSingleObservationQuery(this.testTraits))).thenReturn(
+		Mockito.when(
+				this.session.createSQLQuery(new ObservationQuery().getSingleObservationQuery(this.testTraits, this.germplasmDescriptors)))
+				.thenReturn(
 				this.mockSqlQuery);
 
 		List<ObservationDto> returnedMeasurements =
-				this.trailTraits.getMeasurement(this.TEST_PROJECT_IDENTIFIER, this.testTraits, this.TEST_PLOT_IDENTIFIER);
+				this.trailTraits.getMeasurement(this.TEST_PROJECT_IDENTIFIER, this.testTraits, this.germplasmDescriptors,
+						this.TEST_PLOT_IDENTIFIER);
 
 		this.verifyScalarSetting();
 		Mockito.verify(this.mockSqlQuery).setParameter(Matchers.eq("studyId"), Matchers.eq(this.TEST_PROJECT_IDENTIFIER));
@@ -93,7 +102,8 @@ public class StudyMeasurementsTest {
 	private void verifyScalarSetting() {
 		// There are two columns added per trait
 		Mockito.verify(this.mockSqlQuery, Mockito.times(12 + this.testTraits.size())).addScalar(Matchers.anyString());
-		Mockito.verify(this.mockSqlQuery, Mockito.times(this.testTraits.size())).addScalar(Matchers.anyString(),
+		Mockito.verify(this.mockSqlQuery, Mockito.times(this.testTraits.size() + this.germplasmDescriptors.size()))
+				.addScalar(Matchers.anyString(),
 				Mockito.any(IntegerType.class));
 
 	}

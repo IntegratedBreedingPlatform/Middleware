@@ -1,10 +1,13 @@
 
 package org.generationcp.middleware.service.api.study;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 public class ObservationDto {
 
@@ -13,14 +16,14 @@ public class ObservationDto {
 	private final String trialInstance;
 
 	private final String entryType;
-
+	
 	private final Integer gid;
 
 	private final String designation;
 
 	private final String entryNo;
 
-	private final String seedSource;
+	private final String entryCode;
 
 	private final String repitionNumber;
 
@@ -33,10 +36,12 @@ public class ObservationDto {
 
 	private final List<MeasurementDto> traitMeasurements;
 
+	private final List<Pair<String, String>> additionalGermplasmDescriptors = new ArrayList<>();
+
 	private transient int hashCode;
 
 	public ObservationDto(final Integer measurementId, final String trialInstance, final String entryType, final Integer gid,
-			final String designation, final String entryNo, final String seedSource, final String repitionNumber, final String plotNumber,
+			final String designation, final String entryNo, final String entryCode, final String repitionNumber, final String plotNumber,
 			final String blockNumber, final List<MeasurementDto> traitMeasurements) {
 		this.measurementId = measurementId;
 		this.trialInstance = trialInstance;
@@ -44,7 +49,7 @@ public class ObservationDto {
 		this.gid = gid;
 		this.designation = designation;
 		this.entryNo = entryNo;
-		this.seedSource = seedSource;
+		this.entryCode = entryCode;
 		this.repitionNumber = repitionNumber;
 		this.plotNumber = plotNumber;
 		this.blockNumber = blockNumber;
@@ -75,8 +80,8 @@ public class ObservationDto {
 		return this.entryNo;
 	}
 
-	public String getSeedSource() {
-		return this.seedSource;
+	public String getEntryCode() {
+		return this.entryCode;
 	}
 
 	public String getRepitionNumber() {
@@ -111,25 +116,26 @@ public class ObservationDto {
 		return this.traitMeasurements;
 	}
 
+	public void additionalGermplasmDescriptor(final String name, final String value) {
+		this.additionalGermplasmDescriptors.add(new ImmutablePair<String, String>(name, value));
+	}
+
+	public List<Pair<String, String>> getAdditionalGermplasmDescriptors() {
+		return this.additionalGermplasmDescriptors;
+	}
+
 	@Override
 	public boolean equals(final Object other) {
 		if (!(other instanceof ObservationDto))
 			return false;
 		ObservationDto castOther = (ObservationDto) other;
-		return new EqualsBuilder().append(measurementId, castOther.measurementId).append(trialInstance, castOther.trialInstance)
-				.append(entryType, castOther.entryType).append(gid, castOther.gid).append(designation, castOther.designation)
-				.append(entryNo, castOther.entryNo).append(seedSource, castOther.seedSource)
-				.append(repitionNumber, castOther.repitionNumber).append(plotNumber, castOther.plotNumber)
-				.append(traitMeasurements, castOther.traitMeasurements).isEquals();
+		return new EqualsBuilder().append(measurementId, castOther.measurementId).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
 		if (hashCode == 0) {
-			hashCode =
-					new HashCodeBuilder().append(measurementId).append(trialInstance).append(entryType).append(gid).append(designation)
-							.append(entryNo).append(seedSource).append(repitionNumber).append(plotNumber).append(traitMeasurements)
-							.toHashCode();
+			hashCode = new HashCodeBuilder().append(measurementId).toHashCode();
 		}
 		return hashCode;
 	}

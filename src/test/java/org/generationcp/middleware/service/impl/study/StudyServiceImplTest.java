@@ -35,6 +35,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import com.beust.jcommander.internal.Lists;
+
 /**
  * The class <code>StudyServiceImplTest</code> contains tests for the class <code>{@link StudyServiceImpl}</code>.
  *
@@ -71,20 +73,25 @@ public class StudyServiceImplTest {
 		final TraitService mockTrialTraits = Mockito.mock(TraitService.class);
 		final StudyMeasurements mockTrailMeasurements = Mockito.mock(StudyMeasurements.class);
 		final StudyGermplasmListService mockStudyGermplasmListService = Mockito.mock(StudyGermplasmListService.class);
+		final GermplasmDescriptors germplasmDescriptorService = Mockito.mock(GermplasmDescriptors.class);
 
-		final StudyServiceImpl result = new StudyServiceImpl(mockTrialTraits, mockTrailMeasurements, mockStudyGermplasmListService);
+		final StudyServiceImpl result =
+				new StudyServiceImpl(mockTrialTraits, mockTrailMeasurements, mockStudyGermplasmListService, germplasmDescriptorService);
 
 		final List<TraitDto> projectTraits = Arrays.<TraitDto>asList(new TraitDto(1, "Trait1"), new TraitDto(1, "Trait2"));
+		final List<String> germplasmDescriptors = Lists.newArrayList("STOCK_ID");
 		Mockito.when(mockTrialTraits.getTraits(1234)).thenReturn(projectTraits);
 		final List<MeasurementDto> traits = new ArrayList<MeasurementDto>();
 		traits.add(new MeasurementDto(new TraitDto(1, "traitName"), 9999, "triatValue"));
 		final ObservationDto measurement = new ObservationDto(1, "trialInstance", "entryType", 1234, "designation", "entryNo", "seedSource",
 				"repitionNumber", "plotNumber", "blockNumber", traits);
 		final List<ObservationDto> testMeasurements = Collections.<ObservationDto>singletonList(measurement);
-		Mockito.when(mockTrailMeasurements.getAllMeasurements(1234, projectTraits, 1, 1, 100, null, null)).thenReturn(testMeasurements);
+		Mockito.when(mockTrailMeasurements.getAllMeasurements(1234, projectTraits, germplasmDescriptors, 1, 1, 100, null, null))
+				.thenReturn(testMeasurements);
 		result.getObservations(1234, 1, 1, 100, null, null);
 
-		final List<ObservationDto> allMeasurements = mockTrailMeasurements.getAllMeasurements(1234, projectTraits, 1, 1, 100, null, null);
+		final List<ObservationDto> allMeasurements =
+				mockTrailMeasurements.getAllMeasurements(1234, projectTraits, germplasmDescriptors, 1, 1, 100, null, null);
 		Assert.assertEquals(allMeasurements, testMeasurements);
 	}
 

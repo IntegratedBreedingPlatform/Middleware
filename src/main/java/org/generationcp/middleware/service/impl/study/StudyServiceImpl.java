@@ -64,6 +64,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private TraitService trialTraits;
 
+	private GermplasmDescriptors germplasmDescriptors;
+
 	private StudyMeasurements studyMeasurements;
 
 	private StudyGermplasmListService studyGermplasmListService;
@@ -84,6 +86,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		super(sessionProvider);
 		final Session currentSession = this.getCurrentSession();
 		this.trialTraits = new TraitServiceImpl(currentSession);
+		this.germplasmDescriptors = new GermplasmDescriptors(currentSession);
 		this.studyMeasurements = new StudyMeasurements(this.getCurrentSession());
 		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(this.getCurrentSession());
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(new OntologyMethodDataManagerImpl(sessionProvider),
@@ -107,10 +110,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 	 * @param trialMeasurements
 	 */
 	StudyServiceImpl(final TraitService trialTraits, final StudyMeasurements trialMeasurements,
-			final StudyGermplasmListService studyGermplasmListServiceImpl) {
+			final StudyGermplasmListService studyGermplasmListServiceImpl, GermplasmDescriptors germplasmDescriptors) {
 		this.trialTraits = trialTraits;
 		this.studyMeasurements = trialMeasurements;
 		this.studyGermplasmListService = studyGermplasmListServiceImpl;
+		this.germplasmDescriptors = germplasmDescriptors;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -210,17 +214,30 @@ public class StudyServiceImpl extends Service implements StudyService {
 			final int pageSize, final String sortBy, final String sortOrder) {
 
 		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
+		return this.studyMeasurements.getAllMeasurements(studyIdentifier, traits, findGenericGermplasmDescriptors(studyIdentifier),
+				instanceId, pageNumber, pageSize,
+				sortBy, sortOrder);
+	}
 
-		return this.studyMeasurements.getAllMeasurements(studyIdentifier, traits, instanceId, pageNumber, pageSize, sortBy, sortOrder);
+	private List<String> findGenericGermplasmDescriptors(final int studyIdentifier) {
+
+		final List<String> allGermplasmDescriptors = this.germplasmDescriptors.find(studyIdentifier);
+		final List<String> fixedGermplasmDescriptors = Lists.newArrayList("GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE");
+		final List<String> genericGermplasmDescriptors = Lists.newArrayList();
+
+		for (String gpDescriptor : allGermplasmDescriptors) {
+			if (!fixedGermplasmDescriptors.contains(gpDescriptor)) {
+				genericGermplasmDescriptors.add(gpDescriptor);
+			}
+		}
+		return genericGermplasmDescriptors;
 	}
 
 	@Override
 	public List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier) {
-
 		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
-
-		return this.studyMeasurements.getMeasurement(studyIdentifier, traits, measurementIdentifier);
-
+		return this.studyMeasurements.getMeasurement(studyIdentifier, traits, findGenericGermplasmDescriptors(studyIdentifier),
+				measurementIdentifier);
 	}
 
 	@Override
