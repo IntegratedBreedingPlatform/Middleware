@@ -130,7 +130,7 @@ public class ExperimentModelSaver extends Saver {
 	private String getPlotUniqueId(String cropPrefix) {
 		String plotUniqueId = cropPrefix;
 		plotUniqueId = plotUniqueId + P;
-		plotUniqueId = plotUniqueId + RandomStringUtils.randomAlphanumeric(6);
+		plotUniqueId = plotUniqueId + RandomStringUtils.randomAlphanumeric(8);
 		
 		return plotUniqueId;
 	}
