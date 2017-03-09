@@ -12,7 +12,6 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -36,15 +35,12 @@ import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
-import org.generationcp.middleware.pojos.workbench.ToolLicenseInfo;
-import org.generationcp.middleware.pojos.workbench.ToolName;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.service.api.user.UserDto;
-import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.utils.test.Debug;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
@@ -283,6 +279,22 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final Project project = this.workbenchDataManager.getProjectByNameAndCrop(this.commonTestProject.getProjectName(),
 				this.commonTestProject.getCropType());
 		Assert.assertEquals(this.commonTestProject.getProjectName(), project.getProjectName());
+	}
+
+	@Test
+	public void testGetProjectByUUID() throws MiddlewareQueryException {
+		final Project project = this.workbenchDataManager.getProjectByUuidAndCrop(this.commonTestProject.getUniqueID(),
+				this.commonTestProject.getCropType().getCropName());
+
+		Assert.assertEquals(this.commonTestProject.getUniqueID(), project.getUniqueID());
+		Assert.assertEquals(this.commonTestProject.getCropType(), project.getCropType());
+	}
+
+	@Test
+	public void testGetProjectByUUIDProjectDoesNotExistInTheSpecifiedCrop() throws MiddlewareQueryException {
+		final Project project = this.workbenchDataManager.getProjectByUuidAndCrop(this.commonTestProject.getUniqueID(),
+				"wheat");
+		Assert.assertNull("Expecting a null project because the project's unique id is associated to maize crop.", project);
 	}
 
 	@Test
