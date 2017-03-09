@@ -7,7 +7,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 
 public class ProjectTestDataInitializer {
 
-	public Project createProject() {
+	public static Project createProject() {
 		final Project project = new Project();
 		project.setProjectId((long) 1);
 		project.setProjectName("Project");

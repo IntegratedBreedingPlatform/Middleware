@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.beust.jcommander.internal.Lists;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
@@ -31,6 +30,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.beust.jcommander.internal.Lists;
 
 public class TransactionDAOTest extends IntegrationTestBase {
 
@@ -215,8 +216,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
 
-		UserTestDataInitializer userTestDataInitializer = new UserTestDataInitializer();
-		final User user = userTestDataInitializer.createUser();
+		final User user = UserTestDataInitializer.createUser();
 		user.setUserid(null);
 		this.userDataManager.addUser(user);
 
