@@ -22,7 +22,6 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,15 +29,6 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private UserDataManager userDataManager;
-
-	private static PersonTestDataInitializer personTestDataInitializer;
-	private static UserTestDataInitializer userTestDataInitializer;
-
-	@BeforeClass
-	public static void beforeClass() {
-		UserDataManagerImplTest.personTestDataInitializer = new PersonTestDataInitializer();
-		UserDataManagerImplTest.userTestDataInitializer = new UserTestDataInitializer();
-	}
 
 	@Test
 	public void testGetAllUsers() throws Exception {
@@ -56,7 +46,7 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddUser() throws MiddlewareQueryException {
-		final User user = UserDataManagerImplTest.userTestDataInitializer.createUser();
+		final User user = UserTestDataInitializer.createUser();
 
 		this.userDataManager.addUser(user);
 
@@ -96,7 +86,7 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddPerson() throws MiddlewareQueryException {
-		Person person = UserDataManagerImplTest.personTestDataInitializer.createPerson();
+		Person person = PersonTestDataInitializer.createPerson();
 		// add the person
 		this.userDataManager.addPerson(person);
 
@@ -147,7 +137,7 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetPersonById() throws Exception {
-		final Person person = UserDataManagerImplTest.personTestDataInitializer.createPerson();
+		final Person person = PersonTestDataInitializer.createPerson();
 		this.userDataManager.addPerson(person);
 
 		final Person resultPerson = this.userDataManager.getPersonById(person.getId());
@@ -172,7 +162,7 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetUserById() throws Exception {
-		final User user = UserDataManagerImplTest.userTestDataInitializer.createUser();
+		final User user = UserTestDataInitializer.createUser();
 
 		this.userDataManager.addUser(user);
 
@@ -190,7 +180,7 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetUserByUserName() throws Exception {
-		final User user = UserDataManagerImplTest.userTestDataInitializer.createUser();
+		final User user = UserTestDataInitializer.createUser();
 		user.setUserid(null);
 		this.userDataManager.addUser(user);
 
@@ -208,10 +198,10 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetUserByFullname() {
-		final Person person = UserDataManagerImplTest.personTestDataInitializer.createPerson();
+		final Person person = PersonTestDataInitializer.createPerson();
 		this.userDataManager.addPerson(person);
 
-		final User user = UserDataManagerImplTest.userTestDataInitializer.createUser();
+		final User user = UserTestDataInitializer.createUser();
 		user.setUserid(null);
 		user.setPersonid(person.getId());
 		user.setPerson(person);
@@ -232,7 +222,7 @@ public class UserDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetPersonByEmail() {
-		final Person person = UserDataManagerImplTest.personTestDataInitializer.createPerson();
+		final Person person = PersonTestDataInitializer.createPerson();
 		this.userDataManager.addPerson(person);
 
 		final Person resultPerson = this.userDataManager.getPersonByEmail(person.getEmail());
