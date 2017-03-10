@@ -1621,5 +1621,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return person;
 	}
 
+	@Override
+	public Project getProjectByUuid(final String projectUuid) {
+		return this.getProjectDao().getByUuid(projectUuid);
+	}
 
 }

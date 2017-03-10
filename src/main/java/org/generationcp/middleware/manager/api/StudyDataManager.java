@@ -187,10 +187,12 @@ public interface StudyDataManager {
 	 * @param variableTypeList The conditions and constants of the Study
 	 * @param studyValues The values for the variables to insert
 	 * @param programUUID the program UUID
+	 * @param cropPrefix
 	 * @return StudyReference corresponding to the newly-created Study
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID)
+	StudyReference addStudy(int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID,
+		final String cropPrefix)
 			throws MiddlewareQueryException;
 
 	/**
@@ -222,21 +224,10 @@ public interface StudyDataManager {
 	 * @param experimentType The type of Experiment - could be ExperimentType.PLOT, ExperimentType.SAMPLE, ExperimentType.AVERAGE,
 	 *        ExperimentType.SUMMARY
 	 * @param experimentValues The values to set
+	 * @param cropPrefix
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void addExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues) throws MiddlewareQueryException;
-
-	/**
-	 * Adds or updates an experiment row to the dataset.
-	 * 
-	 * @param dataSetId The ID of the dataset to add the experiment into
-	 * @param experimentType The type of Experiment - could be ExperimentType.PLOT, ExperimentType.SAMPLE, ExperimentType.AVERAGE,
-	 *        ExperimentType.SUMMARY
-	 * @param experimentValues The values to set
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, ExperimentValues experimentValues)
-			throws MiddlewareQueryException;
+	void addExperiment(final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues, final String cropPrefix) throws MiddlewareQueryException;
 
 	/**
 	 * Adds or updates experiment rows to the dataset.
@@ -245,9 +236,10 @@ public interface StudyDataManager {
 	 * @param experimentType The type of Experiment - could be ExperimentType.PLOT, ExperimentType.SAMPLE, ExperimentType.AVERAGE,
 	 *        ExperimentType.SUMMARY
 	 * @param experimentValues The values to set
+	 * @param plotCodePrefix
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValues)
+	void addOrUpdateExperiment(int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValues, String plotCodePrefix)
 			throws MiddlewareQueryException;
 
 	/**

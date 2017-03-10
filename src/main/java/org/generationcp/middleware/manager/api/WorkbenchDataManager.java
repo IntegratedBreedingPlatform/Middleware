@@ -64,7 +64,15 @@ public interface WorkbenchDataManager {
 	 * @return the projects
 	 */
 	List<Project> getProjects(int start, int numOfRows);
-	
+
+	/**
+	 * Gets a project by Uuid. Should return only one value.
+	 *
+	 * @param projectUuid - the project Uuid to match
+	 * @return the project matching the given Uuid
+	 */
+	Project getProjectByUuid(String projectUuid);
+
 	/**
 	 * Gets the list of projects for specified crop.
 	 *
