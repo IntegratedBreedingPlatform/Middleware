@@ -28,14 +28,6 @@ import com.google.common.collect.Maps;
 @RunWith(MockitoJUnitRunner.class)
 public class FieldbookListUtilTest {
 
-	private GermplasmListDataTestDataInitializer germplasmListDataTestDataInitializer;
-
-	@Before
-	public void setUp() {
-		germplasmListDataTestDataInitializer = new GermplasmListDataTestDataInitializer();
-
-	}
-
 	@Test
 	public void sortMethodNamesInAscendingOrderTest() throws Exception {
 		List<Method> newMethodList = new ArrayList<Method>();
@@ -94,7 +86,7 @@ public class FieldbookListUtilTest {
 		InventoryDataManager inventoryDataManager = Mockito.mock(InventoryDataManager.class);
 
 		Mockito.when(inventoryDataManager.retrieveStockIds(Mockito.anyList())).thenReturn(mockData);
-		GermplasmListData germplasmListData = germplasmListDataTestDataInitializer.createGermplasmListData(germplasmList, 101, 1);
+		GermplasmListData germplasmListData = GermplasmListDataTestDataInitializer.createGermplasmListData(germplasmList, 101, 1);
 
 		FieldbookListUtil.populateStockIdInGermplasmListData(Lists.newArrayList(germplasmListData),inventoryDataManager);
 
