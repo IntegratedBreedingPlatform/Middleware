@@ -186,16 +186,7 @@ public class MeasurementRow {
 	}
 
 	public String getKeyIdentifier() {
-		String trialInstanceNumber = this.getMeasurementDataValue(TermId.TRIAL_INSTANCE_FACTOR.getId());
-		if (trialInstanceNumber == null) {
-			trialInstanceNumber = "1";
-		}
-		String plotNumber = this.getMeasurementDataValue(TermId.PLOT_NO.getId());
-		if (plotNumber == null || plotNumber.isEmpty()) {
-			plotNumber = this.getMeasurementDataValue(TermId.PLOT_NNO.getId());
-		}
-		String entryNumber = this.getMeasurementDataValue(TermId.ENTRY_NO.getId());
-		return trialInstanceNumber + "-" + plotNumber + "-" + entryNumber;
+		return this.getMeasurementDataValue(TermId.PLOT_ID.getId());
 	}
 
 	@Override

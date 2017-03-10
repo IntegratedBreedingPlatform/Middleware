@@ -46,9 +46,11 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 	private Germplasm parentGermplasm;
 	private ListDataProject testListDataProject;
 	private Integer studyId;
+	private final String cropPrefix = "ABCD";
 
 	@Before
 	public void beforeTest() {
+		
 		this.listDataProjectDAO = new ListDataProjectDAO();
 		this.listDataProjectSaver = new ListDataProjectSaver(this.sessionProvder);
 		this.listDataProjectDAO.setSession(this.sessionProvder.getSession());
@@ -204,7 +206,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 				.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, ListDataProjectDAOTest.GERMPLASM_PREFERRED_NAME_PREFIX,
 						this.parentGermplasm);
 
-		final int nurseryId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids);
+		final int nurseryId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, cropPrefix);
 
 		return nurseryId;
 	}

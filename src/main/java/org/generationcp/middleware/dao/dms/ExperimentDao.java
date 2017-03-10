@@ -19,7 +19,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.hibernate.Criteria;
@@ -254,11 +253,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 				count = ((Number) obj).longValue();
 			}
 
-			if (count == 0) {
-				return false;
-			} else {
-				return true;
-			}
+			return count != 0;
 
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error at checkIfLocationIDsExistInExperiments=" + locationIds + "," + dataSetId + ","
@@ -267,5 +262,31 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 		return false;
 
+	}
+
+	@SuppressWarnings("rawtypes")
+	public boolean checkIfPlotIdExists(final String plotId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("plotId", plotId));
+			final List list = criteria.list();
+			return list != null && !list.isEmpty();
+		} catch (final HibernateException e) {
+			this.logAndThrowException("Error at checkIfPlotIdExists=" + plotId + " query at ExperimentDao: " + e.getMessage(), e);
+		}
+		return true;
+	}
+
+	@SuppressWarnings("rawtypes")
+	public boolean checkIfPlotIdsExist(final List<String> plotIds) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.in("plotId", plotIds));
+			final List list = criteria.list();
+			return list != null && !list.isEmpty();
+		} catch (final HibernateException e) {
+			this.logAndThrowException("Error at checkIfPlotIdExists=" + plotIds + " query at ExperimentDao: " + e.getMessage(), e);
+		}
+		return true;
 	}
 }

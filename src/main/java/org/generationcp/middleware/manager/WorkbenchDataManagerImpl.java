@@ -575,8 +575,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Project getProjectByUuid(final String projectUuid) {
-		return this.getProjectDao().getByUuid(projectUuid);
+	public Project getProjectByUuidAndCrop(final String projectUuid, final String cropType) {
+		return this.getProjectDao().getByUuid(projectUuid, cropType);
 	}
 
 	@Override
@@ -1621,5 +1621,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return person;
 	}
 
+	@Override
+	public Project getProjectByUuid(final String projectUuid) {
+		return this.getProjectDao().getByUuid(projectUuid);
+	}
 
 }

@@ -27,6 +27,20 @@ import org.hibernate.criterion.Restrictions;
  */
 public class ProjectDAO extends GenericDAO<Project, Long> {
 
+	public Project getByUuid(final String projectUuid) throws MiddlewareQueryException {
+
+		try {
+			if (projectUuid != null) {
+				final Criteria criteria =
+					this.getSession().createCriteria(Project.class).add(Restrictions.eq("uniqueID", projectUuid)).setMaxResults(1);
+				return (Project) criteria.uniqueResult();
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getByUuid(uniqueID=" + projectUuid + ") query from Project: " + e.getMessage(), e);
+		}
+		return null;
+	}
+
 	@Override
 	public Project getById(final Long projectId) throws MiddlewareQueryException {
 		try {
@@ -41,12 +55,13 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		return null;
 	}
 
-	public Project getByUuid(final String projectUuid) throws MiddlewareQueryException {
+	public Project getByUuid(final String projectUuid, final String cropType) throws MiddlewareQueryException {
 
 		try {
 			if (projectUuid != null) {
 				final Criteria criteria =
-						this.getSession().createCriteria(Project.class).add(Restrictions.eq("uniqueID", projectUuid)).setMaxResults(1);
+						this.getSession().createCriteria(Project.class).add(Restrictions.eq("uniqueID", projectUuid))
+								.add(Restrictions.eq("cropType.cropName", cropType)).setMaxResults(1);
 				return (Project) criteria.uniqueResult();
 			}
 		} catch (final HibernateException e) {

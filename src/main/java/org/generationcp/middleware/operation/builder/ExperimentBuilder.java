@@ -134,6 +134,7 @@ public class ExperimentBuilder extends Builder {
 		experiment.setFactors(this.getFactors(experimentModel, variableTypes, stockModelMap));
 		experiment.setVariates(this.getVariates(experimentModel, variableTypes));
 		experiment.setLocationId(experimentModel.getGeoLocation().getLocationId());
+		experiment.setPlotId(experimentModel.getPlotId());
 		return experiment;
 	}
 

@@ -2,7 +2,6 @@ package org.generationcp.middleware.dao.dms;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
-import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
@@ -11,12 +10,10 @@ import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -39,10 +36,11 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 	@Autowired
 	private LocationDataManager locationManager;
+	private final String cropPrefix = "ABCD";
 
 	@Before
 	public void init() throws Exception {
-
+		
 		this.createTestStudies(NO_OF_TEST_STUDIES);
 
 		this.studySearchDao = new StudySearchDao();
@@ -158,7 +156,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 				new StudyTestDataInitializer(studyDataManager, this.ontologyManager, project, this.germplasmDataDM, this.locationManager);
 
 		for (int i = 1; i <= numberOfStudies; i++) {
-			final StudyReference studyReference = studyTestDataInitializer.addTestStudy(StudyType.T, i + " Test Trial Sample");
+			final StudyReference studyReference = studyTestDataInitializer.addTestStudy(StudyType.T, i + " Test Trial Sample", cropPrefix);
 			studyTestDataInitializer.addTestDataset(studyReference.getId());
 		}
 
