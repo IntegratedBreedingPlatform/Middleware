@@ -1231,8 +1231,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			return germplasmCrossesList;
 		}
 	}
-	
-	void setCrossExpansionProperties(CrossExpansionProperties crossExpansionProperties) {
+
+	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
 		this.crossExpansionProperties = crossExpansionProperties;
 	}
 }

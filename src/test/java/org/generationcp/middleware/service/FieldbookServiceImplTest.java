@@ -34,7 +34,6 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -65,13 +64,13 @@ public class FieldbookServiceImplTest {
 
 	@Mock
 	GermplasmDataManager germplasmDataManager;
-	
+
 	@Mock
 	private CrossExpansionProperties crossExpansionProperties;
 
 	@Mock
 	private GermplasmGroupingService germplasmGroupingService;
-	
+
 	private List<Pair<Germplasm, List<Name>>> germplasms;
 
 	private List<Pair<Germplasm, GermplasmListData>> listDataItems;
@@ -96,9 +95,8 @@ public class FieldbookServiceImplTest {
 	@Test
 	public void testSaveNurseryAdvanceGermplasmListSuccess() {
 		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(1);
-		final Integer out =
-				this.fieldbookServiceImpl.saveNurseryAdvanceGermplasmList(this.germplasms, this.listDataItems, germplasmList,
-						this.germplasmAttributes);
+		final Integer out = this.fieldbookServiceImpl.saveNurseryAdvanceGermplasmList(this.germplasms,
+				this.listDataItems, germplasmList, this.germplasmAttributes);
 		Assert.assertEquals("List Id should be 1", (Integer) 1, out);
 
 		// Make sure a call to save various things occur.
@@ -134,7 +132,7 @@ public class FieldbookServiceImplTest {
 	}
 
 	private List<Pair<Germplasm, List<Attribute>>> createGermplasmAttributes() {
-		List<Pair<Germplasm, List<Attribute>>> attrs = new ArrayList<>();
+		final List<Pair<Germplasm, List<Attribute>>> attrs = new ArrayList<>();
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		final Attribute attribute = new Attribute();
 		attribute.setAval("Plot Code");
