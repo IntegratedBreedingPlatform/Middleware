@@ -82,8 +82,6 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 
 	GermplasmListTestDataInitializer germplasmListTestDataInitializer;
 
-	GermplasmListDataTestDataInitializer germplasmListDataTestDataInitializer;
-
 	private Integer lotId;
 	private Lot lot;
 
@@ -116,7 +114,6 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		this.manager.addTransactions(transactions);
 
 		germplasmListTestDataInitializer = new GermplasmListTestDataInitializer();
-		germplasmListDataTestDataInitializer = new GermplasmListDataTestDataInitializer();
 	}
 
 	@Test
@@ -771,7 +768,7 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		this.germplasmListManager.addGermplasmList(germplasmList);
 
 		final GermplasmListData germplasmListData =
-				germplasmListDataTestDataInitializer.createGermplasmListData(germplasmList, germplasmId, 2);
+				GermplasmListDataTestDataInitializer.createGermplasmListData(germplasmList, germplasmId, 2);
 		this.germplasmListManager.addGermplasmListData(germplasmListData);
 
 		Lot lotOne = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "First Lot for Gemrplasm");

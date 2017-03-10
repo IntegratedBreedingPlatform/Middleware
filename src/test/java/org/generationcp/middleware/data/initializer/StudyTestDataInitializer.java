@@ -56,19 +56,19 @@ public class StudyTestDataInitializer {
 		this.locationDataManager = locationDataManager;
 	}
 
-	public StudyReference addTestStudy() throws Exception {
-		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, this.commonTestProject.getUniqueID(), StudyType.T);
+	public StudyReference addTestStudy(final String cropPrefix) throws Exception {
+		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, this.commonTestProject.getUniqueID(), StudyType.T, cropPrefix);
 	}
 	
-	public StudyReference addTestStudy(final String uniqueId) throws Exception {
-		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, uniqueId, StudyType.T);
+	public StudyReference addTestStudy(final String uniqueId, final String cropPrefix) throws Exception {
+		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, uniqueId, StudyType.T, cropPrefix);
 	}
 	
-	public StudyReference addTestStudy(final StudyType studyType, final String studyName ) throws Exception {
-		return this.addTestStudy(studyName, this.commonTestProject.getUniqueID(), studyType);
+	public StudyReference addTestStudy(final StudyType studyType, final String studyName, final String cropPrefix) throws Exception {
+		return this.addTestStudy(studyName, this.commonTestProject.getUniqueID(), studyType, cropPrefix);
 	}
 
-	public StudyReference addTestStudy(final String studyName, final String uniqueId, final StudyType studyType) throws Exception {
+	public StudyReference addTestStudy(final String studyName, final String uniqueId, final StudyType studyType, final String cropPrefix) throws Exception {
 		final VariableTypeList typeList = new VariableTypeList();
 		final VariableList variableList = new VariableList();
 
@@ -100,7 +100,7 @@ public class StudyTestDataInitializer {
 				this.createGermplasm("unique name", String.valueOf(this.gid), "name", "2000", "prop1", "prop2");
 		studyValues.setGermplasmId(this.studyDataManager.addStock(germplasmVariableList));
 
-		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId);
+		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId, cropPrefix);
 	}
 
 	private Variable createVariable(final int termId, final String value, final int rank) throws Exception {

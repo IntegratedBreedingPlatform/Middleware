@@ -180,11 +180,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public StudyReference addStudy(final int parentFolderId, final VariableTypeList variableTypeList, final StudyValues studyValues,
-			final String programUUID) throws MiddlewareQueryException {
+		final String programUUID, final String cropPrefix) throws MiddlewareQueryException {
 
 		try {
 
-			final DmsProject project = this.getStudySaver().saveStudy(parentFolderId, variableTypeList, studyValues, true, programUUID);
+			final DmsProject project = this.getStudySaver().saveStudy(parentFolderId, variableTypeList, studyValues, true, programUUID, cropPrefix);
 
 			return new StudyReference(project.getProjectId(), project.getName(), project.getDescription());
 
@@ -246,12 +246,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public void addExperiment(final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues)
+	public void addExperiment(final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues,
+			final String cropPrefix)
 			throws MiddlewareQueryException {
 
 		try {
 
-			this.getExperimentModelSaver().addExperiment(dataSetId, experimentType, experimentValues);
+			this.getExperimentModelSaver().addExperiment(dataSetId, experimentType, experimentValues, cropPrefix);
 
 		} catch (final Exception e) {
 
@@ -260,27 +261,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public void addOrUpdateExperiment(final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues)
-			throws MiddlewareQueryException {
-
-		try {
-
-			this.getExperimentModelSaver().addOrUpdateExperiment(dataSetId, experimentType, experimentValues);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("error in addOrUpdateExperiment " + e.getMessage(), e);
-		}
-	}
-
-	@Override
 	public void addOrUpdateExperiment(final int dataSetId, final ExperimentType experimentType,
-			final List<ExperimentValues> experimentValuesList) throws MiddlewareQueryException {
+			final List<ExperimentValues> experimentValuesList, final String cropPrefix) throws MiddlewareQueryException {
 
 		try {
 
 			for (final ExperimentValues experimentValues : experimentValuesList) {
-				this.getExperimentModelSaver().addOrUpdateExperiment(dataSetId, experimentType, experimentValues);
+				this.getExperimentModelSaver().addOrUpdateExperiment(dataSetId, experimentType, experimentValues, cropPrefix);
 			}
 
 		} catch (final Exception e) {
