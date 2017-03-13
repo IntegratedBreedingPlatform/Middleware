@@ -176,7 +176,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		workbook.setObservations(observations);
 
 		// Save the workbook
-		final int studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, "maize");
+		final int studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, "9CVR");
 		WorkbookBuilderIntegrationTest.LOG.info("Study " + studyDetails.getStudyName() + " created, studyId: " + studyId);
 
 		// Now the actual test and assertions. Load the workbook using workbook builder.
