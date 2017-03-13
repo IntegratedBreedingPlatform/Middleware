@@ -45,7 +45,8 @@ public class StudyMeasurementsTest {
 		this.germplasmDescriptors = Lists.newArrayList("STOCK_ID");
 		this.testRows =
 				new Object[] {1, "TRIAL_INSTACE", "ENTRY_TYPE", 20000, "DESIGNATION", "ENTRY_NO", "SEED_SOURCE", "REPITION_NUMBER",
-						"PLOT_NUMBER", "BLOCK_NO", "ROW_NO", "COL_NO", "Trait1Value", 1000, "Trait2Value", 2000, "Stock_Id_Value"};
+						"PLOT_NUMBER", "BLOCK_NO", "ROW_NO", "COL_NO", "PlotID-ABC123", "Trait1Value", 1000, "Trait2Value", 2000,
+						"Stock_Id_Value"};
 		this.sampleMeasurements = Arrays.<Object[]>asList(this.testRows);
 		Mockito.when(this.mockSqlQuery.list()).thenReturn(this.sampleMeasurements);
 
@@ -101,7 +102,7 @@ public class StudyMeasurementsTest {
 
 	private void verifyScalarSetting() {
 		// There are two columns added per trait
-		Mockito.verify(this.mockSqlQuery, Mockito.times(12 + this.testTraits.size())).addScalar(Matchers.anyString());
+		Mockito.verify(this.mockSqlQuery, Mockito.times(13 + this.testTraits.size())).addScalar(Matchers.anyString());
 		Mockito.verify(this.mockSqlQuery, Mockito.times(this.testTraits.size() + this.germplasmDescriptors.size()))
 				.addScalar(Matchers.anyString(),
 				Mockito.any(IntegerType.class));

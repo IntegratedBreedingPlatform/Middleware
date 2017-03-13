@@ -222,7 +222,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 	private List<String> findGenericGermplasmDescriptors(final int studyIdentifier) {
 
 		final List<String> allGermplasmDescriptors = this.germplasmDescriptors.find(studyIdentifier);
-		final List<String> fixedGermplasmDescriptors = Lists.newArrayList("GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE");
+		/**
+		 * Fixed descriptors are the ones that are NOT stored in stockprop or nd_experimentprop. We dont need additional joins to props
+		 * table for these as they are available in columns in main entity (e.g. stock or nd_experiment) tables.
+		 */
+		final List<String> fixedGermplasmDescriptors =
+				Lists.newArrayList("GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "PLOT_ID");
 		final List<String> genericGermplasmDescriptors = Lists.newArrayList();
 
 		for (String gpDescriptor : allGermplasmDescriptors) {

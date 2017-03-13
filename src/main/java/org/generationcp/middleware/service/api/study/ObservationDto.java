@@ -29,6 +29,8 @@ public class ObservationDto {
 
 	private final String plotNumber;
 
+	private String plotId;
+
 	private final String blockNumber;
 
 	private String rowNumber;
@@ -90,6 +92,14 @@ public class ObservationDto {
 
 	public String getPlotNumber() {
 		return this.plotNumber;
+	}
+
+	public String getPlotId() {
+		return this.plotId;
+	}
+
+	public void setPlotId(String plotId) {
+		this.plotId = plotId;
 	}
 
 	public String getBlockNumber() {
