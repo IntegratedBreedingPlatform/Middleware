@@ -100,8 +100,8 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar("REP_NO");
 		createSQLQuery.addScalar("PLOT_NO");
 		createSQLQuery.addScalar("BLOCK_NO");
-		createSQLQuery.addScalar("ROW_NO");
-		createSQLQuery.addScalar("COL_NO");
+		createSQLQuery.addScalar("ROW");
+		createSQLQuery.addScalar("COL");
 		createSQLQuery.addScalar("PLOT_ID", new StringType());
 	}
 

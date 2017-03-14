@@ -9,6 +9,7 @@ import org.generationcp.middleware.service.api.study.TraitDto;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +46,7 @@ public class StudyMeasurementsTest {
 		this.germplasmDescriptors = Lists.newArrayList("STOCK_ID");
 		this.testRows =
 				new Object[] {1, "TRIAL_INSTACE", "ENTRY_TYPE", 20000, "DESIGNATION", "ENTRY_NO", "SEED_SOURCE", "REPITION_NUMBER",
-						"PLOT_NUMBER", "BLOCK_NO", "ROW_NO", "COL_NO", "PlotID-ABC123", "Trait1Value", 1000, "Trait2Value", 2000,
+						"PLOT_NUMBER", "BLOCK_NO", "ROW", "COL", "PlotID-ABC123", "Trait1Value", 1000, "Trait2Value", 2000,
 						"Stock_Id_Value"};
 		this.sampleMeasurements = Arrays.<Object[]>asList(this.testRows);
 		Mockito.when(this.mockSqlQuery.list()).thenReturn(this.sampleMeasurements);
@@ -101,11 +102,20 @@ public class StudyMeasurementsTest {
 	}
 
 	private void verifyScalarSetting() {
-		// There are two columns added per trait
-		Mockito.verify(this.mockSqlQuery, Mockito.times(13 + this.testTraits.size())).addScalar(Matchers.anyString());
-		Mockito.verify(this.mockSqlQuery, Mockito.times(this.testTraits.size() + this.germplasmDescriptors.size()))
-				.addScalar(Matchers.anyString(),
-				Mockito.any(IntegerType.class));
+		// 13 - 1 (PLOT_ID) fixed columns + Trait name - no type
+		Mockito.verify(this.mockSqlQuery, Mockito.times(12 + this.testTraits.size())).addScalar(Matchers.anyString());
 
+		// PLOT_ID with StringType
+		Mockito.verify(this.mockSqlQuery).addScalar(Matchers.eq("PLOT_ID"), Mockito.any(StringType.class));
+
+		// Once for the germplasm factor as StringType
+		for (String gpDesc : this.germplasmDescriptors) {
+			Mockito.verify(this.mockSqlQuery).addScalar(Matchers.eq(gpDesc), Mockito.any(StringType.class));
+		}
+
+		// Trait PhenotypeIds as IntegerType for each trait
+		for (TraitDto t : this.testTraits) {
+			Mockito.verify(this.mockSqlQuery).addScalar(Matchers.eq(t.getTraitName() + "_PhenotypeId"), Matchers.any(IntegerType.class));
+		}
 	}
 }
