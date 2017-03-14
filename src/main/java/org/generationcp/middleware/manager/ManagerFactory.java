@@ -54,10 +54,12 @@ import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.ReportService;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.GermplasmNamingReferenceDataResolverImpl;
 import org.generationcp.middleware.service.impl.GermplasmNamingServiceImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
+import org.generationcp.middleware.service.impl.study.StudyServiceImpl;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -274,6 +276,10 @@ public class ManagerFactory implements Serializable {
 
 	public KeySequenceRegisterService getKeySequenceRegisterService() {
 		return new KeySequenceRegisterServiceImpl(this.sessionProvider);
+	}
+
+	public StudyService getStudyService() {
+		return new StudyServiceImpl(this.sessionProvider);
 	}
 
 }

@@ -40,4 +40,9 @@ public class TraitDto {
 		}
 		return hashCode;
 	}
+
+	@Override
+	public String toString() {
+		return "TraitDto [traitId=" + traitId + ", traitName=" + traitName + "]";
+	}
 }

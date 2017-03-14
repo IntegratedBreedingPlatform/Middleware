@@ -84,6 +84,23 @@ public class WorkbookBuilder extends Builder {
 		return this.create(id, StudyType.N);
 	}
 
+	/**
+	 * Given a workbook already loaded via {@link WorkbookBuilder#create(int)} - which does not load observations now - this is a helper
+	 * method to trigger loading the observations collection IF AND WHEN NEEDED. This method is a stop gap mecahnism to lazy load the
+	 * observations collection until we can gradually refactor all code so that entire set of observations (plots) data is not required to
+	 * be loaded in session. This method should only be invoked at a point in process where entire observations (plots) collection with
+	 * measurements is required due to the way rest of the process code is written. For large Nurseries and trials this method is not yet
+	 * performance tuned. Memory footprint of the overall application can be severly impacted if this method is used without consideration
+	 * for performance at scale. So please be very careful and think it through before using this method.
+	 */
+	public void loadAllObservations(final Workbook workbook) {
+		VariableTypeList variables = this.getDataSetBuilder().getVariableTypes(workbook.getMeasurementDatesetId());
+		final List<Experiment> experiments =
+				this.getStudyDataManager().getExperiments(workbook.getMeasurementDatesetId(), 0, Integer.MAX_VALUE, variables);
+		workbook.setObservations(this.buildObservations(experiments, variables.getVariates(), workbook.getFactors(), workbook.getVariates(),
+				!workbook.isNursery(), workbook.getConditions()));
+	}
+
 	public Workbook create(final int id, final StudyType studyType) {
 
 		final Monitor monitor = MonitorFactory.start("Build Workbook");
@@ -111,12 +128,8 @@ public class WorkbookBuilder extends Builder {
 		this.checkMeasurementDataset(Integer.valueOf(dataSetId));
 		workbook.setMeasurementDatesetId(dataSetId);
 
-		// PERF : rationale for count - improve
-		final long expCount = this.getStudyDataManager().countExperiments(dataSetId);
 		// Variables required to get Experiments (?)
 		VariableTypeList variables = this.getDataSetBuilder().getVariableTypes(dataSetId);
-		// DA get experiments
-		final List<Experiment> experiments = this.getStudyDataManager().getExperiments(dataSetId, 0, (int) expCount, variables);
 
 		// FIXME : this heavy id fetch pattern needs changing
 		final DmsProject trialDataSetProject = this.getDataSetBuilder().getTrialDataset(study.getId());
@@ -152,10 +165,6 @@ public class WorkbookBuilder extends Builder {
 		
 		populateBreedingMethodPossibleValues(variates);
 
-		// Build Observation Unit from a Measurement
-		// DA previous for experiments
-		final List<MeasurementRow> observations =
-				this.buildObservations(experiments, variables.getVariates(), factors, variates, isTrial, conditions);
 		final List<TreatmentVariable> treatmentFactors = this.buildTreatmentFactors(variables);
 		final List<ProjectProperty> projectProperties = trialDataSetProject.getProperties();
 
@@ -270,7 +279,6 @@ public class WorkbookBuilder extends Builder {
 		workbook.setVariates(variates);
 		workbook.setConditions(conditions);
 		workbook.setConstants(constants);
-		workbook.setObservations(observations);
 		workbook.setTreatmentFactors(treatmentFactors);
 		workbook.setExperimentalDesignVariables(expDesignVariables);
 

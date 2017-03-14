@@ -213,6 +213,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return workbook;
 	}
 
+	@Override
+	public void loadAllObservations(final Workbook workbook) {
+		if (workbook.getObservations() == null || workbook.getObservations().isEmpty() && workbook.getStudyDetails() != null && workbook
+				.getStudyDetails().getId() != null) {
+			this.getWorkbookBuilder().loadAllObservations(workbook);
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void saveMeasurementRows(final Workbook workbook, final String programUUID) {

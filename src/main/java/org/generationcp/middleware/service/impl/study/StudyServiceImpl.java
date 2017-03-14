@@ -28,19 +28,22 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyMetadata;
-import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
+import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
 import org.generationcp.middleware.service.api.study.TraitDto;
 import org.generationcp.middleware.service.api.study.TraitService;
+import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,6 +63,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	private final String TRIAL_TYPE = "T";
 
 	private TraitService trialTraits;
+
+	private GermplasmDescriptors germplasmDescriptors;
 
 	private StudyMeasurements studyMeasurements;
 
@@ -81,6 +86,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		super(sessionProvider);
 		final Session currentSession = this.getCurrentSession();
 		this.trialTraits = new TraitServiceImpl(currentSession);
+		this.germplasmDescriptors = new GermplasmDescriptors(currentSession);
 		this.studyMeasurements = new StudyMeasurements(this.getCurrentSession());
 		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(this.getCurrentSession());
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(new OntologyMethodDataManagerImpl(sessionProvider),
@@ -104,10 +110,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 	 * @param trialMeasurements
 	 */
 	StudyServiceImpl(final TraitService trialTraits, final StudyMeasurements trialMeasurements,
-			final StudyGermplasmListService studyGermplasmListServiceImpl) {
+			final StudyGermplasmListService studyGermplasmListServiceImpl, GermplasmDescriptors germplasmDescriptors) {
 		this.trialTraits = trialTraits;
 		this.studyMeasurements = trialMeasurements;
 		this.studyGermplasmListService = studyGermplasmListServiceImpl;
+		this.germplasmDescriptors = germplasmDescriptors;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -180,20 +187,62 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<ObservationDto> getObservations(final int studyIdentifier) {
+	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId) {
+		try {
+			final String sql = "select count(*) as totalObservationUnits from nd_experiment nde \n"
+					+ "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
+					+ "    inner join project proj on proj.project_id = ndep.project_id \n"
+					+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n" 
+					+ " where \n"
+					+ "	proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id where (pr.object_project_id = :studyIdentifier and name like '%PLOTDATA')) \n"
+					+ "    and gl.nd_geolocation_id = :instanceId ";
+			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
+			query.addScalar("totalObservationUnits", new IntegerType());
+			query.setParameter("studyIdentifier", studyIdentifier);
+			query.setParameter("instanceId", instanceId);
+			return (int) query.uniqueResult();
+		} catch (HibernateException he) {
+			throw new MiddlewareQueryException(
+					String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
+							studyIdentifier, instanceId) + he.getMessage(),
+					he);
+		}
+	}
+
+	@Override
+	public List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber,
+			final int pageSize, final String sortBy, final String sortOrder) {
 
 		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
+		return this.studyMeasurements.getAllMeasurements(studyIdentifier, traits, findGenericGermplasmDescriptors(studyIdentifier),
+				instanceId, pageNumber, pageSize,
+				sortBy, sortOrder);
+	}
 
-		return this.studyMeasurements.getAllMeasurements(studyIdentifier, traits);
+	private List<String> findGenericGermplasmDescriptors(final int studyIdentifier) {
+
+		final List<String> allGermplasmDescriptors = this.germplasmDescriptors.find(studyIdentifier);
+		/**
+		 * Fixed descriptors are the ones that are NOT stored in stockprop or nd_experimentprop. We dont need additional joins to props
+		 * table for these as they are available in columns in main entity (e.g. stock or nd_experiment) tables.
+		 */
+		final List<String> fixedGermplasmDescriptors =
+				Lists.newArrayList("GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "PLOT_ID");
+		final List<String> genericGermplasmDescriptors = Lists.newArrayList();
+
+		for (String gpDescriptor : allGermplasmDescriptors) {
+			if (!fixedGermplasmDescriptors.contains(gpDescriptor)) {
+				genericGermplasmDescriptors.add(gpDescriptor);
+			}
+		}
+		return genericGermplasmDescriptors;
 	}
 
 	@Override
 	public List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier) {
-
 		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
-
-		return this.studyMeasurements.getMeasurement(studyIdentifier, traits, measurementIdentifier);
-
+		return this.studyMeasurements.getMeasurement(studyIdentifier, traits, findGenericGermplasmDescriptors(studyIdentifier),
+				measurementIdentifier);
 	}
 
 	@Override
@@ -227,6 +276,48 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 	}
 	
+	@SuppressWarnings("rawtypes")
+	@Override
+	public List<StudyInstance> getStudyInstances(final int studyId) {
+
+		try {
+			final String sql = "select \n" + 
+					"	geoloc.nd_geolocation_id as INSTANCE_DBID, \n" + 
+					"	max(if(geoprop.type_id = 8180, geoprop.value, null)) as LOCATION_NAME, \n" + // 8180 = cvterm for LOCATION_NAME
+					"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as LOCATION_ABBR, \n" + // 8189 = cvterm for LOCATION_ABBR
+					"   geoloc.description as INSTANCE_NUMBER \n" +
+					" from \n" + 
+					"	nd_geolocation geoloc \n" + 
+					"    inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n" + 
+					"    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n" + 
+					"    inner join project proj on proj.project_id = ndep.project_id \n" + 
+					"    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n" + 
+					" where \n" + 
+					"    proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id " + 
+					"    		where (pr.object_project_id = :studyId and name like '%ENVIRONMENT')) \n" +
+					"    group by geoloc.nd_geolocation_id \n" + 
+					"    order by (1 * geoloc.description) asc ";
+
+			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
+			query.setParameter("studyId", studyId);
+			query.addScalar("INSTANCE_DBID", new IntegerType());
+			query.addScalar("LOCATION_NAME", new StringType());
+			query.addScalar("LOCATION_ABBR", new StringType());
+			query.addScalar("INSTANCE_NUMBER", new IntegerType());
+			
+			final List queryResults = query.list();
+			final List<StudyInstance> instances = new ArrayList<>();
+			for (final Object result : queryResults) {				
+				Object[] row = (Object[]) result;
+				instances.add(new StudyInstance((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[3]));
+			}
+			return instances;
+		} catch (HibernateException he) {
+			throw new MiddlewareQueryException(
+					"Unexpected error in executing getAllStudyInstanceNumbers(studyId = " + studyId + ") query: " + he.getMessage(), he);
+		}
+	}
+
 	@Override
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
 		return this.getTrialObservationTable(studyIdentifier, null);
