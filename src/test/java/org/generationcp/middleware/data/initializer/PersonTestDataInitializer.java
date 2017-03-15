@@ -4,7 +4,7 @@ import org.generationcp.middleware.pojos.Person;
 
 public class PersonTestDataInitializer {
 
-	public Person createPerson() {
+	public static Person createPerson() {
 		final Person person = new Person();
 		person.setInstituteId(1);
 		person.setFirstName("Test");

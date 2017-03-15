@@ -13,6 +13,8 @@ package org.generationcp.middleware.domain.dms;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang.builder.ToStringStyle;
 import org.generationcp.middleware.domain.oms.TermSummary;
 
 public class ValueReference extends Reference implements Serializable, Comparable<ValueReference> {
@@ -91,16 +93,6 @@ public class ValueReference extends Reference implements Serializable, Comparabl
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("ValueReference [key=");
-		builder.append(this.key);
-		builder.append(", getId()=");
-		builder.append(this.getId());
-		builder.append(", getName()=");
-		builder.append(this.getName());
-		builder.append(", getDescription()=");
-		builder.append(this.getDescription());
-		builder.append("]");
-		return builder.toString();
+		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
 	}
 }

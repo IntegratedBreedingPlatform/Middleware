@@ -47,6 +47,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	private GeolocationDao geolocationDao;
 
 	private static final String PROGRAM_UUID = "123456789";
+	private final String cropPrefix = "ABCD";
 
 	@Before
 	public void setUp() {
@@ -66,7 +67,8 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 			workbook.getStudyDetails().setMeasurementDatasetName(
 					"MultiLocationMeasurement_" + workbook.getStudyDetails().getStudyName() + randomNumber);
 
-			id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
+			
+			id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID, cropPrefix);
 		}
 		final String name = workbooks.get(0).getStudyDetails() != null ? workbooks.get(0).getStudyDetails().getStudyName() : null;
 		Debug.println(IntegrationTestBase.INDENT, "Created study: " + id + ", name = " + name);
@@ -76,7 +78,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	public void testSaveTrialDataset() throws MiddlewareException {
 		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.T);
 
-		final int id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
+		final int id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID, cropPrefix);
 
 		final Workbook createdWorkbook = this.fieldbookService.getTrialDataSet(id);
 
@@ -98,7 +100,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	public void testSaveNurseryDataset() throws MiddlewareException {
 		Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
 
-		final int id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
+		final int id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID, cropPrefix);
 
 		final Workbook createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
 
@@ -120,7 +122,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	public void testAddTrialEnvironmentToTrial() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(4, StudyType.T);
 
-		final int id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
+		final int id = this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID, cropPrefix);
 
 		Workbook createdWorkbook = this.fieldbookService.getTrialDataSet(id);
 
@@ -128,7 +130,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 
 		WorkbookTestDataInitializer.addNewEnvironment(createdWorkbook);
 
-		this.dataImportService.saveDataset(createdWorkbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
+		this.dataImportService.saveDataset(createdWorkbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID, cropPrefix);
 
 		createdWorkbook = this.fieldbookService.getTrialDataSet(id);
 
@@ -141,13 +143,13 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	public void testDeletionOfExperimentPropAndStockProp() throws MiddlewareException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook(10, StudyType.N);
 
-		final int id = this.dataImportService.saveDataset(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
+		final int id = this.dataImportService.saveDataset(workbook, DataImportServiceImplTestIT.PROGRAM_UUID, cropPrefix);
 
 		Workbook createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
 
 		WorkbookTestDataInitializer.deleteExperimentPropVar(createdWorkbook);
 
-		this.dataImportService.saveDataset(createdWorkbook, DataImportServiceImplTestIT.PROGRAM_UUID);
+		this.dataImportService.saveDataset(createdWorkbook, DataImportServiceImplTestIT.PROGRAM_UUID, cropPrefix);
 
 		createdWorkbook = this.fieldbookService.getNurseryDataSet(id);
 
@@ -164,7 +166,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		final Workbook workbook = this.dataImportService.parseWorkbook(file);
 		workbook.print(IntegrationTestBase.INDENT);
 
-		final int id = this.dataImportService.saveDataset(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
+		final int id = this.dataImportService.saveDataset(workbook, DataImportServiceImplTestIT.PROGRAM_UUID, cropPrefix);
 		Debug.println(IntegrationTestBase.INDENT, "Created study:" + id);
 	}
 
@@ -272,7 +274,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		// try to save first then use the name of the saved study
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
 		workbook.print(IntegrationTestBase.INDENT);
-		this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
+		this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID, cropPrefix);
 		String name = workbook.getStudyDetails() != null ? workbook.getStudyDetails().getStudyName() : null;
 		Debug.println(IntegrationTestBase.INDENT, "Name: " + name);
 		boolean isExisting = this.dataImportService.checkIfProjectNameIsExistingInProgram(name, DataImportServiceImplTestIT.PROGRAM_UUID);
@@ -289,7 +291,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		// try to save first then use the name of the saved study
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
 		workbook.print(IntegrationTestBase.INDENT);
-		this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
+		this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID, cropPrefix);
 		final String name = workbook.getStudyDetails().getStudyName();
 		Debug.println(IntegrationTestBase.INDENT, "Name: " + name);
 		final Integer locationId =
@@ -306,7 +308,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	public void testSaveProjectOntology() throws MiddlewareQueryException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
 		workbook.print(IntegrationTestBase.INDENT);
-		final int id = this.dataImportService.saveProjectOntology(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
+		final int id = this.dataImportService.saveProjectOntology(workbook, DataImportServiceImplTestIT.PROGRAM_UUID, cropPrefix);
 		Debug.println(IntegrationTestBase.INDENT, "Created study:" + id + ", name = " + workbook.getStudyDetails().getStudyName());
 
 	}
@@ -315,11 +317,11 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 	public void testSaveProjectData() throws MiddlewareQueryException {
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbook();
 		workbook.print(IntegrationTestBase.INDENT);
-		final int studyId = this.dataImportService.saveProjectOntology(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
+		final int studyId = this.dataImportService.saveProjectOntology(workbook, DataImportServiceImplTestIT.PROGRAM_UUID, cropPrefix);
 		workbook.getStudyDetails().setId(studyId);
 		workbook.setTrialDatasetId(studyId - 1);
 		workbook.setMeasurementDatesetId(studyId - 2);
-		this.dataImportService.saveProjectData(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
+		this.dataImportService.saveProjectData(workbook, DataImportServiceImplTestIT.PROGRAM_UUID, cropPrefix);
 		Debug.println(IntegrationTestBase.INDENT, "Saved project data:" + studyId + ", name = " + workbook.getStudyDetails().getStudyName());
 
 	}
@@ -352,7 +354,7 @@ public class DataImportServiceImplTestIT extends IntegrationTestBase {
 		final int trialNo = 1;
 		final Workbook workbook = WorkbookTestDataInitializer.getTestWorkbookForWizard(studyName, trialNo);
 		workbook.print(IntegrationTestBase.INDENT);
-		this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID);
+		this.dataImportService.saveDataset(workbook, true, false, DataImportServiceImplTestIT.PROGRAM_UUID, cropPrefix);
 		final Map<String, List<Message>> errors =
 				this.dataImportService.validateProjectData(workbook, DataImportServiceImplTestIT.PROGRAM_UUID);
 		Assert.assertNotNull(errors);

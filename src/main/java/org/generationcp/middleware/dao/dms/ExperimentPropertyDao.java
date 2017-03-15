@@ -30,6 +30,7 @@ import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.util.Debug;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -91,6 +92,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(" , siteId.value AS siteId")
 							.append(" , epropBlock.value AS blockNo ")
 							.append(" , ldp.group_name AS pedigree ")
+							.append (" , geo.plot_id as plotId ")
 							.append(" FROM ")
 							.append(" nd_experiment_project eproj ")
 							.append(" INNER JOIN project_relationship pr ON pr.object_project_id = :projectId AND pr.type_id = ")
@@ -144,7 +146,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.addScalar("geolocationId").addScalar("siteName").addScalar("experimentId").addScalar("entryNumber")
 							.addScalar("germplasmName").addScalar("rep").addScalar("plotNo").addScalar("row").addScalar("col")
 							.addScalar("block_id").addScalar("trialInstance").addScalar("studyName").addScalar("gid")
-							.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo").addScalar("pedigree");
+							.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo").addScalar("pedigree").addScalar("plotId", Hibernate.STRING);
 			query.setParameter("projectId", projectId);
 			final List<Object[]> list = query.list();
 			if (list != null && !list.isEmpty()) {
@@ -176,7 +178,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.append(" , blk.value AS blockId ").append(" , st.project_id AS studyId ")
 							.append(" , geo.description AS trialInstance ").append(" , s.dbxref_id AS gid ")
 							.append(" , ppStartDate.value as startDate ").append(" , gpSeason.value as season ")
-							.append(" , epropBlock.value AS blockNo ").append(" FROM ").append("  nd_geolocationprop blk ")
+							.append(" , epropBlock.value AS blockNo ")
+							.append(" , e.plot_id as plotId ")
+							.append(" FROM ").append("  nd_geolocationprop blk ")
 							.append("  INNER JOIN nd_experiment e ON e.nd_geolocation_id = blk.nd_geolocation_id ")
 							.append("  INNER JOIN nd_geolocation geo ON geo.nd_geolocation_id = e.nd_geolocation_id ")
 							.append("  INNER JOIN nd_experiment_project eproj ON eproj.nd_experiment_id = e.nd_experiment_id ")
@@ -221,10 +225,10 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 			final Query query =
 					this.getSession().createSQLQuery(sql.toString()).addScalar("datasetId").addScalar("datasetName").addScalar("studyName")
-							.addScalar("geolocationId").addScalar("siteName").addScalar("siteId").addScalar("experimentId")
-							.addScalar("entryNumber").addScalar("germplasmName").addScalar("rep").addScalar("plotNo").addScalar("row")
+							.addScalar("geolocationId").addScalar("siteName").addScalar("siteId").addScalar("experimentId").addScalar("entryNumber").addScalar("germplasmName").addScalar(
+							"rep").addScalar("plotNo").addScalar("row")
 							.addScalar("col").addScalar("blockId").addScalar("studyId").addScalar("trialInstance").addScalar("gid")
-							.addScalar("startDate").addScalar("season").addScalar("blockNo");
+							.addScalar("startDate").addScalar("season").addScalar("blockNo").addScalar("plotId", Hibernate.STRING);
 
 			if (blockId != null) {
 				query.setParameter("blockId", blockId);
@@ -347,6 +351,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			label.setStartYear(startDate != null && !startDate.equals("null") && startDate.length() > 3 ? startDate.substring(0, 4) : null);
 			label.setSeason(Season.getSeason(season));
 			label.setPedigree((String) row[19]);
+			label.setPlotId((row[20] == null) ? "" : (String) row[20]);
 			labels.add(label);
 
 			datasetId = (Integer) row[0];
@@ -409,6 +414,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			label.setStartYear(startDate != null && !startDate.equals("null") && startDate.length() > 3 ? startDate.substring(0, 4) : null);
 			label.setSeason(Season.getSeason((String) row[18]));
 			label.setBlockNo(this.getIntegerValue(row[19]));
+			label.setPlotId((String) row[20]);
 
 			final String trialKey = this.getTrialKey((Integer) row[0], (Integer) row[3]);
 			FieldMapTrialInstanceInfo trial = trialMap.get(trialKey);

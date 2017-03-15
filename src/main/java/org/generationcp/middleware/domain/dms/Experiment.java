@@ -31,6 +31,8 @@ public class Experiment {
 
 	private Map<String, Variable> variatesMap;
 
+	private String plotId;
+
 	public int getId() {
 		return this.id;
 	}
@@ -82,6 +84,14 @@ public class Experiment {
 
 	public Map<String, Variable> getVariatesMap() {
 		return this.variatesMap;
+	}
+
+	public String getPlotId() {
+		return this.plotId;
+	}
+
+	public void setPlotId(String plotId) {
+		this.plotId = plotId;
 	}
 
 	public void print(int indent) {

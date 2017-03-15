@@ -40,7 +40,7 @@ public class Workbook {
 
 	private List<MeasurementVariable> variates;
 
-	private List<MeasurementRow> observations;
+	private List<MeasurementRow> observations = new ArrayList<>();
 
 	// for exporting only
 	private List<MeasurementRow> exportArrangedObservations;
@@ -86,6 +86,8 @@ public class Workbook {
 	private boolean hasOutOfBoundsData;
 	private List<Integer> columnOrderedLists;
 
+	private Integer plotsIdNotfound;
+
 	public Workbook() {
 		this.reset();
 		this.trialObservations = new ArrayList<>();
@@ -122,6 +124,7 @@ public class Workbook {
 		this.treatmentFactors = null;
 		this.hasExistingDataOverwrite = false;
 		this.hasOutOfBoundsData = false;
+		this.plotsIdNotfound = 0;
 	}
 
 	public StudyDetails getStudyDetails() {
@@ -246,8 +249,8 @@ public class Workbook {
 				}
 			}
 			// we join the new list with the remaining items
-			tempVarList.addAll(copyVarList);
-			return tempVarList;
+			copyVarList.addAll(tempVarList);
+			return copyVarList;
 		}
 		return varList;
 	}
@@ -1062,4 +1065,11 @@ public class Workbook {
 		return null;
 	}
 
+	public Integer getPlotsIdNotfound() {
+		return plotsIdNotfound;
+	}
+
+	public void setPlotsIdNotfound(Integer plotsIdNotfound) {
+		this.plotsIdNotfound = plotsIdNotfound;
+	}
 }

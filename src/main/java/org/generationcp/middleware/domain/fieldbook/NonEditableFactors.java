@@ -54,7 +54,10 @@ public enum NonEditableFactors {
 
 	GROUPGID(TermId.GROUPGID.getId()),
 
-	STOCKID(TermId.STOCKID.getId());
+	STOCKID(TermId.STOCKID.getId()),
+
+	/** The plot id. */
+	PLOT_ID(TermId.PLOT_ID.getId());
 
 
 
@@ -101,5 +104,20 @@ public enum NonEditableFactors {
 			}
 		}
 		return null;
+	}
+
+	/**
+	 * Find.
+	 *
+	 * @param id the id
+	 * @return true if is editable.
+	 */
+	public static boolean isEditable(Integer id) {
+		for (NonEditableFactors factor : NonEditableFactors.values()) {
+			if (factor.getId() == id) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

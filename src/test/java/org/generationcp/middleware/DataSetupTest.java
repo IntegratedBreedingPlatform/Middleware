@@ -110,6 +110,7 @@ public class DataSetupTest extends IntegrationTestBase {
 	private static final String KG_HA = "kg/ha";
 	private static final String GRAIN_YIELD = "Grain Yield";
 	private static final String DRY_AND_WEIGH = "Dry and weigh";
+	private final String cropPrefix = "ABCD";
 
 	@Before
 	public void setUp() {
@@ -121,7 +122,7 @@ public class DataSetupTest extends IntegrationTestBase {
 	@Test
 	public void setUpBasicTestData() throws MiddlewareException {
 		final String programUUID = this.createWorkbenchProgram();
-		this.createNursery(programUUID);
+		this.createNursery(programUUID, cropPrefix);
 	}
 
 	private String createWorkbenchProgram() throws MiddlewareQueryException {
@@ -204,16 +205,16 @@ public class DataSetupTest extends IntegrationTestBase {
 		return program.getUniqueID();
 	}
 
-	private void createNursery(final String programUUID) throws MiddlewareException {
+	private void createNursery(final String programUUID, final String cropPrefix) throws MiddlewareException {
 
 		// Create Germplasm
 		final Integer[] gids = this.germplasmTestDataGenerator.createGermplasmRecords(DataSetupTest.NUMBER_OF_GERMPLASM,
 				DataSetupTest.GERMPLSM_PREFIX);
 
-		this.createNurseryForGermplasm(programUUID, gids);
+		this.createNurseryForGermplasm(programUUID, gids, cropPrefix);
 	}
 
-	public int createNurseryForGermplasm(final String programUUID, final Integer[] gids) {
+	public int createNurseryForGermplasm(final String programUUID, final Integer[] gids, final String cropPrefix) {
 		final int randomInt = new Random().nextInt(100);
 
 		// Germplasm list
@@ -370,7 +371,7 @@ public class DataSetupTest extends IntegrationTestBase {
 		workbook.setObservations(observations);
 
 		// Save the workbook
-		final int nurseryStudyId = this.dataImportService.saveDataset(workbook, true, false, programUUID);
+		final int nurseryStudyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, cropPrefix);
 		DataSetupTest.LOG.info("Nursery " + studyDetails.getStudyName() + " created. ID: " + nurseryStudyId);
 
 		// Convert germplasm list we created into ListDataProject entries
@@ -411,7 +412,6 @@ public class DataSetupTest extends IntegrationTestBase {
 		// Assert.assertEquals(factors.size(),
 		// nurseryWorkbook.getFactors().size());
 		Assert.assertEquals(variates.size(), nurseryWorkbook.getVariates().size());
-		Assert.assertEquals(observations.size(), nurseryWorkbook.getObservations().size());
 
 		// Assert list data got saved with Nursery
 		final List<ListDataProject> listDataProject = this.middlewareFieldbookService.getListDataProject(nurseryListId);
