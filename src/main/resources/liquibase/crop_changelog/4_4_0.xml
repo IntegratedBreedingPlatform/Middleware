@@ -9,9 +9,12 @@
 	<changeSet author="cuenyad" id="v4.4.0-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
-				<columnExists tableName="germplsm" columnName="deleted" />
+				<columnExists tableName="germplsm" columnName="deleted"/>
 			</not>
 		</preConditions>
+
+		<comment>Add deleted column</comment>
+
 		<addColumn tableName="germplsm">
 			<column name="deleted" type="TINYINT(1) UNSIGNED ZEROFILL" defaultValue="0" afterColumn="gchange">
 				<constraints nullable="false"/>
@@ -19,4 +22,17 @@
 		</addColumn>
 	</changeSet>
 
+	<changeSet author="cuenyad" id="v4.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck  expectedResult="1">SELECT IF(EXISTS(SELECT 1
+				FROM germplsm WHERE grplce = gid ),1,0) AS result;
+			</sqlCheck>
+		</preConditions>
+
+		<comment>Set deleted = 1 where the germplsm meet this condition grplce = gid</comment>
+
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE germplsm SET DELETED =1 where grplce = gid;
+		</sql>
+	</changeSet>
 </databaseChangeLog>
