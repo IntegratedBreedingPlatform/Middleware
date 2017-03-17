@@ -42,6 +42,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 
 /**
  * POJO for germplsm table.
@@ -386,6 +387,11 @@ public class Germplasm implements Serializable {
 	@JoinColumn(name = "gid")
 	private List<Name> names = new ArrayList<Name>();
 
+	@Type(type = "org.hibernate.type.NumericBooleanType")
+	@Basic(optional = false)
+	@Column(name = "deleted", columnDefinition = "TINYINT")
+	private Boolean deleted;
+
 	/**
 	 * @OneToMany(mappedBy = "germplasm") private Set<Progenitor> progntr = new HashSet<Progenitor>();
 	 **/
@@ -456,6 +462,7 @@ public class Germplasm implements Serializable {
 	private String locationName = null;
 
 	public Germplasm() {
+		this.deleted = false;
 	}
 
 	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
@@ -477,6 +484,7 @@ public class Germplasm implements Serializable {
 		this.preferredName = preferredName;
 		this.preferredAbbreviation = preferredAbbreviation;
 		this.method = method;
+		this.deleted = false;
 	}
 
 	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
@@ -765,5 +773,13 @@ public class Germplasm implements Serializable {
 			}
 		}
 		return preferredName;
+	}
+
+	public Boolean getDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(Boolean deleted) {
+		this.deleted = deleted;
 	}
 }
