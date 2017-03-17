@@ -13,6 +13,8 @@ package org.generationcp.middleware.manager;
 
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.TransformerUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.AttributeDAO;
@@ -47,7 +49,14 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -1492,5 +1501,33 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	return this.getGermplasmDao().getParentsInfoByGIDList(gidList);
   }
 
+	@Override
+	public void deleteGermplasms(final List<Germplasm> germplasms) {
+		try {
+			final List<Integer> gidsDelete =
+				(List<Integer>) CollectionUtils.collect(germplasms, TransformerUtils.invokerTransformer("getGid"));
+			final GermplasmDAO dao = this.getGermplasmDao();
+			dao.delete(gidsDelete);
 
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+				"Error encountered while saving Germplasm: GermplasmDataManager.deleteGermplasms(germplasms=" + germplasms + "): " + e
+					.getMessage(), e);
+		}
+	}
+
+	@Override
+	public void deleteGermplasm(final Germplasm germplasm) {
+		try {
+
+			final GermplasmDAO dao = this.getGermplasmDao();
+			germplasm.setDeleted(Boolean.TRUE);
+			dao.update(germplasm);
+		} catch (final Exception e) {
+
+			throw new MiddlewareQueryException(
+				"Error encountered while saving Germplasm: GermplasmDataManager.deleteGermplasms(germplasms=" + germplasm + "): " + e
+					.getMessage(), e);
+		}
+	}
 }
