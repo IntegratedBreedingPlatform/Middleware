@@ -189,8 +189,8 @@ class ObservationQuery {
 		        "    nde.plot_id as PLOT_ID, \n");
 		
 		String traitClauseFormat = 
-				" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS %s, \n" + 
-				" MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS %s, \n";
+				" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n" +
+				" MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n";
 
 		for (TraitDto trait : traits) {
 			sqlBuilder.append(String.format(traitClauseFormat, trait.getTraitName(), trait.getTraitName(),
