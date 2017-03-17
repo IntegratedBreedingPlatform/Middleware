@@ -34,6 +34,7 @@ import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -193,6 +194,17 @@ public interface FieldbookService {
 	 * @return the data set
 	 */
 	Workbook getTrialDataSet(int id);
+
+	/**
+	 * Given a workbook already loaded via {@link WorkbookBuilder#create(int)} - which does not load observations now - this is a helper
+	 * method to trigger loading the observations collection IF AND WHEN NEEDED. This method is a stop gap mecahnism to lazy load the
+	 * observations collection until we can gradually refactor all code so that entire set of observations (plots) data is not required to
+	 * be loaded in session. This method should only be invoked at a point in process where entire observations (plots) collection with
+	 * measurements is required due to the way rest of the process code is written. For large Nurseries and trials this method is not yet
+	 * performance tuned. Memory footprint of the overall application can be severly impacted if this method is used without consideration
+	 * for performance at scale. So please be very careful and think it through before using this method.
+	 */
+	void loadAllObservations(final Workbook workbook);
 
 	/**
 	 * Saves the measurement rows of a workbook as a local trial or nursery on the new CHADO schema.

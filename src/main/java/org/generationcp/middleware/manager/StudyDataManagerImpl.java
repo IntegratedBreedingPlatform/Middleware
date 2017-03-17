@@ -66,6 +66,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.PedigreeService;
@@ -1176,6 +1177,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<InstanceMetadata> getInstanceMetadata(int studyId) {
 		return this.getGeolocationDao().getInstanceMetadata(studyId);
+	}
+
+	@Override
+	public Phenotype getPhenotypeById(int phenotypeId) {
+		return getPhenotypeDao().getById(phenotypeId);
+	}
+
+	@Override
+	public void saveOrUpdatePhenotypeValue(int experimentId, int variableId, String value, Phenotype existingPhenotype, int dataTypeId) {
+		getPhenotypeSaver().saveOrUpdate(experimentId, variableId, value, existingPhenotype, dataTypeId);
 	}
 
 	@Override

@@ -40,7 +40,7 @@ public class Workbook {
 
 	private List<MeasurementVariable> variates;
 
-	private List<MeasurementRow> observations;
+	private List<MeasurementRow> observations = new ArrayList<>();
 
 	// for exporting only
 	private List<MeasurementRow> exportArrangedObservations;
@@ -249,8 +249,8 @@ public class Workbook {
 				}
 			}
 			// we join the new list with the remaining items
-			tempVarList.addAll(copyVarList);
-			return tempVarList;
+			copyVarList.addAll(tempVarList);
+			return copyVarList;
 		}
 		return varList;
 	}
