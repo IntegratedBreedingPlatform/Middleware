@@ -63,7 +63,8 @@ public class GermplasmTestDataInitializer {
 		germplasm.setReferenceId(referenceId);
 		germplasm.setMethodName(methodName);
 		germplasm.setLocationName(locationName);
-		germplasm.setPreferredName(GermplasmTestDataInitializer.createGermplasmName(ThreadLocalRandom.current().nextInt(1, 100)));
+		germplasm.setPreferredName(GermplasmTestDataInitializer.createGermplasmName(ThreadLocalRandom.current().nextInt(1, Integer
+			.MAX_VALUE)));
 		return germplasm;
 	}
 
