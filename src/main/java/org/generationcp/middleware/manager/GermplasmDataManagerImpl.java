@@ -815,7 +815,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		if (germplasms != null) {
 			final List<Integer> gids = new ArrayList<>();
 			for (final Germplasm germplasm : germplasms) {
-				if (germplasm.getGid().equals(germplasm.getGrplce())) {// deleted
+				if (germplasm.getDeleted()) {// deleted
 					gids.add(germplasm.getGid());
 				}
 			}

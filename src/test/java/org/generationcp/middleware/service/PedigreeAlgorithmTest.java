@@ -120,7 +120,7 @@ public class PedigreeAlgorithmTest extends IntegrationTestBase {
 	private List<Germplasm> getGermplasmByMethodName(String string, int germplasmStartIndex, int numberOfRows, Operation like) {
 		SQLQuery createSQLQuery = this.sessionProvder.getSession().createSQLQuery("Select * from germplsm g "
 				+ "INNER JOIN methods m ON g.methn = m.mid "
-				+ "where m.mname LIKE :mname and g.gid != g.grplce LIMIT " + numberOfRows);
+				+ "where m.mname LIKE :mname and  g.deleted = 0  LIMIT " + numberOfRows);
 		createSQLQuery.setParameter("mname", string);
 		createSQLQuery.addEntity(Germplasm.class);
 		return createSQLQuery.list();
@@ -129,7 +129,7 @@ public class PedigreeAlgorithmTest extends IntegrationTestBase {
 	private long countGermplasmByMethodName(String string, Operation like) {
 		SQLQuery createSQLQuery = this.sessionProvder.getSession().createSQLQuery("Select count(*) from germplsm g "
 							+ "INNER JOIN methods m ON g.methn = m.mid "
-							+ "where m.mname LIKE :mname and g.gid != g.grplce");
+							+ "where m.mname LIKE :mname and  g.deleted = 0 ");
 		createSQLQuery.setParameter("mname", string);
 
 		return ((BigInteger) createSQLQuery.uniqueResult()).longValue();
