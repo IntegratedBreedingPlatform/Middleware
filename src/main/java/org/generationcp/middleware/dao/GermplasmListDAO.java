@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -591,5 +593,23 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		final Query query = this.getSession().getNamedQuery(GermplasmList.DELETE_GERMPLASM_LIST_BY_LISTID_PHYSICALLY);
 		query.setInteger(GermplasmList.GERMPLASM_LIST_LIST_ID_COLUMN, listId);
 		return query.executeUpdate();
+	}
+
+	/**
+	 * Verify if the gids are used in more than one list
+	 * @param gids gids to check
+	 * @return Map with GID as key and CSV of list where it is used
+	 */
+	public Map<Integer, String> getGermplasmUsedInMoreThanOneList(List<Integer> gids) {
+		Map<Integer, String> resultMap = new HashMap<>();
+
+		final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_GERMPLASM_USED_IN_MORE_THAN_ONE_LIST);
+		query.setParameterList("gids", gids);
+
+		List<Object[]> results = query.list();
+		for (Object[] result : results) {
+			resultMap.put((Integer) result[0], (String) result[1]);
+		}
+		return resultMap;
 	}
 }
