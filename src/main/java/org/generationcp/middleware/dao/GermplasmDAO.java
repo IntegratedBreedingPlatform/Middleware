@@ -566,7 +566,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			generativeChildrenCriteria.add(Restrictions.or(Restrictions.eq("gpid1", gid), Restrictions.eq("gpid2", gid)));
 			generativeChildrenCriteria.add(Restrictions.ge("gnpgs", 2)); // = Two or more parents
 			generativeChildrenCriteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged
-			generativeChildrenCriteria.add(Restrictions.ne("deleted", 0)); // = Record is not deleted or replaced.
+			generativeChildrenCriteria.add(Restrictions.ne("deleted", Boolean.FALSE)); // = Record is not deleted or replaced.
 
 			children.addAll(generativeChildrenCriteria.getExecutableCriteria(this.getSession()).list());
 
@@ -599,7 +599,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final DetachedCriteria criteria = DetachedCriteria.forClass(Germplasm.class);
 			criteria.add(Restrictions.eq("mgid", mgid));
 			criteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged
-			criteria.add(Restrictions.ne("deleted", 0)); // = Record is not deleted or replaced.
+			criteria.add(Restrictions.ne("deleted", Boolean.FALSE)); // = Record is not deleted or replaced.
 
 			@SuppressWarnings("unchecked") final List<Germplasm> groupMembers = criteria.getExecutableCriteria(this.getSession()).list();
 			// Prime the names collection before returning ;)
@@ -666,7 +666,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			criteria.add(Restrictions.eq("gnpgs", 2)); // Restrict to cases where two parents are involved.
 			criteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged.
 			criteria.add(Restrictions.ne("gid", currentCross.getGid())); // Exclude current cross. We are finding "previous" crosses.
-			criteria.add(Restrictions.ne("deleted", 0)); // = Record is not deleted or replaced.
+			criteria.add(Restrictions.ne("deleted", Boolean.FALSE)); // = Record is not deleted or replaced.
 			criteria.addOrder(Order.asc("gid")); // Oldest created cross will be first in list.
 
 			@SuppressWarnings("unchecked") final List<Germplasm> previousCrosses = criteria.getExecutableCriteria(this.getSession()).list();
