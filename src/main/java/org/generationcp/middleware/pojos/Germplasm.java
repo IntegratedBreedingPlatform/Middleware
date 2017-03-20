@@ -39,6 +39,7 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -317,7 +318,18 @@ public class Germplasm implements Serializable {
 			+ " (select n.nval from names n where n.nstat=1 and n.gid = g.gid limit 1) as nval" + "  from germplsm g "
 			+ " inner join listdata ld on (g.gid = ld.gid) " + "where g.gid in (:gidList) " + "group by g.gid";
 
-  @Id
+	public static final String GET_GERMPLASM_USED_IN_MORE_THAN_ONE_LIST = "SELECT \n"
+		+ "   ld.gid                   'gid', \n"
+		+ "   group_concat(l.listname) 'lists' \n"
+		+ " FROM listnms l \n"
+		+ "   INNER JOIN listdata ld ON l.listid = ld.listid \n"
+		+ "   INNER JOIN germplsm g ON ld.gid = g.gid"
+		+ " WHERE ld.gid IN (:gids) \n"
+		+ "       AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED + " \n"
+		+ " GROUP BY ld.gid \n"
+		+ " HAVING count(1) > 1";
+
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "gid")
