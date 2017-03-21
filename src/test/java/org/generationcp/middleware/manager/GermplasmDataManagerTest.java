@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +19,6 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-@Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
 public class GermplasmDataManagerTest {
 
 	private static final Integer TEST_STUDY_ID = 1;
@@ -27,6 +27,7 @@ public class GermplasmDataManagerTest {
 	private GermplasmDAO germplasmDAO;
 
 	@Test
+	@Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
 	public void testGetDirectParentsForStudyOneParentOnly() {
 
 		// we make use of partial mocking techniques so as to be able to inject the GermplasmDAO mock
@@ -70,6 +71,25 @@ public class GermplasmDataManagerTest {
 		Assert.assertEquals("Data manager unable to properly represent parent info when only one is present", testGermplasm.getGpid2(),
 				node.getLinkedNodes().get(1).getGermplasm().getGid());
 
+	}
+
+	@Test
+	public void getCodeFixedStatusByGidList() {
+		final GermplasmDataManagerImpl germplasmDataManager = Mockito.mock(GermplasmDataManagerImpl.class);
+		final List<Integer> gids = Arrays.asList(1, 2);
+		Germplasm gid1 = new Germplasm();
+		gid1.setGid(1);
+		gid1.setMgid(1);
+		Germplasm gid2 = new Germplasm();
+		gid2.setGid(2);
+		gid2.setMgid(0);
+		List<Germplasm> germplasms = Arrays.asList(gid1, gid2);
+		Mockito.when(germplasmDataManager.getGermplasmDao()).thenReturn(germplasmDAO);
+		Mockito.when(germplasmDAO.getByGIDList(gids)).thenReturn(germplasms);
+		Mockito.doCallRealMethod().when(germplasmDataManager).getCodeFixedStatusByGidList(Mockito.anyList());
+		Map<Integer, Boolean> result = germplasmDataManager.getCodeFixedStatusByGidList(gids);
+		Assert.assertEquals(result.get(1), Boolean.TRUE);
+		Assert.assertEquals(result.get(2), Boolean.FALSE);
 	}
 
 }

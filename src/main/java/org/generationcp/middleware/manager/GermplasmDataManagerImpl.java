@@ -1529,4 +1529,22 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 					.getMessage(), e);
 		}
 	}
+
+	@Override
+	public Map<Integer, Boolean> getCodeFixedStatusByGidList(final List<Integer> gids) {
+		try {
+			Map<Integer, Boolean> map = new HashMap<>();
+			final GermplasmDAO dao = this.getGermplasmDao();
+			final List<Germplasm> germplasms = dao.getByGIDList(gids);
+			for (Germplasm germplasm : germplasms) {
+				final Boolean status = (germplasm.getMgid() > 0) ? Boolean.TRUE : Boolean.FALSE;
+				map.put(germplasm.getGid(), status);
+			}
+			return map;
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+					"Error encountered while getting code fixed status: GermplasmDataManager.getCodeFixedStatusByGidList(gids=" + gids
+							+ "): " + e.getMessage(), e);
+		}
+	}
 }

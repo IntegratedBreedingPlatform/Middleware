@@ -1196,4 +1196,12 @@ public interface GermplasmDataManager {
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
 	void deleteGermplasm(final Germplasm germplasm);
+
+	/**
+	 * Given a list of gids, return the code fixed status
+	 *
+	 * @param gids
+	 * @return
+	 */
+	Map<Integer, Boolean> getCodeFixedStatusByGidList(List<Integer> gids);
 }
