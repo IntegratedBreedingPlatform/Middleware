@@ -67,8 +67,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
 
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
@@ -1235,10 +1237,13 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 		assertThat(germplasms, is(equalTo(this.germplasmDataManager.getGermplasms(gidsNews))));
 		this.germplasmDataManager.deleteGermplasms(germplasms);
+		this.sessionProvder.getSession().clear();
 
 		final List<Germplasm> germplasmDeleted = this.germplasmDataManager.getGermplasms(gidsNews);
-		assertThat(germplasmDeleted, both(empty()).and(notNullValue()));
-
+		assertThat(germplasmDeleted, both(is(not(empty()))).and(notNullValue()));
+		for(Germplasm germplasm: germplasmDeleted ) {
+			assertThat(germplasm, (hasProperty("deleted", is(Boolean.TRUE))));
+		}
 	}
 
 }
