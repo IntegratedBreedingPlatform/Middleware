@@ -74,13 +74,13 @@ public class GermplasmAddUpdateFunctionsTest extends IntegrationTestBase {
 		Germplasm newG = this.manager.getGermplasmByGID(addedGid);
 		Assert.assertEquals(newG.getGdate(), oldG.getGdate());
 
-		// update the GID via grplce
-		newG.setGrplce(addedGid);
+		// Update a germplasm as deleted
+		newG.setDeleted(Boolean.TRUE);
 		gList.clear();
 		gList.add(newG);
 		this.manager.updateGermplasm(gList);
 		Germplasm newerG = this.manager.getGermplasmByGID(newG.getGid());
-		Assert.assertEquals(newerG, newG);
+		Assert.assertNull(newerG);
 		Debug.println(IntegrationTestBase.INDENT, "testUpdateGermplasm(" + addedGid + ")");
 
 	}
