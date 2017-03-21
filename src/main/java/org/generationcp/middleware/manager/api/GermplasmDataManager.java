@@ -1198,10 +1198,9 @@ public interface GermplasmDataManager {
 	void deleteGermplasm(final Germplasm germplasm);
 
 	/**
-	 * Given a list of gids, return the code fixed status
 	 *
 	 * @param gids
 	 * @return
 	 */
-	Map<Integer, Boolean> getCodeFixedStatusByGidList(List<Integer> gids);
+	List<Integer > getCodeFixedGidsByGidList(List<Integer> gids);
 }

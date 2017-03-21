@@ -86,10 +86,10 @@ public class GermplasmDataManagerTest {
 		List<Germplasm> germplasms = Arrays.asList(gid1, gid2);
 		Mockito.when(germplasmDataManager.getGermplasmDao()).thenReturn(germplasmDAO);
 		Mockito.when(germplasmDAO.getByGIDList(gids)).thenReturn(germplasms);
-		Mockito.doCallRealMethod().when(germplasmDataManager).getCodeFixedStatusByGidList(Mockito.anyList());
-		Map<Integer, Boolean> result = germplasmDataManager.getCodeFixedStatusByGidList(gids);
-		Assert.assertEquals(result.get(1), Boolean.TRUE);
-		Assert.assertEquals(result.get(2), Boolean.FALSE);
+		Mockito.doCallRealMethod().when(germplasmDataManager).getCodeFixedGidsByGidList(Mockito.anyList());
+		List<Integer> result = germplasmDataManager.getCodeFixedGidsByGidList(gids);
+		Assert.assertEquals(result.size(), 1);
+		Assert.assertEquals(result.get(0), gid1.getGid());
 	}
 
 }
