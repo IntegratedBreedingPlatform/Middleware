@@ -1504,11 +1504,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public void deleteGermplasms(final List<Germplasm> germplasms) {
 		try {
+
 			final List<Integer> gidsDelete =
 				(List<Integer>) CollectionUtils.collect(germplasms, TransformerUtils.invokerTransformer("getGid"));
 			final GermplasmDAO dao = this.getGermplasmDao();
 			dao.delete(gidsDelete);
-
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
 				"Error encountered while saving Germplasm: GermplasmDataManager.deleteGermplasms(germplasms=" + germplasms + "): " + e
@@ -1524,9 +1524,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			germplasm.setDeleted(Boolean.TRUE);
 			dao.update(germplasm);
 		} catch (final Exception e) {
-
 			throw new MiddlewareQueryException(
-				"Error encountered while saving Germplasm: GermplasmDataManager.deleteGermplasms(germplasms=" + germplasm + "): " + e
+				"Error encountered while saving Germplasm: GermplasmDataManager.deleteGermplasm(germplasm=" + germplasm + "): " + e
 					.getMessage(), e);
 		}
 	}
