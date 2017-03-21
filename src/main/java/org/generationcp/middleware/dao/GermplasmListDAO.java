@@ -14,7 +14,6 @@ package org.generationcp.middleware.dao;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +23,6 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -53,6 +51,18 @@ import com.google.common.collect.Maps;
 public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	public static final Integer STATUS_DELETED = 9;
+
+	public static final String GET_GERMPLASM_USED_IN_MORE_THAN_ONE_LIST = " SELECT \n"
+		+ "   ld.gid, \n"
+		+ "   group_concat(l.listname) \n"
+		+ " FROM listnms l \n"
+		+ "   INNER JOIN listdata ld ON l.listid = ld.listid \n"
+		+ "   INNER JOIN germplsm g ON ld.gid = g.gid"
+		+ " WHERE ld.gid IN (:gids) \n"
+		+ "       AND l.liststatus != " + STATUS_DELETED + " \n"
+		+ " GROUP BY ld.gid \n"
+		+ " HAVING count(1) > 1";
+
 	protected static final Criterion RESTRICTED_LIST;
 	
 	static {
@@ -603,7 +613,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	public Map<Integer, String> getGermplasmUsedInMoreThanOneList(List<Integer> gids) {
 		Map<Integer, String> resultMap = new HashMap<>();
 
-		final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_GERMPLASM_USED_IN_MORE_THAN_ONE_LIST);
+		final SQLQuery query = this.getSession().createSQLQuery(GET_GERMPLASM_USED_IN_MORE_THAN_ONE_LIST);
 		query.setParameterList("gids", gids);
 
 		List<Object[]> results = query.list();
