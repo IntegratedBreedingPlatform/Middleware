@@ -27,6 +27,17 @@ import org.hibernate.criterion.Restrictions;
 
 public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
+	public static final String GET_GERMPLASM_USED_IN_ENTRY_LIST = " SELECT \n"
+		+ "   ldp.germplasm_id, \n"
+		+ "   group_concat(p.name) \n"
+		+ " FROM listnms l \n"
+		+ "   INNER JOIN listdata_project ldp ON l.listid = ldp.list_id \n"
+		+ "   INNER JOIN project p ON l.projectid = p.project_id \n"
+		+ " WHERE ldp.germplasm_id IN (:gids) \n"
+		+ "       AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED + " \n"
+		+ "       AND l.listtype IN ('" + GermplasmListType.NURSERY.name() + "', '" + GermplasmListType.TRIAL.name() + "') \n"
+		+ " GROUP BY ldp.germplasm_id";
+
 	public void deleteByListId(final int listId) {
 		try {
 			// Please note we are manually flushing because non hibernate based
@@ -304,6 +315,25 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			listDataProjects.add(listDataProject);
 		}
 
+	}
+
+	/**
+	 * Verify if the gids are used in some entry list
+	 * @param gids gids to check
+	 * @return Map with GID as key and CSV of project where it is used
+	 */
+	public Map<Integer, String> getGermplasmUsedInEntryList(List<Integer> gids) {
+		Map<Integer, String> resultMap = new HashMap<>();
+
+		final SQLQuery query = this.getSession().createSQLQuery(GET_GERMPLASM_USED_IN_ENTRY_LIST);
+		query.setParameterList("gids", gids);
+
+		List<Object[]> results = query.list();
+		for (Object[] result : results) {
+			resultMap.put((Integer) result[0], (String) result[1]);
+		}
+
+		return resultMap;
 	}
 
 }
