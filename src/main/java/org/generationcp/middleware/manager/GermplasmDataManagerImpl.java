@@ -154,7 +154,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			if (germplasm != null) {
 				updatedGid = germplasm.getGrplce();
 			}
-		} while (germplasm != null && !new Integer(0).equals(updatedGid) && !gid.equals(updatedGid));
+		} while (germplasm != null && !new Integer(0).equals(updatedGid) && !germplasm.getGid().equals(updatedGid));
 		return germplasm;
 	}
 
