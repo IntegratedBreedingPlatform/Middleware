@@ -666,7 +666,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			criteria.add(Restrictions.eq("gnpgs", 2)); // Restrict to cases where two parents are involved.
 			criteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged.
 			criteria.add(Restrictions.ne("gid", currentCross.getGid())); // Exclude current cross. We are finding "previous" crosses.
-			criteria.add(Restrictions.eq("", Boolean.FALSE)); // = Record is not  or replaced.
+			criteria.add(Restrictions.eq("deleted", Boolean.FALSE)); // = Record is not  or replaced.
 			criteria.addOrder(Order.asc("gid")); // Oldest created cross will be first in list.
 
 			@SuppressWarnings("unchecked") final List<Germplasm> previousCrosses = criteria.getExecutableCriteria(this.getSession()).list();
