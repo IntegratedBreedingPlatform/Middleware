@@ -1531,15 +1531,22 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Map<Integer, Boolean> getCodeFixedStatusByGidList(final List<Integer> gids) {
+	public Map<Boolean, List<Integer>> getCodeFixedStatusByGidList(final List<Integer> gids) {
 		try {
-			Map<Integer, Boolean> map = new HashMap<>();
+			Map<Boolean, List<Integer>> map = new HashMap<>();
+			List<Integer> codeFixedTrue = new ArrayList<>();
+			List<Integer> codeFixedFalse = new ArrayList<>();
 			final GermplasmDAO dao = this.getGermplasmDao();
 			final List<Germplasm> germplasms = dao.getByGIDList(gids);
 			for (Germplasm germplasm : germplasms) {
-				final Boolean status = (germplasm.getMgid() > 0) ? Boolean.TRUE : Boolean.FALSE;
-				map.put(germplasm.getGid(), status);
+				if (germplasm.getMgid() > 0) {
+					codeFixedTrue.add(germplasm.getGid());
+				} else {
+					codeFixedFalse.add(germplasm.getGid());
+				}
 			}
+			map.put(Boolean.TRUE, codeFixedTrue);
+			map.put(Boolean.FALSE, codeFixedFalse);
 			return map;
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(

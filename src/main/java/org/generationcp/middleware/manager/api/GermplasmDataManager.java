@@ -1203,5 +1203,5 @@ public interface GermplasmDataManager {
 	 * @param gids
 	 * @return
 	 */
-	Map<Integer, Boolean> getCodeFixedStatusByGidList(List<Integer> gids);
+	Map<Boolean, List<Integer>> getCodeFixedStatusByGidList(List<Integer> gids);
 }
