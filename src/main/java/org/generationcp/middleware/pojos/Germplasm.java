@@ -463,13 +463,14 @@ public class Germplasm implements Serializable {
 	private String locationName = null;
 
 	public Germplasm() {
+		super();
 		this.deleted = false;
 	}
 
 	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
 			final Integer userId, final Integer lgid, final Integer locationId, final Integer gdate, final Integer referenceId,
 			final Integer grplce, final Integer mgid, final Name preferredName, final String preferredAbbreviation, final Method method) {
-		super();
+		this();
 		this.gid = gid;
 		this.methodId = methodId;
 		this.gnpgs = gnpgs;
