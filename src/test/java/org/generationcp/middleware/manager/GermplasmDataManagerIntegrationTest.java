@@ -45,6 +45,8 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
+import org.hamcrest.FeatureMatcher;
+import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -67,9 +69,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
 import static org.hamcrest.core.IsNot.not;
 
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
@@ -1241,9 +1243,17 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 		final List<Germplasm> germplasmDeleted = this.germplasmDataManager.getGermplasms(gidsNews);
 		assertThat(germplasmDeleted, both(is(not(empty()))).and(notNullValue()));
-		for(Germplasm germplasm: germplasmDeleted ) {
-			assertThat(germplasm, (hasProperty("deleted", is(Boolean.TRUE))));
-		}
+		assertThat(germplasmDeleted, hasItem(isDeleted(is(Boolean.TRUE))));
+
+	}
+
+	private FeatureMatcher<Germplasm, Boolean> isDeleted(Matcher<Boolean> matcher) {
+		return new FeatureMatcher<Germplasm, Boolean>(matcher, "isDeleted", "isDeleted") {
+			@Override
+			protected Boolean featureValueOf(Germplasm germplasm) {
+				return germplasm.getDeleted();
+			}
+		};
 	}
 
 }
