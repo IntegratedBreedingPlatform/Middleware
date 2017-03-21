@@ -795,7 +795,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		try {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT {g.*} FROM germplsm g WHERE ");
-			queryString.append("g.gid IN( :gids )");
+			queryString.append("g.gid IN( :gids ) ");
+			queryString.append("and g.deleted = 0 ");
+
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("gids", gids);
