@@ -1198,9 +1198,8 @@ public interface GermplasmDataManager {
 	void deleteGermplasm(final Germplasm germplasm);
 
 	/**
-	 *
 	 * @param gids
 	 * @return
 	 */
-	List<Integer > getCodeFixedGidsByGidList(List<Integer> gids);
+	Set<Integer> getCodeFixedGidsByGidList(List<Integer> gids);
 }

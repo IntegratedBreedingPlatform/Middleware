@@ -25,6 +25,7 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
+import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -53,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1531,21 +1533,33 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Integer> getCodeFixedGidsByGidList(final List<Integer> gids) {
+	public Set<Integer> getCodeFixedGidsByGidList(final List<Integer> gids) {
 		try {
-			List<Integer> list = new ArrayList<>();
+			Set<Integer> set = new HashSet<>();
 			final GermplasmDAO dao = this.getGermplasmDao();
 			final List<Germplasm> germplasms = dao.getByGIDList(gids);
 			for (Germplasm germplasm : germplasms) {
 				if (germplasm.getMgid() > 0) {
-					list.add(germplasm.getGid());
+					set.add(germplasm.getGid());
 				}
 			}
-			return list;
+			return set;
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
 					"Error encountered while getting code fixed status: GermplasmDataManager.getCodeFixedStatusByGidList(gids=" + gids
 							+ "): " + e.getMessage(), e);
 		}
 	}
+
+	public Set<Integer> getGidsWithOpenLots(final List<Integer> gids) {
+		try {
+			final LotDAO dao = this.getLotDao();
+			return dao.getGermplasmsWithOpenLots(gids);
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+					"Error encountered while getting gids with open lots: GermplasmDataManager.getGidsWithOpenLots(gids=" + gids + "): " + e
+							.getMessage(), e);
+		}
+	}
+
 }

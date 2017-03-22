@@ -4,6 +4,7 @@ package org.generationcp.middleware.manager;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.data.initializer.GermplasmDataManagerDataInitializer;
@@ -87,9 +88,9 @@ public class GermplasmDataManagerTest {
 		Mockito.when(germplasmDataManager.getGermplasmDao()).thenReturn(germplasmDAO);
 		Mockito.when(germplasmDAO.getByGIDList(gids)).thenReturn(germplasms);
 		Mockito.doCallRealMethod().when(germplasmDataManager).getCodeFixedGidsByGidList(Mockito.anyList());
-		List<Integer> result = germplasmDataManager.getCodeFixedGidsByGidList(gids);
+		Set<Integer> result = germplasmDataManager.getCodeFixedGidsByGidList(gids);
 		Assert.assertEquals(result.size(), 1);
-		Assert.assertEquals(result.get(0), gid1.getGid());
+		Assert.assertEquals(result.contains(gid1.getGid()), Boolean.TRUE);
 	}
 
 }

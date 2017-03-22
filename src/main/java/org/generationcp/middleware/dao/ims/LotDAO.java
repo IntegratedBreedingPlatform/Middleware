@@ -21,6 +21,7 @@ import java.util.Set;
 
 import com.google.common.collect.Lists;
 
+import com.google.common.collect.Sets;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.LotAggregateData;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -94,6 +95,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			+ " LEFT JOIN cvterm_relationship cvr ON cvr.subject_id = lot.scaleid AND cvr.type_id ="+ TermId.HAS_SCALE.getId()
 			+ " LEFT JOIN cvterm cv ON cv.cvterm_id = cvr.object_id "
 			+ " where lot.eid in (:gids) AND lot.etype = 'GERMPLSM' AND lot.status <> 9 ORDER BY lot.eid";
+
+	private static final String GET_GIDS_WITH_OPEN_LOTS = "select distinct (i.eid) FROM ims_lot i "
+			+ "WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) GROUP BY i.lotid ";
 
 	@SuppressWarnings("unchecked")
 	public List<Lot> getByEntityType(String type, int start, int numOfRows) throws MiddlewareQueryException {
@@ -504,6 +508,17 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		}
 
 		return lotScalesForGermplasm;
+	}
+
+	public Set<Integer> getGermplasmsWithOpenLots(final List<Integer> gids) {
+		Set<Integer> gidsWithOpenLots = new HashSet<>();
+		try {
+			Query query = this.getSession().createSQLQuery(GET_GIDS_WITH_OPEN_LOTS).setParameterList("gids", gids);
+			gidsWithOpenLots = Sets.newHashSet(query.list());
+		} catch (Exception e) {
+			this.logAndThrowException("Error at checkGermplasmsWithOpenLots for GIDss = " + gids + AT_LOT_DAO + e.getMessage(), e);
+		}
+		return gidsWithOpenLots;
 	}
 
 	@SuppressWarnings("unchecked")
