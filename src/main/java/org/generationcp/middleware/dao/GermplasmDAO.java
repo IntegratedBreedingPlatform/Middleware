@@ -1239,7 +1239,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	  }
 	}
 
-	public void delete(final List<Integer> gids) {
+	public void deleteGermplasms(final List<Integer> gids) {
 		final StringBuilder queryString = new StringBuilder();
 
 		try {
@@ -1250,7 +1250,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final int success = query.executeUpdate();
 
 		} catch (final HibernateException e) {
-			String message = "Error with delete(GIDS=" + gids + ")  " + e.getMessage();
+			String message = "Error with deleteGermplasms(GIDS=" + gids + ")  " + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

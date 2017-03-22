@@ -51,6 +51,7 @@ import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -1498,38 +1499,29 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return commaSeparatedListOfGids;
 	}
 
-  @Override
-  public Map<Integer, String[]> getParentsInfoByGIDList(List<Integer> gidList) {
-	return this.getGermplasmDao().getParentsInfoByGIDList(gidList);
-  }
-
 	@Override
-	public void deleteGermplasms(final List<Germplasm> germplasms) {
-		try {
-
-			final List<Integer> gidsDelete =
-				(List<Integer>) CollectionUtils.collect(germplasms, TransformerUtils.invokerTransformer("getGid"));
-			final GermplasmDAO dao = this.getGermplasmDao();
-			dao.delete(gidsDelete);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Error encountered while saving Germplasm: GermplasmDataManager.deleteGermplasms(germplasms=" + germplasms + "): " + e
-					.getMessage(), e);
-		}
+	public Map<Integer, String[]> getParentsInfoByGIDList(List<Integer> gidList) {
+		return this.getGermplasmDao().getParentsInfoByGIDList(gidList);
 	}
 
 	@Override
-	public void deleteGermplasm(final Germplasm germplasm) {
-		try {
+	public Integer deleteGermplasms(final List<Germplasm> germplasms) {
 
-			final GermplasmDAO dao = this.getGermplasmDao();
-			germplasm.setDeleted(Boolean.TRUE);
-			dao.update(germplasm);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Error encountered while saving Germplasm: GermplasmDataManager.deleteGermplasm(germplasm=" + germplasm + "): " + e
-					.getMessage(), e);
-		}
+		List<Integer> gidsToValidate = (List<Integer>) CollectionUtils.collect(germplasms, TransformerUtils.invokerTransformer("getGid"));
+
+		List<Integer> notDeletableGermplasmList = this.validateGermplasmForDeletion(gidsToValidate);
+
+		final List<Integer> gidsDelete = new ArrayList<>(CollectionUtils.disjunction(gidsToValidate, notDeletableGermplasmList));
+
+		final GermplasmDAO dao = this.getGermplasmDao();
+		dao.deleteGermplasms(gidsDelete);
+
+		return gidsDelete.size();
+	}
+
+	private List<Integer> validateGermplasmForDeletion(List<Integer> germplasms) {
+		//TODO
+		return new ArrayList<Integer>();
 	}
 
 	@Override
@@ -1546,8 +1538,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			return set;
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
-					"Error encountered while getting code fixed status: GermplasmDataManager.getCodeFixedStatusByGidList(gids=" + gids
-							+ "): " + e.getMessage(), e);
+				"Error encountered while getting code fixed status: GermplasmDataManager.getCodeFixedStatusByGidList(gids=" + gids + "): "
+					+ e.getMessage(), e);
 		}
 	}
 

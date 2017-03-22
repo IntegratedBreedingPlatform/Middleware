@@ -1023,7 +1023,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			// verify
 			List<Method> methodList = this.germplasmDataManager.getProgramMethods(programUUID);
 			Assert.assertEquals("There should be 2 program methods with programUUID[" + programUUID + "]", 2, methodList.size());
-			// delete locations
+			// deleteGermplasms locations
 			this.germplasmDataManager.deleteProgramMethodsByUniqueId(programUUID);
 			methodList = this.germplasmDataManager.getProgramMethods(programUUID);
 			Assert.assertTrue("There should be no program methods with programUUID[" + programUUID + "]", methodList.isEmpty());
@@ -1226,7 +1226,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	public void testDeleteOneGermplasm() {
 		final Germplasm germplasm =  this.germplasmTestDataGenerator.createGermplasm("Germ");
 		assertThat(germplasm, is(equalTo(this.germplasmDataManager.getGermplasmByGID(germplasm.getGid()))));
-		this.germplasmDataManager.deleteGermplasm(germplasm);
+		this.germplasmDataManager.deleteGermplasms(Arrays.asList(germplasm));
 		final Germplasm germplasmDeleted = this.germplasmDataManager.getGermplasmByGID(germplasm.getGid());
 		assertThat(germplasmDeleted, is(nullValue()));
 	}
