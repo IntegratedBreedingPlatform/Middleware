@@ -1187,11 +1187,6 @@ public interface GermplasmDataManager {
 	 * @param germplasms the germplasms
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	public Integer deleteGermplasms(final List<Germplasm> germplasms);
+	Integer deleteGermplasms(final List<Integer> germplasms);
 
-	/**
-	 * @param gids
-	 * @return
-	 */
-	Set<Integer> getCodeFixedGidsByGidList(List<Integer> gids);
 }

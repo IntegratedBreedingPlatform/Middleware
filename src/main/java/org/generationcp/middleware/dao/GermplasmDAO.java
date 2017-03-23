@@ -1247,7 +1247,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			queryString.append("UPDATE germplsm SET deleted = 1 where gid in (:gids)");
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("gids", gids);
-			final int success = query.executeUpdate();
+			query.executeUpdate();
 
 		} catch (final HibernateException e) {
 			String message = "Error with deleteGermplasms(GIDS=" + gids + ")  " + e.getMessage();

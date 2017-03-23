@@ -1226,7 +1226,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	public void testDeleteOneGermplasm() {
 		final Germplasm germplasm =  this.germplasmTestDataGenerator.createGermplasm("Germ");
 		assertThat(germplasm, is(equalTo(this.germplasmDataManager.getGermplasmByGID(germplasm.getGid()))));
-		this.germplasmDataManager.deleteGermplasms(Arrays.asList(germplasm));
+		this.germplasmDataManager.deleteGermplasms(Arrays.asList(germplasm.getGid()));
 		final Germplasm germplasmDeleted = this.germplasmDataManager.getGermplasmByGID(germplasm.getGid());
 		assertThat(germplasmDeleted, is(nullValue()));
 	}
@@ -1238,7 +1238,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final List<Integer> gidsNews = (List<Integer>) CollectionUtils.collect(germplasms, TransformerUtils.invokerTransformer("getGid"));
 
 		assertThat(germplasms, is(equalTo(this.germplasmDataManager.getGermplasms(gidsNews))));
-		this.germplasmDataManager.deleteGermplasms(germplasms);
+		this.germplasmDataManager.deleteGermplasms(gidsNews);
 		this.sessionProvder.getSession().clear();
 
 		final List<Germplasm> germplasmDeleted = this.germplasmDataManager.getGermplasms(gidsNews);
