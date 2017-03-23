@@ -15,7 +15,6 @@ import com.google.common.collect.Lists;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.TransformerUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.AttributeDAO;
@@ -54,7 +53,6 @@ import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -1524,29 +1522,20 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	private List<Integer> validateGermplasmForDeletion(List<Integer> germplasms) {
 
 		final Set<Integer> codeFixedGermplasms = this.getCodeFixedGidsByGidList(germplasms);
-
-		// Add here for offsprings and derived lines
-
+		final Set<Integer> germplasmOffspringByGIDs = this.getGermplasmOffspringByGIDs(germplasms);
 		final Set<Integer> germplasmsUsedInEntryList = this.getGermplasmUsedInEntryList(germplasms);
-
 		final Set<Integer> germplasmsWithOpenLots = this.getGidsWithOpenLots(germplasms);
-
 		final Set<Integer> germplasmsInOneOrMoreLists = this.getGermplasmUsedInMoreThanOneList(germplasms);
 
 		final Set<Integer> all = new HashSet<>();
 
 		all.addAll(codeFixedGermplasms);
-
+		all.addAll(germplasmOffspringByGIDs);
 		all.addAll(germplasmsUsedInEntryList);
-
 		all.addAll(germplasmsWithOpenLots);
-
 		all.addAll(germplasmsInOneOrMoreLists);
 
-		// return Lists.newArrayList(all);
-
-		return new ArrayList<>();
-
+		return Lists.newArrayList(all);
 	}
 
 	protected Set<Integer> getCodeFixedGidsByGidList(final List<Integer> gids) {
@@ -1575,6 +1564,16 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			throw new MiddlewareQueryException(
 					"Error encountered while getting gids with open lots: GermplasmDataManager.getGidsWithOpenLots(gids=" + gids + "): " + e
 							.getMessage(), e);
+		}
+	}
+
+	private Set<Integer> getGermplasmOffspringByGIDs(final List<Integer> gids) {
+		try {
+			return this.getGermplasmDao().getGermplasmOffspringByGIDs(gids).keySet();
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+				"Error encountered while getting gids thart belongs to more than one list: GermplasmDataManager.getGermplasmUsedInMoreThanOneList(gids="
+					+ gids + "): " + e.getMessage(), e);
 		}
 	}
 
