@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.gms.search.GermplasmSortableColumn;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
@@ -1254,5 +1255,56 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	/**
+	 * Get the immediate descendants of a list of gids
+	 * @param gids the gids
+	 * @return a map of gids and its offspring
+	 * @throws MiddlewareQueryException
+	 */
+	public Map<Integer, Set<Integer>> getGermplasmOffspringByGIDs(List<Integer> gids) {
+
+		if (gids != null && gids.size() > 0) {
+			Map<Integer, Set<Integer>> resultMap = new HashMap<>();
+
+			final Query query = this.getSession().createSQLQuery(Germplasm.GET_GERMPLASM_OFFSPRING_BY_GID);
+			query.setParameterList("gids", gids);
+
+			/**
+			 * Returns two columns:
+			 * - gid
+			 * - CSV of parents of the gid (gpid1, gpid2 or progntrs.pid)
+			 */
+			List<Object[]> results = query.list();
+
+			// Transform to Map of gid -> list of offspring
+			for (Object[] result : results) {
+				String[] parentsStr = ObjectUtils.toString(result[1]).split(",");
+				Set<Integer> parents = new HashSet<>();
+
+				for (String parentStr : parentsStr) {
+					try {
+						parents.add(Integer.parseInt(parentStr));
+					} catch (NumberFormatException e) {
+						this.LOG.warn("Could not cast " + parentStr);
+					}
+				}
+
+				Integer offspring = (Integer) result[0];
+
+				for (Integer parent : parents) {
+					if (!resultMap.containsKey(parent)) {
+						resultMap.put(parent, new HashSet<Integer>());
+					}
+					resultMap.get(parent).add(offspring);
+				}
+
+			}
+
+			return resultMap;
+		}
+
+		return new HashMap<>();
 	}
 }

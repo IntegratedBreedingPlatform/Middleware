@@ -318,6 +318,21 @@ public class Germplasm implements Serializable {
 			+ " (select n.nval from names n where n.nstat=1 and n.gid = g.gid limit 1) as nval" + "  from germplsm g "
 			+ " inner join listdata ld on (g.gid = ld.gid) " + "where g.gid in (:gidList) " + "group by g.gid";
 
+	public static final String GET_GERMPLASM_OFFSPRING_BY_GID = " SELECT DISTINCT \n"
+		+ "   g.gid, \n"
+		+ "   CONCAT_WS(',', \n"
+		+ "     if(g.gpid1 != 0, g.gpid1, NULL), \n"
+		+ "     if(g.gpid2 != 0, g.gpid2, NULL), \n"
+		+ "     ifnull(p.pid, NULL)) AS parents \n"
+		+ " FROM germplsm g \n"
+		+ "   LEFT JOIN progntrs p ON g.gid = p.gid \n"
+		+ "   LEFT JOIN listdata ld ON g.gid = ld.gid \n"
+		+ "   LEFT JOIN listnms l ON ld.listid = l.listid \n"
+		+ " WHERE (g.gpid1 in (:gids) OR g.gpid2 in (:gids) OR p.pid in (:gids)) \n"
+		+ "   AND g.deleted = 0 \n"
+		+ "   AND g.grplce = 0 \n"
+		+ "   AND ( l.liststatus != " + GermplasmListDAO.STATUS_DELETED + " OR l.liststatus IS NULL)";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
