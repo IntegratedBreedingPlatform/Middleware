@@ -1515,7 +1515,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final GermplasmDAO dao = this.getGermplasmDao();
 
 		dao.deleteGermplasms(gidsDelete);
-
+		//TODO
+		/*delete from list_data
+		* edlete from list_data_project*/
 		return gidsDelete.size();
 	}
 
