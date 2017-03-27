@@ -11,15 +11,11 @@
 
 package org.generationcp.middleware.manager;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
+import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
@@ -38,10 +34,13 @@ import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.HibernateException;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.base.Function;
-import com.google.common.base.Strings;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of the GermplasmListManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -705,5 +704,21 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return folderIdsToRetrieveFolderCount;
 	}
 
+	@Override
+	public void performListEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
+		for (final Integer gid : germplasms) {
+			final GermplasmListData germplasmListData =
+				this.getGermplasmListDataDAO().getByListIdAndGid(listId, gid);
+			this.deleteGermplasmListData(germplasmListData);
+		}
 
+		// Change entry IDs on listData
+		final List<GermplasmListData> listDatas = this.getGermplasmListDataByListId(listId);
+		Integer entryId = 1;
+		for (final GermplasmListData listData : listDatas) {
+			listData.setEntryId(entryId);
+			entryId++;
+		}
+		this.updateGermplasmListData(listDatas);
+	}
 }

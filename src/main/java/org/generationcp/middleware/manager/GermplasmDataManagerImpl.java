@@ -1506,7 +1506,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Integer deleteGermplasms(final List<Integer> germplasms) {
+	public List<Integer> deleteGermplasms(final List<Integer> germplasms) {
 
 		final List<Integer> notDeletableGermplasmList = this.validateGermplasmForDeletion(germplasms);
 
@@ -1516,11 +1516,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			final GermplasmDAO dao = this.getGermplasmDao();
 
 			dao.deleteGermplasms(gidsDelete);
-			//TODO
-		/*delete from list_data
-		* edlete from list_data_project*/
 		}
-		return gidsDelete.size();
+		return gidsDelete;
 	}
 
 	private List<Integer> validateGermplasmForDeletion(List<Integer> germplasms) {
