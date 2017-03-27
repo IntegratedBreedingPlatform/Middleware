@@ -1512,12 +1512,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		final List<Integer> gidsDelete = new ArrayList<>(CollectionUtils.disjunction(germplasms, notDeletableGermplasmList));
 
-		final GermplasmDAO dao = this.getGermplasmDao();
+		if (gidsDelete.size() > 0) {
+			final GermplasmDAO dao = this.getGermplasmDao();
 
-		dao.deleteGermplasms(gidsDelete);
-		//TODO
+			dao.deleteGermplasms(gidsDelete);
+			//TODO
 		/*delete from list_data
 		* edlete from list_data_project*/
+		}
 		return gidsDelete.size();
 	}
 

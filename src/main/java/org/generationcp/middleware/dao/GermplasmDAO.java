@@ -1294,12 +1294,13 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				Integer offspring = (Integer) result[0];
 
 				for (Integer parent : parents) {
-					if (!resultMap.containsKey(parent)) {
+					if (!resultMap.containsKey(parent) && gids.contains(parent)) {
 						resultMap.put(parent, new HashSet<Integer>());
 					}
-					resultMap.get(parent).add(offspring);
+					else if (gids.contains(parent)) {
+						resultMap.get(parent).add(offspring);
+					}
 				}
-
 			}
 
 			return resultMap;
