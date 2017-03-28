@@ -23,6 +23,7 @@ import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
 import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -705,7 +706,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public void performListEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
+	public void performGermplasmListEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
 		for (final Integer gid : germplasms) {
 			final GermplasmListData germplasmListData =
 				this.getGermplasmListDataDAO().getByListIdAndGid(listId, gid);
@@ -720,5 +721,14 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 			entryId++;
 		}
 		this.updateGermplasmListData(listDatas);
+	}
+
+	@Override
+	public void performListDataProjectEntriesDeletion(final List<Integer> germplasms, final Integer listId){
+		this.getListDataProjectSaver().performListDataProjectEntriesDeletion(germplasms, listId);
+	}
+
+	private final ListDataProjectSaver getListDataProjectSaver() {
+		return new ListDataProjectSaver(this.sessionProvider);
 	}
 }

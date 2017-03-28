@@ -545,5 +545,7 @@ public interface GermplasmListManager {
 	 */
 	List<GermplasmList> getAllGermplasmListsByIds(List<Integer> listIds);
 
-	void performListEntriesDeletion(final List<Integer> germplasms, final Integer listId);
+	public void performGermplasmListEntriesDeletion(final List<Integer> germplasms, final Integer listId);
+
+	public void performListDataProjectEntriesDeletion(final List<Integer> germplasms, final Integer listId);
 }

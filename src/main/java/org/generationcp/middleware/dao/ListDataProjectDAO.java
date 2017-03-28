@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Preconditions;
 import org.generationcp.middleware.domain.dms.DataSetType;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
@@ -13,6 +14,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.Name;
 import org.hibernate.Criteria;
@@ -26,6 +28,8 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 
 public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
+
+
 
 	public static final String GET_GERMPLASM_USED_IN_ENTRY_LIST = " SELECT \n"
 		+ "   ldp.germplasm_id, \n"
@@ -336,4 +340,29 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		return resultMap;
 	}
 
+	public ListDataProject getByListIdAndGid(Integer listId, Integer gid) {
+		{
+
+			// Make sure parameters are not null.
+			Preconditions.checkNotNull(listId, "List id passed cannot be null.");
+			Preconditions.checkNotNull(gid, "Gid passed in cannot be null.");
+
+			ListDataProject result = null;
+
+			try {
+				final Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
+				criteria.add(Restrictions.eq("list", new GermplasmList(listId)));
+				criteria.add(Restrictions.eq("germplasmId", gid));
+				criteria.addOrder(Order.asc("entryId"));
+				result = (ListDataProject) criteria.uniqueResult();
+
+			} catch (final HibernateException e) {
+				throw new MiddlewareQueryException("Error with getByListIdAndGid(listId=" + listId
+					+ ") query from ListDataProjectDAO: " + e.getMessage(), e);
+			}
+			return result;
+
+
+		}
+	}
 }
