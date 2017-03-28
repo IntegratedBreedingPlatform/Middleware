@@ -7,7 +7,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
 	<changeSet author="darla" id="v5beta4-1">
-		<preConditions>
+		<preConditions onFail="MARK_RAN">
 				<tableExists tableName="workbench_project_user_mysql_account" schemaName="workbench"/>
 		</preConditions>
 		<dropTable tableName="workbench_project_user_mysql_account" schemaName="workbench"/>
