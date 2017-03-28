@@ -30,6 +30,15 @@ import org.hibernate.criterion.Restrictions;
 public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 
+	static final String GERMPLASM_LIST_DATA_LIST_ID_COLUMN = "listId";
+
+	static final String GERMPLASM_TABLE = "germplasm";
+
+	static final String GERMPLASM_TABLE_ALIAS = "g";
+
+	static final String GERMPLASM_LIST_NAME_TABLE = "list";
+
+	static final String GERMPLASM_LIST_NAME_TABLE_ALIAS = "l";
 
 	public static final String GET_GERMPLASM_USED_IN_ENTRY_LIST = " SELECT \n"
 		+ "   ldp.germplasm_id, \n"
@@ -351,7 +360,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 			try {
 				final Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
-				criteria.add(Restrictions.eq("list", new GermplasmList(listId)));
+				criteria.add(Restrictions.eq("list", listId));
 				criteria.add(Restrictions.eq("germplasmId", gid));
 				criteria.addOrder(Order.asc("entryId"));
 				result = (ListDataProject) criteria.uniqueResult();

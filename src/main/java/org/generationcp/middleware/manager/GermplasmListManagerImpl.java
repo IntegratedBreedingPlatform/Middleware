@@ -725,7 +725,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public void performListDataProjectEntriesDeletion(final List<Integer> germplasms, final Integer listId){
-		this.getListDataProjectSaver().performListDataProjectEntriesDeletion(germplasms, listId);
+		this.getListDataProjectSaver()
+			.performListDataProjectEntriesDeletion(germplasms, this.getGermplasmListDAO().getByListRef(listId).getId());
 	}
 
 	private final ListDataProjectSaver getListDataProjectSaver() {
