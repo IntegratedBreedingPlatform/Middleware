@@ -1,6 +1,9 @@
 
 package org.generationcp.middleware.operation.saver;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.generationcp.middleware.dao.ListDataProjectDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -9,9 +12,6 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.util.Util;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class ListDataProjectSaver {
 
@@ -144,7 +144,7 @@ public class ListDataProjectSaver {
 	}
 
 	public void performListDataProjectEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
-		ListDataProjectDAO listDataProjectDAO = this.daoFactory.getListDataProjectDAO();
+		final ListDataProjectDAO listDataProjectDAO = this.daoFactory.getListDataProjectDAO();
 		for (final Integer gid : germplasms) {
 			final ListDataProject listDataProject = listDataProjectDAO.getByListIdAndGid(listId, gid);
 			this.deleteListDataProject(listDataProject);
@@ -166,14 +166,15 @@ public class ListDataProjectSaver {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-				"Error encountered while deleting List Data Project: ListDataProjectSaver.deleteListDataProject(listDataProject="
-					+ listDataProject + "): " + e.getMessage(), e);
+					"Error encountered while deleting List Data Project: ListDataProjectSaver.deleteListDataProject(listDataProject="
+							+ listDataProject + "): " + e.getMessage(),
+					e);
 		}
 
 	}
 
 	private List<Integer> updateListDataProject(final List<ListDataProject> listDataProjects) {
-		final List<Integer> idGermplasmListDataSaved = new ArrayList<Integer>();
+		final List<Integer> idGermplasmListDataSaved = new ArrayList<>();
 		try {
 
 			for (final ListDataProject germplasmListData : listDataProjects) {
@@ -186,8 +187,9 @@ public class ListDataProjectSaver {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-				"Error encountered while saving List Data Project: ListDataProjectSaver.updateListDataProject(listDataProjects="
-					+ listDataProjects + "): " + e.getMessage(), e);
+					"Error encountered while saving List Data Project: ListDataProjectSaver.updateListDataProject(listDataProjects="
+							+ listDataProjects + "): " + e.getMessage(),
+					e);
 		}
 
 		return idGermplasmListDataSaved;
