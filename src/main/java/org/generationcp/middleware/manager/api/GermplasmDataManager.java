@@ -1180,14 +1180,5 @@ public interface GermplasmDataManager {
 	 * @return
 	 */
 	Map<Integer, String[]> getParentsInfoByGIDList(List<Integer> gidList);
-
-	/**
-	 * Given a List of valid Germplasm objects, deleteGermplasms the corresponding records in the database.
-	 *
-	 * @param germplasms the germplasms
-	 * @param listId
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<Integer> deleteGermplasms(final List<Integer> germplasms);
-
+	
 }

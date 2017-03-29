@@ -16,31 +16,27 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.ListDataProjectDAO;
+import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.operation.saver.ListDataProjectSaver;
-import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.GermplasmListMetadata;
-import org.generationcp.middleware.pojos.ListDataProject;
-import org.generationcp.middleware.pojos.ListDataProperty;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.*;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.HibernateException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -705,8 +701,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return folderIdsToRetrieveFolderCount;
 	}
 
-	@Override
-	public void performGermplasmListEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
+	protected void performGermplasmListEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
 		for (final Integer gid : germplasms) {
 			final GermplasmListData germplasmListData =
 				this.getGermplasmListDataDAO().getByListIdAndGid(listId, gid);
@@ -723,8 +718,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		this.updateGermplasmListData(listDatas);
 	}
 
-	@Override
-	public void performListDataProjectEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
+	protected void performListDataProjectEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
 		GermplasmList germplasmList = this.getGermplasmListDAO().getByListRef(listId);
 		if (germplasmList != null)
 			this.getListDataProjectSaver()
@@ -733,5 +727,102 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	private final ListDataProjectSaver getListDataProjectSaver() {
 		return new ListDataProjectSaver(this.sessionProvider);
+	}
+
+	public List<Integer> deleteGermplasms(final List<Integer> germplasms, final Integer listId) {
+
+		final List<Integer> notDeletableGermplasmList = this.validateGermplasmForDeletion(germplasms);
+
+		final List<Integer> gidsDelete = new ArrayList<>(CollectionUtils.disjunction(germplasms, notDeletableGermplasmList));
+
+		if (gidsDelete.size() > 0) {
+			final GermplasmDAO dao = this.getGermplasmDao();
+
+			dao.deleteGermplasms(gidsDelete);
+		}
+
+		this.performGermplasmListEntriesDeletion(gidsDelete, listId);
+		this.performListDataProjectEntriesDeletion(gidsDelete, listId);
+		return gidsDelete;
+	}
+
+	private List<Integer> validateGermplasmForDeletion(List<Integer> germplasms) {
+
+		final Set<Integer> codeFixedGermplasms = this.getCodeFixedGidsByGidList(germplasms);
+		final Set<Integer> germplasmOffspringByGIDs = this.getGermplasmOffspringByGIDs(germplasms);
+		final Set<Integer> germplasmsUsedInEntryList = this.getGermplasmUsedInEntryList(germplasms);
+		final Set<Integer> germplasmsWithOpenLots = this.getGidsWithOpenLots(germplasms);
+		final Set<Integer> germplasmsInOneOrMoreLists = this.getGermplasmUsedInMoreThanOneList(germplasms);
+
+		final Set<Integer> all = new HashSet<>();
+
+		all.addAll(codeFixedGermplasms);
+		all.addAll(germplasmOffspringByGIDs);
+		all.addAll(germplasmsUsedInEntryList);
+		all.addAll(germplasmsWithOpenLots);
+		all.addAll(germplasmsInOneOrMoreLists);
+
+		return Lists.newArrayList(all);
+	}
+
+	protected Set<Integer> getCodeFixedGidsByGidList(final List<Integer> gids) {
+		try {
+			Set<Integer> set = new HashSet<>();
+			final GermplasmDAO dao = this.getGermplasmDao();
+			final List<Germplasm> germplasms = dao.getByGIDList(gids);
+			for (Germplasm germplasm : germplasms) {
+				if (germplasm.getMgid() > 0) {
+					set.add(germplasm.getGid());
+				}
+			}
+			return set;
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+					"Error encountered while getting code fixed status: GermplasmDataManager.getCodeFixedStatusByGidList(gids=" + gids
+							+ "): " + e.getMessage(), e);
+		}
+	}
+
+	private Set<Integer> getGidsWithOpenLots(final List<Integer> gids) {
+		try {
+			final LotDAO dao = this.getLotDao();
+			return dao.getGermplasmsWithOpenLots(gids);
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+					"Error encountered while getting gids with open lots: GermplasmDataManager.getGidsWithOpenLots(gids=" + gids + "): " + e
+							.getMessage(), e);
+		}
+	}
+
+	private Set<Integer> getGermplasmOffspringByGIDs(final List<Integer> gids) {
+		try {
+			return this.getGermplasmDao().getGermplasmOffspringByGIDs(gids).keySet();
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+					"Error encountered while getting gids thart belongs to more than one list: GermplasmDataManager.getGermplasmUsedInMoreThanOneList(gids="
+							+ gids + "): " + e.getMessage(), e);
+		}
+	}
+
+	private Set<Integer> getGermplasmUsedInMoreThanOneList(final List<Integer> gids) {
+		try {
+			final GermplasmListDAO dao = this.getGermplasmListDAO();
+			return dao.getGermplasmUsedInMoreThanOneList(gids).keySet();
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+					"Error encountered while getting gids thart belongs to more than one list: GermplasmDataManager.getGermplasmUsedInMoreThanOneList(gids="
+							+ gids + "): " + e.getMessage(), e);
+		}
+	}
+
+	private Set<Integer> getGermplasmUsedInEntryList(final List<Integer> gids) {
+		try {
+			final ListDataProjectDAO dao = this.getListDataProjectDAO();
+			return dao.getGermplasmUsedInEntryList(gids).keySet();
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+					"Error encountered while getting gids that are being used in an Entry List: GermplasmDataManager.getGermplasmUsedInEntryList(gids="
+							+ gids + "): " + e.getMessage(), e);
+		}
 	}
 }
