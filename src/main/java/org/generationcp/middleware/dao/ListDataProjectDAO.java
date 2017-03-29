@@ -360,7 +360,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 			try {
 				final Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
-				criteria.add(Restrictions.eq("list", listId));
+				criteria.add(Restrictions.eq("list.id", listId));
 				criteria.add(Restrictions.eq("germplasmId", gid));
 				criteria.addOrder(Order.asc("entryId"));
 				result = (ListDataProject) criteria.uniqueResult();
