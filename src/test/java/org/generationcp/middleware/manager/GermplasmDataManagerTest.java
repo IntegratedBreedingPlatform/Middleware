@@ -74,23 +74,4 @@ public class GermplasmDataManagerTest {
 
 	}
 
-	@Test
-	public void getCodeFixedStatusByGidList() {
-		final GermplasmDataManagerImpl germplasmDataManager = Mockito.mock(GermplasmDataManagerImpl.class);
-		final List<Integer> gids = Arrays.asList(1, 2);
-		Germplasm gid1 = new Germplasm();
-		gid1.setGid(1);
-		gid1.setMgid(1);
-		Germplasm gid2 = new Germplasm();
-		gid2.setGid(2);
-		gid2.setMgid(0);
-		List<Germplasm> germplasms = Arrays.asList(gid1, gid2);
-		Mockito.when(germplasmDataManager.getGermplasmDao()).thenReturn(germplasmDAO);
-		Mockito.when(germplasmDAO.getByGIDList(gids)).thenReturn(germplasms);
-		Mockito.doCallRealMethod().when(germplasmDataManager).getCodeFixedGidsByGidList(Mockito.anyList());
-		Set<Integer> result = germplasmDataManager.getCodeFixedGidsByGidList(gids);
-		Assert.assertEquals(result.size(), 1);
-		Assert.assertEquals(result.contains(gid1.getGid()), Boolean.TRUE);
-	}
-
 }

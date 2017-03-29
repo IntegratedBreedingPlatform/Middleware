@@ -12,9 +12,15 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.TransformerUtils;
+import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -30,6 +36,8 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListDataProject;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.utils.test.Debug;
+import org.hamcrest.FeatureMatcher;
+import org.hamcrest.Matcher;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -38,7 +46,16 @@ import org.junit.FixMethodOrder;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.hamcrest.core.IsNot.not;
 
 /*
  * The add/update/delete tests are highly dependent on the tests before it Therefore the order of execution is important. In the future, we
@@ -62,6 +79,8 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private GermplasmDataManager dataManager;
+
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
 	private static List<Integer> testDataIds = new ArrayList<Integer>();
 	private static final Integer STATUS_DELETED = 9;
@@ -138,6 +157,10 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 		final GermplasmListData listData = GermplasmListDataTestDataInitializer.createGermplasmListData(testGermplasmList, this.testGermplasm.getGid(), 2);
 		this.manager.addGermplasmListData(listData);
+
+        if (this.germplasmTestDataGenerator == null) {
+            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.dataManager);
+        }
 	}
 
 	@Test
@@ -742,5 +765,62 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 				GermplasmListManagerImplTest.GERMPLASM_LIST_NAME, germplasmList.getName());
 		Assert.assertEquals("The list description should be " + GermplasmListManagerImplTest.GERMPLASM_LIST_DESC,
 				GermplasmListManagerImplTest.GERMPLASM_LIST_DESC, germplasmList.getDescription());
+	}
+
+	@Test
+    @Ignore()
+	public void testDeleteOneGermplasm() {
+		final Germplasm germplasm =  this.germplasmTestDataGenerator.createGermplasm("Germ");
+		assertThat(germplasm, is(equalTo(this.dataManager.getGermplasmByGID(germplasm.getGid()))));
+		this.manager.deleteGermplasms(Arrays.asList(germplasm.getGid()),this.listId);
+		final Germplasm germplasmDeleted = this.dataManager.getGermplasmByGID(germplasm.getGid());
+		assertThat(germplasmDeleted, is(nullValue()));
+	}
+
+	@Test
+    @Ignore()
+	public void testRemoveselecteGermplasm() {
+
+		final List<Germplasm> germplasms = this.germplasmTestDataGenerator.createGermplasmsList(10,"Germ");
+		final List<Integer> gidsNews = (List<Integer>) CollectionUtils.collect(germplasms, TransformerUtils.invokerTransformer("getGid"));
+
+		assertThat(germplasms, is(equalTo(this.dataManager.getGermplasms(gidsNews))));
+		this.manager.deleteGermplasms(gidsNews,this.listId);
+		this.sessionProvder.getSession().clear();
+
+		final List<Germplasm> germplasmDeleted = this.dataManager.getGermplasms(gidsNews);
+		assertThat(germplasmDeleted, both(is(not(empty()))).and(notNullValue()));
+		assertThat(germplasmDeleted, hasItem(isDeleted(is(Boolean.TRUE))));
+
+	}
+
+	private FeatureMatcher<Germplasm, Boolean> isDeleted(Matcher<Boolean> matcher) {
+		return new FeatureMatcher<Germplasm, Boolean>(matcher, "isDeleted", "isDeleted") {
+			@Override
+			protected Boolean featureValueOf(Germplasm germplasm) {
+				return germplasm.getDeleted();
+			}
+		};
+	}
+
+	@Test
+	public void getCodeFixedStatusByGidList() {
+		final GermplasmListManagerImpl germplasmListManager = Mockito.mock(GermplasmListManagerImpl.class);
+		final GermplasmDAO germplasmDAO = Mockito.mock(GermplasmDAO.class);
+
+		final List<Integer> gids = Arrays.asList(1, 2);
+		Germplasm gid1 = new Germplasm();
+		gid1.setGid(1);
+		gid1.setMgid(1);
+		Germplasm gid2 = new Germplasm();
+		gid2.setGid(2);
+		gid2.setMgid(0);
+		List<Germplasm> germplasms = Arrays.asList(gid1, gid2);
+		Mockito.when(germplasmListManager.getGermplasmDao()).thenReturn(germplasmDAO);
+		Mockito.when(germplasmDAO.getByGIDList(gids)).thenReturn(germplasms);
+		Mockito.doCallRealMethod().when(germplasmListManager).getCodeFixedGidsByGidList(Mockito.anyList());
+		Set<Integer> result = germplasmListManager.getCodeFixedGidsByGidList(gids);
+		Assert.assertEquals(result.size(), 1);
+		Assert.assertEquals(result.contains(gid1.getGid()), Boolean.TRUE);
 	}
 }

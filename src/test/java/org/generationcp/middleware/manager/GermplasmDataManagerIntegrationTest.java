@@ -1222,38 +1222,4 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		Assert.assertTrue(result.get(3)[1].equals(parent3Name));
 	}
 
-	@Test
-	public void testDeleteOneGermplasm() {
-		final Germplasm germplasm =  this.germplasmTestDataGenerator.createGermplasm("Germ");
-		assertThat(germplasm, is(equalTo(this.germplasmDataManager.getGermplasmByGID(germplasm.getGid()))));
-		this.germplasmDataManager.deleteGermplasms(Arrays.asList(germplasm.getGid()));
-		final Germplasm germplasmDeleted = this.germplasmDataManager.getGermplasmByGID(germplasm.getGid());
-		assertThat(germplasmDeleted, is(nullValue()));
-	}
-
-	@Test
-	public void testDeleteGermplasmList() {
-
-		final List<Germplasm> germplasms = this.germplasmTestDataGenerator.createGermplasmsList(10,"Germ");
-		final List<Integer> gidsNews = (List<Integer>) CollectionUtils.collect(germplasms, TransformerUtils.invokerTransformer("getGid"));
-
-		assertThat(germplasms, is(equalTo(this.germplasmDataManager.getGermplasms(gidsNews))));
-		this.germplasmDataManager.deleteGermplasms(gidsNews);
-		this.sessionProvder.getSession().clear();
-
-		final List<Germplasm> germplasmDeleted = this.germplasmDataManager.getGermplasms(gidsNews);
-		assertThat(germplasmDeleted, both(is(not(empty()))).and(notNullValue()));
-		assertThat(germplasmDeleted, hasItem(isDeleted(is(Boolean.TRUE))));
-
-	}
-
-	private FeatureMatcher<Germplasm, Boolean> isDeleted(Matcher<Boolean> matcher) {
-		return new FeatureMatcher<Germplasm, Boolean>(matcher, "isDeleted", "isDeleted") {
-			@Override
-			protected Boolean featureValueOf(Germplasm germplasm) {
-				return germplasm.getDeleted();
-			}
-		};
-	}
-
 }
