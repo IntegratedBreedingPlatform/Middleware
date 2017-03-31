@@ -749,14 +749,14 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 		final List<Integer> gidsDelete = new ArrayList<>(CollectionUtils.disjunction(germplasms, notDeletableGermplasmList));
 
-		if (gidsDelete.size() > 0) {
+		if (!gidsDelete.isEmpty()) {
 			final GermplasmDAO dao = this.getGermplasmDao();
-
 			dao.deleteGermplasms(gidsDelete);
+
+			this.performGermplasmListEntriesDeletion(gidsDelete, listId);
+			this.performListDataProjectEntriesDeletion(gidsDelete, listId);
 		}
 
-		this.performGermplasmListEntriesDeletion(gidsDelete, listId);
-		this.performListDataProjectEntriesDeletion(gidsDelete, listId);
 		return gidsDelete;
 	}
 
