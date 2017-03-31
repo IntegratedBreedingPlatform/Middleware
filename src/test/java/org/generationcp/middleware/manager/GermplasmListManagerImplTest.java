@@ -125,7 +125,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Before
 	public void setUpBefore() throws Exception {
-		this.listDataProjectSaver = new ListDataProjectSaver(this.sessionProvider);
+		this.listDataProjectSaver = new ListDataProjectSaver(this.sessionProvder);
 		this.listDataProjectDAO = new ListDataProjectDAO();
 		this.germplasmListTDI = new GermplasmListTestDataInitializer();
 		this.germplasmTDI = new GermplasmTestDataInitializer();
@@ -868,7 +868,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		assertThat(germplasms, is(equalTo(this.dataManager.getGermplasms(gidsNews))));
 
 		this.manager.deleteGermplasms(gidsNews, list1.getId());
-		this.sessionProvider.getSession().clear();
+		this.sessionProvder.getSession().clear();
 
 		final List<Germplasm> germplasmDeleted = this.dataManager.getGermplasms(gidsNews);
 		assertThat(germplasmDeleted, both(is(not(empty()))).and(notNullValue()));
