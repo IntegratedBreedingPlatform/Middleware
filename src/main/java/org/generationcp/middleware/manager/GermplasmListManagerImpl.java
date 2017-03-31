@@ -671,7 +671,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public GermplasmList getGermplasmListByListRef(final Integer listRef) {
+	public List<GermplasmList> getGermplasmListByListRef(final Integer listRef) {
 		return this.getGermplasmListDAO().getByListRef(listRef);
 	}
 
@@ -732,8 +732,8 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	protected void performListDataProjectEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
-		final GermplasmList germplasmList = this.getGermplasmListDAO().getByListRef(listId);
-		if (germplasmList != null) {
+		final List<GermplasmList> germplasmLists = this.getGermplasmListDAO().getByListRef(listId);
+		for (GermplasmList germplasmList: germplasmLists) {
 			this.getListDataProjectSaver().performListDataProjectEntriesDeletion(germplasms, germplasmList.getId());
 		}
 	}

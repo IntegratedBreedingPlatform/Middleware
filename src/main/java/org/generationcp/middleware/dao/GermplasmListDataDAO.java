@@ -267,7 +267,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		criteria.add(Restrictions.ne(GermplasmListDataDAO.GERMPLASM_LIST_DATA_TABLE_STATUS_COLUMN,
 			GermplasmListDataDAO.STATUS_DELETED));
 		List result = criteria.list();
-		return (result != null ? (GermplasmListData) result.get(0) : null);
+		return (result != null && result.size() > 0 ? (GermplasmListData) result.get(0) : null);
 
 	}
 }

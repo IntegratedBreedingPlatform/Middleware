@@ -162,7 +162,10 @@ public class ListDataProjectSaver {
 
 	private void deleteListDataProject(final ListDataProject listDataProject) {
 		try {
-			this.daoFactory.getListDataProjectDAO().makeTransient(listDataProject);
+			if (listDataProject != null) {
+				this.daoFactory.getListDataProjectDAO().makeTransient(listDataProject);
+			}
+
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(

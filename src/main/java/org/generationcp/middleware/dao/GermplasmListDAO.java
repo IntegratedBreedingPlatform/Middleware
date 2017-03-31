@@ -527,10 +527,10 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return criteria.list();
 	}
 
-	public GermplasmList getByListRef(final Integer listRef) {
+	public List<GermplasmList> getByListRef(final Integer listRef) {
 		final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 		criteria.add(Restrictions.eq("listRef", listRef));
-		return (GermplasmList) criteria.uniqueResult();
+		return (List<GermplasmList>) criteria.list();
 	}
 
 	public List<Object[]> getAllListMetadata(final List<Integer> listIdsFromGermplasmList) {

@@ -501,7 +501,7 @@ public interface GermplasmListManager {
 	 * @param listRef
 	 * @return
 	 */
-	org.generationcp.middleware.pojos.GermplasmList getGermplasmListByListRef(Integer listRef);
+	List<GermplasmList> getGermplasmListByListRef(Integer listRef);
 
 	/**
 	 * Retrieves metadata (such as count of entries, list owner) in one go for lists ids provide.
