@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.manager;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.TransformerUtils;
 import org.apache.commons.io.FileUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -43,6 +45,8 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
+import org.hamcrest.FeatureMatcher;
+import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,6 +63,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import static org.hamcrest.CoreMatchers.both;
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.collection.IsEmptyCollection.empty;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsCollectionContaining.hasItem;
+import static org.hamcrest.core.IsNot.not;
 
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
@@ -91,7 +105,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
-	
+
 	private ProgramFavoriteTestDataInitializer programFavoriteTestDataInitializer;
 
 	@Before
@@ -1123,15 +1137,15 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 		Assert.assertTrue(mapCountByNamePermutations.size() > 0);
 	}
-	
+
 	@Test
 	public void testGetFavoriteMethodsByMethodType() {
 		final Method method = this.germplasmDataManager.getMethodByID(154);
-		
+
 		final String programUUID = UUID.randomUUID().toString();
 		final ProgramFavorite programFavorite = this.programFavoriteTestDataInitializer.createProgramFavorite(method.getMid(), programUUID);
 		this.germplasmDataManager.saveProgramFavorite(programFavorite);
-		
+
 		final List<Method> methods = this.germplasmDataManager.getFavoriteMethodsByMethodType(method.getMtype(), programUUID);
 		final Method resultMethod = methods.get(0);
 		Assert.assertEquals("The method code should be " + method.getMcode(), method.getMcode(), resultMethod.getMcode());
@@ -1141,41 +1155,41 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("The method name should be " + method.getMname(), method.getMname(), resultMethod.getMname());
 		Assert.assertEquals("The method description should be " + method.getMdesc(), method.getMdesc(), resultMethod.getMdesc());
 	}
-	
+
 	@Test
 	public void testGetNamesByGidsAndNTypeIdsInMap() {
 		final int GID1 = 1;
 		final int GID2 = 2;
 		final int GID3 = 3;
-		
+
 		//Get the names map before adding new names
 		final Map<Integer, List<Name>> namesMap = this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(Arrays.asList(GID1, GID2, GID3),
 				Arrays.asList(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(), GermplasmNameType.LINE_NAME.getUserDefinedFieldID()));
-		
+
 		//Add new name for germplasm with gid = GID1
 		Name name = NameTestDataInitializer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), GID1, "LINE NAME 00001");
 		this.nameDAO.save(name);
-		
+
 		//Add new names for germplasm with gid = GID2
 		name = NameTestDataInitializer.createName(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(), GID2, "DERIVATIVE NAME 00001");
 		this.nameDAO.save(name);
 		name = NameTestDataInitializer.createName(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), GID2, "LINE NAME 00001");
 		this.nameDAO.save(name);
-		
+
 		//Get the names map after adding new names
 		final Map<Integer, List<Name>> newNamesMap = this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(Arrays.asList(GID1, GID2, GID3),
 				Arrays.asList(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(), GermplasmNameType.LINE_NAME.getUserDefinedFieldID()));
-		
+
 		int sizeBeforeAddingNewName = namesMap.get(GID1) != null ? namesMap.get(GID1).size() : 0;
 		int sizeAfterAddingNewName = newNamesMap.get(GID1).size();
 		// Assert that the new size has 1 more name, which is the newly added name for germplasm with gid = GID1
 		Assert.assertEquals("Expecting list of names for GID 1 to be incremented by 1 new name.", sizeBeforeAddingNewName + 1, sizeAfterAddingNewName);
-		
+
 		sizeBeforeAddingNewName = namesMap.get(GID2) != null ? namesMap.get(GID2).size() : 0;
 		sizeAfterAddingNewName = newNamesMap.get(GID2).size();
 		// Assert that the new size has 2 more names, which is the newly added names for germplasm with gid = GID2
 		Assert.assertEquals("Expecting list of names for GID 2 to be incremented by 2 new names.", sizeBeforeAddingNewName + 2, sizeAfterAddingNewName);
-		
+
 		sizeBeforeAddingNewName = namesMap.get(GID3) != null ? namesMap.get(GID3).size() : 0;
 		sizeAfterAddingNewName = newNamesMap.get(GID3) != null ? namesMap.get(GID3).size() : 0;
 		Assert.assertEquals("Expecting list of names for GID 3 to be constant since there are no new names added for it.", sizeBeforeAddingNewName, sizeAfterAddingNewName);
@@ -1207,4 +1221,5 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		Assert.assertTrue(result.get(3)[0].equals(separator));
 		Assert.assertTrue(result.get(3)[1].equals(parent3Name));
 	}
+
 }

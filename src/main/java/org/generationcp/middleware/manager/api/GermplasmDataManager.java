@@ -1180,5 +1180,5 @@ public interface GermplasmDataManager {
 	 * @return
 	 */
 	Map<Integer, String[]> getParentsInfoByGIDList(List<Integer> gidList);
-
+	
 }

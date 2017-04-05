@@ -485,10 +485,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			final List<String> batchDesignationValues = allDesignationValues.subList(start, end);
 
 			// Count using = by default
-			final SQLQuery query =
-					this.getSession()
-							.createSQLQuery(
-									"select n.* FROM names n inner join germplsm g on g.gid = n.gid where nval in (:namelist) and g.gid != g.grplce and g.grplce = 0");
+			final SQLQuery query = this.getSession().createSQLQuery(
+				"select n.* FROM names n inner join germplsm g on g.gid = n.gid where nval in (:namelist) and  g.deleted = 0  and g.grplce = 0");
 			query.setParameterList("namelist", batchDesignationValues);
 			allNameList.addAll(query.list());
 		}
