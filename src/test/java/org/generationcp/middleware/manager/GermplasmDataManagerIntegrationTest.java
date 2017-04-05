@@ -1023,7 +1023,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			// verify
 			List<Method> methodList = this.germplasmDataManager.getProgramMethods(programUUID);
 			Assert.assertEquals("There should be 2 program methods with programUUID[" + programUUID + "]", 2, methodList.size());
-			// deleteGermplasms locations
+			// delete locations
 			this.germplasmDataManager.deleteProgramMethodsByUniqueId(programUUID);
 			methodList = this.germplasmDataManager.getProgramMethods(programUUID);
 			Assert.assertTrue("There should be no program methods with programUUID[" + programUUID + "]", methodList.isEmpty());

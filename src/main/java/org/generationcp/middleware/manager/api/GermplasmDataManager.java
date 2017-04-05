@@ -1071,7 +1071,7 @@ public interface GermplasmDataManager {
 	List<Method> getProgramMethods(String programUUID);
 
 	/**
-	 * deleteGermplasms all method records filtered by programUUID
+	 * delete all method records filtered by programUUID
 	 * 
 	 * @param programUUID
 	 */

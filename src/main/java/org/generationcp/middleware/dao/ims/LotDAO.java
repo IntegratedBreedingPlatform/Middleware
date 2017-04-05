@@ -34,11 +34,15 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Lot}.
  */
 public class LotDAO extends GenericDAO<Lot, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(LotDAO.class);
 
 	private static final String LOCATION_ID2 = ", locationId=";
 
@@ -516,7 +520,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			Query query = this.getSession().createSQLQuery(GET_GIDS_WITH_OPEN_LOTS).setParameterList("gids", gids);
 			gidsWithOpenLots = Sets.newHashSet(query.list());
 		} catch (Exception e) {
-			this.logAndThrowException("Error at checkGermplasmsWithOpenLots for GIDss = " + gids + AT_LOT_DAO + e.getMessage(), e);
+			LotDAO.LOG.error("Error at checkGermplasmsWithOpenLots for GIDss = " + gids + AT_LOT_DAO + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error at checkGermplasmsWithOpenLots for GIDss = " + gids + AT_LOT_DAO + e.getMessage(), e);
 		}
 		return gidsWithOpenLots;
 	}
