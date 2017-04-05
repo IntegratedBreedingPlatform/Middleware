@@ -193,6 +193,22 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 		Assert.assertFalse(this.listDataProjectDAO.getGermplasmUsedInEntryList(Arrays.asList(this.parentGermplasm.getGid())).size() > 0);
 	}
 
+	@Test
+	public void testGetByListIdAndGidNotNull() {
+		final Integer listId = this.testListDataProject.getList().getId();
+		final List<ListDataProject> listDataProjects = this.middlewareFieldbookService.getListDataProject(listId);
+
+		for (ListDataProject listDataProject : listDataProjects) {
+			Assert.assertNotNull(this.listDataProjectDAO.getByListIdAndGid(listId, listDataProject.getGermplasmId()));
+		}
+	}
+
+	@Test
+	public void testGetByListIdAndGidNull() {
+		final Integer listId = this.testListDataProject.getList().getId();
+		Assert.assertNull(this.listDataProjectDAO.getByListIdAndGid(listId, this.parentGermplasm.getGid()));
+	}
+
 	private List<ListDataProject> createListDataProject(final GermplasmList germplasmList, final long noOfTestEntries, final long noOfCheckEntries) {
 
 		final List<ListDataProject> listDataProjects = new ArrayList<>();
