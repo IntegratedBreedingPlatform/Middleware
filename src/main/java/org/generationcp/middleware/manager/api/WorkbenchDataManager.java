@@ -27,7 +27,6 @@ import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
@@ -770,33 +769,7 @@ public interface WorkbenchDataManager {
 	 * @return - a {@code List} of {@code SecurityQuestion} objects associated with the given User.
 	 */
 	List<SecurityQuestion> getQuestionsByUserId(Integer userId);
-
-	/**
-	 * Returns the ProjectUserMysqlAccount record identified by the given project id and user id.
-	 *
-	 * @param projectId the project id
-	 * @param userId the user id
-	 * @return The ProjectUserMysqlAccount of the given project id and user id.
-	 */
-	ProjectUserMysqlAccount getProjectUserMysqlAccountByProjectIdAndUserId(Integer projectId, Integer userId)
-			throws MiddlewareQueryException;
-
-	/**
-	 * Stores a list of ProjectUserMysqlAccount records in the database.
-	 *
-	 * @param records the records
-	 * @return List of ids of the records saved
-	 */
-	List<Integer> addProjectUserMysqlAccounts(List<ProjectUserMysqlAccount> records);
-
-	/**
-	 * Stores a ProjectUserMysqlAccount record in the database.
-	 *
-	 * @param record the record
-	 * @return id of the record saved
-	 */
-	Integer addProjectUserMysqlAccount(ProjectUserMysqlAccount record);
-
+	
 	/**
 	 * Gets the ProjectUserInfoDAO.
 	 *
