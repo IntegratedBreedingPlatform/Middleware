@@ -715,7 +715,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		return folderIdsToRetrieveFolderCount;
 	}
 
-	protected void performGermplasmListEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
+	private void performGermplasmListEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
 		for (final Integer gid : germplasms) {
 			final GermplasmListData germplasmListData = this.getGermplasmListDataDAO().getByListIdAndGid(listId, gid);
 			this.deleteGermplasmListData(germplasmListData);
@@ -731,7 +731,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 		this.updateGermplasmListData(listDatas);
 	}
 
-	protected void performListDataProjectEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
+	private void performListDataProjectEntriesDeletion(final List<Integer> germplasms, final Integer listId) {
 		final List<GermplasmList> germplasmLists = this.getGermplasmListDAO().getByListRef(listId);
 		for (GermplasmList germplasmList: germplasmLists) {
 			this.getListDataProjectSaver().performListDataProjectEntriesDeletion(germplasms, germplasmList.getId());
