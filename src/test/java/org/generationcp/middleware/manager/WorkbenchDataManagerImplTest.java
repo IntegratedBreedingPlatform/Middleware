@@ -29,7 +29,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
-import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
@@ -472,27 +471,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertNotNull(roles);
 		Assert.assertTrue(!roles.isEmpty());
 	}
-
-	@Test
-	public void testProjectUserMysqlAccount() throws MiddlewareQueryException {
-		final ProjectUserMysqlAccount recordToSave = new ProjectUserMysqlAccount();
-		recordToSave.setProject(this.commonTestProject);
-		recordToSave.setUser(this.testUser1);
-		recordToSave.setMysqlUsername("sample " + new Random().nextInt(10000));
-		recordToSave.setMysqlPassword("password");
-
-		final Integer idSaved = this.workbenchDataManager.addProjectUserMysqlAccount(recordToSave);
-		Assert.assertNotNull("Expected id of the newly saved record in workbench_project_user_mysql_account", idSaved);
-		Debug.println(IntegrationTestBase.INDENT, "Id of record saved: " + idSaved);
-
-		final ProjectUserMysqlAccount record = this.workbenchDataManager.getProjectUserMysqlAccountByProjectIdAndUserId(
-				this.commonTestProject.getProjectId().intValue(), this.testUser1.getUserid());
-		Assert.assertNotNull(record);
-		Assert.assertEquals(this.commonTestProject.getProjectId(), record.getProject().getProjectId());
-		Assert.assertEquals(this.testUser1.getUserid(), record.getUser().getUserid());
-		Debug.println(IntegrationTestBase.INDENT, record.toString());
-	}
-
+	
 	@Test
 	public void testCountAllPersons() throws MiddlewareQueryException {
 		final long count = this.workbenchDataManager.countAllPersons();
