@@ -177,9 +177,6 @@ public class StudyMeasurements {
 		final SQLQuery createSQLQuery = this.session.createSQLQuery(generateQuery);
 
 		this.addScalar(createSQLQuery);
-		createSQLQuery.addScalar("BLOCK_NO");
-		createSQLQuery.addScalar("ROW_NO");
-		createSQLQuery.addScalar("COL_NO");
 		createSQLQuery.addScalar("LocationName");
 		createSQLQuery.addScalar("LocationAbbreviation");
 		createSQLQuery.addScalar("FieldMapColumn");
