@@ -128,6 +128,27 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 		return newLocation;
 	}
+	
+	@Override
+	public List<Location> getLocationsByProgramUUID(final String programUUID) {
+		final Integer fieldLtypeFldId =
+				this.getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
+		final Integer blockLtypeFldId =
+				this.getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
+
+		final List<Location> locList = this.getLocationDataManager().getLocationsByUniqueID(programUUID);
+		final List<Location> newLocation = new ArrayList<Location>();
+
+		for (final Location loc : locList) {
+			if (fieldLtypeFldId != null && fieldLtypeFldId.intValue() == loc.getLtype().intValue() || blockLtypeFldId != null
+					&& blockLtypeFldId.intValue() == loc.getLtype().intValue()) {
+				continue;
+			}
+			newLocation.add(loc);
+		}
+
+		return newLocation;
+	}
 
 	@Override
 	public List<Location> getAllBreedingLocations() {

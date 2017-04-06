@@ -18,14 +18,21 @@ import java.util.List;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.GermplasmListDAO;
+import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UDTableType;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.DatabaseBroker;
+import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -58,9 +65,15 @@ public class FieldbookServiceImplTest {
 
 	@Mock
 	SQLQuery query;
+	
+	@Mock
+	Criteria criteria;
 
 	@Mock
 	GermplasmDataManager germplasmDataManager;
+	
+	@Mock
+	LocationDAO locationDAO;
 
 	private List<Pair<Germplasm, List<Name>>> germplasms;
 
@@ -75,10 +88,12 @@ public class FieldbookServiceImplTest {
 	public void setUp() {
 		Mockito.doReturn(this.session).when(this.sessionProvider).getSession();
 		Mockito.doReturn(this.query).when(this.session).createSQLQuery(Matchers.anyString());
+		Mockito.doReturn(this.criteria).when(this.session).createCriteria(UserDefinedField.class);
 		this.dbBroker.setSessionProvider(this.sessionProvider);
 		this.germplasms = this.createGermplasms();
 		this.listDataItems = this.createListDataItems();
 		this.germplasmAttributes = this.createGermplasmAttributes();
+		Mockito.when(this.dbBroker.getLocationDAO()).thenReturn(locationDAO);
 	}
 
 	@Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
@@ -103,6 +118,12 @@ public class FieldbookServiceImplTest {
 		final GermplasmList germplasmList = this.createGermplasmlist();
 		final Integer out = this.fieldbookServiceImpl.saveGermplasmList(this.listDataItems, germplasmList);
 		Assert.assertEquals("List Id should be 1", (Integer) 1, out);
+	}
+	
+	@Test
+	public void getLocationsByProgramUUID(){
+		List<Location> locations = this.fieldbookServiceImpl.getLocationsByProgramUUID(null);
+		Assert.assertNotNull("The return locations list should not be null", locations);
 	}
 
 	private List<Pair<Germplasm, List<Name>>> createGermplasms() {
