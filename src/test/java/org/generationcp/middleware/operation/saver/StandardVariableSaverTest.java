@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class StandardVariableSaverTest extends IntegrationTestBase {
@@ -29,6 +30,7 @@ public class StandardVariableSaverTest extends IntegrationTestBase {
 		this.cvtermDao = this.stdVarSaver.getCvTermDao();
 	}
 
+	@Ignore("See BMS-3721")
 	@Test
 	public void testSaveCheckType() {
 		final StandardVariable stdVar = this.standardVariableTestDataInitializer.createStandardVariable();
