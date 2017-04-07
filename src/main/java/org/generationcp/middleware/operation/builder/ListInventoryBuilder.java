@@ -288,6 +288,7 @@ public class ListInventoryBuilder extends Builder {
 			final ListDataInventory inventory = entry.getInventoryInfo();
 			if (inventory != null) {
 				inventory.setStockIDs(stockIDs.get(entry.getGid()));
+				entry.setStockIDs(inventory.getStockIDs());
 			}
 		}
 	}
