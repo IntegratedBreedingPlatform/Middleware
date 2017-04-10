@@ -449,7 +449,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	public String getSeedAmount() {
 		return (this.getInventoryInfo() != null && this.getInventoryInfo().getTotalAvailableBalance() != null && !this.getInventoryInfo()
 				.getTotalAvailableBalance().equals(0D)) ?
-				Double.toString(this.getInventoryInfo().getTotalAvailableBalance()) + this.getInventoryInfo().getScaleForGermplsm() :
+				Double.toString(this.getInventoryInfo().getTotalAvailableBalance()) :
 				"";
 	}
 
