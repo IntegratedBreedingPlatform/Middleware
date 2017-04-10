@@ -187,7 +187,7 @@ public class Variable implements Serializable, Comparable<Variable> {
 	}
 
 	/**
-	 * When name of is saved as value, this method returns the id of the enumeration
+	 * When the name of the enumeration is saved as value, this method returns the id of the enumeration
 	 * @return
 	 */
 	public String getIdValue() {
