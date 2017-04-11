@@ -109,10 +109,16 @@ public class WorkbookBuilder extends Builder {
 		final Workbook workbook = new Workbook();
 
 		/**
-		 * 1. Get the dataset id 2. Count total no. of experiments of the dataset 3. getExperiments 4. Per experiment, transform it to
-		 * MeasurementRow a. MeasurementRow (list of MeasurementData) b. MeasurementData label (Experiment > VariableList > Variable >
-		 * localName), value (Experiment > VariableList > Variable), datatype (Experiment > VariableList > Variable > VariableType >
-		 * StandardVariable), iseditable (true for variates, else, false)
+		 * 1. Get the dataset id
+		 * 2. Count total no. of experiments of the dataset
+		 * 3. getExperiments
+		 * 4. Per experiment, transform it to MeasurementRow
+		 *    a. MeasurementRow (list of MeasurementData)
+		 *    b. MeasurementData
+		 *       label (Experiment > VariableList > Variable > localName),
+		 *       value (Experiment > VariableList > Variable),
+		 *       datatype (Experiment > VariableList > Variable > VariableType > StandardVariable),
+		 *       iseditable (true for variates, else, false)
 		 */
 
 		// DA
