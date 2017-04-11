@@ -1053,7 +1053,7 @@ public class WorkbookBuilder extends Builder {
 			final VariableList factors = experiment.getFactors();
 			final VariableList variates = this.getCompleteVariatesInExperiment(experiment, variateTypes);
 
-			final List<MeasurementData> measurementDataList = getMeasurementDataListFromFactors(factorList, factors);
+			final List<MeasurementData> measurementDataList = getMeasurementDataListFromFactors(experiment, factorList, factors);
 
 			this.populateMeasurementData(variateList, variates, measurementDataList);
 
@@ -1067,15 +1067,20 @@ public class WorkbookBuilder extends Builder {
 		return observations;
 	}
 
-	private List<MeasurementData> getMeasurementDataListFromFactors(List<MeasurementVariable> factorList, VariableList factors) {
+	private List<MeasurementData> getMeasurementDataListFromFactors(Experiment experiment, List<MeasurementVariable> factorList,
+		VariableList factors) {
 		final List<MeasurementData> measurementDataList = new ArrayList<>();
 
 		for (final MeasurementVariable factor : factorList) {
 			MeasurementData measurementData = getMeasurementDataFromFactorVariables(factors, factor);
 			if (measurementData == null) {
 				final boolean isEditable = NonEditableFactors.isEditable(factor.getTermId());
+				String value = null;
+				if (factor.getTermId() == TermId.PLOT_ID.getId()) {
+					value = experiment.getPlotId();
+				}
 				measurementData =
-					new MeasurementData(factor.getName(), null, isEditable, this.getDataType(factor.getDataTypeId()), factor.getTermId(),
+					new MeasurementData(factor.getName(), value, isEditable, this.getDataType(factor.getDataTypeId()), factor.getTermId(),
 						factor);
 			}
 			measurementDataList.add(measurementData);
