@@ -70,13 +70,11 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	private Property testProperty;
 	private Scale testScale;
 	private OntologyVariableInfo testVariableInfo;
-	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
 
 	@BeforeClass
 	public static void setUpOnce() {
 		// Variable caching relies on the context holder to determine current crop database in use
 		ContextHolder.setCurrentCrop("wheat");
-		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 	}
 
 	@Test
@@ -238,6 +236,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	public void setUp() throws Exception {
 		final WorkbenchTestDataUtil instance = new WorkbenchTestDataUtil(this.workbenchDataManager);
 		this.testProject = instance.createTestProjectData();
+		ContextHolder.setCurrentProgram(this.testProject.getUniqueID());
 
 		this.testMethod = new org.generationcp.middleware.domain.ontology.Method();
 		this.testMethod.setName(OntologyDataCreationUtil.getNewRandomName());
