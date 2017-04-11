@@ -61,6 +61,12 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 	private static final String GRAIN_YIELD = "Grain Yield";
 	private static final String DRY_AND_WEIGH = "Dry and weigh";
 
+	private List<MeasurementVariable> constants;
+	private List<MeasurementVariable> variates;
+	private String programUUID;
+	private StudyDetails studyDetails;
+	private Workbook workbook;
+
 	@Before
 	public void setUp() {
 		if (this.workbookBuilder == null) {
@@ -68,76 +74,89 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		}
 	}
 
-	@Test
-	public void testWorkbookBuilderLoadsNoObservationsByDefault() throws MiddlewareException {
-
-		// First create a study (workbook) in database.
-		final String programUUID = UUID.randomUUID().toString();
-		final int randomInt = new Random().nextInt(100);
-		final Workbook workbook = new Workbook();
-
+	private void setUpNursery() {
 		// Basic Details
-		final StudyDetails studyDetails = new StudyDetails();
+		studyDetails = new StudyDetails();
 		studyDetails.setStudyType(StudyType.N);
-		studyDetails.setStudyName("Test Nursery " + randomInt);
+		studyDetails.setStudyName("Test Nursery " + new Random().nextInt(100));
 		studyDetails.setTitle(studyDetails.getStudyName() + " Description");
 		studyDetails.setParentFolderId(1);
+
+		setUpWorkbook();
+	}
+
+	private void setUpTrial() {
+		// Basic Details
+		studyDetails = new StudyDetails();
+		studyDetails.setStudyType(StudyType.T);
+		studyDetails.setStudyName("Test Trial " + new Random().nextInt(100));
+		studyDetails.setTitle(studyDetails.getStudyName() + " Description");
+		studyDetails.setParentFolderId(1);
+
+		setUpWorkbook();
+	}
+
+	private void setUpWorkbook() {
+		// Create a study (workbook) in database.
+		workbook = new Workbook();
 		workbook.setStudyDetails(studyDetails);
+
+		programUUID = UUID.randomUUID().toString();
 
 		// Conditions
 		final List<MeasurementVariable> conditions = new ArrayList<>();
 		conditions.add(this.createMeasurementVariable(TermId.STUDY_NAME.getId(), "STUDY_NAME", "Study - assigned (DBCV)",
-				WorkbookBuilderIntegrationTest.PROP_STUDY, WorkbookBuilderIntegrationTest.ASSIGNED, WorkbookBuilderIntegrationTest.DBCV,
-				WorkbookBuilderIntegrationTest.CHAR, studyDetails.getStudyName(), WorkbookBuilderIntegrationTest.STUDY,
-				PhenotypicType.STUDY, true));
+			WorkbookBuilderIntegrationTest.PROP_STUDY, WorkbookBuilderIntegrationTest.ASSIGNED, WorkbookBuilderIntegrationTest.DBCV,
+			WorkbookBuilderIntegrationTest.CHAR, studyDetails.getStudyName(), WorkbookBuilderIntegrationTest.STUDY,
+			PhenotypicType.STUDY, true));
 
 		conditions.add(this.createMeasurementVariable(TermId.STUDY_TITLE.getId(), "STUDY_TITLE", "Study title - assigned (text)",
-				WorkbookBuilderIntegrationTest.PROP_STUDY_TITLE, WorkbookBuilderIntegrationTest.ASSIGNED,
-				WorkbookBuilderIntegrationTest.SCALE_TEXT, WorkbookBuilderIntegrationTest.CHAR, studyDetails.getTitle(),
-				WorkbookBuilderIntegrationTest.STUDY, PhenotypicType.STUDY, true));
+			WorkbookBuilderIntegrationTest.PROP_STUDY_TITLE, WorkbookBuilderIntegrationTest.ASSIGNED,
+			WorkbookBuilderIntegrationTest.SCALE_TEXT, WorkbookBuilderIntegrationTest.CHAR, studyDetails.getTitle(),
+			WorkbookBuilderIntegrationTest.STUDY, PhenotypicType.STUDY, true));
 
 		workbook.setConditions(conditions);
 
 		// Constants
-		final List<MeasurementVariable> constants = new ArrayList<>();
+		constants = new ArrayList<>();
 		constants.add(this.createMeasurementVariable(8270, "SITE_SOIL_PH", "Soil acidity - ph meter (pH)", "Soil acidity", "Ph meter", "pH",
-				WorkbookBuilderIntegrationTest.NUMERIC, "7", WorkbookBuilderIntegrationTest.STUDY, PhenotypicType.VARIATE, false));
+			WorkbookBuilderIntegrationTest.NUMERIC, "7", WorkbookBuilderIntegrationTest.STUDY, PhenotypicType.VARIATE, false));
 		workbook.setConstants(constants);
 
 		// Factors
 		final List<MeasurementVariable> factors = new ArrayList<>();
 		final MeasurementVariable entryFactor =
-				this.createMeasurementVariable(TermId.ENTRY_NO.getId(), "ENTRY_NO", "Germplasm entry - enumerated (number)",
-						"Germplasm entry", WorkbookBuilderIntegrationTest.ENUMERATED, WorkbookBuilderIntegrationTest.NUMBER,
-						WorkbookBuilderIntegrationTest.NUMERIC, null, WorkbookBuilderIntegrationTest.ENTRY, PhenotypicType.GERMPLASM, true);
+			this.createMeasurementVariable(TermId.ENTRY_NO.getId(), "ENTRY_NO", "Germplasm entry - enumerated (number)",
+				"Germplasm entry", WorkbookBuilderIntegrationTest.ENUMERATED, WorkbookBuilderIntegrationTest.NUMBER,
+				WorkbookBuilderIntegrationTest.NUMERIC, null, WorkbookBuilderIntegrationTest.ENTRY, PhenotypicType.GERMPLASM, true);
 		factors.add(entryFactor);
 
 		final MeasurementVariable designationFactor =
-				this.createMeasurementVariable(TermId.DESIG.getId(), "DESIGNATION", "Germplasm designation - assigned (DBCV)",
-						"Germplasm Designation", WorkbookBuilderIntegrationTest.ASSIGNED, WorkbookBuilderIntegrationTest.DBCV,
-						WorkbookBuilderIntegrationTest.CHAR, null, WorkbookBuilderIntegrationTest.DESIG, PhenotypicType.GERMPLASM, true);
+			this.createMeasurementVariable(TermId.DESIG.getId(), "DESIGNATION", "Germplasm designation - assigned (DBCV)",
+				"Germplasm Designation", WorkbookBuilderIntegrationTest.ASSIGNED, WorkbookBuilderIntegrationTest.DBCV,
+				WorkbookBuilderIntegrationTest.CHAR, null, WorkbookBuilderIntegrationTest.DESIG, PhenotypicType.GERMPLASM, true);
 		factors.add(designationFactor);
 
 		final MeasurementVariable gidFactor =
-				this.createMeasurementVariable(TermId.GID.getId(), "GID", "Germplasm identifier - assigned (DBID)", "Germplasm id",
-						WorkbookBuilderIntegrationTest.ASSIGNED, WorkbookBuilderIntegrationTest.DBID,
-						WorkbookBuilderIntegrationTest.NUMERIC, null, WorkbookBuilderIntegrationTest.GID, PhenotypicType.GERMPLASM, true);
+			this.createMeasurementVariable(TermId.GID.getId(), "GID", "Germplasm identifier - assigned (DBID)", "Germplasm id",
+				WorkbookBuilderIntegrationTest.ASSIGNED, WorkbookBuilderIntegrationTest.DBID,
+				WorkbookBuilderIntegrationTest.NUMERIC, null, WorkbookBuilderIntegrationTest.GID, PhenotypicType.GERMPLASM, true);
 		factors.add(gidFactor);
 
 		final MeasurementVariable plotFactor = this.createMeasurementVariable(TermId.PLOT_NO.getId(), "PLOT_NO",
-				"Field plot - enumerated (number)", "Field plot", WorkbookBuilderIntegrationTest.ENUMERATED,
-				WorkbookBuilderIntegrationTest.NUMBER, WorkbookBuilderIntegrationTest.NUMERIC, null, WorkbookBuilderIntegrationTest.PLOT,
-				PhenotypicType.TRIAL_DESIGN, true);
+			"Field plot - enumerated (number)", "Field plot", WorkbookBuilderIntegrationTest.ENUMERATED,
+			WorkbookBuilderIntegrationTest.NUMBER, WorkbookBuilderIntegrationTest.NUMERIC, null, WorkbookBuilderIntegrationTest.PLOT,
+			PhenotypicType.TRIAL_DESIGN, true);
 		factors.add(plotFactor);
 
 		workbook.setFactors(factors);
 
 		// Variates
-		final List<MeasurementVariable> variates = new ArrayList<>();
+		variates = new ArrayList<>();
 		final MeasurementVariable variate = this.createMeasurementVariable(18000, "Grain_yield", "Grain yield -dry and weigh (kg/ha)",
-				WorkbookBuilderIntegrationTest.GRAIN_YIELD, WorkbookBuilderIntegrationTest.DRY_AND_WEIGH,
-				WorkbookBuilderIntegrationTest.KG_HA, WorkbookBuilderIntegrationTest.NUMERIC, null, WorkbookBuilderIntegrationTest.PLOT,
-				PhenotypicType.VARIATE, false);
+			WorkbookBuilderIntegrationTest.GRAIN_YIELD, WorkbookBuilderIntegrationTest.DRY_AND_WEIGH,
+			WorkbookBuilderIntegrationTest.KG_HA, WorkbookBuilderIntegrationTest.NUMERIC, null, WorkbookBuilderIntegrationTest.PLOT,
+			PhenotypicType.VARIATE, false);
 		variates.add(variate);
 
 		workbook.setVariates(variates);
@@ -154,7 +173,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 			dataList.add(entryData);
 
 			final MeasurementData designationData =
-					new MeasurementData(designationFactor.getLabel(), WorkbookBuilderIntegrationTest.GERMPLSM_PREFIX + i);
+				new MeasurementData(designationFactor.getLabel(), WorkbookBuilderIntegrationTest.GERMPLSM_PREFIX + i);
 			designationData.setMeasurementVariable(designationFactor);
 			dataList.add(designationData);
 
@@ -174,6 +193,11 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 			observations.add(row);
 		}
 		workbook.setObservations(observations);
+	}
+
+	@Test
+	public void testWorkbookBuilderLoadsNoObservationsByDefaultNursery() throws MiddlewareException {
+		setUpNursery();
 
 		// Save the workbook
 		final int studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, "9CVR");
@@ -194,6 +218,33 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(studyId, nurseryStudyDetails.getId().intValue());
 		Assert.assertEquals(studyDetails.getStudyName(), nurseryStudyDetails.getStudyName());
 		Assert.assertEquals(studyDetails.getTitle(), nurseryStudyDetails.getTitle());
+		Assert.assertEquals(constants.size(), studyWorkbook.getConstants().size());
+		Assert.assertEquals(variates.size(), studyWorkbook.getVariates().size());
+	}
+
+	@Test
+	public void testWorkbookBuilderLoadsNoObservationsByDefaultTrial() throws MiddlewareException {
+		setUpTrial();
+
+		// Save the workbook
+		final int studyId = this.dataImportService.saveDataset(workbook, true, false, programUUID, "9CVR");
+		WorkbookBuilderIntegrationTest.LOG.info("Study " + studyDetails.getStudyName() + " created, studyId: " + studyId);
+
+		// Now the actual test and assertions. Load the workbook using workbook builder.
+		final Workbook studyWorkbook = this.workbookBuilder.create(studyId, StudyType.T);
+		Assert.assertNotNull(studyWorkbook);
+
+		// The main assertion.
+		Assert.assertEquals("Workbook loaded via WorkbookBuilder.create() must not populate the observations collection by default.", 0,
+				studyWorkbook.getObservations().size());
+
+		// Other basic assertions just as sanity check.
+		final StudyDetails studyDetails = studyWorkbook.getStudyDetails();
+		Assert.assertNotNull(studyDetails);
+		Assert.assertNotNull(studyDetails.getId());
+		Assert.assertEquals(studyId, studyDetails.getId().intValue());
+		Assert.assertEquals(this.studyDetails.getStudyName(), studyDetails.getStudyName());
+		Assert.assertEquals(this.studyDetails.getTitle(), studyDetails.getTitle());
 		Assert.assertEquals(constants.size(), studyWorkbook.getConstants().size());
 		Assert.assertEquals(variates.size(), studyWorkbook.getVariates().size());
 	}
