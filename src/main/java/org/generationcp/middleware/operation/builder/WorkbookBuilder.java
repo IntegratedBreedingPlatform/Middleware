@@ -1047,52 +1047,13 @@ public class WorkbookBuilder extends Builder {
 	public List<MeasurementRow> buildDatasetObservations(final List<Experiment> experiments, final VariableTypeList variateTypes,
 			final List<MeasurementVariable> factorList, final List<MeasurementVariable> variateList) {
 
-		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
+		final List<MeasurementRow> observations = new ArrayList<>();
 		for (final Experiment experiment : experiments) {
 			final int experimentId = experiment.getId();
 			final VariableList factors = experiment.getFactors();
 			final VariableList variates = this.getCompleteVariatesInExperiment(experiment, variateTypes);
-			final List<MeasurementData> measurementDataList = new ArrayList<MeasurementData>();
 
-			for (final MeasurementVariable factor : factorList) {
-				boolean found = false;
-				for (final Variable variable : factors.getVariables()) {
-
-					if (factor.getTermId() == variable.getVariableType().getStandardVariable().getId()) {
-						found = true;
-
-						final boolean isEditable =
-								NonEditableFactors.find(variable.getVariableType().getStandardVariable().getId()) == null ? true : false;
-						final MeasurementData measurementData;
-
-						// BMS-2155 make sure that the value for EXP_DESIGN factor returned is the ID and not the name
-						if (variable.getVariableType().getStandardVariable().getDataType().getId() == TermId.CATEGORICAL_VARIABLE.getId()
-								&& variable.getVariableType().getStandardVariable().getId() != TermId.EXPERIMENT_DESIGN_FACTOR.getId()) {
-							final Integer id =
-									variable.getValue() != null && NumberUtils.isNumber(variable.getValue()) ? Integer.valueOf(variable
-											.getValue()) : null;
-							measurementData =
-									new MeasurementData(variable.getVariableType().getLocalName(), variable.getDisplayValue(), isEditable,
-											this.getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()), id,
-											factor);
-						} else {
-							measurementData =
-									new MeasurementData(variable.getVariableType().getLocalName(), variable.getValue(), isEditable,
-											this.getDataType(variable.getVariableType().getStandardVariable().getDataType().getId()),
-											factor);
-						}
-						measurementDataList.add(measurementData);
-						break;
-					}
-				}
-				if (!found) {
-					final boolean isEditable = NonEditableFactors.find(factor.getTermId()) == null ? true : false;
-					final MeasurementData measurementData =
-							new MeasurementData(factor.getName(), null, isEditable, this.getDataType(factor.getDataTypeId()),
-									factor.getTermId(), factor);
-					measurementDataList.add(measurementData);
-				}
-			}
+			final List<MeasurementData> measurementDataList = getMeasurementDataListFromFactors(factorList, factors);
 
 			this.populateMeasurementData(variateList, variates, measurementDataList);
 
@@ -1104,6 +1065,56 @@ public class WorkbookBuilder extends Builder {
 		}
 
 		return observations;
+	}
+
+	private List<MeasurementData> getMeasurementDataListFromFactors(List<MeasurementVariable> factorList, VariableList factors) {
+		final List<MeasurementData> measurementDataList = new ArrayList<>();
+
+		for (final MeasurementVariable factor : factorList) {
+			MeasurementData measurementData = getMeasurementDataFromFactorVariables(factors, factor);
+			if (measurementData == null) {
+				final boolean isEditable = NonEditableFactors.isEditable(factor.getTermId());
+				measurementData =
+					new MeasurementData(factor.getName(), null, isEditable, this.getDataType(factor.getDataTypeId()), factor.getTermId(),
+						factor);
+			}
+			measurementDataList.add(measurementData);
+		}
+		return measurementDataList;
+	}
+
+	private MeasurementData getMeasurementDataFromFactorVariables(VariableList factors, MeasurementVariable factor) {
+		MeasurementData measurementData = null;
+		for (final Variable variable : factors.getVariables()) {
+			measurementData = getMeasurementDataFromVariable(factor, variable);
+			if (measurementData != null) {
+				break;
+			}
+		}
+		return measurementData;
+	}
+
+	private MeasurementData getMeasurementDataFromVariable(MeasurementVariable factor, Variable variable) {
+		final DMSVariableType variableType = variable.getVariableType();
+		final StandardVariable standardVariable = variableType.getStandardVariable();
+
+		if (factor.getTermId() == standardVariable.getId()) {
+			final boolean isEditable = NonEditableFactors.isEditable(standardVariable.getId());
+
+			final int standardVariableDataTypeId = standardVariable.getDataType().getId();
+			final String value = variable.getValue();
+
+			// BMS-2155 make sure that the value for EXP_DESIGN factor returned is the ID and not the name
+			if (standardVariableDataTypeId == TermId.CATEGORICAL_VARIABLE.getId()
+				&& standardVariable.getId() != TermId.EXPERIMENT_DESIGN_FACTOR.getId()) {
+				final Integer id = value != null && NumberUtils.isNumber(value) ? Integer.valueOf(value) : null;
+				return new MeasurementData(variableType.getLocalName(), variable.getDisplayValue(), isEditable,
+					this.getDataType(standardVariableDataTypeId), id, factor);
+			}
+			return new MeasurementData(variableType.getLocalName(), value, isEditable, this.getDataType(standardVariableDataTypeId),
+				factor);
+		}
+		return null;
 	}
 
 	public void setTreatmentFactorValues(final List<TreatmentVariable> treatmentVariables, final int measurementDatasetId) {
