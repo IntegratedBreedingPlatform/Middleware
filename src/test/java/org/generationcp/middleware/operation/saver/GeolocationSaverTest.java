@@ -101,9 +101,13 @@ public class GeolocationSaverTest {
 		assertNotNull(geolocation.getProperties());
 		assertEquals(4, geolocation.getProperties().size());
 		int propertyIndex = 0;
-		assertGeoPropertiesLoop: for (GeolocationProperty property : geolocation.getProperties()) {
+		for (GeolocationProperty property : geolocation.getProperties()) {
 			propertyIndex++;
 			EnvironmentVariable environmentVariable = null;
+			if (propertyIndex == 4) {
+				assertEquals(String.valueOf(GeolocationSaverTest.EXPERIMENT_DESIGN_FACTOR_RCBD_ID), property.getValue());
+				continue;
+			}
 			switch (propertyIndex) {
 				case 1:
 					environmentVariable = EnvironmentVariable.ENV_1;
@@ -114,9 +118,6 @@ public class GeolocationSaverTest {
 				case 3:
 					environmentVariable = EnvironmentVariable.ENV_3;
 					break;
-				case 4:
-					assertEquals(String.valueOf(GeolocationSaverTest.EXPERIMENT_DESIGN_FACTOR_RCBD_ID), property.getValue());
-					continue assertGeoPropertiesLoop;
 			}
 			assertTrue(environmentVariable.getId() == property.getTypeId());
 			assertEquals(environmentVariable.getValue(), property.getValue());
