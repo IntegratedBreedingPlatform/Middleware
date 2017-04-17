@@ -275,8 +275,8 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	private void addPlotIdFactor(VariableList factors, ExperimentModel experimentModel, VariableTypeList variableTypes) {
-		for (DMSVariableType variableType : variableTypes.getVariableTypes()) {
-			StandardVariable standardVariable = variableType.getStandardVariable();
+		for (final DMSVariableType variableType : variableTypes.getVariableTypes()) {
+			final StandardVariable standardVariable = variableType.getStandardVariable();
 			if (standardVariable.getId() == TermId.PLOT_ID.getId()) {
 				factors.add(new Variable(variableType, experimentModel.getPlotId()));
 				return;
