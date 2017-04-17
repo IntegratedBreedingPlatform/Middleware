@@ -435,7 +435,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	public Variable getVariable(final String programUuid, final Integer id, final boolean filterObsolete,
 			final boolean calculateVariableUsage) {
 
-		final Variable cachedVariable = VariableCache.getFromCache(id);
+		final Variable cachedVariable = VariableCache.getFromCache(id, programUuid);
 		if (cachedVariable != null) {
 			return cachedVariable;
 		}
@@ -505,7 +505,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 			}
 
-			VariableCache.addToCache(id, variable);
+			VariableCache.addToCache(id, variable, programUuid);
 
 			return variable;
 		} catch (final HibernateException e) {

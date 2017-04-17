@@ -21,8 +21,11 @@ public class VariableCache {
 	private static final Logger LOG = LoggerFactory.getLogger(VariableCache.class);
 
 	public static Variable getFromCache(final Integer variableId) {
+		return getFromCache(variableId, VariableCache.getCurrentProgram());
+	}
+
+	public static Variable getFromCache(final Integer variableId, final String currentProgram) {
 		final String currentCrop = VariableCache.getCurrentCrop();
-		final String currentProgram = VariableCache.getCurrentProgram();
 		final VariableCacheKey key = new VariableCacheKey(variableId, currentCrop, currentProgram);
 		final Variable variable = VariableCache.VARIABLE_CACHE.get(key);
 		if (variable != null) {
@@ -32,8 +35,12 @@ public class VariableCache {
 	}
 
 	public static void addToCache(final Integer variableId, final Variable variable) {
+		addToCache(variableId, variable, VariableCache.getCurrentProgram());
+	}
+
+	public static void addToCache(Integer variableId, Variable variable, String programUuid) {
 		VariableCache.VARIABLE_CACHE
-				.put(new VariableCacheKey(variableId, VariableCache.getCurrentCrop(), VariableCache.getCurrentProgram()), variable);
+			.put(new VariableCacheKey(variableId, VariableCache.getCurrentCrop(), programUuid), variable);
 	}
 
 	public static void removeFromCache(final Integer variableId) {
