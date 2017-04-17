@@ -287,8 +287,9 @@ public class ListInventoryBuilder extends Builder {
 		for (final GermplasmListData entry : listEntries) {
 			final ListDataInventory inventory = entry.getInventoryInfo();
 			if (inventory != null) {
-				inventory.setStockIDs(stockIDs.get(entry.getGid()));
-				entry.setStockIDs(inventory.getStockIDs());
+				String stockIdsForGid = stockIDs.get(entry.getGid());
+				inventory.setStockIDs(stockIdsForGid);
+				entry.setStockIDs(stockIdsForGid);
 			}
 		}
 	}
