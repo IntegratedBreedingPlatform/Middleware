@@ -1,0 +1,143 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="vanina" id="v4.5.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'create_plot_id_for_templates';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE create_plot_id_for_templates;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v4.5.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'create_plot_id_for_templates';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			CREATE PROCEDURE create_plot_id_for_templates()
+            BEGIN
+            DECLARE projectId INT;
+            DECLARE rankNumber INT;
+            DECLARE done INT DEFAULT FALSE;
+
+            DECLARE cur1 CURSOR FOR
+            SELECT
+            p.project_id as projectId,
+            (SELECT
+            MAX(rank) + 1
+            FROM
+            projectprop
+            WHERE
+            project_id = p.project_id) as rankNumber
+            FROM
+            project p
+            WHERE
+            p.name LIKE '%-PLOTDATA'
+            AND p.program_uuid IS NULL
+            AND NOT EXISTS( SELECT
+            1
+            FROM
+            projectprop pp
+            WHERE
+            pp.project_id = p.project_id
+            AND pp.value = 'PLOT_ID')
+            ;
+
+            DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+            OPEN cur1;
+            read_loop: LOOP FETCH cur1 INTO projectId, rankNumber;
+
+            IF done THEN
+            LEAVE read_loop;
+            END IF;
+
+
+            INSERT INTO projectprop (project_id, type_id, value, rank)
+            VALUES (
+            projectId,
+            1060,
+            'Field plot id - assigned (text)',
+            rankNumber);
+
+
+            INSERT INTO projectprop (project_id, type_id, value, rank)
+            VALUES (
+            projectId,
+            1070,
+            '8201',
+            rankNumber);
+
+            INSERT INTO projectprop (project_id, type_id, value, rank)
+            VALUES (
+            projectId,
+            1804,
+            'PLOT_ID',
+            rankNumber);
+
+            END LOOP read_loop;
+
+            CLOSE cur1;
+        END
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v4.5.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'create_plot_id_for_templates';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			call create_plot_id_for_templates();
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v4.5.0-4">
+
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'create_plot_id_for_templates';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE create_plot_id_for_templates;
+		</sql>
+
+	</changeSet>
+
+</databaseChangeLog>
