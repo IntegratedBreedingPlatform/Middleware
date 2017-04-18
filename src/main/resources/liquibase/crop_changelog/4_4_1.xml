@@ -6,7 +6,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<changeSet author="vanina" id="v4.5.0-1">
+	<changeSet author="vanina" id="v4.4.1-1">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -23,7 +23,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v4.5.0-2">
+	<changeSet author="vanina" id="v4.4.1-2">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT
@@ -104,7 +104,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v4.5.0-3">
+	<changeSet author="vanina" id="v4.4.1-3">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -121,7 +121,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v4.5.0-4">
+	<changeSet author="vanina" id="v4.4.1-4">
 
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
