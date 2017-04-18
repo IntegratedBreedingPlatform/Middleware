@@ -37,70 +37,70 @@
 		</preConditions>
 		<sql dbms="mysql" splitStatements="false">
 			CREATE PROCEDURE create_plot_id_for_templates()
-            BEGIN
-            DECLARE projectId INT;
-            DECLARE rankNumber INT;
-            DECLARE done INT DEFAULT FALSE;
+			BEGIN
+				DECLARE projectId INT;
+				DECLARE rankNumber INT;
+				DECLARE done INT DEFAULT FALSE;
 
-            DECLARE cur1 CURSOR FOR
-            SELECT
-            p.project_id as projectId,
-            (SELECT
-            MAX(rank) + 1
-            FROM
-            projectprop
-            WHERE
-            project_id = p.project_id) as rankNumber
-            FROM
-            project p
-            WHERE
-            p.name LIKE '%-PLOTDATA'
-            AND p.program_uuid IS NULL
-            AND NOT EXISTS( SELECT
-            1
-            FROM
-            projectprop pp
-            WHERE
-            pp.project_id = p.project_id
-            AND pp.value = 'PLOT_ID')
-            ;
+				DECLARE cur1 CURSOR FOR
+				SELECT
+					p.project_id AS projectId,
+					(SELECT
+					MAX(rank) + 1
+					FROM
+						projectprop
+					WHERE
+						project_id = p.project_id) AS rankNumber
+				FROM
+					project p
+				WHERE
+					p.name LIKE '%-PLOTDATA'
+				AND p.program_uuid IS NULL
+				AND NOT EXISTS( SELECT
+								1
+								FROM
+									projectprop pp
+								WHERE
+									pp.project_id = p.project_id
+								AND pp.value = 'PLOT_ID')
+				;
 
-            DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+				DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
-            OPEN cur1;
-            read_loop: LOOP FETCH cur1 INTO projectId, rankNumber;
+				OPEN cur1;
+				read_loop: LOOP FETCH cur1 INTO projectId, rankNumber;
 
-            IF done THEN
-            LEAVE read_loop;
-            END IF;
-
-
-            INSERT INTO projectprop (project_id, type_id, value, rank)
-            VALUES (
-            projectId,
-            1060,
-            'Field plot id - assigned (text)',
-            rankNumber);
+				IF done THEN
+					LEAVE read_loop;
+				END IF;
 
 
-            INSERT INTO projectprop (project_id, type_id, value, rank)
-            VALUES (
-            projectId,
-            1070,
-            '8201',
-            rankNumber);
+				INSERT INTO projectprop (project_id, type_id, value, rank)
+				VALUES (
+					projectId,
+					1060,
+					'Field plot id - assigned (text)',
+					rankNumber);
 
-            INSERT INTO projectprop (project_id, type_id, value, rank)
-            VALUES (
-            projectId,
-            1804,
-            'PLOT_ID',
-            rankNumber);
 
-            END LOOP read_loop;
+				INSERT INTO projectprop (project_id, type_id, value, rank)
+				VALUES (
+					projectId,
+					1070,
+					'8201',
+					rankNumber);
 
-            CLOSE cur1;
-        END
+				INSERT INTO projectprop (project_id, type_id, value, rank)
+				VALUES (
+					projectId,
+					1804,
+					'PLOT_ID',
+					rankNumber);
+
+				END LOOP read_loop;
+
+				CLOSE cur1;
+			END
 		</sql>
 	</changeSet>
 
