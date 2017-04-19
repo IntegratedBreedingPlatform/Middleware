@@ -214,7 +214,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 			final int pageSize, final String sortBy, final String sortOrder) {
 
 		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
-		return this.studyMeasurements.getAllMeasurements(studyIdentifier, traits, findGenericGermplasmDescriptors(studyIdentifier),
+		final List<TraitDto> selectionMethods = this.trialTraits.getSelectionMethods(studyIdentifier);
+		final List<TraitDto> selectionMethodsAndTraits = new ArrayList<>();
+		selectionMethodsAndTraits.addAll(traits);
+		selectionMethodsAndTraits.addAll(selectionMethods);
+
+		return this.studyMeasurements.getAllMeasurements(studyIdentifier, selectionMethodsAndTraits, findGenericGermplasmDescriptors(studyIdentifier),
 				instanceId, pageNumber, pageSize,
 				sortBy, sortOrder);
 	}
