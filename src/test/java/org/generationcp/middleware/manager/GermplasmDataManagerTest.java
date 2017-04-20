@@ -1,8 +1,10 @@
 
 package org.generationcp.middleware.manager;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.data.initializer.GermplasmDataManagerDataInitializer;
@@ -18,7 +20,6 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-@Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
 public class GermplasmDataManagerTest {
 
 	private static final Integer TEST_STUDY_ID = 1;
@@ -27,6 +28,7 @@ public class GermplasmDataManagerTest {
 	private GermplasmDAO germplasmDAO;
 
 	@Test
+	@Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
 	public void testGetDirectParentsForStudyOneParentOnly() {
 
 		// we make use of partial mocking techniques so as to be able to inject the GermplasmDAO mock

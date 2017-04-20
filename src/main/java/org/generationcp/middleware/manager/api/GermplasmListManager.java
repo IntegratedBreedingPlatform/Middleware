@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
 import org.generationcp.middleware.domain.gms.ListDataInfo;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Database;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
@@ -500,7 +501,7 @@ public interface GermplasmListManager {
 	 * @param listRef
 	 * @return
 	 */
-	org.generationcp.middleware.pojos.GermplasmList getGermplasmListByListRef(Integer listRef);
+	List<GermplasmList> getGermplasmListByListRef(Integer listRef);
 
 	/**
 	 * Retrieves metadata (such as count of entries, list owner) in one go for lists ids provide.
@@ -546,4 +547,12 @@ public interface GermplasmListManager {
 	List<GermplasmList> getAllGermplasmListsByIds(List<Integer> listIds);
 
 
+	/**
+	 * Given a List of valid Germplasm objects, deleteGermplasms the corresponding records in the database.
+	 *
+	 * @param germplasms a list germplasm ID that need to delete
+	 * @param listId for which we want the corresponding germplasms list
+	 * @throws MiddlewareQueryException the middleware query exception
+	 */
+	List<Integer> deleteGermplasms(final List<Integer> germplasms, final Integer listId);
 }

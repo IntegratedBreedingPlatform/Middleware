@@ -826,4 +826,6 @@ public interface FieldbookService {
 	public String getPlotCodePrefix(final String cropName);
 
 	public List<GermplasmList> appendTabLabelToList(List<GermplasmList> germplasmCrossesList);
+
+	List<Location> getLocationsByProgramUUID(String programUUID);
 }

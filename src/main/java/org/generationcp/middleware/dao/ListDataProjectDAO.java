@@ -25,7 +25,31 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 
+import com.google.common.base.Preconditions;
+
 public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
+
+
+	static final String GERMPLASM_LIST_DATA_LIST_ID_COLUMN = "listId";
+
+	static final String GERMPLASM_TABLE = "germplasm";
+
+	static final String GERMPLASM_TABLE_ALIAS = "g";
+
+	static final String GERMPLASM_LIST_NAME_TABLE = "list";
+
+	static final String GERMPLASM_LIST_NAME_TABLE_ALIAS = "l";
+
+	public static final String GET_GERMPLASM_USED_IN_ENTRY_LIST = " SELECT \n"
+		+ "   ldp.germplasm_id, \n"
+		+ "   group_concat(p.name) \n"
+		+ " FROM listnms l \n"
+		+ "   INNER JOIN listdata_project ldp ON l.listid = ldp.list_id \n"
+		+ "   INNER JOIN project p ON l.projectid = p.project_id \n"
+		+ " WHERE ldp.germplasm_id IN (:gids) \n"
+		+ "       AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED + " \n"
+		+ "       AND l.listtype IN ('" + GermplasmListType.NURSERY.name() + "', '" + GermplasmListType.TRIAL.name() + "') \n"
+		+ " GROUP BY ldp.germplasm_id";
 
 	public void deleteByListId(final int listId) {
 		try {
@@ -306,4 +330,44 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 	}
 
+	/**
+	 * Verify if the gids are used in some entry list
+	 * @param gids gids to check
+	 * @return Map with GID as key and CSV of project where it is used
+	 */
+	public Map<Integer, String> getGermplasmUsedInEntryList(final List<Integer> gids) {
+		final Map<Integer, String> resultMap = new HashMap<>();
+
+		final SQLQuery query = this.getSession().createSQLQuery(ListDataProjectDAO.GET_GERMPLASM_USED_IN_ENTRY_LIST);
+		query.setParameterList("gids", gids);
+
+		final List<Object[]> results = query.list();
+		for (final Object[] result : results) {
+			resultMap.put((Integer) result[0], (String) result[1]);
+		}
+
+		return resultMap;
+	}
+
+	public ListDataProject getByListIdAndGid(final Integer listId, final Integer gid) {
+		// Make sure parameters are not null.
+		Preconditions.checkNotNull(listId, "List id passed cannot be null.");
+		Preconditions.checkNotNull(gid, "Gid passed in cannot be null.");
+
+		ListDataProject result = null;
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
+			criteria.add(Restrictions.eq("list.id", listId));
+			criteria.add(Restrictions.eq("germplasmId", gid));
+			criteria.addOrder(Order.asc("entryId"));
+			result = (ListDataProject) criteria.uniqueResult();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+					"Error with getByListIdAndGid(listId=" + listId + ") query from ListDataProjectDAO: " + e.getMessage(), e);
+		}
+		return result;
+
+	}
 }

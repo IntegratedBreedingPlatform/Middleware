@@ -1,16 +1,17 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.dao;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -513,6 +514,26 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Long result2 = this.dao.countMatchGermplasmInList(new HashSet<Integer>());
 		Assert.assertEquals("The count should be zero because the gid list is empty", 0, result2.intValue());
 
+	}
+
+	@Test
+	public void testGetGermplasmDescendantByGIDs() {
+		final Germplasm fParent =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Integer fParentGID = this.germplasmDataDM.addGermplasm(fParent, fParent.getPreferredName());
+
+		final Germplasm mParent =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Integer mParentGID = this.germplasmDataDM.addGermplasm(mParent, mParent.getPreferredName());
+
+		final Germplasm germplasm = GermplasmTestDataInitializer
+			.createGermplasm(20150101, fParentGID, mParentGID, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName",
+				"LocationName");
+		Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
+
+		Assert.assertTrue(this.dao.getGermplasmOffspringByGIDs(Arrays.asList(mParentGID)).size() > 0);
+		Assert.assertTrue(this.dao.getGermplasmOffspringByGIDs(Arrays.asList(fParentGID)).size() > 0);
+		Assert.assertFalse(this.dao.getGermplasmOffspringByGIDs(Arrays.asList(gid)).size() > 0);
 	}
 
 	private void initializeGermplasms() {

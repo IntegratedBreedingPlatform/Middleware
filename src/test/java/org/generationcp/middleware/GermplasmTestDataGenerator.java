@@ -7,6 +7,9 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GermplasmTestDataGenerator {
 	public static final Integer TEST_METHOD_ID = 101;
 	public static final String TEST_METHOD_NAME = "Single cross";
@@ -69,4 +72,27 @@ public class GermplasmTestDataGenerator {
 		return gids;
 	}
 
+	public List<Germplasm> createGermplasmsList(final int numberOfGermplasm, final String prefix) throws MiddlewareQueryException {
+
+		final List<Germplasm> germplasms = new ArrayList<>();
+
+		for (int i = 0; i < numberOfGermplasm; i++) {
+			final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName(prefix + i);
+			final Name preferredName = germplasm.getPreferredName();
+			preferredName.setGermplasmId(germplasm.getGid());
+			this.germplasmDataManager.addGermplasm(germplasm, preferredName);
+
+			germplasms.add(germplasm);
+		}
+		return germplasms;
+	}
+
+	public Germplasm createGermplasm(final String prefix) throws MiddlewareQueryException {
+
+		final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName(prefix);
+		final Name preferredName = germplasm.getPreferredName();
+		this.germplasmDataManager.addGermplasm(germplasm, preferredName);
+
+		return germplasm;
+	}
 }

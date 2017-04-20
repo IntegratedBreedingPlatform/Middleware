@@ -2,6 +2,7 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES.add("CROSSES");
 		GermplasmListDAOTest.EXCLUDED_GERMPLASM_LIST_TYPES.add("FOLDER");
 	}
+
 
 	@Before
 	public void setUp() throws Exception {
@@ -203,4 +205,36 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 				1, allGermplasmListsById.size());
 
 	}
+
+	@Test
+	public void testGetGermplasmUsedInMoreThanOneListFalse() {
+		Assert.assertFalse(this.dao.getGermplasmUsedInMoreThanOneList(Arrays.asList(this.germplasm.getGid())).size() > 0);
+	}
+
+	@Test
+	public void testGetGermplasmUsedInMoreThanOneListSuccess() {
+		final Name name = new Name(null, null, 1, 1, 1, "Name", 0, 0, 0);
+		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
+
+		final GermplasmList list1 = saveGermplasm(createGermplasmListTestData(
+			TEST_GERMPLASM_LIST_NAME, GermplasmListDAOTest.TEST_GERMPLASM_LIST_DESC,
+			TEST_GERMPLASM_LIST_DATE, GermplasmListDAOTest.TEST_GERMPLASM_LIST_TYPE_LST,
+			GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE));
+		this.dataManager.addGermplasm(germplasm, name);
+		final GermplasmListData listData1 = new GermplasmListData(null, list1, germplasm.getGid(), 1, "EntryCode",
+			"SeedSource", "Germplasm Name 5", "GroupName", 0, 99995);
+		this.manager.addGermplasmListData(listData1);
+
+		final GermplasmList list2 = saveGermplasm(createGermplasmListTestData(
+			TEST_GERMPLASM_LIST_NAME, GermplasmListDAOTest.TEST_GERMPLASM_LIST_DESC,
+			TEST_GERMPLASM_LIST_DATE, GermplasmListDAOTest.TEST_GERMPLASM_LIST_TYPE_LST,
+			GermplasmListDAOTest.TEST_GERMPLASM_LIST_USER_ID, GermplasmListDAOTest.STATUS_ACTIVE));
+		this.dataManager.addGermplasm(germplasm, name);
+		final GermplasmListData listData2 = new GermplasmListData(null, list2, germplasm.getGid(), 1, "EntryCode",
+			"SeedSource", "Germplasm Name 5", "GroupName", 0, 99995);
+		this.manager.addGermplasmListData(listData2);
+
+		Assert.assertTrue(this.dao.getGermplasmUsedInMoreThanOneList(Arrays.asList(germplasm.getGid())).size() > 0);
+	}
+
 }

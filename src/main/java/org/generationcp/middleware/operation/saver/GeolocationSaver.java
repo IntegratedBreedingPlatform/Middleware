@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.operation.saver;
 
-import java.util.ArrayList;
-
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
@@ -25,6 +23,8 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.util.StringUtil;
+
+import java.util.ArrayList;
 
 public class GeolocationSaver extends Saver {
 
@@ -102,6 +102,10 @@ public class GeolocationSaver extends Saver {
 
 				} else if (PhenotypicType.TRIAL_ENVIRONMENT == role) {
 					geolocation = this.getGeolocationObject(geolocation, locationId);
+					if (TermId.EXPERIMENT_DESIGN_FACTOR.getId() == variableId) {
+						// Experiment Design saves the id of the category instead of the name
+						variable.setValue(variable.getIdValue());
+					}
 					this.addProperty(geolocation, this.createOrUpdateProperty(variable, geolocation));
 
 				} else if (PhenotypicType.VARIATE == role) {
