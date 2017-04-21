@@ -10,7 +10,7 @@ public interface StudyService {
 
 	List<StudySummary> search(final StudySearchParameters serchParameters);
 
-	int countTotalObservationUnits(final int studyIdentifier, final int instanceId, Boolean allValues);
+	public boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId);
 
 	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
 

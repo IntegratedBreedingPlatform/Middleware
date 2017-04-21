@@ -187,19 +187,17 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId, Boolean allValues) {
+	public boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId) {
 		try {
 			String sql = getSqlForCountTotalObservationUnits();
 
-			if (!allValues) {
-				sql = sql + " 	and ph.value is not null ";
-			}
+			sql = sql + " 	and ph.value is not null ";
 
 			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
 			query.addScalar("totalObservationUnits", new IntegerType());
 			query.setParameter("studyIdentifier", studyIdentifier);
 			query.setParameter("instanceId", instanceId);
-			return (int) query.uniqueResult();
+			return ((int) query.uniqueResult()) > 0;
 		} catch (HibernateException he) {
 			throw new MiddlewareQueryException(String
 				.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ", studyIdentifier,
