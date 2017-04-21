@@ -10,7 +10,9 @@ public interface StudyService {
 
 	List<StudySummary> search(final StudySearchParameters serchParameters);
 
-	int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
+	int countTotalObservationUnits(final int studyIdentifier, final int instanceId, Boolean allValues);
+
+	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
 
 	List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber, final int pageSize,
 			final String sortBy, final String sortOrder);

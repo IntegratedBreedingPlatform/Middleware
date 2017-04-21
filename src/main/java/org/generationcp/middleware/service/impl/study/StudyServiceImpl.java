@@ -187,16 +187,45 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId) {
+	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId, Boolean allValues) {
 		try {
-			final String sql = "select count(*) as totalObservationUnits from nd_experiment nde \n"
+			String sql = "select count(*) as totalObservationUnits from nd_experiment nde \n"
 				+ "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
 				+ "    inner join project proj on proj.project_id = ndep.project_id \n"
 				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
 				+ "		LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
 				+ "		LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n" + " where \n"
 				+ "	proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id where (pr.object_project_id = :studyIdentifier and name like '%PLOTDATA')) \n"
-				+ "    and gl.nd_geolocation_id = :instanceId " + " 	and ph.value is not null ";
+				+ "    and gl.nd_geolocation_id = :instanceId " ;
+
+			if (!allValues) {
+				sql = sql + " 	and ph.value is not null ";
+			}
+
+			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
+			query.addScalar("totalObservationUnits", new IntegerType());
+			query.setParameter("studyIdentifier", studyIdentifier);
+			query.setParameter("instanceId", instanceId);
+			return (int) query.uniqueResult();
+		} catch (HibernateException he) {
+			throw new MiddlewareQueryException(String
+				.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ", studyIdentifier,
+					instanceId) + he.getMessage(), he);
+		}
+	}
+
+	@Override
+	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId) {
+		try {
+			String sql = "select count(*) as totalObservationUnits from nd_experiment nde \n"
+				+ "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
+				+ "    inner join project proj on proj.project_id = ndep.project_id \n"
+				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
+				+ "		LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
+				+ "		LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n" + " where \n"
+				+ "	proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id where (pr.object_project_id = :studyIdentifier and name like '%PLOTDATA')) \n"
+				+ "    and gl.nd_geolocation_id = :instanceId " ;
+
 			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
 			query.addScalar("totalObservationUnits", new IntegerType());
 			query.setParameter("studyIdentifier", studyIdentifier);
