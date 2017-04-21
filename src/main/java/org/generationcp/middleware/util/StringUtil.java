@@ -17,7 +17,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 
-import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -394,7 +394,7 @@ public abstract class StringUtil {
 
 
 	public static String removeBraces(final String str){
-		if(Strings.isNullOrEmpty(str)){
+		if(StringUtils.isBlank(str)){
 			return str;
 		}
 
