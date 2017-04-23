@@ -1181,4 +1181,11 @@ public interface GermplasmDataManager {
 	 */
 	Map<Integer, String[]> getParentsInfoByGIDList(List<Integer> gidList);
 	
+	/**
+	 * Returns the method codes specified in the set of integers
+	 * @param methodIds
+	 * @return
+	 */
+	List<String> getMethodCodeByMethodIds(Set<Integer> methodIds);
+	
 }
