@@ -786,10 +786,11 @@ public interface FieldbookService {
 	 *
 	 * @param listDataItems the list data to add - the key of the Map is the germplasm associated to the germplasm list data value
 	 * @param germplasmList the germplasm list to add
+	 * @param isApplyNewGroupToPreviousCrosses 
 	 *
 	 * @return The id of the newly-created germplasm list
 	 */
-	Integer saveGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList);
+	Integer saveGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList, boolean isApplyNewGroupToPreviousCrosses);
 
 	void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds);
 

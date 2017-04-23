@@ -121,7 +121,7 @@ public class FieldbookServiceImplTest {
 	@Test
 	public void testSaveGermplasmListSuccess() {
 		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(1);
-		final Integer out = this.fieldbookServiceImpl.saveGermplasmList(this.listDataItems, germplasmList);
+		final Integer out = this.fieldbookServiceImpl.saveGermplasmList(this.listDataItems, germplasmList, false);
 		Assert.assertEquals("List Id should be 1", (Integer) 1, out);
 	}
 	
