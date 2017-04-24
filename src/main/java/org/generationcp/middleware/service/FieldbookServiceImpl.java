@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ *
  * Generation Challenge Programme (GCP)
- * 
- * 
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.service;
@@ -78,6 +78,7 @@ import org.generationcp.middleware.util.Util;
 import org.hibernate.FlushMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
@@ -85,6 +86,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Resource
 	private GermplasmGroupingService germplasmGroupingService;
+
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
 
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
 
@@ -110,17 +114,17 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Location> getAllLocations() {
-		final Integer fieldLtypeFldId =
-				this.getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
-		final Integer blockLtypeFldId =
-				this.getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
+		final Integer fieldLtypeFldId = this.getLocationDataManager()
+				.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
+		final Integer blockLtypeFldId = this.getLocationDataManager()
+				.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
 
 		final List<Location> locList = this.getLocationDataManager().getAllLocations();
 		final List<Location> newLocation = new ArrayList<Location>();
 
 		for (final Location loc : locList) {
-			if (fieldLtypeFldId != null && fieldLtypeFldId.intValue() == loc.getLtype().intValue() || blockLtypeFldId != null
-					&& blockLtypeFldId.intValue() == loc.getLtype().intValue()) {
+			if (fieldLtypeFldId != null && fieldLtypeFldId.intValue() == loc.getLtype().intValue()
+					|| blockLtypeFldId != null && blockLtypeFldId.intValue() == loc.getLtype().intValue()) {
 				continue;
 			}
 			newLocation.add(loc);
@@ -157,8 +161,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Location> getAllSeedLocations() {
-		final Integer seedLType =
-				this.getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.getCode());
+		final Integer seedLType = this.getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE,
+				LocationType.SSTORE.getCode());
 		return this.getLocationDataManager().getLocationsByType(seedLType);
 	}
 
@@ -174,7 +178,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Location> getFavoriteLocationByLocationIDs(final List<Integer> locationIds, final Boolean isBreedingLocation) {
+	public List<Location> getFavoriteLocationByLocationIDs(final List<Integer> locationIds,
+			final Boolean isBreedingLocation) {
 		if (isBreedingLocation == null) {
 			return this.getFavoriteLocationByLocationIDs(locationIds);
 		}
@@ -191,11 +196,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public List<Location> getFavoriteLocationByLocationIDs(final List<Integer> locationIds) {
 		return this.getLocationDataManager().getLocationsByIDs(locationIds);
 	}
-	
+
 	@Override
 	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int geolocationId,
 			final CrossExpansionProperties crossExpansionProperties) {
-		return this.getStudyDataManager().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, crossExpansionProperties);
+		return this.getStudyDataManager().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId,
+				crossExpansionProperties);
 	}
 
 	@Override
@@ -206,7 +212,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Integer getGermplasmIdByName(final String name) {
 
-		final List<Germplasm> germplasmList = this.getGermplasmDataManager().getGermplasmByName(name, 0, 1, Operation.EQUAL);
+		final List<Germplasm> germplasmList = this.getGermplasmDataManager().getGermplasmByName(name, 0, 1,
+				Operation.EQUAL);
 		Integer gid = null;
 		if (germplasmList != null && !germplasmList.isEmpty()) {
 			gid = germplasmList.get(0).getGid();
@@ -215,8 +222,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Integer getStandardVariableIdByPropertyScaleMethodRole(final String property, final String scale, final String method,
-			final PhenotypicType role) {
+	public Integer getStandardVariableIdByPropertyScaleMethodRole(final String property, final String scale,
+			final String method, final PhenotypicType role) {
 		return this.getOntologyDataManager().getStandardVariableIdByPropertyScaleMethod(property, scale, method);
 	}
 
@@ -259,8 +266,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 			final Map<String, ?> variableMap = this.getWorkbookSaver().saveVariables(workbook, programUUID);
 
-			// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
-			final Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
+			// unpack maps first level - Maps of Strings, Maps of
+			// VariableTypeList , Maps of Lists of MeasurementVariable
+			final Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap
+					.get("variableTypeMap");
 			final Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
 
 			// unpack maps
@@ -275,22 +284,25 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 			Integer measurementDatasetId = workbook.getMeasurementDatesetId();
 			if (measurementDatasetId == null) {
-				measurementDatasetId =
-						this.getWorkbookBuilder().getMeasurementDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
+				measurementDatasetId = this.getWorkbookBuilder()
+						.getMeasurementDataSetId(workbook.getStudyDetails().getId(), workbook.getStudyName());
 			}
 
 			// save factors
 			// TODO: Possible improvement
-			this.getWorkbookSaver().createStocksIfNecessary(measurementDatasetId, workbook, effectVariables, trialHeaders);
+			this.getWorkbookSaver().createStocksIfNecessary(measurementDatasetId, workbook, effectVariables,
+					trialHeaders);
 
 			if (factors != null) {
 				for (final MeasurementVariable factor : factors) {
 					if (NonEditableFactors.find(factor.getTermId()) == null) {
 						for (final MeasurementRow row : observations) {
 							for (final MeasurementData field : row.getDataList()) {
-								if (factor.getName().equals(field.getLabel()) && factor.getRole() == PhenotypicType.TRIAL_DESIGN) {
+								if (factor.getName().equals(field.getLabel())
+										&& factor.getRole() == PhenotypicType.TRIAL_DESIGN) {
 									this.getExperimentPropertySaver().saveOrUpdateProperty(
-											this.getExperimentDao().getById(row.getExperimentId()), factor.getTermId(), field.getValue());
+											this.getExperimentDao().getById(row.getExperimentId()), factor.getTermId(),
+											field.getValue());
 								}
 							}
 						}
@@ -299,26 +311,28 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			}
 
 			if (variates != null && !variates.isEmpty()) {
-				final Measurements measurements =
-						new Measurements(this.getActiveSession(), this.getPhenotypeSaver(), this.getPhenotypeOutlierSaver());
+				final Measurements measurements = new Measurements(this.getActiveSession(), this.getPhenotypeSaver(),
+						this.getPhenotypeOutlierSaver());
 				measurements.saveMeasurements(observations);
 			}
 
 		} catch (final Exception e) {
-			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
+			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e,
+					FieldbookServiceImpl.LOG);
 		} finally {
 			this.getActiveSession().setFlushMode(FlushMode.AUTO);
 		}
 
-		FieldbookServiceImpl.LOG.debug("========== saveMeasurementRows Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
+		FieldbookServiceImpl.LOG.debug(
+				"========== saveMeasurementRows Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
 
 	}
 
 	@Override
 	public List<Method> getAllBreedingMethods(final boolean filterOutGenerative) {
-		final List<Method> methodList =
-				filterOutGenerative ? this.getGermplasmDataManager().getAllMethodsNotGenerative() : this.getGermplasmDataManager()
-						.getAllMethods();
+		final List<Method> methodList = filterOutGenerative
+				? this.getGermplasmDataManager().getAllMethodsNotGenerative()
+				: this.getGermplasmDataManager().getAllMethods();
 		FieldbookListUtil.sortMethodNamesInAscendingOrder(methodList);
 		return methodList;
 	}
@@ -340,7 +354,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 		return methodList;
 	}
-	
+
 	@Override
 	public List<Method> getFavoriteMethods(final List<Integer> methodIds, final Boolean filterOutGenerative) {
 
@@ -358,7 +372,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Integer saveNurseryAdvanceGermplasmList(final List<Pair<Germplasm, List<Name>>> germplasms,
 			final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList,
-			List<Pair<Germplasm, List<Attribute>>> germplasmAttributes) throws MiddlewareQueryException {
+			final List<Pair<Germplasm, List<Attribute>>> germplasmAttributes) throws MiddlewareQueryException {
 
 		final GermplasmDAO germplasmDao = this.getGermplasmDao();
 		final GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
@@ -381,9 +395,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 					// Check if the given germplasm name exists
 					if (germplasmFound == null) {
-						final List<Germplasm> germplasmsFound =
-								this.getGermplasmDataManager().getGermplasmByName(germplasm.getPreferredName().getNval(), 0, 1,
-										Operation.EQUAL);
+						final List<Germplasm> germplasmsFound = this.getGermplasmDataManager()
+								.getGermplasmByName(germplasm.getPreferredName().getNval(), 0, 1, Operation.EQUAL);
 
 						if (!germplasmsFound.isEmpty()) {
 							germplasmFound = germplasmsFound.get(0);
@@ -395,7 +408,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				// Save germplasm and name entries if non-existing
 				if (germplasmFound == null || germplasmFound.getGid() == null) {
 					final List<Name> nameList = germplasms.get(counter).getRight();
-					// Lgid could not be null in the DB, so we are saving a value before saving it to the DB
+					// Lgid could not be null in the DB, so we are saving a
+					// value before saving it to the DB
 					if (germplasm.getLgid() == null) {
 						germplasm.setLgid(germplasm.getGid() != null ? germplasm.getGid() : Integer.valueOf(0));
 					}
@@ -403,13 +417,17 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					germplasm = germplasmDao.save(germplasm);
 
 					for (final Name name : nameList) {
-						// Germplasm and Name entities are currently only mapped as uni-directional OneToMany so we need to manage the Name
-						// side of the relationship link (Name.germplasmId) manually.
+						// Germplasm and Name entities are currently only mapped
+						// as uni-directional OneToMany so we need to manage the
+						// Name
+						// side of the relationship link (Name.germplasmId)
+						// manually.
 						name.setGermplasmId(germplasm.getGid());
 						germplasm.getNames().add(name);
 					}
 
-					// inherit 'selection history at fixation' names of parent if parent is part of a group (= has mgid)
+					// inherit 'selection history at fixation' names of parent
+					// if parent is part of a group (= has mgid)
 					if (germplasm.getMgid() > 0) {
 						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm);
 					}
@@ -420,9 +438,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					}
 
 					// Save Germplasm attributes
-					List<Attribute> attributesList = germplasmAttributes.get(counter).getRight();
-					AttributeDAO attributeDAO = this.getAttributeDao();
-					for (Attribute attribute : attributesList) {
+					final List<Attribute> attributesList = germplasmAttributes.get(counter).getRight();
+					final AttributeDAO attributeDAO = this.getAttributeDao();
+					for (final Attribute attribute : attributesList) {
 						attribute.setGermplasmId(germplasm.getGid());
 						attributeDAO.save(attribute);
 					}
@@ -437,8 +455,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 		} catch (final Exception e) {
 
-			this.logAndThrowException("Error encountered with FieldbookService.saveNurseryAdvanceGermplasmList(germplasms=" + germplasms
-					+ ", germplasmList=" + germplasmList + "): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
+			this.logAndThrowException(
+					"Error encountered with FieldbookService.saveNurseryAdvanceGermplasmList(germplasms=" + germplasms
+							+ ", germplasmList=" + germplasmList + "): " + e.getMessage(),
+					e, FieldbookServiceImpl.LOG);
 		}
 
 		FieldbookServiceImpl.LOG.debug("========== saveNurseryAdvanceGermplasmList Duration (ms): "
@@ -448,8 +468,21 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	}
 
+	/**
+	 * Saves germplasm list crosses types. ListData items are always added to
+	 * the database, before saving the germplasm list.
+	 *
+	 * @param listDataItems
+	 *            the list data to add - the key of the Map is the germplasm
+	 *            associated to the germplasm list data value
+	 * @param germplasmList
+	 *            the germplasm list to add
+	 *
+	 * @return The id of the newly-created germplasm list
+	 */
 	@Override
-	public Integer saveGermplasmList(final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList) {
+	public Integer saveGermplasmList(final List<Pair<Germplasm, GermplasmListData>> listDataItems,
+			final GermplasmList germplasmList) {
 
 		final GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
 
@@ -459,10 +492,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 			germplasmListDao.save(germplasmList);
 
+			final List<Integer> germplasmGids = new ArrayList<>();
 			// Save germplasms, names, list data
 			for (final Pair<Germplasm, GermplasmListData> pair : listDataItems) {
 
 				final Germplasm germplasm = pair.getLeft();
+				germplasmGids.add(germplasm.getGid());
 				final GermplasmListData germplasmListData = pair.getRight();
 
 				germplasmListData.setGid(germplasm.getGid());
@@ -470,12 +505,21 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				this.getGermplasmListDataDAO().save(germplasmListData);
 			}
 
+			// For Management Group Settings Processing
+			// NOTE: The false boolean should be replace by the variable for
+			// "Apply grouping to new crosses only" option. See: BMS-3883
+			this.germplasmGroupingService.processGroupInheritanceForCrosses(germplasmGids, false,
+					this.crossExpansionProperties.getHybridBreedingMethods());
+
 		} catch (final Exception e) {
-			this.logAndThrowException("Error encountered with FieldbookService.saveNurseryAdvanceGermplasmList(germplasmList="
-					+ germplasmList + "): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
+			this.logAndThrowException(
+					"Error encountered with FieldbookService.saveNurseryAdvanceGermplasmList(germplasmList="
+							+ germplasmList + "): " + e.getMessage(),
+					e, FieldbookServiceImpl.LOG);
 		}
 
-		FieldbookServiceImpl.LOG.debug("========== saveGermplasmList Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
+		FieldbookServiceImpl.LOG
+				.debug("========== saveGermplasmList Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
 
 		return germplasmList.getId();
 
@@ -496,8 +540,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public GermplasmList getGermplasmListByName(final String name, final String programUUID) {
-		final List<GermplasmList> germplasmLists =
-				this.getGermplasmListManager().getGermplasmListByName(name, programUUID, 0, 1, Operation.EQUAL);
+		final List<GermplasmList> germplasmLists = this.getGermplasmListManager().getGermplasmListByName(name,
+				programUUID, 0, 1, Operation.EQUAL);
 		if (!germplasmLists.isEmpty()) {
 			return germplasmLists.get(0);
 		}
@@ -520,8 +564,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<ValueReference> getDistinctStandardVariableValues(final String property, final String scale, final String method,
-			final PhenotypicType role) {
+	public List<ValueReference> getDistinctStandardVariableValues(final String property, final String scale,
+			final String method, final PhenotypicType role) {
 
 		final Integer stdVarId = this.getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
 		if (stdVarId != null) {
@@ -545,7 +589,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 		final List<ValueReference> nurseryTypes = new ArrayList<ValueReference>();
 
-		final StandardVariable stdVar = this.getOntologyDataManager().getStandardVariable(TermId.NURSERY_TYPE.getId(), programUUID);
+		final StandardVariable stdVar = this.getOntologyDataManager().getStandardVariable(TermId.NURSERY_TYPE.getId(),
+				programUUID);
 		final List<Enumeration> validValues = stdVar.getEnumerations();
 
 		if (validValues != null) {
@@ -576,8 +621,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<StandardVariableReference> filterStandardVariablesByMode(final List<Integer> storedInIds, final List<Integer> propertyIds,
-			final boolean isRemoveProperties) {
+	public List<StandardVariableReference> filterStandardVariablesByMode(final List<Integer> storedInIds,
+			final List<Integer> propertyIds, final boolean isRemoveProperties) {
 		final List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
 		final List<CVTerm> variables = new ArrayList<CVTerm>();
 		final Set<Integer> variableIds = new HashSet<Integer>();
@@ -593,18 +638,19 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		variables.addAll(this.getCvTermDao().getValidCvTermsByIds(variableIdList, TermId.CATEGORICAL_VARIATE.getId(),
 				TermId.CATEGORICAL_VARIABLE.getId()));
 		for (final CVTerm variable : variables) {
-			list.add(new StandardVariableReference(variable.getCvTermId(), variable.getName(), variable.getDefinition()));
+			list.add(new StandardVariableReference(variable.getCvTermId(), variable.getName(),
+					variable.getDefinition()));
 		}
 		return list;
 	}
 
 	@Override
-	public List<StandardVariableReference> filterStandardVariablesByIsAIds(final List<StandardVariableReference> standardReferences,
-			final List<Integer> isAIds) {
+	public List<StandardVariableReference> filterStandardVariablesByIsAIds(
+			final List<StandardVariableReference> standardReferences, final List<Integer> isAIds) {
 		List<StandardVariableReference> newRefs = new ArrayList<StandardVariableReference>();
 		try {
-			final List<StandardVariableSummary> variableSummaries =
-					this.getStandardVariableDao().getStandardVariableSummaryWithIsAId(isAIds);
+			final List<StandardVariableSummary> variableSummaries = this.getStandardVariableDao()
+					.getStandardVariableSummaryWithIsAId(isAIds);
 			for (final StandardVariableReference ref : standardReferences) {
 				boolean isFound = false;
 				for (final StandardVariableSummary summary : variableSummaries) {
@@ -626,14 +672,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	private void addAllVariableIdsInMode(final Set<Integer> variableIds, final List<Integer> storedInIds) {
 		for (final Integer storedInId : storedInIds) {
-			variableIds.addAll(this.getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.STORED_IN.getId(), storedInId));
+			variableIds.addAll(
+					this.getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.STORED_IN.getId(), storedInId));
 		}
 	}
 
 	private void createPropertyList(final Set<Integer> propertyVariableList, final List<Integer> propertyIds) {
 		for (final Integer propertyId : propertyIds) {
-			propertyVariableList.addAll(this.getCvTermRelationshipDao().getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(),
-					propertyId));
+			propertyVariableList.addAll(this.getCvTermRelationshipDao()
+					.getSubjectIdsByTypeAndObject(TermId.HAS_PROPERTY.getId(), propertyId));
 		}
 	}
 
@@ -702,17 +749,18 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public int addFieldLocation(final String fieldName, final Integer parentLocationId, final Integer currentUserId) {
-		return this
-				.addLocation(fieldName, parentLocationId, currentUserId, LocationType.FIELD.getCode(), LocdesType.FIELD_PARENT.getCode());
+		return this.addLocation(fieldName, parentLocationId, currentUserId, LocationType.FIELD.getCode(),
+				LocdesType.FIELD_PARENT.getCode());
 	}
 
 	@Override
 	public int addBlockLocation(final String blockName, final Integer parentFieldId, final Integer currentUserId) {
-		return this.addLocation(blockName, parentFieldId, currentUserId, LocationType.BLOCK.getCode(), LocdesType.BLOCK_PARENT.getCode());
+		return this.addLocation(blockName, parentFieldId, currentUserId, LocationType.BLOCK.getCode(),
+				LocdesType.BLOCK_PARENT.getCode());
 	}
 
-	public int addLocation(final String locationName, final Integer parentId, final Integer currentUserId, final String locCode,
-			final String parentCode) {
+	public int addLocation(final String locationName, final Integer parentId, final Integer currentUserId,
+			final String locCode, final String parentCode) {
 		final LocationDataManager manager = this.getLocationDataManager();
 
 		final Integer lType = manager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, locCode);
@@ -730,7 +778,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<StandardVariable> getPossibleTreatmentPairs(final int cvTermId, final int propertyId, final List<Integer> hiddenFields) {
+	public List<StandardVariable> getPossibleTreatmentPairs(final int cvTermId, final int propertyId,
+			final List<Integer> hiddenFields) {
 		final List<StandardVariable> treatmentPairs = new ArrayList<StandardVariable>();
 		treatmentPairs.addAll(this.getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId, hiddenFields));
 
@@ -777,7 +826,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Integer updateGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList) {
+	public Integer updateGermplasmList(final List<Pair<Germplasm, GermplasmListData>> listDataItems,
+			final GermplasmList germplasmList) {
 		final GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
 
 		final long startTime = System.currentTimeMillis();
@@ -798,12 +848,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			}
 
 		} catch (final MiddlewareQueryException e) {
-			FieldbookServiceImpl.LOG.error("Error encountered with FieldbookService.updateNurseryCrossesGermplasmList(germplasmList="
-					+ germplasmList + "): " + e.getMessage());
+			FieldbookServiceImpl.LOG
+					.error("Error encountered with FieldbookService.updateNurseryCrossesGermplasmList(germplasmList="
+							+ germplasmList + "): " + e.getMessage());
 			throw e;
 		}
 
-		FieldbookServiceImpl.LOG.debug("========== updateGermplasmList Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
+		FieldbookServiceImpl.LOG.debug(
+				"========== updateGermplasmList Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
 
 		return germplasmList.getId();
 	}
@@ -863,7 +915,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public String getBlockId(final int datasetId, final String trialInstance) {
-		return this.getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(), trialInstance);
+		return this.getGeolocationPropertyDao().getValueOfTrialInstance(datasetId, TermId.BLOCK_ID.getId(),
+				trialInstance);
 	}
 
 	@Override
@@ -892,13 +945,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			this.getExperimentDestroyer().deleteExperimentsByStudy(datasetId);
 		} catch (final Exception e) {
 
-			this.logAndThrowException("Error encountered with deleteObservationsOfStudy(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
+			this.logAndThrowException("Error encountered with deleteObservationsOfStudy(): " + e.getMessage(), e,
+					FieldbookServiceImpl.LOG);
 		}
 	}
 
 	@Override
-	public List<MeasurementRow> buildTrialObservations(final int trialDatasetId, final List<MeasurementVariable> factorList,
-			final List<MeasurementVariable> variateList) {
+	public List<MeasurementRow> buildTrialObservations(final int trialDatasetId,
+			final List<MeasurementVariable> factorList, final List<MeasurementVariable> variateList) {
 		return this.getWorkbookBuilder().buildTrialObservations(trialDatasetId, factorList, variateList);
 	}
 
@@ -908,8 +962,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Integer addGermplasmName(final String nameValue, final int gid, final int userId, final int nameTypeId, final int locationId,
-			final Integer date) {
+	public Integer addGermplasmName(final String nameValue, final int gid, final int userId, final int nameTypeId,
+			final int locationId, final Integer date) {
 		final Name name = new Name(null, gid, nameTypeId, 0, userId, nameValue, locationId, date, 0);
 		return this.getGermplasmDataManager().addGermplasmName(name);
 	}
@@ -922,7 +976,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Integer addGermplasm(final String nameValue, final int userId) {
 		final Name name = new Name(null, null, 1, 1, userId, nameValue, 0, 0, 0);
-		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, userId, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
+		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, userId, 0, 0, Util.getCurrentDateAsIntegerValue(),
+				name);
 		return this.getGermplasmDataManager().addGermplasm(germplasm, name);
 	}
 
@@ -942,8 +997,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(final String property, final String scale,
-			final String method, final PhenotypicType role, final String programUUID) {
+	public MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(final String property,
+			final String scale, final String method, final PhenotypicType role, final String programUUID) {
 		final MeasurementVariable variable = null;
 		StandardVariable standardVariable = null;
 		final Integer id = this.getStandardVariableIdByPropertyScaleMethodRole(property, scale, method, role);
@@ -956,7 +1011,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void setTreatmentFactorValues(final List<TreatmentVariable> treatmentFactors, final int measurementDatasetID) {
+	public void setTreatmentFactorValues(final List<TreatmentVariable> treatmentFactors,
+			final int measurementDatasetID) {
 		this.getWorkbookBuilder().setTreatmentFactorValues(treatmentFactors, measurementDatasetID);
 	}
 
@@ -1015,14 +1071,15 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			this.getStudyDestroyer().deleteStudy(studyId);
 
 		} catch (final Exception e) {
-			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
+			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e,
+					FieldbookServiceImpl.LOG);
 		}
 	}
 
 	@Override
 	public List<Integer> getFavoriteProjectLocationIds(final String programUUID) {
-		final List<ProgramFavorite> favList =
-				this.getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
+		final List<ProgramFavorite> favList = this.getGermplasmDataManager()
+				.getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
 		final List<Integer> favoriteList = new ArrayList<>();
 		if (favList != null && !favList.isEmpty()) {
 			for (final ProgramFavorite fav : favList) {
@@ -1035,8 +1092,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Integer> getFavoriteProjectMethods(final String programUUID) {
-		final List<ProgramFavorite> favList =
-				this.getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE, programUUID);
+		final List<ProgramFavorite> favList = this.getGermplasmDataManager()
+				.getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE, programUUID);
 		final List<Integer> ids = new ArrayList<Integer>();
 		if (favList != null && !favList.isEmpty()) {
 			for (final ProgramFavorite fav : favList) {
@@ -1057,12 +1114,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public long countListDataProjectByListIdAndEntryType(final int listId, final SystemDefinedEntryType systemDefinedEntryType) {
+	public long countListDataProjectByListIdAndEntryType(final int listId,
+			final SystemDefinedEntryType systemDefinedEntryType) {
 		return this.getListDataProjectDAO().countByListIdAndEntryType(listId, systemDefinedEntryType);
 	}
 
 	@Override
-	public ListDataProject getListDataProjectByStudy(final int projectId, final GermplasmListType type, final int plotId) {
+	public ListDataProject getListDataProjectByStudy(final int projectId, final GermplasmListType type,
+			final int plotId) {
 		return this.getListDataProjectDAO().getByStudy(projectId, type, plotId);
 	}
 
@@ -1073,7 +1132,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public void deleteListDataProjects(final int projectId, final GermplasmListType type) {
-		// when used in advanced, it will delete all the advance lists (list data projects)
+		// when used in advanced, it will delete all the advance lists (list
+		// data projects)
 		final List<GermplasmList> lists = this.getGermplasmListDAO().getByProjectIdAndType(projectId, type);
 		if (lists != null && !lists.isEmpty()) {
 			for (final GermplasmList list : lists) {
@@ -1083,13 +1143,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public int saveOrUpdateListDataProject(final int projectId, final GermplasmListType type, final Integer originalListId,
-			final List<ListDataProject> listDatas, final int userId) {
+	public int saveOrUpdateListDataProject(final int projectId, final GermplasmListType type,
+			final Integer originalListId, final List<ListDataProject> listDatas, final int userId) {
 
 		int listId = 0;
 		try {
 
-			listId = this.getListDataProjectSaver().saveOrUpdateListDataProject(projectId, type, originalListId, listDatas, userId);
+			listId = this.getListDataProjectSaver().saveOrUpdateListDataProject(projectId, type, originalListId,
+					listDatas, userId);
 
 		} catch (final Exception e) {
 			FieldbookServiceImpl.LOG.error(e.getMessage(), e);
@@ -1115,7 +1176,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void saveStudyColumnOrdering(final Integer studyId, final String studyName, final List<Integer> orderedTermIds) {
+	public void saveStudyColumnOrdering(final Integer studyId, final String studyName,
+			final List<Integer> orderedTermIds) {
 		final Integer plotDatasetId = this.getWorkbookBuilder().getMeasurementDataSetId(studyId, studyName);
 		this.getStudyDataManager().updateVariableOrdering(plotDatasetId, orderedTermIds);
 	}
@@ -1141,8 +1203,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			storedInIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
 			storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
 			storedInIds.addAll(PhenotypicType.TRIAL_ENVIRONMENT.getTypeStorages());
-			workbook.setColumnOrderedLists(this.getProjectPropertyDao().getDatasetVariableIdsForGivenStoredInIds(plotDatasetId,
-					storedInIds, null));
+			workbook.setColumnOrderedLists(this.getProjectPropertyDao()
+					.getDatasetVariableIdsForGivenStoredInIds(plotDatasetId, storedInIds, null));
 			return true;
 		}
 		return false;
@@ -1158,7 +1220,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			}
 		} catch (final Exception e) {
 			FieldbookServiceImpl.LOG.error(e.getMessage(), e);
-			this.logAndThrowException("Error encountered with addListDataProjectList(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
+			this.logAndThrowException("Error encountered with addListDataProjectList(): " + e.getMessage(), e,
+					FieldbookServiceImpl.LOG);
 		}
 	}
 
@@ -1171,18 +1234,20 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return this.germplasmGroupingService;
 	}
 
-	void setGermplasmGroupingService(GermplasmGroupingService germplasmGroupingService) {
+	void setGermplasmGroupingService(final GermplasmGroupingService germplasmGroupingService) {
 		this.germplasmGroupingService = germplasmGroupingService;
 	}
 
+	@Override
 	public String getPlotCodePrefix(final String cropName) {
 		return this.getWorkbenchDataManager().getCropTypeByName(cropName).getPlotCodePrefix();
 	}
 
-	public List<GermplasmList> appendTabLabelToList(List<GermplasmList> germplasmCrossesList) {
+	@Override
+	public List<GermplasmList> appendTabLabelToList(final List<GermplasmList> germplasmCrossesList) {
 		{
-			for (Iterator<GermplasmList> iterator = germplasmCrossesList.iterator(); iterator.hasNext();) {
-				GermplasmList germplasmList = (GermplasmList) iterator.next();
+			for (final Iterator<GermplasmList> iterator = germplasmCrossesList.iterator(); iterator.hasNext();) {
+				final GermplasmList germplasmList = iterator.next();
 
 				if (GermplasmListType.IMP_CROSS.toString().equals(germplasmList.getType())) {
 					germplasmList.setTabLabel(GermplasmList.IMP_CROSS);
@@ -1194,5 +1259,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			}
 			return germplasmCrossesList;
 		}
+	}
+
+	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
+		this.crossExpansionProperties = crossExpansionProperties;
 	}
 }

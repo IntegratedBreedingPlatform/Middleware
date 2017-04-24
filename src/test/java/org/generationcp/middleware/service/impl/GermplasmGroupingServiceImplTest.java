@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.service.impl;
 
-import java.util.Collections;
 import java.util.Set;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -59,6 +58,11 @@ public class GermplasmGroupingServiceImplTest {
 		this.selectionHistoryNameCode.setFcode(GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
 		Mockito.when(
 				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE))
+				.thenReturn(this.selectionHistoryNameCode);
+		
+		this.selectionHistoryNameCode.setFcode(GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE_FOR_CROSS);
+		Mockito.when(
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE_FOR_CROSS))
 				.thenReturn(this.selectionHistoryNameCode);
 
 		this.selHisFixNameCode = new UserDefinedField(222);
@@ -515,14 +519,14 @@ public class GermplasmGroupingServiceImplTest {
 	public void testGetSelectionHistory() {
 		Germplasm germplasm = new Germplasm();
 		// Germplasm has no name yet, expect to return null
-		Assert.assertNull(this.germplasmGroupingService.getSelectionHistory(germplasm));
+		Assert.assertNull(this.germplasmGroupingService.getSelectionHistory(germplasm,GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE));
 
 		// Add a matching name
 		Name selHisNameExpected = new Name(1);
 		selHisNameExpected.setTypeId(this.selectionHistoryNameCode.getFldno());
 		germplasm.getNames().add(selHisNameExpected);
 
-		Name selectionHistoryName = this.germplasmGroupingService.getSelectionHistory(germplasm);
+		Name selectionHistoryName = this.germplasmGroupingService.getSelectionHistory(germplasm, GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
 		Assert.assertEquals(selHisNameExpected, selectionHistoryName);
 	}
 
@@ -530,14 +534,14 @@ public class GermplasmGroupingServiceImplTest {
 	public void testGetSelectionHistoryAtFixation() {
 		Germplasm germplasm = new Germplasm();
 		// Germplasm has no name yet, expect to return null
-		Assert.assertNull(this.germplasmGroupingService.getSelectionHistoryAtFixation(germplasm));
+		Assert.assertNull(this.germplasmGroupingService.getSelectionHistory(germplasm, GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE));
 
 		// Add a matching name
 		Name selHisFixNameExpected = new Name(1);
 		selHisFixNameExpected.setTypeId(this.selHisFixNameCode.getFldno());
 		germplasm.getNames().add(selHisFixNameExpected);
 
-		Name selHisFixNameActual = this.germplasmGroupingService.getSelectionHistoryAtFixation(germplasm);
+		Name selHisFixNameActual = this.germplasmGroupingService.getSelectionHistory(germplasm, GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 		Assert.assertEquals(selHisFixNameExpected, selHisFixNameActual);
 	}
 
@@ -548,7 +552,7 @@ public class GermplasmGroupingServiceImplTest {
 				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE))
 				.thenReturn(null);
 
-		this.germplasmGroupingService.getSelectionHistoryNameType();
+		this.germplasmGroupingService.getSelectionHistoryNameType(GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
 		Assert.fail("When " + GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE
 				+ " name type is not setup in UDFLD table, IllegalStateException is expected which did not happen.");
 	}
@@ -559,7 +563,7 @@ public class GermplasmGroupingServiceImplTest {
 		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
 				GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE)).thenReturn(null);
 
-		this.germplasmGroupingService.getSelectionHistoryAtFixationNameType();
+		this.germplasmGroupingService.getSelectionHistoryNameType(GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 		Assert.fail("When " + GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE
 				+ " name type is not setup in UDFLD table, IllegalStateException is expected which did not happen.");
 	}
