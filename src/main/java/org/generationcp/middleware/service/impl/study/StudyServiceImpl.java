@@ -59,6 +59,14 @@ import com.google.common.collect.Ordering;
 public class StudyServiceImpl extends Service implements StudyService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StudyServiceImpl.class);
+	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS = "select count(*) as totalObservationUnits from nd_experiment nde \n"
+		+ "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
+		+ "    inner join project proj on proj.project_id = ndep.project_id \n"
+		+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
+		+ "		LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
+		+ "		LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n" + " where \n"
+		+ "	proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id where (pr.object_project_id = :studyIdentifier and name like '%PLOTDATA')) \n"
+		+ "    and gl.nd_geolocation_id = :instanceId ";
 
 	private final String TRIAL_TYPE = "T";
 
@@ -189,7 +197,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId) {
 		try {
-			String sql = getSqlForCountTotalObservationUnits();
+			String sql = SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS;
 
 			sql = sql + " 	and ph.value is not null ";
 
@@ -208,7 +216,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId) {
 		try {
-			String sql = getSqlForCountTotalObservationUnits();
+			String sql = SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS;
 
 			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
 			query.addScalar("totalObservationUnits", new IntegerType());
@@ -220,17 +228,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 				.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ", studyIdentifier,
 					instanceId) + he.getMessage(), he);
 		}
-	}
-
-	private String getSqlForCountTotalObservationUnits() {
-		return "select count(*) as totalObservationUnits from nd_experiment nde \n"
-					+ "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
-					+ "    inner join project proj on proj.project_id = ndep.project_id \n"
-					+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
-					+ "		LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
-					+ "		LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n" + " where \n"
-					+ "	proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id where (pr.object_project_id = :studyIdentifier and name like '%PLOTDATA')) \n"
-					+ "    and gl.nd_geolocation_id = :instanceId ";
 	}
 
 	@Override
