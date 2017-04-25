@@ -68,6 +68,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 		+ "	proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id where (pr.object_project_id = :studyIdentifier and name like '%PLOTDATA')) \n"
 		+ "    and gl.nd_geolocation_id = :instanceId ";
 
+	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES = SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS + " and ph.value is not null ";
+
 	private final String TRIAL_TYPE = "T";
 
 	private TraitService trialTraits;
@@ -197,11 +199,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId) {
 		try {
-			String sql = SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS;
 
-			sql = sql + " 	and ph.value is not null ";
-
-			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
+			final SQLQuery query = this.getCurrentSession().createSQLQuery(SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES);
 			query.addScalar("totalObservationUnits", new IntegerType());
 			query.setParameter("studyIdentifier", studyIdentifier);
 			query.setParameter("instanceId", instanceId);
