@@ -43,7 +43,7 @@ import com.beust.jcommander.internal.Lists;
  * @author Akhil
  */
 public class StudyServiceImplTest {
-
+	
 	@Mock
 	private Session mockSession;
 
@@ -62,6 +62,32 @@ public class StudyServiceImplTest {
 		Mockito.when(this.mockSessionProvider.getSession()).thenReturn(this.mockSession);
 		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(this.mockSqlQuery);
 		Mockito.when(this.mockSqlQuery.addScalar(Matchers.anyString())).thenReturn(this.mockSqlQuery);
+	}
+	
+	@Test
+	public void testHasMeasurementDataOnEnvironment() throws Exception {
+
+		final Object[] testDBRow = {12345, "Gujarat, India", "GUJ", 1};
+		final List<Object[]> testResult = Arrays.<Object[]>asList(testDBRow);
+		Mockito.when(this.mockSqlQuery.list()).thenReturn(testResult);
+
+		final List<StudyInstance> studyInstances = this.studyServiceImpl.getStudyInstances(123);
+
+		final Session mockSession = Mockito.mock(Session.class);
+		final HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
+		Mockito.when(mockSessionProvider.getSession()).thenReturn(mockSession);
+
+		final StudyDataManager studyDataManager = Mockito.mock(StudyDataManager.class);
+		final UserDataManager userDataManager = Mockito.mock(UserDataManager.class);
+
+		StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
+		studyServiceImpl.setStudyDataManager(studyDataManager);
+		studyServiceImpl.setUserDataManager(userDataManager);
+		
+		StudyInstance studyInstance = studyInstances.get(0);
+		Mockito.when(studyServiceImpl.hasMeasurementDataOnEnvironment(123, studyInstance.getInstanceDbId())).thenReturn(Boolean.FALSE);
+		Assert.assertFalse(studyServiceImpl.hasMeasurementDataOnEnvironment(123, studyInstance.getInstanceDbId()));
+		
 	}
 
 	/**
