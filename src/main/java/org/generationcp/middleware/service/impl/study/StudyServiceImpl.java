@@ -475,6 +475,44 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 	}
 
+	public boolean hasMeasurementDataEntered(final List<Integer> ids, final int studyId) {
+
+		StringBuilder sqlBuilder = new StringBuilder();
+		final List queryResults;
+		try {
+			sqlBuilder.append("SELECT nde.nd_experiment_id,cvterm_variable.cvterm_id,cvterm_variable.name, count(ph.value)\n");
+			sqlBuilder.append(
+				" FROM \n" + " project p \n" + " INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
+					+ "        INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id \n"
+					+ "        INNER JOIN nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id \n"
+					+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
+					+ "        INNER JOIN nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id \n"
+					+ "        INNER JOIN stock s ON s.stock_id = es.stock_id \n"
+					+ "        LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
+					+ "        LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n"
+					+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
+					+ " WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr "
+					+ "							INNER JOIN project p ON p.project_id = pr.subject_project_id "
+					+ "  WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n"
+					+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name");
+
+			final SQLQuery query = this.getCurrentSession().createSQLQuery(sqlBuilder.toString());
+			query.setParameter("studyId", studyId);
+			query.setParameterList("cvtermIds", ids);
+
+			queryResults = query.list();
+
+		} catch (HibernateException he) {
+			throw new MiddlewareQueryException(
+				"Unexpected error in executing hasMeasurementDataEntered(studyId = " + studyId + ") query: " + he.getMessage(), he);
+		}
+
+		if (queryResults.isEmpty()) {
+			return false;
+		}
+		return true;
+	}
+
 	public StudyServiceImpl setStudyDataManager(final StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
 		return this;
