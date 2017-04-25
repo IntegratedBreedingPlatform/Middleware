@@ -68,6 +68,21 @@ public class StudyServiceImpl extends Service implements StudyService {
 		+ "	proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id where (pr.object_project_id = :studyIdentifier and name like '%PLOTDATA')) \n"
 		+ "    and gl.nd_geolocation_id = :instanceId ";
 
+	public static final String SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED = "SELECT nde.nd_experiment_id,cvterm_variable.cvterm_id,cvterm_variable.name, count(ph.value) \n"
+		+ " FROM \n" + " project p \n" + " INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
+		+ "        INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id \n"
+		+ "        INNER JOIN nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id \n"
+		+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
+		+ "        INNER JOIN nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id \n"
+		+ "        INNER JOIN stock s ON s.stock_id = es.stock_id \n"
+		+ "        LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
+		+ "        LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n"
+		+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
+		+ " WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr "
+		+ "							INNER JOIN project p ON p.project_id = pr.subject_project_id "
+		+ "  WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n"
+		+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name";
+
 	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES = SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS + " and ph.value is not null ";
 
 	private final String TRIAL_TYPE = "T";
@@ -496,30 +511,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	public boolean hasMeasurementDataEntered(final List<Integer> ids, final int studyId) {
-
-		StringBuilder sqlBuilder = new StringBuilder();
 		final List queryResults;
 		try {
-			sqlBuilder.append("SELECT nde.nd_experiment_id,cvterm_variable.cvterm_id,cvterm_variable.name, count(ph.value)\n");
-			sqlBuilder.append(
-				" FROM \n" + " project p \n" + " INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
-					+ "        INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id \n"
-					+ "        INNER JOIN nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id \n"
-					+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
-					+ "        INNER JOIN nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id \n"
-					+ "        INNER JOIN stock s ON s.stock_id = es.stock_id \n"
-					+ "        LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
-					+ "        LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n"
-					+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
-					+ " WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr "
-					+ "							INNER JOIN project p ON p.project_id = pr.subject_project_id "
-					+ "  WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n"
-					+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name");
-
-			final SQLQuery query = this.getCurrentSession().createSQLQuery(sqlBuilder.toString());
+			final SQLQuery query = this.getCurrentSession().createSQLQuery(SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED);
 			query.setParameter("studyId", studyId);
 			query.setParameterList("cvtermIds", ids);
-
 			queryResults = query.list();
 
 		} catch (HibernateException he) {
