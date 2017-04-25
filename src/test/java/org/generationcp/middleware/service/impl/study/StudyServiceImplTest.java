@@ -43,7 +43,7 @@ import com.beust.jcommander.internal.Lists;
  * @author Akhil
  */
 public class StudyServiceImplTest {
-
+	
 	@Mock
 	private Session mockSession;
 
@@ -62,6 +62,36 @@ public class StudyServiceImplTest {
 		Mockito.when(this.mockSessionProvider.getSession()).thenReturn(this.mockSession);
 		Mockito.when(this.mockSession.createSQLQuery(Matchers.anyString())).thenReturn(this.mockSqlQuery);
 		Mockito.when(this.mockSqlQuery.addScalar(Matchers.anyString())).thenReturn(this.mockSqlQuery);
+	}
+
+	@Test
+	public void testHasMeasurementDataOnEnvironmentAssertTrue() throws Exception {
+		Mockito.when(this.mockSqlQuery.uniqueResult()).thenReturn(1);
+
+		final Session mockSession = Mockito.mock(Session.class);
+		final HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
+		Mockito.when(mockSessionProvider.getSession()).thenReturn(mockSession);
+		Mockito.when(mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
+				.thenReturn(mockSqlQuery);
+
+		StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
+
+		Assert.assertTrue(studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
+	}
+
+	@Test
+	public void testHasMeasurementDataOnEnvironmentAssertFalse() throws Exception {
+		Mockito.when(this.mockSqlQuery.uniqueResult()).thenReturn(0);
+
+		final Session mockSession = Mockito.mock(Session.class);
+		final HibernateSessionProvider mockSessionProvider = Mockito.mock(HibernateSessionProvider.class);
+		Mockito.when(mockSessionProvider.getSession()).thenReturn(mockSession);
+		Mockito.when(mockSessionProvider.getSession().createSQLQuery(StudyServiceImpl.SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES))
+				.thenReturn(mockSqlQuery);
+
+		StudyServiceImpl studyServiceImpl = new StudyServiceImpl(mockSessionProvider);
+
+		Assert.assertFalse(studyServiceImpl.hasMeasurementDataOnEnvironment(123, 4));
 	}
 
 	/**
