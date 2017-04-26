@@ -73,9 +73,9 @@ class ObservationQuery {
 			+ "            WHERE ndep.nd_experiment_id = ep.nd_experiment_id  AND ispcvt.name = 'COL') COL";
 
 
-	String getAllObservationsQuery(final List<TraitDto> traits, List<String> germplasmDescriptors, final String sortBy,
+	String getAllObservationsQuery(final List<TraitDto> selectionMethodsAndTraits, List<String> germplasmDescriptors, final String sortBy,
 			final String sortOrder) {
-		return this.getObservationsMainQuery(traits, germplasmDescriptors) + getInstanceNumberClause() + getGroupingClause()
+		return this.getObservationsMainQuery(selectionMethodsAndTraits, germplasmDescriptors) + getInstanceNumberClause() + getGroupingClause()
 				+ getOrderingClause(sortBy, sortOrder);
 	}
 
@@ -172,7 +172,7 @@ class ObservationQuery {
 		return columnNames.toString();
 	}
 
-	String getObservationsMainQuery(final List<TraitDto> traits, List<String> germplasmDescriptors) {
+	String getObservationsMainQuery(final List<TraitDto> selectionMethodsAndTraits, List<String> germplasmDescriptors) {
 		StringBuilder sqlBuilder = new StringBuilder();
 		
 		sqlBuilder.append( 
@@ -195,7 +195,7 @@ class ObservationQuery {
 				" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n" +
 				" MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n";
 
-		for (TraitDto trait : traits) {
+		for (TraitDto trait : selectionMethodsAndTraits) {
 			sqlBuilder.append(String.format(traitClauseFormat, trait.getTraitName(), trait.getTraitName(),
 					trait.getTraitName(), trait.getTraitName() + "_PhenotypeId"));
 		}
