@@ -167,12 +167,14 @@ public class StudyTestDataInitializer {
 		datasetValues.setDescription("My Dataset Description");
 		datasetValues.setType(DataSetType.MEANS_DATA);
 
-		DMSVariableType variableType = this.createVariableType(18000, "Grain Yield", "Grain Yield", 4);
-		variableType.setLocalName("Grain Yield");
+		DMSVariableType variableType =
+			this.createVariableType(51570, "GY_Adj_kgha", "Grain yield BY Adjusted GY - Computation IN Kg/ha", 4);
+		variableType.setLocalName("GY_Adj_kgha");
 		typeList.add(variableType);
 
-		variableType = this.createVariableType(18050, "Disease Pressure", "Disease Pressure", 5);
-		variableType.setLocalName("Disease Pressure");
+		variableType =
+			this.createVariableType(20444, "SCMVInc_Cmp_pct", "Sugarcane mosaic virus incidence BY SCMVInc - Computation IN %", 5);
+		variableType.setLocalName("Aphid damage");
 		typeList.add(variableType);
 
 		variableType = this.createVariableType(TermId.PLOT_NO.getId(), "Plot No", "Plot No", 6);
