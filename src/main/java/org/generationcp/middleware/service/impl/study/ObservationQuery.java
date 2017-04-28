@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 import org.fest.util.Collections;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.service.api.study.TraitDto;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
@@ -73,9 +73,9 @@ class ObservationQuery {
 			+ "            WHERE ndep.nd_experiment_id = ep.nd_experiment_id  AND ispcvt.name = 'COL') COL";
 
 
-	String getAllObservationsQuery(final List<TraitDto> selectionMethodsAndTraits, List<String> germplasmDescriptors, final String sortBy,
+	String getAllObservationsQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors, final String sortBy,
 			final String sortOrder) {
-		return this.getObservationsMainQuery(selectionMethodsAndTraits, germplasmDescriptors) + getInstanceNumberClause() + getGroupingClause()
+		return this.getObservationsMainQuery(measurementVariables, germplasmDescriptors) + getInstanceNumberClause() + getGroupingClause()
 				+ getOrderingClause(sortBy, sortOrder);
 	}
 
@@ -83,29 +83,29 @@ class ObservationQuery {
 	 * Constructs a query that will enable us to retrieve information about all plots, associated metadata and measurements in one go, for a
 	 * trial/nursery.
 	 *
-	 * @param traits list of traits that we need to construct a query for.
+	 * @param measurementVariables list of measurementVariables that we need to construct a query for.
 	 */
-	String getObservationQuery(final List<TraitDto> traits) {
+	String getObservationQuery(final List<MeasurementVariableDto> measurementVariables) {
 
-		final String columnNamesFromTraitNames = this.getColumnNamesFromTraitNames(traits);
-		final String orderByTraitId = getOrderByTraitId(traits);
+		final String columnNamesFromTraitNames = this.getColumnNamesFromTraitNames(measurementVariables);
+		final String orderByTraitId = getOrderByTraitId(measurementVariables);
 
-		final String fromText = getFromExpression(traits);
+		final String fromText = getFromExpression(measurementVariables);
 
-		final String orderByText = getOrderByExpression(traits, orderByTraitId);
+		final String orderByText = getOrderByExpression(measurementVariables, orderByTraitId);
 
 		return selectText + columnNamesFromTraitNames +
 
 				fromText + whereText + orderByText;
 	}
 
-	String getObservationQueryWithBlockRowCol(final List<TraitDto> traits, Integer instanceId) {
-		final String columnNamesFromTraitNames = this.getColumnNamesFromTraitNames(traits);
-		final String orderByTraitId = getOrderByTraitId(traits);
+	String getObservationQueryWithBlockRowCol(final List<MeasurementVariableDto> measurementVariables, Integer instanceId) {
+		final String columnNamesFromTraitNames = this.getColumnNamesFromTraitNames(measurementVariables);
+		final String orderByTraitId = getOrderByTraitId(measurementVariables);
 
-		final String fromText = getFromExpression(traits);
+		final String fromText = getFromExpression(measurementVariables);
 
-		final String orderByText = getOrderByExpression(traits, orderByTraitId);
+		final String orderByText = getOrderByExpression(measurementVariables, orderByTraitId);
 
 		String whereText = this.whereText;
 
@@ -122,19 +122,19 @@ class ObservationQuery {
 				fromText + whereText + orderByText;
 	}
 
-	private String getOrderByExpression(final List<TraitDto> traits, final String orderByTraitId) {
-		final String orderByText = Collections.isNullOrEmpty(traits) ? "" : " ORDER BY " + orderByTraitId;
+	private String getOrderByExpression(final List<MeasurementVariableDto> variables, final String orderByTraitId) {
+		final String orderByText = Collections.isNullOrEmpty(variables) ? "" : " ORDER BY " + orderByTraitId;
 		return orderByText;
 	}
 
-	private String getFromExpression(final List<TraitDto> traits) {
+	private String getFromExpression(final List<MeasurementVariableDto> variables) {
 		final String fromText = " FROM\n" + "    Project p\n" + "        INNER JOIN\n"
 				+ "    project_relationship pr ON p.project_id = pr.subject_project_id\n" + "        INNER JOIN\n"
 				+ "    nd_experiment_project ep ON pr.subject_project_id = ep.project_id\n" + "        INNER JOIN\n"
 				+ "    nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id\n" + "        INNER JOIN\n"
 				+ "    nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id\n" + "        INNER JOIN\n"
 				+ "    nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id\n" + "        INNER JOIN\n"
-				+ "    Stock s ON s.stock_id = es.stock_id\n" + this.getTraitDeatilsJoin(traits) 
+				+ "    Stock s ON s.stock_id = es.stock_id\n" + this.getTraitDeatilsJoin(variables)
 
 				+ "    LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = ep.nd_experiment_id AND FieldMapRow.type_id = " + TermId.RANGE_NO.getId() + "\n"
 				+ "    LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = ep.nd_experiment_id AND FieldMapCol.type_id = " + TermId.COLUMN_NO.getId() + "\n"
@@ -144,25 +144,25 @@ class ObservationQuery {
 		return fromText;
 	}
 
-	String getSingleObservationQueryNonOrdered(final List<TraitDto> traits) {
-		return this.getObservationQuery(traits) + "AND nde.nd_experiment_id = ?";
+	String getSingleObservationQueryNonOrdered(final List<MeasurementVariableDto> measurementVariables) {
+		return this.getObservationQuery(measurementVariables) + "AND nde.nd_experiment_id = ?";
 
 	}
 
-	String getSingleObservationQuery(final List<TraitDto> traits, List<String> germplasmDescriptors) {
-		return this.getObservationsMainQuery(traits, germplasmDescriptors) + " AND nde.nd_experiment_id = :experiment_id \n"
+	String getSingleObservationQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors) {
+		return this.getObservationsMainQuery(measurementVariables, germplasmDescriptors) + " AND nde.nd_experiment_id = :experiment_id \n"
 				+ getGroupingClause();
 	}
 
-	private String getColumnNamesFromTraitNames(final List<TraitDto> traits) {
+	private String getColumnNamesFromTraitNames(final List<MeasurementVariableDto> measurementVariables) {
 		final StringBuffer columnNames = new StringBuffer();
-		int size = traits.size();
+		int size = measurementVariables.size();
 		for (int i = 0; i < size; i++) {
 			if (i == 0) {
 				columnNames.append(", \n");
 			}
-			columnNames.append(traits.get(i).getTraitName() + "." + "PhenotypeValue AS " + traits.get(i).getTraitName() + ",\n");
-			columnNames.append(traits.get(i).getTraitName() + "." + "phenotype_id AS " + traits.get(i).getTraitName() + "_PhenotypeId"
+			columnNames.append(measurementVariables.get(i).getName() + "." + "PhenotypeValue AS " + measurementVariables.get(i).getName() + ",\n");
+			columnNames.append(measurementVariables.get(i).getName() + "." + "phenotype_id AS " + measurementVariables.get(i).getName() + "_PhenotypeId"
 					+ "\n");
 
 			if (!(i == size - 1)) {
@@ -172,7 +172,7 @@ class ObservationQuery {
 		return columnNames.toString();
 	}
 
-	String getObservationsMainQuery(final List<TraitDto> selectionMethodsAndTraits, List<String> germplasmDescriptors) {
+	String getObservationsMainQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors) {
 		StringBuilder sqlBuilder = new StringBuilder();
 		
 		sqlBuilder.append( 
@@ -197,9 +197,9 @@ class ObservationQuery {
 				" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n" +
 				" MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n";
 
-		for (TraitDto trait : selectionMethodsAndTraits) {
-			sqlBuilder.append(String.format(traitClauseFormat, trait.getTraitName(), trait.getTraitName(),
-					trait.getTraitName(), trait.getTraitName() + "_PhenotypeId"));
+		for (MeasurementVariableDto measurementVariable : measurementVariables) {
+			sqlBuilder.append(String.format(traitClauseFormat, measurementVariable.getName(), measurementVariable.getName(),
+				measurementVariable.getName(), measurementVariable.getName() + "_PhenotypeId"));
 		}
 		
 		if (!germplasmDescriptors.isEmpty()) {
@@ -249,34 +249,34 @@ class ObservationQuery {
 		return " GROUP BY nde.nd_experiment_id ";
 	}
 
-	private static String getOrderByTraitId(final List<TraitDto> traits) {
-		return Joiner.on(",").join(Lists.transform(traits, new Function<TraitDto, String>() {
+	private static String getOrderByTraitId(final List<MeasurementVariableDto> measurementVariables) {
+		return Joiner.on(",").join(Lists.transform(measurementVariables, new Function<MeasurementVariableDto, String>() {
 
 			@Nullable
 			@Override
-			public String apply(final TraitDto traitDto) {
-				return traitDto.getTraitName() + "_PhenotypeId";
+			public String apply(final MeasurementVariableDto measurementVariables) {
+				return measurementVariables.getName() + "_PhenotypeId";
 			}
 		}));
 	}
 
-	private String getTraitDeatilsJoin(final List<TraitDto> traits) {
+	private String getTraitDeatilsJoin(final List<MeasurementVariableDto> measurementVariables) {
 
 		final StringBuffer leftOuterJoinQuery = new StringBuffer();
-		for (TraitDto trait : traits) {
-			leftOuterJoinQuery.append(this.getTraitDeatilsJoinQuery(trait));
+		for (MeasurementVariableDto measurementVariable : measurementVariables) {
+			leftOuterJoinQuery.append(this.getTraitDeatilsJoinQuery(measurementVariable));
 		}
 		return leftOuterJoinQuery.toString();
 
 	}
 
 	// use the id
-	private String getTraitDeatilsJoinQuery(final TraitDto trait) {
+	private String getTraitDeatilsJoinQuery(final MeasurementVariableDto measurementVariabl) {
 		return "        LEFT OUTER JOIN\n" + "    (SELECT \n" + "        nep.nd_experiment_id,\n" + "            pt.phenotype_id,\n"
 				+ "            IF(cvterm_id = cvterm_id, pt.value, NULL) AS PhenotypeValue\n" + "    FROM\n" + "        phenotype pt\n"
 				+ "    INNER JOIN cvterm svdo ON svdo.cvterm_id = pt.observable_id\n"
 				+ "    INNER JOIN nd_experiment_phenotype nep ON nep.phenotype_id = pt.phenotype_id\n" + "    WHERE\n"
-				+ "        svdo.name = ? ) " + trait.getTraitName() + " ON " + trait.getTraitName()
+				+ "        svdo.name = ? ) " + measurementVariabl.getName() + " ON " + measurementVariabl.getName()
 				+ ".nd_experiment_id = nde.nd_experiment_id\n";
 	}
 }

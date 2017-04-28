@@ -4,8 +4,8 @@ package org.generationcp.middleware.service.impl.study;
 import java.util.Arrays;
 import java.util.List;
 
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.TraitDto;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.type.IntegerType;
@@ -27,7 +27,7 @@ public class StudyMeasurementsTest {
 	private Session session;
 	private StudyMeasurements trailTraits;
 	private SQLQuery mockSqlQuery;
-	private List<TraitDto> testTraits;
+	private List<MeasurementVariableDto> testTraits;
 	private List<String> germplasmDescriptors;
 	private Object[] testRows;
 	private List<Object[]> sampleMeasurements;
@@ -42,7 +42,7 @@ public class StudyMeasurementsTest {
 		this.trailTraits = new StudyMeasurements(this.session);
 
 		this.mockSqlQuery = Mockito.mock(SQLQuery.class);
-		this.testTraits = Arrays.asList(new TraitDto(1, "Trait1"), new TraitDto(2, "Trait2"));
+		this.testTraits = Arrays.asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(2, "Trait2"));
 		this.germplasmDescriptors = Lists.newArrayList("STOCK_ID");
 		this.testRows =
 				new Object[] {1, "TRIAL_INSTACE", "ENTRY_TYPE", 20000, "DESIGNATION", "ENTRY_NO", "SEED_SOURCE", "REPITION_NUMBER",
@@ -114,8 +114,8 @@ public class StudyMeasurementsTest {
 		}
 
 		// Trait PhenotypeIds as IntegerType for each trait
-		for (TraitDto t : this.testTraits) {
-			Mockito.verify(this.mockSqlQuery).addScalar(Matchers.eq(t.getTraitName() + "_PhenotypeId"), Matchers.any(IntegerType.class));
+		for (MeasurementVariableDto t : this.testTraits) {
+			Mockito.verify(this.mockSqlQuery).addScalar(Matchers.eq(t.getName() + "_PhenotypeId"), Matchers.any(IntegerType.class));
 		}
 	}
 }

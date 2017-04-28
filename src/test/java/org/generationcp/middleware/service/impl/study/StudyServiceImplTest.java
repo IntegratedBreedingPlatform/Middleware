@@ -17,14 +17,14 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.UserDataManager;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
+import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmListService;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudySummary;
-import org.generationcp.middleware.service.api.study.TraitDto;
-import org.generationcp.middleware.service.api.study.TraitService;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -135,7 +135,7 @@ public class StudyServiceImplTest {
 	 */
 	@Test
 	public void listMeasurementData() throws Exception {
-		final TraitService mockTrialTraits = Mockito.mock(TraitService.class);
+		final MeasurementVariableService mockTrialTraits = Mockito.mock(MeasurementVariableService.class);
 		final StudyMeasurements mockTrailMeasurements = Mockito.mock(StudyMeasurements.class);
 		final StudyGermplasmListService mockStudyGermplasmListService = Mockito.mock(StudyGermplasmListService.class);
 		final GermplasmDescriptors germplasmDescriptorService = Mockito.mock(GermplasmDescriptors.class);
@@ -143,11 +143,11 @@ public class StudyServiceImplTest {
 		final StudyServiceImpl result =
 				new StudyServiceImpl(mockTrialTraits, mockTrailMeasurements, mockStudyGermplasmListService, germplasmDescriptorService);
 
-		final List<TraitDto> projectTraits = Arrays.<TraitDto>asList(new TraitDto(1, "Trait1"), new TraitDto(1, "Trait2"));
+		final List<MeasurementVariableDto> projectTraits = Arrays.<MeasurementVariableDto>asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(1, "Trait2"));
 		final List<String> germplasmDescriptors = Lists.newArrayList("STOCK_ID");
-		Mockito.when(mockTrialTraits.getTraits(1234)).thenReturn(projectTraits);
+		Mockito.when(mockTrialTraits.getVariables(1234)).thenReturn(projectTraits);
 		final List<MeasurementDto> traits = new ArrayList<MeasurementDto>();
-		traits.add(new MeasurementDto(new TraitDto(1, "traitName"), 9999, "triatValue"));
+		traits.add(new MeasurementDto(new MeasurementVariableDto(1, "traitName"), 9999, "triatValue"));
 		final ObservationDto measurement = new ObservationDto(1, "trialInstance", "entryType", 1234, "designation", "entryNo", "seedSource",
 				"repitionNumber", "plotNumber", "blockNumber", traits);
 		final List<ObservationDto> testMeasurements = Collections.<ObservationDto>singletonList(measurement);
