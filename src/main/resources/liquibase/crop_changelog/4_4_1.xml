@@ -140,4 +140,17 @@
 
 	</changeSet>
 
+	<changeSet author="nahuel" id="v4.4.1-5">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					select case when 'ibdbv2_wheat_merged' = DATABASE() then 1 else 0 end from dual;
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			UPDATE cvterm SET definition = trim(definition) WHERE cv_id = 20000;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
