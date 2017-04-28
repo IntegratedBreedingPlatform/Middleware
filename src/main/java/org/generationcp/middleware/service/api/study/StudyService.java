@@ -10,7 +10,9 @@ public interface StudyService {
 
 	List<StudySummary> search(final StudySearchParameters serchParameters);
 
-	int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
+	public boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId);
+
+	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId);
 
 	List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber, final int pageSize,
 			final String sortBy, final String sortOrder);
@@ -41,4 +43,13 @@ public interface StudyService {
 	 * @return StudyDetailsDto
 	 */
 	StudyDetailsDto getStudyDetails(Integer studyId) throws MiddlewareQueryException;
+
+	/**
+	 *
+	 * @param ids of the variables that i need to check data
+	 * @param studyId id for the study (Nursery / Trial)
+	 * @return the true if any id have data on the study
+	 * @throws MiddlewareQueryException
+	 */
+	boolean hasMeasurementDataEntered(final List<Integer> ids,final int studyId) throws MiddlewareQueryException;
 }

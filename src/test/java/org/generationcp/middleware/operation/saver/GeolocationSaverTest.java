@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.domain.dms.DMSVariableType;
+import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
@@ -26,18 +27,30 @@ import org.mockito.Mockito;
 
 public class GeolocationSaverTest {
 
+	public static final String EXPERIMENT_DESIGN_FACTOR_RCBD = "RCBD";
+	public static final int EXPERIMENT_DESIGN_FACTOR_RCBD_ID = 10110;
+
 	private GeolocationSaver geolocationSaver;
 	private Geolocation geolocation;
 
 	private enum EnvironmentVariable {
 
-		TRIAL_INSTANCE(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.TRIAL_INSTANCE_FACTOR.toString(), PhenotypicType.TRIAL_ENVIRONMENT, "1"), LATITUDE(
-				TermId.LATITUDE.getId(), TermId.LATITUDE.toString(), PhenotypicType.TRIAL_ENVIRONMENT, "1.5"), LONGITUDE(TermId.LONGITUDE
-				.getId(), TermId.LONGITUDE.toString(), PhenotypicType.TRIAL_ENVIRONMENT, "3.6"), GEODETIC_DATUM(TermId.GEODETIC_DATUM
-				.getId(), TermId.GEODETIC_DATUM.toString(), PhenotypicType.TRIAL_ENVIRONMENT, "1"), ALTITUDE(TermId.ALTITUDE.getId(),
-												TermId.ALTITUDE.toString(), PhenotypicType.TRIAL_ENVIRONMENT, "5.5"), ENV_1(1, "ENV_1", PhenotypicType.TRIAL_ENVIRONMENT,
-				"3"), ENV_2(2, "ENV_2", PhenotypicType.TRIAL_ENVIRONMENT, "4"), ENV_3(3, "ENV_2", PhenotypicType.TRIAL_ENVIRONMENT, "5"), VARIATE_1(
-				4, "VARIATE_1", PhenotypicType.VARIATE, "7"), VARIATE_2(5, "VARIATE_2", PhenotypicType.VARIATE, "2");
+		TRIAL_INSTANCE(
+			TermId.TRIAL_INSTANCE_FACTOR.getId(),
+			TermId.TRIAL_INSTANCE_FACTOR.toString(),
+			PhenotypicType.TRIAL_ENVIRONMENT,
+			"1"),
+		LATITUDE(TermId.LATITUDE.getId(), TermId.LATITUDE.toString(), PhenotypicType.TRIAL_ENVIRONMENT, "1.5"),
+		LONGITUDE(TermId.LONGITUDE.getId(), TermId.LONGITUDE.toString(), PhenotypicType.TRIAL_ENVIRONMENT, "3.6"),
+		GEODETIC_DATUM(TermId.GEODETIC_DATUM.getId(), TermId.GEODETIC_DATUM.toString(), PhenotypicType.TRIAL_ENVIRONMENT, "1"),
+		ALTITUDE(TermId.ALTITUDE.getId(), TermId.ALTITUDE.toString(), PhenotypicType.TRIAL_ENVIRONMENT, "5.5"),
+		ENV_1(1, "ENV_1", PhenotypicType.TRIAL_ENVIRONMENT, "3"),
+		ENV_2(2, "ENV_2", PhenotypicType.TRIAL_ENVIRONMENT, "4"),
+		ENV_3(3, "ENV_2", PhenotypicType.TRIAL_ENVIRONMENT, "5"),
+		ENV_4(TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.EXPERIMENT_DESIGN_FACTOR.name(), PhenotypicType.TRIAL_ENVIRONMENT,
+			EXPERIMENT_DESIGN_FACTOR_RCBD),
+		VARIATE_1(4, "VARIATE_1", PhenotypicType.VARIATE, "7"),
+		VARIATE_2(5, "VARIATE_2", PhenotypicType.VARIATE, "2");
 
 		private int id;
 		private String name;
@@ -86,11 +99,15 @@ public class GeolocationSaverTest {
 		assertEquals(EnvironmentVariable.GEODETIC_DATUM.getValue(), geolocation.getGeodeticDatum());
 		assertEquals(EnvironmentVariable.ALTITUDE.getValue(), geolocation.getAltitude().toString());
 		assertNotNull(geolocation.getProperties());
-		assertEquals(3, geolocation.getProperties().size());
+		assertEquals(4, geolocation.getProperties().size());
 		int propertyIndex = 0;
 		for (GeolocationProperty property : geolocation.getProperties()) {
 			propertyIndex++;
 			EnvironmentVariable environmentVariable = null;
+			if (propertyIndex == 4) {
+				assertEquals(String.valueOf(GeolocationSaverTest.EXPERIMENT_DESIGN_FACTOR_RCBD_ID), property.getValue());
+				continue;
+			}
 			switch (propertyIndex) {
 				case 1:
 					environmentVariable = EnvironmentVariable.ENV_1;
@@ -130,7 +147,7 @@ public class GeolocationSaverTest {
 
 	private List<MeasurementData> createMeasurementDataList() {
 		List<MeasurementData> dataList = new ArrayList<MeasurementData>();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < EnvironmentVariable.values().length; i++) {
 			EnvironmentVariable variable = EnvironmentVariable.values()[i];
 			String label = variable.getName();
 			String value = variable.getValue();
@@ -148,7 +165,7 @@ public class GeolocationSaverTest {
 
 	private VariableList createVariableList() {
 		VariableList variableList = new VariableList();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < EnvironmentVariable.values().length; i++) {
 			EnvironmentVariable variable = EnvironmentVariable.values()[i];
 			int standardVariableId = variable.getId();
 			String name = variable.getName();
@@ -180,6 +197,10 @@ public class GeolocationSaverTest {
 	private StandardVariable createStandardVariable(int id) {
 		StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(id);
+		standardVariable.setEnumerations(new ArrayList<Enumeration>());
+		standardVariable.getEnumerations()
+			.add(new Enumeration(GeolocationSaverTest.EXPERIMENT_DESIGN_FACTOR_RCBD_ID, GeolocationSaverTest.EXPERIMENT_DESIGN_FACTOR_RCBD,
+				"", 1));
 		return standardVariable;
 	}
 

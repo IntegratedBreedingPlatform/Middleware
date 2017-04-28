@@ -25,7 +25,9 @@ class ObservationQuery {
 			+ "            cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id\n" + "                INNER JOIN\n"
 			+ "            cvterm iispcvt ON iispcvt.cvterm_id = isp.value\n" + "        WHERE\n"
 			+ "            isp.stock_id = s.stock_id\n" + "                AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE,\n"
-			+ "    s.dbxref_id AS GID,\n" + "    s.name DESIGNATION,\n" + "    s.uniquename ENTRY_NO,\n" + "    (SELECT \n"
+			+ "    s.dbxref_id AS GID,\n" + "    s.name DESIGNATION,\n" + "    s.uniquename ENTRY_NO,\n"
+			+ "    s.value as ENTRY_CODE,\n"
+			+ "    (SELECT \n"
 			+ "            isp.value\n" + "        FROM\n" + "            stockprop isp\n" + "                INNER JOIN\n"
 			+ "            cvterm ispcvt1 ON ispcvt1.cvterm_id = isp.type_id\n" + "        WHERE\n"
 			+ "            isp.stock_id = s.stock_id\n" + "                AND ispcvt1.name = 'SEED_SOURCE') SEED_SOURCE,\n"
@@ -34,7 +36,8 @@ class ObservationQuery {
 			+ "            ndep.nd_experiment_id = ep.nd_experiment_id\n" + "                AND ispcvt.name = 'REP_NO') REP_NO,\n"
 			+ "    (SELECT \n" + "            ndep.value\n" + "        FROM\n" + "            nd_experimentprop ndep\n"
 			+ "                INNER JOIN\n" + "            cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id\n" + "        WHERE\n"
-			+ "            ndep.nd_experiment_id = ep.nd_experiment_id\n" + "                AND ispcvt.name = 'PLOT_NO') PLOT_NO\n";
+			+ "            ndep.nd_experiment_id = ep.nd_experiment_id\n" + "                AND ispcvt.name = 'PLOT_NO') PLOT_NO,\n"
+			+ "    nde.plot_id as PLOT_ID \n";
 
 	final String locationNameSubQuery = "(SELECT \n" +
 			"            l.lname \n" +
@@ -63,16 +66,16 @@ class ObservationQuery {
 
 	final String rowNumberText = "(SELECT  ndep.value   FROM    nd_experimentprop ndep"
 			+ "            INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id"
-			+ "            WHERE ndep.nd_experiment_id = ep.nd_experiment_id  AND ispcvt.name = 'ROW') ROW_NO";
+			+ "            WHERE ndep.nd_experiment_id = ep.nd_experiment_id  AND ispcvt.name = 'ROW') ROW";
 
 	final String columnNumberText = "(SELECT  ndep.value   FROM    nd_experimentprop ndep"
 			+ "            INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id"
-			+ "            WHERE ndep.nd_experiment_id = ep.nd_experiment_id  AND ispcvt.name = 'COL') COL_NO";
+			+ "            WHERE ndep.nd_experiment_id = ep.nd_experiment_id  AND ispcvt.name = 'COL') COL";
 
 
-	String getAllObservationsQuery(final List<TraitDto> traits, List<String> germplasmDescriptors, final String sortBy,
+	String getAllObservationsQuery(final List<TraitDto> selectionMethodsAndTraits, List<String> germplasmDescriptors, final String sortBy,
 			final String sortOrder) {
-		return this.getObservationsMainQuery(traits, germplasmDescriptors) + getInstanceNumberClause() + getGroupingClause()
+		return this.getObservationsMainQuery(selectionMethodsAndTraits, germplasmDescriptors) + getInstanceNumberClause() + getGroupingClause()
 				+ getOrderingClause(sortBy, sortOrder);
 	}
 
@@ -169,7 +172,7 @@ class ObservationQuery {
 		return columnNames.toString();
 	}
 
-	String getObservationsMainQuery(final List<TraitDto> traits, List<String> germplasmDescriptors) {
+	String getObservationsMainQuery(final List<TraitDto> selectionMethodsAndTraits, List<String> germplasmDescriptors) {
 		StringBuilder sqlBuilder = new StringBuilder();
 		
 		sqlBuilder.append( 
@@ -192,7 +195,7 @@ class ObservationQuery {
 				" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n" +
 				" MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n";
 
-		for (TraitDto trait : traits) {
+		for (TraitDto trait : selectionMethodsAndTraits) {
 			sqlBuilder.append(String.format(traitClauseFormat, trait.getTraitName(), trait.getTraitName(),
 					trait.getTraitName(), trait.getTraitName() + "_PhenotypeId"));
 		}

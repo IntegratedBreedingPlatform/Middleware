@@ -24,11 +24,11 @@ public class StudyMeasurements {
 
 	}
 
-	List<ObservationDto> getAllMeasurements(final int projectBusinessIdentifier, final List<TraitDto> traits,
+	List<ObservationDto> getAllMeasurements(final int projectBusinessIdentifier, final List<TraitDto> selectionMethodsAndTraits,
 			List<String> germplasmDescriptors, final int instanceId,
 			final int pageNumber, final int pageSize, final String sortBy, final String sortOrder) {
-		final String generateQuery = this.measurementQuery.getAllObservationsQuery(traits, germplasmDescriptors, sortBy, sortOrder);
-		return this.executeQueryAndMapResults(projectBusinessIdentifier, traits, germplasmDescriptors, generateQuery, instanceId,
+		final String generateQuery = this.measurementQuery.getAllObservationsQuery(selectionMethodsAndTraits, germplasmDescriptors, sortBy, sortOrder);
+		return this.executeQueryAndMapResults(projectBusinessIdentifier, selectionMethodsAndTraits, germplasmDescriptors, generateQuery, instanceId,
 				pageNumber, pageSize);
 	}
 
@@ -47,16 +47,16 @@ public class StudyMeasurements {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier, final List<TraitDto> traits,
+	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier, final List<TraitDto> selectionMethodsAndTraits,
 			List<String> germplasmDescriptors, final String generateQuery, final int instanceId, final int pageNumber, final int pageSize) {
-		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(traits, germplasmDescriptors, generateQuery);
+		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(selectionMethodsAndTraits, germplasmDescriptors, generateQuery);
 		createSQLQuery.setParameter("studyId", projectBusinessIdentifier);
 		createSQLQuery.setParameter("instanceId", String.valueOf(instanceId));
 
 		createSQLQuery.setFirstResult(pageSize * (pageNumber - 1));
 		createSQLQuery.setMaxResults(pageSize);
 
-		return this.mapResults(createSQLQuery.list(), traits, germplasmDescriptors);
+		return this.mapResults(createSQLQuery.list(), selectionMethodsAndTraits, germplasmDescriptors);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -68,12 +68,12 @@ public class StudyMeasurements {
 		return this.mapResults(createSQLQuery.list(), traits, germplasmDescriptors);
 	}
 
-	private SQLQuery createQueryAndAddScalar(final List<TraitDto> traits, List<String> germplasmDescriptors, final String generateQuery) {
+	private SQLQuery createQueryAndAddScalar(final List<TraitDto> selectionMethodsAndTraits, List<String> germplasmDescriptors, final String generateQuery) {
 		final SQLQuery createSQLQuery = this.session.createSQLQuery(generateQuery);
 
 		this.addScalar(createSQLQuery);
 
-		this.addScalarForTraits(traits, createSQLQuery);
+		this.addScalarForTraits(selectionMethodsAndTraits, createSQLQuery);
 
 		for (String gpDescriptor : germplasmDescriptors) {
 			createSQLQuery.addScalar(gpDescriptor, new StringType());
@@ -82,8 +82,8 @@ public class StudyMeasurements {
 		return createSQLQuery;
 	}
 
-	private void addScalarForTraits(final List<TraitDto> traits, final SQLQuery createSQLQuery) {
-		for (final TraitDto trait : traits) {
+	private void addScalarForTraits(final List<TraitDto> selectionMethodsAndTraits, final SQLQuery createSQLQuery) {
+		for (final TraitDto trait : selectionMethodsAndTraits) {
 			createSQLQuery.addScalar(trait.getTraitName());
 			createSQLQuery.addScalar(trait.getTraitName() + "_PhenotypeId", new IntegerType());
 		}
@@ -177,9 +177,6 @@ public class StudyMeasurements {
 		final SQLQuery createSQLQuery = this.session.createSQLQuery(generateQuery);
 
 		this.addScalar(createSQLQuery);
-		createSQLQuery.addScalar("BLOCK_NO");
-		createSQLQuery.addScalar("ROW_NO");
-		createSQLQuery.addScalar("COL_NO");
 		createSQLQuery.addScalar("LocationName");
 		createSQLQuery.addScalar("LocationAbbreviation");
 		createSQLQuery.addScalar("FieldMapColumn");

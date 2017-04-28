@@ -59,6 +59,31 @@ import com.google.common.collect.Ordering;
 public class StudyServiceImpl extends Service implements StudyService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StudyServiceImpl.class);
+	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS = "select count(*) as totalObservationUnits from nd_experiment nde \n"
+		+ "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
+		+ "    inner join project proj on proj.project_id = ndep.project_id \n"
+		+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
+		+ "		LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
+		+ "		LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n" + " where \n"
+		+ "	proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id where (pr.object_project_id = :studyIdentifier and name like '%PLOTDATA')) \n"
+		+ "    and gl.nd_geolocation_id = :instanceId ";
+
+	public static final String SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED = "SELECT nde.nd_experiment_id,cvterm_variable.cvterm_id,cvterm_variable.name, count(ph.value) \n"
+		+ " FROM \n" + " project p \n" + " INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
+		+ "        INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id \n"
+		+ "        INNER JOIN nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id \n"
+		+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
+		+ "        INNER JOIN nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id \n"
+		+ "        INNER JOIN stock s ON s.stock_id = es.stock_id \n"
+		+ "        LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
+		+ "        LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n"
+		+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
+		+ " WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr "
+		+ "							INNER JOIN project p ON p.project_id = pr.subject_project_id "
+		+ "  WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n"
+		+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name";
+
+	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES = SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS + " and ph.value is not null ";
 
 	private final String TRIAL_TYPE = "T";
 
@@ -187,25 +212,35 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
+	public boolean hasMeasurementDataOnEnvironment(final int studyIdentifier, final int instanceId) {
+		try {
+
+			final SQLQuery query = this.getCurrentSession().createSQLQuery(SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES);
+			query.addScalar("totalObservationUnits", new IntegerType());
+			query.setParameter("studyIdentifier", studyIdentifier);
+			query.setParameter("instanceId", instanceId);
+			return ((int) query.uniqueResult()) > 0;
+		} catch (HibernateException he) {
+			throw new MiddlewareQueryException(String
+				.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ", studyIdentifier,
+					instanceId) + he.getMessage(), he);
+		}
+	}
+
+	@Override
 	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId) {
 		try {
-			final String sql = "select count(*) as totalObservationUnits from nd_experiment nde \n"
-					+ "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
-					+ "    inner join project proj on proj.project_id = ndep.project_id \n"
-					+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n" 
-					+ " where \n"
-					+ "	proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id where (pr.object_project_id = :studyIdentifier and name like '%PLOTDATA')) \n"
-					+ "    and gl.nd_geolocation_id = :instanceId ";
+			String sql = SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS;
+
 			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
 			query.addScalar("totalObservationUnits", new IntegerType());
 			query.setParameter("studyIdentifier", studyIdentifier);
 			query.setParameter("instanceId", instanceId);
 			return (int) query.uniqueResult();
 		} catch (HibernateException he) {
-			throw new MiddlewareQueryException(
-					String.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ",
-							studyIdentifier, instanceId) + he.getMessage(),
-					he);
+			throw new MiddlewareQueryException(String
+				.format("Unexpected error in executing countTotalObservations(studyId = %s, instanceNumber = %s) : ", studyIdentifier,
+					instanceId) + he.getMessage(), he);
 		}
 	}
 
@@ -214,7 +249,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 			final int pageSize, final String sortBy, final String sortOrder) {
 
 		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
-		return this.studyMeasurements.getAllMeasurements(studyIdentifier, traits, findGenericGermplasmDescriptors(studyIdentifier),
+		final List<TraitDto> selectionMethods = this.trialTraits.getSelectionMethods(studyIdentifier);
+		final List<TraitDto> selectionMethodsAndTraits = new ArrayList<>();
+		selectionMethodsAndTraits.addAll(traits);
+		selectionMethodsAndTraits.addAll(selectionMethods);
+
+		return this.studyMeasurements.getAllMeasurements(studyIdentifier, selectionMethodsAndTraits, findGenericGermplasmDescriptors(studyIdentifier),
 				instanceId, pageNumber, pageSize,
 				sortBy, sortOrder);
 	}
@@ -468,6 +508,25 @@ public class StudyServiceImpl extends Service implements StudyService {
 			StudyServiceImpl.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public boolean hasMeasurementDataEntered(final List<Integer> ids, final int studyId) {
+		final List queryResults;
+		try {
+			final SQLQuery query = this.getCurrentSession().createSQLQuery(SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED);
+			query.setParameter("studyId", studyId);
+			query.setParameterList("cvtermIds", ids);
+			queryResults = query.list();
+
+		} catch (HibernateException he) {
+			throw new MiddlewareQueryException(
+				"Unexpected error in executing hasMeasurementDataEntered(studyId = " + studyId + ") query: " + he.getMessage(), he);
+		}
+
+		if (queryResults.isEmpty()) {
+			return false;
+		}
+		return true;
 	}
 
 	public StudyServiceImpl setStudyDataManager(final StudyDataManager studyDataManager) {

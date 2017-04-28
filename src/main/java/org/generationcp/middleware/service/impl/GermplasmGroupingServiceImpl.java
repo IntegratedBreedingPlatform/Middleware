@@ -37,6 +37,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmGroupingServiceImpl.class);
 
 	static final String SELECTION_HISTORY_NAME_CODE = "DRVNM";
+	static final String SELECTION_HISTORY_NAME_CODE_FOR_CROSS = "CRSNM";
 	static final String SELECTION_HISTORY_AT_FIXATION_NAME_CODE = "SELHISFIX";
 
 	private GermplasmDAO germplasmDAO;
@@ -180,10 +181,12 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		return true;
 	}
 
-	Name getSelectionHistory(final Germplasm germplasm) {
-		final UserDefinedField selectionHistoryNameType = this.getSelectionHistoryNameType();
+	Name getSelectionHistory(final Germplasm germplasm, final String nameType) {
+		final UserDefinedField selectionHistoryNameType = this.getSelectionHistoryNameType(nameType);
 		return this.findNameByType(germplasm, selectionHistoryNameType);
 	}
+	
+	
 
 	Name findNameByType(final Germplasm germplasm, final UserDefinedField nameType) {
 		final List<Name> names = germplasm.getNames();
@@ -197,11 +200,6 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			}
 		}
 		return matchingName;
-	}
-
-	Name getSelectionHistoryAtFixation(final Germplasm germplasm) {
-		final UserDefinedField selectionHistoryAtFixationNameType = this.getSelectionHistoryAtFixationNameType();
-		return this.findNameByType(germplasm, selectionHistoryAtFixationNameType);
 	}
 
 	/**
@@ -226,11 +224,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 
 		// 2. Check if there is an existing "selection history at fixation" name
-		final Name existingSelHisFixName = this.getSelectionHistoryAtFixation(germplasm);
+		final Name existingSelHisFixName = this.getSelectionHistory(germplasm, GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 
 		// 3. Add a new name as "selection history at fixation" with supplied name value and make it a preferred name.
 		if (existingSelHisFixName == null) {
-			final UserDefinedField selHisFixNameType = this.getSelectionHistoryAtFixationNameType();
+			final UserDefinedField selHisFixNameType = this.getSelectionHistoryNameType(GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 			final Name newSelectionHistoryAtFixation = new Name();
 			newSelectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
 			newSelectionHistoryAtFixation.setTypeId(selHisFixNameType.getFldno());
@@ -249,32 +247,20 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 	}
 
-	UserDefinedField getSelectionHistoryAtFixationNameType() {
-		final UserDefinedField selHisFixNameType =
-				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
-						GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
-		if (selHisFixNameType == null) {
-			throw new IllegalStateException(
-					"Missing required reference data: Please ensure User defined field (UDFLD) record for name type '"
-							+ GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE + "' has been setup.");
-		}
-		return selHisFixNameType;
-	}
-
-	UserDefinedField getSelectionHistoryNameType() {
+	UserDefinedField getSelectionHistoryNameType(final String nameType) {
 		final UserDefinedField selectionHistoryNameType =
-				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
+				this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", nameType);
 		if (selectionHistoryNameType == null) {
 			throw new IllegalStateException(
 					"Missing required reference data: Please ensure User defined field (UDFLD) record for name type '"
-							+ GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE + "' has been setup.");
+							+ nameType + "' has been setup.");
 		}
 		return selectionHistoryNameType;
 	}
 
 	private void copySelectionHistory(final Germplasm germplasm) {
 
-		final Name mySelectionHistory = this.getSelectionHistory(germplasm);
+		final Name mySelectionHistory = this.getSelectionHistory(germplasm, GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
 
 		if (mySelectionHistory != null) {
 			this.addOrUpdateSelectionHistoryAtFixationName(germplasm, mySelectionHistory);
@@ -287,9 +273,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	@Override
 	public void copyParentalSelectionHistoryAtFixation(final Germplasm germplasm) {
-
 		final Germplasm parent = this.germplasmDAO.getById(germplasm.getGpid2());
-		final Name parentSelectionHistoryAtFixation = this.getSelectionHistoryAtFixation(parent);
+		final Name parentSelectionHistoryAtFixation = this.getSelectionHistory(parent, GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 
 		if (parentSelectionHistoryAtFixation != null) {
 			this.addOrUpdateSelectionHistoryAtFixationName(germplasm, parentSelectionHistoryAtFixation);
@@ -303,7 +288,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private void copySelectionHistoryForCross(final Germplasm cross, final Germplasm previousCross) {
 
-		final Name previousCrossSelectionHistory = this.getSelectionHistory(previousCross);
+		final Name previousCrossSelectionHistory = this.getSelectionHistory(previousCross, GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE_FOR_CROSS);
 
 		if (previousCrossSelectionHistory != null) {
 			this.addOrUpdateSelectionHistoryAtFixationName(cross, previousCrossSelectionHistory);
