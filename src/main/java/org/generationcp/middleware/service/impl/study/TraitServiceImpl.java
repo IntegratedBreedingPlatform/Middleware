@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.service.api.study.TraitDto;
 import org.generationcp.middleware.service.api.study.TraitService;
@@ -15,19 +16,27 @@ public class TraitServiceImpl implements TraitService {
 
 	private final Session session;
 
-	final static String STUDY_TRAITS_QUERY = "SELECT \n" + "    cvterm_id, name\n" + "FROM\n" + "    projectprop pp\n"
-			+ "        INNER JOIN\n" + "    cvterm cvt ON cvt.name = pp.value " + "WHERE\n" + "    type_id = " + VariableType.TRAIT.getId()
-			+ "\n" + "        AND project_id = (SELECT \n" + "            p.project_id\n" + "        FROM\n"
+	final static String STUDY_TRAITS_QUERY = "SELECT cvterm_id, name \n" +
+			"FROM cvterm cvt \n " + 
+			"INNER JOIN projectprop ppTermId on (ppTermId.value = cvt.cvterm_id and ppTermId.type_id = " + TermId.STANDARD_VARIABLE.getId() + ") \n" +
+			"INNER JOIN projectprop ppVarType on (ppVarType.project_id = ppTermId.project_id and ppVarType.rank = ppTermId.rank) \n" +
+			"WHERE ppVarType.type_id = " + VariableType.TRAIT.getId() +  
+			" AND ppTermId.project_id = (SELECT \n" + "            p.project_id\n" + "        FROM\n"
 			+ "            project_relationship pr\n" + "                INNER JOIN\n"
 			+ "            project p ON p.project_id = pr.subject_project_id \n" + "        WHERE \n"
 			+ "            pr.object_project_id = ?\n" + "                AND name LIKE '%PLOTDATA')";
+	
 
-	final static String STUDY_SELECTION_METHODS_QUERY = "SELECT \n" + "    cvterm_id, name\n" + "FROM\n" + "    projectprop pp\n"
-		+ "        INNER JOIN\n" + "    cvterm cvt ON cvt.name = pp.value " + "WHERE\n" + "    type_id = " + VariableType.SELECTION_METHOD.getId()
-		+ "\n" + "        AND project_id = (SELECT \n" + "            p.project_id\n" + "        FROM\n"
-		+ "            project_relationship pr\n" + "                INNER JOIN\n"
-		+ "            project p ON p.project_id = pr.subject_project_id \n" + "        WHERE \n"
-		+ "            pr.object_project_id = ?\n" + "                AND name LIKE '%PLOTDATA')";
+	final static String STUDY_SELECTION_METHODS_QUERY = "SELECT cvterm_id, name \n" +
+			"FROM cvterm cvt \n " + 
+			"INNER JOIN projectprop ppTermId on (ppTermId.value = cvt.cvterm_id and ppTermId.type_id = " + TermId.STANDARD_VARIABLE.getId() + ") \n" +
+			"INNER JOIN projectprop ppVarType on (ppVarType.project_id = ppTermId.project_id and ppVarType.rank = ppTermId.rank) \n" +
+			"WHERE ppVarType.type_id = " + VariableType.SELECTION_METHOD.getId() +  
+			" AND ppTermId.project_id = (SELECT \n" + "            p.project_id\n" + "        FROM\n"
+			+ "            project_relationship pr\n" + "                INNER JOIN\n"
+			+ "            project p ON p.project_id = pr.subject_project_id \n" + "        WHERE \n"
+			+ "            pr.object_project_id = ?\n" + "                AND name LIKE '%PLOTDATA')";
+	
 
 	public TraitServiceImpl(final Session session) {
 		this.session = session;
