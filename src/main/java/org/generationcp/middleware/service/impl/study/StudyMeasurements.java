@@ -103,12 +103,14 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar("ROW");
 		createSQLQuery.addScalar("COL");
 		createSQLQuery.addScalar("PLOT_ID", new StringType());
+		createSQLQuery.addScalar("FIELDMAP COLUMN");
+		createSQLQuery.addScalar("FIELDMAP RANGE");
 	}
 
 	private List<ObservationDto> mapResults(final List<Object[]> results, final List<TraitDto> projectTraits,
 			List<String> germplasmDescriptors) {
 		final List<ObservationDto> measurements = new ArrayList<ObservationDto>();
-		final int FIXED_COLUMNS = 13;
+		final int FIXED_COLUMNS = 15;
 
 		if (results != null && !results.isEmpty()) {
 			for (final Object[] row : results) {
@@ -125,6 +127,8 @@ public class StudyMeasurements {
 				measurement.setRowNumber((String) row[10]);
 				measurement.setColumnNumber((String) row[11]);
 				measurement.setPlotId((String) row[12]);
+				measurement.setFieldMapColumn((String) row[13]);
+				measurement.setFieldMapRange((String) row[14]);
 
 				int gpDescIndex = FIXED_COLUMNS + projectTraits.size() * 2;
 				for (String gpDesc : germplasmDescriptors) {

@@ -34,9 +34,14 @@ public class ObservationDto {
 	private final String blockNumber;
 
 	private String rowNumber;
+
 	private String columnNumber;
 
 	private final List<MeasurementDto> traitMeasurements;
+
+	private String fieldMapColumn;
+
+	private String fieldMapRange;
 
 	private final List<Pair<String, String>> additionalGermplasmDescriptors = new ArrayList<>();
 
@@ -148,6 +153,22 @@ public class ObservationDto {
 			hashCode = new HashCodeBuilder().append(measurementId).toHashCode();
 		}
 		return hashCode;
+	}
+
+	public String getFieldMapColumn() {
+		return fieldMapColumn;
+	}
+
+	public void setFieldMapColumn(String fieldMapColumn) {
+		this.fieldMapColumn = fieldMapColumn;
+	}
+
+	public String getFieldMapRange() {
+		return fieldMapRange;
+	}
+
+	public void setFieldMapRange(String fieldMapRange) {
+		this.fieldMapRange = fieldMapRange;
 	}
 
 }
