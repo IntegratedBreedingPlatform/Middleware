@@ -34,9 +34,14 @@ public class ObservationDto {
 	private final String blockNumber;
 
 	private String rowNumber;
+
 	private String columnNumber;
 
-	private final List<MeasurementDto> traitMeasurements;
+	private String fieldMapColumn;
+
+	private String fieldMapRange;
+
+	private final List<MeasurementDto> variableMeasurements;
 
 	private final List<Pair<String, String>> additionalGermplasmDescriptors = new ArrayList<>();
 
@@ -44,7 +49,7 @@ public class ObservationDto {
 
 	public ObservationDto(final Integer measurementId, final String trialInstance, final String entryType, final Integer gid,
 			final String designation, final String entryNo, final String entryCode, final String repitionNumber, final String plotNumber,
-			final String blockNumber, final List<MeasurementDto> traitMeasurements) {
+			final String blockNumber, final List<MeasurementDto> variableMeasurements) {
 		this.measurementId = measurementId;
 		this.trialInstance = trialInstance;
 		this.entryType = entryType;
@@ -55,7 +60,7 @@ public class ObservationDto {
 		this.repitionNumber = repitionNumber;
 		this.plotNumber = plotNumber;
 		this.blockNumber = blockNumber;
-		this.traitMeasurements = traitMeasurements;
+		this.variableMeasurements = variableMeasurements;
 	}
 
 	public Integer getMeasurementId() {
@@ -122,8 +127,8 @@ public class ObservationDto {
 		this.rowNumber = rowNumber;
 	}
 
-	public List<MeasurementDto> getTraitMeasurements() {
-		return this.traitMeasurements;
+	public List<MeasurementDto> getVariableMeasurements() {
+		return this.variableMeasurements;
 	}
 
 	public void additionalGermplasmDescriptor(final String name, final String value) {
@@ -150,4 +155,19 @@ public class ObservationDto {
 		return hashCode;
 	}
 
+	public String getFieldMapColumn() {
+		return fieldMapColumn;
+	}
+
+	public void setFieldMapColumn(String fieldMapColumn) {
+		this.fieldMapColumn = fieldMapColumn;
+	}
+
+	public String getFieldMapRange() {
+		return fieldMapRange;
+	}
+
+	public void setFieldMapRange(String fieldMapRange) {
+		this.fieldMapRange = fieldMapRange;
+	}
 }

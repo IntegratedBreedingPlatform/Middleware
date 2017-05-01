@@ -28,24 +28,24 @@ public class Observations {
 	}
 
 	ObservationDto updataObsevationTraits(final ObservationDto middlewareMeasurement, final String programUuid) {
-		final List<MeasurementDto> traits = middlewareMeasurement.getTraitMeasurements();
+		final List<MeasurementDto> measurements = middlewareMeasurement.getVariableMeasurements();
 
-		for (final MeasurementDto traitMeasurement : traits) {
-			final String triatValue = traitMeasurement.getTriatValue();
+		for (final MeasurementDto measurement : measurements) {
+			final String variableValue = measurement.getVariableValue();
 			// If blank ignore nothing to update
-			if (StringUtils.isNotBlank(triatValue)) {
-				final Integer phenotypeId = traitMeasurement.getPhenotypeId();
-				final Integer traitId = traitMeasurement.getTrait().getTraitId();
+			if (StringUtils.isNotBlank(variableValue)) {
+				final Integer phenotypeId = measurement.getPhenotypeId();
+				final Integer traitId = measurement.getMeasurementVariable().getId();
 
 				// Update Trait
 				final Variable variable = ontologyVariableDataManager.getVariable(programUuid, traitId, false, false);
 
 				if (phenotypeId != null && phenotypeId != 0) {
-					this.updatePhenotype(variable, phenotypeId, triatValue);
+					this.updatePhenotype(variable, phenotypeId, variableValue);
 				} else {
 					final Integer newPhenotypeId =
-							this.insertPhenotype(variable, triatValue, traitId, middlewareMeasurement.getMeasurementId());
-					traitMeasurement.setPhenotypeId(newPhenotypeId);
+							this.insertPhenotype(variable, variableValue, traitId, middlewareMeasurement.getMeasurementId());
+					measurement.setPhenotypeId(newPhenotypeId);
 				}
 			}
 		}
@@ -95,7 +95,7 @@ public class Observations {
 		}
 	}
 
-	private void updatePhenotype(final Variable variable, final Integer phenotypeId, final String triatValue) {
+	private void updatePhenotype(final Variable variable, final Integer phenotypeId, final String variableValue) {
 
 		final Phenotype phenotype = (Phenotype) this.session.get(Phenotype.class, phenotypeId);
 		if (phenotype == null) {
@@ -103,8 +103,8 @@ public class Observations {
 					+ "Please contact support for further information.", phenotypeId.toString()));
 		}
 
-		phenotype.setValue(triatValue);
-		setCategoricalValue(variable, phenotype, triatValue);
+		phenotype.setValue(variableValue);
+		setCategoricalValue(variable, phenotype, variableValue);
 
 		this.session.update(phenotype);
 
