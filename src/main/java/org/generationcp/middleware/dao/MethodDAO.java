@@ -12,7 +12,9 @@
 package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Method;
@@ -474,5 +476,17 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			this.logAndThrowException(this.getLogExceptionMessage("getAllMethod", "", null, e.getMessage(), "Method"), e);
 		}
 		return new ArrayList<Method>();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<String> getMethodCodeByMethodIds(final Set<Integer> methodIds){
+		List<String> methodsCodes = new ArrayList<String>();
+		final StringBuilder queryString = new StringBuilder();
+		queryString.append("SELECT mcode FROM methods WHERE mid  IN (:mids)");
+		final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+		query.setParameterList("mids", methodIds);
+
+		methodsCodes.addAll(query.list());
+		return methodsCodes;
 	}
 }
