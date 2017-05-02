@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.operation.saver;
 
 import org.generationcp.middleware.IntegrationTestBase;
@@ -12,6 +11,7 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
+@Ignore
 public class StandardVariableSaverTest extends IntegrationTestBase {
 
 	private StandardVariableSaver stdVarSaver;
@@ -20,9 +20,9 @@ public class StandardVariableSaverTest extends IntegrationTestBase {
 	private final Integer CVID = 2050;
 	private final String TESTNAME = "Test Name";
 	private final String TESTDEFINITION = "Test Definition";
-	
+
 	private StandardVariableTestDataInitializer standardVariableTestDataInitializer;
-	
+
 	@Before
 	public void setUp() {
 		this.standardVariableTestDataInitializer = new StandardVariableTestDataInitializer();
@@ -31,7 +31,7 @@ public class StandardVariableSaverTest extends IntegrationTestBase {
 	}
 
 	@Ignore("See BMS-3721")
-	@Test
+	@Test()
 	public void testSaveCheckType() {
 		final StandardVariable stdVar = this.standardVariableTestDataInitializer.createStandardVariable();
 		final Enumeration testEnum = new Enumeration(null, this.TESTNAME, this.TESTDEFINITION, 0);
@@ -41,6 +41,6 @@ public class StandardVariableSaverTest extends IntegrationTestBase {
 		Assert.assertNotNull("The newly created CvTerm should exist in the DB", cvTerm);
 		Assert.assertEquals("The newly created CvTerm's name should be " + this.TESTNAME, this.TESTNAME, cvTerm.getName());
 		Assert.assertEquals("The newly created CvTerm's description should be " + this.TESTDEFINITION, this.TESTDEFINITION,
-				cvTerm.getDefinition());
+			cvTerm.getDefinition());
 	}
 }

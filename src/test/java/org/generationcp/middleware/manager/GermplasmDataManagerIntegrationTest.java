@@ -60,8 +60,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.both;
@@ -331,7 +333,14 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		Debug.println(IntegrationTestBase.INDENT, "testGetNamesByGID(" + gid + "): " + names.size());
 		Debug.printObjects(names);
 	}
-
+	
+	@Test
+	public void testGetMethodCodeByMethodIds () throws Exception {
+		final Set<Integer> methodIds = new HashSet<Integer>(Arrays.asList(1));
+		final List<String> methodCodes =  this.germplasmDataManager.getMethodCodeByMethodIds(methodIds);
+		Assert.assertTrue("The method code should be UGM", methodCodes.get(0).equals("UGM"));
+	}
+	
 	@Test
 	public void testGetPreferredNameByGID() throws Exception {
 		final Integer gid = 1;

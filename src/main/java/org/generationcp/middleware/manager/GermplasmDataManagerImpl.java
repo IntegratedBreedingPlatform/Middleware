@@ -1434,6 +1434,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public List<Method> getDerivativeAndMaintenanceMethods(final List<Integer> ids) {
 		return this.getMethodDao().getDerivativeAndMaintenanceMethods(ids);
 	}
+	
+	@Override
+	public List<String> getMethodCodeByMethodIds(final Set<Integer> methodIds){
+		return this.getMethodDao().getMethodCodeByMethodIds(methodIds);
+	}
 
 	@Override
 	public long countMatchGermplasmInList(final Set<Integer> gids) {

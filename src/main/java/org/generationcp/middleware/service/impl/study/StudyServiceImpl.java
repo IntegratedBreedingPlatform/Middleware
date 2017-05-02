@@ -14,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
@@ -26,6 +27,8 @@ import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.service.Service;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
+import org.generationcp.middleware.service.api.study.MeasurementVariableService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyGermplasmDto;
@@ -34,8 +37,6 @@ import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchParameters;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.StudySummary;
-import org.generationcp.middleware.service.api.study.TraitDto;
-import org.generationcp.middleware.service.api.study.TraitService;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.HibernateException;
@@ -59,12 +60,14 @@ import com.google.common.collect.Ordering;
 public class StudyServiceImpl extends Service implements StudyService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StudyServiceImpl.class);
-	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS = "select count(*) as totalObservationUnits from nd_experiment nde \n"
+
+	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT = "select count(*) as totalObservationUnits from "
+		+ "nd_experiment nde \n"
 		+ "    inner join nd_experiment_project ndep on ndep.nd_experiment_id = nde.nd_experiment_id \n"
 		+ "    inner join project proj on proj.project_id = ndep.project_id \n"
-		+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
-		+ "		LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
-		+ "		LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n" + " where \n"
+		+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n";
+
+	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE = " where \n"
 		+ "	proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id where (pr.object_project_id = :studyIdentifier and name like '%PLOTDATA')) \n"
 		+ "    and gl.nd_geolocation_id = :instanceId ";
 
@@ -83,11 +86,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 		+ "  WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n"
 		+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name";
 
-	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES = SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS + " and ph.value is not null ";
+	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_NO_NULL_VALUES =
+		SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT
+		+ "		LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
+		+ "		LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n"
+		+ SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE
+		+ " and ph.value is not null ";
 
 	private final String TRIAL_TYPE = "T";
 
-	private TraitService trialTraits;
+	private MeasurementVariableService measurementVariableService;
 
 	private GermplasmDescriptors germplasmDescriptors;
 
@@ -110,7 +118,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public StudyServiceImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 		final Session currentSession = this.getCurrentSession();
-		this.trialTraits = new TraitServiceImpl(currentSession);
 		this.germplasmDescriptors = new GermplasmDescriptors(currentSession);
 		this.studyMeasurements = new StudyMeasurements(this.getCurrentSession());
 		this.studyGermplasmListService = new StudyGermplasmListServiceImpl(this.getCurrentSession());
@@ -118,6 +125,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 				new OntologyPropertyDataManagerImpl(sessionProvider),
 				new OntologyScaleDataManagerImpl(sessionProvider), sessionProvider);
 		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
+		this.measurementVariableService = new MeasurementVariableServiceImpl(currentSession);
+
 		this.userDataManager = new UserDataManagerImpl(sessionProvider);
 
 		final CacheLoader<StudyKey, String> studyKeyCacheBuilder = new CacheLoader<StudyKey, String>() {
@@ -131,12 +140,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 	/**
 	 * Only used for tests.
 	 *
-	 * @param trialTraits
+	 * @param measurementVariableService
 	 * @param trialMeasurements
 	 */
-	StudyServiceImpl(final TraitService trialTraits, final StudyMeasurements trialMeasurements,
+	StudyServiceImpl(final MeasurementVariableService measurementVariableService, final StudyMeasurements trialMeasurements,
 			final StudyGermplasmListService studyGermplasmListServiceImpl, GermplasmDescriptors germplasmDescriptors) {
-		this.trialTraits = trialTraits;
+		this.measurementVariableService = measurementVariableService;
 		this.studyMeasurements = trialMeasurements;
 		this.studyGermplasmListService = studyGermplasmListServiceImpl;
 		this.germplasmDescriptors = germplasmDescriptors;
@@ -230,9 +239,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public int countTotalObservationUnits(final int studyIdentifier, final int instanceId) {
 		try {
-			String sql = SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS;
-
-			final SQLQuery query = this.getCurrentSession().createSQLQuery(sql);
+			final SQLQuery query = this.getCurrentSession()
+				.createSQLQuery(SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_SELECT + SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE);
 			query.addScalar("totalObservationUnits", new IntegerType());
 			query.setParameter("studyIdentifier", studyIdentifier);
 			query.setParameter("instanceId", instanceId);
@@ -248,13 +256,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber,
 			final int pageSize, final String sortBy, final String sortOrder) {
 
-		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
-		final List<TraitDto> selectionMethods = this.trialTraits.getSelectionMethods(studyIdentifier);
-		final List<TraitDto> selectionMethodsAndTraits = new ArrayList<>();
-		selectionMethodsAndTraits.addAll(traits);
-		selectionMethodsAndTraits.addAll(selectionMethods);
+		final List<MeasurementVariableDto> variablesStudy =this.measurementVariableService.getVariables(studyIdentifier,
+			VariableType.TRAIT.getId(),VariableType.SELECTION_METHOD.getId());
 
-		return this.studyMeasurements.getAllMeasurements(studyIdentifier, selectionMethodsAndTraits, findGenericGermplasmDescriptors(studyIdentifier),
+
+		return this.studyMeasurements.getAllMeasurements(studyIdentifier, variablesStudy, findGenericGermplasmDescriptors(studyIdentifier),
 				instanceId, pageNumber, pageSize,
 				sortBy, sortOrder);
 	}
@@ -280,7 +286,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier) {
-		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
+		final List<MeasurementVariableDto> traits = this.measurementVariableService.getVariables(studyIdentifier, VariableType.TRAIT.getId());
 		return this.studyMeasurements.getMeasurement(studyIdentifier, traits, findGenericGermplasmDescriptors(studyIdentifier),
 				measurementIdentifier);
 	}
@@ -366,26 +372,26 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier, Integer instanceDbId) {
 
-		final List<TraitDto> traits = this.trialTraits.getTraits(studyIdentifier);
+		final List<MeasurementVariableDto> traits = this.measurementVariableService.getVariables(studyIdentifier, VariableType.TRAIT.getId());
 
-		final List<TraitDto> sortedTraits = Ordering.from(new Comparator<TraitDto>() {
+		final List<MeasurementVariableDto> measurementVariables = Ordering.from(new Comparator<MeasurementVariableDto>() {
 
 			@Override
-			public int compare(final TraitDto o1, final TraitDto o2) {
-				return o1.getTraitId() - o2.getTraitId();
+			public int compare(final MeasurementVariableDto o1, final MeasurementVariableDto o2) {
+				return o1.getId() - o2.getId();
 			}
 		}).immutableSortedCopy(traits);
 
-		final List<Object[]> results = this.studyMeasurements.getAllStudyDetailsAsTable(studyIdentifier, sortedTraits, instanceDbId);
+		final List<Object[]> results = this.studyMeasurements.getAllStudyDetailsAsTable(studyIdentifier, measurementVariables, instanceDbId);
 
 		final List<Integer> observationVariableDbIds = new ArrayList<Integer>();
 
 		final List<String> observationVariableNames = new ArrayList<String>();
 
-		for (final Iterator<TraitDto> iterator = sortedTraits.iterator(); iterator.hasNext();) {
-			final TraitDto traitDto = iterator.next();
-			observationVariableDbIds.add(traitDto.getTraitId());
-			observationVariableNames.add(traitDto.getTraitName());
+		for (final Iterator<MeasurementVariableDto> iterator = measurementVariables.iterator(); iterator.hasNext();) {
+			final MeasurementVariableDto measurementVariableDto = iterator.next();
+			observationVariableDbIds.add(measurementVariableDto.getId());
+			observationVariableNames.add(measurementVariableDto.getName());
 		}
 
 		List<List<String>> data = Lists.newArrayList();

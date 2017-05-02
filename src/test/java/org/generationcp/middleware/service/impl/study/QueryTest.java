@@ -5,8 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.service.api.study.TraitDto;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.hibernate.jdbc.util.BasicFormatterImpl;
 import org.junit.Test;
 
@@ -32,8 +31,8 @@ public class QueryTest {
 	@Test
 	public void testMeasurementQueryGeneration() throws Exception {
 		ObservationQuery fixture = new ObservationQuery();
-		final List<TraitDto> traitNames = new LinkedList<TraitDto>();
-		traitNames.add(new TraitDto(1,"PH_cm"));
+		final List<MeasurementVariableDto> traitNames = new LinkedList<MeasurementVariableDto>();
+		traitNames.add(new MeasurementVariableDto(1,"PH_cm"));
 		String result = fixture.getObservationQuery(traitNames);
 		System.out.println(formatString(result));
 		assertEquals("The expected query must match our expected queyr",

@@ -482,7 +482,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	 */
 	@Override
 	public Integer saveGermplasmList(final List<Pair<Germplasm, GermplasmListData>> listDataItems,
-			final GermplasmList germplasmList) {
+			final GermplasmList germplasmList, final boolean isApplyNewGroupToPreviousCrosses) {
 
 		final GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
 
@@ -508,7 +508,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			// For Management Group Settings Processing
 			// NOTE: The false boolean should be replace by the variable for
 			// "Apply grouping to new crosses only" option. See: BMS-3883
-			this.germplasmGroupingService.processGroupInheritanceForCrosses(germplasmGids, false,
+			this.germplasmGroupingService.processGroupInheritanceForCrosses(germplasmGids, isApplyNewGroupToPreviousCrosses,
 					this.crossExpansionProperties.getHybridBreedingMethods());
 
 		} catch (final Exception e) {
