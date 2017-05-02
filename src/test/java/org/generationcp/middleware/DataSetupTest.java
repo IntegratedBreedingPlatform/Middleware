@@ -324,8 +324,8 @@ public class DataSetupTest extends IntegrationTestBase {
 
 		// Variates
 		final List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
-		final MeasurementVariable variate = this.createMeasurementVariable(18000, "Grain_yield",
-				"Grain yield -dry and weigh (kg/ha)", DataSetupTest.GRAIN_YIELD, DataSetupTest.DRY_AND_WEIGH,
+		final MeasurementVariable variate = this.createMeasurementVariable(51570, "GY_Adj_kgha",
+				"Grain yield BY Adjusted GY - Computation IN Kg/ha", DataSetupTest.GRAIN_YIELD, DataSetupTest.DRY_AND_WEIGH,
 				DataSetupTest.KG_HA, DataSetupTest.NUMERIC, null, DataSetupTest.PLOT, PhenotypicType.VARIATE, false);
 		variates.add(variate);
 
