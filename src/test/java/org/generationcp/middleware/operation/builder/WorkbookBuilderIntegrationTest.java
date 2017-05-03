@@ -153,7 +153,8 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 
 		// Variates
 		variates = new ArrayList<>();
-		final MeasurementVariable variate = this.createMeasurementVariable(18000, "Grain_yield", "Grain yield -dry and weigh (kg/ha)",
+		final MeasurementVariable variate =
+			this.createMeasurementVariable(51570, "GY_Adj_kgha", "Grain yield BY Adjusted GY - Computation IN Kg/ha",
 			WorkbookBuilderIntegrationTest.GRAIN_YIELD, WorkbookBuilderIntegrationTest.DRY_AND_WEIGH,
 			WorkbookBuilderIntegrationTest.KG_HA, WorkbookBuilderIntegrationTest.NUMERIC, null, WorkbookBuilderIntegrationTest.PLOT,
 			PhenotypicType.VARIATE, false);

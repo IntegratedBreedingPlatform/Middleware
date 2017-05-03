@@ -30,6 +30,7 @@ public class StandardVariableSaverTest extends IntegrationTestBase {
 		this.cvtermDao = this.stdVarSaver.getCvTermDao();
 	}
 
+	@Ignore("See BMS-3721")
 	@Test()
 	public void testSaveCheckType() {
 		final StandardVariable stdVar = this.standardVariableTestDataInitializer.createStandardVariable();
