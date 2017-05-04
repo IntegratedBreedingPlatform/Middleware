@@ -848,8 +848,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 					new StringBuilder().append("SELECT cvterm_id, name, definition ")
 					.append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
 					.append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId())
-					.append(" AND cvr.object_id = ").append(classType.getId()).append(" ").append(" AND cvt.cv_id = ")
-					.append(CvId.IBDB_TERMS.getId());
+					.append(" AND cvr.object_id = ").append(classType.getId()).append(" ")
+					.append(" AND cvt.cv_id in (" + CvId.TRAIT_CLASS.getId() + "," + CvId.IBDB_TERMS.getId() + ")");
 
 			SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 
@@ -884,7 +884,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 					new StringBuilder().append("SELECT cvterm_id, name, definition, cvr.object_id ")
 					.append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
 					.append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.IS_A.getId()).append(" ")
-					.append("WHERE cv_id = 1000 AND object_id NOT IN (1000, 1002, 1003)  ").append("ORDER BY cvr.object_id ");
+					.append("WHERE cv_id in (" + CvId.TRAIT_CLASS.getId() + "," + CvId.IBDB_TERMS.getId() + ") ")
+					.append("AND object_id NOT IN (1000, 1002, 1003)  ")
+					.append("ORDER BY cvr.object_id ");
 
 			SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 
