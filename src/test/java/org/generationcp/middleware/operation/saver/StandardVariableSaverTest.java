@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore
 public class StandardVariableSaverTest extends IntegrationTestBase {
 
 	private StandardVariableSaver stdVarSaver;
@@ -30,8 +29,7 @@ public class StandardVariableSaverTest extends IntegrationTestBase {
 		this.cvtermDao = this.stdVarSaver.getCvTermDao();
 	}
 
-	@Ignore("See BMS-3721")
-	@Test()
+	@Test
 	public void testSaveCheckType() {
 		final StandardVariable stdVar = this.standardVariableTestDataInitializer.createStandardVariable();
 		final Enumeration testEnum = new Enumeration(null, this.TESTNAME, this.TESTDEFINITION, 0);
