@@ -43,7 +43,9 @@ public enum VariableType {
 			PhenotypicType.TRIAL_DESIGN),
 	EXPERIMENTAL_DESIGN(1810, "Experimental Design",
 			"Experimental Design Variables",
-			PhenotypicType.TRIAL_DESIGN);
+			PhenotypicType.TRIAL_DESIGN),
+	ANALYSIS_SUMMARY(1811, "Analysis Summary",
+			"Analysis Summary Variables", PhenotypicType.VARIATE);
 
 	private Integer id;
 	private String name;
