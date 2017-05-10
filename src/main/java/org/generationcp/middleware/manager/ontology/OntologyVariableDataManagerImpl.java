@@ -70,7 +70,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	private static final String VARIABLE_EXIST_WITH_SAME_NAME = "Variable exist with same name";
 	private static final String CAN_NOT_DELETE_USED_VARIABLE = "Used variable can not be deleted";
 	private static final String VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE =
-			"Analysis variable type should not be assigned together with any other variable type";
+			"Analysis and/or Analysis Summary variable type(s) should not be assigned together with any other variable type";
 
 	@Autowired
 	private OntologyMethodDataManager methodManager;
@@ -532,10 +532,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_EXIST_WITH_SAME_NAME);
 		}
 
-		// Throw if variable type is analysis used with other variable types.
-		if (variableInfo.getVariableTypes().contains(VariableType.ANALYSIS) && variableInfo.getVariableTypes().size() > 1) {
-			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE);
-		}
+		this.checkForReservedVariableTypes(variableInfo);
 
 		// Saving term to database.
 		final CVTerm savedTerm = this.getCvTermDao().save(variableInfo.getName(), variableInfo.getDescription(), CvId.VARIABLES);
@@ -601,10 +598,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		this.checkTermIsVariable(term);
 
-		// Throw if variable type is analysis used with other variable types.
-		if (variableInfo.getVariableTypes().contains(VariableType.ANALYSIS) && variableInfo.getVariableTypes().size() > 1) {
-			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE);
-		}
+		this.checkForReservedVariableTypes(variableInfo);
 
 		final CVTermRelationship methodRelation = elements.getMethodRelation();
 		final CVTermRelationship propertyRelation = elements.getPropertyRelation();
@@ -717,6 +711,13 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		this.getCvTermPropertyDao().save(variableInfo.getId(), TermId.LAST_UPDATE_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
+	}
+
+	// Throw exception if variable types of variable to be added is "reserved" like "Analysis" or "Analysis Summary"
+	private void checkForReservedVariableTypes(final OntologyVariableInfo variableInfo) {
+		if (!Collections.disjoint(variableInfo.getVariableTypes(), VariableType.getReservedVariableTypes()) && variableInfo.getVariableTypes().size() > 1) {
+			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE);
+		}
 	}
 
 	@Override

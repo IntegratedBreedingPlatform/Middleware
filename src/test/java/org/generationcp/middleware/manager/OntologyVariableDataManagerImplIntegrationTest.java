@@ -13,7 +13,6 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -177,6 +176,24 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	public void testUpdateAnalysisVariableShouldNotBeAssignedWithOtherVariableType() throws Exception {
 		this.testVariableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
 		this.testVariableInfo.addVariableType(VariableType.ANALYSIS);
+		this.variableManager.updateVariable(this.testVariableInfo);
+		Assert.fail("Analysis variable type should not be assigned together with any other variable type");
+	}
+	
+	@Test(expected = MiddlewareException.class)
+	public void testAddAnalysisSummaryVariableShouldNotBeAssignedWithOtherVariableType() throws Exception {
+		final OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+		variableInfo.setName(OntologyDataCreationUtil.getNewRandomName());
+		variableInfo.addVariableType(VariableType.ANALYSIS_SUMMARY);
+		variableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
+		this.variableManager.addVariable(variableInfo);
+		Assert.fail("Analysis variable type should not be assigned together with any other variable type");
+	}
+
+	@Test(expected = MiddlewareException.class)
+	public void testUpdateAnalysisSummaryVariableShouldNotBeAssignedWithOtherVariableType() throws Exception {
+		this.testVariableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
+		this.testVariableInfo.addVariableType(VariableType.ANALYSIS_SUMMARY);
 		this.variableManager.updateVariable(this.testVariableInfo);
 		Assert.fail("Analysis variable type should not be assigned together with any other variable type");
 	}

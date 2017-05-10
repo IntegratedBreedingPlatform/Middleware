@@ -2,6 +2,7 @@
 package org.generationcp.middleware.domain.ontology;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -119,5 +120,14 @@ public enum VariableType {
 	@Override
 	public String toString() {
 		return "VariableType{" + "id=" + this.id + ", name='" + this.name + '\'' + ", description='" + this.description + '\'' + '}';
+	}
+	
+	/**
+	 * Returns list of Variable Types that are "reserved" or for special use only and not intended
+	 * to be used when creating a trial or nursery plot (eg. "Analysis" and "Analysis Summary" variable types)
+	 * @return
+	 */
+	public static List<VariableType> getReservedVariableTypes(){
+		return Arrays.asList(ANALYSIS, ANALYSIS_SUMMARY);
 	}
 }
