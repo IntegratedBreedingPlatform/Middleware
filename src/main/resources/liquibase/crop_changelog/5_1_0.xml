@@ -17,5 +17,79 @@
 		</sql>
 	</changeSet>
 	
+	<changeSet author="darla" id="v5.1-2">
+		<preConditions onFail="MARK_RAN">
+			<!-- Check if there are existing summary statistic variables that still have "Analysis" as variable type -->
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(DISTINCT varType.value)
+				  FROM cvtermprop vartype
+				 INNER JOIN cvterm_relationship cr_analysis ON cr_analysis.object_id = vartype.cvterm_id AND cr_analysis.type_id = 1900
+				 WHERE vartype.type_id = 1800 AND varType.value = 'Analysis'
+				 <!-- 	Filter analysis variables that have method names in BMSSummary.csv output file of BV
+				 		Special case is method name "Average" - "Mean" is the header in file but "Mean" is synonym  of "Average" -->	 
+				   AND EXISTS (
+				 	   SELECT 1 
+				 		 FROM cvterm_relationship cr_method  
+				 		INNER JOIN cvterm cv ON cv.cvterm_id = cr_method.object_id AND cv.cv_id = 1020
+				 		WHERE cr_analysis.object_id = cr_method.subject_id 
+				 		  AND cr_method.type_id = 1210 
+				 		  AND cv.name in ('CV', 'NumValues', 'NumMissing', 'Average', 'Variance', 'SD', 'Min', 'Max', 'Range', 'Median', 'LowerQuartile', 'UpperQuartile', 'MeanRep', 'MinRep', 'MaxRep', 'MeanSED', 'MinSED',	'MaxSED', 'MeanLSD', 'MinLSD', 'MaxLSD', 'CV', 'Heritability', 'WaldStatistic', 'WaldDF', 'Pvalue')
+	 				);
+		 	</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			<!-- Update variable type to "Analysis Summary" of previously created summary statistic variables -->
+			UPDATE cvtermprop vartype 
+			 INNER JOIN cvterm_relationship cr_analysis ON cr_analysis.object_id = vartype.cvterm_id AND cr_analysis.type_id = 1900
+			   SET vartype.value = 'Analysis Summary'
+			 WHERE vartype.type_id = 1800 AND varType.value = 'Analysis'
+			   AND EXISTS (
+			  	   SELECT 1 
+			 		 FROM cvterm_relationship cr_method  
+			 		INNER JOIN cvterm cv ON cv.cvterm_id = cr_method.object_id AND cv.cv_id = 1020
+			 		WHERE cr_analysis.object_id = cr_method.subject_id 
+			 		  AND cr_method.type_id = 1210 
+			 		  AND cv.name in ('CV', 'NumValues', 'NumMissing', 'Average', 'Variance', 'SD', 'Min', 'Max', 'Range', 'Median', 'LowerQuartile', 'UpperQuartile', 'MeanRep', 'MinRep', 'MaxRep', 'MeanSED', 'MinSED',	'MaxSED', 'MeanLSD', 'MinLSD', 'MaxLSD', 'CV', 'Heritability', 'WaldStatistic', 'WaldDF', 'Pvalue')
+	 			);
+		</sql>
+	</changeSet>
+	
+	<changeSet author="darla" id="v5.1-3">
+		<preConditions onFail="MARK_RAN">
+			<!-- Check if there are STUDY summary statistic variables that are still stored as "Analysis" variable type (1801)  -->
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(DISTINCT vartype.type_id)
+   				  FROM projectprop vartype
+  				 INNER JOIN projectprop var ON var.project_id = vartype.project_id and var.rank = vartype.rank AND var.type_id = 1070
+  				 WHERE vartype.type_id = 1801
+  				  <!-- 	Filter analysis variables that have method names used by summary statistics variables.
+				 		Special case is method name "Average" - Mean is the header in BV output file but "Mean" is synonym  of "Average" -->
+    			   AND EXISTS (
+				       SELECT 1 
+					     FROM cvterm_relationship cr_method  
+					    INNER JOIN cvterm cv ON cv.cvterm_id = cr_method.object_id AND cv.cv_id = 1020
+					    WHERE cr_method.subject_id = var.value
+					      AND cr_method.type_id = 1210 
+					      AND cv.name in ('CV', 'NumValues', 'NumMissing', 'Average', 'Variance', 'SD', 'Min', 'Max', 'Range', 'Median', 'LowerQuartile', 'UpperQuartile', 'MeanRep', 'MinRep', 'MaxRep', 'MeanSED', 'MinSED',	'MaxSED', 'MeanLSD', 'MinLSD', 'MaxLSD', 'CV', 'Heritability', 'WaldStatistic', 'WaldDF', 'Pvalue')
+	 				);
+		 	</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			<!-- Update variable type to "Analysis Summary" (1811) of STUDY summary variables previously still stored as "Analysis" variable type (1801) -->
+			UPDATE projectprop vartype
+		     INNER JOIN projectprop var ON var.project_id = vartype.project_id and var.rank = vartype.rank AND var.type_id = 1070
+		       SET vartype.type_id = 1811
+		     WHERE vartype.type_id = 1801
+		       AND EXISTS (
+			       SELECT 1 
+				     FROM cvterm_relationship cr_method  
+				    INNER JOIN cvterm cv ON cv.cvterm_id = cr_method.object_id AND cv.cv_id = 1020
+				    WHERE cr_method.subject_id = var.value
+				      AND cr_method.type_id = 1210 
+				      AND cv.name in ('CV', 'NumValues', 'NumMissing', 'Average', 'Variance', 'SD', 'Min', 'Max', 'Range', 'Median', 'LowerQuartile', 'UpperQuartile', 'MeanRep', 'MinRep', 'MaxRep', 'MeanSED', 'MinSED',	'MaxSED', 'MeanLSD', 'MinLSD', 'MaxLSD', 'CV', 'Heritability', 'WaldStatistic', 'WaldDF', 'Pvalue')
+	 			);
+		</sql>
+	</changeSet>
+	
 
 </databaseChangeLog>
