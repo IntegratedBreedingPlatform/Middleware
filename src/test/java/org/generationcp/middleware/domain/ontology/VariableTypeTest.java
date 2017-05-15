@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.domain.ontology;
 
 import java.util.List;
@@ -6,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class VariableTypeTest {
-	
+
 	@Test
 	public void testGetReservedVariableTypes() {
 		final List<VariableType> reservedVariableTypes = VariableType.getReservedVariableTypes();

@@ -492,11 +492,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			variable.setIsFavorite(programFavorite != null);
 
 			if (calculateVariableUsage) {
-			  	// setting variable observations and study to 0 and remove heavy calculation queries not needed to determine if it is editable or not
+				// setting variable observations and study to 0 and remove heavy calculation queries not needed to determine if it is
+				// editable or not
 				variable.setStudies(0);
 				variable.setObservations(0);
 
-			  	variable.setHasUsage(this.isVariableUsedInStudy(id));
+				variable.setHasUsage(this.isVariableUsedInStudy(id));
 
 			} else {
 				final int unknownUsage = -1;
@@ -715,7 +716,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	// Throw exception if variable types of variable to be added is "reserved" like "Analysis" or "Analysis Summary"
 	private void checkForReservedVariableTypes(final OntologyVariableInfo variableInfo) {
-		if (!Collections.disjoint(variableInfo.getVariableTypes(), VariableType.getReservedVariableTypes()) && variableInfo.getVariableTypes().size() > 1) {
+		if (!Collections.disjoint(variableInfo.getVariableTypes(), VariableType.getReservedVariableTypes())
+				&& variableInfo.getVariableTypes().size() > 1) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE);
 		}
 	}
@@ -812,7 +814,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		final SQLQuery query = this.getActiveSession().createSQLQuery(variableUsageCount);
 		query.setParameter("variableId", variableId);
-		List list = query.list();
+		final List list = query.list();
 		return list.size() > 0;
 	}
 
@@ -900,7 +902,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		elements.setTermProperties(termProperties);
 		elements.setVariableOverrides(variableOverrides);
 	}
-	
+
 	@Override
 	public boolean areVariablesUsedInStudy(final List<Integer> variablesIds) {
 		final String variableUsageCount = "SELECT *  FROM projectprop pp " + " WHERE pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
@@ -921,7 +923,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			throw new MiddlewareQueryException("Error at getVariableOverridesByVariableIds:" + e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public void deleteVariablesFromCache(final List<Integer> variablesIds) {
 		for (final Iterator<Integer> iterator = variablesIds.iterator(); iterator.hasNext();) {

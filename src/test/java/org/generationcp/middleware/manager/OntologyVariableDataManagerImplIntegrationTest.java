@@ -105,7 +105,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 		Assert.assertEquals("Study usage should be 0", new Integer(0), variable.getStudies());
 		Assert.assertEquals("Observation usage should be 0", new Integer(0), variable.getObservations());
-	  	Assert.assertFalse("Variable usage should be false",  variable.getHasUsage());
+		Assert.assertFalse("Variable usage should be false", variable.getHasUsage());
 		Assert.assertEquals("Crop ontology id should be " + OntologyVariableDataManagerImplIntegrationTest.CROP_ONTOLOGY_ID,
 				OntologyVariableDataManagerImplIntegrationTest.CROP_ONTOLOGY_ID, variable.getProperty().getCropOntologyId());
 	}
@@ -179,7 +179,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.variableManager.updateVariable(this.testVariableInfo);
 		Assert.fail("Analysis variable type should not be assigned together with any other variable type");
 	}
-	
+
 	@Test(expected = MiddlewareException.class)
 	public void testAddAnalysisSummaryVariableShouldNotBeAssignedWithOtherVariableType() throws Exception {
 		final OntologyVariableInfo variableInfo = new OntologyVariableInfo();
@@ -238,10 +238,10 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 	}
 
-  	@Test
-	public void testIsVariableUsedReturnsFalse() throws Exception{
-	  boolean hasUsage = this.variableManager.isVariableUsedInStudy(testVariableInfo.getId());
-	  Assert.assertFalse("Variable should have no usage", hasUsage);
+	@Test
+	public void testIsVariableUsedReturnsFalse() throws Exception {
+		final boolean hasUsage = this.variableManager.isVariableUsedInStudy(this.testVariableInfo.getId());
+		Assert.assertFalse("Variable should have no usage", hasUsage);
 	}
 
 	/**
@@ -293,7 +293,6 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.testVariableInfo.setIsFavorite(true);
 		this.variableManager.addVariable(this.testVariableInfo);
 
-
 	}
 
 	protected void createTestVariableWithCategoricalValue() {
@@ -310,39 +309,39 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 		this.buildVariable();
 	}
-	
+
 	@Test
 	public void testAreVariablesUsedReturnsFalse() throws Exception {
-		List<Integer> list = new ArrayList<>();
-		list.add(testVariableInfo.getId());
-		boolean hasUsage = this.variableManager.areVariablesUsedInStudy(list);
+		final List<Integer> list = new ArrayList<>();
+		list.add(this.testVariableInfo.getId());
+		final boolean hasUsage = this.variableManager.areVariablesUsedInStudy(list);
 		Assert.assertFalse("Variables should have no usage", hasUsage);
 	}
 
 	@Test
 	public void testGetVariableOverridesByVariableIds() throws Exception {
-		List<Integer> list = new ArrayList<>();
-		list.add(testVariableInfo.getId());
-		List<VariableOverrides> override = this.variableManager.getVariableOverridesByVariableIds(list);
-		VariableOverrides variableOverrides = override.get(0);
+		final List<Integer> list = new ArrayList<>();
+		list.add(this.testVariableInfo.getId());
+		final List<VariableOverrides> override = this.variableManager.getVariableOverridesByVariableIds(list);
+		final VariableOverrides variableOverrides = override.get(0);
 		Assert.assertEquals(variableOverrides.getExpectedMin(), "0");
 		Assert.assertEquals(variableOverrides.getExpectedMax(), "100");
 	}
-	
-	@Test
-	public void testDeleteVariablesFromCache(){
-		
-		List<Integer> variablesIds = new ArrayList<Integer>();
-		int size = VariableCache.getCacheSize();
 
-		Integer variable1Id = 1;
-		Variable variable1 = new Variable();
+	@Test
+	public void testDeleteVariablesFromCache() {
+
+		final List<Integer> variablesIds = new ArrayList<Integer>();
+		final int size = VariableCache.getCacheSize();
+
+		final Integer variable1Id = 1;
+		final Variable variable1 = new Variable();
 		variable1.setId(variable1Id);
 
 		VariableCache.addToCache(variable1Id, variable1);
 		Assert.assertEquals(size + 1, VariableCache.getCacheSize());
 		Assert.assertEquals(variable1, VariableCache.getFromCache(variable1Id));
-		
+
 		variablesIds.add(variable1Id);
 		this.variableManager.deleteVariablesFromCache(variablesIds);
 		Assert.assertEquals(size, VariableCache.getCacheSize());
