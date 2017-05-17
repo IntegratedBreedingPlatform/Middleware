@@ -169,7 +169,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		variableInfo.addVariableType(VariableType.ANALYSIS);
 		variableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
 		this.variableManager.addVariable(variableInfo);
-		Assert.fail("Analysis variable type should not be assigned together with any other variable type");
+		Assert.fail("'Analysis' variable type should not be assigned together with any other variable type");
 	}
 
 	@Test(expected = MiddlewareException.class)
@@ -177,7 +177,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.testVariableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
 		this.testVariableInfo.addVariableType(VariableType.ANALYSIS);
 		this.variableManager.updateVariable(this.testVariableInfo);
-		Assert.fail("Analysis variable type should not be assigned together with any other variable type");
+		Assert.fail("'Analysis' variable type should not be assigned together with any other variable type");
 	}
 
 	@Test(expected = MiddlewareException.class)
@@ -187,7 +187,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		variableInfo.addVariableType(VariableType.ANALYSIS_SUMMARY);
 		variableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
 		this.variableManager.addVariable(variableInfo);
-		Assert.fail("Analysis variable type should not be assigned together with any other variable type");
+		Assert.fail("'Analysis Summary' variable type should not be assigned together with any other variable type");
 	}
 
 	@Test(expected = MiddlewareException.class)
@@ -195,7 +195,17 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.testVariableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
 		this.testVariableInfo.addVariableType(VariableType.ANALYSIS_SUMMARY);
 		this.variableManager.updateVariable(this.testVariableInfo);
-		Assert.fail("Analysis variable type should not be assigned together with any other variable type");
+		Assert.fail("'Analysis Summary' variable type should not be assigned together with any other variable type");
+	}
+	
+	@Test(expected = MiddlewareException.class)
+	public void testAddAnalysisVariableShouldNotBeAssignedWithAnalysisSummaryVariableType() throws Exception {
+		final OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+		variableInfo.setName(OntologyDataCreationUtil.getNewRandomName());
+		variableInfo.addVariableType(VariableType.ANALYSIS);
+		variableInfo.addVariableType(VariableType.ANALYSIS_SUMMARY);
+		this.variableManager.addVariable(variableInfo);
+		Assert.fail("'Analysis' variable type should not be assigned together with 'Analysis Summary' variable type");
 	}
 
 	@Test
