@@ -39,6 +39,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	static final String SELECTION_HISTORY_NAME_CODE = "DRVNM";
 	static final String SELECTION_HISTORY_NAME_CODE_FOR_CROSS = "CRSNM";
 	static final String SELECTION_HISTORY_AT_FIXATION_NAME_CODE = "SELHISFIX";
+	static final String CODED_NAME_1 = "CODE1";
+	static final String CODED_NAME_2 = "CODE2";
+	static final String CODED_NAME_3 = "CODE3";
 
 	private GermplasmDAO germplasmDAO;
 
@@ -257,6 +260,47 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 		return selectionHistoryNameType;
 	}
+	
+	@Override
+	public void copyCodedNames(final Germplasm germplasm) {
+		final Germplasm parent = this.germplasmDAO.getById(germplasm.getGpid2());
+		this.copyCodedName(germplasm, this.getSelectionHistory(parent, GermplasmGroupingServiceImpl.CODED_NAME_1));
+		this.copyCodedName(germplasm, this.getSelectionHistory(parent, GermplasmGroupingServiceImpl.CODED_NAME_2));
+		this.copyCodedName(germplasm, this.getSelectionHistory(parent, GermplasmGroupingServiceImpl.CODED_NAME_3));
+	}
+	
+	
+	private void copyCodedName(final Germplasm germplasm, final Name codedName) {
+		if (codedName != null) {
+			this.addCodedName(germplasm, codedName);
+			LOG.info("Coded name for gid {} saved as germplasm name {} .", germplasm.getGid(),
+					codedName.getNval());
+		} else {
+			LOG.info("No coded name was found for germplasm {}. Nothing to copy.", germplasm.getGid());
+		}
+	}
+	
+	private void addCodedName(final Germplasm germplasm, final Name nameToCopyFrom) {
+
+		// 1. Make current preferred name a non-preferred name by setting nstat = 0
+		// because we are about to add a different name as preferred.
+		final Name currentPreferredName = germplasm.findPreferredName();
+		if (currentPreferredName != null) {
+			currentPreferredName.setNstat(0);
+		}
+
+		final Name codedName = new Name();
+		codedName.setGermplasmId(germplasm.getGid());
+		codedName.setTypeId(nameToCopyFrom.getTypeId());
+		codedName.setNval(nameToCopyFrom.getNval());
+		codedName.setNstat(1); // nstat = 1 means it is preferred name.
+		codedName.setUserId(nameToCopyFrom.getUserId());
+		codedName.setLocationId(nameToCopyFrom.getLocationId());
+		codedName.setNdate(Util.getCurrentDateAsIntegerValue());
+		codedName.setReferenceId(0);
+		germplasm.getNames().add(codedName);
+	}
+	
 
 	private void copySelectionHistory(final Germplasm germplasm) {
 
