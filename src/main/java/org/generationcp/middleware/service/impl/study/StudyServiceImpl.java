@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service.impl.study;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -70,6 +71,27 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public static final String SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE = " where \n"
 		+ "	proj.project_id = (select  p.project_id from project_relationship pr inner join project p ON p.project_id = pr.subject_project_id where (pr.object_project_id = :studyIdentifier and name like '%PLOTDATA')) \n"
 		+ "    and gl.nd_geolocation_id = :instanceId ";
+
+	private static final String SQL_FOR_GET_STARTING_ENTRY_NUMBER = " SELECT \n"
+		+ "   coalesce(min(cast(ldp.entry_id AS SIGNED)), 1) AS 'starting_entry_no' \n"
+		+ " FROM project p \n"
+		+ "   INNER JOIN listnms l ON l.projectid = p.project_id \n"
+		+ "   INNER JOIN listdata_project ldp ON l.listid = ldp.list_id \n"
+		+ " WHERE p.project_id = :studyId";
+
+	public static final String SQL_FOR_GET_STARTING_PLOT_NUMBER = " SELECT \n"
+		+ "   coalesce(min(cast(prop.value AS SIGNED)), 1) AS 'starting_plot_no' \n"
+		+ " FROM project p \n"
+		+ "   INNER JOIN nd_experiment_project ndep ON p.project_id = ndep.project_id \n"
+		+ "   INNER JOIN nd_experiment nde ON ndep.nd_experiment_id = nde.nd_experiment_id \n"
+		+ "   INNER JOIN nd_experimentprop prop ON nde.nd_experiment_id = prop.nd_experiment_id \n"
+		+ " WHERE prop.type_id = " + TermId.PLOT_NO.getId() + " \n"
+		+ "       AND p.project_id = ( \n"
+		+ "         SELECT p.project_id \n"
+		+ "         FROM project p INNER JOIN project_relationship psubj ON p.project_id = psubj.subject_project_id \n"
+		+ "         WHERE psubj.object_project_id = :studyId AND psubj.type_id = " + TermId.BELONGS_TO_STUDY.getId()  + " \n"
+		+ "         AND p.name LIKE '%-PLOTDATA') ";
+
 
 	public static final String SQL_FOR_HAS_MEASUREMENT_DATA_ENTERED = "SELECT nde.nd_experiment_id,cvterm_variable.cvterm_id,cvterm_variable.name, count(ph.value) \n"
 		+ " FROM \n" + " project p \n" + " INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
@@ -511,6 +533,32 @@ public class StudyServiceImpl extends Service implements StudyService {
 			return null;
 		} catch (MiddlewareQueryException e) {
 			final String message = "Error with getStudyDetails() query from study: " + studyId;
+			StudyServiceImpl.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	@Override
+	public int getStartingPlotNumber(int studyId) {
+		try {
+			final SQLQuery query = this.getCurrentSession().createSQLQuery(SQL_FOR_GET_STARTING_PLOT_NUMBER);
+			query.setParameter("studyId", studyId);
+			return ((BigInteger) query.uniqueResult()).intValue();
+		} catch (MiddlewareQueryException e) {
+			final String message = "Error with getStartingPlotNumber() query from study: " + studyId;
+			StudyServiceImpl.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	@Override
+	public int getStartingEntryNumber(int studyId) {
+		try {
+			final SQLQuery query = this.getCurrentSession().createSQLQuery(SQL_FOR_GET_STARTING_ENTRY_NUMBER);
+			query.setParameter("studyId", studyId);
+			return ((BigInteger) query.uniqueResult()).intValue();
+		} catch (MiddlewareQueryException e) {
+			final String message = "Error with getStartingEntryNumber() query from study: " + studyId;
 			StudyServiceImpl.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
