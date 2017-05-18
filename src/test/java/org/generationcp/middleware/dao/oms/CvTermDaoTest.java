@@ -135,7 +135,6 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		}
 	}
 
-	@Ignore("See BMS-3721")
 	@Test
 	public void testGetOntologyTraitClasses() throws Exception {
 		List<TraitClassReference> traitClasses = CvTermDaoTest.dao.getTraitClasses(TermId.ONTOLOGY_TRAIT_CLASS);
@@ -146,7 +145,6 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		}
 	}
 
-	@Ignore("See BMS-3721")
 	@Test
 	public void testGetOntologyResearchClasses() throws Exception {
 		List<TraitClassReference> traitClasses = CvTermDaoTest.dao.getTraitClasses(TermId.ONTOLOGY_RESEARCH_CLASS);
@@ -157,7 +155,6 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		}
 	}
 
-	@Ignore("See BMS-3721")
 	@Test
 	public void testGetAllTraitClasses() throws Exception {
 		List<TraitClassReference> traitClasses = CvTermDaoTest.dao.getAllTraitClasses();
