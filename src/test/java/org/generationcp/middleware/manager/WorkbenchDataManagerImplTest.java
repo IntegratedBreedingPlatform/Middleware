@@ -12,7 +12,6 @@
 package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -30,21 +29,17 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
-import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
-import org.generationcp.middleware.pojos.workbench.ToolLicenseInfo;
-import org.generationcp.middleware.pojos.workbench.ToolName;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
 import org.generationcp.middleware.service.api.user.UserDto;
-import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.utils.test.Debug;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
@@ -286,6 +281,22 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testGetProjectByUUID() throws MiddlewareQueryException {
+		final Project project = this.workbenchDataManager.getProjectByUuidAndCrop(this.commonTestProject.getUniqueID(),
+				this.commonTestProject.getCropType().getCropName());
+
+		Assert.assertEquals(this.commonTestProject.getUniqueID(), project.getUniqueID());
+		Assert.assertEquals(this.commonTestProject.getCropType(), project.getCropType());
+	}
+
+	@Test
+	public void testGetProjectByUUIDProjectDoesNotExistInTheSpecifiedCrop() throws MiddlewareQueryException {
+		final Project project = this.workbenchDataManager.getProjectByUuidAndCrop(this.commonTestProject.getUniqueID(),
+				"wheat");
+		Assert.assertNull("Expecting a null project because the project's unique id is associated to maize crop.", project);
+	}
+
+	@Test
 	public void testGetUserByName() throws MiddlewareQueryException {
 		final User user = this.workbenchDataManager.getUserByName(this.testUser1.getName(), 0, 1, Operation.EQUAL).get(0);
 		Assert.assertEquals(this.testUser1.getName(), user.getName());
@@ -460,27 +471,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertNotNull(roles);
 		Assert.assertTrue(!roles.isEmpty());
 	}
-
-	@Test
-	public void testProjectUserMysqlAccount() throws MiddlewareQueryException {
-		final ProjectUserMysqlAccount recordToSave = new ProjectUserMysqlAccount();
-		recordToSave.setProject(this.commonTestProject);
-		recordToSave.setUser(this.testUser1);
-		recordToSave.setMysqlUsername("sample " + new Random().nextInt(10000));
-		recordToSave.setMysqlPassword("password");
-
-		final Integer idSaved = this.workbenchDataManager.addProjectUserMysqlAccount(recordToSave);
-		Assert.assertNotNull("Expected id of the newly saved record in workbench_project_user_mysql_account", idSaved);
-		Debug.println(IntegrationTestBase.INDENT, "Id of record saved: " + idSaved);
-
-		final ProjectUserMysqlAccount record = this.workbenchDataManager.getProjectUserMysqlAccountByProjectIdAndUserId(
-				this.commonTestProject.getProjectId().intValue(), this.testUser1.getUserid());
-		Assert.assertNotNull(record);
-		Assert.assertEquals(this.commonTestProject.getProjectId(), record.getProject().getProjectId());
-		Assert.assertEquals(this.testUser1.getUserid(), record.getUser().getUserid());
-		Debug.println(IntegrationTestBase.INDENT, record.toString());
-	}
-
+	
 	@Test
 	public void testCountAllPersons() throws MiddlewareQueryException {
 		final long count = this.workbenchDataManager.countAllPersons();

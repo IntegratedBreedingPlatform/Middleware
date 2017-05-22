@@ -14,7 +14,7 @@ public class VariableOverridesDaoTest extends IntegrationTestBase {
 
 	private static VariableOverridesDao dao;
 
-	private static Integer variableId = 18000; // Grain_yield from test db
+	private static Integer variableId = 51570; // GY_Adj_kgha from test db
 	private static String programId = UUID.randomUUID().toString();
 
 	@Before

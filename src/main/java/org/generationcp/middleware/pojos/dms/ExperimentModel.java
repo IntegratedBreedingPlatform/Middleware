@@ -30,9 +30,9 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.BatchSize;
 /**
  *
  * http://gmod.org/wiki/Chado_Natural_Diversity_Module#Table:_nd_experiment
@@ -51,7 +51,7 @@ import org.hibernate.annotations.BatchSize;
 @Table(name = "nd_experiment")
 @Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="nd_experiment")
 //OneToOne relationship to this entity from ExperimentProject requires batching annotation to be on entity unlike OneToMany which can be on the field.
-@BatchSize(size = 500)
+@BatchSize(size = 5000)
 public class ExperimentModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -67,14 +67,20 @@ public class ExperimentModel implements Serializable {
 	// Geolocation
 	@OneToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "nd_geolocation_id")
+
 	private Geolocation geoLocation;
 
 	// References cvterm
 	@Column(name = "type_id")
 	private Integer typeId;
 
+	//plot_id
+	@Basic(optional = true)
+	@Column(name = "plot_id")
+	private String plotId;
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
-	@BatchSize(size = 500)
+	@BatchSize(size = 5000)
 	private List<ExperimentProperty> properties;
 
 	@ManyToOne
@@ -86,13 +92,13 @@ public class ExperimentModel implements Serializable {
 	//FIXME Should this not be a OneToOne? Can one experiment have multiple stock (germplasm) rows?
 	//Collection always contains one item currently.
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "experiment")
-	@BatchSize(size = 500)
+	@BatchSize(size = 5000)
 	private List<ExperimentStock> experimentStocks;
 
 	@OneToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "nd_experiment_phenotype", joinColumns = @JoinColumn(name = "nd_experiment_id"), inverseJoinColumns = @JoinColumn(
 			name = "phenotype_id"))
-	@BatchSize(size = 500)
+	@BatchSize(size = 5000)
 	private List<Phenotype> phenotypes;
 
 	public ExperimentModel() {
@@ -166,6 +172,14 @@ public class ExperimentModel implements Serializable {
 		this.phenotypes = phenotypes;
 	}
 
+	public void setPlotId(String plotId) {
+		this.plotId = plotId;
+	}
+
+	public String getPlotId() {
+		return plotId;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -221,8 +235,10 @@ public class ExperimentModel implements Serializable {
 		builder.append(this.geoLocation);
 		builder.append(", typeId=");
 		builder.append(this.typeId);
+		builder.append(", plotId=");
+		builder.append(this.plotId);
 		builder.append("]");
 		return builder.toString();
 	}
-
+	
 }

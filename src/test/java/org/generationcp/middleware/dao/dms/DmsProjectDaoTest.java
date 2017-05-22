@@ -1,6 +1,9 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -10,12 +13,15 @@ import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
+import org.mockito.internal.matchers.Matches;
 
 public class DmsProjectDaoTest {
 
@@ -33,6 +39,7 @@ public class DmsProjectDaoTest {
 
 		this.mockQuery = Mockito.mock(SQLQuery.class);
 		Mockito.when(this.mockSession.createSQLQuery(DmsProjectDao.GET_CHILDREN_OF_FOLDER)).thenReturn(this.mockQuery);
+
 	}
 
 	/**
@@ -99,6 +106,28 @@ public class DmsProjectDaoTest {
 	@Test(expected = MiddlewareQueryException.class)
 	public void testEmptyStudyTypeParameter2() {
 		this.dao.getChildrenOfFolder(1, PROG_UUID, new ArrayList<StudyType>());
+	}
+
+	@Test
+	public void testGetStudyMetadata() {
+ 		Mockito.when(this.mockSession.createSQLQuery(DmsProjectDao.GET_STUDY_METADATA_BY_ID)).thenReturn(this.mockQuery);
+
+		final Object[] mockDBRow1 = new Object[] {"31", 2088, "TR", "T", "10300", "2088", "TR", "20161212", "", "9006", "2"};
+		Mockito.when(this.mockQuery.uniqueResult()).thenReturn(mockDBRow1);
+		StudyMetadata studyMetadata = this.dao.getStudyMetadata(31);
+
+		assertThat(studyMetadata.getStudyDbId(), equalTo(Integer.parseInt((String)mockDBRow1[0])));
+		assertThat(studyMetadata.getNurseryOrTrialId(), equalTo(mockDBRow1[1]));
+		assertThat(studyMetadata.getStudyName(), equalTo(mockDBRow1[2]));
+		assertThat(studyMetadata.getStudyType(), equalTo(mockDBRow1[3]));
+		assertThat(studyMetadata.getSeasons().get(0), equalTo(TermId.getById(Integer.parseInt((String) mockDBRow1[4])).toString()));
+		assertThat(studyMetadata.getTrialDbId(), equalTo(Integer.parseInt( (String) mockDBRow1[5])));
+		assertThat(studyMetadata.getTrialName(), equalTo(mockDBRow1[6]));
+		assertThat(studyMetadata.getStartDate(), equalTo((mockDBRow1[7])));
+		assertThat(studyMetadata.getEndDate(), equalTo(mockDBRow1[8]));
+		assertThat(studyMetadata.getActive(), equalTo(Boolean.FALSE));
+		assertThat(studyMetadata.getLocationId(), equalTo(Integer.parseInt((String) mockDBRow1[10])));
+
 	}
 
 	private void assertCommonDataMapping(Object[] expected, Reference actual) {

@@ -7,7 +7,7 @@ import org.generationcp.middleware.pojos.User;
 
 public class UserTestDataInitializer {
 
-	public User createUser() {
+	public static User createUser() {
 		final User user = new User();
 		user.setUserid(1);
 		user.setInstalid(-1);
@@ -22,9 +22,9 @@ public class UserTestDataInitializer {
 		return user;
 	}
 
-	public List<User> createUserList() {
+	public static List<User> createUserList() {
 		final List<User> users = new ArrayList<User>();
-		users.add(this.createUser());
+		users.add(UserTestDataInitializer.createUser());
 		return users;
 	}
 }

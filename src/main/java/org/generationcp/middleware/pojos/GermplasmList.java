@@ -25,9 +25,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
@@ -43,6 +46,7 @@ import org.hibernate.annotations.SQLDelete;
 @Entity
 @Table(name = "listnms")
 @SQLDelete(sql = "UPDATE listnms SET liststatus = 9 WHERE listid = ?")
+@NamedQueries({@NamedQuery(name = "deleteGermplasmListByListIdPhysically", query = "DELETE FROM GermplasmList WHERE listid = :listid"),})
 public class GermplasmList implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -50,6 +54,11 @@ public class GermplasmList implements Serializable {
 	public static final String LIST_TYPE = "LST";
     public static final String ADVANCED_LIST_TYPE = "ADVANCED";
     public static final String CROSS_LIST_TYPE = "CROSSES";
+	public static final String DELETE_GERMPLASM_LIST_BY_LISTID_PHYSICALLY = "deleteGermplasmListByListIdPhysically";
+	public static final String GERMPLASM_LIST_LIST_ID_COLUMN = "listid";
+	public static final String CROSSES = "Crosses";
+	public static final String IMP_CROSS = "Imported Crosses";
+	public static final String CRT_CROSS = "Designed Crosses";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -104,11 +113,15 @@ public class GermplasmList implements Serializable {
 	@OneToMany(mappedBy = "list", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
 	@OrderBy("entryId asc")
 	private List<GermplasmListData> listData = new ArrayList<GermplasmListData>();
+	
+	@Transient
+	private String tabLabel;
 
 	public static final String GET_GERMPLASM_LIST_TYPES =
 			"SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid "
 					+ "FROM udflds "
-					+ "WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE' and fcode not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES', 'FOLDER')";
+					+ "WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE' "
+				+ "and fcode not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES', 'CRT_CROSS', 'IMP_CROSS', 'FOLDER')";
 
 	public static final String GET_GERMPLASM_NAME_TYPES =
 			"SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid " + "FROM udflds "
@@ -118,7 +131,7 @@ public class GermplasmList implements Serializable {
 			"SELECT DISTINCT listnms.* "
 					+ "FROM listnms "
 					+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
-					+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) "
+					+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.deleted = 0) "
 					+ "WHERE listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
 					+ "      OR desig LIKE :q OR listname LIKE :q " + "      OR desig LIKE :qNoSpaces "
 					+ "      OR desig LIKE :qStandardized " + ")";
@@ -127,7 +140,7 @@ public class GermplasmList implements Serializable {
 			"SELECT DISTINCT listnms.* "
 					+ "FROM listnms "
 					+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
-					+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) "
+					+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.deleted = 0) "
 					+ "WHERE listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND (listdata.gid LIKE :gid "
 					+ "      OR desig LIKE :q OR listname LIKE :q" + "      OR desig LIKE :qNoSpaces "
 					+ "      OR desig LIKE :qStandardized " + ")";
@@ -136,7 +149,7 @@ public class GermplasmList implements Serializable {
 			"SELECT DISTINCT listnms.* "
 					+ "FROM listnms "
 					+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
-					+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.gid!=germplsm.grplce) "
+					+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.deleted = 0) "
 					+ "WHERE "
 					+ " listtype not in ('NURSERY', 'TRIAL', 'CHECK', 'ADVANCED', 'CROSSES') AND liststatus!=9 AND listtype!='FOLDER' AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
 					+ "      OR desig = :q OR listname = :q " + "      OR desig = :qNoSpaces " + "      OR desig = :qStandardized " + ")";
@@ -257,6 +270,7 @@ public class GermplasmList implements Serializable {
 		this.parent = parent;
 	}
 
+	// TODO Refactor: liststatus is NOT used like a bit array across the system
 	public String getStatusString() {
 		// TODO: make internationalizable
 		final List<String> listStatus = new ArrayList<String>();
@@ -436,6 +450,16 @@ public class GermplasmList implements Serializable {
 
 	public boolean isLockedList() {
 		return this.getStatus() >= 100;
+	}
+
+	
+	public String getTabLabel() {
+		return tabLabel;
+	}
+
+	
+	public void setTabLabel(String tabLabel) {
+		this.tabLabel = tabLabel;
 	}
 
 }

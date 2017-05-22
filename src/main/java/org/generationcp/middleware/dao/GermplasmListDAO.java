@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,7 +27,6 @@ import org.generationcp.middleware.pojos.GermplasmFolderMetadata;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -40,7 +40,6 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
-import org.hibernate.type.Type;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
@@ -52,12 +51,25 @@ import com.google.common.collect.Maps;
 public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	public static final Integer STATUS_DELETED = 9;
+
+	public static final String GET_GERMPLASM_USED_IN_MORE_THAN_ONE_LIST = " SELECT \n"
+		+ "   ld.gid, \n"
+		+ "   group_concat(l.listname) \n"
+		+ " FROM listnms l \n"
+		+ "   INNER JOIN listdata ld ON l.listid = ld.listid \n"
+		+ "   INNER JOIN germplsm g ON ld.gid = g.gid"
+		+ " WHERE ld.gid IN (:gids) \n"
+		+ "       AND l.liststatus != " + STATUS_DELETED + " \n"
+		+ " GROUP BY ld.gid \n"
+		+ " HAVING count(1) > 1";
+
 	protected static final Criterion RESTRICTED_LIST;
 	
 	static {
-		RESTRICTED_LIST = Restrictions
-				.not(Restrictions.in("type", new String[] {GermplasmListType.NURSERY.toString(), GermplasmListType.TRIAL.toString(),
-						GermplasmListType.CHECK.toString(), GermplasmListType.ADVANCED.toString(), GermplasmListType.CROSSES.toString()}));
+		RESTRICTED_LIST = Restrictions.not(Restrictions.in("type",
+			new String[] {GermplasmListType.NURSERY.toString(), GermplasmListType.TRIAL.toString(), GermplasmListType.CHECK.toString(),
+				GermplasmListType.ADVANCED.toString(), GermplasmListType.CROSSES.toString(), GermplasmListType.CRT_CROSS.toString(),
+				GermplasmListType.IMP_CROSS.toString()}));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -515,10 +527,10 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return criteria.list();
 	}
 
-	public GermplasmList getByListRef(final Integer listRef) {
+	public List<GermplasmList> getByListRef(final Integer listRef) {
 		final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
 		criteria.add(Restrictions.eq("listRef", listRef));
-		return (GermplasmList) criteria.uniqueResult();
+		return (List<GermplasmList>) criteria.list();
 	}
 
 	public List<Object[]> getAllListMetadata(final List<Integer> listIdsFromGermplasmList) {
@@ -585,5 +597,30 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 				return folderMetaData.getListId();
 			}
 		});
+	}
+
+	public int deleteGermplasmListByListIdPhysically(final Integer listId) {
+		final Query query = this.getSession().getNamedQuery(GermplasmList.DELETE_GERMPLASM_LIST_BY_LISTID_PHYSICALLY);
+		query.setInteger(GermplasmList.GERMPLASM_LIST_LIST_ID_COLUMN, listId);
+		return query.executeUpdate();
+	}
+
+	/**
+	 * Verify if the gids are used in more than one list
+	 *
+	 * @param gids gids to check
+	 * @return Map with GID as key and CSV of list where it is used
+	 */
+	public Map<Integer, String> getGermplasmUsedInMoreThanOneList(final List<Integer> gids) {
+		final Map<Integer, String> resultMap = new HashMap<>();
+
+		final SQLQuery query = this.getSession().createSQLQuery(GermplasmListDAO.GET_GERMPLASM_USED_IN_MORE_THAN_ONE_LIST);
+		query.setParameterList("gids", gids);
+
+		final List<Object[]> results = query.list();
+		for (final Object[] result : results) {
+			resultMap.put((Integer) result[0], (String) result[1]);
+		}
+		return resultMap;
 	}
 }

@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
 import org.generationcp.middleware.domain.oms.Term;
 
-public class StandardVariableInitializer {
+public class StandardVariableTestDataInitializer {
 
-	public static StandardVariable createStdVariable() {
+	public StandardVariable createStandardVariable() {
 		final StandardVariable stdVariable = new StandardVariable();
 		stdVariable.setName("variable name " + new Random().nextInt(10000));
 		stdVariable.setDescription("variable description");
@@ -30,11 +31,20 @@ public class StandardVariableInitializer {
 		return stdVariable;
 	}
 
-	public static StandardVariable createStdVariable(final Integer id, final String name) {
-		final StandardVariable stdVariable = createStdVariable();
+	public StandardVariable createStandardVariable(final Integer id, final String name) {
+		final StandardVariable stdVariable = this.createStandardVariable();
 		stdVariable.setId(id);
 		stdVariable.setName(name);
 		stdVariable.setDescription(name + " Description");
 		return stdVariable;
+	}
+	
+	public StandardVariable createStandardVariable(Term property, Term scale, Term method, Term dataType, Term storedIn, Term isA,
+			PhenotypicType phenotypicType, int termId, String name) {
+		StandardVariable stdVar = new StandardVariable(property, scale, method, dataType, isA, phenotypicType);
+		stdVar.setId(termId);
+		stdVar.setName(name);
+
+		return stdVar;
 	}
 }

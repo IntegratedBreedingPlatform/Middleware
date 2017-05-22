@@ -356,7 +356,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
         // get the root of the neighborhood
         Object[] traceResult = traceRoot(gid, numberOfStepsBackward, methodType);
 
-        if (traceResult != null) {
+        if (traceResult != null && traceResult.length >= 2) {
             Germplasm root = (Germplasm) traceResult[0];
             Integer stepsLeft = (Integer) traceResult[1];
 

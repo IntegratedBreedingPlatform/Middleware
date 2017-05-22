@@ -142,8 +142,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 	}
 
 	@SuppressWarnings({"unchecked", "rawtypes"})
-	@Test
-	public void testSaveVariables() throws Exception {
+	@Test public void testSaveVariables() throws Exception {
 
 		final String programUUID = "abc";
 		final String studyName = "nursery_1" + new Random().nextInt(10000);
@@ -151,7 +150,8 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		Workbook workbook = WorkbookTestDataInitializer.createTestWorkbook(2, StudyType.N, studyName, 1, true);
 		WorkbookSaver workbookSaver = Mockito.mock(WorkbookSaver.class, Mockito.CALLS_REAL_METHODS);
 
-		VariableTypeListTransformer transformer = Mockito.mock(VariableTypeListTransformer.class); //new VariableTypeListTransformer(Mockito.mock(HibernateSessionProvider.class));
+		VariableTypeListTransformer transformer = Mockito
+			.mock(VariableTypeListTransformer.class); //new VariableTypeListTransformer(Mockito.mock(HibernateSessionProvider.class));
 
 		VariableTypeList trialConditionsVariableTypeList = createVariableTypeList(workbook.getTrialConditions(), 1);
 		Mockito.doReturn(trialConditionsVariableTypeList).when(transformer).transform(workbook.getTrialConditions(), programUUID);
@@ -159,16 +159,17 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		VariableTypeList nonTrialFactorsVariableTypeList = createVariableTypeList(workbook.getNonTrialFactors(), 1);
 		Mockito.doReturn(nonTrialFactorsVariableTypeList).when(transformer).transform(workbook.getNonTrialFactors(), programUUID);
 
-		VariableTypeList trialFactorsVariableTypeList= createVariableTypeList(workbook.getTrialFactors(), 1);
-		Mockito.doReturn(trialFactorsVariableTypeList).when(transformer).transform(workbook.getTrialFactors(),
-				workbook.getTrialConditions().size() + 1, programUUID);
+		VariableTypeList trialFactorsVariableTypeList = createVariableTypeList(workbook.getTrialFactors(), 1);
+		Mockito.doReturn(trialFactorsVariableTypeList).when(transformer)
+			.transform(workbook.getTrialFactors(), workbook.getTrialConditions().size() + 1, programUUID);
 
-		VariableTypeList trialConstantsVariableTypeList= createVariableTypeList(workbook.getTrialConstants(), 1);
-		Mockito.doReturn(trialConstantsVariableTypeList).when(transformer).transform(workbook.getTrialConstants(),
-				workbook.getTrialConditions().size() + workbook.getTrialFactors().size() + 1, programUUID);
+		VariableTypeList trialConstantsVariableTypeList = createVariableTypeList(workbook.getTrialConstants(), 1);
+		Mockito.doReturn(trialConstantsVariableTypeList).when(transformer)
+			.transform(workbook.getTrialConstants(), workbook.getTrialConditions().size() + workbook.getTrialFactors().size() + 1,
+				programUUID);
 
-		VariableTypeList variatesVariableTypeList= createVariableTypeList(workbook.getVariates(), 1);
-		Mockito.doReturn(variatesVariableTypeList).when(transformer).transform(workbook.getVariates(), 10, programUUID);
+		VariableTypeList variatesVariableTypeList = createVariableTypeList(workbook.getVariates(), 1);
+		Mockito.doReturn(variatesVariableTypeList).when(transformer).transform(workbook.getVariates(), workbook.getNonTrialFactors().size()+1, programUUID);
 
 		Mockito.doReturn(transformer).when(workbookSaver).getVariableTypeListTransformer();
 
@@ -176,7 +177,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 		Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
 		Map<String, List<MeasurementVariable>> measurementVariableMap =
-				(Map<String, List<MeasurementVariable>>) variableMap.get("measurementVariableMap");
+			(Map<String, List<MeasurementVariable>>) variableMap.get("measurementVariableMap");
 		Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
 
 		final List<String> trialHeaders = headerMap.get("trialHeaders");

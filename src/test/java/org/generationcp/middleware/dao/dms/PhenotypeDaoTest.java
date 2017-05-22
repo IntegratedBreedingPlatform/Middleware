@@ -47,7 +47,8 @@ public class PhenotypeDaoTest extends IntegrationTestBase {
 
 	private static final String DATASETS = "datasets";
 	private static final String WORKBOOK = "workbook";
-
+	private final String cropPrefix = "ABCD";
+	
 	@Before
 	public void setUp() throws Exception {
 
@@ -56,11 +57,12 @@ public class PhenotypeDaoTest extends IntegrationTestBase {
 			this.dao.setSession(this.sessionProvder.getSession());
 		}
 
-		this.importFieldbookFile(PhenotypeDaoTest.FIELDBOOK_FILE_IBD_VALID);
-		this.importFieldbookFile(PhenotypeDaoTest.FIELDBOOK_FILE_CATVARIATES_ONLY);
+		
+		this.importFieldbookFile(PhenotypeDaoTest.FIELDBOOK_FILE_IBD_VALID, cropPrefix);
+		this.importFieldbookFile(PhenotypeDaoTest.FIELDBOOK_FILE_CATVARIATES_ONLY, cropPrefix);
 	}
 
-	private void importFieldbookFile(String fieldbookFileIbdValid) throws Exception {
+	private void importFieldbookFile(final String fieldbookFileIbdValid, final String cropPrefix) throws Exception {
 
 		if (!this.testDataLoaded) {
 			String fileLocation = PhenotypeDaoTest.class.getClassLoader().getResource(fieldbookFileIbdValid).getFile();
@@ -68,7 +70,7 @@ public class PhenotypeDaoTest extends IntegrationTestBase {
 			Workbook workbook = this.dataImportService.parseWorkbook(file);
 			workbook.print(IntegrationTestBase.INDENT);
 
-			int studyId = this.dataImportService.saveDataset(workbook, null);
+			int studyId = this.dataImportService.saveDataset(workbook, null, cropPrefix);
 
 			List<DatasetReference> datasetRefences = this.studyDataManager.getDatasetReferences(studyId);
 

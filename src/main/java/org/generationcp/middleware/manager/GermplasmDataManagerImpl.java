@@ -11,12 +11,8 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.AttributeDAO;
@@ -51,8 +47,14 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -150,7 +152,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			if (germplasm != null) {
 				updatedGid = germplasm.getGrplce();
 			}
-		} while (germplasm != null && !new Integer(0).equals(updatedGid));
+		} while (germplasm != null && !new Integer(0).equals(updatedGid) && !germplasm.getGid().equals(updatedGid));
 		return germplasm;
 	}
 
@@ -162,6 +164,24 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			germplasm.setPreferredName(preferredName);
 		}
 		return germplasm;
+	}
+
+	@Override
+	public List<Germplasm> getSortedGermplasmWithPrefName(final List<Integer> gids) {
+		List<Germplasm> result = new ArrayList<Germplasm>();
+		for (Iterator<Integer> iterator = gids.iterator(); iterator.hasNext(); ) {
+			Integer gid = iterator.next();
+			result.add(this.getGermplasmWithPrefName(gid));
+		}
+		Comparator<Germplasm> comparator = new Comparator<Germplasm>() {
+
+			@Override public int compare(Germplasm left, Germplasm right) {
+				return left.getPreferredName().getNval().compareTo(right.getPreferredName().getNval());
+			}
+		};
+
+		Collections.sort(result, comparator);
+		return result;
 	}
 
 	@Override
@@ -802,7 +822,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		if (germplasms != null) {
 			final List<Integer> gids = new ArrayList<>();
 			for (final Germplasm germplasm : germplasms) {
-				if (germplasm.getGid().equals(germplasm.getGrplce())) {// deleted
+				if (germplasm.getDeleted()) {// deleted
 					gids.add(germplasm.getGid());
 				}
 			}
@@ -1403,9 +1423,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	/**
 	 * (non-Javadoc)
-	 * 
-	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getUserDefinedFieldsByCodesInMap(java.lang.String,
-	 *      java.lang.String, java.util.List)
+	 *
 	 */
 	@Override
 	public UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code) {
@@ -1415,6 +1433,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Method> getDerivativeAndMaintenanceMethods(final List<Integer> ids) {
 		return this.getMethodDao().getDerivativeAndMaintenanceMethods(ids);
+	}
+	
+	@Override
+	public List<String> getMethodCodeByMethodIds(final Set<Integer> methodIds){
+		return this.getMethodDao().getMethodCodeByMethodIds(methodIds);
 	}
 
 	@Override
@@ -1474,6 +1497,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			}
 		}
 		return commaSeparatedListOfGids;
+	}
+
+	@Override
+	public Map<Integer, String[]> getParentsInfoByGIDList(List<Integer> gidList) {
+		return this.getGermplasmDao().getParentsInfoByGIDList(gidList);
 	}
 
 }

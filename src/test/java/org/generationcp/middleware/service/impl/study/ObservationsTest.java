@@ -20,8 +20,8 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.pojos.dms.ExperimentPhenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.TraitDto;
 import org.hibernate.Session;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,7 +58,7 @@ public class ObservationsTest {
 		traitMeasurements.add(this.measurementDto);
 		this.observationDto =
 				new ObservationDto(new Integer(1), "TrialInstance", "EntryType", new Integer(100), "GID Designation", "Entry No",
-						"Seed Source", "Repition Number", "Plot Number", traitMeasurements);
+						"Seed Source", "Repition Number", "Plot Number", "Block Number", traitMeasurements);
 	}
 
 	/**
@@ -68,8 +68,8 @@ public class ObservationsTest {
 	@Test
 	public void insertTrait() throws Exception {
 
-		when(this.measurementDto.getTriatValue()).thenReturn(CHARACTER_TEST_VALUE);
-		when(this.measurementDto.getTrait()).thenReturn(new TraitDto(TEST_TRAIT_ID, TEST_TRAIT_NAME));
+		when(this.measurementDto.getVariableValue()).thenReturn(CHARACTER_TEST_VALUE);
+		when(this.measurementDto.getMeasurementVariable()).thenReturn(new MeasurementVariableDto(TEST_TRAIT_ID, TEST_TRAIT_NAME));
 		when(this.mockSession.save(isA(Phenotype.class))).thenAnswer(new Answer<Serializable>() {
 
 			// Tick to simulate adding in of the ID
@@ -108,8 +108,8 @@ public class ObservationsTest {
 	@Test
 	public void insertCategoricalTrait() throws Exception {
 
-		when(this.measurementDto.getTriatValue()).thenReturn(TEST_TERM_NAME);
-		when(this.measurementDto.getTrait()).thenReturn(new TraitDto(TEST_TRAIT_ID, TEST_TRAIT_NAME));
+		when(this.measurementDto.getVariableValue()).thenReturn(TEST_TERM_NAME);
+		when(this.measurementDto.getMeasurementVariable()).thenReturn(new MeasurementVariableDto(TEST_TRAIT_ID, TEST_TRAIT_NAME));
 		when(this.mockSession.save(isA(Phenotype.class))).thenAnswer(new Answer<Serializable>() {
 
 			@Override
@@ -148,9 +148,9 @@ public class ObservationsTest {
 	@Test
 	public void updateTrait() throws Exception {
 
-		when(this.measurementDto.getTriatValue()).thenReturn(CHARACTER_TEST_VALUE);
+		when(this.measurementDto.getVariableValue()).thenReturn(CHARACTER_TEST_VALUE);
 		when(this.measurementDto.getPhenotypeId()).thenReturn(1);
-		when(this.measurementDto.getTrait()).thenReturn(new TraitDto(999, TEST_TRAIT_NAME));
+		when(this.measurementDto.getMeasurementVariable()).thenReturn(new MeasurementVariableDto(999, TEST_TRAIT_NAME));
 
 		final Phenotype mockPhenotype = Mockito.mock(Phenotype.class);
 		when(this.mockSession.get(Phenotype.class, 1)).thenReturn(mockPhenotype);
@@ -174,9 +174,9 @@ public class ObservationsTest {
 	@Test
 	public void updateCategoricalTrait() throws Exception {
 
-		when(this.measurementDto.getTriatValue()).thenReturn(TEST_TERM_NAME);
+		when(this.measurementDto.getVariableValue()).thenReturn(TEST_TERM_NAME);
 		when(this.measurementDto.getPhenotypeId()).thenReturn(1);
-		when(this.measurementDto.getTrait()).thenReturn(new TraitDto(999, TEST_TRAIT_NAME));
+		when(this.measurementDto.getMeasurementVariable()).thenReturn(new MeasurementVariableDto(999, TEST_TRAIT_NAME));
 
 		final Phenotype mockPhenotype = Mockito.mock(Phenotype.class);
 		when(this.mockSession.get(Phenotype.class, 1)).thenReturn(mockPhenotype);

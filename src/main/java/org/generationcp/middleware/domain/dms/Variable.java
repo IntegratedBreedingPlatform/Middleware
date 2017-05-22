@@ -186,6 +186,22 @@ public class Variable implements Serializable, Comparable<Variable> {
 		return value;
 	}
 
+	/**
+	 * When the name of the enumeration is saved as value, this method returns the id of the enumeration
+	 * @return
+	 */
+	public String getIdValue() {
+		String value = this.value;
+		StandardVariable standardVariable = this.variableType.getStandardVariable();
+		if (value != null && standardVariable.hasEnumerations()) {
+			Enumeration enumerationByName = standardVariable.findEnumerationByName(value);
+			if (enumerationByName != null) {
+				value = String.valueOf(enumerationByName.getId());
+			}
+		}
+		return value;
+	}
+
 	public void print(int indent) {
 		Debug.println(indent, "Variable: ");
 

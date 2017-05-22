@@ -3,6 +3,7 @@ package org.generationcp.middleware.dao.ims;
 import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -119,5 +120,41 @@ public class LotDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(0, returnedLot.getAggregateData().getReservationMap().size());
 		Assert.assertEquals(0, returnedLot.getAggregateData().getCommittedMap().size());
 
+	}
+
+	@Test
+	public void testGetGermplasmsWithOpenLots() throws Exception {
+		final Germplasm germplasm =
+				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+
+		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments");
+		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
+
+		final Transaction transaction =
+				InventoryDetailsTestDataInitializer.createReservationTransaction(2.0, 0, "Deposit", lot, 1, 1, 1, "LIST");
+		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction));
+
+		final Set<Integer> gids = this.lotDAO.getGermplasmsWithOpenLots(Lists.newArrayList(germplasm.getGid()));
+
+		Assert.assertEquals(1, gids.size());
+	}
+
+	@Test
+	public void testGetGermplasmsWithNoOpenLots() throws Exception {
+		final Germplasm germplasm =
+				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName());
+
+		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 1, 1, "Comments");
+		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
+
+		final Transaction transaction =
+				InventoryDetailsTestDataInitializer.createReservationTransaction(2.0, 0, "Deposit", lot, 1, 1, 1, "LIST");
+		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction));
+
+		final Set<Integer> gids = this.lotDAO.getGermplasmsWithOpenLots(Lists.newArrayList(germplasm.getGid()));
+
+		Assert.assertEquals(0, gids.size());
 	}
 }

@@ -28,6 +28,8 @@ import org.generationcp.middleware.pojos.Georef;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.service.api.location.LocationDetailsDto;
+import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
@@ -48,6 +50,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 	private static final String UNIQUE_ID = "uniqueID";
 	private static final String CLASS_NAME_LOCATION = "Location";
+	private static final String LOCATION = "location";
 	private static final String COUNTRY_ID = "cntryid";
 	private static final String COUNTRY = "country";
 	private static final String GET_BY_TYPE = "getByType";
@@ -917,4 +920,127 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return new ArrayList<LocationDetails>();
 	}
 
+
+	public long countLocationsByFilter(final Map<LocationFilters, Object> filters) {
+
+		try {
+			final StringBuilder sqlString = new StringBuilder();
+
+			sqlString.append("SELECT l.locid ") //
+					.append(" FROM location l ") //
+					.append(" LEFT JOIN georef g on g.locid = l.locid ") //
+					.append(" LEFT JOIN cntry c on c.cntryid = l.cntryid ") //
+					.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype ");
+
+			if (!filters.isEmpty()) {
+				sqlString.append(createConditionWhereByFilter(filters));
+
+			}
+			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
+			
+			for (Map.Entry<LocationFilters, Object> entry : filters.entrySet()) {
+				LocationFilters filter = entry.getKey();
+				Object value = entry.getValue();
+				if (value.getClass().isArray()) {
+					query.setParameterList(filter.getParameter(), (Object[])value);
+				}else{
+					query.setParameter(filter.getParameter(), value);
+				}
+			}
+			
+			return query.list().size();
+		} catch (final HibernateException e) {
+			LocationDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					this.getLogExceptionMessage("countLocationsByFilter", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+	}
+
+	public List<LocationDetailsDto> getLocationsByFilter(final int pageNumber,final int pageSize,
+			final Map<LocationFilters, Object> filters) {
+		final List<LocationDetailsDto> locationList = new ArrayList<LocationDetailsDto>();
+
+		try {
+
+			final StringBuilder sqlString = new StringBuilder();
+
+			sqlString.append("SELECT l.locid ,ud.fname ,l.lname ,l.labbr ") //
+					.append("  ,c.isothree ,c.isoabbr ,g.lat ,g.lon ,g.alt ") //
+					.append(" FROM location l ") //
+					.append(" LEFT JOIN georef g on l.locid = g.locid ") //
+					.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid ") //
+					.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype ");
+
+			if (!filters.isEmpty()) {
+				sqlString.append(createConditionWhereByFilter(filters));
+
+			}
+
+			sqlString.append(" ORDER BY l.locid ");
+
+			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
+			int start = pageSize * (pageNumber - 1);
+			int numOfRows = pageSize;
+			query.setFirstResult(start);
+			query.setMaxResults(numOfRows);
+
+			for (Map.Entry<LocationFilters, Object> entry : filters.entrySet()) {
+				LocationFilters filter = entry.getKey();
+				Object value = entry.getValue();
+				if (value.getClass().isArray()) {
+					query.setParameterList(filter.getParameter(), (Object[])value);
+				}else{
+					query.setParameter(filter.getParameter(), value);
+				}
+			}
+			
+			final List<Object[]> results = query.list();
+
+			if (!results.isEmpty()) {
+				for (final Object[] row : results) {
+					final Integer locationDbId = (Integer) row[0];
+					final String locationType = (String) row[1];
+					final String name = (String) row[2];
+					final String abbreviation = (String) row[3];
+					final String countryCode = (String) row[4];
+					final String countryName = (String) row[5];
+					final Double latitude = (Double) row[6];
+					final Double longitude = (Double) row[7];
+					final Double altitude = (Double) row[8];
+
+					locationList.add(new LocationDetailsDto(locationDbId, locationType, name, abbreviation, countryCode, countryName,
+							latitude, longitude, altitude));
+
+				}
+			}
+
+			return locationList;
+
+		} catch (final HibernateException e) {
+			LocationDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+					this.getLogExceptionMessage("getLocalLocationsByFilter", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+	}
+
+	private String createConditionWhereByFilter(final Map<LocationFilters, Object> filters) {
+		final StringBuilder sqlString = new StringBuilder();
+		sqlString.append(" WHERE 1 = 1");
+
+		for (Map.Entry<LocationFilters, Object> entry : filters.entrySet()) {
+			LocationFilters filter = entry.getKey();
+			Object value = entry.getValue();
+
+			sqlString.append(" AND ");
+
+			if (value.getClass().isArray()) {
+				sqlString.append(filter.getStatement()).append("in (:").append(filter.getParameter()).append(") ");
+
+			} else {
+				sqlString.append(filter.getStatement()).append("= :").append(filter.getParameter()).append(" ");
+			}
+		}
+		return sqlString.toString();
+
+	}
 }

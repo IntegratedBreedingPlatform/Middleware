@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.ObjectUtils;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.gms.search.GermplasmSortableColumn;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
@@ -76,7 +77,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public Germplasm getById(final Integer gid) throws MiddlewareQueryException {
 		try {
 			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT g.* FROM germplsm g WHERE gid!=grplce AND gid=:gid LIMIT 1");
+			queryString.append("SELECT g.* FROM germplsm g WHERE g.deleted = 0 AND gid=:gid LIMIT 1");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameter("gid", gid);
@@ -566,7 +567,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			generativeChildrenCriteria.add(Restrictions.or(Restrictions.eq("gpid1", gid), Restrictions.eq("gpid2", gid)));
 			generativeChildrenCriteria.add(Restrictions.ge("gnpgs", 2)); // = Two or more parents
 			generativeChildrenCriteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged
-			generativeChildrenCriteria.add(Restrictions.neProperty("gid", "grplce")); // = Record is not deleted or replaced.
+			generativeChildrenCriteria.add(Restrictions.eq("deleted", Boolean.FALSE)); // = Record is not deleted or replaced.
 
 			children.addAll(generativeChildrenCriteria.getExecutableCriteria(this.getSession()).list());
 
@@ -599,7 +600,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final DetachedCriteria criteria = DetachedCriteria.forClass(Germplasm.class);
 			criteria.add(Restrictions.eq("mgid", mgid));
 			criteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged
-			criteria.add(Restrictions.neProperty("gid", "grplce")); // = Record is not deleted or replaced.
+			criteria.add(Restrictions.eq("deleted", Boolean.FALSE)); // = Record is not deleted or replaced.
 
 			@SuppressWarnings("unchecked") final List<Germplasm> groupMembers = criteria.getExecutableCriteria(this.getSession()).list();
 			// Prime the names collection before returning ;)
@@ -666,7 +667,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			criteria.add(Restrictions.eq("gnpgs", 2)); // Restrict to cases where two parents are involved.
 			criteria.add(Restrictions.eq("grplce", 0)); // = Record is unchanged.
 			criteria.add(Restrictions.ne("gid", currentCross.getGid())); // Exclude current cross. We are finding "previous" crosses.
-			criteria.add(Restrictions.neProperty("gid", "grplce")); // = Record is not deleted or replaced.
+			criteria.add(Restrictions.eq("deleted", Boolean.FALSE)); // = Record is not  or replaced.
 			criteria.addOrder(Order.asc("gid")); // Oldest created cross will be first in list.
 
 			@SuppressWarnings("unchecked") final List<Germplasm> previousCrosses = criteria.getExecutableCriteria(this.getSession()).list();
@@ -795,7 +796,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		try {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT {g.*} FROM germplsm g WHERE ");
-			queryString.append("g.gid IN( :gids )");
+			queryString.append("g.gid IN( :gids ) ");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("gids", gids);
@@ -1022,7 +1023,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public Germplasm getByLGid(final Integer lgid) throws MiddlewareQueryException {
 		try {
 			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT g.* FROM germplsm g WHERE gid!=grplce AND lgid=:lgid LIMIT 1");
+			queryString.append("SELECT g.* FROM germplsm g WHERE g.deleted = 0 AND lgid=:lgid LIMIT 1");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameter("lgid", lgid);
@@ -1065,7 +1066,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				params.put("gid", q);
 			}
 			// make sure to not include deleted germplasm from the search results
-			queryString.append(" AND g.gid!=g.grplce AND g.grplce = 0 " + LIMIT_CLAUSE);
+			queryString.append(" AND  g.deleted = 0  AND g.grplce = 0 " + LIMIT_CLAUSE);
 			queryString.append(" UNION ");
 		}
 	}
@@ -1083,7 +1084,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		params.put("inventory_id", q);
 
 		// make sure to not include deleted germplasm from the search results
-		queryString.append(" AND g.gid!=g.grplce AND g.grplce = 0 " + LIMIT_CLAUSE);
+		queryString.append(" AND  g.deleted = 0  AND g.grplce = 0 " + LIMIT_CLAUSE);
 		queryString.append(" UNION ");
 	}
 
@@ -1104,7 +1105,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		params.put("deletedStatus", GermplasmDAO.STATUS_DELETED);
 
 		// make sure to not include deleted germplasm from the search results
-		queryString.append(" AND g.gid!=g.grplce AND g.grplce = 0 " + LIMIT_CLAUSE);
+		queryString.append(" AND  g.deleted = 0  AND g.grplce = 0 " + LIMIT_CLAUSE);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -1182,7 +1183,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			// other progenitors
 			queryString.append("SELECT p.gid as GID from progntrs p where p.gid IN (:gids)");
 			queryString.append(") GermplasmParents "
-					+ "INNER JOIN germplsm g on GermplasmParents.GID = g.gid AND g.gid!=g.grplce AND g.grplce = 0");
+					+ "INNER JOIN germplsm g on GermplasmParents.GID = g.gid AND  g.deleted = 0  AND g.grplce = 0");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("gids", gidSearchResults);
@@ -1202,7 +1203,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		try {
 			final Set<Integer> gidGroupMembersSearchResults = new HashSet<Integer>();
 			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT members.gid FROM germplsm members WHERE members.gid!=members.grplce AND members.grplce = 0 "
+			queryString.append("SELECT members.gid FROM germplsm members WHERE members.deleted = 0 AND members.grplce = 0 "
 					+ "AND members.mgid IN (select g.mgid from germplsm g where g.gid IN (:gids) and g.mgid != 0)");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
@@ -1218,4 +1219,93 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
+  	public Map<Integer, String[]> getParentsInfoByGIDList (List<Integer> gidList) {
+	  try {
+		Map<Integer, String[]> pedigreeMap = new HashMap<>();
+		final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_PREFERRED_NAME_AND_PARENT_FOR_A_GID_LIST);
+		query.setParameterList("gidList", gidList);
+		query.addScalar("gid");
+		query.addScalar("pedigree");
+		query.addScalar("nval");
+
+		List<Object[]> results = query.list();
+		for (Object[] result : results) {
+		  pedigreeMap.put((Integer) result[0], new String[] {(String) result[1],(String) result[2]});
+		}
+		return pedigreeMap;
+	  } catch (final HibernateException e) {
+		String message = "Error with getPedigreeByGIDList(GIDS=" + gidList + ") : " + e.getMessage();
+		LOG.error(message, e);
+		throw new MiddlewareQueryException(message, e);
+	  }
+	}
+
+	public void deleteGermplasms(final List<Integer> gids) {
+		final StringBuilder queryString = new StringBuilder();
+
+		try {
+			this.getSession().flush();
+			queryString.append("UPDATE germplsm SET deleted = 1 where gid in (:gids)");
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("gids", gids);
+			query.executeUpdate();
+
+		} catch (final HibernateException e) {
+			String message = "Error with deleteGermplasms(GIDS=" + gids + ")  " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	/**
+	 * Get the immediate descendants of a list of gids
+	 * @param gids the gids
+	 * @return a map of gids and its offspring
+	 * @throws MiddlewareQueryException
+	 */
+	public Map<Integer, Set<Integer>> getGermplasmOffspringByGIDs(List<Integer> gids) {
+
+		if (gids != null && gids.size() > 0) {
+			Map<Integer, Set<Integer>> resultMap = new HashMap<>();
+
+			final Query query = this.getSession().createSQLQuery(Germplasm.GET_GERMPLASM_OFFSPRING_BY_GID);
+			query.setParameterList("gids", gids);
+
+			/**
+			 * Returns two columns:
+			 * - gid
+			 * - CSV of parents of the gid (gpid1, gpid2 or progntrs.pid)
+			 */
+			List<Object[]> results = query.list();
+
+			// Transform to Map of gid -> list of offspring
+			for (Object[] result : results) {
+				String[] parentsStr = ObjectUtils.toString(result[1]).split(",");
+				Set<Integer> parents = new HashSet<>();
+
+				for (String parentStr : parentsStr) {
+					try {
+						parents.add(Integer.parseInt(parentStr));
+					} catch (NumberFormatException e) {
+						this.LOG.warn("Could not cast " + parentStr);
+					}
+				}
+
+				Integer offspring = (Integer) result[0];
+
+				for (Integer parent : parents) {
+					if (!resultMap.containsKey(parent) && gids.contains(parent)) {
+						resultMap.put(parent, new HashSet<Integer>());
+					}
+					else if (gids.contains(parent)) {
+						resultMap.get(parent).add(offspring);
+					}
+				}
+			}
+
+			return resultMap;
+		}
+
+		return new HashMap<>();
+	}
 }

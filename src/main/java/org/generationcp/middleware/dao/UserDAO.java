@@ -15,10 +15,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -290,5 +294,86 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
-	
+
+	public List<UserDto> getUsersAssociatedToStudy(final Integer studyId) throws MiddlewareQueryException {
+		Preconditions.checkNotNull(studyId);
+		List<UserDto> users = new ArrayList<>();
+		String sql = " SELECT DISTINCT "
+			+ "     person.personid AS personId, "
+			+ "     person.fname AS fName, "
+			+ "     person.lname AS lName, "
+			+ "     person.pemail AS email, "
+			+ "     role.role AS role "
+			+ " FROM "
+			+ "     cvterm scale "
+			+ "         INNER JOIN "
+			+ "     cvterm_relationship r ON (r.object_id = scale.cvterm_id) "
+			+ "         INNER JOIN "
+			+ "     cvterm variable ON (r.subject_id = variable.cvterm_id) "
+			+ "         INNER JOIN "
+			+ "     projectprop pp ON (pp.type_id = variable.cvterm_id) "
+			+ "         INNER JOIN "
+			+ "     workbench.persons person ON (pp.value = person.personid) "
+			+ "         INNER JOIN "
+			+ "     workbench.users user ON (user.personid = person.personid) "
+			+ "         LEFT JOIN "
+			+ "     workbench.users_roles role ON (role.userid = user.userid) "
+			+ " WHERE "
+			+ "     pp.project_id = :studyId "
+			+ "         AND r.object_id = 1901 ";
+
+		try {
+			Query query = this.getSession().createSQLQuery(sql).addScalar("personId").addScalar("fName").addScalar("lName")
+					.addScalar("email").addScalar("role").setParameter("studyId", studyId);
+			List<Object> results = query.list();
+			mapUsers(users, results);
+			return users;
+		} catch (MiddlewareQueryException e) {
+			final String message = "Error with getUsersAssociatedToStudy() query from studyId: " + studyId;
+			UserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<UserDto> getUsersForEnvironment(final Integer instanceId) throws MiddlewareQueryException {
+		Preconditions.checkNotNull(instanceId);
+		List<UserDto> users = new ArrayList<>();
+		StringBuilder sql = new StringBuilder().append("SELECT DISTINCT ")
+				.append("    person.personid as personId, person.fname as fName, person.lname as lName, person.pemail as email , role.role as role  ")
+				.append("FROM ").append("    cvterm scale ").append("        INNER JOIN ")
+				.append("    cvterm_relationship r ON (r.object_id = scale.cvterm_id) ").append("        INNER JOIN ")
+				.append("    cvterm variable ON (r.subject_id = variable.cvterm_id) ").append("        INNER JOIN ")
+				.append("    nd_geolocationprop pp ON (pp.type_id = variable.cvterm_id) ")
+				.append("        INNER JOIN workbench.persons person ").append("    ON (pp.value = person.personid) ")
+				.append("    INNER JOIN workbench.users user on (user.personid = person.personid) ")
+				.append("    left join workbench.users_roles role on (role.userid = user.userid) ").append("WHERE ")
+				.append("    pp.nd_geolocation_id = :instanceDbId ").append("        AND r.object_id = 1901    ");
+		try {
+			Query query = this.getSession().createSQLQuery(sql.toString()).addScalar("personId").addScalar("fName").addScalar("lName")
+					.addScalar("email").addScalar("role").setParameter("instanceDbId", instanceId);
+			List<Object> results = query.list();
+			mapUsers(users, results);
+			return users;
+		} catch (MiddlewareQueryException e) {
+			final String message = "Error with getUsersForEnvironment() query from instanceId: " + instanceId;
+			UserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	private void mapUsers(List<UserDto> users, List<Object> results) {
+		for (Object obj : results) {
+			Object[] row = (Object[]) obj;
+			UserDto user = new UserDto();
+			user.setUserId((Integer) row[0]);
+			user.setFirstName((String) row[1]);
+			user.setLastName((String) row[2]);
+			user.setEmail((String) row[3]);
+			if (row[4] instanceof String && !StringUtils.isBlank((String) row[4])) {
+				user.setRole((String) row[4]);
+			}
+			users.add(user);
+		}
+	}
+
 }

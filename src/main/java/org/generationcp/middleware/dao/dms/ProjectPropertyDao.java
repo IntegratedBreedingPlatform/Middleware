@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -31,12 +32,16 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link ProjectProperty}.
  * 
  */
 public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(ProjectPropertyDao.class);
 
 	@SuppressWarnings("unchecked")
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByPropertyNames(
@@ -291,5 +296,56 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		Query query = this.getSession().createSQLQuery(sql);
 		query.setParameterList("projectPropIds", projectPropIds);
 		query.executeUpdate();
+	}
+
+	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId) throws MiddlewareQueryException {
+		Preconditions.checkNotNull(studyId);
+		Map<String, String> geoProperties = new HashMap<>();
+		String sql = " SELECT  "
+			+ "     propName.value AS name, propValue.value AS value "
+			+ " FROM "
+			+ "     projectprop propName "
+			+ "         INNER JOIN "
+			+ "     projectprop propId ON (propId.type_id = " + TermId.STANDARD_VARIABLE.getId()
+			+ "         AND propId.rank = propName.rank "
+			+ "         AND propId.project_id = propName.project_id) "
+			+ "         INNER JOIN "
+			+ "     projectprop propValue ON (propValue.type_id = propId.value "
+			+ "         AND propValue.rank = propId.rank "
+			+ "         AND propId.project_id = propValue.project_id) "
+			+ " WHERE "
+			+ "     propName.project_id = :studyId "
+			+ "         AND propName.type_id = " + TermId.VARIABLE_DESCRIPTION.getId()
+			+ "         AND propId.value NOT IN ("
+			+ TermId.START_DATE.getId() + " , "
+			+ TermId.END_DATE.getId() + ", "
+			+ TermId.SEASON_VAR.getId() + ", "
+			+ TermId.STUDY_STATUS.getId() + ", " + TermId.LOCATION_ID.getId() + ", "
+			+ TermId.STUDY_TYPE.getId() + ") "
+			+ "         AND propId.value NOT IN (SELECT  "
+			+ "             variable.cvterm_id "
+			+ "         FROM "
+			+ "             cvterm scale "
+			+ "                 INNER JOIN "
+			+ "             cvterm_relationship r ON (r.object_id = scale.cvterm_id) "
+			+ "                 INNER JOIN "
+			+ "             cvterm variable ON (r.subject_id = variable.cvterm_id) "
+			+ "         WHERE "
+			+ "             object_id = 1901) ";
+
+		try {
+			Query query =
+					this.getSession().createSQLQuery(sql).addScalar("name").addScalar("value").setParameter("studyId", studyId);
+			List<Object> results = query.list();
+			for (Object obj : results) {
+				Object[] row = (Object[]) obj;
+				geoProperties.put((String) row[0], (String) row[1]);
+			}
+			return geoProperties;
+		} catch (MiddlewareQueryException e) {
+			final String message = "Error with getProjectPropsAndValuesByStudy() query from studyId: " + studyId;
+			ProjectPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 }

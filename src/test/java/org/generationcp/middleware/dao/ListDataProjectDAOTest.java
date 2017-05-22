@@ -1,5 +1,7 @@
 package org.generationcp.middleware.dao;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -18,7 +20,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ListDataProjectDAOTest extends IntegrationTestBase {
@@ -46,9 +50,11 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 	private Germplasm parentGermplasm;
 	private ListDataProject testListDataProject;
 	private Integer studyId;
+	private final String cropPrefix = "ABCD";
 
 	@Before
 	public void beforeTest() {
+		
 		this.listDataProjectDAO = new ListDataProjectDAO();
 		this.listDataProjectSaver = new ListDataProjectSaver(this.sessionProvder);
 		this.listDataProjectDAO.setSession(this.sessionProvder.getSession());
@@ -165,6 +171,44 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 
 	}
 
+	@Test
+	public void testGetGermplasmUsedInEntryListTrue() {
+		final Integer listId = this.testListDataProject.getList().getId();
+		final List<ListDataProject> listDataProjects = this.middlewareFieldbookService.getListDataProject(listId);
+
+		List<Integer> gids = Lists.transform(listDataProjects, new Function<ListDataProject, Integer>() {
+
+			@Nullable
+			@Override
+			public Integer apply(@Nullable ListDataProject listDataProject) {
+				return listDataProject.getGermplasmId();
+			}
+		});
+
+		Assert.assertTrue(this.listDataProjectDAO.getGermplasmUsedInEntryList(gids).size() > 0);
+	}
+
+	@Test
+	public void testGetGermplasmUsedInEntryListFalse() {
+		Assert.assertFalse(this.listDataProjectDAO.getGermplasmUsedInEntryList(Arrays.asList(this.parentGermplasm.getGid())).size() > 0);
+	}
+
+	@Test
+	public void testGetByListIdAndGidNotNull() {
+		final Integer listId = this.testListDataProject.getList().getId();
+		final List<ListDataProject> listDataProjects = this.middlewareFieldbookService.getListDataProject(listId);
+
+		for (ListDataProject listDataProject : listDataProjects) {
+			Assert.assertNotNull(this.listDataProjectDAO.getByListIdAndGid(listId, listDataProject.getGermplasmId()));
+		}
+	}
+
+	@Test
+	public void testGetByListIdAndGidNull() {
+		final Integer listId = this.testListDataProject.getList().getId();
+		Assert.assertNull(this.listDataProjectDAO.getByListIdAndGid(listId, this.parentGermplasm.getGid()));
+	}
+
 	private List<ListDataProject> createListDataProject(final GermplasmList germplasmList, final long noOfTestEntries, final long noOfCheckEntries) {
 
 		final List<ListDataProject> listDataProjects = new ArrayList<>();
@@ -204,7 +248,7 @@ public class ListDataProjectDAOTest extends IntegrationTestBase {
 				.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, ListDataProjectDAOTest.GERMPLASM_PREFERRED_NAME_PREFIX,
 						this.parentGermplasm);
 
-		final int nurseryId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids);
+		final int nurseryId = this.dataSetupTest.createNurseryForGermplasm(programUUID, gids, cropPrefix);
 
 		return nurseryId;
 	}

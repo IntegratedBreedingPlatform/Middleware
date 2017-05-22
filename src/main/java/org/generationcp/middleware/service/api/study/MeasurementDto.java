@@ -1,39 +1,39 @@
 
 package org.generationcp.middleware.service.api.study;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang.builder.EqualsBuilder;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
- * A trait and its associated measurement.
+ * A measurementVariable and its associated measurement.
  *
  */
 public class MeasurementDto {
 
-	private TraitDto trait;
+	private MeasurementVariableDto measurementVariable;
 
 	private Integer phenotypeId;
 
-	private String triatValue;
+	private String variableValue;
 
-	public MeasurementDto(final TraitDto trait, final Integer phenotypeId, final String triatValue) {
-		this.trait = trait;
+	public MeasurementDto(final MeasurementVariableDto measurementVariable, final Integer phenotypeId, final String variableValue) {
 		this.phenotypeId = phenotypeId;
-		this.triatValue = triatValue;
+		this.variableValue = variableValue;
+		this.measurementVariable = measurementVariable;
 	}
 
 	/**
-	 * @return the trait
+	 * @return the measurementVariable
 	 */
-	public TraitDto getTrait() {
-		return this.trait;
+	public MeasurementVariableDto getMeasurementVariable() {
+		return this.measurementVariable;
 	}
 
 	/**
-	 * @param trait the trait to set
+	 * @param measurementVariable the measurementVariable to set
 	 */
-	public void setTrait(TraitDto trait) {
-		this.trait = trait;
+	public void setMeasurementVariable(MeasurementVariableDto measurementVariable) {
+		this.measurementVariable = measurementVariable;
 	}
 
 	/**
@@ -53,15 +53,15 @@ public class MeasurementDto {
 	/**
 	 * @return the triatValue
 	 */
-	public String getTriatValue() {
-		return this.triatValue;
+	public String getVariableValue() {
+		return this.variableValue;
 	}
 
 	/**
-	 * @param triatValue the triatValue to set
+	 * @param variableValue the variableValue to set
 	 */
-	public void setTriatValue(String triatValue) {
-		this.triatValue = triatValue;
+	public void setVariableValue(String variableValue) {
+		this.variableValue = variableValue;
 	}
 
 	@Override
@@ -69,13 +69,17 @@ public class MeasurementDto {
 		if (!(other instanceof MeasurementDto))
 			return false;
 		MeasurementDto castOther = (MeasurementDto) other;
-		return new EqualsBuilder().append(trait, castOther.trait).append(phenotypeId, castOther.phenotypeId)
-				.append(triatValue, castOther.triatValue).isEquals();
+		return new EqualsBuilder().append(measurementVariable, castOther.measurementVariable).append(phenotypeId, castOther.phenotypeId)
+				.append(variableValue, castOther.variableValue).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(trait).append(phenotypeId).append(triatValue).toHashCode();
+		return new HashCodeBuilder().append(measurementVariable).append(phenotypeId).append(variableValue).toHashCode();
 	}
 
+	@Override
+	public String toString() {
+		return "MeasurementDto [measurementVariable=" + measurementVariable + ", phenotypeId=" + phenotypeId + ", variableValue=" + variableValue + "]";
+	}
 }

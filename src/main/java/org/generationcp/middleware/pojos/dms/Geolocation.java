@@ -27,6 +27,7 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.generationcp.middleware.domain.dms.VariableList;
+import org.hibernate.annotations.BatchSize;
 
 /**
  *
@@ -70,6 +71,7 @@ public class Geolocation implements Serializable {
 	 * List of Geolocation Properties
 	 */
 	@OneToMany(mappedBy = "geolocation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	@BatchSize(size = 5000)
 	private List<GeolocationProperty> properties;
 
 	public Geolocation() {

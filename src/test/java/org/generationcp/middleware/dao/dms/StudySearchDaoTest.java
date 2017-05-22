@@ -46,6 +46,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 	@Autowired
 	private LocationDataManager locationManager;
+	private final String cropPrefix = "ABCD";
 
 	private long numberOfDrySeasonBeforeCreatingTestData = 0;
 	private long numberOfWetSeasoBeforeCreatingTestData = 0;
@@ -56,11 +57,10 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		this.studySearchDao = new StudySearchDao();
 		this.studySearchDao.setSession(this.sessionProvder.getSession());
 
-		numberOfDrySeasonBeforeCreatingTestData = studySearchDao.countStudiesBySeason(Season.DRY, PROGRAM_UUID);
-		numberOfWetSeasoBeforeCreatingTestData = studySearchDao.countStudiesBySeason(Season.WET, PROGRAM_UUID);
+		this.numberOfDrySeasonBeforeCreatingTestData = studySearchDao.countStudiesBySeason(Season.DRY, PROGRAM_UUID);
+		this.numberOfWetSeasoBeforeCreatingTestData = studySearchDao.countStudiesBySeason(Season.WET, PROGRAM_UUID);
 
 		this.createTestStudies();
-
 	}
 
 	@Test
@@ -187,8 +187,8 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	@Test
 	public void testCountStudiesBySeason() {
 
-		final long expectedActualDrySeasonCount = numberOfDrySeasonBeforeCreatingTestData + NO_OF_DRY_SEASON_STUDIES;
-		final long expectedActualWetSeasonCount = numberOfWetSeasoBeforeCreatingTestData + NO_OF_WET_SEASON_STUDIES;
+		final long expectedActualDrySeasonCount = this.numberOfDrySeasonBeforeCreatingTestData + NO_OF_DRY_SEASON_STUDIES;
+		final long expectedActualWetSeasonCount = this.numberOfWetSeasoBeforeCreatingTestData + NO_OF_WET_SEASON_STUDIES;
 
 		Assert.assertEquals(expectedActualDrySeasonCount, studySearchDao.countStudiesBySeason(Season.DRY, PROGRAM_UUID));
 		Assert.assertEquals(expectedActualWetSeasonCount, studySearchDao.countStudiesBySeason(Season.WET, PROGRAM_UUID));
@@ -198,8 +198,8 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudiesBySeason() {
 
-		final long expectedActualDrySeasonCount = numberOfDrySeasonBeforeCreatingTestData + NO_OF_DRY_SEASON_STUDIES;
-		final long expectedActualWetSeasonCount = numberOfWetSeasoBeforeCreatingTestData + NO_OF_WET_SEASON_STUDIES;
+		final long expectedActualDrySeasonCount = this.numberOfDrySeasonBeforeCreatingTestData + NO_OF_DRY_SEASON_STUDIES;
+		final long expectedActualWetSeasonCount = this.numberOfWetSeasoBeforeCreatingTestData + NO_OF_WET_SEASON_STUDIES;
 
 		final List<StudyReference> drySeasonStudyReferences = studySearchDao.getStudiesBySeason(Season.DRY, 0, Integer.MAX_VALUE, PROGRAM_UUID);
 		final List<StudyReference> wetSeasonStudyReferences = studySearchDao.getStudiesBySeason(Season.WET, 0, Integer.MAX_VALUE, PROGRAM_UUID);
@@ -257,17 +257,17 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		final StudyReference studyReference1 = studyTestDataInitializer
 				.addTestStudy(TEST_TRIAL_NAME_1, StudyType.T, String.valueOf(TermId.SEASON_DRY.getId()),
-						String.valueOf(LUXEMBOURG_COUNTRY_LOCATION_ID), "20200101");
+						String.valueOf(LUXEMBOURG_COUNTRY_LOCATION_ID), "20200101", cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference1.getId());
 
 		final StudyReference studyReference2 = studyTestDataInitializer
 				.addTestStudy(TEST_TRIAL_NAME_2, StudyType.T, String.valueOf(TermId.SEASON_WET.getId()),
-						String.valueOf(LUXEMBOURG_COUNTRY_LOCATION_ID), "20200102");
+						String.valueOf(LUXEMBOURG_COUNTRY_LOCATION_ID), "20200102", cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference2.getId());
 
 		final StudyReference studyReference3 = studyTestDataInitializer
 				.addTestStudy(TEST_TRIAL_NAME_3, StudyType.T, String.valueOf(TermId.SEASON_DRY.getId()),
-						String.valueOf(LUXEMBOURG_COUNTRY_LOCATION_ID), "20201201");
+						String.valueOf(LUXEMBOURG_COUNTRY_LOCATION_ID), "20201201", cropPrefix);
 		studyTestDataInitializer.addTestDataset(studyReference3.getId());
 
 	}

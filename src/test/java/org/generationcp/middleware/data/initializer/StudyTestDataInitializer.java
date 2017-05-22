@@ -17,7 +17,6 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -57,19 +56,19 @@ public class StudyTestDataInitializer {
 		this.locationDataManager = locationDataManager;
 	}
 
-	public StudyReference addTestStudy() throws Exception {
-		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, this.commonTestProject.getUniqueID(), StudyType.T);
+	public StudyReference addTestStudy(final String cropPrefix) throws Exception {
+		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, this.commonTestProject.getUniqueID(), StudyType.T, cropPrefix);
+	}
+	
+	public StudyReference addTestStudy(final String uniqueId, final String cropPrefix) throws Exception {
+		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, uniqueId, StudyType.T, cropPrefix);
+	}
+	
+	public StudyReference addTestStudy(final StudyType studyType, final String studyName, final String cropPrefix) throws Exception {
+		return this.addTestStudy(studyName, this.commonTestProject.getUniqueID(), studyType, cropPrefix);
 	}
 
-	public StudyReference addTestStudy(final String uniqueId) throws Exception {
-		return this.addTestStudy(StudyTestDataInitializer.STUDY_NAME, uniqueId, StudyType.T);
-	}
-
-	public StudyReference addTestStudy(final StudyType studyType, final String studyName) throws Exception {
-		return this.addTestStudy(studyName, this.commonTestProject.getUniqueID(), studyType);
-	}
-
-	public StudyReference addTestStudy(final String studyName, final String uniqueId, final StudyType studyType) throws Exception {
+	public StudyReference addTestStudy(final String studyName, final String uniqueId, final StudyType studyType, final String cropPrefix) throws Exception {
 		final VariableTypeList typeList = new VariableTypeList();
 		final VariableList variableList = new VariableList();
 
@@ -91,10 +90,10 @@ public class StudyTestDataInitializer {
 
 		final StudyValues studyValues = this.createStudyValues(variableList);
 
-		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId);
+		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId, cropPrefix);
 	}
 
-	public StudyReference addTestStudy(final String studyName, final StudyType studyType, final String seasonId, final String locationId, final String startDate) throws Exception {
+	public StudyReference addTestStudy(final String studyName, final StudyType studyType, final String seasonId, final String locationId, final String startDate, final String cropPrefix) throws Exception {
 
 		final VariableTypeList typeList = new VariableTypeList();
 		final VariableList variableList = new VariableList();
@@ -130,7 +129,7 @@ public class StudyTestDataInitializer {
 
 		final StudyValues studyValues = this.createStudyValues(variableList);
 
-		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, this.commonTestProject.getUniqueID());
+		return this.studyDataManager.addStudy(StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, this.commonTestProject.getUniqueID(), cropPrefix);
 	}
 
 	private StudyValues createStudyValues(final VariableList variableList) throws Exception {
@@ -148,7 +147,6 @@ public class StudyTestDataInitializer {
 		studyValues.setGermplasmId(this.studyDataManager.addStock(germplasmVariableList));
 
 		return studyValues;
-
 	}
 
 	private Variable createVariable(final int termId, final String value, final int rank) throws Exception {
@@ -215,12 +213,14 @@ public class StudyTestDataInitializer {
 		datasetValues.setDescription("My Dataset Description");
 		datasetValues.setType(DataSetType.MEANS_DATA);
 
-		DMSVariableType variableType = this.createVariableType(18000, "Grain Yield", "Grain Yield", 4);
-		variableType.setLocalName("Grain Yield");
+		DMSVariableType variableType =
+			this.createVariableType(51570, "GY_Adj_kgha", "Grain yield BY Adjusted GY - Computation IN Kg/ha", 4);
+		variableType.setLocalName("GY_Adj_kgha");
 		typeList.add(variableType);
 
-		variableType = this.createVariableType(18050, "Disease Pressure", "Disease Pressure", 5);
-		variableType.setLocalName("Disease Pressure");
+		variableType =
+			this.createVariableType(20444, "SCMVInc_Cmp_pct", "Sugarcane mosaic virus incidence BY SCMVInc - Computation IN %", 5);
+		variableType.setLocalName("Aphid damage");
 		typeList.add(variableType);
 
 		variableType = this.createVariableType(TermId.PLOT_NO.getId(), "Plot No", "Plot No", 6);

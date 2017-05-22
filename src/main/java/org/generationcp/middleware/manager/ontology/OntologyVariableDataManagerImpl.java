@@ -70,7 +70,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	private static final String VARIABLE_EXIST_WITH_SAME_NAME = "Variable exist with same name";
 	private static final String CAN_NOT_DELETE_USED_VARIABLE = "Used variable can not be deleted";
 	private static final String VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE =
-			"Analysis variable type should not be assigned together with any other variable type";
+			"Analysis and/or Analysis Summary variable type(s) should not be assigned together with any other variable type";
 
 	@Autowired
 	private OntologyMethodDataManager methodManager;
@@ -435,7 +435,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	public Variable getVariable(final String programUuid, final Integer id, final boolean filterObsolete,
 			final boolean calculateVariableUsage) {
 
-		final Variable cachedVariable = VariableCache.getFromCache(id);
+		final Variable cachedVariable = VariableCache.getFromCache(id, programUuid);
 		if (cachedVariable != null) {
 			return cachedVariable;
 		}
@@ -492,11 +492,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			variable.setIsFavorite(programFavorite != null);
 
 			if (calculateVariableUsage) {
-			  	// setting variable observations and study to 0 and remove heavy calculation queries not needed to determine if it is editable or not
+				// setting variable observations and study to 0 and remove heavy calculation queries not needed to determine if it is
+				// editable or not
 				variable.setStudies(0);
 				variable.setObservations(0);
 
-			  	variable.setHasUsage(this.isVariableUsedInStudy(id));
+				variable.setHasUsage(this.isVariableUsedInStudy(id));
 
 			} else {
 				final int unknownUsage = -1;
@@ -505,7 +506,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 			}
 
-			VariableCache.addToCache(id, variable);
+			VariableCache.addToCache(id, variable, programUuid);
 
 			return variable;
 		} catch (final HibernateException e) {
@@ -532,10 +533,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_EXIST_WITH_SAME_NAME);
 		}
 
-		// Throw if variable type is analysis used with other variable types.
-		if (variableInfo.getVariableTypes().contains(VariableType.ANALYSIS) && variableInfo.getVariableTypes().size() > 1) {
-			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE);
-		}
+		this.checkForReservedVariableTypes(variableInfo);
 
 		// Saving term to database.
 		final CVTerm savedTerm = this.getCvTermDao().save(variableInfo.getName(), variableInfo.getDescription(), CvId.VARIABLES);
@@ -601,10 +599,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		this.checkTermIsVariable(term);
 
-		// Throw if variable type is analysis used with other variable types.
-		if (variableInfo.getVariableTypes().contains(VariableType.ANALYSIS) && variableInfo.getVariableTypes().size() > 1) {
-			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE);
-		}
+		this.checkForReservedVariableTypes(variableInfo);
 
 		final CVTermRelationship methodRelation = elements.getMethodRelation();
 		final CVTermRelationship propertyRelation = elements.getPropertyRelation();
@@ -719,6 +714,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	}
 
+	// Throw exception if variable types of variable to be added is "reserved" like "Analysis" or "Analysis Summary"
+	private void checkForReservedVariableTypes(final OntologyVariableInfo variableInfo) {
+		if (!Collections.disjoint(variableInfo.getVariableTypes(), VariableType.getReservedVariableTypes())
+				&& variableInfo.getVariableTypes().size() > 1) {
+			throw new MiddlewareException(OntologyVariableDataManagerImpl.VARIABLE_TYPE_ANALYSIS_SHOULD_BE_USED_SINGLE);
+		}
+	}
+
 	@Override
 	public void deleteVariable(final Integer variableId) {
 
@@ -811,7 +814,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		final SQLQuery query = this.getActiveSession().createSQLQuery(variableUsageCount);
 		query.setParameter("variableId", variableId);
-		List list = query.list();
+		final List list = query.list();
 		return list.size() > 0;
 	}
 
@@ -899,7 +902,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		elements.setTermProperties(termProperties);
 		elements.setVariableOverrides(variableOverrides);
 	}
-	
+
 	@Override
 	public boolean areVariablesUsedInStudy(final List<Integer> variablesIds) {
 		final String variableUsageCount = "SELECT *  FROM projectprop pp " + " WHERE pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
@@ -920,7 +923,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			throw new MiddlewareQueryException("Error at getVariableOverridesByVariableIds:" + e.getMessage(), e);
 		}
 	}
-	
+
 	@Override
 	public void deleteVariablesFromCache(final List<Integer> variablesIds) {
 		for (final Iterator<Integer> iterator = variablesIds.iterator(); iterator.hasNext();) {

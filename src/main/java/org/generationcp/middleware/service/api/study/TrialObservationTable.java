@@ -2,7 +2,7 @@ package org.generationcp.middleware.service.api.study;
 
 import java.util.List;
 
-public class StudyDetailDto {
+public class TrialObservationTable {
 	
     private Integer studyDbId;
 
@@ -18,7 +18,7 @@ public class StudyDetailDto {
 		return studyDbId;
 	}
 
-	public StudyDetailDto setStudyDbId(final Integer studyDbId) {
+	public TrialObservationTable setStudyDbId(final Integer studyDbId) {
 		this.studyDbId = studyDbId;
 		return this;
 	}
@@ -27,7 +27,7 @@ public class StudyDetailDto {
 		return observationVariableDbIds;
 	}
 
-	public StudyDetailDto setObservationVariableDbIds(List<Integer> observationVariableDbIds) {
+	public TrialObservationTable setObservationVariableDbIds(List<Integer> observationVariableDbIds) {
 		this.observationVariableDbIds = observationVariableDbIds;
 		return this;
 	}
@@ -36,7 +36,7 @@ public class StudyDetailDto {
 		return observationVariableNames;
 	}
 
-	public StudyDetailDto setObservationVariableNames(List<String> observationVariableNames) {
+	public TrialObservationTable setObservationVariableNames(List<String> observationVariableNames) {
 		this.observationVariableNames = observationVariableNames;
 		return this;
 	}
@@ -53,7 +53,7 @@ public class StudyDetailDto {
 		return data;
 	}
 
-	public StudyDetailDto setData(final List<List<String>> data) {
+	public TrialObservationTable setData(final List<List<String>> data) {
 		this.data = data;
 		return this;
 	}

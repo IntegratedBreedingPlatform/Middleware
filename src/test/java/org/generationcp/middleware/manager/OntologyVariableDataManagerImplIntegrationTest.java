@@ -13,7 +13,6 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -70,13 +69,11 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	private Property testProperty;
 	private Scale testScale;
 	private OntologyVariableInfo testVariableInfo;
-	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
 
 	@BeforeClass
 	public static void setUpOnce() {
 		// Variable caching relies on the context holder to determine current crop database in use
 		ContextHolder.setCurrentCrop("wheat");
-		ContextHolder.setCurrentProgram(PROGRAM_UUID);
 	}
 
 	@Test
@@ -108,7 +105,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 		Assert.assertEquals("Study usage should be 0", new Integer(0), variable.getStudies());
 		Assert.assertEquals("Observation usage should be 0", new Integer(0), variable.getObservations());
-	  	Assert.assertFalse("Variable usage should be false",  variable.getHasUsage());
+		Assert.assertFalse("Variable usage should be false", variable.getHasUsage());
 		Assert.assertEquals("Crop ontology id should be " + OntologyVariableDataManagerImplIntegrationTest.CROP_ONTOLOGY_ID,
 				OntologyVariableDataManagerImplIntegrationTest.CROP_ONTOLOGY_ID, variable.getProperty().getCropOntologyId());
 	}
@@ -172,7 +169,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		variableInfo.addVariableType(VariableType.ANALYSIS);
 		variableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
 		this.variableManager.addVariable(variableInfo);
-		Assert.fail("Analysis variable type should not be assigned together with any other variable type");
+		Assert.fail("'Analysis' variable type should not be assigned together with any other variable type");
 	}
 
 	@Test(expected = MiddlewareException.class)
@@ -180,7 +177,35 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.testVariableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
 		this.testVariableInfo.addVariableType(VariableType.ANALYSIS);
 		this.variableManager.updateVariable(this.testVariableInfo);
-		Assert.fail("Analysis variable type should not be assigned together with any other variable type");
+		Assert.fail("'Analysis' variable type should not be assigned together with any other variable type");
+	}
+
+	@Test(expected = MiddlewareException.class)
+	public void testAddAnalysisSummaryVariableShouldNotBeAssignedWithOtherVariableType() throws Exception {
+		final OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+		variableInfo.setName(OntologyDataCreationUtil.getNewRandomName());
+		variableInfo.addVariableType(VariableType.ANALYSIS_SUMMARY);
+		variableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
+		this.variableManager.addVariable(variableInfo);
+		Assert.fail("'Analysis Summary' variable type should not be assigned together with any other variable type");
+	}
+
+	@Test(expected = MiddlewareException.class)
+	public void testUpdateAnalysisSummaryVariableShouldNotBeAssignedWithOtherVariableType() throws Exception {
+		this.testVariableInfo.addVariableType(VariableType.ENVIRONMENT_DETAIL);
+		this.testVariableInfo.addVariableType(VariableType.ANALYSIS_SUMMARY);
+		this.variableManager.updateVariable(this.testVariableInfo);
+		Assert.fail("'Analysis Summary' variable type should not be assigned together with any other variable type");
+	}
+	
+	@Test(expected = MiddlewareException.class)
+	public void testAddAnalysisVariableShouldNotBeAssignedWithAnalysisSummaryVariableType() throws Exception {
+		final OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+		variableInfo.setName(OntologyDataCreationUtil.getNewRandomName());
+		variableInfo.addVariableType(VariableType.ANALYSIS);
+		variableInfo.addVariableType(VariableType.ANALYSIS_SUMMARY);
+		this.variableManager.addVariable(variableInfo);
+		Assert.fail("'Analysis' variable type should not be assigned together with 'Analysis Summary' variable type");
 	}
 
 	@Test
@@ -223,10 +248,10 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 	}
 
-  	@Test
-	public void testIsVariableUsedReturnsFalse() throws Exception{
-	  boolean hasUsage = this.variableManager.isVariableUsedInStudy(testVariableInfo.getId());
-	  Assert.assertFalse("Variable should have no usage", hasUsage);
+	@Test
+	public void testIsVariableUsedReturnsFalse() throws Exception {
+		final boolean hasUsage = this.variableManager.isVariableUsedInStudy(this.testVariableInfo.getId());
+		Assert.assertFalse("Variable should have no usage", hasUsage);
 	}
 
 	/**
@@ -238,6 +263,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	public void setUp() throws Exception {
 		final WorkbenchTestDataUtil instance = new WorkbenchTestDataUtil(this.workbenchDataManager);
 		this.testProject = instance.createTestProjectData();
+		ContextHolder.setCurrentProgram(this.testProject.getUniqueID());
 
 		this.testMethod = new org.generationcp.middleware.domain.ontology.Method();
 		this.testMethod.setName(OntologyDataCreationUtil.getNewRandomName());
@@ -277,7 +303,6 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		this.testVariableInfo.setIsFavorite(true);
 		this.variableManager.addVariable(this.testVariableInfo);
 
-
 	}
 
 	protected void createTestVariableWithCategoricalValue() {
@@ -294,39 +319,39 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 
 		this.buildVariable();
 	}
-	
+
 	@Test
 	public void testAreVariablesUsedReturnsFalse() throws Exception {
-		List<Integer> list = new ArrayList<>();
-		list.add(testVariableInfo.getId());
-		boolean hasUsage = this.variableManager.areVariablesUsedInStudy(list);
+		final List<Integer> list = new ArrayList<>();
+		list.add(this.testVariableInfo.getId());
+		final boolean hasUsage = this.variableManager.areVariablesUsedInStudy(list);
 		Assert.assertFalse("Variables should have no usage", hasUsage);
 	}
 
 	@Test
 	public void testGetVariableOverridesByVariableIds() throws Exception {
-		List<Integer> list = new ArrayList<>();
-		list.add(testVariableInfo.getId());
-		List<VariableOverrides> override = this.variableManager.getVariableOverridesByVariableIds(list);
-		VariableOverrides variableOverrides = override.get(0);
+		final List<Integer> list = new ArrayList<>();
+		list.add(this.testVariableInfo.getId());
+		final List<VariableOverrides> override = this.variableManager.getVariableOverridesByVariableIds(list);
+		final VariableOverrides variableOverrides = override.get(0);
 		Assert.assertEquals(variableOverrides.getExpectedMin(), "0");
 		Assert.assertEquals(variableOverrides.getExpectedMax(), "100");
 	}
-	
-	@Test
-	public void testDeleteVariablesFromCache(){
-		
-		List<Integer> variablesIds = new ArrayList<Integer>();
-		int size = VariableCache.getCacheSize();
 
-		Integer variable1Id = 1;
-		Variable variable1 = new Variable();
+	@Test
+	public void testDeleteVariablesFromCache() {
+
+		final List<Integer> variablesIds = new ArrayList<Integer>();
+		final int size = VariableCache.getCacheSize();
+
+		final Integer variable1Id = 1;
+		final Variable variable1 = new Variable();
 		variable1.setId(variable1Id);
 
 		VariableCache.addToCache(variable1Id, variable1);
 		Assert.assertEquals(size + 1, VariableCache.getCacheSize());
 		Assert.assertEquals(variable1, VariableCache.getFromCache(variable1Id));
-		
+
 		variablesIds.add(variable1Id);
 		this.variableManager.deleteVariablesFromCache(variablesIds);
 		Assert.assertEquals(size, VariableCache.getCacheSize());

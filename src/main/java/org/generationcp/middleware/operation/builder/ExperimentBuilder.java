@@ -134,6 +134,7 @@ public class ExperimentBuilder extends Builder {
 		experiment.setFactors(this.getFactors(experimentModel, variableTypes, stockModelMap));
 		experiment.setVariates(this.getVariates(experimentModel, variableTypes));
 		experiment.setLocationId(experimentModel.getGeoLocation().getLocationId());
+		experiment.setPlotId(experimentModel.getPlotId());
 		return experiment;
 	}
 
@@ -264,12 +265,23 @@ public class ExperimentBuilder extends Builder {
 			Map<Integer, StockModel> stockModelMap) throws MiddlewareQueryException {
 		this.addExperimentFactors(variables, experimentModel, variableTypes);
 		this.addGermplasmFactors(variables, experimentModel, variableTypes, stockModelMap);
+		this.addPlotIdFactor(variables, experimentModel, variableTypes);
 	}
 
 	private void addPlotExperimentFactors(VariableList variables, ExperimentModel experimentModel, VariableTypeList variableTypes,
 			boolean hasVariableType) throws MiddlewareQueryException {
 		this.addExperimentFactors(variables, experimentModel, variableTypes, hasVariableType);
 		this.addGermplasmFactors(variables, experimentModel, variableTypes, null);
+	}
+
+	private void addPlotIdFactor(VariableList factors, ExperimentModel experimentModel, VariableTypeList variableTypes) {
+		for (final DMSVariableType variableType : variableTypes.getVariableTypes()) {
+			final StandardVariable standardVariable = variableType.getStandardVariable();
+			if (standardVariable.getId() == TermId.PLOT_ID.getId()) {
+				factors.add(new Variable(variableType, experimentModel.getPlotId()));
+				return;
+			}
+		}
 	}
 
 	private void addGermplasmFactors(VariableList factors, ExperimentModel experimentModel, VariableTypeList variableTypes,

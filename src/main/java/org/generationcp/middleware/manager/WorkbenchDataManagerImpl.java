@@ -23,7 +23,6 @@ import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.ProjectUserInfoDAO;
-import org.generationcp.middleware.dao.ProjectUserMysqlAccountDAO;
 import org.generationcp.middleware.dao.ProjectUserRoleDAO;
 import org.generationcp.middleware.dao.RoleDAO;
 import org.generationcp.middleware.dao.SecurityQuestionDAO;
@@ -50,14 +49,12 @@ import org.generationcp.middleware.pojos.workbench.IbdbUserMap;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.ProjectUserMysqlAccount;
 import org.generationcp.middleware.pojos.workbench.ProjectUserRole;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.SecurityQuestion;
 import org.generationcp.middleware.pojos.workbench.TemplateSetting;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolConfiguration;
-import org.generationcp.middleware.pojos.workbench.ToolLicenseInfo;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.UserRole;
@@ -127,25 +124,11 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return projectActivityDao;
 	}
 
-	private ProjectUserMysqlAccountDAO getProjectUserMysqlAccountDAO() {
-
-		final ProjectUserMysqlAccountDAO projectUserMysqlAccountDAO = new ProjectUserMysqlAccountDAO();
-		projectUserMysqlAccountDAO.setSession(this.getCurrentSession());
-		return projectUserMysqlAccountDAO;
-	}
-
 	private ProjectDAO getProjectDao() {
 
 		final ProjectDAO projectDao = new ProjectDAO();
 		projectDao.setSession(this.getCurrentSession());
 		return projectDao;
-	}
-
-	private ProjectUserMysqlAccountDAO getProjectUserMysqlAccountDao() {
-
-		final ProjectUserMysqlAccountDAO projectUserMysqlAccountDao = new ProjectUserMysqlAccountDAO();
-		projectUserMysqlAccountDao.setSession(this.getCurrentSession());
-		return projectUserMysqlAccountDao;
 	}
 
 	@Override
@@ -388,14 +371,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 				this.deleteProjectUserRole(projectUser);
 			}
 
-			final List<ProjectUserMysqlAccount> mysqlaccounts =
-					this.getProjectUserMysqlAccountDAO().getByProjectId(project.getProjectId().intValue());
-			if (mysqlaccounts != null) {
-				for (final ProjectUserMysqlAccount mysqlaccount : mysqlaccounts) {
-					this.deleteProjectUserMysqlAccount(mysqlaccount);
-				}
-			}
-
 			final List<WorkbenchDataset> datasets =
 					this.getWorkbenchDatasetByProjectId(projectId, 0, (int) this.countWorkbenchDatasetByProjectId(projectId));
 			for (final WorkbenchDataset dataset : datasets) {
@@ -436,21 +411,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 			this.logAndThrowException("Cannot delete ProjectUserInfo: WorkbenchDataManager.deleteProjectUserInfoDao(projectUserInfo="
 					+ projectUserInfo + "): " + e.getMessage(), e);
-		}
-	}
-
-	public void deleteProjectUserMysqlAccount(final ProjectUserMysqlAccount mysqlaccount) {
-
-		try {
-
-			this.getProjectUserMysqlAccountDAO().makeTransient(mysqlaccount);
-
-		} catch (final Exception e) {
-
-			this.logAndThrowException(
-					"Cannot delete ProjectUserMysqlAccount: WorkbenchDataManager.deleteProjectUserMysqlAccount(mysqlaccount=" + mysqlaccount
-							+ "): " + e.getMessage(),
-					e);
 		}
 	}
 
@@ -575,8 +535,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Project getProjectByUuid(final String projectUuid) {
-		return this.getProjectDao().getByUuid(projectUuid);
+	public Project getProjectByUuidAndCrop(final String projectUuid, final String cropType) {
+		return this.getProjectDao().getByUuid(projectUuid, cropType);
 	}
 
 	@Override
@@ -1164,50 +1124,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public ProjectUserMysqlAccount getProjectUserMysqlAccountByProjectIdAndUserId(final Integer projectId, final Integer userId)
-			throws MiddlewareQueryException {
-		return this.getProjectUserMysqlAccountDao().getByProjectIdAndUserId(projectId, userId);
-	}
-
-	@Override
-	public Integer addProjectUserMysqlAccount(final ProjectUserMysqlAccount record) {
-		final List<ProjectUserMysqlAccount> tosave = new ArrayList<ProjectUserMysqlAccount>();
-		tosave.add(record);
-		final List<Integer> idsOfRecordsSaved = this.addProjectUserMysqlAccount(tosave);
-		if (!idsOfRecordsSaved.isEmpty()) {
-			return idsOfRecordsSaved.get(0);
-		} else {
-			return null;
-		}
-	}
-
-	@Override
-	public List<Integer> addProjectUserMysqlAccounts(final List<ProjectUserMysqlAccount> records) {
-		return this.addProjectUserMysqlAccount(records);
-	}
-
-	private List<Integer> addProjectUserMysqlAccount(final List<ProjectUserMysqlAccount> records) {
-
-		final List<Integer> idsSaved = new ArrayList<Integer>();
-		try {
-			final ProjectUserMysqlAccountDAO dao = this.getProjectUserMysqlAccountDao();
-
-			for (final ProjectUserMysqlAccount record : records) {
-				final ProjectUserMysqlAccount recordSaved = dao.saveOrUpdate(record);
-				idsSaved.add(recordSaved.getId());
-			}
-		} catch (final Exception e) {
-
-			this.logAndThrowException(
-					"Error encountered while adding ProjectUserMysqlAccount: WorkbenchDataManager.addProjectUserMysqlAccount(records="
-							+ records + "): " + e.getMessage(),
-					e);
-		}
-
-		return idsSaved;
-	}
-
-	@Override
 	public UserInfo getUserInfo(final int userId) {
 		try {
 			return this.getUserInfoDao().getUserInfoByUserId(userId);
@@ -1621,5 +1537,9 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return person;
 	}
 
+	@Override
+	public Project getProjectByUuid(final String projectUuid) {
+		return this.getProjectDao().getByUuid(projectUuid);
+	}
 
 }

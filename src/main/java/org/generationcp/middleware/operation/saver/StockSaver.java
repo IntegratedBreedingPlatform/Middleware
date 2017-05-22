@@ -78,6 +78,9 @@ public class StockSaver extends Saver {
 					stockModel = this.getStockObject(stockModel);
 					stockModel.setValue(value);
 
+				} else if (TermId.PLOT_ID.getId() == variableId) {
+					continue;
+
 				} else if (PhenotypicType.GERMPLASM == role) {
 					stockModel = this.getStockObject(stockModel);
 					StockProperty stockProperty = this.getStockProperty(stockModel, variable);

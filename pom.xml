@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-        <version>4.1</version>
+        <version>5.1</version>
 	<name>Middleware</name>
 
 	<properties>
@@ -15,27 +15,6 @@
 		<spring.version>3.2.11.RELEASE</spring.version>
 		<envConfig>${user.name}</envConfig>
 	</properties>
-
-	<distributionManagement>
-		<repository>
-			<id>efficio-nexus</id>
-			<name>Releases</name>
-			<url>http://apps.leafnode.io:8081/nexus/content/repositories/releases/</url>
-		</repository>
-		<snapshotRepository>
-			<id>efficio-nexus</id>
-			<name>Snapshots</name>
-			<url>http://apps.leafnode.io:8081/nexus/content/repositories/snapshots/</url>
-		</snapshotRepository>
-	</distributionManagement>
-
-	<repositories>
-		<repository>
-			<id>jboss-repository</id>
-			<name>Jboss Repository for Maven</name>
-			<url>http://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-		</repository>
-	</repositories>
 
 	<dependencies>
 		<dependency>
