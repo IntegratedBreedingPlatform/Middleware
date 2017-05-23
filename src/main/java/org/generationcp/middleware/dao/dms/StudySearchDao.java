@@ -18,7 +18,6 @@ import java.util.List;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
-import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
@@ -45,10 +44,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			SQLQuery query =
 					this.getSession().createSQLQuery(
-							"select count(distinct p.project_id) " + "from project p"
-									+ " inner join project_relationship r on r.object_project_id = p.project_id and r.type_id"
-									+ " NOT IN (" + TermId.HAS_PARENT_FOLDER.getId() + "," + TermId.STUDY_HAS_FOLDER.getId() + ") "
-									+ "where p.program_uuid = :programUUID AND p.name " + buildMatchCondition(studySearchMatchingOption) + NOT_IN_DELETED_STUDIES_QUERY);
+							"select count(distinct p.project_id) " + this.getSearchByNameMainQuery(studySearchMatchingOption));
 
 			query.setParameter("programUUID", programUUID);
 			this.assignNameParameter(studySearchMatchingOption, query, name);
@@ -68,10 +64,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			SQLQuery query =
 					this.getSession().createSQLQuery(
-							"select distinct p.project_id, p.name, p.description " + "from project p "
-									+ " inner join project_relationship r on r.object_project_id = p.project_id and r.type_id"
-									+ " NOT IN (" + TermId.HAS_PARENT_FOLDER.getId() + "," + TermId.STUDY_HAS_FOLDER.getId() + ") "
-									+ "where p.program_uuid = :programUUID AND p.name " + buildMatchCondition(studySearchMatchingOption) + NOT_IN_DELETED_STUDIES_QUERY);
+							"select distinct p.project_id, p.name, p.description " + this.getSearchByNameMainQuery(studySearchMatchingOption));
 
 			query.setParameter("programUUID", programUUID);
 			this.assignNameParameter(studySearchMatchingOption, query, name);
@@ -89,6 +82,14 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 		return studyReferences;
+	}
+	
+	private String getSearchByNameMainQuery(final StudySearchMatchingOption studySearchMatchingOption) {
+		return "from project p " + " inner join project_relationship r on r.object_project_id = p.project_id and r.type_id" + " NOT IN ("
+				+ TermId.HAS_PARENT_FOLDER.getId() + "," + TermId.STUDY_HAS_FOLDER.getId() + ") "
+				+ "where p.program_uuid = :programUUID AND p.name " + this.buildMatchCondition(studySearchMatchingOption)
+				+ NOT_IN_DELETED_STUDIES_QUERY;
+
 	}
 
 	private String buildMatchCondition(StudySearchMatchingOption studySearchMatchingOption) {
@@ -132,9 +133,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 				dateString += "__";
 			}
 			SQLQuery query =
-					this.getSession().createSQLQuery("select count(distinct p.project_id) from project p "
-							+ " INNER JOIN projectprop projectPropStartDate ON p.project_id = projectPropStartDate.project_id AND projectPropStartDate.type_id = " + TermId.START_DATE.getId() + " AND projectPropStartDate.value LIKE :compareDate "
-							+ "	WHERE p.program_uuid = :programUUID " + NOT_IN_DELETED_STUDIES_QUERY);
+					this.getSession().createSQLQuery("select count(distinct p.project_id) " + this.getSearchByStartDateMainQuery());
 
 
 			query.setParameter("programUUID", programUUID);
@@ -163,9 +162,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 
 			SQLQuery query =
 					this.getSession().createSQLQuery(
-							"select distinct p.project_id, p.name, p.description from project p "
-									+ " INNER JOIN projectprop projectPropStartDate ON p.project_id = projectPropStartDate.project_id AND projectPropStartDate.type_id = " + TermId.START_DATE.getId() + " AND projectPropStartDate.value LIKE :compareDate "
-									+ "	WHERE p.program_uuid = :programUUID " + NOT_IN_DELETED_STUDIES_QUERY);
+							"select distinct p.project_id, p.name, p.description " + this.getSearchByStartDateMainQuery());
 
 			query.setParameter("programUUID", programUUID);
 			query.setParameter("compareDate", dateString);
@@ -185,6 +182,13 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		}
 		return studyReferences;
 	}
+	
+	private String getSearchByStartDateMainQuery(){
+		return "from project p "
+				+ " INNER JOIN projectprop projectPropStartDate ON p.project_id = projectPropStartDate.project_id AND projectPropStartDate.type_id = "
+				+ TermId.START_DATE.getId() + " AND projectPropStartDate.value LIKE :compareDate "
+				+ "	WHERE p.program_uuid = :programUUID " + NOT_IN_DELETED_STUDIES_QUERY;
+	}
 
 	public long countStudiesBySeason(Season season, String programUUID) {
 		try {
@@ -200,24 +204,10 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 						this.getSession()
 								.createSQLQuery(
 										"SELECT COUNT(*) FROM (SELECT DISTINCT p.project_id"
-												+ " FROM project p "
-												+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
-												+ TermId.BELONGS_TO_STUDY.getId()
-												+ " INNER JOIN nd_experiment_project ep "
-												+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id "
-												+ " INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
-												+ TermId.SEASON_VAR.getId()
-												+ " WHERE p.program_uuid = :programUUID AND (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id) "
-												+ "   AND  gp.value = '" + valueId + "'" + "   AND e.nd_experiment_id = " + " 	  (  "
-												+ "		SELECT MIN(nd_experiment_id) " + "		  FROM nd_experiment min "
-												+ "		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " + "  	   )"
-												+ NOT_IN_DELETED_STUDIES_QUERY 
+												+ this.getSearchBySeasonAtEnvironmentLevelMainQuery(valueId)
 												+ "  UNION DISTINCT"
-												+ "  SELECT DISTINCT p.project_id FROM project p"
-												+ "  INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  " + TermId.BELONGS_TO_STUDY.getId()
-												+ "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = " + TermId.SEASON_VAR.getId()
-												+ "  WHERE p.program_uuid = :programUUID AND pp.value = '" + valueId + "'"
-												+ NOT_IN_DELETED_STUDIES_QUERY
+												+ "  SELECT DISTINCT p.project_id "
+												+ this.getSearchBySeasonAtStudyLevelMainQuery(valueId)
 												+ ") projectlist");
 
 				query.setParameter("programUUID", programUUID);
@@ -249,24 +239,10 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 						this.getSession()
 								.createSQLQuery(
 										"SELECT DISTINCT p.project_id, p.name, p.description"
-												+ " FROM project p "
-												+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
-												+ TermId.BELONGS_TO_STUDY.getId()
-												+ " INNER JOIN nd_experiment_project ep "
-												+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id "
-												+ " INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
-												+ TermId.SEASON_VAR.getId()
-												+ " WHERE  p.program_uuid = :programUUID AND (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id) "
-												+ "   AND  gp.value = '" + valueId + "'" + "   AND e.nd_experiment_id = " + " 	  (  "
-												+ "		SELECT MIN(nd_experiment_id) " + "		  FROM nd_experiment min "
-												+ "		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " + "  	   )"
-												+ NOT_IN_DELETED_STUDIES_QUERY
+												+ this.getSearchBySeasonAtEnvironmentLevelMainQuery(valueId)
 												+ "  UNION DISTINCT"
-												+ "  SELECT DISTINCT p.project_id, p.name, p.description FROM project p"
-												+ "  INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  " + TermId.BELONGS_TO_STUDY.getId()
-												+ "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = " + TermId.SEASON_VAR.getId()
-												+ "  WHERE  p.program_uuid = :programUUID AND pp.value = '" + valueId + "'"
-												+ NOT_IN_DELETED_STUDIES_QUERY);
+												+ "  SELECT DISTINCT p.project_id, p.name, p.description "
+												+ this.getSearchBySeasonAtStudyLevelMainQuery(valueId));
 
 				query.setParameter("programUUID", programUUID);
 				query.setFirstResult(start);
@@ -286,28 +262,35 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		}
 		return studyReferences;
 	}
+	
+	private String getSearchBySeasonAtEnvironmentLevelMainQuery(Integer valueId) {
+		return " FROM project p " + " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
+				+ TermId.BELONGS_TO_STUDY.getId() + " INNER JOIN nd_experiment_project ep "
+				+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id "
+				+ " INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
+				+ TermId.SEASON_VAR.getId()
+				+ " WHERE  p.program_uuid = :programUUID AND (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id) "
+				+ "   AND  gp.value = '" + valueId + "'" + "   AND e.nd_experiment_id = " + " 	  (  "
+				+ "		SELECT MIN(nd_experiment_id) " + "		  FROM nd_experiment min "
+				+ "		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " + "  	   )" + NOT_IN_DELETED_STUDIES_QUERY;
+	}
 
+	private String getSearchBySeasonAtStudyLevelMainQuery(Integer valueId) {
+		return "FROM project p  " + "INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
+				+ TermId.BELONGS_TO_STUDY.getId() + "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = "
+				+ TermId.SEASON_VAR.getId() + "  " + "WHERE  p.program_uuid = :programUUID AND pp.value = '" + valueId + "'"
+				+ NOT_IN_DELETED_STUDIES_QUERY;
+	}
+	
 	public long countStudiesByLocationIds(List<Integer> locationIds, String programUUID) {
 		try {
 			SQLQuery query =
 					this.getSession().createSQLQuery(
-							"SELECT COUNT(*) FROM (SELECT DISTINCT p.project_id FROM project p "
-									+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
-									+ TermId.BELONGS_TO_STUDY.getId() + " INNER JOIN nd_experiment_project ep "
-									+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id "
-									+ " INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
-									+ TermId.LOCATION_ID.getId()
-									+ " WHERE  p.program_uuid = :programUUID  AND (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id) "
-									+ "   AND  gp.value IN (" + this.stringify(locationIds) + ") " + "   AND e.nd_experiment_id = "
-									+ " 	  (  " + "		SELECT MIN(nd_experiment_id) " + "		  FROM nd_experiment min "
-									+ "		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " + "  	   )"
-									+ NOT_IN_DELETED_STUDIES_QUERY
+							"SELECT COUNT(*) FROM (SELECT DISTINCT p.project_id " 
+									+ this.getSearchByLocationAtEnvironmentLevelMainQuery(locationIds)
 									+ "  UNION DISTINCT"
-									+ "  SELECT DISTINCT p.project_id FROM project p"
-									+ "  INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  " + TermId.BELONGS_TO_STUDY.getId()
-									+ "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = " + TermId.LOCATION_ID.getId()
-									+ "  WHERE  p.program_uuid = :programUUID AND pp.value IN (" + this.stringify(locationIds) + ")"
-									+ NOT_IN_DELETED_STUDIES_QUERY
+									+ "  SELECT DISTINCT p.project_id "
+									+ this.getSearchByLocationAtStudyLevelMainQuery(locationIds)
 									+ ") locationList;");
 
 			query.setParameter("programUUID", programUUID);
@@ -326,25 +309,11 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			SQLQuery query =
 					this.getSession().createSQLQuery(
-							"SELECT DISTINCT p.project_id, p.name, p.description " + " FROM project p "
-									+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
-									+ TermId.BELONGS_TO_STUDY.getId() + " INNER JOIN nd_experiment_project ep "
-									+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id "
-									+ " INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
-									+ TermId.LOCATION_ID.getId()
-									+ " WHERE  p.program_uuid = :programUUID AND (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id) "
-									+ "   AND  gp.value IN (" + this.stringify(locationIds) + ") " + "   AND e.nd_experiment_id = "
-									+ " 	  (  " + "		SELECT MIN(nd_experiment_id) " + "		  FROM nd_experiment min "
-									+ "		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " + "  	   )"
-									+ NOT_IN_DELETED_STUDIES_QUERY
+							"SELECT DISTINCT p.project_id, p.name, p.description " 
+									+ this.getSearchByLocationAtEnvironmentLevelMainQuery(locationIds)
 									+ "  UNION DISTINCT"
-									+ "  SELECT DISTINCT p.project_id, p.name, p.description FROM project p"
-									+ "  INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  " + TermId.BELONGS_TO_STUDY.getId()
-									+ "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = " + TermId.LOCATION_ID.getId()
-									+ "  WHERE  p.program_uuid = :programUUID  AND pp.value IN (" + this.stringify(locationIds) + ")"
-									+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-									+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId()
-									+ " )");
+									+ "  SELECT DISTINCT p.project_id, p.name, p.description "
+									+ this.getSearchByLocationAtStudyLevelMainQuery(locationIds));
 
 			query.setParameter("programUUID", programUUID);
 			query.setFirstResult(start);
@@ -361,6 +330,28 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 		return studyReferences;
+	}
+	
+	private String getSearchByLocationAtEnvironmentLevelMainQuery(final List<Integer> locationIds) {
+		return " FROM project p "
+				+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
+				+ TermId.BELONGS_TO_STUDY.getId() + " INNER JOIN nd_experiment_project ep "
+				+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id "
+				+ " INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
+				+ TermId.LOCATION_ID.getId()
+				+ " WHERE  p.program_uuid = :programUUID AND (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id) "
+				+ "   AND  gp.value IN (" + this.stringify(locationIds) + ") " + "   AND e.nd_experiment_id = "
+				+ " 	  (  " + "		SELECT MIN(nd_experiment_id) " + "		  FROM nd_experiment min "
+				+ "		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " + "  	   )"
+				+ NOT_IN_DELETED_STUDIES_QUERY;
+	}
+
+	private String getSearchByLocationAtStudyLevelMainQuery(final List<Integer> locationIds) {
+		return "FROM project p"
+				+ "  INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  " + TermId.BELONGS_TO_STUDY.getId()
+				+ "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = " + TermId.LOCATION_ID.getId()
+				+ "  WHERE  p.program_uuid = :programUUID  AND pp.value IN (" + this.stringify(locationIds) + ")"
+				+ NOT_IN_DELETED_STUDIES_QUERY;
 	}
 
 	private String stringify(List<Integer> locationIds) {
