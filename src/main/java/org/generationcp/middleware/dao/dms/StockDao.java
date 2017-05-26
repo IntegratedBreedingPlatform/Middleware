@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.StockModel;
@@ -81,20 +82,23 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		final List<StudyReference> studyReferences = new ArrayList<StudyReference>();
 		try {
 			final SQLQuery query = this.getSession()
-					.createSQLQuery("select distinct p.project_id, p.name, p.description " + "FROM stock s "
+					.createSQLQuery("select distinct p.project_id, p.name, p.description, prop.value " + "FROM stock s "
 							+ "LEFT JOIN nd_experiment_stock es ON s.stock_id = es.stock_id "
 							+ "LEFT JOIN nd_experiment e on es.nd_experiment_id = e.nd_experiment_id "
 							+ "LEFT JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
 							+ "LEFT JOIN project_relationship pr ON pr.subject_project_id = ep.project_id "
-							+ "LEFT JOIN project p ON pr.object_project_id = p.project_id " + "WHERE s.dbxref_id = " + gid
-							+ " AND p.project_id NOT IN (SELECT pp.project_id FROM projectprop pp WHERE pp.type_id = "
+							+ "LEFT JOIN project p ON pr.object_project_id = p.project_id "
+							+ "LEFT OUTER JOIN projectprop prop ON prop.project_id = p.project_id AND prop.type_id = " + TermId.STUDY_TYPE.getId()
+							+ " WHERE s.dbxref_id = " + gid + " AND p.project_id NOT IN (SELECT pp.project_id FROM projectprop pp WHERE pp.type_id = "
 							+ TermId.STUDY_STATUS.getId() + " AND pp.value = " + TermId.DELETED_STUDY.getId() + ")");
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 
 			final List<Object[]> results = query.list();
 			for (final Object[] row : results) {
-				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2]));
+				String studyTypeRaw = (String) row[3];
+				StudyType studyType = studyTypeRaw != null ? StudyType.getStudyTypeById(Integer.valueOf(studyTypeRaw)) : null;
+				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2],null,studyType));
 			}
 
 		} catch (final HibernateException e) {
