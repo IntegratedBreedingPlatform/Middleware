@@ -33,7 +33,9 @@ import org.hibernate.SQLQuery;
 
 public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 
-	public void deleteByMapId(int mapId) throws MiddlewareQueryException {
+	private static final String FROM_GDMS_MARKERS_ONMAP = "FROM gdms_markers_onmap ";
+
+	public void deleteByMapId(int mapId) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
@@ -48,7 +50,7 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public MarkerOnMap findByMarkerIdAndMapId(int markerId, int mapId) throws MiddlewareQueryException {
+	public MarkerOnMap findByMarkerIdAndMapId(int markerId, int mapId) {
 		try {
 
 			Query query = this.getSession().createQuery("FROM MarkerOnMap WHERE markerId = :markerId AND mapId = :mapId");
@@ -68,8 +70,8 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, List<String>> getMapNameByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
-		Map<Integer, List<String>> markerMaps = new HashMap<Integer, List<String>>();
+	public Map<Integer, List<String>> getMapNameByMarkerIds(List<Integer> markerIds) {
+		Map<Integer, List<String>> markerMaps = new HashMap<>();
 
 		try {
 			StringBuilder sqlString =
@@ -87,7 +89,7 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 					Integer markerId = (Integer) row[0];
 					String mapName = (String) row[1];
 
-					List<String> mapNames = new ArrayList<String>();
+					List<String> mapNames = new ArrayList<>();
 					if (markerMaps.containsKey(markerId)) {
 						mapNames = markerMaps.get(markerId);
 					}
@@ -104,8 +106,8 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<MarkerOnMap> getMarkersOnMapByMapId(Integer mapId) throws MiddlewareQueryException {
-		List<MarkerOnMap> markersOnMap = new ArrayList<MarkerOnMap>();
+	public List<MarkerOnMap> getMarkersOnMapByMapId(Integer mapId) {
+		List<MarkerOnMap> markersOnMap = new ArrayList<>();
 
 		try {
 			StringBuilder sqlString =
@@ -175,15 +177,14 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getMarkerIdsByPositionAndLinkageGroup(double startPos, double endPos, String linkageGroup)
-			throws MiddlewareQueryException {
-		List<Integer> toReturn = new ArrayList<Integer>();
+	public List<Integer> getMarkerIdsByPositionAndLinkageGroup(double startPos, double endPos, String linkageGroup) {
+		List<Integer> toReturn = new ArrayList<>();
 		try {
 
 			SQLQuery query;
 
 			StringBuffer sql =
-					new StringBuffer().append("SELECT marker_id ").append("FROM gdms_markers_onmap ")
+					new StringBuffer().append("SELECT marker_id ").append(FROM_GDMS_MARKERS_ONMAP)
 							.append("WHERE linkage_group = :linkage_group ").append("AND start_position ")
 							.append("BETWEEN :start_position ").append("AND :end_position ").append("ORDER BY marker_id ");
 
@@ -202,18 +203,13 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<MarkerOnMap> getMarkersOnMap(List<Integer> mapIds, String linkageGroup, double startPos, double endPos)
-			throws MiddlewareQueryException {
-		List<MarkerOnMap> markersOnMap = new ArrayList<MarkerOnMap>();
+	public List<MarkerOnMap> getMarkersOnMap(List<Integer> mapIds, String linkageGroup, double startPos, double endPos) {
+		List<MarkerOnMap> markersOnMap = new ArrayList<>();
 
 		try {
-			/*
-			 * SELECT gdms_markers_onmap.* FROM gdms_markers_onmap WHERE map_id IN (:mapIds) AND linkage_group = :linkageGroup AND
-			 * start_position BETWEEN :startPos AND :endPos ORDER BY map_id, Linkage_group, start_position
-			 */
 
 			StringBuilder sqlString =
-					new StringBuilder().append("SELECT gdms_markers_onmap.* ").append("FROM gdms_markers_onmap ")
+					new StringBuilder().append("SELECT gdms_markers_onmap.* ").append(FROM_GDMS_MARKERS_ONMAP)
 							.append("WHERE map_id IN (:mapIds) AND linkage_group = :linkageGroup ")
 							.append("		AND start_position BETWEEN :startPos AND :endPos ")
 							.append("ORDER BY map_id, Linkage_group, start_position ");
@@ -249,18 +245,14 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<MarkerOnMap> getMarkersOnMapByMarkerIds(List<Integer> markerIds) throws MiddlewareQueryException {
-		List<MarkerOnMap> markersOnMap = new ArrayList<MarkerOnMap>();
+	public List<MarkerOnMap> getMarkersOnMapByMarkerIds(List<Integer> markerIds) {
+		List<MarkerOnMap> markersOnMap = new ArrayList<>();
 
 		try {
-			/*
-			 * SELECT markeronmap_id, map_id, marker_id, start_position, end_position, linkage_group FROM gdms_markers_onmap WHERE marker_id
-			 * IN (:markerIds) ORDER BY map_id, Linkage_group, start_position
-			 */
 
 			StringBuilder sqlString =
 					new StringBuilder().append("SELECT markeronmap_id, map_id, marker_id, start_position, end_position, linkage_group ")
-							.append("FROM gdms_markers_onmap ").append("WHERE marker_id IN (:markerIds) ")
+							.append(FROM_GDMS_MARKERS_ONMAP).append("WHERE marker_id IN (:markerIds) ")
 							.append("ORDER BY map_id, Linkage_group, start_position ");
 			Query query = this.getSession().createSQLQuery(sqlString.toString());
 			query.setParameterList("markerIds", markerIds);
@@ -315,15 +307,11 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getAllMarkerIds() throws MiddlewareQueryException {
-		List<Integer> toReturn = new ArrayList<Integer>();
+	public List<Integer> getAllMarkerIds() {
+		List<Integer> toReturn = new ArrayList<>();
 
 		try {
-			/*
-			 * SELECT marker_id FROM gdms_markers_onmap
-			 */
-
-			StringBuilder sqlString = new StringBuilder().append("SELECT marker_id ").append("FROM gdms_markers_onmap ");
+			StringBuilder sqlString = new StringBuilder().append("SELECT marker_id ").append(FROM_GDMS_MARKERS_ONMAP);
 			Query query = this.getSession().createSQLQuery(sqlString.toString());
 
 			return query.list();
