@@ -126,14 +126,15 @@ public class MarkerOnMapDAO extends GenericDAO<MarkerOnMap, Integer> {
 					Double endPosition = (Double) row[4];
 					String linkageGroup = (String) row[5];
 
-					markersOnMap.add(new MarkerOnMap(markerOnMapId, mapId2, markerId, startPosition.floatValue(), endPosition.floatValue(),
+					final Float startPositionFloatValue = startPosition != null ? startPosition.floatValue() : null;
+					final Float endPositionFloatValue = endPosition != null ? endPosition.floatValue() : null;
+					markersOnMap.add(new MarkerOnMap(markerOnMapId, mapId2, markerId, startPositionFloatValue, endPositionFloatValue,
 							linkageGroup));
-
 				}
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByMapId query from MarkerOnMap: " + e.getMessage(), e);
+			this.logAndThrowException("Error with getByMapId(id=" + mapId + ")query from MarkerOnMap: " + e.getMessage(), e);
 		}
 
 		return markersOnMap;
