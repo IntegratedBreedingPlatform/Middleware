@@ -426,10 +426,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 						germplasm.getNames().add(name);
 					}
 
-					// inherit 'selection history at fixation' names of parent
+					// inherit 'selection history at fixation' and code names of parent
 					// if parent is part of a group (= has mgid)
 					if (germplasm.getMgid() > 0) {
 						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm);
+						this.germplasmGroupingService.copyCodedNames(germplasm);
 					}
 
 					// set Lgid to GID if it's value was not set previously

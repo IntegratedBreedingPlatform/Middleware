@@ -45,6 +45,9 @@ public class GermplasmGroupingServiceImplTest {
 
 	private UserDefinedField selectionHistoryNameCode;
 	private UserDefinedField selHisFixNameCode;
+	private UserDefinedField codedName1;
+	private UserDefinedField codedName2;
+	private UserDefinedField codedName3;
 
 	static final Set<Integer> HYBRID_METHODS = Sets.newHashSet(416, 417, 418, 419, 426, 321);
 
@@ -71,6 +74,27 @@ public class GermplasmGroupingServiceImplTest {
 		this.selHisFixNameCode.setFcode(GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
 				GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE)).thenReturn(this.selHisFixNameCode);
+		
+		this.codedName1 = new UserDefinedField(600000007);
+		this.codedName1.setFtable("NAMES");
+		this.codedName1.setFtype("NAME");
+		this.codedName1.setFcode(GermplasmGroupingServiceImpl.CODED_NAME_1);
+		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
+				GermplasmGroupingServiceImpl.CODED_NAME_1)).thenReturn(this.codedName1);
+		
+		this.codedName2 = new UserDefinedField(600000008);
+		this.codedName2.setFtable("NAMES");
+		this.codedName2.setFtype("NAME");
+		this.codedName2.setFcode(GermplasmGroupingServiceImpl.CODED_NAME_2);
+		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
+				GermplasmGroupingServiceImpl.CODED_NAME_2)).thenReturn(this.codedName2);
+		
+		this.codedName3 = new UserDefinedField(600000009);
+		this.codedName3.setFtable("NAMES");
+		this.codedName3.setFtype("NAME");
+		this.codedName3.setFcode(GermplasmGroupingServiceImpl.CODED_NAME_3);
+		Mockito.when(this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME",
+				GermplasmGroupingServiceImpl.CODED_NAME_3)).thenReturn(this.codedName3);
 
 		this.selectionHistoryNameParent = new Name();
 		this.selectionHistoryNameParent.setNstat(1);
@@ -601,5 +625,93 @@ public class GermplasmGroupingServiceImplTest {
 		Assert.assertEquals("Advanced germplasm should have one additional name inherited from source (parent).", 2,
 				advancedGermplasm.getNames().size());
 		Assert.assertEquals("Normal advancing name should become non-preferred", new Integer(0), normalAdvancingNameOfChild.getNstat());
+	}
+	
+	@Test
+	public void testCopyCodedNames() {
+
+		// Setup source germplasm which has coded name
+		Germplasm advancedGermplasmSource = new Germplasm(2);
+
+		Name code1 = new Name(12);
+		code1.setNstat(0);
+		code1.setNval("CODE1");
+		code1.setTypeId(this.codedName1.getFldno());
+		advancedGermplasmSource.getNames().add(code1);
+
+		// Setup advanced germplasm with a name given on advancing
+		Germplasm advancedGermplasm = new Germplasm(3);
+		advancedGermplasm.setGpid1(1);
+		advancedGermplasm.setGpid2(advancedGermplasm.getGpid2());
+
+		Name normalAdvancingNameOfChild = new Name(22);
+		normalAdvancingNameOfChild.setNstat(1); // Set as preferred.
+		normalAdvancingNameOfChild.setNval("CML-1-1-1");
+		normalAdvancingNameOfChild.setTypeId(5);
+		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
+
+		// Setup parent child relationship mock between the two via gpid2
+		Mockito.when(this.germplasmDAO.getById(advancedGermplasm.getGpid2())).thenReturn(advancedGermplasmSource);
+
+		// Invoke the service
+		this.germplasmGroupingService.copyCodedNames(advancedGermplasm);
+
+		// Expect that the advanced germplasm now has two names (SELHISFIX name for parent gets added)
+		Assert.assertEquals("Advanced germplasm should have one additional name inherited from source (parent).", 2,
+				advancedGermplasm.getNames().size());
+		Assert.assertEquals("Normal advancing name should become non-preferred", new Integer(0), normalAdvancingNameOfChild.getNstat());
+	}
+	
+	@Test
+	public void testCopyCodedNamesPriorityForSettingPreferredName() {
+
+		// Setup source germplasm which has coded name
+		Germplasm advancedGermplasmSource = new Germplasm(2);
+
+		Name code1 = new Name(12);
+		code1.setNstat(0);
+		code1.setNval("CODE1");
+		code1.setTypeId(this.codedName1.getFldno());
+		advancedGermplasmSource.getNames().add(code1);
+		
+		Name code2 = new Name(12);
+		code2.setNstat(0);
+		code2.setNval("CODE2");
+		code2.setTypeId(this.codedName2.getFldno());
+		advancedGermplasmSource.getNames().add(code2);
+		
+		Name code3 = new Name(12);
+		code3.setNstat(0);
+		code3.setNval("CODE3");
+		code3.setTypeId(this.codedName3.getFldno());
+		advancedGermplasmSource.getNames().add(code3);
+
+		// Setup advanced germplasm with a name given on advancing
+		Germplasm advancedGermplasm = new Germplasm(3);
+		advancedGermplasm.setGpid1(1);
+		advancedGermplasm.setGpid2(advancedGermplasm.getGpid2());
+
+		Name normalAdvancingNameOfChild = new Name(22);
+		normalAdvancingNameOfChild.setNstat(1); // Set as preferred.
+		normalAdvancingNameOfChild.setNval("CML-1-1-1");
+		normalAdvancingNameOfChild.setTypeId(5);
+		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
+
+		// Setup parent child relationship mock between the two via gpid2
+		Mockito.when(this.germplasmDAO.getById(advancedGermplasm.getGpid2())).thenReturn(advancedGermplasmSource);
+
+		// Invoke the service
+		this.germplasmGroupingService.copyCodedNames(advancedGermplasm);
+
+		// Expect that the advanced germplasm now has two names (SELHISFIX name for parent gets added)
+		Assert.assertEquals("Advanced germplasm should have one additional name inherited from source (parent).", 4,
+				advancedGermplasm.getNames().size());
+		for(Name name: advancedGermplasm.getNames()){
+			if(name.getTypeId().equals(this.codedName3.getFldno())){
+				Assert.assertEquals("Name with fldno " + this.codedName3.getFldno() + " should be set as preferred name", new Integer(1), name.getNstat());
+			} else{
+				Assert.assertEquals("Other inherited names should be non-preferred", new Integer(0), name.getNstat());
+			}
+		}
 	}
 }
