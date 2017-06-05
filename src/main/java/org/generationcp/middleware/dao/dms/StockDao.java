@@ -96,7 +96,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 			final List<Object[]> results = query.list();
 			for (final Object[] row : results) {
-				String studyTypeRaw = (String) row[3];
+				final String studyTypeRaw = (String) row[3];
 				final StudyType studyType = studyTypeRaw != null ? StudyType.getStudyTypeById(Integer.valueOf(studyTypeRaw)) : null;
 				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2],null,studyType));
 			}
