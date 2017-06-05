@@ -40,7 +40,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getStockIdsByProperty(final String columnName, final String value) throws MiddlewareQueryException {
-		List<Integer> stockIds = new ArrayList<Integer>();
+		List<Integer> stockIds = new ArrayList<>();
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			if ("dbxrefId".equals(columnName)) {
@@ -79,7 +79,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<StudyReference> getStudiesByGid(final int gid, final int start, final int numOfRows) throws MiddlewareQueryException {
-		final List<StudyReference> studyReferences = new ArrayList<StudyReference>();
+		final List<StudyReference> studyReferences = new ArrayList<>();
 		try {
 			final SQLQuery query = this.getSession()
 					.createSQLQuery("select distinct p.project_id, p.name, p.description, prop.value " + "FROM stock s "
@@ -97,7 +97,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			final List<Object[]> results = query.list();
 			for (final Object[] row : results) {
 				String studyTypeRaw = (String) row[3];
-				StudyType studyType = studyTypeRaw != null ? StudyType.getStudyTypeById(Integer.valueOf(studyTypeRaw)) : null;
+				final StudyType studyType = studyTypeRaw != null ? StudyType.getStudyTypeById(Integer.valueOf(studyTypeRaw)) : null;
 				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2],null,studyType));
 			}
 
@@ -109,7 +109,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public Set<StockModel> findInDataSet(final int datasetId) throws MiddlewareQueryException {
-		final Set<StockModel> stockModels = new LinkedHashSet<StockModel>();
+		final Set<StockModel> stockModels = new LinkedHashSet<>();
 		try {
 
 			final String sql = "SELECT DISTINCT es.stock_id" + " FROM nd_experiment_stock es"
@@ -169,7 +169,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<StockModel> getStocks(final int projectId) throws MiddlewareQueryException {
-		final List<StockModel> stocks = new ArrayList<StockModel>();
+		final List<StockModel> stocks = new ArrayList<>();
 
 		try {
 
@@ -209,7 +209,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public Map<Integer, StockModel> getStocksByIds(final List<Integer> ids) throws MiddlewareQueryException {
-		final Map<Integer, StockModel> stockModels = new HashMap<Integer, StockModel>();
+		final Map<Integer, StockModel> stockModels = new HashMap<>();
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.in("stockId", ids));
