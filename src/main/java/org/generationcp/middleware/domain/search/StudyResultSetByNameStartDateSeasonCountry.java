@@ -44,8 +44,8 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 	private List<StudyReference> buffer;
 	private int bufIndex;
 
-	public StudyResultSetByNameStartDateSeasonCountry(BrowseStudyQueryFilter filter, int numOfRows,
-			HibernateSessionProvider sessionProvider) {
+	public StudyResultSetByNameStartDateSeasonCountry(final BrowseStudyQueryFilter filter, final int numOfRows,
+			final HibernateSessionProvider sessionProvider) {
 
 		super(sessionProvider);
 
@@ -69,36 +69,36 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 		this.bufIndex = 0;
 	}
 
-	private List<Integer> getLocationIds(String countryName) {
-		List<Integer> locationIds = new ArrayList<Integer>();
+	private List<Integer> getLocationIds(final String countryName) {
+		List<Integer> locationIds = new ArrayList<>();
 		if (countryName != null) {
-			List<Country> countries = this.getCountryDao().getByIsoFull(countryName);
+			final List<Country> countries = this.getCountryDao().getByIsoFull(countryName);
 			locationIds = this.getLocationSearchDao().getLocationIds(countries);
 		}
 		return locationIds;
 	}
 
-	private long countStudiesByName(String name) {
-		return this.getStudySearchDao().countStudiesByName(name, studySearchMatchingOption, programUUID);
+	private long countStudiesByName(final String name) {
+		return this.getStudySearchDao().countStudiesByName(name, this.studySearchMatchingOption, this.programUUID);
 	}
 
-	private long countStudiesByStartDate(Integer startDate) {
+	private long countStudiesByStartDate(final Integer startDate) {
 		if (startDate != null) {
-			return this.getStudySearchDao().countStudiesByStartDate(startDate, programUUID);
+			return this.getStudySearchDao().countStudiesByStartDate(startDate, this.programUUID);
 		}
 		return 0;
 	}
 
-	private long countStudiesBySeason(Season season) {
+	private long countStudiesBySeason(final Season season) {
 		if (season != null) {
-			return this.getStudySearchDao().countStudiesBySeason(season, programUUID);
+			return this.getStudySearchDao().countStudiesBySeason(season, this.programUUID);
 		}
 		return 0;
 	}
 
 	private long countStudiesByCountry() {
 		if (this.locationIds != null && !this.locationIds.isEmpty()) {
-			return this.getStudySearchDao().countStudiesByLocationIds(this.locationIds, programUUID);
+			return this.getStudySearchDao().countStudiesByLocationIds(this.locationIds, this.programUUID);
 		}
 		return 0;
 	}
@@ -125,49 +125,45 @@ public class StudyResultSetByNameStartDateSeasonCountry extends Searcher impleme
 		if (this.currentRow < this.countOfStudiesByName) {
 			this.fillBufferByName(this.currentRow);
 		} else if (this.currentRow < this.countOfStudiesByName) {
-			int start = this.currentRow - (int) this.countOfStudiesByName;
+			final int start = this.currentRow - (int) this.countOfStudiesByName;
 			this.fillBufferByName(start);
-		} else if (this.currentRow < this.countOfStudiesByName
-				+ this.countOfStudiesByStartDate) {
-			int start = this.currentRow - (int) this.countOfStudiesByName;
+		} else if (this.currentRow < this.countOfStudiesByName + this.countOfStudiesByStartDate) {
+			final int start = this.currentRow - (int) this.countOfStudiesByName;
 			this.fillBufferByStartDate(start);
-		} else if (this.currentRow < this.countOfStudiesByName
-				+ this.countOfStudiesByStartDate + this.countOfStudiesBySeason) {
-			int start =
-					this.currentRow - (int) this.countOfStudiesByName
-							- (int) this.countOfStudiesByStartDate;
+		} else if (this.currentRow < this.countOfStudiesByName + this.countOfStudiesByStartDate + this.countOfStudiesBySeason) {
+			final int start = this.currentRow - (int) this.countOfStudiesByName - (int) this.countOfStudiesByStartDate;
 			this.fillBufferBySeason(start);
-		} else if (this.currentRow < this.countOfStudiesByName
-				+ this.countOfStudiesByStartDate + this.countOfStudiesBySeason
+		} else if (this.currentRow < this.countOfStudiesByName + this.countOfStudiesByStartDate + this.countOfStudiesBySeason
 				+ this.countOfStudiesByCountry) {
-			int start = this.currentRow - (int) this.countOfStudiesByName - (int) this.countOfStudiesByStartDate - (int) this.countOfStudiesBySeason;
+			final int start = this.currentRow - (int) this.countOfStudiesByName - (int) this.countOfStudiesByStartDate
+					- (int) this.countOfStudiesBySeason;
 			this.fillBufferByCountry(start);
 		}
 	}
 
-	private void fillBufferByName(int start) {
-		this.buffer = this.getStudySearchDao().getStudiesByName(this.name, start, this.numOfRows, studySearchMatchingOption, programUUID);
+	private void fillBufferByName(final int start) {
+		this.buffer = this.getStudySearchDao().getStudiesByName(this.name, start, this.numOfRows, this.studySearchMatchingOption,
+				this.programUUID);
 		this.bufIndex = 0;
 	}
 
-	private void fillBufferByStartDate(int start) {
-		this.buffer = this.getStudySearchDao().getStudiesByStartDate(this.startDate, start, this.numOfRows, programUUID);
+	private void fillBufferByStartDate(final int start) {
+		this.buffer = this.getStudySearchDao().getStudiesByStartDate(this.startDate, start, this.numOfRows, this.programUUID);
 		this.bufIndex = 0;
 	}
 
-	private void fillBufferBySeason(int start) {
-		this.buffer = this.getStudySearchDao().getStudiesBySeason(this.season, start, this.numOfRows, programUUID);
+	private void fillBufferBySeason(final int start) {
+		this.buffer = this.getStudySearchDao().getStudiesBySeason(this.season, start, this.numOfRows, this.programUUID);
 		this.bufIndex = 0;
 	}
 
-	private void fillBufferByCountry(int start) {
-		this.buffer = this.getStudySearchDao().getStudiesByLocationIds(this.locationIds, start, this.numOfRows, programUUID);
+	private void fillBufferByCountry(final int start) {
+		this.buffer = this.getStudySearchDao().getStudiesByLocationIds(this.locationIds, start, this.numOfRows, this.programUUID);
 		this.bufIndex = 0;
 	}
 
 	@Override
 	public long size() {
-		return this.countOfStudiesByName + this.countOfStudiesByStartDate + this.countOfStudiesBySeason
-				+ this.countOfStudiesByCountry;
+		return this.countOfStudiesByName + this.countOfStudiesByStartDate + this.countOfStudiesBySeason + this.countOfStudiesByCountry;
 	}
 }
