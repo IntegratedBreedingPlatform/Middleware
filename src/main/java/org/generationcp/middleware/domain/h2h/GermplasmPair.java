@@ -27,9 +27,6 @@ public class GermplasmPair {
 
 	private TrialEnvironments environments;
 
-	public GermplasmPair() {
-	}
-
 	public GermplasmPair(int gid1, int gid2) {
 		super();
 		this.gid1 = gid1;
@@ -105,8 +102,12 @@ public class GermplasmPair {
 		builder.append(", gId2=");
 		builder.append(this.gid2);
 		builder.append(", environments=");
-		for (TrialEnvironment env : this.environments.getTrialEnvironments()) {
-			builder.append(env.toString()).append(", ");
+		if (this.environments != null) {
+			for (TrialEnvironment env : this.environments.getTrialEnvironments()) {
+				builder.append(env.toString()).append(", ");
+			}
+		} else {
+			builder.append(" ").append(", ");
 		}
 		builder.append("]");
 		return builder.toString();
