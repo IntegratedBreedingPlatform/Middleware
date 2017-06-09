@@ -50,12 +50,12 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
 			this.logAndThrowException(
 					"Error in getExperimentIdsByStockIds=" + stockIds + " query in ExperimentStockDao: " + e.getMessage(), e);
 		}
-		return new ArrayList<Integer>();
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
 	public Map<Integer, Set<Integer>> getEnvironmentsOfGermplasms(Set<Integer> gids) throws MiddlewareQueryException {
-		Map<Integer, Set<Integer>> germplasmEnvironments = new HashMap<Integer, Set<Integer>>();
+		Map<Integer, Set<Integer>> germplasmEnvironments = new HashMap<>();
 
 		if (gids.isEmpty()) {
 			return germplasmEnvironments;
@@ -94,12 +94,15 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
 	}
 
 	public long countStocksByDatasetId(int datasetId) throws MiddlewareQueryException {
+
+		final StringBuilder sql = new StringBuilder();
+		sql.append("SELECT COUNT(DISTINCT es.stock_id) FROM nd_experiment_project ep ")
+			.append(" INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = ep.nd_experiment_id ").append(" WHERE ep.project_id = ")
+			.append(datasetId);
+
 		try {
-			String sql =
-					"SELECT COUNT(DISTINCT es.stock_id) FROM nd_experiment_project ep "
-							+ " INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = ep.nd_experiment_id "
-							+ " WHERE ep.project_id = " + datasetId;
-			SQLQuery query = this.getSession().createSQLQuery(sql);
+
+			SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 			BigInteger count = (BigInteger) query.uniqueResult();
 			return count.longValue();
 

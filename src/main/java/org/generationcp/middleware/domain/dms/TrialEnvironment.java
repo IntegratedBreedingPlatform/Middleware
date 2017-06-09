@@ -85,7 +85,7 @@ public class TrialEnvironment {
 
 	public void addTrait(TraitInfo trait) {
 		if (this.traits == null) {
-			this.traits = new ArrayList<TraitInfo>();
+			this.traits = new ArrayList<>();
 		}
 		this.traits.add(trait);
 	}
