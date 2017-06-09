@@ -35,6 +35,9 @@ import org.slf4j.LoggerFactory;
  */
 public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 
+	private static final String IN_STUDY_SEARCH_DAO = " in StudySearchDao: ";
+	private static final String PROGRAM_UUID = "programUUID";
+	private static final String UNION_DISTINCT = "  UNION DISTINCT";
 	private static final Logger LOG = LoggerFactory.getLogger(StudySearchDao.class);
 	private static final String NOT_IN_DELETED_STUDIES_QUERY = " AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
 			+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId()
@@ -46,12 +49,12 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 					this.getSession().createSQLQuery(
 							"select count(distinct p.project_id) " + this.getSearchByNameMainQuery(studySearchMatchingOption));
 
-			query.setParameter("programUUID", programUUID);
+			query.setParameter(PROGRAM_UUID, programUUID);
 			this.assignNameParameter(studySearchMatchingOption, query, name);
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (HibernateException e) {
-			final String message = "Error in countStudiesByName=" + name + " in StudyDao: " + e.getMessage();
+			final String message = "Error in countStudiesByName=" + name + IN_STUDY_SEARCH_DAO + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -60,13 +63,13 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<StudyReference> getStudiesByName(String name, int start, int numOfRows, StudySearchMatchingOption studySearchMatchingOption, String programUUID) {
-		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
+		List<StudyReference> studyReferences = new ArrayList<>();
 		try {
 			SQLQuery query =
 					this.getSession().createSQLQuery(
 							"select distinct p.project_id, p.name, p.description " + this.getSearchByNameMainQuery(studySearchMatchingOption));
 
-			query.setParameter("programUUID", programUUID);
+			query.setParameter(PROGRAM_UUID, programUUID);
 			this.assignNameParameter(studySearchMatchingOption, query, name);
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
@@ -77,7 +80,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			final String message = "Error in getStudiesByName=" + name + " in StudyDao: " + e.getMessage();
+			final String message = "Error in getStudiesByName=" + name + IN_STUDY_SEARCH_DAO + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -98,10 +101,9 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 
 		if (studySearchMatchingOption == StudySearchMatchingOption.EXACT_MATCHES) {
 			condition  = "= :name";
-		} else if (studySearchMatchingOption == StudySearchMatchingOption.MATCHES_CONTAINING) {
-			condition  = "LIKE :name";
-		} else if (studySearchMatchingOption == StudySearchMatchingOption.MATCHES_STARTING_WITH) {
-			condition  = "LIKE :name";
+		} else if (studySearchMatchingOption == StudySearchMatchingOption.MATCHES_CONTAINING
+				|| studySearchMatchingOption == StudySearchMatchingOption.MATCHES_STARTING_WITH) {
+			condition = "LIKE :name";
 		}
 		return condition;
 
@@ -136,12 +138,12 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 					this.getSession().createSQLQuery("select count(distinct p.project_id) " + this.getSearchByStartDateMainQuery());
 
 
-			query.setParameter("programUUID", programUUID);
+			query.setParameter(PROGRAM_UUID, programUUID);
 			query.setParameter("compareDate", dateString);
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (HibernateException e) {
-			final String message = "Error in countStudiesByStartDate=" + startDate + " in StudyDao: " + e.getMessage();
+			final String message = "Error in countStudiesByStartDate=" + startDate + IN_STUDY_SEARCH_DAO + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -150,7 +152,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	@SuppressWarnings("unchecked")
 	public List<StudyReference> getStudiesByStartDate(int startDate, int start, int numOfRows, String programUUID) {
 
-		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
+		List<StudyReference> studyReferences = new ArrayList<>();
 		try {
 			String dateString = String.valueOf(startDate);
 			// pad LIKE wildcard characters
@@ -164,7 +166,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 					this.getSession().createSQLQuery(
 							"select distinct p.project_id, p.name, p.description " + this.getSearchByStartDateMainQuery());
 
-			query.setParameter("programUUID", programUUID);
+			query.setParameter(PROGRAM_UUID, programUUID);
 			query.setParameter("compareDate", dateString);
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
@@ -176,7 +178,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			final String message = "Error in getStudiesByStartDate=" + startDate + " in StudyDao: " + e.getMessage();
+			final String message = "Error in getStudiesByStartDate=" + startDate + IN_STUDY_SEARCH_DAO + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -205,18 +207,18 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 								.createSQLQuery(
 										"SELECT COUNT(*) FROM (SELECT DISTINCT p.project_id"
 												+ this.getSearchBySeasonAtEnvironmentLevelMainQuery()
-												+ "  UNION DISTINCT"
+												+ UNION_DISTINCT
 												+ "  SELECT DISTINCT p.project_id "
 												+ this.getSearchBySeasonAtStudyLevelMainQuery()
 												+ ") projectlist");
 
-				query.setParameter("programUUID", programUUID);
+				query.setParameter(PROGRAM_UUID, programUUID);
 				query.setParameter("seasonId", valueId);
 				return ((BigInteger) query.uniqueResult()).longValue();
 			}
 
 		} catch (HibernateException e) {
-			final String message = "Error in countStudiesBySeason=" + season + " in StudyDao: " + e.getMessage();
+			final String message = "Error in countStudiesBySeason=" + season + IN_STUDY_SEARCH_DAO + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -226,7 +228,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 	@SuppressWarnings("unchecked")
 	public List<StudyReference> getStudiesBySeason(Season season, int start, int numOfRows, String programUUID) {
 
-		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
+		List<StudyReference> studyReferences = new ArrayList<>();
 		try {
 			int valueId = 0;
 			if (season == Season.DRY) {
@@ -241,11 +243,11 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 								.createSQLQuery(
 										"SELECT DISTINCT p.project_id, p.name, p.description"
 												+ this.getSearchBySeasonAtEnvironmentLevelMainQuery()
-												+ "  UNION DISTINCT"
+												+ UNION_DISTINCT
 												+ "  SELECT DISTINCT p.project_id, p.name, p.description "
 												+ this.getSearchBySeasonAtStudyLevelMainQuery());
 
-				query.setParameter("programUUID", programUUID);
+				query.setParameter(PROGRAM_UUID, programUUID);
 				query.setParameter("seasonId", valueId);
 				query.setFirstResult(start);
 				query.setMaxResults(numOfRows);
@@ -258,7 +260,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			final String message = "Error in getStudiesBySeason=" + season + " in StudyDao: " + e.getMessage();
+			final String message = "Error in getStudiesBySeason=" + season + IN_STUDY_SEARCH_DAO + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -291,12 +293,12 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 					this.getSession().createSQLQuery(
 							"SELECT COUNT(*) FROM (SELECT DISTINCT p.project_id " 
 									+ this.getSearchByLocationAtEnvironmentLevelMainQuery(locationIds)
-									+ "  UNION DISTINCT"
+									+ UNION_DISTINCT
 									+ "  SELECT DISTINCT p.project_id "
 									+ this.getSearchByLocationAtStudyLevelMainQuery(locationIds)
 									+ ") locationList;");
 
-			query.setParameter("programUUID", programUUID);
+			query.setParameter(PROGRAM_UUID, programUUID);
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (HibernateException e) {
@@ -308,17 +310,17 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<StudyReference> getStudiesByLocationIds(List<Integer> locationIds, int start, int numOfRows, String programUUID) {
-		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
+		List<StudyReference> studyReferences = new ArrayList<>();
 		try {
 			SQLQuery query =
 					this.getSession().createSQLQuery(
 							"SELECT DISTINCT p.project_id, p.name, p.description " 
 									+ this.getSearchByLocationAtEnvironmentLevelMainQuery(locationIds)
-									+ "  UNION DISTINCT"
+									+ UNION_DISTINCT
 									+ "  SELECT DISTINCT p.project_id, p.name, p.description "
 									+ this.getSearchByLocationAtStudyLevelMainQuery(locationIds));
 
-			query.setParameter("programUUID", programUUID);
+			query.setParameter(PROGRAM_UUID, programUUID);
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 
