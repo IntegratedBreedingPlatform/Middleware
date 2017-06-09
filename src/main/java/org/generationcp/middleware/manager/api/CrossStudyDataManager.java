@@ -94,12 +94,12 @@ public interface CrossStudyDataManager {
 	List<CategoricalTraitInfo> getTraitsForCategoricalVariates(List<Integer> environmentIds) throws MiddlewareQueryException;
 
 	/**
-	 * Given a list of pairs of GIDs, return all environments where any of the pair of GIDs have been observed or  too specific environments filters by trait or analysis. Both the GIDs in a pair must
+	 * Given a list of pairs of GIDs, return all environments where any of the pair of GIDs have been observed Both the GIDs in a pair must
 	 * have been used in an experiment in a specific environment for that environment to be included in the result.
 	 * 
 	 * @param germplasmPairs List of germplasm pairs of GIDs
-	 * @param filterByTraits Filter to found only Traits
-	 * @param filterByAnalysis Filter to found only variables Analysis
+	 * @param filterByTraits Filter only Traits
+	 * @param filterByAnalysis Filter only Analysis
 	 * @return List of TrialEnvironments corresponding to the list of Germplasm IDs
 	 * @throws MiddlewareQueryException
 	 */
