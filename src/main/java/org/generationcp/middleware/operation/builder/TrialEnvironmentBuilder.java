@@ -125,7 +125,8 @@ public class TrialEnvironmentBuilder extends Builder {
 		return this.getGeolocationDao().getPropertiesForTrialEnvironments(environmentIds);
 	}
 
-	public List<GermplasmPair> getEnvironmentForGermplasmPairs(List<GermplasmPair> germplasmPairs) throws MiddlewareQueryException {
+	public List<GermplasmPair> getEnvironmentForGermplasmPairs(final List<GermplasmPair> germplasmPairs, boolean filterByTraits,
+		boolean filterByAnalysis) throws MiddlewareQueryException {
 		List<TrialEnvironment> trialEnvironments = new ArrayList<TrialEnvironment>();
 
 		Set<Integer> allGids = new HashSet<Integer>();
@@ -143,7 +144,7 @@ public class TrialEnvironmentBuilder extends Builder {
 		trialEnvironmentDetails.addAll(this.getGeolocationDao().getTrialEnvironmentDetails(localEnvironmentIds));
 
 		// Step 3: Get environment traits
-		List<TrialEnvironment> localTrialEnvironments = this.getPhenotypeDao().getEnvironmentTraits(trialEnvironmentDetails);
+		List<TrialEnvironment> localTrialEnvironments = this.getPhenotypeDao().getEnvironmentTraits(trialEnvironmentDetails, filterByTraits, filterByAnalysis);
 		trialEnvironments.addAll(localTrialEnvironments);
 
 		// Step 4: Build germplasm pairs. Get what's common between GID1 AND GID2

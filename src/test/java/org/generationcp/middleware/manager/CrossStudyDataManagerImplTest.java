@@ -113,7 +113,7 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 
 		// Case 3: Central - Local
 
-		List<GermplasmPair> result = this.crossStudyDataManager.getEnvironmentsForGermplasmPairs(pairs);
+		List<GermplasmPair> result = this.crossStudyDataManager.getEnvironmentsForGermplasmPairs(pairs,false,false);
 		for (GermplasmPair pair : result) {
 			pair.print(IntegrationTestBase.INDENT);
 		}
