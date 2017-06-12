@@ -103,7 +103,7 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetEnvironmentsForGermplasmPairs() throws Exception {
-		List<GermplasmPair> pairs = new ArrayList<GermplasmPair>();
+		List<GermplasmPair> pairs = new ArrayList<>();
 
 		// Case 1: Central - Central
 		pairs.add(new GermplasmPair(2434138, 1356114));
