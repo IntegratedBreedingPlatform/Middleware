@@ -24,13 +24,15 @@ public class BrowseStudyQueryFilter implements StudyQueryFilter {
 
 	private Season season;
 
+	private String programUUID;
+
 	private StudySearchMatchingOption studySearchMatchingOption;
 
 	public Integer getStartDate() {
 		return this.startDate;
 	}
 
-	public void setStartDate(Integer startDate) {
+	public void setStartDate(final Integer startDate) {
 		this.startDate = startDate;
 	}
 
@@ -38,7 +40,7 @@ public class BrowseStudyQueryFilter implements StudyQueryFilter {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -46,7 +48,7 @@ public class BrowseStudyQueryFilter implements StudyQueryFilter {
 		return this.country;
 	}
 
-	public void setCountry(String country) {
+	public void setCountry(final String country) {
 		this.country = country;
 	}
 
@@ -54,12 +56,12 @@ public class BrowseStudyQueryFilter implements StudyQueryFilter {
 		return this.season;
 	}
 
-	public void setSeason(Season season) {
+	public void setSeason(final Season season) {
 		this.season = season;
 	}
 
 	public StudySearchMatchingOption getStudySearchMatchingOption() {
-		return studySearchMatchingOption;
+		return this.studySearchMatchingOption;
 	}
 
 	public void setStudySearchMatchingOption(final StudySearchMatchingOption studySearchMatchingOption) {
@@ -69,7 +71,14 @@ public class BrowseStudyQueryFilter implements StudyQueryFilter {
 	@Override
 	public String toString() {
 		return "StudyQueryFilter [startDate=" + this.startDate + ", name=" + this.name + ", country=" + this.country + ", season="
-				+ this.season + "]";
+				+ this.season + ", programUUID=" + this.programUUID + "]";
 	}
 
+	public String getProgramUUID() {
+		return this.programUUID;
+	}
+
+	public void setProgramUUID(final String programUUID) {
+		this.programUUID = programUUID;
+	}
 }
