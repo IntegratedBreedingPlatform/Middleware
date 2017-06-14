@@ -18,7 +18,6 @@ import java.util.List;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
-import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
@@ -36,78 +35,81 @@ import org.slf4j.LoggerFactory;
  */
 public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 
+	private static final String IN_STUDY_SEARCH_DAO = " in StudySearchDao: ";
+	private static final String PROGRAM_UUID = "programUUID";
+	private static final String UNION_DISTINCT = "  UNION DISTINCT";
 	private static final Logger LOG = LoggerFactory.getLogger(StudySearchDao.class);
+	private static final String NOT_IN_DELETED_STUDIES_QUERY = " AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
+			+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId() + ") ";
 
-	public long countStudiesByName(String name, StudySearchMatchingOption studySearchMatchingOption) {
+	public long countStudiesByName(final String name, final StudySearchMatchingOption studySearchMatchingOption, final String programUUID) {
 		try {
-			SQLQuery query =
-					this.getSession().createSQLQuery(
-							"select count(distinct p.project_id) " + "from project p "
-									+ " inner join project_relationship r on r.object_project_id = p.project_id and r.type_id"
-									+ " NOT IN (" + TermId.HAS_PARENT_FOLDER.getId() + "," + TermId.STUDY_HAS_FOLDER.getId() + ") "
-									+ "where p.name " + buildMatchCondition(studySearchMatchingOption) + "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-									+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = "
-									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) ");
+			final SQLQuery query = this.getSession()
+					.createSQLQuery("select count(distinct p.project_id) " + this.getSearchByNameMainQuery(studySearchMatchingOption));
 
+			query.setParameter(StudySearchDao.PROGRAM_UUID, programUUID);
 			this.assignNameParameter(studySearchMatchingOption, query, name);
 			return ((BigInteger) query.uniqueResult()).longValue();
 
-		} catch (HibernateException e) {
-			final String message = "Error in countStudiesByName=" + name + " in StudyDao: " + e.getMessage();
-			LOG.error(message, e);
+		} catch (final HibernateException e) {
+			final String message = "Error in countStudiesByName=" + name + StudySearchDao.IN_STUDY_SEARCH_DAO + e.getMessage();
+			StudySearchDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesByName(String name, int start, int numOfRows, StudySearchMatchingOption studySearchMatchingOption) {
-		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
+	public List<StudyReference> getStudiesByName(final String name, final int start, final int numOfRows,
+			final StudySearchMatchingOption studySearchMatchingOption, final String programUUID) {
+		final List<StudyReference> studyReferences = new ArrayList<>();
 		try {
-			SQLQuery query =
-					this.getSession().createSQLQuery(
-							"select distinct p.project_id, p.name, p.description " + "from project p "
-									+ " inner join project_relationship r on r.object_project_id = p.project_id and r.type_id"
-									+ " NOT IN (" + TermId.HAS_PARENT_FOLDER.getId() + "," + TermId.STUDY_HAS_FOLDER.getId() + ") "
-									+ "where p.name " + buildMatchCondition(studySearchMatchingOption) + "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-									+ TermId.STUDY_STATUS.getId() + "  AND pp.project_id = p.project_id AND pp.value = "
-									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) ");
+			final SQLQuery query = this.getSession().createSQLQuery(
+					"select distinct p.project_id, p.name, p.description " + this.getSearchByNameMainQuery(studySearchMatchingOption));
 
+			query.setParameter(StudySearchDao.PROGRAM_UUID, programUUID);
 			this.assignNameParameter(studySearchMatchingOption, query, name);
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 
-			List<Object[]> results = query.list();
-			for (Object[] row : results) {
+			final List<Object[]> results = query.list();
+			for (final Object[] row : results) {
 				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2]));
 			}
 
-		} catch (HibernateException e) {
-			final String message = "Error in getStudiesByName=" + name + " in StudyDao: " + e.getMessage();
-			LOG.error(message, e);
+		} catch (final HibernateException e) {
+			final String message = "Error in getStudiesByName=" + name + StudySearchDao.IN_STUDY_SEARCH_DAO + e.getMessage();
+			StudySearchDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 		return studyReferences;
 	}
 
-	private String buildMatchCondition(StudySearchMatchingOption studySearchMatchingOption) {
+	private String getSearchByNameMainQuery(final StudySearchMatchingOption studySearchMatchingOption) {
+		return "from project p " + " inner join project_relationship r on r.object_project_id = p.project_id and r.type_id" + " NOT IN ("
+				+ TermId.HAS_PARENT_FOLDER.getId() + "," + TermId.STUDY_HAS_FOLDER.getId() + ") "
+				+ "where p.program_uuid = :programUUID AND p.name " + this.buildMatchCondition(studySearchMatchingOption)
+				+ StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
+
+	}
+
+	private String buildMatchCondition(final StudySearchMatchingOption studySearchMatchingOption) {
 
 		String condition = "";
 
 		if (studySearchMatchingOption == StudySearchMatchingOption.EXACT_MATCHES) {
-			condition  = "= :name";
-		} else if (studySearchMatchingOption == StudySearchMatchingOption.MATCHES_CONTAINING) {
-			condition  = "LIKE :name";
-		} else if (studySearchMatchingOption == StudySearchMatchingOption.MATCHES_STARTING_WITH) {
-			condition  = "LIKE :name";
+			condition = "= :name";
+		} else if (studySearchMatchingOption == StudySearchMatchingOption.MATCHES_CONTAINING
+				|| studySearchMatchingOption == StudySearchMatchingOption.MATCHES_STARTING_WITH) {
+			condition = "LIKE :name";
 		}
 		return condition;
 
 	}
 
-	private String assignNameParameter(StudySearchMatchingOption studySearchMatchingOption, SQLQuery query, String name) {
+	private String assignNameParameter(final StudySearchMatchingOption studySearchMatchingOption, final SQLQuery query, final String name) {
 
-		String condition = "";
+		final String condition = "";
 
 		if (studySearchMatchingOption == StudySearchMatchingOption.EXACT_MATCHES) {
 			query.setParameter("name", name);
@@ -120,8 +122,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-
-	public long countStudiesByStartDate(int startDate) {
+	public long countStudiesByStartDate(final int startDate, final String programUUID) {
 		try {
 			String dateString = String.valueOf(startDate);
 			// pad LIKE wildcard characters
@@ -130,27 +131,24 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			} else if (dateString.length() == 6) { // only month and year
 				dateString += "__";
 			}
-			SQLQuery query =
-					this.getSession().createSQLQuery(
-							"select count(distinct pp.project_id) " + "from projectprop pp " + "where pp.type_id = "
-									+ TermId.START_DATE.getId() + "  and pp.value LIKE :compareDate "
-									+ "	AND NOT EXISTS (SELECT 1 FROM projectprop ss WHERE ss.type_id = " + TermId.STUDY_STATUS.getId()
-									+ "  AND ss.project_id = pp.project_id AND ss.value = "
-									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) ");
+			final SQLQuery query =
+					this.getSession().createSQLQuery("select count(distinct p.project_id) " + this.getSearchByStartDateMainQuery());
+
+			query.setParameter(StudySearchDao.PROGRAM_UUID, programUUID);
 			query.setParameter("compareDate", dateString);
 			return ((BigInteger) query.uniqueResult()).longValue();
 
-		} catch (HibernateException e) {
-			final String message = "Error in countStudiesByStartDate=" + startDate + " in StudyDao: " + e.getMessage();
-			LOG.error(message, e);
+		} catch (final HibernateException e) {
+			final String message = "Error in countStudiesByStartDate=" + startDate + StudySearchDao.IN_STUDY_SEARCH_DAO + e.getMessage();
+			StudySearchDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesByStartDate(int startDate, int start, int numOfRows) {
+	public List<StudyReference> getStudiesByStartDate(final int startDate, final int start, final int numOfRows, final String programUUID) {
 
-		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
+		final List<StudyReference> studyReferences = new ArrayList<>();
 		try {
 			String dateString = String.valueOf(startDate);
 			// pad LIKE wildcard characters
@@ -160,33 +158,36 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 				dateString += "__";
 			}
 
-			SQLQuery query =
-					this.getSession().createSQLQuery(
-							"select distinct p.project_id, p.name, p.description " + "from projectprop pp, project p "
-									+ "where pp.type_id = " + TermId.START_DATE.getId() + "  and pp.value LIKE :compareDate "
-									+ "  and pp.project_id = p.project_id"
-									+ "	AND NOT EXISTS (SELECT 1 FROM projectprop ss WHERE ss.type_id = " + TermId.STUDY_STATUS.getId()
-									+ "  AND ss.project_id = p.project_id AND ss.value = "
-									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) ");
+			final SQLQuery query = this.getSession()
+					.createSQLQuery("select distinct p.project_id, p.name, p.description " + this.getSearchByStartDateMainQuery());
+
+			query.setParameter(StudySearchDao.PROGRAM_UUID, programUUID);
 			query.setParameter("compareDate", dateString);
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 
-			List<Object[]> results = query.list();
-			for (Object[] row : results) {
-				StudyReference sr = new StudyReference((Integer) row[0], (String) row[1], (String) row[2]);
+			final List<Object[]> results = query.list();
+			for (final Object[] row : results) {
+				final StudyReference sr = new StudyReference((Integer) row[0], (String) row[1], (String) row[2]);
 				studyReferences.add(sr);
 			}
 
-		} catch (HibernateException e) {
-			final String message = "Error in getStudiesByStartDate=" + startDate + " in StudyDao: " + e.getMessage();
-			LOG.error(message, e);
+		} catch (final HibernateException e) {
+			final String message = "Error in getStudiesByStartDate=" + startDate + StudySearchDao.IN_STUDY_SEARCH_DAO + e.getMessage();
+			StudySearchDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 		return studyReferences;
 	}
 
-	public long countStudiesBySeason(Season season) {
+	private String getSearchByStartDateMainQuery() {
+		return "from project p "
+				+ " INNER JOIN projectprop projectPropStartDate ON p.project_id = projectPropStartDate.project_id AND projectPropStartDate.type_id = "
+				+ TermId.START_DATE.getId() + " AND projectPropStartDate.value LIKE :compareDate "
+				+ "	WHERE p.program_uuid = :programUUID " + StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
+	}
+
+	public long countStudiesBySeason(final Season season, final String programUUID) {
 		try {
 			int valueId = 0;
 			if (season == Season.DRY) {
@@ -196,41 +197,28 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 			if (valueId != 0) {
-				SQLQuery query =
-						this.getSession()
-								.createSQLQuery(
-										"SELECT COUNT(DISTINCT p.project_id)"
-												+ " FROM project p "
-												+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
-												+ TermId.BELONGS_TO_STUDY.getId()
-												+ " INNER JOIN nd_experiment_project ep "
-												+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id "
-												+ " INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
-												+ TermId.SEASON_VAR.getId()
-												+ " WHERE (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id) "
-												+ "   AND  gp.value = '" + valueId + "'" + "   AND e.nd_experiment_id = " + " 	  (  "
-												+ "		SELECT MIN(nd_experiment_id) " + "		  FROM nd_experiment min "
-												+ "		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " + "  	   )"
-												+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-												+ TermId.STUDY_STATUS.getId() + "   AND pp.project_id = p.project_id AND pp.value = "
-												+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId()
-												+ ")) ");
+				final SQLQuery query = this.getSession()
+						.createSQLQuery("SELECT COUNT(*) FROM (SELECT DISTINCT p.project_id"
+								+ this.getSearchBySeasonAtEnvironmentLevelMainQuery() + StudySearchDao.UNION_DISTINCT
+								+ "  SELECT DISTINCT p.project_id " + this.getSearchBySeasonAtStudyLevelMainQuery() + ") projectlist");
 
+				query.setParameter(StudySearchDao.PROGRAM_UUID, programUUID);
+				query.setParameter("seasonId", valueId);
 				return ((BigInteger) query.uniqueResult()).longValue();
 			}
 
-		} catch (HibernateException e) {
-			final String message = "Error in countStudiesBySeason=" + season + " in StudyDao: " + e.getMessage();
-			LOG.error(message, e);
+		} catch (final HibernateException e) {
+			final String message = "Error in countStudiesBySeason=" + season + StudySearchDao.IN_STUDY_SEARCH_DAO + e.getMessage();
+			StudySearchDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 		return 0;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesBySeason(Season season, int start, int numOfRows) {
+	public List<StudyReference> getStudiesBySeason(final Season season, final int start, final int numOfRows, final String programUUID) {
 
-		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
+		final List<StudyReference> studyReferences = new ArrayList<>();
 		try {
 			int valueId = 0;
 			if (season == Season.DRY) {
@@ -240,109 +228,113 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 			}
 
 			if (valueId != 0) {
-				SQLQuery query =
-						this.getSession()
-								.createSQLQuery(
-										"SELECT DISTINCT p.project_id, p.name, p.description"
-												+ " FROM project p "
-												+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
-												+ TermId.BELONGS_TO_STUDY.getId()
-												+ " INNER JOIN nd_experiment_project ep "
-												+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id "
-												+ " INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
-												+ TermId.SEASON_VAR.getId()
-												+ " WHERE (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id) "
-												+ "   AND  gp.value = '" + valueId + "'" + "   AND e.nd_experiment_id = " + " 	  (  "
-												+ "		SELECT MIN(nd_experiment_id) " + "		  FROM nd_experiment min "
-												+ "		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " + "  	   )"
-												+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = "
-												+ TermId.STUDY_STATUS.getId() + "   AND pp.project_id = p.project_id AND pp.value = "
-												+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId()
-												+ ")) ");
+				final SQLQuery query = this.getSession()
+						.createSQLQuery("SELECT DISTINCT p.project_id, p.name, p.description"
+								+ this.getSearchBySeasonAtEnvironmentLevelMainQuery() + StudySearchDao.UNION_DISTINCT
+								+ "  SELECT DISTINCT p.project_id, p.name, p.description " + this.getSearchBySeasonAtStudyLevelMainQuery());
+
+				query.setParameter(StudySearchDao.PROGRAM_UUID, programUUID);
+				query.setParameter("seasonId", valueId);
 				query.setFirstResult(start);
 				query.setMaxResults(numOfRows);
 
-				List<Object[]> results = query.list();
-				for (Object[] row : results) {
-					StudyReference sr = new StudyReference((Integer) row[0], (String) row[1], (String) row[2]);
+				final List<Object[]> results = query.list();
+				for (final Object[] row : results) {
+					final StudyReference sr = new StudyReference((Integer) row[0], (String) row[1], (String) row[2]);
 					studyReferences.add(sr);
 				}
 			}
 
-		} catch (HibernateException e) {
-			final String message = "Error in getStudiesBySeason=" + season + " in StudyDao: " + e.getMessage();
-			LOG.error(message, e);
+		} catch (final HibernateException e) {
+			final String message = "Error in getStudiesBySeason=" + season + StudySearchDao.IN_STUDY_SEARCH_DAO + e.getMessage();
+			StudySearchDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 		return studyReferences;
 	}
 
-	public long countStudiesByLocationIds(List<Integer> locationIds) {
+	private String getSearchBySeasonAtEnvironmentLevelMainQuery() {
+		return " FROM project p " + " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
+				+ TermId.BELONGS_TO_STUDY.getId() + " INNER JOIN nd_experiment_project ep ON ep.project_id = pr.subject_project_id "
+				+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id and e.type_id = "
+				+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
+				+ " INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
+				+ TermId.SEASON_VAR.getId() + " WHERE  p.program_uuid = :programUUID AND gp.value = :seasonId "
+				+ StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
+	}
+
+	private String getSearchBySeasonAtStudyLevelMainQuery() {
+		return "FROM project p  " + "INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
+				+ TermId.BELONGS_TO_STUDY.getId() + "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = "
+				+ TermId.SEASON_VAR.getId() + "  " + "WHERE  p.program_uuid = :programUUID AND pp.value = :seasonId "
+				+ StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
+	}
+
+	public long countStudiesByLocationIds(final List<Integer> locationIds, final String programUUID) {
 		try {
-			SQLQuery query =
-					this.getSession().createSQLQuery(
-							"SELECT COUNT(DISTINCT p.project_id)" + " FROM project p "
-									+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
-									+ TermId.BELONGS_TO_STUDY.getId() + " INNER JOIN nd_experiment_project ep "
-									+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id "
-									+ " INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
-									+ TermId.LOCATION_ID.getId()
-									+ " WHERE (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id) "
-									+ "   AND  gp.value IN (" + this.stringify(locationIds) + ") " + "   AND e.nd_experiment_id = "
-									+ " 	  (  " + "		SELECT MIN(nd_experiment_id) " + "		  FROM nd_experiment min "
-									+ "		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " + "  	   )"
-									+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = " + TermId.STUDY_STATUS.getId()
-									+ "   AND pp.project_id = p.project_id AND pp.value = "
-									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) ");
+			final SQLQuery query = this.getSession().createSQLQuery("SELECT COUNT(*) FROM (SELECT DISTINCT p.project_id "
+					+ this.getSearchByLocationAtEnvironmentLevelMainQuery(locationIds) + StudySearchDao.UNION_DISTINCT
+					+ "  SELECT DISTINCT p.project_id " + this.getSearchByLocationAtStudyLevelMainQuery(locationIds) + ") locationList;");
+
+			query.setParameter(StudySearchDao.PROGRAM_UUID, programUUID);
 			return ((BigInteger) query.uniqueResult()).longValue();
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			final String message = "Error in countStudiesByLocationIds=" + locationIds + " in StudyDao: " + e.getMessage();
-			LOG.error(message, e);
+			StudySearchDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<StudyReference> getStudiesByLocationIds(List<Integer> locationIds, int start, int numOfRows) {
-		List<StudyReference> studyReferences = new ArrayList<StudyReference>();
+	public List<StudyReference> getStudiesByLocationIds(final List<Integer> locationIds, final int start, final int numOfRows,
+			final String programUUID) {
+		final List<StudyReference> studyReferences = new ArrayList<>();
 		try {
-			SQLQuery query =
-					this.getSession().createSQLQuery(
-							"SELECT DISTINCT p.project_id, p.name, p.description " + " FROM project p "
-									+ " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
-									+ TermId.BELONGS_TO_STUDY.getId() + " INNER JOIN nd_experiment_project ep "
-									+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id "
-									+ " INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
-									+ TermId.LOCATION_ID.getId()
-									+ " WHERE (ep.project_id = p.project_id OR ep.project_id = pr.subject_project_id) "
-									+ "   AND  gp.value IN (" + this.stringify(locationIds) + ") " + "   AND e.nd_experiment_id = "
-									+ " 	  (  " + "		SELECT MIN(nd_experiment_id) " + "		  FROM nd_experiment min "
-									+ "		 WHERE min.nd_geolocation_id = gp.nd_geolocation_id " + "  	   )"
-									+ "	AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.type_id = " + TermId.STUDY_STATUS.getId()
-									+ "   AND pp.project_id = p.project_id AND pp.value = "
-									+ "  (SELECT cvterm_id FROM cvterm WHERE name = 9 AND cv_id = " + CvId.STUDY_STATUS.getId() + ")) ");
+			final SQLQuery query = this.getSession()
+					.createSQLQuery("SELECT DISTINCT p.project_id, p.name, p.description "
+							+ this.getSearchByLocationAtEnvironmentLevelMainQuery(locationIds) + StudySearchDao.UNION_DISTINCT
+							+ "  SELECT DISTINCT p.project_id, p.name, p.description "
+							+ this.getSearchByLocationAtStudyLevelMainQuery(locationIds));
 
+			query.setParameter(StudySearchDao.PROGRAM_UUID, programUUID);
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
 
-			List<Object[]> results = query.list();
-			for (Object[] row : results) {
+			final List<Object[]> results = query.list();
+			for (final Object[] row : results) {
 				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2]));
 			}
 
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			final String message = "Error in getStudiesByLocationIds=" + locationIds + " in StudyDao: " + e.getMessage();
-			LOG.error(message, e);
+			StudySearchDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 		return studyReferences;
 	}
 
-	private String stringify(List<Integer> locationIds) {
-		StringBuffer ids = new StringBuffer();
+	private String getSearchByLocationAtEnvironmentLevelMainQuery(final List<Integer> locationIds) {
+		return " FROM project p " + " INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
+				+ TermId.BELONGS_TO_STUDY.getId() + " INNER JOIN nd_experiment_project ep ON ep.project_id = pr.subject_project_id "
+				+ " INNER JOIN nd_experiment e ON e.nd_experiment_id = ep.nd_experiment_id and e.type_id = "
+				+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId()
+				+ " INNER JOIN nd_geolocationprop gp on gp.nd_geolocation_id = e.nd_geolocation_id AND gp.type_id = "
+				+ TermId.LOCATION_ID.getId() + " WHERE  p.program_uuid = :programUUID AND  gp.value IN (" + this.stringify(locationIds)
+				+ ") " + StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
+	}
+
+	private String getSearchByLocationAtStudyLevelMainQuery(final List<Integer> locationIds) {
+		return "FROM project p" + "  INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
+				+ TermId.BELONGS_TO_STUDY.getId() + "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = "
+				+ TermId.LOCATION_ID.getId() + "  WHERE  p.program_uuid = :programUUID  AND pp.value IN (" + this.stringify(locationIds)
+				+ ")" + StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
+	}
+
+	private String stringify(final List<Integer> locationIds) {
+		final StringBuffer ids = new StringBuffer();
 		boolean first = true;
-		for (Integer locId : locationIds) {
+		for (final Integer locId : locationIds) {
 			if (!first) {
 				ids.append(",");
 			}
