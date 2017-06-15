@@ -127,9 +127,9 @@ public class TrialEnvironmentBuilder extends Builder {
 
 	public List<GermplasmPair> getEnvironmentForGermplasmPairs(final List<GermplasmPair> germplasmPairs, boolean filterByTraits,
 		boolean filterByAnalysis) throws MiddlewareQueryException {
-		List<TrialEnvironment> trialEnvironments = new ArrayList<TrialEnvironment>();
+		List<TrialEnvironment> trialEnvironments = new ArrayList<>();
 
-		Set<Integer> allGids = new HashSet<Integer>();
+		Set<Integer> allGids = new HashSet<>();
 		for (GermplasmPair pair : germplasmPairs) {
 			allGids.add(pair.getGid1());
 			allGids.add(pair.getGid2());
@@ -139,15 +139,26 @@ public class TrialEnvironmentBuilder extends Builder {
 		Map<Integer, Set<Integer>> germplasmEnvironments = this.getExperimentStockDao().getEnvironmentsOfGermplasms(allGids);
 
 		// Step 2: Get the trial environment details
-		Set<Integer> localEnvironmentIds = this.getEnvironmentIdsFromMap(germplasmEnvironments);
-		Set<TrialEnvironment> trialEnvironmentDetails = new HashSet<TrialEnvironment>();
-		trialEnvironmentDetails.addAll(this.getGeolocationDao().getTrialEnvironmentDetails(localEnvironmentIds));
+		Set<TrialEnvironment> trialEnvironmentDetails = new HashSet<>();
+		getTrialEnvironmentDetails(germplasmEnvironments, trialEnvironmentDetails);
 
 		// Step 3: Get environment traits
 		List<TrialEnvironment> localTrialEnvironments = this.getPhenotypeDao().getEnvironmentTraits(trialEnvironmentDetails, filterByTraits, filterByAnalysis);
 		trialEnvironments.addAll(localTrialEnvironments);
 
 		// Step 4: Build germplasm pairs. Get what's common between GID1 AND GID2
+		buildGermplasmPairsBetweenGids(germplasmPairs, germplasmEnvironments, trialEnvironments);
+		return germplasmPairs;
+	}
+
+	private void getTrialEnvironmentDetails(final Map<Integer, Set<Integer>> germplasmEnvironments,
+		final Set<TrialEnvironment> trialEnvironmentDetails) {
+		Set<Integer> localEnvironmentIds = this.getEnvironmentIdsFromMap(germplasmEnvironments);
+		trialEnvironmentDetails.addAll(this.getGeolocationDao().getTrialEnvironmentDetails(localEnvironmentIds));
+	}
+
+	private void buildGermplasmPairsBetweenGids(final List<GermplasmPair> germplasmPairs,
+		final Map<Integer, Set<Integer>> germplasmEnvironments, final List<TrialEnvironment> trialEnvironments) {
 		for (GermplasmPair pair : germplasmPairs) {
 			int gid1 = pair.getGid1();
 			int gid2 = pair.getGid2();
@@ -175,11 +186,10 @@ public class TrialEnvironmentBuilder extends Builder {
 			}
 			pair.setTrialEnvironments(environments);
 		}
-		return germplasmPairs;
 	}
 
 	private Set<Integer> getEnvironmentIdsFromMap(Map<Integer, Set<Integer>> germplasmEnvironments) {
-		Set<Integer> idsToReturn = new HashSet<Integer>();
+		Set<Integer> idsToReturn = new HashSet<>();
 
 		for (Entry<Integer, Set<Integer>> environmentIds : germplasmEnvironments.entrySet()) {
 			Set<Integer> ids = environmentIds.getValue();
