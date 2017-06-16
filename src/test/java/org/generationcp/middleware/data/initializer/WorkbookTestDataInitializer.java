@@ -76,6 +76,9 @@ public class WorkbookTestDataInitializer {
 	public static final String PH_METER = "PH Meter";
 	public static final String DRY_AND_WEIGH = "Dry and Weigh";
 	public static final String MEASURED = "MEASURED";
+	public static final String NUM_VALUES = "NumValues";
+	public static final String MIN = "MIN";
+	public static final String MAX = "MAX";
 
 	// LABELS
 	public static final String STUDY = "STUDY";
@@ -427,12 +430,7 @@ public class WorkbookTestDataInitializer {
 	public static void createConstants(final Workbook workbook) {
 		// Create measurement variables and set its dataTypeId
 		final List<MeasurementVariable> constants = new ArrayList<>();
-
-		constants.add(WorkbookTestDataInitializer.createMeasurementVariable(WorkbookTestDataInitializer.GRAIN_SIZE_ID, "Grain_size",
-				"Grain size - weigh 1000 dry grains (g)", WorkbookTestDataInitializer.GRAIN_SIZE_SCALE,
-				WorkbookTestDataInitializer.DRY_GRAINS, WorkbookTestDataInitializer.GRAIN_SIZE_PROPERTY,
-				WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.TRIAL,
-				TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE, false));
+		WorkbookTestDataInitializer.addConstants(constants);
 		workbook.setConstants(constants);
 	}
 
@@ -535,6 +533,17 @@ public class WorkbookTestDataInitializer {
 		workbook.setObservations(observations);
 	}
 
+	public static MeasurementVariable createMeasurementVariable(final int termId, final String name, final String description,
+			final String scale, final String method, final String property, final String dataType, final String value, final String label,
+			final int dataTypeId, final PhenotypicType role, VariableType variableType) {
+		final MeasurementVariable variable =
+				new MeasurementVariable(termId, name, description, scale, method, property, dataType, value, label);
+		variable.setRole(role);
+		variable.setDataTypeId(dataTypeId);
+		variable.setVariableType(variableType);
+		return variable;
+	}
+	
 	public static MeasurementVariable createMeasurementVariable(final int termId, final String name, final String description,
 			final String scale, final String method, final String property, final String dataType, final String value, final String label,
 			final int dataTypeId, final PhenotypicType role, final boolean isAnalysisVariable) {
@@ -755,6 +764,22 @@ public class WorkbookTestDataInitializer {
 				WorkbookTestDataInitializer.SOIL_ACIDITY, WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE,
 				WorkbookTestDataInitializer.TRIAL, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE, false);
 		variable.setOperation(Operation.ADD);
+		// Add "Analysis Summary" variables
+		constants.add(WorkbookTestDataInitializer.createMeasurementVariable(
+				WorkbookTestDataInitializer.GYLD_ID, WorkbookTestDataInitializer.GYLD + "_" + WorkbookTestDataInitializer.NUM_VALUES, "Grain yield -dry and weigh (kg/ha)",
+				WorkbookTestDataInitializer.KG_HA, WorkbookTestDataInitializer.NUM_VALUES, WorkbookTestDataInitializer.YIELD,
+				WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.PLOT,
+				TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE, VariableType.ANALYSIS_SUMMARY));
+		constants.add(WorkbookTestDataInitializer.createMeasurementVariable(
+				WorkbookTestDataInitializer.GYLD_ID, WorkbookTestDataInitializer.GYLD + "_" + WorkbookTestDataInitializer.MIN, "Grain yield -dry and weigh (kg/ha)",
+				WorkbookTestDataInitializer.KG_HA, WorkbookTestDataInitializer.MIN, WorkbookTestDataInitializer.YIELD,
+				WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.PLOT,
+				TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE, VariableType.ANALYSIS_SUMMARY));
+		constants.add(WorkbookTestDataInitializer.createMeasurementVariable(
+				WorkbookTestDataInitializer.GYLD_ID, WorkbookTestDataInitializer.GYLD + "_" + WorkbookTestDataInitializer.MAX, "Grain yield -dry and weigh (kg/ha)",
+				WorkbookTestDataInitializer.KG_HA, WorkbookTestDataInitializer.MAX, WorkbookTestDataInitializer.YIELD,
+				WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE, WorkbookTestDataInitializer.PLOT,
+				TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.VARIATE, VariableType.ANALYSIS_SUMMARY));
 		constants.add(variable);
 	}
 
