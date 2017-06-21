@@ -103,7 +103,7 @@ public interface CrossStudyDataManager {
 	 * @return List of TrialEnvironments corresponding to the list of Germplasm IDs
 	 * @throws MiddlewareQueryException
 	 */
-	List<GermplasmPair> getEnvironmentsForGermplasmPairs(final List<GermplasmPair> germplasmPairs, boolean filterByTraits, boolean filterByAnalysis) throws MiddlewareQueryException;
+	List<GermplasmPair> getEnvironmentsForGermplasmPairs(final List<GermplasmPair> germplasmPairs, final boolean filterByTraits, final boolean filterByAnalysis) throws MiddlewareQueryException;
 
 	/**
 	 * For each combination of trait, germplasm, and environment, the value observed is returned. If there was no observation for a
