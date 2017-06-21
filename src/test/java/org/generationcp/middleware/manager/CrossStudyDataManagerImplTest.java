@@ -103,7 +103,7 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetEnvironmentsForGermplasmPairs() throws Exception {
-		List<GermplasmPair> pairs = new ArrayList<GermplasmPair>();
+		List<GermplasmPair> pairs = new ArrayList<>();
 
 		// Case 1: Central - Central
 		pairs.add(new GermplasmPair(2434138, 1356114));
@@ -113,7 +113,7 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 
 		// Case 3: Central - Local
 
-		List<GermplasmPair> result = this.crossStudyDataManager.getEnvironmentsForGermplasmPairs(pairs);
+		List<GermplasmPair> result = this.crossStudyDataManager.getEnvironmentsForGermplasmPairs(pairs,false,false);
 		for (GermplasmPair pair : result) {
 			pair.print(IntegrationTestBase.INDENT);
 		}
