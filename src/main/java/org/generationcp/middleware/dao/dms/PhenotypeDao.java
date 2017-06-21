@@ -582,8 +582,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return toreturn;
 	}
 
-	public List<TrialEnvironment> getEnvironmentTraits(final Set<TrialEnvironment> trialEnvironments, boolean filterByTraits,
-		boolean filterByAnalysis) throws MiddlewareQueryException {
+	public List<TrialEnvironment> getEnvironmentTraits(final Set<TrialEnvironment> trialEnvironments, final boolean filterByTraits, final boolean filterByAnalysis) throws MiddlewareQueryException {
 		List<TrialEnvironment> environmentDetails = new ArrayList<>();
 
 		if (trialEnvironments.isEmpty()) {

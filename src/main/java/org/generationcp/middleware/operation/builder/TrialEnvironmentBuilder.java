@@ -125,8 +125,7 @@ public class TrialEnvironmentBuilder extends Builder {
 		return this.getGeolocationDao().getPropertiesForTrialEnvironments(environmentIds);
 	}
 
-	public List<GermplasmPair> getEnvironmentForGermplasmPairs(final List<GermplasmPair> germplasmPairs, boolean filterByTraits,
-		boolean filterByAnalysis) throws MiddlewareQueryException {
+	public List<GermplasmPair> getEnvironmentForGermplasmPairs(final List<GermplasmPair> germplasmPairs, final boolean filterByTraits, final boolean filterByAnalysis) throws MiddlewareQueryException {
 		List<TrialEnvironment> trialEnvironments = new ArrayList<TrialEnvironment>();
 
 		Set<Integer> allGids = new HashSet<Integer>();

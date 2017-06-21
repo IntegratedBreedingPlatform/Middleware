@@ -97,12 +97,12 @@ public class ExperimentStockDao extends GenericDAO<ExperimentStock, Integer> {
 
 		final StringBuilder sql = new StringBuilder();
 		sql.append("SELECT COUNT(DISTINCT es.stock_id) FROM nd_experiment_project ep ")
-			.append(" INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = ep.nd_experiment_id ").append(" WHERE ep.project_id = ")
-			.append(datasetId);
+			.append(" INNER JOIN nd_experiment_stock es ON es.nd_experiment_id = ep.nd_experiment_id ")
+			.append(" WHERE ep.project_id = :datasetId");
 
 		try {
-
 			SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+			query.setParameter("datasetId", datasetId);
 			BigInteger count = (BigInteger) query.uniqueResult();
 			return count.longValue();
 
