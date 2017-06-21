@@ -534,7 +534,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 
 	public List<TraitObservation> getObservationsForTrait(int traitId, List<Integer> environmentIds) throws MiddlewareQueryException {
-		List<TraitObservation> toreturn = new ArrayList<>();
+		List<TraitObservation> traitObservationList = new ArrayList<>();
 
 		try {
 			StringBuilder queryString = new StringBuilder();
@@ -571,7 +571,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				String locationName = (String) row[4];
 				Integer locationId = (Integer) row[5];
 
-				toreturn.add(new TraitObservation(id, value, gid, observationId, locationName, locationId));
+				traitObservationList.add(new TraitObservation(id, value, gid, observationId, locationName, locationId));
 			}
 
 		} catch (HibernateException e) {
@@ -579,7 +579,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		}
 
-		return toreturn;
+		return traitObservationList;
 	}
 
 	public List<TrialEnvironment> getEnvironmentTraits(final Set<TrialEnvironment> trialEnvironments, final boolean filterByTraits, final boolean filterByAnalysis) throws MiddlewareQueryException {
@@ -627,14 +627,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final Integer environmentId = (Integer) row[0];
 				final Integer traitId = (Integer) row[1];
 				final String traitName = (String) row[2];
-				final String traitProperty = (String) row[3];
+				final String property = (String) row[3];
 				final String traitDescription = (String) row[4];
 				final String scaleName = (String) row[5];
 				final Integer typeId = (Integer) row[6];
 
 				int index = environmentDetails.indexOf(new TrialEnvironment(environmentId));
 				final TrialEnvironment environment = environmentDetails.get(index);
-				environment.addTrait(new TraitInfo(traitId, traitName, traitProperty, traitDescription, scaleName, typeId));
+				environment.addTrait(new TraitInfo(traitId, traitName, property, traitDescription, scaleName, typeId));
 				environmentDetails.set(index, environment);
 			}
 
