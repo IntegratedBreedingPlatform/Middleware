@@ -68,7 +68,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public List<NumericTraitInfo> getNumericTraitInfoList(List<Integer> environmentIds, List<Integer> numericVariableIds)
 			throws MiddlewareQueryException {
-		List<NumericTraitInfo> numericTraitInfoList = new ArrayList<NumericTraitInfo>();
+		List<NumericTraitInfo> numericTraitInfoList = new ArrayList<>();
 		try {
 			SQLQuery query =
 					this.getSession().createSQLQuery(
@@ -86,7 +86,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList("numericVariableIds", numericVariableIds);
 
-			List<Object[]> list = new ArrayList<Object[]>();
+			List<Object[]> list = new ArrayList<>();
 
 			if (!environmentIds.isEmpty() && !numericVariableIds.isEmpty()) {
 				list = query.list();
@@ -114,7 +114,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 
 	public List<TraitInfo> getTraitInfoCounts(List<Integer> environmentIds, List<Integer> variableIds) throws MiddlewareQueryException {
-		List<TraitInfo> traitInfoList = new ArrayList<TraitInfo>();
+		List<TraitInfo> traitInfoList = new ArrayList<>();
 		try {
 			SQLQuery query =
 					this.getSession().createSQLQuery(
@@ -130,7 +130,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList("variableIds", variableIds);
 
-			List<Object[]> list = new ArrayList<Object[]>();
+			List<Object[]> list = new ArrayList<>();
 
 			if (!environmentIds.isEmpty() && !variableIds.isEmpty()) {
 				list = query.list();
@@ -154,7 +154,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 
 	public List<TraitInfo> getTraitInfoCounts(List<Integer> environmentIds) throws MiddlewareQueryException {
-		List<TraitInfo> traitInfoList = new ArrayList<TraitInfo>();
+		List<TraitInfo> traitInfoList = new ArrayList<>();
 		try {
 			SQLQuery query =
 					this.getSession().createSQLQuery(
@@ -189,10 +189,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public Map<Integer, List<Double>> getNumericTraitInfoValues(List<Integer> environmentIds, List<NumericTraitInfo> traitInfoList)
 			throws MiddlewareQueryException {
-		Map<Integer, List<Double>> traitValues = new HashMap<Integer, List<Double>>();
+		Map<Integer, List<Double>> traitValues = new HashMap<>();
 
 		// Get trait IDs
-		List<Integer> traitIds = new ArrayList<Integer>();
+		List<Integer> traitIds = new ArrayList<>();
 		for (NumericTraitInfo trait : traitInfoList) {
 			traitIds.add(trait.getId());
 		}
@@ -207,7 +207,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList("traitIds", traitIds);
 
-			List<Object[]> list = new ArrayList<Object[]>();
+			List<Object[]> list = new ArrayList<>();
 
 			if (!environmentIds.isEmpty()) {
 				list = query.list();
@@ -217,7 +217,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				Integer traitId = (Integer) row[0];
 				Double value = (Double) row[1];
 
-				List<Double> values = new ArrayList<Double>();
+				List<Double> values = new ArrayList<>();
 				values.add(value);
 				// If the trait exists in the map, add the value found. Else, just add the <trait, values> pair.
 				if (traitValues.containsKey(traitId)) {
@@ -239,7 +239,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public Map<Integer, List<Double>> getNumericTraitInfoValues(List<Integer> environmentIds, Integer trait)
 			throws MiddlewareQueryException {
-		Map<Integer, List<Double>> traitValues = new HashMap<Integer, List<Double>>();
+		Map<Integer, List<Double>> traitValues = new HashMap<>();
 
 		try {
 			SQLQuery query =
@@ -251,7 +251,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameter("traitId", trait);
 
-			List<Object[]> list = new ArrayList<Object[]>();
+			List<Object[]> list = new ArrayList<>();
 
 			if (!environmentIds.isEmpty()) {
 				list = query.list();
@@ -261,7 +261,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				Integer traitId = (Integer) row[0];
 				Double value = (Double) row[1];
 
-				List<Double> values = new ArrayList<Double>();
+				List<Double> values = new ArrayList<>();
 				values.add(value);
 				// If the trait exists in the map, add the value found. Else, just add the <trait, values> pair.
 				if (traitValues.containsKey(traitId)) {
@@ -284,10 +284,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public Map<Integer, List<String>> getCharacterTraitInfoValues(List<Integer> environmentIds, List<CharacterTraitInfo> traitInfoList)
 			throws MiddlewareQueryException {
 
-		Map<Integer, List<String>> traitValues = new HashMap<Integer, List<String>>();
+		Map<Integer, List<String>> traitValues = new HashMap<>();
 
 		// Get trait IDs
-		List<Integer> traitIds = new ArrayList<Integer>();
+		List<Integer> traitIds = new ArrayList<>();
 		for (CharacterTraitInfo trait : traitInfoList) {
 			traitIds.add(trait.getId());
 		}
@@ -303,7 +303,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			query.setParameterList("environmentIds", environmentIds);
 			query.setParameterList("traitIds", traitIds);
 
-			List<Object[]> list = new ArrayList<Object[]>();
+			List<Object[]> list = new ArrayList<>();
 
 			if (!environmentIds.isEmpty() && !traitIds.isEmpty()) {
 				list = query.list();
@@ -313,7 +313,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				Integer traitId = (Integer) row[0];
 				String value = (String) row[1];
 
-				List<String> values = new ArrayList<String>();
+				List<String> values = new ArrayList<>();
 				values.add(value);
 				// If the trait exists in the map, add the value found. Else, just add the <trait, values> pair.
 				if (traitValues.containsKey(traitId)) {
@@ -332,10 +332,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 
 	public void setCategoricalTraitInfoValues(List<CategoricalTraitInfo> traitInfoList, boolean isCentral) throws MiddlewareQueryException {
-		Map<Integer, String> valueIdName = new HashMap<Integer, String>();
+		Map<Integer, String> valueIdName = new HashMap<>();
 
 		// Get trait IDs
-		List<Integer> traitIds = new ArrayList<Integer>();
+		List<Integer> traitIds = new ArrayList<>();
 		for (CategoricalTraitInfo trait : traitInfoList) {
 			traitIds.add(trait.getId());
 		}
@@ -356,7 +356,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			SQLQuery query = this.getSession().createSQLQuery(queryString);
 			query.setParameterList("traitIds", traitIds);
 
-			List<Object[]> list = new ArrayList<Object[]>();
+			List<Object[]> list = new ArrayList<>();
 
 			if (!traitIds.isEmpty()) {
 				list = query.list();
@@ -409,7 +409,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			throws MiddlewareQueryException {
 
 		// Get trait IDs
-		List<Integer> traitIds = new ArrayList<Integer>();
+		List<Integer> traitIds = new ArrayList<>();
 		for (CategoricalTraitInfo trait : traitInfoList) {
 			traitIds.add(trait.getId());
 		}
@@ -425,7 +425,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			query.setParameterList("traitIds", traitIds);
 			query.setParameterList("environmentIds", environmentIds);
 
-			List<Object[]> list = new ArrayList<Object[]>();
+			List<Object[]> list = new ArrayList<>();
 
 			if (!environmentIds.isEmpty() && !traitIds.isEmpty()) {
 				list = query.list();
@@ -453,7 +453,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public List<Observation> getObservationForTraitOnGermplasms(List<Integer> traitIds, List<Integer> germplasmIds,
 			List<Integer> environmentIds) throws MiddlewareQueryException {
-		List<Observation> observationFinal = new ArrayList<Observation>();
+		List<Observation> observationFinal = new ArrayList<>();
 
 		try {
 			StringBuilder sb = new StringBuilder(PhenotypeDao.GET_OBSERVATIONS);
@@ -464,7 +464,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			query.setParameterList("germplasmIds", germplasmIds);
 			query.setParameterList("environmentIds", environmentIds);
 
-			List<Object[]> list = new ArrayList<Object[]>();
+			List<Object[]> list = new ArrayList<>();
 
 			if (!environmentIds.isEmpty() && !traitIds.isEmpty()) {
 				list = query.list();
@@ -505,7 +505,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	public List<Observation> getObservationForTraits(List<Integer> traitIds, List<Integer> environmentIds, int start, int numOfRows)
 			throws MiddlewareQueryException {
 
-		List<Observation> toReturn = new ArrayList<Observation>();
+		List<Observation> toReturn = new ArrayList<>();
 
 		try {
 			StringBuilder sb = new StringBuilder(PhenotypeDao.GET_OBSERVATIONS);
@@ -534,7 +534,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 
 	public List<TraitObservation> getObservationsForTrait(int traitId, List<Integer> environmentIds) throws MiddlewareQueryException {
-		List<TraitObservation> toreturn = new ArrayList<TraitObservation>();
+		List<TraitObservation> traitObservationList = new ArrayList<>();
 
 		try {
 			StringBuilder queryString = new StringBuilder();
@@ -550,7 +550,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append("WHERE p.observable_id = :traitId AND e.nd_geolocation_id IN ( :environmentIds ) ");
 			queryString.append("ORDER BY s.dbxref_id ");
 
-			PhenotypeDao.LOG.debug(queryString.toString());
+			LOG.debug(queryString.toString());
 
 			SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameter("traitId", traitId).setParameterList("environmentIds", environmentIds);
@@ -571,7 +571,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				String locationName = (String) row[4];
 				Integer locationId = (Integer) row[5];
 
-				toreturn.add(new TraitObservation(id, value, gid, observationId, locationName, locationId));
+				traitObservationList.add(new TraitObservation(id, value, gid, observationId, locationName, locationId));
 			}
 
 		} catch (HibernateException e) {
@@ -579,7 +579,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		}
 
-		return toreturn;
+		return traitObservationList;
 	}
 
 	public List<TrialEnvironment> getEnvironmentTraits(final Set<TrialEnvironment> trialEnvironments, final boolean filterByTraits, final boolean filterByAnalysis) throws MiddlewareQueryException {
@@ -594,8 +594,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			environmentDetails.add(environment);
 		}
 
-		StringBuilder sql = new StringBuilder()
-			.append("SELECT DISTINCT e.nd_geolocation_id as nd_geolocation_id, p.observable_id as observable_id, trait.name as name, trait.definition as definition, c_scale.name as scale, cr_type.object_id as object_id ")
+		StringBuilder sql = new StringBuilder().append(
+			"SELECT DISTINCT e.nd_geolocation_id as nd_geolocation_id, p.observable_id as observable_id, trait.name as name, property.name as property, trait.definition as definition, c_scale.name as scale, cr_type.object_id as object_id ")
 			.append("	FROM phenotype p ")
 			.append("	INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
 			.append("	INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id  AND e.nd_geolocation_id IN (:environmentIds) ")
@@ -618,7 +618,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 			Query query =
 				this.getSession().createSQLQuery(sql.toString()).addScalar("nd_geolocation_id").addScalar("observable_id").addScalar("name")
-					.addScalar("definition").addScalar("scale").addScalar("object_id").setParameterList("environmentIds", environmentIds);
+					.addScalar("property").addScalar("definition").addScalar("scale").addScalar("object_id")
+					.setParameterList("environmentIds", environmentIds);
 
 			List<Object[]> result = query.list();
 
@@ -626,13 +627,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final Integer environmentId = (Integer) row[0];
 				final Integer traitId = (Integer) row[1];
 				final String traitName = (String) row[2];
-				final String traitDescription = (String) row[3];
-				final String scaleName = (String) row[4];
-				final Integer typeId = (Integer) row[5];
+				final String property = (String) row[3];
+				final String traitDescription = (String) row[4];
+				final String scaleName = (String) row[5];
+				final Integer typeId = (Integer) row[6];
 
 				int index = environmentDetails.indexOf(new TrialEnvironment(environmentId));
 				final TrialEnvironment environment = environmentDetails.get(index);
-				environment.addTrait(new TraitInfo(traitId, traitName, traitDescription, scaleName, typeId));
+				environment.addTrait(new TraitInfo(traitId, traitName, property, traitDescription, scaleName, typeId));
 				environmentDetails.set(index, environment);
 			}
 
@@ -729,7 +731,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			throws MiddlewareQueryException {
 		try {
 			if (cvTermIds.isEmpty()) {
-				return new ArrayList<Object[]>();
+				return new ArrayList<>();
 			}
 
 			// get the phenotype_id
@@ -815,7 +817,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 
 	public Map<Integer, Integer> countVariatesDataOfStudy(Integer projectId) throws MiddlewareQueryException {
-		Map<Integer, Integer> map = new HashMap<Integer, Integer>();
+		Map<Integer, Integer> map = new HashMap<>();
 		try {
 
 			StringBuilder sql = new StringBuilder();
@@ -854,7 +856,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in getByTypeAndValue(" + typeId + ", " + value + ") in PhenotypeDao: " + e.getMessage(), e);
 		}
-		return new ArrayList<Phenotype>();
+		return new ArrayList<>();
 	}
 
 	public void deletePhenotypesInProjectByTerm(List<Integer> ids, int termId) throws MiddlewareQueryException {
@@ -974,7 +976,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	}
 
 	public List<Phenotype> getByProjectAndType(int projectId, int typeId) throws MiddlewareQueryException {
-		List<Phenotype> phenotypes = new ArrayList<Phenotype>();
+		List<Phenotype> phenotypes = new ArrayList<>();
 		try {
 			StringBuilder sql =
 					new StringBuilder()
