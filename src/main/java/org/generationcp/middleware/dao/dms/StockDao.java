@@ -82,7 +82,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		final List<StudyReference> studyReferences = new ArrayList<>();
 		try {
 			final SQLQuery query = this.getSession()
-					.createSQLQuery("select distinct p.project_id, p.name, p.description, prop.value " + "FROM stock s "
+					.createSQLQuery("select distinct p.project_id, p.name, p.description, prop.value, p.program_uuid " + "FROM stock s "
 							+ "LEFT JOIN nd_experiment_stock es ON s.stock_id = es.stock_id "
 							+ "LEFT JOIN nd_experiment e on es.nd_experiment_id = e.nd_experiment_id "
 							+ "LEFT JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
@@ -96,9 +96,12 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 			final List<Object[]> results = query.list();
 			for (final Object[] row : results) {
+				if (row[0] == null) {
+					continue;
+				}
 				final String studyTypeRaw = (String) row[3];
 				final StudyType studyType = studyTypeRaw != null ? StudyType.getStudyTypeById(Integer.valueOf(studyTypeRaw)) : null;
-				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2],null,studyType));
+				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2],(String) row[4],studyType));
 			}
 
 		} catch (final HibernateException e) {
