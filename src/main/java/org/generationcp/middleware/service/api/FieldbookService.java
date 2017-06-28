@@ -204,7 +204,7 @@ public interface FieldbookService {
 	 * performance tuned. Memory footprint of the overall application can be severly impacted if this method is used without consideration
 	 * for performance at scale. So please be very careful and think it through before using this method.
 	 */
-	void loadAllObservations(final Workbook workbook);
+	boolean loadAllObservations(final Workbook workbook);
 
 	/**
 	 * Saves the measurement rows of a workbook as a local trial or nursery on the new CHADO schema.
