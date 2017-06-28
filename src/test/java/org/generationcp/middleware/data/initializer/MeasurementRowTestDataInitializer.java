@@ -2,12 +2,14 @@
 package org.generationcp.middleware.data.initializer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 
 public class MeasurementRowTestDataInitializer {
@@ -48,5 +50,18 @@ public class MeasurementRowTestDataInitializer {
 		measurementRow.setDataList(dataList);
 
 		return measurementRow;
+	}
+
+	public List<MeasurementRow> createMeasurementRowList(int id, String name, String value,
+			MeasurementVariable measurementVariable) {
+		List<MeasurementRow> measurementRows = new ArrayList<>();
+		
+		MeasurementData measurementData = MeasurementDataTestDataInitializer.createMeasurementData(id, name, value);
+		measurementData.setMeasurementVariable(measurementVariable);
+		final List<MeasurementData> dataList = Arrays.asList(measurementData);
+		MeasurementRow measurementRow = new MeasurementRow();
+		measurementRow.setDataList(dataList);
+		measurementRows.add(measurementRow);
+		return measurementRows;
 	}
 }

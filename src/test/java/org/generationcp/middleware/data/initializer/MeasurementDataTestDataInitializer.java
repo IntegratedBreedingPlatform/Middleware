@@ -40,7 +40,7 @@ public class MeasurementDataTestDataInitializer {
 	public MeasurementData createMeasurementData(final Integer termId, final String label, final String value, final TermId dataType) {
 		final MeasurementData measurementData = new MeasurementData(label, value);
 		measurementData.setEditable(false);
-		measurementData.setLabel("");
+		measurementData.setLabel(label);
 		measurementData.setPhenotypeId(0);
 		measurementData.setValue(value);
 

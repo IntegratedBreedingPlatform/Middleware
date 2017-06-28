@@ -23,6 +23,14 @@ public class MeasurementVariableTestDataInitializer {
 		measurementVar.setValue(value);
 		return measurementVar;
 	}
+	
+	public MeasurementVariable createMeasurementVariable(final int termId, final String name, final String value) {
+		final MeasurementVariable measurementVar = new MeasurementVariable();
+		measurementVar.setTermId(termId);
+		measurementVar.setName(name);
+		measurementVar.setValue(value);
+		return measurementVar;
+	}
 
 	public List<MeasurementVariable> createMeasurementVariableList() {
 		final List<MeasurementVariable> measurementVarList = new ArrayList<MeasurementVariable>();
