@@ -539,6 +539,55 @@ public class GermplasmGroupingServiceImplTest {
 		Mockito.verify(this.germplasmDAO, Mockito.times(2)).save(Mockito.any(Germplasm.class));
 	}
 
+	/**
+	 * Basic scenario with data available to go through all main logic steps. Cross with hybrid method, both parents containing mgid,
+	 * previous crosses existing with mgid. Apply group to previous crosses.
+	 */
+	@Test
+	public void testProcessGroupInheritanceForCrosses6() {
+
+		Integer crossGid1 = 1;
+		Integer crossGid1Parent1 = 11, crossGid1Parent1MGID = 111;
+		Integer crossGid1Parent2 = 12, crossGid1Parent2MGID = 112;
+		Integer hybridMethodId = 416;
+
+		Germplasm crossGermplasm1 = new Germplasm(crossGid1);
+		crossGermplasm1.setMethodId(hybridMethodId);
+		crossGermplasm1.setGpid1(crossGid1Parent1);
+		crossGermplasm1.setGpid2(crossGid1Parent2);
+		crossGermplasm1.setMgid(0);
+
+		Germplasm crossGermplasm1Parent1 = new Germplasm(crossGid1Parent1);
+		crossGermplasm1Parent1.setMgid(crossGid1Parent1MGID);
+
+		Germplasm crossGermplasm1Parent2 = new Germplasm(crossGid1Parent2);
+		crossGermplasm1Parent2.setMgid(crossGid1Parent2MGID);
+
+		// Setup previous cross with MGID.
+		Germplasm previousCross = new Germplasm(123);
+		Integer previousCrossMGID = 456;
+		previousCross.setMgid(previousCrossMGID);
+		Mockito.when(this.germplasmDAO.getPreviousCrossesBetweenParentGroups(crossGermplasm1))
+				.thenReturn(Lists.newArrayList(previousCross));
+
+		// Just to test, create another cross with non-hybrid method. Expect this to not be processed.
+		Integer crossGid2 = 2;
+		Integer nonHybridMethodId = 416;
+		Germplasm crossGermplasm2 = new Germplasm(crossGid2);
+		crossGermplasm1.setMethodId(nonHybridMethodId);
+		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1, crossGid2), 2))
+				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2, crossGermplasm2));
+		this.germplasmGroupingService.processGroupInheritanceForCrosses(Lists.newArrayList(crossGid1, crossGid2), true, HYBRID_METHODS);
+
+		Assert.assertEquals("Expected new cross to be assigned MGID from previous cross.", previousCrossMGID, crossGermplasm1.getMgid());
+
+		// Previous crosses should be queried once.
+		Mockito.verify(this.germplasmDAO, Mockito.times(1)).getPreviousCrossesBetweenParentGroups(crossGermplasm1);
+		// One Germplasm record should be saved out of the two that are passed.
+		// One other save should occur for saving mgid on previous cross.
+		Mockito.verify(this.germplasmDAO, Mockito.times(2)).save(Mockito.any(Germplasm.class));
+	}
+
 	@Test
 	public void testGetSelectionHistory() {
 		Germplasm germplasm = new Germplasm();
