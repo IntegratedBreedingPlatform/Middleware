@@ -13,10 +13,11 @@ public class MeasurementDataTestDataInitializer {
 
 	public static final String DATA_TYPE_CHAR = "C";
 
-	// This method remains as static for compatibility to older tests that uses this method.
+	// This method remains as static for compatibility to older tests that uses
+	// this method.
 	public static MeasurementData createMeasurementData(final Integer termId, final String label, final String value) {
-		final MeasurementData measurementData =
-				new MeasurementDataTestDataInitializer().createMeasurementData(termId, label, value, TermId.CHARACTER_VARIABLE);
+		final MeasurementData measurementData = new MeasurementDataTestDataInitializer().createMeasurementData(termId,
+				label, value, TermId.CHARACTER_VARIABLE);
 		measurementData.setDataType(MeasurementDataTestDataInitializer.DATA_TYPE_CHAR);
 
 		return measurementData;
@@ -30,17 +31,18 @@ public class MeasurementDataTestDataInitializer {
 
 	/**
 	 * Create a new measurement data
-	 * 
+	 *
 	 * @param termId
 	 * @param label
 	 * @param value
 	 * @param dataType
 	 * @return
 	 */
-	public MeasurementData createMeasurementData(final Integer termId, final String label, final String value, final TermId dataType) {
+	public MeasurementData createMeasurementData(final Integer termId, final String label, final String value,
+			final TermId dataType) {
 		final MeasurementData measurementData = new MeasurementData(label, value);
 		measurementData.setEditable(false);
-		measurementData.setLabel("");
+		measurementData.setLabel(label);
 		measurementData.setPhenotypeId(0);
 		measurementData.setValue(value);
 
@@ -57,15 +59,15 @@ public class MeasurementDataTestDataInitializer {
 
 	/**
 	 * Create a categorical measurement data
-	 * 
+	 *
 	 * @param termId
 	 * @param label
 	 * @param value
 	 * @param possibleValues
 	 * @return
 	 */
-	public MeasurementData createCategoricalMeasurementData(final Integer termId, final String label, final String value,
-			final List<ValueReference> possibleValues) {
+	public MeasurementData createCategoricalMeasurementData(final Integer termId, final String label,
+			final String value, final List<ValueReference> possibleValues) {
 		final MeasurementData data = this.createMeasurementData(termId, label, value, TermId.CATEGORICAL_VARIABLE);
 
 		final MeasurementVariable measurementVariable = data.getMeasurementVariable();
@@ -78,13 +80,14 @@ public class MeasurementDataTestDataInitializer {
 
 	/**
 	 * Create a categorical measurement data with initial ppssibleValue
-	 * 
+	 *
 	 * @param termId
 	 * @param label
 	 * @param value
 	 * @return
 	 */
-	public MeasurementData createCategoricalMeasurementData(final Integer termId, final String label, final String value) {
+	public MeasurementData createCategoricalMeasurementData(final Integer termId, final String label,
+			final String value) {
 		final List<ValueReference> possibleValues = new ArrayList<>();
 		possibleValues.add(new ValueReference(1, "Name", "Desc"));
 

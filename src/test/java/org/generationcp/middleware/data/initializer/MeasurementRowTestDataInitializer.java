@@ -2,12 +2,14 @@
 package org.generationcp.middleware.data.initializer;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 
 public class MeasurementRowTestDataInitializer {
@@ -30,8 +32,10 @@ public class MeasurementRowTestDataInitializer {
 
 		final MeasurementRow measurementRow = new MeasurementRow();
 		final List<MeasurementData> dataList = new ArrayList<>();
-		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.LOCATION_ID.getId(), "LOCATION_ID", "123"));
-		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.TRIAL_LOCATION.getId(), "LOCATION_NAME", "Manila"));
+		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.LOCATION_ID.getId(), "LOCATION_ID",
+				"123"));
+		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.TRIAL_LOCATION.getId(),
+				"LOCATION_NAME", "Manila"));
 		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(111, "Some Variable", "Test Data"));
 		measurementRow.setDataList(dataList);
 
@@ -42,11 +46,27 @@ public class MeasurementRowTestDataInitializer {
 
 		final MeasurementRow measurementRow = new MeasurementRow();
 		final List<MeasurementData> dataList = new ArrayList<>();
-		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.LOCATION_ID.getId(), "LOCATION_ID", "123"));
-		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.TRIAL_LOCATION.getId(), "LOCATION_NAME", "Manila"));
+		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.LOCATION_ID.getId(), "LOCATION_ID",
+				"123"));
+		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.TRIAL_LOCATION.getId(),
+				"LOCATION_NAME", "Manila"));
 		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(8250, "Some Variable", "Test Data"));
 		measurementRow.setDataList(dataList);
 
 		return measurementRow;
+	}
+
+	public List<MeasurementRow> createMeasurementRowList(final int id, final String name, final String value,
+			final MeasurementVariable measurementVariable) {
+		final List<MeasurementRow> measurementRows = new ArrayList<>();
+
+		final MeasurementData measurementData = MeasurementDataTestDataInitializer.createMeasurementData(id, name,
+				value);
+		measurementData.setMeasurementVariable(measurementVariable);
+		final List<MeasurementData> dataList = Arrays.asList(measurementData);
+		final MeasurementRow measurementRow = new MeasurementRow();
+		measurementRow.setDataList(dataList);
+		measurementRows.add(measurementRow);
+		return measurementRows;
 	}
 }
