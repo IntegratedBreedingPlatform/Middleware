@@ -423,14 +423,14 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 							// TODO Flowchart says warn user for this case - this will require returning flag back to the caller from
 							// service.
 
-							if (applyNewGroupToPreviousCrosses) {
-								LOG.info("Applying the new mgid {} to the previous crosses as well.", cross.getMgid());
-								for (final Germplasm previousCross : previousCrosses) {
-									previousCross.setMgid(cross.getMgid());
-									this.germplasmDAO.save(previousCross);
-								}
-							}
+						}
 
+						if (applyNewGroupToPreviousCrosses) {
+							LOG.info("Applying the new mgid {} to the previous crosses as well.", cross.getMgid());
+							for (final Germplasm previousCross : previousCrosses) {
+								previousCross.setMgid(cross.getMgid());
+								this.germplasmDAO.save(previousCross);
+							}
 						}
 					}
 					this.germplasmDAO.save(cross);
