@@ -23,7 +23,7 @@ public class MeasurementVariableTestDataInitializer {
 		measurementVar.setValue(value);
 		return measurementVar;
 	}
-	
+
 	public MeasurementVariable createMeasurementVariable(final int termId, final String name, final String value) {
 		final MeasurementVariable measurementVar = new MeasurementVariable();
 		measurementVar.setTermId(termId);
@@ -37,7 +37,7 @@ public class MeasurementVariableTestDataInitializer {
 		measurementVarList.add(this.createMeasurementVariable());
 		return measurementVarList;
 	}
-	
+
 	public MeasurementVariable createMeasurementVariableWithName(final int termId, final String name) {
 		final MeasurementVariable measurementVar = new MeasurementVariable();
 		measurementVar.setTermId(termId);

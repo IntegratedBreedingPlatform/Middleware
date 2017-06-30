@@ -32,8 +32,10 @@ public class MeasurementRowTestDataInitializer {
 
 		final MeasurementRow measurementRow = new MeasurementRow();
 		final List<MeasurementData> dataList = new ArrayList<>();
-		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.LOCATION_ID.getId(), "LOCATION_ID", "123"));
-		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.TRIAL_LOCATION.getId(), "LOCATION_NAME", "Manila"));
+		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.LOCATION_ID.getId(), "LOCATION_ID",
+				"123"));
+		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.TRIAL_LOCATION.getId(),
+				"LOCATION_NAME", "Manila"));
 		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(111, "Some Variable", "Test Data"));
 		measurementRow.setDataList(dataList);
 
@@ -44,22 +46,25 @@ public class MeasurementRowTestDataInitializer {
 
 		final MeasurementRow measurementRow = new MeasurementRow();
 		final List<MeasurementData> dataList = new ArrayList<>();
-		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.LOCATION_ID.getId(), "LOCATION_ID", "123"));
-		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.TRIAL_LOCATION.getId(), "LOCATION_NAME", "Manila"));
+		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.LOCATION_ID.getId(), "LOCATION_ID",
+				"123"));
+		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(TermId.TRIAL_LOCATION.getId(),
+				"LOCATION_NAME", "Manila"));
 		dataList.add(MeasurementDataTestDataInitializer.createMeasurementData(8250, "Some Variable", "Test Data"));
 		measurementRow.setDataList(dataList);
 
 		return measurementRow;
 	}
 
-	public List<MeasurementRow> createMeasurementRowList(int id, String name, String value,
-			MeasurementVariable measurementVariable) {
-		List<MeasurementRow> measurementRows = new ArrayList<>();
-		
-		MeasurementData measurementData = MeasurementDataTestDataInitializer.createMeasurementData(id, name, value);
+	public List<MeasurementRow> createMeasurementRowList(final int id, final String name, final String value,
+			final MeasurementVariable measurementVariable) {
+		final List<MeasurementRow> measurementRows = new ArrayList<>();
+
+		final MeasurementData measurementData = MeasurementDataTestDataInitializer.createMeasurementData(id, name,
+				value);
 		measurementData.setMeasurementVariable(measurementVariable);
 		final List<MeasurementData> dataList = Arrays.asList(measurementData);
-		MeasurementRow measurementRow = new MeasurementRow();
+		final MeasurementRow measurementRow = new MeasurementRow();
 		measurementRow.setDataList(dataList);
 		measurementRows.add(measurementRow);
 		return measurementRows;
