@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.Georef;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.service.api.location.AdditionalInfoDto;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.hibernate.Criteria;
@@ -964,21 +965,21 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 			final StringBuilder sqlString = new StringBuilder();
 
-			sqlString.append("SELECT l.locid ,ud.fname ,l.lname ,l.labbr ") //
-					.append("  ,c.isothree ,c.isoabbr ,g.lat ,g.lon ,g.alt ") //
+			sqlString.append("SELECT l.locid ,ud.fname ,l.lname ,l.labbr ,c.isothree ,c.isoabbr ,g.lat ,g.lon ,g.alt ,province.lname as province") //
 					.append(" FROM location l ") //
 					.append(" LEFT JOIN georef g on l.locid = g.locid ") //
 					.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid ") //
-					.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype ");
+					.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype, ")
+					.append(" location province");
 
 			if (!filters.isEmpty()) {
 				sqlString.append(createConditionWhereByFilter(filters));
 
 			}
-
+			sqlString.append(" and province.locid = l.snl3id ");
 			sqlString.append(" ORDER BY l.locid ");
 
-			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
+			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString()).addScalar("l.locid").addScalar("ud.fname").addScalar("l.lname").addScalar("l.labbr").addScalar("c.isothree").addScalar("c.isoabbr").addScalar("g.lat").addScalar("g.lon").addScalar("g.alt").addScalar("province");
 			int start = pageSize * (pageNumber - 1);
 			int numOfRows = pageSize;
 			query.setFirstResult(start);
@@ -1008,9 +1009,15 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					final Double longitude = (Double) row[7];
 					final Double altitude = (Double) row[8];
 
-					locationList.add(new LocationDetailsDto(locationDbId, locationType, name, abbreviation, countryCode, countryName,
-							latitude, longitude, altitude));
-
+					final LocationDetailsDto locationDetailsDto =
+						new LocationDetailsDto(locationDbId, locationType, name, abbreviation, countryCode, countryName, latitude,
+						longitude, altitude);
+					if (!locationType.equalsIgnoreCase("COUNTRY")) {
+						AdditionalInfoDto additionalInfoDto = new AdditionalInfoDto(locationDetailsDto.getLocationDbId());
+						additionalInfoDto.addInfo("province", (String) row[9]);
+						locationDetailsDto.setMapAdditionalInfo(additionalInfoDto);
+					}
+					locationList.add(locationDetailsDto);
 				}
 			}
 
