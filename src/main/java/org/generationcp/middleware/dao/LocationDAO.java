@@ -72,7 +72,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			this.logAndThrowException(this.getLogExceptionMessage("getByName", LocationDAO.NAME_OR_OPERATION,
 					name + "|" + operation, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
-		return new ArrayList<Location>();
+		return new ArrayList<>();
 	}
 
 	private void addNameSearchCriteria(final String name, final Operation operation, final Criteria criteria) {
@@ -96,7 +96,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			this.logAndThrowException(this.getLogExceptionMessage("getByName", "name|operation", name + "|" + operation,
 					e.getMessage(), "Location"), e);
 		}
-		return new ArrayList<Location>();
+		return new ArrayList<>();
 	}
 
 	public List<Location> getByName(final String name, final Operation operation, final int start, final int numOfRows)
@@ -113,7 +113,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			this.logAndThrowException(this.getLogExceptionMessage("getByName", LocationDAO.NAME_OR_OPERATION,
 					name + "|" + operation, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
-		return new ArrayList<Location>();
+		return new ArrayList<>();
 	}
 
 	public List<Location> getByNameAndUniqueID(final String name, final Operation operation, final String programUUID,
@@ -131,7 +131,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			this.logAndThrowException(this.getLogExceptionMessage("getByName", "name|operation", name + "|" + operation,
 					e.getMessage(), "Location"), e);
 		}
-		return new ArrayList<Location>();
+		return new ArrayList<>();
 	}
 
 	public long countByName(final String name, final Operation operation) throws MiddlewareQueryException {
@@ -183,7 +183,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			this.logAndThrowException(this.getLogExceptionMessage(LocationDAO.GET_BY_COUNTRY, LocationDAO.COUNTRY,
 					country.toString(), e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
-		return new ArrayList<Location>();
+		return new ArrayList<>();
 	}
 
 	public List<Location> getByCountryAndType(final Country country, final Integer type)
@@ -201,7 +201,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			this.logAndThrowException(this.getLogExceptionMessage(LocationDAO.GET_BY_COUNTRY, LocationDAO.COUNTRY,
 					country.toString(), e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
-		return new ArrayList<Location>();
+		return new ArrayList<>();
 	}
 
 	public List<Location> getByNameCountryAndType(final String name, final Country country, final Integer type)
@@ -234,7 +234,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			this.logAndThrowException(this.getLogExceptionMessage(LocationDAO.GET_BY_COUNTRY, LocationDAO.COUNTRY,
 					country.toString(), e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
-		return new ArrayList<Location>();
+		return new ArrayList<>();
 	}
 
 	public List<Location> getByCountry(final Country country, final int start, final int numOfRows)
@@ -252,7 +252,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			this.logAndThrowException(this.getLogExceptionMessage(LocationDAO.GET_BY_COUNTRY, LocationDAO.COUNTRY,
 					country.toString(), e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
-		return new ArrayList<Location>();
+		return new ArrayList<>();
 	}
 
 	public long countByCountry(final Country country) throws MiddlewareQueryException {
@@ -283,7 +283,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			this.logAndThrowException(this.getLogExceptionMessage(LocationDAO.GET_BY_TYPE, "type", String.valueOf(type),
 					e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
-		return new ArrayList<Location>();
+		return new ArrayList<>();
 	}
 
 	public List<Location> getByType(final Integer type, final String programUUID) throws MiddlewareQueryException {
@@ -300,7 +300,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			this.logAndThrowException(this.getLogExceptionMessage(LocationDAO.GET_BY_TYPE, "type", String.valueOf(type),
 					e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
-		return new ArrayList<Location>();
+		return new ArrayList<>();
 	}
 
 	public List<Location> getByType(final Integer type, final int start, final int numOfRows)
@@ -317,7 +317,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			this.logAndThrowException(this.getLogExceptionMessage(LocationDAO.GET_BY_TYPE, "type", String.valueOf(type),
 					e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
-		return new ArrayList<Location>();
+		return new ArrayList<>();
 	}
 
 	public long countByType(final Integer type) throws MiddlewareQueryException {
@@ -354,7 +354,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 	@SuppressWarnings("rawtypes")
 	public List<Location> getAllBreedingLocations() throws MiddlewareQueryException {
-		final List<Location> locationList = new ArrayList<Location>();
+		final List<Location> locationList = new ArrayList<>();
 		try {
 			final Session session = this.getSession();
 			final SQLQuery query = session.createSQLQuery(Location.GET_ALL_BREEDING_LOCATIONS);
@@ -395,7 +395,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		} catch (final HibernateException e) {
 			this.logAndThrowException(this.getLogExceptionMessage("getAllBreedingLocations", "", null, e.getMessage(),
 					"GermplasmDataManager"), e);
-			return new ArrayList<Location>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -443,7 +443,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			this.logAndThrowException(this.getLogExceptionMessage("getLocationDetails", "id",
 					String.valueOf(locationId), e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
-		return new ArrayList<LocationDetails>();
+		return new ArrayList<>();
 	}
 
 	@Override
@@ -491,12 +491,12 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			this.logAndThrowException(this.getLogExceptionMessage("getLocationDetails", "id",
 					String.valueOf(locationId), e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
-		return new ArrayList<LocationDetails>();
+		return new ArrayList<>();
 	}
 
 	public List<Location> getAllProvincesByCountry(final Integer countryId) throws MiddlewareQueryException {
 		if (countryId == null || countryId == 0) {
-			return new ArrayList<Location>();
+			return new ArrayList<>();
 		}
 
 		try {
@@ -507,7 +507,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		} catch (final HibernateException e) {
 			this.logAndThrowException(this.getLogExceptionMessage("getAllProvinces", "", null, e.getMessage(),
 					LocationDAO.CLASS_NAME_LOCATION), e);
-			return new ArrayList<Location>();
+			return new ArrayList<>();
 		}
 	}
 
@@ -520,12 +520,12 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		} catch (final HibernateException e) {
 			this.logAndThrowException(this.getLogExceptionMessage("getAllProvinces", "", null, e.getMessage(),
 					LocationDAO.CLASS_NAME_LOCATION), e);
-			return new ArrayList<Location>();
+			return new ArrayList<>();
 		}
 	}
 
 	public List<LocationDto> getLocationDtoByIds(final Collection<Integer> ids) throws MiddlewareQueryException {
-		final List<LocationDto> returnList = new ArrayList<LocationDto>();
+		final List<LocationDto> returnList = new ArrayList<>();
 		if (ids == null || ids.isEmpty()) {
 			return returnList;
 		}
@@ -570,7 +570,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 	public Map<Integer, String> getLocationNamesByLocationIDs(final List<Integer> locIds)
 			throws MiddlewareQueryException {
-		final Map<Integer, String> toreturn = new HashMap<Integer, String>();
+		final Map<Integer, String> toreturn = new HashMap<>();
 
 		final List<Location> locations = this.getLocationByIds(locIds);
 		for (final Location location : locations) {
@@ -581,7 +581,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 	public Map<Integer, String> getLocationNamesMapByGIDs(final List<Integer> gids) throws MiddlewareQueryException {
-		final Map<Integer, String> toreturn = new HashMap<Integer, String>();
+		final Map<Integer, String> toreturn = new HashMap<>();
 		for (final Integer gid : gids) {
 			toreturn.put(gid, null);
 		}
@@ -606,7 +606,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 	public Map<Integer, LocationDto> getLocationNamesByGIDs(final List<Integer> gids) throws MiddlewareQueryException {
-		final Map<Integer, LocationDto> toreturn = new HashMap<Integer, LocationDto>();
+		final Map<Integer, LocationDto> toreturn = new HashMap<>();
 		for (final Integer gid : gids) {
 			toreturn.put(gid, null);
 		}
@@ -633,7 +633,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 	public List<Location> getLocationsByDTypeAndLType(final String dval, final Integer dType, final Integer lType)
 			throws MiddlewareQueryException {
-		final List<Location> locations = new ArrayList<Location>();
+		final List<Location> locations = new ArrayList<>();
 		try {
 			final StringBuilder sqlString = new StringBuilder()
 					.append("SELECT  l.locid, l.ltype, l.nllp, l.lname, l.labbr")
@@ -676,7 +676,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 	public List<Location> getByTypeWithParent(final Integer type, final Integer relationshipType)
 			throws MiddlewareQueryException {
-		final List<Location> locationList = new ArrayList<Location>();
+		final List<Location> locationList = new ArrayList<>();
 		try {
 			final Session session = this.getSession();
 			final String sql = "SELECT f.locid, f.lname, fd.dval " + " FROM location f "
@@ -708,7 +708,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 	public Map<Integer, Location> getNamesByIdsIntoMap(final Collection<Integer> ids) throws MiddlewareQueryException {
-		final Map<Integer, Location> map = new HashMap<Integer, Location>();
+		final Map<Integer, Location> map = new HashMap<>();
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Location.class);
 			criteria.add(Restrictions.in(LocationDAO.LOCID, ids));
@@ -728,7 +728,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 	public List<Location> getByIds(final List<Integer> ids) throws MiddlewareQueryException {
-		List<Location> locations = new ArrayList<Location>();
+		List<Location> locations = new ArrayList<>();
 
 		if (ids == null || ids.isEmpty()) {
 			return locations;
@@ -747,7 +747,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 	public List<Location> getByUniqueID(final String programUUID) throws MiddlewareQueryException {
-		List<Location> locations = new ArrayList<Location>();
+		List<Location> locations = new ArrayList<>();
 
 		if (programUUID == null || programUUID.isEmpty()) {
 			return locations;
@@ -783,7 +783,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 	public List<Location> getProgramLocations(final String programUUID) throws MiddlewareQueryException {
-		List<Location> locations = new ArrayList<Location>();
+		List<Location> locations = new ArrayList<>();
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Location.class);
 			criteria.add(Restrictions.eq(LocationDAO.UNIQUE_ID, programUUID));
@@ -803,12 +803,12 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getByIds() query from Location: " + e.getMessage(), e);
 		}
-		return new ArrayList<Locdes>();
+		return new ArrayList<>();
 	}
 
 	public List<Location> getBreedingLocations(final List<Integer> ids) throws MiddlewareQueryException {
 		try {
-			final List<Integer> validCodes = new ArrayList<Integer>();
+			final List<Integer> validCodes = new ArrayList<>();
 			// 410, 411, 412
 			validCodes.add(410);
 			validCodes.add(411);
@@ -849,7 +849,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 	public List<Location> getBreedingLocationsByUniqueID(final String programUUID) {
-		List<Location> locations = new ArrayList<Location>();
+		List<Location> locations = new ArrayList<>();
 
 		if (programUUID == null || programUUID.isEmpty()) {
 			return locations;
@@ -918,7 +918,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			this.logAndThrowException(
 					this.getLogExceptionMessage("getFilteredLocations", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
-		return new ArrayList<LocationDetails>();
+		return new ArrayList<>();
 	}
 
 
@@ -938,7 +938,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 			}
 			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
-			
+
 			for (Map.Entry<LocationFilters, Object> entry : filters.entrySet()) {
 				LocationFilters filter = entry.getKey();
 				Object value = entry.getValue();
@@ -948,7 +948,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					query.setParameter(filter.getParameter(), value);
 				}
 			}
-			
+
 			return query.list().size();
 		} catch (final HibernateException e) {
 			LocationDAO.LOG.error(e.getMessage(), e);
@@ -994,7 +994,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					query.setParameter(filter.getParameter(), value);
 				}
 			}
-			
+
 			final List<Object[]> results = query.list();
 
 			if (!results.isEmpty()) {
