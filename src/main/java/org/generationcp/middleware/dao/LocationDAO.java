@@ -938,16 +938,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 			}
 			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
-
-			for (Map.Entry<LocationFilters, Object> entry : filters.entrySet()) {
-				LocationFilters filter = entry.getKey();
-				Object value = entry.getValue();
-				if (value.getClass().isArray()) {
-					query.setParameterList(filter.getParameter(), (Object[])value);
-				}else{
-					query.setParameter(filter.getParameter(), value);
-				}
-			}
+			this.setQueryParameters(query,filters);
 
 			return query.list().size();
 		} catch (final HibernateException e) {
@@ -957,13 +948,11 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
-	public List<LocationDetailsDto> getLocationsByFilter(final int pageNumber,final int pageSize,
-			final Map<LocationFilters, Object> filters) {
-		final List<LocationDetailsDto> locationList = new ArrayList<LocationDetailsDto>();
-
+	public List<LocationDetailsDto> getLocationsByFilter(final int pageNumber, final int pageSize,
+		final Map<LocationFilters, Object> filters) {
+		final List<LocationDetailsDto> locationList = new ArrayList<>();
+		final StringBuilder sqlString = new StringBuilder();
 		try {
-
-			final StringBuilder sqlString = new StringBuilder();
 
 			sqlString.append("SELECT l.locid ,ud.fname ,l.lname ,l.labbr ,c.isothree ,c.isoabbr ,g.lat ,g.lon ,g.alt ,province.lname as province") //
 					.append(" FROM location l ") //
@@ -984,16 +973,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			int numOfRows = pageSize;
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
-
-			for (Map.Entry<LocationFilters, Object> entry : filters.entrySet()) {
-				LocationFilters filter = entry.getKey();
-				Object value = entry.getValue();
-				if (value.getClass().isArray()) {
-					query.setParameterList(filter.getParameter(), (Object[])value);
-				}else{
-					query.setParameter(filter.getParameter(), value);
-				}
-			}
+			this.setQueryParameters(query,filters);
 
 			final List<Object[]> results = query.list();
 
@@ -1012,7 +992,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					final LocationDetailsDto locationDetailsDto =
 						new LocationDetailsDto(locationDbId, locationType, name, abbreviation, countryCode, countryName, latitude,
 						longitude, altitude);
-					if (!locationType.equalsIgnoreCase("COUNTRY")) {
+					if (!locationType.equalsIgnoreCase(LocationDAO.COUNTRY)) {
 						AdditionalInfoDto additionalInfoDto = new AdditionalInfoDto(locationDetailsDto.getLocationDbId());
 						additionalInfoDto.addInfo("province", (String) row[9]);
 						locationDetailsDto.setMapAdditionalInfo(additionalInfoDto);
@@ -1027,6 +1007,18 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			LocationDAO.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(
 					this.getLogExceptionMessage("getLocalLocationsByFilter", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+	}
+
+	private void setQueryParameters(final SQLQuery query, final Map<LocationFilters, Object> filters) {
+		for (Map.Entry<LocationFilters, Object> entry : filters.entrySet()) {
+			LocationFilters filter = entry.getKey();
+			Object value = entry.getValue();
+			if (value.getClass().isArray()) {
+				query.setParameterList(filter.getParameter(), (Object[])value);
+			}else{
+				query.setParameter(filter.getParameter(), value);
+			}
 		}
 	}
 
