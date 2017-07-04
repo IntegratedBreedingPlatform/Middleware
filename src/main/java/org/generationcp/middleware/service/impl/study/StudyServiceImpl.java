@@ -407,8 +407,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// TODO Update query and use nd_geolocation_id instead. For now instance number will be ok.
 				entry.add((String) row[1]);
 
-				String locationName = (String) row[12];
-				String locationAbbreviation = (String) row[13];
+				String locationName = (String) row[13];
+				String locationAbbreviation = (String) row[14];
 
 				if (StringUtils.isNotBlank(locationAbbreviation)) {
 					entry.add(locationAbbreviation);
@@ -442,14 +442,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// entry type
 				entry.add(String.valueOf(row[2]));
 
-				Object x = row[11];
-				Object y = row[10];
+				Object x = row[10];
+				Object y = row[11];
 
 				// If there is no row and col design,
 				// get fieldmap row and col
 				if (x == null || y == null) {
-					x = row[14];
-					y = row[15];
+					x = row[15];
+					y = row[16];
 				}
 
 				// X = col
@@ -458,10 +458,13 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// Y = row
 				entry.add(String.valueOf(y));
 
+				//plotId
+				entry.add(String.valueOf(row[12]));
+
 				// phenotypic values
 				int columnOffset = 1;
 				for (int i = 0; i < traits.size(); i++) {
-					final Object rowValue = row[15 + columnOffset];
+					final Object rowValue = row[16 + columnOffset];
 
 					if (rowValue != null) {
 						entry.add(String.valueOf(rowValue));
@@ -480,8 +483,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 			dto = new TrialObservationTable().setStudyDbId(instanceDbId != null ? instanceDbId : studyIdentifier).setObservationVariableDbIds(observationVariableDbIds)
 			.setObservationVariableNames(observationVariableNames).setData(data);
 
-		dto.setHeaderRow(Lists.newArrayList("locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
-				"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y"));
+		dto.setHeaderRow(Lists.newArrayList("year", "locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
+				"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y", "plotId"));
 
 		return dto;
 	}

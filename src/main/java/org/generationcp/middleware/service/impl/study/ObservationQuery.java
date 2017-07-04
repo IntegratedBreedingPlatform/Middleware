@@ -72,6 +72,10 @@ class ObservationQuery {
 			+ "            INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id"
 			+ "            WHERE ndep.nd_experiment_id = ep.nd_experiment_id  AND ispcvt.name = 'COL') COL";
 
+	final String yearText = "substring((select value from project p inner join projectprop pp"
+		+ " on pp.project_id = p.project_id where  pp.type_id = '8050' and "
+		+ " p.project_id = :projectId), 1, 4) yearString";
+
 
 	String getAllObservationsQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors, final String sortBy,
 			final String sortOrder) {
@@ -118,6 +122,7 @@ class ObservationQuery {
 				", " + locationAbbreviationSubQuery +
 				", " + fieldmapColumnText +
 				", " + fieldmapRowText +
+				", " + yearText +
 				columnNamesFromTraitNames +
 				fromText + whereText + orderByText;
 	}

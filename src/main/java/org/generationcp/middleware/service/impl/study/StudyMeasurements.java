@@ -90,19 +90,7 @@ public class StudyMeasurements {
 	}
 
 	private void addScalar(final SQLQuery createSQLQuery) {
-		createSQLQuery.addScalar("nd_experiment_id");
-		createSQLQuery.addScalar("TRIAL_INSTANCE");
-		createSQLQuery.addScalar("ENTRY_TYPE");
-		createSQLQuery.addScalar("GID");
-		createSQLQuery.addScalar("DESIGNATION");
-		createSQLQuery.addScalar("ENTRY_NO");
-		createSQLQuery.addScalar("ENTRY_CODE");
-		createSQLQuery.addScalar("REP_NO");
-		createSQLQuery.addScalar("PLOT_NO");
-		createSQLQuery.addScalar("BLOCK_NO");
-		createSQLQuery.addScalar("ROW");
-		createSQLQuery.addScalar("COL");
-		createSQLQuery.addScalar("PLOT_ID", new StringType());
+		this.addScalarWithoutFieldmap(createSQLQuery);
 		createSQLQuery.addScalar("FIELDMAP COLUMN");
 		createSQLQuery.addScalar("FIELDMAP RANGE");
 	}
@@ -161,18 +149,8 @@ public class StudyMeasurements {
 			createSQLQuery.setParameter("instanceId", instanceId);
 		}
 
-		final List<Object[]> result = createSQLQuery.list();
-		return result;
-	}
+		createSQLQuery.setParameter("projectId", Integer.valueOf(projectBusinessIdentifier));
 
-	@SuppressWarnings("unchecked")
-	public List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier, final List<MeasurementVariableDto> measurementVariables,
-			final List<String> germplasmDescriptors) {
-		final String generateQuery =
-				this.measurementQuery.getObservationsMainQuery(measurementVariables, germplasmDescriptors) + this.measurementQuery.getGroupingClause();
-
-		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(measurementVariables, germplasmDescriptors, generateQuery);
-		createSQLQuery.setParameter("studyId", projectBusinessIdentifier);
 
 		final List<Object[]> result = createSQLQuery.list();
 		return result;
@@ -181,12 +159,29 @@ public class StudyMeasurements {
 	private SQLQuery createQueryAndAddScalarWithBlockRowCol(final List<MeasurementVariableDto> measurementVariables, final String generateQuery) {
 		final SQLQuery createSQLQuery = this.session.createSQLQuery(generateQuery);
 
-		this.addScalar(createSQLQuery);
+		this.addScalarWithoutFieldmap(createSQLQuery);
 		createSQLQuery.addScalar("LocationName");
 		createSQLQuery.addScalar("LocationAbbreviation");
 		createSQLQuery.addScalar("FieldMapColumn");
 		createSQLQuery.addScalar("FieldMapRow");
+		createSQLQuery.addScalar("yearString", new StringType());
 		this.addScalarForTraits(measurementVariables, createSQLQuery);
 		return createSQLQuery;
+	}
+
+	private void addScalarWithoutFieldmap(final SQLQuery createSQLQuery) {
+		createSQLQuery.addScalar("nd_experiment_id");
+		createSQLQuery.addScalar("TRIAL_INSTANCE");
+		createSQLQuery.addScalar("ENTRY_TYPE");
+		createSQLQuery.addScalar("GID");
+		createSQLQuery.addScalar("DESIGNATION");
+		createSQLQuery.addScalar("ENTRY_NO");
+		createSQLQuery.addScalar("ENTRY_CODE");
+		createSQLQuery.addScalar("REP_NO");
+		createSQLQuery.addScalar("PLOT_NO");
+		createSQLQuery.addScalar("BLOCK_NO");
+		createSQLQuery.addScalar("ROW");
+		createSQLQuery.addScalar("COL");
+		createSQLQuery.addScalar("PLOT_ID", new StringType());
 	}
 }
