@@ -13,7 +13,9 @@ package org.generationcp.middleware.manager;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import org.generationcp.middleware.IntegrationTestBase;
@@ -39,9 +41,9 @@ import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchDataset;
 import org.generationcp.middleware.pojos.workbench.WorkbenchRuntimeData;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.utils.test.Debug;
-import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,6 +51,10 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.collect.Lists;
+
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
 
 public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
@@ -877,9 +883,9 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final WorkbenchDataManager workbenchDataManager = Mockito.mock(WorkbenchDataManager.class);
 
 		Mockito.when(workbenchDataManager.getAllUsersSortedByLastName()).thenReturn(users);
-		MatcherAssert.assertThat("Expected list users not null.", users != null);
-		MatcherAssert.assertThat("Expected list users not empty.", !users.isEmpty());
-		MatcherAssert.assertThat("Expected list users size 1.", users.size() == 1);
+		assertThat("Expected list users not null.", users != null);
+		assertThat("Expected list users not empty.", !users.isEmpty());
+		assertThat("Expected list users size 1.", users.size() == 1);
 
 	}
 
@@ -888,8 +894,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final UserDto userDto = this.workbenchTestDataUtil.createTestUserDTO(0);
 		final Integer result = this.workbenchDataManager.createUser(userDto);
 
-		MatcherAssert.assertThat("Expected id of a newly saved record in workbench_user.", result != null);
-		MatcherAssert.assertThat("Expected id of new user distinct of 0", !result.equals(0));
+		assertThat("Expected id of a newly saved record in workbench_user.", result != null);
+		assertThat("Expected id of new user distinct of 0", !result.equals(0));
 	}
 
 	@Test
@@ -900,8 +906,36 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		userDto.setRole("BREEDER");
 		final Integer result = this.workbenchDataManager.updateUser(userDto);
 
-		MatcherAssert.assertThat("Expected id of userDto saved record in workbench_user.", result != null);
-		MatcherAssert.assertThat("Expected the same id of userDto saved record ", result.equals(userId));
+		assertThat("Expected id of userDto saved record in workbench_user.", result != null);
+		assertThat("Expected the same id of userDto saved record ", result.equals(userId));
 	}
 
+	@Test
+	public void testCountProjectsByFilter() throws MiddlewareQueryException {
+		final List<Project> projects = this.workbenchDataManager.getProjects();
+		final Map<ProgramFilters, Object> filters = new HashMap<>();
+		if(!projects.isEmpty()){
+			Project project = projects.get(0);
+			filters.put(ProgramFilters.CROP_TYPE, project.getCropType());
+			filters.put(ProgramFilters.PROGRAM_NAME, project.getProjectName());
+			long count = this.workbenchDataManager.countProjectsByFilter(filters);
+			assertThat(new Long(1),is(equalTo(count)));
+
+		}
+	}
+
+	@Test
+	public void testgetProjectsbyFilters() throws MiddlewareQueryException {
+		final List<Project> projects = this.workbenchDataManager.getProjects();
+		final Map<ProgramFilters, Object> filters = new HashMap<>();
+		if(!projects.isEmpty()){
+			Project project = projects.get(0);
+			filters.put(ProgramFilters.CROP_TYPE, project.getCropType());
+			List<Project> Projects = this.workbenchDataManager.getProjects(1, 100, filters);
+			assertThat(project.getProjectId(),is(equalTo(Projects.get(0).getProjectId())));
+			assertThat(project.getCropType().getCropName(),is(equalTo(Projects.get(0).getCropType().getCropName())));
+			assertThat(project.getProjectName(),is(equalTo(Projects.get(0).getProjectName())));
+
+		}
+	}
 }
