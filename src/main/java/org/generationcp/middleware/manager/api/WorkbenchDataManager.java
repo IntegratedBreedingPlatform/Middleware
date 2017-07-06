@@ -41,6 +41,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserDto;
 
 /**
@@ -63,6 +64,24 @@ public interface WorkbenchDataManager {
 	 * @return the projects
 	 */
 	List<Project> getProjects(int start, int numOfRows);
+
+	/**
+	 * Gets count projects.
+	 *
+	 * @param filters - the number of rows to retrieve
+	 * @return the number of all the projects
+	 */
+	long countProjectsByFilter(final Map<ProgramFilters, Object> filters);
+
+	/**
+	 * Gets the projects.
+	 *
+	 * @param start - the starting record
+	 * @param numOfRows - the number of rows to retrieve
+	 * @param filters - the filters that to be included in the query
+	 * @return All projects based on the given start, numOfRows and filters Map
+	 */
+	List<Project> getProjects(final int start, final int numOfRows,final Map<ProgramFilters, Object> filters);
 
 	/**
 	 * Gets a project by Uuid. Should return only one value.
