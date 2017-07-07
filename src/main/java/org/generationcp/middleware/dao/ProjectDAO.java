@@ -144,15 +144,15 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 	public List<Project> getProjectsByFilter(final int pageNumber,final int pageSize, final Map<ProgramFilters, Object> filters)
 		throws MiddlewareException {
 		try {
-			Criteria criteria = this.getSession().createCriteria(Project.class);
+			final Criteria criteria = this.getSession().createCriteria(Project.class);
 			for (Map.Entry<ProgramFilters, Object> entry : filters.entrySet()) {
-				ProgramFilters filter = entry.getKey();
-				Object value = entry.getValue();
+				final ProgramFilters filter = entry.getKey();
+				final Object value = entry.getValue();
 				criteria.add(Restrictions.eq(filter.getStatement(), value));
 			}
 
-			int start = pageSize * (pageNumber - 1);
-			int numOfRows = pageSize;
+			final int start = pageSize * (pageNumber - 1);
+			final int numOfRows = pageSize;
 
 			criteria.setFirstResult(start);
 			criteria.setMaxResults(numOfRows);
@@ -165,10 +165,10 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 
 	public long countProjectsByFilter(final Map<ProgramFilters, Object> filters) throws MiddlewareException {
 		try {
-			Criteria criteria = this.getSession().createCriteria(Project.class);
+			final Criteria criteria = this.getSession().createCriteria(Project.class);
 			for (Map.Entry<ProgramFilters, Object> entry : filters.entrySet()) {
-				ProgramFilters filter = entry.getKey();
-				Object value = entry.getValue();
+				final ProgramFilters filter = entry.getKey();
+				final Object value = entry.getValue();
 				criteria.add(Restrictions.eq(filter.getStatement(), value));
 			}
 
