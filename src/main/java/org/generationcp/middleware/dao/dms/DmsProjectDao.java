@@ -74,6 +74,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final int STUDY_STATUS = TermId.STUDY_STATUS.getId();
 
 	private static final String PROGRAM_UUID = "program_uuid";
+
+	private static final String VALUE = "value";
+
+	private static final String TYPE_ID = "typeId";
+
+	private static final String PROJECT_ID = "projectId";
 	
 	private static final int START_DATE = TermId.START_DATE.getId();
 
@@ -223,7 +229,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public List<Reference> getChildrenOfFolder(Integer folderId, String programUUID, List<StudyType> studyTypes) {
 
-		List<Reference> childrenNodes = new ArrayList<Reference>();
+		List<Reference> childrenNodes = new ArrayList<>();
 		
 		if (studyTypes == null || studyTypes.isEmpty()) {
 			throw new MiddlewareQueryException("Missing required parameter. At least one study type must be specified.");
@@ -250,7 +256,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				// project.description
 				String description = (String) row[2];
 				// non-zero if a study, else a folder
-				Integer isStudy = ((Integer) row[3]).intValue();
+				Integer isStudy = ((Integer) row[3]);
 				// project.program_uuid
 				String projectUUID = (String) row[4];
 				
@@ -273,7 +279,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public List<DatasetReference> getDatasetNodesByStudyId(Integer studyId) throws MiddlewareQueryException {
 
-		List<DatasetReference> datasetReferences = new ArrayList<DatasetReference>();
+		List<DatasetReference> datasetReferences = new ArrayList<>();
 
 		try {
 
@@ -283,7 +289,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
 
 			ProjectionList projectionList = Projections.projectionList();
-			projectionList.add(Projections.property("projectId"));
+			projectionList.add(Projections.property(DmsProjectDao.PROJECT_ID));
 			projectionList.add(Projections.property("name"));
 			projectionList.add(Projections.property("description"));
 			projectionList.add(Projections.property("pr.objectProject.projectId"));
@@ -322,11 +328,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			this.logAndThrowException("Error in getStudiesByName=" + name + " query on DmsProjectDao: " + e.getMessage(), e);
 		}
 
-		return new ArrayList<DmsProject>();
+		return new ArrayList<>();
 	}
 
 	public List<DmsProject> getStudiesByUserIds(Collection<Integer> userIds) throws MiddlewareQueryException {
-		List<Object> userIdStrings = new ArrayList<Object>();
+		List<Object> userIdStrings = new ArrayList<>();
 		if (userIds != null && !userIds.isEmpty()) {
 			for (Integer userId : userIds) {
 				userIdStrings.add(userId.toString());
@@ -355,14 +361,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			this.logAndThrowException("Error in getStudiesByStudyProperty with " + valueExpression + " for property " + studyPropertyId
 					+ " in DmsProjectDao: " + e.getMessage(), e);
 		}
-		return new ArrayList<DmsProject>();
+		return new ArrayList<>();
 	}
 
 	public List<DmsProject> getStudiesByIds(Collection<Integer> projectIds) throws MiddlewareQueryException {
 		try {
 			if (projectIds != null && !projectIds.isEmpty()) {
 				Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-				criteria.add(Restrictions.in("projectId", projectIds));
+				criteria.add(Restrictions.in(DmsProjectDao.PROJECT_ID, projectIds));
 				criteria.createAlias("relatedTos", "pr");
 				criteria.add(Restrictions.eq("pr.typeId", TermId.IS_STUDY.getId()));
 				criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
@@ -372,7 +378,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in getStudiesByIds= " + projectIds + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
-		return new ArrayList<DmsProject>();
+		return new ArrayList<>();
 	}
 
 	public List<DmsProject> getDatasetsByStudy(Integer studyId) throws MiddlewareQueryException {
@@ -387,7 +393,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in getDatasetsByStudy= " + studyId + " query in DmsProjectDao: " + e.getMessage(), e);
 		}
-		return new ArrayList<DmsProject>();
+		return new ArrayList<>();
 	}
 
 	public DmsProject getParentStudyByDataset(Integer datasetId) throws MiddlewareQueryException {
@@ -408,7 +414,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<DmsProject> getStudyAndDatasetsById(Integer projectId) throws MiddlewareQueryException {
-		Set<DmsProject> projects = new HashSet<DmsProject>();
+		Set<DmsProject> projects = new HashSet<>();
 
 		DmsProject project = this.getById(projectId);
 		if (project != null) {
@@ -426,7 +432,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			}
 		}
 
-		return new ArrayList<DmsProject>(projects);
+		return new ArrayList<>(projects);
 	}
 
 	public List<DmsProject> getByFactor(Integer factorId) throws MiddlewareQueryException {
@@ -441,15 +447,15 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error getByFactor=" + factorId + " at DmsProjectDao: " + e.getMessage(), e);
 		}
-		return new ArrayList<DmsProject>();
+		return new ArrayList<>();
 	}
 
 	public List<DmsProject> getByIds(Collection<Integer> projectIds) throws MiddlewareQueryException {
-		List<DmsProject> studyNodes = new ArrayList<DmsProject>();
+		List<DmsProject> studyNodes = new ArrayList<>();
 		try {
 			if (projectIds != null && !projectIds.isEmpty()) {
 				Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-				criteria.add(Restrictions.in("projectId", projectIds));
+				criteria.add(Restrictions.in(DmsProjectDao.PROJECT_ID, projectIds));
 				criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 
 				return criteria.list();
@@ -461,7 +467,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<DmsProject> getProjectsByFolder(Integer folderId, int start, int numOfRows) throws MiddlewareQueryException {
-		List<DmsProject> projects = new ArrayList<DmsProject>();
+		List<DmsProject> projects = new ArrayList<>();
 		if (folderId == null) {
 			return projects;
 		}
@@ -519,11 +525,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			this.logAndThrowException(
 					"Error in getDataSetsByProjectProperty(" + type + ", " + value + ") query in DmsProjectDao: " + e.getMessage(), e);
 		}
-		return new ArrayList<DmsProject>();
+		return new ArrayList<>();
 	}
 
 	public List<StudyReference> getStudiesByTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
-		List<StudyReference> studies = new ArrayList<StudyReference>();
+		List<StudyReference> studies = new ArrayList<>();
 		try {
 			String sql =
 					"SELECT p.project_id, p.name, p.description, count(DISTINCT e.nd_geolocation_id)" + " FROM project p"
@@ -573,7 +579,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public List<StudyDetails> getAllStudyDetails(StudyType studyType, String programUUID, int start, int numOfRows)
 			throws MiddlewareQueryException {
-		List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
+		List<StudyDetails> studyDetails = new ArrayList<>();
 
 		StringBuilder sqlString =
 				new StringBuilder()
@@ -671,8 +677,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					this.getSession().createSQLQuery(
 							"SELECT pp.value FROM project p " + " INNER JOIN projectprop pp ON p.project_id = pp.project_id "
 									+ " WHERE p.project_id = :projectId AND pp.type_id = :typeId");
-			query.setParameter("projectId", studyId);
-			query.setParameter("typeId", TermId.STUDY_TYPE.getId());
+			query.setParameter(DmsProjectDao.PROJECT_ID, studyId);
+			query.setParameter(DmsProjectDao.TYPE_ID, TermId.STUDY_TYPE.getId());
 			Object queryResult = query.uniqueResult();
 			if (queryResult != null) {
 				return StudyType.getStudyTypeById(Integer.valueOf((String) queryResult));
@@ -754,7 +760,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 					studyDetails =
 							new StudyDetails(id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId);
-					studyDetails.setParentFolderId(Long.valueOf(folderId));
+					studyDetails.setParentFolderId(folderId.longValue());
 					studyDetails.setProgramUUID(programUUID);
 				}
 			}
@@ -822,7 +828,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(String programUUID, int start, int numOfRows)
 			throws MiddlewareQueryException {
-		List<StudyDetails> studyDetails = new ArrayList<StudyDetails>();
+		List<StudyDetails> studyDetails = new ArrayList<>();
 		try {
 
 			StringBuilder sqlString =
@@ -986,7 +992,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	 */
 
 	public List<StudyNode> getAllNurseryAndTrialStudyNodes(String programUUID) throws MiddlewareQueryException {
-		List<StudyNode> studyNodes = new ArrayList<StudyNode>();
+		List<StudyNode> studyNodes = new ArrayList<>();
 
 		StringBuilder sqlString =
 				new StringBuilder().append("SELECT DISTINCT p.project_id AS id ").append("        , p.name AS name ")
@@ -1066,7 +1072,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<FolderReference> getAllFolders() throws MiddlewareQueryException {
-		List<FolderReference> folders = new ArrayList<FolderReference>();
+		List<FolderReference> folders = new ArrayList<>();
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(DmsProjectDao.GET_ALL_FOLDERS);
 			List<Object[]> result = query.list();
@@ -1095,7 +1101,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<ValueReference> getDistinctProjectNames() throws MiddlewareQueryException {
-		List<ValueReference> results = new ArrayList<ValueReference>();
+		List<ValueReference> results = new ArrayList<>();
 		try {
 			String sql = "SELECT DISTINCT name FROM project ";
 			SQLQuery query = this.getSession().createSQLQuery(sql);
@@ -1112,7 +1118,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<ValueReference> getDistinctProjectDescriptions() throws MiddlewareQueryException {
-		List<ValueReference> results = new ArrayList<ValueReference>();
+		List<ValueReference> results = new ArrayList<>();
 		try {
 			String sql = "SELECT DISTINCT description FROM project ";
 			SQLQuery query = this.getSession().createSQLQuery(sql);
@@ -1134,7 +1140,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.setParameter("studyDbId", studyDbId);
 			return (Integer) query.uniqueResult();
 		} catch (HibernateException e) {
-			this.LOG.error(e.getMessage(), e);
+			LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 	}
@@ -1156,7 +1162,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	public List<String> getAllSharedProjectNames() throws MiddlewareQueryException {
-		List<String> results = new ArrayList<String>();
+		List<String> results = new ArrayList<>();
 		try {
 			String sql = "SELECT name FROM project WHERE program_uuid is null";
 			SQLQuery query = this.getSession().createSQLQuery(sql);
@@ -1189,10 +1195,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		criteria.add(Restrictions.eq("pr.typeId", TermId.STUDY_TYPE.getId()));
 
 		final DetachedCriteria inactive = DetachedCriteria.forClass(ProjectProperty.class);
-		inactive.add(Restrictions.eq("typeId", Integer.valueOf(DmsProjectDao.STUDY_STATUS)));
-		inactive.add(Restrictions.eq("value", String.valueOf(DmsProjectDao.DELETED_STUDY)));
+		inactive.add(Restrictions.eq(DmsProjectDao.TYPE_ID, Integer.valueOf(DmsProjectDao.STUDY_STATUS)));
+		inactive.add(Restrictions.eq(DmsProjectDao.VALUE, String.valueOf(DmsProjectDao.DELETED_STUDY)));
 		inactive.setProjection(Projections.property("project.projectId"));
-		criteria.add(Property.forName("projectId").notIn(inactive));
+		criteria.add(Property.forName(DmsProjectDao.PROJECT_ID).notIn(inactive));
 
 		if (programDbId != null) {
 			criteria.add(Restrictions.eq("programUUID", programDbId));
@@ -1203,30 +1209,30 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (locationDbId != null) {
 			final DetachedCriteria ppLocation = DetachedCriteria.forClass(ProjectProperty.class);
 
-			ppLocation.add(Restrictions.eq("typeId", DmsProjectDao.LOCATION_ABBR));
-			ppLocation.add(Restrictions.ilike("value", '%' + locationDbId.toLowerCase() + '%'));
+			ppLocation.add(Restrictions.eq(DmsProjectDao.TYPE_ID, DmsProjectDao.LOCATION_ABBR));
+			ppLocation.add(Restrictions.ilike(DmsProjectDao.VALUE, '%' + locationDbId.toLowerCase() + '%'));
 			ppLocation.setProjection(Projections.property("project.projectId"));
 
-			criteria.add(Property.forName("projectId").in(ppLocation));
+			criteria.add(Property.forName(DmsProjectDao.PROJECT_ID).in(ppLocation));
 		}
 
 		if (seasonDbId != null) {
 			final DetachedCriteria ppStartDate = DetachedCriteria.forClass(ProjectProperty.class);
 
-			ppStartDate.add(Restrictions.eq("typeId", Integer.valueOf(DmsProjectDao.START_DATE)));
+			ppStartDate.add(Restrictions.eq(DmsProjectDao.TYPE_ID, Integer.valueOf(DmsProjectDao.START_DATE)));
 			ppStartDate.setProjection(Projections.property("project.projectId"));
 			ppStartDate.add(Restrictions.sqlRestriction("lower(substring(value, 1, 4)) like ?", '%' + seasonDbId.toLowerCase() + '%',
 					new StringType()));
 
 			final DetachedCriteria ppSeason = DetachedCriteria.forClass(ProjectProperty.class);
-			ppSeason.add(Restrictions.eq("typeId", DmsProjectDao.SEASON_VAR_TEXT));
-			ppSeason.add(Restrictions.ilike("value", '%' + seasonDbId.toLowerCase() + '%'));
+			ppSeason.add(Restrictions.eq(DmsProjectDao.TYPE_ID, DmsProjectDao.SEASON_VAR_TEXT));
+			ppSeason.add(Restrictions.ilike(DmsProjectDao.VALUE, '%' + seasonDbId.toLowerCase() + '%'));
 			ppSeason.setProjection(Projections.property("project.projectId"));
 
-			criteria.add(Restrictions.or(Property.forName("projectId").in(ppStartDate), Property.forName("projectId").in(ppSeason)));
+			criteria.add(Restrictions.or(Property.forName(DmsProjectDao.PROJECT_ID).in(ppStartDate), Property.forName(DmsProjectDao.PROJECT_ID).in(ppSeason)));
 		}
 
-		criteria.addOrder(Order.asc("projectId"));
+		criteria.addOrder(Order.asc(DmsProjectDao.PROJECT_ID));
 		return criteria;
 	}
 
