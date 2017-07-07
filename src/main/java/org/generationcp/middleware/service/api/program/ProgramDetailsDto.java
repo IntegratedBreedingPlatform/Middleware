@@ -91,7 +91,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 	}
 
 	@Override
-	public int compareTo(ProgramDetailsDto compareProgramDetails) {
+	public int compareTo(final ProgramDetailsDto compareProgramDetails) {
 		Integer id = compareProgramDetails.getProgramDbId();
 		return this.programDbId.compareTo(id);
 	}
