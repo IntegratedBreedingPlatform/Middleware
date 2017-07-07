@@ -931,6 +931,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		if(!projects.isEmpty()){
 			Project project = projects.get(0);
 			filters.put(ProgramFilters.CROP_TYPE, project.getCropType());
+			filters.put(ProgramFilters.PROGRAM_NAME, project.getProjectName());
 			List<Project> Projects = this.workbenchDataManager.getProjects(1, 100, filters);
 			assertThat(project.getProjectId(),is(equalTo(Projects.get(0).getProjectId())));
 			assertThat(project.getCropType().getCropName(),is(equalTo(Projects.get(0).getCropType().getCropName())));
