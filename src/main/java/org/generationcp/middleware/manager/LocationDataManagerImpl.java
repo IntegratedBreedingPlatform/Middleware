@@ -49,8 +49,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class LocationDataManagerImpl extends DataManager implements LocationDataManager {
 
-	private static final String COUNT_BY_TYPE="countByType";
-	private static final String GET_BY_TYPE="getByType";
+	private static final String COUNT_BY_TYPE = "countByType";
+	private static final String GET_BY_TYPE = "getByType";
 
 
 	public LocationDataManagerImpl() {
@@ -170,34 +170,34 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<Location> getLocationsByType(final Integer type) throws MiddlewareQueryException {
-		return this.getAllByMethod(this.getLocationDao(), GET_BY_TYPE, new Object[] { type },
+		return this.getAllByMethod(this.getLocationDao(), LocationDataManagerImpl.GET_BY_TYPE, new Object[] { type },
 				new Class[] { Integer.class });
 	}
 
 	@Override
 	public List<Location> getLocationsByType(final Integer type, final String programUUID)
 			throws MiddlewareQueryException {
-		return this.getAllByMethod(this.getLocationDao(), GET_BY_TYPE, new Object[] { type, programUUID },
+		return this.getAllByMethod(this.getLocationDao(), LocationDataManagerImpl.GET_BY_TYPE, new Object[] { type, programUUID },
 				new Class[] { Integer.class, String.class });
 	}
 
 	@Override
 	public List<Location> getLocationsByType(final Integer type, final int start, final int numOfRows)
 			throws MiddlewareQueryException {
-		final List<String> methods = Arrays.asList(COUNT_BY_TYPE, GET_BY_TYPE);
+		final List<String> methods = Arrays.asList(LocationDataManagerImpl.COUNT_BY_TYPE, LocationDataManagerImpl.GET_BY_TYPE);
 		return this.getFromCentralAndLocalByMethod(this.getLocationDao(), methods, start, numOfRows,
 				new Object[] { type }, new Class[] { Integer.class });
 	}
 
 	@Override
 	public long countLocationsByType(final Integer type) throws MiddlewareQueryException {
-		return this.countAllByMethod(this.getLocationDao(), COUNT_BY_TYPE, new Object[] { type },
+		return this.countAllByMethod(this.getLocationDao(), LocationDataManagerImpl.COUNT_BY_TYPE, new Object[] { type },
 				new Class[] { Integer.class });
 	}
 
 	@Override
 	public long countLocationsByType(final Integer type, final String programUUID) throws MiddlewareQueryException {
-		return this.countAllByMethod(this.getLocationDao(), COUNT_BY_TYPE, new Object[] { type, programUUID },
+		return this.countAllByMethod(this.getLocationDao(), LocationDataManagerImpl.COUNT_BY_TYPE, new Object[] { type, programUUID },
 				new Class[] { Integer.class, String.class });
 	}
 
