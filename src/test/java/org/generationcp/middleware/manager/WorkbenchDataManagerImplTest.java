@@ -915,10 +915,10 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final List<Project> projects = this.workbenchDataManager.getProjects();
 		final Map<ProgramFilters, Object> filters = new HashMap<>();
 		if(!projects.isEmpty()){
-			Project project = projects.get(0);
+			final  Project project = projects.get(0);
 			filters.put(ProgramFilters.CROP_TYPE, project.getCropType());
 			filters.put(ProgramFilters.PROGRAM_NAME, project.getProjectName());
-			long count = this.workbenchDataManager.countProjectsByFilter(filters);
+			final  long count = this.workbenchDataManager.countProjectsByFilter(filters);
 			assertThat(new Long(1),is(equalTo(count)));
 
 		}
