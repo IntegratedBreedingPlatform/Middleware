@@ -925,7 +925,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testgetProjectsbyFilters() throws MiddlewareQueryException {
+	public void testGetProjectsbyFilters() throws MiddlewareQueryException {
 		final List<Project> projects = this.workbenchDataManager.getProjects();
 		final Map<ProgramFilters, Object> filters = new HashMap<>();
 		if(!projects.isEmpty()){
