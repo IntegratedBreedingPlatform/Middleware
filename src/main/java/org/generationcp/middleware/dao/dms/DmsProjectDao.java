@@ -1196,6 +1196,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		if (programDbId != null) {
 			criteria.add(Restrictions.eq("programUUID", programDbId));
+		}else{
+			criteria.add(Restrictions.isNotNull("programUUID"));
 		}
 
 		if (locationDbId != null) {
