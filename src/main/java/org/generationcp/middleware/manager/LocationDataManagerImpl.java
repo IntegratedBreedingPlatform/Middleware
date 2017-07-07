@@ -49,6 +49,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class LocationDataManagerImpl extends DataManager implements LocationDataManager {
 
+	private static final String COUNT_BY_TYPE="countByType";
+	private static final String GET_BY_TYPE="getByType";
+
+
 	public LocationDataManagerImpl() {
 	}
 
@@ -77,7 +81,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<Location> getLocationsByUniqueID(final String programUUID) throws MiddlewareQueryException {
-		final List<Location> locations = new ArrayList<Location>();
+		final List<Location> locations = new ArrayList<>();
 		locations.addAll(this.getLocationDao().getByUniqueID(programUUID));
 		return locations;
 	}
@@ -91,7 +95,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<Location> getLocationsByName(final String name, final Operation op, final String programUUID)
 			throws MiddlewareQueryException {
-		final List<Location> locations = new ArrayList<Location>();
+		final List<Location> locations = new ArrayList<>();
 		locations.addAll(this.getLocationDao().getByNameAndUniqueID(name, op, programUUID));
 		return locations;
 	}
@@ -117,7 +121,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	@Deprecated
 	public List<Location> getLocationsByName(final String name, final Operation op) throws MiddlewareQueryException {
-		final List<Location> locations = new ArrayList<Location>();
+		final List<Location> locations = new ArrayList<>();
 		locations.addAll(this.getLocationDao().getByName(name, op));
 		return locations;
 	}
@@ -166,34 +170,34 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 
 	@Override
 	public List<Location> getLocationsByType(final Integer type) throws MiddlewareQueryException {
-		return this.getAllByMethod(this.getLocationDao(), "getByType", new Object[] { type },
+		return this.getAllByMethod(this.getLocationDao(), GET_BY_TYPE, new Object[] { type },
 				new Class[] { Integer.class });
 	}
 
 	@Override
 	public List<Location> getLocationsByType(final Integer type, final String programUUID)
 			throws MiddlewareQueryException {
-		return this.getAllByMethod(this.getLocationDao(), "getByType", new Object[] { type, programUUID },
+		return this.getAllByMethod(this.getLocationDao(), GET_BY_TYPE, new Object[] { type, programUUID },
 				new Class[] { Integer.class, String.class });
 	}
 
 	@Override
 	public List<Location> getLocationsByType(final Integer type, final int start, final int numOfRows)
 			throws MiddlewareQueryException {
-		final List<String> methods = Arrays.asList("countByType", "getByType");
+		final List<String> methods = Arrays.asList(COUNT_BY_TYPE, GET_BY_TYPE);
 		return this.getFromCentralAndLocalByMethod(this.getLocationDao(), methods, start, numOfRows,
 				new Object[] { type }, new Class[] { Integer.class });
 	}
 
 	@Override
 	public long countLocationsByType(final Integer type) throws MiddlewareQueryException {
-		return this.countAllByMethod(this.getLocationDao(), "countByType", new Object[] { type },
+		return this.countAllByMethod(this.getLocationDao(), COUNT_BY_TYPE, new Object[] { type },
 				new Class[] { Integer.class });
 	}
 
 	@Override
 	public long countLocationsByType(final Integer type, final String programUUID) throws MiddlewareQueryException {
-		return this.countAllByMethod(this.getLocationDao(), "countByType", new Object[] { type, programUUID },
+		return this.countAllByMethod(this.getLocationDao(), COUNT_BY_TYPE, new Object[] { type, programUUID },
 				new Class[] { Integer.class, String.class });
 	}
 
@@ -205,7 +209,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public Map<String, UserDefinedField> getUserDefinedFieldMapOfCodeByUDTableType(final UDTableType type)
 			throws MiddlewareQueryException {
-		final Map<String, UserDefinedField> types = new HashMap<String, UserDefinedField>();
+		final Map<String, UserDefinedField> types = new HashMap<>();
 
 		final List<UserDefinedField> dTypeFields = this.getUserDefinedFieldByFieldTableNameAndType(type.getTable(),
 				type.getType());
@@ -218,7 +222,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public Integer getUserDefinedFieldIdOfCode(final UDTableType tableType, final String code)
 			throws MiddlewareQueryException {
-		final Map<String, UserDefinedField> types = new HashMap<String, UserDefinedField>();
+		final Map<String, UserDefinedField> types = new HashMap<>();
 
 		final List<UserDefinedField> dTypeFields = this.getUserDefinedFieldByFieldTableNameAndType(tableType.getTable(),
 				tableType.getType());
@@ -276,7 +280,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<Integer> addLocation(final List<Location> locations) throws MiddlewareQueryException {
 
-		final List<Integer> idLocationsSaved = new ArrayList<Integer>();
+		final List<Integer> idLocationsSaved = new ArrayList<>();
 		try {
 
 			final LocationDAO dao = this.getLocationDao();
@@ -415,7 +419,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 				.getUserDefinedFieldMapOfCodeByUDTableType(UDTableType.LOCDES_DTYPE);
 
 		final List<Locdes> locdesOfLocation = this.getLocdesDao().getByLocation(blockId);
-		final List<String> deletedPlots = new ArrayList<String>();
+		final List<String> deletedPlots = new ArrayList<>();
 
 		for (final Locdes locdes : locdesOfLocation) {
 			if (locdes != null) {
@@ -456,12 +460,12 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		final List<Location> locations = super.getAllByMethod(this.getLocationDao(), "getByTypeWithParent",
 				new Object[] { fieldLtype, relationshipType }, new Class[] { Integer.class, Integer.class });
 
-		final Set<Integer> parentIds = new HashSet<Integer>();
+		final Set<Integer> parentIds = new HashSet<>();
 		for (final Location location : locations) {
 			parentIds.add(location.getParentLocationId());
 		}
 
-		final Map<Integer, Location> namesMap = new HashMap<Integer, Location>();
+		final Map<Integer, Location> namesMap = new HashMap<>();
 		if (!parentIds.isEmpty()) {
 			namesMap.putAll(this.getLocationDao().getNamesByIdsIntoMap(parentIds));
 		}
@@ -585,9 +589,9 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	public List<LocationDetailsDto> getLocationsByFilter(final int pageNumber,final int pageSize, final Map<LocationFilters, Object> filters)
 			throws MiddlewareQueryException {
 		final List<LocationDetailsDto> locationsDetailsDto = this.getLocationDao().getLocationsByFilter(pageNumber, pageSize, filters);
-		final List<String> locations = new ArrayList<String>();
+		final List<String> locations = new ArrayList<>();
 
-		if (locationsDetailsDto.size() != 0) {
+		if (!locationsDetailsDto.isEmpty()) {
 			for (LocationDetailsDto locationDto : locationsDetailsDto) {
 				locations.add(locationDto.getLocationDbId().toString());
 
@@ -600,7 +604,7 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public Integer getUserDefinedFieldIdOfName(final UDTableType tableType, final String name)
 			throws MiddlewareQueryException {
-		final Map<String, UserDefinedField> types = new HashMap<String, UserDefinedField>();
+		final Map<String, UserDefinedField> types = new HashMap<>();
 
 		final List<UserDefinedField> dTypeFields = this.getUserDefinedFieldByFieldTableNameAndType(tableType.getTable(),
 				tableType.getType());
@@ -630,10 +634,10 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		locations =listLocation.toArray(locations);
 		final List<Locdes> listFieldParent = this.getLocdesDao().getAllLocationDescriptionsByFilters(LocdesType.FIELD_PARENT.getCode(), locations);
 		final Map<String, UserDefinedField> dTypes = this.getUserDefinedFieldMapOfCodeByUDTableType(UDTableType.LOCDES_DTYPE);
-		final Map<Integer, AdditionalInfoDto> mapAdditionalInfoDto = new HashMap<Integer, AdditionalInfoDto>();
+		final Map<Integer, AdditionalInfoDto> mapAdditionalInfoDto = new HashMap<>();
 
 		if (listFieldParent.isEmpty()) {
-			return new HashMap<Integer, AdditionalInfoDto>();
+			return new HashMap<>();
 		}
 
 		for (Locdes fieldParent : listFieldParent) {
