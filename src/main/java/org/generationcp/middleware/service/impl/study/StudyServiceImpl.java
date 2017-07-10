@@ -93,6 +93,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 		+ SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE
 		+ " and ph.value is not null ";
 
+	public static final String yearText =
+		"select value from project p inner join projectprop pp" + " on pp.project_id = p.project_id where  pp.type_id = '8050' and "
+			+ " p.project_id = :projectId";
+
 	private final String TRIAL_TYPE = "T";
 
 	private MeasurementVariableService measurementVariableService;
@@ -395,12 +399,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 
 		List<List<String>> data = Lists.newArrayList();
-
+		String year = this.getYearFromStudy(studyIdentifier);
 
 		if (!CollectionUtils.isEmpty(results)) {
 
 			for (Object[] row : results) {
 				final List<String> entry = Lists.newArrayList();
+
+				entry.add(year);
 
 				// locationDbId = trial instance number
 				// In brapi this will equate to studyDbId
@@ -546,6 +552,13 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public StudyServiceImpl setUserDataManager(final UserDataManager userDataManager) {
 		this.userDataManager = userDataManager;
 		return this;
+	}
+
+	private String getYearFromStudy(final int studyIdentifier) {
+		final SQLQuery query = this.getCurrentSession().createSQLQuery(yearText);
+		query.setParameter("projectId", studyIdentifier);
+		Object result = query.uniqueResult();
+		return result.toString().substring(0, 4);
 	}
 }
 

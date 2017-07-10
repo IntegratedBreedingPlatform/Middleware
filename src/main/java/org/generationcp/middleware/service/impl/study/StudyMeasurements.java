@@ -149,9 +149,6 @@ public class StudyMeasurements {
 			createSQLQuery.setParameter("instanceId", instanceId);
 		}
 
-		createSQLQuery.setParameter("projectId", Integer.valueOf(projectBusinessIdentifier));
-
-
 		final List<Object[]> result = createSQLQuery.list();
 		return result;
 	}
@@ -164,7 +161,6 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar("LocationAbbreviation");
 		createSQLQuery.addScalar("FieldMapColumn");
 		createSQLQuery.addScalar("FieldMapRow");
-		createSQLQuery.addScalar("yearString", new StringType());
 		this.addScalarForTraits(measurementVariables, createSQLQuery);
 		return createSQLQuery;
 	}
