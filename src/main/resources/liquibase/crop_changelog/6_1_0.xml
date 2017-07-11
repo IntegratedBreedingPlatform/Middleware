@@ -1,0 +1,64 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+
+	<changeSet author="nahuel" id="v6.1-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="projectprop" columnName="variable_id"/>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `projectprop_old` (
+			`projectprop_id` INT(11) NOT NULL AUTO_INCREMENT,
+			`project_id`     INT(11) NOT NULL,
+			`type_id`        INT(11) NOT NULL,
+			`value`          VARCHAR(255)     DEFAULT NULL,
+			`rank`           INT(11) NOT NULL DEFAULT '0',
+			PRIMARY KEY (`projectprop_id`)
+			) AS SELECT *
+			 FROM projectprop;
+
+			CREATE TABLE `projectprop_new` (
+			`projectprop_id` int(11) NOT NULL AUTO_INCREMENT,
+			`project_id` int(11) NOT NULL,
+			`type_id` int(11) NOT NULL,
+			`value` varchar(255) DEFAULT NULL,
+			`rank` int(11) NOT NULL DEFAULT '0',
+			`variable_id` int(11) NOT NULL,
+			`alias` varchar(255) DEFAULT NULL,
+			PRIMARY KEY (`projectprop_id`)
+			) AS SELECT
+			   pp.projectprop_id,
+			   pp.project_id,
+			   pptype.type_id 'type_id',
+			   ppvalue.value  'value',
+			   pp.rank,
+			   pp.value       'variable_id',
+			   pptype.value   'alias'
+			 FROM projectprop pp
+			   INNER JOIN projectprop pptype ON pptype.rank = pp.rank
+												AND pptype.project_id = pp.project_id
+												AND pptype.type_id != 1060 -- Variable description
+												AND pptype.type_id != 1070 -- Standardvariableid
+												AND pp.value != pptype.type_id
+			   LEFT JOIN projectprop ppvalue ON pp.value = ppvalue.type_id
+												AND pp.rank = ppvalue.rank
+												AND pp.project_id = ppvalue.project_id
+			   LEFT JOIN cvterm variable ON pp.value = variable.cvterm_id
+			 WHERE pp.type_id = 1070
+			 ORDER BY pp.project_id, pp.rank;
+
+			DROP TABLE projectprop;
+
+			RENAME TABLE
+			projectprop_new TO projectprop;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
