@@ -66,6 +66,12 @@ public class ProjectProperty implements Serializable {
 	@Column(name = "rank")
 	private Integer rank;
 
+	@Column(name = "variable_id")
+	private Integer variableId;
+
+	@Column(name = "alias")
+	private String alias;
+
 	public ProjectProperty() {
 	}
 
@@ -116,6 +122,22 @@ public class ProjectProperty implements Serializable {
 		this.rank = rank;
 	}
 
+	public Integer getVariableId() {
+		return variableId;
+	}
+
+	public void setVariableId(Integer variableId) {
+		this.variableId = variableId;
+	}
+
+	public String getAlias() {
+		return alias;
+	}
+
+	public void setAlias(String alias) {
+		this.alias = alias;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -159,6 +181,10 @@ public class ProjectProperty implements Serializable {
 		builder.append(this.value);
 		builder.append(", rank=");
 		builder.append(this.rank);
+		builder.append(", variable_id=");
+		builder.append(this.variableId);
+		builder.append(", alias=");
+		builder.append(this.alias);
 		builder.append("]");
 		return builder.toString();
 	}
