@@ -11,12 +11,9 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
@@ -61,6 +58,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -70,6 +68,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -81,9 +80,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
@@ -91,6 +92,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
+	private WorkbenchDataManager workbenchDataManager;
 
 	public StudyDataManagerImpl() {
 	}
@@ -98,12 +100,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public StudyDataManagerImpl(final HibernateSessionProvider sessionProvider, final String databaseName) {
 		super(sessionProvider, databaseName);
 		this.locationDataManager = new LocationDataManagerImpl(sessionProvider);
+		this.workbenchDataManager = new WorkbenchDataManagerImpl(sessionProvider);
 		this.pedigreeService = this.getPedigreeService();
 	}
 
 	public StudyDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 		this.locationDataManager = new LocationDataManagerImpl(sessionProvider);
+		this.workbenchDataManager = new WorkbenchDataManagerImpl(sessionProvider);
 		this.pedigreeService = this.getPedigreeService();
 	}
 
@@ -1105,10 +1109,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<StudySummary> findPagedProjects(final String programDbId, final String locationDbId, final String seasonDbId,
+	public List<StudySummary> findPagedProjects(final Map<StudyFilters, String> parameters,
 			final Integer pageSize, final Integer page) throws MiddlewareQueryException {
+
 		final List<DmsProject> dmsProjects =
-				this.getDmsProjectDao().findPagedProjects(programDbId, locationDbId, seasonDbId, pageSize, page);
+				this.getDmsProjectDao().findPagedProjects(parameters, pageSize, page);
 		final List<StudySummary> studySummaries = Lists.newArrayList();
 		for (final DmsProject dmsProject : dmsProjects) {
 			final StudySummary studySummary = new StudySummary();
@@ -1159,9 +1164,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			studySummary.setOptionalInfo(additionalProps)
 					.setName(dmsProject.getName())
 					.setProgramDbId(dmsProject.getProgramUUID())
-					// TODO setProgramName - will need Workbench Query
 					.setStudyDbid(dmsProject.getProjectId());
-
 			studySummary.setInstanceMetaData(this.getInstanceMetadata(dmsProject.getProjectId()));
 			studySummaries.add(studySummary);
 		}
@@ -1169,9 +1172,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Long countAllStudies(final String programDbId, final String locationDbId, final String seasonDbId)
+	public Long countAllStudies(final Map<StudyFilters, String> parameters)
 			throws MiddlewareQueryException {
-		return this.getDmsProjectDao().countStudies(programDbId, locationDbId, seasonDbId);
+		return this.getDmsProjectDao().countStudies(parameters);
 	}
 
 	@Override

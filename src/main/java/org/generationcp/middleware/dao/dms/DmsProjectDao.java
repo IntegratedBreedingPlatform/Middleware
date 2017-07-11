@@ -11,14 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
@@ -30,13 +22,13 @@ import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.StudyType;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.workbench.StudyNode;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -50,9 +42,17 @@ import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link DmsProject}.
@@ -1173,9 +1173,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return results;
 	}
 
-	public List<DmsProject> findPagedProjects(final String programDbId, final String locationDbId, final String seasonDbId,
+	public List<DmsProject> findPagedProjects(final Map<StudyFilters, String> parameters,
 			final Integer pageSize, final Integer page) {
-		final Criteria criteria = buildCoreCriteria(programDbId, locationDbId, seasonDbId);
+
+		final Criteria criteria = buildCoreCriteria(parameters, getOrderBy(parameters));
 		if (page != null && pageSize != null) {
 			criteria.setFirstResult(pageSize * (page - 1));
 			criteria.setMaxResults(pageSize);
@@ -1183,13 +1184,24 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return criteria.list();
 	}
 
-	public long countStudies(final String programDbId, final String locationDbId, final String seasonDbId) {
-		final Criteria criteria = buildCoreCriteria(programDbId, locationDbId, seasonDbId);
+	private Order getOrderBy(Map<StudyFilters, String> parameters) {
+		if (parameters.containsKey(StudyFilters.SORT_BY_FIELD)) {
+			if ("asc".equals(parameters.get(StudyFilters.ORDER))) {
+				return Order.asc(parameters.get(StudyFilters.SORT_BY_FIELD));
+			} else {
+				return Order.desc(parameters.get(StudyFilters.SORT_BY_FIELD));
+			}
+		}
+		return Order.asc(DmsProjectDao.PROJECT_ID);
+	}
+
+	public long countStudies(final Map<StudyFilters, String> parameters) {
+		final Criteria criteria = buildCoreCriteria(parameters, getOrderBy(parameters));
 		criteria.setProjection(Projections.rowCount());
 		return (long) criteria.uniqueResult();
 	}
 
-	private Criteria buildCoreCriteria(final String programDbId, final String locationDbId, final String seasonDbId) {
+	private Criteria buildCoreCriteria(final Map<StudyFilters, String> parameters, Order orderBy) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.createAlias("properties", "pr");
 		criteria.add(Restrictions.eq("pr.typeId", TermId.STUDY_TYPE.getId()));
@@ -1200,39 +1212,23 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		inactive.setProjection(Projections.property("project.projectId"));
 		criteria.add(Property.forName(DmsProjectDao.PROJECT_ID).notIn(inactive));
 
-		if (programDbId != null) {
-			criteria.add(Restrictions.eq("programUUID", programDbId));
+		if (parameters.containsKey(StudyFilters.PROGRAM_ID)) {
+			criteria.add(Restrictions.eq(StudyFilters.PROGRAM_ID.getParameter(), parameters.get(StudyFilters.PROGRAM_ID)));
 		}else{
-			criteria.add(Restrictions.isNotNull("programUUID"));
+			criteria.add(Restrictions.isNotNull(StudyFilters.PROGRAM_ID.getParameter()));
 		}
 
-		if (locationDbId != null) {
+		if (parameters.containsKey(StudyFilters.LOCATION_ID)) {
 			final DetachedCriteria ppLocation = DetachedCriteria.forClass(ProjectProperty.class);
 
 			ppLocation.add(Restrictions.eq(DmsProjectDao.TYPE_ID, DmsProjectDao.LOCATION_ABBR));
-			ppLocation.add(Restrictions.ilike(DmsProjectDao.VALUE, '%' + locationDbId.toLowerCase() + '%'));
+			ppLocation.add(Restrictions.ilike(DmsProjectDao.VALUE, '%' + parameters.get(StudyFilters.LOCATION_ID).toLowerCase() + '%'));
 			ppLocation.setProjection(Projections.property("project.projectId"));
 
 			criteria.add(Property.forName(DmsProjectDao.PROJECT_ID).in(ppLocation));
 		}
 
-		if (seasonDbId != null) {
-			final DetachedCriteria ppStartDate = DetachedCriteria.forClass(ProjectProperty.class);
-
-			ppStartDate.add(Restrictions.eq(DmsProjectDao.TYPE_ID, Integer.valueOf(DmsProjectDao.START_DATE)));
-			ppStartDate.setProjection(Projections.property("project.projectId"));
-			ppStartDate.add(Restrictions.sqlRestriction("lower(substring(value, 1, 4)) like ?", '%' + seasonDbId.toLowerCase() + '%',
-					new StringType()));
-
-			final DetachedCriteria ppSeason = DetachedCriteria.forClass(ProjectProperty.class);
-			ppSeason.add(Restrictions.eq(DmsProjectDao.TYPE_ID, DmsProjectDao.SEASON_VAR_TEXT));
-			ppSeason.add(Restrictions.ilike(DmsProjectDao.VALUE, '%' + seasonDbId.toLowerCase() + '%'));
-			ppSeason.setProjection(Projections.property("project.projectId"));
-
-			criteria.add(Restrictions.or(Property.forName(DmsProjectDao.PROJECT_ID).in(ppStartDate), Property.forName(DmsProjectDao.PROJECT_ID).in(ppSeason)));
-		}
-
-		criteria.addOrder(Order.asc(DmsProjectDao.PROJECT_ID));
+		criteria.addOrder(orderBy);
 		return criteria;
 	}
 
