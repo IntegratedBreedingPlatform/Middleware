@@ -375,7 +375,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier, Integer instanceDbId) {
-
+		String year = null;
 		final List<MeasurementVariableDto> traits = this.measurementVariableService.getVariables(studyIdentifier, VariableType.TRAIT.getId());
 
 		final List<MeasurementVariableDto> measurementVariables = Ordering.from(new Comparator<MeasurementVariableDto>() {
@@ -399,14 +399,21 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 
 		List<List<String>> data = Lists.newArrayList();
-		String year = this.getYearFromStudy(studyIdentifier);
+		if (instanceDbId != null) {
+			year = this.getYearFromStudy(studyIdentifier);
+		}
+		else {
+			year = null;
+		}
 
 		if (!CollectionUtils.isEmpty(results)) {
 
 			for (Object[] row : results) {
 				final List<String> entry = Lists.newArrayList();
 
-				entry.add(year);
+				if(year != null) {
+					entry.add(year);
+				}
 
 				// locationDbId = trial instance number
 				// In brapi this will equate to studyDbId
@@ -489,9 +496,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 			dto = new TrialObservationTable().setStudyDbId(instanceDbId != null ? instanceDbId : studyIdentifier).setObservationVariableDbIds(observationVariableDbIds)
 			.setObservationVariableNames(observationVariableNames).setData(data);
 
-		dto.setHeaderRow(Lists.newArrayList("year", "locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
+		if (instanceDbId != null) {
+			dto.setHeaderRow(Lists.newArrayList("year", "locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
 				"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y", "plotId"));
-
+		}
+		else {
+			dto.setHeaderRow(Lists.newArrayList("locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
+				"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y", "plotId"));
+		}
 		return dto;
 	}
 
@@ -558,7 +570,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 		final SQLQuery query = this.getCurrentSession().createSQLQuery(yearText);
 		query.setParameter("projectId", studyIdentifier);
 		Object result = query.uniqueResult();
-		return result.toString().substring(0, 4);
+		if (result != null)
+			return result.toString().substring(0, 4);
+		return "";
 	}
 }
 
