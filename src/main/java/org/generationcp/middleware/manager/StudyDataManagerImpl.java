@@ -1128,11 +1128,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			}).immutableSortedCopy(dmsProject.getProperties());
 
 			final Map<String, String> additionalProps = Maps.newHashMap();
-			String additoinalPropKey = null;
+			String additionalPropKey = null;
 			String valueKey = "";
 			for (final ProjectProperty prop : sortedProperties) {
 				if (prop.getTypeId().equals(1805)) {
-					additoinalPropKey = prop.getValue();
+					additionalPropKey = prop.getValue();
 				}
 				if (prop.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
 					valueKey = prop.getValue();
@@ -1150,7 +1150,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 					} else if (valueKey.equals(String.valueOf(TermId.STUDY_TYPE.getId()))) {
 						studySummary.setType(StudyType.getStudyTypeById(Integer.valueOf(prop.getValue())).getName());
 					} else {
-						additionalProps.put(additoinalPropKey, prop.getValue());
+						additionalProps.put(additionalPropKey, prop.getValue());
 					}
 				}
 
