@@ -74,7 +74,7 @@ public class StudyVariableBuilder extends Builder {
 			variable.setValue(project.getDescription());
 		} else {
 			String projectPropValue = getPropertyValue(variableType.getId(), project.getProperties());
-			if(projectPropValue!=null) {
+			if (projectPropValue != null) {
 				variable.setValue(projectPropValue);
 			} else if (experiment != null) {
 				Variable factor = experiment.getFactors().findById(variableType.getId());
@@ -93,7 +93,7 @@ public class StudyVariableBuilder extends Builder {
 
 	private String getPropertyValue(int id, List<ProjectProperty> properties) {
 		for (ProjectProperty property : properties) {
-			if (property.getTypeId() == id) {
+			if (property.getVariableId() == id) {
 				return property.getValue();
 			}
 		}
