@@ -1173,30 +1173,30 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return results;
 	}
 
-	public List<DmsProject> findPagedProjects(final Map<StudyFilters, String> parameters,
-			final Integer pageSize, final Integer page) {
+	public List<DmsProject> findPagedProjects(final Map<StudyFilters, String> filters,
+			final Integer pageSize, final Integer pageNumber) {
 
-		final Criteria criteria = buildCoreCriteria(parameters, getOrderBy(parameters));
-		if (page != null && pageSize != null) {
-			criteria.setFirstResult(pageSize * (page - 1));
+		final Criteria criteria = buildCoreCriteria(filters, getOrderBy(filters));
+		if (pageNumber != null && pageSize != null) {
+			criteria.setFirstResult(pageSize * (pageNumber - 1));
 			criteria.setMaxResults(pageSize);
 		}
 		return criteria.list();
 	}
 
-	private Order getOrderBy(final Map<StudyFilters, String> parameters) {
-		if (parameters.containsKey(StudyFilters.SORT_BY_FIELD)) {
-			if ("asc".equals(parameters.get(StudyFilters.ORDER))) {
-				return Order.asc(parameters.get(StudyFilters.SORT_BY_FIELD));
+	private Order getOrderBy(final Map<StudyFilters, String> filters) {
+		if (filters.containsKey(StudyFilters.SORT_BY_FIELD)) {
+			if ("asc".equals(filters.get(StudyFilters.ORDER))) {
+				return Order.asc(filters.get(StudyFilters.SORT_BY_FIELD));
 			} else {
-				return Order.desc(parameters.get(StudyFilters.SORT_BY_FIELD));
+				return Order.desc(filters.get(StudyFilters.SORT_BY_FIELD));
 			}
 		}
 		return Order.asc(DmsProjectDao.PROJECT_ID);
 	}
 
-	public long countStudies(final Map<StudyFilters, String> parameters) {
-		final Criteria criteria = buildCoreCriteria(parameters, getOrderBy(parameters));
+	public long countStudies(final Map<StudyFilters, String> filters) {
+		final Criteria criteria = buildCoreCriteria(filters, getOrderBy(filters));
 		criteria.setProjection(Projections.rowCount());
 		return (long) criteria.uniqueResult();
 	}
@@ -1214,7 +1214,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		if (parameters.containsKey(StudyFilters.PROGRAM_ID)) {
 			criteria.add(Restrictions.eq(StudyFilters.PROGRAM_ID.getParameter(), parameters.get(StudyFilters.PROGRAM_ID)));
-		}else{
+		} else {
 			criteria.add(Restrictions.isNotNull(StudyFilters.PROGRAM_ID.getParameter()));
 		}
 

@@ -1109,11 +1109,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<StudySummary> findPagedProjects(final Map<StudyFilters, String> parameters,
-			final Integer pageSize, final Integer page) throws MiddlewareQueryException {
+	public List<StudySummary> findPagedProjects(final Map<StudyFilters, String> filters,
+			final Integer pageSize, final Integer pageNumber) throws MiddlewareQueryException {
 
 		final List<DmsProject> dmsProjects =
-				this.getDmsProjectDao().findPagedProjects(parameters, pageSize, page);
+				this.getDmsProjectDao().findPagedProjects(filters, pageSize, pageNumber);
 		final List<StudySummary> studySummaries = Lists.newArrayList();
 		for (final DmsProject dmsProject : dmsProjects) {
 			final StudySummary studySummary = new StudySummary();
@@ -1172,9 +1172,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Long countAllStudies(final Map<StudyFilters, String> parameters)
+	public Long countAllStudies(final Map<StudyFilters, String> filters)
 			throws MiddlewareQueryException {
-		return this.getDmsProjectDao().countStudies(parameters);
+		return this.getDmsProjectDao().countStudies(filters);
 	}
 
 	@Override

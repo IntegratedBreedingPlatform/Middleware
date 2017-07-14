@@ -802,26 +802,26 @@ public interface StudyDataManager {
 	 *
 	 * Retrieves all the StudySummaries of the DMS Project that matches the conditions: SeasonDbId, LocationDbId and ProgramDbId
 	 *
-	 * @param parameters
+	 * @param filters
 	 *            - the filters that to be included in the query
 	 * @param pageSize Page Size
-	 * @param page Page
+	 * @param pageNumber Page Number
 	 * @return List of StudySummary
 	 * @throws MiddlewareQueryException
 	 */
-	List<StudySummary> findPagedProjects(final Map<StudyFilters, String> parameters, Integer pageSize, Integer page)
+	List<StudySummary> findPagedProjects(final Map<StudyFilters, String> filters, Integer pageSize, Integer pageNumber)
 		throws MiddlewareQueryException;
 
 	/**
 	 *
 	 * Count how many DMS Project matches the conditions: programDBid, locationDbId
 	 *
-	 * @param parameters
+	 * @param filters
 	 *            - the filters that to be included in the query
 	 * @return Number of programs
 	 * @throws MiddlewareQueryException
 	 */
-	Long countAllStudies(final Map<StudyFilters, String> parameters) throws MiddlewareQueryException;
+	Long countAllStudies(final Map<StudyFilters, String> filters) throws MiddlewareQueryException;
 
 	List<InstanceMetadata> getInstanceMetadata(int studyId);
 
