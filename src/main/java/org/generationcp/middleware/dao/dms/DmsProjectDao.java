@@ -1184,7 +1184,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return criteria.list();
 	}
 
-	private Order getOrderBy(Map<StudyFilters, String> parameters) {
+	private Order getOrderBy(final Map<StudyFilters, String> parameters) {
 		if (parameters.containsKey(StudyFilters.SORT_BY_FIELD)) {
 			if ("asc".equals(parameters.get(StudyFilters.ORDER))) {
 				return Order.asc(parameters.get(StudyFilters.SORT_BY_FIELD));
@@ -1201,10 +1201,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return (long) criteria.uniqueResult();
 	}
 
-	private Criteria buildCoreCriteria(final Map<StudyFilters, String> parameters, Order orderBy) {
+	private Criteria buildCoreCriteria(final Map<StudyFilters, String> parameters, final Order orderBy) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.createAlias("properties", "pr");
 		criteria.add(Restrictions.eq("pr.typeId", TermId.STUDY_TYPE.getId()));
+		criteria.add(Restrictions.eq("pr.value", String.valueOf(TermId.TRIAL.getId())));
 
 		final DetachedCriteria inactive = DetachedCriteria.forClass(ProjectProperty.class);
 		inactive.add(Restrictions.eq(DmsProjectDao.TYPE_ID, Integer.valueOf(DmsProjectDao.STUDY_STATUS)));
