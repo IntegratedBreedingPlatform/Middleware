@@ -53,7 +53,7 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 		Set<VariableType> variableTypes = standardVariable.getVariableTypes();
 		if(variableTypes != null){
 			Iterator<VariableType> iterator = variableTypes.iterator();
-			this.variableType = iterator.next();;
+			this.variableType = iterator.next();
 		}
 
 		this.rank = rank;
