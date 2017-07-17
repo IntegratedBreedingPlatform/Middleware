@@ -64,6 +64,8 @@ import org.slf4j.Logger;
 
 public abstract class Service extends DatabaseBroker {
 
+	private LocationDataManager locationDataManager = new LocationDataManagerImpl(this.sessionProvider);
+
 	public Service() {
 	}
 
@@ -75,9 +77,7 @@ public abstract class Service extends DatabaseBroker {
 		super(sessionProvider, databaseName);
 	}
 
-	private LocationDataManager locationDataManager = new LocationDataManagerImpl(this.sessionProvider);
-
-	protected void logAndThrowException(String message, Throwable e, Logger log) throws MiddlewareQueryException {
+	protected void logAndThrowException(String message, Throwable e, Logger log) {
 		log.error(e.getMessage(), e);
 		if (e instanceof PhenotypeException) {
 			throw (PhenotypeException) e;
