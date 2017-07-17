@@ -23,6 +23,7 @@ import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitial
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -51,6 +52,7 @@ import com.google.common.collect.Lists;
 @RunWith(MockitoJUnitRunner.class)
 public class FieldbookServiceImplTest {
 
+	public static final String PROGRAM_UUID = "9f9c606e-03c1-4073-bf0c-2ffa58c36037";
 	@Mock
 	Session session;
 
@@ -76,6 +78,9 @@ public class FieldbookServiceImplTest {
 	LocationDAO locationDAO;
 
 	@Mock
+	LocationDataManager locationDataManager;
+
+	@Mock
 	private CrossExpansionProperties crossExpansionProperties;
 
 	@Mock
@@ -94,6 +99,7 @@ public class FieldbookServiceImplTest {
 	public void setUp() {
 		this.fieldbookServiceImpl.setCrossExpansionProperties(this.crossExpansionProperties);
 		this.fieldbookServiceImpl.setGermplasmGroupingService(this.germplasmGroupingService);
+		this.fieldbookServiceImpl.setLocationDataManager(this.locationDataManager);
 		Mockito.doReturn(this.session).when(this.sessionProvider).getSession();
 		Mockito.doReturn(this.query).when(this.session).createSQLQuery(Matchers.anyString());
 		Mockito.doReturn(this.criteria).when(this.session).createCriteria(UserDefinedField.class);
@@ -102,6 +108,7 @@ public class FieldbookServiceImplTest {
 		this.listDataItems = this.createListDataItems();
 		this.germplasmAttributes = this.createGermplasmAttributes();
 		Mockito.when(this.dbBroker.getLocationDAO()).thenReturn(locationDAO);
+		Mockito.when(locationDataManager.getLocationsByUniqueID(PROGRAM_UUID)).thenReturn(new ArrayList<Location>());
 	}
 
 	@Test
@@ -127,7 +134,9 @@ public class FieldbookServiceImplTest {
 	
 	@Test
 	public void getLocationsByProgramUUID(){
-		List<Location> locations = this.fieldbookServiceImpl.getLocationsByProgramUUID(null);
+		final List<Location> locations = this.fieldbookServiceImpl.getLocationsByProgramUUID(PROGRAM_UUID);
+
+		Mockito.verify(this.locationDataManager, Mockito.times(1)).getLocationsByUniqueID(PROGRAM_UUID);
 		Assert.assertNotNull("The return locations list should not be null", locations);
 	}
 

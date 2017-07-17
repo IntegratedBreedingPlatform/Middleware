@@ -75,6 +75,8 @@ public abstract class Service extends DatabaseBroker {
 		super(sessionProvider, databaseName);
 	}
 
+	private LocationDataManager locationDataManager = new LocationDataManagerImpl(this.sessionProvider);
+
 	protected void logAndThrowException(String message, Throwable e, Logger log) throws MiddlewareQueryException {
 		log.error(e.getMessage(), e);
 		if (e instanceof PhenotypeException) {
@@ -144,10 +146,6 @@ public abstract class Service extends DatabaseBroker {
 		return new InventoryDataManagerImpl(this.sessionProvider, this.databaseName);
 	}
 
-	protected LocationDataManager getLocationDataManager() {
-		return new LocationDataManagerImpl(this.sessionProvider);
-	}
-
 	protected final UserDataManager getUserDataManager() {
 		return new UserDataManagerImpl(this.sessionProvider);
 	}
@@ -212,4 +210,11 @@ public abstract class Service extends DatabaseBroker {
 		return new NameBuilder(this.sessionProvider);
 	}
 
+	protected void setLocationDataManager(LocationDataManager locationDataManager) {
+		this.locationDataManager = locationDataManager;
+	}
+
+	protected LocationDataManager getLocationDataManager() {
+		return locationDataManager;
+	}
 }
