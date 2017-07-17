@@ -143,7 +143,7 @@ public class ProjectPropertySaverTest {
 
 		//role and null variable type
 		dmsVariableType.setRole(PhenotypicType.STUDY);
-		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType);
+		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType, null /* TODO */);
 		dmsVariableType.setVariableType(null);
 
 		Assert.assertEquals("SaveVariableType should add properties to dmsProject as expected", 3, dmsProject.getProperties().size());
@@ -156,7 +156,7 @@ public class ProjectPropertySaverTest {
 		// role and variable type
 		dmsVariableType.setRole(PhenotypicType.STUDY);
 		dmsVariableType.setVariableType(VariableType.ANALYSIS);
-		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType);
+		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType, null /* TODO */);
 		Assert.assertEquals("SaveVariableType should add properties to dmsProject as expected", 3, dmsProject.getProperties().size());
 		Assert.assertEquals("SaveVariableType Properties are not matching for supplied Variable Type", VariableType.ANALYSIS.getId(),
 				dmsProject.getProperties().get(0).getTypeId());
@@ -167,7 +167,7 @@ public class ProjectPropertySaverTest {
 		// null role and variable type
 		dmsVariableType.setRole(null);
 		dmsVariableType.setVariableType(VariableType.TRAIT);
-		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType);
+		this.projectPropSaver.saveVariableType(dmsProject, dmsVariableType, null /* TODO */);
 
 		Assert.assertEquals("SaveVariableType should add properties to dmsProject as expected", 3, dmsProject.getProperties().size());
 		Assert.assertEquals("SaveVariableType Properties are not matching for supplied Variable Type", VariableType.TRAIT.getId(),

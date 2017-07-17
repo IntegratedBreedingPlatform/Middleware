@@ -104,17 +104,18 @@ public class ProjectPropertySaver {
 		variableTypeId = variableTypeEnum.getId();
 
 		final List<ProjectProperty> properties = new ArrayList<>();
-		
-		properties.add(new ProjectProperty(project, variableTypeId, variableType.getLocalName(), variableType.getRank()));
-		properties.add(new ProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), variableType.getLocalDescription(), variableType
-				.getRank()));
-		properties.add(new ProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), String.valueOf(variableType.getId()), variableType
-				.getRank()));
+
+		properties.add(
+			new ProjectProperty(project, variableTypeId, null, variableType.getRank(), variableType.getId(), variableType.getLocalName()));
+
+		/*
+		TODO
 
 		if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
 			properties.add(new ProjectProperty(project, TermId.MULTIFACTORIAL_INFO.getId(), variableType.getTreatmentLabel(), variableType
 					.getRank()));
 		}
+		 */
 
 		return properties;
 	}
@@ -148,38 +149,38 @@ public class ProjectPropertySaver {
 	 *
 	 * @param project DMSProject
 	 * @param objDMSVariableType DMSVariableType
+	 * @param value the value of the measurement variable
 	 * @throws MiddlewareQueryException
 	 */
-	public void saveVariableType(final DmsProject project, final DMSVariableType objDMSVariableType) {
+	public void saveVariableType(final DmsProject project, final DMSVariableType objDMSVariableType, String value) {
 
-	  // Setting property, scale and method to standard variable
-	  	final StandardVariableSummary standardVariableSummary =
-			  this.daoFactory.getStandardVariableBuilder().getStandardVariableSummary(objDMSVariableType.getStandardVariable().getId());
-
-	  	objDMSVariableType.getStandardVariable().setProperty(new Term(0, standardVariableSummary.getProperty().getName(), ""));
-	  	objDMSVariableType.getStandardVariable().setScale(new Term(0, standardVariableSummary.getScale().getName(), ""));
-	  	objDMSVariableType.getStandardVariable().setMethod(new Term(0, standardVariableSummary.getMethod().getName(), ""));
 
 		objDMSVariableType.setVariableTypeIfNull();
 
 		final org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = objDMSVariableType.getVariableType();
-		this.saveProjectProperty(project, variableTypeEnum.getId(), objDMSVariableType.getLocalName(), objDMSVariableType.getRank());
-		this.saveProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), objDMSVariableType.getLocalDescription(),
-				objDMSVariableType.getRank());
-		this.saveProjectProperty(project, TermId.STANDARD_VARIABLE.getId(),
-				Integer.toString(objDMSVariableType.getStandardVariable().getId()), objDMSVariableType.getRank());
+
+		this.saveProjectProperty(project, variableTypeEnum.getId(), value, objDMSVariableType.getRank(),
+			objDMSVariableType.getStandardVariable().getId(), objDMSVariableType.getLocalName());
+
+		/*
+			TODO
+
 		if (objDMSVariableType.getTreatmentLabel() != null && !objDMSVariableType.getTreatmentLabel().isEmpty()) {
 			this.saveProjectProperty(project, TermId.MULTIFACTORIAL_INFO.getId(), objDMSVariableType.getTreatmentLabel(),
 					objDMSVariableType.getRank());
 		}
+		 */
 	}
 
-	private void saveProjectProperty(final DmsProject project, final int typeId, final String value, final int rank) {
+	private void saveProjectProperty(final DmsProject project, final int typeId, final String value, final int rank, int variableId,
+		String alias) {
 		final ProjectProperty property = new ProjectProperty();
 		property.setTypeId(typeId);
 		property.setValue(value);
 		property.setRank(rank);
 		property.setProject(project);
+		property.setVariableId(variableId);
+		property.setAlias(alias);
 		this.daoFactory.getProjectPropertyDao().save(property);
 		project.addProperty(property);
 	}
@@ -200,7 +201,7 @@ public class ProjectPropertySaver {
 			}
 
 			final DMSVariableType variableType = new DMSVariableType(localVariableName, localVariableDescription, stdvar, rank);
-			this.saveVariableType(project, variableType);
+			this.saveVariableType(project, variableType, null);
 		}
 	}
 
@@ -288,9 +289,6 @@ public class ProjectPropertySaver {
 		} else {
 			// study
 			this.insertVariable(project, variable, rank);
-			final VariableList variableList = new VariableList();
-			variableList.add(new Variable(this.createVariableType(variable, rank), variable.getValue()));
-			this.saveProjectPropValues(project.getProjectId(), variableList);
 		}
 	}
 
@@ -298,7 +296,7 @@ public class ProjectPropertySaver {
 		if (project.getProperties() == null) {
 			project.setProperties(new ArrayList<ProjectProperty>());
 		}
-		this.saveVariableType(project, this.createVariableType(variable, rank));
+		this.saveVariableType(project, this.createVariableType(variable, rank), variable.getValue());
 	}
 
 	protected DMSVariableType createVariableType(final MeasurementVariable variable, final int rank) {

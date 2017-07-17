@@ -75,11 +75,13 @@ public class ProjectProperty implements Serializable {
 	public ProjectProperty() {
 	}
 
-	public ProjectProperty(DmsProject project, Integer typeId, String value, Integer rank) {
+	public ProjectProperty(DmsProject project, Integer typeId, String value, Integer rank, Integer variableId, String alias) {
 		this.project = project;
 		this.typeId = typeId;
 		this.value = value;
 		this.rank = rank;
+		this.variableId = variableId;
+		this.alias = alias;
 	}
 
 	public Integer getProjectPropertyId() {
