@@ -64,6 +64,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchSetting;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.pojos.workbench.WorkflowTemplate;
+import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
@@ -294,6 +295,16 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<Project> getProjects(final int start, final int numOfRows) {
 		return this.getProjectDao().getAll(start, numOfRows);
+	}
+
+	@Override
+	public List<Project> getProjects(final int start, final int numOfRows,final Map<ProgramFilters, Object> filters) {
+		return this.getProjectDao().getProjectsByFilter(start, numOfRows, filters);
+	}
+
+	@Override
+	public long countProjectsByFilter(final Map<ProgramFilters, Object> filters){
+		return this.getProjectDao().countProjectsByFilter(filters);
 	}
 
 	@Override

@@ -1,18 +1,15 @@
 
 package org.generationcp.middleware.service.impl.study;
 
-import java.util.List;
-
-import javax.annotation.Nullable;
-
-import org.apache.commons.lang3.StringUtils;
-import org.fest.util.Collections;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
-
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
+
+import javax.annotation.Nullable;
+import java.util.List;
 
 class ObservationQuery {
 
@@ -72,7 +69,6 @@ class ObservationQuery {
 			+ "            INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id"
 			+ "            WHERE ndep.nd_experiment_id = ep.nd_experiment_id  AND ispcvt.name = 'COL') COL";
 
-
 	String getAllObservationsQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors, final String sortBy,
 			final String sortOrder) {
 		return this.getObservationsMainQuery(measurementVariables, germplasmDescriptors) + getInstanceNumberClause() + getGroupingClause()
@@ -123,7 +119,7 @@ class ObservationQuery {
 	}
 
 	private String getOrderByExpression(final List<MeasurementVariableDto> variables, final String orderByTraitId) {
-		final String orderByText = Collections.isNullOrEmpty(variables) ? "" : " ORDER BY " + orderByTraitId;
+		final String orderByText = !(variables != null && variables.size() > 0) ? "" : " ORDER BY " + orderByTraitId;
 		return orderByText;
 	}
 
