@@ -65,9 +65,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DmsProjectDao.class);
 
-	private static final Integer SEASON_VAR_TEXT = Integer.valueOf(TermId.SEASON_VAR_TEXT.getId());
-
-	private static final Integer LOCATION_ABBR = Integer.valueOf(TermId.LOCATION_ABBR.getId());
+	private static final Integer LOCATION_ID = Integer.valueOf(TermId.LOCATION_ID.getId());
 
 	private static final int DELETED_STUDY = TermId.DELETED_STUDY.getId();
 
@@ -1221,8 +1219,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (parameters.containsKey(StudyFilters.LOCATION_ID)) {
 			final DetachedCriteria ppLocation = DetachedCriteria.forClass(ProjectProperty.class);
 
-			ppLocation.add(Restrictions.eq(DmsProjectDao.TYPE_ID, DmsProjectDao.LOCATION_ABBR));
-			ppLocation.add(Restrictions.ilike(DmsProjectDao.VALUE, '%' + parameters.get(StudyFilters.LOCATION_ID).toLowerCase() + '%'));
+			ppLocation.add(Restrictions.eq(DmsProjectDao.TYPE_ID, DmsProjectDao.LOCATION_ID));
+			ppLocation.add(Restrictions.eq(DmsProjectDao.VALUE, parameters.get(StudyFilters.LOCATION_ID)));
 			ppLocation.setProjection(Projections.property("project.projectId"));
 
 			criteria.add(Property.forName(DmsProjectDao.PROJECT_ID).in(ppLocation));
