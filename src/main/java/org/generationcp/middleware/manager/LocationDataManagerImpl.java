@@ -34,7 +34,6 @@ import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.service.api.location.AdditionalInfoDto;
 import org.generationcp.middleware.service.api.location.LocationDetailsDto;
 import org.generationcp.middleware.service.api.location.LocationFilters;
 import org.springframework.transaction.annotation.Transactional;
@@ -584,20 +583,10 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		return this.getLocationDao().countLocationsByFilter(filters);
 
 	}
-
 	@Override
 	public List<LocationDetailsDto> getLocationsByFilter(final int pageNumber,final int pageSize, final Map<LocationFilters, Object> filters)
 			throws MiddlewareQueryException {
 		final List<LocationDetailsDto> locationsDetailsDto = this.getLocationDao().getLocationsByFilter(pageNumber, pageSize, filters);
-		final List<String> locations = new ArrayList<>();
-
-		if (!locationsDetailsDto.isEmpty()) {
-			for (LocationDetailsDto locationDto : locationsDetailsDto) {
-				locations.add(locationDto.getLocationDbId().toString());
-
-			}
-			getAdditinalInfoLocation(locationsDetailsDto, locations);
-		}
 		return locationsDetailsDto;
 	}
 	
@@ -615,82 +604,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		return types.get(name.toUpperCase()) != null ? types.get(name.toUpperCase()).getFldno() : null;
 	}
 
-	private void getAdditinalInfoLocation(final List<LocationDetailsDto> locationsDetailsDto, final List<String> locations)
-			throws MiddlewareQueryException {
-		final Map<Integer, AdditionalInfoDto> mapAdditionalInfoDto = getAdditionalInfoFieldMap(locations);
-		
-		if (!mapAdditionalInfoDto.isEmpty()) {
-			for (LocationDetailsDto locationDto : locationsDetailsDto) {
-
-				if (mapAdditionalInfoDto.containsKey(locationDto.getLocationDbId())) {
-					locationDto.setMapAdditionalInfo(mapAdditionalInfoDto.get(locationDto.getLocationDbId()));
-				}
-			}
-		}
-	}
-
-	private Map<Integer, AdditionalInfoDto> getAdditionalInfoFieldMap(final List<String> listLocation) {
-		String[] locations = new String[listLocation.size()];
-		locations =listLocation.toArray(locations);
-		final List<Locdes> listFieldParent = this.getLocdesDao().getAllLocationDescriptionsByFilters(LocdesType.FIELD_PARENT.getCode(), locations);
-		final Map<String, UserDefinedField> dTypes = this.getUserDefinedFieldMapOfCodeByUDTableType(UDTableType.LOCDES_DTYPE);
-		final Map<Integer, AdditionalInfoDto> mapAdditionalInfoDto = new HashMap<>();
-
-		if (listFieldParent.isEmpty()) {
-			return new HashMap<>();
-		}
-
-		for (Locdes fieldParent : listFieldParent) {
-			final Integer locationId = new Integer(fieldParent.getDval());
-			AdditionalInfoDto additionalInfoDto = new AdditionalInfoDto(locationId);
-
-			additionalInfoDto.addInfo(LocdesType.FIELD_PARENT.getCode(), getLocationName(fieldParent.getLocationId()));
-
-			final List<Locdes> listblockParent =
-					this.getLocdesDao().getAllLocationDescriptionsByFilters(LocdesType.BLOCK_PARENT.getCode(), null, fieldParent.getLocationId().toString());
-
-			int countBlockParent = listblockParent.size() == 1 ? 0 : 1;
-			String concatNumeric = "";
-			
-			if(listblockParent.isEmpty()){
-				mapAdditionalInfoDto.put(locationId, additionalInfoDto);
-			}
-			for (final Locdes lBlockParent : listblockParent) {
-
-				if (countBlockParent > 0) {
-					concatNumeric = String.valueOf(countBlockParent);
-					++countBlockParent;
-				}
-
-				additionalInfoDto.addInfo(LocdesType.BLOCK_PARENT.getCode() + concatNumeric, getLocationName(lBlockParent.getLocationId()));
-				final List<Locdes> locdesOfLocation = this.getLocdesDao().getByLocation(lBlockParent.getLocationId());
-				for (final Locdes locdes : locdesOfLocation) {
-
-					final int typeId = locdes.getTypeId();
-					final String value = locdes.getDval();
-					if (typeId == dTypes.get(LocdesType.ROWS_IN_BLOCK.getCode()).getFldno()) {
-						additionalInfoDto.addInfo(LocdesType.ROWS_IN_BLOCK.getCode() + concatNumeric, value);
-					} else if (typeId == dTypes.get(LocdesType.ROWS_IN_PLOT.getCode()).getFldno()) {
-						additionalInfoDto.addInfo(LocdesType.ROWS_IN_PLOT.getCode() + concatNumeric, value);
-					} else if (typeId == dTypes.get(LocdesType.RANGES_IN_BLOCK.getCode()).getFldno()) {
-						additionalInfoDto.addInfo(LocdesType.RANGES_IN_BLOCK.getCode() + concatNumeric, value);
-					} else if (typeId == dTypes.get(LocdesType.PLANTING_ORDER.getCode()).getFldno()) {
-						additionalInfoDto.addInfo(LocdesType.PLANTING_ORDER.getCode() + concatNumeric, value);
-					} else if (typeId == dTypes.get(LocdesType.MACHINE_ROW_CAPACITY.getCode()).getFldno()) {
-						additionalInfoDto.addInfo(LocdesType.MACHINE_ROW_CAPACITY.getCode() + concatNumeric, value);
-					} else if (typeId == dTypes.get(LocdesType.DELETED_PLOTS.getCode()).getFldno()) {
-						additionalInfoDto.addInfo(LocdesType.DELETED_PLOTS.getCode() + concatNumeric, value);
-					}
-
-				}
-				mapAdditionalInfoDto.put(locationId, additionalInfoDto);
-			}
-		}
-		return mapAdditionalInfoDto;
-	}
-
-	private String getLocationName(Integer locationId){
-		Location location=this.getLocationByID(locationId);
+	private String getLocationName(Integer locationId) {
+		Location location = this.getLocationByID(locationId);
 		return location.getLname();
 	}
 }
