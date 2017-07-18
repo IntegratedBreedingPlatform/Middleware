@@ -604,8 +604,4 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		return types.get(name.toUpperCase()) != null ? types.get(name.toUpperCase()).getFldno() : null;
 	}
 
-	private String getLocationName(Integer locationId) {
-		Location location = this.getLocationByID(locationId);
-		return location.getLname();
-	}
 }
