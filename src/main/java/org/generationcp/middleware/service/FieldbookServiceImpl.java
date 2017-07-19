@@ -250,10 +250,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 		return false;
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
-	public void saveMeasurementRows(final Workbook workbook, final String programUUID) {
+	public void saveMeasurementRows(final Workbook workbook, final String programUUID, final boolean saveVariates) {
 
 		final long startTime = System.currentTimeMillis();
 
@@ -312,7 +312,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				}
 			}
 
-			if (variates != null && !variates.isEmpty()) {
+			if (saveVariates && variates != null && !variates.isEmpty()) {
 				final Measurements measurements = new Measurements(this.getActiveSession(), this.getPhenotypeSaver(),
 						this.getPhenotypeOutlierSaver());
 				measurements.saveMeasurements(observations);

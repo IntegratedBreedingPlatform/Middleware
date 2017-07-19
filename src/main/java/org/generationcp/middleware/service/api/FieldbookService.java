@@ -211,8 +211,9 @@ public interface FieldbookService {
 	 *
 	 * @param workbook that contains the measurement rows to save
 	 * @param programUUID unique id of the program
+	 * @param saveVariates flag the indicates if the measurement data should be saved
 	 */
-	void saveMeasurementRows(Workbook workbook, String programUUID);
+	void saveMeasurementRows(Workbook workbook, String programUUID, boolean saveVariates);
 
 	/**
 	 * Saves germplasm list advanced nursery types. This method saves the germplasms (and corresponding name) if not found in the database.
