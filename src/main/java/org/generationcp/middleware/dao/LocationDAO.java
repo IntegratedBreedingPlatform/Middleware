@@ -928,15 +928,12 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			final StringBuilder sqlString = new StringBuilder();
 
 			sqlString.append("SELECT l.locid ") //
-					.append(" FROM location l ") //
-					.append(" LEFT JOIN georef g on g.locid = l.locid ") //
-					.append(" LEFT JOIN cntry c on c.cntryid = l.cntryid ") //
-					.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype ");
+				.append(" FROM location l ") //
+				.append(" LEFT JOIN georef g on g.locid = l.locid ") //
+				.append(" LEFT JOIN cntry c on c.cntryid = l.cntryid ") //
+				.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype ") //
+				.append(createConditionWhereByFilter(filters));
 
-			if (!filters.isEmpty()) {
-				sqlString.append(createConditionWhereByFilter(filters));
-
-			}
 			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 			this.setQueryParameters(query,filters);
 
@@ -955,16 +952,13 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		try {
 
 			sqlString.append("SELECT l.locid ,ud.fname ,l.lname ,l.labbr ,c.isothree ,c.isoabbr ,g.lat ,g.lon ,g.alt ,province.lname as province") //
-					.append(" FROM location l ") //
-					.append(" LEFT JOIN georef g on l.locid = g.locid ") //
-					.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid ") //
-					.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype, ")
-					.append(" location province");
+				.append(" FROM location l ") //
+				.append(" LEFT JOIN georef g on l.locid = g.locid ") //
+				.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid ") //
+				.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype, ") //
+				.append(" location province") //
+				.append(createConditionWhereByFilter(filters));
 
-			if (!filters.isEmpty()) {
-				sqlString.append(createConditionWhereByFilter(filters));
-
-			}
 			sqlString.append(" and province.locid = l.snl3id ");
 			sqlString.append(" ORDER BY l.locid ");
 
