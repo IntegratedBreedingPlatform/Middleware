@@ -211,7 +211,7 @@ public interface FieldbookService {
 	 *
 	 * @param workbook that contains the measurement rows to save
 	 * @param programUUID unique id of the program
-	 * @param saveVariates flag the indicates if the measurement data should be saved
+	 * @param saveVariates flag that indicates if the measurement data should be saved
 	 */
 	void saveMeasurementRows(Workbook workbook, String programUUID, boolean saveVariates);
 
