@@ -120,7 +120,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
 
 		final List<Location> locList = this.getLocationDataManager().getAllLocations();
-		final List<Location> newLocation = new ArrayList<Location>();
+		final List<Location> newLocation = new ArrayList<>();
 
 		for (final Location loc : locList) {
 			if (fieldLtypeFldId != null && fieldLtypeFldId.intValue() == loc.getLtype().intValue()
@@ -141,7 +141,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
 
 		final List<Location> locList = this.getLocationDataManager().getLocationsByUniqueID(programUUID);
-		final List<Location> newLocation = new ArrayList<Location>();
+		final List<Location> newLocation = new ArrayList<>();
 
 		for (final Location loc : locList) {
 			if (fieldLtypeFldId != null && fieldLtypeFldId.intValue() == loc.getLtype().intValue()
@@ -345,8 +345,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Method> getAllGenerativeMethods(final String programUUID) {
-		final List<Method> methodList = this.getGermplasmDataManager().getMethodsByType("GEN", programUUID);
-		return methodList;
+		return this.getGermplasmDataManager().getMethodsByType("GEN", programUUID);
 	}
 
 	@Override
@@ -631,18 +630,18 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<StandardVariableReference> filterStandardVariablesByMode(final List<Integer> storedInIds,
 			final List<Integer> propertyIds, final boolean isRemoveProperties) {
-		final List<StandardVariableReference> list = new ArrayList<StandardVariableReference>();
-		final List<CVTerm> variables = new ArrayList<CVTerm>();
-		final Set<Integer> variableIds = new HashSet<Integer>();
+		final List<StandardVariableReference> list = new ArrayList<>();
+		final List<CVTerm> variables = new ArrayList<>();
+		final Set<Integer> variableIds = new HashSet<>();
 
 		this.addAllVariableIdsInMode(variableIds, storedInIds);
 		if (propertyIds != null && !propertyIds.isEmpty()) {
-			final Set<Integer> propertyVariableList = new HashSet<Integer>();
+			final Set<Integer> propertyVariableList = new HashSet<>();
 			this.createPropertyList(propertyVariableList, propertyIds);
 			this.filterByProperty(variableIds, propertyVariableList, isRemoveProperties);
 		}
 
-		final List<Integer> variableIdList = new ArrayList<Integer>(variableIds);
+		final List<Integer> variableIdList = new ArrayList<>(variableIds);
 		variables.addAll(this.getCvTermDao().getValidCvTermsByIds(variableIdList, TermId.CATEGORICAL_VARIATE.getId(),
 				TermId.CATEGORICAL_VARIABLE.getId()));
 		for (final CVTerm variable : variables) {
@@ -655,7 +654,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<StandardVariableReference> filterStandardVariablesByIsAIds(
 			final List<StandardVariableReference> standardReferences, final List<Integer> isAIds) {
-		List<StandardVariableReference> newRefs = new ArrayList<StandardVariableReference>();
+		List<StandardVariableReference> newRefs = new ArrayList<>();
 		try {
 			final List<StandardVariableSummary> variableSummaries = this.getStandardVariableDao()
 					.getStandardVariableSummaryWithIsAId(isAIds);
@@ -788,11 +787,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<StandardVariable> getPossibleTreatmentPairs(final int cvTermId, final int propertyId,
 			final List<Integer> hiddenFields) {
-		final List<StandardVariable> treatmentPairs = new ArrayList<StandardVariable>();
+		final List<StandardVariable> treatmentPairs = new ArrayList<>();
 		treatmentPairs.addAll(this.getCvTermDao().getAllPossibleTreatmentPairs(cvTermId, propertyId, hiddenFields));
 
-		final List<Integer> termIds = new ArrayList<Integer>();
-		final Map<Integer, CVTerm> termMap = new HashMap<Integer, CVTerm>();
+		final List<Integer> termIds = new ArrayList<>();
+		final Map<Integer, CVTerm> termMap = new HashMap<>();
 
 		for (final StandardVariable pair : treatmentPairs) {
 			termIds.add(pair.getProperty().getId());
@@ -800,7 +799,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			termIds.add(pair.getMethod().getId());
 		}
 
-		final List<CVTerm> terms = new ArrayList<CVTerm>();
+		final List<CVTerm> terms = new ArrayList<>();
 		terms.addAll(this.getCvTermDao().getByIds(termIds));
 
 		for (final CVTerm term : terms) {
@@ -1102,7 +1101,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public List<Integer> getFavoriteProjectMethods(final String programUUID) {
 		final List<ProgramFavorite> favList = this.getGermplasmDataManager()
 				.getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE, programUUID);
-		final List<Integer> ids = new ArrayList<Integer>();
+		final List<Integer> ids = new ArrayList<>();
 		if (favList != null && !favList.isEmpty()) {
 			for (final ProgramFavorite fav : favList) {
 				ids.add(fav.getEntityId());
@@ -1206,7 +1205,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	public boolean setOrderVariableByRank(final Workbook workbook, final Integer plotDatasetId) {
 		if (workbook != null) {
-			final List<Integer> storedInIds = new ArrayList<Integer>();
+			final List<Integer> storedInIds = new ArrayList<>();
 			storedInIds.addAll(PhenotypicType.GERMPLASM.getTypeStorages());
 			storedInIds.addAll(PhenotypicType.TRIAL_DESIGN.getTypeStorages());
 			storedInIds.addAll(PhenotypicType.VARIATE.getTypeStorages());
@@ -1253,20 +1252,18 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<GermplasmList> appendTabLabelToList(final List<GermplasmList> germplasmCrossesList) {
-		{
-			for (final Iterator<GermplasmList> iterator = germplasmCrossesList.iterator(); iterator.hasNext();) {
-				final GermplasmList germplasmList = iterator.next();
+		for (final Iterator<GermplasmList> iterator = germplasmCrossesList.iterator(); iterator.hasNext();) {
+			final GermplasmList germplasmList = iterator.next();
 
-				if (GermplasmListType.IMP_CROSS.toString().equals(germplasmList.getType())) {
-					germplasmList.setTabLabel(GermplasmList.IMP_CROSS);
-				} else if (GermplasmListType.CRT_CROSS.toString().equals(germplasmList.getType())) {
-					germplasmList.setTabLabel(GermplasmList.CRT_CROSS);
-				} else {
-					germplasmList.setTabLabel(GermplasmList.CROSSES);
-				}
+			if (GermplasmListType.IMP_CROSS.toString().equals(germplasmList.getType())) {
+				germplasmList.setTabLabel(GermplasmList.IMP_CROSS);
+			} else if (GermplasmListType.CRT_CROSS.toString().equals(germplasmList.getType())) {
+				germplasmList.setTabLabel(GermplasmList.CRT_CROSS);
+			} else {
+				germplasmList.setTabLabel(GermplasmList.CROSSES);
 			}
-			return germplasmCrossesList;
 		}
+		return germplasmCrossesList;
 	}
 
 	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
