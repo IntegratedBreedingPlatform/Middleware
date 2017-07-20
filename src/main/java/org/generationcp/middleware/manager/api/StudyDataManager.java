@@ -11,9 +11,6 @@
 
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DataSet;
@@ -44,8 +41,12 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
+import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * This is the API for retrieving phenotypic data stored as Studies and datasets from the CHADO schema.
@@ -801,28 +802,26 @@ public interface StudyDataManager {
 	 *
 	 * Retrieves all the StudySummaries of the DMS Project that matches the conditions: SeasonDbId, LocationDbId and ProgramDbId
 	 *
-	 * @param programDbId Program Identifier
-	 * @param locationDbId Location Abbreviation
-	 * @param seasonDbId Season or Year
+	 * @param filters
+	 *            - the filters that to be included in the query
 	 * @param pageSize Page Size
-	 * @param page Page
+	 * @param pageNumber Page Number
 	 * @return List of StudySummary
 	 * @throws MiddlewareQueryException
 	 */
-	List<StudySummary> findPagedProjects(String programDbId, String locationDbId, String seasonDbId, Integer pageSize, Integer page)
-			throws MiddlewareQueryException;
+	List<StudySummary> findPagedProjects(final Map<StudyFilters, String> filters, Integer pageSize, Integer pageNumber)
+		throws MiddlewareQueryException;
 
 	/**
 	 *
-	 * Count how many DMS Project matches the conditions: programDBid, locationDbId and SeasonDbId
+	 * Count how many DMS Project matches the conditions: programDBid, locationDbId
 	 *
-	 * @param programDbId
-	 * @param locationDbId
-	 * @param seasonDbId
+	 * @param filters
+	 *            - the filters that to be included in the query
 	 * @return Number of programs
 	 * @throws MiddlewareQueryException
 	 */
-	Long countAllStudies(String programDbId, String locationDbId, String seasonDbId) throws MiddlewareQueryException;
+	Long countAllStudies(final Map<StudyFilters, String> filters) throws MiddlewareQueryException;
 
 	List<InstanceMetadata> getInstanceMetadata(int studyId);
 

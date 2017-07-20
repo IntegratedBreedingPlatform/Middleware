@@ -135,23 +135,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Location> getLocationsByProgramUUID(final String programUUID) {
-		final Integer fieldLtypeFldId = this.getLocationDataManager()
-				.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
-		final Integer blockLtypeFldId = this.getLocationDataManager()
-				.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
-
-		final List<Location> locList = this.getLocationDataManager().getLocationsByUniqueID(programUUID);
-		final List<Location> newLocation = new ArrayList<>();
-
-		for (final Location loc : locList) {
-			if (fieldLtypeFldId != null && fieldLtypeFldId.intValue() == loc.getLtype().intValue()
-					|| blockLtypeFldId != null && blockLtypeFldId.intValue() == loc.getLtype().intValue()) {
-				continue;
-			}
-			newLocation.add(loc);
-		}
-
-		return newLocation;
+		return this.getLocationDataManager().getLocationsByUniqueID(programUUID);
 	}
 
 	@Override
@@ -377,7 +361,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Integer saveNurseryAdvanceGermplasmList(final List<Pair<Germplasm, List<Name>>> germplasms,
 			final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList,
-			final List<Pair<Germplasm, List<Attribute>>> germplasmAttributes) throws MiddlewareQueryException {
+			final List<Pair<Germplasm, List<Attribute>>> germplasmAttributes) {
 
 		final GermplasmDAO germplasmDao = this.getGermplasmDao();
 		final GermplasmListDAO germplasmListDao = this.getGermplasmListDAO();
