@@ -311,12 +311,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					}
 				}
 			}
-
-			if (saveVariates && variates != null && !variates.isEmpty()) {
-				final Measurements measurements = new Measurements(this.getActiveSession(), this.getPhenotypeSaver(),
-						this.getPhenotypeOutlierSaver());
-				measurements.saveMeasurements(observations);
-			}
+			final Measurements measurements = new Measurements(this.getActiveSession(), this.getPhenotypeSaver(),
+					this.getPhenotypeOutlierSaver());
+			saveMeasurements(saveVariates, variates, observations, measurements);
 
 		} catch (final Exception e) {
 			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e,
@@ -328,6 +325,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		FieldbookServiceImpl.LOG.debug(
 				"========== saveMeasurementRows Duration (ms): " + (System.currentTimeMillis() - startTime) / 60);
 
+	}
+
+	protected void saveMeasurements(final boolean saveVariates, final List<MeasurementVariable> variates,
+			final List<MeasurementRow> observations, final Measurements measurements) {
+		if (saveVariates && variates != null && !variates.isEmpty()) {
+			measurements.saveMeasurements(observations);
+		}
 	}
 
 	@Override

@@ -21,6 +21,10 @@ import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.data.initializer.MeasurementRowTestDataInitializer;
+import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
@@ -47,6 +51,7 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Lists;
+import com.itextpdf.text.xml.simpleparser.handler.NeverNewLineHandler;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FieldbookServiceImplTest {
@@ -86,12 +91,18 @@ public class FieldbookServiceImplTest {
 	private List<Pair<Germplasm, GermplasmListData>> listDataItems;
 
 	private List<Pair<Germplasm, List<Attribute>>> germplasmAttributes;
+	
+	private MeasurementVariableTestDataInitializer measurementVariableTestDataInitializer;
+	
+	private MeasurementRowTestDataInitializer measurementRowTestDataInitializer;
 
 	@InjectMocks
 	private FieldbookServiceImpl fieldbookServiceImpl;
 
 	@Before
 	public void setUp() {
+		this.measurementVariableTestDataInitializer = new MeasurementVariableTestDataInitializer();
+		this.measurementRowTestDataInitializer = new MeasurementRowTestDataInitializer();
 		this.fieldbookServiceImpl.setCrossExpansionProperties(this.crossExpansionProperties);
 		this.fieldbookServiceImpl.setGermplasmGroupingService(this.germplasmGroupingService);
 		Mockito.doReturn(this.session).when(this.sessionProvider).getSession();
@@ -123,6 +134,26 @@ public class FieldbookServiceImplTest {
 		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(1);
 		final Integer out = this.fieldbookServiceImpl.saveGermplasmList(this.listDataItems, germplasmList, false);
 		Assert.assertEquals("List Id should be 1", (Integer) 1, out);
+	}
+	
+	@Test
+	public void testSaveMeasurementsTrue() {
+		Measurements measurements = Mockito.mock(Measurements.class);
+		List<MeasurementVariable> variates = this.measurementVariableTestDataInitializer.createMeasurementVariableList();
+		List<MeasurementRow> observations = this.measurementRowTestDataInitializer.createMeasurementRowList(1, "Test Name", "Test Value", new MeasurementVariable());
+		this.fieldbookServiceImpl.saveMeasurements(true, variates, observations, measurements);
+		//Verify that the method is called
+		Mockito.verify(measurements).saveMeasurements(observations);
+	}
+	
+	@Test
+	public void testSaveMeasurementsFalse() {
+		Measurements measurements = Mockito.mock(Measurements.class);
+		List<MeasurementVariable> variates = this.measurementVariableTestDataInitializer.createMeasurementVariableList();
+		List<MeasurementRow> observations = this.measurementRowTestDataInitializer.createMeasurementRowList(1, "Test Name", "Test Value", new MeasurementVariable());
+		this.fieldbookServiceImpl.saveMeasurements(false, variates, observations, measurements);
+		//Verify that the method is never called
+		Mockito.verify(measurements, Mockito.times(0)).saveMeasurements(observations);
 	}
 	
 	@Test
