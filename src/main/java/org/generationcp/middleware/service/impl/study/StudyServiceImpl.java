@@ -455,8 +455,24 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// entry type
 				entry.add(String.valueOf(row[2]));
 
-				Object x = row[10];
-				Object y = row[11];
+				/**
+				 *
+				 *                x (Col)
+				 *          \\\\\\\\\\\\\\\\\\\\
+				 *          \...|....|....|....\
+				 *          \...|....|....|....\
+				 *          \------------------\
+				 *  y (Row) \...|....|....|....\
+				 *          \...|....|....|....\
+				 *          \------------------\
+				 *          \...|....|....|....\
+				 *          \...|....|....|....\
+				 *          \\\\\\\\\\\\\\\\\\\\
+				 *
+				 *
+				 */
+				Object x = row[11]; // COL
+				Object y = row[10]; // ROW
 
 				// If there is no row and col design,
 				// get fieldmap row and col
