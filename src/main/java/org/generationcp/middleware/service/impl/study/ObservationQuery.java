@@ -164,11 +164,6 @@ class ObservationQuery {
 		return fromText;
 	}
 
-	String getSingleObservationQueryNonOrdered(final List<MeasurementVariableDto> measurementVariables) {
-		return this.getObservationQuery(measurementVariables) + "AND nde.nd_experiment_id = ?";
-
-	}
-
 	String getSingleObservationQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors) {
 		return this.getObservationsMainQuery(measurementVariables, germplasmDescriptors) + " AND nde.nd_experiment_id = :experiment_id \n"
 				+ getGroupingClause();
