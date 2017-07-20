@@ -132,20 +132,20 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 		return newLocation;
 	}
-	
+
 	@Override
 	public List<Location> getLocationsByProgramUUID(final String programUUID) {
-		final Integer fieldLtypeFldId =
-				this.getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
-		final Integer blockLtypeFldId =
-				this.getLocationDataManager().getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
+		final Integer fieldLtypeFldId = this.getLocationDataManager()
+				.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.FIELD.getCode());
+		final Integer blockLtypeFldId = this.getLocationDataManager()
+				.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
 
 		final List<Location> locList = this.getLocationDataManager().getLocationsByUniqueID(programUUID);
 		final List<Location> newLocation = new ArrayList<Location>();
 
 		for (final Location loc : locList) {
-			if (fieldLtypeFldId != null && fieldLtypeFldId.intValue() == loc.getLtype().intValue() || blockLtypeFldId != null
-					&& blockLtypeFldId.intValue() == loc.getLtype().intValue()) {
+			if (fieldLtypeFldId != null && fieldLtypeFldId.intValue() == loc.getLtype().intValue()
+					|| blockLtypeFldId != null && blockLtypeFldId.intValue() == loc.getLtype().intValue()) {
 				continue;
 			}
 			newLocation.add(loc);
@@ -243,14 +243,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public boolean loadAllObservations(final Workbook workbook) {
-		if (workbook.getObservations() == null || workbook.getObservations().isEmpty() && workbook.getStudyDetails() != null && workbook
-				.getStudyDetails().getId() != null) {
+		if (workbook.getObservations() == null || workbook.getObservations().isEmpty()
+				&& workbook.getStudyDetails() != null && workbook.getStudyDetails().getId() != null) {
 			this.getWorkbookBuilder().loadAllObservations(workbook);
 			return true;
 		}
 		return false;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public void saveMeasurementRows(final Workbook workbook, final String programUUID, final boolean saveVariates) {
@@ -313,7 +313,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			}
 			final Measurements measurements = new Measurements(this.getActiveSession(), this.getPhenotypeSaver(),
 					this.getPhenotypeOutlierSaver());
-			saveMeasurements(saveVariates, variates, observations, measurements);
+			this.saveMeasurements(saveVariates, variates, observations, measurements);
 
 		} catch (final Exception e) {
 			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e,
@@ -432,7 +432,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 						germplasm.getNames().add(name);
 					}
 
-					// inherit 'selection history at fixation' and code names of parent
+					// inherit 'selection history at fixation' and code names of
+					// parent
 					// if parent is part of a group (= has mgid)
 					if (germplasm.getMgid() > 0) {
 						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm);
@@ -515,8 +516,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			// For Management Group Settings Processing
 			// NOTE: The false boolean should be replace by the variable for
 			// "Apply grouping to new crosses only" option. See: BMS-3883
-			this.germplasmGroupingService.processGroupInheritanceForCrosses(germplasmGids, isApplyNewGroupToPreviousCrosses,
-					this.crossExpansionProperties.getHybridBreedingMethods());
+			this.germplasmGroupingService.processGroupInheritanceForCrosses(germplasmGids,
+					isApplyNewGroupToPreviousCrosses, this.crossExpansionProperties.getHybridBreedingMethods());
 
 		} catch (final Exception e) {
 			this.logAndThrowException(

@@ -51,7 +51,6 @@ import org.mockito.Mockito;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.common.collect.Lists;
-import com.itextpdf.text.xml.simpleparser.handler.NeverNewLineHandler;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FieldbookServiceImplTest {
@@ -70,13 +69,13 @@ public class FieldbookServiceImplTest {
 
 	@Mock
 	SQLQuery query;
-	
+
 	@Mock
 	Criteria criteria;
 
 	@Mock
 	GermplasmDataManager germplasmDataManager;
-	
+
 	@Mock
 	LocationDAO locationDAO;
 
@@ -91,9 +90,9 @@ public class FieldbookServiceImplTest {
 	private List<Pair<Germplasm, GermplasmListData>> listDataItems;
 
 	private List<Pair<Germplasm, List<Attribute>>> germplasmAttributes;
-	
+
 	private MeasurementVariableTestDataInitializer measurementVariableTestDataInitializer;
-	
+
 	private MeasurementRowTestDataInitializer measurementRowTestDataInitializer;
 
 	@InjectMocks
@@ -112,7 +111,7 @@ public class FieldbookServiceImplTest {
 		this.germplasms = this.createGermplasms();
 		this.listDataItems = this.createListDataItems();
 		this.germplasmAttributes = this.createGermplasmAttributes();
-		Mockito.when(this.dbBroker.getLocationDAO()).thenReturn(locationDAO);
+		Mockito.when(this.dbBroker.getLocationDAO()).thenReturn(this.locationDAO);
 	}
 
 	@Test
@@ -135,30 +134,34 @@ public class FieldbookServiceImplTest {
 		final Integer out = this.fieldbookServiceImpl.saveGermplasmList(this.listDataItems, germplasmList, false);
 		Assert.assertEquals("List Id should be 1", (Integer) 1, out);
 	}
-	
+
 	@Test
 	public void testSaveMeasurementsTrue() {
-		Measurements measurements = Mockito.mock(Measurements.class);
-		List<MeasurementVariable> variates = this.measurementVariableTestDataInitializer.createMeasurementVariableList();
-		List<MeasurementRow> observations = this.measurementRowTestDataInitializer.createMeasurementRowList(1, "Test Name", "Test Value", new MeasurementVariable());
+		final Measurements measurements = Mockito.mock(Measurements.class);
+		final List<MeasurementVariable> variates = this.measurementVariableTestDataInitializer
+				.createMeasurementVariableList();
+		final List<MeasurementRow> observations = this.measurementRowTestDataInitializer.createMeasurementRowList(1,
+				"Test Name", "Test Value", new MeasurementVariable());
 		this.fieldbookServiceImpl.saveMeasurements(true, variates, observations, measurements);
-		//Verify that the method is called
+		// Verify that the method is called
 		Mockito.verify(measurements).saveMeasurements(observations);
 	}
-	
+
 	@Test
 	public void testSaveMeasurementsFalse() {
-		Measurements measurements = Mockito.mock(Measurements.class);
-		List<MeasurementVariable> variates = this.measurementVariableTestDataInitializer.createMeasurementVariableList();
-		List<MeasurementRow> observations = this.measurementRowTestDataInitializer.createMeasurementRowList(1, "Test Name", "Test Value", new MeasurementVariable());
+		final Measurements measurements = Mockito.mock(Measurements.class);
+		final List<MeasurementVariable> variates = this.measurementVariableTestDataInitializer
+				.createMeasurementVariableList();
+		final List<MeasurementRow> observations = this.measurementRowTestDataInitializer.createMeasurementRowList(1,
+				"Test Name", "Test Value", new MeasurementVariable());
 		this.fieldbookServiceImpl.saveMeasurements(false, variates, observations, measurements);
-		//Verify that the method is never called
+		// Verify that the method is never called
 		Mockito.verify(measurements, Mockito.times(0)).saveMeasurements(observations);
 	}
-	
+
 	@Test
-	public void getLocationsByProgramUUID(){
-		List<Location> locations = this.fieldbookServiceImpl.getLocationsByProgramUUID(null);
+	public void getLocationsByProgramUUID() {
+		final List<Location> locations = this.fieldbookServiceImpl.getLocationsByProgramUUID(null);
 		Assert.assertNotNull("The return locations list should not be null", locations);
 	}
 
