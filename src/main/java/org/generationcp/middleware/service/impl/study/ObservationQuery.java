@@ -20,6 +20,7 @@ class ObservationQuery {
 	final String selectText = " SELECT\n"
 		+ "   nde.nd_experiment_id,\n"
 		+ "   gl.description                                      AS                      TRIAL_INSTANCE,\n"
+		+ "   gl.nd_geolocation_id,\n"
 		+ "   (SELECT iispcvt.definition\n"
 		+ "    FROM\n"
 		+ "      stockprop isp\n"

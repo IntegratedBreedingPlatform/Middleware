@@ -415,10 +415,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 					entry.add(year);
 				}
 
-				// locationDbId = trial instance number
-				// In brapi this will equate to studyDbId
-				// TODO Update query and use nd_geolocation_id instead. For now instance number will be ok.
-				entry.add((String) row[1]);
+				int lastFixedColumn = 17;
+
+				// locationDbId = nd_geolocation_id
+				entry.add(String.valueOf(row[lastFixedColumn]));
 
 				String locationName = (String) row[13];
 				String locationAbbreviation = (String) row[14];
@@ -477,7 +477,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// phenotypic values
 				int columnOffset = 1;
 				for (int i = 0; i < traits.size(); i++) {
-					final Object rowValue = row[16 + columnOffset];
+					final Object rowValue = row[lastFixedColumn + columnOffset];
 
 					if (rowValue != null) {
 						entry.add(String.valueOf(rowValue));
