@@ -415,18 +415,23 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// studyDbId = nd_geolocation_id
 				entry.add(String.valueOf(row[17]));
 
-				// locationDbId
-				entry.add(String.valueOf(row[lastFixedColumn]));
-
 				String locationName = (String) row[13];
 				String locationAbbreviation = (String) row[14];
 
+				// studyName
+				String studyName = "Study-" + row[1];
+				entry.add(studyName);
+
+				// locationDbId
+				entry.add(String.valueOf(row[lastFixedColumn]));
+
+				// locationName
 				if (StringUtils.isNotBlank(locationAbbreviation)) {
 					entry.add(locationAbbreviation);
 				} else  if (StringUtils.isNotBlank(locationName)) {
 					entry.add(locationName);
 				} else {
-					entry.add("Study-" + (String) row[1]);
+					entry.add(studyName);
 				}
 
 				// gid
