@@ -72,6 +72,8 @@ public class StudyMeasurements {
 		final SQLQuery createSQLQuery = this.session.createSQLQuery(generateQuery);
 
 		this.addScalar(createSQLQuery);
+		createSQLQuery.addScalar("FIELDMAP COLUMN");
+		createSQLQuery.addScalar("FIELDMAP RANGE");
 
 		this.addScalarForTraits(selectionMethodsAndTraits, createSQLQuery);
 
@@ -87,12 +89,6 @@ public class StudyMeasurements {
 			createSQLQuery.addScalar(measurementVariable.getName());
 			createSQLQuery.addScalar(measurementVariable.getName() + "_PhenotypeId", new IntegerType());
 		}
-	}
-
-	private void addScalar(final SQLQuery createSQLQuery) {
-		this.addScalarWithoutFieldmap(createSQLQuery);
-		createSQLQuery.addScalar("FIELDMAP COLUMN");
-		createSQLQuery.addScalar("FIELDMAP RANGE");
 	}
 
 	private List<ObservationDto> mapResults(final List<Object[]> results, final List<MeasurementVariableDto> projectVariables,
@@ -156,16 +152,18 @@ public class StudyMeasurements {
 	private SQLQuery createQueryAndAddScalarWithBlockRowCol(final List<MeasurementVariableDto> measurementVariables, final String generateQuery) {
 		final SQLQuery createSQLQuery = this.session.createSQLQuery(generateQuery);
 
-		this.addScalarWithoutFieldmap(createSQLQuery);
+		this.addScalar(createSQLQuery);
 		createSQLQuery.addScalar("LocationName");
 		createSQLQuery.addScalar("LocationAbbreviation");
 		createSQLQuery.addScalar("FieldMapColumn");
 		createSQLQuery.addScalar("FieldMapRow");
+		createSQLQuery.addScalar("nd_geolocation_id");
+		createSQLQuery.addScalar("locationDbId");
 		this.addScalarForTraits(measurementVariables, createSQLQuery);
 		return createSQLQuery;
 	}
 
-	private void addScalarWithoutFieldmap(final SQLQuery createSQLQuery) {
+	private void addScalar(final SQLQuery createSQLQuery) {
 		createSQLQuery.addScalar("nd_experiment_id");
 		createSQLQuery.addScalar("TRIAL_INSTANCE");
 		createSQLQuery.addScalar("ENTRY_TYPE");

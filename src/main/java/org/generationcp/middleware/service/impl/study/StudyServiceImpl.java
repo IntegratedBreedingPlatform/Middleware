@@ -375,7 +375,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier, Integer instanceDbId) {
-		String year = null;
 		final List<MeasurementVariableDto> traits = this.measurementVariableService.getVariables(studyIdentifier, VariableType.TRAIT.getId());
 
 		final List<MeasurementVariableDto> measurementVariables = Ordering.from(new Comparator<MeasurementVariableDto>() {
@@ -399,12 +398,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 
 		List<List<String>> data = Lists.newArrayList();
-		if (instanceDbId != null) {
-			year = this.getYearFromStudy(studyIdentifier);
-		}
-		else {
-			year = null;
-		}
+
+		String year = this.getYearFromStudy(studyIdentifier);
 
 		if (!CollectionUtils.isEmpty(results)) {
 
@@ -415,20 +410,28 @@ public class StudyServiceImpl extends Service implements StudyService {
 					entry.add(year);
 				}
 
-				// locationDbId = trial instance number
-				// In brapi this will equate to studyDbId
-				// TODO Update query and use nd_geolocation_id instead. For now instance number will be ok.
-				entry.add((String) row[1]);
+				int lastFixedColumn = 18;
+
+				// studyDbId = nd_geolocation_id
+				entry.add(String.valueOf(row[17]));
 
 				String locationName = (String) row[13];
 				String locationAbbreviation = (String) row[14];
 
+				// studyName
+				String studyName = "Study-" + row[1];
+				entry.add(studyName);
+
+				// locationDbId
+				entry.add(String.valueOf(row[lastFixedColumn]));
+
+				// locationName
 				if (StringUtils.isNotBlank(locationAbbreviation)) {
 					entry.add(locationAbbreviation);
 				} else  if (StringUtils.isNotBlank(locationName)) {
 					entry.add(locationName);
 				} else {
-					entry.add("Study-" + (String) row[1]);
+					entry.add(studyName);
 				}
 
 				// gid
@@ -455,8 +458,24 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// entry type
 				entry.add(String.valueOf(row[2]));
 
-				Object x = row[10];
-				Object y = row[11];
+				/**
+				 *
+				 *                x (Col)
+				 *          \\\\\\\\\\\\\\\\\\\\
+				 *          \...|....|....|....\
+				 *          \...|....|....|....\
+				 *          \------------------\
+				 *  y (Row) \...|....|....|....\
+				 *          \...|....|....|....\
+				 *          \------------------\
+				 *          \...|....|....|....\
+				 *          \...|....|....|....\
+				 *          \\\\\\\\\\\\\\\\\\\\
+				 *
+				 *
+				 */
+				Object x = row[11]; // COL
+				Object y = row[10]; // ROW
 
 				// If there is no row and col design,
 				// get fieldmap row and col
@@ -477,7 +496,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// phenotypic values
 				int columnOffset = 1;
 				for (int i = 0; i < traits.size(); i++) {
-					final Object rowValue = row[16 + columnOffset];
+					final Object rowValue = row[lastFixedColumn + columnOffset];
 
 					if (rowValue != null) {
 						entry.add(String.valueOf(rowValue));
@@ -496,14 +515,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 			dto = new TrialObservationTable().setStudyDbId(instanceDbId != null ? instanceDbId : studyIdentifier).setObservationVariableDbIds(observationVariableDbIds)
 			.setObservationVariableNames(observationVariableNames).setData(data);
 
-		if (instanceDbId != null) {
-			dto.setHeaderRow(Lists.newArrayList("year", "locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
-				"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y", "plotId"));
-		}
-		else {
-			dto.setHeaderRow(Lists.newArrayList("locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
-				"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y", "plotId"));
-		}
+		dto.setHeaderRow(Lists.newArrayList("year", "studyDbId", "studyName", "locationDbId", "locationName", "germplasmDbId",
+			"germplasmName", "observationUnitDbId",
+			"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y", "plotId"));
+
 		return dto;
 	}
 

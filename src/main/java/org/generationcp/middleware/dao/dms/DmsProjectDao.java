@@ -205,7 +205,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ " GROUP BY geoloc.nd_geolocation_id ";
 
 	static final String GET_PROJECTID_BY_STUDYDBID = "SELECT DISTINCT"
-		+ "      p.project_id"
+		+ "      pr.object_project_id"
 		+ " FROM"
 		+ "     project_relationship pr"
 		+ "         INNER JOIN"
@@ -218,7 +218,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "     nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id"
 		+ " WHERE"
 		+ "     gl.nd_geolocation_id = :studyDbId"
-		+ "     AND pr.type_id = " + TermId.IS_STUDY.getId();
+		+ "     AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId();
 
 
 	public List<Reference> getRootFolders(String programUUID, List<StudyType> studyTypes) {

@@ -17,24 +17,49 @@ class ObservationQuery {
 	final String DEFAULT_SORT_ORDER = "asc";
 
 	final String whereText = "where (pr.object_project_id = ? and name LIKE '%PLOTDATA'))";
-	final String selectText = "SELECT \n" + "    nde.nd_experiment_id,\n" + "    gl.description AS TRIAL_INSTANCE,\n" + "    (SELECT \n"
-			+ "            iispcvt.definition\n" + "        FROM\n" + "            stockprop isp\n" + "                INNER JOIN\n"
-			+ "            cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id\n" + "                INNER JOIN\n"
-			+ "            cvterm iispcvt ON iispcvt.cvterm_id = isp.value\n" + "        WHERE\n"
-			+ "            isp.stock_id = s.stock_id\n" + "                AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE,\n"
-			+ "    s.dbxref_id AS GID,\n" + "    s.name DESIGNATION,\n" + "    s.uniquename ENTRY_NO,\n"
-			+ "    s.value as ENTRY_CODE,\n"
-			+ "    (SELECT \n"
-			+ "            isp.value\n" + "        FROM\n" + "            stockprop isp\n" + "                INNER JOIN\n"
-			+ "            cvterm ispcvt1 ON ispcvt1.cvterm_id = isp.type_id\n" + "        WHERE\n"
-			+ "            isp.stock_id = s.stock_id\n" + "                AND ispcvt1.name = 'SEED_SOURCE') SEED_SOURCE,\n"
-			+ "    (SELECT \n" + "            ndep.value\n" + "        FROM\n" + "            nd_experimentprop ndep\n"
-			+ "                INNER JOIN\n" + "            cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id\n" + "        WHERE\n"
-			+ "            ndep.nd_experiment_id = ep.nd_experiment_id\n" + "                AND ispcvt.name = 'REP_NO') REP_NO,\n"
-			+ "    (SELECT \n" + "            ndep.value\n" + "        FROM\n" + "            nd_experimentprop ndep\n"
-			+ "                INNER JOIN\n" + "            cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id\n" + "        WHERE\n"
-			+ "            ndep.nd_experiment_id = ep.nd_experiment_id\n" + "                AND ispcvt.name = 'PLOT_NO') PLOT_NO,\n"
-			+ "    nde.plot_id as PLOT_ID \n";
+	final String selectText = " SELECT\n"
+		+ "   nde.nd_experiment_id,\n"
+		+ "   gl.description                                      AS                      TRIAL_INSTANCE,\n"
+		+ "   gl.nd_geolocation_id,\n"
+		+ "   (SELECT iispcvt.definition\n"
+		+ "    FROM\n"
+		+ "      stockprop isp\n"
+		+ "      INNER JOIN\n"
+		+ "      cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id\n"
+		+ "      INNER JOIN\n"
+		+ "      cvterm iispcvt ON iispcvt.cvterm_id = isp.value\n"
+		+ "    WHERE\n"
+		+ "      isp.stock_id = s.stock_id\n"
+		+ "      AND ispcvt.name = 'ENTRY_TYPE')                                          ENTRY_TYPE,\n"
+		+ "   s.dbxref_id                                         AS                      GID,\n"
+		+ "   s.name                                                                      DESIGNATION,\n"
+		+ "   s.uniquename                                                                ENTRY_NO,\n"
+		+ "   s.value                                             AS                      ENTRY_CODE,\n"
+		+ "   (SELECT isp.value\n"
+		+ "    FROM\n"
+		+ "      stockprop isp\n"
+		+ "      INNER JOIN\n"
+		+ "      cvterm ispcvt1 ON ispcvt1.cvterm_id = isp.type_id\n"
+		+ "    WHERE\n"
+		+ "      isp.stock_id = s.stock_id\n"
+		+ "      AND ispcvt1.name = 'SEED_SOURCE')                                        SEED_SOURCE,\n"
+		+ "   (SELECT ndep.value\n"
+		+ "    FROM\n"
+		+ "      nd_experimentprop ndep\n"
+		+ "      INNER JOIN\n"
+		+ "      cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id\n"
+		+ "    WHERE\n"
+		+ "      ndep.nd_experiment_id = ep.nd_experiment_id\n"
+		+ "      AND ispcvt.name = 'REP_NO')                                              REP_NO,\n"
+		+ "   (SELECT ndep.value\n"
+		+ "    FROM\n"
+		+ "      nd_experimentprop ndep\n"
+		+ "      INNER JOIN\n"
+		+ "      cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id\n"
+		+ "    WHERE\n"
+		+ "      ndep.nd_experiment_id = ep.nd_experiment_id\n"
+		+ "      AND ispcvt.name = 'PLOT_NO')                                             PLOT_NO,\n"
+		+ "   nde.plot_id                                         AS                      PLOT_ID\n";
 
 	final String locationNameSubQuery = "(SELECT \n" +
 			"            l.lname \n" +
@@ -45,6 +70,16 @@ class ObservationQuery {
 			"        WHERE \n" +
 			"            gp.type_id = " + TermId.LOCATION_ID.getId() + " \n" +
 			"                AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS LocationName";
+
+	final String locationDbIdSubQuery = "(SELECT \n" +
+		"            l.locid \n" +
+		"        FROM \n" +
+		"            nd_geolocationprop gp \n" +
+		"                INNER JOIN \n" +
+		"            location l ON l.locid = gp.value \n" +
+		"        WHERE \n" +
+		"            gp.type_id = " + TermId.LOCATION_ID.getId() + " \n" +
+		"                AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS locationDbId";
 
 	final String locationAbbreviationSubQuery = "(SELECT \n" +
 			"            gp.value \n" +
@@ -110,6 +145,7 @@ class ObservationQuery {
 		}
 
 		return selectText + ", " + blockNoText + ", " + rowNumberText + "," + columnNumberText +
+				", " + locationDbIdSubQuery +
 				", " + locationNameSubQuery +
 				", " + locationAbbreviationSubQuery +
 				", " + fieldmapColumnText +
@@ -138,11 +174,6 @@ class ObservationQuery {
 				+ "WHERE\n" + "    p.project_id = ("
 				+ "Select p.project_id from project_relationship pr\n" + "INNER JOIN project p on p.project_id = pr.subject_project_id\n";
 		return fromText;
-	}
-
-	String getSingleObservationQueryNonOrdered(final List<MeasurementVariableDto> measurementVariables) {
-		return this.getObservationQuery(measurementVariables) + "AND nde.nd_experiment_id = ?";
-
 	}
 
 	String getSingleObservationQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors) {
