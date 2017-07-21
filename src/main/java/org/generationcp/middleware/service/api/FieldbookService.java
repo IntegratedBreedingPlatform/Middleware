@@ -54,21 +54,27 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 public interface FieldbookService {
 
 	/**
-	 * Gets the field map info (entries, reps, plots and counts) of the given trial.
+	 * Gets the field map info (entries, reps, plots and counts) of the given
+	 * trial.
 	 *
-	 * @param trialIdList the trial id list
-	 * 
+	 * @param trialIdList
+	 *            the trial id list
+	 *
 	 * @return the FieldMapCount object containing the counts
 	 */
-	List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList, CrossExpansionProperties crossExpansionProperties);
+	List<FieldMapInfo> getFieldMapInfoOfTrial(List<Integer> trialIdList,
+			CrossExpansionProperties crossExpansionProperties);
 
 	/**
-	 * Gets the field map info (entries, reps, plots and counts) of the given nursery.
+	 * Gets the field map info (entries, reps, plots and counts) of the given
+	 * nursery.
 	 *
-	 * @param nurseryIdList the nursery id list
+	 * @param nurseryIdList
+	 *            the nursery id list
 	 * @return the FieldMapCount object containing the counts
 	 */
-	List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList, CrossExpansionProperties crossExpansionProperties);
+	List<FieldMapInfo> getFieldMapInfoOfNursery(List<Integer> nurseryIdList,
+			CrossExpansionProperties crossExpansionProperties);
 
 	/**
 	 * Retrieves all locations from central and local databases.
@@ -94,7 +100,8 @@ public interface FieldbookService {
 	/**
 	 * Gets the all breeding methods.
 	 *
-	 * @param filterOutGenerative the filter out generative
+	 * @param filterOutGenerative
+	 *            the filter out generative
 	 * @return All breeding methods
 	 */
 	List<Method> getAllBreedingMethods(boolean filterOutGenerative);
@@ -102,7 +109,8 @@ public interface FieldbookService {
 	/**
 	 * Gets the breeding methods of generative type.
 	 *
-	 * @param programUUID the filter out generative
+	 * @param programUUID
+	 *            the filter out generative
 	 * @return All breeding methods
 	 */
 	List<Method> getAllGenerativeMethods(final String programUUID);
@@ -110,26 +118,35 @@ public interface FieldbookService {
 	/**
 	 * Gets the favorite breeding methods.
 	 *
-	 * @param methodIds the method ids
-	 * @param filterOutGenerative the filter out generative
+	 * @param methodIds
+	 *            the method ids
+	 * @param filterOutGenerative
+	 *            the filter out generative
 	 * @return the favorite breeding methods
 	 */
 	List<Method> getFavoriteBreedingMethods(List<Integer> methodIds, boolean filterOutGenerative);
 
 	/**
-	 * Save or update Field Map Properties like row, column, block, total rows, total columns, planting order.
+	 * Save or update Field Map Properties like row, column, block, total rows,
+	 * total columns, planting order.
 	 *
-	 * @param info the info
-	 * @param userId the user id
-	 * @param isNew the is new
+	 * @param info
+	 *            the info
+	 * @param userId
+	 *            the user id
+	 * @param isNew
+	 *            the is new
 	 */
 	void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew);
 
 	/**
-	 * Retrieve all field map labels in the block of the specified trial instance id.
+	 * Retrieve all field map labels in the block of the specified trial
+	 * instance id.
 	 *
-	 * @param datasetId the dataset id
-	 * @param geolocationId the geolocation id
+	 * @param datasetId
+	 *            the dataset id
+	 * @param geolocationId
+	 *            the geolocation id
 	 * @return all field maps in block by trial instance id
 	 */
 	List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(int datasetId, int geolocationId,
@@ -138,7 +155,8 @@ public interface FieldbookService {
 	/**
 	 * Gets the dataset references.
 	 *
-	 * @param studyId the study id of the datasets
+	 * @param studyId
+	 *            the study id of the datasets
 	 * @return the dataset references belonging to the given study id
 	 */
 	List<DatasetReference> getDatasetReferences(int studyId);
@@ -146,8 +164,9 @@ public interface FieldbookService {
 	/**
 	 * Gets the favorite location by project id.
 	 *
-	 * @param locationIds the location ids
-	 * @param filtered 
+	 * @param locationIds
+	 *            the location ids
+	 * @param filtered
 	 * @return the favorite locations based on the given project id
 	 */
 	List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds, Boolean filtered);
@@ -155,26 +174,34 @@ public interface FieldbookService {
 	/**
 	 * Gets the study.
 	 *
-	 * @param studyId the study id
+	 * @param studyId
+	 *            the study id
 	 * @return the Study corresponding to the given study id
 	 */
 	Study getStudy(int studyId);
 
 	/**
-	 * Returns the variable id given the property, scale, method, and role (P-S-M-R).
+	 * Returns the variable id given the property, scale, method, and role
+	 * (P-S-M-R).
 	 *
-	 * @param property the property
-	 * @param scale the scale
-	 * @param method the method
-	 * @param role the role
+	 * @param property
+	 *            the property
+	 * @param scale
+	 *            the scale
+	 * @param method
+	 *            the method
+	 * @param role
+	 *            the role
 	 * @return the standard variable id by property scale method role
 	 */
-	Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method, PhenotypicType role);
+	Integer getStandardVariableIdByPropertyScaleMethodRole(String property, String scale, String method,
+			PhenotypicType role);
 
 	/**
 	 * Gets the germplasm id by name.
 	 *
-	 * @param name the name
+	 * @param name
+	 *            the name
 	 * @return the germplasm id by name
 	 */
 	Integer getGermplasmIdByName(String name);
@@ -182,7 +209,8 @@ public interface FieldbookService {
 	/**
 	 * Gets the data set.
 	 *
-	 * @param id the id
+	 * @param id
+	 *            the id
 	 * @return the data set
 	 */
 	Workbook getNurseryDataSet(int id);
@@ -190,58 +218,81 @@ public interface FieldbookService {
 	/**
 	 * Gets the data set.
 	 *
-	 * @param id the id
+	 * @param id
+	 *            the id
 	 * @return the data set
 	 */
 	Workbook getTrialDataSet(int id);
 
 	/**
-	 * Given a workbook already loaded via {@link WorkbookBuilder#create(int)} - which does not load observations now - this is a helper
-	 * method to trigger loading the observations collection IF AND WHEN NEEDED. This method is a stop gap mecahnism to lazy load the
-	 * observations collection until we can gradually refactor all code so that entire set of observations (plots) data is not required to
-	 * be loaded in session. This method should only be invoked at a point in process where entire observations (plots) collection with
-	 * measurements is required due to the way rest of the process code is written. For large Nurseries and trials this method is not yet
-	 * performance tuned. Memory footprint of the overall application can be severly impacted if this method is used without consideration
-	 * for performance at scale. So please be very careful and think it through before using this method.
+	 * Given a workbook already loaded via {@link WorkbookBuilder#create(int)} -
+	 * which does not load observations now - this is a helper method to trigger
+	 * loading the observations collection IF AND WHEN NEEDED. This method is a
+	 * stop gap mecahnism to lazy load the observations collection until we can
+	 * gradually refactor all code so that entire set of observations (plots)
+	 * data is not required to be loaded in session. This method should only be
+	 * invoked at a point in process where entire observations (plots)
+	 * collection with measurements is required due to the way rest of the
+	 * process code is written. For large Nurseries and trials this method is
+	 * not yet performance tuned. Memory footprint of the overall application
+	 * can be severly impacted if this method is used without consideration for
+	 * performance at scale. So please be very careful and think it through
+	 * before using this method.
 	 */
 	boolean loadAllObservations(final Workbook workbook);
 
 	/**
-	 * Saves the measurement rows of a workbook as a local trial or nursery on the new CHADO schema.
+	 * Saves the measurement rows of a workbook as a local trial or nursery on
+	 * the new CHADO schema.
 	 *
-	 * @param workbook that contains the measurement rows to save
-	 * @param programUUID unique id of the program
+	 * @param workbook
+	 *            that contains the measurement rows to save
+	 * @param programUUID
+	 *            unique id of the program
+	 * @param saveVariates
+	 *            flag that indicates if the measurement data should be saved
 	 */
-	void saveMeasurementRows(Workbook workbook, String programUUID);
+	void saveMeasurementRows(Workbook workbook, String programUUID, boolean saveVariates);
 
 	/**
-	 * Saves germplasm list advanced nursery types. This method saves the germplasms (and corresponding name) if not found in the database.
-	 * ListData items are always added to the database, before saving the germplasm list.
+	 * Saves germplasm list advanced nursery types. This method saves the
+	 * germplasms (and corresponding name) if not found in the database.
+	 * ListData items are always added to the database, before saving the
+	 * germplasm list.
 	 *
 	 * Old Fieldbook Implementation:
 	 *
-	 * call Save Listnms; For each entry in the advance list table if (gid != null) germplasm = findByGid(gid) if (germplasm == null)
-	 * germplasm = findByName(table.desig)
+	 * call Save Listnms; For each entry in the advance list table if (gid !=
+	 * null) germplasm = findByGid(gid) if (germplasm == null) germplasm =
+	 * findByName(table.desig)
 	 *
-	 * if (germplasm != null) call Save ListData using gid from germplasm.gid else call Save Germplasm - note new gid generated call Save
-	 * Names using NType = 1027, NVal = table.desig, NStat = 0 call Save Names using NType = 1028, NVal = table.germplasmBCID, NStat = 1
-	 * call Save Names using NType = 1029, NVal = table.cross, NStat = 0 call Save ListData
+	 * if (germplasm != null) call Save ListData using gid from germplasm.gid
+	 * else call Save Germplasm - note new gid generated call Save Names using
+	 * NType = 1027, NVal = table.desig, NStat = 0 call Save Names using NType =
+	 * 1028, NVal = table.germplasmBCID, NStat = 1 call Save Names using NType =
+	 * 1029, NVal = table.cross, NStat = 0 call Save ListData
 	 *
-	 * @param germplasms the germplasms to add - the key of the Map is the germplasm to add, while the value is its corresponding name
-	 *        values
-	 * @param listDataItems the list data to add - the key of the Map is the germplasm associated to the germplasm list data value
-	 * @param germplasmList the germplasm list to add
+	 * @param germplasms
+	 *            the germplasms to add - the key of the Map is the germplasm to
+	 *            add, while the value is its corresponding name values
+	 * @param listDataItems
+	 *            the list data to add - the key of the Map is the germplasm
+	 *            associated to the germplasm list data value
+	 * @param germplasmList
+	 *            the germplasm list to add
 	 *
 	 * @return The id of the newly-created germplasm list
 	 */
 
 	Integer saveNurseryAdvanceGermplasmList(List<Pair<Germplasm, List<Name>>> germplasms,
-			List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList, List<Pair<Germplasm, List<Attribute>>> germplasmAttributes);
+			List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList,
+			List<Pair<Germplasm, List<Attribute>>> germplasmAttributes);
 
 	/**
 	 * Used for retrieving the Cimmyt Wheat Germplasm name.
 	 *
-	 * @param gid the gid
+	 * @param gid
+	 *            the gid
 	 * @return the cimmyt wheat germplasm name by gid
 	 */
 	String getCimmytWheatGermplasmNameByGid(int gid);
@@ -249,7 +300,8 @@ public interface FieldbookService {
 	/**
 	 * Used for retrieving the breeding method id given a method id.
 	 *
-	 * @param mid the mid
+	 * @param mid
+	 *            the mid
 	 * @return the breeding method by id
 	 */
 	Method getBreedingMethodById(int mid);
@@ -257,7 +309,8 @@ public interface FieldbookService {
 	/**
 	 * Used for retrieving the germplasm given a germplasm id.
 	 *
-	 * @param gid the gid
+	 * @param gid
+	 *            the gid
 	 * @return the germplasm by gid
 	 */
 	Germplasm getGermplasmByGID(int gid);
@@ -265,8 +318,10 @@ public interface FieldbookService {
 	/**
 	 * Get germplasm list by name.
 	 *
-	 * @param name the name
-	 * @param programUUID unique id of the program
+	 * @param name
+	 *            the name
+	 * @param programUUID
+	 *            unique id of the program
 	 * @return the germplasm list by name
 	 */
 	GermplasmList getGermplasmListByName(String name, String programUUID);
@@ -274,7 +329,8 @@ public interface FieldbookService {
 	/**
 	 * Get All distinct values given a standard variable id.
 	 *
-	 * @param stdVarId the std var id
+	 * @param stdVarId
+	 *            the std var id
 	 * @return the distinct standard variable values
 	 */
 	List<ValueReference> getDistinctStandardVariableValues(int stdVarId);
@@ -282,7 +338,8 @@ public interface FieldbookService {
 	/**
 	 * Get all standard variables.
 	 *
-	 * @param programUUID unique id of the program
+	 * @param programUUID
+	 *            unique id of the program
 	 * @return the all standard variables
 	 */
 	Set<StandardVariable> getAllStandardVariables(String programUUID);
@@ -290,19 +347,27 @@ public interface FieldbookService {
 	/**
 	 * Get all distinct values given the PSMR combination.
 	 *
-	 * @param property the property
-	 * @param scale the scale
-	 * @param method the method
-	 * @param role the role
+	 * @param property
+	 *            the property
+	 * @param scale
+	 *            the scale
+	 * @param method
+	 *            the method
+	 * @param role
+	 *            the role
 	 * @return the distinct standard variable values
 	 */
-	List<ValueReference> getDistinctStandardVariableValues(String property, String scale, String method, PhenotypicType role);
+	List<ValueReference> getDistinctStandardVariableValues(String property, String scale, String method,
+			PhenotypicType role);
 
 	/**
-	 * Get a standard variable given an id. After the first read, the variable is cached in memory.
+	 * Get a standard variable given an id. After the first read, the variable
+	 * is cached in memory.
 	 *
-	 * @param id the id
-	 * @param programUUID unique id of the program
+	 * @param id
+	 *            the id
+	 * @param programUUID
+	 *            unique id of the program
 	 * @return the standard variable
 	 */
 	StandardVariable getStandardVariable(int id, String programUUID);
@@ -310,7 +375,8 @@ public interface FieldbookService {
 	/**
 	 * Gets the all nursery types.
 	 *
-	 * @param programUUID unique id of the program
+	 * @param programUUID
+	 *            unique id of the program
 	 * @return the all nursery types
 	 */
 	List<ValueReference> getAllNurseryTypes(String programUUID);
@@ -323,7 +389,8 @@ public interface FieldbookService {
 	List<Person> getAllPersons();
 
 	/**
-	 * Returns all Persons from local sorted by first-middle-last followed by all persons from local sorted by first-middle-last.
+	 * Returns all Persons from local sorted by first-middle-last followed by
+	 * all persons from local sorted by first-middle-last.
 	 *
 	 * @return the all persons ordered by local central
 	 */
@@ -332,8 +399,10 @@ public interface FieldbookService {
 	/**
 	 * Count plots with plants selectedof nursery.
 	 *
-	 * @param nurseryId the nursery id
-	 * @param variateIds the variate ids
+	 * @param nurseryId
+	 *            the nursery id
+	 * @param variateIds
+	 *            the variate ids
 	 * @return the count
 	 */
 	int countPlotsWithRecordedVariatesInDataset(int nurseryId, List<Integer> variateIds);
@@ -341,9 +410,12 @@ public interface FieldbookService {
 	/**
 	 * Filter standard variables by mode.
 	 *
-	 * @param storedInIds the stored in ids
-	 * @param propertyIds the property ids
-	 * @param isRemoveProperties the is remove properties
+	 * @param storedInIds
+	 *            the stored in ids
+	 * @param propertyIds
+	 *            the property ids
+	 * @param isRemoveProperties
+	 *            the is remove properties
 	 * @return the list
 	 */
 	List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds, List<Integer> propertyIds,
@@ -352,8 +424,10 @@ public interface FieldbookService {
 	/**
 	 * Gets the nursery variable settings.
 	 *
-	 * @param id the id
-	 * @param isNursery the is nursery
+	 * @param id
+	 *            the id
+	 * @param isNursery
+	 *            the is nursery
 	 * @return the nursery variable settings
 	 */
 
@@ -362,7 +436,8 @@ public interface FieldbookService {
 	/**
 	 * Gets the germplasms.
 	 *
-	 * @param gids the gids
+	 * @param gids
+	 *            the gids
 	 * @return the germplasms
 	 */
 	List<Germplasm> getGermplasms(List<Integer> gids);
@@ -370,7 +445,8 @@ public interface FieldbookService {
 	/**
 	 * Gets the all field locations.
 	 *
-	 * @param locationId the location id
+	 * @param locationId
+	 *            the location id
 	 * @return the all field locations
 	 */
 	List<Location> getAllFieldLocations(int locationId);
@@ -378,7 +454,8 @@ public interface FieldbookService {
 	/**
 	 * Gets the all block locations.
 	 *
-	 * @param fieldId the field id
+	 * @param fieldId
+	 *            the field id
 	 * @return all block locations
 	 */
 	List<Location> getAllBlockLocations(int fieldId);
@@ -386,7 +463,8 @@ public interface FieldbookService {
 	/**
 	 * Gets the block information.
 	 *
-	 * @param blockId the block id
+	 * @param blockId
+	 *            the block id
 	 * @return the block information
 	 */
 	FieldmapBlockInfo getBlockInformation(int blockId);
@@ -401,9 +479,12 @@ public interface FieldbookService {
 	/**
 	 * Adds the field location.
 	 *
-	 * @param fieldName the field name
-	 * @param parentLocationId the parentlocation id
-	 * @param currentUserId the current user id
+	 * @param fieldName
+	 *            the field name
+	 * @param parentLocationId
+	 *            the parentlocation id
+	 * @param currentUserId
+	 *            the current user id
 	 * @return the id
 	 */
 	int addFieldLocation(String fieldName, Integer parentLocationId, Integer currentUserId);
@@ -411,9 +492,12 @@ public interface FieldbookService {
 	/**
 	 * Adds the block location.
 	 *
-	 * @param blockName the block name
-	 * @param parentFieldId the parent field id
-	 * @param currentUserId the current user id
+	 * @param blockName
+	 *            the block name
+	 * @param parentFieldId
+	 *            the parent field id
+	 * @param currentUserId
+	 *            the current user id
 	 * @return the id
 	 */
 	int addBlockLocation(String blockName, Integer parentFieldId, Integer currentUserId);
@@ -421,7 +505,8 @@ public interface FieldbookService {
 	/**
 	 * Get all field maps in the same block.
 	 *
-	 * @param blockId the block id
+	 * @param blockId
+	 *            the block id
 	 * @return the field maps in the given block
 	 */
 	List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(int blockId);
@@ -429,8 +514,10 @@ public interface FieldbookService {
 	/**
 	 * Fetch all the possible pairs of the treatment level variable.
 	 *
-	 * @param cvTermId the cv term id
-	 * @param propertyId the property id
+	 * @param cvTermId
+	 *            the cv term id
+	 * @param propertyId
+	 *            the property id
 	 * @return list of all possible treatment pairs
 	 */
 	List<StandardVariable> getPossibleTreatmentPairs(int cvTermId, int propertyId, List<Integer> hiddenFields);
@@ -438,7 +525,8 @@ public interface FieldbookService {
 	/**
 	 * Get lOcation by id.
 	 *
-	 * @param id the id
+	 * @param id
+	 *            the id
 	 * @return the location by id
 	 */
 	Location getLocationById(int id);
@@ -446,7 +534,8 @@ public interface FieldbookService {
 	/**
 	 * Get person by id.
 	 *
-	 * @param id the id
+	 * @param id
+	 *            the id
 	 * @return the person by id
 	 */
 	Person getPersonById(int id);
@@ -454,8 +543,10 @@ public interface FieldbookService {
 	/**
 	 * get the dataset id of the measurement dataset of the study.
 	 *
-	 * @param studyId the study id
-	 * @param studyName the study name
+	 * @param studyId
+	 *            the study id
+	 * @param studyName
+	 *            the study name
 	 * @return the measurement dataset id
 	 */
 	int getMeasurementDatasetId(int studyId, String studyName);
@@ -463,7 +554,8 @@ public interface FieldbookService {
 	/**
 	 * count the number of observations.
 	 *
-	 * @param datasetId the dataset id
+	 * @param datasetId
+	 *            the dataset id
 	 * @return the long
 	 */
 	long countObservations(int datasetId);
@@ -471,7 +563,8 @@ public interface FieldbookService {
 	/**
 	 * Counts the number of stocks.
 	 *
-	 * @param datasetId the dataset id
+	 * @param datasetId
+	 *            the dataset id
 	 * @return the long
 	 */
 	long countStocks(int datasetId);
@@ -479,7 +572,8 @@ public interface FieldbookService {
 	/**
 	 * Determines if fieldmap exists.
 	 *
-	 * @param datasetId the dataset id
+	 * @param datasetId
+	 *            the dataset id
 	 * @return true, if successful
 	 */
 	boolean hasFieldMap(int datasetId);
@@ -487,7 +581,8 @@ public interface FieldbookService {
 	/**
 	 * Gets the germplasm list by id.
 	 *
-	 * @param listId the list id
+	 * @param listId
+	 *            the list id
 	 * @return the germplasm list by id
 	 */
 	GermplasmList getGermplasmListById(Integer listId);
@@ -495,7 +590,8 @@ public interface FieldbookService {
 	/**
 	 * Gets the owner.
 	 *
-	 * @param userId the user id
+	 * @param userId
+	 *            the user id
 	 * @return the owner
 	 */
 	String getOwnerListName(Integer userId);
@@ -503,8 +599,10 @@ public interface FieldbookService {
 	/**
 	 * Get study details.
 	 *
-	 * @param studyType the study type
-	 * @param studyId the study id
+	 * @param studyType
+	 *            the study type
+	 * @param studyId
+	 *            the study id
 	 * @return the study details
 	 */
 	StudyDetails getStudyDetails(StudyType studyType, int studyId);
@@ -512,8 +610,10 @@ public interface FieldbookService {
 	/**
 	 * Get the block id of a particular trial instance in a dataset.
 	 *
-	 * @param datasetId the dataset id
-	 * @param trialInstance the trial instance
+	 * @param datasetId
+	 *            the dataset id
+	 * @param trialInstance
+	 *            the trial instance
 	 * @return the block id
 	 */
 	String getBlockId(int datasetId, String trialInstance);
@@ -521,7 +621,8 @@ public interface FieldbookService {
 	/**
 	 * Gets the folder name by id.
 	 *
-	 * @param folderId the folder id
+	 * @param folderId
+	 *            the folder id
 	 * @return the folder name by id
 	 */
 	String getFolderNameById(Integer folderId);
@@ -529,7 +630,8 @@ public interface FieldbookService {
 	/**
 	 * Returns true if all instances in the study has fieldmap.
 	 *
-	 * @param studyId the study id
+	 * @param studyId
+	 *            the study id
 	 * @return true, if successful
 	 */
 	boolean checkIfStudyHasFieldmap(int studyId);
@@ -537,9 +639,12 @@ public interface FieldbookService {
 	/**
 	 * Builds the Trial Observations from the trial dataset id.
 	 *
-	 * @param trialDatasetId the trial dataset id
-	 * @param factorList the factor list
-	 * @param variateList the variate list
+	 * @param trialDatasetId
+	 *            the trial dataset id
+	 * @param factorList
+	 *            the factor list
+	 * @param variateList
+	 *            the variate list
 	 * @return the list
 	 */
 	List<MeasurementRow> buildTrialObservations(int trialDatasetId, List<MeasurementVariable> factorList,
@@ -548,8 +653,10 @@ public interface FieldbookService {
 	/**
 	 * Check if study has measurement data.
 	 *
-	 * @param datasetId the dataset id
-	 * @param variateIds the variate ids
+	 * @param datasetId
+	 *            the dataset id
+	 * @param variateIds
+	 *            the variate ids
 	 * @return true, if successful
 	 */
 	boolean checkIfStudyHasMeasurementData(int datasetId, List<Integer> variateIds);
@@ -557,8 +664,10 @@ public interface FieldbookService {
 	/**
 	 * Count the number of variates with data.
 	 *
-	 * @param datasetId the dataset id
-	 * @param variateIds the variate ids
+	 * @param datasetId
+	 *            the dataset id
+	 * @param variateIds
+	 *            the variate ids
 	 * @return the int
 	 */
 	int countVariatesWithData(int datasetId, List<Integer> variateIds);
@@ -566,14 +675,16 @@ public interface FieldbookService {
 	/**
 	 * Delete observations of study.
 	 *
-	 * @param datasetId the dataset id
+	 * @param datasetId
+	 *            the dataset id
 	 */
 	void deleteObservationsOfStudy(int datasetId);
 
 	/**
 	 * Get germplasms by name.
 	 *
-	 * @param name the name
+	 * @param name
+	 *            the name
 	 * @return the germplasm ids by name
 	 */
 	List<Integer> getGermplasmIdsByName(String name);
@@ -581,19 +692,26 @@ public interface FieldbookService {
 	/**
 	 * Add Germplasm Name.
 	 *
-	 * @param nameValue the name value
-	 * @param gid the gid
-	 * @param userId the user id
-	 * @param nameTypeId the name type id
-	 * @param locationId the location id
-	 * @param date the date
+	 * @param nameValue
+	 *            the name value
+	 * @param gid
+	 *            the gid
+	 * @param userId
+	 *            the user id
+	 * @param nameTypeId
+	 *            the name type id
+	 * @param locationId
+	 *            the location id
+	 * @param date
+	 *            the date
 	 * @return the integer
 	 */
 	Integer addGermplasmName(String nameValue, int gid, int userId, int nameTypeId, int locationId, Integer date);
 
 	/**
 	 *
-	 * @param names The list of germplasm names to be added into the system
+	 * @param names
+	 *            The list of germplasm names to be added into the system
 	 * @return
 	 */
 	List<Integer> addGermplasmNames(List<Name> names);
@@ -601,8 +719,10 @@ public interface FieldbookService {
 	/**
 	 * Adds a new Germplasm.
 	 *
-	 * @param nameValue the name value
-	 * @param userId the user id
+	 * @param nameValue
+	 *            the name value
+	 * @param userId
+	 *            the user id
 	 * @return the integer
 	 */
 	Integer addGermplasm(String nameValue, int userId);
@@ -610,8 +730,10 @@ public interface FieldbookService {
 	/**
 	 * Adds the germplasm.
 	 *
-	 * @param germplasm the germplasm
-	 * @param name the name
+	 * @param germplasm
+	 *            the germplasm
+	 * @param name
+	 *            the name
 	 * @return the integer
 	 */
 	Integer addGermplasm(Germplasm germplasm, Name name);
@@ -624,10 +746,13 @@ public interface FieldbookService {
 	List<Integer> addGermplasm(List<Pair<Germplasm, Name>> germplasmPairs);
 
 	/**
-	 * Get an id from the project table that matches the name (regardless if it's a study or a folder).
+	 * Get an id from the project table that matches the name (regardless if
+	 * it's a study or a folder).
 	 *
-	 * @param name the name
-	 * @param programUUID the program UUID
+	 * @param name
+	 *            the name
+	 * @param programUUID
+	 *            the program UUID
 	 * @return the project id by name
 	 */
 	Integer getProjectIdByNameAndProgramUUID(String name, String programUUID);
@@ -635,10 +760,14 @@ public interface FieldbookService {
 	/**
 	 * Returns the stanadard variale given the PSMR combination.
 	 *
-	 * @param property the property
-	 * @param scale the scale
-	 * @param method the method
-	 * @param role the role
+	 * @param property
+	 *            the property
+	 * @param scale
+	 *            the scale
+	 * @param method
+	 *            the method
+	 * @param role
+	 *            the role
 	 * @return the measurement variable by property scale method and role
 	 */
 	MeasurementVariable getMeasurementVariableByPropertyScaleMethodAndRole(String property, String scale, String method,
@@ -649,8 +778,10 @@ public interface FieldbookService {
 	/**
 	 * Return the measurement rows of a given dataset.
 	 *
-	 * @param datasetId the dataset id
-	 * @param isTrial the is trial
+	 * @param datasetId
+	 *            the dataset id
+	 * @param isTrial
+	 *            the is trial
 	 * @return the complete dataset
 	 */
 	Workbook getCompleteDataset(int datasetId, boolean isTrial);
@@ -665,7 +796,8 @@ public interface FieldbookService {
 	/**
 	 * Returns a map of Gid, and list of Names.
 	 *
-	 * @param gids the gids
+	 * @param gids
+	 *            the gids
 	 * @return the names by gids
 	 */
 	Map<Integer, List<Name>> getNamesByGids(List<Integer> gids);
@@ -673,7 +805,8 @@ public interface FieldbookService {
 	/**
 	 * Count germplasm list data by list id.
 	 *
-	 * @param listId the list id
+	 * @param listId
+	 *            the list id
 	 * @return the int
 	 */
 	int countGermplasmListDataByListId(Integer listId);
@@ -681,7 +814,8 @@ public interface FieldbookService {
 	/**
 	 * Count list data project germplasm list data by list id.
 	 *
-	 * @param listId the list id
+	 * @param listId
+	 *            the list id
 	 * @return the int
 	 */
 	int countListDataProjectGermplasmListDataByListId(Integer listId);
@@ -689,8 +823,10 @@ public interface FieldbookService {
 	/**
 	 * Gets the method by code.
 	 *
-	 * @param code the code
-	 * @param programUUID unique id of the program
+	 * @param code
+	 *            the code
+	 * @param programUUID
+	 *            unique id of the program
 	 * @return the method by code
 	 */
 	Method getMethodByCode(String code, String programUUID);
@@ -698,7 +834,8 @@ public interface FieldbookService {
 	/**
 	 * Gets the method by id.
 	 *
-	 * @param id the id
+	 * @param id
+	 *            the id
 	 * @return the method by id
 	 */
 	Method getMethodById(int id);
@@ -706,7 +843,8 @@ public interface FieldbookService {
 	/**
 	 * Gets the method by name.
 	 *
-	 * @param name the name
+	 * @param name
+	 *            the name
 	 * @return the method by name
 	 */
 	Method getMethodByName(String name);
@@ -719,7 +857,8 @@ public interface FieldbookService {
 	/**
 	 * Gets the favorite project location ids.
 	 *
-	 * @param programUUID - unique id of program
+	 * @param programUUID
+	 *            - unique id of program
 	 * @return the favorite project location ids
 	 */
 	List<Integer> getFavoriteProjectLocationIds(String programUUID);
@@ -727,7 +866,8 @@ public interface FieldbookService {
 	/**
 	 * Gets the favorite project methods.
 	 *
-	 * @param programUUID - unique id of program
+	 * @param programUUID
+	 *            - unique id of program
 	 * @return the favorite project methods
 	 */
 	List<Integer> getFavoriteProjectMethods(String programUUID);
@@ -736,7 +876,8 @@ public interface FieldbookService {
 	 * Returns germplasm lists by project id.
 	 *
 	 * @param projectId
-	 * @param type list type
+	 * @param type
+	 *            list type
 	 * @return List of GermplasmList objects under the given project id and type
 	 */
 	List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType type);
@@ -749,7 +890,8 @@ public interface FieldbookService {
 	 * @param list
 	 * @return
 	 */
-	int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId, List<ListDataProject> list, int userId);
+	int saveOrUpdateListDataProject(int projectId, GermplasmListType type, Integer originalListId,
+			List<ListDataProject> list, int userId);
 
 	void updateGermlasmListInfoStudy(int crossesListId, int studyId);
 
@@ -762,7 +904,9 @@ public interface FieldbookService {
 	List<ListDataProject> getListDataProject(int listId);
 
 	/**
-	 * Counts the number of ListDataProject with a speficied SystemDefinedEntryType.
+	 * Counts the number of ListDataProject with a speficied
+	 * SystemDefinedEntryType.
+	 * 
 	 * @param listId
 	 * @param systemDefinedEntryType
 	 * @return
@@ -782,15 +926,20 @@ public interface FieldbookService {
 	void deleteListDataProjects(int projectId, GermplasmListType type);
 
 	/**
-	 * Saves germplasm list crosses types. ListData items are always added to the database, before saving the germplasm list.
+	 * Saves germplasm list crosses types. ListData items are always added to
+	 * the database, before saving the germplasm list.
 	 *
-	 * @param listDataItems the list data to add - the key of the Map is the germplasm associated to the germplasm list data value
-	 * @param germplasmList the germplasm list to add
-	 * @param isApplyNewGroupToPreviousCrosses 
+	 * @param listDataItems
+	 *            the list data to add - the key of the Map is the germplasm
+	 *            associated to the germplasm list data value
+	 * @param germplasmList
+	 *            the germplasm list to add
+	 * @param isApplyNewGroupToPreviousCrosses
 	 *
 	 * @return The id of the newly-created germplasm list
 	 */
-	Integer saveGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList, boolean isApplyNewGroupToPreviousCrosses);
+	Integer saveGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList,
+			boolean isApplyNewGroupToPreviousCrosses);
 
 	void saveStudyColumnOrdering(Integer studyId, String studyName, List<Integer> orderedTermIds);
 
@@ -801,24 +950,31 @@ public interface FieldbookService {
 	/**
 	 * Gets the StandardVariable by Name
 	 *
-	 * @param name of the Standard Varible
-	 * @param programUUID unique id of the program
+	 * @param name
+	 *            of the Standard Varible
+	 * @param programUUID
+	 *            unique id of the program
 	 **/
 	StandardVariable getStandardVariableByName(String name, String programUUID);
 
-	List<StandardVariableReference> filterStandardVariablesByIsAIds(List<StandardVariableReference> standardReferences, List<Integer> isAIds);
+	List<StandardVariableReference> filterStandardVariablesByIsAIds(List<StandardVariableReference> standardReferences,
+			List<Integer> isAIds);
 
 	Location getLocationByName(String locationName, Operation op);
 
 	/**
-	 * Updates germplasm list crosses types. ListData items are always updated in the database, before saving the germplasm list.
+	 * Updates germplasm list crosses types. ListData items are always updated
+	 * in the database, before saving the germplasm list.
 	 *
-	 * @param listDataItems the list data to add - the key of the Map is the germplasm associated to the germplasm list data value
-	 * @param germplasmList the germplasm list to add
+	 * @param listDataItems
+	 *            the list data to add - the key of the Map is the germplasm
+	 *            associated to the germplasm list data value
+	 * @param germplasmList
+	 *            the germplasm list to add
 	 *
 	 * @return The id of the newly-created germplasm list
 	 */
-	Integer updateGermplasmList(List<Pair<Germplasm,GermplasmListData>> listDataItems, GermplasmList germplasmList);
+	Integer updateGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList);
 
 	public List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
 
