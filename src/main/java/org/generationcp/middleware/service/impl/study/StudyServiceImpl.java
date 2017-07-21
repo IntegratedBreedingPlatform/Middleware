@@ -375,7 +375,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier, Integer instanceDbId) {
-		String year = null;
 		final List<MeasurementVariableDto> traits = this.measurementVariableService.getVariables(studyIdentifier, VariableType.TRAIT.getId());
 
 		final List<MeasurementVariableDto> measurementVariables = Ordering.from(new Comparator<MeasurementVariableDto>() {
@@ -399,12 +398,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 
 		List<List<String>> data = Lists.newArrayList();
-		if (instanceDbId != null) {
-			year = this.getYearFromStudy(studyIdentifier);
-		}
-		else {
-			year = null;
-		}
+
+		String year = this.getYearFromStudy(studyIdentifier);
 
 		if (!CollectionUtils.isEmpty(results)) {
 
@@ -515,14 +510,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 			dto = new TrialObservationTable().setStudyDbId(instanceDbId != null ? instanceDbId : studyIdentifier).setObservationVariableDbIds(observationVariableDbIds)
 			.setObservationVariableNames(observationVariableNames).setData(data);
 
-		if (instanceDbId != null) {
-			dto.setHeaderRow(Lists.newArrayList("year", "studyDbId", "locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
-				"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y", "plotId"));
-		}
-		else {
-			dto.setHeaderRow(Lists.newArrayList("studyDbId", "locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
-				"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y", "plotId"));
-		}
+		dto.setHeaderRow(Lists.newArrayList("year", "studyDbId", "studyName", "locationDbId", "locationName", "germplasmDbId",
+			"germplasmName", "observationUnitDbId",
+			"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y", "plotId"));
+
 		return dto;
 	}
 
