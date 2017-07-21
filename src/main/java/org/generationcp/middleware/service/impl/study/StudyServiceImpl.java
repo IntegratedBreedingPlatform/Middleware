@@ -415,9 +415,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 					entry.add(year);
 				}
 
-				int lastFixedColumn = 17;
+				int lastFixedColumn = 18;
 
-				// locationDbId = nd_geolocation_id
+				// studyDbId = nd_geolocation_id
+				entry.add(String.valueOf(row[17]));
+
+				// locationDbId
 				entry.add(String.valueOf(row[lastFixedColumn]));
 
 				String locationName = (String) row[13];
@@ -513,11 +516,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 			.setObservationVariableNames(observationVariableNames).setData(data);
 
 		if (instanceDbId != null) {
-			dto.setHeaderRow(Lists.newArrayList("year", "locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
+			dto.setHeaderRow(Lists.newArrayList("year", "studyDbId", "locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
 				"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y", "plotId"));
 		}
 		else {
-			dto.setHeaderRow(Lists.newArrayList("locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
+			dto.setHeaderRow(Lists.newArrayList("studyDbId", "locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
 				"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y", "plotId"));
 		}
 		return dto;

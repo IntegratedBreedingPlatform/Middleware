@@ -158,6 +158,7 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar("FieldMapColumn");
 		createSQLQuery.addScalar("FieldMapRow");
 		createSQLQuery.addScalar("nd_geolocation_id");
+		createSQLQuery.addScalar("locationDbId");
 		this.addScalarForTraits(measurementVariables, createSQLQuery);
 		return createSQLQuery;
 	}

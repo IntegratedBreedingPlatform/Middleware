@@ -71,6 +71,16 @@ class ObservationQuery {
 			"            gp.type_id = " + TermId.LOCATION_ID.getId() + " \n" +
 			"                AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS LocationName";
 
+	final String locationDbIdSubQuery = "(SELECT \n" +
+		"            l.locid \n" +
+		"        FROM \n" +
+		"            nd_geolocationprop gp \n" +
+		"                INNER JOIN \n" +
+		"            location l ON l.locid = gp.value \n" +
+		"        WHERE \n" +
+		"            gp.type_id = " + TermId.LOCATION_ID.getId() + " \n" +
+		"                AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS locationDbId";
+
 	final String locationAbbreviationSubQuery = "(SELECT \n" +
 			"            gp.value \n" +
 			"        FROM \n" +
@@ -135,6 +145,7 @@ class ObservationQuery {
 		}
 
 		return selectText + ", " + blockNoText + ", " + rowNumberText + "," + columnNumberText +
+				", " + locationDbIdSubQuery +
 				", " + locationNameSubQuery +
 				", " + locationAbbreviationSubQuery +
 				", " + fieldmapColumnText +
