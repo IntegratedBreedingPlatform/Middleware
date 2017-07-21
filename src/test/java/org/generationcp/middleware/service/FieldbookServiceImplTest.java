@@ -21,6 +21,10 @@ import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.data.initializer.MeasurementRowTestDataInitializer;
+import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
+import org.generationcp.middleware.domain.etl.MeasurementRow;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -67,13 +71,13 @@ public class FieldbookServiceImplTest {
 
 	@Mock
 	SQLQuery query;
-	
+
 	@Mock
 	Criteria criteria;
 
 	@Mock
 	GermplasmDataManager germplasmDataManager;
-	
+
 	@Mock
 	LocationDAO locationDAO;
 
@@ -92,11 +96,17 @@ public class FieldbookServiceImplTest {
 
 	private List<Pair<Germplasm, List<Attribute>>> germplasmAttributes;
 
+	private MeasurementVariableTestDataInitializer measurementVariableTestDataInitializer;
+
+	private MeasurementRowTestDataInitializer measurementRowTestDataInitializer;
+
 	@InjectMocks
 	private FieldbookServiceImpl fieldbookServiceImpl;
 
 	@Before
 	public void setUp() {
+		this.measurementVariableTestDataInitializer = new MeasurementVariableTestDataInitializer();
+		this.measurementRowTestDataInitializer = new MeasurementRowTestDataInitializer();
 		this.fieldbookServiceImpl.setCrossExpansionProperties(this.crossExpansionProperties);
 		this.fieldbookServiceImpl.setGermplasmGroupingService(this.germplasmGroupingService);
 		this.fieldbookServiceImpl.setLocationDataManager(this.locationDataManager);
@@ -107,8 +117,9 @@ public class FieldbookServiceImplTest {
 		this.germplasms = this.createGermplasms();
 		this.listDataItems = this.createListDataItems();
 		this.germplasmAttributes = this.createGermplasmAttributes();
-		Mockito.when(this.dbBroker.getLocationDAO()).thenReturn(locationDAO);
-		Mockito.when(locationDataManager.getLocationsByUniqueID(PROGRAM_UUID)).thenReturn(new ArrayList<Location>());
+		Mockito.when(this.dbBroker.getLocationDAO()).thenReturn(this.locationDAO);
+		Mockito.when(this.locationDataManager.getLocationsByUniqueID(FieldbookServiceImplTest.PROGRAM_UUID))
+				.thenReturn(new ArrayList<Location>());
 	}
 
 	@Test
@@ -131,12 +142,38 @@ public class FieldbookServiceImplTest {
 		final Integer out = this.fieldbookServiceImpl.saveGermplasmList(this.listDataItems, germplasmList, false);
 		Assert.assertEquals("List Id should be 1", (Integer) 1, out);
 	}
-	
-	@Test
-	public void getLocationsByProgramUUID(){
-		final List<Location> locations = this.fieldbookServiceImpl.getLocationsByProgramUUID(PROGRAM_UUID);
 
-		Mockito.verify(this.locationDataManager, Mockito.times(1)).getLocationsByUniqueID(PROGRAM_UUID);
+	@Test
+	public void testSaveMeasurementsTrue() {
+		final Measurements measurements = Mockito.mock(Measurements.class);
+		final List<MeasurementVariable> variates = this.measurementVariableTestDataInitializer
+				.createMeasurementVariableList();
+		final List<MeasurementRow> observations = this.measurementRowTestDataInitializer.createMeasurementRowList(1,
+				"Test Name", "Test Value", new MeasurementVariable());
+		this.fieldbookServiceImpl.saveMeasurements(true, variates, observations, measurements);
+		// Verify that the method is called
+		Mockito.verify(measurements).saveMeasurements(observations);
+	}
+
+	@Test
+	public void testSaveMeasurementsFalse() {
+		final Measurements measurements = Mockito.mock(Measurements.class);
+		final List<MeasurementVariable> variates = this.measurementVariableTestDataInitializer
+				.createMeasurementVariableList();
+		final List<MeasurementRow> observations = this.measurementRowTestDataInitializer.createMeasurementRowList(1,
+				"Test Name", "Test Value", new MeasurementVariable());
+		this.fieldbookServiceImpl.saveMeasurements(false, variates, observations, measurements);
+		// Verify that the method is never called
+		Mockito.verify(measurements, Mockito.times(0)).saveMeasurements(observations);
+	}
+
+	@Test
+	public void getLocationsByProgramUUID() {
+		final List<Location> locations = this.fieldbookServiceImpl
+				.getLocationsByProgramUUID(FieldbookServiceImplTest.PROGRAM_UUID);
+
+		Mockito.verify(this.locationDataManager, Mockito.times(1))
+				.getLocationsByUniqueID(FieldbookServiceImplTest.PROGRAM_UUID);
 		Assert.assertNotNull("The return locations list should not be null", locations);
 	}
 
