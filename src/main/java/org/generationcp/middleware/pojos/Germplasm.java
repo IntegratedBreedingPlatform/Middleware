@@ -213,7 +213,8 @@ public class Germplasm implements Serializable {
 
 	public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX3 =
 			"SELECT CONVERT(LTRIM(REPLACE(UPPER(nval), :prefix, '')), SIGNED)+1 AS next_number " + "FROM names "
-					+ "WHERE nval like :prefixLike " + "ORDER BY next_number DESC LIMIT 1";
+					+ "INNER JOIN germplsm ON names.gid = germplsm.gid "
+					+ "WHERE names.nval like :prefixLike AND germplsm.deleted = 0 " + "ORDER BY next_number DESC LIMIT 1";
 
 	public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_WITH_SPACE =
 			"SELECT CONVERT(REPLACE(nval, :prefix, ''), SIGNED)+1 AS last_number " + "FROM names " + "WHERE nval LIKE :prefixLike "

@@ -536,6 +536,56 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertFalse(this.dao.getGermplasmOffspringByGIDs(Arrays.asList(gid)).size() > 0);
 	}
 
+	@Test
+	public void testGetNextSequenceNumberForCrossName() {
+
+		final String crossNamePrefix = "ABCDEFG";
+		final String existingGermplasmNameWithPrefix = crossNamePrefix + "1";
+
+		final Germplasm germplasm = GermplasmTestDataInitializer
+				.createGermplasm(20150101, 0, 0, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName",
+						"LocationName");
+
+		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
+
+		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(gid, existingGermplasmNameWithPrefix);
+
+		this.germplasmDataDM.addGermplasmName(germplasmName);
+
+		String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix);
+
+		Assert.assertEquals("Germplasm with name"  + existingGermplasmNameWithPrefix + " is existing "
+				+ "so the next sequence number should be 2", "2", result);
+
+	}
+
+	@Test
+	public void testGetNextSequenceNumberForCrossNameGermplasmIsDeleted() {
+
+		final String crossNamePrefix = "ABCDEFG";
+		final String existingGermplasmNameWithPrefix = crossNamePrefix + "1";
+
+		final Germplasm germplasm = GermplasmTestDataInitializer
+				.createGermplasm(20150101, 0, 0, 2, 0, 0, 1, 1, GermplasmDAOTest.GROUP_ID, 1, 1, "MethodName",
+						"LocationName");
+
+		// Flag the germplasm as deleted
+		germplasm.setDeleted(true);
+
+		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName());
+
+		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(gid, existingGermplasmNameWithPrefix);
+		germplasmName.setNstat(1);
+
+		this.germplasmDataDM.addGermplasmName(germplasmName);
+
+		String result = this.germplasmDataDM.getNextSequenceNumberForCrossName(crossNamePrefix);
+
+		Assert.assertEquals("Germplasm with name"  + existingGermplasmNameWithPrefix + " is deleted "
+				+ "so the next sequence number should still be 1", "1", result);
+
+	}
+
 	private void initializeGermplasms() {
 		final Germplasm fParent = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0 , 1 ,1 ,0, 1 ,1 , "MethodName", "LocationName");
 		final Integer fParentGID = this.germplasmDataDM.addGermplasm(fParent, fParent.getPreferredName());
