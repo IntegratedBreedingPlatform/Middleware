@@ -198,7 +198,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 	}
 
 	@Override
-	public void addScale(Scale scale) {
+	public Integer addScale(Scale scale) {
 
 		CVTerm term = this.getCvTermDao().getByNameAndCvId(scale.getName(), CvId.SCALES.getId());
 
@@ -259,7 +259,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			// Save creation time
 			this.getCvTermPropertyDao().save(scale.getId(), TermId.CREATION_DATE.getId(), ISO8601DateParser.toString(new Date()), 0);
 
-
+			return scale.getId();
 		} catch (Exception e) {
 			throw new MiddlewareQueryException("Error at addScale :" + e.getMessage(), e);
 		}

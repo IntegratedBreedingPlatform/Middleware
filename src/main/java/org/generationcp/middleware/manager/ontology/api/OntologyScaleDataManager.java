@@ -43,8 +43,9 @@ public interface OntologyScaleDataManager {
 	 * Adds a Scale. If the scale is already found in the local database, it simply retrieves the record found.
 	 *
 	 * @param scale to be added
+	 * @return - id of scale added
 	 */
-	void addScale(Scale scale);
+	Integer addScale(Scale scale);
 
 	/**
 	 * Updates the given scale. This searches for the id. If it exists, the entry in the database is replaced with the new value.
