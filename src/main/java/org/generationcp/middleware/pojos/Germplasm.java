@@ -200,21 +200,10 @@ public class Germplasm implements Serializable {
 					+ "( nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName )";
 
 	public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX =
-			"SELECT CONVERT(REPLACE(nval, :prefix, ''), SIGNED)+1 AS last_number " + "FROM names " + "WHERE nval REGEXP :prefixRegex "
-					+ "ORDER BY last_number DESC LIMIT 1";
-
-	public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX2 =
-			"SELECT CONVERT(REPLACE(nval, :prefix, ''), SIGNED)+1 AS last_number  " + "FROM names "
-					+ "WHERE (SUBSTRING(nval, 1, :prefixLen) = :prefix "
-					+ "AND substring(nval, :prefixLen+1, LENGTH(nval)-:prefixLen) = concat( '', 0 + substring(nval, :prefixLen+1, LENGTH(nval)-:prefixLen))) "
-					+ "OR (SUBSTRING(nval, 1, :prefixLen+1) = :prefix + ' ' "
-					+ "AND substring(nval, :prefixLen+2, LENGTH(nval)-:prefixLen+1) = concat( '', 0 + substring(nval, :prefixLen+2, LENGTH(nval)-:prefixLen+1))) "
-					+ "ORDER BY last_number DESC LIMIT 1";
-
-	public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX3 =
 			"SELECT CONVERT(LTRIM(REPLACE(UPPER(nval), :prefix, '')), SIGNED)+1 AS next_number " + "FROM names "
 					+ "INNER JOIN germplsm ON names.gid = germplsm.gid "
-					+ "WHERE names.nval like :prefixLike AND germplsm.deleted = 0 " + "ORDER BY next_number DESC LIMIT 1";
+					+ "WHERE names.nval like :prefixLike AND germplsm.deleted = 0 AND germplsm.grplce = 0 "
+					+ "ORDER BY next_number DESC LIMIT 1";
 
 	public static final String GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_WITH_SPACE =
 			"SELECT CONVERT(REPLACE(nval, :prefix, ''), SIGNED)+1 AS last_number " + "FROM names " + "WHERE nval LIKE :prefixLike "
