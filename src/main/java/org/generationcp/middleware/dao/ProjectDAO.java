@@ -12,10 +12,13 @@
 package org.generationcp.middleware.dao;
 
 import java.util.List;
+import java.util.Map;
 
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.service.api.program.ProgramFilters;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -136,5 +139,42 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 	public List<Project> getProjectsByCrop(final CropType cropType) throws MiddlewareQueryException {
 		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("cropType", cropType));
 		return criteria.list();
+	}
+
+	public List<Project> getProjectsByFilter(final int pageNumber,final int pageSize, final Map<ProgramFilters, Object> filters)
+		throws MiddlewareException {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Project.class);
+			for (Map.Entry<ProgramFilters, Object> entry : filters.entrySet()) {
+				final ProgramFilters filter = entry.getKey();
+				final Object value = entry.getValue();
+				criteria.add(Restrictions.eq(filter.getStatement(), value));
+			}
+
+			final int start = pageSize * (pageNumber - 1);
+			final int numOfRows = pageSize;
+
+			criteria.setFirstResult(start);
+			criteria.setMaxResults(numOfRows);
+			return criteria.list();
+		} catch (HibernateException e) {
+			throw new MiddlewareException(
+				"Error in getProjectsByFilter(start=" + pageNumber + ", numOfRows=" + pageSize + "): " + e.getMessage(), e);
+		}
+	}
+
+	public long countProjectsByFilter(final Map<ProgramFilters, Object> filters) throws MiddlewareException {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Project.class);
+			for (Map.Entry<ProgramFilters, Object> entry : filters.entrySet()) {
+				final ProgramFilters filter = entry.getKey();
+				final Object value = entry.getValue();
+				criteria.add(Restrictions.eq(filter.getStatement(), value));
+			}
+
+			return criteria.list().size();
+		} catch (HibernateException e) {
+			throw new MiddlewareException("Error in countProjectsByFilter(): " + e.getMessage(), e);
+		}
 	}
 }

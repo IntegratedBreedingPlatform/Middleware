@@ -23,6 +23,7 @@ public class QueryTest {
 	
 	/**
 	 * Run the String generateQuery(String,List<String>) method test.
+	 * TODO Is there another way to test this?
 	 *
 	 * @throws Exception
 	 *
@@ -48,6 +49,7 @@ public class QueryTest {
 		return " SELECT  \n"
 			+ "     nde.nd_experiment_id, \n"
 			+ "     gl.description AS TRIAL_INSTANCE, \n"
+			+ "   gl.nd_geolocation_id,\n"
 			+ "     (SELECT  \n"
 			+ "             iispcvt.definition \n"
 			+ "         FROM \n"
@@ -62,7 +64,7 @@ public class QueryTest {
 			+ "     s.dbxref_id AS GID, \n"
 			+ "     s.name DESIGNATION, \n"
 			+ "     s.uniquename ENTRY_NO, \n"
-			+ "     s.value as ENTRY_CODE, \n"
+			+ "     s.value AS ENTRY_CODE, \n"
 			+ "     (SELECT  \n"
 			+ "             isp.value \n"
 			+ "         FROM \n"
@@ -90,7 +92,7 @@ public class QueryTest {
 			+ "         WHERE \n"
 			+ "             ndep.nd_experiment_id = ep.nd_experiment_id \n"
 			+ "                 AND ispcvt.name = 'PLOT_NO') PLOT_NO, \n"
-			+ "     nde.plot_id as PLOT_ID  \n"
+			+ "     nde.plot_id AS PLOT_ID  \n"
 			+ " ,  \n"
 			+ " PH_cm.PhenotypeValue AS PH_cm, \n"
 			+ " PH_cm.phenotype_id AS PH_cm_PhenotypeId \n"

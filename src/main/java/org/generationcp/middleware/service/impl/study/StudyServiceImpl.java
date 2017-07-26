@@ -93,6 +93,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 		+ SQL_FOR_COUNT_TOTAL_OBSERVATION_UNITS_WHERE
 		+ " and ph.value is not null ";
 
+	public static final String yearText =
+		"select value from project p inner join projectprop pp" + " on pp.project_id = p.project_id where  pp.type_id = '8050' and "
+			+ " p.project_id = :projectId";
+
 	private final String TRIAL_TYPE = "T";
 
 	private MeasurementVariableService measurementVariableService;
@@ -371,7 +375,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier, Integer instanceDbId) {
-
 		final List<MeasurementVariableDto> traits = this.measurementVariableService.getVariables(studyIdentifier, VariableType.TRAIT.getId());
 
 		final List<MeasurementVariableDto> measurementVariables = Ordering.from(new Comparator<MeasurementVariableDto>() {
@@ -396,26 +399,39 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		List<List<String>> data = Lists.newArrayList();
 
+		String year = this.getYearFromStudy(studyIdentifier);
 
 		if (!CollectionUtils.isEmpty(results)) {
 
 			for (Object[] row : results) {
 				final List<String> entry = Lists.newArrayList();
 
-				// locationDbId = trial instance number
-				// In brapi this will equate to studyDbId
-				// TODO Update query and use nd_geolocation_id instead. For now instance number will be ok.
-				entry.add((String) row[1]);
+				if(year != null) {
+					entry.add(year);
+				}
 
-				String locationName = (String) row[12];
-				String locationAbbreviation = (String) row[13];
+				int lastFixedColumn = 18;
 
+				// studyDbId = nd_geolocation_id
+				entry.add(String.valueOf(row[17]));
+
+				String locationName = (String) row[13];
+				String locationAbbreviation = (String) row[14];
+
+				// studyName
+				String studyName = "Study-" + row[1];
+				entry.add(studyName);
+
+				// locationDbId
+				entry.add(String.valueOf(row[lastFixedColumn]));
+
+				// locationName
 				if (StringUtils.isNotBlank(locationAbbreviation)) {
 					entry.add(locationAbbreviation);
 				} else  if (StringUtils.isNotBlank(locationName)) {
 					entry.add(locationName);
 				} else {
-					entry.add("Study-" + (String) row[1]);
+					entry.add(studyName);
 				}
 
 				// gid
@@ -442,14 +458,30 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// entry type
 				entry.add(String.valueOf(row[2]));
 
-				Object x = row[11];
-				Object y = row[10];
+				/**
+				 *
+				 *                x (Col)
+				 *          \\\\\\\\\\\\\\\\\\\\
+				 *          \...|....|....|....\
+				 *          \...|....|....|....\
+				 *          \------------------\
+				 *  y (Row) \...|....|....|....\
+				 *          \...|....|....|....\
+				 *          \------------------\
+				 *          \...|....|....|....\
+				 *          \...|....|....|....\
+				 *          \\\\\\\\\\\\\\\\\\\\
+				 *
+				 *
+				 */
+				Object x = row[11]; // COL
+				Object y = row[10]; // ROW
 
 				// If there is no row and col design,
 				// get fieldmap row and col
 				if (x == null || y == null) {
-					x = row[14];
-					y = row[15];
+					x = row[15];
+					y = row[16];
 				}
 
 				// X = col
@@ -458,10 +490,13 @@ public class StudyServiceImpl extends Service implements StudyService {
 				// Y = row
 				entry.add(String.valueOf(y));
 
+				//plotId
+				entry.add(String.valueOf(row[12]));
+
 				// phenotypic values
 				int columnOffset = 1;
 				for (int i = 0; i < traits.size(); i++) {
-					final Object rowValue = row[15 + columnOffset];
+					final Object rowValue = row[lastFixedColumn + columnOffset];
 
 					if (rowValue != null) {
 						entry.add(String.valueOf(rowValue));
@@ -480,8 +515,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 			dto = new TrialObservationTable().setStudyDbId(instanceDbId != null ? instanceDbId : studyIdentifier).setObservationVariableDbIds(observationVariableDbIds)
 			.setObservationVariableNames(observationVariableNames).setData(data);
 
-		dto.setHeaderRow(Lists.newArrayList("locationDbId", "locationName", "germplasmDbId", "germplasmName", "observationUnitDbId",
-				"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y"));
+		dto.setHeaderRow(Lists.newArrayList("year", "studyDbId", "studyName", "locationDbId", "locationName", "germplasmDbId",
+			"germplasmName", "observationUnitDbId",
+			"plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X", "Y", "plotId"));
 
 		return dto;
 	}
@@ -543,6 +579,15 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public StudyServiceImpl setUserDataManager(final UserDataManager userDataManager) {
 		this.userDataManager = userDataManager;
 		return this;
+	}
+
+	private String getYearFromStudy(final int studyIdentifier) {
+		final SQLQuery query = this.getCurrentSession().createSQLQuery(yearText);
+		query.setParameter("projectId", studyIdentifier);
+		Object result = query.uniqueResult();
+		if (result != null)
+			return result.toString().substring(0, 4);
+		return "";
 	}
 }
 

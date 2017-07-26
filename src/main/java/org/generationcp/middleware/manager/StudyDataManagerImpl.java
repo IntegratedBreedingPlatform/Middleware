@@ -11,12 +11,9 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
@@ -61,6 +58,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -70,6 +68,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.api.study.StudyFilters;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -81,9 +80,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
@@ -91,6 +92,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
+	private WorkbenchDataManager workbenchDataManager;
 
 	public StudyDataManagerImpl() {
 	}
@@ -98,12 +100,14 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public StudyDataManagerImpl(final HibernateSessionProvider sessionProvider, final String databaseName) {
 		super(sessionProvider, databaseName);
 		this.locationDataManager = new LocationDataManagerImpl(sessionProvider);
+		this.workbenchDataManager = new WorkbenchDataManagerImpl(sessionProvider);
 		this.pedigreeService = this.getPedigreeService();
 	}
 
 	public StudyDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 		this.locationDataManager = new LocationDataManagerImpl(sessionProvider);
+		this.workbenchDataManager = new WorkbenchDataManagerImpl(sessionProvider);
 		this.pedigreeService = this.getPedigreeService();
 	}
 
@@ -313,7 +317,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 		final List<DmsProject> datasetProjects = this.getDmsProjectDao().getDataSetsByStudyAndProjectProperty(studyId,
 				TermId.DATASET_TYPE.getId(), String.valueOf(dataSetType.getId()));
-		final List<DataSet> datasets = new ArrayList<DataSet>();
+		final List<DataSet> datasets = new ArrayList<>();
 
 		for (final DmsProject datasetProject : datasetProjects) {
 			datasets.add(this.getDataSetBuilder().build(datasetProject.getProjectId()));
@@ -443,7 +447,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<FieldMapInfo> getFieldMapInfoOfStudy(List<Integer> studyIdList, StudyType studyType,
 			CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException {
-		List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
+		List<FieldMapInfo> fieldMapInfos = new ArrayList<>();
 		for (Integer studyId : studyIdList) {
 			FieldMapInfo fieldMapInfo = new FieldMapInfo();
 
@@ -555,7 +559,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<FieldMapInfo> getAllFieldMapsInBlockByTrialInstanceId(final int datasetId, final int geolocationId,
 			final CrossExpansionProperties crossExpansionProperties) throws MiddlewareQueryException {
-		List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
+		List<FieldMapInfo> fieldMapInfos = new ArrayList<>();
 
 		fieldMapInfos = this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(datasetId, geolocationId, null);
 
@@ -577,7 +581,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public List<FieldMapInfo> getAllFieldMapsInBlockByBlockId(final int blockId) throws MiddlewareQueryException {
 
-		List<FieldMapInfo> fieldMapInfos = new ArrayList<FieldMapInfo>();
+		List<FieldMapInfo> fieldMapInfos = new ArrayList<>();
 
 		fieldMapInfos = this.getExperimentPropertyDao().getAllFieldMapsInBlockByTrialInstanceId(0, 0, blockId);
 
@@ -757,7 +761,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
 	public List<StudyDetails> getAllStudyDetails(final StudyType studyType, final String programUUID) throws MiddlewareQueryException {
-		final List<StudyDetails> list = new ArrayList<StudyDetails>();
+		final List<StudyDetails> list = new ArrayList<>();
 		final List localList = this.getDmsProjectDao().getAllStudyDetails(studyType, programUUID);
 		if (localList != null) {
 			list.addAll(localList);
@@ -783,7 +787,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	@Override
 	public List<StudyDetails> getAllNurseryAndTrialStudyDetails(final String programUUID) throws MiddlewareQueryException {
-		final List<StudyDetails> list = new ArrayList<StudyDetails>();
+		final List<StudyDetails> list = new ArrayList<>();
 		final List localList = this.getDmsProjectDao().getAllNurseryAndTrialStudyDetails(programUUID);
 		if (localList != null) {
 			list.addAll(localList);
@@ -865,8 +869,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	private void populateSiteAndPersonIfNecessary(final List<StudyDetails> studyDetails) throws MiddlewareQueryException {
 		if (studyDetails != null && !studyDetails.isEmpty()) {
-			final Map<Integer, String> siteMap = new HashMap<Integer, String>();
-			final Map<Integer, String> personMap = new HashMap<Integer, String>();
+			final Map<Integer, String> siteMap = new HashMap<>();
+			final Map<Integer, String> personMap = new HashMap<>();
 			this.retrieveSitesAndPersonsFromStudyDetails(studyDetails, siteMap, personMap);
 			for (final StudyDetails detail : studyDetails) {
 				if (detail.getSiteId() != null) {
@@ -881,8 +885,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	private void retrieveSitesAndPersonsFromStudyDetails(final List<StudyDetails> studyDetails, final Map<Integer, String> siteMap,
 			final Map<Integer, String> personMap) throws MiddlewareQueryException {
-		final List<Integer> siteIds = new ArrayList<Integer>();
-		final List<Integer> personIds = new ArrayList<Integer>();
+		final List<Integer> siteIds = new ArrayList<>();
+		final List<Integer> personIds = new ArrayList<>();
 		for (final StudyDetails detail : studyDetails) {
 			if (detail.getSiteId() != null) {
 				siteIds.add(detail.getSiteId());
@@ -936,7 +940,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		if (infos == null) {
 			return;
 		}
-		final Map<Integer, String> locationMap = new HashMap<Integer, String>();
+		final Map<Integer, String> locationMap = new HashMap<>();
 		for (final FieldMapInfo info : infos) {
 			if (info != null && info.getDatasets() != null) {
 				for (final FieldMapDatasetInfo dataset : info.getDatasets()) {
@@ -1105,10 +1109,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<StudySummary> findPagedProjects(final String programDbId, final String locationDbId, final String seasonDbId,
-			final Integer pageSize, final Integer page) throws MiddlewareQueryException {
+	public List<StudySummary> findPagedProjects(final Map<StudyFilters, String> filters,
+			final Integer pageSize, final Integer pageNumber) throws MiddlewareQueryException {
+
 		final List<DmsProject> dmsProjects =
-				this.getDmsProjectDao().findPagedProjects(programDbId, locationDbId, seasonDbId, pageSize, page);
+				this.getDmsProjectDao().findPagedProjects(filters, pageSize, pageNumber);
 		final List<StudySummary> studySummaries = Lists.newArrayList();
 		for (final DmsProject dmsProject : dmsProjects) {
 			final StudySummary studySummary = new StudySummary();
@@ -1123,11 +1128,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			}).immutableSortedCopy(dmsProject.getProperties());
 
 			final Map<String, String> additionalProps = Maps.newHashMap();
-			String additoinalPropKey = null;
+			String additionalPropKey = null;
 			String valueKey = "";
 			for (final ProjectProperty prop : sortedProperties) {
 				if (prop.getTypeId().equals(1805)) {
-					additoinalPropKey = prop.getValue();
+					additionalPropKey = prop.getValue();
 				}
 				if (prop.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
 					valueKey = prop.getValue();
@@ -1135,17 +1140,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				if (valueKey.equals(String.valueOf(prop.getTypeId()))) {
 					if (valueKey.equals(String.valueOf(TermId.START_DATE.getId()))) {
 						studySummary.setStartDate(prop.getValue());
-						studySummary.addYear(prop.getValue().substring(0, 4));
 					} else if (valueKey.equals(String.valueOf(TermId.END_DATE.getId()))) {
 						studySummary.setEndDate(prop.getValue());
 					} else if (valueKey.equals(String.valueOf(TermId.SEASON_VAR_TEXT.getId()))) {
 						studySummary.addSeason(prop.getValue());
-					} else if (valueKey.equals(String.valueOf(TermId.LOCATION_ABBR.getId()))) {
+					} else if (valueKey.equals(String.valueOf(TermId.LOCATION_ID.getId()))) {
 						studySummary.setLocationId(!StringUtils.isEmpty(prop.getValue()) ? String.valueOf(prop.getValue()) : null);
 					} else if (valueKey.equals(String.valueOf(TermId.STUDY_TYPE.getId()))) {
 						studySummary.setType(StudyType.getStudyTypeById(Integer.valueOf(prop.getValue())).getName());
 					} else {
-						additionalProps.put(additoinalPropKey, prop.getValue());
+						additionalProps.put(additionalPropKey, prop.getValue());
 					}
 				}
 
@@ -1159,9 +1163,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			studySummary.setOptionalInfo(additionalProps)
 					.setName(dmsProject.getName())
 					.setProgramDbId(dmsProject.getProgramUUID())
-					// TODO setProgramName - will need Workbench Query
 					.setStudyDbid(dmsProject.getProjectId());
-
 			studySummary.setInstanceMetaData(this.getInstanceMetadata(dmsProject.getProjectId()));
 			studySummaries.add(studySummary);
 		}
@@ -1169,9 +1171,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Long countAllStudies(final String programDbId, final String locationDbId, final String seasonDbId)
+	public Long countAllStudies(final Map<StudyFilters, String> filters)
 			throws MiddlewareQueryException {
-		return this.getDmsProjectDao().countStudies(programDbId, locationDbId, seasonDbId);
+		return this.getDmsProjectDao().countStudies(filters);
 	}
 
 	@Override
