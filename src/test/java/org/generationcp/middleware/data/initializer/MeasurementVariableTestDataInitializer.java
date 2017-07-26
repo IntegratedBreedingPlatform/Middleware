@@ -4,8 +4,10 @@ package org.generationcp.middleware.data.initializer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 
 //TODO convert the methods here to static methods
 public class MeasurementVariableTestDataInitializer {
@@ -43,5 +45,16 @@ public class MeasurementVariableTestDataInitializer {
 		measurementVar.setTermId(termId);
 		measurementVar.setName(name);
 		return measurementVar;
+	}
+	
+	public MeasurementVariable createMeasurementVariable(final int termId, final String name, final String description,
+		final String scale, final String method, final String property, final String dataType, final String value, final String label,
+		final int dataTypeId, final PhenotypicType role) {
+		final MeasurementVariable variable =
+			new MeasurementVariable(termId, name, description, scale, method, property, dataType, value, label);
+		variable.setRole(role);
+		variable.setDataTypeId(dataTypeId);
+		variable.setVariableType(VariableType.TRAIT);
+		return variable;
 	}
 }
