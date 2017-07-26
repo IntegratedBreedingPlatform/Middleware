@@ -10,6 +10,7 @@ public enum DataType {
 	NUMERIC_VARIABLE(1110, "Numeric", false),
 	DATE_TIME_VARIABLE(1117, "Date", false),
 	CHARACTER_VARIABLE(1120, "Character", false),
+	NUMERIC_DBID_VARIABLE(1118, "Numeric DBID", false),
 
 	//Special Data types
 	PERSON(1131, "Person", true),
