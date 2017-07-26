@@ -46,12 +46,12 @@ public class MeasurementVariableTestDataInitializer {
 		measurementVar.setName(name);
 		return measurementVar;
 	}
-	
+
 	public MeasurementVariable createMeasurementVariable(final int termId, final String name, final String description,
-		final String scale, final String method, final String property, final String dataType, final String value, final String label,
-		final int dataTypeId, final PhenotypicType role) {
-		final MeasurementVariable variable =
-			new MeasurementVariable(termId, name, description, scale, method, property, dataType, value, label);
+			final String scale, final String method, final String property, final String dataType, final String value,
+			final String label, final int dataTypeId, final PhenotypicType role) {
+		final MeasurementVariable variable = new MeasurementVariable(termId, name, description, scale, method, property,
+				dataType, value, label);
 		variable.setRole(role);
 		variable.setDataTypeId(dataTypeId);
 		variable.setVariableType(VariableType.TRAIT);
