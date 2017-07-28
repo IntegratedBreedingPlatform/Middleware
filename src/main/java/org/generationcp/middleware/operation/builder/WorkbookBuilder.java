@@ -174,7 +174,7 @@ public class WorkbookBuilder extends Builder {
 		final List<TreatmentVariable> treatmentFactors = this.buildTreatmentFactors(variables);
 		final List<ProjectProperty> projectProperties = trialDataSetProject.getProperties();
 
-		final Map<Integer, org.generationcp.middleware.domain.ontology.VariableType> projectPropRoleMapping =
+		final Map<Integer, VariableType> projectPropRoleMapping =
 				this.generateProjectPropertyRoleMap(projectProperties);
 
 		for (final ProjectProperty projectProperty : projectProperties) {
@@ -182,7 +182,7 @@ public class WorkbookBuilder extends Builder {
 			final StandardVariable stdVariable =
 				this.getStandardVariableBuilder().create(projectProperty.getVariableId(), study.getProgramUUID());
 
-			final org.generationcp.middleware.domain.ontology.VariableType varType = projectPropRoleMapping.get(stdVariable.getId());
+			final VariableType varType = projectPropRoleMapping.get(stdVariable.getId());
 			if (varType != null) {
 				stdVariable.setPhenotypicType(varType.getRole());
 				if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()) {
@@ -354,13 +354,13 @@ public class WorkbookBuilder extends Builder {
 		}
 	}
 
-	private Map<Integer, org.generationcp.middleware.domain.ontology.VariableType> generateProjectPropertyRoleMap(
+	private Map<Integer, VariableType> generateProjectPropertyRoleMap(
 			final List<ProjectProperty> projectProperties) {
-		final Map<Integer, org.generationcp.middleware.domain.ontology.VariableType> projPropRoleMap = new HashMap<>();
+		final Map<Integer, VariableType> projPropRoleMap = new HashMap<>();
 		for (final ProjectProperty projectProp : projectProperties) {
-			if (org.generationcp.middleware.domain.ontology.VariableType.getById(projectProp.getTypeId()) != null) {
-				final org.generationcp.middleware.domain.ontology.VariableType varType =
-					org.generationcp.middleware.domain.ontology.VariableType.getById(projectProp.getTypeId());
+			if (VariableType.getById(projectProp.getTypeId()) != null) {
+				final VariableType varType =
+					VariableType.getById(projectProp.getTypeId());
 				projPropRoleMap.put(projectProp.getVariableId(), varType);
 			}
 		}
@@ -429,14 +429,14 @@ public class WorkbookBuilder extends Builder {
 		final DmsProject dmsProject = this.getDataSetBuilder().getTrialDataset(id);
 		final List<MeasurementVariable> experimentalDesignVariables = new ArrayList<MeasurementVariable>();
 		final List<ProjectProperty> projectProperties = dmsProject != null ? dmsProject.getProperties() : new ArrayList<ProjectProperty>();
-		final Map<Integer, org.generationcp.middleware.domain.ontology.VariableType> projectPropRoleMapping =
+		final Map<Integer, VariableType> projectPropRoleMapping =
 				this.generateProjectPropertyRoleMap(projectProperties);
 		for (final ProjectProperty projectProperty : projectProperties) {
 			boolean isConstant = false;
 			if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
 				final StandardVariable stdVariable =
 						this.getStandardVariableBuilder().create(Integer.parseInt(projectProperty.getValue()), study.getProgramUUID());
-				final org.generationcp.middleware.domain.ontology.VariableType varType = projectPropRoleMapping.get(stdVariable.getId());
+				final VariableType varType = projectPropRoleMapping.get(stdVariable.getId());
 				if (varType != null) {
 					stdVariable.setPhenotypicType(varType.getRole());
 
@@ -879,7 +879,7 @@ public class WorkbookBuilder extends Builder {
 
 	private String getLocalName(final int rank, final List<ProjectProperty> properties) {
 		for (final ProjectProperty property : properties) {
-			if (org.generationcp.middleware.domain.ontology.VariableType.getById(property.getTypeId()) != null
+			if (VariableType.getById(property.getTypeId()) != null
 					&& rank == property.getRank()) {
 				return property.getValue();
 			}
