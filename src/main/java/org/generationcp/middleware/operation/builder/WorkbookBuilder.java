@@ -168,7 +168,7 @@ public class WorkbookBuilder extends Builder {
 				}
 			}
 		}
-		
+
 		populateBreedingMethodPossibleValues(variates);
 
 		final List<TreatmentVariable> treatmentFactors = this.buildTreatmentFactors(variables);
@@ -178,104 +178,103 @@ public class WorkbookBuilder extends Builder {
 				this.generateProjectPropertyRoleMap(projectProperties);
 
 		for (final ProjectProperty projectProperty : projectProperties) {
-			if (projectProperty.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
-				// DA IN A LOOP
-				final StandardVariable stdVariable =
-						this.getStandardVariableBuilder().create(Integer.parseInt(projectProperty.getValue()), study.getProgramUUID());
+			// FIXME DA IN A LOOP
+			final StandardVariable stdVariable =
+				this.getStandardVariableBuilder().create(projectProperty.getVariableId(), study.getProgramUUID());
 
-				final org.generationcp.middleware.domain.ontology.VariableType varType = projectPropRoleMapping.get(stdVariable.getId());
-				if (varType != null) {
-					stdVariable.setPhenotypicType(varType.getRole());
-					if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()) {
+			final org.generationcp.middleware.domain.ontology.VariableType varType = projectPropRoleMapping.get(stdVariable.getId());
+			if (varType != null) {
+				stdVariable.setPhenotypicType(varType.getRole());
+				if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()) {
 
-						Double minRange = null, maxRange = null;
-						if (stdVariable.getConstraints() != null) {
-							minRange = stdVariable.getConstraints().getMinValue();
-							maxRange = stdVariable.getConstraints().getMaxValue();
-						}
+					Double minRange = null, maxRange = null;
+					if (stdVariable.getConstraints() != null) {
+						minRange = stdVariable.getConstraints().getMinValue();
+						maxRange = stdVariable.getConstraints().getMaxValue();
+					}
 
-						String value = null;
-						final int varId = stdVariable.getId();
-						if (varType.getRole() == PhenotypicType.TRIAL_ENVIRONMENT) {
-							// DA geolocation prop access for value
-							value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
-						}
-						// if value is null we have a .... trial instance, or location attribute (lat,long etc)
-						if (value == null) {
-							// set trial env for nursery studies
-							final List<Integer> locIds = this.getExperimentDao().getLocationIdsOfStudy(id);
-							if (locIds != null && !locIds.isEmpty()) {
-								final Integer locId = locIds.get(0);
-								// DA geolocation table
-								final Geolocation geolocation = this.getGeolocationDao().getById(locId);
-								if (geolocation != null) {
-									if (TermId.TRIAL_INSTANCE_FACTOR.getId() == varId) {
-										value = geolocation.getDescription();
+					String value = null;
+					final int varId = stdVariable.getId();
+					if (varType.getRole() == PhenotypicType.TRIAL_ENVIRONMENT) {
+						// DA geolocation prop access for value
+						value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
+					}
+					// if value is null we have a .... trial instance, or location attribute (lat,long etc)
+					if (value == null) {
+						// set trial env for nursery studies
+						final List<Integer> locIds = this.getExperimentDao().getLocationIdsOfStudy(id);
+						if (locIds != null && !locIds.isEmpty()) {
+							final Integer locId = locIds.get(0);
+							// DA geolocation table
+							final Geolocation geolocation = this.getGeolocationDao().getById(locId);
+							if (geolocation != null) {
+								if (TermId.TRIAL_INSTANCE_FACTOR.getId() == varId) {
+									value = geolocation.getDescription();
 
-									} else if (TermId.LATITUDE.getId() == varId && geolocation.getLatitude() != null) {
-										value = geolocation.getLatitude().toString();
+								} else if (TermId.LATITUDE.getId() == varId && geolocation.getLatitude() != null) {
+									value = geolocation.getLatitude().toString();
 
-									} else if (TermId.LONGITUDE.getId() == varId && geolocation.getLongitude() != null) {
-										value = geolocation.getLongitude().toString();
+								} else if (TermId.LONGITUDE.getId() == varId && geolocation.getLongitude() != null) {
+									value = geolocation.getLongitude().toString();
 
-									} else if (TermId.GEODETIC_DATUM.getId() == varId && geolocation.getGeodeticDatum() != null) {
-										geolocation.setGeodeticDatum(value);
+								} else if (TermId.GEODETIC_DATUM.getId() == varId && geolocation.getGeodeticDatum() != null) {
+									geolocation.setGeodeticDatum(value);
 
-									} else if (TermId.ALTITUDE.getId() == varId && geolocation.getAltitude() != null) {
-										value = geolocation.getAltitude().toString();
-									}
+								} else if (TermId.ALTITUDE.getId() == varId && geolocation.getAltitude() != null) {
+									value = geolocation.getAltitude().toString();
 								}
 							}
-							// redundant logic?
-							if (value == null) {
-								value = "";
-							}
 						}
-
-						// continuing redundant logic ...
-						if (value != null) {
-							final MeasurementVariable measurementVariable =
-									new MeasurementVariable(stdVariable.getId(), this.getLocalName(projectProperty.getRank(),
-											projectProperties),// projectProperty.getValue(),
-											stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod()
-													.getName(), stdVariable.getProperty().getName(), stdVariable.getDataType().getName(),
-											value, "", minRange, maxRange);
-							measurementVariable.setFactor(true);
-							measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
-							measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
-									stdVariable.getEnumerations()));
-							measurementVariable.setRole(varType.getRole());
-							if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
-								expDesignVariables.add(measurementVariable);
-							} else if (!conditions.contains(measurementVariable)) {
-								conditions.add(measurementVariable);
-							}
+						// redundant logic?
+						if (value == null) {
+							value = "";
 						}
-						// control flow is unreadable here
-					} else if (isTrial && WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
+					}
 
-						final String value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
-
-						Double minRange = null, maxRange = null;
-						if (stdVariable.getConstraints() != null) {
-							minRange = stdVariable.getConstraints().getMinValue();
-							maxRange = stdVariable.getConstraints().getMaxValue();
-						}
+					// continuing redundant logic ...
+					if (value != null) {
 						final MeasurementVariable measurementVariable =
-								new MeasurementVariable(
-										stdVariable.getId(),
-										this.getLocalName(projectProperty.getRank(), projectProperties),// projectProperty.getValue(),
-										stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
-										stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, "", minRange,
-										maxRange);
+							new MeasurementVariable(stdVariable.getId(), this.getLocalName(
+								projectProperty.getRank(),
+								projectProperties),// projectProperty.getValue(),
+								stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod()
+								.getName(), stdVariable.getProperty().getName(), stdVariable.getDataType().getName(),
+								value, "", minRange, maxRange);
 						measurementVariable.setFactor(true);
 						measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
 						measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
-								stdVariable.getEnumerations()));
+							stdVariable.getEnumerations()));
 						measurementVariable.setRole(varType.getRole());
-						expDesignVariables.add(measurementVariable);
-						this.setValueInCondition(conditions, value, stdVariable.getId());
+						if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
+							expDesignVariables.add(measurementVariable);
+						} else if (!conditions.contains(measurementVariable)) {
+							conditions.add(measurementVariable);
+						}
 					}
+					// control flow is unreadable here
+				} else if (isTrial && WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
+
+					final String value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
+
+					Double minRange = null, maxRange = null;
+					if (stdVariable.getConstraints() != null) {
+						minRange = stdVariable.getConstraints().getMinValue();
+						maxRange = stdVariable.getConstraints().getMaxValue();
+					}
+					final MeasurementVariable measurementVariable =
+						new MeasurementVariable(
+							stdVariable.getId(),
+							this.getLocalName(projectProperty.getRank(), projectProperties),// projectProperty.getValue(),
+							stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
+							stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, "", minRange,
+							maxRange);
+					measurementVariable.setFactor(true);
+					measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
+					measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
+						stdVariable.getEnumerations()));
+					measurementVariable.setRole(varType.getRole());
+					expDesignVariables.add(measurementVariable);
+					this.setValueInCondition(conditions, value, stdVariable.getId());
 				}
 			}
 		}
@@ -357,22 +356,12 @@ public class WorkbookBuilder extends Builder {
 
 	private Map<Integer, org.generationcp.middleware.domain.ontology.VariableType> generateProjectPropertyRoleMap(
 			final List<ProjectProperty> projectProperties) {
-		final Map<Integer, org.generationcp.middleware.domain.ontology.VariableType> projPropRoleMap =
-				new HashMap<Integer, org.generationcp.middleware.domain.ontology.VariableType>();
+		final Map<Integer, org.generationcp.middleware.domain.ontology.VariableType> projPropRoleMap = new HashMap<>();
 		for (final ProjectProperty projectProp : projectProperties) {
-			if (projectProp.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
-
-				final int currentRank = projectProp.getRank();
-				for (final ProjectProperty projectPropInside : projectProperties) {
-					if (projectPropInside.getRank() == currentRank
-							&& org.generationcp.middleware.domain.ontology.VariableType.getById(projectPropInside.getTypeId()) != null) {
-						final org.generationcp.middleware.domain.ontology.VariableType varType =
-								org.generationcp.middleware.domain.ontology.VariableType.getById(projectPropInside.getTypeId());
-						projPropRoleMap.put(Integer.parseInt(projectProp.getValue()), varType);
-						break;
-					}
-				}
-
+			if (org.generationcp.middleware.domain.ontology.VariableType.getById(projectProp.getTypeId()) != null) {
+				final org.generationcp.middleware.domain.ontology.VariableType varType =
+					org.generationcp.middleware.domain.ontology.VariableType.getById(projectProp.getTypeId());
+				projPropRoleMap.put(projectProp.getVariableId(), varType);
 			}
 		}
 		return projPropRoleMap;
