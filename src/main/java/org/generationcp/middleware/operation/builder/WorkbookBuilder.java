@@ -194,11 +194,10 @@ public class WorkbookBuilder extends Builder {
 					}
 
 					String value = null;
-					final int varId = stdVariable.getId();
-					if (varType.getRole() == PhenotypicType.TRIAL_ENVIRONMENT) {
-						// DA geolocation prop access for value
-						value = this.getStudyDataManager().getGeolocationPropValue(stdVariable.getId(), id);
-					}
+
+					// DA geolocation prop access for value
+					value = this.getStudyDataManager().getGeolocationPropValue(stdVariableId, id);
+
 					// if value is null we have a .... trial instance, or location attribute (lat,long etc)
 					if (value == null) {
 						// set trial env for nursery studies
