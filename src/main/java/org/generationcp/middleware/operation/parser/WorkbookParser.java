@@ -42,6 +42,7 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
@@ -456,12 +457,7 @@ public class WorkbookParser {
 				this.errorMessages.add(new Message("error.missing.field.method", Integer.toString(this.currentRow + 1)));
 			}
 
-			if (StringUtils.isEmpty(var.getDataType())) {
-				this.errorMessages.add(new Message("error.missing.field.datatype", Integer.toString(this.currentRow + 1)));
-			} else if (!this.hasIncorrectDatatypeValue && !"N".equals(var.getDataType()) && !"C".equals(var.getDataType())) {
-				this.hasIncorrectDatatypeValue = true;
-				this.errorMessages.add(new Message("error.unsupported.datatype"));
-			}
+			this.validateDataType(var, this.currentRow + 1);
 
 			// Validate variable should have label except variates
 			if (!Section.VARIATE.toString().equals(name) && StringUtils.isEmpty(var.getLabel())) {
@@ -496,6 +492,15 @@ public class WorkbookParser {
 
 			this.currentRow++;
 		}
+	protected void validateDataType(final MeasurementVariable measurementVariable, final Integer rowNumber) {
+
+		if (StringUtils.isEmpty(measurementVariable.getDataType())) {
+			this.errorMessages.add(new Message("error.missing.field.datatype", Integer.toString(rowNumber)));
+		} else if (!this.hasIncorrectDatatypeValue && DataType.getByCode(measurementVariable.getDataType()) == null) {
+			this.hasIncorrectDatatypeValue = true;
+			this.errorMessages.add(new Message("error.unsupported.datatype"));
+		}
+
 	}
 
 	/**

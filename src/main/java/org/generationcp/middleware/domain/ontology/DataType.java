@@ -33,6 +33,7 @@ public enum DataType {
 
 	private static final Map<Integer, DataType> byId = new HashMap<>();
 	private static final Map<String, DataType> byName = new HashMap<>();
+	private static final Map<String, DataType> byCode = new HashMap<>();
 
 	static {
 		for (DataType e : DataType.values()) {
@@ -42,6 +43,10 @@ public enum DataType {
 
 			if (DataType.byName.put(e.getName(), e) != null) {
 				throw new IllegalArgumentException("duplicate name: " + e.getName());
+			}
+
+			if (DataType.byCode.put(e.getDataTypeCode(), e) != null && !e.isSystemDataType()) {
+				throw new IllegalArgumentException("duplicate code: " + e.getName());
 			}
 		}
 	}
@@ -77,11 +82,16 @@ public enum DataType {
 		return DataType.byName.get(name);
 	}
 
+	public static DataType getByCode(String code) {
+		return DataType.byCode.get(code);
+	}
+
 	@Override public String toString() {
 		return "DataType{" +
 				"id=" + id +
 				", name='" + name + '\'' +
 				", systemDataType=" + systemDataType +
+				", dataTypeCode=" + dataTypeCode +
 				"} " + super.toString();
 	}
 }
