@@ -174,8 +174,7 @@ public class WorkbookBuilder extends Builder {
 		final List<TreatmentVariable> treatmentFactors = this.buildTreatmentFactors(variables);
 		final List<ProjectProperty> projectProperties = trialDataSetProject.getProperties();
 
-		final Map<Integer, VariableType> projectPropRoleMapping =
-			this.generateProjectPropertyRoleMap(projectProperties);
+		final Map<Integer, VariableType> projectPropRoleMapping = this.generateProjectPropertyRoleMap(projectProperties);
 
 		for (final ProjectProperty projectProperty : projectProperties) {
 			// FIXME DA IN A LOOP
@@ -184,21 +183,20 @@ public class WorkbookBuilder extends Builder {
 
 			final int stdVariableId = stdVariable.getId();
 
+			Double minRange = null, maxRange = null;
+			if (stdVariable.getConstraints() != null) {
+				minRange = stdVariable.getConstraints().getMinValue();
+				maxRange = stdVariable.getConstraints().getMaxValue();
+			}
+
 			final VariableType varType = projectPropRoleMapping.get(stdVariableId);
 			if (varType != null) {
 				stdVariable.setPhenotypicType(varType.getRole());
+
+				// DA geolocation prop access for value
+				String value = this.getStudyDataManager().getGeolocationPropValue(stdVariableId, id);
+
 				if (!isTrial && PhenotypicType.TRIAL_ENVIRONMENT == varType.getRole()) {
-
-					Double minRange = null, maxRange = null;
-					if (stdVariable.getConstraints() != null) {
-						minRange = stdVariable.getConstraints().getMinValue();
-						maxRange = stdVariable.getConstraints().getMaxValue();
-					}
-
-					String value = null;
-
-					// DA geolocation prop access for value
-					value = this.getStudyDataManager().getGeolocationPropValue(stdVariableId, id);
 
 					// if value is null we have a .... trial instance, or location attribute (lat,long etc)
 					if (value == null) {
@@ -219,43 +217,19 @@ public class WorkbookBuilder extends Builder {
 					// continuing redundant logic ...
 					if (value != null) {
 						final MeasurementVariable measurementVariable =
-							new MeasurementVariable(stdVariableId, projectProperty.getAlias(),// projectProperty.getValue(),
-								stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod()
-								.getName(), stdVariable.getProperty().getName(), stdVariable.getDataType().getName(),
-								value, "", minRange, maxRange);
-						measurementVariable.setFactor(true);
-						measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
-						measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
-							stdVariable.getEnumerations()));
-						measurementVariable.setRole(varType.getRole());
+							this.createMeasurementVariable(stdVariable, projectProperty, value, minRange, maxRange, varType);
+
 						if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariableId)) {
 							expDesignVariables.add(measurementVariable);
 						} else if (!conditions.contains(measurementVariable)) {
 							conditions.add(measurementVariable);
 						}
 					}
-					// control flow is unreadable here
 				} else if (isTrial && WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariableId)) {
 
-					final String value = this.getStudyDataManager().getGeolocationPropValue(stdVariableId, id);
-
-					Double minRange = null, maxRange = null;
-					if (stdVariable.getConstraints() != null) {
-						minRange = stdVariable.getConstraints().getMinValue();
-						maxRange = stdVariable.getConstraints().getMaxValue();
-					}
 					final MeasurementVariable measurementVariable =
-						new MeasurementVariable(
-							stdVariableId,
-							projectProperty.getAlias(),// projectProperty.getValue(),
-							stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
-							stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, "", minRange,
-							maxRange);
-					measurementVariable.setFactor(true);
-					measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
-					measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
-						stdVariable.getEnumerations()));
-					measurementVariable.setRole(varType.getRole());
+						this.createMeasurementVariable(stdVariable, projectProperty, value, minRange, maxRange, varType);
+
 					expDesignVariables.add(measurementVariable);
 					this.setValueInCondition(conditions, value, stdVariableId);
 				}
@@ -431,7 +405,7 @@ public class WorkbookBuilder extends Builder {
 			this.setTreatmentFactorValues(treatmentFactors, dataSetId);
 		}
 		final DmsProject dmsProject = this.getDataSetBuilder().getTrialDataset(id);
-		final List<MeasurementVariable> experimentalDesignVariables = new ArrayList<MeasurementVariable>();
+		final List<MeasurementVariable> experimentalDesignVariables = new ArrayList<>();
 		final List<ProjectProperty> projectProperties = dmsProject != null ? dmsProject.getProperties() : new ArrayList<ProjectProperty>();
 		final Map<Integer, VariableType> projectPropRoleMapping =
 				this.generateProjectPropertyRoleMap(projectProperties);
@@ -498,8 +472,7 @@ public class WorkbookBuilder extends Builder {
 
 						if (value != null) {
 							final MeasurementVariable measurementVariable =
-									this.createMeasurementVariable(stdVariable, projectProperty, projectProperties, value, minRange,
-											maxRange, varType);
+								this.createMeasurementVariable(stdVariable, projectProperty, value, minRange, maxRange, varType);
 							if (WorkbookBuilder.EXPERIMENTAL_DESIGN_VARIABLES.contains(stdVariable.getId())) {
 								experimentalDesignVariables.add(measurementVariable);
 							} else if (isConstant) {
@@ -524,16 +497,15 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	protected MeasurementVariable createMeasurementVariable(final StandardVariable stdVariable, final ProjectProperty projectProperty,
-			final List<ProjectProperty> projectProperties, final String value, final Double minRange, final Double maxRange,
-			final VariableType varType) {
+		final String value, final Double minRange, final Double maxRange, final VariableType varType) {
 		final MeasurementVariable measurementVariable =
-				new MeasurementVariable(stdVariable.getId(), projectProperty.getAlias(),// projectProperty.getValue(),
-						stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(), stdVariable
-								.getProperty().getName(), stdVariable.getDataType().getName(), value, "", minRange, maxRange);
+			new MeasurementVariable(stdVariable.getId(), projectProperty.getAlias(), stdVariable.getDescription(),
+				stdVariable.getScale().getName(), stdVariable.getMethod().getName(), stdVariable.getProperty().getName(),
+				stdVariable.getDataType().getName(), value, "", minRange, maxRange);
 		measurementVariable.setFactor(true);
 		measurementVariable.setDataTypeId(stdVariable.getDataType().getId());
-		measurementVariable.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(
-				stdVariable.getEnumerations()));
+		measurementVariable
+			.setPossibleValues(this.getMeasurementVariableTransformer().transformPossibleValues(stdVariable.getEnumerations()));
 		measurementVariable.setRole(varType.getRole());
 		measurementVariable.setVariableType(varType);
 		return measurementVariable;
