@@ -234,9 +234,7 @@ public class WorkbookBuilder extends Builder {
 					// continuing redundant logic ...
 					if (value != null) {
 						final MeasurementVariable measurementVariable =
-							new MeasurementVariable(stdVariable.getId(), this.getLocalName(
-								projectProperty.getRank(),
-								projectProperties),// projectProperty.getValue(),
+							new MeasurementVariable(stdVariable.getId(), projectProperty.getAlias(),// projectProperty.getValue(),
 								stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod()
 								.getName(), stdVariable.getProperty().getName(), stdVariable.getDataType().getName(),
 								value, "", minRange, maxRange);
@@ -264,7 +262,7 @@ public class WorkbookBuilder extends Builder {
 					final MeasurementVariable measurementVariable =
 						new MeasurementVariable(
 							stdVariable.getId(),
-							this.getLocalName(projectProperty.getRank(), projectProperties),// projectProperty.getValue(),
+							projectProperty.getAlias(),// projectProperty.getValue(),
 							stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(),
 							stdVariable.getProperty().getName(), stdVariable.getDataType().getName(), value, "", minRange,
 							maxRange);
@@ -539,7 +537,7 @@ public class WorkbookBuilder extends Builder {
 			final List<ProjectProperty> projectProperties, final String value, final Double minRange, final Double maxRange,
 			final VariableType varType) {
 		final MeasurementVariable measurementVariable =
-				new MeasurementVariable(stdVariable.getId(), this.getLocalName(projectProperty.getRank(), projectProperties),// projectProperty.getValue(),
+				new MeasurementVariable(stdVariable.getId(), projectProperty.getAlias(),// projectProperty.getValue(),
 						stdVariable.getDescription(), stdVariable.getScale().getName(), stdVariable.getMethod().getName(), stdVariable
 								.getProperty().getName(), stdVariable.getDataType().getName(), value, "", minRange, maxRange);
 		measurementVariable.setFactor(true);
@@ -875,16 +873,6 @@ public class WorkbookBuilder extends Builder {
 			}
 		}
 		return var;
-	}
-
-	private String getLocalName(final int rank, final List<ProjectProperty> properties) {
-		for (final ProjectProperty property : properties) {
-			if (VariableType.getById(property.getTypeId()) != null
-					&& rank == property.getRank()) {
-				return property.getValue();
-			}
-		}
-		return "";
 	}
 
 	protected VariableList getTrialEnvironmentVariableList(final DataSet trialDataset) {
