@@ -208,23 +208,7 @@ public class WorkbookBuilder extends Builder {
 							final Integer locId = locIds.get(0);
 							// DA geolocation table
 							final Geolocation geolocation = this.getGeolocationDao().getById(locId);
-							if (geolocation != null) {
-								if (TermId.TRIAL_INSTANCE_FACTOR.getId() == varId) {
-									value = geolocation.getDescription();
-
-								} else if (TermId.LATITUDE.getId() == varId && geolocation.getLatitude() != null) {
-									value = geolocation.getLatitude().toString();
-
-								} else if (TermId.LONGITUDE.getId() == varId && geolocation.getLongitude() != null) {
-									value = geolocation.getLongitude().toString();
-
-								} else if (TermId.GEODETIC_DATUM.getId() == varId && geolocation.getGeodeticDatum() != null) {
-									geolocation.setGeodeticDatum(value);
-
-								} else if (TermId.ALTITUDE.getId() == varId && geolocation.getAltitude() != null) {
-									value = geolocation.getAltitude().toString();
-								}
-							}
+							value = getVariableValueFromGeolocation(stdVariableId, value, geolocation);
 						}
 						// redundant logic?
 						if (value == null) {
@@ -291,6 +275,27 @@ public class WorkbookBuilder extends Builder {
 		WorkbookBuilder.LOG.debug("" + monitor.stop() + ". This instance was for studyId: " + id);
 
 		return workbook;
+	}
+
+	private String getVariableValueFromGeolocation(int stdVariableId, String value, Geolocation geolocation) {
+		if (geolocation != null) {
+			if (TermId.TRIAL_INSTANCE_FACTOR.getId() == stdVariableId) {
+				value = geolocation.getDescription();
+
+			} else if (TermId.LATITUDE.getId() == stdVariableId && geolocation.getLatitude() != null) {
+				value = geolocation.getLatitude().toString();
+
+			} else if (TermId.LONGITUDE.getId() == stdVariableId && geolocation.getLongitude() != null) {
+				value = geolocation.getLongitude().toString();
+
+			} else if (TermId.GEODETIC_DATUM.getId() == stdVariableId && geolocation.getGeodeticDatum() != null) {
+				geolocation.setGeodeticDatum(value);
+
+			} else if (TermId.ALTITUDE.getId() == stdVariableId && geolocation.getAltitude() != null) {
+				value = geolocation.getAltitude().toString();
+			}
+		}
+		return value;
 	}
 
 	private void populateBreedingMethodPossibleValues(final List<MeasurementVariable> variates) {
@@ -484,23 +489,7 @@ public class WorkbookBuilder extends Builder {
 								final Integer locId = locIds.get(0);
 								final Geolocation geolocation = this.getGeolocationDao().getById(locId);
 								final int varId = stdVariable.getId();
-								if (geolocation != null) {
-									if (TermId.TRIAL_INSTANCE_FACTOR.getId() == varId) {
-										value = geolocation.getDescription();
-
-									} else if (TermId.LATITUDE.getId() == varId && geolocation.getLatitude() != null) {
-										value = geolocation.getLatitude().toString();
-
-									} else if (TermId.LONGITUDE.getId() == varId && geolocation.getLongitude() != null) {
-										value = geolocation.getLongitude().toString();
-
-									} else if (TermId.GEODETIC_DATUM.getId() == varId && geolocation.getGeodeticDatum() != null) {
-										geolocation.setGeodeticDatum(value);
-
-									} else if (TermId.ALTITUDE.getId() == varId && geolocation.getAltitude() != null) {
-										value = geolocation.getAltitude().toString();
-									}
-								}
+								value = getVariableValueFromGeolocation(varId, value, geolocation);
 							}
 							if (value == null) {
 								value = "";
