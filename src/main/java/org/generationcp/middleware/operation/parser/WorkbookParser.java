@@ -80,11 +80,12 @@ public class WorkbookParser {
 	private static final String METHOD = "METHOD";
 	private static final String SCALE = "SCALE";
 
-	public static int DEFAULT_MAX_ROW_LIMIT = 10000;
+	public static final int DEFAULT_MAX_ROW_LIMIT = 10000;
 
-	private int currentRow;
+	private int currentRowZeroBased;
+
 	private List<Message> errorMessages = new ArrayList<>();
-	private boolean hasIncorrectDatatypeValue = false;
+	protected boolean hasIncorrectDatatypeValue = false;
 	private int maxRowLimit = DEFAULT_MAX_ROW_LIMIT;
 
 	private org.generationcp.middleware.domain.etl.Workbook currentWorkbook;
@@ -165,9 +166,9 @@ public class WorkbookParser {
 		this.currentWorkbook = new org.generationcp.middleware.domain.etl.Workbook();
 		Workbook wb;
 
-		this.currentRow = 0;
+		this.currentRowZeroBased = 0;
 		this.errorMessages = new LinkedList<Message>();
-		this.hasIncorrectDatatypeValue = false;
+		this.setHasIncorrectDatatypeValue(false);
 
 		try {
 
@@ -235,7 +236,7 @@ public class WorkbookParser {
 		try {
 			Workbook wb = this.getCorrectWorkbook(file);
 
-			this.currentRow = 0;
+			this.currentRowZeroBased = 0;
 			workbook.setObservations(this.readObservations(wb, workbook, discardInvalidValues));
 		} catch (IOException e) {
 			throw new WorkbookParserException("Error accessing file " + e.getMessage(), e);
@@ -334,8 +335,8 @@ public class WorkbookParser {
 		StudyDetails studyDetails =
 				new StudyDetails(study, title, pmKey, objective, startDateStr, endDateStr, studyTypeValue, 0, null, null);
 
-		while (!WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 8)) {
-			this.currentRow++;
+		while (!WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
+			this.currentRowZeroBased++;
 		}
 		return studyDetails;
 	}
@@ -346,13 +347,13 @@ public class WorkbookParser {
 		try {
 
 			// Cannot have more than one empty row in the description worksheet.
-			if (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 8)) {
-				this.currentRow++;
+			if (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
+				this.currentRowZeroBased++;
 			}
 
-			if (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 8)) {
-				this.errorMessages.add(new Message("error.to.many.empty.rows", name, Integer.toString(this.currentRow - 1), Integer
-						.toString(this.currentRow)));
+			if (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
+				this.errorMessages.add(new Message("error.to.many.empty.rows", name, Integer.toString(this.currentRowZeroBased - 1), Integer
+						.toString(this.currentRowZeroBased)));
 				return Collections.<MeasurementVariable>emptyList();
 			}
 
@@ -377,13 +378,13 @@ public class WorkbookParser {
 				expectedHeaders = WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS;
 			}
 
-			boolean valid = this.checkHeadersValid(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, expectedHeaders);
+			boolean valid = this.checkHeadersValid(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, expectedHeaders);
 			if (!valid && expectedHeaders2 != null) {
-				valid = this.checkHeadersValid(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, expectedHeaders2);
+				valid = this.checkHeadersValid(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, expectedHeaders2);
 			}
 			if (!valid && expectedHeaders != WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS) {
 				valid =
-						this.checkHeadersValid(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow,
+						this.checkHeadersValid(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased,
 								WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS);
 			}
 
@@ -400,23 +401,24 @@ public class WorkbookParser {
 		}
 	}
 
-	protected void extractMeasurementVariablesForSection(Workbook wb, String name, List<MeasurementVariable> measurementVariables) {
+	protected void extractMeasurementVariablesForSection(Workbook workbook, String sectionName, List<MeasurementVariable> measurementVariables) {
 
 		// Moving to the next line is necessary as at this point one is on the previous row.
-		this.currentRow++;
+		this.currentRowZeroBased++;
+
 		// Cannot have more than one empty row in the description worksheet.
-		if (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 8)) {
-			this.currentRow++;
+		if (WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
+			this.currentRowZeroBased++;
 		}
 
-		if (WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 8)) {
-			this.errorMessages.add(new Message("error.to.many.empty.rows", name, Integer.toString(this.currentRow - 1), Integer
-					.toString(this.currentRow)));
+		if (WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
+			this.errorMessages.add(new Message("error.to.many.empty.rows", sectionName, Integer.toString(this.currentRowZeroBased - 1), Integer
+					.toString(this.currentRowZeroBased)));
 			return;
 		}
 
 		// capture empty sections, and return to avoid spillover
-		String value = WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 0);
+		String value = WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 0);
 
 		for (Section section : Section.values()) {
 			if (value.equalsIgnoreCase(section.toString())) {
@@ -424,80 +426,123 @@ public class WorkbookParser {
 			}
 		}
 
-		while (!WorkbookParser.rowIsEmpty(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 8)) {
+		while (!WorkbookParser.rowIsEmpty(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 8)) {
+
+
+			final Integer displayRowNumber = this.currentRowZeroBased + 1;
 
 			// GCP-5802
-			MeasurementVariable var =
-					new MeasurementVariable(WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 0),
-							WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 1),
-							WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 3),
-							WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 4),
-							WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 2),
-							WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 5),
-							WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 6),
-							WorkbookParser.getCellStringValue(wb, WorkbookParser.DESCRIPTION_SHEET, this.currentRow, 7));
+			MeasurementVariable measurementVariableFromParsedData =
+					new MeasurementVariable(WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 0),
+							WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 1),
+							WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 3),
+							WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 4),
+							WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 2),
+							WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 5),
+							WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 6),
+							WorkbookParser.getCellStringValue(workbook, WorkbookParser.DESCRIPTION_SHEET, this.currentRowZeroBased, 7));
 
-			if (StringUtils.isEmpty(var.getName())) {
-				this.errorMessages.add(new Message("error.missing.field.name", Integer.toString(this.currentRow + 1)));
-			}
+			this.validateRequiredFields(measurementVariableFromParsedData, displayRowNumber);
+			this.validateDataTypeIfNecessary(measurementVariableFromParsedData, displayRowNumber);
+			this.validateRequiredFieldsForNonVariateVariables(sectionName, measurementVariableFromParsedData, displayRowNumber);
+			this.validateLabelBasedOnSection(sectionName, measurementVariableFromParsedData, displayRowNumber);
+			this.assignRoleBasedOnSectionName(sectionName, measurementVariableFromParsedData, displayRowNumber);
+			this.assignVariableType(sectionName, measurementVariableFromParsedData, this.currentWorkbook);
 
-			if (StringUtils.isEmpty(var.getDescription())) {
-				this.errorMessages.add(new Message("error.missing.field.description", Integer.toString(this.currentRow + 1)));
-			}
+			measurementVariables.add(measurementVariableFromParsedData);
 
-			if (StringUtils.isEmpty(var.getProperty())) {
-				this.errorMessages.add(new Message("error.missing.field.property", Integer.toString(this.currentRow + 1)));
-			}
-
-			if (StringUtils.isEmpty(var.getScale())) {
-				this.errorMessages.add(new Message("error.missing.field.scale", Integer.toString(this.currentRow + 1)));
-			}
-
-			if (StringUtils.isEmpty(var.getMethod())) {
-				this.errorMessages.add(new Message("error.missing.field.method", Integer.toString(this.currentRow + 1)));
-			}
-
-			this.validateDataType(var, this.currentRow + 1);
-
-			// Validate variable should have label except variates
-			if (!Section.VARIATE.toString().equals(name) && StringUtils.isEmpty(var.getLabel())) {
-				this.errorMessages.add(new Message("error.missing.field.label", Integer.toString(this.currentRow + 1)));
-			}
-
-			if (Section.VARIATE.toString().equals(name) || Section.CONSTANT.toString().equals(name)) {
-				var.setRole(PhenotypicType.VARIATE);
-			} else {
-				PhenotypicType role = PhenotypicType.getPhenotypicTypeForLabel(var.getLabel());
-				if (role == null || role == PhenotypicType.VARIATE) {
-					this.errorMessages.add(new Message("error.invalid.field.label", Integer.toString(this.currentRow + 1)));
-				} else {
-					var.setRole(role);
-				}
-			}
-
-			// NOTE: Explicitly setting variable type
-			if (Section.CONSTANT.toString().equals(name) && this.currentWorkbook != null) {
-				StudyType studyType = this.currentWorkbook.getStudyDetails().getStudyType();
-
-				if (Objects.equals(studyType, StudyType.N)) {
-					var.setVariableType(VariableType.NURSERY_CONDITION);
-				} else if (Objects.equals(studyType, StudyType.T)) {
-					var.setVariableType(VariableType.TRIAL_CONDITION);
-				}
-			} else {
-				var.setVariableType(OntologyDataHelper.mapFromPhenotype(var.getRole(), var.getProperty()));
-			}
-
-			measurementVariables.add(var);
-
-			this.currentRow++;
+			this.currentRowZeroBased++;
 		}
+	}
+
+	protected void assignVariableType(final String name, final MeasurementVariable measurementVariable, final
+			org.generationcp.middleware.domain.etl.Workbook workbook) {
+
+		// NOTE: Explicitly setting variable type
+		if (Section.CONSTANT.toString().equals(name) && workbook != null) {
+			StudyType studyType = workbook.getStudyDetails().getStudyType();
+
+			if (Objects.equals(studyType, StudyType.N)) {
+				measurementVariable.setVariableType(VariableType.NURSERY_CONDITION);
+			} else if (Objects.equals(studyType, StudyType.T)) {
+				measurementVariable.setVariableType(VariableType.TRIAL_CONDITION);
+			}
+		} else {
+			measurementVariable.setVariableType(OntologyDataHelper.mapFromPhenotype(measurementVariable.getRole(), measurementVariable.getProperty()));
+		}
+
+	}
+
+	protected void assignRoleBasedOnSectionName(final String sectionName, final MeasurementVariable measurementVariable, final Integer rowNumber) {
+
+		if (Section.VARIATE.toString().equals(sectionName) || Section.CONSTANT.toString().equals(sectionName)) {
+			measurementVariable.setRole(PhenotypicType.VARIATE);
+		} else {
+			measurementVariable.setRole(PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel()));
+		}
+
+	}
+
+	protected void validateLabelBasedOnSection(final String sectionName, final MeasurementVariable measurementVariable, final Integer rowNumber) {
+
+		if (Section.FACTOR.toString().equals(sectionName) || Section.CONDITION.toString().equals(sectionName)) {
+			PhenotypicType role = PhenotypicType.getPhenotypicTypeForLabel(measurementVariable.getLabel());
+			if (role == null || role == PhenotypicType.VARIATE) {
+				this.errorMessages.add(new Message("error.invalid.field.label", Integer.toString(rowNumber)));
+			}
+
+		}
+
+	}
+
+	protected void validateRequiredFieldsForNonVariateVariables(final String sectionName, final MeasurementVariable measurementVariable, final Integer rowNumber) {
+
+		// The Label of measurementVariable is required if it's in Factor, Condition and Constants section
+		if (!Section.VARIATE.toString().equals(sectionName) && StringUtils.isEmpty(measurementVariable.getLabel())) {
+			this.errorMessages.add(new Message("error.missing.field.label", Integer.toString(rowNumber)));
+		}
+
+	}
+
+	protected void validateRequiredFields(final MeasurementVariable measurementVariable, final Integer rowNumber) {
+
+		if (StringUtils.isEmpty(measurementVariable.getName())) {
+			this.errorMessages.add(new Message("error.missing.field.name", Integer.toString(rowNumber)));
+		}
+
+		if (StringUtils.isEmpty(measurementVariable.getDescription())) {
+			this.errorMessages.add(new Message("error.missing.field.description", Integer.toString(rowNumber)));
+		}
+
+		if (StringUtils.isEmpty(measurementVariable.getProperty())) {
+			this.errorMessages.add(new Message("error.missing.field.property", Integer.toString(rowNumber)));
+		}
+
+
+		if (StringUtils.isEmpty(measurementVariable.getScale())) {
+			this.errorMessages.add(new Message("error.missing.field.scale", Integer.toString(rowNumber)));
+		}
+
+		if (StringUtils.isEmpty(measurementVariable.getMethod())) {
+			this.errorMessages.add(new Message("error.missing.field.method", Integer.toString(rowNumber)));
+		}
+
+	}
+
+	protected void validateDataTypeIfNecessary(final MeasurementVariable measurementVariable, final Integer rowNumber) {
+
+		if (!hasIncorrectDatatypeValue()) {
+			validateDataType(measurementVariable, rowNumber);
+			setHasIncorrectDatatypeValue(true);
+		}
+
+	}
+
 	protected void validateDataType(final MeasurementVariable measurementVariable, final Integer rowNumber) {
 
 		if (StringUtils.isEmpty(measurementVariable.getDataType())) {
 			this.errorMessages.add(new Message("error.missing.field.datatype", Integer.toString(rowNumber)));
-		} else if (!this.hasIncorrectDatatypeValue && DataType.getByCode(measurementVariable.getDataType()) == null) {
-			this.hasIncorrectDatatypeValue = true;
+		} else if (DataType.getByCode(measurementVariable.getDataType()) == null) {
 			this.errorMessages.add(new Message("error.unsupported.datatype"));
 		}
 
@@ -574,7 +619,7 @@ public class WorkbookParser {
 		List<MeasurementVariable> variates = workbook.getVariates();
 
 		for (int col = 0; col < factors.size() + variates.size(); col++) {
-			String columnName = WorkbookParser.getCellStringValue(excelWorkbook, WorkbookParser.OBSERVATION_SHEET, this.currentRow, col);
+			String columnName = WorkbookParser.getCellStringValue(excelWorkbook, WorkbookParser.OBSERVATION_SHEET, this.currentRowZeroBased, col);
 			if (col < factors.size()) {
 
 				if (columnName == null || !factors.get(col).getName().equalsIgnoreCase(columnName)) {
@@ -619,24 +664,24 @@ public class WorkbookParser {
 
 			List<MeasurementVariable> variables = this.checkIfWorkbookVariablesMatchedTheHeadersInObservation(excelWorkbook, workbook);
 
-			this.currentRow++;
+			this.currentRowZeroBased++;
 
-			while (this.currentRow <= lastRowNum) {
+			while (this.currentRowZeroBased <= lastRowNum) {
 
 				// skip over blank rows in the observation sheet
-				if (WorkbookParser.rowIsEmpty(excelWorkbook, WorkbookParser.OBSERVATION_SHEET, this.currentRow, variables.size())) {
-					this.currentRow++;
+				if (WorkbookParser.rowIsEmpty(excelWorkbook, WorkbookParser.OBSERVATION_SHEET, this.currentRowZeroBased, variables.size())) {
+					this.currentRowZeroBased++;
 					continue;
 				}
 
 				List<MeasurementData> dataList =
-						this.convertSheetRowToDataList(this.currentRow, excelWorkbook, discardInvalidValues, variables);
+						this.convertSheetRowToDataList(this.currentRowZeroBased, excelWorkbook, discardInvalidValues, variables);
 
 				// danielv -- made use of new constructor to make it clear that only the measurement data is needed at this point. The other
 				// values are computed later on in the process
 				observations.add(new MeasurementRow(dataList));
 
-				this.currentRow++;
+				this.currentRowZeroBased++;
 			}
 
 			return observations;
@@ -739,6 +784,14 @@ public class WorkbookParser {
 
 	public void setMaxRowLimit(int maxRowLimit) {
 		this.maxRowLimit = maxRowLimit;
+	}
+
+	public boolean hasIncorrectDatatypeValue() {
+		return hasIncorrectDatatypeValue;
+	}
+
+	public void setHasIncorrectDatatypeValue(boolean hasIncorrectDatatypeValue) {
+		this.hasIncorrectDatatypeValue = hasIncorrectDatatypeValue;
 	}
 
 }

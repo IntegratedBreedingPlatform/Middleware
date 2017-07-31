@@ -22,6 +22,7 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
+import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
@@ -69,9 +70,14 @@ public class WorkbookParserTest {
 	@Rule
 	public TestName name = new TestName();
 	private long startTime;
+	public static final int TARGET_ROW_NUMBER = 100;
 
 	@Before
 	public void beforeEachTest() {
+
+		List<Message> errorMessages = new ArrayList<>();
+		this.workbookParser.setErrorMessages(errorMessages);
+
 		this.startTime = System.nanoTime();
 	}
 
@@ -260,8 +266,7 @@ public class WorkbookParserTest {
 		this.addRowInExistingSheet(sampleWorkbook.getSheetAt(0), rowWithErrorInSheet, invalidVariableDetails);
 
 		List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		List<Message> errorMessages = new ArrayList<>();
-		this.workbookParser.setErrorMessages(errorMessages);
+		List<Message> errorMessages = this.workbookParser.getErrorMessages();
 		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
 
 		// assertions
@@ -339,6 +344,259 @@ public class WorkbookParserTest {
 			errorIndex++;
 		}
 	}
+
+	@Test
+	public void testAssignVariableTypeConstantSection() {
+
+
+		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
+		final StudyDetails studyDetails = new StudyDetails();
+		studyDetails.setStudyType(StudyType.T);
+		workbook.setStudyDetails(studyDetails);
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		this.workbookParser.assignVariableType(Section.CONSTANT.name(), measurementVariable, workbook);
+
+		Assert.assertEquals(VariableType.TRIAL_CONDITION, measurementVariable.getVariableType());
+
+
+		studyDetails.setStudyType(StudyType.N);
+		this.workbookParser.assignVariableType(Section.CONSTANT.name(), measurementVariable, workbook);
+		Assert.assertEquals(VariableType.NURSERY_CONDITION, measurementVariable.getVariableType());
+
+	}
+
+	@Test
+	public void testAssignVariableTypeSectionIsNotConstant() {
+
+
+		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
+		final StudyDetails studyDetails = new StudyDetails();
+		studyDetails.setStudyType(StudyType.T);
+		workbook.setStudyDetails(studyDetails);
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+
+		measurementVariable.setRole(PhenotypicType.GERMPLASM);
+		this.workbookParser.assignVariableType(Section.FACTOR.name(), measurementVariable, workbook);
+
+		Assert.assertEquals(VariableType.GERMPLASM_DESCRIPTOR, measurementVariable.getVariableType());
+
+		measurementVariable.setRole(PhenotypicType.TRIAL_DESIGN);
+		this.workbookParser.assignVariableType(Section.FACTOR.name(), measurementVariable, workbook);
+
+		Assert.assertEquals(VariableType.EXPERIMENTAL_DESIGN, measurementVariable.getVariableType());
+
+	}
+
+	@Test
+	public void testAssignRoleBasedOnSectionNameVariateSectionVariableIsInVariateOrConstantSection() {
+
+		final MeasurementVariable variateMeasurementVariable = new MeasurementVariable();
+		this.workbookParser.assignRoleBasedOnSectionName(Section.VARIATE.name(), variateMeasurementVariable, TARGET_ROW_NUMBER);
+
+		// If the variable is in VARIATE section, its role (PhenotypicType) should be always be VARIATE.
+		Assert.assertEquals(PhenotypicType.VARIATE, variateMeasurementVariable.getRole());
+
+		final MeasurementVariable constantMeasurementVariable = new MeasurementVariable();
+		this.workbookParser.assignRoleBasedOnSectionName(Section.CONSTANT.name(), constantMeasurementVariable, TARGET_ROW_NUMBER);
+
+		// If the variable is in VARIATE section, its role (PhenotypicType) should be always be VARIATE.
+		Assert.assertEquals(PhenotypicType.VARIATE, constantMeasurementVariable.getRole());
+
+	}
+
+	@Test
+	public void testAssignRoleBasedOnSectionNameVariateSectionVariableIsInFactorOrConditionSection() {
+
+		final MeasurementVariable variateMeasurementVariable = new MeasurementVariable();
+		variateMeasurementVariable.setLabel(PhenotypicType.DATASET.getLabelList().get(0));
+		this.workbookParser.assignRoleBasedOnSectionName(Section.FACTOR.name(), variateMeasurementVariable, TARGET_ROW_NUMBER);
+
+		// If the variable is in FACTOR section, its role (PhenotypicType) should be based on the variable's Label.
+		Assert.assertEquals(PhenotypicType.DATASET, variateMeasurementVariable.getRole());
+
+		final MeasurementVariable constantMeasurementVariable = new MeasurementVariable();
+		constantMeasurementVariable.setLabel(PhenotypicType.GERMPLASM.getLabelList().get(0));
+		this.workbookParser.assignRoleBasedOnSectionName(Section.CONDITION.name(), constantMeasurementVariable, TARGET_ROW_NUMBER);
+
+		// If the variable is in CONDITION section, its role (PhenotypicType) should be based on the variable's Label.
+		Assert.assertEquals(PhenotypicType.GERMPLASM, constantMeasurementVariable.getRole());
+
+	}
+
+
+
+	@Test
+	public void testValidateRequiredFieldsForNonVariateVariablesVariableSection() {
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setLabel("");
+
+		this.workbookParser.validateRequiredFieldsForNonVariateVariables(Section.VARIATE.name(), measurementVariable, TARGET_ROW_NUMBER);
+		List<Message> messages = this.workbookParser.getErrorMessages();
+
+		// Label is not required for Variable Section, so message should be empty
+		Assert.assertTrue(messages.isEmpty());
+	}
+
+	@Test
+	public void testValidateRequiredFieldsForNonVariateVariablesConditionSection() {
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setLabel("");
+
+		this.workbookParser.validateRequiredFieldsForNonVariateVariables(Section.CONDITION.name(), measurementVariable, TARGET_ROW_NUMBER);
+		List<Message> messages = this.workbookParser.getErrorMessages();
+
+		// Label is required for Condition Section, so message should not be empty
+		Assert.assertFalse(messages.isEmpty());
+		Assert.assertEquals("error.missing.field.label", messages.get(0).getMessageKey());
+
+	}
+
+	@Test
+	public void testValidateRequiredFieldsForNonVariateVariablesFactorSection() {
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setLabel("");
+
+		this.workbookParser.validateRequiredFieldsForNonVariateVariables(Section.FACTOR.name(), measurementVariable, TARGET_ROW_NUMBER);
+		List<Message> messages = this.workbookParser.getErrorMessages();
+
+		// Label is required for Factor Section, so message should not be empty
+		Assert.assertFalse(messages.isEmpty());
+		Assert.assertEquals("error.missing.field.label", messages.get(0).getMessageKey());
+
+	}
+
+	@Test
+	public void testValidateRequiredFieldsForNonVariateVariablesConstantSection() {
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setLabel("");
+
+		this.workbookParser.validateRequiredFieldsForNonVariateVariables(Section.CONSTANT.name(), measurementVariable, TARGET_ROW_NUMBER);
+		List<Message> messages = this.workbookParser.getErrorMessages();
+
+		// Label is required for Constant Section, so message should not be empty
+		Assert.assertFalse(messages.isEmpty());
+		Assert.assertEquals("error.missing.field.label", messages.get(0).getMessageKey());
+
+	}
+
+	@Test
+	public void testValidateRequiredFieldsAllRequiredFieldsHaveValue() {
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+
+		measurementVariable.setName("Test Variable Name");
+		measurementVariable.setDescription("Test Description");
+		measurementVariable.setProperty("Test Property");
+		measurementVariable.setScale("Test Scale");
+		measurementVariable.setMethod("Test Method");
+
+		this.workbookParser.validateRequiredFields(measurementVariable, TARGET_ROW_NUMBER);
+
+		List<Message> messages = this.workbookParser.getErrorMessages();
+
+		Assert.assertTrue("Expecting an empty message list since the required fields have values",messages.isEmpty());
+
+
+	}
+
+	@Test
+	public void testValidateRequiredFieldsAllRequiredFieldIsBlank() {
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		this.workbookParser.validateRequiredFields(measurementVariable, TARGET_ROW_NUMBER);
+
+		List<Message> messages = this.workbookParser.getErrorMessages();
+
+		Assert.assertEquals(5, messages.size());
+
+		Assert.assertEquals("error.missing.field.name", messages.get(0).getMessageKey());
+		Assert.assertEquals(Integer.toString(TARGET_ROW_NUMBER), messages.get(0).getMessageParams()[0]);
+		Assert.assertEquals("error.missing.field.description", messages.get(1).getMessageKey());
+		Assert.assertEquals(Integer.toString(TARGET_ROW_NUMBER), messages.get(1).getMessageParams()[0]);
+		Assert.assertEquals("error.missing.field.property", messages.get(2).getMessageKey());
+		Assert.assertEquals(Integer.toString(TARGET_ROW_NUMBER), messages.get(2).getMessageParams()[0]);
+		Assert.assertEquals("error.missing.field.scale", messages.get(3).getMessageKey());
+		Assert.assertEquals(Integer.toString(TARGET_ROW_NUMBER), messages.get(3).getMessageParams()[0]);
+		Assert.assertEquals("error.missing.field.method", messages.get(4).getMessageKey());
+		Assert.assertEquals(Integer.toString(TARGET_ROW_NUMBER), messages.get(4).getMessageParams()[0]);
+
+	}
+
+	@Test
+	public void testValidateDataTypeIfNecessaryIncorrectDatatypeHasNotYetDetected() {
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setDataType("A");
+
+		this.workbookParser.setHasIncorrectDatatypeValue(false);
+		this.workbookParser.validateDataType(measurementVariable, TARGET_ROW_NUMBER);
+
+		List<Message> messages = this.workbookParser.getErrorMessages();
+
+		Message message = messages.get(0);
+		Assert.assertNotNull(message);
+		Assert.assertEquals("error.unsupported.datatype", message.getMessageKey());
+		Assert.assertNull(message.getMessageParams());
+
+	}
+
+	@Test
+	public void testValidateDataTypeIfNecessaryIncorrectDatatypeHasBeenDetected() {
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setDataType("A");
+
+		this.workbookParser.setHasIncorrectDatatypeValue(true);
+		this.workbookParser.validateDataTypeIfNecessary(measurementVariable, TARGET_ROW_NUMBER);
+
+		List<Message> messages = this.workbookParser.getErrorMessages();
+
+		//Expecting the returned error messages as empty. Datatype validation logic should only be called if invalid datatype hasn't been detected.
+		Assert.assertTrue(messages.isEmpty());
+
+	}
+
+
+	@Test
+	public void testValidateDataTypeMissingDataTypeValue() {
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setDataType("");
+
+		this.workbookParser.validateDataType(measurementVariable, TARGET_ROW_NUMBER);
+
+		List<Message> messages = this.workbookParser.getErrorMessages();
+
+		Message message = messages.get(0);
+		Assert.assertNotNull(message);
+		Assert.assertEquals("error.missing.field.datatype", message.getMessageKey());
+		Assert.assertEquals(Integer.toString(TARGET_ROW_NUMBER), message.getMessageParams()[0]);
+
+	}
+
+	@Test
+	public void testValidateDataTypeInvalidDataTypeValue() {
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setDataType("A");
+
+		this.workbookParser.validateDataType(measurementVariable, TARGET_ROW_NUMBER);
+
+		List<Message> messages = this.workbookParser.getErrorMessages();
+
+		Message message = messages.get(0);
+		Assert.assertNotNull(message);
+		Assert.assertEquals("error.unsupported.datatype", message.getMessageKey());
+		Assert.assertNull(message.getMessageParams());
+
+	}
+
 
 	/**
 	 * Tests ensures that the read measurement variables validates two contiguous empty rows.
