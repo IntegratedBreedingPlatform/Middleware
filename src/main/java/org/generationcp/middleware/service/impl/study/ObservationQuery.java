@@ -130,6 +130,12 @@ class ObservationQuery {
 				fromText + whereText + orderByText;
 	}
 
+	/**
+	 * TODO BMS-4061 Merge with {@link ObservationQuery#getObservationsMainQuery(List, List)}
+	 *
+	 * This query is used by BMSAPI and is very similar to {@link ObservationQuery#getObservationsMainQuery(List, List)}
+	 * which is used Trial and Nursery Manager
+	 */
 	String getObservationQueryWithBlockRowCol(final List<MeasurementVariableDto> measurementVariables, Integer instanceId) {
 		final String columnNamesFromTraitNames = this.getColumnNamesFromTraitNames(measurementVariables);
 		final String orderByMeasurementVariableId = this.getOrderByMeasurementVariableId(measurementVariables);
