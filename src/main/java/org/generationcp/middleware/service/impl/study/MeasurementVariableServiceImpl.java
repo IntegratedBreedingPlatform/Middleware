@@ -20,15 +20,14 @@ public class MeasurementVariableServiceImpl implements MeasurementVariableServic
 		+ "   cvterm_id, \n"
 		+ "   name \n"
 		+ " FROM cvterm cvt \n"
-		+ "   INNER JOIN projectprop ppTermId ON (ppTermId.value = cvt.cvterm_id AND ppTermId.type_id = 1070) \n"
-		+ "   INNER JOIN projectprop ppVarType ON (ppVarType.project_id = ppTermId.project_id AND ppVarType.rank = ppTermId.rank) \n"
-		+ " WHERE ppVarType.type_id IN (:variablesType) AND ppTermId.project_id = ( \n"
+		+ "   INNER JOIN projectprop pp ON (pp.variable_id = cvt.cvterm_id) \n"
+		+ " WHERE pp.type_id IN (:variablesTypes) AND pp.project_id = ( \n"
 		+ "   SELECT p.project_id \n"
 		+ "   FROM project_relationship pr \n"
 		+ "     INNER JOIN project p ON p.project_id = pr.subject_project_id \n"
 		+ "   WHERE \n"
 		+ "     pr.object_project_id = :studyId \n"
-		+ "     AND name LIKE '%PLOTDATA'); \n";
+		+ "     AND name LIKE '%PLOTDATA') ";
 
 	public MeasurementVariableServiceImpl(final Session session) {
 		this.session = session;
@@ -48,7 +47,7 @@ public class MeasurementVariableServiceImpl implements MeasurementVariableServic
 		variableSqlQuery.addScalar("cvterm_id");
 		variableSqlQuery.addScalar("name");
 		variableSqlQuery.setParameter("studyId", studyIdentifier);
-		variableSqlQuery.setParameterList("variablesType", variableTypes);
+		variableSqlQuery.setParameterList("variablesTypes", variableTypes);
 		final List<Object[]> measurementVariables = variableSqlQuery.list();
 		final List<MeasurementVariableDto> variableList = new ArrayList<MeasurementVariableDto>();
 		for (final Object[] rows : measurementVariables) {
