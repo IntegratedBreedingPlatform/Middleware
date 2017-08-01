@@ -533,7 +533,6 @@ public class WorkbookParser {
 
 		if (!hasIncorrectDatatypeValue()) {
 			validateDataType(measurementVariable, rowNumber);
-			setHasIncorrectDatatypeValue(true);
 		}
 
 	}
@@ -542,8 +541,10 @@ public class WorkbookParser {
 
 		if (StringUtils.isEmpty(measurementVariable.getDataType())) {
 			this.errorMessages.add(new Message("error.missing.field.datatype", Integer.toString(rowNumber)));
+			setHasIncorrectDatatypeValue(true);
 		} else if (DataType.getByCode(measurementVariable.getDataType()) == null) {
 			this.errorMessages.add(new Message("error.unsupported.datatype"));
+			setHasIncorrectDatatypeValue(true);
 		}
 
 	}

@@ -77,6 +77,7 @@ public class WorkbookParserTest {
 
 		List<Message> errorMessages = new ArrayList<>();
 		this.workbookParser.setErrorMessages(errorMessages);
+		this.workbookParser.setHasIncorrectDatatypeValue(false);
 
 		this.startTime = System.nanoTime();
 	}
@@ -357,11 +358,13 @@ public class WorkbookParserTest {
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		this.workbookParser.assignVariableType(Section.CONSTANT.name(), measurementVariable, workbook);
 
+		// If the Section is CONSTANT and the study is Trial, the variable type should be TRIAL_CONDITION
 		Assert.assertEquals(VariableType.TRIAL_CONDITION, measurementVariable.getVariableType());
-
 
 		studyDetails.setStudyType(StudyType.N);
 		this.workbookParser.assignVariableType(Section.CONSTANT.name(), measurementVariable, workbook);
+
+		// If the Section is CONSTANT and the study is Nursery, the variable type should be NURSERY_CONDITION
 		Assert.assertEquals(VariableType.NURSERY_CONDITION, measurementVariable.getVariableType());
 
 	}
@@ -377,14 +380,18 @@ public class WorkbookParserTest {
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 
+		// If the Section is not CONSTANT the VariableType should be derived from the variable's PhenotypicType
+
 		measurementVariable.setRole(PhenotypicType.GERMPLASM);
 		this.workbookParser.assignVariableType(Section.FACTOR.name(), measurementVariable, workbook);
 
+		// If the variable's role is GERMPLASM, the VariableType should be GERMPLASM_DESCRIPTOR
 		Assert.assertEquals(VariableType.GERMPLASM_DESCRIPTOR, measurementVariable.getVariableType());
 
 		measurementVariable.setRole(PhenotypicType.TRIAL_DESIGN);
 		this.workbookParser.assignVariableType(Section.FACTOR.name(), measurementVariable, workbook);
 
+		// If the variable's role is TRIAL_DESIGN, the VariableType should be EXPERIMENTAL_DESIGN
 		Assert.assertEquals(VariableType.EXPERIMENTAL_DESIGN, measurementVariable.getVariableType());
 
 	}
@@ -436,7 +443,7 @@ public class WorkbookParserTest {
 		this.workbookParser.validateRequiredFieldsForNonVariateVariables(Section.VARIATE.name(), measurementVariable, TARGET_ROW_NUMBER);
 		List<Message> messages = this.workbookParser.getErrorMessages();
 
-		// Label is not required for Variable Section, so message should be empty
+		// Label is not required for Variable Section, so message list should be empty
 		Assert.assertTrue(messages.isEmpty());
 	}
 
@@ -449,7 +456,7 @@ public class WorkbookParserTest {
 		this.workbookParser.validateRequiredFieldsForNonVariateVariables(Section.CONDITION.name(), measurementVariable, TARGET_ROW_NUMBER);
 		List<Message> messages = this.workbookParser.getErrorMessages();
 
-		// Label is required for Condition Section, so message should not be empty
+		// Label is required for Condition Section, so message list should not be empty
 		Assert.assertFalse(messages.isEmpty());
 		Assert.assertEquals("error.missing.field.label", messages.get(0).getMessageKey());
 
@@ -528,6 +535,24 @@ public class WorkbookParserTest {
 
 	}
 
+
+	@Test
+	public void testValidateDataTypeIfNecessaryDatatypeIsCorrect() {
+
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setDataType("N");
+
+		this.workbookParser.setHasIncorrectDatatypeValue(false);
+		this.workbookParser.validateDataType(measurementVariable, TARGET_ROW_NUMBER);
+
+		List<Message> messages = this.workbookParser.getErrorMessages();
+
+		// The datatype is correct so the message list should be empty
+		Assert.assertTrue(messages.isEmpty());
+		Assert.assertFalse(workbookParser.hasIncorrectDatatypeValue());
+
+	}
+
 	@Test
 	public void testValidateDataTypeIfNecessaryIncorrectDatatypeHasNotYetDetected() {
 
@@ -539,10 +564,12 @@ public class WorkbookParserTest {
 
 		List<Message> messages = this.workbookParser.getErrorMessages();
 
+		// The datatype A is not supported so the message list should not be empty
 		Message message = messages.get(0);
 		Assert.assertNotNull(message);
 		Assert.assertEquals("error.unsupported.datatype", message.getMessageKey());
 		Assert.assertNull(message.getMessageParams());
+		Assert.assertTrue(workbookParser.hasIncorrectDatatypeValue());
 
 	}
 
@@ -557,8 +584,10 @@ public class WorkbookParserTest {
 
 		List<Message> messages = this.workbookParser.getErrorMessages();
 
-		//Expecting the returned error messages as empty. Datatype validation logic should only be called if invalid datatype hasn't been detected.
+		// Expecting the returned error messages as empty.
+		// Datatype validation logic should only be called if invalid datatype hasn't been detected.
 		Assert.assertTrue(messages.isEmpty());
+		Assert.assertTrue(workbookParser.hasIncorrectDatatypeValue());
 
 	}
 
