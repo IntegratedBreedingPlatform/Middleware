@@ -19,6 +19,10 @@ public enum DataType {
 	GERMPLASM_LIST(1135, "Germplasm List", true, "T"),
 	BREEDING_METHOD(1136, "Breeding Method", true, "T");
 
+	private static final Map<Integer, DataType> byId = new HashMap<>();
+	private static final Map<String, DataType> byName = new HashMap<>();
+	private static final Map<String, DataType> byCode = new HashMap<>();
+
 	private Integer id;
 	private String name;
 	private boolean systemDataType;
@@ -30,10 +34,6 @@ public enum DataType {
 		this.systemDataType = systemDataType;
 		this.dataTypeCode = dataTypeCode;
 	}
-
-	private static final Map<Integer, DataType> byId = new HashMap<>();
-	private static final Map<String, DataType> byName = new HashMap<>();
-	private static final Map<String, DataType> byCode = new HashMap<>();
 
 	static {
 		for (DataType e : DataType.values()) {

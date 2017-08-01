@@ -243,7 +243,7 @@ public class WorkbookParser {
 		}
 	}
 
-	protected StudyDetails readStudyDetails(Workbook wb) throws WorkbookParserException {
+	protected StudyDetails readStudyDetails(Workbook wb) {
 
 		// get study details
 		String study =

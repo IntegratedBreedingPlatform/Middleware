@@ -13,10 +13,8 @@ package org.generationcp.middleware.domain.etl;
 
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.Operation;
@@ -368,9 +366,9 @@ public class MeasurementVariable {
 	 */
 	public String getDataTypeCode() {
 
-		DataType dataType = DataType.getById(this.dataTypeId);
-		if (dataType != null) {
-			return dataType.getDataTypeCode();
+		DataType dataTypeEnum = DataType.getById(this.dataTypeId);
+		if (dataTypeEnum != null) {
+			return dataTypeEnum.getDataTypeCode();
 		}
 		return "";
 
