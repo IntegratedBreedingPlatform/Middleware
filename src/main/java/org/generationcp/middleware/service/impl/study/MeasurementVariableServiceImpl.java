@@ -16,13 +16,19 @@ public class MeasurementVariableServiceImpl implements MeasurementVariableServic
 
 	private final Session session;
 
-	final static String STUDY_VARIABLES_QUERY = "SELECT cvterm_id, name \n" + "FROM cvterm cvt \n "
-		+ "INNER JOIN projectprop ppTermId on (ppTermId.value = cvt.cvterm_id and ppTermId.type_id = " + TermId.STANDARD_VARIABLE.getId()
-		+ ") \n" + "INNER JOIN projectprop ppVarType on (ppVarType.project_id = ppTermId.project_id and ppVarType.rank = ppTermId.rank) \n"
-		+ "WHERE ppVarType.type_id in(:variablesType) " + " AND ppTermId.project_id = (SELECT \n" + "            p.project_id\n"
-		+ "        FROM\n" + "            project_relationship pr\n" + "                INNER JOIN\n"
-		+ "            project p ON p.project_id = pr.subject_project_id \n" + "        WHERE \n"
-		+ "            pr.object_project_id = :studyId\n" + "                AND name LIKE '%PLOTDATA')";
+	final static String STUDY_VARIABLES_QUERY = " SELECT \n"
+		+ "   cvterm_id, \n"
+		+ "   name \n"
+		+ " FROM cvterm cvt \n"
+		+ "   INNER JOIN projectprop ppTermId ON (ppTermId.value = cvt.cvterm_id AND ppTermId.type_id = 1070) \n"
+		+ "   INNER JOIN projectprop ppVarType ON (ppVarType.project_id = ppTermId.project_id AND ppVarType.rank = ppTermId.rank) \n"
+		+ " WHERE ppVarType.type_id IN (:variablesType) AND ppTermId.project_id = ( \n"
+		+ "   SELECT p.project_id \n"
+		+ "   FROM project_relationship pr \n"
+		+ "     INNER JOIN project p ON p.project_id = pr.subject_project_id \n"
+		+ "   WHERE \n"
+		+ "     pr.object_project_id = :studyId \n"
+		+ "     AND name LIKE '%PLOTDATA'); \n";
 
 	public MeasurementVariableServiceImpl(final Session session) {
 		this.session = session;
