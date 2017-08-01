@@ -6,7 +6,7 @@ import org.hibernate.criterion.Restrictions;
 
 public class SampleDao extends GenericDAO<Sample, Integer> {
 
-	public Sample getBySampleId(String sampleId) {
+	public Sample getBySampleId(Integer sampleId) {
 		DetachedCriteria criteria = DetachedCriteria.forClass(org.generationcp.middleware.pojos.Sample.class);
 		criteria.add(Restrictions.eq("sampleId", sampleId));
 		return (Sample) criteria.getExecutableCriteria(getSession()).uniqueResult();

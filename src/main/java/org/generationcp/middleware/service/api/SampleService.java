@@ -1,11 +1,11 @@
 package org.generationcp.middleware.service.api;
 
-import org.generationcp.middleware.domain.sample.Sample;
+import org.generationcp.middleware.domain.sample.SampleDTO;
 
 public interface SampleService {
 
-	String createSample(Sample sample);
+	Integer createSample(SampleDTO sampleDTO);
 
-	Sample getSample(String sampleId);
+	SampleDTO getSample(Integer sampleId);
 
 }

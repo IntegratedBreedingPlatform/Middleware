@@ -1,69 +1,37 @@
-package org.generationcp.middleware.pojos;
+package org.generationcp.middleware.domain.sample;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import org.generationcp.middleware.domain.plant.PlantDTO;
+import org.generationcp.middleware.pojos.User;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.Date;
 
-@Entity
-@Table(name = "sample")
-public class Sample implements Serializable {
+public class SampleDTO implements Serializable {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Basic(optional = false)
-	@Column(name = "sample_id")
 	private Integer sampleId;
 
-	@Basic(optional = false)
-	@Column(name = "sample_name")
 	private String sampleName;
 
-	@ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "taken_by")
-	@NotFound(action = NotFoundAction.IGNORE)
-	@Basic(optional = false)
 	private User takenBy;
 
-	@Basic(optional = false)
-	@Column(name = "sampling_date")
 	private Date samplingDate;
 
-	@Basic(optional = false)
-	@Column(name = "created_date")
 	private Date createdDate;
 
-	@Basic(optional = false)
-	@Column(name = "sample_bk")
 	private String sampleBusinessKey;
 
-	@Basic(optional = false)
-	@JoinColumn(name = "plant_id")
-	@OneToOne(targetEntity = Plant.class)
-	private Plant plant;
+	private PlantDTO plant;
 
-	public Sample() {
+	public SampleDTO() {
 
 	}
 
-	public Sample(Integer sampleId, String sampleName, User takenBy, Date samplingDate, Date createdDate, String sampleBusinessKey,
-		Plant plant) {
+	public SampleDTO(Integer sampleId, String sampleName, User takenBy, Date samplingDate, Date createdDate, String sampleBusinessKey,
+		PlantDTO plant) {
 		this.sampleId = sampleId;
 		this.sampleName = sampleName;
 		this.takenBy = takenBy;
@@ -121,19 +89,19 @@ public class Sample implements Serializable {
 		this.sampleBusinessKey = sampleBusinessKey;
 	}
 
-	public Plant getPlant() {
+	public PlantDTO getPlant() {
 		return plant;
 	}
 
-	public void setPlant(Plant plant) {
+	public void setPlant(PlantDTO plant) {
 		this.plant = plant;
 	}
 
 	@Override public boolean equals(final Object other) {
-		if (!(other instanceof Sample)) {
+		if (!(other instanceof SampleDTO)) {
 			return false;
 		}
-		final Sample castOther = (Sample) other;
+		final SampleDTO castOther = (SampleDTO) other;
 		return new EqualsBuilder().append(this.sampleId, castOther.sampleId).isEquals();
 	}
 
