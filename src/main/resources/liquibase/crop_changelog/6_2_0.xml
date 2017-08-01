@@ -1,0 +1,127 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+
+	<changeSet author="vanina" id="v6.2-1">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="sample"></tableExists></not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE sample (
+			sample_id INT NOT NULL,
+			sample_name VARCHAR(45) NOT NULL,
+			takenBy INT(11) NOT NULL,
+			sampling_date DATE NOT NULL,
+			created_date DATE NOT NULL,
+			sample_bk VARCHAR(45) NOT NULL,
+			PRIMARY KEY (sample_id),
+			INDEX fk_users_idx (takenBy ASC),
+			CONSTRAINT fk_sample_user FOREIGN KEY (takenBy)
+			REFERENCES users (userid)
+			ON DELETE RESTRICT ON UPDATE RESTRICT
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2-2">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="plant"></tableExists></not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE plant (
+			plant_id INT NOT NULL,
+			plant_no INT NOT NULL,
+			nd_experiment_id INT(11) NOT NULL,
+			created_date DATE NOT NULL,
+			plant_bk VARCHAR(45) NOT NULL,
+			PRIMARY KEY (plant_id),
+			UNIQUE INDEX plant_id_UNIQUE (plant_id ASC),
+			INDEX fk_plant_exp_idx (nd_experiment_id ASC),
+			CONSTRAINT fk_plant_exp FOREIGN KEY (nd_experiment_id)
+			REFERENCES nd_experiment (nd_experiment_id)
+			ON DELETE NO ACTION ON UPDATE NO ACTION
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT
+				COUNT(*)
+				FROM
+				INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+				WHERE
+				TABLE_NAME = 'sample'
+				AND CONSTRAINT_NAME = 'fk_sample_plant'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample
+			ADD COLUMN plant_id INT NOT NULL AFTER sample_bk ,
+			ADD INDEX fk_sample_plant_idx (plant_id ASC);
+			ALTER TABLE sample
+			ADD CONSTRAINT fk_sample_plant
+			FOREIGN KEY (plant_id)
+			REFERENCES plant(plant_id)
+			ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2-4">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="sample_list"></tableExists></not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE sample_list (
+			list_id INT NOT NULL,
+			list_name VARCHAR(45) NOT NULL,
+			description VARCHAR(45) NULL,
+			hierarchy INT NULL,
+			list_type VARCHAR(10) NOT NULL,
+			created_date DATE NOT NULL,
+			notes VARCHAR(45) NULL,
+			taken_by INT(11) NOT NULL,
+			PRIMARY KEY (list_id),
+			UNIQUE INDEX list_id_UNIQUE (list_id ASC),
+			INDEX fk_sample_list_user_idx (taken_by ASC),
+			CONSTRAINT fk_sample_list_user FOREIGN KEY (taken_by)
+			REFERENCES users (userid)
+			ON DELETE NO ACTION ON UPDATE NO ACTION
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT
+				COUNT(*)
+				FROM
+				INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+				WHERE
+				TABLE_NAME = 'sample_list'
+				AND CONSTRAINT_NAME = 'fk_sample_list_hierarchy'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample_list
+			ADD INDEX fk_sample_list_hierarchy_idx(hierarchy ASC);
+			ALTER TABLE sample_list
+			ADD CONSTRAINT fk_sample_list_hierarchy
+			FOREIGN KEY (hierarchy)
+			REFERENCES sample_list(list_id)
+			ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
