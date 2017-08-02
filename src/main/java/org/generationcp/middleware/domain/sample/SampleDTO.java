@@ -5,7 +5,9 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.generationcp.middleware.domain.plant.PlantDTO;
+import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.service.api.user.UserDto;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -16,7 +18,7 @@ public class SampleDTO implements Serializable {
 
 	private String sampleName;
 
-	private User takenBy;
+	private UserDto takenBy;
 
 	private Date samplingDate;
 
@@ -26,22 +28,21 @@ public class SampleDTO implements Serializable {
 
 	private PlantDTO plant;
 
+	private SampleListDTO sampleList;
+
 	public SampleDTO() {
 
 	}
 
-	public SampleDTO(Integer sampleId, String sampleName, User takenBy, Date samplingDate, Date createdDate, String sampleBusinessKey,
-		PlantDTO plant) {
-		this.sampleId = sampleId;
-		this.sampleName = sampleName;
-		this.takenBy = takenBy;
-		this.samplingDate = samplingDate;
-		this.createdDate = createdDate;
-		this.sampleBusinessKey = sampleBusinessKey;
-		this.plant = plant;
+	public SampleListDTO getSampleList() {
+	  return sampleList;
 	}
 
-	public Integer getSampleId() {
+	public void setSampleList(SampleListDTO sampleList) {
+	  this.sampleList = sampleList;
+	}
+
+    public Integer getSampleId() {
 		return sampleId;
 	}
 
@@ -57,11 +58,11 @@ public class SampleDTO implements Serializable {
 		this.sampleName = sampleName;
 	}
 
-	public User getTakenBy() {
+	public UserDto getTakenBy() {
 		return takenBy;
 	}
 
-	public void setTakenBy(User takenBy) {
+	public void setTakenBy(UserDto takenBy) {
 		this.takenBy = takenBy;
 	}
 

@@ -27,13 +27,6 @@ public class PlantDTO implements Serializable {
 
 	}
 
-	public PlantDTO(Integer plantNumber, Experiment experiment, Date createdDate, String plantBusinessKey) {
-		this.plantNumber = plantNumber;
-		this.experiment = experiment;
-		this.createdDate = createdDate;
-		this.plantBusinessKey = plantBusinessKey;
-	}
-
 	public Integer getPlantId() {
 		return plantId;
 	}

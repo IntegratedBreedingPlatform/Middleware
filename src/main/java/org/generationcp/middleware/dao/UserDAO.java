@@ -376,4 +376,14 @@ public class UserDAO extends GenericDAO<User, Integer> {
 		}
 	}
 
+	public UserDto mapUserToUserDto(User user) {
+	  UserDto userDto = new UserDto();
+	  userDto.setUserId(user.getUserid());
+	  userDto.setFirstName(user.getPerson().getFirstName());
+	  userDto.setLastName(user.getPerson().getLastName());
+	  userDto.setEmail(user.getPerson().getEmail());
+	  userDto.setRole(user.getRoles().toString());
+	  return userDto;
+	}
+
 }

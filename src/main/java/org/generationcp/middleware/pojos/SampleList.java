@@ -4,19 +4,15 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "sample_list")
@@ -56,7 +52,18 @@ public class SampleList implements Serializable {
 	@Basic(optional = false)
 	private User createdBy;
 
-	public Integer getListId() {
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private List<Sample> samples;
+
+	public List<Sample> getSamples() {
+	  return samples;
+	}
+
+	public void setSamples(List<Sample> samples) {
+	  this.samples = samples;
+	}
+
+  public Integer getListId() {
 		return listId;
 	}
 

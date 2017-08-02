@@ -58,6 +58,12 @@ public class Sample implements Serializable {
 	@OneToOne(targetEntity = Plant.class)
 	private Plant plant;
 
+	@ManyToOne(targetEntity = SampleList.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "sample_list")
+	@NotFound(action = NotFoundAction.IGNORE)
+	@Basic(optional = false)
+	private SampleList sampleList;
+
 	public Sample() {
 
 	}
@@ -73,7 +79,15 @@ public class Sample implements Serializable {
 		this.plant = plant;
 	}
 
-	public Integer getSampleId() {
+	public SampleList getSampleList() {
+	  return sampleList;
+	}
+
+	public void setSampleList(SampleList sampleList) {
+	  this.sampleList = sampleList;
+	}
+
+  	public Integer getSampleId() {
 		return sampleId;
 	}
 

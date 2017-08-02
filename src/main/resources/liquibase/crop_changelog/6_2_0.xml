@@ -19,11 +19,12 @@
 			sampling_date DATE NOT NULL,
 			created_date DATE NOT NULL,
 			sample_bk VARCHAR(45) NOT NULL,
+			sample_list INT NOT NULL,
 			PRIMARY KEY (sample_id),
 			INDEX fk_users_idx (takenBy ASC),
 			CONSTRAINT fk_sample_user FOREIGN KEY (takenBy)
 			REFERENCES users (userid)
-			ON DELETE RESTRICT ON UPDATE RESTRICT
+			ON DELETE RESTRICT ON UPDATE NO ACTION
 			);
 		</sql>
 	</changeSet>
@@ -118,6 +119,31 @@
 			ALTER TABLE sample_list
 			ADD CONSTRAINT fk_sample_list_hierarchy
 			FOREIGN KEY (hierarchy)
+			REFERENCES sample_list(list_id)
+			ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2-6">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT
+				COUNT(*)
+				FROM
+				INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+				WHERE
+				TABLE_NAME = 'sample'
+				AND CONSTRAINT_NAME = 'fk_sample_list'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample
+			ADD INDEX fk_sample_list_idx (sample_list ASC);
+			ALTER TABLE sample
+			ADD CONSTRAINT fk_sample_list
+			FOREIGN KEY (sample_list)
 			REFERENCES sample_list(list_id)
 			ON DELETE NO ACTION
 			ON UPDATE NO ACTION;

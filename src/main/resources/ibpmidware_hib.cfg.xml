@@ -116,6 +116,7 @@
         
         <mapping class="org.generationcp.middleware.pojos.Sample"/>
         <mapping class="org.generationcp.middleware.pojos.Plant"/>
+        <mapping class="org.generationcp.middleware.pojos.SampleList"/>
         
     </session-factory>
 </hibernate-configuration>
