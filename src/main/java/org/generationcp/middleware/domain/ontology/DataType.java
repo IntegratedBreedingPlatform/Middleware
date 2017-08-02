@@ -12,12 +12,12 @@ public enum DataType {
 	CHARACTER_VARIABLE(1120, "Character", false, "T"),
 
 	//Special Data types
-	PERSON(1131, "Person", true, "T"),
-	LOCATION(1132, "Location", true, "T"),
-	STUDY(1133, "Study", true, "T"),
-	DATASET(1134, "Dataset", true, "T"),
-	GERMPLASM_LIST(1135, "Germplasm List", true, "T"),
-	BREEDING_METHOD(1136, "Breeding Method", true, "T");
+	PERSON(1131, "Person", true, "C"),
+	LOCATION(1132, "Location", true, "C"),
+	STUDY(1133, "Study", true, "C"),
+	DATASET(1134, "Dataset", true, "C"),
+	GERMPLASM_LIST(1135, "Germplasm List", true, "C"),
+	BREEDING_METHOD(1136, "Breeding Method", true, "C");
 
 	private static final Map<Integer, DataType> byId = new HashMap<>();
 	private static final Map<String, DataType> byName = new HashMap<>();
@@ -69,7 +69,7 @@ public enum DataType {
 	 * "N" for Numeric
 	 * "D" for Date
 	 * "T" for Character/Text
-	 * For Special Data Types, the default data type code is "T" (Character/Text).
+	 * For Special Data Types, the default data type code is letter 'C'.
 	 * @return
 	 */
 	public String getDataTypeCode() { return  this.dataTypeCode; }
