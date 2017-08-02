@@ -464,14 +464,11 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 				this.createProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), "VAR_DESC", rank);
 		final ProjectProperty stdVarProjectProp =
 				this.createProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), Integer.toString(termId), rank);
-		final List<ProjectProperty> projectProperties =
-				this.createProjectProperties(localNameProjectProp, localDescProjectProp, stdVarProjectProp);
 		final String value = "1";
 		final Double minRange = null;
 		final Double maxRange = null;
 		final MeasurementVariable measurementVariable =
-				this.workbookBuilder.createMeasurementVariable(stdVariable, localNameProjectProp, projectProperties, value, minRange,
-						maxRange, varType);
+			this.workbookBuilder.createMeasurementVariable(stdVariable, localNameProjectProp, value, minRange, maxRange, varType);
 		Assert.assertNotNull(measurementVariable);
 		Assert.assertEquals(stdVariable.getId(), measurementVariable.getTermId());
 		Assert.assertEquals(localNameProjectProp.getValue(), measurementVariable.getName());
@@ -490,14 +487,6 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 				measurementVariable.getPossibleValues());
 		Assert.assertEquals(varType.getRole(), measurementVariable.getRole());
 		Assert.assertEquals(varType, measurementVariable.getVariableType());
-	}
-
-	private List<ProjectProperty> createProjectProperties(final ProjectProperty... projectProps) {
-		final List<ProjectProperty> projectProperties = new ArrayList<>();
-		for (final ProjectProperty projectProperty : projectProps) {
-			projectProperties.add(projectProperty);
-		}
-		return projectProperties;
 	}
 
 	private DmsProject createDmsProject(final int id) {
