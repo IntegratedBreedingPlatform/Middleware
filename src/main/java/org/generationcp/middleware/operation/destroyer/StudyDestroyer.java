@@ -62,7 +62,7 @@ public class StudyDestroyer extends Destroyer {
 			Variable var = new Variable(type, TermId.DELETED_STUDY.getId());
 			varList.add(var);
 
-			this.getProjectPropertySaver().saveProjectProperties(study, typeList);
+//			this.getProjectPropertySaver().saveProjectProperties(study, typeList);
 			this.getProjectPropertySaver().saveProjectPropValues(study.getProjectId(), varList);
 		}
 	}

@@ -227,7 +227,7 @@ public class ProjectPropertySaverTest {
 		dmsVariableType.setStandardVariable(standardVariable);
 		variableTypeList.add(dmsVariableType);
 
-		List<ProjectProperty> properties = this.projectPropSaver.create(dmsProject, variableTypeList);
+		List<ProjectProperty> properties = this.projectPropSaver.create(dmsProject, variableTypeList, null);
 
 		Integer typeId = 0;
 		DmsProject project = null;
@@ -286,7 +286,7 @@ public class ProjectPropertySaverTest {
 		dmsVariableType.setStandardVariable(standardVariable);
 		variableTypeList.add(dmsVariableType);
 
-		List<ProjectProperty> properties = this.projectPropSaver.create(dmsProject, variableTypeList);
+		List<ProjectProperty> properties = this.projectPropSaver.create(dmsProject, variableTypeList, null);
 
 		Integer typeId = 0;
 		DmsProject project = null;
@@ -343,7 +343,7 @@ public class ProjectPropertySaverTest {
 		dmsVariableType.setStandardVariable(standardVariable);
 		variableTypeList.add(dmsVariableType);
 
-		this.projectPropSaver.create(dmsProject, variableTypeList);
+		this.projectPropSaver.create(dmsProject, variableTypeList, null);
 	}
 
 	private static Map<Integer, List<Integer>> getDummyProjectPropIds() {
@@ -393,7 +393,7 @@ public class ProjectPropertySaverTest {
 		final DmsProject dmsProject = new DmsProject();
 		dmsProject.setProjectId(1);
 		final VariableTypeList variableTypeList = this.createVariableTypeListTestData(testVarRoles, testVarVariableTypes);
-		final List<ProjectProperty> projectProperties = this.projectPropSaver.create(dmsProject, variableTypeList);
+		final List<ProjectProperty> projectProperties = this.projectPropSaver.create(dmsProject, variableTypeList, null);
 		Assert.assertNotNull(projectProperties);
 		// a project property record is created for each variable for its name, description, ontology variable and treatment label if
 		// available

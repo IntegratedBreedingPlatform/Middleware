@@ -45,17 +45,17 @@ public class DatasetProjectSaver extends Saver {
 		datasetProject.setDescription(this.getDescription(datasetValues));
 		datasetProject.setProgramUUID(programUUID);
 
-		this.addNameVariableTypeIfNecessary(variableTypeList,programUUID);
-		this.addDescriptionVariableTypeIfNecessary(variableTypeList,programUUID);
+		this.addNameVariableTypeIfNecessary(variableTypeList, programUUID);
+		this.addDescriptionVariableTypeIfNecessary(variableTypeList, programUUID);
 		if (datasetValues.getType() != null) {
 			DMSVariableType variableType = this.addDataTypeVariableTypeIfNecessary(variableTypeList, programUUID);
 			this.addDataTypeVariableIfNecessary(datasetValues, variableType);
 		}
 
-		datasetProject.setProperties(this.getProjectPropertySaver().create(datasetProject, variableTypeList));
+		datasetProject.setProperties(this.getProjectPropertySaver().create(datasetProject, variableTypeList, datasetValues.getVariables()));
 		datasetProject.setRelatedTos(this.createProjectRelationship(studyId, datasetProject));
 		this.getDmsProjectDao().save(datasetProject);
-		this.getProjectPropertySaver().saveProjectPropValues(datasetProject.getProjectId(), datasetValues.getVariables());
+//		this.getProjectPropertySaver().saveProjectPropValues(datasetProject.getProjectId(), datasetValues.getVariables());
 
 		return datasetProject;
 	}

@@ -53,21 +53,22 @@ public class ProjectPropertySaver {
 		this.daoFactory = saver;
 	}
 
-	public List<ProjectProperty> create(final DmsProject project, final VariableTypeList variableTypeList) {
+	public List<ProjectProperty> create(final DmsProject project, final VariableTypeList variableTypeList, final VariableList variableList) {
 		final List<ProjectProperty> properties = new ArrayList<>();
 		final List<DMSVariableType> variableTypes = variableTypeList != null ? variableTypeList.getVariableTypes() : null;
 
 		if (variableTypes != null && !variableTypes.isEmpty()) {
 			for (final DMSVariableType variableType : variableTypes) {
-				final List<ProjectProperty> list = this.createVariableProperties(project, variableType);
+				final List<ProjectProperty> list = this.createVariableProperties(project, variableType, variableList);
 				properties.addAll(list);
 			}
 		}
 		return properties;
 	}
 
+	//TODO Fix when testing BreedingView Import
 	public void saveProjectProperties(final DmsProject project, final VariableTypeList variableTypeList) {
-		final List<ProjectProperty> properties = this.create(project, variableTypeList);
+		final List<ProjectProperty> properties = this.create(project, variableTypeList, null);
 		final ProjectPropertyDao projectPropertyDao = this.daoFactory.getProjectPropertyDao();
 		for (final ProjectProperty property : properties) {
 			property.setProject(project);
@@ -77,7 +78,7 @@ public class ProjectPropertySaver {
 		project.setProperties(properties);
 	}
 
-	private List<ProjectProperty> createVariableProperties(final DmsProject project, final DMSVariableType variableType)
+	private List<ProjectProperty> createVariableProperties(final DmsProject project, final DMSVariableType variableType, final VariableList variableList)
 			throws MiddlewareQueryException {
 
 	  	// Setting property, scale and method to standard variable
@@ -105,8 +106,19 @@ public class ProjectPropertySaver {
 
 		final List<ProjectProperty> properties = new ArrayList<>();
 
+		String value = null;
+
+		if (variableList != null) {
+			for (final Variable variable : variableList.getVariables()) {
+				if (variable.getVariableType().equals(variableType)) {
+					value = variable.getValue();
+					break;
+				}
+			}
+		}
+
 		properties.add(
-			new ProjectProperty(project, variableTypeId, null, variableType.getRank(), variableType.getId(), variableType.getLocalName()));
+			new ProjectProperty(project, variableTypeId, value, variableType.getRank(), variableType.getId(), variableType.getLocalName()));
 
 		/*
 		TODO
@@ -131,7 +143,9 @@ public class ProjectPropertySaver {
 
 				if (variableTypeEnum == org.generationcp.middleware.domain.ontology.VariableType.STUDY_DETAIL) {
 					final ProjectProperty property = new ProjectProperty();
-					property.setTypeId(variable.getVariableType().getStandardVariable().getId());
+					property.setVariableId(variable.getVariableType().getStandardVariable().getId());
+					property.setAlias(variable.getVariableType().getLocalName());
+					property.setTypeId(variable.getVariableType().getVariableType().getId());
 					property.setValue(variable.getValue());
 					property.setRank(variable.getVariableType().getRank());
 					property.setProject(this.daoFactory.getDmsProjectDao().getById(projectId));

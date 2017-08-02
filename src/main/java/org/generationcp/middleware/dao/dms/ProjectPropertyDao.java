@@ -58,15 +58,12 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			if (!propertyNames.isEmpty()) {
 
 				StringBuilder sqlString = new StringBuilder()
-						.append("SELECT DISTINCT ppValue.value, ppStdVar.id, ppValue.type_id ")
-						.append("FROM projectprop ppValue  ")
-						.append("INNER JOIN (SELECT project_id, value id, rank FROM projectprop WHERE type_id = 1070) AS ppStdVar ")
-						.append("    ON ppValue.project_id = ppStdVar.project_id ")
-						.append("    AND ppValue.type_id in (")
+						.append("SELECT DISTINCT alias, variable_id, type_id ")
+						.append("FROM projectprop   ")
+						.append("    WHERE type_id in (")
 						.append(Util.convertCollectionToCSV(VariableType.ids()))
 						.append(")")
-						.append("	 AND ppValue.rank = ppStdVar.rank ")
-						.append("    AND ppValue.value IN (:propertyNames) ");
+						.append("    AND alias IN (:propertyNames) ");
 				SQLQuery query = this.getSession().createSQLQuery(
 						sqlString.toString());
 				query.setParameterList("propertyNames", propertyNames);
@@ -76,7 +73,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 				Map<Integer, VariableType> stdVarIdKeyTypeValueList = new HashMap<Integer, VariableType>();
 				for (Object[] row : results) {
 					String name = ((String) row[0]).trim().toUpperCase();
-					String stdVarId = (String) row[1];
+					String stdVarId = String.valueOf(row[1]);
 					Integer variableTypeId = (Integer) row[2];
 
 					if (standardVariableIdsWithTypeInProjects.containsKey(name)) {
@@ -113,7 +110,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			Criteria criteria = this.getSession().createCriteria(
 					this.getPersistentClass());
 			criteria.add(Restrictions.eq("project", project));
-			criteria.add(Restrictions.eq("value",
+			criteria.add(Restrictions.eq("variable_id",
 					String.valueOf(standardVariableId)));
 
 			projectProperty = (ProjectProperty) criteria.uniqueResult();
