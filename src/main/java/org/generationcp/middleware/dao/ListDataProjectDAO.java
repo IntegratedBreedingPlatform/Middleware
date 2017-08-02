@@ -30,6 +30,8 @@ import com.google.common.base.Preconditions;
 public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 
+	private static final String ENTRY_ID = "entryId";
+
 	static final String GERMPLASM_LIST_DATA_LIST_ID_COLUMN = "listId";
 
 	static final String GERMPLASM_TABLE = "germplasm";
@@ -73,7 +75,6 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<ListDataProject> getByListId(final int listId) {
-		final List<ListDataProject> list = new ArrayList<>();
 		try {
 
 			final DetachedCriteria listDataProjectCriteria = DetachedCriteria.forClass(ListDataProject.class);
@@ -87,7 +88,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 
 			final Criteria criteria = this.getSession().createCriteria(ListDataProject.class, "listDataProject");
 			criteria.add(Restrictions.eq("list", new GermplasmList(listId)));
-			criteria.addOrder(Order.asc("entryId"));
+			criteria.addOrder(Order.asc(ENTRY_ID));
 
 			final List<ListDataProject> listDataProjects = criteria.list();
 
@@ -119,8 +120,8 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
 			criteria.add(Restrictions.eq("list", new GermplasmList(listId)));
-			criteria.add(Restrictions.eq("entryId", entryNo));
-			criteria.addOrder(Order.asc("entryId"));
+			criteria.add(Restrictions.eq(ENTRY_ID, entryNo));
+			criteria.addOrder(Order.asc(ENTRY_ID));
 			result = (ListDataProject) criteria.uniqueResult();
 
 		} catch (final HibernateException e) {
@@ -243,7 +244,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 	 * with nstat = 1
 	 */
 	public List<ListDataProject> getListDataProjectWithParents(final Integer listID) {
-		final List<ListDataProject> listDataProjects = new ArrayList<ListDataProject>();
+		final List<ListDataProject> listDataProjects = new ArrayList<>();
 		try {
 
 			final String queryStr = "select lp.listdata_project_id as listdata_project_id, "
@@ -360,7 +361,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(ListDataProject.class);
 			criteria.add(Restrictions.eq("list.id", listId));
 			criteria.add(Restrictions.eq("germplasmId", gid));
-			criteria.addOrder(Order.asc("entryId"));
+			criteria.addOrder(Order.asc(ENTRY_ID));
 			result = (ListDataProject) criteria.uniqueResult();
 
 		} catch (final HibernateException e) {
