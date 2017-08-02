@@ -48,7 +48,7 @@ public class ListDataProjectDAO extends GenericDAO<ListDataProject, Integer> {
 		+ "   INNER JOIN project p ON l.projectid = p.project_id \n"
 		+ " WHERE ldp.germplasm_id IN (:gids) \n"
 		+ "       AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED + " \n"
-		+ "       AND l.listtype IN ('" + GermplasmListType.NURSERY.name() + "', '" + GermplasmListType.TRIAL.name() + "') \n"
+		+ "       AND l.listtype IN ('" + GermplasmListType.NURSERY.name() + "', '" + GermplasmListType.TRIAL.name() + "', '" + GermplasmListType.CHECK.name() + "') \n"
 		+ " GROUP BY ldp.germplasm_id";
 
 	public void deleteByListId(final int listId) {
