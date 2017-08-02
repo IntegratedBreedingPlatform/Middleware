@@ -534,14 +534,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public List<DmsProject> getDataSetsByStudyAndProjectProperty(int studyId, int type, String value) throws MiddlewareQueryException {
+	public List<DmsProject> getDataSetsByStudyAndProjectProperty(int studyId, int variable, String value) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.createAlias("relatedTos", "pr");
 			criteria.add(Restrictions.eq("pr.typeId", TermId.BELONGS_TO_STUDY.getId()));
 			criteria.add(Restrictions.eq("pr.objectProject.projectId", studyId));
 			criteria.createAlias("properties", "prop");
-			criteria.add(Restrictions.eq("prop.typeId", type));
+			criteria.add(Restrictions.eq("prop.variableId", variable));
 			criteria.add(Restrictions.eq("prop.value", value));
 			criteria.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
 			criteria.addOrder(Order.asc("prop.rank"));
@@ -550,7 +550,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		} catch (HibernateException e) {
 			this.logAndThrowException(
-					"Error in getDataSetsByProjectProperty(" + type + ", " + value + ") query in DmsProjectDao: " + e.getMessage(), e);
+					"Error in getDataSetsByProjectProperty(" + variable + ", " + value + ") query in DmsProjectDao: " + e.getMessage(), e);
 		}
 		return new ArrayList<>();
 	}
