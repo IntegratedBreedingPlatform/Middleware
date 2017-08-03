@@ -37,7 +37,7 @@ public class StudyDestroyer extends Destroyer {
 		int maxRank = 0;
 		boolean found = false;
 		for (ProjectProperty property : study.getProperties()) {
-			if (property.getTypeId().equals(TermId.STUDY_STATUS.getId())) {
+			if (property.getVariableId().equals(TermId.STUDY_STATUS.getId())) {
 				found = true;
 				if (property.getValue() == null || !property.getValue().equals(String.valueOf(TermId.DELETED_STUDY.getId()))) {
 					property.setValue(String.valueOf(TermId.DELETED_STUDY.getId()));
@@ -62,8 +62,8 @@ public class StudyDestroyer extends Destroyer {
 			Variable var = new Variable(type, TermId.DELETED_STUDY.getId());
 			varList.add(var);
 
-//			this.getProjectPropertySaver().saveProjectProperties(study, typeList);
-			this.getProjectPropertySaver().saveProjectPropValues(study.getProjectId(), varList);
+			this.getProjectPropertySaver().saveProjectProperties(study, typeList, varList);
+//			this.getProjectPropertySaver().saveProjectPropValues(study.getProjectId(), varList);
 		}
 	}
 

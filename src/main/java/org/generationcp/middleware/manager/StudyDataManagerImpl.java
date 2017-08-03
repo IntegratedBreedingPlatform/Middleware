@@ -532,7 +532,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		try {
 
 			if (variableTypeList != null && variableTypeList.getVariableTypes() != null && !variableTypeList.getVariableTypes().isEmpty()) {
-				this.getProjectPropertySaver().saveProjectProperties(project, variableTypeList);
+				this.getProjectPropertySaver().saveProjectProperties(project, variableTypeList, null);
 			}
 			if (experimentValues != null && !experimentValues.isEmpty()) {
 				this.updateExperimentValues(experimentValues, project.getProjectId(), locationIds);

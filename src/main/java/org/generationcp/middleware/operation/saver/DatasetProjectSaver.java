@@ -161,6 +161,6 @@ public class DatasetProjectSaver extends Saver {
 				additionalProperties.add(variableType);
 			}
 		}
-		this.getProjectPropertySaver().saveProjectProperties(datasetProject, additionalProperties);
+		this.getProjectPropertySaver().saveProjectProperties(datasetProject, additionalProperties, null);
 	}
 }

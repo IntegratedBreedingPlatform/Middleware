@@ -67,8 +67,8 @@ public class ProjectPropertySaver {
 	}
 
 	//TODO Fix when testing BreedingView Import
-	public void saveProjectProperties(final DmsProject project, final VariableTypeList variableTypeList) {
-		final List<ProjectProperty> properties = this.create(project, variableTypeList, null);
+	public void saveProjectProperties(final DmsProject project, final VariableTypeList variableTypeList, final VariableList variableList) {
+		final List<ProjectProperty> properties = this.create(project, variableTypeList, variableList);
 		final ProjectPropertyDao projectPropertyDao = this.daoFactory.getProjectPropertyDao();
 		for (final ProjectProperty property : properties) {
 			property.setProject(project);
@@ -132,28 +132,28 @@ public class ProjectPropertySaver {
 		return properties;
 	}
 
-	public void saveProjectPropValues(final int projectId, final VariableList variableList) {
-		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
-			for (Variable variable : variableList.getVariables()) {
-
-				DMSVariableType dmsVariableType = variable.getVariableType();
-				dmsVariableType.setVariableTypeIfNull();
-
-				VariableType variableTypeEnum = dmsVariableType.getVariableType();
-
-				if (variableTypeEnum == org.generationcp.middleware.domain.ontology.VariableType.STUDY_DETAIL) {
-					final ProjectProperty property = new ProjectProperty();
-					property.setVariableId(variable.getVariableType().getStandardVariable().getId());
-					property.setAlias(variable.getVariableType().getLocalName());
-					property.setTypeId(variable.getVariableType().getVariableType().getId());
-					property.setValue(variable.getValue());
-					property.setRank(variable.getVariableType().getRank());
-					property.setProject(this.daoFactory.getDmsProjectDao().getById(projectId));
-					this.daoFactory.getProjectPropertyDao().save(property);
-				}
-			}
-		}
-	}
+//	public void saveProjectPropValues(final int projectId, final VariableList variableList) {
+//		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
+//			for (Variable variable : variableList.getVariables()) {
+//
+//				DMSVariableType dmsVariableType = variable.getVariableType();
+//				dmsVariableType.setVariableTypeIfNull();
+//
+//				VariableType variableTypeEnum = dmsVariableType.getVariableType();
+//
+//				if (variableTypeEnum == org.generationcp.middleware.domain.ontology.VariableType.STUDY_DETAIL) {
+//					final ProjectProperty property = new ProjectProperty();
+//					property.setVariableId(variable.getVariableType().getStandardVariable().getId());
+//					property.setAlias(variable.getVariableType().getLocalName());
+//					property.setTypeId(variable.getVariableType().getVariableType().getId());
+//					property.setValue(variable.getValue());
+//					property.setRank(variable.getVariableType().getRank());
+//					property.setProject(this.daoFactory.getDmsProjectDao().getById(projectId));
+//					this.daoFactory.getProjectPropertyDao().save(property);
+//				}
+//			}
+//		}
+//	}
 
 	/***
 	 * Saving project property from DMSVariableType. Setting VariableType from Role when DMSVariableType does not have value fro Variable
