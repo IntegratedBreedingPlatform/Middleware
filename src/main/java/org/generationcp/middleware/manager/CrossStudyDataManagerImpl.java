@@ -80,9 +80,8 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 	}
 
 	@Override
-	public List<GermplasmPair> getEnvironmentsForGermplasmPairs(List<GermplasmPair> germplasmPairs, boolean filterByTraits,
-		boolean filterByAnalysis) throws MiddlewareQueryException {
-		return this.getTrialEnvironmentBuilder().getEnvironmentForGermplasmPairs(germplasmPairs, filterByTraits, filterByAnalysis);
+	public List<GermplasmPair> getEnvironmentsForGermplasmPairs(List<GermplasmPair> germplasmPairs, final List<Integer> experimentTypes) throws MiddlewareQueryException {
+		return this.getTrialEnvironmentBuilder().getEnvironmentForGermplasmPairs(germplasmPairs, experimentTypes);
 	}
 
 	@Override

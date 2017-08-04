@@ -582,7 +582,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return traitObservationList;
 	}
 
-	public List<TrialEnvironment> getEnvironmentTraits(final Set<TrialEnvironment> trialEnvironments, final boolean filterByTraits, final boolean filterByAnalysis) throws MiddlewareQueryException {
+	public List<TrialEnvironment> getEnvironmentTraits(final Set<TrialEnvironment> trialEnvironments, final List<Integer> experimentTypes) throws MiddlewareQueryException {
 		List<TrialEnvironment> environmentDetails = new ArrayList<>();
 
 		if (trialEnvironments.isEmpty()) {
@@ -598,7 +598,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			"SELECT DISTINCT e.nd_geolocation_id as nd_geolocation_id, p.observable_id as observable_id, trait.name as name, property.name as property, trait.definition as definition, c_scale.name as scale, cr_type.object_id as object_id ")
 			.append("	FROM phenotype p ")
 			.append("	INNER JOIN nd_experiment_phenotype ep ON p.phenotype_id = ep.phenotype_id ")
-			.append("	INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id  AND e.nd_geolocation_id IN (:environmentIds) ")
+			.append("	INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id  AND e.nd_geolocation_id IN (:environmentIds) AND e.type_id in (:experimentTypes)")
 			.append("	LEFT JOIN cvterm_relationship cr_scale ON p.observable_id = cr_scale.subject_id AND cr_scale.type_id = 1220 ")
 			.append("	LEFT JOIN cvterm_relationship cr_type ON cr_type.subject_id = cr_scale.object_id  AND cr_type.type_id = 1105 ")
 			.append("	LEFT JOIN cvterm_relationship cr_property ON p.observable_id = cr_property.subject_id AND cr_property.type_id = 1200 ")
@@ -606,20 +606,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.append("	LEFT JOIN cvterm trait ON trait.cvterm_id = p.observable_id ")
 			.append("	LEFT JOIN cvterm property ON property.cvterm_id = cr_property.object_id ");
 
-		if (filterByTraits) {
-			sql.append(
-				"	where exists(SELECT * FROM nd_experiment e2 WHERE e.nd_experiment_id = e2.nd_experiment_id and e2.type_id = 1155) ");
-		} else if (filterByAnalysis) {
-			sql.append(
-				"	where not exists(SELECT * FROM nd_experiment e2 WHERE e.nd_experiment_id = e2.nd_experiment_id and e2.type_id = 1155) ");
-		}
 
 		try {
 
-			Query query =
-				this.getSession().createSQLQuery(sql.toString()).addScalar("nd_geolocation_id").addScalar("observable_id").addScalar("name")
-					.addScalar("property").addScalar("definition").addScalar("scale").addScalar("object_id")
-					.setParameterList("environmentIds", environmentIds);
+			Query query = this.getSession().createSQLQuery(sql.toString()).addScalar("nd_geolocation_id").addScalar("observable_id")
+					.addScalar("name").addScalar("property").addScalar("definition").addScalar("scale").addScalar("object_id")
+					.setParameterList("environmentIds", environmentIds).setParameterList("experimentTypes", experimentTypes);
 
 			List<Object[]> result = query.list();
 

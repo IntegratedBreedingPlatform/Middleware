@@ -95,15 +95,15 @@ public interface CrossStudyDataManager {
 
 	/**
 	 * Given a list of pairs of GIDs, return all environments where any of the pair of GIDs have been observed. Both the GIDs in a pair must
-	 * have been used in an experiment in a specific environment for that environment to be included in the result.
+	 * have been used in an experiment in a specific environment for that environment to be included in the result, where a filter for experiment types
+	 * to include is applied affecting the traits that will be included (eg. for plot experiments, include traits. for summary experiments, include analysis variables).
 	 * 
 	 * @param germplasmPairs List of germplasm pairs of GIDs
-	 * @param filterByTraits Filter only Traits
-	 * @param filterByAnalysis Filter only Analysis
+	 * @param experimentTypes - List of experiment type IDs to be included in query (can be for plot and/or analysis types)
 	 * @return List of TrialEnvironments corresponding to the list of Germplasm IDs
 	 * @throws MiddlewareQueryException
 	 */
-	List<GermplasmPair> getEnvironmentsForGermplasmPairs(final List<GermplasmPair> germplasmPairs, final boolean filterByTraits, final boolean filterByAnalysis) throws MiddlewareQueryException;
+	List<GermplasmPair> getEnvironmentsForGermplasmPairs(final List<GermplasmPair> germplasmPairs, final List<Integer> experimentTypes) throws MiddlewareQueryException;
 
 	/**
 	 * For each combination of trait, germplasm, and environment, the value observed is returned. If there was no observation for a

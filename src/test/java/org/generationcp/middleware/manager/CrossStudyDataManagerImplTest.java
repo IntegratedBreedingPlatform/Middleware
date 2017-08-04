@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Test;
@@ -104,16 +105,12 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetEnvironmentsForGermplasmPairs() throws Exception {
 		List<GermplasmPair> pairs = new ArrayList<>();
-
 		// Case 1: Central - Central
 		pairs.add(new GermplasmPair(2434138, 1356114));
-
-		// Case 2: Local - Local
-		pairs.add(new GermplasmPair(-1, -2));
-
-		// Case 3: Central - Local
-
-		List<GermplasmPair> result = this.crossStudyDataManager.getEnvironmentsForGermplasmPairs(pairs,false,false);
+		
+		// Include both traits and analysis variables
+		final List<Integer> experimentTypes = Arrays.asList(TermId.PLOT_EXPERIMENT.getId(), TermId.AVERAGE_EXPERIMENT.getId());
+		List<GermplasmPair> result = this.crossStudyDataManager.getEnvironmentsForGermplasmPairs(pairs, experimentTypes);
 		for (GermplasmPair pair : result) {
 			pair.print(IntegrationTestBase.INDENT);
 		}
