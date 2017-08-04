@@ -1,11 +1,11 @@
 package org.generationcp.middleware.service.api;
 
-import org.generationcp.middleware.domain.plant.PlantDTO;
+import org.generationcp.middleware.pojos.Plant;
 
 public interface PlantService {
 
-	public Integer createPlant(PlantDTO plant);
+	public Plant createOrUpdatePlant(String cropPrefix, Integer plantNumber, Integer experimentId);
 
-	public PlantDTO getPlant(Integer plantId);
+
 
 }

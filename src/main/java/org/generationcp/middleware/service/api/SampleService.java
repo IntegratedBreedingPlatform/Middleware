@@ -1,15 +1,12 @@
 package org.generationcp.middleware.service.api;
 
-import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.pojos.Sample;
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Date;
 
 public interface SampleService {
 
-	Integer createOrUpdateSample(SampleDTO sampleDTO);
+	public Sample createOrUpdateSample(String cropName, Integer plantNumber, String username, String sampleName, Date samplingDate,
+		Integer experimentId);
 
-	SampleDTO getSample(Integer sampleId);
-
-  	List<SampleDTO> getSamples(Collection<Integer> sampleIds);
 }

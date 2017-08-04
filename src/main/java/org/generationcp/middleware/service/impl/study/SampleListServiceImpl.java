@@ -2,20 +2,27 @@ package org.generationcp.middleware.service.impl.study;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
+import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
-import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 @Transactional public class SampleListServiceImpl implements SampleListService {
 
@@ -25,7 +32,10 @@ import java.util.*;
 
 	private UserDAO userDao;
 
+	private StudyMeasurements studyMeasurements;
+
 	@Autowired private SampleService sampleService;
+	private PlantDao plantDao;
 
 	public SampleListServiceImpl(HibernateSessionProvider sessionProvider) {
 		this.sampleListDao = new SampleListDao();
@@ -34,58 +44,60 @@ import java.util.*;
 		this.sampleDao.setSession(sessionProvider.getSession());
 		this.userDao = new UserDAO();
 		this.userDao.setSession(sessionProvider.getSession());
-
+		this.plantDao = new PlantDao();
+		this.plantDao.setSession(sessionProvider.getSession());
 	}
 
 	@Override public Integer createOrUpdateSampleList(SampleListDTO sampleListDTO) {
 		SampleList sampleList = new SampleList();
 
 		sampleList.setCreatedDate(new Date());
-		sampleList.setCreatedBy(userDao.getUserByUserName(sampleListDTO.getCreatedBy().getUsername()));
+		sampleList.setCreatedBy(userDao.getUserByUserName(sampleListDTO.getCreatedBy()));
 		sampleList.setDescription(sampleListDTO.getDescription());
 		sampleList.setHierarchy(sampleListDao.getBySampleListId(sampleListDTO.getHierarchy().getListId()));
-		sampleList.setListName(sampleListDTO.getListName());
+		sampleList.setListName(sampleListDTO.getTrialName() + "#" + Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS") );
 		sampleList.setNotes(sampleListDTO.getNotes());
 		sampleList.setType(sampleListDTO.getType());
 
+		List<ObservationDto> observationDtos = studyMeasurements
+			.getSampleObservations(sampleListDTO.getStudyId(), sampleListDTO.getInstanceIds(), sampleListDTO.getSelectionVariableId());
+
+		Map<Integer, Integer> maxPlantNumbers = this.getMaxPlantNumber(observationDtos);
 		List<Sample> samples = new ArrayList<>();
-		Iterator<SampleDTO> samplesIterator = sampleListDTO.getSamples().iterator();
-		while (samplesIterator.hasNext()) {
-			samples.add(sampleDao.getBySampleId(sampleService.createOrUpdateSample(samplesIterator.next())));
+		Iterator<ObservationDto> observationsIterator = observationDtos.iterator();
+
+		while (observationsIterator.hasNext()) {
+
+			ObservationDto observationDto = observationsIterator.next();
+			Integer sampleNumber = new Integer(observationDto.getVariableMeasurements().get(0).getVariableValue());
+			Integer count = maxPlantNumbers.get(observationDto.getMeasurementId());
+			if(count == null) {
+				//counter should be start in 1
+				count = 0;
+			}
+			for (int i = 0; i < sampleNumber; i++) {
+				count++;
+				Sample sample = sampleService
+					.createOrUpdateSample(sampleListDTO.getCropName(), count, sampleListDTO.getTakenBy(), observationDto.getDesignation(),
+						sampleListDTO.getSamplingDate(), observationDto.getMeasurementId());
+				samples.add(sample);
+			}
 		}
 
 		this.sampleListDao.saveOrUpdate(sampleList);
 		return sampleList.getListId();
 	}
 
-	@Override public SampleListDTO getSampleList(Integer sampleListId) {
-		SampleList sampleList = this.sampleListDao.getById(sampleListId);
-		SampleListDTO sampleListDTO = new SampleListDTO();
+	private Map<Integer, Integer> getMaxPlantNumber(List<ObservationDto> observationDtos) {
 
-		sampleListDTO.setCreatedBy(userDao.mapUserToUserDto(sampleList.getCreatedBy()));
-		sampleListDTO.setDescription(sampleList.getDescription());
-		sampleListDTO.setHierarchy(this.getHierarchy(sampleList.getHierarchy()));
-		sampleListDTO.setListName(sampleList.getListName());
-		sampleListDTO.setNotes(sampleList.getNotes());
-		sampleListDTO.setType(sampleList.getType());
-		sampleListDTO.setCreatedDate(sampleList.getCreatedDate());
-
-		final Collection<Integer> sampleIds = CollectionUtils.collect(sampleList.getSamples(), new Transformer() {
+		final Collection<Integer> experimentIds = CollectionUtils.collect(observationDtos, new Transformer() {
 
 			@Override public Object transform(final Object input) {
-				final Sample sample = (Sample) input;
-				return sample.getSampleId();
+				final ObservationDto observationDto = (ObservationDto) input;
+				return observationDto.getMeasurementId();
 			}
 		});
 
-		sampleListDTO.setSamples(sampleService.getSamples(sampleIds));
-		return sampleListDTO;
-	}
-
-	private SampleListDTO getHierarchy(SampleList hierarchy) {
-		if (hierarchy != null) {
-			return this.getSampleList(hierarchy.getListId());
-		}
-		return null;
+		return this.plantDao.getMaxPlantNumber(experimentIds);
 	}
 }

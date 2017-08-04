@@ -1,19 +1,26 @@
 
 package org.generationcp.middleware.service.impl.study;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.domain.dms.Experiment;
-import org.generationcp.middleware.domain.plant.PlantDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.service.api.PlantService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
 @Transactional
 public class PlantServiceImpl implements PlantService {
+
+	private static final String L = "L";
+
+
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
 
 	private PlantDao plantDao;
 	private ExperimentDao experimentDao;
@@ -36,28 +43,22 @@ public class PlantServiceImpl implements PlantService {
 	}
 
 	@Override
-	public Integer createPlant(PlantDTO plantDTO) {
+	public Plant createOrUpdatePlant(String cropName, Integer plantNumber, Integer experimentId) {
 		Plant plant = new Plant();
-
+		String cropPrefix = this.workbenchDataManager.getCropTypeByName(cropName).getPlotCodePrefix();
 		plant.setCreatedDate(new Date());
-		plant.setExperiment(this.experimentDao.getById(plantDTO.getExperiment().getId()));
-		plant.setPlantBusinessKey(plantDTO.getPlantBusinessKey());
-		plant.setPlantNumber(plantDTO.getPlantNumber());
-		this.plantDao.saveOrUpdate(plant);
-		return plant.getPlantId();
+		plant.setExperiment(experimentDao.getById(experimentId));
+		plant.setPlantBusinessKey(this.getPlantBusinessKey(cropPrefix));
+		plant.setPlantNumber(plantNumber);
+
+		return plant;
 	}
 
-	public PlantDTO getPlant(Integer plantId){
-		Plant plant = this.plantDao.getById(plantId);
-		PlantDTO plantDTO = new PlantDTO();
+	private String getPlantBusinessKey(String cropPrefix) {
+		String plantBussinesKey = cropPrefix;
+		plantBussinesKey = plantBussinesKey + L;
+		plantBussinesKey = plantBussinesKey + RandomStringUtils.randomAlphanumeric(8);
 
-		Experiment experiment = new Experiment();
-		experiment.setId(plant.getExperiment().getNdExperimentId());
-		plantDTO.setExperiment(experiment);
-		plantDTO.setCreatedDate(plant.getCreatedDate());
-		plantDTO.setPlantBusinessKey(plant.getPlantBusinessKey());
-		plantDTO.setPlantId(plant.getPlantId());
-		plantDTO.setPlantNumber(plant.getPlantNumber());
-		return plantDTO;
+		return plantBussinesKey;
 	}
 }
