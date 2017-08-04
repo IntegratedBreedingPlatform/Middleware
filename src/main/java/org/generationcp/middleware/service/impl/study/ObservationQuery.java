@@ -114,8 +114,11 @@ class ObservationQuery {
 	 * Constructs a query that will enable us to retrieve information about all plots, associated metadata and measurements in one go, for a
 	 * trial/nursery.
 	 *
+	 * TODO Delete, this method was replaced by {@link ObservationQuery#getObservationsMainQuery(List, List)}
+	 *
 	 * @param measurementVariables list of measurementVariables that we need to construct a query for.
 	 */
+	@Deprecated
 	String getObservationQuery(final List<MeasurementVariableDto> measurementVariables) {
 
 		final String columnNamesFromTraitNames = this.getColumnNamesFromTraitNames(measurementVariables);
