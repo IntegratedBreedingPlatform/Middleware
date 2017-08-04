@@ -1191,7 +1191,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private Criteria buildCoreCriteria(final Map<StudyFilters, String> parameters, final Order orderBy) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.createAlias("properties", "pr");
-		criteria.add(Restrictions.eq("pr.typeId", TermId.STUDY_TYPE.getId()));
+		criteria.add(Restrictions.eq("pr.variableId", TermId.STUDY_TYPE.getId()));
 
 		final DetachedCriteria inactive = DetachedCriteria.forClass(ProjectProperty.class);
 		inactive.add(Restrictions.eq(DmsProjectDao.VARIABLE_ID, Integer.valueOf(DmsProjectDao.STUDY_STATUS)));
