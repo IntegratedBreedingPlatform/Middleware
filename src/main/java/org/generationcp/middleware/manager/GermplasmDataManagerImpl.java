@@ -11,8 +11,15 @@
 
 package org.generationcp.middleware.manager;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.AttributeDAO;
@@ -47,14 +54,8 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import com.jamonapi.Monitor;
+import com.jamonapi.MonitorFactory;
 
 /**
  * Implementation of the GermplasmDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -85,18 +86,17 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Germplasm> getGermplasmByName(final String name, final int start, final int numOfRows, final Operation op)
-			throws MiddlewareQueryException {
+			{
 		return this.getGermplasmDao().getByNamePermutations(name, op, start, numOfRows);
 	}
 
 	@Override
-	public long countGermplasmByName(final String name, final Operation operation) throws MiddlewareQueryException {
+	public long countGermplasmByName(final String name, final Operation operation) {
 		return this.getGermplasmDao().countByNamePermutations(name, operation);
 	}
 
 	@Override
-	public List<Germplasm> getGermplasmByLocationName(final String name, final int start, final int numOfRows, final Operation op)
-			throws MiddlewareQueryException {
+	public List<Germplasm> getGermplasmByLocationName(final String name, final int start, final int numOfRows, final Operation op) {
 		List<Germplasm> germplasms = new ArrayList<>();
 		final GermplasmDAO dao = this.getGermplasmDao();
 		if (op == Operation.EQUAL) {
