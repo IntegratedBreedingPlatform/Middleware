@@ -110,8 +110,8 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			Criteria criteria = this.getSession().createCriteria(
 					this.getPersistentClass());
 			criteria.add(Restrictions.eq("project", project));
-			criteria.add(Restrictions.eq("variable_id",
-					String.valueOf(standardVariableId)));
+			criteria.add(Restrictions.eq("variableId",
+					standardVariableId));
 
 			projectProperty = (ProjectProperty) criteria.uniqueResult();
 

@@ -418,25 +418,26 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public String getLocalNameByStandardVariableId(final Integer projectId, final Integer standardVariableId)
 			throws MiddlewareQueryException {
-		final Session session = this.getActiveSession();
-
-		try {
-
-			final String sql = "select pp.value " + "from projectprop pp "
-					+ "inner join projectprop pp2 on pp.rank = pp2.rank and pp.project_id = pp2.project_id "
-					+ "where pp.project_id = :projectId and pp2.value = :standardVariableId " + "and pp.type_id not in (pp2.value, "
-					+ TermId.STANDARD_VARIABLE.getId() + "," + TermId.VARIABLE_DESCRIPTION.getId() + ")";
-
-			final Query query = session.createSQLQuery(sql);
-			query.setParameter("projectId", projectId);
-			query.setParameter("standardVariableId", standardVariableId);
-
-			return (String) query.uniqueResult();
-
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getLocalNameByStandardVariableId :" + e.getMessage(), e);
-		}
-		return null;
+//		final Session session = this.getActiveSession();
+//
+//		try {
+//
+//			final String sql = "select alias from projectprop where project_id = :projectId and variable_id = :standardVariableId";
+//
+//			final Query query = session.createSQLQuery(sql);
+//			query.setParameter("projectId", projectId);
+//			query.setParameter("standardVariableId", standardVariableId);
+//
+//			return (String) query.uniqueResult();
+//
+//		} catch (final HibernateException e) {
+//			this.logAndThrowException("Error at getLocalNameByStandardVariableId :" + e.getMessage(), e);
+//		}
+//		return null;
+		DmsProject dmsProject = new DmsProject();
+		dmsProject.setProjectId(projectId);
+		ProjectProperty projectProperty = getProjectPropertyDao().getByStandardVariableId(dmsProject, standardVariableId);
+		return (projectProperty == null) ? null : projectProperty.getAlias();
 	}
 
 	@Override
