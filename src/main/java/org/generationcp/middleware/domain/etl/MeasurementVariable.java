@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.util.Debug;
@@ -355,19 +355,25 @@ public class MeasurementVariable {
 		this.maxRange = maxRange;
 	}
 
-	public String getDataTypeDisplay() {
-		// datatype ids: 1120, 1125, 1128, 1130
-		if (this.dataTypeId == null && this.dataType != null) {
-			return this.dataType;
-		} else if (this.dataTypeId == TermId.CHARACTER_VARIABLE.getId() || this.dataTypeId == TermId.TIMESTAMP_VARIABLE.getId()
-				|| this.dataTypeId == TermId.CHARACTER_DBID_VARIABLE.getId() || this.dataTypeId == TermId.CATEGORICAL_VARIABLE.getId()
-				|| this.dataTypeId == TermId.GERMPLASM_LIST_DATA_TYPE.getId() || this.dataTypeId == TermId.LOCATION_DATA_TYPE.getId()
-				|| this.dataTypeId == TermId.PERSON_DATA_TYPE.getId() || this.dataTypeId == TermId.BREEDING_METHOD_DATA_TYPE.getId()) {
-			return "C";
-		} else {
-			return "N";
+	/**
+	 * Gets the single character code that represents the data type of this variable.
+	 *
+	 * @return "C" for Categorical
+	 * "N" for Numeric
+	 * "D" for Date
+	 * "T" for Character/Text
+	 * If the variable has invalid datatypeid, it will return an empty string.
+	 */
+	public String getDataTypeCode() {
+
+		DataType dataTypeEnum = DataType.getById(this.dataTypeId);
+		if (dataTypeEnum != null) {
+			return dataTypeEnum.getDataTypeCode();
 		}
+		return "";
+
 	}
+
 
 	public boolean isRequired() {
 		return this.required;
