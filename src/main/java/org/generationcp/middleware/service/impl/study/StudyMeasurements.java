@@ -182,8 +182,7 @@ public class StudyMeasurements {
 
 	public List<ObservationDto> getSampleObservations(final int studyId, final List<Integer> instanceIds,
 		final Integer selectionVariableId) {
-		final SQLQuery createSQLQuery =
-			this.session.createSQLQuery(measurementQuery.getSampleObservationQuery());
+		final SQLQuery createSQLQuery = this.session.createSQLQuery(measurementQuery.getSampleObservationQuery());
 
 		createSQLQuery.addScalar("nd_experiment_id", new IntegerType());
 		createSQLQuery.addScalar("preferred_name", new StringType());
@@ -203,7 +202,7 @@ public class StudyMeasurements {
 
 					final List<MeasurementDto> measurementVariableResults = new ArrayList<>();
 
-					MeasurementDto measurementDto = new MeasurementDto((String) row[2]);
+					MeasurementDto measurementDto = new MeasurementDto((row[2]).toString());
 					measurementVariableResults.add(measurementDto);
 
 					ObservationDto measurement = new ObservationDto((Integer) row[0], (String) row[1], measurementVariableResults);

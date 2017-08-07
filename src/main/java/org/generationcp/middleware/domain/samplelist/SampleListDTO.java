@@ -17,8 +17,6 @@ public class SampleListDTO implements Serializable {
 
 	private String description;
 
-	private SampleListDTO hierarchy;
-
 	private String type;
 
 	private String notes;
@@ -118,14 +116,6 @@ public class SampleListDTO implements Serializable {
 		this.description = description;
 	}
 
-	public SampleListDTO getHierarchy() {
-		return hierarchy;
-	}
-
-	public void setHierarchy(SampleListDTO hierarchy) {
-		this.hierarchy = hierarchy;
-	}
-
 	public String getType() {
 		return type;
 	}
@@ -142,7 +132,8 @@ public class SampleListDTO implements Serializable {
 		this.notes = notes;
 	}
 
-	@Override public boolean equals(final Object other) {
+	@Override
+	public boolean equals(final Object other) {
 		if (!(other instanceof SampleListDTO)) {
 			return false;
 		}
@@ -150,12 +141,14 @@ public class SampleListDTO implements Serializable {
 		return new EqualsBuilder().append(this.listId, castOther.listId).isEquals();
 	}
 
-	@Override public int hashCode() {
+	@Override
+	public int hashCode() {
 
 		return new HashCodeBuilder().append(this.listId).hashCode();
 	}
 
-	@Override public String toString() {
+	@Override
+	public String toString() {
 
 		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
 	}

@@ -8,6 +8,7 @@ import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -38,10 +39,8 @@ public class Sample implements Serializable {
 	@ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "taken_by")
 	@NotFound(action = NotFoundAction.IGNORE)
-	@Basic(optional = false)
 	private User takenBy;
 
-	@Basic(optional = false)
 	@Column(name = "sampling_date")
 	private Date samplingDate;
 
@@ -53,15 +52,13 @@ public class Sample implements Serializable {
 	@Column(name = "sample_bk")
 	private String sampleBusinessKey;
 
-	@Basic(optional = false)
 	@JoinColumn(name = "plant_id")
 	@OneToOne(targetEntity = Plant.class)
 	private Plant plant;
 
-	@ManyToOne(targetEntity = SampleList.class, fetch = FetchType.LAZY)
+	@ManyToOne(targetEntity = SampleList.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	@JoinColumn(name = "sample_list")
 	@NotFound(action = NotFoundAction.IGNORE)
-	@Basic(optional = false)
 	private SampleList sampleList;
 
 	public Sample() {

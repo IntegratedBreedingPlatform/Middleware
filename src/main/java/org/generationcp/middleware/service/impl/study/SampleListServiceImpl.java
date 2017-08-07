@@ -47,6 +47,7 @@ public class SampleListServiceImpl implements SampleListService {
 		this.userDao.setSession(sessionProvider.getSession());
 		this.plantDao = new PlantDao();
 		this.plantDao.setSession(sessionProvider.getSession());
+		this.studyMeasurements = new StudyMeasurements(sessionProvider.getSession());
 	}
 
 	@Override public Integer createOrUpdateSampleList(SampleListDTO sampleListDTO) {
@@ -55,7 +56,6 @@ public class SampleListServiceImpl implements SampleListService {
 		sampleList.setCreatedDate(new Date());
 		sampleList.setCreatedBy(userDao.getUserByUserName(sampleListDTO.getCreatedBy()));
 		sampleList.setDescription(sampleListDTO.getDescription());
-		sampleList.setHierarchy(sampleListDao.getBySampleListId(sampleListDTO.getHierarchy().getListId()));
 		sampleList.setListName(sampleListDTO.getTrialName() + "#" + Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS"));
 		sampleList.setNotes(sampleListDTO.getNotes());
 		sampleList.setType(sampleListDTO.getType());
@@ -85,6 +85,7 @@ public class SampleListServiceImpl implements SampleListService {
 			}
 		}
 
+		sampleList.setSamples(samples);
 		this.sampleListDao.saveOrUpdate(sampleList);
 		return sampleList.getListId();
 	}

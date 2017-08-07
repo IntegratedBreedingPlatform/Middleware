@@ -13,16 +13,16 @@
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE sample (
-			sample_id INT NOT NULL,
+			sample_id INT NOT NULL AUTO_INCREMENT,
 			sample_name VARCHAR(45) NOT NULL,
-			takenBy INT(11) NOT NULL,
-			sampling_date DATE NOT NULL,
+			taken_by INT(11) NULL,
+			sampling_date DATE NULL,
 			created_date DATE NOT NULL,
 			sample_bk VARCHAR(45) NOT NULL,
-			sample_list INT NOT NULL,
+			sample_list INT NOT NULL DEFAULT 0,
 			PRIMARY KEY (sample_id),
-			INDEX fk_users_idx (takenBy ASC),
-			CONSTRAINT fk_sample_user FOREIGN KEY (takenBy)
+			INDEX fk_users_idx (taken_by ASC),
+			CONSTRAINT fk_sample_user FOREIGN KEY (taken_by)
 			REFERENCES users (userid)
 			ON DELETE RESTRICT ON UPDATE NO ACTION
 			);
@@ -35,13 +35,12 @@
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE plant (
-			plant_id INT NOT NULL,
+			plant_id INT NOT NULL AUTO_INCREMENT,
 			plant_no INT NOT NULL,
 			nd_experiment_id INT(11) NOT NULL,
 			created_date DATE NOT NULL,
 			plant_bk VARCHAR(45) NOT NULL,
 			PRIMARY KEY (plant_id),
-			UNIQUE INDEX plant_id_UNIQUE (plant_id ASC),
 			INDEX fk_plant_exp_idx (nd_experiment_id ASC),
 			CONSTRAINT fk_plant_exp FOREIGN KEY (nd_experiment_id)
 			REFERENCES nd_experiment (nd_experiment_id)
@@ -65,7 +64,7 @@
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE sample
-			ADD COLUMN plant_id INT NOT NULL AFTER sample_bk ,
+			ADD COLUMN plant_id INT DEFAULT 0,
 			ADD INDEX fk_sample_plant_idx (plant_id ASC);
 			ALTER TABLE sample
 			ADD CONSTRAINT fk_sample_plant
@@ -82,16 +81,15 @@
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE sample_list (
-			list_id INT NOT NULL,
+			list_id INT NOT NULL AUTO_INCREMENT,
 			list_name VARCHAR(45) NOT NULL,
 			description VARCHAR(45) NULL,
 			hierarchy INT NULL,
-			list_type VARCHAR(10) NOT NULL,
+			list_type VARCHAR(30) NOT NULL,
 			created_date DATE NOT NULL,
 			notes VARCHAR(45) NULL,
-			taken_by INT(11) NOT NULL,
+			taken_by INT(11) NULL,
 			PRIMARY KEY (list_id),
-			UNIQUE INDEX list_id_UNIQUE (list_id ASC),
 			INDEX fk_sample_list_user_idx (taken_by ASC),
 			CONSTRAINT fk_sample_list_user FOREIGN KEY (taken_by)
 			REFERENCES users (userid)

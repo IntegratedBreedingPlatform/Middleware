@@ -19,6 +19,7 @@ import java.util.List;
 public class SampleList implements Serializable {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "list_id")
 	private Integer listId;
@@ -49,10 +50,9 @@ public class SampleList implements Serializable {
 	@ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "taken_by")
 	@NotFound(action = NotFoundAction.IGNORE)
-	@Basic(optional = false)
 	private User createdBy;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private List<Sample> samples;
 
 	public List<Sample> getSamples() {

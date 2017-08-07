@@ -43,9 +43,9 @@ public class PlantServiceImpl implements PlantService {
 	}
 
 	@Override
-	public Plant createOrUpdatePlant(String cropName, Integer plantNumber, Integer experimentId) {
+	public Plant createOrUpdatePlant(String cropPrefix, Integer plantNumber, Integer experimentId) {
 		Plant plant = new Plant();
-		String cropPrefix = this.workbenchDataManager.getCropTypeByName(cropName).getPlotCodePrefix();
+
 		plant.setCreatedDate(new Date());
 		plant.setExperiment(experimentDao.getById(experimentId));
 		plant.setPlantBusinessKey(this.getPlantBusinessKey(cropPrefix));
