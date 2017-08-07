@@ -28,9 +28,9 @@ public class OntologyDataHelper {
 		} else if (PhenotypicType.TRIAL_DESIGN == phenotypicType) {
 			variableType = VariableType.EXPERIMENTAL_DESIGN;
 		} else if (PhenotypicType.VARIATE == phenotypicType) {
-			boolean isSelectionMethod = Objects.equals(propertyName, "Inventory amount") ||
-					Objects.equals(propertyName, "Selections") ||
-					Objects.equals(propertyName, "Breeding method");
+			boolean isSelectionMethod = "Inventory amount".equals(propertyName) ||
+					"Selections".equals(propertyName) ||
+					"Breeding method".equals(propertyName);
 
 			variableType = isSelectionMethod ? VariableType.SELECTION_METHOD : VariableType.TRAIT;
 		}
