@@ -6,7 +6,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-
+	<!-- Set the list status of the deleted study's snapshot list to 9(deleted); 8006 corresponds to Study's Status and 12990 is value set for deleted studies-->
 	<changeSet author="mderamos" id="v6.2-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
