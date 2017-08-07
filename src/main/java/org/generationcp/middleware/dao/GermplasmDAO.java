@@ -689,7 +689,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			 * eg. input prefix: "IR" output: next number in "IRNNNNN -----" sequence
 			 */
 
-			final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX3);
+			final SQLQuery query = this.getSession().createSQLQuery(Germplasm.GET_NEXT_IN_SEQUENCE_FOR_CROSS_NAME_PREFIX);
 			query.setParameter("prefix", prefix);
 			query.setParameter("prefixLike", prefix + "%");
 
