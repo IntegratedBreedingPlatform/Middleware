@@ -24,7 +24,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-@Transactional public class SampleListServiceImpl implements SampleListService {
+@Transactional
+public class SampleListServiceImpl implements SampleListService {
 
 	private SampleListDao sampleListDao;
 
@@ -55,7 +56,7 @@ import java.util.Map;
 		sampleList.setCreatedBy(userDao.getUserByUserName(sampleListDTO.getCreatedBy()));
 		sampleList.setDescription(sampleListDTO.getDescription());
 		sampleList.setHierarchy(sampleListDao.getBySampleListId(sampleListDTO.getHierarchy().getListId()));
-		sampleList.setListName(sampleListDTO.getTrialName() + "#" + Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS") );
+		sampleList.setListName(sampleListDTO.getTrialName() + "#" + Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS"));
 		sampleList.setNotes(sampleListDTO.getNotes());
 		sampleList.setType(sampleListDTO.getType());
 
@@ -71,7 +72,7 @@ import java.util.Map;
 			ObservationDto observationDto = observationsIterator.next();
 			Integer sampleNumber = new Integer(observationDto.getVariableMeasurements().get(0).getVariableValue());
 			Integer count = maxPlantNumbers.get(observationDto.getMeasurementId());
-			if(count == null) {
+			if (count == null) {
 				//counter should be start in 1
 				count = 0;
 			}

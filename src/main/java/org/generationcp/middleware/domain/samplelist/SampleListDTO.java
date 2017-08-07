@@ -25,8 +25,6 @@ public class SampleListDTO implements Serializable {
 
 	private String createdBy;
 
-	private List<Integer> gids;
-
 	private Integer selectionVariableId;
 
 	private List<Integer> instanceIds;
@@ -53,14 +51,6 @@ public class SampleListDTO implements Serializable {
 
 	public void setStudyId(Integer studyId) {
 		this.studyId = studyId;
-	}
-
-	public List<Integer> getGids() {
-		return gids;
-	}
-
-	public void setGids(List<Integer> gids) {
-		this.gids = gids;
 	}
 
 	public Integer getSelectionVariableId() {

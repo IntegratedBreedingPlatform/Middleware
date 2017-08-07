@@ -6,5 +6,4 @@ public interface SampleListService {
 
 	public Integer createOrUpdateSampleList(SampleListDTO sampleListDto);
 
-
 }
