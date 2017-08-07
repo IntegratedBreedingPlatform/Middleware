@@ -31,7 +31,6 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -39,39 +38,40 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 
 public class TrialEnvironmentBuilder extends Builder {
 
-	public TrialEnvironmentBuilder(HibernateSessionProvider sessionProviderForLocal) {
+	public TrialEnvironmentBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
 
-	public TrialEnvironments getTrialEnvironmentsInDataset(int studyId, int datasetId) throws MiddlewareException {
-		DmsProject project = this.getDataSetBuilder().getTrialDataset(studyId);
-		DataSet dataSet = this.getDataSetBuilder().build(project.getProjectId());
-		Study study = this.getStudyBuilder().createStudy(dataSet.getStudyId());
+	public TrialEnvironments getTrialEnvironmentsInDataset(final int studyId, final int datasetId) throws MiddlewareException {
+		final DmsProject project = this.getDataSetBuilder().getTrialDataset(studyId);
+		final DataSet dataSet = this.getDataSetBuilder().build(project.getProjectId());
+		final Study study = this.getStudyBuilder().createStudy(dataSet.getStudyId());
 
-		VariableTypeList trialEnvironmentVariableTypes = this.getTrialEnvironmentVariableTypes(study, dataSet);
-		Set<Geolocation> locations = this.getGeoLocations(datasetId);
+		final VariableTypeList trialEnvironmentVariableTypes = this.getTrialEnvironmentVariableTypes(study, dataSet);
+		final Set<Geolocation> locations = this.getGeoLocations(datasetId);
 
 		return this.buildTrialEnvironments(locations, trialEnvironmentVariableTypes);
 	}
 
-	private VariableTypeList getTrialEnvironmentVariableTypes(Study study, DataSet dataSet) {
-		VariableTypeList trialEnvironmentVariableTypes = new VariableTypeList();
+	private VariableTypeList getTrialEnvironmentVariableTypes(final Study study, final DataSet dataSet) {
+		final VariableTypeList trialEnvironmentVariableTypes = new VariableTypeList();
 		trialEnvironmentVariableTypes.addAll(study.getVariableTypesByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT));
 		trialEnvironmentVariableTypes.addAll(dataSet.getFactorsByPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT));
 		return trialEnvironmentVariableTypes;
 	}
 
-	private Set<Geolocation> getGeoLocations(int datasetId) throws MiddlewareQueryException {
+	private Set<Geolocation> getGeoLocations(final int datasetId) {
 		return this.getGeolocationDao().findInDataSet(datasetId);
 	}
 
-	private TrialEnvironments buildTrialEnvironments(Set<Geolocation> locations, VariableTypeList trialEnvironmentVariableTypes) {
+	private TrialEnvironments buildTrialEnvironments(final Set<Geolocation> locations,
+			final VariableTypeList trialEnvironmentVariableTypes) {
 
-		TrialEnvironments trialEnvironments = new TrialEnvironments();
-		for (Geolocation location : locations) {
-			VariableList variables = new VariableList();
-			for (DMSVariableType variableType : trialEnvironmentVariableTypes.getVariableTypes()) {
-				Variable variable = new Variable(variableType, this.getValue(location, variableType));
+		final TrialEnvironments trialEnvironments = new TrialEnvironments();
+		for (final Geolocation location : locations) {
+			final VariableList variables = new VariableList();
+			for (final DMSVariableType variableType : trialEnvironmentVariableTypes.getVariableTypes()) {
+				final Variable variable = new Variable(variableType, this.getValue(location, variableType));
 				variables.add(variable);
 			}
 			trialEnvironments.add(new TrialEnvironment(location.getLocationId(), variables));
@@ -79,9 +79,9 @@ public class TrialEnvironmentBuilder extends Builder {
 		return trialEnvironments;
 	}
 
-	private String getValue(Geolocation location, DMSVariableType variableType) {
+	private String getValue(final Geolocation location, final DMSVariableType variableType) {
 		String value = null;
-		int id = variableType.getStandardVariable().getId();
+		final int id = variableType.getStandardVariable().getId();
 		if (id == TermId.TRIAL_INSTANCE_FACTOR.getId()) {
 			value = location.getDescription();
 		} else if (id == TermId.LATITUDE.getId()) {
@@ -98,10 +98,10 @@ public class TrialEnvironmentBuilder extends Builder {
 		return value;
 	}
 
-	private String getPropertyValue(int id, List<GeolocationProperty> properties) {
+	private String getPropertyValue(final int id, final List<GeolocationProperty> properties) {
 		String value = null;
 		if (properties != null) {
-			for (GeolocationProperty property : properties) {
+			for (final GeolocationProperty property : properties) {
 				if (property.getTypeId() == id) {
 					value = property.getValue();
 					break;
@@ -111,69 +111,71 @@ public class TrialEnvironmentBuilder extends Builder {
 		return value;
 	}
 
-	public TrialEnvironments getAllTrialEnvironments(boolean includePublicData) throws MiddlewareQueryException {
-		TrialEnvironments environments = new TrialEnvironments();
+	public TrialEnvironments getAllTrialEnvironments() {
+		final TrialEnvironments environments = new TrialEnvironments();
 		environments.addAll(this.getGeolocationDao().getAllTrialEnvironments());
 		return environments;
 	}
 
-	public long countAllTrialEnvironments() throws MiddlewareQueryException {
+	public long countAllTrialEnvironments() {
 		return this.getGeolocationDao().countAllTrialEnvironments();
 	}
 
-	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
+	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(final List<Integer> environmentIds) {
 		return this.getGeolocationDao().getPropertiesForTrialEnvironments(environmentIds);
 	}
 
-	public List<GermplasmPair> getEnvironmentForGermplasmPairs(final List<GermplasmPair> germplasmPairs, final boolean filterByTraits, final boolean filterByAnalysis) throws MiddlewareQueryException {
-		List<TrialEnvironment> trialEnvironments = new ArrayList<TrialEnvironment>();
+	public List<GermplasmPair> getEnvironmentForGermplasmPairs(final List<GermplasmPair> germplasmPairs,
+			final List<Integer> experimentTypes) {
+		final List<TrialEnvironment> trialEnvironments = new ArrayList<>();
 
-		Set<Integer> allGids = new HashSet<>();
-		for (GermplasmPair pair : germplasmPairs) {
+		final Set<Integer> allGids = new HashSet<>();
+		for (final GermplasmPair pair : germplasmPairs) {
 			allGids.add(pair.getGid1());
 			allGids.add(pair.getGid2());
 		}
 
 		// Step 1: Get Trial Environments for each GID
-		Map<Integer, Set<Integer>> germplasmEnvironments = this.getExperimentStockDao().getEnvironmentsOfGermplasms(allGids);
+		final Map<Integer, Set<Integer>> germplasmEnvironments = this.getExperimentStockDao().getEnvironmentsOfGermplasms(allGids);
 
 		// Step 2: Get the trial environment details
-		Set<TrialEnvironment> trialEnvironmentDetails = new HashSet<>();
-		getTrialEnvironmentDetails(germplasmEnvironments, trialEnvironmentDetails);
+		final Set<TrialEnvironment> trialEnvironmentDetails = new HashSet<>();
+		this.getTrialEnvironmentDetails(germplasmEnvironments, trialEnvironmentDetails);
 
 		// Step 3: Get environment traits
-		List<TrialEnvironment> localTrialEnvironments = this.getPhenotypeDao().getEnvironmentTraits(trialEnvironmentDetails, filterByTraits, filterByAnalysis);
+		final List<TrialEnvironment> localTrialEnvironments =
+				this.getPhenotypeDao().getEnvironmentTraits(trialEnvironmentDetails, experimentTypes);
 		trialEnvironments.addAll(localTrialEnvironments);
 
 		// Step 4: Build germplasm pairs. Get what's common between GID1 AND GID2
-		buildGermplasmPairsBetweenGids(germplasmPairs, germplasmEnvironments, trialEnvironments);
+		this.buildGermplasmPairsBetweenGids(germplasmPairs, germplasmEnvironments, trialEnvironments);
 		return germplasmPairs;
 	}
 
 	private void getTrialEnvironmentDetails(final Map<Integer, Set<Integer>> germplasmEnvironments,
-		final Set<TrialEnvironment> trialEnvironmentDetails) {
-		Set<Integer> localEnvironmentIds = this.getEnvironmentIdsFromMap(germplasmEnvironments);
+			final Set<TrialEnvironment> trialEnvironmentDetails) {
+		final Set<Integer> localEnvironmentIds = this.getEnvironmentIdsFromMap(germplasmEnvironments);
 		trialEnvironmentDetails.addAll(this.getGeolocationDao().getTrialEnvironmentDetails(localEnvironmentIds));
 	}
 
 	private void buildGermplasmPairsBetweenGids(final List<GermplasmPair> germplasmPairs,
-		final Map<Integer, Set<Integer>> germplasmEnvironments, final List<TrialEnvironment> trialEnvironments) {
-		for (GermplasmPair pair : germplasmPairs) {
-			int gid1 = pair.getGid1();
-			int gid2 = pair.getGid2();
+			final Map<Integer, Set<Integer>> germplasmEnvironments, final List<TrialEnvironment> trialEnvironments) {
+		for (final GermplasmPair pair : germplasmPairs) {
+			final int gid1 = pair.getGid1();
+			final int gid2 = pair.getGid2();
 
-			Set<Integer> g1Environments = germplasmEnvironments.get(gid1);
-			Set<Integer> g2Environments = germplasmEnvironments.get(gid2);
+			final Set<Integer> g1Environments = germplasmEnvironments.get(gid1);
+			final Set<Integer> g2Environments = germplasmEnvironments.get(gid2);
 
-			TrialEnvironments environments = new TrialEnvironments();
+			final TrialEnvironments environments = new TrialEnvironments();
 			if (g1Environments != null && g2Environments != null) {
-				for (Integer env1 : g1Environments) {
-					for (Integer env2 : g2Environments) {
+				for (final Integer env1 : g1Environments) {
+					for (final Integer env2 : g2Environments) {
 
 						if (env1.equals(env2)) {
-							int index = trialEnvironments.indexOf(new TrialEnvironment(env1));
+							final int index = trialEnvironments.indexOf(new TrialEnvironment(env1));
 							if (index > -1) {
-								TrialEnvironment newEnv = trialEnvironments.get(index);
+								final TrialEnvironment newEnv = trialEnvironments.get(index);
 								// If the environment has no traits, do not include in the list of common environments
 								if (newEnv != null && newEnv.getTraits() != null && !newEnv.getTraits().isEmpty()) {
 									environments.add(newEnv);
@@ -187,12 +189,12 @@ public class TrialEnvironmentBuilder extends Builder {
 		}
 	}
 
-	private Set<Integer> getEnvironmentIdsFromMap(Map<Integer, Set<Integer>> germplasmEnvironments) {
-		Set<Integer> idsToReturn = new HashSet<>();
+	private Set<Integer> getEnvironmentIdsFromMap(final Map<Integer, Set<Integer>> germplasmEnvironments) {
+		final Set<Integer> idsToReturn = new HashSet<>();
 
-		for (Entry<Integer, Set<Integer>> environmentIds : germplasmEnvironments.entrySet()) {
-			Set<Integer> ids = environmentIds.getValue();
-			for (Integer id : ids) {
+		for (final Entry<Integer, Set<Integer>> environmentIds : germplasmEnvironments.entrySet()) {
+			final Set<Integer> ids = environmentIds.getValue();
+			for (final Integer id : ids) {
 				idsToReturn.add(id);
 			}
 		}
@@ -200,8 +202,8 @@ public class TrialEnvironmentBuilder extends Builder {
 
 	}
 
-	public TrialEnvironments getEnvironmentsForTraits(List<Integer> traitIds) throws MiddlewareQueryException {
-		TrialEnvironments environments = new TrialEnvironments();
+	public TrialEnvironments getEnvironmentsForTraits(final List<Integer> traitIds) {
+		final TrialEnvironments environments = new TrialEnvironments();
 		environments.addAll(this.getGeolocationDao().getEnvironmentsForTraits(traitIds));
 		return environments;
 	}

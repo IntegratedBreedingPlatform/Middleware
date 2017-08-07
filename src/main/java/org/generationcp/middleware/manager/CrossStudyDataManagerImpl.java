@@ -25,7 +25,6 @@ import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,76 +39,75 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 	public CrossStudyDataManagerImpl() {
 	}
 
-	public CrossStudyDataManagerImpl(HibernateSessionProvider sessionProvider) {
+	public CrossStudyDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 	}
 
 	@Override
-	public TrialEnvironments getAllTrialEnvironments(boolean includePublicData) throws MiddlewareQueryException {
-		return this.getTrialEnvironmentBuilder().getAllTrialEnvironments(includePublicData);
+	public TrialEnvironments getAllTrialEnvironments() {
+		return this.getTrialEnvironmentBuilder().getAllTrialEnvironments();
 	}
 
 	@Override
-	public long countAllTrialEnvironments() throws MiddlewareQueryException {
+	public long countAllTrialEnvironments() {
 		return this.getTrialEnvironmentBuilder().countAllTrialEnvironments();
 	}
 
 	@Override
-	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> trialEnvtIds) throws MiddlewareQueryException {
+	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(final List<Integer> trialEnvtIds) {
 		return this.getTrialEnvironmentBuilder().getPropertiesForTrialEnvironments(trialEnvtIds);
 	}
 
 	@Override
-	public List<StudyReference> getStudiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
+	public List<StudyReference> getStudiesForTrialEnvironments(final List<Integer> environmentIds) {
 		return this.getStudyNodeBuilder().getStudiesForTrialEnvironments(environmentIds);
 	}
 
 	@Override
-	public List<NumericTraitInfo> getTraitsForNumericVariates(List<Integer> environmentIds) throws MiddlewareQueryException {
+	public List<NumericTraitInfo> getTraitsForNumericVariates(final List<Integer> environmentIds) {
 		return this.getTraitBuilder().getTraitsForNumericVariates(environmentIds);
 	}
 
 	@Override
-	public List<CharacterTraitInfo> getTraitsForCharacterVariates(List<Integer> environmentIds) throws MiddlewareQueryException {
+	public List<CharacterTraitInfo> getTraitsForCharacterVariates(final List<Integer> environmentIds) {
 		return this.getTraitBuilder().getTraitsForCharacterVariates(environmentIds);
 	}
 
 	@Override
-	public List<CategoricalTraitInfo> getTraitsForCategoricalVariates(List<Integer> environmentIds) throws MiddlewareQueryException {
+	public List<CategoricalTraitInfo> getTraitsForCategoricalVariates(final List<Integer> environmentIds) {
 		return this.getTraitBuilder().getTraitsForCategoricalVariates(environmentIds);
 	}
 
 	@Override
-	public List<GermplasmPair> getEnvironmentsForGermplasmPairs(List<GermplasmPair> germplasmPairs, boolean filterByTraits,
-		boolean filterByAnalysis) throws MiddlewareQueryException {
-		return this.getTrialEnvironmentBuilder().getEnvironmentForGermplasmPairs(germplasmPairs, filterByTraits, filterByAnalysis);
+	public List<GermplasmPair> getEnvironmentsForGermplasmPairs(final List<GermplasmPair> germplasmPairs,
+			final List<Integer> experimentTypes) {
+		return this.getTrialEnvironmentBuilder().getEnvironmentForGermplasmPairs(germplasmPairs, experimentTypes);
 	}
 
 	@Override
-	public List<Observation> getObservationsForTraitOnGermplasms(List<Integer> traitIds, List<Integer> germplasmIds,
-			List<Integer> environmentIds) throws MiddlewareQueryException {
+	public List<Observation> getObservationsForTraitOnGermplasms(final List<Integer> traitIds, final List<Integer> germplasmIds,
+			final List<Integer> environmentIds) {
 		return this.getTraitBuilder().getObservationsForTraitOnGermplasms(traitIds, germplasmIds, environmentIds);
 	}
 
 	@Override
-	public List<Observation> getObservationsForTraits(List<Integer> traitIds, List<Integer> environmentIds) throws MiddlewareQueryException {
+	public List<Observation> getObservationsForTraits(final List<Integer> traitIds, final List<Integer> environmentIds) {
 		return this.getTraitBuilder().getObservationsForTraits(traitIds, environmentIds);
 	}
 
 	@Override
-	public List<TraitObservation> getObservationsForTrait(int traitId, List<Integer> environmentIds) throws MiddlewareQueryException {
+	public List<TraitObservation> getObservationsForTrait(final int traitId, final List<Integer> environmentIds) {
 		return this.getTraitBuilder().getObservationsForTrait(traitId, environmentIds);
 	}
 
 	@Override
-	public TrialEnvironments getEnvironmentsForTraits(List<Integer> traitIds) throws MiddlewareQueryException {
+	public TrialEnvironments getEnvironmentsForTraits(final List<Integer> traitIds) {
 		return this.getTrialEnvironmentBuilder().getEnvironmentsForTraits(traitIds);
 	}
 
 	@Override
-	public List<GermplasmLocationInfo> getGermplasmLocationInfoByEnvironmentIds(Set<Integer> environmentIds)
-			throws MiddlewareQueryException {
-		List<GermplasmLocationInfo> result = new ArrayList<GermplasmLocationInfo>();
+	public List<GermplasmLocationInfo> getGermplasmLocationInfoByEnvironmentIds(final Set<Integer> environmentIds) {
+		final List<GermplasmLocationInfo> result = new ArrayList<>();
 		if (environmentIds != null && !environmentIds.isEmpty()) {
 			result.addAll(this.getBreedersQueryDao().getGermplasmLocationInfoByEnvironmentIds(environmentIds));
 		}
@@ -117,8 +115,8 @@ public class CrossStudyDataManagerImpl extends DataManager implements CrossStudy
 	}
 
 	@Override
-	public List<Integer> getTrialEnvironmentIdsForGermplasm(Set<Integer> gids) throws MiddlewareQueryException {
-		List<Integer> result = new ArrayList<Integer>();
+	public List<Integer> getTrialEnvironmentIdsForGermplasm(final Set<Integer> gids) {
+		final List<Integer> result = new ArrayList<>();
 		if (gids != null && !gids.isEmpty()) {
 			result.addAll(this.getBreedersQueryDao().getTrialEnvironmentIdsForGermplasm(gids));
 		}
