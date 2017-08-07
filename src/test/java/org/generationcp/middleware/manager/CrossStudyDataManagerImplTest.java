@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.h2h.GermplasmPair;
 import org.generationcp.middleware.domain.h2h.NumericTraitInfo;
 import org.generationcp.middleware.domain.h2h.Observation;
 import org.generationcp.middleware.domain.h2h.TraitObservation;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Test;
@@ -37,116 +38,113 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 	private CrossStudyDataManager crossStudyDataManager;
 
 	@Test
-	public void testGetAllTrialEnvironments() throws Exception {
-		TrialEnvironments environments = this.crossStudyDataManager.getAllTrialEnvironments(false);
+	public void testGetAllTrialEnvironments() {
+		final TrialEnvironments environments = this.crossStudyDataManager.getAllTrialEnvironments(	);
 		environments.print(IntegrationTestBase.INDENT);
 		Debug.println(IntegrationTestBase.INDENT, "#RECORDS: " + environments.size());
 	}
 
 	@Test
-	public void testCountAllTrialEnvironments() throws Exception {
-		long count = this.crossStudyDataManager.countAllTrialEnvironments();
+	public void testCountAllTrialEnvironments() {
+		final long count = this.crossStudyDataManager.countAllTrialEnvironments();
 		Debug.println(IntegrationTestBase.INDENT, "#RECORDS: " + count);
 	}
 
 	@Test
-	public void testGetPropertiesForTrialEnvironments() throws Exception {
-		List<Integer> environmentIds = Arrays.asList(5770, 10081, -1);
+	public void testGetPropertiesForTrialEnvironments() {
+		final List<Integer> environmentIds = Arrays.asList(5770, 10081, -1);
 		Debug.println("testGetPropertiesForTrialEnvironments = " + environmentIds);
-		List<TrialEnvironmentProperty> properties = this.crossStudyDataManager.getPropertiesForTrialEnvironments(environmentIds);
-		for (TrialEnvironmentProperty property : properties) {
+		final List<TrialEnvironmentProperty> properties = this.crossStudyDataManager.getPropertiesForTrialEnvironments(environmentIds);
+		for (final TrialEnvironmentProperty property : properties) {
 			property.print(0);
 		}
 		Debug.println("#RECORDS: " + properties.size());
 	}
 
 	@Test
-	public void testGetStudiesForTrialEnvironments() throws Exception {
-		List<Integer> environmentIds = Arrays.asList(5770, 10081);
+	public void testGetStudiesForTrialEnvironments() {
+		final List<Integer> environmentIds = Arrays.asList(5770, 10081);
 		Debug.println(IntegrationTestBase.INDENT, "testGetStudiesForTrialEnvironments = " + environmentIds);
-		List<StudyReference> studies = this.crossStudyDataManager.getStudiesForTrialEnvironments(environmentIds);
-		for (StudyReference study : studies) {
+		final List<StudyReference> studies = this.crossStudyDataManager.getStudiesForTrialEnvironments(environmentIds);
+		for (final StudyReference study : studies) {
 			study.print(IntegrationTestBase.INDENT);
 		}
 		Debug.println(IntegrationTestBase.INDENT, "#RECORDS: " + studies.size());
 	}
 
 	@Test
-	public void testGetTraitsForNumericVariates() throws Exception {
-		List<Integer> environmentIds = Arrays.asList(10081, 10082, 10083, 10084, 10085, 10086, 10087); // Rice
-		List<NumericTraitInfo> result = this.crossStudyDataManager.getTraitsForNumericVariates(environmentIds);
-		for (NumericTraitInfo trait : result) {
+	public void testGetTraitsForNumericVariates() {
+		final List<Integer> environmentIds = Arrays.asList(10081, 10082, 10083, 10084, 10085, 10086, 10087); // Rice
+		final List<NumericTraitInfo> result = this.crossStudyDataManager.getTraitsForNumericVariates(environmentIds);
+		for (final NumericTraitInfo trait : result) {
 			trait.print(IntegrationTestBase.INDENT);
 		}
 		Debug.println(IntegrationTestBase.INDENT, "#RECORDS: " + result.size());
 	}
 
 	@Test
-	public void testGetTraitsForCharacterVariates() throws Exception {
-		List<Integer> environmentIds = Arrays.asList(10040, 10050, 10060, 10070); // Rice
-		List<CharacterTraitInfo> result = this.crossStudyDataManager.getTraitsForCharacterVariates(environmentIds);
-		for (CharacterTraitInfo trait : result) {
+	public void testGetTraitsForCharacterVariates() {
+		final List<Integer> environmentIds = Arrays.asList(10040, 10050, 10060, 10070); // Rice
+		final List<CharacterTraitInfo> result = this.crossStudyDataManager.getTraitsForCharacterVariates(environmentIds);
+		for (final CharacterTraitInfo trait : result) {
 			trait.print(IntegrationTestBase.INDENT);
 		}
 		Debug.println(IntegrationTestBase.INDENT, "#RECORDS: " + result.size());
 	}
 
 	@Test
-	public void testGetTraitsForCategoricalVariates() throws Exception {
-		List<Integer> environmentIds = Arrays.asList(10010, 10020, 10030, 10040, 10050, 10060, 10070); // Rice
-		List<CategoricalTraitInfo> result = this.crossStudyDataManager.getTraitsForCategoricalVariates(environmentIds);
-		for (CategoricalTraitInfo trait : result) {
+	public void testGetTraitsForCategoricalVariates() {
+		final List<Integer> environmentIds = Arrays.asList(10010, 10020, 10030, 10040, 10050, 10060, 10070); // Rice
+		final List<CategoricalTraitInfo> result = this.crossStudyDataManager.getTraitsForCategoricalVariates(environmentIds);
+		for (final CategoricalTraitInfo trait : result) {
 			trait.print(IntegrationTestBase.INDENT);
 		}
 		Debug.println(IntegrationTestBase.INDENT, "#RECORDS: " + result.size());
 	}
 
 	@Test
-	public void testGetEnvironmentsForGermplasmPairs() throws Exception {
-		List<GermplasmPair> pairs = new ArrayList<>();
-
+	public void testGetEnvironmentsForGermplasmPairs() {
+		final List<GermplasmPair> pairs = new ArrayList<>();
 		// Case 1: Central - Central
 		pairs.add(new GermplasmPair(2434138, 1356114));
 
-		// Case 2: Local - Local
-		pairs.add(new GermplasmPair(-1, -2));
-
-		// Case 3: Central - Local
-
-		List<GermplasmPair> result = this.crossStudyDataManager.getEnvironmentsForGermplasmPairs(pairs,false,false);
-		for (GermplasmPair pair : result) {
+		// Include both traits and analysis variables
+		final List<Integer> experimentTypes = Arrays.asList(TermId.PLOT_EXPERIMENT.getId(), TermId.AVERAGE_EXPERIMENT.getId());
+		final List<GermplasmPair> result = this.crossStudyDataManager.getEnvironmentsForGermplasmPairs(pairs, experimentTypes);
+		for (final GermplasmPair pair : result) {
 			pair.print(IntegrationTestBase.INDENT);
 		}
 		Debug.println(IntegrationTestBase.INDENT, "#RECORDS: " + result.size());
 	}
 
 	@Test
-	public void testGetObservationsForTraitOnGermplasms() throws Exception {
+	public void testGetObservationsForTraitOnGermplasms() {
 
-		List<Integer> traitIds = Arrays.asList(18020, 18180, 18190, 18200);
-		List<Integer> germplasmIds = Arrays.asList(1709);
-		List<Integer> environmentIds = Arrays.asList(10081, 10084, 10085, 10086);
+		final List<Integer> traitIds = Arrays.asList(18020, 18180, 18190, 18200);
+		final List<Integer> germplasmIds = Arrays.asList(1709);
+		final List<Integer> environmentIds = Arrays.asList(10081, 10084, 10085, 10086);
 
-		List<Observation> result = this.crossStudyDataManager.getObservationsForTraitOnGermplasms(traitIds, germplasmIds, environmentIds);
+		final List<Observation> result =
+				this.crossStudyDataManager.getObservationsForTraitOnGermplasms(traitIds, germplasmIds, environmentIds);
 
-		for (Observation observation : result) {
+		for (final Observation observation : result) {
 			observation.print(IntegrationTestBase.INDENT);
 		}
 		Debug.println(IntegrationTestBase.INDENT, "#RECORDS: " + result.size());
 	}
 
 	@Test
-	public void testGetObservationsForTrait() throws Exception {
-		int traitId = 22574;
-		List<Integer> environmentIds = Arrays.asList(5771, 5772, 5773, 5774, 5775, 5776); // Rice
-		List<TraitObservation> result = this.crossStudyDataManager.getObservationsForTrait(traitId, environmentIds);
+	public void testGetObservationsForTrait() {
+		final int traitId = 22574;
+		final List<Integer> environmentIds = Arrays.asList(5771, 5772, 5773, 5774, 5775, 5776); // Rice
+		final List<TraitObservation> result = this.crossStudyDataManager.getObservationsForTrait(traitId, environmentIds);
 		Debug.printObjects(IntegrationTestBase.INDENT, result);
 	}
 
 	@Test
-	public void testGetEnvironmentsForTraits() throws Exception {
-		List<Integer> traitIds = Arrays.asList(22006, 22485);
-		TrialEnvironments environments = this.crossStudyDataManager.getEnvironmentsForTraits(traitIds);
+	public void testGetEnvironmentsForTraits() {
+		final List<Integer> traitIds = Arrays.asList(22006, 22485);
+		final TrialEnvironments environments = this.crossStudyDataManager.getEnvironmentsForTraits(traitIds);
 		environments.print(IntegrationTestBase.INDENT);
 		Debug.println(IntegrationTestBase.INDENT, "#RECORDS: " + environments.size());
 	}
