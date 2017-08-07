@@ -11,7 +11,7 @@ import java.io.Serializable;
 public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetailsDto> {
 
 	private static final long serialVersionUID = 9163866215679883266L;
-	private Integer programDbId;
+	private String programDbId;
 	private String name;
 	private String abbreviation;
 	private String objective;
@@ -21,7 +21,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 
 	}
 
-	public ProgramDetailsDto(final Integer programDbId, final String name, final String abbreviation, final String objective,
+	public ProgramDetailsDto(final String programDbId, final String name, final String abbreviation, final String objective,
 		final String leadPerson) {
 
 		this.programDbId = programDbId;
@@ -31,11 +31,11 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 		this.leadPerson = leadPerson;
 	}
 
-	public Integer getProgramDbId() {
+	public String getProgramDbId() {
 		return programDbId;
 	}
 
-	public void setProgramDbId(Integer programDbId) {
+	public void setProgramDbId(String programDbId) {
 		this.programDbId = programDbId;
 	}
 
@@ -91,8 +91,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 	}
 
 	@Override
-	public int compareTo(final ProgramDetailsDto compareProgramDetails) {
-		Integer id = compareProgramDetails.getProgramDbId();
+	public int compareTo(final ProgramDetailsDto compareProgramDetails) { String id = compareProgramDetails.getProgramDbId();
 		return this.programDbId.compareTo(id);
 	}
 }
