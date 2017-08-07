@@ -125,16 +125,20 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 	 */
 	public void setVariableTypeIfNull(){
 
-		if(this.getVariableType() != null) {
+		if (this.getVariableType() != null) {
 			return;
 		}
 
-		if(this.getRole() == null){
+		if (this.getRole() == null) {
 			return;
 		}
 
 		StandardVariable standardVariable = this.getStandardVariable();
-		String propertyName = standardVariable.getProperty().getName();
+		String propertyName = "";
+		if (standardVariable != null && standardVariable.getProperty() != null) {
+			propertyName = standardVariable.getProperty().getName();
+		}
+
 		this.setVariableType(OntologyDataHelper.mapFromPhenotype(this.getRole(), propertyName));
 	}
 
