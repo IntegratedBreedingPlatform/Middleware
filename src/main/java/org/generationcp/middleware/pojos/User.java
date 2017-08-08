@@ -65,6 +65,13 @@ public class User implements Serializable, BeanFormState {
 	public static final String GET_BY_FULLNAME = "getByFullName";
 	public static final String GET_ALL_USERS_SORTED = "getAllUsersSorted";
 
+	public static final String GET_USERS_BY_PROJECT_UUID =
+		"SELECT users.userid, users.uname, person.fname, person.lname, role.name, users.ustatus, person.pemail\n"
+			+ "FROM users JOIN workbench_project_user_role pu ON users.userid = pu.user_id,\n" + "persons person,\n"
+			+ "workbench_project pp,\n" + "workbench_role role\n" + "WHERE pp.project_uuid = :project_uuid  \n"
+			+ "and person.personid=users.personid\n" + "and role.role_id = pu.role_id\n"
+			+ "and pu.project_id = pp.project_id GROUP BY users.userid";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
