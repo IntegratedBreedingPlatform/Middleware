@@ -50,44 +50,51 @@ public class SampleListServiceImpl implements SampleListService {
 		this.studyMeasurements = new StudyMeasurements(sessionProvider.getSession());
 	}
 
-	@Override public Integer createOrUpdateSampleList(SampleListDTO sampleListDTO) {
-		SampleList sampleList = new SampleList();
+	@Override
+	public Integer createOrUpdateSampleList(SampleListDTO sampleListDTO) {
+		if (sampleListDTO.getSelectionVariableId() != null && !sampleListDTO.getInstanceIds().isEmpty()
+			&& sampleListDTO.getStudyId() != null) {
 
-		sampleList.setCreatedDate(new Date());
-		sampleList.setCreatedBy(userDao.getUserByUserName(sampleListDTO.getCreatedBy()));
-		sampleList.setDescription(sampleListDTO.getDescription());
-		sampleList.setListName(sampleListDTO.getTrialName() + "#" + Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS"));
-		sampleList.setNotes(sampleListDTO.getNotes());
-		sampleList.setType(sampleListDTO.getType());
+			SampleList sampleList = new SampleList();
 
-		List<ObservationDto> observationDtos = studyMeasurements
-			.getSampleObservations(sampleListDTO.getStudyId(), sampleListDTO.getInstanceIds(), sampleListDTO.getSelectionVariableId());
+			sampleList.setCreatedDate(new Date());
+			sampleList.setCreatedBy(userDao.getUserByUserName(sampleListDTO.getCreatedBy()));
+			sampleList.setDescription(sampleListDTO.getDescription());
+			sampleList.setListName(sampleListDTO.getTrialName() + "#" + Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS"));
+			sampleList.setNotes(sampleListDTO.getNotes());
+			sampleList.setType(sampleListDTO.getType());
 
-		Map<Integer, Integer> maxPlantNumbers = this.getMaxPlantNumber(observationDtos);
-		List<Sample> samples = new ArrayList<>();
-		Iterator<ObservationDto> observationsIterator = observationDtos.iterator();
+			List<ObservationDto> observationDtos = studyMeasurements
+				.getSampleObservations(sampleListDTO.getStudyId(), sampleListDTO.getInstanceIds(), sampleListDTO.getSelectionVariableId());
 
-		while (observationsIterator.hasNext()) {
+			if (!observationDtos.isEmpty()) {
 
-			ObservationDto observationDto = observationsIterator.next();
-			Integer sampleNumber = new Integer(observationDto.getVariableMeasurements().get(0).getVariableValue());
-			Integer count = maxPlantNumbers.get(observationDto.getMeasurementId());
-			if (count == null) {
-				//counter should be start in 1
-				count = 0;
-			}
-			for (int i = 0; i < sampleNumber; i++) {
-				count++;
-				Sample sample = sampleService
-					.createOrUpdateSample(sampleListDTO.getCropName(), count, sampleListDTO.getTakenBy(), observationDto.getDesignation(),
-						sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList);
-				samples.add(sample);
+				Map<Integer, Integer> maxPlantNumbers = this.getMaxPlantNumber(observationDtos);
+				List<Sample> samples = new ArrayList<>();
+
+				for (ObservationDto observationDto : observationDtos) {
+
+					Integer sampleNumber = new Integer(observationDto.getVariableMeasurements().get(0).getVariableValue());
+					Integer count = maxPlantNumbers.get(observationDto.getMeasurementId());
+					if (count == null) {
+						//counter should be start in 1
+						count = 0;
+					}
+					for (int i = 0; i < sampleNumber; i++) {
+						count++;
+						Sample sample = sampleService.createOrUpdateSample(sampleListDTO.getCropName(), count, sampleListDTO.getTakenBy(),
+							observationDto.getDesignation(), sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(),
+							sampleList);
+						samples.add(sample);
+					}
+				}
+
+				sampleList.setSamples(samples);
+				this.sampleListDao.saveOrUpdate(sampleList);
+				return sampleList.getListId();
 			}
 		}
-
-		sampleList.setSamples(samples);
-		this.sampleListDao.saveOrUpdate(sampleList);
-		return sampleList.getListId();
+		return null;
 	}
 
 	private Map<Integer, Integer> getMaxPlantNumber(List<ObservationDto> observationDtos) {
