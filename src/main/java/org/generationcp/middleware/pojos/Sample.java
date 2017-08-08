@@ -53,7 +53,7 @@ public class Sample implements Serializable {
 	private String sampleBusinessKey;
 
 	@JoinColumn(name = "plant_id")
-	@OneToOne(targetEntity = Plant.class)
+	@OneToOne(targetEntity = Plant.class, cascade = CascadeType.ALL)
 	private Plant plant;
 
 	@ManyToOne(targetEntity = SampleList.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)

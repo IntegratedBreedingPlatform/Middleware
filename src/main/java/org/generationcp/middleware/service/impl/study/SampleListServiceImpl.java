@@ -80,7 +80,7 @@ public class SampleListServiceImpl implements SampleListService {
 				count++;
 				Sample sample = sampleService
 					.createOrUpdateSample(sampleListDTO.getCropName(), count, sampleListDTO.getTakenBy(), observationDto.getDesignation(),
-						sampleListDTO.getSamplingDate(), observationDto.getMeasurementId());
+						sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList);
 				samples.add(sample);
 			}
 		}

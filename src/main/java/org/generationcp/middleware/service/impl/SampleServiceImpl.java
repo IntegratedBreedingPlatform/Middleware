@@ -8,6 +8,7 @@ import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Sample;
+import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
@@ -16,7 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 
-@Transactional public class SampleServiceImpl implements SampleService {
+@Transactional
+public class SampleServiceImpl implements SampleService {
 
 	private static final String S = "S";
 
@@ -25,8 +27,7 @@ import java.util.Date;
 	private PlantDao plantDao;
 	private UserDAO userDao;
 
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	@Autowired private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired private SampleListService sampleListService;
 
@@ -48,7 +49,7 @@ import java.util.Date;
 
 	@Override
 	public Sample createOrUpdateSample(String cropName, Integer plantNumber, String username, String sampleName, Date samplingDate,
-		Integer experimentId) {
+		Integer experimentId, SampleList sampleList) {
 
 		Sample sample = new Sample();
 		String cropPrefix = this.workbenchDataManager.getCropTypeByName(cropName).getPlotCodePrefix();
@@ -58,6 +59,7 @@ import java.util.Date;
 		sample.setCreatedDate(new Date());
 		sample.setSamplingDate(samplingDate);
 		sample.setSampleBusinessKey(this.getSampleBusinessKey(cropPrefix));
+		sample.setSampleList(sampleList);
 
 		return sample;
 	}
