@@ -17,16 +17,14 @@ import java.util.List;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Locdes;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
@@ -360,6 +358,33 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
+
+	public List<UserDto> getUsersByProjectUUId(final String projectUUID) {
+		final List<UserDto> users = new ArrayList<>();
+		try {
+			if (projectUUID != null) {
+				final SQLQuery query = this.getSession().createSQLQuery(User.GET_USERS_BY_PROJECT_UUID);
+				query.setParameter("project_uuid", projectUUID);
+				final List<Object> results = query.list();
+				for (final Object o : results) {
+					final Object[] user = (Object[]) o;
+					final Integer userId = (Integer) user[0];
+					final String username = (String) user[1];
+					final String firstName = (String) user[2];
+					final String lastName = (String) user[3];
+					final String role = (String) user[4];
+					final Integer status = (Integer) user[5];
+					final String email = (String) user[6];
+					final UserDto u = new UserDto(userId, username, firstName, lastName, role, status, email);
+					users.add(u);
+				}
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in getUsersByProjectUUId(project_uuid=" + projectUUID + ")" + e.getMessage(), e);
+		}
+		return users;
+	}
+
 
 	private void mapUsers(List<UserDto> users, List<Object> results) {
 		for (Object obj : results) {
