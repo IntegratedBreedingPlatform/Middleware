@@ -1450,6 +1450,12 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
+	public List<UserDto> getUsersByProjectUUID(final String project_uuid) throws MiddlewareQueryException {
+		return this.getUserDao().getUsersByProjectUUId(project_uuid);
+
+	}
+
+	@Override
 	public Integer createUser(final UserDto userDto) throws MiddlewareQueryException {
 
 		Integer idUserSaved = null;

@@ -42,6 +42,16 @@ public class UserDto implements Serializable, Comparable<UserDto> {
 		this.role = "TECHNICIAN";
 	}
 
+	public UserDto(Integer userId, String username, String firstName, String lastName, String role, Integer status, String email) {
+		this.userId = userId;
+		this.username = username;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.role = role;
+		this.status = status;
+		this.email = email;
+	}
+
 	public Integer getUserId() {
 		return this.userId;
 	}

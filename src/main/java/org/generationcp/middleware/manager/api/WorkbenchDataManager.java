@@ -958,4 +958,11 @@ public interface WorkbenchDataManager {
 	 */
 	public Integer updateUser(UserDto userDto) throws MiddlewareQueryException;
 
+	/**
+	 * Gets the user by project_uuid.
+	 * @param project_uuid
+	 * @return the user matching the given project_uuid
+	 * @throws MiddlewareQueryException
+	 */
+	List<UserDto> getUsersByProjectUUID(final String project_uuid) throws MiddlewareQueryException;
 }
