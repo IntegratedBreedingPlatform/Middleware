@@ -56,9 +56,8 @@ public class Sample implements Serializable {
 	@OneToOne(targetEntity = Plant.class, cascade = CascadeType.ALL)
 	private Plant plant;
 
-	@ManyToOne(targetEntity = SampleList.class, fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	@ManyToOne
 	@JoinColumn(name = "sample_list")
-	@NotFound(action = NotFoundAction.IGNORE)
 	private SampleList sampleList;
 
 	public Sample() {
