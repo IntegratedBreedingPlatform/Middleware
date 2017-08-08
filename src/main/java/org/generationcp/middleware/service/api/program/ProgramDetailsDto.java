@@ -7,7 +7,6 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.io.Serializable;
 
-
 public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetailsDto> {
 
 	private static final long serialVersionUID = 9163866215679883266L;
@@ -22,7 +21,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 	}
 
 	public ProgramDetailsDto(final String programDbId, final String name, final String abbreviation, final String objective,
-		final String leadPerson) {
+			final String leadPerson) {
 
 		this.programDbId = programDbId;
 		this.name = name;
@@ -35,7 +34,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 		return programDbId;
 	}
 
-	public void setProgramDbId(String programDbId) {
+	public void setProgramDbId(final String programDbId) {
 		this.programDbId = programDbId;
 	}
 
@@ -43,7 +42,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -51,7 +50,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 		return abbreviation;
 	}
 
-	public void setAbbreviation(String abbreviation) {
+	public void setAbbreviation(final String abbreviation) {
 		this.abbreviation = abbreviation;
 	}
 
@@ -59,7 +58,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 		return objective;
 	}
 
-	public void setObjective(String objective) {
+	public void setObjective(final String objective) {
 		this.objective = objective;
 	}
 
@@ -67,7 +66,7 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 		return leadPerson;
 	}
 
-	public void setLeadPerson(String leadPerson) {
+	public void setLeadPerson(final String leadPerson) {
 		this.leadPerson = leadPerson;
 	}
 
@@ -91,7 +90,8 @@ public class ProgramDetailsDto implements Serializable, Comparable<ProgramDetail
 	}
 
 	@Override
-	public int compareTo(final ProgramDetailsDto compareProgramDetails) { String id = compareProgramDetails.getProgramDbId();
+	public int compareTo(final ProgramDetailsDto compareProgramDetails) {
+		final String id = compareProgramDetails.getProgramDbId();
 		return this.programDbId.compareTo(id);
 	}
 }
