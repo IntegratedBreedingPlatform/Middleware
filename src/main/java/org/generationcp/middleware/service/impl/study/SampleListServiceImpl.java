@@ -6,15 +6,15 @@ import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
-import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,7 +40,7 @@ public class SampleListServiceImpl implements SampleListService {
 	private SampleService sampleService;
 
 	@Autowired
-	private StudyService studyService;
+	private StudyDataManager studyService;
 
 	private PlantDao plantDao;
 
@@ -61,14 +61,14 @@ public class SampleListServiceImpl implements SampleListService {
 		if (sampleListDTO.getSelectionVariableId() != null && !sampleListDTO.getInstanceIds().isEmpty()
 			&& sampleListDTO.getStudyId() != null) {
 
-			StudyDetailsDto studyDetailsDto = studyService.getStudyDetails(sampleListDTO.getStudyId());
+			Study study = studyService.getStudy(sampleListDTO.getStudyId());
 			SampleList sampleList = new SampleList();
 
 			sampleList.setCreatedDate(new Date());
 			sampleList.setCreatedBy(userDao.getUserByUserName(sampleListDTO.getCreatedBy()));
 			sampleList.setDescription(sampleListDTO.getDescription());
 			sampleList
-				.setListName(studyDetailsDto.getMetadata().getTrialName() + "#" + Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS"));
+				.setListName(study.getName() + "#" + Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS"));
 			sampleList.setNotes(sampleListDTO.getNotes());
 			sampleList.setType(sampleListDTO.getType());
 
