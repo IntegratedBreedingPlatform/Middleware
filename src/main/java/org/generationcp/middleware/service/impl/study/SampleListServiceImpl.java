@@ -13,6 +13,8 @@ import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.api.study.StudyDetailsDto;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -35,7 +36,12 @@ public class SampleListServiceImpl implements SampleListService {
 
 	private StudyMeasurements studyMeasurements;
 
-	@Autowired private SampleService sampleService;
+	@Autowired
+	private SampleService sampleService;
+
+	@Autowired
+	private StudyService studyService;
+
 	private PlantDao plantDao;
 
 	public SampleListServiceImpl(HibernateSessionProvider sessionProvider) {
@@ -55,12 +61,14 @@ public class SampleListServiceImpl implements SampleListService {
 		if (sampleListDTO.getSelectionVariableId() != null && !sampleListDTO.getInstanceIds().isEmpty()
 			&& sampleListDTO.getStudyId() != null) {
 
+			StudyDetailsDto studyDetailsDto = studyService.getStudyDetails(sampleListDTO.getStudyId());
 			SampleList sampleList = new SampleList();
 
 			sampleList.setCreatedDate(new Date());
 			sampleList.setCreatedBy(userDao.getUserByUserName(sampleListDTO.getCreatedBy()));
 			sampleList.setDescription(sampleListDTO.getDescription());
-			sampleList.setListName(sampleListDTO.getTrialName() + "#" + Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS"));
+			sampleList
+				.setListName(studyDetailsDto.getMetadata().getTrialName() + "#" + Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS"));
 			sampleList.setNotes(sampleListDTO.getNotes());
 			sampleList.setType(sampleListDTO.getType());
 
@@ -101,7 +109,8 @@ public class SampleListServiceImpl implements SampleListService {
 
 		final Collection<Integer> experimentIds = CollectionUtils.collect(observationDtos, new Transformer() {
 
-			@Override public Object transform(final Object input) {
+			@Override
+			public Object transform(final Object input) {
 				final ObservationDto observationDto = (ObservationDto) input;
 				return observationDto.getMeasurementId();
 			}

@@ -13,8 +13,6 @@ public class SampleListDTO implements Serializable {
 
 	private Integer listId;
 
-	private String listName;
-
 	private String description;
 
 	private String type;
@@ -98,14 +96,6 @@ public class SampleListDTO implements Serializable {
 
 	public void setListId(Integer listId) {
 		this.listId = listId;
-	}
-
-	public String getTrialName() {
-		return listName;
-	}
-
-	public void setTrialName(String listName) {
-		this.listName = listName;
 	}
 
 	public String getDescription() {
