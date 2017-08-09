@@ -119,7 +119,7 @@ class ObservationQuery {
 		+ "        LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n"
 		+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n" + " WHERE \n"
 		+ "\tp.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId \n"
-		+ "    AND name LIKE '%PLOTDATA')) \n" + " AND gl.nd_geolocation_id IN (:instanceIds) \n"
+		+ "    AND name LIKE '%PLOTDATA')) \n" + " AND gl.description IN (:instanceIds) \n"
 		+ " and cvterm_variable.cvterm_id = :selectionVariableId\n" + " GROUP BY nde.nd_experiment_id";
 
 	String getAllObservationsQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors, final String sortBy,
