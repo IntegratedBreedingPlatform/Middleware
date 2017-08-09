@@ -14,7 +14,7 @@
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE sample (
 			sample_id INT NOT NULL AUTO_INCREMENT,
-			sample_name VARCHAR(45) NOT NULL,
+			sample_name VARCHAR(100) NOT NULL,
 			taken_by INT(11) NULL,
 			sampling_date DATE NULL,
 			created_date DATE NOT NULL,
@@ -82,7 +82,7 @@
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE sample_list (
 			list_id INT NOT NULL AUTO_INCREMENT,
-			list_name VARCHAR(45) NOT NULL,
+			list_name VARCHAR(100) NOT NULL,
 			description VARCHAR(45) NULL,
 			hierarchy INT NULL,
 			list_type VARCHAR(30) NOT NULL,
