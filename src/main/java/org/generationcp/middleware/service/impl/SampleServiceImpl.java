@@ -54,7 +54,11 @@ public class SampleServiceImpl implements SampleService {
 		Sample sample = new Sample();
 		String cropPrefix = this.workbenchDataManager.getCropTypeByName(cropName).getPlotCodePrefix();
 		sample.setPlant(plantService.createOrUpdatePlant(cropPrefix, plantNumber, experimentId));
-		sample.setTakenBy(userDao.getUserByUserName(username));
+
+		if (!username.isEmpty()) {
+			sample.setTakenBy(userDao.getUserByUserName(username));
+		}
+
 		sample.setSampleName(sampleName);//Preferred name GID
 		sample.setCreatedDate(new Date());
 		sample.setSamplingDate(samplingDate);

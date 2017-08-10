@@ -57,7 +57,7 @@ public class SampleList implements Serializable {
 	private String notes;
 
 	@ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "taken_by")
+	@JoinColumn(name = "created_by")
 	@NotFound(action = NotFoundAction.IGNORE)
 	private User createdBy;
 

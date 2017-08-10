@@ -88,10 +88,10 @@
 			list_type VARCHAR(30) NOT NULL,
 			created_date DATE NOT NULL,
 			notes VARCHAR(45) NULL,
-			taken_by INT(11) NULL,
+			created_by INT(11) NULL,
 			PRIMARY KEY (list_id),
-			INDEX fk_sample_list_user_idx (taken_by ASC),
-			CONSTRAINT fk_sample_list_user FOREIGN KEY (taken_by)
+			INDEX fk_sample_list_user_idx (created_by ASC),
+			CONSTRAINT fk_sample_list_user FOREIGN KEY (created_by)
 			REFERENCES users (userid)
 			ON DELETE NO ACTION ON UPDATE NO ACTION
 			);
