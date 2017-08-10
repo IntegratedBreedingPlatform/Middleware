@@ -68,7 +68,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 							+ "LEFT JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
 							+ "LEFT JOIN project_relationship pr ON pr.subject_project_id = ep.project_id "
 							+ "LEFT JOIN project p ON pr.object_project_id = p.project_id " + "WHERE s.dbxref_id = " + gid
-							+ " AND p.project_id NOT IN (SELECT pp.project_id FROM projectprop pp WHERE pp.type_id = "
+							+ " AND p.project_id NOT IN (SELECT pp.project_id FROM projectprop pp WHERE pp.variable_id = "
 							+ TermId.STUDY_STATUS.getId() + " AND pp.value = " + TermId.DELETED_STUDY.getId() + ")");
 			return ((BigInteger) query.uniqueResult()).longValue();
 
@@ -88,8 +88,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 							+ "LEFT JOIN nd_experiment_project ep ON ep.nd_experiment_id = e.nd_experiment_id "
 							+ "LEFT JOIN project_relationship pr ON pr.subject_project_id = ep.project_id "
 							+ "LEFT JOIN project p ON pr.object_project_id = p.project_id "
-							+ "LEFT OUTER JOIN projectprop prop ON prop.project_id = p.project_id AND prop.type_id = " + TermId.STUDY_TYPE.getId()
-							+ " WHERE s.dbxref_id = " + gid + " AND p.project_id NOT IN (SELECT pp.project_id FROM projectprop pp WHERE pp.type_id = "
+							+ "LEFT OUTER JOIN projectprop prop ON prop.project_id = p.project_id AND prop.variable_id = " + TermId.STUDY_TYPE.getId()
+							+ " WHERE s.dbxref_id = " + gid + " AND p.project_id NOT IN (SELECT pp.project_id FROM projectprop pp WHERE pp.variable_id = "
 							+ TermId.STUDY_STATUS.getId() + " AND pp.value = " + TermId.DELETED_STUDY.getId() + ")");
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
