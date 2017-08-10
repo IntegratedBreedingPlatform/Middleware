@@ -85,7 +85,6 @@
 			list_name VARCHAR(100) NOT NULL,
 			description VARCHAR(45) NULL,
 			hierarchy INT NULL,
-			list_type VARCHAR(30) NOT NULL,
 			created_date DATE NOT NULL,
 			notes VARCHAR(45) NULL,
 			created_by INT(11) NULL,
@@ -146,6 +145,14 @@
 			ON DELETE NO ACTION
 			ON UPDATE NO ACTION;
 		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2-7">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'plant'
+				AND CONSTRAINT_NAME='plant_no_exp' and TABLE_SCHEMA = DATABASE();</sqlCheck>
+		</preConditions>
+		<addUniqueConstraint columnNames="nd_experiment_id, plant_no" constraintName="plant_no_exp" tableName="plant" />
 	</changeSet>
 
 </databaseChangeLog>

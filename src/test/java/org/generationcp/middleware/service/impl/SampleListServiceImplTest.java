@@ -19,13 +19,12 @@ import java.util.Date;
 public class SampleListServiceImplTest extends IntegrationTestBase {
 
 	public static final String P = "P";
-	private static final String SAMPLE_LIST_TYPE = "SAMPLE LIST";
 	public static final String ADMIN = "admin";
 	public static final String DESCRIPTION = "description";
-	public static final String YYYY_M_MDD_HH = "yyyyMMddHH";
-	public static final String TRIAL_NAME = "trialName#";
+	private static final String YYYY_M_MDD_HH = "yyyyMMddHH";
+	private static final String TRIAL_NAME = "trialName#";
 	public static final String NOTES = "Notes";
-	public static final String CROP_PREFIX = "ABCD";
+	private static final String CROP_PREFIX = "ABCD";
 	public static final String GID = "GID";
 	public static final String S = "S";
 
@@ -54,7 +53,6 @@ public class SampleListServiceImplTest extends IntegrationTestBase {
 		sampleList.setDescription(DESCRIPTION);
 		sampleList.setListName(TRIAL_NAME + Util.getCurrentDateAsStringValue(YYYY_M_MDD_HH));
 		sampleList.setNotes(NOTES);
-		sampleList.setType(SAMPLE_LIST_TYPE);
 
 		Plant plant = getPlant();
 		Sample sample = new Sample();
@@ -66,7 +64,6 @@ public class SampleListServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(sampleList.getDescription(), DESCRIPTION);
 		Assert.assertEquals(sampleList.getListName(), TRIAL_NAME + Util.getCurrentDateAsStringValue(YYYY_M_MDD_HH));
 		Assert.assertEquals(sampleList.getNotes(), NOTES);
-		Assert.assertEquals(sampleList.getType(), SAMPLE_LIST_TYPE);
 		Assert.assertEquals(plant.getPlantBusinessKey(), P + CROP_PREFIX);
 		Assert.assertEquals(plant.getPlantNumber(), new Integer(0));
 		Assert.assertEquals(sample.getPlant(), plant);

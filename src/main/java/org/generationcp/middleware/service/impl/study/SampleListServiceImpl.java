@@ -70,7 +70,6 @@ public class SampleListServiceImpl implements SampleListService {
 			sampleList
 				.setListName(study.getName() + "#" + Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS"));
 			sampleList.setNotes(sampleListDTO.getNotes());
-			sampleList.setType(sampleListDTO.getType());
 
 			List<ObservationDto> observationDtos = studyMeasurements
 				.getSampleObservations(sampleListDTO.getStudyId(), sampleListDTO.getInstanceIds(), sampleListDTO.getSelectionVariableId());

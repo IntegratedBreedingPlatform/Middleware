@@ -45,10 +45,6 @@ public class SampleList implements Serializable {
 	@NotFound(action = NotFoundAction.IGNORE)
 	private SampleList hierarchy;
 
-	@Column(name = "list_type")
-	@Basic(optional = false)
-	private String type;
-
 	@Basic(optional = false)
 	@Column(name = "created_date")
 	private Date createdDate;
@@ -102,14 +98,6 @@ public class SampleList implements Serializable {
 
 	public void setHierarchy(SampleList hierarchy) {
 		this.hierarchy = hierarchy;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
 	}
 
 	public Date getCreatedDate() {
