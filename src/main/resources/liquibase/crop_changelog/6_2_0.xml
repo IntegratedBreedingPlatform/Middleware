@@ -6,8 +6,19 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
+	<!-- Set the list status of the deleted study's snapshot list to 9(deleted); 8006 corresponds to Study's Status and 12990 is value set for deleted studies-->
+	<changeSet author="mderamos" id="v6.2-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">SELECT count(*) FROM listnms l INNER JOIN projectprop p ON l.projectid = p.project_id WHERE p.type_id = 8006 AND p.value=12990 AND l.liststatus!=9 AND l.listtype IN ("NURSERY", "TRIAL", "CHECK");</sqlCheck>
+			</not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE listnms l INNER JOIN projectprop p ON l.projectid = p.project_id SET l.liststatus = 9 WHERE p.type_id = 8006 AND p.value=12990 AND l.liststatus!=9 AND l.listtype IN ("NURSERY", "TRIAL", "CHECK");
+		</sql>
+	</changeSet>
 
-	<changeSet author="vanina" id="v6.2-1">
+	<changeSet author="vanina" id="v6.2-2">
 		<preConditions onFail="MARK_RAN">
 			<not><tableExists tableName="sample"></tableExists></not>
 		</preConditions>
@@ -29,7 +40,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v6.2-2">
+	<changeSet author="vanina" id="v6.2-3">
 		<preConditions onFail="MARK_RAN">
 			<not><tableExists tableName="plant"></tableExists></not>
 		</preConditions>
@@ -49,7 +60,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v6.2-3">
+	<changeSet author="vanina" id="v6.2-4">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT
@@ -75,7 +86,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v6.2-4">
+	<changeSet author="vanina" id="v6.2-5">
 		<preConditions onFail="MARK_RAN">
 			<not><tableExists tableName="sample_list"></tableExists></not>
 		</preConditions>
@@ -97,7 +108,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v6.2-5">
+	<changeSet author="vanina" id="v6.2-6">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT
@@ -122,7 +133,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v6.2-6">
+	<changeSet author="vanina" id="v6.2-7">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT
@@ -147,12 +158,11 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v6.2-7">
+	<changeSet author="vanina" id="v6.2-8">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'plant'
 				AND CONSTRAINT_NAME='plant_no_exp' and TABLE_SCHEMA = DATABASE();</sqlCheck>
 		</preConditions>
 		<addUniqueConstraint columnNames="nd_experiment_id, plant_no" constraintName="plant_no_exp" tableName="plant" />
 	</changeSet>
-
 </databaseChangeLog>
