@@ -12,10 +12,12 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.util.Util;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Date;
 
+@Ignore
 public class SampleListServiceImplTest extends IntegrationTestBase {
 
 	public static final String P = "P";
