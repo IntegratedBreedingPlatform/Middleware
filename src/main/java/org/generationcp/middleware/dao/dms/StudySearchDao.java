@@ -265,7 +265,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 
 	private String getSearchBySeasonAtStudyLevelMainQuery() {
 		return "FROM project p  " + "INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
-				+ TermId.BELONGS_TO_STUDY.getId() + "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = "
+				+ TermId.BELONGS_TO_STUDY.getId() + "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.variable_id = "
 				+ TermId.SEASON_VAR.getId() + "  " + "WHERE  p.program_uuid = :programUUID AND pp.value = :seasonId "
 				+ StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
 	}
@@ -326,7 +326,7 @@ public class StudySearchDao extends GenericDAO<DmsProject, Integer> {
 
 	private String getSearchByLocationAtStudyLevelMainQuery(final List<Integer> locationIds) {
 		return "FROM project p" + "  INNER JOIN project_relationship pr ON pr.object_project_id = p.project_id AND pr.type_id =  "
-				+ TermId.BELONGS_TO_STUDY.getId() + "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = "
+				+ TermId.BELONGS_TO_STUDY.getId() + "  INNER JOIN projectprop pp ON p.project_id = pp.project_id AND pp.variable_id = "
 				+ TermId.LOCATION_ID.getId() + "  WHERE  p.program_uuid = :programUUID  AND pp.value IN (" + this.stringify(locationIds)
 				+ ")" + StudySearchDao.NOT_IN_DELETED_STUDIES_QUERY;
 	}
