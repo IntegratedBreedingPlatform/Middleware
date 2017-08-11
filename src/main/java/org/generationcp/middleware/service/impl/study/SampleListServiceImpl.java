@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.impl.study;
 
+import com.google.common.base.Preconditions;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.dao.PlantDao;
@@ -62,6 +63,7 @@ public class SampleListServiceImpl implements SampleListService {
 			&& sampleListDTO.getStudyId() != null) {
 
 			Study study = studyService.getStudy(sampleListDTO.getStudyId());
+			Preconditions.checkNotNull(study, "The study must not be null");
 			SampleList sampleList = new SampleList();
 
 			sampleList.setCreatedDate(new Date());
@@ -74,6 +76,7 @@ public class SampleListServiceImpl implements SampleListService {
 			List<ObservationDto> observationDtos = studyMeasurements
 				.getSampleObservations(sampleListDTO.getStudyId(), sampleListDTO.getInstanceIds(), sampleListDTO.getSelectionVariableId());
 
+			Preconditions.checkArgument(!observationDtos.isEmpty(), "The observation list must not be empty");
 			if (!observationDtos.isEmpty()) {
 
 				Map<Integer, Integer> maxPlantNumbers = this.getMaxPlantNumber(observationDtos);
