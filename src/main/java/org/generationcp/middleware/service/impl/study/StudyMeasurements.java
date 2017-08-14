@@ -1,6 +1,10 @@
 
 package org.generationcp.middleware.service.impl.study;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
@@ -9,13 +13,9 @@ import org.hibernate.Session;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public class StudyMeasurements {
 
-	public static final String STUDY_ID= "studyId";
+	public static final String STUDY_ID = "studyId";
 
 	private final Session session;
 
@@ -27,32 +27,34 @@ public class StudyMeasurements {
 	}
 
 	List<ObservationDto> getAllMeasurements(final int projectBusinessIdentifier, final List<MeasurementVariableDto> measurementVariables,
-			List<String> germplasmDescriptors, final int instanceId,
-			final int pageNumber, final int pageSize, final String sortBy, final String sortOrder) {
-		final String generateQuery = this.measurementQuery.getAllObservationsQuery(measurementVariables, germplasmDescriptors, sortBy, sortOrder);
-		return this.executeQueryAndMapResults(projectBusinessIdentifier, measurementVariables, germplasmDescriptors, generateQuery, instanceId,
-				pageNumber, pageSize);
+			final List<String> germplasmDescriptors, final int instanceId, final int pageNumber, final int pageSize, final String sortBy,
+			final String sortOrder) {
+		final String generateQuery =
+				this.measurementQuery.getAllObservationsQuery(measurementVariables, germplasmDescriptors, sortBy, sortOrder);
+		return this.executeQueryAndMapResults(projectBusinessIdentifier, measurementVariables, germplasmDescriptors, generateQuery,
+				instanceId, pageNumber, pageSize);
 	}
 
-	List<ObservationDto> getMeasurement(final int projectBusinessIdentifier, final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors,
-			final Integer measurementId) {
+	List<ObservationDto> getMeasurement(final int projectBusinessIdentifier, final List<MeasurementVariableDto> measurementVariables,
+			final List<String> germplasmDescriptors, final Integer measurementId) {
 		final String generateQuery = this.measurementQuery.getSingleObservationQuery(measurementVariables, germplasmDescriptors);
-		final List<ObservationDto> measurement =
-				this.executeQueryAndMapResults(projectBusinessIdentifier, measurementVariables, germplasmDescriptors, generateQuery, measurementId);
+		final List<ObservationDto> measurement = this.executeQueryAndMapResults(projectBusinessIdentifier, measurementVariables,
+				germplasmDescriptors, generateQuery, measurementId);
 		// Defensive programming
 		if (measurement.size() > 1) {
 
-			throw new IllegalStateException("We should never have more than on measurment in the measurment list. "
-							+ "Please contact support for further help.");
+			throw new IllegalStateException(
+					"We should never have more than on measurment in the measurment list. " + "Please contact support for further help.");
 		}
 		return measurement;
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier, final List<MeasurementVariableDto> measurementVariables,
-			List<String> germplasmDescriptors, final String generateQuery, final int instanceId, final int pageNumber, final int pageSize) {
+	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier,
+			final List<MeasurementVariableDto> measurementVariables, final List<String> germplasmDescriptors, final String generateQuery,
+			final int instanceId, final int pageNumber, final int pageSize) {
 		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(measurementVariables, germplasmDescriptors, generateQuery);
-		createSQLQuery.setParameter(STUDY_ID, projectBusinessIdentifier);
+		createSQLQuery.setParameter(StudyMeasurements.STUDY_ID, projectBusinessIdentifier);
 		createSQLQuery.setParameter("instanceId", String.valueOf(instanceId));
 
 		createSQLQuery.setFirstResult(pageSize * (pageNumber - 1));
@@ -62,15 +64,17 @@ public class StudyMeasurements {
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier, final List<MeasurementVariableDto> measurementVariables,
-			List<String> germplasmDescriptors, final String generateQuery, final Integer measurementId) {
+	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier,
+			final List<MeasurementVariableDto> measurementVariables, final List<String> germplasmDescriptors, final String generateQuery,
+			final Integer measurementId) {
 		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(measurementVariables, germplasmDescriptors, generateQuery);
-		createSQLQuery.setParameter(STUDY_ID, projectBusinessIdentifier);
+		createSQLQuery.setParameter(StudyMeasurements.STUDY_ID, projectBusinessIdentifier);
 		createSQLQuery.setParameter("experiment_id", measurementId);
 		return this.mapResults(createSQLQuery.list(), measurementVariables, germplasmDescriptors);
 	}
 
-	private SQLQuery createQueryAndAddScalar(final List<MeasurementVariableDto> selectionMethodsAndTraits, List<String> germplasmDescriptors, final String generateQuery) {
+	private SQLQuery createQueryAndAddScalar(final List<MeasurementVariableDto> selectionMethodsAndTraits,
+			final List<String> germplasmDescriptors, final String generateQuery) {
 		final SQLQuery createSQLQuery = this.session.createSQLQuery(generateQuery);
 
 		this.addScalar(createSQLQuery);
@@ -79,7 +83,7 @@ public class StudyMeasurements {
 
 		this.addScalarForTraits(selectionMethodsAndTraits, createSQLQuery);
 
-		for (String gpDescriptor : germplasmDescriptors) {
+		for (final String gpDescriptor : germplasmDescriptors) {
 			createSQLQuery.addScalar(gpDescriptor, new StringType());
 		}
 
@@ -94,7 +98,7 @@ public class StudyMeasurements {
 	}
 
 	private List<ObservationDto> mapResults(final List<Object[]> results, final List<MeasurementVariableDto> projectVariables,
-			List<String> germplasmDescriptors) {
+			final List<String> germplasmDescriptors) {
 		final List<ObservationDto> measurements = new ArrayList<>();
 		final int fixedColumns = 15;
 
@@ -104,21 +108,21 @@ public class StudyMeasurements {
 				final List<MeasurementDto> measurementVariableResults = new ArrayList<>();
 				int counterTwo = 0;
 				for (final MeasurementVariableDto variable : projectVariables) {
-					measurementVariableResults.add(new MeasurementDto(variable, (Integer) row[fixedColumns + counterTwo + 1], (String) row[fixedColumns + counterTwo]));
+					measurementVariableResults.add(new MeasurementDto(variable, (Integer) row[fixedColumns + counterTwo + 1],
+							(String) row[fixedColumns + counterTwo]));
 					counterTwo += 2;
 				}
-				ObservationDto measurement =
-						new ObservationDto((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[3], (String) row[4],
-								(String) row[5], (String) row[6], (String) row[7], (String) row[8], (String) row[9], measurementVariableResults);
+				final ObservationDto measurement = new ObservationDto((Integer) row[0], (String) row[1], (String) row[2], (Integer) row[3],
+						(String) row[4], (String) row[5], (String) row[6], (String) row[7], (String) row[8], (String) row[9],
+						measurementVariableResults);
 				measurement.setRowNumber((String) row[10]);
 				measurement.setColumnNumber((String) row[11]);
 				measurement.setPlotId((String) row[12]);
 				measurement.setFieldMapColumn((String) row[13]);
 				measurement.setFieldMapRange((String) row[14]);
 
-
 				int gpDescIndex = fixedColumns + projectVariables.size() * 2;
-				for (String gpDesc : germplasmDescriptors) {
+				for (final String gpDesc : germplasmDescriptors) {
 					measurement.additionalGermplasmDescriptor(gpDesc, (String) row[gpDescIndex++]);
 				}
 				measurements.add(measurement);
@@ -127,7 +131,8 @@ public class StudyMeasurements {
 		return Collections.unmodifiableList(measurements);
 	}
 
-	private int setQueryParameters(final int studyIdentifier, final List<MeasurementVariableDto> measurementVariables, final SQLQuery createSQLQuery) {
+	private int setQueryParameters(final int studyIdentifier, final List<MeasurementVariableDto> measurementVariables,
+			final SQLQuery createSQLQuery) {
 		int counter = 0;
 		for (final MeasurementVariableDto measurementVariable : measurementVariables) {
 			createSQLQuery.setParameter(counter++, measurementVariable.getName());
@@ -137,7 +142,8 @@ public class StudyMeasurements {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier, final List<MeasurementVariableDto> measurementVariables, Integer instanceId) {
+	public List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier,
+			final List<MeasurementVariableDto> measurementVariables, final Integer instanceId) {
 		final String generateQuery = this.measurementQuery.getObservationQueryWithBlockRowCol(measurementVariables, instanceId);
 		final SQLQuery createSQLQuery = this.createQueryAndAddScalarWithBlockRowCol(measurementVariables, generateQuery);
 
@@ -150,7 +156,8 @@ public class StudyMeasurements {
 		return createSQLQuery.list();
 	}
 
-	private SQLQuery createQueryAndAddScalarWithBlockRowCol(final List<MeasurementVariableDto> measurementVariables, final String generateQuery) {
+	private SQLQuery createQueryAndAddScalarWithBlockRowCol(final List<MeasurementVariableDto> measurementVariables,
+			final String generateQuery) {
 		final SQLQuery createSQLQuery = this.session.createSQLQuery(generateQuery);
 
 		this.addScalar(createSQLQuery);
@@ -180,9 +187,10 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar("PLOT_ID", new StringType());
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<ObservationDto> getSampleObservations(final int studyId, final List<Integer> instanceIds,
-		final Integer selectionVariableId) {
-		final SQLQuery createSQLQuery = this.session.createSQLQuery(measurementQuery.getSampleObservationQuery());
+			final Integer selectionVariableId) {
+		final SQLQuery createSQLQuery = this.session.createSQLQuery(this.measurementQuery.getSampleObservationQuery());
 
 		createSQLQuery.addScalar("nd_experiment_id", new IntegerType());
 		createSQLQuery.addScalar("preferred_name", new StringType());
@@ -195,20 +203,20 @@ public class StudyMeasurements {
 	}
 
 	private List<ObservationDto> mapSampleObservations(final List<Object[]> results) {
-			final List<ObservationDto> measurements = new ArrayList<>();
+		final List<ObservationDto> measurements = new ArrayList<>();
 
-			if (results != null && !results.isEmpty()) {
-				for (final Object[] row : results) {
+		if (results != null && !results.isEmpty()) {
+			for (final Object[] row : results) {
 
-					final List<MeasurementDto> measurementVariableResults = new ArrayList<>();
+				final List<MeasurementDto> measurementVariableResults = new ArrayList<>();
 
-					MeasurementDto measurementDto = new MeasurementDto((row[2]).toString());
-					measurementVariableResults.add(measurementDto);
+				final MeasurementDto measurementDto = new MeasurementDto(row[2].toString());
+				measurementVariableResults.add(measurementDto);
 
-					ObservationDto measurement = new ObservationDto((Integer) row[0], (String) row[1], measurementVariableResults);
-					measurements.add(measurement);
-				}
+				final ObservationDto measurement = new ObservationDto((Integer) row[0], (String) row[1], measurementVariableResults);
+				measurements.add(measurement);
 			}
-			return Collections.unmodifiableList(measurements);
+		}
+		return Collections.unmodifiableList(measurements);
 	}
 }

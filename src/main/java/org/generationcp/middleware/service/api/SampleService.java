@@ -1,13 +1,14 @@
+
 package org.generationcp.middleware.service.api;
+
+import java.util.Date;
 
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 
-import java.util.Date;
-
 public interface SampleService {
 
-	public Sample createOrUpdateSample(String cropName, Integer plantNumber, String username, String sampleName, Date samplingDate,
-		Integer experimentId, SampleList sampleList);
+	Sample buildSample(final String cropName, String cropPrefix, final Integer plantNumber, final String username,
+			final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList);
 
 }

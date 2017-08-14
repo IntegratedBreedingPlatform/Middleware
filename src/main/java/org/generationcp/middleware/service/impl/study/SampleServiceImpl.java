@@ -1,4 +1,4 @@
-package org.generationcp.middleware.service.impl;
+package org.generationcp.middleware.service.impl.study;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.dao.PlantDao;
@@ -10,7 +10,6 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.service.api.PlantService;
-import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,18 +21,18 @@ public class SampleServiceImpl implements SampleService {
 
 	private static final String S = "S";
 
-	private SampleDao sampleDao;
-	private ExperimentDao experimentDao;
-	private PlantDao plantDao;
-	private UserDAO userDao;
+	private final SampleDao sampleDao;
+	private final ExperimentDao experimentDao;
+	private final PlantDao plantDao;
+	private final UserDAO userDao;
 
-	@Autowired private WorkbenchDataManager workbenchDataManager;
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
 
-	@Autowired private SampleListService sampleListService;
+	@Autowired
+	private PlantService plantService;
 
-	@Autowired private PlantService plantService;
-
-	public SampleServiceImpl(HibernateSessionProvider sessionProvider) {
+	public SampleServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.sampleDao = new SampleDao();
 		this.sampleDao.setSession(sessionProvider.getSession());
 
@@ -48,18 +47,25 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public Sample createOrUpdateSample(String cropName, Integer plantNumber, String username, String sampleName, Date samplingDate,
-		Integer experimentId, SampleList sampleList) {
+	public Sample buildSample(final String cropName, final String cropPrefix, final Integer plantNumber, final String username,
+		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList) {
 
-		Sample sample = new Sample();
-		String cropPrefix = this.workbenchDataManager.getCropTypeByName(cropName).getPlotCodePrefix();
-		sample.setPlant(plantService.createOrUpdatePlant(cropPrefix, plantNumber, experimentId));
+		final Sample sample = new Sample();
+		String localCropPrefix;
 
-		if (!username.isEmpty()) {
-			sample.setTakenBy(userDao.getUserByUserName(username));
+		if (cropPrefix == null) {
+			localCropPrefix = this.workbenchDataManager.getCropTypeByName(cropName).getPlotCodePrefix();
+		} else {
+			localCropPrefix = cropPrefix;
 		}
 
-		sample.setSampleName(sampleName);//Preferred name GID
+		sample.setPlant(this.plantService.buildPlant(localCropPrefix, plantNumber, experimentId));
+
+		if (!username.isEmpty()) {
+			sample.setTakenBy(this.userDao.getUserByUserName(username));
+		}
+
+		sample.setSampleName(sampleName);// Preferred name GID
 		sample.setCreatedDate(new Date());
 		sample.setSamplingDate(samplingDate);
 		sample.setSampleBusinessKey(this.getSampleBusinessKey(cropPrefix));
@@ -68,9 +74,9 @@ public class SampleServiceImpl implements SampleService {
 		return sample;
 	}
 
-	private String getSampleBusinessKey(String cropPrefix) {
+	private String getSampleBusinessKey(final String cropPrefix) {
 		String sampleBussinesKey = cropPrefix;
-		sampleBussinesKey = sampleBussinesKey + S;
+		sampleBussinesKey = sampleBussinesKey + SampleServiceImpl.S;
 		sampleBussinesKey = sampleBussinesKey + RandomStringUtils.randomAlphanumeric(8);
 
 		return sampleBussinesKey;

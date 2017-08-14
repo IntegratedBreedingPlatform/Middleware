@@ -1,11 +1,9 @@
+
 package org.generationcp.middleware.pojos;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -19,13 +17,22 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 @Entity
 @Table(name = "sample_list")
 public class SampleList implements Serializable {
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 6160350425863896876L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,74 +64,75 @@ public class SampleList implements Serializable {
 	@NotFound(action = NotFoundAction.IGNORE)
 	private User createdBy;
 
-	@OneToMany(mappedBy="sampleList", cascade=CascadeType.ALL)
+	@OneToMany(mappedBy = "sampleList", cascade = CascadeType.ALL)
 	private List<Sample> samples;
 
 	public List<Sample> getSamples() {
-	  return samples;
+		return this.samples;
 	}
 
-	public void setSamples(List<Sample> samples) {
-	  this.samples = samples;
+	public void setSamples(final List<Sample> samples) {
+		this.samples = samples;
 	}
 
-  public Integer getListId() {
-		return listId;
+	public Integer getListId() {
+		return this.listId;
 	}
 
-	public void setListId(Integer listId) {
+	public void setListId(final Integer listId) {
 		this.listId = listId;
 	}
 
 	public String getListName() {
-		return listName;
+		return this.listName;
 	}
 
-	public void setListName(String listName) {
+	public void setListName(final String listName) {
 		this.listName = listName;
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
 	public SampleList getHierarchy() {
-		return hierarchy;
+		return this.hierarchy;
 	}
 
-	public void setHierarchy(SampleList hierarchy) {
+	public void setHierarchy(final SampleList hierarchy) {
 		this.hierarchy = hierarchy;
 	}
 
 	public Date getCreatedDate() {
-		return createdDate;
+		return this.createdDate;
 	}
 
-	public void setCreatedDate(Date createdDate) {
+	public void setCreatedDate(final Date createdDate) {
 		this.createdDate = createdDate;
 	}
 
 	public String getNotes() {
-		return notes;
+		return this.notes;
 	}
 
-	public void setNotes(String notes) {
+	public void setNotes(final String notes) {
 		this.notes = notes;
 	}
 
 	public User getCreatedBy() {
-		return createdBy;
+		return this.createdBy;
 	}
 
-	public void setCreatedBy(User createdBy) {
+	public void setCreatedBy(final User createdBy) {
 		this.createdBy = createdBy;
 	}
 
-	@Override public boolean equals(final Object other) {
+	@Override
+	public boolean equals(final Object other) {
 		if (!(other instanceof SampleList)) {
 			return false;
 		}
@@ -132,12 +140,14 @@ public class SampleList implements Serializable {
 		return new EqualsBuilder().append(this.listId, castOther.listId).isEquals();
 	}
 
-	@Override public int hashCode() {
+	@Override
+	public int hashCode() {
 
 		return new HashCodeBuilder().append(this.listId).hashCode();
 	}
 
-	@Override public String toString() {
+	@Override
+	public String toString() {
 
 		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
 	}

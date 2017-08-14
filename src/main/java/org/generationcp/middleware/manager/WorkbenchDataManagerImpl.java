@@ -1450,8 +1450,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<UserDto> getUsersByProjectUUID(final String project_uuid) throws MiddlewareQueryException {
-		return this.getUserDao().getUsersByProjectUUId(project_uuid);
+	public List<UserDto> getUsersByProjectUuid(final String projectUuid) throws MiddlewareQueryException {
+		return this.getUserDao().getUsersByProjectUUId(projectUuid);
 
 	}
 

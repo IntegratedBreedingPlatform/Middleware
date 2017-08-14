@@ -1,11 +1,8 @@
+
 package org.generationcp.middleware.pojos;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -19,12 +16,22 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-import java.io.Serializable;
-import java.util.Date;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 @Entity
 @Table(name = "sample")
 public class Sample implements Serializable {
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -5075457623110650250L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,8 +71,8 @@ public class Sample implements Serializable {
 
 	}
 
-	public Sample(Integer sampleId, String sampleName, User takenBy, Date samplingDate, Date createdDate, String sampleBusinessKey,
-		Plant plant) {
+	public Sample(final Integer sampleId, final String sampleName, final User takenBy, final Date samplingDate, final Date createdDate,
+			final String sampleBusinessKey, final Plant plant) {
 		this.sampleId = sampleId;
 		this.sampleName = sampleName;
 		this.takenBy = takenBy;
@@ -76,70 +83,71 @@ public class Sample implements Serializable {
 	}
 
 	public SampleList getSampleList() {
-	  return sampleList;
+		return this.sampleList;
 	}
 
-	public void setSampleList(SampleList sampleList) {
-	  this.sampleList = sampleList;
+	public void setSampleList(final SampleList sampleList) {
+		this.sampleList = sampleList;
 	}
 
-  	public Integer getSampleId() {
-		return sampleId;
+	public Integer getSampleId() {
+		return this.sampleId;
 	}
 
-	public void setSampleId(Integer sampleId) {
+	public void setSampleId(final Integer sampleId) {
 		this.sampleId = sampleId;
 	}
 
 	public String getSampleName() {
-		return sampleName;
+		return this.sampleName;
 	}
 
-	public void setSampleName(String sampleName) {
+	public void setSampleName(final String sampleName) {
 		this.sampleName = sampleName;
 	}
 
 	public User getTakenBy() {
-		return takenBy;
+		return this.takenBy;
 	}
 
-	public void setTakenBy(User takenBy) {
+	public void setTakenBy(final User takenBy) {
 		this.takenBy = takenBy;
 	}
 
 	public Date getSamplingDate() {
-		return samplingDate;
+		return this.samplingDate;
 	}
 
-	public void setSamplingDate(Date samplingDate) {
+	public void setSamplingDate(final Date samplingDate) {
 		this.samplingDate = samplingDate;
 	}
 
 	public Date getCreatedDate() {
-		return createdDate;
+		return this.createdDate;
 	}
 
-	public void setCreatedDate(Date createdDate) {
+	public void setCreatedDate(final Date createdDate) {
 		this.createdDate = createdDate;
 	}
 
 	public String getSampleBusinessKey() {
-		return sampleBusinessKey;
+		return this.sampleBusinessKey;
 	}
 
-	public void setSampleBusinessKey(String sampleBusinessKey) {
+	public void setSampleBusinessKey(final String sampleBusinessKey) {
 		this.sampleBusinessKey = sampleBusinessKey;
 	}
 
 	public Plant getPlant() {
-		return plant;
+		return this.plant;
 	}
 
-	public void setPlant(Plant plant) {
+	public void setPlant(final Plant plant) {
 		this.plant = plant;
 	}
 
-	@Override public boolean equals(final Object other) {
+	@Override
+	public boolean equals(final Object other) {
 		if (!(other instanceof Sample)) {
 			return false;
 		}
@@ -147,12 +155,14 @@ public class Sample implements Serializable {
 		return new EqualsBuilder().append(this.sampleId, castOther.sampleId).isEquals();
 	}
 
-	@Override public int hashCode() {
+	@Override
+	public int hashCode() {
 
 		return new HashCodeBuilder().append(this.sampleId).hashCode();
 	}
 
-	@Override public String toString() {
+	@Override
+	public String toString() {
 
 		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
 	}

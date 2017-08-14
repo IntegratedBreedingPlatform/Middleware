@@ -1,6 +1,8 @@
+
 package org.generationcp.middleware.service.impl;
 
-import org.codehaus.groovy.runtime.dgmimpl.arrays.IntegerArrayGetAtMetaMethod;
+import java.util.Date;
+
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.SampleListDao;
@@ -13,8 +15,6 @@ import org.generationcp.middleware.util.Util;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Date;
 
 public class SampleListServiceImplTest extends IntegrationTestBase {
 
@@ -47,50 +47,52 @@ public class SampleListServiceImplTest extends IntegrationTestBase {
 	@Test
 	public void testCreateSampleList() {
 
-		SampleList sampleList = new SampleList();
+		final SampleList sampleList = new SampleList();
 		sampleList.setCreatedDate(new Date());
-		sampleList.setCreatedBy(userDao.getUserByUserName(ADMIN));
-		sampleList.setDescription(DESCRIPTION);
-		sampleList.setListName(TRIAL_NAME + Util.getCurrentDateAsStringValue(YYYY_M_MDD_HH));
-		sampleList.setNotes(NOTES);
+		sampleList.setCreatedBy(this.userDao.getUserByUserName(SampleListServiceImplTest.ADMIN));
+		sampleList.setDescription(SampleListServiceImplTest.DESCRIPTION);
+		sampleList.setListName(
+				SampleListServiceImplTest.TRIAL_NAME + Util.getCurrentDateAsStringValue(SampleListServiceImplTest.YYYY_M_MDD_HH));
+		sampleList.setNotes(SampleListServiceImplTest.NOTES);
 
-		Plant plant = getPlant();
-		Sample sample = new Sample();
-		getSample(sampleList, plant, sample);
+		final Plant plant = this.getPlant();
+		final Sample sample = new Sample();
+		this.getSample(sampleList, plant, sample);
 
-		sampleListDao.saveOrUpdate(sampleList);
+		this.sampleListDao.saveOrUpdate(sampleList);
 		Assert.assertNotNull(sampleList.getListId());
-		Assert.assertEquals(sampleList.getCreatedBy().getName(), ADMIN);
-		Assert.assertEquals(sampleList.getDescription(), DESCRIPTION);
-		Assert.assertEquals(sampleList.getListName(), TRIAL_NAME + Util.getCurrentDateAsStringValue(YYYY_M_MDD_HH));
-		Assert.assertEquals(sampleList.getNotes(), NOTES);
-		Assert.assertEquals(plant.getPlantBusinessKey(), P + CROP_PREFIX);
+		Assert.assertEquals(sampleList.getCreatedBy().getName(), SampleListServiceImplTest.ADMIN);
+		Assert.assertEquals(sampleList.getDescription(), SampleListServiceImplTest.DESCRIPTION);
+		Assert.assertEquals(sampleList.getListName(),
+				SampleListServiceImplTest.TRIAL_NAME + Util.getCurrentDateAsStringValue(SampleListServiceImplTest.YYYY_M_MDD_HH));
+		Assert.assertEquals(sampleList.getNotes(), SampleListServiceImplTest.NOTES);
+		Assert.assertEquals(plant.getPlantBusinessKey(), SampleListServiceImplTest.P + SampleListServiceImplTest.CROP_PREFIX);
 		Assert.assertEquals(plant.getPlantNumber(), new Integer(0));
 		Assert.assertEquals(sample.getPlant(), plant);
-		Assert.assertEquals(sample.getTakenBy().getName(), ADMIN);
-		Assert.assertEquals(sample.getSampleName(), GID);
-		Assert.assertEquals(sample.getSampleBusinessKey(), S + CROP_PREFIX);
+		Assert.assertEquals(sample.getTakenBy().getName(), SampleListServiceImplTest.ADMIN);
+		Assert.assertEquals(sample.getSampleName(), SampleListServiceImplTest.GID);
+		Assert.assertEquals(sample.getSampleBusinessKey(), SampleListServiceImplTest.S + SampleListServiceImplTest.CROP_PREFIX);
 		Assert.assertEquals(sample.getSampleList(), sampleList);
 
 	}
 
-	private void getSample(SampleList sampleList, Plant plant1, Sample sample) {
+	private void getSample(final SampleList sampleList, final Plant plant1, final Sample sample) {
 
 		sample.setPlant(plant1);
-		sample.setTakenBy(userDao.getUserByUserName(ADMIN));
-		sample.setSampleName(GID);
+		sample.setTakenBy(this.userDao.getUserByUserName(SampleListServiceImplTest.ADMIN));
+		sample.setSampleName(SampleListServiceImplTest.GID);
 		sample.setCreatedDate(new Date());
 		sample.setSamplingDate(new Date());
-		sample.setSampleBusinessKey(S + CROP_PREFIX);
+		sample.setSampleBusinessKey(SampleListServiceImplTest.S + SampleListServiceImplTest.CROP_PREFIX);
 		sample.setSampleList(sampleList);
 	}
 
 	private Plant getPlant() {
-		Plant plant = new Plant();
+		final Plant plant = new Plant();
 
 		plant.setCreatedDate(new Date());
 		plant.setExperiment(new ExperimentModel());
-		plant.setPlantBusinessKey(P + CROP_PREFIX);
+		plant.setPlantBusinessKey(SampleListServiceImplTest.P + SampleListServiceImplTest.CROP_PREFIX);
 		plant.setPlantNumber(0);
 		return plant;
 	}

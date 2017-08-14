@@ -1,15 +1,21 @@
+
 package org.generationcp.middleware.domain.samplelist;
+
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-
 public class SampleListDTO implements Serializable {
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = -3724999931592177161L;
 
 	private Integer listId;
 
@@ -32,83 +38,83 @@ public class SampleListDTO implements Serializable {
 	private String cropName;
 
 	public String getCropName() {
-		return cropName;
+		return this.cropName;
 	}
 
-	public void setCropName(String cropName) {
+	public void setCropName(final String cropName) {
 		this.cropName = cropName;
 	}
 
 	public Integer getStudyId() {
-		return studyId;
+		return this.studyId;
 	}
 
-	public void setStudyId(Integer studyId) {
+	public void setStudyId(final Integer studyId) {
 		this.studyId = studyId;
 	}
 
 	public Integer getSelectionVariableId() {
-		return selectionVariableId;
+		return this.selectionVariableId;
 	}
 
-	public void setSelectionVariableId(Integer selectionVariableId) {
+	public void setSelectionVariableId(final Integer selectionVariableId) {
 		this.selectionVariableId = selectionVariableId;
 	}
 
 	public List<Integer> getInstanceIds() {
-		return instanceIds;
+		return this.instanceIds;
 	}
 
-	public void setInstanceIds(List<Integer> instanceIds) {
+	public void setInstanceIds(final List<Integer> instanceIds) {
 		this.instanceIds = instanceIds;
 	}
 
-	public void setCreatedBy(String createdBy) {
+	public void setCreatedBy(final String createdBy) {
 		this.createdBy = createdBy;
 	}
 
 	public String getTakenBy() {
-		return takenBy;
+		return this.takenBy;
 	}
 
 	public String getCreatedBy() {
-		return createdBy;
+		return this.createdBy;
 	}
 
-	public void setTakenBy(String takenBy) {
+	public void setTakenBy(final String takenBy) {
 
 		this.takenBy = takenBy;
 	}
 
 	public Date getSamplingDate() {
-		return samplingDate;
+		return this.samplingDate;
 	}
 
-	public void setSamplingDate(Date samplingDate) {
+	public void setSamplingDate(final Date samplingDate) {
 		this.samplingDate = samplingDate;
 	}
 
 	public Integer getListId() {
-		return listId;
+		return this.listId;
 	}
 
-	public void setListId(Integer listId) {
+	public void setListId(final Integer listId) {
 		this.listId = listId;
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
 	public String getNotes() {
-		return notes;
+		return this.notes;
 	}
 
-	public void setNotes(String notes) {
+	public void setNotes(final String notes) {
 		this.notes = notes;
 	}
 

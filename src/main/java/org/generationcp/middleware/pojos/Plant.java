@@ -1,12 +1,8 @@
+
 package org.generationcp.middleware.pojos;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import java.io.Serializable;
+import java.util.Date;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -18,12 +14,23 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import java.io.Serializable;
-import java.util.Date;
+
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 @Entity
 @Table(name = "plant")
 public class Plant implements Serializable {
+
+	/**
+	 *
+	 */
+	private static final long serialVersionUID = 8106804623760841599L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,7 +60,7 @@ public class Plant implements Serializable {
 
 	}
 
-	public Plant(Integer plantNumber, ExperimentModel experiment, Date createdDate, String plantBusinessKey) {
+	public Plant(final Integer plantNumber, final ExperimentModel experiment, final Date createdDate, final String plantBusinessKey) {
 		this.plantNumber = plantNumber;
 		this.experiment = experiment;
 		this.createdDate = createdDate;
@@ -61,46 +68,47 @@ public class Plant implements Serializable {
 	}
 
 	public Integer getPlantId() {
-		return plantId;
+		return this.plantId;
 	}
 
-	public void setPlantId(Integer plantId) {
+	public void setPlantId(final Integer plantId) {
 		this.plantId = plantId;
 	}
 
 	public Integer getPlantNumber() {
-		return plantNumber;
+		return this.plantNumber;
 	}
 
-	public void setPlantNumber(Integer plantNumber) {
+	public void setPlantNumber(final Integer plantNumber) {
 		this.plantNumber = plantNumber;
 	}
 
 	public ExperimentModel getExperiment() {
-		return experiment;
+		return this.experiment;
 	}
 
-	public void setExperiment(ExperimentModel experiment) {
+	public void setExperiment(final ExperimentModel experiment) {
 		this.experiment = experiment;
 	}
 
 	public Date getCreatedDate() {
-		return createdDate;
+		return this.createdDate;
 	}
 
-	public void setCreatedDate(Date createdDate) {
+	public void setCreatedDate(final Date createdDate) {
 		this.createdDate = createdDate;
 	}
 
 	public String getPlantBusinessKey() {
-		return plantBusinessKey;
+		return this.plantBusinessKey;
 	}
 
-	public void setPlantBusinessKey(String plantBusinessKey) {
+	public void setPlantBusinessKey(final String plantBusinessKey) {
 		this.plantBusinessKey = plantBusinessKey;
 	}
 
-	@Override public boolean equals(final Object other) {
+	@Override
+	public boolean equals(final Object other) {
 		if (!(other instanceof Plant)) {
 			return false;
 		}
@@ -108,12 +116,14 @@ public class Plant implements Serializable {
 		return new EqualsBuilder().append(this.plantId, castOther.plantId).isEquals();
 	}
 
-	@Override public int hashCode() {
+	@Override
+	public int hashCode() {
 
 		return new HashCodeBuilder().append(this.plantId).hashCode();
 	}
 
-	@Override public String toString() {
+	@Override
+	public String toString() {
 
 		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
 	}
