@@ -275,13 +275,21 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		try {
 
 			SQLQuery query = this.getSession()
-					.createSQLQuery("SELECT distinct ph.value category FROM cvterm_relationship r_variable "
-							+ " INNER JOIN projectprop pp ON (pp.value = r_variable.subject_id) INNER JOIN phenotype ph ON ph.observable_id = r_variable.subject_id "
-							+ " WHERE pp.type_id = " + TermId.STANDARD_VARIABLE.getId()
-							+ " AND pp.project_id NOT IN (SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = pp.project_id "
-							+ " AND stat.type_id = " + TermId.STUDY_STATUS.getId() + " AND stat.value = " + TermId.DELETED_STUDY.getId()
-							+ ") AND r_variable.object_id = :scaleId AND ph.value is not null");
+					.createSQLQuery("SELECT v.name category " +
+			                " FROM cvterm_relationship scale_values "
+			                + "INNER JOIN cvterm v ON v.cvterm_id = scale_values.object_id "
+			                + "WHERE scale_values.subject_id = :scaleId AND scale_values.type_id = 1190 "
+			                + "AND EXISTS ( SELECT 1 "
+			                + " 	 FROM phenotype p "
+			                + " 	INNER JOIN nd_experiment_phenotype eph on eph.phenotype_id = p.phenotype_id "
+			                + "     INNER JOIN nd_experiment_project ep on ep.nd_experiment_id = eph.nd_experiment_id "
+			                + "     WHERE cvalue_id = v.cvterm_id "
+			                + "       AND ep.project_id not in (SELECT stat.project_id FROM projectprop stat WHERE stat.project_id = ep.project_id "
+			                + "       AND stat.type_id = :studyStatusId AND value = :deletedStudy )"
+			                + "   )");
 			query.setParameter("scaleId", scaleId);
+			query.setParameter("studyStatusId", TermId.STUDY_STATUS.getId());
+			query.setParameter("deletedStudy", TermId.DELETED_STUDY.getId());
 			query.addScalar("category", STRING);
 			return query.list();
 		} catch (HibernateException e) {
