@@ -43,18 +43,23 @@ public interface TermDataManager {
 	List<Term> getTermByCvId(int cvId) throws MiddlewareException;
 
 	/**
-	 * Checks if term has referred to other term.
+	 * Checks if term is referred by another term.
 	 */
-	boolean isTermReferred(int termId) throws MiddlewareException;
+	boolean isTermReferred(int termId);
 
 	/**
 	 * @param objectId method, property or scale id
 	 * @param relationshipId which will show type of relationship
 	 * @return This will return list of relationships which have type of relationship is relationshipId and object_id is objectId
-	 * @throws MiddlewareException
 	 */
 	List<TermRelationship> getRelationshipsWithObjectAndType(Integer objectId, TermRelationshipId relationshipId)
 			throws MiddlewareException;
 	
-	public List<String> getCategoriesReferredInPhenotype(int scaleId) throws MiddlewareQueryException;
+	/**
+	 * Return list of scale's values that are being referred in phenotypes of non-deleted studies
+	 * 
+	 * @param scaleId
+	 * @return
+	 */
+	public List<String> getCategoriesReferredInPhenotype(int scaleId);
 }

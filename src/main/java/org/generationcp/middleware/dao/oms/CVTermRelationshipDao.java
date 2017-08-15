@@ -19,7 +19,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
@@ -38,7 +37,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 	private static final StringType STRING = new StringType();
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getSubjectIdsByTypeAndObject(Integer typeId, Integer objectId) throws MiddlewareQueryException {
+	public List<Integer> getSubjectIdsByTypeAndObject(Integer typeId, Integer objectId) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("typeId", typeId));
@@ -48,14 +47,13 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 			return criteria.list();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getSubjectIdsByTypeAndObject=" + typeId + ", " + objectId
+			throw new MiddlewareQueryException("Error with getSubjectIdsByTypeAndObject=" + typeId + ", " + objectId
 					+ ") query from CVTermRelationship: " + e.getMessage(), e);
 		}
-		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getObjectIdByTypeAndSubject(Integer typeId, Integer subjectId) throws MiddlewareQueryException {
+	public List<Integer> getObjectIdByTypeAndSubject(Integer typeId, Integer subjectId) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("typeId", typeId));
@@ -65,14 +63,13 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 			return criteria.list();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getSubjectIdsByTypeAndObject=" + typeId + ", " + subjectId
+			throw new MiddlewareQueryException("Error with getObjectIdByTypeAndSubject=" + typeId + ", " + subjectId
 					+ ") query from CVTermRelationship: " + e.getMessage(), e);
 		}
-		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<CVTermRelationship> getBySubject(int subjectId) throws MiddlewareQueryException {
+	public List<CVTermRelationship> getBySubject(int subjectId) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("subjectId", subjectId));
@@ -80,14 +77,13 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 			return criteria.list();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getBySubject=" + subjectId + " query from CVTermRelationship: " + e.getMessage(), e);
-			return new ArrayList<>();
+			throw new MiddlewareQueryException("Error with getBySubject=" + subjectId + " query from CVTermRelationship: " + e.getMessage(),
+					e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public CVTermRelationship getRelationshipSubjectIdObjectIdByTypeId(int subjectId, int objectId, int typeId)
-			throws MiddlewareQueryException {
+	public CVTermRelationship getRelationshipSubjectIdObjectIdByTypeId(int subjectId, int objectId, int typeId) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("typeId", typeId));
@@ -102,13 +98,13 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getBySubject=" + subjectId + " query from CVTermRelationship: " + e.getMessage(), e);
-			return null;
+			throw new MiddlewareQueryException("Error with getRelationshipSubjectIdObjectIdByTypeId=" + subjectId + ", " + objectId + ", "
+					+ typeId + " query from CVTermRelationship: " + e.getMessage(), e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public CVTermRelationship getRelationshipBySubjectIdAndTypeId(int subjectId, int typeId) throws MiddlewareQueryException {
+	public CVTermRelationship getRelationshipBySubjectIdAndTypeId(int subjectId, int typeId) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("typeId", typeId));
@@ -122,13 +118,12 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getRelationshipBySubjectIdAndTypeId=" + subjectId + ", " + typeId
-					+ ") query from CVTermRelationship: " + e.getMessage(), e);
-			return null;
+			throw new MiddlewareQueryException("Error with getRelationshipBySubjectIdAndTypeId=" + subjectId + ", " + typeId
+					+ " query from CVTermRelationship: " + e.getMessage(), e);
 		}
 	}
 
-	public List<CVTermRelationship> getBySubjectIdAndTypeId(int subjectId, int typeId) throws MiddlewareQueryException {
+	public List<CVTermRelationship> getBySubjectIdAndTypeId(int subjectId, int typeId) {
 
 		List<CVTermRelationship> relationships = new ArrayList<>();
 
@@ -149,7 +144,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		return relationships;
 	}
 
-	public List<CVTermRelationship> getBySubjectIdsAndTypeId(List<Integer> subjectIds, int typeId) throws MiddlewareQueryException {
+	public List<CVTermRelationship> getBySubjectIdsAndTypeId(List<Integer> subjectIds, int typeId) {
 
 		List<CVTermRelationship> relationships = new ArrayList<>();
 
@@ -171,8 +166,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 	}
 
 
-	@SuppressWarnings("unchecked")
-	public List<CVTermRelationship> getByObjectId(int objectId) throws MiddlewareQueryException {
+	public List<CVTermRelationship> getByObjectId(int objectId) {
 
 		List<CVTermRelationship> relationships = new ArrayList<>();
 
@@ -193,7 +187,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 	}
 
 	@SuppressWarnings("unchecked")
-	public CVTermRelationship getRelationshipByObjectId(int objectId) throws MiddlewareQueryException {
+	public CVTermRelationship getRelationshipByObjectId(int objectId) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("objectId", objectId));
@@ -206,39 +200,37 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException(
+			throw new MiddlewareQueryException(
 					"Error with getRelationshipByObjectId=" + objectId + " query from CVTermRelationship: " + e.getMessage(), e);
-			return null;
 		}
 	}
 
-	public CVTermRelationship saveOrUpdateRelationship(CVTermRelationship cvTermRelationship) throws MiddlewareQueryException {
+	public CVTermRelationship saveOrUpdateRelationship(CVTermRelationship cvTermRelationship) {
 		try {
 			this.saveOrUpdate(cvTermRelationship);
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getBySubject=" + cvTermRelationship.getSubjectId() + " query from CVTermRelationship: "
-					+ e.getMessage(), e);
-			return null;
+			throw new MiddlewareQueryException(
+					"Error with saveOrUpdateRelationship=" + cvTermRelationship + " query from CVTermRelationship: " + e.getMessage(), e);
 		}
 		return cvTermRelationship;
 	}
 
-	public boolean isTermReferred(int termId) throws MiddlewareQueryException {
+	public boolean isTermReferred(int termId) {
 		try {
 
 			SQLQuery query =
 					this.getSession().createSQLQuery("SELECT subject_id FROM cvterm_relationship where object_id = :objectId limit 1;");
 			query.setParameter("objectId", termId);
 			List list = query.list();
-			return list.size() > 0;
+			return !list.isEmpty();
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in getAllInventoryScales in CVTermDao: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with isTermReferred=" + termId + " query from CVTermRelationship: " + e.getMessage(),
+					e);
 		}
-		return false;
 	}
 
-	public CVTermRelationship save(Integer subjectId, Integer typeId, Integer objectId) throws MiddlewareQueryException {
+	public CVTermRelationship save(Integer subjectId, Integer typeId, Integer objectId) {
 		CVTermRelationship relationship = this.getRelationshipSubjectIdObjectIdByTypeId(subjectId, objectId, typeId);
 		if (relationship != null) {
 			return relationship;
@@ -265,13 +257,13 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
                 return (Integer) result;
             }
         } catch (HibernateException e) {
-            this.logAndThrowException("Error in retrieveAnalysisDerivedVariableID in CVTermRelationshipDAO: " + e.getMessage(), e);
-            return null;
+			throw new MiddlewareQueryException("Error with retrieveAnalysisDerivedVariableID=" + originalVariableID + ", "
+					+ analysisMethodTermID + " query from CVTermRelationship: " + e.getMessage(), e);
         }
     }
     
 	@SuppressWarnings({"unchecked"})
-	public List<String> getCategoriesReferredInPhenotype(int scaleId) throws MiddlewareQueryException {
+	public List<String> getCategoriesReferredInPhenotype(int scaleId) {
 		try {
 
 			SQLQuery query = this.getSession()

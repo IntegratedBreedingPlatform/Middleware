@@ -41,7 +41,7 @@ public class TermDataManagerImpl extends DataManager implements TermDataManager 
 	}
 
 	@Override
-	public boolean isTermReferred(int termId) throws MiddlewareException {
+	public boolean isTermReferred(int termId) {
 		return this.getCvTermRelationshipDao().isTermReferred(termId);
 	}
 
@@ -103,7 +103,7 @@ public class TermDataManagerImpl extends DataManager implements TermDataManager 
 	}
 	
 	@Override
-	public List<String> getCategoriesReferredInPhenotype(int scaleId) throws MiddlewareQueryException {
+	public List<String> getCategoriesReferredInPhenotype(int scaleId) {
 		return this.getCvTermRelationshipDao().getCategoriesReferredInPhenotype(scaleId);
 	}
 }
