@@ -194,7 +194,7 @@ public class StudyMeasurements {
 
 		createSQLQuery.addScalar("nd_experiment_id", new IntegerType());
 		createSQLQuery.addScalar("preferred_name", new StringType());
-		createSQLQuery.addScalar("value", new IntegerType());
+		createSQLQuery.addScalar("value", new StringType());
 
 		createSQLQuery.setParameter("studyId", studyId);
 		createSQLQuery.setParameter("selectionVariableId", selectionVariableId);
