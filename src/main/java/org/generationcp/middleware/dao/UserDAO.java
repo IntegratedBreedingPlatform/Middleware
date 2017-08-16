@@ -15,18 +15,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Locdes;
-import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.User;
-import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.service.api.user.UserDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
@@ -35,6 +32,8 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Preconditions;
 
 /**
  * DAO class for {@link User}.
@@ -70,7 +69,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 
 				@SuppressWarnings("unchecked")
 				final List<User> users = criteria.list();
-				return !users.isEmpty() ? true : false;
+				return !users.isEmpty();
 			}
 		} catch (final HibernateException e) {
 			final String message = "Error with isPasswordSameAsUserName(username=" + username + ") query from User: " + e.getMessage();
@@ -177,7 +176,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			UserDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<User>();
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -195,7 +194,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			UserDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<User>();
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -230,7 +229,7 @@ public class UserDAO extends GenericDAO<User, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<User> getByIds(final List<Integer> ids) throws MiddlewareQueryException {
-		List<User> toReturn = new ArrayList<User>();
+		List<User> toReturn = new ArrayList<>();
 
 		if (ids == null || ids.isEmpty()) {
 			return toReturn;
@@ -279,7 +278,6 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			projectionList.add(Projections.property("roles.role"), "role");
 			projectionList.add(Projections.property("status"), "status");
 			projectionList.add(Projections.property("person.email"), "email");
-			
 
 			criteria.setProjection(projectionList);
 
@@ -297,38 +295,24 @@ public class UserDAO extends GenericDAO<User, Integer> {
 
 	public List<UserDto> getUsersAssociatedToStudy(final Integer studyId) throws MiddlewareQueryException {
 		Preconditions.checkNotNull(studyId);
-		List<UserDto> users = new ArrayList<>();
-		String sql = " SELECT DISTINCT "
-			+ "     person.personid AS personId, "
-			+ "     person.fname AS fName, "
-			+ "     person.lname AS lName, "
-			+ "     person.pemail AS email, "
-			+ "     role.role AS role "
-			+ " FROM "
-			+ "     cvterm scale "
-			+ "         INNER JOIN "
-			+ "     cvterm_relationship r ON (r.object_id = scale.cvterm_id) "
-			+ "         INNER JOIN "
-			+ "     cvterm variable ON (r.subject_id = variable.cvterm_id) "
-			+ "         INNER JOIN "
-			+ "     projectprop pp ON (pp.type_id = variable.cvterm_id) "
-			+ "         INNER JOIN "
-			+ "     workbench.persons person ON (pp.value = person.personid) "
-			+ "         INNER JOIN "
-			+ "     workbench.users user ON (user.personid = person.personid) "
-			+ "         LEFT JOIN "
-			+ "     workbench.users_roles role ON (role.userid = user.userid) "
-			+ " WHERE "
-			+ "     pp.project_id = :studyId "
-			+ "         AND r.object_id = 1901 ";
+		final List<UserDto> users = new ArrayList<>();
+		final String sql = " SELECT DISTINCT " + "     person.personid AS personId, " + "     person.fname AS fName, "
+				+ "     person.lname AS lName, " + "     person.pemail AS email, " + "     role.role AS role " + " FROM "
+				+ "     cvterm scale " + "         INNER JOIN " + "     cvterm_relationship r ON (r.object_id = scale.cvterm_id) "
+				+ "         INNER JOIN " + "     cvterm variable ON (r.subject_id = variable.cvterm_id) " + "         INNER JOIN "
+				+ "     projectprop pp ON (pp.type_id = variable.cvterm_id) " + "         INNER JOIN "
+				+ "     workbench.persons person ON (pp.value = person.personid) " + "         INNER JOIN "
+				+ "     workbench.users user ON (user.personid = person.personid) " + "         LEFT JOIN "
+				+ "     workbench.users_roles role ON (role.userid = user.userid) " + " WHERE " + "     pp.project_id = :studyId "
+				+ "         AND r.object_id = 1901 ";
 
 		try {
-			Query query = this.getSession().createSQLQuery(sql).addScalar("personId").addScalar("fName").addScalar("lName")
+			final Query query = this.getSession().createSQLQuery(sql).addScalar("personId").addScalar("fName").addScalar("lName")
 					.addScalar("email").addScalar("role").setParameter("studyId", studyId);
-			List<Object> results = query.list();
-			mapUsers(users, results);
+			final List<Object> results = query.list();
+			this.mapUsers(users, results);
 			return users;
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			final String message = "Error with getUsersAssociatedToStudy() query from studyId: " + studyId;
 			UserDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
@@ -337,8 +321,8 @@ public class UserDAO extends GenericDAO<User, Integer> {
 
 	public List<UserDto> getUsersForEnvironment(final Integer instanceId) throws MiddlewareQueryException {
 		Preconditions.checkNotNull(instanceId);
-		List<UserDto> users = new ArrayList<>();
-		StringBuilder sql = new StringBuilder().append("SELECT DISTINCT ")
+		final List<UserDto> users = new ArrayList<>();
+		final StringBuilder sql = new StringBuilder().append("SELECT DISTINCT ")
 				.append("    person.personid as personId, person.fname as fName, person.lname as lName, person.pemail as email , role.role as role  ")
 				.append("FROM ").append("    cvterm scale ").append("        INNER JOIN ")
 				.append("    cvterm_relationship r ON (r.object_id = scale.cvterm_id) ").append("        INNER JOIN ")
@@ -349,22 +333,50 @@ public class UserDAO extends GenericDAO<User, Integer> {
 				.append("    left join workbench.users_roles role on (role.userid = user.userid) ").append("WHERE ")
 				.append("    pp.nd_geolocation_id = :instanceDbId ").append("        AND r.object_id = 1901    ");
 		try {
-			Query query = this.getSession().createSQLQuery(sql.toString()).addScalar("personId").addScalar("fName").addScalar("lName")
+			final Query query = this.getSession().createSQLQuery(sql.toString()).addScalar("personId").addScalar("fName").addScalar("lName")
 					.addScalar("email").addScalar("role").setParameter("instanceDbId", instanceId);
-			List<Object> results = query.list();
-			mapUsers(users, results);
+			final List<Object> results = query.list();
+			this.mapUsers(users, results);
 			return users;
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 			final String message = "Error with getUsersForEnvironment() query from instanceId: " + instanceId;
 			UserDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
-	private void mapUsers(List<UserDto> users, List<Object> results) {
-		for (Object obj : results) {
-			Object[] row = (Object[]) obj;
-			UserDto user = new UserDto();
+	@SuppressWarnings({"unchecked"})
+	public List<UserDto> getUsersByProjectUUId(final String projectUUID) {
+		final List<UserDto> users = new ArrayList<>();
+		try {
+			if (projectUUID != null) {
+				final SQLQuery query = this.getSession().createSQLQuery(User.GET_USERS_BY_PROJECT_UUID);
+				query.setParameter("project_uuid", projectUUID);
+
+				final List<Object> results = query.list();
+				for (final Object o : results) {
+					final Object[] user = (Object[]) o;
+					final Integer userId = (Integer) user[0];
+					final String username = (String) user[1];
+					final String firstName = (String) user[2];
+					final String lastName = (String) user[3];
+					final String role = (String) user[4];
+					final Integer status = (Integer) user[5];
+					final String email = (String) user[6];
+					final UserDto u = new UserDto(userId, username, firstName, lastName, role, status, email);
+					users.add(u);
+				}
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in getUsersByProjectUUId(project_uuid=" + projectUUID + ")", e);
+		}
+		return users;
+	}
+
+	private void mapUsers(final List<UserDto> users, final List<Object> results) {
+		for (final Object obj : results) {
+			final Object[] row = (Object[]) obj;
+			final UserDto user = new UserDto();
 			user.setUserId((Integer) row[0]);
 			user.setFirstName((String) row[1]);
 			user.setLastName((String) row[2]);
@@ -374,6 +386,16 @@ public class UserDAO extends GenericDAO<User, Integer> {
 			}
 			users.add(user);
 		}
+	}
+
+	public UserDto mapUserToUserDto(final User user) {
+		final UserDto userDto = new UserDto();
+		userDto.setUserId(user.getUserid());
+		userDto.setFirstName(user.getPerson().getFirstName());
+		userDto.setLastName(user.getPerson().getLastName());
+		userDto.setEmail(user.getPerson().getEmail());
+		userDto.setRole(user.getRoles().toString());
+		return userDto;
 	}
 
 }

@@ -81,7 +81,7 @@ public interface WorkbenchDataManager {
 	 * @param filters - the filters that to be included in the query
 	 * @return All projects based on the given start, numOfRows and filters Map
 	 */
-	List<Project> getProjects(final int start, final int numOfRows,final Map<ProgramFilters, Object> filters);
+	List<Project> getProjects(final int start, final int numOfRows, final Map<ProgramFilters, Object> filters);
 
 	/**
 	 * Gets a project by Uuid. Should return only one value.
@@ -788,7 +788,7 @@ public interface WorkbenchDataManager {
 	 * @return - a {@code List} of {@code SecurityQuestion} objects associated with the given User.
 	 */
 	List<SecurityQuestion> getQuestionsByUserId(Integer userId);
-	
+
 	/**
 	 * Gets the ProjectUserInfoDAO.
 	 *
@@ -934,7 +934,7 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * Gets the all Users Sorted
-	 * 
+	 *
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
@@ -942,20 +942,28 @@ public interface WorkbenchDataManager {
 
 	/**
 	 * create the user.
-	 * 
+	 *
 	 * @param user the user
 	 * @return Returns the id of the {@code UserDto} record added
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
 	public Integer createUser(UserDto userDto) throws MiddlewareQueryException;
-	
+
 	/**
 	 * updates the user.
-	 * 
+	 *
 	 * @param user the user to update
 	 * @return Returns the id of the {@code UserDto} record added
 	 * @throws MiddlewareQueryException the MiddlewareQueryException
 	 */
 	public Integer updateUser(UserDto userDto) throws MiddlewareQueryException;
 
+	/**
+	 * Gets the user by project_uuid.
+	 * 
+	 * @param projectUuid
+	 * @return the user matching the given project_uuid
+	 * @throws MiddlewareQueryException
+	 */
+	List<UserDto> getUsersByProjectUuid(final String projectUuid) throws MiddlewareQueryException;
 }
