@@ -80,6 +80,8 @@ public class SampleListServiceImpl implements SampleListService {
 		sampleList.setDescription(sampleListDTO.getDescription());
 		sampleList.setListName(study.getName() + "#" + Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS"));
 		sampleList.setNotes(sampleListDTO.getNotes());
+		final SampleList parent = this.sampleListDao.getRotSampleList();
+		sampleList.setHierarchy(parent);
 
 		final List<ObservationDto> observationDtos = this.studyMeasurements.getSampleObservations(sampleListDTO.getStudyId(),
 				sampleListDTO.getInstanceIds(), sampleListDTO.getSelectionVariableId());

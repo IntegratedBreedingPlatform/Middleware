@@ -47,7 +47,7 @@ public class SampleList implements Serializable {
 	@Column(name = "description")
 	private String description;
 
-	@ManyToOne(targetEntity = SampleList.class)
+	@ManyToOne(targetEntity = SampleList.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "hierarchy")
 	@NotFound(action = NotFoundAction.IGNORE)
 	private SampleList hierarchy;

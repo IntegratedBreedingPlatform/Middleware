@@ -165,4 +165,41 @@
 		</preConditions>
 		<addUniqueConstraint columnNames="nd_experiment_id, plant_no" constraintName="plant_no_exp" tableName="plant" />
 	</changeSet>
+
+	<changeSet author="vanina" id="v6.2-9">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM sample_list WHERE list_name = 'Samples';</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM users where uname = 'admin';</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			insert into sample_list values (
+				NULL,
+				'Samples',
+				'',
+				NULL,
+				NOW(),
+				'',
+				(select userid from users where uname = 'admin'));
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2-10">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT
+				COUNT(*)
+				FROM
+				INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+				WHERE
+				TABLE_NAME = 'sample_list'
+				AND CONSTRAINT_NAME = 'list_name_UNIQUE'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample_list
+			ADD UNIQUE INDEX list_name_UNIQUE (list_name ASC)  COMMENT '';
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
