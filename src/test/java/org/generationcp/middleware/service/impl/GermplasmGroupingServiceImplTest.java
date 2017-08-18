@@ -126,10 +126,10 @@ public class GermplasmGroupingServiceImplTest {
 		this.germplasmGroupingService.markFixed(germplasmToFix, false, false);
 
 		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(), germplasmToFix.getMgid());
-		Assert.assertEquals("Existing selection history should become non-preferred name.", new Integer(0),
+		Assert.assertEquals("Existing selection history should remain preferred name.", new Integer(1),
 				this.selectionHistoryNameParent.getNstat());
 		Assert.assertEquals("Selection history at fixation should be added as a new name.", 2, germplasmToFix.getNames().size());
-		Assert.assertEquals("Selection history at fixation should be added as a preferred name.", new Integer(1),
+		Assert.assertEquals("Selection history at fixation should be added as a non-preferred name.", new Integer(0),
 				germplasmToFix.getNames().get(1).getNstat());
 		Assert.assertEquals("Selection history at fixation should be added as with natype = SELHISFIX code.",
 				this.selHisFixNameCode.getFldno(), germplasmToFix.getNames().get(1).getTypeId());
@@ -162,28 +162,28 @@ public class GermplasmGroupingServiceImplTest {
 		Assert.assertEquals("Expecting child2 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child2.getMgid());
 
 		// Parent selection history name must be copied as selhisfix and as preferred name.
-		Assert.assertEquals("Existing selection history should become non-preferred name for parent.", new Integer(0),
+		Assert.assertEquals("Existing selection history should remain preferred name for parent.", new Integer(1),
 				this.selectionHistoryNameParent.getNstat());
 		Assert.assertEquals("Selection history at fixation should be added as a new name for parent.", 2, germplasmToFix.getNames().size());
-		Assert.assertEquals("Selection history at fixation should be added as a preferred name for parent.", new Integer(1),
+		Assert.assertEquals("Selection history at fixation should be added as a non-preferred name for parent.", new Integer(0),
 				germplasmToFix.getNames().get(1).getNstat());
 		Assert.assertEquals("Selection history at fixation should be added as with natype = SELHISFIX code for parent.",
 				this.selHisFixNameCode.getFldno(), germplasmToFix.getNames().get(1).getTypeId());
 
 		// Child1 selection history name must be copied as selhisfix and as preferred name.
-		Assert.assertEquals("Existing selection history should become non-preferred name for child1.", new Integer(0),
+		Assert.assertEquals("Existing selection history should remain preferred name for child1.", new Integer(1),
 				this.selectionHistoryNameChild1.getNstat());
 		Assert.assertEquals("Selection history at fixation should be added as a new name for child1.", 2, child1.getNames().size());
-		Assert.assertEquals("Selection history at fixation should be added as a preferred name for child1.", new Integer(1),
+		Assert.assertEquals("Selection history at fixation should be added as non-preferred name for child1.", new Integer(0),
 				child1.getNames().get(1).getNstat());
 		Assert.assertEquals("Selection history at fixation should be added as with natype = SELHISFIX code for parent.",
 				this.selHisFixNameCode.getFldno(), child1.getNames().get(1).getTypeId());
 
 		// Child2 selection history name must be copied as selhisfix and as preferred name.
-		Assert.assertEquals("Existing selection history should become non-preferred name for child2.", new Integer(0),
+		Assert.assertEquals("Existing selection history should remain preferred name for child2.", new Integer(1),
 				this.selectionHistoryNameChild2.getNstat());
 		Assert.assertEquals("Selection history at fixation should be added as a new name for child2.", 2, child2.getNames().size());
-		Assert.assertEquals("Selection history at fixation should be added as a preferred name for child2.", new Integer(1),
+		Assert.assertEquals("Selection history at fixation should be added as a non-preferred name for child2.", new Integer(0),
 				child2.getNames().get(1).getNstat());
 		Assert.assertEquals("Selection history at fixation should be added as with natype = SELHISFIX code for child2.",
 				this.selHisFixNameCode.getFldno(), child2.getNames().get(1).getTypeId());
@@ -673,7 +673,7 @@ public class GermplasmGroupingServiceImplTest {
 		// Expect that the advanced germplasm now has two names (SELHISFIX name for parent gets added)
 		Assert.assertEquals("Advanced germplasm should have one additional name inherited from source (parent).", 2,
 				advancedGermplasm.getNames().size());
-		Assert.assertEquals("Normal advancing name should become non-preferred", new Integer(0), normalAdvancingNameOfChild.getNstat());
+		Assert.assertEquals("Normal advancing name should remain preferred", new Integer(1), normalAdvancingNameOfChild.getNstat());
 	}
 	
 	@Test

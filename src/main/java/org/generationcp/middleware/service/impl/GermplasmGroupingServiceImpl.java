@@ -210,42 +210,33 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	 * decided that the line is finished or fixed. The solution adopted for meeting this requirement while remaining consistent with the
 	 * design of the BMS is to create a new name type to represent the "selection history at fixation". We will call this the
 	 * ftype=‘SELHISFIX’. When setting a line as fixed we create the MGID and copy the selection history name to the ‘SELHISFIX’
-	 * name. We will set ‘SELHISFIX’ as the preferred name (designation, nstat=1) so that this will be the name that the user sees in
-	 * lists within the BMS. If new germplasm records are made from this record the ‘SELHISFIX’ name will be copied (along with the
-	 * MGID) and continue to be the preferred name. In the background, the ‘selection history’ will continue to grow as it usually does
+	 * name. If new germplasm records are made from this record the ‘SELHISFIX’ name will be copied (along with the
+	 * MGID). In the background, the ‘selection history’ will continue to grow as it usually does
 	 * and will be accessible through the germplasm details screen but will not be the name displayed in lists.
 	 * 
 	 */
 	private void addOrUpdateSelectionHistoryAtFixationName(final Germplasm germplasm, final Name nameToCopyFrom) {
 
-		// 1. Make current preferred name a non-preferred name by setting nstat = 0
-		// because we are about to add a different name as preferred.
-		final Name currentPreferredName = germplasm.findPreferredName();
-
-		if (currentPreferredName != null) {
-			currentPreferredName.setNstat(0);
-		}
-
-		// 2. Check if there is an existing "selection history at fixation" name
+		// 1. Check if there is an existing "selection history at fixation" name
 		final Name existingSelHisFixName = this.getSelectionHistory(germplasm, GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 
-		// 3. Add a new name as "selection history at fixation" with supplied name value and make it a preferred name.
+		// 2. Add a new name as "selection history at fixation" with supplied name value.
 		if (existingSelHisFixName == null) {
 			final UserDefinedField selHisFixNameType = this.getSelectionHistoryNameType(GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 			final Name newSelectionHistoryAtFixation = new Name();
 			newSelectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
 			newSelectionHistoryAtFixation.setTypeId(selHisFixNameType.getFldno());
 			newSelectionHistoryAtFixation.setNval(nameToCopyFrom.getNval());
-			newSelectionHistoryAtFixation.setNstat(1); // nstat = 1 means it is preferred name.
+			newSelectionHistoryAtFixation.setNstat(0);
 			newSelectionHistoryAtFixation.setUserId(nameToCopyFrom.getUserId());
 			newSelectionHistoryAtFixation.setLocationId(nameToCopyFrom.getLocationId());
 			newSelectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
 			newSelectionHistoryAtFixation.setReferenceId(0);
 			germplasm.getNames().add(newSelectionHistoryAtFixation);
 		} else {
-			// 4. Update the extisting "selection history at fixation" with supplied name and make it a preferred name.
+			// 3. Update the extisting "selection history at fixation" with supplied name
 			existingSelHisFixName.setNval(nameToCopyFrom.getNval());
-			existingSelHisFixName.setNstat(1); // nstat = 1 means it is preferred name.
+			existingSelHisFixName.setNstat(0);
 			existingSelHisFixName.setNdate(Util.getCurrentDateAsIntegerValue());
 		}
 	}
@@ -293,7 +284,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		codedName.setGermplasmId(germplasm.getGid());
 		codedName.setTypeId(nameToCopyFrom.getTypeId());
 		codedName.setNval(nameToCopyFrom.getNval());
-		codedName.setNstat(1); // nstat = 1 means it is preferred name.
+		// nstat = 1 means it is preferred name.
+		codedName.setNstat(1);
 		codedName.setUserId(nameToCopyFrom.getUserId());
 		codedName.setLocationId(nameToCopyFrom.getLocationId());
 		codedName.setNdate(Util.getCurrentDateAsIntegerValue());
