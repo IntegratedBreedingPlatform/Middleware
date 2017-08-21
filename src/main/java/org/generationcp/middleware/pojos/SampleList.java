@@ -38,7 +38,7 @@ public class SampleList implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "list_id")
-	private Integer listId;
+	private Integer id;
 
 	@Column(name = "list_name")
 	@Basic(optional = false)
@@ -75,12 +75,12 @@ public class SampleList implements Serializable {
 		this.samples = samples;
 	}
 
-	public Integer getListId() {
-		return this.listId;
+	public Integer getId() {
+		return id;
 	}
 
-	public void setListId(final Integer listId) {
-		this.listId = listId;
+	public void setId(final Integer id) {
+		this.id = id;
 	}
 
 	public String getListName() {
@@ -137,13 +137,13 @@ public class SampleList implements Serializable {
 			return false;
 		}
 		final SampleList castOther = (SampleList) other;
-		return new EqualsBuilder().append(this.listId, castOther.listId).isEquals();
+		return new EqualsBuilder().append(this.id, castOther.id).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
 
-		return new HashCodeBuilder().append(this.listId).hashCode();
+		return new HashCodeBuilder().append(this.id).hashCode();
 	}
 
 	@Override

@@ -12,10 +12,11 @@ public interface SampleListService {
 	 * Sample List folder name must be unique across the elements in the parent folder
 	 * @param folderName
 	 * @param parentId
+	 * @param createdBy
 	 * @return Folder ID
 	 * @throws Exception
 	 */
-	Integer createSampleListFolder(final String folderName, final Integer parentId) throws Exception;
+	Integer createSampleListFolder(final String folderName, final Integer parentId,final String createdBy) throws Exception;
 
 	/**
 	 * Update sample list folder name

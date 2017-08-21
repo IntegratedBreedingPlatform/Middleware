@@ -34,11 +34,11 @@ import java.util.Map;
 @Transactional
 public class SampleListServiceImpl implements SampleListService {
 
-	private final SampleListDao sampleListDao;
+	private SampleListDao sampleListDao;
 
 	private final SampleDao sampleDao;
 
-	private final UserDAO userDao;
+	private UserDAO userDao;
 
 	private final StudyMeasurements studyMeasurements;
 
@@ -63,6 +63,14 @@ public class SampleListServiceImpl implements SampleListService {
 		this.plantDao = new PlantDao();
 		this.plantDao.setSession(sessionProvider.getSession());
 		this.studyMeasurements = new StudyMeasurements(sessionProvider.getSession());
+	}
+
+	public void setSampleListDao(final SampleListDao sampleListDao) {
+		this.sampleListDao = sampleListDao;
+	}
+
+	public void setUserDao (final UserDAO userDao) {
+		this.userDao = userDao;
 	}
 
 	@Override
@@ -115,8 +123,7 @@ public class SampleListServiceImpl implements SampleListService {
 			}
 
 			sampleList.setSamples(samples);
-			this.sampleListDao.saveOrUpdate(sampleList);
-			return sampleList.getListId();
+			return this.sampleListDao.saveOrUpdate(sampleList).getId();
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error in createOrUpdateSampleList in SampleListServiceImpl: " + e.getMessage(), e);
 		}
@@ -143,12 +150,35 @@ public class SampleListServiceImpl implements SampleListService {
 	 *
 	 * @param folderName
 	 * @param parentId
+	 * @param createdBy
 	 * @return Folder ID
 	 * @throws Exception
 	 */
 	@Override
-	public Integer createSampleListFolder(final String folderName, final Integer parentId) throws Exception {
-		return null;
+	public Integer createSampleListFolder(final String folderName, final Integer parentId, final String createdBy) throws Exception {
+		Preconditions.checkNotNull(folderName);
+		Preconditions.checkNotNull(parentId);
+		Preconditions.checkNotNull(createdBy);
+		Preconditions.checkArgument(!folderName.isEmpty(), new IllegalArgumentException("folderName can not be empty"));
+		Preconditions.checkArgument(!createdBy.isEmpty(), new IllegalArgumentException("createdBy can not be empty"));
+
+		final SampleList parentList = this.sampleListDao.getById(parentId);
+		if (parentList == null) {
+			throw new Exception("Parent Folder does not exist");
+		}
+		//TODO check that parentList is a folder
+		if (this.sampleListDao.getSampleListByParentAndName(folderName, parentId) != null) {
+			throw new Exception("folderName is not unique in the specified folder");
+		}
+		final SampleList sampleFolder = new SampleList();
+		sampleFolder.setCreatedDate(new Date());
+		sampleFolder.setCreatedBy(this.userDao.getUserByUserName(createdBy));
+		sampleFolder.setDescription(null);
+		sampleFolder.setListName(folderName);
+		sampleFolder.setNotes(null);
+		sampleFolder.setHierarchy(parentList);
+		//TODO set list type = folder
+		return this.sampleListDao.save(sampleFolder).getId();
 	}
 
 	/**
