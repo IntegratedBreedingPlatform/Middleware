@@ -151,11 +151,11 @@ public class SampleListServiceImpl implements SampleListService {
 	 * @param folderName
 	 * @param parentId
 	 * @param createdBy
-	 * @return Folder ID
+	 * @return Sample List
 	 * @throws Exception
 	 */
 	@Override
-	public Integer createSampleListFolder(final String folderName, final Integer parentId, final String createdBy) throws Exception {
+	public SampleList createSampleListFolder(final String folderName, final Integer parentId, final String createdBy) throws Exception {
 		Preconditions.checkNotNull(folderName);
 		Preconditions.checkNotNull(parentId);
 		Preconditions.checkNotNull(createdBy);
@@ -178,7 +178,7 @@ public class SampleListServiceImpl implements SampleListService {
 		sampleFolder.setNotes(null);
 		sampleFolder.setHierarchy(parentList);
 		//TODO set list type = folder
-		return this.sampleListDao.save(sampleFolder).getId();
+		return this.sampleListDao.save(sampleFolder);
 	}
 
 	/**
@@ -187,11 +187,34 @@ public class SampleListServiceImpl implements SampleListService {
 	 *
 	 * @param folderId
 	 * @param newFolderName
+	 * @return SampleList
 	 * @throws Exception
 	 */
 	@Override
-	public void updateSampleListFolderName(final Integer folderId, final String newFolderName) throws Exception {
+	public SampleList updateSampleListFolderName(final Integer folderId, final String newFolderName) throws Exception {
+		Preconditions.checkNotNull(folderId);
+		Preconditions.checkNotNull(newFolderName);
+		Preconditions.checkArgument(!newFolderName.isEmpty(), new IllegalArgumentException("newFolderName can not be empty"));
 
+		final SampleList folder = this.sampleListDao.getById(folderId);
+
+		if (folder == null) {
+			throw new Exception("Folder does not exist");
+		}
+		//TODO Check that folder is a folder and not a list
+
+		//TODO Confirm
+		//		if (folder.getHierarchy() == null) {
+		//			throw new Exception("Root folder name is not editable");
+		//		}
+
+		if (this.sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId()) != null) {
+			throw new Exception("folderName is not unique in the parent folder");
+		}
+
+		folder.setListName(newFolderName);
+
+		return this.sampleListDao.saveOrUpdate(folder);
 	}
 
 	/**

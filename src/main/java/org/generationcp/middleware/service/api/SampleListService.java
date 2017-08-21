@@ -2,6 +2,7 @@
 package org.generationcp.middleware.service.api;
 
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
+import org.generationcp.middleware.pojos.SampleList;
 
 public interface SampleListService {
 
@@ -13,19 +14,20 @@ public interface SampleListService {
 	 * @param folderName
 	 * @param parentId
 	 * @param createdBy
-	 * @return Folder ID
+	 * @return SampleList (Saved Folder)
 	 * @throws Exception
 	 */
-	Integer createSampleListFolder(final String folderName, final Integer parentId,final String createdBy) throws Exception;
+	SampleList createSampleListFolder(final String folderName, final Integer parentId,final String createdBy) throws Exception;
 
 	/**
 	 * Update sample list folder name
 	 * New folder name should be unique across the elements in the parent folder
 	 * @param folderId
 	 * @param newFolderName
+	 * @return SampleList
 	 * @throws Exception
 	 */
-	void updateSampleListFolderName(final Integer folderId, final String newFolderName) throws Exception;
+	SampleList updateSampleListFolderName(final Integer folderId, final String newFolderName) throws Exception;
 
 	/**
 	 * Move a folder to another folder

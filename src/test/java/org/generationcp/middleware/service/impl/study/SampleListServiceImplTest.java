@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
@@ -90,8 +91,112 @@ public class SampleListServiceImplTest {
 		SampleList sampleFolder = new SampleList();
 		sampleFolder.setId(1);
 		Mockito.when(sampleListDao.save(Mockito.any(SampleList.class))).thenReturn(sampleFolder);
-		final Integer savedId = this.sampleListService.createSampleListFolder("4", 1, "userName");
-		assertThat(sampleFolder.getId(), equalTo(savedId));
+		final SampleList savedObject = this.sampleListService.createSampleListFolder("4", 1, "userName");
+		assertThat(sampleFolder.getId(), equalTo(savedObject.getId()));
+	}
+
+	@Test(expected = MiddlewareQueryException.class)
+	public void createSampleListFolderDBException() throws Exception {
+		final SampleList parentFolder = new SampleList();
+		Mockito.when(sampleListDao.getById(1)).thenReturn(parentFolder);
+		Mockito.when(sampleListDao.getSampleListByParentAndName("4", 1)).thenReturn(null);
+		Mockito.when(userDAO.getUserByUserName("userName")).thenReturn(new User());
+		Mockito.when(sampleListDao.save(Mockito.any(SampleList.class))).thenThrow(MiddlewareQueryException.class);
+		this.sampleListService.createSampleListFolder("4", 1, "userName");
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void updateSampleListFolderNameNullFolderId() throws Exception {
+		this.sampleListService.updateSampleListFolderName(null, "newFolderName");
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void updateSampleListFolderNameNullNewFolderName() throws Exception {
+		this.sampleListService.updateSampleListFolderName(1, null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void updateSampleListFolderNameEmptyNewFolderName() throws Exception {
+		this.sampleListService.updateSampleListFolderName(1, "");
+	}
+
+	@Test(expected = Exception.class)
+	public void updateSampleListFolderNameFolderIdNotExist() throws Exception {
+		final Integer folderId = 1;
+		Mockito.when(sampleListDao.getById(folderId)).thenReturn(null);
+		this.sampleListService.updateSampleListFolderName(folderId, "newFolderName");
+	}
+
+	//TODO
+	@Test
+	public void updateSampleListFolderNameFolderIdNotAFolder() throws Exception {
+
+	}
+
+	//TODO
+	@Test
+	public void updateSampleListFolderNameRotFolderNotEditable() throws Exception {
+
+	}
+
+	@Test(expected = Exception.class)
+	public void updateSampleListFolderNameNameNotUnique() throws Exception {
+		final Integer folderId = 2;
+		final Integer parentFolderId = 1;
+		final String newFolderName = "NEW_NAME";
+		final SampleList parentFolder = new SampleList();
+		parentFolder.setId(parentFolderId);
+		final SampleList folder = new SampleList();
+		folder.setId(folderId);
+		folder.setHierarchy(parentFolder);
+		final SampleList notUniqueFolder = new SampleList();
+
+		Mockito.when(sampleListDao.getById(folderId)).thenReturn(folder);
+		Mockito.when(sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId())).thenReturn(notUniqueFolder);
+		this.sampleListService.updateSampleListFolderName(folderId, newFolderName);
+
+	}
+
+	@Test(expected = MiddlewareQueryException.class)
+	public void updateSampleListFolderNameDBException() throws Exception {
+
+		final Integer folderId = 2;
+		final Integer parentFolderId = 1;
+		final String newFolderName = "NEW_NAME";
+		final SampleList parentFolder = new SampleList();
+		parentFolder.setId(parentFolderId);
+		final SampleList folder = new SampleList();
+		folder.setId(folderId);
+		folder.setHierarchy(parentFolder);
+
+		Mockito.when(sampleListDao.getById(folderId)).thenReturn(folder);
+		Mockito.when(sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId())).thenReturn(null);
+
+		Mockito.when(sampleListDao.saveOrUpdate(folder)).thenThrow(MiddlewareQueryException.class);
+
+		this.sampleListService.updateSampleListFolderName(folderId, newFolderName);
+
+	}
+
+	@Test
+	public void updateSampleListFolderNameOk() throws Exception {
+		final Integer folderId = 2;
+		final Integer parentFolderId = 1;
+		final String newFolderName = "NEW_NAME";
+		final SampleList parentFolder = new SampleList();
+		parentFolder.setId(parentFolderId);
+		final SampleList folder = new SampleList();
+		folder.setId(folderId);
+		folder.setHierarchy(parentFolder);
+
+		Mockito.when(sampleListDao.getById(folderId)).thenReturn(folder);
+		Mockito.when(sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId())).thenReturn(null);
+
+		Mockito.when(sampleListDao.saveOrUpdate(folder)).thenReturn(folder);
+
+		final SampleList savedFolder = this.sampleListService.updateSampleListFolderName(folderId, newFolderName);
+
+		assertThat(savedFolder.getListName(), equalTo(newFolderName));
 	}
 
 }
