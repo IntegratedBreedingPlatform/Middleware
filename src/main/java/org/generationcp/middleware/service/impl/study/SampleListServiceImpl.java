@@ -218,15 +218,13 @@ public class SampleListServiceImpl implements SampleListService {
 
 	/**
 	 * Move a folder to another folder
-	 * FolderID must exist, newParentID must exist
-	 * newParentID folder must not contain another sample list with the name that the one that needs to be moved
-	 *
-	 * @param folderId
-	 * @param newParentId
+	 * sampleListId must exist (could be a folder or a list), newParentFolderId must exist and must be a folder
+	 * newParentFolderId folder must not contain another sample list or folder with the name that the one that needs to be moved
+	 * @param sampleListId
+	 * @param newParentFolderId
 	 * @throws Exception
 	 */
-	@Override
-	public void moveSampleListFolder(final Integer folderId, final Integer newParentId) throws Exception {
+	public void moveSampleList(final Integer sampleListId, final Integer newParentFolderId) throws Exception {
 
 	}
 
@@ -247,7 +245,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 		if (folder.getHierarchy() == null)
 			throw new Exception("Root folder can not be deleted");
-		if (folder.getChildren().size() > 0)
+		if (folder.getChildren() != null && folder.getChildren().size() > 0)
 			throw new Exception("Folder to delete can not have children");
 		this.sampleListDao.makeTransient(folder);
 	}

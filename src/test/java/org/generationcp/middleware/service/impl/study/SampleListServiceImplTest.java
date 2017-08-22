@@ -15,6 +15,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SampleListServiceImplTest {
 
 	@Mock
@@ -133,10 +136,14 @@ public class SampleListServiceImplTest {
 
 	}
 
-	//TODO
-	@Test
-	public void updateSampleListFolderNameRotFolderNotEditable() throws Exception {
-
+	@Test(expected = Exception.class)
+	public void updateSampleListFolderNameRootFolderNotEditable() throws Exception {
+		final Integer folderId = 1;
+		SampleList rootFolder = new SampleList();
+		rootFolder.setId(folderId);
+		rootFolder.setHierarchy(null);
+		Mockito.when(sampleListDao.getById(folderId)).thenReturn(rootFolder);
+		this.sampleListService.updateSampleListFolderName(folderId, "newFolderName");
 	}
 
 	@Test(expected = Exception.class)
@@ -197,6 +204,65 @@ public class SampleListServiceImplTest {
 		final SampleList savedFolder = this.sampleListService.updateSampleListFolderName(folderId, newFolderName);
 
 		assertThat(savedFolder.getListName(), equalTo(newFolderName));
+	}
+
+	@Test(expected = NullPointerException.class)
+	public void deleteSampleListFolderNullFolderId() throws Exception {
+		this.sampleListService.deleteSampleListFolder(null);
+	}
+
+	@Test(expected = Exception.class)
+	public void deleteSampleListFolderFolderNotExist() throws Exception {
+		final Integer folderId = 1;
+		Mockito.when(this.sampleListDao.getById(folderId)).thenReturn(null);
+		this.sampleListService.deleteSampleListFolder(folderId);
+	}
+
+	@Test(expected = Exception.class)
+	public void deleteSampleListFolderFolderIsRootFolder() throws Exception {
+		final Integer folderId = 1;
+		final SampleList rootFolder = new SampleList();
+		rootFolder.setId(folderId);
+		rootFolder.setHierarchy(null);
+		Mockito.when(this.sampleListDao.getById(folderId)).thenReturn(rootFolder);
+		this.sampleListService.deleteSampleListFolder(folderId);
+	}
+
+	@Test(expected = Exception.class)
+	public void deleteSampleListFolderFolderHasChildren() throws Exception {
+		final Integer folderId = 1;
+		final SampleList folder = new SampleList();
+		final SampleList parentFolder = new SampleList();
+		parentFolder.setId(2);
+
+		folder.setId(folderId);
+		folder.setHierarchy(parentFolder);
+
+		final SampleList child = new SampleList();
+		child.setId(3);
+		final List<SampleList> children = new ArrayList<>();
+		children.add(child);
+
+		folder.setChildren(children);
+
+		Mockito.when(this.sampleListDao.getById(folderId)).thenReturn(folder);
+		this.sampleListService.deleteSampleListFolder(folderId);
+	}
+
+	@Test(expected = MiddlewareQueryException.class)
+	public void deleteSampleListFolderDBException() throws Exception {
+		final Integer folderId = 1;
+		final SampleList folder = new SampleList();
+		final SampleList parentFolder = new SampleList();
+		parentFolder.setId(2);
+
+		folder.setId(folderId);
+		folder.setHierarchy(parentFolder);
+
+		Mockito.when(this.sampleListDao.getById(folderId)).thenReturn(folder);
+		Mockito.doThrow(new MiddlewareQueryException("")).when(this.sampleListDao).makeTransient(folder);
+
+		this.sampleListService.deleteSampleListFolder(folderId);
 	}
 
 }
