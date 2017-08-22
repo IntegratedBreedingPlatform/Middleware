@@ -24,6 +24,10 @@ import com.google.common.collect.Sets;
 
 public class GermplasmGroupingServiceImplTest {
 
+
+	private static final Integer PREFERRED_CODE = 1;
+	private static final Integer NON_PREFERRED_CODE = 0;
+
 	@Mock
 	private GermplasmDAO germplasmDAO;
 
@@ -97,17 +101,17 @@ public class GermplasmGroupingServiceImplTest {
 				.thenReturn(this.codedName3);
 
 		this.selectionHistoryNameParent = new Name();
-		this.selectionHistoryNameParent.setNstat(1);
+		this.selectionHistoryNameParent.setNstat(PREFERRED_CODE);
 		this.selectionHistoryNameParent.setNval("SelectionHistory");
 		this.selectionHistoryNameParent.setTypeId(this.selectionHistoryNameCode.getFldno());
 
 		this.selectionHistoryNameChild1 = new Name();
-		this.selectionHistoryNameChild1.setNstat(1);
+		this.selectionHistoryNameChild1.setNstat(PREFERRED_CODE);
 		this.selectionHistoryNameChild1.setNval("SelectionHistoryChild1");
 		this.selectionHistoryNameChild1.setTypeId(this.selectionHistoryNameCode.getFldno());
 
 		this.selectionHistoryNameChild2 = new Name();
-		this.selectionHistoryNameChild2.setNstat(1);
+		this.selectionHistoryNameChild2.setNstat(PREFERRED_CODE);
 		this.selectionHistoryNameChild2.setNval("SelectionHistoryChild2");
 		this.selectionHistoryNameChild2.setTypeId(this.selectionHistoryNameCode.getFldno());
 
@@ -127,12 +131,12 @@ public class GermplasmGroupingServiceImplTest {
 		this.germplasmGroupingService.markFixed(germplasmToFix, false, false);
 
 		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", germplasmToFix.getGid(), germplasmToFix.getMgid());
-		Assert.assertEquals("Existing selection history should remain preferred name.", new Integer(1),
+		Assert.assertEquals("Existing selection history should remain preferred name.", PREFERRED_CODE,
 				this.selectionHistoryNameParent.getNstat());
 		Assert.assertEquals("Selection history at fixation should be added as a new name.", 2, germplasmToFix.getNames().size());
-		Assert.assertEquals("Selection history at fixation should be added as a non-preferred name.", new Integer(0),
+		Assert.assertEquals("Selection history at fixation should be added as a non-preferred name.", NON_PREFERRED_CODE,
 				germplasmToFix.getNames().get(1).getNstat());
-		Assert.assertEquals("Selection history at fixation should be added as with natype = SELHISFIX code.",
+		Assert.assertEquals("Selection history at fixation should be added as with name type = SELHISFIX code.",
 				this.selHisFixNameCode.getFldno(), germplasmToFix.getNames().get(1).getTypeId());
 
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).save(Mockito.any(Germplasm.class));
@@ -163,30 +167,30 @@ public class GermplasmGroupingServiceImplTest {
 		Assert.assertEquals("Expecting child2 mgid to be set the same as founder/parent gid.", germplasmToFix.getGid(), child2.getMgid());
 
 		// Parent selection history name must be copied as selhisfix and as preferred name.
-		Assert.assertEquals("Existing selection history should remain preferred name for parent.", new Integer(1),
+		Assert.assertEquals("Existing selection history should remain preferred name for parent.", PREFERRED_CODE,
 				this.selectionHistoryNameParent.getNstat());
 		Assert.assertEquals("Selection history at fixation should be added as a new name for parent.", 2, germplasmToFix.getNames().size());
-		Assert.assertEquals("Selection history at fixation should be added as a non-preferred name for parent.", new Integer(0),
+		Assert.assertEquals("Selection history at fixation should be added as a non-preferred name for parent.", NON_PREFERRED_CODE,
 				germplasmToFix.getNames().get(1).getNstat());
-		Assert.assertEquals("Selection history at fixation should be added as with natype = SELHISFIX code for parent.",
+		Assert.assertEquals("Selection history at fixation should be added as with name type = SELHISFIX code for parent.",
 				this.selHisFixNameCode.getFldno(), germplasmToFix.getNames().get(1).getTypeId());
 
 		// Child1 selection history name must be copied as selhisfix and as preferred name.
-		Assert.assertEquals("Existing selection history should remain preferred name for child1.", new Integer(1),
+		Assert.assertEquals("Existing selection history should remain preferred name for child1.", PREFERRED_CODE,
 				this.selectionHistoryNameChild1.getNstat());
 		Assert.assertEquals("Selection history at fixation should be added as a new name for child1.", 2, child1.getNames().size());
-		Assert.assertEquals("Selection history at fixation should be added as non-preferred name for child1.", new Integer(0),
+		Assert.assertEquals("Selection history at fixation should be added as non-preferred name for child1.", NON_PREFERRED_CODE,
 				child1.getNames().get(1).getNstat());
-		Assert.assertEquals("Selection history at fixation should be added as with natype = SELHISFIX code for parent.",
+		Assert.assertEquals("Selection history at fixation should be added as with name type = SELHISFIX code for parent.",
 				this.selHisFixNameCode.getFldno(), child1.getNames().get(1).getTypeId());
 
 		// Child2 selection history name must be copied as selhisfix and as preferred name.
-		Assert.assertEquals("Existing selection history should remain preferred name for child2.", new Integer(1),
+		Assert.assertEquals("Existing selection history should remain preferred name for child2.", PREFERRED_CODE,
 				this.selectionHistoryNameChild2.getNstat());
 		Assert.assertEquals("Selection history at fixation should be added as a new name for child2.", 2, child2.getNames().size());
-		Assert.assertEquals("Selection history at fixation should be added as a non-preferred name for child2.", new Integer(0),
+		Assert.assertEquals("Selection history at fixation should be added as a non-preferred name for child2.", NON_PREFERRED_CODE,
 				child2.getNames().get(1).getNstat());
-		Assert.assertEquals("Selection history at fixation should be added as with natype = SELHISFIX code for child2.",
+		Assert.assertEquals("Selection history at fixation should be added as with name type = SELHISFIX code for child2.",
 				this.selHisFixNameCode.getFldno(), child2.getNames().get(1).getTypeId());
 
 		Mockito.verify(this.germplasmDAO, Mockito.times(3)).save(Mockito.any(Germplasm.class));
@@ -662,7 +666,7 @@ public class GermplasmGroupingServiceImplTest {
 		final Germplasm advancedGermplasmSource = new Germplasm(2);
 
 		final Name selHisFixNameOfParent = new Name(11);
-		selHisFixNameOfParent.setNstat(1);
+		selHisFixNameOfParent.setNstat(PREFERRED_CODE);
 		selHisFixNameOfParent.setNval("CML");
 		selHisFixNameOfParent.setTypeId(this.selHisFixNameCode.getFldno());
 		advancedGermplasmSource.getNames().add(selHisFixNameOfParent);
@@ -673,7 +677,7 @@ public class GermplasmGroupingServiceImplTest {
 		advancedGermplasm.setGpid2(advancedGermplasm.getGpid2());
 
 		final Name normalAdvancingNameOfChild = new Name(22);
-		normalAdvancingNameOfChild.setNstat(1); // Set as preferred.
+		normalAdvancingNameOfChild.setNstat(PREFERRED_CODE);
 		normalAdvancingNameOfChild.setNval("CML-1-1-1");
 		normalAdvancingNameOfChild.setTypeId(5);
 		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
@@ -687,7 +691,7 @@ public class GermplasmGroupingServiceImplTest {
 		// Expect that the advanced germplasm now has two names (SELHISFIX name for parent gets added)
 		Assert.assertEquals("Advanced germplasm should have one additional name inherited from source (parent).", 2,
 				advancedGermplasm.getNames().size());
-		Assert.assertEquals("Normal advancing name should remain preferred", new Integer(1), normalAdvancingNameOfChild.getNstat());
+		Assert.assertEquals("Normal advancing name should remain preferred", PREFERRED_CODE, normalAdvancingNameOfChild.getNstat());
 	}
 
 	@Test
@@ -697,7 +701,7 @@ public class GermplasmGroupingServiceImplTest {
 		final Germplasm advancedGermplasmSource = new Germplasm(2);
 
 		final Name code1 = new Name(12);
-		code1.setNstat(0);
+		code1.setNstat(NON_PREFERRED_CODE);
 		code1.setNval("CODE1");
 		code1.setTypeId(this.codedName1.getFldno());
 		advancedGermplasmSource.getNames().add(code1);
@@ -708,7 +712,7 @@ public class GermplasmGroupingServiceImplTest {
 		advancedGermplasm.setGpid2(advancedGermplasm.getGpid2());
 
 		final Name normalAdvancingNameOfChild = new Name(22);
-		normalAdvancingNameOfChild.setNstat(1); // Set as preferred.
+		normalAdvancingNameOfChild.setNstat(PREFERRED_CODE);
 		normalAdvancingNameOfChild.setNval("CML-1-1-1");
 		normalAdvancingNameOfChild.setTypeId(5);
 		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
@@ -722,7 +726,7 @@ public class GermplasmGroupingServiceImplTest {
 		// Expect that the advanced germplasm now has two names (SELHISFIX name for parent gets added)
 		Assert.assertEquals("Advanced germplasm should have one additional name inherited from source (parent).", 2,
 				advancedGermplasm.getNames().size());
-		Assert.assertEquals("Normal advancing name should become non-preferred", new Integer(0), normalAdvancingNameOfChild.getNstat());
+		Assert.assertEquals("Normal advancing name should become non-preferred", NON_PREFERRED_CODE, normalAdvancingNameOfChild.getNstat());
 	}
 
 	@Test
@@ -732,19 +736,19 @@ public class GermplasmGroupingServiceImplTest {
 		final Germplasm advancedGermplasmSource = new Germplasm(2);
 
 		final Name code1 = new Name(12);
-		code1.setNstat(0);
+		code1.setNstat(NON_PREFERRED_CODE);
 		code1.setNval("CODE1");
 		code1.setTypeId(this.codedName1.getFldno());
 		advancedGermplasmSource.getNames().add(code1);
 
 		final Name code2 = new Name(12);
-		code2.setNstat(0);
+		code2.setNstat(NON_PREFERRED_CODE);
 		code2.setNval("CODE2");
 		code2.setTypeId(this.codedName2.getFldno());
 		advancedGermplasmSource.getNames().add(code2);
 
 		final Name code3 = new Name(12);
-		code3.setNstat(0);
+		code3.setNstat(NON_PREFERRED_CODE);
 		code3.setNval("CODE3");
 		code3.setTypeId(this.codedName3.getFldno());
 		advancedGermplasmSource.getNames().add(code3);
@@ -755,7 +759,7 @@ public class GermplasmGroupingServiceImplTest {
 		advancedGermplasm.setGpid2(advancedGermplasm.getGpid2());
 
 		final Name normalAdvancingNameOfChild = new Name(22);
-		normalAdvancingNameOfChild.setNstat(1); // Set as preferred.
+		normalAdvancingNameOfChild.setNstat(PREFERRED_CODE);
 		normalAdvancingNameOfChild.setNval("CML-1-1-1");
 		normalAdvancingNameOfChild.setTypeId(5);
 		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
@@ -771,10 +775,10 @@ public class GermplasmGroupingServiceImplTest {
 				advancedGermplasm.getNames().size());
 		for (final Name name : advancedGermplasm.getNames()) {
 			if (name.getTypeId().equals(this.codedName3.getFldno())) {
-				Assert.assertEquals("Name with fldno " + this.codedName3.getFldno() + " should be set as preferred name", new Integer(1),
+				Assert.assertEquals("Name with fldno " + this.codedName3.getFldno() + " should be set as preferred name", PREFERRED_CODE,
 						name.getNstat());
 			} else {
-				Assert.assertEquals("Other inherited names should be non-preferred", new Integer(0), name.getNstat());
+				Assert.assertEquals("Other inherited names should be non-preferred", NON_PREFERRED_CODE, name.getNstat());
 			}
 		}
 	}
