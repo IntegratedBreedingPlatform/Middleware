@@ -27,12 +27,12 @@ public class StudyMeasurements {
 	}
 
 	List<ObservationDto> getAllMeasurements(final int projectBusinessIdentifier, final List<MeasurementVariableDto> measurementVariables,
-			final List<String> germplasmDescriptors, final int instanceId, final int pageNumber, final int pageSize, final String sortBy,
+			final List<String> germplasmDescriptors, final int instanceId, final boolean hasSamples, final int pageNumber, final int pageSize, final String sortBy,
 			final String sortOrder) {
 		final String generateQuery =
-				this.measurementQuery.getAllObservationsQuery(measurementVariables, germplasmDescriptors, sortBy, sortOrder);
+				this.measurementQuery.getAllObservationsQuery(measurementVariables, germplasmDescriptors, hasSamples, sortBy, sortOrder);
 		return this.executeQueryAndMapResults(projectBusinessIdentifier, measurementVariables, germplasmDescriptors, generateQuery,
-				instanceId, pageNumber, pageSize);
+				instanceId, hasSamples, pageNumber, pageSize);
 	}
 
 	List<ObservationDto> getMeasurement(final int projectBusinessIdentifier, final List<MeasurementVariableDto> measurementVariables,
@@ -52,35 +52,37 @@ public class StudyMeasurements {
 	@SuppressWarnings("unchecked")
 	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier,
 			final List<MeasurementVariableDto> measurementVariables, final List<String> germplasmDescriptors, final String generateQuery,
-			final int instanceId, final int pageNumber, final int pageSize) {
-		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(measurementVariables, germplasmDescriptors, generateQuery);
+			final int instanceId, final boolean hasSamples, final int pageNumber, final int pageSize) {
+		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(measurementVariables, germplasmDescriptors, hasSamples, generateQuery);
 		createSQLQuery.setParameter(StudyMeasurements.STUDY_ID, projectBusinessIdentifier);
 		createSQLQuery.setParameter("instanceId", String.valueOf(instanceId));
 
 		createSQLQuery.setFirstResult(pageSize * (pageNumber - 1));
 		createSQLQuery.setMaxResults(pageSize);
 
-		return this.mapResults(createSQLQuery.list(), measurementVariables, germplasmDescriptors);
+		return this.mapResults(createSQLQuery.list(), measurementVariables, germplasmDescriptors, hasSamples);
 	}
 
 	@SuppressWarnings("unchecked")
 	private List<ObservationDto> executeQueryAndMapResults(final int projectBusinessIdentifier,
 			final List<MeasurementVariableDto> measurementVariables, final List<String> germplasmDescriptors, final String generateQuery,
 			final Integer measurementId) {
-		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(measurementVariables, germplasmDescriptors, generateQuery);
+		final SQLQuery createSQLQuery = this.createQueryAndAddScalar(measurementVariables, germplasmDescriptors,false, generateQuery);
 		createSQLQuery.setParameter(StudyMeasurements.STUDY_ID, projectBusinessIdentifier);
 		createSQLQuery.setParameter("experiment_id", measurementId);
-		return this.mapResults(createSQLQuery.list(), measurementVariables, germplasmDescriptors);
+		return this.mapResults(createSQLQuery.list(), measurementVariables, germplasmDescriptors, false);
 	}
 
 	private SQLQuery createQueryAndAddScalar(final List<MeasurementVariableDto> selectionMethodsAndTraits,
-			final List<String> germplasmDescriptors, final String generateQuery) {
+			final List<String> germplasmDescriptors, final boolean hasSamples, final String generateQuery) {
 		final SQLQuery createSQLQuery = this.session.createSQLQuery(generateQuery);
 
 		this.addScalar(createSQLQuery);
 		createSQLQuery.addScalar("FIELDMAP COLUMN");
 		createSQLQuery.addScalar("FIELDMAP RANGE");
-
+		if(hasSamples) {
+			createSQLQuery.addScalar("SAMPLES");
+		}
 		this.addScalarForTraits(selectionMethodsAndTraits, createSQLQuery);
 
 		for (final String gpDescriptor : germplasmDescriptors) {
@@ -98,9 +100,9 @@ public class StudyMeasurements {
 	}
 
 	private List<ObservationDto> mapResults(final List<Object[]> results, final List<MeasurementVariableDto> projectVariables,
-			final List<String> germplasmDescriptors) {
+			final List<String> germplasmDescriptors, final boolean hasSamples) {
 		final List<ObservationDto> measurements = new ArrayList<>();
-		final int fixedColumns = 15;
+		final int fixedColumns = hasSamples ? 16 : 15;
 
 		if (results != null && !results.isEmpty()) {
 			for (final Object[] row : results) {
@@ -120,6 +122,10 @@ public class StudyMeasurements {
 				measurement.setPlotId((String) row[12]);
 				measurement.setFieldMapColumn((String) row[13]);
 				measurement.setFieldMapRange((String) row[14]);
+
+				if (hasSamples) {
+					measurement.setSamples((row[15]).toString().equalsIgnoreCase("0")  ? "-" : row[15].toString());
+				}
 
 				int gpDescIndex = fixedColumns + projectVariables.size() * 2;
 				for (final String gpDesc : germplasmDescriptors) {

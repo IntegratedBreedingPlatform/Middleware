@@ -122,9 +122,9 @@ class ObservationQuery {
 		+ "    AND name LIKE '%PLOTDATA')) \n" + " AND gl.description IN (:instanceIds) \n"
 		+ " and cvterm_variable.cvterm_id = :selectionVariableId\n" + " GROUP BY nde.nd_experiment_id";
 
-	String getAllObservationsQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors, final String sortBy,
+	String getAllObservationsQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors, final boolean hasSamples, final String sortBy,
 			final String sortOrder) {
-		return this.getObservationsMainQuery(measurementVariables, germplasmDescriptors) + getInstanceNumberClause() + getGroupingClause()
+		return this.getObservationsMainQuery(measurementVariables, germplasmDescriptors, hasSamples) + getInstanceNumberClause() + getGroupingClause()
 				+ getOrderingClause(sortBy, sortOrder);
 	}
 
@@ -193,7 +193,7 @@ class ObservationQuery {
 	}
 
 	String getSingleObservationQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors) {
-		return this.getObservationsMainQuery(measurementVariables, germplasmDescriptors) + " AND nde.nd_experiment_id = :experiment_id \n"
+		return this.getObservationsMainQuery(measurementVariables, germplasmDescriptors, false) + " AND nde.nd_experiment_id = :experiment_id \n"
 				+ getGroupingClause();
 	}
 
@@ -215,7 +215,7 @@ class ObservationQuery {
 		return columnNames.toString();
 	}
 
-	String getObservationsMainQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors) {
+	String getObservationsMainQuery(final List<MeasurementVariableDto> measurementVariables,  List<String> germplasmDescriptors, final boolean hasSamples) {
 		StringBuilder sqlBuilder = new StringBuilder();
 
 		sqlBuilder.append(
@@ -233,8 +233,11 @@ class ObservationQuery {
 				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'ROW') ROW, \n" +
 				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'COL') COL, \n" +
 				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN', \n" +
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n" +
-		        "    nde.plot_id as PLOT_ID, \n");
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n");
+		if (hasSamples) {
+			sqlBuilder.append("    (SELECT count(sp.sample_id) FROM plant pl INNER JOIN sample AS sp ON pl.plant_id = sp.sample_id WHERE nde.nd_experiment_id = pl.nd_experiment_id ) 'SAMPLES', \n");
+		}
+		sqlBuilder.append("    nde.plot_id as PLOT_ID, \n");
 
 		String traitClauseFormat =
 				" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n" +
@@ -264,8 +267,8 @@ class ObservationQuery {
 				"        INNER JOIN stock s ON s.stock_id = es.stock_id \n" +
 				"        LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n" +
 				"        LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n" +
-				"        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n" +
-				" WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n");
+				"        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n");
+		sqlBuilder.append(" WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n");
 
 		return sqlBuilder.toString();
 	}
