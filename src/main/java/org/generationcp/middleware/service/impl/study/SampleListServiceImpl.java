@@ -36,11 +36,13 @@ public class SampleListServiceImpl implements SampleListService {
 
 	private SampleListDao sampleListDao;
 
-	private final SampleDao sampleDao;
-
 	private UserDAO userDao;
 
+	private final SampleDao sampleDao;
+
 	private final StudyMeasurements studyMeasurements;
+
+	private final PlantDao plantDao;
 
 	@Autowired
 	private SampleService sampleService;
@@ -50,8 +52,6 @@ public class SampleListServiceImpl implements SampleListService {
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
-
-	private final PlantDao plantDao;
 
 	public SampleListServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.sampleListDao = new SampleListDao();
@@ -203,10 +203,9 @@ public class SampleListServiceImpl implements SampleListService {
 		}
 		//TODO Check that folder is a folder and not a list
 
-		//TODO Confirm
-		//		if (folder.getHierarchy() == null) {
-		//			throw new Exception("Root folder name is not editable");
-		//		}
+		if (folder.getHierarchy() == null) {
+			throw new Exception("Root folder name is not editable");
+		}
 
 		if (this.sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId()) != null) {
 			throw new Exception("folderName is not unique in the parent folder");
@@ -240,6 +239,16 @@ public class SampleListServiceImpl implements SampleListService {
 	 */
 	@Override
 	public void deleteSampleListFolder(final Integer folderId) throws Exception {
+		Preconditions.checkNotNull(folderId);
+		final SampleList folder = this.sampleListDao.getById(folderId);
+		if (folder == null)
+			throw new Exception("Folder does not exist");
+		//TODO check that folder is a folder
 
+		if (folder.getHierarchy() == null)
+			throw new Exception("Root folder can not be deleted");
+		if (folder.getChildren().size() > 0)
+			throw new Exception("Folder to delete can not have children");
+		this.sampleListDao.makeTransient(folder);
 	}
 }

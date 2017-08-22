@@ -18,10 +18,13 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -66,6 +69,9 @@ public class SampleList implements Serializable {
 
 	@OneToMany(mappedBy = "sampleList", cascade = CascadeType.ALL)
 	private List<Sample> samples;
+
+	@OneToMany(mappedBy = "hierarchy", fetch = FetchType.LAZY)
+	private List<SampleList> children;
 
 	public List<Sample> getSamples() {
 		return this.samples;
@@ -129,6 +135,14 @@ public class SampleList implements Serializable {
 
 	public void setCreatedBy(final User createdBy) {
 		this.createdBy = createdBy;
+	}
+
+	public ImmutableList<SampleList> getChildren() {
+		return ImmutableList.copyOf(children);
+	}
+
+	public void setChildren(final List<SampleList> children) {
+		this.children = children;
 	}
 
 	@Override
