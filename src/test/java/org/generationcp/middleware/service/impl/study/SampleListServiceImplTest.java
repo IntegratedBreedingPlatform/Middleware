@@ -91,8 +91,8 @@ public class SampleListServiceImplTest {
 		SampleList sampleFolder = new SampleList();
 		sampleFolder.setId(1);
 		Mockito.when(sampleListDao.save(Mockito.any(SampleList.class))).thenReturn(sampleFolder);
-		final SampleList savedObject = this.sampleListService.createSampleListFolder("4", 1, "userName");
-		assertThat(sampleFolder.getId(), equalTo(savedObject.getId()));
+		final Integer savedObject = this.sampleListService.createSampleListFolder("4", 1, "userName");
+		assertThat(sampleFolder.getId(), equalTo(savedObject));
 	}
 
 	@Test(expected = MiddlewareQueryException.class)

@@ -155,7 +155,7 @@ public class SampleListServiceImpl implements SampleListService {
 	 * @throws Exception
 	 */
 	@Override
-	public SampleList createSampleListFolder(final String folderName, final Integer parentId, final String createdBy) throws Exception {
+	public Integer createSampleListFolder(final String folderName, final Integer parentId, final String createdBy) throws Exception {
 		Preconditions.checkNotNull(folderName);
 		Preconditions.checkNotNull(parentId);
 		Preconditions.checkNotNull(createdBy);
@@ -178,7 +178,7 @@ public class SampleListServiceImpl implements SampleListService {
 		sampleFolder.setNotes(null);
 		sampleFolder.setHierarchy(parentList);
 		//TODO set list type = folder
-		return this.sampleListDao.save(sampleFolder);
+		return this.sampleListDao.save(sampleFolder).getId();
 	}
 
 	/**
