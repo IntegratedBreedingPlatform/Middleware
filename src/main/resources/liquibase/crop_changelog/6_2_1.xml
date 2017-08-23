@@ -1,0 +1,31 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="vanina" id="v6.2.1-1">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="sample_list" columnName="type"/> </not>
+		</preConditions>
+		<addColumn tableName="sample_list">
+			<column name="type" type="VARCHAR(30)" defaultValue="FOLDER" afterColumn="created_by">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2.1-2">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="sample_list"></tableExists>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			update sample_list
+			set type = 'FOLDER'
+			where list_name = 'Samples';
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

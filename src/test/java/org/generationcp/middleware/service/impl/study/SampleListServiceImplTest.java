@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.SampleList;
@@ -88,11 +89,13 @@ public class SampleListServiceImplTest {
 	@Test
 	public void testCreateSampleListFolderOk() throws Exception {
 		final SampleList parentFolder = new SampleList();
+		parentFolder.setType(SampleListType.FOLDER);
 		Mockito.when(sampleListDao.getById(1)).thenReturn(parentFolder);
 		Mockito.when(sampleListDao.getSampleListByParentAndName("4", 1)).thenReturn(null);
 		Mockito.when(userDAO.getUserByUserName("userName")).thenReturn(new User());
 		SampleList sampleFolder = new SampleList();
 		sampleFolder.setId(1);
+		sampleFolder.setType(SampleListType.FOLDER);
 		Mockito.when(sampleListDao.save(Mockito.any(SampleList.class))).thenReturn(sampleFolder);
 		final Integer savedObject = this.sampleListService.createSampleListFolder("4", 1, "userName");
 		assertThat(sampleFolder.getId(), equalTo(savedObject));
@@ -101,6 +104,7 @@ public class SampleListServiceImplTest {
 	@Test(expected = MiddlewareQueryException.class)
 	public void testCreateSampleListFolderDBException() throws Exception {
 		final SampleList parentFolder = new SampleList();
+		parentFolder.setType(SampleListType.FOLDER);
 		Mockito.when(sampleListDao.getById(1)).thenReturn(parentFolder);
 		Mockito.when(sampleListDao.getSampleListByParentAndName("4", 1)).thenReturn(null);
 		Mockito.when(userDAO.getUserByUserName("userName")).thenReturn(new User());
@@ -172,9 +176,11 @@ public class SampleListServiceImplTest {
 		final String newFolderName = "NEW_NAME";
 		final SampleList parentFolder = new SampleList();
 		parentFolder.setId(parentFolderId);
+		parentFolder.setType(SampleListType.FOLDER);
 		final SampleList folder = new SampleList();
 		folder.setId(folderId);
 		folder.setHierarchy(parentFolder);
+		folder.setType(SampleListType.FOLDER);
 
 		Mockito.when(sampleListDao.getById(folderId)).thenReturn(folder);
 		Mockito.when(sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId())).thenReturn(null);
@@ -192,9 +198,11 @@ public class SampleListServiceImplTest {
 		final String newFolderName = "NEW_NAME";
 		final SampleList parentFolder = new SampleList();
 		parentFolder.setId(parentFolderId);
+		parentFolder.setType(SampleListType.FOLDER);
 		final SampleList folder = new SampleList();
 		folder.setId(folderId);
 		folder.setHierarchy(parentFolder);
+		folder.setType(SampleListType.FOLDER);
 
 		Mockito.when(sampleListDao.getById(folderId)).thenReturn(folder);
 		Mockito.when(sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId())).thenReturn(null);
@@ -255,9 +263,11 @@ public class SampleListServiceImplTest {
 		final SampleList folder = new SampleList();
 		final SampleList parentFolder = new SampleList();
 		parentFolder.setId(2);
+		parentFolder.setType(SampleListType.FOLDER);
 
 		folder.setId(folderId);
 		folder.setHierarchy(parentFolder);
+		folder.setType(SampleListType.FOLDER);
 
 		Mockito.when(this.sampleListDao.getById(folderId)).thenReturn(folder);
 		Mockito.doThrow(new MiddlewareQueryException("")).when(this.sampleListDao).makeTransient(folder);
