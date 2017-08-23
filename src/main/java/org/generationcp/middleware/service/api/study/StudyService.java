@@ -17,9 +17,6 @@ public interface StudyService {
 	List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber, final int pageSize,
 			final String sortBy, final String sortOrder);
 
-	List<ObservationDto> getObservationsWithSamples(final int studyIdentifier, final int instanceId, final int pageNumber, final int pageSize,
-		final String sortBy, final String sortOrder);
-
 	List<ObservationDto> getSingleObservation(final int studyIdentifier, final int measurementIdentifier);
 
 	ObservationDto updataObservation(final Integer studyIdentifier, final ObservationDto middlewareMeasurement);

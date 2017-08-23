@@ -122,9 +122,9 @@ class ObservationQuery {
 		+ "    AND name LIKE '%PLOTDATA')) \n" + " AND gl.description IN (:instanceIds) \n"
 		+ " and cvterm_variable.cvterm_id = :selectionVariableId\n" + " GROUP BY nde.nd_experiment_id";
 
-	String getAllObservationsQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors, final boolean hasSamples, final String sortBy,
+	String getAllObservationsQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors, final String sortBy,
 			final String sortOrder) {
-		return this.getObservationsMainQuery(measurementVariables, germplasmDescriptors, hasSamples) + getInstanceNumberClause() + getGroupingClause()
+		return this.getObservationsMainQuery(measurementVariables, germplasmDescriptors) + getInstanceNumberClause() + getGroupingClause()
 				+ getOrderingClause(sortBy, sortOrder);
 	}
 
@@ -193,7 +193,7 @@ class ObservationQuery {
 	}
 
 	String getSingleObservationQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors) {
-		return this.getObservationsMainQuery(measurementVariables, germplasmDescriptors, false) + " AND nde.nd_experiment_id = :experiment_id \n"
+		return this.getObservationsMainQuery(measurementVariables, germplasmDescriptors) + " AND nde.nd_experiment_id = :experiment_id \n"
 				+ getGroupingClause();
 	}
 
@@ -215,33 +215,29 @@ class ObservationQuery {
 		return columnNames.toString();
 	}
 
-	String getObservationsMainQuery(final List<MeasurementVariableDto> measurementVariables,  List<String> germplasmDescriptors, final boolean hasSamples) {
+	String getObservationsMainQuery(final List<MeasurementVariableDto> measurementVariables,  List<String> germplasmDescriptors) {
 		StringBuilder sqlBuilder = new StringBuilder();
 
-		sqlBuilder.append(
-				"SELECT \n" +
-				"    nde.nd_experiment_id,\n" +
-				"    gl.description AS TRIAL_INSTANCE,\n" +
-				"    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE, \n" +
-				"    s.dbxref_id AS GID,\n" +
-				"    s.name DESIGNATION,\n" +
-				"    s.uniquename ENTRY_NO,\n" +
-				"    s.value as ENTRY_CODE,\n" +
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO, \n" +
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'PLOT_NO') PLOT_NO, \n" +
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') BLOCK_NO, \n" +
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'ROW') ROW, \n" +
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'COL') COL, \n" +
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN', \n" +
-				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n");
-		if (hasSamples) {
-			sqlBuilder.append("    (SELECT count(sp.sample_id) FROM plant pl INNER JOIN sample AS sp ON pl.plant_id = sp.sample_id WHERE nde.nd_experiment_id = pl.nd_experiment_id ) 'SAMPLES', \n");
-		}
-		sqlBuilder.append("    nde.plot_id as PLOT_ID, \n");
+		sqlBuilder.append("SELECT \n")
+			.append("    nde.nd_experiment_id,\n")
+			.append("    gl.description AS TRIAL_INSTANCE,\n")
+			.append("    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE, \n")
+			.append("    s.dbxref_id AS GID,\n")
+			.append("    s.name DESIGNATION,\n")
+			.append("    s.uniquename ENTRY_NO,\n")
+			.append("    s.value as ENTRY_CODE,\n")
+			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO, \n")
+			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'PLOT_NO') PLOT_NO, \n")
+			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') BLOCK_NO, \n")
+			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'ROW') ROW, \n")
+			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'COL') COL, \n")
+			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN', \n")
+			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n")
+			.append("    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM plant pl INNER JOIN sample AS sp ON pl.plant_id = sp.sample_id WHERE nde.nd_experiment_id = pl.nd_experiment_id ) 'SAMPLES', \n")
+			.append("    nde.plot_id as PLOT_ID, \n");
 
 		String traitClauseFormat =
-				" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n" +
-				" MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n";
+			" MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s', \n MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s', \n";
 
 		for (MeasurementVariableDto measurementVariable : measurementVariables) {
 			sqlBuilder.append(String.format(traitClauseFormat, measurementVariable.getName(), measurementVariable.getName(),
@@ -256,19 +252,18 @@ class ObservationQuery {
 			}
 		}
 
-		sqlBuilder.append(
-				" 1=1 FROM \n" +
-				"    project p \n" +
-				"        INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n" +
-				"        INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id \n" +
-				"        INNER JOIN nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id \n" +
-				"        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n" +
-				"        INNER JOIN nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id \n" +
-				"        INNER JOIN stock s ON s.stock_id = es.stock_id \n" +
-				"        LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n" +
-				"        LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n" +
-				"        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n");
-		sqlBuilder.append(" WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n");
+		sqlBuilder.append(" 1=1 FROM \n")
+			.append("	project p \n")
+			.append("	INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n")
+			.append("	INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id \n")
+			.append("	INNER JOIN nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id \n")
+			.append("	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n")
+			.append("	INNER JOIN nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id \n")
+			.append("	INNER JOIN stock s ON s.stock_id = es.stock_id \n")
+			.append("	LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n")
+			.append("	LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n")
+			.append("	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n")
+			.append("		WHERE p.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA')) \n");
 
 		return sqlBuilder.toString();
 	}
