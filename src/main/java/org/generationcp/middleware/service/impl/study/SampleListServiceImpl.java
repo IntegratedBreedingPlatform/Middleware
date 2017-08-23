@@ -169,7 +169,7 @@ public class SampleListServiceImpl implements SampleListService {
 		}
 
 		if (!SampleListType.FOLDER.equals(parentList.getType())) {
-			throw new Exception("Parent is not a folder");
+			throw new Exception("Specified parentID is not a folder");
 		}
 
 		if (this.sampleListDao.getSampleListByParentAndName(folderName, parentId) != null) {
@@ -208,7 +208,7 @@ public class SampleListServiceImpl implements SampleListService {
 		}
 
 		if (!SampleListType.FOLDER.equals(folder.getType())) {
-			throw new Exception("Folder is not a folder");
+			throw new Exception("Specified folderID is not a folder");
 		}
 
 		if (folder.getHierarchy() == null) {
@@ -248,8 +248,9 @@ public class SampleListServiceImpl implements SampleListService {
 		if (newParentFolder == null) {
 			throw new Exception("Specified newParentFolderId does not exist");
 		}
-		//TODO check that newParentFolderId is a folder
-
+		if (!SampleListType.FOLDER.equals(newParentFolder.getType())) {
+			throw new Exception("Specified newParentFolderId is not a folder");
+		}
 		final SampleList uniqueSampleListName =
 				this.sampleListDao.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId);
 		if (uniqueSampleListName != null) {
@@ -275,7 +276,7 @@ public class SampleListServiceImpl implements SampleListService {
 			throw new Exception("Folder does not exist");
 
 		if (!SampleListType.FOLDER.equals(folder.getType())) {
-			throw new Exception("Folder is not a folder");
+			throw new Exception("Specified folderID is not a folder");
 		}
 
 		if (folder.getHierarchy() == null)

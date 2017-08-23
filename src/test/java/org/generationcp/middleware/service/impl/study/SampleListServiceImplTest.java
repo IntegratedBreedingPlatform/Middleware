@@ -80,10 +80,18 @@ public class SampleListServiceImplTest {
 		this.sampleListService.createSampleListFolder("4", 1, "userName");
 	}
 
-	//TODO
-	@Test
+	@Test (expected = Exception.class)
 	public void testCreateSampleListFolderParentListNotAFolder() throws Exception {
-
+		final SampleList parentFolder = new SampleList();
+		parentFolder.setType(SampleListType.SAMPLE_LIST);
+		Mockito.when(sampleListDao.getById(1)).thenReturn(parentFolder);
+		Mockito.when(sampleListDao.getSampleListByParentAndName("4", 1)).thenReturn(null);
+		Mockito.when(userDAO.getUserByUserName("userName")).thenReturn(new User());
+		SampleList sampleFolder = new SampleList();
+		sampleFolder.setId(1);
+		sampleFolder.setType(SampleListType.FOLDER);
+		Mockito.when(sampleListDao.save(Mockito.any(SampleList.class))).thenReturn(sampleFolder);
+		this.sampleListService.createSampleListFolder("4", 1, "userName");
 	}
 
 	@Test
@@ -134,10 +142,14 @@ public class SampleListServiceImplTest {
 		this.sampleListService.updateSampleListFolderName(folderId, "newFolderName");
 	}
 
-	//TODO
-	@Test
+	@Test (expected = Exception.class)
 	public void testUpdateSampleListFolderNameFolderIdNotAFolder() throws Exception {
-
+		final Integer folderId = 1;
+		final SampleList sampleList = new SampleList();
+		sampleList.setId(folderId);
+		sampleList.setType(SampleListType.SAMPLE_LIST);
+		Mockito.when(sampleListDao.getById(folderId)).thenReturn(sampleList);
+		this.sampleListService.updateSampleListFolderName(folderId, "newFolderName");
 	}
 
 	@Test(expected = Exception.class)
@@ -317,9 +329,22 @@ public class SampleListServiceImplTest {
 		this.sampleListService.moveSampleList(sampleListId, folderId);
 	}
 
-	// TODO
-	@Test
+	@Test (expected = Exception.class)
 	public void testMoveSampleListNewParentFolderIdNotAFolder() throws Exception {
+		final Integer sampleListId = 1;
+		final SampleList sampleListToMove = new SampleList();
+		sampleListToMove.setId(sampleListId);
+		sampleListToMove.setHierarchy(new SampleList());
+
+		final Integer folderId = 2;
+		final SampleList folder = new SampleList();
+		folder.setId(folderId);
+		folder.setType(SampleListType.SAMPLE_LIST);
+
+		Mockito.when(this.sampleListDao.getById(sampleListId)).thenReturn(sampleListToMove);
+		Mockito.when(this.sampleListDao.getById(folderId)).thenReturn(folder);
+
+		this.sampleListService.moveSampleList(sampleListId, folderId);
 
 	}
 
@@ -359,6 +384,7 @@ public class SampleListServiceImplTest {
 		final Integer folderId = 2;
 		final SampleList folder = new SampleList();
 		folder.setId(folderId);
+		folder.setType(SampleListType.FOLDER);
 
 		Mockito.when(this.sampleListDao.getById(sampleListId)).thenReturn(sampleListToMove);
 		Mockito.when(this.sampleListDao.getById(folderId)).thenReturn(folder);
