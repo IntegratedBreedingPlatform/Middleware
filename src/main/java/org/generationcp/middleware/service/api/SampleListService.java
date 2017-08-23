@@ -37,7 +37,7 @@ public interface SampleListService {
 	 * @param newParentFolderId
 	 * @throws Exception
 	 */
-	void moveSampleList (final Integer sampleListId, final Integer newParentFolderId) throws Exception;
+	SampleList moveSampleList (final Integer sampleListId, final Integer newParentFolderId) throws Exception;
 
 	/**
 	 * Delete a folder

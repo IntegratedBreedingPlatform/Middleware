@@ -220,12 +220,36 @@ public class SampleListServiceImpl implements SampleListService {
 	 * Move a folder to another folder
 	 * sampleListId must exist (could be a folder or a list), newParentFolderId must exist and must be a folder
 	 * newParentFolderId folder must not contain another sample list or folder with the name that the one that needs to be moved
+	 *
 	 * @param sampleListId
 	 * @param newParentFolderId
+	 * @return SampleList
 	 * @throws Exception
 	 */
-	public void moveSampleList(final Integer sampleListId, final Integer newParentFolderId) throws Exception {
+	public SampleList moveSampleList(final Integer sampleListId, final Integer newParentFolderId) throws Exception {
+		Preconditions.checkNotNull(sampleListId);
+		Preconditions.checkNotNull(newParentFolderId);
+		final SampleList listToMove = this.sampleListDao.getById(sampleListId);
+		if (listToMove == null) {
+			throw new Exception("sampleList does not exist");
+		}
+		if (listToMove.getHierarchy() == null) {
+			throw new Exception("Root folder can not me moved");
+		}
+		final SampleList newParentFolder = this.sampleListDao.getById(newParentFolderId);
+		if (newParentFolder == null) {
+			throw new Exception("Specified newParentFolderId does not exist");
+		}
+		//TODO check that newParentFolderId is a folder
 
+		final SampleList uniqueSampleListName =
+				this.sampleListDao.getSampleListByParentAndName(listToMove.getListName(), newParentFolderId);
+		if (uniqueSampleListName != null) {
+			throw new Exception("folderName is not unique in the parent folder");
+		}
+		listToMove.setHierarchy(newParentFolder);
+
+		return this.sampleListDao.saveOrUpdate(listToMove);
 	}
 
 	/**
