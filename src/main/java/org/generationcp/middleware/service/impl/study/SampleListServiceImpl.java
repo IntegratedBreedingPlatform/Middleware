@@ -10,6 +10,7 @@ import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
+import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -166,7 +167,11 @@ public class SampleListServiceImpl implements SampleListService {
 		if (parentList == null) {
 			throw new Exception("Parent Folder does not exist");
 		}
-		//TODO check that parentList is a folder
+
+		if (!SampleListType.FOLDER.equals(parentList.getType())) {
+			throw new Exception("Parent is not a folder");
+		}
+
 		if (this.sampleListDao.getSampleListByParentAndName(folderName, parentId) != null) {
 			throw new Exception("folderName is not unique in the specified folder");
 		}
@@ -177,7 +182,7 @@ public class SampleListServiceImpl implements SampleListService {
 		sampleFolder.setListName(folderName);
 		sampleFolder.setNotes(null);
 		sampleFolder.setHierarchy(parentList);
-		//TODO set list type = folder
+		sampleFolder.setType(SampleListType.FOLDER);
 		return this.sampleListDao.save(sampleFolder).getId();
 	}
 
@@ -201,7 +206,10 @@ public class SampleListServiceImpl implements SampleListService {
 		if (folder == null) {
 			throw new Exception("Folder does not exist");
 		}
-		//TODO Check that folder is a folder and not a list
+
+		if (!SampleListType.FOLDER.equals(folder.getType())) {
+			throw new Exception("Folder is not a folder");
+		}
 
 		if (folder.getHierarchy() == null) {
 			throw new Exception("Root folder name is not editable");
@@ -241,7 +249,10 @@ public class SampleListServiceImpl implements SampleListService {
 		final SampleList folder = this.sampleListDao.getById(folderId);
 		if (folder == null)
 			throw new Exception("Folder does not exist");
-		//TODO check that folder is a folder
+
+		if (!SampleListType.FOLDER.equals(folder.getType())) {
+			throw new Exception("Folder is not a folder");
+		}
 
 		if (folder.getHierarchy() == null)
 			throw new Exception("Root folder can not be deleted");
