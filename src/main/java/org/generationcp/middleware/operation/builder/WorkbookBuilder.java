@@ -638,6 +638,11 @@ public class WorkbookBuilder extends Builder {
 					measurementDataList.add(measurementData);
 				}
 			}
+			MeasurementVariable measurementVariable = new MeasurementVariable(10,"SAMPLES", "SUM of samples","Number","Enumerated","","","Numeric","SAMPLES");
+			measurementVariable.setDataTypeId(1120);
+			final String sampleValue = getSampleSum(experiment.getPlotId());
+			final MeasurementData measurementData = new MeasurementData("SAMPLES", sampleValue, false, "C", measurementVariable);
+			measurementDataList.add(measurementData);
 
 			this.populateMeasurementData(variateList, variates, measurementDataList);
 
@@ -649,6 +654,10 @@ public class WorkbookBuilder extends Builder {
 		}
 
 		return observations;
+	}
+
+	private String getSampleSum(final String plotId) {
+		return this.getStudyDataManager().getSumSample(plotId);
 	}
 
 	protected void populateMeasurementData(final List<MeasurementVariable> variateList, final VariableList variates,
