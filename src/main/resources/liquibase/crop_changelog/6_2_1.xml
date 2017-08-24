@@ -28,4 +28,39 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="vanina" id="v6.2.1-3">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="sample_list" columnName="type"/>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			alter table sample_list modify column created_date datetime;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2.1-4">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="sample" columnName="created_date"/>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			alter table sample modify column created_date datetime;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2.1-5">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="sample" columnName="created_by"/></not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample
+			ADD COLUMN created_by INT(11) NOT NULL DEFAULT 1,
+			ADD INDEX fk_sample_created_by_idx (created_by ASC);
+			ALTER TABLE sample
+			ADD CONSTRAINT fk_sample_created_by
+			FOREIGN KEY (created_by)
+			REFERENCES users (userid)
+			ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>

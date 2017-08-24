@@ -17,6 +17,7 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.study.ObservationDto;
@@ -26,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -87,12 +90,16 @@ public class SampleListServiceImpl implements SampleListService {
 			Preconditions.checkNotNull(study, "The study must not be null");
 			final SampleList sampleList = new SampleList();
 
-			sampleList.setCreatedDate(new Date());
-			sampleList.setCreatedBy(this.userDao.getUserByUserName(sampleListDTO.getCreatedBy()));
+			DateFormat dateFormat = new SimpleDateFormat(Util.FRONTEND_TIMESTAMP_FORMAT);
+			Date createdDate = new Date();
+			sampleList.setCreatedDate(createdDate);
+			User user = this.userDao.getUserByUserName(sampleListDTO.getCreatedBy());
+			sampleList.setCreatedBy(user);
 			sampleList.setDescription(sampleListDTO.getDescription());
 			sampleList.setListName(study.getName() + "#" + Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS"));
 			sampleList.setNotes(sampleListDTO.getNotes());
-			final SampleList parent = this.sampleListDao.getRotSampleList();
+			sampleList.setType(SampleListType.SAMPLE_LIST);
+			final SampleList parent = this.sampleListDao.getRootSampleList();
 			sampleList.setHierarchy(parent);
 
 			final List<ObservationDto> observationDtos = this.studyMeasurements
@@ -117,8 +124,8 @@ public class SampleListServiceImpl implements SampleListService {
 					count++;
 					final Sample sample = this.sampleService
 						.buildSample(sampleListDTO.getCropName(), cropPrefix, count, sampleListDTO.getTakenBy(),
-							observationDto.getDesignation(), sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(),
-							sampleList);
+							observationDto.getDesignation(), sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList,
+							user, createdDate);
 					samples.add(sample);
 				}
 			}

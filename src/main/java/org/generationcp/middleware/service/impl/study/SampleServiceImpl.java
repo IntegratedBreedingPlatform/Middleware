@@ -9,6 +9,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +49,8 @@ public class SampleServiceImpl implements SampleService {
 
 	@Override
 	public Sample buildSample(final String cropName, final String cropPrefix, final Integer plantNumber, final String username,
-		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList) {
+		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, User createdBy,
+		Date createdDate) {
 
 		final Sample sample = new Sample();
 		String localCropPrefix;
@@ -70,6 +72,8 @@ public class SampleServiceImpl implements SampleService {
 		sample.setSamplingDate(samplingDate);
 		sample.setSampleBusinessKey(this.getSampleBusinessKey(cropPrefix));
 		sample.setSampleList(sampleList);
+		sample.setCreatedDate(createdDate);
+		sample.setCreatedBy(createdBy);
 
 		return sample;
 	}

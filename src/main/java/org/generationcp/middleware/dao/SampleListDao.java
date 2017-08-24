@@ -21,7 +21,7 @@ public class SampleListDao extends GenericDAO<SampleList, Integer> {
 		return (SampleList) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
 	}
 
-	public SampleList getRotSampleList() {
+	public SampleList getRootSampleList() {
 		return this.getBySampleListName(ROOT_FOLDER);
 	}
 
