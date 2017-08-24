@@ -837,4 +837,6 @@ public interface StudyDataManager {
 
 	Integer getProjectIdByStudyDbId(final Integer studyDbId);
 
+	String getSumSample(String Plot_id);
+
 }
