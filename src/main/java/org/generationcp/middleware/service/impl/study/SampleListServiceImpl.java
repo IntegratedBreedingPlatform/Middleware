@@ -237,6 +237,7 @@ public class SampleListServiceImpl implements SampleListService {
 	public SampleList moveSampleList(final Integer sampleListId, final Integer newParentFolderId) throws Exception {
 		Preconditions.checkNotNull(sampleListId);
 		Preconditions.checkNotNull(newParentFolderId);
+		Preconditions.checkArgument(!sampleListId.equals(newParentFolderId), new IllegalArgumentException("Arguments can not have the same value"));
 		final SampleList listToMove = this.sampleListDao.getById(sampleListId);
 		if (listToMove == null) {
 			throw new Exception("sampleList does not exist");

@@ -293,8 +293,13 @@ public class SampleListServiceImplTest {
 	}
 
 	@Test(expected = NullPointerException.class)
-	public void testMoveSampleListNewParentFolderId() throws Exception {
+	public void testMoveSampleListNullParentFolderId() throws Exception {
 		this.sampleListService.moveSampleList(1, null);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void testMoveSampleListRecursiveRelationship() throws Exception {
+		this.sampleListService.moveSampleList(1, 1);
 	}
 
 	@Test(expected = Exception.class)
