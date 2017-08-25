@@ -44,7 +44,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 	private StudyMeasurements studyMeasurements;
 
-	private final PlantDao plantDao;
+	private PlantDao plantDao;
 
 	@Autowired
 	private SampleService sampleService;
@@ -297,5 +297,17 @@ public class SampleListServiceImpl implements SampleListService {
 
 	public void setStudyService(final StudyDataManager studyService) {
 		this.studyService = studyService;
+	}
+
+	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
+		this.workbenchDataManager = workbenchDataManager;
+	}
+
+	public void setPlantDao(final PlantDao plantDAO) {
+		this.plantDao = plantDAO;
+	}
+
+	public void setSampleService(final SampleService sampleService) {
+		this.sampleService = sampleService;
 	}
 }
