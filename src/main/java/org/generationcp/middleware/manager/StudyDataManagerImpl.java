@@ -75,7 +75,6 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.PlotUtil;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1208,18 +1207,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public String getSumSample(String PlotId) {
-		try {
-			final SQLQuery query = this.getCurrentSession().createSQLQuery(
-				"SELECT (SELECT coalesce(nullif(count(sp.sample_id), 0), \"-\")\n" + "\t\t\tFROM plant pl\n" + "            INNER JOIN\n"
-					+ "\t\t\tsample AS sp ON pl.plant_id = sp.sample_id\n" + "\t\t\tWHERE nde.nd_experiment_id = pl.nd_experiment_id\n"
-					+ "        ) 'SAMPLES'\n" + "        FROM nd_experiment nde where  nde.plot_id=:plotId");
-			query.setParameter("plotId", PlotId);
-			return (String) query.uniqueResult();
-
-		} catch (HibernateException he) {
-			throw new MiddlewareException("Unexpected error in executing getSumSample(studyId = " + PlotId + ") query: " + he.getMessage(),
-				he);
-		}
+	public Map<Integer, String> getExperimentToSample(final Integer studyDbId) {
+		return this.getSampleDao().getExperimentToSample(studyDbId);
 	}
 }
