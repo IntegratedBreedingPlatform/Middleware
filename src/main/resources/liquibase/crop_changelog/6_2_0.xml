@@ -6,16 +6,188 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<!-- Set the list status of the deleted study's snapshot list to 9(deleted); 8006 corresponds to Study's Status and 12990 is value set for deleted studies-->
-	<changeSet author="mderamos" id="v6.2-1">
+	<changeSet author="vanina" id="v6.2-2">
 		<preConditions onFail="MARK_RAN">
-			<not>
-				<sqlCheck expectedResult="0">SELECT count(*) FROM listnms l INNER JOIN projectprop p ON l.projectid = p.project_id WHERE p.type_id = 8006 AND p.value=12990 AND l.liststatus!=9 AND l.listtype IN ("NURSERY", "TRIAL", "CHECK");</sqlCheck>
-			</not>
+			<not><tableExists tableName="sample"></tableExists></not>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
-			UPDATE listnms l INNER JOIN projectprop p ON l.projectid = p.project_id SET l.liststatus = 9 WHERE p.type_id = 8006 AND p.value=12990 AND l.liststatus!=9 AND l.listtype IN ("NURSERY", "TRIAL", "CHECK");
+			CREATE TABLE sample (
+			sample_id INT NOT NULL AUTO_INCREMENT,
+			sample_name VARCHAR(100) NOT NULL,
+			taken_by INT(11) NULL,
+			sampling_date DATE NULL,
+			created_date DATE NOT NULL,
+			sample_bk VARCHAR(45) NOT NULL,
+			sample_list INT NOT NULL DEFAULT 0,
+			PRIMARY KEY (sample_id),
+			INDEX fk_users_idx (taken_by ASC),
+			CONSTRAINT fk_sample_user FOREIGN KEY (taken_by)
+			REFERENCES users (userid)
+			ON DELETE RESTRICT ON UPDATE NO ACTION
+			);
 		</sql>
 	</changeSet>
-	
+
+	<changeSet author="vanina" id="v6.2-3">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="plant"></tableExists></not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE plant (
+			plant_id INT NOT NULL AUTO_INCREMENT,
+			plant_no INT NOT NULL,
+			nd_experiment_id INT(11) NOT NULL,
+			created_date DATE NOT NULL,
+			plant_bk VARCHAR(45) NOT NULL,
+			PRIMARY KEY (plant_id),
+			INDEX fk_plant_exp_idx (nd_experiment_id ASC),
+			CONSTRAINT fk_plant_exp FOREIGN KEY (nd_experiment_id)
+			REFERENCES nd_experiment (nd_experiment_id)
+			ON DELETE NO ACTION ON UPDATE NO ACTION
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT
+				COUNT(*)
+				FROM
+				INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+				WHERE
+				TABLE_NAME = 'sample'
+				AND CONSTRAINT_NAME = 'fk_sample_plant'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample
+			ADD COLUMN plant_id INT DEFAULT 0,
+			ADD INDEX fk_sample_plant_idx (plant_id ASC);
+			ALTER TABLE sample
+			ADD CONSTRAINT fk_sample_plant
+			FOREIGN KEY (plant_id)
+			REFERENCES plant(plant_id)
+			ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2-5">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="sample_list"></tableExists></not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE sample_list (
+			list_id INT NOT NULL AUTO_INCREMENT,
+			list_name VARCHAR(100) NOT NULL,
+			description VARCHAR(45) NULL,
+			hierarchy INT NULL,
+			created_date DATE NOT NULL,
+			notes VARCHAR(45) NULL,
+			created_by INT(11) NULL,
+			PRIMARY KEY (list_id),
+			INDEX fk_sample_list_user_idx (created_by ASC),
+			CONSTRAINT fk_sample_list_user FOREIGN KEY (created_by)
+			REFERENCES users (userid)
+			ON DELETE NO ACTION ON UPDATE NO ACTION
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2-6">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT
+				COUNT(*)
+				FROM
+				INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+				WHERE
+				TABLE_NAME = 'sample_list'
+				AND CONSTRAINT_NAME = 'fk_sample_list_hierarchy'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample_list
+			ADD INDEX fk_sample_list_hierarchy_idx(hierarchy ASC);
+			ALTER TABLE sample_list
+			ADD CONSTRAINT fk_sample_list_hierarchy
+			FOREIGN KEY (hierarchy)
+			REFERENCES sample_list(list_id)
+			ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2-7">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT
+				COUNT(*)
+				FROM
+				INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+				WHERE
+				TABLE_NAME = 'sample'
+				AND CONSTRAINT_NAME = 'fk_sample_list'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample
+			ADD INDEX fk_sample_list_idx (sample_list ASC);
+			ALTER TABLE sample
+			ADD CONSTRAINT fk_sample_list
+			FOREIGN KEY (sample_list)
+			REFERENCES sample_list(list_id)
+			ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'plant'
+				AND CONSTRAINT_NAME='plant_no_exp' and TABLE_SCHEMA = DATABASE();</sqlCheck>
+		</preConditions>
+		<addUniqueConstraint columnNames="nd_experiment_id, plant_no" constraintName="plant_no_exp" tableName="plant" />
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2-9">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM sample_list WHERE list_name = 'Samples';</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM users where uname = 'admin';</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			insert into sample_list values (
+				NULL,
+				'Samples',
+				'',
+				NULL,
+				NOW(),
+				'',
+				(select userid from users where uname = 'admin'));
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.2-10">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT
+				COUNT(*)
+				FROM
+				INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+				WHERE
+				TABLE_NAME = 'sample_list'
+				AND CONSTRAINT_NAME = 'list_name_UNIQUE'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample_list
+			ADD UNIQUE INDEX list_name_UNIQUE (list_name ASC)  COMMENT '';
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
