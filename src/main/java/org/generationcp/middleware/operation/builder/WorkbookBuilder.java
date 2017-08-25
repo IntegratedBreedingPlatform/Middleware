@@ -97,8 +97,9 @@ public class WorkbookBuilder extends Builder {
 		VariableTypeList variables = this.getDataSetBuilder().getVariableTypes(workbook.getMeasurementDatesetId());
 		final List<Experiment> experiments =
 				this.getStudyDataManager().getExperiments(workbook.getMeasurementDatesetId(), 0, Integer.MAX_VALUE, variables);
+		final Map<Integer, String> samples = getExperimentToSample(workbook.getStudyDetails().getId());
 		workbook.setObservations(this.buildObservations(experiments, variables.getVariates(), workbook.getFactors(), workbook.getVariates(),
-				!workbook.isNursery(), workbook.getConditions()));
+			!workbook.isNursery(), workbook.getConditions(), samples));
 	}
 
 	public Workbook create(final int id, final StudyType studyType) {
@@ -564,9 +565,9 @@ public class WorkbookBuilder extends Builder {
 
 	private List<MeasurementRow> buildObservations(final List<Experiment> experiments, final VariableTypeList variateTypes,
 			final List<MeasurementVariable> factorList, final List<MeasurementVariable> variateList, final boolean isTrial,
-			final List<MeasurementVariable> conditionList) {
+			final List<MeasurementVariable> conditionList, final Map<Integer, String> samplesMap) {
 
-		final List<MeasurementRow> observations = new ArrayList<MeasurementRow>();
+		final List<MeasurementRow> observations = new ArrayList<>();
 		for (final Experiment experiment : experiments) {
 			final int experimentId = experiment.getId();
 			final VariableList factors = experiment.getFactors();
@@ -638,11 +639,7 @@ public class WorkbookBuilder extends Builder {
 					measurementDataList.add(measurementData);
 				}
 			}
-			MeasurementVariable measurementVariable = new MeasurementVariable(10,"SAMPLES", "SUM of samples","Number","Enumerated","","","Numeric","SAMPLES");
-			measurementVariable.setDataTypeId(1120);
-			final String sampleValue = getSampleSum(experiment.getPlotId());
-			final MeasurementData measurementData = new MeasurementData("SAMPLES", sampleValue, false, "C", measurementVariable);
-			measurementDataList.add(measurementData);
+			measurementDataList.add(this.getExperimentToSample(samplesMap, experimentId));
 
 			this.populateMeasurementData(variateList, variates, measurementDataList);
 
@@ -656,8 +653,21 @@ public class WorkbookBuilder extends Builder {
 		return observations;
 	}
 
-	private String getSampleSum(final String plotId) {
-		return this.getStudyDataManager().getSumSample(plotId);
+	private MeasurementData getExperimentToSample(final Map<Integer, String> samplesMap, final int experimentId) {
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+
+		measurementVariable.setTermId(TermId.SAMPLES.getId());
+		measurementVariable.setName("SAMPLES");
+		measurementVariable.setLabel(measurementVariable.getName());
+		measurementVariable.setFactor(true);
+		measurementVariable.setDataTypeId(1120);
+		final String sampleValue = samplesMap.get(experimentId);
+		return new MeasurementData(measurementVariable.getName(), sampleValue, false, "C", measurementVariable);
+
+	}
+
+	private Map<Integer, String> getExperimentToSample(final Integer studyDbId) {
+		return this.getStudyDataManager().getExperimentToSample(studyDbId);
 	}
 
 	protected void populateMeasurementData(final List<MeasurementVariable> variateList, final VariableList variates,
