@@ -12,6 +12,7 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -95,8 +96,11 @@ public class SampleServiceImpl implements SampleService {
 			SampleDTO dto = new SampleDTO();
 			dto.setSampleName(sample.getSampleName());
 			dto.setSampleBusinessKey(sample.getSampleBusinessKey());
-			Person person = sample.getTakenBy().getPerson();
-			dto.setTakenBy(person.getFirstName() + " " + person.getLastName());
+			User takenBy = sample.getTakenBy();
+			if (takenBy != null) {
+				Person person = takenBy.getPerson();
+				dto.setTakenBy(person.getFirstName() + " " + person.getLastName());
+			}
 			dto.setSamplingDate(sample.getSamplingDate());
 			dto.setSampleList(sample.getSampleList().getListName());
 			Plant plant = sample.getPlant();
