@@ -10,7 +10,7 @@ public class SampleDTO {
 	private String sampleName;
 	private String sampleBusinessKey;
 	private String takenBy;
-	private Date createdDate;
+	private Date samplingDate;
 	private String sampleList;
 	private Integer plantNumber;
 	private String plantBusinessKey;
@@ -39,12 +39,12 @@ public class SampleDTO {
 		this.takenBy = takenBy;
 	}
 
-	public Date getCreatedDate() {
-		return createdDate;
+	public Date getSamplingDate() {
+		return samplingDate;
 	}
 
-	public void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
+	public void setSamplingDate(Date samplingDate) {
+		this.samplingDate = samplingDate;
 	}
 
 	public String getSampleList() {
@@ -84,13 +84,13 @@ public class SampleDTO {
 		SampleDTO sampleDTO = (SampleDTO) o;
 
 		return new EqualsBuilder().append(sampleName, sampleDTO.sampleName).append(sampleBusinessKey, sampleDTO.sampleBusinessKey)
-			.append(takenBy, sampleDTO.takenBy).append(createdDate, sampleDTO.createdDate).append(sampleList, sampleDTO.sampleList)
+			.append(takenBy, sampleDTO.takenBy).append(samplingDate, sampleDTO.samplingDate).append(sampleList, sampleDTO.sampleList)
 			.append(plantNumber, sampleDTO.plantNumber).append(plantBusinessKey, sampleDTO.plantBusinessKey).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(17, 37).append(sampleName).append(sampleBusinessKey).append(takenBy).append(createdDate)
+		return new HashCodeBuilder(17, 37).append(sampleName).append(sampleBusinessKey).append(takenBy).append(samplingDate)
 			.append(sampleList).append(plantNumber).append(plantBusinessKey).toHashCode();
 	}
 }
