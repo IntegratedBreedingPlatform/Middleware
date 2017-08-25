@@ -24,6 +24,7 @@ import org.generationcp.middleware.service.impl.study.StudyMeasurements;
 import org.generationcp.middleware.util.Util;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -488,7 +489,8 @@ public class SampleListServiceImplTest {
 		Mockito.when(plantDao.getMaxPlantNumber(experimentIds)).thenReturn(mapPlantNumbers);
 		Mockito.when(sampleService.buildSample(MAIZE, PLOT_CODE_PREFIX, 1, ADMIN, preferredNameGid, Util.getCurrentDate(), ndExperimentId,
 			sampleList, user, Util.getCurrentDate())).thenReturn(sample);
-		Mockito.when(sampleListDao.saveOrUpdate(Mockito.any(SampleList.class))).thenReturn(sampleList);
+		Mockito.when(sampleListDao.save(Mockito.any(SampleList.class))).thenReturn(sampleList);
+
 		final SampleListDTO sampleListDTO = new SampleListDTO();
 
 		sampleListDTO.setCreatedBy(ADMIN);
@@ -501,9 +503,11 @@ public class SampleListServiceImplTest {
 		sampleListDTO.setSelectionVariableId(selectionVariableId);
 		sampleListDTO.setStudyId(studyId);
 		sampleListDTO.setTakenBy("admin");
-		SampleList createdSampleList = sampleListService.createOrUpdateSampleList(sampleListDTO);
+		sampleList = sampleListService.createOrUpdateSampleList(sampleListDTO);
 
-		assertThat(createdSampleList.getSamples().size(), equalTo(Integer.valueOf(variableValue)));
+		final ArgumentCaptor<SampleList> arg1 = ArgumentCaptor.forClass(SampleList.class);
+
+		Mockito.verify(this.sampleListDao).save(arg1.capture());
 	}
 }
 
