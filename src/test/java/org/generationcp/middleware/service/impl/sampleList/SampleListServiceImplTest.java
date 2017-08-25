@@ -1,15 +1,20 @@
-package org.generationcp.middleware.service.impl.study;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+package org.generationcp.middleware.service.impl.sampleList;
 
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.service.api.study.MeasurementDto;
+import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
+import org.generationcp.middleware.service.impl.study.StudyMeasurements;
+import org.generationcp.middleware.util.Util;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -18,6 +23,9 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 public class SampleListServiceImplTest {
 
@@ -30,6 +38,12 @@ public class SampleListServiceImplTest {
 	@Mock
 	private UserDAO userDAO;
 
+	@Mock
+	private StudyDataManager studyService;
+
+	@Mock
+	private StudyMeasurements studyMeasurements;
+
 	private SampleListServiceImpl sampleListService;
 
 	@Before
@@ -38,6 +52,8 @@ public class SampleListServiceImplTest {
 		sampleListService = new SampleListServiceImpl(session);
 		sampleListService.setSampleListDao(sampleListDao);
 		sampleListService.setUserDao(userDAO);
+		sampleListService.setStudyMeasurements(studyMeasurements);
+		sampleListService.setStudyService(studyService);
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -397,6 +413,52 @@ public class SampleListServiceImplTest {
 
 		Mockito.when(this.sampleListDao.saveOrUpdate(sampleListToMove)).thenThrow(MiddlewareQueryException.class);
 		this.sampleListService.moveSampleList(sampleListId, folderId);
+	}
+
+
+	@Test
+	public void testCreateSampleList() {
+		final int studyId = 1;
+		Study study = new Study();
+		study.setId(studyId);
+
+
+		final Integer selectionVariableId = 2;
+		final List<Integer> instanceIds = new ArrayList<>();
+		instanceIds.add(1);
+		List<ObservationDto> observationDtos = new ArrayList<>();
+
+		final List<MeasurementDto> measurementVariableResults = new ArrayList<>();
+
+		final String variableValue = "10";
+		final MeasurementDto measurementDto = new MeasurementDto(variableValue);
+		measurementVariableResults.add(measurementDto);
+
+		final String preferredNameGid = "GID1";
+		final Integer ndExperimentId = 1;
+		final ObservationDto measurement = new ObservationDto(ndExperimentId, preferredNameGid, measurementVariableResults);
+		observationDtos.add(measurement);
+
+
+		Mockito.when(studyService.getStudy(studyId)).thenReturn(study);
+		Mockito.when(this.studyMeasurements.getSampleObservations(studyId, instanceIds, selectionVariableId)).thenReturn(observationDtos);
+		Mockito.when(study.getName()).thenReturn("Maizing Trial");
+
+		final SampleListDTO sampleListDTO = new SampleListDTO();
+
+		sampleListDTO.setCreatedBy("admin");
+		sampleListDTO.setCropName("maize");
+		sampleListDTO.setDescription("desc");
+		sampleListDTO.setInstanceIds(instanceIds);
+		sampleListDTO.setNotes("notes");
+		sampleListDTO.setSamplingDate(Util.getCurrentDate());
+
+		sampleListDTO.setSelectionVariableId(selectionVariableId);
+		sampleListDTO.setStudyId(studyId);
+		sampleListDTO.setTakenBy("admin");
+		SampleList createdSampleList = sampleListService.createOrUpdateSampleList(sampleListDTO);
+
+		assertThat(createdSampleList.getSamples().size(), equalTo(Integer.valueOf(variableValue)));
 	}
 }
 

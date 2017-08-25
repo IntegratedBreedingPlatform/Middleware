@@ -27,8 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -44,7 +42,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 	private final SampleDao sampleDao;
 
-	private final StudyMeasurements studyMeasurements;
+	private StudyMeasurements studyMeasurements;
 
 	private final PlantDao plantDao;
 
@@ -78,7 +76,7 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public Integer createOrUpdateSampleList(final SampleListDTO sampleListDTO) {
+	public SampleList createOrUpdateSampleList(final SampleListDTO sampleListDTO) {
 
 		Preconditions.checkArgument(sampleListDTO.getInstanceIds() != null, "The Instance List must not be null");
 		Preconditions.checkArgument(!sampleListDTO.getInstanceIds().isEmpty(), "The Instance List must not be empty");
@@ -90,7 +88,6 @@ public class SampleListServiceImpl implements SampleListService {
 			Preconditions.checkNotNull(study, "The study must not be null");
 			final SampleList sampleList = new SampleList();
 
-			DateFormat dateFormat = new SimpleDateFormat(Util.FRONTEND_TIMESTAMP_FORMAT);
 			Date createdDate = new Date();
 			sampleList.setCreatedDate(createdDate);
 			User user = this.userDao.getUserByUserName(sampleListDTO.getCreatedBy());
@@ -131,7 +128,7 @@ public class SampleListServiceImpl implements SampleListService {
 			}
 
 			sampleList.setSamples(samples);
-			return this.sampleListDao.saveOrUpdate(sampleList).getId();
+			return this.sampleListDao.saveOrUpdate(sampleList);
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error in createOrUpdateSampleList in SampleListServiceImpl: " + e.getMessage(), e);
 		}
@@ -292,5 +289,13 @@ public class SampleListServiceImpl implements SampleListService {
 		if (folder.getChildren() != null && folder.getChildren().size() > 0)
 			throw new Exception("Folder to delete can not have children");
 		this.sampleListDao.makeTransient(folder);
+	}
+
+	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {
+		this.studyMeasurements = studyMeasurements;
+	}
+
+	public void setStudyService(final StudyDataManager studyService) {
+		this.studyService = studyService;
 	}
 }
