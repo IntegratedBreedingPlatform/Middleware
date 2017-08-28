@@ -15,6 +15,19 @@ public class SampleDTO {
 	private Integer plantNumber;
 	private String plantBusinessKey;
 
+	public SampleDTO() { }
+
+	public SampleDTO(String sampleName, String sampleBusinessKey, String takenBy, Date samplingDate, String sampleList, Integer plantNumber,
+		String plantBusinessKey) {
+		this.sampleName = sampleName;
+		this.sampleBusinessKey = sampleBusinessKey;
+		this.takenBy = takenBy;
+		this.samplingDate = samplingDate;
+		this.sampleList = sampleList;
+		this.plantNumber = plantNumber;
+		this.plantBusinessKey = plantBusinessKey;
+	}
+
 	public String getSampleName() {
 		return sampleName;
 	}
