@@ -15,10 +15,11 @@ public class SampleDTO {
 	private Integer plantNumber;
 	private String plantBusinessKey;
 
-	public SampleDTO() { }
+	public SampleDTO() {
+	}
 
-	public SampleDTO(String sampleName, String sampleBusinessKey, String takenBy, Date samplingDate, String sampleList, Integer plantNumber,
-		String plantBusinessKey) {
+	public SampleDTO(final String sampleName, final String sampleBusinessKey, final String takenBy, final Date samplingDate,
+		final String sampleList, final Integer plantNumber, final String plantBusinessKey) {
 		this.sampleName = sampleName;
 		this.sampleBusinessKey = sampleBusinessKey;
 		this.takenBy = takenBy;
@@ -32,7 +33,7 @@ public class SampleDTO {
 		return sampleName;
 	}
 
-	public void setSampleName(String sampleName) {
+	public void setSampleName(final String sampleName) {
 		this.sampleName = sampleName;
 	}
 
@@ -40,7 +41,7 @@ public class SampleDTO {
 		return sampleBusinessKey;
 	}
 
-	public void setSampleBusinessKey(String sampleBusinessKey) {
+	public void setSampleBusinessKey(final String sampleBusinessKey) {
 		this.sampleBusinessKey = sampleBusinessKey;
 	}
 
@@ -48,7 +49,7 @@ public class SampleDTO {
 		return takenBy;
 	}
 
-	public void setTakenBy(String takenBy) {
+	public void setTakenBy(final String takenBy) {
 		this.takenBy = takenBy;
 	}
 
@@ -56,7 +57,7 @@ public class SampleDTO {
 		return samplingDate;
 	}
 
-	public void setSamplingDate(Date samplingDate) {
+	public void setSamplingDate(final Date samplingDate) {
 		this.samplingDate = samplingDate;
 	}
 
@@ -64,7 +65,7 @@ public class SampleDTO {
 		return sampleList;
 	}
 
-	public void setSampleList(String sampleList) {
+	public void setSampleList(final String sampleList) {
 		this.sampleList = sampleList;
 	}
 
@@ -72,7 +73,7 @@ public class SampleDTO {
 		return plantNumber;
 	}
 
-	public void setPlantNumber(Integer plantNumber) {
+	public void setPlantNumber(final Integer plantNumber) {
 		this.plantNumber = plantNumber;
 	}
 
@@ -80,12 +81,12 @@ public class SampleDTO {
 		return plantBusinessKey;
 	}
 
-	public void setPlantBusinessKey(String plantBusinessKey) {
+	public void setPlantBusinessKey(final String plantBusinessKey) {
 		this.plantBusinessKey = plantBusinessKey;
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		if (this == o) {
 			return true;
 		}
@@ -94,16 +95,27 @@ public class SampleDTO {
 			return false;
 		}
 
-		SampleDTO sampleDTO = (SampleDTO) o;
+		final SampleDTO sampleDTO = (SampleDTO) o;
 
-		return new EqualsBuilder().append(sampleName, sampleDTO.sampleName).append(sampleBusinessKey, sampleDTO.sampleBusinessKey)
-			.append(takenBy, sampleDTO.takenBy).append(samplingDate, sampleDTO.samplingDate).append(sampleList, sampleDTO.sampleList)
-			.append(plantNumber, sampleDTO.plantNumber).append(plantBusinessKey, sampleDTO.plantBusinessKey).isEquals();
+		return new EqualsBuilder().append(sampleName, sampleDTO.sampleName)
+			.append(sampleBusinessKey, sampleDTO.sampleBusinessKey)
+			.append(takenBy, sampleDTO.takenBy)
+			.append(samplingDate, sampleDTO.samplingDate)
+			.append(sampleList, sampleDTO.sampleList)
+			.append(plantNumber, sampleDTO.plantNumber)
+			.append(plantBusinessKey, sampleDTO.plantBusinessKey)
+			.isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(17, 37).append(sampleName).append(sampleBusinessKey).append(takenBy).append(samplingDate)
-			.append(sampleList).append(plantNumber).append(plantBusinessKey).toHashCode();
+		return new HashCodeBuilder(17, 37).append(sampleName)
+			.append(sampleBusinessKey)
+			.append(takenBy)
+			.append(samplingDate)
+			.append(sampleList)
+			.append(plantNumber)
+			.append(plantBusinessKey)
+			.toHashCode();
 	}
 }
