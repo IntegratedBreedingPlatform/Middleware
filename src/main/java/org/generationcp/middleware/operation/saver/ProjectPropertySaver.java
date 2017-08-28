@@ -385,17 +385,12 @@ public class ProjectPropertySaver {
 
 	private void updateVariable(final DmsProject project, final MeasurementVariable variable) {
 		if (project.getProperties() != null) {
-			final int rank = this.getRank(project, variable.getTermId());
 			for (final ProjectProperty property : project.getProperties()) {
-				if (rank == property.getRank()) {
-					if (property.getTypeId().intValue() == TermId.VARIABLE_DESCRIPTION.getId()) {
-						property.setValue(variable.getDescription());
-					} else if (property.getTypeId().intValue() == variable.getTermId()) {
-						property.setValue(variable.getValue());
-					} else if (VariableType.getById(property.getTypeId().intValue()) != null) {
-						property.setValue(variable.getName());
-					}
+				if (property.getVariableId().equals(variable.getTermId())) {
+					property.setValue(variable.getValue());
+					property.setAlias(variable.getName());
 					this.daoFactory.getProjectPropertyDao().update(property);
+					break;
 				}
 			}
 		}
