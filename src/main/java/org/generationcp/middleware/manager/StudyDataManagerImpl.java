@@ -1113,9 +1113,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	public List<StudySummary> findPagedProjects(final Map<StudyFilters, String> filters,
 			final Integer pageSize, final Integer pageNumber) throws MiddlewareQueryException {
 
-		final List<DmsProject> dmsProjects =
-				this.getDmsProjectDao().findPagedProjects(filters, pageSize, pageNumber);
+		final List<DmsProject> dmsProjects = this.getDmsProjectDao().findPagedProjects(filters, pageSize, pageNumber);
+
 		final List<StudySummary> studySummaries = Lists.newArrayList();
+
 		for (final DmsProject dmsProject : dmsProjects) {
 			final StudySummary studySummary = new StudySummary();
 
@@ -1129,38 +1130,33 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			}).immutableSortedCopy(dmsProject.getProperties());
 
 			final Map<String, String> additionalProps = Maps.newHashMap();
-			String additionalPropKey = null;
-			String valueKey = "";
+
 			for (final ProjectProperty prop : sortedProperties) {
-				if (prop.getTypeId().equals(1805)) {
-					additionalPropKey = prop.getValue();
-				}
-				if (prop.getTypeId().equals(TermId.STANDARD_VARIABLE.getId())) {
-					valueKey = prop.getValue();
-				}
-				if (valueKey.equals(String.valueOf(prop.getTypeId()))) {
-					if (valueKey.equals(String.valueOf(TermId.START_DATE.getId()))) {
-						studySummary.setStartDate(prop.getValue());
-					} else if (valueKey.equals(String.valueOf(TermId.END_DATE.getId()))) {
-						studySummary.setEndDate(prop.getValue());
-					} else if (valueKey.equals(String.valueOf(TermId.SEASON_VAR_TEXT.getId()))) {
-						studySummary.addSeason(prop.getValue());
-					} else if (valueKey.equals(String.valueOf(TermId.LOCATION_ID.getId()))) {
-						studySummary.setLocationId(!StringUtils.isEmpty(prop.getValue()) ? String.valueOf(prop.getValue()) : null);
-					} else if (valueKey.equals(String.valueOf(TermId.STUDY_TYPE.getId()))) {
-						studySummary.setType(StudyType.getStudyTypeById(Integer.valueOf(prop.getValue())).getName());
-					} else {
-						additionalProps.put(additionalPropKey, prop.getValue());
-					}
+
+				final Integer variableId = prop.getVariableId();
+				final String value = prop.getValue();
+
+				if (variableId.equals(TermId.START_DATE.getId())) {
+					studySummary.setStartDate(value);
+				} else if (variableId.equals(TermId.END_DATE.getId())) {
+					studySummary.setEndDate(value);
+				} else if (variableId.equals(TermId.SEASON_VAR_TEXT.getId())) {
+					studySummary.addSeason(value);
+				} else if (variableId.equals(TermId.LOCATION_ID.getId())) {
+					studySummary.setLocationId(!StringUtils.isEmpty(value) ? value : null);
+				} else if (variableId.equals(TermId.STUDY_TYPE.getId())) {
+					studySummary.setType(StudyType.getStudyTypeById(Integer.valueOf(value)).getName());
+				} else {
+					additionalProps.put(prop.getAlias(), value);
 				}
 
 				studySummary.setActive(true);
-				if (prop.getTypeId().equals(String.valueOf(TermId.STUDY_STATUS.getId()))) {
-					if (Integer.valueOf(prop.getValue()).equals(TermId.DELETED_STUDY.getId())) {
-						studySummary.setActive(false);
-					}
+
+				if (variableId.equals(TermId.STUDY_STATUS.getId()) && value.equals(TermId.DELETED_STUDY.getId())) {
+					studySummary.setActive(false);
 				}
 			}
+
 			studySummary.setOptionalInfo(additionalProps)
 					.setName(dmsProject.getName())
 					.setProgramDbId(dmsProject.getProgramUUID())
