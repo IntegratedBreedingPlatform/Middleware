@@ -76,7 +76,7 @@ public class SampleListServiceImpl implements SampleListService {
 	}
 
 	@Override
-	public SampleList createOrUpdateSampleList(final SampleListDTO sampleListDTO) {
+	public SampleList createSampleList(final SampleListDTO sampleListDTO) {
 
 		Preconditions.checkArgument(sampleListDTO.getInstanceIds() != null, "The Instance List must not be null");
 		Preconditions.checkArgument(!sampleListDTO.getInstanceIds().isEmpty(), "The Instance List must not be empty");
@@ -128,9 +128,9 @@ public class SampleListServiceImpl implements SampleListService {
 			}
 
 			sampleList.setSamples(samples);
-			return this.sampleListDao.saveOrUpdate(sampleList);
+			return this.sampleListDao.save(sampleList);
 		} catch (HibernateException e) {
-			throw new MiddlewareQueryException("Error in createOrUpdateSampleList in SampleListServiceImpl: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in createSampleList in SampleListServiceImpl: " + e.getMessage(), e);
 		}
 	}
 

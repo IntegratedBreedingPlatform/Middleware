@@ -6,7 +6,7 @@ import org.generationcp.middleware.pojos.SampleList;
 
 public interface SampleListService {
 
-	SampleList createOrUpdateSampleList(SampleListDTO sampleListDto);
+	SampleList createSampleList(SampleListDTO sampleListDto);
 
 	/**
 	 * Create a sample list folder

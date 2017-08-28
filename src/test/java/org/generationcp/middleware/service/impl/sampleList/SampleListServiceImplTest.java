@@ -503,7 +503,7 @@ public class SampleListServiceImplTest {
 		sampleListDTO.setSelectionVariableId(selectionVariableId);
 		sampleListDTO.setStudyId(studyId);
 		sampleListDTO.setTakenBy("admin");
-		sampleList = sampleListService.createOrUpdateSampleList(sampleListDTO);
+		sampleList = sampleListService.createSampleList(sampleListDTO);
 
 		final ArgumentCaptor<SampleList> arg1 = ArgumentCaptor.forClass(SampleList.class);
 
