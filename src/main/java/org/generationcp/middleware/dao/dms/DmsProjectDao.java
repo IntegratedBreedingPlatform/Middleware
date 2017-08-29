@@ -462,21 +462,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return new ArrayList<>(projects);
 	}
 
-	public List<DmsProject> getByFactor(Integer factorId) throws MiddlewareQueryException {
-		try {
-			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.createAlias("properties", "p");
-			criteria.add(Restrictions.eq("p.typeId", TermId.STANDARD_VARIABLE.getId()));
-			criteria.add(Restrictions.eq("p.value", factorId.toString()));
-
-			return criteria.list();
-
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error getByFactor=" + factorId + " at DmsProjectDao: " + e.getMessage(), e);
-		}
-		return new ArrayList<>();
-	}
-
 	public List<DmsProject> getByIds(Collection<Integer> projectIds) throws MiddlewareQueryException {
 		List<DmsProject> studyNodes = new ArrayList<>();
 		try {
