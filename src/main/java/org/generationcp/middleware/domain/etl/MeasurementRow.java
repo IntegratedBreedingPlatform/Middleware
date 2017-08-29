@@ -93,7 +93,9 @@ public class MeasurementRow {
 		List<MeasurementData> list = new ArrayList<MeasurementData>();
 		if (this.dataList != null && !this.dataList.isEmpty()) {
 			for (MeasurementData data : this.dataList) {
-				if (trialHeaders == null || !trialHeaders.contains(data.getLabel())) {
+				//Remove SAMPLES with TermId = -2 because is nonexistent term Id
+				boolean nonexistentTermId = data.getMeasurementVariable().getTermId() == TermId.SAMPLES.getId();
+				if ( (trialHeaders == null || !trialHeaders.contains(data.getLabel()) ) && !nonexistentTermId) {
 					list.add(data);
 				}
 			}
