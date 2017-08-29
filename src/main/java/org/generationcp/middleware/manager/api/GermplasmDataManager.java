@@ -285,6 +285,13 @@ public interface GermplasmDataManager {
 	 * @return Returns the id of the updated Germplasm {@code Name}s.
 	 */
 	List<Integer> updateGermplasmName(List<Name> names);
+	
+	/**
+	 * Returns all the available attribute types
+	 * 
+	 * @return List of UserDefinedField POJOs that contains all the attribute types
+	 */
+	List<UserDefinedField> getAllAttributesTypes();
 
 	/**
 	 * Returns all the attributes of the Germplasm identified by the given id.

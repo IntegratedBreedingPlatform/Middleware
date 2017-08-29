@@ -1504,4 +1504,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return this.getGermplasmDao().getParentsInfoByGIDList(gidList);
 	}
 
+	@Override
+	public List<UserDefinedField> getAllAttributesTypes() {
+		return this.getAttributeDao().getAttributeTypes();
+	}
+
 }

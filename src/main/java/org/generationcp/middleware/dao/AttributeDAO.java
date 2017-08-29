@@ -17,9 +17,12 @@ import java.util.List;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.workbench.Project;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.Restrictions;
 
 /**
  * DAO class for {@link Attribute}.
@@ -79,5 +82,11 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			}
 		}
 		return returnList;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<UserDefinedField> getAttributeTypes() {
+		final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class).add(Restrictions.eq("ftable", "ATRIBUTS"));
+		return criteria.list();
 	}
 }
