@@ -17,7 +17,6 @@ import java.util.List;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.workbench.Project;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -31,59 +30,59 @@ import org.hibernate.criterion.Restrictions;
 public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 
 	@SuppressWarnings("unchecked")
-	public List<Attribute> getByGID(Integer gid) throws MiddlewareQueryException {
-		List<Attribute> toReturn = new ArrayList<Attribute>();
+	public List<Attribute> getByGID(final Integer gid) {
+		List<Attribute> toReturn = new ArrayList<>();
 		try {
 			if (gid != null) {
-				Query query = this.getSession().getNamedQuery(Attribute.GET_BY_GID);
+				final Query query = this.getSession().getNamedQuery(Attribute.GET_BY_GID);
 				query.setParameter("gid", gid);
 				toReturn = query.list();
 			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByGID(gid=" + gid + ") query from Attributes: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getByGID(gid=" + gid + ") query from Attributes: " + e.getMessage(), e);
 		}
 		return toReturn;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<UserDefinedField> getAttributeTypesByGIDList(List<Integer> gidList) throws MiddlewareQueryException {
-		List<UserDefinedField> returnList = new ArrayList<UserDefinedField>();
+	public List<UserDefinedField> getAttributeTypesByGIDList(final List<Integer> gidList) {
+		List<UserDefinedField> returnList = new ArrayList<>();
 		if (gidList != null && !gidList.isEmpty()) {
 			try {
-				String sql =
-						"SELECT {u.*}" + " FROM atributs a" + " INNER JOIN udflds u" + " WHERE a.atype=u.fldno"
-								+ " AND a.gid in (:gidList)" + " ORDER BY u.fname";
-				SQLQuery query = this.getSession().createSQLQuery(sql);
+				final String sql = "SELECT {u.*}" + " FROM atributs a" + " INNER JOIN udflds u" + " WHERE a.atype=u.fldno"
+						+ " AND a.gid in (:gidList)" + " ORDER BY u.fname";
+				final SQLQuery query = this.getSession().createSQLQuery(sql);
 				query.addEntity("u", UserDefinedField.class);
 				query.setParameterList("gidList", gidList);
 				returnList = query.list();
 
-			} catch (HibernateException e) {
-				this.logAndThrowException("Error with getAttributesByGIDList(gidList=" + gidList + "): " + e.getMessage(), e);
+			} catch (final HibernateException e) {
+				throw new MiddlewareQueryException("Error with getAttributesByGIDList(gidList=" + gidList + "): " + e.getMessage(), e);
 			}
 		}
 		return returnList;
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Attribute> getAttributeValuesByTypeAndGIDList(Integer attributeType, List<Integer> gidList) throws MiddlewareQueryException {
-		List<Attribute> returnList = new ArrayList<Attribute>();
+	public List<Attribute> getAttributeValuesByTypeAndGIDList(final Integer attributeType, final List<Integer> gidList)
+			throws MiddlewareQueryException {
+		List<Attribute> returnList = new ArrayList<>();
 		if (gidList != null && !gidList.isEmpty()) {
 			try {
-				String sql = "SELECT {a.*}" + " FROM atributs a" + " WHERE a.atype=:attributeType" + " AND a.gid in (:gidList)";
-				SQLQuery query = this.getSession().createSQLQuery(sql);
+				final String sql = "SELECT {a.*}" + " FROM atributs a" + " WHERE a.atype=:attributeType" + " AND a.gid in (:gidList)";
+				final SQLQuery query = this.getSession().createSQLQuery(sql);
 				query.addEntity("a", Attribute.class);
 				query.setParameter("attributeType", attributeType);
 				query.setParameterList("gidList", gidList);
 				returnList = query.list();
-			} catch (HibernateException e) {
-				this.logAndThrowException("Error with getAttributeValuesByTypeAndGIDList(attributeType=" + attributeType + ", gidList="
-						+ gidList + "): " + e.getMessage(), e);
+			} catch (final HibernateException e) {
+				throw new MiddlewareQueryException("Error with getAttributeValuesByTypeAndGIDList(attributeType=" + attributeType
+						+ ", gidList=" + gidList + "): " + e.getMessage(), e);
 			}
 		}
 		return returnList;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<UserDefinedField> getAttributeTypes() {
 		final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class).add(Restrictions.eq("ftable", "ATRIBUTS"));
