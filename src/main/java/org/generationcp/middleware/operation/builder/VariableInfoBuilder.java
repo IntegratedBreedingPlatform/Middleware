@@ -63,43 +63,5 @@ public class VariableInfoBuilder {
 		// TODO
 		return null;
 	}
-
-	// TODO
-	private ProjectProperty findTreatmentLabelProperty(Set<ProjectProperty> properties) {
-		for (ProjectProperty property : properties) {
-			if (this.isMultiFactorialType(property)) {
-				return property;
-			}
-		}
-		return null;
-	}
-
-	// TODO investigate isMultiFactorialType
-	private ProjectProperty findLocalNameProperty(String stdVariableIdStr, Set<ProjectProperty> properties) {
-		Integer stdVariableId = Integer.parseInt(stdVariableIdStr);
-		for (ProjectProperty property : properties) {
-			if (this.isStudyInformationType(property)) {
-				return property;
-			}
-
-			if (!this.isLocalDescriptionType(property) && !this.isMultiFactorialType(property)) {
-				if (!stdVariableId.equals(property.getTypeId())) {
-					return property;
-				}
-			}
-		}
-		return null;
-	}
-
-	private boolean isStudyInformationType(ProjectProperty property) {
-		return TermId.STUDY_INFORMATION.getId() == property.getTypeId();
-	}
-
-	private boolean isLocalDescriptionType(ProjectProperty property) {
-		return TermId.VARIABLE_DESCRIPTION.getId() == property.getTypeId();
-	}
-
-	private boolean isMultiFactorialType(ProjectProperty property) {
-		return TermId.MULTIFACTORIAL_INFO.getId() == property.getTypeId();
-	}
+	
 }
