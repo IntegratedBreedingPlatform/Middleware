@@ -6,7 +6,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog-ext
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<changeSet author="vanina" id="v6.2.1-1">
+	<changeSet author="vanina" id="v6.3-1">
 		<preConditions onFail="MARK_RAN">
 			<not><columnExists tableName="sample_list" columnName="type"/> </not>
 		</preConditions>
@@ -17,7 +17,7 @@
 		</addColumn>
 	</changeSet>
 
-	<changeSet author="vanina" id="v6.2.1-2">
+	<changeSet author="vanina" id="v6.3-2">
 		<preConditions onFail="MARK_RAN">
 			<tableExists tableName="sample_list"></tableExists>
 		</preConditions>
@@ -28,7 +28,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v6.2.1-3">
+	<changeSet author="vanina" id="v6.3-3">
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="sample_list" columnName="type"/>
 		</preConditions>
@@ -37,7 +37,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v6.2.1-4">
+	<changeSet author="vanina" id="v6.3-4">
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="sample" columnName="created_date"/>
 		</preConditions>
@@ -46,7 +46,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="vanina" id="v6.2.1-5">
+	<changeSet author="vanina" id="v6.3-5">
 		<preConditions onFail="MARK_RAN">
 			<not><columnExists tableName="sample" columnName="created_by"/></not>
 		</preConditions>
