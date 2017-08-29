@@ -4,6 +4,7 @@ package org.generationcp.middleware.dao;
 import java.util.Date;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
@@ -75,8 +76,9 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		final SampleList sampleList = this.getSampleList();
 		final SampleList parent = this.sampleListDao.getBySampleListName(ROOT_FOLDER);
 		sampleList.setHierarchy(parent);
+		sampleList.setType(SampleListType.SAMPLE_LIST);
 		this.sampleListDao.save(sampleList);
-		final SampleList uSampleList = this.sampleListDao.getSampleListByParentAndName(sampleList.getListName(), sampleList.getId());
+		final SampleList uSampleList = this.sampleListDao.getSampleListByParentAndName(sampleList.getListName(), parent.getId());
 		Assert.assertEquals(uSampleList.getId(), sampleList.getId());
 	}
 
@@ -120,6 +122,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		sampleList.setListName(
 			SampleListDaoTest.TRIAL_NAME + Util.getCurrentDateAsStringValue(SampleListDaoTest.YYYY_M_MDD_HH));
 		sampleList.setNotes(SampleListDaoTest.NOTES);
+		sampleList.setType(SampleListType.SAMPLE_LIST);
 
 		return sampleList;
 	}

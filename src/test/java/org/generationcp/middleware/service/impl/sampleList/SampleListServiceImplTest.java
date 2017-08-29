@@ -1,26 +1,48 @@
-package org.generationcp.middleware.service.impl.study;
+package org.generationcp.middleware.service.impl.sampleList;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Transformer;
+import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.study.MeasurementDto;
+import org.generationcp.middleware.service.api.study.ObservationDto;
+import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
+import org.generationcp.middleware.service.impl.study.StudyMeasurements;
+import org.generationcp.middleware.util.Util;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 public class SampleListServiceImplTest {
 
+	public static final String ADMIN = "admin";
+	public static final String MAIZE = "maize";
+	public static final String PLOT_CODE_PREFIX = "AZDS";
 	@Mock
 	private HibernateSessionProvider session;
 
@@ -30,6 +52,24 @@ public class SampleListServiceImplTest {
 	@Mock
 	private UserDAO userDAO;
 
+	@Mock
+	private StudyDataManager studyService;
+
+	@Mock
+	private StudyMeasurements studyMeasurements;
+
+	@Mock
+	private WorkbenchDataManager workbenchDataManager;
+
+	@Mock
+	PlantDao plantDao;
+
+	@Mock
+	private Study study;
+
+	@Mock
+	private SampleService sampleService;
+
 	private SampleListServiceImpl sampleListService;
 
 	@Before
@@ -38,6 +78,11 @@ public class SampleListServiceImplTest {
 		sampleListService = new SampleListServiceImpl(session);
 		sampleListService.setSampleListDao(sampleListDao);
 		sampleListService.setUserDao(userDAO);
+		sampleListService.setStudyMeasurements(studyMeasurements);
+		sampleListService.setStudyService(studyService);
+		sampleListService.setWorkbenchDataManager(workbenchDataManager);
+		sampleListService.setPlantDao(plantDao);
+		sampleListService.setSampleService(sampleService);
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -397,6 +442,72 @@ public class SampleListServiceImplTest {
 
 		Mockito.when(this.sampleListDao.saveOrUpdate(sampleListToMove)).thenThrow(MiddlewareQueryException.class);
 		this.sampleListService.moveSampleList(sampleListId, folderId);
+	}
+
+
+	@Test
+	public void testCreateSampleList() {
+		final int studyId = 1;
+		study.setId(studyId);
+		CropType cropType = new CropType();
+		cropType.setCropName(MAIZE);
+		cropType.setPlotCodePrefix(PLOT_CODE_PREFIX);
+		Map<Integer, Integer> mapPlantNumbers = new HashMap<>();
+		final Sample sample = new Sample();
+		final Integer selectionVariableId = 2;
+		final List<Integer> instanceIds = new ArrayList<>();
+		instanceIds.add(1);
+		List<ObservationDto> observationDtos = new ArrayList<>();
+		User user = new User();
+		SampleList sampleList = new SampleList();
+
+		final List<MeasurementDto> measurementVariableResults = new ArrayList<>();
+
+		final String variableValue = "10";
+		final MeasurementDto measurementDto = new MeasurementDto(variableValue);
+		measurementVariableResults.add(measurementDto);
+
+		final String preferredNameGid = "GID1";
+		final Integer ndExperimentId = 1;
+		final ObservationDto measurement = new ObservationDto(ndExperimentId, preferredNameGid, measurementVariableResults);
+		observationDtos.add(measurement);
+		final Collection<Integer> experimentIds = CollectionUtils.collect(observationDtos, new Transformer() {
+
+			@Override
+			public Object transform(final Object input) {
+				final ObservationDto observationDto = (ObservationDto) input;
+				return observationDto.getMeasurementId();
+			}
+		});
+
+		mapPlantNumbers.put(1, 5);
+
+		Mockito.when(studyService.getStudy(studyId)).thenReturn(study);
+		Mockito.when(studyMeasurements.getSampleObservations(studyId, instanceIds, selectionVariableId)).thenReturn(observationDtos);
+		Mockito.when(study.getName()).thenReturn("Maizing_Trial");
+		Mockito.when(workbenchDataManager.getCropTypeByName("maize")).thenReturn(cropType);
+		Mockito.when(plantDao.getMaxPlantNumber(experimentIds)).thenReturn(mapPlantNumbers);
+		Mockito.when(sampleService.buildSample(MAIZE, PLOT_CODE_PREFIX, 1, ADMIN, preferredNameGid, Util.getCurrentDate(), ndExperimentId,
+			sampleList, user, Util.getCurrentDate())).thenReturn(sample);
+		Mockito.when(sampleListDao.save(Mockito.any(SampleList.class))).thenReturn(sampleList);
+
+		final SampleListDTO sampleListDTO = new SampleListDTO();
+
+		sampleListDTO.setCreatedBy(ADMIN);
+		sampleListDTO.setCropName("maize");
+		sampleListDTO.setDescription("desc");
+		sampleListDTO.setInstanceIds(instanceIds);
+		sampleListDTO.setNotes("notes");
+		sampleListDTO.setSamplingDate(Util.getCurrentDate());
+
+		sampleListDTO.setSelectionVariableId(selectionVariableId);
+		sampleListDTO.setStudyId(studyId);
+		sampleListDTO.setTakenBy("admin");
+		sampleList = sampleListService.createSampleList(sampleListDTO);
+
+		final ArgumentCaptor<SampleList> arg1 = ArgumentCaptor.forClass(SampleList.class);
+
+		Mockito.verify(this.sampleListDao).save(arg1.capture());
 	}
 }
 

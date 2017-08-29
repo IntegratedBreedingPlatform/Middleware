@@ -60,9 +60,9 @@ public class SampleList implements Serializable {
 	@OneToMany(mappedBy = "hierarchy", fetch = FetchType.LAZY)
 	private List<SampleList> children;
 
-	private SampleListType type;
 	@Column(name="type")
-	@Enumerated(EnumType.ORDINAL)
+	@Enumerated(EnumType.STRING)
+	private SampleListType type;
 
 	public SampleListType getType() {
 		return type;
