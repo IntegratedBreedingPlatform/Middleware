@@ -11,8 +11,16 @@
 
 package org.generationcp.middleware.manager;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.TransformerUtils;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
 import org.apache.commons.io.FileUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -45,36 +53,15 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
-import org.hamcrest.FeatureMatcher;
-import org.hamcrest.Matcher;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import uk.co.jemos.podam.api.PodamFactory;
 import uk.co.jemos.podam.api.PodamFactoryImpl;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
-
-import static org.hamcrest.CoreMatchers.both;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsCollectionContaining.hasItem;
-import static org.hamcrest.core.IsNot.not;
 
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
@@ -1229,6 +1216,15 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		Assert.assertTrue(result.get(2)[1].equals(parent2Name));
 		Assert.assertTrue(result.get(3)[0].equals(separator));
 		Assert.assertTrue(result.get(3)[1].equals(parent3Name));
+	}
+	
+	@Test
+	public void testGetAllAttributeTypes() {
+		final List<UserDefinedField> attributeTypes = this.germplasmDataManager.getAllAttributesTypes();
+		Assert.assertNotNull(attributeTypes);
+		for (final UserDefinedField field : attributeTypes) {
+			Assert.assertEquals("ATRIBUTS", field.getFtable());
+		}
 	}
 
 }
