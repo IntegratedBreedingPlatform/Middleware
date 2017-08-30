@@ -226,7 +226,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	public List<Integer> getDatasetVariableIdsForGivenStoredInIds(Integer projectId, List<Integer> storedInIds,
 			List<Integer> varIdsToExclude) {
 		List<Integer> variableIds = new ArrayList<Integer>();
-		String mainSql = " SELECT variable_id " + " FROM projectprop p " + " WHERE project_id = :projectId ";
+		String mainSql = " SELECT variable_id " + " FROM projectprop pp " + " WHERE project_id = :projectId ";
 		String existsClause = " AND pp.type_id in (:storedInIds) ORDER BY rank ";
 		boolean doExcludeIds = varIdsToExclude != null && !varIdsToExclude.isEmpty();
 
