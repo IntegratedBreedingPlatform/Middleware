@@ -396,20 +396,6 @@ public class ProjectPropertySaver {
 		}
 	}
 
-	private int getRank(final DmsProject project, final int termId) {
-		int rank = -1;
-		if (project.getProperties() != null) {
-			for (final ProjectProperty property : project.getProperties()) {
-				if (property.getTypeId().intValue() == TermId.STANDARD_VARIABLE.getId()
-						&& property.getValue().equals(String.valueOf(termId))) {
-					rank = property.getRank();
-					break;
-				}
-			}
-		}
-		return rank;
-	}
-
 	private void deleteVariable(final DmsProject project, final DmsProject trialDataset, final DmsProject measurementDataset,
 			final PhenotypicType role, final int termId, final Geolocation geolocation) {
 
@@ -439,13 +425,12 @@ public class ProjectPropertySaver {
 	}
 
 	private void deleteVariable(final DmsProject project, final int termId) {
-		final int rank = this.getRank(project, termId);
-		if (project.getProperties() != null && !project.getProperties().isEmpty()) {
-			for (final Iterator<ProjectProperty> iterator = project.getProperties().iterator(); iterator.hasNext();) {
-				final ProjectProperty property = iterator.next();
-				if (rank == property.getRank()) {
+		if (project.getProperties() != null) {
+			for (final ProjectProperty property : project.getProperties()) {
+				if (property.getVariableId().equals(termId)) {
 					this.daoFactory.getProjectPropertyDao().makeTransient(property);
-					iterator.remove();
+					project.getProperties().remove(property);
+					break;
 				}
 			}
 		}
