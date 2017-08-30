@@ -226,21 +226,18 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	public List<Integer> getDatasetVariableIdsForGivenStoredInIds(Integer projectId, List<Integer> storedInIds,
 			List<Integer> varIdsToExclude) {
 		List<Integer> variableIds = new ArrayList<Integer>();
-		String mainSql = " SELECT value " + " FROM projectprop p " + " WHERE project_id = :projectId and type_id = :stdVarConstant ";
-		String existsClause =
-				" AND EXISTS ( " + "		SELECT null " + "		FROM projectprop pp " + "		WHERE pp.project_id = p.project_id "
-						+ "		AND pp.rank = p.rank " + "		AND pp.type_id in (:storedInIds)" + " ) ORDER BY rank ";
+		String mainSql = " SELECT variable_id " + " FROM projectprop p " + " WHERE project_id = :projectId ";
+		String existsClause = " AND pp.type_id in (:storedInIds) ORDER BY rank ";
 		boolean doExcludeIds = varIdsToExclude != null && !varIdsToExclude.isEmpty();
 
 		StringBuilder sb = new StringBuilder(mainSql);
 		if (doExcludeIds) {
-			sb.append("AND value NOT IN (:excludeIds) ");
+			sb.append("AND variable_id NOT IN (:excludeIds) ");
 		}
 		sb.append(existsClause);
 
 		Query query = this.getSession().createSQLQuery(sb.toString());
 		query.setParameter("projectId", projectId);
-		query.setParameter("stdVarConstant", TermId.STANDARD_VARIABLE.getId());
 		if (doExcludeIds) {
 			query.setParameterList("excludeIds", varIdsToExclude);
 		}
