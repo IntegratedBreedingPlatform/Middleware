@@ -31,6 +31,16 @@
 	<changeSet author="vanina" id="v6.3-3">
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="sample_list" columnName="type"/>
+			<sqlCheck expectedResult="1">
+				SELECT count(*)
+				FROM
+				INFORMATION_SCHEMA.columns
+				WHERE
+				TABLE_NAME = 'sample_list'
+				and column_name = 'created_date'
+				and data_type = 'date'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			alter table sample_list modify column created_date datetime;
@@ -40,6 +50,16 @@
 	<changeSet author="vanina" id="v6.3-4">
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="sample" columnName="created_date"/>
+			<sqlCheck expectedResult="1">
+				SELECT count(*)
+				FROM
+				INFORMATION_SCHEMA.columns
+				WHERE
+				TABLE_NAME = 'sample'
+				and column_name = 'created_date'
+				and data_type = 'date'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
 		</preConditions>
 		<sql dbms="mysql" splitStatements="true">
 			alter table sample modify column created_date datetime;

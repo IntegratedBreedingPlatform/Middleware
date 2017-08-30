@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.sampleList;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.generationcp.middleware.dao.PlantDao;
+import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.domain.dms.Study;
@@ -22,6 +23,7 @@ import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyMeasurements;
 import org.generationcp.middleware.util.Util;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -48,6 +50,10 @@ public class SampleListServiceImplTest {
 
 	@Mock
 	private SampleListDao sampleListDao;
+
+
+	@Mock
+	private SampleDao sampleDao;
 
 	@Mock
 	private UserDAO userDAO;
@@ -83,6 +89,7 @@ public class SampleListServiceImplTest {
 		sampleListService.setWorkbenchDataManager(workbenchDataManager);
 		sampleListService.setPlantDao(plantDao);
 		sampleListService.setSampleService(sampleService);
+		sampleListService.setSampleDao(sampleDao);
 	}
 
 	@Test(expected = NullPointerException.class)
@@ -487,8 +494,8 @@ public class SampleListServiceImplTest {
 		Mockito.when(study.getName()).thenReturn("Maizing_Trial");
 		Mockito.when(workbenchDataManager.getCropTypeByName("maize")).thenReturn(cropType);
 		Mockito.when(plantDao.getMaxPlantNumber(experimentIds)).thenReturn(mapPlantNumbers);
-		Mockito.when(sampleService.buildSample(MAIZE, PLOT_CODE_PREFIX, 1, ADMIN, preferredNameGid, Util.getCurrentDate(), ndExperimentId,
-			sampleList, user, Util.getCurrentDate())).thenReturn(sample);
+		Mockito.when(sampleService.buildSample(MAIZE, PLOT_CODE_PREFIX, 1, preferredNameGid, Util.getCurrentDate(), ndExperimentId,
+			sampleList, user, Util.getCurrentDate(), user)).thenReturn(sample);
 		Mockito.when(sampleListDao.save(Mockito.any(SampleList.class))).thenReturn(sampleList);
 
 		final SampleListDTO sampleListDTO = new SampleListDTO();
@@ -502,12 +509,15 @@ public class SampleListServiceImplTest {
 
 		sampleListDTO.setSelectionVariableId(selectionVariableId);
 		sampleListDTO.setStudyId(studyId);
-		sampleListDTO.setTakenBy("admin");
-		sampleList = sampleListService.createSampleList(sampleListDTO);
+		sampleListDTO.setTakenBy(ADMIN);
+		sampleListService.createSampleList(sampleListDTO);
 
-		final ArgumentCaptor<SampleList> arg1 = ArgumentCaptor.forClass(SampleList.class);
-
-		Mockito.verify(this.sampleListDao).save(arg1.capture());
+		final ArgumentCaptor<SampleList> sampleListArgumentCaptor = ArgumentCaptor.forClass(SampleList.class);
+		Mockito.verify(this.sampleListDao).save(sampleListArgumentCaptor.capture());
+		Assert.assertEquals(SampleListType.SAMPLE_LIST, sampleListArgumentCaptor.getValue().getType());
+		Assert.assertEquals("desc", sampleListArgumentCaptor.getValue().getDescription());
+		Assert.assertEquals("notes", sampleListArgumentCaptor.getValue().getNotes());
+		Assert.assertEquals(Integer.valueOf(variableValue).longValue(), sampleListArgumentCaptor.getValue().getSamples().size());
 	}
 }
 

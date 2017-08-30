@@ -40,7 +40,7 @@ public class SampleListServiceImpl implements SampleListService {
 
 	private UserDAO userDao;
 
-	private final SampleDao sampleDao;
+	private SampleDao sampleDao;
 
 	private StudyMeasurements studyMeasurements;
 
@@ -103,7 +103,7 @@ public class SampleListServiceImpl implements SampleListService {
 				.getSampleObservations(sampleListDTO.getStudyId(), sampleListDTO.getInstanceIds(), sampleListDTO.getSelectionVariableId());
 
 			Preconditions.checkArgument(!observationDtos.isEmpty(), "The observation list must not be empty");
-
+			User takenBy = this.userDao.getUserByUserName(sampleListDTO.getTakenBy());
 			final String cropPrefix = this.workbenchDataManager.getCropTypeByName(sampleListDTO.getCropName()).getPlotCodePrefix();
 
 			final Map<Integer, Integer> maxPlantNumbers = this.getMaxPlantNumber(observationDtos);
@@ -120,9 +120,8 @@ public class SampleListServiceImpl implements SampleListService {
 				for (double i = 0; i < sampleNumber.doubleValue(); i++) {
 					count++;
 					final Sample sample = this.sampleService
-						.buildSample(sampleListDTO.getCropName(), cropPrefix, count, sampleListDTO.getTakenBy(),
-							observationDto.getDesignation(), sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList,
-							user, createdDate);
+						.buildSample(sampleListDTO.getCropName(), cropPrefix, count, observationDto.getDesignation(),
+							sampleListDTO.getSamplingDate(), observationDto.getMeasurementId(), sampleList, user, createdDate, takenBy);
 					samples.add(sample);
 				}
 			}
@@ -309,5 +308,9 @@ public class SampleListServiceImpl implements SampleListService {
 
 	public void setSampleService(final SampleService sampleService) {
 		this.sampleService = sampleService;
+	}
+
+	public  void setSampleDao(final SampleDao sampleDao) {
+		this.sampleDao = sampleDao;
 	}
 }
