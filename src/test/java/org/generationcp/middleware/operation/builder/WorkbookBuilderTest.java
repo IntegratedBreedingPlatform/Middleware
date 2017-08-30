@@ -460,10 +460,6 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		final DmsProject project = this.createDmsProject(1);
 		final int rank = 1;
 		final ProjectProperty localNameProjectProp = this.createProjectProperty(project, varType.getId(), "VAR_NAME", rank);
-		final ProjectProperty localDescProjectProp =
-				this.createProjectProperty(project, TermId.VARIABLE_DESCRIPTION.getId(), "VAR_DESC", rank);
-		final ProjectProperty stdVarProjectProp =
-				this.createProjectProperty(project, TermId.STANDARD_VARIABLE.getId(), Integer.toString(termId), rank);
 		final String value = "1";
 		final Double minRange = null;
 		final Double maxRange = null;
