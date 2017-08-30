@@ -242,8 +242,6 @@ public class ProjectPropertySaverTest {
 
 			if(Objects.equals(typeId, VariableType.STUDY_DETAIL.getId())){
 				Assert.assertEquals(dmsVariableType.getLocalName(), projectProperty.getValue());
-			} else if(Objects.equals(typeId, TermId.VARIABLE_DESCRIPTION.getId())){
-				Assert.assertEquals(dmsVariableType.getLocalDescription(), projectProperty.getValue());
 			} else if(Objects.equals(typeId, TermId.STANDARD_VARIABLE.getId())){
 				Assert.assertEquals(String.valueOf(dmsVariableType.getId()), projectProperty.getValue());
 			}else if(Objects.equals(typeId, TermId.MULTIFACTORIAL_INFO.getId())){
@@ -301,8 +299,6 @@ public class ProjectPropertySaverTest {
 
 			if(Objects.equals(typeId, VariableType.TRAIT.getId())){
 				Assert.assertEquals(dmsVariableType.getLocalName(), projectProperty.getValue());
-			} else if(Objects.equals(typeId, TermId.VARIABLE_DESCRIPTION.getId())){
-				Assert.assertEquals(dmsVariableType.getLocalDescription(), projectProperty.getValue());
 			} else if(Objects.equals(typeId, TermId.STANDARD_VARIABLE.getId())){
 				Assert.assertEquals(String.valueOf(dmsVariableType.getId()), projectProperty.getValue());
 			}else if(Objects.equals(typeId, TermId.MULTIFACTORIAL_INFO.getId())){
@@ -430,8 +426,6 @@ public class ProjectPropertySaverTest {
 					dmsVariableType.getLocalDescription(), projectPropertyDesc.getValue());
 			Assert.assertEquals("The project id should " + dmsProject.getProjectId(), dmsProject.getProjectId(), projectPropertyDesc
 					.getProject().getProjectId());
-			Assert.assertEquals("The type id must be " + TermId.VARIABLE_DESCRIPTION.getId(), TermId.VARIABLE_DESCRIPTION.getId(),
-					projectPropertyDesc.getTypeId().intValue());
 			Assert.assertEquals("The rank should " + dmsVariableType.getRank(), dmsVariableType.getRank(), projectPropertyDesc.getRank()
 					.intValue());
 
