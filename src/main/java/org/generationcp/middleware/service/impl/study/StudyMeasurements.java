@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
@@ -210,14 +211,16 @@ public class StudyMeasurements {
 
 		if (results != null && !results.isEmpty()) {
 			for (final Object[] row : results) {
+				final String value = (String) row[2];
+				if (StringUtils.isNotBlank(value) && !"0".equals(value)) {
+					final List<MeasurementDto> measurementVariableResults = new ArrayList<>();
 
-				final List<MeasurementDto> measurementVariableResults = new ArrayList<>();
+					final MeasurementDto measurementDto = new MeasurementDto(value);
+					measurementVariableResults.add(measurementDto);
 
-				final MeasurementDto measurementDto = new MeasurementDto(row[2].toString());
-				measurementVariableResults.add(measurementDto);
-
-				final ObservationDto measurement = new ObservationDto((Integer) row[0], (String) row[1], measurementVariableResults);
-				measurements.add(measurement);
+					final ObservationDto measurement = new ObservationDto((Integer) row[0], (String) row[1], measurementVariableResults);
+					measurements.add(measurement);
+				}
 			}
 		}
 		return Collections.unmodifiableList(measurements);
