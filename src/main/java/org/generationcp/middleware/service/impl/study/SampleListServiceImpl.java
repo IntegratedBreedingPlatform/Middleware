@@ -87,7 +87,7 @@ public class SampleListServiceImpl implements SampleListService {
 			final Study study = this.studyService.getStudy(sampleListDTO.getStudyId());
 			Preconditions.checkNotNull(study, "The study must not be null");
 			final SampleList sampleList = new SampleList();
-
+			User takenBy = null;
 			Date createdDate = new Date();
 			sampleList.setCreatedDate(createdDate);
 			User user = this.userDao.getUserByUserName(sampleListDTO.getCreatedBy());
@@ -103,7 +103,11 @@ public class SampleListServiceImpl implements SampleListService {
 				.getSampleObservations(sampleListDTO.getStudyId(), sampleListDTO.getInstanceIds(), sampleListDTO.getSelectionVariableId());
 
 			Preconditions.checkArgument(!observationDtos.isEmpty(), "The observation list must not be empty");
-			User takenBy = this.userDao.getUserByUserName(sampleListDTO.getTakenBy());
+
+			if (!sampleListDTO.getTakenBy().isEmpty()) {
+				takenBy = this.userDao.getUserByUserName(sampleListDTO.getTakenBy());
+			}
+
 			final String cropPrefix = this.workbenchDataManager.getCropTypeByName(sampleListDTO.getCropName()).getPlotCodePrefix();
 
 			final Map<Integer, Integer> maxPlantNumbers = this.getMaxPlantNumber(observationDtos);
