@@ -11,7 +11,7 @@
 			<not><columnExists tableName="sample_list" columnName="type"/> </not>
 		</preConditions>
 		<addColumn tableName="sample_list">
-			<column name="type" type="VARCHAR(30)" defaultValue="FOLDER" afterColumn="created_by">
+			<column name="type" type="VARCHAR(30)" defaultValue="SAMPLE_LIST" afterColumn="created_by">
 				<constraints nullable="false"/>
 			</column>
 		</addColumn>
@@ -80,6 +80,46 @@
 			REFERENCES users (userid)
 			ON DELETE NO ACTION
 			ON UPDATE NO ACTION;
+		</sql>
+
+
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.3-6">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="sample_list"></tableExists>
+			<not><sqlCheck expectedResult="0">
+				SELECT count(*)
+				FROM
+				sample_list
+				where list_name != 'Samples';
+			</sqlCheck></not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			update sample_list
+			set type = 'SAMPLE_LIST'
+			where list_name != 'Samples';
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.3-7">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="sample_list"></tableExists>
+			<not><sqlCheck expectedResult="0">
+				SELECT count(*)
+				FROM
+				sample_list
+				where hierarchy is null;
+			</sqlCheck></not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE sample_list
+			SET hierarchy = (SELECT list_id
+			FROM (SELECT list_id
+			FROM sample_list
+			WHERE list_name = 'Samples') T)
+			WHERE hierarchy IS NULL
+			and list_name != 'Samples';
 		</sql>
 	</changeSet>
 
