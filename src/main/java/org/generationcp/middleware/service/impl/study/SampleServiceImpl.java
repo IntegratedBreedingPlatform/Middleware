@@ -88,8 +88,8 @@ public class SampleServiceImpl implements SampleService {
 
 	@Override
 	public List<SampleDTO> getSamples(String plot_id) {
-		List<SampleDTO> dtos = new ArrayList<>();
-		List<Sample> samples = this.sampleDao.getByPlotId(plot_id);
+		final List<SampleDTO> listSampleDto = new ArrayList<>();
+		final List<Sample> samples = this.sampleDao.getByPlotId(plot_id);
 		for (Sample sample : samples) {
 			SampleDTO dto = new SampleDTO();
 			dto.setSampleName(sample.getSampleName());
@@ -104,9 +104,9 @@ public class SampleServiceImpl implements SampleService {
 			Plant plant = sample.getPlant();
 			dto.setPlantNumber(plant.getPlantNumber());
 			dto.setPlantBusinessKey(plant.getPlantBusinessKey());
-			dtos.add(dto);
+			listSampleDto.add(dto);
 		}
-		return dtos;
+		return listSampleDto;
 	}
 
 }

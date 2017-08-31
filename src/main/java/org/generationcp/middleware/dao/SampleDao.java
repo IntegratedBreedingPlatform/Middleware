@@ -55,15 +55,15 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	}
 
 	public Map<Integer, String> getExperimentSampleMap(final Integer studyDbId) {
-		Map<Integer, String> samplesMap = new HashMap<>();
+		final Map<Integer, String> samplesMap = new HashMap<>();
 		try {
 			final SQLQuery query = this.getSession().createSQLQuery(SQL_SAMPLES_AND_EXPERIMENTS);
 
 			query.setParameter("studyId", studyDbId);
-			List results = query.list();
+			final List results = query.list();
 
-			for (Object o : results) {
-				Object[] result = (Object[]) o;
+			for (final Object o : results) {
+				final Object[] result = (Object[]) o;
 				if (result != null) {
 					samplesMap.put((Integer) result[0], (String) result[1]);
 				}

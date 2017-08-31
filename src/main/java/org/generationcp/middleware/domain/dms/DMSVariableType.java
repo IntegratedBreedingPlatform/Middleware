@@ -133,7 +133,7 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 			return;
 		}
 
-		String propertyName = this.getStandardVariable().getProperty().getName();
+		final String propertyName = this.getStandardVariable().getProperty().getName();
 		this.setVariableType(OntologyDataHelper.mapFromPhenotype(this.getRole(), propertyName));
 	}
 
