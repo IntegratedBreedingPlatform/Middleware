@@ -200,8 +200,8 @@ public class MeasurementData {
 			// this would return the value from the db
 			return this.value == null ? "" : this.value;
 		} else {
-			if (this.getMeasurementVariable() != null && this.getMeasurementVariable().getDataTypeDisplay() != null
-					&& "N".equalsIgnoreCase(this.getMeasurementVariable().getDataTypeDisplay())) {
+			if (this.getMeasurementVariable() != null && this.getMeasurementVariable().getDataTypeCode() != null
+					&& "N".equalsIgnoreCase(this.getMeasurementVariable().getDataTypeCode())) {
 				if (this.value != null && !EMPTY_STRING.equalsIgnoreCase(this.value) && !"null".equalsIgnoreCase(this.value)) {
 					if (MeasurementData.MISSING_VALUE.equalsIgnoreCase(this.value)) {
 						return MeasurementData.MISSING_VALUE;

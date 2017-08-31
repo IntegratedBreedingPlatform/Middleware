@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,7 +20,9 @@ import org.generationcp.middleware.util.Debug;
 /**
  * Contains the details of an experiment - id, factors, variates.
  */
-public class Experiment {
+public class Experiment implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 
 	private int id;
 
@@ -70,7 +73,7 @@ public class Experiment {
 	public void setVariates(VariableList variates) {
 		this.variates = variates;
 		if (this.variatesMap == null) {
-			this.variatesMap = new HashMap<String, Variable>();
+			this.variatesMap = new HashMap<>();
 			if (variates != null) {
 
 				for (Variable var : variates.getVariables()) {

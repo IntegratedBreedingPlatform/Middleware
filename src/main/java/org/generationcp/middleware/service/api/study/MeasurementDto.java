@@ -22,6 +22,10 @@ public class MeasurementDto {
 		this.measurementVariable = measurementVariable;
 	}
 
+	public MeasurementDto(final String variableValue) {
+		this.variableValue = variableValue;
+	}
+
 	/**
 	 * @return the measurementVariable
 	 */

@@ -13,22 +13,25 @@ import java.util.List;
 
 class ObservationQuery {
 
-	final String DEFAULT_SORT_COLUMN = "PLOT_NO";
-	final String DEFAULT_SORT_ORDER = "asc";
+	public static final String FROM = " FROM ";
+	public static final String INNER_JOIN = " INNER JOIN ";
+	public static final String WHERE = " WHERE ";
+	public static final String DEFAULT_SORT_COLUMN = "PLOT_NO";
+	public static final String DEFAULT_SORT_ORDER = "asc";
 
-	final String whereText = "where (pr.object_project_id = ? and name LIKE '%PLOTDATA'))";
-	final String selectText = " SELECT\n"
+	public static final String WHERE_TEXT = "where (pr.object_project_id = ? and name LIKE '%PLOTDATA'))";
+	public static final String SELECT_TEXT = " SELECT\n"
 		+ "   nde.nd_experiment_id,\n"
 		+ "   gl.description                                      AS                      TRIAL_INSTANCE,\n"
 		+ "   gl.nd_geolocation_id,\n"
 		+ "   (SELECT iispcvt.definition\n"
-		+ "    FROM\n"
+		+ FROM
 		+ "      stockprop isp\n"
-		+ "      INNER JOIN\n"
+		+ INNER_JOIN
 		+ "      cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id\n"
-		+ "      INNER JOIN\n"
+		+ INNER_JOIN
 		+ "      cvterm iispcvt ON iispcvt.cvterm_id = isp.value\n"
-		+ "    WHERE\n"
+		+ WHERE
 		+ "      isp.stock_id = s.stock_id\n"
 		+ "      AND ispcvt.name = 'ENTRY_TYPE')                                          ENTRY_TYPE,\n"
 		+ "   s.dbxref_id                                         AS                      GID,\n"
@@ -36,73 +39,88 @@ class ObservationQuery {
 		+ "   s.uniquename                                                                ENTRY_NO,\n"
 		+ "   s.value                                             AS                      ENTRY_CODE,\n"
 		+ "   (SELECT isp.value\n"
-		+ "    FROM\n"
+		+ FROM
 		+ "      stockprop isp\n"
-		+ "      INNER JOIN\n"
+		+ INNER_JOIN
 		+ "      cvterm ispcvt1 ON ispcvt1.cvterm_id = isp.type_id\n"
-		+ "    WHERE\n"
+		+ WHERE
 		+ "      isp.stock_id = s.stock_id\n"
 		+ "      AND ispcvt1.name = 'SEED_SOURCE')                                        SEED_SOURCE,\n"
 		+ "   (SELECT ndep.value\n"
-		+ "    FROM\n"
+		+ FROM
 		+ "      nd_experimentprop ndep\n"
-		+ "      INNER JOIN\n"
+		+ INNER_JOIN
 		+ "      cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id\n"
-		+ "    WHERE\n"
+		+ WHERE
 		+ "      ndep.nd_experiment_id = ep.nd_experiment_id\n"
 		+ "      AND ispcvt.name = 'REP_NO')                                              REP_NO,\n"
 		+ "   (SELECT ndep.value\n"
-		+ "    FROM\n"
+		+ FROM
 		+ "      nd_experimentprop ndep\n"
-		+ "      INNER JOIN\n"
+		+ INNER_JOIN
 		+ "      cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id\n"
-		+ "    WHERE\n"
+		+ WHERE
 		+ "      ndep.nd_experiment_id = ep.nd_experiment_id\n"
 		+ "      AND ispcvt.name = 'PLOT_NO')                                             PLOT_NO,\n"
 		+ "   nde.plot_id                                         AS                      PLOT_ID\n";
+	public static final String SELECT = "(SELECT ";
+	public static final String ND_GEOLOCATIONPROP_GP = "            nd_geolocationprop gp \n";
+	public static final String GP_TYPE_ID = "            gp.type_id = ";
+	public static final String PHENOTYPE_ID = "_PhenotypeId";
+	public static final String INSTANCE_NUMBER_CLAUSE = " AND gl.nd_geolocation_id = :instanceId \n";
+	public static final String GROUPING_CLAUSE = " GROUP BY nde.nd_experiment_id ";
 
-	final String locationNameSubQuery = "(SELECT \n" +
+	final String locationNameSubQuery = SELECT +
 			"            l.lname \n" +
-			"        FROM \n" +
-			"            nd_geolocationprop gp \n" +
+			FROM + ND_GEOLOCATIONPROP_GP +
 			"                INNER JOIN \n" +
 			"            location l ON l.locid = gp.value \n" +
-			"        WHERE \n" +
-			"            gp.type_id = " + TermId.LOCATION_ID.getId() + " \n" +
+			WHERE + GP_TYPE_ID + TermId.LOCATION_ID.getId() + " \n" +
 			"                AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS LocationName";
 
-	final String locationDbIdSubQuery = "(SELECT \n" +
+	final String locationDbIdSubQuery = SELECT +
 		"            l.locid \n" +
-		"        FROM \n" +
-		"            nd_geolocationprop gp \n" +
+		FROM + ND_GEOLOCATIONPROP_GP +
 		"                INNER JOIN \n" +
 		"            location l ON l.locid = gp.value \n" +
-		"        WHERE \n" +
-		"            gp.type_id = " + TermId.LOCATION_ID.getId() + " \n" +
+		"        WHERE \n" + GP_TYPE_ID + TermId.LOCATION_ID.getId() + " \n" +
 		"                AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS locationDbId";
 
-	final String locationAbbreviationSubQuery = "(SELECT \n" +
+	final String locationAbbreviationSubQuery = SELECT +
 			"            gp.value \n" +
-			"        FROM \n" +
-			"            nd_geolocationprop gp \n" +
-			"        WHERE \n" +
-			"            gp.type_id = " + TermId.LOCATION_ABBR.getId() + " \n" +
+			"        FROM \n" + ND_GEOLOCATIONPROP_GP +
+			"        WHERE \n" + GP_TYPE_ID + TermId.LOCATION_ABBR.getId() + " \n" +
 			"                AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS LocationAbbreviation";
 
-	final String fieldmapRowText = "FieldMapRow.value FieldMapRow";
-	final String fieldmapColumnText = "FieldMapCol.value FieldMapColumn";
+	public static final String FIELDMAP_ROW_TEXT = "FieldMapRow.value FieldMapRow";
+	public static final String FIELDMAP_COLUMN_TEXT = "FieldMapCol.value FieldMapColumn";
 
-	final String blockNoText = "    (SELECT \n" + "            ndep.value\n" + "        FROM\n" + "            nd_experimentprop ndep\n"
+	public static final String BLOCK_NO_TEXT = "    (SELECT \n" + "            ndep.value\n" + "        FROM\n" + "            nd_experimentprop ndep\n"
 			+ "                INNER JOIN\n" + "            cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id\n" + "        WHERE\n"
 			+ "            ndep.nd_experiment_id = ep.nd_experiment_id\n" + "                AND ispcvt.name = 'BLOCK_NO') BLOCK_NO\n";
 
-	final String rowNumberText = "(SELECT  ndep.value   FROM    nd_experimentprop ndep"
+	public static final String ROW_NUMBER_TEXT = "(SELECT  ndep.value   FROM    nd_experimentprop ndep"
 			+ "            INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id"
 			+ "            WHERE ndep.nd_experiment_id = ep.nd_experiment_id  AND ispcvt.name = 'ROW') ROW";
 
-	final String columnNumberText = "(SELECT  ndep.value   FROM    nd_experimentprop ndep"
+	public static final String COLUMN_NUMBER_TEXT = "(SELECT  ndep.value   FROM    nd_experimentprop ndep"
 			+ "            INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id"
 			+ "            WHERE ndep.nd_experiment_id = ep.nd_experiment_id  AND ispcvt.name = 'COL') COL";
+
+	public static final String OBSERVATIONS_FOR_SAMPLES = "SELECT \n" + "    nde.nd_experiment_id as nd_experiment_id,\n"
+		+ "    (select na.nval from names na where na.gid = s.dbxref_id and na.nstat = 1 limit 1) as preferred_name,\n" + "    ph.value as value\n"
+		+ " FROM \n" + "    project p \n" + "        INNER JOIN project_relationship pr ON p.project_id = pr.subject_project_id \n"
+		+ "        INNER JOIN nd_experiment_project ep ON pr.subject_project_id = ep.project_id \n"
+		+ "        INNER JOIN nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id \n"
+		+ "        INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id \n"
+		+ "        INNER JOIN nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id \n"
+		+ "        INNER JOIN stock s ON s.stock_id = es.stock_id \n"
+		+ "        LEFT JOIN nd_experiment_phenotype neph ON neph.nd_experiment_id = nde.nd_experiment_id \n"
+		+ "        LEFT JOIN phenotype ph ON neph.phenotype_id = ph.phenotype_id \n"
+		+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n" + " WHERE \n"
+		+ "\tp.project_id = (SELECT  p.project_id FROM project_relationship pr INNER JOIN project p ON p.project_id = pr.subject_project_id WHERE (pr.object_project_id = :studyId \n"
+		+ "    AND name LIKE '%PLOTDATA')) \n" + " AND gl.description IN (:instanceIds) \n"
+		+ " and cvterm_variable.cvterm_id = :selectionVariableId\n" + " GROUP BY nde.nd_experiment_id";
 
 	String getAllObservationsQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors, final String sortBy,
 			final String sortOrder) {
@@ -125,47 +143,46 @@ class ObservationQuery {
 
 		final String orderByText = getOrderByExpression(measurementVariables, orderByTraitId);
 
-		return selectText + columnNamesFromTraitNames +
+		return SELECT_TEXT + columnNamesFromTraitNames +
 
-				fromText + whereText + orderByText;
+				fromText + WHERE_TEXT + orderByText;
 	}
 
 	String getObservationQueryWithBlockRowCol(final List<MeasurementVariableDto> measurementVariables, Integer instanceId) {
 		final String columnNamesFromTraitNames = this.getColumnNamesFromTraitNames(measurementVariables);
-		final String orderByMeasurementVariableId = this.getOrderByMeasurementVariableId(measurementVariables);
+		final String orderByMeasurementVariableId = getOrderByMeasurementVariableId(measurementVariables);
 
 		final String fromText = getFromExpression(measurementVariables);
 
 		final String orderByText = getOrderByExpression(measurementVariables, orderByMeasurementVariableId);
 
-		String whereText = this.whereText;
+		String whereText = WHERE_TEXT;
 
 		if (instanceId != null) {
-			whereText += " AND gl.nd_geolocation_id = :instanceId \n";
+			whereText += INSTANCE_NUMBER_CLAUSE;
 		}
 
-		return selectText + ", " + blockNoText + ", " + rowNumberText + "," + columnNumberText +
+		return SELECT_TEXT + ", " + BLOCK_NO_TEXT + ", " + ROW_NUMBER_TEXT + "," + COLUMN_NUMBER_TEXT +
 				", " + locationDbIdSubQuery +
 				", " + locationNameSubQuery +
 				", " + locationAbbreviationSubQuery +
-				", " + fieldmapColumnText +
-				", " + fieldmapRowText +
+				", " + FIELDMAP_COLUMN_TEXT +
+				", " + FIELDMAP_ROW_TEXT +
 				columnNamesFromTraitNames +
 				fromText + whereText + orderByText;
 	}
 
 	private String getOrderByExpression(final List<MeasurementVariableDto> variables, final String orderByTraitId) {
-		final String orderByText = !(variables != null && variables.size() > 0) ? "" : " ORDER BY " + orderByTraitId;
-		return orderByText;
+		return !(variables != null && variables.isEmpty()) ? "" : " ORDER BY " + orderByTraitId;
 	}
 
 	private String getFromExpression(final List<MeasurementVariableDto> variables) {
-		final String fromText = " FROM\n" + "    Project p\n" + "        INNER JOIN\n"
-				+ "    project_relationship pr ON p.project_id = pr.subject_project_id\n" + "        INNER JOIN\n"
-				+ "    nd_experiment_project ep ON pr.subject_project_id = ep.project_id\n" + "        INNER JOIN\n"
-				+ "    nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id\n" + "        INNER JOIN\n"
-				+ "    nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id\n" + "        INNER JOIN\n"
-				+ "    nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id\n" + "        INNER JOIN\n"
+		return " FROM\n" + "    Project p\n" + INNER_JOIN
+				+ "    project_relationship pr ON p.project_id = pr.subject_project_id\n" + INNER_JOIN
+				+ "    nd_experiment_project ep ON pr.subject_project_id = ep.project_id\n" + INNER_JOIN
+				+ "    nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id\n" + INNER_JOIN
+				+ "    nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id\n" + INNER_JOIN
+				+ "    nd_experiment_stock es ON ep.nd_experiment_id = es.nd_experiment_id\n" + INNER_JOIN
 				+ "    Stock s ON s.stock_id = es.stock_id\n" + this.getVariableDetailsJoin(variables)
 
 				+ "    LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = ep.nd_experiment_id AND FieldMapRow.type_id = " + TermId.RANGE_NO.getId() + "\n"
@@ -173,7 +190,6 @@ class ObservationQuery {
 
 				+ "WHERE\n" + "    p.project_id = ("
 				+ "Select p.project_id from project_relationship pr\n" + "INNER JOIN project p on p.project_id = pr.subject_project_id\n";
-		return fromText;
 	}
 
 	String getSingleObservationQuery(final List<MeasurementVariableDto> measurementVariables, List<String> germplasmDescriptors) {
@@ -182,17 +198,17 @@ class ObservationQuery {
 	}
 
 	private String getColumnNamesFromTraitNames(final List<MeasurementVariableDto> measurementVariables) {
-		final StringBuffer columnNames = new StringBuffer();
+		final StringBuilder columnNames = new StringBuilder();
 		int size = measurementVariables.size();
 		for (int i = 0; i < size; i++) {
 			if (i == 0) {
 				columnNames.append(", \n");
 			}
 			columnNames.append(measurementVariables.get(i).getName() + "." + "PhenotypeValue AS " + measurementVariables.get(i).getName() + ",\n");
-			columnNames.append(measurementVariables.get(i).getName() + "." + "phenotype_id AS " + measurementVariables.get(i).getName() + "_PhenotypeId"
+			columnNames.append(measurementVariables.get(i).getName() + "." + "phenotype_id AS " + measurementVariables.get(i).getName() + PHENOTYPE_ID
 					+ "\n");
 
-			if (!(i == size - 1)) {
+			if (i != size - 1) {
 				columnNames.append(" , ");
 			}
 		}
@@ -226,7 +242,7 @@ class ObservationQuery {
 
 		for (MeasurementVariableDto measurementVariable : measurementVariables) {
 			sqlBuilder.append(String.format(traitClauseFormat, measurementVariable.getName(), measurementVariable.getName(),
-				measurementVariable.getName(), measurementVariable.getName() + "_PhenotypeId"));
+				measurementVariable.getName(), measurementVariable.getName() + PHENOTYPE_ID));
 		}
 
 		if (!germplasmDescriptors.isEmpty()) {
@@ -255,7 +271,7 @@ class ObservationQuery {
 	}
 
 	String getInstanceNumberClause() {
-		return " AND gl.nd_geolocation_id = :instanceId \n";
+		return INSTANCE_NUMBER_CLAUSE;
 	}
 
 	String getOrderingClause(final String sortBy, final String sortOrder) {
@@ -273,7 +289,7 @@ class ObservationQuery {
 	}
 
 	String getGroupingClause() {
-		return " GROUP BY nde.nd_experiment_id ";
+		return GROUPING_CLAUSE;
 	}
 
 	private static String getOrderByMeasurementVariableId(final List<MeasurementVariableDto> measurementVariables) {
@@ -282,14 +298,14 @@ class ObservationQuery {
 			@Nullable
 			@Override
 			public String apply(final MeasurementVariableDto measurementVariables) {
-				return measurementVariables.getName() + "_PhenotypeId";
+				return measurementVariables.getName() + PHENOTYPE_ID;
 			}
 		}));
 	}
 
 	private String getVariableDetailsJoin(final List<MeasurementVariableDto> measurementVariables) {
 
-		final StringBuffer leftOuterJoinQuery = new StringBuffer();
+		final StringBuilder leftOuterJoinQuery = new StringBuilder();
 		for (MeasurementVariableDto measurementVariable : measurementVariables) {
 			leftOuterJoinQuery.append(this.getVariableDetailsJoinQuery(measurementVariable));
 		}
@@ -300,10 +316,14 @@ class ObservationQuery {
 	// use the id
 	private String getVariableDetailsJoinQuery(final MeasurementVariableDto measurementVariabl) {
 		return "        LEFT OUTER JOIN\n" + "    (SELECT \n" + "        nep.nd_experiment_id,\n" + "            pt.phenotype_id,\n"
-				+ "            IF(cvterm_id = cvterm_id, pt.value, NULL) AS PhenotypeValue\n" + "    FROM\n" + "        phenotype pt\n"
+				+ "            IF(cvterm_id = cvterm_id, pt.value, NULL) AS PhenotypeValue\n" + FROM + "        phenotype pt\n"
 				+ "    INNER JOIN cvterm svdo ON svdo.cvterm_id = pt.observable_id\n"
-				+ "    INNER JOIN nd_experiment_phenotype nep ON nep.phenotype_id = pt.phenotype_id\n" + "    WHERE\n"
+				+ "    INNER JOIN nd_experiment_phenotype nep ON nep.phenotype_id = pt.phenotype_id\n" + WHERE
 				+ "        svdo.name = ? ) " + measurementVariabl.getName() + " ON " + measurementVariabl.getName()
 				+ ".nd_experiment_id = nde.nd_experiment_id\n";
+	}
+
+	public String getSampleObservationQuery() {
+		return OBSERVATIONS_FOR_SAMPLES;
 	}
 }
