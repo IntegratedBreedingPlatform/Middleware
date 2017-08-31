@@ -9,6 +9,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
+import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +48,8 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public Sample buildSample(final String cropName, final String cropPrefix, final Integer plantNumber, final String username,
-		final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList) {
+	public Sample buildSample(final String cropName, final String cropPrefix, final Integer plantNumber, final String sampleName, final Date samplingDate, final Integer experimentId, final SampleList sampleList, User createdBy,
+		Date createdDate, User takenBy) {
 
 		final Sample sample = new Sample();
 		String localCropPrefix;
@@ -60,16 +61,14 @@ public class SampleServiceImpl implements SampleService {
 		}
 
 		sample.setPlant(this.plantService.buildPlant(localCropPrefix, plantNumber, experimentId));
-
-		if (!username.isEmpty()) {
-			sample.setTakenBy(this.userDao.getUserByUserName(username));
-		}
-
+		sample.setTakenBy(takenBy);
 		sample.setSampleName(sampleName);// Preferred name GID
 		sample.setCreatedDate(new Date());
 		sample.setSamplingDate(samplingDate);
 		sample.setSampleBusinessKey(this.getSampleBusinessKey(cropPrefix));
 		sample.setSampleList(sampleList);
+		sample.setCreatedDate(createdDate);
+		sample.setCreatedBy(createdBy);
 
 		return sample;
 	}
