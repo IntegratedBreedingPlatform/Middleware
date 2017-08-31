@@ -87,7 +87,7 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public List<SampleDTO> getSamples(String plot_id) {
+	public List<SampleDTO> getSamples(final String plot_id) {
 		final List<SampleDTO> listSampleDto = new ArrayList<>();
 		final List<Sample> samples = this.sampleDao.getByPlotId(plot_id);
 		for (Sample sample : samples) {
