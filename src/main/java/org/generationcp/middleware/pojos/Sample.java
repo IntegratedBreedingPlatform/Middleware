@@ -66,6 +66,12 @@ public class Sample implements Serializable {
 	@JoinColumn(name = "sample_list")
 	private SampleList sampleList;
 
+	@ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "created_by")
+	@NotFound(action = NotFoundAction.IGNORE)
+	private User createdBy;
+
+
 	public Sample() {
 
 	}
@@ -79,6 +85,14 @@ public class Sample implements Serializable {
 		this.createdDate = createdDate;
 		this.sampleBusinessKey = sampleBusinessKey;
 		this.plant = plant;
+	}
+
+	public User getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(final User createdBy) {
+		this.createdBy = createdBy;
 	}
 
 	public SampleList getSampleList() {

@@ -5,23 +5,13 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.generationcp.middleware.enumeration.SampleListType;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -38,7 +28,7 @@ public class SampleList implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "list_id")
-	private Integer listId;
+	private Integer id;
 
 	@Column(name = "list_name")
 	@Basic(optional = false)
@@ -67,6 +57,21 @@ public class SampleList implements Serializable {
 	@OneToMany(mappedBy = "sampleList", cascade = CascadeType.ALL)
 	private List<Sample> samples;
 
+	@OneToMany(mappedBy = "hierarchy", fetch = FetchType.LAZY)
+	private List<SampleList> children;
+
+	@Column(name="type")
+	@Enumerated(EnumType.STRING)
+	private SampleListType type;
+
+	public SampleListType getType() {
+		return type;
+	}
+
+	public void setType(SampleListType type) {
+		this.type = type;
+	}
+
 	public List<Sample> getSamples() {
 		return this.samples;
 	}
@@ -75,12 +80,12 @@ public class SampleList implements Serializable {
 		this.samples = samples;
 	}
 
-	public Integer getListId() {
-		return this.listId;
+	public Integer getId() {
+		return id;
 	}
 
-	public void setListId(final Integer listId) {
-		this.listId = listId;
+	public void setId(final Integer id) {
+		this.id = id;
 	}
 
 	public String getListName() {
@@ -131,19 +136,27 @@ public class SampleList implements Serializable {
 		this.createdBy = createdBy;
 	}
 
+	public List<SampleList> getChildren() {
+		return children;
+	}
+
+	public void setChildren(final List<SampleList> children) {
+		this.children = children;
+	}
+
 	@Override
 	public boolean equals(final Object other) {
 		if (!(other instanceof SampleList)) {
 			return false;
 		}
 		final SampleList castOther = (SampleList) other;
-		return new EqualsBuilder().append(this.listId, castOther.listId).isEquals();
+		return new EqualsBuilder().append(this.id, castOther.id).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
 
-		return new HashCodeBuilder().append(this.listId).hashCode();
+		return new HashCodeBuilder().append(this.id).hashCode();
 	}
 
 	@Override
