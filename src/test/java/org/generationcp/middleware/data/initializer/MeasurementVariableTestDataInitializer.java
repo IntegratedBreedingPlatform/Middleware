@@ -9,24 +9,23 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 
-//TODO convert the methods here to static methods
 public class MeasurementVariableTestDataInitializer {
 
-	public MeasurementVariable createMeasurementVariable() {
+	public static MeasurementVariable createMeasurementVariable() {
 		final MeasurementVariable measurementVar = new MeasurementVariable();
 		measurementVar.setTermId(TermId.PI_ID.getId());
 		measurementVar.setValue("1");
 		return measurementVar;
 	}
 
-	public MeasurementVariable createMeasurementVariable(final int termId, final String value) {
+	public static MeasurementVariable createMeasurementVariable(final int termId, final String value) {
 		final MeasurementVariable measurementVar = new MeasurementVariable();
 		measurementVar.setTermId(termId);
 		measurementVar.setValue(value);
 		return measurementVar;
 	}
 
-	public MeasurementVariable createMeasurementVariable(final int termId, final String name, final String value) {
+	public static MeasurementVariable createMeasurementVariable(final int termId, final String name, final String value) {
 		final MeasurementVariable measurementVar = new MeasurementVariable();
 		measurementVar.setTermId(termId);
 		measurementVar.setName(name);
@@ -34,20 +33,20 @@ public class MeasurementVariableTestDataInitializer {
 		return measurementVar;
 	}
 
-	public List<MeasurementVariable> createMeasurementVariableList() {
+	public static List<MeasurementVariable> createMeasurementVariableList() {
 		final List<MeasurementVariable> measurementVarList = new ArrayList<MeasurementVariable>();
-		measurementVarList.add(this.createMeasurementVariable());
+		measurementVarList.add(MeasurementVariableTestDataInitializer.createMeasurementVariable());
 		return measurementVarList;
 	}
 
-	public MeasurementVariable createMeasurementVariableWithName(final int termId, final String name) {
+	public static MeasurementVariable createMeasurementVariableWithName(final int termId, final String name) {
 		final MeasurementVariable measurementVar = new MeasurementVariable();
 		measurementVar.setTermId(termId);
 		measurementVar.setName(name);
 		return measurementVar;
 	}
 
-	public MeasurementVariable createMeasurementVariable(final int termId, final String name, final String description,
+	public static MeasurementVariable createMeasurementVariable(final int termId, final String name, final String description,
 			final String scale, final String method, final String property, final String dataType, final String value,
 			final String label, final int dataTypeId, final PhenotypicType role) {
 		final MeasurementVariable variable = new MeasurementVariable(termId, name, description, scale, method, property,
