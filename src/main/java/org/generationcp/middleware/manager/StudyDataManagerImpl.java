@@ -1207,7 +1207,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Map<Integer, String> getExperimentToSample(final Integer studyDbId) {
-		return this.getSampleDao().getExperimentToSample(studyDbId);
+	public Map<Integer, String> getExperimentSampleMap(final Integer studyDbId) {
+		return this.getSampleDao().getExperimentSampleMap(studyDbId);
 	}
 }

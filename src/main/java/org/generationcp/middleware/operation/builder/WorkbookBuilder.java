@@ -97,7 +97,7 @@ public class WorkbookBuilder extends Builder {
 		VariableTypeList variables = this.getDataSetBuilder().getVariableTypes(workbook.getMeasurementDatesetId());
 		final List<Experiment> experiments =
 				this.getStudyDataManager().getExperiments(workbook.getMeasurementDatesetId(), 0, Integer.MAX_VALUE, variables);
-		final Map<Integer, String> samples = getExperimentToSample(workbook.getStudyDetails().getId());
+		final Map<Integer, String> samples = getExperimentSampleMap(workbook.getStudyDetails().getId());
 		workbook.setObservations(this.buildObservations(experiments, variables.getVariates(), workbook.getFactors(), workbook.getVariates(),
 			!workbook.isNursery(), workbook.getConditions(), samples));
 	}
@@ -572,7 +572,7 @@ public class WorkbookBuilder extends Builder {
 			final int experimentId = experiment.getId();
 			final VariableList factors = experiment.getFactors();
 			final VariableList variates = this.getCompleteVariatesInExperiment(experiment, variateTypes);
-			final List<MeasurementData> measurementDataList = new ArrayList<MeasurementData>();
+			final List<MeasurementData> measurementDataList = new ArrayList<>();
 
 			if (isTrial) {
 				for (final MeasurementVariable condition : conditionList) {
@@ -639,7 +639,7 @@ public class WorkbookBuilder extends Builder {
 					measurementDataList.add(measurementData);
 				}
 			}
-			measurementDataList.add(this.getExperimentToSample(samplesMap, experimentId));
+			measurementDataList.add(this.getMeasurementDataWithSample(samplesMap, experimentId));
 
 			this.populateMeasurementData(variateList, variates, measurementDataList);
 
@@ -653,7 +653,16 @@ public class WorkbookBuilder extends Builder {
 		return observations;
 	}
 
-	private MeasurementData getExperimentToSample(final Map<Integer, String> samplesMap, final int experimentId) {
+	/**
+	 * This method set a MeasurementData with the value of the samples.
+	 * Is necessary because the SAMPLES TermId is not a real it
+	 * was created in the code to set the column SAMPLES on MeasurementData.
+	 *
+	 * @param samplesMap
+	 * @param experimentId
+	 * @return MeasurementData
+	 */
+	private MeasurementData getMeasurementDataWithSample(final Map<Integer, String> samplesMap, final int experimentId) {
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 
 		measurementVariable.setTermId(TermId.SAMPLES.getId());
@@ -666,8 +675,16 @@ public class WorkbookBuilder extends Builder {
 
 	}
 
-	private Map<Integer, String> getExperimentToSample(final Integer studyDbId) {
-		return this.getStudyDataManager().getExperimentToSample(studyDbId);
+	/**
+	 * This method recovered the SAMPLES value by ExperimentId Key.
+	 * Is necessary because the SAMPLES represent not existing TermId,
+	 * so is the only way to recover this data.
+	 *
+	 * @param studyDbId
+	 * @return
+	 */
+	private Map<Integer, String> getExperimentSampleMap(final Integer studyDbId) {
+		return this.getStudyDataManager().getExperimentSampleMap(studyDbId);
 	}
 
 	protected void populateMeasurementData(final List<MeasurementVariable> variateList, final VariableList variates,
@@ -706,7 +723,7 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	private List<ValueReference> getAllBreedingMethods() {
-		final List<ValueReference> list = new ArrayList<ValueReference>();
+		final List<ValueReference> list = new ArrayList<>();
 		final List<Method> methodList = this.getGermplasmDataManager().getAllMethodsNotGenerative();
 
 		Collections.sort(methodList, new Comparator<Method>() {
@@ -771,9 +788,9 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	private List<TreatmentVariable> buildTreatmentFactors(final VariableTypeList variables) {
-		final List<TreatmentVariable> treatmentFactors = new ArrayList<TreatmentVariable>();
-		List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
-		final Map<String, VariableTypeList> treatmentMap = new HashMap<String, VariableTypeList>();
+		final List<TreatmentVariable> treatmentFactors = new ArrayList<>();
+		List<MeasurementVariable> factors = new ArrayList<>();
+		final Map<String, VariableTypeList> treatmentMap = new HashMap<>();
 		if (variables != null && variables.getFactors() != null && !variables.getFactors().getVariableTypes().isEmpty()) {
 			for (final DMSVariableType variable : variables.getFactors().getVariableTypes()) {
 				if (variable.getRole() == PhenotypicType.TRIAL_DESIGN && variable.getTreatmentLabel() != null
@@ -807,7 +824,7 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	private List<MeasurementVariable> buildFactors(final VariableTypeList variables, final boolean isTrial) {
-		List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
+		List<MeasurementVariable> factors = new ArrayList<>();
 		final VariableTypeList factorList = new VariableTypeList();
 		if (variables != null && variables.getFactors() != null && !variables.getFactors().getVariableTypes().isEmpty()) {
 
@@ -849,11 +866,11 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	private List<MeasurementVariable> buildVariates(final VariableTypeList variables, final List<MeasurementVariable> constants) {
-		List<MeasurementVariable> variates = new ArrayList<MeasurementVariable>();
+		List<MeasurementVariable> variates = new ArrayList<>();
 		VariableTypeList filteredVariables = null;
 
 		if (variables != null && variables.getVariates() != null && !variables.getVariates().getVariableTypes().isEmpty()) {
-			final List<String> constantHeaders = new ArrayList<String>();
+			final List<String> constantHeaders = new ArrayList<>();
 			if (constants != null) {
 				for (final MeasurementVariable constant : constants) {
 					constantHeaders.add(constant.getName());
@@ -1005,7 +1022,7 @@ public class WorkbookBuilder extends Builder {
 	}
 
 	protected VariableTypeList removeTrialDatasetVariables(final VariableTypeList variables, final VariableList toBeDeleted) {
-		final List<Integer> trialList = new ArrayList<Integer>();
+		final List<Integer> trialList = new ArrayList<>();
 		if (toBeDeleted != null && !toBeDeleted.isEmpty()) {
 			for (final Variable variable : toBeDeleted.getVariables()) {
 				trialList.add(variable.getVariableType().getStandardVariable().getId());

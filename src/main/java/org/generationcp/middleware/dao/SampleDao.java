@@ -54,7 +54,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 			.list();
 	}
 
-	public Map<Integer, String> getExperimentToSample(final Integer studyDbId) {
+	public Map<Integer, String> getExperimentSampleMap(final Integer studyDbId) {
 		Map<Integer, String> samplesMap = new HashMap<>();
 		try {
 			final SQLQuery query = this.getSession().createSQLQuery(SQL_SAMPLES_AND_EXPERIMENTS);
@@ -71,7 +71,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 		} catch (HibernateException he) {
 			throw new MiddlewareException(
-				"Unexpected error in executing getSampleByExperiment(studyDbId = " + studyDbId + ") query: " + he.getMessage(), he);
+				"Unexpected error in executing getExperimentSampleMap(studyDbId = " + studyDbId + ") query: " + he.getMessage(), he);
 		}
 		return samplesMap;
 	}

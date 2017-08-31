@@ -837,6 +837,12 @@ public interface StudyDataManager {
 
 	Integer getProjectIdByStudyDbId(final Integer studyDbId);
 
-	Map<Integer, String> getExperimentToSample(final Integer studyDbId);
+	/**
+	 * Retrieves a map with the values of SAMPLES by ExperimentId Key.
+	 *
+	 * @param studyDbId
+	 * @return
+	 */
+	Map<Integer, String> getExperimentSampleMap(final Integer studyDbId);
 
 }
