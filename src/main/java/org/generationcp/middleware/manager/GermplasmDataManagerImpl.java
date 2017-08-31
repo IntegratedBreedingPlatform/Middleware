@@ -1008,11 +1008,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Map<Integer, String> getPrefferedIdsByGIDs(final List<Integer> gids) {
+	public Map<Integer, String> getPreferredIdsByGIDs(final List<Integer> gids) {
 		final Map<Integer, String> toreturn = new HashMap<>();
 
 		if (!gids.isEmpty()) {
-			final Map<Integer, String> results = this.getNameDao().getPrefferedIdsByGIDs(gids);
+			final Map<Integer, String> results = this.getNameDao().getPreferredIdsByGIDs(gids);
 			for (final Integer gid : results.keySet()) {
 				toreturn.put(gid, results.get(gid));
 			}
@@ -1061,7 +1061,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final Map<Integer, String> toreturn = new HashMap<>();
 
 		if (!gids.isEmpty()) {
-			final Map<Integer, String> results = this.getNameDao().getPrefferedNamesByGIDs(gids);
+			final Map<Integer, String> results = this.getNameDao().getPreferredNamesByGIDs(gids);
 			for (final Integer gid : results.keySet()) {
 				toreturn.put(gid, results.get(gid));
 			}

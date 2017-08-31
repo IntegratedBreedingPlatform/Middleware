@@ -743,9 +743,9 @@ public interface GermplasmDataManager {
 	 * Returns a Map of GIDs to preferred ids given a list of GIDs.
 	 * 
 	 * @param gids the gids
-	 * @return the preffered ids by gi ds
+	 * @return the preferred ids by gi ds
 	 */
-	Map<Integer, String> getPrefferedIdsByGIDs(List<Integer> gids);
+	Map<Integer, String> getPreferredIdsByGIDs(List<Integer> gids);
 
 	/**
 	 * Given the germplasm name and a location ID, returns list of all germplasm with specified name and location id.

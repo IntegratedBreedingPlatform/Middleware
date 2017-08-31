@@ -40,9 +40,9 @@ public class Name implements Serializable {
 	public static final String GET_PREFERRED_IDS_BY_LIST_ID = "SELECT {n.*} " + "FROM listdata ld " + "JOIN names n "
 			+ "ON ld.gid = n.gid " + "WHERE n.nstat = 8 " + "AND ld.listid = :listId";
 
-	public static final String GET_PREFFERED_IDS_BY_GIDS = "SELECT gid, nval " + "FROM names " + "WHERE nstat = 8 AND gid IN (:gids)";
+	public static final String GET_PREFERRED_IDS_BY_GIDS = "SELECT gid, nval " + "FROM names " + "WHERE nstat = 8 AND gid IN (:gids)";
 
-	public static final String GET_PREFFERED_NAMES_BY_GIDS = "SELECT gid, nval " + "FROM names " + "WHERE nstat = 1 AND gid IN (:gids)";
+	public static final String GET_PREFERRED_NAMES_BY_GIDS = "SELECT gid, nval " + "FROM names " + "WHERE nstat = 1 AND gid IN (:gids)";
 
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)

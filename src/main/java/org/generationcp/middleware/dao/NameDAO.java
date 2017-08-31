@@ -237,14 +237,14 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, String> getPrefferedIdsByGIDs(final List<Integer> gids) {
+	public Map<Integer, String> getPreferredIdsByGIDs(final List<Integer> gids) {
 		final Map<Integer, String> toreturn = new HashMap<Integer, String>();
 		for (final Integer gid : gids) {
 			toreturn.put(gid, null);
 		}
 
 		try {
-			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_PREFFERED_IDS_BY_GIDS);
+			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_PREFERRED_IDS_BY_GIDS);
 			query.setParameterList("gids", gids);
 
 			final List<Object> results = query.list();
@@ -255,7 +255,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				toreturn.put(gid, preferredId);
 			}
 		} catch (final HibernateException e) {
-			String message = "Error with getPrefferedIdsByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
+			String message = "Error with getPreferredIdsByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -264,14 +264,14 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, String> getPrefferedNamesByGIDs(final List<Integer> gids) {
+	public Map<Integer, String> getPreferredNamesByGIDs(final List<Integer> gids) {
 		final Map<Integer, String> toreturn = new HashMap<Integer, String>();
 		for (final Integer gid : gids) {
 			toreturn.put(gid, null);
 		}
 
 		try {
-			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_PREFFERED_NAMES_BY_GIDS);
+			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_PREFERRED_NAMES_BY_GIDS);
 			query.setParameterList("gids", gids);
 
 			final List<Object> results = query.list();

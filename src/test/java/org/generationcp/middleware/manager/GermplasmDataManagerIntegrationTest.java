@@ -717,7 +717,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetPreferredIdsByGIDs() throws MiddlewareQueryException {
 		final List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
-		final Map<Integer, String> results = this.germplasmDataManager.getPrefferedIdsByGIDs(gids);
+		final Map<Integer, String> results = this.germplasmDataManager.getPreferredIdsByGIDs(gids);
 		for (final Integer gid : results.keySet()) {
 			Debug.println(IntegrationTestBase.INDENT, gid + " : " + results.get(gid));
 		}
