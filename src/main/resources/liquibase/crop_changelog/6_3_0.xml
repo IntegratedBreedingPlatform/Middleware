@@ -123,4 +123,46 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="vanina" id="v6.3-8">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="sample_list"></tableExists>
+			<sqlCheck expectedResult="0">
+				SELECT count(*)
+				FROM
+				sample_list
+				where list_name = 'Samples';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			insert into sample_list values (
+			NULL,
+			'Samples',
+			'',
+			NULL,
+			NOW(),
+			'',
+			null,
+			'FOLDER');
+		</sql>
+	</changeSet>
+
+	<changeSet author="vanina" id="v6.3-9">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="sample_list"></tableExists>
+			<not><sqlCheck expectedResult="0">
+				SELECT count(*)
+				FROM
+				sample_list
+				where list_name = 'Samples';
+			</sqlCheck></not>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM users where uname = 'admin';</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			update sample_list
+			set created_by = null
+			where created_by = (select userid from users where uname = 'admin')
+			and list_name = 'Samples';
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
