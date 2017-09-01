@@ -242,9 +242,7 @@ public class ProjectPropertySaverTest {
 
 			if(Objects.equals(typeId, VariableType.STUDY_DETAIL.getId())){
 				Assert.assertEquals(dmsVariableType.getLocalName(), projectProperty.getValue());
-			} else if(Objects.equals(typeId, TermId.STANDARD_VARIABLE.getId())){
-				Assert.assertEquals(String.valueOf(dmsVariableType.getId()), projectProperty.getValue());
-			}else if(Objects.equals(typeId, TermId.MULTIFACTORIAL_INFO.getId())){
+			} else if(Objects.equals(typeId, TermId.MULTIFACTORIAL_INFO.getId())){
 				Assert.assertEquals(dmsVariableType.getTreatmentLabel(), projectProperty.getValue());
 			}
 		}
@@ -299,9 +297,7 @@ public class ProjectPropertySaverTest {
 
 			if(Objects.equals(typeId, VariableType.TRAIT.getId())){
 				Assert.assertEquals(dmsVariableType.getLocalName(), projectProperty.getValue());
-			} else if(Objects.equals(typeId, TermId.STANDARD_VARIABLE.getId())){
-				Assert.assertEquals(String.valueOf(dmsVariableType.getId()), projectProperty.getValue());
-			}else if(Objects.equals(typeId, TermId.MULTIFACTORIAL_INFO.getId())){
+			} else if(Objects.equals(typeId, TermId.MULTIFACTORIAL_INFO.getId())){
 				Assert.assertEquals(dmsVariableType.getTreatmentLabel(), projectProperty.getValue());
 			}
 		}
@@ -437,9 +433,7 @@ public class ProjectPropertySaverTest {
 					String.valueOf(dmsVariableType.getId()), projectPropertyOntologyVar.getValue());
 			Assert.assertEquals("The project id should " + dmsProject.getProjectId(), dmsProject.getProjectId(), projectPropertyOntologyVar
 					.getProject().getProjectId());
-			Assert.assertEquals("The type id must be " + TermId.STANDARD_VARIABLE.getId(), TermId.STANDARD_VARIABLE.getId(),
-					projectPropertyOntologyVar.getTypeId().intValue());
-			Assert.assertEquals("The rank should " + dmsVariableType.getRank(), dmsVariableType.getRank(), projectPropertyOntologyVar
+				Assert.assertEquals("The rank should " + dmsVariableType.getRank(), dmsVariableType.getRank(), projectPropertyOntologyVar
 					.getRank().intValue());
 
 			if (dmsVariableType.getTreatmentLabel() != null && !"".equals(dmsVariableType.getTreatmentLabel())) {
