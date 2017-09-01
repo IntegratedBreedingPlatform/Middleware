@@ -199,11 +199,11 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		List<Integer> ids = new ArrayList<Integer>();
 		try {
 			String sql =
-					"SELECT dprop.value " + " FROM project_relationship mpr "
+					"SELECT dprop.variable_id " + " FROM project_relationship mpr "
 							+ " INNER JOIN project_relationship pr ON pr.object_project_id = mpr.object_project_id "
 							+ "   AND pr.type_id = " + TermId.BELONGS_TO_STUDY.getId() + " AND pr.subject_project_id <> " + datasetId
-							+ " INNER JOIN projectprop dprop ON dprop.project_id = pr.subject_project_id " + " AND dprop.type_id = "
-							+ TermId.STANDARD_VARIABLE.getId() + " WHERE mpr.subject_project_id = " + datasetId + " AND mpr.type_id = "
+							+ " INNER JOIN projectprop dprop ON dprop.project_id = pr.subject_project_id "
+							+ " WHERE mpr.subject_project_id = " + datasetId + " AND mpr.type_id = "
 							+ TermId.BELONGS_TO_STUDY.getId();
 			Query query = this.getSession().createSQLQuery(sql);
 			List<String> results = query.list();
