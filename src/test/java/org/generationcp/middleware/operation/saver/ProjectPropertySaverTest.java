@@ -46,7 +46,7 @@ public class ProjectPropertySaverTest {
 	private ProjectPropertyDao projectPropDao;
 
 	private int datasetId;
-	private Map<Integer, List<Integer>> dummyProjectPropIds;
+	private List<ProjectProperty> dummyProjectPropIds;
 
 	private static final String propertyName = "Property Name";
 
@@ -66,8 +66,7 @@ public class ProjectPropertySaverTest {
 		final List<Integer> variableIds = new ArrayList<Integer>(ProjectPropertySaverTest.GERMPLASM_PLOT_VARIATE_IDS);
 		Collections.shuffle(variableIds);
 
-		final int startRank = this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, this.dummyProjectPropIds);
-		this.verifyUpdateVariablesRankingAssertions(variableIds, this.dummyProjectPropIds, startRank);
+		this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, this.dummyProjectPropIds);
 	}
 
 	@Test
@@ -76,8 +75,7 @@ public class ProjectPropertySaverTest {
 		variableIds.add(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		Collections.shuffle(variableIds);
 
-		final int startRank = this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, this.dummyProjectPropIds);
-		this.verifyUpdateVariablesRankingAssertions(variableIds, this.dummyProjectPropIds, startRank);
+		this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, this.dummyProjectPropIds);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -88,18 +86,18 @@ public class ProjectPropertySaverTest {
 
 		// New variables exist in DB but not included in passed in list of variables
 		final List<Integer> newVariableIds = Arrays.asList(123, 456, 789);
-		final Map<Integer, List<Integer>> newMap = new HashMap<>(this.dummyProjectPropIds);
+		final List<ProjectProperty> projectProperties= new ArrayList<>(this.dummyProjectPropIds);
 		for (int i = 0; i < newVariableIds.size(); i++) {
-			final int start = this.dummyProjectPropIds.size() + i * 3;
-			newMap.put(newVariableIds.get(i), Arrays.asList(start + 1, start + 2, start + 3));
+			final ProjectProperty projectProperty = new ProjectProperty();
+			projectProperty.setVariableId(newVariableIds.get(i));
+			projectProperties.add(projectProperty);
 		}
 		Mockito.doReturn(newVariableIds).when(this.projectPropDao)
 				.getDatasetVariableIdsForGivenStoredInIds(Matchers.anyInt(), Matchers.anyList(), Matchers.anyList());
 
-		final int startRank = this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, newMap);
+		this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, projectProperties);
 		final List<Integer> idsToUpdate = new ArrayList<>(variableIds);
 		idsToUpdate.addAll(newVariableIds);
-		this.verifyUpdateVariablesRankingAssertions(idsToUpdate, newMap, startRank);
 	}
 
 	@Test
@@ -108,15 +106,14 @@ public class ProjectPropertySaverTest {
 		Collections.shuffle(variableIds);
 
 		// Variable ID was included in list of variables but actually already deleted from DB
-		final Map<Integer, List<Integer>> newMap = new HashMap<Integer, List<Integer>>(this.dummyProjectPropIds);
+		final List<ProjectProperty> projectProperties= new ArrayList<>(this.dummyProjectPropIds);
 		final List<Integer> idsToUpdate = new ArrayList<Integer>(variableIds);
 		for (final Integer deletedId : ProjectPropertySaverTest.VARS_TO_DELETE) {
-			newMap.remove(deletedId);
+			projectProperties.remove(deletedId);
 			idsToUpdate.remove(deletedId);
 		}
 
-		final int startRank = this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, newMap);
-		this.verifyUpdateVariablesRankingAssertions(idsToUpdate, newMap, startRank);
+		this.callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(variableIds, projectProperties);
 	}
 
 	@Test
@@ -342,38 +339,27 @@ public class ProjectPropertySaverTest {
 		this.projectPropSaver.create(dmsProject, variableTypeList, null);
 	}
 
-	private static Map<Integer, List<Integer>> getDummyProjectPropIds() {
+	private static List<ProjectProperty> getDummyProjectPropIds() {
 		final List<Integer> allVariableIds = new ArrayList<>();
 		allVariableIds.addAll(ProjectPropertySaverTest.DATASET_STUDY_TRIAL_IDS);
 		allVariableIds.addAll(ProjectPropertySaverTest.GERMPLASM_PLOT_VARIATE_IDS);
 
-		final Map<Integer, List<Integer>> idsMap = new HashMap<>();
+		final List<ProjectProperty> projectProperties = new ArrayList<>();
 
-		for (int i = 0; i < allVariableIds.size(); i++) {
-			final int start = i * 3;
-			idsMap.put(allVariableIds.get(i), Arrays.asList(start + 1, start + 2, start + 3));
+		for (final Integer i: allVariableIds) {
+			ProjectProperty projectProperty = new ProjectProperty();
+			projectProperty.setVariableId(i);
+			projectProperties.add(projectProperty);
 		}
 
-		return idsMap;
+		return projectProperties;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Ignore
-	private void verifyUpdateVariablesRankingAssertions(final List<Integer> variableIds, final Map<Integer, List<Integer>> idsMap,
-			final int startRank) {
-//		Mockito.verify(this.projectPropDao, Mockito.times(variableIds.size())).updateRank(Matchers.anyList(), Matchers.anyInt());
-		int rank = startRank;
-		for (final Integer id : variableIds) {
-//			Mockito.verify(this.projectPropDao).updateRank(idsMap.get(id), rank++);
-		}
-	}
-
-	@Ignore
 	private int callUpdateVariablesRankingWIthMockDaoReturnsAndAssertions(final List<Integer> variableIds,
-			final Map<Integer, List<Integer>> idsMap) throws MiddlewareQueryException {
-		final int startRank = idsMap.size() + 1;
+			final List<ProjectProperty> projectProperties) throws MiddlewareQueryException {
+		final int startRank = projectProperties.size() + 1;
 		Mockito.doReturn(startRank).when(this.projectPropDao).getNextRank(this.datasetId);
-//		Mockito.doReturn(idsMap).when(this.projectPropDao).getProjectPropertyIDsPerVariableId(this.datasetId);
+		Mockito.doReturn(projectProperties).when(this.projectPropDao).getByProjectId(this.datasetId);
 
 		this.projectPropSaver.updateVariablesRanking(this.datasetId, variableIds);
 
