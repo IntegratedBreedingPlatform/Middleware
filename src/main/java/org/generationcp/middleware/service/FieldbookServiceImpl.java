@@ -47,6 +47,7 @@ import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -76,6 +77,8 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.FieldbookListUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.FlushMode;
+import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +94,20 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	private CrossExpansionProperties crossExpansionProperties;
 
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
+
+	public static final String SQL_STUDY_HAD_SAMPLES =
+		"SELECT COUNT(sp.sample_id) AS Sample FROM project p INNER JOIN\n"
+			+ "    project_relationship pr ON p.project_id = pr.subject_project_id INNER JOIN\n"
+			+ "    nd_experiment_project ep ON pr.subject_project_id = ep.project_id INNER JOIN\n"
+			+ "    nd_experiment nde ON nde.nd_experiment_id = ep.nd_experiment_id INNER JOIN\n"
+			+ "    plant AS pl ON nde.nd_experiment_id = pl.nd_experiment_id INNER JOIN\n"
+			+ "    sample AS sp ON pl.plant_id = sp.sample_id WHERE p.project_id = (SELECT \n"
+			+ "            p.project_id FROM project_relationship pr INNER JOIN\n"
+			+ "            project p ON p.project_id = pr.subject_project_id WHERE\n"
+			+ "            (pr.object_project_id = :studyId AND name LIKE '%PLOTDATA'))\n"
+			+ "GROUP BY pl.nd_experiment_id";
+
+
 
 	public FieldbookServiceImpl() {
 		super();
@@ -136,6 +153,22 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public List<Location> getLocationsByProgramUUID(final String programUUID) {
 		return this.getLocationDataManager().getLocationsByUniqueID(programUUID);
+	}
+
+	@Override
+	public boolean hasSamples(Integer studyId) {
+		final List queryResults;
+		try {
+			final SQLQuery query = this.getCurrentSession().createSQLQuery(SQL_STUDY_HAD_SAMPLES);
+			query.setParameter("studyId", studyId);
+			queryResults = query.list();
+
+		} catch (HibernateException he) {
+			throw new MiddlewareException(
+				"Unexpected error in executing hasSamples(studyId = " + studyId + ") query: " + he.getMessage(), he);
+		}
+
+		return queryResults.isEmpty() ? false : true;
 	}
 
 	@Override

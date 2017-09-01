@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.ObservationDto;
@@ -80,6 +81,7 @@ public class StudyMeasurements {
 		this.addScalar(createSQLQuery);
 		createSQLQuery.addScalar("FIELDMAP COLUMN");
 		createSQLQuery.addScalar("FIELDMAP RANGE");
+		createSQLQuery.addScalar("SAMPLES");
 
 		this.addScalarForTraits(selectionMethodsAndTraits, createSQLQuery);
 
@@ -100,7 +102,7 @@ public class StudyMeasurements {
 	private List<ObservationDto> mapResults(final List<Object[]> results, final List<MeasurementVariableDto> projectVariables,
 			final List<String> germplasmDescriptors) {
 		final List<ObservationDto> measurements = new ArrayList<>();
-		final int fixedColumns = 15;
+		final int fixedColumns = 16;
 
 		if (results != null && !results.isEmpty()) {
 			for (final Object[] row : results) {
@@ -120,6 +122,8 @@ public class StudyMeasurements {
 				measurement.setPlotId((String) row[12]);
 				measurement.setFieldMapColumn((String) row[13]);
 				measurement.setFieldMapRange((String) row[14]);
+				measurement.setSamples((String)(row[15]));
+
 
 				int gpDescIndex = fixedColumns + projectVariables.size() * 2;
 				for (final String gpDesc : germplasmDescriptors) {
@@ -207,14 +211,16 @@ public class StudyMeasurements {
 
 		if (results != null && !results.isEmpty()) {
 			for (final Object[] row : results) {
+				final String value = (String) row[2];
+				if (StringUtils.isNotBlank(value) && !"0".equals(value)) {
+					final List<MeasurementDto> measurementVariableResults = new ArrayList<>();
 
-				final List<MeasurementDto> measurementVariableResults = new ArrayList<>();
+					final MeasurementDto measurementDto = new MeasurementDto(value);
+					measurementVariableResults.add(measurementDto);
 
-				final MeasurementDto measurementDto = new MeasurementDto(row[2].toString());
-				measurementVariableResults.add(measurementDto);
-
-				final ObservationDto measurement = new ObservationDto((Integer) row[0], (String) row[1], measurementVariableResults);
-				measurements.add(measurement);
+					final ObservationDto measurement = new ObservationDto((Integer) row[0], (String) row[1], measurementVariableResults);
+					measurements.add(measurement);
+				}
 			}
 		}
 		return Collections.unmodifiableList(measurements);

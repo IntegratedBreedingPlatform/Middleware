@@ -985,4 +985,13 @@ public interface FieldbookService {
 	public List<GermplasmList> appendTabLabelToList(List<GermplasmList> germplasmCrossesList);
 
 	List<Location> getLocationsByProgramUUID(String programUUID);
+
+
+	/**
+	 * @param studyId id for the study Trial
+	 * @return the true if the study has samples
+	 */
+	boolean hasSamples(Integer studyId);
+
+
 }

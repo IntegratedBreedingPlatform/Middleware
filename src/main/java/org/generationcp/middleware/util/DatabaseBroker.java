@@ -27,6 +27,7 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
+import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
@@ -556,6 +557,12 @@ public class DatabaseBroker {
 
 	public TermPropertyBuilder getTermPropertyBuilder() {
 		return new TermPropertyBuilder(this.sessionProvider);
+	}
+
+	public SampleDao getSampleDao() {
+		SampleDao sampleDao = new SampleDao();
+		sampleDao.setSession(this.getActiveSession());
+		return sampleDao;
 	}
 
 	// ================================ InventoryDataManager DAO Methods =============================

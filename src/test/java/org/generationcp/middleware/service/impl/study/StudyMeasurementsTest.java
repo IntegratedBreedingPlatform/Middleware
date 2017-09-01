@@ -44,10 +44,9 @@ public class StudyMeasurementsTest {
 		this.mockSqlQuery = Mockito.mock(SQLQuery.class);
 		this.testTraits = Arrays.asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(2, "Trait2"));
 		this.germplasmDescriptors = Lists.newArrayList("STOCK_ID");
-		this.testRows =
-				new Object[] {1, "TRIAL_INSTACE", "ENTRY_TYPE", 20000, "DESIGNATION", "ENTRY_NO", "SEED_SOURCE", "REPITION_NUMBER",
-						"PLOT_NUMBER", "BLOCK_NO", "ROW", "COL","","", "PlotID-ABC123", "Trait1Value", 1000, "Trait2Value", 2000,
-						"Stock_Id_Value"};
+		this.testRows = new Object[] {1, "TRIAL_INSTACE", "ENTRY_TYPE", 20000, "DESIGNATION", "ENTRY_NO", "SEED_SOURCE", "REPITION_NUMBER",
+			"PLOT_NUMBER", "BLOCK_NO", "ROW", "COL", "", "", "PlotID-ABC123", "SAMPLES", "Trait1Value", 1000, "Trait2Value", 2000,
+			"Stock_Id_Value"};
 		this.sampleMeasurements = Arrays.<Object[]>asList(this.testRows);
 		Mockito.when(this.mockSqlQuery.list()).thenReturn(this.sampleMeasurements);
 
@@ -103,7 +102,7 @@ public class StudyMeasurementsTest {
 
 	private void verifyScalarSetting() {
 		// 13 - 1 (PLOT_ID) fixed columns + Trait name - no type
-		Mockito.verify(this.mockSqlQuery, Mockito.times(14 + this.testTraits.size())).addScalar(Matchers.anyString());
+		Mockito.verify(this.mockSqlQuery, Mockito.times(15 + this.testTraits.size())).addScalar(Matchers.anyString());
 
 		// PLOT_ID with StringType
 		Mockito.verify(this.mockSqlQuery).addScalar(Matchers.eq("PLOT_ID"), Mockito.any(StringType.class));

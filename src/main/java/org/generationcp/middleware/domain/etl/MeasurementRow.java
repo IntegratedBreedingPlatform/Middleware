@@ -90,10 +90,12 @@ public class MeasurementRow {
 	}
 
 	public List<MeasurementData> getNonTrialDataList(List<String> trialHeaders) {
-		List<MeasurementData> list = new ArrayList<MeasurementData>();
+		final List<MeasurementData> list = new ArrayList<>();
 		if (this.dataList != null && !this.dataList.isEmpty()) {
 			for (MeasurementData data : this.dataList) {
-				if (trialHeaders == null || !trialHeaders.contains(data.getLabel())) {
+				//Remove SAMPLES with TermId = -2 because is nonexistent term Id
+				boolean isSampleVaraible = data.getMeasurementVariable().getTermId() == TermId.SAMPLES.getId();
+				if ( (trialHeaders == null || !trialHeaders.contains(data.getLabel()) ) && !isSampleVaraible) {
 					list.add(data);
 				}
 			}

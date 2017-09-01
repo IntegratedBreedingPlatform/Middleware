@@ -52,6 +52,7 @@ public class Util {
 	public static final String FRONTEND_DATE_FORMAT = "yyyy-MM-dd";
 	// NOTE: Future Improvement: BMS should only use one front end date format
 	public static final String FRONTEND_DATE_FORMAT_2 = "MM/dd/yyyy";
+	public static final String FRONTEND_DATE_FORMAT_3 = "dd/MM/yyyy";
 	public static final String FRONTEND_TIMESTAMP_FORMAT = "yyyy-MM-dd hh:mm:ss";
 
 	private Util() {
