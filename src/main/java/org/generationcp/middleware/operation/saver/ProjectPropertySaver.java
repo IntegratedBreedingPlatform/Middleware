@@ -41,8 +41,6 @@ import org.hibernate.Hibernate;
 
 public class ProjectPropertySaver {
 
-	protected static final String PROJECT_PROPERTY_ID = "projectPropertyId";
-
 	private final Saver daoFactory;
 
 	public ProjectPropertySaver(final HibernateSessionProvider sessionProviderForLocal) {
@@ -131,29 +129,6 @@ public class ProjectPropertySaver {
 
 		return properties;
 	}
-
-//	public void saveProjectPropValues(final int projectId, final VariableList variableList) {
-//		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
-//			for (Variable variable : variableList.getVariables()) {
-//
-//				DMSVariableType dmsVariableType = variable.getVariableType();
-//				dmsVariableType.setVariableTypeIfNull();
-//
-//				VariableType variableTypeEnum = dmsVariableType.getVariableType();
-//
-//				if (variableTypeEnum == org.generationcp.middleware.domain.ontology.VariableType.STUDY_DETAIL) {
-//					final ProjectProperty property = new ProjectProperty();
-//					property.setVariableId(variable.getVariableType().getStandardVariable().getId());
-//					property.setAlias(variable.getVariableType().getLocalName());
-//					property.setTypeId(variable.getVariableType().getVariableType().getId());
-//					property.setValue(variable.getValue());
-//					property.setRank(variable.getVariableType().getRank());
-//					property.setProject(this.daoFactory.getDmsProjectDao().getById(projectId));
-//					this.daoFactory.getProjectPropertyDao().save(property);
-//				}
-//			}
-//		}
-//	}
 
 	/***
 	 * Saving project property from DMSVariableType. Setting VariableType from Role when DMSVariableType does not have value fro Variable
@@ -462,9 +437,9 @@ public class ProjectPropertySaver {
 
 	public void updateVariablesRanking(final int datasetId, final List<Integer> variableIds) {
 		int rank = this.daoFactory.getProjectPropertyDao().getNextRank(datasetId);
-		final Map<Integer, List<Integer>> projectPropIDMap =
-				this.daoFactory.getProjectPropertyDao().getProjectPropertyIDsPerVariableId(datasetId);
-		rank = this.updateVariableRank(variableIds, rank, projectPropIDMap);
+		List<ProjectProperty> projectProperties =  this.daoFactory.getProjectPropertyDao().getByProjectId(datasetId);
+
+		rank = this.updateVariableRank(variableIds, rank, projectProperties);
 
 		// if any factors were added but not included in list of variables, update their ranks also so they come last
 		final List<Integer> storedInIds = new ArrayList<>();
@@ -474,17 +449,20 @@ public class ProjectPropertySaver {
 
 		final List<Integer> germplasmPlotVariateIds =
 				this.daoFactory.getProjectPropertyDao().getDatasetVariableIdsForGivenStoredInIds(datasetId, storedInIds, variableIds);
-		this.updateVariableRank(germplasmPlotVariateIds, rank, projectPropIDMap);
+		this.updateVariableRank(germplasmPlotVariateIds, rank, projectProperties);
 	}
 
 	// Iterate and update rank, exclude deleted variables
-	private int updateVariableRank(final List<Integer> variableIds, final int startRank, final Map<Integer, List<Integer>> projectPropIDMap) {
+	private int updateVariableRank(final List<Integer> variableIds, final int startRank, final List<ProjectProperty> projectProperties) {
 		int rank = startRank;
 		for (final Integer variableId : variableIds) {
-			final List<Integer> projectPropIds = projectPropIDMap.get(variableId);
-			if (projectPropIds != null) {
-				this.daoFactory.getProjectPropertyDao().updateRank(projectPropIds, rank);
-				rank++;
+			// TODO, needs to be improved because we should not have duplicated variables per study
+			for (final ProjectProperty pp: projectProperties) {
+				if (pp.getVariableId().equals(variableId)) {
+					pp.setRank(rank);
+					this.daoFactory.getProjectPropertyDao().saveOrUpdate(pp);
+					rank++;
+				}
 			}
 		}
 		return rank;
