@@ -164,14 +164,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 							+ " WHERE mpr.subject_project_id = " + datasetId + " AND mpr.type_id = "
 							+ TermId.BELONGS_TO_STUDY.getId();
 			Query query = this.getSession().createSQLQuery(sql);
-			List<String> results = query.list();
-			if (results != null && !results.isEmpty()) {
-				for (String result : results) {
-					if (NumberUtils.isNumber(result)) {
-						ids.add(Integer.valueOf(result));
-					}
-				}
-			}
+			ids = query.list();
 
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error in getVariablesOfSiblingDatasets(" + datasetId + ") in ProjectPropertyDao: " + e.getMessage(),
