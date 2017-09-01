@@ -138,31 +138,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<ValueReference> getDistinctStandardVariableValues(int stdVarId)
-			throws MiddlewareQueryException {
-		List<ValueReference> results = new ArrayList<ValueReference>();
-
-		try {
-			String sql = "SELECT DISTINCT value "
-					+ " FROM projectprop WHERE type_id = :stdVarId ";
-			Query query = this.getSession().createSQLQuery(sql);
-			query.setParameter("stdVarId", stdVarId);
-
-			List<String> list = query.list();
-			if (list != null && !list.isEmpty()) {
-				for (String row : list) {
-					results.add(new ValueReference(row, row));
-				}
-			}
-
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error in getDistinctStandardVariableValues(" + stdVarId + ") in ProjectPropertyDao: " + e.getMessage(), e);
-		}
-		return results;
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<ProjectProperty> getByTypeAndValue(int typeId, String value) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -174,24 +149,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			this.logAndThrowException("Error in getByTypeAndValue(" + typeId + ", " + value + ") in ProjectPropertyDao: " + e.getMessage(),
 					e);
 		}
-		return new ArrayList<ProjectProperty>();
-	}
-
-	@SuppressWarnings("unchecked")
-	public String getValueByProjectIdAndTypeId(int projectId, int typeId) throws MiddlewareQueryException {
-		try {
-			String sql = "SELECT value FROM projectprop WHERE project_id = " + projectId + " AND type_id = " + typeId;
-			Query query = this.getSession().createSQLQuery(sql);
-			List<String> results = query.list();
-			if (results != null && !results.isEmpty()) {
-				return results.get(0);
-			}
-
-		} catch (HibernateException e) {
-			this.logAndThrowException(
-					"Error in getByProjectIdAndTypeId(" + projectId + ", " + typeId + ") in ProjectPropertyDao: " + e.getMessage(), e);
-		}
-		return null;
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -243,46 +201,22 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		return variableIds;
 	}
 
-	@SuppressWarnings("unchecked")
-	public Map<Integer, List<Integer>> getProjectPropertyIDsPerVariableId(Integer projectId) {
-		Map<Integer, List<Integer>> projectPropertyIDsMap = new LinkedHashMap<Integer, List<Integer>>();
-		String sql =
-				"SELECT rank, projectprop_id, value, type_id " + "FROM projectprop " + "WHERE project_id = :projectId " + "ORDER BY rank ";
-		Query query = this.getSession().createSQLQuery(sql);
-		query.setParameter("projectId", projectId);
-		List<Object[]> results = query.list();
+	public List<ProjectProperty> getByProjectId(final Integer projectId) {
+		List<ProjectProperty> list = new ArrayList<>();
+		DmsProject dmsProject = new DmsProject();
+		dmsProject.setProjectId(projectId);
+		try {
+			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("project", dmsProject));
 
-		List<Integer> projectPropIds = new ArrayList<Integer>();
-		Integer currentRank = 1;
-		Integer currentVariableId = 1;
-		for (Object[] row : results) {
-			Integer rank = (Integer) row[0];
-			if (rank.compareTo(currentRank) > 0) {
-				projectPropertyIDsMap.put(currentVariableId, projectPropIds);
-				projectPropIds = new ArrayList<>();
-				currentRank = rank;
-			}
+			list = criteria.list();
 
-			String value = (String) row[2];
-			Integer typeId = (Integer) row[3];
-			if (typeId == TermId.STANDARD_VARIABLE.getId()) {
-				currentVariableId = Integer.parseInt(value);
-			}
-			projectPropIds.add((Integer) row[1]);
+		} catch (HibernateException e) {
+			final String message = "Error in getByProjectId(" + dmsProject.getProjectId() + ") in ProjectPropertyDao";
+			ProjectPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		if (!projectPropIds.isEmpty()) {
-			projectPropertyIDsMap.put(currentVariableId, projectPropIds);
-		}
-
-		return projectPropertyIDsMap;
-	}
-
-	public void updateRank(List<Integer> projectPropIds, int rank) {
-		String sql = " UPDATE projectprop SET rank = " + rank + " WHERE projectprop_id IN (:projectPropIds)";
-
-		Query query = this.getSession().createSQLQuery(sql);
-		query.setParameterList("projectPropIds", projectPropIds);
-		query.executeUpdate();
+		return list;
 	}
 
 	public Map<String, String> getProjectPropsAndValuesByStudy(final Integer studyId) throws MiddlewareQueryException {
