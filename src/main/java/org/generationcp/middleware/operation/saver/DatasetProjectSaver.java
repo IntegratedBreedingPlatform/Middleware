@@ -55,7 +55,6 @@ public class DatasetProjectSaver extends Saver {
 		datasetProject.setProperties(this.getProjectPropertySaver().create(datasetProject, variableTypeList, datasetValues.getVariables()));
 		datasetProject.setRelatedTos(this.createProjectRelationship(studyId, datasetProject));
 		this.getDmsProjectDao().save(datasetProject);
-//		this.getProjectPropertySaver().saveProjectPropValues(datasetProject.getProjectId(), datasetValues.getVariables());
 
 		return datasetProject;
 	}
