@@ -33,13 +33,11 @@ public class VariableInfoBuilderTest {
 
         List<ProjectProperty> projectProperties = new ArrayList<>();
 
-		final String standardVariableProp = "8007";
 		final String variableTypeProp = VariableType.TRAIT.getName();
 		final String studyInformationProp = "STUDY Info Type";
 		final String multiFactorialInformationProp = "Multi Factorial Info";
 
 
-        projectProperties.add(this.createProjectProperty(1, 2, TermId.STANDARD_VARIABLE.getId(), standardVariableProp, standardVariableProp));
 		projectProperties.add(this.createProjectProperty(2, 2, TermId.STUDY_INFORMATION.getId(), studyInformationProp, studyInformationProp));
         projectProperties.add(this.createProjectProperty(4, 2, VariableType.TRAIT.getId(), variableTypeProp, variableTypeProp));
         projectProperties.add(this.createProjectProperty(5, 2, TermId.MULTIFACTORIAL_INFO.getId(), multiFactorialInformationProp, multiFactorialInformationProp));
@@ -48,15 +46,11 @@ public class VariableInfoBuilderTest {
 
 		String message = "The %s for VariableInfo was not mapped correctly.";
 
-		Assert.assertEquals(4, variableInfoSet.size());
+		Assert.assertEquals(3, variableInfoSet.size());
 
 		for (VariableInfo variableInfo:variableInfoSet) {
 			if (variableInfo.getLocalName().equalsIgnoreCase(studyInformationProp)) {
 				Assert.assertEquals(String.format(message, "Local Name"), studyInformationProp, variableInfo.getLocalName());
-				Assert.assertEquals(2, variableInfo.getRank());
-			}
-			else if (variableInfo.getLocalName().equalsIgnoreCase(standardVariableProp)) {
-				Assert.assertEquals(String.format(message, "Standard Variable"), standardVariableProp, variableInfo.getLocalName());
 				Assert.assertEquals(2, variableInfo.getRank());
 			}
 			else if (variableInfo.getLocalName().equalsIgnoreCase(variableTypeProp)) {
