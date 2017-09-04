@@ -33,8 +33,10 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,17 +70,20 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 				criteria.add(Restrictions.in("typeId", VariableType.ids()));
 				criteria.add(Restrictions.in("alias", propertyNames));
 
-				List<ProjectProperty> results = criteria.list();
+				List<Object[]> results = criteria.list();
 
-				for (final ProjectProperty projectProperty : results) {
+				for (final Object[] row : results) {
+					final String alias = (String) row[0];
+					final Integer variableId = (Integer) row[1];
+					final Integer typeId = (Integer) row[2];
 					Map<Integer, VariableType> stdVarIdKeyTypeValueList = new HashMap();
 
-					if (standardVariableIdsWithTypeInProjects.containsKey(projectProperty.getAlias().toUpperCase())) {
-						stdVarIdKeyTypeValueList = standardVariableIdsWithTypeInProjects.get(projectProperty.getAlias().toUpperCase());
+					if (standardVariableIdsWithTypeInProjects.containsKey(alias.toUpperCase())) {
+						stdVarIdKeyTypeValueList = standardVariableIdsWithTypeInProjects.get(alias.toUpperCase());
 					}
 
-					stdVarIdKeyTypeValueList.put(projectProperty.getVariableId(), VariableType.getById(projectProperty.getTypeId()));
-					standardVariableIdsWithTypeInProjects.put(projectProperty.getAlias().toUpperCase(), stdVarIdKeyTypeValueList);
+					stdVarIdKeyTypeValueList.put(variableId, VariableType.getById(typeId));
+					standardVariableIdsWithTypeInProjects.put(alias.toUpperCase(), stdVarIdKeyTypeValueList);
 
 				}
 			}
