@@ -264,6 +264,11 @@ public class SampleListServiceImpl implements SampleListService {
 		if (uniqueSampleListName != null) {
 			throw new Exception("folderName is not unique in the parent folder");
 		}
+
+		if (areRelatives(listToMove, newParentFolder)) {
+			throw new Exception("You can not move list because are relatives with parent folder");
+		}
+
 		listToMove.setHierarchy(newParentFolder);
 
 		return this.sampleListDao.saveOrUpdate(listToMove);
@@ -292,6 +297,17 @@ public class SampleListServiceImpl implements SampleListService {
 		if (folder.getChildren() != null && folder.getChildren().size() > 0)
 			throw new Exception("Folder to delete can not have children");
 		this.sampleListDao.makeTransient(folder);
+	}
+
+	private boolean areRelatives(SampleList listToMove, SampleList newParentFolder) {
+		if (newParentFolder.getHierarchy() == null) {
+			return false;
+		}
+		if (newParentFolder.getHierarchy().equals(listToMove)) {
+			return true;
+		} else {
+			return areRelatives(listToMove, newParentFolder.getHierarchy());
+		}
 	}
 
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {
