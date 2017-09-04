@@ -13,10 +13,8 @@ package org.generationcp.middleware.operation.builder;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.helper.VariableInfo;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
