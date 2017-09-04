@@ -85,8 +85,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getGermplasmByName(final String name, final int start, final int numOfRows, final Operation op)
-			{
+	public List<Germplasm> getGermplasmByName(final String name, final int start, final int numOfRows, final Operation op) {
 		return this.getGermplasmDao().getByNamePermutations(name, op, start, numOfRows);
 	}
 
@@ -152,7 +151,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			if (germplasm != null) {
 				updatedGid = germplasm.getGrplce();
 			}
-		} while (germplasm != null && !new Integer(0).equals(updatedGid) && !germplasm.getGid().equals(updatedGid));
+		} while (germplasm != null && !Integer.valueOf(0).equals(updatedGid) && !germplasm.getGid().equals(updatedGid));
 		return germplasm;
 	}
 
@@ -168,14 +167,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Germplasm> getSortedGermplasmWithPrefName(final List<Integer> gids) {
-		List<Germplasm> result = new ArrayList<Germplasm>();
-		for (Iterator<Integer> iterator = gids.iterator(); iterator.hasNext(); ) {
-			Integer gid = iterator.next();
+		final List<Germplasm> result = new ArrayList<>();
+		for (final Iterator<Integer> iterator = gids.iterator(); iterator.hasNext();) {
+			final Integer gid = iterator.next();
 			result.add(this.getGermplasmWithPrefName(gid));
 		}
-		Comparator<Germplasm> comparator = new Comparator<Germplasm>() {
+		final Comparator<Germplasm> comparator = new Comparator<Germplasm>() {
 
-			@Override public int compare(Germplasm left, Germplasm right) {
+			@Override
+			public int compare(final Germplasm left, final Germplasm right) {
 				return left.getPreferredName().getNval().compareTo(right.getPreferredName().getNval());
 			}
 		};
@@ -201,7 +201,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	/**
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getByGIDWithListTypeFilters(java.lang.Integer, java.lang.Integer,
 	 *      java.util.List)
 	 */
@@ -410,9 +410,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public List<Method> getAllMethods() {
 		return this.getMethodDao().getAllMethod();
 	}
-	
+
 	@Override
-	public List<Method> getFavoriteMethodsByMethodType(String methodType, String programUUID) {
+	public List<Method> getFavoriteMethodsByMethodType(final String methodType, final String programUUID) {
 		return this.getMethodDao().getFavoriteMethodsByMethodType(methodType, programUUID);
 	}
 
@@ -1008,11 +1008,11 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Map<Integer, String> getPrefferedIdsByGIDs(final List<Integer> gids) {
+	public Map<Integer, String> getPreferredIdsByGIDs(final List<Integer> gids) {
 		final Map<Integer, String> toreturn = new HashMap<>();
 
 		if (!gids.isEmpty()) {
-			final Map<Integer, String> results = this.getNameDao().getPrefferedIdsByGIDs(gids);
+			final Map<Integer, String> results = this.getNameDao().getPreferredIdsByGIDs(gids);
 			for (final Integer gid : results.keySet()) {
 				toreturn.put(gid, results.get(gid));
 			}
@@ -1061,7 +1061,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		final Map<Integer, String> toreturn = new HashMap<>();
 
 		if (!gids.isEmpty()) {
-			final Map<Integer, String> results = this.getNameDao().getPrefferedNamesByGIDs(gids);
+			final Map<Integer, String> results = this.getNameDao().getPreferredNamesByGIDs(gids);
 			for (final Integer gid : results.keySet()) {
 				toreturn.put(gid, results.get(gid));
 			}
@@ -1083,14 +1083,14 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public List<Germplasm> searchForGermplasm(final GermplasmSearchParameter germplasmSearchParameter) {
-		List<Germplasm> germplasms = this.getGermplasmDao().searchForGermplasms(germplasmSearchParameter);
+		final List<Germplasm> germplasms = this.getGermplasmDao().searchForGermplasms(germplasmSearchParameter);
 		this.getListInventoryBuilder().setAvailableBalanceScaleForGermplasm(germplasms);
 		return germplasms;
 	}
 
 	/**
 	 * Return the count of germplasm search results based on the following parameters:
-	 * 
+	 *
 	 * @param q - keyword
 	 * @param o - operation
 	 * @param includeParents - include the parents of the search germplasm
@@ -1359,7 +1359,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	/**
 	 * Local method for getting a particular germplasm's Name.
-	 * 
+	 *
 	 * @param names The Map containing Names for a germplasm. This is usually provided by getGermplasmParentNamesForStudy() in GermplasmDAO.
 	 * @param ntype the name type, i.e. Pedigree, Selection History, Cross Name,etc.
 	 * @return an instance of Name representing the searched name, or an empty Name instance if it doesn't exist
@@ -1399,7 +1399,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		// Defaulting to a UDFLD with fldno = 0 - this prevents NPEs and DB constraint violations.
 		UserDefinedField plotCodeUdfld = new UserDefinedField(0);
 		for (final UserDefinedField userDefinedField : udfldAttributes) {
-			if (userDefinedField.getFcode().equals("PLOTCODE")) {
+			if ("PLOTCODE".equals(userDefinedField.getFcode())) {
 				plotCodeUdfld = userDefinedField;
 				break;
 			}
@@ -1434,9 +1434,9 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public List<Method> getDerivativeAndMaintenanceMethods(final List<Integer> ids) {
 		return this.getMethodDao().getDerivativeAndMaintenanceMethods(ids);
 	}
-	
+
 	@Override
-	public List<String> getMethodCodeByMethodIds(final Set<Integer> methodIds){
+	public List<String> getMethodCodeByMethodIds(final Set<Integer> methodIds) {
 		return this.getMethodDao().getMethodCodeByMethodIds(methodIds);
 	}
 
@@ -1452,9 +1452,10 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	/**
 	 * (non-Javadoc)
-	 * 
+	 *
 	 * @see org.generationcp.middleware.manager.api.GermplasmDataManager#getGermplasmWithAllNamesAndAncestry(java.util.Set, int)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<Germplasm> getGermplasmWithAllNamesAndAncestry(final Set<Integer> gids, final int numberOfLevelsToTraverse) {
 		final Monitor monitor = MonitorFactory.start("org.generationcp.middleware.manager.GermplasmDataManagerImpl"
@@ -1500,8 +1501,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Map<Integer, String[]> getParentsInfoByGIDList(List<Integer> gidList) {
+	public Map<Integer, String[]> getParentsInfoByGIDList(final List<Integer> gidList) {
 		return this.getGermplasmDao().getParentsInfoByGIDList(gidList);
+	}
+
+	@Override
+	public List<UserDefinedField> getAllAttributesTypes() {
+		return this.getAttributeDao().getAttributeTypes();
 	}
 
 }
