@@ -36,7 +36,7 @@ import org.hibernate.type.StringType;
  */
 public class MapDAO extends GenericDAO<Map, Integer> {
 
-	private static final String GET_MAP_DETAILS_SELECT = "SELECT COUNT(DISTINCT gdms_mapping_data.marker_id) AS marker_count "
+	private static final String GET_MAP_DETAILS_SELECT = "SELECT COUNT(gdms_mapping_data.marker_id) AS marker_count "
 			+ "       , MAX(gdms_mapping_data.start_position) AS max " + "       , gdms_mapping_data.linkage_group AS Linkage_group "
 			+ "       , concat(gdms_mapping_data.map_name,'') AS map " + "       , concat(gdms_map.map_type,'') AS map_type "
 			+ "       , gdms_map.map_desc AS map_desc " + "       , gdms_map.map_unit AS map_unit " + "FROM gdms_mapping_data, gdms_map "
