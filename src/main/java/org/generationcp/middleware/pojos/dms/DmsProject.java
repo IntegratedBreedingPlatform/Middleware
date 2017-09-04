@@ -206,7 +206,7 @@ public class DmsProject implements Serializable {
 
 	public void addProperty(ProjectProperty property) {
 		if (this.properties == null) {
-			this.properties = new ArrayList<ProjectProperty>();
+			this.properties = new ArrayList<>();
 		}
 		this.properties.add(property);
 	}

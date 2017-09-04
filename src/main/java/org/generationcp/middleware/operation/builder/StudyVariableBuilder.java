@@ -91,9 +91,9 @@ public class StudyVariableBuilder extends Builder {
 		return variable;
 	}
 
-	private String getPropertyValue(int id, List<ProjectProperty> properties) {
+	private String getPropertyValue(int variableId, List<ProjectProperty> properties) {
 		for (ProjectProperty property : properties) {
-			if (property.getVariableId() == id) {
+			if (property.getVariableId() .equals(variableId)) {
 				return property.getValue();
 			}
 		}
