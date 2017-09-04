@@ -1101,18 +1101,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		for (final DmsProject dmsProject : dmsProjects) {
 			final StudySummary studySummary = new StudySummary();
 
-			final List<ProjectProperty> sortedProperties = Ordering.from(new Comparator<ProjectProperty>() {
-
-				@Override
-				public int compare(final ProjectProperty o1, final ProjectProperty o2) {
-					final Integer rankCompare = o1.getRank() - o2.getRank();
-					return rankCompare == 0 ? o1.getTypeId() - o2.getTypeId() : rankCompare;
-				}
-			}).immutableSortedCopy(dmsProject.getProperties());
-
 			final Map<String, String> additionalProps = Maps.newHashMap();
 
-			for (final ProjectProperty prop : sortedProperties) {
+			for (final ProjectProperty prop : dmsProject.getProperties()) {
 
 				final Integer variableId = prop.getVariableId();
 				final String value = prop.getValue();
