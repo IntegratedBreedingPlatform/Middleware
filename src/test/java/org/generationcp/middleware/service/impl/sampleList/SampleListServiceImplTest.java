@@ -451,6 +451,28 @@ public class SampleListServiceImplTest {
 		this.sampleListService.moveSampleList(sampleListId, folderId);
 	}
 
+	@Test(expected = Exception.class)
+	public void testMoveSampleListBetweenRelatives() throws Exception {
+		final Integer sampleListId = 1;
+		final String listName = "NAME";
+		final SampleList sampleListToMove = new SampleList();
+		sampleListToMove.setId(sampleListId);
+		sampleListToMove.setHierarchy(new SampleList());
+		sampleListToMove.setListName(listName);
+
+		final Integer folderId = 2;
+		final SampleList folder = new SampleList();
+		folder.setId(folderId);
+		folder.setType(SampleListType.FOLDER);
+		folder.setHierarchy(sampleListToMove);
+
+		Mockito.when(this.sampleListDao.getById(sampleListId)).thenReturn(sampleListToMove);
+		Mockito.when(this.sampleListDao.getById(folderId)).thenReturn(folder);
+		Mockito.when(this.sampleListDao.getSampleListByParentAndName(listName, folderId)).thenReturn(null);
+
+		Mockito.when(this.sampleListDao.saveOrUpdate(sampleListToMove)).thenThrow(MiddlewareQueryException.class);
+		this.sampleListService.moveSampleList(sampleListId, folderId);
+	}
 
 	@Test
 	public void testCreateSampleList() {

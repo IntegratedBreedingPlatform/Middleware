@@ -299,7 +299,7 @@ public class SampleListServiceImpl implements SampleListService {
 		this.sampleListDao.makeTransient(folder);
 	}
 
-	private boolean areRelatives(SampleList listToMove, SampleList newParentFolder) {
+	protected boolean areRelatives(SampleList listToMove, SampleList newParentFolder) {
 		if (newParentFolder.getHierarchy() == null) {
 			return false;
 		}
