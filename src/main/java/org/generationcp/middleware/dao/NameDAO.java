@@ -44,22 +44,23 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(NameDAO.class);
 
 	public List<Name> getByGIDWithFilters(final Integer gid, final Integer status, final GermplasmNameType type) {
- 		if(type != null) {
- 			return getByGIDWithListTypeFilters(gid, status, Collections.<Integer>singletonList(Integer.valueOf(type.getUserDefinedFieldID())));
- 		}
- 		return getByGIDWithListTypeFilters(gid, status, null);
- 	}
+		if (type != null) {
+			return this.getByGIDWithListTypeFilters(gid, status,
+					Collections.<Integer>singletonList(Integer.valueOf(type.getUserDefinedFieldID())));
+		}
+		return this.getByGIDWithListTypeFilters(gid, status, null);
+	}
 
- 	/**
- 	 * Get the names associated with a GID
- 	 * @param gid the gid for which we are getting names
- 	 * @param status the status of the gid. Note if status is null or 0 we will omit deleted values i.e. status will be set to 9
- 	 * @param type a list of name types to retrieve. Note if type is null or empty it will be omited from the query
- 	 * @return
- 	 * @throws MiddlewareQueryException
- 	 */
- 	@SuppressWarnings("unchecked")
- 	public List<Name> getByGIDWithListTypeFilters(final Integer gid, final Integer status, final List<Integer> type) {
+	/**
+	 * Get the names associated with a GID
+	 *
+	 * @param gid the gid for which we are getting names
+	 * @param status the status of the gid. Note if status is null or 0 we will omit deleted values i.e. status will be set to 9
+	 * @param type a list of name types to retrieve. Note if type is null or empty it will be omited from the query
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Name> getByGIDWithListTypeFilters(final Integer gid, final Integer status, final List<Integer> type) {
 		try {
 			if (gid != null) {
 				final StringBuilder queryString = new StringBuilder();
@@ -97,25 +98,13 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				return query.list();
 			}
 
-			/**
-			 * List<Criterion> criterions = new ArrayList<Criterion>(); Criterion gidCriterion = Restrictions.eq("germplasmId", gid);
-			 * criterions.add(gidCriterion);
-			 *
-			 * if(status != null && status != 0) { Criterion statusCriterion = Restrictions.eq("nstat", status);
-			 * criterions.add(statusCriterion); }
-			 *
-			 * if(type != null) { Integer typeid = type.getUserDefinedFieldID(); Criterion typeCriterion = Restrictions.eq("type.fldno",
-			 * typeid); criterions.add(typeCriterion); }
-			 *
-			 * List<Name> results = getByCriteria(criterions); return results;
-			 **/
 		} catch (final HibernateException e) {
-			String message = "Error with getByGIDWithFilters(gid=" + gid + ", status=" + status + ", type=" + type
+			final String message = "Error with getByGIDWithFilters(gid=" + gid + ", status=" + status + ", type=" + type
 					+ ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<Name>();
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -135,7 +124,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				}
 			}
 		} catch (final HibernateException e) {
-			String message = "Error with getByGIDAndNval(gid=" + gid + ", nval=" + nval + ") query from Name " + e.getMessage();
+			final String message = "Error with getByGIDAndNval(gid=" + gid + ", nval=" + nval + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -151,11 +140,11 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				return crit.list();
 			}
 		} catch (final HibernateException e) {
-			String message = "Error with getNamesByNameIds(nIds=" + nIds + ") query from Name " + e.getMessage();
+			final String message = "Error with getNamesByNameIds(nIds=" + nIds + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<Name>();
+		return new ArrayList<>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -168,11 +157,11 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				return query.list();
 			}
 		} catch (final HibernateException e) {
-			String message = "Error with getPreferredIdsByListId(listId=" + listId + ") query from Name " + e.getMessage();
+			final String message = "Error with getPreferredIdsByListId(listId=" + listId + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<Name>();
+		return new ArrayList<>();
 	}
 
 	public Name getNameByNameId(final Integer nId) {
@@ -183,7 +172,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				return (Name) crit.uniqueResult();
 			}
 		} catch (final HibernateException e) {
-			String message = "Error with getNameByNameId(nId=" + nId + ") query from Name " + e.getMessage();
+			final String message = "Error with getNameByNameId(nId=" + nId + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -197,8 +186,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	 * @return the list of GidNidElement (gId and nId pairs) @
 	 */
 	@SuppressWarnings("rawtypes")
-	public List<GermplasmNameDetails> getGermplasmNameDetailsByNames(final List<String> germplasmNames, final GetGermplasmByNameModes mode) {
-		final List<GermplasmNameDetails> toReturn = new ArrayList<GermplasmNameDetails>();
+	public List<GermplasmNameDetails> getGermplasmNameDetailsByNames(final List<String> germplasmNames,
+			final GetGermplasmByNameModes mode) {
+		final List<GermplasmNameDetails> toReturn = new ArrayList<>();
 
 		try {
 
@@ -208,9 +198,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				SQLQuery query = this.getSession().createSQLQuery(Name.GET_NAME_DETAILS_BY_NAME);
 
 				if (mode == GetGermplasmByNameModes.SPACES_REMOVED_BOTH_SIDES) {
-					query =
-							this.getSession().createSQLQuery(
-									"SELECT gid, nid, REPLACE(nval, ' ', '') " + "FROM names " + "WHERE nval IN (:germplasmNameList)");
+					query = this.getSession().createSQLQuery(
+							"SELECT gid, nid, REPLACE(nval, ' ', '') " + "FROM names " + "WHERE nval IN (:germplasmNameList)");
 				}
 
 				query.setParameterList("germplasmNameList", germplasmNames);
@@ -228,8 +217,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				}
 			}
 		} catch (final HibernateException e) {
-			String message = "Error with getGermplasmNameDetailsByNames(germplasmNames=" + germplasmNames + ") query from Name "
-					+ e.getMessage();
+			final String message =
+					"Error with getGermplasmNameDetailsByNames(germplasmNames=" + germplasmNames + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -237,14 +226,14 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, String> getPrefferedIdsByGIDs(final List<Integer> gids) {
-		final Map<Integer, String> toreturn = new HashMap<Integer, String>();
+	public Map<Integer, String> getPreferredIdsByGIDs(final List<Integer> gids) {
+		final Map<Integer, String> toreturn = new HashMap<>();
 		for (final Integer gid : gids) {
 			toreturn.put(gid, null);
 		}
 
 		try {
-			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_PREFFERED_IDS_BY_GIDS);
+			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_PREFERRED_IDS_BY_GIDS);
 			query.setParameterList("gids", gids);
 
 			final List<Object> results = query.list();
@@ -255,7 +244,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				toreturn.put(gid, preferredId);
 			}
 		} catch (final HibernateException e) {
-			String message = "Error with getPrefferedIdsByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
+			final String message = "Error with getPreferredIdsByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -264,14 +253,14 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, String> getPrefferedNamesByGIDs(final List<Integer> gids) {
-		final Map<Integer, String> toreturn = new HashMap<Integer, String>();
+	public Map<Integer, String> getPreferredNamesByGIDs(final List<Integer> gids) {
+		final Map<Integer, String> toreturn = new HashMap<>();
 		for (final Integer gid : gids) {
 			toreturn.put(gid, null);
 		}
 
 		try {
-			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_PREFFERED_NAMES_BY_GIDS);
+			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_PREFERRED_NAMES_BY_GIDS);
 			query.setParameterList("gids", gids);
 
 			final List<Object> results = query.list();
@@ -282,7 +271,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				toreturn.put(gid, preferredId);
 			}
 		} catch (final HibernateException e) {
-			String message = "Error with getPrefferedNamesByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
+			final String message = "Error with getPrefferedNamesByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -292,7 +281,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<Name> getNamesByGids(final List<Integer> gids) {
-		List<Name> toReturn = new ArrayList<Name>();
+		List<Name> toReturn = new ArrayList<>();
 
 		if (gids == null || gids.isEmpty()) {
 			return toReturn;
@@ -304,7 +293,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 			toReturn = criteria.list();
 		} catch (final HibernateException e) {
-			String message = "Error with getNamesByGids(gids=" + gids + ") query from Name " + e.getMessage();
+			final String message = "Error with getNamesByGids(gids=" + gids + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -320,7 +309,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			return query.list();
 
 		} catch (final Exception e) {
-			String message = "Error with NameDAO.getGidsByName(" + name + ") " + e.getMessage();
+			final String message = "Error with NameDAO.getGidsByName(" + name + ") " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -328,7 +317,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public Map<Integer, List<Name>> getNamesByGidsInMap(final List<Integer> gids) {
-		final Map<Integer, List<Name>> map = new HashMap<Integer, List<Name>>();
+		final Map<Integer, List<Name>> map = new HashMap<>();
 
 		if (gids == null || gids.isEmpty()) {
 			return map;
@@ -345,24 +334,24 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			for (final Name name : list) {
 				List<Name> names = map.get(name.getGermplasmId());
 				if (names == null) {
-					names = new ArrayList<Name>();
+					names = new ArrayList<>();
 					map.put(name.getGermplasmId(), names);
 				}
 				names.add(name);
 			}
 
 		} catch (final HibernateException e) {
-			String message = "Error with getNamesByGidsInMap(gids=" + gids + ") query from Name " + e.getMessage();
+			final String message = "Error with getNamesByGidsInMap(gids=" + gids + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
 
 		return map;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public Map<Integer, List<Name>> getNamesByGidsAndNTypeIdsInMap(final List<Integer> gids, final List<Integer> ntypeIds) {
-		final Map<Integer, List<Name>> map = new HashMap<Integer, List<Name>>();
+		final Map<Integer, List<Name>> map = new HashMap<>();
 
 		if (gids == null || gids.isEmpty()) {
 			return map;
@@ -380,14 +369,14 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			for (final Name name : list) {
 				List<Name> names = map.get(name.getGermplasmId());
 				if (names == null) {
-					names = new ArrayList<Name>();
+					names = new ArrayList<>();
 					map.put(name.getGermplasmId(), names);
 				}
 				names.add(name);
 			}
 
 		} catch (final HibernateException e) {
-			String message = "Error with getNamesByGidsInMap(gids=" + gids + ") query from Name " + e.getMessage();
+			final String message = "Error with getNamesByGidsInMap(gids=" + gids + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -411,7 +400,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			return query.list();
 
 		} catch (final HibernateException e) {
-			String message = "Error with getAllMatchingNames(" + prefix + ", " + suffix + ") query from Name " + e.getMessage();
+			final String message = "Error with getAllMatchingNames(" + prefix + ", " + suffix + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -429,7 +418,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			return result.get(0).intValue() > 0;
 
 		} catch (final HibernateException e) {
-			String message = "Error with getAllMatchingNames(" + name + ") query from Name " + e.getMessage();
+			final String message = "Error with getAllMatchingNames(" + name + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -486,7 +475,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 			// Count using = by default
 			final SQLQuery query = this.getSession().createSQLQuery(
-				"select n.* FROM names n inner join germplsm g on g.gid = n.gid where nval in (:namelist) and  g.deleted = 0  and g.grplce = 0");
+					"select n.* FROM names n inner join germplsm g on g.gid = n.gid where nval in (:namelist) and  g.deleted = 0  and g.grplce = 0");
 			query.setParameterList("namelist", batchDesignationValues);
 			allNameList.addAll(query.list());
 		}
