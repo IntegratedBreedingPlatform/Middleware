@@ -73,9 +73,6 @@ import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.PlotUtil;
-import org.hibernate.HibernateException;
-import org.hibernate.Query;
-import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -418,22 +415,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Override
 	public String getLocalNameByStandardVariableId(final Integer projectId, final Integer standardVariableId)
 			throws MiddlewareQueryException {
-//		final Session session = this.getActiveSession();
-//
-//		try {
-//
-//			final String sql = "select alias from projectprop where project_id = :projectId and variable_id = :standardVariableId";
-//
-//			final Query query = session.createSQLQuery(sql);
-//			query.setParameter("projectId", projectId);
-//			query.setParameter("standardVariableId", standardVariableId);
-//
-//			return (String) query.uniqueResult();
-//
-//		} catch (final HibernateException e) {
-//			this.logAndThrowException("Error at getLocalNameByStandardVariableId :" + e.getMessage(), e);
-//		}
-//		return null;
 		DmsProject dmsProject = new DmsProject();
 		dmsProject.setProjectId(projectId);
 		ProjectProperty projectProperty = getProjectPropertyDao().getByStandardVariableId(dmsProject, standardVariableId);
