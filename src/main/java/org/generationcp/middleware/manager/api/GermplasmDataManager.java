@@ -18,7 +18,6 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.manager.Operation;
@@ -285,6 +284,13 @@ public interface GermplasmDataManager {
 	 * @return Returns the id of the updated Germplasm {@code Name}s.
 	 */
 	List<Integer> updateGermplasmName(List<Name> names);
+	
+	/**
+	 * Returns all the available attribute types
+	 * 
+	 * @return List of UserDefinedField POJOs that contains all the attribute types
+	 */
+	List<UserDefinedField> getAllAttributesTypes();
 
 	/**
 	 * Returns all the attributes of the Germplasm identified by the given id.
@@ -737,9 +743,9 @@ public interface GermplasmDataManager {
 	 * Returns a Map of GIDs to preferred ids given a list of GIDs.
 	 * 
 	 * @param gids the gids
-	 * @return the preffered ids by gi ds
+	 * @return the preferred ids by gi ds
 	 */
-	Map<Integer, String> getPrefferedIdsByGIDs(List<Integer> gids);
+	Map<Integer, String> getPreferredIdsByGIDs(List<Integer> gids);
 
 	/**
 	 * Given the germplasm name and a location ID, returns list of all germplasm with specified name and location id.
