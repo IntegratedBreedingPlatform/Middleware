@@ -1,208 +1,126 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <changeSet author="vanina" id="v6.3-1">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="sample_list" columnName="type"/>
-            </not>
-        </preConditions>
-        <addColumn tableName="sample_list">
-            <column name="type" type="VARCHAR(30)" defaultValue="SAMPLE_LIST" afterColumn="created_by">
-                <constraints nullable="false"/>
-            </column>
-        </addColumn>
-    </changeSet>
+	<changeSet author="vanina" id="v6.3-1">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="sample_list" columnName="type"/> </not>
+		</preConditions>
+		<addColumn tableName="sample_list">
+			<column name="type" type="VARCHAR(30)" defaultValue="SAMPLE_LIST" afterColumn="created_by">
+				<constraints nullable="false"/>
+			</column>
+		</addColumn>
+	</changeSet>
 
-    <changeSet author="vanina" id="v6.3-2">
-        <preConditions onFail="MARK_RAN">
-            <tableExists tableName="sample_list"></tableExists>
-        </preConditions>
-        <sql dbms="mysql" splitStatements="true">
-            update sample_list
-            set type = 'FOLDER'
-            where list_name = 'Samples';
-        </sql>
-    </changeSet>
+	<changeSet author="vanina" id="v6.3-2">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="sample_list"></tableExists>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			update sample_list
+			set type = 'FOLDER'
+			where list_name = 'Samples';
+		</sql>
+	</changeSet>
 
-    <changeSet author="vanina" id="v6.3-3">
-        <preConditions onFail="MARK_RAN">
-            <columnExists tableName="sample_list" columnName="type"/>
-            <sqlCheck expectedResult="1">
-                SELECT count(*)
-                FROM
-                INFORMATION_SCHEMA.columns
-                WHERE
-                TABLE_NAME = 'sample_list'
-                and column_name = 'created_date'
-                and data_type = 'date'
-                AND TABLE_SCHEMA = DATABASE();
-            </sqlCheck>
-        </preConditions>
-        <sql dbms="mysql" splitStatements="true">
-            alter table sample_list modify column created_date datetime;
-        </sql>
-    </changeSet>
+	<changeSet author="vanina" id="v6.3-3">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="sample_list" columnName="type"/>
+			<sqlCheck expectedResult="1">
+				SELECT count(*)
+				FROM
+				INFORMATION_SCHEMA.columns
+				WHERE
+				TABLE_NAME = 'sample_list'
+				and column_name = 'created_date'
+				and data_type = 'date'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			alter table sample_list modify column created_date datetime;
+		</sql>
+	</changeSet>
 
-    <changeSet author="vanina" id="v6.3-4">
-        <preConditions onFail="MARK_RAN">
-            <columnExists tableName="sample" columnName="created_date"/>
-            <sqlCheck expectedResult="1">
-                SELECT count(*)
-                FROM
-                INFORMATION_SCHEMA.columns
-                WHERE
-                TABLE_NAME = 'sample'
-                and column_name = 'created_date'
-                and data_type = 'date'
-                AND TABLE_SCHEMA = DATABASE();
-            </sqlCheck>
-        </preConditions>
-        <sql dbms="mysql" splitStatements="true">
-            alter table sample modify column created_date datetime;
-        </sql>
-    </changeSet>
+	<changeSet author="vanina" id="v6.3-4">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="sample" columnName="created_date"/>
+			<sqlCheck expectedResult="1">
+				SELECT count(*)
+				FROM
+				INFORMATION_SCHEMA.columns
+				WHERE
+				TABLE_NAME = 'sample'
+				and column_name = 'created_date'
+				and data_type = 'date'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			alter table sample modify column created_date datetime;
+		</sql>
+	</changeSet>
 
-    <changeSet author="vanina" id="v6.3-5">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <columnExists tableName="sample" columnName="created_by"/>
-            </not>
-        </preConditions>
-        <sql dbms="mysql" splitStatements="true">
-            ALTER TABLE sample
-            ADD COLUMN created_by INT(11) NOT NULL DEFAULT 1,
-            ADD INDEX fk_sample_created_by_idx (created_by ASC);
-            ALTER TABLE sample
-            ADD CONSTRAINT fk_sample_created_by
-            FOREIGN KEY (created_by)
-            REFERENCES users (userid)
-            ON DELETE NO ACTION
-            ON UPDATE NO ACTION;
-        </sql>
+	<changeSet author="vanina" id="v6.3-5">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="sample" columnName="created_by"/></not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample
+			ADD COLUMN created_by INT(11) NOT NULL DEFAULT 1,
+			ADD INDEX fk_sample_created_by_idx (created_by ASC);
+			ALTER TABLE sample
+			ADD CONSTRAINT fk_sample_created_by
+			FOREIGN KEY (created_by)
+			REFERENCES users (userid)
+			ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
+		</sql>
 
 
-    </changeSet>
+	</changeSet>
 
-    <changeSet author="vanina" id="v6.3-6">
-        <preConditions onFail="MARK_RAN">
-            <tableExists tableName="sample_list"></tableExists>
-            <not>
-                <sqlCheck expectedResult="0">
-                    SELECT count(*)
-                    FROM
-                    sample_list
-                    where list_name != 'Samples';
-                </sqlCheck>
-            </not>
-        </preConditions>
-        <sql dbms="mysql" splitStatements="true">
-            update sample_list
-            set type = 'FOLDER'
-            where list_name not like '%#%';
-        </sql>
-    </changeSet>
+	<changeSet author="vanina" id="v6.3-6">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="sample_list"></tableExists>
+			<not><sqlCheck expectedResult="0">
+				SELECT count(*)
+				FROM
+				sample_list
+				where list_name != 'Samples';
+			</sqlCheck></not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			update sample_list
+			set type = 'SAMPLE_LIST'
+			where list_name != 'Samples';
+		</sql>
+	</changeSet>
 
-    <changeSet author="vanina" id="v6.3-7">
-        <preConditions onFail="MARK_RAN">
-            <tableExists tableName="sample_list"></tableExists>
-            <not>
-                <sqlCheck expectedResult="0">
-                    SELECT count(*)
-                    FROM
-                    sample_list
-                    where hierarchy is null;
-                </sqlCheck>
-            </not>
-        </preConditions>
-        <sql dbms="mysql" splitStatements="true">
-            UPDATE sample_list
-            SET hierarchy = (SELECT list_id
-            FROM (SELECT list_id
-            FROM sample_list
-            WHERE list_name = 'Samples') T)
-            WHERE hierarchy IS NULL
-            and list_name != 'Samples';
-        </sql>
-    </changeSet>
-
-    <changeSet author="vanina" id="v6.3-8">
-        <preConditions onFail="MARK_RAN">
-            <tableExists tableName="sample_list"></tableExists>
-            <sqlCheck expectedResult="0">
-                SELECT count(*)
-                FROM sample_list
-                where list_name = 'Samples';
-            </sqlCheck>
-        </preConditions>
-        <sql dbms="mysql" splitStatements="true">
-            insert into sample_list values (
-	            NULL,
-	            'Samples',
-	            '',
-	            NULL,
-	            NOW(),
-	            '',
-	            null,
-	            'FOLDER');
-        </sql>
-    </changeSet>
-
-    <changeSet author="vanina" id="v6.3-9">
-        <preConditions onFail="MARK_RAN">
-            <tableExists tableName="sample_list"></tableExists>
-            <not>
-                <sqlCheck expectedResult="0">
-                    SELECT count(*)
-                    FROM sample_list
-                    where list_name = 'Samples';
-                </sqlCheck>
-            </not>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM users where uname = 'admin';</sqlCheck>
-        </preConditions>
-        <sql dbms="mysql" splitStatements="true">
-            update sample_list
-            set created_by = null
-            where created_by = (select userid from users where uname = 'admin')
-            and list_name = 'Samples';
-        </sql>
-    </changeSet>
-
-    <changeSet author="vanina" id="v6.3-10">
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">
-                SELECT COUNT(*)
-                FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-                WHERE TABLE_NAME = 'sample_list'
-                AND CONSTRAINT_NAME = 'fk_sample_list_hierarchy'
-                AND TABLE_SCHEMA = DATABASE();
-            </sqlCheck>
-        </preConditions>
-        <sql dbms="mysql" splitStatements="true">
-            ALTER TABLE sample_list
-            DROP FOREIGN KEY fk_sample_list_hierarchy ;
-            ALTER TABLE sample_list
-            DROP INDEX fk_sample_list_hierarchy_idx;
-        </sql>
-    </changeSet>
-
-    <changeSet author="vanina" id="v6.3-11">
-        <preConditions onFail="MARK_RAN">
-            <tableExists tableName="sample_list"></tableExists>
-            <sqlCheck expectedResult="1">
-                SELECT count(*)
-                FROM sample_list
-                where list_name = 'Samples';
-            </sqlCheck>
-        </preConditions>
-        <sql dbms="mysql" splitStatements="true">
-            update sample_list
-            set hierarchy = null
-            where list_name = 'Samples';
-        </sql>
-    </changeSet>
+	<changeSet author="vanina" id="v6.3-7">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="sample_list"></tableExists>
+			<not><sqlCheck expectedResult="0">
+				SELECT count(*)
+				FROM
+				sample_list
+				where hierarchy is null;
+			</sqlCheck></not>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE sample_list
+			SET hierarchy = (SELECT list_id
+			FROM (SELECT list_id
+			FROM sample_list
+			WHERE list_name = 'Samples') T)
+			WHERE hierarchy IS NULL
+			and list_name != 'Samples';
+		</sql>
+	</changeSet>
 
 </databaseChangeLog>
