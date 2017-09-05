@@ -258,15 +258,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public List<ObservationDto> getObservations(final int studyIdentifier, final int instanceId, final int pageNumber,
-			final int pageSize, final String sortBy, final String sortOrder) {
+		final int pageSize, final String sortBy, final String sortOrder) {
 
 		final List<MeasurementVariableDto> variablesStudy =this.measurementVariableService.getVariables(studyIdentifier,
 			VariableType.TRAIT.getId(),VariableType.SELECTION_METHOD.getId());
 
-
-		return this.studyMeasurements.getAllMeasurements(studyIdentifier, variablesStudy, findGenericGermplasmDescriptors(studyIdentifier),
-				instanceId, pageNumber, pageSize,
-				sortBy, sortOrder);
+		return this.studyMeasurements
+			.getAllMeasurements(studyIdentifier, variablesStudy, findGenericGermplasmDescriptors(studyIdentifier), instanceId,
+				pageNumber, pageSize, sortBy, sortOrder);
 	}
 
 	private List<String> findGenericGermplasmDescriptors(final int studyIdentifier) {

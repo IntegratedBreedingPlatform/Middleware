@@ -81,6 +81,7 @@ public class GermplasmTestDataInitializer {
 		name.setReferenceId(Integer.valueOf(1));
 		name.setTypeId(Integer.valueOf(1));
 		name.setUserId(Integer.valueOf(1));
+		name.setNstat(Integer.valueOf(1));
 
 		return name;
 	}

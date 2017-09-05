@@ -36,7 +36,7 @@ public class ObservationQueryTest {
 		final List<MeasurementVariableDto> traitNames = new LinkedList<MeasurementVariableDto>();
 		traitNames.add(new MeasurementVariableDto(1, "PH_cm"));
 		List<String> germplasmDescriptors = Lists.newArrayList("STOCK_ID");
-		String result = fixture.getAllObservationsQuery(traitNames, germplasmDescriptors, null, null);
+		String result = fixture.getAllObservationsQuery(traitNames, germplasmDescriptors,null, null);
 		assertEquals("The generated query must match the expected query.", formatString(expectedQueryForAllMeasurements()),
 				formatString(result));
 	}
@@ -72,6 +72,7 @@ public class ObservationQueryTest {
 				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'COL') COL, \n"
 				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN', \n"
 				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n"
+				+ "    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM plant pl INNER JOIN sample AS sp ON pl.plant_id = sp.sample_id WHERE nde.nd_experiment_id = pl.nd_experiment_id ) 'SAMPLES', \n"
 				+ "    nde.plot_id as PLOT_ID,"
 				+ " MAX(IF(cvterm_variable.name = 'PH_cm', ph.value, NULL)) AS 'PH_cm', \n"
 				+ " MAX(IF(cvterm_variable.name = 'PH_cm', ph.phenotype_id, NULL)) AS 'PH_cm_PhenotypeId', \n"
@@ -107,6 +108,7 @@ public class ObservationQueryTest {
 				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'COL') COL, \n"
 				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN', \n"
 				+ "    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = ep.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE', \n"
+				+ "    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM plant pl INNER JOIN sample AS sp ON pl.plant_id = sp.sample_id WHERE nde.nd_experiment_id = pl.nd_experiment_id ) 'SAMPLES', \n"
 				+ "    nde.plot_id as PLOT_ID,"
 				+ " MAX(IF(cvterm_variable.name = 'PH_cm', ph.value, NULL)) AS 'PH_cm', \n"
 				+ " MAX(IF(cvterm_variable.name = 'PH_cm', ph.phenotype_id, NULL)) AS 'PH_cm_PhenotypeId', \n"

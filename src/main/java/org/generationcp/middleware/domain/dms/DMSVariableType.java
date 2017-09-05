@@ -53,7 +53,7 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 		Set<VariableType> variableTypes = standardVariable.getVariableTypes();
 		if(variableTypes != null){
 			Iterator<VariableType> iterator = variableTypes.iterator();
-			this.variableType = iterator.next();;
+			this.variableType = iterator.next();
 		}
 
 		this.rank = rank;
@@ -133,8 +133,7 @@ public class DMSVariableType implements Serializable, Comparable<DMSVariableType
 			return;
 		}
 
-		StandardVariable standardVariable = this.getStandardVariable();
-		String propertyName = standardVariable.getProperty().getName();
+		final String propertyName = this.getStandardVariable().getProperty().getName();
 		this.setVariableType(OntologyDataHelper.mapFromPhenotype(this.getRole(), propertyName));
 	}
 

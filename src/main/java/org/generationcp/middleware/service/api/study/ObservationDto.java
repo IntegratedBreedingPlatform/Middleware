@@ -1,13 +1,13 @@
 
 package org.generationcp.middleware.service.api.study;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ObservationDto {
 
@@ -25,7 +25,7 @@ public class ObservationDto {
 
 	private final String entryCode;
 
-	private final String repitionNumber;
+	private final String repetionNumber;
 
 	private final String plotNumber;
 
@@ -41,6 +41,8 @@ public class ObservationDto {
 
 	private String fieldMapRange;
 
+	private String samples;
+
 	private final List<MeasurementDto> variableMeasurements;
 
 	private final List<Pair<String, String>> additionalGermplasmDescriptors = new ArrayList<>();
@@ -48,7 +50,7 @@ public class ObservationDto {
 	private transient int hashCode;
 
 	public ObservationDto(final Integer measurementId, final String trialInstance, final String entryType, final Integer gid,
-			final String designation, final String entryNo, final String entryCode, final String repitionNumber, final String plotNumber,
+			final String designation, final String entryNo, final String entryCode, final String repetionNumber, final String plotNumber,
 			final String blockNumber, final List<MeasurementDto> variableMeasurements) {
 		this.measurementId = measurementId;
 		this.trialInstance = trialInstance;
@@ -57,10 +59,24 @@ public class ObservationDto {
 		this.designation = designation;
 		this.entryNo = entryNo;
 		this.entryCode = entryCode;
-		this.repitionNumber = repitionNumber;
+		this.repetionNumber = repetionNumber;
 		this.plotNumber = plotNumber;
 		this.blockNumber = blockNumber;
 		this.variableMeasurements = variableMeasurements;
+	}
+
+	public ObservationDto(Integer measurementId, String designation, List<MeasurementDto> variableResults) {
+		this.measurementId = measurementId;
+		this.designation = designation;
+		this.variableMeasurements = variableResults;
+		this.trialInstance = null;
+		this.entryType = null;
+		this.gid = null;
+		this.entryNo = null;
+		this.entryCode = null;
+		this.repetionNumber = null;
+		this.plotNumber = null;
+		this.blockNumber = null;
 	}
 
 	public Integer getMeasurementId() {
@@ -92,7 +108,7 @@ public class ObservationDto {
 	}
 
 	public String getRepitionNumber() {
-		return this.repitionNumber;
+		return this.repetionNumber;
 	}
 
 	public String getPlotNumber() {
@@ -141,8 +157,9 @@ public class ObservationDto {
 
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof ObservationDto))
+		if (!(other instanceof ObservationDto)) {
 			return false;
+		}
 		ObservationDto castOther = (ObservationDto) other;
 		return new EqualsBuilder().append(measurementId, castOther.measurementId).isEquals();
 	}
@@ -169,5 +186,13 @@ public class ObservationDto {
 
 	public void setFieldMapRange(String fieldMapRange) {
 		this.fieldMapRange = fieldMapRange;
+	}
+
+	public String getSamples() {
+		return samples;
+	}
+
+	public void setSamples(final String samples) {
+		this.samples = samples;
 	}
 }

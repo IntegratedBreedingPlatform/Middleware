@@ -1,10 +1,8 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.data.initializer.GermplasmDataManagerDataInitializer;
