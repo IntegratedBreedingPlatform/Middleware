@@ -265,7 +265,7 @@ public class SampleListServiceImpl implements SampleListService {
 			throw new Exception("folderName is not unique in the parent folder");
 		}
 
-		if (areRelatives(listToMove, newParentFolder)) {
+		if (isDescendant(listToMove, newParentFolder)) {
 			throw new Exception("You can not move list because are relatives with parent folder");
 		}
 
@@ -299,14 +299,14 @@ public class SampleListServiceImpl implements SampleListService {
 		this.sampleListDao.makeTransient(folder);
 	}
 
-	protected boolean areRelatives(SampleList listToMove, SampleList newParentFolder) {
-		if (newParentFolder.getHierarchy() == null) {
+	protected boolean isDescendant(SampleList list, SampleList of) {
+		if (of.getHierarchy() == null) {
 			return false;
 		}
-		if (newParentFolder.getHierarchy().equals(listToMove)) {
+		if (of.getHierarchy().equals(list)) {
 			return true;
 		} else {
-			return areRelatives(listToMove, newParentFolder.getHierarchy());
+			return isDescendant(list, of.getHierarchy());
 		}
 	}
 
