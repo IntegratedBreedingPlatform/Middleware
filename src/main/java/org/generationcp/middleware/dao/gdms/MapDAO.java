@@ -27,6 +27,8 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.FloatType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Map}.
@@ -35,6 +37,8 @@ import org.hibernate.type.StringType;
  * <b>File Created</b>: Jul 9, 2012.
  */
 public class MapDAO extends GenericDAO<Map, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(MapDAO.class);
 
 	private static final String GET_MAP_DETAILS_SELECT = "SELECT COUNT(gdms_mapping_data.marker_id) AS marker_count "
 			+ "       , MAX(gdms_mapping_data.start_position) AS max " + "       , gdms_mapping_data.linkage_group AS Linkage_group "
@@ -91,12 +95,10 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 			+ "     gdms_map.map_name" + "     ,gdms_markers_onmap.linkage_group" + "     ,gdms_markers_onmap.start_position ASC";
 
 	@SuppressWarnings("rawtypes")
-	public List<MapDetailElement> getMapDetailsByName(String nameLike, int start, int numOfRows) throws MiddlewareQueryException {
-
-		nameLike = nameLike.toLowerCase();
+	public List<MapDetailElement> getMapDetailsByName(String nameLike, int start, int numOfRows) {
 
 		SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_DETAILS_BY_NAME);
-		query.setString("nameLike", nameLike);
+		query.setString("nameLike", nameLike.toLowerCase());
 		query.setFirstResult(start);
 		query.setMaxResults(numOfRows);
 
@@ -126,12 +128,12 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 			return maps;
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMapDetailsByName() query from Map: " + e.getMessage(), e);
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMapDetailsByName() query from Map: " + e.getMessage(), e);
 		}
-		return maps;
 	}
 
-	public List<MapInfo> getMapInfoByMapAndChromosome(Integer mapId, String chromosome) throws MiddlewareQueryException {
+	public List<MapInfo> getMapInfoByMapAndChromosome(Integer mapId, String chromosome) {
 		SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_INFO_BY_MAP_AND_CHROMOSOME);
 		query.setInteger("mapId", mapId);
 		query.setString("chromosome", chromosome);
@@ -167,14 +169,14 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 				}
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMapInfoByMapAndChromosome() query: " + e.getMessage(), e);
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMapInfoByMapAndChromosome() query: " + e.getMessage(), e);
 		}
 
 		return mapInfoList;
 	}
 
-	public List<MapInfo> getMapInfoByMapChromosomeAndPosition(Integer mapId, String chromosome, Float startPosition)
-			throws MiddlewareQueryException {
+	public List<MapInfo> getMapInfoByMapChromosomeAndPosition(Integer mapId, String chromosome, Float startPosition) {
 		SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_INFO_BY_MAP_CHROMOSOME_AND_POSITION);
 		query.setInteger("mapId", mapId);
 		query.setString("chromosome", chromosome);
@@ -209,13 +211,14 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 				}
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMapInfoByMapChromosomeAndPosition() query: " + e.getMessage(), e);
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMapInfoByMapChromosomeAndPosition() query: " + e.getMessage(), e);
 		}
 
 		return mapInfoList;
 	}
 
-	public List<MapInfo> getMapInfoByMarkersAndMap(List<Integer> markers, Integer mapId) throws MiddlewareQueryException {
+	public List<MapInfo> getMapInfoByMarkersAndMap(List<Integer> markers, Integer mapId) {
 		SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_INFO_BY_MARKERS_AND_MAP);
 		query.setParameterList("markerIdList", markers);
 		query.setInteger("mapId", mapId);
@@ -251,13 +254,14 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 				}
 			}
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMapInfoByMapAndChromosome() query: " + e.getMessage(), e);
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMapInfoByMarkersAndMap() query: " + e.getMessage(), e);
 		}
 
 		return mapInfoList;
 	}
 
-	public Map getByName(String mapName) throws MiddlewareQueryException {
+	public Map getByName(String mapName) {
 		Map map = null;
 
 		try {
@@ -266,14 +270,15 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 			map = (Map) criteria.uniqueResult();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByName query from Map: " + e.getMessage(), e);
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getByName() query: " + e.getMessage(), e);
 		}
 
 		return map;
 	}
 
 	@Override
-	public Map getById(Integer mapId) throws MiddlewareQueryException {
+	public Map getById(Integer mapId) {
 		Map map = null;
 
 		try {
@@ -282,30 +287,30 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 			map = (Map) criteria.uniqueResult();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getById query from Map: " + e.getMessage(), e);
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getById() query: " + e.getMessage(), e);
 		}
 
 		return map;
 	}
 
-	public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException {
-
-		nameLike = nameLike.toLowerCase();
+	public Long countMapDetailsByName(String nameLike) {
 
 		SQLQuery query = this.getSession().createSQLQuery(MapDAO.COUNT_MAP_DETAILS_BY_NAME);
-		query.setString("nameLike", nameLike);
+		query.setString("nameLike", nameLike.toLowerCase());
 
 		try {
 			BigInteger result = (BigInteger) query.uniqueResult();
 			return result.longValue();
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countMapDetailsByName() query from Map: " + e.getMessage(), e);
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with countMapDetailsByName() query: " + e.getMessage(), e);
 		}
-		return 0L;
+
 	}
 
 	@SuppressWarnings("rawtypes")
-	public List<MapDetailElement> getAllMapDetails(int start, int numOfRows) throws MiddlewareQueryException {
+	public List<MapDetailElement> getAllMapDetails(int start, int numOfRows) {
 		List<MapDetailElement> values = new ArrayList<MapDetailElement>();
 
 		try {
@@ -333,12 +338,12 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 
 			return values;
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getAllMapDetails() query from Map & Mapping Data: " + e.getMessage(), e);
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getAllMapDetails() query: " + e.getMessage(), e);
 		}
-		return values;
 	}
 
-	public long countAllMapDetails() throws MiddlewareQueryException {
+	public long countAllMapDetails() {
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(MapDAO.COUNT_MAP_DETAILS);
 			BigInteger result = (BigInteger) query.uniqueResult();
@@ -347,39 +352,41 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 			}
 			return 0;
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countAllMapDetails() query from Map & Mapping Data: " + e.getMessage(), e);
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with countAllMapDetails() query: " + e.getMessage(), e);
 		}
-		return 0;
 	}
 
-	public Integer getMapIdByName(String mapName) throws MiddlewareQueryException {
+	public Integer getMapIdByName(String mapName) {
 		try {
+
 			SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_ID_BY_NAME);
 			query.setParameter("mapName", mapName);
 			return (Integer) query.uniqueResult();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMapIdByName(" + mapName + ") in MapDAO: " + e.getMessage(), e);
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMapIdByName(" + mapName + ") in MapDAO: " + e.getMessage(), e);
 		}
-		return null;
 	}
 
-	public String getMapNameById(Integer mapId) throws MiddlewareQueryException {
+	public String getMapNameById(Integer mapId) {
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_NAME_BY_ID);
 			query.setParameter("mapId", mapId);
 			return (String) query.addScalar("map_name", StringType.class.newInstance()).uniqueResult();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMapNameById(" + mapId + ") in MapDAO: " + e.getMessage(), e);
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMapNameById(" + mapId + ") in MapDAO: " + e.getMessage(), e);
 		} catch (Exception e) {
-			this.logAndThrowException("Error with getMapNameById(" + mapId + ") in MapDAO: " + e.getMessage(), e);
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMapNameById(" + mapId + ") in MapDAO: " + e.getMessage(), e);
 		}
-		return null;
 	}
 
 	@SuppressWarnings("rawtypes")
-	public List<MapDetailElement> getMapAndMarkerCountByMarkers(List<Integer> markerIds) throws MiddlewareQueryException {
+	public List<MapDetailElement> getMapAndMarkerCountByMarkers(List<Integer> markerIds) {
 		List<MapDetailElement> details = new ArrayList<MapDetailElement>();
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_AND_MARKER_COUNT_BY_MARKERS);
@@ -391,12 +398,13 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMapAndMarkerCountByMarkers(" + markerIds + ") in MapDAO: " + e.getMessage(), e);
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMapAndMarkerCountByMarkers(" + markerIds + ") in MapDAO: " + e.getMessage(), e);
 		}
 		return details;
 	}
 
-	public void deleteByMapId(int mapId) throws MiddlewareQueryException {
+	public void deleteByMapId(int mapId) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
@@ -406,12 +414,13 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 			SQLQuery statement = this.getSession().createSQLQuery("DELETE FROM gdms_map WHERE map_id = " + mapId);
 			statement.executeUpdate();
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in deleteByMapId=" + mapId + " in MapDAO: " + e.getMessage(), e);
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in deleteByMapId=" + mapId + " in MapDAO: " + e.getMessage(), e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Map> getMapsByIds(List<Integer> mapIds) throws MiddlewareQueryException {
+	public List<Map> getMapsByIds(List<Integer> mapIds) {
 		try {
 			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.in("mapId", mapIds));
@@ -419,9 +428,9 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 			return criteria.list();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error in getMapsByIds=" + mapIds + " in MapDAO: " + e.getMessage(), e);
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getMapsByIds=" + mapIds + " in MapDAO: " + e.getMessage(), e);
 		}
-		return new ArrayList<Map>();
 
 	}
 
