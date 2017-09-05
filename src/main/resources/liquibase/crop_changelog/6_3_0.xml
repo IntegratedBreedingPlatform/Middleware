@@ -134,21 +134,20 @@
             <tableExists tableName="sample_list"></tableExists>
             <sqlCheck expectedResult="0">
                 SELECT count(*)
-                FROM
-                sample_list
+                FROM sample_list
                 where list_name = 'Samples';
             </sqlCheck>
         </preConditions>
         <sql dbms="mysql" splitStatements="true">
             insert into sample_list values (
-            NULL,
-            'Samples',
-            '',
-            NULL,
-            NOW(),
-            '',
-            null,
-            'FOLDER');
+	            NULL,
+	            'Samples',
+	            '',
+	            NULL,
+	            NOW(),
+	            '',
+	            null,
+	            'FOLDER');
         </sql>
     </changeSet>
 
@@ -158,8 +157,7 @@
             <not>
                 <sqlCheck expectedResult="0">
                     SELECT count(*)
-                    FROM
-                    sample_list
+                    FROM sample_list
                     where list_name = 'Samples';
                 </sqlCheck>
             </not>
@@ -176,12 +174,9 @@
     <changeSet author="vanina" id="v6.3-10">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
-                SELECT
-                COUNT(*)
-                FROM
-                INFORMATION_SCHEMA.TABLE_CONSTRAINTS
-                WHERE
-                TABLE_NAME = 'sample_list'
+                SELECT COUNT(*)
+                FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+                WHERE TABLE_NAME = 'sample_list'
                 AND CONSTRAINT_NAME = 'fk_sample_list_hierarchy'
                 AND TABLE_SCHEMA = DATABASE();
             </sqlCheck>
@@ -199,8 +194,7 @@
             <tableExists tableName="sample_list"></tableExists>
             <sqlCheck expectedResult="1">
                 SELECT count(*)
-                FROM
-                sample_list
+                FROM sample_list
                 where list_name = 'Samples';
             </sqlCheck>
         </preConditions>
