@@ -32,9 +32,13 @@
 			`rank` int(11) NOT NULL DEFAULT '0',
 			`variable_id` int(11) NOT NULL,
 			`alias` varchar(255) DEFAULT NULL,
-			PRIMARY KEY (`projectprop_id`)
-			) AS SELECT
-			   pp.projectprop_id,
+			PRIMARY KEY (`projectprop_id`),
+			UNIQUE KEY `projectprop_idx1` (`project_id`,`type_id`,`rank`,`variable_id`),
+			KEY `projectprop_idx2` (`type_id`),
+			KEY `projectprop_idx3` (`variable_id`),
+			CONSTRAINT `projectprop_2_fk1` FOREIGN KEY (`project_id`) REFERENCES `project` (`project_id`) ON DELETE CASCADE,
+			CONSTRAINT `projectprop_2_fk2` FOREIGN KEY (`type_id`) REFERENCES `cvterm` (`cvterm_id`) ON DELETE CASCADE
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8 AS SELECT
 			   pp.project_id,
 			   pptype.type_id 'type_id',
 			   ppvalue.value  'value',
