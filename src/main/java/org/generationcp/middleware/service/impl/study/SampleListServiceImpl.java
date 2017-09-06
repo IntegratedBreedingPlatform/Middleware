@@ -24,6 +24,7 @@ import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
@@ -33,7 +34,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-@Transactional
+@Transactional (propagation = Propagation.REQUIRED)
 public class SampleListServiceImpl implements SampleListService {
 
 	private SampleListDao sampleListDao;
@@ -167,8 +168,8 @@ public class SampleListServiceImpl implements SampleListService {
 		Preconditions.checkNotNull(folderName);
 		Preconditions.checkNotNull(parentId);
 		Preconditions.checkNotNull(createdBy);
-		Preconditions.checkArgument(!folderName.isEmpty(), new IllegalArgumentException("folderName can not be empty"));
-		Preconditions.checkArgument(!createdBy.isEmpty(), new IllegalArgumentException("createdBy can not be empty"));
+		Preconditions.checkArgument(!folderName.isEmpty(), "folderName can not be empty");
+		Preconditions.checkArgument(!createdBy.isEmpty(), "createdBy can not be empty");
 
 		final SampleList parentList = this.sampleListDao.getById(parentId);
 		if (parentList == null) {
@@ -206,7 +207,7 @@ public class SampleListServiceImpl implements SampleListService {
 	public SampleList updateSampleListFolderName(final Integer folderId, final String newFolderName) throws Exception {
 		Preconditions.checkNotNull(folderId);
 		Preconditions.checkNotNull(newFolderName);
-		Preconditions.checkArgument(!newFolderName.isEmpty(), new IllegalArgumentException("newFolderName can not be empty"));
+		Preconditions.checkArgument(!newFolderName.isEmpty(), "newFolderName can not be empty");
 
 		final SampleList folder = this.sampleListDao.getById(folderId);
 
@@ -244,7 +245,7 @@ public class SampleListServiceImpl implements SampleListService {
 	public SampleList moveSampleList(final Integer sampleListId, final Integer newParentFolderId) throws Exception {
 		Preconditions.checkNotNull(sampleListId);
 		Preconditions.checkNotNull(newParentFolderId);
-		Preconditions.checkArgument(!sampleListId.equals(newParentFolderId), new IllegalArgumentException("Arguments can not have the same value"));
+		Preconditions.checkArgument(!sampleListId.equals(newParentFolderId), "Arguments can not have the same value");
 		final SampleList listToMove = this.sampleListDao.getById(sampleListId);
 		if (listToMove == null) {
 			throw new Exception("sampleList does not exist");
@@ -264,6 +265,11 @@ public class SampleListServiceImpl implements SampleListService {
 		if (uniqueSampleListName != null) {
 			throw new Exception("folderName is not unique in the parent folder");
 		}
+
+		if (isDescendant(listToMove, newParentFolder)) {
+			throw new Exception("You can not move list because are relatives with parent folder");
+		}
+
 		listToMove.setHierarchy(newParentFolder);
 
 		return this.sampleListDao.saveOrUpdate(listToMove);
@@ -292,6 +298,17 @@ public class SampleListServiceImpl implements SampleListService {
 		if (folder.getChildren() != null && folder.getChildren().size() > 0)
 			throw new Exception("Folder to delete can not have children");
 		this.sampleListDao.makeTransient(folder);
+	}
+
+	protected boolean isDescendant(SampleList list, SampleList of) {
+		if (of.getHierarchy() == null) {
+			return false;
+		}
+		if (of.getHierarchy().equals(list)) {
+			return true;
+		} else {
+			return isDescendant(list, of.getHierarchy());
+		}
 	}
 
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {
