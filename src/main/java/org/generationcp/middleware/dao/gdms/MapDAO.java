@@ -1,12 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * <p/>
  * Generation Challenge Programme (GCP)
- *
- *
+ * <p/>
+ * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
  *******************************************************************************/
 
 package org.generationcp.middleware.dao.gdms;
@@ -27,6 +26,8 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.FloatType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Map}.
@@ -36,11 +37,14 @@ import org.hibernate.type.StringType;
  */
 public class MapDAO extends GenericDAO<Map, Integer> {
 
-	private static final String GET_MAP_DETAILS_SELECT = "SELECT COUNT(DISTINCT gdms_mapping_data.marker_id) AS marker_count "
-			+ "       , MAX(gdms_mapping_data.start_position) AS max " + "       , gdms_mapping_data.linkage_group AS Linkage_group "
-			+ "       , concat(gdms_mapping_data.map_name,'') AS map " + "       , concat(gdms_map.map_type,'') AS map_type "
-			+ "       , gdms_map.map_desc AS map_desc " + "       , gdms_map.map_unit AS map_unit " + "FROM gdms_mapping_data, gdms_map "
-			+ "WHERE gdms_mapping_data.map_id=gdms_map.map_id ";
+	private static final Logger LOG = LoggerFactory.getLogger(MapDAO.class);
+
+	private static final String GET_MAP_DETAILS_SELECT =
+			"SELECT COUNT(gdms_mapping_data.marker_id) AS marker_count " + "       , MAX(gdms_mapping_data.start_position) AS max "
+					+ "       , gdms_mapping_data.linkage_group AS Linkage_group "
+					+ "       , concat(gdms_mapping_data.map_name,'') AS map " + "       , concat(gdms_map.map_type,'') AS map_type "
+					+ "       , gdms_map.map_desc AS map_desc " + "       , gdms_map.map_unit AS map_unit "
+					+ "FROM gdms_mapping_data, gdms_map " + "WHERE gdms_mapping_data.map_id=gdms_map.map_id ";
 
 	private static final String GET_MAP_DETAILS_WHERE = "       AND lower(gdms_mapping_data.map_name) LIKE (:nameLike) ";
 
@@ -49,75 +53,76 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 
 	public static final String GET_MAP_DETAILS = MapDAO.GET_MAP_DETAILS_SELECT + MapDAO.GET_MAP_DETAILS_GROUP_ORDER;
 
-	public static final String GET_MAP_DETAILS_BY_NAME = MapDAO.GET_MAP_DETAILS_SELECT + MapDAO.GET_MAP_DETAILS_WHERE
-			+ MapDAO.GET_MAP_DETAILS_GROUP_ORDER;
+	public static final String GET_MAP_DETAILS_BY_NAME =
+			MapDAO.GET_MAP_DETAILS_SELECT + MapDAO.GET_MAP_DETAILS_WHERE + MapDAO.GET_MAP_DETAILS_GROUP_ORDER;
 
 	public static final String COUNT_MAP_DETAILS = "SELECT COUNT(DISTINCT gdms_mapping_data.linkage_group, gdms_mapping_data.map_name) "
 			+ "FROM `gdms_mapping_data` JOIN `gdms_map` ON gdms_mapping_data.map_id=gdms_map.map_id ";
 
-	public static final String COUNT_MAP_DETAILS_BY_NAME = MapDAO.COUNT_MAP_DETAILS
-			+ "WHERE lower(gdms_mapping_data.map_name) LIKE (:nameLike) ";
+	public static final String COUNT_MAP_DETAILS_BY_NAME =
+			MapDAO.COUNT_MAP_DETAILS + "WHERE lower(gdms_mapping_data.map_name) LIKE (:nameLike) ";
 
 	public static final String GET_MAP_ID_BY_NAME = "SELECT map_id FROM gdms_map WHERE map_name = :mapName LIMIT 0,1";
 
 	public static final String GET_MAP_NAME_BY_ID = "SELECT map_name FROM gdms_map WHERE map_id = :mapId";
 
-	public static final String GET_MAP_AND_MARKER_COUNT_BY_MARKERS = "SELECT CONCAT(m.map_name, ''), COUNT(k.marker_id) "
-			+ "FROM gdms_map m " + "INNER JOIN gdms_markers_onmap k ON k.map_id = m.map_id " + "WHERE k.marker_id IN (:markerIds) "
-			+ "GROUP BY m.map_name";
+	public static final String GET_MAP_AND_MARKER_COUNT_BY_MARKERS =
+			"SELECT CONCAT(m.map_name, ''), COUNT(k.marker_id) " + "FROM gdms_map m "
+					+ "INNER JOIN gdms_markers_onmap k ON k.map_id = m.map_id " + "WHERE k.marker_id IN (:markerIds) "
+					+ "GROUP BY m.map_name";
 
-	public static final String GET_MAP_INFO_BY_MAP_AND_CHROMOSOME = "SELECT DISTINCT " + "  gdms_markers_onmap.marker_id"
-			+ " ,gdms_marker.marker_name" + " ,gdms_map.map_name" + " ,gdms_map.map_type" + " ,gdms_markers_onmap.start_position"
-			+ " ,gdms_markers_onmap.linkage_group" + " ,gdms_map.map_unit" + " FROM gdms_map" + "     INNER JOIN gdms_markers_onmap ON"
-			+ "         gdms_map.map_id = gdms_markers_onmap.map_id" + "     LEFT JOIN gdms_marker ON"
-			+ "         gdms_marker.marker_id = gdms_markers_onmap.marker_id" + " WHERE" + "     gdms_markers_onmap.map_id = :mapId"
-			+ "     AND gdms_markers_onmap.linkage_group = :chromosome";
+	public static final String GET_MAP_INFO_BY_MAP_AND_CHROMOSOME =
+			"SELECT DISTINCT " + "  gdms_markers_onmap.marker_id" + " ,gdms_marker.marker_name" + " ,gdms_map.map_name"
+					+ " ,gdms_map.map_type" + " ,gdms_markers_onmap.start_position" + " ,gdms_markers_onmap.linkage_group"
+					+ " ,gdms_map.map_unit" + " FROM gdms_map" + "     INNER JOIN gdms_markers_onmap ON"
+					+ "         gdms_map.map_id = gdms_markers_onmap.map_id" + "     LEFT JOIN gdms_marker ON"
+					+ "         gdms_marker.marker_id = gdms_markers_onmap.marker_id" + " WHERE" + "     gdms_markers_onmap.map_id = :mapId"
+					+ "     AND gdms_markers_onmap.linkage_group = :chromosome";
 
-	public static final String GET_MAP_INFO_BY_MAP_CHROMOSOME_AND_POSITION = "SELECT DISTINCT " + "  gdms_markers_onmap.marker_id"
-			+ " ,gdms_marker.marker_name" + " ,gdms_map.map_name" + " ,gdms_map.map_type" + " ,gdms_markers_onmap.linkage_group"
-			+ " ,gdms_map.map_unit" + " FROM gdms_map" + "     INNER JOIN gdms_markers_onmap ON"
-			+ "         gdms_map.map_id = gdms_markers_onmap.map_id" + "     LEFT JOIN gdms_marker ON"
-			+ "         gdms_marker.marker_id = gdms_markers_onmap.marker_id" + " WHERE" + "     gdms_markers_onmap.map_id = :mapId"
-			+ "     AND gdms_markers_onmap.linkage_group = :chromosome" + "     AND gdms_markers_onmap.start_position = :startPosition"
-			+ " ORDER BY" + "      gdms_map.map_name" + "     ,gdms_markers_onmap.linkage_group"
-			+ "     ,gdms_markers_onmap.start_position ASC";
+	public static final String GET_MAP_INFO_BY_MAP_CHROMOSOME_AND_POSITION =
+			"SELECT DISTINCT " + "  gdms_markers_onmap.marker_id" + " ,gdms_marker.marker_name" + " ,gdms_map.map_name"
+					+ " ,gdms_map.map_type" + " ,gdms_markers_onmap.linkage_group" + " ,gdms_map.map_unit" + " FROM gdms_map"
+					+ "     INNER JOIN gdms_markers_onmap ON" + "         gdms_map.map_id = gdms_markers_onmap.map_id"
+					+ "     LEFT JOIN gdms_marker ON" + "         gdms_marker.marker_id = gdms_markers_onmap.marker_id" + " WHERE"
+					+ "     gdms_markers_onmap.map_id = :mapId" + "     AND gdms_markers_onmap.linkage_group = :chromosome"
+					+ "     AND gdms_markers_onmap.start_position = :startPosition" + " ORDER BY" + "      gdms_map.map_name"
+					+ "     ,gdms_markers_onmap.linkage_group" + "     ,gdms_markers_onmap.start_position ASC";
 
-	public static final String GET_MAP_INFO_BY_MARKERS_AND_MAP = "SELECT DISTINCT " + "  gdms_markers_onmap.marker_id"
-			+ " ,gdms_marker.marker_name" + " ,gdms_map.map_name" + " ,gdms_map.map_type" + " ,gdms_markers_onmap.start_position"
-			+ " ,gdms_markers_onmap.linkage_group" + " ,gdms_map.map_unit" + " FROM gdms_map" + "     INNER JOIN gdms_markers_onmap ON"
-			+ "         gdms_map.map_id = gdms_markers_onmap.map_id" + "     LEFT JOIN gdms_marker ON"
-			+ "         gdms_marker.marker_id = gdms_markers_onmap.marker_id" + " WHERE"
-			+ "     gdms_markers_onmap.marker_id IN (:markerIdList)" + "     AND gdms_markers_onmap.map_id = :mapId" + " ORDER BY"
-			+ "     gdms_map.map_name" + "     ,gdms_markers_onmap.linkage_group" + "     ,gdms_markers_onmap.start_position ASC";
+	public static final String GET_MAP_INFO_BY_MARKERS_AND_MAP =
+			"SELECT DISTINCT " + "  gdms_markers_onmap.marker_id" + " ,gdms_marker.marker_name" + " ,gdms_map.map_name"
+					+ " ,gdms_map.map_type" + " ,gdms_markers_onmap.start_position" + " ,gdms_markers_onmap.linkage_group"
+					+ " ,gdms_map.map_unit" + " FROM gdms_map" + "     INNER JOIN gdms_markers_onmap ON"
+					+ "         gdms_map.map_id = gdms_markers_onmap.map_id" + "     LEFT JOIN gdms_marker ON"
+					+ "         gdms_marker.marker_id = gdms_markers_onmap.marker_id" + " WHERE"
+					+ "     gdms_markers_onmap.marker_id IN (:markerIdList)" + "     AND gdms_markers_onmap.map_id = :mapId" + " ORDER BY"
+					+ "     gdms_map.map_name" + "     ,gdms_markers_onmap.linkage_group" + "     ,gdms_markers_onmap.start_position ASC";
 
 	@SuppressWarnings("rawtypes")
-	public List<MapDetailElement> getMapDetailsByName(String nameLike, int start, int numOfRows) throws MiddlewareQueryException {
+	public List<MapDetailElement> getMapDetailsByName(final String nameLike, final int start, final int numOfRows) {
 
-		nameLike = nameLike.toLowerCase();
-
-		SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_DETAILS_BY_NAME);
-		query.setString("nameLike", nameLike);
+		final SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_DETAILS_BY_NAME);
+		query.setString("nameLike", nameLike.toLowerCase());
 		query.setFirstResult(start);
 		query.setMaxResults(numOfRows);
 
-		List<MapDetailElement> maps = new ArrayList<MapDetailElement>();
+		final List<MapDetailElement> maps = new ArrayList<MapDetailElement>();
 
 		try {
 
-			List results = query.list();
+			final List results = query.list();
 
-			for (Object o : results) {
-				Object[] result = (Object[]) o;
+			for (final Object o : results) {
+				final Object[] result = (Object[]) o;
 				if (result != null) {
-					int markerCount = ((BigInteger) result[0]).intValue();
-					Double maxStartPosition = (Double) result[1];
-					String linkageGroup = (String) result[2];
-					String mapName = (String) result[3];
-					String mapType = (String) result[4];
-					String mapDesc = (String) result[5];
-					String mapUnit = (String) result[6];
+					final int markerCount = ((BigInteger) result[0]).intValue();
+					final Double maxStartPosition = (Double) result[1];
+					final String linkageGroup = (String) result[2];
+					final String mapName = (String) result[3];
+					final String mapType = (String) result[4];
+					final String mapDesc = (String) result[5];
+					final String mapUnit = (String) result[6];
 
-					MapDetailElement map =
+					final MapDetailElement map =
 							new MapDetailElement(markerCount, maxStartPosition, linkageGroup, mapName, mapType, mapDesc, mapUnit);
 					maps.add(map);
 				}
@@ -125,14 +130,14 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 
 			return maps;
 
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMapDetailsByName() query from Map: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMapDetailsByName() query from Map: " + e.getMessage(), e);
 		}
-		return maps;
 	}
 
-	public List<MapInfo> getMapInfoByMapAndChromosome(Integer mapId, String chromosome) throws MiddlewareQueryException {
-		SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_INFO_BY_MAP_AND_CHROMOSOME);
+	public List<MapInfo> getMapInfoByMapAndChromosome(final Integer mapId, final String chromosome) {
+		final SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_INFO_BY_MAP_AND_CHROMOSOME);
 		query.setInteger("mapId", mapId);
 		query.setString("chromosome", chromosome);
 
@@ -144,38 +149,38 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 		query.addScalar("linkage_group", new StringType());
 		query.addScalar("map_unit", new StringType());
 
-		List<MapInfo> mapInfoList = new ArrayList<MapInfo>();
+		final List<MapInfo> mapInfoList = new ArrayList<MapInfo>();
 
 		try {
-			@SuppressWarnings("rawtypes")
-			List results = query.list();
+			@SuppressWarnings("rawtypes") final List results = query.list();
 
-			for (Object o : results) {
-				Object[] result = (Object[]) o;
+			for (final Object o : results) {
+				final Object[] result = (Object[]) o;
 
 				if (result != null) {
-					Integer markerId = (Integer) result[0];
-					String markerName = (String) result[1];
-					String mapName = (String) result[2];
-					String mapType = (String) result[3];
-					Float startPosition = (Float) result[4];
-					String linkageGroup = (String) result[5];
-					String mapUnit = (String) result[6];
+					final Integer markerId = (Integer) result[0];
+					final String markerName = (String) result[1];
+					final String mapName = (String) result[2];
+					final String mapType = (String) result[3];
+					final Float startPosition = (Float) result[4];
+					final String linkageGroup = (String) result[5];
+					final String mapUnit = (String) result[6];
 
-					MapInfo mapInfo = new MapInfo(markerId, markerName, mapId, mapName, linkageGroup, startPosition, mapType, mapUnit);
+					final MapInfo mapInfo =
+							new MapInfo(markerId, markerName, mapId, mapName, linkageGroup, startPosition, mapType, mapUnit);
 					mapInfoList.add(mapInfo);
 				}
 			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMapInfoByMapAndChromosome() query: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMapInfoByMapAndChromosome() query: " + e.getMessage(), e);
 		}
 
 		return mapInfoList;
 	}
 
-	public List<MapInfo> getMapInfoByMapChromosomeAndPosition(Integer mapId, String chromosome, Float startPosition)
-			throws MiddlewareQueryException {
-		SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_INFO_BY_MAP_CHROMOSOME_AND_POSITION);
+	public List<MapInfo> getMapInfoByMapChromosomeAndPosition(final Integer mapId, final String chromosome, final Float startPosition) {
+		final SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_INFO_BY_MAP_CHROMOSOME_AND_POSITION);
 		query.setInteger("mapId", mapId);
 		query.setString("chromosome", chromosome);
 		query.setFloat("startPosition", startPosition);
@@ -187,36 +192,37 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 		query.addScalar("linkage_group", new StringType());
 		query.addScalar("map_unit", new StringType());
 
-		List<MapInfo> mapInfoList = new ArrayList<MapInfo>();
+		final List<MapInfo> mapInfoList = new ArrayList<MapInfo>();
 
 		try {
-			@SuppressWarnings("rawtypes")
-			List results = query.list();
+			@SuppressWarnings("rawtypes") final List results = query.list();
 
-			for (Object o : results) {
-				Object[] result = (Object[]) o;
+			for (final Object o : results) {
+				final Object[] result = (Object[]) o;
 
 				if (result != null) {
-					Integer markerId = (Integer) result[0];
-					String markerName = (String) result[1];
-					String mapName = (String) result[2];
-					String mapType = (String) result[3];
-					String linkageGroup = (String) result[4];
-					String mapUnit = (String) result[5];
+					final Integer markerId = (Integer) result[0];
+					final String markerName = (String) result[1];
+					final String mapName = (String) result[2];
+					final String mapType = (String) result[3];
+					final String linkageGroup = (String) result[4];
+					final String mapUnit = (String) result[5];
 
-					MapInfo mapInfo = new MapInfo(markerId, markerName, mapId, mapName, linkageGroup, startPosition, mapType, mapUnit);
+					final MapInfo mapInfo =
+							new MapInfo(markerId, markerName, mapId, mapName, linkageGroup, startPosition, mapType, mapUnit);
 					mapInfoList.add(mapInfo);
 				}
 			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMapInfoByMapChromosomeAndPosition() query: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMapInfoByMapChromosomeAndPosition() query: " + e.getMessage(), e);
 		}
 
 		return mapInfoList;
 	}
 
-	public List<MapInfo> getMapInfoByMarkersAndMap(List<Integer> markers, Integer mapId) throws MiddlewareQueryException {
-		SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_INFO_BY_MARKERS_AND_MAP);
+	public List<MapInfo> getMapInfoByMarkersAndMap(final List<Integer> markers, final Integer mapId) {
+		final SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_INFO_BY_MARKERS_AND_MAP);
 		query.setParameterList("markerIdList", markers);
 		query.setInteger("mapId", mapId);
 
@@ -228,200 +234,207 @@ public class MapDAO extends GenericDAO<Map, Integer> {
 		query.addScalar("linkage_group", new StringType());
 		query.addScalar("map_unit", new StringType());
 
-		List<MapInfo> mapInfoList = new ArrayList<MapInfo>();
+		final List<MapInfo> mapInfoList = new ArrayList<MapInfo>();
 
 		try {
-			@SuppressWarnings("rawtypes")
-			List results = query.list();
+			@SuppressWarnings("rawtypes") final List results = query.list();
 
-			for (Object o : results) {
-				Object[] result = (Object[]) o;
+			for (final Object o : results) {
+				final Object[] result = (Object[]) o;
 
 				if (result != null) {
-					Integer markerId = (Integer) result[0];
-					String markerName = (String) result[1];
-					String mapName = (String) result[2];
-					String mapType = (String) result[3];
-					Float startPosition = (Float) result[4];
-					String linkageGroup = (String) result[5];
-					String mapUnit = (String) result[6];
+					final Integer markerId = (Integer) result[0];
+					final String markerName = (String) result[1];
+					final String mapName = (String) result[2];
+					final String mapType = (String) result[3];
+					final Float startPosition = (Float) result[4];
+					final String linkageGroup = (String) result[5];
+					final String mapUnit = (String) result[6];
 
-					MapInfo mapInfo = new MapInfo(markerId, markerName, mapId, mapName, linkageGroup, startPosition, mapType, mapUnit);
+					final MapInfo mapInfo =
+							new MapInfo(markerId, markerName, mapId, mapName, linkageGroup, startPosition, mapType, mapUnit);
 					mapInfoList.add(mapInfo);
 				}
 			}
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMapInfoByMapAndChromosome() query: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMapInfoByMarkersAndMap() query: " + e.getMessage(), e);
 		}
 
 		return mapInfoList;
 	}
 
-	public Map getByName(String mapName) throws MiddlewareQueryException {
+	public Map getByName(final String mapName) {
 		Map map = null;
 
 		try {
-			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("mapName", mapName));
 			map = (Map) criteria.uniqueResult();
 
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByName query from Map: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getByName() query: " + e.getMessage(), e);
 		}
 
 		return map;
 	}
 
 	@Override
-	public Map getById(Integer mapId) throws MiddlewareQueryException {
+	public Map getById(final Integer mapId) {
 		Map map = null;
 
 		try {
-			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("mapId", mapId));
 			map = (Map) criteria.uniqueResult();
 
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getById query from Map: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getById() query: " + e.getMessage(), e);
 		}
 
 		return map;
 	}
 
-	public Long countMapDetailsByName(String nameLike) throws MiddlewareQueryException {
+	public Long countMapDetailsByName(final String nameLike) {
 
-		nameLike = nameLike.toLowerCase();
-
-		SQLQuery query = this.getSession().createSQLQuery(MapDAO.COUNT_MAP_DETAILS_BY_NAME);
-		query.setString("nameLike", nameLike);
+		final SQLQuery query = this.getSession().createSQLQuery(MapDAO.COUNT_MAP_DETAILS_BY_NAME);
+		query.setString("nameLike", nameLike.toLowerCase());
 
 		try {
-			BigInteger result = (BigInteger) query.uniqueResult();
+			final BigInteger result = (BigInteger) query.uniqueResult();
 			return result.longValue();
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countMapDetailsByName() query from Map: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with countMapDetailsByName() query: " + e.getMessage(), e);
 		}
-		return 0L;
+
 	}
 
 	@SuppressWarnings("rawtypes")
-	public List<MapDetailElement> getAllMapDetails(int start, int numOfRows) throws MiddlewareQueryException {
-		List<MapDetailElement> values = new ArrayList<MapDetailElement>();
+	public List<MapDetailElement> getAllMapDetails(final int start, final int numOfRows) {
+		final List<MapDetailElement> values = new ArrayList<MapDetailElement>();
 
 		try {
-			SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_DETAILS);
+			final SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_DETAILS);
 			query.setFirstResult(start);
 			query.setMaxResults(numOfRows);
-			List results = query.list();
+			final List results = query.list();
 
-			for (Object o : results) {
-				Object[] result = (Object[]) o;
+			for (final Object o : results) {
+				final Object[] result = (Object[]) o;
 				if (result != null) {
-					BigInteger markerCount = (BigInteger) result[0];
-					Double max = (Double) result[1];
-					String linkageGroup = (String) result[2];
-					String mapName2 = (String) result[3];
-					String mapType = (String) result[4];
-					String mapDesc = (String) result[5];
-					String mapUnit = (String) result[6];
+					final BigInteger markerCount = (BigInteger) result[0];
+					final Double max = (Double) result[1];
+					final String linkageGroup = (String) result[2];
+					final String mapName2 = (String) result[3];
+					final String mapType = (String) result[4];
+					final String mapDesc = (String) result[5];
+					final String mapUnit = (String) result[6];
 
-					MapDetailElement element =
+					final MapDetailElement element =
 							new MapDetailElement(markerCount.intValue(), max, linkageGroup, mapName2, mapType, mapDesc, mapUnit);
 					values.add(element);
 				}
 			}
 
 			return values;
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getAllMapDetails() query from Map & Mapping Data: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getAllMapDetails() query: " + e.getMessage(), e);
 		}
-		return values;
 	}
 
-	public long countAllMapDetails() throws MiddlewareQueryException {
+	public long countAllMapDetails() {
 		try {
-			SQLQuery query = this.getSession().createSQLQuery(MapDAO.COUNT_MAP_DETAILS);
-			BigInteger result = (BigInteger) query.uniqueResult();
+			final SQLQuery query = this.getSession().createSQLQuery(MapDAO.COUNT_MAP_DETAILS);
+			final BigInteger result = (BigInteger) query.uniqueResult();
 			if (result != null) {
 				return result.longValue();
 			}
 			return 0;
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with countAllMapDetails() query from Map & Mapping Data: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with countAllMapDetails() query: " + e.getMessage(), e);
 		}
-		return 0;
 	}
 
-	public Integer getMapIdByName(String mapName) throws MiddlewareQueryException {
+	public Integer getMapIdByName(final String mapName) {
 		try {
-			SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_ID_BY_NAME);
+
+			final SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_ID_BY_NAME);
 			query.setParameter("mapName", mapName);
 			return (Integer) query.uniqueResult();
 
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMapIdByName(" + mapName + ") in MapDAO: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMapIdByName(" + mapName + ") in MapDAO: " + e.getMessage(), e);
 		}
-		return null;
 	}
 
-	public String getMapNameById(Integer mapId) throws MiddlewareQueryException {
+	public String getMapNameById(final Integer mapId) {
 		try {
-			SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_NAME_BY_ID);
+			final SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_NAME_BY_ID);
 			query.setParameter("mapId", mapId);
 			return (String) query.addScalar("map_name", StringType.class.newInstance()).uniqueResult();
 
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMapNameById(" + mapId + ") in MapDAO: " + e.getMessage(), e);
-		} catch (Exception e) {
-			this.logAndThrowException("Error with getMapNameById(" + mapId + ") in MapDAO: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMapNameById(" + mapId + ") in MapDAO: " + e.getMessage(), e);
+		} catch (final Exception e) {
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMapNameById(" + mapId + ") in MapDAO: " + e.getMessage(), e);
 		}
-		return null;
 	}
 
 	@SuppressWarnings("rawtypes")
-	public List<MapDetailElement> getMapAndMarkerCountByMarkers(List<Integer> markerIds) throws MiddlewareQueryException {
-		List<MapDetailElement> details = new ArrayList<MapDetailElement>();
+	public List<MapDetailElement> getMapAndMarkerCountByMarkers(final List<Integer> markerIds) {
+		final List<MapDetailElement> details = new ArrayList<MapDetailElement>();
 		try {
-			SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_AND_MARKER_COUNT_BY_MARKERS);
+			final SQLQuery query = this.getSession().createSQLQuery(MapDAO.GET_MAP_AND_MARKER_COUNT_BY_MARKERS);
 			query.setParameterList("markerIds", markerIds);
-			List results = query.list();
-			for (Object o : results) {
-				Object[] result = (Object[]) o;
+			final List results = query.list();
+			for (final Object o : results) {
+				final Object[] result = (Object[]) o;
 				details.add(new MapDetailElement(((BigInteger) result[1]).intValue(), null, null, result[0].toString(), null, null, null));
 			}
 
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getMapAndMarkerCountByMarkers(" + markerIds + ") in MapDAO: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getMapAndMarkerCountByMarkers(" + markerIds + ") in MapDAO: " + e.getMessage(),
+					e);
 		}
 		return details;
 	}
 
-	public void deleteByMapId(int mapId) throws MiddlewareQueryException {
+	public void deleteByMapId(final int mapId) {
 		try {
 			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 			// statement
 			this.getSession().flush();
-			
-			SQLQuery statement = this.getSession().createSQLQuery("DELETE FROM gdms_map WHERE map_id = " + mapId);
+
+			final SQLQuery statement = this.getSession().createSQLQuery("DELETE FROM gdms_map WHERE map_id = " + mapId);
 			statement.executeUpdate();
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error in deleteByMapId=" + mapId + " in MapDAO: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in deleteByMapId=" + mapId + " in MapDAO: " + e.getMessage(), e);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Map> getMapsByIds(List<Integer> mapIds) throws MiddlewareQueryException {
+	public List<Map> getMapsByIds(final List<Integer> mapIds) {
 		try {
-			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.in("mapId", mapIds));
 
 			return criteria.list();
 
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error in getMapsByIds=" + mapIds + " in MapDAO: " + e.getMessage(), e);
+		} catch (final HibernateException e) {
+			MapDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in getMapsByIds=" + mapIds + " in MapDAO: " + e.getMessage(), e);
 		}
-		return new ArrayList<Map>();
 
 	}
 
