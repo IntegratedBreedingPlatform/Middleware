@@ -45,7 +45,7 @@ public class StudyMeasurementsTest {
 		this.testTraits = Arrays.asList(new MeasurementVariableDto(1, "Trait1"), new MeasurementVariableDto(2, "Trait2"));
 		this.germplasmDescriptors = Lists.newArrayList("STOCK_ID");
 		this.testRows = new Object[] {1, "TRIAL_INSTACE", "ENTRY_TYPE", 20000, "DESIGNATION", "ENTRY_NO", "SEED_SOURCE", "REPITION_NUMBER",
-			"PLOT_NUMBER", "BLOCK_NO", "ROW", "COL", "", "", "PlotID-ABC123", "SUM OF SAMPLES", "Trait1Value", 1000, "Trait2Value", 2000,
+			"PLOT_NUMBER", "BLOCK_NO", "ROW", "COL", "", "", "PlotID-ABC123", "SUM_OF_SAMPLES", "Trait1Value", 1000, "Trait2Value", 2000,
 			"Stock_Id_Value"};
 		this.sampleMeasurements = Arrays.<Object[]>asList(this.testRows);
 		Mockito.when(this.mockSqlQuery.list()).thenReturn(this.sampleMeasurements);
