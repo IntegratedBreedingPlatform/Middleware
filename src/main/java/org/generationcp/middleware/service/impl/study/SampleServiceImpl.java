@@ -87,11 +87,11 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	private String getSampleBusinessKey(final String cropPrefix) {
-		String sampleBussinesKey = cropPrefix;
-		sampleBussinesKey = sampleBussinesKey + SampleServiceImpl.S;
-		sampleBussinesKey = sampleBussinesKey + RandomStringUtils.randomAlphanumeric(8);
+		String sampleBusinessKey = cropPrefix;
+		sampleBusinessKey = sampleBusinessKey + SampleServiceImpl.S;
+		sampleBusinessKey = sampleBusinessKey + RandomStringUtils.randomAlphanumeric(8);
 
-		return sampleBussinesKey;
+		return sampleBusinessKey;
 	}
 
 	@Override
