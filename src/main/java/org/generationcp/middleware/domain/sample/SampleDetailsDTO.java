@@ -6,39 +6,40 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class SampleDetailsDTO implements Serializable {
 
-	private static final long serialVersionUID = 2340381705850740790L;
+	private static final long serialVersionUID = -4175016670661637734L;
 
 	private Integer studyDbId;
 	private Integer locationDbId;
 	private String plotId;
-	private String plantId;
-	private String sampleId;
+	private String plantBusinessKey;
+	private String SampleBusinessKey;
 	private String takenBy;
-	private String sampleDate;
+	private Date sampleDate;
 	private String sampleType;
 	private String tissueType;
 	private String notes;
 	private String studyName;
 	private String season;
 	private String locationName;
-	private Integer entryNumber;
-	private Integer plotNumber;
-	private Integer germplasmDbId;
-	private String plantingDate;
+	private Integer entryNo;
+	private Integer plotNo;
+	private Integer Gid;
+	private String seedingDate;
 	private String harvestDate;
 
-	public SampleDetailsDTO(){
+	public SampleDetailsDTO() {
 
 	}
 
-	public SampleDetailsDTO(final Integer studyDbId, final String plotId, final String plantId, final String sampleId) {
-		this.studyDbId = studyDbId;
-		this.plotId = plotId;
-		this.plantId = plantId;
-		this.sampleId = sampleId;
+	public SampleDetailsDTO(final Integer studyDbId, final String plotId, final String plantBusinessKey, final String SampleBusinessKey) {
+		this.setStudyDbId(studyDbId);
+		this.setPlotId(plotId);
+		this.setPlantBusinessKey(plantBusinessKey);
+		this.setSampleBusinessKey(SampleBusinessKey);
 	}
 
 	public Integer getStudyDbId() {
@@ -65,20 +66,20 @@ public class SampleDetailsDTO implements Serializable {
 		this.plotId = plotId;
 	}
 
-	public String getPlantId() {
-		return plantId;
+	public String getPlantBusinessKey() {
+		return plantBusinessKey;
 	}
 
-	public void setPlantId(String plantId) {
-		this.plantId = plantId;
+	public void setPlantBusinessKey(String plantBusinessKey) {
+		this.plantBusinessKey = plantBusinessKey;
 	}
 
-	public String getSampleId() {
-		return sampleId;
+	public String getSampleBusinessKey() {
+		return SampleBusinessKey;
 	}
 
-	public void setSampleId(String sampleId) {
-		this.sampleId = sampleId;
+	public void setSampleBusinessKey(String sampleBusinessKey) {
+		this.SampleBusinessKey = sampleBusinessKey;
 	}
 
 	public String getTakenBy() {
@@ -89,11 +90,11 @@ public class SampleDetailsDTO implements Serializable {
 		this.takenBy = takenBy;
 	}
 
-	public String getSampleDate() {
+	public Date getSampleDate() {
 		return sampleDate;
 	}
 
-	public void setSampleDate(String sampleDate) {
+	public void setSampleDate(Date sampleDate) {
 		this.sampleDate = sampleDate;
 	}
 
@@ -145,36 +146,36 @@ public class SampleDetailsDTO implements Serializable {
 		this.locationName = locationName;
 	}
 
-	public Integer getEntryNumber() {
-		return entryNumber;
+	public Integer getEntryNo() {
+		return entryNo;
 	}
 
-	public void setEntryNumber(Integer entryNumber) {
-		this.entryNumber = entryNumber;
+	public void setEntryNo(Integer entryNo) {
+		this.entryNo = entryNo;
 	}
 
-	public Integer getPlotNumber() {
-		return plotNumber;
+	public Integer getPlotNo() {
+		return plotNo;
 	}
 
-	public void setPlotNumber(Integer plotNumber) {
-		this.plotNumber = plotNumber;
+	public void setPlotNo(Integer plotNo) {
+		this.plotNo = plotNo;
 	}
 
-	public Integer getGermplasmDbId() {
-		return germplasmDbId;
+	public Integer getGid() {
+		return Gid;
 	}
 
-	public void setGermplasmDbId(Integer germplasmDbId) {
-		this.germplasmDbId = germplasmDbId;
+	public void setGid(Integer gid) {
+		this.Gid = gid;
 	}
 
-	public String getPlantingDate() {
-		return plantingDate;
+	public String getSeedingDate() {
+		return seedingDate;
 	}
 
-	public void setPlantingDate(String plantingDate) {
-		this.plantingDate = plantingDate;
+	public void setSeedingDate(String seedingDate) {
+		this.seedingDate = seedingDate;
 	}
 
 	public String getHarvestDate() {
@@ -191,24 +192,16 @@ public class SampleDetailsDTO implements Serializable {
 			return false;
 		}
 		final SampleDetailsDTO sampleDetailsDto = (SampleDetailsDTO) other;
-		return new EqualsBuilder()
-			.append(this.studyDbId, sampleDetailsDto.studyDbId)
-			.append(this.locationDbId, sampleDetailsDto.locationDbId)
-			.append(this.plotId, sampleDetailsDto.plotId)
-			.append(this.plantId, sampleDetailsDto.plantId)
-			.append(this.sampleId, sampleDetailsDto.sampleId)
-			.append(this.germplasmDbId, sampleDetailsDto.germplasmDbId).isEquals();
+		return new EqualsBuilder().append(this.studyDbId, sampleDetailsDto.studyDbId)
+			.append(this.locationDbId, sampleDetailsDto.locationDbId).append(this.plotId, sampleDetailsDto.plotId)
+			.append(this.plantBusinessKey, sampleDetailsDto.plantBusinessKey)
+			.append(this.SampleBusinessKey, sampleDetailsDto.SampleBusinessKey).append(this.Gid, sampleDetailsDto.Gid).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder()
-			.append(this.studyDbId)
-			.append(this.locationDbId)
-			.append(this.plotId)
-			.append(this.plantId)
-			.append(this.sampleId)
-			.append(this.germplasmDbId).hashCode();
+		return new HashCodeBuilder().append(this.studyDbId).append(this.locationDbId).append(this.plotId).append(this.plantBusinessKey)
+			.append(this.SampleBusinessKey).append(this.Gid).hashCode();
 	}
 
 	@Override
