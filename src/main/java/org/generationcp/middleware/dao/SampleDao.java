@@ -75,4 +75,10 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		}
 		return samplesMap;
 	}
+
+	@SuppressWarnings("unchecked")
+	public Sample getBySampleBk(final String sampleBk) {
+		return (Sample) this.getSession().createCriteria(Sample.class, "sample")
+			.add(Restrictions.eq("sampleBusinessKey", sampleBk)).uniqueResult();
+	}
 }

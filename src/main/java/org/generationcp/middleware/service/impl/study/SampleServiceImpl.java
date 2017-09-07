@@ -1,11 +1,14 @@
 package org.generationcp.middleware.service.impl.study;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.PlantDao;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
@@ -13,6 +16,9 @@ import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
+import org.generationcp.middleware.pojos.dms.GeolocationProperty;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 @Transactional
@@ -67,7 +74,8 @@ public class SampleServiceImpl implements SampleService {
 
 		sample.setPlant(this.plantService.buildPlant(localCropPrefix, plantNumber, experimentId));
 		sample.setTakenBy(takenBy);
-		sample.setSampleName(sampleName);// Preferred name GID
+		// Preferred name GID
+		sample.setSampleName(sampleName);
 		sample.setCreatedDate(new Date());
 		sample.setSamplingDate(samplingDate);
 		sample.setSampleBusinessKey(this.getSampleBusinessKey(cropPrefix));
@@ -87,9 +95,9 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public List<SampleDTO> getSamples(final String plot_id) {
+	public List<SampleDTO> getSamples(final String plotId) {
 		final List<SampleDTO> listSampleDto = new ArrayList<>();
-		final List<Sample> samples = this.sampleDao.getByPlotId(plot_id);
+		final List<Sample> samples = this.sampleDao.getByPlotId(plotId);
 		for (Sample sample : samples) {
 			SampleDTO dto = new SampleDTO();
 			dto.setSampleName(sample.getSampleName());
@@ -109,4 +117,78 @@ public class SampleServiceImpl implements SampleService {
 		return listSampleDto;
 	}
 
+	public SampleDetailsDTO getSample(final String sampleId) {
+		final SampleDetailsDTO samplesDetailsDto;
+		final Sample sample = this.sampleDao.getBySampleBk(sampleId);
+		if (sample != null) {
+			final Integer studyId =
+				sample.getPlant().getExperiment().getExperimentStocks().get(0).getExperiment().getProject().getRelatedTos().get(0)
+					.getObjectProject().getProjectId();
+			final String plotId = sample.getPlant().getExperiment().getPlotId();
+			final String samplingDate = sample.getSamplingDate() != null ? sample.getSamplingDate().toString() : null;
+			final String studyName =
+				sample.getPlant().getExperiment().getExperimentStocks().get(0).getExperiment().getProject().getRelatedTos().get(0)
+					.getObjectProject().getName();
+			final String plotNo = sample.getPlant().getExperiment().getExperimentStocks().get(0).getStock().getUniqueName();
+			final Integer gid = sample.getPlant().getExperiment().getExperimentStocks().get(0).getStock().getDbxrefId();
+
+			samplesDetailsDto =
+				new SampleDetailsDTO(studyId, plotId, sample.getPlant().getPlantBusinessKey(), sample.getSampleBusinessKey());
+
+			samplesDetailsDto.setTakenBy(sample.getTakenBy().getName());
+			samplesDetailsDto.setSampleDate(samplingDate);
+			samplesDetailsDto.setStudyName(studyName);
+			samplesDetailsDto.setEntryNumber(Integer.valueOf(plotNo));
+			samplesDetailsDto.setGermplasmDbId(gid);
+
+			getPlotNoByExperimentProperty(sample.getPlant().getExperiment().getProperties(), samplesDetailsDto);
+			getSeedingDateByProjectProperties(
+				sample.getPlant().getExperiment().getProject().getRelatedTos().get(0).getObjectProject().getProperties(),
+				samplesDetailsDto);
+			getLocationByGeoLocationProperties(sample.getPlant().getExperiment().getGeoLocation().getProperties(), samplesDetailsDto);
+
+		} else {
+			samplesDetailsDto = new SampleDetailsDTO();
+		}
+		return samplesDetailsDto;
+	}
+
+	private void getLocationByGeoLocationProperties(final List<GeolocationProperty> geolocationProperties,
+		final SampleDetailsDTO samplesDetailsDto) {
+		for (GeolocationProperty properties:geolocationProperties) {
+			if (properties.getTypeId().equals(TermId.TRIAL_LOCATION.getId()) && StringUtils.isNotBlank(properties.getValue())) {
+				samplesDetailsDto.setLocationName(properties.getValue());
+			} else if (properties.getTypeId().equals(TermId.LOCATION_ID.getId()) && StringUtils.isNotBlank(properties.getValue())) {
+				samplesDetailsDto.setLocationDbId(Integer.valueOf(properties.getValue()));
+			}
+		}
+	}
+
+	private void getSeedingDateByProjectProperties(final List<ProjectProperty> projectProperties,
+		final SampleDetailsDTO samplesDetailsDto) {
+		boolean foundPlantingDate = false;
+		Iterator<ProjectProperty> projectPropertyIterator = projectProperties.iterator();
+		while (projectPropertyIterator.hasNext() && !foundPlantingDate) {
+			ProjectProperty projectProperty = projectPropertyIterator.next();
+			//SEEDING_DATE
+			if (projectProperty.getTypeId().equals(8383) && StringUtils.isNotBlank(projectProperty.getValue())) {
+				final String plantingDate = projectProperty.getValue();
+				samplesDetailsDto.setPlantingDate(plantingDate);
+				foundPlantingDate = true;
+			}
+		}
+	}
+
+	private void getPlotNoByExperimentProperty(final List<ExperimentProperty> experimentProperty, final SampleDetailsDTO sampleDetailsDTO) {
+		boolean foundPlotNumber = false;
+		Iterator<ExperimentProperty> experimentPropertyIterator = experimentProperty.iterator();
+		while (experimentPropertyIterator.hasNext() && !foundPlotNumber) {
+			ExperimentProperty properties = experimentPropertyIterator.next();
+			if (properties.getTypeId().equals(TermId.PLOT_NO.getId())) {
+				final Integer plotNumber = Integer.valueOf(properties.getValue());
+				sampleDetailsDTO.setPlotNumber(plotNumber);
+				foundPlotNumber = true;
+			}
+		}
+	}
 }
