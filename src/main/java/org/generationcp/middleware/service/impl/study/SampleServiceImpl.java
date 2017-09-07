@@ -117,7 +117,7 @@ public class SampleServiceImpl implements SampleService {
 		return listSampleDto;
 	}
 
-	public SampleDetailsDTO getSample(final String sampleId) {
+	public SampleDetailsDTO getSampleObservation(final String sampleId) {
 		final SampleDetailsDTO samplesDetailsDto;
 		final Sample sample = this.sampleDao.getBySampleBk(sampleId);
 		if (sample != null) {
@@ -125,21 +125,20 @@ public class SampleServiceImpl implements SampleService {
 				sample.getPlant().getExperiment().getExperimentStocks().get(0).getExperiment().getProject().getRelatedTos().get(0)
 					.getObjectProject().getProjectId();
 			final String plotId = sample.getPlant().getExperiment().getPlotId();
-			final String samplingDate = sample.getSamplingDate() != null ? sample.getSamplingDate().toString() : null;
 			final String studyName =
 				sample.getPlant().getExperiment().getExperimentStocks().get(0).getExperiment().getProject().getRelatedTos().get(0)
 					.getObjectProject().getName();
-			final String plotNo = sample.getPlant().getExperiment().getExperimentStocks().get(0).getStock().getUniqueName();
+			final String entryNo = sample.getPlant().getExperiment().getExperimentStocks().get(0).getStock().getUniqueName();
 			final Integer gid = sample.getPlant().getExperiment().getExperimentStocks().get(0).getStock().getDbxrefId();
 
 			samplesDetailsDto =
 				new SampleDetailsDTO(studyId, plotId, sample.getPlant().getPlantBusinessKey(), sample.getSampleBusinessKey());
 
 			samplesDetailsDto.setTakenBy(sample.getTakenBy().getName());
-			samplesDetailsDto.setSampleDate(samplingDate);
+			samplesDetailsDto.setSampleDate(sample.getSamplingDate());
 			samplesDetailsDto.setStudyName(studyName);
-			samplesDetailsDto.setEntryNumber(Integer.valueOf(plotNo));
-			samplesDetailsDto.setGermplasmDbId(gid);
+			samplesDetailsDto.setEntryNo(Integer.valueOf(entryNo));
+			samplesDetailsDto.setGid(gid);
 
 			getPlotNoByExperimentProperty(sample.getPlant().getExperiment().getProperties(), samplesDetailsDto);
 			getSeedingDateByProjectProperties(
@@ -173,7 +172,7 @@ public class SampleServiceImpl implements SampleService {
 			//SEEDING_DATE
 			if (projectProperty.getTypeId().equals(8383) && StringUtils.isNotBlank(projectProperty.getValue())) {
 				final String plantingDate = projectProperty.getValue();
-				samplesDetailsDto.setPlantingDate(plantingDate);
+				samplesDetailsDto.setSeedingDate(plantingDate);
 				foundPlantingDate = true;
 			}
 		}
@@ -186,7 +185,7 @@ public class SampleServiceImpl implements SampleService {
 			ExperimentProperty properties = experimentPropertyIterator.next();
 			if (properties.getTypeId().equals(TermId.PLOT_NO.getId())) {
 				final Integer plotNumber = Integer.valueOf(properties.getValue());
-				sampleDetailsDTO.setPlotNumber(plotNumber);
+				sampleDetailsDTO.setPlotNo(plotNumber);
 				foundPlotNumber = true;
 			}
 		}

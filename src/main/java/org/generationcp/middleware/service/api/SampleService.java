@@ -17,5 +17,5 @@ public interface SampleService {
 
 	List<SampleDTO> getSamples(String plot_id);
 
-	SampleDetailsDTO getSample(String sampleId);
+	SampleDetailsDTO getSampleObservation(String sampleId);
 }
