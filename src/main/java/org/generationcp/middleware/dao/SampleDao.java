@@ -16,7 +16,7 @@ import java.util.Map;
 
 public class SampleDao extends GenericDAO<Sample, Integer> {
 
-	protected final static String SQL_SAMPLES_AND_EXPERIMENTS =
+	protected static final String SQL_SAMPLES_AND_EXPERIMENTS =
 		"SELECT  nde.nd_experiment_id, (SELECT COALESCE(NULLIF(COUNT(sp.sample_id), 0), '-')\n FROM plant pl INNER JOIN\n"
 			+ "            						sample AS sp ON pl.plant_id = sp.sample_id\n" + "        WHERE\n"
 			+ "            						nde.nd_experiment_id = pl.nd_experiment_id) 'SAMPLES'"
