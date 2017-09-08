@@ -81,7 +81,7 @@ public class StudyMeasurements {
 		this.addScalar(createSQLQuery);
 		createSQLQuery.addScalar("FIELDMAP COLUMN");
 		createSQLQuery.addScalar("FIELDMAP RANGE");
-		createSQLQuery.addScalar("SAMPLES");
+		createSQLQuery.addScalar("SUM_OF_SAMPLES");
 
 		this.addScalarForTraits(selectionMethodsAndTraits, createSQLQuery);
 

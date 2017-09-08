@@ -617,12 +617,12 @@ public class WorkbookBuilder extends Builder {
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 
 		measurementVariable.setTermId(TermId.SAMPLES.getId());
-		measurementVariable.setName("SAMPLES");
+		measurementVariable.setName(String.valueOf(TermId.SAMPLES.getId()));
 		measurementVariable.setLabel(measurementVariable.getName());
 		measurementVariable.setFactor(true);
 		measurementVariable.setDataTypeId(1120);
 		final String sampleValue = samplesMap.get(experimentId);
-		return new MeasurementData(measurementVariable.getName(), sampleValue, false, "C", measurementVariable);
+		return new MeasurementData(String.valueOf(TermId.SAMPLES.getId()), sampleValue, false, "C", measurementVariable);
 
 	}
 
