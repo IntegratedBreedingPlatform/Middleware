@@ -144,7 +144,7 @@ public class SampleServiceImpl implements SampleService {
 		samplesDetailsDto.setGid(gid);
 
 		getPlotNoByExperimentProperty(sample.getPlant().getExperiment().getProperties(), samplesDetailsDto);
-		getSeedingDateByProjectProperties(
+		getProjectProperties(
 			sample.getPlant().getExperiment().getProject().getRelatedTos().get(0).getObjectProject().getProperties(), samplesDetailsDto);
 		getLocationByGeoLocationProperties(sample.getPlant().getExperiment().getGeoLocation().getProperties(), samplesDetailsDto);
 
@@ -162,17 +162,19 @@ public class SampleServiceImpl implements SampleService {
 		}
 	}
 
-	private void getSeedingDateByProjectProperties(final List<ProjectProperty> projectProperties,
+	private void getProjectProperties(final List<ProjectProperty> projectProperties,
 		final SampleDetailsDTO samplesDetailsDto) {
-		boolean foundPlantingDate = false;
-		Iterator<ProjectProperty> projectPropertyIterator = projectProperties.iterator();
-		while (projectPropertyIterator.hasNext() && !foundPlantingDate) {
-			ProjectProperty projectProperty = projectPropertyIterator.next();
+
+		for (ProjectProperty projectProperty : projectProperties) {
 			//SEEDING_DATE
 			if (projectProperty.getTypeId().equals(8383) && StringUtils.isNotBlank(projectProperty.getValue())) {
 				final String plantingDate = projectProperty.getValue();
 				samplesDetailsDto.setSeedingDate(plantingDate);
-				foundPlantingDate = true;
+			}
+			//CROP SEASON
+			if (projectProperty.getTypeId().equals(8370) && StringUtils.isNotBlank(projectProperty.getValue())) {
+				final String season = projectProperty.getValue();
+				samplesDetailsDto.setSeason(season);
 			}
 		}
 	}
