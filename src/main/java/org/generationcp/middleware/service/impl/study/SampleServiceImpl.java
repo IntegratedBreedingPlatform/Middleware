@@ -120,35 +120,34 @@ public class SampleServiceImpl implements SampleService {
 	public SampleDetailsDTO getSampleObservation(final String sampleId) {
 		final SampleDetailsDTO samplesDetailsDto;
 		final Sample sample = this.sampleDao.getBySampleBk(sampleId);
-		if (sample != null) {
-			final Integer studyId =
-				sample.getPlant().getExperiment().getExperimentStocks().get(0).getExperiment().getProject().getRelatedTos().get(0)
-					.getObjectProject().getProjectId();
-			final String plotId = sample.getPlant().getExperiment().getPlotId();
-			final String studyName =
-				sample.getPlant().getExperiment().getExperimentStocks().get(0).getExperiment().getProject().getRelatedTos().get(0)
-					.getObjectProject().getName();
-			final String entryNo = sample.getPlant().getExperiment().getExperimentStocks().get(0).getStock().getUniqueName();
-			final Integer gid = sample.getPlant().getExperiment().getExperimentStocks().get(0).getStock().getDbxrefId();
 
-			samplesDetailsDto =
-				new SampleDetailsDTO(studyId, plotId, sample.getPlant().getPlantBusinessKey(), sample.getSampleBusinessKey());
-
-			samplesDetailsDto.setTakenBy(sample.getTakenBy().getName());
-			samplesDetailsDto.setSampleDate(sample.getSamplingDate());
-			samplesDetailsDto.setStudyName(studyName);
-			samplesDetailsDto.setEntryNo(Integer.valueOf(entryNo));
-			samplesDetailsDto.setGid(gid);
-
-			getPlotNoByExperimentProperty(sample.getPlant().getExperiment().getProperties(), samplesDetailsDto);
-			getSeedingDateByProjectProperties(
-				sample.getPlant().getExperiment().getProject().getRelatedTos().get(0).getObjectProject().getProperties(),
-				samplesDetailsDto);
-			getLocationByGeoLocationProperties(sample.getPlant().getExperiment().getGeoLocation().getProperties(), samplesDetailsDto);
-
-		} else {
-			samplesDetailsDto = new SampleDetailsDTO();
+		if (sample == null) {
+			return new SampleDetailsDTO();
 		}
+
+		final Integer studyId =
+			sample.getPlant().getExperiment().getExperimentStocks().get(0).getExperiment().getProject().getRelatedTos().get(0)
+				.getObjectProject().getProjectId();
+		final String takenBy = sample.getTakenBy() != null ? sample.getTakenBy().getPerson().getDisplayName() : null;
+		final String plotId = sample.getPlant().getExperiment().getPlotId();
+		final String studyName =
+			sample.getPlant().getExperiment().getExperimentStocks().get(0).getExperiment().getProject().getRelatedTos().get(0)
+				.getObjectProject().getName();
+		final String entryNo = sample.getPlant().getExperiment().getExperimentStocks().get(0).getStock().getUniqueName();
+		final Integer gid = sample.getPlant().getExperiment().getExperimentStocks().get(0).getStock().getDbxrefId();
+
+		samplesDetailsDto = new SampleDetailsDTO(studyId, plotId, sample.getPlant().getPlantBusinessKey(), sample.getSampleBusinessKey());
+		samplesDetailsDto.setTakenBy(takenBy);
+		samplesDetailsDto.setSampleDate(sample.getSamplingDate());
+		samplesDetailsDto.setStudyName(studyName);
+		samplesDetailsDto.setEntryNo(Integer.valueOf(entryNo));
+		samplesDetailsDto.setGid(gid);
+
+		getPlotNoByExperimentProperty(sample.getPlant().getExperiment().getProperties(), samplesDetailsDto);
+		getSeedingDateByProjectProperties(
+			sample.getPlant().getExperiment().getProject().getRelatedTos().get(0).getObjectProject().getProperties(), samplesDetailsDto);
+		getLocationByGeoLocationProperties(sample.getPlant().getExperiment().getGeoLocation().getProperties(), samplesDetailsDto);
+
 		return samplesDetailsDto;
 	}
 
