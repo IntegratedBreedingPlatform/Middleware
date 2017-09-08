@@ -16,9 +16,12 @@ import org.generationcp.middleware.pojos.Plant;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.User;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,16 +128,16 @@ public class SampleServiceImpl implements SampleService {
 			return new SampleDetailsDTO();
 		}
 
-		final Integer studyId =
-			sample.getPlant().getExperiment().getExperimentStocks().get(0).getExperiment().getProject().getRelatedTos().get(0)
-				.getObjectProject().getProjectId();
+		final ExperimentModel experiment = sample.getPlant().getExperiment();
+		final DmsProject objectProject =
+			experiment.getExperimentStocks().get(0).getExperiment().getProject().getRelatedTos().get(0).getObjectProject();
+		final Integer studyId = objectProject.getProjectId();
 		final String takenBy = sample.getTakenBy() != null ? sample.getTakenBy().getPerson().getDisplayName() : null;
-		final String plotId = sample.getPlant().getExperiment().getPlotId();
-		final String studyName =
-			sample.getPlant().getExperiment().getExperimentStocks().get(0).getExperiment().getProject().getRelatedTos().get(0)
-				.getObjectProject().getName();
-		final String entryNo = sample.getPlant().getExperiment().getExperimentStocks().get(0).getStock().getUniqueName();
-		final Integer gid = sample.getPlant().getExperiment().getExperimentStocks().get(0).getStock().getDbxrefId();
+		final String plotId = experiment.getPlotId();
+		final String studyName = objectProject.getName();
+		final StockModel stock = experiment.getExperimentStocks().get(0).getStock();
+		final String entryNo = stock.getUniqueName();
+		final Integer gid = stock.getDbxrefId();
 
 		samplesDetailsDto = new SampleDetailsDTO(studyId, plotId, sample.getPlant().getPlantBusinessKey(), sample.getSampleBusinessKey());
 		samplesDetailsDto.setTakenBy(takenBy);
@@ -143,15 +146,15 @@ public class SampleServiceImpl implements SampleService {
 		samplesDetailsDto.setEntryNo(Integer.valueOf(entryNo));
 		samplesDetailsDto.setGid(gid);
 
-		getPlotNoByExperimentProperty(sample.getPlant().getExperiment().getProperties(), samplesDetailsDto);
-		getProjectProperties(
+		fillPlotNoByExperimentProperty(sample.getPlant().getExperiment().getProperties(), samplesDetailsDto);
+		fillProjectProperties(
 			sample.getPlant().getExperiment().getProject().getRelatedTos().get(0).getObjectProject().getProperties(), samplesDetailsDto);
-		getLocationByGeoLocationProperties(sample.getPlant().getExperiment().getGeoLocation().getProperties(), samplesDetailsDto);
+		fillLocationByGeoLocationProperties(sample.getPlant().getExperiment().getGeoLocation().getProperties(), samplesDetailsDto);
 
 		return samplesDetailsDto;
 	}
 
-	private void getLocationByGeoLocationProperties(final List<GeolocationProperty> geolocationProperties,
+	private void fillLocationByGeoLocationProperties(final List<GeolocationProperty> geolocationProperties,
 		final SampleDetailsDTO samplesDetailsDto) {
 		for (GeolocationProperty properties:geolocationProperties) {
 			if (properties.getTypeId().equals(TermId.TRIAL_LOCATION.getId()) && StringUtils.isNotBlank(properties.getValue())) {
@@ -162,7 +165,7 @@ public class SampleServiceImpl implements SampleService {
 		}
 	}
 
-	private void getProjectProperties(final List<ProjectProperty> projectProperties,
+	private void fillProjectProperties(final List<ProjectProperty> projectProperties,
 		final SampleDetailsDTO samplesDetailsDto) {
 
 		for (ProjectProperty projectProperty : projectProperties) {
@@ -179,7 +182,7 @@ public class SampleServiceImpl implements SampleService {
 		}
 	}
 
-	private void getPlotNoByExperimentProperty(final List<ExperimentProperty> experimentProperty, final SampleDetailsDTO sampleDetailsDTO) {
+	private void fillPlotNoByExperimentProperty(final List<ExperimentProperty> experimentProperty, final SampleDetailsDTO sampleDetailsDTO) {
 		boolean foundPlotNumber = false;
 		Iterator<ExperimentProperty> experimentPropertyIterator = experimentProperty.iterator();
 		while (experimentPropertyIterator.hasNext() && !foundPlotNumber) {
