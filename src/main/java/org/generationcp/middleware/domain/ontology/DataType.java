@@ -10,7 +10,6 @@ public enum DataType {
 	NUMERIC_VARIABLE(1110, "Numeric", false, "N"),
 	DATE_TIME_VARIABLE(1117, "Date", false, "D"),
 	CHARACTER_VARIABLE(1120, "Character", false, "T"),
-    NUMERIC_DBID_VARIABLE(1118, "Numeric DBID", false, "N"),
 
 	//Special Data types
 	PERSON(1131, "Person", true, "C"),
@@ -18,7 +17,9 @@ public enum DataType {
 	STUDY(1133, "Study", true, "C"),
 	DATASET(1134, "Dataset", true, "C"),
 	GERMPLASM_LIST(1135, "Germplasm List", true, "C"),
-	BREEDING_METHOD(1136, "Breeding Method", true, "C");
+	BREEDING_METHOD(1136, "Breeding Method", true, "C"),
+	// Added for migrating v3 data which use this id
+	NUMERIC_DBID_VARIABLE(1118, "Numeric DBID", true, "N");
 
 	private static final Map<Integer, DataType> byId = new HashMap<>();
 	private static final Map<String, DataType> byName = new HashMap<>();
