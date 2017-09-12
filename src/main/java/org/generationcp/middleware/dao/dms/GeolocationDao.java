@@ -43,6 +43,14 @@ import org.hibernate.type.IntegerType;
  */
 public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 
+	private static final String LOCATION_ID = "locationId";
+	private static final String PROJECT_ID = "project_id";
+	private static final String ISOABBR = "isoabbr";
+	private static final String PROVINCE_NAME = "provinceName";
+	private static final String LOCATION_NAME = "locationName";
+	private static final String ENVT_ID = "envtId";
+	private static final String DESCRIPTION = "description";
+	private static final String AT_GEOLOCATION_DAO = " at GeolocationDao: ";
 	private static final String GET_ALL_ENVIRONMENTS_QUERY =
 			"SELECT DISTINCT gp.nd_geolocation_id as envtId, l.lname AS locationName, prov.lname AS provinceName, "
 					+ "       c.isoabbr, p.project_id, p.name, gp.value AS locationId, p.description AS description "
@@ -73,14 +81,14 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			return (Geolocation) query.uniqueResult();
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getParentGeolocation=" + projectId + " at GeolocationDao: " + e.getMessage(), e);
+			this.logAndThrowException("Error at getParentGeolocation=" + projectId + AT_GEOLOCATION_DAO + e.getMessage(), e);
 		}
 		return null;
 	}
 
 	@SuppressWarnings("unchecked")
 	public Set<Geolocation> findInDataSet(int datasetId) throws MiddlewareQueryException {
-		Set<Geolocation> locations = new LinkedHashSet<Geolocation>();
+		Set<Geolocation> locations = new LinkedHashSet<>();
 		try {
 
 			String sql =
@@ -94,7 +102,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at findInDataSet=" + datasetId + " at GeolocationDao: " + e.getMessage(), e);
+			this.logAndThrowException("Error at findInDataSet=" + datasetId + AT_GEOLOCATION_DAO + e.getMessage(), e);
 		}
 		return locations;
 	}
@@ -104,21 +112,21 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		try {
 
 			String sql = "SELECT DISTINCT loc.nd_geolocation_id" + " FROM nd_geolocation loc" + " WHERE loc.description = :description";
-			Query query = this.getSession().createSQLQuery(sql).setParameter("description", description);
+			Query query = this.getSession().createSQLQuery(sql).setParameter(DESCRIPTION, description);
 			List<Integer> ids = query.list();
 			if (!ids.isEmpty()) {
 				return this.getById(ids.get(0));
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at findByDescription=" + description + " at GeolocationDao: " + e.getMessage(), e);
+			this.logAndThrowException("Error at findByDescription=" + description + AT_GEOLOCATION_DAO + e.getMessage(), e);
 		}
 		return null;
 	}
 
 	@SuppressWarnings("unchecked")
 	public Set<Integer> getLocationIds(Integer projectId) throws MiddlewareQueryException {
-		Set<Integer> locationIds = new HashSet<Integer>();
+		Set<Integer> locationIds = new HashSet<>();
 		try {
 			String sql =
 					"SELECT DISTINCT e.nd_geolocation_id" + " FROM nd_experiment e, nd_experiment_project ep "
@@ -127,24 +135,24 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			locationIds.addAll(query.list());
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getLocationIds=" + projectId + " at GeolocationDao: " + e.getMessage(), e);
+			this.logAndThrowException("Error at getLocationIds=" + projectId + AT_GEOLOCATION_DAO + e.getMessage(), e);
 		}
 		return locationIds;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<TrialEnvironment> getAllTrialEnvironments() throws MiddlewareQueryException {
-		List<TrialEnvironment> environments = new ArrayList<TrialEnvironment>();
+		List<TrialEnvironment> environments = new ArrayList<>();
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(GeolocationDao.GET_ALL_ENVIRONMENTS_QUERY);
-			query.addScalar("envtId");
-			query.addScalar("locationName");
-			query.addScalar("provinceName");
-			query.addScalar("isoabbr");
-			query.addScalar("project_id");
+			query.addScalar(ENVT_ID);
+			query.addScalar(LOCATION_NAME);
+			query.addScalar(PROVINCE_NAME);
+			query.addScalar(ISOABBR);
+			query.addScalar(PROJECT_ID);
 			query.addScalar("name");
-			query.addScalar("locationId");
-			query.addScalar("description");
+			query.addScalar(LOCATION_ID);
+			query.addScalar(DESCRIPTION);
 			List<Object[]> list = query.list();
 			for (Object[] row : list) {
 				// otherwise it's invalid data and should not be included
@@ -163,17 +171,17 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<TrialEnvironment> getTrialEnvironments(int start, int numOfRows) throws MiddlewareQueryException {
-		List<TrialEnvironment> environments = new ArrayList<TrialEnvironment>();
+		List<TrialEnvironment> environments = new ArrayList<>();
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(GeolocationDao.GET_ALL_ENVIRONMENTS_QUERY);
-			query.addScalar("envtId");
-			query.addScalar("locationName");
-			query.addScalar("provinceName");
-			query.addScalar("isoabbr");
-			query.addScalar("project_id");
+			query.addScalar(ENVT_ID);
+			query.addScalar(LOCATION_NAME);
+			query.addScalar(PROVINCE_NAME);
+			query.addScalar(ISOABBR);
+			query.addScalar(PROJECT_ID);
 			query.addScalar("name");
-			query.addScalar("locationId");
-			query.addScalar("description");
+			query.addScalar(LOCATION_ID);
+			query.addScalar(DESCRIPTION);
 			this.setStartAndNumOfRows(query, start, numOfRows);
 			List<Object[]> list = query.list();
 			for (Object[] row : list) {
@@ -207,7 +215,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<TrialEnvironmentProperty> getPropertiesForTrialEnvironments(List<Integer> environmentIds) throws MiddlewareQueryException {
-		List<TrialEnvironmentProperty> properties = new ArrayList<TrialEnvironmentProperty>();
+		List<TrialEnvironmentProperty> properties = new ArrayList<>();
 		try {
 			// if categorical value, get related cvterm.definition as property value.
 			// Else, get the value as it's stored in nd_geolocationprop
@@ -221,9 +229,9 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			Query query = this.getSession().createSQLQuery(sql).setParameterList("environmentIds", environmentIds);
 
 			int lastId = 0;
-			String lastName = new String();
-			String lastDescription = new String();
-			Map<Integer, String> environmentValuesMap = new HashMap<Integer, String>();
+			String lastName = "";
+			String lastDescription = "";
+			Map<Integer, String> environmentValuesMap = new HashMap<>();
 
 			List<Object[]> result = query.list();
 			for (Object[] row : result) {
@@ -240,7 +248,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 					lastId = id;
 					lastName = name;
 					lastDescription = description;
-					environmentValuesMap = new HashMap<Integer, String>();
+					environmentValuesMap = new HashMap<>();
 				}
 
 				environmentValuesMap.put((Integer) row[3], (String) row[4]);
@@ -252,14 +260,14 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 
 		} catch (HibernateException e) {
 			this.logAndThrowException(
-					"Error at getPropertiesForTrialEnvironments=" + environmentIds + " at GeolocationDao: " + e.getMessage(), e);
+					"Error at getPropertiesForTrialEnvironments=" + environmentIds + AT_GEOLOCATION_DAO + e.getMessage(), e);
 		}
 		return properties;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<TrialEnvironment> getTrialEnvironmentDetails(Set<Integer> environmentIds) throws MiddlewareQueryException {
-		List<TrialEnvironment> environmentDetails = new ArrayList<TrialEnvironment>();
+		List<TrialEnvironment> environmentDetails = new ArrayList<>();
 
 		if (environmentIds.isEmpty()) {
 			return environmentDetails;
@@ -279,17 +287,17 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 							+ "	INNER JOIN project_relationship pr ON pr.subject_project_id = ep.project_id AND pr.type_id = "
 							+ TermId.BELONGS_TO_STUDY.getId() + " " + "	INNER JOIN project p ON p.project_id = pr.object_project_id ";
 
-			SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+			SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameterList("locationIds", environmentIds);
 			query.addScalar("nd_geolocation_id", Hibernate.INTEGER);
 			query.addScalar("lname", Hibernate.STRING);
 			query.addScalar("value", Hibernate.INTEGER);
-			query.addScalar("project_id", Hibernate.INTEGER);
+			query.addScalar(PROJECT_ID, Hibernate.INTEGER);
 			query.addScalar("name", Hibernate.STRING);
-			query.addScalar("description", Hibernate.STRING);
-			query.addScalar("provinceName", Hibernate.STRING);
-			query.addScalar("isoabbr", Hibernate.STRING);
-			List<Integer> locIds = new ArrayList<Integer>();
+			query.addScalar(DESCRIPTION, Hibernate.STRING);
+			query.addScalar(PROVINCE_NAME, Hibernate.STRING);
+			query.addScalar(ISOABBR, Hibernate.STRING);
+			List<Integer> locIds = new ArrayList<>();
 
 			List<Object[]> result = query.list();
 
@@ -309,7 +317,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getTrialEnvironmentDetails=" + environmentIds + " at GeolocationDao: " + e.getMessage(), e);
+			this.logAndThrowException("Error at getTrialEnvironmentDetails=" + environmentIds + AT_GEOLOCATION_DAO + e.getMessage(), e);
 		}
 
 		return environmentDetails;
@@ -328,8 +336,8 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		query.setParameterList("locationIds", locationIds);
 		query.addScalar("locid", Hibernate.INTEGER);
 		query.addScalar("lname", Hibernate.STRING);
-		query.addScalar("provinceName", Hibernate.STRING);
-		query.addScalar("isoabbr", Hibernate.STRING);
+		query.addScalar(PROVINCE_NAME, Hibernate.STRING);
+		query.addScalar(ISOABBR, Hibernate.STRING);
 
 		List<Object[]> result = query.list();
 
@@ -374,13 +382,13 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 							+ " LEFT JOIN cntry c ON c.cntryid = l.cntryid"
 							+ " WHERE ph.observable_id IN (:traitIds);";
 			SQLQuery query = this.getSession().createSQLQuery(sql);
-			query.addScalar("envtId");
-			query.addScalar("locationName");
-			query.addScalar("provinceName");
-			query.addScalar("isoabbr");
-			query.addScalar("project_id");
+			query.addScalar(ENVT_ID);
+			query.addScalar(LOCATION_NAME);
+			query.addScalar(PROVINCE_NAME);
+			query.addScalar(ISOABBR);
+			query.addScalar(PROJECT_ID);
 			query.addScalar("name");
-			query.addScalar("locationId");
+			query.addScalar(LOCATION_ID);
 			query.setParameterList("traitIds", traitIds);
 			List<Object[]> list = query.list();
 			for (Object[] row : list) {
@@ -422,14 +430,14 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 
 		} catch (HibernateException e) {
 			this.logAndThrowException("Error at getLocationIdByProjectNameAndDescription with project name =" + projectName
-					+ " and location description = " + locationDescription + " at GeolocationDao: " + e.getMessage(), e);
+					+ " and location description = " + locationDescription + AT_GEOLOCATION_DAO + e.getMessage(), e);
 		}
 		return null;
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<ValueReference> getDistinctTrialInstances() throws MiddlewareQueryException {
-		List<ValueReference> results = new ArrayList<ValueReference>();
+		List<ValueReference> results = new ArrayList<>();
 
 		try {
 			String sql = "SELECT DISTINCT description FROM nd_geolocation";
@@ -443,7 +451,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getDistinctTrialInstances " + " at GeolocationDao: " + e.getMessage(), e);
+			this.logAndThrowException("Error at getDistinctTrialInstances " + AT_GEOLOCATION_DAO + e.getMessage(), e);
 		}
 
 		return results;
@@ -451,7 +459,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<ValueReference> getDistinctLatitudes() throws MiddlewareQueryException {
-		List<ValueReference> results = new ArrayList<ValueReference>();
+		List<ValueReference> results = new ArrayList<>();
 
 		try {
 			String sql = "SELECT DISTINCT latitude FROM nd_geolocation";
@@ -465,7 +473,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getDistinctLatitudes " + " at GeolocationDao: " + e.getMessage(), e);
+			this.logAndThrowException("Error at getDistinctLatitudes " + AT_GEOLOCATION_DAO + e.getMessage(), e);
 		}
 
 		return results;
@@ -473,7 +481,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<ValueReference> getDistinctLongitudes() throws MiddlewareQueryException {
-		List<ValueReference> results = new ArrayList<ValueReference>();
+		List<ValueReference> results = new ArrayList<>();
 
 		try {
 			String sql = "SELECT DISTINCT longitude FROM nd_geolocation";
@@ -487,7 +495,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getDistinctLongitudes " + " at GeolocationDao: " + e.getMessage(), e);
+			this.logAndThrowException("Error at getDistinctLongitudes " + AT_GEOLOCATION_DAO + e.getMessage(), e);
 		}
 
 		return results;
@@ -495,7 +503,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<ValueReference> getDistinctAltitudes() throws MiddlewareQueryException {
-		List<ValueReference> results = new ArrayList<ValueReference>();
+		List<ValueReference> results = new ArrayList<>();
 
 		try {
 			String sql = "SELECT DISTINCT altitude FROM nd_geolocation";
@@ -508,7 +516,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getDistinctAltitudes " + " at GeolocationDao: " + e.getMessage(), e);
+			this.logAndThrowException("Error at getDistinctAltitudes " + AT_GEOLOCATION_DAO + e.getMessage(), e);
 		}
 
 		return results;
@@ -516,7 +524,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<ValueReference> getDistinctDatums() throws MiddlewareQueryException {
-		List<ValueReference> results = new ArrayList<ValueReference>();
+		List<ValueReference> results = new ArrayList<>();
 
 		try {
 			String sql = "SELECT DISTINCT geodetic_datum FROM nd_geolocation";
@@ -529,7 +537,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error at getDistinctDatums " + " at GeolocationDao: " + e.getMessage(), e);
+			this.logAndThrowException("Error at getDistinctDatums " + AT_GEOLOCATION_DAO + e.getMessage(), e);
 		}
 
 		return results;
