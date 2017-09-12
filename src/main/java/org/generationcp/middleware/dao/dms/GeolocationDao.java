@@ -270,9 +270,10 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			// Get location name, study id and study name
 			String sql =
 					"SELECT DISTINCT e.nd_geolocation_id, l.lname, gp.value, p.project_id, p.name, p.description, prov.lname as provinceName, c.isoabbr "
-							+ "FROM nd_experiment e " + "	INNER JOIN nd_geolocationprop gp ON e.nd_geolocation_id = gp.nd_geolocation_id "
-							+ "						AND gp.type_id =  " + TermId.LOCATION_ID.getId() + " 					AND e.nd_geolocation_id IN (:locationIds) "
-							+ "	LEFT JOIN location l ON l.locid = gp.value " + "	LEFT JOIN location prov ON prov.locid = l.snl1id "
+							+ "FROM nd_experiment e " + "	LEFT JOIN nd_geolocationprop gp ON e.nd_geolocation_id = gp.nd_geolocation_id "
+							+ "	AND gp.type_id =  " + TermId.LOCATION_ID.getId() + " AND e.nd_geolocation_id IN (:locationIds) "
+							+ "	LEFT JOIN location l ON l.locid = gp.value " 
+							+ " LEFT JOIN location prov ON prov.locid = l.snl1id "
 							+ "	LEFT JOIN cntry c ON l.cntryid = c.cntryid "
 							+ "	INNER JOIN nd_experiment_project ep ON e.nd_experiment_id = ep.nd_experiment_id "
 							+ "	INNER JOIN project_relationship pr ON pr.subject_project_id = ep.project_id AND pr.type_id = "
