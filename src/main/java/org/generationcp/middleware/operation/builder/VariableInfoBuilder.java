@@ -32,7 +32,7 @@ public class VariableInfoBuilder {
 	private VariableInfo createVariableDef(ProjectProperty stdVariableProperty) {
 
 		String localNameProperty = stdVariableProperty.getAlias();
-		String localDescriptionProperty = this.findLocalDescriptionProperty(stdVariableProperty);
+		String localDescriptionProperty = stdVariableProperty.getDescription();
 
 		VariableInfo variableDef = new VariableInfo();
 		variableDef.setLocalName(localNameProperty == null ? null : localNameProperty);

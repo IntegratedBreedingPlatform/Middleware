@@ -12,11 +12,12 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-
+import org.hibernate.annotations.Formula;
 
 /**
  * http://wiki.cimmyt.org/confluence/display/MBP/Business+Rules+for+Mapping+to+Chado
@@ -72,6 +73,9 @@ public class ProjectProperty implements Serializable {
 	@Column(name = "alias")
 	private String alias;
 
+	@Formula("(select c.definition from cvterm c where c.cvterm_id = variable_id) ")
+	private String description;
+
 	public ProjectProperty() {
 	}
 
@@ -82,6 +86,7 @@ public class ProjectProperty implements Serializable {
 		this.rank = rank;
 		this.variableId = variableId;
 		this.alias = alias;
+		this.description = description;
 	}
 
 	public Integer getProjectPropertyId() {
@@ -138,6 +143,14 @@ public class ProjectProperty implements Serializable {
 
 	public void setAlias(String alias) {
 		this.alias = alias;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
 	}
 
 	@Override
