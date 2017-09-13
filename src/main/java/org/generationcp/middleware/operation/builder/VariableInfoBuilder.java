@@ -56,10 +56,5 @@ public class VariableInfoBuilder {
 
 		return variableDef;
 	}
-
-	private String findLocalDescriptionProperty(ProjectProperty properties) {
-		// TODO
-		return null;
-	}
 	
 }
