@@ -103,7 +103,7 @@ public class DataSetBuilder extends Builder {
 		return dataSet;
 	}
 
-	private Set<Integer> getLocationIds(Integer projectId) throws MiddlewareQueryException {
+	private Set<Integer> getLocationIds(Integer projectId) {
 		return this.getGeolocationDao().getLocationIds(projectId);
 	}
 

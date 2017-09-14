@@ -49,7 +49,7 @@ public class GeolocationDaoTest {
 	}
 
 	@Test
-	public void testGetTrialEnvironmentDetails() throws Exception {
+	public void testGetTrialEnvironmentDetails() {
 		final Set<Integer> environmentIds = new HashSet<Integer>();
 		environmentIds.add(5822);
 		final SQLQuery mockQuery = Mockito.mock(SQLQuery.class);

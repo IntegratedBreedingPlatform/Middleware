@@ -216,7 +216,7 @@ public class GeolocationSaver extends Saver {
 	}
 
 	public Geolocation saveGeolocationOrRetrieveIfExisting(String studyName, VariableList variableList, MeasurementRow row,
-			boolean isNursery, boolean isDeleteTrialObservations, String programUUID) throws MiddlewareQueryException {
+			boolean isNursery, boolean isDeleteTrialObservations, String programUUID) {
 		Geolocation geolocation = null;
 
 		if (variableList != null && variableList.getVariables() != null && !variableList.getVariables().isEmpty()) {
