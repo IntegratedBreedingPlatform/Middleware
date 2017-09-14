@@ -36,13 +36,15 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.type.IntegerType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * DAO class for {@link Geolocation}.
  *
  */
 public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
-
+	private static final Logger LOG = LoggerFactory.getLogger(GeolocationDao.class);
 	private static final String LOCATION_ID = "locationId";
 	private static final String PROJECT_ID = "project_id";
 	private static final String ISOABBR = "isoabbr";
@@ -76,11 +78,11 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			return (Geolocation) query.uniqueResult();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error at getParentGeolocation=" + projectId + GeolocationDao.AT_GEOLOCATION_DAO + e.getMessage(),
-					e);
+			final String errorMessage = "Error at getParentGeolocation=" + projectId + GeolocationDao.AT_GEOLOCATION_DAO
+					+ e.getMessage();
+			GeolocationDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
-		return null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -98,8 +100,10 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error at findInDataSet=" + datasetId + GeolocationDao.AT_GEOLOCATION_DAO + e.getMessage(), e);
+			final String errorMessage = "Error at findInDataSet=" + datasetId + GeolocationDao.AT_GEOLOCATION_DAO
+					+ e.getMessage();
+			GeolocationDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 		return locations;
 	}
@@ -118,9 +122,10 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error at findByDescription=" + description + GeolocationDao.AT_GEOLOCATION_DAO + e.getMessage(),
-					e);
+			final String errorMessage = "Error at findByDescription=" + description + GeolocationDao.AT_GEOLOCATION_DAO
+					+ e.getMessage();
+			GeolocationDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 		return null;
 	}
@@ -136,8 +141,10 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			locationIds.addAll(query.list());
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error at getLocationIds=" + projectId + GeolocationDao.AT_GEOLOCATION_DAO + e.getMessage(), e);
+			final String errorMessage = "Error at getLocationIds=" + projectId + GeolocationDao.AT_GEOLOCATION_DAO
+					+ e.getMessage();
+			GeolocationDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 		return locationIds;
 	}
@@ -167,7 +174,9 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getAllTrialEnvironments at GeolocationDao: " + e.getMessage(), e);
+			final String errorMessage = "Error at getAllTrialEnvironments at GeolocationDao: " + e.getMessage();
+			GeolocationDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 		return environments;
 	}
@@ -199,7 +208,9 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getTrialEnvironments at GeolocationDao: " + e.getMessage(), e);
+			final String errorMessage = "Error at getTrialEnvironments at GeolocationDao: " + e.getMessage();
+			GeolocationDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 		return environments;
 	}
@@ -212,10 +223,10 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at countAllTrialEnvironments at GeolocationDao: " + e.getMessage(), e);
+			final String errorMessage = "Error at countAllTrialEnvironments at GeolocationDao: " + e.getMessage();
+			GeolocationDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
-
-		return 0;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -268,8 +279,10 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getPropertiesForTrialEnvironments=" + environmentIds
-					+ GeolocationDao.AT_GEOLOCATION_DAO + e.getMessage(), e);
+			final String errorMessage = "Error at getPropertiesForTrialEnvironments=" + environmentIds
+					+ GeolocationDao.AT_GEOLOCATION_DAO + e.getMessage();
+			GeolocationDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 		return properties;
 	}
@@ -329,8 +342,10 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getTrialEnvironmentDetails=" + environmentIds
-					+ GeolocationDao.AT_GEOLOCATION_DAO + e.getMessage(), e);
+			final String errorMessage = "Error at getTrialEnvironmentDetails=" + environmentIds
+					+ GeolocationDao.AT_GEOLOCATION_DAO + e.getMessage();
+			GeolocationDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 
 		return environmentDetails;
@@ -411,7 +426,9 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getEnvironmentForTraits at GeolocationDao: " + e.getMessage(), e);
+			final String errorMessage = "Error at getEnvironmentForTraits at GeolocationDao: " + e.getMessage();
+			GeolocationDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 		return environments;
 	}
@@ -439,9 +456,11 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getLocationIdByProjectNameAndDescription with project name ="
+			final String errorMessage = "Error at getLocationIdByProjectNameAndDescription with project name ="
 					+ projectName + " and location description = " + locationDescription
-					+ GeolocationDao.AT_GEOLOCATION_DAO + e.getMessage(), e);
+					+ GeolocationDao.AT_GEOLOCATION_DAO + e.getMessage();
+			GeolocationDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 		return null;
 	}
@@ -462,8 +481,10 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error at getDistinctTrialInstances " + GeolocationDao.AT_GEOLOCATION_DAO + e.getMessage(), e);
+			final String errorMessage = "Error at getDistinctTrialInstances " + GeolocationDao.AT_GEOLOCATION_DAO
+					+ e.getMessage();
+			GeolocationDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 
 		return results;
@@ -485,8 +506,10 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error at getDistinctLatitudes " + GeolocationDao.AT_GEOLOCATION_DAO + e.getMessage(), e);
+			final String errorMessage = "Error at getDistinctLatitudes " + GeolocationDao.AT_GEOLOCATION_DAO
+					+ e.getMessage();
+			GeolocationDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 
 		return results;
@@ -508,8 +531,10 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error at getDistinctLongitudes " + GeolocationDao.AT_GEOLOCATION_DAO + e.getMessage(), e);
+			final String errorMessage = "Error at getDistinctLongitudes " + GeolocationDao.AT_GEOLOCATION_DAO
+					+ e.getMessage();
+			GeolocationDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 
 		return results;
@@ -530,8 +555,10 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error at getDistinctAltitudes " + GeolocationDao.AT_GEOLOCATION_DAO + e.getMessage(), e);
+			final String errorMessage = "Error at getDistinctAltitudes " + GeolocationDao.AT_GEOLOCATION_DAO
+					+ e.getMessage();
+			GeolocationDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 
 		return results;
@@ -552,8 +579,10 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException(
-					"Error at getDistinctDatums " + GeolocationDao.AT_GEOLOCATION_DAO + e.getMessage(), e);
+			final String errorMessage = "Error at getDistinctDatums " + GeolocationDao.AT_GEOLOCATION_DAO
+					+ e.getMessage();
+			GeolocationDao.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
 		}
 
 		return results;
