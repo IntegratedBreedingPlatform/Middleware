@@ -15,7 +15,7 @@ public interface SampleService {
 	Sample buildSample(final String cropName, final String cropPrefix, final Integer plantNumber, final String sampleName,
 		final Date samplingDate, final Integer experimentId, final SampleList sampleList, User createdBy, Date createdDate, User takenBy);
 
-	List<SampleDTO> getSamples(String plot_id);
+	List<SampleDTO> getSamples(final String plot_id);
 
-	SampleDetailsDTO getSampleObservation(String sampleId);
+	SampleDetailsDTO getSampleObservation(final String sampleId);
 }
