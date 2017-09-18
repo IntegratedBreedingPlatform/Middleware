@@ -1,12 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- * 
+ * <p/>
  * Generation Challenge Programme (GCP)
- * 
- * 
+ * <p/>
+ * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- * 
  *******************************************************************************/
 
 package org.generationcp.middleware.operation.builder;
@@ -188,8 +187,8 @@ public class StandardVariableBuilder extends Builder {
 		return this.getCvTermDao().getById(id);
 	}
 
-	public StandardVariable findOrSave(String name, String description, String propertyName, String scaleName, String methodName,
-			PhenotypicType role, VariableType variableType, String dataTypeString, String programUUID) {
+	public StandardVariable findOrSave(final String name, final String description, final String propertyName, final String scaleName, final String methodName,
+			final PhenotypicType role, final VariableType variableType, final String dataTypeString, final String programUUID) {
 
 		final TermBuilder termBuilder = this.getTermBuilder();
 		final Term property = termBuilder.findOrSaveProperty(propertyName, propertyName, null, termBuilder.getDefaultTraitClasses());
@@ -203,26 +202,24 @@ public class StandardVariableBuilder extends Builder {
 		filterOpts.addMethodId(method.getId());
 		filterOpts.addScaleId(scale.getId());
 
-		List<Variable> variableList = this.getOntologyVariableDataManager().getWithFilter(filterOpts);
-		StandardVariable standardVariable;
+		final List<Variable> variableList = this.getOntologyVariableDataManager().getWithFilter(filterOpts);
+		final StandardVariable standardVariable;
 
-		if(variableType == null){
-			variableType = OntologyDataHelper.mapFromPhenotype(role, propertyName);
-		}
+		final VariableType newVariableType = (variableType == null) ? OntologyDataHelper.mapFromPhenotype(role, propertyName) : variableType;
 
 		if (variableList == null || variableList.isEmpty()) {
 			final OntologyVariableInfo variableInfo =
 					this.createOntologyVariableInfo(name, description, method.getId(), property.getId(), scale.getId(), programUUID, null,
-							null, variableType);
+							null, newVariableType);
 			this.getOntologyVariableDataManager().addVariable(variableInfo);
 			standardVariable = this.create(variableInfo.getId(), programUUID);
 		} else {
-			Variable variable = variableList.get(0);
+			final Variable variable = variableList.get(0);
 			standardVariable = this.create(variable.getId(), programUUID);
 		}
 
 		standardVariable.setPhenotypicType(role);
-		standardVariable.setVariableTypes(new HashSet<>(new ArrayList<>(Collections.singletonList(variableType))));
+		standardVariable.setVariableTypes(new HashSet<>(new ArrayList<>(Collections.singletonList(newVariableType))));
 
 		return standardVariable;
 	}
@@ -236,9 +233,10 @@ public class StandardVariableBuilder extends Builder {
 		return dataTypeString;
 	}
 
-	private OntologyVariableInfo createOntologyVariableInfo(final String name, final String description, final int methodId, final int propertyId, final int scaleId,
-			final String programUUID, final String minValue, final String maxValue, VariableType variableType) {
-		OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+	private OntologyVariableInfo createOntologyVariableInfo(final String name, final String description, final int methodId,
+			final int propertyId, final int scaleId, final String programUUID, final String minValue, final String maxValue,
+			final VariableType variableType) {
+		final OntologyVariableInfo variableInfo = new OntologyVariableInfo();
 		variableInfo.setName(name);
 		variableInfo.setDescription(description);
 		variableInfo.setMethodId(methodId);
@@ -254,7 +252,11 @@ public class StandardVariableBuilder extends Builder {
 	}
 
 	/**
+	 * @deprecated
 	 * Use OntologyDataHelper to map from PhenotypicType to VariableType correctly.
+	 * @param role
+	 * @param isForAnalysis
+	 * @return
 	 */
 	@Deprecated
 	public VariableType mapPhenotypicTypeToDefaultVariableType(final PhenotypicType role, final boolean isForAnalysis) {
@@ -323,8 +325,8 @@ public class StandardVariableBuilder extends Builder {
 		final List<String> headerNamesNotFoundInProjectProperty = new ArrayList<>();
 		for (final String name : headerNames) {
 
-			if (!standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase())
-					|| standardVariableIdsWithTypeInProjects.get(name.toUpperCase()).keySet().isEmpty()) {
+			if (!standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase()) || standardVariableIdsWithTypeInProjects
+					.get(name.toUpperCase()).keySet().isEmpty()) {
 				headerNamesNotFoundInProjectProperty.add(name);
 			}
 
@@ -340,8 +342,8 @@ public class StandardVariableBuilder extends Builder {
 		final List<String> headerNamesNotFoundInProjectPropAndTerms = new ArrayList<>();
 		for (final String name : headerNames) {
 
-			if (!standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase())
-					|| standardVariableIdsWithTypeInProjects.get(name.toUpperCase()).keySet().isEmpty()) {
+			if (!standardVariableIdsWithTypeInProjects.containsKey(name.toUpperCase()) || standardVariableIdsWithTypeInProjects
+					.get(name.toUpperCase()).keySet().isEmpty()) {
 				headerNamesNotFoundInProjectPropAndTerms.add(name);
 			}
 

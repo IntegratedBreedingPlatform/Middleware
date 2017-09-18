@@ -181,7 +181,7 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testCheckForOutOfBoundsDataWithValidData() {
 
-		Workbook testWorkbook = this.createTestWorkbook(true);
+		final Workbook testWorkbook = this.createTestWorkbook(true);
 
 		Assert.assertTrue(this.dataImportService.checkForOutOfBoundsData(testWorkbook, PROGRAM_UUID));
 
@@ -190,7 +190,7 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testCheckForOutOfBoundsDataWithInvalidData() {
 
-		Workbook testWorkbook = this.createTestWorkbook(false);
+		final Workbook testWorkbook = this.createTestWorkbook(false);
 
 		Assert.assertFalse(this.dataImportService.checkForOutOfBoundsData(testWorkbook, PROGRAM_UUID));
 
@@ -199,8 +199,8 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testFindMeasurementVariableByTermIdMeasurementVariableIsFound() {
 
-		final Optional<MeasurementVariable> result = this.dataImportService
-				.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), this.workbook.getFactors());
+		final Optional<MeasurementVariable> result =
+				this.dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), this.workbook.getFactors());
 
 		Assert.assertTrue("Measurement variable is found, so the value is present", result.isPresent());
 		Assert.assertNotNull(result.get());
@@ -210,8 +210,8 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testFindMeasurementVariableByTermIdMeasurementVariableIsNotFound() {
 
-		final Optional<MeasurementVariable> result = this.dataImportService
-				.findMeasurementVariableByTermId(TermId.BREEDING_METHOD_CODE.getId(), this.workbook.getFactors());
+		final Optional<MeasurementVariable> result =
+				this.dataImportService.findMeasurementVariableByTermId(TermId.BREEDING_METHOD_CODE.getId(), this.workbook.getFactors());
 
 		Assert.assertFalse("No measurement variable found, so the value is not present", result.isPresent());
 
@@ -222,8 +222,8 @@ public class DataImportServiceImplTest {
 
 		this.dataImportService.setRequiredField(TermId.ENTRY_NO.getId(), this.workbook.getFactors());
 
-		final Optional<MeasurementVariable> result = this.dataImportService
-				.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), this.workbook.getFactors());
+		final Optional<MeasurementVariable> result =
+				this.dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), this.workbook.getFactors());
 
 		if (result.isPresent()) {
 			Assert.assertEquals(TermId.ENTRY_NO.getId(), result.get().getTermId());
@@ -237,21 +237,21 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testSetRequiredFieldsForTrial() {
 
-		Workbook trialWorkbook = WorkbookTestDataInitializer
+		final Workbook trialWorkbook = WorkbookTestDataInitializer
 				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.T, STUDY_NAME, TRIAL_NO, true);
 
 		this.dataImportService.setRequiredFields(trialWorkbook);
 
-		Optional<MeasurementVariable> optionalPlotNo = dataImportService
-				.findMeasurementVariableByTermId(TermId.PLOT_NO.getId(), trialWorkbook.getFactors());
-		Optional<MeasurementVariable> optionalEntryNo = dataImportService
-				.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), trialWorkbook.getFactors());
-		Optional<MeasurementVariable> optionalGid =
+		final Optional<MeasurementVariable> optionalPlotNo =
+				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NO.getId(), trialWorkbook.getFactors());
+		final Optional<MeasurementVariable> optionalEntryNo =
+				dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), trialWorkbook.getFactors());
+		final Optional<MeasurementVariable> optionalGid =
 				dataImportService.findMeasurementVariableByTermId(TermId.GID.getId(), trialWorkbook.getFactors());
-		Optional<MeasurementVariable> optionalTrialInstance = dataImportService
-				.findMeasurementVariableByTermId(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialWorkbook.getTrialVariables());
-		Optional<MeasurementVariable> optionalPlotNNo = dataImportService
-				.findMeasurementVariableByTermId(TermId.PLOT_NNO.getId(), trialWorkbook.getFactors());
+		final Optional<MeasurementVariable> optionalTrialInstance =
+				dataImportService.findMeasurementVariableByTermId(TermId.TRIAL_INSTANCE_FACTOR.getId(), trialWorkbook.getTrialVariables());
+		final Optional<MeasurementVariable> optionalPlotNNo =
+				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NNO.getId(), trialWorkbook.getFactors());
 
 		Assert.assertTrue(optionalPlotNo.get().isRequired());
 		Assert.assertTrue(optionalEntryNo.get().isRequired());
@@ -266,16 +266,16 @@ public class DataImportServiceImplTest {
 
 		this.dataImportService.setRequiredFields(this.workbook);
 
-		Optional<MeasurementVariable> optionalPlotNo = dataImportService
-				.findMeasurementVariableByTermId(TermId.PLOT_NO.getId(), this.workbook.getFactors());
-		Optional<MeasurementVariable> optionalEntryNo = dataImportService
-				.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), this.workbook.getFactors());
-		Optional<MeasurementVariable> optionalGid =
+		final Optional<MeasurementVariable> optionalPlotNo =
+				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NO.getId(), this.workbook.getFactors());
+		final Optional<MeasurementVariable> optionalEntryNo =
+				dataImportService.findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), this.workbook.getFactors());
+		final Optional<MeasurementVariable> optionalGid =
 				dataImportService.findMeasurementVariableByTermId(TermId.GID.getId(), this.workbook.getFactors());
-		Optional<MeasurementVariable> optionalTrialInstance = dataImportService
-				.findMeasurementVariableByTermId(TermId.TRIAL_INSTANCE_FACTOR.getId(), this.workbook.getTrialVariables());
-		Optional<MeasurementVariable> optionalPlotNNo = dataImportService
-				.findMeasurementVariableByTermId(TermId.PLOT_NNO.getId(), this.workbook.getFactors());
+		final Optional<MeasurementVariable> optionalTrialInstance =
+				dataImportService.findMeasurementVariableByTermId(TermId.TRIAL_INSTANCE_FACTOR.getId(), this.workbook.getTrialVariables());
+		final Optional<MeasurementVariable> optionalPlotNNo =
+				dataImportService.findMeasurementVariableByTermId(TermId.PLOT_NNO.getId(), this.workbook.getFactors());
 
 		Assert.assertTrue(optionalPlotNo.get().isRequired());
 		Assert.assertTrue(optionalEntryNo.get().isRequired());
@@ -310,7 +310,7 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testParseWorkbookWithDiscardInvalidValuesIsTrue() throws WorkbookParserException {
 
-		Workbook testWorkbook = this.createTestWorkbook(true);
+		final Workbook testWorkbook = this.createTestWorkbook(true);
 
 		Mockito.when(this.parser.parseFile(this.file, false)).thenReturn(testWorkbook);
 
@@ -327,7 +327,7 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testParseWorkbookWithDiscardInvalidValuesIsFalse() throws WorkbookParserException {
 
-		Workbook testWorkbook = this.createTestWorkbook(true);
+		final Workbook testWorkbook = this.createTestWorkbook(true);
 
 		Mockito.when(this.parser.parseFile(this.file, false)).thenReturn(testWorkbook);
 
@@ -459,9 +459,9 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testPopulatePossibleValuesForCategoricalVariatesStandardVariableIsCategorical() {
 
-		List<MeasurementVariable> variates = new ArrayList<>();
+		final List<MeasurementVariable> variates = new ArrayList<>();
 
-		MeasurementVariable testMeasurementVariable =
+		final MeasurementVariable testMeasurementVariable =
 				new MeasurementVariable(EARASP_1_5_NAME, "", EARASP_1_5_SCALE, EARASP_1_5_METHOD, EARASP_1_5_PROPERTY, "", "C", "VARIATE");
 		variates.add(testMeasurementVariable);
 
@@ -474,13 +474,13 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testPopulatePossibleValuesForCategoricalVariatesStandardVariableIsNotCategorical() {
 
-		StandardVariable testStandardVariable = this.createTestCategoricalStandardVariable(EARASP_1_5_NAME);
+		final StandardVariable testStandardVariable = this.createTestCategoricalStandardVariable(EARASP_1_5_NAME);
 		testStandardVariable.setDataType(new Term(TermId.NUMERIC_VARIABLE.getId(), "Numeric variable", ""));
 		Mockito.when(this.ontologyDataManager.getStandardVariable(EARASP_1_5_TERMID, PROGRAM_UUID)).thenReturn(testStandardVariable);
 
-		List<MeasurementVariable> variates = new ArrayList<>();
+		final List<MeasurementVariable> variates = new ArrayList<>();
 
-		MeasurementVariable testMeasurementVariable =
+		final MeasurementVariable testMeasurementVariable =
 				new MeasurementVariable(EARASP_1_5_NAME, "", EARASP_1_5_SCALE, EARASP_1_5_METHOD, EARASP_1_5_PROPERTY, "", "C", "VARIATE");
 		variates.add(testMeasurementVariable);
 
@@ -493,8 +493,7 @@ public class DataImportServiceImplTest {
 	@Test
 	public void testGetTermIdsOfMeasurementVariables() {
 
-		Set<Integer> termIds =
-				this.dataImportService.getTermIdsOfMeasurementVariables(this.workbook.getFactors());
+		final Set<Integer> termIds = this.dataImportService.getTermIdsOfMeasurementVariables(this.workbook.getFactors());
 
 		Assert.assertTrue("The termid of entry no should be in the list because it's in the ontology",
 				termIds.contains(TermId.ENTRY_NO.getId()));
@@ -512,17 +511,17 @@ public class DataImportServiceImplTest {
 	public void testRemoveObsoleteMeasurementVariableVariableIsObsolete() {
 
 		// Create an 'AD' measurement variable
-		final MeasurementVariable adObsolete = new MeasurementVariable("AD","", "days","Computed", "Anthesis time.","N", "", "VARIATE");
+		final MeasurementVariable adObsolete = new MeasurementVariable("AD", "", "days", "Computed", "Anthesis time.", "N", "", "VARIATE");
 
 		// Create an 'AD' standard variable and tag as obsolete
 		final StandardVariable adStandardVariable = new StandardVariable();
 		adStandardVariable.setObsolete(true);
 
-		Mockito.when(this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames(adObsolete.getProperty(), adObsolete.getScale(), adObsolete.getMethod()
-				, PROGRAM_UUID)).thenReturn(adStandardVariable);
+		Mockito.when(this.ontologyDataManager
+				.findStandardVariableByTraitScaleMethodNames(adObsolete.getProperty(), adObsolete.getScale(), adObsolete.getMethod(),
+						PROGRAM_UUID)).thenReturn(adStandardVariable);
 
-
-		List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(adObsolete);
 
 		this.dataImportService.removeObsoleteMeasurementVariable(measurementVariables, PROGRAM_UUID);
@@ -537,17 +536,17 @@ public class DataImportServiceImplTest {
 	public void testRemoveObsoleteMeasurementVariable() {
 
 		// Create an 'AD' measurement variable
-		final MeasurementVariable adObsolete = new MeasurementVariable("AD","", "days","Computed", "Anthesis time.","N", "", "VARIATE");
+		final MeasurementVariable adObsolete = new MeasurementVariable("AD", "", "days", "Computed", "Anthesis time.", "N", "", "VARIATE");
 
 		// Create an 'AD' standard variable
 		final StandardVariable adStandardVariable = new StandardVariable();
 		adStandardVariable.setObsolete(false);
 
-		Mockito.when(this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames(adObsolete.getProperty(), adObsolete.getScale(), adObsolete.getMethod()
-				, PROGRAM_UUID)).thenReturn(adStandardVariable);
+		Mockito.when(this.ontologyDataManager
+				.findStandardVariableByTraitScaleMethodNames(adObsolete.getProperty(), adObsolete.getScale(), adObsolete.getMethod(),
+						PROGRAM_UUID)).thenReturn(adStandardVariable);
 
-
-		List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(adObsolete);
 
 		this.dataImportService.removeObsoleteMeasurementVariable(measurementVariables, PROGRAM_UUID);
@@ -559,11 +558,11 @@ public class DataImportServiceImplTest {
 
 	}
 
-	private StandardVariable createTestCategoricalStandardVariable(String name) {
-		StandardVariable stdVar = new StandardVariable();
+	private StandardVariable createTestCategoricalStandardVariable(final String name) {
+		final StandardVariable stdVar = new StandardVariable();
 		stdVar.setName(name);
 		stdVar.setDataType(new Term(DataType.CATEGORICAL_VARIABLE.getId(), "", ""));
-		List<Enumeration> enumerations = new ArrayList<>();
+		final List<Enumeration> enumerations = new ArrayList<>();
 		for (int i = 1; i <= 6; i++) {
 			enumerations.add(new Enumeration(i, String.valueOf(i), "", 0));
 		}
@@ -571,13 +570,13 @@ public class DataImportServiceImplTest {
 		return stdVar;
 	}
 
-	private Workbook createTestWorkbook(boolean withOutOfBoundsData) {
+	private Workbook createTestWorkbook(final boolean withOutOfBoundsData) {
 
-		Workbook testWorkbook = new Workbook();
+		final Workbook testWorkbook = new Workbook();
 
-		List<MeasurementVariable> variates = new ArrayList<>();
+		final List<MeasurementVariable> variates = new ArrayList<>();
 
-		MeasurementVariable categoricalMeasurementVariable =
+		final MeasurementVariable categoricalMeasurementVariable =
 				new MeasurementVariable(EARASP_1_5_TERMID, EARASP_1_5_NAME, EARASP_1_5_DEFINITION, EARASP_1_5_SCALE, EARASP_1_5_METHOD,
 						EARASP_1_5_PROPERTY, NUMERIC, "", "VARIATE");
 
@@ -585,11 +584,11 @@ public class DataImportServiceImplTest {
 
 		testWorkbook.setVariates(variates);
 
-		List<MeasurementRow> observations = new ArrayList<>();
-		List<MeasurementData> dataList = new ArrayList<>();
-		MeasurementData variateCategorical = new MeasurementData(EARASP_1_5_NAME, withOutOfBoundsData ? "7" : "6");
+		final List<MeasurementRow> observations = new ArrayList<>();
+		final List<MeasurementData> dataList = new ArrayList<>();
+		final MeasurementData variateCategorical = new MeasurementData(EARASP_1_5_NAME, withOutOfBoundsData ? "7" : "6");
 		dataList.add(variateCategorical);
-		MeasurementRow row = new MeasurementRow();
+		final MeasurementRow row = new MeasurementRow();
 
 		row.setDataList(dataList);
 		observations.add(row);
@@ -652,8 +651,8 @@ public class DataImportServiceImplTest {
 	}
 
 	private Workbook createTestWorkbook() {
-		Workbook wb = new Workbook();
-		StudyDetails studyDetails = new StudyDetails();
+		final Workbook wb = new Workbook();
+		final StudyDetails studyDetails = new StudyDetails();
 		studyDetails.setStudyType(StudyType.N);
 		wb.setStudyDetails(studyDetails);
 		wb.setFactors(this.createTestFactors());
@@ -661,7 +660,7 @@ public class DataImportServiceImplTest {
 	}
 
 	private List<MeasurementVariable> createTestFactors() {
-		List<MeasurementVariable> list = new ArrayList<>();
+		final List<MeasurementVariable> list = new ArrayList<>();
 
 		list.add(new MeasurementVariable(TermId.ENTRY_NO.getId(), ENTRY, "The germplasm entry number", NUMBER, ENUMERATED, GERMPLASM_ENTRY,
 				NUMERIC, STUDY, ENTRY));

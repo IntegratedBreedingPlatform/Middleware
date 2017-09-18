@@ -1,12 +1,11 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * <p/>
  * Generation Challenge Programme (GCP)
- *
- *
+ * <p/>
+ * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
  *******************************************************************************/
 
 package org.generationcp.middleware.domain.dms;
@@ -51,13 +50,13 @@ public class StandardVariable implements Serializable {
 	private Map<Integer, Integer> overridenEnumerations;
 
 	private String cropOntologyId;
-	
+
 	private Set<VariableType> variableTypes;
 
 	public StandardVariable() {
 	}
 
-	public StandardVariable(Term property, Term scale, Term method, Term dataType, Term isA, PhenotypicType phenotypicType) {
+	public StandardVariable(final Term property, final Term scale, final Term method, final Term dataType, final Term isA, final PhenotypicType phenotypicType) {
 		this.property = property;
 		this.scale = scale;
 		this.method = method;
@@ -67,7 +66,7 @@ public class StandardVariable implements Serializable {
 	}
 
 	/* Copy constructor. Used by the copy method */
-	private StandardVariable(StandardVariable stdVar) {
+	private StandardVariable(final StandardVariable stdVar) {
 		this(stdVar.getProperty(), stdVar.getScale(), stdVar.getMethod(), stdVar.getDataType(), stdVar.getIsA(),
 				stdVar.getPhenotypicType());
 		this.setId(0);
@@ -82,7 +81,7 @@ public class StandardVariable implements Serializable {
 		return this.term.getId();
 	}
 
-	public void setId(int id) {
+	public void setId(final int id) {
 		this.term.setId(id);
 	}
 
@@ -90,7 +89,7 @@ public class StandardVariable implements Serializable {
 		return this.term.getName();
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.term.setName(name);
 	}
 
@@ -98,7 +97,7 @@ public class StandardVariable implements Serializable {
 		return this.term.getDefinition();
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.term.setDefinition(description);
 	}
 
@@ -106,7 +105,7 @@ public class StandardVariable implements Serializable {
 		return this.term.isObsolete();
 	}
 
-	public void setObsolete(boolean isObsolete) {
+	public void setObsolete(final boolean isObsolete) {
 		this.term.setObsolete(isObsolete);
 	}
 
@@ -114,7 +113,7 @@ public class StandardVariable implements Serializable {
 		return this.property;
 	}
 
-	public void setProperty(Term property) {
+	public void setProperty(final Term property) {
 		this.property = property;
 	}
 
@@ -122,7 +121,7 @@ public class StandardVariable implements Serializable {
 		return this.scale;
 	}
 
-	public void setScale(Term scale) {
+	public void setScale(final Term scale) {
 		this.scale = scale;
 	}
 
@@ -130,7 +129,7 @@ public class StandardVariable implements Serializable {
 		return this.method;
 	}
 
-	public void setMethod(Term method) {
+	public void setMethod(final Term method) {
 		this.method = method;
 	}
 
@@ -138,7 +137,7 @@ public class StandardVariable implements Serializable {
 		return this.dataType;
 	}
 
-	public void setDataType(Term dataType) {
+	public void setDataType(final Term dataType) {
 		this.dataType = dataType;
 	}
 
@@ -146,7 +145,7 @@ public class StandardVariable implements Serializable {
 		return this.constraints;
 	}
 
-	public void setConstraints(VariableConstraints constraints) {
+	public void setConstraints(final VariableConstraints constraints) {
 		this.constraints = constraints;
 	}
 
@@ -154,11 +153,11 @@ public class StandardVariable implements Serializable {
 		return this.enumerations;
 	}
 
-	public Enumeration getEnumeration(Integer id) {
+	public Enumeration getEnumeration(final Integer id) {
 		if (this.enumerations == null) {
 			return null;
 		}
-		for (Enumeration enumeration : this.enumerations) {
+		for (final Enumeration enumeration : this.enumerations) {
 			if (enumeration.getId().equals(id)) {
 				return enumeration;
 			}
@@ -166,11 +165,11 @@ public class StandardVariable implements Serializable {
 		return null;
 	}
 
-	public Enumeration getEnumeration(String name, String description) {
+	public Enumeration getEnumeration(final String name, final String description) {
 		if (this.enumerations == null) {
 			return null;
 		}
-		for (Enumeration enumeration : this.enumerations) {
+		for (final Enumeration enumeration : this.enumerations) {
 			if (enumeration.getName().equalsIgnoreCase(name) && enumeration.getDescription().equalsIgnoreCase(description)) {
 				return enumeration;
 			}
@@ -178,11 +177,11 @@ public class StandardVariable implements Serializable {
 		return null;
 	}
 
-	public Enumeration getEnumerationByName(String name) {
+	public Enumeration getEnumerationByName(final String name) {
 		if (this.enumerations == null) {
 			return null;
 		}
-		for (Enumeration enumeration : this.enumerations) {
+		for (final Enumeration enumeration : this.enumerations) {
 			if (enumeration.getName().equalsIgnoreCase(name)) {
 				return enumeration;
 			}
@@ -190,11 +189,11 @@ public class StandardVariable implements Serializable {
 		return null;
 	}
 
-	public Enumeration getEnumerationByDescription(String description) {
+	public Enumeration getEnumerationByDescription(final String description) {
 		if (this.enumerations == null) {
 			return null;
 		}
-		for (Enumeration enumeration : this.enumerations) {
+		for (final Enumeration enumeration : this.enumerations) {
 			if (enumeration.getDescription().equalsIgnoreCase(description)) {
 				return enumeration;
 			}
@@ -202,7 +201,7 @@ public class StandardVariable implements Serializable {
 		return null;
 	}
 
-	public void setEnumerations(List<Enumeration> enumerations) {
+	public void setEnumerations(final List<Enumeration> enumerations) {
 		this.enumerations = enumerations;
 	}
 
@@ -210,7 +209,7 @@ public class StandardVariable implements Serializable {
 		return this.phenotypicType;
 	}
 
-	public void setPhenotypicType(PhenotypicType phenotypicType) {
+	public void setPhenotypicType(final PhenotypicType phenotypicType) {
 		this.phenotypicType = phenotypicType;
 	}
 
@@ -218,13 +217,13 @@ public class StandardVariable implements Serializable {
 		return this.cropOntologyId;
 	}
 
-	public void setCropOntologyId(String cropOntologyId) {
+	public void setCropOntologyId(final String cropOntologyId) {
 		this.cropOntologyId = cropOntologyId;
 	}
 
-	public Enumeration findEnumerationByName(String name) {
+	public Enumeration findEnumerationByName(final String name) {
 		if (this.enumerations != null) {
-			for (Enumeration enumeration : this.enumerations) {
+			for (final Enumeration enumeration : this.enumerations) {
 				if (enumeration.getName().equals(name)) {
 					return enumeration;
 				}
@@ -233,10 +232,10 @@ public class StandardVariable implements Serializable {
 		return null;
 	}
 
-	public Enumeration findEnumerationById(int id) {
+	public Enumeration findEnumerationById(final int id) {
 		if (this.enumerations != null) {
-			for (Enumeration enumeration : this.enumerations) {
-				if (enumeration.getId()!=null && enumeration.getId() == id) {
+			for (final Enumeration enumeration : this.enumerations) {
+				if (enumeration.getId() != null && enumeration.getId() == id) {
 					return enumeration;
 				}
 			}
@@ -252,9 +251,9 @@ public class StandardVariable implements Serializable {
 		return new StandardVariable(this);
 	}
 
-	public void print(int previousIndent) {
+	public void print(final int previousIndent) {
 		Debug.println(previousIndent, "Standard Variable: ");
-		int indent = previousIndent + 3;
+		final int indent = previousIndent + 3;
 		Debug.println(indent, "term: " + this.term);
 		Debug.println(indent, "property: " + this.property);
 		Debug.println(indent, "method " + this.method);
@@ -277,12 +276,12 @@ public class StandardVariable implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
 		if (obj instanceof StandardVariable) {
-			StandardVariable other = (StandardVariable) obj;
+			final StandardVariable other = (StandardVariable) obj;
 			return other.getId() == this.getId();
 		}
 		return false;
@@ -290,7 +289,7 @@ public class StandardVariable implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("StandardVariable [");
 		builder.append("term=");
 		builder.append(this.term);
@@ -322,7 +321,7 @@ public class StandardVariable implements Serializable {
 		return this.isA;
 	}
 
-	public void setIsA(Term isA) {
+	public void setIsA(final Term isA) {
 		this.isA = isA;
 	}
 
@@ -336,7 +335,7 @@ public class StandardVariable implements Serializable {
 	/**
 	 * @param overridenEnumerations the overridenEnumerations to set
 	 */
-	public void setOverridenEnumerations(Map<Integer, Integer> overridenEnumerations) {
+	public void setOverridenEnumerations(final Map<Integer, Integer> overridenEnumerations) {
 		this.overridenEnumerations = overridenEnumerations;
 	}
 
@@ -352,7 +351,7 @@ public class StandardVariable implements Serializable {
 	public boolean isNumericCategoricalVariate() {
 		if (this.dataType != null && this.dataType.getId() == TermId.CATEGORICAL_VARIABLE.getId() && this.enumerations != null
 				&& !this.enumerations.isEmpty()) {
-			for (Enumeration enumeration : this.enumerations) {
+			for (final Enumeration enumeration : this.enumerations) {
 				if (enumeration.getName() == null || !NumberUtils.isNumber(enumeration.getName().trim())) {
 					return false;
 				}
@@ -362,10 +361,10 @@ public class StandardVariable implements Serializable {
 		return false;
 	}
 
-	public void setVariableTypes(Set<VariableType> variableTypes) {
+	public void setVariableTypes(final Set<VariableType> variableTypes) {
 		this.variableTypes = variableTypes;
 	}
-	
+
 	public Set<VariableType> getVariableTypes() {
 		return this.variableTypes;
 	}
