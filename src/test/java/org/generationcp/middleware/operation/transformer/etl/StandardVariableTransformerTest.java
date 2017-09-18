@@ -69,6 +69,7 @@ public class StandardVariableTransformerTest {
 		}
 		assertEquals(variable.getProperty().getCropOntologyId(),
 				standardVariable.getCropOntologyId());
+		assertTrue(standardVariable.isObsolete());
 	}
 
 	private Variable createVariableTestData() {
@@ -81,6 +82,7 @@ public class StandardVariableTransformerTest {
 		variable.setScale(createScaleTestData());
 		variable.setMinValue("1");
 		variable.setMaxValue("4");
+		variable.setObsolete(true);
 		return variable;
 	}
 

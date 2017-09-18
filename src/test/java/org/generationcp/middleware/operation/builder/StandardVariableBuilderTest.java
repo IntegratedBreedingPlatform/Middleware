@@ -17,9 +17,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import junit.framework.Assert;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -274,6 +276,44 @@ public class StandardVariableBuilderTest extends IntegrationTestBase {
 			assertTrue("If the header name doesn't match any Standard Variables, the variable list must be empty",
 					headerStandardVariables.isEmpty());
 		}
+	}
+
+	@Test
+	public void testSetRoleOfVariablesVariableTypeIsUnassigned() {
+
+		final StandardVariable trialInstanceFactor = standardVariableBuilder.create(TermId.TRIAL_INSTANCE_FACTOR.getId(), null);
+		final List<StandardVariable> standardVariables = new ArrayList<>();
+		standardVariables.add(trialInstanceFactor);
+
+		// Assign a null VariableType for trialInstanceFactor
+		final Map<Integer, VariableType> variableTypeMap = new HashMap<>();
+		variableTypeMap.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), null);
+
+		standardVariableBuilder.setRoleOfVariables(standardVariables, variableTypeMap);
+
+		// The trialInstanceFactor has no VariableType assigned to it, so the phenotypicType (role) is null
+		Assert.assertNull(trialInstanceFactor.getPhenotypicType());
+
+
+	}
+
+	@Test
+	public void testSetRoleOfVariablesVariableTypeIsAssigned() {
+
+		final StandardVariable trialInstanceFactor = standardVariableBuilder.create(TermId.TRIAL_INSTANCE_FACTOR.getId(), null);
+		final List<StandardVariable> standardVariables = new ArrayList<>();
+		standardVariables.add(trialInstanceFactor);
+
+		// Assign the trialInstanceFactor to VariableType.ENVIRONMENT_DETAIL
+		final Map<Integer, VariableType> variableTypeMap = new HashMap<>();
+		variableTypeMap.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), VariableType.ENVIRONMENT_DETAIL);
+
+		standardVariableBuilder.setRoleOfVariables(standardVariables, variableTypeMap);
+
+		// The phenotypicType (role) of trialInstanceFactor should be from VariableType.ENVIRONMENT_DETAIL
+		Assert.assertEquals(VariableType.ENVIRONMENT_DETAIL.getRole(), trialInstanceFactor.getPhenotypicType());
+
+
 	}
 
 	private List<String> createLocalVariableNamesOfProjectTestData() {

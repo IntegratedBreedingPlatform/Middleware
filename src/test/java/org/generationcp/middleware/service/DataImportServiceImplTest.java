@@ -508,6 +508,57 @@ public class DataImportServiceImplTest {
 
 	}
 
+	@Test
+	public void testRemoveObsoleteMeasurementVariableVariableIsObsolete() {
+
+		// Create an 'AD' measurement variable
+		final MeasurementVariable adObsolete = new MeasurementVariable("AD","", "days","Computed", "Anthesis time.","N", "", "VARIATE");
+
+		// Create an 'AD' standard variable and tag as obsolete
+		final StandardVariable adStandardVariable = new StandardVariable();
+		adStandardVariable.setObsolete(true);
+
+		Mockito.when(this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames(adObsolete.getProperty(), adObsolete.getScale(), adObsolete.getMethod()
+				, PROGRAM_UUID)).thenReturn(adStandardVariable);
+
+
+		List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		measurementVariables.add(adObsolete);
+
+		this.dataImportService.removeObsoleteMeasurementVariable(measurementVariables, PROGRAM_UUID);
+
+		// Expecting that measurementVariables list is empty.
+		// The added variable should be deleted from the list because it is obsolete.
+		Assert.assertTrue(measurementVariables.isEmpty());
+
+	}
+
+	@Test
+	public void testRemoveObsoleteMeasurementVariable() {
+
+		// Create an 'AD' measurement variable
+		final MeasurementVariable adObsolete = new MeasurementVariable("AD","", "days","Computed", "Anthesis time.","N", "", "VARIATE");
+
+		// Create an 'AD' standard variable
+		final StandardVariable adStandardVariable = new StandardVariable();
+		adStandardVariable.setObsolete(false);
+
+		Mockito.when(this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames(adObsolete.getProperty(), adObsolete.getScale(), adObsolete.getMethod()
+				, PROGRAM_UUID)).thenReturn(adStandardVariable);
+
+
+		List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		measurementVariables.add(adObsolete);
+
+		this.dataImportService.removeObsoleteMeasurementVariable(measurementVariables, PROGRAM_UUID);
+
+		// Expecting that measurementVariables list has 1 item.
+		// The added variable should not be deleted from the list because it is not obsolete.
+		Assert.assertEquals(1, measurementVariables.size());
+		Assert.assertTrue(adObsolete.equals(measurementVariables.get(0)));
+
+	}
+
 	private StandardVariable createTestCategoricalStandardVariable(String name) {
 		StandardVariable stdVar = new StandardVariable();
 		stdVar.setName(name);
