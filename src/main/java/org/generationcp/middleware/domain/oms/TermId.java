@@ -109,6 +109,9 @@ public enum TermId {
 	// Planting Order
 	, ROW_COLUMN(32778), SERPENTINE(32779)
 
+	// Planting date
+	, SEEDING_DATE(8383)
+
 	, BREEDING_METHOD_ID(8257), BREEDING_METHOD(8256), BREEDING_METHOD_CODE(8251)
 
 	// Advance Nursery
