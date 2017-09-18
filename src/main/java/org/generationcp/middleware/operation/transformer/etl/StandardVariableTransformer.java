@@ -31,6 +31,7 @@ public class StandardVariableTransformer extends Transformer {
 		standardVariable.setProperty(variable.getProperty());
 		standardVariable.setScale(variable.getScale());
 		standardVariable.setMethod(variable.getMethod());
+		standardVariable.setObsolete(variable.isObsolete());
 		final DataType dataType = variable.getScale().getDataType();
 		if (dataType != null) {
 			standardVariable.setDataType(new Term(dataType.getId(), dataType.getName(), dataType.getName()));

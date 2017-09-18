@@ -364,10 +364,12 @@ public class StandardVariableBuilder extends Builder {
 		return standardVariablesInProjects;
 	}
 
-	private void setRoleOfVariables(final List<StandardVariable> variables, final Map<Integer, VariableType> varIdsWithType) {
+	protected void setRoleOfVariables(final List<StandardVariable> variables, final Map<Integer, VariableType> varIdsWithType) {
 		for (final StandardVariable standardVariable : variables) {
 			final VariableType type = varIdsWithType.get(standardVariable.getId());
-			standardVariable.setPhenotypicType(type.getRole());
+			if (type != null) {
+				standardVariable.setPhenotypicType(type.getRole());
+			}
 		}
 	}
 

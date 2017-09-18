@@ -102,6 +102,14 @@ public class StandardVariable implements Serializable {
 		this.term.setDefinition(description);
 	}
 
+	public boolean isObsolete() {
+		return this.term.isObsolete();
+	}
+
+	public void setObsolete(boolean isObsolete) {
+		this.term.setObsolete(isObsolete);
+	}
+
 	public Term getProperty() {
 		return this.property;
 	}

@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -225,14 +226,39 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public Workbook parseWorkbook(final File file, final String programUUID, final boolean discardInvalidValues, final WorkbookParser workbookParser)
 			throws WorkbookParserException {
 
-		// partially parse the file to parse the description sheet only at first
+		// Parse the description sheet only at first
 		final Workbook workbook = workbookParser.parseFile(file, false);
 
+		// Remove obsolete traits in the workbook if there's any
+		this.removeObsoleteMeasurementVariable(workbook.getVariates(), programUUID);
+
+		// Populate possible values for categorical variates
 		this.populatePossibleValuesForCategoricalVariates(workbook.getVariates(), programUUID);
 
+		// Parse the observation sheet
 		workbookParser.parseAndSetObservationRows(file, workbook, discardInvalidValues);
 
 		return workbook;
+	}
+
+	protected void removeObsoleteMeasurementVariable(final List<MeasurementVariable> measurementVariables, final String programUUID) {
+
+		final Iterator<MeasurementVariable> iterator = measurementVariables.iterator();
+
+		while (iterator.hasNext()) {
+
+			final MeasurementVariable measurementVariable = iterator.next();
+
+			final StandardVariable standardVariable = this.ontologyDataManager
+					.findStandardVariableByTraitScaleMethodNames(measurementVariable.getProperty(), measurementVariable.getScale(),
+							measurementVariable.getMethod(), programUUID);
+
+			if (standardVariable != null && standardVariable.isObsolete()) {
+				iterator.remove();
+			}
+
+		}
+
 	}
 
 	@Override
