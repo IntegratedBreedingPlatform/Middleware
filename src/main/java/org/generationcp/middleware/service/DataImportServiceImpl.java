@@ -229,8 +229,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// Parse the description sheet only at first
 		final Workbook workbook = workbookParser.parseFile(file, false);
 
-		// Remove obsolete traits in the workbook if there's any
-		this.removeObsoleteMeasurementVariable(workbook.getVariates(), programUUID);
+		// Remove obsolete factors, conditions, constants and traits in the workbook if there's any
+		this.removeObsoloteVariablesInWorkbook(workbook, programUUID);
 
 		// Populate possible values for categorical variates
 		this.populatePossibleValuesForCategoricalVariates(workbook.getVariates(), programUUID);
@@ -241,7 +241,16 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		return workbook;
 	}
 
-	protected void removeObsoleteMeasurementVariable(final List<MeasurementVariable> measurementVariables, final String programUUID) {
+	protected void removeObsoloteVariablesInWorkbook(final Workbook workbook, final String programUUID) {
+
+		this.removeObsoleteMeasurementVariables(workbook.getConditions(), programUUID);
+		this.removeObsoleteMeasurementVariables(workbook.getFactors(), programUUID);
+		this.removeObsoleteMeasurementVariables(workbook.getConstants(), programUUID);
+		this.removeObsoleteMeasurementVariables(workbook.getVariates(), programUUID);
+
+	}
+
+	protected void removeObsoleteMeasurementVariables(final List<MeasurementVariable> measurementVariables, final String programUUID) {
 
 		final Iterator<MeasurementVariable> iterator = measurementVariables.iterator();
 

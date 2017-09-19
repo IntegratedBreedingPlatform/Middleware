@@ -38,10 +38,15 @@ import com.google.common.base.Optional;
 @RunWith(MockitoJUnitRunner.class)
 public class DataImportServiceImplTest {
 
+	private static final String PROGRAM_UUID = "123456789";
+	public static final int TEST_VARIABLE_TERM_ID = 1111;
+	public static final String TEST_PROPERTY_NAME = "test Property";
+	public static final String TEST_SCALE_NAME = "test Scale";
+	public static final String TEST_METHOD_NAME = "test Method";
+	public static final String TEST_VARIABLE_NAME = "test Variable";
 	private static final String EARASP_1_5_PROPERTY = "Ear aspect";
 	private static final String EARASP_1_5_METHOD = "EARASP rating";
 	private static final String EARASP_1_5_SCALE = "1-5 rating scale";
-	private static final String EARASP_1_5_DEFINITION = "Sample Categorical Variate";
 	private static final String EARASP_1_5_NAME = "EARASP_1_5";
 	private static final int EARASP_1_5_TERMID = 20314;
 	public static final int INVALID_VARIABLES_COUNT = 5;
@@ -73,20 +78,6 @@ public class DataImportServiceImplTest {
 	public static final String[] STRINGS_WITH_VALID_CHARACTERS =
 			new String[] {"i_am_groot", "hello123world", "%%bangbang", "something_something", "zawaruldoisbig"};
 
-	private static final String PROGRAM_UUID = "123456789";
-	private static final String ENTRY = "ENTRY";
-	private static final String NUMBER = "NUMBER";
-	private static final String ENUMERATED = "ENUMERATED";
-	private static final String GERMPLASM_ENTRY = "GERMPLASM_ENTRY";
-	private static final String NUMERIC = "NUMERIC";
-	private static final String STUDY = "STUDY";
-	private static final String NESTED_NUMBER = "NESTED NUMBER";
-	private static final String FIELD_PLOT = "FIELD PLOT";
-	private static final String NUMERIC_VALUE = "NUMERIC VALUE";
-	private static final String PLOT = "PLOT";
-	private static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
-	private static final String TRIAL = "TRIAL";
-
 	@Before
 	public void init() {
 
@@ -94,25 +85,31 @@ public class DataImportServiceImplTest {
 				.createTestWorkbook(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS, StudyType.N, STUDY_NAME, TRIAL_NO,
 						IS_MULTIPLE_LOCATION);
 
-		Mockito.when(this.ontologyDataManager
-				.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.TRIAL, WorkbookTestDataInitializer.NUMBER,
-						WorkbookTestDataInitializer.ENUMERATED)).thenReturn(TermId.TRIAL_INSTANCE_FACTOR.getId());
-		Mockito.when(this.ontologyDataManager
-				.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ENTRY, WorkbookTestDataInitializer.NUMBER,
-						WorkbookTestDataInitializer.ENUMERATED)).thenReturn(TermId.ENTRY_NO.getId());
-		Mockito.when(this.ontologyDataManager
-				.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.GERMPLASM_ID, WorkbookTestDataInitializer.DBID,
-						WorkbookTestDataInitializer.ASSIGNED)).thenReturn(TermId.GID.getId());
-		Mockito.when(this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(WorkbookTestDataInitializer.FIELD_PLOT,
-				WorkbookTestDataInitializer.NESTED_NUMBER, WorkbookTestDataInitializer.ENUMERATED)).thenReturn(TermId.PLOT_NO.getId());
-		Mockito.when(this.ontologyDataManager
-				.getStandardVariableIdByPropertyScaleMethod(EARASP_1_5_PROPERTY, EARASP_1_5_SCALE, EARASP_1_5_METHOD))
-				.thenReturn(EARASP_1_5_TERMID);
-		Mockito.when(this.ontologyDataManager.getStandardVariable(EARASP_1_5_TERMID, PROGRAM_UUID))
-				.thenReturn(this.createTestCategoricalStandardVariable(EARASP_1_5_NAME));
-		Mockito.when(this.ontologyDataManager
-				.findStandardVariableByTraitScaleMethodNames(EARASP_1_5_PROPERTY, EARASP_1_5_SCALE, EARASP_1_5_METHOD, PROGRAM_UUID))
-				.thenReturn(this.createTestCategoricalStandardVariable(EARASP_1_5_NAME));
+		this.mockStandardVariable(TEST_VARIABLE_TERM_ID, TEST_VARIABLE_NAME, TEST_PROPERTY_NAME, TEST_SCALE_NAME, TEST_METHOD_NAME,
+				PROGRAM_UUID);
+		this.mockStandardVariable(TermId.PLOT_NO.getId(), WorkbookTestDataInitializer.PLOT, WorkbookTestDataInitializer.FIELD_PLOT,
+				WorkbookTestDataInitializer.NESTED_NUMBER, WorkbookTestDataInitializer.ENUMERATED, PROGRAM_UUID);
+		this.mockStandardVariable(TermId.GID.getId(), WorkbookTestDataInitializer.GID, WorkbookTestDataInitializer.GERMPLASM_ID,
+				WorkbookTestDataInitializer.DBID, WorkbookTestDataInitializer.ASSIGNED, PROGRAM_UUID);
+		this.mockStandardVariable(TermId.ENTRY_NO.getId(), WorkbookTestDataInitializer.ENTRY, WorkbookTestDataInitializer.GERMPLASM_ENTRY,
+				WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED, PROGRAM_UUID);
+		this.mockStandardVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), WorkbookTestDataInitializer.TRIAL_NAME,
+				WorkbookTestDataInitializer.TRIAL, WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED,
+				PROGRAM_UUID);
+
+		this.mockStandardVariable(EARASP_1_5_TERMID, EARASP_1_5_NAME, EARASP_1_5_PROPERTY, EARASP_1_5_SCALE, EARASP_1_5_METHOD,
+				PROGRAM_UUID);
+
+	}
+
+	protected void mockStandardVariable(final Integer termId, final String name, final String property, final String scale,
+			final String method, final String programUUID) {
+
+		Mockito.when(this.ontologyDataManager.getStandardVariableIdByPropertyScaleMethod(property, scale, method)).thenReturn(termId);
+		Mockito.when(this.ontologyDataManager.getStandardVariable(termId, programUUID))
+				.thenReturn(this.createTestCategoricalStandardVariable(name));
+		Mockito.when(this.ontologyDataManager.findStandardVariableByTraitScaleMethodNames(property, scale, method, programUUID))
+				.thenReturn(this.createTestCategoricalStandardVariable(name));
 
 	}
 
@@ -343,6 +340,34 @@ public class DataImportServiceImplTest {
 	}
 
 	@Test
+	public void testParseWorkbookWithObsoleteVariables() throws WorkbookParserException {
+
+		final Workbook testWorkbook = this.createTestWorkbook(false);
+
+		// Add obsolete variable to workbook's factors, conditions, constants and variates list.
+		final StandardVariable obsoleteStandardVariable = new StandardVariable();
+		obsoleteStandardVariable.setObsolete(true);
+
+		Mockito.when(this.ontologyDataManager
+				.findStandardVariableByTraitScaleMethodNames(TEST_PROPERTY_NAME, TEST_SCALE_NAME, TEST_METHOD_NAME, PROGRAM_UUID))
+				.thenReturn(obsoleteStandardVariable);
+
+		Mockito.when(this.parser.parseFile(this.file, false)).thenReturn(testWorkbook);
+
+		this.dataImportService.parseWorkbook(this.file, PROGRAM_UUID, false, this.parser);
+
+		Mockito.verify(this.parser).parseAndSetObservationRows(this.file, testWorkbook, false);
+
+		// Expecting workbook's factors, conditions, constants and variates list are empty because
+		// they only contained obsolete variables.
+		Assert.assertTrue(testWorkbook.getFactors().isEmpty());
+		Assert.assertTrue(testWorkbook.getConditions().isEmpty());
+		Assert.assertTrue(testWorkbook.getConstants().isEmpty());
+		Assert.assertTrue(testWorkbook.getVariates().isEmpty());
+
+	}
+
+	@Test
 	public void testCheckIfAllObservationHasGidAndNumericGidIsBlank() {
 
 		final List<MeasurementRow> observations = this.workbook.getObservations();
@@ -508,6 +533,53 @@ public class DataImportServiceImplTest {
 	}
 
 	@Test
+	public void testRemoveObsoloteVariablesInWorkbookVariablesAreObsolote() {
+
+		final Workbook testWorkbook = this.createTestWorkbook(false);
+
+		// Add obsolete variable to workbook's factors, conditions, constants and variates list.
+		final StandardVariable obsoleteStandardVariable = new StandardVariable();
+		obsoleteStandardVariable.setObsolete(true);
+
+		Mockito.when(this.ontologyDataManager
+				.findStandardVariableByTraitScaleMethodNames(TEST_PROPERTY_NAME, TEST_SCALE_NAME, TEST_METHOD_NAME, PROGRAM_UUID))
+				.thenReturn(obsoleteStandardVariable);
+
+		this.dataImportService.removeObsoloteVariablesInWorkbook(testWorkbook, PROGRAM_UUID);
+
+		// Expecting workbook's factors, conditions, constants and variates list are empty because
+		// they only contained obsolete variables.
+		Assert.assertTrue(testWorkbook.getFactors().isEmpty());
+		Assert.assertTrue(testWorkbook.getConditions().isEmpty());
+		Assert.assertTrue(testWorkbook.getConstants().isEmpty());
+		Assert.assertTrue(testWorkbook.getVariates().isEmpty());
+
+	}
+
+	@Test
+	public void testRemoveObsoloteVariablesInWorkbookVariablesAreNotObsolote() {
+
+		final Workbook testWorkbook = this.createTestWorkbook(false);
+
+		final StandardVariable standardVariable = new StandardVariable();
+		standardVariable.setObsolete(false);
+
+		Mockito.when(this.ontologyDataManager
+				.findStandardVariableByTraitScaleMethodNames(TEST_PROPERTY_NAME, TEST_SCALE_NAME, TEST_METHOD_NAME, PROGRAM_UUID))
+				.thenReturn(standardVariable);
+
+		this.dataImportService.removeObsoloteVariablesInWorkbook(testWorkbook, PROGRAM_UUID);
+
+		// Expecting workbook's factors, conditions, constants and variates list have data because
+		// they contain non-obsolete variables
+		Assert.assertFalse(testWorkbook.getFactors().isEmpty());
+		Assert.assertFalse(testWorkbook.getConditions().isEmpty());
+		Assert.assertFalse(testWorkbook.getConstants().isEmpty());
+		Assert.assertFalse(testWorkbook.getVariates().isEmpty());
+
+	}
+
+	@Test
 	public void testRemoveObsoleteMeasurementVariableVariableIsObsolete() {
 
 		// Create an 'AD' measurement variable
@@ -524,7 +596,7 @@ public class DataImportServiceImplTest {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(adObsolete);
 
-		this.dataImportService.removeObsoleteMeasurementVariable(measurementVariables, PROGRAM_UUID);
+		this.dataImportService.removeObsoleteMeasurementVariables(measurementVariables, PROGRAM_UUID);
 
 		// Expecting that measurementVariables list is empty.
 		// The added variable should be deleted from the list because it is obsolete.
@@ -549,7 +621,7 @@ public class DataImportServiceImplTest {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(adObsolete);
 
-		this.dataImportService.removeObsoleteMeasurementVariable(measurementVariables, PROGRAM_UUID);
+		this.dataImportService.removeObsoleteMeasurementVariables(measurementVariables, PROGRAM_UUID);
 
 		// Expecting that measurementVariables list has 1 item.
 		// The added variable should not be deleted from the list because it is not obsolete.
@@ -574,19 +646,18 @@ public class DataImportServiceImplTest {
 
 		final Workbook testWorkbook = new Workbook();
 
-		final List<MeasurementVariable> variates = new ArrayList<>();
-
-		final MeasurementVariable categoricalMeasurementVariable =
-				new MeasurementVariable(EARASP_1_5_TERMID, EARASP_1_5_NAME, EARASP_1_5_DEFINITION, EARASP_1_5_SCALE, EARASP_1_5_METHOD,
-						EARASP_1_5_PROPERTY, NUMERIC, "", "VARIATE");
-
-		variates.add(categoricalMeasurementVariable);
-
-		testWorkbook.setVariates(variates);
+		testWorkbook.setFactors(new ArrayList<MeasurementVariable>(Arrays.asList(
+				new MeasurementVariable(TEST_VARIABLE_NAME, "", TEST_SCALE_NAME, TEST_METHOD_NAME, TEST_PROPERTY_NAME, "", "", ""))));
+		testWorkbook.setConditions(new ArrayList<MeasurementVariable>(Arrays.asList(
+				new MeasurementVariable(TEST_VARIABLE_NAME, "", TEST_SCALE_NAME, TEST_METHOD_NAME, TEST_PROPERTY_NAME, "", "", ""))));
+		testWorkbook.setConstants(new ArrayList<MeasurementVariable>(Arrays.asList(
+				new MeasurementVariable(TEST_VARIABLE_NAME, "", TEST_SCALE_NAME, TEST_METHOD_NAME, TEST_PROPERTY_NAME, "", "", ""))));
+		testWorkbook.setVariates(new ArrayList<MeasurementVariable>(Arrays.asList(
+				new MeasurementVariable(TEST_VARIABLE_NAME, "", TEST_SCALE_NAME, TEST_METHOD_NAME, TEST_PROPERTY_NAME, "", "", ""))));
 
 		final List<MeasurementRow> observations = new ArrayList<>();
 		final List<MeasurementData> dataList = new ArrayList<>();
-		final MeasurementData variateCategorical = new MeasurementData(EARASP_1_5_NAME, withOutOfBoundsData ? "7" : "6");
+		final MeasurementData variateCategorical = new MeasurementData(TEST_VARIABLE_NAME, withOutOfBoundsData ? "7" : "6");
 		dataList.add(variateCategorical);
 		final MeasurementRow row = new MeasurementRow();
 
@@ -650,24 +721,4 @@ public class DataImportServiceImplTest {
 		return measurementVariables;
 	}
 
-	private Workbook createTestWorkbook() {
-		final Workbook wb = new Workbook();
-		final StudyDetails studyDetails = new StudyDetails();
-		studyDetails.setStudyType(StudyType.N);
-		wb.setStudyDetails(studyDetails);
-		wb.setFactors(this.createTestFactors());
-		return wb;
-	}
-
-	private List<MeasurementVariable> createTestFactors() {
-		final List<MeasurementVariable> list = new ArrayList<>();
-
-		list.add(new MeasurementVariable(TermId.ENTRY_NO.getId(), ENTRY, "The germplasm entry number", NUMBER, ENUMERATED, GERMPLASM_ENTRY,
-				NUMERIC, STUDY, ENTRY));
-		list.add(new MeasurementVariable(TermId.PLOT_NO.getId(), PLOT, "Plot number ", NESTED_NUMBER, ENUMERATED, FIELD_PLOT, NUMERIC,
-				NUMERIC_VALUE, PLOT));
-		list.add(new MeasurementVariable(TermId.TRIAL_INSTANCE_FACTOR.getId(), "TRIAL_INSTANCE", "TRIAL NUMBER", NUMBER, ENUMERATED,
-				TRIAL_INSTANCE, NUMERIC, "", TRIAL));
-		return list;
-	}
 }
