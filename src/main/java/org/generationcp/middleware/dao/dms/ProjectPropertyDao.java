@@ -66,7 +66,8 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 						.append(Util.convertCollectionToCSV(VariableType.ids()))
 						.append(")")
 						.append("	 AND ppValue.rank = ppStdVar.rank ")
-						.append("    AND ppValue.value IN (:propertyNames) ");
+						.append("    AND ppValue.value IN (:propertyNames) ")
+						.append("INNER JOIN cvterm ON cvterm.cvterm_id = ppStdVar.id AND cvterm.is_obsolete = 0");
 				SQLQuery query = this.getSession().createSQLQuery(
 						sqlString.toString());
 				query.setParameterList("propertyNames", propertyNames);
