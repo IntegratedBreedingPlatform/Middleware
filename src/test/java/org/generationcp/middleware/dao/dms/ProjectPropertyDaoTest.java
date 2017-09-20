@@ -1,39 +1,43 @@
 /*******************************************************************************
- *
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * <p/>
  * Generation Challenge Programme (GCP)
- *
- *
+ * <p/>
+ * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
  *******************************************************************************/
 
 package org.generationcp.middleware.dao.dms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-@Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
 public class ProjectPropertyDaoTest extends IntegrationTestBase {
 
-	private ProjectPropertyDao dao;
+	private static ProjectPropertyDao dao;
+	private static CVTermDao cvTermDao;
 
 	@Before
 	public void setUp() throws Exception {
-		this.dao = new ProjectPropertyDao();
-		this.dao.setSession(this.sessionProvder.getSession());
+		dao = new ProjectPropertyDao();
+		dao.setSession(this.sessionProvder.getSession());
+		cvTermDao = new CVTermDao();
+		cvTermDao.setSession(this.sessionProvder.getSession());
+
 	}
 
 	@Test
@@ -55,6 +59,24 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		}
 	}
 
+	@Test
+	public void testGetStandardVariableIdsWithTypeByPropertyNamesVariableIsObsolete() throws Exception {
+
+		final String trialInstance = "TRIAL_INSTANCE";
+		List<String> propertyNames = Arrays.asList(trialInstance);
+
+		CVTerm trialInstanceTerm = cvTermDao.getByName(trialInstance);
+		trialInstanceTerm.setIsObsolete(true);
+		cvTermDao.saveOrUpdate(trialInstanceTerm);
+		this.sessionProvder.getSession().flush();
+
+		Map<String, Map<Integer, VariableType>> results = this.dao.getStandardVariableIdsWithTypeByPropertyNames(propertyNames);
+
+		// The TRIAL_INSTANCE variable is obsolete so the result should be empty
+		Assert.assertTrue(results.isEmpty());
+
+	}
+
 	private Map<String, VariableType> createVarNameWithTypeMapTestData() {
 		Map<String, VariableType> varNameWithTypeMap = new HashMap<String, VariableType>();
 		varNameWithTypeMap.put("TRIAL_INSTANCE", VariableType.ENVIRONMENT_DETAIL);
@@ -64,7 +86,6 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		varNameWithTypeMap.put("CROSS", VariableType.GERMPLASM_DESCRIPTOR);
 		varNameWithTypeMap.put("PLOT_NO", VariableType.EXPERIMENTAL_DESIGN);
 		varNameWithTypeMap.put("REP_NO", VariableType.EXPERIMENTAL_DESIGN);
-		varNameWithTypeMap.put("SITE_SOIL_PH", VariableType.TRAIT);
 		return varNameWithTypeMap;
 	}
 }
