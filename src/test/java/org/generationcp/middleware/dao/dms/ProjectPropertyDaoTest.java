@@ -1,11 +1,13 @@
 /*******************************************************************************
+ *
  * Copyright (c) 2012, All Rights Reserved.
- * <p/>
+ *
  * Generation Challenge Programme (GCP)
- * <p/>
- * <p/>
+ *
+ *
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
+ *
  *******************************************************************************/
 
 package org.generationcp.middleware.dao.dms;
@@ -86,6 +88,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		varNameWithTypeMap.put("CROSS", VariableType.GERMPLASM_DESCRIPTOR);
 		varNameWithTypeMap.put("PLOT_NO", VariableType.EXPERIMENTAL_DESIGN);
 		varNameWithTypeMap.put("REP_NO", VariableType.EXPERIMENTAL_DESIGN);
+		varNameWithTypeMap.put("SITE_SOIL_PH", VariableType.TRAIT);
 		return varNameWithTypeMap;
 	}
 }
