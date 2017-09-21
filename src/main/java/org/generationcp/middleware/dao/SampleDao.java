@@ -8,15 +8,13 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Restrictions;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class SampleDao extends GenericDAO<Sample, Integer> {
 
-	protected final static String SQL_SAMPLES_AND_EXPERIMENTS =
+	protected static final String SQL_SAMPLES_AND_EXPERIMENTS =
 		"SELECT  nde.nd_experiment_id, (SELECT COALESCE(NULLIF(COUNT(sp.sample_id), 0), '-')\n FROM plant pl INNER JOIN\n"
 			+ "            						sample AS sp ON pl.plant_id = sp.sample_id\n" + "        WHERE\n"
 			+ "            						nde.nd_experiment_id = pl.nd_experiment_id) 'SAMPLES'"
@@ -32,16 +30,6 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		final DetachedCriteria criteria = DetachedCriteria.forClass(Sample.class);
 		criteria.add(Restrictions.eq("sampleId", sampleId));
 		return (Sample) criteria.getExecutableCriteria(this.getSession()).uniqueResult();
-	}
-
-	public List<Sample> getBySampleIds(final Collection<Integer> sampleIds) {
-		final List<Sample> samples = new ArrayList<>();
-
-		for (Integer id : sampleIds) {
-			samples.add(this.getBySampleId(id));
-		}
-
-		return samples;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -74,5 +62,17 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 				"Unexpected error in executing getExperimentSampleMap(studyDbId = " + studyDbId + ") query: " + he.getMessage(), he);
 		}
 		return samplesMap;
+	}
+
+	public Sample getBySampleBk(final String sampleBk){
+		Sample sample;
+		try {
+			sample = (Sample) this.getSession().createCriteria(Sample.class, "sample").add(Restrictions.eq("sampleBusinessKey", sampleBk))
+				.uniqueResult();
+		} catch (HibernateException he) {
+			throw new MiddlewareException(
+				"Unexpected error in executing getBySampleBk(sampleBusinessKey = " + sampleBk + ") query: " + he.getMessage(), he);
+		}
+		return sample;
 	}
 }
