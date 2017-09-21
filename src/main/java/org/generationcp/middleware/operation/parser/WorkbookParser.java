@@ -22,6 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -35,6 +36,7 @@ import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.SheetUtil;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
@@ -117,20 +119,25 @@ public class WorkbookParser {
 	}
 
 	/**
-	 * Added handling for parsing the file if its xls or xlsx
+	 * Load the Excel file and convert it to appropriate Excel workbook format (.xlsx (XSSFWorkbook) or .xls (HSSFWorkbook))
 	 * 
 	 * @param file
 	 * @return
 	 * @throws IOException
 	 */
-	protected Workbook getCorrectWorkbook(File file) throws IOException, WorkbookParserException {
-		InputStream inp = new FileInputStream(file);
-		InputStream inp2 = new FileInputStream(file);
-		Workbook wb;
+	public Workbook loadFileToExcelWorkbook(File file) throws WorkbookParserException {
+
+		Workbook excelWorkbook = null;
+
 		try {
-			wb = new HSSFWorkbook(inp);
-		} catch (OfficeXmlFileException ee) {
-			WorkbookParser.LOG.debug(ee.getMessage(), ee);
+			excelWorkbook = convertExcelFileToProperFormat(file);
+		} catch (FileNotFoundException e) {
+			throw new WorkbookParserException("File not found " + e.getMessage(), e);
+		} catch (IOException e) {
+			throw new WorkbookParserException("Error accessing file " + e.getMessage(), e);
+		}
+
+		if (excelWorkbook instanceof XSSFWorkbook) {
 			int maxLimit = 65000;
 			Boolean overLimit = PoiUtil.isAnySheetRowsOverMaxLimit(file.getAbsolutePath(), maxLimit);
 			if (overLimit) {
@@ -138,19 +145,33 @@ public class WorkbookParser {
 				workbookParserException
 						.addMessage(new Message("error.file.is.too.large", new DecimalFormat("###,###,###").format(maxLimit)));
 				throw workbookParserException;
-			} else {
-				wb = new XSSFWorkbook(inp2);
 			}
+		}
 
+		return excelWorkbook;
+	}
+
+	protected Workbook convertExcelFileToProperFormat(File file) throws IOException {
+
+		InputStream inp = new FileInputStream(file);
+		InputStream inp2 = new FileInputStream(file);
+
+		Workbook excelWorkbook;
+
+		try {
+			excelWorkbook = new HSSFWorkbook(inp);
+		} catch (OfficeXmlFileException ee) {
+			excelWorkbook = new XSSFWorkbook(inp2);
 		} finally {
 			inp.close();
 			inp2.close();
 		}
-		return wb;
+
+		return excelWorkbook;
 	}
 
-	public org.generationcp.middleware.domain.etl.Workbook parseFile(File file, boolean performValidation) throws WorkbookParserException {
-		return this.parseFile(file, performValidation, true);
+	public org.generationcp.middleware.domain.etl.Workbook parseFile(Workbook excelWorkbook, boolean performValidation) throws WorkbookParserException {
+		return this.parseFile(excelWorkbook, performValidation, true);
 	}
 
 	/**
@@ -160,44 +181,32 @@ public class WorkbookParser {
 	 * @return workbook
 	 * @throws org.generationcp.middleware.exceptions.WorkbookParserException
 	 */
-	public org.generationcp.middleware.domain.etl.Workbook parseFile(File file, boolean performValidation, boolean isReadVariate)
+	public org.generationcp.middleware.domain.etl.Workbook parseFile(Workbook excelWorkbook, boolean performValidation, boolean isReadVariate)
 			throws WorkbookParserException {
 
 		this.currentWorkbook = new org.generationcp.middleware.domain.etl.Workbook();
-		Workbook wb;
-
 		this.currentRowZeroBased = 0;
 		this.errorMessages = new LinkedList<Message>();
 		this.setHasIncorrectDatatypeValue(false);
 
-		try {
+		// validation Descriptin and Observation Sheets
+		this.validateExistenceOfSheets(excelWorkbook);
 
-			wb = this.getCorrectWorkbook(file);
+		// throw an exception here if
+		if (!this.errorMessages.isEmpty() && performValidation) {
+			throw new WorkbookParserException(this.errorMessages);
+		}
 
-			// validation Descriptin and Observation Sheets
-			this.validateExistenceOfSheets(wb);
+		this.currentWorkbook.setStudyDetails(this.readStudyDetails(excelWorkbook));
+		this.currentWorkbook.setConditions(this.readMeasurementVariables(excelWorkbook, Section.CONDITION.toString()));
+		this.currentWorkbook.setFactors(this.readMeasurementVariables(excelWorkbook, Section.FACTOR.toString()));
+		this.currentWorkbook.setConstants(this.readMeasurementVariables(excelWorkbook, Section.CONSTANT.toString()));
+		if (isReadVariate) {
+			this.currentWorkbook.setVariates(this.readMeasurementVariables(excelWorkbook, Section.VARIATE.toString()));
+		}
 
-			// throw an exception here if
-			if (!this.errorMessages.isEmpty() && performValidation) {
-				throw new WorkbookParserException(this.errorMessages);
-			}
-
-			this.currentWorkbook.setStudyDetails(this.readStudyDetails(wb));
-			this.currentWorkbook.setConditions(this.readMeasurementVariables(wb, Section.CONDITION.toString()));
-			this.currentWorkbook.setFactors(this.readMeasurementVariables(wb, Section.FACTOR.toString()));
-			this.currentWorkbook.setConstants(this.readMeasurementVariables(wb, Section.CONSTANT.toString()));
-			if (isReadVariate) {
-				this.currentWorkbook.setVariates(this.readMeasurementVariables(wb, Section.VARIATE.toString()));
-			}
-
-			if (!this.errorMessages.isEmpty() && performValidation) {
-				throw new WorkbookParserException(this.errorMessages);
-			}
-
-		} catch (FileNotFoundException e) {
-			throw new WorkbookParserException("File not found " + e.getMessage(), e);
-		} catch (IOException e) {
-			throw new WorkbookParserException("Error accessing file " + e.getMessage(), e);
+		if (!this.errorMessages.isEmpty() && performValidation) {
+			throw new WorkbookParserException(this.errorMessages);
 		}
 
 		return this.currentWorkbook;
@@ -231,16 +240,39 @@ public class WorkbookParser {
 		}
 	}
 
-	public void parseAndSetObservationRows(File file, org.generationcp.middleware.domain.etl.Workbook workbook, boolean discardInvalidValues)
+	public void parseAndSetObservationRows(Workbook excelWorkbook, org.generationcp.middleware.domain.etl.Workbook workbook, boolean discardInvalidValues)
 			throws WorkbookParserException {
-		try {
-			Workbook wb = this.getCorrectWorkbook(file);
 
 			this.currentRowZeroBased = 0;
-			workbook.setObservations(this.readObservations(wb, workbook, discardInvalidValues));
-		} catch (IOException e) {
-			throw new WorkbookParserException("Error accessing file " + e.getMessage(), e);
+			workbook.setObservations(this.readObservations(excelWorkbook, workbook, discardInvalidValues));
+
+	}
+
+	public void removeObsoleteColumnsInExcelWorkbook(final org.apache.poi.ss.usermodel.Workbook excelWorkbook, final List<String> obsoleteVariableNames) {
+
+		// Get the Observation sheet
+		Sheet observationSheet = excelWorkbook.getSheetAt(WorkbookParser.OBSERVATION_SHEET);
+
+		// The first row is the header that contains column names
+		Iterator<Cell> cellIterator = observationSheet.getRow(observationSheet.getFirstRowNum()).cellIterator();
+
+		int columnIndex = 0;
+
+		// Iterate through cells of the header
+		while (cellIterator.hasNext()) {
+
+			String columnName = PoiUtil.getCellStringValue(cellIterator.next());
+
+			if (obsoleteVariableNames.contains(columnName)) {
+				// Delete the column of the obsolete variable.
+				PoiUtil.deleteColumn(observationSheet, columnIndex);
+				// We do not increment the columnIndex here since we deleted a column,
+				// the next columnIndex should remain the same.
+			} else {
+				columnIndex++;
+			}
 		}
+
 	}
 
 	protected StudyDetails readStudyDetails(Workbook wb) {

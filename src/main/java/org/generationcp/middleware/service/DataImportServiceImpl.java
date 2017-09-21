@@ -11,6 +11,7 @@
 package org.generationcp.middleware.service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -112,7 +113,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	@SuppressWarnings("unchecked")
 	@Override
 	public int saveDataset(final Workbook workbook, final boolean retainValues, final boolean isDeleteObservations,
-		final String programUUID, final String cropPrefix) {
+			final String programUUID, final String cropPrefix) {
 
 		Map<String, ?> variableMap = null;
 		final TimerWatch timerWatch = new TimerWatch("saveDataset (grand total)");
@@ -149,11 +150,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public Workbook parseWorkbook(final File file) throws WorkbookParserException {
 		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
 
+		final org.apache.poi.ss.usermodel.Workbook excelWorkbook = parser.loadFileToExcelWorkbook(file);
+
 		// partially parse the file to parse the description sheet only at first
 		// Set performValidation to false to disable validation during parsing.
-		final Workbook workbook = parser.parseFile(file, false);
+		final Workbook workbook = parser.parseFile(excelWorkbook, false);
 
-		parser.parseAndSetObservationRows(file, workbook, false);
+		parser.parseAndSetObservationRows(excelWorkbook, workbook, false);
 
 		return workbook;
 	}
@@ -162,8 +165,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public Workbook strictParseWorkbook(final File file, final String programUUID) throws WorkbookParserException {
 		final WorkbookParser parser = new WorkbookParser(this.maxRowLimit);
 
+		org.apache.poi.ss.usermodel.Workbook excelWorkbook = parser.loadFileToExcelWorkbook(file);
+
 		// partially parse the file to parse the description sheet only at first
-		return this.strictParseWorkbook(file, parser, parser.parseFile(file, true), programUUID);
+		return this.strictParseWorkbook(file, parser, parser.parseFile(excelWorkbook, true), programUUID);
 	}
 
 	protected Workbook strictParseWorkbook(final File file, final WorkbookParser parser, final Workbook workbook, final String programUUID)
@@ -193,9 +198,11 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			throw new WorkbookParserException(messages);
 		}
 
+		final org.apache.poi.ss.usermodel.Workbook excelWorkbook = parser.loadFileToExcelWorkbook(file);
+
 		// this version of the workbookparser method is also capable of throwing a workbookparserexception with a list of messages
 		// containing validation errors inside
-		parser.parseAndSetObservationRows(file, workbook, false);
+		parser.parseAndSetObservationRows(excelWorkbook, workbook, false);
 
 		this.setRequiredFields(workbook);
 
@@ -223,35 +230,61 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public Workbook parseWorkbook(final File file, final String programUUID, final boolean discardInvalidValues, final WorkbookParser workbookParser)
-			throws WorkbookParserException {
+	public Workbook parseWorkbook(final File file, final String programUUID, final boolean discardInvalidValues,
+			final WorkbookParser workbookParser) throws WorkbookParserException {
+
+		final org.apache.poi.ss.usermodel.Workbook excelWorkbook = workbookParser.loadFileToExcelWorkbook(file);
 
 		// Parse the description sheet only at first
-		final Workbook workbook = workbookParser.parseFile(file, false);
+		final Workbook workbook = workbookParser.parseFile(excelWorkbook, false);
 
 		// Remove obsolete factors, conditions, constants and traits in the workbook if there's any
-		this.removeObsoloteVariablesInWorkbook(workbook, programUUID);
+		List<String> obsoleteVariableNames = this.removeObsoloteVariablesInWorkbook(workbook, programUUID);
+
+		workbookParser.removeObsoleteColumnsInExcelWorkbook(excelWorkbook, obsoleteVariableNames);
 
 		// Populate possible values for categorical variates
 		this.populatePossibleValuesForCategoricalVariates(workbook.getVariates(), programUUID);
 
 		// Parse the observation sheet
-		workbookParser.parseAndSetObservationRows(file, workbook, discardInvalidValues);
+		workbookParser.parseAndSetObservationRows(excelWorkbook, workbook, discardInvalidValues);
 
 		return workbook;
 	}
 
-	protected void removeObsoloteVariablesInWorkbook(final Workbook workbook, final String programUUID) {
+	/**
+	 * Remove obsolete variables (factors, conditions, constants and variates) in Workbook.
+	 * Returns the list of all obsolete variable names that are removed.
+	 *
+	 * @param workbook
+	 * @param programUUID
+	 * @return
+	 */
+	protected List<String> removeObsoloteVariablesInWorkbook(final Workbook workbook, final String programUUID) {
 
-		this.removeObsoleteMeasurementVariables(workbook.getConditions(), programUUID);
-		this.removeObsoleteMeasurementVariables(workbook.getFactors(), programUUID);
-		this.removeObsoleteMeasurementVariables(workbook.getConstants(), programUUID);
-		this.removeObsoleteMeasurementVariables(workbook.getVariates(), programUUID);
+		final List<String> obsoleteVariableNames = new ArrayList<>();
+
+		obsoleteVariableNames.addAll(this.removeObsoleteMeasurementVariables(workbook.getConditions(), programUUID));
+		obsoleteVariableNames.addAll(this.removeObsoleteMeasurementVariables(workbook.getFactors(), programUUID));
+		obsoleteVariableNames.addAll(this.removeObsoleteMeasurementVariables(workbook.getConstants(), programUUID));
+		obsoleteVariableNames.addAll(this.removeObsoleteMeasurementVariables(workbook.getVariates(), programUUID));
+
+		return obsoleteVariableNames;
 
 	}
 
-	protected void removeObsoleteMeasurementVariables(final List<MeasurementVariable> measurementVariables, final String programUUID) {
+	/**
+	 * Remove obsolete variables in specified measuremnt variable list.
+	 * Returns the list of all obsolete variable names that are removed.
+	 *
+	 * @param workbook
+	 * @param programUUID
+	 * @return
+	 */
+	protected List<String> removeObsoleteMeasurementVariables(final List<MeasurementVariable> measurementVariables,
+			final String programUUID) {
 
+		final List<String> obsoleteVariableNames = new ArrayList<>();
 		final Iterator<MeasurementVariable> iterator = measurementVariables.iterator();
 
 		while (iterator.hasNext()) {
@@ -263,10 +296,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 							measurementVariable.getMethod(), programUUID);
 
 			if (standardVariable != null && standardVariable.isObsolete()) {
+				obsoleteVariableNames.add(measurementVariable.getName());
 				iterator.remove();
 			}
 
 		}
+
+		return obsoleteVariableNames;
 
 	}
 

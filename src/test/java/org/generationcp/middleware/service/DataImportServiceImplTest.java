@@ -66,6 +66,9 @@ public class DataImportServiceImplTest {
 	private GermplasmDataManager germplasmDataManager;
 
 	@Mock
+	private org.apache.poi.ss.usermodel.Workbook excelWorkbook;
+
+	@Mock
 	private File file;
 
 	private Workbook workbook;
@@ -309,11 +312,12 @@ public class DataImportServiceImplTest {
 
 		final Workbook testWorkbook = this.createTestWorkbook(true);
 
-		Mockito.when(this.parser.parseFile(this.file, false)).thenReturn(testWorkbook);
+		Mockito.when(this.parser.loadFileToExcelWorkbook(this.file)).thenReturn(this.excelWorkbook);
+		Mockito.when(this.parser.parseFile(excelWorkbook, false)).thenReturn(testWorkbook);
 
 		this.dataImportService.parseWorkbook(this.file, PROGRAM_UUID, true, this.parser);
 
-		Mockito.verify(this.parser).parseAndSetObservationRows(this.file, testWorkbook, true);
+		Mockito.verify(this.parser).parseAndSetObservationRows(excelWorkbook, testWorkbook, true);
 
 		Assert.assertFalse("Make sure the possible values of categorical variates is populated",
 				testWorkbook.getVariates().get(0).getPossibleValues().isEmpty());
@@ -326,11 +330,12 @@ public class DataImportServiceImplTest {
 
 		final Workbook testWorkbook = this.createTestWorkbook(true);
 
-		Mockito.when(this.parser.parseFile(this.file, false)).thenReturn(testWorkbook);
+		Mockito.when(this.parser.loadFileToExcelWorkbook(this.file)).thenReturn(this.excelWorkbook);
+		Mockito.when(this.parser.parseFile(this.excelWorkbook, false)).thenReturn(testWorkbook);
 
 		this.dataImportService.parseWorkbook(this.file, PROGRAM_UUID, false, this.parser);
 
-		Mockito.verify(this.parser).parseAndSetObservationRows(this.file, testWorkbook, false);
+		Mockito.verify(this.parser).parseAndSetObservationRows(excelWorkbook, testWorkbook, false);
 
 		Assert.assertFalse("Make sure the possible values of categorical variates is populated",
 				testWorkbook.getVariates().get(0).getPossibleValues().isEmpty());
@@ -352,11 +357,12 @@ public class DataImportServiceImplTest {
 				.findStandardVariableByTraitScaleMethodNames(TEST_PROPERTY_NAME, TEST_SCALE_NAME, TEST_METHOD_NAME, PROGRAM_UUID))
 				.thenReturn(obsoleteStandardVariable);
 
-		Mockito.when(this.parser.parseFile(this.file, false)).thenReturn(testWorkbook);
+		Mockito.when(this.parser.loadFileToExcelWorkbook(this.file)).thenReturn(this.excelWorkbook);
+		Mockito.when(this.parser.parseFile(excelWorkbook, false)).thenReturn(testWorkbook);
 
 		this.dataImportService.parseWorkbook(this.file, PROGRAM_UUID, false, this.parser);
 
-		Mockito.verify(this.parser).parseAndSetObservationRows(this.file, testWorkbook, false);
+		Mockito.verify(this.parser).parseAndSetObservationRows(excelWorkbook, testWorkbook, false);
 
 		// Expecting workbook's factors, conditions, constants and variates list are empty because
 		// they only contained obsolete variables.
@@ -545,7 +551,7 @@ public class DataImportServiceImplTest {
 				.findStandardVariableByTraitScaleMethodNames(TEST_PROPERTY_NAME, TEST_SCALE_NAME, TEST_METHOD_NAME, PROGRAM_UUID))
 				.thenReturn(obsoleteStandardVariable);
 
-		this.dataImportService.removeObsoloteVariablesInWorkbook(testWorkbook, PROGRAM_UUID);
+		final List<String> obsoloteVariableNames = this.dataImportService.removeObsoloteVariablesInWorkbook(testWorkbook, PROGRAM_UUID);
 
 		// Expecting workbook's factors, conditions, constants and variates list are empty because
 		// they only contained obsolete variables.
@@ -553,6 +559,9 @@ public class DataImportServiceImplTest {
 		Assert.assertTrue(testWorkbook.getConditions().isEmpty());
 		Assert.assertTrue(testWorkbook.getConstants().isEmpty());
 		Assert.assertTrue(testWorkbook.getVariates().isEmpty());
+
+		// The obsolete variable names list should contain the name of obsolete variable names that were removed
+		Assert.assertTrue(obsoloteVariableNames.contains(TEST_VARIABLE_NAME));
 
 	}
 
@@ -568,14 +577,17 @@ public class DataImportServiceImplTest {
 				.findStandardVariableByTraitScaleMethodNames(TEST_PROPERTY_NAME, TEST_SCALE_NAME, TEST_METHOD_NAME, PROGRAM_UUID))
 				.thenReturn(standardVariable);
 
-		this.dataImportService.removeObsoloteVariablesInWorkbook(testWorkbook, PROGRAM_UUID);
+		final List<String> obsoloteVariableNames = this.dataImportService.removeObsoloteVariablesInWorkbook(testWorkbook, PROGRAM_UUID);
 
-		// Expecting workbook's factors, conditions, constants and variates list have data because
+		// Expecting workbook's factors, conditions, constants and variates list are not empty because
 		// they contain non-obsolete variables
 		Assert.assertFalse(testWorkbook.getFactors().isEmpty());
 		Assert.assertFalse(testWorkbook.getConditions().isEmpty());
 		Assert.assertFalse(testWorkbook.getConstants().isEmpty());
 		Assert.assertFalse(testWorkbook.getVariates().isEmpty());
+
+		// The obsolete variable names list should be empty because no obsolete variable was removed.
+		Assert.assertTrue(obsoloteVariableNames.isEmpty());
 
 	}
 
@@ -596,11 +608,15 @@ public class DataImportServiceImplTest {
 		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
 		measurementVariables.add(adObsolete);
 
-		this.dataImportService.removeObsoleteMeasurementVariables(measurementVariables, PROGRAM_UUID);
+		final List<String> obsoloteVariableNames =
+				this.dataImportService.removeObsoleteMeasurementVariables(measurementVariables, PROGRAM_UUID);
 
 		// Expecting that measurementVariables list is empty.
 		// The added variable should be deleted from the list because it is obsolete.
 		Assert.assertTrue(measurementVariables.isEmpty());
+
+		// The obsolete variable names list should contain the name of obsolete variable that was removed
+		Assert.assertTrue(obsoloteVariableNames.contains(adObsolete.getName()));
 
 	}
 

@@ -4,6 +4,7 @@ package org.generationcp.middleware.operation.parser;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.operation.parser.WorkbookParser.Section;
 import org.generationcp.middleware.util.Message;
+import org.generationcp.middleware.util.PoiUtil;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -166,7 +168,7 @@ public class WorkbookParserTest {
 
 		this.setupHeaderValidationMocks(moleWorkbookParser, sampleWorkbook, section);
 
-		moleWorkbookParser.parseFile(this.file, true);
+		moleWorkbookParser.parseFile(sampleWorkbook, true);
 		Mockito.verify(moleWorkbookParser).checkHeadersValid(sampleWorkbook, 0, 0, headerArray);
 	}
 
@@ -179,7 +181,7 @@ public class WorkbookParserTest {
 		this.setupHeaderValidationMocks(moleWorkbookParser, sampleWorkbook, section);
 
 		try {
-			moleWorkbookParser.parseFile(this.file, true);
+			moleWorkbookParser.parseFile(sampleWorkbook, true);
 			Assert.fail("Validation exception should have been thrown");
 		} catch (WorkbookParserException e) {
 			String errorMessage = "Incorrect headers for " + sectionName;
@@ -190,7 +192,7 @@ public class WorkbookParserTest {
 	private void setupHeaderValidationMocks(WorkbookParser moleWorkbookParser, Workbook sampleWorkbook, Section section)
 			throws IOException, WorkbookParserException {
 		// mock / skip other parsing logic and validations
-		Mockito.doReturn(sampleWorkbook).when(moleWorkbookParser).getCorrectWorkbook(this.file);
+		Mockito.doReturn(sampleWorkbook).when(moleWorkbookParser).loadFileToExcelWorkbook(file);
 		Mockito.doNothing().when(moleWorkbookParser).validateExistenceOfSheets(sampleWorkbook);
 		Mockito.doReturn(new StudyDetails()).when(moleWorkbookParser).readStudyDetails(sampleWorkbook);
 
@@ -864,6 +866,55 @@ public class WorkbookParserTest {
 		Assert.assertEquals("1", result.get(0).getMeasurementData(ENTRY_NO).getValue());
 		Assert.assertEquals("1", result.get(0).getMeasurementData(PLOT_NO).getValue());
 		Assert.assertEquals("6", result.get(0).getMeasurementData(ALEU_COL_1_5).getValue());
+
+	}
+
+	@Test
+	public void testRemoveObsoleteColumnsInExcelWorkbook() {
+
+		Workbook excelWorkbook = new HSSFWorkbook();
+
+		// Create description sheet
+		excelWorkbook.createSheet("Description");
+
+		// We're only interested in observation sheet
+		Sheet observationSheet = excelWorkbook.createSheet("Observation");
+
+		// Add column names
+		Row headerRow = observationSheet.createRow(0);
+
+		final String firstColumnName = "TRIAL_INSTANCE";
+		final String secondColumnName = "PLOT_NO";
+		final String thirdColumnName = "TRAIT_1";
+		final String firstColumnData = "DATA1";
+		final String secondColumnData = "DATA2";
+		final String thirdColumnData = "DATA3";
+
+		headerRow.createCell(0).setCellValue(firstColumnName);
+		headerRow.createCell(1).setCellValue(secondColumnName);
+		headerRow.createCell(2).setCellValue(thirdColumnName);
+
+		// Add data
+		Row dataRow = observationSheet.createRow(1);
+		dataRow.createCell(0).setCellValue(firstColumnData);
+		dataRow.createCell(1).setCellValue(secondColumnData);
+		dataRow.createCell(2).setCellValue(thirdColumnData);
+
+		// Delete the second column
+		List<String> obsoleteVariableToDelete = Arrays.asList(secondColumnName);
+
+		this.workbookParser.removeObsoleteColumnsInExcelWorkbook(excelWorkbook, obsoleteVariableToDelete);
+
+		// Verify the header row
+		Assert.assertEquals(firstColumnName, headerRow.getCell(0).getStringCellValue());;
+		Assert.assertEquals("Second column is deleted, so the third column data should move to second column.", thirdColumnName, headerRow.getCell(1).getStringCellValue());
+		Assert.assertEquals("The third column should be null since third column is moved to the second column", null, headerRow.getCell(2));
+
+		// Verify the data row
+		Assert.assertEquals(firstColumnData, dataRow.getCell(0).getStringCellValue());
+		Assert.assertEquals("Second column is deleted, so the third column data should move to second column.", thirdColumnData, dataRow.getCell(1).getStringCellValue());
+		Assert.assertEquals("The third column should be null since third column is moved to the second column", null, dataRow.getCell(2));
+
 
 	}
 
