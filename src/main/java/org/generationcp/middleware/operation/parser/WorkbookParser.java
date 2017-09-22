@@ -254,24 +254,22 @@ public class WorkbookParser {
 		Sheet observationSheet = excelWorkbook.getSheetAt(WorkbookParser.OBSERVATION_SHEET);
 
 		// The first row is the header that contains column names
-		Iterator<Cell> cellIterator = observationSheet.getRow(observationSheet.getFirstRowNum()).cellIterator();
+		Row headerRow = observationSheet.getRow(observationSheet.getFirstRowNum());
 
-		int columnIndex = 0;
-
-		// Iterate through cells of the header
-		while (cellIterator.hasNext()) {
-
-			String columnName = PoiUtil.getCellStringValue(cellIterator.next());
-
-			if (obsoleteVariableNames.contains(columnName)) {
-				// Delete the column of the obsolete variable.
-				PoiUtil.deleteColumn(observationSheet, columnIndex);
-				// We do not increment the columnIndex here since we deleted a column,
-				// the next columnIndex should remain the same.
-			} else {
-				columnIndex++;
+		for (int columnIndex = 0; columnIndex <= headerRow.getLastCellNum(); columnIndex++ ) {
+			Cell cell = headerRow.getCell(columnIndex);
+			if (cell != null) {
+				String columnName = cell.getStringCellValue();
+				if (obsoleteVariableNames.contains(columnName)) {
+					// Delete the column of the obsolete variable.
+					PoiUtil.deleteColumn(observationSheet, columnIndex);
+					// Decrement the column index since we deleted a column
+					columnIndex--;
+				}
 			}
+
 		}
+
 
 	}
 

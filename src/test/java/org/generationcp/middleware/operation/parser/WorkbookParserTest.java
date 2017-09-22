@@ -883,37 +883,51 @@ public class WorkbookParserTest {
 		// Add column names
 		Row headerRow = observationSheet.createRow(0);
 
-		final String firstColumnName = "TRIAL_INSTANCE";
-		final String secondColumnName = "PLOT_NO";
-		final String thirdColumnName = "TRAIT_1";
-		final String firstColumnData = "DATA1";
-		final String secondColumnData = "DATA2";
-		final String thirdColumnData = "DATA3";
+		final String columnTrialInstance = "TRIAL_INSTANCE";
+		final String columnPlotNo = "PLOT_NO";
+		final String columnPlantHeight = "PlantHeight";
+		final String columnEarPH = "EarPH";
+		final String columnEarSel = "EarSel";
 
-		headerRow.createCell(0).setCellValue(firstColumnName);
-		headerRow.createCell(1).setCellValue(secondColumnName);
-		headerRow.createCell(2).setCellValue(thirdColumnName);
+		final String columnData1 = "DATA1";
+		final String columnData2 = "DATA2";
+		final String columnData3 = "DATA3";
+		final String columnData4 = "DATA4";
+		final String columnData5 = "DATA5";
+
+		headerRow.createCell(0).setCellValue(columnTrialInstance);
+		headerRow.createCell(1).setCellValue(columnPlotNo);
+		headerRow.createCell(2).setCellValue(columnPlantHeight);
+		headerRow.createCell(3).setCellValue(columnEarPH);
+		headerRow.createCell(4).setCellValue(columnEarSel);
 
 		// Add data
 		Row dataRow = observationSheet.createRow(1);
-		dataRow.createCell(0).setCellValue(firstColumnData);
-		dataRow.createCell(1).setCellValue(secondColumnData);
-		dataRow.createCell(2).setCellValue(thirdColumnData);
+		dataRow.createCell(0).setCellValue(columnData1);
+		dataRow.createCell(1).setCellValue(columnData2);
+		dataRow.createCell(2).setCellValue(columnData3);
+		dataRow.createCell(3).setCellValue(columnData4);
+		dataRow.createCell(4).setCellValue(columnData5);
 
-		// Delete the second column
-		List<String> obsoleteVariableToDelete = Arrays.asList(secondColumnName);
+		// Delete the Trial Instance, Plant Height and EarPH columns
+		List<String> obsoleteVariableToDelete = Arrays.asList(columnTrialInstance, columnPlantHeight, columnEarPH);
 
 		this.workbookParser.removeObsoleteColumnsInExcelWorkbook(excelWorkbook, obsoleteVariableToDelete);
 
 		// Verify the header row
-		Assert.assertEquals(firstColumnName, headerRow.getCell(0).getStringCellValue());;
-		Assert.assertEquals("Second column is deleted, so the third column data should move to second column.", thirdColumnName, headerRow.getCell(1).getStringCellValue());
-		Assert.assertEquals("The third column should be null since third column is moved to the second column", null, headerRow.getCell(2));
+		Assert.assertEquals("columnTrialInstance is deleted, so columnPlotNo is now on the first column", columnPlotNo, headerRow.getCell(0).getStringCellValue());;
+		Assert.assertEquals("columnPlantHeight and columnEarPH are deleted, so columnEarSel is now on the second column ", columnEarSel, headerRow.getCell(1).getStringCellValue());
+		Assert.assertEquals("No cell should be on the third column", null, headerRow.getCell(2));
+		Assert.assertEquals("No cell should be on the fourth column", null, headerRow.getCell(3));
+		Assert.assertEquals("No cell should be on the fifth column", null, headerRow.getCell(4));
+
 
 		// Verify the data row
-		Assert.assertEquals(firstColumnData, dataRow.getCell(0).getStringCellValue());
-		Assert.assertEquals("Second column is deleted, so the third column data should move to second column.", thirdColumnData, dataRow.getCell(1).getStringCellValue());
-		Assert.assertEquals("The third column should be null since third column is moved to the second column", null, dataRow.getCell(2));
+		Assert.assertEquals("columnTrialInstance data is deleted, so columnPlotNo data is now on the first column", columnData2, dataRow.getCell(0).getStringCellValue());;
+		Assert.assertEquals("columnPlantHeight and columnEarPH data are deleted, so columnEarSel data is now on the second column ", columnData5, dataRow.getCell(1).getStringCellValue());
+		Assert.assertEquals("No cell should be on the third column", null, dataRow.getCell(2));
+		Assert.assertEquals("No cell should be on the fourth column", null, dataRow.getCell(3));
+		Assert.assertEquals("No cell should be on the fifth column", null, dataRow.getCell(4));
 
 
 	}
