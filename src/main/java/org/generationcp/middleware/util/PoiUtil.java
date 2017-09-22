@@ -1,22 +1,14 @@
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
- *
+ * <p/>
  * Generation Challenge Programme (GCP)
- *
- *
+ * <p/>
+ * <p/>
  * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
  *******************************************************************************/
 
 package org.generationcp.middleware.util;
-
-import java.awt.Point;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
@@ -28,6 +20,12 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * A convenience class for POI library.
@@ -45,15 +43,16 @@ public class PoiUtil {
 	}
 
 	// WorkBook convenience methods
-	public static void setRepeatingRows(Workbook workBook, int sheetIndex, int fromRow, int toRow) {
+	public static void setRepeatingRows(final Workbook workBook, final int sheetIndex, final int fromRow, final int toRow) {
 		workBook.setRepeatingRowsAndColumns(sheetIndex, -1, -1, fromRow, toRow);
 	}
 
-	public static void setRepeatingColumns(Workbook workBook, int sheetIndex, int fromCol, int toCol) {
+	public static void setRepeatingColumns(final Workbook workBook, final int sheetIndex, final int fromCol, final int toCol) {
 		workBook.setRepeatingRowsAndColumns(sheetIndex, fromCol, toCol, -1, -1);
 	}
 
-	public static void setRepeatingRowsAndColumns(Workbook workBook, int sheetIndex, int fromCol, int toCol, int fromRow, int toRow) {
+	public static void setRepeatingRowsAndColumns(final Workbook workBook, final int sheetIndex, final int fromCol, final int toCol,
+			final int fromRow, final int toRow) {
 		workBook.setRepeatingRowsAndColumns(sheetIndex, fromCol, toCol, fromRow, toRow);
 	}
 
@@ -61,7 +60,8 @@ public class PoiUtil {
 		return cell == null ? null : cell.getNumericCellValue();
 	}
 
-	public static String getCellStringValue(final Workbook wb, final Integer sheetNumber, final Integer rowNumber, final Integer columnNumber) {
+	public static String getCellStringValue(final Workbook wb, final Integer sheetNumber, final Integer rowNumber,
+			final Integer columnNumber) {
 
 		final Sheet sheet = wb.getSheetAt(sheetNumber);
 		final Row row = sheet.getRow(rowNumber);
@@ -75,7 +75,8 @@ public class PoiUtil {
 
 	}
 
-	public static Double getCellNumericValue(final Workbook wb, final Integer sheetNumber, final Integer rowNumber, final Integer columnNumber) {
+	public static Double getCellNumericValue(final Workbook wb, final Integer sheetNumber, final Integer rowNumber,
+			final Integer columnNumber) {
 
 		final Sheet sheet = wb.getSheetAt(sheetNumber);
 		final Row row = sheet.getRow(rowNumber);
@@ -89,8 +90,8 @@ public class PoiUtil {
 
 	}
 
-	public static String getCellStringValue(Cell cell) {
-		Object out = PoiUtil.getCellValue(cell);
+	public static String getCellStringValue(final Cell cell) {
+		final Object out = PoiUtil.getCellValue(cell);
 
 		if (out != null) {
 			return out.toString().trim();
@@ -99,7 +100,7 @@ public class PoiUtil {
 		return null;
 	}
 
-	public static Object getCellValue(Cell cell) {
+	public static Object getCellValue(final Cell cell) {
 		if (cell == null) {
 			return null;
 		}
@@ -119,7 +120,7 @@ public class PoiUtil {
 
 	// setCellValue with cell name as parameter
 
-	private static Object getFormulaValue(Cell cell) {
+	private static Object getFormulaValue(final Cell cell) {
 		switch (cell.getCachedFormulaResultType()) {
 			case Cell.CELL_TYPE_NUMERIC:
 				return cell.getNumericCellValue();
@@ -130,13 +131,13 @@ public class PoiUtil {
 		}
 	}
 
-	private static Object getNumericValue(Cell cell) {
+	private static Object getNumericValue(final Cell cell) {
 		if (DateUtil.isCellDateFormatted(cell)) {
-			Date date = cell.getDateCellValue();
+			final Date date = cell.getDateCellValue();
 			return PoiUtil.EXCEL_DATE_FORMATTER.format(date);
 		}
 
-		double doubleVal = cell.getNumericCellValue();
+		final double doubleVal = cell.getNumericCellValue();
 		if (doubleVal % 1 == 0) {
 			return (int) doubleVal;
 		} else {
@@ -144,70 +145,70 @@ public class PoiUtil {
 		}
 	}
 
-	public static void setCellValue(Sheet sheet, String cellName, String value) {
-		Point cellIndex = PoiUtil.getCellIndex(cellName);
+	public static void setCellValue(final Sheet sheet, final String cellName, final String value) {
+		final Point cellIndex = PoiUtil.getCellIndex(cellName);
 		PoiUtil.setCellValue(sheet, cellIndex.y, cellIndex.x, value);
 	}
 
-	public static void setCellValue(Sheet sheet, String cellName, Integer value) {
-		Point cellIndex = PoiUtil.getCellIndex(cellName);
+	public static void setCellValue(final Sheet sheet, final String cellName, final Integer value) {
+		final Point cellIndex = PoiUtil.getCellIndex(cellName);
 		PoiUtil.setCellValue(sheet, cellIndex.y, cellIndex.x, value);
 	}
 
-	public static void setCellValue(Sheet sheet, String cellName, Long value) {
-		Point cellIndex = PoiUtil.getCellIndex(cellName);
+	public static void setCellValue(final Sheet sheet, final String cellName, final Long value) {
+		final Point cellIndex = PoiUtil.getCellIndex(cellName);
 		PoiUtil.setCellValue(sheet, cellIndex.y, cellIndex.x, value);
 	}
 
-	public static void setCellValue(Sheet sheet, String cellName, Double value) {
-		Point cellIndex = PoiUtil.getCellIndex(cellName);
+	public static void setCellValue(final Sheet sheet, final String cellName, final Double value) {
+		final Point cellIndex = PoiUtil.getCellIndex(cellName);
 		PoiUtil.setCellValue(sheet, cellIndex.y, cellIndex.x, value);
 	}
 
-	public static void setCellValue(Sheet sheet, String cellName, Date value) {
-		Point cellIndex = PoiUtil.getCellIndex(cellName);
+	public static void setCellValue(final Sheet sheet, final String cellName, final Date value) {
+		final Point cellIndex = PoiUtil.getCellIndex(cellName);
 		PoiUtil.setCellValue(sheet, cellIndex.y, cellIndex.x, value);
 	}
 
-	public static void setCellValue(Sheet sheet, String cellName, Object value) {
-		Point cellIndex = PoiUtil.getCellIndex(cellName);
+	public static void setCellValue(final Sheet sheet, final String cellName, final Object value) {
+		final Point cellIndex = PoiUtil.getCellIndex(cellName);
 		PoiUtil.setCellValue(sheet, cellIndex.y, cellIndex.x, value);
 	}
 
 	// setCellValue with String column name and integer row index as parameter
-	public static void setCellValue(Sheet sheet, String colName, int rowIndex, String value) {
-		int columnIndex = PoiUtil.getColumnIndex(colName);
+	public static void setCellValue(final Sheet sheet, final String colName, final int rowIndex, final String value) {
+		final int columnIndex = PoiUtil.getColumnIndex(colName);
 		PoiUtil.setCellValue(sheet, columnIndex, rowIndex, value);
 	}
 
-	public static void setCellValue(Sheet sheet, String colName, int rowIndex, Integer value) {
-		int columnIndex = PoiUtil.getColumnIndex(colName);
+	public static void setCellValue(final Sheet sheet, final String colName, final int rowIndex, final Integer value) {
+		final int columnIndex = PoiUtil.getColumnIndex(colName);
 		PoiUtil.setCellValue(sheet, columnIndex, rowIndex, value);
 	}
 
-	public static void setCellValue(Sheet sheet, String colName, int rowIndex, Long value) {
-		int columnIndex = PoiUtil.getColumnIndex(colName);
+	public static void setCellValue(final Sheet sheet, final String colName, final int rowIndex, final Long value) {
+		final int columnIndex = PoiUtil.getColumnIndex(colName);
 		PoiUtil.setCellValue(sheet, columnIndex, rowIndex, value);
 	}
 
-	public static void setCellValue(Sheet sheet, String colName, int rowIndex, Double value) {
-		int columnIndex = PoiUtil.getColumnIndex(colName);
+	public static void setCellValue(final Sheet sheet, final String colName, final int rowIndex, final Double value) {
+		final int columnIndex = PoiUtil.getColumnIndex(colName);
 		PoiUtil.setCellValue(sheet, columnIndex, rowIndex, value);
 	}
 
-	public static void setCellValue(Sheet sheet, String colName, int rowIndex, Date value) {
-		int columnIndex = PoiUtil.getColumnIndex(colName);
+	public static void setCellValue(final Sheet sheet, final String colName, final int rowIndex, final Date value) {
+		final int columnIndex = PoiUtil.getColumnIndex(colName);
 		PoiUtil.setCellValue(sheet, columnIndex, rowIndex, value);
 	}
 
-	public static void setCellValue(Sheet sheet, String colName, int rowIndex, Object value) {
-		int columnIndex = PoiUtil.getColumnIndex(colName);
+	public static void setCellValue(final Sheet sheet, final String colName, final int rowIndex, final Object value) {
+		final int columnIndex = PoiUtil.getColumnIndex(colName);
 		PoiUtil.setCellValue(sheet, columnIndex, rowIndex, value);
 	}
 
 	// setCellValue with integer indices as parameter
 
-	public static void setCellValue(Sheet sheet, int columnIndex, int rowIndex, String value) {
+	public static void setCellValue(final Sheet sheet, final int columnIndex, final int rowIndex, final String value) {
 		Row row = sheet.getRow(rowIndex);
 		if (row == null) {
 			row = sheet.createRow(rowIndex);
@@ -229,7 +230,7 @@ public class PoiUtil {
 		}
 	}
 
-	public static void setCellValue(Sheet sheet, int columnIndex, int rowIndex, Integer value) {
+	public static void setCellValue(final Sheet sheet, final int columnIndex, final int rowIndex, final Integer value) {
 		Row row = sheet.getRow(rowIndex);
 		if (row == null) {
 			row = sheet.createRow(rowIndex);
@@ -251,7 +252,7 @@ public class PoiUtil {
 		}
 	}
 
-	public static void setCellValue(Sheet sheet, int columnIndex, int rowIndex, Long value) {
+	public static void setCellValue(final Sheet sheet, final int columnIndex, final int rowIndex, final Long value) {
 		Row row = sheet.getRow(rowIndex);
 		if (row == null) {
 			row = sheet.createRow(rowIndex);
@@ -273,7 +274,7 @@ public class PoiUtil {
 		}
 	}
 
-	public static void setCellValue(Sheet sheet, int columnIndex, int rowIndex, Double value) {
+	public static void setCellValue(final Sheet sheet, final int columnIndex, final int rowIndex, final Double value) {
 		Row row = sheet.getRow(rowIndex);
 		if (row == null) {
 			row = sheet.createRow(rowIndex);
@@ -295,7 +296,7 @@ public class PoiUtil {
 		}
 	}
 
-	public static void setCellValue(Sheet sheet, int columnIndex, int rowIndex, Date value) {
+	public static void setCellValue(final Sheet sheet, final int columnIndex, final int rowIndex, final Date value) {
 		Row row = sheet.getRow(rowIndex);
 		if (row == null) {
 			row = sheet.createRow(rowIndex);
@@ -317,7 +318,7 @@ public class PoiUtil {
 		}
 	}
 
-	public static void setCellValue(Sheet sheet, int columnIndex, int rowIndex, Object value) {
+	public static void setCellValue(final Sheet sheet, final int columnIndex, final int rowIndex, final Object value) {
 		Row row = sheet.getRow(rowIndex);
 		if (row == null) {
 			row = sheet.createRow(rowIndex);
@@ -339,12 +340,12 @@ public class PoiUtil {
 		}
 	}
 
-	public static void setCellAlignment(Sheet sheet, int rowIndex, String columnName, short alignment) {
+	public static void setCellAlignment(final Sheet sheet, final int rowIndex, final String columnName, final short alignment) {
 		PoiUtil.setCellAlignment(sheet, rowIndex, PoiUtil.getColumnIndex(columnName), alignment);
 	}
 
-	public static void setCellAlignment(Sheet sheet, int rowIndex, int columnIndex, short alignment) {
-		Cell cell = PoiUtil.getCell(sheet, columnIndex, rowIndex);
+	public static void setCellAlignment(final Sheet sheet, final int rowIndex, final int columnIndex, final short alignment) {
+		final Cell cell = PoiUtil.getCell(sheet, columnIndex, rowIndex);
 
 		if (cell == null) {
 			throw new IllegalArgumentException("Cell with col=" + columnIndex + " and row=" + rowIndex + " is null.");
@@ -354,16 +355,16 @@ public class PoiUtil {
 	}
 
 	// other convenience methods
-	public static Cell getCell(Sheet sheet, String cellName) {
-		Point cellIndex = PoiUtil.getCellIndex(cellName);
+	public static Cell getCell(final Sheet sheet, final String cellName) {
+		final Point cellIndex = PoiUtil.getCellIndex(cellName);
 		return PoiUtil.getCell(sheet, cellIndex.x, cellIndex.y);
 	}
 
-	public static Cell getCell(Sheet sheet, String columnName, int rowIndex) {
+	public static Cell getCell(final Sheet sheet, final String columnName, final int rowIndex) {
 		return PoiUtil.getCell(sheet, PoiUtil.getColumnIndex(columnName), rowIndex);
 	}
 
-	public static Cell getCell(Sheet sheet, int columnIndex, int rowIndex) {
+	public static Cell getCell(final Sheet sheet, final int columnIndex, final int rowIndex) {
 		Row row = sheet.getRow(rowIndex);
 		if (row == null) {
 			row = sheet.createRow(rowIndex);
@@ -377,14 +378,14 @@ public class PoiUtil {
 		return cell;
 	}
 
-	public static int getColumnIndex(String columnName) {
-		String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	public static int getColumnIndex(final String columnName) {
+		final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
 		int columnIndex = 0;
 		int charPosition = 0;
 		for (int index = columnName.length() - 1; index >= 0; index--) {
-			char ch = columnName.charAt(index);
-			int charIndex = chars.indexOf(ch);
+			final char ch = columnName.charAt(index);
+			final int charIndex = chars.indexOf(ch);
 			if (charIndex == -1) {
 				throw new IllegalArgumentException("Invalid character in column name: " + ch);
 			}
@@ -396,21 +397,21 @@ public class PoiUtil {
 		return columnIndex - 1;
 	}
 
-	public static Point getCellIndex(String cellName) {
+	public static Point getCellIndex(final String cellName) {
 		int indexOfRowNum = -1;
 		for (int index = 0; index < cellName.length(); index++) {
-			char ch = cellName.charAt(index);
+			final char ch = cellName.charAt(index);
 			if (Character.isDigit(ch)) {
 				indexOfRowNum = index;
 				break;
 			}
 		}
 
-		String columnName = cellName.substring(0, indexOfRowNum);
-		String rowStr = cellName.substring(indexOfRowNum);
+		final String columnName = cellName.substring(0, indexOfRowNum);
+		final String rowStr = cellName.substring(indexOfRowNum);
 
-		int row = StringUtil.parseInt(rowStr, 1) - 1;
-		int col = PoiUtil.getColumnIndex(columnName);
+		final int row = StringUtil.parseInt(rowStr, 1) - 1;
+		final int col = PoiUtil.getColumnIndex(columnName);
 
 		return new Point(row, col);
 	}
@@ -425,8 +426,8 @@ public class PoiUtil {
 	 * @param column the column number to create the cell in
 	 * @param halign the horizontal alignment for the cell.
 	 */
-	public static Cell createCell(CellStyle cellStyle, Row row, short column, short halign, short valign) {
-		Cell cell = row.createCell(column);
+	public static Cell createCell(final CellStyle cellStyle, final Row row, final short column, final short halign, final short valign) {
+		final Cell cell = row.createCell(column);
 		cellStyle.setAlignment(halign);
 		cellStyle.setVerticalAlignment(valign);
 		cell.setCellStyle(cellStyle);
@@ -440,14 +441,14 @@ public class PoiUtil {
 	/**
 	 * @return true if all cells in a column is empty or null false if one or more cells in the column is empty or null.
 	 */
-	public static Boolean columnIsEmpty(Sheet sheet, int columnIndex) {
+	public static Boolean columnIsEmpty(final Sheet sheet, final int columnIndex) {
 		Boolean b = true;
 		int index = 0;
 		try {
 			Row row = sheet.getRow(index);
 			while (row != null) {
-				if (PoiUtil.getCellValue(row.getCell(columnIndex)) != null
-						&& !"".equalsIgnoreCase(PoiUtil.getCellValue(row.getCell(columnIndex)).toString())) {
+				if (PoiUtil.getCellValue(row.getCell(columnIndex)) != null && !""
+						.equalsIgnoreCase(PoiUtil.getCellValue(row.getCell(columnIndex)).toString())) {
 					b = false;
 					return false;
 				}
@@ -455,7 +456,7 @@ public class PoiUtil {
 				row = sheet.getRow(index);
 
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			PoiUtil.LOG.error(e.getMessage(), e);
 		}
 		return b;
@@ -464,7 +465,7 @@ public class PoiUtil {
 	/**
 	 * @return false if all cells in a column is not empty or null true if one or more cells in the column is empty or null.
 	 */
-	public static Boolean columnHasEmpty(Sheet sheet, int columnIndex) {
+	public static Boolean columnHasEmpty(final Sheet sheet, final int columnIndex) {
 		int index = 0;
 		try {
 			Row row = sheet.getRow(index);
@@ -476,32 +477,32 @@ public class PoiUtil {
 				if (row == null) {
 					return true;
 				}
-				if (PoiUtil.getCellValue(row.getCell(columnIndex)) == null
-						|| "".equalsIgnoreCase(PoiUtil.getCellValue(row.getCell(columnIndex)).toString())) {
+				if (PoiUtil.getCellValue(row.getCell(columnIndex)) == null || ""
+						.equalsIgnoreCase(PoiUtil.getCellValue(row.getCell(columnIndex)).toString())) {
 					return true;
 				}
 				index++;
 				row = sheet.getRow(index);
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			PoiUtil.LOG.error(e.getMessage(), e);
 		}
 		return false;
 	}
 
-	public static Boolean isEmpty(Sheet sheet, int rowIndex, int columnIndex) {
-		Row row = sheet.getRow(rowIndex);
+	public static Boolean isEmpty(final Sheet sheet, final int rowIndex, final int columnIndex) {
+		final Row row = sheet.getRow(rowIndex);
 
-		return row == null || PoiUtil.getCellValue(row.getCell(columnIndex)) == null
-				|| "".equalsIgnoreCase(PoiUtil.getCellValue(row.getCell(columnIndex)).toString());
+		return row == null || PoiUtil.getCellValue(row.getCell(columnIndex)) == null || ""
+				.equalsIgnoreCase(PoiUtil.getCellValue(row.getCell(columnIndex)).toString());
 	}
 
 	/**
 	 * @return the content of the column into an array
 	 */
-	public static String[] asStringArrayColumn(Sheet sheet, int columnIndex) {
+	public static String[] asStringArrayColumn(final Sheet sheet, final int columnIndex) {
 
-		List<String> contents = new ArrayList<String>();
+		final List<String> contents = new ArrayList<String>();
 		int index = 0;
 		Row row = sheet.getRow(index);
 		String cellvalue = "";
@@ -513,14 +514,14 @@ public class PoiUtil {
 					if (cellvalue == null) {
 						cellvalue = "";
 					}
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					PoiUtil.LOG.error(e.getMessage(), e);
 				}
 				contents.add(cellvalue);
 				index++;
 				row = sheet.getRow(index);
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			PoiUtil.LOG.error(e.getMessage(), e);
 		}
 		return contents.toArray(new String[0]);
@@ -537,9 +538,9 @@ public class PoiUtil {
 	 * @param end
 	 * @return true if the row is empty
 	 */
-	public static Boolean rowIsEmpty(Sheet sheet, int rowIndex, int start, int end) {
+	public static Boolean rowIsEmpty(final Sheet sheet, final int rowIndex, final int start, final int end) {
 
-		Row row = sheet.getRow(rowIndex);
+		final Row row = sheet.getRow(rowIndex);
 
 		if (row == null) {
 			return true;
@@ -549,13 +550,13 @@ public class PoiUtil {
 			Cell c;
 			try {
 				c = row.getCell(cn, Row.RETURN_BLANK_AS_NULL);
-			} catch (Exception e) {
+			} catch (final Exception e) {
 				PoiUtil.LOG.error(e.getMessage(), e);
 				c = null;
 			}
 			if (c != null) {
 
-				Object cellValue = PoiUtil.getCellValue(c);
+				final Object cellValue = PoiUtil.getCellValue(c);
 				if (cellValue != null && !"".equals(String.valueOf(cellValue))) {
 					return false;
 
@@ -575,8 +576,8 @@ public class PoiUtil {
 	 * @param end
 	 * @return true if the row has empty values
 	 */
-	public static Boolean rowHasEmpty(Sheet sheet, int rowIndex, int start, int end) {
-		Row row = sheet.getRow(rowIndex);
+	public static Boolean rowHasEmpty(final Sheet sheet, final int rowIndex, final int start, final int end) {
+		final Row row = sheet.getRow(rowIndex);
 		Boolean hasEmpty = false;
 		if (!PoiUtil.rowIsEmpty(sheet, rowIndex, start, end)) {
 
@@ -584,14 +585,14 @@ public class PoiUtil {
 				Cell c;
 				try {
 					c = row.getCell(cn, Row.RETURN_BLANK_AS_NULL);
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					PoiUtil.LOG.error(e.getMessage(), e);
 					c = null;
 				}
 				if (c == null) {
 					hasEmpty = true;
 				} else {
-					Object cellValue = PoiUtil.getCellValue(c);
+					final Object cellValue = PoiUtil.getCellValue(c);
 					if (cellValue == null || "".equals(String.valueOf(cellValue))) {
 						hasEmpty = true;
 					}
@@ -612,11 +613,11 @@ public class PoiUtil {
 	 * @return The String array representation of the row
 	 */
 
-	public static String[] rowAsStringArray(Sheet sheet, int rowIndex) {
-		Row row = sheet.getRow(rowIndex);
+	public static String[] rowAsStringArray(final Sheet sheet, final int rowIndex) {
+		final Row row = sheet.getRow(rowIndex);
 
-		int start = row.getFirstCellNum();
-		int end = row.getLastCellNum() - 1;
+		final int start = row.getFirstCellNum();
+		final int end = row.getLastCellNum() - 1;
 
 		return PoiUtil.rowAsStringArray(sheet, rowIndex, start, end);
 	}
@@ -630,7 +631,7 @@ public class PoiUtil {
 	 * @param end
 	 * @return The String array representation of the row
 	 */
-	public static String[] rowAsStringArray(Sheet sheet, int rowIndex, int start, int end) {
+	public static String[] rowAsStringArray(final Sheet sheet, final int rowIndex, final int start, final int end) {
 		return PoiUtil.rowAsStringArray(sheet, rowIndex, start, end, Integer.MAX_VALUE);
 
 	}
@@ -645,22 +646,22 @@ public class PoiUtil {
 	 * @param max
 	 * @return The String array representation of the row
 	 */
-	public static String[] rowAsStringArray(Sheet sheet, int rowIndex, int start, int end, int max) {
-		Row row = sheet.getRow(rowIndex);
-		List<String> values = new ArrayList<String>();
+	public static String[] rowAsStringArray(final Sheet sheet, final int rowIndex, final int start, final int end, final int max) {
+		final Row row = sheet.getRow(rowIndex);
+		final List<String> values = new ArrayList<String>();
 
 		if (!PoiUtil.rowIsEmpty(sheet, rowIndex, start, end)) {
 
 			for (int cn = start; cn <= end && cn < max; cn++) {
 				try {
-					Cell cell = row.getCell(cn, Row.RETURN_BLANK_AS_NULL);
+					final Cell cell = row.getCell(cn, Row.RETURN_BLANK_AS_NULL);
 					if (cell != null) {
 						// assures that the row we'll be getting is a string
 						cell.setCellType(Cell.CELL_TYPE_STRING);
 						values.add(cell.getStringCellValue());
 
 					}
-				} catch (Exception e) {
+				} catch (final Exception e) {
 					PoiUtil.LOG.error(e.getMessage(), e);
 					values.add("");
 				}
@@ -680,7 +681,7 @@ public class PoiUtil {
 	 * @param end
 	 * @return The delimited-String representation of the row
 	 */
-	public static String rowAsString(Sheet sheet, int rowIndex, int start, int end, String delimiter) {
+	public static String rowAsString(final Sheet sheet, final int rowIndex, final int start, final int end, final String delimiter) {
 
 		return PoiUtil.rowAsString(sheet, rowIndex, start, end, delimiter, Integer.MAX_VALUE);
 
@@ -696,25 +697,26 @@ public class PoiUtil {
 	 * @param max
 	 * @return The delimited-String representation of the row
 	 */
-	public static String rowAsString(Sheet sheet, int rowIndex, int start, int end, String delimiter, int max) {
+	public static String rowAsString(final Sheet sheet, final int rowIndex, final int start, final int end, final String delimiter,
+			final int max) {
 
 		return StringUtils.join(PoiUtil.rowAsStringArray(sheet, rowIndex, start, end, max), delimiter);
 
 	}
 
-	public static String rowAsString(Sheet sheet, int rowIndex, String delimiter) {
-		Row row = sheet.getRow(rowIndex);
+	public static String rowAsString(final Sheet sheet, final int rowIndex, final String delimiter) {
+		final Row row = sheet.getRow(rowIndex);
 		if (row == null) {
 			return "";
 		}
-		int startCell = row.getFirstCellNum();
-		int endCell = row.getLastCellNum() - 1;
+		final int startCell = row.getFirstCellNum();
+		final int endCell = row.getLastCellNum() - 1;
 
 		return PoiUtil.rowAsString(sheet, rowIndex, startCell, endCell, delimiter);
 	}
 
-	public static String rowAsString(Sheet sheet, int rowIndex, String delimiter, int maxStringLength) {
-		String resultString = PoiUtil.rowAsString(sheet, rowIndex, delimiter);
+	public static String rowAsString(final Sheet sheet, final int rowIndex, final String delimiter, final int maxStringLength) {
+		final String resultString = PoiUtil.rowAsString(sheet, rowIndex, delimiter);
 		if (maxStringLength < resultString.length()) {
 			return resultString.substring(0, maxStringLength);
 		} else {
@@ -724,10 +726,10 @@ public class PoiUtil {
 
 	/**
 	 * Gets the 1-based index of the last cell contained in this row or -1 if the row does not contain any cells.
-	 * 
+	 *
 	 * @param sheet
 	 * @param rowNo
-	 * @return 
+	 * @return
 	 */
 	public static int getLastCellNum(final Sheet sheet, final int rowNo) {
 		if (sheet == null || sheet.getRow(rowNo) == null) {
@@ -736,9 +738,9 @@ public class PoiUtil {
 
 		short index = sheet.getRow(rowNo).getLastCellNum();
 
-		while (index > 0) { 
-			Cell cell = sheet.getRow(rowNo).getCell(index - 1);
-			Object cellValue = getCellValue(cell);
+		while (index > 0) {
+			final Cell cell = sheet.getRow(rowNo).getCell(index - 1);
+			final Object cellValue = getCellValue(cell);
 			if (cell == null || cellValue == null) {
 				index--;
 				continue;
@@ -757,7 +759,7 @@ public class PoiUtil {
 		return index;
 	}
 
-	public static Integer getLastRowNum(Sheet sheet) {
+	public static Integer getLastRowNum(final Sheet sheet) {
 		Integer lastRowNum = sheet.getLastRowNum() + 1;
 
 		if (lastRowNum == 1) {
@@ -783,11 +785,11 @@ public class PoiUtil {
 		return lastRowNum;
 	}
 
-	public static boolean areSheetRowsOverMaxLimit(String fileName, int sheetIndex, int maxLimit) {
+	public static boolean areSheetRowsOverMaxLimit(final String fileName, final int sheetIndex, final int maxLimit) {
 
 		try {
 			new PoiEventUserModel().areSheetRowsOverMaxLimit(fileName, sheetIndex, maxLimit);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			PoiUtil.LOG.error(e.getMessage(), e);
 			// Exception means parser has exeeded the set max limit
 			return true;
@@ -796,11 +798,11 @@ public class PoiUtil {
 		return false;
 	}
 
-	public static boolean isAnySheetRowsOverMaxLimit(String fileName, int maxLimit) {
+	public static boolean isAnySheetRowsOverMaxLimit(final String fileName, final int maxLimit) {
 
 		try {
 			new PoiEventUserModel().isAnySheetRowsOverMaxLimit(fileName, maxLimit);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			PoiUtil.LOG.error(e.getMessage(), e);
 			// Exception means parser has exeeded the set max limit
 			return true;
@@ -818,31 +820,31 @@ public class PoiUtil {
 	 * @param sheet
 	 * @param column
 	 */
-	public static void deleteColumn(Sheet sheet, int columnToDelete ){
+	public static void deleteColumn(final Sheet sheet, final int columnToDelete) {
 		int maxColumn = 0;
-		for ( int r=0; r < sheet.getLastRowNum()+1; r++ ){
-			Row row = sheet.getRow( r );
+		for (int r = 0; r < sheet.getLastRowNum() + 1; r++) {
+			final Row row = sheet.getRow(r);
 
 			// if no row exists here; then nothing to do; next!
-			if ( row == null )
+			if (row == null)
 				continue;
 
 			// if the row doesn't have this many columns then we are good; next!
-			int lastColumn = row.getLastCellNum();
-			if ( lastColumn > maxColumn )
+			final int lastColumn = row.getLastCellNum();
+			if (lastColumn > maxColumn)
 				maxColumn = lastColumn;
 
-			if ( lastColumn < columnToDelete )
+			if (lastColumn < columnToDelete)
 				continue;
 
-			for ( int x=columnToDelete+1; x < lastColumn + 1; x++ ){
-				Cell oldCell    = row.getCell(x-1);
-				if ( oldCell != null )
-					row.removeCell( oldCell );
+			for (int x = columnToDelete + 1; x < lastColumn + 1; x++) {
+				final Cell oldCell = row.getCell(x - 1);
+				if (oldCell != null)
+					row.removeCell(oldCell);
 
-				Cell nextCell   = row.getCell( x );
-				if ( nextCell != null ){
-					Cell newCell    = row.createCell( x-1, nextCell.getCellType() );
+				final Cell nextCell = row.getCell(x);
+				if (nextCell != null) {
+					final Cell newCell = row.createCell(x - 1, nextCell.getCellType());
 					cloneCell(newCell, nextCell);
 				}
 			}
@@ -850,34 +852,33 @@ public class PoiUtil {
 
 	}
 
-
 	/*
 	 * Takes an existing Cell and merges all the styles and forumla
 	 * into the new one
 	 */
-	private static void cloneCell( Cell cNew, Cell cOld ){
-		cNew.setCellComment( cOld.getCellComment() );
-		cNew.setCellStyle( cOld.getCellStyle() );
+	private static void cloneCell(final Cell cNew, final Cell cOld) {
+		cNew.setCellComment(cOld.getCellComment());
+		cNew.setCellStyle(cOld.getCellStyle());
 
-		switch ( cNew.getCellType() ){
-			case Cell.CELL_TYPE_BOOLEAN:{
-				cNew.setCellValue( cOld.getBooleanCellValue() );
+		switch (cNew.getCellType()) {
+			case Cell.CELL_TYPE_BOOLEAN: {
+				cNew.setCellValue(cOld.getBooleanCellValue());
 				break;
 			}
-			case Cell.CELL_TYPE_NUMERIC:{
-				cNew.setCellValue( cOld.getNumericCellValue() );
+			case Cell.CELL_TYPE_NUMERIC: {
+				cNew.setCellValue(cOld.getNumericCellValue());
 				break;
 			}
-			case Cell.CELL_TYPE_STRING:{
-				cNew.setCellValue( cOld.getStringCellValue() );
+			case Cell.CELL_TYPE_STRING: {
+				cNew.setCellValue(cOld.getStringCellValue());
 				break;
 			}
-			case Cell.CELL_TYPE_ERROR:{
-				cNew.setCellValue( cOld.getErrorCellValue() );
+			case Cell.CELL_TYPE_ERROR: {
+				cNew.setCellValue(cOld.getErrorCellValue());
 				break;
 			}
-			case Cell.CELL_TYPE_FORMULA:{
-				cNew.setCellFormula( cOld.getCellFormula() );
+			case Cell.CELL_TYPE_FORMULA: {
+				cNew.setCellFormula(cOld.getCellFormula());
 				break;
 			}
 		}
