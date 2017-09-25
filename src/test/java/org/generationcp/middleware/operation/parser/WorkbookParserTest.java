@@ -1,12 +1,4 @@
-
 package org.generationcp.middleware.operation.parser;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -43,6 +35,14 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+
 @RunWith(MockitoJUnitRunner.class)
 public class WorkbookParserTest {
 
@@ -50,14 +50,14 @@ public class WorkbookParserTest {
 	private static final String PLOT_NO = "PLOT_NO";
 	private static final String ENTRY_NO = "ENTRY_NO";
 	private static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
-	public final static String[] INCORRECT_CONDITION_HEADERS = new String[] {"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE",
-			"VALUE", "PLOT"};
-	public final static String[] INCORRECT_FACTOR_HEADERS = new String[] {"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE123",
-			"VALUE", "LABEL"};
-	public final static String[] INCORRECT_CONSTANT_HEADERS = new String[] {"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE",
-			"VALUE123", "SAMPLE LEVEL"};
-	public final static String[] INCORRECT_VARIATE_HEADERS = new String[] {"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE",
-			"VALUE", "SAMPLE LEVEL123"};
+	public final static String[] INCORRECT_CONDITION_HEADERS =
+			new String[] {"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "PLOT"};
+	public final static String[] INCORRECT_FACTOR_HEADERS =
+			new String[] {"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE123", "VALUE", "LABEL"};
+	public final static String[] INCORRECT_CONSTANT_HEADERS =
+			new String[] {"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE123", "SAMPLE LEVEL"};
+	public final static String[] INCORRECT_VARIATE_HEADERS =
+			new String[] {"DESCRIPTION", "PROPERTY", "SCALE", "METHOD", "DATA TYPE", "VALUE", "SAMPLE LEVEL123"};
 
 	protected final Logger LOG = LoggerFactory.getLogger(this.getClass());
 
@@ -75,7 +75,7 @@ public class WorkbookParserTest {
 	@Before
 	public void beforeEachTest() {
 
-		List<Message> errorMessages = new ArrayList<>();
+		final List<Message> errorMessages = new ArrayList<>();
 		this.workbookParser.setErrorMessages(errorMessages);
 		this.workbookParser.setHasIncorrectDatatypeValue(false);
 
@@ -84,9 +84,9 @@ public class WorkbookParserTest {
 
 	@After
 	public void afterEachTest() {
-		long elapsedTime = System.nanoTime() - this.startTime;
-		this.LOG.debug("+++++ Test: " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + " took " + (double) elapsedTime
-				/ 1000000 + " ms = " + (double) elapsedTime / 1000000000 + " s +++++");
+		final long elapsedTime = System.nanoTime() - this.startTime;
+		this.LOG.debug("+++++ Test: " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + " took "
+				+ (double) elapsedTime / 1000000 + " ms = " + (double) elapsedTime / 1000000000 + " s +++++");
 	}
 
 	@Test
@@ -159,43 +159,44 @@ public class WorkbookParserTest {
 		this.testIncorrectSectionHeadersValidated(Section.VARIATE, WorkbookParserTest.INCORRECT_VARIATE_HEADERS);
 	}
 
-	private void testCorrectSectionHeaders(Section section, String[] headerArray) throws IOException, WorkbookParserException {
-		WorkbookParser moleWorkbookParser = Mockito.spy(this.workbookParser);
+	private void testCorrectSectionHeaders(final Section section, final String[] headerArray) throws IOException, WorkbookParserException {
+		final WorkbookParser moleWorkbookParser = Mockito.spy(this.workbookParser);
 
-		Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headerArray);
+		final Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headerArray);
 
 		this.setupHeaderValidationMocks(moleWorkbookParser, sampleWorkbook, section);
 
-		moleWorkbookParser.parseFile(this.file, true);
+		moleWorkbookParser.parseFile(sampleWorkbook, true);
 		Mockito.verify(moleWorkbookParser).checkHeadersValid(sampleWorkbook, 0, 0, headerArray);
 	}
 
-	private void testIncorrectSectionHeadersValidated(Section section, String[] headerArray) throws IOException, WorkbookParserException {
-		WorkbookParser moleWorkbookParser = Mockito.spy(this.workbookParser);
+	private void testIncorrectSectionHeadersValidated(final Section section, final String[] headerArray)
+			throws IOException, WorkbookParserException {
+		final WorkbookParser moleWorkbookParser = Mockito.spy(this.workbookParser);
 
-		String sectionName = section.toString();
-		Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(sectionName, headerArray);
+		final String sectionName = section.toString();
+		final Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(sectionName, headerArray);
 
 		this.setupHeaderValidationMocks(moleWorkbookParser, sampleWorkbook, section);
 
 		try {
-			moleWorkbookParser.parseFile(this.file, true);
+			moleWorkbookParser.parseFile(sampleWorkbook, true);
 			Assert.fail("Validation exception should have been thrown");
-		} catch (WorkbookParserException e) {
-			String errorMessage = "Incorrect headers for " + sectionName;
+		} catch (final WorkbookParserException e) {
+			final String errorMessage = "Incorrect headers for " + sectionName;
 			Assert.assertTrue("Should have thrown validation exception but did not", errorMessage.equals(e.getMessage()));
 		}
 	}
 
-	private void setupHeaderValidationMocks(WorkbookParser moleWorkbookParser, Workbook sampleWorkbook, Section section)
+	private void setupHeaderValidationMocks(final WorkbookParser moleWorkbookParser, final Workbook sampleWorkbook, final Section section)
 			throws IOException, WorkbookParserException {
 		// mock / skip other parsing logic and validations
-		Mockito.doReturn(sampleWorkbook).when(moleWorkbookParser).getCorrectWorkbook(this.file);
+		Mockito.doReturn(sampleWorkbook).when(moleWorkbookParser).loadFileToExcelWorkbook(file);
 		Mockito.doNothing().when(moleWorkbookParser).validateExistenceOfSheets(sampleWorkbook);
 		Mockito.doReturn(new StudyDetails()).when(moleWorkbookParser).readStudyDetails(sampleWorkbook);
 
 		// only interested in specific section
-		for (Section aSection : Section.values()) {
+		for (final Section aSection : Section.values()) {
 			if (!aSection.equals(section)) {
 				Mockito.doReturn(new ArrayList<MeasurementVariable>()).when(moleWorkbookParser)
 						.readMeasurementVariables(sampleWorkbook, aSection.toString());
@@ -203,17 +204,16 @@ public class WorkbookParserTest {
 		}
 
 		// when processing variate section, do not read actual measurement vars after validating headers
-		Mockito.doNothing()
-				.when(moleWorkbookParser)
+		Mockito.doNothing().when(moleWorkbookParser)
 				.extractMeasurementVariablesForSection(Matchers.any(Workbook.class), Matchers.any(String.class),
 						Matchers.anyListOf(MeasurementVariable.class));
 	}
 
-	private Workbook createWorkbookWithSectionHeaders(String sectionName, String[] headerArray) {
-		Workbook sampleWorkbook = new HSSFWorkbook();
-		Sheet firstSheet = sampleWorkbook.createSheet();
+	private Workbook createWorkbookWithSectionHeaders(final String sectionName, final String[] headerArray) {
+		final Workbook sampleWorkbook = new HSSFWorkbook();
+		final Sheet firstSheet = sampleWorkbook.createSheet();
 
-		Row row = firstSheet.createRow(0);
+		final Row row = firstSheet.createRow(0);
 		Cell cell = row.createCell(0);
 		cell.setCellValue(sectionName);
 
@@ -227,12 +227,12 @@ public class WorkbookParserTest {
 
 	@Test
 	public void testExtractMeasurementVariablesForSection() {
-		Section section = Section.CONDITION;
-		String[] headers = WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS;
-		Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headers);
+		final Section section = Section.CONDITION;
+		final String[] headers = WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS;
+		final Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headers);
 		this.addSectionVariableDetailsToWorkbook(sampleWorkbook, this.createVariableDetailsListTestData(section, headers));
-		List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		List<Message> errorMessages = new ArrayList<>();
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		final List<Message> errorMessages = new ArrayList<>();
 		this.workbookParser.setErrorMessages(errorMessages);
 		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
 		Assert.assertTrue("There should be no error after extracting the measurement variables", errorMessages.isEmpty());
@@ -243,12 +243,12 @@ public class WorkbookParserTest {
 	 */
 	@Test
 	public void testExtractMeasurementVariablesForConstant() {
-		Section section = Section.CONSTANT;
-		String[] headers = WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS;
-		Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headers);
+		final Section section = Section.CONSTANT;
+		final String[] headers = WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS;
+		final Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headers);
 		this.addSectionVariableDetailsToWorkbook(sampleWorkbook, this.createVariableDetailsListTestData(section, headers));
-		List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		List<Message> errorMessages = new ArrayList<>();
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		final List<Message> errorMessages = new ArrayList<>();
 		this.workbookParser.setErrorMessages(errorMessages);
 		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
 		Assert.assertTrue("There should be no error after extracting the measurement variables", errorMessages.isEmpty());
@@ -256,25 +256,25 @@ public class WorkbookParserTest {
 
 	@Test
 	public void testExtractMeasurementVariablesForSectionWithEmptyVariableDetails() {
-		Section section = Section.CONDITION;
-		String[] headers = WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS;
-		Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headers);
+		final Section section = Section.CONDITION;
+		final String[] headers = WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS;
+		final Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headers);
 		this.addSectionVariableDetailsToWorkbook(sampleWorkbook, this.createVariableDetailsListTestData(section, headers));
 		// add row with errors for testing
-		int rowWithErrorInSheet = 6;
-		String[] invalidVariableDetails = new String[headers.length + 1];
+		final int rowWithErrorInSheet = 6;
+		final String[] invalidVariableDetails = new String[headers.length + 1];
 		this.fillVariableDetails(invalidVariableDetails, "", "", "", "", "", "", "WITH ERROR", "");
 		this.addRowInExistingSheet(sampleWorkbook.getSheetAt(0), rowWithErrorInSheet, invalidVariableDetails);
 
-		List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		List<Message> errorMessages = this.workbookParser.getErrorMessages();
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		final List<Message> errorMessages = this.workbookParser.getErrorMessages();
 		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
 
 		// assertions
 		Assert.assertEquals("There should be 7 errors after extracting the measurement variables", 7, errorMessages.size());
 		int errorIndex = 0;
-		int rowWithError = rowWithErrorInSheet + 1;
-		for (Message message : errorMessages) {
+		final int rowWithError = rowWithErrorInSheet + 1;
+		for (final Message message : errorMessages) {
 			switch (errorIndex) {
 				case 0:
 					Assert.assertEquals("error.missing.field.name", message.getMessageKey());
@@ -308,28 +308,28 @@ public class WorkbookParserTest {
 
 	@Test
 	public void testExtractMeasurementVariablesForSectionWithIncorrectDataTypeAndLabel() {
-		Section section = Section.FACTOR;
-		String[] headers = WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS;
-		Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headers);
+		final Section section = Section.FACTOR;
+		final String[] headers = WorkbookParser.DEFAULT_EXPECTED_VARIABLE_HEADERS;
+		final Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headers);
 		this.addSectionVariableDetailsToWorkbook(sampleWorkbook, this.createVariableDetailsListTestData(section, headers));
 		// add row with errors for testing
-		int rowWithErrorInSheet = 6;
-		String[] invalidVariableDetails = new String[headers.length + 1];
-		this.fillVariableDetails(invalidVariableDetails, "NAME " + rowWithErrorInSheet, "DESCRIPTION " + rowWithErrorInSheet, "PROPERTY"
-				+ rowWithErrorInSheet, "SCALE" + rowWithErrorInSheet, "METHOD" + rowWithErrorInSheet, "Numeric", "WITH ERROR",
+		final int rowWithErrorInSheet = 6;
+		final String[] invalidVariableDetails = new String[headers.length + 1];
+		this.fillVariableDetails(invalidVariableDetails, "NAME " + rowWithErrorInSheet, "DESCRIPTION " + rowWithErrorInSheet,
+				"PROPERTY" + rowWithErrorInSheet, "SCALE" + rowWithErrorInSheet, "METHOD" + rowWithErrorInSheet, "Numeric", "WITH ERROR",
 				"Invalid label");
 		this.addRowInExistingSheet(sampleWorkbook.getSheetAt(0), rowWithErrorInSheet, invalidVariableDetails);
 
-		List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		List<Message> errorMessages = new ArrayList<>();
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		final List<Message> errorMessages = new ArrayList<>();
 		this.workbookParser.setErrorMessages(errorMessages);
 		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
 
 		// assertions
 		Assert.assertEquals("There should be 2 errors after extracting the measurement variables", 2, errorMessages.size());
 		int errorIndex = 0;
-		int rowWithError = rowWithErrorInSheet + 1;
-		for (Message message : errorMessages) {
+		final int rowWithError = rowWithErrorInSheet + 1;
+		for (final Message message : errorMessages) {
 			switch (errorIndex) {
 				case 0:
 					Assert.assertEquals("error.unsupported.datatype", message.getMessageKey());
@@ -348,7 +348,6 @@ public class WorkbookParserTest {
 
 	@Test
 	public void testAssignVariableTypeConstantSection() {
-
 
 		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
 		final StudyDetails studyDetails = new StudyDetails();
@@ -371,7 +370,6 @@ public class WorkbookParserTest {
 
 	@Test
 	public void testAssignVariableTypeSectionIsNotConstant() {
-
 
 		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
 		final StudyDetails studyDetails = new StudyDetails();
@@ -432,8 +430,6 @@ public class WorkbookParserTest {
 
 	}
 
-
-
 	@Test
 	public void testValidateRequiredFieldsForNonVariateVariablesVariableSection() {
 
@@ -441,7 +437,7 @@ public class WorkbookParserTest {
 		measurementVariable.setLabel("");
 
 		this.workbookParser.validateRequiredFieldsForNonVariateVariables(Section.VARIATE.name(), measurementVariable, TARGET_ROW_NUMBER);
-		List<Message> messages = this.workbookParser.getErrorMessages();
+		final List<Message> messages = this.workbookParser.getErrorMessages();
 
 		// Label is not required for Variable Section, so message list should be empty
 		Assert.assertTrue(messages.isEmpty());
@@ -454,7 +450,7 @@ public class WorkbookParserTest {
 		measurementVariable.setLabel("");
 
 		this.workbookParser.validateRequiredFieldsForNonVariateVariables(Section.CONDITION.name(), measurementVariable, TARGET_ROW_NUMBER);
-		List<Message> messages = this.workbookParser.getErrorMessages();
+		final List<Message> messages = this.workbookParser.getErrorMessages();
 
 		// Label is required for Condition Section, so message list should not be empty
 		Assert.assertFalse(messages.isEmpty());
@@ -469,7 +465,7 @@ public class WorkbookParserTest {
 		measurementVariable.setLabel("");
 
 		this.workbookParser.validateRequiredFieldsForNonVariateVariables(Section.FACTOR.name(), measurementVariable, TARGET_ROW_NUMBER);
-		List<Message> messages = this.workbookParser.getErrorMessages();
+		final List<Message> messages = this.workbookParser.getErrorMessages();
 
 		// Label is required for Factor Section, so message should not be empty
 		Assert.assertFalse(messages.isEmpty());
@@ -484,7 +480,7 @@ public class WorkbookParserTest {
 		measurementVariable.setLabel("");
 
 		this.workbookParser.validateRequiredFieldsForNonVariateVariables(Section.CONSTANT.name(), measurementVariable, TARGET_ROW_NUMBER);
-		List<Message> messages = this.workbookParser.getErrorMessages();
+		final List<Message> messages = this.workbookParser.getErrorMessages();
 
 		// Label is required for Constant Section, so message should not be empty
 		Assert.assertFalse(messages.isEmpty());
@@ -505,10 +501,9 @@ public class WorkbookParserTest {
 
 		this.workbookParser.validateRequiredFields(measurementVariable, TARGET_ROW_NUMBER);
 
-		List<Message> messages = this.workbookParser.getErrorMessages();
+		final List<Message> messages = this.workbookParser.getErrorMessages();
 
-		Assert.assertTrue("Expecting an empty message list since the required fields have values",messages.isEmpty());
-
+		Assert.assertTrue("Expecting an empty message list since the required fields have values", messages.isEmpty());
 
 	}
 
@@ -518,7 +513,7 @@ public class WorkbookParserTest {
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 		this.workbookParser.validateRequiredFields(measurementVariable, TARGET_ROW_NUMBER);
 
-		List<Message> messages = this.workbookParser.getErrorMessages();
+		final List<Message> messages = this.workbookParser.getErrorMessages();
 
 		Assert.assertEquals(5, messages.size());
 
@@ -535,7 +530,6 @@ public class WorkbookParserTest {
 
 	}
 
-
 	@Test
 	public void testValidateDataTypeIfNecessaryDatatypeIsCorrect() {
 
@@ -545,7 +539,7 @@ public class WorkbookParserTest {
 		this.workbookParser.setHasIncorrectDatatypeValue(false);
 		this.workbookParser.validateDataType(measurementVariable, TARGET_ROW_NUMBER);
 
-		List<Message> messages = this.workbookParser.getErrorMessages();
+		final List<Message> messages = this.workbookParser.getErrorMessages();
 
 		// The datatype is correct so the message list should be empty
 		Assert.assertTrue(messages.isEmpty());
@@ -562,10 +556,10 @@ public class WorkbookParserTest {
 		this.workbookParser.setHasIncorrectDatatypeValue(false);
 		this.workbookParser.validateDataType(measurementVariable, TARGET_ROW_NUMBER);
 
-		List<Message> messages = this.workbookParser.getErrorMessages();
+		final List<Message> messages = this.workbookParser.getErrorMessages();
 
 		// The datatype A is not supported so the message list should not be empty
-		Message message = messages.get(0);
+		final Message message = messages.get(0);
 		Assert.assertNotNull(message);
 		Assert.assertEquals("error.unsupported.datatype", message.getMessageKey());
 		Assert.assertNull(message.getMessageParams());
@@ -582,7 +576,7 @@ public class WorkbookParserTest {
 		this.workbookParser.setHasIncorrectDatatypeValue(true);
 		this.workbookParser.validateDataTypeIfNecessary(measurementVariable, TARGET_ROW_NUMBER);
 
-		List<Message> messages = this.workbookParser.getErrorMessages();
+		final List<Message> messages = this.workbookParser.getErrorMessages();
 
 		// Expecting the returned error messages as empty.
 		// Datatype validation logic should only be called if invalid datatype hasn't been detected.
@@ -590,7 +584,6 @@ public class WorkbookParserTest {
 		Assert.assertTrue(workbookParser.hasIncorrectDatatypeValue());
 
 	}
-
 
 	@Test
 	public void testValidateDataTypeMissingDataTypeValue() {
@@ -600,9 +593,9 @@ public class WorkbookParserTest {
 
 		this.workbookParser.validateDataType(measurementVariable, TARGET_ROW_NUMBER);
 
-		List<Message> messages = this.workbookParser.getErrorMessages();
+		final List<Message> messages = this.workbookParser.getErrorMessages();
 
-		Message message = messages.get(0);
+		final Message message = messages.get(0);
 		Assert.assertNotNull(message);
 		Assert.assertEquals("error.missing.field.datatype", message.getMessageKey());
 		Assert.assertEquals(Integer.toString(TARGET_ROW_NUMBER), message.getMessageParams()[0]);
@@ -617,15 +610,14 @@ public class WorkbookParserTest {
 
 		this.workbookParser.validateDataType(measurementVariable, TARGET_ROW_NUMBER);
 
-		List<Message> messages = this.workbookParser.getErrorMessages();
+		final List<Message> messages = this.workbookParser.getErrorMessages();
 
-		Message message = messages.get(0);
+		final Message message = messages.get(0);
 		Assert.assertNotNull(message);
 		Assert.assertEquals("error.unsupported.datatype", message.getMessageKey());
 		Assert.assertNull(message.getMessageParams());
 
 	}
-
 
 	/**
 	 * Tests ensures that the read measurement variables validates two contiguous empty rows.
@@ -657,32 +649,32 @@ public class WorkbookParserTest {
 
 	@Test
 	public void testExtractVariantsWithSelectionSuccess() {
-		Section section = Section.VARIATE;
-		String[] headers = WorkbookParser.EXPECTED_VARIATE_HEADERS_2;
-		Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headers);
+		final Section section = Section.VARIATE;
+		final String[] headers = WorkbookParser.EXPECTED_VARIATE_HEADERS_2;
+		final Workbook sampleWorkbook = this.createWorkbookWithSectionHeaders(section.toString(), headers);
 		// this.addSectionVariableDetailsToWorkbook(sampleWorkbook, this.createVariableDetailsListTestData(section, headers));
 
-		int rowWithSelectionsDataInSheet = 1;
-		String[] validVariatsDetails = new String[headers.length + 1];
+		final int rowWithSelectionsDataInSheet = 1;
+		final String[] validVariatsDetails = new String[headers.length + 1];
 
-		this.fillVariableDetails(validVariatsDetails, "NPSEL_Local", "Number of plants selected - counted (number)", "Selections",
-				"Number", "New_Counted", "N", "", "PLOT");
+		this.fillVariableDetails(validVariatsDetails, "NPSEL_Local", "Number of plants selected - counted (number)", "Selections", "Number",
+				"New_Counted", "N", "", "PLOT");
 		this.addRowInExistingSheet(sampleWorkbook.getSheetAt(0), rowWithSelectionsDataInSheet, validVariatsDetails);
 
-		List<MeasurementVariable> measurementVariables = new ArrayList<>();
-		List<Message> errorMessages = new ArrayList<>();
+		final List<MeasurementVariable> measurementVariables = new ArrayList<>();
+		final List<Message> errorMessages = new ArrayList<>();
 		this.workbookParser.setErrorMessages(errorMessages);
 		this.workbookParser.extractMeasurementVariablesForSection(sampleWorkbook, section.toString(), measurementVariables);
 
 		System.out.println("Error Messages:" + errorMessages.size());
 
-		HSSFSheet sheet = (HSSFSheet) sampleWorkbook.getSheetAt(0);
+		final HSSFSheet sheet = (HSSFSheet) sampleWorkbook.getSheetAt(0);
 
 		Assert.assertEquals(1, measurementVariables.size());
 
-		MeasurementVariable mv = measurementVariables.get(0);
+		final MeasurementVariable mv = measurementVariables.get(0);
 
-		HSSFRow row = sheet.getRow(1);
+		final HSSFRow row = sheet.getRow(1);
 
 		Assert.assertEquals(mv.getName(), row.getCell(0).getStringCellValue());
 		Assert.assertEquals(mv.getDescription(), row.getCell(1).getStringCellValue());
@@ -700,11 +692,11 @@ public class WorkbookParserTest {
 	@Test
 	public void testValidateExistenceOfObservationRecordsNoRecords() {
 
-		Workbook excelWorkbook = this.createTestExcelWorkbook(false, false);
+		final Workbook excelWorkbook = this.createTestExcelWorkbook(false, false);
 		try {
 			this.workbookParser.validateExistenceOfObservationRecords(excelWorkbook);
 			Assert.fail("validateExistenceOfObservationRecords should throw an exception");
-		} catch (WorkbookParserException e) {
+		} catch (final WorkbookParserException e) {
 			Assert.assertEquals("error.observation.no.records", e.getErrorMessages().get(0).getMessageKey());
 		}
 	}
@@ -712,10 +704,10 @@ public class WorkbookParserTest {
 	@Test
 	public void testValidateExistenceOfObservationRecordsWithRecords() {
 
-		Workbook excelWorkbook = this.createTestExcelWorkbook(true, false);
+		final Workbook excelWorkbook = this.createTestExcelWorkbook(true, false);
 		try {
 			this.workbookParser.validateExistenceOfObservationRecords(excelWorkbook);
-		} catch (WorkbookParserException e) {
+		} catch (final WorkbookParserException e) {
 			Assert.fail("The Excel workbook has records so exception should not be thrown");
 		}
 	}
@@ -723,12 +715,12 @@ public class WorkbookParserTest {
 	@Test
 	public void testValidateMaximumLimitOfObservationRecordsMaximumRecordsIsReached() {
 
-		Workbook excelWorkbook = this.createTestExcelWorkbook(true, true);
+		final Workbook excelWorkbook = this.createTestExcelWorkbook(true, true);
 
 		try {
 			this.workbookParser.validateMaximumLimitOfObservationRecords(excelWorkbook);
 			Assert.fail("The Excel workbook has exceed the limit of rows, exception should be thrown");
-		} catch (WorkbookParserException e) {
+		} catch (final WorkbookParserException e) {
 			Assert.assertEquals("error.observation.over.maximum.limit", e.getErrorMessages().get(0).getMessageKey());
 		}
 	}
@@ -736,11 +728,11 @@ public class WorkbookParserTest {
 	@Test
 	public void testValidateMaximumLimitOfObservationRecordsLimitNotReached() {
 
-		Workbook excelWorkbook = this.createTestExcelWorkbook(true, false);
+		final Workbook excelWorkbook = this.createTestExcelWorkbook(true, false);
 
 		try {
 			this.workbookParser.validateMaximumLimitOfObservationRecords(excelWorkbook);
-		} catch (WorkbookParserException e) {
+		} catch (final WorkbookParserException e) {
 			Assert.fail("The Excel workbook has a few records, there should be no exception thrown");
 		}
 	}
@@ -748,12 +740,12 @@ public class WorkbookParserTest {
 	@Test
 	public void testCheckIfWorkbookVariablesMatchedTheHeadersInObservationVariableAndHeadersMatched() {
 
-		org.generationcp.middleware.domain.etl.Workbook workbook = this.createTestWorkbook();
-		Workbook excelWorkbook = this.createTestExcelWorkbookFromWorkbook(workbook, true);
+		final org.generationcp.middleware.domain.etl.Workbook workbook = this.createTestWorkbook();
+		final Workbook excelWorkbook = this.createTestExcelWorkbookFromWorkbook(workbook, true);
 
 		try {
 			this.workbookParser.checkIfWorkbookVariablesMatchedTheHeadersInObservation(excelWorkbook, workbook);
-		} catch (WorkbookParserException e) {
+		} catch (final WorkbookParserException e) {
 			Assert.fail("The workbook variables and observation headers in Excel workbook should match");
 		}
 	}
@@ -761,15 +753,15 @@ public class WorkbookParserTest {
 	@Test
 	public void testCheckIfWorkbookVariablesMatchedTheHeadersInObservationVariableAndHeadersDidNotMatch() {
 
-		org.generationcp.middleware.domain.etl.Workbook workbook = this.createTestWorkbook();
-		Workbook excelWorkbook = this.createTestExcelWorkbookFromWorkbook(workbook, true);
+		final org.generationcp.middleware.domain.etl.Workbook workbook = this.createTestWorkbook();
+		final Workbook excelWorkbook = this.createTestExcelWorkbookFromWorkbook(workbook, true);
 		// Add a variate so that variables won't match with the observation's headers
 		workbook.getVariates().add(new MeasurementVariable("PH", "", "", "", "", "", "", ""));
 
 		try {
 			this.workbookParser.checkIfWorkbookVariablesMatchedTheHeadersInObservation(excelWorkbook, workbook);
 			Assert.fail("The workbook variables and observation headers in Excel workbook should not match, exception must be thrown ");
-		} catch (WorkbookParserException e) {
+		} catch (final WorkbookParserException e) {
 			Assert.assertEquals("Incorrect header for observations.", e.getMessage());
 		}
 	}
@@ -777,14 +769,14 @@ public class WorkbookParserTest {
 	@Test
 	public void testConvertSheetRowToDataListDiscardInvalidValues() {
 
-		org.generationcp.middleware.domain.etl.Workbook workbook = this.createTestWorkbook();
-		Workbook excelWorkbook = this.createTestExcelWorkbookFromWorkbook(workbook, true);
-		List<MeasurementVariable> allVariables = new LinkedList<>();
+		final org.generationcp.middleware.domain.etl.Workbook workbook = this.createTestWorkbook();
+		final Workbook excelWorkbook = this.createTestExcelWorkbookFromWorkbook(workbook, true);
+		final List<MeasurementVariable> allVariables = new LinkedList<>();
 		allVariables.addAll(workbook.getFactors());
 		allVariables.addAll(workbook.getVariates());
 
-		List<MeasurementData> result = this.workbookParser.convertSheetRowToDataList(1, excelWorkbook, true, allVariables);
-		MeasurementRow row = new MeasurementRow(result);
+		final List<MeasurementData> result = this.workbookParser.convertSheetRowToDataList(1, excelWorkbook, true, allVariables);
+		final MeasurementRow row = new MeasurementRow(result);
 
 		Assert.assertEquals("1", row.getMeasurementData(TRIAL_INSTANCE).getValue());
 		Assert.assertEquals("1", row.getMeasurementData(ENTRY_NO).getValue());
@@ -798,14 +790,14 @@ public class WorkbookParserTest {
 	@Test
 	public void testConvertSheetRowToDataListKeepInvalidValues() {
 
-		org.generationcp.middleware.domain.etl.Workbook workbook = this.createTestWorkbook();
-		Workbook excelWorkbook = this.createTestExcelWorkbookFromWorkbook(workbook, true);
-		List<MeasurementVariable> allVariables = new LinkedList<>();
+		final org.generationcp.middleware.domain.etl.Workbook workbook = this.createTestWorkbook();
+		final Workbook excelWorkbook = this.createTestExcelWorkbookFromWorkbook(workbook, true);
+		final List<MeasurementVariable> allVariables = new LinkedList<>();
 		allVariables.addAll(workbook.getFactors());
 		allVariables.addAll(workbook.getVariates());
 
-		List<MeasurementData> result = this.workbookParser.convertSheetRowToDataList(1, excelWorkbook, false, allVariables);
-		MeasurementRow row = new MeasurementRow(result);
+		final List<MeasurementData> result = this.workbookParser.convertSheetRowToDataList(1, excelWorkbook, false, allVariables);
+		final MeasurementRow row = new MeasurementRow(result);
 
 		Assert.assertEquals("1", row.getMeasurementData(TRIAL_INSTANCE).getValue());
 		Assert.assertEquals("1", row.getMeasurementData(ENTRY_NO).getValue());
@@ -816,10 +808,10 @@ public class WorkbookParserTest {
 	@Test
 	public void testReadObservationsWithoutInvalidValues() throws WorkbookParserException {
 
-		org.generationcp.middleware.domain.etl.Workbook workbook = this.createTestWorkbook();
-		Workbook excelWorkbook = this.createTestExcelWorkbookFromWorkbook(workbook, false);
+		final org.generationcp.middleware.domain.etl.Workbook workbook = this.createTestWorkbook();
+		final Workbook excelWorkbook = this.createTestExcelWorkbookFromWorkbook(workbook, false);
 
-		List<MeasurementRow> result = this.workbookParser.readObservations(excelWorkbook, workbook, true);
+		final List<MeasurementRow> result = this.workbookParser.readObservations(excelWorkbook, workbook, true);
 
 		Assert.assertEquals(1, result.size());
 
@@ -833,10 +825,10 @@ public class WorkbookParserTest {
 	@Test
 	public void testReadObservationsWithInvalidValues() throws WorkbookParserException {
 
-		org.generationcp.middleware.domain.etl.Workbook workbook = this.createTestWorkbook();
-		Workbook excelWorkbook = this.createTestExcelWorkbookFromWorkbook(workbook, true);
+		final org.generationcp.middleware.domain.etl.Workbook workbook = this.createTestWorkbook();
+		final Workbook excelWorkbook = this.createTestExcelWorkbookFromWorkbook(workbook, true);
 
-		List<MeasurementRow> result = this.workbookParser.readObservations(excelWorkbook, workbook, true);
+		final List<MeasurementRow> result = this.workbookParser.readObservations(excelWorkbook, workbook, true);
 
 		Assert.assertEquals(1, result.size());
 
@@ -853,10 +845,10 @@ public class WorkbookParserTest {
 	@Test
 	public void testReadObservationsKeepTheInvalidValues() throws WorkbookParserException {
 
-		org.generationcp.middleware.domain.etl.Workbook workbook = this.createTestWorkbook();
-		Workbook excelWorkbook = this.createTestExcelWorkbookFromWorkbook(workbook, true);
+		final org.generationcp.middleware.domain.etl.Workbook workbook = this.createTestWorkbook();
+		final Workbook excelWorkbook = this.createTestExcelWorkbookFromWorkbook(workbook, true);
 
-		List<MeasurementRow> result = this.workbookParser.readObservations(excelWorkbook, workbook, false);
+		final List<MeasurementRow> result = this.workbookParser.readObservations(excelWorkbook, workbook, false);
 
 		Assert.assertEquals(1, result.size());
 
@@ -867,8 +859,75 @@ public class WorkbookParserTest {
 
 	}
 
-	private List<String[]> createVariableDetailsListTestData(Section section, String[] headers) {
-		List<String[]> variableDetailsList = new ArrayList<>();
+	@Test
+	public void testRemoveObsoleteColumnsInExcelWorkbook() {
+
+		final Workbook excelWorkbook = new HSSFWorkbook();
+
+		// Create description sheet
+		excelWorkbook.createSheet("Description");
+
+		// We're only interested in observation sheet
+		final Sheet observationSheet = excelWorkbook.createSheet("Observation");
+
+		// Add column names
+		final Row headerRow = observationSheet.createRow(0);
+
+		final String columnTrialInstance = "TRIAL_INSTANCE";
+		final String columnPlotNo = "PLOT_NO";
+		final String columnPlantHeight = "PlantHeight";
+		final String columnEarPH = "EarPH";
+		final String columnEarSel = "EarSel";
+
+		final String columnData1 = "DATA1";
+		final String columnData2 = "DATA2";
+		final String columnData3 = "DATA3";
+		final String columnData4 = "DATA4";
+		final String columnData5 = "DATA5";
+
+		headerRow.createCell(0).setCellValue(columnTrialInstance);
+		headerRow.createCell(1).setCellValue(columnPlotNo);
+		headerRow.createCell(2).setCellValue(columnPlantHeight);
+		headerRow.createCell(3).setCellValue(columnEarPH);
+		headerRow.createCell(4).setCellValue(columnEarSel);
+
+		// Add data
+		final Row dataRow = observationSheet.createRow(1);
+		dataRow.createCell(0).setCellValue(columnData1);
+		dataRow.createCell(1).setCellValue(columnData2);
+		dataRow.createCell(2).setCellValue(columnData3);
+		dataRow.createCell(3).setCellValue(columnData4);
+		dataRow.createCell(4).setCellValue(columnData5);
+
+		// Delete the Trial Instance, Plant Height and EarPH columns
+		final List<String> obsoleteVariableToDelete = Arrays.asList(columnTrialInstance, columnPlantHeight, columnEarPH);
+
+		this.workbookParser.removeObsoleteColumnsInExcelWorkbook(excelWorkbook, obsoleteVariableToDelete);
+
+		// Verify the header row
+		Assert.assertEquals("columnTrialInstance is deleted, so columnPlotNo is now on the first column", columnPlotNo,
+				headerRow.getCell(0).getStringCellValue());
+		;
+		Assert.assertEquals("columnPlantHeight and columnEarPH are deleted, so columnEarSel is now on the second column ", columnEarSel,
+				headerRow.getCell(1).getStringCellValue());
+		Assert.assertEquals("No cell should be on the third column", null, headerRow.getCell(2));
+		Assert.assertEquals("No cell should be on the fourth column", null, headerRow.getCell(3));
+		Assert.assertEquals("No cell should be on the fifth column", null, headerRow.getCell(4));
+
+		// Verify the data row
+		Assert.assertEquals("columnTrialInstance data is deleted, so columnPlotNo data is now on the first column", columnData2,
+				dataRow.getCell(0).getStringCellValue());
+		;
+		Assert.assertEquals("columnPlantHeight and columnEarPH data are deleted, so columnEarSel data is now on the second column ",
+				columnData5, dataRow.getCell(1).getStringCellValue());
+		Assert.assertEquals("No cell should be on the third column", null, dataRow.getCell(2));
+		Assert.assertEquals("No cell should be on the fourth column", null, dataRow.getCell(3));
+		Assert.assertEquals("No cell should be on the fifth column", null, dataRow.getCell(4));
+
+	}
+
+	private List<String[]> createVariableDetailsListTestData(final Section section, final String[] headers) {
+		final List<String[]> variableDetailsList = new ArrayList<>();
 		String variableName;
 		String description;
 		String property;
@@ -878,7 +937,7 @@ public class WorkbookParserTest {
 		String value = null;
 		String label = null;
 		for (int i = 1; i <= 5; i++) {
-			String[] variableDetails = new String[headers.length + 1];
+			final String[] variableDetails = new String[headers.length + 1];
 			variableName = "NAME " + i;
 			description = "DESCRIPTION " + i;
 			property = "PROPERTY" + i;
@@ -923,8 +982,8 @@ public class WorkbookParserTest {
 		return variableDetailsList;
 	}
 
-	private void fillVariableDetails(String[] variableDetails, String variableName, String description, String property, String scale,
-			String method, String dataType, String value, String label) {
+	private void fillVariableDetails(final String[] variableDetails, final String variableName, final String description,
+			final String property, final String scale, final String method, final String dataType, final String value, final String label) {
 		variableDetails[0] = variableName;
 		variableDetails[1] = description;
 		variableDetails[2] = property;
@@ -935,41 +994,41 @@ public class WorkbookParserTest {
 		variableDetails[7] = label;
 	}
 
-	private void addSectionVariableDetailsToWorkbook(Workbook sampleWorkbook, List<String[]> variableDetailsList) {
-		Sheet firstSheet = sampleWorkbook.getSheetAt(0);
+	private void addSectionVariableDetailsToWorkbook(final Workbook sampleWorkbook, final List<String[]> variableDetailsList) {
+		final Sheet firstSheet = sampleWorkbook.getSheetAt(0);
 		int rowNumber = 1;
-		for (String[] variableDetails : variableDetailsList) {
+		for (final String[] variableDetails : variableDetailsList) {
 			this.addRowInExistingSheet(firstSheet, rowNumber, variableDetails);
 			rowNumber++;
 		}
 	}
 
-	private void addRowInExistingSheet(Sheet sheet, int rowNumber, String[] data) {
-		Row row = sheet.createRow(rowNumber);
+	private void addRowInExistingSheet(final Sheet sheet, final int rowNumber, final String[] data) {
+		final Row row = sheet.createRow(rowNumber);
 		for (int i = 0; i < data.length; i++) {
-			Cell cell = row.createCell(i);
+			final Cell cell = row.createCell(i);
 			cell.setCellValue(data[i]);
 		}
 	}
 
-	protected Workbook createTestExcelWorkbook(boolean withRecords, boolean overMaximumRowLimit) {
-		HSSFWorkbook excelWorkbook = new HSSFWorkbook();
+	protected Workbook createTestExcelWorkbook(final boolean withRecords, final boolean overMaximumRowLimit) {
+		final HSSFWorkbook excelWorkbook = new HSSFWorkbook();
 		excelWorkbook.createSheet("Description");
-		HSSFSheet observationSheet = excelWorkbook.createSheet("Observation");
+		final HSSFSheet observationSheet = excelWorkbook.createSheet("Observation");
 
 		if (withRecords) {
-			int numberOfRows = overMaximumRowLimit ? WorkbookParser.DEFAULT_MAX_ROW_LIMIT + 1 : 100;
+			final int numberOfRows = overMaximumRowLimit ? WorkbookParser.DEFAULT_MAX_ROW_LIMIT + 1 : 100;
 			for (int i = 0; i <= numberOfRows; i++) {
 
 				// create header row
 				if (i == 0) {
-					HSSFRow row = observationSheet.createRow(i);
+					final HSSFRow row = observationSheet.createRow(i);
 					row.createCell(0).setCellValue(TRIAL_INSTANCE);
 					row.createCell(1).setCellValue(ENTRY_NO);
 					row.createCell(2).setCellValue(PLOT_NO);
 					row.createCell(3).setCellValue("EarASP_1_5");
 				} else {
-					HSSFRow row = observationSheet.createRow(i);
+					final HSSFRow row = observationSheet.createRow(i);
 					row.createCell(0).setCellValue(i);
 					row.createCell(1).setCellValue(i);
 					row.createCell(2).setCellValue(i);
@@ -983,25 +1042,26 @@ public class WorkbookParserTest {
 
 	}
 
-	private Workbook createTestExcelWorkbookFromWorkbook(org.generationcp.middleware.domain.etl.Workbook workbook, boolean withInvalidValues) {
+	private Workbook createTestExcelWorkbookFromWorkbook(final org.generationcp.middleware.domain.etl.Workbook workbook,
+			final boolean withInvalidValues) {
 
-		HSSFWorkbook excelWorkbook = new HSSFWorkbook();
+		final HSSFWorkbook excelWorkbook = new HSSFWorkbook();
 		excelWorkbook.createSheet("Description");
-		HSSFSheet observationSheet = excelWorkbook.createSheet("Observation");
+		final HSSFSheet observationSheet = excelWorkbook.createSheet("Observation");
 
-		List<MeasurementVariable> allVariables = new LinkedList<>();
+		final List<MeasurementVariable> allVariables = new LinkedList<>();
 		allVariables.addAll(workbook.getFactors());
 		allVariables.addAll(workbook.getVariates());
 
-		HSSFRow row1 = observationSheet.createRow(0);
+		final HSSFRow row1 = observationSheet.createRow(0);
 		for (int i = 0; i < allVariables.size(); i++) {
-			HSSFCell cell = row1.createCell(i);
+			final HSSFCell cell = row1.createCell(i);
 			cell.setCellValue(allVariables.get(i).getName());
 		}
 
-		HSSFRow row2 = observationSheet.createRow(1);
+		final HSSFRow row2 = observationSheet.createRow(1);
 		for (int i = 0; i < allVariables.size(); i++) {
-			HSSFCell cell = row2.createCell(i);
+			final HSSFCell cell = row2.createCell(i);
 
 			if (allVariables.get(i).getDataTypeId() == DataType.CATEGORICAL_VARIABLE.getId()) {
 				cell.setCellValue(withInvalidValues ? "6" : "1");
@@ -1015,16 +1075,16 @@ public class WorkbookParserTest {
 	}
 
 	private org.generationcp.middleware.domain.etl.Workbook createTestWorkbook() {
-		org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
+		final org.generationcp.middleware.domain.etl.Workbook workbook = new org.generationcp.middleware.domain.etl.Workbook();
 
-		List<MeasurementVariable> factors = new LinkedList<>();
-		List<MeasurementVariable> variates = new LinkedList<>();
+		final List<MeasurementVariable> factors = new LinkedList<>();
+		final List<MeasurementVariable> variates = new LinkedList<>();
 
 		factors.add(new MeasurementVariable(TRIAL_INSTANCE, "", "", "", "", "", "", ""));
 		factors.add(new MeasurementVariable(ENTRY_NO, "", "", "", "", "", "", ""));
 		factors.add(new MeasurementVariable(PLOT_NO, "", "", "", "", "", "", ""));
 
-		MeasurementVariable categorical = new MeasurementVariable(ALEU_COL_1_5, "", "", "", "", "", "", "");
+		final MeasurementVariable categorical = new MeasurementVariable(ALEU_COL_1_5, "", "", "", "", "", "", "");
 		categorical.setPossibleValues(this.createPossibleValues());
 		categorical.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId());
 		categorical.setRole(PhenotypicType.VARIATE);
@@ -1037,7 +1097,7 @@ public class WorkbookParserTest {
 	}
 
 	private List<ValueReference> createPossibleValues() {
-		List<ValueReference> possibleValues = new ArrayList<>();
+		final List<ValueReference> possibleValues = new ArrayList<>();
 		possibleValues.add(new ValueReference(1, "1", ""));
 		possibleValues.add(new ValueReference(2, "2", ""));
 		possibleValues.add(new ValueReference(3, "3", ""));

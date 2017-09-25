@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.operation.transformer.etl;
 
 import static org.junit.Assert.assertEquals;
@@ -26,53 +25,51 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 public class StandardVariableTransformerTest {
-	
+
 	private static StandardVariableTransformer standardVariableTransformer;
-	
+
 	@BeforeClass
 	public static void setUp() {
 		standardVariableTransformer = new StandardVariableTransformer(Mockito.mock(HibernateSessionProvider.class));
 	}
 
 	@Test
-	public void testTransformVariable()
-			throws MiddlewareQueryException {
-		Variable variable = createVariableTestData();
-		StandardVariable standardVariable = standardVariableTransformer.transformVariable(variable);
+	public void testTransformVariable() throws MiddlewareQueryException {
+		final Variable variable = createVariableTestData();
+		final StandardVariable standardVariable = standardVariableTransformer.transformVariable(variable);
 		assertNotNull(standardVariable);
-		assertEquals(variable.getId(),standardVariable.getId());
-		assertEquals(variable.getName(),standardVariable.getName());
-		assertEquals(variable.getDefinition(),standardVariable.getDescription());
-		assertEquals(variable.getProperty(),standardVariable.getProperty());
-		assertEquals(variable.getScale(),standardVariable.getScale());
-		assertEquals(variable.getMethod(),standardVariable.getMethod());
-		DataType vDataType = variable.getScale().getDataType();
-		Term svDataType = standardVariable.getDataType();
-		assertEquals(vDataType.getId(),new Integer(svDataType.getId()));
-		assertEquals(vDataType.getName(),svDataType.getName());
-		VariableConstraints svConstraints = standardVariable.getConstraints();
-		assertEquals(new Double(variable.getMinValue()),svConstraints.getMinValue());
-		assertEquals(new Double(variable.getMaxValue()),svConstraints.getMaxValue());
-		List<Enumeration> validValues = standardVariable.getEnumerations();
-		List<TermSummary> categories = variable.getScale().getCategories();
-		assertEquals(categories.size(),categories.size());
+		assertEquals(variable.getId(), standardVariable.getId());
+		assertEquals(variable.getName(), standardVariable.getName());
+		assertEquals(variable.getDefinition(), standardVariable.getDescription());
+		assertEquals(variable.getProperty(), standardVariable.getProperty());
+		assertEquals(variable.getScale(), standardVariable.getScale());
+		assertEquals(variable.getMethod(), standardVariable.getMethod());
+		final DataType vDataType = variable.getScale().getDataType();
+		final Term svDataType = standardVariable.getDataType();
+		assertEquals(vDataType.getId(), new Integer(svDataType.getId()));
+		assertEquals(vDataType.getName(), svDataType.getName());
+		final VariableConstraints svConstraints = standardVariable.getConstraints();
+		assertEquals(new Double(variable.getMinValue()), svConstraints.getMinValue());
+		assertEquals(new Double(variable.getMaxValue()), svConstraints.getMaxValue());
+		final List<Enumeration> validValues = standardVariable.getEnumerations();
+		final List<TermSummary> categories = variable.getScale().getCategories();
+		assertEquals(categories.size(), categories.size());
 
-		Map<String, String> categoryMap = new HashMap<>();
-		for (TermSummary category : categories) {
+		final Map<String, String> categoryMap = new HashMap<>();
+		for (final TermSummary category : categories) {
 			categoryMap.put(category.getName(), category.getDefinition());
 		}
 
-		for (Enumeration enumeration : validValues) {
+		for (final Enumeration enumeration : validValues) {
 			assertTrue(categoryMap.keySet().contains(enumeration.getName()));
-			assertEquals(categoryMap.get(enumeration.getName()),
-					enumeration.getDescription());
+			assertEquals(categoryMap.get(enumeration.getName()), enumeration.getDescription());
 		}
-		assertEquals(variable.getProperty().getCropOntologyId(),
-				standardVariable.getCropOntologyId());
+		assertEquals(variable.getProperty().getCropOntologyId(), standardVariable.getCropOntologyId());
+		assertTrue(standardVariable.isObsolete());
 	}
 
 	private Variable createVariableTestData() {
-		Variable variable = new Variable();
+		final Variable variable = new Variable();
 		variable.setId(1);
 		variable.setName("VARIABLE NAME");
 		variable.setDefinition("VARIABLE DEF");
@@ -81,31 +78,32 @@ public class StandardVariableTransformerTest {
 		variable.setScale(createScaleTestData());
 		variable.setMinValue("1");
 		variable.setMaxValue("4");
+		variable.setObsolete(true);
 		return variable;
 	}
 
 	private Property createPropertyTestData() {
-		Term term = new Term();
+		final Term term = new Term();
 		term.setId(2);
 		term.setName("PROPERTY NAME");
 		term.setDefinition("PROPERTY DEF");
-		return new Property(term);	
+		return new Property(term);
 	}
-	
+
 	private Method createMethodTestData() {
-		Term term = new Term();
+		final Term term = new Term();
 		term.setId(2);
 		term.setName("METHOD NAME");
 		term.setDefinition("METHOD DEF");
 		return new Method(term);
 	}
-	
+
 	private Scale createScaleTestData() {
-		Term term = new Term();
+		final Term term = new Term();
 		term.setId(2);
 		term.setName("SCALE NAME");
 		term.setDefinition("SCALE DEF");
-		Scale scale = new Scale(term);
+		final Scale scale = new Scale(term);
 		scale.setDataType(DataType.CATEGORICAL_VARIABLE);
 		scale.addCategory(new TermSummary(null, "CAT NAME 1", "CAT DESC 1"));
 		scale.addCategory(new TermSummary(null, "CAT NAME 2", "CAT DESC 2"));

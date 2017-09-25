@@ -1,4 +1,3 @@
-
 package org.generationcp.middleware.operation.transformer.etl;
 
 import java.util.ArrayList;
@@ -31,16 +30,17 @@ public class StandardVariableTransformer extends Transformer {
 		standardVariable.setProperty(variable.getProperty());
 		standardVariable.setScale(variable.getScale());
 		standardVariable.setMethod(variable.getMethod());
+		standardVariable.setObsolete(variable.isObsolete());
 		final DataType dataType = variable.getScale().getDataType();
 		if (dataType != null) {
 			standardVariable.setDataType(new Term(dataType.getId(), dataType.getName(), dataType.getName()));
 		}
 		if (variable.getMinValue() != null && variable.getMaxValue() != null) {
-			standardVariable.setConstraints(new VariableConstraints(0, 0, Double.parseDouble(variable.getMinValue()), Double
-					.parseDouble(variable.getMaxValue())));
+			standardVariable.setConstraints(
+					new VariableConstraints(0, 0, Double.parseDouble(variable.getMinValue()), Double.parseDouble(variable.getMaxValue())));
 		} else if (variable.getScale().getMinValue() != null && variable.getScale().getMaxValue() != null) {
-			standardVariable.setConstraints(new VariableConstraints(0, 0, Double.parseDouble(variable.getScale().getMinValue()), Double
-					.parseDouble(variable.getScale().getMaxValue())));
+			standardVariable.setConstraints(new VariableConstraints(0, 0, Double.parseDouble(variable.getScale().getMinValue()),
+					Double.parseDouble(variable.getScale().getMaxValue())));
 		}
 		standardVariable.setEnumerations(this.getValidValues(variable));
 		standardVariable.setCropOntologyId(variable.getProperty().getCropOntologyId());

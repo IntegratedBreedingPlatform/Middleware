@@ -108,10 +108,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 				StringBuilder sqlString =
 						new StringBuilder().append("SELECT cvt.name, cvt.cvterm_id ").append("FROM cvterm cvt ")
-						.append("WHERE cvt.cv_id = :cvId and cvt.name IN (:nameOrSynonyms) ").append("UNION ")
+						.append("WHERE cvt.cv_id = :cvId and cvt.name IN (:nameOrSynonyms) AND cvt.is_obsolete = 0 ").append("UNION ")
 						.append("SELECT syn.synonym, cvt.cvterm_id ")
 						.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
-						.append("AND cvt.cv_id = :cvId AND syn.synonym IN (:nameOrSynonyms) ");
+						.append("AND cvt.cv_id = :cvId AND syn.synonym IN (:nameOrSynonyms) AND cvt.is_obsolete = 0");
 
 				SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 				query.setParameter("cvId", cvId);
@@ -661,8 +661,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				StringBuilder sqlString =
 						new StringBuilder().append("SELECT DISTINCT cvtr.name, syn.synonym, cvt.cvterm_id ")
 						.append("FROM cvterm_relationship cvr ")
-						.append("INNER JOIN cvterm cvtr ON cvr.object_id = cvtr.cvterm_id AND cvr.type_id = 1200 ")
-						.append("INNER JOIN cvterm cvt ON cvr.subject_id = cvt.cvterm_id AND cvt.cv_id = 1040 ")
+						.append("INNER JOIN cvterm cvtr ON cvr.object_id = cvtr.cvterm_id AND cvr.type_id = 1200 AND cvtr.is_obsolete = 0 ")
+						.append("INNER JOIN cvterm cvt ON cvr.subject_id = cvt.cvterm_id AND cvt.cv_id = 1040 AND cvt.is_obsolete = 0  ")
 						.append(", cvtermsynonym syn ")
 						.append("WHERE (cvtr.cvterm_id = syn.cvterm_id AND syn.synonym IN (:propertyNameOrSynonyms) ")
 						.append("OR cvtr.name IN (:propertyNameOrSynonyms)) ");
