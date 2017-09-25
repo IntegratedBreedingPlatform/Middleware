@@ -256,7 +256,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		transaction.setInventoryID(this.preferredName.getNval());
 		this.transactionDAO.save(transaction);
 
-		final List<Germplasm> resultsWithInventoryOnly = this.dao.searchForGermplasms(this.preferredName.getNval(), Operation.LIKE, false, true, false);
+		final List<Germplasm> resultsWithInventoryOnly = this.dao.searchForGermplasms(this.createSearchParam(this.preferredName.getNval(), Operation.LIKE, false, true, false));
 		this.assertPossibleGermplasmFieldsForInventorySearch(resultsWithInventoryOnly);
 
 		Assert.assertEquals(1, resultsWithInventoryOnly.size());

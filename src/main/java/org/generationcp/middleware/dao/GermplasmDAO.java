@@ -810,24 +810,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return new ArrayList<>();
 	}
 
-	/**
-	 * Search for germplasms given a search term
-	 *
-	 * @param searchedString - the search term to be used
-	 * @param o - like or equal
-	 * @param includeParents boolean flag to denote whether parents will be included in search results
-	 * @param withInventoryOnly - boolean flag to denote whether result will be filtered by those with inventories only
-	 * @param includeMGMembers - boolean flag to denote whether the MG members will be included in the result
-	 * @return List of Germplasms
-	 * @throws MiddlewareQueryException
-	 */
-	public List<Germplasm> searchForGermplasms(final String searchedString, final Operation o, final boolean includeParents,
-			final boolean withInventoryOnly, final boolean includeMGMembers) throws MiddlewareQueryException {
-		// use the one that uses the new GermplasmSearchParameter pojo for performing the search
-		return this
-				.searchForGermplasms(new GermplasmSearchParameter(searchedString, o, includeParents, withInventoryOnly, includeMGMembers));
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<Germplasm> searchForGermplasms(final GermplasmSearchParameter germplasmSearchParameter) throws MiddlewareQueryException {
 
