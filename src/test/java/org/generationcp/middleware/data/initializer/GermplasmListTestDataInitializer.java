@@ -208,22 +208,22 @@ public class GermplasmListTestDataInitializer {
 		return listEntry;
 	}
 
-	public List<GermplasmList> createGermplasmLists(final int numOfEntries) {
+	public static List<GermplasmList> createGermplasmLists(final int numOfEntries) {
 		final List<GermplasmList> germplasmLists = new ArrayList<GermplasmList>();
 
 		for (int i = 0; i < numOfEntries; i++) {
 			final Integer id = i + 1;
-			germplasmLists.add(this.createGermplasmListWithListData(id, numOfEntries));
+			germplasmLists.add(createGermplasmListWithListData(id, numOfEntries));
 		}
 		return germplasmLists;
 	}
 
-	public List<GermplasmList> createGermplasmListsWithType(final int numOfEntries) {
+	public static List<GermplasmList> createGermplasmListsWithType(final int numOfEntries) {
 		final List<GermplasmList> germplasmLists = new ArrayList<GermplasmList>();
 
 		for (int i = 0; i < numOfEntries; i++) {
 			final Integer id = i + 1;
-			final GermplasmList germplasmList = this.createGermplasmListWithListData(id, numOfEntries);
+			final GermplasmList germplasmList = createGermplasmListWithListData(id, numOfEntries);
 			germplasmList.setType("test" + id);
 			germplasmLists.add(germplasmList);
 		}
