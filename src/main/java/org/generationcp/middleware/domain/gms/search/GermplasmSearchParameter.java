@@ -1,3 +1,4 @@
+
 package org.generationcp.middleware.domain.gms.search;
 
 import java.util.LinkedHashMap;
@@ -24,7 +25,7 @@ public class GermplasmSearchParameter {
 
 	private int numberOfEntries;
 
-	private Map<String, Boolean> sortState;
+	private final Map<String, Boolean> sortState;
 
 	public GermplasmSearchParameter(final String searchKeyword, final Operation operation) {
 		this.searchKeyword = searchKeyword;
@@ -43,7 +44,7 @@ public class GermplasmSearchParameter {
 		this.withInventoryOnly = withInventoryOnly;
 		this.includeMGMembers = includeMGMembers;
 	}
-	
+
 	// Constructor for making a copy of GermplasmSearchParameter object
 	public GermplasmSearchParameter(final GermplasmSearchParameter aSearchParameter) {
 		this(aSearchParameter.getSearchKeyword(), aSearchParameter.getOperation(), aSearchParameter.isIncludeParents(),
@@ -107,11 +108,12 @@ public class GermplasmSearchParameter {
 	}
 
 	public Map<String, Boolean> getSortState() {
-		return sortState;
+		return this.sortState;
 	}
 
 	/**
 	 * Setup sort states if any (for sorting the germplasm query results)
+	 * 
 	 * @param sortPropertyIds
 	 * @param sortStates
 	 */
@@ -120,24 +122,78 @@ public class GermplasmSearchParameter {
 			return;
 		}
 
-		sortState.clear();
+		this.sortState.clear();
 
 		for (int i = 0; i < sortPropertyIds.length; i++) {
-			sortState.put(String.valueOf(sortPropertyIds[i]),sortStates[i]);
+			this.sortState.put(String.valueOf(sortPropertyIds[i]), sortStates[i]);
 		}
 	}
 
 	@Override
 	public String toString() {
-		return "GermplasmSearchParameter{" +
-				"searchKeyword='" + searchKeyword + '\'' +
-				", operation=" + operation +
-				", includeParents=" + includeParents +
-				", withInventoryOnly=" + withInventoryOnly +
-				", includeMGMembers=" + includeMGMembers +
-				", startingRow=" + startingRow +
-				", numberOfEntries=" + numberOfEntries +
-				", sortState=" + sortState +
-				'}';
+		return "GermplasmSearchParameter{" + "searchKeyword='" + this.searchKeyword + '\'' + ", operation=" + this.operation
+				+ ", includeParents=" + this.includeParents + ", withInventoryOnly=" + this.withInventoryOnly + ", includeMGMembers="
+				+ this.includeMGMembers + ", startingRow=" + this.startingRow + ", numberOfEntries=" + this.numberOfEntries + ", sortState="
+				+ this.sortState + '}';
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (this.includeMGMembers ? 1231 : 1237);
+		result = prime * result + (this.includeParents ? 1231 : 1237);
+		result = prime * result + this.numberOfEntries;
+		result = prime * result + (this.operation == null ? 0 : this.operation.hashCode());
+		result = prime * result + (this.searchKeyword == null ? 0 : this.searchKeyword.hashCode());
+		result = prime * result + (this.sortState == null ? 0 : this.sortState.hashCode());
+		result = prime * result + this.startingRow;
+		result = prime * result + (this.withInventoryOnly ? 1231 : 1237);
+		return result;
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		final GermplasmSearchParameter other = (GermplasmSearchParameter) obj;
+		if (this.includeMGMembers != other.includeMGMembers) {
+			return false;
+		}
+		if (this.includeParents != other.includeParents) {
+			return false;
+		}
+		if (this.numberOfEntries != other.numberOfEntries) {
+			return false;
+		}
+		if (this.operation != other.operation) {
+			return false;
+		}
+		if (this.searchKeyword == null) {
+			if (other.searchKeyword != null) {
+				return false;
+			}
+		} else if (!this.searchKeyword.equals(other.searchKeyword)) {
+			return false;
+		}
+		if (this.sortState == null) {
+			if (other.sortState != null) {
+				return false;
+			}
+		} else if (!this.sortState.equals(other.sortState)) {
+			return false;
+		}
+		if (this.startingRow != other.startingRow) {
+			return false;
+		}
+		return this.withInventoryOnly == other.withInventoryOnly;
+	}
+
 }
