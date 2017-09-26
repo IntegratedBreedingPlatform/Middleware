@@ -1018,18 +1018,7 @@ public interface GermplasmDataManager {
 	 */
 	UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code);
 
-	/**
-	 * Return the count of germplasm search results based on the following parameters:
-	 * 
-	 * @param q - keyword
-	 * @param o - operation
-	 * @param includeParents - include the parents of the search germplasm
-	 * @param withInventoryOnly - include germplasm with inventory details only
-	 * @param includeMGMembers - include germplasm of the same group of the search germplasm
-	 * @return
-	 */
-	Integer countSearchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly, boolean includeMGMembers);
-
+	
 	List<Method> getDerivativeAndMaintenanceMethods(List<Integer> ids);
 	
 	/**

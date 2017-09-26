@@ -42,9 +42,6 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jamonapi.Monitor;
-import com.jamonapi.MonitorFactory;
-
 /**
  * DAO class for {@link Germplasm}.
  *
@@ -1058,22 +1055,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
-	}
-
-	public Integer countSearchForGermplasms(final String q, final Operation o, final boolean includeParents,
-			final boolean withInventoryOnly, final boolean includeMGMembers) {
-
-		final Monitor countSearchForGermplasms = MonitorFactory.start("Method Started : countSearchForGermplasms ");
-
-		Integer searchResultsCount = 0;
-
-		final Set<Integer> gidSearchResults = this.retrieveGIDSearchResults(q, o, includeParents, withInventoryOnly, includeMGMembers);
-
-		searchResultsCount = gidSearchResults.size();
-
-		GermplasmDAO.LOG.debug("Method End : countSearchForGermplasms " + countSearchForGermplasms.stop());
-
-		return searchResultsCount;
 	}
 
 	private void searchInGidCriteria(final StringBuilder queryString, final Map<String, String> params, final String q, final Operation o) {
