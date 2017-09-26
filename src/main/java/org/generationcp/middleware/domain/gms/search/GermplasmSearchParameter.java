@@ -1,6 +1,5 @@
 package org.generationcp.middleware.domain.gms.search;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -43,6 +42,12 @@ public class GermplasmSearchParameter {
 		this.includeParents = includeParents;
 		this.withInventoryOnly = withInventoryOnly;
 		this.includeMGMembers = includeMGMembers;
+	}
+	
+	// Constructor for making a copy of GermplasmSearchParameter object
+	public GermplasmSearchParameter(final GermplasmSearchParameter aSearchParameter) {
+		this(aSearchParameter.getSearchKeyword(), aSearchParameter.getOperation(), aSearchParameter.isIncludeParents(),
+				aSearchParameter.isWithInventoryOnly(), aSearchParameter.includeMGMembers);
 	}
 
 	public String getSearchKeyword() {
