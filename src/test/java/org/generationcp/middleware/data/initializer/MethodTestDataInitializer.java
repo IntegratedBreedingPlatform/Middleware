@@ -16,21 +16,32 @@ public class MethodTestDataInitializer {
 		// do nothing
 	}
 
-	public Method createMethod() {
-		return this.createMethod(METHOD_ID, METHOD_TYPE);
+	public static Method createMethod() {
+		return MethodTestDataInitializer.createMethod(MethodTestDataInitializer.METHOD_ID,
+				MethodTestDataInitializer.METHOD_TYPE);
 	}
 
-	public Method createMethod(final int methodId, final String methodType) {
+	public static Method createMethod(final int methodId, final String methodType) {
 		final Method method = new Method();
 		method.setMid(methodId);
 		method.setMtype(methodType);
-		method.setMcode(MCODE);
+		method.setMcode(MethodTestDataInitializer.MCODE);
+		method.setMname("Method Name " + (methodId + 1));
+		method.setMdesc("Method Description " + (methodId + 1));
 		return method;
 	}
 
-	public List<Method> createMethodList() {
+	public static List<Method> createMethodList() {
 		final List<Method> methodList = new ArrayList<>();
-		methodList.add(this.createMethod());
+		methodList.add(MethodTestDataInitializer.createMethod());
+		return methodList;
+	}
+
+	public static List<Method> createMethodList(final int noOfEntries) {
+		final List<Method> methodList = new ArrayList<>();
+		for (int i = 0; i < noOfEntries; i++) {
+			methodList.add(MethodTestDataInitializer.createMethod(i, MethodTestDataInitializer.METHOD_TYPE));
+		}
 		return methodList;
 	}
 }
