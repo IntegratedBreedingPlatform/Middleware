@@ -796,19 +796,7 @@ public interface GermplasmDataManager {
 	 * @return Map<Integer, String> - map of gids to their corresponding location name
 	 */
 	Map<Integer, String> getLocationNamesByGids(List<Integer> gids);
-
-	/**
-	 * Search for germplasms given a search term
-	 * 
-	 * @param searchedString - the search term to be used
-	 * @param o - like or equal
-	 * @param includeParents boolean flag to denote whether parents will be included in search results
-	 * @param withInventoryOnly - boolean flag to denote whether result will be filtered by those with inventories only
-	 * @param includeMGMembers - boolean flag to denote whether the management group members (same mgid) will be included in the result
-	 * @return List of Germplasms
-	 */
-	List<Germplasm> searchForGermplasm(String q, Operation o, boolean includeParents, boolean withInventoryOnly, boolean includeMGMembers);
-
+	
 	/**
 	 * Search for germplasms given a search term
 	 * 

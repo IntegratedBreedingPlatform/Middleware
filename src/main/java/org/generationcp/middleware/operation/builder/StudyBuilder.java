@@ -76,6 +76,7 @@ public class StudyBuilder extends Builder {
 	public Study createStudy(DmsProject project, boolean hasVariableType) throws MiddlewareException {
 		Study study = new Study();
 		study.setId(project.getProjectId());
+		study.setProgramUUID(project.getProgramUUID());
 
 		VariableTypeList variableTypes = this.getVariableTypeBuilder().create(
 				project.getProperties(),project.getProgramUUID());
