@@ -1076,12 +1076,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> searchForGermplasm(final String q, final Operation o, final boolean includeParents,
-			final boolean withInventoryOnly, final boolean includeMGMembers) {
-		return this.getGermplasmDao().searchForGermplasms(q, o, includeParents, withInventoryOnly, includeMGMembers);
-	}
-
-	@Override
 	public List<Germplasm> searchForGermplasm(final GermplasmSearchParameter germplasmSearchParameter) {
 		final List<Germplasm> germplasms = this.getGermplasmDao().searchForGermplasms(germplasmSearchParameter);
 		this.getListInventoryBuilder().setAvailableBalanceScaleForGermplasm(germplasms);
