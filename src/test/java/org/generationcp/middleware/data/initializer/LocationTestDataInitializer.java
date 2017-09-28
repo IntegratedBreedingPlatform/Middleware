@@ -22,6 +22,14 @@ public class LocationTestDataInitializer {
 		location.setLname(lname);
 		return location;
 	}
+	
+	public static Location createLocationWithLabbr(final Integer locId, final String lname, final String labbr) {
+		final Location location = new Location();
+		location.setLocid(locId);
+		location.setLname(lname);
+		location.setLabbr(labbr);
+		return location;
+	}
 
 	public static Location createLocation(final Integer locId, final String lname, final String uuid) {
 		final Location location = new Location();
