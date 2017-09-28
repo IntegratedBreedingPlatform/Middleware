@@ -44,6 +44,7 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.NonEditableFactors;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -669,7 +670,7 @@ public class WorkbookBuilder extends Builder {
 		measurementVariable.setName(String.valueOf(TermId.SAMPLES.getId()));
 		measurementVariable.setLabel(measurementVariable.getName());
 		measurementVariable.setFactor(true);
-		measurementVariable.setDataTypeId(1120);
+		measurementVariable.setDataTypeId(DataType.CHARACTER_VARIABLE.getId());
 		measurementVariable.setPossibleValues(new ArrayList<ValueReference>());
 		final String sampleValue = samplesMap.get(experimentId);
 		return new MeasurementData(String.valueOf(TermId.SAMPLES.getId()), sampleValue, false, "C", measurementVariable);

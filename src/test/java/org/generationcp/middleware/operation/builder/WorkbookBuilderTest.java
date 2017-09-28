@@ -516,7 +516,7 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 		Assert.assertEquals(String.valueOf(TermId.SAMPLES.getId()), samplesMeasurementVariable.getName());
 		Assert.assertEquals(String.valueOf(TermId.SAMPLES.getId()), samplesMeasurementVariable.getLabel());
 		Assert.assertTrue(samplesMeasurementVariable.isFactor());
-		Assert.assertEquals(Integer.valueOf(1120), samplesMeasurementVariable.getDataTypeId());
+		Assert.assertEquals(Integer.valueOf(DataType.CHARACTER_VARIABLE.getId()), samplesMeasurementVariable.getDataTypeId());
 		Assert.assertNotNull(samplesMeasurementVariable.getPossibleValues());
 
 	}
