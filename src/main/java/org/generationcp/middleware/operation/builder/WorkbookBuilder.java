@@ -662,7 +662,7 @@ public class WorkbookBuilder extends Builder {
 	 * @param experimentId
 	 * @return MeasurementData
 	 */
-	private MeasurementData getMeasurementDataWithSample(final Map<Integer, String> samplesMap, final int experimentId) {
+	protected MeasurementData getMeasurementDataWithSample(final Map<Integer, String> samplesMap, final int experimentId) {
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
 
 		measurementVariable.setTermId(TermId.SAMPLES.getId());
@@ -670,6 +670,7 @@ public class WorkbookBuilder extends Builder {
 		measurementVariable.setLabel(measurementVariable.getName());
 		measurementVariable.setFactor(true);
 		measurementVariable.setDataTypeId(1120);
+		measurementVariable.setPossibleValues(new ArrayList<ValueReference>());
 		final String sampleValue = samplesMap.get(experimentId);
 		return new MeasurementData(String.valueOf(TermId.SAMPLES.getId()), sampleValue, false, "C", measurementVariable);
 
