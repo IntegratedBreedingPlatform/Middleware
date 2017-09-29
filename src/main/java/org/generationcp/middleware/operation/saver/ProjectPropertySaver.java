@@ -212,18 +212,19 @@ public class ProjectPropertySaver {
 			Hibernate.initialize(geolocation.getProperties());
 
 			for (final MeasurementVariable variable : variables) {
-				switch (variable.getOperation().toString()) {
+				final String operation = variable.getOperation().toString();
+				switch (operation) {
 
 					case "DELETE":
 						this.deleteVariable(study, trialDataset, measurementDataset, variable.getRole(), variable.getTermId(), geolocation);
 						break;
 					case "ADD":
 						this.insertVariable(study, trialDataset, measurementDataset, variable, rank, isConstant, geolocation);
+						rank++;
 						break;
 					case "UPDATE":
 						this.updateVariable(study, trialDataset, measurementDataset, variable, isConstant, geolocation);
 						break;
-
 					default:
 						break;
 				}
@@ -305,7 +306,7 @@ public class ProjectPropertySaver {
 
 	protected DMSVariableType createVariableType(final MeasurementVariable variable, final int rank) {
 		final DMSVariableType varType = new DMSVariableType();
-		final StandardVariable stdvar = new StandardVariable();
+		final StandardVariable stdVariable = new StandardVariable();
 
 		varType.setRole(variable.getRole());
 		varType.setVariableType(variable.getVariableType());
@@ -313,13 +314,13 @@ public class ProjectPropertySaver {
 		varType.setLocalDescription(variable.getDescription());
 		varType.setRank(rank);
 
-		stdvar.setId(variable.getTermId());
-		stdvar.setPhenotypicType(variable.getRole());
-		stdvar.setMethod(new Term(0, variable.getMethod(), ""));
-		stdvar.setProperty(new Term(0, variable.getProperty(), ""));
-		stdvar.setScale(new Term(0, variable.getScale(), ""));
+		stdVariable.setId(variable.getTermId());
+		stdVariable.setPhenotypicType(variable.getRole());
+		stdVariable.setMethod(new Term(0, variable.getMethod(), ""));
+		stdVariable.setProperty(new Term(0, variable.getProperty(), ""));
+		stdVariable.setScale(new Term(0, variable.getScale(), ""));
 
-		varType.setStandardVariable(stdvar);
+		varType.setStandardVariable(stdVariable);
 
 		if (variable.getTreatmentLabel() != null && !variable.getTreatmentLabel().isEmpty()) {
 			varType.setTreatmentLabel(variable.getTreatmentLabel());
@@ -467,8 +468,8 @@ public class ProjectPropertySaver {
 			for (final MeasurementVariable variable : variables) {
 				switch (variable.getOperation().toString()) {
 					case "ADD":
-						final int measurementRank = this.getNextRank(measurementDataset);
-						this.insertVariable(measurementDataset, variable, measurementRank);
+						final int rank = this.getNextRank(measurementDataset);
+						this.insertVariable(measurementDataset, variable, rank);
 						break;
 
 					case "DELETE":
