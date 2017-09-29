@@ -12,7 +12,7 @@ import org.generationcp.middleware.domain.oms.Term;
 
 public class StandardVariableTestDataInitializer {
 
-	public StandardVariable createStandardVariable() {
+	public static StandardVariable createStandardVariable() {
 		final StandardVariable stdVariable = new StandardVariable();
 		stdVariable.setName("variable name " + new Random().nextInt(10000));
 		stdVariable.setDescription("variable description");
@@ -31,17 +31,18 @@ public class StandardVariableTestDataInitializer {
 		return stdVariable;
 	}
 
-	public StandardVariable createStandardVariable(final Integer id, final String name) {
-		final StandardVariable stdVariable = this.createStandardVariable();
+	public static StandardVariable createStandardVariable(final Integer id, final String name) {
+		final StandardVariable stdVariable = StandardVariableTestDataInitializer.createStandardVariable();
 		stdVariable.setId(id);
 		stdVariable.setName(name);
 		stdVariable.setDescription(name + " Description");
 		return stdVariable;
 	}
-	
-	public StandardVariable createStandardVariable(Term property, Term scale, Term method, Term dataType, Term storedIn, Term isA,
-			PhenotypicType phenotypicType, int termId, String name) {
-		StandardVariable stdVar = new StandardVariable(property, scale, method, dataType, isA, phenotypicType);
+
+	public static StandardVariable createStandardVariable(final Term property, final Term scale, final Term method,
+			final Term dataType, final Term storedIn, final Term isA, final PhenotypicType phenotypicType,
+			final int termId, final String name) {
+		final StandardVariable stdVar = new StandardVariable(property, scale, method, dataType, isA, phenotypicType);
 		stdVar.setId(termId);
 		stdVar.setName(name);
 
