@@ -29,12 +29,15 @@ public class LocationDAOTest extends IntegrationTestBase {
 	private static final String PROGRAM_UUID3 = "asdfg-54321";
 
 	private static LocationDAO locationDAO;
+	private static LocationTestDataInitializer locationDataInitializer;
 
 	@Before
 	public void setUp() throws Exception {
 		final Session session = this.sessionProvder.getSession();
 		LocationDAOTest.locationDAO = new LocationDAO();
 		LocationDAOTest.locationDAO.setSession(session);
+
+		LocationDAOTest.locationDataInitializer = new LocationTestDataInitializer();
 	}
 
 	@Test
@@ -70,35 +73,35 @@ public class LocationDAOTest extends IntegrationTestBase {
 		final List<Location> locations = new ArrayList<>();
 
 		// add historical breeding location (null program uuid)
-		locations.add(LocationTestDataInitializer.createLocation(LocationDAOTest.HISTORICAL_LOC_ID,
+		locations.add(LocationDAOTest.locationDataInitializer.createLocation(LocationDAOTest.HISTORICAL_LOC_ID,
 				LocationDAOTest.LOCATION + LocationDAOTest.HISTORICAL_LOC_ID, Location.BREEDING_LOCATION_TYPE_IDS[0],
 				LocationDAOTest.ABBR + LocationDAOTest.HISTORICAL_LOC_ID, null));
 
 		// Add locations for Program 1 - 2 breeding locations, 1 non-breeding
 		// location
 		Integer id = LocationDAOTest.PROGRAM1_BREEDING_LOC_IDS[0];
-		locations.add(LocationTestDataInitializer.createLocation(id, LocationDAOTest.LOCATION + id,
+		locations.add(LocationDAOTest.locationDataInitializer.createLocation(id, LocationDAOTest.LOCATION + id,
 				Location.BREEDING_LOCATION_TYPE_IDS[0], LocationDAOTest.ABBR + id, LocationDAOTest.PROGRAM_UUID1));
 		id = LocationDAOTest.PROGRAM1_BREEDING_LOC_IDS[1];
-		locations.add(LocationTestDataInitializer.createLocation(id, LocationDAOTest.LOCATION + id,
+		locations.add(LocationDAOTest.locationDataInitializer.createLocation(id, LocationDAOTest.LOCATION + id,
 				Location.BREEDING_LOCATION_TYPE_IDS[1], LocationDAOTest.ABBR + id, LocationDAOTest.PROGRAM_UUID1));
-		locations.add(LocationTestDataInitializer.createLocation(22, LocationDAOTest.LOCATION + 22,
+		locations.add(LocationDAOTest.locationDataInitializer.createLocation(22, LocationDAOTest.LOCATION + 22,
 				LocationDAOTest.NON_BREEDING_LOC_TYPE, LocationDAOTest.ABBR + 22, LocationDAOTest.PROGRAM_UUID1));
 
 		// Add locations for Program 2 - 3 breeding locations, 2 non-breeding
 		// location
 		id = LocationDAOTest.PROGRAM2_BREEDING_LOC_IDS[0];
-		locations.add(LocationTestDataInitializer.createLocation(id, LocationDAOTest.LOCATION + id,
+		locations.add(LocationDAOTest.locationDataInitializer.createLocation(id, LocationDAOTest.LOCATION + id,
 				Location.BREEDING_LOCATION_TYPE_IDS[0], LocationDAOTest.ABBR + id, LocationDAOTest.PROGRAM_UUID2));
 		id = LocationDAOTest.PROGRAM2_BREEDING_LOC_IDS[1];
-		locations.add(LocationTestDataInitializer.createLocation(id, LocationDAOTest.LOCATION + id,
+		locations.add(LocationDAOTest.locationDataInitializer.createLocation(id, LocationDAOTest.LOCATION + id,
 				Location.BREEDING_LOCATION_TYPE_IDS[1], LocationDAOTest.ABBR + id, LocationDAOTest.PROGRAM_UUID2));
 		id = LocationDAOTest.PROGRAM2_BREEDING_LOC_IDS[2];
-		locations.add(LocationTestDataInitializer.createLocation(id, LocationDAOTest.LOCATION + id,
+		locations.add(LocationDAOTest.locationDataInitializer.createLocation(id, LocationDAOTest.LOCATION + id,
 				Location.BREEDING_LOCATION_TYPE_IDS[2], LocationDAOTest.ABBR + id, LocationDAOTest.PROGRAM_UUID2));
-		locations.add(LocationTestDataInitializer.createLocation(33, LocationDAOTest.LOCATION + 33,
+		locations.add(LocationDAOTest.locationDataInitializer.createLocation(33, LocationDAOTest.LOCATION + 33,
 				LocationDAOTest.NON_BREEDING_LOC_TYPE, LocationDAOTest.ABBR + 33, LocationDAOTest.PROGRAM_UUID2));
-		locations.add(LocationTestDataInitializer.createLocation(34, LocationDAOTest.LOCATION + 34,
+		locations.add(LocationDAOTest.locationDataInitializer.createLocation(34, LocationDAOTest.LOCATION + 34,
 				LocationDAOTest.NON_BREEDING_LOC_TYPE, LocationDAOTest.ABBR + 34, LocationDAOTest.PROGRAM_UUID2));
 
 		for (final Location location : locations) {
