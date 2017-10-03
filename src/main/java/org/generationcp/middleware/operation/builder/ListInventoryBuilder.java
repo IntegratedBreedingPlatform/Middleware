@@ -320,11 +320,12 @@ public class ListInventoryBuilder extends Builder {
 	 * @param listId
 	 * @param start
 	 * @param numOfRows
+	 * @param programUUID
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
 	public List<GermplasmListData> retrieveInventoryLotsForList(final Integer listId, final int start, final int numOfRows,
-			final List<GermplasmListData> listEntries) throws MiddlewareQueryException {
+			final List<GermplasmListData> listEntries, final String programUUID) throws MiddlewareQueryException {
 
 		final List<Integer> listEntryIds = new ArrayList<Integer>();
 		final List<Integer> gids = new ArrayList<Integer>();
@@ -339,7 +340,7 @@ public class ListInventoryBuilder extends Builder {
 
 			// NEED to pass specific GIDs instead of listdata.gid because of handling for CHANGES table
 			// where listdata.gid may not be the final germplasm displayed
-			final List<Lot> lots = this.getLotDao().getLotAggregateDataForList(listId, gids);
+			final List<Lot> lots = this.getLotDao().getLotAggregateDataForList(listId, gids, programUUID);
 
 			// add to each list entry related lot information
 			final List<ListEntryLotDetails> lotRows = LotTransformer.extractLotRowsForList(listEntries, lots);
@@ -356,7 +357,7 @@ public class ListInventoryBuilder extends Builder {
 	 * @return
 	 * @throws MiddlewareQueryException
 	 */
-	public List<GermplasmListData> retrieveReservedInventoryLotsForList(final Integer listId, final List<GermplasmListData> listEntries)
+	public List<GermplasmListData> retrieveReservedInventoryLotsForList(final Integer listId, final List<GermplasmListData> listEntries, final String programUUID)
 			throws MiddlewareQueryException {
 
 		final List<Integer> listEntryIds = new ArrayList<Integer>();
@@ -369,7 +370,7 @@ public class ListInventoryBuilder extends Builder {
 
 		if (listEntries != null && !listEntries.isEmpty()) {
 
-			final List<Lot> lots = this.getLotDao().getReservedLotAggregateDataForList(listId, gids);
+			final List<Lot> lots = this.getLotDao().getReservedLotAggregateDataForList(listId, gids, programUUID);
 
 			final List<ListEntryLotDetails> lotRows = LotTransformer.extractLotRowsForList(listEntries, lots);
 			this.setLocationsAndScales(lotRows);

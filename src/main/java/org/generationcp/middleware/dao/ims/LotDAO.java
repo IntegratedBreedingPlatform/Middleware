@@ -89,7 +89,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	private static final String GET_LOTS_FOR_LIST =
 			"SELECT lot.*, recordid, trnqty * -1 , trnstat, trnid " + "FROM " + "   (" + LotDAO.GET_LOTS_FOR_GERMPLASM_WITH_FILTERED_STOCKS
 					+ "   ) lot " + " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid "
-					+ "  AND trnstat in (:statusList) AND trnqty < 0 " + "  AND sourceid = :listId AND sourcetype = 'LIST' ";
+					+ "  AND trnstat in (:statusList) AND trnqty < 0 " + "  AND sourceid = :listId AND sourcetype = 'LIST' "
+					+ " LEFT JOIN location ON lot.locid = location.locid WHERE (location.program_uuid IS NULL OR location.program_uuid = :programUUID) ";
 
 	private static final String GET_LOTS_STATUS_FOR_GERMPLASM = "SELECT i.lotid, COUNT(DISTINCT (act.trnstat)), act.trnstat"
 			+ " FROM ims_lot i LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9"
@@ -401,7 +402,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		return lots;
 	}
 
-	public List<Lot> getLotAggregateDataForList(Integer listId, List<Integer> gids) throws MiddlewareQueryException {
+	public List<Lot> getLotAggregateDataForList(Integer listId, List<Integer> gids, final String programUUID) throws MiddlewareQueryException {
 		List<Lot> lots = new ArrayList<Lot>();
 
 		try {
@@ -411,6 +412,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.setParameterList("gids", gids);
 			query.setParameter("listId", listId);
 			query.setParameter("includeCloseLots", 0);
+			query.setParameter("programUUID", programUUID);
+
 			List<Integer> statusList = Lists.newArrayList();
 			statusList.add(0);
 			statusList.add(1);
@@ -426,7 +429,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		return lots;
 	}
 
-	public List<Lot> getReservedLotAggregateDataForList(Integer listId, List<Integer> gids) throws MiddlewareQueryException {
+	public List<Lot> getReservedLotAggregateDataForList(Integer listId, List<Integer> gids, String programUUID) throws MiddlewareQueryException {
 		List<Lot> lots = new ArrayList<Lot>();
 
 		try {
@@ -435,6 +438,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			Query query = this.getSession().createSQLQuery(sql);
 			query.setParameterList("gids", gids);
 			query.setParameter("listId", listId);
+			query.setParameter("programUUID", programUUID);
+
 			List<Integer> statusList = Lists.newArrayList();
 			statusList.add(0);
 			query.setParameterList("statusList", statusList);

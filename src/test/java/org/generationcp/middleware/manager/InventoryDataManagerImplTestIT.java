@@ -594,7 +594,7 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 
 	@Test
 	public void testGetLotsForGermplasmList() throws MiddlewareQueryException {
-		List<GermplasmListData> listEntries = this.manager.getLotDetailsForList(-543041, 0, 500);
+		List<GermplasmListData> listEntries = this.manager.getLotDetailsForList(-543041, 0, 500, "");
 		for (GermplasmListData entry : listEntries) {
 			Debug.print("Id=" + entry.getId() + ", GID = " + entry.getGid());
 			Debug.print(3, entry.getInventoryInfo());
