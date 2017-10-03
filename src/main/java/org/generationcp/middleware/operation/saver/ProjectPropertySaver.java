@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
@@ -212,7 +213,11 @@ public class ProjectPropertySaver {
 			Hibernate.initialize(geolocation.getProperties());
 
 			for (final MeasurementVariable variable : variables) {
-				switch (variable.getOperation()) {
+				Operation operation = variable.getOperation();
+				if (operation == null) {
+					continue;
+				}
+				switch (operation) {
 					case DELETE:
 						this.deleteVariable(study, trialDataset, measurementDataset, variable.getRole(), variable.getTermId(), geolocation);
 						break;
@@ -464,7 +469,11 @@ public class ProjectPropertySaver {
 	public void saveFactors(final DmsProject measurementDataset, final List<MeasurementVariable> variables) {
 		if (variables != null && !variables.isEmpty()) {
 			for (final MeasurementVariable variable : variables) {
-				switch (variable.getOperation()) {
+				Operation operation = variable.getOperation();
+				if (operation == null) {
+					continue;
+				}
+				switch (operation) {
 					case ADD:
 						final int rank = this.getNextRank(measurementDataset);
 						this.insertVariable(measurementDataset, variable, rank);
