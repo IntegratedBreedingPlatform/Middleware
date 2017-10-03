@@ -212,17 +212,15 @@ public class ProjectPropertySaver {
 			Hibernate.initialize(geolocation.getProperties());
 
 			for (final MeasurementVariable variable : variables) {
-				final String operation = variable.getOperation().toString();
-				switch (operation) {
-
-					case "DELETE":
+				switch (variable.getOperation()) {
+					case DELETE:
 						this.deleteVariable(study, trialDataset, measurementDataset, variable.getRole(), variable.getTermId(), geolocation);
 						break;
-					case "ADD":
+					case ADD:
 						this.insertVariable(study, trialDataset, measurementDataset, variable, rank, isConstant, geolocation);
 						rank++;
 						break;
-					case "UPDATE":
+					case UPDATE:
 						this.updateVariable(study, trialDataset, measurementDataset, variable, isConstant, geolocation);
 						break;
 					default:
@@ -466,13 +464,13 @@ public class ProjectPropertySaver {
 	public void saveFactors(final DmsProject measurementDataset, final List<MeasurementVariable> variables) {
 		if (variables != null && !variables.isEmpty()) {
 			for (final MeasurementVariable variable : variables) {
-				switch (variable.getOperation().toString()) {
-					case "ADD":
+				switch (variable.getOperation()) {
+					case ADD:
 						final int rank = this.getNextRank(measurementDataset);
 						this.insertVariable(measurementDataset, variable, rank);
 						break;
 
-					case "DELETE":
+					case DELETE:
 						this.deleteVariableForFactors(measurementDataset, variable);
 						break;
 					// update operation is not allowed with factors
