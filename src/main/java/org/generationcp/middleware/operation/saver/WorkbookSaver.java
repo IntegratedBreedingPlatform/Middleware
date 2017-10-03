@@ -265,16 +265,19 @@ public class WorkbookSaver extends Saver {
 	}
 
 	public void removeDeletedVariablesAndObservations(final Workbook workbook) {
+		for (MeasurementRow measurementRow : workbook.getTrialObservations()) {
+			this.removeDeletedVariablesInObservations(workbook.getConstants(), workbook.getTrialObservations());
+			this.removeDeletedVariablesInObservations(measurementRow.getMeasurementVariables(), workbook.getTrialObservations());
+		}
 		this.removeDeletedVariablesInObservations(workbook.getFactors(), workbook.getObservations());
 		this.removeDeletedVariablesInObservations(workbook.getVariates(), workbook.getObservations());
 		this.removeDeletedVariables(workbook.getConditions());
 		this.removeDeletedVariables(workbook.getFactors());
 		this.removeDeletedVariables(workbook.getVariates());
 		this.removeDeletedVariables(workbook.getConstants());
-		for (final MeasurementRow measurementRow : workbook.getTrialObservations()) {
-			this.removeDeletedVariablesInObservations(measurementRow.getMeasurementVariables(), workbook.getTrialObservations());
 
-		}
+		
+		
 	}
 
 	private void removeDeletedVariablesInObservations(final List<MeasurementVariable> variableList, final List<MeasurementRow> observations) {
