@@ -265,8 +265,7 @@ public class WorkbookSaver extends Saver {
 	}
 
 	public void removeDeletedVariablesAndObservations(final Workbook workbook) {
-		for (Iterator<MeasurementRow> iterator = workbook.getTrialObservations().iterator(); iterator.hasNext();) {
-			MeasurementRow measurementRow = (MeasurementRow) iterator.next();
+		for (MeasurementRow measurementRow : workbook.getTrialObservations()) {
 			this.removeDeletedVariablesInObservations(workbook.getConstants(), workbook.getTrialObservations());
 			this.removeDeletedVariablesInObservations(measurementRow.getMeasurementVariables(), workbook.getTrialObservations());
 		}
