@@ -57,11 +57,11 @@ public class ExperimentBuilder extends Builder {
 
 	public List<Experiment> build(int projectId, TermId type, int start, int numOfRows, VariableTypeList variableTypes)
 			throws MiddlewareQueryException {
-		List<Experiment> experiments = new ArrayList<Experiment>();
-		List<ExperimentProject> experimentProjects =
+		final List<Experiment> experiments = new ArrayList<>();
+		final List<ExperimentProject> experimentProjects =
 				this.getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
-		Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentProjects);
-		for (ExperimentProject experimentProject : experimentProjects) {
+		final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentProjects);
+		for (final ExperimentProject experimentProject : experimentProjects) {
 			experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
 		}
 		return experiments;
@@ -69,7 +69,7 @@ public class ExperimentBuilder extends Builder {
 
 	public List<Experiment> build(int projectId, TermId type, int start, int numOfRows, VariableTypeList variableTypes,
 			boolean hasVariableType) throws MiddlewareQueryException {
-		List<Experiment> experiments = new ArrayList<Experiment>();
+		List<Experiment> experiments = new ArrayList<>();
 		List<ExperimentProject> experimentProjects =
 				this.getExperimentProjectDao().getExperimentProjects(projectId, type.getId(), start, numOfRows);
 		for (ExperimentProject experimentProject : experimentProjects) {
@@ -79,8 +79,8 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	private Map<Integer, StockModel> getStockModelMap(List<ExperimentProject> experimentProjects) throws MiddlewareQueryException {
-		Map<Integer, StockModel> stockModelMap = new HashMap<Integer, StockModel>();
-		for (ExperimentProject experimentProject : experimentProjects) {
+		final Map<Integer, StockModel> stockModelMap = new HashMap<>();
+		for (final ExperimentProject experimentProject : experimentProjects) {
 			List<ExperimentStock> experimentStocks = experimentProject.getExperiment().getExperimentStocks();
 			if (experimentStocks != null && experimentStocks.size() == 1) {
 				StockModel stock = experimentStocks.get(0).getStock();
@@ -95,13 +95,13 @@ public class ExperimentBuilder extends Builder {
 			throws MiddlewareQueryException {
 		Monitor monitor = MonitorFactory.start("Build Experiments");
 		try {
-			List<Experiment> experiments = new ArrayList<Experiment>();
-			List<ExperimentProject> experimentProjects =
+			final List<Experiment> experiments = new ArrayList<>();
+			final List<ExperimentProject> experimentProjects =
 					this.getExperimentProjectDao().getExperimentProjects(projectId, types, start, numOfRows);
 			// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
-			Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentProjects);
+			final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentProjects);
 
-			for (ExperimentProject experimentProject : experimentProjects) {
+			for (final ExperimentProject experimentProject : experimentProjects) {
 				experiments.add(this.createExperiment(experimentProject.getExperiment(), variableTypes, stockModelMap));
 			}
 			return experiments;
@@ -214,14 +214,14 @@ public class ExperimentBuilder extends Builder {
 
 	private void addLocationFactors(ExperimentModel experimentModel, VariableList factors, VariableTypeList variableTypes) {
 		for (DMSVariableType variableType : variableTypes.getVariableTypes()) {
-			
+			if (PhenotypicType.TRIAL_ENVIRONMENT == variableType.getRole()) {
 				Variable variable = this.createLocationFactor(experimentModel.getGeoLocation(), variableType);
-				if(variable != null){
+				if (variable != null) {
 					variable.getVariableType().setRole(PhenotypicType.TRIAL_ENVIRONMENT);
 					variable.getVariableType().getStandardVariable().setPhenotypicType(PhenotypicType.TRIAL_ENVIRONMENT);
 					factors.add(variable);
 				}
-			
+			}
 		}
 	}
 
