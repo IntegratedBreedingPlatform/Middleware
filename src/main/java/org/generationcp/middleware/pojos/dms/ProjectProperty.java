@@ -11,9 +11,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.Formula;
@@ -68,6 +70,10 @@ public class ProjectProperty implements Serializable {
 
 	@Column(name = "variable_id")
 	private Integer variableId;
+
+	@OneToOne
+	@JoinColumn(name = "variable_id", updatable = false, insertable = false)
+	private CVTerm variable;
 
 	@Column(name = "alias")
 	private String alias;

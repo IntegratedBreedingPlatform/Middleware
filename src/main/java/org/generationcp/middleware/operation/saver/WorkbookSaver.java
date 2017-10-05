@@ -58,6 +58,16 @@ public class WorkbookSaver extends Saver {
 
 	private static final Logger LOG = LoggerFactory.getLogger(WorkbookSaver.class);
 
+	private static final String TRIALHEADERS = "trialHeaders";
+	private static final String TRIALVARIABLETYPELIST = "trialVariableTypeList";
+	private static final String TRIALVARIABLES = "trialVariables";
+	private static final String EFFECTVARIABLE = "effectVariables";
+	private static final String TRIALMV = "trialMV";
+	private static final String EFFECTMV = "effectMV";
+	private static final String HEADERMAP = "headerMap";
+	private static final String VARIABLETYPEMAP = "variableTypeMap";
+	private static final String MEASUREMENTVARIABLEMAP = "measurementVariableMap";
+
 	public WorkbookSaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 	}
@@ -79,9 +89,9 @@ public class WorkbookSaver extends Saver {
 		workbook.reset();
 
 		// Create Maps, which we will fill with transformed Workbook Variable Data
-		final Map<String, List<String>> headerMap = new HashMap<String, List<String>>();
-		final Map<String, VariableTypeList> variableTypeMap = new HashMap<String, VariableTypeList>();
-		final Map<String, List<MeasurementVariable>> measurementVariableMap = new HashMap<String, List<MeasurementVariable>>();
+		final Map<String, List<String>> headerMap = new HashMap<>();
+		final Map<String, VariableTypeList> variableTypeMap = new HashMap<>();
+		final Map<String, List<MeasurementVariable>> measurementVariableMap = new HashMap<>();
 
 		// GCP-6091 start
 		final List<MeasurementVariable> trialMV = workbook.getTrialVariables();
@@ -103,22 +113,22 @@ public class WorkbookSaver extends Saver {
 		effectVariables.addAll(this.getVariableTypeListTransformer().transform(workbook.getVariates(), effectVariables.size() + 1 ,programUUID));
 
 		// -- headers
-		headerMap.put("trialHeaders", trialHeaders);
+		headerMap.put(TRIALHEADERS, trialHeaders);
 		// -- variableTypeLists
-		variableTypeMap.put("trialVariableTypeList", trialVariableTypeList);
-		variableTypeMap.put("trialVariables", trialVariables);
-		variableTypeMap.put("effectVariables", effectVariables);
+		variableTypeMap.put(TRIALVARIABLETYPELIST, trialVariableTypeList);
+		variableTypeMap.put(TRIALVARIABLES, trialVariables);
+		variableTypeMap.put(EFFECTVARIABLE, effectVariables);
 		// -- measurementVariables
-		measurementVariableMap.put("trialMV", trialMV);
+		measurementVariableMap.put(TRIALMV, trialMV);
 
 		final List<MeasurementVariable> effectMV = workbook.getMeasurementDatasetVariables();
-		measurementVariableMap.put("effectMV", effectMV);
+		measurementVariableMap.put(EFFECTMV, effectMV);
 
 		// load 3 maps into a super Map
 		final Map<String, Map<String, ?>> variableMap = new HashMap<>();
-		variableMap.put("headerMap", headerMap);
-		variableMap.put("variableTypeMap", variableTypeMap);
-		variableMap.put("measurementVariableMap", measurementVariableMap);
+		variableMap.put(HEADERMAP, headerMap);
+		variableMap.put(VARIABLETYPEMAP, variableTypeMap);
+		variableMap.put(MEASUREMENTVARIABLEMAP, measurementVariableMap);
 		return variableMap;
 	}
 
@@ -138,21 +148,21 @@ public class WorkbookSaver extends Saver {
 			final boolean isDeleteObservations, final String programUUID, final String cropPrefix) throws Exception {
 
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
-		Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
-		Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
+		Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get(HEADERMAP);
+		Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get(VARIABLETYPEMAP);
 		Map<String, List<MeasurementVariable>> measurementVariableMap =
-				(Map<String, List<MeasurementVariable>>) variableMap.get("measurementVariableMap");
+				(Map<String, List<MeasurementVariable>>) variableMap.get(MEASUREMENTVARIABLEMAP);
 
 		// unpack maps
 		// Strings
-		final List<String> trialHeaders = headerMap.get("trialHeaders");
+		final List<String> trialHeaders = headerMap.get(TRIALHEADERS);
 		// VariableTypeLists
-		VariableTypeList trialVariableTypeList = variableTypeMap.get("trialVariableTypeList");
-		final VariableTypeList trialVariables = variableTypeMap.get("trialVariables");
-		final VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
+		VariableTypeList trialVariableTypeList = variableTypeMap.get(TRIALVARIABLETYPELIST);
+		final VariableTypeList trialVariables = variableTypeMap.get(TRIALVARIABLES);
+		final VariableTypeList effectVariables = variableTypeMap.get(EFFECTVARIABLE);
 		// Lists of measurementVariables
-		final List<MeasurementVariable> trialMV = measurementVariableMap.get("trialMV");
-		List<MeasurementVariable> effectMV = measurementVariableMap.get("effectMV");
+		final List<MeasurementVariable> trialMV = measurementVariableMap.get(TRIALMV);
+		List<MeasurementVariable> effectMV = measurementVariableMap.get(EFFECTMV);
 
 		// TODO : Review code and see whether variable validation and possible dataset creation abort is a good idea (rebecca)
 
@@ -255,22 +265,23 @@ public class WorkbookSaver extends Saver {
 	}
 
 	public void removeDeletedVariablesAndObservations(final Workbook workbook) {
+		for (MeasurementRow measurementRow : workbook.getTrialObservations()) {
+			this.removeDeletedVariablesInObservations(workbook.getConstants(), workbook.getTrialObservations());
+			this.removeDeletedVariablesInObservations(measurementRow.getMeasurementVariables(), workbook.getTrialObservations());
+		}
 		this.removeDeletedVariablesInObservations(workbook.getFactors(), workbook.getObservations());
 		this.removeDeletedVariablesInObservations(workbook.getVariates(), workbook.getObservations());
 		this.removeDeletedVariables(workbook.getConditions());
 		this.removeDeletedVariables(workbook.getFactors());
 		this.removeDeletedVariables(workbook.getVariates());
 		this.removeDeletedVariables(workbook.getConstants());
-		for (Iterator<MeasurementRow> iterator = workbook.getTrialObservations().iterator(); iterator.hasNext();) {
-			MeasurementRow measurementRow = (MeasurementRow) iterator.next();
-			this.removeDeletedVariablesInObservations(measurementRow.getMeasurementVariables(), workbook.getTrialObservations());
-		}
+
 		
 		
 	}
 
 	private void removeDeletedVariablesInObservations(final List<MeasurementVariable> variableList, final List<MeasurementRow> observations) {
-		final List<Integer> deletedList = new ArrayList<Integer>();
+		final List<Integer> deletedList = new ArrayList<>();
 		if (variableList != null) {
 			for (final MeasurementVariable var : variableList) {
 				if (var.getOperation() != null && var.getOperation().equals(Operation.DELETE)) {
@@ -279,15 +290,15 @@ public class WorkbookSaver extends Saver {
 			}
 		}
 		if (deletedList != null && observations != null) {
-			for (final Integer termId : deletedList) {
+			for (final Integer deletedTermId : deletedList) {
 				// remove from measurement rows
 				int index = 0;
 				int varIndex = 0;
 				boolean found = false;
 				for (final MeasurementRow row : observations) {
 					if (index == 0) {
-						for (final MeasurementData var : row.getDataList()) {
-							if (var.getMeasurementVariable().getTermId() == termId.intValue()) {
+						for (final MeasurementData mData : row.getDataList()) {
+							if (mData.getMeasurementVariable().getTermId() == deletedTermId.intValue()) {
 								found = true;
 								break;
 							}
@@ -307,11 +318,11 @@ public class WorkbookSaver extends Saver {
 
 	private void removeDeletedVariables(final List<MeasurementVariable> variableList) {
 		if (variableList != null) {
-			final Iterator<MeasurementVariable> variable = variableList.iterator();
-			while (variable.hasNext()) {
-				final MeasurementVariable var = variable.next();
-				if (var.getOperation() != null && var.getOperation().equals(Operation.DELETE)) {
-					variable.remove();
+			final Iterator<MeasurementVariable> itrMVariable = variableList.iterator();
+			while (itrMVariable.hasNext()) {
+				final MeasurementVariable mVariable = itrMVariable.next();
+				if (mVariable.getOperation() != null && mVariable.getOperation().equals(Operation.DELETE)) {
+					itrMVariable.remove();
 				}
 			}
 		}
@@ -864,19 +875,19 @@ public class WorkbookSaver extends Saver {
 		workbook.setVariableMap(variableMap);
 
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
-		final Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
+		final Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get(VARIABLETYPEMAP);
 		final Map<String, List<MeasurementVariable>> measurementVariableMap =
-				(Map<String, List<MeasurementVariable>>) variableMap.get("measurementVariableMap");
+				(Map<String, List<MeasurementVariable>>) variableMap.get(MEASUREMENTVARIABLEMAP);
 
 		// unpack maps
 		final VariableTypeList trialVariables = new VariableTypeList();
 		// addAll instead of assigning directly to avoid changing the state of the object
-		trialVariables.addAll(variableTypeMap.get("trialVariables"));
+		trialVariables.addAll(variableTypeMap.get(TRIALVARIABLES));
 		final VariableTypeList effectVariables = new VariableTypeList();
 		// addAll instead of assigning directly to avoid changing the state of the object
-		effectVariables.addAll(variableTypeMap.get("effectVariables"));
-		final List<MeasurementVariable> trialMV = measurementVariableMap.get("trialMV");
-		final List<MeasurementVariable> effectMV = measurementVariableMap.get("effectMV");
+		effectVariables.addAll(variableTypeMap.get(EFFECTVARIABLE));
+		final List<MeasurementVariable> trialMV = measurementVariableMap.get(TRIALMV);
+		final List<MeasurementVariable> effectMV = measurementVariableMap.get(EFFECTMV);
 
 		// locationId and experiment are not yet needed here
 		final int studyId = this.createStudyIfNecessary(workbook, 0, false, programUUID, cropPrefix);
@@ -927,23 +938,23 @@ public class WorkbookSaver extends Saver {
 		}
 
 		// unpack maps first level - Maps of Strings, Maps of VariableTypeList , Maps of Lists of MeasurementVariable
-		final Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get("headerMap");
-		final Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get("variableTypeMap");
+		final Map<String, List<String>> headerMap = (Map<String, List<String>>) variableMap.get(HEADERMAP);
+		final Map<String, VariableTypeList> variableTypeMap = (Map<String, VariableTypeList>) variableMap.get(VARIABLETYPEMAP);
 		final Map<String, List<MeasurementVariable>> measurementVariableMap =
-				(Map<String, List<MeasurementVariable>>) variableMap.get("measurementVariableMap");
+				(Map<String, List<MeasurementVariable>>) variableMap.get(MEASUREMENTVARIABLEMAP);
 
 		// unpack maps
-		final List<String> trialHeaders = headerMap.get("trialHeaders");
-		final VariableTypeList trialVariableTypeList = variableTypeMap.get("trialVariableTypeList");
-		final VariableTypeList trialVariables = variableTypeMap.get("trialVariables");
-		final VariableTypeList effectVariables = variableTypeMap.get("effectVariables");
-		final List<MeasurementVariable> trialMV = measurementVariableMap.get("trialMV");
+		final List<String> trialHeaders = headerMap.get(TRIALHEADERS);
+		final VariableTypeList trialVariableTypeList = variableTypeMap.get(TRIALVARIABLETYPELIST);
+		final VariableTypeList trialVariables = variableTypeMap.get(TRIALVARIABLES);
+		final VariableTypeList effectVariables = variableTypeMap.get(EFFECTVARIABLE);
+		final List<MeasurementVariable> trialMV = measurementVariableMap.get(TRIALMV);
 
 		// GCP-8092 Nurseries will always have a unique geolocation, no more concept of shared/common geolocation
 		// create locations (entries to nd_geolocation) and associate to observations
 		final int studyLocationId/* = DEFAULT_GEOLOCATION_ID */;
-		final List<Integer> locationIds = new ArrayList<Integer>();
-		final Map<Integer, VariableList> trialVariatesMap = new HashMap<Integer, VariableList>();
+		final List<Integer> locationIds = new ArrayList<>();
+		final Map<Integer, VariableList> trialVariatesMap = new HashMap<>();
 		if (trialVariableTypeList != null) {// multi-location
 			studyLocationId =
 					this.createLocationsAndSetToObservations(locationIds, workbook, trialVariableTypeList, trialHeaders, trialVariatesMap,

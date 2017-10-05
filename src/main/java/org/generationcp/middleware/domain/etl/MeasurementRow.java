@@ -94,8 +94,8 @@ public class MeasurementRow {
 		if (this.dataList != null && !this.dataList.isEmpty()) {
 			for (MeasurementData data : this.dataList) {
 				//Remove SAMPLES with TermId = -2 because is nonexistent term Id
-				boolean isSampleVaraible = data.getMeasurementVariable().getTermId() == TermId.SAMPLES.getId();
-				if ( (trialHeaders == null || !trialHeaders.contains(data.getLabel()) ) && !isSampleVaraible) {
+				boolean isSampleVariable = data.getMeasurementVariable().getTermId() == TermId.SAMPLES.getId();
+				if ( (trialHeaders == null || !trialHeaders.contains(data.getLabel()) ) && !isSampleVariable) {
 					list.add(data);
 				}
 			}

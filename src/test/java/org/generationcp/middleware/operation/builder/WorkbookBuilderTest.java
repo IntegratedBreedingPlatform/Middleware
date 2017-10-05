@@ -12,7 +12,9 @@
 package org.generationcp.middleware.operation.builder;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -20,6 +22,7 @@ import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
@@ -483,6 +486,32 @@ public class WorkbookBuilderTest extends IntegrationTestBase {
 				measurementVariable.getPossibleValues());
 		Assert.assertEquals(varType.getRole(), measurementVariable.getRole());
 		Assert.assertEquals(varType, measurementVariable.getVariableType());
+	}
+
+	@Test
+	public void testGetMeasurementDataWithSample() {
+
+		final int experimentId = 999;
+		final String samplesValue = "some value";
+
+		final Map<Integer, String> samplesMap = new HashMap<>();
+		samplesMap.put(experimentId, samplesValue);
+
+		final MeasurementData samplesMeasurementData = this.workbookBuilder.getMeasurementDataWithSample(samplesMap, experimentId);
+
+		Assert.assertEquals(String.valueOf(TermId.SAMPLES.getId()), samplesMeasurementData.getLabel());
+		Assert.assertFalse(samplesMeasurementData.isEditable());
+		Assert.assertEquals(samplesValue, samplesMeasurementData.getValue());
+		Assert.assertEquals("C", samplesMeasurementData.getDataType());
+
+		final MeasurementVariable samplesMeasurementVariable = samplesMeasurementData.getMeasurementVariable();
+		Assert.assertEquals(TermId.SAMPLES.getId(), samplesMeasurementVariable.getTermId());
+		Assert.assertEquals(String.valueOf(TermId.SAMPLES.getId()), samplesMeasurementVariable.getName());
+		Assert.assertEquals(String.valueOf(TermId.SAMPLES.getId()), samplesMeasurementVariable.getLabel());
+		Assert.assertTrue(samplesMeasurementVariable.isFactor());
+		Assert.assertEquals(Integer.valueOf(DataType.CHARACTER_VARIABLE.getId()), samplesMeasurementVariable.getDataTypeId());
+		Assert.assertNotNull(samplesMeasurementVariable.getPossibleValues());
+
 	}
 
 	private DmsProject createDmsProject(final int id) {

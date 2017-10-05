@@ -51,39 +51,46 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			}
 		});
 
-		Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap();
-
 		try {
-
 			if (!propertyNames.isEmpty()) {
-
-				Criteria criteria = this.getSession().createCriteria(this.getPersistentClass()).setProjection(Projections.distinct(
-						Projections.projectionList().add(Projections.property("alias")).add(Projections.property("variableId"))
-								.add(Projections.property("typeId"))));
+				Criteria criteria = this.getSession().createCriteria(this.getPersistentClass(), "property")
+					.setProjection(Projections.distinct(Projections.projectionList()
+						.add(Projections.property("alias"))
+						.add(Projections.property("variableId"))
+						.add(Projections.property("typeId"))));
 				criteria.add(Restrictions.in("typeId", VariableType.ids()));
 				criteria.add(Restrictions.in("alias", propertyNames));
+				criteria.createAlias("property.variable", "variable").add(Restrictions.eq("variable.isObsolete", 0));
 
 				List<Object[]> results = criteria.list();
-
-				for (final Object[] row : results) {
-					final String alias = (String) row[0];
-					final Integer variableId = (Integer) row[1];
-					final Integer typeId = (Integer) row[2];
-					Map<Integer, VariableType> stdVarIdKeyTypeValueList = new HashMap();
-
-					if (standardVariableIdsWithTypeInProjects.containsKey(alias.toUpperCase())) {
-						stdVarIdKeyTypeValueList = standardVariableIdsWithTypeInProjects.get(alias.toUpperCase());
-					}
-
-					stdVarIdKeyTypeValueList.put(variableId, VariableType.getById(typeId));
-					standardVariableIdsWithTypeInProjects.put(alias.toUpperCase(), stdVarIdKeyTypeValueList);
-
-				}
+				return convertToVariablestandardVariableIdsWithTypeMap(results);
 			}
 		} catch (HibernateException e) {
-			final String message = "Error in getStandardVariableIdsWithTypeByPropertyNames=" + propertyNames;
-			ProjectPropertyDao.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
+			this.logAndThrowException(
+					"Error in getStandardVariableIdsWithTypeByPropertyNames="
+							+ propertyNames + " in ProjectPropertyDao: "
+							+ e.getMessage(), e);
+		}
+
+		return new HashMap<String, Map<Integer, VariableType>>();
+	}
+
+	protected Map<String, Map<Integer, VariableType>> convertToVariablestandardVariableIdsWithTypeMap(List<Object[]> queryResult) {
+
+		Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects = new HashMap<String, Map<Integer, VariableType>>();
+
+		for (final Object[] row : queryResult) {
+			final String alias = (String) row[0];
+			final Integer variableId = (Integer) row[1];
+			final Integer typeId = (Integer) row[2];
+			Map<Integer, VariableType> stdVarIdKeyTypeValueList = new HashMap();
+
+			if (standardVariableIdsWithTypeInProjects.containsKey(alias.toUpperCase())) {
+				stdVarIdKeyTypeValueList = standardVariableIdsWithTypeInProjects.get(alias.toUpperCase());
+			}
+
+			stdVarIdKeyTypeValueList.put(variableId, VariableType.getById(typeId));
+			standardVariableIdsWithTypeInProjects.put(alias.toUpperCase(), stdVarIdKeyTypeValueList);
 		}
 
 		return standardVariableIdsWithTypeInProjects;
