@@ -7,7 +7,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
 	<!-- Set the list status of the deleted study's snapshot list to 9(deleted); 8006 corresponds to Study's Status and 12990 is value set for deleted studies-->
-	<changeSet author="mderamos" id="v7.0-1">
+	<changeSet author="mderamos" id="v6.4.2-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<sqlCheck expectedResult="0">SELECT count(*) FROM listnms l INNER JOIN projectprop p ON l.projectid = p.project_id WHERE p.type_id = 8006 AND p.value = '12990' AND l.liststatus != 9 AND l.listtype IN ('NURSERY', 'TRIAL', 'CHECK');</sqlCheck>
