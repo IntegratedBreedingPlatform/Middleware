@@ -168,13 +168,17 @@ public class SampleServiceImpl implements SampleService {
 
 		for (final ProjectProperty projectProperty : projectProperties) {
 			//SEEDING_DATE
-			if (projectProperty.getTypeId().equals(TermId.SEEDING_DATE.getId()) && StringUtils.isNotBlank(projectProperty.getValue())) {
-				final String plantingDate = projectProperty.getValue();
+			String value = projectProperty.getValue();
+			if (StringUtils.isBlank(value)) {
+				continue;
+			}
+			if (projectProperty.getVariableId().equals(TermId.SEEDING_DATE.getId())) {
+				final String plantingDate = value;
 				samplesDetailsDto.setSeedingDate(plantingDate);
 			}
 			//CROP SEASON
-			if (projectProperty.getTypeId().equals(TermId.SEASON_VAR_TEXT.getId()) && StringUtils.isNotBlank(projectProperty.getValue())) {
-				final String season = projectProperty.getValue();
+			if (projectProperty.getVariableId().equals(TermId.SEASON_VAR_TEXT.getId())) {
+				final String season = value;
 				samplesDetailsDto.setSeason(season);
 			}
 		}
