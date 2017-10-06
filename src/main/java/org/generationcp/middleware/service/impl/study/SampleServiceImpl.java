@@ -129,8 +129,7 @@ public class SampleServiceImpl implements SampleService {
 		}
 
 		final ExperimentModel experiment = sample.getPlant().getExperiment();
-		final DmsProject objectProject =
-			experiment.getExperimentStocks().get(0).getExperiment().getProject().getRelatedTos().get(0).getObjectProject();
+		final DmsProject objectProject = experiment.getProject().getRelatedTos().get(0).getObjectProject();
 		final Integer studyId = objectProject.getProjectId();
 		final String takenBy = sample.getTakenBy() != null ? sample.getTakenBy().getPerson().getDisplayName() : null;
 		final String plotId = experiment.getPlotId();
