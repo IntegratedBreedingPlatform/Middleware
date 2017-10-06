@@ -1,0 +1,33 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd
+		http://www.liquibase.org/xml/ns/dbchangelog-ext
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="vanina" id="v7.1-1">
+		<preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*)
+					FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+					WHERE TABLE_NAME = 'sample'
+					AND CONSTRAINT_NAME = 'fk_sample_list'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample
+			DROP FOREIGN KEY fk_sample_list;
+			ALTER TABLE sample
+			CHANGE COLUMN sample_list sample_list INT(11) NULL ;
+			ALTER TABLE sample
+			ADD CONSTRAINT fk_sample_list
+			  FOREIGN KEY (sample_list)
+			  REFERENCES sample_list (list_id)
+			  ON DELETE NO ACTION
+			  ON UPDATE NO ACTION;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
