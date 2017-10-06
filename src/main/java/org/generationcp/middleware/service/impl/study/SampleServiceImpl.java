@@ -146,10 +146,9 @@ public class SampleServiceImpl implements SampleService {
 		samplesDetailsDto.setEntryNo(Integer.valueOf(entryNo));
 		samplesDetailsDto.setGid(gid);
 
-		fillPlotNoByExperimentProperty(sample.getPlant().getExperiment().getProperties(), samplesDetailsDto);
-		fillProjectProperties(sample.getPlant().getExperiment().getProject().getRelatedTos().get(0).getObjectProject().getProperties(),
-			samplesDetailsDto);
-		fillLocationByGeoLocationProperties(sample.getPlant().getExperiment().getGeoLocation().getProperties(), samplesDetailsDto);
+		fillPlotNoByExperimentProperty(experiment.getProperties(), samplesDetailsDto);
+		fillProjectProperties(objectProject.getProperties(), samplesDetailsDto);
+		fillLocationByGeoLocationProperties(experiment.getGeoLocation().getProperties(), samplesDetailsDto);
 
 		return samplesDetailsDto;
 	}
