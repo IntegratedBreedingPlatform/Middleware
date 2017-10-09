@@ -477,7 +477,7 @@ public class ProjectPropertySaver {
 	private int updateVariableRank(final List<Integer> variableIds, final int startRank, final List<ProjectProperty> projectProperties) {
 		int rank = startRank;
 		for (final Integer variableId : variableIds) {
-			// TODO, needs to be improved because we should not have duplicated variables per study
+			// FIXME needs to be improved because we should not have duplicated variables per study
 			for (final ProjectProperty pp: projectProperties) {
 				if (pp.getVariableId().equals(variableId)) {
 					pp.setRank(rank);
