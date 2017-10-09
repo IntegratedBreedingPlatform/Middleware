@@ -7,7 +7,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
 
-	<changeSet author="nahuel" id="v6.1-1">
+	<changeSet author="nahuel" id="v7.1.0-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="projectprop" columnName="variable_id"/>
