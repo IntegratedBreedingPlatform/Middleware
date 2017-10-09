@@ -40,14 +40,6 @@ public class VariableInfoBuilder {
 		variableDef.setStdVariableId(stdVariableProperty.getVariableId());
 		variableDef.setRank(stdVariableProperty.getRank());
 
-		/**
-		 * TODO
-		String treatmentLabelProperty = this.findTreatmentLabelProperty(stdVariableProperty);
-		if (treatmentLabelProperty != null) {
-			variableDef.setTreatmentLabel(treatmentLabelProperty);
-		}
-		 */
-
 		VariableType varType = VariableType.getById(stdVariableProperty.getTypeId());
 		if (varType != null) {
 			variableDef.setRole(varType.getRole());
