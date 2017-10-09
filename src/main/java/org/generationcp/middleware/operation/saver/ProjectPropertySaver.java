@@ -64,7 +64,6 @@ public class ProjectPropertySaver {
 		return properties;
 	}
 
-	//TODO Fix when testing BreedingView Import
 	public void saveProjectProperties(final DmsProject project, final VariableTypeList variableTypeList, final VariableList variableList) {
 		final List<ProjectProperty> properties = this.create(project, variableTypeList, variableList);
 		final ProjectPropertyDao projectPropertyDao = this.daoFactory.getProjectPropertyDao();
@@ -117,15 +116,6 @@ public class ProjectPropertySaver {
 		properties.add(
 			new ProjectProperty(project, variableTypeId, value, variableType.getRank(), variableType.getId(), variableType.getLocalName()));
 
-		/*
-		TODO
-
-		if (variableType.getTreatmentLabel() != null && !"".equals(variableType.getTreatmentLabel())) {
-			properties.add(new ProjectProperty(project, TermId.MULTIFACTORIAL_INFO.getId(), variableType.getTreatmentLabel(), variableType
-					.getRank()));
-		}
-		 */
-
 		return properties;
 	}
 
@@ -141,20 +131,10 @@ public class ProjectPropertySaver {
 	 * @throws MiddlewareQueryException
 	 */
 	public void saveVariableType(final DmsProject project, final DMSVariableType objDMSVariableType, String value) {
-
-
 		objDMSVariableType.setVariableTypeIfNull();
 		final org.generationcp.middleware.domain.ontology.VariableType variableTypeEnum = objDMSVariableType.getVariableType();
 		this.saveProjectProperty(project, variableTypeEnum.getId(), value, objDMSVariableType.getRank(),
 		objDMSVariableType.getStandardVariable().getId(), objDMSVariableType.getLocalName());
-
-		/*
-				TODO
-		if (objDMSVariableType.getTreatmentLabel() != null && !objDMSVariableType.getTreatmentLabel().isEmpty()) {
-			this.saveProjectProperty(project, TermId.MULTIFACTORIAL_INFO.getId(), objDMSVariableType.getTreatmentLabel(),
-				objDMSVariableType.getRank());
-		}
-		 */
 	}
 
 	private void saveProjectProperty(final DmsProject project, final int typeId, final String value, final int rank, int variableId,

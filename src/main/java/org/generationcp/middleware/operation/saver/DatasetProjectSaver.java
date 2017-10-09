@@ -121,7 +121,7 @@ public class DatasetProjectSaver extends Saver {
 	public void addDatasetVariableType(int datasetId, DMSVariableType variableType) throws MiddlewareQueryException {
 		DmsProject project = this.getDmsProjectDao().getById(datasetId);
 		if (project != null) {
-			this.getProjectPropertySaver().saveVariableType(project, variableType, null /* TODO */);
+			this.getProjectPropertySaver().saveVariableType(project, variableType, null);
 		}
 	}
 
