@@ -11,16 +11,6 @@
 
 package org.generationcp.middleware.service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.annotation.Resource;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -47,6 +37,7 @@ import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
@@ -66,6 +57,7 @@ import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.User;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -73,6 +65,7 @@ import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
+import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.FieldbookListUtil;
 import org.generationcp.middleware.util.Util;
@@ -83,6 +76,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
@@ -1283,7 +1285,24 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		return germplasmCrossesList;
 	}
 
+	@Override
+	public List getSampleLists(final Integer trialId) {
+		return this.getSampleListServiceImpl().getSampleLists(trialId);
+	}
+
 	void setCrossExpansionProperties(final CrossExpansionProperties crossExpansionProperties) {
 		this.crossExpansionProperties = crossExpansionProperties;
 	}
+
+	@Override
+	public SampleList getSampleList(final Integer sampleListId) {
+		return this.getSampleListServiceImpl().getSampleList(sampleListId);
+	}
+
+	@Override
+	public List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId) {
+
+		return this.getSampleListServiceImpl().getSampleDetailsDTOs(sampleListId);
+	}
+
 }

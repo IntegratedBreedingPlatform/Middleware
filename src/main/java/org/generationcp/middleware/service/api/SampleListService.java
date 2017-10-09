@@ -1,8 +1,11 @@
 
 package org.generationcp.middleware.service.api;
 
+import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.pojos.SampleList;
+
+import java.util.List;
 
 public interface SampleListService {
 
@@ -47,4 +50,9 @@ public interface SampleListService {
 	 */
 	void deleteSampleListFolder(final Integer folderId) throws Exception;
 
+	List getSampleLists(final Integer trialId);
+
+	SampleList getSampleList(Integer sampleListId);
+
+	List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId);
 }

@@ -18,4 +18,6 @@ public interface SampleService {
 	List<SampleDTO> getSamples(final String plot_id);
 
 	SampleDetailsDTO getSampleObservation(final String sampleId);
+
+	List<SampleDetailsDTO> getSamples(final Integer sampleListId);
 }

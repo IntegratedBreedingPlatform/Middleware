@@ -32,6 +32,7 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.StudyType;
+import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
@@ -44,6 +45,7 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
+import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
@@ -993,5 +995,9 @@ public interface FieldbookService {
 	 */
 	boolean hasSamples(Integer studyId);
 
+	List<SampleList> getSampleLists(final Integer trialId);
 
+	SampleList getSampleList(Integer sampleListId);
+
+	List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId);
 }

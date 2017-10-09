@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.service.api.PlantService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
+@Repository
 @Transactional
 public class SampleServiceImpl implements SampleService {
 
@@ -99,8 +101,12 @@ public class SampleServiceImpl implements SampleService {
 
 	@Override
 	public List<SampleDTO> getSamples(final String plotId) {
-		final List<SampleDTO> listSampleDto = new ArrayList<>();
 		final List<Sample> samples = this.sampleDao.getByPlotId(plotId);
+		return mapSampleToSampleDTO(samples);
+	}
+
+	private List<SampleDTO> mapSampleToSampleDTO(final List<Sample> samples) {
+		final List<SampleDTO> listSampleDto = new ArrayList<>();
 		for (Sample sample : samples) {
 			SampleDTO dto = new SampleDTO();
 			dto.setSampleName(sample.getSampleName());
@@ -115,6 +121,7 @@ public class SampleServiceImpl implements SampleService {
 			Plant plant = sample.getPlant();
 			dto.setPlantNumber(plant.getPlantNumber());
 			dto.setPlantBusinessKey(plant.getPlantBusinessKey());
+
 			listSampleDto.add(dto);
 		}
 		return listSampleDto;
@@ -124,6 +131,11 @@ public class SampleServiceImpl implements SampleService {
 		final SampleDetailsDTO samplesDetailsDto;
 		final Sample sample = this.sampleDao.getBySampleBk(sampleId);
 
+		return getSampleDetailsDTO(sample);
+	}
+
+	private SampleDetailsDTO getSampleDetailsDTO(final Sample sample) {
+		final SampleDetailsDTO samplesDetailsDto;
 		if (sample == null) {
 			return new SampleDetailsDTO();
 		}
@@ -193,5 +205,16 @@ public class SampleServiceImpl implements SampleService {
 				foundPlotNumber = true;
 			}
 		}
+	}
+
+	@Override
+	public List<SampleDetailsDTO> getSamples(final Integer sampleListId) {
+		final List<Sample> samples = this.sampleDao.getBySampleListId(sampleListId);
+		final List<SampleDetailsDTO> result = new ArrayList<>();
+		for (Sample sample : samples) {
+			result.add(getSampleDetailsDTO(sample));
+		}
+
+		return result;
 	}
 }

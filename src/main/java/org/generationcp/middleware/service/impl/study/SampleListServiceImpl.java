@@ -9,10 +9,13 @@ import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.UserDAO;
 import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.StudyDataManagerImpl;
+import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Sample;
@@ -24,16 +27,21 @@ import org.generationcp.middleware.service.api.study.ObservationDto;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+@Repository
 @Transactional (propagation = Propagation.REQUIRED)
 public class SampleListServiceImpl implements SampleListService {
 
@@ -66,6 +74,9 @@ public class SampleListServiceImpl implements SampleListService {
 		this.plantDao = new PlantDao();
 		this.plantDao.setSession(sessionProvider.getSession());
 		this.studyMeasurements = new StudyMeasurements(sessionProvider.getSession());
+		this.sampleService = new SampleServiceImpl(sessionProvider);
+		this.studyService = new StudyDataManagerImpl(sessionProvider);
+		this.workbenchDataManager = new WorkbenchDataManagerImpl(sessionProvider);
 	}
 
 	public void setSampleListDao(final SampleListDao sampleListDao) {
@@ -309,6 +320,21 @@ public class SampleListServiceImpl implements SampleListService {
 		} else {
 			return isDescendant(list, of.getHierarchy());
 		}
+	}
+
+	@Override
+	public List getSampleLists(final Integer trialId) {
+		return this.sampleListDao.getSampleLists(trialId);
+	}
+
+	@Override
+	public SampleList getSampleList(final Integer sampleListId) {
+		return this.sampleListDao.getById(sampleListId);
+	}
+
+	@Override
+	public List<SampleDetailsDTO> getSampleDetailsDTOs(final Integer sampleListId) {
+		return this.sampleService.getSamples(sampleListId);
 	}
 
 	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {

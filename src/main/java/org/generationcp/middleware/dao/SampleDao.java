@@ -75,4 +75,10 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		}
 		return sample;
 	}
+
+	public List<Sample> getBySampleListId(final Integer sampleListId) {
+		final DetachedCriteria criteria = DetachedCriteria.forClass(Sample.class);
+		criteria.add(Restrictions.eq("sampleList.id", sampleListId));
+		return (List<Sample>) criteria.getExecutableCriteria(this.getSession()).list();
+	}
 }
