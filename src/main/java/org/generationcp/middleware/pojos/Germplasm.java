@@ -389,6 +389,67 @@ public class Germplasm implements Serializable {
 	@Transient
 	private String locationName = null;
 
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private String methodNumber = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private String methodGroup = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private String methodCode = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private String germplasmPeferredName = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private String germplasmPeferredId = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private String femaleParentPreferredName = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private String femaleParentPreferredID = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private String maleParentPreferredName = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private String maleParentPreferredID = null;
+
+	/**
+	 * This variable is populated when the user tries to search germplasm list.
+	 */
+	@Transient
+	private String germplasmNamesString = null;
+
 	public Germplasm() {
 		super();
 		this.deleted = false;
@@ -710,5 +771,85 @@ public class Germplasm implements Serializable {
 
 	public void setDeleted(Boolean deleted) {
 		this.deleted = deleted;
+	}
+
+	public String getMethodNumber() {
+		return methodNumber;
+	}
+
+	public void setMethodNumber(final String methodNumber) {
+		this.methodNumber = methodNumber;
+	}
+
+	public String getMethodGroup() {
+		return methodGroup;
+	}
+
+	public void setMethodGroup(final String methodGroup) {
+		this.methodGroup = methodGroup;
+	}
+
+	public String getGermplasmPeferredName() {
+		return germplasmPeferredName;
+	}
+
+	public void setGermplasmPeferredName(final String germplasmPeferredName) {
+		this.germplasmPeferredName = germplasmPeferredName;
+	}
+
+	public String getFemaleParentPreferredName() {
+		return femaleParentPreferredName;
+	}
+
+	public void setFemaleParentPreferredName(final String femaleParentPreferredName) {
+		this.femaleParentPreferredName = femaleParentPreferredName;
+	}
+
+	public String getFemaleParentPreferredID() {
+		return femaleParentPreferredID;
+	}
+
+	public void setFemaleParentPreferredID(final String femaleParentPreferredID) {
+		this.femaleParentPreferredID = femaleParentPreferredID;
+	}
+
+	public String getMaleParentPreferredName() {
+		return maleParentPreferredName;
+	}
+
+	public void setMaleParentPreferredName(final String maleParentPreferredName) {
+		this.maleParentPreferredName = maleParentPreferredName;
+	}
+
+	public String getMaleParentPreferredID() {
+		return maleParentPreferredID;
+	}
+
+	public void setMaleParentPreferredID(final String maleParentPreferredID) {
+		this.maleParentPreferredID = maleParentPreferredID;
+	}
+
+	public String getMethodCode() {
+		return methodCode;
+	}
+
+	public void setMethodCode(final String methodCode) {
+		this.methodCode = methodCode;
+	}
+
+	public String getGermplasmPeferredId() {
+		return germplasmPeferredId;
+	}
+
+	public void setGermplasmPeferredId(final String germplasmPeferredId) {
+		this.germplasmPeferredId = germplasmPeferredId;
+	}
+
+	public String getGermplasmNamesString() {
+		return germplasmNamesString;
+	}
+
+	public void setGermplasmNamesString(final String germplasmNamesString) {
+		this.germplasmNamesString = germplasmNamesString;
 	}
 }

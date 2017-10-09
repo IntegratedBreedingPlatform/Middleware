@@ -57,14 +57,24 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String QUERY_FROM_GERMPLASM = ") query from Germplasm: ";
 	private static final String GERMPLASM_NOT_DELETED_CLAUSE = " AND  g.deleted = 0  AND g.grplce = 0 ";
 	private static final String STATUS_DELETED = "9";
-	private static final String STOCK_IDS = "stockIDs";
 	private static final String GERMPLSM = "germplsm";
 	private static final String Q_NO_SPACES = "qNoSpaces";
 	private static final String Q_STANDARDIZED = "qStandardized";
-	private static final String AVAIL_LOTS = "availableLots";
-	private static final String AVAIL_BALANCE = "availableBalance";
-	private static final String METHOD_NAME = "methodName";
-	private static final String LOCATION_NAME = "locationName";
+	public static final String STOCK_IDS = "stockIDs";
+	public static final String AVAIL_LOTS = "availableLots";
+	public static final String AVAIL_BALANCE = "availableBalance";
+	public static final String METHOD_NAME = "methodName";
+	public static final String LOCATION_NAME = "locationName";
+	public static final String METHOD_ABBREVIATION = "methodAbbreviation";
+	public static final String METHOD_NUMBER = "methodNumber";
+	public static final String METHOD_GROUP = "methodGroup";
+	public static final String PREFERRED_NAME = "preferredName";
+	public static final String PREFERRED_ID = "preferredId";
+	public static final String FEMALE_PARENT_ID = "femaleParentPreferredId";
+	public static final String FEMALE_PARENT_PREFERRED_NAME = "femaleParentPreferredName";
+	public static final String MALE_PARENT_ID = "maleParentPreferredId";
+	public static final String MALE_PARENT_PREFERRED_NAME = "maleParentPreferredName";
+
 	// Prevent silly searches from resulting in GIANT IN clauses in search query (which reuses this function).
 	// Old search query had the same hardcoded limit of 5000 anyway so this is not changing existing logic as such. Applies to both
 	// count and search queries. In future we can detect that the search is resulting in more than 5000 matches and go back to the
@@ -72,6 +82,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String LIMIT_CLAUSE = " LIMIT 5000 ";
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDAO.class);
+	private static final java.lang.String NAMES = "names";
 
 	@Override
 	public Germplasm getById(final Integer gid, final boolean lock)  {
@@ -872,12 +883,70 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			final StringBuilder queryString = new StringBuilder();
 			queryString
-					.append("SELECT g.*, " + "GROUP_CONCAT(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR ', ') AS stockIDs, "
-							+ "COUNT(DISTINCT gt.lotid) AS availableLots, SUM(gt.trnqty) AS availableBalance," + "m.mname AS methodName, l.lname AS locationName FROM germplsm g "
-							+ "LEFT JOIN ims_lot gl ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 "
-							+ "LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid AND gt.trnstat <> 9  "
-							+ "LEFT JOIN methods m ON m.mid = g.methn " + "LEFT JOIN location l ON l.locid = g.glocn "
+					.append("SELECT g.*, \n"
+							+ " Group_concat(DISTINCT allNames.nval ORDER BY allNames.nval SEPARATOR" + "       ', ')\n"
+							+ "                                   AS names,"
+							+ "       Group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR \n"
+							+ "       ', ') \n" + "                                   AS stockIDs, \n"
+							+ "       Count(DISTINCT gt.lotid)    AS availableLots, \n"
+							+ "       Sum(gt.trnqty)              AS availableBalance, \n"
+							+ "       m.mname                     AS methodName, \n"
+							+ "       l.lname                     AS locationName, \n"
+							+ "       m.mcode                     AS methodAbbreviation, \n"
+							+ "       m.mid                       AS methodNumber, \n"
+							+ "       m.mgrp                      AS methodGroup, \n"
+							+ "       nameOfGermplasm.nval        AS preferredName, \n"
+							+ "       preferredIdOfGermplasm.nval AS preferredID, \n"
+							+ "       CASE \n"
+							+ "         WHEN g.gnpgs >= 2 \n"
+							+ "              AND g.gpid1 IS NOT NULL \n"
+							+ "              AND g.gpid1 <> 0 THEN g.gpid1 \n"
+							+ "         ELSE '-' \n"
+							+ "       END                         AS femaleParentPreferredId,\n"
+							+ "       CASE \n"
+							+ "         WHEN g.gnpgs >= 2 \n"
+							+ "              AND g.gpid1 IS NOT NULL \n"
+							+ "              AND g.gpid1 <> 0 THEN nameOfFemaleParent.nval \n"
+							+ "         ELSE '-' \n"
+							+ "       END                         AS femaleParentPreferredName,\n"
+							+ "        CASE \n"
+							+ "         WHEN g.gnpgs >= 2 \n"
+							+ "              AND g.gpid2 IS NOT NULL \n"
+							+ "              AND g.gpid2 <> 0 THEN g.gpid2 \n"
+							+ "         ELSE '-' \n"
+							+ "       END                         AS maleParentPreferredId,\n"
+							+ "       CASE \n"
+							+ "         WHEN g.gnpgs >= 2 \n"
+							+ "              AND g.gpid2 IS NOT NULL \n"
+							+ "              AND g.gpid2 <> 0 THEN nameOfMaleParent.nval \n"
+							+ "         ELSE '-' \n"
+							+ "       END                         AS maleParentPreferredName \n"
+							+ "FROM   germplsm g \n"
+							+ "       LEFT JOIN ims_lot gl \n"
+							+ "              ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 \n"
+							+ "       LEFT JOIN ims_transaction gt \n"
+							+ "              ON gt.lotid = gl.lotid AND gt.trnstat <> 9 \n"
+							+ "       LEFT JOIN methods m \n"
+							+ "              ON m.mid = g.methn \n"
+							+ "       LEFT JOIN location l \n"
+							+ "              ON l.locid = g.glocn \n"
+							+ "       LEFT JOIN `names` allNames  \n"
+							+ "              ON g.gid = allNames.gid \n"
+							+ "       LEFT JOIN `names` nameOfGermplasm \n"
+							+ "              ON g.gid = nameOfGermplasm.gid \n"
+							+ "                 AND nameOfGermplasm.nstat = 1 \n"
+							+ "       LEFT JOIN `names` preferredIdOfGermplasm \n"
+							+ "              ON g.gid = preferredIdOfGermplasm.gid \n"
+							+ "                 AND preferredIdOfGermplasm.nstat = 8 \n"
+							+ "       LEFT JOIN `names` nameOfFemaleParent \n"
+							+ "              ON g.gpid1 = nameOfFemaleParent.gid \n"
+							+ "                 AND nameOfFemaleParent.nstat = 1 \n"
+							+ "       LEFT JOIN `names` nameOfMaleParent \n"
+							+ "              ON g.gpid2 = nameOfMaleParent.gid \n"
+							+ "                 AND nameOfMaleParent.nstat = 1 \n"
 							+ "WHERE g.gid IN (:gids) GROUP BY g.gid");
+
+
 
 			queryString.append(this.addSortingColumns(germplasmSearchParameter.getSortState()));
 
@@ -889,6 +958,16 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			query.addScalar(GermplasmDAO.AVAIL_BALANCE);
 			query.addScalar(GermplasmDAO.METHOD_NAME);
 			query.addScalar(GermplasmDAO.LOCATION_NAME);
+			query.addScalar(GermplasmDAO.METHOD_ABBREVIATION);
+			query.addScalar(GermplasmDAO.METHOD_NUMBER);
+			query.addScalar(GermplasmDAO.METHOD_GROUP);
+			query.addScalar(GermplasmDAO.PREFERRED_NAME);
+			query.addScalar(GermplasmDAO.PREFERRED_ID);
+			query.addScalar(GermplasmDAO.FEMALE_PARENT_ID);
+			query.addScalar(GermplasmDAO.FEMALE_PARENT_PREFERRED_NAME);
+			query.addScalar(GermplasmDAO.MALE_PARENT_ID);
+			query.addScalar(GermplasmDAO.MALE_PARENT_PREFERRED_NAME);
+			query.addScalar(GermplasmDAO.NAMES);
 			query.setFirstResult(startingRow);
 			query.setMaxResults(noOfEntries);
 
@@ -939,8 +1018,18 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		inventoryInfo.setActualInventoryLotCount(row[2] != null ? ((BigInteger) row[2]).intValue() : 0);
 		inventoryInfo.setTotalAvailableBalance(row[3] != null ? (Double) row[3] : 0d);
 		germplasm.setInventoryInfo(inventoryInfo);
-		germplasm.setMethodName(row[4] != null ? (String) row[4] : "");
-		germplasm.setLocationName(row[5] != null ? (String) row[5] : "");
+		germplasm.setMethodName(row[4] != null ? String.valueOf(row[4]) : "");
+		germplasm.setLocationName(row[5] != null ? String.valueOf(row[5]) : "");
+		germplasm.setMethodCode(row[6] != null ? String.valueOf(row[6]) : "");
+		germplasm.setMethodNumber(row[7] != null ? String.valueOf(row[7]) : "");
+		germplasm.setMethodGroup(row[8] != null ? String.valueOf(row[8]) : "");
+		germplasm.setGermplasmPeferredName(row[9] != null ? String.valueOf(row[9]) : "");
+		germplasm.setGermplasmPeferredId(row[10] != null ? String.valueOf(row[10]) : "");
+		germplasm.setFemaleParentPreferredID(row[11] != null ?  String.valueOf(row[11]) : "");
+		germplasm.setFemaleParentPreferredName(row[12] != null ? String.valueOf(row[12]) : "");
+		germplasm.setMaleParentPreferredID(row[13] != null ? String.valueOf(row[13]) : "");
+		germplasm.setMaleParentPreferredName(row[14] != null ? String.valueOf(row[14]) : "");
+		germplasm.setGermplasmNamesString(row[15] != null ? String.valueOf(row[15]) : "");
 		return germplasm;
 	}
 
