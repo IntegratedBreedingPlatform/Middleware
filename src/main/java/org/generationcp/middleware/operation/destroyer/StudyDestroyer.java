@@ -25,44 +25,14 @@ public class StudyDestroyer extends Destroyer {
 	public void deleteStudy(int studyId) throws MiddlewareQueryException {
 		DmsProject study = this.getDmsProjectDao().getById(studyId);
 		this.renameStudyAndDatasets(study);
-
-		if (study.getProperties() != null && !study.getProperties().isEmpty()) {
-			this.updateStudyStatusToDeleted(study);
-		}
-
+		this.updateStudyStatusToDeleted(study);
 		this.deleteRelationshipsIfNotAStudy(study);
 	}
 
 	private void updateStudyStatusToDeleted(DmsProject study) throws MiddlewareQueryException {
-		int maxRank = 0;
-		boolean found = false;
-		for (ProjectProperty property : study.getProperties()) {
-			if (property.getVariableId().equals(TermId.STUDY_STATUS.getId())) {
-				found = true;
-				if (property.getValue() == null || !property.getValue().equals(String.valueOf(TermId.DELETED_STUDY.getId()))) {
-					property.setValue(String.valueOf(TermId.DELETED_STUDY.getId()));
-					this.getProjectPropertyDao().saveOrUpdate(property);
-				}
-				break;
-			}
-			if (property.getRank() != null && property.getRank() > maxRank) {
-				maxRank = property.getRank();
-			}
-		}
-		if (!found) {
-			// create a study status using the maxRank
-			VariableTypeList typeList = new VariableTypeList();
-			StandardVariable statusDeletedTerm = new StandardVariable();
-			statusDeletedTerm.setId(TermId.STUDY_STATUS.getId());
-			statusDeletedTerm.setPhenotypicType(PhenotypicType.STUDY);
-			DMSVariableType type =
-					new DMSVariableType(TermId.STUDY_STATUS.name(), TermId.STUDY_STATUS.name(), statusDeletedTerm, maxRank + 1);
-			typeList.add(type);
-			VariableList varList = new VariableList();
-			Variable var = new Variable(type, TermId.DELETED_STUDY.getId());
-			varList.add(var);
-
-			this.getProjectPropertySaver().saveProjectProperties(study, typeList, varList);
+		if (null != study) {
+			study.setDeleted(true);
+			this.getDmsProjectDao().save(study);
 		}
 	}
 
@@ -83,6 +53,7 @@ public class StudyDestroyer extends Destroyer {
 		if (datasets != null) {
 			for (DmsProject dataset : datasets) {
 				dataset.setName(dataset.getName() + "#" + tstamp);
+				dataset.setDeleted(true);
 				this.getDmsProjectDao().save(dataset);
 			}
 		}

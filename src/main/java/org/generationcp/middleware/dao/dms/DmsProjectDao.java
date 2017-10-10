@@ -67,24 +67,20 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private static final Integer LOCATION_ID = Integer.valueOf(TermId.LOCATION_ID.getId());
 
-	private static final int DELETED_STUDY = TermId.DELETED_STUDY.getId();
-
 	private static final int STUDY_STATUS = TermId.STUDY_STATUS.getId();
 
 	private static final String PROGRAM_UUID = "program_uuid";
-
 	private static final String VALUE = "value";
-
 	private static final String TYPE_ID = "typeId";
-
 	private static final String PROJECT_ID = "projectId";
-
 	private static final String VARIABLE_ID = "variableId";
-	
+	private static final String DELETED = "deleted";
+	private static final int DELETED_STUDY = 1;
+
 	private static final int START_DATE = TermId.START_DATE.getId();
 
 	/**
-	 * Type of study and whether study is deleted are stored in projectprops table.
+	 * Type of study is stored in projectprops table.
 	 * Which folder the study is in, is defined in the project_relationship table.
 	 */
 	static final String GET_CHILDREN_OF_FOLDER =
@@ -97,7 +93,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					+ "	LEFT OUTER JOIN projectprop prop ON prop.project_id = subject.project_id AND prop.variable_id = " + TermId.STUDY_TYPE.getId()
 					+ "    WHERE (pr.type_id = " + TermId.HAS_PARENT_FOLDER.getId() + " or pr.type_id = " + TermId.IS_STUDY.getId() + ")"
 					+ "		AND pr.object_project_id = :folderId "
-					+ "     AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.variable_id = " + TermId.STUDY_STATUS.getId() + " AND pp.project_id = subject.project_id AND pp.value = " + TermId.DELETED_STUDY.getId() + ") "
+					+ "     AND NOT EXISTS (SELECT 1 FROM project p WHERE p.project_id = subject.project_id AND p.deleted = " + DELETED_STUDY + ")"
 					+ "     AND (subject.program_uuid = :program_uuid OR subject.program_uuid IS NULL) "
 					+ "     AND (prop.value in (:studyTypeIds) or prop.value IS NULL)"  // the OR here for value = null is required for folders.
 					+ "	ORDER BY name";
@@ -105,8 +101,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final String GET_STUDIES_OF_FOLDER = "SELECT  DISTINCT pr.subject_project_id "
 			+ "FROM    project_relationship pr, project p " + "WHERE   pr.type_id = " + TermId.IS_STUDY.getId() + " "
 			+ "        AND pr.subject_project_id = p.project_id " + "        AND pr.object_project_id = :folderId "
-			+ "		AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.variable_id = " + TermId.STUDY_STATUS.getId()
-			+ "     	AND pp.project_id = p.project_id AND pp.value = " + "         " + TermId.DELETED_STUDY.getId() + ") "
+			+ "		AND p.deleted != " + DELETED_STUDY + " "
 			+ "ORDER BY p.name ";
 
 	private static final String GET_ALL_FOLDERS = "SELECT pr.object_project_id, pr.subject_project_id, p.name, p.description "
@@ -116,8 +111,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final String GET_ALL_PROGRAM_STUDIES_AND_FOLDERS = "SELECT pr.subject_project_id "
 			+ "FROM project_relationship pr, project p " + "WHERE pr.type_id = " + TermId.IS_STUDY.getId() + " "
 			+ "AND pr.subject_project_id = p.project_id " + "AND p.program_uuid = :program_uuid "
-			+ "AND NOT EXISTS (SELECT 1 FROM projectprop pp WHERE pp.variable_id = " + TermId.STUDY_STATUS.getId() + " "
-			+ "AND pp.project_id = p.project_id AND pp.value = " + TermId.DELETED_STUDY.getId() + ") "
+			+ "AND p.deleted != " + DELETED_STUDY + "  "
 			+ "UNION SELECT pr.subject_project_id " + "FROM project_relationship pr, project p " + "WHERE pr.type_id = "
 			+ TermId.HAS_PARENT_FOLDER.getId() + " " + "AND pr.subject_project_id = p.project_id " + "AND p.program_uuid = :program_uuid ";
 
@@ -602,9 +596,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		.append("INNER JOIN  projectprop ppNursery ON ip.project_id = ppNursery.project_id ")
 		.append("AND ppNursery.variable_id = " + TermId.STUDY_TYPE.getId() + " ")
 		.append( "AND ppNursery.value = " + studyType.getId() + " ")
-		.append("WHERE ip.project_id NOT IN (SELECT project_id FROM projectprop ppDeleted WHERE ") 
-		.append("ppDeleted.variable_id = " + TermId.STUDY_STATUS.getId() + " ")
-		.append("AND ppDeleted.value = " + TermId.DELETED_STUDY.getId() + " )")
+		.append("WHERE ip.deleted != " + DELETED_STUDY + "  ")
 		.append("AND ip.program_uuid = :" + DmsProjectDao.PROGRAM_UUID + " ")
 		.append("OR ip.program_uuid IS NULL ")
 		.append("ORDER BY ip.name ");
@@ -776,10 +768,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append("       LEFT JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
 			.append("       LEFT JOIN nd_geolocationprop gpSiteName ON e.nd_geolocation_id = gpSiteName.nd_geolocation_id ")
 			.append("           AND gpSiteName.type_id =  ").append(TermId.TRIAL_LOCATION.getId()).append(" ")
-			.append("WHERE p.project_id NOT IN (SELECT project_id FROM projectprop ppDeleted WHERE ppDeleted.variable_id =  ")
-			.append(TermId.STUDY_STATUS.getId()).append(" ")
-			.append("               AND ppDeleted.value =  ")
-			.append(TermId.DELETED_STUDY.getId()).append(") ").append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID)
+			.append("WHERE p.deleted != " + DELETED_STUDY + " ")
+			.append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID)
 			.append(" = :").append(DmsProjectDao.PROGRAM_UUID).append(" ").append("   OR p.")
 			.append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ");
 
@@ -812,9 +802,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append("INNER JOIN  projectprop ppStudy ON ip.project_id = ppStudy.project_id ")
 			.append("AND ppStudy.variable_id = " + TermId.STUDY_TYPE.getId() + " ")
 			.append( "AND ppStudy.value IN (" + TermId.NURSERY.getId() + "," + TermId.TRIAL.getId() + ")")
-			.append("WHERE ip.project_id NOT IN (SELECT project_id FROM projectprop ppDeleted WHERE ") 
-			.append("ppDeleted.variable_id = " + TermId.STUDY_STATUS.getId() + " ")
-			.append("AND ppDeleted.value = " + TermId.DELETED_STUDY.getId() + " )")
+			.append("WHERE ip.deleted != " + DELETED_STUDY + " ")
 			.append("AND ip.program_uuid = :" + DmsProjectDao.PROGRAM_UUID + " ")
 			.append("OR ip.program_uuid IS NULL ")
 			.append("ORDER BY ip.name ");
@@ -935,13 +923,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.append(TermId.TRIAL_LOCATION.getId())
 			.append(" ")
 			// 8180
-			.append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.variable_id =  ")
-			.append(TermId.STUDY_STATUS.getId())
-			.append(" ")
-			// 8006
-			.append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ")
-			.append(TermId.DELETED_STUDY.getId()).append(") ")
-			// 12990
+			.append("WHERE p.deleted != " + DELETED_STUDY + " ")
 			.append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID).append(" = :").append(DmsProjectDao.PROGRAM_UUID)
 			.append(" ").append("   OR p.").append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ");
 
@@ -981,10 +963,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.append("   INNER JOIN nd_experiment e ON ep.nd_experiment_id = e.nd_experiment_id ")
 				.append("   LEFT JOIN nd_geolocationprop gpSeason ON e.nd_geolocation_id = gpSeason.nd_geolocation_id ")
 				.append("           AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ")
-				.append("WHERE NOT EXISTS (SELECT 1 FROM projectprop ppDeleted WHERE ppDeleted.variable_id =  ")
-				.append(TermId.STUDY_STATUS.getId()).append(" ")
-				.append("               AND ppDeleted.project_id = p.project_id AND ppDeleted.value =  ")
-				.append(TermId.DELETED_STUDY.getId()).append(") ").append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID)
+				.append("WHERE p.deleted != " + DELETED_STUDY + " ")
+				.append("   AND (p.").append(DmsProjectDao.PROGRAM_UUID)
 				.append(" = :").append(DmsProjectDao.PROGRAM_UUID).append(" ").append("   OR p.")
 				.append(DmsProjectDao.PROGRAM_UUID).append(" IS NULL) ");
 		List<Object[]> list = null;
@@ -1178,11 +1158,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		criteria.createAlias("properties", "pr");
 		criteria.add(Restrictions.eq("pr.variableId", TermId.STUDY_TYPE.getId()));
 
-		final DetachedCriteria inactive = DetachedCriteria.forClass(ProjectProperty.class);
-		inactive.add(Restrictions.eq(DmsProjectDao.VARIABLE_ID, Integer.valueOf(DmsProjectDao.STUDY_STATUS)));
-		inactive.add(Restrictions.eq(DmsProjectDao.VALUE, String.valueOf(DmsProjectDao.DELETED_STUDY)));
-		inactive.setProjection(Projections.property("project.projectId"));
-		criteria.add(Property.forName(DmsProjectDao.PROJECT_ID).notIn(inactive));
+		criteria.add(Restrictions.ne(DmsProjectDao.DELETED, DmsProjectDao.DELETED_STUDY));
 
 		if (parameters.containsKey(StudyFilters.PROGRAM_ID)) {
 			criteria.add(Restrictions.eq(StudyFilters.PROGRAM_ID.getParameter(), parameters.get(StudyFilters.PROGRAM_ID)));
