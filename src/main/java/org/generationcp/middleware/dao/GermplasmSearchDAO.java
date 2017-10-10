@@ -45,6 +45,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String Q_STANDARDIZED = "qStandardized";
 
 	private static final String NAMES = "names";
+	public static final String GID = "GID";
+	public static final String GROUP_ID = "GROUP ID";
 	public static final String STOCK_IDS = "STOCKID";
 	public static final String AVAIL_LOTS = "LOTS";
 	public static final String AVAIL_BALANCE = "AVAILABLE";
@@ -89,6 +91,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			query.addEntity(GermplasmSearchDAO.GERMPLSM, Germplasm.class);
 			query.addScalar(GermplasmSearchDAO.NAMES);
 			query.addScalar(GermplasmSearchDAO.STOCK_IDS);
+			query.addScalar(GermplasmSearchDAO.GID);
+			query.addScalar(GermplasmSearchDAO.GROUP_ID);
 			query.addScalar(GermplasmSearchDAO.AVAIL_LOTS);
 			query.addScalar(GermplasmSearchDAO.AVAIL_BALANCE);
 			query.addScalar(GermplasmSearchDAO.METHOD_NAME);
@@ -350,7 +354,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		selectClauseColumnsMap.put(METHOD_GROUP, String.format("m.mgrp AS `%s` \n", METHOD_GROUP));
 		selectClauseColumnsMap.put(PREFERRED_ID, String.format("preferredIdOfGermplasm.nval AS `%s` \n", PREFERRED_ID));
 		selectClauseColumnsMap.put(PREFERRED_NAME, String.format("nameOfGermplasm.nval AS `%s` \n", PREFERRED_NAME));
-		selectClauseColumnsMap.put(GERMPLASM_DATE, String.format("g.date AS `%s` \n", GERMPLASM_DATE));
+		selectClauseColumnsMap.put(GERMPLASM_DATE, String.format("g.gdate AS `%s` \n", GERMPLASM_DATE));
 		selectClauseColumnsMap.put(FEMALE_PARENT_ID, String.format(
 				"       CASE \n" + "         WHEN g.gnpgs >= 2 \n" + "              AND g.gpid1 IS NOT NULL \n"
 						+ "              AND g.gpid1 <> 0 THEN g.gpid1 \n" + "         ELSE '-' \n"
@@ -372,9 +376,13 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		selectClause.append("SELECT g.*, \n" + " Group_concat(DISTINCT allNames.nval ORDER BY allNames.nval SEPARATOR" + "       ', ')\n"
 				+ "                                   AS names,"
 				+ "       Group_concat(DISTINCT gt.inventory_id ORDER BY gt.inventory_id SEPARATOR \n" + "       ', ') \n"
-				+ "                                   AS `" + STOCK_IDS + "`, \n" + "       Count(DISTINCT gt.lotid)    AS `" + AVAIL_LOTS
-				+ "`, \n" + "       Sum(gt.trnqty)              AS `" + AVAIL_BALANCE + "`, \n" + "       m.mname                     AS `"
-				+ METHOD_NAME + "`, \n" + "       l.lname                     AS `" + LOCATION_NAME + "` \n");
+				+ "                                   AS `" + STOCK_IDS + "`, \n"
+				+ "       g.gid                     AS `" + GID + "`, \n"
+				+ "       g.mgid                     AS `" + GROUP_ID + "`, \n"
+				+ "       Count(DISTINCT gt.lotid)    AS `" + AVAIL_LOTS + "`, \n"
+				+ "       Sum(gt.trnqty)              AS `" + AVAIL_BALANCE + "`, \n"
+				+ "       m.mname                     AS `" + METHOD_NAME + "`, \n"
+				+ "       l.lname                     AS `" + LOCATION_NAME + "` \n");
 
 		for (String propertyId : addedColumnsPropertyIds) {
 			if (selectClauseColumnsMap.containsKey(propertyId)) {
@@ -421,11 +429,11 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		final GermplasmInventory inventoryInfo = new GermplasmInventory(germplasm.getGid());
 		germplasm.setGermplasmNamesString(row[1] != null ? String.valueOf(row[1]) : "");
 		inventoryInfo.setStockIDs((String) row[2]);
-		inventoryInfo.setActualInventoryLotCount(row[3] != null ? ((BigInteger) row[3]).intValue() : 0);
-		inventoryInfo.setTotalAvailableBalance(row[4] != null ? (Double) row[4] : 0d);
+		inventoryInfo.setActualInventoryLotCount(row[5] != null ? ((BigInteger) row[5]).intValue() : 0);
+		inventoryInfo.setTotalAvailableBalance(row[6] != null ? (Double) row[6] : 0d);
 		germplasm.setInventoryInfo(inventoryInfo);
-		germplasm.setMethodName(row[5] != null ? String.valueOf(row[5]) : "");
-		germplasm.setLocationName(row[6] != null ? String.valueOf(row[6]) : "");
+		germplasm.setMethodName(row[7] != null ? String.valueOf(row[7]) : "");
+		germplasm.setLocationName(row[8] != null ? String.valueOf(row[8]) : "");
 
 		germplasm.setGermplasmDate(getValueOfAddedColumns(GERMPLASM_DATE, row, addedColumnsPropertyIds));
 		germplasm.setMethodCode(getValueOfAddedColumns(METHOD_ABBREVIATION, row, addedColumnsPropertyIds));
@@ -443,7 +451,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
 	protected String getValueOfAddedColumns(String propertyId, final Object[] row, final List<String> addedColumnsPropertyIds) {
 
-		int addedColumnIndex = (addedColumnsPropertyIds.indexOf(propertyId) + 7);
+		int addedColumnIndex = (addedColumnsPropertyIds.indexOf(propertyId) + 9);
 
 		return row[addedColumnIndex] != null ? String.valueOf(row[addedColumnIndex]) : "";
 

@@ -1,12 +1,14 @@
 
 package org.generationcp.middleware.domain.gms.search;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.NullArgumentException;
 import org.generationcp.middleware.manager.Operation;
 
 /*
@@ -124,11 +126,14 @@ public class GermplasmSearchParameter {
 	}
 
 	public void setAddedColumnsPropertyIds(final List<String> addedColumnsPropertyIds) {
+		if (addedColumnsPropertyIds == null) {
+			throw new NullArgumentException("addedColumnsPropertyIds must not be null");
+		}
 		this.addedColumnsPropertyIds = addedColumnsPropertyIds;
 	}
 
 	public List<String> getAddedColumnsPropertyIds() {
-		return this.addedColumnsPropertyIds;
+		return Collections.unmodifiableList(this.addedColumnsPropertyIds);
 	}
 
 	/**
