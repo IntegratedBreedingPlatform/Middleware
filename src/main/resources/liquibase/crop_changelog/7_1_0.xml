@@ -65,4 +65,79 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="nahuel" id="v7.1.0-2" >
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="project_details"/>
+			</not>
+		</preConditions>
+		<createTable tableName="project_details">
+			<column name="project_details_id" type="INT" autoIncrement="true">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="deleted" type="TINYINT(1) UNSIGNED ZEROFILL" defaultValue="0">
+				<constraints nullable="false"/>
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v7.1.0-3" >
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="project" columnName="project_details_id"/>
+			</not>
+		</preConditions>
+		<addColumn tableName="project">
+			<column name="project_details_id" type="INT" >
+				<constraints foreignKeyName="fk_project_details_id"
+							 nullable="true"
+							 referencedTableName="project_details"
+							 referencedColumnNames="project_details_id"
+							 deleteCascade="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v7.1.0-4" >
+		<sql dbms="mysql" splitStatements="true">
+			DROP procedure IF EXISTS update_project_details_with_deleted_studies;
+		</sql>
+		<sql dbms="mysql" splitStatements="false">
+			CREATE PROCEDURE update_project_details_with_deleted_studies ()
+			  BEGIN
+
+				DECLARE projectId INT;
+				DECLARE updateDone INT DEFAULT 0;
+
+				DECLARE cur1 CURSOR FOR
+				  SELECT p.project_id
+				  FROM projectprop pp
+					INNER JOIN project p ON pp.project_id = p.project_id
+				  WHERE pp.variable_id = 8006 AND value = 12990;
+
+				DECLARE CONTINUE HANDLER FOR SQLSTATE '02000' SET updateDone = 1;
+
+				OPEN cur1;
+				read_loop: LOOP FETCH cur1
+				INTO projectId;
+
+				  IF updateDone = 1
+				  THEN
+					LEAVE read_loop;
+				  END IF;
+
+				  INSERT INTO project_details (deleted) VALUES (1);
+				  SET @id = LAST_INSERT_ID();
+				  UPDATE project SET project_details_id = @id WHERE project_id = projectId;
+
+				END LOOP read_loop;
+
+			  END
+		</sql>
+		<sql dbms="mysql" splitStatements="true">
+			CALL update_project_details_with_deleted_studies();
+			DROP PROCEDURE update_project_details_with_deleted_studies;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
